@@ -3,6 +3,8 @@ package com.zutubi.validation;
 import junit.framework.TestCase;
 import com.zutubi.validation.mock.MockAnimal;
 import com.zutubi.validation.mock.MockWallet;
+import com.zutubi.validation.providers.AnnotationValidatorProvider;
+import com.zutubi.validation.providers.ReflectionValidatorProvider;
 
 import java.util.List;
 import java.util.Arrays;
@@ -20,6 +22,8 @@ public class DefaultValidationManagerTest extends TestCase
         super.setUp();
 
         validationManager = new DefaultValidationManager();
+        validationManager.addValidatorProvider(new AnnotationValidatorProvider());
+        validationManager.addValidatorProvider(new ReflectionValidatorProvider());
         validationContext = new DelegatingValidationContext(this);
     }
 

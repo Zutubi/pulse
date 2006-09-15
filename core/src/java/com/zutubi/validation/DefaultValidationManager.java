@@ -15,9 +15,6 @@ public class DefaultValidationManager implements ValidationManager
 
     public DefaultValidationManager()
     {
-        // configure the default validation provider.
-        providers.add(new AnnotationValidatorProvider());
-        providers.add(new ReflectionValidatorProvider());
     }
 
     public void validate(Object o) throws ValidationException
@@ -27,6 +24,8 @@ public class DefaultValidationManager implements ValidationManager
 
     public void validate(Object o, ValidationContext context) throws ValidationException
     {
+        verify(providers);
+
         // get validators
         List<Validator> validators = new LinkedList<Validator>();
         for (ValidatorProvider provider : providers)
@@ -42,11 +41,32 @@ public class DefaultValidationManager implements ValidationManager
         }
     }
 
+    private void verify(List<ValidatorProvider> providers) throws IllegalArgumentException
+    {
+        if (providers == null || providers.size() == 0)
+        {
+            throw new IllegalArgumentException();
+        }
+    }
+
+    /**
+     * Set the validator providers. These are used to determine which validators should be applied to
+     * the objects being validated.
+     *
+     * @param providers
+     *
+     * @throws IllegalArgumentException
+     */
     public void setProviders(List<ValidatorProvider> providers)
     {
+        verify(providers);
         this.providers = providers;
     }
 
+    /**
+     * Add a validator provider to the existing list of validator providers.
+     * @param provider
+     */
     public void addValidatorProvider(ValidatorProvider provider)
     {
         this.providers.add(provider);

@@ -1,7 +1,5 @@
 package com.zutubi.validation.validators;
 
-import com.zutubi.validation.FieldValidator;
-import com.zutubi.validation.ValidationContext;
 import com.zutubi.validation.ValidationException;
 
 /**
@@ -11,12 +9,17 @@ public class RequiredValidator extends FieldValidatorSupport
 {
     public static final String REQUIRED = ".required";
 
+    public RequiredValidator()
+    {
+
+    }
+
     public void validate(Object obj) throws ValidationException
     {
         Object fieldValue = getFieldValue(getFieldName(), obj);
         if (fieldValue == null)
         {
-            validationContext.addFieldError(getFieldName(), getRequiredErrorText());
+            validationContext.addFieldError(getFieldName(), getMessage());
         }
 
         if (fieldValue instanceof String)
@@ -24,13 +27,33 @@ public class RequiredValidator extends FieldValidatorSupport
             String str = ((String)fieldValue);
             if (str.length() == 0)
             {
-                validationContext.addFieldError(getFieldName(), getRequiredErrorText());
+                validationContext.addFieldError(getFieldName(), getMessage());
             }
         }
     }
 
-    private String getRequiredErrorText()
+    protected Object[] getMessageArgs()
     {
-        return validationContext.getText(getFieldName() + REQUIRED);
+        return new Object[]{getFieldName()};
+    }
+
+    public String getMessageKey()
+    {
+        String messageKey = super.getMessageKey();
+        if (messageKey != null)
+        {
+            return messageKey;
+        }
+        return getFieldName() + REQUIRED;
+    }
+
+    public String getDefaultMessage()
+    {
+        String defaultMessage = super.getDefaultMessage();
+        if (defaultMessage != null)
+        {
+            return defaultMessage;
+        }
+        return validationContext.getText(REQUIRED, getMessageArgs());
     }
 }

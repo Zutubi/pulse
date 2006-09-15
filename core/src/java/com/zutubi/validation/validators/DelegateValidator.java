@@ -67,7 +67,9 @@ public class DelegateValidator extends FieldValidatorSupport
 
         public AppendingValidationContext(ValidationContext parent, Object obj, String field)
         {
-            super(parent, parent, makeTextPovider(obj));
+            this.validationAware = parent;
+            this.localeProvider = parent;
+            this.textProvider = makeTextPovider(obj, parent);
 
             this.fieldName = field;
         }

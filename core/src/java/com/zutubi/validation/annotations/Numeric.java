@@ -11,7 +11,7 @@ import java.lang.annotation.RetentionPolicy;
  * <class-comment/>
  */
 @Constraint(handler = NumericValidator.class)
-@Target({ElementType.METHOD})
+@Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
 public @interface Numeric
 {

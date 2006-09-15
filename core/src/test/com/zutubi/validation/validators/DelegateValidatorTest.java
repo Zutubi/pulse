@@ -6,6 +6,7 @@ import com.zutubi.validation.DefaultValidationManager;
 import com.zutubi.validation.ValidationException;
 import com.zutubi.validation.bean.DefaultObjectFactory;
 import com.zutubi.validation.providers.AnnotationValidatorProvider;
+import com.zutubi.validation.providers.ReflectionValidatorProvider;
 import com.zutubi.validation.mock.MockDoor;
 
 import java.util.Arrays;
@@ -32,6 +33,8 @@ public class DelegateValidatorTest extends FieldValidatorTestCase
         super.setUp();
 
         validationManager = new DefaultValidationManager();
+        validationManager.addValidatorProvider(new AnnotationValidatorProvider());
+        validationManager.addValidatorProvider(new ReflectionValidatorProvider());
         ((DelegateValidator)validator).setValidationManager(validationManager);
     }
 

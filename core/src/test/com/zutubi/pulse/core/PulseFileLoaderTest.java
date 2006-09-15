@@ -15,7 +15,8 @@ public class PulseFileLoaderTest extends PulseTestCase
 
     public void setUp()
     {
-        loader = new PulseFileLoader(new ObjectFactory());
+        loader = new PulseFileLoader();
+        loader.setObjectFactory(new ObjectFactory());
     }
 
     protected void tearDown() throws Exception

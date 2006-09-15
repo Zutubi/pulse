@@ -2,10 +2,9 @@ package com.zutubi.pulse.core;
 
 import com.zutubi.pulse.core.validation.CommandValidationException;
 import com.zutubi.pulse.util.IOUtils;
-import com.zutubi.validation.ValidationManager;
-import com.zutubi.validation.DefaultValidationManager;
-import com.zutubi.validation.DelegatingValidationContext;
-import com.zutubi.validation.ValidationException;
+import com.zutubi.pulse.validation.PulseValidationManager;
+import com.zutubi.pulse.validation.PulseValidationContext;
+import com.zutubi.validation.*;
 import nu.xom.*;
 
 import java.io.File;
@@ -27,14 +26,16 @@ public class FileLoader
     private final Map<String, Class> typeDefinitions = new HashMap<String, Class>();
     private ObjectFactory factory;
 
+    private ValidationManager validationManager;
+
     public FileLoader()
     {
         // For the Spring
     }
 
-    public FileLoader(ObjectFactory factory)
+    public void setValidationManager(ValidationManager validationManager)
     {
-        setObjectFactory(factory);
+        this.validationManager = validationManager;
     }
 
     /**
@@ -233,14 +234,13 @@ public class FileLoader
 
     private void validate(Object obj) throws CommandValidationException, ValidationException
     {
-        ValidationManager validationManager = new DefaultValidationManager();
-        DelegatingValidationContext validationContext = new DelegatingValidationContext(obj);
+        validationManager = new PulseValidationManager();
+        ValidationContext validationContext = new PulseValidationContext(obj);
         validationManager.validate(obj, validationContext);
         if (validationContext.hasErrors())
         {
             throw new CommandValidationException(validationContext);
         }
-
     }
 
     private void loadSubElements(Element e, Object type, boolean resolveReferences, Scope scope, IntrospectionHelper typeHelper, int depth, ResourceRepository resourceRepository, TypeLoadPredicate predicate)

@@ -5,7 +5,7 @@ import java.util.Locale;
 /**
  * <class-comment/>
  */
-public class DefaultLocalProvider implements LocaleProvider
+public class DefaultLocaleProvider implements LocaleProvider
 {
     public Locale getLocale()
     {

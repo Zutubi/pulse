@@ -31,7 +31,8 @@ public class AnyCapableBuildHostRequirements extends AbstractBuildHostRequiremen
             }
         }
 
-        PulseFileLoader fileLoader = new PulseFileLoader(new ObjectFactory());
+        PulseFileLoader fileLoader = new PulseFileLoader();
+        fileLoader.setObjectFactory(new ObjectFactory());
         try
         {
             requirements = fileLoader.loadRequiredResources(request.getRevision().getPulseFile(), request.getRequest().getRecipeName());

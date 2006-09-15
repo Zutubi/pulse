@@ -12,7 +12,7 @@ import java.lang.annotation.RetentionPolicy;
  * <class-comment/>
  */
 @Constraint( handler = DelegateValidator.class )
-@Target({ElementType.METHOD})
+@Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
 public @interface Validate
 {

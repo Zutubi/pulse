@@ -45,7 +45,11 @@ public class RecipeProcessorTest extends PulseTestCase implements EventListener
         recipeProcessor.setEventManager(eventManager);
         events = new LinkedBlockingQueue<Event>(10);
         eventManager.register(this);
-        recipeProcessor.init();
+
+        FileLoader fileLoader = new PulseFileLoader();
+        fileLoader.setObjectFactory(new ObjectFactory());
+        recipeProcessor.setFileLoader(fileLoader);
+        
         recipeProcessor.getFileLoader().register("failure", FailureCommand.class);
         recipeProcessor.getFileLoader().register("exception", ExceptionCommand.class);
         recipeProcessor.getFileLoader().register("unexpected-exception", UnexpectedExceptionCommand.class);

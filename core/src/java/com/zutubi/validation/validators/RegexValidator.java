@@ -32,7 +32,32 @@ public class RegexValidator extends FieldValidatorSupport
         String stringValue = (String) value;
         if (stringValue.length() > 0 && !stringValue.matches(pattern))
         {
-            validationContext.addFieldError(validationContext.getFullFieldName(getFieldName()), getFieldName() + INVALID);
+            validationContext.addFieldError(getFieldName(), getMessage());
         }
+    }
+
+    protected Object[] getMessageArgs()
+    {
+        return new Object[]{getFieldName()};
+    }
+
+    public String getMessageKey()
+    {
+        String messageKey = super.getMessageKey();
+        if (messageKey != null)
+        {
+            return messageKey;
+        }
+        return getFieldName() + INVALID;
+    }
+
+    public String getDefaultMessage()
+    {
+        String defaultMessage = super.getDefaultMessage();
+        if (defaultMessage != null)
+        {
+            return defaultMessage;
+        }
+        return validationContext.getText(INVALID, getMessageArgs());
     }
 }
