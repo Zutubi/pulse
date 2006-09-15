@@ -5,6 +5,7 @@ import com.zutubi.validation.i18n.*;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Collection;
 
 /**
  * <class-comment/>
@@ -71,7 +72,7 @@ public class DelegatingValidationContext implements ValidationContext
         validationAware.addFieldError(field, error);
     }
 
-    public List<String> getActionErrors()
+    public Collection<String> getActionErrors()
     {
         return validationAware.getActionErrors();
     }
@@ -96,9 +97,44 @@ public class DelegatingValidationContext implements ValidationContext
         return validationAware.hasActionErrors();
     }
 
+    public boolean hasFieldError(String field)
+    {
+        return validationAware.hasFieldError(field);
+    }
+
     public Map getFieldErrors()
     {
         return validationAware.getFieldErrors();
+    }
+
+    public void addActionMessage(String message)
+    {
+        validationAware.addActionMessage(message);
+    }
+
+    public Collection<String> getActionMessages()
+    {
+        return validationAware.getActionMessages();
+    }
+
+    public boolean hasActionMessages()
+    {
+        return validationAware.hasActionMessages();
+    }
+
+    public void setActionMessages(Collection<String> messages)
+    {
+        validationAware.setActionMessages(messages);
+    }
+
+    public void setActionErrors(Collection<String> errors)
+    {
+        validationAware.setActionErrors(errors);
+    }
+
+    public void setFieldErrors(Map<String, List<String>> errors)
+    {
+        validationAware.setFieldErrors(errors);
     }
 
     public Locale getLocale()

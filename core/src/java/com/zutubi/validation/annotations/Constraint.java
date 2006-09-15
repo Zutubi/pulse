@@ -14,5 +14,5 @@ import java.lang.annotation.ElementType;
 @Target(ElementType.ANNOTATION_TYPE)
 public @interface Constraint
 {
-    Class<? extends Validator> handler();
+    Class<? extends Validator>[] value();
 }

@@ -138,20 +138,23 @@ public class AnnotationValidatorProvider implements ValidatorProvider
         for (Annotation annotation : constraints)
         {
             Constraint constraint = annotation.annotationType().getAnnotation(Constraint.class);
-            try
+            for (Class validatorClass : constraint.value())
             {
-                Validator validator = objectFactory.buildBean(constraint.handler());
-                AnnotationUtils.setPropertiesFromAnnotation(annotation, validator);
-                if (validator instanceof FieldValidator)
+                try
                 {
-                    ((FieldValidator)validator).setFieldName(descriptor.getName());
+                    Validator validator = objectFactory.buildBean(validatorClass);
+                    AnnotationUtils.setPropertiesFromAnnotation(annotation, validator);
+                    if (validator instanceof FieldValidator)
+                    {
+                        ((FieldValidator)validator).setFieldName(descriptor.getName());
+                    }
+                    validators.add(validator);
                 }
-                validators.add(validator);
-            }
-            catch (Exception e)
-            {
-                // noop.
-                e.printStackTrace();
+                catch (Exception e)
+                {
+                    // noop.
+                    e.printStackTrace();
+                }
             }
         }
         return validators;

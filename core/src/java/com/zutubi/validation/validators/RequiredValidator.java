@@ -1,11 +1,12 @@
 package com.zutubi.validation.validators;
 
 import com.zutubi.validation.ValidationException;
+import com.zutubi.validation.Shortcircuitable;
 
 /**
  * <class-comment/>
  */
-public class RequiredValidator extends FieldValidatorSupport
+public class RequiredValidator extends FieldValidatorSupport implements Shortcircuitable
 {
     public static final String REQUIRED = ".required";
 

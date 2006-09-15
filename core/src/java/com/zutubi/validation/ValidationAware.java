@@ -2,25 +2,40 @@ package com.zutubi.validation;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Collection;
 
 /**
  * <class-comment/>
  */
 public interface ValidationAware
 {
+    void addActionMessage(String message);
+
     void addActionError(String error);
 
     void addFieldError(String field, String error);
 
-    List<String> getActionErrors();
+    Collection<String> getActionMessages();
+
+    Collection<String> getActionErrors();
 
     List<String> getFieldErrors(String field);
+
+    Map<String, List<String>> getFieldErrors();
 
     boolean hasErrors();
 
     boolean hasFieldErrors();
 
+    boolean hasFieldError(String field);
+
     boolean hasActionErrors();
 
-    Map<String, List<String>> getFieldErrors();
+    boolean hasActionMessages();
+
+    void setActionMessages(Collection<String> messages);
+
+    void setActionErrors(Collection<String> errors);
+
+    void setFieldErrors(Map<String, List<String>> errors);
 }

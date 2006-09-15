@@ -11,7 +11,7 @@ import java.lang.annotation.RetentionPolicy;
 /**
  * <class-comment/>
  */
-@Constraint( handler = RegexValidator.class )
+@Constraint(RegexValidator.class)
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
 public @interface Regex

@@ -5,7 +5,7 @@ import com.zutubi.validation.validators.NumericValidator;
 /**
  * <class-comment/>
  */
-@Constraint(handler = NumericValidator.class)
+@Constraint(NumericValidator.class)
 public @interface Max
 {
     @ConstraintProperty("max")

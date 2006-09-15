@@ -34,6 +34,11 @@ public class RecipeProcessor
     {
     }
 
+    public void init()
+    {
+        
+    }
+
     public static String getCommandDirName(int i, CommandResult result)
     {
         // Use the command name because:

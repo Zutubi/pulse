@@ -4,9 +4,7 @@ import junit.framework.TestCase;
 import com.zutubi.validation.bean.DefaultObjectFactory;
 import com.zutubi.validation.Validator;
 import com.zutubi.validation.mock.*;
-import com.zutubi.validation.validators.RequiredValidator;
-import com.zutubi.validation.validators.NumericValidator;
-import com.zutubi.validation.validators.DelegateValidator;
+import com.zutubi.validation.validators.*;
 
 import java.util.List;
 
@@ -83,7 +81,6 @@ public class AnnotationValidatorProviderTest extends TestCase
 
         assertEquals(2, validators.size());
         RequiredValidator r = (RequiredValidator) validators.get(0);
-//        assertEquals("content", r.getFieldName());
 
         // ensure that the readable validator is picked up only once, even through the interface is
         // implemented multiple times.
@@ -92,6 +89,16 @@ public class AnnotationValidatorProviderTest extends TestCase
 
         assertEquals(2, validators.size());
         r = (RequiredValidator) validators.get(0);
-//        assertEquals("content", r.getFieldName());
+    }
+
+    public void testValidatorOrdering()
+    {
+        MockStraightJacket jacket = new MockStraightJacket();
+        List<Validator> validators = provider.getValidators(jacket);
+        assertEquals(4, validators.size());
+        assertTrue(validators.get(0) instanceof RequiredValidator);
+        assertTrue(validators.get(1) instanceof EmailFieldValidator);
+        assertTrue(validators.get(2) instanceof NameValidator);
+        assertTrue(validators.get(3) instanceof RegexValidator);
     }
 }

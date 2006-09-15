@@ -2,6 +2,7 @@ package com.zutubi.validation;
 
 import com.zutubi.validation.providers.AnnotationValidatorProvider;
 import com.zutubi.validation.providers.ReflectionValidatorProvider;
+import com.zutubi.validation.validators.DelegateValidator;
 
 import java.util.List;
 import java.util.LinkedList;
@@ -36,6 +37,22 @@ public class DefaultValidationManager implements ValidationManager
         // run them.
         for (Validator v : validators)
         {
+            // short curcuit is on a per field basis.
+            if (v instanceof FieldValidator)
+            {
+                FieldValidator vf = (FieldValidator) v;
+                if (context.hasFieldError(vf.getFieldName()) && v instanceof Shortcircuitable)
+                {
+                    // short circuit.
+                    continue;
+                }
+            }
+
+            if (v instanceof DelegateValidator)
+            {
+                //TODO: need to fix this, either by wiring or supporting static access to the validation manager.
+                ((DelegateValidator)v).setValidationManager(this);
+            }
             v.setValidationContext(context);
             v.validate(o);
         }
