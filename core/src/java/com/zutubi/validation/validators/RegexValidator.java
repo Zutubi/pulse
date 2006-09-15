@@ -1,7 +1,7 @@
 package com.zutubi.validation.validators;
 
 import com.zutubi.validation.ValidationException;
-import com.zutubi.validation.Shortcircuitable;
+import com.zutubi.validation.ShortCircuitableValidator;
 
 import java.util.regex.Pattern;
 import java.util.regex.Matcher;
@@ -9,13 +9,19 @@ import java.util.regex.Matcher;
 /**
  * <class-comment/>
  */
-public class RegexValidator extends FieldValidatorSupport implements Shortcircuitable
+public class RegexValidator extends FieldValidatorSupport
 {
     private static final String INVALID = ".invalid";
 
     private String pattern = ".";
 
     private boolean caseSensitive = true;
+
+    public RegexValidator()
+    {
+        setDefaultMessageKey(".invalid");
+        setMessageKey("${fieldName}.invalid");
+    }
 
     public void validate(Object obj) throws ValidationException
     {
@@ -83,30 +89,5 @@ public class RegexValidator extends FieldValidatorSupport implements Shortcircui
     public void setCaseSensitive(boolean caseSensitive)
     {
         this.caseSensitive = caseSensitive;
-    }
-
-    protected Object[] getMessageArgs()
-    {
-        return new Object[]{getFieldName()};
-    }
-
-    public String getMessageKey()
-    {
-        String messageKey = super.getMessageKey();
-        if (messageKey != null)
-        {
-            return messageKey;
-        }
-        return getFieldName() + INVALID;
-    }
-
-    public String getDefaultMessage()
-    {
-        String defaultMessage = super.getDefaultMessage();
-        if (defaultMessage != null)
-        {
-            return defaultMessage;
-        }
-        return validationContext.getText(INVALID, getMessageArgs());
     }
 }

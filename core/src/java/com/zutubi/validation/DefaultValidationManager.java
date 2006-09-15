@@ -1,7 +1,5 @@
 package com.zutubi.validation;
 
-import com.zutubi.validation.providers.AnnotationValidatorProvider;
-import com.zutubi.validation.providers.ReflectionValidatorProvider;
 import com.zutubi.validation.validators.DelegateValidator;
 
 import java.util.List;
@@ -41,7 +39,7 @@ public class DefaultValidationManager implements ValidationManager
             if (v instanceof FieldValidator)
             {
                 FieldValidator vf = (FieldValidator) v;
-                if (context.hasFieldError(vf.getFieldName()) && v instanceof Shortcircuitable)
+                if (context.hasFieldError(vf.getFieldName()) && (v instanceof ShortCircuitableValidator) && ((ShortCircuitableValidator)v).isShortCircuit())
                 {
                     // short circuit.
                     continue;

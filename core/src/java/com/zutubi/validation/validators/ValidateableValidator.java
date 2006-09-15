@@ -1,14 +1,12 @@
 package com.zutubi.validation.validators;
 
-import com.zutubi.validation.Validator;
-import com.zutubi.validation.ValidationContext;
 import com.zutubi.validation.Validateable;
-import com.zutubi.validation.Shortcircuitable;
+import com.zutubi.validation.ShortCircuitableValidator;
 
 /**
  * <class-comment/>
  */
-public class ValidateableValidator extends ValidatorSupport implements Shortcircuitable
+public class ValidateableValidator extends ValidatorSupport
 {
     public void validate(Object obj)
     {
