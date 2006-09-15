@@ -9,7 +9,7 @@ import java.lang.annotation.ElementType;
  * <class-comment/>
  */
 @Retention(RetentionPolicy.RUNTIME)
-@Target(ElementType.ANNOTATION_TYPE)
+@Target(ElementType.METHOD)
 public @interface ConstraintProperty
 {
     public String value();

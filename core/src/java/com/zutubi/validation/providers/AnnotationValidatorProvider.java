@@ -31,20 +31,76 @@ public class AnnotationValidatorProvider implements ValidatorProvider
 
     public List<Validator> getValidators(Object obj)
     {
+        return traverse(obj.getClass(), new HashSet());
+    }
+
+    public List<Validator> traverse(Class clazz, Set<Class> checked)
+    {
+        List<Validator> validators = new LinkedList<Validator>();
+
+        if (checked.contains(clazz) || clazz.equals(Object.class))
+        {
+            return validators;
+        }
+
+        // traverse our way up the hierarchy.
+        if (clazz.isInterface())
+        {
+            for (Class interfaceClass : clazz.getInterfaces())
+            {
+                validators.addAll(traverse(interfaceClass, checked));
+            }
+        }
+        else
+        {
+            validators.addAll(traverse(clazz.getSuperclass(), checked));
+        }
+
+        // traverse across the hierarchy
+        for (Class interfaceClass : clazz.getInterfaces())
+        {
+            if (!checked.contains(interfaceClass))
+            {
+                validators.addAll(traverse(interfaceClass, checked));
+            }
+        }
+
+        // analyse the class
+        if (!checked.contains(clazz))
+        {
+            validators.addAll(analyze(clazz));
+            checked.add(clazz);
+        }
+
+        return validators;
+    }
+
+    public List<Validator> analyze(Class clazz)
+    {
         // validators are based on the runtime type of the object, not the runtime state, so we can happily cache
         // the details.
 
         List<Validator> validators = new LinkedList<Validator>();
         try
         {
-            for (PropertyDescriptor descriptor : Introspector.getBeanInfo(obj.getClass(), Object.class).getPropertyDescriptors())
+            Class stopClass = clazz.getSuperclass();
+            for (PropertyDescriptor descriptor : Introspector.getBeanInfo(clazz, stopClass).getPropertyDescriptors())
             {
-                List<Annotation> constraints = new LinkedList<Annotation>();
-                constraints.addAll(constraintsOnMethod(descriptor.getReadMethod()));
-                constraints.addAll(constraintsOnMethod(descriptor.getWriteMethod()));
+                // the property must be readable for us to be able to validate it.
+                Method read = descriptor.getReadMethod();
+                if (read != null)
+                {
+                    List<Annotation> constraints = new LinkedList<Annotation>();
+                    constraints.addAll(constraintsOnMethod(read));
+                    Method write = descriptor.getWriteMethod();
+                    if (write != null)
+                    {
+                        constraints.addAll(constraintsOnMethod(write));
+                    }
 
-                // convert constraints into validators.
-                validators.addAll(validatorsFromConstraints(constraints, descriptor));
+                    // convert constraints into validators.
+                    validators.addAll(validatorsFromConstraints(constraints, descriptor));
+                }
             }
         }
         catch (IntrospectionException e)

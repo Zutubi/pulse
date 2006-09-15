@@ -28,6 +28,32 @@ public class CommandGroupLoadTest extends FileLoaderTestBase
         assertFalse(a.getFailIfNotPresent());
     }
 
+    public void testMissingNestedCommandValidation()
+    {
+        try
+        {
+            loadGroup("command-validation", "noNestedCommand");
+            fail();
+        }
+        catch (PulseException e)
+        {
+            assertTrue(e.getMessage().contains("The command tag requires a nested command."));
+        }
+    }
+
+    public void testMissingNameCommandValidation()
+    {
+        try
+        {
+            loadGroup("name-validation", null);
+            fail();
+        }
+        catch (PulseException e)
+        {
+            assertTrue(e.getMessage().contains("The command tag requires a nested command."));
+        }
+    }
+
     private CommandGroup loadGroup(String name, String commandName) throws PulseException
     {
         PulseFile bf = load(name);

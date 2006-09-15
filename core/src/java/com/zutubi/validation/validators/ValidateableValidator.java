@@ -11,6 +11,12 @@ public class ValidateableValidator extends ValidatorSupport
 {
     public void validate(Object obj)
     {
+        // short circuit this validation.
+        if (validationContext.hasErrors())
+        {
+            return;
+        }
+
         if (Validateable.class.isAssignableFrom(obj.getClass()))
         {
             ((Validateable)obj).validate(getValidationContext());
