@@ -2,11 +2,8 @@ package com.zutubi.pulse.i18n;
 
 import com.zutubi.i18n.DefaultMessageHandler;
 import com.zutubi.i18n.MessageHandler;
-import com.zutubi.i18n.context.XWorkContextResolver;
-import com.zutubi.i18n.context.DefaultContextCache;
-import com.zutubi.i18n.context.Context;
-import com.zutubi.i18n.context.XWorkContext;
 import com.zutubi.i18n.bundle.DefaultBundleManager;
+import com.zutubi.i18n.context.*;
 
 /**
  * <class-comment/>
@@ -20,7 +17,7 @@ public class Messages
         if (handler == null)
         {
             DefaultBundleManager bundleManager = new DefaultBundleManager();
-            bundleManager.addResolver(new XWorkContextResolver());
+            bundleManager.addResolver(new ExtendedClassContextResolver());
             bundleManager.setContextCache(new DefaultContextCache());
             handler = new DefaultMessageHandler(bundleManager);
         }
@@ -31,7 +28,7 @@ public class Messages
     {
         if (!(context instanceof Context))
         {
-            context = new XWorkContext(context);
+            context = new ClassContext(context);
         }
         return getHandler().format(context, key);
     }
@@ -40,7 +37,7 @@ public class Messages
     {
         if (!(context instanceof Context))
         {
-            context = new XWorkContext(context);
+            context = new ClassContext(context);
         }
         return getHandler().format(context, key, arg);
     }
@@ -49,7 +46,7 @@ public class Messages
     {
         if (!(context instanceof Context))
         {
-            context = new XWorkContext(context);
+            context = new ClassContext(context);
         }
         return getHandler().format(context, key, args);
     }

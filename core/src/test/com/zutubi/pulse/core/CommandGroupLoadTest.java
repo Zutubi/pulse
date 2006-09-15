@@ -50,7 +50,7 @@ public class CommandGroupLoadTest extends FileLoaderTestBase
         }
         catch (PulseException e)
         {
-            assertTrue(e.getMessage().contains("The command tag requires a nested command."));
+            assertTrue(e.getMessage().contains("A name must be provided for the command (possibly on a surrounding 'command' tag)."));
         }
     }
 
