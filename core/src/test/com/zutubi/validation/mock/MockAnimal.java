@@ -9,7 +9,7 @@ public class MockAnimal
 {
     private String head;
 
-    @Required
+    @Required(messageKey = "animal.head.required")
     public String getHead()
     {
         return head;

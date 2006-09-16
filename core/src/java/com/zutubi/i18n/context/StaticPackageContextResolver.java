@@ -12,9 +12,14 @@ public class StaticPackageContextResolver implements ContextResolver<PackageCont
 {
     private Map<String, String> bundles = new HashMap<String, String>();
 
+    public void addBundle(String packageName, String bundle)
+    {
+        bundles.put(packageName, bundle);
+    }
+
     public void addBundle(PackageContext context, String bundle)
     {
-        bundles.put(context.getContext(), bundle);
+        addBundle(context.getContext(), bundle);
     }
 
     public String[] resolve(PackageContext context)

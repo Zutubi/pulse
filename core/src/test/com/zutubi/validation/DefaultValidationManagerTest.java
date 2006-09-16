@@ -46,7 +46,7 @@ public class DefaultValidationManagerTest extends TestCase
         List<String> fieldErrors = validationContext.getFieldErrors("head");
         assertNotNull(fieldErrors);
         assertEquals(1, fieldErrors.size());
-        assertEquals("head.required", fieldErrors.get(0));
+        assertEquals("animal.head.required", fieldErrors.get(0));
     }
 
     public void testMockWallet() throws ValidationException

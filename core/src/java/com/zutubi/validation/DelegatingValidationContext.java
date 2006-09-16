@@ -1,6 +1,7 @@
 package com.zutubi.validation;
 
 import com.zutubi.validation.i18n.*;
+import com.zutubi.pulse.i18n.MessagesTextProvider;
 
 import java.util.List;
 import java.util.Locale;
@@ -50,7 +51,10 @@ public class DelegatingValidationContext implements ValidationContext
         {
             return (TextProvider) obj;
         }
-        return new DefaultTextProvider(localeProvider);
+        // this is no good.... we need a text provider that behaves in the same way as the
+        // systems text provider, ie our MessageTextProvider... but how do we inject it?
+        return new MessagesTextProvider(obj);
+//        return new DefaultTextProvider(localeProvider);
     }
 
     public ValidationAware makeValidationAware(Object o)

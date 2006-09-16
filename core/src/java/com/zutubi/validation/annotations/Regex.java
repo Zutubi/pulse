@@ -17,4 +17,13 @@ import java.lang.annotation.RetentionPolicy;
 public @interface Regex
 {
     public String pattern();
+
+    public static final String DEFAULT_messageKey = "";
+
+    public static final String DEFAULT_defaultMessage = "";
+
+    public String messageKey() default DEFAULT_messageKey;
+
+    public String defaultMessage() default DEFAULT_defaultMessage;
+
 }

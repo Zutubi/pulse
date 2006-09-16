@@ -53,7 +53,7 @@ public abstract class FieldValidatorSupport extends ValidatorSupport implements 
         if (messageKey != null)
         {
             messageKey = messageKey.replace("${fieldName}", getFieldName());
-            message = validationContext.getText(messageKey);
+            message = validationContext.getText(messageKey, getMessageArgs());
             if (message == null)
             {
                 message = determineDefaultMessage();
@@ -82,7 +82,7 @@ public abstract class FieldValidatorSupport extends ValidatorSupport implements 
             if (defaultMessageKey != null)
             {
                 defaultMessageKey = defaultMessageKey.replace("${fieldName}", getFieldName());
-                defaultMessage = validationContext.getText(defaultMessageKey);
+                defaultMessage = validationContext.getText(defaultMessageKey, getMessageArgs());
             }
             if (defaultMessage == null)
             {

@@ -16,4 +16,11 @@ import java.lang.annotation.RetentionPolicy;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface Name
 {
+    public static final String DEFAULT_messageKey = "";
+
+    public static final String DEFAULT_defaultMessage = "";
+
+    public String messageKey() default DEFAULT_messageKey;
+
+    public String defaultMessage() default DEFAULT_defaultMessage;
 }

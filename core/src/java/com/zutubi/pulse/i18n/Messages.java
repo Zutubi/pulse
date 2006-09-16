@@ -11,13 +11,17 @@ import com.zutubi.i18n.context.*;
 public class Messages
 {
     private static DefaultMessageHandler handler;
+    private static StaticPackageContextResolver packages;
 
     private static synchronized MessageHandler getHandler()
     {
         if (handler == null)
         {
+            packages = new StaticPackageContextResolver();
+
             DefaultBundleManager bundleManager = new DefaultBundleManager();
             bundleManager.addResolver(new ExtendedClassContextResolver());
+            bundleManager.addResolver(packages);
             bundleManager.setContextCache(new DefaultContextCache());
             handler = new DefaultMessageHandler(bundleManager);
         }
@@ -49,5 +53,10 @@ public class Messages
             context = new ClassContext(context);
         }
         return getHandler().format(context, key, args);
+    }
+
+    public void setBundle(String bundleName, String packageName)
+    {
+        packages.addBundle(new PackageContext(packageName), bundleName);
     }
 }

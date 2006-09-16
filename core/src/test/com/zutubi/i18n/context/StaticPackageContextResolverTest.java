@@ -25,7 +25,7 @@ public class StaticPackageContextResolverTest extends TestCase
 
     public void testMatchingPackage()
     {
-        resolver.addBundle(new PackageContext("com.zutubi.i18n"), "bundle");
+        resolver.addBundle("com.zutubi.i18n", "bundle");
 
         String[] resolvedBundleNames = resolver.resolve(new PackageContext("com.zutubi.i18n"));
         assertEquals(1, resolvedBundleNames.length);
@@ -34,7 +34,7 @@ public class StaticPackageContextResolverTest extends TestCase
 
     public void testHierarchicalPackage()
     {
-        resolver.addBundle(new PackageContext("com.zutubi.i18n"), "bundle");
+        resolver.addBundle("com.zutubi.i18n", "bundle");
 
         String[] resolvedBundleNames = resolver.resolve(new PackageContext("com.zutubi.i18n.something"));
         assertEquals(1, resolvedBundleNames.length);
@@ -43,8 +43,8 @@ public class StaticPackageContextResolverTest extends TestCase
 
     public void testMultiplePackages()
     {
-        resolver.addBundle(new PackageContext("com.zutubi.i18n"), "bundle");
-        resolver.addBundle(new PackageContext("com"), "anotherbundle");
+        resolver.addBundle("com.zutubi.i18n", "bundle");
+        resolver.addBundle("com", "anotherbundle");
 
         String[] resolvedBundleNames = resolver.resolve(new PackageContext("com.zutubi.i18n"));
         assertEquals(2, resolvedBundleNames.length);
