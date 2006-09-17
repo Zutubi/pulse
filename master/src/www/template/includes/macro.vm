@@ -1700,9 +1700,9 @@
 #
 # Shows a table with recent builds for a project
 #
-#macro(projectRecentBuilds $id $key $recentBuilds $rssEnabled)
+#macro(projectRecentBuilds $id $key $recentBuilds $rssEnabled $projectId)
     <table id="$id" class="content">
-        #rssHeadingRow($key 13 "$rssEnabled" "rss.action?projectId=$id" "rss.builds" )
+        #rssHeadingRow($key 13 "$rssEnabled" "rss.action?projectId=$projectId" "rss.builds" )
         <tr>
             #contentHeading("build.id" 1)
             #contentHeading("build.spec" 1)
