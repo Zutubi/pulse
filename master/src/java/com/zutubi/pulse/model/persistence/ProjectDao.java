@@ -18,6 +18,8 @@ public interface ProjectDao extends EntityDao<Project>
     
     Project findByScmId(long id);
 
+    Project findByBuildSpecification(BuildSpecification buildSpecification);
+
     void save(VersionedPulseFileDetails details);
 
     VersionedPulseFileDetails findVersionedPulseFileDetails(long id);
