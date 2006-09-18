@@ -16,7 +16,7 @@ public class ProcessSupport
     {
         String path = FileSystemUtils.composeFilename(outputFileDir.getName(), outputFile.getName());
         StoredFileArtifact fileArtifact = new StoredFileArtifact(path, "text/plain");
-        StoredArtifact artifact = new StoredArtifact("command output", fileArtifact);
+        StoredArtifact artifact = new StoredArtifact(ExecutableCommand.OUTPUT_NAME, fileArtifact);
         for (ProcessArtifact p : processes)
         {
             p.getProcessor().process(outputDir, fileArtifact, cmdResult);

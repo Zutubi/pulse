@@ -13,6 +13,9 @@
     result   : error
     errors   :
       Unable to create process: No such executable 'nosuchexe'
+    artifacts:
+      * environment
+        * out/00000001-noice/environment/env.txt
 
   completed:
   elapsed  :
