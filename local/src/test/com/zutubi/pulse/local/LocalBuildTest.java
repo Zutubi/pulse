@@ -144,6 +144,7 @@ public class LocalBuildTest extends PulseTestCase
         cleanBuildLog(new File(tmpDir, "build.log"));
 
         cleanExceptionFiles(tmpDir);
+        cleanEnvTxtFiles(tmpDir);
 
         if (generateMode)
         {
@@ -153,6 +154,44 @@ public class LocalBuildTest extends PulseTestCase
         else
         {
             assertDirectoriesEqual(expectedDir, tmpDir);
+        }
+    }
+
+    private void cleanEnvTxtFiles(File dir) throws IOException
+    {
+        // keep the first 6 lines of the file, delete the rest.
+        File env = new File(dir, "env.txt");
+        if (env.isFile())
+        {
+            File cleaned = new File(dir, "env.txt.cleaned");
+            StringBuffer cleanedContent = new StringBuffer();
+            BufferedReader reader = new BufferedReader(new StringReader(IOUtils.fileToString(env)));
+            for (int i = 0; i < 6; i++)
+            {
+                cleanedContent.append(reader.readLine() + "\n");
+            }
+
+            FileOutputStream output = null;
+            try
+            {
+                output  = new FileOutputStream(cleaned);
+                output.write(cleanedContent.toString().getBytes());
+            }
+            finally
+            {
+                IOUtils.close(output);
+            }
+
+            env.delete();
+        }
+
+        for (String filename : dir.list())
+        {
+            File f = new File(dir, filename);
+            if (f.isDirectory())
+            {
+                cleanEnvTxtFiles(f);
+            }
         }
     }
 
