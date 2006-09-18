@@ -38,6 +38,11 @@ public class MockProjectManager implements ProjectManager
         throw new RuntimeException("Method not implemented.");
     }
 
+    public Project getProjectByBuildSpecification(BuildSpecification buildSpecification)
+    {
+        throw new RuntimeException("Method not implemented.");
+    }
+
     public List<Project> getAllProjects()
     {
         return new LinkedList<Project>(projects.values());
