@@ -14,6 +14,7 @@ import java.lang.reflect.InvocationTargetException;
 public class ShutdownManager
 {
     private List<Stoppable> stoppables;
+    private static final int EXIT_REBOOT = 111;
 
     /**
      * Performs the shutdown sequence.
@@ -22,7 +23,7 @@ public class ShutdownManager
      */
     public void shutdown(boolean force, boolean exitJvm)
     {
-        if(checkWrapper(111))
+        if(checkWrapper(0))
         {
             return;
         }
@@ -90,6 +91,15 @@ public class ShutdownManager
     public void setStoppables(List<Stoppable> stoppables)
     {
         this.stoppables = stoppables;
+    }
+
+    public void reboot()
+    {
+        if(!checkWrapper(EXIT_REBOOT))
+        {
+            stop(true);
+            System.exit(EXIT_REBOOT);
+        }
     }
 
     private class ShutdownRunner implements Runnable

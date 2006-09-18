@@ -20,6 +20,8 @@ import com.zutubi.pulse.scm.SCMChangeEvent;
 import com.zutubi.pulse.scm.SCMException;
 import com.zutubi.pulse.scm.SCMServer;
 import com.zutubi.pulse.services.SlaveStatus;
+import com.zutubi.pulse.services.UpgradeState;
+import com.zutubi.pulse.services.UpgradeStatus;
 import junit.framework.TestCase;
 
 import java.io.File;
@@ -831,6 +833,11 @@ public class ThreadedRecipeQueueTest extends TestCase implements EventListener
         }
 
         public void slaveDeleted(long id)
+        {
+            throw new RuntimeException("Method not implemented.");
+        }
+
+        public void upgradeStatus(UpgradeStatus upgradeStatus)
         {
             throw new RuntimeException("Method not implemented.");
         }

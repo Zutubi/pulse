@@ -1,6 +1,8 @@
 package com.zutubi.pulse.agent;
 
 import com.zutubi.pulse.model.Slave;
+import com.zutubi.pulse.services.UpgradeState;
+import com.zutubi.pulse.services.UpgradeStatus;
 
 import java.util.List;
 
@@ -20,4 +22,6 @@ public interface AgentManager
     void slaveAdded(long id);
     void slaveChanged(long id);
     void slaveDeleted(long id);
+
+    void upgradeStatus(UpgradeStatus upgradeStatus);
 }

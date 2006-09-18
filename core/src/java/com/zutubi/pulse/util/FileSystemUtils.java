@@ -387,6 +387,20 @@ public class FileSystemUtils
         }
     }
 
+    public static void extractZip(File zipFile, File dir) throws IOException
+    {
+        ZipInputStream zin = null;
+        try
+        {
+            zin = new ZipInputStream(new FileInputStream(zipFile));
+            extractZip(zin, dir);
+        }
+        finally
+        {
+            IOUtils.close(zin);
+        }
+    }
+
     public static void extractZip(ZipInputStream zin, File dir) throws IOException
     {
         ZipEntry entry;

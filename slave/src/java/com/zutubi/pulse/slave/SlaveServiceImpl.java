@@ -15,6 +15,7 @@ import com.zutubi.pulse.services.SlaveService;
 import com.zutubi.pulse.services.SlaveStatus;
 import com.zutubi.pulse.slave.command.CleanupRecipeCommand;
 import com.zutubi.pulse.slave.command.RecipeCommand;
+import com.zutubi.pulse.slave.command.UpdateCommand;
 import com.zutubi.pulse.util.logging.Logger;
 
 import java.util.List;
@@ -36,6 +37,18 @@ public class SlaveServiceImpl implements SlaveService
     public int ping()
     {
         return Version.getVersion().getBuildNumberAsInt();
+    }
+
+    public boolean updateVersion(String token, String build, String master, long id, String packageUrl, long packageSize)
+    {
+        serviceTokenManager.validateToken(token);
+
+        // Currently we always accept the request!  Should check we can write to the
+        // home dirs first I suppose...
+        UpdateCommand command = new UpdateCommand(build, master, token, id, packageUrl, packageSize);
+        ComponentContext.autowire(command);
+        threadPool.execute(command);
+        return true;
     }
 
     public SlaveStatus getStatus(String token)
@@ -79,7 +92,6 @@ public class SlaveServiceImpl implements SlaveService
         serviceTokenManager.validateToken(token);
 
         CleanupRecipeCommand command = new CleanupRecipeCommand(project, spec, recipeId, incremental);
-        // TODO more dodgy wiring :-/
         ComponentContext.autowire(command);
         threadPool.execute(command);
     }

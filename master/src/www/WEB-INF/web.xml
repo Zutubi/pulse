@@ -133,6 +133,11 @@
     </servlet>
 
     <servlet>
+        <servlet-name>package</servlet-name>
+        <servlet-class>com.zutubi.pulse.servlet.DownloadPackageServlet</servlet-class>
+    </servlet>
+
+    <servlet>
         <servlet-name>patch</servlet-name>
         <servlet-class>com.zutubi.pulse.servlet.DownloadPatchServlet</servlet-class>
     </servlet>
@@ -173,6 +178,11 @@
     <servlet-mapping>
         <servlet-name>download</servlet-name>
         <url-pattern>/download</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>package</servlet-name>
+        <url-pattern>/packages/*</url-pattern>
     </servlet-mapping>
 
     <servlet-mapping>

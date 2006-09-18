@@ -17,6 +17,9 @@
         <foreach target="clean"/>
 
         <delete dir="build"/>
+    </target>
+
+    <target name="clean.dev">
         <delete dir="data"/>
         <delete dir="master/system"/>
         <delete file="master/etc/admin.token"/>
@@ -24,14 +27,10 @@
         <delete file="master/etc/pulse-init.properties"/>
 
         <!-- clean out the user.home/.pulse/* directory -->
-        <delete dir="${user.home}/.pulse"/>
+        <delete dir="${user.home}/.pulse"/>        
     </target>
 
-    <target name="build.boot">
-        <ant inheritAll="false" dir="boot" antfile="build.xml" target="build.module"/>
-    </target>
-
-    <target name="build.core" depends="build.boot">
+    <target name="build.core">
         <ant inheritAll="false" dir="core" antfile="build.xml" target="build.module"/>
     </target>
 
@@ -69,7 +68,7 @@
 
         <property name="package.name.local" value="pulse-local-${pulse.version}"/>
         <property name="package.root.local" value="build/package/${package.name.local}"/>
-        <property name="version.root.local" value="${package.root.local}/${pulse.build}"/>
+        <property name="version.root.local" value="${package.root.local}/versions/${pulse.build}"/>
 
         <delete dir="${package.root.local}"/>
         <mkdir dir="${package.root.local}"/>
@@ -89,7 +88,7 @@
 
         <retrieve.dependencies module="." conf="local" dest="${version.root.local}/lib"/>
 
-        <move tofile="${package.root.local}/boot.jar">
+        <move tofile="${package.root.local}/lib/boot.jar">
             <fileset dir="${version.root.local}/lib" includes="boot-*.jar"/>
         </move>
 
@@ -97,14 +96,11 @@
             <fileset dir="local/etc" includes="*.xml"/>
         </copy>
 
-        <copy todir="${version.root.local}/commands">
+        <copy todir="${version.root.local}/boot">
             <fileset dir="local/etc" includes="*.commands.properties"/>
-        </copy>
-
-        <copy todir="${version.root.local}">
             <fileset dir="local/etc" includes="classpath.txt"/>
         </copy>
-        
+
         <!-- place holder for package documentation -->
         <!--<copy todir="${version.root.local}/docs">-->
             <!--<fileset dir="etc" includes="delete-me.txt"/>-->
@@ -129,7 +125,7 @@
 
         <property name="package.name.slave" value="pulse-agent-${pulse.version}"/>
         <property name="package.root.slave" value="build/package/${package.name.slave}"/>
-        <property name="version.root.slave" value="${package.root.slave}/${pulse.build}"/>
+        <property name="version.root.slave" value="${package.root.slave}/versions/${pulse.build}"/>
 
         <delete dir="${package.root.slave}"/>
         <mkdir dir="${package.root.slave}"/>
@@ -158,7 +154,7 @@
         <retrieve.dependencies module="." conf="local" dest="${version.root.slave}/lib"/>
         <retrieve.dependencies module="." conf="slave" dest="${version.root.slave}/lib"/>
 
-        <move tofile="${package.root.slave}/boot.jar">
+        <move tofile="${package.root.slave}/lib/boot.jar">
             <fileset dir="${version.root.slave}/lib" includes="boot-*.jar"/>
         </move>
 
@@ -169,7 +165,7 @@
         </copy>
 -->
         <!-- place holder for the log directory -->
-        <copy todir="${version.root.slave}/system/logs">
+        <copy todir="${package.root.slave}/logs">
             <fileset dir="etc" includes="delete-me.txt"/>
         </copy>
 
@@ -191,11 +187,8 @@
             <fileset dir="slave/etc" includes="*.xml"/>
         </copy>
 
-        <copy todir="${version.root.slave}/commands">
+        <copy todir="${version.root.slave}/boot">
             <fileset dir="server-core/etc" includes="*.commands.properties"/>
-        </copy>
-
-        <copy todir="${version.root.slave}">
             <fileset dir="slave/etc" includes="classpath.txt"/>
         </copy>
 
@@ -248,7 +241,7 @@
 
         <property name="package.name.master" value="pulse-${pulse.version}"/>
         <property name="package.root.master" value="build/package/${package.name.master}"/>
-        <property name="version.root.master" value="${package.root.master}/${pulse.build}"/>
+        <property name="version.root.master" value="${package.root.master}/versions/${pulse.build}"/>
 
         <delete dir="${package.root.master}"/>
         <mkdir dir="${package.root.master}"/>
@@ -279,7 +272,7 @@
         <retrieve.dependencies module="." conf="local" dest="${version.root.master}/lib"/>
         <retrieve.dependencies module="." conf="master" dest="${version.root.master}/lib"/>
 
-        <move tofile="${package.root.master}/boot.jar">
+        <move tofile="${package.root.master}/lib/boot.jar">
             <fileset dir="${version.root.master}/lib" includes="boot-*.jar"/>
         </move>
 
@@ -293,7 +286,7 @@
             <fileset dir="master/src/templates" includes="**/*.vm **/*.ftl **/*.properties"/>
         </copy>
         <!-- place holder for the log directory -->
-        <copy todir="${version.root.master}/system/logs">
+        <copy todir="${package.root.master}/logs">
             <fileset dir="etc" includes="delete-me.txt"/>
         </copy>
         <copy todir="${version.root.master}/system/www">
@@ -319,13 +312,10 @@
             <fileset dir="master/etc" includes="*.xml"/>
         </copy>
 
-        <copy todir="${version.root.master}/commands">
+        <copy todir="${version.root.master}/boot">
             <fileset dir="local/etc" includes="*.commands.properties"/>
             <fileset dir="server-core/etc" includes="*.commands.properties"/>
             <fileset dir="master/etc" includes="*.commands.properties"/>
-        </copy>
-
-        <copy todir="${version.root.master}">
             <fileset dir="master/etc" includes="classpath.txt"/>
         </copy>
 
@@ -337,6 +327,13 @@
             <fileset dir="${package.root.master}/bin"/>
             <mapper type="glob" from="*.in" to="*"/>
         </move>
+
+        <copy todir="${version.root.master}/system/packages">
+            <fileset dir="build">
+                <include name="pulse-agent-*"/>
+                <include name="pulse-local-*"/>
+            </fileset>
+        </copy>
 
         <!-- the ant zip command doesn't preserve permissions, so we call out to zip -->
         <exec executable="zip" dir="${package.root.master}/..">
@@ -449,7 +446,6 @@
         <property file="ivy.properties"/>
         <ivy:configure/>
         <!-- retrieve all of the modules external dependencies -->
-        <retrieve.dependencies module="boot" dest="lib" conf="external"/>
         <retrieve.dependencies module="core" dest="lib" conf="external"/>
         <retrieve.dependencies module="server-core" dest="lib" conf="external"/>
         <retrieve.dependencies module="local" dest="lib" conf="external"/>
@@ -479,7 +475,6 @@
     <macrodef name="foreach">
         <attribute name="target"/>
         <sequential>
-            <ant inheritAll="false" dir="boot" antfile="build.xml" target="@{target}"/>
             <ant inheritAll="false" dir="core" antfile="build.xml" target="@{target}"/>
             <ant inheritAll="false" dir="local" antfile="build.xml" target="@{target}"/>
             <ant inheritAll="false" dir="server-core" antfile="build.xml" target="@{target}"/>

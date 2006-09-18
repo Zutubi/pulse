@@ -28,9 +28,6 @@ public class SlaveFileRepository implements FileRepository
 
     public File getPatchFile(long userId, long number) throws PulseException
     {
-        FileOutputStream fos = null;
-        InputStream urlStream = null;
-
         if(!recipeDir.isDirectory())
         {
             recipeDir.mkdirs();
@@ -39,23 +36,15 @@ public class SlaveFileRepository implements FileRepository
         try
         {
             URL patchUrl = new URL(masterUrl +  "/patch?token=" + serviceTokenManager.getToken() + "&user=" + userId + "&number=" + number);
-            URLConnection urlConnection = patchUrl.openConnection();
-
-            // take url connection input stream and write contents to patch file
             File patchFile = new File(recipeDir, "patch.zip");
-            fos = new FileOutputStream(patchFile);
-            urlStream = urlConnection.getInputStream();
-            IOUtils.joinStreams(urlStream, fos);
+
+            IOUtils.downloadFile(patchUrl, patchFile);
+
             return patchFile;
         }
         catch (IOException e)
         {
             throw new PulseException("Error downloading patch from master: " + e.getMessage(), e);
-        }
-        finally
-        {
-            IOUtils.close(urlStream);
-            IOUtils.close(fos);
         }
     }
 }

@@ -21,7 +21,7 @@ if $cygwin; then
   [ -n "$PULSE_HOME" ] && PULSE_HOME=`cygpath --path --unix "$PULSE_HOME"`
 fi
 
-BOOT_JAR="$PULSE_HOME/boot.jar"
+BOOT_JAR="$PULSE_HOME/lib/boot.jar"
 
 if [ ! -f "$BOOT_JAR" ] ; then
   echo "Error: PULSE_HOME is not defined correctly."

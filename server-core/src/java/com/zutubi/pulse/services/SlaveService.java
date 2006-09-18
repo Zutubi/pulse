@@ -20,6 +20,21 @@ public interface SlaveService
      */
     int ping();
 
+    /**
+     * The update mechanism needs to be stable.  Any changes to the way this
+     * works requires knowledge in new code (master and slave side) that
+     * knows to veto impossible updates.
+     *
+     * @param token secure token for inter-agent communication
+     * @param build the build number to update to
+     * @param master url of the master requesting the update
+     * @param id the slave's id, for when it calls us back
+     * @param packageUrl URL from which a zip containing the given build can
+     *                   be obtained
+     * @return true if the agent wishes to proceed with the update
+     */
+    boolean updateVersion(String token, String build, String master, long id, String packageUrl, long packageSize);
+
     SlaveStatus getStatus(String token);
 
     /**

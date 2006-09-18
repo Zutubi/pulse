@@ -14,7 +14,7 @@
 
         <property name="port" column="PORT" type="int"/>
 
-        <property name="enabled" column="ENABLED" type="boolean"/>
+        <property name="enableStateName" column="ENABLE_STATE" type="string"/>
         
         <bag name="resources" cascade="all-delete-orphan" lazy="false">
             <key column="SLAVE_ID"/>

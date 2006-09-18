@@ -23,9 +23,7 @@
 
     <dependencies>
 
-        <dependency org="zutubi" name="pulse-boot" rev="latest.integration" conf="release->release"/>
-        <dependency org="zutubi" name="pulse-boot" rev="latest.integration" conf="external->external"/>
-        <dependency org="zutubi" name="pulse-boot" rev="latest.integration" conf="build->build"/>
+        <dependency org="zutubi" name="boot" rev="1.0" conf="external,build,release->default"/>
 
         <dependency org="apache" name="ant" rev="1.6.5" conf="external,build,release->directoryscanner"/>
 

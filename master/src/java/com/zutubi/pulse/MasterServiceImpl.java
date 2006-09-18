@@ -2,15 +2,14 @@ package com.zutubi.pulse;
 
 import com.zutubi.pulse.events.Event;
 import com.zutubi.pulse.events.EventManager;
-import com.zutubi.pulse.services.MasterService;
-import com.zutubi.pulse.services.ServiceTokenManager;
-import com.zutubi.pulse.services.InvalidTokenException;
+import com.zutubi.pulse.services.*;
 import com.zutubi.pulse.model.ResourceManager;
 import com.zutubi.pulse.model.SlaveManager;
 import com.zutubi.pulse.model.Slave;
 import com.zutubi.pulse.model.PersistentResource;
 import com.zutubi.pulse.core.model.Resource;
 import com.zutubi.pulse.bootstrap.ComponentContext;
+import com.zutubi.pulse.agent.AgentManager;
 
 import java.util.List;
 
@@ -22,6 +21,13 @@ public class MasterServiceImpl implements MasterService
     private EventManager eventManager;
     private ResourceManager resourceManager;
     private SlaveManager slaveManager;
+    private AgentManager agentManager;
+
+    public void upgradeStatus(String token, UpgradeStatus upgradeStatus)
+    {
+        getServiceTokenManager().validateToken(token);
+        agentManager.upgradeStatus(upgradeStatus);
+    }
 
     public void handleEvent(String token, Event event) throws InvalidTokenException
     {
@@ -108,5 +114,10 @@ public class MasterServiceImpl implements MasterService
         }
 
         return serviceTokenManager;
+    }
+
+    public void setAgentManager(AgentManager agentManager)
+    {
+        this.agentManager = agentManager;
     }
 }

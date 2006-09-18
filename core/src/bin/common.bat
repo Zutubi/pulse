@@ -5,9 +5,10 @@
 set DEFAULT_PULSE_HOME=%~dp0..
 if "%PULSE_HOME%"=="" set PULSE_HOME=%DEFAULT_PULSE_HOME%
 
-if exist "%PULSE_HOME%\boot.jar" goto havePulse
+set BOOT_JAR="%PULSE_HOME%\lib\boot.jar"
+if exist "%BOOT_JAR%" goto havePulse
 
-echo Could not find "%PULSE_HOME%\boot.jar", please
+echo Could not find "%BOOT_JAR%", please
 echo set PULSE_HOME
 goto end
 
@@ -42,7 +43,7 @@ if "%PULSE_OPTS%"=="" set PULSE_OPTS=-Xmx512m
 
 :restart
 
-%_EXECCMD% %JAVA_OPTS% %PULSE_OPTS% -classpath "%PULSE_HOME%\boot.jar" -Dpulse.home="%PULSE_HOME%" -Djava.awt.headless=true %*
+%_EXECCMD% %JAVA_OPTS% %PULSE_OPTS% -classpath "%BOOT_JAR%" -Dpulse.home="%PULSE_HOME%" -Djava.awt.headless=true %*
 
 if errorlevel 111 goto restart
 
