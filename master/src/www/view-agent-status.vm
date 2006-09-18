@@ -12,10 +12,13 @@
         #headingRow("agent.status" 2)
         #dynamicRow("agent.name" $agent.name)
         #dynamicRow("agent.location" $agent.location)
-        #dynamicRow("agent.status" $agent.status.toString().toLowerCase())
+        #dynamicRow("agent.status" $agent.status.prettyString)
 #if($agent.isSlave() && $agent.hasBeenPinged())
         #dynamicRow("agent.last.ping" $action.getPrettyDate($agent.lastPingTime))
         #dynamicRow("agent.since.last.ping" "$agent.secondsSincePing seconds")
+    #if($agent.pingError)
+        #docRow("agent.ping.error" $agent.pingError)
+    #end
 #end
     </table>
 

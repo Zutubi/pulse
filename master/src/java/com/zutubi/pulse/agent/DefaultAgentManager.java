@@ -135,6 +135,7 @@ public class DefaultAgentManager implements AgentManager, Stoppable
             }
             catch (TimeoutException e)
             {
+                LOG.warning("Timed out pinging agent '" + agent.getName() + "'", e);
                 status = new SlaveStatus(Status.OFFLINE, "Agent ping timed out");
             }
             catch(Exception e)
@@ -208,6 +209,7 @@ public class DefaultAgentManager implements AgentManager, Stoppable
             }
             catch (Exception e)
             {
+                LOG.warning("Exception pinging agent '" + agent.getName() + "': " + e.getMessage(), e);
                 status = new SlaveStatus(Status.OFFLINE, "Exception: '" + e.getClass().getName() + "'. Reason: " + e.getMessage());
             }
 
