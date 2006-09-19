@@ -6,7 +6,7 @@ import com.zutubi.pulse.form.squeezer.SqueezeException;
 /**
  * <class-comment/>
  */
-public class IntegerSqueezer implements TypeSqueezer
+public class BooleanSqueezer implements TypeSqueezer
 {
     public String squeeze(Object obj) throws SqueezeException
     {
@@ -19,6 +19,6 @@ public class IntegerSqueezer implements TypeSqueezer
 
     public Object unsqueeze(String... str) throws SqueezeException
     {
-        return Integer.parseInt(str[0]);
+        return Boolean.parseBoolean(str[0]);
     }
 }

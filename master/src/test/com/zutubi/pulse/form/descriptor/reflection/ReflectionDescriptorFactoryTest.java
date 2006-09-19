@@ -1,14 +1,15 @@
 package com.zutubi.pulse.form.descriptor.reflection;
 
 import junit.framework.TestCase;
-import com.zutubi.pulse.form.mock.MockBook;
-import com.zutubi.pulse.form.mock.MockBookPro;
-import com.zutubi.pulse.form.mock.MockAccount;
+import com.zutubi.pulse.form.mock.*;
 import com.zutubi.pulse.form.descriptor.FormDescriptor;
 import com.zutubi.pulse.form.descriptor.FieldDescriptor;
+import com.zutubi.pulse.form.descriptor.InstanceDescriptor;
 import com.zutubi.pulse.form.descriptor.annotation.AnnotationDecorator;
+import com.zutubi.pulse.form.FieldType;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * <class-comment/>
@@ -44,14 +45,14 @@ public class ReflectionDescriptorFactoryTest extends TestCase
         assertNotNull(titleField);
         assertEquals(String.class, titleField.getType());
         assertEquals("title", titleField.getName());
-        assertEquals("text", titleField.getFieldType());
+        assertEquals(FieldType.TEXT, titleField.getFieldType());
         assertFalse(titleField.isRequired());
 
         FieldDescriptor contentField = form.getFieldDescriptor("content");
         assertNotNull(contentField);
         assertEquals(String.class, contentField.getType());
         assertEquals("content", contentField.getName());
-        assertEquals("text", contentField.getFieldType());
+        assertEquals(FieldType.TEXT, contentField.getFieldType());
         assertFalse(contentField.isRequired());
     }
 
@@ -85,21 +86,21 @@ public class ReflectionDescriptorFactoryTest extends TestCase
         assertNotNull(passwordField);
         assertEquals(String.class, passwordField.getType());
         assertEquals("password", passwordField.getName());
-        assertEquals("password", passwordField.getFieldType());
+        assertEquals(FieldType.PASSWORD, passwordField.getFieldType());
 
         // check that the password annotation hint has worked on the pass field.
         FieldDescriptor passField = form.getFieldDescriptor("pass");
         assertNotNull(passField);
         assertEquals(String.class, passField.getType());
         assertEquals("pass", passField.getName());
-        assertEquals("password", passField.getFieldType());
+        assertEquals(FieldType.PASSWORD, passField.getFieldType());
 
         // check that the name field has an non standard size
         FieldDescriptor nameField = form.getFieldDescriptor("name");
         assertNotNull(nameField);
         assertEquals(String.class, nameField.getType());
         assertEquals("name", nameField.getName());
-        assertEquals("text", nameField.getFieldType());
+        assertEquals(FieldType.TEXT, nameField.getFieldType());
         assertEquals(50, nameField.getParameters().get("size"));
 
         // check that the user field does not have the undefined size of 0 specified.
@@ -109,5 +110,45 @@ public class ReflectionDescriptorFactoryTest extends TestCase
         assertEquals("user", userField.getName());
         assertEquals("text", userField.getFieldType());
         assertFalse(userField.getParameters().containsKey("size"));
+    }
+
+    public void testMockSelectFields()
+    {
+        FormDescriptor form = factory.createFormDescriptor(MockSelect.class);
+        assertEquals(MockSelect.class, form.getType());
+
+        assertEquals(1, form.getFieldDescriptors().size());
+
+        FieldDescriptor fieldField = form.getFieldDescriptor("field");
+        assertNotNull(fieldField);
+
+        // now to configure - requires an instance.
+        FieldDescriptor instanceField = (FieldDescriptor) ((InstanceDescriptor)fieldField).setInstance(new MockSelect());
+
+        assertEquals(String.class, instanceField.getType());
+        assertEquals("field", instanceField.getName());
+        assertEquals(FieldType.SELECT, instanceField.getFieldType());
+
+        Map<String, Object> parameters = instanceField.getParameters();
+        assertTrue(parameters.containsKey("list"));
+        List<String> list = (List<String>) parameters.get("list");
+        assertEquals("A", list.get(0));
+        assertEquals("B", list.get(1));
+        assertEquals("C", list.get(2));
+    }
+
+    public void testMockCheckbox()
+    {
+        FormDescriptor form = factory.createFormDescriptor(MockCheckbox.class);
+        assertEquals(MockCheckbox.class, form.getType());
+
+        assertEquals(1, form.getFieldDescriptors().size());
+
+        FieldDescriptor selectField = form.getFieldDescriptor("select");
+        assertNotNull(selectField);
+
+        assertEquals(FieldType.CHECKBOX, selectField.getFieldType());
+        assertEquals(Boolean.class, selectField.getType());
+        assertEquals("select", selectField.getName());
     }
 }

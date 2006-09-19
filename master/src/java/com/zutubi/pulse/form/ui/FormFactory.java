@@ -4,6 +4,7 @@ import com.zutubi.pulse.form.ui.components.*;
 import com.zutubi.pulse.form.descriptor.FormDescriptor;
 import com.zutubi.pulse.form.descriptor.ActionDescriptor;
 import com.zutubi.pulse.form.descriptor.FieldDescriptor;
+import com.zutubi.pulse.form.descriptor.InstanceDescriptor;
 import com.zutubi.pulse.form.FieldType;
 import com.zutubi.validation.bean.BeanUtils;
 import com.zutubi.validation.bean.BeanException;
@@ -17,7 +18,7 @@ import java.util.Map;
  */
 public class FormFactory
 {
-    public FormComponent createForm(FormDescriptor descriptor)
+    public FormComponent createForm(FormDescriptor descriptor, Object instance)
     {
         List<String> fieldOrder = evaluateFieldOrder(descriptor);
 
@@ -28,7 +29,7 @@ public class FormFactory
         int i = 1;
         for (String fieldName : fieldOrder)
         {
-            Component field = createField(descriptor.getFieldDescriptor(fieldName));
+            Component field = createField(descriptor.getFieldDescriptor(fieldName), instance);
             field.setTabIndex(i++);
             form.addNested(field);
         }
@@ -72,8 +73,12 @@ public class FormFactory
         return ordered;
     }
 
-    private Component createField(FieldDescriptor descriptor)
+    private Component createField(FieldDescriptor descriptor, Object instance)
     {
+        if (descriptor instanceof InstanceDescriptor)
+        {
+            descriptor = (FieldDescriptor) ((InstanceDescriptor)descriptor).setInstance(instance);
+        }
         if (FieldType.TEXT.equals(descriptor.getFieldType()))
         {
             TextComponent c = new TextComponent();
@@ -89,6 +94,18 @@ public class FormFactory
         else if (FieldType.RADIO.equals(descriptor.getFieldType()))
         {
             RadioComponent c = new RadioComponent();
+            configureComponent(c, descriptor);
+            return c;
+        }
+        else if (FieldType.SELECT.equals(descriptor.getFieldType()))
+        {
+            SelectComponent c = new SelectComponent();
+            configureComponent(c, descriptor);
+            return c;
+        }
+        else if (FieldType.CHECKBOX.equals(descriptor.getFieldType()))
+        {
+            CheckboxComponent c = new CheckboxComponent();
             configureComponent(c, descriptor);
             return c;
         }

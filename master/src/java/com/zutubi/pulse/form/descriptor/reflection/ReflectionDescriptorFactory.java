@@ -1,6 +1,7 @@
 package com.zutubi.pulse.form.descriptor.reflection;
 
 import com.zutubi.pulse.form.descriptor.*;
+import com.zutubi.pulse.form.FieldType;
 
 import java.beans.BeanInfo;
 import java.beans.IntrospectionException;
@@ -21,6 +22,7 @@ public class ReflectionDescriptorFactory implements DescriptorFactory
     {
         defaultFieldTypeMapping.put(String.class, "text");
         defaultFieldTypeMapping.put(Boolean.class, "checkbox");
+        defaultFieldTypeMapping.put(Boolean.TYPE, "checkbox");
     }
 
     private final Map<Class, FormDescriptor> formDescriptorCache = new HashMap<Class, FormDescriptor>();
@@ -71,11 +73,19 @@ public class ReflectionDescriptorFactory implements DescriptorFactory
 
             BeanInfo beanInfo = Introspector.getBeanInfo(type, Object.class);
 
+            // Handle the first pass analysis.  Here, all of the fields are considered on an individual basis.
             for (PropertyDescriptor pd : beanInfo.getPropertyDescriptors())
             {
                 DefaultFieldDescriptor fd = new DefaultFieldDescriptor();
                 fd.setName(pd.getName());
-                fd.setType(pd.getPropertyType());
+                if (pd.getPropertyType() == Boolean.TYPE)
+                {
+                    fd.setType(Boolean.class);
+                }
+                else
+                {
+                    fd.setType(pd.getPropertyType());
+                }
 
                 // some little bit of magic, take a guess at any property called password. If we come up with any
                 // other magical cases, then we can refactor this a bit.
@@ -88,6 +98,48 @@ public class ReflectionDescriptorFactory implements DescriptorFactory
                     fd.setFieldType(defaultFieldTypeMapping.get(pd.getPropertyType()));
                 }
                 fieldDescriptors.add(fd);
+            }
+
+            // Handle the second pass analysis. It is here where fields are considered in groups.
+            // a) look for xxx and xxxOptions properties.
+            Map<String, FieldDescriptor> optionsCandidates = new HashMap<String, FieldDescriptor>();
+            Map<String, FieldDescriptor> descriptorMap = new HashMap<String, FieldDescriptor>();
+            for (FieldDescriptor fd : fieldDescriptors)
+            {
+                String name = fd.getName();
+                if (name.endsWith("Options"))
+                {
+                    String property = name.substring(0, name.length() - 7);
+                    optionsCandidates.put(property, fd);
+                }
+                descriptorMap.put(name, fd);
+            }
+
+            for (String candidate : optionsCandidates.keySet())
+            {
+                // does this candidate property exist?
+                if (descriptorMap.containsKey(candidate))
+                {
+                    FieldDescriptor optionsDescriptor = optionsCandidates.get(candidate);
+                    fieldDescriptors.remove(optionsDescriptor);
+
+                    // now we need to update the field.
+                    FieldDescriptor optionDescriptor = descriptorMap.get(candidate);
+                    optionDescriptor.setFieldType(FieldType.SELECT);
+                    fieldDescriptors.remove(optionDescriptor);
+
+                    // extract the list.
+                    for (PropertyDescriptor descriptor : beanInfo.getPropertyDescriptors())
+                    {
+                        if (descriptor.getName().equals(candidate + "Options"))
+                        {
+                            InstanceFieldDescriptor newFieldDescriptor = new InstanceFieldDescriptor(optionDescriptor);
+                            newFieldDescriptor.setReadMethod(descriptor.getReadMethod());
+                            fieldDescriptors.add(newFieldDescriptor);
+                            break;
+                        }
+                    }
+                }
             }
 
             return fieldDescriptors;

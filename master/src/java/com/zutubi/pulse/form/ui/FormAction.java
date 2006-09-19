@@ -149,7 +149,7 @@ public class FormAction extends ActionSupport
         FormDescriptor descriptor = descriptorFactory.createFormDescriptor(obj.getClass());
 
         // build the form.
-        FormComponent form = new FormFactory().createForm(descriptor);
+        FormComponent form = new FormFactory().createForm(descriptor, obj);
         populateForm(form, obj);
 
         // render it.
