@@ -10,7 +10,7 @@ public interface FieldType
     /**
      * Text field type, represents a plain string value.
      */
-    public static final String TEXT = "text";
+    static final String TEXT = "text";
 
     /**
      * Email field is similar to a text field, but adds validation to ensure that the field only accepts
@@ -18,53 +18,55 @@ public interface FieldType
      *
      * Note: This type is not yet supported.
      */
-    public static final String EMAIL = "email";
+    static final String EMAIL = "email";
 
     /**
      *
      */
-    public static final String PASSWORD = "password";
+    static final String PASSWORD = "password";
 
     /**
      *
      */
-    public static final String HIDDEN = "hidden";
+    static final String HIDDEN = "hidden";
 
     /**
      * Note: This type is not yet supported.
      */
-    public static final String URL = "url";
+    static final String URL = "url";
 
     /**
      * Note: This type is not yet supported.
      */
-    public static final String FILE = "file";
+    static final String FILE = "file";
 
     /**
      * Note: This type is not yet supported.
      */
-    public static final String DIRECTORY = "directory";
+    static final String DIRECTORY = "directory";
 
     /**
      * Note: This type is not yet supported.
      */
-    public static final String DATE = "date";
+    static final String DATE = "date";
 
     /**
      * Note: This type is not yet supported.
      */
-    public static final String INTEGER = "int";
+    static final String INTEGER = "int";
 
     /**
      * A project field is one that allows you to select one of the configured projects.
      *
      * Note: This type is not yet supported.
      */
-    public static final String PROJECT = "project";
+    static final String PROJECT = "project";
 
-    public static final String RADIO = "radio";
+    static final String RADIO = "radio";
 
-    public static final String TEXTAREA = "textarea";
+    static final String TEXTAREA = "textarea";
 
-    public static final String CHECKBOX = "checkbox";
+    static final String CHECKBOX = "checkbox";
+
+    static final String SELECT = "select";
 }

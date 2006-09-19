@@ -1,6 +1,6 @@
-<#list parameters.list as listKey>
-<#assign itemKey = listKey/>
-<#assign itemValue = listKey/>
+<#list parameters.list as item>
+<#assign itemKey = item/>
+<#assign itemValue = item/>
 <input type="radio" name="${parameters.name?html}" id="${parameters.name?html}${itemKey?html}"<#rt/>
 <#if parameters.value?exists && parameters.value == itemKey>
  checked="checked"<#rt/>
