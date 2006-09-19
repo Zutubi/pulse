@@ -2,6 +2,7 @@ package com.zutubi.pulse.form.sample;
 
 import com.zutubi.pulse.form.persistence.Copyable;
 import com.zutubi.pulse.form.descriptor.annotation.Field;
+import com.zutubi.pulse.form.descriptor.annotation.Form;
 
 import java.util.Collection;
 import java.util.List;
@@ -10,6 +11,7 @@ import java.util.LinkedList;
 /**
  * <class-comment/>
  */
+@Form(fieldOrder = {"host", "user", "password", "format", "show"})
 public class Jabber implements Copyable
 {
     private String host = "initial host";

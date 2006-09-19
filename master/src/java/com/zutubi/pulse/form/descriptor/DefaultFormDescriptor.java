@@ -20,6 +20,8 @@ public class DefaultFormDescriptor implements FormDescriptor
 
     private Class type;
 
+    private String[] fieldOrder;
+
     public DefaultFormDescriptor()
     {
         // default values.
@@ -62,9 +64,14 @@ public class DefaultFormDescriptor implements FormDescriptor
         return null;
     }
 
-    public List<String> getFieldOrder()
+    public String[] getFieldOrder()
     {
-        return null;
+        return this.fieldOrder;
+    }
+
+    public void setFieldOrder(String[] order)
+    {
+        this.fieldOrder = order;
     }
 
     public List<ActionDescriptor> getActionDescriptors()

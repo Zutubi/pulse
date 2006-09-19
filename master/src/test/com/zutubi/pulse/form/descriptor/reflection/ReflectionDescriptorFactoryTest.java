@@ -123,18 +123,9 @@ public class ReflectionDescriptorFactoryTest extends TestCase
         assertNotNull(fieldField);
 
         // now to configure - requires an instance.
-        FieldDescriptor instanceField = (FieldDescriptor) ((InstanceDescriptor)fieldField).setInstance(new MockSelect());
-
-        assertEquals(String.class, instanceField.getType());
-        assertEquals("field", instanceField.getName());
-        assertEquals(FieldType.SELECT, instanceField.getFieldType());
-
-        Map<String, Object> parameters = instanceField.getParameters();
-        assertTrue(parameters.containsKey("list"));
-        List<String> list = (List<String>) parameters.get("list");
-        assertEquals("A", list.get(0));
-        assertEquals("B", list.get(1));
-        assertEquals("C", list.get(2));
+        assertEquals(String.class, fieldField.getType());
+        assertEquals("field", fieldField.getName());
+        assertEquals(FieldType.SELECT, fieldField.getFieldType());
     }
 
     public void testMockCheckbox()

@@ -4,14 +4,12 @@ import com.zutubi.pulse.form.ui.components.*;
 import com.zutubi.pulse.form.descriptor.FormDescriptor;
 import com.zutubi.pulse.form.descriptor.ActionDescriptor;
 import com.zutubi.pulse.form.descriptor.FieldDescriptor;
-import com.zutubi.pulse.form.descriptor.InstanceDescriptor;
 import com.zutubi.pulse.form.FieldType;
 import com.zutubi.validation.bean.BeanUtils;
 import com.zutubi.validation.bean.BeanException;
 
-import java.util.List;
-import java.util.LinkedList;
-import java.util.Map;
+import java.util.*;
+import java.lang.reflect.Method;
 
 /**
  * <class-comment/>
@@ -53,7 +51,7 @@ public class FormFactory
         LinkedList<String> ordered = new LinkedList<String>();
         if (descriptor.getFieldOrder() != null)
         {
-            ordered.addAll(descriptor.getFieldOrder());
+            ordered.addAll(Arrays.asList(descriptor.getFieldOrder()));
         }
 
         // are we done?
@@ -75,41 +73,82 @@ public class FormFactory
 
     private Component createField(FieldDescriptor descriptor, Object instance)
     {
-        if (descriptor instanceof InstanceDescriptor)
-        {
-            descriptor = (FieldDescriptor) ((InstanceDescriptor)descriptor).setInstance(instance);
-        }
         if (FieldType.TEXT.equals(descriptor.getFieldType()))
         {
-            TextComponent c = new TextComponent();
-            configureComponent(c, descriptor);
-            return c;
+            return createTextField(descriptor);
         }
         else if (FieldType.PASSWORD.equals(descriptor.getFieldType()))
         {
-            PasswordComponent c = new PasswordComponent();
-            configureComponent(c, descriptor);
-            return c;
+            return createPasswordField(descriptor);
         }
         else if (FieldType.RADIO.equals(descriptor.getFieldType()))
         {
-            RadioComponent c = new RadioComponent();
-            configureComponent(c, descriptor);
-            return c;
+            return createRadioField(descriptor);
         }
         else if (FieldType.SELECT.equals(descriptor.getFieldType()))
         {
-            SelectComponent c = new SelectComponent();
-            configureComponent(c, descriptor);
-            return c;
+            return createSelectField(descriptor, instance);
         }
         else if (FieldType.CHECKBOX.equals(descriptor.getFieldType()))
         {
-            CheckboxComponent c = new CheckboxComponent();
-            configureComponent(c, descriptor);
-            return c;
+            return createCheckboxField(descriptor);
         }
-        throw new RuntimeException("Unsupported field type '" + descriptor.getFieldType() + "'");
+        else
+        {
+            throw new RuntimeException("Unsupported field type '" + descriptor.getFieldType() + "'");
+        }
+    }
+
+    private Component createCheckboxField(FieldDescriptor descriptor)
+    {
+        CheckboxComponent c = new CheckboxComponent();
+        configureComponent(c, descriptor);
+
+        return c;
+    }
+
+    private Component createSelectField(FieldDescriptor descriptor, Object instance)
+    {
+        SelectComponent c = new SelectComponent();
+        configureComponent(c, descriptor);
+
+        // lookup the option list.
+        String name = descriptor.getName();
+        String optionMethodName = "get" + name.substring(0, 1).toUpperCase() + name.substring(1) + "Options";
+
+        try
+        {
+            Method optionMethod = instance.getClass().getMethod(optionMethodName);
+            Collection<String> list = (Collection<String>) optionMethod.invoke(instance);
+            c.setList(list);
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+
+        return c;
+    }
+
+    private Component createRadioField(FieldDescriptor descriptor)
+    {
+        RadioComponent c = new RadioComponent();
+        configureComponent(c, descriptor);
+        return c;
+    }
+
+    private Component createPasswordField(FieldDescriptor descriptor)
+    {
+        PasswordComponent c = new PasswordComponent();
+        configureComponent(c, descriptor);
+        return c;
+    }
+
+    private Component createTextField(FieldDescriptor descriptor)
+    {
+        TextComponent c = new TextComponent();
+        configureComponent(c, descriptor);
+        return c;
     }
 
     private void configureComponent(FieldComponent c, FieldDescriptor descriptor)

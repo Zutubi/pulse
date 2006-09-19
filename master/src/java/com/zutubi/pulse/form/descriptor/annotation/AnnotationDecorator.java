@@ -26,7 +26,8 @@ public class AnnotationDecorator implements DescriptorDecorator
         Annotation[] classAnnotations = descriptor.getType().getAnnotations();
 
         // modify the descriptor based on the annotations located at the class level.
-
+        // (form descriptor...)
+        decorateFromAnnotations(descriptor, classAnnotations);
 
         // now to decorate the individual fields.
         for (FieldDescriptor fieldDescriptor : descriptor.getFieldDescriptors())
@@ -63,6 +64,18 @@ public class AnnotationDecorator implements DescriptorDecorator
             // noops.
         }
         return annotations;
+    }
+
+    private void decorateFromAnnotations(FormDescriptor descriptor, Annotation[] classAnnotations)
+    {
+        for (Annotation annotation : classAnnotations)
+        {
+            if (annotation instanceof Form)
+            {
+                // apply annotations..
+                AnnotationUtils.setPropertiesFromAnnotation(annotation, descriptor);
+            }
+        }
     }
 
     private void decorateFromAnnotations(FieldDescriptor fieldDescriptor, List<Annotation> fieldAnnotations)

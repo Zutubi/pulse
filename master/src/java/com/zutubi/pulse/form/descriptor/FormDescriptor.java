@@ -45,7 +45,9 @@ public interface FormDescriptor extends Descriptor
      *
      * @return a list of field names.
      */
-    List<String> getFieldOrder();
+    String[] getFieldOrder();
+
+    void setFieldOrder(String[] order);
 
     /**
      * Get the list of action descriptors defined for this form. The action descriptors define the

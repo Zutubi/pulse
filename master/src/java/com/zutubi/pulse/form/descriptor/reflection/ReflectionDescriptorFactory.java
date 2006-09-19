@@ -126,19 +126,6 @@ public class ReflectionDescriptorFactory implements DescriptorFactory
                     // now we need to update the field.
                     FieldDescriptor optionDescriptor = descriptorMap.get(candidate);
                     optionDescriptor.setFieldType(FieldType.SELECT);
-                    fieldDescriptors.remove(optionDescriptor);
-
-                    // extract the list.
-                    for (PropertyDescriptor descriptor : beanInfo.getPropertyDescriptors())
-                    {
-                        if (descriptor.getName().equals(candidate + "Options"))
-                        {
-                            InstanceFieldDescriptor newFieldDescriptor = new InstanceFieldDescriptor(optionDescriptor);
-                            newFieldDescriptor.setReadMethod(descriptor.getReadMethod());
-                            fieldDescriptors.add(newFieldDescriptor);
-                            break;
-                        }
-                    }
                 }
             }
 
