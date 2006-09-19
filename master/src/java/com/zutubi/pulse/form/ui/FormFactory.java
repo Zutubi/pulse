@@ -19,7 +19,6 @@ public class FormFactory
 {
     public FormComponent createForm(FormDescriptor descriptor)
     {
-
         List<String> fieldOrder = evaluateFieldOrder(descriptor);
 
         FormComponent form = new FormComponent();
@@ -78,31 +77,32 @@ public class FormFactory
         if (FieldType.TEXT.equals(descriptor.getFieldType()))
         {
             TextComponent c = new TextComponent();
-            c.setName(descriptor.getName());
-            c.setLabel(descriptor.getName() + ".label");
-            c.setRequired(descriptor.isRequired());
-            applyParameters(c, descriptor.getParameters());
+            configureComponent(c, descriptor);
             return c;
         }
         else if (FieldType.PASSWORD.equals(descriptor.getFieldType()))
         {
             PasswordComponent c = new PasswordComponent();
-            c.setName(descriptor.getName());
-            c.setLabel(descriptor.getName() + ".label");
-            c.setRequired(descriptor.isRequired());
-            applyParameters(c, descriptor.getParameters());
+            configureComponent(c, descriptor);
+            return c;
+        }
+        else if (FieldType.RADIO.equals(descriptor.getFieldType()))
+        {
+            RadioComponent c = new RadioComponent();
+            configureComponent(c, descriptor);
             return c;
         }
         throw new RuntimeException("Unsupported field type '" + descriptor.getFieldType() + "'");
     }
 
-    private void applyParameters(FieldComponent c, Map<String, Object> parameters)
+    private void configureComponent(FieldComponent c, FieldDescriptor descriptor)
     {
-        // Sigh, it would be nice if we could treat everything as a string. That way, we just pass
-        // the entire parameter map into the component.  That way, if something is defined, it is made
-        // available in the template.  If typing is required, then either the types need to be defined
-        // at the annotation level.. or they have to be defined in the object.  In annotations, it is
-        // self documenting.
+        // default fields.
+        c.setName(descriptor.getName());
+        c.setLabel(descriptor.getName() + ".label");
+        c.setRequired(descriptor.isRequired());
+
+        Map<String, Object> parameters = descriptor.getParameters();
 
         for (Map.Entry<String, Object> entry : parameters.entrySet())
         {

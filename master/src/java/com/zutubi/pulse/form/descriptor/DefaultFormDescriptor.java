@@ -16,7 +16,19 @@ public class DefaultFormDescriptor implements FormDescriptor
 
     private Map<String, Object> parameters = new HashMap<String, Object>();
 
+    private List<ActionDescriptor> actionDescriptors = new LinkedList<ActionDescriptor>();
+
     private Class type;
+
+    public DefaultFormDescriptor()
+    {
+        // default values.
+        actionDescriptors = Arrays.asList((ActionDescriptor)
+                new DefaultActionDescriptor(ActionDescriptor.SAVE),
+                new DefaultActionDescriptor(ActionDescriptor.CANCEL),
+                new DefaultActionDescriptor(ActionDescriptor.RESET)
+        );
+    }
 
     public Class getType()
     {
@@ -57,11 +69,12 @@ public class DefaultFormDescriptor implements FormDescriptor
 
     public List<ActionDescriptor> getActionDescriptors()
     {
-        return Arrays.asList((ActionDescriptor)
-                new DefaultActionDescriptor(ActionDescriptor.SAVE),
-                new DefaultActionDescriptor(ActionDescriptor.CANCEL),
-                new DefaultActionDescriptor(ActionDescriptor.RESET)
-        );
+        return this.actionDescriptors;
+    }
+
+    public void setActionDescriptors(List<ActionDescriptor> actionDescriptors)
+    {
+        this.actionDescriptors = actionDescriptors;
     }
 
     public Map<String, Object> getParameters()

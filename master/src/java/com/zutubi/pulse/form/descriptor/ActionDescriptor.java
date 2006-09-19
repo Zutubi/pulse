@@ -22,6 +22,25 @@ public interface ActionDescriptor extends Descriptor
      */
     public static final String RESET = "reset";
 
+    // ---( Wizard actions )---
+
+    /**
+     * The next action requests that the wizard be transitioned to the next form.  This is available only when another
+     * form is available.
+     */
+    public static final String NEXT = "next";
+
+    /**
+     * The previous action requests that the wizard be transitioned to the previous form.
+     */
+    public static final String PREVIOUS = "previous";
+
+    /**
+     * The finish action, available in the final stage of a wizard, requests that the wizard be completed and the
+     * appropriate action taken.
+     */
+    public static final String FINISH = "finish";
+
     /**
      * Get the action string.  The value should be one of #SAVE, #CANCEL or #RESET
      *

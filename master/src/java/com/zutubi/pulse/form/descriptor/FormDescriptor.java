@@ -56,6 +56,13 @@ public interface FormDescriptor extends Descriptor
     List<ActionDescriptor> getActionDescriptors();
 
     /**
+     * Set the list of action descriptors defined for this form.
+     * 
+     * @param actions
+     */
+    void setActionDescriptors(List<ActionDescriptor> actions);
+
+    /**
      * The parameter map defines a set of 'extra' parameters for this form.
      *
      * @return a map of key:value pairs.

@@ -1,5 +1,7 @@
 package com.zutubi.pulse.form;
 
+import java.util.List;
+
 /**
  * <class-comment/>
  */
@@ -58,5 +60,7 @@ public interface FieldType
      *
      * Note: This type is not yet supported.
      */
-    public static final String PROJECT = "project";    
+    public static final String PROJECT = "project";
+    
+    public static final String RADIO = "radio";
 }
