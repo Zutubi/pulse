@@ -1,13 +1,13 @@
-<input type="text"<#rt/>
+<textarea<#rt/>
  name="${parameters.name?default("")?html}"<#rt/>
-<#if parameters.size?exists>
- size="${parameters.size?html}"<#rt/>
+<#if parameters.cols?exists>
+ cols="${parameters.cols?default("")?html}"<#rt/>
 </#if>
-<#if parameters.maxlength?exists>
- maxlength="${parameters.maxlength?html}"<#rt/>
+<#if parameters.rows?exists>
+ rows="${parameters.rows?default("")?html}"<#rt/>
 </#if>
-<#if parameters.value?exists>
- value="${parameters.value}"<#rt/>
+<#if parameters.wrap?exists>
+ wrap="${parameters.wrap?html}"<#rt/>
 </#if>
 <#if parameters.disabled?default(false)>
  disabled="disabled"<#rt/>
@@ -28,4 +28,8 @@
  style="${parameters.cssStyle?html}"<#rt/>
 </#if>
 <#include "/forms/simple/scripting-events.ftl" />
-/>
+><#rt/>
+<#if parameters.value?exists>
+${parameters.value}<#t/>
+</#if>
+</textarea>

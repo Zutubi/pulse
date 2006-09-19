@@ -13,10 +13,7 @@ import java.lang.annotation.RetentionPolicy;
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
 
-@Field(fieldType = FieldType.TEXT)
-public @interface Text
+@Field(fieldType = FieldType.TEXTAREA)
+public @interface TextArea
 {
-    public static final int DEFAULT_size = 0;
-
-    public int size() default DEFAULT_size;
 }

@@ -24,6 +24,8 @@ public class FreemarkerRenderer implements Renderer
 
     private Map<String, Object> additionalContext;
 
+    private boolean error;
+
     public void setAdditionalContext(Map<String, Object> context)
     {
         this.additionalContext = context;
@@ -63,9 +65,15 @@ public class FreemarkerRenderer implements Renderer
         }
         catch (Exception e)
         {
+            error = true;
             e.printStackTrace();
             writer.append(e.getMessage());
         }
+    }
+
+    public boolean hasError()
+    {
+        return this.error;
     }
 
     public String getRenderedContent()
@@ -76,6 +84,7 @@ public class FreemarkerRenderer implements Renderer
     public void reset()
     {
         writer = new StringWriter();
+        error = false;
     }
 
     /**

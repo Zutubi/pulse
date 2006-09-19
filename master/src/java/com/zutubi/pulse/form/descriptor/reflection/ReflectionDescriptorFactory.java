@@ -20,6 +20,7 @@ public class ReflectionDescriptorFactory implements DescriptorFactory
     static
     {
         defaultFieldTypeMapping.put(String.class, "text");
+        defaultFieldTypeMapping.put(Boolean.class, "checkbox");
     }
 
     private final Map<Class, FormDescriptor> formDescriptorCache = new HashMap<Class, FormDescriptor>();

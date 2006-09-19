@@ -20,6 +20,7 @@
 <#if parameters.cssStyle?exists>
  style="${parameters.cssStyle?html}"<#rt/>
 </#if>
+<#include "/forms/simple/scripting-events.ftl" />
 /><#rt/>
 <label for="${parameters.name?html}${itemKey?html}"><#rt/>
     ${itemValue}<#t/>

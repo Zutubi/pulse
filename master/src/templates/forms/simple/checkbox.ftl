@@ -1,13 +1,6 @@
-<input type="text"<#rt/>
- name="${parameters.name?default("")?html}"<#rt/>
-<#if parameters.size?exists>
- size="${parameters.size?html}"<#rt/>
-</#if>
-<#if parameters.maxlength?exists>
- maxlength="${parameters.maxlength?html}"<#rt/>
-</#if>
-<#if parameters.value?exists>
- value="${parameters.value}"<#rt/>
+<input type="checkbox" name="${parameters.name?html}" value="${parameters.fieldValue?html}"<#rt/>
+<#if parameters.value?exists && parameters.value == parameters.fieldValue>
+ checked="checked"<#rt/>
 </#if>
 <#if parameters.disabled?default(false)>
  disabled="disabled"<#rt/>

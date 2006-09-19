@@ -69,14 +69,14 @@ public abstract class Component implements Renderable
         return (String) getParameter("name");
     }
 
-    public void setValue(String value)
+    public void setValue(Object value)
     {
         addParameter("value", value);
     }
 
-    public String getValue()
+    public Object getValue()
     {
-        return (String) getParameter("value");
+        return getParameter("value");
     }
 
     public void setLabel(String label)
@@ -101,11 +101,11 @@ public abstract class Component implements Renderable
 
     public void setClass(String clazz)
     {
-        addParameter("class", clazz);
+        addParameter("cssClass", clazz);
     }
 
     public void setStyle(String style)
     {
-        addParameter("style", style);
+        addParameter("cssStyle", style);
     }
 }

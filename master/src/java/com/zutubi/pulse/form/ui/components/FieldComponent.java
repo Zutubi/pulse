@@ -14,14 +14,4 @@ public abstract class FieldComponent extends Component
     {
         return (Boolean)getParameter("required", false);
     }
-
-    public void setLabel(String label)
-    {
-        addParameter("label", label);
-    }
-
-    public String getLabel()
-    {
-        return (String) getParameter("label");
-    }
 }

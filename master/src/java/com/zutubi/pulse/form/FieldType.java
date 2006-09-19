@@ -21,12 +21,12 @@ public interface FieldType
     public static final String EMAIL = "email";
 
     /**
-     * Note: This type is not yet supported.
+     *
      */
     public static final String PASSWORD = "password";
 
     /**
-     * Note: This type is not yet supported.
+     *
      */
     public static final String HIDDEN = "hidden";
 
@@ -61,6 +61,10 @@ public interface FieldType
      * Note: This type is not yet supported.
      */
     public static final String PROJECT = "project";
-    
+
     public static final String RADIO = "radio";
+
+    public static final String TEXTAREA = "textarea";
+
+    public static final String CHECKBOX = "checkbox";
 }

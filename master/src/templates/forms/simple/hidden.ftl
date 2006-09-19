@@ -12,4 +12,5 @@
 <#if parameters.cssStyle?exists>
  style="${parameters.cssStyle?html}"<#rt/>
 </#if>
+<#include "/forms/simple/scripting-events.ftl" />
 />

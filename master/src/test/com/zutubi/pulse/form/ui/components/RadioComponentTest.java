@@ -37,13 +37,14 @@ public class RadioComponentTest extends ComponentTestCase
         super.tearDown();
     }
 
-    public void testRender()
+    public void testComponentRendering()
     {
         radio.setList(Arrays.asList("plain", "html"));
         radio.setValue("plain");
         radio.setName("contact.type");
         radio.setLabel("Email format");
         radio.render(renderer);
+        assertFalse(renderer.hasError());
         System.out.println(renderer.getRenderedContent());
     }
 }

@@ -14,4 +14,5 @@
 <#if parameters.tabindex?exists>
  tabindex="${parameters.tabindex?html}"<#rt/>
 </#if>
+<#include "/forms/simple/scripting-events.ftl" />
 />
