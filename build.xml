@@ -132,6 +132,11 @@
         <retrieve.dependencies module="." conf="local" dest="${package.root}/lib"/>
         <retrieve.dependencies module="." conf="master" dest="${package.root}/lib"/>
 
+        <!-- add the placeholder for the lib patch directory -->
+        <copy todir="${package.root}/lib/patch">
+            <fileset dir="etc" includes="delete-me.txt"/>
+        </copy>
+
         <!-- place holder for package documentation -->
 <!--
         <copy todir="${package.root}/docs">
@@ -193,6 +198,10 @@
         </tar>
 
         <antcall target="nsis.master"/>
+    </target>
+
+    <target name="package.devkit">
+        
     </target>
 
     <target name="nsis.master" if="on.windows">

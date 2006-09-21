@@ -138,6 +138,15 @@ public class PulseCtl
 
         List<URL> classpath = new LinkedList<URL>();
 
+        // add the patch directory to the start of the classpath.
+        classpath.add(new File(pulseHome, asPath("lib", "patch")).toURL());
+
+        // grab all of the jar and xml files in the patch directory and add them to the classpath.
+        File patchlibdir = new File(pulseHome, asPath("lib", "patch"));
+        final File[] patchFiles = patchlibdir.listFiles();
+        appendToClasspath(patchFiles, ".jar", classpath);
+        appendToClasspath(patchFiles, ".xml", classpath);
+
         // construct the classpath:
         //for i in "$PULSE_HOME"/system/www/WEB-INF/classes \
         //         "$PULSE_HOME"/lib                        \
