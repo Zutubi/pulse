@@ -35,6 +35,7 @@ public class AddProjectWizard extends BaseWizard
     private CvsDetails cvsDetails;
     private SvnDetails svnDetails;
     private P4Details p4Details;
+    private ClearCaseDetails ccDetails;
 
     private CustomDetails customDetails;
     private VersionedDetails versionedDetails;
@@ -61,6 +62,7 @@ public class AddProjectWizard extends BaseWizard
         cvsDetails = new CvsDetails(this, "cvs");
         svnDetails = new SvnDetails(this, "svn");
         p4Details = new P4Details(this, "p4");
+        ccDetails = new ClearCaseDetails(this, "clearcase");
 
         // step 3, project.
         antDetails = new AntDetails(this, "ant");
@@ -78,6 +80,7 @@ public class AddProjectWizard extends BaseWizard
         addState(cvsDetails);
         addState(svnDetails);
         addState(p4Details);
+        addState(ccDetails);
         addState(antDetails);
         addState(makeDetails);
         addState(mavenDetails);
@@ -192,6 +195,10 @@ public class AddProjectWizard extends BaseWizard
         {
             scm = p4Details.getP4();
         }
+        else if ("clearcase".equals(scmType))
+        {
+            scm = ccDetails.getClearCase();
+        }
         return scm;
     }
 
@@ -240,6 +247,7 @@ public class AddProjectWizard extends BaseWizard
                 scms.put("cvs", "cvs");
                 scms.put("p4", "perforce");
                 scms.put("svn", "subversion");
+                scms.put("clearcase", "clearcase");
             }
             return scms;
         }
@@ -425,6 +433,26 @@ public class AddProjectWizard extends BaseWizard
         public Svn getSvn()
         {
             return svn;
+        }
+
+        public String getNextStateName()
+        {
+            return ((AddProjectWizard) getWizard()).projectDetails.getType();
+        }
+    }
+
+    private class ClearCaseDetails extends BaseWizardState
+    {
+        private ClearCase clearCase = new ClearCase();
+
+        public ClearCaseDetails(Wizard wizard, String name)
+        {
+            super(wizard, name);
+        }
+
+        public ClearCase getClearCase()
+        {
+            return clearCase;
         }
 
         public String getNextStateName()

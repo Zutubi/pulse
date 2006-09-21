@@ -16,4 +16,5 @@
     <validator name="name" class="com.zutubi.pulse.xwork.validator.validators.NameValidator"/>
     <validator name="licensekey" class="com.zutubi.pulse.xwork.validator.validators.LicenseKeyValidator"/>
     <validator name="regex" class="com.zutubi.pulse.xwork.validator.validators.RegexValidator"/>
+    <validator name="clearcaseurl" class="com.zutubi.pulse.xwork.validator.validators.ClearCaseURLValidator"/>
 </validators>

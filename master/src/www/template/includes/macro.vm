@@ -919,6 +919,7 @@
     #if ($project.scm.class.name == 'com.zutubi.pulse.model.Svn') subversion #end
     #if ($project.scm.class.name == 'com.zutubi.pulse.model.Cvs') cvs #end
     #if ($project.scm.class.name == 'com.zutubi.pulse.model.P4') perforce #end
+    #if ($project.scm.class.name == 'com.zutubi.pulse.model.ClearCase') clearcase #end
 #end
 
 ##
@@ -2094,7 +2095,36 @@
             var updater = new Ajax.Updater({success: 'test-results'},
                                            "ajax/testP4.action",
                                            {
-                                               method: 'get',
+                                               method: 'post',
+                                               parameters: params,
+                                               onFailure: reportError
+                                           });
+
+            #ajaxError("test-results")
+        }
+
+    </script>
+#end
+
+##
+## Fragment of script to test a perforce connection
+##
+#macro(clearCaseTestScript $form)
+    <script type="text/javascript">
+        function testSettings()
+        {
+            #testInProgress("test-results")
+
+            var url = escape($F("${form}_clearCase_url"));
+            var viewstore = escape($F("${form}_clearCase_viewstore"));
+            var useVWSParameter = escape($F("${form}_clearCase_useVWSParameter"));
+            var clearCaseLT = escape($F("${form}_clearCase_clearCaseLT"));
+            var params = "url=" + url + "&viewstore=" + viewstore + "&useVWSParameter=" + useVWSParameter + "&clearCaseLT=" + clearCaseLT;
+
+            var updater = new Ajax.Updater({success: 'test-results'},
+                                           "ajax/testClearCase.action",
+                                           {
+                                               method: 'post',
                                                parameters: params,
                                                onFailure: reportError
                                            });
@@ -2124,7 +2154,7 @@
             var updater = new Ajax.Updater({success: 'test-results'},
                                            "ajax/testSvn.action",
                                            {
-                                               method: 'get',
+                                               method: 'post',
                                                parameters: params,
                                                onFailure: reportError
                                            });
@@ -2152,7 +2182,7 @@
             var updater = new Ajax.Updater({success: 'test-results'},
                                            "ajax/testCVS.action",
                                            {
-                                               method: 'get',
+                                               method: 'post',
                                                parameters: params,
                                                onFailure: reportError
                                            });

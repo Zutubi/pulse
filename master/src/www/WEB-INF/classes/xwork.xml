@@ -280,6 +280,7 @@
             <result name="svn" type="chain">editSvn!input</result>
             <result name="cvs" type="chain">editCvs!input</result>
             <result name="p4" type="chain">editP4!input</result>
+            <result name="clearcase" type="chain">editClearCase!input</result>
             <result name="error" type="velocity">generic-error.vm</result>
         </action>
 
@@ -292,6 +293,19 @@
         <action name="editSvn" class="com.zutubi.pulse.web.project.EditSvnAction">
             <interceptor-ref name="crudStack"/>
             <result name="input" type="velocity">edit-scm-svn.vm</result>
+            <result name="cancel" type="redirect">/configureProject.action?id=${projectId}</result>
+            <result name="success" type="redirect">/configureProject.action?id=${projectId}</result>
+        </action>
+
+        <!-- Alias is required as WW can't chain to a non-execute method :| -->
+        <action name="editClearCase!input" class="com.zutubi.pulse.web.project.EditClearCaseAction" method="doInput">
+            <interceptor-ref name="crudStack"/>
+            <result name="input" type="velocity">edit-scm-clearcase.vm</result>
+        </action>
+
+        <action name="editClearCase" class="com.zutubi.pulse.web.project.EditClearCaseAction">
+            <interceptor-ref name="crudStack"/>
+            <result name="input" type="velocity">edit-scm-clearcase.vm</result>
             <result name="cancel" type="redirect">/configureProject.action?id=${projectId}</result>
             <result name="success" type="redirect">/configureProject.action?id=${projectId}</result>
         </action>
@@ -504,6 +518,7 @@
             <param name="wizardClass">com.zutubi.pulse.web.project.AddProjectWizard</param>
             <result name="project" type="velocity">addproject-project.vm</result>
             <result name="cvs" type="velocity">addproject-cvs.vm</result>
+            <result name="clearcase" type="velocity">addproject-clearcase.vm</result>
             <result name="svn" type="velocity">addproject-svn.vm</result>
             <result name="p4" type="velocity">addproject-p4.vm</result>
             <result name="custom" type="velocity">addproject-custom.vm</result>
@@ -1269,6 +1284,10 @@
         </action>
 
         <action name="testP4" class="com.zutubi.pulse.web.ajax.TestP4Action">
+            <result name="success" type="velocity">test-settings.vm</result>
+        </action>
+
+        <action name="testClearCase" class="com.zutubi.pulse.web.ajax.TestClearCaseAction">
             <result name="success" type="velocity">test-settings.vm</result>
         </action>
 

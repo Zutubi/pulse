@@ -25,6 +25,9 @@
         <subclass name="com.zutubi.pulse.model.Cvs" discriminator-value="CVS" dynamic-update="false">
         </subclass>
 
+        <subclass name="com.zutubi.pulse.model.ClearCase" discriminator-value="CLEARCASE" dynamic-update="false">
+        </subclass>
+
     </class>
 
 </hibernate-mapping>

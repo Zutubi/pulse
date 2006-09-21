@@ -41,6 +41,10 @@ public class EditScmAction extends ProjectActionSupport
         {
             return "svn";
         }
+        else if (scm instanceof ClearCase)
+        {
+            return "clearcase";
+        }
 
         addActionError("Internal error: unrecognised scm type");
         return ERROR;

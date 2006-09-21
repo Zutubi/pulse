@@ -1,0 +1,35 @@
+#helpTag("ClearCase")
+#authorisationTags($principle)
+#projectTags($project)
+<html>
+<head>
+    <title>#wwtext("name=edit.clearCase")</title>
+    <script type="text/javascript" src="$base/js/prototype.js"></script>
+    #clearCaseTestScript("clearCase.edit")
+</head>
+<body>
+    #projectTabs("configuration")
+
+    #parse("/template/includes/actionerrors.vm")
+
+#wwcform("action=editClearCase.action" "id=clearCase.edit" "heading=%{getText('edit.clearCase')}" "method=post")
+    #wwhidden("name=id")
+    #wwhidden("name=projectId")
+
+    #wwtextfield("name=clearCase.url" "label=%{getText('clearCase.url')}" "required=true" "size=60" "tabindex=1")
+    #inlineHelp("clearCase.url.help")
+    #wwtextfield("name=clearCase.viewstore" "label=%{getText('clearCase.viewstore')}" "size=60" "tabindex=2")
+    #inlineHelp("clearCase.viewstore.help")
+    #wwcheckbox("name=clearCase.useVWSParameter" "label=%{getText('clearCase.useVWSParameter')}" "tabindex=3")
+    #inlineHelp("clearCase.useVWSParameter.help")
+    #wwcheckbox("name=clearCase.clearCaseLT" "label=%{getText('clearCase.clearCaseLT')}" "tabindex=4")
+    #inlineHelp("clearCase.clearCaseLT.help")
+
+    #testSettingsRow()
+
+    #saveCancel(10)
+ #end
+
+    #tabEnd()
+</body>
+</html>
