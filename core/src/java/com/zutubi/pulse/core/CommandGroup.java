@@ -70,7 +70,7 @@ public class CommandGroup implements Command, Validateable
         command.execute(recipeId, context, result);
         for(Artifact artifact: artifacts)
         {
-            artifact.capture(result, context.getPaths().getBaseDir(), context.getOutputDir());
+            artifact.capture(result, context);
         }
     }
 

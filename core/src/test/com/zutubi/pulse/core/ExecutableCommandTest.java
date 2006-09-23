@@ -215,7 +215,7 @@ public class ExecutableCommandTest extends PulseTestCase
 
     private void execute(ExecutableCommand command, CommandResult result)
     {
-        CommandContext context = new CommandContext(new SimpleRecipePaths(baseDirectory, null), outputDirectory);
+        CommandContext context = new CommandContext(new SimpleRecipePaths(baseDirectory, null), outputDirectory, null);
         command.execute(0, context, result);
     }
 }

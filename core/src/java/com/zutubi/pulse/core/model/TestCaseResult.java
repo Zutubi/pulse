@@ -91,4 +91,35 @@ public class TestCaseResult extends TestResult
     {
         return false;
     }
+
+    public boolean isEquivalent(TestResult otherResult)
+    {
+        if(!(otherResult instanceof TestCaseResult))
+        {
+            return false;
+        }
+
+        if(!super.isEquivalent(otherResult))
+        {
+            return false;
+        }
+
+        TestCaseResult other = (TestCaseResult) otherResult;
+        if(message == null)
+        {
+            if(other.message != null)
+            {
+                return false;
+            }
+        }
+        else
+        {
+            if(!message.equals(other.message))
+            {
+                return false;
+            }
+        }
+
+        return status == other.status;
+    }
 }

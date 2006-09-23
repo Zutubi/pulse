@@ -29,16 +29,9 @@ Error messages:
 
 
 Broken tests (total: 9, errors: 2, failures: 3):
-  - second stage :: second recipe@[pending] :: failing tests ::
-    first-artifact
-    first-artifact/testpath
+  - second stage :: second recipe@[pending]
     * root test suite
       total: 8, errors: 2, failures: 2
-    * root test suite :: 2 failed (failure)
-      a failure message which is bound to be detailed, potentially to
-      the extreme but in this case just to wrap a bit
-    * root test suite :: 3 error (error)
-      short error
     * root test suite :: nested suite
       total: 3, errors: 1, failures: 1
     * root test suite :: nested suite :: n1 failed (failure)
@@ -46,9 +39,10 @@ Broken tests (total: 9, errors: 2, failures: 3):
       the extreme but in this case just to wrap a bit
     * root test suite :: nested suite :: n2 error (error)
       short error
-  - second stage :: second recipe@[pending] :: failing tests ::
-    second-artifact
-    second-artifact/this/time/a/very/very/very/very/long/pathname/wh
-    ich/will/look/ugly/i/have/no/doubt
+    * root test suite :: 2 failed (failure)
+      a failure message which is bound to be detailed, potentially to
+      the extreme but in this case just to wrap a bit
+    * root test suite :: 3 error (error)
+      short error
     * test case at top level (failure)
       and i failed

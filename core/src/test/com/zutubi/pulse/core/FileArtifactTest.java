@@ -1,8 +1,8 @@
 package com.zutubi.pulse.core;
 
+import com.zutubi.pulse.core.model.CommandResult;
 import com.zutubi.pulse.test.PulseTestCase;
 import com.zutubi.pulse.util.FileSystemUtils;
-import com.zutubi.pulse.core.model.CommandResult;
 
 import java.io.File;
 import java.io.IOException;
@@ -73,7 +73,7 @@ public class FileArtifactTest extends PulseTestCase
     public void testCapturesExplicitFile()
     {
         fileArtifactObject.setFile("file.txt");
-        fileArtifactObject.capture(result, tmpSourceDir, tmpOutputDir);
+        capture();
 
         assertArtifactCaptured("file.txt");
         assertCapturedArtifactCount(1);
@@ -82,7 +82,7 @@ public class FileArtifactTest extends PulseTestCase
     public void testHandlesNonExistantFile()
     {
         fileArtifactObject.setFile("file.jpg");
-        fileArtifactObject.capture(result, tmpSourceDir, tmpOutputDir);
+        capture();
 
         assertArtifactNotCaptured("file.jpg");
         assertCapturedArtifactCount(0);
@@ -91,7 +91,7 @@ public class FileArtifactTest extends PulseTestCase
         fileArtifactObject.setFile("file.jpg");
         try
         {
-            fileArtifactObject.capture(result, tmpSourceDir, tmpOutputDir);
+            capture();
             fail();
         }
         catch (BuildException be)
@@ -104,7 +104,7 @@ public class FileArtifactTest extends PulseTestCase
     public void testSupportsWildCardMatchingOfSingleFile()
     {
         fileArtifactObject.setFile("*.tmp");
-        fileArtifactObject.capture(result, tmpSourceDir, tmpOutputDir);
+        capture();
 
         assertArtifactCaptured("file.tmp");
         assertCapturedArtifactCount(1);
@@ -113,7 +113,7 @@ public class FileArtifactTest extends PulseTestCase
     public void testSupportsWildCardMatchingOfMultipleFiles()
     {
         fileArtifactObject.setFile("some/file-*.txt");
-        fileArtifactObject.capture(result, tmpSourceDir, tmpOutputDir);
+        capture();
 
         assertArtifactNotCaptured("file.txt");
         assertArtifactNotCaptured("file.tmp");
@@ -126,7 +126,7 @@ public class FileArtifactTest extends PulseTestCase
     public void testSupportsWildCardMatchingAcrossMultipleDirectories()
     {
         fileArtifactObject.setFile("**/*.txt");
-        fileArtifactObject.capture(result, tmpSourceDir, tmpOutputDir);
+        capture();
 
         assertArtifactCaptured("file.txt");
         assertArtifactNotCaptured("file.tmp");
@@ -141,7 +141,7 @@ public class FileArtifactTest extends PulseTestCase
         File f = new File(tmpSourceDir, "file.txt");
         fileArtifactObject.setFile(f.getAbsolutePath());
 
-        fileArtifactObject.capture(result, tmpSourceDir, tmpOutputDir);
+        capture();
         assertArtifactCaptured("file.txt");
         assertCapturedArtifactCount(1);
     }
@@ -151,7 +151,7 @@ public class FileArtifactTest extends PulseTestCase
         File f = new File(tmpSourceDir, "file.*");
         fileArtifactObject.setFile(f.getAbsolutePath());
 
-        fileArtifactObject.capture(result, tmpSourceDir, tmpOutputDir);
+        capture();
         assertArtifactCaptured("file.txt");
         assertArtifactCaptured("file.tmp");
         assertCapturedArtifactCount(1);
@@ -161,12 +161,18 @@ public class FileArtifactTest extends PulseTestCase
     {
         File f = new File(tmpSourceDir, "some/directory/*.txt");
         fileArtifactObject.setFile(f.getAbsolutePath());
-        fileArtifactObject.capture(result, tmpSourceDir, tmpOutputDir);
+        capture();
 
         assertArtifactCaptured("file-xyz.txt");
         assertCapturedArtifactCount(1);
     }
 
+    private void capture()
+    {
+        RecipePaths paths = new SimpleRecipePaths(tmpSourceDir, null);
+        CommandContext context = new CommandContext(paths, tmpOutputDir, null);
+        fileArtifactObject.capture(result, context);
+    }
     private void assertArtifactCaptured(String relativePath)
     {
         // need to add 'test/' since this is the artifact name prefix.
@@ -185,5 +191,4 @@ public class FileArtifactTest extends PulseTestCase
     {
         assertEquals(count, result.getArtifacts().size());
     }
-
 }

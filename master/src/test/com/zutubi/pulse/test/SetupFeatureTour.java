@@ -3,10 +3,7 @@ package com.zutubi.pulse.test;
 import com.zutubi.pulse.MasterBuildPaths;
 import com.zutubi.pulse.agent.AgentManager;
 import com.zutubi.pulse.bootstrap.MasterConfigurationManager;
-import com.zutubi.pulse.core.AntPostProcessor;
-import com.zutubi.pulse.core.DirectoryArtifact;
-import com.zutubi.pulse.core.JUnitReportPostProcessor;
-import com.zutubi.pulse.core.RecipeProcessor;
+import com.zutubi.pulse.core.*;
 import com.zutubi.pulse.core.model.*;
 import com.zutubi.pulse.model.*;
 import com.zutubi.pulse.model.persistence.*;
@@ -430,7 +427,9 @@ public class SetupFeatureTour implements Runnable
             try
             {
                 StoredFileArtifact fileArtifact = addArtifact(command, dummy, "output.txt", "command output", "text/plain");
-                pp.process(command.getAbsoluteOutputDir(configManager.getDataDirectory()), fileArtifact, command);
+                TestSuiteResult testResults = new TestSuiteResult();
+                CommandContext context = new CommandContext(null, command.getAbsoluteOutputDir(configManager.getDataDirectory()), testResults);
+                pp.process(fileArtifact, command, context);
             }
             catch (Exception e)
             {
@@ -444,12 +443,22 @@ public class SetupFeatureTour implements Runnable
         File dummy = getDataFile("junit-failed.xml");
         JUnitReportPostProcessor pp = new JUnitReportPostProcessor();
 
-        for (CommandResult command: commands)
+        for (int i = 0; i < commands.length; i++)
         {
+            CommandResult command = commands[i];
+
             try
             {
                 StoredFileArtifact fileArtifact = addArtifact(command, dummy, "TESTS-TestSuites.xml", "JUnit XML Report", "text/html");
-                pp.process(command.getAbsoluteOutputDir(configManager.getDataDirectory()), fileArtifact, command);
+                TestSuiteResult testResults = new TestSuiteResult();
+                CommandContext context = new CommandContext(null, command.getAbsoluteOutputDir(configManager.getDataDirectory()), testResults);
+                pp.process(fileArtifact, command, context);
+
+                recipes[i].setTestSummary(testResults.getSummary());
+                TestSuitePersister persister = new TestSuitePersister();
+                File testDir = new File(recipes[i].getAbsoluteOutputDir(configManager.getDataDirectory()), RecipeResult.TEST_DIR);
+                testDir.mkdirs();
+                persister.write(testResults, testDir);
             }
             catch (Exception e)
             {
@@ -466,7 +475,10 @@ public class SetupFeatureTour implements Runnable
         {
             DirectoryArtifact da = new DirectoryArtifact();
             da.setName("JUnit HTML Report");
-            da.capture(command, dir, command.getAbsoluteOutputDir(configManager.getDataDirectory()));
+            RecipePaths paths = new SimpleRecipePaths(dir, null);
+            TestSuiteResult tests = new TestSuiteResult();
+            CommandContext context = new CommandContext(paths, command.getAbsoluteOutputDir(configManager.getDataDirectory()), tests);
+            da.capture(command, context);
         }
     }
 

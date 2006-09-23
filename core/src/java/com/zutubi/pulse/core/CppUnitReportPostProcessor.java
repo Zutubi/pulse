@@ -1,7 +1,11 @@
 package com.zutubi.pulse.core;
 
-import com.zutubi.pulse.core.model.*;
-import nu.xom.*;
+import com.zutubi.pulse.core.model.TestCaseResult;
+import com.zutubi.pulse.core.model.TestResult;
+import com.zutubi.pulse.core.model.TestSuiteResult;
+import nu.xom.Document;
+import nu.xom.Element;
+import nu.xom.Elements;
 
 import java.util.Map;
 import java.util.TreeMap;
@@ -32,7 +36,7 @@ public class CppUnitReportPostProcessor extends XMLReportPostProcessor
         suites = new TreeMap<String, TestSuiteResult>();
     }
 
-    protected void processDocument(Document doc, StoredFileArtifact artifact)
+    protected void processDocument(Document doc, TestSuiteResult tests)
     {
         Element root = doc.getRootElement();
 
@@ -49,7 +53,7 @@ public class CppUnitReportPostProcessor extends XMLReportPostProcessor
             processSuccessfulTests(testElements.get(i));
         }
 
-        addSuites(artifact);
+        addSuites(tests);
     }
 
     private void processFailedTests(Element element)
@@ -85,11 +89,11 @@ public class CppUnitReportPostProcessor extends XMLReportPostProcessor
         }
     }
 
-    private void addSuites(StoredFileArtifact artifact)
+    private void addSuites(TestSuiteResult tests)
     {
         for(TestSuiteResult suite: suites.values())
         {
-            artifact.addTest(suite);
+            tests.add(suite);
         }
     }
 

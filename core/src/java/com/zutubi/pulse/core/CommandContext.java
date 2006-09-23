@@ -1,5 +1,7 @@
 package com.zutubi.pulse.core;
 
+import com.zutubi.pulse.core.model.TestSuiteResult;
+
 import java.io.File;
 import java.io.OutputStream;
 
@@ -9,14 +11,28 @@ import java.io.OutputStream;
  */
 public class CommandContext
 {
+    /**
+     * Paths for the recipe being executed.
+     */
     private RecipePaths paths;
-    private OutputStream outputStream;
+    /**
+     * Output directory for the command being executed.
+     */
     private File outputDir;
+    /**
+     * Test results being accumulated for the recipe.
+     */
+    private TestSuiteResult testResults;
+    /**
+     * If not null, stream to write command output to (in addition to any output artifact).
+     */
+    private OutputStream outputStream;
 
-    public CommandContext(RecipePaths paths, File outputDir)
+    public CommandContext(RecipePaths paths, File outputDir, TestSuiteResult testResults)
     {
         this.paths = paths;
         this.outputDir = outputDir;
+        this.testResults = testResults;
     }
 
     public RecipePaths getPaths()
@@ -27,6 +43,11 @@ public class CommandContext
     public File getOutputDir()
     {
         return outputDir;
+    }
+
+    public TestSuiteResult getTestResults()
+    {
+        return testResults;
     }
 
     public OutputStream getOutputStream()

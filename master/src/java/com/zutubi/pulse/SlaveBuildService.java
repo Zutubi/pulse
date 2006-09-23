@@ -84,9 +84,15 @@ public class SlaveBuildService implements BuildService
         ZipInputStream zis = null;
         FileInputStream fis = null;
         FileOutputStream fos = null;
+        File tempDir = null;
 
         try
         {
+            // We don't want the system to see partially-unzipped directories,
+            // so we unzip to a temporary location and rename as the final
+            // step.
+            tempDir = FileSystemUtils.createTempDirectory();
+
             URL resultUrl = new URL("http", slave.getHost(), slave.getPort(), "/download?token=" + serviceTokenManager.getToken() + "&project=" + UrlEncoded.encodeString(project) + "&spec=" + UrlEncoded.encodeString(spec) + "&incremental=" + incremental + "&output=" + output + "&recipe=" + recipeId);
             URLConnection urlConnection = resultUrl.openConnection();
 
@@ -106,13 +112,18 @@ public class SlaveBuildService implements BuildService
             // now unzip the file
             fis = new FileInputStream(zipFile);
             zis = new ZipInputStream(fis);
-            FileSystemUtils.extractZip(zis, destination);
+            FileSystemUtils.extractZip(zis, tempDir);
             IOUtils.close(fis);
             fis = null;
             IOUtils.close(zis);
             zis = null;
 
             zipFile.delete();
+
+            if(!tempDir.renameTo(destination))
+            {
+                throw new BuildException("Unable to rename result directory to '" + destination.getAbsolutePath() + "'");
+            }
         }
         catch (IOException e)
         {
@@ -123,6 +134,11 @@ public class SlaveBuildService implements BuildService
             IOUtils.close(zis);
             IOUtils.close(fis);
             IOUtils.close(fos);
+
+            if(tempDir != null)
+            {
+                FileSystemUtils.removeDirectory(tempDir);
+            }
         }
     }
 

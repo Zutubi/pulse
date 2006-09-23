@@ -4,7 +4,7 @@ package com.zutubi.pulse.core.model;
  * Provides a small amoutn of summary information for a group of tests
  * results.
  */
-public class TestResultSummary
+public class TestResultSummary extends Entity
 {
     /**
      * Number of cases with failure status.
@@ -107,5 +107,18 @@ public class TestResultSummary
         }
 
         return false;
+    }
+
+    public void add(TestResultSummary summary)
+    {
+        addErrors(summary.errors);
+        addFailures(summary.failures);
+        addTotal(summary.total);
+    }
+
+    public String getSuccessRate()
+    {
+        double rate = getPassed() * 100.0 / total;
+        return String.format("%.2f", rate);
     }
 }

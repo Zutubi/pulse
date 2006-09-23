@@ -2,6 +2,7 @@ package com.zutubi.pulse.model;
 
 import com.zutubi.pulse.core.model.*;
 
+import java.io.File;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -223,4 +224,16 @@ public class RecipeResultNode extends Entity
         return worst;
     }
 
+    public void loadFailedTestResults(File dataRoot, int limit)
+    {
+        if(result != null)
+        {
+            result.loadFailedTestResults(dataRoot, limit);
+        }
+
+        for(RecipeResultNode child: children)
+        {
+            child.loadFailedTestResults(dataRoot, limit);
+        }
+    }
 }

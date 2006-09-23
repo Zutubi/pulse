@@ -15,8 +15,8 @@ import com.zutubi.pulse.util.logging.Logger;
 
 import java.io.*;
 import java.util.Date;
-import java.util.List;
 import java.util.LinkedList;
+import java.util.List;
 
 /**
  */
@@ -667,31 +667,31 @@ public class SetupDummyBuilds implements Runnable
         StoredArtifact artifact = createSimpleArtifact(name, filename);
         StoredFileArtifact file = artifact.getFile();
 
-        TestSuiteResult suite = new TestSuiteResult("suite one");
-        suite.add(new TestCaseResult("pass1", 100));
-        suite.add(new TestCaseResult("pass2", 10000));
-        suite.add(new TestCaseResult("fail1", 1, TestCaseResult.Status.FAILURE, "fail1 failure message"));
-        file.addTest(suite);
-
-        suite = new TestSuiteResult("suite two");
-        suite.add(new TestCaseResult("2fail1", 1, TestCaseResult.Status.FAILURE, "2fail1 failure message"));
-        suite.add(new TestCaseResult("2error1", 1, TestCaseResult.Status.ERROR, "2error1 error message"));
-        file.addTest(suite);
-
-        suite = new TestSuiteResult("complex suite");
-        suite.add(new TestCaseResult("cpass1", 100));
-        suite.add(new TestCaseResult("cpass2", 10000));
-        suite.add(new TestCaseResult("cfail1", 1, TestCaseResult.Status.FAILURE, "a very long single line failure message that keeps going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going"));
-        suite.add(new TestCaseResult("cerror1", 1, TestCaseResult.Status.ERROR, "a formatted error message:\n    this is indented\n    and this is indented below it"));
-        suite.add(new TestCaseResult("cerror2", 3245, TestCaseResult.Status.ERROR, "boring error"));
-        suite.add(new TestCaseResult("cpass3", 1050));
-        suite.add(new TestCaseResult("cpass4", 105005050));
-        TestSuiteResult nestedSuite = new TestSuiteResult("nested suite");
-        nestedSuite.add(new TestCaseResult("npass1", 11000));
-        nestedSuite.add(new TestCaseResult("nfail1", 1, TestCaseResult.Status.FAILURE, "nfail1 failure message"));
-        nestedSuite.add(new TestCaseResult("nerror1", 55067, TestCaseResult.Status.ERROR, "nerror1 failure message"));
-        suite.add(nestedSuite);
-        file.addTest(suite);
+//        TestSuiteResult suite = new TestSuiteResult("suite one");
+//        suite.add(new TestCaseResult("pass1", 100));
+//        suite.add(new TestCaseResult("pass2", 10000));
+//        suite.add(new TestCaseResult("fail1", 1, TestCaseResult.Status.FAILURE, "fail1 failure message"));
+//        file.addTest(suite);
+//
+//        suite = new TestSuiteResult("suite two");
+//        suite.add(new TestCaseResult("2fail1", 1, TestCaseResult.Status.FAILURE, "2fail1 failure message"));
+//        suite.add(new TestCaseResult("2error1", 1, TestCaseResult.Status.ERROR, "2error1 error message"));
+//        file.addTest(suite);
+//
+//        suite = new TestSuiteResult("complex suite");
+//        suite.add(new TestCaseResult("cpass1", 100));
+//        suite.add(new TestCaseResult("cpass2", 10000));
+//        suite.add(new TestCaseResult("cfail1", 1, TestCaseResult.Status.FAILURE, "a very long single line failure message that keeps going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going"));
+//        suite.add(new TestCaseResult("cerror1", 1, TestCaseResult.Status.ERROR, "a formatted error message:\n    this is indented\n    and this is indented below it"));
+//        suite.add(new TestCaseResult("cerror2", 3245, TestCaseResult.Status.ERROR, "boring error"));
+//        suite.add(new TestCaseResult("cpass3", 1050));
+//        suite.add(new TestCaseResult("cpass4", 105005050));
+//        TestSuiteResult nestedSuite = new TestSuiteResult("nested suite");
+//        nestedSuite.add(new TestCaseResult("npass1", 11000));
+//        nestedSuite.add(new TestCaseResult("nfail1", 1, TestCaseResult.Status.FAILURE, "nfail1 failure message"));
+//        nestedSuite.add(new TestCaseResult("nerror1", 55067, TestCaseResult.Status.ERROR, "nerror1 failure message"));
+//        suite.add(nestedSuite);
+//        file.addTest(suite);
 
         return artifact;
     }

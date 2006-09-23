@@ -117,12 +117,17 @@
             <result name="error" type="velocity">generic-error.vm</result>
         </action>
 
+        <action name="viewTestSuite" class="com.zutubi.pulse.web.project.ViewTestSuiteAction">
+            <result name="success" type="velocity">view-test-suite.vm</result>
+            <result name="error" type="velocity">generic-error.vm</result>
+        </action>
+
         <action name="viewCommandLog" class="com.zutubi.pulse.web.project.ViewBuildAction">
             <result name="success" type="velocity">view-command-log.vm</result>
             <result name="error" type="velocity">generic-error.vm</result>
         </action>
 
-        <action name="viewBuildArtifacts" class="com.zutubi.pulse.web.project.ViewBuildAction">
+        <action name="viewBuildArtifacts" class="com.zutubi.pulse.web.project.ViewArtifactsAction">
             <result name="success" type="velocity">view-artifacts.vm</result>
             <result name="error" type="velocity">generic-error.vm</result>
         </action>

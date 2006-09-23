@@ -129,6 +129,8 @@ public class FreemarkerBuildResultRendererTest extends PulseTestCase
         CommandResult command = new CommandResult("failing tests");
         command.failure("tests let me down");
 
+        TestSuiteResult tests = new TestSuiteResult();
+
         StoredFileArtifact artifact = new StoredFileArtifact("first-artifact/testpath");
         TestSuiteResult rootSuite = new TestSuiteResult("root test suite");
         rootSuite.add(new TestCaseResult("1 passed"));
@@ -149,15 +151,16 @@ public class FreemarkerBuildResultRendererTest extends PulseTestCase
         TestSuiteResult nestedEmptySuite = new TestSuiteResult("mmmm, boundary conditions");
         rootSuite.add(nestedEmptySuite);
 
-        artifact.addTest(rootSuite);
+        tests.add(rootSuite);
         command.addArtifact(new StoredArtifact("first-artifact", artifact));
 
         artifact = new StoredFileArtifact("second-artifact/this/time/a/very/very/very/very/long/pathname/which/will/look/ugly/i/have/no/doubt");
-        artifact.addTest(new TestCaseResult("test case at top level", 0, TestCaseResult.Status.FAILURE, "and i failed"));
+        tests.add(new TestCaseResult("test case at top level", 0, TestCaseResult.Status.FAILURE, "and i failed"));
         command.addArtifact(new StoredArtifact("second-artifact", artifact));
 
         secondResult.add(command);
-
+        secondResult.setFailedTestResults(tests);
+        secondResult.setTestSummary(tests.getSummary());
         createAndVerify("failures", type, "http://host.url", result);
     }
 

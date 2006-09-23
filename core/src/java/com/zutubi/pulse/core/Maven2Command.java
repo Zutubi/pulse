@@ -52,7 +52,7 @@ public class Maven2Command extends ExecutableCommand
         super.execute(recipeId, context, cmdResult);
 
         Maven2PostProcessor pp = new Maven2PostProcessor("maven.pp");
-        pp.process(context.getOutputDir(), cmdResult.getArtifact(OUTPUT_NAME).getFile(), cmdResult);
+        pp.process(cmdResult.getArtifact(OUTPUT_NAME).getFile(), cmdResult, context);
     }
 
     public String getGoals()

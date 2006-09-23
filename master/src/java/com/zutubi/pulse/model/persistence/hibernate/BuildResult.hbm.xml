@@ -124,6 +124,17 @@
             <one-to-many class="com.zutubi.pulse.core.model.CommandResult"/>
         </list>
 
+        <many-to-one name="testSummary" class="com.zutubi.pulse.core.model.TestResultSummary" column="TEST_SUMMARY_ID" cascade="all"/>
+
     </class>
 
+    <class name="com.zutubi.pulse.core.model.TestResultSummary" table="TEST_RESULT_SUMMARY" lazy="false">
+        <id name="id" type="java.lang.Long" column="ID" unsaved-value="0">
+            <generator class="hilo"/>
+        </id>
+
+        <property name="errors" column="ERRORS" type="int"/>
+        <property name="failures" column="FAILURES" type="int"/>
+        <property name="total" column="TOTAL" type="int"/>
+    </class>
 </hibernate-mapping>

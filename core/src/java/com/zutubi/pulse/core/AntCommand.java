@@ -57,7 +57,7 @@ public class AntCommand extends ExecutableCommand
         super.execute(recipeId, context, cmdResult);
 
         AntPostProcessor pp = new AntPostProcessor("ant.pp");
-        pp.process(context.getOutputDir(), cmdResult.getArtifact(OUTPUT_NAME).getFile(), cmdResult);
+        pp.process(cmdResult.getArtifact(OUTPUT_NAME).getFile(), cmdResult, context);
     }
 
     public String getBuildFile()

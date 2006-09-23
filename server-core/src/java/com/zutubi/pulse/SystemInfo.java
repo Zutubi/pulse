@@ -31,8 +31,11 @@ public class SystemInfo
         info.paths = new Properties();
 
         EnvConfig envConfig = configurationManager.getEnvConfig();
-        info.paths.put("pulse.homeDir.field", envConfig.getPulseHome());
-
+        if(envConfig.getPulseHome() != null)
+        {
+            info.paths.put("pulse.homeDir.field", envConfig.getPulseHome());
+        }
+        
         // TODO: show the pulse config path details... and while we are at it, show the system config details as well.
         //info.paths.put("pulse.config.field", envConfig.getPulseConfig());
 

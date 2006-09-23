@@ -59,7 +59,7 @@ public class ProjectRepoBootstrapper implements Bootstrapper
             {
                 return paths.getOutputDir();
             }
-        }, context.getOutputDir()));
+        }, context.getOutputDir(), null));
 
         // If the checkout and base differ, then we need to copy over to the base.
         if(!paths.getBaseDir().equals(paths.getPersistentWorkDir()))

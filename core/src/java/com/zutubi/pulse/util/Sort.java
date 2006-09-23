@@ -2,7 +2,6 @@ package com.zutubi.pulse.util;
 
 import java.text.Collator;
 import java.util.Comparator;
-import java.util.Arrays;
 
 /**
  * <class-comment/>
@@ -34,9 +33,9 @@ public class Sort
         public int compare(String p1, String p2)
         {
             String firstPath = "";
-            String firstName = "";
+            String firstName = p1;
             String secondPath= "";
-            String secondName= "";
+            String secondName= p2;
 
             int index = p1.lastIndexOf('.');
             if(index >= 0)

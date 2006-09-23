@@ -15,7 +15,6 @@ public class StoredFileArtifact extends Entity
     private String path;
     private String type;
     private List<Feature> features;
-    private List<TestResult> tests;
 
     public StoredFileArtifact()
     {
@@ -32,7 +31,6 @@ public class StoredFileArtifact extends Entity
         setPath(path);
         this.type = type;
         features = new LinkedList<Feature>();
-        tests = new LinkedList<TestResult>();
     }
 
     public String getPath()
@@ -133,65 +131,6 @@ public class StoredFileArtifact extends Entity
         for (Feature f : features)
         {
             if (f instanceof PlainFeature)
-            {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
-    public List<TestResult> getTests()
-    {
-        return tests;
-    }
-
-    public void setTests(List<TestResult> tests)
-    {
-        this.tests = tests;
-    }
-
-    public void addTest(TestResult test)
-    {
-        tests.add(test);
-    }
-
-    public boolean hasBrokenTests()
-    {
-        return getTestSummary().getBroken() > 0;
-    }
-
-    public TestResultSummary getTestSummary()
-    {
-        TestResultSummary summary = new TestResultSummary();
-        accumulateTestSummary(summary);
-        return summary;
-    }
-
-    public void accumulateTestSummary(TestResultSummary summary)
-    {
-        for (TestResult test : tests)
-        {
-            test.accumulateSummary(summary);
-        }
-    }
-
-    public void addAllTestResults(List<TestResult> allTests)
-    {
-        for(TestResult result: tests)
-        {
-            if(!testExists(result.getName(), allTests))
-            {
-                allTests.add(result);
-            }
-        }
-    }
-
-    private boolean testExists(String name, List<TestResult> tests)
-    {
-        for(TestResult t: tests)
-        {
-            if(t.getName().equals(name))
             {
                 return true;
             }

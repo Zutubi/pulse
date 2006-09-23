@@ -1,0 +1,81 @@
+#helpTag("Build+Tests+Tab")
+#authorisationTags($principle)
+#buildTags($project $result)
+<html>
+<head>
+    <title>#wwtext("name=build") $result.number</title>
+</head>
+<body>
+    #buildTabs($result "tests")
+
+    <p>
+        <a href="viewTests.action?id=$result.id">#wwtext("name=tests.all")</a>
+        :: <a href="viewTestSuite.action?id=$result.id&nodeId=$node.id">#wwtext("name=build.stage") $!webwork.htmlEncode($node.stage)</a>
+#set($suitePath="")
+#foreach($element in $paths)
+    #if($element.length() > 0)
+        #set($suitePath = "$suitePath/$element")
+        :: <a href="viewTestSuite.action?id=$result.id&nodeId=$node.id&path=$action.urlEncode($suitePath)">#wwtext("name=test.suite") $!webwork.htmlEncode($action.urlDecode($element))</a>
+    #end
+#end
+    </p>
+
+    #testSummaryTable($suite.summary)
+
+#if($suite.suites.size() > 0)
+    <table class="fill-content">
+        #headingRow("test.suites" 7)
+        <tr>
+            #contentHeading("test.name" 1)
+            #contentHeading("test.status" 2)
+            #contentHeading("test.total" 1)
+            #contentHeading("test.failures" 1)
+            #contentHeading("test.errors" 1)
+            #contentHeading("test.duration" 1)
+        </tr>
+    #foreach($childSuite in $suite.suites)
+        #if($path.length() > 0)
+            #set($childPath = "$path/$action.urlEncode($childSuite.name)")
+        #else
+            #set($childPath = "$action.urlEncode($childSuite.name)")
+        #end
+        <tr>
+            #dynamicLinkCell($childSuite.name "viewTestSuite.action?id=$result.id&nodeId=$node.id&path=$action.urlEncode($childPath)")
+            #testStatusCell($childSuite)
+            #rightCell($childSuite.total)
+            #rightCell($childSuite.failures)
+            #rightCell($childSuite.errors)
+            #rightCell($childSuite.prettyDuration)
+        </tr>
+    #end
+    </table>
+#end
+
+#if($suite.cases.size() > 0)
+    <table class="fill-content">
+        #headingRow("test.cases" 5)
+        <tr>
+            #contentHeading("test.name" 1)
+            #contentHeading("test.status" 2)
+            #contentHeading("test.details" 1)
+            #contentHeading("test.duration" 1)
+        </tr>
+    #foreach($childCase in $suite.cases)
+        <tr>
+            #dynamicCell($childCase.name)
+            #testStatusCell($childCase)
+            #if($childCase.message)
+            <td class="content-wrap">
+                $action.plainToHtml($childCase.message)
+            </td>
+            #else
+                #contentCell("empty.cell")
+            #end
+            #rightCell($childCase.prettyDuration)
+        </tr>
+    #end
+    </table>
+#end
+
+    #tabEnd()
+</html>
