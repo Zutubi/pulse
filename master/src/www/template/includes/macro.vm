@@ -826,7 +826,7 @@
         #wwtext("name=tests.none")
     #else
         #if($recipe)
-            <a href="viewTests.action?id=$build.id&amp;nodeId=$recipe.id">
+            <a href="viewTestSuite.action?id=$build.id&amp;nodeId=$recipe.id">
         #else
             <a href="viewTests.action?id=$build.id">
         #end
@@ -1163,7 +1163,7 @@
         #dynamicCell($recipe.recipeNameSafe)
         #dynamicCell($resultNode.hostSafe)
         #statusCell($recipe $showAnimated)
-        #testResultsCell($build $recipe $recipe)
+        #testResultsCell($build $resultNode $recipe)
         #dateClassCell($recipe)
         #elapsedCell($recipe)
         <td class="content">
