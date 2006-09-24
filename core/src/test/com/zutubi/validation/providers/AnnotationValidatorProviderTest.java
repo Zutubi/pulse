@@ -1,7 +1,6 @@
 package com.zutubi.validation.providers;
 
 import junit.framework.TestCase;
-import com.zutubi.validation.bean.DefaultObjectFactory;
 import com.zutubi.validation.Validator;
 import com.zutubi.validation.mock.*;
 import com.zutubi.validation.validators.*;
@@ -105,7 +104,7 @@ public class AnnotationValidatorProviderTest extends TestCase
         List<Validator> validators = provider.getValidators(jacket);
         assertEquals(4, validators.size());
         assertTrue(validators.get(0) instanceof RequiredValidator);
-        assertTrue(validators.get(1) instanceof EmailFieldValidator);
+        assertTrue(validators.get(1) instanceof EmailValidator);
         assertTrue(validators.get(2) instanceof NameValidator);
         assertTrue(validators.get(3) instanceof RegexValidator);
     }

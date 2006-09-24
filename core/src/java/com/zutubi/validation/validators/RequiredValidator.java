@@ -12,7 +12,6 @@ public class RequiredValidator extends FieldValidatorSupport
 
     public RequiredValidator()
     {
-        setMessageKey("${fieldName}.required");
         setDefaultMessageKey(".required");
     }
 
@@ -21,7 +20,7 @@ public class RequiredValidator extends FieldValidatorSupport
         Object fieldValue = getFieldValue(getFieldName(), obj);
         if (fieldValue == null)
         {
-            validationContext.addFieldError(getFieldName(), getMessage());
+            addFieldError(getFieldName());
         }
 
         if (fieldValue instanceof String)
@@ -29,7 +28,7 @@ public class RequiredValidator extends FieldValidatorSupport
             String str = ((String)fieldValue);
             if (str.length() == 0)
             {
-                validationContext.addFieldError(getFieldName(), getMessage());
+                addFieldError(getFieldName());
             }
         }
     }

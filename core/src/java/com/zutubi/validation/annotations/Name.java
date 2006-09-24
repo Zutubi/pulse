@@ -20,7 +20,11 @@ public @interface Name
 
     public static final String DEFAULT_defaultMessage = "";
 
+    public static final boolean DEFAULT_shortCircuit = true;
+
     public String messageKey() default DEFAULT_messageKey;
 
     public String defaultMessage() default DEFAULT_defaultMessage;
+
+    public boolean shortCircuit() default DEFAULT_shortCircuit;
 }

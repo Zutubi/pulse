@@ -7,7 +7,7 @@ import com.zutubi.validation.ShortCircuitableValidator;
 /**
  * <class-comment/>
  */
-public abstract class FieldValidatorSupport extends ValidatorSupport implements FieldValidator, ShortCircuitableValidator
+public abstract class FieldValidatorSupport extends ValidatorSupport implements FieldValidator
 {
     private String fieldName;
 
@@ -17,18 +17,6 @@ public abstract class FieldValidatorSupport extends ValidatorSupport implements 
 
     private String messageKey;
     private String defaultMessageKey;
-
-    private boolean shortCircuit = true;
-
-    public void setShortCircuit(boolean b)
-    {
-        shortCircuit = b;
-    }
-
-    public boolean isShortCircuit()
-    {
-        return shortCircuit;
-    }
 
     public String getFieldName()
     {
@@ -115,5 +103,17 @@ public abstract class FieldValidatorSupport extends ValidatorSupport implements 
     protected void setDefaultMessageKey(String messageKey)
     {
         this.defaultMessageKey = messageKey;
+    }
+
+    // helper methods
+
+    protected void addFieldError(String fieldName)
+    {
+        validationContext.addFieldError(fieldName, getMessage());
+    }
+
+    protected void addActionError()
+    {
+        validationContext.addActionError(getMessage());
     }
 }

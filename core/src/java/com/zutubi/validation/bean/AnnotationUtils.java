@@ -4,6 +4,8 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.util.Map;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * <class-comment/>
@@ -74,11 +76,11 @@ public class AnnotationUtils
     public static Map<String, Object> collectPropertiesFromAnnotation(Annotation annotation)
     {
         Map<String, Object> properties = new HashMap<String, Object>();
-        for (Method annotationMethod : annotation.getClass().getMethods())
+        for (Method annotationMethod : annotation.getClass().getDeclaredMethods())
         {
             try
             {
-                if (!isDefault(annotation, annotationMethod))
+                if (isUserDeclared(annotationMethod) && !isDefault(annotation, annotationMethod))
                 {
                     properties.put(annotationMethod.getName(), annotationMethod.invoke(annotation));
                 }
@@ -91,4 +93,17 @@ public class AnnotationUtils
         return properties;
     }
 
+    private static final Set<String> internalMethods = new HashSet<String>();
+    static
+    {
+        internalMethods.add("toString");
+        internalMethods.add("hashCode");
+        internalMethods.add("annotationType");
+        internalMethods.add("equals");
+    }
+
+    public static final boolean isUserDeclared(Method annotationMethod)
+    {
+        return !internalMethods.contains(annotationMethod.getName());
+    }
 }
