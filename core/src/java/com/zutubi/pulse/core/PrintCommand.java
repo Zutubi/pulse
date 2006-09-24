@@ -12,8 +12,7 @@ import java.util.List;
 /**
  * A command that prints a message to stdout.
  */
-public class
-        PrintCommand extends CommandSupport
+public class PrintCommand extends CommandSupport
 {
     /**
      * The message to print.
@@ -30,7 +29,7 @@ public class
 
     private boolean terminated = false;
 
-    public void execute(long recipeId, CommandContext context, CommandResult result)
+    public void execute(CommandContext context, CommandResult result)
     {
         if(terminated)
         {

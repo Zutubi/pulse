@@ -858,7 +858,7 @@ public class ThreadedRecipeQueueTest extends TestCase implements EventListener
             throw new RuntimeException("Method not implemented.");
         }
 
-        public boolean build(RecipeRequest request)
+        public boolean build(RecipeRequest request, BuildContext context)
         {
             semaphore.release();
             if(throwError)

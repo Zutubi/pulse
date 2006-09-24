@@ -3,6 +3,7 @@ package com.zutubi.pulse.slave;
 import com.zutubi.pulse.ChainBootstrapper;
 import com.zutubi.pulse.ServerBootstrapper;
 import com.zutubi.pulse.ServerRecipePaths;
+import com.zutubi.pulse.BuildContext;
 import com.zutubi.pulse.core.BuildException;
 import com.zutubi.pulse.core.RecipeProcessor;
 import com.zutubi.pulse.core.RecipeRequest;
@@ -56,7 +57,7 @@ public class SlaveRecipeProcessor
         return null;
     }
 
-    public void processRecipe(String master, long slaveId, RecipeRequest request)
+    public void processRecipe(String master, long slaveId, RecipeRequest request, BuildContext context)
     {
         MasterService masterProxy = getMasterProxy(master);
         if(masterProxy != null)
@@ -68,7 +69,7 @@ public class SlaveRecipeProcessor
 
             try
             {
-                recipeProcessor.build(request, processorPaths, repo, true);
+                recipeProcessor.build(request, processorPaths, repo, true, context);
             }
             catch (BuildException e)
             {

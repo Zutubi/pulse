@@ -65,9 +65,9 @@ public class CommandGroup implements Command, Validateable
         return customArtifact;
     }
 
-    public void execute(long recipeId, CommandContext context, CommandResult result)
+    public void execute(CommandContext context, CommandResult result)
     {
-        command.execute(recipeId, context, result);
+        command.execute(context, result);
         for(Artifact artifact: artifacts)
         {
             artifact.capture(result, context);

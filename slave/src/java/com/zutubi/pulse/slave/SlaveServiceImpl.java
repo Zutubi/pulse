@@ -3,6 +3,7 @@ package com.zutubi.pulse.slave;
 import com.zutubi.pulse.ResourceDiscoverer;
 import com.zutubi.pulse.SystemInfo;
 import com.zutubi.pulse.Version;
+import com.zutubi.pulse.BuildContext;
 import com.zutubi.pulse.agent.Status;
 import com.zutubi.pulse.bootstrap.ComponentContext;
 import com.zutubi.pulse.core.RecipeRequest;
@@ -62,11 +63,11 @@ public class SlaveServiceImpl implements SlaveService
         }
     }
 
-    public boolean build(String token, String master, long slaveId, RecipeRequest request) throws InvalidTokenException
+    public boolean build(String token, String master, long slaveId, RecipeRequest request, BuildContext context) throws InvalidTokenException
     {
         serviceTokenManager.validateToken(token);
 
-        RecipeCommand command = new RecipeCommand(master, slaveId, request);
+        RecipeCommand command = new RecipeCommand(master, slaveId, request, context);
         ComponentContext.autowire(command);
         ErrorHandlingRunnable runnable = new ErrorHandlingRunnable(master, serviceTokenManager, request.getId(), command);
         ComponentContext.autowire(runnable);

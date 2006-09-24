@@ -393,7 +393,7 @@ public class RecipeControllerTest extends PulseTestCase
             throw new RuntimeException("Method not implemented.");
         }
 
-        public boolean build(RecipeRequest request)
+        public boolean build(RecipeRequest request, BuildContext context)
         {
             throw new RuntimeException("Method not implemented.");
         }

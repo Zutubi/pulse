@@ -16,7 +16,7 @@ public class UnexpectedExceptionCommand extends CommandSupport
         super(name);
     }
 
-    public void execute(long recipeId, CommandContext context, CommandResult result)
+    public void execute(CommandContext context, CommandResult result)
     {
         throw new RuntimeException("unexpected exception command");
     }

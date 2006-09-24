@@ -203,6 +203,28 @@ public class ExecutableCommandTest extends PulseTestCase
         assertEquals("text/plain", outputArtifact.getType());
     }
 
+    public void testBuildNumberAddedToEnvironment() throws IOException
+    {
+        ExecutableCommand command = new ExecutableCommand();
+        command.setExe("echo");
+        CommandResult result = new CommandResult("success");
+        execute(command, result, 1234);
+
+        String output = getEnv();
+        assertTrue(output.contains("PULSE_BUILD_NUMBER=1234"));
+    }
+
+    public void testBuildNumberNotAddedToEnvironmentWhenNotSpecified() throws IOException
+    {
+        ExecutableCommand command = new ExecutableCommand();
+        command.setExe("echo");
+        CommandResult result = new CommandResult("success");
+        execute(command, result);
+
+        String output = getEnv();
+        assertFalse(output.contains("PULSE_BUILD_NUMBER"));
+    }
+
     private String getOutput() throws IOException
     {
         return IOUtils.fileToString(new File(outputDirectory, ExecutableCommand.OUTPUT_NAME + "/output.txt"));
@@ -216,6 +238,13 @@ public class ExecutableCommandTest extends PulseTestCase
     private void execute(ExecutableCommand command, CommandResult result)
     {
         CommandContext context = new CommandContext(new SimpleRecipePaths(baseDirectory, null), outputDirectory, null);
-        command.execute(0, context, result);
+        command.execute(context, result);
+    }
+
+    private void execute(ExecutableCommand command, CommandResult result, long buildNumber)
+    {
+        CommandContext context = new CommandContext(new SimpleRecipePaths(baseDirectory, null), outputDirectory, null);
+        context.setBuildNumber(buildNumber);
+        command.execute(context, result);
     }
 }
