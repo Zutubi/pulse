@@ -1,7 +1,6 @@
 #helpTag("Dashboard+Section")
 #authorisationTags($principle)
 <content tag="selectedTab">dashboard</content>
-<content tag="helpPage">Dashboard</content>
 <html>
 <head>
     <title>#wwtext("name=dashboard")</title>
