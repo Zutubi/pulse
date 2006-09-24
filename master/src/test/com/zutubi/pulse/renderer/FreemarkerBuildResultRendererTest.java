@@ -16,7 +16,7 @@ import java.util.List;
  */
 public class FreemarkerBuildResultRendererTest extends PulseTestCase
 {
-    private boolean generate = false;
+    private boolean generate = true;
 
     FreemarkerBuildResultRenderer renderer;
 
@@ -65,12 +65,22 @@ public class FreemarkerBuildResultRendererTest extends PulseTestCase
 
     public void testWithFailures() throws Exception
     {
-        failuresHelper("plain");
+        failuresHelper("plain", false);
     }
 
     public void testHTMLWithFailures() throws Exception
     {
-        failuresHelper("html");
+        failuresHelper("html", false);
+    }
+
+    public void testWithExcessFailures() throws Exception
+    {
+        failuresHelper("plain", true);
+    }
+
+    public void testHTMLWithExcessFailures() throws Exception
+    {
+        failuresHelper("html", true);
     }
 
     private void errorsHelper(String type) throws Exception
@@ -112,7 +122,7 @@ public class FreemarkerBuildResultRendererTest extends PulseTestCase
         createAndVerify("errors", type, "http://another.url", result, changes);
     }
 
-    private void failuresHelper(String type) throws Exception
+    private void failuresHelper(String type, boolean excessFailures) throws Exception
     {
         BuildResult result = createSuccessfulBuild();
         result.failure("test failed tests");
@@ -133,23 +143,13 @@ public class FreemarkerBuildResultRendererTest extends PulseTestCase
 
         StoredFileArtifact artifact = new StoredFileArtifact("first-artifact/testpath");
         TestSuiteResult rootSuite = new TestSuiteResult("root test suite");
-        rootSuite.add(new TestCaseResult("1 passed"));
         rootSuite.add(new TestCaseResult("2 failed", 0, TestCaseResult.Status.FAILURE, "a failure message which is bound to be detailed, potentially to the extreme but in this case just to wrap a bit"));
         rootSuite.add(new TestCaseResult("3 error", 0, TestCaseResult.Status.ERROR, "short error"));
-        rootSuite.add(new TestCaseResult("4 passed"));
 
         TestSuiteResult nestedSuite = new TestSuiteResult("nested suite");
         nestedSuite.add(new TestCaseResult("n1 failed", 0, TestCaseResult.Status.FAILURE, "a failure message which is bound to be detailed, potentially to the extreme but in this case just to wrap a bit"));
         nestedSuite.add(new TestCaseResult("n2 error", 0, TestCaseResult.Status.ERROR, "short error"));
-        nestedSuite.add(new TestCaseResult("n3 passed"));
         rootSuite.add(nestedSuite);
-
-        TestSuiteResult nestedPassSuite = new TestSuiteResult("you shouldn't see this!");
-        nestedPassSuite.add(new TestCaseResult("nps"));
-        rootSuite.add(nestedPassSuite);
-
-        TestSuiteResult nestedEmptySuite = new TestSuiteResult("mmmm, boundary conditions");
-        rootSuite.add(nestedEmptySuite);
 
         tests.add(rootSuite);
         command.addArtifact(new StoredArtifact("first-artifact", artifact));
@@ -160,8 +160,14 @@ public class FreemarkerBuildResultRendererTest extends PulseTestCase
 
         secondResult.add(command);
         secondResult.setFailedTestResults(tests);
-        secondResult.setTestSummary(tests.getSummary());
-        createAndVerify("failures", type, "http://host.url", result);
+        TestResultSummary summary = tests.getSummary();
+        if(excessFailures)
+        {
+            summary.setFailures(summary.getFailures() + 123);
+        }
+
+        secondResult.setTestSummary(summary);
+        createAndVerify((excessFailures ? "excess" : "") + "failures", type, "http://host.url", result);
     }
 
     private BuildResult createBuildWithChanges(List<Changelist> changes)

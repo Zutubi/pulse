@@ -241,19 +241,7 @@ pre.feature {
 
 [#assign testSummary = result.testSummary]
 [#if !testSummary.allPassed()]
-<tr><td>
-    <table class="content" style="border-collapse: collapse; border: 1px solid #bbb; margin-bottom: 16px;">
-        <th class="heading" colspan="3" style="border: 1px solid #bbb; padding: 4px; text-align: left; vertical-align: top; background: #e9e9f5;">
-            broken tests (total: ${testSummary.total}, errors: ${testSummary.errors}, failures: ${testSummary.failures})
-        </th>
-        <tr>
-            [@contentHeader cc="test"/]
-            [@contentHeader cc="status"/]
-            [@contentHeader cc="details"/]
-        </tr>
-        [@buildFailedTestsHTML result=result/]
-    </table>
-</td></tr>
+    [@buildFailedTestsHTML result=result/]
 [/#if]
 </table>
 </body>

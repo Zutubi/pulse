@@ -122,20 +122,14 @@ A macro to show test suite failures as part of a flat plain text list.
         [#else]
             [#local testContext = suite.name]
         [/#if]
-    * ${renderer.wrapString(testContext, "      ")}
-      ${renderer.wrapString("total: ${suite.total}, errors: ${suite.errors}, failures: ${suite.failures}", "      ")}
     [#else]
         [#local testContext = suiteContext]
     [/#if]
     [#list suite.suites as childSuite]
-        [#if childSuite.hasBrokenTests()]
-            [@showTestSuiteFailures suite=childSuite suiteContext=testContext/]
-       [/#if]
+        [@showTestSuiteFailures suite=childSuite suiteContext=testContext/]
     [/#list]
     [#list suite.cases as childCase]
-        [#if childCase.hasBrokenTests()]
-            [@showTestCaseFailure test=childCase suiteContext=testContext/]
-        [/#if]
+        [@showTestCaseFailure test=childCase suiteContext=testContext/]
     [/#list]
 [/#macro]
 
@@ -145,7 +139,12 @@ A macro to show the failed tests in a recipe as a flat plain text list.
 [#macro recipeFailedTests result context]
     [#if result.hasBrokenTests()]
   - ${renderer.wrapString(context, "    ")}
-        [@showTestSuiteFailures suite=result.testResults showContext=false/]
+        [#local excess = result.excessFailureCount/]
+        [#if excess &gt; 0]
+    NOTE: This recipe has ${excess} more failures, see the full test report
+    for details.
+        [/#if]
+        [@showTestSuiteFailures suite=result.failedTestResults showContext=false/]
     [/#if]
 [/#macro]
 
@@ -282,47 +281,62 @@ results as a HTML nested list.
 [/#macro]
 
 [#macro showSuiteFailuresHTML test showSummary=true indent=""]
-    [#if test.hasBrokenTests()]
-        [#if showSummary]
-        <tr>
-            [#assign class = "test-failure"]
-            [@classCell cc="${indent}${test.name?html}"/]
-            [@contentCell cc="&nbsp;"/]
-            [@contentCell cc="total: ${test.total}, errors: ${test.errors}, failures: ${test.failures}"/]
-        </tr>
-            [#local nestedIndent="${indent}&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"/]
-        [#else]
-            [#local nestedIndent=indent/]
-        [/#if]
-        [#list test.suites as childSuite]
-            [@showSuiteFailuresHTML test=childSuite indent=nestedIndent/]
-        [/#list]
-        [#list test.cases as childCase]
-            [@showCaseFailureHTML test=childCase indent=nestedIndent/]
-        [/#list]
+    [#if showSummary]
+    <tr>
+        [#assign class = "test-failure"]
+        [@classCell cc="${indent}${test.name?html}"/]
+        [@contentCell cc="&nbsp;"/]
+        [@contentCell cc="&nbsp;"/]
+    </tr>
+        [#local nestedIndent="${indent}&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"/]
+    [#else]
+        [#local nestedIndent=indent/]
     [/#if]
+    [#list test.suites as childSuite]
+        [@showSuiteFailuresHTML test=childSuite indent=nestedIndent/]
+    [/#list]
+    [#list test.cases as childCase]
+        [@showCaseFailureHTML test=childCase indent=nestedIndent/]
+    [/#list]
 [/#macro]
 
 [#macro showCaseFailureHTML test indent=""]
-    [#if test.hasBrokenTests()]
-        <tr>
-        [#assign class = "test-failure"]
-            [@classCell cc="${indent}${test.name?html}"/]
-            [@classCell cc=test.status?lower_case/]
-        [#if test.message?exists]
-            [@openCell/]
-                    <pre>${test.message?html}</pre>
-            </td>
-        [#else]
-            [@contentCell cc="&nbsp;"/]
-        [/#if]
-        </tr>
+    <tr>
+    [#assign class = "test-failure"]
+        [@classCell cc="${indent}${test.name?html}"/]
+        [@classCell cc=test.status?lower_case/]
+    [#if test.message?exists]
+        [@openCell/]
+                <pre>${test.message?html}</pre>
+        </td>
+    [#else]
+        [@contentCell cc="&nbsp;"/]
     [/#if]
+    </tr>
 [/#macro]
 
 [#macro recipeNodeFailedTestsHTML node]
-    [#if node.result.hasBrokenTests()]
-        [@showSuiteFailuresHTML test=node.result.testResults showSummary=false/]
+    [#if node.result?exists]
+        [#if node.result.hasBrokenTests()]
+            [#local summary = node.result.testSummary/]
+                <tr><td>
+                    <table class="content" style="border-collapse: collapse; border: 1px solid #bbb; margin-bottom: 16px;">
+                        <th class="heading" colspan="3" style="border: 1px solid #bbb; padding: 4px; text-align: left; vertical-align: top; background: #e9e9f5;">
+                            stage ${node.stage} :: ${node.result.recipeNameSafe}@${node.hostSafe} :: broken tests (total: ${summary.total}, errors: ${summary.errors}, failures: ${summary.failures})
+                        </th>
+            [#local excess = node.result.excessFailureCount/]
+            [#if excess &gt; 0]
+                        <tr><th colspan="3" style="background-color: #ffffc0">This recipe has ${excess} further test failures, see the full test report for details.</th></tr>
+            [/#if]
+                        <tr>
+                            [@contentHeader cc="test"/]
+                            [@contentHeader cc="status"/]
+                            [@contentHeader cc="details"/]
+                        </tr>
+            [@showSuiteFailuresHTML test=node.result.failedTestResults showSummary=false/]
+                    </table>
+                </td></tr>
+        [/#if]
     [/#if]
     [#list node.children as child]
         [@recipeNodeFailedTestsHTML node=child/]
