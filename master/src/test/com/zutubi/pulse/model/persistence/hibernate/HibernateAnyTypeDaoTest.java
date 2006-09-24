@@ -4,7 +4,6 @@
 package com.zutubi.pulse.model.persistence.hibernate;
 
 import com.zutubi.pulse.core.model.Entity;
-import com.zutubi.pulse.core.model.RecipeResult;
 import com.zutubi.pulse.model.Project;
 import com.zutubi.pulse.model.User;
 import com.zutubi.pulse.model.persistence.AnyTypeDao;
@@ -44,8 +43,7 @@ public class HibernateAnyTypeDaoTest extends MasterPersistenceTestCase
         entities.add(new Project());
         entities.add(new Project());
         entities.add(new User());
-        entities.add(new RecipeResult());
-        entities.add(new RecipeResult());
+        entities.add(new User());
         List<ObjectHandle> expectedHandles = new LinkedList<ObjectHandle>();
         for (Entity e : entities)
         {
@@ -54,7 +52,7 @@ public class HibernateAnyTypeDaoTest extends MasterPersistenceTestCase
         }
 
         List<ObjectHandle> handles = dao.findAll();
-        assertEquals(5, handles.size());
+        assertEquals(4, handles.size());
         for (ObjectHandle handle : handles)
         {
             assertTrue(hasEntry(expectedHandles, handle));
