@@ -290,7 +290,8 @@ public class TimeStamps
         {
             if (elapsed < Constants.SECOND && result.length() == 0)
             {
-                result.append("< 1 sec");
+                result.append(elapsed);
+                result.append(" ms");
             }
             else
             {

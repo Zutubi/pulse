@@ -1,17 +1,19 @@
 package com.zutubi.pulse.model;
 
-import com.zutubi.pulse.core.model.Entity;
-import com.zutubi.pulse.condition.*;
+import antlr.collections.AST;
+import com.zutubi.pulse.condition.FalseNotifyCondition;
+import com.zutubi.pulse.condition.NotifyCondition;
+import com.zutubi.pulse.condition.NotifyConditionFactory;
+import com.zutubi.pulse.condition.TrueNotifyCondition;
 import com.zutubi.pulse.condition.antlr.NotifyConditionLexer;
 import com.zutubi.pulse.condition.antlr.NotifyConditionParser;
 import com.zutubi.pulse.condition.antlr.NotifyConditionTreeParser;
+import com.zutubi.pulse.core.model.Entity;
 import com.zutubi.pulse.util.logging.Logger;
 
 import java.io.StringReader;
-import java.util.List;
 import java.util.LinkedList;
-
-import antlr.collections.AST;
+import java.util.List;
 
 /**
  * A subscription is a mapping from a project event to a contact point.  When
@@ -142,7 +144,7 @@ public class Subscription extends Entity
      */
     public boolean conditionSatisfied(BuildResult result)
     {
-        return getNotifyCondition().satisfied(result, contactPoint.getUser());
+        return !result.isPersonal() && getNotifyCondition().satisfied(result, contactPoint.getUser());
     }
 
     /**

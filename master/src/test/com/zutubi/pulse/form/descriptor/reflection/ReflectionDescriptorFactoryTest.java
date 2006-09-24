@@ -4,7 +4,6 @@ import junit.framework.TestCase;
 import com.zutubi.pulse.form.mock.*;
 import com.zutubi.pulse.form.descriptor.FormDescriptor;
 import com.zutubi.pulse.form.descriptor.FieldDescriptor;
-import com.zutubi.pulse.form.descriptor.InstanceDescriptor;
 import com.zutubi.pulse.form.descriptor.annotation.AnnotationDecorator;
 import com.zutubi.pulse.form.FieldType;
 

@@ -104,6 +104,18 @@ public class RecipeRequest
         return recipeName;
     }
 
+    public String getRecipeNameSafe()
+    {
+        if(recipeName == null)
+        {
+            return "[default]";
+        }
+        else
+        {
+            return recipeName;
+        }
+    }
+
     public void setBootstrapper(Bootstrapper bootstrapper)
     {
         this.bootstrapper = bootstrapper;

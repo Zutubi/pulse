@@ -189,6 +189,24 @@ public class DefaultBuildManager implements BuildManager, EventListener
         return fileArtifactDao.findById(id);
     }
 
+    public List<BuildResult> getPersonalBuilds(User user)
+    {
+        return buildResultDao.findByUser(user);
+    }
+
+    public BuildResult getLatestBuildResult(User user)
+    {
+        List<BuildResult> results = buildResultDao.getLatestByUser(user, 1);
+        if(results.size() > 0)
+        {
+            return results.get(0);
+        }
+        else
+        {
+            return null;
+        }
+    }
+
     public List<BuildResult> queryBuilds(Project[] projects, ResultState[] states, String[] specs, long earliestStartTime, long latestStartTime, Boolean hasWorkDir, int first, int max, boolean mostRecentFirst)
     {
         return buildResultDao.queryBuilds(projects, states, specs, earliestStartTime, latestStartTime, hasWorkDir, first, max, mostRecentFirst);
@@ -259,6 +277,22 @@ public class DefaultBuildManager implements BuildManager, EventListener
         while (results.size() > 0);
     }
 
+    public void deleteAllBuilds(User user)
+    {
+        MasterBuildPaths paths = new MasterBuildPaths(configurationManager);
+        File userDir = paths.getUserDir(user.getId());
+        if (!FileSystemUtils.removeDirectory(userDir))
+        {
+            LOG.warning("Unable to remove user directory '" + userDir.getAbsolutePath() + "'");
+        }
+
+        List<BuildResult> results = buildResultDao.findByUser(user);
+        for (BuildResult r : results)
+        {
+            buildResultDao.delete(r);
+        }
+    }
+
     public Changelist getChangelistByRevision(String serverUid, Revision revision)
     {
         return changelistDao.findByRevision(serverUid, revision);
@@ -266,18 +300,32 @@ public class DefaultBuildManager implements BuildManager, EventListener
 
     public void delete(BuildResult result)
     {
-        cleanupResult(result.getProject(), result);
+        cleanupResult(result);
     }
 
     public void abortUnfinishedBuilds(Project project, String message)
     {
         BuildResult lastBuild = getLatestBuildResult(project);
-        if (lastBuild != null && !lastBuild.completed())
+        abortBuild(lastBuild, message);
+    }
+
+    public void abortUnfinishedBuilds(User user, String message)
+    {
+        List<BuildResult> results = buildResultDao.getLatestByUser(user, 1);
+        if(results.size() > 0)
         {
-            lastBuild.abortUnfinishedRecipes();
-            lastBuild.error(message);
-            lastBuild.complete();
-            save(lastBuild);
+            abortBuild(results.get(0), message);
+        }
+    }
+
+    private void abortBuild(BuildResult build, String message)
+    {
+        if (build != null && !build.completed())
+        {
+            build.abortUnfinishedRecipes();
+            build.error(message);
+            build.complete();
+            save(build);
         }
     }
 
@@ -307,31 +355,73 @@ public class DefaultBuildManager implements BuildManager, EventListener
                 }
                 else
                 {
-                    cleanupResult(project, build);
+                    cleanupResult(build);
                 }
             }
         }
     }
 
-    private void cleanupResult(Project project, BuildResult build)
+    public void cleanupBuilds(User user)
+    {
+        int count = buildResultDao.getCompletedResultCount(user);
+        int max = user.getMyBuildsCount();
+        if(count > max)
+        {
+            List<BuildResult> results = buildResultDao.getOldestCompletedBuilds(user, count - max);
+            for(BuildResult result: results)
+            {
+                cleanupResult(result);
+            }
+        }
+    }
+
+    public boolean canCancel(BuildResult build, User user)
+    {
+        if(build.isPersonal())
+        {
+            return build.getUser().equals(user);
+        }
+        else
+        {
+            try
+            {
+                projectManager.checkWrite(build.getProject());
+                return true;
+            }
+            catch (Exception e)
+            {
+                return false;
+            }
+        }
+    }
+
+    private void cleanupResult(BuildResult build)
     {
         MasterBuildPaths paths = new MasterBuildPaths(configurationManager);
-        File buildDir = paths.getBuildDir(project, build);
+        File buildDir = paths.getBuildDir(build);
         if (!FileSystemUtils.removeDirectory(buildDir))
         {
             LOG.warning("Unable to clean up build directory '" + buildDir.getAbsolutePath() + "'");
             return;
         }
 
-        // Remove records of this build from changelists
-        BuildScmDetails scmDetails = build.getScmDetails();
-        if(scmDetails != null)
+        if(build.isPersonal())
         {
-            List<Changelist> changelists = changelistDao.findByResult(build.getId());
-            for(Changelist change: changelists)
+            File patch = paths.getUserPatchFile(build.getUser().getId(), build.getNumber());
+            patch.delete();
+        }
+        else
+        {
+            // Remove records of this build from changelists
+            BuildScmDetails scmDetails = build.getScmDetails();
+            if(scmDetails != null)
             {
-                change.removeResultId(build.getId());
-                changelistDao.save(change);
+                List<Changelist> changelists = changelistDao.findByResult(build.getId());
+                for(Changelist change: changelists)
+                {
+                    change.removeResultId(build.getId());
+                    changelistDao.save(change);
+                }
             }
         }
 
@@ -350,7 +440,7 @@ public class DefaultBuildManager implements BuildManager, EventListener
     {
         for (RecipeResultNode node : nodes)
         {
-            File workDir = paths.getBaseDir(project, build, node.getResult().getId());
+            File workDir = paths.getBaseDir(build, node.getResult().getId());
             if (!FileSystemUtils.removeDirectory(workDir))
             {
                 LOG.warning("Unable to clean up build directory '" + workDir.getAbsolutePath() + "'");
@@ -363,7 +453,15 @@ public class DefaultBuildManager implements BuildManager, EventListener
     public void handleEvent(Event evt)
     {
         BuildCompletedEvent completedEvent = (BuildCompletedEvent) evt;
-        cleanupBuilds(completedEvent.getResult().getProject());
+        BuildResult result = completedEvent.getResult();
+        if(result.isPersonal())
+        {
+            cleanupBuilds(result.getUser());
+        }
+        else
+        {
+            cleanupBuilds(result.getProject());
+        }
     }
 
     public Class[] getHandledEvents()

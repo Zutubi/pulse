@@ -32,7 +32,7 @@
     <modules>
         <!-- we know where all of the pulse packages are located, no
              point searching through the others -->
-        <module organisation="zutubi" name=".*" resolver="build"/>
+        <module organisation="zutubi" name="pulse-.*" resolver="build"/>
     </modules>
 
 </ivyconf>

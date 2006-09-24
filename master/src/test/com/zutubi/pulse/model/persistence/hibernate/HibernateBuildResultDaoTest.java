@@ -2,10 +2,7 @@ package com.zutubi.pulse.model.persistence.hibernate;
 
 import com.zutubi.pulse.core.model.*;
 import com.zutubi.pulse.model.*;
-import com.zutubi.pulse.model.persistence.BuildResultDao;
-import com.zutubi.pulse.model.persistence.BuildSpecificationDao;
-import com.zutubi.pulse.model.persistence.ChangelistDao;
-import com.zutubi.pulse.model.persistence.ProjectDao;
+import com.zutubi.pulse.model.persistence.*;
 
 import java.util.Calendar;
 import java.util.List;
@@ -20,6 +17,7 @@ public class HibernateBuildResultDaoTest extends MasterPersistenceTestCase
     private ProjectDao projectDao;
     private BuildSpecificationDao buildSpecificationDao;
     private ChangelistDao changelistDao;
+    private UserDao userDao;
 
     public void setUp() throws Exception
     {
@@ -28,6 +26,7 @@ public class HibernateBuildResultDaoTest extends MasterPersistenceTestCase
         projectDao = (ProjectDao) context.getBean("projectDao");
         buildSpecificationDao = (BuildSpecificationDao) context.getBean("buildSpecificationDao");
         changelistDao = (ChangelistDao) context.getBean("changelistDao");
+        userDao = (UserDao) context.getBean("userDao");
     }
 
     public void tearDown() throws Exception
@@ -36,6 +35,7 @@ public class HibernateBuildResultDaoTest extends MasterPersistenceTestCase
         projectDao = null;
         buildResultDao = null;
         changelistDao = null;
+        userDao = null;
 
         try
         {
@@ -410,6 +410,136 @@ public class HibernateBuildResultDaoTest extends MasterPersistenceTestCase
         assertNotNull(changelistDao.findById(list.getId()));
     }
 
+    public void testFindByUser()
+    {
+        Project p = new Project("p", "test");
+        projectDao.save(p);
+
+        User u1 = new User("u1", "u1");
+        User u2 = new User("u2", "u2");
+        User u3 = new User("u3", "u3");
+        userDao.save(u1);
+        userDao.save(u2);
+        userDao.save(u3);
+
+        BuildResult r1 = createCompletedBuild(p, 1);
+        BuildResult r2 = createPersonalBuild(u1, p, 1);
+        BuildResult r3 = createPersonalBuild(u2, p, 1);
+        BuildResult r4 = createPersonalBuild(u2, p, 2);
+        buildResultDao.save(r1);
+        buildResultDao.save(r2);
+        buildResultDao.save(r3);
+        buildResultDao.save(r4);
+
+        commitAndRefreshTransaction();
+
+        List<BuildResult> results = buildResultDao.findByUser(u1);
+        assertEquals(1, results.size());
+        assertEquals(u1, results.get(0).getUser());
+
+        results = buildResultDao.findByUser(u2);
+        assertEquals(2, results.size());
+        assertEquals(u2, results.get(0).getUser());
+        assertEquals(2, results.get(0).getNumber());
+        assertEquals(u2, results.get(1).getUser());
+
+        results = buildResultDao.findByUser(u3);
+        assertEquals(0, results.size());
+    }
+
+    public void testGetLatestByUser()
+    {
+        Project p = new Project("p", "test");
+        projectDao.save(p);
+
+        User u1 = new User("u1", "u1");
+        User u2 = new User("u2", "u2");
+        userDao.save(u1);
+        userDao.save(u2);
+
+        BuildResult r1 = createPersonalBuild(u1, p, 1);
+        BuildResult r2 = createPersonalBuild(u2, p, 1);
+        BuildResult r3 = createPersonalBuild(u2, p, 2);
+        buildResultDao.save(r1);
+        buildResultDao.save(r2);
+        buildResultDao.save(r3);
+
+        commitAndRefreshTransaction();
+
+        List<BuildResult> results = buildResultDao.getLatestByUser(u1, 1);
+        assertEquals(1, results.size());
+        assertEquals(u1, results.get(0).getUser());
+
+        results = buildResultDao.getLatestByUser(u2, 1);
+        assertEquals(1, results.size());
+        assertEquals(u2, results.get(0).getUser());
+        assertEquals(2, results.get(0).getNumber());
+    }
+
+    public void testGetCompletedPersonalBuildCount()
+    {
+        Project p = new Project("p", "test");
+        projectDao.save(p);
+
+        User u1 = new User("u1", "u1");
+        User u2 = new User("u2", "u2");
+        userDao.save(u1);
+        userDao.save(u2);
+
+        BuildResult r1 = createPersonalBuild(u1, p, 1);
+        BuildResult r2 = createIncompletePersonalBuild(u1, p, 2);
+        BuildResult r3 = createPersonalBuild(u2, p, 1);
+        BuildResult r4 = createPersonalBuild(u2, p, 2);
+        buildResultDao.save(r1);
+        buildResultDao.save(r2);
+        buildResultDao.save(r3);
+        buildResultDao.save(r4);
+
+        commitAndRefreshTransaction();
+
+        assertEquals(1, buildResultDao.getCompletedResultCount(u1));
+        assertEquals(2, buildResultDao.getCompletedResultCount(u2));
+    }
+
+    public void testGetOldestCompletedPersonalBuilds()
+    {
+        Project p = new Project("p", "test");
+        projectDao.save(p);
+
+        User u1 = new User("u1", "u1");
+        User u2 = new User("u2", "u2");
+        userDao.save(u1);
+        userDao.save(u2);
+
+        BuildResult r1 = createPersonalBuild(u1, p, 1);
+        BuildResult r2 = createIncompletePersonalBuild(u1, p, 2);
+        BuildResult r3 = createPersonalBuild(u2, p, 1);
+        BuildResult r4 = createPersonalBuild(u2, p, 2);
+        buildResultDao.save(r1);
+        buildResultDao.save(r2);
+        buildResultDao.save(r3);
+        buildResultDao.save(r4);
+
+        commitAndRefreshTransaction();
+
+        List<BuildResult> results = buildResultDao.getOldestCompletedBuilds(u1, -1);
+        assertEquals(1, results.size());
+        assertEquals(u1, results.get(0).getUser());
+        assertEquals(1, results.get(0).getNumber());
+
+        results = buildResultDao.getOldestCompletedBuilds(u2, -1);
+        assertEquals(2, results.size());
+        assertEquals(u2, results.get(0).getUser());
+        assertEquals(1, results.get(0).getNumber());
+        assertEquals(u2, results.get(1).getUser());
+        assertEquals(2, results.get(1).getNumber());
+
+        results = buildResultDao.getOldestCompletedBuilds(u2, 1);
+        assertEquals(1, results.size());
+        assertEquals(u2, results.get(0).getUser());
+        assertEquals(1, results.get(0).getNumber());
+    }
+
     private BuildResult createCompletedBuild(Project project, long number)
     {
         return createCompletedBuild(project, new BuildSpecification("test spec"), number);
@@ -420,6 +550,20 @@ public class HibernateBuildResultDaoTest extends MasterPersistenceTestCase
         BuildResult result = new BuildResult(new TriggerBuildReason("scm trigger"), project, spec.getName(), number);
         result.commence(0);
         result.complete();
+        return result;
+    }
+
+    private BuildResult createPersonalBuild(User user, Project project, long number)
+    {
+        BuildResult result = createIncompletePersonalBuild(user, project, number);
+        result.complete();
+        return result;
+    }
+
+    private BuildResult createIncompletePersonalBuild(User user, Project project, long number)
+    {
+        BuildResult result = new BuildResult(user, project, "spec", number);
+        result.commence(0);
         return result;
     }
 }

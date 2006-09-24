@@ -15,10 +15,13 @@ import com.zutubi.pulse.events.build.RecipeDispatchedEvent;
 import com.zutubi.pulse.events.build.RecipeErrorEvent;
 import com.zutubi.pulse.filesystem.remote.RemoteFile;
 import com.zutubi.pulse.model.*;
+import com.zutubi.pulse.personal.PatchArchive;
 import com.zutubi.pulse.scm.SCMChangeEvent;
 import com.zutubi.pulse.scm.SCMException;
 import com.zutubi.pulse.scm.SCMServer;
 import com.zutubi.pulse.services.SlaveStatus;
+import com.zutubi.pulse.services.UpgradeState;
+import com.zutubi.pulse.services.UpgradeStatus;
 import junit.framework.TestCase;
 
 import java.io.File;
@@ -766,7 +769,7 @@ public class ThreadedRecipeQueueTest extends TestCase implements EventListener
             throw new RuntimeException("Method not implemented.");
         }
 
-        public String getPulseFile(long id, Project project, Revision revision)
+        public String getPulseFile(long id, Project project, Revision revision, PatchArchive patch)
         {
             long number = ((NumericalRevision) revision).getRevisionNumber();
             if(number == 0)
@@ -830,6 +833,11 @@ public class ThreadedRecipeQueueTest extends TestCase implements EventListener
         }
 
         public void slaveDeleted(long id)
+        {
+            throw new RuntimeException("Method not implemented.");
+        }
+
+        public void upgradeStatus(UpgradeStatus upgradeStatus)
         {
             throw new RuntimeException("Method not implemented.");
         }

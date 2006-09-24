@@ -14,29 +14,26 @@ if [ -z "$PULSE_HOME" -o ! -d "$PULSE_HOME" ] ; then
   PULSE_HOME=`cd "$PULSE_HOME" && pwd`
 fi
 
-if [ ! -f "$PULSE_HOME"/lib/core-[0-9]*.jar ] ; then
-  echo "Error: PULSE_HOME is not defined correctly."
-  echo "  We cannot find the core jar"
-  exit 1
-fi
 
 # For Cygwin, ensure paths are in UNIX format before anything is touched
 if $cygwin; then
   [ -n "$JAVA_HOME" ] && JAVA_HOME=`cygpath --unix "$JAVA_HOME"`
   [ -n "$PULSE_HOME" ] && PULSE_HOME=`cygpath --path --unix "$PULSE_HOME"`
-  [ -n "$LOCALCLASSPATH" ] && LOCALCLASSPATH=`cygpath --path --unix "$LOCALCLASSPATH"`
 fi
 
-# Construct the runtime classpath.
-for i in "$PULSE_HOME"/lib/boot-*.jar; do
-  LOCALCLASSPATH="$LOCALCLASSPATH":"$i"
-done
+BOOT_JAR="$PULSE_HOME/lib/boot.jar"
+
+if [ ! -f "$BOOT_JAR" ] ; then
+  echo "Error: PULSE_HOME is not defined correctly."
+  echo "  Unable to find boot.jar"
+  exit 1
+fi
 
 # For Cygwin, switch paths to Windows format before running java
 if $cygwin; then
   JAVA_HOME=`cygpath --path --windows "$JAVA_HOME"`
   PULSE_HOME=`cygpath --path --windows "$PULSE_HOME"`
-  LOCALCLASSPATH=`cygpath --path --windows "$LOCALCLASSPATH"`
+  BOOT_JAR=`cygpath --path --windows "$BOOT_JAR"`
 fi
 
 # Sort out the location of the java executable.
@@ -69,9 +66,9 @@ fi
 
 if [ -z "$PULSE_PID" ]
 then
-    exec "$JAVACMD" $JAVA_OPTS $PULSE_OPTS -classpath "$LOCALCLASSPATH" -Dpulse.home="$PULSE_HOME" -Djava.awt.headless=true $@
+    exec "$JAVACMD" $JAVA_OPTS $PULSE_OPTS -classpath "$BOOT_JAR" -Dpulse.home="$PULSE_HOME" -Djava.awt.headless=true $@
 else
-    "$JAVACMD" $JAVA_OPTS $PULSE_OPTS -classpath "$LOCALCLASSPATH" -Dpulse.home="$PULSE_HOME" -Djava.awt.headless=true $@ >> "$PULSE_HOME"/pulse.out 2>&1 &
+    "$JAVACMD" $JAVA_OPTS $PULSE_OPTS -classpath "$BOOT_JAR" -Dpulse.home="$PULSE_HOME" -Djava.awt.headless=true $@ >> "$PULSE_HOME"/pulse.out 2>&1 &
     echo $! > $PULSE_PID
     exit 0
 fi

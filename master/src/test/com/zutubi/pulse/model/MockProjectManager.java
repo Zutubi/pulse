@@ -1,6 +1,7 @@
 package com.zutubi.pulse.model;
 
-import com.zutubi.pulse.core.BuildRevision;
+import com.zutubi.pulse.core.model.Revision;
+import com.zutubi.pulse.personal.PatchArchive;
 import org.acegisecurity.annotation.Secured;
 
 import java.util.LinkedList;
@@ -34,6 +35,11 @@ public class MockProjectManager implements ProjectManager
     }
 
     public Project getProjectByScm(long scmId)
+    {
+        throw new RuntimeException("Method not implemented.");
+    }
+
+    public Project getProjectByBuildSpecification(BuildSpecification buildSpecification)
     {
         throw new RuntimeException("Method not implemented.");
     }
@@ -109,11 +115,6 @@ public class MockProjectManager implements ProjectManager
         throw new RuntimeException("Method not implemented.");
     }
 
-    public void triggerBuild(Project project, String specification, BuildReason reason, BuildRevision revision, boolean force)
-    {
-        throw new RuntimeException("Method not implemented.");
-    }
-
     public long getNextBuildNumber(Project project)
     {
         throw new RuntimeException("Method not implemented.");
@@ -165,6 +166,16 @@ public class MockProjectManager implements ProjectManager
     }
 
     public void removeAcls(String authority)
+    {
+        throw new RuntimeException("Method not implemented.");
+    }
+
+    public void triggerBuild(Project project, String specification, BuildReason reason, Revision revision, boolean force)
+    {
+        throw new RuntimeException("Method not implemented.");
+    }
+
+    public void triggerBuild(long number, Project project, BuildSpecification specification, User user, PatchArchive archive)
     {
         throw new RuntimeException("Method not implemented.");
     }

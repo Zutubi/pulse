@@ -67,15 +67,23 @@ public class ExecutableCommandTest extends PulseTestCase
         ExecutableCommand command = new ExecutableCommand();
         command.setExe("unknown");
         command.setArgs("command");
+        CommandResult result = new CommandResult("exception");
         try
         {
-            execute(command, new CommandResult("exception"));
-            assertTrue(false);
+            execute(command, result);
+            fail();
         }
         catch (BuildException e)
         {
             // noop            
         }
+
+        // verify that the env output is captured even with the command failing.
+        assertEquals(1, result.getArtifacts().size());
+        StoredArtifact artifact = result.getArtifacts().get(0);
+        assertEquals(1, artifact.getChildren().size());
+        StoredFileArtifact fileArtifact = artifact.getChildren().get(0);
+        assertEquals(ExecutableCommand.ENV_NAME + "/env.txt", fileArtifact.getPath());
     }
 
     public void testPostProcess() throws FileLoadException
@@ -111,7 +119,7 @@ public class ExecutableCommandTest extends PulseTestCase
 
         assertTrue(dir.mkdir());
 
-        if(SystemUtils.isWindows())
+        if (SystemUtils.isWindows())
         {
             file = new File(dir, "list.bat");
             FileSystemUtils.createFile(file, "dir");
@@ -166,9 +174,43 @@ public class ExecutableCommandTest extends PulseTestCase
         assertTrue(output.contains("test variable value"));
     }
 
+    public void testEnvironmentDetailsAreCaptured() throws IOException
+    {
+        ExecutableCommand command = new ExecutableCommand();
+        command.setExe("echo");
+        command.setArgs("hello world");
+        CommandResult result = new CommandResult("success");
+        execute(command, result);
+
+        List<StoredArtifact> artifacts = result.getArtifacts();
+        assertEquals(2, artifacts.size());
+
+        StoredArtifact artifact = artifacts.get(0);
+        assertEquals(1, artifact.getChildren().size());
+
+        StoredFileArtifact envArtifact = artifact.getChildren().get(0);
+        assertEquals(ExecutableCommand.ENV_NAME + "/env.txt", envArtifact.getPath());
+        assertEquals("text/plain", envArtifact.getType());
+
+        String output = getEnv();
+        assertTrue(output.contains("Command Line:"));
+        assertTrue(output.contains("Process Environment:"));
+        assertTrue(output.contains("Resources:"));
+
+        artifact = artifacts.get(1);
+        StoredFileArtifact outputArtifact = artifact.getChildren().get(0);
+        assertEquals(ExecutableCommand.OUTPUT_NAME + "/output.txt", outputArtifact.getPath());
+        assertEquals("text/plain", outputArtifact.getType());
+    }
+
     private String getOutput() throws IOException
     {
-        return IOUtils.fileToString(new File(outputDirectory, "command output/output.txt"));
+        return IOUtils.fileToString(new File(outputDirectory, ExecutableCommand.OUTPUT_NAME + "/output.txt"));
+    }
+
+    private String getEnv() throws IOException
+    {
+        return IOUtils.fileToString(new File(outputDirectory, ExecutableCommand.ENV_NAME + "/env.txt"));
     }
 
     private void execute(ExecutableCommand command, CommandResult result)

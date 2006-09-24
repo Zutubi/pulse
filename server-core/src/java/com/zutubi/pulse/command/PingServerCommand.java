@@ -79,4 +79,9 @@ public class PingServerCommand implements Command
             return 3;
         }
     }
+
+    public String getHelp()
+    {
+        return "pings the pulse server at a given url";
+    }
 }

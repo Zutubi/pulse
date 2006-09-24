@@ -5,6 +5,7 @@ import org.jivesoftware.smack.Chat;
 import com.zutubi.pulse.jabber.JabberManager;
 import com.zutubi.pulse.bootstrap.ComponentContext;
 import com.zutubi.pulse.util.logging.Logger;
+import com.zutubi.validation.annotations.Required;
 
 /**
  * A contact point used to notify users via an XMPP IM.
@@ -42,7 +43,7 @@ public class JabberContactPoint extends ContactPoint
         }
     }
 
-    public String getUsername()
+    @Required public String getUsername()
     {
         return getUid();
     }

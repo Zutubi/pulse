@@ -1,9 +1,0 @@
-@echo off
-@setlocal
-
-"%~dp0unserv.exe" "__SERVICE_NAME__"
-if not ERRORLEVEL 1 goto end
-exit /B 1
-
-:end
-@endlocal

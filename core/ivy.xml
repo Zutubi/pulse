@@ -23,11 +23,11 @@
 
     <dependencies>
 
-        <dependency org="zutubi" name="pulse-boot" rev="latest.integration" conf="release->release"/>
-        <dependency org="zutubi" name="pulse-boot" rev="latest.integration" conf="external->external"/>
-        <dependency org="zutubi" name="pulse-boot" rev="latest.integration" conf="build->build"/>
+        <dependency org="zutubi" name="boot" rev="1.0" conf="external,build,release->default"/>
 
         <dependency org="apache" name="ant" rev="1.6.5" conf="external,build,release->directoryscanner"/>
+
+        <dependency org="javasvn" name="javasvn" rev="20060911" conf="external,build,release->default"/>
 
         <dependency org="junit" name="junit" rev="3.8.1" conf="external,build->default"/>
 
@@ -35,6 +35,8 @@
         <dependency org="opensymphony" name="oscore" rev="2.2.4" conf="external,build,release->default"/>
 
         <dependency org="xom" name="xom" rev="20051027" conf="external,build,release->default"/>
+
+        <dependency org="xstream" name="xstream" rev="1.2" conf="external,build,release->default"/>
 
     </dependencies>
 

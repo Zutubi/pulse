@@ -2,15 +2,17 @@ package com.zutubi.pulse.core;
 
 import com.zutubi.pulse.core.model.CommandResult;
 import com.zutubi.pulse.core.model.StoredArtifact;
+import com.zutubi.pulse.util.FileSystemUtils;
+import org.apache.tools.ant.DirectoryScanner;
 
-import java.io.*;
+import java.io.File;
 
 /**
  * Information about a single file artifact to be captured.
  */
 public class FileArtifact extends Artifact
 {
-    private File file;
+    private String file;
     private String type = null;
 
     public FileArtifact()
@@ -20,46 +22,90 @@ public class FileArtifact extends Artifact
 
     public void capture(CommandResult result, File baseDir, File outputDir)
     {
-        StoredArtifact stored = new StoredArtifact(getName());
-        File captureFile;
-        if(file.isAbsolute())
+        // The specified file may or may not be absolute.  If it is absolute, then we need to jump through a few
+        // hoops.
+        File captureFile = new File(file);
+        if (captureFile.isAbsolute())
         {
-            captureFile = file;
-        }
-        else
-        {
-            captureFile = new File(baseDir, file.getPath());
-        }
-
-        if(!captureFile.exists())
-        {
-            if(getFailIfNotPresent())
+            if (captureFile.isFile())
             {
-                throw new BuildException("Capturing artifact '" + getName() + "': file '" + captureFile.getAbsolutePath() + "' does not exist");
+                // excellent, we have the file, we can capture it and continue.
+                StoredArtifact artifact = new StoredArtifact(getName());
+                captureFile(artifact, captureFile, FileSystemUtils.composeFilename(getName(), captureFile.getName()), outputDir, result, type);
+                result.addArtifact(artifact);
+                return;
+            }
+
+            // does the file contain any wild cards?
+            if (file.indexOf("*") != -1)
+            {
+                // if so, then take the directory immediately above the wild card and use it as the base directory
+                // for the scan.
+
+                String filePath = captureFile.getAbsolutePath();
+                File alternateBaseDir = new File(filePath.substring(0, filePath.indexOf('*')));
+                if (!alternateBaseDir.isDirectory())
+                {
+                    // this will be the case if the wildcard is embedded within a filename, such as file*.txt
+                    alternateBaseDir = alternateBaseDir.getParentFile();
+                }
+                filePath = filePath.substring(alternateBaseDir.getAbsolutePath().length());
+                if (filePath.startsWith("/") || filePath.startsWith("\\"))
+                {
+                    filePath = filePath.substring(1);
+                }
+
+                scanAndCaptureFiles(alternateBaseDir, filePath, outputDir, result);
             }
             else
             {
-                // Don't attempt to capture.
-                return;
+                // absolute file without wildcards that does not exist. This will be picked up by the getFailIfNotPresent
+                // check at the end of this method.
+                if (getFailIfNotPresent())
+                {
+                    throw new BuildException("Capturing artifact '" + getName() + "': no file matching '" + file + "' exists");
+                }
             }
         }
-
-        captureFile(stored, captureFile, file.getName(), outputDir, result, type);
-        result.addArtifact(stored);
+        else
+        {
+            // The file path is relative, we have our base directory, lets get to work.
+            scanAndCaptureFiles(baseDir, file, outputDir, result);
+        }
     }
 
-    public FileArtifact(String name, File file)
+    private void scanAndCaptureFiles(File baseDir, String file, File outputDir, CommandResult result)
     {
-        super(name);
-        this.file = file;
+        DirectoryScanner scanner = new DirectoryScanner();
+        scanner.setBasedir(baseDir);
+        scanner.setIncludes(new String[]{file});
+        scanner.scan();
+
+        StoredArtifact artifact = new StoredArtifact(getName());
+        for (String includedFile : scanner.getIncludedFiles())
+        {
+            File source = new File(baseDir, includedFile);
+            captureFile(artifact, source, FileSystemUtils.composeFilename(getName(), includedFile), outputDir, result, type);
+        }
+        if (artifact.getChildren().size() > 0)
+        {
+            result.addArtifact(artifact);
+        }
+        else
+        {
+            if (getFailIfNotPresent())
+            {
+                throw new BuildException("Capturing artifact '" + getName() + "': no file matching '" + file + "' exists");
+            }
+        }
     }
 
-    public File getFile()
+    public String getFile()
     {
         return file;
     }
 
-    public void setFile(File file)
+    public void setFile(String file)
     {
         this.file = file;
     }

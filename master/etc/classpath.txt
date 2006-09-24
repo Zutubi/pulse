@@ -1,0 +1,4 @@
+lib/
+lib/.*\.xml
+lib/.*\.jar
+system/www/WEB-INF/classes/

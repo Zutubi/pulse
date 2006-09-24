@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet type="text/xsl" href="http://www.jayasoft.fr/org/ivyrep/ivy-doc.xsl"?>
+<ivy-module version="1.0">
+    <info organisation="zutubi" module="boot" revision="1.0" status="release"/>
+
+    <publications>
+        <artifact name="boot" type="jar"/>
+    </publications>
+</ivy-module>

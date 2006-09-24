@@ -5,6 +5,7 @@ import com.zutubi.pulse.events.build.BuildCompletedEvent;
 import com.zutubi.pulse.model.BuildResult;
 import com.zutubi.pulse.model.Project;
 import com.zutubi.pulse.model.UnknownBuildReason;
+import com.zutubi.pulse.model.User;
 import com.zutubi.pulse.test.PulseTestCase;
 
 /**
@@ -85,7 +86,16 @@ public class BuildCompletedEventFilterTest extends PulseTestCase
     {
         assertFalse(filter.accept(createTrigger(PROJECT, "another spec", "SUCCESS"), createEvent(ResultState.SUCCESS)));
     }
-    
+
+    public void testPersonalBuild()
+    {
+        Project project = new Project();
+        project.setId(PROJECT);
+        BuildResult result = new BuildResult(new User(), project, SPEC, 1);
+        result.setState(ResultState.SUCCESS);
+        assertFalse(filter.accept(createTrigger("SUCCESS"), new BuildCompletedEvent(this, result)));
+    }
+
     private MockTrigger createTrigger(String s)
     {
         return createTrigger(PROJECT, SPEC, s);

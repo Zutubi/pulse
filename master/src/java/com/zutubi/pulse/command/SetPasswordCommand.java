@@ -61,6 +61,11 @@ public class SetPasswordCommand extends AdminCommand
         setPassword(commandLine.getOptionValue('p'));
     }
 
+    public String getHelp()
+    {
+        return "sets the admin password";
+    }
+
     public int doExecute() throws XmlRpcException, IOException
     {
         xmlRpcClient.execute("RemoteApi.setPassword", new Vector<Object>(Arrays.asList(

@@ -1,19 +1,28 @@
 package com.zutubi.pulse.model;
 
+import com.zutubi.pulse.bootstrap.ComponentContext;
 import com.zutubi.pulse.core.BuildException;
 import com.zutubi.pulse.core.model.Revision;
+import com.zutubi.pulse.personal.PatchArchive;
 import com.zutubi.pulse.util.FileSystemUtils;
+import com.zutubi.pulse.bootstrap.ComponentContext;
+import com.zutubi.pulse.util.logging.Logger;
 import org.apache.velocity.VelocityContext;
 import org.apache.velocity.app.VelocityEngine;
 
 import java.io.File;
 import java.io.StringWriter;
-import java.util.*;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Set;
+import java.util.TreeSet;
 
 /**
  */
 public abstract class TemplatePulseFileDetails extends PulseFileDetails
 {
+    private static final Logger LOG = Logger.getLogger(TemplatePulseFileDetails.class);
+
     private List<Capture> captures = new LinkedList<Capture>();
     private List<String> outputProcessors = new LinkedList<String>();
     private VelocityEngine velocityEngine;
@@ -23,7 +32,7 @@ public abstract class TemplatePulseFileDetails extends PulseFileDetails
         return true;
     }
 
-    public String getPulseFile(long id, Project project, Revision revision)
+    public String getPulseFile(long id, Project project, Revision revision, PatchArchive patch)
     {
         try
         {
@@ -35,11 +44,12 @@ public abstract class TemplatePulseFileDetails extends PulseFileDetails
             context.put("captures", captures);
 
             StringWriter stringWriter = new StringWriter(1024);
-            velocityEngine.mergeTemplate("pulse-file" + File.separatorChar + getTemplateName(), context, stringWriter);
+            getVelocityEngine().mergeTemplate("pulse-file" + File.separatorChar + getTemplateName(), context, stringWriter);
             return stringWriter.getBuffer().toString();
         }
         catch (Exception e)
         {
+            LOG.warning(e);
             throw new BuildException("Loading template pulse file: " + e.getMessage(), e);
         }
     }
@@ -151,6 +161,15 @@ public abstract class TemplatePulseFileDetails extends PulseFileDetails
     private void setOutputProcessors(List<String> outputProcessors)
     {
         this.outputProcessors = outputProcessors;
+    }
+
+    public VelocityEngine getVelocityEngine()
+    {
+        if(velocityEngine == null)
+        {
+            velocityEngine = (VelocityEngine) ComponentContext.getBean("velocityEngine");
+        }
+        return velocityEngine;
     }
 
     public void setVelocityEngine(VelocityEngine velocityEngine)

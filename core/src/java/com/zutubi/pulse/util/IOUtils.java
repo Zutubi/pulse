@@ -1,10 +1,10 @@
 package com.zutubi.pulse.util;
 
 import com.zutubi.pulse.util.logging.Logger;
+import com.zutubi.pulse.core.PulseException;
 
 import java.io.*;
-import java.net.ServerSocket;
-import java.net.Socket;
+import java.net.*;
 import java.util.Properties;
 import java.util.zip.ZipFile;
 
@@ -230,4 +230,39 @@ public class IOUtils
         }
     }
 
+    public static void downloadFile(URL url, File destination) throws IOException
+    {
+        FileOutputStream fos = null;
+        InputStream urlStream = null;
+
+        try
+        {
+            HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
+
+            int code = urlConnection.getResponseCode();
+            if(code != 200)
+            {
+                String error = "Host returned code " + Integer.toString(code);
+                String message = urlConnection.getResponseMessage();
+
+                if(message != null)
+                {
+                    error += ": " + message;
+                }
+
+                throw new IOException(error);
+            }
+            
+            // take url connection input stream and write contents to file
+            fos = new FileOutputStream(destination);
+            urlStream = urlConnection.getInputStream();
+            IOUtils.joinStreams(urlStream, fos);
+        }
+        finally
+        {
+            IOUtils.close(urlStream);
+            IOUtils.close(fos);
+        }
+
+    }
 }

@@ -4,9 +4,9 @@ import com.zutubi.pulse.*;
 import com.zutubi.pulse.bootstrap.MasterConfigurationManager;
 import com.zutubi.pulse.bootstrap.StartupManager;
 import com.zutubi.pulse.core.model.Resource;
-import com.zutubi.pulse.events.EventManager;
-import com.zutubi.pulse.events.SlaveAgentRemovedEvent;
-import com.zutubi.pulse.events.SlaveStatusEvent;
+import com.zutubi.pulse.core.Stoppable;
+import com.zutubi.pulse.events.*;
+import com.zutubi.pulse.events.EventListener;
 import com.zutubi.pulse.license.LicenseManager;
 import com.zutubi.pulse.license.authorisation.AddAgentAuthorisation;
 import com.zutubi.pulse.logging.ServerMessagesHandler;
@@ -14,19 +14,17 @@ import com.zutubi.pulse.model.NamedEntityComparator;
 import com.zutubi.pulse.model.ResourceManager;
 import com.zutubi.pulse.model.Slave;
 import com.zutubi.pulse.model.SlaveManager;
-import com.zutubi.pulse.services.ServiceTokenManager;
-import com.zutubi.pulse.services.SlaveService;
-import com.zutubi.pulse.services.SlaveStatus;
+import com.zutubi.pulse.services.*;
 import com.zutubi.pulse.util.logging.Logger;
 
 import java.net.MalformedURLException;
-import java.util.*;
 import java.util.concurrent.*;
 import java.util.concurrent.locks.ReentrantLock;
+import java.util.*;
 
 /**
  */
-public class DefaultAgentManager implements AgentManager
+public class DefaultAgentManager implements AgentManager, EventListener, Stoppable
 {
     private static final Logger LOG = Logger.getLogger(DefaultAgentManager.class);
 
@@ -49,6 +47,9 @@ public class DefaultAgentManager implements AgentManager
 
     private LicenseManager licenseManager;
     private ExecutorService pingService = Executors.newCachedThreadPool();
+
+    private Map<Long, AgentUpdater> updaters = new TreeMap<Long, AgentUpdater>();
+    private ReentrantLock updatersLock = new ReentrantLock();
 
     public void init()
     {
@@ -86,6 +87,15 @@ public class DefaultAgentManager implements AgentManager
         {
             SlaveService service = slaveProxyFactory.createProxy(slave);
             SlaveBuildService buildService = new SlaveBuildService(service, serviceTokenManager, slave, configurationManager, resourceManager);
+
+            if(slave.getEnableState() == Slave.EnableState.UPGRADING)
+            {
+                // Something went wrong: lost contact with slave (or master
+                // died) during upgrade.
+                slave.setEnableState(Slave.EnableState.FAILED_UPGRADE);
+                slaveManager.save(slave);
+            }
+
             SlaveAgent agent = new SlaveAgent(slave, service, serviceTokenManager, buildService);
             slaveAgents.put(slave.getId(), agent);
             pingSlave(agent);
@@ -134,6 +144,7 @@ public class DefaultAgentManager implements AgentManager
             }
             catch (TimeoutException e)
             {
+                LOG.warning("Timed out pinging agent '" + agent.getName() + "'", e);
                 status = new SlaveStatus(Status.OFFLINE, "Agent ping timed out");
             }
             catch(Exception e)
@@ -163,8 +174,92 @@ public class DefaultAgentManager implements AgentManager
             if(oldStatus != agent.getStatus())
             {
                 eventManager.publish(new SlaveStatusEvent(this, oldStatus, agent));
+
+                if(status.getStatus() == Status.VERSION_MISMATCH)
+                {
+                    // Try to update this agent.
+                    updateAgent(agent);
+                }
             }
         }
+    }
+
+    private void updateAgent(SlaveAgent agent)
+    {
+        Slave slave = agent.getSlave();
+        slave.setEnableState(Slave.EnableState.UPGRADING);
+        slaveManager.save(slave);
+
+        String masterUrl = "http://" + MasterAgent.constructMasterLocation(configurationManager.getAppConfig(), configurationManager.getSystemConfig());
+        AgentUpdater updater = new AgentUpdater(agent, serviceTokenManager.getToken(), masterUrl, eventManager, configurationManager.getSystemPaths());
+        updatersLock.lock();
+
+        try
+        {
+            updaters.put(agent.getSlave().getId(), updater);
+            updater.start();
+        }
+        finally
+        {
+            updatersLock.unlock();
+        }
+    }
+
+    public void stop(boolean force)
+    {
+        if(force)
+        {
+            pingService.shutdownNow();
+            updatersLock.lock();
+            try
+            {
+                for(AgentUpdater updater: updaters.values())
+                {
+                    updater.stop(force);
+                }
+            }
+            finally
+            {
+                updatersLock.unlock();
+            }
+        }
+        else
+        {
+            pingService.shutdown();
+        }
+    }
+
+    public void handleEvent(Event evt)
+    {
+        SlaveUpgradeCompleteEvent suce = (SlaveUpgradeCompleteEvent) evt;
+        Slave slave = suce.getAgent().getSlave();
+
+        updatersLock.lock();
+        try
+        {
+            updaters.remove(slave.getId());
+        }
+        finally
+        {
+            updatersLock.unlock();
+        }
+
+        if(suce.isSuccessful())
+        {
+            slave.setEnableState(Slave.EnableState.ENABLED);
+            slaveManager.save(slave);
+            pingSlave(suce.getAgent());
+        }
+        else
+        {
+            slave.setEnableState(Slave.EnableState.FAILED_UPGRADE);
+            slaveManager.save(slave);
+        }
+    }
+
+    public Class[] getHandledEvents()
+    {
+        return new Class[] { SlaveUpgradeCompleteEvent.class };
     }
 
     private class Pinger implements Callable<SlaveStatus>
@@ -195,6 +290,7 @@ public class DefaultAgentManager implements AgentManager
             }
             catch (Exception e)
             {
+                LOG.warning("Exception pinging agent '" + agent.getName() + "': " + e.getMessage(), e);
                 status = new SlaveStatus(Status.OFFLINE, "Exception: '" + e.getClass().getName() + "'. Reason: " + e.getMessage());
             }
 
@@ -317,6 +413,27 @@ public class DefaultAgentManager implements AgentManager
         }
     }
 
+    public void upgradeStatus(UpgradeStatus upgradeStatus)
+    {
+        updatersLock.lock();
+        try
+        {
+            AgentUpdater updater = updaters.get(upgradeStatus.getSlaveId());
+            if(updater != null)
+            {
+                updater.upgradeStatus(upgradeStatus);
+            }
+            else
+            {
+                LOG.warning("Received upgrade status for agent that is not upgrading [" + upgradeStatus.getSlaveId() + "]");
+            }
+        }
+        finally
+        {
+            updatersLock.unlock();
+        }
+    }
+
     private void removeSlaveAgent(long id)
     {
         SlaveAgent agent = slaveAgents.remove(id);
@@ -351,6 +468,7 @@ public class DefaultAgentManager implements AgentManager
     public void setEventManager(EventManager eventManager)
     {
         this.eventManager = eventManager;
+        eventManager.register(this);
     }
 
     public void setStartupManager(StartupManager startupManager)

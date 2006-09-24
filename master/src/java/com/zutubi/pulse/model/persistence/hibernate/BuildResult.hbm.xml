@@ -30,6 +30,8 @@
 
         <many-to-one name="project" column="PROJECT" class="com.zutubi.pulse.model.Project" cascade="none"/>
 
+        <many-to-one name="user" column="USER" class="com.zutubi.pulse.model.User" cascade="none" not-null="false"/>
+
         <property name="buildSpecification" column="BUILD_SPEC" type="string" length="255"/>
 
         <many-to-one name="scmDetails" class="com.zutubi.pulse.model.BuildScmDetails" column="SCM_DETAILS"
@@ -50,6 +52,10 @@
 
         <subclass name="com.zutubi.pulse.model.ManualTriggerBuildReason" discriminator-value="MANUAL_TRIGGER" lazy="false">
             <property name="username" type="string" column="DETAILS"/>
+        </subclass>
+
+        <subclass name="com.zutubi.pulse.model.PersonalBuildReason" discriminator-value="PERSONAL" lazy="false">
+            <property name="user" type="string" column="USER"/>
         </subclass>
 
         <subclass name="com.zutubi.pulse.model.RemoteTriggerBuildReason" discriminator-value="REMOTE_TRIGGER" lazy="false"/>

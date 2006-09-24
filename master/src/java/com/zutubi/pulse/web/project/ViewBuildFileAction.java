@@ -62,6 +62,8 @@ public class ViewBuildFileAction extends ProjectActionSupport
             return ERROR;
         }
 
+        checkPermissions(result);        
+
         FileInputStream is = null;
         ByteArrayOutputStream os = null;
 

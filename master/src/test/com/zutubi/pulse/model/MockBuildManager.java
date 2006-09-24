@@ -78,6 +78,16 @@ public class MockBuildManager implements BuildManager
         throw new RuntimeException("Method not implemented.");
     }
 
+    public List<BuildResult> getPersonalBuilds(User user)
+    {
+        throw new RuntimeException("Method not implemented.");
+    }
+
+    public BuildResult getLatestBuildResult(User user)
+    {
+        throw new RuntimeException("Method not implemented.");
+    }
+
     public List<BuildResult> queryBuilds(Project[] projects, ResultState[] states, String[] specs, long earliestStartTime, long latestStartTime, Boolean hasWorkDir, int first, int max, boolean mostRecentFirst)
     {
         throw new RuntimeException("Method not implemented.");
@@ -129,7 +139,7 @@ public class MockBuildManager implements BuildManager
 
         for (BuildResult r : buildResults.values())
         {
-            if (r.getProject().equals(project))
+            if (!r.isPersonal() && r.getProject().equals(project))
             {
                 if (result == null || result.getNumber() < r.getNumber())
                 {
@@ -189,6 +199,10 @@ public class MockBuildManager implements BuildManager
         throw new RuntimeException("Method not implemented.");
     }
 
+    public void deleteAllBuilds(User user)
+    {
+    }
+
     public Changelist getChangelistByRevision(String serverUid, Revision revision)
     {
         throw new RuntimeException("Method not implemented.");
@@ -209,8 +223,32 @@ public class MockBuildManager implements BuildManager
         }
     }
 
+    public void abortUnfinishedBuilds(User user, String message)
+    {
+        BuildResult result = null;
+
+        for (BuildResult r : buildResults.values())
+        {
+            if (user.equals(r.getOwner()) && r.inProgress())
+            {
+                r.error(message);
+                r.complete();
+            }
+        }
+    }
+
     public boolean isSpaceAvailableForBuild()
     {
         return true;
+    }
+
+    public void cleanupBuilds(User user)
+    {
+        throw new RuntimeException("Method not implemented.");
+    }
+
+    public boolean canCancel(BuildResult build, User user)
+    {
+        throw new RuntimeException("Method not implemented.");
     }
 }

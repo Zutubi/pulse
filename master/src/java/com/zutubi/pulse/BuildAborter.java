@@ -1,8 +1,6 @@
 package com.zutubi.pulse;
 
-import com.zutubi.pulse.model.BuildManager;
-import com.zutubi.pulse.model.Project;
-import com.zutubi.pulse.model.ProjectManager;
+import com.zutubi.pulse.model.*;
 
 import java.util.List;
 
@@ -12,17 +10,25 @@ public class BuildAborter implements Runnable
 {
     private ProjectManager projectManager;
     private BuildManager buildManager;
+    private UserManager userManager;
+    private static final String ABORT_MESSAGE = "Server shut down while build in progress";
 
     public void run()
     {
         List<Project> projects = projectManager.getAllProjects();
         for (Project project : projects)
         {
-            buildManager.abortUnfinishedBuilds(project, "Server shut down while build in progress");
+            buildManager.abortUnfinishedBuilds(project, ABORT_MESSAGE);
             if(project.getState() == Project.State.BUILDING || project.getState() == Project.State.PAUSING)
             {
                 projectManager.buildCompleted(project.getId());
             }
+        }
+
+        List<User> users = userManager.getAllUsers();
+        for(User user: users)
+        {
+            buildManager.abortUnfinishedBuilds(user, ABORT_MESSAGE);
         }
     }
 
@@ -36,4 +42,8 @@ public class BuildAborter implements Runnable
         this.buildManager = buildManager;
     }
 
+    public void setUserManager(UserManager userManager)
+    {
+        this.userManager = userManager;
+    }
 }

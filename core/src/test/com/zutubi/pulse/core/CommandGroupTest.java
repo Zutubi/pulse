@@ -41,13 +41,12 @@ public class CommandGroupTest extends PulseTestCase
     public void testCaptureFile() throws Exception
     {
         File file = new File(baseDirectory, "testfile");
-        fileCaptureHelper(file);
+        fileCaptureHelper(file.getAbsolutePath());
     }
 
     public void testCaptureFileRelative() throws Exception
     {
-        File file = new File("testfile");
-        fileCaptureHelper(file);
+        fileCaptureHelper("testfile");
     }
 
     public void testCaptureFileNonExistent() throws Exception
@@ -55,8 +54,8 @@ public class CommandGroupTest extends PulseTestCase
         CommandGroup group = createEchoCommand();
         FileArtifact fa = group.createArtifact();
         fa.setName("non-existent");
-        fa.setFile(new File("pfffft"));
-        testFailureWithMessage(group, "does not exist");
+        fa.setFile("pfffft");
+        testFailureWithMessage(group, "no file matching");
     }
 
     public void testCaptureFileNonExistentNoFail() throws Exception
@@ -64,12 +63,12 @@ public class CommandGroupTest extends PulseTestCase
         CommandGroup group = createEchoCommand();
         FileArtifact fa = group.createArtifact();
         fa.setName("non-existent");
-        fa.setFile(new File("pfffft"));
+        fa.setFile("pfffft");
         fa.setFailIfNotPresent(false);
         testSuccess(group);
     }
 
-    private void fileCaptureHelper(File file) throws IOException, FileLoadException
+    private void fileCaptureHelper(String file) throws IOException, FileLoadException
     {
         File inFile = new File(baseDirectory, "testfile");
         FileSystemUtils.createFile(inFile, "some data");

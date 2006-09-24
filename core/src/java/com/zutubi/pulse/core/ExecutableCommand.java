@@ -1,16 +1,16 @@
 package com.zutubi.pulse.core;
 
 import com.zutubi.pulse.core.model.CommandResult;
+import com.zutubi.pulse.core.model.StoredFileArtifact;
+import com.zutubi.pulse.core.model.StoredArtifact;
 import com.zutubi.pulse.util.ForkOutputStream;
 import com.zutubi.pulse.util.IOUtils;
 import com.zutubi.pulse.util.SystemUtils;
+import com.zutubi.pulse.util.FileSystemUtils;
 import com.zutubi.pulse.util.logging.Logger;
 
 import java.io.*;
-import java.util.Arrays;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * 
@@ -21,6 +21,7 @@ public class ExecutableCommand implements Command, ScopeAware
     private static final Logger LOG = Logger.getLogger(ExecutableCommand.class);
 
     public static final String OUTPUT_NAME = "command output";
+    public static final String ENV_NAME = "environment";
 
     private String name;
     private String exe;
@@ -41,10 +42,26 @@ public class ExecutableCommand implements Command, ScopeAware
 
         builder.redirectErrorStream(true);
 
-        File outputFileDir = new File(context.getOutputDir(), "command output");
+        File envFileDir = new File(context.getOutputDir(), ENV_NAME);
+        if (!envFileDir.mkdir())
+        {
+            throw new BuildException("Unable to create directory for the environment artifact '" + envFileDir.getAbsolutePath() + "'");
+        }
+
+        // record the commands execution environment as an artifact.
+        try
+        {
+            recordExecutionEnvironment(builder, cmdResult, envFileDir);
+        }
+        catch (IOException e)
+        {
+            throw new BuildException("Unable to record the process execution environment. ", e);
+        }
+
+        File outputFileDir = new File(context.getOutputDir(), OUTPUT_NAME);
         if (!outputFileDir.mkdir())
         {
-            throw new BuildException("Unable to create directory for output artifact '" + outputFileDir.getAbsolutePath() + "'");
+            throw new BuildException("Unable to create directory for the output artifact '" + outputFileDir.getAbsolutePath() + "'");
         }
 
         try
@@ -53,8 +70,7 @@ public class ExecutableCommand implements Command, ScopeAware
         }
         catch (IOException e)
         {
-            // CIB-149: try and make friendlier error messages for common
-            // problems.
+            // CIB-149: try and make friendlier error messages for common problems.
             String message = e.getMessage();
             if (message.contains("nosuchexe") || message.contains("error=2"))
             {
@@ -81,7 +97,7 @@ public class ExecutableCommand implements Command, ScopeAware
             try
             {
                 outputFileStream = new FileOutputStream(outputFile);
-                if(context.getOutputStream() != null)
+                if (context.getOutputStream() != null)
                 {
                     output = new ForkOutputStream(outputFileStream, context.getOutputStream());
                 }
@@ -131,15 +147,97 @@ public class ExecutableCommand implements Command, ScopeAware
         }
     }
 
+    private void recordExecutionEnvironment(ProcessBuilder builder, CommandResult cmdResult, File outputDir) throws IOException
+    {
+        File file = new File(outputDir, "env.txt");
+
+        // buffered contents to be written to the file later.
+        StringBuffer buffer = new StringBuffer();
+
+        buffer.append("Command Line:\n");
+        buffer.append("-------------\n");
+        buffer.append(constructCommandLine(builder)).append("\n");
+
+        buffer.append("\nProcess Environment:\n");
+        buffer.append("--------------------\n");
+
+        // use a tree map to provide ordering to the keys.
+        Map<String, String> env = new TreeMap<String, String>(builder.environment());
+        for (String key : env.keySet())
+        {
+            buffer.append(key).append("=").append(env.get(key)).append("\n");
+        }
+
+        buffer.append("\nResources: (via scope)\n");
+        buffer.append("----------------------\n");
+        if (scope != null && scope.getEnvironment().size() > 0)
+        {
+            for (Map.Entry<String, String> setting : scope.getEnvironment().entrySet())
+            {
+                buffer.append(setting.getKey()).append("=").append(setting.getValue()).append("\n");
+            }
+        }
+        else
+        {
+            buffer.append("No environment variables defined via the command scope.\n");
+        }
+
+        buffer.append("\nResources: (via environment tag)\n");
+        buffer.append("--------------------------------\n");
+        if (this.env.size() > 0)
+        {
+            for (Environment setting : this.env)
+            {
+                buffer.append(setting.getName()).append("=").append(setting.getValue()).append("\n");
+            }
+        }
+        else
+        {
+            buffer.append("No environment variables defined via the command env tags.\n");
+        }
+
+        // write the buffer to the file.
+        Writer writer = null;
+        try
+        {
+            writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file)));
+            writer.append(buffer.toString());
+            writer.flush();
+        }
+        finally
+        {
+            IOUtils.close(writer);
+        }
+
+        // capture the artifact.
+        String path = FileSystemUtils.composeFilename(outputDir.getName(), file.getName());
+
+        StoredArtifact envArtifact = new StoredArtifact(ENV_NAME, new StoredFileArtifact(path, "text/plain"));
+        cmdResult.addArtifact(envArtifact);
+    }
+
+    protected StoredFileArtifact getOutputFileArtifact(CommandResult result)
+    {
+        StoredArtifact outputArtifact = result.getArtifact(OUTPUT_NAME);
+        for (StoredFileArtifact file : outputArtifact.getChildren())
+        {
+            if (file.getPath().equals(OUTPUT_NAME + "/output.txt"))
+            {
+                return file;
+            }
+        }
+        return null;
+    }
+
     private List<String> constructCommand()
     {
         String binary = exe;
 
         File exeFile = new File(exe);
-        if(!exeFile.isAbsolute())
+        if (!exeFile.isAbsolute())
         {
             exeFile = SystemUtils.findInPath(exe, scope == null ? null : scope.getPathDirectories().values());
-            if(exeFile != null)
+            if (exeFile != null)
             {
                 binary = exeFile.getAbsolutePath();
             }
@@ -166,7 +264,7 @@ public class ExecutableCommand implements Command, ScopeAware
         }
         else
         {
-            if(workingDir.isAbsolute())
+            if (workingDir.isAbsolute())
             {
                 builder.directory(workingDir);
             }
@@ -183,7 +281,7 @@ public class ExecutableCommand implements Command, ScopeAware
 
         if (scope != null)
         {
-            for(Map.Entry<String, String> setting: scope.getEnvironment().entrySet())
+            for (Map.Entry<String, String> setting : scope.getEnvironment().entrySet())
             {
                 childEnvironment.put(setting.getKey(), setting.getValue());
             }

@@ -1,9 +1,6 @@
 package com.zutubi.pulse.model;
 
-import com.zutubi.pulse.core.model.Feature;
-import com.zutubi.pulse.core.model.Result;
-import com.zutubi.pulse.core.model.ResultState;
-import com.zutubi.pulse.core.model.TestResultSummary;
+import com.zutubi.pulse.core.model.*;
 import org.acegisecurity.acl.basic.AclObjectIdentity;
 import org.acegisecurity.acl.basic.AclObjectIdentityAware;
 
@@ -19,6 +16,10 @@ public class BuildResult extends Result implements AclObjectIdentityAware, Itera
 
     private BuildReason reason;
     private Project project;
+    /**
+     * If not null, this build is a personal build for the given user.
+     */
+    private User user;
     private String buildSpecification;
     private long number;
     private BuildScmDetails scmDetails;
@@ -37,11 +38,18 @@ public class BuildResult extends Result implements AclObjectIdentityAware, Itera
     {
         this.reason = reason;
         this.project = project;
+        this.user = null;
         this.buildSpecification = buildSpecification;
         this.number = number;
         state = ResultState.INITIAL;
         root = new RecipeResultNode(null, null);
         hasWorkDir = true;
+    }
+
+    public BuildResult(User user, Project project, String buildSpecification, long number)
+    {
+        this(new PersonalBuildReason(user.getLogin()), project, buildSpecification, number);
+        this.user = user;
     }
 
     public BuildReason getReason()
@@ -62,6 +70,16 @@ public class BuildResult extends Result implements AclObjectIdentityAware, Itera
     private void setProject(Project project)
     {
         this.project = project;
+    }
+
+    public User getUser()
+    {
+        return user;
+    }
+
+    private void setUser(User user)
+    {
+        this.user = user;
     }
 
     public String getBuildSpecification()
@@ -197,6 +215,23 @@ public class BuildResult extends Result implements AclObjectIdentityAware, Itera
     public Iterator<RecipeResultNode> iterator()
     {
         return new ResultIterator();
+    }
+
+    public boolean isPersonal()
+    {
+        return user != null;
+    }
+
+    public Entity getOwner()
+    {
+        if(user == null)
+        {
+            return project;
+        }
+        else
+        {
+            return user;
+        }
     }
 
     private class ResultIterator implements Iterator<RecipeResultNode>

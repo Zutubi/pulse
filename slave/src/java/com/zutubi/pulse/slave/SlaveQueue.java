@@ -1,6 +1,7 @@
 package com.zutubi.pulse.slave;
 
 import com.zutubi.pulse.util.logging.Logger;
+import com.zutubi.pulse.core.Stoppable;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -16,7 +17,7 @@ import java.util.concurrent.locks.ReentrantLock;
  * The slave is dumb about scheduling: all "smarts" are on the master which
  * has full knowledge of all agents and thus can make better decisions.
  */
-public class SlaveQueue implements Runnable
+public class SlaveQueue implements Runnable, Stoppable
 {
     private static final Logger LOG = Logger.getLogger(SlaveQueue.class);
 
@@ -63,6 +64,11 @@ public class SlaveQueue implements Runnable
         {
             recipesLock.unlock();
         }
+    }
+
+    public void stop(boolean force)
+    {
+        stop();
     }
 
     public void run()
@@ -157,4 +163,5 @@ public class SlaveQueue implements Runnable
     {
         return recipes.size();
     }
+
 }

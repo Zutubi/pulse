@@ -4,6 +4,7 @@ import com.opensymphony.util.TextUtils;
 import com.zutubi.pulse.util.logging.Logger;
 
 import java.io.*;
+import java.net.URLConnection;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 import java.util.zip.ZipOutputStream;
@@ -112,6 +113,19 @@ public class FileSystemUtils
         {
             throw new IOException("Unable to create output directory '" + output.getPath() + "'");
         }
+    }
+
+    /**
+     * Create a temporary directory using pre-defined prefix and suffix values.  Use this when you really don't
+     * care what the directory is called.
+     *
+     * @return
+     *
+     * @throws IOException
+     */
+    public static File createTempDirectory() throws IOException
+    {
+        return createTempDirectory("dir", null);
     }
 
     public static File createTempDirectory(String prefix, String suffix) throws IOException
@@ -373,6 +387,20 @@ public class FileSystemUtils
         }
     }
 
+    public static void extractZip(File zipFile, File dir) throws IOException
+    {
+        ZipInputStream zin = null;
+        try
+        {
+            zin = new ZipInputStream(new FileInputStream(zipFile));
+            extractZip(zin, dir);
+        }
+        finally
+        {
+            IOUtils.close(zin);
+        }
+    }
+
     public static void extractZip(ZipInputStream zin, File dir) throws IOException
     {
         ZipEntry entry;
@@ -530,6 +558,16 @@ public class FileSystemUtils
         if(File.separatorChar != '/')
         {
             path = path.replace(File.separatorChar, '/');
+        }
+
+        return path;
+    }
+
+    public static String denormaliseSeparators(String path)
+    {
+        if(File.separatorChar != '/')
+        {
+            path = path.replace('/', File.separatorChar);
         }
 
         return path;

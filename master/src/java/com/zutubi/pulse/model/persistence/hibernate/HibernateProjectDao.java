@@ -39,6 +39,11 @@ public class HibernateProjectDao extends HibernateEntityDao<Project> implements 
         return (Project) findUniqueByNamedQuery("findByScmId", "scmId", id);
     }
 
+    public Project findByBuildSpecification(BuildSpecification buildSpecification)
+    {
+        return (Project) findUniqueByNamedQuery("findProjectByBuildSpecification", "buildSpecification", buildSpecification);
+    }
+
     public void save(VersionedPulseFileDetails details)
     {
         getHibernateTemplate().saveOrUpdate(details);

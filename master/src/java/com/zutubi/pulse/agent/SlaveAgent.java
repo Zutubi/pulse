@@ -8,6 +8,7 @@ import com.zutubi.pulse.model.Slave;
 import com.zutubi.pulse.services.ServiceTokenManager;
 import com.zutubi.pulse.services.SlaveService;
 import com.zutubi.pulse.services.SlaveStatus;
+import com.zutubi.pulse.services.UpgradeState;
 
 import java.text.DateFormat;
 import java.util.Date;
@@ -26,6 +27,12 @@ public class SlaveAgent implements Agent
     private ServiceTokenManager serviceTokenManager;
     private BuildService buildService;
     private String pingError = null;
+    /**
+     * The upgrade state is only used when the slave enable state is UPGRADING.
+     */
+    private UpgradeState upgradeState = UpgradeState.NONE;
+    private int upgradeProgress = -1;
+    private String upgradeMessage = null;
 
     public SlaveAgent(Slave slave, SlaveService slaveService, ServiceTokenManager serviceTokenManager, BuildService buildService)
     {
@@ -33,7 +40,22 @@ public class SlaveAgent implements Agent
         this.slaveService = slaveService;
         this.serviceTokenManager = serviceTokenManager;
         this.buildService = buildService;
-        status = slave.isEnabled() ? Status.OFFLINE : Status.DISABLED;
+
+        // Restore transient state based on persistent state
+        switch(slave.getEnableState())
+        {
+            case ENABLED:
+                status = Status.OFFLINE;
+                break;
+            case DISABLED:
+            case UPGRADING:
+                status = Status.DISABLED;
+                break;
+            case FAILED_UPGRADE:
+                status = Status.DISABLED;
+                upgradeState = UpgradeState.FAILED;
+                break;
+        }
     }
 
     public long getId()
@@ -138,6 +160,16 @@ public class SlaveAgent implements Agent
         return slave.isEnabled();
     }
 
+    public boolean isUpgrading()
+    {
+        return slave.getEnableState() == Slave.EnableState.UPGRADING;
+    }
+
+    public boolean isFailedUpgrade()
+    {
+        return slave.getEnableState() == Slave.EnableState.FAILED_UPGRADE;
+    }
+
     public boolean isAvailable()
     {
         return status == Status.IDLE;
@@ -148,5 +180,27 @@ public class SlaveAgent implements Agent
         lastPingTime = status.getPingTime();
         this.status = status.getStatus();
         pingError = status.getMessage();
+    }
+
+    public void upgradeStatus(UpgradeState state, int progress, String message)
+    {
+        upgradeState = state;
+        upgradeProgress = progress;
+        upgradeMessage = message;
+    }
+
+    public UpgradeState getUpgradeState()
+    {
+        return upgradeState;
+    }
+
+    public int getUpgradeProgress()
+    {
+        return upgradeProgress;
+    }
+
+    public String getUpgradeMessage()
+    {
+        return upgradeMessage;
     }
 }

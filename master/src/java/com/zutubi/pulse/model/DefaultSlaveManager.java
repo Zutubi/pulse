@@ -1,11 +1,16 @@
 package com.zutubi.pulse.model;
 
-import com.zutubi.pulse.util.Constants;
+import com.zutubi.pulse.model.persistence.BuildSpecificationDao;
 import com.zutubi.pulse.model.persistence.SlaveDao;
-import com.zutubi.pulse.scheduling.*;
+import com.zutubi.pulse.scheduling.Scheduler;
+import com.zutubi.pulse.scheduling.SchedulingException;
+import com.zutubi.pulse.scheduling.SimpleTrigger;
+import com.zutubi.pulse.scheduling.Trigger;
 import com.zutubi.pulse.scheduling.tasks.PingSlaves;
+import com.zutubi.pulse.util.Constants;
 import com.zutubi.pulse.util.logging.Logger;
 
+import java.util.LinkedList;
 import java.util.List;
 
 /**
@@ -16,8 +21,9 @@ public class DefaultSlaveManager implements SlaveManager
     private static final Logger LOG = Logger.getLogger(DefaultSlaveManager.class);
 
     private SlaveDao slaveDao;
-
+    private BuildSpecificationDao buildSpecificationDao;
     private Scheduler scheduler;
+    private ProjectManager projectManager;
 
     private static final String PING_NAME = "ping";
     private static final String PING_GROUP = "services";
@@ -67,8 +73,49 @@ public class DefaultSlaveManager implements SlaveManager
         Slave slave = slaveDao.findById(id);
         if (slave != null)
         {
+            // Remove all build stages that require this slave explicitly
+            List<BuildSpecification> buildSpecs = buildSpecificationDao.findBySlave(slave);
+            for(BuildSpecification spec: buildSpecs)
+            {
+                removeStages(spec.getRoot(), id);
+                if(spec.getRoot().getChildren().size() == 0)
+                {
+                    // Completely empty spec should be deleted
+                    projectManager.deleteBuildSpecification(projectManager.getProjectByBuildSpecification(spec), spec.getId());
+                }
+                else
+                {
+                    // Still stages remaining, save
+                    projectManager.save(spec);
+                }
+            }
+
             slaveDao.delete(slave);
         }
+    }
+
+    private void removeStages(BuildSpecificationNode node, long id)
+    {
+        List<BuildSpecificationNode> dead = new LinkedList<BuildSpecificationNode>();
+        for(BuildSpecificationNode child: node.getChildren())
+        {
+            BuildStage stage = child.getStage();
+            if(stage != null)
+            {
+                BuildHostRequirements hostRequirements = stage.getHostRequirements();
+                if(hostRequirements instanceof SlaveBuildHostRequirements)
+                {
+                    if(((SlaveBuildHostRequirements)hostRequirements).getSlave().getId() == id)
+                    {
+                        dead.add(child);
+                    }
+                }
+            }
+
+            removeStages(child, id);
+        }
+
+        node.getChildren().removeAll(dead);
     }
 
     public void delete(Slave slave)
@@ -89,5 +136,15 @@ public class DefaultSlaveManager implements SlaveManager
     public void setScheduler(Scheduler scheduler)
     {
         this.scheduler = scheduler;
+    }
+
+    public void setBuildSpecificationDao(BuildSpecificationDao buildSpecificationDao)
+    {
+        this.buildSpecificationDao = buildSpecificationDao;
+    }
+
+    public void setProjectManager(ProjectManager projectManager)
+    {
+        this.projectManager = projectManager;
     }
 }

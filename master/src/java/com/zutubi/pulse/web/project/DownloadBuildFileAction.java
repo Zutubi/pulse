@@ -47,6 +47,8 @@ public class DownloadBuildFileAction extends ProjectActionSupport
             return ERROR;
         }
 
+        checkPermissions(result);        
+
         try
         {
             File file = new File(result.getAbsoluteOutputDir(configurationManager.getDataDirectory()), BuildResult.PULSE_FILE);

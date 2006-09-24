@@ -10,10 +10,23 @@ import java.util.List;
  */
 public class Slave extends Entity
 {
+    /**
+     * Persistent slave states.  The minimum we need to remember even across
+     * restarts to ensure disabled slaves stay that way and failed (or
+     * interrupted) upgrades are not retried with user intervention.
+     */
+    public enum EnableState
+    {
+        ENABLED,
+        DISABLED,
+        UPGRADING,
+        FAILED_UPGRADE
+    }
+
     private String name;
     private String host;
     private int port = 8090;
-    private boolean enabled = true;
+    private EnableState enableState = EnableState.ENABLED;
 
     protected List<PersistentResource> resources = new LinkedList<PersistentResource>();
 
@@ -68,12 +81,27 @@ public class Slave extends Entity
 
     public boolean isEnabled()
     {
-        return enabled;
+        return enableState == EnableState.ENABLED;
     }
 
-    public void setEnabled(boolean enabled)
+    public EnableState getEnableState()
     {
-        this.enabled = enabled;
+        return enableState;
+    }
+
+    public void setEnableState(EnableState enableState)
+    {
+        this.enableState = enableState;
+    }
+
+    private String getEnableStateName()
+    {
+        return enableState.toString();
+    }
+
+    private void setEnableStateName(String name)
+    {
+        this.enableState = EnableState.valueOf(name);
     }
 
     public List<PersistentResource> getResources()

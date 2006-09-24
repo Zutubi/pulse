@@ -4,7 +4,6 @@ import com.opensymphony.util.TextUtils;
 import com.zutubi.pulse.ShutdownManager;
 import com.zutubi.pulse.Version;
 import com.zutubi.pulse.bootstrap.ComponentContext;
-import com.zutubi.pulse.core.BuildRevision;
 import com.zutubi.pulse.core.model.ResultState;
 import com.zutubi.pulse.model.*;
 
@@ -174,7 +173,7 @@ public class RemoteApi
                 throw new IllegalArgumentException("Unknown build specification '" + buildSpecification + "'");
             }
 
-            projectManager.triggerBuild(project, buildSpecification, new RemoteTriggerBuildReason(), new BuildRevision(), true);
+            projectManager.triggerBuild(project, buildSpecification, new RemoteTriggerBuildReason(), null, true);
             return true;
         }
         finally
@@ -244,12 +243,33 @@ public class RemoteApi
         }
         else
         {
-            adminTokenManager.checkAdminToken(token);
+            if(!adminTokenManager.checkAdminToken(token))
+            {
+                throw new AuthenticationException("Invalid token");
+            }
         }
 
         // Sigh ... this is tricky, because if we shutdown here Jetty dies
         // before this request is complete and the client gets an error :-|.
         shutdownManager.delayedShutdown(force, exitJvm);
+        return true;
+    }
+
+    public boolean stopService(String token) throws AuthenticationException
+    {
+        if (tokenManager != null)
+        {
+            tokenManager.verifyAdmin(token);
+        }
+        else
+        {
+            if(!adminTokenManager.checkAdminToken(token))
+            {
+                throw new AuthenticationException("Invalid token");
+            }
+        }
+
+        shutdownManager.delayedStop();
         return true;
     }
 

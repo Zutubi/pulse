@@ -1,12 +1,11 @@
 package com.zutubi.pulse;
 
 import com.zutubi.pulse.bootstrap.MasterConfigurationManager;
-import com.zutubi.pulse.core.BuildException;
-import com.zutubi.pulse.core.RecipeProcessor;
-import com.zutubi.pulse.core.RecipeRequest;
-import com.zutubi.pulse.core.ResourceRepository;
+import com.zutubi.pulse.core.*;
 import com.zutubi.pulse.events.EventManager;
 import com.zutubi.pulse.events.build.RecipeErrorEvent;
+import com.zutubi.pulse.repository.FileRepositoryAware;
+import com.zutubi.pulse.repository.MasterFileRepository;
 import com.zutubi.pulse.util.logging.Logger;
 
 /**
@@ -32,7 +31,13 @@ public class MasterRecipeRunner implements Runnable
 
     public void run()
     {
-        request.setBootstrapper(new ChainBootstrapper(new ServerBootstrapper(), request.getBootstrapper()));
+        Bootstrapper requestBootstrapper = request.getBootstrapper();
+        if(requestBootstrapper instanceof FileRepositoryAware)
+        {
+            ((FileRepositoryAware)requestBootstrapper).setFileRepository(new MasterFileRepository(configurationManager));
+        }
+        
+        request.setBootstrapper(new ChainBootstrapper(new ServerBootstrapper(), requestBootstrapper));
         ServerRecipePaths recipePaths = new ServerRecipePaths(request.getProject(), request.getSpec(), request.getId(), configurationManager.getUserPaths().getData(), request.isIncremental());
 
         try

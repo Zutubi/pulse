@@ -5,6 +5,7 @@ import com.zutubi.pulse.core.model.Feature;
 import com.zutubi.pulse.core.model.StoredFileArtifact;
 import com.zutubi.pulse.util.FileSystemUtils;
 import com.zutubi.pulse.util.IOUtils;
+import com.zutubi.pulse.util.SystemUtils;
 import com.zutubi.pulse.test.PulseTestCase;
 
 import java.io.File;
@@ -66,7 +67,7 @@ public class Maven2PostProcessorTest extends PostProcessorTestBase
 
     public void testCompilerError() throws Exception
     {
-        createAndProcessArtifact("compilererror", pp);
+        CommandResult result = createAndProcessArtifact("compilererror", pp);
         assertErrors("[INFO] ----------------------------------------------------------------------------\n" +
                 "[ERROR] BUILD FAILURE\n" +
                 "[INFO] ----------------------------------------------------------------------------\n" +
@@ -75,11 +76,20 @@ public class Maven2PostProcessorTest extends PostProcessorTestBase
                 "base.dir/src/main/java/com/zutubi/maven2/test/App.java:[12,4] ';' expected\n" +
                 "\n" +
                 "");
+
+        if(SystemUtils.isWindows())
+        {
+            assertTrue(result.failed());
+        }
+        else
+        {
+            assertTrue(result.succeeded());
+        }
     }
 
     public void testTestFailure() throws Exception
     {
-        createAndProcessArtifact("testfailure", pp);
+        CommandResult result = createAndProcessArtifact("testfailure", pp);
         assertErrors("[surefire] Running com.zutubi.maven2.test.AppTest\n" +
                 "[surefire] Tests run: 1, Failures: 1, Errors: 0, Time elapsed: x sec <<<<<<<< FAILURE !! ",
 
@@ -91,5 +101,24 @@ public class Maven2PostProcessorTest extends PostProcessorTestBase
                 "[INFO] For more information, run Maven with the -e switch\n" +
                 "[INFO] ----------------------------------------------------------------------------\n" +
                 "[INFO] ----------------------------------------------------------------------------");
+
+        if(SystemUtils.isWindows())
+        {
+            assertTrue(result.failed());
+        }
+        else
+        {
+            assertTrue(result.succeeded());
+        }
+    }
+
+    public void testSuccessfulError() throws Exception
+    {
+        CommandResult result = createAndProcessArtifact("successfulerror", pp);
+        assertErrors("[INFO] Generate \"Continuous Integration\" report.\n" +
+                "[ERROR] VM #displayTree: error : too few arguments to macro. Wanted 2 got 0\n" +
+                "[ERROR] VM #menuItem: error : too few arguments to macro. Wanted 1 got 0\n" +
+                "[INFO] Generate \"Dependencies\" report.");
+        assertTrue(result.succeeded());
     }
 }

@@ -1,6 +1,7 @@
 package com.zutubi.pulse.model;
 
 import com.zutubi.pulse.core.model.Entity;
+import com.zutubi.validation.annotations.Required;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -23,7 +24,7 @@ public abstract class ContactPoint extends Entity
         this.name = name;
     }
 
-    public String getName()
+    @Required public String getName()
     {
         return this.name;
     }

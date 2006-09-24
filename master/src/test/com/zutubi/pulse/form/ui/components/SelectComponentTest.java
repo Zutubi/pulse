@@ -26,7 +26,9 @@ public class SelectComponentTest extends ComponentTestCase
     public void testComponentRendering()
     {
         component.setList(Arrays.asList("plain", "html"));
+        component.setName("name");
         component.render(renderer);
         assertFalse(renderer.hasError());
+        System.out.println(renderer.getRenderedContent());
     }
 }

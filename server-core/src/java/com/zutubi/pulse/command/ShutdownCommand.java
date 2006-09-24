@@ -6,6 +6,7 @@ import org.apache.xmlrpc.XmlRpcException;
 import java.io.IOException;
 import java.util.Vector;
 import java.util.Arrays;
+import java.lang.reflect.Method;
 
 
 /**
@@ -52,7 +53,7 @@ public class ShutdownCommand extends AdminCommand
 
         CommandLineParser parser = new PosixParser();
         CommandLine commandLine = parser.parse(options, argv, true);
-        
+
         setForce(commandLine.hasOption('f'));
 
         if (commandLine.hasOption('p'))
@@ -67,6 +68,11 @@ public class ShutdownCommand extends AdminCommand
         {
             setConfig(commandLine.getOptionValue('f'));
         }
+    }
+
+    public String getHelp()
+    {
+        return "sends a shutdown request to the Pulse server";
     }
 
     public int doExecute() throws XmlRpcException, IOException

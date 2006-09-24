@@ -28,6 +28,7 @@
         <dependency org="zutubi" name="pulse-core" rev="latest.integration" conf="external->external"/>
 
         <dependency org="apache" name="commons-cli" rev="1.0" conf="external,build,release->default"/>
+        <dependency org="apache" name="commons-httpclient" rev="3.0" conf="external,build,release->default"/>
 
     </dependencies>
 

@@ -30,12 +30,16 @@
     <option value=""></option>
 </#if>
 <#list parameters.list as item>
-    <#assign itemKey = item/>
-    <#assign itemValue = item/>
-    <option value="${itemKey?html}"<#rt/>
-        <#if parameters.value?exists && parameters.value == itemKey>
+    <#assign optionValue = item/>
+    <#if parameters.listValues[item]?exists>
+        <#assign optionLabel = parameters.listValues[item]/>
+    <#else>
+        <#assign optionLabel = item/>
+    </#if>
+    <option value="${optionValue?html}"<#rt/>
+        <#if parameters.value?exists && parameters.value == optionValue>
  selected="selected"<#rt/>
         </#if>
-    >${itemValue?html}</option><#lt/>
+    ><@i18n>${optionLabel?html}</@i18n></option><#lt/>
 </#list>
 </select>

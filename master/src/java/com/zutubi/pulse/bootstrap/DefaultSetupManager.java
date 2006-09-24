@@ -3,7 +3,7 @@ package com.zutubi.pulse.bootstrap;
 import com.opensymphony.util.TextUtils;
 import com.opensymphony.xwork.spring.SpringObjectFactory;
 import com.zutubi.pulse.bootstrap.conf.EnvConfig;
-import com.zutubi.pulse.bootstrap.conf.PropertiesWriter;
+import com.zutubi.pulse.config.PropertiesWriter;
 import com.zutubi.pulse.license.LicenseHolder;
 import com.zutubi.pulse.model.UserManager;
 import com.zutubi.pulse.upgrade.UpgradeManager;

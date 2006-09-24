@@ -1,12 +1,14 @@
 package com.zutubi.pulse.web.agents;
 
+import com.zutubi.pulse.model.Slave;
+
 /**
  */
 public class EnableAgentAction extends AgentActionSupport
 {
-    private boolean enable;
+    private String enable;
 
-    public void setEnable(boolean enable)
+    public void setEnable(String enable)
     {
         this.enable = enable;
     }
@@ -16,9 +18,17 @@ public class EnableAgentAction extends AgentActionSupport
         lookupSlave();
         if(slave != null)
         {
-            slave.setEnabled(enable);
-            getSlaveManager().save(slave);
-            getAgentManager().slaveChanged(getAgentId());
+            try
+            {
+                Slave.EnableState state = Slave.EnableState.valueOf(enable);
+                slave.setEnableState(state);
+                getSlaveManager().save(slave);
+                getAgentManager().slaveChanged(getAgentId());
+            }
+            catch(IllegalArgumentException e)
+            {
+                // Ignore invalid requests
+            }
         }
 
         return SUCCESS;

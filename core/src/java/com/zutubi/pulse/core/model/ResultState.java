@@ -184,6 +184,18 @@ public enum ResultState
         return states;
     }
 
+    public static String[] getCompletedStateNames()
+    {
+        ResultState[] states = getCompletedStates();
+        String[] result = new String[states.length];
+        for(int i = 0; i < states.length; i++)
+        {
+            result[i] = states[i].toString();
+        }
+
+        return result;
+    }
+
     public static ResultState getWorseState(ResultState s1, ResultState s2)
     {
         if(s1 == ERROR || s2 == ERROR)

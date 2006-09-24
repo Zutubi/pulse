@@ -10,6 +10,9 @@ import com.zutubi.pulse.security.AcegiSecurityManager;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.logging.Level;
+import java.net.Socket;
+import java.net.SocketImplFactory;
+import java.net.SocketImpl;
 
 /**
  * <class-comment/>

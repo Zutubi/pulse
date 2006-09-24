@@ -6,6 +6,7 @@ import com.zutubi.pulse.core.model.ResultState;
 import com.zutubi.pulse.model.BuildResult;
 import com.zutubi.pulse.model.Project;
 import com.zutubi.pulse.model.RecipeResultNode;
+import com.zutubi.pulse.model.User;
 
 import java.util.List;
 
@@ -50,4 +51,13 @@ public interface BuildResultDao extends EntityDao<BuildResult>
     List<String> findAllSpecificationsForProjects(Project[] projects);
 
     List<BuildResult> querySpecificationBuilds(Project project, String spec, ResultState[] states, long lowestNumber, long highestNumber, int first, int max, boolean mostRecentFirst, boolean initialise);
+
+    List<BuildResult> findByUser(User user);
+
+    List<BuildResult> getLatestByUser(User user, int max);
+
+    int getCompletedResultCount(User user);
+
+    List<BuildResult> getOldestCompletedBuilds(User user, int max);
+
 }

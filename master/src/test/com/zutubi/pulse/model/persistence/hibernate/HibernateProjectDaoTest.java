@@ -6,8 +6,8 @@ import com.zutubi.pulse.model.persistence.BuildSpecificationDao;
 import com.zutubi.pulse.model.persistence.ProjectDao;
 
 import java.util.Arrays;
-import java.util.TreeMap;
 import java.util.List;
+import java.util.TreeMap;
 
 /**
  * 
@@ -236,6 +236,24 @@ public class HibernateProjectDaoTest extends MasterPersistenceTestCase
         // assert that we get the right project back.
         assertNotNull(projectDao.findByScmId(project.getScm().getId()));
         assertEquals(project.getId(), projectDao.findByScmId(project.getScm().getId()).getId());
+    }
+
+    public void testFindByBuildSpecification()
+    {
+        Project p1 = new Project("p1", "This is a test project");
+        Project p2 = new Project("p2", "This is a test project");
+        BuildSpecification spec1 = new BuildSpecification();
+        BuildSpecification spec2 = new BuildSpecification();
+        p1.addBuildSpecification(spec1);
+        p2.addBuildSpecification(spec2);
+        projectDao.save(p1);
+        projectDao.save(p2);
+        commitAndRefreshTransaction();
+
+        // assert that we get the right project back.
+        Project found = projectDao.findByBuildSpecification(spec1);
+        assertNotNull(found);
+        assertEquals(p1.getId(), found.getId());
     }
 
     public void testFindByAdminAuthority()

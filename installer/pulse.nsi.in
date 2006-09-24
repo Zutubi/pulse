@@ -15,7 +15,7 @@
 
   ;Name and file
   Name "Zutubi __SERVICE_NAME__ __VERSION__"
-  OutFile "..\__PACKAGE_NAME__.exe"
+  OutFile "..\..\__PACKAGE_NAME__.exe"
 
   ;Default installation folder
   InstallDir "$PROGRAMFILES\Zutubi\__SERVICE_NAME__ __VERSION__"

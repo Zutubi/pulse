@@ -19,4 +19,9 @@ public class LocalBuildCommand implements Command
         // LocalBuild will exit with an error if it detects one.
         return 0;
     }
+
+    public String getHelp()
+    {
+        return "execute local build";
+    }
 }

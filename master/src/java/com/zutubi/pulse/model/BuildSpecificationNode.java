@@ -97,6 +97,19 @@ public class BuildSpecificationNode extends Entity
         return null;
     }
 
+    public void getNodesByPredicate(Predicate<BuildSpecificationNode> predicate, List<BuildSpecificationNode> nodes)
+    {
+        if(predicate.satisfied(this))
+        {
+            nodes.add(this);
+        }
+
+        for(BuildSpecificationNode child: children)
+        {
+            child.getNodesByPredicate(predicate, nodes);
+        }
+    }
+
     public BuildSpecificationNode getNode(final long id)
     {
         return getNodeByPredicate(new Predicate<BuildSpecificationNode>()

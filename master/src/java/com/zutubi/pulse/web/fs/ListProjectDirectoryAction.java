@@ -32,6 +32,8 @@ public class ListProjectDirectoryAction extends AbstractProjectWorkingCopyAction
     {
         BuildResult buildResult = buildManager.getBuildResult(getBuildId());
 
+        checkPermissions(buildResult);
+
         // no point in displaying any details if the working directory is not available.
         if (!buildResult.getHasWorkDir())
         {
@@ -54,7 +56,7 @@ public class ListProjectDirectoryAction extends AbstractProjectWorkingCopyAction
         String remainingPath = getWorkingCopyPathSegment();
 
         MasterBuildPaths paths = new MasterBuildPaths(configurationManager);
-        File baseDir = paths.getBaseDir(project, buildResult, Long.valueOf(recipeId));
+        File baseDir = paths.getBaseDir(buildResult, Long.valueOf(recipeId));
 
         if (!baseDir.isDirectory())
         {

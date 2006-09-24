@@ -54,6 +54,8 @@
             <key column="USER_ID"/>
             <many-to-many class="com.zutubi.pulse.model.Project" column="PROJECT_ID"/>
         </set>
+
+        <property name="nextBuildNumber" column="NEXT_BUILD_NUMBER" type="long"/>
     </class>
 
     <!--

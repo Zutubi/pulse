@@ -46,6 +46,9 @@ public class FreemarkerRenderer implements Renderer
             context.putAll(r.getContext());
         }
 
+        // add support for i18n handling.
+        context.put("i18n", new I18NTransform());
+
         String templateName = getTemplateName(r);
         doRender(r, context, templateName);
     }
