@@ -19,6 +19,7 @@
                     #dynamicRow("general.help.url" $config.helpUrl)
                     #enabledDisabledRow("general.rss.enabled" $config.rssEnabled)
                     #enabledDisabledRow("general.anonymous" $config.anonymousAccessEnabled)
+                    #dynamicRow("scm.polling.interval" $config.scmPollingInterval)
                 </table>
 
                 <table id="commit.message.links" class="fill-content">

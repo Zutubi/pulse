@@ -4,6 +4,31 @@
 <html>
 <head>
     <title>#wwtext("name=build") $result.number</title>
+    <script type="text/javascript">
+    <!--
+        var successfulShowing = {
+            "suites": true,
+            "cases": true
+        };
+
+        function toggleSuccessful(name)
+        {
+            if(successfulShowing[name])
+            {
+                text = "#wwtext("name=tests.show.successful")";
+                successfulShowing[name] = false;
+            }
+            else
+            {
+                text = "#wwtext("name=tests.hide.successful")";
+                successfulShowing[name] = true;
+            }
+
+            toggleSuccessfulTestRows("child-" + name, successfulShowing[name]);
+            setText(name + "-toggle", text);
+        }
+	-->
+    </script>
 </head>
 <body>
     #buildTabs($result "tests")
@@ -23,8 +48,15 @@
     #testSummaryTable($suite.summary)
 
 #if($suite.suites.size() > 0)
-    <table class="fill-content">
-        #headingRow("test.suites" 7)
+    <table id="child-suites" class="fill-content">
+        <th class="heading" colspan="7">
+           <span class="action">
+               <a href="#" id="suites-toggle" onclick="toggleSuccessful('suites'); return false;">
+                    #wwtext("name=tests.hide.successful")
+                </a>
+            </span>
+            #wwtext("name=test.suites")
+        </th>
         <tr>
             #contentHeading("test.name" 1)
             #contentHeading("test.status" 2)
@@ -39,7 +71,12 @@
         #else
             #set($childPath = "$action.urlEncode($childSuite.name)")
         #end
-        <tr>
+        #if($childSuite.hasBrokenTests())
+            #set($cssClass = "failed")
+        #else
+            #set($cssClass = "successful")
+        #end
+        <tr class="$cssClass">
             #dynamicLinkCell($childSuite.name "viewTestSuite.action?id=$result.id&nodeId=$node.id&path=$action.urlEncode($childPath)")
             #testStatusCell($childSuite)
             #rightCell($childSuite.total)
@@ -52,8 +89,15 @@
 #end
 
 #if($suite.cases.size() > 0)
-    <table class="fill-content">
-        #headingRow("test.cases" 5)
+    <table id="child-cases" class="fill-content">
+        <th class="heading" colspan="5">
+           <span class="action">
+               <a href="#" id="cases-toggle" onclick="toggleSuccessful('cases'); return false;">
+                    #wwtext("name=tests.hide.successful")
+                </a>
+            </span>
+            #wwtext("name=test.cases")
+        </th>
         <tr>
             #contentHeading("test.name" 1)
             #contentHeading("test.status" 2)
@@ -61,7 +105,12 @@
             #contentHeading("test.duration" 1)
         </tr>
     #foreach($childCase in $suite.cases)
-        <tr>
+        #if($childCase.hasBrokenTests())
+            #set($cssClass = "failed")
+        #else
+            #set($cssClass = "successful")
+        #end
+        <tr class="$cssClass">
             #dynamicCell($childCase.name)
             #testStatusCell($childCase)
             #if($childCase.message)

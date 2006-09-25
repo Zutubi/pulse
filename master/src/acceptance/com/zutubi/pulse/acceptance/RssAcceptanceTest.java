@@ -88,7 +88,7 @@ public class RssAcceptanceTest extends BaseAcceptanceTestCase
         clickLinkWithText("Administration");
         clickLink("general.edit");
         GeneralConfigurationForm form = new GeneralConfigurationForm(tester);
-        form.saveFormElements(null, null, "true", null);
+        form.saveFormElements(null, null, "true", null, "5");
     }
 
     private SyndFeed readResponseAsFeed() throws FeedException, IOException

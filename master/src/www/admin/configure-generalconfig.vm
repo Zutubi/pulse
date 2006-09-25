@@ -18,8 +18,9 @@
     #wwcheckbox("name=rssEnabled" "label=%{getText('general.rss.enabled')}" "tabindex=3")
     #inlineHelp("general.rss.enabled.help")
     #wwcheckbox("name=anonEnabled" "label=%{getText('general.anonymous.enable')}" "tabindex=4")
+    #wwtextfield("name=scmPollingInterval" "label=%{getText('scm.polling.interval')}" "size=10" "tabindex=5")
 
-    #saveCancel("5")
+    #saveCancel("6")
 #end
 
     #tabEnd()

@@ -17,6 +17,7 @@ public class GeneralConfigurationAction extends ActionSupport
     private String helpUrl;
     private boolean rssEnabled;
     private boolean anonEnabled;
+    private Integer scmPollingInterval;
 
     public String doReset()
     {
@@ -87,6 +88,16 @@ public class GeneralConfigurationAction extends ActionSupport
         this.anonEnabled = anonEnabled;
     }
 
+    public Integer getScmPollingInterval()
+    {
+        return scmPollingInterval;
+    }
+
+    public void setScmPollingInterval(Integer scmPollingInterval)
+    {
+        this.scmPollingInterval = scmPollingInterval;
+    }
+
     private void resetConfig()
     {
         MasterConfiguration config = configurationManager.getAppConfig();
@@ -94,6 +105,7 @@ public class GeneralConfigurationAction extends ActionSupport
         config.setHelpUrl(null);
         config.setRssEnabled(null);
         config.setAnonymousAccessEnabled(null);
+        config.setScmPollingInterval(null);
         guestAccessManager.init();
     }
 
@@ -104,6 +116,7 @@ public class GeneralConfigurationAction extends ActionSupport
         config.setHelpUrl(helpUrl);
         config.setRssEnabled(rssEnabled);
         config.setAnonymousAccessEnabled(anonEnabled);
+        config.setScmPollingInterval(scmPollingInterval);
         guestAccessManager.init();
     }
 
@@ -114,6 +127,7 @@ public class GeneralConfigurationAction extends ActionSupport
         helpUrl = config.getHelpUrl();
         rssEnabled = config.getRssEnabled();
         anonEnabled = config.getAnonymousAccessEnabled();
+        scmPollingInterval = config.getScmPollingInterval();
     }
 
     /**

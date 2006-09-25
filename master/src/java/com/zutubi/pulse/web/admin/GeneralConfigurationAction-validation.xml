@@ -14,4 +14,13 @@
             <message key="general.help.url.required">required field</message>
         </field-validator>
     </field>
+    <field name="scmPollingInterval">
+        <field-validator type="required">
+            <message key="scm.polling.interval.required">required field</message>
+        </field-validator>
+        <field-validator type="int">
+            <param name="min">1</param>
+            <message key="scm.polling.interval.invalid">invalid field</message>
+        </field-validator>
+    </field>
 </validators>

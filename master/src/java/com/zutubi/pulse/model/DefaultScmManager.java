@@ -5,6 +5,7 @@ import com.zutubi.pulse.model.persistence.ScmDao;
 import com.zutubi.pulse.scheduling.*;
 import com.zutubi.pulse.scm.MonitorScms;
 import com.zutubi.pulse.util.logging.Logger;
+import com.zutubi.pulse.bootstrap.MasterConfigurationManager;
 
 import java.util.List;
 
@@ -23,6 +24,8 @@ public class DefaultScmManager implements ScmManager
     private static final String MONITOR_GROUP = "scm";
     private static final long POLLING_FREQUENCY = Constants.MINUTE;
 
+    private MasterConfigurationManager configManager;
+
     public void setScmDao(ScmDao scmDao)
     {
         this.scmDao = scmDao;
@@ -31,6 +34,11 @@ public class DefaultScmManager implements ScmManager
     public void setScheduler(Scheduler scheduler)
     {
         this.scheduler = scheduler;
+    }
+
+    public void setConfigurationManager(MasterConfigurationManager configManager)
+    {
+        this.configManager = configManager;
     }
 
     public void init()
@@ -74,5 +82,15 @@ public class DefaultScmManager implements ScmManager
     public Scm getScm(long id)
     {
         return scmDao.findById(id);
+    }
+
+    public int getDefaultPollingInterval()
+    {
+        return configManager.getAppConfig().getScmPollingInterval();
+    }
+
+    public void setDefaultPollingInterval(int interval)
+    {
+        configManager.getAppConfig().setScmPollingInterval(interval);
     }
 }

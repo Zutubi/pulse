@@ -772,7 +772,7 @@
     #end
 #end
 
-#macro(aggregateResultCell $changelist)
+#macro(aggregateResultCell $changelist $myProjects)
     #set ($selectedResult = "n")
     #foreach($id in $changelist.resultIds)
         #set($result = $action.getResult($id))
@@ -784,7 +784,13 @@
         #end
     #end
 
-    <td id="${changelist.id}_cell" class="$selectedResult.state.string">
+    #if($myProjects)
+        #set($changeId = "${changelist.id}_projects")
+    #else
+        #set($changeId = "${changelist.id}")
+    #end
+
+    <td id="${changeId}_cell" class="$selectedResult.state.string">
         #if($selectedResult.succeeded())
             <img alt="success" src="$base/images/accept.gif"/>
         #elseif($selectedResult.inProgress())
@@ -799,13 +805,13 @@
             &nbsp;
         #end
         $selectedResult.state.prettyString
-        <a href="#" id="${changelist.id}_link" onclick="showHideBuildsFloat('$changelist.id'); return false">+</a>
-        <div id="$changelist.id" style="display: none">
+        <a href="#" id="${changeId}_link" onclick="showHideBuildsFloat('$changeId'); return false">+</a>
+        <div id="$changeId" style="display: none">
         <table class="content" style="margin: 0">
             <tr>
                 <th class="heading" colspan="5">
                     <span class="action">
-                        <a href="#" onclick="showHideBuildsFloat('$changelist.id'); return false;"><img alt="$action.getText('close')" src="$base/images/delete.gif"/>#wwtext("name=close")</a>
+                        <a href="#" onclick="showHideBuildsFloat('$changeId'); return false;"><img alt="$action.getText('close')" src="$base/images/delete.gif"/>#wwtext("name=close")</a>
                     </span>
                     #wwtext("name=build.results")
                 </th>
@@ -842,7 +848,7 @@
         #wwtext("name=tests.none")
     #else
         #if($recipe)
-            <a href="viewTests.action?id=$build.id&amp;nodeId=$recipe.id">
+            <a href="viewTestSuite.action?id=$build.id&amp;nodeId=$recipe.id">
         #else
             <a href="viewTests.action?id=$build.id">
         #end
@@ -1184,7 +1190,7 @@
         #dynamicCell($recipe.recipeNameSafe)
         #dynamicCell($resultNode.hostSafe)
         #statusCell($recipe $showAnimated)
-        #testResultsCell($build $recipe $recipe)
+        #testResultsCell($build $resultNode $recipe)
         #dateClassCell($recipe)
         #elapsedCell($recipe)
         <td class="content">

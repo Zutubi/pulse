@@ -39,6 +39,10 @@ public abstract class Scm extends Entity implements Cloneable
      * The active status of this SCM.
      */
     private boolean monitor;
+
+    private Integer pollingInterval;
+    private Long lastPollTime;
+
     private static final String CHANGE_VIEWER_URL = "change.viewer.url";
     private static final String PROPERTY_REVISION = "revision";
     private static final String PROPERTY_AUTHOR = "author";
@@ -82,6 +86,26 @@ public abstract class Scm extends Entity implements Cloneable
     public void setPath(String path)
     {
         this.path = path;
+    }
+
+    public Integer getPollingInterval()
+    {
+        return pollingInterval;
+    }
+
+    public void setPollingInterval(Integer pollingInterval)
+    {
+        this.pollingInterval = pollingInterval;
+    }
+
+    public Long getLastPollTime()
+    {
+        return lastPollTime;
+    }
+
+    public void setLastPollTime(Long lastPollTime)
+    {
+        this.lastPollTime = lastPollTime;
     }
 
     public String getChangeViewerUrl()

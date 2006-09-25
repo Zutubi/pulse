@@ -32,6 +32,12 @@
                     #dynamicRow("scm.change.viewer.url" $project.scm.changeViewerUrl)
 #end
                     #dynamicRow("scm.monitor" "$project.scm.monitor")
+                    #if (!$project.scm.pollingInterval)
+                        #set($defaultSPI = "$defaultScmPollingInterval (default)")
+                        #dynamicRow("scm.polling.interval" $defaultSPI)
+                    #else
+                        #dynamicRow("scm.polling.interval" "$project.scm.pollingInterval")
+                    #end
                     #enabledDisabledRow("scm.filters" $project.scm.filterEnabled)
 #acl("domainObject=project" "hasPermission=4,1")
                     <tr>
