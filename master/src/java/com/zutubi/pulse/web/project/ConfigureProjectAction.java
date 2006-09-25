@@ -38,6 +38,11 @@ public class ConfigureProjectAction extends ProjectActionSupport
         return triggers;
     }
 
+    public int getDefaultScmPollingInterval()
+    {
+        return scmManager.getDefaultPollingInterval();
+    }
+
     public List<User> getProjectAdmins()
     {
         List<User> result = new LinkedList<User>();

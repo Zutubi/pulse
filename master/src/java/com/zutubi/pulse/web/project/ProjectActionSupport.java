@@ -19,10 +19,10 @@ import java.util.List;
  */
 public class ProjectActionSupport extends ActionSupport
 {
-    private ProjectManager projectManager;
-    private BuildManager buildManager;
-    private ScmManager scmManager;
-    private Scheduler scheduler;
+    protected ProjectManager projectManager;
+    protected BuildManager buildManager;
+    protected ScmManager scmManager;
+    protected Scheduler scheduler;
 
     private static final long NONE_SPECIFIED = -1;
 

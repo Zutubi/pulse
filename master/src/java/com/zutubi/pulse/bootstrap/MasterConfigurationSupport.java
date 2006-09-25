@@ -319,4 +319,14 @@ public class MasterConfigurationSupport extends ConfigSupport implements MasterC
     {
         setProperty(JABBER_PASSWORD, password);
     }
+
+    public Integer getScmPollingInterval()
+    {
+        return getInteger(SCM_POLLING_INTERVAL, Integer.valueOf(5));
+    }
+
+    public void setScmPollingInterval(Integer interval)
+    {
+        setInteger(SCM_POLLING_INTERVAL, interval);
+    }
 }

@@ -235,6 +235,7 @@
         <property name="mappings">
             <list>
                 <value>com/zutubi/pulse/upgrade/schema/build_0101011001/BuildResult.hbm.xml</value>
+                <value>com/zutubi/pulse/upgrade/schema/build_0101011001/Scm.hbm.xml</value>
             </list>
         </property>
     </bean>

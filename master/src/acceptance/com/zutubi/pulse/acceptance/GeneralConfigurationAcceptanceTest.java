@@ -48,7 +48,7 @@ public class GeneralConfigurationAcceptanceTest extends BaseAcceptanceTestCase
         GeneralConfigurationForm form = new GeneralConfigurationForm(tester);
 
         form.assertFormPresent();
-        form.saveFormElements("http://saved.base.url.net", "saved.help.url", "true", "true");
+        form.saveFormElements("http://saved.base.url.net", "saved.help.url", "true", "true", "4");
 
         form.assertFormNotPresent();
 
@@ -57,8 +57,8 @@ public class GeneralConfigurationAcceptanceTest extends BaseAcceptanceTestCase
 
         clickLink("general.edit");
         form.assertFormPresent();
-        form.assertFormElements("http://saved.base.url.net", "saved.help.url", "true", "true");
-        form.saveFormElements("http://saved.base.url.net", "saved.help.url", "true", "false");
+        form.assertFormElements("http://saved.base.url.net", "saved.help.url", "true", "true", "4");
+        form.saveFormElements("http://saved.base.url.net", "saved.help.url", "true", "false", "5");
     }
 
     public void testCancel() throws Exception
@@ -72,7 +72,7 @@ public class GeneralConfigurationAcceptanceTest extends BaseAcceptanceTestCase
         GeneralConfigurationForm form = new GeneralConfigurationForm(tester);
         form.assertFormPresent();
 
-        form.cancelFormElements("http://cancelled.base.url.net", "cancelled.help.url", "true", "true");
+        form.cancelFormElements("http://cancelled.base.url.net", "cancelled.help.url", "true", "true", "5");
         form.assertFormNotPresent();
 
         assertTextNotPresent("http://cancelled.base.url.net");
@@ -88,11 +88,21 @@ public class GeneralConfigurationAcceptanceTest extends BaseAcceptanceTestCase
         form.assertFormPresent();
 
         // check that the base url is validated.
-        form.saveFormElements("not.a.url", "some.help.url", "true", "false");
+        form.saveFormElements("not.a.url", "some.help.url", "true", "false", "5");
         form.assertFormPresent();
-        form.assertFormElements("not.a.url", "some.help.url", "true", "false");
+        form.assertFormElements("not.a.url", "some.help.url", "true", "false", "5");
 
-        form.saveFormElements("", "some.help.url", "true", "false");
+        form.saveFormElements("", "some.help.url", "true", "false", "5");
+        form.assertFormPresent();
+
+        // check that the scm polling interval is 0 <
+        form.saveFormElements("http://base.url.com", "some.help.url", "true", "false", "0");
+        form.assertFormPresent();
+
+        form.saveFormElements("http://base.url.com", "some.help.url", "true", "false", "-30");
+        form.assertFormPresent();
+
+        form.saveFormElements("http://base.url.com", "some.help.url", "true", "false", "a");
         form.assertFormPresent();
     }
 

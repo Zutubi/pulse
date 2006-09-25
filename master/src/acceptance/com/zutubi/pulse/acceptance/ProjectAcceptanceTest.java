@@ -925,7 +925,7 @@ public class ProjectAcceptanceTest extends ProjectAcceptanceTestBase
     public void testScmFilterDefaultDisplay()
     {
         assertTablePresent("project.scm");
-        assertTableRowEqual("project.scm", 4, new String[]{"filters", "disabled"});
+        assertTableRowEqual("project.scm", 5, new String[]{"filters", "disabled"});
     }
 
     public void testScmFilterAddDeleteExclusion()

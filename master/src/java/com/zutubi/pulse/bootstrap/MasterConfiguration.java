@@ -51,6 +51,9 @@ public interface MasterConfiguration extends LogConfiguration
 
     public static final String ANONYMOUS_ACCESS_ENABLED = "anon.enabled";
 
+    //---( scm integration )---
+    public static final String SCM_POLLING_INTERVAL = "scm.polling.interval";
+
     //--- ( ldap integration )---
 
     public static final String LDAP_ENABLED = "ldap.enabled";
@@ -157,4 +160,8 @@ public interface MasterConfiguration extends LogConfiguration
     String getLdapEmailAttribute();
 
     void setLdapEmailAttribute(String attribute);
+
+    Integer getScmPollingInterval();
+
+    void setScmPollingInterval(Integer interval);
 }
