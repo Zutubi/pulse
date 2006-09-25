@@ -1510,12 +1510,16 @@
                 #wwtext("name=build.stage") :: $!webwork.htmlEncode($recipeNode.stage) :: $!webwork.htmlEncode("$recipeNode.result.recipeNameSafe@$recipeNode.hostSafe")
             </th>
         </tr>
+        #set($excess = $recipeNode.result.excessFailureCount)
+        #if($excess > 0)
+            #noteRow($action.getText("test.excess.failures", [$excess]) 3)
+        #end
         <tr>
             #contentHeading("test.name" 1)
             #contentHeading("test.details" 1)
             #contentHeading("test.duration" 1)
         </tr>
-        #showRecipeTestFailures($recipeNode.result)
+        #showRecipeTestFailures($buildResult $recipeNode)
     </table>
             #end
         #end
@@ -1877,10 +1881,14 @@
 ##
 ## Shows a test suite with any nested tests.
 ##
-#macro(showTestSuiteFailures $recipe $test $indent)
+#macro(showTestSuiteFailures $build $recipe $test $indent)
+    ## Yes, this is insane, but velocity does not have locals, so there is no
+    ## pure velocity way (that I know of) to implement the path construction
+    #set($path = $action.pushSuite($test))
+
     <tr>
         <td class="test-failure content-nowrap">
-             ${indent}$!webwork.htmlEncode($test.name)
+             ${indent}<a href='viewTestSuite.action?id=$build.id&amp;nodeId=$recipe.id&amp;path=$action.urlEncode($path)'>$!webwork.htmlEncode($test.name)</a>
          </td>
         #contentCell("empty.cell")
         <td class="content" width="10%">
@@ -1889,22 +1897,24 @@
     </tr>
 
     #foreach($child in $test.suites)
-        #showTestSuiteFailures($recipe $child "${indent}&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;")
+        #showTestSuiteFailures($build $recipe $child "${indent}&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;")
     #end
     #foreach($child in $test.cases)
         #showTestCaseFailure($recipe $child "${indent}&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;")
     #end
+
+    $action.popSuite()
 #end
 
 ##
 ## Shows the test summary view for all tests in the given recipe.
 ##
-#macro(showRecipeTestFailures $recipe)
-    #if($recipe.failedTestResults)
-        #foreach($child in $recipe.failedTestResults.suites)
-            #showTestSuiteFailures($recipe $child "")
+#macro(showRecipeTestFailures $build $recipe)
+    #if($recipe.result.failedTestResults)
+        #foreach($child in $recipe.result.failedTestResults.suites)
+            #showTestSuiteFailures($build $recipe $child "")
         #end
-        #foreach($child in $recipe.failedTestResults.cases)
+        #foreach($child in $recipe.result.failedTestResults.cases)
             #showTestCaseFailure($recipe $child "")
         #end
     #end

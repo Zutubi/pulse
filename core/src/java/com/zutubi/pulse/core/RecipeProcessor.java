@@ -10,6 +10,7 @@ import com.zutubi.pulse.model.ResourceRequirement;
 import com.zutubi.pulse.util.FileSystemUtils;
 import com.zutubi.pulse.util.IOUtils;
 import com.zutubi.pulse.util.logging.Logger;
+import com.zutubi.pulse.BuildContext;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
@@ -52,7 +53,7 @@ public class RecipeProcessor
         return String.format("%08d-%s", i, result.getCommandName());
     }
 
-    public void build(RecipeRequest request, RecipePaths paths, ResourceRepository resourceRepository, boolean capture)
+    public void build(RecipeRequest request, RecipePaths paths, ResourceRepository resourceRepository, boolean capture, BuildContext context)
     {
         // This result holds only the recipe details (stamps, state etc), not
         // the command results.  A full recipe result with command results is
@@ -72,7 +73,7 @@ public class RecipeProcessor
             CommandResult bootstrapResult = new CommandResult(bootstrapCommand.getName());
             File commandOutput = new File(paths.getOutputDir(), getCommandDirName(0, bootstrapResult));
 
-            executeCommand(request.getId(), bootstrapResult, paths, commandOutput, testResults, bootstrapCommand, capture);
+            executeCommand(request.getId(), bootstrapResult, paths, commandOutput, testResults, bootstrapCommand, capture, context);
 
             if (bootstrapResult.succeeded())
             {
@@ -96,7 +97,7 @@ public class RecipeProcessor
                     throw new BuildException("Undefined recipe '" + recipeName + "'");
                 }
 
-                build(request.getId(), recipe, paths, testResults, capture);
+                build(request.getId(), recipe, paths, testResults, capture, context);
             }
         }
         catch (BuildException e)
@@ -140,7 +141,7 @@ public class RecipeProcessor
         }
     }
 
-    public void build(long recipeId, Recipe recipe, RecipePaths paths, TestSuiteResult testResults, boolean capture) throws BuildException
+    public void build(long recipeId, Recipe recipe, RecipePaths paths, TestSuiteResult testResults, boolean capture, BuildContext context) throws BuildException
     {
         // TODO: support continuing build when errors occur. Take care: exceptions.
         int i = 1;
@@ -160,7 +161,7 @@ public class RecipeProcessor
             runningCommand = command;
             runningLock.unlock();
 
-            executeCommand(recipeId, result, paths, commandOutput, testResults, command, capture);
+            executeCommand(recipeId, result, paths, commandOutput, testResults, command, capture, context);
 
             switch (result.getState())
             {
@@ -172,7 +173,7 @@ public class RecipeProcessor
         }
     }
 
-    private void executeCommand(long recipeId, CommandResult result, RecipePaths paths, File commandOutput, TestSuiteResult testResults, Command command, boolean capture)
+    private void executeCommand(long recipeId, CommandResult result, RecipePaths paths, File commandOutput, TestSuiteResult testResults, Command command, boolean capture, BuildContext context)
     {
         result.commence();
         result.setOutputDir(commandOutput.getPath());
@@ -186,14 +187,18 @@ public class RecipeProcessor
                 throw new BuildException("Could not create command output directory '" + commandOutput.getAbsolutePath() + "'");
             }
 
-            CommandContext context = new CommandContext(paths, commandOutput, testResults);
+            CommandContext commandContext = new CommandContext(paths, commandOutput, testResults);
+            if (context != null && context.getBuildNumber() != -1)
+            {
+                commandContext.setBuildNumber(context.getBuildNumber());
+            }
             if(capture)
             {
                 outputStream = new CommandOutputStream(eventManager, recipeId, true);
-                context.setOutputStream(outputStream);
+                commandContext.setOutputStream(outputStream);
             }
 
-            command.execute(recipeId, context, result);
+            command.execute(commandContext, result);
         }
         catch (BuildException e)
         {

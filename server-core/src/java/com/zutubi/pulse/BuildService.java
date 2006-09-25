@@ -19,7 +19,7 @@ public interface BuildService extends RemoteService
      */
     boolean hasResource(String resource, String version);
 
-    boolean build(RecipeRequest request);
+    boolean build(RecipeRequest request, BuildContext context);
 
     /**
      * Collects files produced by the recipe execution to the given local

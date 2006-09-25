@@ -34,7 +34,7 @@ public class ShutdownCommand extends AdminCommand
     public void parse(String... argv) throws ParseException
     {
         Options options = new Options();
-        options.addOption(new Option("f", "force", false, "force shutdown"));
+        options.addOption(new Option("F", "force", false, "force shutdown"));
         options.addOption(OptionBuilder.withLongOpt("port")
                 .withArgName("port")
                 .hasArg()
@@ -54,7 +54,7 @@ public class ShutdownCommand extends AdminCommand
         CommandLineParser parser = new PosixParser();
         CommandLine commandLine = parser.parse(options, argv, true);
 
-        setForce(commandLine.hasOption('f'));
+        setForce(commandLine.hasOption('F'));
 
         if (commandLine.hasOption('p'))
         {

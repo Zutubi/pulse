@@ -13,7 +13,7 @@ import java.io.*;
 import java.util.*;
 
 /**
- * 
+ *
  *
  */
 public class ExecutableCommand implements Command, ScopeAware
@@ -34,11 +34,11 @@ public class ExecutableCommand implements Command, ScopeAware
     private Process child;
     private volatile boolean terminated = false;
 
-    public void execute(long recipeId, CommandContext context, CommandResult cmdResult)
+    public void execute(CommandContext context, CommandResult cmdResult)
     {
         ProcessBuilder builder = new ProcessBuilder(constructCommand());
         updateWorkingDir(builder, context.getPaths());
-        updateChildEnvironment(builder);
+        updateChildEnvironment(builder, context);
 
         builder.redirectErrorStream(true);
 
@@ -275,7 +275,7 @@ public class ExecutableCommand implements Command, ScopeAware
         }
     }
 
-    private void updateChildEnvironment(ProcessBuilder builder)
+    private void updateChildEnvironment(ProcessBuilder builder, CommandContext context)
     {
         Map<String, String> childEnvironment = builder.environment();
 
@@ -290,6 +290,11 @@ public class ExecutableCommand implements Command, ScopeAware
         for (Environment setting : env)
         {
             childEnvironment.put(setting.getName(), setting.getValue());
+        }
+
+        if (context.getBuildNumber() != -1)
+        {
+            childEnvironment.put("PULSE_BUILD_NUMBER", Long.toString(context.getBuildNumber()));            
         }
     }
 

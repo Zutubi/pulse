@@ -478,7 +478,11 @@ public class ThreadedRecipeQueue implements Runnable, RecipeQueue, EventListener
 
         try
         {
-            agent.getBuildService().build(request.getRequest());
+            // Generate the build context.
+            BuildContext context = new BuildContext();
+            context.setBuildNumber(request.getBuild().getNumber());
+
+            agent.getBuildService().build(request.getRequest(), context);
             unavailableAgents.add(agent);
             executingAgents.put(request.getRequest().getId(), agent);
         }

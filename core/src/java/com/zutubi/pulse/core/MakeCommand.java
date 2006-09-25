@@ -30,7 +30,7 @@ public class MakeCommand extends ExecutableCommand
         }
     }
 
-    public void execute(long recipeId, CommandContext context, CommandResult cmdResult)
+    public void execute(CommandContext context, CommandResult cmdResult)
     {
         checkExe();
 
@@ -46,7 +46,7 @@ public class MakeCommand extends ExecutableCommand
             cmdResult.getProperties().put("targets", targets);
         }
 
-        super.execute(recipeId, context, cmdResult);
+        super.execute(context, cmdResult);
     }
 
     public String getMakefile()

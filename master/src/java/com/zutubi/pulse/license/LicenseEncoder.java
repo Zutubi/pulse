@@ -9,6 +9,7 @@ import java.security.spec.InvalidKeySpecException;
 import java.security.spec.PKCS8EncodedKeySpec;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Calendar;
 
 /**
  * <class-comment/>
@@ -179,6 +180,32 @@ public class LicenseEncoder implements LicenseKeyFactory
         {
             e.printStackTrace();
             System.exit(1);
+        }
+    }
+
+    private static class NewOpenSourceLicense
+    {
+        public static void main(String[] args)
+        {
+            String projectName = "insert name here";
+
+            // code, name, expiry
+            LicenseEncoder.main(new String[]{"NON_PROFIT", projectName});
+        }
+    }
+
+    private static class NewStandardCommercialLicense
+    {
+        public static void main(String[] args)
+        {
+            String companyName = "insert name here";
+
+            // code, name, expiry
+            SimpleDateFormat expiryFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+            Calendar oneYearFromToday = Calendar.getInstance();
+            oneYearFromToday.add(Calendar.YEAR, 1);
+
+            LicenseEncoder.main(new String[]{"STANDARD", companyName, expiryFormat.format(oneYearFromToday.getTime())});
         }
     }
 }

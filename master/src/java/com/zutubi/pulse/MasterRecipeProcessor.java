@@ -28,9 +28,9 @@ public class MasterRecipeProcessor implements Stoppable
         executor = Executors.newSingleThreadExecutor();
     }
 
-    public void processRecipe(RecipeRequest request)
+    public void processRecipe(RecipeRequest request, BuildContext context)
     {
-        executor.execute(new MasterRecipeRunner(request, recipeProcessor, eventManager, configurationManager, resourceManager.getMasterRepository()));
+        executor.execute(new MasterRecipeRunner(request, recipeProcessor, eventManager, configurationManager, resourceManager.getMasterRepository(), context));
     }
 
     public void setRecipeProcessor(RecipeProcessor recipeProcessor)
@@ -41,11 +41,6 @@ public class MasterRecipeProcessor implements Stoppable
     public void setConfigurationManager(MasterConfigurationManager configurationManager)
     {
         this.configurationManager = configurationManager;
-    }
-
-    public void setEventManager(EventManager eventManager)
-    {
-        this.eventManager = eventManager;
     }
 
     public void terminateRecipe(long id)
@@ -67,13 +62,29 @@ public class MasterRecipeProcessor implements Stoppable
         executor.shutdownNow();
     }
 
+    public long getBuildingRecipe()
+    {
+        return recipeProcessor.getBuildingRecipe(); 
+    }
+
+    /**
+     * Required resource
+     *
+     * @param resourceManager
+     */
     public void setResourceManager(ResourceManager resourceManager)
     {
         this.resourceManager = resourceManager;
     }
 
-    public long getBuildingRecipe()
+    /**
+     * Required resource.
+     *
+     * @param eventManager
+     */
+    public void setEventManager(EventManager eventManager)
     {
-        return recipeProcessor.getBuildingRecipe(); 
+        this.eventManager = eventManager;
     }
+
 }

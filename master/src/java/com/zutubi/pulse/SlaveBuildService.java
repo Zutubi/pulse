@@ -54,7 +54,7 @@ public class SlaveBuildService implements BuildService
         return resourceManager.getSlaveRepository(slave).hasResource(resource, version);
     }
 
-    public boolean build(RecipeRequest request)
+    public boolean build(RecipeRequest request, BuildContext context)
     {
         MasterConfiguration appConfig = configurationManager.getAppConfig();
         SystemConfiguration systemConfig = configurationManager.getSystemConfig();
@@ -62,7 +62,7 @@ public class SlaveBuildService implements BuildService
 
         try
         {
-            return service.build(serviceTokenManager.getToken(), masterUrl, slave.getId(), request);
+            return service.build(serviceTokenManager.getToken(), masterUrl, slave.getId(), request, context);
         }
         catch (RuntimeException e)
         {

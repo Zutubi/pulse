@@ -22,7 +22,7 @@ public abstract class CommandSupport implements Command
         this.name = name;
     }
 
-    public void execute(long recipeId, CommandContext context, CommandResult result)
+    public void execute(CommandContext context, CommandResult result)
     {
     }
 

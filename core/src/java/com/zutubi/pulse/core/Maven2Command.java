@@ -39,7 +39,7 @@ public class Maven2Command extends ExecutableCommand
         }
     }
 
-    public void execute(long recipeId, CommandContext context, CommandResult cmdResult)
+    public void execute(CommandContext context, CommandResult cmdResult)
     {
         checkExe();
 
@@ -49,7 +49,7 @@ public class Maven2Command extends ExecutableCommand
             cmdResult.getProperties().put("goals", goals);
         }
 
-        super.execute(recipeId, context, cmdResult);
+        super.execute(context, cmdResult);
 
         Maven2PostProcessor pp = new Maven2PostProcessor("maven.pp");
         pp.process(cmdResult.getArtifact(OUTPUT_NAME).getFile(), cmdResult, context);

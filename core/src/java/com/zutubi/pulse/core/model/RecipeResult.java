@@ -21,7 +21,7 @@ public class RecipeResult extends Result
     private String recipeName;
     private List<CommandResult> results = new LinkedList<CommandResult>();
     private TestSuiteResult failedTestResults;
-    private TestResultSummary testSummary;
+    private TestResultSummary testSummary = new TestResultSummary();
 
     public RecipeResult()
     {
@@ -241,6 +241,25 @@ public class RecipeResult extends Result
                 LOG.severe("Unable to load test results", e);
             }
         }
+    }
+
+    /**
+     * As there is a limit imposed on the number of failed test cases that
+     * are loaded, various views need to know if there are excess failures to
+     * be reported.
+     *
+     * @return the number of test failures that have not been loaded
+     */
+    public int getExcessFailureCount()
+    {
+        int loadedCount = 0;
+
+        if(failedTestResults != null)
+        {
+            loadedCount = failedTestResults.getSummary().getBroken();
+        }
+
+        return testSummary.getBroken() - loadedCount;
     }
 
     public TestResultSummary getTestSummary()
