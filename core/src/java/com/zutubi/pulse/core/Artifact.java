@@ -3,13 +3,13 @@ package com.zutubi.pulse.core;
 import com.zutubi.pulse.core.model.CommandResult;
 import com.zutubi.pulse.core.model.StoredArtifact;
 import com.zutubi.pulse.core.model.StoredFileArtifact;
-import com.zutubi.pulse.util.IOUtils;
 import com.zutubi.pulse.util.FileSystemUtils;
+import com.zutubi.pulse.util.IOUtils;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.List;
 import java.util.LinkedList;
+import java.util.List;
 
 /**
  * An artifact represents a by product of the build process that is considered important enough persist beyond the
@@ -105,14 +105,13 @@ public abstract class Artifact
      * @param artifact  is the artifact entity to which the file belongs.
      * @param fromFile  is the source file. That is, the artifact file in the working directory.
      * @param path      is the path relative to the output directory to which the fromFile will be copied.
-     * @param outputDir is the output directory into which the artifact (fromFile) will be copied
      * @param result    is the command result instance to which this artifact belongs. If processing of this artifact
      * identifies any error features, it is this command result that will be marked as failed.
      * @param type      is the mime type of the artifact.
      */
-    protected void captureFile(StoredArtifact artifact, File fromFile, String path, File outputDir, CommandResult result, String type)
+    protected void captureFile(StoredArtifact artifact, File fromFile, String path, CommandResult result, CommandContext context, String type)
     {
-        File toFile = new File(outputDir, path);
+        File toFile = new File(context.getOutputDir(), path);
         File parent = toFile.getParentFile();
 
         try
@@ -124,7 +123,7 @@ public abstract class Artifact
 
             for(ProcessArtifact process: processes)
             {
-                process.getProcessor().process(outputDir, fileArtifact, result);
+                process.getProcessor().process(fileArtifact, result, context);
             }
         }
         catch (IOException e)
@@ -137,9 +136,7 @@ public abstract class Artifact
      * Called to actually capture the artifacts from the working to the output directory.
      *
      * @param result    command we are capturing artifacts from
-     * @param baseDir   base directory for the project checkout
-     * @param outputDir where to capture the artifacts to
      */
-    public abstract void capture(CommandResult result, File baseDir, File outputDir);
+    public abstract void capture(CommandResult result, CommandContext context);
 
 }

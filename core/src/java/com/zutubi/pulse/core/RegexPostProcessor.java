@@ -62,21 +62,21 @@ public class RegexPostProcessor implements PostProcessor, Validateable
         patterns = new LinkedList<RegexPattern>();
     }
 
-    public void process(File outputDir, StoredFileArtifact artifact, CommandResult result)
+    public void process(StoredFileArtifact artifact, CommandResult result, CommandContext context)
     {
         List<PlainFeature> features = new LinkedList<PlainFeature>();
 
         if (leadingContext == 0 && trailingContext == 0)
         {
             // Optimise this common case
-            simpleProcess(outputDir, artifact, result, features);
+            simpleProcess(context.getOutputDir(), artifact, result, features);
         }
         else
         {
             BufferedReader reader = null;
             try
             {
-                File file = new File(outputDir, artifact.getPath());
+                File file = new File(context.getOutputDir(), artifact.getPath());
                 reader = new BufferedReader(new FileReader(file));
                 String line;
                 long lineNumber = 0;

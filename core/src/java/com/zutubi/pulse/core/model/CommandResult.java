@@ -3,7 +3,6 @@ package com.zutubi.pulse.core.model;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Properties;
-import java.util.Collection;
 
 /**
  * 
@@ -99,21 +98,5 @@ public class CommandResult extends Result
     public boolean hasArtifacts()
     {
         return artifacts.size() > 0;
-    }
-
-    public void accumulateTestSummary(TestResultSummary summary)
-    {
-        for (StoredArtifact a : artifacts)
-        {
-            a.accumulateTestSummary(summary);
-        }
-    }
-
-    public void addAllTestResults(List<TestResult> tests)
-    {
-        for(StoredArtifact a: artifacts)
-        {
-            a.addAllTestResults(tests);            
-        }
     }
 }

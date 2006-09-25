@@ -12,14 +12,14 @@ import java.util.List;
  */
 public class ProcessSupport
 {
-    public static void postProcess(List<ProcessArtifact> processes, File outputFileDir, File outputFile, File outputDir, CommandResult cmdResult)
+    public static void postProcess(List<ProcessArtifact> processes, File outputFileDir, File outputFile, CommandResult cmdResult, CommandContext context)
     {
         String path = FileSystemUtils.composeFilename(outputFileDir.getName(), outputFile.getName());
         StoredFileArtifact fileArtifact = new StoredFileArtifact(path, "text/plain");
         StoredArtifact artifact = new StoredArtifact(ExecutableCommand.OUTPUT_NAME, fileArtifact);
         for (ProcessArtifact p : processes)
         {
-            p.getProcessor().process(outputDir, fileArtifact, cmdResult);
+            p.getProcessor().process(fileArtifact, cmdResult, context);
         }
         cmdResult.addArtifact(artifact);
     }

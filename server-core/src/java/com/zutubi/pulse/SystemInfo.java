@@ -36,7 +36,7 @@ public class SystemInfo
         {
             info.paths.put("pulse.homeDir.field", pulseHome);
         }
-        
+
         // TODO: show the pulse config path details... and while we are at it, show the system config details as well.
         //info.paths.put("pulse.config.field", envConfig.getPulseConfig());
 

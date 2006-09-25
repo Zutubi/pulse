@@ -60,7 +60,7 @@ public abstract class CommandTestBase extends PulseTestCase
     {
         command.setWorkingDir(baseDir);
         CommandResult commandResult = new CommandResult("test");
-        CommandContext context = new CommandContext(new SimpleRecipePaths(baseDir, null), outputDir);
+        CommandContext context = new CommandContext(new SimpleRecipePaths(baseDir, null), outputDir, null);
         command.execute(0, context, commandResult);
         return commandResult;
     }

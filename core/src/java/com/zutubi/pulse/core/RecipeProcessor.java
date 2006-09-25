@@ -7,11 +7,13 @@ import com.zutubi.pulse.events.build.CommandCompletedEvent;
 import com.zutubi.pulse.events.build.RecipeCommencedEvent;
 import com.zutubi.pulse.events.build.RecipeCompletedEvent;
 import com.zutubi.pulse.model.ResourceRequirement;
+import com.zutubi.pulse.util.FileSystemUtils;
 import com.zutubi.pulse.util.IOUtils;
 import com.zutubi.pulse.util.logging.Logger;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
 import java.util.concurrent.locks.Lock;
@@ -56,6 +58,7 @@ public class RecipeProcessor
         // the command results.  A full recipe result with command results is
         // assembled elsewhere.
         RecipeResult result = new RecipeResult(request.getRecipeName());
+        TestSuiteResult testResults = new TestSuiteResult();
         result.setId(request.getId());
         result.commence();
 
@@ -69,7 +72,7 @@ public class RecipeProcessor
             CommandResult bootstrapResult = new CommandResult(bootstrapCommand.getName());
             File commandOutput = new File(paths.getOutputDir(), getCommandDirName(0, bootstrapResult));
 
-            executeCommand(request.getId(), bootstrapResult, paths, commandOutput, bootstrapCommand, capture);
+            executeCommand(request.getId(), bootstrapResult, paths, commandOutput, testResults, bootstrapCommand, capture);
 
             if (bootstrapResult.succeeded())
             {
@@ -93,7 +96,7 @@ public class RecipeProcessor
                     throw new BuildException("Undefined recipe '" + recipeName + "'");
                 }
 
-                build(request.getId(), recipe, paths, capture);
+                build(request.getId(), recipe, paths, testResults, capture);
             }
         }
         catch (BuildException e)
@@ -107,6 +110,8 @@ public class RecipeProcessor
         }
         finally
         {
+            writeTestResults(paths, testResults);
+            result.setTestSummary(testResults.getSummary());
             result.complete();
             eventManager.publish(new RecipeCompletedEvent(this, result));
 
@@ -120,7 +125,22 @@ public class RecipeProcessor
         }
     }
 
-    public void build(long recipeId, Recipe recipe, RecipePaths paths, boolean capture) throws BuildException
+    private void writeTestResults(RecipePaths paths, TestSuiteResult testResults)
+    {
+        try
+        {
+            TestSuitePersister persister = new TestSuitePersister();
+            File testDir = new File(paths.getOutputDir(), RecipeResult.TEST_DIR);
+            FileSystemUtils.createDirectory(testDir);
+            persister.write(testResults, testDir);
+        }
+        catch (IOException e)
+        {
+            LOG.severe("Unable to write out test results", e);
+        }
+    }
+
+    public void build(long recipeId, Recipe recipe, RecipePaths paths, TestSuiteResult testResults, boolean capture) throws BuildException
     {
         // TODO: support continuing build when errors occur. Take care: exceptions.
         int i = 1;
@@ -140,7 +160,7 @@ public class RecipeProcessor
             runningCommand = command;
             runningLock.unlock();
 
-            executeCommand(recipeId, result, paths, commandOutput, command, capture);
+            executeCommand(recipeId, result, paths, commandOutput, testResults, command, capture);
 
             switch (result.getState())
             {
@@ -152,7 +172,7 @@ public class RecipeProcessor
         }
     }
 
-    private void executeCommand(long recipeId, CommandResult result, RecipePaths paths, File commandOutput, Command command, boolean capture)
+    private void executeCommand(long recipeId, CommandResult result, RecipePaths paths, File commandOutput, TestSuiteResult testResults, Command command, boolean capture)
     {
         result.commence();
         result.setOutputDir(commandOutput.getPath());
@@ -166,7 +186,7 @@ public class RecipeProcessor
                 throw new BuildException("Could not create command output directory '" + commandOutput.getAbsolutePath() + "'");
             }
 
-            CommandContext context = new CommandContext(paths, commandOutput);
+            CommandContext context = new CommandContext(paths, commandOutput, testResults);
             if(capture)
             {
                 outputStream = new CommandOutputStream(eventManager, recipeId, true);

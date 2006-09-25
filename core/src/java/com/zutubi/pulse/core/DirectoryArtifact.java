@@ -68,15 +68,15 @@ public class DirectoryArtifact extends Artifact
         return result;
     }
 
-    public void capture(CommandResult result, File baseDir, File outputDir)
+    public void capture(CommandResult result, CommandContext context)
     {
         if (base == null)
         {
-            base = baseDir;
+            base = context.getPaths().getBaseDir();
         }
         else if (!base.isAbsolute())
         {
-            base = new File(baseDir, base.getPath());
+            base = new File(context.getPaths().getBaseDir(), base.getPath());
         }
 
         if (!base.exists())
@@ -116,7 +116,7 @@ public class DirectoryArtifact extends Artifact
         for (String file : scanner.getIncludedFiles())
         {
             File source = new File(base, file);
-            captureFile(artifact, source, FileSystemUtils.composeFilename(getName(), file), outputDir, result, type);
+            captureFile(artifact, source, FileSystemUtils.composeFilename(getName(), file), result, context, type);
         }
         result.addArtifact(artifact);
     }

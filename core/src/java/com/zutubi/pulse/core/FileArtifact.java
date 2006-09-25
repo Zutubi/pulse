@@ -20,7 +20,7 @@ public class FileArtifact extends Artifact
 
     }
 
-    public void capture(CommandResult result, File baseDir, File outputDir)
+    public void capture(CommandResult result, CommandContext context)
     {
         // The specified file may or may not be absolute.  If it is absolute, then we need to jump through a few
         // hoops.
@@ -31,7 +31,7 @@ public class FileArtifact extends Artifact
             {
                 // excellent, we have the file, we can capture it and continue.
                 StoredArtifact artifact = new StoredArtifact(getName());
-                captureFile(artifact, captureFile, FileSystemUtils.composeFilename(getName(), captureFile.getName()), outputDir, result, type);
+                captureFile(artifact, captureFile, FileSystemUtils.composeFilename(getName(), captureFile.getName()), result, context, type);
                 result.addArtifact(artifact);
                 return;
             }
@@ -55,7 +55,7 @@ public class FileArtifact extends Artifact
                     filePath = filePath.substring(1);
                 }
 
-                scanAndCaptureFiles(alternateBaseDir, filePath, outputDir, result);
+                scanAndCaptureFiles(alternateBaseDir, filePath, result, context);
             }
             else
             {
@@ -70,11 +70,11 @@ public class FileArtifact extends Artifact
         else
         {
             // The file path is relative, we have our base directory, lets get to work.
-            scanAndCaptureFiles(baseDir, file, outputDir, result);
+            scanAndCaptureFiles(context.getPaths().getBaseDir(), file, result, context);
         }
     }
 
-    private void scanAndCaptureFiles(File baseDir, String file, File outputDir, CommandResult result)
+    private void scanAndCaptureFiles(File baseDir, String file, CommandResult result, CommandContext context)
     {
         DirectoryScanner scanner = new DirectoryScanner();
         scanner.setBasedir(baseDir);
@@ -85,7 +85,7 @@ public class FileArtifact extends Artifact
         for (String includedFile : scanner.getIncludedFiles())
         {
             File source = new File(baseDir, includedFile);
-            captureFile(artifact, source, FileSystemUtils.composeFilename(getName(), includedFile), outputDir, result, type);
+            captureFile(artifact, source, FileSystemUtils.composeFilename(getName(), includedFile), result, context, type);
         }
         if (artifact.getChildren().size() > 0)
         {

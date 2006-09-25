@@ -12,7 +12,8 @@ import java.util.List;
 /**
  * A command that prints a message to stdout.
  */
-public class PrintCommand extends CommandSupport
+public class
+        PrintCommand extends CommandSupport
 {
     /**
      * The message to print.
@@ -63,7 +64,7 @@ public class PrintCommand extends CommandSupport
             IOUtils.close(writer);
         }
 
-        ProcessSupport.postProcess(processes, outputFileDir, outputFile, context.getOutputDir(), result);
+        ProcessSupport.postProcess(processes, outputFileDir, outputFile, result, context);
     }
 
     public void setMessage(String message)

@@ -1,5 +1,6 @@
 package com.zutubi.pulse.web.project;
 
+import com.zutubi.pulse.bootstrap.MasterConfigurationManager;
 import com.zutubi.pulse.core.model.Changelist;
 import com.zutubi.pulse.model.BuildResult;
 import com.zutubi.pulse.model.Project;
@@ -17,6 +18,7 @@ public class ViewBuildAction extends ProjectActionSupport
     private List<Changelist> changelists;
     private long selectedNode;
     private CommitMessageHelper commitMessageHelper;
+    private MasterConfigurationManager configurationManager;
 
     public long getId()
     {
@@ -68,6 +70,8 @@ public class ViewBuildAction extends ProjectActionSupport
         }
 
         checkPermissions(result);
+        
+        result.loadFailedTestResults(configurationManager.getDataDirectory(), 50);
 
         return SUCCESS;
     }
@@ -89,5 +93,10 @@ public class ViewBuildAction extends ProjectActionSupport
         }
 
         return commitMessageHelper.applyTransforms(changelist, 60);
+    }
+
+    public void setConfigurationManager(MasterConfigurationManager configurationManager)
+    {
+        this.configurationManager = configurationManager;
     }
 }

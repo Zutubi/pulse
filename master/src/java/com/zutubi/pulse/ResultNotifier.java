@@ -1,6 +1,7 @@
 package com.zutubi.pulse;
 
 import com.zutubi.pulse.bootstrap.ComponentContext;
+import com.zutubi.pulse.bootstrap.MasterConfigurationManager;
 import com.zutubi.pulse.events.Event;
 import com.zutubi.pulse.events.EventListener;
 import com.zutubi.pulse.events.EventManager;
@@ -18,11 +19,14 @@ public class ResultNotifier implements EventListener
 {
     private SubscriptionManager subscriptionManager;
     private UserManager userManager;
+    private MasterConfigurationManager configurationManager;
 
     public void handleEvent(Event evt)
     {
         BuildCompletedEvent event = (BuildCompletedEvent) evt;
         BuildResult buildResult = event.getResult();
+
+        buildResult.loadFailedTestResults(configurationManager.getDataDirectory(), 50);
 
         Set<String> notifiedContactPoints = new HashSet<String>();
 
@@ -71,5 +75,10 @@ public class ResultNotifier implements EventListener
     public void setUserManager(UserManager userManager)
     {
         this.userManager = userManager;
+    }
+
+    public void setConfigurationManager(MasterConfigurationManager configurationManager)
+    {
+        this.configurationManager = configurationManager;
     }
 }

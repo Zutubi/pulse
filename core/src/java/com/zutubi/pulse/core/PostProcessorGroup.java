@@ -3,7 +3,6 @@ package com.zutubi.pulse.core;
 import com.zutubi.pulse.core.model.CommandResult;
 import com.zutubi.pulse.core.model.StoredFileArtifact;
 
-import java.io.File;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -18,11 +17,11 @@ public class PostProcessorGroup implements PostProcessor
 
     private List<PostProcessor> processors = new LinkedList<PostProcessor>();
 
-    public void process(File outputDir, StoredFileArtifact artifact, CommandResult result)
+    public void process(StoredFileArtifact artifact, CommandResult result, CommandContext context)
     {
         for (PostProcessor processor : processors)
         {
-            processor.process(outputDir, artifact, result);
+            processor.process(artifact, result, context);
         }
     }
 

@@ -1,11 +1,9 @@
 package com.zutubi.pulse.core.model;
 
 import com.zutubi.pulse.util.FileSystemUtils;
-import com.zutubi.pulse.util.Sort;
+import com.zutubi.pulse.util.logging.Logger;
 
 import java.io.File;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -16,9 +14,14 @@ import java.util.List;
 public class RecipeResult extends Result
 {
     public static final String RECIPE_LOG = "recipe.log";
+    public static final String TEST_DIR = "tests";
+
+    private static final Logger LOG = Logger.getLogger(RecipeResult.class);
 
     private String recipeName;
     private List<CommandResult> results = new LinkedList<CommandResult>();
+    private TestSuiteResult failedTestResults;
+    private TestResultSummary testSummary;
 
     public RecipeResult()
     {
@@ -92,6 +95,9 @@ public class RecipeResult extends Result
 
         // Copy across features
         features.addAll(result.features);
+
+        // And the test summary (test results come across on disk as they may be large)
+        testSummary = result.testSummary;
 
         this.stamps.setEndTime(result.stamps.getEndTime());
     }
@@ -188,31 +194,10 @@ public class RecipeResult extends Result
 
     public void accumulateTestSummary(TestResultSummary summary)
     {
-        for (CommandResult c : results)
+        if (testSummary != null)
         {
-            c.accumulateTestSummary(summary);
+            summary.add(testSummary);
         }
-    }
-
-    public List<TestResult> getAllTestResults()
-    {
-        List<TestResult> tests = new LinkedList<TestResult>();
-        for(CommandResult command: results)
-        {
-            command.addAllTestResults(tests);
-        }
-
-        final Comparator<String> packageComp = new Sort.PackageComparator();
-
-        Collections.sort(tests, new Comparator<TestResult>()
-        {
-            public int compare(TestResult t1, TestResult t2)
-            {
-                return packageComp.compare(t1.getName(), t2.getName());
-            }
-        });
-
-        return tests;
     }
 
     public CommandResult getCommandResult(String name)
@@ -226,5 +211,50 @@ public class RecipeResult extends Result
         }
 
         return null;
+    }
+
+    public TestSuiteResult getFailedTestResults()
+    {
+        return failedTestResults;
+    }
+
+    public void setFailedTestResults(TestSuiteResult failedTestResults)
+    {
+        this.failedTestResults = failedTestResults;
+    }
+
+    public void loadFailedTestResults(File dataRoot, int limit)
+    {
+        File output = getAbsoluteOutputDir(dataRoot);
+        File testDir = new File(output, TEST_DIR);
+        if(testDir.exists())
+        {
+            try
+            {
+                TestSuitePersister persister = new TestSuitePersister();
+                failedTestResults = persister.read(null, testDir, true, true, limit);
+            }
+            catch (Exception e)
+            {
+                // There is other info to show, don't totally explode
+                // because we can't load the tests
+                LOG.severe("Unable to load test results", e);
+            }
+        }
+    }
+
+    public TestResultSummary getTestSummary()
+    {
+        return testSummary;
+    }
+
+    public void setTestSummary(TestResultSummary testSummary)
+    {
+        this.testSummary = testSummary;
+    }
+
+    public boolean hasBrokenTests()
+    {
+        return testSummary != null && testSummary.getBroken() > 0;
     }
 }

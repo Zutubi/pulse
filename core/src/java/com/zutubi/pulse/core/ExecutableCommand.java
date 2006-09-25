@@ -1,12 +1,12 @@
 package com.zutubi.pulse.core;
 
 import com.zutubi.pulse.core.model.CommandResult;
-import com.zutubi.pulse.core.model.StoredFileArtifact;
 import com.zutubi.pulse.core.model.StoredArtifact;
+import com.zutubi.pulse.core.model.StoredFileArtifact;
+import com.zutubi.pulse.util.FileSystemUtils;
 import com.zutubi.pulse.util.ForkOutputStream;
 import com.zutubi.pulse.util.IOUtils;
 import com.zutubi.pulse.util.SystemUtils;
-import com.zutubi.pulse.util.FileSystemUtils;
 import com.zutubi.pulse.util.logging.Logger;
 
 import java.io.*;
@@ -135,7 +135,7 @@ public class ExecutableCommand implements Command, ScopeAware
                 cmdResult.getProperties().put("working directory", builder.directory().getAbsolutePath());
             }
 
-            ProcessSupport.postProcess(processes, outputFileDir, outputFile, context.getOutputDir(), cmdResult);
+            ProcessSupport.postProcess(processes, outputFileDir, outputFile, cmdResult, context);
         }
         catch (IOException e)
         {
