@@ -1,10 +1,10 @@
 package com.zutubi.pulse.form.ui;
 
-import com.zutubi.pulse.form.ui.components.*;
 import com.zutubi.pulse.form.descriptor.FormDescriptor;
 import com.zutubi.pulse.form.descriptor.ActionDescriptor;
 import com.zutubi.pulse.form.descriptor.FieldDescriptor;
 import com.zutubi.pulse.form.FieldType;
+import com.zutubi.pulse.form.ui.components.*;
 import com.zutubi.validation.bean.BeanUtils;
 import com.zutubi.validation.bean.BeanException;
 
@@ -16,31 +16,33 @@ import java.lang.reflect.Method;
  */
 public class FormFactory
 {
-    public FormComponent createForm(FormDescriptor descriptor, Object instance)
+    public Form createForm(FormDescriptor descriptor, Object instance)
     {
         List<String> fieldOrder = evaluateFieldOrder(descriptor);
 
-        FormComponent form = new FormComponent();
+        Form form = new Form();
         form.setMethod("post");
         form.addParameters(descriptor.getParameters());
 
         int i = 1;
         for (String fieldName : fieldOrder)
         {
-            Component field = createField(descriptor.getFieldDescriptor(fieldName), instance);
-            field.setTabIndex(i++);
-            form.addNested(field);
+            UIComponent field = createField(descriptor.getFieldDescriptor(fieldName), instance);
+            field.setTabindex(i++);
+            form.addNestedComponent(field);
         }
 
-        SubmitGroupComponent submitGroup = new SubmitGroupComponent();
+        SubmitGroup submitGroup = new SubmitGroup();
         for (ActionDescriptor actionDescriptor : descriptor.getActionDescriptors())
         {
-            SubmitComponent field = new SubmitComponent(actionDescriptor.getAction());
-            field.setTabIndex(i++);
-            submitGroup.addNested(field);
+            Submit field = new Submit();
+            field.setName(actionDescriptor.getAction());
+            field.setValue(actionDescriptor.getAction());
+            field.setTabindex(i++);
+            submitGroup.addNestedComponent(field);
         }
 
-        form.addNested(submitGroup);
+        form.addNestedComponent(submitGroup);
 
         return form;
     }
@@ -71,7 +73,7 @@ public class FormFactory
         return ordered;
     }
 
-    private Component createField(FieldDescriptor descriptor, Object instance)
+    private UIComponent createField(FieldDescriptor descriptor, Object instance)
     {
         if (FieldType.TEXT.equals(descriptor.getFieldType()))
         {
@@ -99,17 +101,17 @@ public class FormFactory
         }
     }
 
-    private Component createCheckboxField(FieldDescriptor descriptor)
+    private UIComponent createCheckboxField(FieldDescriptor descriptor)
     {
-        CheckboxComponent c = new CheckboxComponent();
+        CheckboxField c = new CheckboxField();
         configureComponent(c, descriptor);
 
         return c;
     }
 
-    private Component createSelectField(FieldDescriptor descriptor, Object instance)
+    private UIComponent createSelectField(FieldDescriptor descriptor, Object instance)
     {
-        SelectComponent c = new SelectComponent();
+        SelectField c = new SelectField();
         configureComponent(c, descriptor);
 
         // lookup the option list.
@@ -130,31 +132,32 @@ public class FormFactory
         return c;
     }
 
-    private Component createRadioField(FieldDescriptor descriptor)
+    private UIComponent createRadioField(FieldDescriptor descriptor)
     {
-        RadioComponent c = new RadioComponent();
+        RadioField c = new RadioField();
         configureComponent(c, descriptor);
         return c;
     }
 
-    private Component createPasswordField(FieldDescriptor descriptor)
+    private UIComponent createPasswordField(FieldDescriptor descriptor)
     {
-        PasswordComponent c = new PasswordComponent();
+        PasswordField c = new PasswordField();
         configureComponent(c, descriptor);
         return c;
     }
 
-    private Component createTextField(FieldDescriptor descriptor)
+    private UIComponent createTextField(FieldDescriptor descriptor)
     {
-        TextComponent c = new TextComponent();
+        TextField c = new TextField();
         configureComponent(c, descriptor);
         return c;
     }
 
-    private void configureComponent(FieldComponent c, FieldDescriptor descriptor)
+    private void configureComponent(UIComponent c, FieldDescriptor descriptor)
     {
         // default fields.
         c.setName(descriptor.getName());
+        c.setId(descriptor.getName());
         c.setLabel(descriptor.getName() + ".label");
         c.setRequired(descriptor.isRequired());
 

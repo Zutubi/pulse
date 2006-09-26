@@ -1,111 +1,96 @@
 package com.zutubi.pulse.form.ui.components;
 
-import com.zutubi.pulse.form.ui.Renderable;
-import com.zutubi.pulse.form.ui.Renderer;
+import com.zutubi.pulse.form.ui.RenderContext;
 
+import java.util.List;
+import java.util.LinkedList;
 import java.util.Map;
 import java.util.HashMap;
 
 /**
  * <class-comment/>
  */
-public abstract class Component implements Renderable
+public class Component
 {
-    protected Map<String, Object> parameters = new HashMap<String, Object>();
+    private String id;
 
-    public Map<String, Object> getParameters()
+    protected RenderContext context;
+
+    protected Map<String, Object> parameters;
+
+    private List<Component> nestedComponents;
+
+    public void setContext(RenderContext context)
     {
+        this.context = context;
+    }
+
+    public boolean start() throws Exception
+    {
+        return true;
+    }
+
+    public boolean end() throws Exception
+    {
+        return false;
+    }
+
+    public List<Component> getNestedComponents()
+    {
+        if (nestedComponents == null)
+        {
+            nestedComponents = new LinkedList<Component>();
+        }
+        return nestedComponents;
+    }
+
+    public void addNestedComponent(Component component)
+    {
+        getNestedComponents().add(component);
+    }
+
+    protected Map<String, Object> getParameters()
+    {
+        if (parameters == null)
+        {
+            parameters = new HashMap<String, Object>();
+        }
         return parameters;
     }
 
-    public void addParameter(String name, Object value)
+    public void addParameter(String key, Object value)
     {
-        this.parameters.put(name, value);
+        getParameters().put(key, value);
     }
 
-    public void addParameters(Map<String, Object> parameters)
+    public void addParameters(Map<String, Object> params)
     {
-        this.parameters.putAll(parameters);
+        getParameters().putAll(params);
     }
 
-    public Object getParameter(String name)
+    public Component getNestedComponent(String id)
     {
-        return this.parameters.get(name);
-    }
-
-    public Object getParameter(String name, Object defaultValue)
-    {
-        if (this.parameters.containsKey(name))
+        if (id == null)
         {
-            return this.parameters.get(name);
+            return null;
         }
-        return defaultValue;
+        for (Component component : getNestedComponents())
+        {
+            if (id.equals(component.getId()))
+            {
+                return component;
+            }
+        }
+        return null;
     }
 
-    public void removeParameter(String s)
+    public String getId()
     {
-        this.parameters.remove(s);
-    }
-
-    public void render(Renderer r)
-    {
-        r.render(this);
-    }
-
-    public Map<String, Object> getContext()
-    {
-        Map<String, Object> context = new HashMap<String, Object>();
-        context.put("parameters", getParameters());
-        return context;
-    }
-
-    public void setName(String name)
-    {
-        addParameter("name", name);
-    }
-
-    public String getName()
-    {
-        return (String) getParameter("name");
-    }
-
-    public void setValue(Object value)
-    {
-        addParameter("value", value);
-    }
-
-    public Object getValue()
-    {
-        return getParameter("value");
-    }
-
-    public void setLabel(String label)
-    {
-        addParameter("label", label);
-    }
-
-    public String getLabel()
-    {
-        return (String) getParameter("label");
-    }
-
-    public void setTabIndex(int i)
-    {
-        addParameter("tabindex", Integer.toString(i));
+        return id;
     }
 
     public void setId(String id)
     {
-        addParameter("id", id);
-    }
-
-    public void setClass(String clazz)
-    {
-        addParameter("cssClass", clazz);
-    }
-
-    public void setStyle(String style)
-    {
-        addParameter("cssStyle", style);
+        this.id = id;
     }
 }

@@ -1,15 +1,18 @@
 package com.zutubi.pulse.form.ui.components;
 
 import com.zutubi.pulse.test.PulseTestCase;
-import com.zutubi.pulse.form.ui.renderers.FreemarkerRenderer;
-import freemarker.template.Configuration;
-import freemarker.template.DefaultObjectWrapper;
+import com.zutubi.pulse.form.ui.renderers.FreemarkerTemplateRenderer;
+import com.zutubi.pulse.form.ui.ComponentRenderer;
 import freemarker.cache.TemplateLoader;
 import freemarker.cache.FileTemplateLoader;
 import freemarker.cache.MultiTemplateLoader;
+import freemarker.template.Configuration;
+import freemarker.template.DefaultObjectWrapper;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.Writer;
+import java.io.StringWriter;
 import java.util.List;
 import java.util.Arrays;
 
@@ -18,20 +21,34 @@ import java.util.Arrays;
  */
 public abstract class ComponentTestCase extends PulseTestCase
 {
-    protected FreemarkerRenderer renderer;
+    protected ComponentRenderer renderer;
+    protected Writer writer;
 
     protected void setUp() throws Exception
     {
         super.setUp();
 
-        renderer = new FreemarkerRenderer();
+        writer = new StringWriter();
 
         Configuration config = new Configuration();
         config.setTemplateLoader(getMultiLoader());
         config.setObjectWrapper(new DefaultObjectWrapper());
         config.addAutoInclude("macro.ftl");
 
-        renderer.setFreemarkerConfiguration(config);
+        FreemarkerTemplateRenderer templateRenderer = new FreemarkerTemplateRenderer();
+        templateRenderer.setConfiguration(config);
+        templateRenderer.setWriter(writer);
+
+        renderer = new ComponentRenderer();
+        renderer.setTemplateRenderer(templateRenderer);
+    }
+
+    protected void tearDown() throws Exception
+    {
+        renderer = null;
+        writer = null;
+
+        super.tearDown();
     }
 
     private TemplateLoader getMultiLoader()
@@ -54,8 +71,5 @@ public abstract class ComponentTestCase extends PulseTestCase
         return new MultiTemplateLoader(loaders);
     }
 
-    protected void tearDown() throws Exception
-    {
-        super.tearDown();
-    }
+
 }

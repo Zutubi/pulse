@@ -1,7 +1,5 @@
 package com.zutubi.pulse.form.descriptor;
 
-import com.zutubi.pulse.form.ui.components.FormComponent;
-
 import java.util.List;
 import java.util.Map;
 

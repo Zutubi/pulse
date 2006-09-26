@@ -1,7 +1,18 @@
 <#list parameters.list as item>
-<#assign itemKey = item/>
-<#assign itemValue = item/>
-<input type="radio" name="${parameters.name?html}" id="${parameters.name?html}${itemKey?html}"<#rt/>
+    <#if parameters.listKey?exists>
+        <#assign itemKey = item[parameters.listKey]/>
+    <#else>
+        <#assign itemKey = item/>
+    </#if>
+    <#if parameters.listValue?exists>
+        <#assign itemValue = item[parameters.listValue]/>
+    <#else>
+        <#assign itemValue = item/>
+    </#if>
+<input type="radio"<#rt/>
+<#if parameters.name?exists>
+ name="${parameters.name?html}" id="${parameters.name?html}${itemKey?html}"<#rt/>
+</#if>
 <#if parameters.value?exists && parameters.value == itemKey>
  checked="checked"<#rt/>
 </#if>
@@ -22,7 +33,11 @@
 </#if>
 <#include "/forms/simple/scripting-events.ftl" />
 /><#rt/>
-<label for="${parameters.name?html}${itemKey?html}"><#rt/>
+<label<#rt/>
+<#if parameters.name?exists>
+ for="${parameters.name?html}${itemKey?html}"<#rt/>
+</#if>
+><#rt/>
     ${itemValue}<#t/>
 </label>
 </#list>

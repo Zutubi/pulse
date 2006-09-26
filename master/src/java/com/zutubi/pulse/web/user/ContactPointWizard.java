@@ -8,10 +8,7 @@ import com.zutubi.pulse.form.descriptor.ActionDescriptor;
 import com.zutubi.pulse.form.descriptor.DefaultActionDescriptor;
 import com.zutubi.pulse.form.descriptor.annotation.AnnotationDecorator;
 import com.zutubi.pulse.form.descriptor.reflection.ReflectionDescriptorFactory;
-import com.zutubi.pulse.form.ui.components.FormComponent;
-import com.zutubi.pulse.form.ui.components.Component;
 import com.zutubi.pulse.form.ui.FormFactory;
-import com.zutubi.pulse.form.ui.renderers.FreemarkerRenderer;
 import com.zutubi.pulse.form.squeezer.TypeSqueezer;
 import com.zutubi.pulse.form.squeezer.Squeezers;
 import com.zutubi.pulse.form.squeezer.SqueezeException;
@@ -193,7 +190,7 @@ public class ContactPointWizard extends BaseWizard
 
         private DefaultValidationManager validationManager;
 
-        private FreemarkerRenderer renderer;
+//        private FreemarkerRenderer renderer;
 
         private Object subject;
 
@@ -213,6 +210,7 @@ public class ContactPointWizard extends BaseWizard
         {
             super.initialise();
 
+/*
             descriptorFactory = new ReflectionDescriptorFactory();
             descriptorFactory.addDecorator(new AnnotationDecorator());
 
@@ -224,12 +222,15 @@ public class ContactPointWizard extends BaseWizard
             renderer.setFreemarkerConfiguration((Configuration) ComponentContext.getBean("freemarkerConfiguration"));
 
             doRender(subject);
+*/
         }
 
+/*
         public String getForm()
         {
             return renderer.getRenderedContent();
         }
+*/
 
         public void execute()
         {
@@ -243,6 +244,7 @@ public class ContactPointWizard extends BaseWizard
 
         public void validate()
         {
+/*
             ValidationContext validatorContext = new DelegatingValidationContext(this);
             // read the parameters and apply them manually to our bean.
             populateObject(subject, validatorContext);
@@ -264,99 +266,7 @@ public class ContactPointWizard extends BaseWizard
                 // prepare for rendering.
                 doRender(subject);
             }
-        }
-
-        private void doRender(Object obj)
-        {
-            FormDescriptor descriptor = descriptorFactory.createFormDescriptor(obj.getClass());
-            descriptor.setActionDescriptors(Arrays.asList((ActionDescriptor)
-                    new DefaultActionDescriptor(ActionDescriptor.PREVIOUS),
-                    new DefaultActionDescriptor(ActionDescriptor.FINISH),
-                    new DefaultActionDescriptor(ActionDescriptor.CANCEL)
-            ));
-
-            // build the form.
-            FormComponent form = new FormFactory().createForm(descriptor, obj);
-            populateForm(form, obj);
-
-            // render it.
-            form.render(renderer);
-        }
-
-        private void populateObject(Object obj, ValidationContext validatorContext)
-        {
-            FormDescriptor formDescriptor = descriptorFactory.createFormDescriptor(obj.getClass());
-            for (FieldDescriptor fieldDescriptor : formDescriptor.getFieldDescriptors())
-            {
-                String name = fieldDescriptor.getName();
-
-                TypeSqueezer squeezer = Squeezers.findSqueezer(fieldDescriptor.getType());
-
-                String[] paramValue = getParameterValue(name);
-                if (paramValue != null)
-                {
-                    try
-                    {
-                        Object value = squeezer.unsqueeze(paramValue);
-                        BeanUtils.setProperty(name, value, obj);
-                    }
-                    catch (SqueezeException e)
-                    {
-                        validatorContext.addFieldError(name, name + ".conversionerror");
-                    }
-                    catch (BeanException e)
-                    {
-                        validatorContext.addFieldError(name, name + ".beanerror");
-                    }
-                }
-            }
-        }
-
-        private String[] getParameterValue(String parameterName)
-        {
-            Map parameters = ActionContext.getContext().getParameters();
-            if (!parameters.containsKey(parameterName))
-            {
-                return null;
-            }
-            Object parameterValue = parameters.get(parameterName);
-            if (parameterValue instanceof String)
-            {
-                return new String[]{(String)parameterValue};
-            }
-            else if (parameterValue instanceof String[])
-            {
-                return (String[]) parameterValue;
-            }
-
-            // unexpected non string type...
-            return null;
-        }
-
-        private void populateForm(FormComponent form, Object obj)
-        {
-            FormDescriptor formDescriptor = descriptorFactory.createFormDescriptor(obj.getClass());
-            for (FieldDescriptor fieldDescriptor : formDescriptor.getFieldDescriptors())
-            {
-                try
-                {
-                    String propertyName = fieldDescriptor.getName();
-                    Object propertyValue = BeanUtils.getProperty(propertyName, obj);
-
-                    Component component = form.getNestedComponent(propertyName);
-
-                    TypeSqueezer squeezer = Squeezers.findSqueezer(fieldDescriptor.getType());
-                    component.setValue(squeezer.squeeze(propertyValue));
-                }
-                catch (BeanException e)
-                {
-                    e.printStackTrace();
-                }
-                catch (SqueezeException e)
-                {
-                    e.printStackTrace();
-                }
-            }
+*/
         }
     }
 }

@@ -1,5 +1,11 @@
-<input type="checkbox" name="${parameters.name?html}" value="${parameters.fieldValue?html}"<#rt/>
-<#if parameters.value?exists && parameters.value == parameters.fieldValue>
+<input type="checkbox"<#rt/>
+<#if parameters.name?exists>
+ name="${parameters.name?html}"<#rt/>
+</#if>
+<#if parameters.fieldValue?exists>
+ value="${parameters.fieldValue?html}"<#rt/>
+</#if>
+<#if parameters.value?exists && parameters.fieldValue?exists && parameters.value == parameters.fieldValue>
  checked="checked"<#rt/>
 </#if>
 <#if parameters.disabled?default(false)>

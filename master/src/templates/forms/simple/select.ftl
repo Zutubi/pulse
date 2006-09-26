@@ -30,16 +30,23 @@
     <option value=""></option>
 </#if>
 <#list parameters.list as item>
-    <#assign optionValue = item/>
-    <#if parameters.listValues[item]?exists>
-        <#assign optionLabel = parameters.listValues[item]/>
+<#--<@ww.iterator value="parameters.list">-->
+    <#if parameters.listKey?exists>
+        <#assign itemKey = item[parameters.listKey]/>
     <#else>
-        <#assign optionLabel = item/>
+        <#assign itemKey = item/>
     </#if>
-    <option value="${optionValue?html}"<#rt/>
-        <#if parameters.value?exists && parameters.value == optionValue>
+    <#if parameters.listValue?exists>
+        <#assign itemValue = item[parameters.listValue]/>
+    <#else>
+        <#assign itemValue = item/>
+    </#if>
+    <option value="${itemKey?html}"<#rt/>
+        <#if parameters.value?exists && parameters.value == itemKey>
+        <#--<#if tag.contains(parameters.nameValue, itemKey) == true>-->
  selected="selected"<#rt/>
         </#if>
-    ><@i18n>${optionLabel?html}</@i18n></option><#lt/>
+    >${itemValue?html}</option><#lt/>
+<#--</@ww.iterator>-->
 </#list>
 </select>

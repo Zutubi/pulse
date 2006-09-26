@@ -27,7 +27,10 @@
 <#else>
  class="checkboxLabel"<#rt/>
 </#if>
->${parameters.label?html}</label><#rt/>
+><#rt/>
+<#if parameters.label?exists>
+ ${parameters.label?html}</label><#rt/>
+</#if>
                 </td><#lt/>
             </tr>
         </table>

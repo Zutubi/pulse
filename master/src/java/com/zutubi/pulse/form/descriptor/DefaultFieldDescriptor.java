@@ -2,8 +2,6 @@ package com.zutubi.pulse.form.descriptor;
 
 import com.zutubi.pulse.form.FieldType;
 import com.zutubi.pulse.form.descriptor.FieldDescriptor;
-import com.zutubi.pulse.form.ui.components.Component;
-import com.zutubi.pulse.form.ui.components.TextComponent;
 import com.zutubi.validation.bean.BeanException;
 import com.zutubi.validation.bean.BeanUtils;
 

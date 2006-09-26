@@ -11,13 +11,17 @@ import com.zutubi.pulse.form.persistence.ObjectStore;
 import com.zutubi.pulse.form.squeezer.SqueezeException;
 import com.zutubi.pulse.form.squeezer.TypeSqueezer;
 import com.zutubi.pulse.form.squeezer.Squeezers;
-import com.zutubi.pulse.form.ui.components.FormComponent;
-import com.zutubi.pulse.form.ui.components.Component;
+import com.zutubi.pulse.form.ui.components.Form;
+import com.zutubi.pulse.form.ui.components.UIComponent;
+import com.zutubi.pulse.form.ui.renderers.FreemarkerTemplateRenderer;
 import com.zutubi.validation.*;
 import com.zutubi.validation.bean.BeanUtils;
 import com.zutubi.validation.bean.BeanException;
 
 import java.util.Map;
+import java.io.StringWriter;
+
+import freemarker.template.Configuration;
 
 /**
  * <class-comment/>
@@ -55,7 +59,9 @@ public class FormAction extends ActionSupport
 
     private ValidationManager validationManager;
 
-    private Renderer renderer;
+    private String renderedForm;
+
+    private Configuration configuration;
 
     public void setObjectKey(String objectKey)
     {
@@ -64,7 +70,7 @@ public class FormAction extends ActionSupport
 
     public String getRenderedForm()
     {
-        return renderer.getRenderedContent();
+        return renderedForm;
     }
 
     public String execute() throws Exception
@@ -89,7 +95,7 @@ public class FormAction extends ActionSupport
         }
     }
 
-    public String doSave() throws ValidationException
+    public String doSave() throws Exception
     {
         Copyable obj = objectStore.load(objectKey);
 
@@ -117,7 +123,7 @@ public class FormAction extends ActionSupport
         return SAVE;
     }
 
-    public String doReset()
+    public String doReset() throws Exception
     {
         Copyable obj = objectStore.reset(objectKey);
 
@@ -126,7 +132,7 @@ public class FormAction extends ActionSupport
         return RESET;
     }
 
-    public String doCancel()
+    public String doCancel() throws Exception
     {
         Object obj = objectStore.load(objectKey);
 
@@ -135,7 +141,7 @@ public class FormAction extends ActionSupport
         return CANCEL;
     }
 
-    public String doInput()
+    public String doInput() throws Exception
     {
         Object obj = objectStore.load(objectKey);
 
@@ -144,16 +150,25 @@ public class FormAction extends ActionSupport
         return INPUT;
     }
 
-    private void doRender(Object obj)
+    private void doRender(Object obj) throws Exception
     {
         FormDescriptor descriptor = descriptorFactory.createFormDescriptor(obj.getClass());
 
         // build the form.
-        FormComponent form = new FormFactory().createForm(descriptor, obj);
+        Form form = new FormFactory().createForm(descriptor, obj);
         populateForm(form, obj);
 
         // render it.
-        form.render(renderer);
+        StringWriter writer = new StringWriter();
+        FreemarkerTemplateRenderer templateRenderer = new FreemarkerTemplateRenderer();
+        templateRenderer.setConfiguration(configuration);
+        templateRenderer.setWriter(writer);
+
+        ComponentRenderer renderer = new ComponentRenderer();
+        renderer.setTemplateRenderer(templateRenderer);
+        renderer.render(form);
+
+        renderedForm = writer.toString();
     }
 
     private void populateObject(Object obj, ValidationContext validatorContext)
@@ -206,7 +221,7 @@ public class FormAction extends ActionSupport
         return null;
     }
 
-    private void populateForm(FormComponent form, Object obj)
+    private void populateForm(Form form, Object obj)
     {
         FormDescriptor formDescriptor = descriptorFactory.createFormDescriptor(obj.getClass());
         for (FieldDescriptor fieldDescriptor : formDescriptor.getFieldDescriptors())
@@ -216,7 +231,7 @@ public class FormAction extends ActionSupport
                 String propertyName = fieldDescriptor.getName();
                 Object propertyValue = BeanUtils.getProperty(propertyName, obj);
 
-                Component component = form.getNestedComponent(propertyName);
+                UIComponent component = (UIComponent) form.getNestedComponent(propertyName);
 
                 TypeSqueezer squeezer = Squeezers.findSqueezer(fieldDescriptor.getType());
                 component.setValue(squeezer.squeeze(propertyValue));
@@ -252,14 +267,9 @@ public class FormAction extends ActionSupport
         this.descriptorFactory = descriptorFactory;
     }
 
-    /**
-     * Required resource.
-     *
-     * @param renderer
-     */
-    public void setRenderer(Renderer renderer)
+    public void setFreemarkerConfiguration(Configuration config)
     {
-        this.renderer = renderer;
+        this.configuration = config;
     }
 
     public void setValidationManager(ValidationManager validationManager)
