@@ -17,11 +17,8 @@ then
     fatal "PULSE_HOME must be set."
 fi
 
-if [[ -z "$PULSE_HOME" ]]
-then
-    base="$(dirname $0)"
-    PULSE_HOME="${base#/bin}"
-fi
+base="$(dirname $0)"
+PULSE_HOME="${base#/bin}"
 
 if [[ -z "$PULSE_USER" ]]
 then
