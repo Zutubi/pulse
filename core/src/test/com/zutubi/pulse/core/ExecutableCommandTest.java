@@ -216,13 +216,28 @@ public class ExecutableCommandTest extends PulseTestCase
 
     public void testBuildNumberNotAddedToEnvironmentWhenNotSpecified() throws IOException
     {
+        // if we are running in pulse, then PULSE_BUILD_NUMBER will already
+        // be added to the environment.
+        boolean runningInPulse = System.getenv().containsKey("PULSE_BUILD_NUMBER");
+
         ExecutableCommand command = new ExecutableCommand();
         command.setExe("echo");
         CommandResult result = new CommandResult("success");
         execute(command, result);
 
         String output = getEnv();
-        assertFalse(output.contains("PULSE_BUILD_NUMBER"));
+
+        if (runningInPulse)
+        {
+            // should only appear once.
+            assertTrue(output.indexOf("PULSE_BUILD_NUMBER") == output.lastIndexOf("PULSE_BUILD_NUMBER"));
+        }
+        else
+        {
+            // does not appear.
+            assertFalse(output.contains("PULSE_BUILD_NUMBER"));
+        }
+
     }
 
     private String getOutput() throws IOException
