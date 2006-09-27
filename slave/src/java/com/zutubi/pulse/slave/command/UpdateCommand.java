@@ -1,22 +1,23 @@
 package com.zutubi.pulse.slave.command;
 
-import com.zutubi.pulse.util.logging.Logger;
-import com.zutubi.pulse.util.FileSystemUtils;
-import com.zutubi.pulse.util.IOUtils;
-import com.zutubi.pulse.util.RandomUtils;
-import com.zutubi.pulse.bootstrap.SystemPaths;
+import com.zutubi.pulse.ShutdownManager;
 import com.zutubi.pulse.bootstrap.ConfigurationManager;
 import com.zutubi.pulse.command.PulseCtl;
 import com.zutubi.pulse.core.PulseRuntimeException;
-import com.zutubi.pulse.ShutdownManager;
 import com.zutubi.pulse.services.MasterService;
 import com.zutubi.pulse.services.UpgradeState;
 import com.zutubi.pulse.services.UpgradeStatus;
 import com.zutubi.pulse.slave.MasterProxyFactory;
+import com.zutubi.pulse.util.FileSystemUtils;
+import com.zutubi.pulse.util.IOUtils;
+import com.zutubi.pulse.util.RandomUtils;
+import com.zutubi.pulse.util.logging.Logger;
 
-import java.io.*;
-import java.net.URL;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
 import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.Arrays;
 
 /**
@@ -60,7 +61,6 @@ public class UpdateCommand implements Runnable
 
         try
         {
-
             sendMessage(masterService, UpgradeState.STARTED);
 
             File pulseHome = new File(configurationManager.getEnvConfig().getPulseHome());
@@ -68,6 +68,17 @@ public class UpdateCommand implements Runnable
 
             if(!versionDir.exists())
             {
+                // Make sure we can create the version dir (have write access)
+                if(!versionDir.mkdirs())
+                {
+                    LOG.warning("Unable to create directory '" + versionDir.getAbsolutePath() + "'");
+                    sendMessage(masterService, UpgradeState.FAILED, "Unable to create version directory: check that the user running the agent has write access to the agent install directory.");
+                    return;
+                }
+
+                // Need to remove it again: should not be there if the upgrade fails
+                versionDir.delete();
+
                 // Need to obtain the package
                 if(!downloadAndApplyUpdate(masterService, pulseHome, versionDir))
                 {
@@ -174,7 +185,7 @@ public class UpdateCommand implements Runnable
         }
         finally
         {
-            //FileSystemUtils.removeDirectory(tempDir);
+            FileSystemUtils.removeDirectory(tempDir);
         }
     }
 

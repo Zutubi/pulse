@@ -1,9 +1,9 @@
 package com.zutubi.pulse.slave;
 
+import com.zutubi.pulse.BuildContext;
 import com.zutubi.pulse.ResourceDiscoverer;
 import com.zutubi.pulse.SystemInfo;
 import com.zutubi.pulse.Version;
-import com.zutubi.pulse.BuildContext;
 import com.zutubi.pulse.agent.Status;
 import com.zutubi.pulse.bootstrap.ComponentContext;
 import com.zutubi.pulse.core.RecipeRequest;
@@ -44,8 +44,7 @@ public class SlaveServiceImpl implements SlaveService
     {
         serviceTokenManager.validateToken(token);
 
-        // Currently we always accept the request!  Should check we can write to the
-        // home dirs first I suppose...
+        // Currently we always accept the request
         UpdateCommand command = new UpdateCommand(build, master, token, id, packageUrl, packageSize);
         ComponentContext.autowire(command);
         threadPool.execute(command);
