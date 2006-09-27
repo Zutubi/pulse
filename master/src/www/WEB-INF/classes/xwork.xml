@@ -832,7 +832,7 @@
             <param name="wizardClass">com.zutubi.pulse.web.user.ContactPointWizard</param>
             <result name="select" type="velocity">create-contact.vm</result>
             <result name="email" type="velocity">create-contact-form.vm</result>
-            <result name="jabber" type="velocity">create-contact-jabber.vm</result>
+            <result name="jabber" type="velocity">create-contact-form.vm</result>
             <result name="cancel" type="redirect">/preferences.action</result>
             <result name="success" type="redirect">/preferences.action</result>
         </action>

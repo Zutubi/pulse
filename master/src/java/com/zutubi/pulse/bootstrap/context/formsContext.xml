@@ -17,10 +17,18 @@
 
     <bean id="objectStore" class="com.zutubi.pulse.form.persistence.stores.MemoryObjectStore"/>
 
-    <bean id="renderer" class="com.zutubi.pulse.form.ui.renderers.FreemarkerRenderer" autowire="byName" singleton="false"/>
-
     <bean id="annotationDecorator" class="com.zutubi.pulse.form.descriptor.annotation.AnnotationDecorator"/>
 
-    <bean id="validationManager" class="com.zutubi.validation.DefaultValidationManager"/>
+    <bean id="validationManager" class="com.zutubi.validation.DefaultValidationManager">
+        <property name="providers">
+            <list>
+                <ref local="annotationValidatorProvider"/>
+                <ref local="reflectionValidatorProvider"/>
+            </list>
+        </property>
+    </bean>
+
+    <bean id="annotationValidatorProvider" class="com.zutubi.validation.providers.AnnotationValidatorProvider"/>
+    <bean id="reflectionValidatorProvider" class="com.zutubi.validation.providers.ReflectionValidatorProvider"/>
 
 </beans>

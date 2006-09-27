@@ -24,10 +24,12 @@ public class AnnotationValidatorProvider implements ValidatorProvider
     // happy autowiring context.
     private ObjectFactory objectFactory = new DefaultObjectFactory();
 
+/*
     public void setObjectFactory(ObjectFactory objectFactory)
     {
         this.objectFactory = objectFactory;
     }
+*/
 
     public List<Validator> getValidators(Object obj)
     {

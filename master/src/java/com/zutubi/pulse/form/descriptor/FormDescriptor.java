@@ -34,6 +34,10 @@ public interface FormDescriptor extends Descriptor
     //Q: should we throw an exception if the name does not match a field?
     FieldDescriptor getFieldDescriptor(String name);
 
+    void addFieldDescriptor(FieldDescriptor descriptor);
+
+    void setFieldDescriptors(List<FieldDescriptor> fieldDescriptors);
+
     /**
      * Get the list of field names, in the order in which they should be rendered. If this method
      * returns null, then the order of the fields is undefined.

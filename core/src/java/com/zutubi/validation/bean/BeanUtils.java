@@ -73,7 +73,7 @@ public class BeanUtils
                     return propertyDescriptor;
                 }
             }
-            throw new PropertyNotFoundException();
+            throw new PropertyNotFoundException(String.format("Property %s not found in target class %s", propertyName, target));
         }
         catch (IntrospectionException e)
         {

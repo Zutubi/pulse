@@ -56,6 +56,8 @@ public class WizardAction extends ActionSupport
      */
     private String previous;
 
+    private String finish;
+
     /**
      * The submit field value is used as an override for the next, previous and
      * cancel fields, and is set by a javascript function when the user hits enter
@@ -111,6 +113,11 @@ public class WizardAction extends ActionSupport
         this.next = next;
     }
 
+    public void setFinish(String finish)
+    {
+        this.finish = finish;
+    }
+
     /**
      *
      * @param submit
@@ -156,6 +163,18 @@ public class WizardAction extends ActionSupport
         }
     }
 
+    public boolean isFinishSelected()
+    {
+        if (TextUtils.stringSet(submit))
+        {
+            return submit.equals("finish");
+        }
+        else
+        {
+            return TextUtils.stringSet(finish);
+        }
+    }
+
     public void validate()
     {
         if (!TextUtils.stringSet(wizardClass))
@@ -169,7 +188,7 @@ public class WizardAction extends ActionSupport
         // will need to be handled by which ever method (execute() doInput() doDefault() has been
         // called). We dont want to add  these errors to the wizard instance since WW will then
         // return the INPUT result.
-        if (isNextSelected())
+        if (isNextSelected() || isFinishSelected())
         {
             // only want to be validating when we are moving forward.
             getWizard().validate();
@@ -284,7 +303,7 @@ public class WizardAction extends ActionSupport
                 return doPrevious();
             }
 
-            if (isNextSelected())
+            if (isNextSelected() || isFinishSelected())
             {
                 return doNext();
             }

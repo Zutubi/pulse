@@ -31,17 +31,21 @@ public class ReflectionDescriptorFactory implements DescriptorFactory
 
     public FormDescriptor createFormDescriptor(Class type)
     {
+/*
         if (formDescriptorCache.containsKey(type))
         {
             return formDescriptorCache.get(type);
         }
+*/
 
         DefaultFormDescriptor formDescriptor = new DefaultFormDescriptor();
         formDescriptor.setType(type);
         formDescriptor.setFieldDescriptors(buildFieldDescriptors(type));
 
         FormDescriptor decoratedDescriptor = applyDecorators(formDescriptor);
+/*
         formDescriptorCache.put(type, decoratedDescriptor);
+*/
 
         return decoratedDescriptor;
     }

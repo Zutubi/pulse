@@ -23,6 +23,7 @@ public abstract class ComponentTestCase extends PulseTestCase
 {
     protected ComponentRenderer renderer;
     protected Writer writer;
+    protected FreemarkerTemplateRenderer templateRenderer;
 
     protected void setUp() throws Exception
     {
@@ -35,7 +36,7 @@ public abstract class ComponentTestCase extends PulseTestCase
         config.setObjectWrapper(new DefaultObjectWrapper());
         config.addAutoInclude("macro.ftl");
 
-        FreemarkerTemplateRenderer templateRenderer = new FreemarkerTemplateRenderer();
+        templateRenderer = new FreemarkerTemplateRenderer();
         templateRenderer.setConfiguration(config);
         templateRenderer.setWriter(writer);
 
@@ -45,6 +46,7 @@ public abstract class ComponentTestCase extends PulseTestCase
 
     protected void tearDown() throws Exception
     {
+        templateRenderer = null;
         renderer = null;
         writer = null;
 

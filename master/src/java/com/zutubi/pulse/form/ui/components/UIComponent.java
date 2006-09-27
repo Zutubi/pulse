@@ -22,6 +22,12 @@ public abstract class UIComponent extends Component
 
     protected void evaluateParameters()
     {
+        Form form = (Form) findAncestor(Form.class);
+        if (form != null)
+        {
+            String id = form.getId() + "_" + getParameters().get("name");
+            setId(id);
+        }
 
         evaluateExtraParameters();
     }

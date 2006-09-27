@@ -21,6 +21,7 @@ public class FormFactory
         List<String> fieldOrder = evaluateFieldOrder(descriptor);
 
         Form form = new Form();
+        form.addParameter("heading", instance.getClass().getName());
         form.setMethod("post");
         form.addParameters(descriptor.getParameters());
 
@@ -47,7 +48,7 @@ public class FormFactory
         return form;
     }
 
-    private List<String> evaluateFieldOrder(FormDescriptor descriptor)
+    protected List<String> evaluateFieldOrder(FormDescriptor descriptor)
     {
         // If a field order is defined, lets us it as the starting point.
         LinkedList<String> ordered = new LinkedList<String>();
@@ -73,7 +74,7 @@ public class FormFactory
         return ordered;
     }
 
-    private UIComponent createField(FieldDescriptor descriptor, Object instance)
+    protected UIComponent createField(FieldDescriptor descriptor, Object instance)
     {
         if (FieldType.TEXT.equals(descriptor.getFieldType()))
         {
@@ -95,6 +96,10 @@ public class FormFactory
         {
             return createCheckboxField(descriptor);
         }
+        else if (FieldType.HIDDEN.equals(descriptor.getFieldType()))
+        {
+            return createHiddenField(descriptor);
+        }
         else
         {
             throw new RuntimeException("Unsupported field type '" + descriptor.getFieldType() + "'");
@@ -106,6 +111,13 @@ public class FormFactory
         CheckboxField c = new CheckboxField();
         configureComponent(c, descriptor);
 
+        return c;
+    }
+
+    private UIComponent createHiddenField(FieldDescriptor descriptor)
+    {
+        HiddenField c = new HiddenField();
+        configureComponent(c, descriptor);
         return c;
     }
 

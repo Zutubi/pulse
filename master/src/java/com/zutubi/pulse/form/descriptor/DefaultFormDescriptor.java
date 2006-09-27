@@ -47,6 +47,11 @@ public class DefaultFormDescriptor implements FormDescriptor
         return fieldDescriptors;
     }
 
+    public void addFieldDescriptor(FieldDescriptor descriptor)
+    {
+        fieldDescriptors.add(descriptor);
+    }
+
     public void setFieldDescriptors(List<FieldDescriptor> fieldDescriptors)
     {
         this.fieldDescriptors = fieldDescriptors;

@@ -18,6 +18,7 @@ public class Component
 
     protected Map<String, Object> parameters;
 
+    private Component parent;
     private List<Component> nestedComponents;
 
     public void setContext(RenderContext context)
@@ -46,6 +47,7 @@ public class Component
 
     public void addNestedComponent(Component component)
     {
+        component.parent = this;
         getNestedComponents().add(component);
     }
 
@@ -84,13 +86,26 @@ public class Component
         return null;
     }
 
+    protected Component findAncestor(Class clazz)
+    {
+        if (parent == null)
+        {
+            return null;
+        }
+        if (parent.getClass() == clazz)
+        {
+            return parent;
+        }
+        return parent.findAncestor(clazz);
+    }
+
     public String getId()
     {
-        return id;
+        return (String) getParameters().get("id");
     }
 
     public void setId(String id)
     {
-        this.id = id;
+        addParameter("id", id);
     }
 }

@@ -2,6 +2,7 @@ package com.zutubi.pulse.form.ui;
 
 import com.opensymphony.xwork.ActionContext;
 import com.opensymphony.xwork.ActionSupport;
+import com.opensymphony.xwork.validator.ValidatorContext;
 import com.zutubi.pulse.form.descriptor.FieldDescriptor;
 import com.zutubi.pulse.form.descriptor.FormDescriptor;
 import com.zutubi.pulse.form.descriptor.DescriptorFactory;
@@ -55,11 +56,11 @@ public class FormAction extends ActionSupport
      */
     private ObjectStore objectStore;
 
+    private String renderedForm;
+
     private DescriptorFactory descriptorFactory;
 
     private ValidationManager validationManager;
-
-    private String renderedForm;
 
     private Configuration configuration;
 
@@ -99,18 +100,17 @@ public class FormAction extends ActionSupport
     {
         Copyable obj = objectStore.load(objectKey);
 
-
-
         // copy the form values into the object, checking for conversion errors.
-        populateObject(obj, validatorContext);
-
-        // validate the form input
-        validationManager.validate(obj, validatorContext);
+        FormSupport support = new FormSupport();
+        support.setConfiguration(configuration);
+        support.setDescriptorFactory(descriptorFactory);
+        support.setValidationManager(validationManager);
+        support.validate(obj, validatorContext);
 
         if (validatorContext.hasErrors())
         {
             // prepare for rendering.
-            doRender(obj);
+            doRender(obj, validatorContext);
             return INPUT;
         }
 
@@ -118,7 +118,7 @@ public class FormAction extends ActionSupport
         objectStore.save(objectKey, obj);
 
         // do rendering...
-        doRender(obj);
+        doRender(obj, null);
 
         return SAVE;
     }
@@ -127,7 +127,7 @@ public class FormAction extends ActionSupport
     {
         Copyable obj = objectStore.reset(objectKey);
 
-        doRender(obj);
+        doRender(obj, null);
 
         return RESET;
     }
@@ -136,7 +136,7 @@ public class FormAction extends ActionSupport
     {
         Object obj = objectStore.load(objectKey);
 
-        doRender(obj);
+        doRender(obj, null);
 
         return CANCEL;
     }
@@ -145,106 +145,19 @@ public class FormAction extends ActionSupport
     {
         Object obj = objectStore.load(objectKey);
 
-        doRender(obj);
+        doRender(obj, null);
 
         return INPUT;
     }
 
-    private void doRender(Object obj) throws Exception
+    private void doRender(Object obj, ValidationContext context) throws Exception
     {
-        FormDescriptor descriptor = descriptorFactory.createFormDescriptor(obj.getClass());
+        FormSupport support = new FormSupport();
+        support.setConfiguration(configuration);
+        support.setDescriptorFactory(descriptorFactory);
+        support.setValidationManager(validationManager);
 
-        // build the form.
-        Form form = new FormFactory().createForm(descriptor, obj);
-        populateForm(form, obj);
-
-        // render it.
-        StringWriter writer = new StringWriter();
-        FreemarkerTemplateRenderer templateRenderer = new FreemarkerTemplateRenderer();
-        templateRenderer.setConfiguration(configuration);
-        templateRenderer.setWriter(writer);
-
-        ComponentRenderer renderer = new ComponentRenderer();
-        renderer.setTemplateRenderer(templateRenderer);
-        renderer.render(form);
-
-        renderedForm = writer.toString();
-    }
-
-    private void populateObject(Object obj, ValidationContext validatorContext)
-    {
-        FormDescriptor formDescriptor = descriptorFactory.createFormDescriptor(obj.getClass());
-        for (FieldDescriptor fieldDescriptor : formDescriptor.getFieldDescriptors())
-        {
-            String name = fieldDescriptor.getName();
-
-            TypeSqueezer squeezer = Squeezers.findSqueezer(fieldDescriptor.getType());
-
-            String[] paramValue = getParameterValue(name);
-            if (paramValue != null)
-            {
-                try
-                {
-                    Object value = squeezer.unsqueeze(paramValue);
-                    BeanUtils.setProperty(name, value, obj);
-                }
-                catch (SqueezeException e)
-                {
-                    validatorContext.addFieldError(name, name + ".conversionerror");
-                }
-                catch (BeanException e)
-                {
-                    validatorContext.addFieldError(name, name + ".beanerror");
-                }
-            }
-        }
-    }
-
-    private String[] getParameterValue(String parameterName)
-    {
-        Map parameters = ActionContext.getContext().getParameters();
-        if (!parameters.containsKey(parameterName))
-        {
-            return null;
-        }
-        Object parameterValue = parameters.get(parameterName);
-        if (parameterValue instanceof String)
-        {
-            return new String[]{(String)parameterValue};
-        }
-        else if (parameterValue instanceof String[])
-        {
-            return (String[]) parameterValue;
-        }
-
-        // unexpected non string type...
-        return null;
-    }
-
-    private void populateForm(Form form, Object obj)
-    {
-        FormDescriptor formDescriptor = descriptorFactory.createFormDescriptor(obj.getClass());
-        for (FieldDescriptor fieldDescriptor : formDescriptor.getFieldDescriptors())
-        {
-            try
-            {
-                String propertyName = fieldDescriptor.getName();
-                Object propertyValue = BeanUtils.getProperty(propertyName, obj);
-
-                UIComponent component = (UIComponent) form.getNestedComponent(propertyName);
-
-                TypeSqueezer squeezer = Squeezers.findSqueezer(fieldDescriptor.getType());
-                component.setValue(squeezer.squeeze(propertyValue));
-            }
-            catch (BeanException e)
-            {
-                e.printStackTrace();
-            }
-            catch (SqueezeException e)
-            {
-                e.printStackTrace();
-            }
-        }
+        renderedForm = support.renderForm(obj, context);
     }
 
     /**

@@ -63,6 +63,10 @@ public class DelegatingValidationContext implements ValidationContext
         {
             return (ValidationAware)o;
         }
+        else if (o instanceof com.opensymphony.xwork.ValidationAware)
+        {
+            return new XWorkValidationAwareBridge((com.opensymphony.xwork.ValidationAware)o);
+        }
         return new ValidationAwareSupport();
     }
 
