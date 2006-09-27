@@ -6,6 +6,17 @@ import subprocess
 import sys
 import time
 
+
+WINDOWS = os.name == "nt"
+
+
+def getScript(name):
+    if WINDOWS:
+        return name + ".bat"
+    else:
+        return "./" + name + "sh"
+    
+
 class Pulse:
     def __init__(self, baseDir, port):
         self.baseDir = os.path.abspath(baseDir)
@@ -17,10 +28,10 @@ class Pulse:
         If wait is True, this function will wait for Pulse to start listening on the
         given port before returning.  If the server cannot be started successfully,
         an exception is thrown carrying the reason."""
-        os.chdir(self.baseDir)
+        os.chdir(os.path.join(self.baseDir, 'bin'))
         self.stdout = open('stdout.txt', 'w')
         self.stderr = open('stderr.txt', 'w')
-        self.pop = subprocess.Popen(['./bin/startup.sh', '-p', str(self.port), '-f', 'config.properties'], stdout=self.stdout, stderr=self.stderr)
+        self.pop = subprocess.Popen([getScript('startup'), '-p', str(self.port), '-f', 'config.properties'], stdout=self.stdout, stderr=self.stderr, shell=False)
         if wait:
             if not self.waitFor():
                 raise Exception('Timed out waiting for server to start')
@@ -49,8 +60,8 @@ class Pulse:
         """Stops this running pulse server using a shutdown script.  Failure for
         the process to exit in the given timeout (in seconds) will result in an
         exception being thrown."""
-        os.chdir(self.baseDir)
-        ret = subprocess.call(['./bin/shutdown.sh', '-p', str(self.port), '-f', 'config.properties'])
+        os.chdir(os.path.join(self.baseDir, 'bin'))
+        ret = subprocess.call([getScript('shutdown'), '-p', str(self.port), '-f', 'config.properties'], shell=WINDOWS)
         if ret != 0:
             raise Exception('Shutdown scripted exited with code ' + str(ret))
         endTime = time.time() + timeout
@@ -73,5 +84,3 @@ if __name__ == "__main__":
         print "It is running!"
         time.sleep(20)
         p.stop()
-        
-
