@@ -35,9 +35,9 @@ public class DelegatingValidationContext implements ValidationContext
     {
         if (obj instanceof TextProvider)
         {
-            return (TextProvider) obj;
+            return ((TextProvider)obj).getTextProvider(obj);
         }
-        return getTextProvider(obj);
+        return new DefaultTextProvider();
     }
 
     public ValidationAware makeValidationAware(Object o)

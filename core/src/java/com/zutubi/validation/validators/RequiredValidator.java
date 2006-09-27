@@ -12,6 +12,7 @@ public class RequiredValidator extends FieldValidatorSupport
 
     public RequiredValidator()
     {
+        setMessageKey("${fieldName}.required");
         setDefaultMessageKey(".required");
     }
 
