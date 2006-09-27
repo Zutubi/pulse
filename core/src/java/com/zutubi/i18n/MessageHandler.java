@@ -7,7 +7,6 @@ import java.util.Locale;
  */
 public interface MessageHandler
 {
-
     /**
      * Set the locale with the language and country for the
      * current thread.
@@ -30,11 +29,43 @@ public interface MessageHandler
      */
     public Locale getLocale();
 
+    /**
+     * Retrieve the message for the specified i18n key within the provided
+     * context.
+     *
+     * @param context
+     * @param key
+     *
+     * @return
+     */
     public String format(Object context, String key);
 
+    /**
+     * Retrieve the message for the specified i18n key within the provided
+     * context.
+     *
+     * @param context
+     * @param key
+     * @param arg
+     *
+     * @return
+     */
     public String format(Object context, String key, Object arg);
 
+    /**
+     * Retrieve the message for the specified i18n key within the provided
+     * context.
+     *
+     * @param context
+     * @param key
+     * @param args
+     *
+     * @return
+     */
     public String format(Object context, String key, Object... args);
 
+    /**
+     * Clear any cached data held by this message handler.
+     */
     public void clear();
 }

@@ -5,7 +5,9 @@ import java.util.MissingResourceException;
 import java.text.MessageFormat;
 
 /**
- * <class-comment/>
+ * The default formatter implementation.  This implementation delegates the
+ * formatting to the MessageFormat object.
+ * 
  */
 public class Formatter
 {

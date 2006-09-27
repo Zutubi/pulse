@@ -8,7 +8,8 @@ import java.util.Locale;
 import java.util.ResourceBundle;
 
 /**
- * <class-comment/>
+ * The default implementation of the MessageHandler interface.
+ * 
  */
 public class DefaultMessageHandler implements MessageHandler
 {

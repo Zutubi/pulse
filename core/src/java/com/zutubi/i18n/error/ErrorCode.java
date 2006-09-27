@@ -5,7 +5,6 @@ package com.zutubi.i18n.error;
  */
 public class ErrorCode
 {
-
     private int errorCode;
 
     /**

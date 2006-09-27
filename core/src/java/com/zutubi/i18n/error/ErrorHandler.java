@@ -9,7 +9,9 @@ import com.zutubi.i18n.bundle.BundleManager;
 import java.text.MessageFormat;
 
 /**
- * <class-comment/>
+ * The error handler is an extension on the MessageHandler that provides
+ * error code based message lookup.
+ *
  */
 public class ErrorHandler
 {

@@ -3,7 +3,9 @@ package com.zutubi.i18n.locale;
 import java.util.Locale;
 
 /**
- * <class-comment/>
+ * The Locale Manager class provides support for storing global and threadlocal
+ * locale settings.
+ * 
  */
 public class LocaleManager
 {
