@@ -108,4 +108,14 @@ public class Component
     {
         addParameter("id", id);
     }
+
+    protected String getText(String key)
+    {
+        String str = context.getText(key);
+        if (str != null)
+        {
+            return str;
+        }
+        return key;
+    }
 }

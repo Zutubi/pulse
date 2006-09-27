@@ -1,6 +1,6 @@
 package com.zutubi.pulse.form.ui;
 
-import com.zutubi.pulse.i18n.TextProvider;
+import com.zutubi.pulse.form.TextProvider;
 
 /**
  * <class-comment/>

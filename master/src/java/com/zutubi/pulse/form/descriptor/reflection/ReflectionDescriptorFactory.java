@@ -40,6 +40,7 @@ public class ReflectionDescriptorFactory implements DescriptorFactory
 
         DefaultFormDescriptor formDescriptor = new DefaultFormDescriptor();
         formDescriptor.setType(type);
+        formDescriptor.setName(type.getSimpleName());
         formDescriptor.setFieldDescriptors(buildFieldDescriptors(type));
 
         FormDescriptor decoratedDescriptor = applyDecorators(formDescriptor);

@@ -172,7 +172,7 @@ public class ContactPointWizard extends BaseWizard
             support.setValidationManager(validationManager);
             support.setConfiguration(configuration);
             support.setDescriptorFactory(descriptorFactory);
-            support.setTextProvider(new com.zutubi.pulse.i18n.MessagesTextProvider(subject));
+            support.setTextProvider(new com.zutubi.pulse.form.MessagesTextProvider(subject));
 
             try
             {
@@ -208,7 +208,7 @@ public class ContactPointWizard extends BaseWizard
             support.setValidationManager(validationManager);
             support.setConfiguration(configuration);
             support.setDescriptorFactory(descriptorFactory);
-            support.setTextProvider(new com.zutubi.pulse.i18n.MessagesTextProvider(subject));
+            support.setTextProvider(new com.zutubi.pulse.form.MessagesTextProvider(subject));
 
             try
             {

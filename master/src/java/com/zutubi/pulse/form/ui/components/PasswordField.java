@@ -14,8 +14,18 @@ public class PasswordField extends TextField
         return TEMPLATE;
     }
 
+    protected void evaluateExtraParameters()
+    {
+        super.evaluateExtraParameters();
+
+        if (showPassword != null)
+        {
+            addParameter("showPassword", showPassword);
+        }
+    }
+
     public void setShowPassword(String showPassword)
     {
-        addParameter("showPassword", showPassword);
+        this.showPassword = showPassword;
     }
 }

@@ -21,7 +21,7 @@ public class FormFactory
         List<String> fieldOrder = evaluateFieldOrder(descriptor);
 
         Form form = new Form();
-        form.addParameter("heading", instance.getClass().getName());
+        form.setId(instance.getClass().getSimpleName());
         form.setMethod("post");
         form.addParameters(descriptor.getParameters());
 
@@ -38,7 +38,7 @@ public class FormFactory
         {
             Submit field = new Submit();
             field.setName(actionDescriptor.getAction());
-            field.setValue(actionDescriptor.getAction());
+            field.setValue(actionDescriptor.getAction() + ".label");
             field.setTabindex(i++);
             submitGroup.addNestedComponent(field);
         }

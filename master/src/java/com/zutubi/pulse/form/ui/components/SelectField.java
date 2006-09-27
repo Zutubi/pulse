@@ -5,6 +5,12 @@ package com.zutubi.pulse.form.ui.components;
  */
 public class SelectField extends ListUIComponent
 {
+    protected String headerKey;
+    protected String headerValue;
+    protected String emptyOption;
+    protected String multiple;
+    protected String size;
+
     public String getDefaultTemplate()
     {
         return "select";
@@ -14,18 +20,29 @@ public class SelectField extends ListUIComponent
     {
         super.evaluateExtraParameters();
 
-        if ((headerKey != null) && (headerValue != null)) {
+        if ((headerKey != null) && (headerValue != null))
+        {
             addParameter("headerKey", headerKey);
             addParameter("headerValue", headerValue);
         }
-    }
 
-    protected String headerKey;
-    protected String headerValue;
+        if (emptyOption != null)
+        {
+            addParameter("emptyOption", emptyOption);
+        }
+        if (multiple != null)
+        {
+            addParameter("multiple", multiple);
+        }
+        if (size != null)
+        {
+            addParameter("size", size);
+        }
+    }
 
     public void setEmptyOption(String emptyOption)
     {
-        addParameter("emptyOption", emptyOption);
+        this.emptyOption = emptyOption;
     }
 
     public void setHeaderKey(String headerKey)
@@ -40,11 +57,11 @@ public class SelectField extends ListUIComponent
 
     public void setMultiple(String multiple)
     {
-        addParameter("multiple", multiple);
+        this.multiple = multiple;
     }
 
     public void setSize(String size)
     {
-        addParameter("size", size);
+        this.size = size;
     }
 }

@@ -11,6 +11,24 @@ public class TextField extends UIComponent
     protected String readonly;
     protected String size;
 
+    protected void evaluateExtraParameters()
+    {
+        super.evaluateExtraParameters();
+
+        if (maxlength != null)
+        {
+            addParameter("maxlength", maxlength);
+        }
+        if (readonly != null)
+        {
+            addParameter("readonly", readonly);
+        }
+        if (size != null)
+        {
+            addParameter("size", size);
+        }
+    }
+
     public String getDefaultTemplate()
     {
         return TEMPLATE;
@@ -18,16 +36,16 @@ public class TextField extends UIComponent
 
     public void setMaxlength(String maxlength)
     {
-        addParameter("maxlength", maxlength);
+        this.maxlength = maxlength;
     }
 
     public void setReadonly(String readonly)
     {
-        addParameter("readonly", readonly);
+        this.readonly = readonly;
     }
 
     public void setSize(String size)
     {
-        addParameter("size", size);
+        this.size = size;
     }
 }

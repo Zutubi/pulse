@@ -1,4 +1,6 @@
-package com.zutubi.pulse.i18n;
+package com.zutubi.pulse.form;
+
+import com.zutubi.pulse.i18n.Messages;
 
 /**
  * <class-comment/>

@@ -7,6 +7,33 @@ import com.zutubi.pulse.form.ui.TemplateRendererContext;
  */
 public abstract class UIComponent extends Component
 {
+    protected String cssClass;
+    protected String cssStyle;
+    protected String disabled;
+    protected String label;
+    protected String labelPosition;
+    protected String name;
+    protected Boolean required;
+    protected Integer tabindex;
+    protected String value;
+    protected String title;
+
+    // HTML scripting events attributes
+    protected String onclick;
+    protected String ondblclick;
+    protected String onmousedown;
+    protected String onmouseup;
+    protected String onmouseover;
+    protected String onmousemove;
+    protected String onmouseout;
+    protected String onfocus;
+    protected String onblur;
+    protected String onkeypress;
+    protected String onkeydown;
+    protected String onkeyup;
+    protected String onselect;
+    protected String onchange;
+
     public boolean end() throws Exception
     {
         // generate the template renderer context
@@ -22,6 +49,99 @@ public abstract class UIComponent extends Component
 
     protected void evaluateParameters()
     {
+        if (this.name != null)
+        {
+            addParameter("name", getText(name));
+        }
+        if (label != null)
+        {
+            addParameter("label", getText(label));
+        }
+        if (labelPosition != null)
+        {
+            addParameter("labelposition", labelPosition);
+        }
+        if (required != null)
+        {
+            addParameter("required", required);
+        }
+        if (disabled != null)
+        {
+            addParameter("disabled", disabled);
+        }
+        if (tabindex != null)
+        {
+            addParameter("tabindex", tabindex);
+        }
+        if (onclick != null)
+        {
+            addParameter("onclick", onclick);
+        }
+        if (ondblclick != null)
+        {
+            addParameter("ondblclick", ondblclick);
+        }
+        if (onmousedown != null)
+        {
+            addParameter("onmousedown", onmousedown);
+        }
+        if (onmouseup != null)
+        {
+            addParameter("onmouseup", onmouseup);
+        }
+        if (onmouseover != null)
+        {
+            addParameter("onmouseover", onmouseover);
+        }
+        if (onmousemove != null)
+        {
+            addParameter("onmousemove", onmousemove);
+        }
+        if (onmouseout != null)
+        {
+            addParameter("onmouseout", onmouseout);
+        }
+        if (onfocus != null)
+        {
+            addParameter("onfocus", onfocus);
+        }
+        if (onblur != null)
+        {
+            addParameter("onblur", onblur);
+        }
+        if (onkeypress != null)
+        {
+            addParameter("onkeypress", onkeypress);
+        }
+        if (onkeydown != null)
+        {
+            addParameter("onkeydown", onkeydown);
+        }
+        if (onkeyup != null)
+        {
+            addParameter("onkeyup", onkeyup);
+        }
+        if (onselect != null)
+        {
+            addParameter("onselect", onselect);
+        }
+        if (onchange != null)
+        {
+            addParameter("onchange", onchange);
+        }
+        if (cssClass != null)
+        {
+            addParameter("cssClass", cssClass);
+        }
+        if (cssStyle != null)
+        {
+            addParameter("cssStyle", cssStyle);
+        }
+        if (title != null)
+        {
+            addParameter("title", getText(title));
+        }
+
         Form form = (Form) findAncestor(Form.class);
         if (form != null)
         {
@@ -29,14 +149,9 @@ public abstract class UIComponent extends Component
             setId(id);
         }
 
-        if (getParameters().containsKey("label"))
+        if (value != null)
         {
-            String label = (String) getParameters().get("label");
-            label = context.getText(label);
-            if (label != null)
-            {
-                getParameters().put("label", label);
-            }
+            addParameter("value", getText(value));
         }
 
         evaluateExtraParameters();
@@ -49,121 +164,121 @@ public abstract class UIComponent extends Component
 
     public void setCssClass(String cssClass)
     {
-        addParameter("cssClass", cssClass);
+        this.cssClass = cssClass;
     }
 
     public void setCssStyle(String cssStyle)
     {
-        addParameter("cssStyle", cssStyle);
+        this.cssStyle = cssStyle;
     }
 
     public void setDisabled(String disabled)
     {
-        addParameter("disabled", disabled);
+        this.disabled = disabled;
     }
 
     public void setLabel(String label)
     {
-        addParameter("label", label);
+        this.label = label;
     }
 
     public void setLabelPosition(String labelPosition)
     {
-        addParameter("labelposition", labelPosition);
+        this.labelPosition = labelPosition;
     }
 
     public void setName(String name)
     {
-        addParameter("name", name);
+        this.name = name;
     }
 
     public void setRequired(boolean required)
     {
-        addParameter("required", required);
+        this.required = required;
     }
 
     public void setTabindex(int tabindex)
     {
-        addParameter("tabindex", Integer.toString(tabindex));
+        this.tabindex = tabindex;
     }
 
     public void setValue(String value)
     {
-        addParameter("value", value);
+        this.value = value;
     }
 
     public void setTitle(String title)
     {
-        addParameter("title", title);
+        this.title = title;
     }
 
     public void setOnclick(String onclick)
     {
-        addParameter("onclick", onclick);
+        this.onclick = onclick;
     }
 
     public void setOndblclick(String ondblclick)
     {
-        addParameter("ondblclick", ondblclick);
+        this.ondblclick = ondblclick;
     }
 
     public void setOnmousedown(String onmousedown)
     {
-        addParameter("onmousedown", onmousedown);
+        this.onmousedown = onmousedown;
     }
 
     public void setOnmouseup(String onmouseup)
     {
-        addParameter("onmouseup", onmouseup);
+        this.onmouseup = onmouseup;
     }
 
     public void setOnmouseover(String onmouseover)
     {
-        addParameter("onmouseover", onmouseover);
+        this.onmouseover = onmouseover;
     }
 
     public void setOnmousemove(String onmousemove)
     {
-        addParameter("onmousemove", onmousemove);
+        this.onmousemove = onmousemove;
     }
 
     public void setOnmouseout(String onmouseout)
     {
-        addParameter("onmouseout", onmouseout);
+        this.onmouseout = onmouseout;
     }
 
     public void setOnfocus(String onfocus)
     {
-        addParameter("onfocus", onfocus);
+        this.onfocus = onfocus;
     }
 
     public void setOnblur(String onblur)
     {
-        addParameter("onblur", onblur);
+        this.onblur = onblur;
     }
 
     public void setOnkeypress(String onkeypress)
     {
-        addParameter("onkeypress", onkeypress);
+        this.onkeypress = onkeypress;
     }
 
     public void setOnkeydown(String onkeydown)
     {
-        addParameter("onkeydown", onkeydown);
+        this.onkeydown = onkeydown;
     }
 
     public void setOnkeyup(String onkeyup)
     {
-        addParameter("onkeyup", onkeyup);
+        this.onkeyup = onkeyup;
     }
 
     public void setOnselect(String onselect)
     {
-        addParameter("onselect", onselect);
+        this.onselect = onselect;
     }
 
     public void setOnchange(String onchange)
     {
-        addParameter("onchange", onchange);
+        this.onchange = onchange;
     }
 }

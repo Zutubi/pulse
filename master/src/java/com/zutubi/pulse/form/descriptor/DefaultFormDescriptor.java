@@ -22,6 +22,8 @@ public class DefaultFormDescriptor implements FormDescriptor
 
     private String[] fieldOrder;
 
+    private String name;
+
     public DefaultFormDescriptor()
     {
         // default values.
@@ -94,4 +96,13 @@ public class DefaultFormDescriptor implements FormDescriptor
         return parameters;
     }
 
+    public String getName()
+    {
+        return name;
+    }
+
+    public void setName(String name)
+    {
+        this.name = name;
+    }
 }

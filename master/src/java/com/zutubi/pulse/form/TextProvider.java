@@ -1,4 +1,4 @@
-package com.zutubi.pulse.i18n;
+package com.zutubi.pulse.form;
 
 /**
  * <class-comment/>

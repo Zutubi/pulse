@@ -72,4 +72,8 @@ public interface FormDescriptor extends Descriptor
      * @return a map of key:value pairs.
      */
     Map<String, Object> getParameters();
+
+    String getName();
+
+    void setName(String name);
 }
