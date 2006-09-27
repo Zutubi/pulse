@@ -10,6 +10,7 @@ import com.zutubi.pulse.form.ui.renderers.FreemarkerTemplateRenderer;
 import com.zutubi.pulse.form.squeezer.TypeSqueezer;
 import com.zutubi.pulse.form.squeezer.Squeezers;
 import com.zutubi.pulse.form.squeezer.SqueezeException;
+import com.zutubi.pulse.i18n.TextProvider;
 import com.zutubi.validation.bean.BeanUtils;
 import com.zutubi.validation.bean.BeanException;
 import com.zutubi.validation.ValidationContext;
@@ -30,6 +31,13 @@ public class FormSupport
     private DescriptorFactory descriptorFactory;
 
     private ValidationManager validationManager;
+
+    public void setTextProvider(TextProvider textProvider)
+    {
+        this.textProvider = textProvider;
+    }
+
+    private TextProvider textProvider;
 
     public void validate(Object obj, ValidationContext validatorContext) throws ValidationException
     {
@@ -59,6 +67,9 @@ public class FormSupport
     private String renderDescriptor(FormDescriptor descriptor, Object obj, ValidationContext context)
             throws Exception
     {
+        InlineHelpDecorator inlineHelpDecorator = new InlineHelpDecorator(textProvider);
+        descriptor = inlineHelpDecorator.decorate(descriptor);
+
         // build the form.
         Form form = new FormFactory().createForm(descriptor, obj);
         populateForm(form, descriptor, obj);
@@ -72,6 +83,7 @@ public class FormSupport
 
         ComponentRenderer renderer = new ComponentRenderer();
         renderer.setTemplateRenderer(templateRenderer);
+        renderer.setTextProvider(textProvider);
 
         // render it.
         renderer.render(form);

@@ -3,28 +3,15 @@ package com.zutubi.pulse.web.user;
 import com.zutubi.pulse.model.*;
 import com.zutubi.pulse.web.wizard.*;
 import com.zutubi.pulse.form.descriptor.*;
-import com.zutubi.pulse.form.descriptor.annotation.AnnotationDecorator;
-import com.zutubi.pulse.form.descriptor.reflection.ReflectionDescriptorFactory;
-import com.zutubi.pulse.form.ui.FormFactory;
 import com.zutubi.pulse.form.ui.FormSupport;
-import com.zutubi.pulse.form.squeezer.TypeSqueezer;
-import com.zutubi.pulse.form.squeezer.Squeezers;
-import com.zutubi.pulse.form.squeezer.SqueezeException;
-import com.zutubi.pulse.bootstrap.ComponentContext;
 import com.zutubi.pulse.notifications.EmailNotificationHandler;
 import com.zutubi.pulse.notifications.JabberNotificationHandler;
-import com.zutubi.validation.annotations.Validate;
+import com.zutubi.pulse.validation.MessagesTextProvider;
 import com.zutubi.validation.*;
-import com.zutubi.validation.providers.AnnotationValidatorProvider;
-import com.zutubi.validation.providers.ReflectionValidatorProvider;
-import com.zutubi.validation.bean.BeanUtils;
-import com.zutubi.validation.bean.BeanException;
 import com.opensymphony.xwork.Validateable;
-import com.opensymphony.xwork.ActionContext;
 
 import java.util.Map;
 import java.util.TreeMap;
-import java.util.Arrays;
 
 import freemarker.template.Configuration;
 
@@ -185,6 +172,7 @@ public class ContactPointWizard extends BaseWizard
             support.setValidationManager(validationManager);
             support.setConfiguration(configuration);
             support.setDescriptorFactory(descriptorFactory);
+            support.setTextProvider(new com.zutubi.pulse.i18n.MessagesTextProvider(subject));
 
             try
             {
@@ -213,12 +201,14 @@ public class ContactPointWizard extends BaseWizard
 
         public void validate()
         {
-            ValidationContext validatorContext = new DelegatingValidationContext(this);
+            MessagesTextProvider textProvider = new MessagesTextProvider(subject);
+            ValidationContext validatorContext = new DelegatingValidationContext(new XWorkValidationAdapter(this), textProvider);
 
             FormSupport support = new FormSupport();
             support.setValidationManager(validationManager);
             support.setConfiguration(configuration);
             support.setDescriptorFactory(descriptorFactory);
+            support.setTextProvider(new com.zutubi.pulse.i18n.MessagesTextProvider(subject));
 
             try
             {

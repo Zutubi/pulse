@@ -29,6 +29,16 @@ public abstract class UIComponent extends Component
             setId(id);
         }
 
+        if (getParameters().containsKey("label"))
+        {
+            String label = (String) getParameters().get("label");
+            label = context.getText(label);
+            if (label != null)
+            {
+                getParameters().put("label", label);
+            }
+        }
+
         evaluateExtraParameters();
     }
 

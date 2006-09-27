@@ -1,11 +1,9 @@
 package com.zutubi.pulse.i18n;
 
-import com.zutubi.validation.i18n.TextProviderSupport;
-
 /**
  * <class-comment/>
  */
-public class MessagesTextProvider extends TextProviderSupport
+public class MessagesTextProvider implements TextProvider
 {
     private Object context;
 
@@ -14,8 +12,8 @@ public class MessagesTextProvider extends TextProviderSupport
         this.context = context;
     }
 
-    protected String lookupText(String key, Object... args)
+    public String getText(String key)
     {
-        return Messages.format(context, key, args);
+        return Messages.format(context, key);
     }
 }

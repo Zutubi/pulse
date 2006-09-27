@@ -174,7 +174,8 @@ public class FormFactory
         c.setRequired(descriptor.isRequired());
 
         Map<String, Object> parameters = descriptor.getParameters();
-
+        c.addParameters(parameters);
+/*
         for (Map.Entry<String, Object> entry : parameters.entrySet())
         {
             try
@@ -186,5 +187,6 @@ public class FormFactory
                 // noop.
             }
         }
+*/
     }
 }
