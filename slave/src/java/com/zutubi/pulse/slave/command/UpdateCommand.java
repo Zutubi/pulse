@@ -14,11 +14,9 @@ import com.zutubi.pulse.util.RandomUtils;
 import com.zutubi.pulse.util.logging.Logger;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.Arrays;
 
 /**
  */
@@ -230,7 +228,7 @@ public class UpdateCommand implements Runnable
                     return false;
                 }
 
-                if(!filesMatch(installFile, packageFile))
+                if(!FileSystemUtils.filesMatch(installFile, packageFile))
                 {
                     return false;
                 }
@@ -238,46 +236,6 @@ public class UpdateCommand implements Runnable
         }
 
         return true;
-    }
-
-    private boolean filesMatch(File installFile, File packageFile) throws IOException
-    {
-        if(installFile.length() != packageFile.length())
-        {
-            return false;
-        }
-
-        FileInputStream installIn = null;
-        FileInputStream packageIn = null;
-
-        try
-        {
-            installIn = new FileInputStream(installFile);
-            packageIn = new FileInputStream(installFile);
-            byte[] installBuffer = new byte[1024];
-            byte[] packageBuffer = new byte[1024];
-            int n;
-
-            while ((n = packageIn.read(packageBuffer)) > 0)
-            {
-                if(installIn.read(installBuffer) != n)
-                {
-                    return false;
-                }
-
-                if(!Arrays.equals(packageBuffer, installBuffer))
-                {
-                    return false;
-                }
-            }
-
-            return true;
-        }
-        finally
-        {
-            IOUtils.close(installIn);
-            IOUtils.close(packageIn);
-        }
     }
 
     private void updateActiveVersion(File pulseHome) throws IOException

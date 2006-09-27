@@ -136,6 +136,54 @@ public class FileSystemUtilsTest extends PulseTestCase
         }
     }
 
+    public void testFilesMatchBothEmpty() throws IOException
+    {
+        filesMatchHelper("", "", true);
+    }
+
+    public void testFilesMatchFirstShorter() throws IOException
+    {
+        filesMatchHelper("short", "longer", false);
+    }
+
+    public void testFilesMatchSecondShorter() throws IOException
+    {
+        filesMatchHelper("longer", "short", false);
+    }
+
+    public void testFilesMatchSameContent() throws IOException
+    {
+        filesMatchHelper("content", "content", true);
+    }
+
+    public void testFilesMatchSameLength() throws IOException
+    {
+        filesMatchHelper("content", "CONTENT", false);
+    }
+
+    public void testFilesMatchLongFiles() throws IOException
+    {
+        StringBuilder builder = new StringBuilder();
+        for(int i = 0; i < 10000; i++)
+        {
+            builder.append("some random string");
+        }
+
+        String content = builder.toString();
+        filesMatchHelper(content, content, true);
+    }
+
+    private void filesMatchHelper(String s1, String s2, boolean expected) throws IOException
+    {
+        File f1 = new File(tmpDir, "f1");
+        File f2 = new File(tmpDir, "f2");
+
+        FileSystemUtils.createFile(f1, s1);
+        FileSystemUtils.createFile(f2, s2);
+
+        assertEquals(expected, FileSystemUtils.filesMatch(f1, f2));
+    }
+
     public String asPath(String... pathElements)
     {
         StringBuffer buff = new StringBuffer();
