@@ -40,17 +40,7 @@ public interface MessageHandler
      */
     public String format(Object context, String key);
 
-    /**
-     * Retrieve the message for the specified i18n key within the provided
-     * context.
-     *
-     * @param context
-     * @param key
-     * @param arg
-     *
-     * @return
-     */
-    public String format(Object context, String key, Object arg);
+    public String format(Object context, Locale locale, String key);
 
     /**
      * Retrieve the message for the specified i18n key within the provided
@@ -64,8 +54,11 @@ public interface MessageHandler
      */
     public String format(Object context, String key, Object... args);
 
+    public String format(Object context, Locale locale, String key, Object... args);
+
     /**
      * Clear any cached data held by this message handler.
      */
     public void clear();
+
 }

@@ -9,7 +9,7 @@ import java.util.ResourceBundle;
 
 /**
  * The default implementation of the MessageHandler interface.
- * 
+ *
  */
 public class DefaultMessageHandler implements MessageHandler
 {
@@ -39,22 +39,14 @@ public class DefaultMessageHandler implements MessageHandler
 
     public String format(Object context, String key)
     {
-        for (ResourceBundle bundle : bundleManager.getBundles(context, getLocale()))
-        {
-            String formattedText = formatter.format(bundle, key);
-            if (formattedText != null)
-            {
-                return formattedText;
-            }
-        }
-        return null;
+        return format(context, getLocale(), key);
     }
 
-    public String format(Object context, String key, Object arg)
+    public String format(Object context, Locale locale, String key)
     {
-        for (ResourceBundle bundle : bundleManager.getBundles(context, getLocale()))
+        for (ResourceBundle bundle : bundleManager.getBundles(context, locale))
         {
-            String formattedText = formatter.format(bundle, key, arg);
+            String formattedText = formatter.format(bundle, key);
             if (formattedText != null)
             {
                 return formattedText;
@@ -66,6 +58,19 @@ public class DefaultMessageHandler implements MessageHandler
     public String format(Object context, String key, Object... args)
     {
         for (ResourceBundle bundle : bundleManager.getBundles(context, getLocale()))
+        {
+            String formattedText = formatter.format(bundle, key, args);
+            if (formattedText != null)
+            {
+                return formattedText;
+            }
+        }
+        return null;
+    }
+
+    public String format(Object context, Locale locale, String key, Object... args)
+    {
+        for (ResourceBundle bundle : bundleManager.getBundles(context, locale))
         {
             String formattedText = formatter.format(bundle, key, args);
             if (formattedText != null)

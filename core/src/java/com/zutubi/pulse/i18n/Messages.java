@@ -11,6 +11,7 @@ import com.zutubi.i18n.context.*;
 public class Messages
 {
     private static DefaultMessageHandler handler;
+
     private static StaticPackageContextResolver packages;
 
     private static synchronized MessageHandler getHandler()
@@ -30,29 +31,28 @@ public class Messages
 
     public static String format(Object context, String key)
     {
-        if (!(context instanceof Context))
+        if (context instanceof Context)
         {
-            context = new ClassContext(context);
+            return getHandler().format(context, key);
         }
-        return getHandler().format(context, key);
-    }
-
-    public static String format(Object context, String key, Object arg)
-    {
-        if (!(context instanceof Context))
+        else if (context instanceof String)
         {
-            context = new ClassContext(context);
+            return getHandler().format(new PackageContext(context), key);
         }
-        return getHandler().format(context, key, arg);
+        return getHandler().format(new ClassContext(context), key);
     }
 
     public static String format(Object context, String key, Object... args)
     {
-        if (!(context instanceof Context))
+        if (context instanceof Context)
         {
-            context = new ClassContext(context);
+            return getHandler().format(context, key, args);
         }
-        return getHandler().format(context, key, args);
+        else if (context instanceof String)
+        {
+            return getHandler().format(new PackageContext(context), key, args);
+        }
+        return getHandler().format(new ClassContext(context), key, args);
     }
 
     public void setBundle(String bundleName, String packageName)

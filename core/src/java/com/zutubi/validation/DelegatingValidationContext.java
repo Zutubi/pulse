@@ -1,10 +1,8 @@
 package com.zutubi.validation;
 
 import com.zutubi.validation.i18n.*;
-import com.zutubi.pulse.i18n.MessagesTextProvider;
 
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 import java.util.Collection;
 
@@ -14,21 +12,18 @@ import java.util.Collection;
 public class DelegatingValidationContext implements ValidationContext
 {
     protected ValidationAware validationAware;
-    protected LocaleProvider localeProvider;
     protected TextProvider textProvider;
 
-    public DelegatingValidationContext(ValidationAware validationAware, LocaleProvider localeProvider, TextProvider textProvider)
+    public DelegatingValidationContext(ValidationAware validationAware, TextProvider textProvider)
     {
         this.validationAware = validationAware;
-        this.localeProvider = localeProvider;
         this.textProvider = textProvider;
     }
 
     public DelegatingValidationContext(Object obj)
     {
         validationAware = makeValidationAware(obj);
-        localeProvider = makeLocaleProvider(obj);
-        textProvider = makeTextPovider(obj, localeProvider);
+        textProvider = makeTextPovider(obj);
     }
 
     protected DelegatingValidationContext()
@@ -36,25 +31,13 @@ public class DelegatingValidationContext implements ValidationContext
 
     }
 
-    public LocaleProvider makeLocaleProvider(Object obj)
-    {
-        if (obj instanceof LocaleProvider)
-        {
-            return (LocaleProvider) obj;
-        }
-        return new DefaultLocaleProvider();
-    }
-
-    public TextProvider makeTextPovider(Object obj, LocaleProvider localeProvider)
+    public TextProvider makeTextPovider(Object obj)
     {
         if (obj instanceof TextProvider)
         {
             return (TextProvider) obj;
         }
-        // this is no good.... we need a text provider that behaves in the same way as the
-        // systems text provider, ie our MessageTextProvider... but how do we inject it?
-        return new MessagesTextProvider(obj);
-//        return new DefaultTextProvider(localeProvider);
+        return getTextProvider(obj);
     }
 
     public ValidationAware makeValidationAware(Object o)
@@ -65,9 +48,14 @@ public class DelegatingValidationContext implements ValidationContext
         }
         else if (o instanceof com.opensymphony.xwork.ValidationAware)
         {
-            return new XWorkValidationAwareBridge((com.opensymphony.xwork.ValidationAware)o);
+            return new XWorkValidationAdapter((com.opensymphony.xwork.ValidationAware)o);
         }
         return new ValidationAwareSupport();
+    }
+
+    public TextProvider getTextProvider(Object context)
+    {
+        return textProvider.getTextProvider(context);
     }
 
     public void addActionError(String error)
@@ -143,11 +131,6 @@ public class DelegatingValidationContext implements ValidationContext
     public void setFieldErrors(Map<String, List<String>> errors)
     {
         validationAware.setFieldErrors(errors);
-    }
-
-    public Locale getLocale()
-    {
-        return localeProvider.getLocale();
     }
 
     public String getText(String key)

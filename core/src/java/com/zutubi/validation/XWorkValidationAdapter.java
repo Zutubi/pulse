@@ -9,11 +9,11 @@ import java.util.Map;
 /**
  * <class-comment/>
  */
-public class XWorkValidationAwareBridge implements ValidationAware
+public class XWorkValidationAdapter implements ValidationAware
 {
     private com.opensymphony.xwork.ValidationAware delegate;
 
-    public XWorkValidationAwareBridge(com.opensymphony.xwork.ValidationAware delegate)
+    public XWorkValidationAdapter(com.opensymphony.xwork.ValidationAware delegate)
     {
         this.delegate = delegate;
     }

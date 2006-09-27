@@ -47,4 +47,5 @@ public interface TextProvider
      */
     String getText(String key, String defaultValue, Object... args);
 
+    TextProvider getTextProvider(Object context);
 }

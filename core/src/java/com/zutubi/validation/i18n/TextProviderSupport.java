@@ -34,5 +34,10 @@ public abstract class TextProviderSupport implements TextProvider
         return defaultValue;
     }
 
+    public TextProvider getTextProvider(Object context)
+    {
+        return this;
+    }
+
     protected abstract String lookupText(String key, Object... args);
 }
