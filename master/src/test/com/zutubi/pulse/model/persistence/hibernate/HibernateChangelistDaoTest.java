@@ -4,8 +4,8 @@ import com.zutubi.pulse.core.model.*;
 import com.zutubi.pulse.model.Project;
 import com.zutubi.pulse.model.User;
 import com.zutubi.pulse.model.persistence.ChangelistDao;
+import com.zutubi.pulse.util.Constants;
 
-import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
@@ -32,7 +32,7 @@ public class HibernateChangelistDaoTest extends MasterPersistenceTestCase
 
     public void testLoadSave() throws Exception
     {
-        Date date = Calendar.getInstance().getTime();
+        Date date = new Date(System.currentTimeMillis() - Constants.YEAR);
         CvsRevision revision = new CvsRevision("pulse", "MAIN", "test changelist", date);
         Changelist list = new Changelist("scm", revision);
         Change change = new Change("some/random/file", "23", Change.Action.EDIT);
