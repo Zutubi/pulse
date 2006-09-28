@@ -144,7 +144,7 @@ class PulsePackage:
         if self.packageFile.endswith('.zip'):
             subprocess.call(['unzip', '-qd', destDir, self.packageFile])
         else:
-            subprocess.call(['tar', '-xC', destDir, '-f', self.packageFile])
+            subprocess.call(['tar', '-zxC', destDir, '-f', self.packageFile])
         
         return os.path.join(destDir, self.getBasename())
         

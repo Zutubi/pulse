@@ -129,14 +129,14 @@ public class UpdateCommand implements Runnable
 
     private boolean downloadAndApplyUpdate(MasterService masterService, File pulseHome, File versionDir) throws IOException
     {
-        File tempDir = new File(configurationManager.getSystemPaths().getTmpRoot(), RandomUtils.randomString(10));
+        File tempDir = new File(configurationManager.getSystemPaths().getTmpRoot(), RandomUtils.randomString(3));
         tempDir.mkdirs();
 
         try
         {
             URL packageUrl = new URL(url);
             File packageFile = new File(tempDir, build + ".zip");
-            File unpackDir = new File(tempDir, "unpack");
+            File unpackDir = new File(tempDir, "un");
 
             sendMessage(masterService, UpgradeState.DOWNLOADING);
             IOUtils.downloadFile(packageUrl, packageFile);

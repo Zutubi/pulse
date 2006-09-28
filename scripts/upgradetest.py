@@ -31,7 +31,7 @@ def removeDir(dead):
         
         
 def createTestDir():
-    name = 'agent-upgrade-test'
+    name = 'upgradetest'
     if os.path.exists(name):
         removeDir(name)
     os.makedirs(name)
@@ -47,7 +47,11 @@ def unpackAndStart(packageFile, unpackDir, port, service):
 
 
 def setupMaster(port):
-    ret = subprocess.call(['ant', '-Dmaster.port=' + str(port), 'setup.master'])
+    if WINDOWS:
+        ant = 'ant.bat'
+    else:
+        ant = 'ant'
+    ret = subprocess.call([ant, '-Dmaster.port=' + str(port), 'setup.master'])
     if ret != 0:
         raise Exception('Master setup failed')
     
@@ -99,7 +103,7 @@ def upgradeTest(version, build, service):
     if not os.path.isfile(masterPackageFile):
         raise Exception('Master package file "' + masterPackageFile + '" does not exist')
 
-    oldAgentPackageFile = os.path.join('master', 'src', 'acceptance', 'data', 'pulse-agent-1.1.999.zip')
+    oldAgentPackageFile = os.path.join('master', 'src', 'acceptance', 'data', 'pulse-agent-1.1.999.tar.gz')
     if not os.path.isfile(oldAgentPackageFile):
         raise Exception('Old agent package "' + oldAgentPackageFile + '" does not exist')
 
