@@ -272,9 +272,9 @@ public class ProjectWizardAcceptanceTest extends BaseAcceptanceTestCase
 
         assertTablePresent("project.triggers");
         assertTableRowsEqual("project.triggers", 1, new String[][]{
-                new String[]{"name", "type", "build specification", "actions", "actions"},
-                new String[]{"scm trigger", "event", "default", "edit", "delete"},
-                new String[]{"add new trigger", "add new trigger", "add new trigger", "add new trigger", "add new trigger"}
+                new String[]{"name", "type", "build specification", "state", "actions", "actions", "actions"},
+                new String[]{"scm trigger", "event", "default", "enabled", "disable", "edit", "delete"},
+                new String[]{"add new trigger", "add new trigger", "add new trigger", "add new trigger", "add new trigger", "add new trigger", "add new trigger"}
         });
     }
 
