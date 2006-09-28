@@ -143,16 +143,29 @@ def upgradeTest(version, build, service):
 
 if __name__ == "__main__":
     if len(sys.argv) < 3:
-        print >> sys.stderr, "Usage: %s <version> <build number> [ service ]" % sys.argv[0]
+        print >> sys.stderr, "Usage: %s <version> <build number> [ both | service ]" % sys.argv[0]
         sys.exit(1)
         
-    service = False
-    if len(sys.argv) > 3 and sys.argv[3] == "service":
-        log('Running as a service')
-        service = True
+    serviceValues = [ False ]
+    if len(sys.argv) > 3:
+        if sys.argv[3] == "both":
+            if not WINDOWS:
+                serviceValues = [ False, True ]
+        elif sys.argv[3] == "service":
+            serviceValues = [ True ]
        
     rootDir = getRoot(sys.argv[0])
     os.chdir(rootDir)
     version = sys.argv[1]
     build = int(sys.argv[2])
-    upgradeTest(version, build, service)
+
+    for service in serviceValues:
+        log("================================================================")
+        log("Running agent upgrade test (service = " + str(service) + ")")
+        log("================================================================")
+        upgradeTest(version, build, service)
+        log("================================================================")
+
+    log("Agent upgrade test PASSED.")
+    sys.exit(0)
+    

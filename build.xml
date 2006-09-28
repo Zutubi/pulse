@@ -427,8 +427,16 @@
         </exec>
         <fail message="One or more acceptance tests failed.  See the reports (${report.dir}) for details."
               if="test.failed"/>
+              
+        <antcall target="test.agent.upgrade"/>
     </target>
 
+    <target name="test.agent.upgrade">
+        <exec executable="python" failonerror="true">
+            <arg line="scripts/upgradetest.py ${pulse.version} ${pulse.build} both"/>
+        </exec>
+    </target>
+    
     <target name="setup.master" depends="init">
         <property name="build.dir" value="master/build"/>
         <junit>
