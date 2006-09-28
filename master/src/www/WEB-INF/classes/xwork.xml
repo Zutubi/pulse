@@ -468,6 +468,11 @@
             <result name="error" type="velocity">generic-error.vm</result>
         </action>
 
+        <action name="toggleTrigger" class="com.zutubi.pulse.web.project.ToggleTriggerAction">
+            <result name="success" type="redirect">/configureProject.action?id=${projectId}</result>
+            <result name="error" type="velocity">generic-error.vm</result>
+        </action>
+
         <!-- Alias is required as WW can't chain to a non-execute method :| -->
         <action name="editCronTrigger!input" class="com.zutubi.pulse.web.project.EditCronTriggerAction" method="doInput">
             <interceptor-ref name="crudStack"/>
