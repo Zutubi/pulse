@@ -5,6 +5,7 @@ import socket
 import subprocess
 import sys
 import time
+import xmlrpclib
 
 
 WINDOWS = os.name == "nt"
@@ -14,7 +15,7 @@ def getScript(name):
     if WINDOWS:
         return name + ".bat"
     else:
-        return "./" + name + "sh"
+        return "./" + name + ".sh"
     
 
 class Pulse:
@@ -22,19 +23,38 @@ class Pulse:
         self.baseDir = os.path.abspath(baseDir)
         self.port = port
         
-    def start(self, wait=True):
+    
+    def getEnv(self):
+        return {'PULSE_CONFIG': os.path.join(self.baseDir, 'bin', 'config.properties'), 'PULSE_HOME': self.baseDir, 'PULSE_USER': os.getenv('USERNAME'), 'USERNAME': os.getenv('USERNAME'), 'PULSE_PID': os.path.join(self.baseDir, 'pulse.pid'), 'JAVA_HOME': os.getenv('JAVA_HOME')}
+    
+    
+    def start(self, wait=True, service=False):
         """Starts this pulse server.  A local properties file
         is used, output is captured to baseDir/stdout.txt and baseDir/stderr.txt.
         If wait is True, this function will wait for Pulse to start listening on the
         given port before returning.  If the server cannot be started successfully,
         an exception is thrown carrying the reason."""
+        oldDir = os.getcwdu()
         os.chdir(os.path.join(self.baseDir, 'bin'))
-        self.stdout = open('stdout.txt', 'w')
-        self.stderr = open('stderr.txt', 'w')
-        self.pop = subprocess.Popen([getScript('startup'), '-p', str(self.port), '-f', 'config.properties'], stdout=self.stdout, stderr=self.stderr, shell=False)
-        if wait:
-            if not self.waitFor():
-                raise Exception('Timed out waiting for server to start')
+        try:
+            if service:
+                configFile = open('config.properties', 'w')
+                configFile.writelines(['webapp.port=%d\n' % self.port])
+                configFile.close()
+                ret = subprocess.call(['init.sh', 'start'], env=self.getEnv())
+                if ret != 0:
+                    raise Exception('init script exited with code %d' % ret)
+                self.pop = True
+            else:
+                self.stdout = open('stdout.txt', 'w')
+                self.stderr = open('stderr.txt', 'w')
+                self.pop = subprocess.Popen([getScript('startup'), '-p', str(self.port), '-f', 'config.properties'], stdout=self.stdout, stderr=self.stderr)
+            
+            if wait:
+                if not self.waitFor():
+                    raise Exception('Timed out waiting for server to start')
+        finally:
+            os.chdir(oldDir)
     
     
     def waitFor(self, timeout=60):
@@ -54,33 +74,97 @@ class Pulse:
                 time.sleep(1)
         
         return False
+        
+        
+    def cleanup(self, service=False):
+        ret = 0
+        if self.pop is not None:
+            oldDir = os.getcwdu()
+            os.chdir(os.path.join(self.baseDir, 'bin'))
+            try:
+                if service:
+                    ret = subprocess.call(['init.sh', 'stop'], env=self.getEnv())
+                    self.pop=None
+                else:
+                    ret = subprocess.call([getScript('shutdown'), '-p', str(self.port), '-f', 'config.properties'])
+            finally:
+                os.chdir(oldDir)
+        
+        return ret
     
     
-    def stop(self, timeout=60):
+    def stop(self, timeout=60, service=False):
         """Stops this running pulse server using a shutdown script.  Failure for
         the process to exit in the given timeout (in seconds) will result in an
         exception being thrown."""
-        os.chdir(os.path.join(self.baseDir, 'bin'))
-        ret = subprocess.call([getScript('shutdown'), '-p', str(self.port), '-f', 'config.properties'], shell=WINDOWS)
+        ret = self.cleanup(service)
         if ret != 0:
             raise Exception('Shutdown scripted exited with code ' + str(ret))
-        endTime = time.time() + timeout
-        while time.time() < endTime:
-            ret = self.pop.poll()
-            if ret is None:
-                time.sleep(1)
-            else:
-                self.stdout.close()
-                self.stderr.close()
-                return
-        raise Exception('Timed out waiting for pulse process "' + str(self.pop.pid) + '" to exit')
+        if not service:
+            endTime = time.time() + timeout
+            while time.time() < endTime:
+                ret = self.pop.poll()
+                if ret is None:
+                    time.sleep(1)
+                else:
+                    self.stdout.close()
+                    self.stderr.close()
+                    self.pop = None
+                    return
+            raise Exception('Timed out waiting for pulse process "' + str(self.pop.pid) + '" to exit')
+    
+    
+    def getAdminToken(self):
+        activeFilename = os.path.join(self.baseDir, 'active-version.txt')
+        activeFile = open(activeFilename)
+        activeVersion = activeFile.read()
+        activeFile.close()
+        versionDir = os.path.join(self.baseDir, 'versions', activeVersion)
+        tokenFilename = os.path.join(versionDir, 'system', 'config', 'admin.token')
+        tokenFile = open(tokenFilename)
+        token = tokenFile.read()
+        tokenFile.close()
+        return token
+        
+        
+    def getServerProxy(self):
+        return xmlrpclib.ServerProxy('http://localhost:' + str(self.port) + '/xmlrpc')
+        
+        
 
+class PulsePackage:
+    def __init__(self, packageFile):
+        self.packageFile = packageFile
+    
+    
+    def extractTo(self, destDir):
+        if not os.path.exists(destDir):
+            os.makedirs(destDir)
+        
+        if self.packageFile.endswith('.zip'):
+            subprocess.call(['unzip', '-qd', destDir, self.packageFile])
+        else:
+            subprocess.call(['tar', '-xC', destDir, '-f', self.packageFile])
+        
+        return os.path.join(destDir, self.getBasename())
+        
+        
+    def getFilename(self):
+        return os.path.split(self.packageFile)[1]
+        
+        
+    def getBasename(self):
+        f = self.getFilename()
+        max = 1
+        if f.endswith(".tar.gz"):
+            # Evil two part extensions be damned!
+            max = 2
+            
+        return f.rsplit(".", max)[0]
 
 
 if __name__ == "__main__":
-    if len(sys.argv) > 0:
-        p = Pulse(sys.argv[1], 8745)
-        p.start()
-        print "It is running!"
-        time.sleep(20)
-        p.stop()
+    if len(sys.argv) > 1:
+        p = PulsePackage(sys.argv[1])
+        p.extractTo(sys.argv[2])
+

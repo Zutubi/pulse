@@ -8,6 +8,8 @@ import com.zutubi.pulse.core.Stoppable;
 import com.zutubi.pulse.events.*;
 import com.zutubi.pulse.events.EventListener;
 import com.zutubi.pulse.license.LicenseManager;
+import com.zutubi.pulse.license.LicenseException;
+import com.zutubi.pulse.license.LicenseHolder;
 import com.zutubi.pulse.license.authorisation.AddAgentAuthorisation;
 import com.zutubi.pulse.logging.ServerMessagesHandler;
 import com.zutubi.pulse.model.NamedEntityComparator;
@@ -125,6 +127,13 @@ public class DefaultAgentManager implements AgentManager, EventListener, Stoppab
     public int getAgentCount()
     {
         return slaveAgents.size() + 1;
+    }
+
+    public void addSlave(Slave slave) throws LicenseException
+    {
+        LicenseHolder.ensureAuthorization(LicenseHolder.AUTH_ADD_AGENT);
+        slaveManager.save(slave);
+        slaveAdded(slave.getId());
     }
 
     private void pingSlave(SlaveAgent agent)
@@ -432,6 +441,29 @@ public class DefaultAgentManager implements AgentManager, EventListener, Stoppab
         {
             updatersLock.unlock();
         }
+    }
+
+    public boolean agentExists(String name)
+    {
+        return getAgent(name) != null;
+    }
+
+    public Agent getAgent(String name)
+    {
+        if(masterAgent.getName().equals(name))
+        {
+            return masterAgent;
+        }
+
+        for(SlaveAgent s: slaveAgents.values())
+        {
+            if(s.getName().equals(name))
+            {
+                return s;
+            }
+        }
+
+        return null;
     }
 
     private void removeSlaveAgent(long id)

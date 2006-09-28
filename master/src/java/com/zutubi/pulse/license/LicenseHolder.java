@@ -8,6 +8,8 @@ import java.util.LinkedList;
  */
 public class LicenseHolder
 {
+    public static final String AUTH_ADD_AGENT = "canAddAgent";
+
     private static License license;
 
     private static List<String> authorisations = new LinkedList<String>();
@@ -27,6 +29,14 @@ public class LicenseHolder
         return authorisations.contains(auth);
     }
 
+    public static synchronized void ensureAuthorization(String auth) throws LicenseException
+    {
+        if(!hasAuthorization(auth))
+        {
+            throw new LicenseException();
+        }
+    }
+    
     public static synchronized void setAuthorizations(List<String> authorisations)
     {
         LicenseHolder.authorisations = authorisations;

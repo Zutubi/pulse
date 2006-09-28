@@ -483,6 +483,7 @@ public class FileSystemUtils
             os = new FileOutputStream(file);
             ow = new OutputStreamWriter(os);
             ow.write(data);
+            ow.flush();
         }
         finally
         {

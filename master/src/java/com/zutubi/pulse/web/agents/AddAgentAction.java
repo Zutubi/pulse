@@ -5,17 +5,18 @@ import com.zutubi.pulse.model.Slave;
 import com.zutubi.pulse.model.SlaveManager;
 import com.zutubi.pulse.web.ActionSupport;
 import com.zutubi.pulse.license.Licensed;
+import com.zutubi.pulse.license.LicenseHolder;
+import com.zutubi.pulse.license.LicenseException;
 
 /**
  * 
  *
  */
-@Licensed("canAddAgent")
+@Licensed(LicenseHolder.AUTH_ADD_AGENT)
 public class AddAgentAction extends ActionSupport
 {
     private Slave slave = new Slave();
     private AgentManager agentManager;
-    private SlaveManager slaveManager;
 
     public Slave getSlave()
     {
@@ -31,17 +32,16 @@ public class AddAgentAction extends ActionSupport
             return;
         }
 
-        if (slave.getName().equals("master") || slaveManager.getSlave(slave.getName()) != null)
+        if (agentManager.agentExists(slave.getName()))
         {
             // slave name already in use.
             addFieldError("slave.name", "An agent with name '" + slave.getName() + "' already exists.");
         }
     }
 
-    public String execute()
+    public String execute() throws LicenseException
     {
-        slaveManager.save(slave);
-        agentManager.slaveAdded(slave.getId());
+        agentManager.addSlave(slave);
         return SUCCESS;
     }
 
@@ -49,11 +49,6 @@ public class AddAgentAction extends ActionSupport
     {
         // setup any default data.
         return SUCCESS;
-    }
-
-    public void setSlaveManager(SlaveManager slaveManager)
-    {
-        this.slaveManager = slaveManager;
     }
 
     public void setAgentManager(AgentManager agentManager)

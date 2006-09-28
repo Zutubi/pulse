@@ -429,6 +429,27 @@
               if="test.failed"/>
     </target>
 
+    <target name="setup.master" depends="init">
+        <property name="build.dir" value="master/build"/>
+        <junit>
+            <sysproperty key="pulse.port" value="${master.port}"/>
+            <sysproperty key="bootstrap" value="com/zutubi/pulse/bootstrap/bootstrapContext.xml"/>
+            <classpath>
+                <pathelement location="${build.dir}/classes"/>
+                <pathelement location="${build.dir}/test.classes"/>
+                <pathelement location="${build.dir}/accept.classes"/>
+                <fileset dir="${build.dir}/lib">
+                    <include name="**/*.jar"/>
+                </fileset>
+            </classpath>
+            <batchtest todir="fubar">
+                <fileset dir="master/src/acceptance">
+                    <include name="**/SetupAcceptanceTest.java"/>
+                </fileset>
+            </batchtest>
+        </junit>
+    </target>
+    
     <target name="init">
         <property name="project.root.dir" value="."/>
         <property name="project.repository" value="${project.root.dir}/build/repository"/>

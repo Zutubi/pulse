@@ -4,6 +4,7 @@ import com.zutubi.pulse.api.AuthenticationException;
 import com.zutubi.pulse.api.AdminTokenManager;
 import com.zutubi.pulse.bootstrap.ComponentContext;
 import com.zutubi.pulse.ShutdownManager;
+import com.zutubi.pulse.Version;
 
 /**
  */
@@ -21,32 +22,32 @@ public class RemoteApi
     {
         // Sigh ... this is tricky, because if we shutdown here Jetty dies
         // before this request is complete and the client gets an error :-|.
-        if(tokenManager.checkAdminToken(token))
-        {
-            shutdownManager.delayedShutdown(force, exitJvm);
-        }
-        else
-        {
-            throw new AuthenticationException("Invalid token");
-        }
-
+        checkToken(token);
+        shutdownManager.delayedShutdown(force, exitJvm);
         return true;
     }
 
     public boolean stopService(String token) throws AuthenticationException
     {
-        if(tokenManager.checkAdminToken(token))
-        {
-            shutdownManager.delayedStop();
-        }
-        else
+        checkToken(token);
+        shutdownManager.delayedStop();
+        return true;
+    }
+
+    public int getBuildNumber(String token) throws AuthenticationException
+    {
+        checkToken(token);
+        return Version.getVersion().getBuildNumberAsInt();
+    }
+
+    private void checkToken(String token) throws AuthenticationException
+    {
+        if(!tokenManager.checkAdminToken(token))
         {
             throw new AuthenticationException("Invalid token");
         }
 
-        return true;
     }
-
     public void setTokenManager(AdminTokenManager tokenManager)
     {
         this.tokenManager = tokenManager;

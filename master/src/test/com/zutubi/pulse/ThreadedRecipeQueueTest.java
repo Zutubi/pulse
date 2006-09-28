@@ -842,6 +842,16 @@ public class ThreadedRecipeQueueTest extends TestCase implements EventListener
             throw new RuntimeException("Method not implemented.");
         }
 
+        public boolean agentExists(String name)
+        {
+            throw new RuntimeException("Method not implemented.");
+        }
+
+        public Agent getAgent(String name)
+        {
+            throw new RuntimeException("Method not implemented.");
+        }
+
         public void addSlave(Slave slave)
         {
             SlaveAgent agent = new SlaveAgent(slave, null, null, new MockBuildService(slave.getId()));
