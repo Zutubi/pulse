@@ -91,7 +91,12 @@ public class SlaveBuildService implements BuildService
             // We don't want the system to see partially-unzipped directories,
             // so we unzip to a temporary location and rename as the final
             // step.
-            tempDir = FileSystemUtils.createTempDirectory();
+            tempDir = new File(destination.getAbsolutePath() + ".tmp");
+            if(!tempDir.mkdirs())
+            {
+                tempDir = null;
+                throw new BuildException("Unable to create temporary directory '" + tempDir.getAbsolutePath() + "'");
+            }
 
             URL resultUrl = new URL("http", slave.getHost(), slave.getPort(), "/download?token=" + serviceTokenManager.getToken() + "&project=" + UrlEncoded.encodeString(project) + "&spec=" + UrlEncoded.encodeString(spec) + "&incremental=" + incremental + "&output=" + output + "&recipe=" + recipeId);
             URLConnection urlConnection = resultUrl.openConnection();
