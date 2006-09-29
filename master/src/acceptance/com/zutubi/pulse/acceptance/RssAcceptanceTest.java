@@ -1,16 +1,16 @@
 package com.zutubi.pulse.acceptance;
 
-import com.zutubi.pulse.util.RandomUtils;
-import com.zutubi.pulse.acceptance.forms.GeneralConfigurationForm;
 import com.sun.syndication.feed.synd.SyndFeed;
+import com.sun.syndication.io.FeedException;
 import com.sun.syndication.io.SyndFeedInput;
 import com.sun.syndication.io.XmlReader;
-import com.sun.syndication.io.FeedException;
+import com.zutubi.pulse.acceptance.forms.GeneralConfigurationForm;
+import com.zutubi.pulse.util.RandomUtils;
 
-import java.io.ByteArrayOutputStream;
-import java.io.PrintStream;
 import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.PrintStream;
 
 /**
  * <class-comment/>
@@ -88,7 +88,7 @@ public class RssAcceptanceTest extends BaseAcceptanceTestCase
         clickLinkWithText("Administration");
         clickLink("general.edit");
         GeneralConfigurationForm form = new GeneralConfigurationForm(tester);
-        form.saveFormElements(null, null, "true", null, "5");
+        form.saveFormElements(null, null, "true", null, "5", null, null);
     }
 
     private SyndFeed readResponseAsFeed() throws FeedException, IOException

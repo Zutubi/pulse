@@ -25,7 +25,7 @@ public class AnonymousAccessAcceptanceTest extends BaseAcceptanceTestCase
 
         GeneralConfigurationForm form = new GeneralConfigurationForm(tester);
         form.assertFormPresent();
-        form.saveFormElements(null, null, null, "true", "5");
+        form.saveFormElements(null, null, null, "true", "5", null, null);
 
         clickLink("logout");
         assertLinkPresent("tab.projects");
@@ -36,7 +36,7 @@ public class AnonymousAccessAcceptanceTest extends BaseAcceptanceTestCase
         clickLink("general.edit");
 
         form.assertFormPresent();
-        form.saveFormElements(null, null, null, "false", "5");
+        form.saveFormElements(null, null, null, "false", "5", null, null);
         clickLink("logout");
 
         LoginForm login = new LoginForm(tester);
