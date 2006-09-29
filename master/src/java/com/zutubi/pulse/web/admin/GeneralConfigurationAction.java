@@ -1,8 +1,10 @@
 package com.zutubi.pulse.web.admin;
 
 import com.zutubi.pulse.GuestAccessManager;
+import com.zutubi.pulse.ThreadedRecipeQueue;
 import com.zutubi.pulse.bootstrap.MasterConfiguration;
 import com.zutubi.pulse.bootstrap.MasterConfigurationManager;
+import com.zutubi.pulse.util.Constants;
 import com.zutubi.pulse.web.ActionSupport;
 
 /**
@@ -18,6 +20,9 @@ public class GeneralConfigurationAction extends ActionSupport
     private boolean rssEnabled;
     private boolean anonEnabled;
     private Integer scmPollingInterval;
+    private boolean recipeTimeoutEnabled;
+    private Long recipeTimeout;
+    private ThreadedRecipeQueue recipeQueue;
 
     public String doReset()
     {
@@ -98,6 +103,26 @@ public class GeneralConfigurationAction extends ActionSupport
         this.scmPollingInterval = scmPollingInterval;
     }
 
+    public boolean isRecipeTimeoutEnabled()
+    {
+        return recipeTimeoutEnabled;
+    }
+
+    public void setRecipeTimeoutEnabled(boolean recipeTimeoutEnabled)
+    {
+        this.recipeTimeoutEnabled = recipeTimeoutEnabled;
+    }
+
+    public Long getRecipeTimeout()
+    {
+        return recipeTimeout;
+    }
+
+    public void setRecipeTimeout(Long recipeTimeout)
+    {
+        this.recipeTimeout = recipeTimeout;
+    }
+
     private void resetConfig()
     {
         MasterConfiguration config = configurationManager.getAppConfig();
@@ -106,7 +131,9 @@ public class GeneralConfigurationAction extends ActionSupport
         config.setRssEnabled(null);
         config.setAnonymousAccessEnabled(null);
         config.setScmPollingInterval(null);
-        guestAccessManager.init();
+        config.setUnsatisfiableRecipeTimeout(null);
+
+        postChange(config);
     }
 
     private void saveConfig()
@@ -117,6 +144,27 @@ public class GeneralConfigurationAction extends ActionSupport
         config.setRssEnabled(rssEnabled);
         config.setAnonymousAccessEnabled(anonEnabled);
         config.setScmPollingInterval(scmPollingInterval);
+
+        if(recipeTimeoutEnabled)
+        {
+            config.setUnsatisfiableRecipeTimeout(recipeTimeout);
+        }
+        else
+        {
+            config.setUnsatisfiableRecipeTimeout((long) -1);
+        }
+
+        postChange(config);
+    }
+
+    private void postChange(MasterConfiguration config)
+    {
+        long timeout = config.getUnsatisfiableRecipeTimeout();
+        if(timeout > 0)
+        {
+            timeout *= Constants.MINUTE;
+        }
+        recipeQueue.setUnsatisfiableTimeout(timeout);
         guestAccessManager.init();
     }
 
@@ -128,6 +176,36 @@ public class GeneralConfigurationAction extends ActionSupport
         rssEnabled = config.getRssEnabled();
         anonEnabled = config.getAnonymousAccessEnabled();
         scmPollingInterval = config.getScmPollingInterval();
+
+        long timeout = config.getUnsatisfiableRecipeTimeout();
+        if(timeout >= 0)
+        {
+            recipeTimeout = timeout;
+            recipeTimeoutEnabled = true;
+        }
+        else
+        {
+            recipeTimeout = MasterConfiguration.UNSATISFIABLE_RECIPE_TIMEOUT_DEFAULT;
+            recipeTimeoutEnabled = false;
+        }
+    }
+
+    public void validate()
+    {
+        if(recipeTimeoutEnabled)
+        {
+            if(recipeTimeout == null)
+            {
+                addFieldError("recipeTimeout", getText("recipe.queue.timeout.required"));
+            }
+            else
+            {
+                if (recipeTimeout < 0)
+                {
+                    addFieldError("recipeTimeout", getText("recipe.queue.timeout.invalid"));
+                }
+            }
+        }
     }
 
     /**
@@ -143,5 +221,10 @@ public class GeneralConfigurationAction extends ActionSupport
     public void setGuestAccessManager(GuestAccessManager guestAccessManager)
     {
         this.guestAccessManager = guestAccessManager;
+    }
+
+    public void setRecipeQueue(ThreadedRecipeQueue recipeQueue)
+    {
+        this.recipeQueue = recipeQueue;
     }
 }

@@ -1,5 +1,6 @@
 package com.zutubi.pulse.web.admin;
 
+import com.zutubi.pulse.agent.AgentManager;
 import com.zutubi.pulse.bootstrap.MasterConfiguration;
 import com.zutubi.pulse.bootstrap.MasterConfigurationManager;
 import com.zutubi.pulse.jabber.JabberManager;
@@ -10,13 +11,12 @@ import com.zutubi.pulse.model.ProjectManager;
 import com.zutubi.pulse.model.UserManager;
 import com.zutubi.pulse.security.ldap.LdapManager;
 import com.zutubi.pulse.web.ActionSupport;
-import com.zutubi.pulse.agent.AgentManager;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
-import java.util.List;
 import java.util.LinkedList;
+import java.util.List;
 
 /**
  */
@@ -54,6 +54,11 @@ public class ServerSettingsAction extends ActionSupport
     public List<CommitMessageTransformer> getCommitMessageTransformers()
     {
         return commitMessageTransformers;
+    }
+
+    public boolean isRecipeTimeoutEnabled()
+    {
+        return config.getUnsatisfiableRecipeTimeout() >= 0;
     }
 
     public String execute() throws Exception

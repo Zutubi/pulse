@@ -329,4 +329,14 @@ public class MasterConfigurationSupport extends ConfigSupport implements MasterC
     {
         setInteger(SCM_POLLING_INTERVAL, interval);
     }
+
+    public long getUnsatisfiableRecipeTimeout()
+    {
+        return getLong(UNSATISFIABLE_RECIPE_TIMEOUT, UNSATISFIABLE_RECIPE_TIMEOUT_DEFAULT);
+    }
+
+    public void setUnsatisfiableRecipeTimeout(Long timeout)
+    {
+        setLong(UNSATISFIABLE_RECIPE_TIMEOUT, timeout);
+    }
 }

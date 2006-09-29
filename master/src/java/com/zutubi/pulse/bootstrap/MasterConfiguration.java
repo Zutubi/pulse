@@ -18,6 +18,10 @@ public interface MasterConfiguration extends LogConfiguration
     //---( help configuration )---
     public static final String HELP_URL = "help.url";
 
+    //---( queue configuration )---
+    public static final String UNSATISFIABLE_RECIPE_TIMEOUT = "unsatisfiable.recipe.timeout";
+    public static final long UNSATISFIABLE_RECIPE_TIMEOUT_DEFAULT = 15;
+
     //---( mail configuration )---
 
     public static final String SMTP_HOST = "mail.smtp.host";
@@ -164,4 +168,8 @@ public interface MasterConfiguration extends LogConfiguration
     Integer getScmPollingInterval();
 
     void setScmPollingInterval(Integer interval);
+
+    long getUnsatisfiableRecipeTimeout();
+
+    void setUnsatisfiableRecipeTimeout(Long timeout);
 }

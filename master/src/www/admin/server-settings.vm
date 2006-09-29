@@ -20,6 +20,12 @@
                     #enabledDisabledRow("general.rss.enabled" $config.rssEnabled)
                     #enabledDisabledRow("general.anonymous" $config.anonymousAccessEnabled)
                     #dynamicRow("scm.polling.interval" $config.scmPollingInterval)
+                    #if($recipeTimeoutEnabled)
+                        #set($timeoutValue = $action.getText('recipe.queue.timeout.value', [$config.unsatisfiableRecipeTimeout]))
+                    #else
+                        #set($timeoutValue = $action.getText('recipe.queue.timeout.never'))
+                    #end
+                    #dynamicRow("recipe.queue.timeout" $timeoutValue)
                 </table>
 
                 <table id="commit.message.links" class="fill-content">
