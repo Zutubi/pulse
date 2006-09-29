@@ -23,5 +23,5 @@ public interface NotificationSchemeManager
      *
      * @see #getNotificationSchemes() for the list of available schemes.
      */
-    NotificationHandler getNotificationHandler(String scheme);
+    Class<? extends NotificationHandler> getNotificationHandler(String scheme);
 }

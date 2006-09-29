@@ -1,19 +1,35 @@
 package com.zutubi.pulse.notifications;
 
 import java.util.List;
+import java.util.Map;
+import java.util.HashMap;
+import java.util.LinkedList;
 
 /**
  * <class-comment/>
  */
 public class DefaultNotificationSchemeManager implements NotificationSchemeManager
 {
-    public List<String> getNotificationSchemes()
+    private Map<String, Class<? extends NotificationHandler>> handlers = new HashMap<String, Class<? extends NotificationHandler>>();
+
+    public DefaultNotificationSchemeManager()
     {
-        return null;
     }
 
-    public NotificationHandler getNotificationHandler(String scheme)
+    public void init()
     {
-        return null;
+        // initialise the default handlers
+        handlers.put("email", EmailNotificationHandler.class);
+        handlers.put("jabber", JabberNotificationHandler.class);
+    }
+
+    public List<String> getNotificationSchemes()
+    {
+        return new LinkedList(handlers.keySet());
+    }
+
+    public Class<? extends NotificationHandler> getNotificationHandler(String scheme)
+    {
+        return handlers.get(scheme);
     }
 }

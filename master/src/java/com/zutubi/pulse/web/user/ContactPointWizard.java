@@ -6,7 +6,10 @@ import com.zutubi.pulse.form.descriptor.*;
 import com.zutubi.pulse.form.ui.FormSupport;
 import com.zutubi.pulse.notifications.EmailNotificationHandler;
 import com.zutubi.pulse.notifications.JabberNotificationHandler;
+import com.zutubi.pulse.notifications.NotificationSchemeManager;
+import com.zutubi.pulse.notifications.NotificationHandler;
 import com.zutubi.pulse.validation.MessagesTextProvider;
+import com.zutubi.pulse.core.ObjectFactory;
 import com.zutubi.validation.*;
 import com.opensymphony.xwork.Validateable;
 
@@ -28,27 +31,53 @@ public class ContactPointWizard extends BaseWizard
 
     private WizardCompleteState complete;
 
-    private PluginContactState email;
-
-    private PluginContactState jabber;
-
     private DescriptorFactory descriptorFactory;
 
     private ValidationManager validationManager;
 
     private Configuration configuration;
 
+    private NotificationSchemeManager schemeManager;
+
+    private ObjectFactory objectFactory;
+
+    public void setNotificationSchemeManager(NotificationSchemeManager schemeManager)
+    {
+        this.schemeManager = schemeManager;
+    }
+
+    public void setObjectFactory(ObjectFactory objectFactory)
+    {
+        this.objectFactory = objectFactory;
+    }
+
     public ContactPointWizard()
     {
-        select = new SelectContactState(this, "select");
-        email = new PluginContactState(this, "email", new EmailNotificationHandler());
-        jabber = new PluginContactState(this, "jabber", new JabberNotificationHandler());
-        complete = new WizardCompleteState(this, "success");
+    }
 
+    public void initialise()
+    {
+        select = new SelectContactState(this, "select");
         addInitialState("select", select);
-        addState(email);
-        addState(jabber);
+
+        for (String scheme : schemeManager.getNotificationSchemes())
+        {
+            try
+            {
+                Class handlerClass = schemeManager.getNotificationHandler(scheme);
+                Object handler = objectFactory.buildBean(handlerClass);
+                addState(new PluginContactState(this, scheme, handler));
+            }
+            catch (Exception e)
+            {
+                e.printStackTrace();
+            }
+        }
+
+        complete = new WizardCompleteState(this, "success");
         addFinalState("success", complete);
+
+        super.initialise();
     }
 
     /**
@@ -96,14 +125,13 @@ public class ContactPointWizard extends BaseWizard
         // handle the creation of the contact point.
         User user = userManager.getUser(userId);
         ContactPoint contact = null;
-        if (select.getContact().equals("jabber"))
-        {
-//            contact = jabber.getContact();
-        }
-        else if (select.getContact().equals("email"))
-        {
-//            contact = email.getContact();
-        }
+
+        WizardState state = getState(select.getContact());
+        NotificationHandler handler = (NotificationHandler) ((PluginContactState)state).getSubject();
+
+        // new contact point.
+        // set handler ObjectHandle.
+
         user.add(contact);
         userManager.save(user);
     }
@@ -157,6 +185,11 @@ public class ContactPointWizard extends BaseWizard
             super(wizard, name);
 
             this.subject = obj;
+        }
+
+        public Object getSubject()
+        {
+            return subject;
         }
 
         public String getNextStateName()

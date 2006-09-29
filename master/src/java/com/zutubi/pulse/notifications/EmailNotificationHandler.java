@@ -11,7 +11,7 @@ import java.util.LinkedList;
  * <class-comment/>
  */
 @Form(fieldOrder = {"name", "email", "format"})
-public class EmailNotificationHandler
+public class EmailNotificationHandler implements NotificationHandler
 {
     private String email;
     private String format = "html";

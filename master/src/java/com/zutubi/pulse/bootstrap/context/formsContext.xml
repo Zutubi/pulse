@@ -31,4 +31,6 @@
     <bean id="annotationValidatorProvider" class="com.zutubi.validation.providers.AnnotationValidatorProvider"/>
     <bean id="reflectionValidatorProvider" class="com.zutubi.validation.providers.ReflectionValidatorProvider"/>
 
+    <bean id="notificationSchemeManager" class="com.zutubi.pulse.notifications.DefaultNotificationSchemeManager" init-method="init"/>
+
 </beans>

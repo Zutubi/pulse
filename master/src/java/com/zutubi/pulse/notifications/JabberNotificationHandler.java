@@ -8,7 +8,7 @@ import com.zutubi.pulse.form.descriptor.annotation.Field;
  * <class-comment/>
  */
 @Form(fieldOrder = {"name", "username"})
-public class JabberNotificationHandler
+public class JabberNotificationHandler implements NotificationHandler
 {
     private String name;
     private String username;
