@@ -10,6 +10,11 @@ public class AnonymousAccessAcceptanceTest extends BaseAcceptanceTestCase
     public void testDisabledByDefault()
     {
         beginAt("/");
+        if(tester.getDialog().isLinkPresent("logout"))
+        {
+            clickLink("logout");
+        }
+        
         LoginForm form = new LoginForm(tester);
         form.assertFormPresent();
     }
