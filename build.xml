@@ -397,7 +397,7 @@
             <arg line="acceptance-test-wait.sh"/>
         </exec>
 
-        <junit printsummary="yes" fork="on" failureProperty="test.failed" errorProperty="test.failed">
+        <junit printsummary="yes" fork="on" forkmode="once" maxmemory="512m" failureProperty="test.failed" errorProperty="test.failed">
             <sysproperty key="pulse.port" value="8889"/>
             <sysproperty key="bootstrap" value="com/zutubi/pulse/bootstrap/bootstrapContext.xml"/>
             <classpath>
