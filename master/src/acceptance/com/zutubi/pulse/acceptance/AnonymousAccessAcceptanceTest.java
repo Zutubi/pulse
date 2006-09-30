@@ -14,7 +14,7 @@ public class AnonymousAccessAcceptanceTest extends BaseAcceptanceTestCase
         {
             clickLink("logout");
         }
-        
+
         LoginForm form = new LoginForm(tester);
         form.assertFormPresent();
     }
