@@ -17,8 +17,10 @@ then
     fatal "PULSE_HOME must be set."
 fi
 
-base="$(dirname $0)"
-PULSE_HOME="${base#/bin}"
+if [[ -z "$JAVA_HOME" ]]
+then
+    fatal "JAVA_HOME must be set."
+fi
 
 if [[ -z "$PULSE_USER" ]]
 then
@@ -33,12 +35,12 @@ fi
 
 d_start()
 {
-    su - $PULSE_USER -c "$PULSE_HOME/bin/startup.sh $PULSE_PID"
+    su $PULSE_USER -c "'$PULSE_HOME/bin/startup.sh' '$PULSE_PID'"
 }
 
 d_stop()
 {
-    su - $PULSE_USER -c "$PULSE_HOME/bin/shutdown.sh --force"
+    su $PULSE_USER -c "'$PULSE_HOME/bin/shutdown.sh' --force"
     if [[ -f "$PULSE_PID" ]]
     then
         pid=$(cat "$PULSE_PID")
