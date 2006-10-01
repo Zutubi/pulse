@@ -54,11 +54,13 @@ public class FormSupport
         return renderDescriptor(descriptor, obj, context);
     }
 
-    public String renderWizard(Object obj, String state, ValidationContext context) throws Exception
+    public String renderWizard(Object obj, String state, ValidationContext context, boolean isFirstState, boolean isLastState) throws Exception
     {
         FormDescriptor descriptor = descriptorFactory.createFormDescriptor(obj.getClass());
         WizardDecorator decorator = new WizardDecorator();
         decorator.setState(state);
+        decorator.setFirstState(isFirstState);
+        decorator.setLastState(isLastState);
         descriptor = decorator.decorate(descriptor);
 
         return renderDescriptor(descriptor, obj, context);

@@ -4,6 +4,8 @@ import com.zutubi.pulse.form.descriptor.*;
 import com.zutubi.pulse.form.FieldType;
 
 import java.util.Arrays;
+import java.util.List;
+import java.util.LinkedList;
 
 /**
  * <class-comment/>
@@ -14,6 +16,9 @@ public class WizardDecorator
 
     private int currentStep;
     private int numberOfSteps;
+
+    private boolean showPrevious;
+    private boolean showFinish;
 
     public void setStep(int step, int totalNumberOfSteps)
     {
@@ -48,16 +53,36 @@ public class WizardDecorator
         stateField.setType(String.class);
         descriptor.addFieldDescriptor(stateField);
 
-        // wizard has different actions depending upon the stage of the action.
-        descriptor.setActionDescriptors(Arrays.asList((ActionDescriptor)
-                new DefaultActionDescriptor(ActionDescriptor.PREVIOUS),
-                new DefaultActionDescriptor(ActionDescriptor.FINISH),
-                new DefaultActionDescriptor(ActionDescriptor.CANCEL)
-        ));
+        List<ActionDescriptor> actionDescriptors = new LinkedList<ActionDescriptor>();
+        if (showPrevious)
+        {
+            actionDescriptors.add(new DefaultActionDescriptor(ActionDescriptor.PREVIOUS));
+        }
+        if (showFinish)
+        {
+            actionDescriptors.add(new DefaultActionDescriptor(ActionDescriptor.FINISH));
+        }
+        else
+        {
+            actionDescriptors.add(new DefaultActionDescriptor(ActionDescriptor.NEXT));
+        }
+        actionDescriptors.add(new DefaultActionDescriptor(ActionDescriptor.CANCEL));
+
+        descriptor.setActionDescriptors(actionDescriptors);
 
         // wizard has a different heading.
         // set heading...
 
         return descriptor;
+    }
+
+    public void setFirstState(boolean firstState)
+    {
+        showPrevious = !firstState;
+    }
+
+    public void setLastState(boolean lastState)
+    {
+        showFinish = lastState;
     }
 }

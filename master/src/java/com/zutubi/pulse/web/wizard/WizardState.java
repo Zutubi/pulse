@@ -23,6 +23,8 @@ public interface WizardState
      */
     String getStateName();
 
+    String getView();
+
     /**
      * Return the name of the state following this one. This method will be called after
      * the state has been validated and executed.

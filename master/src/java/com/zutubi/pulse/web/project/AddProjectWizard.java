@@ -44,8 +44,6 @@ public class AddProjectWizard extends BaseWizard
     private Maven2Details maven2Details;
     private XCodeDetails xcodeDetails;
 
-    private WizardCompleteState completeState;
-
     private ProjectManager projectManager;
     private BuildSpecificationNodeDao buildSpecificationNodeDao;
     private Scheduler scheduler;
@@ -71,10 +69,7 @@ public class AddProjectWizard extends BaseWizard
         versionedDetails = new VersionedDetails(this, "versioned");
         xcodeDetails = new XCodeDetails(this, "xcode");
 
-        // finished.
-        completeState = new WizardCompleteState(this, "success");
-
-        addInitialState(projectDetails.getStateName(), projectDetails);
+        addInitialState(projectDetails);
         addState(cvsDetails);
         addState(svnDetails);
         addState(p4Details);
@@ -85,7 +80,6 @@ public class AddProjectWizard extends BaseWizard
         addState(customDetails);
         addState(versionedDetails);
         addState(xcodeDetails);
-        addFinalState(completeState.getStateName(), completeState);
     }
 
     public void initialise()
@@ -486,7 +480,7 @@ public class AddProjectWizard extends BaseWizard
 
         public String getNextStateName()
         {
-            return ((AddProjectWizard) getWizard()).completeState.getStateName();
+            return "success";
         }
 
         public PulseFileDetails getDetails()
@@ -506,7 +500,7 @@ public class AddProjectWizard extends BaseWizard
 
         public String getNextStateName()
         {
-            return ((AddProjectWizard) getWizard()).completeState.getStateName();
+            return "success";
         }
 
         public PulseFileDetails getDetails()
@@ -526,7 +520,7 @@ public class AddProjectWizard extends BaseWizard
 
         public String getNextStateName()
         {
-            return ((AddProjectWizard) getWizard()).completeState.getStateName();
+            return "success";
         }
 
         public PulseFileDetails getDetails()
@@ -554,7 +548,7 @@ public class AddProjectWizard extends BaseWizard
 
         public String getNextStateName()
         {
-            return ((AddProjectWizard) getWizard()).completeState.getStateName();
+            return "success";
         }
 
         public PulseFileDetails getDetails()
@@ -583,7 +577,7 @@ public class AddProjectWizard extends BaseWizard
 
         public String getNextStateName()
         {
-            return ((AddProjectWizard) getWizard()).completeState.getStateName();
+            return "success";
         }
 
         public PulseFileDetails getDetails()
@@ -613,7 +607,7 @@ public class AddProjectWizard extends BaseWizard
 
         public String getNextStateName()
         {
-            return ((AddProjectWizard) getWizard()).completeState.getStateName();
+            return "success";
         }
 
         public PulseFileDetails getDetails()
@@ -633,7 +627,7 @@ public class AddProjectWizard extends BaseWizard
 
         public String getNextStateName()
         {
-            return ((AddProjectWizard) getWizard()).completeState.getStateName();
+            return "success";
         }
 
         public PulseFileDetails getDetails()

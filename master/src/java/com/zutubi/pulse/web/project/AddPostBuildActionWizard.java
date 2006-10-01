@@ -33,12 +33,10 @@ public class AddPostBuildActionWizard extends BaseWizard
         selectState = new SelectActionType(this, "select");
         configTag = new ConfigureTag(this, TAG_STATE);
         configExe = new ConfigureExe(this, EXE_STATE);
-        WizardCompleteState finalState = new WizardCompleteState(this, "success");
 
-        addInitialState("select", selectState);
+        addInitialState(selectState);
         addState(configTag);
         addState(configExe);
-        addFinalState("success", finalState);
     }
 
     public long getProjectId()

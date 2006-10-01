@@ -3,18 +3,12 @@ package com.zutubi.pulse.web.user;
 import com.zutubi.pulse.model.*;
 import com.zutubi.pulse.web.wizard.*;
 import com.zutubi.pulse.form.descriptor.*;
-import com.zutubi.pulse.form.ui.FormSupport;
-import com.zutubi.pulse.notifications.EmailNotificationHandler;
-import com.zutubi.pulse.notifications.JabberNotificationHandler;
 import com.zutubi.pulse.notifications.NotificationSchemeManager;
 import com.zutubi.pulse.notifications.NotificationHandler;
-import com.zutubi.pulse.validation.MessagesTextProvider;
 import com.zutubi.pulse.core.ObjectFactory;
 import com.zutubi.validation.*;
-import com.opensymphony.xwork.Validateable;
 
-import java.util.Map;
-import java.util.TreeMap;
+import java.util.List;
 
 import freemarker.template.Configuration;
 
@@ -26,10 +20,6 @@ public class ContactPointWizard extends BaseWizard
     private long userId;
 
     private UserManager userManager;
-
-    private SelectContactState select;
-
-    private WizardCompleteState complete;
 
     private DescriptorFactory descriptorFactory;
 
@@ -57,25 +47,37 @@ public class ContactPointWizard extends BaseWizard
 
     public void initialise()
     {
-        select = new SelectContactState(this, "select");
-        addInitialState("select", select);
+        List<String> schemes = schemeManager.getNotificationSchemes();
 
-        for (String scheme : schemeManager.getNotificationSchemes())
+        SelectContact pojo = new SelectContact(schemes);
+
+        SelectWizardState select = new SelectWizardState(this, pojo, "select", true, false);
+        select.setConfiguration(configuration);
+        select.setValidationManager(validationManager);
+        select.setDescriptorFactory(descriptorFactory);
+
+        addInitialState(select);
+
+        // initialise the wizard states.
+        for (String scheme : schemes)
         {
             try
             {
                 Class handlerClass = schemeManager.getNotificationHandler(scheme);
                 Object handler = objectFactory.buildBean(handlerClass);
-                addState(new PluginContactState(this, scheme, handler));
+
+                FormWizardState state = new FormWizardState(this, handler, scheme, "success", false, true);
+                state.setConfiguration(configuration);
+                state.setValidationManager(validationManager);
+                state.setDescriptorFactory(descriptorFactory);
+
+                addState(state);
             }
             catch (Exception e)
             {
                 e.printStackTrace();
             }
         }
-
-        complete = new WizardCompleteState(this, "success");
-        addFinalState("success", complete);
 
         super.initialise();
     }
@@ -126,37 +128,42 @@ public class ContactPointWizard extends BaseWizard
         User user = userManager.getUser(userId);
         ContactPoint contact = null;
 
-        WizardState state = getState(select.getContact());
-        NotificationHandler handler = (NotificationHandler) ((PluginContactState)state).getSubject();
+        SelectContact selectData = (SelectContact) ((FormWizardState)getState("select")).getSubject();
+
+        WizardState state = getState(selectData.getContact());
+        NotificationHandler handler = (NotificationHandler) ((FormWizardState)state).getSubject();
 
         // new contact point.
+
         // set handler ObjectHandle.
 
         user.add(contact);
         userManager.save(user);
     }
 
-    public class SelectContactState extends BaseWizardState
+    public class SelectContact
     {
-        private Map<String, String> contacts;
-
+        private String name;
         private String contact;
 
-        public SelectContactState(Wizard wizard, String name)
+        private List<String> options;
+
+        public SelectContact(List<String> options)
         {
-            super(wizard, name);
+            this.options = options;
         }
 
-        public Map<String, String> getContacts()
+/*
+        public String getName()
         {
-            if (contacts == null)
-            {
-                contacts = new TreeMap<String, String>();
-                contacts.put("email", "email"); //TODO: externalise these strings..
-                contacts.put("jabber", "jabber");
-            }
-            return contacts;
+            return name;
         }
+
+        public void setName(String name)
+        {
+            this.name = name;
+        }
+*/
 
         public String getContact()
         {
@@ -168,101 +175,22 @@ public class ContactPointWizard extends BaseWizard
             this.contact = contact;
         }
 
-        public String getNextStateName()
+        public List<String> getContactOptions()
         {
-            return contact;
+            return options;
         }
     }
 
-    public class PluginContactState extends BaseWizardState implements Validateable
+    public class SelectWizardState extends FormWizardState
     {
-        private String renderedForm;
-
-        private Object subject;
-
-        public PluginContactState(Wizard wizard, String name, Object obj)
+        public SelectWizardState(Wizard wizard, Object obj, String stateName, boolean isFirstState, boolean isLastState)
         {
-            super(wizard, name);
-
-            this.subject = obj;
-        }
-
-        public Object getSubject()
-        {
-            return subject;
+            super(wizard, obj, stateName, null, isFirstState, isLastState);
         }
 
         public String getNextStateName()
         {
-            return "success";
-        }
-
-        public void initialise()
-        {
-            super.initialise();
-
-            FormSupport support = new FormSupport();
-            support.setValidationManager(validationManager);
-            support.setConfiguration(configuration);
-            support.setDescriptorFactory(descriptorFactory);
-            support.setTextProvider(new com.zutubi.pulse.form.MessagesTextProvider(subject));
-
-            try
-            {
-                renderedForm = support.renderWizard(subject, getStateName(), null);
-            }
-            catch (Exception e)
-            {
-                e.printStackTrace();
-            }
-        }
-
-        public String getForm()
-        {
-            return renderedForm;
-        }
-
-        public void execute()
-        {
-            super.execute();
-        }
-
-        public void reset()
-        {
-            super.reset();
-        }
-
-        public void validate()
-        {
-            MessagesTextProvider textProvider = new MessagesTextProvider(subject);
-            ValidationContext validatorContext = new DelegatingValidationContext(new XWorkValidationAdapter(this), textProvider);
-
-            FormSupport support = new FormSupport();
-            support.setValidationManager(validationManager);
-            support.setConfiguration(configuration);
-            support.setDescriptorFactory(descriptorFactory);
-            support.setTextProvider(new com.zutubi.pulse.form.MessagesTextProvider(subject));
-
-            try
-            {
-                support.validate(subject, validatorContext);
-            }
-            catch (ValidationException e)
-            {
-                validatorContext.addActionError(e.getMessage());
-            }
-
-            if (validatorContext.hasErrors())
-            {
-                try
-                {
-                    renderedForm = support.renderWizard(subject, getStateName(), validatorContext);
-                }
-                catch (Exception e)
-                {
-                    e.printStackTrace();
-                }
-            }
+            return ((SelectContact)getSubject()).getContact();
         }
     }
 }

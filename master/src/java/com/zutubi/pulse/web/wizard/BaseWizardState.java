@@ -42,6 +42,11 @@ public abstract class BaseWizardState implements WizardState, ValidationAware
         return stateName;
     }
 
+    public String getView()
+    {
+        return getStateName();
+    }
+
     public final Wizard getWizard()
     {
         return wizard;

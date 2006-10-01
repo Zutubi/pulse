@@ -222,7 +222,7 @@ public class WizardAction extends ActionSupport
         {
             initIfRequired();
             // always return to the current state.
-            return getCurrentStateName();
+            return getCurrentView();
         }
         catch (RuntimeException e)
         {
@@ -254,14 +254,14 @@ public class WizardAction extends ActionSupport
             // always attempt to move to the next state.
             if (wizard.hasErrors())
             {
-                return getCurrentStateName();
+                return getCurrentView();
             }
-            String nextState = wizard.traverseForward();
+            String nextView = wizard.traverseForward();
             if (wizard.isComplete())
             {
                 removeWizard();
             }
-            return nextState;
+            return nextView;
         }
         catch (RuntimeException e)
         {
@@ -308,7 +308,7 @@ public class WizardAction extends ActionSupport
                 return doNext();
             }
 
-            return getCurrentStateName();
+            return getCurrentView();
         }
         catch (RuntimeException e)
         {
@@ -376,9 +376,9 @@ public class WizardAction extends ActionSupport
         return getWizard().getCurrentState();
     }
 
-    public String getCurrentStateName()
+    public String getCurrentView()
     {
-        return getWizard().getCurrentState().getStateName();
+        return getWizard().getCurrentState().getView();
     }
 
     /**
@@ -389,7 +389,7 @@ public class WizardAction extends ActionSupport
      */
     public String getState()
     {
-        return getCurrentStateName();
+        return getWizard().getCurrentState().getStateName();
     }
 
     //---( custom handling of the TextProvider interface )---
