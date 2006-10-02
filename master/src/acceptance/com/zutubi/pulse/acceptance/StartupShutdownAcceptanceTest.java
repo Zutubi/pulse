@@ -34,9 +34,6 @@ public class StartupShutdownAcceptanceTest extends TestCase
 
     protected void setUp() throws Exception
     {
-        sys = new Properties();
-        sys.putAll(System.getProperties());
-
         // This system property is only required when running these tests within intelliJ
         // So, if this property has been set, leave it. If not, set it. This means that we need to set this property
         // when running accept.master.
@@ -44,6 +41,8 @@ public class StartupShutdownAcceptanceTest extends TestCase
         {
             System.setProperty("bootstrap", "com/zutubi/pulse/bootstrap/ideaBootstrapContext.xml");
         }
+        sys = new Properties();
+        sys.putAll(System.getProperties());
 
         // create a temporary user home.
         tmpDir = FileSystemUtils.createTempDirectory(getClass().getSimpleName() + ".", "." + getName());
@@ -66,6 +65,11 @@ public class StartupShutdownAcceptanceTest extends TestCase
         configFile = null;
         defaultConfigFile = null;
 
+        resetSystemProperties();
+    }
+
+    private void resetSystemProperties()
+    {
         System.getProperties().clear();
         System.getProperties().putAll(sys);
     }
@@ -158,6 +162,9 @@ public class StartupShutdownAcceptanceTest extends TestCase
         assertExternalConfigAvailable(actualCtx);
         assertExternalConfigContents(actualCtx, fileCtx);
 
+        // ensure the command line (system properties) is cleaned up.
+        resetSystemProperties();
+
         // now lets shutdown the server.
         assertShutdownServer(cmdCtx);
         assertServerNotAvailable(actualCtx);
@@ -238,6 +245,66 @@ public class StartupShutdownAcceptanceTest extends TestCase
         actualCtx.setExternalConfig(configFile.getAbsolutePath());
 
         assertSecondTimeStartup(ctx, fileCtx, actualCtx);
+    }
+
+    // test the shutdown command to ensure that
+
+    /**
+     * Test that the shutdown command is able to shutdown a server configured
+     * to run on non-standard port and context path.
+     *
+     * This is more a test of the AdminCommand being able to accurately locate
+     * the running server than the shutdown command being able to shutdown a
+     * server.
+     */
+    public void testThatShutdownWorksForNonStandardDeployment() throws Exception
+    {
+        RuntimeContext cmdCtx = new RuntimeContext("8083", "/some/sort/of/crazy/context/path");
+        cmdCtx.setDataDirectory(dataDir.getAbsolutePath());
+        cmdCtx.setExternalConfig(configFile.getAbsolutePath());
+
+        assertServerNotAvailable(cmdCtx);
+        assertStartServer(cmdCtx);
+        assertServerAvailable(cmdCtx);
+
+        resetSystemProperties();
+
+        // now lets shutdown the server using the default context. This checks
+        // that the runtime context is remembered and used for admin functions.
+        RuntimeContext shutdownCtx = new RuntimeContext();
+        assertShutdownServer(shutdownCtx);
+        assertServerNotAvailable(cmdCtx);
+    }
+
+    /**
+     * This is the scenario when a user is changing the configuration of a
+     * running pulse instance.  We need to ensure that the file context is not
+     * relied upon to interact with the running server.
+     */
+    public void testShutdownWorksForIncorrectFileConfig() throws ParseException, InterruptedException
+    {
+        RuntimeContext cmdCtx = new RuntimeContext("8083", "/some/sort/of/crazy/context/path");
+        cmdCtx.setDataDirectory(dataDir.getAbsolutePath());
+        cmdCtx.setExternalConfig(configFile.getAbsolutePath());
+
+        assertServerNotAvailable(cmdCtx);
+        assertStartServer(cmdCtx);
+        assertServerAvailable(cmdCtx);
+
+        resetSystemProperties();
+
+        // now we set the new startup configuration while the server is still
+        // running.
+        RuntimeContext fileCtx = new RuntimeContext("8086", "/domain/name/anyone");
+        fileCtx.setDataDirectory(dataDir.getAbsolutePath());
+        fileCtx.setExternalConfig(configFile.getAbsolutePath());
+        writeToConfigFile(fileCtx);
+
+        // test that the shutdown command is still able to shutdown the runnign server.
+        RuntimeContext shutdownCtx = new RuntimeContext();
+        assertShutdownServer(shutdownCtx);
+
+        assertServerNotAvailable(cmdCtx);
     }
 
     private void writeToConfigFile(RuntimeContext fileCtx)

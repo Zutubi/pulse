@@ -6,6 +6,8 @@ import com.zutubi.pulse.bootstrap.ConfigurationManager;
 import com.zutubi.pulse.bootstrap.SystemBootstrapManager;
 import com.zutubi.pulse.bootstrap.SystemConfiguration;
 import com.zutubi.pulse.bootstrap.conf.EnvConfig;
+import com.zutubi.pulse.bootstrap.conf.ConfigSupport;
+import com.zutubi.pulse.bootstrap.conf.FileConfig;
 import com.zutubi.pulse.util.IOUtils;
 import com.opensymphony.util.TextUtils;
 import org.apache.xmlrpc.XmlRpcClient;
@@ -90,14 +92,17 @@ public abstract class AdminCommand implements Command
         URL url;
         try
         {
-            SystemConfiguration sysConfig = configurationManager.getSystemConfig();
-            int webPort = sysConfig.getServerPort();
+            File configRoot = configurationManager.getSystemPaths().getConfigRoot();
+            File startupConfigFile = new File(configRoot, "runtime.properties");
+            ConfigSupport sysConfig = new ConfigSupport(new FileConfig(startupConfigFile));
+
+            int webPort = sysConfig.getInteger(SystemConfiguration.WEBAPP_PORT);
             if (port != -1)
             {
                 webPort = port;
             }
 
-            String path = sysConfig.getContextPath();
+            String path = sysConfig.getProperty(SystemConfiguration.CONTEXT_PATH);
             if (TextUtils.stringSet(contextPath))
             {
                 path = contextPath;

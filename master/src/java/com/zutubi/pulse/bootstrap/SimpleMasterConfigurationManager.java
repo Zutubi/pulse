@@ -7,6 +7,7 @@ import com.zutubi.pulse.bootstrap.conf.FileConfig;
 import com.zutubi.pulse.bootstrap.conf.VolatileReadOnlyConfig;
 
 import java.io.File;
+import java.util.Properties;
 
 /**
  * <class-comment/>
@@ -26,7 +27,9 @@ public class SimpleMasterConfigurationManager extends AbstractConfigurationManag
             EnvConfig envConfig = getEnvConfig();
 
             // command line configuration only.
-            Config system = new VolatileReadOnlyConfig(System.getProperties());
+            Properties systemCopy = new Properties();
+            systemCopy.putAll(System.getProperties());
+            Config system = new VolatileReadOnlyConfig(systemCopy);
 
             // look for the external user configuration file.
             String configPath = envConfig.getDefaultPulseConfig();
