@@ -5,6 +5,7 @@ import com.zutubi.pulse.bootstrap.MasterConfiguration;
 import com.zutubi.pulse.bootstrap.MasterConfigurationManager;
 import com.zutubi.pulse.core.Stoppable;
 import com.zutubi.pulse.util.logging.Logger;
+import com.zutubi.pulse.util.Constants;
 import org.jivesoftware.smack.*;
 import org.jivesoftware.smack.filter.MessageTypeFilter;
 import org.jivesoftware.smack.packet.Message;
@@ -27,12 +28,13 @@ public class JabberManager implements Stoppable, PacketListener
      * if everything was ok.
      */
     private String statusMessage = null;
+    private long lastFailureTime = -1;
 
-    public void init()
+    public synchronized void init()
     {
         statusMessage = null;
         MasterConfiguration appConfig = configurationManager.getAppConfig();
-        if (TextUtils.stringSet(appConfig.getJabberHost()))
+        if (isConfigured())
         {
             LOG.info("Initialising Jabber");
             Roster.setDefaultSubscriptionMode(Roster.SUBSCRIPTION_ACCEPT_ALL);
@@ -51,9 +53,7 @@ public class JabberManager implements Stoppable, PacketListener
                 }
                 catch(Exception nesty)
                 {
-                    stop(true);
-                    statusMessage = "Could not initialise Jabber: " + nesty.getMessage();
-                    LOG.warning(statusMessage);
+                    connectionError("Could not initialise Jabber: " + nesty.getMessage());
                 }
             }
         }
@@ -64,15 +64,18 @@ public class JabberManager implements Stoppable, PacketListener
         }
     }
 
-    private void openConnection(MasterConfiguration appConfig)
-            throws XMPPException
+    public boolean isConfigured()
+    {
+        return TextUtils.stringSet(configurationManager.getAppConfig().getJabberHost());
+    }
+
+    private void openConnection(MasterConfiguration appConfig) throws XMPPException
     {
         connection = openConnection(appConfig.getJabberHost(), appConfig.getJabberPort(), appConfig.getJabberUsername(), appConfig.getJabberPassword(), appConfig.getJabberForceSSL());
         connection.addPacketListener(this, new MessageTypeFilter(Message.Type.ERROR));
     }
 
-    private XMPPConnection openConnection(String host, int port, String username, String password, boolean forceSSL)
-            throws XMPPException
+    private XMPPConnection openConnection(String host, int port, String username, String password, boolean forceSSL) throws XMPPException
     {
         XMPPConnection connection = null;
 
@@ -120,10 +123,31 @@ public class JabberManager implements Stoppable, PacketListener
 
     public XMPPConnection getConnection()
     {
+        // Try automagic reconnection at most a minute after the last error
+        // to prevent hammering away at a broken connection.
+        if(connection == null && (lastFailureTime < 0 || lastFailureTime + Constants.MINUTE < System.currentTimeMillis()))
+        {
+            init();
+        }
+
         return connection;
     }
 
-    public void stop(boolean force)
+    /**
+     * Used to report an error when attempting to establish or use the Jabber
+     * connection.
+     *
+     * @param message a description of the error
+     */
+    public void connectionError(String message)
+    {
+        stop(true);
+        statusMessage = message;
+        lastFailureTime = System.currentTimeMillis();
+        LOG.warning(statusMessage);
+    }
+
+    public synchronized void stop(boolean force)
     {
         if(connection != null)
         {
