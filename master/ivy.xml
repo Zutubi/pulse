@@ -42,7 +42,7 @@
 
         <dependency org="hsqldb" name="hsqldb" rev="1.8.0.5" conf="external,build,release->default"/>
 
-        <dependency org="jive" name="smack" rev="2.2.0" conf="external,build,release->default"/>
+        <dependency org="jive" name="smack" rev="2.2.1" conf="external,build,release->default"/>
 
         <dependency org="opensymphony" name="quartz" rev="20060404" conf="external,build,release->default"/>
         <dependency org="opensymphony" name="sitemesh" rev="2.2.1" conf="external,build,release->default"/>
