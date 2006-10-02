@@ -12,17 +12,16 @@ import java.io.IOException;
 
 /**
  */
-public abstract class XMLReportPostProcessor implements PostProcessor
+public abstract class XMLReportPostProcessor extends TestReportPostProcessor
 {
     private String reportType;
-    private String name;
 
     protected XMLReportPostProcessor(String reportType)
     {
         this.reportType = reportType;
     }
 
-    public void process(StoredFileArtifact artifact, CommandResult result, CommandContext context)
+    protected void internalProcess(StoredFileArtifact artifact, CommandResult result, CommandContext context)
     {
         File file = new File(context.getOutputDir(), artifact.getPath());
         FileInputStream input = null;
@@ -47,21 +46,6 @@ public abstract class XMLReportPostProcessor implements PostProcessor
         {
             IOUtils.close(input);
         }
-    }
-
-    public String getName()
-    {
-        return name;
-    }
-
-    public void setName(String name)
-    {
-        this.name = name;
-    }
-
-    public Object getValue()
-    {
-        return this;
     }
 
     protected String getText(Element element)

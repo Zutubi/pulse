@@ -1,9 +1,8 @@
 package com.zutubi.pulse.core;
 
-import com.zutubi.pulse.core.model.TestCaseResult;
-import com.zutubi.pulse.core.model.TestResult;
-import com.zutubi.pulse.core.model.TestSuiteResult;
+import com.zutubi.pulse.core.model.*;
 
+import java.io.File;
 import java.util.List;
 
 /**
@@ -74,6 +73,39 @@ public class JUnitReportPostProcessorTest extends XMLReportPostProcessorTestBase
                         "\tat com.zutubi.pulse.core.JUnitReportPostProcessorTest.testError(JUnitReportPostProcessorTest.java:68)");
     }
 
+    public void testFailOnFailure()
+    {
+        CommandResult result = new CommandResult("test");
+        result.commence();
+        failOnFailureHelper(result);
+
+        assertTrue(result.failed());
+        assertEquals("One or more test cases failed.", result.getFeatures().get(0).getSummary());
+    }
+
+    public void testFailOnFailureNotSet()
+    {
+        CommandResult result = new CommandResult("test");
+        result.commence();
+        pp.setFailOnFailure(false);
+        failOnFailureHelper(result);
+
+        assertFalse(result.failed());
+        assertEquals(0, result.getFeatures().size());
+    }
+
+    public void testFailOnFailureAlreadyFailed()
+    {
+        CommandResult result = new CommandResult("test");
+        result.commence();
+        result.failure("bogosity");
+        failOnFailureHelper(result);
+
+        assertTrue(result.failed());
+        assertEquals(1, result.getFeatures().size());
+        assertEquals("bogosity", result.getFeatures().get(0).getSummary());
+    }
+
     private void checkWarning(TestResult testResult, String name, long duration, String contents)
     {
         assertTrue(testResult instanceof TestSuiteResult);
@@ -87,5 +119,14 @@ public class JUnitReportPostProcessorTest extends XMLReportPostProcessorTestBase
         assertEquals("warning", caseResult.getName());
         assertEquals(10, caseResult.getDuration());
         assertTrue(caseResult.getMessage().contains(contents));
+    }
+
+    private void failOnFailureHelper(CommandResult result)
+    {
+        File outputDir = getOutputDir();
+        StoredFileArtifact artifact = getArtifact("simple");
+        TestSuiteResult testResults = new TestSuiteResult();
+        CommandContext context = new CommandContext(null, outputDir, testResults);
+        pp.process(artifact, result, context);
     }
 }
