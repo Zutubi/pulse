@@ -190,7 +190,7 @@ public class LicenseEncoder implements LicenseKeyFactory
             String projectName = "insert name here";
 
             // code, name, expiry
-            LicenseEncoder.main(new String[]{"NON_PROFIT", projectName});
+            LicenseEncoder.main(new String[]{LicenseType.NON_PROFIT.toString(), projectName});
         }
     }
 
@@ -205,7 +205,7 @@ public class LicenseEncoder implements LicenseKeyFactory
             Calendar oneYearFromToday = Calendar.getInstance();
             oneYearFromToday.add(Calendar.YEAR, 1);
 
-            LicenseEncoder.main(new String[]{"STANDARD", companyName, expiryFormat.format(oneYearFromToday.getTime())});
+            LicenseEncoder.main(new String[]{LicenseType.STANDARD.toString(), companyName, expiryFormat.format(oneYearFromToday.getTime())});
         }
     }
 }

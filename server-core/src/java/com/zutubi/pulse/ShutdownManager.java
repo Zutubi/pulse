@@ -11,7 +11,16 @@ import java.util.List;
  */
 public class ShutdownManager
 {
+    /**
+     * The list of objects that are called during a shutdown.  
+     */
     private List<Stoppable> stoppables;
+
+    /**
+     * Set to true when the shutdown manager is executing a shutdown, false
+     * otherwise.
+     */
+    private boolean shuttingDown = false;
 
     /**
      * Performs the shutdown sequence.
@@ -20,13 +29,37 @@ public class ShutdownManager
      */
     public void shutdown(boolean force, boolean exitJvm)
     {
+        // Ensure that we only handle one shutdown request at a time.
+        synchronized(this)
+        {
+            if (shuttingDown)
+            {
+                return;
+            }
+            shuttingDown = true;
+        }
+        try
+        {
+            doShutdown(force, exitJvm);
+        }
+        finally
+        {
+            synchronized(this)
+            {
+                shuttingDown = false;
+            }
+        }
+    }
+
+    private void doShutdown(boolean force, boolean exitJvm)
+    {
         for (Stoppable stoppable : stoppables)
         {
             stoppable.stop(force);
         }
         if (exitJvm)
         {
-            // why exit? because some external packages do not clean up all of there threads... 
+            // why exit? because some external packages do not clean up all of there threads...
             System.exit(0);
         }
         else
