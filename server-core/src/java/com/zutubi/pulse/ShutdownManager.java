@@ -13,8 +13,17 @@ import java.lang.reflect.InvocationTargetException;
  */
 public class ShutdownManager
 {
+    /**
+     * The list of objects that are called during a shutdown.  
+     */
     private List<Stoppable> stoppables;
     private static final int EXIT_REBOOT = 111;
+
+    /**
+     * Set to true when the shutdown manager is executing a shutdown, false
+     * otherwise.
+     */
+    private boolean shuttingDown = false;
 
     /**
      * Performs the shutdown sequence.
@@ -22,6 +31,30 @@ public class ShutdownManager
      * @param force if true, forcibly terminate active tasks
      */
     public void shutdown(boolean force, boolean exitJvm)
+    {
+        // Ensure that we only handle one shutdown request at a time.
+        synchronized(this)
+        {
+            if (shuttingDown)
+            {
+                return;
+            }
+            shuttingDown = true;
+        }
+        try
+        {
+            doShutdown(force, exitJvm);
+        }
+        finally
+        {
+            synchronized(this)
+            {
+                shuttingDown = false;
+            }
+        }
+    }
+
+    private void doShutdown(boolean force, boolean exitJvm)
     {
         if(checkWrapper(0))
         {
@@ -32,7 +65,7 @@ public class ShutdownManager
 
         if (exitJvm)
         {
-            // why exit? because some external packages do not clean up all of their threads... 
+            // why exit? because some external packages do not clean up all of there threads...
             System.exit(0);
         }
         else
