@@ -16,9 +16,10 @@
 
         #wwtextfield("name=newName" "label=%{getText('group.name')}" "required=true" "tabindex=1")
         #wwcheckbox("name=admin" "label=%{getText('group.grant.admin')}" "tabindex=2")
-        #wwcheckbox("name=adminAllProjects" "label=%{getText('group.admin.all.projects')}" "tabindex=3" "onclick=setEnableState('group.edit_projects', 'group.edit_adminAllProjects', true)")
-        #wwselect("name=projects" "label=%{getText('group.admin.selected.projects')}" "list=allProjects" "multiple=true" "tabindex=4")
-        #saveCancel(5)
+        #wwcheckbox("name=personal" "label=%{getText('group.grant.personal')}" "tabindex=3")
+        #wwcheckbox("name=adminAllProjects" "label=%{getText('group.admin.all.projects')}" "tabindex=4" "onclick=setEnableState('group.edit_projects', 'group.edit_adminAllProjects', true)")
+        #wwselect("name=projects" "label=%{getText('group.admin.selected.projects')}" "list=allProjects" "multiple=true" "tabindex=5")
+        #saveCancel(6)
     #end
 
     <script type="text/javascript">

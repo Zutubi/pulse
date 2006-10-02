@@ -1,9 +1,11 @@
 package com.zutubi.pulse.web.admin.user;
 
-import com.zutubi.pulse.web.user.UserActionSupport;
-import com.zutubi.pulse.model.*;
+import com.zutubi.pulse.model.Group;
+import com.zutubi.pulse.model.Project;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 /**
  *
@@ -35,6 +37,7 @@ public class EditGroupAction extends GroupBasicsActionSupport
         setStartPage(getGroupStartPage(group));
         newName = group.getName();
         setAdmin(hasAdminAuthority(group));
+        setPersonal(hasPersonalAuthority(group));
         setAdminAllProjects(group.getAdminAllProjects());
 
         List<Project> adminProjects = getProjectManager().getProjectsWithAdmin(group.getDefaultAuthority());

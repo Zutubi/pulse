@@ -1,10 +1,10 @@
 package com.zutubi.pulse.web.admin.user;
 
-import com.zutubi.pulse.web.ActionSupport;
 import com.zutubi.pulse.model.*;
+import com.zutubi.pulse.web.ActionSupport;
 
-import java.util.List;
 import java.util.Collections;
+import java.util.List;
 
 /**
  */
@@ -36,6 +36,11 @@ public class GroupsActionSupport extends ActionSupport
     public boolean hasAdminAuthority(Group group)
     {
         return group.hasAuthority(GrantedAuthority.ADMINISTRATOR);
+    }
+
+    public boolean hasPersonalAuthority(Group group)
+    {
+        return group.hasAuthority(GrantedAuthority.PERSONAL);
     }
 
     public List<Project> getAdminProjects(Group group)

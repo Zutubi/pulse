@@ -1,9 +1,9 @@
 package com.zutubi.pulse.web.admin.user;
 
-import com.zutubi.pulse.model.Project;
-import com.zutubi.pulse.model.NamedEntityComparator;
-import com.zutubi.pulse.model.Group;
 import com.zutubi.pulse.model.GrantedAuthority;
+import com.zutubi.pulse.model.Group;
+import com.zutubi.pulse.model.NamedEntityComparator;
+import com.zutubi.pulse.model.Project;
 
 import java.util.*;
 
@@ -12,6 +12,7 @@ import java.util.*;
 public class GroupBasicsActionSupport extends GroupActionSupport
 {
     private boolean admin;
+    private boolean personal;
     private boolean adminAllProjects;
     private Map<Long, String> allProjects;
     private List<Long> projects = new ArrayList<Long>();
@@ -25,6 +26,16 @@ public class GroupBasicsActionSupport extends GroupActionSupport
     public void setAdmin(boolean admin)
     {
         this.admin = admin;
+    }
+
+    public boolean isPersonal()
+    {
+        return personal;
+    }
+
+    public void setPersonal(boolean personal)
+    {
+        this.personal = personal;
     }
 
     public boolean isAdminAllProjects()
@@ -82,6 +93,15 @@ public class GroupBasicsActionSupport extends GroupActionSupport
         else
         {
             group.removeAdditionalAuthority(GrantedAuthority.ADMINISTRATOR);
+        }
+
+        if(isPersonal())
+        {
+            group.addAdditionalAuthority(GrantedAuthority.PERSONAL);
+        }
+        else
+        {
+            group.removeAdditionalAuthority(GrantedAuthority.PERSONAL);
         }
 
         group.setAdminAllProjects(isAdminAllProjects());

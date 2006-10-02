@@ -56,6 +56,25 @@ public class DefaultUserManager implements UserManager
         return userDao.getHiddenProjects(user);
     }
 
+    public boolean hasAuthority(User user, String authority)
+    {
+        if(user.hasAuthority(authority))
+        {
+            return true;
+        }
+
+        List<Group> groups = groupDao.findByMember(user);
+        for(Group g: groups)
+        {
+            if(g.hasAuthority(authority))
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     public void addUser(User newUser, boolean grantAdminPermissions, boolean useLdapAuthencation)
     {
         // ensure that the user has the correct authorities to login.
