@@ -6,4 +6,10 @@
             <message>invalid url</message>
         </field-validator>
     </field>
+    <field name="pollingInterval">
+        <field-validator type="int">
+            <param name="min">1</param>
+            <message>polling interval must be at least 1 minute</message>
+        </field-validator>
+    </field>
 </validators>

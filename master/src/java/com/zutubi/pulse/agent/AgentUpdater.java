@@ -1,20 +1,20 @@
 package com.zutubi.pulse.agent;
 
-import com.zutubi.pulse.services.SlaveService;
-import com.zutubi.pulse.services.UpgradeStatus;
-import com.zutubi.pulse.services.UpgradeState;
 import com.zutubi.pulse.Version;
+import com.zutubi.pulse.bootstrap.SystemPaths;
 import com.zutubi.pulse.events.EventManager;
 import com.zutubi.pulse.events.SlaveUpgradeCompleteEvent;
-import com.zutubi.pulse.util.logging.Logger;
-import com.zutubi.pulse.bootstrap.SystemPaths;
+import com.zutubi.pulse.services.SlaveService;
+import com.zutubi.pulse.services.UpgradeState;
+import com.zutubi.pulse.services.UpgradeStatus;
 import com.zutubi.pulse.servlet.DownloadPackageServlet;
+import com.zutubi.pulse.util.logging.Logger;
 
-import java.util.concurrent.Executors;
+import java.io.File;
 import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
-import java.io.File;
 
 /**
  * An active object (i.e. runs in it's own thread) that tries to update an
@@ -32,6 +32,20 @@ public class AgentUpdater implements Runnable
     private SystemPaths systemPaths;
     private ExecutorService executor = Executors.newSingleThreadExecutor();
     private LinkedBlockingQueue<UpgradeStatus> statuses = new LinkedBlockingQueue<UpgradeStatus>();
+    /**
+     * Maximum number of seconds to wait between status events before timing
+     * out the upgrade.
+     */
+    private long statusTimeout = 600;
+    /**
+     * Maximum number of seconds to wait between receiving the reboot status and
+     * a successful ping.
+     */
+    private long rebootTimeout = 300;
+    /**
+     * Number of milliseconds between pings while waiting for reboot.
+     */
+    private long pingInterval = 5000;
 
     public AgentUpdater(SlaveAgent agent, String token, String masterUrl, EventManager eventManager, SystemPaths systemPaths)
     {
@@ -68,7 +82,7 @@ public class AgentUpdater implements Runnable
             boolean rebooting = false;
             while (!rebooting)
             {
-                UpgradeStatus status = statuses.poll(600, TimeUnit.SECONDS);
+                UpgradeStatus status = statuses.poll(statusTimeout, TimeUnit.SECONDS);
                 if(status == null)
                 {
                     agent.upgradeStatus(UpgradeState.FAILED, -1, "Timed out waiting for message from agent.");
@@ -90,7 +104,7 @@ public class AgentUpdater implements Runnable
             }
 
             // Now the agent is rebooting, ping it until it is back up.
-            long endTime = System.currentTimeMillis() + 300000;
+            long endTime = System.currentTimeMillis() + TimeUnit.SECONDS.toMillis(rebootTimeout);
             int expectedBuild = Version.getVersion().getBuildNumberAsInt();
             while(System.currentTimeMillis() < endTime)
             {
@@ -107,7 +121,7 @@ public class AgentUpdater implements Runnable
                 catch(Exception e)
                 {
                     // We expect some pings to fail, so can't read too much into it
-                    Thread.sleep(5000);
+                    Thread.sleep(pingInterval);
                 }
             }
 
@@ -143,5 +157,20 @@ public class AgentUpdater implements Runnable
     public void upgradeStatus(UpgradeStatus upgradeStatus)
     {
         statuses.add(upgradeStatus);
+    }
+
+    public void setStatusTimeout(long statusTimeout)
+    {
+        this.statusTimeout = statusTimeout;
+    }
+
+    public void setRebootTimeout(long rebootTimeout)
+    {
+        this.rebootTimeout = rebootTimeout;
+    }
+
+    public void setPingInterval(long pingInterval)
+    {
+        this.pingInterval = pingInterval;
     }
 }

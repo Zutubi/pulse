@@ -3,6 +3,7 @@ package com.zutubi.pulse;
 import com.zutubi.pulse.agent.Agent;
 import com.zutubi.pulse.agent.AgentManager;
 import com.zutubi.pulse.agent.SlaveAgent;
+import com.zutubi.pulse.bootstrap.MasterConfigurationManager;
 import com.zutubi.pulse.core.BuildException;
 import com.zutubi.pulse.core.BuildRevision;
 import com.zutubi.pulse.core.Stoppable;
@@ -16,6 +17,7 @@ import com.zutubi.pulse.model.Project;
 import com.zutubi.pulse.model.Scm;
 import com.zutubi.pulse.scm.SCMChangeEvent;
 import com.zutubi.pulse.scm.SCMException;
+import com.zutubi.pulse.util.Constants;
 import com.zutubi.pulse.util.logging.Logger;
 
 import java.util.LinkedList;
@@ -35,8 +37,6 @@ public class ThreadedRecipeQueue implements Runnable, RecipeQueue, EventListener
 {
     private static final Logger LOG = Logger.getLogger(ThreadedRecipeQueue.class);
 
-    private boolean checkOnEnqueue = true;
-
     private final ReentrantLock lock = new ReentrantLock();
 
     private final Condition lockCondition = lock.newCondition();
@@ -49,25 +49,10 @@ public class ThreadedRecipeQueue implements Runnable, RecipeQueue, EventListener
     private final Map<Long, Agent> onlineAgents = new TreeMap<Long, Agent>();
 
     /**
-     * The queue to which new dispatch requests are added.
-     */
-    private final List<RecipeDispatchRequest> newDispatches = new LinkedList<RecipeDispatchRequest>();
-
-    /**
      * The internal queue of dispatch requests.
      */
     private final List<RecipeDispatchRequest> queuedDispatches = new LinkedList<RecipeDispatchRequest>();
 
-    /**
-     * Arrival point for newly-available agents.  The run method will pick
-     * these up.
-     */
-    private final List<Agent> newAgents = new LinkedList<Agent>();
-    /**
-     * Leaving point for agents that have dropped offline.  The run method
-     * picks these up.
-     */
-    private final List<Agent> droppedAgents = new LinkedList<Agent>();
     /**
      * Map from agent id to agent for all agents that are available to
      * receive recipe requests.  Only touched by the run thread.
@@ -83,8 +68,21 @@ public class ThreadedRecipeQueue implements Runnable, RecipeQueue, EventListener
     private ExecutorService executor;
 
     private boolean stopRequested = false;
-
     private boolean isRunning = false;
+    /**
+     * * Maximum number of seconds between checks of the queue.  Usually
+     * checks occur due to the condition being flagged, but we need to
+     * wake up periodically to enforce timeouts.
+     */
+    private int sleepInterval = 60;
+    /**
+     * Maximum number of millis to leave a request that cannot be satisfied
+     * in the queue.  This is based on how long there has been no capable
+     * agent available (not on how long the request has been queued).  If the
+     * timeout is 0, unsatisfiable requests will be rejected immediately.  If
+     * the timeout is negative, requests will never time out.
+     */
+    private long unsatisfiableTimeout = 0;
 
     private AgentManager agentManager;
     private EventManager eventManager;
@@ -148,13 +146,23 @@ public class ThreadedRecipeQueue implements Runnable, RecipeQueue, EventListener
             {
                 if (requestMayBeFulfilled(dispatchRequest))
                 {
-                    newDispatches.add(dispatchRequest);
-                    dispatchRequest.queued();
-                    lockCondition.signal();
+                    addToQueue(dispatchRequest);
                 }
                 else
                 {
-                    error = new RecipeErrorEvent(this, dispatchRequest.getRequest().getId(), "No online agent is capable of executing the build stage");
+                    if(unsatisfiableTimeout == 0)
+                    {
+                        error = new RecipeErrorEvent(this, dispatchRequest.getRequest().getId(), "No online agent is capable of executing the build stage");
+                    }
+                    else
+                    {
+                        if(unsatisfiableTimeout > 0)
+                        {
+                            dispatchRequest.setTimeout(System.currentTimeMillis() + unsatisfiableTimeout);
+                        }
+
+                        addToQueue(dispatchRequest);
+                    }
                 }
             }
             finally
@@ -173,6 +181,13 @@ public class ThreadedRecipeQueue implements Runnable, RecipeQueue, EventListener
             // Publish outside the lock.
             eventManager.publish(error);
         }
+    }
+
+    private void addToQueue(RecipeDispatchRequest dispatchRequest)
+    {
+        queuedDispatches.add(dispatchRequest);
+        dispatchRequest.queued();
+        lockCondition.signal();
     }
 
     private void determineRevision(RecipeDispatchRequest dispatchRequest) throws BuildException, SCMException
@@ -205,7 +220,6 @@ public class ThreadedRecipeQueue implements Runnable, RecipeQueue, EventListener
         try
         {
             snapshot.addAll(queuedDispatches);
-            snapshot.addAll(newDispatches);
         }
         finally
         {
@@ -224,7 +238,7 @@ public class ThreadedRecipeQueue implements Runnable, RecipeQueue, EventListener
             lock.lock();
             RecipeDispatchRequest removeRequest = null;
 
-            for (RecipeDispatchRequest request : newDispatches)
+            for (RecipeDispatchRequest request : queuedDispatches)
             {
                 if (request.getRequest().getId() == id)
                 {
@@ -235,25 +249,8 @@ public class ThreadedRecipeQueue implements Runnable, RecipeQueue, EventListener
 
             if (removeRequest != null)
             {
-                newDispatches.remove(removeRequest);
+                queuedDispatches.remove(removeRequest);
                 removed = true;
-            }
-            else
-            {
-                for (RecipeDispatchRequest request : queuedDispatches)
-                {
-                    if (request.getRequest().getId() == id)
-                    {
-                        removeRequest = request;
-                        break;
-                    }
-                }
-
-                if (removeRequest != null)
-                {
-                    queuedDispatches.remove(removeRequest);
-                    removed = true;
-                }
             }
         }
         finally
@@ -270,11 +267,8 @@ public class ThreadedRecipeQueue implements Runnable, RecipeQueue, EventListener
         try
         {
             onlineAgents.put(agent.getId(), agent);
-            if (!newAgents.contains(agent))
-            {
-                newAgents.add(agent);
-            }
-            droppedAgents.remove(agent);
+            availableAgents.put(agent.getId(), agent);
+            resetTimeouts(agent);
             lockCondition.signal();
         }
         finally
@@ -283,20 +277,35 @@ public class ThreadedRecipeQueue implements Runnable, RecipeQueue, EventListener
         }
     }
 
+    private void resetTimeouts(Agent agent)
+    {
+        for(RecipeDispatchRequest request: queuedDispatches)
+        {
+            if(request.hasTimeout() && request.getHostRequirements().fulfilledBy(request, agent.getBuildService()))
+            {
+                request.clearTimeout();
+            }
+        }
+    }
+
     void offline(Agent agent)
     {
         RecipeErrorEvent error = null;
-        List<RecipeDispatchRequest> unfulfillable = new LinkedList<RecipeDispatchRequest>();
+        List<RecipeDispatchRequest> removedRequests = null;
 
         lock.lock();
         try
         {
             onlineAgents.remove(agent.getId());
 
-            // Check all queued requests may still be handled by an online
-            // agent.
-            unfulfillable.addAll(checkQueuedRequests(queuedDispatches));
-            unfulfillable.addAll(checkQueuedRequests(newDispatches));
+            if(unsatisfiableTimeout == 0)
+            {
+                removedRequests = removeUnfulfillable();
+            }
+            else if(unsatisfiableTimeout > 0)
+            {
+                checkQueuedTimeouts(System.currentTimeMillis() + unsatisfiableTimeout);
+            }
 
             long deadRecipe = 0;
             for (Map.Entry<Long, Agent> entry : executingAgents.entrySet())
@@ -316,12 +325,7 @@ public class ThreadedRecipeQueue implements Runnable, RecipeQueue, EventListener
                 error = new RecipeErrorEvent(this, deadRecipe, "Connection to agent lost during recipe execution");
             }
 
-            // Ensure the agent is dropped from available list
-            if (!droppedAgents.contains(agent))
-            {
-                droppedAgents.add(agent);
-            }
-            newAgents.remove(agent);
+            availableAgents.remove(agent.getId());
             lockCondition.signal();
         }
         finally
@@ -335,15 +339,31 @@ public class ThreadedRecipeQueue implements Runnable, RecipeQueue, EventListener
             eventManager.publish(error);
         }
 
-        publishUnfulfillable(unfulfillable);
+        if(removedRequests != null)
+        {
+            publishUnfulfillable(removedRequests);
+        }
     }
 
-    private List<RecipeDispatchRequest> checkQueuedRequests(List<RecipeDispatchRequest> requests)
+    private void checkQueuedTimeouts(long timeout)
+    {
+        assert(lock.isHeldByCurrentThread());
+
+        for (RecipeDispatchRequest request : queuedDispatches)
+        {
+            if (!request.hasTimeout() && !requestMayBeFulfilled(request))
+            {
+                request.setTimeout(timeout);
+            }
+        }
+    }
+
+    private List<RecipeDispatchRequest> removeUnfulfillable()
     {
         assert(lock.isHeldByCurrentThread());
 
         List<RecipeDispatchRequest> unfulfillable = new LinkedList<RecipeDispatchRequest>();
-        for (RecipeDispatchRequest request : requests)
+        for (RecipeDispatchRequest request : queuedDispatches)
         {
             if (!requestMayBeFulfilled(request))
             {
@@ -351,17 +371,12 @@ public class ThreadedRecipeQueue implements Runnable, RecipeQueue, EventListener
             }
         }
 
-        removeUnfulfillable(unfulfillable, requests);
+        queuedDispatches.removeAll(unfulfillable);
         return unfulfillable;
     }
 
     private boolean requestMayBeFulfilled(RecipeDispatchRequest request)
     {
-        if (!checkOnEnqueue)
-        {
-            return true;
-        }
-
         for (Agent a : onlineAgents.values())
         {
             if (request.getHostRequirements().fulfilledBy(request, a.getBuildService()))
@@ -390,65 +405,58 @@ public class ThreadedRecipeQueue implements Runnable, RecipeQueue, EventListener
             LOG.debug("lock.lock();");
             try
             {
-                if (newDispatches.size() == 0 && newAgents.size() == 0)
-                {
-                    try
-                    {
-                        LOG.debug("lockCondition.await();");
-                        lockCondition.await(60, TimeUnit.SECONDS);
-                        LOG.debug("lockCondition.unawait();");
-                    }
-                    catch (InterruptedException e)
-                    {
-                        LOG.debug("lockCondition.wait() was interrupted: " + e.getMessage());
-                    }
-                }
-
                 if (stopRequested)
                 {
                     break;
                 }
 
-                queuedDispatches.addAll(newDispatches);
-                newDispatches.clear();
-
-                for (Agent a : droppedAgents)
-                {
-                    availableAgents.remove(a.getId());
-                }
-                droppedAgents.clear();
-
-                for (Agent a : newAgents)
-                {
-                    availableAgents.put(a.getId(), a);
-                }
-                newAgents.clear();
-
-                List<RecipeDispatchRequest> dispatchedRequests = new LinkedList<RecipeDispatchRequest>();
+                List<RecipeDispatchRequest> doneRequests = new LinkedList<RecipeDispatchRequest>();
                 List<Agent> unavailableAgents = new LinkedList<Agent>();
+                long currentTime = System.currentTimeMillis();
 
                 for (RecipeDispatchRequest request : queuedDispatches)
                 {
-                    for (Agent agent : availableAgents.values())
+                    if(request.hasTimedOut(currentTime))
                     {
-                        BuildService service = agent.getBuildService();
-
-                        // can the request be sent to this service?
-                        if (request.getHostRequirements().fulfilledBy(request, service) && !unavailableAgents.contains(agent))
+                        doneRequests.add(request);
+                        eventManager.publish(new RecipeErrorEvent(this, request.getRequest().getId(), "Recipe request timed out waiting for a capable agent to become available"));
+                    }
+                    else
+                    {
+                        for (Agent agent : availableAgents.values())
                         {
-                            if (dispatchRequest(request, agent, unavailableAgents, dispatchedRequests))
+                            BuildService service = agent.getBuildService();
+
+                            // can the request be sent to this service?
+                            if (request.getHostRequirements().fulfilledBy(request, service) && !unavailableAgents.contains(agent))
                             {
-                                break;
+                                if (dispatchRequest(request, agent, unavailableAgents, doneRequests))
+                                {
+                                    break;
+                                }
                             }
                         }
                     }
                 }
 
-                queuedDispatches.removeAll(dispatchedRequests);
+                queuedDispatches.removeAll(doneRequests);
 
                 for (Agent a : unavailableAgents)
                 {
                     availableAgents.remove(a.getId());
+                }
+
+                try
+                {
+                    // Wake up when there is something to do, and also
+                    // perdiodically to check for timed-out requests.
+                    LOG.debug("lockCondition.await();");
+                    lockCondition.await(sleepInterval, TimeUnit.SECONDS);
+                    LOG.debug("lockCondition.unawait();");
+                }
+                catch (InterruptedException e)
+                {
+                    LOG.debug("lockCondition.wait() was interrupted: " + e.getMessage());
                 }
             }
             finally
@@ -478,7 +486,11 @@ public class ThreadedRecipeQueue implements Runnable, RecipeQueue, EventListener
 
         try
         {
-            agent.getBuildService().build(request.getRequest());
+            // Generate the build context.
+            BuildContext context = new BuildContext();
+            context.setBuildNumber(request.getBuild().getNumber());
+
+            agent.getBuildService().build(request.getRequest(), context);
             unavailableAgents.add(agent);
             executingAgents.put(request.getRequest().getId(), agent);
         }
@@ -526,7 +538,7 @@ public class ThreadedRecipeQueue implements Runnable, RecipeQueue, EventListener
         lock.lock();
         try
         {
-            return queuedDispatches.size() + newDispatches.size();
+            return queuedDispatches.size();
         }
         finally
         {
@@ -612,13 +624,21 @@ public class ThreadedRecipeQueue implements Runnable, RecipeQueue, EventListener
 
     private void handleScmChange(SCMChangeEvent event)
     {
-        List<RecipeDispatchRequest> unfulfillable = new LinkedList<RecipeDispatchRequest>();
+        List<RecipeDispatchRequest> rejects = null;
         Scm changedScm = event.getScm();
         lock.lock();
         try
         {
-            unfulfillable.addAll(checkQueueForChanges(changedScm, event, newDispatches));
-            unfulfillable.addAll(checkQueueForChanges(changedScm, event, queuedDispatches));
+            List<RecipeDispatchRequest> unfulfillable = checkQueueForChanges(changedScm, event, queuedDispatches);
+            if(unsatisfiableTimeout == 0)
+            {
+                queuedDispatches.removeAll(unfulfillable);
+                rejects = unfulfillable;
+            }
+            else if(unsatisfiableTimeout > 0)
+            {
+                updateTimeouts(unfulfillable, System.currentTimeMillis() + unsatisfiableTimeout);
+            }
         }
         finally
         {
@@ -626,7 +646,21 @@ public class ThreadedRecipeQueue implements Runnable, RecipeQueue, EventListener
         }
 
         // Publish events outside the lock
-        publishUnfulfillable(unfulfillable);
+        if(rejects != null)
+        {
+            publishUnfulfillable(rejects);
+        }
+    }
+
+    private void updateTimeouts(List<RecipeDispatchRequest> requests, long timeout)
+    {
+        for(RecipeDispatchRequest request: requests)
+        {
+            if(!request.hasTimeout())
+            {
+                request.setTimeout(timeout);
+            }
+        }
     }
 
     private void publishUnfulfillable(List<RecipeDispatchRequest> unfulfillable)
@@ -662,26 +696,22 @@ public class ThreadedRecipeQueue implements Runnable, RecipeQueue, EventListener
             }
         }
 
-        removeUnfulfillable(unfulfillable, requests);
         return unfulfillable;
-    }
-
-    private void removeUnfulfillable(List<RecipeDispatchRequest> unfulfillable, List<RecipeDispatchRequest> requests)
-    {
-        for (RecipeDispatchRequest request : unfulfillable)
-        {
-            requests.remove(request);
-        }
-    }
-
-    public void setCheckOnEnqueue(boolean checkOnEnqueue)
-    {
-        this.checkOnEnqueue = checkOnEnqueue;
     }
 
     public Class[] getHandledEvents()
     {
         return new Class[]{RecipeCompletedEvent.class, RecipeErrorEvent.class, SCMChangeEvent.class, SlaveEvent.class};
+    }
+
+    public void setSleepInterval(int sleepInterval)
+    {
+        this.sleepInterval = sleepInterval;
+    }
+
+    public void setUnsatisfiableTimeout(long unsatisfiableTimeout)
+    {
+        this.unsatisfiableTimeout = unsatisfiableTimeout;
     }
 
     public void setEventManager(EventManager eventManager)
@@ -692,5 +722,16 @@ public class ThreadedRecipeQueue implements Runnable, RecipeQueue, EventListener
     public void setAgentManager(AgentManager agentManager)
     {
         this.agentManager = agentManager;
+    }
+
+    public void setConfigurationManager(MasterConfigurationManager configurationManager)
+    {
+        long timeout = configurationManager.getAppConfig().getUnsatisfiableRecipeTimeout();
+        if(timeout > 0)
+        {
+            timeout *= Constants.MINUTE;
+        }
+
+        this.unsatisfiableTimeout = timeout;
     }
 }

@@ -64,11 +64,15 @@ then
     PULSE_OPTS=-Xmx512m
 fi
 
-if [ -z "$PULSE_PID" ]
-then
-    exec "$JAVACMD" $JAVA_OPTS $PULSE_OPTS -classpath "$BOOT_JAR" -Dpulse.home="$PULSE_HOME" -Djava.awt.headless=true $@
-else
-    "$JAVACMD" $JAVA_OPTS $PULSE_OPTS -classpath "$BOOT_JAR" -Dpulse.home="$PULSE_HOME" -Djava.awt.headless=true $@ >> "$PULSE_HOME"/pulse.out 2>&1 &
-    echo $! > $PULSE_PID
-    exit 0
-fi
+code=111
+while [[ $code -eq 111 ]]
+do
+    if [ -z "$PULSE_OUT" ]
+    then
+        "$JAVACMD" $JAVA_OPTS $PULSE_OPTS -classpath "$BOOT_JAR" -Dpulse.home="$PULSE_HOME" -Djava.awt.headless=true $@
+    else
+        "$JAVACMD" $JAVA_OPTS $PULSE_OPTS -classpath "$BOOT_JAR" -Dpulse.home="$PULSE_HOME" -Djava.awt.headless=true $@ >> "$PULSE_OUT" 2>&1
+    fi
+    code=$?
+done
+

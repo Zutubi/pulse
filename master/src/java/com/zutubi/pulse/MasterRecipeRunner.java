@@ -9,6 +9,7 @@ import com.zutubi.pulse.repository.MasterFileRepository;
 import com.zutubi.pulse.util.logging.Logger;
 
 /**
+ *
  */
 public class MasterRecipeRunner implements Runnable
 {
@@ -19,14 +20,16 @@ public class MasterRecipeRunner implements Runnable
     private EventManager eventManager;
     private MasterConfigurationManager configurationManager;
     private ResourceRepository resourceRepository;
+    private BuildContext context;
 
-    public MasterRecipeRunner(RecipeRequest request, RecipeProcessor recipeProcessor, EventManager eventManager, MasterConfigurationManager configurationManager, ResourceRepository resourceRepository)
+    public MasterRecipeRunner(RecipeRequest request, RecipeProcessor recipeProcessor, EventManager eventManager, MasterConfigurationManager configurationManager, ResourceRepository resourceRepository, BuildContext context)
     {
         this.request = request;
         this.recipeProcessor = recipeProcessor;
         this.eventManager = eventManager;
         this.configurationManager = configurationManager;
         this.resourceRepository = resourceRepository;
+        this.context = context;
     }
 
     public void run()
@@ -42,7 +45,7 @@ public class MasterRecipeRunner implements Runnable
 
         try
         {
-            recipeProcessor.build(request, recipePaths, resourceRepository, true);
+            recipeProcessor.build(request, recipePaths, resourceRepository, true, context);
         }
         catch (BuildException e)
         {

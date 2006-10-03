@@ -5,7 +5,7 @@ import com.zutubi.pulse.util.TimeStamps;
 /**
  * Abstract base for test suites and cases.
  */
-public abstract class TestResult extends Entity
+public abstract class TestResult
 {
     public static final long UNKNOWN_DURATION = -1;
 
@@ -89,5 +89,15 @@ public abstract class TestResult extends Entity
         summary.addErrors(getErrors());
         summary.addFailures(getFailures());
         summary.addTotal(getTotal());
+    }
+
+    public boolean isEquivalent(TestResult other)
+    {
+        if(!getName().equals(other.getName()))
+        {
+            return false;
+        }
+
+        return getDuration() == other.getDuration();
     }
 }

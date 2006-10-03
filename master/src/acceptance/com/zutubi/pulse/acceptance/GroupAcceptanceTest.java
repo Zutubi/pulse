@@ -1,12 +1,12 @@
 package com.zutubi.pulse.acceptance;
 
-import com.zutubi.pulse.acceptance.forms.GroupForm;
-import com.zutubi.pulse.acceptance.forms.AddGroupMembersForm;
-import com.zutubi.pulse.util.RandomUtils;
-import com.meterware.httpunit.WebTable;
 import com.meterware.httpunit.TableCell;
-import net.sourceforge.jwebunit.ExpectedTable;
+import com.meterware.httpunit.WebTable;
+import com.zutubi.pulse.acceptance.forms.AddGroupMembersForm;
+import com.zutubi.pulse.acceptance.forms.GroupForm;
+import com.zutubi.pulse.util.RandomUtils;
 import net.sourceforge.jwebunit.ExpectedRow;
+import net.sourceforge.jwebunit.ExpectedTable;
 
 /**
  */
@@ -32,22 +32,29 @@ public class GroupAcceptanceTest extends BaseAcceptanceTestCase
     public void testAddGroup()
     {
         GroupForm form = addPrologue();
-        form.saveFormElements(groupName, "false", "false", "");
-        assertGroup(groupName, 0, false, 0);
+        form.saveFormElements(groupName, "false", "false", "false", "");
+        assertGroup(groupName, 0, false, false, 0);
     }
 
     public void testAddGroupServerAdmin()
     {
         GroupForm form = addPrologue();
-        form.saveFormElements(groupName, "true", "false", "");
-        assertGroup(groupName, 0, true, 0);
+        form.saveFormElements(groupName, "true", "false", "false", "");
+        assertGroup(groupName, 0, true, false, 0);
+    }
+
+    public void testAddGroupPersonal()
+    {
+        GroupForm form = addPrologue();
+        form.saveFormElements(groupName, "false", "true", "false", "");
+        assertGroup(groupName, 0, false, true, 0);
     }
 
     public void testAddGroupAllProjectAdmin()
     {
         GroupForm form = addPrologue();
-        form.saveFormElements(groupName, "false", "true", "");
-        assertGroup(groupName, 0, false, -1);
+        form.saveFormElements(groupName, "false", "false", "true", "");
+        assertGroup(groupName, 0, false, false, -1);
     }
 
     public void testAddGroupSomeProjectsAdmin()
@@ -55,14 +62,14 @@ public class GroupAcceptanceTest extends BaseAcceptanceTestCase
         GroupForm form = addPrologue();
         String id1 = form.getOptionValue("projects", "groups1");
         String id2 = form.getOptionValue("projects", "groups2");
-        form.saveFormElements(groupName, "false", "false", id1 + "," + id2);
-        assertGroup(groupName, 0, false, 2);
+        form.saveFormElements(groupName, "false", "false", "false", id1 + "," + id2);
+        assertGroup(groupName, 0, false, false, 2);
     }
 
     public void testAddGroupValidation()
     {
         GroupForm form = addPrologue();
-        form.saveFormElements("", "false", "false", "");
+        form.saveFormElements("", "false", "false", "false", "");
         form.assertFormPresent();
         assertTextPresent("name is required");
     }
@@ -71,7 +78,7 @@ public class GroupAcceptanceTest extends BaseAcceptanceTestCase
     {
         testAddGroup();
         GroupForm form = addPrologue();
-        form.saveFormElements(groupName, "false", "false", "");
+        form.saveFormElements(groupName, "false", "false", "false", "");
         form.assertFormPresent();
         assertTextPresent("a group with name " + groupName + " already exists");
     }
@@ -80,16 +87,16 @@ public class GroupAcceptanceTest extends BaseAcceptanceTestCase
     {
         testAddGroup();
         GroupForm form = editPrologue();
-        form.assertFormElements(groupName, "false", "false", "");
-        form.saveFormElements(groupName + " edited", "true", "true", "");
-        assertGroup(groupName + " edited", 0, true, -1);
+        form.assertFormElements(groupName, "false", "false", "false", "");
+        form.saveFormElements(groupName + " edited", "true", "true", "true", "");
+        assertGroup(groupName + " edited", 0, true, true, -1);
     }
 
     public void testEditGroupValidation()
     {
         testAddGroup();
         GroupForm form = editPrologue();
-        form.saveFormElements("", "false", "false", "");
+        form.saveFormElements("", "false", "false", "false", "");
         form.assertFormPresent();
         assertTextPresent("name is required");
     }
@@ -102,7 +109,7 @@ public class GroupAcceptanceTest extends BaseAcceptanceTestCase
         testAddGroup();
 
         GroupForm form = editPrologue();
-        form.saveFormElements(original, "false", "false", "");
+        form.saveFormElements(original, "false", "false", "false", "");
         form.assertFormPresent();
         assertTextPresent("a group with name " + original + " already exists");
     }
@@ -111,8 +118,8 @@ public class GroupAcceptanceTest extends BaseAcceptanceTestCase
     {
         testAddGroupSomeProjectsAdmin();
         GroupForm form = editPrologue();
-        form.saveFormElements(groupName, "false", "false", "");
-        assertGroup(groupName, 0, false, 0);
+        form.saveFormElements(groupName, "false", "false", "false", "");
+        assertGroup(groupName, 0, false, false, 0);
     }
 
     public void testAddGroupMembers()
@@ -121,7 +128,7 @@ public class GroupAcceptanceTest extends BaseAcceptanceTestCase
         addMember("gu1");
         assertGroupMembers("gu1");
         clickLinkWithText("return to groups view");
-        assertGroup(groupName, 1, false, 0);
+        assertGroup(groupName, 1, false, false, 0);
     }
 
     public void testAddGroupMembersCurrentMembersNotShown()
@@ -283,12 +290,12 @@ public class GroupAcceptanceTest extends BaseAcceptanceTestCase
         clickLinkWithText("edit", getGroupRow(name) - 2);
     }
 
-    private void assertGroup(String name, int members, boolean serverAdmin, int projects)
+    private void assertGroup(String name, int members, boolean serverAdmin, boolean personal, int projects)
     {
         int row = getGroupRow(name);
         if(row >= 0)
         {
-            assertGroup(name, row, members, serverAdmin, projects);
+            assertGroup(name, row, members, serverAdmin, personal, projects);
         }
         else
         {
@@ -311,10 +318,11 @@ public class GroupAcceptanceTest extends BaseAcceptanceTestCase
         return -1;
     }
 
-    private void assertGroup(String name, int row, int members, boolean serverAdmin, int projects)
+    private void assertGroup(String name, int row, int members, boolean serverAdmin, boolean personal, int projects)
     {
         String membersText = Integer.toString(members) + " users";
         String adminText = serverAdmin ? "server admin" : "none";
+        String personalText = personal ? "personal builds allowed" : "none";
         String projectText = "admin for all projects";
 
         if(projects == 0)
@@ -326,7 +334,7 @@ public class GroupAcceptanceTest extends BaseAcceptanceTestCase
             projectText = "admin for " + projects + " projects";
         }
 
-        assertTableRowEqual("groups", row, new String[] { name, membersText, adminText, projectText, "edit", "delete" });
+        assertTableRowEqual("groups", row, new String[] { name, membersText, adminText, personalText, projectText, "edit", "delete" });
     }
 
     private void assertGroupMembers(String... members)

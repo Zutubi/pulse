@@ -10,6 +10,9 @@ import com.zutubi.pulse.util.TimeStamps;
 import com.zutubi.pulse.xwork.TextProviderSupport;
 import com.zutubi.pulse.xwork.interceptor.Cancelable;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
+import java.net.URLEncoder;
 import java.util.List;
 import java.util.Locale;
 import java.util.ResourceBundle;
@@ -25,7 +28,7 @@ public class ActionSupport extends com.opensymphony.xwork.ActionSupport implemen
     protected static final String ERROR_STATUS_CODE = "javax.servlet.error.status_code";
     protected static final String ERROR_EXCEPTION = "javax.servlet.error.exception";
 
-    
+
     /**
      * Use our own text provider implementation. It would be nice if there was a way to replace
      * the textProvider used by the default action support.
@@ -127,5 +130,29 @@ public class ActionSupport extends com.opensymphony.xwork.ActionSupport implemen
     public String escapeSpaces(String s)
     {
         return s.replace(" ", "%20");
+    }
+
+    public String urlEncode(String s)
+    {
+        try
+        {
+            return URLEncoder.encode(s, "UTF-8");
+        }
+        catch (UnsupportedEncodingException e)
+        {
+            return s;
+        }
+    }
+
+    public String urlDecode(String s)
+    {
+        try
+        {
+            return URLDecoder.decode(s, "UTF-8");
+        }
+        catch (UnsupportedEncodingException e)
+        {
+            return s;
+        }
     }
 }

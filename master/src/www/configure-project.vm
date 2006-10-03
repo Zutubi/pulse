@@ -32,6 +32,12 @@
                     #dynamicRow("scm.change.viewer.url" $project.scm.changeViewerUrl)
 #end
                     #dynamicRow("scm.monitor" "$project.scm.monitor")
+                    #if (!$project.scm.pollingInterval)
+                        #set($defaultSPI = "$defaultScmPollingInterval (default)")
+                        #dynamicRow("scm.polling.interval" $defaultSPI)
+                    #else
+                        #dynamicRow("scm.polling.interval" "$project.scm.pollingInterval")
+                    #end
                     #enabledDisabledRow("scm.filters" $project.scm.filterEnabled)
 #acl("domainObject=project" "hasPermission=4,1")
                     <tr>
@@ -152,13 +158,14 @@
                 <!-- Triggers -->
 
                 <table id="project.triggers" class="fill-content">
-                    #headingRow("project.triggers" 5)
+                    #headingRow("project.triggers" 7)
                     <tr>
                         #contentHeading("trigger.name" 1)
                         #contentHeading("trigger.type" 1)
                         #contentHeading("trigger.spec" 1)
+                        #contentHeading("trigger.state" 1)
 #acl("domainObject=project" "hasPermission=4,1")
-                        #contentHeading("actions" 2)
+                        #contentHeading("actions" 3)
 #end
                     </tr>
 #if($triggers.size() > 0)
@@ -168,17 +175,30 @@
                         #dynamicCell($trigger.name)
                         #dynamicCell($trigger.type)
                         #dynamicCell($trigger.dataMap.spec)
+            #if($trigger.paused)
+                        #contentCell("trigger.disabled")
+            #else
+                        #contentCell("trigger.enabled")
+            #end
+
         #acl("domainObject=project" "hasPermission=4,1")
+                        <td class="content">
+            #if($trigger.paused)
+                            <a id="toggle_$!webwork.htmlEncode($trigger.name)" href="toggleTrigger.action?id=$trigger.id&amp;projectId=$project.id&amp;pause=false">#wwtext("name=trigger.enable")</a>
+            #else
+                            <a id="toggle_$!webwork.htmlEncode($trigger.name)" href="toggleTrigger.action?id=$trigger.id&amp;projectId=$project.id&amp;pause=true">#wwtext("name=trigger.disable")</a>
+            #end
+                        </td>
                         #editCell("editTrigger!input.action?id=$trigger.id&amp;projectId=$project.id" "edit_$!webwork.htmlEncode($trigger.name)")
                         #deleteCell("delete_$!webwork.htmlEncode($trigger.name)" "deleteTrigger.action?id=$trigger.id" $confirmMessage )
         #end
                     </tr>
     #end
 #else
-                    #contentRow("triggers.none" 5)
+                    #contentRow("triggers.none" 7)
 #end
 #acl("domainObject=project" "hasPermission=4,1")
-                    #addRow("trigger.add" 5 "addTrigger.action?projectId=$project.id" "project.trigger.add")
+                    #addRow("trigger.add" 7 "addTrigger.action?projectId=$project.id" "project.trigger.add")
 #end
                 </table>
 

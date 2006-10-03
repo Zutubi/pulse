@@ -5,6 +5,8 @@ import com.zutubi.pulse.web.wizard.*;
 import com.zutubi.pulse.form.descriptor.*;
 import com.zutubi.pulse.notifications.NotificationSchemeManager;
 import com.zutubi.pulse.notifications.NotificationHandler;
+import com.zutubi.pulse.notifications.EmailNotificationHandler;
+import com.zutubi.pulse.notifications.JabberNotificationHandler;
 import com.zutubi.pulse.core.ObjectFactory;
 import com.zutubi.validation.*;
 
@@ -126,24 +128,35 @@ public class ContactPointWizard extends BaseWizard
     {
         // handle the creation of the contact point.
         User user = userManager.getUser(userId);
-        ContactPoint contact = null;
 
         SelectContact selectData = (SelectContact) ((FormWizardState)getState("select")).getSubject();
-
         WizardState state = getState(selectData.getContact());
         NotificationHandler handler = (NotificationHandler) ((FormWizardState)state).getSubject();
 
         // new contact point.
-
-        // set handler ObjectHandle.
-
-        user.add(contact);
-        userManager.save(user);
+        if (handler instanceof EmailNotificationHandler)
+        {
+            EmailNotificationHandler emailHandler = (EmailNotificationHandler)handler;
+            EmailContactPoint email = new EmailContactPoint();
+            email.setEmail(emailHandler.getEmail());
+            email.setType(emailHandler.getFormat());
+            email.setName(emailHandler.getName());
+            user.add(email);
+            userManager.save(user);
+        }
+        else if (handler instanceof JabberNotificationHandler)
+        {
+            JabberNotificationHandler jabberHandler = (JabberNotificationHandler) handler;
+            JabberContactPoint jabber = new JabberContactPoint();
+            jabber.setName(jabberHandler.getName());
+            jabber.setUsername(jabberHandler.getUsername());
+            user.add(jabber);
+            userManager.save(user);
+        }
     }
 
     public class SelectContact
     {
-        private String name;
         private String contact;
 
         private List<String> options;
@@ -152,18 +165,6 @@ public class ContactPointWizard extends BaseWizard
         {
             this.options = options;
         }
-
-/*
-        public String getName()
-        {
-            return name;
-        }
-
-        public void setName(String name)
-        {
-            this.name = name;
-        }
-*/
 
         public String getContact()
         {

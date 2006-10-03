@@ -3,6 +3,7 @@ package com.zutubi.pulse.form.ui.components;
 import com.zutubi.pulse.test.PulseTestCase;
 import com.zutubi.pulse.form.ui.renderers.FreemarkerTemplateRenderer;
 import com.zutubi.pulse.form.ui.ComponentRenderer;
+import com.zutubi.pulse.form.NoopTextProvider;
 import freemarker.cache.TemplateLoader;
 import freemarker.cache.FileTemplateLoader;
 import freemarker.cache.MultiTemplateLoader;
@@ -42,6 +43,7 @@ public abstract class ComponentTestCase extends PulseTestCase
 
         renderer = new ComponentRenderer();
         renderer.setTemplateRenderer(templateRenderer);
+        renderer.setTextProvider(new NoopTextProvider());
     }
 
     protected void tearDown() throws Exception

@@ -18,8 +18,18 @@
     #wwcheckbox("name=rssEnabled" "label=%{getText('general.rss.enabled')}" "tabindex=3")
     #inlineHelp("general.rss.enabled.help")
     #wwcheckbox("name=anonEnabled" "label=%{getText('general.anonymous.enable')}" "tabindex=4")
+    #wwtextfield("name=scmPollingInterval" "label=%{getText('scm.polling.interval')}" "size=6" "after= minutes" "tabindex=5")
 
-    #saveCancel("5")
+    #wwcheckbox("name=recipeTimeoutEnabled" "label=%{getText('enable.recipe.queue.timeout')}" "fieldValue=true" "onclick=setEnableState('general.config_recipeTimeout', 'general.config_recipeTimeoutEnabled')" "tabindex=6")
+    #inlineHelp("enable.recipe.queue.timeout.help")
+    #wwtextfield("name=recipeTimeout" "label=%{getText('recipe.queue.timeout')}" "size=6" "after= minutes" "tabindex=7")
+    #inlineHelp("recipe.queue.timeout.help")
+
+    <script type="text/javascript">
+        setEnableState('general.config_recipeTimeout', 'general.config_recipeTimeoutEnabled');
+    </script>
+
+    #saveCancel("8")
 #end
 
     #tabEnd()

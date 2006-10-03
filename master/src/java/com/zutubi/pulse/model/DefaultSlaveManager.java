@@ -9,6 +9,9 @@ import com.zutubi.pulse.scheduling.Trigger;
 import com.zutubi.pulse.scheduling.tasks.PingSlaves;
 import com.zutubi.pulse.util.Constants;
 import com.zutubi.pulse.util.logging.Logger;
+import com.zutubi.pulse.agent.AgentManager;
+import com.zutubi.pulse.license.LicenseHolder;
+import com.zutubi.pulse.license.LicenseException;
 
 import java.util.LinkedList;
 import java.util.List;

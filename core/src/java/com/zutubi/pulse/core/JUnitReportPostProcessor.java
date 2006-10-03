@@ -1,12 +1,9 @@
 package com.zutubi.pulse.core;
 
-import com.zutubi.pulse.core.model.*;
-import com.zutubi.pulse.util.IOUtils;
+import com.zutubi.pulse.core.model.TestCaseResult;
+import com.zutubi.pulse.core.model.TestResult;
+import com.zutubi.pulse.core.model.TestSuiteResult;
 import nu.xom.*;
-
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
 
 /**
  */
@@ -26,13 +23,13 @@ public class JUnitReportPostProcessor extends XMLReportPostProcessor
         super("JUnit");
     }
 
-    protected void processDocument(Document doc, StoredFileArtifact artifact)
+    protected void processDocument(Document doc, TestSuiteResult tests)
     {
         Element root = doc.getRootElement();
         if(root.getLocalName().equals(ELEMENT_SUITE))
         {
             // A single suite
-            processSuite(root, artifact);
+            processSuite(root, tests);
         }
         else
         {
@@ -40,12 +37,12 @@ public class JUnitReportPostProcessor extends XMLReportPostProcessor
             Elements suiteElements = root.getChildElements(ELEMENT_SUITE);
             for(int i = 0; i < suiteElements.size(); i++)
             {
-                processSuite(suiteElements.get(i), artifact);
+                processSuite(suiteElements.get(i), tests);
             }
         }
     }
 
-    private void processSuite(Element element, StoredFileArtifact artifact)
+    private void processSuite(Element element, TestSuiteResult tests)
     {
         String name = "";
 
@@ -75,7 +72,8 @@ public class JUnitReportPostProcessor extends XMLReportPostProcessor
         {
             processCase(cases.get(i), suite);
         }
-        artifact.addTest(suite);
+
+        tests.add(suite);
     }
 
     private void processCase(Element element, TestSuiteResult suite)

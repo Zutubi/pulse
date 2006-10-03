@@ -29,7 +29,7 @@ public class PrintCommand extends CommandSupport
 
     private boolean terminated = false;
 
-    public void execute(long recipeId, CommandContext context, CommandResult result)
+    public void execute(CommandContext context, CommandResult result)
     {
         if(terminated)
         {
@@ -63,7 +63,7 @@ public class PrintCommand extends CommandSupport
             IOUtils.close(writer);
         }
 
-        ProcessSupport.postProcess(processes, outputFileDir, outputFile, context.getOutputDir(), result);
+        ProcessSupport.postProcess(processes, outputFileDir, outputFile, result, context);
     }
 
     public void setMessage(String message)

@@ -1,5 +1,7 @@
 package com.zutubi.pulse.model;
 
+import com.zutubi.pulse.license.LicenseException;
+
 import java.util.List;
 
 /**
@@ -14,4 +16,5 @@ public interface SlaveManager extends EntityManager<Slave>
     Slave getSlave(long id);
 
     void delete(long id);
+
 }

@@ -1,7 +1,10 @@
 package com.zutubi.pulse.model.persistence.hibernate;
 
 import com.zutubi.pulse.bootstrap.ComponentContext;
-import com.zutubi.pulse.core.model.*;
+import com.zutubi.pulse.core.model.Feature;
+import com.zutubi.pulse.core.model.PlainFeature;
+import com.zutubi.pulse.core.model.StoredArtifact;
+import com.zutubi.pulse.core.model.StoredFileArtifact;
 import com.zutubi.pulse.model.persistence.ArtifactDao;
 import com.zutubi.pulse.model.persistence.FileArtifactDao;
 
@@ -34,21 +37,12 @@ public class HibernateFileArtifactDaoTest extends MasterPersistenceTestCase
         parent.add(artifact);
 
         artifact.addFeature(new PlainFeature(Feature.Level.ERROR, "summary", 2));
-        TestSuiteResult suiteResult = new TestSuiteResult("suite result", 100);
-        TestCaseResult testCase = new TestCaseResult("case result", 20, TestCaseResult.Status.FAILURE, "my failure message");
-        suiteResult.add(testCase);
-        artifact.addTest(suiteResult);
 
         fileArtifactDao.save(artifact);
         commitAndRefreshTransaction();
 
         StoredFileArtifact otherArtifact = fileArtifactDao.findById(artifact.getId());
         assertEquals(1, otherArtifact.getFeatures().size());
-        assertEquals(1, otherArtifact.getTests().size());
-        TestSuiteResult otherSuite = (TestSuiteResult) otherArtifact.getTests().get(0);
-        assertEquals(1, otherSuite.getChildren().size());
-        TestCaseResult otherCase = (TestCaseResult) otherSuite.getChildren().get(0);
-        assertPropertyEquals(testCase, otherCase);
         assertPropertyEquals(artifact, otherArtifact);
     }
 }

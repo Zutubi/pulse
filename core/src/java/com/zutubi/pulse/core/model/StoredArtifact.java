@@ -204,32 +204,4 @@ public class StoredArtifact extends Entity
 
         return null;
     }
-
-    public boolean hasBrokenTests()
-    {
-        return getTestSummary().getBroken() > 0;
-    }
-
-    public TestResultSummary getTestSummary()
-    {
-        TestResultSummary summary = new TestResultSummary();
-        accumulateTestSummary(summary);
-        return summary;
-    }
-
-    public void accumulateTestSummary(TestResultSummary summary)
-    {
-        for (StoredFileArtifact file : children)
-        {
-            file.accumulateTestSummary(summary);
-        }
-    }
-
-    public void addAllTestResults(List<TestResult> tests)
-    {
-        for(StoredFileArtifact file: children)
-        {
-            file.addAllTestResults(tests);
-        }
-    }
 }

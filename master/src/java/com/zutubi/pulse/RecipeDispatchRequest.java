@@ -1,7 +1,7 @@
 package com.zutubi.pulse;
 
-import com.zutubi.pulse.core.RecipeRequest;
 import com.zutubi.pulse.core.BuildRevision;
+import com.zutubi.pulse.core.RecipeRequest;
 import com.zutubi.pulse.model.BuildHostRequirements;
 import com.zutubi.pulse.model.BuildResult;
 import com.zutubi.pulse.util.TimeStamps;
@@ -16,6 +16,11 @@ public class RecipeDispatchRequest
     private RecipeRequest request;
     private BuildResult build;
     private long queueTime;
+    /**
+     * Time at which the request should be timed out as no capable agent has
+     * become available.  If negative, no timeout is currently in place.
+     */
+    private long timeout = -1;
 
     public RecipeDispatchRequest(BuildHostRequirements hostRequirements, BuildRevision revision, RecipeRequest request, BuildResult build)
     {
@@ -58,5 +63,30 @@ public class RecipeDispatchRequest
     public String getPrettyQueueTime()
     {
         return TimeStamps.getPrettyTime(queueTime);
+    }
+
+    public long getTimeout()
+    {
+        return timeout;
+    }
+
+    public void setTimeout(long timeout)
+    {
+        this.timeout = timeout;
+    }
+
+    public boolean hasTimeout()
+    {
+        return timeout >= 0;
+    }
+
+    public boolean hasTimedOut(long currentTime)
+    {
+        return hasTimeout() && currentTime >= timeout;
+    }
+
+    public void clearTimeout()
+    {
+        timeout = -1;
     }
 }

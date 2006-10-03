@@ -1,24 +1,25 @@
 package com.zutubi.pulse.core;
 
-import com.zutubi.pulse.core.model.StoredFileArtifact;
 import com.zutubi.pulse.core.model.CommandResult;
-import com.zutubi.pulse.core.model.TestSuiteResult;
+import com.zutubi.pulse.core.model.StoredFileArtifact;
 import com.zutubi.pulse.core.model.TestCaseResult;
+import com.zutubi.pulse.core.model.TestSuiteResult;
 import com.zutubi.pulse.util.IOUtils;
 import com.zutubi.pulse.util.logging.Logger;
 
-import java.io.*;
-import java.util.regex.Pattern;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
 import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * <class-comment/>
  */
-public class OCUnitReportPostProcessor implements PostProcessor
+public class OCUnitReportPostProcessor extends TestReportPostProcessor
 {
     private static final Logger LOG = Logger.getLogger(OCUnitReportPostProcessor.class);
-
-    private String name;
 
     private BufferedReader reader;
 
@@ -35,27 +36,12 @@ public class OCUnitReportPostProcessor implements PostProcessor
 
     public OCUnitReportPostProcessor(String name)
     {
-        this.name = name;
+        setName(name);
     }
-
-    public String getName()
+    
+    protected void internalProcess(StoredFileArtifact artifact, CommandResult result, CommandContext context)
     {
-        return name;
-    }
-
-    public void setName(String name)
-    {
-        this.name = name;
-    }
-
-    public Object getValue()
-    {
-        return this;
-    }
-
-    public void process(File outputDir, StoredFileArtifact artifact, CommandResult result)
-    {
-        File file = new File(outputDir, artifact.getPath());
+        File file = new File(context.getOutputDir(), artifact.getPath());
         if (!file.isFile())
         {
             return;
@@ -68,7 +54,7 @@ public class OCUnitReportPostProcessor implements PostProcessor
             // read until you locate the start of a test suite.
             try
             {
-                processFile(artifact);
+                processFile(context.getTestResults());
             }
             catch (IllegalStateException e)
             {
@@ -88,7 +74,7 @@ public class OCUnitReportPostProcessor implements PostProcessor
         }
     }
 
-    private void processFile(StoredFileArtifact artifact) throws IOException
+    private void processFile(TestSuiteResult tests) throws IOException
     {
         // look for a TestSuite.
         currentLine = nextLine();
@@ -98,7 +84,7 @@ public class OCUnitReportPostProcessor implements PostProcessor
             if (START_SUITE_PATTERN.matcher(currentLine).matches())
             {
                 // we have a test suite.
-                artifact.addTest(processSuite());
+                tests.add(processSuite());
             }
             currentLine = nextLine();
         }

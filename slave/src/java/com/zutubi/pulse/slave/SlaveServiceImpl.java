@@ -1,5 +1,6 @@
 package com.zutubi.pulse.slave;
 
+import com.zutubi.pulse.BuildContext;
 import com.zutubi.pulse.ResourceDiscoverer;
 import com.zutubi.pulse.SystemInfo;
 import com.zutubi.pulse.Version;
@@ -43,8 +44,7 @@ public class SlaveServiceImpl implements SlaveService
     {
         serviceTokenManager.validateToken(token);
 
-        // Currently we always accept the request!  Should check we can write to the
-        // home dirs first I suppose...
+        // Currently we always accept the request
         UpdateCommand command = new UpdateCommand(build, master, token, id, packageUrl, packageSize);
         ComponentContext.autowire(command);
         threadPool.execute(command);
@@ -75,11 +75,11 @@ public class SlaveServiceImpl implements SlaveService
         }
     }
 
-    public boolean build(String token, String master, long slaveId, RecipeRequest request) throws InvalidTokenException
+    public boolean build(String token, String master, long slaveId, RecipeRequest request, BuildContext context) throws InvalidTokenException
     {
         serviceTokenManager.validateToken(token);
 
-        RecipeCommand command = new RecipeCommand(master, slaveId, request);
+        RecipeCommand command = new RecipeCommand(master, slaveId, request, context);
         ComponentContext.autowire(command);
         ErrorHandlingRunnable runnable = new ErrorHandlingRunnable(master, serviceTokenManager, request.getId(), command);
         ComponentContext.autowire(runnable);

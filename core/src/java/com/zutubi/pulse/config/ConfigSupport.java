@@ -88,6 +88,15 @@ public class ConfigSupport implements Config
         return null;
     }
 
+    public Long getLong(String key, Long defaultValue)
+    {
+        if (hasProperty(key))
+        {
+            return Long.valueOf(getProperty(key));
+        }
+        return defaultValue;
+    }
+
     public void setLong(String key, Long value)
     {
         if (value != null)

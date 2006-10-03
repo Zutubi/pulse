@@ -43,6 +43,8 @@
                 <ref local="groups"/>
                 <ref local="schemaUpgrade0101007001"/>
                 <ref local="orphanedTriggers"/>
+                <ref local="schemaUpgrade0101011001"/>
+                <ref local="testStorage"/>
             </list>
         </property>
     </bean>
@@ -226,5 +228,19 @@
 
     <bean id="orphanedTriggers" class="com.zutubi.pulse.upgrade.tasks.OrphanedTriggerUpgradeTask" autowire="byName">
         <property name="buildNumber" value="101008001"/>
+    </bean>
+
+    <bean id="schemaUpgrade0101011001" class="com.zutubi.pulse.upgrade.tasks.MigrateSchemaUpgradeTask" autowire="byName">
+        <property name="buildNumber" value="101011001"/>
+        <property name="mappings">
+            <list>
+                <value>com/zutubi/pulse/upgrade/schema/build_0101011001/BuildResult.hbm.xml</value>
+                <value>com/zutubi/pulse/upgrade/schema/build_0101011001/Scm.hbm.xml</value>
+            </list>
+        </property>
+    </bean>
+
+    <bean id="testStorage" class="com.zutubi.pulse.upgrade.tasks.TestStorageUpgradeTask" autowire="byName">
+        <property name="buildNumber" value="101011002"/>
     </bean>
 </beans>

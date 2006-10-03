@@ -20,7 +20,7 @@ public class EmailContactForm extends BaseForm
     {
         if (create)
         {
-            return "email.create";
+            return "EmailNotificationHandler";
         }
         else
         {
@@ -30,7 +30,14 @@ public class EmailContactForm extends BaseForm
 
     public String[] getFieldNames()
     {
-        return new String[]{"contact.name", "contact.email", "contact.type"};
+        if (create)
+        {
+            return new String[]{"name", "email", "format"};
+        }
+        else
+        {
+            return new String[]{"contact.name", "contact.email", "contact.type"};
+        }
     }
 
     public void saveFormElements(String... args)

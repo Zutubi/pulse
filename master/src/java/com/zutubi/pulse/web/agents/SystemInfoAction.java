@@ -1,8 +1,8 @@
 package com.zutubi.pulse.web.agents;
 
-import com.caucho.hessian.client.HessianRuntimeException;
 import com.zutubi.pulse.SystemInfo;
 import com.zutubi.pulse.agent.Agent;
+import com.zutubi.pulse.util.logging.Logger;
 
 /**
  *
@@ -10,6 +10,8 @@ import com.zutubi.pulse.agent.Agent;
  */
 public class SystemInfoAction extends AgentActionSupport
 {
+    private static final Logger LOG = Logger.getLogger(SystemInfoAction.class);
+
     private SystemInfo info;
 
     /**
@@ -28,6 +30,7 @@ public class SystemInfoAction extends AgentActionSupport
             catch(RuntimeException e)
             {
                 addActionError("Unable to contact agent: " + e.getMessage());
+                LOG.warning(e);
             }
         }
         else

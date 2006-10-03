@@ -15,11 +15,12 @@
           <tr>
               <td>
                   <table class="fill-content" id="groups">
-                      #headingRow("groups" 6)
+                      #headingRow("groups" 7)
                       <tr>
                           #contentHeading("group.name" 1)
                           #contentHeading("group.members" 1)
                           #contentHeading("group.server.permissions" 1)
+                          #contentHeading("group.personal.permissions" 1)
                           #contentHeading("group.project.permissions" 1)
                           #contentHeading("actions" 2)
                       </tr>
@@ -37,6 +38,11 @@
 #else
                           #contentCell("group.permissions.none")
 #end
+#if($action.hasPersonalAuthority($group))
+                          #contentCell("group.personal.allowed")
+#else
+                          #contentCell("group.permissions.none")
+#end
 #if($group.adminAllProjects)
                           #contentCell("group.all.projects.admin")
 #else
@@ -51,7 +57,7 @@
                           #deleteCell("delete_$group.id" "deleteGroup.action?groupId=$group.id&amp;startPage=$startPage" $confirmMessage)
                       </tr>
                       #end
-                      #addRow("group.add" 6 "createGroup!input.action" "group.add")
+                      #addRow("group.add" 7 "createGroup!input.action" "group.add")
                   </table>
 #if($groups.size() > 0)
                   <table class="fill-content">

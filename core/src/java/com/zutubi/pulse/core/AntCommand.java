@@ -38,7 +38,7 @@ public class AntCommand extends ExecutableCommand
         }
     }
 
-    public void execute(long recipeId, CommandContext context, CommandResult cmdResult)
+    public void execute(CommandContext context, CommandResult cmdResult)
     {
         checkExe();
 
@@ -54,10 +54,10 @@ public class AntCommand extends ExecutableCommand
             cmdResult.getProperties().put("targets", targets);
         }
 
-        super.execute(recipeId, context, cmdResult);
+        super.execute(context, cmdResult);
 
         AntPostProcessor pp = new AntPostProcessor("ant.pp");
-        pp.process(context.getOutputDir(), cmdResult.getArtifact(OUTPUT_NAME).getFile(), cmdResult);
+        pp.process(cmdResult.getArtifact(OUTPUT_NAME).getFile(), cmdResult, context);
     }
 
     public String getBuildFile()

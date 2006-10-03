@@ -98,19 +98,19 @@ public class UserPreferencesAcceptanceTest extends BaseAcceptanceTestCase
         EmailContactForm emailForm = emailSetup();
 
         // name is required.
-        emailForm.saveFormElements("", "email@example.com", "html");
+        emailForm.finishFormElements("", "email@example.com", "html");
         emailForm.assertFormPresent();
         emailForm.assertFormElements("", "email@example.com", "html");
         assertTextPresent("required");
 
         // email is required
-        emailForm.saveFormElements("example", "", "plain");
+        emailForm.finishFormElements("example", "", "plain");
         emailForm.assertFormPresent();
         emailForm.assertFormElements("example", "", "plain");
         assertTextPresent("required");
 
         // email must be valid
-        emailForm.saveFormElements("example", "incorrect email address", "html");
+        emailForm.finishFormElements("example", "incorrect email address", "html");
         emailForm.assertFormPresent();
         emailForm.assertFormElements("example", "incorrect email address", "html");
         assertTextPresent("valid");
@@ -404,7 +404,7 @@ public class UserPreferencesAcceptanceTest extends BaseAcceptanceTestCase
     private void createEmailContactPoint(String name, String email)
     {
         EmailContactForm emailForm = emailSetup();
-        emailForm.saveFormElements(name, email, "html");
+        emailForm.finishFormElements(name, email, "html");
         emailForm.assertFormNotPresent();
         assertTextPresent(name);
         assertTextPresent(email);
@@ -462,16 +462,16 @@ public class UserPreferencesAcceptanceTest extends BaseAcceptanceTestCase
     private void addJabber(String name)
     {
         JabberContactForm jabberForm = jabberSetup();
-        jabberForm.saveFormElements(name, "jabbername");
+        jabberForm.finishFormElements(name, "jabbername");
     }
 
     public void testAddJabberContactValidation()
     {
         JabberContactForm jabberForm = jabberSetup();
-        jabberForm.saveFormElements("", "");
+        jabberForm.finishFormElements("", "");
         jabberForm.assertFormPresent();
-        assertTextPresent("name is required");
-        assertTextPresent("username is required");
+        assertTextPresent("Name is a required field");
+        assertTextPresent("This field is required");
     }
 
     public void testAddJabberContactCancel()

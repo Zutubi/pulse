@@ -1,6 +1,7 @@
 package com.zutubi.pulse.local;
 
 import com.zutubi.pulse.ResourceDiscoverer;
+import com.zutubi.pulse.BuildContext;
 import com.zutubi.pulse.core.*;
 import com.zutubi.pulse.core.model.Resource;
 import com.zutubi.pulse.events.DefaultEventManager;
@@ -177,7 +178,7 @@ public class LocalBuild
             processor.setFileLoader(fileLoader);
 
             RecipeRequest request = new RecipeRequest(0, bootstrapper, loadPulseFile(baseDir, pulseFileName), recipe);
-            processor.build(request, paths, repository, false);
+            processor.build(request, paths, repository, false, new BuildContext());
         }
         catch (FileNotFoundException e)
         {

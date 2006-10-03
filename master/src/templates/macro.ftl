@@ -97,40 +97,39 @@ ${level?lower_case?cap_first} messages:
 [/#macro]
 
 <#---------------------------------------------------------------------------
-A macro to show failed test results as a flat plain text list.
+A macro to show a failed test case as part of a flat plain text list.
 ---------------------------------------------------------------------------->
-[#macro showTestFailures test suiteContext=""]
-    [#if test.hasBrokenTests()]
-        [#if test.isSuite()]
-            [#local testStatus = test.name]
-        [#else]
-            [#local testStatus = "${test.name} (${test.status?lower_case})"]
-        [/#if]
-        [#if suiteContext?length &gt; 0]
-            [#local testContext = "${suiteContext} :: ${testStatus}"]
-        [#else]
-            [#local testContext = testStatus]
-        [/#if]
+[#macro showTestCaseFailure test suiteContext=""]
+    [#local testStatus = "${test.name} (${test.status?lower_case})"]
+    [#if suiteContext?length &gt; 0]
+        [#local testContext = "${suiteContext} :: ${testStatus}"]
+    [#else]
+        [#local testContext = testStatus]
+    [/#if]
     * ${renderer.wrapString(testContext, "      ")}
-        [#if test.isSuite()]
-      ${renderer.wrapString("total: ${test.total}, errors: ${test.errors}, failures: ${test.failures}", "      ")}
-            [#list test.children as child]
-                [@showTestFailures test=child suiteContext=testContext/]
-            [/#list]
-        [#else]
-            [#if test.message?exists]
+    [#if test.message?exists]
       ${renderer.wrapString(test.message, "      ")}
-            [/#if]
-        [/#if]
     [/#if]
 [/#macro]
 
 <#---------------------------------------------------------------------------
-A macro to show the failed tests for a file artifact flat plain text list.
+A macro to show test suite failures as part of a flat plain text list.
 ---------------------------------------------------------------------------->
-[#macro fileArtifactFailedTests artifact]
-    [#list artifact.tests as test]
-        [@showTestFailures test=test/]
+[#macro showTestSuiteFailures suite showContext=true suiteContext=""]
+    [#if showContext]
+        [#if suiteContext?length &gt; 0]
+            [#local testContext = "${suiteContext} :: ${suite.name}"]
+        [#else]
+            [#local testContext = suite.name]
+        [/#if]
+    [#else]
+        [#local testContext = suiteContext]
+    [/#if]
+    [#list suite.suites as childSuite]
+        [@showTestSuiteFailures suite=childSuite suiteContext=testContext/]
+    [/#list]
+    [#list suite.cases as childCase]
+        [@showTestCaseFailure test=childCase suiteContext=testContext/]
     [/#list]
 [/#macro]
 
@@ -138,19 +137,15 @@ A macro to show the failed tests for a file artifact flat plain text list.
 A macro to show the failed tests in a recipe as a flat plain text list.
 ---------------------------------------------------------------------------->
 [#macro recipeFailedTests result context]
-    [#list result.commandResults as command]
-        [#local commandContext = "${context} :: ${command.commandName}"]
-        [#list command.artifacts as artifact]
-            [#local artifactContext="${commandContext} :: ${artifact.name}"]
-            [#list artifact.children as fileArtifact]
-                [#if fileArtifact.hasBrokenTests()]
-  - ${renderer.wrapString(artifactContext, "    ")}
-    ${renderer.wrapString("${fileArtifact.path}", "    ")}
-                    [@fileArtifactFailedTests artifact=fileArtifact/]
-                [/#if]
-            [/#list]
-        [/#list]
-    [/#list]
+    [#if result.hasBrokenTests()]
+  - ${renderer.wrapString(context, "    ")}
+        [#local excess = result.excessFailureCount/]
+        [#if excess &gt; 0]
+    NOTE: This recipe has ${excess} more failures, see the full test report
+    for details.
+        [/#if]
+        [@showTestSuiteFailures suite=result.failedTestResults showContext=false/]
+    [/#if]
 [/#macro]
 
 <#---------------------------------------------------------------------------
@@ -285,47 +280,64 @@ results as a HTML nested list.
     [/#if]
 [/#macro]
 
-[#macro showTestHTML test indent=""]
-    [#if test.hasBrokenTests()]
-        <tr>
+[#macro showSuiteFailuresHTML test showSummary=true indent=""]
+    [#if showSummary]
+    <tr>
         [#assign class = "test-failure"]
-            [@classCell cc="${indent}${test.name?html}"/]
-        [#if test.isSuite()]
-            [@contentCell cc="&nbsp;"/]
-            [@contentCell cc="total: ${test.total}, errors: ${test.errors}, failures: ${test.failures}"/]
-        [#else]
-            [@classCell cc=test.status?lower_case/]
-            [#if test.message?exists]
-                [@openCell/]
-                    <pre>${test.message?html}</pre>
-                </td>
-            [#else]
-                [@contentCell cc="&nbsp;"/]
-            [/#if]
-        [/#if]
-        </tr>
-    [#if test.isSuite()]
-            [#list test.children as child]
-                [@showTestHTML test=child indent="${indent}&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"/]
-            [/#list]
-        [/#if]
+        [@classCell cc="${indent}${test.name?html}"/]
+        [@contentCell cc="&nbsp;"/]
+        [@contentCell cc="&nbsp;"/]
+    </tr>
+        [#local nestedIndent="${indent}&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"/]
+    [#else]
+        [#local nestedIndent=indent/]
     [/#if]
-[/#macro]
-
-[#macro recipeFailedTestsHTML recipe]
-    [#list recipe.commandResults as command]
-        [#list command.artifacts as artifact]
-            [#list artifact.children as fileArtifact]
-                [#list fileArtifact.tests as test]
-                    [@showTestHTML test=test/]
-                [/#list]
-            [/#list]
-        [/#list]
+    [#list test.suites as childSuite]
+        [@showSuiteFailuresHTML test=childSuite indent=nestedIndent/]
+    [/#list]
+    [#list test.cases as childCase]
+        [@showCaseFailureHTML test=childCase indent=nestedIndent/]
     [/#list]
 [/#macro]
 
+[#macro showCaseFailureHTML test indent=""]
+    <tr>
+    [#assign class = "test-failure"]
+        [@classCell cc="${indent}${test.name?html}"/]
+        [@classCell cc=test.status?lower_case/]
+    [#if test.message?exists]
+        [@openCell/]
+                <pre>${test.message?html}</pre>
+        </td>
+    [#else]
+        [@contentCell cc="&nbsp;"/]
+    [/#if]
+    </tr>
+[/#macro]
+
 [#macro recipeNodeFailedTestsHTML node]
-    [@recipeFailedTestsHTML recipe=node.result/]
+    [#if node.result?exists]
+        [#if node.result.hasBrokenTests()]
+            [#local summary = node.result.testSummary/]
+                <tr><td>
+                    <table class="content" style="border-collapse: collapse; border: 1px solid #bbb; margin-bottom: 16px;">
+                        <th class="heading" colspan="3" style="border: 1px solid #bbb; padding: 4px; text-align: left; vertical-align: top; background: #e9e9f5;">
+                            stage ${node.stage} :: ${node.result.recipeNameSafe}@${node.hostSafe} :: broken tests (total: ${summary.total}, errors: ${summary.errors}, failures: ${summary.failures})
+                        </th>
+            [#local excess = node.result.excessFailureCount/]
+            [#if excess &gt; 0]
+                        <tr><th colspan="3" style="background-color: #ffffc0">This recipe has ${excess} further test failures, see the full test report for details.</th></tr>
+            [/#if]
+                        <tr>
+                            [@contentHeader cc="test"/]
+                            [@contentHeader cc="status"/]
+                            [@contentHeader cc="details"/]
+                        </tr>
+            [@showSuiteFailuresHTML test=node.result.failedTestResults showSummary=false/]
+                    </table>
+                </td></tr>
+        [/#if]
+    [/#if]
     [#list node.children as child]
         [@recipeNodeFailedTestsHTML node=child/]
     [/#list]

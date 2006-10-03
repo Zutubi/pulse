@@ -27,7 +27,7 @@ public class BootstrapCommand implements Command
         this.bootstrapper = bootstrapper;
     }
 
-    public void execute(long recipeId, CommandContext context, CommandResult result)
+    public void execute(CommandContext context, CommandResult result)
     {
         bootstrapper.bootstrap(context);
 

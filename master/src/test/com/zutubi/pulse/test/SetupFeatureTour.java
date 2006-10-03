@@ -1,11 +1,9 @@
 package com.zutubi.pulse.test;
 
 import com.zutubi.pulse.MasterBuildPaths;
+import com.zutubi.pulse.agent.AgentManager;
 import com.zutubi.pulse.bootstrap.MasterConfigurationManager;
-import com.zutubi.pulse.core.AntPostProcessor;
-import com.zutubi.pulse.core.DirectoryArtifact;
-import com.zutubi.pulse.core.JUnitReportPostProcessor;
-import com.zutubi.pulse.core.RecipeProcessor;
+import com.zutubi.pulse.core.*;
 import com.zutubi.pulse.core.model.*;
 import com.zutubi.pulse.model.*;
 import com.zutubi.pulse.model.persistence.*;
@@ -28,12 +26,14 @@ public class SetupFeatureTour implements Runnable
     private MasterBuildPaths masterBuildPaths;
     private ProjectDao projectDao;
     private BuildResultDao buildResultDao;
+    private GroupDao groupDao;
     private UserDao userDao;
     private UserManager userManager;
     private MasterConfigurationManager configManager;
     private SlaveDao slaveDao;
     private CommitMessageTransformerDao commitMessageTransformerDao;
     private ChangelistDao changelistDao;
+    private AgentManager agentManager;
 
     private Slave slave;
     private Project project;
@@ -43,7 +43,6 @@ public class SetupFeatureTour implements Runnable
     private long buildNumber = 0;
     private int commandIndex = 0;
 
-    private long revisions[] = {100, 102, 103, 109, 133, 150, 151, 152, 153, 155, 160, 177, 179, 180, 200, 201};
     private String comments[] = {
             "Fixed tab indexes and text field sizes.",
             "CIB-315: Build specification triggering links shown to unauthorised users.",
@@ -60,10 +59,28 @@ public class SetupFeatureTour implements Runnable
             "CIB-311: beefing up remote API.  Added project listing, latest build results, project state monitoring/changing and build triggering.",
             "CIB-304: Allow dashboard projects to be customised.  Added a configure link to the dashboard to allow users to select which projects they want displayed.",
             "CIB-290: Cron triggers: add improved inline documentation and usage examples.",
-            "Improve acceptance testing reports."
+            "Improve acceptance testing reports.",
+            "CIB-611: link project name on dashboard",
+            "CIB-606: merge from branch 1.1.x. Fisheye timestamp is now in GMT",
+            "Reload project and build spec when crossing thread boundary into build controller to prevent races between hibernate sessions.",
+            "Remove the shell package, it is not used, and there is no intention of using it at this stage.\n" +
+                    "Document the form FieldType and Descriptors.",
+            "CIB-609: merge change from branch 1.1.x onto trunk.  This change allows wildcard characters to be used for artifact names",
+            "CIB-608: Hang when svn server goes down.  Set socket timeout on svn sockets so reads don't block forever.",
+            "CIB-608: Updated to new version of JavaSvn.",
+            "CIB-610: Cleanup subversion working copies before update.",
+            "CIB-619: Please display the real time a uit test takes.  Show milliseconds for any elapsed time < 1 sec.",
+            "CIB-616: Improve maven 2 error detection on windows.",
+            "Restructured packages for autoupdates.  Updated boot component so that it is configured via files (classpath and available commands).",
+            "Update the annotations to allow specification of messageKey and defaultMessage for the validators.",
+            "CIB-620: fixed the broken rss link on the recent projects panel.",
+            "CIB-613, CIB-621: record the execution environment of a command",
+            "CIB-622: Failed to delete agent: Constraint violation.  That was a little trickier than expected!",
+            "CIB-623: Agent ping timeout is not logged.  Log more errors and show the agent ping error message on the status page.",
     };
 
     int changeIndex = 0;
+    private int revision = 200;
 
     public void run()
     {
@@ -110,8 +127,9 @@ public class SetupFeatureTour implements Runnable
 
     private void setupSlaves()
     {
-        slave = new Slave("linux64", "localhost", 8090);
+        slave = new Slave("linux64", "sneezy", 8090);
         slaveDao.save(slave);
+        agentManager.slaveAdded(slave.getId());
     }
 
     private void createLogMessages()
@@ -170,11 +188,18 @@ public class SetupFeatureTour implements Runnable
 
     private void setupUsers(Project project)
     {
+        Group admins = groupDao.findByName("administrators");
+        Group projectAdmins = groupDao.findByName("project administrators");
+
         User user = new User("jsankey", "Jason Sankey");
         userManager.setPassword(user, "password");
         user.setEnabled(true);
         user.add(GrantedAuthority.USER);
-        user.add(GrantedAuthority.ADMINISTRATOR);
+
+        admins.addUser(user);
+        groupDao.save(admins);
+        projectAdmins.addUser(user);
+        groupDao.save(projectAdmins);
 
         ContactPoint contactPoint = new EmailContactPoint("jason@zutubi.com");
         contactPoint.setName("zutubi mail");
@@ -189,10 +214,10 @@ public class SetupFeatureTour implements Runnable
         jabber.setUsername("jason@jabber");
         projects = new LinkedList<Project>();
         projects.add(project);
-        subscription = new Subscription(projects, contactPoint);
+        subscription = new Subscription(projects, jabber);
         subscription.setCondition("all changed or failed");
-        contactPoint.add(subscription);
-        user.add(contactPoint);
+        jabber.add(subscription);
+        user.add(jabber);
 
         userDao.save(user);
     }
@@ -292,7 +317,7 @@ public class SetupFeatureTour implements Runnable
         {
             String author = Math.random() > 0.3 ? "jsankey" : "dostermeier"; // ;)
 
-            changes.add(createChange(previous, revisions[changeIndex], author, comments[changeIndex], (1000 - revisions[changeIndex]) * 600000, generateChangeFiles()));
+            changes.add(createChange(previous, revision++, author, comments[changeIndex], (1000 - revision) * 600000, generateChangeFiles()));
             changeIndex++;
             if (changeIndex >= comments.length)
             {
@@ -402,7 +427,9 @@ public class SetupFeatureTour implements Runnable
             try
             {
                 StoredFileArtifact fileArtifact = addArtifact(command, dummy, "output.txt", "command output", "text/plain");
-                pp.process(command.getAbsoluteOutputDir(configManager.getDataDirectory()), fileArtifact, command);
+                TestSuiteResult testResults = new TestSuiteResult();
+                CommandContext context = new CommandContext(null, command.getAbsoluteOutputDir(configManager.getDataDirectory()), testResults);
+                pp.process(fileArtifact, command, context);
             }
             catch (Exception e)
             {
@@ -416,12 +443,22 @@ public class SetupFeatureTour implements Runnable
         File dummy = getDataFile("junit-failed.xml");
         JUnitReportPostProcessor pp = new JUnitReportPostProcessor();
 
-        for (CommandResult command: commands)
+        for (int i = 0; i < commands.length; i++)
         {
+            CommandResult command = commands[i];
+
             try
             {
                 StoredFileArtifact fileArtifact = addArtifact(command, dummy, "TESTS-TestSuites.xml", "JUnit XML Report", "text/html");
-                pp.process(command.getAbsoluteOutputDir(configManager.getDataDirectory()), fileArtifact, command);
+                TestSuiteResult testResults = new TestSuiteResult();
+                CommandContext context = new CommandContext(null, command.getAbsoluteOutputDir(configManager.getDataDirectory()), testResults);
+                pp.process(fileArtifact, command, context);
+
+                recipes[i].setTestSummary(testResults.getSummary());
+                TestSuitePersister persister = new TestSuitePersister();
+                File testDir = new File(recipes[i].getAbsoluteOutputDir(configManager.getDataDirectory()), RecipeResult.TEST_DIR);
+                testDir.mkdirs();
+                persister.write(testResults, testDir);
             }
             catch (Exception e)
             {
@@ -438,7 +475,10 @@ public class SetupFeatureTour implements Runnable
         {
             DirectoryArtifact da = new DirectoryArtifact();
             da.setName("JUnit HTML Report");
-            da.capture(command, dir, command.getAbsoluteOutputDir(configManager.getDataDirectory()));
+            RecipePaths paths = new SimpleRecipePaths(dir, null);
+            TestSuiteResult tests = new TestSuiteResult();
+            CommandContext context = new CommandContext(paths, command.getAbsoluteOutputDir(configManager.getDataDirectory()), tests);
+            da.capture(command, context);
         }
     }
 
@@ -533,5 +573,15 @@ public class SetupFeatureTour implements Runnable
     public void setChangelistDao(ChangelistDao changelistDao)
     {
         this.changelistDao = changelistDao;
+    }
+
+    public void setGroupDao(GroupDao groupDao)
+    {
+        this.groupDao = groupDao;
+    }
+
+    public void setAgentManager(AgentManager agentManager)
+    {
+        this.agentManager = agentManager;
     }
 }

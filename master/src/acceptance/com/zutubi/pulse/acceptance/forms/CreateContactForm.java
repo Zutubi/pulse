@@ -14,7 +14,7 @@ public class CreateContactForm extends BaseForm
 
     public String getFormName()
     {
-        return "contact.create";
+        return "SelectContact";
     }
 
     public String[] getFieldNames()

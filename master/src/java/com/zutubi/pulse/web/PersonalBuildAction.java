@@ -9,6 +9,7 @@ import com.zutubi.pulse.events.EventManager;
 import com.zutubi.pulse.model.*;
 import com.zutubi.pulse.personal.PatchArchive;
 import com.zutubi.pulse.util.logging.Logger;
+import org.acegisecurity.AccessDeniedException;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.File;
@@ -59,6 +60,24 @@ public class PersonalBuildAction extends ActionSupport
         ActionContext ac = ActionContext.getContext();
         HttpServletRequest request = (HttpServletRequest) ac.get(ServletActionContext.HTTP_REQUEST);
 
+        User user = null;
+        Object principle = getPrinciple();
+        if(principle != null)
+        {
+            user = userManager.getUser((String) principle);
+        }
+
+        if(user == null)
+        {
+            errorMessage = "Unable to determine user";
+            return ERROR;
+        }
+
+        if(!userManager.hasAuthority(user, GrantedAuthority.PERSONAL))
+        {
+            throw new AccessDeniedException("User does not have authority to submit personal build requests.");
+        }
+
         if (!(request instanceof MultiPartRequestWrapper))
         {
             errorMessage = "Invalid request: expecting multipart POST";
@@ -84,19 +103,6 @@ public class PersonalBuildAction extends ActionSupport
         if(spec == null)
         {
             errorMessage = "Unknown build specification '" + specification + "'";
-            return ERROR;
-        }
-
-        User user = null;
-        Object principle = getPrinciple();
-        if(principle != null)
-        {
-            user = userManager.getUser((String) principle);
-        }
-
-        if(user == null)
-        {
-            errorMessage = "Unable to determine user";
             return ERROR;
         }
 

@@ -36,7 +36,7 @@ public class XCodeCommand extends ExecutableCommand
         }
     }
 
-    public void execute(long recipeId, CommandContext context, CommandResult cmdResult)
+    public void execute(CommandContext context, CommandResult cmdResult)
     {
         checkExe();
 
@@ -70,10 +70,10 @@ public class XCodeCommand extends ExecutableCommand
             cmdResult.getProperties().put("settings", settings);
         }
 
-        super.execute(recipeId, context, cmdResult);
+        super.execute(context, cmdResult);
 
         XCodePostProcessor pp = new XCodePostProcessor("xcode.pp");
-        pp.process(context.getOutputDir(), cmdResult.getArtifact(OUTPUT_NAME).getFile(), cmdResult);
+        pp.process(cmdResult.getArtifact(OUTPUT_NAME).getFile(), cmdResult, context);
     }
 
     public void setTarget(String target)

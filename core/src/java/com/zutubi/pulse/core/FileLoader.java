@@ -4,6 +4,7 @@ import com.zutubi.pulse.core.validation.CommandValidationException;
 import com.zutubi.pulse.util.IOUtils;
 import com.zutubi.pulse.validation.PulseValidationManager;
 import com.zutubi.pulse.validation.PulseValidationContext;
+import com.zutubi.pulse.validation.MessagesTextProvider;
 import com.zutubi.validation.*;
 import nu.xom.*;
 
@@ -235,7 +236,7 @@ public class FileLoader
     private void validate(Object obj) throws CommandValidationException, ValidationException
     {
         validationManager = new PulseValidationManager();
-        ValidationContext validationContext = new PulseValidationContext(obj);
+        ValidationContext validationContext = new PulseValidationContext(new MessagesTextProvider(obj));
         validationManager.validate(obj, validationContext);
         if (validationContext.hasErrors())
         {

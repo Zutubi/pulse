@@ -20,7 +20,6 @@ import com.zutubi.pulse.scm.SCMChangeEvent;
 import com.zutubi.pulse.scm.SCMException;
 import com.zutubi.pulse.scm.SCMServer;
 import com.zutubi.pulse.services.SlaveStatus;
-import com.zutubi.pulse.services.UpgradeState;
 import com.zutubi.pulse.services.UpgradeStatus;
 import junit.framework.TestCase;
 
@@ -45,7 +44,7 @@ public class ThreadedRecipeQueueTest extends TestCase implements EventListener
     private Slave slave1000;
     private Slave slave2000;
     private Slave slave3000;
-    private RecipeErrorEvent recipeError;
+    private List<RecipeErrorEvent> recipeErrors;
     private DefaultEventManager eventManager;
     private RecipeDispatchedEvent dispatchedEvent;
 
@@ -76,8 +75,10 @@ public class ThreadedRecipeQueueTest extends TestCase implements EventListener
         queue = new ThreadedRecipeQueue();
         queue.setEventManager(eventManager);
         queue.setAgentManager(agentManager);
-        queue.setCheckOnEnqueue(false);
+        queue.setUnsatisfiableTimeout(-1);
         queue.init();
+
+        recipeErrors = new LinkedList<RecipeErrorEvent>();
     }
 
     public void tearDown() throws Exception
@@ -93,6 +94,7 @@ public class ThreadedRecipeQueueTest extends TestCase implements EventListener
         errorSemaphore = null;
         dispatchedSemaphore = null;
         queue = null;
+        recipeErrors = null;
         super.tearDown();
     }
 
@@ -151,7 +153,10 @@ public class ThreadedRecipeQueueTest extends TestCase implements EventListener
     {
         Thread.sleep(100);
         queue.stop();
-        Thread.yield();
+        while(queue.isRunning())
+        {
+            Thread.yield();
+        }
 
         queue.enqueue(createDispatchRequest(0));
         queue.online(createAvailableAgent(0));
@@ -329,7 +334,7 @@ public class ThreadedRecipeQueueTest extends TestCase implements EventListener
 
     public void testOfflineWhileQueued() throws Exception
     {
-        queue.setCheckOnEnqueue(true);
+        queue.setUnsatisfiableTimeout(0);
         queue.enqueue(createDispatchRequest(1000, 1000));
         queue.enqueue(createDispatchRequest(1000, 1001));
         assertTrue(semaphore.tryAcquire(30, TimeUnit.SECONDS));
@@ -341,7 +346,7 @@ public class ThreadedRecipeQueueTest extends TestCase implements EventListener
 
     public void testNoOnlineAgent() throws Exception
     {
-        queue.setCheckOnEnqueue(true);
+        queue.setUnsatisfiableTimeout(0);
         queue.enqueue(createDispatchRequest(0, 1000));
         assertTrue(errorSemaphore.tryAcquire(30, TimeUnit.SECONDS));
         assertRecipeError(1000, "No online agent is capable of executing the build stage");
@@ -379,7 +384,7 @@ public class ThreadedRecipeQueueTest extends TestCase implements EventListener
         assertTrue(dispatchedSemaphore.tryAcquire(30, TimeUnit.SECONDS));
         assertTrue(semaphore.tryAcquire(30, TimeUnit.SECONDS));
         assertTrue(errorSemaphore.tryAcquire(30, TimeUnit.SECONDS));
-        assertEquals("Unable to dispatch recipe: Error during dispatch", recipeError.getErrorMessage());
+        assertEquals("Unable to dispatch recipe: Error during dispatch", recipeErrors.get(0).getErrorMessage());
         assertEquals(0, queue.length());
 
         // Make sure we can dispatch another afterwards
@@ -478,7 +483,7 @@ public class ThreadedRecipeQueueTest extends TestCase implements EventListener
         queue.enqueue(createDispatchRequest(0, 1000, scm));
         queue.enqueue(createDispatchRequest(0, 1001, scm));
 
-        queue.setCheckOnEnqueue(true);
+        queue.setUnsatisfiableTimeout(0);
         Agent agent = createAvailableAgent(0);
         queue.online(agent);
         assertTrue(semaphore.tryAcquire(30, TimeUnit.SECONDS));
@@ -518,6 +523,70 @@ public class ThreadedRecipeQueueTest extends TestCase implements EventListener
         assertFalse(semaphore.tryAcquire(3, TimeUnit.SECONDS));
     }
 
+    public void testTimedOutRequest() throws Exception
+    {
+        queue.setSleepInterval(1);
+        queue.setUnsatisfiableTimeout(1);
+        queue.enqueue(createDispatchRequest(0, 111));
+        assertTrue(errorSemaphore.tryAcquire(30, TimeUnit.SECONDS));
+        assertRecipeError(111, "Recipe request timed out waiting for a capable agent to become available");
+    }
+
+    public void testNoTimeout() throws Exception
+    {
+        queue.setSleepInterval(1);
+        queue.setUnsatisfiableTimeout(-1);
+        queue.enqueue(createDispatchRequest(0, 111));
+        assertFalse(errorSemaphore.tryAcquire(3, TimeUnit.SECONDS));
+    }
+
+    public void testTimedOutAfterAgentOffline() throws Exception
+    {
+        queue.setUnsatisfiableTimeout(1);
+        queue.setSleepInterval(1);
+        queue.enqueue(createDispatchRequest(1000, 1000));
+        queue.enqueue(createDispatchRequest(1000, 1001));
+        assertTrue(semaphore.tryAcquire(30, TimeUnit.SECONDS));
+
+        sendOfflineEvent(slave1000);
+        assertTrue(errorSemaphore.tryAcquire(30, TimeUnit.SECONDS));
+        assertTrue(errorSemaphore.tryAcquire(30, TimeUnit.SECONDS));
+        assertRecipeError(1001, "Recipe request timed out waiting for a capable agent to become available");
+    }
+
+    public void testNoTimeoutAgentOffline() throws Exception
+    {
+        queue.setUnsatisfiableTimeout(-1);
+        queue.setSleepInterval(1);
+        queue.enqueue(createDispatchRequest(1000, 1000));
+        queue.enqueue(createDispatchRequest(1000, 1001));
+        assertTrue(semaphore.tryAcquire(30, TimeUnit.SECONDS));
+
+        sendOfflineEvent(slave1000);
+        assertTrue(errorSemaphore.tryAcquire(30, TimeUnit.SECONDS));
+        assertFalse(errorSemaphore.tryAcquire(3, TimeUnit.SECONDS));
+        assertNoError(1001);
+    }
+
+    public void testChangeMakesTimeout() throws Exception
+    {
+        MockScm scm = new MockScm();
+        scm.setId(12);
+        queue.enqueue(createDispatchRequest(0, 1000, scm));
+        queue.enqueue(createDispatchRequest(0, 1001, scm));
+
+        queue.setSleepInterval(1);
+        queue.setUnsatisfiableTimeout(1);
+        Agent agent = createAvailableAgent(0);
+        queue.online(agent);
+        assertTrue(semaphore.tryAcquire(30, TimeUnit.SECONDS));
+
+        // Negative revision will be rejected by mock
+        queue.handleEvent(new SCMChangeEvent(scm, new NumericalRevision(-1), new NumericalRevision(1)));
+        assertTrue(errorSemaphore.tryAcquire(30, TimeUnit.SECONDS));
+        assertRecipeError(1001, "Recipe request timed out waiting for a capable agent to become available");
+    }
+
     //-----------------------------------------------------------------------
     // Helpers and mocks
     //-----------------------------------------------------------------------
@@ -529,9 +598,27 @@ public class ThreadedRecipeQueueTest extends TestCase implements EventListener
 
     private void assertRecipeError(long id, String message)
     {
-        assertNotNull(recipeError);
-        assertEquals(id, recipeError.getRecipeId());
-        assertEquals(message, recipeError.getErrorMessage());
+        for(RecipeErrorEvent error: recipeErrors)
+        {
+            if(error.getRecipeId() == id)
+            {
+                assertEquals(message, error.getErrorMessage());
+                return;
+            }
+        }
+
+        fail("Recipe error with given id not found");
+    }
+
+    private void assertNoError(long id)
+    {
+        for(RecipeErrorEvent error: recipeErrors)
+        {
+            if(error.getRecipeId() == id)
+            {
+                fail("Found error for id that should have no errors");
+            }
+        }
     }
 
     private void sendOnlineEvent(Slave slave)
@@ -598,9 +685,10 @@ public class ThreadedRecipeQueueTest extends TestCase implements EventListener
 
     public void handleEvent(Event evt)
     {
+        System.out.println("evt = " + evt.toString());
         if(evt instanceof RecipeErrorEvent)
         {
-            recipeError = (RecipeErrorEvent) evt;
+            recipeErrors.add((RecipeErrorEvent) evt);
             errorSemaphore.release();
         }
         else
@@ -842,6 +930,16 @@ public class ThreadedRecipeQueueTest extends TestCase implements EventListener
             throw new RuntimeException("Method not implemented.");
         }
 
+        public boolean agentExists(String name)
+        {
+            throw new RuntimeException("Method not implemented.");
+        }
+
+        public Agent getAgent(String name)
+        {
+            throw new RuntimeException("Method not implemented.");
+        }
+
         public void addSlave(Slave slave)
         {
             SlaveAgent agent = new SlaveAgent(slave, null, null, new MockBuildService(slave.getId()));
@@ -866,7 +964,7 @@ public class ThreadedRecipeQueueTest extends TestCase implements EventListener
             throw new RuntimeException("Method not implemented.");
         }
 
-        public boolean build(RecipeRequest request)
+        public boolean build(RecipeRequest request, BuildContext context)
         {
             semaphore.release();
             if(throwError)

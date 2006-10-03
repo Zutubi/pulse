@@ -772,7 +772,7 @@
     #end
 #end
 
-#macro(aggregateResultCell $changelist)
+#macro(aggregateResultCell $changelist $myProjects)
     #set ($selectedResult = "n")
     #foreach($id in $changelist.resultIds)
         #set($result = $action.getResult($id))
@@ -784,7 +784,13 @@
         #end
     #end
 
-    <td id="${changelist.id}_cell" class="$selectedResult.state.string">
+    #if($myProjects)
+        #set($changeId = "${changelist.id}_projects")
+    #else
+        #set($changeId = "${changelist.id}")
+    #end
+
+    <td id="${changeId}_cell" class="$selectedResult.state.string">
         #if($selectedResult.succeeded())
             <img alt="success" src="$base/images/accept.gif"/>
         #elseif($selectedResult.inProgress())
@@ -799,13 +805,13 @@
             &nbsp;
         #end
         $selectedResult.state.prettyString
-        <a href="#" id="${changelist.id}_link" onclick="showHideBuildsFloat('$changelist.id'); return false">+</a>
-        <div id="$changelist.id" style="display: none">
+        <a href="#" id="${changeId}_link" onclick="showHideBuildsFloat('$changeId'); return false">+</a>
+        <div id="$changeId" style="display: none">
         <table class="content" style="margin: 0">
             <tr>
                 <th class="heading" colspan="5">
                     <span class="action">
-                        <a href="#" onclick="showHideBuildsFloat('$changelist.id'); return false;"><img alt="$action.getText('close')" src="$base/images/delete.gif"/>#wwtext("name=close")</a>
+                        <a href="#" onclick="showHideBuildsFloat('$changeId'); return false;"><img alt="$action.getText('close')" src="$base/images/delete.gif"/>#wwtext("name=close")</a>
                     </span>
                     #wwtext("name=build.results")
                 </th>
@@ -842,7 +848,7 @@
         #wwtext("name=tests.none")
     #else
         #if($recipe)
-            <a href="viewTests.action?id=$build.id&amp;selectedNode=$recipe.id">
+            <a href="viewTestSuite.action?id=$build.id&amp;nodeId=$recipe.id">
         #else
             <a href="viewTests.action?id=$build.id">
         #end
@@ -1184,7 +1190,7 @@
         #dynamicCell($recipe.recipeNameSafe)
         #dynamicCell($resultNode.hostSafe)
         #statusCell($recipe $showAnimated)
-        #testResultsCell($build $recipe $recipe)
+        #testResultsCell($build $resultNode $recipe)
         #dateClassCell($recipe)
         #elapsedCell($recipe)
         <td class="content">
@@ -1280,70 +1286,12 @@
 #end
 
 ##
-## Summarises broken tests for the given test result
-##
-#macro(testSummary $build $command $fileArtifact $test)
-    #if($test.hasBrokenTests())
-        #if($test.isSuite())
-    <li class="header">#wwtext("name=test.suite") :: $!webwork.htmlEncode($test.name)
-        <ul>
-            #testSuiteSummary($build $command $fileArtifact $test)
-        </ul>
-    </li>
-        #else
-    <li class="error"><b>$test.status.toString().toLowerCase()</b> :: #wwtext("name=test.case") $!webwork.htmlEncode($test.name)
-        $action.plainToHtml($test.message)
-    </li>
-         #end
-    #end
-#end
-
-##
-## Summarises broken tests for the given test suite result
-##
-#macro(testSuiteSummary $build $command $fileArtifact $suite)
-    #foreach($test in $suite.children)
-        #testSummary($build $command $fileArtifact $test)
-    #end
-#end
-
-##
-## Summarises broken tests for the given file artifact into a nested list
-##
-#macro(fileArtifactTestSummary $build $command $fileArtifact $showHeader)
-    #if($fileArtifact.hasBrokenTests())
-        #if($showHeader)
-    <li class="header">#wwtext("name=artifact") :: $!webwork.htmlEncode($fileArtifact.path)
-        #end
-        <ul>
-        #foreach($test in $fileArtifact.tests)
-            #testSummary($build $command $fileArtifact $test)
-        #end
-        </ul>
-        #if($showHeader)
-    </li>
-        #end
-    #end
-#end
-
-##
 ## Summarises the messages of a given level on an artifact into a nested list
 ##
 #macro(artifactMessageSummary $build $command $artifact $level $showHeader)
     #if($artifact.hasMessages($level))
         #foreach($fileArtifact in $artifact.children)
             #fileArtifactMessageSummary($build $command $fileArtifact $level $showHeader)
-        #end
-    #end
-#end
-
-##
-## Summarises broken tests for the given artifact into a nested list
-##
-#macro(artifactTestSummary $build $recipe $command $artifact $showHeader)
-    #if($artifact.hasBrokenTests())
-        #foreach($fileArtifact in $artifact.children)
-            #fileArtifactTestSummary($build $command $fileArtifact $showHeader)
         #end
     #end
 #end
@@ -1357,15 +1305,6 @@
         #foreach($artifact in $commandResult.artifacts)
             #artifactMessageSummary($build $commandResult $artifact $level true)
         #end
-    #end
-#end
-
-##
-## Summarises broken tests for the given command result into a nested list
-##
-#macro(commandTestSummary $build $recipe $command)
-    #foreach($artifact in $command.artifacts)
-        #artifactTestSummary($build $recipe $command $artifact true)
     #end
 #end
 
@@ -1397,21 +1336,6 @@
 #end
 
 ##
-## Summarises broken tests for the given recipe result into a nested list
-##
-#macro(recipeTestSummary $build $recipe)
-    #foreach($command in $recipe.commandResults)
-        #if($command.hasBrokenTests())
-    <li class="header">#wwtext("name=command") :: $!webwork.htmlEncode($command.commandName)
-        <ul>
-            #commandTestSummary($build $recipe $command)
-        </ul>
-    </li>
-        #end
-    #end
-#end
-
-##
 ## Summarises the messages of a given level on a recipe result node into a nested list
 ##
 #macro(nodeMessageSummary $build $node $level)
@@ -1428,22 +1352,6 @@
 #end
 
 ##
-## Summarises broken tests for the given node into a nested list
-##
-#macro(nodeTestSummary $build $node)
-    #if($node.hasBrokenTests())
-    <li class="header">#wwtext("name=build.stage") :: $!webwork.htmlEncode($node.stage) :: $!webwork.htmlEncode("$node.result.recipeNameSafe @ $node.hostSafe")
-        <ul>
-            #recipeTestSummary($build $node.result)
-        #foreach($child in $node.children)
-            #nodeMessageSummaru($build $child)
-        #end
-        </ul>
-    </il>
-    #end
-#end
-
-##
 ## Summarises the messages of a given level on a build result into a nested list
 ##
 #macro(buildMessageSummary $buildResult $level)
@@ -1456,17 +1364,6 @@
         #end
         </ul>
     #end
-#end
-
-##
-## Summarises broken tests for the given build into a nested list
-##
-#macro(buildTestSummary $build)
-    <ul class="error">
-    #foreach($node in $build.root.children)
-        #nodeTestSummary($build $node)
-    #end
-    </ul>
 #end
 
 ##
@@ -1500,13 +1397,6 @@
     #end
     #if($showFeatures)
         #fileArtifactFeatures($build $result $fileArtifact)
-        #if($fileArtifact.hasBrokenTests())
-            <ul class="error">
-                <li class="header">#wwtext("name=tests.broken")
-                #fileArtifactTestSummary($build $result $fileArtifact false)
-                </li>
-            </ul>
-        #end
     #end
     </li>
 #end
@@ -1615,6 +1505,34 @@
     #end
 #end
 
+#macro(buildTestFailures $buildResult)
+    #if($buildResult.hasBrokenTests())
+    <h2 class="section">#wwtext("name=failed.tests")</h2>
+        #foreach($recipeNode in $buildResult.root.children)
+            #if($recipeNode.hasBrokenTests())
+    <table class="fill-content">
+        <tr>
+            <th class="heading" colspan="3">
+                #wwtext("name=build.stage") :: $!webwork.htmlEncode($recipeNode.stage) :: $!webwork.htmlEncode("$recipeNode.result.recipeNameSafe@$recipeNode.hostSafe")
+            </th>
+        </tr>
+        #set($excess = $recipeNode.result.excessFailureCount)
+        #if($excess > 0)
+            #noteRow($action.getText("test.excess.failures", [$excess]) 3)
+        #end
+        <tr>
+            #contentHeading("test.name" 1)
+            #contentHeading("test.details" 1)
+            #contentHeading("test.duration" 1)
+        </tr>
+        #showRecipeTestFailures($buildResult $recipeNode)
+    </table>
+            #end
+        #end
+    #end
+#end
+
+
 ##
 ## Shows the main build result view (shared with project current build)
 ##
@@ -1673,27 +1591,7 @@
     #buildMessageSummary($buildResult $errorLevel)
     #buildMessageSummary($buildResult $warningLevel)
         #end
-        #if($buildResult.hasBrokenTests())
-    <h2 class="section">#wwtext("name=test.failures")</h2>
-            #foreach($recipeNode in $buildResult.root.children)
-                #if($recipeNode.hasBrokenTests())
-    <table class="content">
-        <tr>
-            <th class="heading" colspan="5">
-                #wwtext("name=build.stage") :: $!webwork.htmlEncode($recipeNode.stage) :: $!webwork.htmlEncode("$recipeNode.result.recipeNameSafe@$recipeNode.hostSafe")
-            </th>
-        </tr>
-        <tr>
-            #contentHeading("test.name" 1)
-            #contentHeading("test.status" 2)
-            #contentHeading("test.details" 1)
-            #contentHeading("test.duration" 1)
-        </tr>
-        #showRecipeTests($recipeNode.result false)
-    </table>
-                #end
-            #end
-        #end
+        #buildTestFailures($buildResult)
     #end
 #end
 
@@ -1968,12 +1866,63 @@
     #end
 #end
 
+#macro(showTestCaseFailure $recipe $test $indent)
+    <tr>
+        <td class="test-failure content-nowrap">
+             ${indent}$!webwork.htmlEncode($test.name)
+         </td>
+    #if($test.message)
+        <td class="content-wrap">
+            $action.plainToHtml($test.message)
+        </td>
+    #else
+        #contentCell("empty.cell")
+    #end
+        <td class="content" width="10%">
+            $!webwork.htmlEncode($test.prettyDuration)
+        </td>
+    </tr>
+#end
+
+##
+## Shows a test suite with any nested tests.
+##
+#macro(showTestSuiteFailures $build $recipe $test $indent)
+    ## Yes, this is insane, but velocity does not have locals, so there is no
+    ## pure velocity way (that I know of) to implement the path construction
+    #set($path = $action.pushSuite($test))
+
+    <tr>
+        <td class="test-failure content-nowrap">
+             ${indent}<a href='viewTestSuite.action?id=$build.id&amp;nodeId=$recipe.id&amp;path=$action.urlEncode($path)'>$!webwork.htmlEncode($test.name)</a>
+         </td>
+        #contentCell("empty.cell")
+        <td class="content" width="10%">
+            $!webwork.htmlEncode($test.prettyDuration)
+        </td>
+    </tr>
+
+    #foreach($child in $test.suites)
+        #showTestSuiteFailures($build $recipe $child "${indent}&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;")
+    #end
+    #foreach($child in $test.cases)
+        #showTestCaseFailure($recipe $child "${indent}&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;")
+    #end
+
+    $action.popSuite()
+#end
+
 ##
 ## Shows the test summary view for all tests in the given recipe.
 ##
-#macro(showRecipeTests $recipe $showPassed)
-    #foreach($test in $recipe.allTestResults)
-        #showTest($recipe $test "" $showPassed "")
+#macro(showRecipeTestFailures $build $recipe)
+    #if($recipe.result.failedTestResults)
+        #foreach($child in $recipe.result.failedTestResults.suites)
+            #showTestSuiteFailures($build $recipe $child "")
+        #end
+        #foreach($child in $recipe.result.failedTestResults.cases)
+            #showTestCaseFailure($recipe $child "")
+        #end
     #end
 #end
 
@@ -2261,4 +2210,29 @@
     }
 
     ${name}Selected();
+#end
+
+##
+## Shows a test summary table for a result
+##
+#macro(testSummaryTable $summary)
+##    <h2 class="section">#wwtext("name=test.summary")</h2>
+
+    <table class="fill-content">
+        #headingRow("test.summary" 6)
+        <tr>
+            #contentHeading("test.status" 2)
+            #contentHeading("test.total" 1)
+            #contentHeading("test.failures" 1)
+            #contentHeading("test.errors" 1)
+            #contentHeading("test.success.rate" 1)
+        </tr>
+        <tr>
+            #testStatusCell($summary)
+            #rightCell($summary.total)
+            #rightCell($summary.failures)
+            #rightCell($summary.errors)
+            #rightCell("${summary.successRate}%")
+        </tr>
+    </table>
 #end

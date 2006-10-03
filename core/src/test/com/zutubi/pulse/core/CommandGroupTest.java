@@ -245,8 +245,8 @@ public class CommandGroupTest extends PulseTestCase
 
     private void execute(CommandGroup group, CommandResult result)
     {
-        CommandContext context = new CommandContext(new SimpleRecipePaths(baseDirectory, null), outputDirectory);
-        group.execute(0, context, result);
+        CommandContext context = new CommandContext(new SimpleRecipePaths(baseDirectory, null), outputDirectory, null);
+        group.execute(context, result);
     }
 
     private CommandResult testSuccess(CommandGroup group) throws IOException

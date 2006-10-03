@@ -17,10 +17,9 @@ then
     fatal "PULSE_HOME must be set."
 fi
 
-if [[ -z "$PULSE_HOME" ]]
+if [[ -z "$JAVA_HOME" ]]
 then
-    base="$(dirname $0)"
-    PULSE_HOME="${base#/bin}"
+    fatal "JAVA_HOME must be set."
 fi
 
 if [[ -z "$PULSE_USER" ]]
@@ -36,12 +35,23 @@ fi
 
 d_start()
 {
-    su - $PULSE_USER -c "$PULSE_HOME/bin/startup.sh $PULSE_PID"
+    if [[ -n "$USERNAME" && "$USERNAME" = "$PULSE_USER" ]]
+    then
+        "$PULSE_HOME/bin/launch.sh" "$PULSE_PID"
+    else
+        su $PULSE_USER -c "'$PULSE_HOME/bin/launch.sh' '$PULSE_PID'"
+    fi
 }
 
 d_stop()
 {
-    su - $PULSE_USER -c "$PULSE_HOME/bin/shutdown.sh --force"
+    if [[ -n "$USERNAME" && "$USERNAME" = "$PULSE_USER" ]]
+    then
+        "$PULSE_HOME/bin/shutdown.sh" --force
+    else
+        su $PULSE_USER -c "'$PULSE_HOME/bin/shutdown.sh' --force"
+    fi
+    
     if [[ -f "$PULSE_PID" ]]
     then
         pid=$(cat "$PULSE_PID")
@@ -55,7 +65,22 @@ d_stop()
 
         if [[ $count -gt 30 ]]
         then
-            kill -9 $pid
+            # The PID of the startup script is actually recorded.  Use this to
+            # find the child Java process PID (the only grandchild)
+            child=$(ps --ppid $pid -o pid=)
+            if [[ -n "$child" ]]
+            then
+                child=$(ps --ppid $child -o pid=)
+                if [[ -n "$child" ]]
+                then
+                    kill $child
+                    if [[ $(ps --pid $pid | grep -c $pid) != "0" ]]
+                    then
+                        # Kill it harder
+                        pkill -9 $child
+                    fi
+                fi
+            fi
         fi
     fi
 
@@ -87,3 +112,4 @@ case "$1" in
 esac
 
 exit 0
+

@@ -1,23 +1,22 @@
 package com.zutubi.pulse.slave.command;
 
-import com.zutubi.pulse.util.logging.Logger;
-import com.zutubi.pulse.util.FileSystemUtils;
-import com.zutubi.pulse.util.IOUtils;
-import com.zutubi.pulse.util.RandomUtils;
-import com.zutubi.pulse.bootstrap.SystemPaths;
+import com.zutubi.pulse.ShutdownManager;
 import com.zutubi.pulse.bootstrap.ConfigurationManager;
 import com.zutubi.pulse.command.PulseCtl;
 import com.zutubi.pulse.core.PulseRuntimeException;
-import com.zutubi.pulse.ShutdownManager;
 import com.zutubi.pulse.services.MasterService;
 import com.zutubi.pulse.services.UpgradeState;
 import com.zutubi.pulse.services.UpgradeStatus;
 import com.zutubi.pulse.slave.MasterProxyFactory;
+import com.zutubi.pulse.util.FileSystemUtils;
+import com.zutubi.pulse.util.IOUtils;
+import com.zutubi.pulse.util.RandomUtils;
+import com.zutubi.pulse.util.logging.Logger;
 
-import java.io.*;
-import java.net.URL;
+import java.io.File;
+import java.io.IOException;
 import java.net.MalformedURLException;
-import java.util.Arrays;
+import java.net.URL;
 
 /**
  */
@@ -60,7 +59,6 @@ public class UpdateCommand implements Runnable
 
         try
         {
-
             sendMessage(masterService, UpgradeState.STARTED);
 
             File pulseHome = new File(configurationManager.getEnvConfig().getPulseHome());
@@ -68,6 +66,17 @@ public class UpdateCommand implements Runnable
 
             if(!versionDir.exists())
             {
+                // Make sure we can create the version dir (have write access)
+                if(!versionDir.mkdirs())
+                {
+                    LOG.warning("Unable to create directory '" + versionDir.getAbsolutePath() + "'");
+                    sendMessage(masterService, UpgradeState.FAILED, "Unable to create version directory: check that the user running the agent has write access to the agent install directory.");
+                    return;
+                }
+
+                // Need to remove it again: should not be there if the upgrade fails
+                versionDir.delete();
+
                 // Need to obtain the package
                 if(!downloadAndApplyUpdate(masterService, pulseHome, versionDir))
                 {
@@ -120,14 +129,14 @@ public class UpdateCommand implements Runnable
 
     private boolean downloadAndApplyUpdate(MasterService masterService, File pulseHome, File versionDir) throws IOException
     {
-        File tempDir = new File(configurationManager.getSystemPaths().getTmpRoot(), RandomUtils.randomString(10));
+        File tempDir = new File(configurationManager.getSystemPaths().getTmpRoot(), RandomUtils.randomString(3));
         tempDir.mkdirs();
 
         try
         {
             URL packageUrl = new URL(url);
             File packageFile = new File(tempDir, build + ".zip");
-            File unpackDir = new File(tempDir, "unpack");
+            File unpackDir = new File(tempDir, "un");
 
             sendMessage(masterService, UpgradeState.DOWNLOADING);
             IOUtils.downloadFile(packageUrl, packageFile);
@@ -174,7 +183,7 @@ public class UpdateCommand implements Runnable
         }
         finally
         {
-            //FileSystemUtils.removeDirectory(tempDir);
+            FileSystemUtils.removeDirectory(tempDir);
         }
     }
 
@@ -219,7 +228,7 @@ public class UpdateCommand implements Runnable
                     return false;
                 }
 
-                if(!filesMatch(installFile, packageFile))
+                if(!FileSystemUtils.filesMatch(installFile, packageFile))
                 {
                     return false;
                 }
@@ -227,46 +236,6 @@ public class UpdateCommand implements Runnable
         }
 
         return true;
-    }
-
-    private boolean filesMatch(File installFile, File packageFile) throws IOException
-    {
-        if(installFile.length() != packageFile.length())
-        {
-            return false;
-        }
-
-        FileInputStream installIn = null;
-        FileInputStream packageIn = null;
-
-        try
-        {
-            installIn = new FileInputStream(installFile);
-            packageIn = new FileInputStream(installFile);
-            byte[] installBuffer = new byte[1024];
-            byte[] packageBuffer = new byte[1024];
-            int n;
-
-            while ((n = packageIn.read(packageBuffer)) > 0)
-            {
-                if(installIn.read(installBuffer) != n)
-                {
-                    return false;
-                }
-
-                if(!Arrays.equals(packageBuffer, installBuffer))
-                {
-                    return false;
-                }
-            }
-
-            return true;
-        }
-        finally
-        {
-            IOUtils.close(installIn);
-            IOUtils.close(packageIn);
-        }
     }
 
     private void updateActiveVersion(File pulseHome) throws IOException

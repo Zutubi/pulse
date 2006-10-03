@@ -110,6 +110,13 @@ public class HibernateBuildResultDaoTest extends MasterPersistenceTestCase
         assertPropertyEquals(buildResult, anotherBuildResult);
     }
 
+    public void testSaveAndLoadTestSummary()
+    {
+        TestResultSummary summary = new TestResultSummary(3, 323, 111111);
+        RecipeResult result = createRecipe();
+        result.setTestSummary(summary);
+        saveAndLoadRecipe(result);
+    }
     private RecipeResult createRecipe()
     {
         RecipeResult recipeResult = new RecipeResult("project");

@@ -112,8 +112,8 @@ public class Maven2CommandTest extends PulseTestCase
         removeInExtension(baseDir);
 
         CommandResult result = new CommandResult("maven2-test");
-        CommandContext context = new CommandContext(new SimpleRecipePaths(baseDir, null), outputDir);
-        command.execute(0, context, result);
+        CommandContext context = new CommandContext(new SimpleRecipePaths(baseDir, null), outputDir, null);
+        command.execute(context, result);
 
         return result;
     }

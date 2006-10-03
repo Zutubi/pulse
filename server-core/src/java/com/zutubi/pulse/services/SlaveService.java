@@ -1,6 +1,7 @@
 package com.zutubi.pulse.services;
 
 import com.zutubi.pulse.SystemInfo;
+import com.zutubi.pulse.BuildContext;
 import com.zutubi.pulse.core.RecipeRequest;
 import com.zutubi.pulse.core.model.Resource;
 import com.zutubi.pulse.logging.CustomLogRecord;
@@ -49,7 +50,7 @@ public interface SlaveService
      * @throws InvalidTokenException if the given token does not match the
      * slave's
      */
-    boolean build(String token, String master, long slaveId, RecipeRequest request) throws InvalidTokenException;
+    boolean build(String token, String master, long slaveId, RecipeRequest request, BuildContext context) throws InvalidTokenException;
 
     void cleanupRecipe(String token, String project, String spec, long recipeId, boolean incremental) throws InvalidTokenException;
 

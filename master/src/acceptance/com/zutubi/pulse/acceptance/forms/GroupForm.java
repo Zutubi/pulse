@@ -30,16 +30,16 @@ public class GroupForm extends BaseForm
     {
         if(create)
         {
-            return new String[] { "name", "admin", "adminAllProjects", "projects" };
+            return new String[] { "name", "admin", "personal", "adminAllProjects", "projects" };
         }
         else
         {
-            return new String[] { "newName", "admin", "adminAllProjects", "projects" };
+            return new String[] { "newName", "admin", "personal", "adminAllProjects", "projects" };
         }
     }
 
     public int[] getFieldTypes()
     {
-        return new int[] { TEXTFIELD, CHECKBOX, CHECKBOX, MULTI_SELECT };
+        return new int[] { TEXTFIELD, CHECKBOX, CHECKBOX, CHECKBOX, MULTI_SELECT };
     }
 }

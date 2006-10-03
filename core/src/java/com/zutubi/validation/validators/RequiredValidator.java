@@ -22,6 +22,7 @@ public class RequiredValidator extends FieldValidatorSupport
         if (fieldValue == null)
         {
             addFieldError(getFieldName());
+            return;
         }
 
         if (fieldValue instanceof String)

@@ -10,14 +10,14 @@ import java.io.File;
  */
 public abstract class XMLReportPostProcessorTestBase extends PulseTestCase
 {
-    protected PostProcessor pp;
+    protected XMLReportPostProcessor pp;
 
-    public XMLReportPostProcessorTestBase(PostProcessor pp)
+    public XMLReportPostProcessorTestBase(XMLReportPostProcessor pp)
     {
         this.pp = pp;
     }
 
-    public XMLReportPostProcessorTestBase(String name, PostProcessor pp)
+    public XMLReportPostProcessorTestBase(String name, XMLReportPostProcessor pp)
     {
         super(name);
         this.pp = pp;
@@ -33,13 +33,25 @@ public abstract class XMLReportPostProcessorTestBase extends PulseTestCase
         super.tearDown();
     }
 
-    protected StoredFileArtifact runProcessor(String name)
+    protected File getOutputDir()
     {
         File root = getPulseRoot();
-        File outputDir = new File(root, FileSystemUtils.composeFilename("core", "src", "test", "com", "zutubi", "pulse", "core"));
-        StoredFileArtifact artifact = new StoredFileArtifact(getClass().getSimpleName() + "." + name + ".xml");
-        pp.process(outputDir, artifact, new CommandResult("test"));
-        return artifact;
+        return new File(root, FileSystemUtils.composeFilename("core", "src", "test", "com", "zutubi", "pulse", "core"));
+    }
+
+    protected StoredFileArtifact getArtifact(String name)
+    {
+        return new StoredFileArtifact(getClass().getSimpleName() + "." + name + ".xml");
+    }
+
+    protected TestSuiteResult runProcessor(String name)
+    {
+        File outputDir = getOutputDir();
+        StoredFileArtifact artifact = getArtifact(name);
+        TestSuiteResult testResults = new TestSuiteResult();
+        CommandContext context = new CommandContext(null, outputDir, testResults);
+        pp.process(artifact, new CommandResult("test"), context);
+        return testResults;
     }
 
     protected void checkCase(TestCaseResult caseResult, String name, TestCaseResult.Status status, long duration, String message)

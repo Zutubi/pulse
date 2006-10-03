@@ -4,6 +4,7 @@ import com.zutubi.pulse.core.model.*;
 import org.acegisecurity.acl.basic.AclObjectIdentity;
 import org.acegisecurity.acl.basic.AclObjectIdentityAware;
 
+import java.io.File;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -183,11 +184,6 @@ public class BuildResult extends Result implements AclObjectIdentityAware, Itera
         this.scmDetails = scmDetails;
     }
 
-    public void accumulateTestSummary(TestResultSummary summary)
-    {
-        root.accumulateTestSummary(summary);
-    }
-
     public AclObjectIdentity getAclObjectIdentity()
     {
         return project;
@@ -234,6 +230,11 @@ public class BuildResult extends Result implements AclObjectIdentityAware, Itera
         }
     }
 
+    public void loadFailedTestResults(File dataRoot, int limitPerRecipe)
+    {
+        root.loadFailedTestResults(dataRoot, limitPerRecipe);
+    }
+
     private class ResultIterator implements Iterator<RecipeResultNode>
     {
         List<RecipeResultNode> remaining;
@@ -259,5 +260,20 @@ public class BuildResult extends Result implements AclObjectIdentityAware, Itera
         {
             throw new UnsupportedOperationException("Build result may not have recipes removed");
         }
+    }
+
+    public TestResultSummary getTestSummary()
+    {
+        return root.getTestSummary();
+    }
+
+    public boolean hasTests()
+    {
+        return getTestSummary().getTotal() > 0;
+    }
+
+    public boolean hasBrokenTests()
+    {
+        return getTestSummary().getBroken() > 0;
     }
 }

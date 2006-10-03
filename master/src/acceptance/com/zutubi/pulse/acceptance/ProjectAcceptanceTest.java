@@ -640,6 +640,24 @@ public class ProjectAcceptanceTest extends ProjectAcceptanceTestBase
         assertProjectTriggerTable(new String[][]{});
     }
 
+    public void testDisableEnableTrigger()
+    {
+        String triggerName = "scm trigger";
+        assertProjectTriggerTable(new String[][]{
+                getTriggerRow(triggerName, "event", "default", true),
+        });
+
+        assertAndClick("toggle_" + triggerName);
+        assertProjectTriggerTable(new String[][]{
+                getTriggerRow(triggerName, "event", "default", false),
+        });
+
+        assertAndClick("toggle_" + triggerName);
+        assertProjectTriggerTable(new String[][]{
+                getTriggerRow(triggerName, "event", "default", true),
+        });
+    }
+
     public void testCreateTriggerValidation()
     {
         // ensure that the name remains unique.
@@ -925,7 +943,7 @@ public class ProjectAcceptanceTest extends ProjectAcceptanceTestBase
     public void testScmFilterDefaultDisplay()
     {
         assertTablePresent("project.scm");
-        assertTableRowEqual("project.scm", 4, new String[]{"filters", "disabled"});
+        assertTableRowEqual("project.scm", 5, new String[]{"filters", "disabled"});
     }
 
     public void testScmFilterAddDeleteExclusion()
@@ -1341,7 +1359,25 @@ public class ProjectAcceptanceTest extends ProjectAcceptanceTestBase
 
     private String[] getTriggerRow(String name, String type, String spec)
     {
-        return new String[]{name, type, spec, "edit", "delete"};
+        return getTriggerRow(name, type, spec, true);
+    }
+
+    private String[] getTriggerRow(String name, String type, String spec, boolean enabled)
+    {
+        String state;
+        String action;
+        if(enabled)
+        {
+            state = "enabled";
+            action = "disable";
+        }
+        else
+        {
+            state = "disabled";
+            action = "enable";
+        }
+
+        return new String[]{name, type, spec, state, action, "edit", "delete"};
     }
 
     private void assertProjectActionTable(String[][] rows)

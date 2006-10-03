@@ -1,6 +1,7 @@
 package com.zutubi.validation;
 
 import com.zutubi.validation.validators.DelegateValidator;
+import com.zutubi.validation.validators.ValidateableValidator;
 
 import java.util.List;
 import java.util.LinkedList;
@@ -50,6 +51,10 @@ public class DefaultValidationManager implements ValidationManager
             {
                 //TODO: need to fix this, either by wiring or supporting static access to the validation manager.
                 ((DelegateValidator)v).setValidationManager(this);
+            }
+            if (v instanceof ValidateableValidator && context.hasErrors() && ((ShortCircuitableValidator)v).isShortCircuit())
+            {
+                continue;
             }
             v.setValidationContext(context);
             v.validate(o);

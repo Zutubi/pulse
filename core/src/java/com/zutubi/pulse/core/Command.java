@@ -11,7 +11,7 @@ import java.util.List;
  */
 public interface Command
 {
-    void execute(long recipeId, CommandContext context, CommandResult result);
+    void execute(CommandContext context, CommandResult result);
 
     List<String> getArtifactNames();
 

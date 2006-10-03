@@ -1,19 +1,16 @@
 package com.zutubi.pulse.core;
 
 import com.zutubi.pulse.core.model.CommandResult;
-import com.zutubi.pulse.core.model.StoredFileArtifact;
 import com.zutubi.pulse.core.model.StoredArtifact;
-import com.zutubi.pulse.util.ForkOutputStream;
-import com.zutubi.pulse.util.IOUtils;
-import com.zutubi.pulse.util.SystemUtils;
-import com.zutubi.pulse.util.FileSystemUtils;
+import com.zutubi.pulse.core.model.StoredFileArtifact;
+import com.zutubi.pulse.util.*;
 import com.zutubi.pulse.util.logging.Logger;
 
 import java.io.*;
 import java.util.*;
 
 /**
- * 
+ *
  *
  */
 public class ExecutableCommand implements Command, ScopeAware
@@ -34,11 +31,11 @@ public class ExecutableCommand implements Command, ScopeAware
     private Process child;
     private volatile boolean terminated = false;
 
-    public void execute(long recipeId, CommandContext context, CommandResult cmdResult)
+    public void execute(CommandContext context, CommandResult cmdResult)
     {
         ProcessBuilder builder = new ProcessBuilder(constructCommand());
         updateWorkingDir(builder, context.getPaths());
-        updateChildEnvironment(builder);
+        updateChildEnvironment(builder, context);
 
         builder.redirectErrorStream(true);
 
@@ -135,7 +132,7 @@ public class ExecutableCommand implements Command, ScopeAware
                 cmdResult.getProperties().put("working directory", builder.directory().getAbsolutePath());
             }
 
-            ProcessSupport.postProcess(processes, outputFileDir, outputFile, context.getOutputDir(), cmdResult);
+            ProcessSupport.postProcess(processes, outputFileDir, outputFile, cmdResult, context);
         }
         catch (IOException e)
         {
@@ -151,49 +148,54 @@ public class ExecutableCommand implements Command, ScopeAware
     {
         File file = new File(outputDir, "env.txt");
 
+        final String separator = Constants.LINE_SEPARATOR;
+
         // buffered contents to be written to the file later.
         StringBuffer buffer = new StringBuffer();
 
-        buffer.append("Command Line:\n");
-        buffer.append("-------------\n");
-        buffer.append(constructCommandLine(builder)).append("\n");
+        buffer.append("Command Line:").append(separator);
+        buffer.append("-------------").append(separator);
+        buffer.append(constructCommandLine(builder)).append(separator);
 
-        buffer.append("\nProcess Environment:\n");
-        buffer.append("--------------------\n");
+        buffer.append(separator);
+        buffer.append("Process Environment:").append(separator);
+        buffer.append("--------------------").append(separator);
 
         // use a tree map to provide ordering to the keys.
         Map<String, String> env = new TreeMap<String, String>(builder.environment());
         for (String key : env.keySet())
         {
-            buffer.append(key).append("=").append(env.get(key)).append("\n");
+            buffer.append(key).append("=").append(env.get(key)).append(separator);
         }
 
-        buffer.append("\nResources: (via scope)\n");
-        buffer.append("----------------------\n");
+        buffer.append(separator);
+        buffer.append("Resources: (via scope)").append(separator);
+        buffer.append("----------------------").append(separator);
         if (scope != null && scope.getEnvironment().size() > 0)
         {
             for (Map.Entry<String, String> setting : scope.getEnvironment().entrySet())
             {
-                buffer.append(setting.getKey()).append("=").append(setting.getValue()).append("\n");
+                buffer.append(setting.getKey()).append("=").append(setting.getValue()).append(separator);
             }
         }
         else
         {
-            buffer.append("No environment variables defined via the command scope.\n");
+            buffer.append("No environment variables defined via the command scope.").append(separator);
         }
 
-        buffer.append("\nResources: (via environment tag)\n");
-        buffer.append("--------------------------------\n");
+        buffer.append(separator);
+        buffer.append("Resources: (via environment tag)").append(separator);
+        buffer.append("--------------------------------").append(separator);
         if (this.env.size() > 0)
         {
             for (Environment setting : this.env)
             {
-                buffer.append(setting.getName()).append("=").append(setting.getValue()).append("\n");
+                buffer.append(setting.getName()).append("=").append(setting.getValue()).append(separator);
             }
         }
         else
         {
-            buffer.append("No environment variables defined via the command env tags.\n");
+            buffer.append("No environment variables defined via the command env tags.").append(separator);
         }
 
         // write the buffer to the file.
@@ -275,7 +277,7 @@ public class ExecutableCommand implements Command, ScopeAware
         }
     }
 
-    private void updateChildEnvironment(ProcessBuilder builder)
+    private void updateChildEnvironment(ProcessBuilder builder, CommandContext context)
     {
         Map<String, String> childEnvironment = builder.environment();
 
@@ -290,6 +292,11 @@ public class ExecutableCommand implements Command, ScopeAware
         for (Environment setting : env)
         {
             childEnvironment.put(setting.getName(), setting.getValue());
+        }
+
+        if (context.getBuildNumber() != -1)
+        {
+            childEnvironment.put("PULSE_BUILD_NUMBER", Long.toString(context.getBuildNumber()));
         }
     }
 

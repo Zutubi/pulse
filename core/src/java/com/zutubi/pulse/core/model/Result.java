@@ -335,23 +335,4 @@ public abstract class Result extends Entity
     {
         return Feature.Level.valueOf(name);
     }
-
-    public abstract void accumulateTestSummary(TestResultSummary summary);
-
-    public boolean hasTests()
-    {
-        return getTestSummary().getTotal() > 0;
-    }
-
-    public boolean hasBrokenTests()
-    {
-        return getTestSummary().getBroken() > 0;
-    }
-
-    public TestResultSummary getTestSummary()
-    {
-        TestResultSummary summary = new TestResultSummary();
-        accumulateTestSummary(summary);
-        return summary;
-    }
 }

@@ -43,9 +43,9 @@ public class MasterBuildService implements BuildService
         return resourceManager.getMasterRepository().hasResource(resource, version);
     }
 
-    public boolean build(RecipeRequest request)
+    public boolean build(RecipeRequest request, BuildContext context)
     {
-        masterRecipeProcessor.processRecipe(request);
+        masterRecipeProcessor.processRecipe(request, context);
         return true;
     }
 

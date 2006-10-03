@@ -401,7 +401,6 @@ public class HibernateBuildResultDao extends HibernateEntityDao<BuildResult> imp
                     for(StoredFileArtifact file: artifact.getChildren())
                     {
                         Hibernate.initialize(file.getFeatures());
-                        Hibernate.initialize(file.getTests());
                     }
                 }
             }

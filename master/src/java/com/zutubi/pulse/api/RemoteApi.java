@@ -3,6 +3,9 @@ package com.zutubi.pulse.api;
 import com.opensymphony.util.TextUtils;
 import com.zutubi.pulse.ShutdownManager;
 import com.zutubi.pulse.Version;
+import com.zutubi.pulse.license.LicenseException;
+import com.zutubi.pulse.agent.AgentManager;
+import com.zutubi.pulse.agent.Agent;
 import com.zutubi.pulse.bootstrap.ComponentContext;
 import com.zutubi.pulse.core.model.ResultState;
 import com.zutubi.pulse.model.*;
@@ -24,6 +27,8 @@ public class RemoteApi
     private BuildManager buildManager;
     private ProjectManager projectManager;
     private UserManager userManager;
+    private AgentManager agentManager;
+    private SlaveManager slaveManager;
 
     public RemoteApi()
     {
@@ -233,6 +238,42 @@ public class RemoteApi
         }
     }
 
+    public boolean addAgent(String token, String name, String host, int port) throws AuthenticationException, LicenseException
+    {
+        tokenManager.verifyAdmin(token);
+
+        if(!TextUtils.stringSet(name) || agentManager.agentExists(name))
+        {
+            return false;
+        }
+
+        if(!TextUtils.stringSet(host))
+        {
+            return false;
+        }
+
+        if(port <= 0)
+        {
+            return false;
+        }
+
+        agentManager.addSlave(new Slave(name, host, port));
+        return true;
+    }
+
+    public String getAgentStatus(String token, String name) throws AuthenticationException
+    {
+        tokenManager.verifyUser(token);
+
+        Agent agent = agentManager.getAgent(name);
+        if(agent == null)
+        {
+            return "";
+        }
+
+        return agent.getStatus().getPrettyString();
+    }
+
     public boolean shutdown(String token, boolean force, boolean exitJvm) throws AuthenticationException
     {
         // check the tokenmanager. If we have one, then lets us it. If not, then its very early in
@@ -371,5 +412,15 @@ public class RemoteApi
             throw new IllegalArgumentException("Unknown project '" + projectName + "'");
         }
         return project;
+    }
+
+    public void setAgentManager(AgentManager agentManager)
+    {
+        this.agentManager = agentManager;
+    }
+
+    public void setSlaveManager(SlaveManager slaveManager)
+    {
+        this.slaveManager = slaveManager;
     }
 }

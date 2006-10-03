@@ -203,6 +203,43 @@ public class ExecutableCommandTest extends PulseTestCase
         assertEquals("text/plain", outputArtifact.getType());
     }
 
+    public void testBuildNumberAddedToEnvironment() throws IOException
+    {
+        ExecutableCommand command = new ExecutableCommand();
+        command.setExe("echo");
+        CommandResult result = new CommandResult("success");
+        execute(command, result, 1234);
+
+        String output = getEnv();
+        assertTrue(output.contains("PULSE_BUILD_NUMBER=1234"));
+    }
+
+    public void testBuildNumberNotAddedToEnvironmentWhenNotSpecified() throws IOException
+    {
+        // if we are running in pulse, then PULSE_BUILD_NUMBER will already
+        // be added to the environment.
+        boolean runningInPulse = System.getenv().containsKey("PULSE_BUILD_NUMBER");
+
+        ExecutableCommand command = new ExecutableCommand();
+        command.setExe("echo");
+        CommandResult result = new CommandResult("success");
+        execute(command, result);
+
+        String output = getEnv();
+
+        if (runningInPulse)
+        {
+            // should only appear once.
+            assertTrue(output.indexOf("PULSE_BUILD_NUMBER") == output.lastIndexOf("PULSE_BUILD_NUMBER"));
+        }
+        else
+        {
+            // does not appear.
+            assertFalse(output.contains("PULSE_BUILD_NUMBER"));
+        }
+
+    }
+
     private String getOutput() throws IOException
     {
         return IOUtils.fileToString(new File(outputDirectory, ExecutableCommand.OUTPUT_NAME + "/output.txt"));
@@ -215,7 +252,14 @@ public class ExecutableCommandTest extends PulseTestCase
 
     private void execute(ExecutableCommand command, CommandResult result)
     {
-        CommandContext context = new CommandContext(new SimpleRecipePaths(baseDirectory, null), outputDirectory);
-        command.execute(0, context, result);
+        CommandContext context = new CommandContext(new SimpleRecipePaths(baseDirectory, null), outputDirectory, null);
+        command.execute(context, result);
+    }
+
+    private void execute(ExecutableCommand command, CommandResult result, long buildNumber)
+    {
+        CommandContext context = new CommandContext(new SimpleRecipePaths(baseDirectory, null), outputDirectory, null);
+        context.setBuildNumber(buildNumber);
+        command.execute(context, result);
     }
 }

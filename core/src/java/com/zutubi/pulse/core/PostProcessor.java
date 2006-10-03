@@ -3,8 +3,6 @@ package com.zutubi.pulse.core;
 import com.zutubi.pulse.core.model.CommandResult;
 import com.zutubi.pulse.core.model.StoredFileArtifact;
 
-import java.io.File;
-
 
 /**
  * Post processors are used to detect interesting features in artifacts
@@ -14,5 +12,5 @@ import java.io.File;
  */
 public interface PostProcessor extends Reference
 {
-    void process(File outputDir, StoredFileArtifact artifact, CommandResult result);
+    void process(StoredFileArtifact artifact, CommandResult result, CommandContext context);
 }

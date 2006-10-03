@@ -9,6 +9,7 @@ import com.zutubi.pulse.scheduling.Task;
 import com.zutubi.pulse.scheduling.TaskExecutionContext;
 import com.zutubi.pulse.util.logging.Logger;
 import com.zutubi.pulse.util.Pair;
+import com.zutubi.pulse.util.Constants;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -42,6 +43,31 @@ public class MonitorScms implements Task
         {
             try
             {
+                long now = System.currentTimeMillis();
+
+                // A) is it time to poll this scm server?
+                if (scm.getLastPollTime() != null)
+                {
+                    // poll interval.
+                    int pollingInterval = scmManager.getDefaultPollingInterval();
+                    if (scm.getPollingInterval() != null)
+                    {
+                        pollingInterval = scm.getPollingInterval();
+                    }
+
+                    long lastPollTime = scm.getLastPollTime();
+                    long nextPollTime = lastPollTime + Constants.MINUTE * pollingInterval;
+
+                    if (now < nextPollTime)
+                    {
+                        continue;
+                    }
+                }
+
+                // set the poll time.
+                scm.setLastPollTime(now);
+                scmManager.save(scm);
+
                 // when was the last time that we checked? if never, get the latest revision.
                 SCMServer server = scm.createServer();
                 if (!latestRevisions.containsKey(scm.getId()))

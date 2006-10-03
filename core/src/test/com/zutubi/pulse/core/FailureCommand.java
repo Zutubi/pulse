@@ -17,7 +17,7 @@ public class FailureCommand extends CommandSupport
         super(name);
     }
 
-    public void execute(long recipeId, CommandContext context, CommandResult result)
+    public void execute(CommandContext context, CommandResult result)
     {
         result.failure("failure command");
     }

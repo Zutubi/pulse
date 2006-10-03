@@ -1,11 +1,13 @@
 package com.zutubi.pulse;
 
 import com.zutubi.pulse.bootstrap.ComponentContext;
+import com.zutubi.pulse.bootstrap.MasterConfigurationManager;
 import com.zutubi.pulse.events.Event;
 import com.zutubi.pulse.events.EventListener;
 import com.zutubi.pulse.events.EventManager;
 import com.zutubi.pulse.events.build.BuildCompletedEvent;
 import com.zutubi.pulse.model.*;
+import com.zutubi.pulse.util.logging.Logger;
 
 import java.util.HashSet;
 import java.util.List;
@@ -16,13 +18,40 @@ import java.util.Set;
  */
 public class ResultNotifier implements EventListener
 {
+    public static final String FAILURE_LIMIT_PROPERTY = "pulse.notification.test.failure.limit";
+    public static final int DEFAULT_FAILURE_LIMIT = 20;
+
+    private static final Logger LOG = Logger.getLogger(ResultNotifier.class);
+
     private SubscriptionManager subscriptionManager;
     private UserManager userManager;
+    private MasterConfigurationManager configurationManager;
+
+    public static int getFailureLimit()
+    {
+        int limit = DEFAULT_FAILURE_LIMIT;
+        String property = System.getProperty(FAILURE_LIMIT_PROPERTY);
+        if(property != null)
+        {
+            try
+            {
+                limit = Integer.parseInt(property);
+            }
+            catch(NumberFormatException e)
+            {
+                LOG.warning(e);
+            }
+        }
+
+        return limit;
+    }
 
     public void handleEvent(Event evt)
     {
         BuildCompletedEvent event = (BuildCompletedEvent) evt;
         BuildResult buildResult = event.getResult();
+
+        buildResult.loadFailedTestResults(configurationManager.getDataDirectory(), getFailureLimit());
 
         Set<String> notifiedContactPoints = new HashSet<String>();
 
@@ -71,5 +100,10 @@ public class ResultNotifier implements EventListener
     public void setUserManager(UserManager userManager)
     {
         this.userManager = userManager;
+    }
+
+    public void setConfigurationManager(MasterConfigurationManager configurationManager)
+    {
+        this.configurationManager = configurationManager;
     }
 }
