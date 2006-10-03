@@ -1,13 +1,18 @@
 package com.zutubi.pulse.web.user;
 
 import com.zutubi.pulse.model.*;
-import com.zutubi.pulse.web.wizard.BaseWizard;
-import com.zutubi.pulse.web.wizard.BaseWizardState;
-import com.zutubi.pulse.web.wizard.Wizard;
-import com.zutubi.pulse.web.wizard.WizardCompleteState;
+import com.zutubi.pulse.web.wizard.*;
+import com.zutubi.pulse.form.descriptor.*;
+import com.zutubi.pulse.notifications.NotificationSchemeManager;
+import com.zutubi.pulse.notifications.NotificationHandler;
+import com.zutubi.pulse.notifications.EmailNotificationHandler;
+import com.zutubi.pulse.notifications.JabberNotificationHandler;
+import com.zutubi.pulse.core.ObjectFactory;
+import com.zutubi.validation.*;
 
-import java.util.Map;
-import java.util.TreeMap;
+import java.util.List;
+
+import freemarker.template.Configuration;
 
 /**
  * <class-comment/>
@@ -18,22 +23,65 @@ public class ContactPointWizard extends BaseWizard
 
     private UserManager userManager;
 
-    private EmailContactState email;
-    private JabberContactState jabber;
-    private SelectContactState select;
-    private WizardCompleteState complete;
+    private DescriptorFactory descriptorFactory;
+
+    private ValidationManager validationManager;
+
+    private Configuration configuration;
+
+    private NotificationSchemeManager schemeManager;
+
+    private ObjectFactory objectFactory;
+
+    public void setNotificationSchemeManager(NotificationSchemeManager schemeManager)
+    {
+        this.schemeManager = schemeManager;
+    }
+
+    public void setObjectFactory(ObjectFactory objectFactory)
+    {
+        this.objectFactory = objectFactory;
+    }
 
     public ContactPointWizard()
     {
-        select = new SelectContactState(this, "select");
-        jabber = new JabberContactState(this, "jabber");
-        email = new EmailContactState(this, "email");
-        complete = new WizardCompleteState(this, "success");
+    }
 
-        addInitialState("select", select);
-        addState(jabber);
-        addState(email);
-        addFinalState("success", complete);
+    public void initialise()
+    {
+        List<String> schemes = schemeManager.getNotificationSchemes();
+
+        SelectContact pojo = new SelectContact(schemes);
+
+        SelectWizardState select = new SelectWizardState(this, pojo, "select", true, false);
+        select.setConfiguration(configuration);
+        select.setValidationManager(validationManager);
+        select.setDescriptorFactory(descriptorFactory);
+
+        addInitialState(select);
+
+        // initialise the wizard states.
+        for (String scheme : schemes)
+        {
+            try
+            {
+                Class handlerClass = schemeManager.getNotificationHandler(scheme);
+                Object handler = objectFactory.buildBean(handlerClass);
+
+                FormWizardState state = new FormWizardState(this, handler, scheme, "success", false, true);
+                state.setConfiguration(configuration);
+                state.setValidationManager(validationManager);
+                state.setDescriptorFactory(descriptorFactory);
+
+                addState(state);
+            }
+            catch (Exception e)
+            {
+                e.printStackTrace();
+            }
+        }
+
+        super.initialise();
     }
 
     /**
@@ -61,43 +109,61 @@ public class ContactPointWizard extends BaseWizard
         this.userManager = userManager;
     }
 
+    public void setDescriptorFactory(DescriptorFactory descriptorFactory)
+    {
+        this.descriptorFactory = descriptorFactory;
+    }
+
+    public void setValidationManager(ValidationManager validationManager)
+    {
+        this.validationManager = validationManager;
+    }
+
+    public void setFreemarkerConfiguration(Configuration config)
+    {
+        this.configuration = config;
+    }
+
     public void process()
     {
         // handle the creation of the contact point.
         User user = userManager.getUser(userId);
-        ContactPoint contact = null;
-        if (select.getContact().equals("jabber"))
+
+        SelectContact selectData = (SelectContact) ((FormWizardState)getState("select")).getSubject();
+        WizardState state = getState(selectData.getContact());
+        NotificationHandler handler = (NotificationHandler) ((FormWizardState)state).getSubject();
+
+        // new contact point.
+        if (handler instanceof EmailNotificationHandler)
         {
-            contact = jabber.getContact();
+            EmailNotificationHandler emailHandler = (EmailNotificationHandler)handler;
+            EmailContactPoint email = new EmailContactPoint();
+            email.setEmail(emailHandler.getEmail());
+            email.setType(emailHandler.getFormat());
+            email.setName(emailHandler.getName());
+            user.add(email);
+            userManager.save(user);
         }
-        else if (select.getContact().equals("email"))
+        else if (handler instanceof JabberNotificationHandler)
         {
-            contact = email.getContact();
+            JabberNotificationHandler jabberHandler = (JabberNotificationHandler) handler;
+            JabberContactPoint jabber = new JabberContactPoint();
+            jabber.setName(jabberHandler.getName());
+            jabber.setUsername(jabberHandler.getUsername());
+            user.add(jabber);
+            userManager.save(user);
         }
-        user.add(contact);
-        userManager.save(user);
     }
 
-    public class SelectContactState extends BaseWizardState
+    public class SelectContact
     {
-        private Map<String, String> contacts;
-
         private String contact;
 
-        public SelectContactState(Wizard wizard, String name)
-        {
-            super(wizard, name);
-        }
+        private List<String> options;
 
-        public Map<String, String> getContacts()
+        public SelectContact(List<String> options)
         {
-            if (contacts == null)
-            {
-                contacts = new TreeMap<String, String>();
-                contacts.put("email", "email"); //TODO: externalise these strings..
-                contacts.put("jabber", "jabber");
-            }
-            return contacts;
+            this.options = options;
         }
 
         public String getContact()
@@ -110,49 +176,22 @@ public class ContactPointWizard extends BaseWizard
             this.contact = contact;
         }
 
-        public String getNextStateName()
+        public List<String> getContactOptions()
         {
-            return contact;
+            return options;
         }
     }
 
-    public class JabberContactState extends BaseWizardState
+    public class SelectWizardState extends FormWizardState
     {
-        private JabberContactPoint contact = new JabberContactPoint();
-
-        public JabberContactState(Wizard wizard, String name)
+        public SelectWizardState(Wizard wizard, Object obj, String stateName, boolean isFirstState, boolean isLastState)
         {
-            super(wizard, name);
+            super(wizard, obj, stateName, null, isFirstState, isLastState);
         }
 
         public String getNextStateName()
         {
-            return "success";
-        }
-
-        public JabberContactPoint getContact()
-        {
-            return contact;
-        }
-    }
-
-    public class EmailContactState extends BaseWizardState
-    {
-        private EmailContactPoint contact = new EmailContactPoint();
-
-        public EmailContactState(Wizard wizard, String name)
-        {
-            super(wizard, name);
-        }
-
-        public String getNextStateName()
-        {
-            return "success";
-        }
-
-        public EmailContactPoint getContact()
-        {
-            return contact;
+            return ((SelectContact)getSubject()).getContact();
         }
     }
 }

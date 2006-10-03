@@ -1,7 +1,11 @@
 package com.zutubi.pulse.core;
 
-import com.zutubi.pulse.core.validation.CommandValidationManager;
+import com.zutubi.pulse.core.validation.CommandValidationException;
 import com.zutubi.pulse.util.IOUtils;
+import com.zutubi.pulse.validation.PulseValidationManager;
+import com.zutubi.pulse.validation.PulseValidationContext;
+import com.zutubi.pulse.validation.MessagesTextProvider;
+import com.zutubi.validation.*;
 import nu.xom.*;
 
 import java.io.File;
@@ -23,14 +27,16 @@ public class FileLoader
     private final Map<String, Class> typeDefinitions = new HashMap<String, Class>();
     private ObjectFactory factory;
 
+    private ValidationManager validationManager;
+
     public FileLoader()
     {
         // For the Spring
     }
 
-    public FileLoader(ObjectFactory factory)
+    public void setValidationManager(ValidationManager validationManager)
     {
-        setObjectFactory(factory);
+        this.validationManager = validationManager;
     }
 
     /**
@@ -198,7 +204,8 @@ public class FileLoader
                 }
 
                 // Apply declarative validation
-                CommandValidationManager.validate(type, name);
+                validate(type);
+//                CommandValidationManager.validate(type, name);
             }
         }
         catch (InvocationTargetException ex)
@@ -223,6 +230,17 @@ public class FileLoader
         catch (Exception ex)
         {
             throw createParseException(name, e, ex);
+        }
+    }
+
+    private void validate(Object obj) throws CommandValidationException, ValidationException
+    {
+        validationManager = new PulseValidationManager();
+        ValidationContext validationContext = new PulseValidationContext(new MessagesTextProvider(obj));
+        validationManager.validate(obj, validationContext);
+        if (validationContext.hasErrors())
+        {
+            throw new CommandValidationException(validationContext);
         }
     }
 

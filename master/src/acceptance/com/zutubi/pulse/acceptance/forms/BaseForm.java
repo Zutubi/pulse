@@ -49,7 +49,6 @@ public abstract class BaseForm
      * returns an array of TEXTFIELD identifiers.
      *
      * @return an array of form field identifiers.
-     *
      * @see BaseForm#TEXTFIELD
      * @see BaseForm#CHECKBOX
      * @see BaseForm#RADIOBOX
@@ -86,6 +85,12 @@ public abstract class BaseForm
     {
         setFormElements(args);
         tester.submit("next");
+    }
+
+    public void finishFormElements(String... args)
+    {
+        setFormElements(args);
+        tester.submit("finish");
     }
 
     public void next()
@@ -132,7 +137,7 @@ public abstract class BaseForm
                     break;
                 case MULTI_CHECKBOX:
                 case MULTI_SELECT:
-                    if(values[i] != null)
+                    if (values[i] != null)
                     {
                         setMultiValues(getFieldNames()[i], values[i]);
                     }
@@ -173,11 +178,11 @@ public abstract class BaseForm
                     break;
                 case MULTI_CHECKBOX:
                 case MULTI_SELECT:
-                    if(values[i] != null)
+                    if (values[i] != null)
                     {
                         String[] expected;
 
-                        if(values[i].length() > 0)
+                        if (values[i].length() > 0)
                         {
                             expected = values[i].split(",");
                         }
@@ -230,20 +235,20 @@ public abstract class BaseForm
 
     public void assertOptionNotPresent(String field, String option)
     {
-        for(String o: tester.getDialog().getOptionsFor(field))
+        for (String o : tester.getDialog().getOptionsFor(field))
         {
-            if(o.equals(option))
+            if (o.equals(option))
             {
                 Assert.fail("Unexpected option '" + option + "' present in field '" + field + "'");
             }
         }
     }
 
-    public void assertMultiValues(String name, String ...values)
+    public void assertMultiValues(String name, String... values)
     {
         String[] gotValues = tester.getDialog().getForm().getParameterValues(name);
         Assert.assertEquals(values.length, gotValues.length);
-        for(int i = 0; i < values.length; i++)
+        for (int i = 0; i < values.length; i++)
         {
             Assert.assertEquals(values[i], gotValues[i]);
         }
@@ -252,7 +257,7 @@ public abstract class BaseForm
     public void setMultiValues(String name, String values)
     {
         String[] set;
-        if(values.length() > 0)
+        if (values.length() > 0)
         {
             set = values.split(",");
         }

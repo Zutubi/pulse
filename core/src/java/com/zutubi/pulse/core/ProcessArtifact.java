@@ -1,7 +1,8 @@
 package com.zutubi.pulse.core;
 
-import com.opensymphony.xwork.validator.ValidatorContext;
-import com.zutubi.pulse.core.validation.Validateable;
+import com.zutubi.validation.Validateable;
+import com.zutubi.validation.ValidationContext;
+
 
 /**
  * A reference to a post-processor.
@@ -20,7 +21,7 @@ class ProcessArtifact implements Validateable
         this.processor = processor;
     }
 
-    public void validate(ValidatorContext context)
+    public void validate(ValidationContext context)
     {
         if(processor == null)
         {

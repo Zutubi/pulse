@@ -19,7 +19,7 @@ public class JabberContactForm extends BaseForm
     {
         if(create)
         {
-            return "jabber.create";
+            return "JabberNotificationHandler";
         }
         else
         {
@@ -29,7 +29,14 @@ public class JabberContactForm extends BaseForm
 
     public String[] getFieldNames()
     {
-        return new String[]{"contact.name", "contact.username"};
+        if (create)
+        {
+            return new String[]{"name", "username"};
+        }
+        else
+        {
+            return new String[]{"contact.name", "contact.username"};
+        }
     }
 
     public int[] getFieldTypes()

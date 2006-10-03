@@ -12,9 +12,8 @@ import java.util.List;
  */
 public class PulseFileLoader extends FileLoader
 {
-    public PulseFileLoader(ObjectFactory factory)
+    public PulseFileLoader()
     {
-        super(factory);
         register("property", Property.class);
         register("recipe", Recipe.class);
         register("def", ComponentDefinition.class);

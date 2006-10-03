@@ -7,7 +7,6 @@ public class TwoStepWizard extends BaseWizard
 {
     TestWizardState stateOne;
     TestWizardState stateTwo;
-    WizardCompleteState completeState;
 
     public TwoStepWizard()
     {
@@ -18,8 +17,6 @@ public class TwoStepWizard extends BaseWizard
         addState(stateTwo);
         initialState = stateOne;
 
-        completeState = new WizardCompleteState(this, "success");
-        stateTwo.setNextState(completeState.getStateName());
-        addFinalState(completeState.getStateName(), completeState);
+        stateTwo.setNextState("success");
     }
 }

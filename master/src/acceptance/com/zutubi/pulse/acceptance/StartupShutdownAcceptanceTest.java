@@ -75,23 +75,28 @@ public class StartupShutdownAcceptanceTest extends TestCase
      */
     public void testDefaultFirstTimeStartup() throws Exception
     {
+        // we are using the default runtime context.
         RuntimeContext ctx = new RuntimeContext();
 
+        // we are expecting the following file context.
         RuntimeContext fileCtx = new RuntimeContext("8080", "/");
         fileCtx.setDataDirectory(defaultDataDir.getAbsolutePath());
 
+        // we are expecting the actual server context to be the following:
         RuntimeContext actualCtx = new RuntimeContext("8080", "/");
         actualCtx.setDataDirectory(defaultDataDir.getAbsolutePath());
         actualCtx.setExternalConfig(defaultConfigFile.getAbsolutePath());
 
+        // assert that things are expected in the situation where we are starting the
+        // server for the first time.
         assertFirstTimeStartup(ctx, fileCtx, actualCtx);
     }
 
     public void testFirstTimeStartupWithCommandLineOptions() throws Exception
     {
-        RuntimeContext ctx = new RuntimeContext();
-        ctx.setPort("8081");
-        ctx.setContextPath("/builder");
+        RuntimeContext cmdCtx = new RuntimeContext();
+        cmdCtx.setPort("8081");
+        cmdCtx.setContextPath("/builder");
 
         RuntimeContext fileCtx = new RuntimeContext("8080", "/");
         fileCtx.setDataDirectory(defaultDataDir.getAbsolutePath());
@@ -100,13 +105,13 @@ public class StartupShutdownAcceptanceTest extends TestCase
         actualCtx.setDataDirectory(defaultDataDir.getAbsolutePath());
         actualCtx.setExternalConfig(defaultConfigFile.getAbsolutePath());
 
-        assertFirstTimeStartup(ctx, fileCtx, actualCtx);
+        assertFirstTimeStartup(cmdCtx, fileCtx, actualCtx);
     }
 
     public void testFirstTimeStartupWithDataDirectorySpecified() throws Exception
     {
-        RuntimeContext ctx = new RuntimeContext("8082", "/pulse");
-        ctx.setDataDirectory(dataDir.getAbsolutePath());
+        RuntimeContext cmdCtx = new RuntimeContext("8082", "/pulse");
+        cmdCtx.setDataDirectory(dataDir.getAbsolutePath());
 
         RuntimeContext fileCtx = new RuntimeContext("8080", "/");
         fileCtx.setDataDirectory(dataDir.getAbsolutePath());
@@ -115,14 +120,14 @@ public class StartupShutdownAcceptanceTest extends TestCase
         actualCtx.setDataDirectory(dataDir.getAbsolutePath());
         actualCtx.setExternalConfig(defaultConfigFile.getAbsolutePath());
 
-        assertFirstTimeStartup(ctx, fileCtx, actualCtx);
+        assertFirstTimeStartup(cmdCtx, fileCtx, actualCtx);
     }
 
     public void testFirstTimeStartupWithEverythingSpecified() throws Exception
     {
-        RuntimeContext ctx = new RuntimeContext("8083", "/some/sort/of/crazy/context/path");
-        ctx.setDataDirectory(dataDir.getAbsolutePath());
-        ctx.setExternalConfig(configFile.getAbsolutePath());
+        RuntimeContext cmdCtx = new RuntimeContext("8083", "/some/sort/of/crazy/context/path");
+        cmdCtx.setDataDirectory(dataDir.getAbsolutePath());
+        cmdCtx.setExternalConfig(configFile.getAbsolutePath());
 
         RuntimeContext fileCtx = new RuntimeContext("8080", "/");
         fileCtx.setDataDirectory(dataDir.getAbsolutePath());
@@ -131,11 +136,15 @@ public class StartupShutdownAcceptanceTest extends TestCase
         actualCtx.setDataDirectory(dataDir.getAbsolutePath());
         actualCtx.setExternalConfig(configFile.getAbsolutePath());
 
-        assertFirstTimeStartup(ctx, fileCtx, actualCtx);
+        assertFirstTimeStartup(cmdCtx, fileCtx, actualCtx);
     }
 
     /**
      * Here, a first time startup assumes that the external config file does not exist.
+     *
+     * @param cmdCtx is the command line context. This is what should be used to run a command.
+     * @param fileCtx is the context stored in the file.
+     * @param actualCtx is the actual server context. This is what is used to communicate with the server.
      */
     private void assertFirstTimeStartup(RuntimeContext cmdCtx, RuntimeContext fileCtx, RuntimeContext actualCtx) throws Exception
     {

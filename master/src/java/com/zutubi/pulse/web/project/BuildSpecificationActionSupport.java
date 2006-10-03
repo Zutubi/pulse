@@ -59,7 +59,8 @@ public class BuildSpecificationActionSupport extends ProjectActionSupport
         {
             public void run()
             {
-                FileLoader fileLoader = new PulseFileLoader(new ObjectFactory());
+                FileLoader fileLoader = new PulseFileLoader();
+                fileLoader.setObjectFactory(new ObjectFactory());
                 try
                 {
                     PulseFileDetails details = getProject().getPulseFileDetails();

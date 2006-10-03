@@ -1,6 +1,7 @@
 package com.zutubi.pulse.core;
 
 import com.zutubi.pulse.core.model.CommandResult;
+import com.zutubi.validation.annotations.Required;
 
 import java.util.List;
 
@@ -14,7 +15,7 @@ public interface Command
 
     List<String> getArtifactNames();
 
-    String getName();
+    @Required String getName();
 
     void setName(String name);
 

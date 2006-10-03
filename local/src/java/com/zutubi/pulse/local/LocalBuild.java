@@ -163,13 +163,19 @@ public class LocalBuild
         try
         {
             logStream = new FileOutputStream(logFile);
+
+            // manually write these components.
             EventManager manager = new DefaultEventManager();
+            ObjectFactory objectFactory = new ObjectFactory();
+            FileLoader fileLoader = new PulseFileLoader();
+            fileLoader.setObjectFactory(objectFactory);
+
             manager.register(new BuildStatusPrinter(paths.getBaseDir(), logStream));
 
             Bootstrapper bootstrapper = new LocalBootstrapper();
             RecipeProcessor processor = new RecipeProcessor();
             processor.setEventManager(manager);
-            processor.init();
+            processor.setFileLoader(fileLoader);
 
             RecipeRequest request = new RecipeRequest(0, bootstrapper, loadPulseFile(baseDir, pulseFileName), recipe);
             processor.build(request, paths, repository, false, new BuildContext());

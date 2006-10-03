@@ -48,11 +48,10 @@ public class AddArtifactWizard extends BaseWizard
         configFile = new ConfigureFileArtifact(this, FILE_STATE);
         configProcessors = new ConfigureProcessors(this);
 
-        addInitialState("select", selectState);
+        addInitialState(selectState);
         addState(configDir);
         addState(configFile);
         addState(configProcessors);
-        addFinalState("success", new WizardCompleteState(this, "success"));
     }
 
     public long getProjectId()

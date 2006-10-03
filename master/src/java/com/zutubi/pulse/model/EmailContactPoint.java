@@ -6,6 +6,8 @@ import com.zutubi.pulse.bootstrap.ComponentContext;
 import com.zutubi.pulse.bootstrap.MasterConfigurationManager;
 import com.zutubi.pulse.renderer.BuildResultRenderer;
 import com.zutubi.pulse.util.logging.Logger;
+import com.zutubi.validation.annotations.Required;
+import com.zutubi.validation.annotations.Email;
 
 import javax.mail.*;
 import javax.mail.internet.InternetAddress;
@@ -39,7 +41,7 @@ public class EmailContactPoint extends ContactPoint
         setEmail(email);
     }
 
-    public String getEmail()
+    @Required @Email public String getEmail()
     {
         return getUid();
     }

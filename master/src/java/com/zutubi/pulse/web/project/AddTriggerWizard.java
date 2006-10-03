@@ -39,19 +39,16 @@ public class AddTriggerWizard extends BaseWizard
     private SelectTriggerType selectState;
     private ConfigureCronTrigger configCron;
     private ConfigureBuildCompletedTrigger configBuildCompleted;
-    private WizardCompleteState finalState;
 
     public AddTriggerWizard()
     {
         selectState = new SelectTriggerType(this, "select");
         configCron = new ConfigureCronTrigger(this, CRON_STATE);
         configBuildCompleted = new ConfigureBuildCompletedTrigger(this, BUILD_COMPLETED_STATE);
-        finalState = new WizardCompleteState(this, "success");
 
-        addInitialState("select", selectState);
+        addInitialState(selectState);
         addState(configCron);
         addState(configBuildCompleted);
-        addFinalState("success", finalState);
     }
 
     public long getProjectId()

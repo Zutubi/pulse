@@ -1,0 +1,17 @@
+<plugin name="Sample plugin" key="com.zutubi.pulse.plugins.SampleEventListener">
+    
+    <plugin-info>
+    </plugin-info>
+    
+<!--
+    <event-listener key="event" name="EventListener" class="com.zutubi.pulse.plugins.SampleListener">
+    </event-listener>
+-->
+
+    <form-descriptor key="sampleForm" name="Sample Form">
+    </form-descriptor>
+
+    <object-descriptor key="jabber.config" name="Jabber Configuration" class="com.zutubi.pulse.form.sample.Jabber">
+    </object-descriptor>
+
+</plugin>

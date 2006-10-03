@@ -40,7 +40,7 @@ public class BaseWizard implements Wizard
     /**
      * The final state of the wizard.
      */
-    protected WizardState finalState;
+    protected WizardState finalState = new WizardCompleteState(this, "success");
 
     /**
      * A mapping of all the wizards states and their names.
@@ -64,7 +64,7 @@ public class BaseWizard implements Wizard
      */
     public BaseWizard()
     {
-
+        states.put("success", finalState);
     }
 
     /**
@@ -88,24 +88,13 @@ public class BaseWizard implements Wizard
 
     public void addState(WizardState state)
     {
-        addState(state.getStateName(), state);
+        states.put(state.getStateName(), state);
     }
 
-    public void addState(String name, WizardState state)
-    {
-        states.put(name, state);
-    }
-
-    public void addInitialState(String name, WizardState state)
+    public void addInitialState(WizardState state)
     {
         initialState = state;
-        states.put(name, state);
-    }
-
-    public void addFinalState(String name, WizardState state)
-    {
-        finalState = state;
-        states.put(name, state);
+        states.put(state.getStateName(), state);
     }
 
     /**
@@ -188,7 +177,7 @@ public class BaseWizard implements Wizard
         // we can not progress to the next state until validation is successful.
         if (hasErrors())
         {
-            return currentState.getStateName();
+            return currentState.getView();
         }
 
         // execute current state
@@ -200,7 +189,7 @@ public class BaseWizard implements Wizard
         if (nextState == null)
         {
             addActionError("Unknown next state: " + nextState);
-            return currentState.getStateName();
+            return currentState.getView();
         }
 
         // move on to the next state.
@@ -209,7 +198,7 @@ public class BaseWizard implements Wizard
         clearErrors();
         currentState.initialise();
 
-        return currentState.getStateName();
+        return currentState.getView();
     }
 
     /**
@@ -223,7 +212,7 @@ public class BaseWizard implements Wizard
         {
             currentState = history.pop();
         }
-        return currentState.getStateName();
+        return currentState.getView();
     }
 
     /**
@@ -234,7 +223,7 @@ public class BaseWizard implements Wizard
     public String restart()
     {
         currentState = initialState;
-        return currentState.getStateName();
+        return currentState.getView();
     }
 
     /**

@@ -39,10 +39,7 @@ public class RecipeProcessor
 
     public void init()
     {
-        if (fileLoader == null)
-        {
-            fileLoader = new PulseFileLoader(new ObjectFactory());
-        }
+        
     }
 
     public static String getCommandDirName(int i, CommandResult result)

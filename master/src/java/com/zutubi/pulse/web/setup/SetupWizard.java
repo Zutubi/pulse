@@ -40,9 +40,8 @@ public class SetupWizard extends BaseWizard
         createAdminState = new CreateAdminState(this, "admin");
         serverSettingsState = new ServerSettingsState(this, "settings");
 
-        addInitialState("admin", createAdminState);
-        addState("settings", serverSettingsState);
-        addFinalState("success", new WizardCompleteState(this, "success"));
+        addInitialState(createAdminState);
+        addState(serverSettingsState);
     }
 
     public void process()

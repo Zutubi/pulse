@@ -15,7 +15,7 @@ public abstract class FileLoaderTestBase extends PulseTestCase
         super.setUp();
 
         ObjectFactory factory = new ObjectFactory();
-        loader = new PulseFileLoader(factory);
+        loader = new PulseFileLoader();
         loader.setObjectFactory(factory);
 
         // initialise the loader some test objects.

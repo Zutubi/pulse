@@ -22,7 +22,9 @@ public class CustomDetailsHelper
 
         try
         {
-            PulseFileLoader loader = new PulseFileLoader(new ObjectFactory());
+            PulseFileLoader loader = new PulseFileLoader();
+            loader.setObjectFactory(new ObjectFactory());
+            
             loader.load(new ByteArrayInputStream(pulseFile.getBytes()), new PulseFile(), new Scope(), resourceRepository, new CustomProjectValidationPredicate());
         }
         catch(ParseException pe)
