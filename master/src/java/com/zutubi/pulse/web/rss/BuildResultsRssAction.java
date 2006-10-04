@@ -122,7 +122,7 @@ public class BuildResultsRssAction extends ProjectActionSupport
         query.add(BuildResultExpressions.buildResultCompleted());
         query.setFirstResult(0);
         query.setMaxResults(10);
-        query.add(Order.desc("number"));
+        query.add(BuildResultExpressions.orderByDescEndDate());
 
         // build the rss feed.
         feed = new SyndFeedImpl();
