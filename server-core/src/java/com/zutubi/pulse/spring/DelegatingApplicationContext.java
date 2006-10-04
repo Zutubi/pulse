@@ -219,19 +219,4 @@ public class DelegatingApplicationContext implements ConfigurableApplicationCont
     {
         return delegate.isRunning();
     }
-
-    public void registerShutdownHook()
-    {
-        delegate.registerShutdownHook();
-    }
-
-    public boolean isActive()
-    {
-        return delegate.isActive();
-    }
-
-    public ClassLoader getClassLoader()
-    {
-        return delegate.getClassLoader();
-    }
 }
