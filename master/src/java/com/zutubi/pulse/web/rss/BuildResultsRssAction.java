@@ -6,18 +6,21 @@ import com.sun.syndication.feed.synd.*;
 import com.zutubi.pulse.bootstrap.MasterConfigurationManager;
 import com.zutubi.pulse.model.BuildResult;
 import com.zutubi.pulse.model.Project;
+import com.zutubi.pulse.model.User;
+import com.zutubi.pulse.model.UserManager;
+import com.zutubi.pulse.model.persistence.UserDao;
 import com.zutubi.pulse.renderer.BuildResultRenderer;
 import com.zutubi.pulse.search.BuildResultExpressions;
 import com.zutubi.pulse.search.Queries;
 import com.zutubi.pulse.search.SearchQuery;
 import com.zutubi.pulse.web.project.ProjectActionSupport;
+import org.hibernate.criterion.Expression;
 import org.hibernate.criterion.Order;
 
 import java.io.StringWriter;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Arrays;
 
 /**
  * <class-comment/>
@@ -30,6 +33,13 @@ public class BuildResultsRssAction extends ProjectActionSupport
     private Queries queries;
 
     private SyndFeed feed;
+
+    private long userId = -1;
+
+    public void setUserId(long userId)
+    {
+        this.userId = userId;
+    }
 
     public SyndFeed getFeed()
     {
@@ -48,7 +58,15 @@ public class BuildResultsRssAction extends ProjectActionSupport
         Project project = getProject();
         if (project == null)
         {
-            feed = generateFeed(new AllProjectsResultTemplate());
+            if (userId != -1)
+            {
+                User u = userManager.getUser(userId);
+                feed = generateFeed(new UserDashboardTemplate(u));
+            }
+            else
+            {
+                feed = generateFeed(new AllProjectsResultTemplate());
+            }
         }
         else
         {
@@ -71,33 +89,50 @@ public class BuildResultsRssAction extends ProjectActionSupport
         feed.setLink(template.getLink());
 
         List<SyndEntry> entries = new LinkedList<SyndEntry>();
-        for (BuildResult result : template.getQuery().list())
+        SearchQuery<BuildResult> query = template.getQuery();
+        if (query != null)
         {
-            SyndEntry entry = new SyndEntryImpl();
+            for (BuildResult result : query.list())
+            {
+                SyndEntry entry = new SyndEntryImpl();
 
-            // with rss 2.0, the content is added in the description field.
-            SyndContent description = new SyndContentImpl();
+                // with rss 2.0, the content is added in the description field.
+                SyndContent description = new SyndContentImpl();
 
-            // type should be based on user selected type.
-            description.setType("text/plain");
-            description.setValue(template.getEntryTitle(result));
-            entry.setDescription(description);
-            entry.setTitle(template.getTitle());
+                // type should be based on user selected type.
+                description.setType("text/plain");
+                description.setValue(template.getEntryTitle(result));
+                entry.setDescription(description);
+                entry.setTitle(template.getEntryTitle(result));
 
-            ContentModule content = new ContentModuleImpl();
-            content.setEncodeds(Arrays.asList(renderResult(result)));
-            entry.setModules(Arrays.asList(content));
+                ContentModule content = new ContentModuleImpl();
 
-            // NOTES:
-            // calling setLink is effectively setting guid without a isPermaLink reference.
-            // calling setUri() is equivalent to guid isPermaLink=false - refer to ConverterForRSS094.java
-            entry.setLink(template.getEntryLink(result));
-            entry.setPublishedDate(new Date(result.getStamps().getEndTime()));
-            entries.add(entry);
+                //NOTE: Do not use Arrays.asList here. The entry.setPublishedDate will fail if you do.
+                content.setEncodeds(asList(renderResult(result)));
+                entry.setModules(asList(content));
+
+                // NOTES:
+                // calling setLink is effectively setting guid without a isPermaLink reference.
+                // calling setUri() is equivalent to guid isPermaLink=false - refer to ConverterForRSS094.java
+                entry.setLink(template.getEntryLink(result));
+                entry.setPublishedDate(new Date(result.getStamps().getEndTime()));
+                entries.add(entry);
+            }
         }
+        
         feed.setEntries(entries);
 
         return feed;
+    }
+
+    private <X> List<X> asList(X... objs)
+    {
+        List<X> l = new LinkedList<X>();
+        for (X x : objs)
+        {
+            l.add(x);
+        }
+        return l;
     }
 
     private String renderResult(BuildResult result)
@@ -106,7 +141,7 @@ public class BuildResultsRssAction extends ProjectActionSupport
         buildResultRenderer.render(configurationManager.getAppConfig().getBaseUrl(),
                 result,
                 getBuildManager().getChangesForBuild(result),
-                BuildResultRenderer.TYPE_HTML , w);
+                BuildResultRenderer.TYPE_HTML, w);
         return w.toString();
     }
 
@@ -128,10 +163,15 @@ public class BuildResultsRssAction extends ProjectActionSupport
     private interface RssFeedTemplate
     {
         SearchQuery<BuildResult> getQuery();
+
         String getTitle();
+
         String getDescription();
+
         String getLink();
+
         String getEntryTitle(BuildResult result);
+
         String getEntryLink(BuildResult result);
     }
 
@@ -143,7 +183,7 @@ public class BuildResultsRssAction extends ProjectActionSupport
             query.add(BuildResultExpressions.buildResultCompleted());
             query.setFirstResult(0);
             query.setMaxResults(10);
-            query.add(Order.desc("number"));
+            query.add(BuildResultExpressions.orderByDescEndDate());
             return query;
         }
 
@@ -164,14 +204,11 @@ public class BuildResultsRssAction extends ProjectActionSupport
 
         public String getEntryTitle(BuildResult result)
         {
-            StringBuffer titleBuffer = new StringBuffer();
-            titleBuffer.append("Project ");
-            titleBuffer.append(result.getProject().getName());
-            titleBuffer.append(" build ");
-            titleBuffer.append(result.getNumber());
-            titleBuffer.append(" ");
-            titleBuffer.append(result.succeeded() ? "succeeded" : "failed");
-            return titleBuffer.toString();
+            return String.format("Project %s build %s %s",
+                    result.getProject().getName(),
+                    result.getNumber(),
+                    (result.succeeded() ? "succeeded" : "failed")
+            );
         }
 
         public String getEntryLink(BuildResult result)
@@ -197,7 +234,7 @@ public class BuildResultsRssAction extends ProjectActionSupport
             query.add(BuildResultExpressions.buildResultCompleted());
             query.setFirstResult(0);
             query.setMaxResults(10);
-            query.add(Order.desc("number"));
+            query.add(Order.desc("stamps.endTime"));
             return query;
         }
 
@@ -213,55 +250,71 @@ public class BuildResultsRssAction extends ProjectActionSupport
 
         public String getLink()
         {
-            return configurationManager.getAppConfig().getBaseUrl() +"/currentBuild.action?id=" + project.getId();
+            return configurationManager.getAppConfig().getBaseUrl() + "/currentBuild.action?id=" + project.getId();
         }
 
         public String getEntryTitle(BuildResult result)
         {
-            StringBuffer titleBuffer = new StringBuffer();
-            titleBuffer.append("Build ");
-            titleBuffer.append(result.getNumber());
-            titleBuffer.append(" ");
-            titleBuffer.append(result.succeeded() ? "succeeded" : "failed");
-            return titleBuffer.toString();
+            return String.format("Build %s %s", result.getNumber(), (result.succeeded() ? "succeeded" : "failed"));
         }
 
         public String getEntryLink(BuildResult result)
         {
-            return configurationManager.getAppConfig().getBaseUrl() +"/viewBuild.action?id=" + result.getId();
+            return configurationManager.getAppConfig().getBaseUrl() + "/viewBuild.action?id=" + result.getId();
         }
     }
 
     private class UserDashboardTemplate implements RssFeedTemplate
     {
+        private User user;
+
+        public UserDashboardTemplate(User user)
+        {
+            this.user = user;
+        }
+
         public SearchQuery<BuildResult> getQuery()
         {
-            return null;
+            List<Project> projects = userManager.getVisibleProjects(user);
+            if (projects.size() == 0)
+            {
+                return null;
+            }
+            SearchQuery<BuildResult> query = queries.getBuildResults();
+            query.add(Expression.and(BuildResultExpressions.projectIn(projects), BuildResultExpressions.buildResultCompleted()));
+            query.setFirstResult(0);
+            query.setMaxResults(10);
+            query.add(BuildResultExpressions.orderByDescEndDate());
+            return query;
         }
 
         public String getTitle()
         {
-            return null;
+            return "Pulse build results";
         }
 
         public String getDescription()
         {
-            return null;
+            return "This feed contains the latest pulse build results for the dashboard projects.";
         }
 
         public String getLink()
         {
-            return null;
+            return configurationManager.getAppConfig().getBaseUrl() + "/dashboard.action";
         }
 
         public String getEntryTitle(BuildResult result)
         {
-            return null;
+            return String.format("Project %s build %s %s",
+                    result.getProject().getName(),
+                    result.getNumber(),
+                    (result.succeeded() ? "succeeded" : "failed")
+            );
         }
 
         public String getEntryLink(BuildResult result)
         {
-            return null;
+            return configurationManager.getAppConfig().getBaseUrl() + "/viewBuild.action?id=" + result.getId();
         }
     }
 }

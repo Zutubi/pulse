@@ -34,6 +34,9 @@
             }
         }
     </script>
+#if ($rssEnabled)
+    <link rel="alternate" type="application/rss+xml" title="RSS" href="$base/rss.action?userId=$principle.id"/>
+#end
 </head>
 <body>
     #dashboardTabs("homepage")

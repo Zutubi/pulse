@@ -56,6 +56,11 @@ public class DefaultUserManager implements UserManager
         return userDao.getHiddenProjects(user);
     }
 
+    public List<Project> getVisibleProjects(User user)
+    {
+        return userDao.findVisibleProjectsByUser(user);
+    }
+
     public boolean hasAuthority(User user, String authority)
     {
         if(user.hasAuthority(authority))

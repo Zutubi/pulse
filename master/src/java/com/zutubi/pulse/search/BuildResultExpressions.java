@@ -4,6 +4,9 @@ import com.zutubi.pulse.core.model.ResultState;
 import com.zutubi.pulse.model.Project;
 import org.hibernate.criterion.Criterion;
 import org.hibernate.criterion.Expression;
+import org.hibernate.criterion.Order;
+
+import java.util.List;
 
 /**
  * The Build result restrictions provides a set of pre-defined expressions that can be applied to Search Queries
@@ -14,6 +17,11 @@ public class BuildResultExpressions
     public static Criterion projectEq(Project project)
     {
         return Expression.eq("project", project);
+    }
+
+    public static Criterion projectIn(List<Project> projects)
+    {
+        return Expression.in("project", projects);
     }
 
     public static Criterion buildSpecEq(String buildSpec)
@@ -50,5 +58,10 @@ public class BuildResultExpressions
     public static Criterion hasWorkDirectory(boolean b)
     {
         return Expression.eq("hasWorkDir", b);
+    }
+
+    public static Order orderByDescEndDate()
+    {
+        return Order.desc("stamps.endTime");
     }
 }

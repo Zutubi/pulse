@@ -50,11 +50,11 @@ public class HibernateResourceDaoTest extends MasterPersistenceTestCase
         commitAndRefreshTransaction();
 
         Resource otherResource = resourceDao.findById(resource.getId());
-        Assert.assertEquals(resource.getName(), otherResource.getName());
-        Assert.assertTrue(otherResource.hasProperty(p1.getName()));
-        Assert.assertEquals(p1.getValue(), otherResource.getProperty(p1.getName()).getValue());
+        assertEquals(resource.getName(), otherResource.getName());
+        assertTrue(otherResource.hasProperty(p1.getName()));
+        assertEquals(p1.getValue(), otherResource.getProperty(p1.getName()).getValue());
 
-        Assert.assertTrue(otherResource.hasVersion(version.getValue()));
+        assertTrue(otherResource.hasVersion(version.getValue()));
     }
 
     public void testFindByNullSlave() throws Exception

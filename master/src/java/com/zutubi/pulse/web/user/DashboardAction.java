@@ -80,8 +80,7 @@ public class DashboardAction extends ActionSupport
 
         myBuilds = buildManager.getPersonalBuilds(user);
         
-        projects = projectManager.getAllProjects();
-        projects.removeAll(userManager.getHiddenProjects(user));
+        projects = userManager.getVisibleProjects(user);
 
         Collections.sort(projects, new NamedEntityComparator());
         latestBuilds = new LinkedList<List<BuildResult>>();

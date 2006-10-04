@@ -36,10 +36,10 @@ public class HibernateResourceVersionDaoTest extends MasterPersistenceTestCase
         commitAndRefreshTransaction();
 
         ResourceVersion otherVersion = resourceVersionDao.findById(version.getId());
-        Assert.assertEquals(version.getValue(), otherVersion.getValue());
-        Assert.assertTrue(otherVersion.hasProperty(p1.getName()));
-        Assert.assertTrue(otherVersion.hasProperty(p2.getName()));
-        Assert.assertEquals(p1.getValue(), otherVersion.getProperty(p1.getName()).getValue());
-        Assert.assertEquals(p2.getValue(), otherVersion.getProperty(p2.getName()).getValue());
+        assertEquals(version.getValue(), otherVersion.getValue());
+        assertTrue(otherVersion.hasProperty(p1.getName()));
+        assertTrue(otherVersion.hasProperty(p2.getName()));
+        assertEquals(p1.getValue(), otherVersion.getProperty(p1.getName()).getValue());
+        assertEquals(p2.getValue(), otherVersion.getProperty(p2.getName()).getValue());
     }
 }

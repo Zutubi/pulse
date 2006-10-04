@@ -22,4 +22,13 @@ public interface UserDao extends EntityDao<User>
     List<User> findByNotInGroup(Group group);
 
     List<User> findByHiddenProject(Project project);
+
+    /**
+     * Visible projects are all of those projects that the User has not explicitly marked as hidden.
+     * 
+     * @param user whose visible projects will be retrieved.
+     *
+     * @return a list of projects.
+     */
+    List<Project> findVisibleProjectsByUser(User user);
 }

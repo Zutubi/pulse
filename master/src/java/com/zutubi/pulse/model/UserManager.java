@@ -71,6 +71,8 @@ public interface UserManager extends EntityManager<User>, UserDetailsService
      */
     Set<Project> getHiddenProjects(User user);
 
+    List<Project> getVisibleProjects(User user);
+
     /**
      * Returns true iff the given user has been granted the given authority,
      * either directly or by being a member of a group that has been granted

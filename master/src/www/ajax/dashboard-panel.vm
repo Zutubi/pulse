@@ -93,7 +93,11 @@
     </table>
 #end
 
-<h2 #if($myBuilds.size() == 0) style="margin-top: 0" #end class="section">#wwtext("name=my.projects")</h2>
+<h2 #if($myBuilds.size() == 0) style="margin-top: 0" #end class="section">#wwtext("name=my.projects")
+#if($rssEnabled)
+    <a class="unadorned" href="$base/rss.action?userId=$principle.id"><img alt="$action.getText('rss')" src="$base/images/feed-icon-16x16.gif"/></a>
+#end
+</h2>
 
     <table id="$id" class="content">
 #foreach($project in $projects)

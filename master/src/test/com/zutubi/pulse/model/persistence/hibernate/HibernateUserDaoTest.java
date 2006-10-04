@@ -192,6 +192,50 @@ public class HibernateUserDaoTest extends MasterPersistenceTestCase
         assertEquals(0, users.size());
     }
 
+    public void testFindVisibleProjectsByUser()
+    {
+        Project p1 = new Project("1", "project 1");
+        Project p2 = new Project("2", "project 2");
+        projectDao.save(p1);
+        projectDao.save(p2);
+
+        // A) Mark project 1 as hidden. Project 2 should be visible.
+
+        Set<Project> projects = new HashSet<Project>();
+        projects.add(p1);
+
+        User user = new User();
+        user.setHiddenProjects(projects);
+        userDao.save(user);
+        commitAndRefreshTransaction();
+
+        List<Project> visibleProjects = userDao.findVisibleProjectsByUser(user);
+        assertEquals(1, visibleProjects.size());
+        assertEquals(p2, visibleProjects.get(0));
+
+        // B) Mark project 2 as hidden, no projects should be visible.
+
+        projects.add(projectDao.findById(p2.getId()));
+        user.setHiddenProjects(projects);
+        userDao.save(user);
+        commitAndRefreshTransaction();
+
+        // verify that no projects are visible.
+        visibleProjects = userDao.findVisibleProjectsByUser(user);
+        assertEquals(0, visibleProjects.size());
+
+        // C) Mark no projects as hidden. All projects should be visible.
+
+        projects.clear();
+        user.setHiddenProjects(projects);
+        userDao.save(user);
+        commitAndRefreshTransaction();
+
+        // verify that all projects are visible.
+        visibleProjects = userDao.findVisibleProjectsByUser(user);
+        assertEquals(2, visibleProjects.size());
+    }
+
 /*
     public void testGrantedAuthorities()
     {

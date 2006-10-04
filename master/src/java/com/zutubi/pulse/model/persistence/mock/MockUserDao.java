@@ -48,4 +48,9 @@ public class MockUserDao extends MockEntityDao<User> implements UserDao
     {
         throw new RuntimeException("Method not implemented.");
     }
+
+    public List<Project> findVisibleProjectsByUser(User user)
+    {
+        throw new RuntimeException("Method not implemented.");
+    }
 }
