@@ -1,11 +1,12 @@
 package com.zutubi.pulse.model;
 
-import com.zutubi.pulse.test.PulseTestCase;
-import com.zutubi.pulse.scm.SCMServer;
 import com.zutubi.pulse.scm.SCMException;
+import com.zutubi.pulse.scm.SCMServer;
+import com.zutubi.pulse.test.PulseTestCase;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
 /**
  * <class-comment/>
@@ -61,6 +62,16 @@ public class ScmTest extends PulseTestCase
         public SCMServer createServer() throws SCMException
         {
             return null;
+        }
+
+        public String getType()
+        {
+            return "type";
+        }
+
+        public Map<String, String> getRepositoryProperties()
+        {
+            throw new RuntimeException("Method not implemented.");
         }
     }
 }

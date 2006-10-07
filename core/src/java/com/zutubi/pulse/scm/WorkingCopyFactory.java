@@ -3,23 +3,54 @@ package com.zutubi.pulse.scm;
 import com.zutubi.pulse.scm.svn.SvnWorkingCopy;
 
 import java.io.File;
+import java.lang.reflect.Constructor;
+import java.util.Map;
+import java.util.TreeMap;
 
 /**
- * Not entirely a classic factory: this factory knows how to create a working
- * copy object based on a directory on the file system.  For example, if it
- * finds a .svn subdirectory, it presumes a Subversion working copy.
  */
 public class WorkingCopyFactory
 {
-    public static WorkingCopy create(File base)
+    private static Map<String, Constructor> typeMap = new TreeMap<String, Constructor>();
+
+    static
     {
-        // Is this a subversion working copy?
-        File test = new File(base, ".svn");
-        if(test.isDirectory())
+        try
         {
-            return new SvnWorkingCopy(base);
+            registerType(SCMConfiguration.TYPE_SUBVERSION, SvnWorkingCopy.class);
+        }
+        catch (NoSuchMethodException e)
+        {
+            // Programmer error
+        }
+    }
+
+    public static WorkingCopy create(String type, File base)
+    {
+        Constructor constructor = typeMap.get(type);
+        if(constructor != null)
+        {
+            try
+            {
+                return (WorkingCopy) constructor.newInstance(base);
+            }
+            catch (Exception e)
+            {
+                return null;
+            }
         }
 
         return null;
+    }
+
+    public static void registerType(String type, Class clazz) throws IllegalArgumentException, NoSuchMethodException
+    {
+        if(!WorkingCopy.class.isAssignableFrom(clazz))
+        {
+            throw new IllegalArgumentException("Class '" + clazz.getName() + "' does not implement WorkingCopy");
+        }
+
+        Constructor constructor = clazz.getConstructor(File.class);
+        typeMap.put(type, constructor);
     }
 }

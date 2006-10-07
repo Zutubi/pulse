@@ -1,9 +1,14 @@
 package com.zutubi.pulse.model;
 
+import com.opensymphony.util.TextUtils;
+import com.zutubi.pulse.scm.SCMConfiguration;
 import com.zutubi.pulse.scm.SCMException;
 import com.zutubi.pulse.scm.SCMServer;
 import com.zutubi.pulse.scm.svn.SVNServer;
-import com.opensymphony.util.TextUtils;
+import com.zutubi.pulse.scm.svn.SvnWorkingCopy;
+
+import java.util.Map;
+import java.util.TreeMap;
 
 /**
  * 
@@ -11,11 +16,10 @@ import com.opensymphony.util.TextUtils;
  */
 public class Svn extends Scm
 {
-    private final String URL = "svn.url";
-    private final String USERNAME = "svn.username";
-    private final String PASSWORD = "svn.password";
-    private final String KEYFILE = "svn.keyfile";
-    private final String PASSPHRASE = "svn.passphrase";
+    private static final String USERNAME = "svn.username";
+    private static final String PASSWORD = "svn.password";
+    private static final String KEYFILE = "svn.keyfile";
+    private static final String PASSPHRASE = "svn.passphrase";
 
     @Override
     public SCMServer createServer() throws SCMException
@@ -47,14 +51,26 @@ public class Svn extends Scm
         return server;
     }
 
+    public String getType()
+    {
+        return SCMConfiguration.TYPE_SUBVERSION;
+    }
+
+    public Map<String, String> getRepositoryProperties()
+    {
+        Map<String, String> result = new TreeMap<String, String>();
+        result.put(SvnWorkingCopy.PROPERTY_URL, getUrl());
+        return result;
+    }
+
     public String getUrl()
     {
-        return (String) getProperties().get(URL);
+        return (String) getProperties().get(SvnWorkingCopy.PROPERTY_URL);
     }
 
     public void setUrl(String url)
     {
-        getProperties().put(URL, url);
+        getProperties().put(SvnWorkingCopy.PROPERTY_URL, url);
     }
 
     public String getUsername()

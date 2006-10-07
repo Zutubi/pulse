@@ -3,12 +3,13 @@ package com.zutubi.pulse.api;
 import com.opensymphony.util.TextUtils;
 import com.zutubi.pulse.ShutdownManager;
 import com.zutubi.pulse.Version;
-import com.zutubi.pulse.license.LicenseException;
-import com.zutubi.pulse.agent.AgentManager;
 import com.zutubi.pulse.agent.Agent;
+import com.zutubi.pulse.agent.AgentManager;
 import com.zutubi.pulse.bootstrap.ComponentContext;
 import com.zutubi.pulse.core.model.ResultState;
+import com.zutubi.pulse.license.LicenseException;
 import com.zutubi.pulse.model.*;
+import com.zutubi.pulse.scm.SCMConfiguration;
 
 import java.util.Date;
 import java.util.Hashtable;
@@ -172,12 +173,7 @@ public class RemoteApi
         {
             tokenManager.loginUser(token);
             Project project = getProject(projectName);
-            BuildSpecification spec = project.getBuildSpecification(buildSpecification);
-            if(spec == null)
-            {
-                throw new IllegalArgumentException("Unknown build specification '" + buildSpecification + "'");
-            }
-
+            getBuildSpecification(project, buildSpecification);
             projectManager.triggerBuild(project, buildSpecification, new RemoteTriggerBuildReason(), null, true);
             return true;
         }
@@ -192,6 +188,18 @@ public class RemoteApi
         tokenManager.verifyUser(token);
         Project project = getProject(projectName);
         return project.getState().toString().toLowerCase();
+    }
+
+    public Hashtable<String, String> preparePersonalBuild(String token, String projectName, String buildSpecification) throws AuthenticationException
+    {
+        tokenManager.verifyRoleIn(token, GrantedAuthority.PERSONAL);
+        Project project = getProject(projectName);
+        getBuildSpecification(project, buildSpecification);
+
+        Hashtable<String, String> scmDetails = new Hashtable<String, String>();
+        scmDetails.put(SCMConfiguration.PROPERTY_TYPE, project.getScm().getType());
+        scmDetails.putAll(project.getScm().getRepositoryProperties());
+        return scmDetails;
     }
 
     public boolean pauseProject(String token, String projectName) throws AuthenticationException
@@ -359,6 +367,27 @@ public class RemoteApi
         return result;
     }
 
+    private Project getProject(String projectName)
+    {
+        Project project = projectManager.getProject(projectName);
+        if(project == null)
+        {
+            throw new IllegalArgumentException("Unknown project '" + projectName + "'");
+        }
+        return project;
+    }
+
+    private BuildSpecification getBuildSpecification(Project project, String buildSpecification)
+    {
+        BuildSpecification spec = project.getBuildSpecification(buildSpecification);
+        if(spec == null)
+        {
+            throw new IllegalArgumentException("Unknown build specification '" + buildSpecification + "'");
+        }
+
+        return spec;
+    }
+
     /**
      * Required resource.
      *
@@ -402,16 +431,6 @@ public class RemoteApi
     public void setAdminTokenManager(AdminTokenManager adminTokenManager)
     {
         this.adminTokenManager = adminTokenManager;
-    }
-
-    private Project getProject(String projectName)
-    {
-        Project project = projectManager.getProject(projectName);
-        if(project == null)
-        {
-            throw new IllegalArgumentException("Unknown project '" + projectName + "'");
-        }
-        return project;
     }
 
     public void setAgentManager(AgentManager agentManager)

@@ -1,8 +1,12 @@
 package com.zutubi.pulse.model;
 
+import com.zutubi.pulse.scm.SCMConfiguration;
 import com.zutubi.pulse.scm.SCMException;
 import com.zutubi.pulse.scm.SCMServer;
 import com.zutubi.pulse.scm.p4.P4Server;
+
+import java.util.Map;
+import java.util.TreeMap;
 
 /**
  * 
@@ -21,6 +25,19 @@ public class P4 extends Scm
         P4Server server = new P4Server(getPort(), getUser(), getPassword(), getClient());
         server.setExcludedPaths(getFilteredPaths());
         return server;
+    }
+
+    public String getType()
+    {
+        return SCMConfiguration.TYPE_PERFORCE;
+    }
+
+    public Map<String, String> getRepositoryProperties()
+    {
+        Map<String, String> result = new TreeMap<String, String>();
+        result.put(PORT, getPort());
+        result.put(CLIENT, getClient());
+        return result;
     }
 
     public String getPort()

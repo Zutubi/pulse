@@ -130,6 +130,18 @@ public class FileStatus
             {
                 return false;
             }
+        },
+        UNCHANGED
+        {
+            public boolean isConsistent()
+            {
+                return true;
+            }
+
+            public boolean requiresFile()
+            {
+                return false;
+            }
         };
 
         public abstract boolean isConsistent();
@@ -143,12 +155,17 @@ public class FileStatus
     private String path;
     private State state;
     private boolean directory;
+    /**
+     * True iff there is a more recent revision of the file on the server.
+     */
+    private boolean outOfDate;
 
     public FileStatus(String path, State state, boolean directory)
     {
         this.path = FileSystemUtils.normaliseSeparators(path);
         this.state = state;
         this.directory = directory;
+        this.outOfDate = false;
     }
 
     public String getPath()
@@ -164,6 +181,16 @@ public class FileStatus
     public boolean isDirectory()
     {
         return directory;
+    }
+
+    public boolean isOutOfDate()
+    {
+        return outOfDate;
+    }
+
+    public void setOutOfDate(boolean outOfDate)
+    {
+        this.outOfDate = outOfDate;
     }
 
     public void apply(File base) throws IOException

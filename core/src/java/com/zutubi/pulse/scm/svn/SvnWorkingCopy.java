@@ -1,21 +1,35 @@
 package com.zutubi.pulse.scm.svn;
 
 import com.zutubi.pulse.core.model.NumericalRevision;
+import com.zutubi.pulse.personal.PersonalBuildSupport;
 import com.zutubi.pulse.scm.FileStatus;
+import com.zutubi.pulse.scm.SCMException;
 import com.zutubi.pulse.scm.WorkingCopy;
 import com.zutubi.pulse.scm.WorkingCopyStatus;
 import org.tmatesoft.svn.core.SVNException;
 import org.tmatesoft.svn.core.SVNNodeKind;
+import org.tmatesoft.svn.core.internal.io.dav.DAVRepositoryFactory;
+import org.tmatesoft.svn.core.internal.io.svn.SVNRepositoryFactoryImpl;
 import org.tmatesoft.svn.core.wc.*;
 
 import java.io.File;
+import java.util.Properties;
 
 /**
  */
-public class SvnWorkingCopy implements WorkingCopy
+public class SvnWorkingCopy extends PersonalBuildSupport implements WorkingCopy
 {
+    public static final String PROPERTY_URL = "svn.url";
+
     private File base;
     private SVNClientManager clientManager;
+
+    static
+    {
+        // Initialise SVN library
+        DAVRepositoryFactory.setup();
+        SVNRepositoryFactoryImpl.setup();
+    }
 
     public SvnWorkingCopy(File path)
     {
@@ -31,21 +45,68 @@ public class SvnWorkingCopy implements WorkingCopy
         clientManager = SVNClientManager.newInstance(options, name, password);
     }
 
-    public WorkingCopyStatus getStatus()
+    public boolean matchesRepository(Properties repositoryDetails) throws SCMException
+    {
+        // We just check that the URL matches
+        String url = repositoryDetails.getProperty(PROPERTY_URL);
+        if(url == null)
+        {
+            throw new SCMException("Subversion repository details not returned by Pulse server");
+        }
+
+        try
+        {
+            SVNInfo info = clientManager.getWCClient().doInfo(base, null);
+            String wcUrl = info.getURL().toString();
+            if(wcUrl.equals(url))
+            {
+                return true;
+            }
+            else
+            {
+                warning("Working copy's repository URL '" + wcUrl + "' does not match Pulse project's repository URL '" + url + "'");
+                return false;
+            }
+        }
+        catch (SVNException e)
+        {
+            throw convertException(e);
+        }
+    }
+
+    public WorkingCopyStatus getStatus() throws SCMException
     {
         StatusHandler handler = new StatusHandler();
 
         try
         {
             SVNStatusClient statusClient = clientManager.getStatusClient();
-            statusClient.doStatus(base, true, false, true, false, false, handler);
+            statusClient.doStatus(base, true, true, true, false, false, handler);
         }
         catch (SVNException e)
         {
-            e.printStackTrace();
+            throw convertException(e);
         }
 
         return handler.getStatus();
+    }
+
+    public void update() throws SCMException
+    {
+        SVNUpdateClient updateClient = clientManager.getUpdateClient();
+        try
+        {
+            updateClient.doUpdate(base, SVNRevision.HEAD, true);
+        }
+        catch (SVNException e)
+        {
+            throw convertException(e);
+        }
+    }
+
+    private SCMException convertException(SVNException e)
+    {
+        return new SCMException(e.getMessage(), e);
     }
 
     private class StatusHandler implements ISVNStatusHandler
@@ -70,51 +131,73 @@ public class SvnWorkingCopy implements WorkingCopy
 
             if(path.length() == 0)
             {
-                // TODO dev-personal: what if nested files are updated to
-                // another revision??
                 // Grab the revision for the base directory
                 status.setRevision(new NumericalRevision(svnStatus.getRevision().getNumber()));
             }
 
-            if(contentsStatus == SVNStatusType.STATUS_ADDED)
+            FileStatus.State fileState = null;
+
+            if(contentsStatus == SVNStatusType.STATUS_NORMAL)
             {
-                status.add(new FileStatus(path, FileStatus.State.ADDED, directory));
+                fileState = FileStatus.State.UNCHANGED;
+            }
+            else if(contentsStatus == SVNStatusType.STATUS_ADDED)
+            {
+                fileState = FileStatus.State.ADDED;
             }
             else if(contentsStatus == SVNStatusType.STATUS_CONFLICTED)
             {
-                status.add(new FileStatus(path, FileStatus.State.UNRESOLVED, directory));
+                fileState = FileStatus.State.UNRESOLVED;
             }
             else if(contentsStatus == SVNStatusType.STATUS_DELETED)
             {
-                status.add(new FileStatus(path, FileStatus.State.DELETED, directory));
+                fileState = FileStatus.State.DELETED;
             }
             else if(contentsStatus == SVNStatusType.STATUS_EXTERNAL)
             {
-                status.add(new FileStatus(path, FileStatus.State.UNSUPPORTED, directory));
+                fileState = FileStatus.State.UNSUPPORTED;
             }
             else if(contentsStatus == SVNStatusType.STATUS_INCOMPLETE)
             {
-                status.add(new FileStatus(path, FileStatus.State.INCOMPLETE, directory));
+                fileState = FileStatus.State.INCOMPLETE;
             }
             else if(contentsStatus == SVNStatusType.STATUS_MERGED)
             {
-                status.add(new FileStatus(path, FileStatus.State.MERGED, directory));
+                fileState = FileStatus.State.MERGED;
             }
             else if(contentsStatus == SVNStatusType.STATUS_MISSING)
             {
-                status.add(new FileStatus(path, FileStatus.State.MISSING, directory));
+                fileState = FileStatus.State.MISSING;
             }
             else if(contentsStatus == SVNStatusType.STATUS_MODIFIED)
             {
-                status.add(new FileStatus(path, FileStatus.State.MODIFIED, directory));
+                fileState = FileStatus.State.MODIFIED;
             }
             else if(contentsStatus == SVNStatusType.STATUS_OBSTRUCTED)
             {
-                status.add(new FileStatus(path, FileStatus.State.OBSTRUCTED, directory));
+                fileState = FileStatus.State.OBSTRUCTED;
             }
             else if(contentsStatus == SVNStatusType.STATUS_REPLACED)
             {
-                status.add(new FileStatus(path, FileStatus.State.REPLACED, directory));
+                fileState = FileStatus.State.REPLACED;
+            }
+            else if(contentsStatus == SVNStatusType.STATUS_NONE)
+            {
+                fileState = FileStatus.State.UNCHANGED;
+            }
+
+            if(fileState != null)
+            {
+                FileStatus fs = new FileStatus(path, fileState, directory);
+
+                if(svnStatus.getRemoteContentsStatus() != SVNStatusType.STATUS_NONE ||
+                   svnStatus.getRemotePropertiesStatus() != SVNStatusType.STATUS_NONE)
+                {
+                    // Remote change to this file
+                    fs.setOutOfDate(true);
+                }
+
+                status.add(fs);
             }
         }
 

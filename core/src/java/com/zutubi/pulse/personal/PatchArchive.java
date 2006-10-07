@@ -4,8 +4,6 @@ import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.io.xml.DomDriver;
 import com.zutubi.pulse.core.PulseException;
 import com.zutubi.pulse.scm.FileStatus;
-import com.zutubi.pulse.scm.WorkingCopy;
-import com.zutubi.pulse.scm.WorkingCopyFactory;
 import com.zutubi.pulse.scm.WorkingCopyStatus;
 import com.zutubi.pulse.util.FileSystemUtils;
 import com.zutubi.pulse.util.IOUtils;
@@ -33,26 +31,15 @@ public class PatchArchive
      * Creates a new archive from a working copy at base.  The state of the
      * working copy is established and the patch created based on that state.
      *
+     * @param status    status of the working copy based at base
      * @param base      the base directory for the working copy
      * @param patchFile the destination of the patch file created
-     * @throws PulseException in the event of any error creating the patch
+     * @throws PersonalBuildException in the event of any error creating the patch
      */
-    public PatchArchive(File base, File patchFile) throws PulseException
+    public PatchArchive(WorkingCopyStatus status, File base, File patchFile) throws PersonalBuildException
     {
         this.patchFile = patchFile;
-
-        WorkingCopy wc = WorkingCopyFactory.create(base);
-        if(wc == null)
-        {
-            throw new PulseException("Unable to identify working copy '" + base.getAbsolutePath() + "'");
-        }
-
-        status = wc.getStatus();
-        if(!status.inConsistentState())
-        {
-            // TODO dev-personal: more info!!
-            throw new PulseException("Working copy '" + base.getAbsolutePath() + "' is not in a consistent state");
-        }
+        this.status = status;
 
         try
         {
@@ -60,7 +47,7 @@ public class PatchArchive
         }
         catch (IOException e)
         {
-            throw new PulseException("I/O error creating patch file: " + e.getMessage(), e);
+            throw new PersonalBuildException("I/O error creating patch file: " + e.getMessage(), e);
         }
     }
 

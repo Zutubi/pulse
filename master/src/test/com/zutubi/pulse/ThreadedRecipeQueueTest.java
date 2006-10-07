@@ -726,6 +726,16 @@ public class ThreadedRecipeQueueTest extends TestCase implements EventListener
         {
             return new MockScmServer(throwError);
         }
+
+        public String getType()
+        {
+            return "mock";
+        }
+
+        public Map<String, String> getRepositoryProperties()
+        {
+            throw new RuntimeException("Method not implemented.");
+        }
     }
 
     class MockScmServer implements SCMServer

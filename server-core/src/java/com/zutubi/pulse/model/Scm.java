@@ -51,6 +51,8 @@ public abstract class Scm extends Entity implements Cloneable
     private static final String PROPERTY_TIMESTAMP_FISHEYE = "time.fisheye";
 
     public abstract SCMServer createServer() throws SCMException;
+    public abstract String getType();
+    public abstract Map<String, String> getRepositoryProperties();
 
     public boolean supportsUpdate()
     {

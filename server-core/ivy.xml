@@ -29,7 +29,6 @@
 
         <dependency org="apache" name="commons-collections" rev="3.1" conf="external,build,release->default"/>
         <dependency org="apache" name="commons-cli" rev="1.0" conf="external,build,release->default"/>
-        <dependency org="apache" name="xmlrpc" rev="2.0.1" conf="external,build,release->default"/>
 
         <dependency org="caucho" name="hessian" rev="3.0.13" conf="external,build,release->default"/>
 

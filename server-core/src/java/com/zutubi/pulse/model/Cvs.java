@@ -3,12 +3,15 @@ package com.zutubi.pulse.model;
 import com.opensymphony.util.TextUtils;
 import com.zutubi.pulse.bootstrap.ComponentContext;
 import com.zutubi.pulse.bootstrap.ConfigurationManager;
+import com.zutubi.pulse.scm.SCMConfiguration;
 import com.zutubi.pulse.scm.SCMException;
 import com.zutubi.pulse.scm.SCMServer;
 import com.zutubi.pulse.scm.cvs.CvsServer;
 import com.zutubi.pulse.util.Constants;
 
 import java.io.File;
+import java.util.Map;
+import java.util.TreeMap;
 
 /**
  * The CVS object defines the configuration properties required to communicate with a
@@ -46,6 +49,20 @@ public class Cvs extends Scm
         ConfigurationManager configurationManager = (ConfigurationManager) ComponentContext.getBean("configurationManager");
         File tmpRoot = configurationManager.getSystemPaths().getTmpRoot();
         return new CvsServer(getRoot(), getModule(), getPassword(), getBranch(), getFilteredPaths(), tmpRoot);
+    }
+
+    public String getType()
+    {
+        return SCMConfiguration.TYPE_CVS;
+    }
+
+    public Map<String, String> getRepositoryProperties()
+    {
+        Map<String, String> result = new TreeMap<String, String>();
+        result.put(ROOT, getRoot());
+        result.put(MODULE, getModule());
+        result.put(BRANCH, getBranch());
+        return result;
     }
 
     /**
