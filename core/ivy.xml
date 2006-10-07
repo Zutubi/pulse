@@ -26,6 +26,7 @@
         <dependency org="zutubi" name="boot" rev="1.0" conf="external,build,release->default"/>
 
         <dependency org="apache" name="ant" rev="1.6.5" conf="external,build,release->directoryscanner"/>
+        <dependency org="apache" name="commons-cli" rev="1.0" conf="external,build,release->default"/>
         <dependency org="apache" name="xmlrpc" rev="2.0.1" conf="external,build,release->default"/>
 
         <dependency org="javasvn" name="javasvn" rev="20060911" conf="external,build,release->default"/>
