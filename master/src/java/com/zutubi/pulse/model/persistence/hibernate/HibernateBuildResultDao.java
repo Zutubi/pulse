@@ -15,6 +15,7 @@ import org.springframework.orm.hibernate3.HibernateCallback;
 import org.springframework.orm.hibernate3.SessionFactoryUtils;
 
 import java.sql.SQLException;
+import java.util.Date;
 import java.util.List;
 
 public class HibernateBuildResultDao extends HibernateEntityDao<BuildResult> implements BuildResultDao
@@ -31,6 +32,23 @@ public class HibernateBuildResultDao extends HibernateEntityDao<BuildResult> imp
     public List<BuildResult> findLatestByProject(Project project, int max)
     {
         return findLatestByProject(project, 0, max);
+    }
+
+    public List<BuildResult> findSinceByProject(final Project project, final Date since)
+    {
+        return (List<BuildResult>) getHibernateTemplate().execute(new HibernateCallback()
+        {
+            public Object doInHibernate(Session session) throws HibernateException
+            {
+                Query queryObject = session.createQuery("from BuildResult model where model.project = :project and model.user = null and model.stamps.endTime > :since order by model.number desc");
+                queryObject.setEntity("project", project);
+                queryObject.setLong("since", since.getTime());
+
+                SessionFactoryUtils.applyTransactionTimeout(queryObject, getSessionFactory());
+
+                return queryObject.list();
+            }
+        });
     }
 
     public List<BuildResult> findLatestByProject(final Project project, final int first, final int max)

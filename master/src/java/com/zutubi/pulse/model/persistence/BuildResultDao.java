@@ -9,6 +9,7 @@ import com.zutubi.pulse.model.RecipeResultNode;
 import com.zutubi.pulse.model.User;
 
 import java.util.List;
+import java.util.Date;
 
 public interface BuildResultDao extends EntityDao<BuildResult>
 {
@@ -21,6 +22,8 @@ public interface BuildResultDao extends EntityDao<BuildResult>
     List<BuildResult> queryBuilds(Project[] projects, ResultState[] states, String[] specs, long earliestStartTime, long latestStartTime, Boolean hasWorkDir, int first, int max, boolean mostRecentFirst);
 
     List<BuildResult> findLatestByProject(Project project, int max);
+
+    List<BuildResult> findSinceByProject(Project project, Date since);
 
     List<BuildResult> findLatestByProject(Project project, int first, int max);
 

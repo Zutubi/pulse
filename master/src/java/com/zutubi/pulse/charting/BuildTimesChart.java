@@ -1,6 +1,8 @@
 package com.zutubi.pulse.charting;
 
 import com.zutubi.pulse.core.model.ResultState;
+import com.zutubi.pulse.i18n.Messages;
+import com.zutubi.pulse.util.Constants;
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.axis.NumberAxis;
 import org.jfree.chart.axis.ValueAxis;
@@ -33,9 +35,11 @@ public class BuildTimesChart implements XYToolTipGenerator, Chart
 
     private int range = DEFAULT_RANGE;
 
+    private static final Messages I18N = Messages.getInstance(BuildTimesChart.class);
+
     public String generateToolTip(XYDataset dataset, int series, int item)
     {
-        return String.format(seriesTimeTooltip, dataset.getY(series, item));
+        return String.format(I18N.format(seriesTimeTooltip), dataset.getY(series, item));
     }
 
     public void setRange(int range)
@@ -71,7 +75,7 @@ public class BuildTimesChart implements XYToolTipGenerator, Chart
             }
             lastId = id;
             
-            long elapsed = results.getElapsed();
+            long elapsed = results.getElapsed() / Constants.SECOND; // convert to seconds. 
 
             data.add(new ChartData(id, elapsed));
 
@@ -82,7 +86,7 @@ public class BuildTimesChart implements XYToolTipGenerator, Chart
 
         for (ChartData d : data)
         {
-            ds.add(d.id, d.time, seriesTimeLabel);
+            ds.add(d.id, d.time, I18N.format(seriesTimeLabel));
         }
 
         if (lastId - firstId < range)
@@ -93,17 +97,23 @@ public class BuildTimesChart implements XYToolTipGenerator, Chart
         XYItemRenderer renderer = new DefaultXYItemRenderer();
         renderer.setToolTipGenerator(this);
 
-        NumberAxis domainAxis = new NumberAxis(domainAxisLabel);
+        NumberAxis domainAxis = new NumberAxis(I18N.format(domainAxisLabel));
         domainAxis.setLowerBound(firstId - 1);
         domainAxis.setUpperBound(lastId + 1);
 
-        ValueAxis rangeAxis = new NumberAxis(rangeAxisLabel);
-        rangeAxis.setLowerBound(minTime - 5);
+        if (minTime == Long.MAX_VALUE && maxTime == Long.MIN_VALUE)
+        {
+            minTime = 5;
+            maxTime = 100;
+        }
+
+        ValueAxis rangeAxis = new NumberAxis(I18N.format(rangeAxisLabel));
+        rangeAxis.setLowerBound(Math.min(minTime, 0));
         rangeAxis.setUpperBound(maxTime + 5);
 
         XYPlot plot = new XYPlot(ds, domainAxis, rangeAxis, renderer);
 
-        JFreeChart chart = new JFreeChart(chartLabel, plot);
+        JFreeChart chart = new JFreeChart(I18N.format(chartLabel), plot);
         chart.setBackgroundPaint(WHITE);
         chart.setBorderVisible(false);
 

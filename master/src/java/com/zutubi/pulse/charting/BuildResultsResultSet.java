@@ -21,6 +21,11 @@ public class BuildResultsResultSet implements ResultSet
         this.results = this.source.iterator();
     }
 
+    public boolean hasNext()
+    {
+        return results.hasNext();
+    }
+
     public boolean next()
     {
         if (results.hasNext())

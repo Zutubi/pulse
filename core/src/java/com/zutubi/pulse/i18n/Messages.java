@@ -10,9 +10,16 @@ import com.zutubi.i18n.context.*;
  */
 public class Messages
 {
+    private Object context;
+
     private static DefaultMessageHandler handler;
 
     private static StaticPackageContextResolver packages;
+
+    private Messages(Object context)
+    {
+        this.context = context;
+    }
 
     private static synchronized MessageHandler getHandler()
     {
@@ -31,32 +38,52 @@ public class Messages
 
     public static String format(Object context, String key)
     {
-        if (context instanceof Context)
-        {
-            return getHandler().format(context, key);
-        }
-        else if (context instanceof String)
-        {
-            return getHandler().format(new PackageContext(context), key);
-        }
-        return getHandler().format(new ClassContext(context), key);
+        return getHandler().format(getContext(context), key);
     }
 
     public static String format(Object context, String key, Object... args)
     {
-        if (context instanceof Context)
-        {
-            return getHandler().format(context, key, args);
-        }
-        else if (context instanceof String)
-        {
-            return getHandler().format(new PackageContext(context), key, args);
-        }
-        return getHandler().format(new ClassContext(context), key, args);
+        return getHandler().format(getContext(context), key, args);
     }
 
-    public void setBundle(String bundleName, String packageName)
+    public static void setBundle(String bundleName, String packageName)
     {
         packages.addBundle(new PackageContext(packageName), bundleName);
+    }
+
+    private static Context getContext(Object obj)
+    {
+        if (obj instanceof Context)
+        {
+            return (Context)obj;
+        }
+        else if (obj instanceof String)
+        {
+            return new PackageContext(obj);
+        }
+        else
+        {
+            return new ClassContext(obj);
+        }
+    }
+
+    public static Messages getInstance(Object context)
+    {
+        return new Messages(getContext(context));
+    }
+
+    public static Messages getInstance(Class clazz)
+    {
+        return new Messages(new ClassContext(clazz));
+    }
+
+    public String format(String key)
+    {
+        return Messages.format(context, key);
+    }
+
+    public String format(String key, Object... args)
+    {
+        return Messages.format(context, key, args);
     }
 }

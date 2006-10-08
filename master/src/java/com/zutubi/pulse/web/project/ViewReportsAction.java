@@ -1,12 +1,10 @@
 package com.zutubi.pulse.web.project;
 
-import com.zutubi.pulse.charting.BuildResultsChart;
-import com.zutubi.pulse.charting.BuildResultsDataSource;
-import com.zutubi.pulse.charting.ChartUtils;
-import com.zutubi.pulse.charting.BuildTimesChart;
+import com.zutubi.pulse.charting.*;
 import com.zutubi.pulse.charting.demo.DemoDataSourceFactory;
 import com.zutubi.pulse.model.Project;
 import com.zutubi.pulse.model.ProjectManager;
+import com.zutubi.pulse.model.persistence.BuildResultDao;
 import com.zutubi.pulse.web.ActionSupport;
 
 import java.util.Map;
@@ -25,6 +23,8 @@ public class ViewReportsAction extends ActionSupport
     private Map buildTimesChart;
 
     private int timeframe = 45;
+
+    private BuildResultDao buildResultDao;
 
     public long getId()
     {
@@ -70,7 +70,9 @@ public class ViewReportsAction extends ActionSupport
     {
         project = projectManager.getProject(id);
 
-        BuildResultsDataSource dataSource = DemoDataSourceFactory.createBuildResultsDataSource();
+        DBBuildResultsDataSource dataSource = new DBBuildResultsDataSource();
+        dataSource.setProject(project);
+        dataSource.setBuildResultDao(buildResultDao);
 
         BuildResultsChart chart = new BuildResultsChart();
         chart.setTimeframe(timeframe);
@@ -98,5 +100,10 @@ public class ViewReportsAction extends ActionSupport
     public void setProjectManager(ProjectManager projectManager)
     {
         this.projectManager = projectManager;
+    }
+
+    public void setBuildResultDao(BuildResultDao buildResultDao)
+    {
+        this.buildResultDao = buildResultDao;
     }
 }

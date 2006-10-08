@@ -1,5 +1,6 @@
 package com.zutubi.pulse.charting.demo;
 
+import com.zutubi.pulse.charting.DemoBuildResultDataSource;
 import com.zutubi.pulse.charting.BuildResultsDataSource;
 import com.zutubi.pulse.core.model.ResultState;
 import com.zutubi.pulse.model.BuildResult;
@@ -17,7 +18,7 @@ public class DemoDataSourceFactory
 
     public static BuildResultsDataSource createBuildResultsDataSource()
     {
-        return new BuildResultsDataSource(createBuildResults());
+        return new DemoBuildResultDataSource(createBuildResults());
     }
 
     private static LinkedList<BuildResult> createBuildResults()
@@ -34,7 +35,7 @@ public class DemoDataSourceFactory
             {
                 boolean success = RAND.nextInt(50) < 40;
                 long finished = date.getTimeInMillis();
-                long started = finished - 100 - (RAND.nextInt(30) + 2 * i + k);
+                long started = finished - 1000 - (RAND.nextInt(3000) + 200 * i);
                 buildResults.add(createBuildResult(l++, success, started, finished));
             }
             date.add(Calendar.DAY_OF_YEAR, 1);
