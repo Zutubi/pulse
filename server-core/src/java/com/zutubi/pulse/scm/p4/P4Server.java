@@ -9,56 +9,26 @@ import com.zutubi.pulse.scm.CachingSCMServer;
 import com.zutubi.pulse.scm.SCMException;
 import com.zutubi.pulse.scm.SCMFileCache;
 import com.zutubi.pulse.scm.ScmFilepathFilter;
+import static com.zutubi.pulse.scm.p4.P4Constants.*;
 import com.zutubi.pulse.util.FileSystemUtils;
-import com.zutubi.pulse.util.IOUtils;
 import com.zutubi.pulse.util.logging.Logger;
 
-import java.io.*;
+import java.io.File;
+import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-
 public class P4Server extends CachingSCMServer
 {
     private static final Logger LOG = Logger.getLogger(P4Server.class);
 
-    private static final String ENV_PORT = "P4PORT";
-    private static final String ENV_USER = "P4USER";
-    private static final String ENV_PASSWORD = "P4PASSWD";
-    private static final String ENV_CLIENT = "P4CLIENT";
-    private static final String P4_COMMAND = "p4";
-    private static final String COMMAND_CHANGES = "changes";
-    private static final String COMMAND_CLIENT = "client";
-    private static final String COMMAND_CLIENTS = "clients";
-    private static final String COMMAND_DESCRIBE = "describe";
-    private static final String COMMAND_INFO = "info";
-    private static final String COMMAND_LABEL = "label";
-    private static final String COMMAND_LABELS = "labels";
-    private static final String COMMAND_LABELSYNC = "labelsync";
-    private static final String COMMAND_SYNC = "sync";
-    private static final String FLAG_CLIENT = "-c";
-    private static final String FLAG_DELETE = "-d";
-    private static final String FLAG_FORCE = "-f";
-    private static final String FLAG_INPUT = "-i";
-    private static final String FLAG_LABEL = "-l";
-    private static final String FLAG_MAXIMUM = "-m";
-    private static final String FLAG_OUTPUT = "-o";
-    private static final String FLAG_PREVIEW = "-n";
-    private static final String FLAG_SHORT = "-s";
-    private static final String FLAG_STATUS = "-s";
-    private static final String VALUE_SUBMITTED = "submitted";
-    private static final String VALUE_ALL_FILES = "...";
-    private static final String ASCII_CHARSET = "US-ASCII";
-
-    private ProcessBuilder p4Builder;
-    private Pattern changesPattern;
+    private P4Client client;
     private String templateClient;
     private File clientRoot;
     private String port;
-    private Pattern lineSplitterPattern;
     private Pattern syncPattern;
     private List<String> excludedPaths;
 
@@ -67,116 +37,15 @@ public class P4Server extends CachingSCMServer
         this.excludedPaths = filteredPaths;
     }
 
-    class P4Result
-    {
-        public StringBuffer stdout;
-        public StringBuffer stderr;
-        public int exitCode;
-    }
-
-    private void setEnv(String variable, String value)
-    {
-        if (value != null)
-        {
-            p4Builder.environment().put(variable, value);
-        }
-    }
-
-    P4Result runP4(String input, String ...commands) throws SCMException
-    {
-        return runP4(true, input, commands);
-    }
-
-    P4Result runP4(boolean throwOnStderr, String input, String ...commands) throws SCMException
-    {
-        P4Result result = new P4Result();
-        Process child;
-
-        p4Builder.command(commands);
-
-        try
-        {
-            child = p4Builder.start();
-        }
-        catch (IOException e)
-        {
-            throw new SCMException("Could not start p4 process", e);
-        }
-
-        if (input != null)
-        {
-            try
-            {
-                OutputStream stdinStream = child.getOutputStream();
-
-                stdinStream.write(input.getBytes(ASCII_CHARSET));
-                stdinStream.close();
-            }
-            catch (IOException e)
-            {
-                throw new SCMException("Error writing to input of p4 process", e);
-            }
-        }
-
-        try
-        {
-            InputStreamReader stdoutReader = new InputStreamReader(child.getInputStream(), ASCII_CHARSET);
-            InputStreamReader stderrReader = new InputStreamReader(child.getErrorStream(), ASCII_CHARSET);
-            StringWriter stdoutWriter = new StringWriter();
-            StringWriter stderrWriter = new StringWriter();
-
-            IOUtils.joinReaderToWriter(stdoutReader, stdoutWriter);
-            IOUtils.joinReaderToWriter(stderrReader, stderrWriter);
-
-            result.exitCode = child.waitFor();
-            result.stdout = stdoutWriter.getBuffer();
-            result.stderr = stderrWriter.getBuffer();
-        }
-        catch (IOException e)
-        {
-            throw new SCMException("Error reading output of p4 process", e);
-        }
-        catch (InterruptedException e)
-        {
-            // Do nothing
-        }
-
-        if (result.exitCode != 0)
-        {
-            String message = "p4 process returned non-zero exit code: " + Integer.toString(result.exitCode);
-
-            if (result.stderr.length() > 0)
-            {
-                message += ", error '" + result.stderr.toString().trim() + "'";
-            }
-
-            throw new SCMException(message);
-        }
-
-        if (result.stderr.length() > 0 && throwOnStderr)
-        {
-            throw new SCMException("p4 process returned error '" + result.stderr.toString().trim() + "'");
-        }
-
-        return result;
-    }
-
     private void createClient(String clientName, File toDirectory) throws SCMException
     {
-        P4Result result = runP4(null, P4_COMMAND, FLAG_CLIENT, templateClient, COMMAND_CLIENT, FLAG_OUTPUT);
-        String clientSpec = result.stdout.toString();
-
-        clientSpec = clientSpec.replaceAll("\nRoot:.*", Matcher.quoteReplacement("\nRoot: " + toDirectory.getAbsolutePath()));
-        clientSpec = clientSpec.replaceAll("\nHost:.*", Matcher.quoteReplacement("\nHost: "));
-        clientSpec = clientSpec.replaceAll("\nClient:.*" + templateClient, Matcher.quoteReplacement("\nClient: " + clientName));
-        clientSpec = clientSpec.replaceAll("//" + templateClient + "/", Matcher.quoteReplacement("//" + clientName + "/"));
-        runP4(clientSpec, P4_COMMAND, COMMAND_CLIENT, FLAG_INPUT);
+        client.createClient(templateClient, clientName, toDirectory);
     }
 
     private boolean clientExists(String clientName) throws SCMException
     {
-        P4Result result = runP4(null, P4_COMMAND, COMMAND_CLIENTS);
-        String [] lines = lineSplitterPattern.split(result.stdout);
+        P4Client.P4Result result = client.runP4(null, P4_COMMAND, COMMAND_CLIENTS);
+        String [] lines = client.splitLines(result);
         for (String line : lines)
         {
             String [] parts = line.split(" ");
@@ -245,7 +114,7 @@ public class P4Server extends CachingSCMServer
 
         try
         {
-            return getLatestRevisionForFiles(clientName);
+            return client.getLatestRevisionForFiles(clientName);
         }
         finally
         {
@@ -268,7 +137,7 @@ public class P4Server extends CachingSCMServer
 
         try
         {
-            P4Result result = runP4(null, P4_COMMAND, FLAG_CLIENT, clientName, COMMAND_SYNC, FLAG_FORCE, FLAG_PREVIEW);
+            P4Client.P4Result result = client.runP4(null, P4_COMMAND, FLAG_CLIENT, clientName, COMMAND_SYNC, FLAG_FORCE, FLAG_PREVIEW);
             Matcher matcher = syncPattern.matcher(result.stdout);
             while(matcher.find())
             {
@@ -298,42 +167,11 @@ public class P4Server extends CachingSCMServer
     {
         try
         {
-            runP4(null, P4_COMMAND, COMMAND_CLIENT, FLAG_DELETE, clientName);
+            client.runP4(null, P4_COMMAND, COMMAND_CLIENT, FLAG_DELETE, clientName);
         }
         catch (SCMException e)
         {
             LOG.warning("Unable to delete client: " + e.getMessage(), e);
-        }
-    }
-
-    private NumericalRevision getLatestRevisionForFiles(String clientName, String ...files) throws SCMException
-    {
-        String args[] = new String[8 + files.length];
-
-        args[0] = P4_COMMAND;
-        args[1] = FLAG_CLIENT;
-        args[2] = clientName;
-        args[3] = COMMAND_CHANGES;
-        args[4] = FLAG_STATUS;
-        args[5] = VALUE_SUBMITTED;
-        args[6] = FLAG_MAXIMUM;
-        args[7] = "1";
-
-        for (int i = 0; i < files.length; i++)
-        {
-            args[8 + i] = files[i];
-        }
-
-        P4Result result = runP4(null, args);
-        Matcher matcher = changesPattern.matcher(result.stdout);
-
-        if (matcher.find())
-        {
-            return new NumericalRevision(Long.parseLong(matcher.group(1)));
-        }
-        else
-        {
-            return new NumericalRevision(0);
         }
     }
 
@@ -359,8 +197,8 @@ public class P4Server extends CachingSCMServer
         //   ... <file>#<revision> <action>
         //   ... <file>#<revision> <action>
         //   ...
-        P4Result result = runP4(null, P4_COMMAND, FLAG_CLIENT, clientName, COMMAND_DESCRIBE, FLAG_SHORT, Long.toString(number));
-        String[] lines = lineSplitterPattern.split(result.stdout);
+        P4Client.P4Result result = client.runP4(null, P4_COMMAND, FLAG_CLIENT, clientName, COMMAND_DESCRIBE, FLAG_SHORT, Long.toString(number));
+        String[] lines = client.splitLines(result);
 
         if (lines.length < 1)
         {
@@ -491,14 +329,14 @@ public class P4Server extends CachingSCMServer
             }
 
             long number = ((NumericalRevision) revision).getRevisionNumber();
-            P4Result result;
+            P4Client.P4Result result;
             if(force)
             {
-                result = runP4(null, P4_COMMAND, FLAG_CLIENT, clientName, COMMAND_SYNC, FLAG_FORCE, "@" + Long.toString(number));
+                result = client.runP4(null, P4_COMMAND, FLAG_CLIENT, clientName, COMMAND_SYNC, FLAG_FORCE, "@" + Long.toString(number));
             }
             else
             {
-                result = runP4(false, null, P4_COMMAND, FLAG_CLIENT, clientName, COMMAND_SYNC, "@" + Long.toString(number));
+                result = client.runP4(false, null, P4_COMMAND, FLAG_CLIENT, clientName, COMMAND_SYNC, "@" + Long.toString(number));
             }
 
             if (changes != null)
@@ -544,7 +382,7 @@ public class P4Server extends CachingSCMServer
 
     public P4Server(String port, String user, String password, String client)
     {
-        p4Builder = new ProcessBuilder();
+        this.client = new P4Client();
         templateClient = client;
         this.port = port;
 
@@ -554,38 +392,20 @@ public class P4Server extends CachingSCMServer
         //   ...
         syncPattern = Pattern.compile("^(.+)#([0-9]+) - (refreshing|updating|added as|deleted as) (.+)$", Pattern.MULTILINE);
 
-        // Output of p4 changes -s submitted -m 1:
-        //   Change <number> on <date> by <user>@<client>
-        changesPattern = Pattern.compile("^Change ([0-9]+) on (.+) by (.+)@(.+) '(.+)'$", Pattern.MULTILINE);
-        lineSplitterPattern = Pattern.compile("\r?\n");
-
-        setEnv(ENV_PORT, port);
-        setEnv(ENV_USER, user);
+        this.client.setEnv(ENV_PORT, port);
+        this.client.setEnv(ENV_USER, user);
 
         if (password != null)
         {
-            setEnv(ENV_PASSWORD, password);
+            this.client.setEnv(ENV_PASSWORD, password);
         }
 
-        setEnv(ENV_CLIENT, client);
+        this.client.setEnv(ENV_CLIENT, client);
     }
 
     public Map<String, String> getServerInfo() throws SCMException
     {
-        Map<String, String> info = new TreeMap<String, String>();
-        P4Result result = runP4(null, P4_COMMAND, FLAG_CLIENT, templateClient, COMMAND_INFO);
-        String [] lines = lineSplitterPattern.split(result.stdout);
-
-        for(String line: lines)
-        {
-            int index = line.indexOf(':');
-            if(index > 0 && index < line.length() - 1)
-            {
-                info.put(line.substring(0, index).trim(), line.substring(index + 1).trim());
-            }
-        }
-
-        return info;
+        return client.getServerInfo(templateClient);
     }
 
     public String getUid()
@@ -625,7 +445,7 @@ public class P4Server extends CachingSCMServer
                 fileArgument = fileArgument + "@" + revision;
             }
 
-            P4Result result = runP4(null, P4_COMMAND, FLAG_CLIENT, clientName, "print", "-q", fileArgument);
+            P4Client.P4Result result = client.runP4(null, P4_COMMAND, FLAG_CLIENT, clientName, "print", "-q", fileArgument);
             return result.stdout.toString();
         }
         catch (SCMException e)
@@ -676,8 +496,8 @@ public class P4Server extends CachingSCMServer
         {
             if (start <= end)
             {
-                P4Result p4Result = runP4(null, P4_COMMAND, FLAG_CLIENT, clientName, COMMAND_CHANGES, FLAG_STATUS, VALUE_SUBMITTED, clientRoot.getAbsoluteFile() + "/...@" + Long.toString(start) + "," + Long.toString(end));
-                Matcher matcher = changesPattern.matcher(p4Result.stdout);
+                P4Client.P4Result p4Result = client.runP4(null, P4_COMMAND, FLAG_CLIENT, clientName, COMMAND_CHANGES, FLAG_STATUS, VALUE_SUBMITTED, clientRoot.getAbsoluteFile() + "/...@" + Long.toString(start) + "," + Long.toString(end));
+                Matcher matcher = client.getChangesPattern().matcher(p4Result.stdout);
 
                 while (matcher.find())
                 {
@@ -710,7 +530,7 @@ public class P4Server extends CachingSCMServer
         try
         {
             String root = new File(clientRoot.getAbsolutePath(), VALUE_ALL_FILES).getAbsolutePath();
-            long latestRevision = getLatestRevisionForFiles(clientName, root).getRevisionNumber();
+            long latestRevision = client.getLatestRevisionForFiles(clientName, root).getRevisionNumber();
             long sinceRevision = ((NumericalRevision) since).getRevisionNumber();
             if(latestRevision > sinceRevision)
             {
@@ -771,7 +591,7 @@ public class P4Server extends CachingSCMServer
                 throw new SCMException("Cannot create label '" + name + "': label already exists");
             }
 
-            runP4(false, null, P4_COMMAND, FLAG_CLIENT, clientName, COMMAND_LABELSYNC, FLAG_LABEL, name, clientRoot.getAbsoluteFile() + "/...@" + revision.toString());
+            client.runP4(false, null, P4_COMMAND, FLAG_CLIENT, clientName, COMMAND_LABELSYNC, FLAG_LABEL, name, clientRoot.getAbsoluteFile() + "/...@" + revision.toString());
         }
         finally
         {
@@ -781,16 +601,16 @@ public class P4Server extends CachingSCMServer
 
     public void writeConnectionDetails(File outputDir) throws SCMException, IOException
     {
-        P4Result result = runP4(null, P4_COMMAND, FLAG_CLIENT, templateClient, COMMAND_INFO);
+        P4Client.P4Result result = client.runP4(null, P4_COMMAND, FLAG_CLIENT, templateClient, COMMAND_INFO);
         FileSystemUtils.createFile(new File(outputDir, "server-info.txt"), result.stdout.toString());
 
-        result = runP4(null, P4_COMMAND, FLAG_CLIENT, templateClient, COMMAND_CLIENT, FLAG_OUTPUT);
+        result = client.runP4(null, P4_COMMAND, FLAG_CLIENT, templateClient, COMMAND_CLIENT, FLAG_OUTPUT);
         FileSystemUtils.createFile(new File(outputDir, "template-client.txt"), result.stdout.toString());
     }
 
     public boolean labelExists(String client, String name) throws SCMException
     {
-        P4Result p4Result = runP4(null, P4_COMMAND, FLAG_CLIENT, client, COMMAND_LABELS);
+        P4Client.P4Result p4Result = this.client.runP4(null, P4_COMMAND, FLAG_CLIENT, client, COMMAND_LABELS);
 
         // $ p4 labels
         // Label jim 2006/06/20 'Created by Jason. '
@@ -809,8 +629,8 @@ public class P4Server extends CachingSCMServer
 
     private void createLabel(String client, String name) throws SCMException
     {
-        P4Result p4Result = runP4(null, P4_COMMAND, FLAG_CLIENT, client, COMMAND_LABEL, FLAG_OUTPUT, name);
-        runP4(p4Result.stdout.toString(), P4_COMMAND, FLAG_CLIENT, client, COMMAND_LABEL, FLAG_INPUT);
+        P4Client.P4Result p4Result = this.client.runP4(null, P4_COMMAND, FLAG_CLIENT, client, COMMAND_LABEL, FLAG_OUTPUT, name);
+        this.client.runP4(p4Result.stdout.toString(), P4_COMMAND, FLAG_CLIENT, client, COMMAND_LABEL, FLAG_INPUT);
     }
 
     public static void main(String argv[])

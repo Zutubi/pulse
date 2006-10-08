@@ -19,6 +19,7 @@ import java.util.List;
  */
 public class P4ServerTest extends PulseTestCase
 {
+    private P4Client client;
     private P4Server server;
     private File tmpDir;
     private File repoDir;
@@ -29,6 +30,8 @@ public class P4ServerTest extends PulseTestCase
     protected void setUp() throws Exception
     {
         super.setUp();
+        client = new P4Client();
+
         tmpDir = FileSystemUtils.createTempDirectory(getClass().getName(), "");
 
         repoDir = new File(tmpDir, "repo");
@@ -41,7 +44,9 @@ public class P4ServerTest extends PulseTestCase
 
     protected void tearDown() throws Exception
     {
+        client = null;
         server = null;
+
         p4dProcess.destroy();
         removeDirectory(tmpDir);
         super.tearDown();
@@ -278,7 +283,7 @@ public class P4ServerTest extends PulseTestCase
         assertFalse(server.labelExists("test-client", "test-tag"));
         server.tag(new NumericalRevision(5), "test-tag", false);
         assertTrue(server.labelExists("test-client", "test-tag"));
-        P4Server.P4Result result = server.runP4(null, "p4", "-c", "test-client", "sync", "-f", "-n", "@test-tag");
+        P4Client.P4Result result = client.runP4(null, "p4", "-c", "test-client", "sync", "-f", "-n", "@test-tag");
         assertTrue(result.stdout.toString().contains("//depot2/file9#1"));
     }
 
@@ -287,7 +292,7 @@ public class P4ServerTest extends PulseTestCase
         testTag();
         server.tag(new NumericalRevision(7), "test-tag", true);
         assertTrue(server.labelExists("test-client", "test-tag"));
-        P4Server.P4Result result = server.runP4(null, "p4", "-c", "test-client", "sync", "-f", "-n", "@test-tag");
+        P4Client.P4Result result = client.runP4(null, "p4", "-c", "test-client", "sync", "-f", "-n", "@test-tag");
         assertTrue(result.stdout.toString().contains("//depot2/file9#2"));
     }
 
@@ -378,12 +383,8 @@ public class P4ServerTest extends PulseTestCase
     private void getServer(String client)
     {
         server = new P4Server(":1666", "test-user", "", client);
-    }
-
-    private int randomInt()
-    {
-        double random = Math.random() * 100;
-        return (int) random;
+        this.client.setEnv(P4Constants.ENV_PORT, ":1666");
+        this.client.setEnv(P4Constants.ENV_USER, "test-user");
     }
 
     private void checkDirectory(String name) throws IOException
