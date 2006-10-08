@@ -8,4 +8,6 @@ public interface ResultSet
     boolean next();
 
     Object getFieldValue(String fieldName);
+
+    boolean hasNext();
 }

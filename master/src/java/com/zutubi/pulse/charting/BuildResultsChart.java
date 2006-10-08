@@ -1,6 +1,7 @@
 package com.zutubi.pulse.charting;
 
 import com.zutubi.pulse.core.model.ResultState;
+import com.zutubi.pulse.i18n.Messages;
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.axis.DateAxis;
 import org.jfree.chart.axis.NumberAxis;
@@ -54,6 +55,10 @@ public class BuildResultsChart implements XYToolTipGenerator, Chart
     private static final SimpleDateFormat DATE_FMT = new SimpleDateFormat("d-MMM-yyyy");
     private static final Calendar CALENDAR = Calendar.getInstance();
 
+    private static final Messages I18N = Messages.getInstance(BuildResultsChart.class);
+
+    private boolean hasResults;
+
     public BuildResultsChart()
     {
     }
@@ -86,21 +91,31 @@ public class BuildResultsChart implements XYToolTipGenerator, Chart
     public JFreeChart render()
     {
         // process data source: group by day of year and count the successes and failures.
-        Map<String, ChartData> map = aggregateData(source);
+        BuildResultsResultSet resultSet = source.getLastByDays(timeframe);
+
+        Map<String, ChartData> map = aggregateData(resultSet);
 
         TimeTableXYDataset ds = generateDataSet(map);
-
+        
         final XYItemRenderer renderer = new StackedXYBarRenderer();
         renderer.setSeriesPaint(0, ChartColors.FAILURE);
         renderer.setSeriesPaint(1, ChartColors.SUCCESS);
         renderer.setToolTipGenerator(this);
 
-        final DateAxis domainAxis = new DateAxis(dateAxisLabel);
-        final ValueAxis rangeAxis = new NumberAxis(rangeAxisLabel);
+        final DateAxis domainAxis = new DateAxis(I18N.format(dateAxisLabel));
+        final ValueAxis rangeAxis = new NumberAxis(I18N.format(rangeAxisLabel));
+
+        // If the dataset has no results, then we need to specify a lower bound of zero otherwise the
+        // rendered graph will have the range axis in the middle of the page. We do not want to be
+        // showing the negative range.  If there is a better way to achive this outcome, please use it.
+        if (!hasResults)
+        {
+            rangeAxis.setLowerBound(0D);
+        }
 
         final XYPlot plot = new XYPlot(ds, domainAxis, rangeAxis, renderer);
 
-        final JFreeChart chart = new JFreeChart(chartTitle, plot);
+        final JFreeChart chart = new JFreeChart(I18N.format(chartTitle), plot);
 
         chart.setBackgroundPaint(ChartColors.BACKGROUND);
         chart.setBorderVisible(false);
@@ -112,32 +127,34 @@ public class BuildResultsChart implements XYToolTipGenerator, Chart
     {
         Calendar cal = Calendar.getInstance();
         cal.add(Calendar.DAY_OF_YEAR, -timeframe);
-        
+
+        String failureSeries = I18N.format(failureSeriesLabel);
+        String successSeries = I18N.format(successSeriesLabel);
+
         TimeTableXYDataset ds = new TimeTableXYDataset();
-        for (int i = 0; i < timeframe; i++)
+        for (int i = 0; i <= timeframe; i++)
         {
             Date date = cal.getTime();
             String key = getAggregateKey(date.getTime());
             if (map.containsKey(key))
             {
                 ChartData d = map.get(key);
-                ds.add(new Day(date), d.failureCount, failureSeriesLabel);
-                ds.add(new Day(date), d.successCount, successSeriesLabel);
+                ds.add(new Day(date), d.failureCount, failureSeries);
+                ds.add(new Day(date), d.successCount, successSeries);
+                hasResults = true;
             }
             else
             {
-                ds.add(new Day(date), 0, failureSeriesLabel);
-                ds.add(new Day(date), 0, successSeriesLabel);
+                ds.add(new Day(date), 0, failureSeries);
+                ds.add(new Day(date), 0, successSeries);
             }
             cal.add(Calendar.DAY_OF_YEAR, 1);
         }
         return ds;
     }
 
-    private Map<String, ChartData> aggregateData(BuildResultsDataSource source)
+    private Map<String, ChartData> aggregateData(BuildResultsResultSet resultSet)
     {
-        BuildResultsResultSet resultSet = source.getLastByDays(timeframe);
-
         Map<String, ChartData> map = new TreeMap<String, ChartData>();
         while (resultSet.next())
         {
@@ -172,11 +189,11 @@ public class BuildResultsChart implements XYToolTipGenerator, Chart
         long p = Math.round(((total != 0) ? value / total : 0) * 100);
         if (series == 0)
         {
-            return String.format(failureSeriesTooltip, p);
+            return String.format(I18N.format(failureSeriesTooltip), p);
         }
         else
         {
-            return String.format(successSeriesTooltip, p);
+            return String.format(I18N.format(successSeriesTooltip), p);
         }
     }
 
