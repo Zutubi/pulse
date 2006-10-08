@@ -1,5 +1,6 @@
 package com.zutubi.pulse.scm;
 
+import com.zutubi.pulse.scm.p4.P4WorkingCopy;
 import com.zutubi.pulse.scm.svn.SvnWorkingCopy;
 
 import java.io.File;
@@ -18,6 +19,7 @@ public class WorkingCopyFactory
         try
         {
             registerType(SCMConfiguration.TYPE_SUBVERSION, SvnWorkingCopy.class);
+            registerType(SCMConfiguration.TYPE_PERFORCE, P4WorkingCopy.class);
         }
         catch (NoSuchMethodException e)
         {

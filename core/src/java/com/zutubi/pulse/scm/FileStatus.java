@@ -23,6 +23,18 @@ public class FileStatus
                 return true;
             }
         },
+        BRANCHED
+        {
+            public boolean isConsistent()
+            {
+                return true;
+            }
+
+            public boolean requiresFile()
+            {
+                return true;
+            }
+        },
         DELETED
         {
             public boolean isConsistent()
@@ -191,6 +203,11 @@ public class FileStatus
     public void setOutOfDate(boolean outOfDate)
     {
         this.outOfDate = outOfDate;
+    }
+
+    public boolean isInteresting()
+    {
+        return isOutOfDate() || state != State.UNCHANGED;
     }
 
     public void apply(File base) throws IOException

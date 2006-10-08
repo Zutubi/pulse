@@ -212,7 +212,10 @@ public class SvnWorkingCopy extends PersonalBuildSupport implements WorkingCopy
                     fs.setOutOfDate(true);
                 }
 
-                status.add(fs);
+                if(fs.isInteresting())
+                {
+                    status.add(fs);
+                }
             }
         }
 

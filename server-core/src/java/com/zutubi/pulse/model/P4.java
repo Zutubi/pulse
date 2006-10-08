@@ -3,6 +3,7 @@ package com.zutubi.pulse.model;
 import com.zutubi.pulse.scm.SCMConfiguration;
 import com.zutubi.pulse.scm.SCMException;
 import com.zutubi.pulse.scm.SCMServer;
+import static com.zutubi.pulse.scm.p4.P4Constants.*;
 import com.zutubi.pulse.scm.p4.P4Server;
 
 import java.util.Map;
@@ -14,11 +15,6 @@ import java.util.TreeMap;
  */
 public class P4 extends Scm
 {
-    private final String PORT = "p4.port";
-    private final String USER = "p4.user";
-    private final String PASSWORD = "p4.password";
-    private final String CLIENT = "p4.client";
-
     @Override
     public SCMServer createServer() throws SCMException
     {
@@ -35,48 +31,48 @@ public class P4 extends Scm
     public Map<String, String> getRepositoryProperties()
     {
         Map<String, String> result = new TreeMap<String, String>();
-        result.put(PORT, getPort());
-        result.put(CLIENT, getClient());
+        result.put(PROPERTY_PORT, getPort());
+        result.put(PROPERTY_CLIENT, getClient());
         return result;
     }
 
     public String getPort()
     {
-        return (String) getProperties().get(PORT);
+        return (String) getProperties().get(PROPERTY_PORT);
     }
 
     public void setPort(String port)
     {
-        getProperties().put(PORT, port);
+        getProperties().put(PROPERTY_PORT, port);
     }
 
     public String getUser()
     {
-        return (String) getProperties().get(USER);
+        return (String) getProperties().get(PROPERTY_USER);
     }
 
     public void setUser(String user)
     {
-        getProperties().put(USER, user);
+        getProperties().put(PROPERTY_USER, user);
     }
 
     public String getPassword()
     {
-        return (String) getProperties().get(PASSWORD);
+        return (String) getProperties().get(PROPERTY_PASSWORD);
     }
 
     public void setPassword(String password)
     {
-        getProperties().put(PASSWORD, password);
+        getProperties().put(PROPERTY_PASSWORD, password);
     }
 
     public String getClient()
     {
-        return (String) getProperties().get(CLIENT);
+        return (String) getProperties().get(PROPERTY_CLIENT);
     }
 
     public void setClient(String client)
     {
-        getProperties().put(CLIENT, client);
+        getProperties().put(PROPERTY_CLIENT, client);
     }
 }

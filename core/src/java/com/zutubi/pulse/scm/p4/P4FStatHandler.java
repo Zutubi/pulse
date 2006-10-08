@@ -1,0 +1,303 @@
+package com.zutubi.pulse.scm.p4;
+
+import com.zutubi.pulse.personal.PersonalBuildUI;
+import com.zutubi.pulse.scm.FileStatus;
+import com.zutubi.pulse.scm.SCMException;
+import com.zutubi.pulse.scm.WorkingCopyStatus;
+import static com.zutubi.pulse.scm.p4.P4Constants.*;
+
+import java.util.HashMap;
+import java.util.Map;
+
+/**
+ */
+public class P4FStatHandler extends P4ErrorDetectingHandler
+{
+    private PersonalBuildUI ui;
+    private WorkingCopyStatus status;
+    private Map<String, String> currentItem = new HashMap<String, String>();
+
+    public P4FStatHandler(PersonalBuildUI ui, WorkingCopyStatus status)
+    {
+        super(true);
+        this.ui = ui;
+        this.status = status;
+    }
+
+    public void handleStdout(String line) throws SCMException
+    {
+        line = line.trim();
+        if(line.length() == 0)
+        {
+            if(currentItem.size() > 0)
+            {
+                handleItem();
+                currentItem.clear();
+            }
+        }
+        else
+        {
+            String[] parts = line.split(" ", 3);
+            if(parts.length == 3)
+            {
+                currentItem.put(parts[1], parts[2]);
+            }
+            else if(parts.length == 2)
+            {
+                currentItem.put(parts[1], "");
+            }
+        }
+    }
+
+    public void handleExitCode(int code) throws SCMException
+    {
+        super.handleExitCode(code);
+        if(currentItem.size() > 0)
+        {
+            handleItem();
+        }
+    }
+
+    private void handleItem()
+    {
+        if(currentItem.containsKey(FSTAT_CLIENT_FILE))
+        {
+            String path = getPath(currentItem.get(FSTAT_CLIENT_FILE));
+            String action = currentItem.get(FSTAT_ACTION);
+            FileStatus.State state = FileStatus.State.UNCHANGED;
+
+            if(currentItem.containsKey(FSTAT_UNRESOLVED))
+            {
+                state = FileStatus.State.UNRESOLVED;
+            }
+            else if(action != null)
+            {
+                state = mapAction(action);
+                String have = currentItem.get(FSTAT_HAVE_REVISION);
+                if(have != null && have.equals(REVISION_NONE))
+                {
+                    if(state != FileStatus.State.DELETED)
+                    {
+                        warning("Change to deleted file '" + path + "'");
+                        state = FileStatus.State.UNRESOLVED;
+                    }
+                }
+            }
+
+            FileStatus fs = new FileStatus(path, state, false);
+
+            // Don't bother checking OOD for inconsistent or deleted files:
+            // too tricky, and useless anyhow.
+            if(fs.getState().isConsistent() && fs.getState() != FileStatus.State.DELETED)
+            {
+                fs.setOutOfDate(isCurrentItemOutOfDate());
+            }
+
+            if(fs.isInteresting())
+            {
+                status.add(fs);
+            }
+        }
+    }
+
+    private boolean isCurrentItemOutOfDate()
+    {
+        // It is if the revisions don't match or there is no haveRevision
+        String haveRevision = currentItem.get(FSTAT_HAVE_REVISION);
+        String headRevision = currentItem.get(FSTAT_HEAD_REVISION);
+
+        if(haveRevision == null)
+        {
+            return headRevision != null;
+        }
+
+        if(headRevision == null)
+        {
+            warning("Have revision but no head revision, assuming file is out of date.");
+        }
+
+        return !haveRevision.equals(headRevision);
+    }
+
+    private FileStatus.State mapAction(String action)
+    {
+        if(action.equals(ACTION_ADD))
+        {
+            return FileStatus.State.ADDED;
+        }
+        else if (action.equals(ACTION_BRANCH))
+        {
+            return FileStatus.State.BRANCHED;
+        }
+        else if (action.equals(ACTION_DELETE))
+        {
+            return FileStatus.State.DELETED;
+        }
+        else if (action.equals(ACTION_EDIT))
+        {
+            return FileStatus.State.MODIFIED;
+        }
+        else if (action.equals(ACTION_INTEGRATE))
+        {
+            return FileStatus.State.MERGED;
+        }
+        else
+        {
+            warning("Unrecognised action '" + action + "': assuming file is modified.");
+            return FileStatus.State.MODIFIED;
+        }
+    }
+
+    private String getPath(String clientFile)
+    {
+        // clientFile has form //<client>/<path>
+        int length = clientFile.length();
+        if(length > 3)
+        {
+            int index = clientFile.indexOf('/', 2);
+            if(index >= 0 && index < length - 1)
+            {
+                clientFile = clientFile.substring(index + 1);
+            }
+        }
+
+        return clientFile;
+    }
+
+    private void warning(String message)
+    {
+        if(ui != null)
+        {
+            ui.warning(message);
+        }
+    }
+
+    // Run: p4 fstat -Op -Rc //...@revision
+    //
+    // Summary (so far):
+    //   - file is changed on client if we have an [action] (which also
+    //     denotes the type of the change)
+    //   - file is out of date on client if the [headRev] is different
+    //     to the [haveRev], or there is no [haveRev]
+    //   - file is in an inconsistent state if we have an [unresolved]:
+    //     i.e. a merge (possibly just a sync) has not been resolved
+    //
+    // Full details:
+    //
+    // Normal item:
+    // ... depotFile //depot/script1
+    // ... clientFile /home/jason/p41\script1
+    // ... isMapped
+    // ... headAction add
+    // ... headType xtext
+    // ... headTime 1160291666
+    // ... headRev 1
+    // ... headChange 1
+    // ... headModTime 1160295147
+    // ... haveRev 1
+    //
+    // Open for edit:
+    // ... depotFile //depot/script1
+    // ... clientFile /home/jason/p41\script1
+    // ... isMapped
+    // ... headAction add
+    // ... headType xtext
+    // ... headTime 1160291666
+    // ... headRev 1
+    // ... headChange 1
+    // ... headModTime 1160295147
+    // ... haveRev 1
+    // ... action edit
+    // ... change default
+    // ... type xtext
+    // ... actionOwner test-user
+    //
+    // Open for add:
+    // ... depotFile //depot/newfile
+    // ... clientFile /home/jason/p41\newfile
+    // ... action add
+    // ... change default
+    // ... type text
+    // ... actionOwner test-user
+    //
+    // Open for delete:
+    // ... depotFile //depot/script1
+    // ... clientFile /home/jason/p41\script1
+    // ... isMapped
+    // ... headAction add
+    // ... headType xtext
+    // ... headTime 1160291666
+    // ... headRev 1
+    // ... headChange 1
+    // ... headModTime 1160295147
+    // ... haveRev 1
+    // ... action delete
+    // ... change default
+    // ... type xtext
+    // ... actionOwner test-user
+    //
+    // Open for edit (change type):
+    // ... depotFile //depot/file5
+    // ... clientFile /home/jason/p41\file5
+    // ... isMapped
+    // ... headAction add
+    // ... headType text
+    // ... headTime 1160291666
+    // ... headRev 1
+    // ... headChange 1
+    // ... headModTime 1160294903
+    // ... haveRev 1
+    // ... action edit
+    // ... change default
+    // ... type xtext
+    // ... actionOwner test-user
+    //
+    // Integrate new file:
+    // ... depotFile //depot/script2
+    // ... clientFile /home/jason/p41\script2
+    // ... action branch
+    // ... change default
+    // ... type xtext
+    // ... actionOwner test-user
+    // ... resolved
+    //
+    // Integrate (merge) from branch:
+    // ... depotFile //depot/file1
+    // ... clientFile /home/jason/p41\file1
+    // ... isMapped
+    // ... headAction add
+    // ... headType text
+    // ... headTime 1160291666
+    // ... headRev 1
+    // ... headChange 1
+    // ... headModTime 1160294897
+    // ... haveRev 1
+    // ... action integrate
+    // ... change default
+    // ... type text
+    // ... actionOwner test-user
+    // ... unresolved
+    //
+    // New file in repo (not yet sync'd):
+    // ... depotFile //depot/newfile
+    // ... clientFile /home/jason/p41\newfile
+    // ... isMapped
+    // ... headAction add
+    // ... headType text
+    // ... headTime 1160307400
+    // ... headRev 1
+    // ... headChange 4
+    // ... headModTime 1160310899
+    //
+    // File deleted in repo (not yet sync'd):
+    // ... depotFile //depot/file1
+    // ... clientFile /home/jason/p41\file1
+    // ... isMapped
+    // ... headAction delete
+    // ... headType text
+    // ... headTime 1160307528
+    // ... headRev 2
+    // ... headChange 5
+    // ... headModTime 0
+    // ... haveRev 1
+}
