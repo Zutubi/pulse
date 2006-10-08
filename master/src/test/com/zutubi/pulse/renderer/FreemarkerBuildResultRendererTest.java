@@ -16,7 +16,7 @@ import java.util.List;
  */
 public class FreemarkerBuildResultRendererTest extends PulseTestCase
 {
-    private boolean generate = true;
+    private boolean generate = false;
 
     FreemarkerBuildResultRenderer renderer;
 
