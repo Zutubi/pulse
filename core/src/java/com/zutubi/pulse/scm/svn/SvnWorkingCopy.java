@@ -6,6 +6,7 @@ import com.zutubi.pulse.scm.FileStatus;
 import com.zutubi.pulse.scm.SCMException;
 import com.zutubi.pulse.scm.WorkingCopy;
 import com.zutubi.pulse.scm.WorkingCopyStatus;
+import org.tmatesoft.svn.core.SVNCancelException;
 import org.tmatesoft.svn.core.SVNException;
 import org.tmatesoft.svn.core.SVNNodeKind;
 import org.tmatesoft.svn.core.internal.io.dav.DAVRepositoryFactory;
@@ -81,6 +82,7 @@ public class SvnWorkingCopy extends PersonalBuildSupport implements WorkingCopy
         try
         {
             SVNStatusClient statusClient = clientManager.getStatusClient();
+            statusClient.setEventHandler(handler);
             statusClient.doStatus(base, true, true, true, false, false, handler);
         }
         catch (SVNException e)
@@ -109,9 +111,28 @@ public class SvnWorkingCopy extends PersonalBuildSupport implements WorkingCopy
         return new SCMException(e.getMessage(), e);
     }
 
-    private class StatusHandler implements ISVNStatusHandler
+    private class StatusHandler implements ISVNEventHandler, ISVNStatusHandler
     {
         WorkingCopyStatus status = new WorkingCopyStatus();
+
+        public void handleEvent(SVNEvent event, double progress)
+        {
+            SVNEventAction action = event.getAction();
+            if(action == SVNEventAction.STATUS_COMPLETED)
+            {
+                // This is the repository revision that the status was run
+                // against.  As we check for out of date files against this
+                // revision, if no files are out of date then it is safe to
+                // check out this revision.  (Note even files we don't have,
+                // such as newly-added files, will be reported by the status
+                // operation as out of date.)
+                status.setRevision(new NumericalRevision(event.getRevision()));
+            }
+        }
+
+        public void checkCancelled() throws SVNCancelException
+        {
+        }
 
         public void handleStatus(SVNStatus svnStatus)
         {
@@ -127,12 +148,6 @@ public class SvnWorkingCopy extends PersonalBuildSupport implements WorkingCopy
             if(path.startsWith("/") || path.startsWith(File.separator))
             {
                 path = path.substring(1);
-            }
-
-            if(path.length() == 0)
-            {
-                // Grab the revision for the base directory
-                status.setRevision(new NumericalRevision(svnStatus.getRevision().getNumber()));
             }
 
             FileStatus.State fileState = null;

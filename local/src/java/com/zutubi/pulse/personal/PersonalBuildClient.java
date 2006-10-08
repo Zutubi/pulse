@@ -118,7 +118,7 @@ public class PersonalBuildClient extends PersonalBuildSupport
     {
         WorkingCopyStatus status = getStatus(wc);
 
-        if(status.isOutOfDate())
+        while(status.isOutOfDate())
         {
             if(config.getConfirmUpdate())
             {
