@@ -1,0 +1,36 @@
+#helpTag("Projects")
+#authorisationTags($principle)
+#projectTags($project)
+#macro(render $chart)
+    ${chart.imageMap}
+    <img style="border:none" src="${base}/chart?filename=${chart.location}" border="1" height="${chart.height}" width="${chart.width}" usemap="${chart.imageMapName}"/>
+#end
+<html>
+<head>
+    <title>$!webwork.htmlEncode($project.name)</title>
+</head>
+<body>
+    #projectTabs("reporting")
+
+<table>
+    <tr>
+        <td>
+            #render($buildResultsChart)
+        </td>
+        <td>
+            #render($buildTimesChart)
+        </td>
+        <!--
+        <td valign="top">
+            #wwform("action=projectReports.action" "method=post")
+                #wwhidden("name=id")
+                #wwselect("name=timeframe" "label=%{getText('chart.timeframe')}" "list=timeframes" "tabindex=1")
+                #refresh(2)
+            #end
+        </td>
+        -->
+    </tr>
+</table>
+
+</body>
+</html>

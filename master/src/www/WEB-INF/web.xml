@@ -149,6 +149,18 @@
     </servlet>
 
     <!--
+     This servlet is reponsible for writing a temporary image file to the response stream.
+     When creating charts, the chart must first be rendered to a temporary file and then referenced within the
+     template using:
+
+            <img src="$base/chart/?filename=${tempFileLocation}.
+    -->
+    <servlet>
+      <servlet-name>displayChart</servlet-name>
+      <servlet-class>org.jfree.chart.servlet.DisplayChart</servlet-class>
+    </servlet>
+
+    <!--
         <servlet>
             <servlet-name>UserProfileServlet</servlet-name>
             <servlet-class>com.zutubilet.ProfileServlet</servlet-class>
@@ -193,6 +205,12 @@
     <servlet-mapping>
         <servlet-name>XmlRpcServlet</servlet-name>
         <url-pattern>/xmlrpc</url-pattern>
+    </servlet-mapping>
+
+    <!-- Charts are available via the /chart path. -->
+    <servlet-mapping>
+      <servlet-name>displayChart</servlet-name>
+      <url-pattern>/chart/*</url-pattern>
     </servlet-mapping>
 
     <!--

@@ -228,6 +228,7 @@
         #projectTab("home" "currentBuild" $selected)
         #projectTab("history" "history" $selected)
         #projectTab("configuration" "configureProject" $selected)
+        #projectTab("reporting" "projectReports" $selected)
     #closeTabs()
 #end
 
@@ -998,6 +999,12 @@
 #macro(closeSubmit)
         </td>
     </tr>
+#end
+
+#macro(refresh $tabIndex)
+    #openSubmit()
+        #wwsubmit("name=refresh" "value=%{getText('refresh.name')}" "tabindex=$tabIndex")
+    #closeSubmit()
 #end
 
 ##

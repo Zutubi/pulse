@@ -284,6 +284,7 @@
         <action name="configureProject" class="com.zutubi.pulse.web.project.ConfigureProjectAction">
             <result name="success" type="velocity">configure-project.vm</result>
             <result name="error" type="redirect">viewProjects.action</result>
+            <result name="input" type="redirect">viewProjects.action</result>
         </action>
 
         <action name="editScm" class="com.zutubi.pulse.web.project.EditScmAction">
@@ -778,6 +779,11 @@
         <action name="rss" class="com.zutubi.pulse.web.rss.BuildResultsRssAction">
             <result name="disabled" type="velocity">generic-error.vm</result>
         </action>
+
+        <action name="projectReports" class="com.zutubi.pulse.web.project.ViewReportsAction">
+            <result name="success" type="velocity">project-reports.vm</result>
+            <result name="input" type="velocity">project-reports.vm</result>
+        </action>
     </package>
 
     <package name="personal" namespace="/personal" extends="webwork-default-package">
@@ -1094,7 +1100,7 @@
             <result name="cancel" type="redirect">/admin/serverSettings.action</result>
             <result name="success" type="redirect">/admin/serverSettings.action</result>
         </action>
-        
+
         <action name="general" class="com.zutubi.pulse.web.admin.GeneralConfigurationAction">
             <interceptor-ref name="defaultStack"/>
             <result name="error" type="velocity">configure-generalconfig.vm</result>
