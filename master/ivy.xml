@@ -65,6 +65,8 @@
 
         <dependency org="jwebunit" name="jwebunit" rev="1.2" conf="external,build->default"/>
 
+        <dependency org="jfree" name="jfreechart" rev="1.0.0-rc1" conf="external,build,release->default"/>
+
     </dependencies>
 
 </ivy-module>
