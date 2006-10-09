@@ -194,18 +194,46 @@ public class LicenseEncoder implements LicenseKeyFactory
         }
     }
 
-    private static class NewStandardCommercialLicense
+    private static class NewCommercialLicense
     {
-        public static void main(String[] args)
+        public void generateKey(String companyName, LicenseType type)
         {
-            String companyName = "insert name here";
-
             // code, name, expiry
             SimpleDateFormat expiryFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
             Calendar oneYearFromToday = Calendar.getInstance();
             oneYearFromToday.add(Calendar.YEAR, 1);
 
-            LicenseEncoder.main(new String[]{LicenseType.STANDARD.toString(), companyName, expiryFormat.format(oneYearFromToday.getTime())});
+            LicenseEncoder.main(new String[]{type.toString(), companyName, expiryFormat.format(oneYearFromToday.getTime())});
+        }
+    }
+
+    private static class NewStandardLicense extends NewCommercialLicense
+    {
+        public void generateKey(String companyName)
+        {
+            super.generateKey(companyName, LicenseType.STANDARD);
+        }
+
+        public static void main(String[] args)
+        {
+            String companyName = "insert name here";
+
+            new NewStandardLicense().generateKey(companyName);
+        }
+    }
+
+    private static class NewProfessionalLicense extends NewCommercialLicense
+    {
+        public void generateKey(String companyName)
+        {
+            super.generateKey(companyName, LicenseType.PROFESSIONAL);
+        }
+
+        public static void main(String[] args)
+        {
+            String companyName = "insert name here";
+
+            new NewStandardLicense().generateKey(companyName);
         }
     }
 }
