@@ -16,6 +16,7 @@ import javax.servlet.http.HttpSession;
 public class LogoutAction extends ActionSupport
 {
     private ConfigurationManager configurationManager;
+    private static final String ROOT_CONTEXT = "/";
 
     public String execute()
     {
@@ -26,7 +27,11 @@ public class LogoutAction extends ActionSupport
         // set a new acegi remember me cookie that expires immediately.
         Cookie terminate = new Cookie(TokenBasedRememberMeServices.ACEGI_SECURITY_HASHED_REMEMBER_ME_COOKIE_KEY, null);
         terminate.setMaxAge(0);
-        terminate.setPath(getContextPath());
+        String contextPath = getContextPath();
+        if (!contextPath.equals(ROOT_CONTEXT))
+        {
+            terminate.setPath(contextPath);
+        }
 
         HttpServletResponse response = ServletActionContext.getResponse();
         response.addCookie(terminate);
