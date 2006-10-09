@@ -116,9 +116,25 @@ public class TestResultSummary extends Entity
         addTotal(summary.total);
     }
 
+    /**
+     * This method indicates whether or not this test result summary contains any test results.
+     *
+     * @return true if the number of tests in this summary is greater than zero, false otherwise.
+     */
+    public boolean hasTests()
+    {
+        return total > 0;
+    }
+
     public String getSuccessRate()
     {
-        double rate = getPassed() * 100.0 / total;
+        // default the success rate to zero. If we have some tests (usually the case but not always),
+        // then determine the percentage. 
+        double rate = 0D;
+        if (hasTests())
+        {
+            rate = getPassed() * 100.0 / total;
+        }
         return String.format("%.2f", rate);
     }
 }
