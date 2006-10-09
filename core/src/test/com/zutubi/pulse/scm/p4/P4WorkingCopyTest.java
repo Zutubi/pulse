@@ -50,6 +50,7 @@ public class P4WorkingCopyTest extends PulseTestCase implements PersonalBuildUI
         p4dProcess.waitFor();
         
         p4dProcess = Runtime.getRuntime().exec(new String[] { "p4d", "-r", repoDir.getAbsolutePath()});
+        waitForServer(1666);
 
         createClients();
 
@@ -70,6 +71,7 @@ public class P4WorkingCopyTest extends PulseTestCase implements PersonalBuildUI
         client.setEnv(ENV_CLIENT, CLIENT_NAME);
         client.setEnv(ENV_PORT, ":1666");
         client.setEnv(ENV_USER, "test-user");
+        client.setEnv("PWD", clientRoot.getAbsolutePath());
         client.setWorkingDir(clientRoot);
 
         client.createClient("client-1", CLIENT_NAME, clientRoot);
@@ -82,6 +84,7 @@ public class P4WorkingCopyTest extends PulseTestCase implements PersonalBuildUI
         otherClient.setEnv(ENV_CLIENT, OTHER_CLIENT_NAME);
         otherClient.setEnv(ENV_PORT, ":1666");
         otherClient.setEnv(ENV_USER, "test-user");
+        otherClient.setEnv("PWD", otherClientRoot.getAbsolutePath());
         otherClient.setWorkingDir(otherClientRoot);
 
         otherClient.createClient("client-1", OTHER_CLIENT_NAME, otherClientRoot);

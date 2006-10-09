@@ -7,6 +7,8 @@ import junit.framework.AssertionFailedError;
 import junit.framework.TestCase;
 
 import java.io.*;
+import java.net.InetSocketAddress;
+import java.net.Socket;
 import java.net.URL;
 import java.util.*;
 
@@ -312,5 +314,37 @@ public abstract class PulseTestCase extends TestCase
     public static void assertEndsWith(String a, String b)
     {
         assertTrue("'" + b + "' does not end with '" + a + "'", b.endsWith(a));
+    }
+
+    protected void waitForServer(int port) throws IOException
+    {
+        int retries = 0;
+
+        while(true)
+        {
+            Socket sock = new Socket();
+            try
+            {
+                sock.connect(new InetSocketAddress(port));
+                break;
+            }
+            catch (IOException e)
+            {
+                if(retries++ < 10)
+                {
+                    try
+                    {
+                        Thread.sleep(100);
+                    }
+                    catch (InterruptedException e1)
+                    {
+                    }
+                }
+                else
+                {
+                    throw new RuntimeException("Server did not start");
+                }
+            }
+        }
     }
 }
