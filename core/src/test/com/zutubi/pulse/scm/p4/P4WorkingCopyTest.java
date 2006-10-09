@@ -23,7 +23,6 @@ public class P4WorkingCopyTest extends PulseTestCase implements PersonalBuildUI
     private static final String HEAD_REVISION = "2";
 
     private File tempDir;
-    private File repoDir;
     private Process p4dProcess;
     private File clientRoot;
     private P4Client client;
@@ -40,12 +39,16 @@ public class P4WorkingCopyTest extends PulseTestCase implements PersonalBuildUI
     {
         tempDir = FileSystemUtils.createTempDirectory(P4WorkingCopyTest.class.getName(), "");
         tempDir = tempDir.getCanonicalFile();
-        repoDir = new File(tempDir, "repo");
+        File repoDir = new File(tempDir, "repo");
         repoDir.mkdir();
 
         File repoZip = getTestDataFile("core", "repo", "zip");
         FileSystemUtils.extractZip(repoZip, repoDir);
 
+        // Restore from checkpoint
+        p4dProcess = Runtime.getRuntime().exec(new String[] { "p4d", "-r", repoDir.getAbsolutePath(), "-jr", "checkpoint.1"});
+        p4dProcess.waitFor();
+        
         p4dProcess = Runtime.getRuntime().exec(new String[] { "p4d", "-r", repoDir.getAbsolutePath()});
 
         createClients();
