@@ -28,11 +28,11 @@ public class SubscriptionForm extends BaseForm
 
     public String[] getFieldNames()
     {
-        return new String[] { "contactPointId", "projects", "condition" };
+        return new String[] { "contactPointId", "personal", "projects", "condition" };
     }
 
     public int[] getFieldTypes()
     {
-        return new int[] { SELECT, MULTI_SELECT, SELECT };
+        return new int[] { SELECT, RADIOBOX, MULTI_SELECT, SELECT };
     }
 }

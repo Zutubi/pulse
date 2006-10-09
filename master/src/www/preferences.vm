@@ -75,7 +75,7 @@
                     #headingRow("subscriptions" 5)
                     <tr>
                         #contentHeading("subscription.contact" 1)
-                        #contentHeading("subscription.projects" 1)
+                        #contentHeading("subscription.to" 1)
                         #contentHeading("subscription.condition" 1)
                         #contentHeading("actions" 2)
                     </tr>
@@ -87,12 +87,16 @@
                     <tr>
                         #dynamicCell($contact.name)
                         <td class="content">
-    #if($projects.size() > 0)
-        #foreach($project in $projects)
-                            $!webwork.htmlEncode($project.name)<br/>
-        #end
+    #if($subscription.personal)
+                            #wwtext("name=subscription.personal")
     #else
+        #if($projects.size() > 0)
+            #foreach($project in $projects)
+                            $!webwork.htmlEncode($project.name)<br/>
+            #end
+        #else
                             #wwtext("name=subscription.projects.all")
+        #end
     #end
                         </td>
                         #dynamicCell($subscription.condition)

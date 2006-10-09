@@ -31,7 +31,13 @@ public class Subscription extends Entity
     private ContactPoint contactPoint;
 
     /**
-     * Condition to be satisfied before notifying.
+     * Indicates the type of subscription: personal builds or project builds.
+     */
+    boolean personal;
+
+    /**
+     * Condition to be satisfied before notifying.  Not currently used for
+     * personal builds.
      */
     private String condition;
 
@@ -41,6 +47,9 @@ public class Subscription extends Entity
      */
     private List<Project> projects = new LinkedList<Project>();
 
+    /**
+     * Cache of the parsed and modelled condition.
+     */
     private NotifyCondition notifyCondition = null;
 
     /**
@@ -109,6 +118,16 @@ public class Subscription extends Entity
         this.contactPoint = contactPoint;
     }
 
+    public boolean isPersonal()
+    {
+        return personal;
+    }
+
+    public void setPersonal(boolean personal)
+    {
+        this.personal = personal;
+    }
+
     public List<Project> getProjects()
     {
         return projects;
@@ -144,7 +163,14 @@ public class Subscription extends Entity
      */
     public boolean conditionSatisfied(BuildResult result)
     {
-        return !result.isPersonal() && getNotifyCondition().satisfied(result, contactPoint.getUser());
+        if(result.isPersonal())
+        {
+            return contactPoint.getUser().equals(result.getOwner());
+        }
+        else
+        {
+            return getNotifyCondition().satisfied(result, contactPoint.getUser());
+        }
     }
 
     /**

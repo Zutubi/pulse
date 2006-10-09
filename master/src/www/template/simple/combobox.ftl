@@ -2,6 +2,9 @@
 <br/>
 <#if parameters.list?exists>
 <select onChange="this.form.elements['${parameters.name?html}'].value=this.options[this.selectedIndex].value"<#rt/>
+    <#if parameters.id?exists>
+ id="${parameters.id?html}_select"<#rt/>
+    </#if>
     <#if parameters.disabled?exists && parameters.disabled>
  disabled="disabled"<#rt/>
     </#if>
