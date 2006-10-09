@@ -1812,6 +1812,13 @@
     <td class="test-failure">
         #wwtext("name=test.failure")
     </td>
+    #elseif($tests.total == 0)
+    <td>
+        <img alt="success" src="$base/images/none_blue.gif"/>
+    </td>
+    <td>
+        #wwtext("name=test.none")
+    </td>
     #else
     <td class="success">
         <img alt="success" src="$base/images/accept.gif"/>

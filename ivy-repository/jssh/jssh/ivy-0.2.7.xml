@@ -6,7 +6,7 @@
 
         <license name="Apache Software License" url="..."/>
         <license name="GPL" url="..."/>
-        <license name="LGPL" url="..."/>
+        <license name="LGPL" url="http://www.gnu.org/licenses/lgpl.html"/>
 
         <description homepage="http://sourceforge.net/projects/sshtools/">
             Java SSH API
