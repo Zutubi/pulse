@@ -20,8 +20,10 @@ public class SubscriptionActionSupport extends UserActionSupport
     private ProjectManager projectManager;
 
     protected long contactPointId;
+    protected String personal = "false";
     protected String condition = "true";
 
+    protected Map<String, String> personals;
     protected Map<String, String> conditions;
     protected Map<Long, String> allProjects;
     protected Map<Long, String> contactPoints;
@@ -29,8 +31,18 @@ public class SubscriptionActionSupport extends UserActionSupport
     protected User user;
     protected ContactPoint contactPoint;
     protected List<Long> projects = new LinkedList<Long>();
-;
+
     private NotifyConditionFactory notifyConditionFactory;
+
+    public String getPersonal()
+    {
+        return personal;
+    }
+
+    public void setPersonal(String personal)
+    {
+        this.personal = personal;
+    }
 
     public long getContactPointId()
     {
@@ -60,6 +72,18 @@ public class SubscriptionActionSupport extends UserActionSupport
     public void setCondition(String condition)
     {
         this.condition = condition;
+    }
+
+    public Map<String, String> getPersonals()
+    {
+        if(personals == null)
+        {
+            personals = new LinkedHashMap<String, String>(2);
+            personals.put("false", "project builds");
+            personals.put("true", "personal builds");
+        }
+
+        return personals;
     }
 
     public Map getConditions()
@@ -149,34 +173,37 @@ public class SubscriptionActionSupport extends UserActionSupport
             addFieldError("contactPointId", "Unknown contact point '" + contactPointId + "' for user '" + user.getName() + "'");
         }
 
-        // Parse the condition
-        try
+        if(!Boolean.parseBoolean(personal))
         {
-            NotifyConditionLexer lexer = new NotifyConditionLexer(new StringReader(condition));
-            NotifyConditionParser parser = new NotifyConditionParser(lexer);
-            parser.orexpression();
-            AST t = parser.getAST();
-            if(t != null)
+            // Parse the condition
+            try
             {
-                NotifyConditionTreeParser tree = new NotifyConditionTreeParser();
-                tree.setNotifyConditionFactory(notifyConditionFactory);
-                tree.cond(t);
+                NotifyConditionLexer lexer = new NotifyConditionLexer(new StringReader(condition));
+                NotifyConditionParser parser = new NotifyConditionParser(lexer);
+                parser.orexpression();
+                AST t = parser.getAST();
+                if(t != null)
+                {
+                    NotifyConditionTreeParser tree = new NotifyConditionTreeParser();
+                    tree.setNotifyConditionFactory(notifyConditionFactory);
+                    tree.cond(t);
+                }
             }
-        }
-        catch(MismatchedTokenException mte)
-        {
-            if(mte.token.getText() == null)
+            catch(MismatchedTokenException mte)
             {
-                addFieldError("condition", "line " + mte.getLine() + ":" + mte.getColumn() + ": end of input when expecting " + NotifyConditionParser._tokenNames[mte.expecting]);
+                if(mte.token.getText() == null)
+                {
+                    addFieldError("condition", "line " + mte.getLine() + ":" + mte.getColumn() + ": end of input when expecting " + NotifyConditionParser._tokenNames[mte.expecting]);
+                }
+                else
+                {
+                    addFieldError("condition", mte.toString());
+                }
             }
-            else
+            catch (Exception e)
             {
-                addFieldError("condition", mte.toString());
+                addFieldError("condition", e.toString());
             }
-        }
-        catch (Exception e)
-        {
-            addFieldError("condition", e.toString());
         }
     }
 

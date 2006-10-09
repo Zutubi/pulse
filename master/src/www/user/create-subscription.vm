@@ -4,6 +4,16 @@
 <html>
 <head>
     <title>#wwtext("name=subscription.create")</title>
+    <script type="text/javascript">
+        <!--
+        function setEnableStates()
+        {
+            setEnableState('subscription.create_projects', 'personalfalse');
+            setEnableState('subscription.create_condition', 'personalfalse');
+            setEnableState('subscription.create_condition_select', 'personalfalse');
+        }
+        -->
+    </script>
 </head>
 <content tag="action">subscription.create</content>
 <body>
@@ -17,12 +27,13 @@
     #wwcform("action=createSubscription.action" "id=subscription.create" "heading=%{getText('subscription.create')}" "method=post")
         #wwhidden("name=userId")
 
-        #wwselect("name=contactPointId" "label=%{getText('subscription.contact')}" "list=contactPoints" "required=true" "tabindex=1")
-        #wwselect("name=projects" "label=%{getText('subscription.projects')}" "list=allProjects" "multiple=true" "tabindex=2")
+        #wwselect("name=contactPointId" "label=%{getText('subscription.contact')}" "list=contactPoints" "tabindex=1")
+        #wwradio("name=personal" "label=%{getText('subscription.type')}" "list=personals" "tabindex=2" "onclick=setEnableStates()")
+        #wwselect("name=projects" "label=%{getText('subscription.projects')}" "list=allProjects" "multiple=true" "tabindex=3")
         #inlineHelp("subscription.projects.help")
-        #wwcombobox("name=condition" "list=conditions" "listKey=key" "listValue=value" "size=50" "label=%{getText('subscription.condition')}" "tabindex=3")
+        #wwcombobox("name=condition" "list=conditions" "listKey=key" "listValue=value" "size=50" "label=%{getText('subscription.condition')}" "tabindex=4")
         #inlineHelp("condition.help")
-        #saveCancel(4)
+        #saveCancel(5)
     #end
 
     </td><td class="columns">

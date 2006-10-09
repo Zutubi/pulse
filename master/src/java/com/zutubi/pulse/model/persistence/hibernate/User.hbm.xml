@@ -118,6 +118,8 @@
             <generator class="hilo"/>
         </id>
 
+        <property name="personal" column="PERSONAL" type="boolean"/>
+
         <property name="condition" column="CONDITION" type="string" length="255"/>
 
         <bag name="projects" table="SUBSCRIPTION_PROJECTS" cascade="none" lazy="false">

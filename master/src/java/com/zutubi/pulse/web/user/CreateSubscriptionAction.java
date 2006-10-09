@@ -1,11 +1,9 @@
 package com.zutubi.pulse.web.user;
 
-import com.zutubi.pulse.jabber.JabberManager;
-import com.zutubi.pulse.bootstrap.MasterConfigurationManager;
-import com.zutubi.pulse.model.*;
 import com.opensymphony.util.TextUtils;
-
-import java.util.LinkedList;
+import com.zutubi.pulse.bootstrap.MasterConfigurationManager;
+import com.zutubi.pulse.jabber.JabberManager;
+import com.zutubi.pulse.model.Subscription;
 
 /**
  *
@@ -50,8 +48,16 @@ public class CreateSubscriptionAction extends SubscriptionActionSupport
     public String execute()
     {
         Subscription subscription = new Subscription(contactPoint);
-        updateProjects(subscription);
-        subscription.setCondition(condition);
+        if(Boolean.parseBoolean(personal))
+        {
+            subscription.setPersonal(true);    
+        }
+        else
+        {
+            updateProjects(subscription);
+            subscription.setCondition(condition);
+        }
+
         getSubscriptionManager().save(subscription);
         return SUCCESS;
     }

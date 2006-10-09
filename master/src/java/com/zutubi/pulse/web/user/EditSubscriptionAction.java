@@ -34,6 +34,7 @@ public class EditSubscriptionAction extends SubscriptionActionSupport
             return ERROR;
         }
 
+        personal = Boolean.toString(subscription.isPersonal());
         populateProjects(subscription);
         contactPointId = subscription.getContactPoint().getId();
         condition = subscription.getCondition();
@@ -60,9 +61,21 @@ public class EditSubscriptionAction extends SubscriptionActionSupport
 
     public String execute()
     {
-        updateProjects(subscription);
         subscription.setContactPoint(contactPoint);
-        subscription.setCondition(condition);
+        boolean p = Boolean.parseBoolean(personal);
+        subscription.setPersonal(p);
+
+        if(p)
+        {
+            subscription.getProjects().clear();
+            subscription.setCondition("true");
+        }
+        else
+        {
+            updateProjects(subscription);
+            subscription.setCondition(condition);
+        }
+        
         getSubscriptionManager().save(subscription);
         return SUCCESS;
     }

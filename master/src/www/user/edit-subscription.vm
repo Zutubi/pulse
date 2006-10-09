@@ -4,6 +4,16 @@
 <html>
 <head>
     <title>#wwtext("name=subscription.edit")</title>
+    <script type="text/javascript">
+        <!--
+        function setEnableStates()
+        {
+            setEnableState('subscription.edit_projects', 'personalfalse');
+            setEnableState('subscription.edit_condition', 'personalfalse');
+            setEnableState('subscription.edit_condition_select', 'personalfalse');
+        }
+        -->
+    </script>
 </head>
 <body>
     #dashboardTabs("preferences")
@@ -17,11 +27,12 @@
         #wwhidden("name=id")
 
         #wwselect("name=contactPointId" "label=%{getText('subscription.contact')}" "list=contactPoints" "required=true" "tabindex=1")
-        #wwselect("name=projects" "label=%{getText('subscription.projects')}" "list=allProjects" "multiple=true" "tabindex=2")
+        #wwradio("name=personal" "label=%{getText('subscription.type')}" "list=personals" "tabindex=2" "onclick=setEnableStates()")
+        #wwselect("name=projects" "label=%{getText('subscription.projects')}" "list=allProjects" "multiple=true" "tabindex=3")
         #inlineHelp("subscription.projects.help")
-        #wwcombobox("name=condition" "list=conditions" "listKey=key" "listValue=value" "size=50" "label=%{getText('subscription.condition')}" "tabindex=3")
+        #wwcombobox("name=condition" "list=conditions" "listKey=key" "listValue=value" "size=50" "label=%{getText('subscription.condition')}" "tabindex=4")
         #inlineHelp("condition.help")
-        #saveCancel(4)
+        #saveCancel(5)
     #end
 
     </td><td class="columns">
@@ -30,6 +41,12 @@
 
     </td></tr>
 </table>
+
+    <script type="text/javascript">
+        <!--
+        setEnableStates();
+        -->
+    </script>
 
     #tabEnd()
 </body>
