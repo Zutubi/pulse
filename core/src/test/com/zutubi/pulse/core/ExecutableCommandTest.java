@@ -240,6 +240,22 @@ public class ExecutableCommandTest extends PulseTestCase
 
     }
 
+    public void testResourcePathsAddedToEnvironment() throws IOException
+    {
+        ExecutableCommand command = new ExecutableCommand();
+        Scope scope = new Scope();
+        ResourceProperty rp = new ResourceProperty("java.bin.dir", "somedir", false, true);
+        scope.add(rp);
+        command.setScope(scope);
+        command.setExe("echo");
+
+        CommandResult result = new CommandResult("success");
+        execute(command, result, 1234);
+
+        String output = getEnv();
+        assertTrue(output.contains("PATH=somedir" + File.pathSeparator));
+    }
+
     private String getOutput() throws IOException
     {
         return IOUtils.fileToString(new File(outputDirectory, ExecutableCommand.OUTPUT_NAME + "/output.txt"));
