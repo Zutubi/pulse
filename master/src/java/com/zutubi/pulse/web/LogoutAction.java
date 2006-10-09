@@ -1,6 +1,8 @@
 package com.zutubi.pulse.web;
 
 import com.opensymphony.webwork.ServletActionContext;
+import com.zutubi.pulse.bootstrap.ConfigurationManager;
+import com.zutubi.pulse.bootstrap.MasterConfigurationManager;
 import org.acegisecurity.ui.rememberme.TokenBasedRememberMeServices;
 
 import javax.servlet.http.Cookie;
@@ -13,7 +15,7 @@ import javax.servlet.http.HttpSession;
  */
 public class LogoutAction extends ActionSupport
 {
-    private static final String ROOT_CONTEXT = "/";
+    private ConfigurationManager configurationManager;
 
     public String execute()
     {
@@ -24,11 +26,26 @@ public class LogoutAction extends ActionSupport
         // set a new acegi remember me cookie that expires immediately.
         Cookie terminate = new Cookie(TokenBasedRememberMeServices.ACEGI_SECURITY_HASHED_REMEMBER_ME_COOKIE_KEY, null);
         terminate.setMaxAge(0);
-//        terminate.setPath(ROOT_CONTEXT);
+        terminate.setPath(getContextPath());
 
         HttpServletResponse response = ServletActionContext.getResponse();
         response.addCookie(terminate);
 
         return SUCCESS;
+    }
+
+    protected String getContextPath()
+    {
+        return configurationManager.getSystemConfig().getContextPath();
+    }
+
+    /**
+     * Required resource.
+     *
+     * @param configurationManager
+     */
+    public void setConfigurationManager(MasterConfigurationManager configurationManager)
+    {
+        this.configurationManager = configurationManager;
     }
 }
