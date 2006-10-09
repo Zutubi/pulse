@@ -206,7 +206,7 @@ pre.feature {
             [@dynamicCell cc=change.revision.revisionString/]
             [@dynamicCell cc=change.user/]
             [@dynamicCell cc=change.prettyTime/]
-            [@dynamicCell cc=renderer.trimmedString(change.comment, 60)/]
+            [@contentCell cc=renderer.transformComment(change)/]
             [@linkCell cc="view" url="${baseUrl}/viewChangelist.action?id=${change.id?c}&amp;buildId=${result.id?c}"/]
         </tr>
         [/#list]

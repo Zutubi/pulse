@@ -3,8 +3,10 @@ package com.zutubi.pulse.renderer;
 import com.zutubi.pulse.core.model.Changelist;
 import com.zutubi.pulse.core.model.Feature;
 import com.zutubi.pulse.model.BuildResult;
+import com.zutubi.pulse.model.ProjectManager;
 import com.zutubi.pulse.util.StringUtils;
 import com.zutubi.pulse.util.logging.Logger;
+import com.zutubi.pulse.web.project.CommitMessageHelper;
 import freemarker.template.Configuration;
 import freemarker.template.Template;
 
@@ -21,6 +23,8 @@ public class FreemarkerBuildResultRenderer implements BuildResultRenderer
     private static final Logger LOG = Logger.getLogger(FreemarkerBuildResultRenderer.class);
 
     private Configuration freemarkerConfiguration;
+    private CommitMessageHelper commitMessageHelper;
+    private ProjectManager projectManager;
 
     public void render(String baseUrl, BuildResult result, List<Changelist> changelists, String type, Writer writer)
     {
@@ -58,8 +62,28 @@ public class FreemarkerBuildResultRenderer implements BuildResultRenderer
         return StringUtils.wrapString(s, 64, prefix);
     }
 
+    public String transformComment(Changelist changelist)
+    {
+        if(commitMessageHelper == null)
+        {
+            commitMessageHelper = new CommitMessageHelper(projectManager.getCommitMessageTransformers());
+        }
+
+        return commitMessageHelper.applyTransforms(changelist, 60);
+    }
+
     public void setFreemarkerConfiguration(Configuration freemarkerConfiguration)
     {
         this.freemarkerConfiguration = freemarkerConfiguration;
+    }
+
+    public void setCommitMessageHelper(CommitMessageHelper commitMessageHelper)
+    {
+        this.commitMessageHelper = commitMessageHelper;
+    }
+
+    public void setProjectManager(ProjectManager projectManager)
+    {
+        this.projectManager = projectManager;
     }
 }

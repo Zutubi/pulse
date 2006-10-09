@@ -4,11 +4,13 @@ import com.zutubi.pulse.core.model.*;
 import com.zutubi.pulse.model.*;
 import com.zutubi.pulse.test.PulseTestCase;
 import com.zutubi.pulse.util.IOUtils;
+import com.zutubi.pulse.web.project.CommitMessageHelper;
 import freemarker.template.Configuration;
 import freemarker.template.DefaultObjectWrapper;
 
 import java.io.*;
 import java.net.URISyntaxException;
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -31,6 +33,11 @@ public class FreemarkerBuildResultRendererTest extends PulseTestCase
         freemarkerConfiguration.setObjectWrapper(new DefaultObjectWrapper());
         freemarkerConfiguration.addAutoInclude("macro.ftl");
         renderer.setFreemarkerConfiguration(freemarkerConfiguration);
+
+        CommitMessageTransformer tx = new CommitMessageTransformer("wow", "(CIB-[0-9]+)", "http://jira.zutubi.com/browse/$1");
+        List<CommitMessageTransformer> txs = new ArrayList<CommitMessageTransformer>(1);
+        txs.add(tx);
+        renderer.setCommitMessageHelper(new CommitMessageHelper(txs));
     }
 
     protected void tearDown() throws Exception
@@ -56,6 +63,14 @@ public class FreemarkerBuildResultRendererTest extends PulseTestCase
     public void testWithErrors() throws Exception
     {
         errorsHelper("plain");
+    }
+
+    public void testHTMLWithChanges() throws Exception
+    {
+        List<Changelist> changes = getChanges();
+        BuildResult result = createBuildWithChanges(changes);
+
+        createAndVerify("changes", "html", "http://another.url", result, changes);
     }
 
     public void testHTMLWithErrors() throws Exception
@@ -191,7 +206,7 @@ public class FreemarkerBuildResultRendererTest extends PulseTestCase
     private List<Changelist> getChanges()
     {
         List<Changelist> changes = new LinkedList<Changelist>();
-        Changelist list = new Changelist("scm", new Revision("test author", "short comment", 324252, "655"));
+        Changelist list = new Changelist("scm", new Revision("test author", "CIB-1: short comment", 324252, "655"));
         changes.add(list);
         list = new Changelist("scm", new Revision("author2", "this time we will use a longer comment to make sure that the renderer is applying some sort of trimming to the resulting output dadada da dadad ad ad adadad ad ad ada d adada dad ad ad d ad ada da d", 310000, "656"));
         changes.add(list);
