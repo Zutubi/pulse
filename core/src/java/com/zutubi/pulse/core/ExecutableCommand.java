@@ -22,6 +22,7 @@ public class ExecutableCommand implements Command, ScopeAware
 
     public static final String OUTPUT_NAME = "command output";
     public static final String ENV_NAME = "environment";
+    private static final String ENV_PATH = "PATH";
 
     private String name;
     private String exe;
@@ -285,6 +286,14 @@ public class ExecutableCommand implements Command, ScopeAware
             {
                 childEnvironment.put(setting.getKey(), setting.getValue());
             }
+
+            String path = childEnvironment.get(ENV_PATH);
+            for(String dir: scope.getPathDirectories().values())
+            {
+                path = dir + File.pathSeparatorChar + path;
+            }
+
+            childEnvironment.put(ENV_PATH, path);
         }
 
         for (Environment setting : env)
