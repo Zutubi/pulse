@@ -90,7 +90,7 @@ public class P4WorkingCopy extends PersonalBuildSupport implements WorkingCopy
         client.runP4(false, null, P4_COMMAND, COMMAND_SYNC);
         // Post sync files my be unresolved.  Use CVS/Subversion style
         // automatic merging to try and resolve such files.
-        client.runP4(null, P4_COMMAND, COMMAND_RESOLVE, FLAG_AUTO_MERGE);
+        client.runP4(false, null, P4_COMMAND, COMMAND_RESOLVE, FLAG_AUTO_MERGE);
     }
 
     P4Client getClient()
