@@ -3,7 +3,7 @@
 <ivy-module version="1.0">
 
     <info organisation="jfree" revision="1.0.2" module="jfreechart" status="release">
-        <license name="..."/>
+        <license name="LGPL" url="http://www.gnu.org/licenses/lgpl.html"/>
         <description homepage="http://www.jfreechart.org/">
             A free Java chart library. JFreeChart supports pie charts (2D and 3D), bar charts
             (horizontal and vertical, regular and stacked), line charts, scatter plots, time
