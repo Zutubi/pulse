@@ -48,7 +48,7 @@ public class GeneralConfigurationAcceptanceTest extends BaseAcceptanceTestCase
         GeneralConfigurationForm form = new GeneralConfigurationForm(tester);
 
         form.assertFormPresent();
-        form.saveFormElements("http://saved.base.url.net", "saved.help.url", "true", "true", "false", "4", "true", "0");
+        form.saveFormElements("http://saved.base.url.net", "saved.help.url", "true", "false", "false", "4", "true", "0");
 
         form.assertFormNotPresent();
 
@@ -58,7 +58,7 @@ public class GeneralConfigurationAcceptanceTest extends BaseAcceptanceTestCase
 
         clickLink("general.edit");
         form.assertFormPresent();
-        form.assertFormElements("http://saved.base.url.net", "saved.help.url", "true", "true", "false", "4", "true", "0");
+        form.assertFormElements("http://saved.base.url.net", "saved.help.url", "true", "false", "false", "4", "true", "0");
     }
 
     public void testCancel() throws Exception
@@ -72,7 +72,7 @@ public class GeneralConfigurationAcceptanceTest extends BaseAcceptanceTestCase
         GeneralConfigurationForm form = new GeneralConfigurationForm(tester);
         form.assertFormPresent();
 
-        form.cancelFormElements("http://cancelled.base.url.net", "cancelled.help.url", "true", "true", "false", "5", "true", "100");
+        form.cancelFormElements("http://cancelled.base.url.net", "cancelled.help.url", "true", "false", "false", "5", "true", "100");
         form.assertFormNotPresent();
 
         assertTextNotPresent("http://cancelled.base.url.net");
