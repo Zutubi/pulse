@@ -55,6 +55,8 @@ public interface MasterConfiguration extends LogConfiguration
 
     public static final String ANONYMOUS_ACCESS_ENABLED = "anon.enabled";
 
+    public static final String ANONYMOUS_SIGNUP_ENABLED = "signup.enabled";
+
     //---( scm integration )---
     public static final String SCM_POLLING_INTERVAL = "scm.polling.interval";
 
@@ -132,6 +134,10 @@ public interface MasterConfiguration extends LogConfiguration
     Boolean getAnonymousAccessEnabled();
 
     void setAnonymousAccessEnabled(Boolean anonEnabled);
+
+    Boolean getAnonymousSignupEnabled();
+
+    void setAnonymousSignupEnabled(Boolean signupEnabled);
 
     Boolean getLdapEnabled();
 

@@ -76,6 +76,20 @@ public abstract class BaseAcceptanceTestCase extends ExtendedWebTestCase
         clickLink("logout");
     }
 
+    protected void ensureLoggedOut()
+    {
+        beginAt("/");
+        if (isLinkPresent("logout"))
+        {
+            clickLink("logout");
+        }
+    }
+
+    protected boolean isLinkPresent(String linkId)
+    {
+        return tester.getDialog().isLinkPresent(linkId);
+    }
+
     protected boolean hasLinkWithText(String text) throws Exception
     {
         return tester.getDialog().getResponse().getLinkWith(text) != null;
@@ -146,8 +160,14 @@ public abstract class BaseAcceptanceTestCase extends ExtendedWebTestCase
     protected void navigateToUserAdministration()
     {
         gotoPage("/");
-        clickLinkWithText("administration");
+        clickLink("tab.administration");
         clickLinkWithText("users");
+    }
+
+    protected void navigateToGeneralConfiguration()
+    {
+        beginAt("/");
+        clickLink("tab.administration");
     }
 
     protected void submitAntSetupForm()

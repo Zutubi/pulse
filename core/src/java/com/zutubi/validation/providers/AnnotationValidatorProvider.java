@@ -33,7 +33,7 @@ public class AnnotationValidatorProvider implements ValidatorProvider
 
     public List<Validator> getValidators(Object obj)
     {
-        return traverse(obj.getClass(), new HashSet());
+        return traverse(obj.getClass(), new HashSet<Class>());
     }
 
     public List<Validator> traverse(Class clazz, Set<Class> checked)

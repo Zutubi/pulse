@@ -20,5 +20,11 @@
         #closeSubmit()
     #end
 
+    #if ($config.anonymousSignupEnabled)
+    <p>
+        Not a member? <a id="signup" href="signup!input.action">Signup</a> for an account.
+    </p>
+    #end
+
 </body>
 </html>

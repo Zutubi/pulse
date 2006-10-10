@@ -257,6 +257,7 @@ The beans defined within the security subsystem need not be accessed by other co
                 PATTERN_TYPE_APACHE_ANT
                 /switchuser.vm=ROLE_ADMINISTRATOR
                 /j_acegi_switch_user=ROLE_ADMINISTRATOR
+                /signup*.action*=ROLE_ANONYMOUS
                 /login.action*=ROLE_ANONYMOUS,ROLE_GUEST,ROLE_USER
                 /logout.action=ROLE_ANONYMOUS,ROLE_GUEST,ROLE_USER
                 /=ROLE_USER,ROLE_GUEST

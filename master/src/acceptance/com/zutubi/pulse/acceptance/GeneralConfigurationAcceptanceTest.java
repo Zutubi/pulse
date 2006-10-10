@@ -112,10 +112,4 @@ public class GeneralConfigurationAcceptanceTest extends BaseAcceptanceTestCase
         assertTextPresent("timeout value must not be negative");
     }
 
-    private void navigateToGeneralConfiguration()
-    {
-        beginAt("/");
-        clickLinkWithText("Administration");
-    }
-
 }

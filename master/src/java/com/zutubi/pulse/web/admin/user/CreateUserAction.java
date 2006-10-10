@@ -13,7 +13,7 @@ import java.util.Arrays;
 @Licensed("canAddUser")
 public class CreateUserAction extends UserActionSupport
 {
-    private User newUser = new User();
+    protected User newUser = new User();
     private String confirm;
     private boolean ldapAuthentication = false;
     private int startPage = 0;

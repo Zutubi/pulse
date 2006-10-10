@@ -78,6 +78,11 @@ public abstract class BaseForm
     public void saveFormElements(String... args)
     {
         setFormElements(args);
+        save();
+    }
+
+    public void save()
+    {
         tester.submit("save");
     }
 

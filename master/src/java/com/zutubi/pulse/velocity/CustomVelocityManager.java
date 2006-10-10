@@ -34,6 +34,7 @@ public class CustomVelocityManager extends VelocityManager
         MasterConfiguration config = configManager.getAppConfig();
         context.put("helpUrl", config.getHelpUrl());
         context.put("rssEnabled", config.getRssEnabled());
+        context.put("config", config);
 
         String login = AcegiUtils.getLoggedInUser();
         if (login != null && getUserManager() != null)

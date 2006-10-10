@@ -19,11 +19,11 @@ public class GeneralConfigurationForm extends BaseForm
 
     public String[] getFieldNames()
     {
-        return new String[]{"baseUrl", "helpUrl", "rssEnabled", "anonEnabled", "scmPollingInterval", "recipeTimeoutEnabled", "recipeTimeout"};
+        return new String[]{"baseUrl", "helpUrl", "rssEnabled", "anonEnabled", "signupEnabled", "scmPollingInterval", "recipeTimeoutEnabled", "recipeTimeout"};
     }
 
     public int[] getFieldTypes()
     {
-        return new int[]{TEXTFIELD, TEXTFIELD, CHECKBOX, CHECKBOX, TEXTFIELD, CHECKBOX, TEXTFIELD};
+        return new int[]{TEXTFIELD, TEXTFIELD, CHECKBOX, CHECKBOX, CHECKBOX, TEXTFIELD, CHECKBOX, TEXTFIELD};
     }
 }
