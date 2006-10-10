@@ -16,6 +16,7 @@
 
     <decorator name="login" page="basic.vm">
         <pattern>/login*</pattern>
+        <pattern>/signup*</pattern>
     </decorator>
 
     <decorator name="basoc" page="basic.vm">

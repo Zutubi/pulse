@@ -19,6 +19,7 @@
                     #dynamicRow("general.help.url" $config.helpUrl)
                     #enabledDisabledRow("general.rss.enabled" $config.rssEnabled)
                     #enabledDisabledRow("general.anonymous" $config.anonymousAccessEnabled)
+                    #enabledDisabledRow("general.signup" $config.anonymousSignupEnabled)
                     #dynamicRow("scm.polling.interval" $config.scmPollingInterval)
                     #if($recipeTimeoutEnabled)
                         #set($timeoutValue = $action.getText('recipe.queue.timeout.value', [$config.unsatisfiableRecipeTimeout]))

@@ -3,11 +3,16 @@ package com.zutubi.pulse.personal;
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.io.xml.DomDriver;
 import com.zutubi.pulse.core.PulseException;
+import com.zutubi.pulse.core.model.CvsRevision;
+import com.zutubi.pulse.core.model.Entity;
+import com.zutubi.pulse.core.model.NumericalRevision;
+import com.zutubi.pulse.core.model.Revision;
 import com.zutubi.pulse.scm.FileStatus;
 import com.zutubi.pulse.scm.WorkingCopyStatus;
 import com.zutubi.pulse.util.FileSystemUtils;
 import com.zutubi.pulse.util.IOUtils;
 import com.zutubi.pulse.util.NullOutputStream;
+import com.zutubi.pulse.xstream.FileStatusConverter;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -70,7 +75,7 @@ public class PatchArchive
                 throw new PulseException("Missing meta entry in patch file '" + patchFile.getAbsolutePath() + "'");
             }
 
-            XStream xstream = new XStream(new DomDriver());
+            XStream xstream = createXStream();
             status = (WorkingCopyStatus) xstream.fromXML(zin);
         }
         catch(IOException e)
@@ -110,8 +115,24 @@ public class PatchArchive
     {
         ZipEntry entry = new ZipEntry("meta.xml");
         os.putNextEntry(entry);
-        XStream xstream = new XStream(new DomDriver());
+        XStream xstream = createXStream();
         xstream.toXML(status, os);
+    }
+
+    private XStream createXStream()
+    {
+        XStream xstream = new XStream(new DomDriver());
+        xstream.alias("status", WorkingCopyStatus.class);
+        xstream.alias("revision", Revision.class);
+        xstream.alias("numerical", NumericalRevision.class);
+        xstream.alias("cvs", CvsRevision.class);
+        xstream.omitField(Entity.class, "id");
+        xstream.alias("fileStatus", FileStatus.class);
+        xstream.addImplicitCollection(WorkingCopyStatus.class, "changes");
+        xstream.setMode(XStream.NO_REFERENCES);
+        xstream.registerConverter(new FileStatusConverter());
+        
+        return xstream;
     }
 
     private void addFiles(File base, ZipOutputStream os) throws IOException

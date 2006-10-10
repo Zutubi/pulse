@@ -19,6 +19,7 @@ public class GeneralConfigurationAction extends ActionSupport
     private String helpUrl;
     private boolean rssEnabled;
     private boolean anonEnabled;
+    private boolean signupEnabled;
     private Integer scmPollingInterval;
     private boolean recipeTimeoutEnabled;
     private Long recipeTimeout;
@@ -93,6 +94,16 @@ public class GeneralConfigurationAction extends ActionSupport
         this.anonEnabled = anonEnabled;
     }
 
+    public boolean isSignupEnabled()
+    {
+        return signupEnabled;
+    }
+
+    public void setSignupEnabled(boolean signupEnabled)
+    {
+        this.signupEnabled = signupEnabled;
+    }
+
     public Integer getScmPollingInterval()
     {
         return scmPollingInterval;
@@ -130,6 +141,7 @@ public class GeneralConfigurationAction extends ActionSupport
         config.setHelpUrl(null);
         config.setRssEnabled(null);
         config.setAnonymousAccessEnabled(null);
+        config.setAnonymousSignupEnabled(null);
         config.setScmPollingInterval(null);
         config.setUnsatisfiableRecipeTimeout(null);
 
@@ -143,6 +155,7 @@ public class GeneralConfigurationAction extends ActionSupport
         config.setHelpUrl(helpUrl);
         config.setRssEnabled(rssEnabled);
         config.setAnonymousAccessEnabled(anonEnabled);
+        config.setAnonymousSignupEnabled(signupEnabled);
         config.setScmPollingInterval(scmPollingInterval);
 
         if(recipeTimeoutEnabled)
@@ -175,6 +188,7 @@ public class GeneralConfigurationAction extends ActionSupport
         helpUrl = config.getHelpUrl();
         rssEnabled = config.getRssEnabled();
         anonEnabled = config.getAnonymousAccessEnabled();
+        signupEnabled = config.getAnonymousSignupEnabled();
         scmPollingInterval = config.getScmPollingInterval();
 
         long timeout = config.getUnsatisfiableRecipeTimeout();

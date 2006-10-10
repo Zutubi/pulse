@@ -180,6 +180,16 @@ public class MasterConfigurationSupport extends ConfigSupport implements MasterC
         setBooleanProperty(ANONYMOUS_ACCESS_ENABLED, anonEnabled);
     }
 
+    public Boolean getAnonymousSignupEnabled()
+    {
+        return getBooleanProperty(ANONYMOUS_SIGNUP_ENABLED, Boolean.FALSE);
+    }
+
+    public void setAnonymousSignupEnabled(Boolean signupEnabled)
+    {
+        setBooleanProperty(ANONYMOUS_SIGNUP_ENABLED, signupEnabled);
+    }
+
     public Boolean getLdapEnabled()
     {
         return getBooleanProperty(LDAP_ENABLED, false);
