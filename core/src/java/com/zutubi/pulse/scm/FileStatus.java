@@ -185,14 +185,30 @@ public class FileStatus
         return path;
     }
 
+    public void setPath(String path)
+    {
+        this.path = path;
+    }
+
     public State getState()
     {
         return state;
     }
 
+
+    public void setState(State state)
+    {
+        this.state = state;
+    }
+
     public boolean isDirectory()
     {
         return directory;
+    }
+
+    public void setDirectory(boolean directory)
+    {
+        this.directory = directory;
     }
 
     public boolean isOutOfDate()
