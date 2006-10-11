@@ -289,13 +289,19 @@ public class ExecutableCommand implements Command, ScopeAware
                 childEnvironment.put(setting.getKey(), setting.getValue());
             }
 
-            String path = childEnvironment.get(ENV_PATH);
+            /**
+             * Here, we are using a custom get property method that runs a case insensitive lookup of the ENV_PATH
+             * property. This is required because on Windows, the PATH variable is actually in the map as Path, and
+             * so is not matched. 
+             */
+            String translatedKey = translateKey(ENV_PATH, childEnvironment);
+            String path = childEnvironment.get(translatedKey);
+
             for(String dir: scope.getPathDirectories().values())
             {
                 path = dir + File.pathSeparatorChar + path;
             }
-
-            childEnvironment.put(ENV_PATH, path);
+            childEnvironment.put(translatedKey, path);
         }
 
         for (Environment setting : env)
@@ -307,6 +313,24 @@ public class ExecutableCommand implements Command, ScopeAware
         {
             childEnvironment.put("PULSE_BUILD_NUMBER", Long.toString(context.getBuildNumber()));
         }
+    }
+
+    /**
+     * Take the specified key, and find a case insensitive match in the maps key set. Return this match,
+     * or null if no match is found.
+     */
+    private String translateKey(String propertyName, Map<String, String> map)
+    {
+        // case insensitive lookup.
+        propertyName = propertyName.toLowerCase();
+        for (String key : map.keySet())
+        {
+            if (key.toLowerCase().equals(propertyName))
+            {
+                return key;
+            }
+        }
+        return null;
     }
 
     protected Scope getScope()
