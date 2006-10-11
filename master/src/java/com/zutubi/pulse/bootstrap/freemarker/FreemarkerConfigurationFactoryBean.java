@@ -45,6 +45,12 @@ public class FreemarkerConfigurationFactoryBean implements FactoryBean
         MasterConfigurationManager manager = (MasterConfigurationManager) ComponentContext.getBean("configurationManager");
 
         List<File> templateRoots = manager.getSystemPaths().getTemplateRoots();
+        File userTemplateRoot = manager.getUserPaths().getUserTemplateRoot();
+        if(userTemplateRoot.isDirectory())
+        {
+            templateRoots.add(0, userTemplateRoot);
+        }
+
         FileTemplateLoader loaders[] = new FileTemplateLoader[templateRoots.size()];
 
         for (int i = 0; i < loaders.length; i++)

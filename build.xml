@@ -97,6 +97,7 @@
         </copy>
 
         <copy todir="${version.root.local}/boot">
+            <fileset dir="core/etc" includes="*.commands.properties"/>
             <fileset dir="local/etc" includes="*.commands.properties"/>
             <fileset dir="local/etc" includes="classpath.txt"/>
         </copy>
@@ -122,7 +123,6 @@
     </target>
 
     <target name="package.slave" depends="init, clean, build.local, build.slave">
-
         <property name="package.name.slave" value="pulse-agent-${pulse.version}"/>
         <property name="package.root.slave" value="build/package/${package.name.slave}"/>
         <property name="version.root.slave" value="${package.root.slave}/versions/${pulse.build}"/>
@@ -137,6 +137,7 @@
 
         <copy todir="${package.root.slave}/bin">
             <fileset dir="core/src/bin" includes="**/*"/>
+            <fileset dir="local/src/bin" includes="**/*"/>
             <fileset dir="server-core/src/bin" includes="**/*"/>
         </copy>
 
@@ -188,6 +189,8 @@
         </copy>
 
         <copy todir="${version.root.slave}/boot">
+            <fileset dir="core/etc" includes="*.commands.properties"/>
+            <fileset dir="local/etc" includes="*.commands.properties"/>
             <fileset dir="server-core/etc" includes="*.commands.properties"/>
             <fileset dir="slave/etc" includes="classpath.txt"/>
         </copy>
@@ -313,6 +316,7 @@
         </copy>
 
         <copy todir="${version.root.master}/boot">
+            <fileset dir="core/etc" includes="*.commands.properties"/>
             <fileset dir="local/etc" includes="*.commands.properties"/>
             <fileset dir="server-core/etc" includes="*.commands.properties"/>
             <fileset dir="master/etc" includes="*.commands.properties"/>

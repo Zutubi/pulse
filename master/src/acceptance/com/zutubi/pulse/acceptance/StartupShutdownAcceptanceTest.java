@@ -4,6 +4,7 @@ import com.opensymphony.util.TextUtils;
 import com.zutubi.pulse.acceptance.forms.setup.PulseLicenseForm;
 import com.zutubi.pulse.acceptance.forms.setup.SetPulseDataForm;
 import com.zutubi.pulse.bootstrap.SystemConfiguration;
+import com.zutubi.pulse.command.BootContext;
 import com.zutubi.pulse.command.PingServerCommand;
 import com.zutubi.pulse.command.ShutdownCommand;
 import com.zutubi.pulse.command.StartCommand;
@@ -15,6 +16,7 @@ import net.sourceforge.jwebunit.WebTester;
 import org.apache.commons.cli.ParseException;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Properties;
@@ -290,7 +292,7 @@ public class StartupShutdownAcceptanceTest extends TestCase
      * running pulse instance.  We need to ensure that the file context is not
      * relied upon to interact with the running server.
      */
-    public void testShutdownWorksForIncorrectFileConfig() throws ParseException, InterruptedException
+    public void testShutdownWorksForIncorrectFileConfig() throws ParseException, InterruptedException, IOException
     {
         RuntimeContext cmdCtx = new RuntimeContext("8083", "/some/sort/of/crazy/context/path");
         cmdCtx.setDataDirectory(dataDir.getAbsolutePath());
@@ -389,6 +391,8 @@ public class StartupShutdownAcceptanceTest extends TestCase
     {
         StartCommand start = new StartCommand();
         List<String> args = new LinkedList<String>();
+
+        args.add("start");
         if (TextUtils.stringSet(ctx.getPort()))
         {
             args.add("-p");
@@ -409,14 +413,14 @@ public class StartupShutdownAcceptanceTest extends TestCase
             args.add("-f");
             args.add(ctx.getExternalConfig());
         }
-        start.parse(args.toArray(new String[args.size()]));
-        assertEquals(0, start.execute());
+        assertEquals(0, start.execute(getBootContext(args)));
     }
 
-    private void assertShutdownServer(RuntimeContext ctx) throws ParseException, InterruptedException
+    private void assertShutdownServer(RuntimeContext ctx) throws ParseException, InterruptedException, IOException
     {
         ShutdownCommand shutdown = new ShutdownCommand();
         List<String> args = new LinkedList<String>();
+        args.add("shutdown");
         if (TextUtils.stringSet(ctx.getPort()))
         {
             args.add("-p");
@@ -432,11 +436,15 @@ public class StartupShutdownAcceptanceTest extends TestCase
             args.add("-f");
             args.add(ctx.getExternalConfig());
         }
-        shutdown.parse(args.toArray(new String[args.size()]));
         shutdown.setExitJvm(false);
-        assertEquals(0, shutdown.execute());
+        assertEquals(0, shutdown.execute(getBootContext(args)));
 
         Thread.sleep(2000); // give pulse a chance to shutdown.
+    }
+
+    private BootContext getBootContext(List<String> args)
+    {
+        return new BootContext(null, args.toArray(new String[args.size()]), null, null, null);
     }
 
     private void assertExternalConfigNotAvailable(RuntimeContext ctx)

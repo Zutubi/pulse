@@ -1,7 +1,7 @@
 package com.zutubi.pulse.local;
 
-import com.zutubi.pulse.ResourceDiscoverer;
 import com.zutubi.pulse.BuildContext;
+import com.zutubi.pulse.ResourceDiscoverer;
 import com.zutubi.pulse.core.*;
 import com.zutubi.pulse.core.model.Resource;
 import com.zutubi.pulse.events.DefaultEventManager;
@@ -17,8 +17,7 @@ import java.util.List;
  */
 public class LocalBuild
 {
-
-    @SuppressWarnings({"ACCESS_STATIC_VIA_INSTANCE"})
+    @SuppressWarnings({ "ACCESS_STATIC_VIA_INSTANCE", "AccessStaticViaInstance" })
     public static void main(String argv[])
     {
         String pulseFile = "pulse.xml";
@@ -28,32 +27,20 @@ public class LocalBuild
 
         Options options = new Options();
 
-        options.addOption(OptionBuilder.withLongOpt("help")
-                .withDescription("display usage")
-                .create('h'));
-
         options.addOption(OptionBuilder.withLongOpt("output-dir")
-                .withArgName("dir")
                 .hasArg()
-                .withDescription("write output to specified directory [default: pulse.out]")
                 .create('o'));
 
         options.addOption(OptionBuilder.withLongOpt("pulse-file")
-                .withArgName("file")
                 .hasArg()
-                .withDescription("use specified pulse file [default: pulse.xml]")
                 .create('p'));
 
         options.addOption(OptionBuilder.withLongOpt("recipe")
-                .withArgName("recipe")
                 .hasArg()
-                .withDescription("execute recipe [default: the default recipe]")
                 .create('r'));
 
         options.addOption(OptionBuilder.withLongOpt("resources-file")
-                .withArgName("file")
                 .hasArg()
-                .withDescription("use resources file [default: <none>]")
                 .create('e'));
 
 
@@ -62,16 +49,10 @@ public class LocalBuild
         try
         {
             CommandLine commandLine = parser.parse(options, argv, true);
-            if(commandLine.hasOption('h'))
-            {
-                HelpFormatter formatter = new HelpFormatter();
-                formatter.printHelp("pulse-local", options);
-                System.exit(0);
-            }
 
-            if (commandLine.hasOption('b'))
+            if (commandLine.hasOption('p'))
             {
-                pulseFile = commandLine.getOptionValue('b');
+                pulseFile = commandLine.getOptionValue('p');
             }
 
             if (commandLine.hasOption('r'))
@@ -87,12 +68,6 @@ public class LocalBuild
             if (commandLine.hasOption('o'))
             {
                 outputDir = commandLine.getOptionValue('o');
-            }
-
-            argv = commandLine.getArgs();
-            if (argv.length > 0)
-            {
-                recipe = argv[0];
             }
 
             LocalBuild b = new LocalBuild();

@@ -36,6 +36,7 @@ public class Data implements MasterUserPaths
     private File projectRoot;
     private File userRoot;
     private File databaseRoot;
+    private File userTemplateRoot;
 
     public static final String CONFIG_FILE_NAME = "pulse.config.properties";
 
@@ -225,6 +226,15 @@ public class Data implements MasterUserPaths
             userRoot = new File(pulseData, "users");
         }
         return userRoot;
+    }
+
+    public File getUserTemplateRoot()
+    {
+        if(userTemplateRoot == null)
+        {
+            userTemplateRoot = new File(userConfigRoot, "templates");
+        }
+        return userTemplateRoot;
     }
 
     private Config getConfig()

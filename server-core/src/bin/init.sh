@@ -47,9 +47,9 @@ d_stop()
 {
     if [[ -n "$USERNAME" && "$USERNAME" = "$PULSE_USER" ]]
     then
-        "$PULSE_HOME/bin/shutdown.sh" --force
+        "$PULSE_HOME/bin/pulse" shutdown --force
     else
-        su $PULSE_USER -c "'$PULSE_HOME/bin/shutdown.sh' --force"
+        su $PULSE_USER -c "'$PULSE_HOME/bin/pulse' shutdown --force"
     fi
     
     if [[ -f "$PULSE_PID" ]]

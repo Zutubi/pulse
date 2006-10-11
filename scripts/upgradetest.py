@@ -87,7 +87,7 @@ def testNormalUpgrade(agent, master, build):
             log('Checking new agent build number...')
             agentBuild = agentProxy.RemoteApi.getBuildNumber(agent.getAdminToken())
             if agentBuild != build:
-                raise Exception('Unexpected agent build after upgrade "' + agentBuild + '"')
+                raise Exception('Unexpected agent build after upgrade "' + str(agentBuild) + '"')
             log('Build number matches!')
             return
         else:

@@ -6,11 +6,15 @@ then
     exit 1
 fi
 
-binDir=`dirname "$0"`
+binDir=`dirname $0`
+if [ - "$PULSE_HOME" ]
+then
+    binDir="$PULSE_HOME/bin"
+fi
+
 export PULSE_OUT="$binDir/../pulse.out"
 
 # Launch startup in background and record PID
-"$binDir"/startup.sh &
+"$binDir"/common.sh start &
 echo $! > "$1"
 exit 0
-
