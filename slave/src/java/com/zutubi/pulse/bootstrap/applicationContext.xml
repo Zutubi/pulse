@@ -78,6 +78,8 @@
 
     <bean id="recipeProcessor" class="com.zutubi.pulse.core.RecipeProcessor" autowire="byName" init-method="init"/>
 
+    <bean id="fileLoader" class="com.zutubi.pulse.core.PulseFileLoader" autowire="byName"/>
+
     <bean id="eventManager" class="com.zutubi.pulse.events.DefaultEventManager" autowire="byName"/>
 
     <bean id="customSerialiserFactory" class="com.zutubi.pulse.hessian.CustomSerialiserFactory"/>

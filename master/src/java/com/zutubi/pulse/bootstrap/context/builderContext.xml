@@ -103,6 +103,8 @@
 
     <bean id="recipeProcessor" class="com.zutubi.pulse.core.RecipeProcessor" autowire="byName" init-method="init"/>
 
+    <bean id="fileLoader" class="com.zutubi.pulse.core.PulseFileLoader" autowire="byName"/>
+
     <bean id="masterRecipeProcessor" class="com.zutubi.pulse.MasterRecipeProcessor" autowire="byName"/>
 
     <bean id="freemarkerConfiguration" class="com.zutubi.pulse.bootstrap.freemarker.FreemarkerConfigurationFactoryBean"
