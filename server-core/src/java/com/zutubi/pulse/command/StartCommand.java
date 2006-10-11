@@ -1,11 +1,16 @@
 package com.zutubi.pulse.command;
 
-import org.apache.commons.cli.*;
+import com.opensymphony.util.TextUtils;
 import com.zutubi.pulse.bootstrap.SystemBootstrapManager;
 import com.zutubi.pulse.bootstrap.SystemConfiguration;
 import com.zutubi.pulse.bootstrap.conf.EnvConfig;
 import com.zutubi.pulse.util.logging.Logger;
-import com.opensymphony.util.TextUtils;
+import org.apache.commons.cli.*;
+
+import java.util.Arrays;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * The start command is used as the entry point to starting the system.
@@ -69,32 +74,24 @@ public class StartCommand implements Command
         this.pulseConfig = path;
     }
 
-    @SuppressWarnings({"ACCESS_STATIC_VIA_INSTANCE"})
-    public void parse(String... argv) throws ParseException
+    @SuppressWarnings({ "ACCESS_STATIC_VIA_INSTANCE", "AccessStaticViaInstance" })
+    private void parse(String... argv) throws ParseException
     {
         Options options = new Options();
         options.addOption(OptionBuilder.withLongOpt("port")
-                .withArgName("port")
                 .hasArg()
-                .withDescription("the port to be used by the pulse web interface.")
                 .create('p'));
 
         options.addOption(OptionBuilder.withLongOpt("data")
-                .withArgName("data")
                 .hasArg()
-                .withDescription("the pulse data directory.")
                 .create('d'));
 
         options.addOption(OptionBuilder.withLongOpt("config")
-                .withArgName("config")
                 .hasArg()
-                .withDescription("the pulse config file location.")
                 .create('f'));
 
         options.addOption(OptionBuilder.withLongOpt("contextpath")
-                .withArgName("contextpath")
                 .hasArg()
-                .withDescription("the webapps context path.")
                 .create('c'));
 
         CommandLineParser parser = new PosixParser();
@@ -116,6 +113,17 @@ public class StartCommand implements Command
         {
             setConfig(commandLine.getOptionValue('f'));
         }
+    }
+
+    public int execute(BootContext context) throws ParseException
+    {
+        return execute(context.getCommandArgv());
+    }
+
+    public int execute(String[] argv) throws ParseException
+    {
+        parse(argv);
+        return execute();
     }
 
     public int execute()
@@ -164,13 +172,43 @@ public class StartCommand implements Command
 
     public String getHelp()
     {
-        return "starts the Pulse server";
+        return "start the pulse server";
+    }
+
+    public String getDetailedHelp()
+    {
+        return "Starts the pulse server, running in this console.  A message will be printed\n" +
+               "when the server has started and the web interface is available.";
+    }
+
+    public List<String> getUsages()
+    {
+        return Arrays.asList(new String[] { "" });
+    }
+
+    public List<String> getAliases()
+    {
+        return Arrays.asList(new String[] { "st" });
+    }
+
+    public Map<String, String> getOptions()
+    {
+        Map<String, String> options = new LinkedHashMap<String, String>();
+        options.put("-p [--port] port", "the port to be used by the pulse web interface");
+        options.put("-d [--data] dir", "use the specified directory for all pulse data");
+        options.put("-c [--contextPath] path", "the pulse web application context path");
+        options.put("-f [--config] file", "specify an alternate config file");
+        return options;
+    }
+
+    public boolean isDefault()
+    {
+        return false;
     }
 
     public static void main(String[] args) throws Exception
     {
-        Command cmd = new StartCommand();
-        cmd.parse(args);
-        cmd.execute();
+        StartCommand cmd = new StartCommand();
+        cmd.execute(args);
     }
 }

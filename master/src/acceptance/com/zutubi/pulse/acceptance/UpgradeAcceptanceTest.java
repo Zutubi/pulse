@@ -4,10 +4,8 @@ import com.zutubi.pulse.command.ShutdownCommand;
 import com.zutubi.pulse.command.StartCommand;
 import com.zutubi.pulse.util.FileSystemUtils;
 import com.zutubi.pulse.util.IOUtils;
-import org.xml.sax.SAXException;
 
 import java.io.File;
-import java.io.IOException;
 import java.io.InputStream;
 import java.util.zip.ZipInputStream;
 
@@ -35,7 +33,7 @@ public class UpgradeAcceptanceTest extends BaseAcceptanceTestCase
 //        super.tearDown();
     }
 
-    public void testUpgradeFromVersionOnePointOne() throws IOException, InterruptedException, SAXException
+    public void testUpgradeFromVersionOnePointOne() throws Exception
     {
         System.setProperty("bootstrap", "com/zutubi/pulse/bootstrap/ideaBootstrapContext.xml");
 

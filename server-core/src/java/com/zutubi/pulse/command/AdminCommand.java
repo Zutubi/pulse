@@ -1,13 +1,19 @@
 package com.zutubi.pulse.command;
 
+import com.opensymphony.util.TextUtils;
 import com.zutubi.pulse.api.AdminTokenManager;
 import com.zutubi.pulse.bootstrap.ComponentContext;
 import com.zutubi.pulse.bootstrap.ConfigurationManager;
 import com.zutubi.pulse.bootstrap.SystemBootstrapManager;
 import com.zutubi.pulse.bootstrap.SystemConfiguration;
 import com.zutubi.pulse.bootstrap.conf.EnvConfig;
+import com.zutubi.pulse.config.ConfigSupport;
+import com.zutubi.pulse.config.FileConfig;
 import com.zutubi.pulse.util.IOUtils;
-import com.opensymphony.util.TextUtils;
+import org.apache.commons.cli.CommandLine;
+import org.apache.commons.cli.OptionBuilder;
+import org.apache.commons.cli.Options;
+import org.apache.commons.cli.ParseException;
 import org.apache.xmlrpc.XmlRpcClient;
 import org.apache.xmlrpc.XmlRpcException;
 
@@ -15,6 +21,10 @@ import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.Arrays;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * The abstract base command for commands that are run on the same host as the
@@ -67,7 +77,7 @@ public abstract class AdminCommand implements Command
         this.pulseConfig = path;
     }
 
-    public int execute()
+    public int execute(BootContext context) throws ParseException, IOException
     {
         // initialise the necessary resources
         // a) the xml rpc client
@@ -90,14 +100,18 @@ public abstract class AdminCommand implements Command
         URL url;
         try
         {
-            SystemConfiguration sysConfig = configurationManager.getSystemConfig();
-            int webPort = sysConfig.getServerPort();
+            File configRoot = configurationManager.getSystemPaths().getConfigRoot();
+            SystemConfiguration config = configurationManager.getSystemConfig();
+            File startupConfigFile = new File(configRoot, "runtime.properties");
+            ConfigSupport sysConfig = new ConfigSupport(new FileConfig(startupConfigFile));
+
+            int webPort = sysConfig.getInteger(SystemConfiguration.WEBAPP_PORT, config.getServerPort());
             if (port != -1)
             {
                 webPort = port;
             }
 
-            String path = sysConfig.getContextPath();
+            String path = sysConfig.getProperty(SystemConfiguration.CONTEXT_PATH, config.getContextPath());
             if (TextUtils.stringSet(contextPath))
             {
                 path = contextPath;
@@ -129,7 +143,7 @@ public abstract class AdminCommand implements Command
         try
         {
             adminToken = loadAdminToken(configurationManager);
-            return doExecute();
+            return doExecute(context);
         }
         catch (IOException e)
         {
@@ -138,16 +152,67 @@ public abstract class AdminCommand implements Command
         }
         catch (XmlRpcException e)
         {
-            System.err.println("Unable to send shutdown command to server: " + e.getMessage());
+            System.err.println("Unable to send command to server: " + e.getMessage());
             return 1;
         }
     }
 
+
+    public List<String> getUsages()
+    {
+        return Arrays.asList(new String[] { "" });
+    }
+
+    public Map<String, String> getOptions()
+    {
+        Map<String, String> options = new LinkedHashMap<String, String>();
+        options.put("-p [--port] port", "the port to be used by the pulse web interface");
+        options.put("-c [--contextPath] path", "the pulse web application context path");
+        options.put("-f [--config] file", "specify an alternate config file");
+        return options;
+    }
+
+    public boolean isDefault()
+    {
+        return false;
+    }
+
     /**
-     * Admin command implementations should implement there custom functionality
+     * Admin command implementations should implement their custom functionality
      * in this method. When this method is invoked, both the XmlRpcClient and the
      * AdminToken will be available.
      */
-    public abstract int doExecute() throws XmlRpcException, IOException;
+    public abstract int doExecute(BootContext context) throws XmlRpcException, IOException, ParseException;
 
+    @SuppressWarnings({ "AccessStaticViaInstance" })
+    protected Options getSharedOptions()
+    {
+        Options options = new Options();
+        options.addOption(OptionBuilder.withLongOpt("port")
+                .hasArg()
+                .create('p'));
+        options.addOption(OptionBuilder.withLongOpt("contextpath")
+                .hasArg()
+                .create('c'));
+        options.addOption(OptionBuilder.withLongOpt("config")
+                .hasArg()
+                .create('f'));
+        return options;        
+    }
+
+    protected void processSharedOptions(CommandLine commandLine)
+    {
+        if (commandLine.hasOption('p'))
+        {
+            setPort(Integer.parseInt(commandLine.getOptionValue('p')));
+        }
+        if (commandLine.hasOption('c'))
+        {
+            setContextPath(commandLine.getOptionValue('c'));
+        }
+        if (commandLine.hasOption('f'))
+        {
+            setConfig(commandLine.getOptionValue('f'));
+        }
+    }
 }

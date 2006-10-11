@@ -4,6 +4,7 @@ import com.opensymphony.util.TextUtils;
 import com.zutubi.pulse.acceptance.forms.setup.PulseLicenseForm;
 import com.zutubi.pulse.acceptance.forms.setup.SetPulseDataForm;
 import com.zutubi.pulse.bootstrap.SystemConfiguration;
+import com.zutubi.pulse.command.BootContext;
 import com.zutubi.pulse.command.PingServerCommand;
 import com.zutubi.pulse.command.ShutdownCommand;
 import com.zutubi.pulse.command.StartCommand;
@@ -15,6 +16,7 @@ import net.sourceforge.jwebunit.WebTester;
 import org.apache.commons.cli.ParseException;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Properties;
@@ -34,9 +36,6 @@ public class StartupShutdownAcceptanceTest extends TestCase
 
     protected void setUp() throws Exception
     {
-        sys = new Properties();
-        sys.putAll(System.getProperties());
-
         // This system property is only required when running these tests within intelliJ
         // So, if this property has been set, leave it. If not, set it. This means that we need to set this property
         // when running accept.master.
@@ -44,6 +43,8 @@ public class StartupShutdownAcceptanceTest extends TestCase
         {
             System.setProperty("bootstrap", "com/zutubi/pulse/bootstrap/ideaBootstrapContext.xml");
         }
+        sys = new Properties();
+        sys.putAll(System.getProperties());
 
         // create a temporary user home.
         tmpDir = FileSystemUtils.createTempDirectory(getClass().getSimpleName() + ".", "." + getName());
@@ -66,6 +67,11 @@ public class StartupShutdownAcceptanceTest extends TestCase
         configFile = null;
         defaultConfigFile = null;
 
+        resetSystemProperties();
+    }
+
+    private void resetSystemProperties()
+    {
         System.getProperties().clear();
         System.getProperties().putAll(sys);
     }
@@ -167,6 +173,9 @@ public class StartupShutdownAcceptanceTest extends TestCase
         assertExternalConfigAvailable(actualCtx);
         assertExternalConfigContents(actualCtx, fileCtx);
 
+        // ensure the command line (system properties) is cleaned up.
+        resetSystemProperties();
+
         // now lets shutdown the server.
         assertShutdownServer(cmdCtx);
         assertServerNotAvailable(actualCtx);
@@ -249,6 +258,66 @@ public class StartupShutdownAcceptanceTest extends TestCase
         assertSecondTimeStartup(ctx, fileCtx, actualCtx);
     }
 
+    // test the shutdown command to ensure that
+
+    /**
+     * Test that the shutdown command is able to shutdown a server configured
+     * to run on non-standard port and context path.
+     *
+     * This is more a test of the AdminCommand being able to accurately locate
+     * the running server than the shutdown command being able to shutdown a
+     * server.
+     */
+    public void testThatShutdownWorksForNonStandardDeployment() throws Exception
+    {
+        RuntimeContext cmdCtx = new RuntimeContext("8083", "/some/sort/of/crazy/context/path");
+        cmdCtx.setDataDirectory(dataDir.getAbsolutePath());
+        cmdCtx.setExternalConfig(configFile.getAbsolutePath());
+
+        assertServerNotAvailable(cmdCtx);
+        assertStartServer(cmdCtx);
+        assertServerAvailable(cmdCtx);
+
+        resetSystemProperties();
+
+        // now lets shutdown the server using the default context. This checks
+        // that the runtime context is remembered and used for admin functions.
+        RuntimeContext shutdownCtx = new RuntimeContext();
+        assertShutdownServer(shutdownCtx);
+        assertServerNotAvailable(cmdCtx);
+    }
+
+    /**
+     * This is the scenario when a user is changing the configuration of a
+     * running pulse instance.  We need to ensure that the file context is not
+     * relied upon to interact with the running server.
+     */
+    public void testShutdownWorksForIncorrectFileConfig() throws ParseException, InterruptedException, IOException
+    {
+        RuntimeContext cmdCtx = new RuntimeContext("8083", "/some/sort/of/crazy/context/path");
+        cmdCtx.setDataDirectory(dataDir.getAbsolutePath());
+        cmdCtx.setExternalConfig(configFile.getAbsolutePath());
+
+        assertServerNotAvailable(cmdCtx);
+        assertStartServer(cmdCtx);
+        assertServerAvailable(cmdCtx);
+
+        resetSystemProperties();
+
+        // now we set the new startup configuration while the server is still
+        // running.
+        RuntimeContext fileCtx = new RuntimeContext("8086", "/domain/name/anyone");
+        fileCtx.setDataDirectory(dataDir.getAbsolutePath());
+        fileCtx.setExternalConfig(configFile.getAbsolutePath());
+        writeToConfigFile(fileCtx);
+
+        // test that the shutdown command is still able to shutdown the runnign server.
+        RuntimeContext shutdownCtx = new RuntimeContext();
+        assertShutdownServer(shutdownCtx);
+
+        assertServerNotAvailable(cmdCtx);
+    }
+
     private void writeToConfigFile(RuntimeContext fileCtx)
     {
         // create external config file setting the values we expect.
@@ -322,6 +391,8 @@ public class StartupShutdownAcceptanceTest extends TestCase
     {
         StartCommand start = new StartCommand();
         List<String> args = new LinkedList<String>();
+
+        args.add("start");
         if (TextUtils.stringSet(ctx.getPort()))
         {
             args.add("-p");
@@ -342,14 +413,14 @@ public class StartupShutdownAcceptanceTest extends TestCase
             args.add("-f");
             args.add(ctx.getExternalConfig());
         }
-        start.parse(args.toArray(new String[args.size()]));
-        assertEquals(0, start.execute());
+        assertEquals(0, start.execute(getBootContext(args)));
     }
 
-    private void assertShutdownServer(RuntimeContext ctx) throws ParseException, InterruptedException
+    private void assertShutdownServer(RuntimeContext ctx) throws ParseException, InterruptedException, IOException
     {
         ShutdownCommand shutdown = new ShutdownCommand();
         List<String> args = new LinkedList<String>();
+        args.add("shutdown");
         if (TextUtils.stringSet(ctx.getPort()))
         {
             args.add("-p");
@@ -365,11 +436,15 @@ public class StartupShutdownAcceptanceTest extends TestCase
             args.add("-f");
             args.add(ctx.getExternalConfig());
         }
-        shutdown.parse(args.toArray(new String[args.size()]));
         shutdown.setExitJvm(false);
-        assertEquals(0, shutdown.execute());
+        assertEquals(0, shutdown.execute(getBootContext(args)));
 
         Thread.sleep(2000); // give pulse a chance to shutdown.
+    }
+
+    private BootContext getBootContext(List<String> args)
+    {
+        return new BootContext(null, args.toArray(new String[args.size()]), null, null, null);
     }
 
     private void assertExternalConfigNotAvailable(RuntimeContext ctx)

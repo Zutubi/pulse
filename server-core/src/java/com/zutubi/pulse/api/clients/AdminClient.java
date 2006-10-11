@@ -1,5 +1,6 @@
 package com.zutubi.pulse.api.clients;
 
+import com.zutubi.pulse.command.BootContext;
 import com.zutubi.pulse.command.Command;
 import com.zutubi.pulse.command.ShutdownCommand;
 
@@ -40,12 +41,8 @@ public class AdminClient
                 return 2;
             }
 
-            String[] commandArgs = new String[argv.length - 1];
-            System.arraycopy(argv, 1, commandArgs, 0, commandArgs.length);
-
             Command command = commands.get(commandName);
-            command.parse(commandArgs);
-            return command.execute();
+            return command.execute(new BootContext(null, argv, null, null, null));
         }
         catch (Exception e)
         {

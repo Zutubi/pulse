@@ -1,13 +1,12 @@
 package com.zutubi.pulse.command;
 
-import org.apache.commons.cli.*;
 import org.apache.xmlrpc.XmlRpcClient;
 import org.apache.xmlrpc.XmlRpcException;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.Vector;
+import java.util.*;
 
 /**
  * The ping server command sends a ping request to the server, useful for checking the
@@ -15,7 +14,7 @@ import java.util.Vector;
  */
 public class PingServerCommand implements Command
 {
-    private String baseUrl;
+    private String baseUrl = "http://localhost:8080";
 
     /**
      * Required argument.
@@ -27,24 +26,12 @@ public class PingServerCommand implements Command
         this.baseUrl = baseUrl;
     }
 
-    public void parse(String... argv) throws Exception
+    public int execute()
     {
-        Options options = new Options();
-        CommandLineParser parser = new PosixParser();
-        CommandLine cl = parser.parse(options, argv, true);
-
-        // TODO: is there some way that the following requirement can be handled by the parser?
-        // the left over args are the host to ping.
-        String[] args = cl.getArgs();
-        if (args.length != 1)
-        {
-            throw new ParseException("Expected one argument.");
-        }
-
-        setBaseUrl(args[0]);
+        return execute(null);
     }
 
-    public int execute()
+    public int execute(BootContext context)
     {
         try
         {
@@ -83,5 +70,31 @@ public class PingServerCommand implements Command
     public String getHelp()
     {
         return "pings the pulse server at a given url";
+    }
+
+    public String getDetailedHelp()
+    {
+        return "Sends a basic ping to the remote API service of the pulse server at a given\n" +
+               "url.  If no URL is specified, the default is http://localhost:8080.";
+    }
+
+    public List<String> getUsages()
+    {
+        return Arrays.asList(new String[] { "<url>" });
+    }
+
+    public List<String> getAliases()
+    {
+        return Arrays.asList(new String[] { "pi" });
+    }
+
+    public Map<String, String> getOptions()
+    {
+        return new HashMap<String, String>(0);
+    }
+
+    public boolean isDefault()
+    {
+        return false;
     }
 }

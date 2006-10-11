@@ -24,4 +24,6 @@ public interface MasterUserPaths extends UserPaths
     File getProjectRoot();
 
     File getUserRoot();
+
+    File getUserTemplateRoot();
 }

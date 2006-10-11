@@ -11,11 +11,11 @@ import xmlrpclib
 WINDOWS = os.name == "nt"
 
 
-def getScript(name):
+def getScript():
     if WINDOWS:
-        return name + ".bat"
+        return "pulse.bat"
     else:
-        return "./" + name + ".sh"
+        return "./pulse"
     
 
 class Pulse:
@@ -48,7 +48,7 @@ class Pulse:
             else:
                 self.stdout = open('stdout.txt', 'w')
                 self.stderr = open('stderr.txt', 'w')
-                self.pop = subprocess.Popen([getScript('startup'), '-p', str(self.port), '-f', 'config.properties'], stdout=self.stdout, stderr=self.stderr)
+                self.pop = subprocess.Popen([getScript(), 'start', '-p', str(self.port), '-f', 'config.properties'], stdout=self.stdout, stderr=self.stderr)
             
             if wait:
                 if not self.waitFor():
@@ -86,7 +86,7 @@ class Pulse:
                     ret = subprocess.call(['init.sh', 'stop'], env=self.getEnv())
                     self.pop=None
                 else:
-                    ret = subprocess.call([getScript('shutdown'), '-p', str(self.port), '-f', 'config.properties'])
+                    ret = subprocess.call([getScript(), 'shutdown', '-p', str(self.port), '-f', 'config.properties'])
             finally:
                 os.chdir(oldDir)
         

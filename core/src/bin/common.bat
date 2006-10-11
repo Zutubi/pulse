@@ -43,7 +43,7 @@ if "%PULSE_OPTS%"=="" set PULSE_OPTS=-Xmx512m
 
 :restart
 
-%_EXECCMD% %JAVA_OPTS% %PULSE_OPTS% -classpath "%BOOT_JAR%" -Dpulse.home="%PULSE_HOME%" -Djava.awt.headless=true %*
+%_EXECCMD% %JAVA_OPTS% %PULSE_OPTS% -classpath "%BOOT_JAR%" -Dpulse.home="%PULSE_HOME%" -Djava.awt.headless=true -Djava.util.logging.config.class=com.zutubi.pulse.logging.ConsoleConfig com.zutubi.pulse.command.PulseCtl %*
 
 if errorlevel 111 goto restart
 
