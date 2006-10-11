@@ -6,6 +6,8 @@ import com.zutubi.pulse.events.system.SystemStartedEvent;
 import com.zutubi.pulse.freemarker.CustomFreemarkerManager;
 import com.zutubi.pulse.util.logging.Logger;
 import com.zutubi.pulse.security.AcegiSecurityManager;
+import com.zutubi.pulse.bootstrap.conf.FileConfig;
+import com.zutubi.pulse.bootstrap.conf.ConfigSupport;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -13,6 +15,7 @@ import java.util.logging.Level;
 import java.net.Socket;
 import java.net.SocketImplFactory;
 import java.net.SocketImpl;
+import java.io.File;
 
 /**
  * <class-comment/>
@@ -117,6 +120,14 @@ public class DefaultStartupManager implements StartupManager
         try
         {
             starting = true;
+
+            // record the startup config to the config directory.
+            SystemConfiguration config = configurationManager.getSystemConfig();
+            File configRoot = configurationManager.getSystemPaths().getConfigRoot();
+            File startupConfigFile = new File(configRoot, "runtime.properties");
+            ConfigSupport startupConfig = new ConfigSupport(new FileConfig(startupConfigFile));
+            startupConfig.setProperty(SystemConfiguration.CONTEXT_PATH, config.getContextPath());
+            startupConfig.setInteger(SystemConfiguration.WEBAPP_PORT, config.getServerPort());
 
             CustomFreemarkerManager.initialiseLogging();
 
