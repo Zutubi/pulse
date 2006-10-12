@@ -1,11 +1,12 @@
 package com.zutubi.pulse.local;
 
 import com.zutubi.pulse.core.PulseException;
+import com.zutubi.pulse.test.PulseTestCase;
 import com.zutubi.pulse.util.FileSystemUtils;
 import com.zutubi.pulse.util.IOUtils;
-import com.zutubi.pulse.test.PulseTestCase;
 
 import java.io.*;
+import java.net.URISyntaxException;
 import java.net.URL;
 
 /**
@@ -39,10 +40,10 @@ public class LocalBuildTest extends PulseTestCase
         return new File(root, FileSystemUtils.composeFilename("local", "src", "test", "com", "zutubi", "pulse", "local", "data", name));
     }
 
-    private String copyFile(String name) throws IOException
+    private String copyFile(String name) throws IOException, URISyntaxException
     {
         URL pulseURL = getInputURL(name);
-        File srcFile = new File(pulseURL.getFile());
+        File srcFile = new File(pulseURL.toURI());
         File destFile = new File(tmpDir, srcFile.getName());
 
         IOUtils.copyFile(srcFile, destFile);
@@ -83,10 +84,10 @@ public class LocalBuildTest extends PulseTestCase
         }
     }
 
-    public void testLoadResources() throws IOException, PulseException
+    public void testLoadResources() throws IOException, PulseException, URISyntaxException
     {
         String pulseFile = copyFile("resourceload");
-        String resourceFile = getInputURL("resources").getFile();
+        String resourceFile = new File(getInputURL("resources").toURI()).getAbsolutePath();
 
         builder.runBuild(tmpDir, pulseFile, null, resourceFile, "out");
         compareOutput("resourceload");
@@ -97,7 +98,7 @@ public class LocalBuildTest extends PulseTestCase
         simpleCase("commandFailure");
     }
 
-    private void simpleCase(String name) throws IOException, PulseException
+    private void simpleCase(String name) throws IOException, PulseException, URISyntaxException
     {
         String pulseFile = copyFile(name);
         builder.runBuild(tmpDir, pulseFile, "my-default", null, "out");

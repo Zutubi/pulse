@@ -193,7 +193,7 @@ public class SVNServer implements SCMServer
         authenticationManager = SVNWCUtil.createDefaultAuthenticationManager(username, password);
         authenticationManager.setAuthenticationProvider(new ISVNAuthenticationProvider()
         {
-            public SVNAuthentication requestClientAuthentication(String kind, SVNURL url, String realm, String errorMessage, SVNAuthentication previousAuth, boolean authMayBeStored)
+            public SVNAuthentication requestClientAuthentication(String kind, SVNURL url, String realm, SVNErrorMessage errorMessage, SVNAuthentication previousAuth, boolean authMayBeStored)
             {
                 return new SVNSSHAuthentication(username, new File(privateKeyFile), null, 22, false);
             }
@@ -222,7 +222,7 @@ public class SVNServer implements SCMServer
         authenticationManager = SVNWCUtil.createDefaultAuthenticationManager(username, password);
         authenticationManager.setAuthenticationProvider(new ISVNAuthenticationProvider()
         {
-            public SVNAuthentication requestClientAuthentication(String kind, SVNURL url, String realm, String errorMessage, SVNAuthentication previousAuth, boolean authMayBeStored)
+            public SVNAuthentication requestClientAuthentication(String kind, SVNURL url, String realm, SVNErrorMessage errorMessage, SVNAuthentication previousAuth, boolean authMayBeStored)
             {
                 return new SVNSSHAuthentication(username, new File(privateKeyFile), passphrase, 22, false);
             }
