@@ -1,15 +1,15 @@
 package com.zutubi.pulse.command;
 
+import com.opensymphony.util.TextUtils;
 import com.zutubi.pulse.api.AdminTokenManager;
 import com.zutubi.pulse.bootstrap.ComponentContext;
 import com.zutubi.pulse.bootstrap.ConfigurationManager;
 import com.zutubi.pulse.bootstrap.SystemBootstrapManager;
 import com.zutubi.pulse.bootstrap.SystemConfiguration;
-import com.zutubi.pulse.bootstrap.conf.EnvConfig;
 import com.zutubi.pulse.bootstrap.conf.ConfigSupport;
+import com.zutubi.pulse.bootstrap.conf.EnvConfig;
 import com.zutubi.pulse.bootstrap.conf.FileConfig;
 import com.zutubi.pulse.util.IOUtils;
-import com.opensymphony.util.TextUtils;
 import org.apache.xmlrpc.XmlRpcClient;
 import org.apache.xmlrpc.XmlRpcException;
 
@@ -114,7 +114,7 @@ public abstract class AdminCommand implements Command
                 remoteApiPath.append("/");
             }
             remoteApiPath.append(path);
-            if (!path.endsWith("/"))
+            if (!remoteApiPath.toString().endsWith("/"))
             {
                 remoteApiPath.append("/");
             }
