@@ -78,4 +78,18 @@ public class ShutdownCommand extends AdminCommand
         xmlRpcClient.execute("RemoteApi.shutdown", new Vector<Object>(Arrays.asList(new Object[]{adminToken, force, exitJvm})));
         return 0;
     }
+
+    public static void main(String argv[])
+    {
+        ShutdownCommand command = new ShutdownCommand();
+        try
+        {
+            command.parse(argv);
+            command.execute();
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+    }
 }
