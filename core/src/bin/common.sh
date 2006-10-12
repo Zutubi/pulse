@@ -65,7 +65,7 @@ then
 fi
 
 code=111
-while [[ $code -eq 111 ]]
+while [ $code -eq 111 ]
 do
     if [ -z "$PULSE_OUT" ]
     then
