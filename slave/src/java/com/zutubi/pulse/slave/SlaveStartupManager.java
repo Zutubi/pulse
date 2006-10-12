@@ -3,6 +3,8 @@ package com.zutubi.pulse.slave;
 import com.zutubi.pulse.bootstrap.ComponentContext;
 import com.zutubi.pulse.bootstrap.Startup;
 import com.zutubi.pulse.bootstrap.StartupException;
+import com.zutubi.pulse.bootstrap.SystemConfiguration;
+import com.zutubi.pulse.bootstrap.conf.ConfigSupport;
 import com.zutubi.pulse.core.ObjectFactory;
 import com.zutubi.pulse.core.Stoppable;
 import com.zutubi.pulse.util.logging.Logger;
@@ -11,6 +13,7 @@ import org.mortbay.jetty.Server;
 import org.mortbay.jetty.servlet.WebApplicationContext;
 import org.mortbay.util.InetAddrPort;
 
+import java.io.File;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -31,12 +34,20 @@ public class SlaveStartupManager implements Startup, Stoppable
     {
         ComponentContext.addClassPathContextDefinitions(systemContexts.toArray(new String[systemContexts.size()]));
 
-        runStartupRunnables();
+        // record the startup config to the config directory.
+        SystemConfiguration config = configurationManager.getSystemConfig();
+        File configRoot = configurationManager.getSystemPaths().getConfigRoot();
+        File startupConfigFile = new File(configRoot, "runtime.properties");
+        ConfigSupport startupConfig = new ConfigSupport(new com.zutubi.pulse.bootstrap.conf.FileConfig(startupConfigFile));
+        startupConfig.setProperty(SystemConfiguration.CONTEXT_PATH, config.getContextPath());
+        startupConfig.setInteger(SystemConfiguration.WEBAPP_PORT, config.getServerPort());
 
+        runStartupRunnables();
         jettyServer = new Server();
         int port = configurationManager.getSystemConfig().getServerPort();
         SocketListener listener = new SocketListener(new InetAddrPort(port));
         jettyServer.addListener(listener);
+
         try
         {
             WebApplicationContext context = jettyServer.addWebApplication("/", configurationManager.getSystemPaths().getContentRoot().getAbsolutePath());
@@ -47,7 +58,7 @@ public class SlaveStartupManager implements Startup, Stoppable
         }
         catch (Exception e)
         {
-            e.printStackTrace();
+            throw new StartupException(e);
         }
     }
 
