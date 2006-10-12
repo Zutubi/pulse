@@ -51,7 +51,7 @@ public class DirectoryPluginLoader extends PluginLoaderSupport
             DirectoryClassLoader loader = new DirectoryClassLoader(base, parent);
             
             URL pluginDescriptor = loader.findResource(resource);
-            Plugin plugin = loadPlugin(pluginDescriptor, loader, base.toURL());
+            Plugin plugin = loadPlugin(pluginDescriptor, loader, base.toURI().toURL());
 
             List<Plugin> plugins = new LinkedList<Plugin>();
             if (plugin != null)

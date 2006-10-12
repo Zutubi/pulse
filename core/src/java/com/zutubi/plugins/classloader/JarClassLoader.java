@@ -29,7 +29,7 @@ public class JarClassLoader extends PluginsClassLoader
 
     protected URL getDataURL(String name, byte[] data) throws MalformedURLException
     {
-        return new URL(null, file.toURL().toExternalForm() + '!' + name, new BytesURLStreamHandler(data));
+        return new URL(null, file.toURI().toURL().toExternalForm() + '!' + name, new BytesURLStreamHandler(data));
     }
 
     private void openJar() throws IOException

@@ -1,12 +1,12 @@
 package com.zutubi.pulse.charting.demo;
 
-import javax.swing.*;
 import javax.imageio.ImageIO;
-import java.io.IOException;
-import java.io.File;
-import java.net.URL;
+import javax.swing.*;
 import java.awt.*;
 import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
+import java.net.URL;
 
 public class ScrollPaneWatermark extends JViewport
 {
@@ -76,7 +76,7 @@ public class ScrollPaneWatermark extends JViewport
         // ta.setOpaque(false);
 
         ScrollPaneWatermark watermark = new ScrollPaneWatermark();
-        watermark.setBackgroundTexture(new File("C:\\projects\\pulse\\trunk\\master\\src\\www\\images\\sample.png").toURL());
+        watermark.setBackgroundTexture(new File("C:\\projects\\pulse\\trunk\\master\\src\\www\\images\\sample.png").toURI().toURL());
         watermark.setView(ta);
 
         JScrollPane scroll = new JScrollPane();
