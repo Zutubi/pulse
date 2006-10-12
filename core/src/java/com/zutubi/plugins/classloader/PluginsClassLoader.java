@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.security.SecureClassLoader;
 import java.util.Collections;
@@ -114,7 +115,17 @@ public abstract class PluginsClassLoader extends SecureClassLoader implements Cl
     public static ClassLoader getInstance(URL url, ClassLoader parent)
     {
         ClassLoader loader;
-        File file = new File(url.getFile());
+        File file;
+
+        try
+        {
+            file = new File(url.toURI());
+        }
+        catch(URISyntaxException e)
+        {
+            file = new File(url.toString());
+        }
+        
         if (file.isDirectory())
         {
             loader = new DirectoryClassLoader(file, parent);
