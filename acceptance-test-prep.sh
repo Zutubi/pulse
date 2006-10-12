@@ -41,7 +41,7 @@ pushd "$tmpDir/$packageName"
 
 # Fire it up!
 export PULSE_HOME=
-$(pwd)/bin/pulse start -p 8889 -f config.properties > ../stdout.txt 2> ../stderr.txt
+"$(pwd)/bin/pulse" start -p 8889 -f config.properties > ../stdout.txt 2> ../stderr.txt
 
 trap ERR
 
