@@ -367,7 +367,7 @@ public class FatController implements EventListener, Stoppable
      * @return a mapping of owners to queued build request events. These events will be
      * the order that these events will be handled.
      */
-    public Map<Entity, List<AbstractBuildRequestEvent>> snapshotProjectQueue()
+    public Map<Entity, List<AbstractBuildRequestEvent>> snapshotBuildQueue()
     {
         lock.lock();
         try

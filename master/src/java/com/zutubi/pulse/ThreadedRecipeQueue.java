@@ -266,10 +266,13 @@ public class ThreadedRecipeQueue implements Runnable, RecipeQueue, EventListener
         lock.lock();
         try
         {
-            onlineAgents.put(agent.getId(), agent);
-            availableAgents.put(agent.getId(), agent);
-            resetTimeouts(agent);
-            lockCondition.signal();
+            if(!onlineAgents.containsKey(agent.getId()))
+            {
+                onlineAgents.put(agent.getId(), agent);
+                availableAgents.put(agent.getId(), agent);
+                resetTimeouts(agent);
+                lockCondition.signal();
+            }
         }
         finally
         {
@@ -449,7 +452,7 @@ public class ThreadedRecipeQueue implements Runnable, RecipeQueue, EventListener
                 try
                 {
                     // Wake up when there is something to do, and also
-                    // perdiodically to check for timed-out requests.
+                    // periodically to check for timed-out requests.
                     LOG.debug("lockCondition.await();");
                     lockCondition.await(sleepInterval, TimeUnit.SECONDS);
                     LOG.debug("lockCondition.unawait();");
@@ -588,7 +591,11 @@ public class ThreadedRecipeQueue implements Runnable, RecipeQueue, EventListener
             if (agent != null)
             {
                 executingAgents.remove(event.getRecipeId());
-                online(agent);
+                if(onlineAgents.containsKey(agent.getId()))
+                {
+                    availableAgents.put(agent.getId(), agent);
+                    lockCondition.signal();
+                }
             }
         }
         finally

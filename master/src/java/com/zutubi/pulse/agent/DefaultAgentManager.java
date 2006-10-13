@@ -3,26 +3,29 @@ package com.zutubi.pulse.agent;
 import com.zutubi.pulse.*;
 import com.zutubi.pulse.bootstrap.MasterConfigurationManager;
 import com.zutubi.pulse.bootstrap.StartupManager;
-import com.zutubi.pulse.core.model.Resource;
 import com.zutubi.pulse.core.Stoppable;
+import com.zutubi.pulse.core.model.Resource;
 import com.zutubi.pulse.events.*;
 import com.zutubi.pulse.events.EventListener;
-import com.zutubi.pulse.license.LicenseManager;
 import com.zutubi.pulse.license.LicenseException;
 import com.zutubi.pulse.license.LicenseHolder;
+import com.zutubi.pulse.license.LicenseManager;
 import com.zutubi.pulse.license.authorisation.AddAgentAuthorisation;
 import com.zutubi.pulse.logging.ServerMessagesHandler;
 import com.zutubi.pulse.model.NamedEntityComparator;
 import com.zutubi.pulse.model.ResourceManager;
 import com.zutubi.pulse.model.Slave;
 import com.zutubi.pulse.model.SlaveManager;
-import com.zutubi.pulse.services.*;
+import com.zutubi.pulse.services.ServiceTokenManager;
+import com.zutubi.pulse.services.SlaveService;
+import com.zutubi.pulse.services.SlaveStatus;
+import com.zutubi.pulse.services.UpgradeStatus;
 import com.zutubi.pulse.util.logging.Logger;
 
 import java.net.MalformedURLException;
+import java.util.*;
 import java.util.concurrent.*;
 import java.util.concurrent.locks.ReentrantLock;
-import java.util.*;
 
 /**
  */
@@ -255,6 +258,7 @@ public class DefaultAgentManager implements AgentManager, EventListener, Stoppab
 
         if(suce.isSuccessful())
         {
+            suce.getAgent().setStatus(Status.OFFLINE);
             slave.setEnableState(Slave.EnableState.ENABLED);
             slaveManager.save(slave);
             pingSlave(suce.getAgent());

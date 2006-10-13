@@ -203,6 +203,22 @@ public class ThreadedRecipeQueueTest extends TestCase implements EventListener
         assertTrue(semaphore.tryAcquire(30, TimeUnit.SECONDS));
     }
 
+    public void testTwoBuildsSameServiceOnlineAfter() throws Exception
+    {
+        Agent agent = createAvailableAgent(0);
+        queue.online(agent);
+        queue.enqueue(createDispatchRequest(0, 1000));
+        queue.enqueue(createDispatchRequest(0, 1001));
+        queue.online(agent);
+
+        assertTrue(semaphore.tryAcquire(30, TimeUnit.SECONDS));
+        assertFalse(semaphore.tryAcquire(1, TimeUnit.SECONDS));
+        assertEquals(1, queue.length());
+
+        sendRecipeCompleted(1000);
+        assertTrue(semaphore.tryAcquire(30, TimeUnit.SECONDS));
+    }
+
     public void testRecipeError() throws Exception
     {
         queue.online(createAvailableAgent(0));

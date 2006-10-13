@@ -43,7 +43,10 @@
             #docRow("agent.upgrade.message" $agent.upgradeMessage)
         #end
     #else
-        #contentRow("agent.status" "agent.disabled")
+        <tr>
+            #contentRowHeading("agent.status")
+            #contentCell("agent.disabled")
+        </tr>
     #end
 #end
     </table>

@@ -174,7 +174,12 @@ public class FileStatus
 
     public FileStatus(String path, State state, boolean directory)
     {
-        this.path = FileSystemUtils.normaliseSeparators(path);
+        if(path != null)
+        {
+            path = FileSystemUtils.normaliseSeparators(path);
+        }
+        
+        this.path = path;
         this.state = state;
         this.directory = directory;
         this.outOfDate = false;

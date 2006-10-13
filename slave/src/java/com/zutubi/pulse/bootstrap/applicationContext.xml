@@ -68,11 +68,7 @@
 
     <bean id="threadPool" class="com.zutubi.pulse.slave.SlaveThreadPool" autowire="byName"/>
 
-    <bean id="slaveQueue" class="com.zutubi.pulse.slave.SlaveQueue" init-method="start">
-        <property name="executor">
-            <ref local="threadPool"/>
-        </property>
-    </bean>
+    <bean id="slaveQueue" class="com.zutubi.pulse.slave.SlaveQueue" init-method="start"/>
 
     <bean id="slaveRecipeProcessor" class="com.zutubi.pulse.slave.SlaveRecipeProcessor" autowire="byName"/>
 

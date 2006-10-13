@@ -60,7 +60,7 @@ public class ViewServerQueuesAction extends ActionSupport
         buildQueue = new LinkedList<AbstractBuildRequestEvent>();
         executingBuilds = new LinkedList<BuildResult>();
 
-        Map<Entity, List<AbstractBuildRequestEvent>> builds = fatController.snapshotProjectQueue();
+        Map<Entity, List<AbstractBuildRequestEvent>> builds = fatController.snapshotBuildQueue();
         for(Entity entity: builds.keySet())
         {
             List<AbstractBuildRequestEvent> events = builds.get(entity);
@@ -77,7 +77,7 @@ public class ViewServerQueuesAction extends ActionSupport
                     result = buildManager.getLatestBuildResult((Project) active.getOwner());
                 }
 
-                if(result != null && (result.inProgress() || result.terminating()))
+                if(result != null && !result.completed())
                 {
                     executingBuilds.add(result);
                 }

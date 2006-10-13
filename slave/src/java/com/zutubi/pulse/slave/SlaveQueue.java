@@ -1,7 +1,7 @@
 package com.zutubi.pulse.slave;
 
-import com.zutubi.pulse.util.logging.Logger;
 import com.zutubi.pulse.core.Stoppable;
+import com.zutubi.pulse.util.logging.Logger;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -21,7 +21,7 @@ public class SlaveQueue implements Runnable, Stoppable
 {
     private static final Logger LOG = Logger.getLogger(SlaveQueue.class);
 
-    private Executor executor = new SlaveThreadPool();
+    private Executor executor = Executors.newSingleThreadExecutor();
     private List<Runnable> recipes = new LinkedList<Runnable>();
     private Lock recipesLock = new ReentrantLock();
     private Condition recipesCondition = recipesLock.newCondition();
