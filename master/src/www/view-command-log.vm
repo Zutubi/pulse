@@ -81,11 +81,10 @@
                 <div id="node_$commandResult.id" style="display: none">
                     <div class="panecontent">
                         <table class="content">
-                            #headingRow("command.summary" 6)
+                            #headingRow("command.summary" 5)
                             <tr>
                                 #contentHeading("command.name" 1)
                                 #contentHeading("build.status" 2)
-                                #contentHeading("build.tests" 1)
                                 #contentHeading("build.when" 1)
                                 #contentHeading("build.elapsed" 1)
                             </tr>
@@ -93,11 +92,10 @@
                                 #set($cssClass = $commandResult.state.string)
                                 #contentCell($commandResult.commandName)
                                 #statusCell($commandResult true)
-                                #testResultsCell($result  $recipeResult $commandResult)
                                 #dateClassCell($commandResult)
                                 #elapsedCell($commandResult)
                             </tr>
-                            #directMessages($commandResult 6)
+                            #directMessages($commandResult 5)
                         </table>
 
             #if($commandResult.properties.size() > 0)

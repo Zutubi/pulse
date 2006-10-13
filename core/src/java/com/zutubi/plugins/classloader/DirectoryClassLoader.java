@@ -21,7 +21,7 @@ public class DirectoryClassLoader extends PluginsClassLoader
 
     protected URL getDataURL(String name, byte[] data) throws MalformedURLException
     {
-        return new URL(null, dir.toURL().toExternalForm() + name, new BytesURLStreamHandler(data));
+        return new URL(null, dir.toURI().toURL().toExternalForm() + name, new BytesURLStreamHandler(data));
     }
 
     protected byte[] getFile(String path)

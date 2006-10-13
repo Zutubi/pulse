@@ -29,7 +29,7 @@
         <dependency org="apache" name="commons-cli" rev="1.0" conf="external,build,release->default"/>
         <dependency org="apache" name="xmlrpc" rev="2.0.1" conf="external,build,release->default"/>
 
-        <dependency org="javasvn" name="javasvn" rev="20060911" conf="external,build,release->default"/>
+        <dependency org="javasvn" name="javasvn" rev="1.0.6" conf="external,build,release->default"/>
 
         <dependency org="junit" name="junit" rev="3.8.1" conf="external,build->default"/>
 

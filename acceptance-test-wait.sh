@@ -11,6 +11,10 @@ do
     if [[ $i -eq 8 ]]
     then
         echo 'sheesh, I havent got all day!'
+    elif [[ $i -eq 150 ]]
+    then
+        echo 'giving up'
+        exit 1
     else
         echo "still waiting..."
     fi

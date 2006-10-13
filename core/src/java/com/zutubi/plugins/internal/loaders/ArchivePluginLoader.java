@@ -77,7 +77,7 @@ public class ArchivePluginLoader extends PluginLoaderSupport
             {
                 return new LinkedList<Plugin>();
             }
-            Plugin plugin = loadPlugin(descriptor, loader, archiveFile.toURL());
+            Plugin plugin = loadPlugin(descriptor, loader, archiveFile.toURI().toURL());
             if (plugin == null)
             {
                 return new LinkedList<Plugin>();

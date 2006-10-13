@@ -32,8 +32,6 @@
 
         <dependency org="caucho" name="hessian" rev="3.0.13" conf="external,build,release->default"/>
 
-        <dependency org="javasvn" name="javasvn" rev="20060911" conf="external,build,release->default"/>
-
         <dependency org="jetty" name="org.mortbay.jetty" rev="5.1.6" conf="external,build,release->default"/>
 
         <dependency org="jssh" name="jssh" rev="0.2.7" conf="external,build,release->default"/>

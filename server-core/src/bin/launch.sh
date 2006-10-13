@@ -7,7 +7,7 @@ then
 fi
 
 binDir=`dirname $0`
-if [ - "$PULSE_HOME" ]
+if [ -d "$PULSE_HOME" ]
 then
     binDir="$PULSE_HOME/bin"
 fi

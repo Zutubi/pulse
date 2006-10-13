@@ -123,7 +123,7 @@ public abstract class AdminCommand implements Command
                 remoteApiPath.append("/");
             }
             remoteApiPath.append(path);
-            if (!path.endsWith("/"))
+            if (!remoteApiPath.toString().endsWith("/"))
             {
                 remoteApiPath.append("/");
             }
@@ -197,7 +197,7 @@ public abstract class AdminCommand implements Command
         options.addOption(OptionBuilder.withLongOpt("config")
                 .hasArg()
                 .create('f'));
-        return options;        
+        return options;
     }
 
     protected void processSharedOptions(CommandLine commandLine)

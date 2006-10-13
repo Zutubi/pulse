@@ -14,7 +14,7 @@ public class PluginsClassLoaderTest extends PluginsTestCase
         File pluginsDirectory = getPluginsDirectory();
 
         // first make a classloader of the entire directory.
-        ClassLoader loader = PluginsClassLoader.getInstance(pluginsDirectory.toURL());
+        ClassLoader loader = PluginsClassLoader.getInstance(pluginsDirectory.toURI().toURL());
 
         // check we got the right one back
         assertEquals(DirectoryClassLoader.class, loader.getClass());
