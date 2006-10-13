@@ -1,14 +1,18 @@
 package com.zutubi.pulse.scm.svn;
 
+import com.zutubi.pulse.config.Config;
+import com.zutubi.pulse.config.ConfigSupport;
 import com.zutubi.pulse.core.model.NumericalRevision;
 import com.zutubi.pulse.personal.PersonalBuildSupport;
 import com.zutubi.pulse.scm.FileStatus;
 import com.zutubi.pulse.scm.SCMException;
 import com.zutubi.pulse.scm.WorkingCopy;
 import com.zutubi.pulse.scm.WorkingCopyStatus;
+import static com.zutubi.pulse.scm.svn.SvnConstants.*;
 import org.tmatesoft.svn.core.SVNCancelException;
 import org.tmatesoft.svn.core.SVNException;
 import org.tmatesoft.svn.core.SVNNodeKind;
+import org.tmatesoft.svn.core.auth.ISVNAuthenticationManager;
 import org.tmatesoft.svn.core.internal.io.dav.DAVRepositoryFactory;
 import org.tmatesoft.svn.core.internal.io.svn.SVNRepositoryFactoryImpl;
 import org.tmatesoft.svn.core.wc.*;
@@ -20,8 +24,6 @@ import java.util.Properties;
  */
 public class SvnWorkingCopy extends PersonalBuildSupport implements WorkingCopy
 {
-    public static final String PROPERTY_URL = "svn.url";
-
     private File base;
     private SVNClientManager clientManager;
 
@@ -32,24 +34,41 @@ public class SvnWorkingCopy extends PersonalBuildSupport implements WorkingCopy
         SVNRepositoryFactoryImpl.setup();
     }
 
-    public SvnWorkingCopy(File path)
+    public SvnWorkingCopy(File path, Config config)
     {
         this.base = path;
         ISVNOptions options = SVNWCUtil.createDefaultOptions(true);
         clientManager = SVNClientManager.newInstance(options);
-    }
 
-    public SvnWorkingCopy(File path, String name, String password)
-    {
-        this.base = path;
-        ISVNOptions options = SVNWCUtil.createDefaultOptions(true);
-        clientManager = SVNClientManager.newInstance(options, name, password);
+        ConfigSupport configSupport = new ConfigSupport(config);
+        if (!configSupport.hasProperty(PROPERTY_KEYFILE))
+        {
+            if (configSupport.hasProperty(PROPERTY_USERNAME))
+            {
+                clientManager = SVNClientManager.newInstance(options, configSupport.getProperty(PROPERTY_USERNAME), configSupport.getProperty(PROPERTY_PASSWORD, ""));
+            }
+            else
+            {
+                clientManager = SVNClientManager.newInstance(options);
+            }
+        }
+        else
+        {
+            String username = configSupport.getProperty(PROPERTY_USERNAME);
+            String password = configSupport.getProperty(PROPERTY_PASSWORD, "");
+            String privateKeyFile = configSupport.getProperty(PROPERTY_KEYFILE);
+            String passphrase = configSupport.getProperty(PROPERTY_PASSPHRASE);
+
+            ISVNAuthenticationManager authenticationManager = SVNWCUtil.createDefaultAuthenticationManager(username, password);
+            authenticationManager.setAuthenticationProvider(new SVNSSHAuthenticationProvider(username, privateKeyFile, passphrase));
+            clientManager = SVNClientManager.newInstance(options, authenticationManager);
+        }
     }
 
     public boolean matchesRepository(Properties repositoryDetails) throws SCMException
     {
         // We just check that the URL matches
-        String url = repositoryDetails.getProperty(PROPERTY_URL);
+        String url = repositoryDetails.getProperty(SvnConstants.PROPERTY_URL);
         if(url == null)
         {
             throw new SCMException("Subversion repository details not returned by Pulse server");
@@ -126,7 +145,9 @@ public class SvnWorkingCopy extends PersonalBuildSupport implements WorkingCopy
                 // check out this revision.  (Note even files we don't have,
                 // such as newly-added files, will be reported by the status
                 // operation as out of date.)
-                status.setRevision(new NumericalRevision(event.getRevision()));
+                NumericalRevision rev = new NumericalRevision(event.getRevision());
+                status.setRevision(rev);
+                status("Repository revision: " + rev.getRevisionString());
             }
         }
 
@@ -214,6 +235,7 @@ public class SvnWorkingCopy extends PersonalBuildSupport implements WorkingCopy
 
                 if(fs.isInteresting())
                 {
+                    status(fs.toString());
                     status.add(fs);
                 }
             }

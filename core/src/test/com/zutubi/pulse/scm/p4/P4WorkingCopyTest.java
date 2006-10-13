@@ -29,6 +29,7 @@ public class P4WorkingCopyTest extends PulseTestCase implements PersonalBuildUI
     private File otherClientRoot;
     private P4Client otherClient;
 
+    private List<String> debugs = new LinkedList<String>();
     private List<String> statuses = new LinkedList<String>();
     private List<String> errors = new LinkedList<String>();
     private List<String> warnings = new LinkedList<String>();
@@ -54,7 +55,7 @@ public class P4WorkingCopyTest extends PulseTestCase implements PersonalBuildUI
 
         createClients();
 
-        wc = new P4WorkingCopy();
+        wc = new P4WorkingCopy(null, null);
         wc.setUI(this);
         wc.getClient().setEnv(ENV_CLIENT, CLIENT_NAME);
         wc.getClient().setEnv(ENV_PORT, ":1666");
@@ -330,6 +331,11 @@ public class P4WorkingCopyTest extends PulseTestCase implements PersonalBuildUI
 
     public void setVerbosity(Verbosity verbosity)
     {
+    }
+
+    public void debug(String message)
+    {
+        debugs.add(message);
     }
 
     public void status(String message)

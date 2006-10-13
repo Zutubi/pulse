@@ -243,4 +243,9 @@ public class FileStatus
             }
         }
     }
+
+    public String toString()
+    {
+        return String.format("%s %-16s %s", outOfDate ? "*" : " ", state.toString(), path);
+    }
 }

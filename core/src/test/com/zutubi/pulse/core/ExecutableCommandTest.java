@@ -1,5 +1,6 @@
 package com.zutubi.pulse.core;
 
+import com.zutubi.pulse.BuildContext;
 import com.zutubi.pulse.core.model.*;
 import com.zutubi.pulse.test.PulseTestCase;
 import com.zutubi.pulse.util.FileSystemUtils;
@@ -274,8 +275,10 @@ public class ExecutableCommandTest extends PulseTestCase
 
     private void execute(ExecutableCommand command, CommandResult result, long buildNumber)
     {
+        BuildContext buildContext = new BuildContext();
+        buildContext.setBuildNumber(buildNumber);
         CommandContext context = new CommandContext(new SimpleRecipePaths(baseDirectory, null), outputDirectory, null);
-        context.setBuildNumber(buildNumber);
+        context.setBuildContext(buildContext);
         command.execute(context, result);
     }
 }

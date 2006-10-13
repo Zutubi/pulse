@@ -6,7 +6,6 @@ import com.zutubi.pulse.core.model.RecipeResult;
 import com.zutubi.pulse.model.BuildResult;
 import com.zutubi.pulse.model.RecipeResultNode;
 import com.zutubi.pulse.model.User;
-import com.zutubi.pulse.model.UserManager;
 import com.zutubi.pulse.util.CircularBuffer;
 
 import java.io.File;
@@ -28,7 +27,6 @@ public class TailRecipeLogAction extends ProjectActionSupport
     private RecipeResultNode resultNode;
     private String tail = "";
     private MasterConfigurationManager configurationManager;
-    private UserManager userManager;
     private boolean logExists;
 
     public long getId()
@@ -224,10 +222,5 @@ public class TailRecipeLogAction extends ProjectActionSupport
     public void setConfigurationManager(MasterConfigurationManager configurationManager)
     {
         this.configurationManager = configurationManager;
-    }
-
-    public void setUserManager(UserManager userManager)
-    {
-        this.userManager = userManager;
     }
 }

@@ -94,6 +94,7 @@ public interface PersonalBuildUI
 
     void setVerbosity(Verbosity verbosity);
 
+    void debug(String message);
     void status(String message);
     void warning(String message);
     void error(String message);

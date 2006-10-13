@@ -11,16 +11,14 @@ import java.util.List;
 public class WorkingCopyStatus implements Iterable<FileStatus>
 {
     private Revision revision;
-    private List<FileStatus> changes;
+    private List<FileStatus> changes = new LinkedList<FileStatus>();
 
     public WorkingCopyStatus()
     {
-        changes = new LinkedList<FileStatus>();
     }
 
     public WorkingCopyStatus(Revision revision)
     {
-        this();
         this.revision = revision;
     }
 
@@ -36,17 +34,17 @@ public class WorkingCopyStatus implements Iterable<FileStatus>
 
     public void add(FileStatus status)
     {
-        changes.add(status);
+        getChanges().add(status);
     }
 
     public Iterator<FileStatus> iterator()
     {
-        return changes.iterator();
+        return getChanges().iterator();
     }
 
     public boolean isOutOfDate()
     {
-        for(FileStatus fs: changes)
+        for(FileStatus fs: getChanges())
         {
             if(fs.isOutOfDate())
             {
@@ -59,11 +57,10 @@ public class WorkingCopyStatus implements Iterable<FileStatus>
 
     public boolean inConsistentState()
     {
-        for(FileStatus fs: changes)
+        for(FileStatus fs: getChanges())
         {
             if(!fs.getState().isConsistent())
             {
-                System.err.println(fs.getPath() +": " + fs.getState().toString());
                 return false;
             }
         }
@@ -73,6 +70,12 @@ public class WorkingCopyStatus implements Iterable<FileStatus>
 
     public List<FileStatus> getChanges()
     {
+        // Odd perhaps, but being instantiated by XStream means we need to
+        // guard against null (the meaning is clear: an empty list).
+        if(changes == null)
+        {
+            changes = new LinkedList<FileStatus>();
+        }
         return changes;
     }
 }

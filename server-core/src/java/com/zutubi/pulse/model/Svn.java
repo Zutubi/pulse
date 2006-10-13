@@ -5,7 +5,7 @@ import com.zutubi.pulse.scm.SCMConfiguration;
 import com.zutubi.pulse.scm.SCMException;
 import com.zutubi.pulse.scm.SCMServer;
 import com.zutubi.pulse.scm.svn.SVNServer;
-import com.zutubi.pulse.scm.svn.SvnWorkingCopy;
+import com.zutubi.pulse.scm.svn.SvnConstants;
 
 import java.util.Map;
 import java.util.TreeMap;
@@ -16,11 +16,6 @@ import java.util.TreeMap;
  */
 public class Svn extends Scm
 {
-    private static final String USERNAME = "svn.username";
-    private static final String PASSWORD = "svn.password";
-    private static final String KEYFILE = "svn.keyfile";
-    private static final String PASSPHRASE = "svn.passphrase";
-
     @Override
     public SCMServer createServer() throws SCMException
     {
@@ -59,57 +54,57 @@ public class Svn extends Scm
     public Map<String, String> getRepositoryProperties()
     {
         Map<String, String> result = new TreeMap<String, String>();
-        result.put(SvnWorkingCopy.PROPERTY_URL, getUrl());
+        result.put(SvnConstants.PROPERTY_URL, getUrl());
         return result;
     }
 
     public String getUrl()
     {
-        return (String) getProperties().get(SvnWorkingCopy.PROPERTY_URL);
+        return (String) getProperties().get(SvnConstants.PROPERTY_URL);
     }
 
     public void setUrl(String url)
     {
-        getProperties().put(SvnWorkingCopy.PROPERTY_URL, url);
+        getProperties().put(SvnConstants.PROPERTY_URL, url);
     }
 
     public String getUsername()
     {
-        return (String) getProperties().get(USERNAME);
+        return (String) getProperties().get(SvnConstants.PROPERTY_USERNAME);
     }
 
     public void setUsername(String username)
     {
-        getProperties().put(USERNAME, username);
+        getProperties().put(SvnConstants.PROPERTY_USERNAME, username);
     }
 
     public String getPassword()
     {
-        return (String) getProperties().get(PASSWORD);
+        return (String) getProperties().get(SvnConstants.PROPERTY_PASSWORD);
     }
 
     public void setPassword(String password)
     {
-        getProperties().put(PASSWORD, password);
+        getProperties().put(SvnConstants.PROPERTY_PASSWORD, password);
     }
 
     public String getKeyfile()
     {
-        return (String) getProperties().get(KEYFILE);
+        return (String) getProperties().get(SvnConstants.PROPERTY_KEYFILE);
     }
 
     public void setKeyfile(String keyfile)
     {
-        getProperties().put(KEYFILE, keyfile);
+        getProperties().put(SvnConstants.PROPERTY_KEYFILE, keyfile);
     }
 
     public String getPassphrase()
     {
-        return (String) getProperties().get(PASSPHRASE);
+        return (String) getProperties().get(SvnConstants.PROPERTY_PASSPHRASE);
     }
 
     public void setPassphrase(String passphrase)
     {
-        getProperties().put(PASSPHRASE, passphrase);
+        getProperties().put(SvnConstants.PROPERTY_PASSPHRASE, passphrase);
     }
 }

@@ -3,6 +3,8 @@ package com.zutubi.pulse.personal;
 import com.zutubi.pulse.command.BootContext;
 import com.zutubi.pulse.command.Command;
 import com.zutubi.pulse.config.CommandLineConfig;
+import com.zutubi.pulse.config.CompositeConfig;
+import com.zutubi.pulse.config.PropertiesConfig;
 import com.zutubi.pulse.scm.WorkingCopy;
 import org.apache.commons.cli.*;
 
@@ -10,10 +12,7 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.util.Arrays;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  */
@@ -22,19 +21,23 @@ public class PersonalBuildCommand implements Command, PersonalBuildUI
 {
     private File base;
     private String[] files;
-    private CommandLineConfig uiConfig;
+    private CommandLineConfig switchConfig;
+    private PropertiesConfig defineConfig;
     private BufferedReader inputReader;
     private Verbosity verbosity;
 
     public void processArguments(String... argv) throws ParseException
     {
-        uiConfig = new CommandLineConfig();
+        switchConfig = new CommandLineConfig();
         Options options = new Options();
 
         options.addOption(OptionBuilder.withLongOpt("quiet")
                 .create('q'));
         options.addOption(OptionBuilder.withLongOpt("verbose")
                 .create('v'));
+        options.addOption(OptionBuilder.withLongOpt("define")
+                .hasArg()
+                .create('d'));
 
         addPropertyOption(options, 's', "server", PersonalBuildConfig.PROPERTY_PULSE_URL);
         addPropertyOption(options, 'u', "user", PersonalBuildConfig.PROPERTY_PULSE_USER);
@@ -45,7 +48,12 @@ public class PersonalBuildCommand implements Command, PersonalBuildUI
         CommandLineParser parser = new PosixParser();
 
         CommandLine commandLine = parser.parse(options, argv, true);
+        Properties defines = new Properties();
 
+        if(commandLine.hasOption('d'))
+        {
+            addDefinedOption(defines, commandLine.getOptionValue('d'));
+        }
         if(commandLine.hasOption('q'))
         {
             setVerbosity(Verbosity.QUIET);
@@ -55,9 +63,24 @@ public class PersonalBuildCommand implements Command, PersonalBuildUI
             setVerbosity(Verbosity.VERBOSE);
         }
 
-        uiConfig.setCommandLine(commandLine);
+        switchConfig.setCommandLine(commandLine);
+        defineConfig = new PropertiesConfig(defines);
         base = new File(System.getProperty("user.dir"));
         files = commandLine.getArgs();
+    }
+
+    private void addDefinedOption(Properties defines, String value) throws ParseException
+    {
+        int index = value.indexOf('=');
+        if(index <= 0 || index >= value.length() - 1)
+        {
+            throw new ParseException("Invalid property definition syntax '" + value + "' (expected name=value)");
+        }
+
+        String propertyName = value.substring(0, index);
+        String propertyValue = value.substring(index + 1);
+
+        defines.put(propertyName, propertyValue);
     }
 
     private void addPropertyOption(Options options, char shortOption, String longOption, String property)
@@ -65,7 +88,7 @@ public class PersonalBuildCommand implements Command, PersonalBuildUI
         options.addOption(OptionBuilder.withLongOpt(longOption)
                 .hasArg()
                 .create(shortOption));
-        uiConfig.mapSwitch(Character.toString(shortOption), property);
+        switchConfig.mapSwitch(Character.toString(shortOption), property);
     }
 
     private int execute(String[] argv) throws ParseException
@@ -73,6 +96,7 @@ public class PersonalBuildCommand implements Command, PersonalBuildUI
         processArguments(argv);
         inputReader = new BufferedReader(new InputStreamReader(System.in));
 
+        CompositeConfig uiConfig = new CompositeConfig(switchConfig, defineConfig);
         PersonalBuildConfig config = new PersonalBuildConfig(base, uiConfig);
         PersonalBuildClient client = new PersonalBuildClient(config);
         client.setUI(this);
@@ -80,11 +104,12 @@ public class PersonalBuildCommand implements Command, PersonalBuildUI
         try
         {
             WorkingCopy wc = client.checkConfiguration();
+
             File patchFile = null;
 
             try
             {
-                patchFile = File.createTempFile("pulse.patch", ".zip");
+                patchFile = File.createTempFile("pulse.patch.", ".zip");
             }
             catch (IOException e)
             {
@@ -151,6 +176,7 @@ public class PersonalBuildCommand implements Command, PersonalBuildUI
         options.put("-s [--server] url", "set pulse server url");
         options.put("-u [--user] name", "set pulse user name");
         options.put("-p [--password] password", "set pulse password");
+        options.put("-d [--define] name=value" , "set named property to given value");
         options.put("-q [--quiet]", "suppress unnecessary output");
         options.put("-v [--verbose]", "show verbose output");
         return options;
@@ -170,6 +196,14 @@ public class PersonalBuildCommand implements Command, PersonalBuildUI
     public void setVerbosity(Verbosity verbosity)
     {
         this.verbosity = verbosity;
+    }
+
+    public void debug(String message)
+    {
+        if(verbosity == Verbosity.VERBOSE)
+        {
+            System.out.println(message);
+        }
     }
 
     public void status(String message)

@@ -1,7 +1,7 @@
 package com.zutubi.pulse.core;
 
-import com.zutubi.pulse.core.model.TestSuiteResult;
 import com.zutubi.pulse.BuildContext;
+import com.zutubi.pulse.core.model.TestSuiteResult;
 
 import java.io.File;
 import java.io.OutputStream;
@@ -35,7 +35,7 @@ public class CommandContext
 
     private long recipeId;
 
-    private long buildNumber = -1;
+    private BuildContext buildContext;
 
     public CommandContext(RecipePaths paths, File outputDir, TestSuiteResult testResults)
     {
@@ -78,21 +78,31 @@ public class CommandContext
     }
 
     /**
-     * Get the build number of the build that this command execution is a part
-     * of.
-     *
-     * @return the build number, or -1 if the build number is not specified.
+     * @return context for the containing build, if any (null if running a
+     * standalone recipe)
      */
+    public BuildContext getBuildContext()
+    {
+        return buildContext;
+    }
+
+    public void setBuildContext(BuildContext buildContext)
+    {
+        this.buildContext = buildContext;
+    }
+
     public long getBuildNumber()
     {
-        return buildNumber;
+        if(buildContext == null)
+        {
+            return -1;
+        }
+        else
+        {
+            return buildContext.getBuildNumber();
+        }
     }
-
-    public void setBuildNumber(long buildNumber)
-    {
-        this.buildNumber = buildNumber;
-    }
-
+    
     /**
      * Get the id of the recipe to which this command execution is associated.
      *

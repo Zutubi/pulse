@@ -1,5 +1,6 @@
 package com.zutubi.pulse.scm.p4;
 
+import com.zutubi.pulse.config.Config;
 import com.zutubi.pulse.core.model.NumericalRevision;
 import com.zutubi.pulse.personal.PersonalBuildSupport;
 import com.zutubi.pulse.scm.SCMException;
@@ -7,6 +8,7 @@ import com.zutubi.pulse.scm.WorkingCopy;
 import com.zutubi.pulse.scm.WorkingCopyStatus;
 import static com.zutubi.pulse.scm.p4.P4Constants.*;
 
+import java.io.File;
 import java.util.Properties;
 
 /**
@@ -15,7 +17,7 @@ public class P4WorkingCopy extends PersonalBuildSupport implements WorkingCopy
 {
     private P4Client client;
 
-    public P4WorkingCopy()
+    public P4WorkingCopy(File base, Config config)
     {
         this.client = new P4Client();
     }

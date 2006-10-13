@@ -1,5 +1,6 @@
 package com.zutubi.pulse.scm;
 
+import com.zutubi.pulse.config.Config;
 import com.zutubi.pulse.scm.p4.P4WorkingCopy;
 import com.zutubi.pulse.scm.svn.SvnWorkingCopy;
 
@@ -27,14 +28,14 @@ public class WorkingCopyFactory
         }
     }
 
-    public static WorkingCopy create(String type, File base)
+    public static WorkingCopy create(String type, File base, Config config)
     {
         Constructor constructor = typeMap.get(type);
         if(constructor != null)
         {
             try
             {
-                return (WorkingCopy) constructor.newInstance(base);
+                return (WorkingCopy) constructor.newInstance(base, config);
             }
             catch (Exception e)
             {
@@ -52,7 +53,7 @@ public class WorkingCopyFactory
             throw new IllegalArgumentException("Class '" + clazz.getName() + "' does not implement WorkingCopy");
         }
 
-        Constructor constructor = clazz.getConstructor(File.class);
+        Constructor constructor = clazz.getConstructor(File.class, Config.class);
         typeMap.put(type, constructor);
     }
 }

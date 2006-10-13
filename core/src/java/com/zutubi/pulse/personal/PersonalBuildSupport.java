@@ -13,6 +13,14 @@ public abstract class PersonalBuildSupport implements PersonalBuildWorker
         this.ui = ui;
     }
 
+    protected void debug(String message)
+    {
+        if(ui != null)
+        {
+            ui.debug(message);
+        }
+    }
+    
     protected void status(String message)
     {
         if(ui != null)

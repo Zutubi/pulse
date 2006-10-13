@@ -1,7 +1,7 @@
 package com.zutubi.pulse.services;
 
 import com.zutubi.pulse.bootstrap.ConfigurationManager;
-import com.zutubi.pulse.bootstrap.SystemPaths;
+import com.zutubi.pulse.bootstrap.UserPaths;
 import com.zutubi.pulse.util.FileSystemUtils;
 import com.zutubi.pulse.util.IOUtils;
 import com.zutubi.pulse.util.RandomUtils;
@@ -25,7 +25,7 @@ public class ServiceTokenManager
      */
     private boolean generate = true;
 
-    private SystemPaths paths;
+    private UserPaths paths;
     private String token;
 
     public void init()
@@ -104,7 +104,7 @@ public class ServiceTokenManager
 
     File getTokenFile()
     {
-        return new File(paths.getConfigRoot(), TOKEN_FILE);
+        return new File(paths.getUserConfigRoot(), TOKEN_FILE);
     }
 
     public void setGenerate(boolean generate)
@@ -114,7 +114,7 @@ public class ServiceTokenManager
 
     public void setConfigurationManager(ConfigurationManager configurationManager)
     {
-        this.paths = configurationManager.getSystemPaths();
+        this.paths = configurationManager.getUserPaths();
     }
 
 }

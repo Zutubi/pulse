@@ -7,7 +7,7 @@ import java.io.File;
 
 /**
  */
-public class PersonalBuildConfig
+public class PersonalBuildConfig implements Config
 {
     private static final String PROPERTIES_FILENAME = ".pulse.personal.properties";
 
@@ -142,5 +142,30 @@ public class PersonalBuildConfig
             userConfig.setBooleanProperty(property, value);
             return true;
         }
+    }
+
+    public void setProperty(String key, String value)
+    {
+        config.setProperty(key, value);
+    }
+
+    public void removeProperty(String key)
+    {
+        config.removeProperty(key);
+    }
+
+    public boolean hasProperty(String key)
+    {
+        return config.hasProperty(key);
+    }
+
+    public String getProperty(String key)
+    {
+        return config.getProperty(key);
+    }
+
+    public boolean isWriteable()
+    {
+        return config.isWriteable();
     }
 }

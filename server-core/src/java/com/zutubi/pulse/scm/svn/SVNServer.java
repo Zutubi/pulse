@@ -13,9 +13,6 @@ import com.zutubi.pulse.util.IOUtils;
 import com.zutubi.pulse.util.logging.Logger;
 import org.tmatesoft.svn.core.*;
 import org.tmatesoft.svn.core.auth.ISVNAuthenticationManager;
-import org.tmatesoft.svn.core.auth.ISVNAuthenticationProvider;
-import org.tmatesoft.svn.core.auth.SVNAuthentication;
-import org.tmatesoft.svn.core.auth.SVNSSHAuthentication;
 import org.tmatesoft.svn.core.internal.io.dav.DAVRepositoryFactory;
 import org.tmatesoft.svn.core.internal.io.svn.SVNRepositoryFactoryImpl;
 import org.tmatesoft.svn.core.io.SVNRepository;
@@ -191,18 +188,7 @@ public class SVNServer implements SCMServer
     public SVNServer(String url, final String username, final String password, final String privateKeyFile) throws SCMException
     {
         authenticationManager = SVNWCUtil.createDefaultAuthenticationManager(username, password);
-        authenticationManager.setAuthenticationProvider(new ISVNAuthenticationProvider()
-        {
-            public SVNAuthentication requestClientAuthentication(String kind, SVNURL url, String realm, SVNErrorMessage errorMessage, SVNAuthentication previousAuth, boolean authMayBeStored)
-            {
-                return new SVNSSHAuthentication(username, new File(privateKeyFile), null, 22, false);
-            }
-
-            public int acceptServerAuthentication(SVNURL url, String realm, Object certificate, boolean resultMayBeStored)
-            {
-                return ACCEPTED;
-            }
-        });
+        authenticationManager.setAuthenticationProvider(new SVNSSHAuthenticationProvider(username, privateKeyFile, null));
         initialiseRepository(url);
     }
 
@@ -220,18 +206,7 @@ public class SVNServer implements SCMServer
     public SVNServer(String url, final String username, final String password, final String privateKeyFile, final String passphrase) throws SCMException
     {
         authenticationManager = SVNWCUtil.createDefaultAuthenticationManager(username, password);
-        authenticationManager.setAuthenticationProvider(new ISVNAuthenticationProvider()
-        {
-            public SVNAuthentication requestClientAuthentication(String kind, SVNURL url, String realm, SVNErrorMessage errorMessage, SVNAuthentication previousAuth, boolean authMayBeStored)
-            {
-                return new SVNSSHAuthentication(username, new File(privateKeyFile), passphrase, 22, false);
-            }
-
-            public int acceptServerAuthentication(SVNURL url, String realm, Object certificate, boolean resultMayBeStored)
-            {
-                return ACCEPTED;
-            }
-        });
+        authenticationManager.setAuthenticationProvider(new SVNSSHAuthenticationProvider(username, privateKeyFile, passphrase));
         initialiseRepository(url);
     }
 
@@ -663,4 +638,5 @@ public class SVNServer implements SCMServer
         {
         }
     }
+
 }

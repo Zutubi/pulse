@@ -1,5 +1,6 @@
 package com.zutubi.pulse.core;
 
+import com.zutubi.pulse.BuildContext;
 import com.zutubi.pulse.core.model.*;
 import com.zutubi.pulse.events.EventManager;
 import com.zutubi.pulse.events.build.CommandCommencedEvent;
@@ -10,7 +11,6 @@ import com.zutubi.pulse.model.ResourceRequirement;
 import com.zutubi.pulse.util.FileSystemUtils;
 import com.zutubi.pulse.util.IOUtils;
 import com.zutubi.pulse.util.logging.Logger;
-import com.zutubi.pulse.BuildContext;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
@@ -187,7 +187,7 @@ public class RecipeProcessor
             CommandContext commandContext = new CommandContext(paths, commandOutput, testResults);
             if (context != null && context.getBuildNumber() != -1)
             {
-                commandContext.setBuildNumber(context.getBuildNumber());
+                commandContext.setBuildContext(context);
             }
             if(capture)
             {
