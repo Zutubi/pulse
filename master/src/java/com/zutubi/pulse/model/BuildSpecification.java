@@ -55,6 +55,7 @@ public class BuildSpecification extends Entity implements NamedEntity
     {
         BuildSpecification copy = new BuildSpecification(name);
         copy.timeout = timeout;
+        copy.retainWorkingCopy = retainWorkingCopy;
         copy.isolateChangelists = isolateChangelists;
         copy.checkoutScheme = checkoutScheme;
         copy.root = root.copy();
