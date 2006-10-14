@@ -14,14 +14,14 @@
 ;General
 
   ;Name and file
-  Name "Zutubi __SERVICE_NAME__ __VERSION__"
+  Name "Zutubi __SERVICE_NAME__"
   OutFile "..\..\__PACKAGE_NAME__.exe"
 
   ;Default installation folder
-  InstallDir "$PROGRAMFILES\Zutubi\__SERVICE_NAME__ __VERSION__"
+  InstallDir "$PROGRAMFILES\Zutubi\__SERVICE_NAME__"
   
   ;Get installation folder from registry if available
-  InstallDirRegKey HKCU "Software\Zutubi\__SERVICE_NAME__ __VERSION__" ""
+  InstallDirRegKey HKCU "Software\Zutubi\__SERVICE_NAME__" ""
 
 ;--------------------------------
 ;Interface Settings
@@ -40,7 +40,7 @@
   !insertmacro MUI_PAGE_DIRECTORY
 
   !define MUI_STARTMENUPAGE_REGISTRY_ROOT "HKCU" 
-  !define MUI_STARTMENUPAGE_REGISTRY_KEY "Software\Zutubi\__SERVICE_NAME__ __VERSION__"
+  !define MUI_STARTMENUPAGE_REGISTRY_KEY "Software\Zutubi\__SERVICE_NAME__"
   !define MUI_STARTMENUPAGE_REGISTRY_VALUENAME "Start Menu Folder"
   
   !insertmacro MUI_PAGE_STARTMENU Application $STARTMENU_FOLDER
@@ -84,7 +84,7 @@ Exit:
 FunctionEnd
 
 Function EnsureJRE
-  nsExec::ExecToStack '"$INSTDIR\bin\inserv" check-jvm'
+  nsExec::ExecToStack '"$INSTDIR\bin\findjvm"'
   Pop $0
   Pop $1
   StrCmp $0 "error" 0 CheckExit
@@ -110,21 +110,16 @@ Section "Pulse" SecMain
 
   Call EnsureJre
   
-  nsExec::Exec '"$INSTDIR\bin\stop-service.bat"'
-  nsExec::Exec '"$INSTDIR\bin\unserv" "__SERVICE_NAME__"'
-  nsExec::ExecToStack '"$INSTDIR\bin\inserv" "__SERVICE_NAME__" "__SERVICE_DESCRIPTION__"'
+  nsExec::Exec '"$INSTDIR\bin\uninstall-service.bat"'
+  nsExec::ExecToStack '"$INSTDIR\bin\install-service.bat" "__SERVICE_NAME__" "__SERVICE_DESCRIPTION__"'
   Pop $0
-  Pop $1
-  StrCmp $0 "error" 0 CheckExit
-  StrCpy $1 "Could not run service installer"
-  Goto ServiceFailed
 CheckExit:
   StrCmp $0 "0" ServiceOK 0
 ServiceFailed:
-  MessageBox MB_OK "Unable to install pulse service: $1.$\n$\nTry installing manually using $INSTDIR\bin\install-service.bat.  Shortcuts will not work until the service is installed."
+  MessageBox MB_OK "Unable to install pulse service.$\n$\nTry installing manually using $INSTDIR\bin\install-service.bat.  Shortcuts will not work until the service is installed."
 ServiceOK:
   ;Store installation folder
-  WriteRegStr HKCU "Software\Zutubi\__SERVICE_NAME__ __VERSION__" "" $INSTDIR
+  WriteRegStr HKCU "Software\Zutubi\__SERVICE_NAME__" "" $INSTDIR
   
   !insertmacro MUI_STARTMENU_WRITE_BEGIN Application
     CreateDirectory "$SMPROGRAMS\$STARTMENU_FOLDER"
@@ -169,6 +164,6 @@ Section "un.Uninstall"
 
   RMDir /r "$INSTDIR"
 
-  DeleteRegKey /ifempty HKCU "Software\Zutubi\__SERVICE_NAME__ __VERSION__"
+  DeleteRegKey /ifempty HKCU "Software\Zutubi\__SERVICE_NAME__"
 
 SectionEnd
