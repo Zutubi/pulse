@@ -6,7 +6,7 @@
     <!--
     	function openBrowseFileDialog()
     	{
-    	    openFileDialog('$base', 'setup.data', 'data', 'file:///', false, false);
+    	    openFileDialog('$base', 'setup.data', 'data', 'file:///', false, false, true);
     	    return false;
     	}
     -->
