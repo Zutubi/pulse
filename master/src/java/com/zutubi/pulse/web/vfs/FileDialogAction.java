@@ -1,7 +1,5 @@
 package com.zutubi.pulse.web.vfs;
 
-import com.zutubi.pulse.bootstrap.MasterConfigurationManager;
-
 import java.io.File;
 
 /**
@@ -9,16 +7,21 @@ import java.io.File;
  */
 public class FileDialogAction extends VFSActionSupport
 {
-    private MasterConfigurationManager configurationManager;
-
-    private String pulseHome;
-
-    private String userHome;
-
+    /**
+     * The file system separator.
+     */
     private String separator;
 
+    //---( the following properties are generally applicable. )---
+
+    /**
+     * The file system root that defines base directory to be browsed.
+     */
     private String root;
 
+    /**
+     * The initial path defines what directory path should be opened
+     */
     private String initialPath;
 
     /**
@@ -36,15 +39,6 @@ public class FileDialogAction extends VFSActionSupport
      */
     private boolean showHidden = false;
 
-    public String getPulseHome()
-    {
-        return pulseHome;
-    }
-
-    public String getUserHome()
-    {
-        return userHome;
-    }
 
     public String getSeparator()
     {
@@ -101,22 +95,26 @@ public class FileDialogAction extends VFSActionSupport
         this.showHidden = showHidden;
     }
 
+    public String getTitle()
+    {
+        return getText("dialog.title");
+    }
+
+    public String getHeader()
+    {
+        return getText("dialog.header");
+    }
+
+    public String getDescription()
+    {
+        return getText("dialog.description");
+    }
+
     public String execute() throws Exception
     {
-        // pulse home
-        File f = configurationManager.getHomeDirectory();
-        if (f != null)
-        {
-            pulseHome = f.getAbsolutePath();
-            pulseHome = makeJavascriptFriendly(pulseHome);
-        }
-
-        // user home
-        userHome = System.getProperty("user.home");
-        userHome = makeJavascriptFriendly(userHome);
-
+        super.execute();
+        
         separator = makeJavascriptFriendly(File.separator);
-
         return SUCCESS;
     }
 
@@ -126,23 +124,14 @@ public class FileDialogAction extends VFSActionSupport
      * '\' escaping the first character of the files it separates. SO, to fix this, we escape it if
      * necessary.
      *
-     * @param str
-     *
+     * @param str string to be processed.
+     * 
      * @return a version of str with the '\' escaped.
      */
-    private String makeJavascriptFriendly(String str)
+    protected String makeJavascriptFriendly(String str)
     {
         return str.replace("\\", "\\\\");
     }
 
-    /**
-     * Required resource.
-     *
-     * @param configurationManager
-     */
-    public void setConfigurationManager(MasterConfigurationManager configurationManager)
-    {
-        this.configurationManager = configurationManager;
-    }
 
 }

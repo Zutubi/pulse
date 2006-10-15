@@ -120,7 +120,7 @@
 
         <default-interceptor-ref name="completeStack"/>
 
-        <action name="fileDialog" class="com.zutubi.pulse.web.vfs.FileDialogAction">
+        <action name="fileDialog" class="com.zutubi.pulse.web.setup.PulseDataFileDialogAction">
             <result name="success" type="velocity">tree/filedialog.vm</result>
         </action>
 

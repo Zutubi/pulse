@@ -1371,33 +1371,12 @@
             <result name="error" type="velocity">/generic-error.vm</result>
         </action>
 
-        <action name="fileDialog" class="com.zutubi.pulse.web.vfs.FileDialogAction">
-            <result name="success" type="velocity">tree/filedialog.vm</result>
-        </action>
-
         <action name="new-folder" class="com.zutubi.pulse.web.ActionSupport">
             <result name="success" type="velocity">tree/browse-new-folder.vm</result>
         </action>
 
-    </package>
-
-    <package name="forms" namespace="/forms" extends="webwork-default-package">
-        <default-interceptor-ref name="completeStack"/>
-
-        <action name="jabber" class="com.zutubi.pulse.form.ui.FormAction">
-            <param name="objectKey">jabber.config</param>
-            <result name="input" type="velocity">form.vm</result>
-            <result name="cancel" type="velocity">form.vm</result>
-            <result name="reset" type="velocity">form.vm</result>
-            <result name="save" type="velocity">form.vm</result>
-        </action>
-
-        <action name="x" class="com.zutubi.pulse.form.ui.FormAction">
-            <result name="success" type="velocity">form.vm</result>
-            <result name="input" type="velocity">form.vm</result>
-            <result name="cancel" type="velocity">form.vm</result>
-            <result name="reset" type="velocity">form.vm</result>
-            <result name="save" type="velocity">form.vm</result>
+        <action name="fileDialog" class="com.zutubi.pulse.web.admin.AddResourceFileDialogAction">
+            <result name="success" type="velocity">tree/filedialog.vm</result>
         </action>
 
     </package>

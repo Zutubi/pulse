@@ -11,11 +11,11 @@
     	{
     	    if ($agentId == -1)
     	    {
-    	        openFileDialog('$base', 'resource.add.ant', 'dir', 'file:///', false, false, false);
+    	        openFileDialog('$base/popups/fileDialog.action', 'resource.add.ant', 'dir', 'file:///', false, false, false);
     	    }
     	    else
     	    {
-    	        openFileDialog('$base', 'resource.add.ant', 'dir', 'agent://$agentId/', false, false, false);
+    	        openFileDialog('$base/popups/fileDialog.action', 'resource.add.ant', 'dir', 'agent://$agentId/', false, false, false);
     	    }
     	    return false;
     	}

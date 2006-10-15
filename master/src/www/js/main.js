@@ -120,9 +120,9 @@ function openResourceBrowser(contextPath, resourceId, versionId)
     browseWindow.focus();
 }
 
-function openFileDialog(contextPath, formname, fieldname, root, showFiles, showHidden, showToolbar)
+function openFileDialog(path, formname, fieldname, root, showFiles, showHidden, showToolbar)
 {
-    var browseWindow = window.open(contextPath + '/popups/fileDialog.action?formname=' + formname +
+    var browseWindow = window.open(path + '?formname=' + formname +
                                    '&fieldname=' + fieldname + '&root=' + root +
                                    '&showFiles=' + showFiles + '&showHidden=' + showHidden +
                                    '&showToolbar=' + showToolbar,

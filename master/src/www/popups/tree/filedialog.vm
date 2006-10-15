@@ -1,9 +1,10 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN">
 <html>
 <head>
-    <title>Select directory</title>
+    <title>$title</title>
 
     <link rel="stylesheet" type="text/css" href="$base/css/treeview/tree.css"/>
+    <link rel="stylesheet" type="text/css" href="$base/css/filedialog.css"/>
 
     <script type="text/javascript" src="$base/js/prototype.js"></script>
     <script type="text/javascript" src="$base/js/zutubi.js"></script>
@@ -373,43 +374,31 @@
             //-->
     </script>
 
-    <style type="text/css">
-        .viewport{
-            overflow:auto;
-        }
-
-        .bordered{
-            margin:0px 0px 10px 0px;
-            border-width:1px;
-            border-color:blue;
-            border-style:solid;
-        }
-
-        .nofluff {
-           margin:0px;
-           padding:0px;
-        }
-    </style>
-
 </head>
 
 <body>
     <!-- banner -->
-    <div style="padding-bottom:10px;">
-        <div style="float:left;">
-            <b>Select pulse data directory</b>
-            <br/>
-            All pulse data files will be stored in this directory.
-        </div>
-        <div id="loading" style="float:right;display:none;"><img src="$base/images/inprogress.gif" alt="loading..."/></div>
-        <div style="clear:both;"></div>
+    <div id="banner">
+        <h2>$header</h2>
+        <p>
+            $description
+        </p>
+    </div>
+    <div id="loading">
+        <img src="$base/images/inprogress.gif" alt="loading..."/>
+    </div>
+
+    <div style="clear:both;"></div>
+
+    <!-- error message -->
+    <div class="error" id="error">
     </div>
 
     <!--toolbar-->
     <div id="toolbar"></div>
 
     <!--directory view-->
-    <div class="viewport bordered" id="view">
+    <div class="viewport" id="view">
         <div id="browseTree"></div>
     </div>
 
