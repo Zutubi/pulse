@@ -11,7 +11,7 @@ import java.util.Map;
 /**
  * <class-comment/>
  */
-public class ResourceRepositoryTest extends PulseTestCase
+public class FileResourceRepositoryTest extends PulseTestCase
 {
     private FileResourceRepository repo = null;
 

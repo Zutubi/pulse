@@ -1,17 +1,16 @@
 <html>
 <head>
     <title>#wwtext("name=data.setup")</title>
+    <script type="text/javascript" src="$base/js/main.js"></script>
     <script type="text/javascript">
-        <!--
-        function openPopup()
-        {
-            var formElement = document.forms['setup.data'].elements['data'];
-            window.open('$base/popups/browse-dirs.action?formname=setup.data&fieldname=data&initPath=' + formElement.value, 'browse_popup', 'width=400, height=550, resizable=yes', false);
-            return false
-        }
-        //-->
+    <!--
+    	function openBrowseFileDialog()
+    	{
+    	    openFileDialog('$base', 'setup.data', 'data', 'file:///', false, false);
+    	    return false;
+    	}
+    -->
     </script>
-
 </head>
 
 <body>
@@ -20,13 +19,8 @@
     #parse("/template/includes/actionerrors.vm")
 
 #wwcform("action=setupData.action" "heading=%{getText('data.setup')}" "name=setup.data" "method=post")
-
-    #wwtextfield("template=controlheader" "name=data" "required=true" "label=%{getText('data.field')}")
-    #wwtextfield("theme=simple" "template=ctext" "name=data" "size=60" "tabindex=1" "onkeypress=return submitenter(this,event);")
-    #wwsubmit("theme=simple" "name=browse" "value=browse" "onclick=openPopup(); return false;")
-    #wwtextfield("template=controlfooter" "name=data")
+    #wwtextfield("name=data" "required=true" "label=%{getText('data.field')}" "size=60" "tabindex=1"  "after= <a href='#' onclick='return openBrowseFileDialog();'>browse</a>"  "onkeypress=return submitenter(this,event);")
     #inlineHelp("data.help")
-
     #next(2)
 #end
 <p>

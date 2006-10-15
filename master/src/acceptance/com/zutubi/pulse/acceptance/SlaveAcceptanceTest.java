@@ -3,6 +3,7 @@ package com.zutubi.pulse.acceptance;
 import com.zutubi.pulse.acceptance.forms.MasterAgentForm;
 import com.zutubi.pulse.acceptance.forms.ResourceForm;
 import com.zutubi.pulse.acceptance.forms.SlaveForm;
+import com.zutubi.pulse.acceptance.forms.AddResourceWizard;
 import com.zutubi.pulse.util.RandomUtils;
 
 /**
@@ -166,11 +167,17 @@ public class SlaveAcceptanceTest extends BaseAcceptanceTestCase
         clickLinkWithText("resources");
         clickLink("resource.add");
 
-        ResourceForm form = new ResourceForm(tester);
-        assertResourceValidation(form);
+        // select custom from the drop down.
+        AddResourceWizard.Select select = new AddResourceWizard.Select(tester);
+        select.assertFormPresent();
+        select.nextFormElements("custom");
+        select.assertFormNotPresent();
 
-        form.saveFormElements(resourceName);
-        form.assertFormNotPresent();
+        // then select edit resource.
+        AddResourceWizard.Custom custom = new AddResourceWizard.Custom(tester);
+        custom.assertFormPresent();
+        custom.nextFormElements(resourceName);
+        custom.assertFormNotPresent();
     }
 
     // @Required(agent)
@@ -234,10 +241,17 @@ public class SlaveAcceptanceTest extends BaseAcceptanceTestCase
         clickLinkWithText("resources");
         clickLink("resource.add");
 
-        ResourceForm form = new ResourceForm(tester);
-        assertResourceValidation(form);
-        form.saveFormElements(name);
-        form.assertFormNotPresent();
+        // select custom from the drop down.
+        AddResourceWizard.Select select = new AddResourceWizard.Select(tester);
+        select.assertFormPresent();
+        select.nextFormElements("custom");
+        select.assertFormNotPresent();
+
+        // then select edit resource.
+        AddResourceWizard.Custom custom = new AddResourceWizard.Custom(tester);
+        custom.assertFormPresent();
+        custom.nextFormElements(name);
+        custom.assertFormNotPresent();
 
         // return to the resources view.
         clickLinkWithText("resources");

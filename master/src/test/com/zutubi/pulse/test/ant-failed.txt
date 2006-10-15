@@ -118,7 +118,7 @@ common-test:
     [junit] Tests run: 37, Failures: 0, Errors: 0, Time elapsed: 0.881 sec
     [junit] Running com.zutubi.pulse.core.ResourceReferenceTest
     [junit] Tests run: 1, Failures: 0, Errors: 0, Time elapsed: 1.132 sec
-    [junit] Running com.zutubi.pulse.core.ResourceRepositoryTest
+    [junit] Running com.zutubi.pulse.core.FileResourceRepositoryTest
     [junit] Tests run: 4, Failures: 0, Errors: 0, Time elapsed: 1.211 sec
     [junit] Running com.zutubi.pulse.core.VariableHelperTest
     [junit] Tests run: 18, Failures: 0, Errors: 0, Time elapsed: 0.11 sec

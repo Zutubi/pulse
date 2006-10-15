@@ -21,4 +21,6 @@ public interface ResourceManager extends EntityManager<PersistentResource>
 
     void renameResource(PersistentResource resource, String newName);
     void renameResourceVersion(PersistentResource resource, String value, String newValue);
+
+    void addResource(Slave slave, Resource resource);
 }

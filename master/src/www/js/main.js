@@ -120,6 +120,17 @@ function openResourceBrowser(contextPath, resourceId, versionId)
     browseWindow.focus();
 }
 
+function openFileDialog(contextPath, formname, fieldname, root, showFiles, showHidden, showToolbar)
+{
+    var browseWindow = window.open(contextPath + '/popups/fileDialog.action?formname=' + formname +
+                                   '&fieldname=' + fieldname + '&root=' + root +
+                                   '&showFiles=' + showFiles + '&showHidden=' + showHidden +
+                                   '&showToolbar=' + showToolbar,
+            'browse_popup', 'width=400, height=550, resizable=yes', false);
+    browseWindow.opener = self;
+    browseWindow.focus();
+}
+
 // @deprecated. Use the Prototype function Element.toggle instead.
 function toggleElementDisplay(element)
 {

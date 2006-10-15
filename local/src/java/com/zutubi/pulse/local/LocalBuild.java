@@ -1,7 +1,7 @@
 package com.zutubi.pulse.local;
 
+import com.zutubi.pulse.resources.ResourceDiscoverer;
 import com.zutubi.pulse.BuildContext;
-import com.zutubi.pulse.ResourceDiscoverer;
 import com.zutubi.pulse.core.*;
 import com.zutubi.pulse.core.model.Resource;
 import com.zutubi.pulse.events.DefaultEventManager;

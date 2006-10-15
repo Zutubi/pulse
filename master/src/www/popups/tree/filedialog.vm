@@ -92,6 +92,48 @@
             {
                 onResize(event);
 
+                if ($showToolbar)
+                {
+                    initialiseToolbar();
+                }
+
+                // construct the directory browser.
+                var tree = new ZUTUBI.widget.TreeView('browseTree');
+                tree.setSeparator('$separator');
+
+                // register event handlers and callbacks.
+                tree.setDynamicLoad(function(node, onCompleteCallback)
+                {
+                    ls(node, onCompleteCallback, $showFiles, $showHidden);
+                }, 1);
+
+                // when a node is selected, ensure that it is visible.
+                tree.onSelect = function(node)
+                {
+                    ensureVisible();
+                }
+
+                // when a node is activated (dblclicked), toggle it.
+                tree.onActivate = function(node)
+                {
+                    if (node.hasChildren(true))
+                    {
+                        node.toggle();
+                    }
+                };
+
+                // load the root nodes for the file system, then draw and open the tree.
+                Element.show($('loading'));
+                ls(tree.getRoot(), function()
+                {
+                    Element.hide($('loading'));
+                    tree.draw();
+                    tree.expandToPath(getFormValue());
+                }, $showFiles, $showHidden);
+            }
+
+            function initialiseToolbar()
+            {
                 // initialise toolbar items.
                 var goToHome = new ZUTUBI.widget.GoToToolbarItem('home', 'Go to user home', 'browseTree', '$!userHome');
                 var goToPulseHome = new ZUTUBI.widget.GoToToolbarItem('pulsehome', 'Go to pulse home', 'browseTree', '$!pulseHome');
@@ -131,6 +173,7 @@
                 };
 
                 var refreshFolder = new ZUTUBI.widget.ToolbarItem('refresh');
+                refreshFolder.setTooltip('Refresh folder');
                 refreshFolder.onClick = function()
                 {
                     var tree = ZUTUBI.widget.TreeView.getTree('browseTree');
@@ -156,40 +199,6 @@
                 toolbar.add(deleteFolder);
                 toolbar.add(refreshFolder);
                 toolbar.draw();
-
-                // construct the directory browser.
-                var tree = new ZUTUBI.widget.TreeView('browseTree');
-                tree.setSeparator('$separator');
-
-                // register event handlers and callbacks.
-                tree.setDynamicLoad(function(node, onCompleteCallback)
-                {
-                    ls(node, onCompleteCallback, true);
-                }, 1);
-
-                // when a node is selected, ensure that it is visible.
-                tree.onSelect = function(node)
-                {
-                    ensureVisible();
-                }
-
-                // when a node is activated (dblclicked), toggle it.
-                tree.onActivate = function(node)
-                {
-                    if (node.hasChildren(true))
-                    {
-                        node.toggle();
-                    }
-                };
-
-                // load the root nodes for the file system, then draw and open the tree.
-                Element.show($('loading'));
-                ls(tree.getRoot(), function()
-                {
-                    Element.hide($('loading'));
-                    tree.draw();
-                    tree.expandToPath(getFormValue());
-                });
             }
 
             /*
@@ -212,7 +221,7 @@
                 Element.setStyle(vElem, {"height":viewHeight + "px"});
             }
 
-            function ls(node, onCompleteCallback, dirOnly)
+            function ls(node, onCompleteCallback, showFiles, showHidden)
             {
                 // generate id path.
                 var p = node.getPath();
@@ -224,7 +233,7 @@
                         onComplete: lsResponse(node, onCompleteCallback),
                         onFailure: handleFailure,
                         onException: handleException,
-                        parameters: "path=" + p + (dirOnly && "&dirOnly=true" || "")
+                        parameters: "root=$root&path=" + p + (showFiles && "&showFiles=" + showFiles || "") + (showHidden && "&showHidden=" + showHidden || "")
                     }
                 );
             }
@@ -279,11 +288,11 @@
                 var ajax = new Ajax.Request(
                     "$base/ajax/mkdir.action",
                     {
-                        method: 'get',
+                        method: 'post',
                         onComplete: mkdirResponse(node, name),
                         onFailure: handleFailure,
                         onException: handleException,
-                        parameters: "path=" + p + "&name=" + name
+                        parameters: "root=$root&path=" + p + "&name=" + name
                     }
                 );
             }
@@ -330,11 +339,11 @@
                 var ajax = new Ajax.Request(
                     "$base/ajax/rmdir.action",
                     {
-                        method: 'get',
+                        method: 'post',
                         onComplete: rmdirResponse(node),
                         onFailure: handleFailure,
                         onException: handleException,
-                        parameters: "pid=" + p
+                        parameters: "root=$root&path=" + p
                     }
                 );
             }
@@ -392,7 +401,7 @@
             <br/>
             All pulse data files will be stored in this directory.
         </div>
-        <div id="loading" style="float:right;display:none;"><img src="$base/images/treeview/loading.gif" alt="loading..."/></div>
+        <div id="loading" style="float:right;display:none;"><img src="$base/images/inprogress.gif" alt="loading..."/></div>
         <div style="clear:both;"></div>
     </div>
 

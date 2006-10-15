@@ -1138,6 +1138,20 @@
             <result name="success" type="redirect">/admin/serverSettings.action</result>
         </action>
 
+        <action name="addResource" class="com.zutubi.pulse.web.wizard.WizardAction">
+            <interceptor-ref name="wizardStack"/>
+            <param name="wizardClass">com.zutubi.pulse.web.admin.AddResourceWizard</param>
+            <result name="select" type="velocity">addresource.vm</result>
+            <result name="ant" type="velocity">addresource-ant.vm</result>
+            <result name="java" type="velocity">addresource-java.vm</result>
+            <result name="maven" type="velocity">addresource-maven.vm</result>
+            <result name="maven2" type="velocity">addresource-maven2.vm</result>
+            <result name="custom" type="velocity">addresource-custom.vm</result>
+            <result name="success" type="redirect">/viewResources.action?agentId=${agentId}</result>
+            <result name="cancel" type="redirect">/viewResources.action?agentId=${agentId}</result>
+            <result name="error" type="velocity">/generic-error.vm</result>
+        </action>
+
         <action name="createResource" class="com.zutubi.pulse.web.admin.CreateResourceAction">
             <result name="input" type="velocity">create-resource.vm</result>
             <result name="cancel" type="redirect">/viewResources.action?agentId=${agentId}</result>
@@ -1325,6 +1339,18 @@
             <result name="success" type="velocity">test-settings.vm</result>
         </action>
 
+        <action name="ls" class="com.zutubi.pulse.web.vfs.LsAction">
+            <result name="success" type="json">ls.xml</result>
+        </action>
+
+        <action name="mkdir" class="com.zutubi.pulse.web.vfs.MkdirAction">
+            <result name="success" type="json">mkdir.xml</result>
+        </action>
+
+        <action name="rmdir" class="com.zutubi.pulse.web.vfs.RmAction">
+            <result name="success" type="json">rmdir.xml</result>
+        </action>
+
     </package>
 
     <package name="popups" namespace="/popups" extends="webwork-default-package">
@@ -1345,8 +1371,8 @@
             <result name="error" type="velocity">/generic-error.vm</result>
         </action>
 
-        <action name="browse-dirs" class="com.zutubi.pulse.web.tree.SelectDirectoryAction">
-            <result name="success" type="velocity">tree/browse-dirs.vm</result>
+        <action name="fileDialog" class="com.zutubi.pulse.web.vfs.FileDialogAction">
+            <result name="success" type="velocity">tree/filedialog.vm</result>
         </action>
 
         <action name="new-folder" class="com.zutubi.pulse.web.ActionSupport">

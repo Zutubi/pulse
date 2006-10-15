@@ -91,7 +91,7 @@
         #set($args = "")
     #end
 
-        #addRow("resource.add" 6 "$base/admin/createResource!input.action${args}" "resource.add")
+    #addRow("resource.add" 6 "$base/admin/addResource!input.action${args}" "resource.add")
 #end
     </table>
 

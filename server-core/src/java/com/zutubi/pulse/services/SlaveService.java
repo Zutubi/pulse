@@ -2,6 +2,8 @@ package com.zutubi.pulse.services;
 
 import com.zutubi.pulse.SystemInfo;
 import com.zutubi.pulse.BuildContext;
+import com.zutubi.pulse.resources.ResourceConstructor;
+import com.zutubi.pulse.filesystem.FileInfo;
 import com.zutubi.pulse.core.RecipeRequest;
 import com.zutubi.pulse.core.model.Resource;
 import com.zutubi.pulse.logging.CustomLogRecord;
@@ -61,4 +63,18 @@ public interface SlaveService
     List<CustomLogRecord> getRecentMessages(String token) throws InvalidTokenException;
 
     List<Resource> discoverResources(String token);
+
+    /*
+    String[] list(String path);
+    */
+    
+    FileInfo getFileInfo(String token, String path);
+
+    String[] listRoots(String token);
+
+    Resource createResource(ResourceConstructor constructor, String path)
+            ;
+
+    boolean isResourceHome(ResourceConstructor constructor, String path)
+            ;
 }

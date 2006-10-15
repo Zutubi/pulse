@@ -40,10 +40,19 @@ public class ResourceAcceptanceTest extends BaseAcceptanceTestCase
     public void testAddResourceValidation()
     {
         clickLink("resource.add");
-        ResourceForm form = new ResourceForm(tester);
-        form.assertFormPresent();
-        form.saveFormElements("");
-        form.assertFormPresent();
+
+        // select custom from the drop down.
+        AddResourceWizard.Select select = new AddResourceWizard.Select(tester);
+        select.assertFormPresent();
+        select.nextFormElements("custom");
+        select.assertFormNotPresent();
+
+        // then select edit resource.
+        AddResourceWizard.Custom custom = new AddResourceWizard.Custom(tester);
+        custom.assertFormPresent();
+        custom.nextFormElements("");
+
+        custom.assertFormPresent();
         assertTextPresent("name is required");
     }
 
@@ -51,11 +60,20 @@ public class ResourceAcceptanceTest extends BaseAcceptanceTestCase
     {
         addResource(resourceName);
         clickLinkWithText("resources");
+
         clickLink("resource.add");
-        ResourceForm form = new ResourceForm(tester);
-        form.assertFormPresent();
-        form.saveFormElements(resourceName);
-        form.assertFormPresent();
+        // select custom from the drop down.
+        AddResourceWizard.Select select = new AddResourceWizard.Select(tester);
+        select.assertFormPresent();
+        select.nextFormElements("custom");
+        select.assertFormNotPresent();
+
+        // then select edit resource.
+        AddResourceWizard.Custom custom = new AddResourceWizard.Custom(tester);
+        custom.assertFormPresent();
+        custom.nextFormElements(resourceName);
+        custom.assertFormPresent();
+
         assertTextPresent("A resource with name '" + resourceName + "' already exists");
     }
 
@@ -350,8 +368,20 @@ public class ResourceAcceptanceTest extends BaseAcceptanceTestCase
     private void addResource(String name)
     {
         clickLink("resource.add");
-        ResourceForm form = new ResourceForm(tester);
-        form.assertFormPresent();
-        form.saveFormElements(name);
+
+        // select custom from the drop down.
+        AddResourceWizard.Select select = new AddResourceWizard.Select(tester);
+        select.assertFormPresent();
+        select.nextFormElements("custom");
+        select.assertFormNotPresent();
+
+        // then select edit resource.
+        AddResourceWizard.Custom custom = new AddResourceWizard.Custom(tester);
+        custom.assertFormPresent();
+        custom.nextFormElements(name);
+        custom.assertFormNotPresent();
+
+        assertLinkPresent("edit_" + name);
+        clickLink("edit_" + name);
     }
 }

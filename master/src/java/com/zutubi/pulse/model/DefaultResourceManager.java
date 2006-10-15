@@ -1,8 +1,9 @@
 package com.zutubi.pulse.model;
 
-import com.zutubi.pulse.ResourceDiscoverer;
+import com.zutubi.pulse.resources.ResourceDiscoverer;
 import com.zutubi.pulse.core.model.Resource;
 import com.zutubi.pulse.core.model.ResourceVersion;
+import com.zutubi.pulse.core.ConfigurableResourceRepository;
 import com.zutubi.pulse.model.persistence.BuildSpecificationNodeDao;
 import com.zutubi.pulse.model.persistence.ResourceDao;
 
@@ -72,22 +73,13 @@ public class DefaultResourceManager implements ResourceManager
 
     public void addDiscoveredResources(Slave slave, List<Resource> resources)
     {
-        DatabaseResourceRepository repository;
-        if(slave == null)
-        {
-            repository = masterResourceRepository;
-        }
-        else
-        {
-            repository = getSlaveRepository(slave);
-        }
+        ConfigurableResourceRepository repository = getRepository(slave);
 
         for(Resource r: resources)
         {
             if(!repository.hasResource(r.getName()))
             {
-                PersistentResource persistent = new PersistentResource(r, slave);
-                repository.addResource(persistent);
+                repository.addResource(r);
             }
         }
     }
@@ -140,12 +132,18 @@ public class DefaultResourceManager implements ResourceManager
         resourceDao.save(resource);
     }
 
+    public void addResource(Slave slave, Resource resource)
+    {
+        ConfigurableResourceRepository repository = getRepository(slave);
+        repository.addResource(resource, true);
+    }
+
     public List<PersistentResource> findBySlave(Slave slave)
     {
         return resourceDao.findAllBySlave(slave);
     }
 
-    public DatabaseResourceRepository getRepository(Slave slave)
+    public ConfigurableResourceRepository getRepository(Slave slave)
     {
         if(slave == null)
         {

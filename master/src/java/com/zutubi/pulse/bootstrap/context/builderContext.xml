@@ -181,5 +181,12 @@
     <bean id="queries" class="com.zutubi.pulse.search.Queries" autowire="byName"/>
 
     <bean id="serviceTokenManager" class="com.zutubi.pulse.services.ServiceTokenManager" autowire="byName" init-method="init"/>
-    
+
+    <!-- re create the file system manager now that the slave details are available. -->
+    <bean id="fileSystemManager" class="com.zutubi.pulse.vfs.VfsManagerFactoryBean" destroy-method="shutdown">
+        <property name="slaveManager"><ref local="slaveManager"/></property>
+        <property name="slaveProxyFactory"><ref local="slaveProxyFactory"/></property>
+        <property name="serviceTokenManager"><ref local="serviceTokenManager"/></property>
+    </bean>
+
 </beans>

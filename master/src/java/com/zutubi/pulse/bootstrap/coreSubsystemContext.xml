@@ -41,4 +41,10 @@
     <import resource="classpath:/com/zutubi/pulse/bootstrap/context/webserverContext.xml"/>
     <import resource="classpath:/com/zutubi/pulse/bootstrap/context/licenseContext.xml"/>
 
+    <!--
+     define the file system manager here so that it is available during setup. This is also redefined later
+     when other requirements become available.
+     -->
+    <bean id="fileSystemManager" class="com.zutubi.pulse.vfs.VfsManagerFactoryBean" destroy-method="shutdown"/>
+
 </beans>
