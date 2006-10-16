@@ -22,7 +22,6 @@ public class AgentFileNameParser extends AbstractFileNameParser
 
     public AgentFileName parseUri(final VfsComponentContext context, final FileName base, final String filename) throws FileSystemException
     {
-        // FTP URI are generic URI (as per RFC 2396)
         final StringBuffer name = new StringBuffer();
         name.append(filename);
 

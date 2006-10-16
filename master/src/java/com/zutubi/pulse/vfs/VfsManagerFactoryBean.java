@@ -33,7 +33,7 @@ public class VfsManagerFactoryBean implements FactoryBean
                 if (instance == null)
                 {
                     instance = new DefaultFileSystemManager();
-                    instance.addProvider("file", new DefaultLocalFileProvider());
+                    instance.addProvider("local", new DefaultLocalFileProvider());
                     instance.addProvider("ram", new RamFileProvider());
 
                     AgentFileProvider fileProvider = new AgentFileProvider();
