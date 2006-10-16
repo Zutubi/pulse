@@ -3,7 +3,6 @@ package com.zutubi.pulse;
 import com.zutubi.pulse.bootstrap.MasterConfigurationManager;
 import com.zutubi.pulse.core.BuildException;
 import com.zutubi.pulse.model.BuildResult;
-import com.zutubi.pulse.model.Project;
 
 import java.io.File;
 
@@ -11,12 +10,10 @@ import java.io.File;
  */
 public class DefaultRecipeResultCollector implements RecipeResultCollector
 {
-    private Project project;
     private MasterBuildPaths paths;
 
-    public DefaultRecipeResultCollector(Project project, MasterConfigurationManager configManager)
+    public DefaultRecipeResultCollector(MasterConfigurationManager configManager)
     {
-        this.project = project;
         this.paths = new MasterBuildPaths(configManager);
     }
 

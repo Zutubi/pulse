@@ -26,7 +26,7 @@ public class VariableHelperTest extends TestCase
 
         try
         {
-            result = VariableHelper.replaceVariables(input, true, scope);
+            result = VariableHelper.replaceVariables(input, scope);
         }
         catch (PulseException e)
         {
@@ -39,7 +39,7 @@ public class VariableHelperTest extends TestCase
 
     private void successTest(String in, String out) throws Exception
     {
-        String result = VariableHelper.replaceVariables(in, true, scope);
+        String result = VariableHelper.replaceVariables(in, scope);
         assertEquals(out, result);
     }
 

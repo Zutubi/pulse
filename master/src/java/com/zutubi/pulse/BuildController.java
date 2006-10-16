@@ -1,6 +1,7 @@
 package com.zutubi.pulse;
 
 import com.zutubi.pulse.bootstrap.MasterConfigurationManager;
+import com.zutubi.pulse.bootstrap.ComponentContext;
 import com.zutubi.pulse.core.Bootstrapper;
 import com.zutubi.pulse.core.BuildException;
 import com.zutubi.pulse.core.BuildRevision;
@@ -554,6 +555,7 @@ public class BuildController implements EventListener
 
             for(PostBuildAction action: buildResult.getProject().getPostBuildActions())
             {
+                ComponentContext.autowire(action);
                 action.execute(buildResult);
             }
         }

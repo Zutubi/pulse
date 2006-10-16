@@ -254,7 +254,7 @@ public class FatController implements EventListener, Stoppable
                     projectManager.buildCommenced(project.getId());
                 }
                 
-                RecipeResultCollector collector = new DefaultRecipeResultCollector(project, configManager);
+                RecipeResultCollector collector = new DefaultRecipeResultCollector(configManager);
                 BuildController controller = new BuildController(event, buildSpec, eventManager, projectManager, userManager, buildManager, recipeQueue, collector, quartzScheduler, configManager, serviceTokenManager);
                 controller.run();
                 runningBuilds.add(controller);

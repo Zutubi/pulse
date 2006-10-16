@@ -1,10 +1,11 @@
 package com.zutubi.pulse.model;
 
+import com.zutubi.pulse.MasterBuildPaths;
+import com.zutubi.pulse.bootstrap.MasterConfigurationManager;
 import com.zutubi.pulse.core.FileLoadException;
 import com.zutubi.pulse.core.Scope;
 import com.zutubi.pulse.core.VariableHelper;
-import com.zutubi.pulse.core.model.Property;
-import com.zutubi.pulse.core.model.ResultState;
+import com.zutubi.pulse.core.model.*;
 import com.zutubi.pulse.util.StringUtils;
 
 import java.util.LinkedList;
@@ -17,6 +18,7 @@ public class RunExecutablePostBuildAction extends PostBuildAction
 {
     private String command;
     private String arguments;
+    private MasterConfigurationManager configurationManager;
 
     public RunExecutablePostBuildAction()
     {
@@ -70,16 +72,81 @@ public class RunExecutablePostBuildAction extends PostBuildAction
     {
         List<String> args = StringUtils.split(arguments);
 
+        Scope scope = getScope(result, configurationManager);
+
+        for(String arg: args)
+        {
+            commandLine.add(VariableHelper.replaceVariables(arg, scope, true));
+        }
+    }
+
+    public static Scope getScope(BuildResult result, MasterConfigurationManager configurationManager)
+    {
+        MasterBuildPaths paths = new MasterBuildPaths(configurationManager);
+
         Scope scope = new Scope();
         scope.add(new Property("project", result.getProject().getName()));
         scope.add(new Property("number", Long.toString(result.getNumber())));
         scope.add(new Property("specification", result.getBuildSpecification()));
         scope.add(new Property("status", result.getState().getString()));
+        scope.add(new Property("reason", result.getReason().getSummary()));
 
-        for(String arg: args)
+        TestResultSummary tests = result.getTestSummary();
+        String testSummary;
+        if(tests.getTotal() > 0)
         {
-            commandLine.add(VariableHelper.replaceVariables(arg, true, scope));
+            if(tests.allPassed())
+            {
+                testSummary = "all " + tests.getTotal() + " tests passed";
+            }
+            else
+            {
+                testSummary = Integer.toString(tests.getBroken()) + " of " + tests.getTotal() + " tests broken";
+            }
         }
+        else
+        {
+            testSummary = "no tests";
+        }
+
+        scope.add(new Property("test.summary", testSummary));
+        scope.add(new Property("build.dir", paths.getBuildDir(result).getAbsolutePath()));
+
+        for(RecipeResultNode node: result.getRoot().getChildren())
+        {
+            addStageProperties(result, node, scope, paths, configurationManager);
+        }
+        return scope;
+    }
+
+    private static void addStageProperties(BuildResult result, RecipeResultNode node, Scope scope, MasterBuildPaths paths, MasterConfigurationManager configurationManager)
+    {
+        String name = node.getStage();
+        String prefix = "stage." + name + ".";
+
+        RecipeResult recipeResult = node.getResult();
+        scope.add(new Property(prefix + "agent", node.getHostSafe()));
+        if(result != null)
+        {
+            scope.add(new Property(prefix + "recipe", recipeResult.getRecipeNameSafe()));
+            scope.add(new Property(prefix + "status", recipeResult.getState().getString()));
+            scope.add(new Property(prefix + "dir", paths.getRecipeDir(result, recipeResult.getId()).getAbsolutePath()));
+
+            for(CommandResult command: recipeResult.getCommandResults())
+            {
+                addCommandProperties(node, command, scope, configurationManager);
+            }
+        }
+    }
+
+    private static void addCommandProperties(RecipeResultNode node, CommandResult commandResult, Scope scope, MasterConfigurationManager configurationManager)
+    {
+        String stageName = node.getStage();
+        String commandName = commandResult.getCommandName();
+        String prefix = "stage." + stageName + ".command." + commandName + ".";
+
+        scope.add(new Property(prefix + "status", commandResult.getState().getString()));
+        scope.add(new Property(prefix + "dir", commandResult.getAbsoluteOutputDir(configurationManager.getDataDirectory()).getAbsolutePath()));
     }
 
     public String getCommand()
@@ -102,19 +169,8 @@ public class RunExecutablePostBuildAction extends PostBuildAction
         this.arguments = arguments;
     }
 
-    public static void validateArguments(String arguments) throws Exception
+    public void setConfigurationManager(MasterConfigurationManager configurationManager)
     {
-        List<String> args = StringUtils.split(arguments);
-
-        Scope scope = new Scope();
-        scope.add(new Property("project", "project"));
-        scope.add(new Property("number", "number"));
-        scope.add(new Property("specification", "specification"));
-        scope.add(new Property("status", "status"));
-
-        for(String arg: args)
-        {
-            VariableHelper.replaceVariables(arg, true, scope);
-        }
+        this.configurationManager = configurationManager;
     }
 }

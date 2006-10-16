@@ -8,9 +8,6 @@
 <body>
     #projectTabs("configuration")
 
-<table class="columns">
-    <tr><td class="columns">
-
     #parse("/template/includes/actionerrors.vm")
 
 #wwcform("action=editExeAction.action" "id=edit.exe.post.build.action" "heading=%{getText('edit.exe.post.build.action')}" "method=post")
@@ -33,12 +30,11 @@
 
 #end
 
-    </td><td class="columns">
-
     #parse("/template/includes/post-build-action-variables.vm")
 
-    </td>
-</table>
+#if($exampleScope)
+    #parse("/template/includes/exe-action-example-variables.vm")    
+#end
 
     #tabEnd()
 </body>

@@ -25,7 +25,7 @@ import java.io.File;
 import java.util.List;
 
 /**
- * 
+ *
  *
  */
 public class DefaultBuildManager implements BuildManager, EventListener
@@ -351,7 +351,7 @@ public class DefaultBuildManager implements BuildManager, EventListener
             {
                 if (rule.getWorkDirOnly())
                 {
-                    cleanupWork(project, build);
+                    cleanupWork(build);
                 }
                 else
                 {
@@ -428,15 +428,15 @@ public class DefaultBuildManager implements BuildManager, EventListener
         buildResultDao.delete(build);
     }
 
-    private void cleanupWork(Project project, BuildResult build)
+    private void cleanupWork(BuildResult build)
     {
         build.setHasWorkDir(false);
         buildResultDao.save(build);
         MasterBuildPaths paths = new MasterBuildPaths(configurationManager);
-        cleanupWorkForNodes(paths, project, build, build.getRoot().getChildren());
+        cleanupWorkForNodes(paths, build, build.getRoot().getChildren());
     }
 
-    private void cleanupWorkForNodes(MasterBuildPaths paths, Project project, BuildResult build, List<RecipeResultNode> nodes)
+    private void cleanupWorkForNodes(MasterBuildPaths paths, BuildResult build, List<RecipeResultNode> nodes)
     {
         for (RecipeResultNode node : nodes)
         {
@@ -446,7 +446,7 @@ public class DefaultBuildManager implements BuildManager, EventListener
                 LOG.warning("Unable to clean up build directory '" + workDir.getAbsolutePath() + "'");
             }
 
-            cleanupWorkForNodes(paths, project, build, node.getChildren());
+            cleanupWorkForNodes(paths, build, node.getChildren());
         }
     }
 

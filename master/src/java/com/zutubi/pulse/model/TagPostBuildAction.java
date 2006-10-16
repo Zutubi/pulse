@@ -65,7 +65,7 @@ public class TagPostBuildAction extends PostBuildAction
         scope.add(new Property("number", Long.toString(result.getNumber())));
         scope.add(new Property("specification", result.getBuildSpecification()));
         scope.add(new Property("status", result.getState().getString()));
-        return VariableHelper.replaceVariables(tag, true, scope);
+        return VariableHelper.replaceVariables(tag, scope);
     }
 
     public String getTag()
@@ -97,6 +97,6 @@ public class TagPostBuildAction extends PostBuildAction
         scope.add(new Property("specification", "specification"));
         scope.add(new Property("status", "status"));
 
-        VariableHelper.replaceVariables(tag, true, scope);
+        VariableHelper.replaceVariables(tag, scope);
     }
 }
