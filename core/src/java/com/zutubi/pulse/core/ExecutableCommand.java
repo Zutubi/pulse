@@ -4,7 +4,6 @@ import com.zutubi.pulse.core.model.CommandResult;
 import com.zutubi.pulse.core.model.StoredArtifact;
 import com.zutubi.pulse.core.model.StoredFileArtifact;
 import com.zutubi.pulse.util.*;
-import com.zutubi.pulse.util.logging.Logger;
 
 import java.io.*;
 import java.util.*;
@@ -15,8 +14,6 @@ import java.util.*;
  */
 public class ExecutableCommand implements Command, ScopeAware
 {
-    private static final Logger LOG = Logger.getLogger(ExecutableCommand.class);
-
     public static final String OUTPUT_NAME = "command output";
     public static final String ENV_NAME = "environment";
     private static final String ENV_PATH = "PATH";
@@ -30,7 +27,9 @@ public class ExecutableCommand implements Command, ScopeAware
     private Scope scope;
 
     private Process child;
+    private CancellableReader reader;
     private volatile boolean terminated = false;
+
 
     public void execute(CommandContext context, CommandResult cmdResult)
     {
@@ -62,6 +61,13 @@ public class ExecutableCommand implements Command, ScopeAware
             throw new BuildException("Unable to create directory for the output artifact '" + outputFileDir.getAbsolutePath() + "'");
         }
 
+        if (terminatedCheck(cmdResult))
+        {
+            // Catches the case where we were asked to terminate before
+            // creating the child process.
+            return;
+        }
+
         try
         {
             child = builder.start();
@@ -78,42 +84,59 @@ public class ExecutableCommand implements Command, ScopeAware
             throw new BuildException("Unable to create process: " + message, e);
         }
 
-        if (terminated)
-        {
-            // Catches the case where we were asked to terminate before
-            // creating the child process.
-            cmdResult.error("Command terminated");
-            return;
-        }
+        File outputFile = new File(outputFileDir, "output.txt");
 
         try
         {
-            File outputFile = new File(outputFileDir, "output.txt");
-            FileOutputStream outputFileStream = null;
-            OutputStream output = null;
+            FileOutputStream outputFileStream = new FileOutputStream(outputFile);
+            OutputStream output;
 
-            try
+            if (context.getOutputStream() != null)
             {
-                outputFileStream = new FileOutputStream(outputFile);
-                if (context.getOutputStream() != null)
-                {
-                    output = new ForkOutputStream(outputFileStream, context.getOutputStream());
-                }
-                else
-                {
-                    output = outputFileStream;
-                }
-
-                InputStream input = child.getInputStream();
-
-                IOUtils.joinStreams(input, output);
+                output = new ForkOutputStream(outputFileStream, context.getOutputStream());
             }
-            finally
+            else
             {
-                IOUtils.close(outputFileStream);
+                output = outputFileStream;
+            }
+
+            InputStream input = child.getInputStream();
+            reader = new CancellableReader(input, output);
+            reader.start();
+
+            if (terminatedCheck(cmdResult))
+            {
+                return;
             }
 
             final int result = child.waitFor();
+
+            // Wait at least once: we want to allow the reader some time to
+            // complete after we are terminated so that we can identify the
+            // resource leak (see below).
+            boolean readerComplete = reader.waitFor(10);
+            while(!terminated && !readerComplete)
+            {
+                reader.waitFor(10);
+            }
+
+            if(readerComplete)
+            {
+                IOException ioe = reader.getIoError();
+                if(ioe != null)
+                {
+                    throw new BuildException(ioe);
+                }
+            }
+            else
+            {
+                // This is a case where we cannot clean up all child processes,
+                // and so must cut the reader thread loose.  This happens on
+                // Windows, and we have no better solution but to report the
+                // resource leak.
+                cmdResult.error("Unable to cleanly terminate the child process tree.  It is likely that some orphaned processes remain.");
+            }
+
             String commandLine = constructCommandLine(builder);
 
             if (result == 0)
@@ -132,8 +155,6 @@ public class ExecutableCommand implements Command, ScopeAware
             {
                 cmdResult.getProperties().put("working directory", builder.directory().getAbsolutePath());
             }
-
-            ProcessSupport.postProcess(processes, outputFileDir, outputFile, cmdResult, context);
         }
         catch (IOException e)
         {
@@ -141,8 +162,31 @@ public class ExecutableCommand implements Command, ScopeAware
         }
         catch (InterruptedException e)
         {
-            throw new BuildException(e);
+            if(!terminatedCheck(cmdResult))
+            {
+                throw new BuildException(e);
+            }
         }
+        finally
+        {
+            // In finally so that any output gathered will be captured as an
+            // artifact, even if the command failed.
+            if(outputFile.exists())
+            {
+                ProcessSupport.postProcess(processes, outputFileDir, outputFile, cmdResult, context);
+            }
+        }
+    }
+
+    private boolean terminatedCheck(CommandResult commandResult)
+    {
+        if(terminated)
+        {
+            commandResult.error("Command terminated");
+            return true;
+        }
+
+        return false;
     }
 
     private void recordExecutionEnvironment(ProcessBuilder builder, CommandResult cmdResult, File outputDir) throws IOException
@@ -448,6 +492,11 @@ public class ExecutableCommand implements Command, ScopeAware
         {
             child.destroy();
         }
+
+        if(reader != null)
+        {
+            reader.cancel();
+        }
     }
 
     List<Arg> getArgs()
@@ -512,6 +561,80 @@ public class ExecutableCommand implements Command, ScopeAware
         public void setValue(String value)
         {
             this.value = value;
+        }
+    }
+
+    class CancellableReader
+    {
+        private Thread readerThread;
+        private InputStream in;
+        private OutputStream out;
+        private IOException ioError = null;
+        private boolean interrupted = false;
+
+        public CancellableReader(InputStream in, OutputStream out)
+        {
+            this.in = in;
+            this.out = out;
+        }
+
+        public synchronized void start()
+        {
+            readerThread = new Thread(new Runnable()
+            {
+                public void run()
+                {
+                    try
+                    {
+                        byte[] buffer = new byte[1024];
+                        int n;
+
+                        while (!interrupted && !Thread.interrupted() && (n = in.read(buffer)) > 0)
+                        {
+                            out.write(buffer, 0, n);
+                        }
+                    }
+                    catch (IOException e)
+                    {
+                        ioError = e;
+                    }
+                    finally
+                    {
+                        close();
+                    }
+                }
+            });
+            readerThread.start();
+        }
+
+        private void close()
+        {
+            IOUtils.close(in);
+            IOUtils.close(out);
+        }
+
+        public synchronized void cancel()
+        {
+            interrupted = true;
+        }
+
+        public boolean waitFor(long seconds)
+        {
+            try
+            {
+                readerThread.join(Constants.SECOND * seconds);
+            }
+            catch (InterruptedException e)
+            {
+                // Empty
+            }
+
+            return !readerThread.isAlive();
+        }
+
+        public IOException getIoError()
+        {
+            return ioError;
         }
     }
 }

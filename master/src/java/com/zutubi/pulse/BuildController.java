@@ -260,13 +260,19 @@ public class BuildController implements EventListener
 
     private void handleBuildTerminationRequest(BuildTerminationRequestEvent event)
     {
-        // Tell every running recipe to stop, and mark the build terminating
-        // (so it will go into the error state on completion).
-        buildResult.terminate(event.isTimeout());
-
-        for (TreeNode<RecipeController> controllerNode : executingControllers)
+        long id = event.getId();
+        
+        if (id == buildResult.getId() || id == -1)
         {
-            controllerNode.getData().terminateRecipe(event.isTimeout());
+            // Tell every running recipe to stop, and mark the build terminating
+            // (so it will go into the error state on completion).
+            buildResult.terminate(event.isTimeout());
+            for (TreeNode<RecipeController> controllerNode : executingControllers)
+            {
+                controllerNode.getData().terminateRecipe(event.isTimeout());
+            }
+
+            buildManager.save(buildResult);
         }
     }
 
@@ -563,7 +569,7 @@ public class BuildController implements EventListener
 
     public Class[] getHandledEvents()
     {
-        return new Class[]{BuildCommencedEvent.class, RecipeEvent.class, BuildTerminationRequestEvent.class};
+        return new Class[]{BuildCommencedEvent.class, RecipeEvent.class, BuildTerminationRequestEvent.class, RecipeTimeoutEvent.class };
     }
 
     public long getBuildId()

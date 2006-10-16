@@ -1,6 +1,7 @@
 package com.zutubi.pulse.core;
 
 import com.zutubi.pulse.core.model.CommandResult;
+import com.zutubi.pulse.core.model.StoredArtifact;
 import com.zutubi.pulse.util.SystemUtils;
 
 /**
@@ -56,8 +57,12 @@ public class AntCommand extends ExecutableCommand
 
         super.execute(context, cmdResult);
 
-        AntPostProcessor pp = new AntPostProcessor("ant.pp");
-        pp.process(cmdResult.getArtifact(OUTPUT_NAME).getFile(), cmdResult, context);
+        StoredArtifact artifact = cmdResult.getArtifact(OUTPUT_NAME);
+        if(artifact != null)
+        {
+            AntPostProcessor pp = new AntPostProcessor("ant.pp");
+            pp.process(artifact.getFile(), cmdResult, context);
+        }
     }
 
     public String getBuildFile()
