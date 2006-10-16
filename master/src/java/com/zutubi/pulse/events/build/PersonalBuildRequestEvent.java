@@ -50,4 +50,14 @@ public class PersonalBuildRequestEvent extends AbstractBuildRequestEvent
     {
         return user;
     }
+
+    public String toString()
+    {
+        String result = "Personal Build Request Event: " + number;
+        if(user != null)
+        {
+            result += ": " + user.getLogin();
+        }
+        return result;
+    }
 }
