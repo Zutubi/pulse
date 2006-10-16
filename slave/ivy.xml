@@ -2,7 +2,7 @@
 <?xml-stylesheet type="text/xsl" href="http://www.jayasoft.fr/org/ivyrep/ivy-doc.xsl"?>
 <ivy-module version="1.0">
 
-    <info organisation="zutubi" module="pulse-slave" status="integration">
+    <info organisation="zutubi" module="pulse-slave" status="release" revision="1.1.15">
         <ivyauthor name="zutubi" url="http://www.zutubi.com/"/>
         <description homepage="http://www.zutubi.com/">
             description....
@@ -20,9 +20,9 @@
     </publications>
 
     <dependencies>
-        <dependency org="zutubi" name="pulse-server-core" rev="latest.integration" conf="release->release"/>
-        <dependency org="zutubi" name="pulse-server-core" rev="latest.integration" conf="external->external"/>
-        <dependency org="zutubi" name="pulse-server-core" rev="latest.integration" conf="build->build"/>
+        <dependency org="zutubi" name="pulse-server-core" rev="1.1.15" conf="release->release"/>
+        <dependency org="zutubi" name="pulse-server-core" rev="1.1.15" conf="external->external"/>
+        <dependency org="zutubi" name="pulse-server-core" rev="1.1.15" conf="build->build"/>
     </dependencies>
 
 
