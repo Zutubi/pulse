@@ -280,7 +280,7 @@ public class SetupFeatureTour implements Runnable
             recipes[i] = new RecipeResult(null);
             buildResultDao.save(recipes[i]);
 
-            File recipeDir = masterBuildPaths.getRecipeDir(project, build, recipes[i].getId());
+            File recipeDir = masterBuildPaths.getRecipeDir(build, recipes[i].getId());
             recipes[i].commence();
             recipes[i].setAbsoluteOutputDir(configManager.getDataDirectory(), recipeDir);
             RecipeResultNode node = new RecipeResultNode(specNode.getStage().getName(), recipes[i]);
@@ -289,7 +289,7 @@ public class SetupFeatureTour implements Runnable
             i++;
         }
 
-        File buildDir = masterBuildPaths.getBuildDir(project, build);
+        File buildDir = masterBuildPaths.getBuildDir(build);
         build.commence();
         build.setAbsoluteOutputDir(configManager.getDataDirectory(), buildDir);
         buildDir.mkdirs();

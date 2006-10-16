@@ -2,6 +2,8 @@ package com.zutubi.pulse.web.project;
 
 import com.opensymphony.util.TextUtils;
 import com.opensymphony.xwork.Validateable;
+import com.zutubi.pulse.bootstrap.MasterConfigurationManager;
+import com.zutubi.pulse.core.Scope;
 import com.zutubi.pulse.core.model.ResultState;
 import com.zutubi.pulse.model.*;
 import com.zutubi.pulse.web.wizard.BaseWizard;
@@ -23,6 +25,8 @@ public class AddPostBuildActionWizard extends BaseWizard
     private long projectId;
 
     private ProjectManager projectManager;
+    private BuildManager buildManager;
+    private MasterConfigurationManager configurationManager;
 
     private SelectActionType selectState;
     private ConfigureTag configTag;
@@ -54,6 +58,11 @@ public class AddPostBuildActionWizard extends BaseWizard
     public Project getProject()
     {
         return projectManager.getProject(projectId);
+    }
+
+    public boolean isExe()
+    {
+        return EXE_STATE.equals(selectState.getType());
     }
 
     public void process()
@@ -88,6 +97,16 @@ public class AddPostBuildActionWizard extends BaseWizard
     public void setProjectManager(ProjectManager projectManager)
     {
         this.projectManager = projectManager;
+    }
+
+    public void setBuildManager(BuildManager buildManager)
+    {
+        this.buildManager = buildManager;
+    }
+
+    public void setConfigurationManager(MasterConfigurationManager configurationManager)
+    {
+        this.configurationManager = configurationManager;
     }
 
     public class SelectActionType extends BaseWizardState implements Validateable
@@ -234,14 +253,32 @@ public class AddPostBuildActionWizard extends BaseWizard
         }
     }
 
-    public class ConfigureExe extends BaseWizardState implements Validateable
+    public class ConfigureExe extends BaseWizardState
     {
         private String command;
         private String arguments;
+        private Scope exampleScope;
 
         public ConfigureExe(Wizard wizard, String stateName)
         {
             super(wizard, stateName);
+        }
+
+        public void initialise()
+        {
+            super.initialise();
+
+            List<BuildResult> lastBuild = buildManager.queryBuilds(new Project[] { getProject() }, new ResultState[] { ResultState.SUCCESS }, null, -1, -1, null, 0, 1, true);
+            if(!lastBuild.isEmpty())
+            {
+                BuildResult result = lastBuild.get(0);
+                exampleScope = RunExecutablePostBuildAction.getScope(result, configurationManager);
+            }
+        }
+
+        public Scope getExampleScope()
+        {
+            return exampleScope;
         }
 
         public String getCommand()
@@ -267,18 +304,6 @@ public class AddPostBuildActionWizard extends BaseWizard
         public String getNextStateName()
         {
             return "success";
-        }
-
-        public void validate()
-        {
-            try
-            {
-                RunExecutablePostBuildAction.validateArguments(arguments);
-            }
-            catch (Exception e)
-            {
-                addFieldError("arguments", e.getMessage());
-            }
         }
     }
 

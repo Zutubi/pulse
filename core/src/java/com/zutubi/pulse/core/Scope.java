@@ -12,7 +12,7 @@ public class Scope
 {
     private Scope parent;
 
-    private Map<String, Reference> references = new HashMap<String, Reference>();
+    private Map<String, Reference> references = new LinkedHashMap<String, Reference>();
     /**
      * Variables to add to the environment when launching child processes in
      * this scope.
@@ -37,6 +37,11 @@ public class Scope
     public Scope getParent()
     {
         return parent;
+    }
+
+    public Map<String, Reference> getReferences()
+    {
+        return references;
     }
 
     public boolean containsReference(String name)

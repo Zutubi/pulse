@@ -266,7 +266,7 @@ public class DefaultBuildManager implements BuildManager, EventListener
 
     public void delete(BuildResult result)
     {
-        cleanupResult(result.getProject(), result);
+        cleanupResult(result);
     }
 
     public void abortUnfinishedBuilds(Project project, String message)
@@ -303,20 +303,20 @@ public class DefaultBuildManager implements BuildManager, EventListener
             {
                 if (rule.getWorkDirOnly())
                 {
-                    cleanupWork(project, build);
+                    cleanupWork(build);
                 }
                 else
                 {
-                    cleanupResult(project, build);
+                    cleanupResult(build);
                 }
             }
         }
     }
 
-    private void cleanupResult(Project project, BuildResult build)
+    private void cleanupResult(BuildResult build)
     {
         MasterBuildPaths paths = new MasterBuildPaths(configurationManager);
-        File buildDir = paths.getBuildDir(project, build);
+        File buildDir = paths.getBuildDir(build);
         if (!FileSystemUtils.removeDirectory(buildDir))
         {
             LOG.warning("Unable to clean up build directory '" + buildDir.getAbsolutePath() + "'");
@@ -338,25 +338,25 @@ public class DefaultBuildManager implements BuildManager, EventListener
         buildResultDao.delete(build);
     }
 
-    private void cleanupWork(Project project, BuildResult build)
+    private void cleanupWork(BuildResult build)
     {
         build.setHasWorkDir(false);
         buildResultDao.save(build);
         MasterBuildPaths paths = new MasterBuildPaths(configurationManager);
-        cleanupWorkForNodes(paths, project, build, build.getRoot().getChildren());
+        cleanupWorkForNodes(paths, build, build.getRoot().getChildren());
     }
 
-    private void cleanupWorkForNodes(MasterBuildPaths paths, Project project, BuildResult build, List<RecipeResultNode> nodes)
+    private void cleanupWorkForNodes(MasterBuildPaths paths, BuildResult build, List<RecipeResultNode> nodes)
     {
         for (RecipeResultNode node : nodes)
         {
-            File workDir = paths.getBaseDir(project, build, node.getResult().getId());
+            File workDir = paths.getBaseDir(build, node.getResult().getId());
             if (!FileSystemUtils.removeDirectory(workDir))
             {
                 LOG.warning("Unable to clean up build directory '" + workDir.getAbsolutePath() + "'");
             }
 
-            cleanupWorkForNodes(paths, project, build, node.getChildren());
+            cleanupWorkForNodes(paths, build, node.getChildren());
         }
     }
 

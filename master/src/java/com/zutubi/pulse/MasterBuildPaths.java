@@ -53,23 +53,23 @@ public class MasterBuildPaths
         return String.format("%08d", result.getNumber());
     }
 
-    public File getBuildDir(Project project, BuildResult result)
+    public File getBuildDir(BuildResult result)
     {
-        return new File(getBuildsDir(project), getBuildDirName(result));
+        return new File(getBuildsDir(result.getProject()), getBuildDirName(result));
     }
 
-    public File getRecipeDir(Project project, BuildResult result, long recipeId)
+    public File getRecipeDir(BuildResult result, long recipeId)
     {
-        return new File(getBuildDir(project, result), Long.toString(recipeId));
+        return new File(getBuildDir(result), Long.toString(recipeId));
     }
 
-    public File getOutputDir(Project project, BuildResult result, long recipeId)
+    public File getOutputDir(BuildResult result, long recipeId)
     {
-        return new File(getRecipeDir(project, result, recipeId), "output");
+        return new File(getRecipeDir(result, recipeId), "output");
     }
 
-    public File getBaseDir(Project project, BuildResult result, long recipeId)
+    public File getBaseDir(BuildResult result, long recipeId)
     {
-        return new File(getRecipeDir(project, result, recipeId), "base");
+        return new File(getRecipeDir(result, recipeId), "base");
     }
 }

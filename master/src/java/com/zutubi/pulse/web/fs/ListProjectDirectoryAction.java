@@ -54,7 +54,7 @@ public class ListProjectDirectoryAction extends AbstractProjectWorkingCopyAction
         String remainingPath = getWorkingCopyPathSegment();
 
         MasterBuildPaths paths = new MasterBuildPaths(configurationManager);
-        File baseDir = paths.getBaseDir(project, buildResult, Long.valueOf(recipeId));
+        File baseDir = paths.getBaseDir(buildResult, Long.valueOf(recipeId));
 
         if (!baseDir.isDirectory())
         {

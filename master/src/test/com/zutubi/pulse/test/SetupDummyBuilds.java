@@ -469,7 +469,7 @@ public class SetupDummyBuilds implements Runnable
     {
         RecipeResult recipeResult = new RecipeResult(null);
         buildResultDao.save(recipeResult);
-        File recipeDir = masterBuildPaths.getRecipeDir(project, buildResult, recipeResult.getId());
+        File recipeDir = masterBuildPaths.getRecipeDir(buildResult, recipeResult.getId());
         recipeResult.commence();
         recipeResult.add(createComplexCommand());
         recipeResult.add(createWarningFeaturesCommand());
@@ -486,7 +486,7 @@ public class SetupDummyBuilds implements Runnable
     {
         RecipeResult recipeResult = new RecipeResult(null);
         buildResultDao.save(recipeResult);
-        File recipeDir = masterBuildPaths.getRecipeDir(project, buildResult, recipeResult.getId());
+        File recipeDir = masterBuildPaths.getRecipeDir(buildResult, recipeResult.getId());
         recipeResult.commence();
         CommandResult command = createTestErrorsCommand(0, recipeDir);
         recipeResult.add(command);

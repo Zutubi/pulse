@@ -212,7 +212,7 @@ public class IntrospectionHelper
                 public void set(Object parent, String value, boolean resolveReferences, Scope scope)
                         throws InvocationTargetException, IllegalAccessException, FileLoadException
                 {
-                    method.invoke(parent, VariableHelper.replaceVariables(value, resolveReferences, scope));
+                    method.invoke(parent, resolveReferences ? VariableHelper.replaceVariables(value, scope) : value);
                 }
             };
 
@@ -330,7 +330,7 @@ public class IntrospectionHelper
                     {
                         try
                         {
-                            Object attribute = c.newInstance(VariableHelper.replaceVariables(value, resolveReferences, scope));
+                            Object attribute = c.newInstance(resolveReferences ? VariableHelper.replaceVariables(value, scope) : value);
                             method.invoke(parent, attribute);
                         } catch (InstantiationException ie)
                         {

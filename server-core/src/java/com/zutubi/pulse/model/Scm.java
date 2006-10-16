@@ -234,7 +234,7 @@ public abstract class Scm extends Entity implements Cloneable
 
         try
         {
-            VariableHelper.replaceVariables(url, true, scope);
+            VariableHelper.replaceVariables(url, scope);
         }
         catch (FileLoadException e)
         {
@@ -256,7 +256,7 @@ public abstract class Scm extends Entity implements Cloneable
 
             try
             {
-                return VariableHelper.replaceVariables(url, true, scope);
+                return VariableHelper.replaceVariables(url, scope);
             }
             catch (FileLoadException e)
             {

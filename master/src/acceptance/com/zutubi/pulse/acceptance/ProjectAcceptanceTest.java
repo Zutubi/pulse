@@ -1122,20 +1122,16 @@ public class ProjectAcceptanceTest extends ProjectAcceptanceTestBase
 
         AddPostBuildActionForm typeForm = new AddPostBuildActionForm(tester);
         typeForm.assertFormPresent();
-        typeForm.nextFormElements("", "tag", null, null, "true");
+        typeForm.nextFormElements("", "exe", null, null, "true");
         typeForm.assertFormPresent();
         assertTextPresent("name is required");
 
-        typeForm.nextFormElements("my-action", "tag", null, null, "true");
-        AddTagActionForm tagForm = new AddTagActionForm(tester);
+        typeForm.nextFormElements("my-action", "exe", null, null, "true");
+        AddExeActionForm tagForm = new AddExeActionForm(tester);
         tagForm.assertFormPresent();
-        tagForm.nextFormElements("", "true");
+        tagForm.nextFormElements("", "args");
         tagForm.assertFormPresent();
-        assertTextPresent("tag name is required");
-
-        tagForm.nextFormElements("${unknown}", "true");
-        tagForm.assertFormPresent();
-        assertTextPresent("Reference to unknown variable 'unknown'");
+        assertTextPresent("command is required");
     }
 
     public void testEditExeAction()
@@ -1165,9 +1161,6 @@ public class ProjectAcceptanceTest extends ProjectAcceptanceTestBase
         form.assertFormPresent();
         assertTextPresent("name is required");
         assertTextPresent("command is required");
-
-        form.saveFormElements("newname", null, null, "false", "", "${unknown}");
-        assertTextPresent("Reference to unknown variable 'unknown'");
     }
 
     public void testEditExeActionSameName()

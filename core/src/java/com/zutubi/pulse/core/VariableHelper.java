@@ -203,21 +203,15 @@ public class VariableHelper
         throw new FileLoadException("Unknown variable reference '" + token.value + "'");
     }
 
-    /**
-     * @param input
-     * @param properties
-     * @return
-     * @throws FileLoadException
-     *
-     */
-    public static String replaceVariables(String input, boolean resolveReferences, Scope properties)
+    public static String replaceVariables(String input, Scope properties)
             throws FileLoadException
     {
-        if(!resolveReferences)
-        {
-            return input;
-        }
+        return replaceVariables(input, properties, false);
+    }
 
+    public static String replaceVariables(String input, Scope properties, boolean allowUnresolved)
+            throws FileLoadException
+    {
         StringBuilder result = new StringBuilder();
 
         List<Token> tokens = tokenise(input);
@@ -241,6 +235,12 @@ public class VariableHelper
                             throw new FileLoadException("Reference to non string variable '" + token.value + "'");
                         }
                         result.append(obj.toString());
+                    }
+                    else if(allowUnresolved)
+                    {
+                        result.append("${");
+                        result.append(token.value);
+                        result.append("}");
                     }
                     else
                     {

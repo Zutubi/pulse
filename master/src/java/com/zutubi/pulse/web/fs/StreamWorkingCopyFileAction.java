@@ -54,7 +54,7 @@ public class StreamWorkingCopyFileAction extends AbstractProjectWorkingCopyActio
         String remainingPath = getWorkingCopyPathSegment();
 
         MasterBuildPaths paths = new MasterBuildPaths(configurationManager);
-        File baseDir = paths.getBaseDir(project, buildResult, Long.valueOf(recipeId));
+        File baseDir = paths.getBaseDir(buildResult, Long.valueOf(recipeId));
 
         File file = baseDir;
         if (TextUtils.stringSet(remainingPath))

@@ -10,7 +10,10 @@ import com.zutubi.pulse.events.build.BuildCompletedEvent;
 import com.zutubi.pulse.events.build.BuildRequestEvent;
 import com.zutubi.pulse.events.build.BuildTerminationRequestEvent;
 import com.zutubi.pulse.events.build.RecipeTimeoutEvent;
-import com.zutubi.pulse.license.*;
+import com.zutubi.pulse.license.LicenseEvent;
+import com.zutubi.pulse.license.LicenseExpiredEvent;
+import com.zutubi.pulse.license.LicenseHolder;
+import com.zutubi.pulse.license.LicenseUpdateEvent;
 import com.zutubi.pulse.model.BuildManager;
 import com.zutubi.pulse.model.BuildSpecification;
 import com.zutubi.pulse.model.Project;
@@ -248,7 +251,7 @@ public class FatController implements EventListener, Stoppable
             if (!stopping)
             {
                 projectManager.buildCommenced(project.getId());
-                RecipeResultCollector collector = new DefaultRecipeResultCollector(project, configManager);
+                RecipeResultCollector collector = new DefaultRecipeResultCollector(configManager);
                 BuildController controller = new BuildController(event, buildSpec, eventManager, projectManager, buildManager, recipeQueue, collector, quartzScheduler, configManager, serviceTokenManager);
                 controller.run();
                 runningBuilds.add(controller);
