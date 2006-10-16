@@ -3,8 +3,6 @@ package com.zutubi.pulse.util;
 import com.zutubi.pulse.util.logging.Logger;
 
 import java.io.*;
-import java.net.ServerSocket;
-import java.net.Socket;
 import java.util.Properties;
 import java.util.zip.ZipFile;
 
@@ -16,21 +14,6 @@ import java.util.zip.ZipFile;
 public class IOUtils
 {
     private static final Logger LOG = Logger.getLogger(IOUtils.class);
-
-    public static void close(Socket s)
-    {
-        try
-        {
-            if (s != null)
-            {
-                s.close();
-            }
-        }
-        catch (IOException e)
-        {
-            LOG.finest(e);
-        }
-    }
 
     public static Properties read(File f) throws IOException
     {
@@ -68,73 +51,13 @@ public class IOUtils
         }
     }
 
-    public static void close(InputStream i)
+    public static void close(Closeable closeable)
     {
         try
         {
-            if (i != null)
+            if (closeable != null)
             {
-                i.close();
-            }
-        }
-        catch (IOException e)
-        {
-            LOG.finest(e);
-        }
-    }
-
-    public static void close(Reader r)
-    {
-        try
-        {
-            if (r != null)
-            {
-                r.close();
-            }
-        }
-        catch (IOException e)
-        {
-            LOG.finest(e);
-        }
-    }
-
-    public static void close(ServerSocket s)
-    {
-        try
-        {
-            if (s != null)
-            {
-                s.close();
-            }
-        }
-        catch (IOException e)
-        {
-            LOG.finest(e);
-        }
-    }
-
-    public static void close(OutputStream outStream)
-    {
-        try
-        {
-            if (outStream != null)
-            {
-                outStream.close();
-            }
-        }
-        catch (IOException e)
-        {
-            LOG.finest(e);
-        }
-    }
-
-    public static void close(Writer w)
-    {
-        try
-        {
-            if (w != null)
-            {
-                w.close();
+                closeable.close();
             }
         }
         catch (IOException e)
@@ -163,7 +86,7 @@ public class IOUtils
         byte[] buffer = new byte[1024];
         int n;
 
-        while ((n = input.read(buffer)) > 0)
+        while (!Thread.interrupted() && (n = input.read(buffer)) > 0)
         {
             output.write(buffer, 0, n);
         }

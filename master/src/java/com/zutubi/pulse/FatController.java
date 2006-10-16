@@ -142,7 +142,7 @@ public class FatController implements EventListener, Stoppable
             if (force)
             {
                 // Notify controllers to stop forcefully
-                eventManager.publish(new BuildTerminationRequestEvent(this, false));
+                eventManager.publish(new BuildTerminationRequestEvent(this, -1, false));
             }
             else
             {
@@ -186,10 +186,6 @@ public class FatController implements EventListener, Stoppable
         else if (event instanceof BuildCompletedEvent)
         {
             handleBuildCompleted((BuildCompletedEvent) event);
-        }
-        else if (event instanceof RecipeTimeoutEvent)
-        {
-            handleRecipeTimeout((RecipeTimeoutEvent) event);
         }
         else if (event instanceof LicenseEvent)
         {
@@ -264,45 +260,9 @@ public class FatController implements EventListener, Stoppable
         }
     }
 
-    private void handleRecipeTimeout(RecipeTimeoutEvent event)
-    {
-        // No worries if we don't find the controller: it may have finished
-        lock.lock();
-        try
-        {
-            for (BuildController controller : runningBuilds)
-            {
-                if (controller.getBuildId() == event.getBuildId())
-                {
-                    controller.handleEvent(event);
-                    break;
-                }
-            }
-        }
-        finally
-        {
-            lock.unlock();
-        }
-    }
-
     public void terminateBuild(long id, boolean timeout)
     {
-        lock.lock();
-        try
-        {
-            for (BuildController controller : runningBuilds)
-            {
-                if (controller.getBuildId() == id)
-                {
-                    controller.handleEvent(new BuildTerminationRequestEvent(this, timeout));
-                    break;
-                }
-            }
-        }
-        finally
-        {
-            lock.unlock();
-        }
+        eventManager.publish(new BuildTerminationRequestEvent(this, id, timeout));
     }
 
     private void handleBuildCompleted(BuildCompletedEvent event)

@@ -7,11 +7,16 @@ import com.zutubi.pulse.events.Event;
  */
 public class BuildTerminationRequestEvent extends Event
 {
-    boolean timeout;
+    /**
+     * ID of the build to terminate, or -1 to terminate all builds.
+     */
+    private long id;
+    private boolean timeout;
 
-    public BuildTerminationRequestEvent(Object source, boolean timeout)
+    public BuildTerminationRequestEvent(Object source, long id, boolean timeout)
     {
         super(source);
+        this.id = id;
         this.timeout = timeout;
     }
 
@@ -20,8 +25,13 @@ public class BuildTerminationRequestEvent extends Event
         return timeout;
     }
 
+    public long getId()
+    {
+        return id;
+    }
+
     public String toString()
     {
-        return "Build Termination Request Event";
-    }    
+        return "Build Termination Request Event: " + id;
+    }
 }

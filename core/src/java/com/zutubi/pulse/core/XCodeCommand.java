@@ -2,6 +2,7 @@ package com.zutubi.pulse.core;
 
 import com.opensymphony.util.TextUtils;
 import com.zutubi.pulse.core.model.CommandResult;
+import com.zutubi.pulse.core.model.StoredArtifact;
 
 /**
  * <class-comment/>
@@ -72,8 +73,12 @@ public class XCodeCommand extends ExecutableCommand
 
         super.execute(context, cmdResult);
 
-        XCodePostProcessor pp = new XCodePostProcessor("xcode.pp");
-        pp.process(cmdResult.getArtifact(OUTPUT_NAME).getFile(), cmdResult, context);
+        StoredArtifact artifact = cmdResult.getArtifact(OUTPUT_NAME);
+        if(artifact != null)
+        {
+            XCodePostProcessor pp = new XCodePostProcessor("xcode.pp");
+            pp.process(artifact.getFile(), cmdResult, context);
+        }
     }
 
     public void setTarget(String target)
