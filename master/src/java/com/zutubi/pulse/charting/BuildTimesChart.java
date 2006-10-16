@@ -51,7 +51,7 @@ public class BuildTimesChart implements XYToolTipGenerator, Chart
     {
         CategoryTableXYDataset ds = new CategoryTableXYDataset();
 
-        long firstId = -1, lastId = -1;
+        long firstNumber = -1, lastNumber = -1;
 
         long minTime = Long.MAX_VALUE;
         long maxTime = Long.MIN_VALUE;
@@ -62,22 +62,22 @@ public class BuildTimesChart implements XYToolTipGenerator, Chart
 
         while (results.next())
         {
-            long id = results.getId();
+            long number = results.getNumber();
             if (results.getState() != ResultState.SUCCESS)
             {
                 // only count successes.
                 continue;
             }
 
-            if (firstId == -1)
+            if (firstNumber == -1)
             {
-                firstId = id;
+                firstNumber = number;
             }
-            lastId = id;
+            lastNumber = number;
             
             long elapsed = results.getElapsed() / Constants.SECOND; // convert to seconds. 
 
-            data.add(new ChartData(id, elapsed));
+            data.add(new ChartData(number, elapsed));
 
             // track the maximum and minimum values.
             minTime = Math.min(minTime, elapsed);
@@ -86,20 +86,20 @@ public class BuildTimesChart implements XYToolTipGenerator, Chart
 
         for (ChartData d : data)
         {
-            ds.add(d.id, d.time, I18N.format(seriesTimeLabel));
+            ds.add(d.number, d.time, I18N.format(seriesTimeLabel));
         }
 
-        if (lastId - firstId < range)
+        if (lastNumber - firstNumber < range)
         {
-            lastId = firstId + range;
+            lastNumber = firstNumber + range;
         }
 
         XYItemRenderer renderer = new DefaultXYItemRenderer();
         renderer.setToolTipGenerator(this);
 
         NumberAxis domainAxis = new NumberAxis(I18N.format(domainAxisLabel));
-        domainAxis.setLowerBound(firstId - 1);
-        domainAxis.setUpperBound(lastId + 1);
+        domainAxis.setLowerBound(firstNumber - 1);
+        domainAxis.setUpperBound(lastNumber + 1);
 
         if (minTime == Long.MAX_VALUE && maxTime == Long.MIN_VALUE)
         {
@@ -132,11 +132,11 @@ public class BuildTimesChart implements XYToolTipGenerator, Chart
 
         public ChartData(long id, long time)
         {
-            this.id = id;
+            this.number = id;
             this.time = time;
         }
 
-        long id;
+        long number;
         long time;
     }
 }

@@ -51,6 +51,11 @@ public class BuildResultsResultSet implements ResultSet
         return ((BuildResult) current).getId();
     }
 
+    public long getNumber()
+    {
+        return ((BuildResult) current).getNumber();
+    }
+
     public long getElapsed()
     {
         return ((BuildResult) current).getStamps().getElapsed();
