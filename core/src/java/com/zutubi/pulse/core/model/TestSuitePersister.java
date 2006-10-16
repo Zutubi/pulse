@@ -43,12 +43,10 @@ public class TestSuitePersister
     private void writeCases(TestSuiteResult suite, File file) throws IOException
     {
         Document doc = suiteToDoc(suite);
-        FileOutputStream fos = null;
         BufferedOutputStream bos = null;
-
         try
         {
-            fos = new FileOutputStream(file);
+            FileOutputStream fos = new FileOutputStream(file);
             bos = new BufferedOutputStream(fos);
 
             Serializer serializer = new Serializer(bos);

@@ -82,180 +82,172 @@ public class StartupShutdownAcceptanceTest extends TestCase
     public void testDefaultFirstTimeStartup() throws Exception
     {
         // we are using the default runtime context.
-        RuntimeContext ctx = new RuntimeContext();
+        RuntimeContext commandline = new RuntimeContext();
 
         // we are expecting the following file context.
-        RuntimeContext fileCtx = new RuntimeContext("8080", "/");
-        fileCtx.setDataDirectory(defaultDataDir.getAbsolutePath());
+        RuntimeContext file = new RuntimeContext("8080", "/");
+        file.setDataDirectory(defaultDataDir.getAbsolutePath());
 
         // we are expecting the actual server context to be the following:
-        RuntimeContext actualCtx = new RuntimeContext("8080", "/");
-        actualCtx.setDataDirectory(defaultDataDir.getAbsolutePath());
-        actualCtx.setExternalConfig(defaultConfigFile.getAbsolutePath());
+        RuntimeContext expected = new RuntimeContext("8080", "/");
+        expected.setDataDirectory(defaultDataDir.getAbsolutePath());
+        expected.setExternalConfig(defaultConfigFile.getAbsolutePath());
 
         // assert that things are expected in the situation where we are starting the
         // server for the first time.
-        assertFirstTimeStartup(ctx, fileCtx, actualCtx);
+        assertFirstTimeStartup(commandline, file, expected);
     }
 
     public void testFirstTimeStartupWithCommandLineOptions() throws Exception
     {
-        RuntimeContext cmdCtx = new RuntimeContext();
-        cmdCtx.setPort("8081");
-        cmdCtx.setContextPath("/builder");
+        RuntimeContext commandline = new RuntimeContext();
+        commandline.setPort("8081");
+        commandline.setContextPath("/builder");
 
-        RuntimeContext fileCtx = new RuntimeContext("8080", "/");
-        fileCtx.setDataDirectory(defaultDataDir.getAbsolutePath());
+        RuntimeContext file = new RuntimeContext("8080", "/");
+        file.setDataDirectory(defaultDataDir.getAbsolutePath());
 
-        RuntimeContext actualCtx = new RuntimeContext("8081", "/builder");
-        actualCtx.setDataDirectory(defaultDataDir.getAbsolutePath());
-        actualCtx.setExternalConfig(defaultConfigFile.getAbsolutePath());
+        RuntimeContext expected = new RuntimeContext("8081", "/builder");
+        expected.setDataDirectory(defaultDataDir.getAbsolutePath());
+        expected.setExternalConfig(defaultConfigFile.getAbsolutePath());
 
-        assertFirstTimeStartup(cmdCtx, fileCtx, actualCtx);
+        assertFirstTimeStartup(commandline, file, expected);
     }
 
     public void testFirstTimeStartupWithDataDirectorySpecified() throws Exception
     {
-        RuntimeContext cmdCtx = new RuntimeContext("8082", "/pulse");
-        cmdCtx.setDataDirectory(dataDir.getAbsolutePath());
+        RuntimeContext commandline = new RuntimeContext("8082", "/pulse");
+        commandline.setDataDirectory(dataDir.getAbsolutePath());
 
-        RuntimeContext fileCtx = new RuntimeContext("8080", "/");
-        fileCtx.setDataDirectory(dataDir.getAbsolutePath());
+        RuntimeContext file = new RuntimeContext("8080", "/");
+        file.setDataDirectory(dataDir.getAbsolutePath());
 
-        RuntimeContext actualCtx = new RuntimeContext("8082", "/pulse");
-        actualCtx.setDataDirectory(dataDir.getAbsolutePath());
-        actualCtx.setExternalConfig(defaultConfigFile.getAbsolutePath());
+        RuntimeContext expected = new RuntimeContext("8082", "/pulse");
+        expected.setDataDirectory(dataDir.getAbsolutePath());
+        expected.setExternalConfig(defaultConfigFile.getAbsolutePath());
 
-        assertFirstTimeStartup(cmdCtx, fileCtx, actualCtx);
+        assertFirstTimeStartup(commandline, file, expected);
     }
 
     public void testFirstTimeStartupWithEverythingSpecified() throws Exception
     {
-        RuntimeContext cmdCtx = new RuntimeContext("8083", "/some/sort/of/crazy/context/path");
-        cmdCtx.setDataDirectory(dataDir.getAbsolutePath());
-        cmdCtx.setExternalConfig(configFile.getAbsolutePath());
+        RuntimeContext commandline = new RuntimeContext("8083", "/some/sort/of/crazy/context/path");
+        commandline.setDataDirectory(dataDir.getAbsolutePath());
+        commandline.setExternalConfig(configFile.getAbsolutePath());
 
-        RuntimeContext fileCtx = new RuntimeContext("8080", "/");
-        fileCtx.setDataDirectory(dataDir.getAbsolutePath());
+        RuntimeContext file = new RuntimeContext("8080", "/");
+        file.setDataDirectory(dataDir.getAbsolutePath());
 
-        RuntimeContext actualCtx = new RuntimeContext("8083", "/some/sort/of/crazy/context/path");
-        actualCtx.setDataDirectory(dataDir.getAbsolutePath());
-        actualCtx.setExternalConfig(configFile.getAbsolutePath());
+        RuntimeContext expected = new RuntimeContext("8083", "/some/sort/of/crazy/context/path");
+        expected.setDataDirectory(dataDir.getAbsolutePath());
+        expected.setExternalConfig(configFile.getAbsolutePath());
 
-        assertFirstTimeStartup(cmdCtx, fileCtx, actualCtx);
+        assertFirstTimeStartup(commandline, file, expected);
     }
 
     /**
      * Here, a first time startup assumes that the external config file does not exist.
      *
-     * @param cmdCtx is the command line context. This is what should be used to run a command.
-     * @param fileCtx is the context stored in the file.
-     * @param actualCtx is the actual server context. This is what is used to communicate with the server.
+     * @param commandline is the command line context. This is what should be used to run a command.
+     * @param file is the expected context stored in the file.
+     * @param expected is the actual server context. This is what is used to communicate with the server.
      */
-    private void assertFirstTimeStartup(RuntimeContext cmdCtx, RuntimeContext fileCtx, RuntimeContext actualCtx) throws Exception
+    private void assertFirstTimeStartup(RuntimeContext commandline, RuntimeContext file, RuntimeContext expected) throws Exception
     {
-        assertServerNotAvailable(actualCtx);
-        assertExternalConfigNotAvailable(actualCtx);
+        assertServerNotAvailable(expected);
+        assertExternalConfigNotAvailable(expected);
 
-        assertStartServer(cmdCtx);
-        assertServerAvailable(actualCtx);
+        assertStartServer(commandline);
+        assertServerAvailable(expected);
 
-        if (TextUtils.stringSet(cmdCtx.getConfiguredDataDirectory()))
+        if (TextUtils.stringSet(commandline.getConfiguredDataDirectory()))
         {
-            assertPromptForLicense(actualCtx);
+            assertPromptForLicense(expected);
         }
         else
         {
-            fileCtx.setDataDirectory(assertPromptForPulseDataDirectory(actualCtx));
+            file.setDataDirectory(assertPromptForPulseDataDirectory(expected));
         }
 
         // verify that the pulse config file is written to the user home.
-        assertExternalConfigAvailable(actualCtx);
-        assertExternalConfigContents(actualCtx, fileCtx);
+        assertExternalConfigAvailable(expected.getExternalConfigFile());
+        assertExternalConfigContents(expected.getExternalConfigFile(), file);
 
         // ensure the command line (system properties) is cleaned up.
         resetSystemProperties();
 
         // now lets shutdown the server.
-        assertShutdownServer(cmdCtx);
-        assertServerNotAvailable(actualCtx);
+        assertShutdownServer(commandline);
+        assertServerNotAvailable(expected);
     }
 
     public void testDefaultSecondTimeStartup() throws Exception
     {
-        RuntimeContext ctx = new RuntimeContext();
-
-        // create external config file setting the values we expect.
-        Config config = new FileConfig(defaultConfigFile);
-        config.setProperty(SystemConfiguration.WEBAPP_PORT, "8080");
-        config.setProperty(SystemConfiguration.CONTEXT_PATH, "/");
-        config.setProperty(SystemConfiguration.PULSE_DATA, defaultDataDir.getAbsolutePath());
+        RuntimeContext commandline = new RuntimeContext();
 
         // the file runtime context should mirror the config file.
-        RuntimeContext fileCtx = new RuntimeContext("8080", "/");
-        fileCtx.setDataDirectory(defaultDataDir.getAbsolutePath());
+        RuntimeContext file = new RuntimeContext("8080", "/");
+        file.setDataDirectory(defaultDataDir.getAbsolutePath());
+        writeToConfigFile(defaultConfigFile, file);
 
         // the actual runtime context.
-        RuntimeContext actualCtx = new RuntimeContext("8080", "/");
-        actualCtx.setDataDirectory(defaultDataDir.getAbsolutePath());
-        actualCtx.setExternalConfig(defaultConfigFile.getAbsolutePath());
+        RuntimeContext expected = new RuntimeContext("8080", "/");
+        expected.setDataDirectory(defaultDataDir.getAbsolutePath());
+        expected.setExternalConfig(defaultConfigFile.getAbsolutePath());
 
-        assertSecondTimeStartup(ctx, fileCtx, actualCtx);
+        assertSecondTimeStartup(commandline, file, expected);
     }
 
     public void testSecondTimeStartupWithCommandLine() throws Exception
     {
-        RuntimeContext ctx = new RuntimeContext("8081", "/sweet");
+        RuntimeContext commandline = new RuntimeContext("8081", "/sweet");
 
         // the file runtime context should mirror the config file.
-        RuntimeContext fileCtx = new RuntimeContext("8080", "/");
-        fileCtx.setDataDirectory(defaultDataDir.getAbsolutePath());
-        fileCtx.setExternalConfig(defaultConfigFile.getAbsolutePath());
-        writeToConfigFile(fileCtx);
+        RuntimeContext file = new RuntimeContext("8080", "/");
+        file.setDataDirectory(defaultDataDir.getAbsolutePath());
+        writeToConfigFile(defaultConfigFile, file);
 
         // the actual runtime context.
-        RuntimeContext actualCtx = new RuntimeContext("8081", "/sweet");
-        actualCtx.setDataDirectory(defaultDataDir.getAbsolutePath());
-        actualCtx.setExternalConfig(defaultConfigFile.getAbsolutePath());
+        RuntimeContext expected = new RuntimeContext("8081", "/sweet");
+        expected.setDataDirectory(defaultDataDir.getAbsolutePath());
+        expected.setExternalConfig(defaultConfigFile.getAbsolutePath());
 
-        assertSecondTimeStartup(ctx, fileCtx, actualCtx);
+        assertSecondTimeStartup(commandline, file, expected);
     }
 
     public void testSecondTimeStartupWithEditedConfig() throws Exception
     {
-        RuntimeContext ctx = new RuntimeContext();
+        RuntimeContext commandline = new RuntimeContext();
 
         // the file runtime context should mirror the config file.
-        RuntimeContext fileCtx = new RuntimeContext("8083", "/solid");
-        fileCtx.setDataDirectory(defaultDataDir.getAbsolutePath());
-        fileCtx.setExternalConfig(defaultConfigFile.getAbsolutePath());
-        writeToConfigFile(fileCtx);
+        RuntimeContext file = new RuntimeContext("8083", "/solid");
+        file.setDataDirectory(defaultDataDir.getAbsolutePath());
+        writeToConfigFile(defaultConfigFile, file);
 
         // the actual runtime context.
-        RuntimeContext actualCtx = new RuntimeContext("8083", "/solid");
-        actualCtx.setDataDirectory(defaultDataDir.getAbsolutePath());
-        actualCtx.setExternalConfig(defaultConfigFile.getAbsolutePath());
+        RuntimeContext expected = new RuntimeContext("8083", "/solid");
+        expected.setDataDirectory(defaultDataDir.getAbsolutePath());
+        expected.setExternalConfig(defaultConfigFile.getAbsolutePath());
 
-        assertSecondTimeStartup(ctx, fileCtx, actualCtx);
+        assertSecondTimeStartup(commandline, file, expected);
     }
 
     public void testSecondTimeStartupWithCustomEditedConfig() throws Exception
     {
-        // the file runtime context should mirror the config file.
-        RuntimeContext fileCtx = new RuntimeContext("8086", "/domain/name/anyone");
-        fileCtx.setDataDirectory(dataDir.getAbsolutePath());
-        fileCtx.setExternalConfig(configFile.getAbsolutePath());
-        writeToConfigFile(fileCtx);
+        RuntimeContext commandline = new RuntimeContext();
+        commandline.setExternalConfig(configFile.getAbsolutePath());
 
-        RuntimeContext ctx = new RuntimeContext();
-        ctx.setExternalConfig(configFile.getAbsolutePath());
+        // the file runtime context should mirror the config file.
+        RuntimeContext file = new RuntimeContext("8086", "/domain/name/anyone");
+        file.setDataDirectory(dataDir.getAbsolutePath());
+        writeToConfigFile(configFile, file);
 
         // the actual runtime context.
-        RuntimeContext actualCtx = new RuntimeContext("8086", "/domain/name/anyone");
-        actualCtx.setDataDirectory(dataDir.getAbsolutePath());
-        actualCtx.setExternalConfig(configFile.getAbsolutePath());
+        RuntimeContext expected = new RuntimeContext("8086", "/domain/name/anyone");
+        expected.setDataDirectory(dataDir.getAbsolutePath());
+        expected.setExternalConfig(configFile.getAbsolutePath());
 
-        assertSecondTimeStartup(ctx, fileCtx, actualCtx);
+        assertSecondTimeStartup(commandline, file, expected);
     }
 
     // test the shutdown command to ensure that
@@ -267,61 +259,65 @@ public class StartupShutdownAcceptanceTest extends TestCase
      * This is more a test of the AdminCommand being able to accurately locate
      * the running server than the shutdown command being able to shutdown a
      * server.
+     *
+     * @throws Exception if an unexpected error occurs.
      */
     public void testThatShutdownWorksForNonStandardDeployment() throws Exception
     {
-        RuntimeContext cmdCtx = new RuntimeContext("8083", "/some/sort/of/crazy/context/path");
-        cmdCtx.setDataDirectory(dataDir.getAbsolutePath());
-        cmdCtx.setExternalConfig(configFile.getAbsolutePath());
+        RuntimeContext startupCommandLine = new RuntimeContext("8083", "/some/sort/of/crazy/context/path");
+        startupCommandLine.setDataDirectory(dataDir.getAbsolutePath());
+        startupCommandLine.setExternalConfig(configFile.getAbsolutePath());
 
-        assertServerNotAvailable(cmdCtx);
-        assertStartServer(cmdCtx);
-        assertServerAvailable(cmdCtx);
+        assertServerNotAvailable(startupCommandLine);
+        assertStartServer(startupCommandLine);
+        assertServerAvailable(startupCommandLine);
 
         resetSystemProperties();
 
         // now lets shutdown the server using the default context. This checks
         // that the runtime context is remembered and used for admin functions.
-        RuntimeContext shutdownCtx = new RuntimeContext();
-        assertShutdownServer(shutdownCtx);
-        assertServerNotAvailable(cmdCtx);
+        RuntimeContext shutdownCommandLine = new RuntimeContext();
+        assertShutdownServer(shutdownCommandLine);
+        
+        assertServerNotAvailable(startupCommandLine);
     }
 
     /**
      * This is the scenario when a user is changing the configuration of a
      * running pulse instance.  We need to ensure that the file context is not
      * relied upon to interact with the running server.
+     *
+     * @throws Exception if an unexpected error occurs.
      */
-    public void testShutdownWorksForIncorrectFileConfig() throws ParseException, InterruptedException, IOException
+    public void testShutdownWorksForIncorrectFileConfig() throws Exception
     {
-        RuntimeContext cmdCtx = new RuntimeContext("8083", "/some/sort/of/crazy/context/path");
-        cmdCtx.setDataDirectory(dataDir.getAbsolutePath());
-        cmdCtx.setExternalConfig(configFile.getAbsolutePath());
+        RuntimeContext startupCommandLine = new RuntimeContext("8083", "/some/sort/of/crazy/context/path");
+        startupCommandLine.setDataDirectory(dataDir.getAbsolutePath());
+        startupCommandLine.setExternalConfig(configFile.getAbsolutePath());
 
-        assertServerNotAvailable(cmdCtx);
-        assertStartServer(cmdCtx);
-        assertServerAvailable(cmdCtx);
+        assertServerNotAvailable(startupCommandLine);
+        assertStartServer(startupCommandLine);
+        assertServerAvailable(startupCommandLine);
 
         resetSystemProperties();
 
         // now we set the new startup configuration while the server is still
         // running.
-        RuntimeContext fileCtx = new RuntimeContext("8086", "/domain/name/anyone");
-        fileCtx.setDataDirectory(dataDir.getAbsolutePath());
-        fileCtx.setExternalConfig(configFile.getAbsolutePath());
-        writeToConfigFile(fileCtx);
+        RuntimeContext file = new RuntimeContext("8086", "/domain/name/anyone");
+        file.setDataDirectory(dataDir.getAbsolutePath());
+        writeToConfigFile(configFile, file);
 
         // test that the shutdown command is still able to shutdown the runnign server.
-        RuntimeContext shutdownCtx = new RuntimeContext();
-        assertShutdownServer(shutdownCtx);
+        RuntimeContext shutdownCommandLine = new RuntimeContext();
+        assertShutdownServer(shutdownCommandLine);
 
-        assertServerNotAvailable(cmdCtx);
+        assertServerNotAvailable(startupCommandLine);
     }
 
-    private void writeToConfigFile(RuntimeContext fileCtx)
+    private void writeToConfigFile(File externalConfigFile, RuntimeContext fileCtx)
     {
         // create external config file setting the values we expect.
-        Config config = new FileConfig(fileCtx.getExternalConfigFile());
+        Config config = new FileConfig(externalConfigFile);
         config.setProperty(SystemConfiguration.WEBAPP_PORT, fileCtx.getPort());
         config.setProperty(SystemConfiguration.CONTEXT_PATH, fileCtx.getContextPath());
         config.setProperty(SystemConfiguration.PULSE_DATA, fileCtx.getConfiguredDataDirectory());
@@ -329,30 +325,31 @@ public class StartupShutdownAcceptanceTest extends TestCase
 
     /**
      *
+     * @throws Exception if an unexpected error occurs.
      */
-    public void assertSecondTimeStartup(RuntimeContext cmdCtx, RuntimeContext fileContext, RuntimeContext actualCtx) throws Exception
+    public void assertSecondTimeStartup(RuntimeContext commandline, RuntimeContext file, RuntimeContext expected) throws Exception
     {
-        assertExternalConfigAvailable(actualCtx);
-        assertServerNotAvailable(actualCtx);
+        assertExternalConfigAvailable(expected.getExternalConfigFile());
+        assertServerNotAvailable(expected);
 
-        assertStartServer(cmdCtx);
-        assertServerAvailable(actualCtx);
+        assertStartServer(commandline);
+        assertServerAvailable(expected);
 
         // always expected a license prompt, never a data prompt since the data directory is located in the config file.
-        assertPromptForLicense(actualCtx);
+        assertPromptForLicense(expected);
 
         // verify that the pulse config file is written to the user home.
-        assertExternalConfigAvailable(actualCtx);
-        assertExternalConfigContents(actualCtx, fileContext);
+        assertExternalConfigAvailable(expected.getExternalConfigFile());
+        assertExternalConfigContents(expected.getExternalConfigFile(), file);
 
         // now lets shutdown the server.
-        assertShutdownServer(cmdCtx);
-        assertServerNotAvailable(actualCtx);
+        assertShutdownServer(commandline);
+        assertServerNotAvailable(expected);
     }
 
-    private String assertPromptForPulseDataDirectory(RuntimeContext ctx)
+    private String assertPromptForPulseDataDirectory(RuntimeContext expected)
     {
-        WebTester tester = ctx.initWebTester();
+        WebTester tester = expected.initWebTester();
 
         SetPulseDataForm form = new SetPulseDataForm(tester);
         form.assertFormPresent();
@@ -365,9 +362,9 @@ public class StartupShutdownAcceptanceTest extends TestCase
         return dataDir;
     }
 
-    private void assertPromptForLicense(RuntimeContext ctx)
+    private void assertPromptForLicense(RuntimeContext expected)
     {
-        WebTester tester = ctx.initWebTester();
+        WebTester tester = expected.initWebTester();
 
         PulseLicenseForm form = new PulseLicenseForm(tester);
         form.assertFormPresent();
@@ -387,54 +384,54 @@ public class StartupShutdownAcceptanceTest extends TestCase
         assertEquals(0, ping.execute());
     }
 
-    private void assertStartServer(RuntimeContext ctx) throws ParseException
+    private void assertStartServer(RuntimeContext commandline) throws ParseException
     {
         StartCommand start = new StartCommand();
         List<String> args = new LinkedList<String>();
 
         args.add("start");
-        if (TextUtils.stringSet(ctx.getPort()))
+        if (TextUtils.stringSet(commandline.getPort()))
         {
             args.add("-p");
-            args.add(ctx.getPort());
+            args.add(commandline.getPort());
         }
-        if (TextUtils.stringSet(ctx.getContextPath()))
+        if (TextUtils.stringSet(commandline.getContextPath()))
         {
             args.add("-c");
-            args.add(ctx.getContextPath());
+            args.add(commandline.getContextPath());
         }
-        if (TextUtils.stringSet(ctx.getConfiguredDataDirectory()))
+        if (TextUtils.stringSet(commandline.getConfiguredDataDirectory()))
         {
             args.add("-d");
-            args.add(ctx.getConfiguredDataDirectory());
+            args.add(commandline.getConfiguredDataDirectory());
         }
-        if (TextUtils.stringSet(ctx.getExternalConfig()))
+        if (TextUtils.stringSet(commandline.getExternalConfig()))
         {
             args.add("-f");
-            args.add(ctx.getExternalConfig());
+            args.add(commandline.getExternalConfig());
         }
         assertEquals(0, start.execute(getBootContext(args)));
     }
 
-    private void assertShutdownServer(RuntimeContext ctx) throws ParseException, InterruptedException, IOException
+    private void assertShutdownServer(RuntimeContext commandline) throws ParseException, InterruptedException, IOException
     {
         ShutdownCommand shutdown = new ShutdownCommand();
         List<String> args = new LinkedList<String>();
         args.add("shutdown");
-        if (TextUtils.stringSet(ctx.getPort()))
+        if (TextUtils.stringSet(commandline.getPort()))
         {
             args.add("-p");
-            args.add(ctx.getPort());
+            args.add(commandline.getPort());
         }
-        if (TextUtils.stringSet(ctx.getContextPath()))
+        if (TextUtils.stringSet(commandline.getContextPath()))
         {
             args.add("-c");
-            args.add(ctx.getContextPath());
+            args.add(commandline.getContextPath());
         }
-        if (TextUtils.stringSet(ctx.getExternalConfig()))
+        if (TextUtils.stringSet(commandline.getExternalConfig()))
         {
             args.add("-f");
-            args.add(ctx.getExternalConfig());
+            args.add(commandline.getExternalConfig());
         }
         shutdown.setExitJvm(false);
         assertEquals(0, shutdown.execute(getBootContext(args)));
@@ -452,14 +449,13 @@ public class StartupShutdownAcceptanceTest extends TestCase
         assertFalse(ctx.getExternalConfigFile().exists());
     }
 
-    private void assertExternalConfigAvailable(RuntimeContext ctx)
+    private void assertExternalConfigAvailable(File f)
     {
-        assertTrue(ctx.getExternalConfigFile().isFile());
+        assertTrue(f.isFile());
     }
 
-    private void assertExternalConfigContents(RuntimeContext actualContext, RuntimeContext fileCtx)
+    private void assertExternalConfigContents(File externalConfigFile, RuntimeContext expected)
     {
-        File externalConfigFile = actualContext.getExternalConfigFile();
         Config config = new FileConfig(externalConfigFile);
         assertTrue(config.hasProperty(SystemConfiguration.PULSE_DATA));
         assertTrue(config.hasProperty(SystemConfiguration.WEBAPP_PORT));
@@ -467,11 +463,17 @@ public class StartupShutdownAcceptanceTest extends TestCase
 
         // these are the expected contents of the external config file generated by the pulse instance.
         // If the file was already there (updated by the user), then these values may vary.
-        assertEquals(fileCtx.getPort(), config.getProperty(SystemConfiguration.WEBAPP_PORT));
-        assertEquals(fileCtx.getContextPath(), config.getProperty(SystemConfiguration.CONTEXT_PATH));
-        assertEquals(fileCtx.getConfiguredDataDirectory(), config.getProperty(SystemConfiguration.PULSE_DATA));
+        assertEquals(expected.getPort(), config.getProperty(SystemConfiguration.WEBAPP_PORT));
+        assertEquals(expected.getContextPath(), config.getProperty(SystemConfiguration.CONTEXT_PATH));
+
+        assertEquals(expected.getConfiguredDataDirectory(), config.getProperty(SystemConfiguration.PULSE_DATA));
     }
 
+    /**
+     * The runtime context object defines the variables used by pulse when starting up to determine
+     * its runtime configuration.
+     * 
+     */
     private class RuntimeContext
     {
         private String contextPath;

@@ -114,7 +114,10 @@ public class PulsePluginManager
 
     public void destory()
     {
-        repository.destory();
+        if (repository != null)
+        {
+            repository.destory();
+        }
 
         for (Plugin plugin : plugins)
         {

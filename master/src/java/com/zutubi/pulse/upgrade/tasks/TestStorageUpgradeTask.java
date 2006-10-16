@@ -142,8 +142,7 @@ public class TestStorageUpgradeTask extends DatabaseUpgradeTask implements Confi
         File absoluteOutput = new File(configurationManager.getDataDirectory(), outputDir);
         File testDir = new File(absoluteOutput, RecipeResult.TEST_DIR);
 
-        testDir.mkdirs();
-        if(!testDir.isDirectory())
+        if(!testDir.isDirectory() && !testDir.mkdirs())
         {
             throw new IOException("Unable to create test directory '" + testDir.getAbsolutePath() + "'");
         }

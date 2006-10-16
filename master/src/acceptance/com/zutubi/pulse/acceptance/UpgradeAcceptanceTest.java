@@ -1,11 +1,14 @@
 package com.zutubi.pulse.acceptance;
 
+import com.zutubi.pulse.command.BootContext;
 import com.zutubi.pulse.command.ShutdownCommand;
 import com.zutubi.pulse.command.StartCommand;
+import com.zutubi.pulse.test.TestUtils;
 import com.zutubi.pulse.util.FileSystemUtils;
 import com.zutubi.pulse.util.IOUtils;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.InputStream;
 import java.util.zip.ZipInputStream;
 
@@ -18,8 +21,6 @@ public class UpgradeAcceptanceTest extends BaseAcceptanceTestCase
 
     protected void setUp() throws Exception
     {
-//        super.setUp();
-
         tmpDir = FileSystemUtils.createTempDirectory("UpgradeAccepanceTest", this.getName());
     }
 
@@ -27,10 +28,8 @@ public class UpgradeAcceptanceTest extends BaseAcceptanceTestCase
     {
         if (!FileSystemUtils.removeDirectory(tmpDir))
         {
-            throw new RuntimeException();
+            throw new RuntimeException("Failed to remove the temporary directory: " + tmpDir.getAbsolutePath());
         }
-
-//        super.tearDown();
     }
 
     public void testUpgradeFromVersionOnePointOne() throws Exception
@@ -41,7 +40,10 @@ public class UpgradeAcceptanceTest extends BaseAcceptanceTestCase
         InputStream is = null;
         try
         {
-            is = getClass().getResourceAsStream("data/pulse-1.1.0-data.zip");
+            File root = TestUtils.getPulseRoot();
+            File data = new File(root, FileSystemUtils.composeFilename("master", "src", "acceptance", "data", "pulse-1.1.0-data.zip"));
+            is = new FileInputStream(data);
+            
             assertNotNull(is);
             FileSystemUtils.extractZip(new ZipInputStream(is), tmpDir);
         }
@@ -81,12 +83,14 @@ public class UpgradeAcceptanceTest extends BaseAcceptanceTestCase
 
         ShutdownCommand shutdown = new ShutdownCommand();
         shutdown.setExitJvm(false);
-        shutdown.setForce(true);
-        shutdown.setPort(8990);
-        shutdown.execute();
+        shutdown.execute(getBootContext("-F", "true", "-p", "8990"));
 
         // allow time for the shutdown to complete.
         Thread.sleep(2000);
     }
 
+    private BootContext getBootContext(String... args)
+    {
+        return new BootContext(null, args, null, null, null);
+    }
 }
