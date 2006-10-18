@@ -159,10 +159,6 @@
             <fileset dir="server-core/src/lib" includes="**/*"/>
         </copy>
 
-        <copy todir="${version.root.slave}/licenses">
-            <fileset dir="ivy-repository" includes="**/*.txt"/>
-        </copy>
-
         <fixcrlf srcdir="${package.root.slave}/bin" eol="lf" eof="remove" includes="**/*.sh"/>
         <chmod perm="755" dir="${package.root.slave}/bin" includes="**/*.sh" verbose="true"/>
 
@@ -277,10 +273,6 @@
 
         <copy todir="${package.root.master}/lib">
             <fileset dir="server-core/src/lib" includes="**/*"/>
-        </copy>
-
-        <copy todir="${version.root.master}/licenses">
-            <fileset dir="ivy-repository" includes="**/*.txt"/>
         </copy>
 
         <fixcrlf srcdir="${package.root.master}/bin" eol="lf" eof="remove" includes="**/*.sh"/>

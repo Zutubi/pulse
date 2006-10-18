@@ -15,15 +15,16 @@ Contents
 
     README.txt 		This file
     bin/            Startup and admin scripts for launching Pulse.
-    lib/            Library files
-    licenses/       License files for Pulse and bundled software.
+    lib/            Pulse bootstrap library files
+    logs/           Log files
+    versions/       License files for Pulse and bundled software.
 
-    system/         
-        config/     Default configuration files.
-        logs/       Log files
-        templates/  Various templates used by Pulse
-        www/        Pulse Web UI
+        pulse-build-number/
 
+            config/         Default configuration files.
+            packages/       Agent and Local packages.
+            templates/      Various templates used by Pulse
+            www/            Pulse web UI
 
 Requirements
 ------------
@@ -51,7 +52,7 @@ Installation
    
    
 For an extended description of the installation process, please see the Getting
-Started Guide http://confluence.zutubi.com/display/pulse0101/Getting+Started+Guide
+Started Guide http://confluence.zutubi.com/display/pulse0102/Getting+Started+Guide
    
 Problems?
 ---------
@@ -61,7 +62,7 @@ following places:
 
 The Pulse Documentation:
     
-    http://confluence.zutubi.com/display/pulse0101/Getting+Started+Guide
+    http://confluence.zutubi.com/display/pulse0102/Getting+Started+Guide
 
 The Pulse Support Forums:
     
