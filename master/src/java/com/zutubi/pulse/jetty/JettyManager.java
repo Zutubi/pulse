@@ -10,6 +10,7 @@ import org.mortbay.util.MultiException;
 
 import java.io.File;
 import java.util.List;
+import java.net.BindException;
 
 /**
  * The Jetty Manager provides access to the runtime configuration of the jetty server, and hence
@@ -77,7 +78,14 @@ public class JettyManager implements Stoppable
         {
             for(Exception nested: (List<Exception>)e.getExceptions())
             {
-                LOG.severe("Unable to start server: " + nested.getMessage(), nested);
+                if (nested instanceof BindException)
+                {
+                    handleBindException();
+                }
+                else
+                {
+                    LOG.severe("Unable to start server: " + nested.getMessage(), nested);
+                }
             }
 
             // This is fatal.
@@ -90,6 +98,13 @@ public class JettyManager implements Stoppable
             // This is fatal.
             System.exit(1);
         }
+    }
+
+    private void handleBindException()
+    {
+        int port = configurationManager.getSystemConfig().getServerPort();
+        LOG.severe(String.format("Pulse is unable to start on port %s because it " +
+                "is being used by another process.  Please select a different port and restart pulse.", port));
     }
 
     /**
