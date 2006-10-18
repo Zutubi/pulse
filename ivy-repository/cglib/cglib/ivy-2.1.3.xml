@@ -17,6 +17,7 @@
 
     <publications>
         <artifact name="cglib-nodep" type="jar"/>
+        <artifact name="cglib-license" type="txt"/>
     </publications>
 
 </ivy-module>

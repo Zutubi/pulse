@@ -11,6 +11,7 @@
 
     <publications>
         <artifact name="commons-fileupload" type="jar"/>
+        <artifact name="commons-fileupload-license" type="txt"/>
     </publications>
 
 </ivy-module>

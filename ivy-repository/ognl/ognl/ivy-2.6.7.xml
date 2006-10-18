@@ -13,6 +13,7 @@
 
     <publications>
         <artifact name="ognl" type="jar" conf="default"/>
+        <artifact name="ognl-license" type="txt" conf="default"/>
     </publications>
 
 </ivy-module>

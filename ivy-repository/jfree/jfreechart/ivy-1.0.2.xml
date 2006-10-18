@@ -15,6 +15,7 @@
 
     <publications>
         <artifact name="jfreechart" type="jar"/>
+        <artifact name="jfreechart-license" type="txt"/>
     </publications>
 
     <dependencies>

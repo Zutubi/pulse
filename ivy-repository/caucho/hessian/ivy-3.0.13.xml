@@ -10,6 +10,7 @@
 
     <publications>
         <artifact name="hessian" type="jar"/>
+        <artifact name="hessian-license" type="txt"/>
     </publications>
 
 </ivy-module>

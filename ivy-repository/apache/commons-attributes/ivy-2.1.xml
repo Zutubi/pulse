@@ -16,6 +16,7 @@
     <publications>
         <artifact name="commons-attributes-compiler" type="jar" conf="default"/>
         <artifact name="commons-attributes-api" type="jar" conf="default"/>
+        <artifact name="commons-attributes-license" type="txt" conf="default"/>
     </publications>
 
     <dependencies>

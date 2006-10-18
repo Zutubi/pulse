@@ -17,6 +17,7 @@
 
     <publications>
         <artifact name="javacvs" type="jar" conf="default"/>
+        <artifact name="javacvs-license" type="txt" conf="default"/>
     </publications>
 
 </ivy-module>

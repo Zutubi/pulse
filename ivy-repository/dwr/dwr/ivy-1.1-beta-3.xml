@@ -11,6 +11,7 @@
 
     <publications>
         <artifact name="dwr" type="jar"/>
+        <artifact name="dwr-license" type="txt"/>
     </publications>
 
 </ivy-module>

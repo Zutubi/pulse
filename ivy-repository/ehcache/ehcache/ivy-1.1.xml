@@ -16,6 +16,12 @@
         <conf name="default" description="for minimal use"/>
         <conf name="1.2" extends="default" description="for use in jdk 1.2 or 1.3"/>
     </configurations>
+
+    <publications>
+        <artifact name="ehcache" type="jar"/>
+        <artifact name="ehcache-license" type="txt"/>
+    </publications>
+
     <dependencies>
         <dependency org="apache" name="commons-logging" rev="1.0.4" conf="default"/>
         <dependency org="apache" name="xerces" rev="2.5.0" conf="1.2->default"/>

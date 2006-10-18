@@ -13,6 +13,8 @@
     <publications>
         <artifact name="ant" type="jar" conf="default"/>
         <artifact name="apache-ant-directoryscanner" type="jar" conf="directoryscanner"/>
+        <artifact name="ant-license" type="txt" conf="default, directoryscanner"/>
+        <artifact name="ant-notice" type="txt" conf="default, directoryscanner"/>
     </publications>
 
 </ivy-module>

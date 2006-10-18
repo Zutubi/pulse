@@ -23,6 +23,8 @@
         <artifact name="acegi-security-jboss" type="jar" conf="jboss"/>
         <artifact name="acegi-security-jetty" type="jar" conf="jetty"/>
         <artifact name="acegi-security-resin" type="jar" conf="resin"/>
+        <artifact name="acegi-security-license" type="txt" conf="default"/>
+        <artifact name="acegi-security-notice" type="txt" conf="default"/>
     </publications>
 
     <dependencies>

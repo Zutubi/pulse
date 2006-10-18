@@ -20,6 +20,7 @@
     <publications>
         <artifact name="xwork" type="jar" conf="default,minimal"/>
         <artifact name="xwork-optional" type="jar" conf="optional"/>
+        <artifact name="xwork-license" type="txt" conf="default,minimal"/>
     </publications>
 
     <dependencies>

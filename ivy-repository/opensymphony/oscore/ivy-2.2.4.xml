@@ -15,5 +15,6 @@
     </configurations>
     <publications>
         <artifact name="oscore" type="jar" conf="default"/>
+        <artifact name="oscore-license" type="txt" conf="default"/>
     </publications>
 </ivy-module>

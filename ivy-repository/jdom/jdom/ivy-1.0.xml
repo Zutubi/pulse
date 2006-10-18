@@ -12,6 +12,7 @@
 
     <publications>
         <artifact name="jdom" type="jar"/>
+        <artifact name="jdom-license" type="txt"/>
     </publications>
 
 </ivy-module>

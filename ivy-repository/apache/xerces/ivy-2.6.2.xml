@@ -12,6 +12,7 @@
 
     <publications>
         <artifact name="xercesImpl" type="jar"/>
+        <artifact name="xerces-license" type="txt"/>
     </publications>
 
 </ivy-module>

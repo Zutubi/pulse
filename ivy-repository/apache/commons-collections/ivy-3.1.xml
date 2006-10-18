@@ -16,6 +16,7 @@
 
     <publications>
         <artifact name="commons-collections" type="jar"/>
+        <artifact name="commons-collections-license" type="txt"/>
     </publications>
 
 </ivy-module>

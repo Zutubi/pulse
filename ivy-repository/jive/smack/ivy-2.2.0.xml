@@ -8,6 +8,7 @@
     <publications>
         <artifact name="smack" type="jar"/>
         <artifact name="smackx" type="jar"/>
+        <artifact name="smack-license" type="txt"/>
     </publications>
 
 </ivy-module>

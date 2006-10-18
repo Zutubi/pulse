@@ -11,6 +11,7 @@
 
     <publications>
         <artifact name="commons-dbcp" type="jar"/>
+        <artifact name="commons-dbcp-license" type="txt"/>
     </publications>
 
 </ivy-module>

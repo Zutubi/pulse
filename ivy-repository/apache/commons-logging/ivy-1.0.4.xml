@@ -13,6 +13,7 @@
     <publications>
         <artifact name="commons-logging" type="jar"/>
         <artifact name="commons-logging-api" type="jar"/>
+        <artifact name="commons-logging-license" type="txt"/>
     </publications>
 
 </ivy-module>

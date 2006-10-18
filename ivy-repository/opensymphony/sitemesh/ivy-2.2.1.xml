@@ -14,6 +14,7 @@
 
     <publications>
         <artifact name="sitemesh" type="jar" conf="default"/>
+        <artifact name="sitemesh-license" type="txt" conf="default"/>
     </publications>
 
     <dependencies>

@@ -13,7 +13,7 @@
 
     <configurations>
         <conf name="release" description="Defines those packages that are included in the final release."/>
-        <conf name="external" description="All of those packages not written by Zutubi."/>
+        <conf name="external" description="All of those packages that are external to Pulse."/>
         <conf name="build" description="All of the packages required during the build."/>
     </configurations>
 

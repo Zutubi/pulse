@@ -11,6 +11,7 @@
 
     <publications>
         <artifact name="commons-codec" type="jar"/>
+        <artifact name="commons-codec-license" type="txt"/>
     </publications>
 
 </ivy-module>

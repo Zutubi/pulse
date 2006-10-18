@@ -13,6 +13,7 @@
 
     <publications>
         <artifact name="quartz" type="jar" conf="default"/>
+        <artifact name="quartz-license" type="txt" conf="default"/>
     </publications>
 
     <dependencies>

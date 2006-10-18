@@ -8,6 +8,7 @@
 
     <publications>
         <artifact name="jhighlight" type="jar"/>
+        <artifact name="jhighlight-license" type="txt"/>
     </publications>
 
 </ivy-module>

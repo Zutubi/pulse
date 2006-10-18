@@ -16,6 +16,7 @@
 
     <publications>
         <artifact name="jwebunit" type="jar" conf="default"/>
+        <artifact name="jwebunit-license" type="txt" conf="default"/>
     </publications>
 
     <dependencies>

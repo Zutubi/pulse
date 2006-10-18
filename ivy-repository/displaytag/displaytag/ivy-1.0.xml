@@ -10,6 +10,7 @@
 
     <publications>
         <artifact name="displaytag" type="jar"/>
+        <artifact name="displaytag-license" type="txt"/>
     </publications>
 
 </ivy-module>

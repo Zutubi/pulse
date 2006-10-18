@@ -12,6 +12,7 @@
 
     <publications>
         <artifact name="junit" type="jar" conf="default"/>
+        <artifact name="junit-license" type="txt" conf="default"/>
     </publications>
 
 </ivy-module>

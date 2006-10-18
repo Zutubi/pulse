@@ -13,6 +13,7 @@
     <publications>
         <artifact name="jasper-compiler" type="jar"/>
         <artifact name="jasper-runtime" type="jar"/>
+        <artifact name="jasper-license" type="txt"/>
     </publications>
 
     <dependencies>

@@ -34,6 +34,7 @@
         <artifact name="spring-remoting" type="jar" conf="spring-remoting"/>
         <artifact name="spring-web" type="jar" conf="spring-web"/>
         <artifact name="spring-support" type="jar" conf="spring-support"/>
+        <artifact name="spring-license" type="txt" conf="spring-core"/>
     </publications>
 
     <dependencies>

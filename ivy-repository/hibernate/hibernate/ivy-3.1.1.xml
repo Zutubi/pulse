@@ -24,6 +24,7 @@
 
     <publications>
         <artifact name="hibernate" type="jar"/>
+        <artifact name="hibernate-license" type="txt"/>
     </publications>
 
     <dependencies>

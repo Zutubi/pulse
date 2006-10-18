@@ -39,9 +39,12 @@
         <conf name="cewolf"/>
         <conf name="hibernate"/>
     </configurations>
+
     <publications>
         <artifact name="webwork" type="jar" conf="default"/>
+        <artifact name="webwork-license" type="txt" conf="default"/>
     </publications>
+
     <dependencies>
 
         <dependency org="mockobjects" name="mockobjects-core" rev="0.09" conf="build->*"/>

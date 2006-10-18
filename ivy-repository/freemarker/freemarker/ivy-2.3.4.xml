@@ -11,6 +11,7 @@
 
     <publications>
         <artifact name="freemarker" type="jar"/>
+        <artifact name="freemarker-license" type="txt"/>
     </publications>
 
 </ivy-module>

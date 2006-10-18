@@ -11,6 +11,7 @@
 
     <publications>
         <artifact name="commons-httpclient" type="jar"/>
+        <artifact name="commons-httpclient-license" type="txt"/>
     </publications>
 </ivy-module>
 

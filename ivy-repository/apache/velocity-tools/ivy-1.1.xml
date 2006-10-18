@@ -19,6 +19,7 @@
 
     <publications>
         <artifact name="velocity-tools-view" type="jar" conf="view,default"/>
+        <artifact name="velocity-tools-license" type="txt" conf="view,default"/>
     </publications>
 
 </ivy-module>

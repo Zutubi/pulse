@@ -11,6 +11,7 @@
 
     <publications>
         <artifact name="ws-commons-util" type="jar"/>
+        <artifact name="ws-commons-util-license" type="txt"/>
     </publications>
 </ivy-module>
 

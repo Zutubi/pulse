@@ -11,6 +11,7 @@
 
     <publications>
         <artifact name="xmlrpc" type="jar"/>
+        <artifact name="xmlrpc-license" type="txt"/>
     </publications>
 
     <dependencies>

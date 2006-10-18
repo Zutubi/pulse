@@ -39,6 +39,8 @@
         <artifact name="commons-vfs-provider-webdav" type="jar" conf="full"/>
         <artifact name="commons-vfs-provider-zip" type="jar" conf="full"/>
 
+        <artifact name="commons-vfs-license" type="txt" conf="default"/>
+
     </publications>
 
     <dependencies>

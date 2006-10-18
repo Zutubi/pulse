@@ -13,6 +13,7 @@
     <publications>
         <artifact name="velocity" type="jar"/>
         <artifact name="velocity-dep" type="jar"/>
+        <artifact name="velocity-license" type="txt"/>
     </publications>
 
 </ivy-module>

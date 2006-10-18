@@ -17,6 +17,7 @@
     <publications>
         <artifact name="j2ssh-common" type="jar" conf="default"/>
         <artifact name="j2ssh-core" type="jar" conf="default"/>
+        <artifact name="j2ssh-license" type="txt" conf="default"/>
     </publications>
 
 </ivy-module>

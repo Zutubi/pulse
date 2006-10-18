@@ -6,4 +6,10 @@
 		revision="20051027"
 		status="release"
 		publication="20051126021021"/>
+
+    <publications>
+        <artifact name="xom" type="jar"/>
+        <artifact name="xom-license" type="txt"/>
+    </publications>
+
 </ivy-module>

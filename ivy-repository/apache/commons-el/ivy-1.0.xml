@@ -16,6 +16,7 @@
 
     <publications>
         <artifact name="commons-el" type="jar" conf="default"/>
+        <artifact name="commons-el-license" type="txt" conf="default"/>
     </publications>
 
     <!--<dependencies>
