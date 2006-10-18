@@ -38,10 +38,12 @@ def createTestDir():
     return name
     
     
-def unpackAndStart(packageFile, unpackDir, port, service):        
+def unpackAndStart(packageFile, unpackDir, port, service, dataDir = None):        
     package = PulsePackage(packageFile)
     base = package.extractTo(unpackDir)
     server = Pulse(base, port)
+    if dataDir is not None:
+        server.setDataDir(dataDir)
     server.start(service=service)
     return server
 
@@ -112,7 +114,7 @@ def upgradeTest(version, build, service):
     master = None
     try:
         log('Starting old agent...')
-        agent = unpackAndStart(oldAgentPackageFile, testDir, AGENT_PORT, service)
+        agent = unpackAndStart(oldAgentPackageFile, testDir, AGENT_PORT, service, os.path.abspath(os.path.join(testDir, 'agent-data')))
         log('Old agent started.')
         log('Starting master...')
         master = unpackAndStart(masterPackageFile, testDir, MASTER_PORT, service)

@@ -1,7 +1,7 @@
 package com.zutubi.pulse.slave;
 
 import com.zutubi.pulse.bootstrap.UserPaths;
-import com.zutubi.pulse.bootstrap.SystemPaths;
+import com.zutubi.pulse.util.logging.Logger;
 
 import java.io.File;
 
@@ -9,18 +9,23 @@ import java.io.File;
  */
 public class SlaveUserPaths implements UserPaths
 {
-    private static final String CONFIG_DIR = ".pulse-agent";
+    private static final Logger LOG = Logger.getLogger(SlaveUserPaths.class);
 
     private File data;
     private File userConfigRoot;
 
-    public SlaveUserPaths(SystemPaths systemPaths)
+    public SlaveUserPaths(DefaultSlaveConfiguration appConfig)
     {
-        data = new File(systemPaths.getSystemRoot(), "data");
+        data = new File(appConfig.getDataPath());
+        userConfigRoot = new File(data, "config");
 
-        String home = System.getProperty("user.home");
-        File homeDir = new File(home);
-        this.userConfigRoot = new File(homeDir, CONFIG_DIR);
+        if(!userConfigRoot.isDirectory())
+        {
+            if(!userConfigRoot.mkdirs())
+            {
+                LOG.severe("Unable to create user config directory '" + userConfigRoot.getAbsolutePath() + "'");
+            }
+        }
     }
 
     public File getData()

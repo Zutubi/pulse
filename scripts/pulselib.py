@@ -22,7 +22,10 @@ class Pulse:
     def __init__(self, baseDir, port):
         self.baseDir = os.path.abspath(baseDir)
         self.port = port
-        
+        self.dataDir = None
+
+    def setDataDir(self, dataDir):
+        self.dataDir = dataDir
     
     def getEnv(self):
         return {'PULSE_CONFIG': os.path.join(self.baseDir, 'bin', 'config.properties'), 'PULSE_HOME': self.baseDir, 'PULSE_USER': os.getenv('USERNAME'), 'USERNAME': os.getenv('USERNAME'), 'PULSE_PID': os.path.join(self.baseDir, 'pulse.pid'), 'JAVA_HOME': os.getenv('JAVA_HOME')}
@@ -40,6 +43,8 @@ class Pulse:
             if service:
                 configFile = open('config.properties', 'w')
                 configFile.writelines(['webapp.port=%d\n' % self.port])
+                if self.dataDir is not None:
+                    configFile.writelines(['pulse.data=%s\n' % self.dataDir])
                 configFile.close()
                 ret = subprocess.call(['init.sh', 'start'], env=self.getEnv())
                 if ret != 0:
@@ -48,7 +53,10 @@ class Pulse:
             else:
                 self.stdout = open('stdout.txt', 'w')
                 self.stderr = open('stderr.txt', 'w')
-                self.pop = subprocess.Popen([getScript(), 'start', '-p', str(self.port), '-f', 'config.properties'], stdout=self.stdout, stderr=self.stderr)
+                command = [getScript(), 'start', '-p', str(self.port), '-f', 'config.properties']
+                if self.dataDir is not None:
+                    command += ['-d', self.dataDir]
+                self.pop = subprocess.Popen(command, stdout=self.stdout, stderr=self.stderr)
             
             if wait:
                 if not self.waitFor():
