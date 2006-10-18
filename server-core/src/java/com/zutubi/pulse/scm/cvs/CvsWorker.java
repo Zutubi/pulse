@@ -38,7 +38,6 @@ public class CvsWorker
     private String password;
 
     private CvsClient client;
-    private LogAnalyser analyser;
 
     /**
      * Set the cvs root
@@ -214,7 +213,7 @@ public class CvsWorker
             throw new SCMException("Failed to retrieve the cvs server changes between details.");
         }
 
-        List<Changelist> changelists = getAnalyser(uid).extract(response);
+        List<Changelist> changelists = getAnalyser(uid).extract(response, branch);
         LOG.exiting(changelists.size());
         return changelists;
     }
@@ -333,11 +332,7 @@ public class CvsWorker
      */
     private LogAnalyser getAnalyser(String uid)
     {
-        if (analyser == null)
-        {
-            analyser = new LogAnalyser(uid, getClient().getRoot());
-        }
-        return analyser;
+        return new LogAnalyser(uid, getClient().getRoot());
     }
 
     /**

@@ -482,6 +482,32 @@ public class CvsWorkerTest extends PulseTestCase
         assertCvsRevision(changelist.getRevision(), "daniel", "BRANCH", "file1.txt modified on BRANCH by author a\n");
     }
 
+    public void testChangesOnHeadAndBranch() throws SCMException, ParseException
+    {
+        String module = "unit-test/CvsWorkerTest/testChangesOnHeadAndBranch";
+        cvs.setModule(module);
+
+        CvsRevision fromRevision = new CvsRevision(null, null, null, SERVER_DATE.parse("2006-10-10 00:00:00 GMT"));
+        CvsRevision toRevision = new CvsRevision(null, null, null, SERVER_DATE.parse("2006-10-18 00:00:00 GMT"));
+
+        List<Changelist> changes = cvs.getChangesBetween("test", fromRevision, toRevision);
+        assertEquals(2, changes.size());
+        Changelist changelist = changes.get(0);
+        assertEquals("", changelist.getRevision().getBranch());
+        changelist = changes.get(1);
+        assertEquals("", changelist.getRevision().getBranch());
+
+        // now check that we can do the same on the branch.
+        cvs.setBranch("BRANCH");
+        fromRevision.setBranch("BRANCH");
+        toRevision.setBranch("BRANCH");
+
+        changes = cvs.getChangesBetween("test", fromRevision, toRevision);
+        assertEquals(1, changes.size());
+        changelist = changes.get(0);
+        assertEquals("BRANCH", changelist.getRevision().getBranch());
+    }
+
     public void testHasBranchChangedSince() throws SCMException, ParseException
     {
         String module = "unit-test/CvsWorkerTest/testHasBranchChangedSince";

@@ -429,6 +429,7 @@ public class BuildController implements EventListener
             SCMServer server = scm.createServer();
             List<BuildResult> previousBuildResults = buildManager.getLatestCompletedBuildResults(project, specification.getName(), 1);
 
+            // BUG: If there is no previous build result, no change list is captured, even when the build is SCM Triggered.
             if (previousBuildResults.size() == 1)
             {
                 BuildScmDetails previousScmDetails = previousBuildResults.get(0).getScmDetails();
