@@ -21,10 +21,24 @@
 
     <target name="clean.dev">
         <delete dir="data"/>
+
+        <!-- clean up this annoying log file. -->
+        <delete file="velocity.log"/>
+
+        <!-- clean out the master -->
         <delete dir="master/system"/>
         <delete file="master/etc/admin.token"/>
         <delete file="master/etc/service.token"/>
-        <delete file="master/etc/pulse-init.properties"/>
+        <delete file="master/etc/runtime.properties"/>
+
+        <!-- clean out the slave -->
+        <delete dir="slave/system"/>
+        <delete file="slave/etc/admin.token"/>
+        <delete file="slave/etc/service.token"/>
+        <delete file="slave/etc/runtime.properties"/>
+
+        <!-- clean out the acceptance test playground. -->
+        <delete dir="pulse-accept"/>
 
         <!-- clean out the user.home/.pulse/* directory -->
         <delete dir="${user.home}/.pulse"/>        
@@ -431,7 +445,7 @@
         </exec>
         <fail message="One or more acceptance tests failed.  See the reports (${report.dir}) for details."
               if="test.failed"/>
-              
+
         <antcall target="test.agent.upgrade"/>
     </target>
 
