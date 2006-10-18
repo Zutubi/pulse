@@ -40,7 +40,8 @@ public class LogAnalyser
 
     public Date latestUpdate(List<LogInformation> rlogResponse)
     {
-        List<Revision> revisions = extractRevisions(rlogResponse);
+        // here, we are not interested in the branch/tag of the revision, so use null.
+        List<Revision> revisions = extractRevisions(rlogResponse, null);
         if (revisions.size() == 0)
         {
             return null;
@@ -55,7 +56,7 @@ public class LogAnalyser
      * @param rlogResponse
      *
      */
-    private List<Revision> extractRevisions(List<LogInformation> rlogResponse)
+    private List<Revision> extractRevisions(List<LogInformation> rlogResponse, String tag)
     {
         // The rlog response will contain a reference for each relevant file. Those
         // files that have changed will contain revisions that we will extract and analyse.
@@ -63,14 +64,12 @@ public class LogAnalyser
 
         for (LogInformation logInfo : rlogResponse)
         {
-            String branchName = getBranchName(logInfo);
-
             for (Object obj : logInfo.getRevisionList())
             {
                 LogInformation.Revision rev = (LogInformation.Revision) obj;
 
                 Revision revision = new Revision(rev, root);
-                revision.setTag(branchName);
+                revision.setTag(tag);
                 revisions.add(revision);
             }
         }
@@ -86,37 +85,10 @@ public class LogAnalyser
         return revisions;
     }
 
-    private String getBranchName(LogInformation logInfo)
-    {
-        // are we on a branch? use the cvs magic branch numbers..
-        for (Object obj : logInfo.getAllSymbolicNames())
-        {
-            // we are analysing the following. If there is a '0' in the second last location,
-            // then the symbolic name refers to a branch.
-            // M symbolic names:
-            // M 	BRANCH: 1.1.0.2
-
-            LogInformation.SymName symName = (LogInformation.SymName) obj;
-            String rev = symName.getRevision();
-            StringTokenizer tokens = new StringTokenizer(rev, ".", false);
-            List<String> l = new LinkedList<String>();
-            while (tokens.hasMoreTokens())
-            {
-                l.add(tokens.nextToken());
-            }
-            if (l.size() > 2 && l.get(l.size() - 2).equals("0"))
-            {
-                // its a branch!.
-                return symName.getName();
-            }
-        }
-        return null;
-    }
-
-    public List<Changelist> extract(List<LogInformation> rlogResponse)
+    public List<Changelist> extract(List<LogInformation> rlogResponse, String tag)
     {
         // retrieve the log info for all of the files that have been modified.
-        List<Revision> simpleChanges = extractRevisions(rlogResponse);
+        List<Revision> simpleChanges = extractRevisions(rlogResponse, tag);
 
         // group by author, branch, sort by date. this will have the affect of grouping
         // all of the changes in a single changeset together, ordered by date.

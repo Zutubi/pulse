@@ -8,6 +8,7 @@
         <pattern>/popups/*</pattern>
         <pattern>/view/*</pattern>
         <pattern>/viewArtifact.action*</pattern>
+        <pattern>/selenium/*</pattern>
     </excludes>
 
     <decorator name="main" page="main.vm">
