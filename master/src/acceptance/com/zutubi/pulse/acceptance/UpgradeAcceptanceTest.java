@@ -54,9 +54,7 @@ public class UpgradeAcceptanceTest extends BaseAcceptanceTestCase
 
         // start pulse using the extracted data directory.
         StartCommand start = new StartCommand();
-        start.setPort(8990);
-        start.setData(tmpDir.getAbsolutePath());
-        assertEquals(0, start.execute());
+        assertEquals(0, start.execute(getBootContext("start", "-p", "8990", "-d", tmpDir.getAbsolutePath())));
 
         // now we need to go to the Web UI and wait.
 
@@ -83,7 +81,7 @@ public class UpgradeAcceptanceTest extends BaseAcceptanceTestCase
 
         ShutdownCommand shutdown = new ShutdownCommand();
         shutdown.setExitJvm(false);
-        shutdown.execute(getBootContext("-F", "true", "-p", "8990"));
+        assertEquals(0, shutdown.execute(getBootContext("shutdown", "-F", "true", "-p", "8990")));
 
         // allow time for the shutdown to complete.
         Thread.sleep(2000);
