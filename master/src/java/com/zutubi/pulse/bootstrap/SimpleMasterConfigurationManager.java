@@ -32,7 +32,7 @@ public class SimpleMasterConfigurationManager extends AbstractConfigurationManag
             Config system = new VolatileReadOnlyConfig(systemCopy);
 
             // look for the external user configuration file.
-            String configPath = envConfig.getDefaultPulseConfig();
+            String configPath = envConfig.getDefaultPulseConfig(CONFIG_DIR);
             if (envConfig.hasPulseConfig())
             {
                 configPath = envConfig.getPulseConfig();

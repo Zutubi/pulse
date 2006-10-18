@@ -8,6 +8,8 @@ import java.io.File;
  */
 public interface MasterConfigurationManager extends ConfigurationManager, DataResolver
 {
+    public static final String CONFIG_DIR = ".pulse";
+    
     /**
      * 
      * @return system configuration.

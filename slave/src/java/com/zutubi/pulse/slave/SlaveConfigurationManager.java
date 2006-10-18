@@ -18,8 +18,8 @@ public class SlaveConfigurationManager extends AbstractConfigurationManager
     public void init()
     {
         SystemPaths systemPaths = getSystemPaths();
-        userPaths = new SlaveUserPaths(systemPaths);
-        appConfig = new DefaultSlaveConfiguration(userPaths, systemPaths, getEnvConfig());
+        appConfig = new DefaultSlaveConfiguration(systemPaths, getEnvConfig());
+        userPaths = new SlaveUserPaths(appConfig);
     }
 
     public SystemConfiguration getSystemConfig()

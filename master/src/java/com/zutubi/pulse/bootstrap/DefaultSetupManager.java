@@ -108,7 +108,7 @@ public class DefaultSetupManager implements SetupManager
         String externalConfig = envConfig.getPulseConfig();
         if (!TextUtils.stringSet(externalConfig))
         {
-            externalConfig = envConfig.getDefaultPulseConfig();
+            externalConfig = envConfig.getDefaultPulseConfig(MasterConfigurationManager.CONFIG_DIR);
         }
         File f = new File(externalConfig);
         if (!f.isAbsolute())

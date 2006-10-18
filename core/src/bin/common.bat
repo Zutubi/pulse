@@ -16,7 +16,7 @@ goto end
 
 set _JAVACMD=%JAVACMD%
 
-if not defined JAVA_HOME goto noJavaHome
+if not defined JAVA_HOME goto noJavaHomeS
 if not exist "%JAVA_HOME%\bin\java.exe" goto noJavaHome
 if not defined _JAVACMD set _JAVACMD=%JAVA_HOME%\bin\java.exe
 
@@ -30,22 +30,13 @@ if "%_JAVACMD%" == "" set _JAVACMD=java.exe
 
 :haveJava
 
-set _EXECCMD="%_JAVACMD%"
-if "%1" == "start" goto doStart
-goto doExec
-
-:doStart
-set _EXECCMD=start "Pulse" "%_JAVACMD%"
-
-:doExec
-
 if "%PULSE_OPTS%"=="" set PULSE_OPTS=-Xmx512m
 
 :restart
 
-%_EXECCMD% %JAVA_OPTS% %PULSE_OPTS% -classpath "%BOOT_JAR%" -Dpulse.home="%PULSE_HOME%" -Djava.awt.headless=true -Djava.util.logging.config.class=com.zutubi.pulse.logging.ConsoleConfig com.zutubi.pulse.command.PulseCtl %*
+"%_JAVACMD%" %JAVA_OPTS% %PULSE_OPTS% -classpath "%BOOT_JAR%" -Dpulse.home="%PULSE_HOME%" -Djava.awt.headless=true -Djava.util.logging.config.class=com.zutubi.pulse.logging.ConsoleConfig com.zutubi.pulse.command.PulseCtl %*
 
-if errorlevel 111 goto restart
+if %ERRORLEVEL% equ 111 goto restart
 
 :end
 

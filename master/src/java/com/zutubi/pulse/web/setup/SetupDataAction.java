@@ -92,7 +92,7 @@ public class SetupDataAction extends SetupActionSupport
             }
             else
             {
-                pulseConfig = new File(envConfig.getDefaultPulseConfig());
+                pulseConfig = new File(envConfig.getDefaultPulseConfig(MasterConfigurationManager.CONFIG_DIR));
             }
         }
         return pulseConfig;
@@ -104,7 +104,8 @@ public class SetupDataAction extends SetupActionSupport
         String userHome = System.getProperty("user.home");
         if (TextUtils.stringSet(userHome))
         {
-            this.data = FileSystemUtils.composeFilename(userHome, ".pulse", "data");
+            String userConfig = configurationManager.getEnvConfig().getDefaultPulseConfigDir(MasterConfigurationManager.CONFIG_DIR);
+            this.data = FileSystemUtils.composeFilename(userConfig, "data");
         }
         else
         {

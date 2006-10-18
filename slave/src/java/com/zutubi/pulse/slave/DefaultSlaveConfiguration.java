@@ -2,13 +2,13 @@ package com.zutubi.pulse.slave;
 
 import com.zutubi.pulse.bootstrap.SystemConfiguration;
 import com.zutubi.pulse.bootstrap.SystemPaths;
-import com.zutubi.pulse.bootstrap.UserPaths;
 import com.zutubi.pulse.bootstrap.conf.EnvConfig;
 import com.zutubi.pulse.bootstrap.conf.VolatileReadOnlyConfig;
 import com.zutubi.pulse.config.CompositeConfig;
 import com.zutubi.pulse.config.Config;
 import com.zutubi.pulse.config.ConfigSupport;
 import com.zutubi.pulse.config.FileConfig;
+import com.zutubi.pulse.util.FileSystemUtils;
 import com.zutubi.pulse.util.logging.Logger;
 
 import java.io.File;
@@ -20,33 +20,43 @@ public class DefaultSlaveConfiguration implements SlaveConfiguration, SystemConf
     private static final Logger LOG = Logger.getLogger(DefaultSlaveConfiguration.class);
 
     private static final String PROPERTIES_FILE = "pulse-agent.properties";
+    private static final String CONFIG_DIR = ".pulse-agent";
 
+    private EnvConfig envConfig;
     private ConfigSupport config;
-    private UserPaths userPaths;
     private SystemPaths systemPaths;
 
-    public DefaultSlaveConfiguration(UserPaths userPaths, SystemPaths systemPaths, EnvConfig env)
+    public DefaultSlaveConfiguration(SystemPaths systemPaths, EnvConfig env)
     {
-        this.userPaths = userPaths;
         this.systemPaths = systemPaths;
         init(env);
     }
 
     public void init(EnvConfig env)
     {
-        Config commandLineAndSystemProperties = new VolatileReadOnlyConfig(System.getProperties());
+        this.envConfig = env;
 
-        File pulseConfigProperties = new File(userPaths.getUserConfigRoot(), PROPERTIES_FILE);
-        if (env.hasPulseConfig())
-        {
-            pulseConfigProperties = new File(env.getPulseConfig());
-        }
-        FileConfig userConfig = new FileConfig(pulseConfigProperties);
+        Config commandLineAndSystemProperties = new VolatileReadOnlyConfig(System.getProperties());
 
         File systemConfigProperties = new File(systemPaths.getConfigRoot(), PROPERTIES_FILE);
         FileConfig systemConfig = new FileConfig(systemConfigProperties);
 
-        config = new ConfigSupport(new CompositeConfig(commandLineAndSystemProperties, userConfig, systemConfig));
+        String pulseConfigProperties = env.getDefaultPulseConfig(CONFIG_DIR);
+        if (env.hasPulseConfig())
+        {
+            pulseConfigProperties = env.getPulseConfig();
+        }
+
+        File pulseConfigFile = new File(pulseConfigProperties);
+        if(pulseConfigFile.isFile())
+        {
+            FileConfig userConfig = new FileConfig(pulseConfigFile);
+            config = new ConfigSupport(new CompositeConfig(commandLineAndSystemProperties, userConfig, systemConfig));
+        }
+        else
+        {
+            config = new ConfigSupport(new CompositeConfig(commandLineAndSystemProperties, systemConfig));
+        }
     }
 
     public int getServerPort()
@@ -66,13 +76,13 @@ public class DefaultSlaveConfiguration implements SlaveConfiguration, SystemConf
 
     public void setDataPath(String path)
     {
-        // n/a
+        config.setProperty(PULSE_DATA, path);
     }
 
     public String getDataPath()
     {
-        // n/a
-        return null;
+        String defaultData = FileSystemUtils.composeFilename(envConfig.getDefaultPulseConfigDir(CONFIG_DIR), "data");
+        return config.getProperty(PULSE_DATA, defaultData);
     }
 
     public void setLoggingLevel(String c)

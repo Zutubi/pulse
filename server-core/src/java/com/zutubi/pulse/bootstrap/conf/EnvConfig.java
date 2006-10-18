@@ -10,7 +10,7 @@ import com.zutubi.pulse.util.FileSystemUtils;
  */
 public class EnvConfig extends ConfigSupport
 {
-    // we are leaving the definition of the PULSE_HOME property in the PulseCtl do that it does
+    // we are leaving the definition of the PULSE_HOME property in the PulseCtl so that it does
     // not depend on a this class. PulseCtls dependencies need to be kept to a minimum.
     public static final String PULSE_HOME = PulseCtl.PULSE_HOME;
     public static final String VERSION_HOME = PulseCtl.VERSION_HOME;
@@ -20,6 +20,7 @@ public class EnvConfig extends ConfigSupport
     public static final String USER_HOME = "user.home";
 
     private String defaultConfig;
+    private String defaultConfigDir;
 
     public EnvConfig(Config props)
     {
@@ -61,11 +62,21 @@ public class EnvConfig extends ConfigSupport
         return hasProperty(EnvConfig.PULSE_CONFIG);
     }
 
-    public String getDefaultPulseConfig()
+    public String getDefaultPulseConfigDir(String base)
+    {
+        if (defaultConfigDir == null)
+        {
+            defaultConfigDir = FileSystemUtils.composeFilename(getUserHome(), base);
+        }
+        return defaultConfigDir;
+
+    }
+
+    public String getDefaultPulseConfig(String base)
     {
         if (defaultConfig == null)
         {
-            defaultConfig = FileSystemUtils.composeFilename(getUserHome(), ".pulse", "config.properties");
+            defaultConfig = FileSystemUtils.composeFilename(getDefaultPulseConfigDir(base), "config.properties");
         }
         return defaultConfig;
     }

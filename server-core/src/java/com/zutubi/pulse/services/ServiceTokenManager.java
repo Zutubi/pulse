@@ -104,7 +104,7 @@ public class ServiceTokenManager
 
     File getTokenFile()
     {
-        return new File(paths.getData(), TOKEN_FILE);
+        return new File(paths.getUserConfigRoot(), TOKEN_FILE);
     }
 
     public void setGenerate(boolean generate)
