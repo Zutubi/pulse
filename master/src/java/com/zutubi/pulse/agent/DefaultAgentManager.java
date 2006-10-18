@@ -22,6 +22,7 @@ import com.zutubi.pulse.services.SlaveStatus;
 import com.zutubi.pulse.services.UpgradeStatus;
 import com.zutubi.pulse.util.logging.Logger;
 
+import java.net.ConnectException;
 import java.net.MalformedURLException;
 import java.util.*;
 import java.util.concurrent.*;
@@ -134,7 +135,8 @@ public class DefaultAgentManager implements AgentManager, EventListener, Stoppab
 
     public void addSlave(Slave slave) throws LicenseException
     {
-        LicenseHolder.ensureAuthorization(LicenseHolder.AUTH_ADD_AGENT);
+        LicenseHolder.ensureAuthorization(AddAgentAuthorisation.AUTH);
+        
         slaveManager.save(slave);
         slaveAdded(slave.getId());
     }
@@ -162,7 +164,8 @@ public class DefaultAgentManager implements AgentManager, EventListener, Stoppab
             catch(Exception e)
             {
                 String message = "Unexpected error pinging agent '" + agent.getName() + "': " + e.getMessage();
-                LOG.warning(message, e);
+                LOG.warning(message);
+                LOG.debug(e);
                 status = new SlaveStatus(Status.OFFLINE, message);
             }
 
@@ -185,7 +188,7 @@ public class DefaultAgentManager implements AgentManager, EventListener, Stoppab
 
             if(oldStatus != agent.getStatus())
             {
-                eventManager.publish(new SlaveStatusEvent(this, oldStatus, agent));
+                eventManager.publish(new AgentStatusEvent(this, oldStatus, agent));
 
                 if(status.getStatus() == Status.VERSION_MISMATCH)
                 {
@@ -244,7 +247,7 @@ public class DefaultAgentManager implements AgentManager, EventListener, Stoppab
     public void handleEvent(Event evt)
     {
         SlaveUpgradeCompleteEvent suce = (SlaveUpgradeCompleteEvent) evt;
-        Slave slave = suce.getAgent().getSlave();
+        Slave slave = suce.getSlaveAgent().getSlave();
 
         updatersLock.lock();
         try
@@ -258,10 +261,10 @@ public class DefaultAgentManager implements AgentManager, EventListener, Stoppab
 
         if(suce.isSuccessful())
         {
-            suce.getAgent().setStatus(Status.OFFLINE);
+            suce.getSlaveAgent().setStatus(Status.OFFLINE);
             slave.setEnableState(Slave.EnableState.ENABLED);
             slaveManager.save(slave);
-            pingSlave(suce.getAgent());
+            pingSlave(suce.getSlaveAgent());
         }
         else
         {
@@ -303,13 +306,55 @@ public class DefaultAgentManager implements AgentManager, EventListener, Stoppab
             }
             catch (Exception e)
             {
-                LOG.warning("Exception pinging agent '" + agent.getName() + "': " + e.getMessage(), e);
-                status = new SlaveStatus(Status.OFFLINE, "Exception: '" + e.getClass().getName() + "'. Reason: " + e.getMessage());
+                Throwable cause = e.getCause();
+                // the most common cause of the exception is the Connect Exception.
+                if (cause instanceof ConnectException)
+                {
+                    status = new SlaveStatus(Status.OFFLINE, cause.getMessage());
+                }
+                else
+                {
+                    LOG.warning("Exception pinging agent '" + agent.getName() + "': " + e.getMessage());
+                    LOG.debug(e);
+                    status = new SlaveStatus(Status.OFFLINE, "Exception: '" + e.getClass().getName() + "'. Reason: " + e.getMessage());
+                }
             }
 
             status.setPingTime(System.currentTimeMillis());
             return status;
         }
+    }
+
+    public void enableMasterAgent()
+    {
+        if (masterAgent.isEnabled())
+        {
+            // No need to go through all of the formalities. 
+            return;
+        }
+
+        // generate a master agent status change event.
+        AgentStatusEvent statusEvent = new AgentStatusEvent(this, masterAgent.getStatus(), masterAgent);
+
+        masterAgent.setStatus(Status.IDLE);
+
+        eventManager.publish(statusEvent);
+    }
+
+    public void disableMasterAgent()
+    {
+        if (!masterAgent.isEnabled())
+        {
+            // No need to go through all of the formalities.
+            return;
+        }
+
+        // generate a master agent status change event.
+        AgentStatusEvent statusEvent = new AgentStatusEvent(this, masterAgent.getStatus(), masterAgent);
+
+        masterAgent.setStatus(Status.DISABLED);
+
+        eventManager.publish(statusEvent);
     }
 
     public List<Agent> getAllAgents()
@@ -335,7 +380,10 @@ public class DefaultAgentManager implements AgentManager, EventListener, Stoppab
         try
         {
             List<Agent> online = new LinkedList<Agent>();
-            online.add(masterAgent);
+            if (masterAgent.isEnabled())
+            {
+                online.add(masterAgent);
+            }
 
             for(SlaveAgent a: slaveAgents.values())
             {

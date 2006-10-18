@@ -49,7 +49,7 @@
                     #dynamicCell($changelist.user)
                     #dateCell($changelist)
                     #contentCell($action.transformComment($changelist))
-                    #linkCell("view" "viewChangelist.action?id=$changelist.id")
+                    #linkCell("view.$changelist.id" "view" "viewChangelist.action?id=$changelist.id")
                 </tr>
             #end
         #else

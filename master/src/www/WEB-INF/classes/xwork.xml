@@ -1244,6 +1244,10 @@
             <result name="success" type="redirect">/viewAgents.action</result>
         </action>
 
+        <action name="enableMaster" class="com.zutubi.pulse.web.agents.EnableMasterAction">
+            <result name="success" type="redirect">/viewAgents.action</result>
+        </action>
+
         <action name="pingAgent" class="com.zutubi.pulse.web.agents.PingAgentAction">
             <result name="success" type="redirect">/viewAgents.action</result>
         </action>

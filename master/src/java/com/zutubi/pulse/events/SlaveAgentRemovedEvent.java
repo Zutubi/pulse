@@ -4,7 +4,7 @@ import com.zutubi.pulse.agent.SlaveAgent;
 
 /**
  */
-public class SlaveAgentRemovedEvent extends SlaveEvent
+public class SlaveAgentRemovedEvent extends SlaveAgentEvent
 {
     public SlaveAgentRemovedEvent(Object source, SlaveAgent agent)
     {

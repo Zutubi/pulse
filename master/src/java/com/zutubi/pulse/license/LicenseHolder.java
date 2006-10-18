@@ -1,5 +1,7 @@
 package com.zutubi.pulse.license;
 
+import com.zutubi.pulse.license.authorisation.AddAgentAuthorisation;
+
 import java.util.List;
 import java.util.LinkedList;
 
@@ -9,6 +11,9 @@ import java.util.LinkedList;
 public class LicenseHolder
 {
     public static final String AUTH_ADD_AGENT = "canAddAgent";
+    public static final String AUTH_ADD_PROJECT = "canAddProject";
+    public static final String AUTH_ADD_USER = "canAddUser";
+    public static final String AUTH_RUN_PULSE = "canRunPulse";
 
     private static License license;
 
@@ -29,11 +34,14 @@ public class LicenseHolder
         return authorisations.contains(auth);
     }
 
-    public static synchronized void ensureAuthorization(String auth) throws LicenseException
+    public static synchronized void ensureAuthorization(String... auths) throws LicenseException
     {
-        if(!hasAuthorization(auth))
+        for (String auth : auths)
         {
-            throw new LicenseException();
+            if(!hasAuthorization(auth))
+            {
+                throw new LicenseException();
+            }
         }
     }
     

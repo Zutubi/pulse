@@ -349,4 +349,14 @@ public class MasterConfigurationSupport extends ConfigSupport implements MasterC
     {
         setLong(UNSATISFIABLE_RECIPE_TIMEOUT, timeout);
     }
+
+    public boolean isMasterEnabled()
+    {
+        return getBooleanProperty(MASTER_ENABLED, Boolean.TRUE);
+    }
+
+    public void setMasterEnabled(Boolean b)
+    {
+        setBooleanProperty(MASTER_ENABLED, b);
+    }
 }

@@ -2,14 +2,15 @@ package com.zutubi.pulse.events;
 
 import com.zutubi.pulse.agent.SlaveAgent;
 import com.zutubi.pulse.agent.Status;
+import com.zutubi.pulse.agent.Agent;
 
 /**
  */
-public class SlaveStatusEvent extends SlaveEvent
+public class AgentStatusEvent extends AgentEvent
 {
     private Status oldStatus;
 
-    public SlaveStatusEvent(Object source, Status oldStatus, SlaveAgent agent)
+    public AgentStatusEvent(Object source, Status oldStatus, Agent agent)
     {
         super(source, agent);
         this.oldStatus = oldStatus;

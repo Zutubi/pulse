@@ -4,17 +4,17 @@ import com.zutubi.pulse.agent.SlaveAgent;
 
 /**
  */
-public class SlaveEvent extends Event
+public class SlaveAgentEvent extends AgentEvent
 {
     private SlaveAgent agent;
 
-    public SlaveEvent(Object source, SlaveAgent agent)
+    public SlaveAgentEvent(Object source, SlaveAgent agent)
     {
-        super(source);
+        super(source, agent);
         this.agent = agent;
     }
 
-    public SlaveAgent getAgent()
+    public SlaveAgent getSlaveAgent()
     {
         return agent;
     }

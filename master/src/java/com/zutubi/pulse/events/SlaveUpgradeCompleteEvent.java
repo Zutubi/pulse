@@ -4,7 +4,7 @@ import com.zutubi.pulse.agent.SlaveAgent;
 
 /**
  */
-public class SlaveUpgradeCompleteEvent extends SlaveEvent
+public class SlaveUpgradeCompleteEvent extends SlaveAgentEvent
 {
     private boolean successful;
 

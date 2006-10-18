@@ -67,6 +67,25 @@ public class SlaveAcceptanceTest extends BaseAcceptanceTestCase
         assertTextPresent("host is required");
     }
 
+    public void testMasterEnableDisable()
+    {
+        // the initial status of the master should be enabled
+        assertLinkPresent("agent.disable.master");
+        assertLinkNotPresent("agent.enable.master");
+        
+        clickLink("agent.disable.master");
+
+        // the status should now be disabled.
+        assertLinkNotPresent("agent.disable.master");
+        assertLinkPresent("agent.enable.master");
+
+        clickLink("agent.enable.master");
+
+        // and back again.
+        assertLinkPresent("agent.disable.master");
+        assertLinkNotPresent("agent.enable.master");
+    }
+
     // Slave basics
 
     public void testAddSlave()

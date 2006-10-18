@@ -2,6 +2,7 @@ package com.zutubi.pulse.license.authorisation;
 
 import com.zutubi.pulse.model.UserManager;
 import com.zutubi.pulse.license.License;
+import com.zutubi.pulse.license.LicenseHolder;
 
 /**
  * <class-comment/>
@@ -10,13 +11,13 @@ public class AddUserAuthorisation implements Authorisation
 {
     private UserManager userManager;
 
-    public static final String[] AUTH = {"canAddUser"};
+    public static final String[] AUTH = {LicenseHolder.AUTH_ADD_USER};
 
     public String[] getAuthorisation(License license)
     {
         if (license == null)
         {
-            return new String[0];
+            return NO_AUTH;
         }
 
         if (license.getSupportedUsers() == License.UNRESTRICTED)
@@ -28,7 +29,7 @@ public class AddUserAuthorisation implements Authorisation
         {
             return AUTH;
         }
-        return new String[0];
+        return NO_AUTH;
     }
 
     /**

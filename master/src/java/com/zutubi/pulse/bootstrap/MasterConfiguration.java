@@ -15,6 +15,8 @@ public interface MasterConfiguration extends LogConfiguration
 
     public static final String AGENT_HOST = "agent.url";
 
+    public static final String MASTER_ENABLED = "server.agent.enabled";
+
     //---( help configuration )---
     public static final String HELP_URL = "help.url";
 
@@ -178,4 +180,8 @@ public interface MasterConfiguration extends LogConfiguration
     long getUnsatisfiableRecipeTimeout();
 
     void setUnsatisfiableRecipeTimeout(Long timeout);
+
+    boolean isMasterEnabled();
+
+    void setMasterEnabled(Boolean b);
 }

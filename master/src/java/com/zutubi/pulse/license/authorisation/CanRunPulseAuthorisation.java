@@ -2,6 +2,7 @@ package com.zutubi.pulse.license.authorisation;
 
 import com.zutubi.pulse.license.License;
 import com.zutubi.pulse.license.LicenseType;
+import com.zutubi.pulse.license.LicenseHolder;
 import com.zutubi.pulse.Version;
 
 import java.util.Date;
@@ -11,9 +12,7 @@ import java.util.Date;
  */
 public class CanRunPulseAuthorisation implements Authorisation
 {
-    private static final String[] AUTH = {"canRunPulse"};
-
-    private static final String[] NO_AUTH = new String[0];
+    private static final String[] AUTH = {LicenseHolder.AUTH_RUN_PULSE};
 
     public String[] getAuthorisation(License license)
     {

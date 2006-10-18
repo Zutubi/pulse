@@ -51,11 +51,22 @@ public class MasterAgent implements Agent
 
     public boolean isOnline()
     {
-        return true;
+        return isEnabled();
+    }
+
+    public boolean isEnabled()
+    {
+        MasterConfiguration masterConfig = configurationManager.getAppConfig();
+        return masterConfig.isMasterEnabled();
     }
 
     public Status getStatus()
     {
+        if (!isEnabled())
+        {
+            return Status.DISABLED;
+        }
+        
         if(service.getBuildingRecipe() == 0)
         {
             return Status.IDLE;
@@ -63,6 +74,19 @@ public class MasterAgent implements Agent
         else
         {
             return Status.BUILDING;
+        }
+    }
+
+    public void setStatus(Status status)
+    {
+        MasterConfiguration masterConfig = configurationManager.getAppConfig();
+        if (status == Status.DISABLED)
+        {
+            masterConfig.setMasterEnabled(false);
+        }
+        else
+        {
+            masterConfig.setMasterEnabled(true);
         }
     }
 

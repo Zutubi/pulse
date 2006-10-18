@@ -640,7 +640,7 @@ public class ThreadedRecipeQueueTest extends TestCase implements EventListener
     private void sendOnlineEvent(Slave slave)
     {
         SlaveAgent a = (SlaveAgent) agentManager.getAgent(slave);
-        SlaveStatusEvent event = new SlaveStatusEvent(this, Status.OFFLINE, a);
+        AgentStatusEvent event = new AgentStatusEvent(this, Status.OFFLINE, a);
         queue.handleEvent(event);
     }
 
@@ -962,6 +962,16 @@ public class ThreadedRecipeQueueTest extends TestCase implements EventListener
         }
 
         public Agent getAgent(String name)
+        {
+            throw new RuntimeException("Method not implemented.");
+        }
+
+        public void enableMasterAgent()
+        {
+            throw new RuntimeException("Method not implemented.");
+        }
+
+        public void disableMasterAgent()
         {
             throw new RuntimeException("Method not implemented.");
         }

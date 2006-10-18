@@ -31,7 +31,7 @@
             #dateCell($changelist)
             #contentCell($action.transformComment($changelist))
             #aggregateResultCell($changelist $showWho)
-            #linkCell("view" "viewChangelist.action?id=$changelist.id")
+            #linkCell("view.$changelist.id" "view" "viewChangelist.action?id=$changelist.id")
         </tr>
         #end
     #else

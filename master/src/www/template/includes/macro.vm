@@ -621,9 +621,9 @@
 ##
 ## Outputs a link cell for a content table
 ##
-#macro(linkCell $key $url)
+#macro(linkCell $id $key $url)
     <td class="content">
-        <a href="$url">#wwtext("name=$key")</a>
+        <a id="$id" href="$url">#wwtext("name=$key")</a>
     </td>
 #end
 

@@ -31,4 +31,10 @@ public interface AgentManager
     boolean agentExists(String name);
 
     Agent getAgent(String name);
+
+    void enableMasterAgent()
+            ;
+
+    void disableMasterAgent()
+            ;
 }

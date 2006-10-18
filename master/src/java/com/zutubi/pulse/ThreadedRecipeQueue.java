@@ -2,7 +2,6 @@ package com.zutubi.pulse;
 
 import com.zutubi.pulse.agent.Agent;
 import com.zutubi.pulse.agent.AgentManager;
-import com.zutubi.pulse.agent.SlaveAgent;
 import com.zutubi.pulse.bootstrap.MasterConfigurationManager;
 import com.zutubi.pulse.core.BuildException;
 import com.zutubi.pulse.core.BuildRevision;
@@ -568,9 +567,9 @@ public class ThreadedRecipeQueue implements Runnable, RecipeQueue, EventListener
         {
             handleRecipeEvent((RecipeEvent) evt);
         }
-        else if (evt instanceof SlaveEvent)
+        else if (evt instanceof AgentEvent)
         {
-            handleSlaveEvent((SlaveEvent) evt);
+            handleSlaveEvent((AgentEvent) evt);
         }
         else if (evt instanceof SCMChangeEvent)
         {
@@ -604,11 +603,11 @@ public class ThreadedRecipeQueue implements Runnable, RecipeQueue, EventListener
         }
     }
 
-    private void handleSlaveEvent(SlaveEvent event)
+    private void handleSlaveEvent(AgentEvent event)
     {
-        if (event instanceof SlaveStatusEvent)
+        if (event instanceof AgentStatusEvent)
         {
-            handleSlaveStatus((SlaveStatusEvent) event);
+            handleAgentStatus((AgentStatusEvent) event);
         }
         else if (event instanceof SlaveAgentRemovedEvent)
         {
@@ -616,9 +615,9 @@ public class ThreadedRecipeQueue implements Runnable, RecipeQueue, EventListener
         }
     }
 
-    private void handleSlaveStatus(SlaveStatusEvent event)
+    private void handleAgentStatus(AgentStatusEvent event)
     {
-        SlaveAgent agent = event.getAgent();
+        Agent agent = event.getAgent();
         if (agent.isOnline())
         {
             online(agent);
@@ -708,7 +707,7 @@ public class ThreadedRecipeQueue implements Runnable, RecipeQueue, EventListener
 
     public Class[] getHandledEvents()
     {
-        return new Class[]{RecipeCompletedEvent.class, RecipeErrorEvent.class, SCMChangeEvent.class, SlaveEvent.class};
+        return new Class[]{RecipeCompletedEvent.class, RecipeErrorEvent.class, SCMChangeEvent.class, AgentEvent.class};
     }
 
     public void setSleepInterval(int sleepInterval)
