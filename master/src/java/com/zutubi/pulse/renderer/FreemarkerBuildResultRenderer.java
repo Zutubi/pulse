@@ -40,7 +40,7 @@ public class FreemarkerBuildResultRenderer implements BuildResultRenderer
 
         try
         {
-            Template template = freemarkerConfiguration.getTemplate(getTemplatePath() + File.separatorChar + templateName + ".ftl");
+            Template template = freemarkerConfiguration.getTemplate(getTemplatePath(result.isPersonal()) + File.separatorChar + templateName + ".ftl");
             template.process(dataMap, writer);
             writer.flush();
         }
@@ -51,19 +51,19 @@ public class FreemarkerBuildResultRenderer implements BuildResultRenderer
         }
     }
 
-    private String getTemplatePath()
+    private String getTemplatePath(boolean personal)
     {
-        return FileSystemUtils.composeFilename("notifications", "builds");
+        return FileSystemUtils.composeFilename("notifications", (personal ? "personal" : "project") + "-builds");
     }
 
-    public List<TemplateInfo> getAvailableTemplates()
+    public List<TemplateInfo> getAvailableTemplates(boolean personal)
     {
         // Templates are stored under <root>/notifications/builds/<name>.ftl
         List<TemplateInfo> result = new ArrayList<TemplateInfo>();
         List<File> templateRoots = systemPaths.getTemplateRoots();
         for(File root: templateRoots)
         {
-            File dir = new File(root, getTemplatePath());
+            File dir = new File(root, getTemplatePath(personal));
             if(dir.isDirectory())
             {
                 String[] names = dir.list(new FilenameFilter()
@@ -76,7 +76,7 @@ public class FreemarkerBuildResultRenderer implements BuildResultRenderer
 
                 for(String name: names)
                 {
-                    result.add(getTemplateInfo(name.substring(0, name.length() - 4)));
+                    result.add(getTemplateInfo(name.substring(0, name.length() - 4), personal));
                 }
             }
         }
@@ -84,11 +84,11 @@ public class FreemarkerBuildResultRenderer implements BuildResultRenderer
         return result;
     }
 
-    public TemplateInfo getTemplateInfo(String templateName)
+    public TemplateInfo getTemplateInfo(String templateName, boolean personal)
     {
         String display = getDefaultDisplay(templateName);
         String mimeType = "text/plain";
-        File propertiesFile = findProperties(templateName);
+        File propertiesFile = findProperties(templateName, personal);
 
         if(propertiesFile != null)
         {
@@ -113,12 +113,12 @@ public class FreemarkerBuildResultRenderer implements BuildResultRenderer
         return templateName.replaceAll("-", " ");
     }
 
-    private File findProperties(String templateName)
+    private File findProperties(String templateName, boolean personal)
     {
         List<File> templateRoots = systemPaths.getTemplateRoots();
         for(File root: templateRoots)
         {
-            File dir = new File(root, getTemplatePath());
+            File dir = new File(root, getTemplatePath(personal));
             if(dir.isDirectory())
             {
                 File candidate = new File(dir, templateName + ".properties");

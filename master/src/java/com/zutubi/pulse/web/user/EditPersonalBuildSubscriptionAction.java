@@ -10,6 +10,11 @@ public class EditPersonalBuildSubscriptionAction extends SubscriptionActionSuppo
 {
     private PersonalBuildSubscription subscription;
 
+    public EditPersonalBuildSubscriptionAction()
+    {
+        super(true);
+    }
+
     public String doInput() throws Exception
     {
         super.doInput();

@@ -7,9 +7,12 @@ import com.zutubi.pulse.config.FileConfig;
 import com.zutubi.pulse.license.License;
 import com.zutubi.pulse.license.LicenseDecoder;
 import com.zutubi.pulse.license.LicenseException;
+import com.zutubi.pulse.util.FileSystemUtils;
 import com.zutubi.pulse.util.logging.Logger;
 
 import java.io.File;
+import java.io.IOException;
+import java.util.List;
 import java.util.Properties;
 
 /**
@@ -54,7 +57,7 @@ public class Data implements MasterUserPaths
      * The data directory MUST be initialised before the application can start.
      *
      * @return true if the data is initialised
-     * @see #init()
+     * @see #init(SystemPaths)
      */
     public boolean isInitialised()
     {
@@ -70,8 +73,9 @@ public class Data implements MasterUserPaths
      * Initialise the data directory. This will ensure that the necessary directories
      * and configuration files are setup.
      *
+     * @param systemPaths system paths
      */
-    public void init()
+    public void init(SystemPaths systemPaths)
     {
         if (isInitialised())
         {
@@ -86,7 +90,7 @@ public class Data implements MasterUserPaths
 
         // write the version file.
         Version systemVersion = Version.getVersion();
-        updateVersion(systemVersion);
+        updateVersion(systemVersion, systemPaths);
     }
 
     /**
@@ -94,7 +98,7 @@ public class Data implements MasterUserPaths
      *
      * @param version
      */
-    public void updateVersion(Version version)
+    public void updateVersion(Version version, SystemPaths systemPaths)
     {
         // we are messing around writing to a properties object first because the Config interface is
         // not available in the pulse core.
@@ -102,6 +106,34 @@ public class Data implements MasterUserPaths
         getConfig().setProperty(Version.BUILD_NUMBER, version.getBuildNumber());
         getConfig().setProperty(Version.RELEASE_DATE, version.getReleaseDate());
         getConfig().setProperty(Version.VERSION_NUMBER, version.getVersionNumber());
+
+        // Copy across some example template files to the user's template root
+        File userTemplateRoot = getUserTemplateRoot();
+        if (!userTemplateRoot.isDirectory())
+        {
+            if(!userTemplateRoot.getParentFile().isDirectory())
+            {
+                userTemplateRoot.getParentFile().mkdirs();
+            }
+
+            List<File> templateRoots = systemPaths.getTemplateRoots();
+            for(File templateRoot: templateRoots)
+            {
+                File examplesDir = new File(templateRoot, "examples");
+                if(examplesDir.isDirectory())
+                {
+                    try
+                    {
+                        FileSystemUtils.copyRecursively(examplesDir, userTemplateRoot);
+                        break;
+                    }
+                    catch (IOException e)
+                    {
+                        LOG.warning("Unable to copy example templates to '" + userTemplateRoot.getAbsolutePath() + "'", e);
+                    }
+                }
+            }
+        }
     }
 
     public int getBuildNumber()
@@ -232,7 +264,7 @@ public class Data implements MasterUserPaths
     {
         if(userTemplateRoot == null)
         {
-            userTemplateRoot = new File(userConfigRoot, "templates");
+            userTemplateRoot = new File(getUserConfigRoot(), "templates");
         }
         return userTemplateRoot;
     }

@@ -66,7 +66,8 @@ public class EmailContactPoint extends ContactPoint
             prefix += " ";
         }
 
-        String subject = prefix + result.getProject().getName() + ": build " + Long.toString(result.getNumber()) + ": " + result.getState().getPrettyString();
+        String prelude = result.isPersonal() ? "personal build " : (result.getProject().getName() + ": build ");
+        String subject = prefix + prelude + Long.toString(result.getNumber()) + ": " + result.getState().getPrettyString();
         sendMail(subject, mimeType, rendered, config);
     }
 
@@ -113,7 +114,7 @@ public class EmailContactPoint extends ContactPoint
 
             msg.setRecipient(Message.RecipientType.TO, new InternetAddress(getEmail()));
             msg.setSubject(subject);
-            msg.setContent(body, "text/" + mimeType);
+            msg.setContent(body, mimeType);
             msg.setHeader("X-Mailer", "Zutubi-Pulse");
             msg.setSentDate(new Date());
 

@@ -156,7 +156,7 @@ public class DefaultSetupManager implements SetupManager
         Data d = configurationManager.getData();
         if (!d.isInitialised())
         {
-            configurationManager.getData().init();
+            configurationManager.getData().init(configurationManager.getSystemPaths());
         }
 
         state = SetupState.STARTING;

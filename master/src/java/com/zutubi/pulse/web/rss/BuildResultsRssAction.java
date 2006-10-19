@@ -7,8 +7,6 @@ import com.zutubi.pulse.bootstrap.MasterConfigurationManager;
 import com.zutubi.pulse.model.BuildResult;
 import com.zutubi.pulse.model.Project;
 import com.zutubi.pulse.model.User;
-import com.zutubi.pulse.model.UserManager;
-import com.zutubi.pulse.model.persistence.UserDao;
 import com.zutubi.pulse.renderer.BuildResultRenderer;
 import com.zutubi.pulse.search.BuildResultExpressions;
 import com.zutubi.pulse.search.Queries;
@@ -141,7 +139,7 @@ public class BuildResultsRssAction extends ProjectActionSupport
         buildResultRenderer.render(configurationManager.getAppConfig().getBaseUrl(),
                 result,
                 getBuildManager().getChangesForBuild(result),
-                BuildResultRenderer.TYPE_HTML, w);
+                "html-email", w);
         return w.toString();
     }
 

@@ -32,7 +32,7 @@ public class SubscriptionHelper
     private TextProvider textProvider;
 
 
-    public SubscriptionHelper(User user, ContactPoint contactPoint, ProjectManager projectManager, NotifyConditionFactory notifyConditionFactory, TextProvider textProvider, BuildResultRenderer buildResultRenderer)
+    public SubscriptionHelper(boolean personal, User user, ContactPoint contactPoint, ProjectManager projectManager, NotifyConditionFactory notifyConditionFactory, TextProvider textProvider, BuildResultRenderer buildResultRenderer)
     {
         this.user = user;
         this.contactPoint = contactPoint;
@@ -41,7 +41,7 @@ public class SubscriptionHelper
         this.textProvider = textProvider;
         availableTemplates = new TreeMap<String, String>();
 
-        List<TemplateInfo> templates = buildResultRenderer.getAvailableTemplates();
+        List<TemplateInfo> templates = buildResultRenderer.getAvailableTemplates(personal);
         for(TemplateInfo info: templates)
         {
             availableTemplates.put(info.getTemplate(), info.getDisplay());

@@ -228,7 +228,7 @@ public class SubscriptionWizard extends BaseWizard
         public void initialise()
         {
             Long contactId = selectState.getContactId();
-            helper = new SubscriptionHelper(getUser(), getUser().getContactPoint(contactId), projectManager, notifyConditionFactory, getTextProvider(), buildResultRenderer);
+            helper = new SubscriptionHelper(true, getUser(), getUser().getContactPoint(contactId), projectManager, notifyConditionFactory, getTextProvider(), buildResultRenderer);
         }
 
         public String getNextStateName()
@@ -295,7 +295,7 @@ public class SubscriptionWizard extends BaseWizard
         public void initialise()
         {
             Long contactId = selectState.getContactId();
-            helper = new SubscriptionHelper(getUser(), getUser().getContactPoint(contactId), projectManager, notifyConditionFactory, getTextProvider(), buildResultRenderer);
+            helper = new SubscriptionHelper(false, getUser(), getUser().getContactPoint(contactId), projectManager, notifyConditionFactory, getTextProvider(), buildResultRenderer);
         }
 
         public String getNextStateName()

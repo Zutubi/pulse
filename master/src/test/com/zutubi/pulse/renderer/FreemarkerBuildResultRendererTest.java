@@ -125,6 +125,26 @@ public class FreemarkerBuildResultRendererTest extends PulseTestCase
         failuresHelper("html-email", true);
     }
 
+    public void testPersonalSimpleInstant() throws Exception
+    {
+        personalBuildHelper("simple-instant-message");
+    }
+
+    public void testPersonalDetailedInstant() throws Exception
+    {
+        personalBuildHelper("detailed-instant-message");
+    }
+
+    public void testPersonalPlainTextEmail() throws Exception
+    {
+        personalBuildHelper("plain-text-email");
+    }
+
+    public void testPersonalHTMLEmail() throws Exception
+    {
+        personalBuildHelper("html-email");
+    }
+
     private void errorsHelper(String type) throws Exception
     {
         List<Changelist> changes = getChanges();
@@ -212,6 +232,52 @@ public class FreemarkerBuildResultRendererTest extends PulseTestCase
         createAndVerify((excessFailures ? "excess" : "") + "failures", type, "http://host.url", result);
     }
 
+    private void personalBuildHelper(String type) throws Exception
+    {
+        User user = new User("jason", "Jason Sankey");
+        BuildResult result = new BuildResult(user, new Project("my project", "project description"), "nightly", 12);
+        initialiseResult(result);
+
+        result.failure("test failed tests");
+
+        RecipeResultNode firstNode = result.getRoot().getChildren().get(0);
+        firstNode.getResult().failure("tests failed dude");
+
+        RecipeResultNode nestedNode = firstNode.getChildren().get(0);
+        nestedNode.getResult().failure("tests failed nested dude");
+
+        RecipeResultNode secondNode = result.getRoot().getChildren().get(1);
+        RecipeResult secondResult = secondNode.getResult();
+
+        CommandResult command = new CommandResult("failing tests");
+        command.failure("tests let me down");
+
+        TestSuiteResult tests = new TestSuiteResult();
+
+        StoredFileArtifact artifact = new StoredFileArtifact("first-artifact/testpath");
+        TestSuiteResult rootSuite = new TestSuiteResult("root test suite");
+        rootSuite.add(new TestCaseResult("2 failed", 0, TestCaseResult.Status.FAILURE, "a failure message which is bound to be detailed, potentially to the extreme but in this case just to wrap a bit"));
+        rootSuite.add(new TestCaseResult("3 error", 0, TestCaseResult.Status.ERROR, "short error"));
+
+        TestSuiteResult nestedSuite = new TestSuiteResult("nested suite");
+        nestedSuite.add(new TestCaseResult("n1 failed", 0, TestCaseResult.Status.FAILURE, "a failure message which is bound to be detailed, potentially to the extreme but in this case just to wrap a bit"));
+        nestedSuite.add(new TestCaseResult("n2 error", 0, TestCaseResult.Status.ERROR, "short error"));
+        rootSuite.add(nestedSuite);
+
+        tests.add(rootSuite);
+        command.addArtifact(new StoredArtifact("first-artifact", artifact));
+
+        artifact = new StoredFileArtifact("second-artifact/this/time/a/very/very/very/very/long/pathname/which/will/look/ugly/i/have/no/doubt");
+        tests.add(new TestCaseResult("test case at top level", 0, TestCaseResult.Status.FAILURE, "and i failed"));
+        command.addArtifact(new StoredArtifact("second-artifact", artifact));
+
+        secondResult.add(command);
+        secondResult.setFailedTestResults(tests);
+        TestResultSummary summary = tests.getSummary();
+        secondResult.setTestSummary(summary);
+        createAndVerify("personal", type, "http://host.url", result);
+    }
+
     private BuildResult createBuildWithChanges(List<Changelist> changes)
     {
         BuildResult result = createSuccessfulBuild();
@@ -243,6 +309,12 @@ public class FreemarkerBuildResultRendererTest extends PulseTestCase
     private BuildResult createSuccessfulBuild()
     {
         BuildResult result = new BuildResult(new TriggerBuildReason("scm trigger"), new Project("test project", "test description"), "test spec", 101);
+        initialiseResult(result);
+        return result;
+    }
+
+    private void initialiseResult(BuildResult result)
+    {
         result.setId(11);
         result.setScmDetails(new BuildScmDetails());
         result.commence(10000);
@@ -261,7 +333,6 @@ public class FreemarkerBuildResultRendererTest extends PulseTestCase
 
         result.complete();
         result.getStamps().setEndTime(100000);
-        return result;
     }
 
     protected void createAndVerify(String expectedName, String baseUrl, BuildResult result, List<Changelist> changelists) throws IOException

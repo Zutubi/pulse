@@ -2,13 +2,14 @@ package com.zutubi.pulse.upgrade;
 
 import com.zutubi.pulse.Version;
 import com.zutubi.pulse.bootstrap.Data;
-import com.zutubi.pulse.util.FileSystemUtils;
+import com.zutubi.pulse.bootstrap.DefaultSystemPaths;
 import com.zutubi.pulse.test.PulseTestCase;
 import com.zutubi.pulse.upgrade.tasks.MockUpgradeTask;
+import com.zutubi.pulse.util.FileSystemUtils;
 
+import java.io.File;
 import java.util.LinkedList;
 import java.util.List;
-import java.io.File;
 
 /**
  * <class-comment/>
@@ -36,7 +37,7 @@ public class DefaultUpgradeManagerTest extends PulseTestCase
 
         tmpDir = FileSystemUtils.createTempDirectory("DefaultUpgradeManagerTest", getName());
         tmpData = new Data(tmpDir);
-        tmpData.init();
+        tmpData.init(new DefaultSystemPaths(new File("."), new File(".")));
         tmpData.setBuildNumber(0);
     }
 

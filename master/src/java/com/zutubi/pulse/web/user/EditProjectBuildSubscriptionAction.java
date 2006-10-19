@@ -19,6 +19,11 @@ public class EditProjectBuildSubscriptionAction extends SubscriptionActionSuppor
     private String template;
     private String condition;
 
+    public EditProjectBuildSubscriptionAction()
+    {
+        super(false);
+    }
+
     public long getId()
     {
         return id;

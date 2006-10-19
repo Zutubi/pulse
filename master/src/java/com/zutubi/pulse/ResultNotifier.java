@@ -80,7 +80,7 @@ public class ResultNotifier implements EventListener
                 String templateName = subscription.getTemplate();
                 String rendered = renderResult(buildResult, templateName, renderCache);
                 notifiedContactPoints.add(contactPoint.getUid());
-                contactPoint.notify(buildResult, rendered, buildResultRenderer.getTemplateInfo(templateName).getMimeType());
+                contactPoint.notify(buildResult, rendered, buildResultRenderer.getTemplateInfo(templateName, buildResult.isPersonal()).getMimeType());
                 
                 // Contact point may be modified: e.g. error may be set.
                 userManager.save(contactPoint);

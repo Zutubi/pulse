@@ -20,6 +20,7 @@ public abstract class SubscriptionActionSupport extends UserActionSupport
     protected long contactPointId;
     protected Map<Long, String> contactPoints;
 
+    protected boolean personal;
     protected User user;
     protected ContactPoint contactPoint;
     protected String template;
@@ -28,6 +29,11 @@ public abstract class SubscriptionActionSupport extends UserActionSupport
     private ProjectManager projectManager;
     private NotifyConditionFactory notifyConditionFactory;
     private BuildResultRenderer buildResultRenderer;
+
+    protected SubscriptionActionSupport(boolean personal)
+    {
+        this.personal = personal;
+    }
 
     public long getId()
     {
@@ -101,7 +107,7 @@ public abstract class SubscriptionActionSupport extends UserActionSupport
 
     protected void createHelper()
     {
-        helper = new SubscriptionHelper(user, contactPoint, projectManager, notifyConditionFactory, this, buildResultRenderer);
+        helper = new SubscriptionHelper(personal, user, contactPoint, projectManager, notifyConditionFactory, this, buildResultRenderer);
     }
 
     protected boolean lookupUser()

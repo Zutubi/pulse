@@ -1,8 +1,8 @@
 package com.zutubi.pulse.bootstrap;
 
 import com.zutubi.pulse.Version;
-import com.zutubi.pulse.util.FileSystemUtils;
 import com.zutubi.pulse.test.PulseTestCase;
+import com.zutubi.pulse.util.FileSystemUtils;
 
 import java.io.File;
 import java.io.IOException;
@@ -49,7 +49,7 @@ public class DataTest extends PulseTestCase
         assertTrue(dataDir.mkdirs());
         assertFalse(data.isInitialised());
 
-        data.init();
+        data.init(new DefaultSystemPaths(new File("."), new File(".")));
 
         assertTrue(data.isInitialised());
         assertTrue(dataDir.exists());
@@ -59,7 +59,7 @@ public class DataTest extends PulseTestCase
     public void testVersionDetails() throws IOException
     {
         Data data = new Data(dataDir);
-        data.init();
+        data.init(new DefaultSystemPaths(new File("."), new File(".")));
 
         Version v = Version.getVersion();
         Version dataVersion = data.getVersion();

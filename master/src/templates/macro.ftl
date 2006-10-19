@@ -274,6 +274,128 @@ HTML-specific macros
 
 
 <#---------------------------------------------------------------------------
+Outputs inline style definitions for HTML result emails.
+---------------------------------------------------------------------------->
+[#macro stylesHTML]
+    <style type="text/css">
+    <!--
+body {
+    font: sans-serif;
+}
+
+h1 {
+    font-size: 130%;
+}
+
+h3 {
+    margin-top: 0px;
+    font-size: 100%;
+}
+
+.small {
+    font-size: 80%;
+}
+
+a:link, a:visited {
+    color: #668;
+    text-decoration: none;
+}
+
+a:hover {
+    color: #336;
+    border-bottom: solid 2px #336;
+}
+
+a {
+    font-weight: bold;
+    text-decoration: none;
+    border-bottom: dotted 1px #336;
+}
+
+a.unadorned {
+    border-bottom: none;
+}
+
+table.content {
+    border-collapse: collapse;
+    border: 1px solid #bbb;
+    margin-bottom: 16px;
+}
+
+th.heading, th.content, td.content, td.content-right, td.failure, td.error, td.test-failure, td.success {
+    border: 1px solid #bbb;
+    padding: 4px;
+    text-align: left;
+    vertical-align: top;
+}
+
+th.heading {
+    background: #e9e9f5;
+}
+
+td.success {
+    color: #383;
+    background: #ffffff;
+}
+
+td.failure, td.error, td.test-failure {
+    color: #b22;
+    font-weight: bold;
+}
+
+td.failure, td.error {
+    background: #fff0f0;
+}
+
+
+ul {
+    margin-left: 20px;
+    padding-left: 20px;
+    padding-right: 20px;
+}
+
+ul.error, ul.warning, ul.info {
+    border: solid 1px;
+}
+
+ul.error {
+    border-color: #c00000;
+    background-color: #ffdddd;
+}
+
+ul.warning {
+    border-color: #f0c000;
+    background-color: #ffffce;
+}
+
+ul.info {
+    border-color: #b0b0f0;
+    background-color: #eeeeff;
+}
+
+li.error, li.warning, li.info {
+    font-weight: normal;
+    margin-top: 4px;
+    margin-bottom: 4px;
+}
+
+li.header {
+    font-family: sans-serif;
+    font-weight: bold;
+    margin-top: 4px;
+    margin-bottom: 4px;
+}
+
+pre.feature {
+    font-family: sans-serif;
+    margin-top: 8px;
+    margin-bottom: 0px;
+}
+    -->
+    </style>
+[/#macro]
+
+<#---------------------------------------------------------------------------
 Shows a summary table for a build.
 ---------------------------------------------------------------------------->
 [#macro buildSummaryHTML result]

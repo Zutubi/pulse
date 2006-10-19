@@ -14,11 +14,7 @@ import java.util.List;
  */
 public interface BuildResultRenderer
 {
-    public static final String TYPE_PLAIN = "plain";
-    public static final String TYPE_HTML = "html";
-
     public void render(String baseUrl, BuildResult result, List<Changelist> changelists, String templateName, Writer writer);
-    public List<TemplateInfo> getAvailableTemplates();
-    public TemplateInfo getTemplateInfo(String templateName);
-    
+    public List<TemplateInfo> getAvailableTemplates(boolean personal);
+    public TemplateInfo getTemplateInfo(String templateName, boolean personal);   
 }
