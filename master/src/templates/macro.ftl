@@ -1,6 +1,57 @@
 [#ftl]
 
 <#---------------------------------------------------------------------------
+=============================================================================
+Functions that return useful urls.
+=============================================================================
+----------------------------------------------------------------------------->
+
+
+<#---------------------------------------------------------------------------
+Returns a link to the projecty home page for the project the given build
+belongs to.
+---------------------------------------------------------------------------->
+[#function projectLink result]
+    [#return "${baseUrl}/currentBuild.action?id=${result.project.id?c}"/]
+[/#function]
+
+<#---------------------------------------------------------------------------
+Returns a link to the summary page for a build result.
+---------------------------------------------------------------------------->
+[#function buildLink result]
+    [#return "${baseUrl}/viewBuild.action?id=${result.id?c}"/]
+[/#function]
+
+<#---------------------------------------------------------------------------
+Returns a link to the tests page for a build result.
+---------------------------------------------------------------------------->
+[#function testsLink result]
+    [#return "${baseUrl}/viewTests.action?id=${result.id?c}"/]
+[/#function]
+
+<#---------------------------------------------------------------------------
+Returns a link to the detailed view page for a build stage.
+---------------------------------------------------------------------------->
+[#function stageDetailsLink result node]
+    [#return "${baseUrl}/viewCommandLog.action?id=${result.id?c}&amp;selectedNode=${node.id?c}"/]
+[/#function]
+
+<#---------------------------------------------------------------------------
+Returns a link to the tests page for a build stage.
+---------------------------------------------------------------------------->
+[#function stageTestsLink result node]
+    [#return "${baseUrl}/viewTestSuite.action?id=${result.id?c}&amp;nodeId=${node.id?c}"/]
+[/#function]
+
+
+<#---------------------------------------------------------------------------
+=============================================================================
+Macros that output plain text.
+=============================================================================
+----------------------------------------------------------------------------->
+
+
+<#---------------------------------------------------------------------------
 A macro to show the messages directly on the result object of the given
 level.
 ---------------------------------------------------------------------------->
@@ -71,9 +122,9 @@ results as a flat list but with context.
 [#macro recipeNodeMessages node level context=""]
     [#if node.hasMessages(level)]
         [#if context?length &gt; 0]
-            [#local nestedContext = "${context} :: stage ${node.stage?html} :: ${node.result.recipeNameSafe}@${node.hostSafe}"]
+            [#local nestedContext = "${context} :: stage ${node.stage} :: ${node.result.recipeNameSafe}@${node.hostSafe}"]
         [#else]
-            [#local nestedContext = "stage ${node.stage?html} :: ${node.result.recipeNameSafe}@${node.hostSafe}"]
+            [#local nestedContext = "stage ${node.stage} :: ${node.result.recipeNameSafe}@${node.hostSafe}"]
         [/#if]
         [@recipeResultMessages result=node.result level=level context=nestedContext/]
         [#list node.children as child]
@@ -93,6 +144,33 @@ ${level?lower_case?cap_first} messages:
         [#list result.root.children as child]
             [@recipeNodeMessages node=child level=level/]
         [/#list]
+    [/#if]
+[/#macro]
+
+<#---------------------------------------------------------------------------
+Outputs a list of build stage results for the given build.
+---------------------------------------------------------------------------->
+[#macro buildStages result]
+    [#list result.root.children as child]
+  * ${child.stage} :: ${child.result.recipeNameSafe}@${child.hostSafe} :: ${result.state.prettyString}
+    [/#list]
+[/#macro]
+
+<#---------------------------------------------------------------------------
+Shows a list of the changes made in a build.
+---------------------------------------------------------------------------->
+[#macro buildChanges]
+    [#if changelists?exists]
+        [#if changelists?size &gt; 0]
+New changes in this build:
+            [#list changelists as change]
+                [#assign revision = change.revision]
+  * ${revision.revisionString} by ${revision.author}:
+    ${renderer.wrapString(renderer.trimmedString(revision.comment, 180), "    ")}
+            [/#list]
+        [#else]
+There were no new changes in this build.
+        [/#if]
     [/#if]
 [/#macro]
 
@@ -134,11 +212,16 @@ A macro to show test suite failures as part of a flat plain text list.
 [/#macro]
 
 <#---------------------------------------------------------------------------
-A macro to show the failed tests in a recipe as a flat plain text list.
+A macro to show the test summary in a recipe, include the failed tests as a
+flat plain text list.
 ---------------------------------------------------------------------------->
-[#macro recipeFailedTests result context]
-    [#if result.hasBrokenTests()]
+[#macro recipeTestSummary result context]
+    [#local summary = result.testSummary]
+    [#if summary.total &gt; 0]
   - ${renderer.wrapString(context, "    ")}
+    Test summary: total: ${summary.total}, errors: ${summary.errors}, failures: ${summary.failures}
+    [/#if]
+    [#if result.hasBrokenTests()]
         [#local excess = result.excessFailureCount/]
         [#if excess &gt; 0]
     NOTE: This recipe has ${excess} more failures, see the full test report
@@ -149,33 +232,135 @@ A macro to show the failed tests in a recipe as a flat plain text list.
 [/#macro]
 
 <#---------------------------------------------------------------------------
-A macro to show the failed tests in a recipe node as a flat plain text list.
+A macro to show the test summary for a recipe node, including the failed
+tests as a flat plain text list.
 ---------------------------------------------------------------------------->
-[#macro recipeNodeFailedTests node context=""]
+[#macro recipeNodeTestSummary node context=""]
     [#if context?length &gt; 0]
         [#local nestedContext = "${context} :: ${node.stage} :: ${node.result.recipeNameSafe}@${node.hostSafe}"]
     [#else]
         [#local nestedContext = "${node.stage} :: ${node.result.recipeNameSafe}@${node.hostSafe}"]
     [/#if]
     [#if node.result?exists]
-        [@recipeFailedTests result=node.result context=nestedContext/]
+        [@recipeTestSummary result=node.result context=nestedContext/]
     [/#if]
     [#list node.children as child]
-        [@recipeNodeFailedTests node=child context=nestedContext/]
+        [@recipeNodeTestSummary node=child context=nestedContext/]
     [/#list]
 [/#macro]
 
 <#---------------------------------------------------------------------------
-A macro to show the failed tests in a build as a flat plain text list.
+A macro to show test summary information for a build including the failed
+tests as a flat plain text list.
 ---------------------------------------------------------------------------->
-[#macro buildFailedTests result]
+[#macro buildTestSummary result]
     [#local summary = result.testSummary]
+    [#if summary.total &gt; 0]
+Test summary: total: ${summary.total}, errors: ${summary.errors}, failures: ${summary.failures}
+    [/#if]
     [#if !summary.allPassed()]
-Broken tests (total: ${summary.total}, errors: ${summary.errors}, failures: ${summary.failures}):
         [#list result.root.children as child]
-            [@recipeNodeFailedTests node=child/]
+            [@recipeNodeTestSummary node=child/]
         [/#list]
     [/#if]
+[/#macro]
+
+
+<#---------------------------------------------------------------------------
+=============================================================================
+HTML-specific macros
+=============================================================================
+----------------------------------------------------------------------------->
+
+
+<#---------------------------------------------------------------------------
+Shows a summary table for a build.
+---------------------------------------------------------------------------->
+[#macro buildSummaryHTML result]
+    [@openTable/]
+        [@headingRow heading="summary" span=11/]
+        <tr>
+            [@contentHeader cc="id"/]
+            [@contentHeader cc="status"/]
+            [@contentHeader cc="spec"/]
+            [@contentHeader cc="reason"/]
+            [@contentHeader cc="tests"/]
+            [@contentHeader cc="elapsed"/]
+            [@contentHeader cc="actions" span=2/]
+        </tr>
+        <tr>
+            [#assign class = result.state.string]
+            [@classCell cc=result.number?c/]
+            [@classCell cc=result.stateName?lower_case/]
+            [@classCell cc=result.buildSpecification/]
+            [@classCell cc=result.reason.summary/]
+            [@linkCell cc=result.testSummary url="${testsLink(result)}" class=class/]
+            [@classCell cc=result.stamps.prettyElapsed/]
+            [@linkCell cc="view" url="${baseUrl}/viewBuild.action?id=${result.id?c}"/]
+            [@linkCell cc="artifacts" url="${baseUrl}/viewBuildArtifacts.action?id=${result.id?c}"/]
+        </tr>
+    </table>
+[/#macro]
+
+<#---------------------------------------------------------------------------
+Shows a summary for each stage in a build.
+---------------------------------------------------------------------------->
+[#macro buildStageSummariesHTML result]
+    [@openTable/]
+        [@headingRow heading="stages" span=7/]
+        <tr>
+            [@contentHeader cc="stage"/]
+            [@contentHeader cc="recipe"/]
+            [@contentHeader cc="host"/]
+            [@contentHeader cc="status"/]
+            [@contentHeader cc="tests"/]
+            [@contentHeader cc="elapsed"/]
+            [@contentHeader cc="actions"/]
+        </tr>
+    [#list result.root.children as child]
+        <tr>
+            [#assign class = child.result.state.string]
+            [@classCell cc=child.stage/]
+            [@classCell cc=child.result.recipeNameSafe/]
+            [@classCell cc=child.hostSafe/]
+            [@classCell cc=child.result.stateName?lower_case/]
+            [@linkCell cc=child.testSummary url="${stageTestsLink(result, child)}" class=class/]
+            [@classCell cc=child.result.stamps.prettyElapsed/]
+            [@linkCell cc="view" url="${stageDetailsLink(result, child)}"/]
+        </tr>
+    [/#list]
+    </table>
+[/#macro]
+
+<#---------------------------------------------------------------------------
+Shows a table with the given changelists.
+---------------------------------------------------------------------------->
+[#macro buildChangesHTML changelists]
+    [@openTable/]
+        [@headingRow heading="changes" span=5/]
+        <tr>
+            [@contentHeader cc="revision"/]
+            [@contentHeader cc="who"/]
+            [@contentHeader cc="when"/]
+            [@contentHeader cc="comment"/]
+            [@contentHeader cc="actions"/]
+        </tr>
+    [#if changelists?size &gt; 0]
+        [#list changelists as change]
+        <tr>
+            [@dynamicCell cc=change.revision.revisionString/]
+            [@dynamicCell cc=change.user/]
+            [@dynamicCell cc=change.prettyTime/]
+            [@contentCell cc=renderer.transformComment(change)/]
+            [@linkCell cc="view" url="${baseUrl}/viewChangelist.action?id=${change.id?c}&amp;buildId=${result.id?c}"/]
+        </tr>
+        [/#list]
+    [#else]
+        <tr>
+            [@contentCell cc="no changes in this build" span=5/]
+        <tr>
+    [/#if]
+    </table>
 [/#macro]
 
 <#---------------------------------------------------------------------------
@@ -280,6 +465,9 @@ results as a HTML nested list.
     [/#if]
 [/#macro]
 
+<#---------------------------------------------------------------------------
+Shows failing tests from a test suite.
+---------------------------------------------------------------------------->
 [#macro showSuiteFailuresHTML test showSummary=true indent=""]
     [#if showSummary]
     <tr>
@@ -300,6 +488,9 @@ results as a HTML nested list.
     [/#list]
 [/#macro]
 
+<#---------------------------------------------------------------------------
+Outputs a single failing test case.
+---------------------------------------------------------------------------->
 [#macro showCaseFailureHTML test indent=""]
     <tr>
     [#assign class = "test-failure"]
@@ -315,15 +506,16 @@ results as a HTML nested list.
     </tr>
 [/#macro]
 
+<#---------------------------------------------------------------------------
+Outputs failing test cases for the given recipe node.
+---------------------------------------------------------------------------->
 [#macro recipeNodeFailedTestsHTML node]
     [#if node.result?exists]
         [#if node.result.hasBrokenTests()]
             [#local summary = node.result.testSummary/]
                 <tr><td>
-                    <table class="content" style="border-collapse: collapse; border: 1px solid #bbb; margin-bottom: 16px;">
-                        <th class="heading" colspan="3" style="border: 1px solid #bbb; padding: 4px; text-align: left; vertical-align: top; background: #e9e9f5;">
-                            stage ${node.stage} :: ${node.result.recipeNameSafe}@${node.hostSafe} :: broken tests (total: ${summary.total}, errors: ${summary.errors}, failures: ${summary.failures})
-                        </th>
+                    [@openTable/]
+                        [@headingRow heading="stage ${node.stage} :: broken tests (total: ${summary.total}, errors: ${summary.errors}, failures: ${summary.failures})" span=3/]
             [#local excess = node.result.excessFailureCount/]
             [#if excess &gt; 0]
                         <tr><th colspan="3" style="background-color: #ffffc0">This recipe has ${excess} further test failures, see the full test report for details.</th></tr>
@@ -343,28 +535,41 @@ results as a HTML nested list.
     [/#list]
 [/#macro]
 
+<#---------------------------------------------------------------------------
+Outputs failing test cases for the given build.
+---------------------------------------------------------------------------->
 [#macro buildFailedTestsHTML result]
     [#list result.root.children as child]
         [@recipeNodeFailedTestsHTML node=child/]
     [/#list]
 [/#macro]
 
-[#macro openCell type="td" class="content"]
-    <${type} class="${class}" style="border: 1px solid #bbb; padding: 4px; text-align: left;">
+<#---------------------------------------------------------------------------
+Opens a table, adding embedded styles.
+---------------------------------------------------------------------------->
+[#macro openTable]
+    <table class="content" style="border-collapse: collapse; border: 1px solid #bbb; margin-bottom: 16px;">
+[/#macro]
+
+<#---------------------------------------------------------------------------
+Opens a table cell, adding embedded styles.
+---------------------------------------------------------------------------->
+[#macro openCell type="td" class="content" span=1]
+    <${type} class="${class}" colspan="${span}" style="border: 1px solid #bbb; padding: 3px; text-align: left;">
 [/#macro]
 
 <#---------------------------------------------------------------------------
 A content header cell
 ---------------------------------------------------------------------------->
-[#macro contentHeader cc]
-    [@openCell type="th"/]${cc}</th>
+[#macro contentHeader cc span=1]
+    [@openCell type="th" span=span/]${cc}</th>
 [/#macro]
 
 <#---------------------------------------------------------------------------
 A content cell
 ---------------------------------------------------------------------------->
-[#macro contentCell cc]
-    [@openCell/]${cc}</td>
+[#macro contentCell cc span=1]
+    [@openCell span=span/]${cc}</td>
 [/#macro]
 
 <#---------------------------------------------------------------------------
@@ -384,6 +589,17 @@ A content cell with CSS class set to the value of $class
 <#---------------------------------------------------------------------------
 A content cell with a link
 ---------------------------------------------------------------------------->
-[#macro linkCell cc url]
-    [@openCell/]<a href="${url}">${cc}</a></td>
+[#macro linkCell cc url class="content"]
+    [@openCell class=class/]<a href="${url}">${cc}</a></td>
+[/#macro]
+
+<#---------------------------------------------------------------------------
+A heading row to top a table.
+---------------------------------------------------------------------------->
+[#macro headingRow heading span]
+    <tr>
+        <th class="heading" colspan="${span}" style="border: 1px solid #bbb; padding: 3px; text-align: left; vertical-align: top; background: #e9e9f5;">
+            ${heading}
+        </th>
+    </tr>
 [/#macro]

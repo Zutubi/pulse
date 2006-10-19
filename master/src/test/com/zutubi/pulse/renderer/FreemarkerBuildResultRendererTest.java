@@ -65,6 +65,33 @@ public class FreemarkerBuildResultRendererTest extends PulseTestCase
         errorsHelper("plain-text-email");
     }
 
+    public void testSimpleInstantBasic() throws Exception
+    {
+        BuildResult result = createSuccessfulBuild();
+        createAndVerify("basic", "simple-instant-message", "http://test.url:8080", result, new LinkedList<Changelist>());
+    }
+
+    public void testSimpleInstantError() throws Exception
+    {
+        errorsHelper("simple-instant-message");
+    }
+
+    public void testDetailedInstantBasic() throws Exception
+    {
+        BuildResult result = createSuccessfulBuild();
+        createAndVerify("basic", "detailed-instant-message", "http://test.url:8080", result, new LinkedList<Changelist>());
+    }
+
+    public void testDetailedInstantError() throws Exception
+    {
+        errorsHelper("detailed-instant-message");
+    }
+
+    public void testDetailedInstantFailures() throws Exception
+    {
+        failuresHelper("detailed-instant-message", false);
+    }
+
     public void testHTMLWithChanges() throws Exception
     {
         List<Changelist> changes = getChanges();
@@ -253,9 +280,17 @@ public class FreemarkerBuildResultRendererTest extends PulseTestCase
 
         // Just a hack that makes it easier to view expected output in a
         // browser during development.
-        if (type.contains("html"))
+        if (type.equals("html-email"))
         {
             extension = "html";
+        }
+        else if(type.equals("simple-instant-message"))
+        {
+            extension = "si.txt";
+        }
+        else if(type.equals("detailed-instant-message"))
+        {
+            extension = "di.txt";
         }
 
         if (generate)

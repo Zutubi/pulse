@@ -1,10 +1,10 @@
 package com.zutubi.pulse.resources;
 
-import com.zutubi.pulse.util.SystemUtils;
-import com.zutubi.pulse.core.model.Resource;
-import com.zutubi.pulse.core.model.ResourceVersion;
-import com.zutubi.pulse.core.model.ResourceProperty;
 import com.zutubi.pulse.core.FileLoadException;
+import com.zutubi.pulse.core.model.Resource;
+import com.zutubi.pulse.core.model.ResourceProperty;
+import com.zutubi.pulse.core.model.ResourceVersion;
+import com.zutubi.pulse.util.SystemUtils;
 
 import java.io.File;
 import java.io.IOException;
@@ -30,7 +30,7 @@ public class StandardTemplateResourceConstructor implements ResourceConstructor
 
     public boolean isResourceHome(String home)
     {
-        return isResourceHome(new File(home));
+        return home != null && isResourceHome(new File(home));
     }
 
     public boolean isResourceHome(File home)

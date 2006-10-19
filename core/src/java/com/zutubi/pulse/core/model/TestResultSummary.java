@@ -137,4 +137,24 @@ public class TestResultSummary extends Entity
         }
         return String.format("%.2f", rate);
     }
+
+
+    public String toString()
+    {
+        if(hasTests())
+        {
+            if(allPassed())
+            {
+                return "all " + total + " passed";
+            }
+            else
+            {
+                return Integer.toString(getBroken()) + " of " + total + " broken";
+            }
+        }
+        else
+        {
+            return "none";
+        }
+    }
 }
