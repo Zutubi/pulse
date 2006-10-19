@@ -118,18 +118,22 @@
             <generator class="hilo"/>
         </id>
 
-        <property name="personal" column="PERSONAL" type="boolean"/>
+        <discriminator column="TYPE" type="string"/>
 
-        <property name="condition" column="CONDITION" type="string" length="255"/>
+        <many-to-one name="contactPoint" column="CONTACT_ID" class="com.zutubi.pulse.model.ContactPoint" insert="true" lazy="false"/>
 
-        <bag name="projects" table="SUBSCRIPTION_PROJECTS" cascade="none" lazy="false">
-            <key column="SUBSCRIPTION_ID"/>
-            <many-to-many class="com.zutubi.pulse.model.Project" column="PROJECT_ID"/>
-        </bag>
+        <property name="template" column="TEMPLATE" type="string" length="255"/>
 
-        <many-to-one name="contactPoint" column="CONTACT_ID" class="com.zutubi.pulse.model.ContactPoint" insert="true"
-                     lazy="false"/>
+        <subclass name="com.zutubi.pulse.model.PersonalBuildSubscription" discriminator-value="PERSONAL"/>
 
+        <subclass name="com.zutubi.pulse.model.ProjectBuildSubscription" discriminator-value="PROJECT">    
+            <property name="condition" column="CONDITION" type="string" length="255"/>
+
+            <bag name="projects" table="SUBSCRIPTION_PROJECTS" cascade="none" lazy="false">
+                <key column="SUBSCRIPTION_ID"/>
+                <many-to-many class="com.zutubi.pulse.model.Project" column="PROJECT_ID"/>
+            </bag>
+        </subclass>
     </class>
 
     <query name="subscription.findByProject"><![CDATA[

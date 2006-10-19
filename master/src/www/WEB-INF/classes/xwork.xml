@@ -903,11 +903,13 @@
             <result name="success" type="redirect">/preferences.action</result>
         </action>
 
-        <action name="createSubscription" class="com.zutubi.pulse.web.user.CreateSubscriptionAction">
-            <result name="input" type="velocity">create-subscription.vm</result>
+        <action name="subscriptionWizard" class="com.zutubi.pulse.web.wizard.WizardAction">
+            <interceptor-ref name="wizardStack"/>
+            <param name="wizardClass">com.zutubi.pulse.web.user.SubscriptionWizard</param>
+            <result name="select" type="velocity">create-subscription.vm</result>
+            <result name="personal" type="velocity">create-subscription-personal.vm</result>
+            <result name="project" type="velocity">create-subscription-project.vm</result>
             <result name="cancel" type="redirect">/preferences.action</result>
-            <result name="error" type="chain">preferences!input</result>
-            <!--<result name="error" type="redirect">/preferences.action</result>-->
             <result name="success" type="redirect">/preferences.action</result>
         </action>
 
@@ -915,12 +917,17 @@
             <result name="success" type="redirect">/preferences.action</result>
         </action>
 
-        <action name="editSubscription" class="com.zutubi.pulse.web.user.EditSubscriptionAction">
-            <result name="input" type="velocity">edit-subscription.vm</result>
+        <action name="editPersonalBuildSubscription" class="com.zutubi.pulse.web.user.EditPersonalBuildSubscriptionAction">
+            <result name="input" type="velocity">edit-subscription-personal.vm</result>
             <result name="cancel" type="redirect">/preferences.action</result>
             <result name="success" type="redirect">/preferences.action</result>
         </action>
 
+        <action name="editProjectBuildSubscription" class="com.zutubi.pulse.web.user.EditProjectBuildSubscriptionAction">
+            <result name="input" type="velocity">edit-subscription-project.vm</result>
+            <result name="cancel" type="redirect">/preferences.action</result>
+            <result name="success" type="redirect">/preferences.action</result>
+        </action>
     </package>
 
     <package name="startup" namespace="/startup" extends="webwork-default-package">

@@ -4,7 +4,7 @@ import antlr.MismatchedTokenException;
 import antlr.collections.AST;
 import com.zutubi.pulse.condition.*;
 import com.zutubi.pulse.core.ObjectFactory;
-import com.zutubi.pulse.model.Subscription;
+import com.zutubi.pulse.model.ProjectBuildSubscription;
 import com.zutubi.pulse.test.PulseTestCase;
 
 import java.io.StringReader;
@@ -147,7 +147,7 @@ public class NotifyConditionParserTest extends PulseTestCase
 
     private NotifyCondition parseExpression(String expression)
     {
-        Subscription s = new Subscription();
+        ProjectBuildSubscription s = new ProjectBuildSubscription();
         s.setCondition(expression);
         NotifyConditionFactory factory = new NotifyConditionFactory();
         factory.setObjectFactory(new ObjectFactory());

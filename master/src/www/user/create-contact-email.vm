@@ -16,8 +16,7 @@
 
         #wwtextfield("name=contact.name" "label=%{getText('contact.name')}" "size=60" "required=true" "tabindex=1" "onkeypress=return submitenter(this,event)")
         #wwtextfield("name=contact.email" "label=%{getText('contact.email')}" "size=60" "required=true" "tabindex=2" "onkeypress=return submitenter(this,event)")
-        #wwradio("name=contact.type" "label=%{getText('contact.format')}"  "list={'html', 'plain'}" "tabindex=3" "onkeypress=return submitenter(this,event)")
-        #previousFinishCancel(4)
+        #previousFinishCancel(3)
     #end
 
     #tabEnd()

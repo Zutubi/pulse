@@ -1,5 +1,6 @@
 package com.zutubi.pulse.web.user;
 
+import com.zutubi.pulse.model.ProjectManager;
 import com.zutubi.pulse.model.User;
 import com.zutubi.pulse.security.AcegiUtils;
 
@@ -10,6 +11,13 @@ import java.util.Arrays;
  */
 public class PreferencesAction extends UserActionSupport
 {
+    private ProjectManager projectManager;
+
+    public int getProjectCount()
+    {
+        return projectManager.getProjectCount();
+    }
+    
     public String getRefreshInterval()
     {
         long refreshInterval = getUser().getRefreshInterval();
@@ -56,5 +64,10 @@ public class PreferencesAction extends UserActionSupport
             return SUCCESS;
         }
         return result;
+    }
+
+    public void setProjectManager(ProjectManager projectManager)
+    {
+        this.projectManager = projectManager;
     }
 }

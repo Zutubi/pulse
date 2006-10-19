@@ -1,0 +1,37 @@
+#helpTag("User+Subscriptions")
+#authorisationTags($principle)
+<content tag="selectedTab">dashboard</content>
+<html>
+<head>
+    <title>#wwtext("name=subscription.create")</title>
+</head>
+<body>
+    #dashboardTabs("preferences")
+
+    #parse("/template/includes/actionerrors.vm")
+
+<table class="columns">
+    <tr><td class="columns">
+
+    #wwcform("action=subscriptionWizard.action" "id=subscription.create.project" "heading=%{getText('subscription.create.project')}" "method=post")
+        #wwhidden("name=state")
+        #wwhidden("name=submit")
+        #wwselect("name=projects" "label=%{getText('subscription.projects')}" "list=allProjects" "multiple=true" "tabindex=1")
+        #inlineHelp("subscription.projects.help")
+        #wwcombobox("name=condition" "list=conditions" "listKey=key" "listValue=value" "size=50" "label=%{getText('subscription.condition')}" "tabindex=2")
+        #inlineHelp("condition.help")
+        #wwselect("name=template" "label=%{getText('subscription.template')}" "list=availableTemplates" "tabindex=3")
+
+        #previousFinishCancel(4)
+    #end
+
+    </td><td class="columns">
+
+    #parse("/user/subscription-help.vm")
+
+    </td></tr>
+</table>
+
+    #tabEnd()
+</body>
+</html>

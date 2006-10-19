@@ -1,21 +1,16 @@
 package com.zutubi.pulse.notifications;
 
-import com.zutubi.validation.annotations.Required;
-import com.zutubi.validation.annotations.Email;
-import com.zutubi.pulse.form.descriptor.annotation.Radio;
 import com.zutubi.pulse.form.descriptor.annotation.Form;
-
-import java.util.List;
-import java.util.LinkedList;
+import com.zutubi.validation.annotations.Email;
+import com.zutubi.validation.annotations.Required;
 
 /**
  * <class-comment/>
  */
-@Form(fieldOrder = {"name", "email", "format"})
+@Form(fieldOrder = {"name", "email"})
 public class EmailNotificationHandler implements NotificationHandler
 {
     private String email;
-    private String format = "html";
     private String name;
 
     @Required public String getName()
@@ -37,16 +32,4 @@ public class EmailNotificationHandler implements NotificationHandler
     {
         this.email = email;
     }
-
-    @Required @Radio(list = {"plain", "html"})
-    public String getFormat()
-    {
-        return format;
-    }
-
-    public void setFormat(String format)
-    {
-        this.format = format;
-    }
-
 }

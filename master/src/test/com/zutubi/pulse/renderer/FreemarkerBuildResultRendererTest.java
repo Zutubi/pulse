@@ -62,7 +62,7 @@ public class FreemarkerBuildResultRendererTest extends PulseTestCase
 
     public void testWithErrors() throws Exception
     {
-        errorsHelper("plain");
+        errorsHelper("plain-text-email");
     }
 
     public void testHTMLWithChanges() throws Exception
@@ -70,32 +70,32 @@ public class FreemarkerBuildResultRendererTest extends PulseTestCase
         List<Changelist> changes = getChanges();
         BuildResult result = createBuildWithChanges(changes);
 
-        createAndVerify("changes", "html", "http://another.url", result, changes);
+        createAndVerify("changes", "html-email", "http://another.url", result, changes);
     }
 
     public void testHTMLWithErrors() throws Exception
     {
-        errorsHelper("html");
+        errorsHelper("html-email");
     }
 
     public void testWithFailures() throws Exception
     {
-        failuresHelper("plain", false);
+        failuresHelper("plain-text-email", false);
     }
 
     public void testHTMLWithFailures() throws Exception
     {
-        failuresHelper("html", false);
+        failuresHelper("html-email", false);
     }
 
     public void testWithExcessFailures() throws Exception
     {
-        failuresHelper("plain", true);
+        failuresHelper("plain-text-email", true);
     }
 
     public void testHTMLWithExcessFailures() throws Exception
     {
-        failuresHelper("html", true);
+        failuresHelper("html-email", true);
     }
 
     private void errorsHelper(String type) throws Exception
@@ -239,7 +239,7 @@ public class FreemarkerBuildResultRendererTest extends PulseTestCase
 
     protected void createAndVerify(String expectedName, String baseUrl, BuildResult result, List<Changelist> changelists) throws IOException
     {
-        createAndVerify(expectedName, "plain", baseUrl, result, changelists);
+        createAndVerify(expectedName, "plain-text-email", baseUrl, result, changelists);
     }
 
     protected void createAndVerify(String expectedName, String type, String baseUrl, BuildResult result) throws IOException, URISyntaxException
@@ -250,7 +250,10 @@ public class FreemarkerBuildResultRendererTest extends PulseTestCase
     protected void createAndVerify(String expectedName, String type, String baseUrl, BuildResult result, List<Changelist> changelists) throws IOException
     {
         String extension = "txt";
-        if (type.equals("html"))
+
+        // Just a hack that makes it easier to view expected output in a
+        // browser during development.
+        if (type.contains("html"))
         {
             extension = "html";
         }

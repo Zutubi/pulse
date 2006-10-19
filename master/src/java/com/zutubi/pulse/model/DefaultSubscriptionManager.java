@@ -46,12 +46,16 @@ public class DefaultSubscriptionManager implements SubscriptionManager
         List<Subscription> suscriptions = subscriptionDao.findByProject(project);
         for(Subscription s: suscriptions)
         {
-            List<Project> projects = s.getProjects();
-            projects.remove(project);
-            if(projects.size() == 0)
+            if(s instanceof ProjectBuildSubscription)
             {
-                // This subscription is no longer useful.
-                delete(s);
+                ProjectBuildSubscription pbs = (ProjectBuildSubscription) s;
+                List<Project> projects = pbs.getProjects();
+                projects.remove(project);
+                if(projects.size() == 0)
+                {
+                    // This subscription is no longer useful.
+                    delete(s);
+                }
             }
         }
     }

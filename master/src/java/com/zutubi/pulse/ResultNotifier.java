@@ -7,11 +7,11 @@ import com.zutubi.pulse.events.EventListener;
 import com.zutubi.pulse.events.EventManager;
 import com.zutubi.pulse.events.build.BuildCompletedEvent;
 import com.zutubi.pulse.model.*;
+import com.zutubi.pulse.renderer.BuildResultRenderer;
 import com.zutubi.pulse.util.logging.Logger;
 
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.io.StringWriter;
+import java.util.*;
 
 /**
  *
@@ -26,6 +26,8 @@ public class ResultNotifier implements EventListener
     private SubscriptionManager subscriptionManager;
     private UserManager userManager;
     private MasterConfigurationManager configurationManager;
+    private BuildResultRenderer buildResultRenderer;
+    private BuildManager buildManager;
 
     public static int getFailureLimit()
     {
@@ -54,6 +56,7 @@ public class ResultNotifier implements EventListener
         buildResult.loadFailedTestResults(configurationManager.getDataDirectory(), getFailureLimit());
 
         Set<String> notifiedContactPoints = new HashSet<String>();
+        Map<String, String> renderCache = new HashMap<String, String>();
 
         // Retrieve all of the subscriptions indicating an interest in the project
         // associated with the build result.
@@ -74,12 +77,29 @@ public class ResultNotifier implements EventListener
             // determine which of these subscriptions should be notified.
             if (subscription.conditionSatisfied(buildResult))
             {
+                String templateName = subscription.getTemplate();
+                String rendered = renderResult(buildResult, templateName, renderCache);
                 notifiedContactPoints.add(contactPoint.getUid());
-                contactPoint.notify(buildResult);
+                contactPoint.notify(buildResult, rendered, buildResultRenderer.getTemplateInfo(templateName).getMimeType());
+                
                 // Contact point may be modified: e.g. error may be set.
                 userManager.save(contactPoint);
             }
         }
+    }
+
+    private String renderResult(BuildResult result, String template, Map<String, String> cache)
+    {
+        String rendered = cache.get(template);
+        if(rendered == null)
+        {
+            StringWriter w = new StringWriter();
+            buildResultRenderer.render(configurationManager.getAppConfig().getBaseUrl(), result, buildManager.getChangesForBuild(result), template, w);
+            rendered = w.toString();
+            cache.put(template, rendered);
+        }
+
+        return rendered;
     }
 
     public Class[] getHandledEvents()
@@ -105,5 +125,15 @@ public class ResultNotifier implements EventListener
     public void setConfigurationManager(MasterConfigurationManager configurationManager)
     {
         this.configurationManager = configurationManager;
+    }
+
+    public void setBuildResultRenderer(BuildResultRenderer buildResultRenderer)
+    {
+        this.buildResultRenderer = buildResultRenderer;
+    }
+
+    public void setBuildManager(BuildManager buildManager)
+    {
+        this.buildManager = buildManager;
     }
 }

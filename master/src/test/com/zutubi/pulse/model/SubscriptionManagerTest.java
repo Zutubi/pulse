@@ -1,16 +1,8 @@
 package com.zutubi.pulse.model;
 
-import com.zutubi.pulse.model.persistence.hibernate.MasterPersistenceTestCase;
 import com.zutubi.pulse.model.persistence.SubscriptionDao;
-import com.zutubi.pulse.model.persistence.ProjectDao;
-import com.zutubi.pulse.model.persistence.ContactPointDao;
-import com.zutubi.pulse.model.persistence.mock.MockEntityDao;
 import com.zutubi.pulse.model.persistence.mock.MockSubscriptionDao;
-import com.zutubi.pulse.bootstrap.ComponentContext;
 import com.zutubi.pulse.test.PulseTestCase;
-
-import java.util.List;
-import java.util.LinkedList;
 
 /**
  * <class-comment/>
@@ -48,7 +40,7 @@ public class SubscriptionManagerTest extends PulseTestCase
     public void testDeleteByProjectLastProject()
     {
         ContactPoint contactPoint = new EmailContactPoint();
-        Subscription subscription = new Subscription(contactPoint);
+        ProjectBuildSubscription subscription = new ProjectBuildSubscription(contactPoint, "html-email", "true");
         Project project = addProject(11, subscription);
         subscriptionManager.save(subscription);
 
@@ -60,14 +52,14 @@ public class SubscriptionManagerTest extends PulseTestCase
     public void testDeleteByProjectMoreProjects()
     {
         ContactPoint contactPoint = new EmailContactPoint();
-        Subscription subscription = new Subscription(contactPoint);
+        ProjectBuildSubscription subscription = new ProjectBuildSubscription(contactPoint, "html-email", "true");
         Project project = addProject(11, subscription);
         addProject(12, subscription);
         subscriptionManager.save(subscription);
 
         subscriptionManager.deleteAllSubscriptions(project);
 
-        Subscription other = subscriptionManager.getSubscription(subscription.getId());
+        ProjectBuildSubscription other = (ProjectBuildSubscription) subscriptionManager.getSubscription(subscription.getId());
         assertNotNull(other);
         assertEquals(1, other.getProjects().size());
     }
@@ -75,7 +67,7 @@ public class SubscriptionManagerTest extends PulseTestCase
     public void testDeleteByProjectNotIncluded()
     {
         ContactPoint contactPoint = new EmailContactPoint();
-        Subscription subscription = new Subscription(contactPoint);
+        ProjectBuildSubscription subscription = new ProjectBuildSubscription(contactPoint, "html-email", "true");
         addProject(11, subscription);
         subscriptionManager.save(subscription);
 
@@ -83,12 +75,12 @@ public class SubscriptionManagerTest extends PulseTestCase
         project.setId(1211);
         subscriptionManager.deleteAllSubscriptions(project);
 
-        Subscription other = subscriptionManager.getSubscription(subscription.getId());
+        ProjectBuildSubscription other = (ProjectBuildSubscription) subscriptionManager.getSubscription(subscription.getId());
         assertNotNull(other);
         assertEquals(1, other.getProjects().size());
     }
 
-    private Project addProject(long id, Subscription subscription)
+    private Project addProject(long id, ProjectBuildSubscription subscription)
     {
         Project p = new Project();
         p.setId(id);

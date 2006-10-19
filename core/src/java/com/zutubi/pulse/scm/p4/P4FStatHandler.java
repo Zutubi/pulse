@@ -95,6 +95,10 @@ public class P4FStatHandler extends P4ErrorDetectingHandler
 
             if(fs.isInteresting())
             {
+                if(ui != null)
+                {
+                    ui.status(fs.toString());
+                }
                 status.add(fs);
             }
         }

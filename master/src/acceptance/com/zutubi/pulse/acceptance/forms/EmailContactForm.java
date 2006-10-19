@@ -32,11 +32,11 @@ public class EmailContactForm extends BaseForm
     {
         if (create)
         {
-            return new String[]{"name", "email", "format"};
+            return new String[]{ "name", "email" };
         }
         else
         {
-            return new String[]{"contact.name", "contact.email", "contact.type"};
+            return new String[]{"contact.name", "contact.email" };
         }
     }
 
@@ -54,6 +54,6 @@ public class EmailContactForm extends BaseForm
     
     public int[] getFieldTypes()
     {
-        return new int[]{TEXTFIELD, TEXTFIELD, RADIOBOX};
+        return new int[]{TEXTFIELD, TEXTFIELD};
     }
 }

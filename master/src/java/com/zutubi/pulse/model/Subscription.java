@@ -1,19 +1,7 @@
 package com.zutubi.pulse.model;
 
-import antlr.collections.AST;
-import com.zutubi.pulse.condition.FalseNotifyCondition;
-import com.zutubi.pulse.condition.NotifyCondition;
-import com.zutubi.pulse.condition.NotifyConditionFactory;
-import com.zutubi.pulse.condition.TrueNotifyCondition;
-import com.zutubi.pulse.condition.antlr.NotifyConditionLexer;
-import com.zutubi.pulse.condition.antlr.NotifyConditionParser;
-import com.zutubi.pulse.condition.antlr.NotifyConditionTreeParser;
 import com.zutubi.pulse.core.model.Entity;
 import com.zutubi.pulse.util.logging.Logger;
-
-import java.io.StringReader;
-import java.util.LinkedList;
-import java.util.List;
 
 /**
  * A subscription is a mapping from a project event to a contact point.  When
@@ -21,7 +9,7 @@ import java.util.List;
  *
  * @author jsankey
  */
-public class Subscription extends Entity
+public abstract class Subscription extends Entity
 {
     private static final Logger LOG = Logger.getLogger(Subscription.class);
 
@@ -31,32 +19,9 @@ public class Subscription extends Entity
     private ContactPoint contactPoint;
 
     /**
-     * Indicates the type of subscription: personal builds or project builds.
+     * The template to use to render this subscription.
      */
-    boolean personal;
-
-    /**
-     * Condition to be satisfied before notifying.  Not currently used for
-     * personal builds.
-     */
-    private String condition;
-
-    /**
-     * The projects to which this subscription is associated.  If empty,
-     * the subscription is associated with all projects.
-     */
-    private List<Project> projects = new LinkedList<Project>();
-
-    /**
-     * Cache of the parsed and modelled condition.
-     */
-    private NotifyCondition notifyCondition = null;
-
-    /**
-     * A reference to the systems notify condition factory, used for instantiating
-     * the subscriptions condition.
-     */
-    private NotifyConditionFactory notifyFactory;
+    private String template;
 
     //=======================================================================
     // Construction
@@ -75,28 +40,16 @@ public class Subscription extends Entity
      * contact point.
      *
      * @param contactPoint the contact point to notify on the event
+     * @param template name of the template to use to render builds for this
+     *                 subscription
      */
-    public Subscription(ContactPoint contactPoint)
+    public Subscription(ContactPoint contactPoint, String template)
     {
         this.contactPoint = contactPoint;
-        this.condition = NotifyConditionFactory.TRUE;
+        this.template = template;
         this.contactPoint.add(this);
     }
 
-    /**
-     * Constructs a new subscription connection the given event with the given
-     * contact point.
-     *
-     * @param contactPoint the contact point to notify on the event
-     */
-    public Subscription(List<Project> projects, ContactPoint contactPoint)
-    {
-        this.projects = projects;
-        this.contactPoint = contactPoint;
-        this.condition = NotifyConditionFactory.TRUE;
-
-        this.contactPoint.add(this);
-    }
 
     //=======================================================================
     // Interface
@@ -118,40 +71,14 @@ public class Subscription extends Entity
         this.contactPoint = contactPoint;
     }
 
-    public boolean isPersonal()
+    public String getTemplate()
     {
-        return personal;
+        return template;
     }
 
-    public void setPersonal(boolean personal)
+    public void setTemplate(String template)
     {
-        this.personal = personal;
-    }
-
-    public List<Project> getProjects()
-    {
-        return projects;
-    }
-
-    public void setProjects(List<Project> projects)
-    {
-        this.projects = projects;
-    }
-
-    /**
-     * Sets the given condition as that which must be satisfied before the
-     * contact point should be notified.
-     *
-     * @param condition the condition to set.
-     */
-    public void setCondition(String condition)
-    {
-        this.condition = condition;
-    }
-
-    public String getCondition()
-    {
-        return this.condition;
+        this.template = template;
     }
 
     /**
@@ -161,60 +88,5 @@ public class Subscription extends Entity
      * @param result the build model to test the properties of
      * @return true iff the contact point should be notified for this model
      */
-    public boolean conditionSatisfied(BuildResult result)
-    {
-        if(result.isPersonal())
-        {
-            return contactPoint.getUser().equals(result.getOwner());
-        }
-        else
-        {
-            return getNotifyCondition().satisfied(result, contactPoint.getUser());
-        }
-    }
-
-    /**
-     * The notify condition factory is a required resource, and used when checking
-     * if the subscription's 'notification condition' has been satisfied.
-     *
-     * @param notifyFactory
-     */
-    public void setNotifyConditionFactory(NotifyConditionFactory notifyFactory)
-    {
-        this.notifyFactory = notifyFactory;
-    }
-
-    public NotifyCondition getNotifyCondition()
-    {
-        if(notifyCondition == null)
-        {
-            // Need to parse our condition.
-            try
-            {
-                NotifyConditionLexer lexer = new NotifyConditionLexer(new StringReader(condition));
-
-                NotifyConditionParser parser = new NotifyConditionParser(lexer);
-                parser.orexpression();
-                AST t = parser.getAST();
-                if(t == null)
-                {
-                    // Empty expression evals to true
-                    notifyCondition = new TrueNotifyCondition();
-                }
-                else
-                {
-                    NotifyConditionTreeParser tree = new NotifyConditionTreeParser();
-                    tree.setNotifyConditionFactory(notifyFactory);
-                    notifyCondition = tree.cond(t);
-                }
-            }
-            catch (Exception e)
-            {
-                LOG.severe("Unable to parse subscription condition '" + condition + "'");
-                notifyCondition = new FalseNotifyCondition();
-            }
-        }
-
-        return notifyCondition;
-    }
+    public abstract boolean conditionSatisfied(BuildResult result);    
 }

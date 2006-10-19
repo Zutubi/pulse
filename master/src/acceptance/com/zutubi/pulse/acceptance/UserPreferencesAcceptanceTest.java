@@ -70,8 +70,8 @@ public class UserPreferencesAcceptanceTest extends BaseAcceptanceTestCase
 
         assertTablePresent("subscriptions");
         assertTableRowsEqual("subscriptions", 1, new String[][]{
-                new String[]{"contact", "subscribed to", "condition", "actions"},
-                new String[]{CONTACT_REQUIRED, CONTACT_REQUIRED, CONTACT_REQUIRED, CONTACT_REQUIRED}
+                new String[]{"contact", "subscribed to", "actions"},
+                new String[]{CONTACT_REQUIRED, CONTACT_REQUIRED, CONTACT_REQUIRED}
         });
 
         // can not create subscriptions unless there are projects to subscribe to.
@@ -98,21 +98,21 @@ public class UserPreferencesAcceptanceTest extends BaseAcceptanceTestCase
         EmailContactForm emailForm = emailSetup();
 
         // name is required.
-        emailForm.finishFormElements("", "email@example.com", "html");
+        emailForm.finishFormElements("", "email@example.com");
         emailForm.assertFormPresent();
-        emailForm.assertFormElements("", "email@example.com", "html");
+        emailForm.assertFormElements("", "email@example.com");
         assertTextPresent("required");
 
         // email is required
-        emailForm.finishFormElements("example", "", "plain");
+        emailForm.finishFormElements("example", "");
         emailForm.assertFormPresent();
-        emailForm.assertFormElements("example", "", "plain");
+        emailForm.assertFormElements("example", "");
         assertTextPresent("required");
 
         // email must be valid
-        emailForm.finishFormElements("example", "incorrect email address", "html");
+        emailForm.finishFormElements("example", "incorrect email address");
         emailForm.assertFormPresent();
-        emailForm.assertFormElements("example", "incorrect email address", "html");
+        emailForm.assertFormElements("example", "incorrect email address");
         assertTextPresent("valid");
 
         // no need to check the radio box here.
@@ -122,7 +122,7 @@ public class UserPreferencesAcceptanceTest extends BaseAcceptanceTestCase
     {
         EmailContactForm emailForm = emailSetup();
 
-        emailForm.cancelFormElements("example", "email@example.com", "plain");
+        emailForm.cancelFormElements("example", "email@example.com");
         emailForm.assertFormNotPresent();
 
         assertTablePresent("contacts");
@@ -396,15 +396,15 @@ public class UserPreferencesAcceptanceTest extends BaseAcceptanceTestCase
 
         assertTablePresent("subscriptions");
         assertTableRowsEqual("subscriptions", 1, new String[][]{
-                new String[]{"contact", "subscribed to", "condition", "actions"},
-                new String[]{CONTACT_REQUIRED, CONTACT_REQUIRED, CONTACT_REQUIRED, CONTACT_REQUIRED}
+                new String[]{"contact", "subscribed to", "actions"},
+                new String[]{CONTACT_REQUIRED, CONTACT_REQUIRED, CONTACT_REQUIRED}
         });
     }
 
     private void createEmailContactPoint(String name, String email)
     {
         EmailContactForm emailForm = emailSetup();
-        emailForm.finishFormElements(name, email, "html");
+        emailForm.finishFormElements(name, email);
         emailForm.assertFormNotPresent();
         assertTextPresent(name);
         assertTextPresent(email);
@@ -421,8 +421,8 @@ public class UserPreferencesAcceptanceTest extends BaseAcceptanceTestCase
         clickLink("edit_home");
 
         EmailContactForm form = new EmailContactForm(tester, false);
-        form.assertFormElements("home", "user@example.com", "html");
-        form.saveFormElements("newHome", "anotherUser@example.com", "plain");
+        form.assertFormElements("home", "user@example.com");
+        form.saveFormElements("newHome", "anotherUser@example.com");
 
         // ensure that we have correctly changed the email contact.
         assertLinkPresent("edit_newHome");
@@ -430,8 +430,8 @@ public class UserPreferencesAcceptanceTest extends BaseAcceptanceTestCase
 
         clickLink("edit_newHome");
         form.assertFormPresent();
-        form.assertFormElements("newHome", "anotherUser@example.com", "plain");
-        form.cancelFormElements("cancelled", "nouser@example.com", "html");
+        form.assertFormElements("newHome", "anotherUser@example.com");
+        form.cancelFormElements("cancelled", "nouser@example.com");
 
         // assert that the contact appears as expected.
         assertTextPresent("newHome");
@@ -523,20 +523,24 @@ public class UserPreferencesAcceptanceTest extends BaseAcceptanceTestCase
     }
 
     // @Requires a project.
-    public void testCreateSubscription()
+    public void testCreateSubscriptionProject()
     {
         addJabber("jabbier");
 
         clickLink("subscription.create");
-        SubscriptionForm form = new SubscriptionForm(tester, true);
+        CreateSubscriptionForm form = new CreateSubscriptionForm(tester);
         form.assertFormPresent();
+        String contactId = tester.getDialog().getOptionValuesFor("contactId")[0];
+        String contactName = tester.getDialog().getOptionsFor("contactId")[0];
+        form.nextFormElements(contactId, "project");
+
+        CreateProjectSubscriptionForm projectForm = new CreateProjectSubscriptionForm(tester);
+        projectForm.assertFormPresent();
         String projectId = tester.getDialog().getOptionValuesFor("projects")[0];
         String projectName = tester.getDialog().getOptionsFor("projects")[0];
-        String contactId = tester.getDialog().getOptionValuesFor("contactPointId")[0];
-        String contactName = tester.getDialog().getOptionsFor("contactPointId")[0];
-        form.saveFormElements(contactId, "false", projectId, "changed");
+        projectForm.nextFormElements(projectId, "changed", "simple-instant-message");
 
-        assertSubscriptionsTable(projectName, contactName, "changed");
+        assertSubscriptionsTable(projectName, contactName);
     }
 
     // @Requires a project.
@@ -545,13 +549,17 @@ public class UserPreferencesAcceptanceTest extends BaseAcceptanceTestCase
         addJabber("jabbier");
 
         clickLink("subscription.create");
-        SubscriptionForm form = new SubscriptionForm(tester, true);
+        CreateSubscriptionForm form = new CreateSubscriptionForm(tester);
         form.assertFormPresent();
-        String contactId = tester.getDialog().getOptionValuesFor("contactPointId")[0];
-        String contactName = tester.getDialog().getOptionsFor("contactPointId")[0];
-        form.saveFormElements(contactId, "false", "", "changed");
+        String contactId = tester.getDialog().getOptionValuesFor("contactId")[0];
+        String contactName = tester.getDialog().getOptionsFor("contactId")[0];
+        form.nextFormElements(contactId, "project");
 
-        assertSubscriptionsTable("[all projects]", contactName, "changed");
+        CreateProjectSubscriptionForm projectForm = new CreateProjectSubscriptionForm(tester);
+        projectForm.assertFormPresent();
+        projectForm.nextFormElements("", "changed", "simple-instant-message");
+
+        assertSubscriptionsTable("[all projects]", contactName);
     }
 
     // @Requires a project.
@@ -560,48 +568,57 @@ public class UserPreferencesAcceptanceTest extends BaseAcceptanceTestCase
         addJabber("jabbier");
 
         clickLink("subscription.create");
-        SubscriptionForm form = new SubscriptionForm(tester, true);
+        CreateSubscriptionForm form = new CreateSubscriptionForm(tester);
         form.assertFormPresent();
-        String contactId = tester.getDialog().getOptionValuesFor("contactPointId")[0];
-        String contactName = tester.getDialog().getOptionsFor("contactPointId")[0];
-        form.saveFormElements(contactId, "true", null, null);
+        String contactId = tester.getDialog().getOptionValuesFor("contactId")[0];
+        String contactName = tester.getDialog().getOptionsFor("contactId")[0];
+        form.nextFormElements(contactId, "personal");
 
-        assertSubscriptionsTable("personal builds", contactName, "true");
+        CreatePersonalSubscriptionForm personalForm = new CreatePersonalSubscriptionForm(tester);
+        personalForm.assertFormPresent();
+        personalForm.nextFormElements("html-email");
+
+        assertSubscriptionsTable("personal builds", contactName);
     }
 
     // @Requires a project.
-    public void testEditSubscription()
+    public void testEditSubscriptionProject()
     {
         addJabber("zlast");
-        testCreateSubscription();
+        testCreateSubscriptionProject();
 
         clickLinkWithText("edit", 4);
-        SubscriptionForm form = new SubscriptionForm(tester, false);
+        EditProjectSubscriptionForm form = new EditProjectSubscriptionForm(tester);
         form.assertFormPresent();
+        form.assertFormElements(null, null, "changed", "simple-instant-message");
 
         String projectId = tester.getDialog().getOptionValuesFor("projects")[1];
         String projectName = tester.getDialog().getOptionsFor("projects")[1];
         String contactId = tester.getDialog().getOptionValuesFor("contactPointId")[1];
         String contactName = tester.getDialog().getOptionsFor("contactPointId")[1];
-        form.saveFormElements(contactId, "false", projectId, "true");
+        form.saveFormElements(contactId, projectId, "true", "html-email");
 
-        assertSubscriptionsTable(projectName, contactName, "true");
+        assertSubscriptionsTable(projectName, contactName);
+        clickLinkWithText("edit", 4);
+        form.assertFormElements(contactId, projectId, "true", "html-email");
     }
 
     public void testEditSubscriptionPersonal()
     {
         addJabber("zlast");
-        testCreateSubscription();
+        testCreateSubscriptionPersonal();
 
         clickLinkWithText("edit", 4);
-        SubscriptionForm form = new SubscriptionForm(tester, false);
-        form.assertFormPresent();
+        EditPersonalSubscriptionForm form = new EditPersonalSubscriptionForm(tester);
+        form.assertFormElements(null, "html-email");
 
         String contactId = tester.getDialog().getOptionValuesFor("contactPointId")[1];
         String contactName = tester.getDialog().getOptionsFor("contactPointId")[1];
-        form.saveFormElements(contactId, "true", null, null);
+        form.saveFormElements(contactId, "plain-text-email");
 
-        assertSubscriptionsTable("personal builds", contactName, "true");
+        assertSubscriptionsTable("personal builds", contactName);
+        clickLinkWithText("edit", 4);
+        form.assertFormElements(contactId, "plain-text-email");
     }
 
     private void assertContactsTable(String name, String uid)
@@ -612,11 +629,11 @@ public class UserPreferencesAcceptanceTest extends BaseAcceptanceTestCase
         assertTableRowsEqual("contacts", 1, expectedTable);
     }
 
-    private void assertSubscriptionsTable(String project, String contact, String condition)
+    private void assertSubscriptionsTable(String project, String contact)
     {
         ExpectedTable expectedTable = new ExpectedTable();
-        expectedTable.appendRow(new ExpectedRow(new String[]{"contact", "subscribed to", "condition", "actions", "actions"}));
-        expectedTable.appendRow(new ExpectedRow(new String[]{contact, project, condition, "edit", "delete"}));
+        expectedTable.appendRow(new ExpectedRow(new String[]{"contact", "subscribed to", "actions", "actions"}));
+        expectedTable.appendRow(new ExpectedRow(new String[]{contact, project, "edit", "delete"}));
         assertTableRowsEqual("subscriptions", 1, expectedTable);
     }
 

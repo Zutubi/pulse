@@ -1,47 +1,42 @@
 package com.zutubi.pulse.web.user;
 
-import antlr.MismatchedTokenException;
-import antlr.collections.AST;
 import com.zutubi.pulse.condition.NotifyConditionFactory;
-import com.zutubi.pulse.condition.antlr.NotifyConditionLexer;
-import com.zutubi.pulse.condition.antlr.NotifyConditionParser;
-import com.zutubi.pulse.condition.antlr.NotifyConditionTreeParser;
-import com.zutubi.pulse.model.*;
+import com.zutubi.pulse.model.ContactPoint;
+import com.zutubi.pulse.model.ProjectManager;
+import com.zutubi.pulse.model.Subscription;
+import com.zutubi.pulse.model.User;
+import com.zutubi.pulse.renderer.BuildResultRenderer;
 
-import java.io.StringReader;
-import java.util.*;
+import java.util.Map;
+import java.util.TreeMap;
 
 /**
  *
  *
  */
-public class SubscriptionActionSupport extends UserActionSupport
+public abstract class SubscriptionActionSupport extends UserActionSupport
 {
-    private ProjectManager projectManager;
-
+    protected long id;
     protected long contactPointId;
-    protected String personal = "false";
-    protected String condition = "true";
-
-    protected Map<String, String> personals;
-    protected Map<String, String> conditions;
-    protected Map<Long, String> allProjects;
     protected Map<Long, String> contactPoints;
 
     protected User user;
     protected ContactPoint contactPoint;
-    protected List<Long> projects = new LinkedList<Long>();
+    protected String template;
+    protected SubscriptionHelper helper;
 
+    private ProjectManager projectManager;
     private NotifyConditionFactory notifyConditionFactory;
+    private BuildResultRenderer buildResultRenderer;
 
-    public String getPersonal()
+    public long getId()
     {
-        return personal;
+        return id;
     }
 
-    public void setPersonal(String personal)
+    public void setId(long id)
     {
-        this.personal = personal;
+        this.id = id;
     }
 
     public long getContactPointId()
@@ -54,58 +49,6 @@ public class SubscriptionActionSupport extends UserActionSupport
         this.contactPointId = contactPointId;
     }
 
-    public List<Long> getProjects()
-    {
-        return projects;
-    }
-
-    public void setProjects(List<Long> projects)
-    {
-        this.projects = projects;
-    }
-
-    public String getCondition()
-    {
-        return condition;
-    }
-
-    public void setCondition(String condition)
-    {
-        this.condition = condition;
-    }
-
-    public Map<String, String> getPersonals()
-    {
-        if(personals == null)
-        {
-            personals = new LinkedHashMap<String, String>(2);
-            personals.put("false", "project builds");
-            personals.put("true", "personal builds");
-        }
-
-        return personals;
-    }
-
-    public Map getConditions()
-    {
-        if (conditions == null)
-        {
-            conditions = new LinkedHashMap<String, String>();
-            conditions.put(NotifyConditionFactory.TRUE, getText("condition.allbuilds"));
-            conditions.put("not " + NotifyConditionFactory.SUCCESS, getText("condition.allfailed"));
-            conditions.put(NotifyConditionFactory.CHANGED, getText("condition.allchanged"));
-            conditions.put(NotifyConditionFactory.CHANGED + " or not " + NotifyConditionFactory.SUCCESS,
-                    getText("condition.allchangedorfailed"));
-            conditions.put(NotifyConditionFactory.CHANGED_BY_ME, getText("condition.changedbyme"));
-            conditions.put(NotifyConditionFactory.CHANGED_BY_ME + " and not " + NotifyConditionFactory.SUCCESS,
-                    getText("condition.brokenbyme"));
-            conditions.put("not " + NotifyConditionFactory.SUCCESS + " or " + NotifyConditionFactory.STATE_CHANGE,
-                    getText("condition.allfailedandfirstsuccess"));
-            conditions.put(NotifyConditionFactory.STATE_CHANGE, getText("condition.statechange"));
-        }
-        return conditions;
-    }
-
     public Map<Long, String> getContactPoints()
     {
         if(contactPoints == null)
@@ -116,42 +59,63 @@ public class SubscriptionActionSupport extends UserActionSupport
                 contactPoints.put(contact.getId(), contact.getName());
             }
         }
-        
+
         return contactPoints;
     }
 
-    public Map<Long, String> getAllProjects()
+    public String getTemplate()
     {
-        if(allProjects == null)
-        {
-            allProjects = new LinkedHashMap<Long, String>();
-            List<Project> all = projectManager.getAllProjects();
-            Collections.sort(all, new NamedEntityComparator());
-            for(Project p: all)
-            {
-                allProjects.put(p.getId(), p.getName());
-            }
-        }
-        return allProjects;
+        return template;
     }
 
-    public void setup()
+    public void setTemplate(String template)
     {
-        lookupUser();
-        if(hasErrors())
-        {
-            return;
-        }
+        this.template = template;
     }
 
-    protected void lookupUser()
+    public Map<String, String> getAvailableTemplates()
+    {
+        return helper.getAvailableTemplates();
+    }
+
+    public String doInput() throws Exception
     {
         user = getUser();
         if (user == null)
         {
             addUnknownUserActionError();
+            return ERROR;
         }
+
+        Subscription s = lookupSubscription();
+        if(hasErrors())
+        {
+            return ERROR;
+        }
+        
+        contactPoint = s.getContactPoint();
+        createHelper();
+
+        return INPUT;
     }
+
+    protected void createHelper()
+    {
+        helper = new SubscriptionHelper(user, contactPoint, projectManager, notifyConditionFactory, this, buildResultRenderer);
+    }
+
+    protected boolean lookupUser()
+    {
+        user = getUser();
+        if (user == null)
+        {
+            addUnknownUserActionError();
+            return true;
+        }
+        return false;
+    }
+
+    protected abstract Subscription lookupSubscription();
 
     public void validate()
     {
@@ -160,72 +124,10 @@ public class SubscriptionActionSupport extends UserActionSupport
             return;
         }
 
-        user = getUser();
-        if (user == null)
-        {
-            addUnknownUserActionError();
-            return;
-        }
-
         contactPoint = user.getContactPoint(contactPointId);
         if (contactPoint == null)
         {
             addFieldError("contactPointId", "Unknown contact point '" + contactPointId + "' for user '" + user.getName() + "'");
-        }
-
-        if(!Boolean.parseBoolean(personal))
-        {
-            // Parse the condition
-            try
-            {
-                NotifyConditionLexer lexer = new NotifyConditionLexer(new StringReader(condition));
-                NotifyConditionParser parser = new NotifyConditionParser(lexer);
-                parser.orexpression();
-                AST t = parser.getAST();
-                if(t != null)
-                {
-                    NotifyConditionTreeParser tree = new NotifyConditionTreeParser();
-                    tree.setNotifyConditionFactory(notifyConditionFactory);
-                    tree.cond(t);
-                }
-            }
-            catch(MismatchedTokenException mte)
-            {
-                if(mte.token.getText() == null)
-                {
-                    addFieldError("condition", "line " + mte.getLine() + ":" + mte.getColumn() + ": end of input when expecting " + NotifyConditionParser._tokenNames[mte.expecting]);
-                }
-                else
-                {
-                    addFieldError("condition", mte.toString());
-                }
-            }
-            catch (Exception e)
-            {
-                addFieldError("condition", e.toString());
-            }
-        }
-    }
-
-    protected void populateProjects(Subscription subscription)
-    {
-        for(Project p: subscription.getProjects())
-        {
-            projects.add(p.getId());
-        }
-    }
-
-    protected void updateProjects(Subscription subscription)
-    {
-        List<Project> subscriptionProjects = subscription.getProjects();
-        subscriptionProjects.clear();
-        for(Long id: projects)
-        {
-            Project p = projectManager.getProject(id);
-            if(p != null)
-            {
-                subscriptionProjects.add(p);
-            }
         }
     }
 
@@ -237,5 +139,10 @@ public class SubscriptionActionSupport extends UserActionSupport
     public void setNotifyConditionFactory(NotifyConditionFactory notifyConditionFactory)
     {
         this.notifyConditionFactory = notifyConditionFactory;
+    }
+
+    public void setBuildResultRenderer(BuildResultRenderer buildResultRenderer)
+    {
+        this.buildResultRenderer = buildResultRenderer;
     }
 }

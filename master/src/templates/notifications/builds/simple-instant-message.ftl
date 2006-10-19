@@ -1,0 +1,1 @@
+project ${result.project.name}: build ${result.number}: ${result.state.prettyString}

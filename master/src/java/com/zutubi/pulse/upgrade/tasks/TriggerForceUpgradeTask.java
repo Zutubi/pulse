@@ -2,10 +2,10 @@ package com.zutubi.pulse.upgrade.tasks;
 
 import com.zutubi.pulse.scheduling.tasks.BuildProjectTask;
 import com.zutubi.pulse.upgrade.UpgradeContext;
-import com.zutubi.pulse.util.IOUtils;
 import com.zutubi.pulse.util.JDBCUtils;
 
-import java.io.*;
+import java.io.IOException;
+import java.io.Serializable;
 import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.sql.ResultSet;
@@ -65,26 +65,14 @@ public class TriggerForceUpgradeTask extends DatabaseUpgradeTask
 
     private void updateDataMap(Connection con, ResultSet rs) throws IOException, ClassNotFoundException, SQLException
     {
-        byte[] data = rs.getBytes("data");
-
-        ObjectInputStream ois = null;
-        ObjectOutputStream oos = null;
-
-        try
+        byte[] data = upgradeBlob(rs, "data", new ObjectUpgrader()
         {
-            ois = new ObjectInputStream(new ByteArrayInputStream(data));
-            Map<Serializable, Serializable> dataMap = (Map<Serializable, Serializable>)ois.readObject();
-            dataMap.put(BuildProjectTask.PARAM_FORCE, true);
-            ByteArrayOutputStream byteStream = new ByteArrayOutputStream();
-            oos = new ObjectOutputStream(byteStream);
-            oos.writeObject(dataMap);
-            data = byteStream.toByteArray();
-        }
-        finally
-        {
-            IOUtils.close(ois);
-            IOUtils.close(oos);
-        }
+            public void upgrade(Object object)
+            {
+                Map<Serializable, Serializable> dataMap = (Map<Serializable, Serializable>) object;
+                dataMap.put(BuildProjectTask.PARAM_FORCE, true);
+            }
+        });
 
         CallableStatement stmt = null;
         try

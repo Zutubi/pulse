@@ -25,7 +25,6 @@ public class EditEmailContactPointAction extends AbstractEditContactPointAction
         EmailContactPoint persistentContact = (EmailContactPoint) getUserManager().getContactPoint(getId());
         persistentContact.setEmail(contact.getEmail());
         persistentContact.setName(contact.getName());
-        persistentContact.setType(contact.getType());
         getUserManager().save(persistentContact);
         return SUCCESS;
     }

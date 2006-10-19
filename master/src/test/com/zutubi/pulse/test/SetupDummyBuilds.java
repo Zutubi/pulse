@@ -167,8 +167,8 @@ public class SetupDummyBuilds implements Runnable
         contactPoint.setName("gmail");
         List<Project> projects = new LinkedList<Project>();
         projects.add(project);
-        Subscription subscription = new Subscription(projects, contactPoint);
-        contactPoint.add(subscription);
+        ProjectBuildSubscription subscription = new ProjectBuildSubscription(contactPoint, "html-email", "true");
+        subscription.setProjects(projects);
         user.add(contactPoint);
         userDao.save(user);
     }

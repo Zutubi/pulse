@@ -1,8 +1,9 @@
 package com.zutubi.pulse.model.persistence.mock;
 
-import com.zutubi.pulse.model.persistence.SubscriptionDao;
-import com.zutubi.pulse.model.Subscription;
 import com.zutubi.pulse.model.Project;
+import com.zutubi.pulse.model.ProjectBuildSubscription;
+import com.zutubi.pulse.model.Subscription;
+import com.zutubi.pulse.model.persistence.SubscriptionDao;
 
 import java.util.List;
 
@@ -16,15 +17,8 @@ public class MockSubscriptionDao extends MockEntityDao<Subscription> implements 
         {
             public boolean include(Subscription s)
             {
-                for(Project p: s.getProjects())
-                {
-                    if(p.equals(project))
-                    {
-                        return true;
-                    }
-                }
+                return s instanceof ProjectBuildSubscription && ((ProjectBuildSubscription) s).getProjects().contains(project);
 
-                return false;
             }
         });
     }
@@ -35,7 +29,7 @@ public class MockSubscriptionDao extends MockEntityDao<Subscription> implements 
         {
             public boolean include(Subscription o)
             {
-                return o.getProjects().size() == 0;
+                return o instanceof ProjectBuildSubscription && ((ProjectBuildSubscription) o).getProjects().size() == 0;
             }
         });
     }

@@ -47,6 +47,8 @@
                 <ref local="testStorage"/>
                 <ref local="schemaUpgrade0101999001"/>
                 <ref local="slaveEnabledState"/>
+                <ref local="schemaUpgrade0101999006"/>
+                <ref local="customNotificationTemplates"/>
             </list>
         </property>
     </bean>
@@ -259,5 +261,18 @@
 
     <bean id="slaveEnabledState" class="com.zutubi.pulse.upgrade.tasks.SlaveEnabledStateUpgradeTask" autowire="byName">
         <property name="buildNumber" value="101999002"/>
+    </bean>
+
+    <bean id="schemaUpgrade0101999006" class="com.zutubi.pulse.upgrade.tasks.MigrateSchemaUpgradeTask" autowire="byName">
+        <property name="buildNumber" value="101999006"/>
+        <property name="mappings">
+            <list>
+                <value>com/zutubi/pulse/upgrade/schema/build_0101999006/User.hbm.xml</value>
+            </list>
+        </property>
+    </bean>
+
+    <bean id="customNotificationTemplates" class="com.zutubi.pulse.upgrade.tasks.CustomNotificationTemplatesUpgradeTask" autowire="byName">
+        <property name="buildNumber" value="101999007"/>
     </bean>
 </beans>

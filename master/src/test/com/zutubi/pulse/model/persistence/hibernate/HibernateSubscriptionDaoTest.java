@@ -1,15 +1,12 @@
 package com.zutubi.pulse.model.persistence.hibernate;
 
-import com.zutubi.pulse.model.ContactPoint;
-import com.zutubi.pulse.model.EmailContactPoint;
-import com.zutubi.pulse.model.Project;
-import com.zutubi.pulse.model.Subscription;
+import com.zutubi.pulse.model.*;
 import com.zutubi.pulse.model.persistence.ContactPointDao;
 import com.zutubi.pulse.model.persistence.ProjectDao;
 import com.zutubi.pulse.model.persistence.SubscriptionDao;
 
-import java.util.List;
 import java.util.LinkedList;
+import java.util.List;
 
 
 /**
@@ -56,13 +53,13 @@ public class HibernateSubscriptionDaoTest extends MasterPersistenceTestCase
         Project project = new Project();
         List<Project> projects = new LinkedList<Project>();
         projects.add(project);
-        Subscription subscription = new Subscription(projects, contactPoint);
+        ProjectBuildSubscription subscription = new ProjectBuildSubscription(contactPoint, "html-email", projects, "true");
         save(contactPoint, project, subscription);
 
         List<Subscription> subscriptions = subDao.findByProject(project);
         assertNotNull(subscriptions);
         assertEquals(1, subscriptions.size());
-        Subscription otherSubscription = subscriptions.get(0);
+        ProjectBuildSubscription otherSubscription = (ProjectBuildSubscription) subscriptions.get(0);
         assertEquals(projects.get(0), otherSubscription.getProjects().get(0));
         assertEquals(contactPoint, otherSubscription.getContactPoint());
     }
@@ -71,13 +68,13 @@ public class HibernateSubscriptionDaoTest extends MasterPersistenceTestCase
     {
         ContactPoint contactPoint = new EmailContactPoint();
         Project project = new Project();
-        Subscription subscription = new Subscription(contactPoint);
+        ProjectBuildSubscription subscription = new ProjectBuildSubscription(contactPoint, "html-email", "true");
         save(contactPoint, project, subscription);
 
         List<Subscription> subscriptions = subDao.findByNoProject();
         assertNotNull(subscriptions);
         assertEquals(1, subscriptions.size());
-        Subscription otherSubscription = subscriptions.get(0);
+        ProjectBuildSubscription otherSubscription = (ProjectBuildSubscription) subscriptions.get(0);
         assertEquals(0, otherSubscription.getProjects().size());
         assertEquals(contactPoint, otherSubscription.getContactPoint());
     }
@@ -88,16 +85,16 @@ public class HibernateSubscriptionDaoTest extends MasterPersistenceTestCase
         Project project = new Project();
         List<Project> projects = new LinkedList<Project>();
         projects.add(project);
-        Subscription subWithProject = new Subscription(projects, contactPoint);
+        ProjectBuildSubscription subWithProject = new ProjectBuildSubscription(contactPoint, "html-email", projects, "true");
         save(contactPoint, project, subWithProject);
 
-        Subscription subWithoutProject = new Subscription(contactPoint);
+        ProjectBuildSubscription subWithoutProject = new ProjectBuildSubscription(contactPoint, "html-email", "true");
         save(subWithoutProject);
         
         List<Subscription> subscriptions = subDao.findByNoProject();
         assertNotNull(subscriptions);
         assertEquals(1, subscriptions.size());
-        Subscription otherSubscription = subscriptions.get(0);
+        ProjectBuildSubscription otherSubscription = (ProjectBuildSubscription) subscriptions.get(0);
         assertEquals(0, otherSubscription.getProjects().size());
         assertEquals(subWithoutProject, otherSubscription);
     }
@@ -108,7 +105,7 @@ public class HibernateSubscriptionDaoTest extends MasterPersistenceTestCase
         Project project = new Project();
         List<Project> projects = new LinkedList<Project>();
         projects.add(project);
-        Subscription subscription = new Subscription(projects, contactPoint);
+        ProjectBuildSubscription subscription = new ProjectBuildSubscription(contactPoint, "html-email", projects, "true");
         save(contactPoint, project, subscription);
 
         subDao.delete(subscription);

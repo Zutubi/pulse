@@ -1,18 +1,23 @@
 package com.zutubi.pulse.web.user;
 
-import com.zutubi.pulse.model.*;
-import com.zutubi.pulse.web.wizard.*;
-import com.zutubi.pulse.form.descriptor.*;
-import com.zutubi.pulse.notifications.NotificationSchemeManager;
-import com.zutubi.pulse.notifications.NotificationHandler;
+import com.zutubi.pulse.core.ObjectFactory;
+import com.zutubi.pulse.form.descriptor.DescriptorFactory;
+import com.zutubi.pulse.model.EmailContactPoint;
+import com.zutubi.pulse.model.JabberContactPoint;
+import com.zutubi.pulse.model.User;
+import com.zutubi.pulse.model.UserManager;
 import com.zutubi.pulse.notifications.EmailNotificationHandler;
 import com.zutubi.pulse.notifications.JabberNotificationHandler;
-import com.zutubi.pulse.core.ObjectFactory;
-import com.zutubi.validation.*;
+import com.zutubi.pulse.notifications.NotificationHandler;
+import com.zutubi.pulse.notifications.NotificationSchemeManager;
+import com.zutubi.pulse.web.wizard.BaseWizard;
+import com.zutubi.pulse.web.wizard.FormWizardState;
+import com.zutubi.pulse.web.wizard.Wizard;
+import com.zutubi.pulse.web.wizard.WizardState;
+import com.zutubi.validation.ValidationManager;
+import freemarker.template.Configuration;
 
 import java.util.List;
-
-import freemarker.template.Configuration;
 
 /**
  * <class-comment/>
@@ -139,7 +144,6 @@ public class ContactPointWizard extends BaseWizard
             EmailNotificationHandler emailHandler = (EmailNotificationHandler)handler;
             EmailContactPoint email = new EmailContactPoint();
             email.setEmail(emailHandler.getEmail());
-            email.setType(emailHandler.getFormat());
             email.setName(emailHandler.getName());
             user.add(email);
             userManager.save(user);

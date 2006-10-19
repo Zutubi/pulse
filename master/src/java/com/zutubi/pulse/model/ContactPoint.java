@@ -125,12 +125,12 @@ public abstract class ContactPoint extends Entity
         this.subscriptions = subscriptions;
     }
 
-    public void notify(BuildResult result)
+    public void notify(BuildResult result, String rendered, String mimeType)
     {
         lastError = null;
         try
         {
-            internalNotify(result);
+            internalNotify(result, rendered, mimeType);
         }
         catch(Exception e)
         {
@@ -142,7 +142,8 @@ public abstract class ContactPoint extends Entity
         }
     }
 
-    protected abstract void internalNotify(BuildResult result) throws Exception;
+    public abstract String getDefaultTemplate();
 
+    protected abstract void internalNotify(BuildResult result, String rendered, String mimeType) throws Exception;
 }
 

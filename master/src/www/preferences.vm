@@ -72,11 +72,10 @@
                     #addRow("contact.create" 4 "$base/user/contactWizard.action?userId=$user.id" "contact.create")
                 </table>
                 <table id="subscriptions" class="fill-content">
-                    #headingRow("subscriptions" 5)
+                    #headingRow("subscriptions" 4)
                     <tr>
                         #contentHeading("subscription.contact" 1)
                         #contentHeading("subscription.to" 1)
-                        #contentHeading("subscription.condition" 1)
                         #contentHeading("actions" 2)
                     </tr>
 
@@ -99,8 +98,11 @@
         #end
     #end
                         </td>
-                        #dynamicCell($subscription.condition)
-                        #editCell("$base/user/editSubscription!input.action?id=$subscription.id" "edit_sub_$subscription.id")
+    #if($subscription.personal)
+                        #editCell("$base/user/editPersonalBuildSubscription!input.action?id=$subscription.id" "edit_sub_$subscription.id")
+    #else
+                        #editCell("$base/user/editProjectBuildSubscription!input.action?id=$subscription.id" "edit_sub_$subscription.id")
+    #end
                         #deleteCell("delete_$subscription.id" "$base/user/deleteSubscription.action?id=$subscription.id&login=$user.login" $confirmMessage)
                     </tr>
 #end
@@ -109,9 +111,13 @@
                  the user AND the user has configured contact points.
                 -->
 #if($user.contactPoints.size() > 0)
-                    #addRow("subscription.create" 5 "$base/user/createSubscription!input.action?userId=$user.id" "subscription.create")
+    #if($projectCount > 0)
+                    #addRow("subscription.create" 4 "$base/user/subscriptionWizard.action?userId=$user.id" "subscription.create")
+    #else
+                    <td class="content" colspan="4">#wwtext("name=subscription.requires.project")</td>    
+    #end
 #else
-                    <td class="content" colspan="5">#wwtext("name=subscription.requires.contact")</td>
+                    <td class="content" colspan="4">#wwtext("name=subscription.requires.contact")</td>
 #end
                 </table>
             </td>

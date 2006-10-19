@@ -1,11 +1,11 @@
 package com.zutubi.pulse.model;
 
-import org.jivesoftware.smack.XMPPConnection;
-import org.jivesoftware.smack.Chat;
-import com.zutubi.pulse.jabber.JabberManager;
 import com.zutubi.pulse.bootstrap.ComponentContext;
+import com.zutubi.pulse.jabber.JabberManager;
 import com.zutubi.pulse.util.logging.Logger;
 import com.zutubi.validation.annotations.Required;
+import org.jivesoftware.smack.Chat;
+import org.jivesoftware.smack.XMPPConnection;
 
 /**
  * A contact point used to notify users via an XMPP IM.
@@ -18,7 +18,12 @@ public class JabberContactPoint extends ContactPoint
 
     private JabberManager jabberManager;
 
-    public void internalNotify(BuildResult result) throws Exception
+    public String getDefaultTemplate()
+    {
+        return "simple-instant-message";
+    }
+
+    public void internalNotify(BuildResult result, String rendered, String mimeType) throws Exception
     {
         // TODO: oh dear, again
         ComponentContext.autowire(this);
@@ -35,7 +40,7 @@ public class JabberContactPoint extends ContactPoint
             try
             {
                 Chat chat = connection.createChat(getUsername());
-                chat.sendMessage("project " + result.getProject().getName() + ": build " + result.getNumber() + ": " + result.getState().getPrettyString());
+                chat.sendMessage(rendered);
             }
             catch (Exception e)
             {

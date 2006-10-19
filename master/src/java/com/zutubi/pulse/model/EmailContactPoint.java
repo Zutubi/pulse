@@ -1,18 +1,16 @@
 package com.zutubi.pulse.model;
 
-import com.zutubi.pulse.bootstrap.MasterConfiguration;
 import com.opensymphony.util.TextUtils;
 import com.zutubi.pulse.bootstrap.ComponentContext;
+import com.zutubi.pulse.bootstrap.MasterConfiguration;
 import com.zutubi.pulse.bootstrap.MasterConfigurationManager;
-import com.zutubi.pulse.renderer.BuildResultRenderer;
 import com.zutubi.pulse.util.logging.Logger;
-import com.zutubi.validation.annotations.Required;
 import com.zutubi.validation.annotations.Email;
+import com.zutubi.validation.annotations.Required;
 
 import javax.mail.*;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
-import java.io.StringWriter;
 import java.util.Date;
 import java.util.Properties;
 
@@ -27,12 +25,10 @@ public class EmailContactPoint extends ContactPoint
     private static final String SMTP_HOST_PROPERTY = "mail.smtp.host";
     private static final String SMTP_AUTH_PROPERTY = "mail.smtp.auth";
 
-    private static final String PROPERTY_TYPE = "type";
     private static final String NO_SMTP_HOST_ERROR = "Unable to deliver email: SMTP host not configured.";
 
     public EmailContactPoint()
     {
-        setType(BuildResultRenderer.TYPE_HTML);
     }
 
     public EmailContactPoint(String email)
@@ -51,17 +47,12 @@ public class EmailContactPoint extends ContactPoint
         setUid(email);
     }
 
-    public String getType()
+    public String getDefaultTemplate()
     {
-        return (String)getProperties().get(PROPERTY_TYPE);
+        return "html-email";
     }
 
-    public void setType(String type)
-    {
-        getProperties().put(PROPERTY_TYPE, type);
-    }
-
-    public void internalNotify(BuildResult result) throws Exception
+    public void internalNotify(BuildResult result, String rendered, String mimeType) throws Exception
     {
         MasterConfiguration config = lookupConfigManager().getAppConfig();
         String prefix = config.getSmtpPrefix();
@@ -76,17 +67,7 @@ public class EmailContactPoint extends ContactPoint
         }
 
         String subject = prefix + result.getProject().getName() + ": build " + Long.toString(result.getNumber()) + ": " + result.getState().getPrettyString();
-        sendMail(subject, renderResult(result), config);
-    }
-
-    private String renderResult(BuildResult result)
-    {
-        StringWriter w = new StringWriter();
-        BuildResultRenderer renderer = (BuildResultRenderer) ComponentContext.getBean("buildResultRenderer");
-        BuildManager buildManager = (BuildManager) ComponentContext.getBean("buildManager");
-        MasterConfigurationManager configManager = lookupConfigManager();
-        renderer.render(configManager.getAppConfig().getBaseUrl(), result, buildManager.getChangesForBuild(result), getType(), w);
-        return w.toString();
+        sendMail(subject, mimeType, rendered, config);
     }
 
     private MasterConfigurationManager lookupConfigManager()
@@ -94,7 +75,7 @@ public class EmailContactPoint extends ContactPoint
         return (MasterConfigurationManager) ComponentContext.getBean("configurationManager");
     }
 
-    private void sendMail(String subject, String body, final MasterConfiguration config) throws Exception
+    private void sendMail(String subject, String mimeType, String body, final MasterConfiguration config) throws Exception
     {
         if (!TextUtils.stringSet(config.getSmtpHost()))
         {
@@ -132,8 +113,8 @@ public class EmailContactPoint extends ContactPoint
 
             msg.setRecipient(Message.RecipientType.TO, new InternetAddress(getEmail()));
             msg.setSubject(subject);
-            msg.setContent(body, "text/" + getType());
-            msg.setHeader("X-Mailer", "Project-Cinnamon");
+            msg.setContent(body, "text/" + mimeType);
+            msg.setHeader("X-Mailer", "Zutubi-Pulse");
             msg.setSentDate(new Date());
 
             Transport.send(msg);

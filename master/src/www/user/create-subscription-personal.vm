@@ -10,12 +10,12 @@
 
     #parse("/template/includes/actionerrors.vm")
 
-    #wwcform("action=subscriptionWizard.action" "id=subscription.create" "heading=%{getText('subscription.create.type')}" "method=post")
+    #wwcform("action=subscriptionWizard.action" "id=subscription.create.personal" "heading=%{getText('subscription.create.personal')}" "method=post")
         #wwhidden("name=state")
         #wwhidden("name=submit")
-        #wwselect("name=contactId" "label=%{getText('subscription.contact')}" "list=contacts" "tabindex=1")
-        #wwselect("name=type" "label=%{getText('subscription.type')}" "list=types" "tabindex=2")
-        #nextCancel(3)
+        #wwselect("name=template" "label=%{getText('subscription.template')}" "list=availableTemplates" "tabindex=1")
+
+        #previousFinishCancel(2)
     #end
 
     #tabEnd()
