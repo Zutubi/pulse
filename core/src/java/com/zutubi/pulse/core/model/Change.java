@@ -109,6 +109,16 @@ public class Change extends Entity
 
     public String toString()
     {
-        return filename + "#" + revision.toString() + " - " + action.toString();
+        StringBuffer buffer = new StringBuffer();
+        buffer.append(filename);
+        if (revision != null)
+        {
+            buffer.append("#").append(revision);
+        }
+        if (action != null)
+        {
+            buffer.append("-").append(action.toString());
+        }
+        return buffer.toString();
     }
 }
