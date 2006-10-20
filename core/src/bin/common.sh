@@ -76,3 +76,4 @@ do
     code=$?
 done
 
+exit $code

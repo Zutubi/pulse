@@ -5,7 +5,7 @@
 set DEFAULT_PULSE_HOME=%~dp0..
 if "%PULSE_HOME%"=="" set PULSE_HOME=%DEFAULT_PULSE_HOME%
 
-set BOOT_JAR="%PULSE_HOME%\lib\boot.jar"
+set BOOT_JAR=%PULSE_HOME%\lib\boot.jar
 if exist "%BOOT_JAR%" goto havePulse
 
 echo Could not find "%BOOT_JAR%", please
@@ -36,9 +36,11 @@ if "%PULSE_OPTS%"=="" set PULSE_OPTS=-Xmx512m
 
 "%_JAVACMD%" %JAVA_OPTS% %PULSE_OPTS% -classpath "%BOOT_JAR%" -Dpulse.home="%PULSE_HOME%" -Djava.awt.headless=true -Djava.util.logging.config.class=com.zutubi.pulse.logging.ConsoleConfig com.zutubi.pulse.command.PulseCtl %*
 
-if %ERRORLEVEL% equ 111 goto restart
+set CODE=%ERRORLEVEL%
+if %CODE% equ 111 goto restart
 
 :end
 
 @endlocal
 
+exit %CODE%
