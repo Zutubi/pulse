@@ -35,10 +35,6 @@
 
         <dependency org="jetty" name="org.mortbay.jetty" rev="5.1.6" conf="external,build,release->default"/>
 
-        <dependency org="jssh" name="jssh" rev="0.2.7" conf="external,build,release->default"/>
-
-        <dependency org="netbeans" name="javacvs" rev="11nov2005" conf="external,build,release->default"/>
-
         <dependency org="springframework" name="spring" rev="2.0-M5" conf="external,build,release->spring-beans,spring-context,spring-core"/>
 
         <dependency org="sun" name="servlet" rev="2.4" conf="external,build,release->default"/>
