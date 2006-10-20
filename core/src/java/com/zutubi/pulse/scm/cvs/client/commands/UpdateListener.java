@@ -12,10 +12,9 @@ import org.netbeans.lib.cvsclient.event.*;
 
 public class UpdateListener extends CVSAdapter
 {
-
     public UpdateListener()
     {
-        changes = new LinkedList();
+        changes = new LinkedList<Change>();
     }
 
     public void fileAdded(FileAddedEvent e)
@@ -33,10 +32,10 @@ public class UpdateListener extends CVSAdapter
         changes.add(new Change(e.getFilePath(), null, Change.Action.EDIT));
     }
 
-    public List getChanges()
+    public List<Change> getChanges()
     {
         return changes;
     }
 
-    private List changes;
+    private List<Change> changes;
 }

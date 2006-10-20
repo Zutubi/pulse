@@ -1,12 +1,8 @@
-// Decompiled by Jad v1.5.8f. Copyright 2001 Pavel Kouznetsov.
-// Jad home page: http://www.kpdus.com/jad.html
-// Decompiler options: packimports(3) 
-// Source File Name:   CvsClient.java
-
 package com.zutubi.pulse.scm.cvs.client;
 
 import com.opensymphony.util.TextUtils;
 import com.zutubi.pulse.core.model.CvsRevision;
+import com.zutubi.pulse.core.model.Change;
 import com.zutubi.pulse.scm.SCMException;
 import com.zutubi.pulse.scm.cvs.client.commands.LogListener;
 import com.zutubi.pulse.scm.cvs.client.commands.StatusListener;
@@ -23,6 +19,7 @@ import org.netbeans.lib.cvsclient.command.GlobalOptions;
 import org.netbeans.lib.cvsclient.command.checkout.CheckoutCommand;
 import org.netbeans.lib.cvsclient.command.log.RlogCommand;
 import org.netbeans.lib.cvsclient.command.status.StatusCommand;
+import org.netbeans.lib.cvsclient.command.status.StatusInformation;
 import org.netbeans.lib.cvsclient.command.tag.RtagCommand;
 import org.netbeans.lib.cvsclient.command.update.UpdateCommand;
 import org.netbeans.lib.cvsclient.connection.AuthenticationException;
@@ -35,11 +32,20 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.TimeZone;
 
-// Referenced classes of package com.zutubi.pulse.scm.cvs.client:
-//            ConnectionFactory
-
+/**
+ *
+ */
 public class CvsClient
 {
+    private static final SimpleDateFormat SERVER_DATE;
+    static
+    {
+        SERVER_DATE = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss z");
+        SERVER_DATE.setTimeZone(TimeZone.getTimeZone("GMT"));
+    }
+
+    private CVSRoot root;
+    private String password;
 
     public CvsClient()
     {
@@ -57,8 +63,7 @@ public class CvsClient
 
     public String version() throws SCMException
     {
-        VersionCommand version;
-        version = new VersionCommand();
+        VersionCommand version = new VersionCommand();
 
         if (!executeCommand(version, null, null))
         {
@@ -67,11 +72,9 @@ public class CvsClient
         return version.getVersion();
     }
 
-    public List update(File workingDirectory, CvsRevision revision)
-            throws SCMException
+    public List<Change> update(File workingDirectory, CvsRevision revision) throws SCMException
     {
-        UpdateCommand update;
-        update = new UpdateCommand();
+        UpdateCommand update = new UpdateCommand();
         update.setPruneDirectories(true);
         update.setBuildDirectories(true);
         update.setResetStickyOnes(true);
@@ -86,8 +89,8 @@ public class CvsClient
                 update.setUpdateByDate(SERVER_DATE.format(revision.getDate()));
             }
         }
-        UpdateListener listener;
-        listener = new UpdateListener();
+
+        UpdateListener listener = new UpdateListener();
         if (!executeCommand(update, workingDirectory, listener))
         {
             throw new SCMException("Failed to update.");
@@ -95,19 +98,17 @@ public class CvsClient
         return listener.getChanges();
     }
 
-    public List checkout(File workdir, String module, CvsRevision revision)
-            throws SCMException
+    public List checkout(File workdir, String module, CvsRevision revision) throws SCMException
     {
         return checkout(workdir, module, revision, true);
     }
 
-    public List checkout(File workdir, String module, CvsRevision revision, boolean recursive)
-            throws SCMException
+    public List<Change> checkout(File workdir, String module, CvsRevision revision, boolean recursive) throws SCMException
     {
-        CheckoutCommand checkout;
-        checkout = new CheckoutCommand();
+        CheckoutCommand checkout = new CheckoutCommand();
         checkout.setModule(module);
         checkout.setRecursive(recursive);
+
         if (TextUtils.stringSet(revision.getBranch()))
         {
             checkout.setCheckoutByRevision(revision.getBranch());
@@ -116,8 +117,8 @@ public class CvsClient
         {
             checkout.setCheckoutByDate(SERVER_DATE.format(revision.getDate()));
         }
-        UpdateListener listener;
-        listener = new UpdateListener();
+
+        UpdateListener listener = new UpdateListener();
         if (!executeCommand(checkout, workdir, listener))
         {
             throw new SCMException("Failed to checkout.");
@@ -125,13 +126,19 @@ public class CvsClient
         return listener.getChanges();
     }
 
-    public void tag(String module, CvsRevision revision, String name, boolean moveExisting)
-            throws SCMException
+    public void tag(String module, CvsRevision revision, String name) throws SCMException
+    {
+        tag(module, revision, name, false);
+    }
+    
+    public void tag(String module, CvsRevision revision, String name, boolean moveExisting) throws SCMException
     {
         RtagCommand tag = new RtagCommand();
-        tag.setModules(new String[]{
-                module
-        });
+        tag.setModules(new String[]{module});
+        tag.setTag(name);
+        tag.setOverrideExistingTag(moveExisting);
+        tag.setRecursive(true);
+
         if (TextUtils.stringSet(revision.getBranch()))
         {
             tag.setTagByRevision(revision.getBranch());
@@ -140,34 +147,29 @@ public class CvsClient
         {
             tag.setTagByDate(SERVER_DATE.format(revision.getDate()));
         }
-        tag.setTag(name);
-        tag.setOverrideExistingTag(moveExisting);
-        tag.setRecursive(true);
+
         if (!executeCommand(tag, null, null))
         {
             throw new SCMException("Failed to tag.");
         }
     }
 
-    public void deleteTag(String module, String name)
-            throws SCMException
+    public void deleteTag(String module, String name) throws SCMException
     {
         RtagCommand tag = new RtagCommand();
-        tag.setModules(new String[]{
-                module
-        });
+        tag.setModules(new String[]{module});
         tag.setTag(name);
         tag.setDeleteTag(true);
         tag.setRecursive(true);
         tag.setClearFromRemoved(true);
+
         if (!executeCommand(tag, null, null))
         {
             throw new SCMException("Failed to delete tag.");
         }
     }
 
-    public List rlog(String module, CvsRevision from, CvsRevision to)
-            throws SCMException
+    public List rlog(String module, CvsRevision from, CvsRevision to) throws SCMException
     {
         return rlog(module, from, to, false);
     }
@@ -175,8 +177,7 @@ public class CvsClient
     public List rlog(String module, CvsRevision from, CvsRevision to, boolean verbose)
             throws SCMException
     {
-        RlogCommand rlog;
-        rlog = new RlogCommand();
+        RlogCommand rlog = new RlogCommand();
         rlog.setModule(module);
         rlog.setSuppressHeader(!verbose);
 
@@ -212,14 +213,12 @@ public class CvsClient
         return response;
     }
 
-    public List status(File workingCopy) throws SCMException
+    public List<StatusInformation> status(File workingCopy) throws SCMException
     {
-        StatusCommand status;
-        StatusListener listener;
-        status = new StatusCommand();
+        StatusCommand status = new StatusCommand();
         status.setRecursive(true);
         status.setFiles(new File[]{workingCopy});
-        listener = new StatusListener();
+        StatusListener listener = new StatusListener();
         if (!executeCommand(status, workingCopy, listener))
         {
             throw new SCMException("Failed to run status command.");
@@ -227,8 +226,7 @@ public class CvsClient
         return listener.getInfo();
     }
 
-    public void testConnection()
-            throws SCMException
+    public void testConnection() throws SCMException
     {
         Connection connection = null;
         try
@@ -316,13 +314,4 @@ public class CvsClient
         return connection;
     }
 
-    private static final SimpleDateFormat SERVER_DATE;
-    private CVSRoot root;
-    private String password;
-
-    static
-    {
-        SERVER_DATE = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss z");
-        SERVER_DATE.setTimeZone(TimeZone.getTimeZone("GMT"));
-    }
 }

@@ -3,6 +3,7 @@ package com.zutubi.pulse.scm;
 import com.zutubi.pulse.config.Config;
 import com.zutubi.pulse.scm.p4.P4WorkingCopy;
 import com.zutubi.pulse.scm.svn.SvnWorkingCopy;
+import com.zutubi.pulse.scm.cvs.CvsWorkingCopy;
 
 import java.io.File;
 import java.lang.reflect.Constructor;
@@ -21,6 +22,7 @@ public class WorkingCopyFactory
         {
             registerType(SCMConfiguration.TYPE_SUBVERSION, SvnWorkingCopy.class);
             registerType(SCMConfiguration.TYPE_PERFORCE, P4WorkingCopy.class);
+            registerType(SCMConfiguration.TYPE_CVS, CvsWorkingCopy.class);
         }
         catch (NoSuchMethodException e)
         {

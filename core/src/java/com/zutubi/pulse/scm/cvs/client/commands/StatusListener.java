@@ -8,10 +8,9 @@ import org.netbeans.lib.cvsclient.event.FileInfoEvent;
 
 public class StatusListener extends CVSAdapter
 {
-
     public StatusListener()
     {
-        info = new LinkedList();
+        info = new LinkedList<StatusInformation>();
     }
 
     public void fileInfoGenerated(FileInfoEvent e)
@@ -19,10 +18,10 @@ public class StatusListener extends CVSAdapter
         info.add((StatusInformation)e.getInfoContainer());
     }
 
-    public List getInfo()
+    public List<StatusInformation> getInfo()
     {
         return info;
     }
 
-    private List info;
+    private List<StatusInformation> info;
 }
