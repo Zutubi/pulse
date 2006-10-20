@@ -15,8 +15,8 @@ public class HelpCommand implements Command
         // With no args, or when help is invoked due to an unrecognised
         // command, show top level help.  With args, use arg name as
         // command to show help for.
-        String[] argv = context.getCommandArgv();
-        if(argv.length == 0 || !argv[0].equals("help"))
+        String[] argv = context.getArgv();
+        if(argv.length <= 1)
         {
             showHelp(context.getCommands());
         }
@@ -35,15 +35,15 @@ public class HelpCommand implements Command
                 }
             }
 
-            Command command = aliasCommands.get(argv[0]);
+            Command command = aliasCommands.get(argv[1]);
             if(command == null || command.getHelp() == null)
             {
-                System.err.println("Unrecognised command '" + argv[0] + "'");
+                System.err.println("Unrecognised command '" + argv[1] + "'");
                 return 1;
             }
             else
             {
-                showHelp(argv[0], command);
+                showHelp(argv[1], command);
             }
         }
 

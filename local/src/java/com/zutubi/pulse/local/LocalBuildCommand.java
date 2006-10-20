@@ -45,9 +45,9 @@ public class LocalBuildCommand implements Command
     public Map<String, String> getOptions()
     {
         Map<String, String> options = new LinkedHashMap<String, String>();
-        options.put("-r [--recipe] recipe", "execute specified recipe [default: the default recipe]");
-        options.put("-p [--pulse-file] file", "use specified pulse file [default: pulse.xml]");
-        options.put("-o [--output-dir] dir", "write output to specified directory [default: pulse.out]");
+        options.put("-r [--recipe] recipe",       "set recipe to execute [default: the default recipe]");
+        options.put("-p [--pulse-file] file",     "use specified pulse file [default: pulse.xml]");
+        options.put("-o [--output-dir] dir",      "write output to directory [default: pulse.out]");
         options.put("-e [--resources-file] file", "use specified resources file [default: <none>]");
         return options;
     }
