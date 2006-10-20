@@ -80,7 +80,7 @@
 
     <target name="package.local" depends="init, clean, build.local">
 
-        <property name="package.name.local" value="pulse-local-${pulse.version}"/>
+        <property name="package.name.local" value="pulse-dev-${pulse.version}"/>
         <property name="package.root.local" value="build/package/${package.name.local}"/>
         <property name="version.root.local" value="${package.root.local}/versions/${pulse.build}"/>
 
@@ -134,6 +134,26 @@
                 <exclude name="${package.name.local}/bin/*"/>
             </tarfileset>
         </tar>
+
+        <antcall target="nsis.local"/>
+    </target>
+
+    <target name="nsis.local" if="on.windows">
+        <property name="package.name.local" value="pulse-dev-${pulse.version}"/>
+        <property name="package.root.local" value="build/package/${package.name.local}"/>
+
+        <copy file="installer/env.nsh" todir="${package.root.local}"/>
+        <copy file="installer/pulse.ico" todir="${package.root.local}"/>
+        <copy file="installer/dev.nsi.in" tofile="${package.root.local}/dev.nsi"/>
+
+        <replace file="${package.root.local}/dev.nsi">
+            <replacefilter token="__PACKAGE_NAME__" value="${package.name.local}"/>
+            <replacefilter token="__VERSION__" value="${pulse.version}"/>
+        </replace>
+
+        <exec executable="makensis" dir="${package.root.local}">
+            <arg line="dev.nsi"/>
+        </exec>
     </target>
 
     <target name="package.slave" depends="init, clean, build.local, build.slave">
@@ -341,7 +361,7 @@
         <copy todir="${version.root.master}/system/packages">
             <fileset dir="build">
                 <include name="pulse-agent-*"/>
-                <include name="pulse-local-*"/>
+                <include name="pulse-dev-*"/>
             </fileset>
         </copy>
 
