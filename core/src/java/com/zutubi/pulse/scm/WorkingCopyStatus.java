@@ -78,4 +78,17 @@ public class WorkingCopyStatus implements Iterable<FileStatus>
         }
         return changes;
     }
+
+    public FileStatus getFileStatus(String path)
+    {
+        for(FileStatus fs: changes)
+        {
+            if(fs.getPath().equals(path))
+            {
+                return fs;
+            }
+        }
+
+        return null;
+    }
 }

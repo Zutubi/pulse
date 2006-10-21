@@ -6,6 +6,7 @@ import com.zutubi.pulse.util.logging.Logger;
 import java.io.*;
 import java.net.URLConnection;
 import java.util.Arrays;
+import java.util.zip.CRC32;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 import java.util.zip.ZipOutputStream;
@@ -119,9 +120,8 @@ public class FileSystemUtils
      * Create a temporary directory using pre-defined prefix and suffix values.  Use this when you really don't
      * care what the directory is called.
      *
-     * @return
-     *
-     * @throws IOException
+     * @return a File object for the created directory
+     * @throws IOException if the directory cannot be created
      */
     public static File createTempDirectory() throws IOException
     {
@@ -181,20 +181,14 @@ public class FileSystemUtils
 
     public static boolean isSymlink(File file) throws IOException
     {
-        if (SystemUtils.isWindows())
-        {
-            return false;
-        }
-
-        return !file.getCanonicalPath().equals(file.getAbsolutePath());
+        return !SystemUtils.isWindows() && !file.getCanonicalPath().equals(file.getAbsolutePath());
     }
 
     /**
      * On supported systems, returns the permissions of the given file
      * encoded as a single integer.  The encoding depends on the platform:
      * <p/>
-     * - Un*x: the least significant four digits of the integer hold four
-     * octal digits giving permissions as used by chmod/stat
+     * - Un*x: the same mode format used by chmod/stat.
      * <p/>
      * On unsupported platforms, this call always returns 0.
      *
@@ -215,7 +209,7 @@ public class FileSystemUtils
         {
             try
             {
-                process = Runtime.getRuntime().exec("stat -c %a " + file.getAbsolutePath());
+                process = Runtime.getRuntime().exec(new String[] { "stat",  "-c",  "%a", file.getAbsolutePath()});
             }
             catch (IOException e)
             {
@@ -231,7 +225,7 @@ public class FileSystemUtils
 
             if (exitCode == 0)
             {
-                result = Integer.parseInt(stdoutWriter.getBuffer().toString().trim());
+                result = Integer.parseInt(stdoutWriter.getBuffer().toString().trim(), 8);
             }
             else
             {
@@ -268,11 +262,11 @@ public class FileSystemUtils
             return;
         }
 
-        Process process = null;
+        Process process;
 
         try
         {
-            process = Runtime.getRuntime().exec("chmod " + permissions + " " + file.getAbsolutePath());
+            process = Runtime.getRuntime().exec(new String[] { "chmod",  Integer.toString(permissions, 8), file.getAbsolutePath()});
         }
         catch (IOException e)
         {
@@ -299,6 +293,25 @@ public class FileSystemUtils
                 process.destroy();
             }
         }
+    }
+
+    public static boolean setExecutable(File file)
+    {
+        if(!SystemUtils.isWindows())
+        {
+            try
+            {
+                Process p = Runtime.getRuntime().exec(new String[] { "chmod", "+x", file.getAbsolutePath()});
+                int exitCode = p.waitFor();
+                return exitCode == 0;
+            }
+            catch (Exception e)
+            {
+                // Oh well, we tried
+            }
+        }
+
+        return false;
     }
 
     public static void createZip(File zipFile, File base, File source) throws IOException
@@ -387,6 +400,101 @@ public class FileSystemUtils
         }
     }
 
+    public static byte[] getZipModeBlock(int mode)
+    {
+        // extra field: (Variable)
+        //
+        //     ...
+        //     files, the following structure should be used for all
+        //     programs storing data in this field:
+        //
+        //     header1+data1 + header2+data2 . . .
+        //
+        //     Each header should consist of:
+        //
+        //       Header ID - 2 bytes
+        //       Data Size - 2 bytes
+        //
+        //     Note: all fields stored in Intel low-byte/high-byte order.
+        //
+        //     The Header ID field indicates the type of data that is in
+        //     the following data block.
+        // ...
+        //
+        // The Data Size field indicates the size of the following
+        // data block. Programs can use this value to skip to the
+        // next header block, passing over any data blocks that are
+        // not of interest.
+
+        // Value         Size            Description
+        // -----         ----            -----------
+        // (Unix3) 0x756e        Short           tag for this extra block type
+        //         TSize         Short           total data size for this block
+        //         CRC           Long            CRC-32 of the remaining data
+        //         Mode          Short           file permissions
+        //         SizDev        Long            symlink'd size OR major/minor dev num
+        //         UID           Short           user ID
+        //         GID           Short           group ID
+        //         (var.)        variable        symbolic link filename
+        byte[] data = new byte[18];
+
+        encodeZipShort(0x756E, data, 0);
+        encodeZipShort(14, data, 2);
+
+        // CRC fills this gap later
+
+        encodeZipShort(mode, data, 8);
+        Arrays.fill(data, 10, 18, (byte) 0);
+
+        CRC32 crc = new CRC32();
+        crc.update(data, 8, 10);
+        long checksum = crc.getValue();
+
+        encodeZipLong(checksum, data, 4);
+        return data;
+    }
+
+    public static void encodeZipShort(int value, byte[] block, int offset)
+    {
+        block[offset] = (byte) (value & 0xFF);
+        block[offset + 1] = (byte) ((value & 0xFF00) >> 8);
+    }
+
+    public static int decodeZipShort(byte[] block, int offset)
+    {
+        int value = (block[offset + 1] << 8) & 0xFF00;
+        value += (block[offset] & 0xFF);
+        return value;
+    }
+
+    public static void encodeZipLong(long value, byte[] block, int offset)
+    {
+        block[offset] = (byte) ((value & 0xFF));
+        block[offset + 1] = (byte) ((value & 0xFF00) >> 8);
+        block[offset + 2] = (byte) ((value & 0xFF0000) >> 16);
+        block[offset + 3] = (byte) ((value & 0xFF000000L) >> 24);
+    }
+
+    public static long decodeZipLong(byte[] block, int offset)
+    {
+        long value = (block[offset + 3] << 24) & 0xFF000000L;
+        value += (block[offset + 2] << 16) & 0xFF0000;
+        value += (block[offset + 1] << 8) & 0xFF00;
+        value += (block[offset] & 0xFF);
+        return value;
+    }
+
+    public static int getModeFromZipBlock(byte[] block)
+    {
+        // Currently assumes the block was made by us.
+        if (block.length == 18)
+        {
+            return decodeZipShort(block, 8);
+        }
+
+        return 0;
+    }
+
     public static void extractZip(File zipFile, File dir) throws IOException
     {
         ZipInputStream zin = null;
@@ -439,8 +547,8 @@ public class FileSystemUtils
         try
         {
             out = new FileOutputStream(file);
-            byte [] b = new byte[512];
-            int len = 0;
+            byte[] b = new byte[512];
+            int len;
             while ((len = zin.read(b)) != -1)
             {
                 out.write(b, 0, len);
@@ -453,8 +561,8 @@ public class FileSystemUtils
     }
 
     /**
-     * @param src
-     * @param dest
+     * @param src  source file
+     * @param dest detination file
      * @param force delete the destination directory if it already exists before renaming.
      * @return true if the rename was successful, false otherwise.
      */
@@ -528,7 +636,7 @@ public class FileSystemUtils
         return false;
     }
 
-    public static File composeFile(String ...parts)
+    public static File composeFile(String... parts)
     {
         String result = composeFilename(parts);
         return new File(result);
@@ -556,7 +664,7 @@ public class FileSystemUtils
 
     public static String normaliseSeparators(String path)
     {
-        if(File.separatorChar != '/')
+        if (File.separatorChar != '/')
         {
             path = path.replace(File.separatorChar, '/');
         }
@@ -566,7 +674,7 @@ public class FileSystemUtils
 
     public static String denormaliseSeparators(String path)
     {
-        if(File.separatorChar != '/')
+        if (File.separatorChar != '/')
         {
             path = path.replace('/', File.separatorChar);
         }
@@ -583,7 +691,7 @@ public class FileSystemUtils
      */
     public static String localiseSeparators(String path)
     {
-        if(File.separatorChar == '/')
+        if (File.separatorChar == '/')
         {
             return path.replace('\\', '/');
         }
@@ -595,26 +703,26 @@ public class FileSystemUtils
 
     public static void copyRecursively(File from, File to) throws IOException
     {
-        if(!SystemUtils.isWindows() && SystemUtils.findInPath("cp") != null)
+        if (!SystemUtils.isWindows() && SystemUtils.findInPath("cp") != null)
         {
             // Use the Unix cp command because it:
             //   - preserves permissions; and
             //   - is likely to be faster when it matters (i.e. large copy)
             String flags = "-p";
-            if(from.isDirectory())
+            if (from.isDirectory())
             {
-                if(to.exists())
+                if (to.exists())
                 {
-                    if(to.isDirectory())
+                    if (to.isDirectory())
                     {
-                        if(!removeDirectory(to))
+                        if (!removeDirectory(to))
                         {
                             throw new IOException("Cannot remove existing directory '" + to.getAbsolutePath() + "'");
                         }
                     }
                     else
                     {
-                        if(!to.delete())
+                        if (!to.delete())
                         {
                             throw new IOException("Cannot remove existing file '" + to.getAbsolutePath() + "'");
                         }
@@ -628,7 +736,7 @@ public class FileSystemUtils
             try
             {
                 int exit = child.waitFor();
-                if(exit != 0)
+                if (exit != 0)
                 {
                     // Attempt to copy ourselves.
                     LOG.info("Copy using cp from '" + from.getAbsolutePath() + "' to '" + to.getAbsolutePath() + "' failed, trying internal copy");
@@ -652,11 +760,11 @@ public class FileSystemUtils
     // WARNING: will not handle recursive symlinks
     private static void internalCopy(File from, File to) throws IOException
     {
-        if(from.isDirectory())
+        if (from.isDirectory())
         {
             ensureDirectory(to);
 
-            for(String file: from.list())
+            for (String file : from.list())
             {
                 internalCopy(new File(from, file), new File(to, file));
             }
@@ -669,7 +777,7 @@ public class FileSystemUtils
 
     private static void ensureDirectory(File to) throws IOException
     {
-        if(!to.isDirectory() && !to.mkdirs())
+        if (!to.isDirectory() && !to.mkdirs())
         {
             throw new IOException("Unable to create destination directory '" + to.getAbsolutePath() + "'");
         }
@@ -677,7 +785,9 @@ public class FileSystemUtils
 
     /**
      * This method returns true if the specified file is the root of a file system.
-     * @param f
+     *
+     * @param f file to test
+     * @return true iff the given file is a root
      */
     public static boolean isRoot(File f)
     {
@@ -692,7 +802,7 @@ public class FileSystemUtils
      */
     public static boolean isDirectory(String path)
     {
-        if(TextUtils.stringSet(path))
+        if (TextUtils.stringSet(path))
         {
             File f = new File(path);
             return f.isDirectory();
@@ -709,7 +819,7 @@ public class FileSystemUtils
      */
     public static boolean isFile(String path)
     {
-        if(TextUtils.stringSet(path))
+        if (TextUtils.stringSet(path))
         {
             File f = new File(path);
             return f.isFile();
@@ -750,7 +860,7 @@ public class FileSystemUtils
      */
     public static boolean filesMatch(File f1, File f2) throws IOException
     {
-        if(f1.length() != f2.length())
+        if (f1.length() != f2.length())
         {
             return false;
         }
@@ -768,12 +878,12 @@ public class FileSystemUtils
 
             while ((n = in2.read(b2)) > 0)
             {
-                if(in1.read(b1) != n)
+                if (in1.read(b1) != n)
                 {
                     return false;
                 }
 
-                if(!Arrays.equals(b2, b1))
+                if (!Arrays.equals(b2, b1))
                 {
                     return false;
                 }

@@ -60,6 +60,7 @@ public class PatchArchive
      * Creates a patch from an existing archive file.
      *
      * @param patchFile the file to create the patch from
+     * @throws com.zutubi.pulse.core.PulseException on error
      */
     public PatchArchive(File patchFile) throws PulseException
     {
@@ -220,7 +221,14 @@ public class PatchArchive
 
     private void extractEntry(File base, ZipEntry entry, ZipInputStream zin) throws IOException
     {
-        File f = new File(base, getPath(entry));
+        String path = getPath(entry);
+        FileStatus fs = status.getFileStatus(path);
+        if(fs == null)
+        {
+            throw new IOException("Zip entry without status '" + path + "'");
+        }
+
+        File f = new File(base, path);
         if(entry.isDirectory())
         {
             f.mkdirs();
@@ -228,7 +236,7 @@ public class PatchArchive
         else
         {
             File parent = f.getParentFile();
-            if(!parent.isDirectory())
+            if(parent != null && !parent.isDirectory())
             {
                 parent.mkdirs();
             }
@@ -263,7 +271,7 @@ public class PatchArchive
     {
         for(FileStatus fs: status)
         {
-            if(fs.getPath().equals(path) && fs.getState().requiresFile() == true)
+            if(fs.getPath().equals(path) && fs.getState().requiresFile())
             {
                 return true;
             }
