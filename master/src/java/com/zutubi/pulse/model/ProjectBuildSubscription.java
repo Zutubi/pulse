@@ -98,7 +98,7 @@ public class ProjectBuildSubscription extends Subscription
 
     public boolean conditionSatisfied(BuildResult result)
     {
-        return getNotifyCondition().satisfied(result, getContactPoint().getUser());
+        return !result.isPersonal() && getNotifyCondition().satisfied(result, getContactPoint().getUser());
     }
 
     public NotifyCondition getNotifyCondition()
