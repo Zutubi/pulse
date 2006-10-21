@@ -26,6 +26,11 @@ public class PulseXmlRpcClient
         client = new XmlRpcClient(url);
     }
 
+    public int getVersion()
+    {
+        return (Integer) execute("RemoteApi.getVersion");
+    }
+
     public String login(String username, String password)
     {
         return (String) execute("RemoteApi.login", username, password);
@@ -57,7 +62,7 @@ public class PulseXmlRpcClient
         {
             buildSpecification = "";
         }
-        
+
         Hashtable<String, String> result = (Hashtable<String, String>) execute("RemoteApi.preparePersonalBuild", token, projectName, buildSpecification);
 
         SCMConfiguration config = new SCMConfiguration(result.get(SCMConfiguration.PROPERTY_TYPE));
@@ -87,7 +92,7 @@ public class PulseXmlRpcClient
         }
         catch (Exception e)
         {
-            throw new PulseXmlRpcException(e);
+            throw new PulseXmlRpcException(e.getMessage(), e);
         }
     }
 }

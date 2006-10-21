@@ -1,5 +1,6 @@
 package com.zutubi.pulse.scm.p4;
 
+import com.zutubi.pulse.config.PropertiesConfig;
 import com.zutubi.pulse.personal.PersonalBuildUI;
 import com.zutubi.pulse.scm.FileStatus;
 import com.zutubi.pulse.scm.SCMException;
@@ -55,7 +56,7 @@ public class P4WorkingCopyTest extends PulseTestCase implements PersonalBuildUI
 
         createClients();
 
-        wc = new P4WorkingCopy(null, null);
+        wc = new P4WorkingCopy(null, new PropertiesConfig());
         wc.setUI(this);
         wc.getClient().setEnv(ENV_CLIENT, CLIENT_NAME);
         wc.getClient().setEnv(ENV_PORT, ":1666");

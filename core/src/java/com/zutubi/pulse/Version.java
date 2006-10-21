@@ -3,10 +3,10 @@ package com.zutubi.pulse;
 import com.zutubi.pulse.util.IOUtils;
 
 import java.io.*;
-import java.util.Properties;
-import java.util.Date;
-import java.text.SimpleDateFormat;
 import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Properties;
 
 /**
  * This class provides a java interface to the contents of the version.properties
@@ -250,5 +250,17 @@ public class Version implements Comparable
         Integer j = otherVersion.getBuildNumberAsInt();
 
         return i.compareTo(j);
+    }
+
+    public static String buildNumberToVersion(int version)
+    {
+        // Digits are: major major minor minor build build build patch patch patch
+        version = version / 1000;
+        int build = version % 1000;
+        version = version / 1000;
+        int minor = version % 100;
+        int major = version / 100;
+
+        return String.format("%d.%d.%d", major, minor, build);
     }
 }

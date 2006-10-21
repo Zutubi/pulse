@@ -62,8 +62,16 @@ public class ConfigSupport implements Config
     {
         if (hasProperty(key))
         {
-            return Integer.valueOf(getProperty(key));
+            try
+            {
+                return Integer.valueOf(getProperty(key));
+            }
+            catch (NumberFormatException e)
+            {
+                // Fall through to default
+            }
         }
+        
         return defaultValue;
     }
 
@@ -92,7 +100,14 @@ public class ConfigSupport implements Config
     {
         if (hasProperty(key))
         {
-            return Long.valueOf(getProperty(key));
+            try
+            {
+                return Long.valueOf(getProperty(key));
+            }
+            catch (NumberFormatException e)
+            {
+                // Fall through to default
+            }
         }
         return defaultValue;
     }

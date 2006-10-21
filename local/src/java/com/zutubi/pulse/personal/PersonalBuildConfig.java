@@ -19,6 +19,7 @@ public class PersonalBuildConfig implements Config
 
     public static final String PROPERTY_CHECK_REPOSITORY = "check.repository";
     public static final String PROPERTY_CONFIRM_UPDATE = "confirm.update";
+    public static final String PROPERTY_CONFIRMED_VERSION = "confirmed.version";
 
     private File base;
     private ConfigSupport config;
@@ -131,6 +132,16 @@ public class PersonalBuildConfig implements Config
         return setBooleanProperty(PROPERTY_CONFIRM_UPDATE, confirm);
     }
 
+    public int getConfirmedVersion()
+    {
+        return config.getInteger(PROPERTY_CONFIRMED_VERSION, 0);
+    }
+
+    public boolean setConfirmedVersion(int version)
+    {
+        return setIntegerProperty(PROPERTY_CONFIRMED_VERSION, version);
+    }
+
     private boolean setBooleanProperty(String property, boolean value)
     {
         if(userConfig == null)
@@ -140,6 +151,19 @@ public class PersonalBuildConfig implements Config
         else
         {
             userConfig.setBooleanProperty(property, value);
+            return true;
+        }
+    }
+
+    private boolean setIntegerProperty(String property, int value)
+    {
+        if(userConfig == null)
+        {
+            return false;
+        }
+        else
+        {
+            userConfig.setInteger(property, value);
             return true;
         }
     }

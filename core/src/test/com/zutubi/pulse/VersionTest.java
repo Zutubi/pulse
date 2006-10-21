@@ -53,4 +53,14 @@ public class VersionTest extends PulseTestCase
         assertEquals(v.getBuildDate(), v2.getBuildDate());
         assertEquals(v.getReleaseDate(), v2.getReleaseDate());
     }
+
+    public void testbuildNumberToVersion()
+    {
+        assertEquals("1.2.11", Version.buildNumberToVersion(102011000));
+    }
+
+    public void testbuildNumberToVersionPatch()
+    {
+        assertEquals("1.2.101", Version.buildNumberToVersion(102101333));
+    }
 }

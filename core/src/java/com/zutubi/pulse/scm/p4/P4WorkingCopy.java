@@ -1,8 +1,10 @@
 package com.zutubi.pulse.scm.p4;
 
 import com.zutubi.pulse.config.Config;
+import com.zutubi.pulse.config.ConfigSupport;
 import com.zutubi.pulse.core.model.NumericalRevision;
 import com.zutubi.pulse.personal.PersonalBuildSupport;
+import com.zutubi.pulse.personal.PersonalBuildUI;
 import com.zutubi.pulse.scm.SCMException;
 import com.zutubi.pulse.scm.WorkingCopy;
 import com.zutubi.pulse.scm.WorkingCopyStatus;
@@ -15,11 +17,15 @@ import java.util.Properties;
  */
 public class P4WorkingCopy extends PersonalBuildSupport implements WorkingCopy
 {
+    public static final String PROPERTY_CONFIRM_RESOLVE = "p4.confirm.resolve";
+
     private P4Client client;
+    private ConfigSupport configSupport;
 
     public P4WorkingCopy(File base, Config config)
     {
         this.client = new P4Client();
+        configSupport = new ConfigSupport(config);
     }
 
     public boolean matchesRepository(Properties repositoryDetails) throws SCMException
@@ -89,10 +95,29 @@ public class P4WorkingCopy extends PersonalBuildSupport implements WorkingCopy
 
     public void update() throws SCMException
     {
-        client.runP4(false, null, P4_COMMAND, COMMAND_SYNC);
-        // Post sync files my be unresolved.  Use CVS/Subversion style
-        // automatic merging to try and resolve such files.
-        client.runP4(false, null, P4_COMMAND, COMMAND_RESOLVE, FLAG_AUTO_MERGE);
+        P4SyncHandler syncHandler = new P4SyncHandler(getUi());
+        client.runP4WithHandler(syncHandler, null, P4_COMMAND, COMMAND_SYNC);
+
+        if(syncHandler.isResolveRequired())
+        {
+            if(configSupport.getBooleanProperty(PROPERTY_CONFIRM_RESOLVE, true))
+            {
+                PersonalBuildUI.Response response = ynaPrompt("Some files must be resolved.  Auto-resolve now?", PersonalBuildUI.Response.YES);
+                if(response.isPersistent())
+                {
+                    configSupport.setBooleanProperty(PROPERTY_CONFIRM_RESOLVE, !response.isAffirmative());
+                }
+
+                if(!response.isAffirmative())
+                {
+                    return;
+                }
+            }
+
+            status("Running auto-resolve...");
+            client.runP4WithHandler(new P4ProgressPrintingHandler(getUi(), false), null, P4_COMMAND, COMMAND_RESOLVE, FLAG_AUTO_MERGE);
+            status("Resolve complete.");
+        }
     }
 
     P4Client getClient()

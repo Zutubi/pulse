@@ -4,6 +4,7 @@ import com.zutubi.pulse.Version;
 import com.zutubi.pulse.scm.*;
 import com.zutubi.pulse.util.IOUtils;
 import com.zutubi.pulse.xmlrpc.PulseXmlRpcClient;
+import com.zutubi.pulse.xmlrpc.PulseXmlRpcException;
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.HttpStatus;
 import org.apache.commons.httpclient.UsernamePasswordCredentials;
@@ -33,12 +34,15 @@ public class PersonalBuildClient extends PersonalBuildSupport
 
     public WorkingCopy checkConfiguration() throws PersonalBuildException
     {
-        status("Verifying configuration with pulse server...");
+        debug("Verifying configuration with pulse server...");
         checkRequiredConfig();
 
         try
         {
             PulseXmlRpcClient rpc = new PulseXmlRpcClient(config.getPulseUrl());
+
+            checkVersion(rpc);
+
             String token = null;
 
             try
@@ -47,10 +51,10 @@ public class PersonalBuildClient extends PersonalBuildSupport
                 token = rpc.login(config.getPulseUser(), config.getPulsePassword());
                 debug("Login successful.");
                 WorkingCopy wc = prepare(rpc, token);
-                status("Verified: personal build for project: " + config.getProject() + ", specification: " + config.getSpecification() + ".");
+                debug("Verified: personal build for project: " + config.getProject() + ", specification: " + config.getSpecification() + ".");
                 return wc;
             }
-            catch(PersonalBuildException e)
+            catch (PersonalBuildException e)
             {
                 throw e;
             }
@@ -69,9 +73,47 @@ public class PersonalBuildClient extends PersonalBuildSupport
         }
     }
 
+    private void checkVersion(PulseXmlRpcClient rpc) throws PersonalBuildException
+    {
+        int ourBuild = Version.getVersion().getBuildNumberAsInt();
+        int confirmedBuild = config.getConfirmedVersion();
+
+        debug("Checking pulse serrver version...");
+        try
+        {
+            int serverBuild = rpc.getVersion();
+            if (serverBuild != ourBuild)
+            {
+                debug("Server build (%d) does not match local build (%d)", serverBuild, ourBuild);
+                if(serverBuild != confirmedBuild)
+                {
+                    PersonalBuildUI.Response response = ynaPrompt(String.format("Server version (%s) does not match tools version (%s).  Continue anyway?",
+                                                                                Version.buildNumberToVersion(serverBuild),
+                                                                                Version.buildNumberToVersion(ourBuild)),
+                                                                  PersonalBuildUI.Response.NO);
+
+                    if(response == PersonalBuildUI.Response.ALWAYS)
+                    {
+                        config.setConfirmedVersion(serverBuild);
+                    }
+                    else if(!response.isAffirmative())
+                    {
+                        throw new UserAbortException();
+                    }
+                }
+            }
+
+            debug("Version accepted.");
+        }
+        catch (PulseXmlRpcException e)
+        {
+            throw new PersonalBuildException("Unable to get pulse server version: " + e.getMessage(), e);
+        }
+    }
+
     private void checkRequiredConfig() throws PersonalBuildException
     {
-        if(config.getProject() == null)
+        if (config.getProject() == null)
         {
             throw new PersonalBuildException("Required property 'project' not specified.");
         }
@@ -88,24 +130,24 @@ public class PersonalBuildClient extends PersonalBuildSupport
             debug("SCM type: " + scmType);
 
             WorkingCopy wc = WorkingCopyFactory.create(scmType, config.getBase(), config);
-            if(wc == null)
+            if (wc == null)
             {
                 throw new PersonalBuildException("Personal builds are not supported for this SCM (" + scmType + ")");
             }
 
             wc.setUI(getUi());
-            if(config.getCheckRepository())
+            if (config.getCheckRepository())
             {
                 debug("Checking working copy matches project SCM configuration");
-                if(!wc.matchesRepository(scmConfiguration.getRepositoryDetails()))
+                if (!wc.matchesRepository(scmConfiguration.getRepositoryDetails()))
                 {
                     PersonalBuildUI.Response response = ynaPrompt("This working copy may not match project '" + config.getProject() + "'.  Continue anyway?", PersonalBuildUI.Response.NO);
-                    if(response.isPersistent())
+                    if (response.isPersistent())
                     {
                         config.setCheckRepository(!response.isAffirmative());
                     }
 
-                    if(!response.isAffirmative())
+                    if (!response.isAffirmative())
                     {
                         throw new UserAbortException();
                     }
@@ -118,11 +160,11 @@ public class PersonalBuildClient extends PersonalBuildSupport
 
             return wc;
         }
-        catch(PersonalBuildException e)
+        catch (PersonalBuildException e)
         {
             throw e;
         }
-        catch(Exception e)
+        catch (Exception e)
         {
             throw new PersonalBuildException("Unable to prepare personal build: " + e.getMessage(), e);
         }
@@ -134,19 +176,19 @@ public class PersonalBuildClient extends PersonalBuildSupport
         WorkingCopyStatus status = getStatus(wc);
         status("Status retrieved.");
 
-        while(status.isOutOfDate())
+        while (status.isOutOfDate())
         {
             debug("Working copy is out of date.");
-            if(config.getConfirmUpdate())
+            if (config.getConfirmUpdate())
             {
                 // Ask user if we should update.
                 PersonalBuildUI.Response response = ynaPrompt("Working copy must be updated to continue.  Update and continue?", PersonalBuildUI.Response.NO);
-                if(response.isPersistent())
+                if (response.isPersistent())
                 {
                     config.setConfirmUpdate(!response.isAffirmative());
                 }
 
-                if(!response.isAffirmative())
+                if (!response.isAffirmative())
                 {
                     throw new UserAbortException();
                 }
@@ -158,7 +200,7 @@ public class PersonalBuildClient extends PersonalBuildSupport
                 wc.update();
                 status("Update complete.");
             }
-            catch(SCMException e)
+            catch (SCMException e)
             {
                 throw new PersonalBuildException("Unable to update working copy: " + e.getMessage(), e);
             }
@@ -171,7 +213,7 @@ public class PersonalBuildClient extends PersonalBuildSupport
         status("Creating patch archive...");
         PatchArchive patchArchive = new PatchArchive(status, config.getBase(), patchFile);
         status("Patch created.");
-        
+
         return patchArchive;
     }
 
@@ -188,7 +230,7 @@ public class PersonalBuildClient extends PersonalBuildSupport
             throw new PersonalBuildException("Unable to get working copy status: " + e.getMessage(), e);
         }
 
-        if(!status.inConsistentState())
+        if (!status.inConsistentState())
         {
             // Fatal, we can't deal with wc's in this state
             throw new PersonalBuildException("Working copy is not in a consistent state.");
@@ -224,7 +266,7 @@ public class PersonalBuildClient extends PersonalBuildSupport
             {
                 // That's good ... now check the response
                 String response = IOUtils.inputStreamToString(post.getResponseBodyAsStream());
-                if(response.startsWith("OK:"))
+                if (response.startsWith("OK:"))
                 {
                     String numberStr = response.substring(3);
                     try
