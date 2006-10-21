@@ -1,8 +1,8 @@
 package com.zutubi.pulse.scm.cvs.client;
 
 import com.opensymphony.util.TextUtils;
-import com.zutubi.pulse.core.model.CvsRevision;
 import com.zutubi.pulse.core.model.Change;
+import com.zutubi.pulse.core.model.CvsRevision;
 import com.zutubi.pulse.scm.SCMException;
 import com.zutubi.pulse.scm.cvs.client.commands.LogListener;
 import com.zutubi.pulse.scm.cvs.client.commands.StatusListener;
@@ -28,7 +28,6 @@ import org.netbeans.lib.cvsclient.event.CVSListener;
 
 import java.io.File;
 import java.text.SimpleDateFormat;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.TimeZone;
 
@@ -74,6 +73,13 @@ public class CvsClient
 
     public List<Change> update(File workingDirectory, CvsRevision revision) throws SCMException
     {
+        UpdateListener listener = new UpdateListener();
+        update(workingDirectory, revision, listener);
+        return listener.getChanges();
+    }
+
+    public void update(File workingDirectory, CvsRevision revision, CVSListener listener) throws SCMException
+    {
         UpdateCommand update = new UpdateCommand();
         update.setPruneDirectories(true);
         update.setBuildDirectories(true);
@@ -90,12 +96,10 @@ public class CvsClient
             }
         }
 
-        UpdateListener listener = new UpdateListener();
         if (!executeCommand(update, workingDirectory, listener))
         {
             throw new SCMException("Failed to update.");
         }
-        return listener.getChanges();
     }
 
     public List checkout(File workdir, String module, CvsRevision revision) throws SCMException
@@ -205,25 +209,31 @@ public class CvsClient
         {
             rlog.setDateFilter(dateFilter);
         }
-        List response = new LinkedList();
-        if (!executeCommand(rlog, null, new LogListener(response)))
+        
+        LogListener listener = new LogListener();
+        if (!executeCommand(rlog, null, listener))
         {
             throw new SCMException("Failed to retrieve the cvs server changes between details.");
         }
-        return response;
+        return listener.getLogInfo();
     }
 
     public List<StatusInformation> status(File workingCopy) throws SCMException
     {
+        StatusListener listener = new StatusListener();
+        status(workingCopy, listener);
+        return listener.getInfo();
+    }
+
+    public void status(File workingCopy, CVSListener listener) throws SCMException
+    {
         StatusCommand status = new StatusCommand();
         status.setRecursive(true);
         status.setFiles(new File[]{workingCopy});
-        StatusListener listener = new StatusListener();
         if (!executeCommand(status, workingCopy, listener))
         {
             throw new SCMException("Failed to run status command.");
         }
-        return listener.getInfo();
     }
 
     public void testConnection() throws SCMException
@@ -247,12 +257,13 @@ public class CvsClient
     /**
      * Execute the cvs command.
      *
-     * @param command          to be executed on the configured cvs connection.
-     * @param responseListener
+     * @param command to be executed on the configured cvs connection.
+     * @param listener
      * @return true if the command is successful, false otherwise.
-     * @throws SCMException
+     *
+     * @throws SCMException thrown when an error occurs.
      */
-    public boolean executeCommand(Command command, File localPath, CVSListener responseListener) throws SCMException
+    public boolean executeCommand(Command command, File localPath, CVSListener listener) throws SCMException
     {
         Connection connection = null;
         try
@@ -263,9 +274,9 @@ public class CvsClient
             connection = openConnection();
 
             Client client = new Client(connection, new StandardAdminHandler());
-            if (responseListener != null)
+            if (listener != null)
             {
-                client.getEventManager().addCVSListener(responseListener);
+                client.getEventManager().addCVSListener(listener);
             }
             if (localPath != null)
             {
