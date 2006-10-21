@@ -1,8 +1,8 @@
 package com.zutubi.pulse.model;
 
-import com.zutubi.pulse.bootstrap.MasterConfiguration;
 import com.opensymphony.util.TextUtils;
 import com.zutubi.pulse.bootstrap.ComponentContext;
+import com.zutubi.pulse.bootstrap.MasterConfiguration;
 import com.zutubi.pulse.bootstrap.MasterConfigurationManager;
 import com.zutubi.pulse.renderer.BuildResultRenderer;
 import com.zutubi.pulse.util.logging.Logger;
@@ -131,7 +131,7 @@ public class EmailContactPoint extends ContactPoint
             msg.setRecipient(Message.RecipientType.TO, new InternetAddress(getEmail()));
             msg.setSubject(subject);
             msg.setContent(body, "text/" + getType());
-            msg.setHeader("X-Mailer", "Project-Cinnamon");
+            msg.setHeader("X-Mailer", "Zutubi-Pulse");
             msg.setSentDate(new Date());
 
             Transport.send(msg);
@@ -139,7 +139,7 @@ public class EmailContactPoint extends ContactPoint
         catch (Exception e)
         {
             LOG.warning("Unable to send email to address '" + getEmail() + "': " + e.getMessage(), e);
-            throw e;
+            throw new NotificationException("Unable to send email to address '" + getEmail() + "': " + e.getMessage() + " (check the address and/or the SMTP server configuration)");
         }
     }
 

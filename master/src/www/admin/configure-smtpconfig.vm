@@ -13,10 +13,15 @@
 #wwcform("action=editSmtp!save.action" "heading=%{getText('smtp.config')}" "method=post")
 
     #wwtextfield("name=smtp.host" "label=%{getText('smtp.host')}" "required=true" "tabindex=1")
-    #wwtextfield("name=smtp.username" "label=%{getText('smtp.username')}" "tabindex=2")
-    #wwpassword("name=smtp.password" "label=%{getText('smtp.password')}" "showPassword=true" "tabindex=3")
-    #wwtextfield("name=smtp.from" "label=%{getText('smtp.from')}" "required=true" "tabindex=4")
+    #inlineHelp("smtp.host.help")
+    #wwtextfield("name=smtp.from" "label=%{getText('smtp.from')}" "required=true" "tabindex=2")
+    #inlineHelp("smtp.from.help")
+    #wwtextfield("name=smtp.username" "label=%{getText('smtp.username')}" "tabindex=3")
+    #inlineHelp("smtp.username.help")
+    #wwpassword("name=smtp.password" "label=%{getText('smtp.password')}" "showPassword=true" "tabindex=4")
+    #inlineHelp("smtp.password.help")
     #wwtextfield("name=smtp.prefix" "label=%{getText('smtp.prefix')}" "tabindex=5")
+    #inlineHelp("smtp.prefix.help")
 
     #openSubmit()
         #wwsubmit("name=save" "value=%{getText('save.name')}" "tabindex=6")

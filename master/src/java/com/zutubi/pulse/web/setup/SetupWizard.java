@@ -2,14 +2,15 @@ package com.zutubi.pulse.web.setup;
 
 import com.opensymphony.util.TextUtils;
 import com.opensymphony.xwork.Validateable;
+import com.opensymphony.xwork.validator.validators.EmailValidator;
 import com.zutubi.pulse.bootstrap.MasterConfiguration;
 import com.zutubi.pulse.bootstrap.MasterConfigurationManager;
 import com.zutubi.pulse.bootstrap.SetupManager;
 import com.zutubi.pulse.bootstrap.SystemConfigurationSupport;
 import com.zutubi.pulse.model.GrantedAuthority;
+import com.zutubi.pulse.model.Group;
 import com.zutubi.pulse.model.User;
 import com.zutubi.pulse.model.UserManager;
-import com.zutubi.pulse.model.Group;
 import com.zutubi.pulse.security.AcegiUtils;
 import com.zutubi.pulse.util.logging.Logger;
 import com.zutubi.pulse.web.DefaultAction;
@@ -19,6 +20,8 @@ import com.zutubi.pulse.web.wizard.Wizard;
 import com.zutubi.pulse.web.wizard.WizardCompleteState;
 
 import java.util.concurrent.Executors;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * <class-comment/>
@@ -275,9 +278,21 @@ public class SetupWizard extends BaseWizard
 
         public void validate()
         {
-            if (TextUtils.stringSet(smtpHost) && !TextUtils.stringSet(fromAddress))
+            if (TextUtils.stringSet(smtpHost))
             {
-                addFieldError("fromAddress", "from address is required when smtp host is provided");
+                if (!TextUtils.stringSet(fromAddress))
+                {
+                    addFieldError("fromAddress", "from address is required when smtp host is provided");
+                }
+                else
+                {
+                    Pattern pattern = Pattern.compile(EmailValidator.emailAddressPattern, Pattern.CASE_INSENSITIVE);
+                    Matcher matcher = pattern.matcher(fromAddress);
+                    if (!matcher.matches())
+                    {
+                        addFieldError("fromAddress", "from email address is invalid");
+                    }
+                }
             }
         }
 
