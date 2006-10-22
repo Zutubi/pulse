@@ -20,7 +20,28 @@ public class FileSystemUtils
 {
     private static final Logger LOG = Logger.getLogger(FileSystemUtils.class);
 
-    private static final char ZIP_SEPARATOR = '/';
+    public static final char ZIP_SEPARATOR = '/';
+
+    // Unix-style file mode values
+    
+    public static final int PERMISSION_OWNER_READ    = 0x100;
+    public static final int PERMISSION_OWNER_WRITE   = 0x080;
+    public static final int PERMISSION_OWNER_EXECUTE = 0x040;
+    public static final int PERMISSION_GROUP_READ    = 0x020;
+    public static final int PERMISSION_GROUP_WRITE   = 0x010;
+    public static final int PERMISSION_GROUP_EXECUTE = 0x008;
+    public static final int PERMISSION_OTHER_READ    = 0x004;
+    public static final int PERMISSION_OTHER_WRITE   = 0x002;
+    public static final int PERMISSION_OTHER_EXECUTE = 0x001;
+
+    public static final int PERMISSION_OWNER_FULL    = PERMISSION_OWNER_READ | PERMISSION_OWNER_WRITE | PERMISSION_OWNER_EXECUTE;
+    public static final int PERMISSION_GROUP_FULL    = PERMISSION_GROUP_READ | PERMISSION_GROUP_WRITE | PERMISSION_GROUP_EXECUTE;
+    public static final int PERMISSION_OTHER_FULL    = PERMISSION_OTHER_READ | PERMISSION_OTHER_WRITE | PERMISSION_OTHER_EXECUTE;
+
+    public static final int PERMISSION_ALL_READ      = PERMISSION_OWNER_READ | PERMISSION_GROUP_READ | PERMISSION_OTHER_READ;
+    public static final int PERMISSION_ALL_WRITE     = PERMISSION_OWNER_WRITE | PERMISSION_GROUP_WRITE | PERMISSION_OTHER_WRITE;
+    public static final int PERMISSION_ALL_EXECUTE   = PERMISSION_OWNER_EXECUTE | PERMISSION_GROUP_EXECUTE | PERMISSION_OTHER_EXECUTE;
+    public static final int PERMISSION_ALL_FULL      = PERMISSION_OWNER_FULL | PERMISSION_GROUP_FULL | PERMISSION_OTHER_FULL;
 
     /**
      * Recursively delete a directory and its contents.

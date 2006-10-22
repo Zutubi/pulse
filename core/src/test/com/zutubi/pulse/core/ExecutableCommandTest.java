@@ -129,7 +129,7 @@ public class ExecutableCommandTest extends PulseTestCase
         {
             file = new File(dir, "./list.sh");
             FileSystemUtils.createFile(file, "#! /bin/sh\nls");
-            FileSystemUtils.setPermissions(file, 777);
+            FileSystemUtils.setPermissions(file, FileSystemUtils.PERMISSION_ALL_FULL);
         }
 
 

@@ -32,7 +32,8 @@ public class FileSystemUtilsTest extends PulseTestCase
         if (System.getProperty("os.name").equals("Linux"))
         {
             int permissions = FileSystemUtils.getPermissions(new File("/bin/sh"));
-            assertEquals(777, permissions);
+            // It is a link, hence the full permissions
+            assertEquals(FileSystemUtils.PERMISSION_ALL_FULL, permissions);
         }
     }
 
