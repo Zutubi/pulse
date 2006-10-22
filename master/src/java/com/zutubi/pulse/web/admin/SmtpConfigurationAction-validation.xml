@@ -3,12 +3,15 @@
 <validators>
     <field name="smtp.from">
         <field-validator type="requiredstring">
-            <message key="smtp.from.required">required field</message>
+            <message key="smtp.from.required">from address is required</message>
+        </field-validator>
+        <field-validator type="email">
+            <message key="smtp.from.invalid">invalid from email address</message>
         </field-validator>
     </field>
     <field name="smtp.host">
         <field-validator type="requiredstring">
-            <message key="smtp.host.required">required field</message>
+            <message key="smtp.host.required">smtp host is required</message>
         </field-validator>
     </field>
 </validators>

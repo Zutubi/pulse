@@ -35,7 +35,7 @@ public class SmtpConfigurationAcceptanceTest extends BaseAcceptanceTestCase
         assertTableRowsEqual("smtp.config", 1, new String[][]{
                 new String[]{"smtp host"},
                 new String[]{"subject prefix"},
-                new String[]{"from"},
+                new String[]{"from address"},
                 new String[]{"username"}
         });
 

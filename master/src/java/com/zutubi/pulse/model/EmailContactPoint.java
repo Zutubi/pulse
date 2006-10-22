@@ -123,7 +123,7 @@ public class EmailContactPoint extends ContactPoint
         catch (Exception e)
         {
             LOG.warning("Unable to send email to address '" + getEmail() + "': " + e.getMessage(), e);
-            throw e;
+            throw new NotificationException("Unable to send email to address '" + getEmail() + "': " + e.getMessage() + " (check the address and/or the SMTP server configuration)");
         }
     }
 
