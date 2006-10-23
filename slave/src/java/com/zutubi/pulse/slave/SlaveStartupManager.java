@@ -12,7 +12,6 @@ import com.zutubi.pulse.util.logging.Logger;
 import org.mortbay.http.SocketListener;
 import org.mortbay.jetty.Server;
 import org.mortbay.jetty.servlet.WebApplicationContext;
-import org.mortbay.util.InetAddrPort;
 
 import java.io.File;
 import java.util.LinkedList;
@@ -46,10 +45,13 @@ public class SlaveStartupManager implements Startup, Stoppable
 
         jettyServer = new Server();
         int port = config.getServerPort();
-        SocketListener listener = new SocketListener(new InetAddrPort(port));
-        jettyServer.addListener(listener);
+
         try
         {
+            SocketListener listener = new SocketListener();
+            listener.setHost(config.getBindAddress());
+            listener.setPort(port);
+            jettyServer.addListener(listener);
             WebApplicationContext context = jettyServer.addWebApplication(config.getContextPath(), configurationManager.getSystemPaths().getContentRoot().getAbsolutePath());
             context.setDefaultsDescriptor(null);
             jettyServer.start();
