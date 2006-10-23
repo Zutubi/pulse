@@ -46,6 +46,7 @@ public class P4Constants
     public static final String FLAG_RESTRICT_TO_CLIENT = "-Rc";
     public static final String FLAG_SHORT = "-s";
     public static final String FLAG_STATUS = "-s";
+    public static final String FLAG_TYPE = "-t";
     public static final String VALUE_SUBMITTED = "submitted";
     public static final String VALUE_ALL_FILES = "...";
 
@@ -81,4 +82,14 @@ public class P4Constants
 
     public static final String REVISION_NONE = "none";
 
+    public static final String[] EXECUTABLE_TYPES = {
+            "xtext",
+            "kxtext",
+            "xbinary",
+            "cxtext",
+            "xltext",
+            "uxbinary",
+            "xtempobj",
+            "xunicode"
+    };
 }

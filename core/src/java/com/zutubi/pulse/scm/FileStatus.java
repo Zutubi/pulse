@@ -173,7 +173,7 @@ public class FileStatus
 
             public boolean requiresFile()
             {
-                return false;
+                return true;
             }
         },
         MISSING

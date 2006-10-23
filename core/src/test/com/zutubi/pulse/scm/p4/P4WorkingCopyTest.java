@@ -135,7 +135,61 @@ public class P4WorkingCopyTest extends PulseTestCase implements PersonalBuildUI
 
         WorkingCopyStatus status = wc.getStatus();
         assertEquals(HEAD_REVISION, status.getRevision().getRevisionString());
-        assertChange(status, "file1", FileStatus.State.MODIFIED, false);
+        assertChange(status, "file1", FileStatus.State.MODIFIED, false, true);
+    }
+
+    public void testStatusOpenForEditExecutable() throws SCMException
+    {
+        client.runP4(null, P4_COMMAND, COMMAND_EDIT, "script1");
+
+        WorkingCopyStatus status = wc.getStatus();
+        assertEquals(HEAD_REVISION, status.getRevision().getRevisionString());
+        assertChange(status, "script1", FileStatus.State.MODIFIED, false, true);
+    }
+
+    public void testStatusOpenForEditAddExecutable() throws SCMException
+    {
+        client.runP4(null, P4_COMMAND, COMMAND_EDIT, FLAG_TYPE, "text+x", "file1");
+
+        WorkingCopyStatus status = wc.getStatus();
+        assertEquals(HEAD_REVISION, status.getRevision().getRevisionString());
+        assertExecutable(status, "file1", true);
+    }
+
+    public void testStatusOpenForEditRemoveExecutable() throws SCMException
+    {
+        client.runP4(null, P4_COMMAND, COMMAND_EDIT, FLAG_TYPE, "text", "script1");
+
+        WorkingCopyStatus status = wc.getStatus();
+        assertEquals(HEAD_REVISION, status.getRevision().getRevisionString());
+        assertExecutable(status, "script1", false);
+    }
+
+    public void testStatusOpenForEditBinary() throws SCMException
+    {
+        client.runP4(null, P4_COMMAND, COMMAND_EDIT, "bin1");
+
+        WorkingCopyStatus status = wc.getStatus();
+        assertEquals(HEAD_REVISION, status.getRevision().getRevisionString());
+        assertChange(status, "bin1", FileStatus.State.MODIFIED, false, false);
+    }
+
+    public void testStatusOpenForEditAddBinary() throws SCMException
+    {
+        client.runP4(null, P4_COMMAND, COMMAND_EDIT, FLAG_TYPE, "binary", "file1");
+
+        WorkingCopyStatus status = wc.getStatus();
+        assertEquals(HEAD_REVISION, status.getRevision().getRevisionString());
+        assertChange(status, "file1", FileStatus.State.MODIFIED, false, false);
+    }
+
+    public void testStatusOpenForEditRemoveBinary() throws SCMException
+    {
+        client.runP4(null, P4_COMMAND, COMMAND_EDIT, FLAG_TYPE, "text", "bin1");
+
+        WorkingCopyStatus status = wc.getStatus();
+        assertEquals(HEAD_REVISION, status.getRevision().getRevisionString());
+        assertChange(status, "bin1", FileStatus.State.MODIFIED, false, true);
     }
 
     public void testStatusOpenForAdd() throws SCMException, IOException
@@ -146,7 +200,29 @@ public class P4WorkingCopyTest extends PulseTestCase implements PersonalBuildUI
 
         WorkingCopyStatus status = wc.getStatus();
         assertEquals(HEAD_REVISION, status.getRevision().getRevisionString());
-        assertChange(status, "newfile", FileStatus.State.ADDED, false);
+        assertChange(status, "newfile", FileStatus.State.ADDED, false, true);
+    }
+
+    public void testStatusOpenForAddBinary() throws SCMException, IOException
+    {
+        File newFile = new File(clientRoot, "newfile");
+        FileSystemUtils.createFile(newFile, "new");
+        client.runP4(null, P4_COMMAND, COMMAND_ADD, FLAG_TYPE, "binary", "newfile");
+
+        WorkingCopyStatus status = wc.getStatus();
+        assertEquals(HEAD_REVISION, status.getRevision().getRevisionString());
+        assertChange(status, "newfile", FileStatus.State.ADDED, false, false);
+    }
+
+    public void testStatusOpenForAddExecutable() throws SCMException, IOException
+    {
+        File newFile = new File(clientRoot, "newfile");
+        FileSystemUtils.createFile(newFile, "new");
+        client.runP4(null, P4_COMMAND, COMMAND_ADD, FLAG_TYPE, "text+x", "newfile");
+
+        WorkingCopyStatus status = wc.getStatus();
+        assertEquals(HEAD_REVISION, status.getRevision().getRevisionString());
+        assertExecutable(status, "newfile", true);
     }
 
     public void testStatusOpenForDelete() throws SCMException, IOException
@@ -155,7 +231,7 @@ public class P4WorkingCopyTest extends PulseTestCase implements PersonalBuildUI
 
         WorkingCopyStatus status = wc.getStatus();
         assertEquals(HEAD_REVISION, status.getRevision().getRevisionString());
-        assertChange(status, "dir1/file1", FileStatus.State.DELETED, false);
+        assertChange(status, "dir1/file1", FileStatus.State.DELETED, false, false);
     }
 
     public void testStatusOpenForIntegrate() throws SCMException, IOException
@@ -164,7 +240,67 @@ public class P4WorkingCopyTest extends PulseTestCase implements PersonalBuildUI
 
         WorkingCopyStatus status = wc.getStatus();
         assertEquals(HEAD_REVISION, status.getRevision().getRevisionString());
-        assertChange(status, "integrated", FileStatus.State.BRANCHED, false);
+        assertChange(status, "integrated", FileStatus.State.BRANCHED, false, true);
+    }
+
+    public void testStatusOpenForIntegrateEdited() throws SCMException, IOException
+    {
+        client.runP4(null, P4_COMMAND, COMMAND_EDIT, "branches/1/file1");
+        client.submit("edit on branch 1");
+
+        client.runP4(null, P4_COMMAND, COMMAND_INTEGRATE, "branches/1/...", "...");
+        client.runP4(null, P4_COMMAND, COMMAND_RESOLVE, FLAG_AUTO_MERGE);
+
+        WorkingCopyStatus status = wc.getStatus();
+        assertChange(status, "file1", FileStatus.State.MERGED, false, true);
+    }
+
+    public void testStatusOpenForIntegrateBinary() throws SCMException, IOException
+    {
+        client.runP4(null, P4_COMMAND, COMMAND_EDIT, "branches/1/bin1");
+        client.submit("edit on branch 1");
+
+        client.runP4(null, P4_COMMAND, COMMAND_INTEGRATE, "branches/1/...", "...");
+        client.runP4(null, P4_COMMAND, COMMAND_RESOLVE, FLAG_AUTO_MERGE);
+
+        WorkingCopyStatus status = wc.getStatus();
+        assertChange(status, "bin1", FileStatus.State.MERGED, false, false);
+    }
+
+    public void testStatusOpenForIntegrateExecutable() throws SCMException, IOException
+    {
+        client.runP4(null, P4_COMMAND, COMMAND_EDIT, "branches/1/script1");
+        client.submit("edit on branch 1");
+
+        client.runP4(null, P4_COMMAND, COMMAND_INTEGRATE, "branches/1/...", "...");
+        client.runP4(null, P4_COMMAND, COMMAND_RESOLVE, FLAG_AUTO_MERGE);
+
+        WorkingCopyStatus status = wc.getStatus();
+        assertChange(status, "script1", FileStatus.State.MERGED, false, true);
+    }
+
+    public void testStatusOpenForIntegrateAddExecutable() throws SCMException, IOException
+    {
+        client.runP4(null, P4_COMMAND, COMMAND_EDIT, FLAG_TYPE, "text+x", "branches/1/file1");
+        client.submit("edit on branch 1");
+
+        client.runP4(null, P4_COMMAND, COMMAND_INTEGRATE, FLAG_TYPE, "branches/1/...", "...");
+        client.runP4(null, P4_COMMAND, COMMAND_RESOLVE, FLAG_AUTO_MERGE);
+
+        WorkingCopyStatus status = wc.getStatus();
+        assertExecutable(status, "file1", true);
+    }
+
+    public void testStatusOpenForIntegrateRemoveExecutable() throws SCMException, IOException
+    {
+        client.runP4(null, P4_COMMAND, COMMAND_EDIT, FLAG_TYPE, "text", "branches/1/script1");
+        client.submit("edit on branch 1");
+
+        client.runP4(null, P4_COMMAND, COMMAND_INTEGRATE, FLAG_TYPE, "branches/1/...", "...");
+        client.runP4(null, P4_COMMAND, COMMAND_RESOLVE, FLAG_AUTO_MERGE);
+
+        WorkingCopyStatus status = wc.getStatus();
+        assertExecutable(status, "script1", false);
     }
 
     public void testStatusOODEdited() throws SCMException, IOException
@@ -172,7 +308,7 @@ public class P4WorkingCopyTest extends PulseTestCase implements PersonalBuildUI
         otherEdit();
 
         WorkingCopyStatus status = wc.getStatus();
-        assertChange(status, "file1", FileStatus.State.UNCHANGED, true);
+        assertChange(status, "file1", FileStatus.State.UNCHANGED, true, false);
     }
 
     public void testStatusOODAdded() throws SCMException, IOException
@@ -183,7 +319,7 @@ public class P4WorkingCopyTest extends PulseTestCase implements PersonalBuildUI
         otherClient.submit("comment");
 
         WorkingCopyStatus status = wc.getStatus();
-        assertChange(status, "newfile", FileStatus.State.UNCHANGED, true);
+        assertChange(status, "newfile", FileStatus.State.UNCHANGED, true, false);
     }
 
     public void testStatusOODDeleted() throws SCMException
@@ -192,7 +328,7 @@ public class P4WorkingCopyTest extends PulseTestCase implements PersonalBuildUI
         otherClient.submit("comment");
 
         WorkingCopyStatus status = wc.getStatus();
-        assertChange(status, "file1", FileStatus.State.UNCHANGED, true);
+        assertChange(status, "file1", FileStatus.State.UNCHANGED, true, false);
     }
 
     public void testStatusOODAndLocalChange() throws SCMException
@@ -203,7 +339,7 @@ public class P4WorkingCopyTest extends PulseTestCase implements PersonalBuildUI
         otherClient.submit("comment");
 
         WorkingCopyStatus status = wc.getStatus();
-        assertChange(status, "file1", FileStatus.State.MODIFIED, true);
+        assertChange(status, "file1", FileStatus.State.MODIFIED, true, true);
     }
 
     public void testStatusEditEdited() throws SCMException, IOException
@@ -214,7 +350,7 @@ public class P4WorkingCopyTest extends PulseTestCase implements PersonalBuildUI
         client.runP4(null, P4_COMMAND, COMMAND_SYNC);
         
         WorkingCopyStatus status = wc.getStatus();
-        assertChange(status, "file1", FileStatus.State.UNRESOLVED, false);
+        assertChange(status, "file1", FileStatus.State.UNRESOLVED, false, false);
     }
 
     public void testStatusEditDeleted() throws SCMException
@@ -226,7 +362,7 @@ public class P4WorkingCopyTest extends PulseTestCase implements PersonalBuildUI
         client.runP4(null, P4_COMMAND, COMMAND_SYNC);
         
         WorkingCopyStatus status = wc.getStatus();
-        assertChange(status, "file1", FileStatus.State.UNRESOLVED, false);
+        assertChange(status, "file1", FileStatus.State.UNRESOLVED, false, false);
     }
 
     public void testStatusDeleteEdited() throws SCMException, IOException
@@ -237,7 +373,7 @@ public class P4WorkingCopyTest extends PulseTestCase implements PersonalBuildUI
         client.runP4(null, P4_COMMAND, COMMAND_SYNC);
 
         WorkingCopyStatus status = wc.getStatus();
-        assertChange(status, "file1", FileStatus.State.DELETED, false);
+        assertChange(status, "file1", FileStatus.State.DELETED, false, false);
     }
 
     public void testStatusDeleteDeleted() throws SCMException
@@ -249,7 +385,7 @@ public class P4WorkingCopyTest extends PulseTestCase implements PersonalBuildUI
         client.runP4(null, P4_COMMAND, COMMAND_SYNC);
 
         WorkingCopyStatus status = wc.getStatus();
-        assertChange(status, "file1", FileStatus.State.DELETED, false);
+        assertChange(status, "file1", FileStatus.State.DELETED, false, false);
     }
 
     public void testStatusUnresolvedMerge() throws SCMException
@@ -260,7 +396,7 @@ public class P4WorkingCopyTest extends PulseTestCase implements PersonalBuildUI
         client.runP4(null, P4_COMMAND, COMMAND_INTEGRATE, "//depot/branches/1/...", "//depot/...");
 
         WorkingCopyStatus status = wc.getStatus();
-        assertChange(status, "file1", FileStatus.State.UNRESOLVED, false);
+        assertChange(status, "file1", FileStatus.State.UNRESOLVED, false, false);
     }
 
     public void testUpdateAlreadyUpToDate() throws SCMException
@@ -289,7 +425,7 @@ public class P4WorkingCopyTest extends PulseTestCase implements PersonalBuildUI
         wc.update();
         WorkingCopyStatus status = wc.getStatus();
         assertEquals("3", status.getRevision().getRevisionString());
-        assertChange(status, "file1", FileStatus.State.MODIFIED, false);
+        assertChange(status, "file1", FileStatus.State.MODIFIED, false, true);
     }
 
     public void testUpdateConflict() throws SCMException, IOException
@@ -303,7 +439,7 @@ public class P4WorkingCopyTest extends PulseTestCase implements PersonalBuildUI
         wc.update();
         WorkingCopyStatus status = wc.getStatus();
         assertEquals("3", status.getRevision().getRevisionString());
-        assertChange(status, "file1", FileStatus.State.UNRESOLVED, false);
+        assertChange(status, "file1", FileStatus.State.UNRESOLVED, false, false);
     }
 
     private void otherEdit() throws SCMException, IOException
@@ -314,7 +450,7 @@ public class P4WorkingCopyTest extends PulseTestCase implements PersonalBuildUI
         otherClient.submit("comment");
     }
 
-    private void assertChange(WorkingCopyStatus status, String path, FileStatus.State state, boolean outOfDate)
+    private void assertChange(WorkingCopyStatus status, String path, FileStatus.State state, boolean outOfDate, boolean text)
     {
         List<FileStatus> changes = status.getChanges();
         assertEquals(1, changes.size());
@@ -323,7 +459,24 @@ public class P4WorkingCopyTest extends PulseTestCase implements PersonalBuildUI
         assertEquals(state, fs.getState());
         assertFalse(fs.isDirectory());
         assertEquals(outOfDate, fs.isOutOfDate());
+        if(text)
+        {
+            assertEquals(1, fs.getProperties().size());
+            assertEquals(FileStatus.EOLStyle.TEXT.toString(), fs.getProperty(FileStatus.PROPERTY_EOL_STYLE));
+        }
+        else
+        {
+            assertEquals(0, fs.getProperties().size());
+        }
     }
+
+    private void assertExecutable(WorkingCopyStatus status, String path, boolean executable)
+    {
+        FileStatus fs = status.getFileStatus(path);
+        assertEquals(path, fs.getPath());
+        assertEquals(Boolean.toString(executable), fs.getProperty(FileStatus.PROPERTY_EXECUTABLE));
+    }
+
 
     private void assertWarning(String message)
     {

@@ -99,6 +99,20 @@ public class P4FStatHandler extends P4ErrorDetectingHandler
                 {
                     ui.status(fs.toString());
                 }
+
+                if(fs.getState().requiresFile())
+                {
+                    String type = getCurrentItemType();
+                    String headType = getCurrentItemHeadType();
+
+                    if(fileIsText(type))
+                    {
+                        fs.setProperty(FileStatus.PROPERTY_EOL_STYLE, FileStatus.EOLStyle.TEXT.toString());
+                    }
+
+                    resolveExecutableProperty(fs, type, headType);
+                }
+
                 status.add(fs);
             }
         }
@@ -121,6 +135,48 @@ public class P4FStatHandler extends P4ErrorDetectingHandler
         }
 
         return !haveRevision.equals(headRevision);
+    }
+
+    private String getCurrentItemType()
+    {
+        String type = currentItem.get(FSTAT_TYPE);
+        if(type == null)
+        {
+            type = getCurrentItemHeadType();
+        }
+        return type;
+    }
+
+    private String getCurrentItemHeadType()
+    {
+        String type = currentItem.get(FSTAT_HEAD_TYPE);
+        if(type == null)
+        {
+            type = "text";
+        }
+
+        return type;
+    }
+
+    private void resolveExecutableProperty(FileStatus fs, String type, String headType)
+    {
+        if(!type.equals(headType))
+        {
+            if(fileIsExecutable(type))
+            {
+                if(!fileIsExecutable(headType))
+                {
+                    fs.setProperty(FileStatus.PROPERTY_EXECUTABLE, "true");
+                }
+            }
+            else
+            {
+                if(fileIsExecutable(headType))
+                {
+                    fs.setProperty(FileStatus.PROPERTY_EXECUTABLE, "false");
+                }
+            }
+        }
     }
 
     private FileStatus.State mapAction(String action)
@@ -166,6 +222,38 @@ public class P4FStatHandler extends P4ErrorDetectingHandler
         }
 
         return clientFile;
+    }
+
+    private boolean fileIsExecutable(String type)
+    {
+        int plusIndex = type.indexOf('+');
+        if(plusIndex >= 0)
+        {
+            for(int i = plusIndex + 1; i < type.length(); i++)
+            {
+                if(type.charAt(i) == 'x')
+                {
+                    return true;
+                }
+            }
+        }
+        else
+        {
+            for(String exe: EXECUTABLE_TYPES)
+            {
+                if(type.equals(exe))
+                {
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
+
+    private boolean fileIsText(String type)
+    {
+        return type.contains("text");
     }
 
     private void warning(String message)
