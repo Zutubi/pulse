@@ -113,6 +113,8 @@ public class DefaultProjectManager implements ProjectManager
         {
             deleteProject(project);
         }
+
+        licenseManager.refreshAuthorisations();
     }
 
     @Secured({"ACL_PROJECT_WRITE"})
@@ -369,6 +371,8 @@ public class DefaultProjectManager implements ProjectManager
             project.addAdmin(group.getDefaultAuthority());
         }
         projectDao.save(project);
+
+        licenseManager.refreshAuthorisations();
     }
 
     public void setProjectDao(ProjectDao dao)
