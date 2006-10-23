@@ -69,7 +69,7 @@
              </td>
             #dynamicCell($change.user)
             #dateCell($change)
-            #contentCell($action.transformComment($change))
+            <td class="content"><pre>$action.transformComment($change)</pre></td>
             #linkCell("view.$change.id" "view" "viewChangelist.action?id=$change.id&buildId=$result.id")
         </tr>
         #if($change.changes.size() > 0)
