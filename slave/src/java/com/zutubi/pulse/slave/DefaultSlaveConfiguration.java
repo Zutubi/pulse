@@ -44,6 +44,11 @@ public class DefaultSlaveConfiguration implements SlaveConfiguration, SystemConf
         config = new ConfigSupport(new CompositeConfig(commandLineAndSystemProperties, userConfig, systemConfig));
     }
 
+    public String getBindAddress()
+    {
+        return config.getProperty(WEBAPP_BIND_ADDRESS, "0.0.0.0");
+    }
+
     public int getServerPort()
     {
         return config.getInteger(WEBAPP_PORT, 8090);
