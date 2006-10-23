@@ -1,0 +1,1 @@
+<regex-test.pp name="regex-test" status-group="1" name-group="2" pass-status="PASS" failure-status="FAIL"><![CDATA[\[(.*)\].*<(.*)>]]></regex-test.pp>
