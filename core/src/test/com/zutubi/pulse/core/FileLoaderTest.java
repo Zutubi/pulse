@@ -340,7 +340,7 @@ public class FileLoaderTest extends FileLoaderTestBase
     public void testAntCommandDefaults() throws Exception
     {
         AntCommand command = antCommandHelper(0);
-        assertEquals(SystemUtils.isWindows() ? "ant.bat" : "ant", command.getExe());
+        assertEquals(SystemUtils.IS_WINDOWS ? "ant.bat" : "ant", command.getExe());
         assertNull(command.getTargets());
     }
 

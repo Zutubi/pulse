@@ -34,7 +34,7 @@ public class JavaResourceConstructor implements ResourceConstructor
 
         // we expect the ant binary to be in the bin directory.
         File bin = new File(home, "bin");
-        if (SystemUtils.isWindows())
+        if (SystemUtils.IS_WINDOWS)
         {
             return new File(bin, "java.exe").isFile();
         }
@@ -64,7 +64,7 @@ public class JavaResourceConstructor implements ResourceConstructor
             File binDir = new File(home, "bin");
             version.addProperty(new ResourceProperty(JAVA_BIN_DIR, binDir.getCanonicalPath(), false, true));
 
-            if (SystemUtils.isWindows())
+            if (SystemUtils.IS_WINDOWS)
             {
                 File bin = new File(binDir, "java.exe");
                 version.addProperty(new ResourceProperty(JAVA_BIN, bin.getCanonicalPath(), false, false));

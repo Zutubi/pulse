@@ -30,7 +30,7 @@ public class MavenPostProcessor extends PostProcessorGroup
         RegexPostProcessor maven = new RegexPostProcessor();
         maven.addErrorRegexs(errorRegexs);
 
-        if (!SystemUtils.isWindows())
+        if (!SystemUtils.IS_WINDOWS)
         {
             maven.setFailOnError(false);
         }

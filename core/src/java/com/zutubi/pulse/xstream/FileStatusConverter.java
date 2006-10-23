@@ -8,6 +8,8 @@ import com.thoughtworks.xstream.io.HierarchicalStreamReader;
 import com.thoughtworks.xstream.io.HierarchicalStreamWriter;
 import com.zutubi.pulse.scm.FileStatus;
 
+import java.util.Map;
+
 /**
  * A custom converter for writing out file statuses.  Unfortunately this is
  * the simplest way I could find to get the enum handling right (i.e. to
@@ -30,6 +32,18 @@ public class FileStatusConverter implements Converter
         writer.startNode("outOfDate");
         context.convertAnother(status.isOutOfDate());
         writer.endNode();
+
+        for(Map.Entry<String, String> property: status.getProperties().entrySet())
+        {
+            writer.startNode("property");
+            writer.startNode("name");
+            context.convertAnother(property.getKey());
+            writer.endNode();
+            writer.startNode("value");
+            context.convertAnother(property.getValue());
+            writer.endNode();
+            writer.endNode();
+        }
     }
 
     public Object unmarshal(HierarchicalStreamReader reader, UnmarshallingContext context)
@@ -64,6 +78,28 @@ public class FileStatusConverter implements Converter
             else if(fieldName.equals("outOfDate"))
             {
                 result.setOutOfDate((Boolean) context.convertAnother(result, boolean.class));
+            }
+            else if(fieldName.equals("property"))
+            {
+                if(!reader.hasMoreChildren())
+                {
+                    throw new ConversionException("Property has no child elements");
+                }
+
+                reader.moveDown();
+                String name = reader.getValue();
+                reader.moveUp();
+
+                if(!reader.hasMoreChildren())
+                {
+                    throw new ConversionException("Property has no value element");
+                }
+
+                reader.moveDown();
+                String value = reader.getValue();
+                reader.moveUp();
+
+                result.setProperty(name, value);
             }
             else
             {

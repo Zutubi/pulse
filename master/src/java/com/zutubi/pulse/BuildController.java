@@ -1,7 +1,7 @@
 package com.zutubi.pulse;
 
-import com.zutubi.pulse.bootstrap.MasterConfigurationManager;
 import com.zutubi.pulse.bootstrap.ComponentContext;
+import com.zutubi.pulse.bootstrap.MasterConfigurationManager;
 import com.zutubi.pulse.core.Bootstrapper;
 import com.zutubi.pulse.core.BuildException;
 import com.zutubi.pulse.core.BuildRevision;
@@ -14,6 +14,7 @@ import com.zutubi.pulse.events.EventManager;
 import com.zutubi.pulse.events.build.*;
 import com.zutubi.pulse.model.*;
 import com.zutubi.pulse.scheduling.quartz.TimeoutRecipeJob;
+import com.zutubi.pulse.scm.FileStatus;
 import com.zutubi.pulse.scm.SCMException;
 import com.zutubi.pulse.scm.SCMServer;
 import com.zutubi.pulse.services.ServiceTokenManager;
@@ -239,8 +240,7 @@ public class BuildController implements EventListener
             initialBootstrapper = new CheckoutBootstrapper(project.getName(), specification.getName(), project.getScm(), request.getRevision(), false);
             if(request.isPersonal())
             {
-                PersonalBuildRequestEvent pbr = ((PersonalBuildRequestEvent) request);
-                initialBootstrapper = new PatchBootstrapper(initialBootstrapper, pbr.getUser().getId(), pbr.getNumber());
+                initialBootstrapper = createPersonalBuildBootstrapper(initialBootstrapper);
             }
         }
         else
@@ -252,6 +252,22 @@ public class BuildController implements EventListener
 
         // execute the first level of recipe controllers...
         initialiseNodes(initialBootstrapper, tree.getRoot().getChildren());
+    }
+
+    private Bootstrapper createPersonalBuildBootstrapper(Bootstrapper initialBootstrapper)
+    {
+        // TODO: preferrable to move this out (maybe to the request)
+        PersonalBuildRequestEvent pbr = ((PersonalBuildRequestEvent) request);
+        try
+        {
+            FileStatus.EOLStyle localEOL = project.getScm().createServer().getEOLPolicy();
+            initialBootstrapper = new PatchBootstrapper(initialBootstrapper, pbr.getUser().getId(), pbr.getNumber(), localEOL);
+        }
+        catch (SCMException e)
+        {
+            throw new BuildException("Unable to determine SCM end-of-line policy: " + e.getMessage(), e);
+        }
+        return initialBootstrapper;
     }
 
     private String getTriggerName(long recipeId)

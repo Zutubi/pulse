@@ -202,7 +202,7 @@ public class FileSystemUtils
 
     public static boolean isSymlink(File file) throws IOException
     {
-        return !SystemUtils.isWindows() && !file.getCanonicalPath().equals(file.getAbsolutePath());
+        return !SystemUtils.IS_WINDOWS && !file.getCanonicalPath().equals(file.getAbsolutePath());
     }
 
     /**
@@ -211,18 +211,19 @@ public class FileSystemUtils
      * <p/>
      * - Un*x: the same mode format used by chmod/stat.
      * <p/>
-     * On unsupported platforms, this call always returns 0.
+     * On unsupported platforms, this call always returns -1.
      *
      * @param file the file to return the permissions for
-     * @return an encoding of the permissions of the given file
+     * @return the permissions of the given file, or -1 if they cannot be
+     *         determined
      */
     public static int getPermissions(File file)
     {
-        int result = 0;
+        int result = -1;
 
-        if (SystemUtils.isWindows())
+        if (SystemUtils.IS_WINDOWS)
         {
-            return result;
+            return -1;
         }
 
         Process process = null;
@@ -274,55 +275,43 @@ public class FileSystemUtils
      *
      * @param file        the file to set permissions on
      * @param permissions the permissions to set, as encoded by
-     *                    {@link #getPermissions(File)}
+ *                    {@link #getPermissions(java.io.File)}
+     * @return true if the operation succeeded
      */
-    public static void setPermissions(File file, int permissions)
+    public static boolean setPermissions(File file, int permissions)
     {
-        if (SystemUtils.isWindows())
+        if (SystemUtils.IS_WINDOWS || permissions < 0)
         {
-            return;
+            return false;
         }
 
-        Process process;
-
-        try
-        {
-            process = Runtime.getRuntime().exec(new String[] { "chmod",  Integer.toString(permissions, 8), file.getAbsolutePath()});
-        }
-        catch (IOException e)
-        {
-            // Cannot execute chmod: therefore unsupported system.
-            return;
-        }
-
-        try
-        {
-            int exitCode = process.waitFor();
-            if (exitCode != 0)
-            {
-                LOG.warning("Unable to set permissions for '" + file.getAbsolutePath() + "': chmod exited with code " + exitCode);
-            }
-        }
-        catch (InterruptedException e)
-        {
-            LOG.warning("Unable to set permissions for '" + file.getAbsolutePath() + "': " + e.getMessage(), e);
-        }
-        finally
-        {
-            if (process != null)
-            {
-                process.destroy();
-            }
-        }
+        return runChmod(file, Integer.toString(permissions, 8));
     }
 
     public static boolean setExecutable(File file)
     {
-        if(!SystemUtils.isWindows())
+        return setExecutable(file, true);
+    }
+
+    public static boolean setExecutable(File file, boolean executable)
+    {
+        if(executable)
+        {
+            return runChmod(file, "a+x");
+        }
+        else
+        {
+            return runChmod(file, "a-x");
+        }
+    }
+
+    private static boolean runChmod(File file, String arg)
+    {
+        if(!SystemUtils.IS_WINDOWS)
         {
             try
             {
-                Process p = Runtime.getRuntime().exec(new String[] { "chmod", "+x", file.getAbsolutePath()});
+                Process p = Runtime.getRuntime().exec(new String[] { "chmod", arg, file.getAbsolutePath()});
                 int exitCode = p.waitFor();
                 return exitCode == 0;
             }
@@ -621,6 +610,35 @@ public class FileSystemUtils
         }
     }
 
+    public static File createTempFile(String prefix, String suffix, String data) throws IOException
+    {
+        File file = File.createTempFile(prefix, suffix);
+        createFile(file, data);
+        return file;
+    }
+
+    public static void createFile(File file, byte[] data) throws IOException
+    {
+        FileOutputStream os = null;
+
+        try
+        {
+            os = new FileOutputStream(file);
+            os.write(data);
+        }
+        finally
+        {
+            IOUtils.close(os);
+        }
+    }
+
+    public static File createTempFile(String prefix, String suffix, byte[] data) throws IOException
+    {
+        File file = File.createTempFile(prefix, suffix);
+        createFile(file, data);
+        return file;
+    }
+
     public static void createFile(File file, InputStream is) throws IOException
     {
         FileOutputStream os = null;
@@ -638,7 +656,7 @@ public class FileSystemUtils
 
     public static boolean createSymlink(File symlink, File destination) throws IOException
     {
-        if (SystemUtils.isLinux())
+        if (SystemUtils.IS_LINUX)
         {
             Process p = Runtime.getRuntime().exec("ln -s " + destination.getAbsolutePath() + " " + symlink.getAbsolutePath());
             int result = 0;
@@ -724,7 +742,7 @@ public class FileSystemUtils
 
     public static void copyRecursively(File from, File to) throws IOException
     {
-        if (!SystemUtils.isWindows() && SystemUtils.findInPath("cp") != null)
+        if (!SystemUtils.IS_WINDOWS && SystemUtils.findInPath("cp") != null)
         {
             // Use the Unix cp command because it:
             //   - preserves permissions; and
@@ -919,4 +937,98 @@ public class FileSystemUtils
         }
     }
 
+    /**
+     * Translates all line endings (CR, CRLF or LF) in the given file to the
+     * given bytes.
+     *
+     * @param file                the file to translate
+     * @param eol                 the new line ending as a byte array
+     * @param preservePermissions if true, the permissions on the file will
+     *                            be preserved
+     * @throws IOException if an error occurs
+     */
+    public static void translateEOLs(File file, byte[] eol, boolean preservePermissions) throws IOException
+    {
+        File tempFile = null;
+        int permissions = -1;
+
+        if(preservePermissions)
+        {
+            permissions = getPermissions(file);
+        }
+
+        try
+        {
+            tempFile = File.createTempFile(FileSystemUtils.class.getName(), ".tmp");
+
+            InputStream in = null;
+            OutputStream out = null;
+
+            try
+            {
+                in = new FileInputStream(file);
+                out = new BufferedOutputStream(new FileOutputStream(tempFile));
+
+                byte[] buffer = new byte[1024];
+                int n;
+                boolean skipNewline = false;
+
+                while((n = in.read(buffer)) > 0)
+                {
+                    for(int i = 0; i < n; i++)
+                    {
+                        byte b = buffer[i];
+                        switch(b)
+                        {
+                            case '\r':
+                                out.write(eol);
+                                skipNewline = true;
+                                break;
+
+                            case '\n':
+                                if(skipNewline)
+                                {
+                                    skipNewline = false;
+                                }
+                                else
+                                {
+                                    out.write(eol);
+                                }
+                                break;
+
+                            default:
+                                skipNewline = false;                                
+                                out.write(b);
+                                break;
+                        }
+
+                    }
+                }
+            }
+            finally
+            {
+                IOUtils.close(in);
+                IOUtils.close(out);
+            }
+
+            if(!tempFile.renameTo(file))
+            {
+                throw new IOException("Unable to rename temporary file '" + tempFile.getAbsolutePath() + "' to '" + file.getAbsolutePath() + "'");
+            }
+
+            if(permissions >= 0)
+            {
+                setPermissions(file, permissions);
+            }
+            
+            tempFile = null;
+        }
+        finally
+        {
+            if(tempFile != null)
+            {
+                tempFile.delete();
+            }
+        }
+    }
 }

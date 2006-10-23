@@ -273,7 +273,7 @@ public class ZipTest extends PulseTestCase
 
     public void testZipWithSymlink() throws IOException
     {
-        if (SystemUtils.isLinux())
+        if (SystemUtils.IS_LINUX)
         {
             Map<String, String> files = new TreeMap<String, String>();
             files.put("top", null);

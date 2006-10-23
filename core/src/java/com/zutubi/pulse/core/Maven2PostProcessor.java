@@ -1,7 +1,7 @@
 package com.zutubi.pulse.core;
 
-import com.zutubi.pulse.util.SystemUtils;
 import com.zutubi.pulse.core.model.Feature;
+import com.zutubi.pulse.util.SystemUtils;
 
 import java.util.regex.Pattern;
 
@@ -58,7 +58,7 @@ public class Maven2PostProcessor extends PostProcessorGroup
         RegexPattern failureRegex = new RegexPattern(Feature.Level.ERROR, failurePattern);
         failurePP.addRegexPattern(failureRegex);
 
-        if (!SystemUtils.isWindows())
+        if (!SystemUtils.IS_WINDOWS)
         {
             // Prefer the exit code on all systems except windows.
             failurePP.setFailOnError(false);

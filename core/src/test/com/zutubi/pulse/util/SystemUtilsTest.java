@@ -19,7 +19,7 @@ public class SystemUtilsTest extends PulseTestCase
     {
         String list;
 
-        if (SystemUtils.isWindows())
+        if (SystemUtils.IS_WINDOWS)
         {
             list = "dir";
         }
@@ -34,7 +34,7 @@ public class SystemUtilsTest extends PulseTestCase
 
     public void testFindInPathComFile()
     {
-        if(SystemUtils.isWindows())
+        if(SystemUtils.IS_WINDOWS)
         {
             assertNotNull(SystemUtils.findInPath("more"));
         }
@@ -42,7 +42,7 @@ public class SystemUtilsTest extends PulseTestCase
 
     public void testFindInPathCaseInsensitive()
     {
-        if(SystemUtils.isWindows())
+        if(SystemUtils.IS_WINDOWS)
         {
             assertNotNull(SystemUtils.findInPath("DiR"));
         }
@@ -53,7 +53,7 @@ public class SystemUtilsTest extends PulseTestCase
         File mvn = SystemUtils.findInPath("mvn");
         if(mvn != null)
         {
-            if(SystemUtils.isWindows())
+            if(SystemUtils.IS_WINDOWS)
             {
                 assertEquals("mvn.bat", mvn.getName());
             }

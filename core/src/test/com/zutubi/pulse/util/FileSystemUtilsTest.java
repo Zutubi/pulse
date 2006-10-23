@@ -3,8 +3,10 @@ package com.zutubi.pulse.util;
 import com.zutubi.pulse.test.PulseTestCase;
 
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Arrays;
 import java.util.zip.ZipInputStream;
 
 /**
@@ -29,7 +31,7 @@ public class FileSystemUtilsTest extends PulseTestCase
 
     public void testGetPermissions()
     {
-        if (System.getProperty("os.name").equals("Linux"))
+        if (!SystemUtils.IS_WINDOWS)
         {
             int permissions = FileSystemUtils.getPermissions(new File("/bin/sh"));
             // It is a link, hence the full permissions
@@ -39,13 +41,51 @@ public class FileSystemUtilsTest extends PulseTestCase
 
     public void testSetPermissions() throws IOException
     {
-        if (System.getProperty("os.name").equals("Linux"))
+        if (!SystemUtils.IS_WINDOWS)
         {
             File tmpDir = FileSystemUtils.createTempDirectory(getClass().getName(), "");
             FileSystemUtils.setPermissions(tmpDir, 0);
             int permissions = FileSystemUtils.getPermissions(tmpDir);
             assertEquals(permissions, 0);
             assertTrue(FileSystemUtils.removeDirectory(tmpDir));
+        }
+    }
+
+    public void testSetExecutableOn() throws IOException
+    {
+        if(!SystemUtils.IS_WINDOWS)
+        {
+            File temp = File.createTempFile(FileSystemUtils.class.getName(), ".tmp");
+            try
+            {
+                FileSystemUtils.setPermissions(temp, FileSystemUtils.PERMISSION_ALL_READ);
+                assertEquals(FileSystemUtils.PERMISSION_ALL_READ, FileSystemUtils.getPermissions(temp));
+                FileSystemUtils.setExecutable(temp, true);
+                assertEquals(FileSystemUtils.PERMISSION_ALL_READ | FileSystemUtils.PERMISSION_ALL_EXECUTE, FileSystemUtils.getPermissions(temp));
+            }
+            finally
+            {
+                temp.delete();
+            }
+        }
+    }
+
+    public void testSetExecutableOff() throws IOException
+    {
+        if(!SystemUtils.IS_WINDOWS)
+        {
+            File temp = File.createTempFile(FileSystemUtils.class.getName(), ".tmp");
+            try
+            {
+                FileSystemUtils.setPermissions(temp, FileSystemUtils.PERMISSION_ALL_FULL);
+                assertEquals(FileSystemUtils.PERMISSION_ALL_FULL, FileSystemUtils.getPermissions(temp));
+                FileSystemUtils.setExecutable(temp, false);
+                assertEquals(FileSystemUtils.PERMISSION_ALL_READ | FileSystemUtils.PERMISSION_ALL_WRITE, FileSystemUtils.getPermissions(temp));
+            }
+            finally
+            {
+                temp.delete();
+            }
         }
     }
 
@@ -125,7 +165,7 @@ public class FileSystemUtilsTest extends PulseTestCase
 
     public void testRecursiveCopyPreservesPermissions() throws Exception
     {
-        if(SystemUtils.isLinux())
+        if (SystemUtils.IS_LINUX)
         {
             File from = new File(tmpDir, "from");
             File to = new File(tmpDir, "to");
@@ -165,13 +205,265 @@ public class FileSystemUtilsTest extends PulseTestCase
     public void testFilesMatchLongFiles() throws IOException
     {
         StringBuilder builder = new StringBuilder();
-        for(int i = 0; i < 10000; i++)
+        for (int i = 0; i < 10000; i++)
         {
             builder.append("some random string");
         }
 
         String content = builder.toString();
         filesMatchHelper(content, content, true);
+    }
+
+    public void testOverwritePreservesPermissions() throws IOException
+    {
+        if (SystemUtils.IS_LINUX)
+        {
+            File f = null;
+            try
+            {
+                f = File.createTempFile(FileSystemUtils.class.getName(), ".txt");
+                assertTrue(FileSystemUtils.PERMISSION_ALL_FULL != FileSystemUtils.getPermissions(f));
+                FileSystemUtils.setPermissions(f, FileSystemUtils.PERMISSION_ALL_FULL);
+                assertEquals(FileSystemUtils.PERMISSION_ALL_FULL, FileSystemUtils.getPermissions(f));
+
+                FileOutputStream os = null;
+                try
+                {
+                    os = new FileOutputStream(f);
+                    os.write("hello".getBytes());
+                }
+                finally
+                {
+                    IOUtils.close(os);
+                }
+
+                assertEquals(FileSystemUtils.PERMISSION_ALL_FULL, FileSystemUtils.getPermissions(f));
+            }
+            finally
+            {
+                if (f != null)
+                {
+                    f.delete();
+                }
+            }
+        }
+    }
+
+    public void testRenameOverNukesPermissions() throws IOException
+    {
+        if (SystemUtils.IS_LINUX)
+        {
+            File f = null;
+            try
+            {
+                f = File.createTempFile(FileSystemUtils.class.getName(), ".txt");
+                assertTrue(FileSystemUtils.PERMISSION_ALL_FULL != FileSystemUtils.getPermissions(f));
+                FileSystemUtils.setPermissions(f, FileSystemUtils.PERMISSION_ALL_FULL);
+                assertEquals(FileSystemUtils.PERMISSION_ALL_FULL, FileSystemUtils.getPermissions(f));
+
+                File temp = File.createTempFile(FileSystemUtilsTest.class.getName(), "");
+                temp.renameTo(f);
+                assertTrue(FileSystemUtils.PERMISSION_ALL_FULL != FileSystemUtils.getPermissions(f));
+            }
+            finally
+            {
+                if (f != null)
+                {
+                    f.delete();
+                }
+            }
+        }
+    }
+
+    public void testGetAndSetPermissionPerformance() throws IOException
+    {
+        if (SystemUtils.findInPath("chmod") != null && SystemUtils.findInPath("stat") != null)
+        {
+            File f = null;
+            try
+            {
+                f = File.createTempFile(FileSystemUtils.class.getName(), ".txt");
+
+                long startTime = System.currentTimeMillis();
+                for (int i = 0; i < 100; i++)
+                {
+                   FileSystemUtils.getPermissions(f);
+                }
+                
+                long runningTime = System.currentTimeMillis() - startTime;
+                System.out.printf("Can get permissions %.2f times/second\n", 100000.0 / runningTime);
+
+                startTime = System.currentTimeMillis();
+                for (int i = 0; i < 100; i++)
+                {
+                   FileSystemUtils.setPermissions(f, FileSystemUtils.PERMISSION_ALL_EXECUTE);
+                }
+
+                runningTime = System.currentTimeMillis() - startTime;
+                System.out.printf("Can set permissions %.2f times/second\n", 100000.0 / runningTime);
+
+                startTime = System.currentTimeMillis();
+                for (int i = 0; i < 100; i++)
+                {
+                   FileSystemUtils.getPermissions(f);
+                   FileSystemUtils.setPermissions(f, FileSystemUtils.PERMISSION_ALL_EXECUTE);
+                }
+
+                runningTime = System.currentTimeMillis() - startTime;
+                System.out.printf("Can get and set permissions %.2f times/second\n", 100000.0 / runningTime);
+            }
+            finally
+            {
+                if (f != null)
+                {
+                    f.delete();
+                }
+            }
+        }
+    }
+
+    public void testTranslateEOLLF() throws IOException
+    {
+        simpleEOLTest(SystemUtils.LF_BYTES, "line 1\nline 2\nline 3\nline 4\nline 5\nline 6\nline 7\nline 8\n");
+    }
+
+    public void testTranslateEOLCR() throws IOException
+    {
+        simpleEOLTest(SystemUtils.CR_BYTES, "line 1\rline 2\rline 3\rline 4\rline 5\rline 6\rline 7\rline 8\r");
+    }
+
+    public void testTranslateEOLCRLF() throws IOException
+    {
+        simpleEOLTest(SystemUtils.CRLF_BYTES, "line 1\r\nline 2\r\nline 3\r\nline 4\r\nline 5\r\nline 6\r\nline 7\r\nline 8\r\n");
+    }
+
+    public void testTranslateEOLPreservePermissions() throws IOException
+    {
+        if (SystemUtils.IS_LINUX)
+        {
+            File test = null;
+            try
+            {
+                test = FileSystemUtils.createTempFile(FileSystemUtilsTest.class.getName(), ".tmp", "line 1\nline 2\nline 3\r\nline 4\nline 5\rline 6\r\nline 7\rline 8\r");
+                FileSystemUtils.setPermissions(test, FileSystemUtils.PERMISSION_ALL_FULL);
+                FileSystemUtils.translateEOLs(test, SystemUtils.CRLF_BYTES, true);
+                assertEquals("line 1\r\nline 2\r\nline 3\r\nline 4\r\nline 5\r\nline 6\r\nline 7\r\nline 8\r\n", IOUtils.fileToString(test));
+                assertEquals(FileSystemUtils.PERMISSION_ALL_FULL, FileSystemUtils.getPermissions(test));
+            }
+            finally
+            {
+                if(test != null)
+                {
+                    test.delete();
+                }
+            }
+        }
+    }
+
+    public void testTranslateEOLEmptyFile() throws IOException
+    {
+        File test = null;
+        try
+        {
+            test = FileSystemUtils.createTempFile(FileSystemUtilsTest.class.getName(), ".tmp", "");
+            FileSystemUtils.translateEOLs(test, SystemUtils.CRLF_BYTES, true);
+            assertEquals("", IOUtils.fileToString(test));
+        }
+        finally
+        {
+            if(test != null)
+            {
+                test.delete();
+            }
+        }
+    }
+
+    public void testTranslateEOLJustLF() throws IOException
+    {
+        File test = null;
+        try
+        {
+            test = FileSystemUtils.createTempFile(FileSystemUtilsTest.class.getName(), ".tmp", "\n");
+            FileSystemUtils.translateEOLs(test, SystemUtils.CRLF_BYTES, true);
+            assertEquals("\r\n", IOUtils.fileToString(test));
+        }
+        finally
+        {
+            if(test != null)
+            {
+                test.delete();
+            }
+        }
+    }
+
+    public void testTranslateEOLTwoCRs() throws IOException
+    {
+        File test = null;
+        try
+        {
+            test = FileSystemUtils.createTempFile(FileSystemUtilsTest.class.getName(), ".tmp", "\r\r");
+            FileSystemUtils.translateEOLs(test, SystemUtils.LF_BYTES, true);
+            assertEquals("\n\n", IOUtils.fileToString(test));
+        }
+        finally
+        {
+            if(test != null)
+            {
+                test.delete();
+            }
+        }
+    }
+
+    public void testTranslateEOLCRLFAcrossBoundary() throws IOException
+    {
+        byte [] in = new byte[1030];
+        byte [] out = new byte[1029];
+
+        Arrays.fill(in, (byte) 'x');
+        Arrays.fill(out, (byte) 'x');
+
+        in[1023] = '\r';
+        in[1024] = '\n';
+        out[1023] = '\n';
+
+        File test = null;
+        try
+        {
+            test = FileSystemUtils.createTempFile(FileSystemUtilsTest.class.getName(), ".tmp", in);
+            FileSystemUtils.translateEOLs(test, SystemUtils.LF_BYTES, true);
+
+            byte[] got = IOUtils.fileToBytes(test);
+            assertEquals(out.length, got.length);
+            for(int i = 0; i < out.length; i++)
+            {
+                assertEquals(out[i], got[i]);
+            }
+        }
+        finally
+        {
+            if(test != null)
+            {
+                test.delete();
+            }
+        }
+    }
+
+    private void simpleEOLTest(byte[] eol, String out) throws IOException
+    {
+        File test = null;
+        try
+        {
+            test = FileSystemUtils.createTempFile(FileSystemUtilsTest.class.getName(), ".tmp", "line 1\nline 2\nline 3\r\nline 4\nline 5\rline 6\r\nline 7\rline 8\r");
+            FileSystemUtils.translateEOLs(test, eol, false);
+            assertEquals(out, IOUtils.fileToString(test));
+        }
+        finally
+        {
+            if(test != null)
+            {
+                test.delete();
+            }
+        }
     }
 
     private void filesMatchHelper(String s1, String s2, boolean expected) throws IOException
@@ -203,7 +495,7 @@ public class FileSystemUtilsTest extends PulseTestCase
         InputStream is = null;
         try
         {
-            is = getClass().getResourceAsStream("FileSystemUtils."+getName()+".zip");
+            is = getClass().getResourceAsStream("FileSystemUtils." + getName() + ".zip");
             assertNotNull(is);
             FileSystemUtils.extractZip(new ZipInputStream(is), tmpDir);
         }

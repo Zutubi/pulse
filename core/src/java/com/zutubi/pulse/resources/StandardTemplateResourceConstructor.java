@@ -41,7 +41,7 @@ public class StandardTemplateResourceConstructor implements ResourceConstructor
         }
         // we expect the ant binary to be in the bin directory.
         File bin = new File(home, "bin");
-        if (SystemUtils.isWindows())
+        if (SystemUtils.IS_WINDOWS)
         {
             return new File(bin, scriptName + ".bat").isFile();
         }
@@ -72,7 +72,7 @@ public class StandardTemplateResourceConstructor implements ResourceConstructor
             File binDir = new File(home, "bin");
             version.addProperty(new ResourceProperty(resourceName + ".bin.dir", binDir.getAbsolutePath(), false, true));
 
-            if (SystemUtils.isWindows())
+            if (SystemUtils.IS_WINDOWS)
             {
                 version.addProperty(new ResourceProperty(resourceName + ".bin", new File(binDir, scriptName + ".bat").getCanonicalPath(), false, false));
             }

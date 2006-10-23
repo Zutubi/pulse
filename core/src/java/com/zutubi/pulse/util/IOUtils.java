@@ -155,6 +155,25 @@ public class IOUtils
         }
     }
 
+    public static byte[] fileToBytes(File file) throws IOException
+    {
+        FileInputStream is = null;
+        ByteArrayOutputStream os = null;
+
+        try
+        {
+            is = new FileInputStream(file);
+            os = new ByteArrayOutputStream((int) file.length());
+            joinStreams(is, os);
+            return os.toByteArray();
+        }
+        finally
+        {
+            close(is);
+            close(os);
+        }
+    }
+
     public static void downloadFile(URL url, File destination) throws IOException
     {
         FileOutputStream fos = null;
@@ -177,7 +196,7 @@ public class IOUtils
 
                 throw new IOException(error);
             }
-            
+
             // take url connection input stream and write contents to file
             fos = new FileOutputStream(destination);
             urlStream = urlConnection.getInputStream();

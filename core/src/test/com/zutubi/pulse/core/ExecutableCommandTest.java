@@ -120,7 +120,7 @@ public class ExecutableCommandTest extends PulseTestCase
 
         assertTrue(dir.mkdir());
 
-        if (SystemUtils.isWindows())
+        if (SystemUtils.IS_WINDOWS)
         {
             file = new File(dir, "list.bat");
             FileSystemUtils.createFile(file, "dir");

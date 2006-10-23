@@ -27,7 +27,7 @@ public class AntCommand extends ExecutableCommand
 
             if (getExe() == null)
             {
-                if (SystemUtils.isWindows())
+                if (SystemUtils.IS_WINDOWS)
                 {
                     setExe("ant.bat");
                 }

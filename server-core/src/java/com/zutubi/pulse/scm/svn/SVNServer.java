@@ -5,10 +5,7 @@ import com.zutubi.pulse.core.model.Changelist;
 import com.zutubi.pulse.core.model.NumericalRevision;
 import com.zutubi.pulse.core.model.Revision;
 import com.zutubi.pulse.filesystem.remote.RemoteFile;
-import com.zutubi.pulse.scm.FilepathFilter;
-import com.zutubi.pulse.scm.SCMException;
-import com.zutubi.pulse.scm.SCMServer;
-import com.zutubi.pulse.scm.ScmFilepathFilter;
+import com.zutubi.pulse.scm.*;
 import com.zutubi.pulse.util.IOUtils;
 import com.zutubi.pulse.util.logging.Logger;
 import org.tmatesoft.svn.core.*;
@@ -566,6 +563,11 @@ public class SVNServer implements SCMServer
         {
             IOUtils.close(os);
         }
+    }
+
+    public FileStatus.EOLStyle getEOLPolicy()
+    {
+        return FileStatus.EOLStyle.BINARY;
     }
 
     //=======================================================================

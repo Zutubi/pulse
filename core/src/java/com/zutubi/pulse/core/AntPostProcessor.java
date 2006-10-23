@@ -51,7 +51,7 @@ public class AntPostProcessor extends RegexPostProcessor
         // Unfortunately the ant.bat file on windows does not exit with
         // a non-zero code on failure.  Thus, we need to rely on the output
         // to see if ant is reporting failure.
-        if (!SystemUtils.isWindows())
+        if (!SystemUtils.IS_WINDOWS)
         {
             // By default, prefer the exit code!
             setFailOnError(false);

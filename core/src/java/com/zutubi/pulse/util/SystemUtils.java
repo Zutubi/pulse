@@ -10,19 +10,38 @@ import java.util.List;
  */
 public class SystemUtils
 {
+    public static final boolean IS_WINDOWS = System.getProperty("os.name").toLowerCase().startsWith("win");
+    public static final boolean IS_LINUX = System.getProperty("os.name").toLowerCase().startsWith("linux");
+
+    public static final String LINE_SEPARATOR;
+
+    public static final byte[] LINE_SEPARATOR_BYTES;
+    public static final byte[] CR_BYTES   = new byte [] { '\r' };
+    public static final byte[] CRLF_BYTES = new byte [] { '\r', '\n' };
+    public static final byte[] LF_BYTES   = new byte [] { '\n' };
+
+    static
+    {
+        String sep = System.getProperty("line.separator");
+        if(sep == null)
+        {
+            if(IS_WINDOWS)
+            {
+                sep = "\r\n";
+            }
+            else
+            {
+                sep = "\n";
+            }
+        }
+
+        LINE_SEPARATOR = sep;
+        LINE_SEPARATOR_BYTES = LINE_SEPARATOR.getBytes();
+    }
+
     public static String osName()
     {
         return System.getProperty("os.name");
-    }
-
-    public static boolean isLinux()
-    {
-        return osName().equals("Linux");
-    }
-
-    public static boolean isWindows()
-    {
-        return osName().toLowerCase().contains("win");
     }
 
     public static File findInPath(String name)
@@ -57,7 +76,7 @@ public class SystemUtils
             allPaths.addAll(Arrays.asList(paths));
         }
 
-        if (isWindows())
+        if (IS_WINDOWS)
         {
             return findInWindowsPaths(allPaths, name);
         }
@@ -137,17 +156,5 @@ public class SystemUtils
         }
 
         return false;
-    }
-
-    public static String getLineSeparator()
-    {
-        if(isWindows())
-        {
-            return "\r\n";
-        }
-        else
-        {
-            return "\n";
-        }
     }
 }

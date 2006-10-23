@@ -1,17 +1,9 @@
 package com.zutubi.pulse.core;
 
 import com.zutubi.pulse.core.model.CommandResult;
-import com.zutubi.pulse.core.model.Feature;
-import com.zutubi.pulse.core.model.StoredFileArtifact;
-import com.zutubi.pulse.util.FileSystemUtils;
-import com.zutubi.pulse.util.IOUtils;
 import com.zutubi.pulse.util.SystemUtils;
-import com.zutubi.pulse.test.PulseTestCase;
 
-import java.io.File;
 import java.io.IOException;
-import java.net.URL;
-import java.util.List;
 
 /**
  * Tests for RegexPostProcessor.
@@ -77,7 +69,7 @@ public class Maven2PostProcessorTest extends PostProcessorTestBase
                 "\n" +
                 "");
 
-        if(SystemUtils.isWindows())
+        if(SystemUtils.IS_WINDOWS)
         {
             assertTrue(result.failed());
         }
@@ -102,7 +94,7 @@ public class Maven2PostProcessorTest extends PostProcessorTestBase
                 "[INFO] ----------------------------------------------------------------------------\n" +
                 "[INFO] ----------------------------------------------------------------------------");
 
-        if(SystemUtils.isWindows())
+        if(SystemUtils.IS_WINDOWS)
         {
             assertTrue(result.failed());
         }

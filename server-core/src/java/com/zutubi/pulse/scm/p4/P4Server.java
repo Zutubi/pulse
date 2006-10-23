@@ -5,10 +5,7 @@ import com.zutubi.pulse.core.model.Changelist;
 import com.zutubi.pulse.core.model.NumericalRevision;
 import com.zutubi.pulse.core.model.Revision;
 import com.zutubi.pulse.filesystem.remote.CachingRemoteFile;
-import com.zutubi.pulse.scm.CachingSCMServer;
-import com.zutubi.pulse.scm.SCMException;
-import com.zutubi.pulse.scm.SCMFileCache;
-import com.zutubi.pulse.scm.ScmFilepathFilter;
+import com.zutubi.pulse.scm.*;
 import static com.zutubi.pulse.scm.p4.P4Constants.*;
 import com.zutubi.pulse.util.FileSystemUtils;
 import com.zutubi.pulse.util.logging.Logger;
@@ -606,6 +603,40 @@ public class P4Server extends CachingSCMServer
 
         result = client.runP4(null, P4_COMMAND, FLAG_CLIENT, templateClient, COMMAND_CLIENT, FLAG_OUTPUT);
         FileSystemUtils.createFile(new File(outputDir, "template-client.txt"), result.stdout.toString());
+    }
+
+    public FileStatus.EOLStyle getEOLPolicy() throws SCMException
+    {
+        final FileStatus.EOLStyle[] eol = new FileStatus.EOLStyle[]{FileStatus.EOLStyle.NATIVE};
+
+        client.runP4WithHandler(new P4ErrorDetectingHandler(true)
+        {
+            public void handleStdout(String line) throws SCMException
+            {
+                if(line.startsWith("LineEnd:"))
+                {
+                    String ending = line.substring(8).trim();
+                    if(ending.equals("local"))
+                    {
+                       eol[0] = FileStatus.EOLStyle.NATIVE;
+                    }
+                    else if(ending.equals("unix") || ending.equals("share"))
+                    {
+                       eol[0] = FileStatus.EOLStyle.LINEFEED;
+                    }
+                    else if(ending.equals("mac"))
+                    {
+                       eol[0] = FileStatus.EOLStyle.CARRIAGE_RETURN;
+                    }
+                    else if(ending.equals("win"))
+                    {
+                       eol[0] = FileStatus.EOLStyle.CARRIAGE_RETURN_LINEFEED;
+                    }
+                }
+            }
+        }, P4_COMMAND, FLAG_CLIENT, templateClient, COMMAND_CLIENT, FLAG_OUTPUT);
+
+        return eol[0];
     }
 
     public boolean labelExists(String client, String name) throws SCMException

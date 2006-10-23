@@ -178,16 +178,21 @@ public class PatchArchive
         return status;
     }
 
-    public void apply(File base) throws PulseException
+    public void apply(File base, FileStatus.EOLStyle localEOL) throws PulseException
     {
         try
         {
             for(FileStatus fs: status)
             {
-                fs.apply(base);
+                fs.preApply(base);
             }
 
             unzip(base);
+
+            for(FileStatus fs: status)
+            {
+                fs.postApply(base, localEOL);
+            }
         }
         catch (IOException e)
         {

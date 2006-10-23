@@ -171,4 +171,12 @@ public interface SCMServer
     void tag(Revision revision, String name, boolean moveExisting) throws SCMException;
 
     void writeConnectionDetails(File outputDir) throws SCMException, IOException;
+
+    /**
+     * Returns the policy for line endings enforced at a client level, if any.
+     *
+     * @return the EOL policy, which will be EOLStyle.BINARY if no policy is
+     *         in effect
+     */
+    FileStatus.EOLStyle getEOLPolicy() throws SCMException;
 }
