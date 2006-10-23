@@ -435,6 +435,8 @@ public class DefaultAgentManager implements AgentManager, EventListener, Stoppab
             try
             {
                 addSlaveAgent(slave);
+
+                licenseManager.refreshAuthorisations();
             }
             finally
             {
@@ -467,6 +469,8 @@ public class DefaultAgentManager implements AgentManager, EventListener, Stoppab
         try
         {
             removeSlaveAgent(id);
+
+            licenseManager.refreshAuthorisations();
         }
         finally
         {

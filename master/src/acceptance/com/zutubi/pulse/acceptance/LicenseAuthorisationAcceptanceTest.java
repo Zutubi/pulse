@@ -3,9 +3,11 @@ package com.zutubi.pulse.acceptance;
 import com.zutubi.pulse.acceptance.forms.CreateUserForm;
 import com.zutubi.pulse.acceptance.forms.LicenseEditForm;
 import com.zutubi.pulse.acceptance.forms.LoginForm;
+import com.zutubi.pulse.acceptance.forms.SlaveForm;
 import com.zutubi.pulse.license.License;
 import com.zutubi.pulse.license.LicenseType;
 import com.zutubi.pulse.test.LicenseHelper;
+import com.zutubi.pulse.util.RandomUtils;
 import junit.framework.Test;
 import junit.framework.TestSuite;
 import net.sourceforge.jwebunit.WebTester;
@@ -86,6 +88,52 @@ public class LicenseAuthorisationAcceptanceTest extends BaseAcceptanceTestCase
         goTo("/admin/addAgent.action");
         assertTextPresent("not licensed to execute the requested action");
     }
+/*
+    public void testAddAgentLimitedByLicense() throws Exception
+    {
+        // install a license that supports 4 agents.
+        installLicense(tester, new License(LicenseType.CUSTOM, "holder").setSupportedAgents(4));
+
+        // create and ensure that 4 and only 4 agents can be created.
+        for (int i = 0; i < 10; i++)
+        {
+            String agentName = "agent-" + RandomUtils.randomString(5);
+            addAgent(agentName);
+        }
+    }
+
+    public void testAddUserLimitedByLicense() throws Exception
+    {
+        // install a license that supports a limited number of users.
+        installLicense(tester, new License(LicenseType.CUSTOM, "holder").setSupportedUsers(17));
+
+        // create and ensure that 5 and only 5 users can be created.
+        for (int i = 0; i < 10; i++)
+        {
+            String userName = "user-" + RandomUtils.randomString(5);
+            addUser(userName);
+        }
+    }
+
+    private void addUser(String login)
+    {
+        clickLink("tab.administration");
+        clickLinkWithText("users");
+        CreateUserForm form = new CreateUserForm(tester);
+        form.assertFormPresent();
+        form.saveFormElements(login, login, Boolean.toString(false), login, login);
+    }
+
+    // reusable item of work.
+    private void addAgent(String name)
+    {
+        clickLink("tab.agents");
+        clickLink("agent.add");
+        SlaveForm form = new SlaveForm(tester, true);
+        form.assertFormPresent();
+        form.saveFormElements(name, "host", "80");
+    }
+*/
 
     private static void installLicense(WebTester tester, License l) throws Exception
     {
