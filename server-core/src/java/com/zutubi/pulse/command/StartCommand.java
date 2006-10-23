@@ -1,11 +1,11 @@
 package com.zutubi.pulse.command;
 
-import org.apache.commons.cli.*;
+import com.opensymphony.util.TextUtils;
 import com.zutubi.pulse.bootstrap.SystemBootstrapManager;
 import com.zutubi.pulse.bootstrap.SystemConfiguration;
 import com.zutubi.pulse.bootstrap.conf.EnvConfig;
 import com.zutubi.pulse.util.logging.Logger;
-import com.opensymphony.util.TextUtils;
+import org.apache.commons.cli.*;
 
 /**
  * The start command is used as the entry point to starting the system.
@@ -40,6 +40,8 @@ public class StartCommand implements Command
 
     private String pulseConfig = null;
 
+    private String bindAddress = null;
+
     /**
      * Specify the port to which pulse will bind its web user interface.
      *
@@ -69,7 +71,12 @@ public class StartCommand implements Command
         this.pulseConfig = path;
     }
 
-    @SuppressWarnings({"ACCESS_STATIC_VIA_INSTANCE"})
+    public void setBindAddress(String bindAddress)
+    {
+        this.bindAddress = bindAddress;
+    }
+
+    @SuppressWarnings({"ACCESS_STATIC_VIA_INSTANCE", "AccessStaticViaInstance"})
     public void parse(String... argv) throws ParseException
     {
         Options options = new Options();
@@ -94,8 +101,14 @@ public class StartCommand implements Command
         options.addOption(OptionBuilder.withLongOpt("contextpath")
                 .withArgName("contextpath")
                 .hasArg()
-                .withDescription("the webapps context path.")
+                .withDescription("the web application's context path.")
                 .create('c'));
+
+        options.addOption(OptionBuilder.withLongOpt("bindaddress")
+                .withArgName("address")
+                .hasArg()
+                .withDescription("the web application's bind address.")
+                .create('b'));
 
         CommandLineParser parser = new PosixParser();
         CommandLine commandLine = parser.parse(options, argv, true);
@@ -115,6 +128,10 @@ public class StartCommand implements Command
         if (commandLine.hasOption('f'))
         {
             setConfig(commandLine.getOptionValue('f'));
+        }
+        if (commandLine.hasOption('b'))
+        {
+            setBindAddress(commandLine.getOptionValue('b'));
         }
     }
 
@@ -149,6 +166,11 @@ public class StartCommand implements Command
             if (TextUtils.stringSet(contextPath))
             {
                 System.setProperty(SystemConfiguration.CONTEXT_PATH, contextPath);
+            }
+
+            if (TextUtils.stringSet(bindAddress))
+            {
+                System.setProperty(SystemConfiguration.WEBAPP_BIND_ADDRESS, bindAddress);
             }
 
             SystemBootstrapManager bootstrap = new SystemBootstrapManager();
