@@ -359,7 +359,7 @@ public class FileStatus
 
     public boolean isInteresting()
     {
-        return isOutOfDate() || state != State.UNCHANGED;
+        return isOutOfDate() || state != State.UNCHANGED || properties.size() > 0;
     }
 
     public void preApply(File base) throws IOException

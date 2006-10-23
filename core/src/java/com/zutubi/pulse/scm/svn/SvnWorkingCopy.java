@@ -18,6 +18,8 @@ import org.tmatesoft.svn.core.internal.io.svn.SVNRepositoryFactoryImpl;
 import org.tmatesoft.svn.core.wc.*;
 
 import java.io.File;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Properties;
 
 /**
@@ -103,13 +105,94 @@ public class SvnWorkingCopy extends PersonalBuildSupport implements WorkingCopy
             SVNStatusClient statusClient = clientManager.getStatusClient();
             statusClient.setEventHandler(handler);
             statusClient.doStatus(base, true, true, true, false, false, handler);
+            WorkingCopyStatus wcs = handler.getStatus();
+
+            // Now find out if any changed files have an eol-style
+            getProperties(wcs, handler.propertyChangedPaths);
+
+            return wcs;
         }
         catch (SVNException e)
         {
             throw convertException(e);
         }
 
-        return handler.getStatus();
+    }
+
+    private void getProperties(WorkingCopyStatus wcs, List<String> propertyChangedPaths) throws SVNException
+    {
+        SVNWCClient wcc = clientManager.getWCClient();
+
+        for(FileStatus fs: wcs)
+        {
+            if(fs.getState().requiresFile())
+            {
+                SVNPropertyData property = wcc.doGetProperty(new File(base, fs.getPath()), SVN_PROPERTY_EOL_STYLE, SVNRevision.WORKING, SVNRevision.WORKING, false);
+                if(property != null)
+                {
+                    fs.setProperty(FileStatus.PROPERTY_EOL_STYLE, convertEOLStyle(property.getValue()));
+                }
+            }
+
+            if(fs.getState() == FileStatus.State.ADDED)
+            {
+                // For new files, check for svn:executable 
+                SVNPropertyData property = wcc.doGetProperty(new File(base, fs.getPath()), SVN_PROPERTY_EXECUTABLE, SVNRevision.WORKING, SVNRevision.WORKING, false);
+                if(property != null)
+                {
+                    fs.setProperty(FileStatus.PROPERTY_EXECUTABLE, "true");
+                }
+            }
+        }
+
+        // For items with changed properties, check if the executable property has flipped
+        for(String path: propertyChangedPaths)
+        {
+            FileStatus fs = wcs.getFileStatus(path);
+            SVNPropertyData baseProperty = wcc.doGetProperty(new File(base, path), SVN_PROPERTY_EXECUTABLE, SVNRevision.BASE, SVNRevision.BASE, false);
+            SVNPropertyData workingProperty = wcc.doGetProperty(new File(base, path), SVN_PROPERTY_EXECUTABLE, SVNRevision.WORKING, SVNRevision.WORKING, false);
+
+            if(baseProperty == null)
+            {
+                if(workingProperty != null)
+                {
+                    // Added svn:executable
+                    fs.setProperty(FileStatus.PROPERTY_EXECUTABLE, "true");
+                }
+            }
+            else
+            {
+                if(workingProperty == null)
+                {
+                    // Removed svn:executable
+                    fs.setProperty(FileStatus.PROPERTY_EXECUTABLE, "false");
+                }
+            }
+        }
+    }
+
+    private String convertEOLStyle(String eol)
+    {
+        if(eol.equals("native"))
+        {
+            return FileStatus.EOLStyle.NATIVE.toString();
+        }
+        else if(eol.equals("CR"))
+        {
+            return FileStatus.EOLStyle.CARRIAGE_RETURN.toString();
+        }
+        else if(eol.equals("CRLF"))
+        {
+            return FileStatus.EOLStyle.CARRIAGE_RETURN_LINEFEED.toString();
+        }
+        else if(eol.equals("LF"))
+        {
+            return FileStatus.EOLStyle.LINEFEED.toString();
+        }
+        else
+        {
+            return FileStatus.EOLStyle.BINARY.toString();
+        }
     }
 
     public void update() throws SCMException
@@ -135,6 +218,7 @@ public class SvnWorkingCopy extends PersonalBuildSupport implements WorkingCopy
     private class StatusHandler implements ISVNEventHandler, ISVNStatusHandler
     {
         WorkingCopyStatus status = new WorkingCopyStatus();
+        List<String> propertyChangedPaths = new LinkedList<String>();
 
         public void handleEvent(SVNEvent event, double progress)
         {
@@ -219,9 +303,15 @@ public class SvnWorkingCopy extends PersonalBuildSupport implements WorkingCopy
             {
                 fileState = FileStatus.State.REPLACED;
             }
-            else if (contentsStatus == SVNStatusType.STATUS_NONE)
+            else
             {
                 fileState = FileStatus.State.UNCHANGED;
+            }
+
+            SVNStatusType propertiesStatus = svnStatus.getPropertiesStatus();
+            if(propertiesStatus != SVNStatusType.STATUS_NONE)
+            {
+                propertyChangedPaths.add(path);
             }
 
             if (fileState != null)
