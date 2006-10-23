@@ -280,6 +280,9 @@ public class DefaultAgentManager implements AgentManager
             try
             {
                 addSlaveAgent(slave);
+
+                // ensure that the license authorisations are correct.
+                licenseManager.refreshAuthorisations();
             }
             finally
             {
@@ -312,6 +315,9 @@ public class DefaultAgentManager implements AgentManager
         try
         {
             removeSlaveAgent(id);
+
+            // ensure that the license authorisations are correct.
+            licenseManager.refreshAuthorisations();
         }
         finally
         {
