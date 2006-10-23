@@ -9,8 +9,7 @@ import com.zutubi.pulse.model.UserManager;
 import com.zutubi.pulse.upgrade.UpgradeManager;
 import com.zutubi.pulse.util.IOUtils;
 
-import java.io.File;
-import java.io.IOException;
+import java.io.*;
 import java.util.List;
 import java.util.Properties;
 
@@ -117,7 +116,7 @@ public class DefaultSetupManager implements SetupManager
         {
             // copy the template file into the config location.
             SystemPaths paths = configurationManager.getSystemPaths();
-            File configTemplate = new File(paths.getConfigRoot(), "config.properties");
+            File configTemplate = new File(paths.getConfigRoot(), "config.properties.template");
             File parentFile = f.getParentFile();
 /*
             System.out.println("File: " + f);
@@ -131,7 +130,7 @@ public class DefaultSetupManager implements SetupManager
             {
                 throw new IOException("Unable to create config file '" + f.getAbsolutePath() + "'");
             }
-            IOUtils.copyFile(configTemplate, f);
+            copyTemplateConfig(configTemplate, f);
 
             // write the default configuration to this template file.
             // There needs to be a way to do this without duplicating the default configuration data.
@@ -143,6 +142,36 @@ public class DefaultSetupManager implements SetupManager
 
             PropertiesWriter writer = new PropertiesWriter();
             writer.write(f, props);
+        }
+    }
+
+    private void copyTemplateConfig(File template, File destination) throws IOException
+    {
+        BufferedReader reader = null;
+        BufferedWriter writer = null;
+
+        try
+        {
+            reader = new BufferedReader(new FileReader(template));
+            writer = new BufferedWriter(new FileWriter(destination));
+
+            String line;
+            boolean doneSkipping = false;
+
+            while((line = reader.readLine()) != null)
+            {
+                if(doneSkipping || !line.startsWith("###"))
+                {
+                    doneSkipping = true;
+                    writer.write(line);
+                    writer.write('\n');
+                }
+            }
+        }
+        finally
+        {
+            IOUtils.close(reader);
+            IOUtils.close(writer);
         }
     }
 
