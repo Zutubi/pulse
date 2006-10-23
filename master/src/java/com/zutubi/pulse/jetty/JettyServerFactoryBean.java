@@ -1,6 +1,7 @@
 package com.zutubi.pulse.jetty;
 
 import com.zutubi.pulse.bootstrap.MasterConfigurationManager;
+import com.zutubi.pulse.bootstrap.SystemConfiguration;
 import com.zutubi.pulse.util.logging.Logger;
 import org.mortbay.http.SocketListener;
 import org.mortbay.jetty.Server;
@@ -30,7 +31,9 @@ public class JettyServerFactoryBean implements FactoryBean
 
                     // configuration of the server depends upon the configmanager.
                     SocketListener listener = new SocketListener();
-                    listener.setPort(configManager.getSystemConfig().getServerPort());
+                    SystemConfiguration systemConfiguration = configManager.getSystemConfig();
+                    listener.setHost(systemConfiguration.getBindAddress());
+                    listener.setPort(systemConfiguration.getServerPort());
                     instance.addListener(listener);
                 }
             }

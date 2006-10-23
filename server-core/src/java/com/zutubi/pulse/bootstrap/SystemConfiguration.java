@@ -5,6 +5,7 @@ package com.zutubi.pulse.bootstrap;
  */
 public interface SystemConfiguration
 {
+    public static final String WEBAPP_BIND_ADDRESS = "webapp.bindAddress";
     /**
      *
      */
@@ -19,6 +20,11 @@ public interface SystemConfiguration
      *
      */
     public static final String PULSE_DATA = "pulse.data";
+
+    /**
+     * @return the address that we should bind the http server to.
+     */
+    String getBindAddress();
 
     /**
      * The port on which the http server will listen for connections.

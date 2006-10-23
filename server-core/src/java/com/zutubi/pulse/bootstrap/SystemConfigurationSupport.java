@@ -17,6 +17,11 @@ public class SystemConfigurationSupport extends ConfigSupport implements SystemC
         super(new CompositeConfig(config));
     }
 
+    public String getBindAddress()
+    {
+        return getProperty(WEBAPP_BIND_ADDRESS, "0.0.0.0");
+    }
+
     public int getServerPort()
     {
         return getInteger(WEBAPP_PORT, 8080);

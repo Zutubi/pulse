@@ -45,6 +45,8 @@ public class StartCommand implements Command
 
     private String pulseConfig = null;
 
+    private String bindAddress = null;
+
     /**
      * Specify the port to which pulse will bind its web user interface.
      *
@@ -74,6 +76,11 @@ public class StartCommand implements Command
         this.pulseConfig = path;
     }
 
+    public void setBindAddress(String bindAddress)
+    {
+        this.bindAddress = bindAddress;
+    }
+
     @SuppressWarnings({ "ACCESS_STATIC_VIA_INSTANCE", "AccessStaticViaInstance" })
     private void parse(String... argv) throws ParseException
     {
@@ -94,6 +101,10 @@ public class StartCommand implements Command
                 .hasArg()
                 .create('c'));
 
+        options.addOption(OptionBuilder.withLongOpt("bindaddress")
+                .hasArg()
+                .create('b'));
+
         CommandLineParser parser = new PosixParser();
         CommandLine commandLine = parser.parse(options, argv, true);
 
@@ -112,6 +123,10 @@ public class StartCommand implements Command
         if (commandLine.hasOption('f'))
         {
             setConfig(commandLine.getOptionValue('f'));
+        }
+        if (commandLine.hasOption('b'))
+        {
+            setBindAddress(commandLine.getOptionValue('b'));
         }
     }
 
@@ -159,6 +174,11 @@ public class StartCommand implements Command
                 System.setProperty(SystemConfiguration.CONTEXT_PATH, contextPath);
             }
 
+            if (TextUtils.stringSet(bindAddress))
+            {
+                System.setProperty(SystemConfiguration.WEBAPP_BIND_ADDRESS, bindAddress);
+            }
+
             SystemBootstrapManager bootstrap = new SystemBootstrapManager();
             bootstrap.bootstrapSystem();
             return 0;
@@ -196,7 +216,8 @@ public class StartCommand implements Command
         Map<String, String> options = new LinkedHashMap<String, String>();
         options.put("-p [--port] port", "the port to be used by the pulse web interface");
         options.put("-d [--data] dir", "use the specified directory for all pulse data");
-        options.put("-c [--contextPath] path", "the pulse web application context path");
+        options.put("-c [--contextpath] path", "the pulse web application context path");
+        options.put("-b [--bindaddress] addr", "the address to bind the server to");
         options.put("-f [--config] file", "specify an alternate config file");
         return options;
     }
