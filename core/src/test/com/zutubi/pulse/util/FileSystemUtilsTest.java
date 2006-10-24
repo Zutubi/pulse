@@ -2,10 +2,7 @@ package com.zutubi.pulse.util;
 
 import com.zutubi.pulse.test.PulseTestCase;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 import java.util.Arrays;
 import java.util.zip.ZipInputStream;
 
@@ -277,7 +274,7 @@ public class FileSystemUtilsTest extends PulseTestCase
 
     public void testGetAndSetPermissionPerformance() throws IOException
     {
-        if (SystemUtils.findInPath("chmod") != null && SystemUtils.findInPath("stat") != null)
+        if (!SystemUtils.IS_WINDOWS)
         {
             File f = null;
             try
@@ -495,7 +492,8 @@ public class FileSystemUtilsTest extends PulseTestCase
         InputStream is = null;
         try
         {
-            is = getClass().getResourceAsStream("FileSystemUtils." + getName() + ".zip");
+            File dataFile = getTestDataFile("core", getName(), "zip");
+            is = new FileInputStream(dataFile);
             assertNotNull(is);
             FileSystemUtils.extractZip(new ZipInputStream(is), tmpDir);
         }

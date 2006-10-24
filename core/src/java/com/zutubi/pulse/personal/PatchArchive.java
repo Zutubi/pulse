@@ -227,12 +227,6 @@ public class PatchArchive
     private void extractEntry(File base, ZipEntry entry, ZipInputStream zin) throws IOException
     {
         String path = getPath(entry);
-        FileStatus fs = status.getFileStatus(path);
-        if(fs == null)
-        {
-            throw new IOException("Zip entry without status '" + path + "'");
-        }
-
         File f = new File(base, path);
         if(entry.isDirectory())
         {
@@ -257,8 +251,6 @@ public class PatchArchive
                 IOUtils.close(out);
             }
         }
-
-        f.setLastModified(entry.getTime());
     }
 
     private String getPath(ZipEntry entry) throws IOException

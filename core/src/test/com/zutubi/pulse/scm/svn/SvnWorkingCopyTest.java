@@ -76,15 +76,15 @@ public class SvnWorkingCopyTest extends PulseTestCase
         FileSystemUtils.extractZip(repoZip, tempDir);
 
         File dump = new File(tempDir, "SvnWorkingCopyTest.dump");
-        svnProcess = Runtime.getRuntime().exec(new String[] { "svnadmin", "load", repoDir.getAbsolutePath() });
+        svnProcess = Runtime.getRuntime().exec(new String[] { "svnadmin", "load", "-q", repoDir.getAbsolutePath() });
         FileInputStream is = new FileInputStream(dump);
         IOUtils.joinStreams(is, svnProcess.getOutputStream());
-        is.close();
         svnProcess.getOutputStream().close();
+        is.close();
         svnProcess.waitFor();
 
         // Start svn server
-        svnProcess = Runtime.getRuntime().exec(new String[] { "svnserve", "--foreground", "-dr", repoDir.getAbsolutePath()});
+        svnProcess = Runtime.getRuntime().exec(new String[] { "svnserve", "--foreground", "-dr", "."}, null, repoDir);
         waitForServer(3690);
 
         clientManager = SVNClientManager.newInstance();

@@ -254,7 +254,7 @@ public class ExecutableCommandTest extends PulseTestCase
         execute(command, result, 1234);
 
         String output = getEnv();
-        assertTrue(output.contains("PATH=somedir" + File.pathSeparator));
+        assertTrue(output.toLowerCase().contains("path=somedir" + File.pathSeparator));
     }
 
     private String getOutput() throws IOException

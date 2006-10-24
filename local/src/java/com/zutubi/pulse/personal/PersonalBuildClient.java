@@ -78,7 +78,7 @@ public class PersonalBuildClient extends PersonalBuildSupport
         int ourBuild = Version.getVersion().getBuildNumberAsInt();
         int confirmedBuild = config.getConfirmedVersion();
 
-        debug("Checking pulse serrver version...");
+        debug("Checking pulse server version...");
         try
         {
             int serverBuild = rpc.getVersion();

@@ -959,7 +959,7 @@ public class FileSystemUtils
 
         try
         {
-            tempFile = File.createTempFile(FileSystemUtils.class.getName(), ".tmp");
+            tempFile = File.createTempFile(file.getName(), ".tmp", file.getParentFile());
 
             InputStream in = null;
             OutputStream out = null;
@@ -1011,6 +1011,7 @@ public class FileSystemUtils
                 IOUtils.close(out);
             }
 
+            file.delete();
             if(!tempFile.renameTo(file))
             {
                 throw new IOException("Unable to rename temporary file '" + tempFile.getAbsolutePath() + "' to '" + file.getAbsolutePath() + "'");
