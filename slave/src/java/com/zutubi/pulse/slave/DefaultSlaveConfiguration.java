@@ -1,5 +1,6 @@
 package com.zutubi.pulse.slave;
 
+import com.opensymphony.util.TextUtils;
 import com.zutubi.pulse.bootstrap.SystemConfiguration;
 import com.zutubi.pulse.bootstrap.SystemPaths;
 import com.zutubi.pulse.bootstrap.UserPaths;
@@ -46,7 +47,15 @@ public class DefaultSlaveConfiguration implements SlaveConfiguration, SystemConf
 
     public String getBindAddress()
     {
-        return config.getProperty(WEBAPP_BIND_ADDRESS, "0.0.0.0");
+        String result = config.getProperty(WEBAPP_BIND_ADDRESS);
+        if(TextUtils.stringSet(result))
+        {
+            return result;
+        }
+        else
+        {
+            return "0.0.0.0";
+        }
     }
 
     public int getServerPort()
