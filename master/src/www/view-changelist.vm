@@ -22,7 +22,7 @@
         </tr>
         <tr>
             #contentRowHeading("changelist.comment")
-            <td class="content-wrap">$action.transformComment($changelist)</td>
+            <td class="content-wrap"><pre>$action.transformComment($changelist)</pre></td>
         </tr>
     </table>
 
