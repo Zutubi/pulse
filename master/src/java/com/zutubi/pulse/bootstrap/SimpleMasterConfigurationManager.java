@@ -5,6 +5,8 @@ import com.zutubi.pulse.bootstrap.conf.EnvConfig;
 import com.zutubi.pulse.bootstrap.conf.VolatileReadOnlyConfig;
 import com.zutubi.pulse.config.Config;
 import com.zutubi.pulse.config.FileConfig;
+import com.zutubi.pulse.events.EventManager;
+import com.zutubi.pulse.events.DataDirectoryChangedEvent;
 
 import java.io.File;
 import java.util.Properties;
@@ -102,6 +104,10 @@ public class SimpleMasterConfigurationManager extends AbstractConfigurationManag
     public void setPulseData(File f)
     {
         getSystemConfig().setDataPath(f.getAbsolutePath());
+
+        // this object is instantiated before the eventManager, so the wiring needs to be manual.
+        EventManager eventManager = (EventManager) ComponentContext.getBean("eventManager");
+        eventManager.publish(new DataDirectoryChangedEvent(this));
 
         // refresh the data instance.
         data = null;

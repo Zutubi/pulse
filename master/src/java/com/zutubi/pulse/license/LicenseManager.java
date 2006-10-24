@@ -3,6 +3,10 @@ package com.zutubi.pulse.license;
 import com.zutubi.pulse.bootstrap.Data;
 import com.zutubi.pulse.bootstrap.DataResolver;
 import com.zutubi.pulse.license.authorisation.Authorisation;
+import com.zutubi.pulse.events.EventManager;
+import com.zutubi.pulse.events.EventListener;
+import com.zutubi.pulse.events.Event;
+import com.zutubi.pulse.events.DataDirectoryChangedEvent;
 
 import java.util.Arrays;
 import java.util.LinkedList;
@@ -14,6 +18,8 @@ import java.util.List;
  */
 public class LicenseManager
 {
+    private EventManager eventManager;
+
     private DataResolver resolver;
 
     private List<Authorisation> authorisations = new LinkedList<Authorisation>();
@@ -29,6 +35,24 @@ public class LicenseManager
     }
 
     public void init()
+    {
+        eventManager.register(new EventListener()
+        {
+            public void handleEvent(Event evt)
+            {
+                refresh();
+            }
+
+            public Class[] getHandledEvents()
+            {
+                return new Class[]{DataDirectoryChangedEvent.class};
+            }
+        });
+        
+        refresh();
+    }
+
+    private void refresh()
     {
         // load the license from disk.
         Data data = resolver.getData();
@@ -71,5 +95,15 @@ public class LicenseManager
     {
         this.authorisations.add(auth);
         refreshAuthorisations();
+    }
+
+    /**
+     * Required resource.
+     *
+     * @param eventManager instance.
+     */
+    public void setEventManager(EventManager eventManager)
+    {
+        this.eventManager = eventManager;
     }
 }
