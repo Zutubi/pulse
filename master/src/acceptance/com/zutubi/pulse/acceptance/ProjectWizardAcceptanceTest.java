@@ -69,7 +69,7 @@ public class ProjectWizardAcceptanceTest extends BaseAcceptanceTestCase
         assertDefaultSetup(projectName);
 
         // ensure that it appears in your list of projects.
-        clickLinkWithText("projects");
+        clickLink(Navigation.TAB_PROJECTS);
         assertLinkPresentWithText(projectName);
     }
 
@@ -103,7 +103,7 @@ public class ProjectWizardAcceptanceTest extends BaseAcceptanceTestCase
         assertDefaultSetup(projectName);
 
         // ensure that it appears in your list of projects.
-        clickLinkWithText("projects");
+        clickLink(Navigation.TAB_PROJECTS);
         assertLinkPresentWithText(projectName);
     }
 
@@ -151,16 +151,15 @@ public class ProjectWizardAcceptanceTest extends BaseAcceptanceTestCase
         assertSpecifics(type, properties);
 
         // ensure that it appears in your list of projects.
-        clickLinkWithText("projects");
+        clickLink(Navigation.TAB_PROJECTS);
         assertLinkPresentWithText(projectName);
     }
 
     private void startAddProjectWizard()
     {
         beginAt("/");
-        clickLinkWithText("projects");
-        assertLinkPresent("project.add");
-        clickLink("project.add");
+        clickLink(Navigation.TAB_PROJECTS);
+        assertAndClick(Navigation.Projects.LINK_ADD_PROJECT);
     }
 
     public void testProjectNameUnique()

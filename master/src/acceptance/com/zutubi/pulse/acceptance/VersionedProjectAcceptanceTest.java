@@ -23,8 +23,7 @@ public class VersionedProjectAcceptanceTest extends ProjectAcceptanceTestBase
         // verify what we have to start with.
         assertProjectSpecificsTable("versioned", "pulse.xml");
 
-        assertLinkPresent("project.specifics.edit");
-        clickLink("project.specifics.edit");
+        assertAndClick("project.specifics.edit");
 
         // assert that the form is pre populated with the expected data.
         form.assertFormElements("pulse.xml");
@@ -41,8 +40,7 @@ public class VersionedProjectAcceptanceTest extends ProjectAcceptanceTestBase
 
         assertProjectSpecificsTable("versioned", "pulse.xml");
 
-        assertLinkPresent("project.specifics.edit");
-        clickLink("project.specifics.edit");
+        assertAndClick("project.specifics.edit");
 
         form.assertFormElements("pulse.xml");
 
@@ -59,8 +57,7 @@ public class VersionedProjectAcceptanceTest extends ProjectAcceptanceTestBase
         // test the editing of versioned specifics.
         assertProjectSpecificsTable("versioned", "pulse.xml");
 
-        assertLinkPresent("project.specifics.edit");
-        clickLink("project.specifics.edit");
+        assertAndClick("project.specifics.edit");
 
         form.assertFormElements("pulse.xml");
 

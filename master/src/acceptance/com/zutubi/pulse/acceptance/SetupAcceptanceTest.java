@@ -65,7 +65,7 @@ public class SetupAcceptanceTest extends BaseAcceptanceTestCase
         // one complete, we should see the home page, and it should contain the following:
         assertTextPresent(":: welcome ::");
         assertTextPresent("A. D. Ministrator");
-        assertLinkPresentWithText("logout");
+        assertLinkPresent(Navigation.LINK_LOGOUT);
 
         // lets also take this opportunity to verify that what was set during the setup wizard
         // was actually persisted.

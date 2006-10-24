@@ -4,10 +4,6 @@ import com.zutubi.pulse.acceptance.forms.GeneralConfigurationForm;
 import com.zutubi.pulse.acceptance.forms.SignupForm;
 import com.zutubi.pulse.util.RandomUtils;
 
-import java.io.IOException;
-
-import org.xml.sax.SAXException;
-
 /**
  * This acceptance test case covers the various aspects of an annonymous user using the signup functionality
  * to create an account for themselves.
@@ -178,8 +174,8 @@ public class UserSignupAcceptanceTest extends BaseAcceptanceTestCase
 
         form.assertFormNotPresent();
 
-        assertLinkNotPresent("tab.administration");
-        assertLinkPresent("tab.projects");
-        assertLinkPresent("tab.dashboard");
+        assertLinkNotPresent(Navigation.TAB_ADMINISTRATION);
+        assertLinkPresent(Navigation.TAB_PROJECTS);
+        assertLinkPresent(Navigation.TAB_DASHBOARD);
     }
 }

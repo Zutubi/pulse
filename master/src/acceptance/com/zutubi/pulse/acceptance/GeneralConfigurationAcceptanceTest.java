@@ -32,7 +32,7 @@ public class GeneralConfigurationAcceptanceTest extends BaseAcceptanceTestCase
     {
         navigateToGeneralConfiguration();
 
-        clickLinkWithText("reset");
+        clickLink(Navigation.Administration.LINK_RESET_GENERAL);
         assertTextPresent("http://confluence.zutubi.com/display/");
     }
 
@@ -43,7 +43,7 @@ public class GeneralConfigurationAcceptanceTest extends BaseAcceptanceTestCase
         assertTextNotPresent("http://saved.base.url.net");
         assertTextNotPresent("saved.help.url");
 
-        clickLink("general.edit");
+        clickLink(Navigation.Administration.LINK_EDIT_GENERAL);
 
         GeneralConfigurationForm form = new GeneralConfigurationForm(tester);
 
@@ -56,7 +56,7 @@ public class GeneralConfigurationAcceptanceTest extends BaseAcceptanceTestCase
         assertTextPresent("saved.help.url");
         assertTextPresent("after 0 minutes");
 
-        clickLink("general.edit");
+        clickLink(Navigation.Administration.LINK_EDIT_GENERAL);
         form.assertFormPresent();
         form.assertFormElements("http://saved.base.url.net", "saved.help.url", "true", "false", "false", "4", "true", "0");
     }
@@ -67,7 +67,7 @@ public class GeneralConfigurationAcceptanceTest extends BaseAcceptanceTestCase
         // ensure that we are not starting with the email address we using for this test.
         assertTextNotPresent("cancelled.host.com");
 
-        clickLink("general.edit");
+        clickLink(Navigation.Administration.LINK_EDIT_GENERAL);
 
         GeneralConfigurationForm form = new GeneralConfigurationForm(tester);
         form.assertFormPresent();
@@ -83,7 +83,7 @@ public class GeneralConfigurationAcceptanceTest extends BaseAcceptanceTestCase
     public void testValidation() throws Exception
     {
         navigateToGeneralConfiguration();
-        clickLink("general.edit");
+        clickLink(Navigation.Administration.LINK_EDIT_GENERAL);
 
         GeneralConfigurationForm form = new GeneralConfigurationForm(tester);
         form.assertFormPresent();

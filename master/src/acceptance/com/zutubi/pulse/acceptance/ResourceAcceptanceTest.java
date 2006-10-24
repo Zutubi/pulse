@@ -20,7 +20,7 @@ public class ResourceAcceptanceTest extends BaseAcceptanceTestCase
         propertyName = "property-" + RandomUtils.randomString(5);
 
         login("admin", "admin");
-        clickLinkWithText("agents");
+        clickLink(Navigation.TAB_AGENTS);
         clickLinkWithText("master");
         clickLinkWithText("resources");
     }

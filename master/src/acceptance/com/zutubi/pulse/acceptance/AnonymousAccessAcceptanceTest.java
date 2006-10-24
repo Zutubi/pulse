@@ -10,10 +10,7 @@ public class AnonymousAccessAcceptanceTest extends BaseAcceptanceTestCase
     public void testDisabledByDefault()
     {
         beginAt("/");
-        if(tester.getDialog().isLinkPresent("logout"))
-        {
-            clickLink("logout");
-        }
+        ensureLoggedOut();
 
         LoginForm form = new LoginForm(tester);
         form.assertFormPresent();
@@ -25,27 +22,27 @@ public class AnonymousAccessAcceptanceTest extends BaseAcceptanceTestCase
         // TODO: ensure that a project has been created before this test is executed.
 
         loginAsAdmin();
-        clickLink("tab.administration");
-        clickLink("general.edit");
+        clickLink(Navigation.TAB_ADMINISTRATION);
+        clickLink(Navigation.Administration.LINK_EDIT_GENERAL);
 
         GeneralConfigurationForm form = new GeneralConfigurationForm(tester);
         form.assertFormPresent();
         form.setCheckboxChecked("anonEnabled", true);
         form.save();
 
-        clickLink("logout");
-        assertLinkPresent("tab.projects");
+        clickLink(Navigation.LINK_LOGOUT);
+        assertLinkPresent(Navigation.TAB_PROJECTS);
         assertLinkPresent("login");
 
         loginAsAdmin();
-        clickLink("tab.administration");
-        clickLink("general.edit");
+        clickLink(Navigation.TAB_ADMINISTRATION);
+        clickLink(Navigation.Administration.LINK_EDIT_GENERAL);
 
         form.assertFormPresent();
         form.setCheckboxChecked("anonEnabled", false);
         form.save();
 
-        clickLink("logout");
+        clickLink(Navigation.LINK_LOGOUT);
 
         LoginForm login = new LoginForm(tester);
         login.assertFormPresent();

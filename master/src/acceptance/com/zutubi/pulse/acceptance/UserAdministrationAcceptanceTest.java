@@ -49,16 +49,16 @@ public class UserAdministrationAcceptanceTest extends BaseAcceptanceTestCase
         assertFormReset();
 
         // check that we can login with this new user.
-        clickLinkWithText("logout");
+        logout();
 
         login(login, login);
 
         // if login was successful, should see the welcome page and a logout link.
         assertTextPresent(":: welcome ::");
-        assertLinkPresentWithText("logout");
+        assertLinkPresent(Navigation.LINK_LOGOUT);
 
         // ensure that this user does not have admin permissions.
-        assertLinkNotPresentWithText("administration");
+        assertLinkNotPresent(Navigation.TAB_ADMINISTRATION);
     }
 
     public void testCreateUserValidation()

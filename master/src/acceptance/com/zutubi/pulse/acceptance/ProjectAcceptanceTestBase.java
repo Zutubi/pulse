@@ -38,8 +38,8 @@ public class ProjectAcceptanceTestBase extends BaseAcceptanceTestCase
 
         // navigate to the create project wizard.
         // fill in the form details.
-        clickLinkWithText("projects");
-        clickLinkWithText("add new project");
+        clickLink(Navigation.TAB_PROJECTS);
+        assertAndClick(Navigation.Projects.LINK_ADD_PROJECT);
 
         projectName = "project " + RandomUtils.randomString(5);
         submitProjectBasicsForm(projectName, DESCRIPTION, URL, "cvs", type.toString().toLowerCase());
@@ -56,7 +56,4 @@ public class ProjectAcceptanceTestBase extends BaseAcceptanceTestCase
 
         assertTablePresent("project.basics");
     }
-
-
-
 }

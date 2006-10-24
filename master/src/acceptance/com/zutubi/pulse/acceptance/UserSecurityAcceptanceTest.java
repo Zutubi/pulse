@@ -38,8 +38,7 @@ public class UserSecurityAcceptanceTest extends BaseAcceptanceTestCase
         loginForm.loginFormElements("admin", "admin", "false");
         loginForm.assertFormNotPresent();
 
-        // logout.
-        assertAndClick("logout");
+        assertAndClick(Navigation.LINK_LOGOUT);
 
         // assert that we are back at the login page.
         loginForm.assertFormPresent();
@@ -97,7 +96,7 @@ public class UserSecurityAcceptanceTest extends BaseAcceptanceTestCase
         assertCookieSet(cookieName);
 
         // logging out should set a nother cookie, this time one that expires now.
-        assertAndClick("logout");
+        assertAndClick(Navigation.LINK_LOGOUT);
 
         // check that the cookie has expired.
         assertCookieValue(cookieName, "");

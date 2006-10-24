@@ -51,8 +51,8 @@ public class RssAcceptanceTest extends BaseAcceptanceTestCase
     {
         // navigate to the create project wizard.
         // fill in the form details.
-        clickLinkWithText("projects");
-        clickLinkWithText("add new project");
+        clickLink(Navigation.TAB_PROJECTS);
+        assertAndClick(Navigation.Projects.LINK_ADD_PROJECT);
 
         String projectName = "project " + RandomUtils.randomString(5);
         submitProjectBasicsForm(projectName, "test project description", "http://test.project.com", "cvs", "versioned");

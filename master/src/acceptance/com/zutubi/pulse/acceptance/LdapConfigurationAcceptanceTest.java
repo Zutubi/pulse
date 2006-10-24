@@ -27,20 +27,13 @@ public class LdapConfigurationAcceptanceTest extends BaseAcceptanceTestCase
         super.tearDown();
     }
 
-
-    private void navigateToLdapConfiguration()
-    {
-        beginAt("/");
-        clickLinkWithText("administration");
-    }
-
     public void testEdit() throws Exception
     {
         navigateToLdapConfiguration();
 
         LdapConfigurationForm form = new LdapConfigurationForm(tester);
 
-        assertAndClick("ldap.edit");
+        assertAndClick(Navigation.Administration.LINK_EDIT_LDAP);
         form.assertFormPresent();
 
         form.saveFormElements("true", "ldap://dummy/", "dc=example,dc=com", "uid=admin", "password", "(uid={0})", "true", "mail");
@@ -50,7 +43,7 @@ public class LdapConfigurationAcceptanceTest extends BaseAcceptanceTestCase
 
         assertLdapTable("true", "ldap://dummy/", "dc=example,dc=com", "uid=admin", "(uid={0})", "true", "mail");
 
-        assertAndClick("ldap.edit");
+        assertAndClick(Navigation.Administration.LINK_EDIT_LDAP);
         form.assertFormElements("true", "ldap://dummy/", "dc=example,dc=com", "uid=admin", "password", "(uid={0})", "true", "mail");
         form.cancelFormElements("true", "ldap://dummy/", "dc=example,dc=com", "uid=admin", "password", "(uid={0})", "true", "mail");
     }
@@ -60,7 +53,7 @@ public class LdapConfigurationAcceptanceTest extends BaseAcceptanceTestCase
         navigateToLdapConfiguration();
         testEdit();
 
-        assertAndClick("ldap.reset");
+        assertAndClick(Navigation.Administration.LINK_RESET_LDAP);
         assertLdapTable("false", "", "", "", "", "false", "");
     }
 
@@ -68,7 +61,7 @@ public class LdapConfigurationAcceptanceTest extends BaseAcceptanceTestCase
     {
         navigateToLdapConfiguration();
 
-        assertAndClick("ldap.edit");
+        assertAndClick(Navigation.Administration.LINK_EDIT_LDAP);
         LdapConfigurationForm form = new LdapConfigurationForm(tester);
         form.assertFormPresent();
         form.cancelFormElements("true", "oogie", "oogie", "oogie", "oogie", "boogie", "false", "boogie");
@@ -80,7 +73,7 @@ public class LdapConfigurationAcceptanceTest extends BaseAcceptanceTestCase
     {
         navigateToLdapConfiguration();
 
-        assertAndClick("ldap.edit");
+        assertAndClick(Navigation.Administration.LINK_EDIT_LDAP);
         LdapConfigurationForm form = new LdapConfigurationForm(tester);
         form.assertFormPresent();
         form.saveFormElements("true", "", "", "", "", "", "false", "");

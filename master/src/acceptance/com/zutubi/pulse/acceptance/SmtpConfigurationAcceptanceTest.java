@@ -41,12 +41,6 @@ public class SmtpConfigurationAcceptanceTest extends BaseAcceptanceTestCase
 
     }
 
-    private void navigateToSmtpConfiguration()
-    {
-        beginAt("/");
-        clickLinkWithText("administration");
-    }
-
     public void testEdit() throws Exception
     {
         navigateToSmtpConfiguration();

@@ -85,8 +85,8 @@ public class ProjectAcceptanceTest extends ProjectAcceptanceTestBase
 
         //check that we can not change the name of the project to an already in use project name.
         // create a new project.
-        clickLinkWithText("projects");
-        clickLinkWithText("add new project");
+        clickLink(Navigation.TAB_PROJECTS);
+        assertAndClick(Navigation.Projects.LINK_ADD_PROJECT);
 
         String newProject = "proect " + RandomUtils.randomString(5);
         submitProjectBasicsForm(newProject, "test description", "http://test/url", "cvs", "versioned");
@@ -930,7 +930,7 @@ public class ProjectAcceptanceTest extends ProjectAcceptanceTestBase
         assertProjectCvsTable("cvs", TEST_CVSROOT + "[updatedModule]");
 
         // ensure that project A is as expected.
-        clickLinkWithText("projects");
+        clickLink(Navigation.TAB_PROJECTS);
         clickLink(projectName); // use the id of the link.
         clickLinkWithText("configuration");
         assertProjectCvsTable("cvs", TEST_CVSROOT + "[module]");

@@ -27,27 +27,19 @@ public class JabberConfigurationAcceptanceTest extends BaseAcceptanceTestCase
         super.tearDown();
     }
 
-
-    private void navigateToJabberConfiguration()
-    {
-        beginAt("/");
-        clickLinkWithText("administration");
-    }
-
     public void testEdit() throws Exception
     {
         navigateToJabberConfiguration();
 
         JabberConfigurationForm form = new JabberConfigurationForm(tester);
 
-        assertAndClick("jabber.edit");
+        assertAndClick(Navigation.Administration.LINK_EDIT_JABBER);
         form.assertFormPresent();
 
         form.saveFormElements("testhost", "10101", "testuser", "testpassword");
 
         // The jabber config throws up a wait page, run around it :)
-        beginAt("/");
-        clickLinkWithText("administration");
+        navigateToJabberConfiguration();
 
         assertJabberTable("testhost", "10101", "testuser");
 
@@ -61,7 +53,7 @@ public class JabberConfigurationAcceptanceTest extends BaseAcceptanceTestCase
         navigateToJabberConfiguration();
         testEdit();
 
-        assertAndClick("jabber.reset");
+        assertAndClick(Navigation.Administration.LINK_RESET_JABBER);
         assertJabberTable("", "5222", "");
     }
 
@@ -69,7 +61,7 @@ public class JabberConfigurationAcceptanceTest extends BaseAcceptanceTestCase
     {
         navigateToJabberConfiguration();
 
-        assertAndClick("jabber.edit");
+        assertAndClick(Navigation.Administration.LINK_EDIT_JABBER);
         JabberConfigurationForm form = new JabberConfigurationForm(tester);
         form.assertFormPresent();
         form.cancelFormElements("boohoo", "1", "hoo", "hoo");
@@ -81,7 +73,7 @@ public class JabberConfigurationAcceptanceTest extends BaseAcceptanceTestCase
     {
         navigateToJabberConfiguration();
 
-        assertAndClick("jabber.edit");
+        assertAndClick(Navigation.Administration.LINK_EDIT_JABBER);
         JabberConfigurationForm form = new JabberConfigurationForm(tester);
         form.assertFormPresent();
         form.saveFormElements("", "-1", "", "");

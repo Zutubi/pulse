@@ -199,9 +199,9 @@
 ##
 ## A single tab
 ##
-#macro(tabItem $name $url $selected)
+#macro(tabItem $id $name $url $selected)
     <li>
-        <a href="$url"
+        <a id="$id" href="$url"
     #if($selected == $name)
             class="active"
     #else
@@ -217,7 +217,7 @@
 ## Shows a project tab of the given name with the given action name
 ##
 #macro(projectTab $name $action $selected)
-    #tabItem($name "${action}.action?id=$project.id" $selected)
+    #tabItem("tab.project.$name" $name "${action}.action?id=$project.id" $selected)
 #end
 
 ##
@@ -236,7 +236,7 @@
 ## Shows a build tab of the given name with the given action name
 ##
 #macro(buildTab $result $name $action $selected)
-    #tabItem($name "${action}.action?id=$result.id" $selected)
+    #tabItem("tab.build.$name" $name "${action}.action?id=$result.id" $selected)
 #end
 
 ##
@@ -269,7 +269,7 @@
     #else
         #set($args = "")
     #end
-    #tabItem($name "${action}.action${args}" $selected)
+    #tabItem("tab.agent.$name" $name "${action}.action${args}" $selected)
 #end
 
 ##
@@ -288,7 +288,7 @@
 ## Shows an admin tab of the given name with the given action name
 ##
 #macro(adminTab $name $action $selected)
-    #tabItem($name "${action}.action" $selected)
+    #tabItem("tab.administration.$name" $name "${action}.action" $selected)
 #end
 
 ##
@@ -306,7 +306,7 @@
 ## Shows a dashboard tab of the given name with the given action name
 ##
 #macro(dashboardTab $name $action $selected)
-    #tabItem($name "${action}.action" $selected)
+    #tabItem("tab.dashboard.$name" $name "${action}.action" $selected)
 #end
 
 ##

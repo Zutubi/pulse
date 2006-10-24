@@ -35,7 +35,7 @@ public class LicenseManagementAcceptanceTest extends BaseAcceptanceTestCase
         loginAsAdmin();
 
         // start on the system information page.
-        clickLinkWithText("administration");
+        clickLink(Navigation.TAB_ADMINISTRATION);
 
         newLicenseHolder = RandomUtils.randomString(10);
         newLicenseKey = LicenseHelper.newLicenseKey(LicenseType.EVALUATION, newLicenseHolder, null);

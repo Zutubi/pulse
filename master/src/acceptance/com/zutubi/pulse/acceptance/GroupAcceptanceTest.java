@@ -24,7 +24,7 @@ public class GroupAcceptanceTest extends BaseAcceptanceTestCase
         ensureUser("gu1");
         ensureUser("gu2");
         ensureUser("gu3");
-        clickLinkWithText("administration");
+        clickLink(Navigation.TAB_ADMINISTRATION);
         clickLinkWithText("groups");
         groupName = "group " + RandomUtils.randomString(5);
     }
@@ -153,22 +153,20 @@ public class GroupAcceptanceTest extends BaseAcceptanceTestCase
         // Check that they can see both the administration link, and the
         // project editing/triggering links.
         String user = "gu " + RandomUtils.randomString(5);
-        clickLinkWithText("administration");
-        clickLinkWithText("users");
+        navigateToUserAdministration();
         submitCreateUserForm(user, user, user, user);
         logout();
 
         assertUserHasNoPrivileges(user);
 
         loginAsAdmin();
-        clickLinkWithText("administration");
-        clickLinkWithText("groups");
+        navigateToGroupsAdministration();
         testAddGroupServerAdmin();
         addMember(user);
         logout();
 
         login(user, user);
-        assertLinkPresentWithText("administration");
+        clickLink(Navigation.TAB_ADMINISTRATION);
         assertProjectPrivileges("groups1", true);
         assertProjectPrivileges("groups2", true);
     }
@@ -176,33 +174,34 @@ public class GroupAcceptanceTest extends BaseAcceptanceTestCase
     public void testRemoveAdminPrivileges()
     {
         String user = "gu " + RandomUtils.randomString(5);
-        clickLinkWithText("administration");
-        clickLinkWithText("users");
+        navigateToUserAdministration();
         submitCreateUserForm(user, user, user, user);
-        clickLinkWithText("groups");
+
+        navigateToGroupsAdministration();
         testAddGroupServerAdmin();
         addMember(user);
         clickLink("remove_" + user);
         logout();
 
         login(user, user);
-        assertLinkNotPresentWithText("administration");
+        assertLinkNotPresent(Navigation.TAB_ADMINISTRATION);
     }
 
     public void testProjectAdminsGetPrivileges()
     {
         // Should have write access to all projects
         String user = "gu " + RandomUtils.randomString(5);
-        clickLinkWithText("administration");
-        clickLinkWithText("users");
+        navigateToUserAdministration();
         submitCreateUserForm(user, user, user, user);
-        clickLinkWithText("groups");
+
+        navigateToGroupsAdministration();
+        
         testAddGroupAllProjectAdmin();
         addMember(user);
         logout();
 
         login(user, user);
-        assertLinkNotPresentWithText("administration");
+        assertLinkNotPresent(Navigation.TAB_ADMINISTRATION);
         assertProjectPrivileges("groups1", true);
         assertProjectPrivileges("groups2", true);
         assertProjectPrivileges("groups3", true);
@@ -211,10 +210,11 @@ public class GroupAcceptanceTest extends BaseAcceptanceTestCase
     public void testRemoveProjectAdminPrivileges()
     {
         String user = "gu " + RandomUtils.randomString(5);
-        clickLinkWithText("administration");
-        clickLinkWithText("users");
+        navigateToUserAdministration();
         submitCreateUserForm(user, user, user, user);
-        clickLinkWithText("groups");
+
+        navigateToGroupsAdministration();
+
         testAddGroupAllProjectAdmin();
         addMember(user);
         clickLink("remove_" + user);
@@ -228,16 +228,17 @@ public class GroupAcceptanceTest extends BaseAcceptanceTestCase
     {
         // Should have write access to groups1 and groups2 but not groups3
         String user = "gu " + RandomUtils.randomString(5);
-        clickLinkWithText("administration");
-        clickLinkWithText("users");
+        navigateToUserAdministration();
         submitCreateUserForm(user, user, user, user);
-        clickLinkWithText("groups");
+
+        navigateToGroupsAdministration();
+        
         testAddGroupSomeProjectsAdmin();
         addMember(user);
         logout();
 
         login(user, user);
-        assertLinkNotPresentWithText("administration");
+        assertLinkNotPresent(Navigation.TAB_ADMINISTRATION);
         assertProjectPrivileges("groups1", true);
         assertProjectPrivileges("groups2", true);
         assertProjectPrivileges("groups3", false);
@@ -246,10 +247,9 @@ public class GroupAcceptanceTest extends BaseAcceptanceTestCase
     public void testRemoveSpecificProjectAdminPrivileges()
     {
         String user = "gu " + RandomUtils.randomString(5);
-        clickLinkWithText("administration");
-        clickLinkWithText("users");
+        navigateToUserAdministration();
         submitCreateUserForm(user, user, user, user);
-        clickLinkWithText("groups");
+        navigateToGroupsAdministration();
         testAddGroupSomeProjectsAdmin();
         addMember(user);
         clickLink("remove_" + user);
@@ -354,8 +354,8 @@ public class GroupAcceptanceTest extends BaseAcceptanceTestCase
     private void assertUserHasNoPrivileges(String user)
     {
         login(user, user);
-        assertLinkNotPresentWithText("administration");
-        clickLinkWithText("projects");
+        assertLinkNotPresent(Navigation.TAB_ADMINISTRATION);
+        clickLink(Navigation.TAB_PROJECTS);
         clickLink("groups1");
         assertLinkNotPresentWithText("trigger");
         logout();
@@ -363,7 +363,7 @@ public class GroupAcceptanceTest extends BaseAcceptanceTestCase
 
     private void assertProjectPrivileges(String project, boolean writeable)
     {
-        clickLinkWithText("projects");
+        clickLink(Navigation.TAB_PROJECTS);
         clickLink(project);
         if(writeable)
         {

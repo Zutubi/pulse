@@ -3,11 +3,9 @@ package com.zutubi.pulse.acceptance;
 import com.zutubi.pulse.acceptance.forms.CreateUserForm;
 import com.zutubi.pulse.acceptance.forms.LicenseEditForm;
 import com.zutubi.pulse.acceptance.forms.LoginForm;
-import com.zutubi.pulse.acceptance.forms.SlaveForm;
 import com.zutubi.pulse.license.License;
 import com.zutubi.pulse.license.LicenseType;
 import com.zutubi.pulse.test.LicenseHelper;
-import com.zutubi.pulse.util.RandomUtils;
 import junit.framework.Test;
 import junit.framework.TestSuite;
 import net.sourceforge.jwebunit.WebTester;
@@ -34,15 +32,15 @@ public class LicenseAuthorisationAcceptanceTest extends BaseAcceptanceTestCase
     public void testAddProjectLinkOnlyAvailableWhenLicensed() throws Exception
     {
         // verify that the link is initially available.
-        clickLinkWithText("projects");
-        assertLinkPresentWithText("add new project");
+        clickLink(Navigation.TAB_PROJECTS);
+        assertAndClick(Navigation.Projects.LINK_ADD_PROJECT);
 
         // configure a license that supports 0 projects.
         installLicense(tester, new License(LicenseType.CUSTOM, "holder").setSupportedProjects(0));
 
         // verify that add project wizard link is not available.
-        clickLinkWithText("projects");
-        assertLinkNotPresentWithText("add new project");
+        clickLink(Navigation.TAB_PROJECTS);
+        assertLinkNotPresent(Navigation.Projects.LINK_ADD_PROJECT);
 
         // verify that add project wizard action can not be triggered directly.
         goTo("/addProject!input.action");
@@ -54,16 +52,14 @@ public class LicenseAuthorisationAcceptanceTest extends BaseAcceptanceTestCase
         // verify that the form is available.
         CreateUserForm form = new CreateUserForm(tester);
 
-        clickLinkWithText("administration");
-        clickLinkWithText("users");
+        navigateToUserAdministration();
         form.assertFormPresent();
 
         // configure a license that supports 0 users.
         installLicense(tester, new License(LicenseType.CUSTOM, "holder").setSupportedUsers(0));
 
         // verify create user form is not available.
-        clickLinkWithText("administration");
-        clickLinkWithText("users");
+        navigateToUserAdministration();
         form.assertFormNotPresent();
 
         // verify that we can not post directly to the create user action.
@@ -74,15 +70,15 @@ public class LicenseAuthorisationAcceptanceTest extends BaseAcceptanceTestCase
     public void testAddAgentLinkOnlyAvailableWhenLicensed() throws Exception
     {
         // firstly, verify that the add agent link exists.
-        clickLinkWithText("agents");
-        assertLinkPresentWithText("add new agent");
+        clickLink(Navigation.TAB_AGENTS);
+        assertLinkPresentWithText(Navigation.Agents.LINK_ADD_AGENTS);
 
         // configure a license that supports 0 users.
         installLicense(tester, new License(LicenseType.CUSTOM, "holder").setSupportedAgents(0));
 
         // verify that the link is no longer available.
-        clickLinkWithText("agents");
-        assertLinkNotPresentWithText("add new agent");
+        clickLink(Navigation.TAB_AGENTS);
+        assertLinkNotPresentWithText(Navigation.Agents.LINK_ADD_AGENTS);
 
         // verify that we can not post directly to the add agent action.
         goTo("/admin/addAgent.action");
@@ -117,7 +113,7 @@ public class LicenseAuthorisationAcceptanceTest extends BaseAcceptanceTestCase
 
     private void addUser(String login)
     {
-        clickLink("tab.administration");
+        clickLink(Navigation.Tabs.TAB_ADMINISTRATION);
         clickLinkWithText("users");
         CreateUserForm form = new CreateUserForm(tester);
         form.assertFormPresent();
@@ -127,8 +123,8 @@ public class LicenseAuthorisationAcceptanceTest extends BaseAcceptanceTestCase
     // reusable item of work.
     private void addAgent(String name)
     {
-        clickLink("tab.agents");
-        clickLink("agent.add");
+        clickLink(Navigation.Tabs.TAB_AGENTS);
+        assertAndClick(Navigation.Agents.LINK_ADD_AGENTS);
         SlaveForm form = new SlaveForm(tester, true);
         form.assertFormPresent();
         form.saveFormElements(name, "host", "80");
@@ -141,7 +137,7 @@ public class LicenseAuthorisationAcceptanceTest extends BaseAcceptanceTestCase
 
         // navigate to admin license update.
         tester.beginAt("/");
-        tester.clickLinkWithText("administration");
+        tester.clickLink(Navigation.TAB_ADMINISTRATION);
         tester.clickLink("license.edit");
 
         LicenseEditForm form = new LicenseEditForm(tester);
@@ -186,9 +182,7 @@ public class LicenseAuthorisationAcceptanceTest extends BaseAcceptanceTestCase
 
         protected void logout()
         {
-            beginAt("/");
-            clickLink("logout");
+            clickLink(Navigation.LINK_LOGOUT);
         }
-
     }
 }

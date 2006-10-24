@@ -25,7 +25,7 @@ public class CommitMessageLinkAcceptanceTest extends BaseAcceptanceTestCase
         beginAt("/");
         ensureProject("cml1");
         ensureProject("cml2");
-        clickLinkWithText("administration");
+        clickLink(Navigation.TAB_ADMINISTRATION);
     }
 
     protected void tearDown() throws Exception

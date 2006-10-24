@@ -72,16 +72,14 @@ public abstract class BaseAcceptanceTestCase extends ExtendedWebTestCase
 
     protected void logout()
     {
-        beginAt("/");
-        clickLink("logout");
+        clickLink(Navigation.LINK_LOGOUT);
     }
 
     protected void ensureLoggedOut()
     {
-        beginAt("/");
-        if (isLinkPresent("logout"))
+        if (isLinkPresent(Navigation.LINK_LOGOUT))
         {
-            clickLink("logout");
+            logout();
         }
     }
 
@@ -159,15 +157,34 @@ public abstract class BaseAcceptanceTestCase extends ExtendedWebTestCase
 
     protected void navigateToUserAdministration()
     {
-        gotoPage("/");
-        clickLink("tab.administration");
-        clickLinkWithText("users");
+        clickLink(Navigation.TAB_ADMINISTRATION);
+        clickLink(Navigation.Administration.TAB_USERS);
+    }
+
+    protected void navigateToGroupsAdministration()
+    {
+        clickLink(Navigation.TAB_ADMINISTRATION);
+        clickLink(Navigation.Administration.TAB_GROUPS);
     }
 
     protected void navigateToGeneralConfiguration()
     {
-        beginAt("/");
-        clickLink("tab.administration");
+        clickLink(Navigation.TAB_ADMINISTRATION);
+    }
+
+    protected void navigateToJabberConfiguration()
+    {
+        clickLink(Navigation.TAB_ADMINISTRATION);
+    }
+
+    protected void navigateToLdapConfiguration()
+    {
+        clickLink(Navigation.TAB_ADMINISTRATION);
+    }
+
+    protected void navigateToSmtpConfiguration()
+    {
+        clickLink(Navigation.TAB_ADMINISTRATION);
     }
 
     protected void submitAntSetupForm()
@@ -204,8 +221,8 @@ public abstract class BaseAcceptanceTestCase extends ExtendedWebTestCase
         Vector<String> users = (Vector<String>) callRemoteApi("getAllUserLogins");
         if(!users.contains(login))
         {
-            clickLinkWithText("administration");
-            clickLinkWithText("users");
+            clickLink(Navigation.TAB_ADMINISTRATION);
+            clickLink(Navigation.Administration.TAB_USERS);
             submitCreateUserForm(login, login, login, login);
         }
     }
@@ -215,8 +232,8 @@ public abstract class BaseAcceptanceTestCase extends ExtendedWebTestCase
         Vector<String> projects = (Vector<String>) callRemoteApi("getAllProjectNames");
         if(!projects.contains(name))
         {
-            clickLinkWithText("projects");
-            clickLink("project.add");
+            clickLink(Navigation.TAB_PROJECTS);
+            clickLink(Navigation.Projects.LINK_ADD_PROJECT);
             submitProjectBasicsForm(name, "desc", "url", "cvs", "ant");
             submitCvsSetupForm(TEST_CVSROOT, "module", "", "");
             submitAntSetupForm();
@@ -296,4 +313,5 @@ public abstract class BaseAcceptanceTestCase extends ExtendedWebTestCase
             WebResponse resp = tester.getDialog().getWebClient().getResponse(req);
         }
     }
+
 }

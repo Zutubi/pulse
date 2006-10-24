@@ -33,8 +33,7 @@ public class SlaveAcceptanceTest extends BaseAcceptanceTestCase
         super.setUp();
 
         login("admin", "admin");
-        beginAt("/");
-        clickLinkWithText("agents");
+        clickLink(Navigation.TAB_AGENTS);
     }
 
     protected void tearDown() throws Exception
@@ -101,7 +100,7 @@ public class SlaveAcceptanceTest extends BaseAcceptanceTestCase
 
     public void testAddSlaveValidation()
     {
-        clickLink("agent.add");
+        assertAndClick(Navigation.Agents.LINK_ADD_AGENTS);
         SlaveForm form = new SlaveForm(tester, true);
         assertSlaveValidation(form);
     }
@@ -109,7 +108,7 @@ public class SlaveAcceptanceTest extends BaseAcceptanceTestCase
     public void testAddSlaveDuplicate()
     {
         addAgent(slaveName);
-        clickLink("agent.add");
+        assertAndClick(Navigation.Agents.LINK_ADD_AGENTS);
         SlaveForm form = new SlaveForm(tester, true);
         assertSlaveDuplicate(form);
     }
@@ -171,7 +170,7 @@ public class SlaveAcceptanceTest extends BaseAcceptanceTestCase
         // add resource - need to be on the agent page.
         addResource(resourceName);
 
-        clickLinkWithText("agents");
+        clickLink(Navigation.TAB_AGENTS);
         assertTextPresent(slaveName);
         clickLink("delete_" + slaveName);
         assertTextNotPresent(slaveName);
@@ -244,7 +243,7 @@ public class SlaveAcceptanceTest extends BaseAcceptanceTestCase
 
     private void addAgent(String name)
     {
-        clickLink("agent.add");
+        assertAndClick(Navigation.Agents.LINK_ADD_AGENTS);
         SlaveForm form = new SlaveForm(tester, true);
         form.assertFormPresent();
         form.saveFormElements(name, SLAVE_HOST, SLAVE_PORT);
