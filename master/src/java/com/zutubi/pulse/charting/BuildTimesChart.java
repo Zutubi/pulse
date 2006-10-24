@@ -51,7 +51,7 @@ public class BuildTimesChart implements XYToolTipGenerator, Chart
     {
         CategoryTableXYDataset ds = new CategoryTableXYDataset();
 
-        long firstNumber = -1, lastNumber = -1;
+        long minBuild = -1, maxBuild = -1;
 
         long minTime = Long.MAX_VALUE;
         long maxTime = Long.MIN_VALUE;
@@ -69,19 +69,23 @@ public class BuildTimesChart implements XYToolTipGenerator, Chart
                 continue;
             }
 
-            if (firstNumber == -1)
-            {
-                firstNumber = number;
-            }
-            lastNumber = number;
-            
-            long elapsed = results.getElapsed() / Constants.SECOND; // convert to seconds. 
+            long elapsed = results.getElapsed() / Constants.SECOND; // convert to seconds.
 
             data.add(new ChartData(number, elapsed));
 
             // track the maximum and minimum values.
             minTime = Math.min(minTime, elapsed);
             maxTime = Math.max(maxTime, elapsed);
+
+            if (minBuild == -1)
+            {
+                minBuild = maxBuild = number;
+            }
+            else
+            {
+                minBuild = Math.min(minBuild, number);
+                maxBuild = Math.max(maxBuild, number);
+            }
         }
 
         for (ChartData d : data)
@@ -89,17 +93,17 @@ public class BuildTimesChart implements XYToolTipGenerator, Chart
             ds.add(d.number, d.time, I18N.format(seriesTimeLabel));
         }
 
-        if (lastNumber - firstNumber < range)
+        if (maxBuild - minBuild < range)
         {
-            lastNumber = firstNumber + range;
+            maxBuild = minBuild + range;
         }
 
         XYItemRenderer renderer = new DefaultXYItemRenderer();
         renderer.setToolTipGenerator(this);
 
         NumberAxis domainAxis = new NumberAxis(I18N.format(domainAxisLabel));
-        domainAxis.setLowerBound(firstNumber - 1);
-        domainAxis.setUpperBound(lastNumber + 1);
+        domainAxis.setLowerBound(minBuild - 1);
+        domainAxis.setUpperBound(maxBuild + 1);
 
         if (minTime == Long.MAX_VALUE && maxTime == Long.MIN_VALUE)
         {
