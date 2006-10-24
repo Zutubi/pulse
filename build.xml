@@ -334,7 +334,7 @@
         <copy todir="${version.root.master}/system/config">
             <fileset dir="master/etc" includes="pulse-defaults.properties,logging.properties"/>
             <fileset dir="master/etc" includes="logging/*.properties"/>
-            <fileset dir="master/etc" includes="config.properties"/>
+            <fileset dir="master/etc" includes="config.properties.template"/>
         </copy>
 
         <copy todir="${version.root.master}/lib">
