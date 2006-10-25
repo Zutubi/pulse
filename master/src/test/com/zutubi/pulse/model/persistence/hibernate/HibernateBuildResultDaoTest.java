@@ -319,7 +319,7 @@ public class HibernateBuildResultDaoTest extends MasterPersistenceTestCase
 
         commitAndRefreshTransaction();
 
-        List<BuildResult> latestCompleted = buildResultDao.findLatestCompleted(p1, b1.getName(), 10);
+        List<BuildResult> latestCompleted = buildResultDao.findLatestCompleted(p1, b1.getName(), 1, 10);
         assertEquals(2, latestCompleted.size());
         assertPropertyEquals(r2, latestCompleted.get(0));
         assertPropertyEquals(r1, latestCompleted.get(1));
@@ -341,7 +341,7 @@ public class HibernateBuildResultDaoTest extends MasterPersistenceTestCase
 
         commitAndRefreshTransaction();
 
-        List<BuildResult> latestCompleted = buildResultDao.findLatestCompleted(p1, b1.getName(), 10);
+        List<BuildResult> latestCompleted = buildResultDao.findLatestCompleted(p1, b1.getName(), 1, 10);
         assertEquals(1, latestCompleted.size());
         assertPropertyEquals(r1, latestCompleted.get(0));
     }
@@ -363,7 +363,7 @@ public class HibernateBuildResultDaoTest extends MasterPersistenceTestCase
 
         commitAndRefreshTransaction();
 
-        List<BuildResult> latestCompleted = buildResultDao.findLatestCompleted(p1, b1.getName(), 10);
+        List<BuildResult> latestCompleted = buildResultDao.findLatestCompleted(p1, b1.getName(), 1, 10);
         assertEquals(1, latestCompleted.size());
         assertPropertyEquals(r1, latestCompleted.get(0));
     }
@@ -388,10 +388,37 @@ public class HibernateBuildResultDaoTest extends MasterPersistenceTestCase
 
         commitAndRefreshTransaction();
 
-        List<BuildResult> latestCompleted = buildResultDao.findLatestCompleted(p1, b1.getName(), 2);
+        List<BuildResult> latestCompleted = buildResultDao.findLatestCompleted(p1, b1.getName(), 1, 2);
         assertEquals(2, latestCompleted.size());
         assertPropertyEquals(r4, latestCompleted.get(0));
         assertPropertyEquals(r3, latestCompleted.get(1));
+    }
+
+    public void testGetLatestCompletedFirst()
+    {
+        Project p1 = new Project();
+        projectDao.save(p1);
+
+        BuildSpecification b1 = new BuildSpecification("b1");
+        buildSpecificationDao.save(b1);
+
+        BuildResult r1 = createCompletedBuild(p1, b1, 1);
+        BuildResult r2 = createCompletedBuild(p1, b1, 2);
+        BuildResult r3 = createCompletedBuild(p1, b1, 3);
+        BuildResult r4 = createCompletedBuild(p1, b1, 4);
+
+        buildResultDao.save(r1);
+        buildResultDao.save(r2);
+        buildResultDao.save(r3);
+        buildResultDao.save(r4);
+
+        commitAndRefreshTransaction();
+
+        List<BuildResult> latestCompleted = buildResultDao.findLatestCompleted(p1, b1.getName(), 1, 4);
+        assertEquals(3, latestCompleted.size());
+        assertPropertyEquals(r3, latestCompleted.get(0));
+        assertPropertyEquals(r2, latestCompleted.get(1));
+        assertPropertyEquals(r1, latestCompleted.get(2));
     }
 
     public void testDeleteBuildRetainChangelist()

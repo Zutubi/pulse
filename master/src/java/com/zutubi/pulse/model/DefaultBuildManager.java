@@ -146,7 +146,12 @@ public class DefaultBuildManager implements BuildManager, EventListener
 
     public List<BuildResult> getLatestCompletedBuildResults(Project project, String spec, int max)
     {
-        return buildResultDao.findLatestCompleted(project, spec, max);
+        return getLatestCompletedBuildResults(project, spec, 0, max);
+    }
+
+    public List<BuildResult> getLatestCompletedBuildResults(Project project, String spec, int first, int max)
+    {
+        return buildResultDao.findLatestCompleted(project, spec, first, max);        
     }
 
     public List<BuildResult> getOldestBuildsForProject(Project project, int max)
@@ -231,6 +236,35 @@ public class DefaultBuildManager implements BuildManager, EventListener
         {
             LOG.warning("The internal database is close to reaching its size limit.  Consider adding more cleanup rules to remove old build information.");
         }
+    }
+
+    public Revision getPreviousRevision(Project project, String specification)
+    {
+        Revision previousRevision = null;
+        int offset = 0;
+
+        while(true)
+        {
+            List<BuildResult> previousBuildResults = getLatestCompletedBuildResults(project, specification, offset, 1);
+
+            if (previousBuildResults.size() == 1)
+            {
+                BuildScmDetails previousScmDetails = previousBuildResults.get(0).getScmDetails();
+                if (previousScmDetails != null)
+                {
+                    previousRevision = previousScmDetails.getRevision();
+                    break;
+                }
+            }
+            else
+            {
+                break;
+            }
+
+            offset++;
+        }
+
+        return previousRevision;
     }
 
     public List<Changelist> getLatestChangesForUser(User user, int max)

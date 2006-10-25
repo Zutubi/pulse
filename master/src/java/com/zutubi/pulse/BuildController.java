@@ -446,29 +446,19 @@ public class BuildController implements EventListener
     {
         Scm scm = project.getScm();
         Revision revision = buildRevision.getRevision();
+        Revision previousRevision = buildManager.getPreviousRevision(project, specification.getName());
 
-        try
+        if (previousRevision != null)
         {
-            SCMServer server = scm.createServer();
-            List<BuildResult> previousBuildResults = buildManager.getLatestCompletedBuildResults(project, specification.getName(), 1);
-
-            // BUG: If there is no previous build result, no change list is captured, even when the build is SCM Triggered.
-            if (previousBuildResults.size() == 1)
+            try
             {
-                BuildScmDetails previousScmDetails = previousBuildResults.get(0).getScmDetails();
-                if (previousScmDetails != null)
-                {
-                    Revision previousRevision = previousScmDetails.getRevision();
-                    if (previousRevision != null)
-                    {
-                        getChangeSince(server, previousRevision, revision);
-                    }
-                }
+                SCMServer server = scm.createServer();
+                getChangeSince(server, previousRevision, revision);
             }
-        }
-        catch (SCMException e)
-        {
-            LOG.warning("Unable to retrieve changelist details from SCM server: " + e.getMessage(), e);
+            catch (SCMException e)
+            {
+                LOG.warning("Unable to retrieve changelist details from SCM server: " + e.getMessage(), e);
+            }
         }
 
         BuildScmDetails scmDetails = new BuildScmDetails(revision);

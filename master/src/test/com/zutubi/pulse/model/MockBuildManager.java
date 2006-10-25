@@ -128,6 +128,11 @@ public class MockBuildManager implements BuildManager
         throw new RuntimeException("Method not implemented.");
     }
 
+    public List<BuildResult> getLatestCompletedBuildResults(Project project, String spec, int first, int max)
+    {
+        throw new RuntimeException("Method not implemented.");
+    }
+
     public BuildResult getPreviousBuildResult(BuildResult result)
     {
         throw new RuntimeException("Method not implemented.");
@@ -162,6 +167,11 @@ public class MockBuildManager implements BuildManager
     }
 
     public void cleanupBuilds()
+    {
+        throw new RuntimeException("Method not implemented.");
+    }
+
+    public Revision getPreviousRevision(Project project, String specification)
     {
         throw new RuntimeException("Method not implemented.");
     }

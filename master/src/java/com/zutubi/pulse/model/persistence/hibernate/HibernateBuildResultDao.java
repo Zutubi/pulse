@@ -18,6 +18,7 @@ import java.sql.SQLException;
 import java.util.Date;
 import java.util.List;
 
+@SuppressWarnings({"unchecked"})
 public class HibernateBuildResultDao extends HibernateEntityDao<BuildResult> implements BuildResultDao
 {
     private static final Logger LOG = Logger.getLogger(HibernateEntityDao.class);
@@ -87,17 +88,17 @@ public class HibernateBuildResultDao extends HibernateEntityDao<BuildResult> imp
         });
     }
 
-    public List<BuildResult> findLatestCompleted(final Project project, final String spec, final int max)
+    public List<BuildResult> findLatestCompleted(final Project project, final String spec, final int first, final int max)
     {
         return (List<BuildResult>) getHibernateTemplate().execute(new HibernateCallback()
         {
             public Object doInHibernate(Session session) throws HibernateException
             {
-                Query queryObject = session.createQuery("from BuildResult model where model.user = null and model.project = :project and model.buildSpecification = :spec and model.stateName != :initial and model.stateName != :inProgress order by model.number desc");
+                Query queryObject = session.createQuery("from BuildResult model where model.user = null and model.project = :project and model.buildSpecification = :spec and model.stateName in (:stateNames) order by model.number desc");
                 queryObject.setEntity("project", project);
                 queryObject.setParameter("spec", spec);
-                queryObject.setParameter("initial", ResultState.INITIAL.toString(), Hibernate.STRING);
-                queryObject.setParameter("inProgress", ResultState.IN_PROGRESS.toString(), Hibernate.STRING);
+                queryObject.setParameterList("stateNames", ResultState.getCompletedStateNames());
+                queryObject.setFirstResult(first);
                 queryObject.setMaxResults(max);
 
                 SessionFactoryUtils.applyTransactionTimeout(queryObject, getSessionFactory());
@@ -133,10 +134,9 @@ public class HibernateBuildResultDao extends HibernateEntityDao<BuildResult> imp
         {
             public Object doInHibernate(Session session) throws HibernateException
             {
-                Query queryObject = session.createQuery("from BuildResult model where model.user = null and model.project = :project and model.stateName != :initial and model.stateName != :inProgress order by model.number asc");
+                Query queryObject = session.createQuery("from BuildResult model where model.user = null and model.project = :project and model.stateName in (:stateNames) order by model.number asc");
                 queryObject.setEntity("project", project);
-                queryObject.setParameter("initial", ResultState.INITIAL.toString(), Hibernate.STRING);
-                queryObject.setParameter("inProgress", ResultState.IN_PROGRESS.toString(), Hibernate.STRING);
+                queryObject.setParameterList("stateNames", ResultState.getCompletedStateNames());
                 queryObject.setFirstResult(first);
                 queryObject.setMaxResults(max);
 
@@ -212,7 +212,7 @@ public class HibernateBuildResultDao extends HibernateEntityDao<BuildResult> imp
                 Criteria criteria = getBuildResultCriteria(session, project, states, null);
                 if(hasWorkDir != null)
                 {
-                    criteria.add(Expression.eq("hasWorkDir", hasWorkDir.booleanValue()));
+                    criteria.add(Expression.eq("hasWorkDir", hasWorkDir));
                 }
                 criteria.setProjection(Projections.rowCount());
                 return criteria.uniqueResult();
@@ -273,7 +273,7 @@ public class HibernateBuildResultDao extends HibernateEntityDao<BuildResult> imp
 
                 if(hasWorkDir != null)
                 {
-                    criteria.add(Expression.eq("hasWorkDir", hasWorkDir.booleanValue()));
+                    criteria.add(Expression.eq("hasWorkDir", hasWorkDir));
                 }
 
                 if(first >= 0)

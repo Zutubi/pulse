@@ -69,6 +69,8 @@ public interface BuildManager
 
     List<BuildResult> getLatestCompletedBuildResults(Project project, String spec, int max);
 
+    List<BuildResult> getLatestCompletedBuildResults(Project project, String spec, int first, int max);
+
     BuildResult getLatestBuildResult(Project project);
 
     BuildResult getByProjectAndNumber(final Project project, final long number);
@@ -83,6 +85,8 @@ public interface BuildManager
     BuildResult getPreviousBuildResult(BuildResult result);
 
     void cleanupBuilds();
+
+    Revision getPreviousRevision(Project project, String specification);
 
     /**
      * Returns the most recent changelists submitted by the given user.

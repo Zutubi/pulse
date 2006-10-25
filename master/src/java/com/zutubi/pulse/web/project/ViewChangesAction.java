@@ -149,14 +149,23 @@ public class ViewChangesAction extends ProjectActionSupport
             return null;
         }
 
-        List<BuildResult> previousResults = getBuildManager().querySpecificationBuilds(project, result.getBuildSpecification(), states, -1, toBuild - 1, 0, 1, true, false);
-        if(previousResults.size() > 0)
+        int offset = 0;
+        while(true)
         {
-            return previousResults.get(0);
-        }
-        else
-        {
-            return null;
+            List<BuildResult> previousResults = getBuildManager().querySpecificationBuilds(project, result.getBuildSpecification(), states, -1, toBuild - 1, offset, 1, true, false);
+            if(previousResults.size() > 0)
+            {
+                if(previousResults.get(0).getScmDetails() != null)
+                {
+                    return previousResults.get(0);
+                }
+            }
+            else
+            {
+                return null;
+            }
+
+            offset++;
         }
     }
 
