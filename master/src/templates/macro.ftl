@@ -152,7 +152,7 @@ Outputs a list of build stage results for the given build.
 ---------------------------------------------------------------------------->
 [#macro buildStages result]
     [#list result.root.children as child]
-  * ${child.stage} :: ${child.result.recipeNameSafe}@${child.hostSafe} :: ${result.state.prettyString}
+  * ${child.stage} :: ${child.result.recipeNameSafe}@${child.hostSafe} :: ${child.result.state.prettyString}
     [/#list]
 [/#macro]
 

@@ -87,6 +87,11 @@ public class FreemarkerBuildResultRendererTest extends PulseTestCase
         errorsHelper("detailed-instant-message");
     }
 
+    public void testDetailedInstantSingleStageFailure() throws Exception
+    {
+        singleStageFailureHelper("detailed-instant-message");
+    }
+
     public void testDetailedInstantFailures() throws Exception
     {
         failuresHelper("detailed-instant-message", false);
@@ -113,6 +118,16 @@ public class FreemarkerBuildResultRendererTest extends PulseTestCase
     public void testHTMLWithFailures() throws Exception
     {
         failuresHelper("html-email", false);
+    }
+
+    public void testWithSingleStageFailure() throws Exception
+    {
+        singleStageFailureHelper("plain-text-email");
+    }
+
+    public void testHTMLWithSingleStageFailure() throws Exception
+    {
+        singleStageFailureHelper("html-email");
     }
 
     public void testWithExcessFailures() throws Exception
@@ -232,6 +247,20 @@ public class FreemarkerBuildResultRendererTest extends PulseTestCase
         createAndVerify((excessFailures ? "excess" : "") + "failures", type, "http://host.url", result);
     }
 
+    private void singleStageFailureHelper(String type) throws Exception
+    {
+        BuildResult result = createSuccessfulBuild();
+        result.failure("a stage failed");
+
+        RecipeResultNode secondNode = result.getRoot().getChildren().get(1);
+        RecipeResult secondResult = secondNode.getResult();
+
+        CommandResult command = new CommandResult("failing tests");
+        command.failure("i failed");
+        secondResult.add(command);
+        createAndVerify("singelstagefailure", type, "http://host.url", result);
+    }
+
     private void personalBuildHelper(String type) throws Exception
     {
         User user = new User("jason", "Jason Sankey");
@@ -320,14 +349,20 @@ public class FreemarkerBuildResultRendererTest extends PulseTestCase
         result.commence(10000);
 
         RecipeResult recipeResult = new RecipeResult("first recipe");
+        recipeResult.commence();
+        recipeResult.complete();
         RecipeResultNode node = new RecipeResultNode("first stage", recipeResult);
         result.getRoot().addChild(node);
 
         recipeResult = new RecipeResult("second recipe");
+        recipeResult.commence();
+        recipeResult.complete();
         node = new RecipeResultNode("second stage", recipeResult);
         result.getRoot().addChild(node);
 
         recipeResult = new RecipeResult("nested recipe");
+        recipeResult.commence();
+        recipeResult.complete();
         node = new RecipeResultNode("nested stage", recipeResult);
         result.getRoot().getChildren().get(0).addChild(node);
 
@@ -405,6 +440,6 @@ public class FreemarkerBuildResultRendererTest extends PulseTestCase
 
     private String replaceTimestamps(String str)
     {
-        return str.replaceAll("\n.*ago<", "@@@@");
+        return str.replaceAll("\n.*ago<", "@@@@").replaceAll("\n[0-9]+ ms", "@@@@");
     }
 }
