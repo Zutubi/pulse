@@ -319,7 +319,7 @@ public class HibernateBuildResultDaoTest extends MasterPersistenceTestCase
 
         commitAndRefreshTransaction();
 
-        List<BuildResult> latestCompleted = buildResultDao.findLatestCompleted(p1, b1.getName(), 1, 10);
+        List<BuildResult> latestCompleted = buildResultDao.findLatestCompleted(p1, b1.getName(), 0, 10);
         assertEquals(2, latestCompleted.size());
         assertPropertyEquals(r2, latestCompleted.get(0));
         assertPropertyEquals(r1, latestCompleted.get(1));
@@ -341,7 +341,7 @@ public class HibernateBuildResultDaoTest extends MasterPersistenceTestCase
 
         commitAndRefreshTransaction();
 
-        List<BuildResult> latestCompleted = buildResultDao.findLatestCompleted(p1, b1.getName(), 1, 10);
+        List<BuildResult> latestCompleted = buildResultDao.findLatestCompleted(p1, b1.getName(), 0, 10);
         assertEquals(1, latestCompleted.size());
         assertPropertyEquals(r1, latestCompleted.get(0));
     }
@@ -363,7 +363,7 @@ public class HibernateBuildResultDaoTest extends MasterPersistenceTestCase
 
         commitAndRefreshTransaction();
 
-        List<BuildResult> latestCompleted = buildResultDao.findLatestCompleted(p1, b1.getName(), 1, 10);
+        List<BuildResult> latestCompleted = buildResultDao.findLatestCompleted(p1, b1.getName(), 0, 10);
         assertEquals(1, latestCompleted.size());
         assertPropertyEquals(r1, latestCompleted.get(0));
     }
@@ -388,7 +388,7 @@ public class HibernateBuildResultDaoTest extends MasterPersistenceTestCase
 
         commitAndRefreshTransaction();
 
-        List<BuildResult> latestCompleted = buildResultDao.findLatestCompleted(p1, b1.getName(), 1, 2);
+        List<BuildResult> latestCompleted = buildResultDao.findLatestCompleted(p1, b1.getName(), 0, 2);
         assertEquals(2, latestCompleted.size());
         assertPropertyEquals(r4, latestCompleted.get(0));
         assertPropertyEquals(r3, latestCompleted.get(1));
