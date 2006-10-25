@@ -1,5 +1,6 @@
 package com.zutubi.pulse.bootstrap;
 
+import com.opensymphony.util.TextUtils;
 import com.zutubi.pulse.config.CompositeConfig;
 import com.zutubi.pulse.config.Config;
 import com.zutubi.pulse.config.ConfigSupport;
@@ -19,7 +20,15 @@ public class SystemConfigurationSupport extends ConfigSupport implements SystemC
 
     public String getBindAddress()
     {
-        return getProperty(WEBAPP_BIND_ADDRESS, "0.0.0.0");
+        String result = config.getProperty(WEBAPP_BIND_ADDRESS);
+        if(TextUtils.stringSet(result))
+        {
+            return result;
+        }
+        else
+        {
+            return "0.0.0.0";
+        }
     }
 
     public int getServerPort()
