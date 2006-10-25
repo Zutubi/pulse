@@ -10,7 +10,7 @@ import java.util.Properties;
 /**
  * A contact point defines a means of contacting a user.
  */
-public abstract class ContactPoint extends Entity
+public abstract class ContactPoint extends Entity implements NamedEntity
 {
     private String name;
     private Properties properties;

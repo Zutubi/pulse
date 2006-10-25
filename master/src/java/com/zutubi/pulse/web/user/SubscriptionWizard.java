@@ -10,6 +10,7 @@ import com.zutubi.pulse.web.wizard.BaseWizard;
 import com.zutubi.pulse.web.wizard.BaseWizardState;
 import com.zutubi.pulse.web.wizard.Wizard;
 
+import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -177,6 +178,7 @@ public class SubscriptionWizard extends BaseWizard
 
             contacts = new LinkedHashMap<Long, String>();
             List<ContactPoint> contactPoints = user.getContactPoints();
+            Collections.sort(contactPoints, new NamedEntityComparator());
             for (ContactPoint contact : contactPoints)
             {
                 contacts.put(contact.getId(), contact.getName());

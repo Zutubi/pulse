@@ -1,14 +1,13 @@
 package com.zutubi.pulse.web.user;
 
 import com.zutubi.pulse.condition.NotifyConditionFactory;
-import com.zutubi.pulse.model.ContactPoint;
-import com.zutubi.pulse.model.ProjectManager;
-import com.zutubi.pulse.model.Subscription;
-import com.zutubi.pulse.model.User;
+import com.zutubi.pulse.model.*;
 import com.zutubi.pulse.renderer.BuildResultRenderer;
 
+import java.util.Collections;
+import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
-import java.util.TreeMap;
 
 /**
  *
@@ -59,10 +58,13 @@ public abstract class SubscriptionActionSupport extends UserActionSupport
     {
         if(contactPoints == null)
         {
-            contactPoints = new TreeMap<Long, String>();
-            for (ContactPoint contact : user.getContactPoints())
+            contactPoints = new LinkedHashMap<Long, String>();
+            List<ContactPoint> contactPoints = user.getContactPoints();
+            Collections.sort(contactPoints, new NamedEntityComparator());
+
+            for (ContactPoint contact : contactPoints)
             {
-                contactPoints.put(contact.getId(), contact.getName());
+                this.contactPoints.put(contact.getId(), contact.getName());
             }
         }
 
