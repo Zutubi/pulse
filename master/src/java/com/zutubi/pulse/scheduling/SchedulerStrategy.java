@@ -9,6 +9,8 @@ public interface SchedulerStrategy extends Stoppable
 {
     String canHandle();
 
+    void init(Trigger trigger) throws SchedulingException;
+
     void schedule(Trigger trigger) throws SchedulingException;
 
     void unschedule(Trigger trigger) throws SchedulingException;
@@ -29,5 +31,4 @@ public interface SchedulerStrategy extends Stoppable
      * @return true iff the given trigger depends on the given project
      */
     boolean dependsOnProject(Trigger trigger, long projectId);
-
 }

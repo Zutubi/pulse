@@ -22,7 +22,6 @@ public class EventSchedulerStrategy implements SchedulerStrategy
 
     private Map<Long, EventListener> activeListenerMap = new HashMap<Long, EventListener>();
 
-    private Map<Long, EventListener> pausedListenerMap = new HashMap<Long, EventListener>();
     private ObjectFactory objectFactory;
 
     public String canHandle()
@@ -30,89 +29,32 @@ public class EventSchedulerStrategy implements SchedulerStrategy
         return EventTrigger.TYPE;
     }
 
+    public void init(Trigger trigger) throws SchedulingException
+    {
+        if(trigger.isActive())
+        {
+            register(trigger);
+        }
+    }
+
     public void schedule(final Trigger trigger) throws SchedulingException
     {
-        final EventTrigger eventTrigger = (EventTrigger) trigger;
-
-        EventListener eventListener = new EventListener()
-        {
-            public Class[] getHandledEvents()
-            {
-                return eventTrigger.getTriggerEvents();
-            }
-
-            public void handleEvent(Event evt)
-            {
-                try
-                {
-                    boolean accept = true;
-                    Class<? extends EventTriggerFilter> filterClass = eventTrigger.getFilterClass();
-
-                    if(filterClass != null)
-                    {
-                        try
-                        {
-                            EventTriggerFilter filter = objectFactory.buildBean(filterClass);
-                            accept = filter.accept(eventTrigger, evt);
-                        }
-                        catch (Exception e)
-                        {
-                            LOG.severe("Unable to construct event filter of type '" + filterClass.getName() + "': " + e.getMessage(), e);
-                        }
-                    }
-
-                    if(accept)
-                    {
-                        triggerHandler.fire(trigger);
-                    }
-                }
-                catch (SchedulingException e)
-                {
-                    LOG.severe(e);
-                }
-            }
-        };
-        
-        activeListenerMap.put(eventTrigger.getId(), eventListener);
-        eventManager.register(eventListener);
-        trigger.setState(TriggerState.SCHEDULED);
+        register(trigger);
     }
 
     public void unschedule(Trigger trigger) throws SchedulingException
     {
-        if (activeListenerMap.containsKey(trigger.getId()))
-        {
-            EventListener listener = activeListenerMap.remove(trigger.getId());
-            eventManager.unregister(listener);
-            trigger.setState(TriggerState.NONE);
-        }
-        else if (pausedListenerMap.containsKey(trigger.getId()))
-        {
-            pausedListenerMap.remove(trigger.getId());
-            trigger.setState(TriggerState.NONE);
-        }
+        unregister(trigger, TriggerState.NONE);
     }
 
     public void pause(Trigger trigger) throws SchedulingException
     {
-        if (activeListenerMap.containsKey(trigger.getId()))
-        {
-            EventListener listener = activeListenerMap.remove(trigger.getId());
-            eventManager.unregister(listener);
-            pausedListenerMap.put(trigger.getId(), listener);
-            trigger.setState(TriggerState.PAUSED);
-        }
+        unregister(trigger, TriggerState.PAUSED);
     }
 
     public void resume(Trigger trigger) throws SchedulingException
     {
-        if (pausedListenerMap.containsKey(trigger.getId()))
-        {
-            EventListener listener = pausedListenerMap.remove(trigger.getId());
-            eventManager.register(listener);
-            activeListenerMap.put(trigger.getId(), listener);
-            trigger.setState(TriggerState.SCHEDULED);
-        }
+        register(trigger);
     }
 
     public void stop(boolean force)
@@ -121,10 +63,26 @@ public class EventSchedulerStrategy implements SchedulerStrategy
         {
             eventManager.unregister(listener);
         }
+    }
 
-        for (EventListener listener : pausedListenerMap.values())
+    private void register(Trigger trigger)
+    {
+        final EventTrigger eventTrigger = (EventTrigger) trigger;
+
+        EventListener eventListener = new EventTriggerListener(eventTrigger, trigger);
+
+        activeListenerMap.put(eventTrigger.getId(), eventListener);
+        eventManager.register(eventListener);
+        trigger.setState(TriggerState.SCHEDULED);
+    }
+
+    private void unregister(Trigger trigger, TriggerState newState)
+    {
+        if (activeListenerMap.containsKey(trigger.getId()))
         {
+            EventListener listener = activeListenerMap.remove(trigger.getId());
             eventManager.unregister(listener);
+            trigger.setState(newState);
         }
     }
 
@@ -175,5 +133,53 @@ public class EventSchedulerStrategy implements SchedulerStrategy
     public void setObjectFactory(ObjectFactory objectFactory)
     {
         this.objectFactory = objectFactory;
+    }
+
+    private class EventTriggerListener implements EventListener
+    {
+        private final EventTrigger eventTrigger;
+        private final Trigger trigger;
+
+        public EventTriggerListener(EventTrigger eventTrigger, Trigger trigger)
+        {
+            this.eventTrigger = eventTrigger;
+            this.trigger = trigger;
+        }
+
+        public Class[] getHandledEvents()
+        {
+            return eventTrigger.getTriggerEvents();
+        }
+
+        public void handleEvent(Event evt)
+        {
+            try
+            {
+                boolean accept = true;
+                Class<? extends EventTriggerFilter> filterClass = eventTrigger.getFilterClass();
+
+                if(filterClass != null)
+                {
+                    try
+                    {
+                        EventTriggerFilter filter = objectFactory.buildBean(filterClass);
+                        accept = filter.accept(eventTrigger, evt);
+                    }
+                    catch (Exception e)
+                    {
+                        LOG.severe("Unable to construct event filter of type '" + filterClass.getName() + "': " + e.getMessage(), e);
+                    }
+                }
+
+                if(accept)
+                {
+                    triggerHandler.fire(trigger);
+                }
+            }
+            catch (SchedulingException e)
+            {
+                LOG.severe(e);
+            }
+        }
     }
 }

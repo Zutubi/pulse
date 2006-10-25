@@ -96,6 +96,16 @@ public abstract class QuartzSchedulerStrategy implements SchedulerStrategy
         }
     }
 
+    public void init(Trigger trigger) throws SchedulingException
+    {
+        boolean pause = trigger.isPaused();
+        schedule(trigger);
+        if(pause)
+        {
+            pause(trigger);
+        }
+    }
+
     public void schedule(Trigger trigger) throws SchedulingException
     {
         try

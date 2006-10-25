@@ -62,13 +62,7 @@ public class DefaultScheduler implements Scheduler, EventListener
                 SchedulerStrategy strategy = getStrategy(trigger);
                 try
                 {
-                    strategy.schedule(trigger);
-                    // WARNING: there is a very brief opportunity here for a paused trigger to
-                    // execute.... should close this gap..
-                    if (trigger.isPaused())
-                    {
-                        strategy.pause(trigger);
-                    }
+                    strategy.init(trigger);
                 }
                 catch (SchedulingException e)
                 {
@@ -171,6 +165,7 @@ public class DefaultScheduler implements Scheduler, EventListener
         }
         SchedulerStrategy impl = getStrategy(trigger);
         impl.pause(trigger);
+        triggerDao.save(trigger);
     }
 
     public void resume(String group) throws SchedulingException

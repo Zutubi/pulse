@@ -10,6 +10,10 @@ public class NoopSchedulerStrategy implements SchedulerStrategy
         return NoopTrigger.TYPE;
     }
 
+    public void init(Trigger trigger) throws SchedulingException
+    {
+    }
+
     public void pause(Trigger trigger) throws SchedulingException
     {
         trigger.setState(TriggerState.PAUSED);
@@ -22,7 +26,6 @@ public class NoopSchedulerStrategy implements SchedulerStrategy
 
     public void stop(boolean force)
     {
-        throw new RuntimeException("Method not implemented.");
     }
 
     public void schedule(Trigger trigger) throws SchedulingException
