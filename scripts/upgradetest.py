@@ -158,6 +158,7 @@ if __name__ == "__main__":
        
     rootDir = getRoot(sys.argv[0])
     os.chdir(rootDir)
+    os.unsetenv("PULSE_HOME")
     version = sys.argv[1]
     build = int(sys.argv[2])
 

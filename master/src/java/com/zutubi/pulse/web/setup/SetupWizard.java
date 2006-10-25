@@ -17,9 +17,7 @@ import com.zutubi.pulse.web.DefaultAction;
 import com.zutubi.pulse.web.wizard.BaseWizard;
 import com.zutubi.pulse.web.wizard.BaseWizardState;
 import com.zutubi.pulse.web.wizard.Wizard;
-import com.zutubi.pulse.web.wizard.WizardCompleteState;
 
-import java.util.concurrent.Executors;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -72,12 +70,19 @@ public class SetupWizard extends BaseWizard
         // create an administrators group (for convenience)
         Group adminGroup = new Group("administrators");
         adminGroup.addAdditionalAuthority(GrantedAuthority.ADMINISTRATOR);
+        adminGroup.addAdditionalAuthority(GrantedAuthority.PERSONAL);
         userManager.addGroup(adminGroup);
 
         // and a project admins group that has write access to all projects
         Group projectAdmins = new Group("project administrators");
+        adminGroup.addAdditionalAuthority(GrantedAuthority.PERSONAL);
         projectAdmins.setAdminAllProjects(true);
         userManager.addGroup(projectAdmins);
+
+        // and a developers group that has personal build access (for convenience)
+        Group developersGroup = new Group("developers");
+        developersGroup.addAdditionalAuthority(GrantedAuthority.PERSONAL);
+        userManager.addGroup(developersGroup);
 
         // apply the settings
         config.setBaseUrl(serverSettingsState.getBaseUrl());
