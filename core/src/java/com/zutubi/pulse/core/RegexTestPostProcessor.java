@@ -33,6 +33,8 @@ public class RegexTestPostProcessor implements PostProcessor
     private int statusGroup;
     private int nameGroup;
 
+    private boolean trim = true;
+
     private Map<String, TestCaseResult.Status> statusMap = new HashMap<String, TestCaseResult.Status>();
 
     public RegexTestPostProcessor()
@@ -59,7 +61,10 @@ public class RegexTestPostProcessor implements PostProcessor
         }
 
         // clean up any whitespace from the regex which may have been added via the addText()
-        regex = regex.trim();
+        if (trim)
+        {
+            regex = regex.trim();
+        }
 
         try
         {
@@ -76,7 +81,6 @@ public class RegexTestPostProcessor implements PostProcessor
                 // as it is and move on.
                 LOG.info(e);
             }
-
         }
         catch (IOException e)
         {
@@ -175,5 +179,10 @@ public class RegexTestPostProcessor implements PostProcessor
     public void addText(String txt)
     {
         regex = txt;
+    }
+
+    public void setTrim(boolean trim)
+    {
+        this.trim = trim;
     }
 }
