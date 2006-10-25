@@ -31,8 +31,8 @@
         </tr>
     #foreach($fileStatus in $patchArchive.status.changes)
         <tr>
-            #contentCell($fileStatus.path)
-            #contentCell($fileStatus.state.toString().toLowerCase())
+            #dynamicCell($fileStatus.path)
+            #dynamicCell($fileStatus.state.toString().toLowerCase())
         </tr>
     #end
 #else
