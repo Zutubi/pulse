@@ -58,6 +58,9 @@ public class RegexTestPostProcessor implements PostProcessor
             return;
         }
 
+        // clean up any whitespace from the regex which may have been added via the addText()
+        regex = regex.trim();
+
         try
         {
             reader = new BufferedReader(new FileReader(file));
