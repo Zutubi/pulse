@@ -71,14 +71,14 @@ public class LicenseAuthorisationAcceptanceTest extends BaseAcceptanceTestCase
     {
         // firstly, verify that the add agent link exists.
         clickLink(Navigation.TAB_AGENTS);
-        assertLinkPresentWithText(Navigation.Agents.LINK_ADD_AGENTS);
+        assertLinkPresent(Navigation.Agents.LINK_ADD_AGENTS);
 
         // configure a license that supports 0 users.
         installLicense(tester, new License(LicenseType.CUSTOM, "holder").setSupportedAgents(0));
 
         // verify that the link is no longer available.
         clickLink(Navigation.TAB_AGENTS);
-        assertLinkNotPresentWithText(Navigation.Agents.LINK_ADD_AGENTS);
+        assertLinkNotPresent(Navigation.Agents.LINK_ADD_AGENTS);
 
         // verify that we can not post directly to the add agent action.
         goTo("/admin/addAgent.action");
