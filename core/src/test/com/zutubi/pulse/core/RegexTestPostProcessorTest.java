@@ -71,7 +71,7 @@ public class RegexTestPostProcessorTest extends PulseTestCase
     private TestSuiteResult process()
     {
         RegexTestPostProcessor pp = new RegexTestPostProcessor();
-        pp.setRegex("\\[(.*)\\].*<(.*)>");
+        pp.setRegex("\\[(.*)\\] .*EDT:(.*)");
         pp.setStatusGroup(1);
         pp.setNameGroup(2);
         pp.setPassStatus("PASS");
