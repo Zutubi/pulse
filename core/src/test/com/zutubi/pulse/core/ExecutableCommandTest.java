@@ -257,6 +257,47 @@ public class ExecutableCommandTest extends PulseTestCase
         assertTrue(output.toLowerCase().contains("path=somedir" + File.pathSeparator));
     }
 
+    public void testNoSuchExecutableOnWindows()
+    {
+        if(SystemUtils.IS_WINDOWS)
+        {
+            ExecutableCommand command = new ExecutableCommand();
+            command.setExe("thisfiledoesnotexist");
+
+            try
+            {
+                CommandResult result = new CommandResult("success");
+                execute(command, result, 1234);
+                fail();
+            }
+            catch (BuildException e)
+            {
+                assertTrue(e.getMessage().contains("No such executable 'thisfiledoesnotexist'"));
+            }
+        }
+    }
+
+    public void testNoSuchWorkDirOnWindows()
+    {
+        if(SystemUtils.IS_WINDOWS)
+        {
+            ExecutableCommand command = new ExecutableCommand();
+            command.setExe("dir");
+            command.setWorkingDir(new File("nosuchworkdir"));
+
+            try
+            {
+                CommandResult result = new CommandResult("success");
+                execute(command, result, 1234);
+                fail();
+            }
+            catch (BuildException e)
+            {
+                assertTrue(e.getMessage().contains("Working directory 'nosuchworkdir' does not exist"));
+            }
+        }
+    }
+
     private String getOutput() throws IOException
     {
         return IOUtils.fileToString(new File(outputDirectory, ExecutableCommand.OUTPUT_NAME + "/output.txt"));
