@@ -76,9 +76,13 @@ public class ExecutableCommand implements Command, ScopeAware
         {
             // CIB-149: try and make friendlier error messages for common problems.
             String message = e.getMessage();
-            if (message.contains("nosuchexe") || message.contains("error=2"))
+            if (message.contains("nosuchexe") || message.endsWith("error=2"))
             {
                 message = "No such executable '" + exe + "'";
+            }
+            else if (message.endsWith("error=267"))
+            {
+                message = "Working directory '" + workingDir.getPath() + "' does not exist";
             }
 
             throw new BuildException("Unable to create process: " + message, e);
