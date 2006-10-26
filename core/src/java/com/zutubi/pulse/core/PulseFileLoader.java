@@ -35,6 +35,7 @@ public class PulseFileLoader extends FileLoader
         register("maven2", Maven2Command.class);
         register("executable", ExecutableCommand.class);
         register("print", PrintCommand.class);
+        register("sleep", SleepCommand.class);
         register("make", MakeCommand.class);
         register("xcodebuild", XCodeCommand.class);
         register("resource", ResourceReference.class);
