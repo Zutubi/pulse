@@ -28,7 +28,7 @@ class Pulse:
         self.dataDir = dataDir
     
     def getEnv(self):
-        return {'PULSE_CONFIG': os.path.join(self.baseDir, 'bin', 'config.properties'), 'PULSE_HOME': self.baseDir, 'PULSE_USER': os.getenv('USERNAME'), 'USERNAME': os.getenv('USERNAME'), 'PULSE_PID': os.path.join(self.baseDir, 'pulse.pid'), 'JAVA_HOME': os.getenv('JAVA_HOME')}
+        return {'PULSE_CONFIG': os.path.join(self.baseDir, 'bin', 'config.properties'), 'PULSE_HOME': self.baseDir, 'PULSE_USER': os.getenv('USER'), 'USER': os.getenv('USER'), 'PULSE_PID': os.path.join(self.baseDir, 'pulse.pid'), 'JAVA_HOME': os.getenv('JAVA_HOME')}
     
     
     def start(self, wait=True, service=False):

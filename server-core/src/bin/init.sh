@@ -35,7 +35,7 @@ fi
 
 d_start()
 {
-    if [[ -n "$USERNAME" && "$USERNAME" = "$PULSE_USER" ]]
+    if [[ -n "$USER" && "$USER" = "$PULSE_USER" ]]
     then
         "$PULSE_HOME/bin/launch.sh" "$PULSE_PID"
     else
@@ -45,7 +45,7 @@ d_start()
 
 d_stop()
 {
-    if [[ -n "$USERNAME" && "$USERNAME" = "$PULSE_USER" ]]
+    if [[ -n "$USER" && "$USER" = "$PULSE_USER" ]]
     then
         "$PULSE_HOME/bin/pulse" shutdown --force
     else
