@@ -237,7 +237,6 @@ public class DefaultBuildManager implements BuildManager, EventListener
 
     public void deleteAllBuilds(Project project)
     {
-        int offset = 0;
         List<BuildResult> results;
 
         MasterBuildPaths paths = new MasterBuildPaths(configurationManager);
@@ -249,12 +248,11 @@ public class DefaultBuildManager implements BuildManager, EventListener
 
         do
         {
-            results = buildResultDao.findOldestByProject(project, offset, 100);
+            results = buildResultDao.findOldestByProject(project, 100);
             for (BuildResult r : results)
             {
-                buildResultDao.delete(r);
+                cleanupResult(r);
             }
-            offset += results.size();
         }
         while (results.size() > 0);
     }
