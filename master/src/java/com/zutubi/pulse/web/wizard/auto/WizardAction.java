@@ -216,12 +216,32 @@ public class WizardAction extends ActionSupport
         }
     }
 
+    private boolean validateWizard()
+    {
+        try
+        {
+            Object wizard = getWizardInstance();
+
+            ValidationContext validationContext = createValidationContext(wizard, this);
+
+            // validate the form input
+            validationManager.validate(wizard, validationContext);
+
+            return !hasErrors();
+        }
+        catch (ValidationException e)
+        {
+            addActionError(e.getMessage());
+            return false;
+        }
+    }
+
     public String execute()
     {
         // validation.
         if (isNextSelected() || isFinishSelected())
         {
-            if (!validateState())
+            if (!validateState() || !validateWizard())
             {
                 return "step";
             }

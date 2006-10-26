@@ -1,16 +1,15 @@
 package com.zutubi.pulse.web.user.contact;
 
 import com.zutubi.pulse.core.ObjectFactory;
-import com.zutubi.pulse.model.EmailContactPoint;
-import com.zutubi.pulse.model.JabberContactPoint;
-import com.zutubi.pulse.model.User;
-import com.zutubi.pulse.model.UserManager;
+import com.zutubi.pulse.model.*;
 import com.zutubi.pulse.notifications.EmailNotificationHandler;
 import com.zutubi.pulse.notifications.JabberNotificationHandler;
 import com.zutubi.pulse.notifications.NotificationHandler;
 import com.zutubi.pulse.notifications.NotificationSchemeManager;
 import com.zutubi.pulse.wizard.Wizard;
 import com.zutubi.pulse.wizard.WizardTransition;
+import com.zutubi.validation.Validateable;
+import com.zutubi.validation.ValidationContext;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -20,7 +19,7 @@ import java.util.Map;
 /**
  * <class comment/>
  */
-public class ContactPointWizard implements Wizard
+public class ContactPointWizard implements Wizard, Validateable
 {
     private UserManager userManager = null;
     private NotificationSchemeManager schemeManager = null;
@@ -138,6 +137,21 @@ public class ContactPointWizard implements Wizard
         currentState = selectState;
 
         return currentState;
+    }
+
+    public void validate(ValidationContext context)
+    {
+        // handle some wizard level validation of the current state.
+        if (currentState instanceof NotificationHandler)
+        {
+            User user = userManager.getUser(userId);
+            String name = ((NotificationHandler)currentState).getName();
+            ContactPoint contact = user.getContactPoint(name);
+            if (contact != null)
+            {
+                context.addFieldError("name", context.getText("name.invalid"));
+            }
+        }
     }
 
     public void setUserManager(UserManager userManager)

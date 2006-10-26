@@ -854,8 +854,8 @@
         <action name="contactWizard" class="com.zutubi.pulse.web.wizard.auto.WizardAction">
             <interceptor-ref name="wizStack"/>
             <param name="wizard">com.zutubi.pulse.web.user.contact.ContactPointWizard</param>
-            <result name="input" type="velocity">/wizard/wizard.vm</result>
-            <result name="step" type="velocity">/wizard/wizard.vm</result>
+            <result name="input" type="velocity">/wizard/contact-points-wizard.vm</result>
+            <result name="step" type="velocity">/wizard/contact-points-wizard.vm</result>
             <result name="cancel" type="redirect">/preferences.action</result>
             <result name="success" type="redirect">/preferences.action</result>
         </action>

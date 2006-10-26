@@ -1,6 +1,7 @@
 package com.zutubi.pulse.notifications;
 
 import com.zutubi.pulse.form.descriptor.annotation.Form;
+import com.zutubi.pulse.form.descriptor.annotation.Text;
 import com.zutubi.validation.annotations.Email;
 import com.zutubi.validation.annotations.Required;
 
@@ -13,7 +14,8 @@ public class EmailNotificationHandler implements NotificationHandler
     private String email;
     private String name;
 
-    @Required public String getName()
+    @Required @Text(size= 60)
+    public String getName()
     {
         return name;
     }
@@ -23,7 +25,8 @@ public class EmailNotificationHandler implements NotificationHandler
         this.name = name;
     }
 
-    @Required @Email public String getEmail()
+    @Required @Email @Text(size= 60)
+    public String getEmail()
     {
         return email;
     }
