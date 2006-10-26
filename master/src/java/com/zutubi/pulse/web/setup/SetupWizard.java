@@ -75,7 +75,7 @@ public class SetupWizard extends BaseWizard
 
         // and a project admins group that has write access to all projects
         Group projectAdmins = new Group("project administrators");
-        adminGroup.addAdditionalAuthority(GrantedAuthority.PERSONAL);
+        projectAdmins.addAdditionalAuthority(GrantedAuthority.PERSONAL);
         projectAdmins.setAdminAllProjects(true);
         userManager.addGroup(projectAdmins);
 
