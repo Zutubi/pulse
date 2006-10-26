@@ -69,8 +69,14 @@ function confirmUrl(message, url)
 // enter is pressed in a form field. Without this, the first submit (previous)
 // button would always be selected.
 // How?: it sends a hidden field called submit with the details. 
-function submitenter(field, evt)
+function submitenter(field, evt, value)
 {
+    // provide backward compatibility. The value may not be specified, in which case default to 'next'.
+    if (!value)
+    {
+        value = "next"; // the default value.
+    }
+
     var keycode;
     if (window.event)
     {
@@ -88,7 +94,7 @@ function submitenter(field, evt)
     if (keycode == 13)
     {
         // submit the next button.
-        field.form.submit.value = "next";
+        field.form.submit.value = value;
         field.form.submit();
         return false;
     }

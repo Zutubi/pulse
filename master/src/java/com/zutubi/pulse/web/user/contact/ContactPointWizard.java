@@ -1,0 +1,184 @@
+package com.zutubi.pulse.web.user.contact;
+
+import com.zutubi.pulse.core.ObjectFactory;
+import com.zutubi.pulse.model.EmailContactPoint;
+import com.zutubi.pulse.model.JabberContactPoint;
+import com.zutubi.pulse.model.User;
+import com.zutubi.pulse.model.UserManager;
+import com.zutubi.pulse.notifications.EmailNotificationHandler;
+import com.zutubi.pulse.notifications.JabberNotificationHandler;
+import com.zutubi.pulse.notifications.NotificationHandler;
+import com.zutubi.pulse.notifications.NotificationSchemeManager;
+import com.zutubi.pulse.wizard.Wizard;
+import com.zutubi.pulse.wizard.WizardTransition;
+
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+/**
+ * <class comment/>
+ */
+public class ContactPointWizard implements Wizard
+{
+    private UserManager userManager = null;
+    private NotificationSchemeManager schemeManager = null;
+    private ObjectFactory objectFactory = null;
+
+    private SelectContact selectState;
+
+    private Map<String, Object> handlers = new HashMap<String, Object>();
+
+    private Object currentState;
+
+    private long userId;
+    
+    /**
+     * The user to which the new contact point will be added.
+     *
+     * @param userId
+     */
+    public void setUserId(long userId)
+    {
+        this.userId = userId;
+    }
+
+    public long getUserId()
+    {
+        return userId;
+    }
+
+    public Object getCurrentState()
+    {
+        return currentState;
+    }
+
+    public List<WizardTransition> getAvailableActions()
+    {
+        if (currentState == selectState)
+        {
+            return Arrays.asList(WizardTransition.NEXT, WizardTransition.CANCEL);
+        }
+        return Arrays.asList(WizardTransition.PREVIOUS, WizardTransition.FINISH, WizardTransition.CANCEL);
+    }
+
+    public void process()
+    {
+        // handle the creation of the contact point.
+        User user = userManager.getUser(userId);
+
+        NotificationHandler handler = (NotificationHandler) handlers.get(selectState.getContact());
+
+        // new contact point.
+        if (handler instanceof EmailNotificationHandler)
+        {
+            EmailNotificationHandler emailHandler = (EmailNotificationHandler)handler;
+            EmailContactPoint email = new EmailContactPoint();
+            email.setEmail(emailHandler.getEmail());
+            email.setName(emailHandler.getName());
+            user.add(email);
+            userManager.save(user);
+        }
+        else if (handler instanceof JabberNotificationHandler)
+        {
+            JabberNotificationHandler jabberHandler = (JabberNotificationHandler) handler;
+            JabberContactPoint jabber = new JabberContactPoint();
+            jabber.setName(jabberHandler.getName());
+            jabber.setUsername(jabberHandler.getUsername());
+            user.add(jabber);
+            userManager.save(user);
+        }
+    }
+
+    public Object traverseForward()
+    {
+        if (currentState == selectState)
+        {
+            currentState = handlers.get(selectState.getContact());
+        }
+        return currentState;
+    }
+
+    public Object traverseBackward()
+    {
+        currentState = selectState;
+        return currentState;
+    }
+
+    public void cancel()
+    {
+
+    }
+
+    public void initialise()
+    {
+        List<String> schemes = schemeManager.getNotificationSchemes();
+        selectState = new SelectContact(schemes);
+        
+        currentState = selectState;
+
+        for (String scheme : schemes)
+        {
+            try
+            {
+                Class handlerClass = schemeManager.getNotificationHandler(scheme);
+                Object handler = objectFactory.buildBean(handlerClass);
+                handlers.put(scheme, handler);
+            }
+            catch (Exception e)
+            {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    public Object restart()
+    {
+        currentState = selectState;
+
+        return currentState;
+    }
+
+    public void setUserManager(UserManager userManager)
+    {
+        this.userManager = userManager;
+    }
+
+    public class SelectContact
+    {
+        private String contact;
+
+        private List<String> options;
+
+        public SelectContact(List<String> options)
+        {
+            this.options = options;
+        }
+
+        public String getContact()
+        {
+            return contact;
+        }
+
+        public void setContact(String contact)
+        {
+            this.contact = contact;
+        }
+
+        public List<String> getContactOptions()
+        {
+            return options;
+        }
+    }
+
+    public void setObjectFactory(ObjectFactory objectFactory)
+    {
+        this.objectFactory = objectFactory;
+    }
+
+    public void setNotificationSchemeManager(NotificationSchemeManager schemeManager)
+    {
+        this.schemeManager = schemeManager;
+    }
+}

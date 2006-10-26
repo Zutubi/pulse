@@ -2,8 +2,8 @@ package com.zutubi.pulse.form.ui;
 
 import com.zutubi.pulse.form.descriptor.*;
 import com.zutubi.pulse.form.FieldType;
+import com.zutubi.pulse.wizard.WizardTransition;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.LinkedList;
 
@@ -17,8 +17,12 @@ public class WizardDecorator
     private int currentStep;
     private int numberOfSteps;
 
-    private boolean showPrevious;
-    private boolean showFinish;
+    private List<WizardTransition> transitions;
+
+    public void setActions(List<WizardTransition> transitions)
+    {
+        this.transitions = transitions;
+    }
 
     public void setStep(int step, int totalNumberOfSteps)
     {
@@ -34,9 +38,16 @@ public class WizardDecorator
     public FormDescriptor decorate(FormDescriptor descriptor)
     {
         // each field has onkeypress handler: onkeypress=return submitenter(this,event)
+
+        String defaultAction = "next";
+        if (transitions.contains(WizardTransition.FINISH))
+        {
+            defaultAction = "finish";
+        }
+
         for (FieldDescriptor fieldDescriptor : descriptor.getFieldDescriptors())
         {
-            fieldDescriptor.getParameters().put("onkeypress", "return submitenter(this, event)");
+            fieldDescriptor.getParameters().put("onkeypress", "return submitenter(this, event, '"+defaultAction+"')");
         }
 
         // wizard has extra fields.
@@ -54,19 +65,22 @@ public class WizardDecorator
         descriptor.addFieldDescriptor(stateField);
 
         List<ActionDescriptor> actionDescriptors = new LinkedList<ActionDescriptor>();
-        if (showPrevious)
+        if (transitions.contains(WizardTransition.PREVIOUS))
         {
             actionDescriptors.add(new DefaultActionDescriptor(ActionDescriptor.PREVIOUS));
         }
-        if (showFinish)
-        {
-            actionDescriptors.add(new DefaultActionDescriptor(ActionDescriptor.FINISH));
-        }
-        else
+        if (transitions.contains(WizardTransition.NEXT))
         {
             actionDescriptors.add(new DefaultActionDescriptor(ActionDescriptor.NEXT));
         }
-        actionDescriptors.add(new DefaultActionDescriptor(ActionDescriptor.CANCEL));
+        if (transitions.contains(WizardTransition.FINISH))
+        {
+            actionDescriptors.add(new DefaultActionDescriptor(ActionDescriptor.FINISH));
+        }
+        if (transitions.contains(WizardTransition.CANCEL))
+        {
+            actionDescriptors.add(new DefaultActionDescriptor(ActionDescriptor.CANCEL));
+        }
 
         descriptor.setActionDescriptors(actionDescriptors);
 
@@ -74,15 +88,5 @@ public class WizardDecorator
         // set heading...
 
         return descriptor;
-    }
-
-    public void setFirstState(boolean firstState)
-    {
-        showPrevious = !firstState;
-    }
-
-    public void setLastState(boolean lastState)
-    {
-        showFinish = lastState;
     }
 }

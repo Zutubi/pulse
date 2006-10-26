@@ -4,6 +4,7 @@ import freemarker.template.Configuration;
 import com.zutubi.pulse.form.descriptor.FormDescriptor;
 import com.zutubi.pulse.form.descriptor.DescriptorFactory;
 import com.zutubi.pulse.form.descriptor.FieldDescriptor;
+import com.zutubi.pulse.form.descriptor.DefaultFieldDescriptor;
 import com.zutubi.pulse.form.ui.components.Form;
 import com.zutubi.pulse.form.ui.components.UIComponent;
 import com.zutubi.pulse.form.ui.renderers.FreemarkerTemplateRenderer;
@@ -11,6 +12,8 @@ import com.zutubi.pulse.form.squeezer.TypeSqueezer;
 import com.zutubi.pulse.form.squeezer.Squeezers;
 import com.zutubi.pulse.form.squeezer.SqueezeException;
 import com.zutubi.pulse.form.TextProvider;
+import com.zutubi.pulse.form.FieldType;
+import com.zutubi.pulse.wizard.Wizard;
 import com.zutubi.validation.bean.BeanUtils;
 import com.zutubi.validation.bean.BeanException;
 import com.zutubi.validation.ValidationContext;
@@ -59,8 +62,22 @@ public class FormSupport
         FormDescriptor descriptor = descriptorFactory.createFormDescriptor(obj.getClass());
         WizardDecorator decorator = new WizardDecorator();
         decorator.setState(state);
+/*
         decorator.setFirstState(isFirstState);
         decorator.setLastState(isLastState);
+*/
+        descriptor = decorator.decorate(descriptor);
+
+        return renderDescriptor(descriptor, obj, context);
+    }
+
+    public String renderWizard(Wizard wizard, Object obj, ValidationContext context) throws Exception
+    {
+        FormDescriptor descriptor = descriptorFactory.createFormDescriptor(obj.getClass());
+
+        WizardDecorator decorator = new WizardDecorator();
+        decorator.setActions(wizard.getAvailableActions());
+        decorator.setState(obj.getClass().getName());
         descriptor = decorator.decorate(descriptor);
 
         return renderDescriptor(descriptor, obj, context);
@@ -118,7 +135,7 @@ public class FormSupport
         }
     }
 
-    private void populateObject(Object obj, ValidationContext validatorContext)
+    public void populateObject(Object obj, ValidationContext validatorContext)
     {
         FormDescriptor formDescriptor = descriptorFactory.createFormDescriptor(obj.getClass());
         for (FieldDescriptor fieldDescriptor : formDescriptor.getFieldDescriptors())

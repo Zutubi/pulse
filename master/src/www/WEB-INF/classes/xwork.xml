@@ -851,15 +851,11 @@
             <result name="success" type="redirect">/preferences.action</result>
         </action>
 
-        <action name="contactWizard" class="com.zutubi.pulse.web.wizard.WizardAction">
-            <interceptor-ref name="wizardStack"/>
-            <param name="wizardClass">com.zutubi.pulse.web.user.ContactPointWizard</param>
-            <result name="select" type="velocity">create-contact.vm</result>
-            <result name="form" type="velocity">create-contact-form.vm</result>
-<!--
-            <result name="email" type="velocity">create-contact-form.vm</result>
-            <result name="jabber" type="velocity">create-contact-form.vm</result>
--->
+        <action name="contactWizard" class="com.zutubi.pulse.web.wizard.auto.WizardAction">
+            <interceptor-ref name="wizStack"/>
+            <param name="wizard">com.zutubi.pulse.web.user.contact.ContactPointWizard</param>
+            <result name="input" type="velocity">/wizard/wizard.vm</result>
+            <result name="step" type="velocity">/wizard/wizard.vm</result>
             <result name="cancel" type="redirect">/preferences.action</result>
             <result name="success" type="redirect">/preferences.action</result>
         </action>
@@ -1388,6 +1384,17 @@
 
         <action name="fileDialog" class="com.zutubi.pulse.web.admin.AddResourceFileDialogAction">
             <result name="success" type="velocity">tree/filedialog.vm</result>
+        </action>
+
+    </package>
+
+    <package name="wizard" namespace="/wizard" extends="webwork-default-package">
+        <default-interceptor-ref name="wizStack"/>
+
+        <action name="wizard" class="com.zutubi.pulse.web.wizard.auto.WizardAction">
+            <result name="step" type="velocity">wizard.vm</result>
+            <result name="cancel" type="redirect">/</result>
+            <result name="success" type="redirect">/</result>
         </action>
 
     </package>
