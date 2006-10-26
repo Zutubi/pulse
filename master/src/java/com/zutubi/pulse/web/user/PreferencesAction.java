@@ -3,6 +3,8 @@ package com.zutubi.pulse.web.user;
 import com.zutubi.pulse.model.ProjectManager;
 import com.zutubi.pulse.model.User;
 import com.zutubi.pulse.security.AcegiUtils;
+import com.zutubi.pulse.license.LicenseHolder;
+import com.zutubi.pulse.license.License;
 
 import java.util.Arrays;
 
@@ -54,6 +56,19 @@ public class PreferencesAction extends UserActionSupport
             return ERROR;
         }
         return super.doInput();
+    }
+
+    /**
+     * This needs to be moved into the licensing
+     */
+    public boolean canAddContact()
+    {
+        int supportedContactPoints = LicenseHolder.getLicense().getSupportedContactPoints();
+        if (supportedContactPoints != License.UNRESTRICTED)
+        {
+            return getUser().getContactPoints().size() < supportedContactPoints;
+        }
+        return true;
     }
 
     public String execute() throws Exception

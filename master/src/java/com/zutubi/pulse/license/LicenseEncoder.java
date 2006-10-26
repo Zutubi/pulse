@@ -84,6 +84,7 @@ public class LicenseEncoder implements LicenseKeyFactory
         writeLineTo(buffer, String.valueOf(license.getSupportedAgents()));
         writeLineTo(buffer, String.valueOf(license.getSupportedProjects()));
         writeLineTo(buffer, String.valueOf(license.getSupportedUsers()));
+        writeLineTo(buffer, String.valueOf(license.getSupportedContactPoints()));
 
         return buffer.toString();
     }
@@ -145,27 +146,33 @@ public class LicenseEncoder implements LicenseKeyFactory
             if (license.getType() == LicenseType.ENTERPRISE)
             {
                 license.setSupported(16, License.UNRESTRICTED, License.UNRESTRICTED);
+                license.setSupportedContactPoints(License.UNRESTRICTED);
             }
             else if (license.getType() == LicenseType.EVALUATION)
             {
                 // keep default values of License.UNDEFINED.
                 license.setSupported(License.UNRESTRICTED, License.UNRESTRICTED, License.UNRESTRICTED);
+                license.setSupportedContactPoints(License.UNRESTRICTED);
             }
             else if (license.getType() == LicenseType.NON_PROFIT)
             {
                 license.setSupported(5, 10, License.UNRESTRICTED);
+                license.setSupportedContactPoints(License.UNRESTRICTED);
             }
             else if (license.getType() == LicenseType.PROFESSIONAL)
             {
                 license.setSupported(6, License.UNRESTRICTED, License.UNRESTRICTED);
+                license.setSupportedContactPoints(License.UNRESTRICTED);
             }
             else if (license.getType() == LicenseType.SMALL_TEAM)
             {
                 license.setSupported(1, 2, 2);
+                license.setSupportedContactPoints(3);
             }
             else if (license.getType() == LicenseType.STANDARD)
             {
                 license.setSupported(2, License.UNRESTRICTED, License.UNRESTRICTED);
+                license.setSupportedContactPoints(License.UNRESTRICTED);
             }
 
             LicenseEncoder encoder = new LicenseEncoder();
@@ -191,6 +198,17 @@ public class LicenseEncoder implements LicenseKeyFactory
 
             // code, name, expiry
             LicenseEncoder.main(new String[]{LicenseType.NON_PROFIT.toString(), projectName});
+        }
+    }
+
+    private static class NewSmallTeamLicense
+    {
+        public static void main(String[] args)
+        {
+            String projectName = "insert name here";
+
+            // code, name, expiry
+            LicenseEncoder.main(new String[]{LicenseType.SMALL_TEAM.toString(), projectName});
         }
     }
 
@@ -231,7 +249,7 @@ public class LicenseEncoder implements LicenseKeyFactory
 
         public static void main(String[] args)
         {
-            String companyName = "insert name here";
+            String companyName = "Cenqua";
 
             new NewStandardLicense().generateKey(companyName);
         }

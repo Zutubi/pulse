@@ -13,6 +13,14 @@ public class LicenseEncodeDecodeTest extends PulseTestCase
     private LicenseEncoder encoder;
     private LicenseDecoder decoder;
 
+    /**
+     * Original license string used to ensure backward compatibility of licenses.
+     */
+    private static final String LICENSE_V1 = "AAAAOUVWQUxVQVRJT04KUy4gTy4gTWVCb2R5CjIwMDYt" +
+            "MTAtMTkgMTE6MjY6MjEgRVNUCjEyCjM0CjU2CgLWL3MGBkF68yRbQ4BAjuU7XmO/uJp7jOGFTk5s0" +
+            "y7aPiuzxTEuQ/1216+Y+M1n8kQEfZsSSB4dfB/qIynqHdl0EJsvozdORIALcRrAXByhcBKIQE3KfJ" +
+            "g/fPhm4Nmfy6Hic9gMeioXjpf6meDSOfnP1F9sOnIh2E1B70Ou3zP0";
+
     public LicenseEncodeDecodeTest()
     {
     }
@@ -75,5 +83,27 @@ public class LicenseEncodeDecodeTest extends PulseTestCase
         License l = new License(LicenseType.EVALUATION, "S. O. MeBody", null);
         l.setSupported(12, 34, 56);
         assertEquals(l, decoder.decode(encoder.encode(l)));
+    }
+
+    public void testBackwardCompatibilityOfLicense() throws LicenseException
+    {
+/*
+        Calendar yesterday = Calendar.getInstance();
+        yesterday.add(Calendar.DAY_OF_YEAR, -1);
+        License l = new License(LicenseType.EVALUATION, "S. O. MeBody", yesterday.getTime());
+        l.setSupported(12, 34, 56);
+        System.out.println(new String(encoder.encode(l)));
+*/
+
+        License l = decoder.decode(LICENSE_V1.getBytes());
+        assertEquals(12, l.getSupportedAgents());
+        assertEquals(34, l.getSupportedProjects());
+        assertEquals(56, l.getSupportedUsers());
+        assertEquals(License.UNRESTRICTED, l.getSupportedContactPoints());
+        assertEquals(0, l.getDaysRemaining());
+        assertEquals("S. O. MeBody", l.getHolder());
+        assertEquals(LicenseType.EVALUATION, l.getType());
+        assertTrue(l.expires());
+        assertTrue(l.isExpired());
     }
 }

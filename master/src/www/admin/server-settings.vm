@@ -73,8 +73,14 @@
                         #else
                             #set($t = "$res.inUse of $res.supported")
                         #end
-                    #dynamicRow("license.restriction.$res.entity" $t)
+                        #dynamicRow("license.restriction.$res.entity" $t)
                     #end
+                    #if($action.supportedContactPoints == -1)
+                        #set($t = "$unrestricted")
+                    #else
+                        #set($t = "$action.supportedContactPoints")
+                    #end
+                    #dynamicRow("license.restriction.contact" $t)
 
                 </table>
             </td>

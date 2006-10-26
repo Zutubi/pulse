@@ -85,6 +85,10 @@ public class LicenseDecoder
             String projects = reader.readLine();
             String users = reader.readLine();
 
+            // contact points were not restricted until Pulse v1.2, License generated before then will not have
+            // contact points specified.
+            String contactPoints = reader.readLine();
+
             // Support old 1-letter codes
             if(code != null && code.length() == 1)
             {
@@ -114,6 +118,11 @@ public class LicenseDecoder
 
             License license = new License(type, holder, expiryDate);
             license.setSupported(Integer.valueOf(agents), Integer.valueOf(projects), Integer.valueOf(users));
+            if (contactPoints != null)
+            {
+                license.setSupportedContactPoints(Integer.valueOf(contactPoints));
+            }
+            
             return license;
         }
         catch (IOException e)

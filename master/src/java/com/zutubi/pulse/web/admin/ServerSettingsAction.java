@@ -61,6 +61,11 @@ public class ServerSettingsAction extends ActionSupport
         return config.getUnsatisfiableRecipeTimeout() >= 0;
     }
 
+    public int getSupportedContactPoints()
+    {
+        return LicenseHolder.getLicense().getSupportedContactPoints();
+    }
+
     public String execute() throws Exception
     {
         config = configurationManager.getAppConfig();

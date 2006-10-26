@@ -20,11 +20,15 @@ public class License
 
     public static final int UNRESTRICTED = -1;
 
+    public static final int UNSPECIFIED = -2;
+
     private int supportedProjects = UNRESTRICTED;
 
     private int supportedUsers = UNRESTRICTED;
 
     private int supportedAgents = UNRESTRICTED;
+
+    private int supportedContactPoints = UNSPECIFIED;
 
     public License(LicenseType type, String holder)
     {
@@ -61,6 +65,12 @@ public class License
     public License setSupportedUsers(int users)
     {
         this.supportedUsers = users;
+        return this;
+    }
+
+    public License setSupportedContactPoints(int contactPoints)
+    {
+        this.supportedContactPoints = contactPoints;
         return this;
     }
 
@@ -124,6 +134,25 @@ public class License
         return supportedAgents;
     }
 
+    /**
+     * Get the number of contact points per user supported by this license.
+     * 
+     * @return the number of contact points a user is allowed by this license.
+     */
+    public int getSupportedContactPoints()
+    {
+        // retroactively apply contact point restrictions to all of the small team licenses issues so far.
+        if (supportedContactPoints == UNSPECIFIED)
+        {
+            if (type == LicenseType.SMALL_TEAM)
+            {
+                return 3;
+            }
+            return UNRESTRICTED;
+        }
+        return supportedContactPoints;
+    }
+
     public boolean equals(Object o)
     {
         if (!(o instanceof License))
@@ -137,6 +166,7 @@ public class License
                 ObjectUtils.equals(type, other.type) &&
                 ObjectUtils.equals(supportedAgents, other.supportedAgents) &&
                 ObjectUtils.equals(supportedUsers, other.supportedUsers) &&
+                ObjectUtils.equals(supportedContactPoints, other.supportedContactPoints) &&
                 ObjectUtils.equals(supportedProjects, other.supportedProjects);
     }
 

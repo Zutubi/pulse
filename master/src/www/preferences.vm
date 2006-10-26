@@ -69,7 +69,9 @@
                     </tr>
     #end
 #end
+#if ($action.canAddContact())
                     #addRow("contact.create" 4 "$base/user/contactWizard.action?userId=$user.id" "contact.create")
+#end                    
                 </table>
                 <table id="subscriptions" class="fill-content">
                     #headingRow("subscriptions" 4)
