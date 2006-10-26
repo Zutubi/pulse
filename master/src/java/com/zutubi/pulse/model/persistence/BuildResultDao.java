@@ -33,9 +33,9 @@ public interface BuildResultDao extends EntityDao<BuildResult>
 
     BuildResult findPreviousBuildResult(BuildResult result);
 
-    List<BuildResult> findOldestByProject(Project project, int max);
+    List<BuildResult> findOldestByProject(Project project, int max, boolean includePersonal);
 
-    List<BuildResult> findOldestByProject(Project project, int first, int max);
+    List<BuildResult> findOldestByProject(Project project, int first, int max, boolean includePersonal);
 
     BuildResult findByProjectAndNumber(final Project project, final long number);
 

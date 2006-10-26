@@ -210,17 +210,17 @@ public class HibernateBuildResultDaoTest extends MasterPersistenceTestCase
 
         commitAndRefreshTransaction();
 
-        List<BuildResult> oldest = buildResultDao.findOldestByProject(p1, 1);
+        List<BuildResult> oldest = buildResultDao.findOldestByProject(p1, 1, false);
         assertEquals(1, oldest.size());
         assertPropertyEquals(r1, oldest.get(0));
 
-        oldest = buildResultDao.findOldestByProject(p1, 3);
+        oldest = buildResultDao.findOldestByProject(p1, 3, false);
         assertEquals(3, oldest.size());
         assertPropertyEquals(r1, oldest.get(0));
         assertPropertyEquals(r2, oldest.get(1));
         assertPropertyEquals(r3, oldest.get(2));
 
-        oldest = buildResultDao.findOldestByProject(p1, 100);
+        oldest = buildResultDao.findOldestByProject(p1, 100, false);
         assertEquals(4, oldest.size());
     }
 
@@ -241,7 +241,7 @@ public class HibernateBuildResultDaoTest extends MasterPersistenceTestCase
 
         commitAndRefreshTransaction();
 
-        List<BuildResult> oldest = buildResultDao.findOldestByProject(p1, 1, 2);
+        List<BuildResult> oldest = buildResultDao.findOldestByProject(p1, 1, 2, false);
         assertEquals(2, oldest.size());
         assertPropertyEquals(r2, oldest.get(0));
         assertPropertyEquals(r3, oldest.get(1));
@@ -257,7 +257,7 @@ public class HibernateBuildResultDaoTest extends MasterPersistenceTestCase
 
         commitAndRefreshTransaction();
 
-        List<BuildResult> oldest = buildResultDao.findOldestByProject(p1, 1);
+        List<BuildResult> oldest = buildResultDao.findOldestByProject(p1, 1, false);
         assertEquals(0, oldest.size());
     }
 
@@ -272,8 +272,57 @@ public class HibernateBuildResultDaoTest extends MasterPersistenceTestCase
 
         commitAndRefreshTransaction();
 
-        List<BuildResult> oldest = buildResultDao.findOldestByProject(p1, 1);
+        List<BuildResult> oldest = buildResultDao.findOldestByProject(p1, 1, false);
         assertEquals(0, oldest.size());
+    }
+
+    public void testGetOldestBuildsExcludesPersonal()
+    {
+        User u1 = new User("u1", "u1");
+        userDao.save(u1);
+
+        Project p1 = new Project();
+        projectDao.save(p1);
+
+        BuildResult r1 = createCompletedBuild(p1, 1);
+        BuildResult r2 = createCompletedBuild(p1, 2);
+        BuildResult r3 = createPersonalBuild(u1, p1, 1);
+
+        buildResultDao.save(r1);
+        buildResultDao.save(r2);
+        buildResultDao.save(r3);
+
+        commitAndRefreshTransaction();
+
+        List<BuildResult> oldest = buildResultDao.findOldestByProject(p1, 3, false);
+        assertEquals(2, oldest.size());
+        assertPropertyEquals(r1, oldest.get(0));
+        assertPropertyEquals(r2, oldest.get(1));
+    }
+
+    public void testGetOldestBuildsIncludesPersonal()
+    {
+        User u1 = new User("u1", "u1");
+        userDao.save(u1);
+
+        Project p1 = new Project();
+        projectDao.save(p1);
+
+        BuildResult r1 = createCompletedBuild(p1, 1);
+        BuildResult r2 = createCompletedBuild(p1, 2);
+        BuildResult r3 = createPersonalBuild(u1, p1, 1);
+
+        buildResultDao.save(r1);
+        buildResultDao.save(r2);
+        buildResultDao.save(r3);
+
+        commitAndRefreshTransaction();
+
+        List<BuildResult> oldest = buildResultDao.findOldestByProject(p1, 3, true);
+        assertEquals(3, oldest.size());
+        assertPropertyEquals(r1, oldest.get(0));
+        assertPropertyEquals(r2, oldest.get(1));
+        assertPropertyEquals(r3, oldest.get(2));
     }
 
     public void testGetPreviousBuildResult()

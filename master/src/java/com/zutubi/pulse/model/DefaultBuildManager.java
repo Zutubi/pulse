@@ -156,12 +156,12 @@ public class DefaultBuildManager implements BuildManager, EventListener
 
     public List<BuildResult> getOldestBuildsForProject(Project project, int max)
     {
-        return buildResultDao.findOldestByProject(project, max);
+        return buildResultDao.findOldestByProject(project, max, false);
     }
 
     public List<BuildResult> getOldestBuildsForProject(Project project, int first, int max)
     {
-        return buildResultDao.findOldestByProject(project, first, max);
+        return buildResultDao.findOldestByProject(project, first, max, false);
     }
 
     public BuildResult getLatestBuildResult(Project project)
@@ -294,7 +294,6 @@ public class DefaultBuildManager implements BuildManager, EventListener
 
     public void deleteAllBuilds(Project project)
     {
-        int offset = 0;
         List<BuildResult> results;
 
         MasterBuildPaths paths = new MasterBuildPaths(configurationManager);
@@ -306,12 +305,11 @@ public class DefaultBuildManager implements BuildManager, EventListener
 
         do
         {
-            results = buildResultDao.findOldestByProject(project, offset, 100);
+            results = buildResultDao.findOldestByProject(project, 100, true);
             for (BuildResult r : results)
             {
-                buildResultDao.delete(r);
+                cleanupResult(r);
             }
-            offset += results.size();
         }
         while (results.size() > 0);
     }
@@ -328,7 +326,7 @@ public class DefaultBuildManager implements BuildManager, EventListener
         List<BuildResult> results = buildResultDao.findByUser(user);
         for (BuildResult r : results)
         {
-            buildResultDao.delete(r);
+            cleanupResult(r);
         }
     }
 
@@ -438,7 +436,7 @@ public class DefaultBuildManager implements BuildManager, EventListener
     {
         MasterBuildPaths paths = new MasterBuildPaths(configurationManager);
         File buildDir = paths.getBuildDir(build);
-        if (!FileSystemUtils.removeDirectory(buildDir))
+        if (buildDir.exists() && !FileSystemUtils.removeDirectory(buildDir))
         {
             LOG.warning("Unable to clean up build directory '" + buildDir.getAbsolutePath() + "'");
             return;

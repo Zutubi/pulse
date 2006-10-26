@@ -114,7 +114,7 @@ public class HibernateBuildResultDao extends HibernateEntityDao<BuildResult> imp
         {
             public Object doInHibernate(Session session) throws HibernateException
             {
-                Criteria criteria = getBuildResultCriteria(session, project, states, spec);
+                Criteria criteria = getBuildResultCriteria(session, project, states, spec, false);
                 criteria.setFirstResult(first);
                 criteria.setMaxResults(max);
                 criteria.addOrder(Order.desc("id"));
@@ -123,26 +123,22 @@ public class HibernateBuildResultDao extends HibernateEntityDao<BuildResult> imp
         });
     }
 
-    public List<BuildResult> findOldestByProject(final Project project, final int max)
+    public List<BuildResult> findOldestByProject(Project project, int max, boolean includePersonal)
     {
-        return findOldestByProject(project, 0, max);
+        return findOldestByProject(project, 0, max, includePersonal);
     }
 
-    public List<BuildResult> findOldestByProject(final Project project, final int first, final int max)
+    public List<BuildResult> findOldestByProject(final Project project, final int first, final int max, final boolean includePersonal)
     {
         return (List<BuildResult>) getHibernateTemplate().execute(new HibernateCallback()
         {
             public Object doInHibernate(Session session) throws HibernateException
             {
-                Query queryObject = session.createQuery("from BuildResult model where model.user = null and model.project = :project and model.stateName in (:stateNames) order by model.number asc");
-                queryObject.setEntity("project", project);
-                queryObject.setParameterList("stateNames", ResultState.getCompletedStateNames());
-                queryObject.setFirstResult(first);
-                queryObject.setMaxResults(max);
-
-                SessionFactoryUtils.applyTransactionTimeout(queryObject, getSessionFactory());
-
-                return queryObject.list();
+                Criteria criteria = getBuildResultCriteria(session, project, ResultState.getCompletedStates(), null, includePersonal);
+                criteria.setFirstResult(first);
+                criteria.setMaxResults(max);
+                criteria.addOrder(Order.asc("id"));
+                return criteria.list();
             }
         });
     }
@@ -224,7 +220,7 @@ public class HibernateBuildResultDao extends HibernateEntityDao<BuildResult> imp
         {
             public Object doInHibernate(Session session) throws HibernateException
             {
-                Criteria criteria = getBuildResultCriteria(session, project, states, spec);
+                Criteria criteria = getBuildResultCriteria(session, project, states, spec, false);
                 criteria.setProjection(Projections.rowCount());
                 return criteria.uniqueResult();
             }
@@ -237,7 +233,7 @@ public class HibernateBuildResultDao extends HibernateEntityDao<BuildResult> imp
         {
             public Object doInHibernate(Session session) throws HibernateException
             {
-                Criteria criteria = getBuildResultCriteria(session, project, states, null);
+                Criteria criteria = getBuildResultCriteria(session, project, states, null, false);
                 if(hasWorkDir != null)
                 {
                     criteria.add(Expression.eq("hasWorkDir", hasWorkDir));
@@ -453,10 +449,14 @@ public class HibernateBuildResultDao extends HibernateEntityDao<BuildResult> imp
         }
     }
 
-    private Criteria getBuildResultCriteria(Session session, Project project, ResultState[] states, String spec)
+    private Criteria getBuildResultCriteria(Session session, Project project, ResultState[] states, String spec, boolean includePersonal)
     {
         Criteria criteria = session.createCriteria(BuildResult.class);
-        criteria.add(Expression.isNull("user"));
+        if(!includePersonal)
+        {
+            criteria.add(Expression.isNull("user"));
+        }
+        
         criteria.add(Expression.eq("project", project));
 
         addStatesToCriteria(states, criteria);
