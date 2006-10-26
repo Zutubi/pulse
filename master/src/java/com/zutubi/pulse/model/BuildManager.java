@@ -75,6 +75,8 @@ public interface BuildManager
 
     BuildResult getByProjectAndNumber(final Project project, final long number);
 
+    BuildResult getByUserAndNumber(User user, long id);
+
     /**
      * Retrieve the build result that occured immediately before the specified build result.
      *

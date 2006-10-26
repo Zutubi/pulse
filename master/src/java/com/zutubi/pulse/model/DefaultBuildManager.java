@@ -179,6 +179,11 @@ public class DefaultBuildManager implements BuildManager, EventListener
         return buildResultDao.findByProjectAndNumber(project, number);
     }
 
+    public BuildResult getByUserAndNumber(User user, long id)
+    {
+        return buildResultDao.findByUserAndNumber(user, id);
+    }
+
     public CommandResult getCommandResult(long id)
     {
         return buildResultDao.findCommandResult(id);

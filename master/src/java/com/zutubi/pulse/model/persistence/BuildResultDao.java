@@ -39,6 +39,8 @@ public interface BuildResultDao extends EntityDao<BuildResult>
 
     BuildResult findByProjectAndNumber(final Project project, final long number);
 
+    BuildResult findByUserAndNumber(User user, long id);
+
     CommandResult findCommandResult(long id);
 
     RecipeResultNode findRecipeResultNode(long id);
@@ -62,5 +64,4 @@ public interface BuildResultDao extends EntityDao<BuildResult>
     int getCompletedResultCount(User user);
 
     List<BuildResult> getOldestCompletedBuilds(User user, int max);
-
 }

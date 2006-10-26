@@ -161,6 +161,11 @@ public class MockBuildManager implements BuildManager
         throw new RuntimeException("Method not implemented.");
     }
 
+    public BuildResult getByUserAndNumber(User user, long id)
+    {
+        throw new RuntimeException("Method not implemented.");
+    }
+
     public long getNextBuildNumber(Project project)
     {
         return nextBuildNumber++;

@@ -10,11 +10,9 @@ import com.zutubi.pulse.core.model.ResultState;
 import com.zutubi.pulse.license.LicenseException;
 import com.zutubi.pulse.model.*;
 import com.zutubi.pulse.scm.SCMConfiguration;
+import com.zutubi.pulse.util.TimeStamps;
 
-import java.util.Date;
-import java.util.Hashtable;
-import java.util.List;
-import java.util.Vector;
+import java.util.*;
 
 /**
  * Implements a simple API for remote monitoring and control.
@@ -63,7 +61,7 @@ public class RemoteApi
         tokenManager.verifyAdmin(token);
         List<User> users = userManager.getAllUsers();
         Vector<String> result = new Vector<String>(users.size());
-        for(User user: users)
+        for (User user : users)
         {
             result.add(user.getLogin());
         }
@@ -78,7 +76,7 @@ public class RemoteApi
 
         List<Project> projects = projectManager.getAllProjects();
         Vector<String> result = new Vector<String>(projects.size());
-        for(Project p: projects)
+        for (Project p : projects)
         {
             result.add(p.getName());
         }
@@ -91,13 +89,13 @@ public class RemoteApi
         User user = tokenManager.verifyUser(token);
         List<Project> projects = projectManager.getAllProjects();
 
-        if(user != null)
+        if (user != null)
         {
             projects.removeAll(userManager.getHiddenProjects(user));
         }
-        
+
         Vector<String> result = new Vector<String>(projects.size());
-        for(Project p: projects)
+        for (Project p : projects)
         {
             result.add(p.getName());
         }
@@ -107,12 +105,12 @@ public class RemoteApi
 
     public Vector<Hashtable<String, Object>> getBuild(String token, String projectName, int id) throws AuthenticationException
     {
-        Vector<Hashtable<String,  Object>> result = new Vector<Hashtable<String, Object>>(1);
+        Vector<Hashtable<String, Object>> result = new Vector<Hashtable<String, Object>>(1);
 
         tokenManager.verifyUser(token);
         Project project = getProject(projectName);
         BuildResult build = buildManager.getByProjectAndNumber(project, id);
-        if(build == null)
+        if (build == null)
         {
             return result;
         }
@@ -127,20 +125,20 @@ public class RemoteApi
         Project project = getProject(projectName);
 
         String[] specs = null;
-        if(TextUtils.stringSet(buildSpecification))
+        if (TextUtils.stringSet(buildSpecification))
         {
             specs = new String[] { buildSpecification };
         }
 
         ResultState[] states = null;
-        if(completedOnly)
+        if (completedOnly)
         {
             states = ResultState.getCompletedStates();
         }
 
-        List<BuildResult> builds = buildManager.queryBuilds(new Project[]{project}, states, specs, -1, -1, null, 0, maxResults, true);
+        List<BuildResult> builds = buildManager.queryBuilds(new Project[] { project }, states, specs, -1, -1, null, 0, maxResults, true);
         Vector<Hashtable<String, Object>> result = new Vector<Hashtable<String, Object>>(builds.size());
-        for(BuildResult build: builds)
+        for (BuildResult build : builds)
         {
             Hashtable<String, Object> buildDetails = convertResult(build);
             result.add(buildDetails);
@@ -149,21 +147,86 @@ public class RemoteApi
         return result;
     }
 
-    public Vector<Hashtable<String,Object>> getLatestBuildForProject(String token, String projectName, String buildSpecification, boolean completedOnly) throws AuthenticationException
+    public Vector<Hashtable<String, Object>> getLatestBuildForProject(String token, String projectName, String buildSpecification, boolean completedOnly) throws AuthenticationException
     {
         return getLatestBuildsForProject(token, projectName, buildSpecification, completedOnly, 1);
+    }
+
+    public Vector<Hashtable<String, Object>> getPersonalBuild(String token, int id) throws AuthenticationException
+    {
+        Vector<Hashtable<String, Object>> result = new Vector<Hashtable<String, Object>>(1);
+
+        User user = tokenManager.verifyUser(token);
+        BuildResult build = buildManager.getByUserAndNumber(user, id);
+        if (build == null)
+        {
+            return result;
+        }
+
+        result.add(convertResult(build));
+        return result;
+    }
+
+    public Vector<Hashtable<String, Object>> getLatestPersonalBuilds(String token, boolean completedOnly, int maxResults) throws AuthenticationException
+    {
+        User user = tokenManager.verifyUser(token);
+
+        List<BuildResult> builds = buildManager.getPersonalBuilds(user);
+        if (completedOnly)
+        {
+            Iterator<BuildResult> it = builds.iterator();
+            while (it.hasNext())
+            {
+                BuildResult b = it.next();
+                if (!b.completed())
+                {
+                    it.remove();
+                }
+            }
+        }
+
+        if (maxResults >= 0 && builds.size() > maxResults)
+        {
+            builds = builds.subList(0, maxResults);
+        }
+
+        Vector<Hashtable<String, Object>> result = new Vector<Hashtable<String, Object>>(builds.size());
+        for (BuildResult build : builds)
+        {
+            Hashtable<String, Object> buildDetails = convertResult(build);
+            result.add(buildDetails);
+        }
+
+        return result;
+    }
+
+    public Vector<Hashtable<String, Object>> getLatestPersonalBuild(String token, boolean completedOnly) throws AuthenticationException
+    {
+        return getLatestPersonalBuilds(token, completedOnly, 1);
     }
 
     private Hashtable<String, Object> convertResult(BuildResult build)
     {
         Hashtable<String, Object> buildDetails = new Hashtable<String, Object>();
-        buildDetails.put("id", (int)build.getNumber());
+        buildDetails.put("id", (int) build.getNumber());
+        buildDetails.put("project", build.getProject().getName());
         buildDetails.put("specification", build.getBuildSpecification());
         buildDetails.put("status", build.getState().getPrettyString());
         buildDetails.put("completed", build.completed());
         buildDetails.put("succeeded", build.succeeded());
-        buildDetails.put("startTime", new Date(build.getStamps().getStartTime()));
-        buildDetails.put("endTime", new Date(build.getStamps().getEndTime()));
+
+        TimeStamps timeStamps = build.getStamps();
+        buildDetails.put("startTime", new Date(timeStamps.getStartTime()));
+        buildDetails.put("endTime", new Date(timeStamps.getEndTime()));
+        if (timeStamps.hasEstimatedTimeRemaining())
+        {
+            buildDetails.put("progress", timeStamps.getEstimatedPercentComplete());
+        }
+        else
+        {
+            buildDetails.put("progress", -1);
+        }
+
         return buildDetails;
     }
 
@@ -208,7 +271,7 @@ public class RemoteApi
         {
             tokenManager.loginUser(token);
             Project project = getProject(projectName);
-            if(project.isPaused())
+            if (project.isPaused())
             {
                 return false;
             }
@@ -230,7 +293,7 @@ public class RemoteApi
         {
             tokenManager.loginUser(token);
             Project project = getProject(projectName);
-            if(project.isPaused())
+            if (project.isPaused())
             {
                 projectManager.resumeProject(project);
                 return true;
@@ -250,17 +313,17 @@ public class RemoteApi
     {
         tokenManager.verifyAdmin(token);
 
-        if(!TextUtils.stringSet(name) || agentManager.agentExists(name))
+        if (!TextUtils.stringSet(name) || agentManager.agentExists(name))
         {
             return false;
         }
 
-        if(!TextUtils.stringSet(host))
+        if (!TextUtils.stringSet(host))
         {
             return false;
         }
 
-        if(port <= 0)
+        if (port <= 0)
         {
             return false;
         }
@@ -274,7 +337,7 @@ public class RemoteApi
         tokenManager.verifyUser(token);
 
         Agent agent = agentManager.getAgent(name);
-        if(agent == null)
+        if (agent == null)
         {
             return "";
         }
@@ -292,7 +355,7 @@ public class RemoteApi
         }
         else
         {
-            if(!adminTokenManager.checkAdminToken(token))
+            if (!adminTokenManager.checkAdminToken(token))
             {
                 throw new AuthenticationException("Invalid token");
             }
@@ -312,7 +375,7 @@ public class RemoteApi
         }
         else
         {
-            if(!adminTokenManager.checkAdminToken(token))
+            if (!adminTokenManager.checkAdminToken(token))
             {
                 throw new AuthenticationException("Invalid token");
             }
@@ -325,13 +388,10 @@ public class RemoteApi
     /**
      * Updates the specified users password.
      *
-     * @param token used to authenticate the request.
-     *
-     * @param login name identifying the user whose password is being set.
+     * @param token    used to authenticate the request.
+     * @param login    name identifying the user whose password is being set.
      * @param password is the new password.
-     *
      * @return true if the request was successful, false otherwise.
-     *
      * @throws AuthenticationException if the token does not authorise administrator access.
      */
     public boolean setPassword(String token, String login, String password) throws AuthenticationException
@@ -341,7 +401,7 @@ public class RemoteApi
         User user = userManager.getUser(login);
         if (user == null)
         {
-            throw new IllegalArgumentException("Unknown username '"+login +"'");
+            throw new IllegalArgumentException("Unknown username '" + login + "'");
         }
         userManager.setPassword(user, password);
         userManager.save(user);
@@ -360,7 +420,7 @@ public class RemoteApi
         tokenManager.verifyAdmin(token);
         List<CommitMessageTransformer> transformers = projectManager.getCommitMessageTransformers();
         int result = transformers.size();
-        for(CommitMessageTransformer t: transformers)
+        for (CommitMessageTransformer t : transformers)
         {
             projectManager.delete(t);
         }
@@ -370,7 +430,7 @@ public class RemoteApi
     private Project getProject(String projectName)
     {
         Project project = projectManager.getProject(projectName);
-        if(project == null)
+        if (project == null)
         {
             throw new IllegalArgumentException("Unknown project '" + projectName + "'");
         }
@@ -380,7 +440,7 @@ public class RemoteApi
     private BuildSpecification getBuildSpecification(Project project, String buildSpecification)
     {
         BuildSpecification spec = project.getBuildSpecification(buildSpecification);
-        if(spec == null)
+        if (spec == null)
         {
             throw new IllegalArgumentException("Unknown build specification '" + buildSpecification + "'");
         }

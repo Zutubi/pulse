@@ -175,6 +175,34 @@ public class HibernateBuildResultDao extends HibernateEntityDao<BuildResult> imp
         return null;
     }
 
+    public BuildResult findByUserAndNumber(final User user, final long number)
+    {
+        List results = (List) getHibernateTemplate().execute(new HibernateCallback()
+        {
+            public Object doInHibernate(Session session) throws HibernateException, SQLException
+            {
+                Query queryObject = session.createQuery("from BuildResult model where model.user = :user and model.number = :number");
+                queryObject.setEntity("user", user);
+                queryObject.setParameter("number", number, Hibernate.LONG);
+
+                SessionFactoryUtils.applyTransactionTimeout(queryObject, getSessionFactory());
+
+                return queryObject.list();
+            }
+        });
+
+        if (results.size() > 1)
+        {
+            LOG.warning("findByUserAndNumber has returned " + results.size() +
+                    " results when expecting at most one.");
+        }
+        if (results.size() > 0)
+        {
+            return (BuildResult) results.get(0);
+        }
+        return null;
+    }
+
     public CommandResult findCommandResult(long id)
     {
         return (CommandResult) findAnyType(id, CommandResult.class);
