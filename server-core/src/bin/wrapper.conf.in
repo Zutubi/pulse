@@ -36,7 +36,7 @@ wrapper.app.parameter.3=start
 wrapper.app.parameter.4=com.zutubi.pulse.command.PulseCtl
 wrapper.app.parameter.5=true
 wrapper.app.parameter.6=1
-wrapper.app.parameter.7=stop
+wrapper.app.parameter.7=stopservice
 
 wrapper.on_exit.111=RESTART
 

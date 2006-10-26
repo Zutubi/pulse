@@ -55,7 +55,7 @@ public class ShutdownCommand extends AdminCommand
 
     public List<String> getAliases()
     {
-        return Arrays.asList(new String[] { "sd", "shut" });
+        return Arrays.asList(new String[] { "sd", "shut", "stop" });
     }
 
 
