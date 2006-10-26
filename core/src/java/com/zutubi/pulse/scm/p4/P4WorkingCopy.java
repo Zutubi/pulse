@@ -3,6 +3,7 @@ package com.zutubi.pulse.scm.p4;
 import com.zutubi.pulse.config.Config;
 import com.zutubi.pulse.config.ConfigSupport;
 import com.zutubi.pulse.core.model.NumericalRevision;
+import com.zutubi.pulse.core.model.Revision;
 import com.zutubi.pulse.personal.PersonalBuildSupport;
 import com.zutubi.pulse.personal.PersonalBuildUI;
 import com.zutubi.pulse.scm.SCMException;
@@ -93,10 +94,50 @@ public class P4WorkingCopy extends PersonalBuildSupport implements WorkingCopy
         return status;
     }
 
-    public void update() throws SCMException
+    public WorkingCopyStatus getLocalStatus(String... spec) throws SCMException
     {
+        WorkingCopyStatus status = new WorkingCopyStatus();
+        P4FStatHandler handler = new P4FStatHandler(getUi(), status, false);
+
+        // Spec can be either a changelist # or a list of files
+        String changelist = "default";
+        if(spec.length == 1 && spec[0].startsWith("#"))
+        {
+            // It's a changelist
+            changelist = spec[0].substring(1);
+            if(changelist.length() == 0)
+            {
+                throw new SCMException("Empty changelist name specified (" + spec[0] + ")");
+            }
+
+            client.runP4WithHandler(handler, null, P4_COMMAND, COMMAND_FSTAT, FLAG_PATH_IN_DEPOT_FORMAT, FLAG_CHANGELIST, changelist);
+        }
+        else if(spec.length > 0)
+        {
+            // Then it is a list of files
+            String[] commands = new String[spec.length + 3];
+            commands[0] = P4_COMMAND;
+            commands[1] = COMMAND_FSTAT;
+            commands[2] = FLAG_PATH_IN_DEPOT_FORMAT;
+            System.arraycopy(spec, 0, commands, 3, spec.length);
+
+            client.runP4WithHandler(handler, null, commands);
+        }
+        else
+        {
+            // Emulate submit behaviour: default changelist
+            client.runP4WithHandler(handler, null, P4_COMMAND, COMMAND_FSTAT, FLAG_PATH_IN_DEPOT_FORMAT, FLAG_CHANGELIST, "default");
+        }
+
+        return status;
+    }
+
+    public Revision update() throws SCMException
+    {
+        NumericalRevision revision = client.getLatestRevisionForFiles(null);
+
         P4SyncHandler syncHandler = new P4SyncHandler(getUi());
-        client.runP4WithHandler(syncHandler, null, P4_COMMAND, COMMAND_SYNC);
+        client.runP4WithHandler(syncHandler, null, P4_COMMAND, COMMAND_SYNC, "@" + revision.getRevisionString());
 
         if(syncHandler.isResolveRequired())
         {
@@ -110,7 +151,7 @@ public class P4WorkingCopy extends PersonalBuildSupport implements WorkingCopy
 
                 if(!response.isAffirmative())
                 {
-                    return;
+                    return revision;
                 }
             }
 
@@ -118,6 +159,8 @@ public class P4WorkingCopy extends PersonalBuildSupport implements WorkingCopy
             client.runP4WithHandler(new P4ProgressPrintingHandler(getUi(), false), null, P4_COMMAND, COMMAND_RESOLVE, FLAG_AUTO_MERGE);
             status("Resolve complete.");
         }
+
+        return revision;
     }
 
     P4Client getClient()

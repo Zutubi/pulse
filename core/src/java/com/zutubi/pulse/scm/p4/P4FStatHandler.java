@@ -15,6 +15,7 @@ public class P4FStatHandler extends P4ErrorDetectingHandler
 {
     private PersonalBuildUI ui;
     private WorkingCopyStatus status;
+    private boolean checkOutOfDate = true;
     private Map<String, String> currentItem = new HashMap<String, String>();
 
     public P4FStatHandler(PersonalBuildUI ui, WorkingCopyStatus status)
@@ -22,6 +23,12 @@ public class P4FStatHandler extends P4ErrorDetectingHandler
         super(true);
         this.ui = ui;
         this.status = status;
+    }
+
+    public P4FStatHandler(PersonalBuildUI ui, WorkingCopyStatus status, boolean checkOutOfDate)
+    {
+        this(ui, status);
+        this.checkOutOfDate = checkOutOfDate;
     }
 
     public void handleStdout(String line) throws SCMException
@@ -88,7 +95,7 @@ public class P4FStatHandler extends P4ErrorDetectingHandler
 
             // Don't bother checking OOD for inconsistent or deleted files:
             // too tricky, and useless anyhow.
-            if(fs.getState().isConsistent() && fs.getState() != FileStatus.State.DELETED)
+            if(checkOutOfDate && fs.getState().isConsistent() && fs.getState() != FileStatus.State.DELETED)
             {
                 fs.setOutOfDate(isCurrentItemOutOfDate());
             }

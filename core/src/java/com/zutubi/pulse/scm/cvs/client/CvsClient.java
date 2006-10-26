@@ -221,15 +221,23 @@ public class CvsClient
     public List<StatusInformation> status(File workingCopy) throws SCMException
     {
         StatusListener listener = new StatusListener();
-        status(workingCopy, listener);
+        status(workingCopy, null, listener);
         return listener.getInfo();
     }
 
-    public void status(File workingCopy, CVSListener listener) throws SCMException
+    public void status(File workingCopy, File[] files, CVSListener listener) throws SCMException
     {
         StatusCommand status = new StatusCommand();
         status.setRecursive(true);
-        status.setFiles(new File[]{workingCopy});
+        if(files == null)
+        {
+            status.setFiles(new File[]{workingCopy});
+        }
+        else
+        {
+            status.setFiles(files);
+        }
+
         if (!executeCommand(status, workingCopy, listener))
         {
             throw new SCMException("Failed to run status command.");

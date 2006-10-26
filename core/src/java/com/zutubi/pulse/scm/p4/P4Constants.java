@@ -34,6 +34,7 @@ public class P4Constants
     public static final String COMMAND_SUBMIT = "submit";
     public static final String COMMAND_SYNC = "sync";
     public static final String FLAG_AUTO_MERGE = "-am";
+    public static final String FLAG_CHANGELIST = "-c";
     public static final String FLAG_CLIENT = "-c";
     public static final String FLAG_DELETE = "-d";
     public static final String FLAG_FORCE = "-f";

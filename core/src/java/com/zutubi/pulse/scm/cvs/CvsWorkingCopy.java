@@ -3,11 +3,9 @@ package com.zutubi.pulse.scm.cvs;
 import com.zutubi.pulse.config.Config;
 import com.zutubi.pulse.config.ConfigSupport;
 import com.zutubi.pulse.core.model.CvsRevision;
+import com.zutubi.pulse.core.model.Revision;
 import com.zutubi.pulse.personal.PersonalBuildSupport;
-import com.zutubi.pulse.scm.FileStatus;
-import com.zutubi.pulse.scm.SCMException;
-import com.zutubi.pulse.scm.WorkingCopy;
-import com.zutubi.pulse.scm.WorkingCopyStatus;
+import com.zutubi.pulse.scm.*;
 import com.zutubi.pulse.scm.cvs.client.CvsClient;
 import com.zutubi.pulse.util.IOUtils;
 import org.netbeans.lib.cvsclient.CVSRoot;
@@ -18,6 +16,7 @@ import static org.netbeans.lib.cvsclient.file.FileStatus.*;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Date;
 import java.util.Properties;
 
 /**
@@ -77,12 +76,23 @@ public class CvsWorkingCopy extends PersonalBuildSupport implements WorkingCopy
         WorkingCopyStatus status = new WorkingCopyStatus();
         StatusHandler statusHandler = new StatusHandler(status);
 
-        client.status(workingDir, statusHandler);
+        client.status(workingDir, null, statusHandler);
 
         return status;
     }
 
-    public void update() throws SCMException
+    public WorkingCopyStatus getLocalStatus(String... spec) throws SCMException
+    {
+        File[] files = SCMUtils.specToFiles(workingDir, spec);
+        WorkingCopyStatus status = new WorkingCopyStatus();
+        StatusHandler statusHandler = new StatusHandler(status, false);
+
+        client.status(workingDir, files, statusHandler);
+
+        return status;
+    }
+
+    public Revision update() throws SCMException
     {
         // updating to the latest repository version for the current configurations branch (or head).
         String branch = configSupport.getProperty(CvsConstants.BRANCH);
@@ -92,17 +102,25 @@ public class CvsWorkingCopy extends PersonalBuildSupport implements WorkingCopy
             branch = null;
         }
         
-        CvsRevision revision = new CvsRevision(null, branch, null, null);
+        CvsRevision revision = new CvsRevision(null, branch, null, new Date());
         client.update(workingDir, revision);
+        return revision;
     }
 
     private class StatusHandler extends CVSAdapter
     {
         private WorkingCopyStatus status = null;
+        private boolean recordOutOfDate = true;
 
         public StatusHandler(WorkingCopyStatus status)
         {
             this.status = status;
+        }
+
+        public StatusHandler(WorkingCopyStatus status, boolean recordOutOfDate)
+        {
+            this.status = status;
+            this.recordOutOfDate = recordOutOfDate;
         }
 
         public void fileInfoGenerated(FileInfoEvent e)
@@ -160,7 +178,7 @@ public class CvsWorkingCopy extends PersonalBuildSupport implements WorkingCopy
             }
             else if (fileStatus == HAS_CONFLICTS)
             {
-                fileState = FileStatus.State.MODIFIED;
+                fileState = FileStatus.State.UNRESOLVED;
             }
             else if (fileStatus == UNRESOLVED_CONFLICT)
             {
@@ -179,7 +197,7 @@ public class CvsWorkingCopy extends PersonalBuildSupport implements WorkingCopy
             if (fileState != null)
             {
                 FileStatus fs = new FileStatus(path, fileState, localFile.isDirectory());
-                fs.setOutOfDate(outOfDate);
+                fs.setOutOfDate(recordOutOfDate && outOfDate);
                 if (fs.isInteresting())
                 {
                     status(fs.toString());

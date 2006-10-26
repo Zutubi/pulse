@@ -6,6 +6,7 @@ import com.zutubi.pulse.config.CommandLineConfig;
 import com.zutubi.pulse.config.CompositeConfig;
 import com.zutubi.pulse.config.PropertiesConfig;
 import com.zutubi.pulse.scm.WorkingCopy;
+import com.zutubi.pulse.scm.WorkingCopyStatus;
 import org.apache.commons.cli.*;
 
 import java.io.BufferedReader;
@@ -16,7 +17,7 @@ import java.util.*;
 
 /**
  */
-@SuppressWarnings({"AccessStaticViaInstance"})
+@SuppressWarnings({ "AccessStaticViaInstance" })
 public class PersonalBuildCommand implements Command, PersonalBuildUI
 {
     private File base;
@@ -25,6 +26,7 @@ public class PersonalBuildCommand implements Command, PersonalBuildUI
     private PropertiesConfig defineConfig;
     private BufferedReader inputReader;
     private Verbosity verbosity;
+    private boolean statusOnly = false;
 
     public void processArguments(String... argv) throws ParseException
     {
@@ -35,6 +37,8 @@ public class PersonalBuildCommand implements Command, PersonalBuildUI
                 .create('q'));
         options.addOption(OptionBuilder.withLongOpt("verbose")
                 .create('v'));
+        options.addOption(OptionBuilder.withLongOpt("status")
+                .create('t'));
         options.addOption(OptionBuilder.withLongOpt("define")
                 .hasArg()
                 .create('d'));
@@ -50,17 +54,21 @@ public class PersonalBuildCommand implements Command, PersonalBuildUI
         CommandLine commandLine = parser.parse(options, argv, true);
         Properties defines = new Properties();
 
-        if(commandLine.hasOption('d'))
+        if (commandLine.hasOption('d'))
         {
             addDefinedOption(defines, commandLine.getOptionValue('d'));
         }
-        if(commandLine.hasOption('q'))
+        if (commandLine.hasOption('q'))
         {
             setVerbosity(Verbosity.QUIET);
         }
-        if(commandLine.hasOption('v'))
+        if (commandLine.hasOption('v'))
         {
             setVerbosity(Verbosity.VERBOSE);
+        }
+        if (commandLine.hasOption('t'))
+        {
+            statusOnly = true;
         }
 
         switchConfig.setCommandLine(commandLine);
@@ -72,7 +80,7 @@ public class PersonalBuildCommand implements Command, PersonalBuildUI
     private void addDefinedOption(Properties defines, String value) throws ParseException
     {
         int index = value.indexOf('=');
-        if(index <= 0 || index >= value.length() - 1)
+        if (index <= 0 || index >= value.length() - 1)
         {
             throw new ParseException("Invalid property definition syntax '" + value + "' (expected name=value)");
         }
@@ -105,28 +113,46 @@ public class PersonalBuildCommand implements Command, PersonalBuildUI
         {
             WorkingCopy wc = client.checkConfiguration();
 
-            File patchFile = null;
-
-            try
+            if (statusOnly)
             {
-                patchFile = File.createTempFile("pulse.patch.", ".zip");
+                WorkingCopyStatus wcs = client.getStatus(wc, files);
+                if(!wcs.hasChanges())
+                {
+                    status("No changes found.");
+                }
             }
-            catch (IOException e)
+            else
             {
-                error("Unable to create temporary patch file: " + e.getMessage(), e);
-                return 1;
+                File patchFile;
+
+                try
+                {
+                    patchFile = File.createTempFile("pulse.patch.", ".zip");
+                }
+                catch (IOException e)
+                {
+                    error("Unable to create temporary patch file: " + e.getMessage(), e);
+                    return 1;
+                }
+
+                patchFile.deleteOnExit();
+
+                PatchArchive patch = client.preparePatch(wc, patchFile, files);
+                if(patch == null)
+                {
+                    status("No changes found.");
+                }
+                else
+                {
+                    client.sendRequest(patch);
+                }
             }
-
-            patchFile.deleteOnExit();
-
-            PatchArchive patch = client.preparePatch(wc, patchFile);
-            client.sendRequest(patch);
         }
-        catch(UserAbortException e)
+        catch (UserAbortException e)
         {
             return 2;
         }
-        catch(PersonalBuildException e)
+        catch (PersonalBuildException e)
         {
             error(e.getMessage(), e);
             return 1;
@@ -160,7 +186,7 @@ public class PersonalBuildCommand implements Command, PersonalBuildUI
 
     public List<String> getUsages()
     {
-        return Arrays.asList(new String[] { "" });
+        return Arrays.asList(new String[] { "", "<file> ...", "#<changelist>" });
     }
 
     public List<String> getAliases()
@@ -176,9 +202,10 @@ public class PersonalBuildCommand implements Command, PersonalBuildUI
         options.put("-s [--server] url", "set pulse server url");
         options.put("-u [--user] name", "set pulse user name");
         options.put("-p [--password] password", "set pulse password");
-        options.put("-d [--define] name=value" , "set named property to given value");
+        options.put("-d [--define] name=value", "set named property to given value");
         options.put("-q [--quiet]", "suppress unnecessary output");
         options.put("-v [--verbose]", "show verbose output");
+        options.put("-t [--status]", "show status only, do not update or build");
         return options;
     }
 
@@ -200,7 +227,7 @@ public class PersonalBuildCommand implements Command, PersonalBuildUI
 
     public void debug(String message)
     {
-        if(verbosity == Verbosity.VERBOSE)
+        if (verbosity == Verbosity.VERBOSE)
         {
             System.out.println(message);
         }
@@ -208,7 +235,7 @@ public class PersonalBuildCommand implements Command, PersonalBuildUI
 
     public void status(String message)
     {
-        if(verbosity != Verbosity.QUIET)
+        if (verbosity != Verbosity.QUIET)
         {
             System.out.println(message);
         }
@@ -226,7 +253,7 @@ public class PersonalBuildCommand implements Command, PersonalBuildUI
 
     public void error(String message, Throwable throwable)
     {
-        if(verbosity == Verbosity.VERBOSE)
+        if (verbosity == Verbosity.VERBOSE)
         {
             throwable.printStackTrace(System.err);
         }
@@ -238,7 +265,7 @@ public class PersonalBuildCommand implements Command, PersonalBuildUI
     {
         String choices = "Yes/No/Always";
 
-        switch(defaultResponse)
+        switch (defaultResponse)
         {
             case YES:
                 choices += " [default: Yes]";
@@ -256,7 +283,7 @@ public class PersonalBuildCommand implements Command, PersonalBuildUI
             System.out.println(question);
 
             Response response = null;
-            while(response == null)
+            while (response == null)
             {
                 System.out.print(choices + "> ");
                 String input = inputReader.readLine();

@@ -91,4 +91,9 @@ public class WorkingCopyStatus implements Iterable<FileStatus>
 
         return null;
     }
+
+    public boolean hasChanges()
+    {
+        return changes.size() > 0;
+    }
 }

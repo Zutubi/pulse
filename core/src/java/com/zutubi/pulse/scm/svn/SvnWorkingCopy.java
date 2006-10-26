@@ -3,11 +3,9 @@ package com.zutubi.pulse.scm.svn;
 import com.zutubi.pulse.config.Config;
 import com.zutubi.pulse.config.ConfigSupport;
 import com.zutubi.pulse.core.model.NumericalRevision;
+import com.zutubi.pulse.core.model.Revision;
 import com.zutubi.pulse.personal.PersonalBuildSupport;
-import com.zutubi.pulse.scm.FileStatus;
-import com.zutubi.pulse.scm.SCMException;
-import com.zutubi.pulse.scm.WorkingCopy;
-import com.zutubi.pulse.scm.WorkingCopyStatus;
+import com.zutubi.pulse.scm.*;
 import static com.zutubi.pulse.scm.svn.SvnConstants.*;
 import org.tmatesoft.svn.core.SVNCancelException;
 import org.tmatesoft.svn.core.SVNException;
@@ -98,13 +96,35 @@ public class SvnWorkingCopy extends PersonalBuildSupport implements WorkingCopy
 
     public WorkingCopyStatus getStatus() throws SCMException
     {
+        return getStatus(true, base);
+    }
+
+    public WorkingCopyStatus getLocalStatus(String... spec) throws SCMException
+    {
+        File[] files = SCMUtils.specToFiles(base, spec);
+        if(files == null)
+        {
+            return getStatus(false, base);
+        }
+        else
+        {
+            return getStatus(false, files);
+        }
+    }
+
+    private WorkingCopyStatus getStatus(boolean remote, File... files) throws SCMException
+    {
         StatusHandler handler = new StatusHandler();
 
         try
         {
             SVNStatusClient statusClient = clientManager.getStatusClient();
             statusClient.setEventHandler(handler);
-            statusClient.doStatus(base, true, true, true, false, false, handler);
+            for(File f: files)
+            {
+                statusClient.doStatus(f, true, remote, true, false, false, handler);
+            }
+
             WorkingCopyStatus wcs = handler.getStatus();
 
             // Now find out if any changed files have an eol-style
@@ -116,7 +136,6 @@ public class SvnWorkingCopy extends PersonalBuildSupport implements WorkingCopy
         {
             throw convertException(e);
         }
-
     }
 
     private void getProperties(WorkingCopyStatus wcs, List<String> propertyChangedPaths) throws SVNException
@@ -195,14 +214,15 @@ public class SvnWorkingCopy extends PersonalBuildSupport implements WorkingCopy
         }
     }
 
-    public void update() throws SCMException
+    public Revision update() throws SCMException
     {
         SVNUpdateClient updateClient = clientManager.getUpdateClient();
         updateClient.setEventHandler(new UpdateHandler());
         
         try
         {
-            updateClient.doUpdate(base, SVNRevision.HEAD, true);
+            long rev = updateClient.doUpdate(base, SVNRevision.HEAD, true);
+            return new NumericalRevision(rev);
         }
         catch (SVNException e)
         {
@@ -213,6 +233,82 @@ public class SvnWorkingCopy extends PersonalBuildSupport implements WorkingCopy
     private SCMException convertException(SVNException e)
     {
         return new SCMException(e.getMessage(), e);
+    }
+
+    private FileStatus convertStatus(SVNStatus svnStatus, List<String> propertyChangedPaths)
+    {
+        SVNStatusType contentsStatus = svnStatus.getContentsStatus();
+        String path = svnStatus.getFile().getPath();
+        boolean directory = svnStatus.getKind() == SVNNodeKind.DIR;
+
+        if (path.startsWith(base.getPath()))
+        {
+            path = path.substring(base.getPath().length());
+        }
+
+        if (path.startsWith("/") || path.startsWith(File.separator))
+        {
+            path = path.substring(1);
+        }
+
+        FileStatus.State fileState;
+
+        if (contentsStatus == SVNStatusType.STATUS_NORMAL)
+        {
+            fileState = FileStatus.State.UNCHANGED;
+        }
+        else if (contentsStatus == SVNStatusType.STATUS_ADDED)
+        {
+            fileState = FileStatus.State.ADDED;
+        }
+        else if (contentsStatus == SVNStatusType.STATUS_CONFLICTED)
+        {
+            fileState = FileStatus.State.UNRESOLVED;
+        }
+        else if (contentsStatus == SVNStatusType.STATUS_DELETED)
+        {
+            fileState = FileStatus.State.DELETED;
+        }
+        else if (contentsStatus == SVNStatusType.STATUS_EXTERNAL)
+        {
+            fileState = FileStatus.State.UNSUPPORTED;
+        }
+        else if (contentsStatus == SVNStatusType.STATUS_INCOMPLETE)
+        {
+            fileState = FileStatus.State.INCOMPLETE;
+        }
+        else if (contentsStatus == SVNStatusType.STATUS_MERGED)
+        {
+            fileState = FileStatus.State.MERGED;
+        }
+        else if (contentsStatus == SVNStatusType.STATUS_MISSING)
+        {
+            fileState = FileStatus.State.MISSING;
+        }
+        else if (contentsStatus == SVNStatusType.STATUS_MODIFIED)
+        {
+            fileState = FileStatus.State.MODIFIED;
+        }
+        else if (contentsStatus == SVNStatusType.STATUS_OBSTRUCTED)
+        {
+            fileState = FileStatus.State.OBSTRUCTED;
+        }
+        else if (contentsStatus == SVNStatusType.STATUS_REPLACED)
+        {
+            fileState = FileStatus.State.REPLACED;
+        }
+        else
+        {
+            fileState = FileStatus.State.UNCHANGED;
+        }
+
+        SVNStatusType propertiesStatus = svnStatus.getPropertiesStatus();
+        if(propertiesStatus != SVNStatusType.STATUS_NONE)
+        {
+            propertyChangedPaths.add(path);
+        }
+
+        return new FileStatus(path, fileState, directory);
     }
 
     private class StatusHandler implements ISVNEventHandler, ISVNStatusHandler
@@ -243,93 +339,19 @@ public class SvnWorkingCopy extends PersonalBuildSupport implements WorkingCopy
 
         public void handleStatus(SVNStatus svnStatus)
         {
-            SVNStatusType contentsStatus = svnStatus.getContentsStatus();
-            String path = svnStatus.getFile().getPath();
-            boolean directory = svnStatus.getKind() == SVNNodeKind.DIR;
+            FileStatus fs = convertStatus(svnStatus, propertyChangedPaths);
 
-            if (path.startsWith(base.getPath()))
+            if (svnStatus.getRemoteContentsStatus() != SVNStatusType.STATUS_NONE ||
+                svnStatus.getRemotePropertiesStatus() != SVNStatusType.STATUS_NONE)
             {
-                path = path.substring(base.getPath().length());
-            }
-
-            if (path.startsWith("/") || path.startsWith(File.separator))
-            {
-                path = path.substring(1);
+                // Remote change to this file
+                fs.setOutOfDate(true);
             }
 
-            FileStatus.State fileState = null;
-
-            if (contentsStatus == SVNStatusType.STATUS_NORMAL)
+            if (fs.isInteresting())
             {
-                fileState = FileStatus.State.UNCHANGED;
-            }
-            else if (contentsStatus == SVNStatusType.STATUS_ADDED)
-            {
-                fileState = FileStatus.State.ADDED;
-            }
-            else if (contentsStatus == SVNStatusType.STATUS_CONFLICTED)
-            {
-                fileState = FileStatus.State.UNRESOLVED;
-            }
-            else if (contentsStatus == SVNStatusType.STATUS_DELETED)
-            {
-                fileState = FileStatus.State.DELETED;
-            }
-            else if (contentsStatus == SVNStatusType.STATUS_EXTERNAL)
-            {
-                fileState = FileStatus.State.UNSUPPORTED;
-            }
-            else if (contentsStatus == SVNStatusType.STATUS_INCOMPLETE)
-            {
-                fileState = FileStatus.State.INCOMPLETE;
-            }
-            else if (contentsStatus == SVNStatusType.STATUS_MERGED)
-            {
-                fileState = FileStatus.State.MERGED;
-            }
-            else if (contentsStatus == SVNStatusType.STATUS_MISSING)
-            {
-                fileState = FileStatus.State.MISSING;
-            }
-            else if (contentsStatus == SVNStatusType.STATUS_MODIFIED)
-            {
-                fileState = FileStatus.State.MODIFIED;
-            }
-            else if (contentsStatus == SVNStatusType.STATUS_OBSTRUCTED)
-            {
-                fileState = FileStatus.State.OBSTRUCTED;
-            }
-            else if (contentsStatus == SVNStatusType.STATUS_REPLACED)
-            {
-                fileState = FileStatus.State.REPLACED;
-            }
-            else
-            {
-                fileState = FileStatus.State.UNCHANGED;
-            }
-
-            SVNStatusType propertiesStatus = svnStatus.getPropertiesStatus();
-            if(propertiesStatus != SVNStatusType.STATUS_NONE)
-            {
-                propertyChangedPaths.add(path);
-            }
-
-            if (fileState != null)
-            {
-                FileStatus fs = new FileStatus(path, fileState, directory);
-
-                if (svnStatus.getRemoteContentsStatus() != SVNStatusType.STATUS_NONE ||
-                    svnStatus.getRemotePropertiesStatus() != SVNStatusType.STATUS_NONE)
-                {
-                    // Remote change to this file
-                    fs.setOutOfDate(true);
-                }
-
-                if (fs.isInteresting())
-                {
-                    status(fs.toString());
-                    status.add(fs);
-                }
+                status(fs.toString());
+                status.add(fs);
             }
         }
 

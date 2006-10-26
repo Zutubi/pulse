@@ -1,5 +1,6 @@
 package com.zutubi.pulse.scm;
 
+import com.zutubi.pulse.core.model.Revision;
 import com.zutubi.pulse.personal.PersonalBuildWorker;
 
 import java.util.Properties;
@@ -12,5 +13,7 @@ public interface WorkingCopy extends PersonalBuildWorker
 
     WorkingCopyStatus getStatus() throws SCMException;
 
-    void update() throws SCMException;
+    WorkingCopyStatus getLocalStatus(String... spec) throws SCMException;
+
+    Revision update() throws SCMException;
 }

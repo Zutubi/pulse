@@ -1,6 +1,7 @@
 package com.zutubi.pulse.personal;
 
 import com.zutubi.pulse.Version;
+import com.zutubi.pulse.core.model.Revision;
 import com.zutubi.pulse.scm.*;
 import com.zutubi.pulse.util.IOUtils;
 import com.zutubi.pulse.xmlrpc.PulseXmlRpcClient;
@@ -170,60 +171,46 @@ public class PersonalBuildClient extends PersonalBuildSupport
         }
     }
 
-    public PatchArchive preparePatch(WorkingCopy wc, File patchFile) throws PersonalBuildException
+    public PatchArchive preparePatch(WorkingCopy wc, File patchFile, String... spec) throws PersonalBuildException
     {
-        status("Getting working copy status...");
-        WorkingCopyStatus status = getStatus(wc);
-        status("Status retrieved.");
-
-        while (status.isOutOfDate())
+        Revision rev;
+        try
         {
-            debug("Working copy is out of date.");
-            if (config.getConfirmUpdate())
-            {
-                // Ask user if we should update.
-                PersonalBuildUI.Response response = ynaPrompt("Working copy must be updated to continue.  Update and continue?", PersonalBuildUI.Response.NO);
-                if (response.isPersistent())
-                {
-                    config.setConfirmUpdate(!response.isAffirmative());
-                }
-
-                if (!response.isAffirmative())
-                {
-                    throw new UserAbortException();
-                }
-            }
-
-            try
-            {
-                status("Updating working copy...");
-                wc.update();
-                status("Update complete.");
-            }
-            catch (SCMException e)
-            {
-                throw new PersonalBuildException("Unable to update working copy: " + e.getMessage(), e);
-            }
-
-            status("Getting working copy status...");
-            status = getStatus(wc);
-            status("Status retrieved.");
+            status("Updating working copy...");
+            rev = wc.update();
+            status("Update complete.");
+        }
+        catch (SCMException e)
+        {
+            throw new PersonalBuildException("Unable to update working copy: " + e.getMessage(), e);
         }
 
-        status("Creating patch archive...");
-        PatchArchive patchArchive = new PatchArchive(status, config.getBase(), patchFile);
-        status("Patch created.");
+        status("Getting working copy status...");
+        WorkingCopyStatus status = getStatus(wc, spec);
+        status.setRevision(rev);
+        status("Status retrieved.");
 
-        return patchArchive;
+        if (status.hasChanges())
+        {
+            status("Creating patch archive...");
+            PatchArchive patchArchive = new PatchArchive(status, config.getBase(), patchFile);
+            status("Patch created.");
+
+            return patchArchive;
+        }
+        else
+        {
+            return null;
+        }
     }
 
-    private WorkingCopyStatus getStatus(WorkingCopy wc) throws PersonalBuildException
+    public WorkingCopyStatus getStatus(WorkingCopy wc, String... spec) throws PersonalBuildException
     {
-        WorkingCopyStatus status = null;
+        WorkingCopyStatus status;
 
         try
         {
-            status = wc.getStatus();
+            status = wc.getLocalStatus(spec);
         }
         catch (SCMException e)
         {
