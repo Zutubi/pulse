@@ -30,6 +30,7 @@ import org.quartz.Trigger;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
@@ -284,24 +285,55 @@ public class BuildController implements EventListener
             // Tell every running recipe to stop, and mark the build terminating
             // (so it will go into the error state on completion).
             buildResult.terminate(event.isTimeout());
-            for (TreeNode<RecipeController> controllerNode : executingControllers)
+            List<TreeNode<RecipeController>> completedNodes = new ArrayList<TreeNode<RecipeController>>(executingControllers.size());
+
+            if(executingControllers.size() > 0)
             {
-                controllerNode.getData().terminateRecipe(event.isTimeout());
+                for (TreeNode<RecipeController> controllerNode : executingControllers)
+                {
+                    RecipeController controller = controllerNode.getData();
+                    controller.terminateRecipe(event.isTimeout());
+                    if(controller.isFinished())
+                    {
+                        completedNodes.add(controllerNode);
+                    }
+                }
+
+                buildManager.save(buildResult);
+                executingControllers.removeAll(completedNodes);
             }
 
-            buildManager.save(buildResult);
+            if(executingControllers.size() == 0)
+            {
+                completeBuild();
+            }
         }
     }
 
     private void handleRecipeTimeout(RecipeTimeoutEvent event)
     {
+        TreeNode<RecipeController> found = null;
         for (TreeNode<RecipeController> controllerNode : executingControllers)
         {
             RecipeController controller = controllerNode.getData();
             if(controller.getResult().getId() == event.getRecipeId())
             {
-                controller.getResult().terminate(true);
-                controller.terminateRecipe(true);
+                found = controllerNode;
+                break;
+            }
+        }
+
+        if(found != null)
+        {
+            RecipeController controller = found.getData();
+            controller.terminateRecipe(true);
+            if(controller.isFinished())
+            {
+                executingControllers.remove(controller);
+                if(executingControllers.size() == 0)
+                {
+                    completeBuild();
+                }
             }
         }
     }
