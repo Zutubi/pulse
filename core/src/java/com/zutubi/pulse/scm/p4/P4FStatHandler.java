@@ -56,6 +56,15 @@ public class P4FStatHandler extends P4ErrorDetectingHandler
         }
     }
 
+    public void handleStderr(String line)
+    {
+        // Filter out spurious error (nothing changed)
+        if(!line.contains("file(s) not opened on this client"))
+        {
+            super.handleStderr(line);
+        }
+    }
+
     public void handleExitCode(int code) throws SCMException
     {
         super.handleExitCode(code);

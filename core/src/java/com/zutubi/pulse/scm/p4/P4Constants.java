@@ -33,10 +33,12 @@ public class P4Constants
     public static final String COMMAND_SET = "set";
     public static final String COMMAND_SUBMIT = "submit";
     public static final String COMMAND_SYNC = "sync";
+    public static final String FLAG_AFFECTED_CHANGELIST = "-e";
     public static final String FLAG_AUTO_MERGE = "-am";
     public static final String FLAG_CHANGELIST = "-c";
     public static final String FLAG_CLIENT = "-c";
     public static final String FLAG_DELETE = "-d";
+    public static final String FLAG_FILES_OPENED = "-Ro";
     public static final String FLAG_FORCE = "-f";
     public static final String FLAG_INPUT = "-i";
     public static final String FLAG_LABEL = "-l";

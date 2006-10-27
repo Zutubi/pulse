@@ -35,7 +35,7 @@ public class P4SyncHandler implements P4Handler
     {
         if(ui != null)
         {
-            if(line.equals("File(s) up-to-date."))
+            if(line.contains("ile(s) up-to-date."))
             {
                 ui.status(line);
             }

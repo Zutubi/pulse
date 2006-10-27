@@ -190,7 +190,7 @@
             <batchtest todir="${report.dir}/junit/xml">
                 <fileset dir="${test.dir}">
                     <include name="**/*Test.java"/>
-                    <exclude name="**/P4*"/>
+                    <exclude name="**/P4Server*"/>
                     <exclude name="**/Cvs*"/>
                     <!-- temporarily exclude this test since it relies on a repo not located on windows. -->
                     <exclude name="**/SVN*"/>

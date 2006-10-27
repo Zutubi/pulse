@@ -110,23 +110,24 @@ public class P4WorkingCopy extends PersonalBuildSupport implements WorkingCopy
                 throw new SCMException("Empty changelist name specified (" + spec[0] + ")");
             }
 
-            client.runP4WithHandler(handler, null, P4_COMMAND, COMMAND_FSTAT, FLAG_PATH_IN_DEPOT_FORMAT, FLAG_CHANGELIST, changelist);
+            client.runP4WithHandler(handler, null, P4_COMMAND, COMMAND_FSTAT, FLAG_PATH_IN_DEPOT_FORMAT, FLAG_FILES_OPENED, FLAG_AFFECTED_CHANGELIST, changelist, "//...");
         }
         else if(spec.length > 0)
         {
             // Then it is a list of files
-            String[] commands = new String[spec.length + 3];
+            String[] commands = new String[spec.length + 4];
             commands[0] = P4_COMMAND;
             commands[1] = COMMAND_FSTAT;
             commands[2] = FLAG_PATH_IN_DEPOT_FORMAT;
-            System.arraycopy(spec, 0, commands, 3, spec.length);
+            commands[3] = FLAG_FILES_OPENED;
+            System.arraycopy(spec, 0, commands, 4, spec.length);
 
             client.runP4WithHandler(handler, null, commands);
         }
         else
         {
             // Emulate submit behaviour: default changelist
-            client.runP4WithHandler(handler, null, P4_COMMAND, COMMAND_FSTAT, FLAG_PATH_IN_DEPOT_FORMAT, FLAG_CHANGELIST, "default");
+            client.runP4WithHandler(handler, null, P4_COMMAND, COMMAND_FSTAT, FLAG_PATH_IN_DEPOT_FORMAT, FLAG_FILES_OPENED, FLAG_AFFECTED_CHANGELIST, "default", "//...");
         }
 
         return status;
