@@ -565,6 +565,28 @@ public class P4WorkingCopyTest extends PulseTestCase implements PersonalBuildUI
         assertEquals("file1", status.getChanges().get(1).getPath());
     }
 
+    public void testLocalStatusChangelist() throws SCMException
+    {
+        long changelist = client.createChangelist("test");
+        openForEdit("bin1", changelist);
+        openForEdit("file1");
+        openForEdit("script1", changelist);
+
+        WorkingCopyStatus status = wc.getLocalStatus("#" + Long.toString(changelist));
+        assertEquals(2, status.getChanges().size());
+        assertEquals("bin1", status.getChanges().get(0).getPath());
+        assertEquals("script1", status.getChanges().get(1).getPath());
+    }
+
+    public void testLocalStatusChangelistNoChanges() throws SCMException
+    {
+        long changelist = client.createChangelist("test");
+        openForEdit("file1");
+
+        WorkingCopyStatus status = wc.getLocalStatus("#" + Long.toString(changelist));
+        assertEquals(0, status.getChanges().size());
+    }
+
     public void testUpdateAlreadyUpToDate() throws SCMException
     {
         wc.update();
@@ -611,6 +633,11 @@ public class P4WorkingCopyTest extends PulseTestCase implements PersonalBuildUI
     private void openForEdit(String path) throws SCMException
     {
         client.runP4(null, P4_COMMAND, COMMAND_EDIT, path);
+    }
+
+    private void openForEdit(String path, long changelist) throws SCMException
+    {
+        client.runP4(null, P4_COMMAND, COMMAND_EDIT, FLAG_CHANGELIST, Long.toString(changelist), path);
     }
 
     private void openForAdd(String type) throws IOException, SCMException

@@ -59,7 +59,7 @@ public class P4FStatHandler extends P4ErrorDetectingHandler
     public void handleStderr(String line)
     {
         // Filter out spurious error (nothing changed)
-        if(!line.contains("file(s) not opened on this client"))
+        if(!line.contains("file(s) not opened on this client") && !line.equals("//... - no such file(s)."))
         {
             super.handleStderr(line);
         }

@@ -226,6 +226,26 @@ public class P4Client
         }
     }
 
+    public long createChangelist(String description) throws SCMException
+    {
+        P4Client.P4Result result = runP4(null, P4_COMMAND, COMMAND_CHANGE, FLAG_OUTPUT);
+        String changeSpec = result.stdout.toString();
+
+        changeSpec = changeSpec.replaceAll("<enter description here>", Matcher.quoteReplacement(description));
+        result = runP4(changeSpec, P4_COMMAND, COMMAND_CHANGE, FLAG_INPUT);
+        Pattern created = Pattern.compile("Change ([0-9]+) created.");
+        String response = result.stdout.toString().trim();
+        Matcher m = created.matcher(response);
+        if(m.matches())
+        {
+            return Long.parseLong(m.group(1));
+        }
+        else
+        {
+            throw new SCMException("Unrecognised response from p4 change '" + response + "'");
+        }
+    }
+
     public void submit(String comment) throws SCMException
     {
         P4Result result = runP4(null, P4_COMMAND, COMMAND_CHANGE, FLAG_OUTPUT);
