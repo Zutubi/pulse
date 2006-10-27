@@ -500,7 +500,7 @@ public class UserPreferencesAcceptanceTest extends BaseAcceptanceTestCase
         form.saveFormElements("", "");
         form.assertFormPresent();
         assertTextPresent("name is a required field");
-        assertTextPresent("username is required field");
+        assertTextPresent("this field is required");
     }
 
     public void testEditJabberContactCancel()
