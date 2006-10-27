@@ -288,7 +288,7 @@ public class WizardAction extends ActionSupport
         {
             initWizardIfRequired();
 
-            getWizardInstance().process();
+            getWizardInstance().doFinish();
 
             removeWizard();
 
@@ -307,7 +307,7 @@ public class WizardAction extends ActionSupport
         {
             initWizardIfRequired();
 
-            getWizardInstance().traverseBackward();
+            getWizardInstance().doPrevious();
 
             return "step";
         }
@@ -324,7 +324,7 @@ public class WizardAction extends ActionSupport
         {
             initWizardIfRequired();
 
-            getWizardInstance().traverseForward();
+            getWizardInstance().doNext();
 
             return "step";
         }
@@ -341,7 +341,7 @@ public class WizardAction extends ActionSupport
         {
             initWizardIfRequired();
 
-            getWizardInstance().cancel();
+            getWizardInstance().doCancel();
             removeWizard();
             
             return "cancel";

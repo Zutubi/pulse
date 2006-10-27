@@ -62,7 +62,7 @@ public class ContactPointWizard implements Wizard, Validateable
         return Arrays.asList(WizardTransition.PREVIOUS, WizardTransition.FINISH, WizardTransition.CANCEL);
     }
 
-    public void process()
+    public void doFinish()
     {
         // handle the creation of the contact point.
         User user = userManager.getUser(userId);
@@ -90,7 +90,7 @@ public class ContactPointWizard implements Wizard, Validateable
         }
     }
 
-    public Object traverseForward()
+    public Object doNext()
     {
         if (currentState == selectState)
         {
@@ -99,13 +99,13 @@ public class ContactPointWizard implements Wizard, Validateable
         return currentState;
     }
 
-    public Object traverseBackward()
+    public Object doPrevious()
     {
         currentState = selectState;
         return currentState;
     }
 
-    public void cancel()
+    public void doCancel()
     {
 
     }
@@ -132,7 +132,7 @@ public class ContactPointWizard implements Wizard, Validateable
         }
     }
 
-    public Object restart()
+    public Object doRestart()
     {
         currentState = selectState;
 

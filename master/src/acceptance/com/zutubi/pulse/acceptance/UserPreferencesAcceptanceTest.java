@@ -417,8 +417,7 @@ public class UserPreferencesAcceptanceTest extends BaseAcceptanceTestCase
         createEmailContactPoint("home", "user@example.com");
 
         // edit the contact point.
-        assertLinkPresent("edit_home");
-        clickLink("edit_home");
+        assertAndClick("edit_home");
 
         EmailContactForm form = new EmailContactForm(tester, false);
         form.assertFormElements("home", "user@example.com");
@@ -500,8 +499,8 @@ public class UserPreferencesAcceptanceTest extends BaseAcceptanceTestCase
         form.assertFormPresent();
         form.saveFormElements("", "");
         form.assertFormPresent();
-        assertTextPresent("name is required");
-        assertTextPresent("username is required");
+        assertTextPresent("name is a required field");
+        assertTextPresent("username is required field");
     }
 
     public void testEditJabberContactCancel()

@@ -28,7 +28,7 @@ public interface Wizard
      * The process method is called when the wizard is complete and no more data / input
      * is required. This method is called iff the wizard is completed successfully.
      */
-    void process();
+    void doFinish();
 
     /**
      * Request that the wizard move to the next state, as determined by the current
@@ -36,20 +36,20 @@ public interface Wizard
      *
      * @return the next state, or the current state if the traversal failed.
      */
-    Object traverseForward();
+    Object doNext();
 
     /**
      * Request that the wizard move back to its previous state.
      *
      * @return the next state, or the current state if the traversal failed.
      */
-    Object traverseBackward();
+    Object doPrevious();
 
     /**
      * Notify the wizard that it has been cancelled.
      *
      */
-    void cancel();
+    void doCancel();
 
     /**
      * Initialise this wizard. This will be called sometime after the wizard is instantiated
@@ -62,5 +62,5 @@ public interface Wizard
      * 
      * @return return the new state.
      */
-    Object restart();
+    Object doRestart();
 }

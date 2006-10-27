@@ -1,0 +1,14 @@
+#helpTag("Contact+Points")
+<content tag="selectedTab">dashboard</content>
+<html>
+<head>
+    <title>#wwtext("name=contact.edit")</title>
+</head>
+<body>
+    #dashboardTabs("preferences")
+
+    $renderedForm
+
+    #tabEnd()
+</body>
+</html>

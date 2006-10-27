@@ -62,10 +62,6 @@ public class FormSupport
         FormDescriptor descriptor = descriptorFactory.createFormDescriptor(obj.getClass());
         WizardDecorator decorator = new WizardDecorator();
         decorator.setState(state);
-/*
-        decorator.setFirstState(isFirstState);
-        decorator.setLastState(isLastState);
-*/
         descriptor = decorator.decorate(descriptor);
 
         return renderDescriptor(descriptor, obj, context);

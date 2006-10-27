@@ -864,33 +864,8 @@
             <result name="success" type="redirect">/preferences.action</result>
         </action>
 
-        <action name="editContactPoint" class="com.zutubi.pulse.web.user.EditContactPointAction">
-            <result name="email" type="chain">editEmailContactPoint!input</result>
-            <result name="jabber" type="chain">editJabberContactPoint!input</result>
-        </action>
-
-        <!-- Alias is required as WW can't chain to a non-execute method :| -->
-        <action name="editEmailContactPoint!input" class="com.zutubi.pulse.web.user.EditEmailContactPointAction"
-                method="doInput">
-            <interceptor-ref name="defaultStack"/>
-            <result name="input" type="velocity">edit-contact-email.vm</result>
-        </action>
-
-        <action name="editEmailContactPoint" class="com.zutubi.pulse.web.user.EditEmailContactPointAction">
-            <result name="input" type="velocity">edit-contact-email.vm</result>
-            <result name="cancel" type="redirect">/preferences.action</result>
-            <result name="success" type="redirect">/preferences.action</result>
-        </action>
-
-        <!-- Alias is required as WW can't chain to a non-execute method :| -->
-        <action name="editJabberContactPoint!input" class="com.zutubi.pulse.web.user.EditJabberContactPointAction"
-                method="doInput">
-            <interceptor-ref name="defaultStack"/>
-            <result name="input" type="velocity">edit-contact-jabber.vm</result>
-        </action>
-
-        <action name="editJabberContactPoint" class="com.zutubi.pulse.web.user.EditJabberContactPointAction">
-            <result name="input" type="velocity">edit-contact-jabber.vm</result>
+        <action name="editContactPoint" class="com.zutubi.pulse.web.user.contact.EditContactPointAction">
+            <result name="input" type="velocity">edit-contact.vm</result>
             <result name="cancel" type="redirect">/preferences.action</result>
             <result name="success" type="redirect">/preferences.action</result>
         </action>

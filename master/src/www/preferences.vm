@@ -57,7 +57,7 @@
                             $!webwork.htmlEncode($contact.name)
                         </td>
                         #dynamicCell($contact.uid)
-                        #editCell("$base/user/editContactPoint!default.action?id=$contact.id&userId=$user.id" "edit_$!webwork.htmlEncode($contact.name)")
+                        #editCell("$base/user/editContactPoint.action?id=$contact.id&userId=$user.id" "edit_$!webwork.htmlEncode($contact.name)")
                         #deleteCell("delete_$!webwork.htmlEncode($contact.name)" "$base/user/deleteContactPoint.action?id=$contact.id&userId=$user.id" $confirmMessage)
                     </tr>
     #if($contact.lastError)

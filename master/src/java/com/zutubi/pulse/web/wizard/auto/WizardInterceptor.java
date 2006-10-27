@@ -85,7 +85,7 @@ public class WizardInterceptor implements Interceptor
                         Wizard wizard = wizardAction.getWizardInstance();
                         while (!expectedState.equals(actualState))
                         {
-                            wizard.traverseBackward();
+                            wizard.doPrevious();
                             expectedState = wizard.getCurrentState().getClass().getName();
                         }
                     }
@@ -93,7 +93,7 @@ public class WizardInterceptor implements Interceptor
                 else
                 {
                     wizardAction.addActionError(wizardAction.getText("wizard.state.lost"));
-                    wizardAction.getWizardInstance().restart();
+                    wizardAction.getWizardInstance().doRestart();
                     shortCircuit = "step";
                 }
             }

@@ -7,7 +7,6 @@ import net.sourceforge.jwebunit.WebTester;
  */
 public class EmailContactForm extends BaseForm
 {
-
     private boolean create;
 
     public EmailContactForm(WebTester tester, boolean create)
@@ -18,33 +17,19 @@ public class EmailContactForm extends BaseForm
 
     public String getFormName()
     {
-        if (create)
-        {
-            return "EmailNotificationHandler";
-        }
-        else
-        {
-            return "email.edit";
-        }
+        return "EmailNotificationHandler";
     }
 
     public String[] getFieldNames()
     {
-        if (create)
-        {
-            return new String[]{ "name", "email" };
-        }
-        else
-        {
-            return new String[]{"contact.name", "contact.email" };
-        }
+        return new String[]{ "name", "email" };
     }
 
     public void saveFormElements(String... args)
     {
         if(create)
         {
-            super.nextFormElements(args);
+            super.finishFormElements(args);
         }
         else
         {
