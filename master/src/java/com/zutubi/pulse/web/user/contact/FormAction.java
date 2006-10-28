@@ -30,7 +30,8 @@ public abstract class FormAction extends ActionSupport implements Validateable
     protected ValidationManager validationManager;
     private Configuration configuration;
     private DescriptorFactory descriptorFactory;
-    protected String renderedForm;
+
+    private Object state;
 
     public void setCancel(String cancel)
     {
@@ -92,46 +93,14 @@ public abstract class FormAction extends ActionSupport implements Validateable
     {
     }
 
-    public String getRenderedForm()
-    {
-        return renderedForm;
-    }
-
     protected boolean isSubmitted()
     {
         return isCancelSelected() || isSaveSelected() || isResetSelected();
     }
 
-    protected String renderState(Object subject)
-    {
-
-        // Setting up this form support is ugly.  There must be a better way to handle the initialisation
-        // of the required objects.
-        FormSupport support = createFormSupport(subject);
-
-        ValidationContext validatorContext = createValidationContext(subject, this);
-        try
-        {
-            // rendering should be much simpler once the state, first and last variables are removed.
-            return support.renderForm(subject, validatorContext);
-        }
-        catch (Exception e)
-        {
-            e.printStackTrace();
-            return null;
-        }
-    }
-
-    private ValidationContext createValidationContext(Object subject, com.opensymphony.xwork.ActionSupport action)
-    {
-        MessagesTextProvider textProvider = new MessagesTextProvider(subject);
-        return new DelegatingValidationContext(new XWorkValidationAdapter(action), textProvider);
-    }
-
     protected FormSupport createFormSupport(Object subject)
     {
         FormSupport support = new FormSupport();
-        support.setValidationManager(validationManager);
         support.setConfiguration(configuration);
         support.setDescriptorFactory(descriptorFactory);
         support.setTextProvider(new com.zutubi.pulse.form.MessagesTextProvider(subject));
@@ -153,14 +122,18 @@ public abstract class FormAction extends ActionSupport implements Validateable
         this.descriptorFactory = descriptorFactory;
     }
 
+    public Object getState()
+    {
+        return state;
+    }
+
     public String execute() throws Exception
     {
-        Object state = doLoad();
+        state = doLoad();
 
         if (!isSubmitted())
         {
             // render the form.
-            renderedForm = renderState(state);
             return "input";
         }
 
@@ -171,7 +144,6 @@ public abstract class FormAction extends ActionSupport implements Validateable
 
         if (isResetSelected())
         {
-            renderedForm = renderState(state);
             return "input";
         }
 
@@ -181,13 +153,11 @@ public abstract class FormAction extends ActionSupport implements Validateable
         ValidationContext ctx = new DelegatingValidationContext(new XWorkValidationAdapter(this), textProvider);
 
         FormSupport formsupport = createFormSupport(state);
-        formsupport.populateObject(state, ctx);
-
+        formsupport.populateObject(state);
         validationManager.validate(state, ctx);
 
         if (hasErrors())
         {
-            renderedForm = renderState(state);
             return "input";
         }
 
@@ -196,7 +166,6 @@ public abstract class FormAction extends ActionSupport implements Validateable
 
         if (hasErrors())
         {
-            renderedForm = renderState(state);
             return "input";
         }
 

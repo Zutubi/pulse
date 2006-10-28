@@ -1,15 +1,13 @@
 package com.zutubi.pulse.form.ui.renderers;
 
+import com.zutubi.pulse.form.ui.TemplateRenderer;
+import com.zutubi.pulse.form.ui.TemplateRendererContext;
 import freemarker.template.Configuration;
 import freemarker.template.Template;
 
-import java.util.Map;
-import java.util.HashMap;
 import java.io.Writer;
-
-import com.zutubi.pulse.form.ui.TemplateRenderer;
-import com.zutubi.pulse.form.ui.TemplateRendererContext;
-import com.zutubi.validation.ValidationContext;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * <class-comment/>
@@ -17,8 +15,6 @@ import com.zutubi.validation.ValidationContext;
 public class FreemarkerTemplateRenderer implements TemplateRenderer
 {
     private Configuration configuration;
-
-    private ValidationContext validationContext;
 
     private Writer writer;
 
@@ -33,7 +29,7 @@ public class FreemarkerTemplateRenderer implements TemplateRenderer
         String templateName = "/"+defaultTemplateDir+"/"+defaultTheme+"/" + rendererContext.getName() + ".ftl";
 
         Map<String, Object> context = new HashMap<String, Object>();
-        Map params = rendererContext.getParameters();
+        Map<String, Object> params = rendererContext.getParameters();
         if (!params.containsKey("templateDir"))
         {
             params.put("templateDir", defaultTemplateDir);
@@ -44,11 +40,7 @@ public class FreemarkerTemplateRenderer implements TemplateRenderer
         }
 
         context.put("parameters", rendererContext.getParameters());
-
-        if (this.validationContext != null)
-        {
-            context.put("fieldErrors", validationContext.getFieldErrors());
-        }
+        context.put("fieldErrors", rendererContext.get("fieldErrors"));
 
         Template template = configuration.getTemplate(templateName);
         template.process(context, writer);
@@ -63,10 +55,5 @@ public class FreemarkerTemplateRenderer implements TemplateRenderer
     public void setConfiguration(Configuration configuration)
     {
         this.configuration = configuration;
-    }
-
-    public void setValidationContext(ValidationContext validationContext)
-    {
-        this.validationContext = validationContext;
     }
 }

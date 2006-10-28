@@ -7,7 +7,7 @@
 <body>
     #dashboardTabs("preferences")
 
-    $renderedForm
+        #wizard("object=wizardInstance")
 
     #tabEnd()
 </body>

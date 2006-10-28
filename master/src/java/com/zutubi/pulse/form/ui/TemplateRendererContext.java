@@ -11,10 +11,13 @@ public class TemplateRendererContext
 
     private Map<String, Object> parameters;
 
-    public TemplateRendererContext(String name, Map<String, Object> parameters)
+    private RenderContext context;
+
+    public TemplateRendererContext(String name, Map<String, Object> parameters, RenderContext context)
     {
         this.name = name;
         this.parameters = parameters;
+        this.context = context;
     }
 
     public String getName()
@@ -25,5 +28,10 @@ public class TemplateRendererContext
     public Map<String, Object> getParameters()
     {
         return parameters;
+    }
+
+    public Object get(String key)
+    {
+        return context.get(key);
     }
 }

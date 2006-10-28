@@ -39,7 +39,7 @@ public abstract class UIComponent extends Component
         // generate the template renderer context
         evaluateParameters();
 
-        TemplateRendererContext templateContext = new TemplateRendererContext(getDefaultTemplate(), getParameters());
+        TemplateRendererContext templateContext = new TemplateRendererContext(getDefaultTemplate(), getParameters(), context);
         context.getRenderer().render(templateContext);
 
         return false;
@@ -149,11 +149,18 @@ public abstract class UIComponent extends Component
             setId(id);
         }
 
-        if (value != null)
+        // if the value is set directly, then us it.
+        if (!getParameters().containsKey("value"))
         {
-            addParameter("value", getText(value));
+            if (value != null)
+            {
+                addParameter("value", getText(value));
+            }
+            else if (name != null) // else, look up the value based on the name of this component.
+            {
+                addParameter("value", context.get(name));
+            }
         }
-
         evaluateExtraParameters();
     }
 

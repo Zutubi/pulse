@@ -1,25 +1,20 @@
 package com.zutubi.pulse.form.ui;
 
-import freemarker.template.Configuration;
-import com.zutubi.pulse.form.descriptor.FormDescriptor;
+import com.opensymphony.xwork.ActionContext;
+import com.opensymphony.xwork.util.OgnlValueStack;
+import com.zutubi.pulse.form.TextProvider;
 import com.zutubi.pulse.form.descriptor.DescriptorFactory;
 import com.zutubi.pulse.form.descriptor.FieldDescriptor;
-import com.zutubi.pulse.form.descriptor.DefaultFieldDescriptor;
-import com.zutubi.pulse.form.ui.components.Form;
-import com.zutubi.pulse.form.ui.components.UIComponent;
-import com.zutubi.pulse.form.ui.renderers.FreemarkerTemplateRenderer;
-import com.zutubi.pulse.form.squeezer.TypeSqueezer;
-import com.zutubi.pulse.form.squeezer.Squeezers;
+import com.zutubi.pulse.form.descriptor.FormDescriptor;
 import com.zutubi.pulse.form.squeezer.SqueezeException;
-import com.zutubi.pulse.form.TextProvider;
-import com.zutubi.pulse.form.FieldType;
+import com.zutubi.pulse.form.squeezer.Squeezers;
+import com.zutubi.pulse.form.squeezer.TypeSqueezer;
+import com.zutubi.pulse.form.ui.components.Form;
+import com.zutubi.pulse.form.ui.renderers.FreemarkerTemplateRenderer;
 import com.zutubi.pulse.wizard.Wizard;
-import com.zutubi.validation.bean.BeanUtils;
-import com.zutubi.validation.bean.BeanException;
-import com.zutubi.validation.ValidationContext;
-import com.zutubi.validation.ValidationManager;
-import com.zutubi.validation.ValidationException;
-import com.opensymphony.xwork.ActionContext;
+import freemarker.template.Configuration;
+import ognl.Ognl;
+import ognl.OgnlException;
 
 import java.io.StringWriter;
 import java.util.Map;
@@ -33,41 +28,16 @@ public class FormSupport
 
     private DescriptorFactory descriptorFactory;
 
-    private ValidationManager validationManager;
-
-    public void setTextProvider(TextProvider textProvider)
-    {
-        this.textProvider = textProvider;
-    }
-
     private TextProvider textProvider;
 
-    public void validate(Object obj, ValidationContext validatorContext) throws ValidationException
-    {
-        populateObject(obj, validatorContext);
-
-        // validate the form input
-        validationManager.validate(obj, validatorContext);
-    }
-
-    public String renderForm(Object obj, ValidationContext context) throws Exception
+    public String renderForm(Object obj) throws Exception
     {
         FormDescriptor descriptor = descriptorFactory.createFormDescriptor(obj.getClass());
 
-        return renderDescriptor(descriptor, obj, context);
+        return renderDescriptor(descriptor, obj);
     }
 
-    public String renderWizard(Object obj, String state, ValidationContext context, boolean isFirstState, boolean isLastState) throws Exception
-    {
-        FormDescriptor descriptor = descriptorFactory.createFormDescriptor(obj.getClass());
-        WizardDecorator decorator = new WizardDecorator();
-        decorator.setState(state);
-        descriptor = decorator.decorate(descriptor);
-
-        return renderDescriptor(descriptor, obj, context);
-    }
-
-    public String renderWizard(Wizard wizard, Object obj, ValidationContext context) throws Exception
+    public String renderWizard(Wizard wizard, Object obj) throws Exception
     {
         FormDescriptor descriptor = descriptorFactory.createFormDescriptor(obj.getClass());
 
@@ -76,10 +46,10 @@ public class FormSupport
         decorator.setState(obj.getClass().getName());
         descriptor = decorator.decorate(descriptor);
 
-        return renderDescriptor(descriptor, obj, context);
+        return renderDescriptor(descriptor, obj);
     }
 
-    private String renderDescriptor(FormDescriptor descriptor, Object obj, ValidationContext context)
+    private String renderDescriptor(FormDescriptor descriptor, Object obj)
             throws Exception
     {
         PropertiesFormDecorator decorator = new PropertiesFormDecorator(textProvider);
@@ -87,51 +57,37 @@ public class FormSupport
 
         // build the form.
         Form form = new FormFactory().createForm(descriptor, obj);
-        populateForm(form, descriptor, obj);
 
         // setup the rendering resources.
         StringWriter writer = new StringWriter();
         FreemarkerTemplateRenderer templateRenderer = new FreemarkerTemplateRenderer();
         templateRenderer.setConfiguration(configuration);
         templateRenderer.setWriter(writer);
-        templateRenderer.setValidationContext(context);
 
         ComponentRenderer renderer = new ComponentRenderer();
         renderer.setTemplateRenderer(templateRenderer);
         renderer.setTextProvider(textProvider);
 
-        // render it.
-        renderer.render(form);
+        // we are cheating a bit here but using the ActionContext value stack to manipulate the
+        // subsequent renderer context. We should be a little more direct in how we provide the
+        // objects details to the RenderContext (and subsequent retrieval via get(key);
+        OgnlValueStack stack = ActionContext.getContext().getValueStack();
+        try
+        {
+            stack.push(obj);
+
+            // render it.
+            renderer.render(form);
+        }
+        finally
+        {
+            stack.pop();
+        }
 
         return writer.toString();
     }
 
-    private void populateForm(Form form, FormDescriptor formDescriptor, Object obj)
-    {
-        for (FieldDescriptor fieldDescriptor : formDescriptor.getFieldDescriptors())
-        {
-            try
-            {
-                String propertyName = fieldDescriptor.getName();
-                Object propertyValue = BeanUtils.getProperty(propertyName, obj);
-
-                UIComponent component = (UIComponent) form.getNestedComponent(propertyName);
-
-                TypeSqueezer squeezer = Squeezers.findSqueezer(fieldDescriptor.getType());
-                component.setValue(squeezer.squeeze(propertyValue));
-            }
-            catch (BeanException e)
-            {
-                //e.printStackTrace();
-            }
-            catch (SqueezeException e)
-            {
-                e.printStackTrace();
-            }
-        }
-    }
-
-    public void populateObject(Object obj, ValidationContext validatorContext)
+    public void populateObject(Object obj)
     {
         FormDescriptor formDescriptor = descriptorFactory.createFormDescriptor(obj.getClass());
         for (FieldDescriptor fieldDescriptor : formDescriptor.getFieldDescriptors())
@@ -146,15 +102,15 @@ public class FormSupport
                 try
                 {
                     Object value = squeezer.unsqueeze(paramValue);
-                    BeanUtils.setProperty(name, value, obj);
+                    Ognl.setValue(name, obj, value);
+                }
+                catch (OgnlException e)
+                {
+                    e.printStackTrace();
                 }
                 catch (SqueezeException e)
                 {
-                    validatorContext.addFieldError(name, name + ".conversionerror");
-                }
-                catch (BeanException e)
-                {
-                    validatorContext.addFieldError(name, name + ".beanerror");
+                    e.printStackTrace();
                 }
             }
         }
@@ -181,11 +137,6 @@ public class FormSupport
         return null;
     }
 
-    public void setValidationManager(ValidationManager validationManager)
-    {
-        this.validationManager = validationManager;
-    }
-
     public void setDescriptorFactory(DescriptorFactory descriptorFactory)
     {
         this.descriptorFactory = descriptorFactory;
@@ -194,5 +145,10 @@ public class FormSupport
     public void setConfiguration(Configuration configuration)
     {
         this.configuration = configuration;
+    }
+
+    public void setTextProvider(TextProvider textProvider)
+    {
+        this.textProvider = textProvider;
     }
 }

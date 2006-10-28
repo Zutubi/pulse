@@ -205,7 +205,9 @@ public class WizardAction extends ActionSupport
             Object state = getState();
             FormSupport support = createFormSupport(state);
             ValidationContext validationContext = createValidationContext(state, this);
-            support.validate(state, validationContext);
+
+            support.populateObject(state);
+            validationManager.validate(state, validationContext);
 
             return !hasErrors();
         }
@@ -401,7 +403,6 @@ public class WizardAction extends ActionSupport
     private FormSupport createFormSupport(Object subject)
     {
         FormSupport support = new FormSupport();
-        support.setValidationManager(validationManager);
         support.setConfiguration(configuration);
         support.setDescriptorFactory(descriptorFactory);
         support.setTextProvider(new com.zutubi.pulse.form.MessagesTextProvider(subject));

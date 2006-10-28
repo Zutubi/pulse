@@ -5,8 +5,6 @@ import com.zutubi.pulse.form.descriptor.ActionDescriptor;
 import com.zutubi.pulse.form.descriptor.FieldDescriptor;
 import com.zutubi.pulse.form.FieldType;
 import com.zutubi.pulse.form.ui.components.*;
-import com.zutubi.validation.bean.BeanUtils;
-import com.zutubi.validation.bean.BeanException;
 
 import java.util.*;
 import java.lang.reflect.Method;
@@ -175,18 +173,5 @@ public class FormFactory
 
         Map<String, Object> parameters = descriptor.getParameters();
         c.addParameters(parameters);
-/*
-        for (Map.Entry<String, Object> entry : parameters.entrySet())
-        {
-            try
-            {
-                BeanUtils.setProperty(entry.getKey(), entry.getValue(), c);
-            }
-            catch (BeanException e)
-            {
-                // noop.
-            }
-        }
-*/
     }
 }

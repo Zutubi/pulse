@@ -7,7 +7,7 @@
 <body>
     #dashboardTabs("preferences")
 
-    $renderedForm
+        #form("object=state")
 
     #tabEnd()
 </body>

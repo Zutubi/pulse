@@ -12,7 +12,7 @@ public abstract class BodyUIComponent extends UIComponent
         // generate the template renderer context
         evaluateParameters();
 
-        TemplateRendererContext templateContext = new TemplateRendererContext(getDefaultOpenTemplate(), getParameters());
+        TemplateRendererContext templateContext = new TemplateRendererContext(getDefaultOpenTemplate(), getParameters(), context);
         context.getRenderer().render(templateContext);
 
         return true;

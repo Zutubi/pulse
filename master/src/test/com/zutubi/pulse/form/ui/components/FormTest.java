@@ -20,23 +20,4 @@ public class FormTest extends ComponentTestCase
 
         System.out.println(content);
     }
-
-    public void testRenderingFormWithValidationErrors() throws Exception
-    {
-        ValidationContext context = new DelegatingValidationContext(null);
-        context.addFieldError("field", "field error");
-        templateRenderer.setValidationContext(context);
-
-        TextField field = new TextField();
-        field.setName("field");
-        Form form = new Form();
-        form.setId("form");
-        form.addNestedComponent(field);
-
-        renderer.render(form);
-
-        String content = writer.toString();
-
-        System.out.println(content);
-    }
 }
