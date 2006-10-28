@@ -3,6 +3,7 @@ package com.zutubi.pulse.config;
 import com.zutubi.pulse.test.PulseTestCase;
 import com.zutubi.pulse.util.FileSystemUtils;
 import com.zutubi.pulse.util.IOUtils;
+import com.zutubi.pulse.util.Constants;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -63,16 +64,35 @@ public class PropertiesWriterTest extends PulseTestCase
         writer.write(config, props);
 
         // assert the file is as expected.
+        assertAsExpected();
+        
+        Properties written = IOUtils.read(config);
+        assertEquals(props.getProperty("simple.property"), written.getProperty("simple.property"));
+        assertEquals(props.getProperty("simple.property.2"), written.getProperty("simple.property.2"));
+        assertEquals(props.getProperty("simple.property.3"), written.getProperty("simple.property.3"));
+    }
+
+    private void assertAsExpected() throws IOException
+    {
         assertStreamsEqual(
                 getClass().getResourceAsStream(getClass().getSimpleName() + "." + getName() + ".expected.properties"),
                 new FileInputStream(config)
         );
-
-        //for the paranoid: verify that the when reading the config we end up with the same content as we set.
     }
 
-//    public void testUpdateExistingMultilineProperties() throws IOException
-//    {
-//        //TODO:
-//    }
+    public void testUpdateExistingMultilineProperties() throws IOException
+    {
+        Properties props = new Properties();
+        props.setProperty("multiline.property", "a new value");
+        props.setProperty("multiline.property.2", "a new value with\nnew lines");
+
+        PropertiesWriter writer = new PropertiesWriter();
+        writer.write(config, props);
+
+        assertAsExpected();
+
+        Properties written = IOUtils.read(config);
+        assertEquals(props.getProperty("multiline.property"), written.getProperty("multiline.property"));
+        assertEquals(props.getProperty("multiline.property.2"), written.getProperty("multiline.property.2"));
+    }
 }

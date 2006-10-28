@@ -12,6 +12,18 @@ import java.util.Properties;
  */
 public class PropertiesWriter
 {
+    /**
+     * Write the specified properties to the given file.  If the properties already exist within the file, then
+     * the existing values will be replaced by the new values.  Any properties that are not present in the config file
+     * will be written at the end.
+     *
+     * This method will ensure that any existing comments within the file are maintained.  
+     *
+     * @param config file to which the properties will be written.
+     * @param props to be written to the file.
+     *
+     * @throws IOException if a problem occurs writing the properties to file.
+     */
     public void write(File config, Properties props) throws IOException
     {
         // each time we write a property value, we want to remove it from the properties remaining to be
@@ -19,10 +31,11 @@ public class PropertiesWriter
         Properties copy = new Properties();
         copy.putAll(props);
 
-        // convert the property values according to the Properties object convensions.
+        // Convert the property values according to the Properties object convensions. Why? To ensure that
+        // when we make a change to the config file the properties object is able to accurately read the values.
         convert(copy);
 
-        StringBuffer contents = new StringBuffer();
+        StringBuffer buffer = new StringBuffer();
 
         BufferedReader reader = null;
         try
@@ -36,36 +49,61 @@ public class PropertiesWriter
                 if (trimmedLine.startsWith("#"))
                 {
                     // is a comment, just append it.
-                    contents.append(line);
+                    buffer.append(line);
                 }
                 else if (trimmedLine.length() == 0)
                 {
-                    contents.append(line);
+                    buffer.append(line);
                 }
                 else
                 {
-                    // we are dealing with a property here.
+                    // We are dealing with a property here.
                     String propertyName = trimmedLine.substring(0, trimmedLine.indexOf('='));
                     if (copy.containsKey(propertyName))
                     {
-                        contents.append(propertyName).append("=").append(copy.getProperty(propertyName));
+                        buffer.append(propertyName).append("=").append(copy.getProperty(propertyName));
                         copy.remove(propertyName);
+
+                        // If the property we are replacing is a multiline property, we need to remove all of it.
+                        boolean isMultiLine = line.endsWith("\\");
+                        while (isMultiLine)
+                        {
+                            line = reader.readLine();
+                            if (line == null) // reached the end of the while loop.
+                            {
+                                break;
+                            }
+                            isMultiLine = line.endsWith("\\");
+                        }
                     }
                     else
                     {
-                        contents.append(line);
+                        // We are not updating this property, so write it out as is.
+                        boolean isMultiLine = line.endsWith("\\");
+                        while (isMultiLine)
+                        {
+                            buffer.append(line);
+                            buffer.append(Constants.LINE_SEPARATOR);
+                            line = reader.readLine();
+                            if (line == null) // reached the end of the while loop.
+                            {
+                                break;
+                            }                            
+                            isMultiLine = line.endsWith("\\");
+                        }
+                        buffer.append(line);
                     }
                 }
-                contents.append(Constants.LINE_SEPARATOR);
+                buffer.append(Constants.LINE_SEPARATOR);
             }
 
-            // write the remaining properties to the end of the file.
+            // Write the remaining properties to the end of the file.
             Enumeration remainingNames = copy.propertyNames();
             while (remainingNames.hasMoreElements())
             {
                 String propertyName = (String) remainingNames.nextElement();
-                contents.append(propertyName).append("=").append(copy.getProperty(propertyName));
-                contents.append(Constants.LINE_SEPARATOR);
+                buffer.append(propertyName).append("=").append(copy.getProperty(propertyName));
+                buffer.append(Constants.LINE_SEPARATOR);
             }
         }
         finally
@@ -73,12 +111,12 @@ public class PropertiesWriter
             IOUtils.close(reader);
         }
 
-        // write the updated contents.
+        // Write the updated contents.
         BufferedWriter writer = null;
         try
         {
             writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(config)));
-            writer.append(contents.toString());
+            writer.append(buffer.toString());
             writer.flush();
         }
         finally
@@ -88,12 +126,18 @@ public class PropertiesWriter
 
     }
 
-    private void convert(Properties copy)
+    /**
+     * Convert the property values according to the Properties object convensions.  The most stable way to do
+     * this is to use the properties object to render its content to a string, and then read that string.
+     * 
+     * @param properties instance whose contents are going to be converted according to the properties object conventions.
+     */
+    private void convert(Properties properties)
     {
         ByteArrayOutputStream os = new ByteArrayOutputStream();
         try
         {
-            copy.store(os, null);
+            properties.store(os, null);
             BufferedReader reader = new BufferedReader(new StringReader(os.toString()));
             String line = reader.readLine();
             while (line != null)
@@ -102,7 +146,7 @@ public class PropertiesWriter
                 {
                     String propertyName = line.substring(0, line.indexOf('='));
                     String value = line.substring(line.indexOf('=') + 1);
-                    copy.setProperty(propertyName, value);
+                    properties.setProperty(propertyName, value);
                 }
                 line = reader.readLine();
             }
