@@ -10,6 +10,7 @@ import static com.zutubi.pulse.scm.svn.SvnConstants.*;
 import org.tmatesoft.svn.core.SVNCancelException;
 import org.tmatesoft.svn.core.SVNException;
 import org.tmatesoft.svn.core.SVNNodeKind;
+import org.tmatesoft.svn.core.SVNURL;
 import org.tmatesoft.svn.core.auth.ISVNAuthenticationManager;
 import org.tmatesoft.svn.core.internal.io.dav.DAVRepositoryFactory;
 import org.tmatesoft.svn.core.internal.io.svn.SVNRepositoryFactoryImpl;
@@ -41,11 +42,27 @@ public class SvnWorkingCopy extends PersonalBuildSupport implements WorkingCopy
         clientManager = SVNClientManager.newInstance(options);
 
         ConfigSupport configSupport = new ConfigSupport(config);
+        String user = configSupport.getProperty(PROPERTY_USERNAME);
+
+        if(user == null)
+        {
+            // See if there is a username specified in the working copy URL.
+            try
+            {
+                SVNInfo info = clientManager.getWCClient().doInfo(base, null);
+                user = info.getURL().getUserInfo();
+            }
+            catch (SVNException e)
+            {
+                // Ignore this error, we can proceed.
+            }
+        }
+
         if (!configSupport.hasProperty(PROPERTY_KEYFILE))
         {
-            if (configSupport.hasProperty(PROPERTY_USERNAME))
+            if (user != null)
             {
-                clientManager = SVNClientManager.newInstance(options, configSupport.getProperty(PROPERTY_USERNAME), configSupport.getProperty(PROPERTY_PASSWORD, ""));
+                clientManager = SVNClientManager.newInstance(options, user, configSupport.getProperty(PROPERTY_PASSWORD, ""));
             }
             else
             {
@@ -54,13 +71,12 @@ public class SvnWorkingCopy extends PersonalBuildSupport implements WorkingCopy
         }
         else
         {
-            String username = configSupport.getProperty(PROPERTY_USERNAME);
             String password = configSupport.getProperty(PROPERTY_PASSWORD, "");
             String privateKeyFile = configSupport.getProperty(PROPERTY_KEYFILE);
             String passphrase = configSupport.getProperty(PROPERTY_PASSPHRASE);
 
-            ISVNAuthenticationManager authenticationManager = SVNWCUtil.createDefaultAuthenticationManager(username, password);
-            authenticationManager.setAuthenticationProvider(new SVNSSHAuthenticationProvider(username, privateKeyFile, passphrase));
+            ISVNAuthenticationManager authenticationManager = SVNWCUtil.createDefaultAuthenticationManager(user, password);
+            authenticationManager.setAuthenticationProvider(new SVNSSHAuthenticationProvider(user, privateKeyFile, passphrase));
             clientManager = SVNClientManager.newInstance(options, authenticationManager);
         }
     }
@@ -74,11 +90,30 @@ public class SvnWorkingCopy extends PersonalBuildSupport implements WorkingCopy
             throw new SCMException("Subversion repository details not returned by Pulse server");
         }
 
+        SVNURL serverURL;
+
+        try
+        {
+            serverURL = SVNURL.parseURIEncoded(url);
+        }
+        catch (SVNException e)
+        {
+            // Not the personal-builder's problem
+            return true;
+        }
+
         try
         {
             SVNInfo info = clientManager.getWCClient().doInfo(base, null);
-            String wcUrl = info.getURL().toString();
-            if (wcUrl.equals(url))
+            SVNURL wcUrl = info.getURL();
+
+            boolean eq = serverURL.getProtocol().equals(wcUrl.getProtocol()) &&
+                    serverURL.hasPort() == wcUrl.hasPort() &&
+                    serverURL.getPort() == wcUrl.getPort() &&
+                    serverURL.getHost().equals(wcUrl.getHost()) &&
+                    serverURL.getPath().equals(wcUrl.getPath());
+
+            if (eq)
             {
                 return true;
             }
@@ -102,7 +137,7 @@ public class SvnWorkingCopy extends PersonalBuildSupport implements WorkingCopy
     public WorkingCopyStatus getLocalStatus(String... spec) throws SCMException
     {
         File[] files = SCMUtils.specToFiles(base, spec);
-        if(files == null)
+        if (files == null)
         {
             return getStatus(false, base);
         }
@@ -120,7 +155,7 @@ public class SvnWorkingCopy extends PersonalBuildSupport implements WorkingCopy
         {
             SVNStatusClient statusClient = clientManager.getStatusClient();
             statusClient.setEventHandler(handler);
-            for(File f: files)
+            for (File f : files)
             {
                 statusClient.doStatus(f, true, remote, true, false, false, handler);
             }
@@ -142,22 +177,22 @@ public class SvnWorkingCopy extends PersonalBuildSupport implements WorkingCopy
     {
         SVNWCClient wcc = clientManager.getWCClient();
 
-        for(FileStatus fs: wcs)
+        for (FileStatus fs : wcs)
         {
-            if(fs.getState().requiresFile())
+            if (fs.getState().requiresFile())
             {
                 SVNPropertyData property = wcc.doGetProperty(new File(base, fs.getPath()), SVN_PROPERTY_EOL_STYLE, SVNRevision.WORKING, SVNRevision.WORKING, false);
-                if(property != null)
+                if (property != null)
                 {
                     fs.setProperty(FileStatus.PROPERTY_EOL_STYLE, convertEOLStyle(property.getValue()));
                 }
             }
 
-            if(fs.getState() == FileStatus.State.ADDED)
+            if (fs.getState() == FileStatus.State.ADDED)
             {
                 // For new files, check for svn:executable 
                 SVNPropertyData property = wcc.doGetProperty(new File(base, fs.getPath()), SVN_PROPERTY_EXECUTABLE, SVNRevision.WORKING, SVNRevision.WORKING, false);
-                if(property != null)
+                if (property != null)
                 {
                     fs.setProperty(FileStatus.PROPERTY_EXECUTABLE, "true");
                 }
@@ -165,15 +200,15 @@ public class SvnWorkingCopy extends PersonalBuildSupport implements WorkingCopy
         }
 
         // For items with changed properties, check if the executable property has flipped
-        for(String path: propertyChangedPaths)
+        for (String path : propertyChangedPaths)
         {
             FileStatus fs = wcs.getFileStatus(path);
             SVNPropertyData baseProperty = wcc.doGetProperty(new File(base, path), SVN_PROPERTY_EXECUTABLE, SVNRevision.BASE, SVNRevision.BASE, false);
             SVNPropertyData workingProperty = wcc.doGetProperty(new File(base, path), SVN_PROPERTY_EXECUTABLE, SVNRevision.WORKING, SVNRevision.WORKING, false);
 
-            if(baseProperty == null)
+            if (baseProperty == null)
             {
-                if(workingProperty != null)
+                if (workingProperty != null)
                 {
                     // Added svn:executable
                     fs.setProperty(FileStatus.PROPERTY_EXECUTABLE, "true");
@@ -181,7 +216,7 @@ public class SvnWorkingCopy extends PersonalBuildSupport implements WorkingCopy
             }
             else
             {
-                if(workingProperty == null)
+                if (workingProperty == null)
                 {
                     // Removed svn:executable
                     fs.setProperty(FileStatus.PROPERTY_EXECUTABLE, "false");
@@ -192,19 +227,19 @@ public class SvnWorkingCopy extends PersonalBuildSupport implements WorkingCopy
 
     private String convertEOLStyle(String eol)
     {
-        if(eol.equals("native"))
+        if (eol.equals("native"))
         {
             return FileStatus.EOLStyle.NATIVE.toString();
         }
-        else if(eol.equals("CR"))
+        else if (eol.equals("CR"))
         {
             return FileStatus.EOLStyle.CARRIAGE_RETURN.toString();
         }
-        else if(eol.equals("CRLF"))
+        else if (eol.equals("CRLF"))
         {
             return FileStatus.EOLStyle.CARRIAGE_RETURN_LINEFEED.toString();
         }
-        else if(eol.equals("LF"))
+        else if (eol.equals("LF"))
         {
             return FileStatus.EOLStyle.LINEFEED.toString();
         }
@@ -218,7 +253,7 @@ public class SvnWorkingCopy extends PersonalBuildSupport implements WorkingCopy
     {
         SVNUpdateClient updateClient = clientManager.getUpdateClient();
         updateClient.setEventHandler(new UpdateHandler());
-        
+
         try
         {
             long rev = updateClient.doUpdate(base, SVNRevision.HEAD, true);
@@ -303,7 +338,7 @@ public class SvnWorkingCopy extends PersonalBuildSupport implements WorkingCopy
         }
 
         SVNStatusType propertiesStatus = svnStatus.getPropertiesStatus();
-        if(propertiesStatus != SVNStatusType.STATUS_NONE)
+        if (propertiesStatus != SVNStatusType.STATUS_NONE)
         {
             propertyChangedPaths.add(path);
         }
@@ -342,7 +377,7 @@ public class SvnWorkingCopy extends PersonalBuildSupport implements WorkingCopy
             FileStatus fs = convertStatus(svnStatus, propertyChangedPaths);
 
             if (svnStatus.getRemoteContentsStatus() != SVNStatusType.STATUS_NONE ||
-                svnStatus.getRemotePropertiesStatus() != SVNStatusType.STATUS_NONE)
+                    svnStatus.getRemotePropertiesStatus() != SVNStatusType.STATUS_NONE)
             {
                 // Remote change to this file
                 fs.setOutOfDate(true);

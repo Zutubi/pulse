@@ -19,6 +19,7 @@ import org.tmatesoft.svn.core.wc.SVNWCClient;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.util.Properties;
 
 /**
  */
@@ -123,6 +124,27 @@ public class SvnWorkingCopyTest extends PulseTestCase
         otherUpdateClient = null;
         client = null;
         wc = null;
+    }
+
+    public void testMatchesRepositoryMatches() throws SCMException
+    {
+        Properties p = new Properties();
+        p.put(SvnConstants.PROPERTY_URL, "svn://localhost/test/trunk");
+        assertTrue(wc.matchesRepository(p));
+    }
+
+    public void testMatchesRepositoryDoesntMatch() throws SCMException
+    {
+        Properties p = new Properties();
+        p.put(SvnConstants.PROPERTY_URL, "svn://localhost/test/branches/1.0.x");
+        assertFalse(wc.matchesRepository(p));
+    }
+
+    public void testMatchesRepositoryEmbeddedUser() throws SCMException
+    {
+        Properties p = new Properties();
+        p.put(SvnConstants.PROPERTY_URL, "svn://goober@localhost/test/trunk");
+        assertTrue(wc.matchesRepository(p));
     }
 
     public void testGetStatusNoChanges() throws Exception
