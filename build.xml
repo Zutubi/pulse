@@ -39,6 +39,7 @@
 
         <!-- clean out the acceptance test playground. -->
         <delete dir="pulse-accept"/>
+        <delete dir="upgradetest"/>
 
         <!-- clean out the user.home/.pulse/* directory -->
         <delete dir="${user.home}/.pulse"/>        
