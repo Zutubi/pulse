@@ -6,5 +6,5 @@ then
     binDir="$PULSE_HOME/bin"
 fi
 
-"$binDir"/common.sh $@
+"$binDir"/common.sh "$@"
 exit $?
