@@ -252,14 +252,19 @@ public class Version implements Comparable
         return i.compareTo(j);
     }
 
-    public static String buildNumberToVersion(int version)
+    public static int getPatch(int buildNumber)
+    {
+        return buildNumber % 1000;
+    }
+
+    public static String buildNumberToVersion(int buildNumber)
     {
         // Digits are: major major minor minor build build build patch patch patch
-        version = version / 1000;
-        int build = version % 1000;
-        version = version / 1000;
-        int minor = version % 100;
-        int major = version / 100;
+        buildNumber = buildNumber / 1000;
+        int build = buildNumber % 1000;
+        buildNumber = buildNumber / 1000;
+        int minor = buildNumber % 100;
+        int major = buildNumber / 100;
 
         return String.format("%d.%d.%d", major, minor, build);
     }

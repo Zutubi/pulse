@@ -88,11 +88,20 @@ public class PersonalBuildClient extends PersonalBuildSupport
                 debug("Server build (%d) does not match local build (%d)", serverBuild, ourBuild);
                 if(serverBuild != confirmedBuild)
                 {
-                    PersonalBuildUI.Response response = ynaPrompt(String.format("Server version (%s) does not match tools version (%s).  Continue anyway?",
-                                                                                Version.buildNumberToVersion(serverBuild),
-                                                                                Version.buildNumberToVersion(ourBuild)),
-                                                                  PersonalBuildUI.Response.NO);
+                    String serverVersion = Version.buildNumberToVersion(serverBuild);
+                    String ourVersion = Version.buildNumberToVersion(ourBuild);
+                    String question;
 
+                    if(serverVersion.equals(ourVersion))
+                    {
+                        question = String.format("Server build (%d) does not match tools build (%d).  Continue anyway?", serverBuild, ourBuild);
+                    }
+                    else
+                    {
+                        question = String.format("Server version (%s) does not match tools version (%s).  Continue anyway?", serverVersion, ourVersion);
+                    }
+
+                    PersonalBuildUI.Response response = ynaPrompt(question, PersonalBuildUI.Response.NO);
                     if(response == PersonalBuildUI.Response.ALWAYS)
                     {
                         config.setConfirmedVersion(serverBuild);
