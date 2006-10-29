@@ -173,11 +173,9 @@ public class PersonalBuildCommand implements Command, PersonalBuildUI
 
     public String getDetailedHelp()
     {
-        return "Sends a personal build request to a pulse server.  This involves taking a\n" +
-               "snapshot of the current working directory state, forming a pulse patch file\n" +
-               "and sending the patch to the pulse server to execute a build.  If the working\n" +
-               "copy is out of date, you will be prompted to update it before a patch will be\n" +
-               "constructed.\n\n" +
+        return "Sends a personal build request to a pulse server.  This involves updating\n" +
+               "the current working copy, analysing any outstanding changes, forming a patch\n" +
+               "file and sending the patch to the pulse server to execute a build.\n\n" +
                "Configuration is defined via properties files or command line arguments.  The\n" +
                "configuration specifies connection details for the pulse server, along with\n" +
                "information about the project and build specification you wish to execute.\n" +

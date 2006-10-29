@@ -9,9 +9,10 @@ import java.io.File;
  */
 public class PersonalBuildConfig implements Config
 {
-    private static final String PROPERTIES_FILENAME = ".pulse.personal.properties";
+    private static final String PROPERTIES_FILENAME = ".pulse.properties";
 
-    public static final String PROPERTY_PULSE_URL = "pulse.url";
+
+    private File base;    public static final String PROPERTY_PULSE_URL = "pulse.url";
     public static final String PROPERTY_PULSE_USER = "pulse.user";
     public static final String PROPERTY_PULSE_PASSWORD = "pulse.password";
     public static final String PROPERTY_PROJECT = "project";
@@ -21,7 +22,6 @@ public class PersonalBuildConfig implements Config
     public static final String PROPERTY_CONFIRM_UPDATE = "confirm.update";
     public static final String PROPERTY_CONFIRMED_VERSION = "confirmed.version";
 
-    private File base;
     private ConfigSupport config;
     private ConfigSupport userConfig;
 
