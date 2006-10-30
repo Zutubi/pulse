@@ -153,7 +153,7 @@ public class LicenseEncoder implements LicenseKeyFactory
             }
             else if (license.getType() == LicenseType.NON_PROFIT)
             {
-                license.setSupported(5, 10, License.UNRESTRICTED);
+                license.setSupported(5, 5, License.UNRESTRICTED);
             }
             else if (license.getType() == LicenseType.PROFESSIONAL)
             {

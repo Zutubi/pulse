@@ -103,6 +103,27 @@ public class Project extends Entity implements AclObjectIdentity, AclObjectIdent
             copy.postBuildActions.add(action.copy());
         }
 
+        // Fix the build specification references. The copied post build actions currently reference the original
+        // projects specifications. Since the specifications have themselves been copied, we need to reference the
+        // new copies.
+        for(PostBuildAction action: copy.postBuildActions)
+        {
+            List<BuildSpecification> copiedSpecs = new LinkedList<BuildSpecification>();
+            for (BuildSpecification originalSpec : action.getSpecifications())
+            {
+                // find the copied spec that matches the original.
+                for (BuildSpecification copiedSpec : copy.buildSpecifications)
+                {
+                    if (copiedSpec.getName().equals(originalSpec.getName()))
+                    {
+                        copiedSpecs.add(copiedSpec);
+                        break;
+                    }
+                }
+            }
+            action.setSpecifications(copiedSpecs);
+        }
+
         copy.aclEntries = new LinkedList<ProjectAclEntry>();
         for(ProjectAclEntry acl: aclEntries)
         {
