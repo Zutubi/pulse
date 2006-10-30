@@ -35,7 +35,7 @@ public class CvsServerTest extends PulseTestCase
         Logger.setLogging("system");
 
         // test repository root.
-        cvsRoot = ":pserver:cvstester:cvs@www.cinnamonbob.com:/cvsroot";
+        cvsRoot = ":ext:cvstester:cvs@www.cinnamonbob.com:/cvsroot";
 
         // cleanup the working directory.
         workdir = FileSystemUtils.createTempDirectory("CvsServer", "Test");
