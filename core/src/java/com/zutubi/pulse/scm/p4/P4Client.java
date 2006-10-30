@@ -98,7 +98,7 @@ public class P4Client
         }
         catch (IOException e)
         {
-            throw new SCMException("Could not start p4 process", e);
+            throw new SCMException("Could not start p4 process: " + e.getMessage(), e);
         }
 
         if (input != null)

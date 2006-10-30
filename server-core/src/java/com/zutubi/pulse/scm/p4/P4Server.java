@@ -634,7 +634,7 @@ public class P4Server extends CachingSCMServer
                     }
                 }
             }
-        }, P4_COMMAND, FLAG_CLIENT, templateClient, COMMAND_CLIENT, FLAG_OUTPUT);
+        }, null, P4_COMMAND, FLAG_CLIENT, templateClient, COMMAND_CLIENT, FLAG_OUTPUT);
 
         return eol[0];
     }

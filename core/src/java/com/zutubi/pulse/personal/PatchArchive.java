@@ -240,6 +240,11 @@ public class PatchArchive
                 parent.mkdirs();
             }
 
+            if(!f.canWrite())
+            {
+                FileSystemUtils.setWritable(f);
+            }
+
             FileOutputStream out = null;
             try
             {

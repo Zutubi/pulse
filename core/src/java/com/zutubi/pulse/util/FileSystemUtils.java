@@ -305,6 +305,23 @@ public class FileSystemUtils
         }
     }
 
+    public static boolean setWritable(File file)
+    {
+        return setWritable(file, true);
+    }
+
+    public static boolean setWritable(File file, boolean executable)
+    {
+        if(executable)
+        {
+            return runChmod(file, "a+w");
+        }
+        else
+        {
+            return runChmod(file, "a-w");
+        }
+    }
+
     private static boolean runChmod(File file, String arg)
     {
         if(!SystemUtils.IS_WINDOWS)
