@@ -69,14 +69,13 @@ public class BuildQueue
         // if there is already a floater for the same project + specification
         if (!event.getRevision().isFixed())
         {
-            // Ignore the running build.
-            for (int i = 1; i < entityRequests.size(); i++)
+            // Include the running build, it can be floating until the first
+            // recipe is dispatched (CIB-701).
+            for (AbstractBuildRequestEvent e : entityRequests)
             {
-                AbstractBuildRequestEvent e = entityRequests.get(i);
                 if (!e.getRevision().isFixed() && e.getSpecification().equals(event.getSpecification()))
                 {
-                    // This spec is already queued, no need to remember this
-                    // request.
+                    // Existing floater, no need to remember this request.
                     return;
                 }
             }
