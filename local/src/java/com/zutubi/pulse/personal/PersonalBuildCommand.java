@@ -184,7 +184,7 @@ public class PersonalBuildCommand implements Command, PersonalBuildUI
 
     public List<String> getUsages()
     {
-        return Arrays.asList(new String[] { "", "<file> ...", "#<changelist>" });
+        return Arrays.asList(new String[] { "", "<file> ...", ":<changelist>" });
     }
 
     public List<String> getAliases()

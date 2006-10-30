@@ -100,8 +100,8 @@ public class P4WorkingCopy extends PersonalBuildSupport implements WorkingCopy
         P4FStatHandler handler = new P4FStatHandler(getUi(), status, false);
 
         // Spec can be either a changelist # or a list of files
-        String changelist = "default";
-        if(spec.length == 1 && spec[0].startsWith("#"))
+        String changelist;
+        if(spec.length == 1 && spec[0].startsWith(":"))
         {
             // It's a changelist
             changelist = spec[0].substring(1);
