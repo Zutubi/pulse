@@ -29,7 +29,7 @@
             #dynamicCell($changelist.revision.author)
     #end
             #dateCell($changelist)
-            #contentCell($action.transformComment($changelist))
+            #commitCommentCell($changelist)
             #aggregateResultCell($changelist $showWho)
             #linkCell("view.$changelist.id" "view" "viewChangelist.action?id=$changelist.id")
         </tr>

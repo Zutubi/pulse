@@ -6,33 +6,9 @@
     <title>#wwtext("name=dashboard")</title>
     <script type="text/javascript" src="$base/js/prototype.js"></script>
     <script type="text/javascript" src="$base/js/scriptaculous/scriptaculous.js"></script>
+    <script type="text/javascript" src="$base/js/main.js"></script>
     <script type="text/javascript">
         #updater("$base/ajax/dashboardPanel.action" "panel" $principle)
-
-        function showHideBuildsFloat(id)
-        {
-            var window = getElement('buildsWindow');
-            var link = getElement(id + "_link");
-
-            if(window.style.display == 'none')
-            {
-                var element = getElement(id);
-                var cell = getElement(id + "_cell");
-                var windowContent = getElement('buildsWindowContent');
-
-                windowContent.innerHTML = element.innerHTML;
-                var position = Position.positionedOffset(cell);
-                window.style.visibility = 'hidden';
-                window.style.display = '';
-                window.style.left = position[0] + cell.offsetWidth - window.offsetWidth - 20 + "px";
-                window.style.visibility = 'visible';
-                window.style.top = position[1] + 20 + "px";
-            }
-            else
-            {
-                window.style.display = 'none';
-            }
-        }
     </script>
 #if ($rssEnabled)
     <link rel="alternate" type="application/rss+xml" title="RSS" href="$base/rss.action?userId=$principle.id"/>
@@ -50,6 +26,11 @@
         </div>
     </div>
 
+    <div id="commentsWindow" class="floating" style="display: none;">
+        <div id="commentsWindowContent">
+        </div>
+    </div>
+    
     #tabEnd()
 </body>
 </html>

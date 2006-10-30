@@ -48,7 +48,7 @@
                     </td>
                     #dynamicCell($changelist.user)
                     #dateCell($changelist)
-                    <td class="content">$action.transformComment($changelist)</td>
+                    #commitCommentCell($changelist)
                     #linkCell("view.$changelist.id" "view" "viewChangelist.action?id=$changelist.id")
                 </tr>
             #end

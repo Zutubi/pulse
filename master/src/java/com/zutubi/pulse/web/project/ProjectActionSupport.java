@@ -4,6 +4,7 @@ import com.opensymphony.util.TextUtils;
 import com.zutubi.pulse.core.model.Feature;
 import com.zutubi.pulse.core.model.Revision;
 import com.zutubi.pulse.model.*;
+import com.zutubi.pulse.core.model.Changelist;
 import com.zutubi.pulse.scheduling.Scheduler;
 import com.zutubi.pulse.web.ActionSupport;
 import org.acegisecurity.AccessDeniedException;
@@ -28,6 +29,8 @@ public class ProjectActionSupport extends ActionSupport
     protected long projectId = NONE_SPECIFIED;
 
     protected String projectName = null;
+
+    private CommitMessageHelper commitMessageHelper;
 
     public void setProjectManager(ProjectManager manager)
     {
@@ -223,5 +226,23 @@ public class ProjectActionSupport extends ActionSupport
     public void setUserManager(UserManager userManager)
     {
         this.userManager = userManager;
+    }
+
+    public String transformComment(Changelist changelist)
+    {
+        if(commitMessageHelper == null)
+        {
+            commitMessageHelper = new CommitMessageHelper(getProjectManager().getCommitMessageTransformers());
+        }
+        return commitMessageHelper.applyTransforms(changelist);
+    }
+
+    public String transformComment(Changelist changelist, int maxChars)
+    {
+        if(commitMessageHelper == null)
+        {
+            commitMessageHelper = new CommitMessageHelper(getProjectManager().getCommitMessageTransformers());
+        }
+        return commitMessageHelper.applyTransforms(changelist, maxChars);
     }
 }

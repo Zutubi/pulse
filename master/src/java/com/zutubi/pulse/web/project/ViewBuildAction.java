@@ -25,7 +25,7 @@ public class ViewBuildAction extends ProjectActionSupport
     private BuildResult result;
     private List<Changelist> changelists;
     private long selectedNode;
-    private CommitMessageHelper commitMessageHelper;
+
     private MasterConfigurationManager configurationManager;
     /**
      * Insanity to work around lack of locals in velocity.
@@ -139,16 +139,6 @@ public class ViewBuildAction extends ProjectActionSupport
             changelists = getBuildManager().getChangesForBuild(getResult());
         }
         return changelists;
-    }
-
-    public String transformComment(Changelist changelist)
-    {
-        if(commitMessageHelper == null)
-        {
-            commitMessageHelper = new CommitMessageHelper(getProjectManager().getCommitMessageTransformers());
-        }
-
-        return commitMessageHelper.applyTransforms(changelist, 60);
     }
 
     public void setConfigurationManager(MasterConfigurationManager configurationManager)
