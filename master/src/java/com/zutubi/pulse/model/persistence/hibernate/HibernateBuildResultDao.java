@@ -35,14 +35,15 @@ public class HibernateBuildResultDao extends HibernateEntityDao<BuildResult> imp
         return findLatestByProject(project, 0, max);
     }
 
-    public List<BuildResult> findSinceByProject(final Project project, final Date since)
+    public List<BuildResult> findSinceByProject(final Project project, final String spec, final Date since)
     {
         return (List<BuildResult>) getHibernateTemplate().execute(new HibernateCallback()
         {
             public Object doInHibernate(Session session) throws HibernateException
             {
-                Query queryObject = session.createQuery("from BuildResult model where model.project = :project and model.user = null and model.stamps.endTime > :since order by model.number desc");
+                Query queryObject = session.createQuery("from BuildResult model where model.project = :project and model.buildSpecification = :spec and model.user = null and model.stamps.endTime > :since order by model.number desc");
                 queryObject.setEntity("project", project);
+                queryObject.setParameter("spec", spec);
                 queryObject.setLong("since", since.getTime());
 
                 SessionFactoryUtils.applyTransactionTimeout(queryObject, getSessionFactory());
@@ -94,16 +95,13 @@ public class HibernateBuildResultDao extends HibernateEntityDao<BuildResult> imp
         {
             public Object doInHibernate(Session session) throws HibernateException
             {
-                Query queryObject = session.createQuery("from BuildResult model where model.user = null and model.project = :project and model.buildSpecification = :spec and model.stateName in (:stateNames) order by model.number desc");
-                queryObject.setEntity("project", project);
-                queryObject.setParameter("spec", spec);
-                queryObject.setParameterList("stateNames", ResultState.getCompletedStateNames());
-                queryObject.setFirstResult(first);
-                queryObject.setMaxResults(max);
+                Criteria criteria = getBuildResultCriteria(session, project, ResultState.getCompletedStates(), spec, false);
+                criteria.setFirstResult(first);
+                criteria.setMaxResults(max);
 
-                SessionFactoryUtils.applyTransactionTimeout(queryObject, getSessionFactory());
+                SessionFactoryUtils.applyTransactionTimeout(criteria, getSessionFactory());
 
-                return queryObject.list();
+                return criteria.list();
             }
         });
     }

@@ -413,6 +413,11 @@ td.image {
     text-align: center;
 }
 
+td.chart {
+    padding-top: 20px;
+    padding-bottom: 20px;    
+}
+
 td.expand, td.collapse {
     padding-left: 16px;
     background-repeat: no-repeat;

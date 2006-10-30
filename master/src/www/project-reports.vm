@@ -14,21 +14,34 @@
 
 <table>
     <tr>
-        <td>
+        <td class="chart">
             #render($buildResultsChart)
         </td>
-        <td>
+        <td class="chart">
+            #render($testCountChart)
+        </td>
+    </tr>
+    <tr>
+        <td class="chart">
             #render($buildTimesChart)
         </td>
-        <!--
-        <td valign="top">
-            #wwform("action=projectReports.action" "method=post")
+        <td class="chart">
+            #render($stageTimesChart)
+        </td>
+    </tr>
+    <tr>
+        <td colspan="2" style="padding-left: 30px">
+            #wwcform("action=projectReports.action" "heading=%{getText('chart.parameters')}" "colspan=5" "width=100%" "method=post")
                 #wwhidden("name=id")
-                #wwselect("name=timeframe" "label=%{getText('chart.timeframe')}" "list=timeframes" "tabindex=1")
-                #refresh(2)
+                <tr>
+                    #wwselect("name=specId" "label=%{getText('chart.specification')}" "list=buildSpecifications" "singleRow=true" "tabindex=1")
+                    #wwselect("name=timeframe" "label=%{getText('chart.timeframe')}" "list=timeframes" "singleRow=true" "tabindex=2")
+                    <td>
+                        #wwsubmit("name=refresh" "value=%{getText('refresh.name')}" "tabindex=$tabIndex")
+                    </td>
+                </tr>
             #end
         </td>
-        -->
     </tr>
 </table>
 

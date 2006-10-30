@@ -1,29 +1,30 @@
 package com.zutubi.pulse.charting;
 
-import com.zutubi.pulse.core.model.ResultState;
 import com.zutubi.pulse.i18n.Messages;
-import com.zutubi.pulse.util.Constants;
 import org.jfree.chart.JFreeChart;
+import org.jfree.chart.axis.DateAxis;
 import org.jfree.chart.axis.NumberAxis;
 import org.jfree.chart.axis.ValueAxis;
 import org.jfree.chart.labels.XYToolTipGenerator;
 import org.jfree.chart.plot.XYPlot;
 import org.jfree.chart.renderer.xy.DefaultXYItemRenderer;
 import org.jfree.chart.renderer.xy.XYItemRenderer;
-import org.jfree.data.xy.CategoryTableXYDataset;
+import org.jfree.data.time.Day;
+import org.jfree.data.time.TimeTableXYDataset;
 import org.jfree.data.xy.XYDataset;
 
-import static java.awt.Color.BLUE;
 import static java.awt.Color.WHITE;
-import java.util.List;
-import java.util.LinkedList;
+import java.util.Date;
 
 /**
  * <class comment/>
  */
 public class BuildTimesChart implements XYToolTipGenerator, Chart
 {
-    private BuildResultsDataSource source;
+    private static final Messages I18N = Messages.getInstance(BuildTimesChart.class);
+
+    private boolean stages;
+    private TimeBasedChartData data;
 
     private String domainAxisLabel = "axis.domain.label";
     private String rangeAxisLabel = "axis.range.label";
@@ -31,89 +32,70 @@ public class BuildTimesChart implements XYToolTipGenerator, Chart
     private String seriesTimeLabel = "series.time.label";
     private String seriesTimeTooltip = "series.time.tooltip";
 
-    public static final int DEFAULT_RANGE = 45;
 
-    private int range = DEFAULT_RANGE;
-
-    private static final Messages I18N = Messages.getInstance(BuildTimesChart.class);
+    public BuildTimesChart(boolean stages)
+    {
+        this.stages = stages;
+        if(stages)
+        {
+            chartLabel += ".stages";
+        }
+    }
 
     public String generateToolTip(XYDataset dataset, int series, int item)
     {
         return String.format(I18N.format(seriesTimeTooltip), dataset.getY(series, item));
     }
 
-    public void setRange(int range)
-    {
-        this.range = range;
-    }
-
     public JFreeChart render()
     {
-        CategoryTableXYDataset ds = new CategoryTableXYDataset();
+        final TimeTableXYDataset ds = new TimeTableXYDataset();
 
-        long minBuild = -1, maxBuild = -1;
+        final double[] minTime = new double[]{Double.MAX_VALUE};
+        final double[] maxTime = new double[]{Double.MIN_VALUE};
 
-        long minTime = Long.MAX_VALUE;
-        long maxTime = Long.MIN_VALUE;
-
-        BuildResultsResultSet results = source.getLastByBuilds(range);
-
-        List<ChartData> data = new LinkedList<ChartData>();
-
-        while (results.next())
+        data.populateDataSet(ds, new DailyDataHandler()
         {
-            long number = results.getNumber();
-            if (results.getState() != ResultState.SUCCESS)
+            public void handle(Date day, DailyData data)
             {
-                // only count successes.
-                continue;
+                if(data != null && data.getSuccessCount() > 0)
+                {
+                    double elapsed;
+
+                    if(stages)
+                    {
+                        elapsed = data.getAverageStageTime();
+                    }
+                    else
+                    {
+                        elapsed = data.getAverageBuildTime();
+                    }
+
+                    ds.add(new Day(day), elapsed, I18N.format(seriesTimeLabel));
+                    minTime[0] = Math.min(minTime[0], elapsed);
+                    maxTime[0] = Math.max(maxTime[0], elapsed);
+                }
+
             }
-
-            long elapsed = results.getElapsed() / Constants.SECOND; // convert to seconds.
-
-            data.add(new ChartData(number, elapsed));
-
-            // track the maximum and minimum values.
-            minTime = Math.min(minTime, elapsed);
-            maxTime = Math.max(maxTime, elapsed);
-
-            if (minBuild == -1)
-            {
-                minBuild = maxBuild = number;
-            }
-            else
-            {
-                minBuild = Math.min(minBuild, number);
-                maxBuild = Math.max(maxBuild, number);
-            }
-        }
-
-        for (ChartData d : data)
-        {
-            ds.add(d.number, d.time, I18N.format(seriesTimeLabel));
-        }
-
-        if (maxBuild - minBuild < range)
-        {
-            maxBuild = minBuild + range;
-        }
+        });
 
         XYItemRenderer renderer = new DefaultXYItemRenderer();
         renderer.setToolTipGenerator(this);
 
-        NumberAxis domainAxis = new NumberAxis(I18N.format(domainAxisLabel));
-        domainAxis.setLowerBound(minBuild - 1);
-        domainAxis.setUpperBound(maxBuild + 1);
+        DateAxis domainAxis = new DateAxis(I18N.format(domainAxisLabel));
+        domainAxis.setLowerBound(data.getLowerBound());
+        domainAxis.setUpperBound(data.getUpperBound());
 
-        if (minTime == Long.MAX_VALUE && maxTime == Long.MIN_VALUE)
+        if (minTime[0] == Double.MAX_VALUE && maxTime[0] == Double.MIN_VALUE)
         {
-            minTime = 5;
-            maxTime = 100;
+            minTime[0] = 5;
+            maxTime[0] = 100;
         }
 
         ValueAxis rangeAxis = new NumberAxis(I18N.format(rangeAxisLabel));
-        rangeAxis.setLowerBound(Math.min(minTime, 0));
-        rangeAxis.setUpperBound(maxTime + 5);
+        double buffer = Math.max(maxTime[0] / 15.0, 5);
+        rangeAxis.setLowerBound(Math.max(minTime[0] - buffer, 0));
+        rangeAxis.setUpperBound(maxTime[0] + buffer);
 
         XYPlot plot = new XYPlot(ds, domainAxis, rangeAxis, renderer);
 
@@ -121,26 +103,13 @@ public class BuildTimesChart implements XYToolTipGenerator, Chart
         chart.setBackgroundPaint(WHITE);
         chart.setBorderVisible(false);
 
-        chart.getXYPlot().getRenderer().setSeriesPaint(0, BLUE);
+        chart.getXYPlot().getRenderer().setSeriesPaint(0, ChartColours.NEUTRAL);
 
         return chart;
     }
 
-    public void setSource(BuildResultsDataSource dataSource)
+    public void setData(TimeBasedChartData data)
     {
-        this.source = dataSource;
-    }
-
-    private class ChartData
-    {
-
-        public ChartData(long id, long time)
-        {
-            this.number = id;
-            this.time = time;
-        }
-
-        long number;
-        long time;
+        this.data = data;
     }
 }

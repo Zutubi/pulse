@@ -23,7 +23,7 @@ public interface BuildResultDao extends EntityDao<BuildResult>
 
     List<BuildResult> findLatestByProject(Project project, int max);
 
-    List<BuildResult> findSinceByProject(Project project, Date since);
+    List<BuildResult> findSinceByProject(Project project, String spec, Date since);
 
     List<BuildResult> findLatestByProject(Project project, int first, int max);
 

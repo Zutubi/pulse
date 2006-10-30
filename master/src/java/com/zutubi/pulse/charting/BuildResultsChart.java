@@ -1,6 +1,5 @@
 package com.zutubi.pulse.charting;
 
-import com.zutubi.pulse.core.model.ResultState;
 import com.zutubi.pulse.i18n.Messages;
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.axis.DateAxis;
@@ -14,11 +13,7 @@ import org.jfree.data.time.Day;
 import org.jfree.data.time.TimeTableXYDataset;
 import org.jfree.data.xy.XYDataset;
 
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
 import java.util.Date;
-import java.util.Map;
-import java.util.TreeMap;
 
 /**
  * A bar graph of build results over time.  The success/failure status of the builds are represented
@@ -38,22 +33,7 @@ public class BuildResultsChart implements XYToolTipGenerator, Chart
     private String failureSeriesTooltip = "series.failure.tooltip";
     private String successSeriesTooltip = "series.success.tooltip";
 
-    private BuildResultsDataSource source;
-
-    /**
-     * The default timeframe is 30 days.
-     */
-    public static final int DEFAULT_TIMEFRAME = 30;
-
-    /**
-     * The timeframe of this chart represents the number of days that will make up the domain of this chart.
-     *
-     * @see BuildResultsChart#DEFAULT_TIMEFRAME
-     */
-    private int timeframe = DEFAULT_TIMEFRAME;
-
-    private static final SimpleDateFormat DATE_FMT = new SimpleDateFormat("d-MMM-yyyy");
-    private static final Calendar CALENDAR = Calendar.getInstance();
+    private TimeBasedChartData data;
 
     private static final Messages I18N = Messages.getInstance(BuildResultsChart.class);
 
@@ -63,43 +43,18 @@ public class BuildResultsChart implements XYToolTipGenerator, Chart
     {
     }
 
-    /**
-     * Get the timeframe for this chart.
-     *
-     * @return the timeframe in days.
-     */
-    public int getTimeframe()
+    public void setData(TimeBasedChartData data)
     {
-        return timeframe;
-    }
-
-    /**
-     * Set the timeframe for this chart.
-     *
-     * @param timeframe in days.
-     */
-    public void setTimeframe(int timeframe)
-    {
-        this.timeframe = timeframe;
-    }
-
-    public void setSource(BuildResultsDataSource source)
-    {
-        this.source = source;
+        this.data = data;
     }
 
     public JFreeChart render()
     {
-        // process data source: group by day of year and count the successes and failures.
-        BuildResultsResultSet resultSet = source.getLastByDays(timeframe);
-
-        Map<String, ChartData> map = aggregateData(resultSet);
-
-        TimeTableXYDataset ds = generateDataSet(map);
+        TimeTableXYDataset ds = generateDataSet();
         
         final XYItemRenderer renderer = new StackedXYBarRenderer();
-        renderer.setSeriesPaint(0, ChartColors.FAILURE);
-        renderer.setSeriesPaint(1, ChartColors.SUCCESS);
+        renderer.setSeriesPaint(0, ChartColours.FAILURE);
+        renderer.setSeriesPaint(1, ChartColours.SUCCESS);
         renderer.setToolTipGenerator(this);
 
         final DateAxis domainAxis = new DateAxis(I18N.format(dateAxisLabel));
@@ -117,65 +72,37 @@ public class BuildResultsChart implements XYToolTipGenerator, Chart
 
         final JFreeChart chart = new JFreeChart(I18N.format(chartTitle), plot);
 
-        chart.setBackgroundPaint(ChartColors.BACKGROUND);
+        chart.setBackgroundPaint(ChartColours.BACKGROUND);
         chart.setBorderVisible(false);
 
         return chart;
     }
 
-    private TimeTableXYDataset generateDataSet(Map<String, ChartData> map)
+    private TimeTableXYDataset generateDataSet()
     {
-        Calendar cal = Calendar.getInstance();
-        cal.add(Calendar.DAY_OF_YEAR, -timeframe);
+        final String failureSeries = I18N.format(failureSeriesLabel);
+        final String successSeries = I18N.format(successSeriesLabel);
 
-        String failureSeries = I18N.format(failureSeriesLabel);
-        String successSeries = I18N.format(successSeriesLabel);
-
-        TimeTableXYDataset ds = new TimeTableXYDataset();
-        for (int i = 0; i <= timeframe; i++)
+        final TimeTableXYDataset ds = new TimeTableXYDataset();
+        data.populateDataSet(ds, new DailyDataHandler()
         {
-            Date date = cal.getTime();
-            String key = getAggregateKey(date.getTime());
-            if (map.containsKey(key))
+            public void handle(Date date, DailyData data)
             {
-                ChartData d = map.get(key);
-                ds.add(new Day(date), d.failureCount, failureSeries);
-                ds.add(new Day(date), d.successCount, successSeries);
-                hasResults = true;
+                if(data == null)
+                {
+                    ds.add(new Day(date), 0, failureSeries);
+                    ds.add(new Day(date), 0, successSeries);
+                }
+                else
+                {
+                    ds.add(new Day(date), data.getFailureCount(), failureSeries);
+                    ds.add(new Day(date), data.getSuccessCount(), successSeries);
+                    hasResults = true;
+                }
             }
-            else
-            {
-                ds.add(new Day(date), 0, failureSeries);
-                ds.add(new Day(date), 0, successSeries);
-            }
-            cal.add(Calendar.DAY_OF_YEAR, 1);
-        }
+        });
+
         return ds;
-    }
-
-    private Map<String, ChartData> aggregateData(BuildResultsResultSet resultSet)
-    {
-        Map<String, ChartData> map = new TreeMap<String, ChartData>();
-        while (resultSet.next())
-        {
-            String timestamp = getAggregateKey(resultSet.getEndTime());
-            if (!map.containsKey(timestamp))
-            {
-                map.put(timestamp, new ChartData());
-            }
-
-            ChartData a = map.get(timestamp);
-            ResultState state = resultSet.getState();
-            if (state == ResultState.SUCCESS)
-            {
-                a.successCount++;
-            }
-            else
-            {
-                a.failureCount++;
-            }
-        }
-        return map;
     }
 
     /**
@@ -195,17 +122,5 @@ public class BuildResultsChart implements XYToolTipGenerator, Chart
         {
             return String.format(I18N.format(successSeriesTooltip), p);
         }
-    }
-
-    protected String getAggregateKey(long l)
-    {
-        CALENDAR.setTimeInMillis(l);
-        return DATE_FMT.format(CALENDAR.getTime());
-    }
-
-    private class ChartData
-    {
-        int successCount;
-        int failureCount;
     }
 }

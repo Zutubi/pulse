@@ -1,7 +1,9 @@
 package com.zutubi.pulse.charting;
 
-import com.zutubi.pulse.model.BuildResult;
+import com.zutubi.pulse.core.model.RecipeResult;
 import com.zutubi.pulse.core.model.ResultState;
+import com.zutubi.pulse.model.BuildResult;
+import com.zutubi.pulse.model.RecipeResultNode;
 
 import java.util.Iterator;
 import java.util.List;
@@ -61,6 +63,36 @@ public class BuildResultsResultSet implements ResultSet
         return ((BuildResult) current).getStamps().getElapsed();
     }
 
+    public double getAverageStageTime()
+    {
+        int count = 0;
+        long total = 0;
+
+        for(RecipeResultNode node: ((BuildResult)current))
+        {
+            RecipeResult recipeResult = node.getResult();
+            if(recipeResult != null)
+            {
+                count++;
+                total += recipeResult.getStamps().getElapsed();
+            }
+        }
+
+        if(total > 0)
+        {
+            return ((double)total) / count;
+        }
+        else
+        {
+            return 0;
+        }
+    }
+
+    public long getTotalTests()
+    {
+        return ((BuildResult)current).getTestSummary().getTotal();
+    }
+    
     public Object getFieldValue(String fieldName)
     {
         BuildResult currentResult = (BuildResult) current;
