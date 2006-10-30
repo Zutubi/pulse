@@ -67,11 +67,19 @@ public class WizardInterceptor implements Interceptor
                     String expectedState = wizardAction.getState().getClass().getName();
                     if (!expectedState.equals(actualState))
                     {
+                        String previousExpected = null;
                         Wizard wizard = wizardAction.getWizardInstance();
                         while (!expectedState.equals(actualState))
                         {
+                            // a small safety net. When we get to the initial state, doPrevious will go no further.
+                            // (atm at least). So, if we get the same state twice, we can exit.
+                            if (previousExpected != null && previousExpected.equals(expectedState))
+                            {
+                                break;
+                            }
                             wizard.doPrevious();
                             expectedState = wizard.getCurrentState().getClass().getName();
+                            previousExpected = expectedState;
                         }
                     }
                 }
