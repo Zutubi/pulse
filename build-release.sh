@@ -2,7 +2,7 @@
 
 set -e
 
-COMPONENTS="boot core local server-core master slave"
+COMPONENTS="core local server-core master slave"
 
 fatal()
 {
