@@ -351,10 +351,25 @@ function showHideCommentsWindow(id)
         var windowContent = getElement('commentsWindowContent');
 
         windowContent.innerHTML = element.innerHTML;
+        
+        var row = cell.parentNode;
         var position = Position.positionedOffset(cell);
+        var rowPosition = Position.positionedOffset(row);
+
         window.style.visibility = 'hidden';
         window.style.display = '';
-        window.style.left = position[0] + cell.offsetWidth - window.offsetWidth + 100 + "px";
+
+        var desiredLeft = position[0] + cell.offsetWidth - window.offsetWidth + 20;
+        var maxLeft = rowPosition[0];
+        if (desiredLeft < maxLeft)
+        {
+            window.style.left = maxLeft + "px";
+        }
+        else
+        {
+            window.style.left = desiredLeft + "px";
+        }
+
         window.style.visibility = 'visible';
         window.style.top = position[1] + 20 + "px";
     }
