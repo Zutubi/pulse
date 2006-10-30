@@ -49,6 +49,7 @@ public class ProjectQueueTest extends PulseTestCase
     {
         assertTrue(queue.buildRequested(createEvent(p1, "spec1")));
         BuildRequestEvent request2 = createEvent(p1, "spec1");
+        request2.getRevision().fix();
         assertFalse(queue.buildRequested(request2));
         assertEquals(request2, queue.buildCompleted(p1));
         assertNull(queue.buildCompleted(p1));
