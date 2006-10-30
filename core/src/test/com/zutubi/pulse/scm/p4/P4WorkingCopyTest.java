@@ -559,7 +559,7 @@ public class P4WorkingCopyTest extends PulseTestCase implements PersonalBuildUI
         openForEdit("bin1");
         openForEdit("file1");
 
-        WorkingCopyStatus status = wc.getLocalStatus("#default");
+        WorkingCopyStatus status = wc.getLocalStatus(":default");
         assertEquals(2, status.getChanges().size());
         assertEquals("bin1", status.getChanges().get(0).getPath());
         assertEquals("file1", status.getChanges().get(1).getPath());
@@ -572,7 +572,7 @@ public class P4WorkingCopyTest extends PulseTestCase implements PersonalBuildUI
         openForEdit("file1");
         openForEdit("script1", changelist);
 
-        WorkingCopyStatus status = wc.getLocalStatus("#" + Long.toString(changelist));
+        WorkingCopyStatus status = wc.getLocalStatus(":" + Long.toString(changelist));
         assertEquals(2, status.getChanges().size());
         assertEquals("bin1", status.getChanges().get(0).getPath());
         assertEquals("script1", status.getChanges().get(1).getPath());
@@ -583,7 +583,7 @@ public class P4WorkingCopyTest extends PulseTestCase implements PersonalBuildUI
         long changelist = client.createChangelist("test");
         openForEdit("file1");
 
-        WorkingCopyStatus status = wc.getLocalStatus("#" + Long.toString(changelist));
+        WorkingCopyStatus status = wc.getLocalStatus(":" + Long.toString(changelist));
         assertEquals(0, status.getChanges().size());
     }
 
