@@ -98,7 +98,7 @@ public class HibernateBuildResultDao extends HibernateEntityDao<BuildResult> imp
                 Criteria criteria = getBuildResultCriteria(session, project, ResultState.getCompletedStates(), spec, false);
                 criteria.setFirstResult(first);
                 criteria.setMaxResults(max);
-
+                criteria.addOrder(Order.desc("number"));
                 SessionFactoryUtils.applyTransactionTimeout(criteria, getSessionFactory());
 
                 return criteria.list();

@@ -497,8 +497,7 @@ public class BuildController implements EventListener
         buildResult.setScmDetails(scmDetails);
     }
 
-    private List<Changelist> getChangeSince(SCMServer server, Revision previousRevision, Revision revision)
-            throws SCMException
+    private List<Changelist> getChangeSince(SCMServer server, Revision previousRevision, Revision revision) throws SCMException
     {
         List<Changelist> result = new LinkedList<Changelist>();
         List<Changelist> scmChanges = server.getChanges(previousRevision, revision, "");
