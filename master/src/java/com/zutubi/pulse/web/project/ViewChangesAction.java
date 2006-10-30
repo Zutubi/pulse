@@ -24,7 +24,6 @@ public class ViewChangesAction extends ProjectActionSupport
     private BuildResult sinceResult;
     private BuildResult result;
     private List<Changelist> changelists;
-    private CommitMessageHelper commitMessageHelper;
 
     public void setId(long id)
     {
@@ -179,15 +178,5 @@ public class ViewChangesAction extends ProjectActionSupport
         previousUnsuccessful = getPrevious(new ResultState[] { ResultState.ERROR, ResultState.FAILURE });
 
         return SUCCESS;
-    }
-
-    public String transformComment(Changelist changelist)
-    {
-        if(commitMessageHelper == null)
-        {
-            commitMessageHelper = new CommitMessageHelper(getProjectManager().getCommitMessageTransformers());
-        }
-
-        return commitMessageHelper.applyTransforms(changelist, 60);
     }
 }

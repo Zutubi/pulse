@@ -819,7 +819,36 @@
         </table>
         </div>
     </td>
+#end
 
+##
+##
+##
+#macro(commitCommentCell $changelist)
+    #set($changeId = "${changelist.id}_comment")
+    <td class="content" id="${changeId}_cell">
+    #if ($changelist.comment.length() > 60)
+        $action.transformComment($changelist, 60)
+        <a href="#" id="${changeId}_link" onclick="showHideCommentsWindow('$changeId'); return false;">+</a>
+        <div id="$changeId" style="display: none">
+            <table class="content" style="margin: 0">
+                <tr>
+                    <th class="heading" colspan="5">
+                        <span class="action">
+                            <a href="#" onclick="showHideCommentsWindow('$changeId'); return false;"><img alt="$action.getText('close')" src="$base/images/delete.gif"/>#wwtext("name=close")</a>
+                        </span>
+                        #wwtext("name=change.comment")
+                    </th>
+                </tr>
+                <tr>
+                    <td><pre>$action.transformComment($changelist)</pre></td>
+                </tr>
+            </table>
+        </div>
+    #else
+        $action.transformComment($changelist)
+    #end
+    </td>
 #end
 
 ##

@@ -3,6 +3,7 @@ package com.zutubi.pulse.web.project;
 import com.opensymphony.util.TextUtils;
 import com.zutubi.pulse.core.model.Feature;
 import com.zutubi.pulse.core.model.Revision;
+import com.zutubi.pulse.core.model.Changelist;
 import com.zutubi.pulse.model.BuildManager;
 import com.zutubi.pulse.model.Project;
 import com.zutubi.pulse.model.ProjectManager;
@@ -29,6 +30,8 @@ public class ProjectActionSupport extends ActionSupport
     protected long projectId = NONE_SPECIFIED;
 
     protected String projectName = null;
+
+    private CommitMessageHelper commitMessageHelper;
 
     public void setProjectManager(ProjectManager manager)
     {
@@ -196,5 +199,23 @@ public class ProjectActionSupport extends ActionSupport
         }
 
         return null;
+    }
+
+    public String transformComment(Changelist changelist)
+    {
+        if(commitMessageHelper == null)
+        {
+            commitMessageHelper = new CommitMessageHelper(getProjectManager().getCommitMessageTransformers());
+        }
+        return commitMessageHelper.applyTransforms(changelist);
+    }
+
+    public String transformComment(Changelist changelist, int maxChars)
+    {
+        if(commitMessageHelper == null)
+        {
+            commitMessageHelper = new CommitMessageHelper(getProjectManager().getCommitMessageTransformers());
+        }
+        return commitMessageHelper.applyTransforms(changelist, maxChars);
     }
 }

@@ -122,9 +122,15 @@ public class ViewChangelistAction extends ActionSupport
         return SUCCESS;
     }
 
+
     public String transformComment(Changelist changelist)
     {
         return commitMessageHelper.applyTransforms(changelist);
+    }
+
+    public String transformComment(Changelist changelist, int maxChars)
+    {
+        return commitMessageHelper.applyTransforms(changelist, maxChars);
     }
 
     public void setChangelistDao(ChangelistDao changelistDao)

@@ -21,7 +21,6 @@ public class ProjectHomeAction extends ProjectActionSupport
     private BuildResult currentBuild;
     private List<Changelist> latestChanges;
     private List<BuildResult> recentBuilds;
-    private CommitMessageHelper commitMessageHelper;
 
     public long getId()
     {
@@ -142,16 +141,6 @@ public class ProjectHomeAction extends ProjectActionSupport
         }
 
         return SUCCESS;
-    }
-
-    public String transformComment(Changelist changelist)
-    {
-        if(commitMessageHelper == null)
-        {
-            commitMessageHelper = new CommitMessageHelper(getProjectManager().getCommitMessageTransformers());
-        }
-
-        return commitMessageHelper.applyTransforms(changelist, 60);
     }
 
     public void setProjectName(String projectName)

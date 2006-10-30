@@ -159,8 +159,16 @@ public class DashboardAction extends ActionSupport
         {
             commitMessageHelper = new CommitMessageHelper(projectManager.getCommitMessageTransformers());
         }
+        return commitMessageHelper.applyTransforms(changelist);
+    }
 
-        return commitMessageHelper.applyTransforms(changelist, 60);
+    public String transformComment(Changelist changelist, int maxChars)
+    {
+        if(commitMessageHelper == null)
+        {
+            commitMessageHelper = new CommitMessageHelper(projectManager.getCommitMessageTransformers());
+        }
+        return commitMessageHelper.applyTransforms(changelist, maxChars);
     }
 
     public String getChangeUrl(Changelist changelist)

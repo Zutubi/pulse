@@ -4,6 +4,8 @@
 <html>
 <head>
     <title>#wwtext("name=build") $result.number</title>
+    <script type="text/javascript" src="$base/js/prototype.js"></script>
+    <script type="text/javascript" src="$base/js/main.js"></script>
 </head>
 <body>
     #buildTabs($result "changes")
@@ -69,7 +71,7 @@
              </td>
             #dynamicCell($change.user)
             #dateCell($change)
-            <td class="content"><pre>$action.transformComment($change)</pre></td>
+            #commitCommentCell($change)
             #linkCell("view" "viewChangelist.action?id=$change.id&buildId=$result.id")
         </tr>
         #if($change.changes.size() > 0)
@@ -103,5 +105,10 @@
     </p>
 #end
 
+    <div id="commentsWindow" class="floating" style="display: none;">
+        <div id="commentsWindowContent">
+        </div>
+    </div>
+    
     #tabEnd()
 </html>

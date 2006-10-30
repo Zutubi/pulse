@@ -330,3 +330,64 @@ function openDebugAlert(obj)
         alert (temp);
     }
 }
+
+/**
+ * Show / Hide the commit comment popup.  Requires that the following be added to the page.
+ *
+ *    <div id="commentsWindow" class="floating" style="display: none;">
+ *       <div id="commentsWindowContent">
+ *       </div>
+ *   </div>
+ */
+function showHideCommentsWindow(id)
+{
+    var window = getElement('commentsWindow');
+    var link = getElement(id + "_link");
+
+    if(window.style.display == 'none')
+    {
+        var element = getElement(id);
+        var cell = getElement(id + "_cell");
+        var windowContent = getElement('commentsWindowContent');
+
+        windowContent.innerHTML = element.innerHTML;
+        var position = Position.positionedOffset(cell);
+        window.style.visibility = 'hidden';
+        window.style.display = '';
+        window.style.left = position[0] + cell.offsetWidth - window.offsetWidth + 100 + "px";
+        window.style.visibility = 'visible';
+        window.style.top = position[1] + 20 + "px";
+    }
+    else
+    {
+        window.style.display = 'none';
+    }
+}
+
+/**
+ * A slight variation on the above.
+ */
+function showHideBuildsFloat(id)
+{
+    var window = getElement('buildsWindow');
+    var link = getElement(id + "_link");
+
+    if(window.style.display == 'none')
+    {
+        var element = getElement(id);
+        var cell = getElement(id + "_cell");
+        var windowContent = getElement('buildsWindowContent');
+
+        windowContent.innerHTML = element.innerHTML;
+        var position = Position.positionedOffset(cell);
+        window.style.visibility = 'hidden';
+        window.style.display = '';
+        window.style.left = position[0] + cell.offsetWidth - window.offsetWidth - 20 + "px";
+        window.style.visibility = 'visible';
+        window.style.top = position[1] + 20 + "px";
+    }
+    else
+    {
+        window.style.display = 'none';
+    }
+}
