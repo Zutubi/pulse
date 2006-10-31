@@ -22,8 +22,7 @@ public class WorkingCopyFactory
         {
             registerType(SCMConfiguration.TYPE_SUBVERSION, SvnWorkingCopy.class);
             registerType(SCMConfiguration.TYPE_PERFORCE, P4WorkingCopy.class);
-// disable until we can get proper testing sorted out. :|            
-//            registerType(SCMConfiguration.TYPE_CVS, CvsWorkingCopy.class);
+            registerType(SCMConfiguration.TYPE_CVS, CvsWorkingCopy.class);
         }
         catch (NoSuchMethodException e)
         {

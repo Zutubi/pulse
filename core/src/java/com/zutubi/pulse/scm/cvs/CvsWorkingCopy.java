@@ -1,15 +1,18 @@
 package com.zutubi.pulse.scm.cvs;
 
+import com.opensymphony.util.TextUtils;
 import com.zutubi.pulse.config.Config;
 import com.zutubi.pulse.config.ConfigSupport;
 import com.zutubi.pulse.core.model.CvsRevision;
 import com.zutubi.pulse.core.model.Revision;
 import com.zutubi.pulse.personal.PersonalBuildSupport;
+import com.zutubi.pulse.personal.PersonalBuildException;
 import com.zutubi.pulse.scm.*;
 import com.zutubi.pulse.scm.cvs.client.CvsClient;
 import com.zutubi.pulse.util.IOUtils;
 import org.netbeans.lib.cvsclient.CVSRoot;
 import org.netbeans.lib.cvsclient.command.status.StatusInformation;
+import org.netbeans.lib.cvsclient.command.DefaultFileInfoContainer;
 import org.netbeans.lib.cvsclient.event.CVSAdapter;
 import org.netbeans.lib.cvsclient.event.FileInfoEvent;
 import static org.netbeans.lib.cvsclient.file.FileStatus.*;
@@ -29,16 +32,38 @@ public class CvsWorkingCopy extends PersonalBuildSupport implements WorkingCopy
     private File workingDir;
     private ConfigSupport configSupport;
 
-    public CvsWorkingCopy(File path, Config config)
+    public CvsWorkingCopy(File path, Config config) throws PersonalBuildException
     {
         this.workingDir = path;
         this.client = new CvsClient();
         this.configSupport = new ConfigSupport(config);
 
-        client.setRoot(CVSRoot.parse(configSupport.getProperty(CvsConstants.ROOT)));
-        if (configSupport.hasProperty(CvsConstants.PASS))
+        CVSRoot cvsRoot;
+        try
         {
-            client.setPassword(configSupport.getProperty(CvsConstants.PASS));
+            cvsRoot = CVSRoot.parse(loadLocalWorkingRoot());
+        }
+        catch (IOException e)
+        {
+            if (configSupport.hasProperty(CvsConstants.ROOT))
+            {
+                cvsRoot = CVSRoot.parse(configSupport.getProperty(CvsConstants.ROOT));
+            }
+            else
+            {
+                throw new PersonalBuildException("Failed to determine the cvs root. You can work around this problem by adding " +
+                        "the cvs.root property to the .pulse.properties file.");
+            }
+        }
+        client.setRoot(cvsRoot);
+
+        // is the password specified?
+        if (!TextUtils.stringSet(cvsRoot.getPassword()))
+        {
+            if (configSupport.hasProperty(CvsConstants.PASS))
+            {
+                client.setPassword(configSupport.getProperty(CvsConstants.PASS));
+            }
         }
     }
 
@@ -46,8 +71,7 @@ public class CvsWorkingCopy extends PersonalBuildSupport implements WorkingCopy
     {
         try
         {
-            File rootFile = new File(workingDir, "CVS" + File.separator + "Root");
-            String localRoot = IOUtils.fileToString(rootFile);
+            String localRoot = loadLocalWorkingRoot();
             CVSRoot localCvsRoot = CVSRoot.parse(localRoot);
 
             String projectRoot = repositoryDetails.getProperty(CvsConstants.ROOT);
@@ -59,8 +83,7 @@ public class CvsWorkingCopy extends PersonalBuildSupport implements WorkingCopy
             }
 
             // now check that the modules match.
-            File repositoryFile = new File(workingDir, "CVS" + File.separator + "Repository");
-            String localModule = IOUtils.fileToString(repositoryFile);
+            String localModule = loadLocalWorkingModule();
             String projectModule = repositoryDetails.getProperty(CvsConstants.MODULE);
 
             return localModule.equals(projectModule);
@@ -69,6 +92,18 @@ public class CvsWorkingCopy extends PersonalBuildSupport implements WorkingCopy
         {
             throw new SCMException(e);
         }
+    }
+
+    private String loadLocalWorkingModule() throws IOException
+    {
+        File repositoryFile = new File(workingDir, "CVS" + File.separator + "Repository");
+        return IOUtils.fileToString(repositoryFile).trim();
+    }
+
+    private String loadLocalWorkingRoot() throws IOException
+    {
+        File rootFile = new File(workingDir, "CVS" + File.separator + "Root");
+        return IOUtils.fileToString(rootFile).trim();
     }
 
     public WorkingCopyStatus getStatus() throws SCMException
@@ -102,9 +137,33 @@ public class CvsWorkingCopy extends PersonalBuildSupport implements WorkingCopy
             branch = null;
         }
         
+        UpdateHandler updateHandler = new UpdateHandler();
+        
         CvsRevision revision = new CvsRevision(null, branch, null, new Date());
-        client.update(workingDir, revision);
+        client.update(workingDir, revision, updateHandler);
         return revision;
+    }
+
+    private class UpdateHandler extends CVSAdapter
+    {
+        private String basePath = new File("").getAbsolutePath();
+
+        public void fileInfoGenerated(FileInfoEvent e)
+        {
+            DefaultFileInfoContainer info = (DefaultFileInfoContainer) e.getInfoContainer();
+
+            // determine the path relative to the current working directory.
+            String file = info.getFile().getAbsolutePath();
+            if (file.startsWith(basePath))
+            {
+                file = file.substring(basePath.length() + 1);
+                if (file.startsWith(File.separator))
+                {
+                    file = file.substring(1);
+                }
+            }
+            getUi().status(String.format("%s     %s", info.getType(), file));
+        }
     }
 
     private class StatusHandler extends CVSAdapter
