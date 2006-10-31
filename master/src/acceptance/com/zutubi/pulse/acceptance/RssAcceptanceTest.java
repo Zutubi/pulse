@@ -56,7 +56,7 @@ public class RssAcceptanceTest extends BaseAcceptanceTestCase
 
         String projectName = "project " + RandomUtils.randomString(5);
         submitProjectBasicsForm(projectName, "test project description", "http://test.project.com", "cvs", "versioned");
-        submitCvsSetupForm(":pserver:cvstester@cinnamonbob.com:/cvsroot", "project", "cvs", "");
+        submitCvsSetupForm(":ext:cvstester@cinnamonbob.com:/cvsroot", "project", "cvs", "");
         submitVersionedSetupForm("pulse.xml");
         assertTablePresent("project.basics");
         return projectName;

@@ -20,7 +20,7 @@ import java.util.Vector;
  */
 public abstract class BaseAcceptanceTestCase extends ExtendedWebTestCase
 {
-    protected static final String TEST_CVSROOT = ":pserver:cvstester:cvs@www.cinnamonbob.com:/cvsroot";
+    protected static final String TEST_CVSROOT = ":ext:cvstester:cvs@www.cinnamonbob.com:/cvsroot";
 
     //---( add project wizard forms )---
     protected static final String FO_ANT_SETUP = "ant.setup";

@@ -14,7 +14,7 @@ import java.util.Properties;
  */
 public class ProjectWizardAcceptanceTest extends BaseAcceptanceTestCase
 {
-    private static final String TEST_CVSROOT = ":pserver:cvstester:cvs@www.cinnamonbob.com:/cvsroot";
+    private static final String TEST_CVSROOT = ":ext:cvstester:cvs@www.cinnamonbob.com:/cvsroot";
 
     public ProjectWizardAcceptanceTest()
     {
