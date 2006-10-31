@@ -35,6 +35,8 @@ public class RegexTestPostProcessor implements PostProcessor
 
     private boolean trim = true;
 
+    private boolean failOnFailure = true;
+
     private Map<String, TestCaseResult.Status> statusMap = new HashMap<String, TestCaseResult.Status>();
 
     public RegexTestPostProcessor()
@@ -53,6 +55,22 @@ public class RegexTestPostProcessor implements PostProcessor
     }
 
     public void process(StoredFileArtifact artifact, CommandResult result, CommandContext context)
+    {
+        int brokenBefore = context.getTestResults().getSummary().getBroken();
+
+        internalProcess(artifact, result, context);
+
+        if(failOnFailure && !result.failed() && !result.errored())
+        {
+            int brokenAfter = context.getTestResults().getSummary().getBroken();
+            if(brokenAfter > brokenBefore)
+            {
+                result.failure("One or more test cases failed.");
+            }
+        }
+    }
+
+    public void internalProcess(StoredFileArtifact artifact, CommandResult result, CommandContext context)
     {
         File file = new File(context.getOutputDir(), artifact.getPath());
         if (!file.isFile())
@@ -184,5 +202,10 @@ public class RegexTestPostProcessor implements PostProcessor
     public void setTrim(boolean trim)
     {
         this.trim = trim;
+    }
+
+    public void setFailOnFailure(boolean failOnFailure)
+    {
+        this.failOnFailure = failOnFailure;
     }
 }
