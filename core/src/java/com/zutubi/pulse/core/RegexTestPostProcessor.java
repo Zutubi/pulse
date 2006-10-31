@@ -19,11 +19,9 @@ import java.util.regex.Pattern;
 /**
  * <class comment/>
  */
-public class RegexTestPostProcessor implements PostProcessor
+public class RegexTestPostProcessor extends TestReportPostProcessor
 {
     private static final Logger LOG = Logger.getLogger(RegexTestPostProcessor.class);
-
-    private String name;
 
     private BufferedReader reader;
 
@@ -47,12 +45,10 @@ public class RegexTestPostProcessor implements PostProcessor
 
     public RegexTestPostProcessor(String name)
     {
-        this();
-        
-        this.name = name;
+        setName(name);
     }
 
-    public void process(StoredFileArtifact artifact, CommandResult result, CommandContext context)
+    public void internalProcess(StoredFileArtifact artifact, CommandResult result, CommandContext context)
     {
         File file = new File(context.getOutputDir(), artifact.getPath());
         if (!file.isFile())
@@ -113,21 +109,6 @@ public class RegexTestPostProcessor implements PostProcessor
             }
             currentLine = nextLine();
         }
-    }
-
-    public void setName(String name)
-    {
-        this.name = name;
-    }
-
-    public String getName()
-    {
-        return name;
-    }
-
-    public Object getValue()
-    {
-        return this;
     }
 
     private String nextLine() throws IOException
