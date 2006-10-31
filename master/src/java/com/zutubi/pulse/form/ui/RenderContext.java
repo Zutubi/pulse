@@ -4,6 +4,8 @@ import com.zutubi.pulse.form.TextProvider;
 import com.opensymphony.xwork.util.OgnlValueStack;
 import com.opensymphony.xwork.ActionContext;
 
+import java.io.Writer;
+
 /**
  * <class-comment/>
  */
@@ -14,6 +16,8 @@ public class RenderContext
     private TextProvider textProvider;
 
     private OgnlValueStack stack;
+    
+    private Writer writer;
 
     public RenderContext(TemplateRenderer renderer, TextProvider provider)
     {
@@ -43,5 +47,15 @@ public class RenderContext
             stack = ActionContext.getContext().getValueStack();
         }
         return stack;
+    }
+
+    public Writer getWriter()
+    {
+        return writer;
+    }
+
+    public void setWriter(Writer writer)
+    {
+        this.writer = writer;
     }
 }

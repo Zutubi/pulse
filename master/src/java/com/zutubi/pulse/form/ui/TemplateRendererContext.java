@@ -1,6 +1,7 @@
 package com.zutubi.pulse.form.ui;
 
 import java.util.Map;
+import java.io.Writer;
 
 /**
  * <class-comment/>
@@ -33,5 +34,10 @@ public class TemplateRendererContext
     public Object get(String key)
     {
         return context.get(key);
+    }
+
+    public Writer getWriter()
+    {
+        return context.getWriter();
     }
 }

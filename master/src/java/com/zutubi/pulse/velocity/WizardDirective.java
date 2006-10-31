@@ -26,7 +26,9 @@ public class WizardDirective extends AbstractDirective
 
     private DescriptorFactory descriptorFactory;
 
-    private String object;
+    private String objectName;
+
+    private String theme;
 
     public WizardDirective()
     {
@@ -50,22 +52,33 @@ public class WizardDirective extends AbstractDirective
 
         // render the form.
         OgnlValueStack stack = ActionContext.getContext().getValueStack();
-        Wizard wizard = (Wizard) stack.findValue(object);
+        Wizard wizard = (Wizard) stack.findValue(objectName);
 
-        writer.write(renderState(wizard));
+        writer.write(internalRender(wizard));
 
         return true;
     }
 
-    public void setObject(String name)
+    /**
+     * Specify the name used to access the object that will be used as the basis for the form
+     * being rendered. 
+     *
+     * @param objectName used to lookup the object from the OgnlValueStack.
+     */
+    public void setObject(String objectName)
     {
-        this.object = name;
+        this.objectName = objectName;
     }
 
-    private String renderState(Wizard wizard)
+    public void setTheme(String theme)
+    {
+        this.theme = theme;
+    }
+
+    private String internalRender(Wizard wizard)
     {
         Object subject = wizard.getCurrentState();
-        FormSupport support = createFormSupport(subject);
+        FormSupport support = formSupport(subject);
 
         try
         {
@@ -79,24 +92,33 @@ public class WizardDirective extends AbstractDirective
         }
     }
 
-    private FormSupport createFormSupport(Object subject)
+    private FormSupport formSupport(Object subject)
     {
         FormSupport support = new FormSupport();
         support.setConfiguration(configuration);
         support.setDescriptorFactory(descriptorFactory);
         support.setTextProvider(new com.zutubi.pulse.form.MessagesTextProvider(subject));
+        support.setTheme(theme);
         return support;
     }
 
+    /**
+     * Required resource for the form rendering.
+     *
+     * @param configuration instance
+     */
     public void setFreemarkerConfiguration(Configuration configuration)
     {
         this.configuration = configuration;
     }
 
+    /**
+     * Required resource for the form analysis
+     *
+     * @param descriptorFactory instance
+     */
     public void setDescriptorFactory(DescriptorFactory descriptorFactory)
     {
         this.descriptorFactory = descriptorFactory;
     }
-
-
 }

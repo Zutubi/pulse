@@ -27,6 +27,8 @@ public class FormDirective extends AbstractDirective
 
     private String object;
 
+    private String theme;
+
     public FormDirective()
     {
         ComponentContext.autowire(this);
@@ -51,7 +53,7 @@ public class FormDirective extends AbstractDirective
         OgnlValueStack stack = ActionContext.getContext().getValueStack();
         Object instance = stack.findValue(object);
 
-        writer.write(renderState(instance));
+        writer.write(internalRender(instance));
 
         return true;
     }
@@ -61,7 +63,12 @@ public class FormDirective extends AbstractDirective
         this.object = name;
     }
 
-    private String renderState(Object subject)
+    public void setTheme(String theme)
+    {
+        this.theme = theme;
+    }
+
+    private String internalRender(Object subject)
     {
         FormSupport support = createFormSupport(subject);
 
@@ -83,6 +90,7 @@ public class FormDirective extends AbstractDirective
         support.setConfiguration(configuration);
         support.setDescriptorFactory(descriptorFactory);
         support.setTextProvider(new com.zutubi.pulse.form.MessagesTextProvider(subject));
+        support.setTheme(theme);
         return support;
     }
 

@@ -2,6 +2,7 @@ package com.zutubi.pulse.form.ui;
 
 import com.opensymphony.xwork.ActionContext;
 import com.opensymphony.xwork.util.OgnlValueStack;
+import com.opensymphony.util.TextUtils;
 import com.zutubi.pulse.form.TextProvider;
 import com.zutubi.pulse.form.descriptor.DescriptorFactory;
 import com.zutubi.pulse.form.descriptor.FieldDescriptor;
@@ -30,6 +31,8 @@ public class FormSupport
 
     private TextProvider textProvider;
 
+    private String theme;
+
     public String renderForm(Object obj) throws Exception
     {
         FormDescriptor descriptor = descriptorFactory.createFormDescriptor(obj.getClass());
@@ -41,9 +44,7 @@ public class FormSupport
     {
         FormDescriptor descriptor = descriptorFactory.createFormDescriptor(obj.getClass());
 
-        WizardDecorator decorator = new WizardDecorator();
-        decorator.setActions(wizard.getAvailableActions());
-        decorator.setState(obj.getClass().getName());
+        WizardDecorator decorator = new WizardDecorator(wizard);
         descriptor = decorator.decorate(descriptor);
 
         return renderDescriptor(descriptor, obj);
@@ -62,11 +63,15 @@ public class FormSupport
         StringWriter writer = new StringWriter();
         FreemarkerTemplateRenderer templateRenderer = new FreemarkerTemplateRenderer();
         templateRenderer.setConfiguration(configuration);
-        templateRenderer.setWriter(writer);
+        if (TextUtils.stringSet(theme))
+        {
+            templateRenderer.setTheme(theme);
+        }
 
+        RenderContext context = new RenderContext(templateRenderer, textProvider);
+        context.setWriter(writer);
         ComponentRenderer renderer = new ComponentRenderer();
-        renderer.setTemplateRenderer(templateRenderer);
-        renderer.setTextProvider(textProvider);
+        renderer.setContext(context);
 
         // we are cheating a bit here but using the ActionContext value stack to manipulate the
         // subsequent renderer context. We should be a little more direct in how we provide the
@@ -83,6 +88,7 @@ public class FormSupport
         {
             stack.pop();
         }
+        writer.flush();
 
         return writer.toString();
     }
@@ -135,6 +141,11 @@ public class FormSupport
 
         // unexpected non string type...
         return null;
+    }
+
+    public void setTheme(String theme)
+    {
+        this.theme = theme;
     }
 
     public void setDescriptorFactory(DescriptorFactory descriptorFactory)

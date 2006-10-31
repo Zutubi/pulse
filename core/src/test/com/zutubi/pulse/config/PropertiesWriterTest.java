@@ -3,7 +3,6 @@ package com.zutubi.pulse.config;
 import com.zutubi.pulse.test.PulseTestCase;
 import com.zutubi.pulse.util.FileSystemUtils;
 import com.zutubi.pulse.util.IOUtils;
-import com.zutubi.pulse.util.Constants;
 
 import java.io.File;
 import java.io.FileInputStream;

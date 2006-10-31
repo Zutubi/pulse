@@ -3,6 +3,7 @@ package com.zutubi.pulse.form.ui;
 import com.zutubi.pulse.form.descriptor.*;
 import com.zutubi.pulse.form.FieldType;
 import com.zutubi.pulse.wizard.WizardTransition;
+import com.zutubi.pulse.wizard.Wizard;
 
 import java.util.List;
 import java.util.LinkedList;
@@ -14,25 +15,12 @@ public class WizardDecorator
 {
     private String state;
 
-    private int currentStep;
-    private int numberOfSteps;
-
     private List<WizardTransition> transitions;
 
-    public void setActions(List<WizardTransition> transitions)
+    public WizardDecorator(Wizard wizard)
     {
-        this.transitions = transitions;
-    }
-
-    public void setStep(int step, int totalNumberOfSteps)
-    {
-        currentStep = step;
-        numberOfSteps = totalNumberOfSteps;
-    }
-
-    public void setState(String state)
-    {
-        this.state = state;
+        state = wizard.getCurrentState().getClass().getName();
+        transitions = wizard.getAvailableActions();
     }
 
     public FormDescriptor decorate(FormDescriptor descriptor)

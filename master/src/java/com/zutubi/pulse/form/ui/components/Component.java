@@ -12,8 +12,6 @@ import java.util.HashMap;
  */
 public class Component
 {
-    private String id;
-
     protected RenderContext context;
 
     protected Map<String, Object> parameters;
