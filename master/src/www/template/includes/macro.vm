@@ -1246,7 +1246,6 @@
         <tr>
             #contentHeading("command.name" 1)
             #contentHeading("build.status" 2)
-            #contentHeading("build.tests" 1)
             #contentHeading("build.when" 1)
             #contentHeading("build.elapsed" 1)
         </tr>
@@ -1259,7 +1258,6 @@
                 </a>
             </td>
             #statusCell($command true)
-            #testResultsCell($build $recipe $command)
             #dateClassCell($command)
             #elapsedCell($command)
         </tr>
