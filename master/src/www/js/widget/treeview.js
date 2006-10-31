@@ -126,6 +126,11 @@ ZUTUBI.widget.TreeView.prototype.expandTo = function(requestPath)
     for (var i = 0; i < requestPath.length; i++)
     {
         var path = requestPath[i];
+        if (path == "")
+        {
+            // happens when the path begins with a '/'
+            continue;
+        }
         if (!node.expanded)
         {
             node.toggle();
