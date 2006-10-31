@@ -25,7 +25,7 @@
     #wwtextfield("name=p4.changeViewerUrl" "label=%{getText('scm.change.viewer.url')}" "size=60" "tabindex=6" "onkeypress=return submitenter(this,event)")
     #inlineHelp("scm.change.viewer.url.help")
     #wwcheckbox("name=monitor" "label=%{getText('scm.monitor')}" "tabindex=7")
-    #wwtextfield("name=cvs.pollingInterval" "label=%{getText('scm.polling.interval')}" "tabindex=8")
+    #wwtextfield("name=p4.pollingInterval" "label=%{getText('scm.polling.interval')}" "tabindex=8")
 
     #testSettingsRow()
 
