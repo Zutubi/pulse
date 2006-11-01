@@ -27,7 +27,6 @@ public class RemoteApi
     private ProjectManager projectManager;
     private UserManager userManager;
     private AgentManager agentManager;
-    private SlaveManager slaveManager;
 
     public RemoteApi()
     {
@@ -496,10 +495,5 @@ public class RemoteApi
     public void setAgentManager(AgentManager agentManager)
     {
         this.agentManager = agentManager;
-    }
-
-    public void setSlaveManager(SlaveManager slaveManager)
-    {
-        this.slaveManager = slaveManager;
     }
 }

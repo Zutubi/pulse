@@ -83,6 +83,7 @@ public class ComponentContext
                 ctx.close();
                 ctx = (ConfigurableApplicationContext) ctx.getParent();
             }
+            context = null;
         }
     }
 }
