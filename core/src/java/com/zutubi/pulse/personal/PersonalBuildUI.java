@@ -100,5 +100,8 @@ public interface PersonalBuildUI
     void error(String message);
     void error(String message, Throwable throwable);
 
+    void enterContext();
+    void exitContext();
+
     Response ynaPrompt(String question, Response defaultResponse);
 }

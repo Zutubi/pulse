@@ -53,6 +53,23 @@ public abstract class PersonalBuildSupport implements PersonalBuildWorker
         }
     }
 
+
+    public void enterContext()
+    {
+        if (ui != null)
+        {
+            ui.enterContext();
+        }
+    }
+
+    public void exitContext()
+    {
+        if (ui != null)
+        {
+            ui.exitContext();
+        }
+    }
+
     protected PersonalBuildUI.Response ynaPrompt(String question, PersonalBuildUI.Response defaultResponse)
     {
         if(ui == null)

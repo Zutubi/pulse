@@ -9,10 +9,7 @@ import com.zutubi.pulse.scm.WorkingCopy;
 import com.zutubi.pulse.scm.WorkingCopyStatus;
 import org.apache.commons.cli.*;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.util.*;
 
 /**
@@ -27,6 +24,8 @@ public class PersonalBuildCommand implements Command, PersonalBuildUI
     private BufferedReader inputReader;
     private Verbosity verbosity;
     private boolean statusOnly = false;
+    private String indent = "";
+
 
     public void processArguments(String... argv) throws ParseException
     {
@@ -214,7 +213,7 @@ public class PersonalBuildCommand implements Command, PersonalBuildUI
 
     private void fatal(String message)
     {
-        System.err.println("Error: " + message);
+        print("Error: " + message, System.err);
         System.exit(1);
     }
 
@@ -227,7 +226,7 @@ public class PersonalBuildCommand implements Command, PersonalBuildUI
     {
         if (verbosity == Verbosity.VERBOSE)
         {
-            System.out.println(message);
+            print(message, System.out);
         }
     }
 
@@ -235,18 +234,18 @@ public class PersonalBuildCommand implements Command, PersonalBuildUI
     {
         if (verbosity != Verbosity.QUIET)
         {
-            System.out.println(message);
+            print(message, System.out);
         }
     }
 
     public void warning(String message)
     {
-        System.out.println("Warning: " + message);
+        print("Warning: " + message, System.err);
     }
 
     public void error(String message)
     {
-        System.out.println("Error: " + message);
+        print("Error: " + message, System.err);
     }
 
     public void error(String message, Throwable throwable)
@@ -257,6 +256,24 @@ public class PersonalBuildCommand implements Command, PersonalBuildUI
         }
 
         error(message);
+    }
+
+    private void print(String message, PrintStream stream)
+    {
+        stream.println(indent + message);
+    }
+
+    public void enterContext()
+    {
+        indent += "  ";
+    }
+
+    public void exitContext()
+    {
+        if(indent.length() >= 2)
+        {
+            indent = indent.substring(2);
+        }
     }
 
     public Response ynaPrompt(String question, Response defaultResponse)

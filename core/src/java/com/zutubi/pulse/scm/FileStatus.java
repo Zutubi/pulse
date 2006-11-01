@@ -413,6 +413,6 @@ public class FileStatus
 
     public String toString()
     {
-        return String.format("%s %-16s %s", outOfDate ? "*" : " ", state.toString(), path);
+        return String.format("%-12s %s %s", state.toString(), outOfDate ? "*" : " ", path);
     }
 }

@@ -186,7 +186,15 @@ public class PersonalBuildClient extends PersonalBuildSupport
         try
         {
             status("Updating working copy...");
-            rev = wc.update();
+            enterContext();
+            try
+            {
+                rev = wc.update();
+            }
+            finally
+            {
+                exitContext();
+            }
             status("Update complete.");
         }
         catch (SCMException e)
@@ -195,14 +203,34 @@ public class PersonalBuildClient extends PersonalBuildSupport
         }
 
         status("Getting working copy status...");
-        WorkingCopyStatus status = getStatus(wc, spec);
-        status.setRevision(rev);
+        enterContext();
+
+        WorkingCopyStatus status;
+        try
+        {
+            status = getStatus(wc, spec);
+            status.setRevision(rev);
+        }
+        finally
+        {
+            exitContext();
+        }
         status("Status retrieved.");
 
         if (status.hasChanges())
         {
             status("Creating patch archive...");
-            PatchArchive patchArchive = new PatchArchive(status, config.getBase(), patchFile);
+            enterContext();
+
+            PatchArchive patchArchive;
+            try
+            {
+                patchArchive = new PatchArchive(status, config.getBase(), patchFile, getUi());
+            }
+            finally
+            {
+                exitContext();
+            }
             status("Patch created.");
 
             return patchArchive;

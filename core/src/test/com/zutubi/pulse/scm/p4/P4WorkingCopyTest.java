@@ -754,6 +754,14 @@ public class P4WorkingCopyTest extends PulseTestCase implements PersonalBuildUI
         errors.add(message);
     }
 
+    public void enterContext()
+    {
+    }
+
+    public void exitContext()
+    {
+    }
+
     public Response ynaPrompt(String question, Response defaultResponse)
     {
         return defaultResponse;

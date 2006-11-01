@@ -41,14 +41,14 @@ public class PatchArchive
      * @param patchFile the destination of the patch file created
      * @throws PersonalBuildException in the event of any error creating the patch
      */
-    public PatchArchive(WorkingCopyStatus status, File base, File patchFile) throws PersonalBuildException
+    public PatchArchive(WorkingCopyStatus status, File base, File patchFile, PersonalBuildUI ui) throws PersonalBuildException
     {
         this.patchFile = patchFile;
         this.status = status;
 
         try
         {
-            createPatchArchive(base);
+            createPatchArchive(base, ui);
         }
         catch (IOException e)
         {
@@ -89,7 +89,7 @@ public class PatchArchive
         }
     }
 
-    private void createPatchArchive(File base) throws IOException
+    private void createPatchArchive(File base, PersonalBuildUI ui) throws IOException
     {
         // The zip archive is laid out as follows:
         // <root>/
@@ -103,8 +103,8 @@ public class PatchArchive
         try
         {
             os = new ZipOutputStream(new FileOutputStream(patchFile));
-            addMeta(os);
-            addFiles(base, os);
+            addMeta(os, ui);
+            addFiles(base, os, ui);
         }
         finally
         {
@@ -112,9 +112,11 @@ public class PatchArchive
         }
     }
 
-    private void addMeta(ZipOutputStream os) throws IOException
+    private void addMeta(ZipOutputStream os, PersonalBuildUI ui) throws IOException
     {
-        ZipEntry entry = new ZipEntry("meta.xml");
+        status(ui, META_ENTRY);
+
+        ZipEntry entry = new ZipEntry(META_ENTRY);
         os.putNextEntry(entry);
         XStream xstream = createXStream();
         xstream.toXML(status, os);
@@ -136,7 +138,7 @@ public class PatchArchive
         return xstream;
     }
 
-    private void addFiles(File base, ZipOutputStream os) throws IOException
+    private void addFiles(File base, ZipOutputStream os, PersonalBuildUI ui) throws IOException
     {
         os.putNextEntry(new ZipEntry(FILES_PATH));
         for(FileStatus fs: status)
@@ -145,13 +147,15 @@ public class PatchArchive
             {
                 File f = new File(base, FileSystemUtils.denormaliseSeparators(fs.getPath()));
                 String path = FILES_PATH + fs.getPath();
-                addFile(os, f, path);
+                addFile(os, f, path, ui);
             }
         }
     }
 
-    private void addFile(ZipOutputStream os, File f, String path) throws IOException
+    private void addFile(ZipOutputStream os, File f, String path, PersonalBuildUI ui) throws IOException
     {
+        status(ui, path);
+
         ZipEntry entry = new ZipEntry(path);
         entry.setTime(f.lastModified());
         os.putNextEntry(entry);
@@ -305,6 +309,14 @@ public class PatchArchive
         finally
         {
             IOUtils.close(zin);
+        }
+    }
+
+    private void status(PersonalBuildUI ui, String message)
+    {
+        if(ui != null)
+        {
+            ui.status(message);
         }
     }
 }

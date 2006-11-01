@@ -63,4 +63,9 @@ public class VersionTest extends PulseTestCase
     {
         assertEquals("1.2.101", Version.buildNumberToVersion(102101333));
     }
+
+    public void testbuildNumberToVersionZeroBuild()
+    {
+        assertEquals("1.2.0", Version.buildNumberToVersion(102000000));
+    }
 }

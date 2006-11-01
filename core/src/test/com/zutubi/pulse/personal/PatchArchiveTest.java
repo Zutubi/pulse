@@ -48,7 +48,7 @@ public class PatchArchiveTest extends PulseTestCase
         fs.setProperty(FileStatus.PROPERTY_EOL_STYLE, FileStatus.EOLStyle.CARRIAGE_RETURN.toString());
         wcs.add(fs);
         
-        PatchArchive archive = new PatchArchive(wcs, baseDir, archiveFile);
+        PatchArchive archive = new PatchArchive(wcs, baseDir, archiveFile, null);
         assertTrue(archiveFile.exists());
         FileSystemUtils.extractZip(archiveFile, extractDir);
         //System.out.println(IOUtils.fileToString(new File(extractDir, "meta.xml")));

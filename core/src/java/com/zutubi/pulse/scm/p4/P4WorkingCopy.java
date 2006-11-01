@@ -157,7 +157,15 @@ public class P4WorkingCopy extends PersonalBuildSupport implements WorkingCopy
             }
 
             status("Running auto-resolve...");
-            client.runP4WithHandler(new P4ProgressPrintingHandler(getUi(), false), null, P4_COMMAND, COMMAND_RESOLVE, FLAG_AUTO_MERGE);
+            enterContext();
+            try
+            {
+                client.runP4WithHandler(new P4ProgressPrintingHandler(getUi(), false), null, P4_COMMAND, COMMAND_RESOLVE, FLAG_AUTO_MERGE);
+            }
+            finally
+            {
+                exitContext();
+            }
             status("Resolve complete.");
         }
 

@@ -5,14 +5,14 @@ import com.zutubi.pulse.config.Config;
 import com.zutubi.pulse.config.ConfigSupport;
 import com.zutubi.pulse.core.model.CvsRevision;
 import com.zutubi.pulse.core.model.Revision;
-import com.zutubi.pulse.personal.PersonalBuildSupport;
 import com.zutubi.pulse.personal.PersonalBuildException;
+import com.zutubi.pulse.personal.PersonalBuildSupport;
 import com.zutubi.pulse.scm.*;
 import com.zutubi.pulse.scm.cvs.client.CvsClient;
 import com.zutubi.pulse.util.IOUtils;
 import org.netbeans.lib.cvsclient.CVSRoot;
-import org.netbeans.lib.cvsclient.command.status.StatusInformation;
 import org.netbeans.lib.cvsclient.command.DefaultFileInfoContainer;
+import org.netbeans.lib.cvsclient.command.status.StatusInformation;
 import org.netbeans.lib.cvsclient.event.CVSAdapter;
 import org.netbeans.lib.cvsclient.event.FileInfoEvent;
 import static org.netbeans.lib.cvsclient.file.FileStatus.*;
@@ -162,7 +162,8 @@ public class CvsWorkingCopy extends PersonalBuildSupport implements WorkingCopy
                     file = file.substring(1);
                 }
             }
-            getUi().status(String.format("%s     %s", info.getType(), file));
+
+            status(String.format("%s     %s", info.getType(), file));
         }
     }
 
