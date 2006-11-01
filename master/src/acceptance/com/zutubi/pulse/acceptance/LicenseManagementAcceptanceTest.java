@@ -147,7 +147,7 @@ public class LicenseManagementAcceptanceTest extends BaseAcceptanceTestCase
                 {"expiry date", "Never"},
                 {"agent restriction", "unrestricted"},
                 {"project restriction", "unrestricted"},
-                {"user restriction", "1 of 200"}
+                {"user restriction", "3 of 200"}
         });
         // assuming that we only have a single user...
     }
