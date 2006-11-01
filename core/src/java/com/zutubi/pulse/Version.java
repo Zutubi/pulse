@@ -67,6 +67,12 @@ public class Version implements Comparable
         this.buildDate = buildDate;
         this.buildNumber = buildNumber;
         this.releaseDate = releaseDate;
+
+        // CIB-717: fix the build number released with 1.2 M1
+        if (buildNumber.equals("010200000"))
+        {
+            buildNumber = "0102000000";
+        }
     }
 
     /**
