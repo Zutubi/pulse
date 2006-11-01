@@ -408,6 +408,57 @@ public class RemoteApi
     }
 
     /**
+     * Create a new user.
+     *
+     * @param user      is a map of containing the users details.
+     * @param token     used to authenticate the request
+     *
+     * @return true if the request is successful
+     *
+     * @throws AuthenticationException if you are not authorised to execute this action.
+     */
+    public boolean createUser(String token, Hashtable<String, Object> user) throws AuthenticationException
+    {
+        tokenManager.verifyAdmin(token);
+
+        // validate the user details.
+
+        User instance = new User();
+        instance.setLogin((String) user.get("login"));
+        instance.setName((String) user.get("name"));
+
+        userManager.save(instance);
+
+        userManager.setPassword(instance, (String) user.get("password"));
+
+        return true;
+    }
+
+    /**
+     * Delete the specified user.
+     *
+     * @param token     used to authenticate the request.
+     * @param login     identifies the user to be deleted.
+     *
+     * @return true if the request is successful, false otherwise.
+     *
+     * @throws AuthenticationException is you are not authorised to execute this request.
+     */
+    public boolean deleteUser(String token, String login) throws AuthenticationException
+    {
+        tokenManager.verifyAdmin(token);
+
+        User user = userManager.getUser(login);
+        if (user != null)
+        {
+            userManager.delete(user);
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
      * Deletes all commit message links, primarily for testing purposes.
      *
      * @param token used to authenticate the request
