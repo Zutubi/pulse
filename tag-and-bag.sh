@@ -4,7 +4,7 @@ set -e
 
 usage()
 {
-    echo "Usage: $0 [ <option>... ] <build number> <version>"
+    echo "Usage: $0 [ <option>... ] <version>"
     echo "       $0 -h"
     echo "Options:"
     echo "   -u <subversion user>: provide an alternative user name to subversion"
@@ -24,6 +24,12 @@ yesNo()
     fi
 }
 
+fatal()
+{
+    echo "$1"
+    exit 1
+}
+
 while getopts "hu:y" options; do
     case $options in
         h ) usage
@@ -39,14 +45,17 @@ done
 
 shift $(($OPTIND - 1))
 
-if [[ $# -ne 2 ]]
+if [[ $# -ne 1 ]]
 then
     usage
     exit 1
 fi
 
-buildNumber=$1
-version=$2
+version="$1"
+if [[ ! "$version" =~ [1-9]+\.[0-9]+\.[0-9]+ ]]
+then
+    fatal "Invalid version '$version'"
+fi
 
 if [[ ! -z "$user" ]]
 then
@@ -69,7 +78,7 @@ yesNo "Build release now [yN]? "
 
 svn co $svnTag $tmpDir
 pushd $tmpDir
-./build-release.sh $buildNumber $version
+./build-release.sh $version
 
 echo "========================================================================="
 echo "= Changes on tag $version"

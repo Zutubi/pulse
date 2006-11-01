@@ -10,13 +10,23 @@ fatal()
     exit 1
 }
 
-if [[ $# -ne 2 ]]
+if [[ $# -ne 1 ]]
 then
-    fatal "Usage: $0 <build number> <version>"
+    fatal "Usage: $0 <version>"
 fi
 
-build=$1
-version=$2
+version="$1"
+
+if [[ ! "$version" =~ [1-9]+\.[0-9]+\.[0-9]+ ]]
+then
+    fatal "Invalid version '$version'"
+fi
+
+major=$(echo $version | cut -d. -f1)
+minor=$(echo $version | cut -d. -f2)
+build=$(echo $version | cut -d. -f3)
+
+build=$(printf "%02d%02d%03d000" $major $minor $build)
 
 tmpFile=/tmp/tmp.$$
 
