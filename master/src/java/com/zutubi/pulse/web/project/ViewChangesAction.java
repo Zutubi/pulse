@@ -1,10 +1,12 @@
 package com.zutubi.pulse.web.project;
 
 import com.zutubi.pulse.core.model.Changelist;
+import com.zutubi.pulse.core.model.ChangelistComparator;
 import com.zutubi.pulse.core.model.ResultState;
 import com.zutubi.pulse.model.BuildResult;
 import com.zutubi.pulse.model.Project;
 
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -173,7 +175,8 @@ public class ViewChangesAction extends ProjectActionSupport
             }
         }
         changelists.addAll(getBuildManager().getChangesForBuild(result));
-
+        Collections.sort(changelists, new ChangelistComparator());
+        
         previousSuccessful = getPrevious(new ResultState[] { ResultState.SUCCESS });
         previousUnsuccessful = getPrevious(new ResultState[] { ResultState.ERROR, ResultState.FAILURE });
 

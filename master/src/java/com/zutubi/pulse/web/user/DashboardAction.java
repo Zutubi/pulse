@@ -1,6 +1,7 @@
 package com.zutubi.pulse.web.user;
 
 import com.zutubi.pulse.core.model.Changelist;
+import com.zutubi.pulse.core.model.ChangelistComparator;
 import com.zutubi.pulse.core.model.Revision;
 import com.zutubi.pulse.model.*;
 import com.zutubi.pulse.security.AcegiUtils;
@@ -8,7 +9,6 @@ import com.zutubi.pulse.web.ActionSupport;
 import com.zutubi.pulse.web.project.CommitMessageHelper;
 
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -142,15 +142,6 @@ public class DashboardAction extends ActionSupport
     public void setUserManager(UserManager userManager)
     {
         this.userManager = userManager;
-    }
-
-    private class ChangelistComparator implements Comparator<Changelist>
-    {
-        public int compare(Changelist c1, Changelist c2)
-        {
-            // Compare the date.
-            return -c1.getDate().compareTo(c2.getDate());
-        }
     }
 
     public String transformComment(Changelist changelist)
