@@ -48,7 +48,7 @@ public interface PersonalBuildUI
         public abstract boolean isAffirmative();
         public abstract boolean isPersistent();
 
-        public static Response fromInput(String input, Response defaultResponse)
+        public static Response fromInput(String input, Response defaultResponse, Response... allowedResponses)
         {
             input = input.toUpperCase();
             int length = input.length();
@@ -63,7 +63,7 @@ public interface PersonalBuildUI
 
                 for(Response r: values())
                 {
-                    if(r.toString().charAt(0) == inputChar)
+                    if(in(r, allowedResponses) && r.toString().charAt(0) == inputChar)
                     {
                         return r;
                     }
@@ -73,7 +73,11 @@ public interface PersonalBuildUI
             {
                 try
                 {
-                    return valueOf(input);
+                    Response r = valueOf(input);
+                    if(in(r, allowedResponses))
+                    {
+                        return r;
+                    }
                 }
                 catch(IllegalArgumentException e)
                 {
@@ -82,6 +86,19 @@ public interface PersonalBuildUI
             }
 
             return null;
+        }
+
+        private static boolean in(Response r, Response... a)
+        {
+            for(Response c: a)
+            {
+                if(c == r)
+                {
+                    return true;
+                }
+            }
+
+            return false;
         }
     }
 
@@ -103,5 +120,10 @@ public interface PersonalBuildUI
     void enterContext();
     void exitContext();
 
+    String inputPrompt(String question);
+    String inputPrompt(String prompt, String defaultResponse);
+    String passwordPrompt(String question);
+
+    Response ynPrompt(String question, Response defaultResponse);
     Response ynaPrompt(String question, Response defaultResponse);
 }

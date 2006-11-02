@@ -27,6 +27,7 @@ import java.net.MalformedURLException;
 public class PersonalBuildClient extends PersonalBuildSupport
 {
     private PersonalBuildConfig config;
+    private String password;
 
     public PersonalBuildClient(PersonalBuildConfig config)
     {
@@ -49,7 +50,7 @@ public class PersonalBuildClient extends PersonalBuildSupport
             try
             {
                 debug("Logging in to pulse: url: " + config.getPulseUrl() + ", user: " + config.getPulseUser());
-                token = rpc.login(config.getPulseUser(), config.getPulsePassword());
+                token = rpc.login(config.getPulseUser(), getPassword());
                 debug("Login successful.");
                 WorkingCopy wc = prepare(rpc, token);
                 debug("Verified: personal build for project: " + config.getProject() + ", specification: " + config.getSpecification() + ".");
@@ -74,6 +75,24 @@ public class PersonalBuildClient extends PersonalBuildSupport
         }
     }
 
+    private String getPassword()
+    {
+        if (password == null)
+        {
+            password = config.getPulsePassword();
+            if (password == null)
+            {
+                password = passwordPrompt("Pulse password");
+                if (password == null)
+                {
+                    password = "";
+                }
+            }
+        }
+
+        return password;
+    }
+
     private void checkVersion(PulseXmlRpcClient rpc) throws PersonalBuildException
     {
         int ourBuild = Version.getVersion().getBuildNumberAsInt();
@@ -86,13 +105,13 @@ public class PersonalBuildClient extends PersonalBuildSupport
             if (serverBuild != ourBuild)
             {
                 debug("Server build (%d) does not match local build (%d)", serverBuild, ourBuild);
-                if(serverBuild != confirmedBuild)
+                if (serverBuild != confirmedBuild)
                 {
                     String serverVersion = Version.buildNumberToVersion(serverBuild);
                     String ourVersion = Version.buildNumberToVersion(ourBuild);
                     String question;
 
-                    if(serverVersion.equals(ourVersion))
+                    if (serverVersion.equals(ourVersion))
                     {
                         question = String.format("Server build (%d) does not match tools build (%d).  Continue anyway?", serverBuild, ourBuild);
                     }
@@ -102,11 +121,11 @@ public class PersonalBuildClient extends PersonalBuildSupport
                     }
 
                     PersonalBuildUI.Response response = ynaPrompt(question, PersonalBuildUI.Response.NO);
-                    if(response == PersonalBuildUI.Response.ALWAYS)
+                    if (response == PersonalBuildUI.Response.ALWAYS)
                     {
                         config.setConfirmedVersion(serverBuild);
                     }
-                    else if(!response.isAffirmative())
+                    else if (!response.isAffirmative())
                     {
                         throw new UserAbortException();
                     }
@@ -123,9 +142,30 @@ public class PersonalBuildClient extends PersonalBuildSupport
 
     private void checkRequiredConfig() throws PersonalBuildException
     {
+        if (config.getPulseUrl() == null)
+        {
+            PersonalBuildUI.Response response = ynPrompt("No pulse server configured.  Configure one now?", PersonalBuildUI.Response.YES);
+            if (response.isAffirmative())
+            {
+                new ConfigCommand().setupPulseConfig(getUi(), config);
+            }
+            else
+            {
+                throw new PersonalBuildException("Required property '" + PersonalBuildConfig.PROPERTY_PULSE_URL + "' not specified.");                
+            }
+        }
+
         if (config.getProject() == null)
         {
-            throw new PersonalBuildException("Required property 'project' not specified.");
+            PersonalBuildUI.Response response = ynPrompt("No pulse project configured.  Configure one now?", PersonalBuildUI.Response.YES);
+            if (response.isAffirmative())
+            {
+                new ConfigCommand().setupLocalConfig(getUi(), config);
+            }
+            else
+            {
+                throw new PersonalBuildException("Required property '" + PersonalBuildConfig.PROPERTY_PROJECT + "' not specified.");
+            }
         }
     }
 
@@ -267,7 +307,7 @@ public class PersonalBuildClient extends PersonalBuildSupport
     {
         HttpClient client = new HttpClient();
 
-        UsernamePasswordCredentials credentials = new UsernamePasswordCredentials(config.getPulseUser(), config.getPulsePassword());
+        UsernamePasswordCredentials credentials = new UsernamePasswordCredentials(config.getPulseUser(), getPassword());
         client.getState().setCredentials(new AuthScope(null, -1), credentials);
         client.getParams().setAuthenticationPreemptive(true);
 

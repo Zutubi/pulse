@@ -762,6 +762,26 @@ public class P4WorkingCopyTest extends PulseTestCase implements PersonalBuildUI
     {
     }
 
+    public String inputPrompt(String question)
+    {
+        return null;
+    }
+
+    public String inputPrompt(String prompt, String defaultResponse)
+    {
+        return defaultResponse;
+    }
+
+    public String passwordPrompt(String question)
+    {
+        return null;
+    }
+
+    public Response ynPrompt(String question, Response defaultResponse)
+    {
+        return defaultResponse;
+    }
+
     public Response ynaPrompt(String question, Response defaultResponse)
     {
         return defaultResponse;

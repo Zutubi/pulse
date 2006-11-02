@@ -53,8 +53,7 @@ public abstract class PersonalBuildSupport implements PersonalBuildWorker
         }
     }
 
-
-    public void enterContext()
+    protected void enterContext()
     {
         if (ui != null)
         {
@@ -62,11 +61,84 @@ public abstract class PersonalBuildSupport implements PersonalBuildWorker
         }
     }
 
-    public void exitContext()
+    protected void exitContext()
     {
         if (ui != null)
         {
             ui.exitContext();
+        }
+    }
+
+    protected String inputPrompt(String prompt)
+    {
+        if(ui != null)
+        {
+            return ui.inputPrompt(prompt);
+        }
+        else
+        {
+            return "";
+        }
+    }
+
+    protected String inputPrompt(String prompt, String defaultResponse)
+    {
+        if(ui != null)
+        {
+            return ui.inputPrompt(prompt, defaultResponse);
+        }
+        else
+        {
+            return defaultResponse;
+        }
+    }
+
+    protected String passwordPrompt(String prompt)
+    {
+        if(ui != null)
+        {
+            return ui.passwordPrompt(prompt);
+        }
+        else
+        {
+            return "";
+        }
+    }
+
+    protected String readConfirmedPassword(String prompt)
+    {
+        if(ui != null)
+        {
+            while(true)
+            {
+                String password = ui.passwordPrompt(prompt);
+                String confirm = ui.passwordPrompt("Confirm");
+
+                if(password.equals(confirm))
+                {
+                    return password;
+                }
+                else
+                {
+                    status("Passwords do not match");
+                }
+            }
+        }
+        else
+        {
+            return "";
+        }
+    }
+
+    protected PersonalBuildUI.Response ynPrompt(String question, PersonalBuildUI.Response defaultResponse)
+    {
+        if(ui == null)
+        {
+            return defaultResponse;
+        }
+        else
+        {
+            return ui.ynPrompt(question, defaultResponse);
         }
     }
 
@@ -85,5 +157,10 @@ public abstract class PersonalBuildSupport implements PersonalBuildWorker
     public PersonalBuildUI getUi()
     {
         return ui;
+    }
+
+    public boolean hasUI()
+    {
+        return ui != null;
     }
 }

@@ -9,23 +9,23 @@ import com.zutubi.pulse.scm.WorkingCopy;
 import com.zutubi.pulse.scm.WorkingCopyStatus;
 import org.apache.commons.cli.*;
 
-import java.io.*;
+import java.io.File;
+import java.io.IOException;
 import java.util.*;
 
 /**
  */
 @SuppressWarnings({ "AccessStaticViaInstance" })
-public class PersonalBuildCommand implements Command, PersonalBuildUI
+public class PersonalBuildCommand implements Command
 {
     private File base;
     private String[] files;
     private CommandLineConfig switchConfig;
     private PropertiesConfig defineConfig;
-    private BufferedReader inputReader;
-    private Verbosity verbosity;
+    private String patchFilename;
+    private boolean noRequest = false;
     private boolean statusOnly = false;
-    private String indent = "";
-
+    private ConsoleUI console = new ConsoleUI();
 
     public void processArguments(String... argv) throws ParseException
     {
@@ -41,6 +41,11 @@ public class PersonalBuildCommand implements Command, PersonalBuildUI
         options.addOption(OptionBuilder.withLongOpt("define")
                 .hasArg()
                 .create('d'));
+        options.addOption(OptionBuilder.withLongOpt("file")
+                .hasArg()
+                .create('f'));
+        options.addOption(OptionBuilder.withLongOpt("no-request")
+                .create('n'));
 
         addPropertyOption(options, 's', "server", PersonalBuildConfig.PROPERTY_PULSE_URL);
         addPropertyOption(options, 'u', "user", PersonalBuildConfig.PROPERTY_PULSE_USER);
@@ -59,15 +64,23 @@ public class PersonalBuildCommand implements Command, PersonalBuildUI
         }
         if (commandLine.hasOption('q'))
         {
-            setVerbosity(Verbosity.QUIET);
+            console.setVerbosity(PersonalBuildUI.Verbosity.QUIET);
         }
         if (commandLine.hasOption('v'))
         {
-            setVerbosity(Verbosity.VERBOSE);
+            console.setVerbosity(PersonalBuildUI.Verbosity.VERBOSE);
         }
         if (commandLine.hasOption('t'))
         {
             statusOnly = true;
+        }
+        if (commandLine.hasOption('n'))
+        {
+            noRequest = true;
+        }
+        if(commandLine.hasOption('f'))
+        {
+            patchFilename = commandLine.getOptionValue('f');
         }
 
         switchConfig.setCommandLine(commandLine);
@@ -101,12 +114,11 @@ public class PersonalBuildCommand implements Command, PersonalBuildUI
     private int execute(String[] argv) throws ParseException
     {
         processArguments(argv);
-        inputReader = new BufferedReader(new InputStreamReader(System.in));
 
         CompositeConfig uiConfig = new CompositeConfig(switchConfig, defineConfig);
         PersonalBuildConfig config = new PersonalBuildConfig(base, uiConfig);
         PersonalBuildClient client = new PersonalBuildClient(config);
-        client.setUI(this);
+        client.setUI(console);
 
         try
         {
@@ -117,31 +129,37 @@ public class PersonalBuildCommand implements Command, PersonalBuildUI
                 WorkingCopyStatus wcs = client.getStatus(wc, files);
                 if(!wcs.hasChanges())
                 {
-                    status("No changes found.");
+                    console.status("No changes found.");
                 }
             }
             else
             {
                 File patchFile;
 
-                try
+                if(patchFilename == null)
                 {
-                    patchFile = File.createTempFile("pulse.patch.", ".zip");
+                    try
+                    {
+                        patchFile = File.createTempFile("pulse.patch.", ".zip");
+                        patchFile.deleteOnExit();
+                    }
+                    catch (IOException e)
+                    {
+                        console.error("Unable to create temporary patch file: " + e.getMessage(), e);
+                        return 1;
+                    }
                 }
-                catch (IOException e)
+                else
                 {
-                    error("Unable to create temporary patch file: " + e.getMessage(), e);
-                    return 1;
+                    patchFile = new File(patchFilename);
                 }
-
-                patchFile.deleteOnExit();
 
                 PatchArchive patch = client.preparePatch(wc, patchFile, files);
                 if(patch == null)
                 {
-                    status("No changes found.");
+                    console.status("No changes found.");
                 }
-                else
+                else if(!noRequest)
                 {
                     client.sendRequest(patch);
                 }
@@ -153,7 +171,7 @@ public class PersonalBuildCommand implements Command, PersonalBuildUI
         }
         catch (PersonalBuildException e)
         {
-            error(e.getMessage(), e);
+            console.error(e.getMessage(), e);
             return 1;
         }
 
@@ -199,9 +217,11 @@ public class PersonalBuildCommand implements Command, PersonalBuildUI
         options.put("-s [--server] url", "set pulse server url");
         options.put("-u [--user] name", "set pulse user name");
         options.put("-p [--password] password", "set pulse password");
+        options.put("-f [--file] filename", "set patch file name");
         options.put("-d [--define] name=value", "set named property to given value");
         options.put("-q [--quiet]", "suppress unnecessary output");
         options.put("-v [--verbose]", "show verbose output");
+        options.put("-n [--no-request]", "create patch but do not request build");
         options.put("-t [--status]", "show status only, do not update or build");
         return options;
     }
@@ -209,109 +229,6 @@ public class PersonalBuildCommand implements Command, PersonalBuildUI
     public boolean isDefault()
     {
         return false;
-    }
-
-    private void fatal(String message)
-    {
-        print("Error: " + message, System.err);
-        System.exit(1);
-    }
-
-    public void setVerbosity(Verbosity verbosity)
-    {
-        this.verbosity = verbosity;
-    }
-
-    public void debug(String message)
-    {
-        if (verbosity == Verbosity.VERBOSE)
-        {
-            print(message, System.out);
-        }
-    }
-
-    public void status(String message)
-    {
-        if (verbosity != Verbosity.QUIET)
-        {
-            print(message, System.out);
-        }
-    }
-
-    public void warning(String message)
-    {
-        print("Warning: " + message, System.err);
-    }
-
-    public void error(String message)
-    {
-        print("Error: " + message, System.err);
-    }
-
-    public void error(String message, Throwable throwable)
-    {
-        if (verbosity == Verbosity.VERBOSE)
-        {
-            throwable.printStackTrace(System.err);
-        }
-
-        error(message);
-    }
-
-    private void print(String message, PrintStream stream)
-    {
-        stream.println(indent + message);
-    }
-
-    public void enterContext()
-    {
-        indent += "  ";
-    }
-
-    public void exitContext()
-    {
-        if(indent.length() >= 2)
-        {
-            indent = indent.substring(2);
-        }
-    }
-
-    public Response ynaPrompt(String question, Response defaultResponse)
-    {
-        String choices = "Yes/No/Always";
-
-        switch (defaultResponse)
-        {
-            case YES:
-                choices += " [default: Yes]";
-                break;
-            case NO:
-                choices += " [default: No]";
-                break;
-            case ALWAYS:
-                choices += " [default: Always]";
-                break;
-        }
-
-        try
-        {
-            System.out.println(question);
-
-            Response response = null;
-            while (response == null)
-            {
-                System.out.print(choices + "> ");
-                String input = inputReader.readLine();
-                response = Response.fromInput(input, defaultResponse);
-            }
-
-            return response;
-        }
-        catch (IOException e)
-        {
-            fatal("Unable to prompt for input: " + e.getMessage());
-            return null;
-        }
     }
 
     public static void main(String[] argv)

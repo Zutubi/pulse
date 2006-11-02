@@ -27,6 +27,8 @@ public class SvnWorkingCopy extends PersonalBuildSupport implements WorkingCopy
 {
     private File base;
     private SVNClientManager clientManager;
+    private ConfigSupport configSupport;
+    private ISVNAuthenticationManager authenticationManager;
 
     static
     {
@@ -40,45 +42,63 @@ public class SvnWorkingCopy extends PersonalBuildSupport implements WorkingCopy
         this.base = path;
         ISVNOptions options = SVNWCUtil.createDefaultOptions(true);
         clientManager = SVNClientManager.newInstance(options);
+        configSupport = new ConfigSupport(config);
+    }
 
-        ConfigSupport configSupport = new ConfigSupport(config);
-        String user = configSupport.getProperty(PROPERTY_USERNAME);
-
-        if(user == null)
+    private void initAuthenticationManager()
+    {
+        if (authenticationManager == null)
         {
-            // See if there is a username specified in the working copy URL.
-            try
-            {
-                SVNInfo info = clientManager.getWCClient().doInfo(base, null);
-                user = info.getURL().getUserInfo();
-            }
-            catch (SVNException e)
-            {
-                // Ignore this error, we can proceed.
-            }
-        }
+            String user = configSupport.getProperty(PROPERTY_USERNAME);
 
-        if (!configSupport.hasProperty(PROPERTY_KEYFILE))
-        {
-            if (user != null)
+            if(user == null)
             {
-                clientManager = SVNClientManager.newInstance(options, user, configSupport.getProperty(PROPERTY_PASSWORD, ""));
+                // See if there is a username specified in the working copy URL.
+                try
+                {
+                    SVNInfo info = clientManager.getWCClient().doInfo(base, null);
+                    user = info.getURL().getUserInfo();
+                }
+                catch (SVNException e)
+                {
+                    // Ignore this error, we can proceed.
+                }
+            }
+
+            if(user == null)
+            {
+                authenticationManager = SVNWCUtil.createDefaultAuthenticationManager();
             }
             else
             {
-                clientManager = SVNClientManager.newInstance(options);
+                authenticationManager = SVNWCUtil.createDefaultAuthenticationManager(user, getPassword(configSupport));
+
+                if(configSupport.hasProperty(PROPERTY_KEYFILE))
+                {
+                    String privateKeyFile = configSupport.getProperty(PROPERTY_KEYFILE);
+                    String passphrase = configSupport.getProperty(PROPERTY_PASSPHRASE);
+
+                    authenticationManager.setAuthenticationProvider(new SVNSSHAuthenticationProvider(user, privateKeyFile, passphrase));
+                }
+            }
+
+            clientManager = SVNClientManager.newInstance(clientManager.getOptions(), authenticationManager);
+        }
+    }
+
+    public String getPassword(ConfigSupport configSupport)
+    {
+        String password = configSupport.getProperty(PROPERTY_PASSWORD);
+        if(password == null)
+        {
+            password = passwordPrompt("Subversion password");
+            if(password == null)
+            {
+                password = "";
             }
         }
-        else
-        {
-            String password = configSupport.getProperty(PROPERTY_PASSWORD, "");
-            String privateKeyFile = configSupport.getProperty(PROPERTY_KEYFILE);
-            String passphrase = configSupport.getProperty(PROPERTY_PASSPHRASE);
 
-            ISVNAuthenticationManager authenticationManager = SVNWCUtil.createDefaultAuthenticationManager(user, password);
-            authenticationManager.setAuthenticationProvider(new SVNSSHAuthenticationProvider(user, privateKeyFile, passphrase));
-            clientManager = SVNClientManager.newInstance(options, authenticationManager);
-        }
+        return password;
     }
 
     public boolean matchesRepository(Properties repositoryDetails) throws SCMException
@@ -149,6 +169,11 @@ public class SvnWorkingCopy extends PersonalBuildSupport implements WorkingCopy
 
     private WorkingCopyStatus getStatus(boolean remote, File... files) throws SCMException
     {
+        if (remote)
+        {
+            initAuthenticationManager();
+        }
+        
         StatusHandler handler = new StatusHandler();
 
         try
@@ -251,6 +276,8 @@ public class SvnWorkingCopy extends PersonalBuildSupport implements WorkingCopy
 
     public Revision update() throws SCMException
     {
+        initAuthenticationManager();
+
         SVNUpdateClient updateClient = clientManager.getUpdateClient();
         updateClient.setEventHandler(new UpdateHandler());
 

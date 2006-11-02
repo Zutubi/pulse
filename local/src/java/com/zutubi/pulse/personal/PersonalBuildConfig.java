@@ -10,9 +10,8 @@ import java.io.File;
 public class PersonalBuildConfig implements Config
 {
     private static final String PROPERTIES_FILENAME = ".pulse.properties";
-
-
-    private File base;    public static final String PROPERTY_PULSE_URL = "pulse.url";
+    
+    public static final String PROPERTY_PULSE_URL = "pulse.url";
     public static final String PROPERTY_PULSE_USER = "pulse.user";
     public static final String PROPERTY_PULSE_PASSWORD = "pulse.password";
     public static final String PROPERTY_PROJECT = "project";
@@ -22,7 +21,9 @@ public class PersonalBuildConfig implements Config
     public static final String PROPERTY_CONFIRM_UPDATE = "confirm.update";
     public static final String PROPERTY_CONFIRMED_VERSION = "confirmed.version";
 
+    private File base;
     private ConfigSupport config;
+    private ConfigSupport localConfig;
     private ConfigSupport userConfig;
 
     public PersonalBuildConfig(File base, Config ui)
@@ -36,7 +37,11 @@ public class PersonalBuildConfig implements Config
         // Next: system properties
         composite.append(new PropertiesConfig(System.getProperties()));
 
-        // Now all properties files in the base and its parents
+        localConfig = new ConfigSupport(new FileConfig(getLocalConfigFile()));
+        composite.append(localConfig);
+
+        // Now all properties files in the parent directories
+        base = base.getParentFile();
         while(base != null)
         {
             File properties = new File(base, PROPERTIES_FILENAME);
@@ -48,11 +53,10 @@ public class PersonalBuildConfig implements Config
         }
 
         // Next: user's settings from properties in home directory
-        String userHome = System.getProperty("user.home");
-        if(userHome != null)
+        File userFile = getUserConfigFile();
+        if(userFile != null)
         {
-            File homeConfig = FileSystemUtils.composeFile(userHome, PROPERTIES_FILENAME);
-            userConfig = new ConfigSupport(new FileConfig(homeConfig));
+            userConfig = new ConfigSupport(new FileConfig(userFile));
             composite.append(userConfig);
         }
 
@@ -65,7 +69,6 @@ public class PersonalBuildConfig implements Config
     private Config getDefaults()
     {
         PropertiesConfig defaults = new PropertiesConfig();
-        defaults.setProperty(PROPERTY_PULSE_URL, "http://pulse:8080");
 
         String userName = System.getProperty("user.name");
         if(userName != null)
@@ -73,14 +76,13 @@ public class PersonalBuildConfig implements Config
             defaults.setProperty(PROPERTY_PULSE_USER, userName);
         }
 
-        defaults.setProperty(PROPERTY_PULSE_PASSWORD, "");
         return defaults;
     }
 
     public String getPulseUrl()
     {
         String url = config.getProperty(PROPERTY_PULSE_URL);
-        if(url.endsWith("/"))
+        if(url != null && url.endsWith("/"))
         {
             url = url.substring(0, url.length() - 1);
         }
@@ -170,8 +172,21 @@ public class PersonalBuildConfig implements Config
 
     public void setProperty(String key, String value)
     {
-        config.setProperty(key, value);
+        setProperty(key, value, false);
     }
+
+    public void setProperty(String key, String value, boolean local)
+    {
+        if (local)
+        {
+            localConfig.setProperty(key, value);
+        }
+        else
+        {
+            userConfig.setProperty(key, value);
+        }
+    }
+
 
     public void removeProperty(String key)
     {
@@ -191,5 +206,21 @@ public class PersonalBuildConfig implements Config
     public boolean isWriteable()
     {
         return config.isWriteable();
+    }
+
+    public File getUserConfigFile()
+    {
+        String userHome = System.getProperty("user.home");
+        if(userHome != null)
+        {
+            return FileSystemUtils.composeFile(userHome, PROPERTIES_FILENAME);
+        }
+
+        return null;
+    }
+
+    public File getLocalConfigFile()
+    {
+        return new File(base, PROPERTIES_FILENAME);
     }
 }
