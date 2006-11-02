@@ -210,15 +210,7 @@ public class Scope
 
     public void add(ResourceProperty resourceProperty)
     {
-        try
-        {
-            add(new ReferenceInfo(resourceProperty));
-        }
-        catch (FileLoadException e)
-        {
-            // Should never happen as we allow unresolved
-            LOG.severe("Internal error: " + e.getMessage(), e);
-        }
+        add(new ReferenceInfo(resourceProperty));
     }
 
     /**
@@ -297,9 +289,22 @@ public class Scope
             addToEnvironment = false;
         }
 
-        public ReferenceInfo(ResourceProperty p) throws FileLoadException
+        public ReferenceInfo(ResourceProperty p)
         {
-            this.reference = new Property(p.getName(), VariableHelper.replaceVariables(p.getValue(), Scope.this, true));
+            String value = p.getValue();
+            if (p.getResolveVariables())
+            {
+                try
+            {
+                value = VariableHelper.replaceVariables(p.getValue(), Scope.this, true);
+                }
+                catch (FileLoadException e)
+                {
+                    // Just use the unresolved value
+                }
+            }
+
+            this.reference = new Property(p.getName(), value);
             this.addToPath = p.getAddToPath();
             this.addToEnvironment = p.getAddToEnvironment();
         }

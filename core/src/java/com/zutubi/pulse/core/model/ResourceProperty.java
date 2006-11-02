@@ -8,17 +8,19 @@ public class ResourceProperty
     private String value;
     private boolean addToEnvironment = false;
     private boolean addToPath = false;
+    private boolean resolveVariables = false;
 
     public ResourceProperty()
     {
     }
 
-    public ResourceProperty(String name, String value, boolean addToEnvironment, boolean addToPath)
+    public ResourceProperty(String name, String value, boolean addToEnvironment, boolean addToPath, boolean resolveVariables)
     {
         this.name = name;
         this.value = value;
         this.addToEnvironment = addToEnvironment;
         this.addToPath = addToPath;
+        this.resolveVariables = resolveVariables;
     }
 
     public String getName()
@@ -59,5 +61,15 @@ public class ResourceProperty
     public void setAddToPath(boolean addToPath)
     {
         this.addToPath = addToPath;
+    }
+
+    public boolean getResolveVariables()
+    {
+        return resolveVariables;
+    }
+
+    public void setResolveVariables(boolean resolveVariables)
+    {
+        this.resolveVariables = resolveVariables;
     }
 }

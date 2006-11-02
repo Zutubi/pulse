@@ -45,7 +45,7 @@ public class PersistentResource extends Resource
         Resource resource = new Resource(getName());
         for(ResourceProperty p: getProperties().values())
         {
-            resource.addProperty(new ResourceProperty(p.getName(), p.getValue(), p.getAddToEnvironment(), p.getAddToPath()));
+            resource.addProperty(new ResourceProperty(p.getName(), p.getValue(), p.getAddToEnvironment(), p.getAddToPath(), p.getResolveVariables()));
         }
 
         for(ResourceVersion v: getVersions().values())
@@ -55,7 +55,7 @@ public class PersistentResource extends Resource
             {
                 try
                 {
-                    copy.addProperty(new ResourceProperty(p.getName(), p.getValue(), p.getAddToEnvironment(), p.getAddToPath()));
+                    copy.addProperty(new ResourceProperty(p.getName(), p.getValue(), p.getAddToEnvironment(), p.getAddToPath(), p.getResolveVariables()));
                 }
                 catch (FileLoadException e)
                 {

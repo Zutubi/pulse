@@ -23,8 +23,8 @@ public class ScopeTest extends PulseTestCase
         scope = new Scope(parent);
         parent.add(new Property("parent only", "parent"));
         parent.add(new Property("parent and child", "parent"));
-        parent.add(new ResourceProperty("parent only resource", "parent resource", true, true));
-        parent.add(new ResourceProperty("parent and child resource", "parent resource", true, true));
+        parent.add(new ResourceProperty("parent only resource", "parent resource", true, true, false));
+        parent.add(new ResourceProperty("parent and child resource", "parent resource", true, true, false));
 
         Map<String, String> env = System.getenv();
         for(Map.Entry<String, String> var: env.entrySet())
@@ -34,10 +34,10 @@ public class ScopeTest extends PulseTestCase
 
         scope.add(new Property("child only", "child"));
         scope.add(new Property("parent and child", "child"));
-        scope.add(new ResourceProperty("child only resource", "child resource", true, true));
-        scope.add(new ResourceProperty("parent and child resource", "child resource", true, true));
+        scope.add(new ResourceProperty("child only resource", "child resource", true, true, false));
+        scope.add(new ResourceProperty("parent and child resource", "child resource", true, true, false));
 
-        scope.add(new ResourceProperty("not added", "not added", false, false));
+        scope.add(new ResourceProperty("not added", "not added", false, false, false));
     }
 
     public void testProperty()
@@ -78,15 +78,23 @@ public class ScopeTest extends PulseTestCase
     public void testReferToEarlierProperty()
     {
         Scope s = new Scope();
-        s.add(new ResourceProperty("test", "value", false, false));
-        s.add(new ResourceProperty("test2", "${test}2", false, false));
+        s.add(new ResourceProperty("test", "value", false, false, false));
+        s.add(new ResourceProperty("test2", "${test}2", false, false, true));
         assertEquals("value2", s.getReference("test2").getValue());
+    }
+
+    public void testDontResolve()
+    {
+        Scope s = new Scope();
+        s.add(new ResourceProperty("test", "value", false, false, false));
+        s.add(new ResourceProperty("test2", "${test}2", false, false, false));
+        assertEquals("${test}2", s.getReference("test2").getValue());
     }
 
     public void testSelfReference()
     {
         Scope s = new Scope();
-        s.add(new ResourceProperty("testvar", "${testvar}", false, false));
+        s.add(new ResourceProperty("testvar", "${testvar}", false, false, true));
         assertEquals("${testvar}", s.getReference("testvar").getValue());
     }
 
@@ -94,17 +102,17 @@ public class ScopeTest extends PulseTestCase
     {
         Scope p = new Scope();
         Scope c = new Scope(p);
-        p.add(new ResourceProperty("test", "value", false, false));
-        c.add(new ResourceProperty("test2", "${test}2", false, false));
+        p.add(new ResourceProperty("test", "value", false, false, false));
+        c.add(new ResourceProperty("test2", "${test}2", false, false, true));
         assertEquals("value2", c.getReference("test2").getValue());
     }
 
     public void testAddToPathPreservesOrder()
     {
         Scope s = new Scope();
-        s.add(new ResourceProperty("j", "jv", false, true));
-        s.add(new ResourceProperty("z", "zv", false, true));
-        s.add(new ResourceProperty("a", "av", false, true));
+        s.add(new ResourceProperty("j", "jv", false, true, false));
+        s.add(new ResourceProperty("z", "zv", false, true, false));
+        s.add(new ResourceProperty("a", "av", false, true, false));
         assertEquals(FileSystemUtils.composeSearchPath("av", "zv", "jv") + File.pathSeparatorChar, s.getPathPrefix());
     }
 
@@ -112,8 +120,8 @@ public class ScopeTest extends PulseTestCase
     {
         Scope p = new Scope();
         Scope c = new Scope(p);
-        p.add(new ResourceProperty("testvar", "parent", false, true));
-        c.add(new ResourceProperty("testvar", "child", false, false));
+        p.add(new ResourceProperty("testvar", "parent", false, true, false));
+        c.add(new ResourceProperty("testvar", "child", false, false, false));
         assertEquals("parent" + File.pathSeparator, p.getPathPrefix());
         assertEquals("", c.getPathPrefix());
     }
@@ -122,15 +130,15 @@ public class ScopeTest extends PulseTestCase
     {
         Scope p = new Scope();
         Scope c = new Scope(p);
-        p.add(new ResourceProperty("priceless", "parent", true, false));
-        c.add(new ResourceProperty("priceless", "child", false, false));
+        p.add(new ResourceProperty("priceless", "parent", true, false, false));
+        c.add(new ResourceProperty("priceless", "child", false, false, false));
         assertFalse(c.containsReference("env.PRICELESS"));
     }
 
     public void testAddToEnvironmentAddsEnvVar()
     {
         Scope s = new Scope();
-        s.add(new ResourceProperty("testvar", "value", true, false));
+        s.add(new ResourceProperty("testvar", "value", true, false, false));
         assertEquals("value", s.getReference("env.testvar").getValue());
     }
 
@@ -138,15 +146,15 @@ public class ScopeTest extends PulseTestCase
     {
         Scope p = new Scope();
         Scope c = new Scope(p);
-        p.add(new ResourceProperty("testvar", "value", true, false));
+        p.add(new ResourceProperty("testvar", "value", true, false, false));
         assertEquals("value", c.getReference("env.testvar").getValue());
     }
 
     public void testAddToEnvReferenceEnvVar()
     {
         Scope s = new Scope();
-        s.add(new ResourceProperty("testvar", "value", true, false));
-        s.add(new ResourceProperty("testvar2", "${env.testvar}2", true, false));
+        s.add(new ResourceProperty("testvar", "value", true, false, false));
+        s.add(new ResourceProperty("testvar2", "${env.testvar}2", true, false, true));
         assertEquals("value2", s.getReference("testvar2").getValue());
     }
 
@@ -154,8 +162,8 @@ public class ScopeTest extends PulseTestCase
     {
         Scope p = new Scope();
         Scope c = new Scope(p);
-        p.add(new ResourceProperty("testvar", "value", true, false));
-        c.add(new ResourceProperty("testvar2", "${env.testvar}2", true, false));
+        p.add(new ResourceProperty("testvar", "value", true, false, false));
+        c.add(new ResourceProperty("testvar2", "${env.testvar}2", true, false, true));
         assertEquals("value2", c.getReference("testvar2").getValue());
     }
 
@@ -163,15 +171,15 @@ public class ScopeTest extends PulseTestCase
     {
         Scope s = new Scope();
         s.addEnvironmentProperty("PATH", "dummypath");
-        s.add(new ResourceProperty("somevar", "someval", false, true));
-        s.add(new ResourceProperty("refvar", "${env.PATH}?", false, false));
+        s.add(new ResourceProperty("somevar", "someval", false, true, false));
+        s.add(new ResourceProperty("refvar", "${env.PATH}?", false, false, true));
         assertEquals("someval" + File.pathSeparatorChar + "dummypath?", s.getReference("refvar").getValue());
     }
 
     public void testSelfReferenceEnvVar()
     {
         Scope s = new Scope();
-        s.add(new ResourceProperty("refvar", "${env.refvar}?", true, false));
+        s.add(new ResourceProperty("refvar", "${env.refvar}?", true, false, true));
         assertEquals("${env.refvar}?", s.getReference("refvar").getValue());
     }
 
@@ -179,8 +187,22 @@ public class ScopeTest extends PulseTestCase
     {
         Scope s = new Scope();
         s.addEnvironmentProperty("PATH", "dummypath");
-        s.add(new ResourceProperty("refvar", "${env.PATH}?", false, true));
+        s.add(new ResourceProperty("refvar", "${env.PATH}?", false, true, true));
         assertEquals("dummypath?", s.getReference("refvar").getValue());
+    }
+
+    public void testBackslash()
+    {
+        Scope s = new Scope();
+        s.add(new ResourceProperty("myvar", "\\", false, true, true));
+        assertEquals("\\", s.getReference("myvar").getValue());
+    }
+
+    public void testBadSyntax()
+    {
+        Scope s = new Scope();
+        s.add(new ResourceProperty("myvar", "this ${ is invalid", false, true, true));
+        assertEquals("this ${ is invalid", s.getReference("myvar").getValue());        
     }
 
     private String getValue(String name)

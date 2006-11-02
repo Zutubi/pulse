@@ -47,12 +47,6 @@ public class VariableHelper
         }
     }
 
-    /**
-     * @param input
-     * @return
-     * @throws FileLoadException
-     *
-     */
     private static List<Token> tokenise(String input) throws FileLoadException
     {
         List<Token> result = new LinkedList<Token>();
@@ -77,7 +71,7 @@ public class VariableHelper
                         case '$':
                         {
                             state = LexerState.DOLLAR;
-                            // only add a token is there is something to add.
+                            // only add a token if there is something to add.
                             String str = current.toString();
                             if (str.length() > 0)
                             {
@@ -181,7 +175,6 @@ public class VariableHelper
             {
                 case VARIABLE_REFERENCE:
                     return true;
-
             }
         }
         return false;
@@ -203,8 +196,7 @@ public class VariableHelper
         throw new FileLoadException("Unknown variable reference '" + token.value + "'");
     }
 
-    public static String replaceVariables(String input, Scope properties)
-            throws FileLoadException
+    public static String replaceVariables(String input, Scope properties) throws FileLoadException
     {
         return replaceVariables(input, properties, false);
     }

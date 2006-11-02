@@ -7,7 +7,6 @@ import com.zutubi.pulse.model.PersistentResource;
 import com.zutubi.pulse.model.Slave;
 import com.zutubi.pulse.model.persistence.ResourceDao;
 import com.zutubi.pulse.model.persistence.SlaveDao;
-import junit.framework.Assert;
 
 import java.util.List;
 
@@ -37,11 +36,11 @@ public class HibernateResourceDaoTest extends MasterPersistenceTestCase
     public void testLoadSave() throws Exception
     {
         PersistentResource resource = new PersistentResource("resource name");
-        ResourceProperty p1 = new ResourceProperty("test name", "test value", true, true);
+        ResourceProperty p1 = new ResourceProperty("test name", "test value", true, true, true);
         resource.addProperty(p1);
 
         ResourceVersion version = new ResourceVersion("version value");
-        ResourceProperty p2 = new ResourceProperty("test name", "test value", true, true);
+        ResourceProperty p2 = new ResourceProperty("test name", "test value", true, true, true);
         version.addProperty(p2);
         resource.add(version);
 

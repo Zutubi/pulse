@@ -19,8 +19,10 @@
     #inlineHelp("property.add.to.environment.help")
     #wwcheckbox("name=property.addToPath" "label=%{getText('property.add.to.path')}" "tabindex=4")
     #inlineHelp("property.add.to.path.help")
+    #wwcheckbox("name=property.resolveVariables" "label=%{getText('property.resolve.variables')}" "tabindex=5")
+    #inlineHelp("property.resolve.variables.help")
 
-    #saveCancel(5)
+    #saveCancel(6)
 #end
 
     #tabEnd()

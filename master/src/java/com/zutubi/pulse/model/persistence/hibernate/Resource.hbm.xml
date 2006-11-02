@@ -19,6 +19,7 @@
                 <property name="value" column="VALUE" type="string" length="1023"/>
                 <property name="addToEnvironment" column="ADD_TO_ENVIRONMENT" type="boolean"/>
                 <property name="addToPath" column="ADD_TO_PATH" type="boolean"/>
+                <property name="resolveVariables" column="RESOLVE_VARIABLES" type="boolean"/>
             </composite-element>
         </map>
 
@@ -44,6 +45,7 @@
                 <property name="value" column="VALUE" type="string" length="1023" not-null="true"/>
                 <property name="addToEnvironment" column="ADD_TO_ENVIRONMENT" type="boolean"/>
                 <property name="addToPath" column="ADD_TO_PATH" type="boolean"/>
+                <property name="resolveVariables" column="RESOLVE_VARIABLES" type="boolean"/>
             </composite-element>
         </map>
     </class>

@@ -48,10 +48,10 @@ public class ExecutableCommandTest extends PulseTestCase
     {
         ExecutableCommand command = new ExecutableCommand();
         command.setExe("dir");
-        command.setArgs("w");
+        command.setArgs("wtfisgoingon");
         CommandResult result = new CommandResult("failure");
         execute(command, result);
-        assertEquals(result.getState(), ResultState.FAILURE);
+        assertEquals(ResultState.FAILURE, result.getState());
     }
 
     public void testExecuteSuccessExpectedNoArg() throws Exception
@@ -146,7 +146,7 @@ public class ExecutableCommandTest extends PulseTestCase
     {
         File data = getTestDataFile("core", "scope", "bin");
         Scope scope = new Scope();
-        scope.add(new ResourceProperty("mypath", data.getAbsolutePath(), false, true));
+        scope.add(new ResourceProperty("mypath", data.getAbsolutePath(), false, true, false));
 
         ExecutableCommand command = new ExecutableCommand();
         command.setExe("custom");
@@ -161,8 +161,8 @@ public class ExecutableCommandTest extends PulseTestCase
     {
         File data = getTestDataFile("core", "scope", "bin");
         Scope scope = new Scope();
-        scope.add(new ResourceProperty("mypath", data.getAbsolutePath(), false, true));
-        scope.add(new ResourceProperty("TESTVAR", "test variable value", true, false));
+        scope.add(new ResourceProperty("mypath", data.getAbsolutePath(), false, true, false));
+        scope.add(new ResourceProperty("TESTVAR", "test variable value", true, false, false));
 
         ExecutableCommand command = new ExecutableCommand();
         command.setExe("custom");
@@ -245,7 +245,7 @@ public class ExecutableCommandTest extends PulseTestCase
     {
         ExecutableCommand command = new ExecutableCommand();
         Scope scope = new Scope();
-        ResourceProperty rp = new ResourceProperty("java.bin.dir", "somedir", false, true);
+        ResourceProperty rp = new ResourceProperty("java.bin.dir", "somedir", false, true, false);
         scope.add(rp);
         command.setScope(scope);
         command.setExe("echo");

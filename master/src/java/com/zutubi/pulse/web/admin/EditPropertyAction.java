@@ -13,6 +13,7 @@ public class EditPropertyAction extends ResourceActionSupport
     private String newValue;
     private boolean newAddToEnvironment = false;
     private boolean newAddToPath = false;
+    private boolean newResolveVariables = false;
     private ResourceProperty property;
 
     public String getName()
@@ -70,6 +71,16 @@ public class EditPropertyAction extends ResourceActionSupport
         this.newAddToPath = newAddToPath;
     }
 
+    public boolean getNewResolveVariables()
+    {
+        return newResolveVariables;
+    }
+
+    public void setNewResolveVariables(boolean newResolveVariables)
+    {
+        this.newResolveVariables = newResolveVariables;
+    }
+
     private void lookupProperty()
     {
         lookupResource();
@@ -111,6 +122,7 @@ public class EditPropertyAction extends ResourceActionSupport
         newValue = property.getValue();
         newAddToEnvironment = property.getAddToEnvironment();
         newAddToPath = property.getAddToPath();
+        newResolveVariables = property.getResolveVariables();
 
         return INPUT;
     }
@@ -152,7 +164,7 @@ public class EditPropertyAction extends ResourceActionSupport
 
     public String execute()
     {
-        ResourceProperty newProperty = new ResourceProperty(newName, newValue, newAddToEnvironment, newAddToPath);
+        ResourceProperty newProperty = new ResourceProperty(newName, newValue, newAddToEnvironment, newAddToPath, newResolveVariables);
 
         try
         {

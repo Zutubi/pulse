@@ -59,20 +59,20 @@ public class JavaResourceConstructor implements ResourceConstructor
             ResourceVersion version = new ResourceVersion(home.getName());
             javaResource.add(version);
 
-            version.addProperty(new ResourceProperty(JAVA_HOME, home.getCanonicalPath(), true, false));
+            version.addProperty(new ResourceProperty(JAVA_HOME, home.getCanonicalPath(), true, false, false));
 
             File binDir = new File(home, "bin");
-            version.addProperty(new ResourceProperty(JAVA_BIN_DIR, binDir.getCanonicalPath(), false, true));
+            version.addProperty(new ResourceProperty(JAVA_BIN_DIR, binDir.getCanonicalPath(), false, true, false));
 
             if (SystemUtils.IS_WINDOWS)
             {
                 File bin = new File(binDir, "java.exe");
-                version.addProperty(new ResourceProperty(JAVA_BIN, bin.getCanonicalPath(), false, false));
+                version.addProperty(new ResourceProperty(JAVA_BIN, bin.getCanonicalPath(), false, false, false));
             }
             else
             {
                 File bin = new File(binDir, "java");
-                version.addProperty(new ResourceProperty(JAVA_BIN, bin.getCanonicalPath(), false, false));
+                version.addProperty(new ResourceProperty(JAVA_BIN, bin.getCanonicalPath(), false, false, false));
             }
             return javaResource;
         }

@@ -1,11 +1,11 @@
 package com.zutubi.pulse.model;
 
-import com.zutubi.pulse.model.persistence.hibernate.MasterPersistenceTestCase;
-import com.zutubi.pulse.model.persistence.ResourceDao;
+import com.zutubi.pulse.core.FileLoadException;
 import com.zutubi.pulse.core.model.Resource;
 import com.zutubi.pulse.core.model.ResourceProperty;
 import com.zutubi.pulse.core.model.ResourceVersion;
-import com.zutubi.pulse.core.FileLoadException;
+import com.zutubi.pulse.model.persistence.ResourceDao;
+import com.zutubi.pulse.model.persistence.hibernate.MasterPersistenceTestCase;
 
 /**
  * <class comment/>
@@ -34,7 +34,7 @@ public class DatabaseResourceRepositoryTest extends MasterPersistenceTestCase
     public void testAddResource()
     {
         Resource resource = new Resource("a");
-        resource.addProperty(new ResourceProperty("p", "v", false, false));
+        resource.addProperty(new ResourceProperty("p", "v", false, false, false));
 
         repository.addResource(resource);
         commitAndRefreshTransaction();
@@ -53,13 +53,13 @@ public class DatabaseResourceRepositoryTest extends MasterPersistenceTestCase
     public void testAddResourceOverwrite()
     {
         Resource original = new Resource("a");
-        original.addProperty(new ResourceProperty("p", "v", false, false));
+        original.addProperty(new ResourceProperty("p", "v", false, false, false));
 
         repository.addResource(original);
         commitAndRefreshTransaction();
 
         Resource update = new Resource("a");
-        update.addProperty(new ResourceProperty("p", "value", true, true));
+        update.addProperty(new ResourceProperty("p", "value", true, true, true));
 
         // check that overwrite works.
         repository.addResource(update, true);
@@ -90,7 +90,7 @@ public class DatabaseResourceRepositoryTest extends MasterPersistenceTestCase
     {
         Resource resource = new Resource("a");
         ResourceVersion version = new ResourceVersion("b");
-        version.addProperty(new ResourceProperty("p", "v", false, false));
+        version.addProperty(new ResourceProperty("p", "v", false, false, false));
         resource.add(version);
         
         repository.addResource(resource);
@@ -114,7 +114,7 @@ public class DatabaseResourceRepositoryTest extends MasterPersistenceTestCase
     {
         Resource resource = new Resource("a");
         ResourceVersion version = new ResourceVersion("b");
-        version.addProperty(new ResourceProperty("p", "v", false, false));
+        version.addProperty(new ResourceProperty("p", "v", false, false, false));
         resource.add(version);
 
         repository.addResource(resource);
@@ -122,7 +122,7 @@ public class DatabaseResourceRepositoryTest extends MasterPersistenceTestCase
 
         Resource updatedResource = new Resource("a");
         ResourceVersion updatedVersion = new ResourceVersion("b");
-        updatedVersion.addProperty(new ResourceProperty("p", "value", true, true));
+        updatedVersion.addProperty(new ResourceProperty("p", "value", true, true, true));
         updatedResource.add(updatedVersion);
 
         repository.addResource(updatedResource, true);

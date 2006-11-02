@@ -66,25 +66,25 @@ public class StandardTemplateResourceConstructor implements ResourceConstructor
             ResourceVersion version = new ResourceVersion(home.getName());
             resource.add(version);
 
-            version.addProperty(new ResourceProperty((resourceName + "_HOME").toUpperCase(), home.getCanonicalPath(), true, false));
+            version.addProperty(new ResourceProperty((resourceName + "_HOME").toUpperCase(), home.getCanonicalPath(), true, false, false));
 
             // configure the binary directory for this version.
             File binDir = new File(home, "bin");
-            version.addProperty(new ResourceProperty(resourceName + ".bin.dir", binDir.getAbsolutePath(), false, true));
+            version.addProperty(new ResourceProperty(resourceName + ".bin.dir", binDir.getAbsolutePath(), false, true, false));
 
             if (SystemUtils.IS_WINDOWS)
             {
-                version.addProperty(new ResourceProperty(resourceName + ".bin", new File(binDir, scriptName + ".bat").getCanonicalPath(), false, false));
+                version.addProperty(new ResourceProperty(resourceName + ".bin", new File(binDir, scriptName + ".bat").getCanonicalPath(), false, false, false));
             }
             else
             {
-                version.addProperty(new ResourceProperty(resourceName + ".bin", new File(binDir, scriptName).getCanonicalPath(), false, false));
+                version.addProperty(new ResourceProperty(resourceName + ".bin", new File(binDir, scriptName).getCanonicalPath(), false, false, false));
             }
 
             File lib = new File(home, "lib");
             if (lib.isDirectory())
             {
-                version.addProperty(new ResourceProperty(resourceName + ".lib.dir", lib.getAbsolutePath(), false, false));
+                version.addProperty(new ResourceProperty(resourceName + ".lib.dir", lib.getAbsolutePath(), false, false, false));
             }
             return resource;
         }

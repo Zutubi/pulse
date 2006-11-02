@@ -2,7 +2,6 @@ package com.zutubi.pulse.resources;
 
 import com.zutubi.pulse.core.model.Resource;
 import com.zutubi.pulse.core.model.ResourceProperty;
-import com.zutubi.pulse.util.FileSystemUtils;
 import com.zutubi.pulse.util.SystemUtils;
 
 import java.io.File;
@@ -58,7 +57,7 @@ public class ResourceDiscoverer
         if (makeBin != null)
         {
             Resource makeResource = new Resource("make");
-            makeResource.addProperty(new ResourceProperty("make.bin", makeBin.getAbsolutePath(), false, false));
+            makeResource.addProperty(new ResourceProperty("make.bin", makeBin.getAbsolutePath(), false, false, false));
             resources.add(makeResource);
         }
     }
