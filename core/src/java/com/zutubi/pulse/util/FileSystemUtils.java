@@ -700,6 +700,16 @@ public class FileSystemUtils
 
     public static String composeFilename(String... parts)
     {
+        return composeParts(File.separatorChar, parts);
+    }
+
+    public static String composeSearchPath(String ...parts)
+    {
+        return composeParts(File.pathSeparatorChar, parts);        
+    }
+
+    private static String composeParts(char separatorChar, String... parts)
+    {
         String result = "";
         boolean first = true;
 
@@ -712,7 +722,7 @@ public class FileSystemUtils
             }
             else
             {
-                result = result + File.separatorChar + part;
+                result = result + separatorChar + part;
             }
         }
         return result;

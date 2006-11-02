@@ -17,6 +17,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -75,7 +76,7 @@ public class RecipeProcessor
             if (bootstrapResult.succeeded())
             {
                 // Now we can load the recipe from the pulse file
-                PulseFile pulseFile = loadPulseFile(request, paths.getBaseDir(), resourceRepository);
+                PulseFile pulseFile = loadPulseFile(request, paths.getBaseDir(), resourceRepository, context);
                 Recipe recipe;
 
                 String recipeName = request.getRecipeName();
@@ -214,12 +215,16 @@ public class RecipeProcessor
         }
     }
 
-    private PulseFile loadPulseFile(RecipeRequest request, File baseDir, ResourceRepository resourceRepository) throws BuildException
+    private PulseFile loadPulseFile(RecipeRequest request, File baseDir, ResourceRepository resourceRepository, BuildContext buildContext) throws BuildException
     {
         Scope globalScope = new Scope();
-        Property property = new Property("base.dir", baseDir.getAbsolutePath());
-        globalScope.add(property);
+        globalScope.add(new Property("base.dir", baseDir.getAbsolutePath()));
+        if(buildContext != null)
+        {
+            globalScope.add(new Property("build.number", Long.toString(buildContext.getBuildNumber())));
+        }
 
+        addEnvironment(globalScope);
         importResources(resourceRepository, request.getResourceRequirements(), globalScope);
 
         InputStream stream = null;
@@ -245,6 +250,15 @@ public class RecipeProcessor
         finally
         {
             IOUtils.close(stream);
+        }
+    }
+
+    private void addEnvironment(Scope globalScope)
+    {
+        Map<String, String> env = System.getenv();
+        for(Map.Entry<String, String> var: env.entrySet())
+        {
+            globalScope.addEnvironmentProperty(var.getKey(), var.getValue());
         }
     }
 

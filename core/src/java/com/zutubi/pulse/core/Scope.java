@@ -2,7 +2,9 @@ package com.zutubi.pulse.core;
 
 import com.zutubi.pulse.core.model.Property;
 import com.zutubi.pulse.core.model.ResourceProperty;
+import com.zutubi.pulse.util.logging.Logger;
 
+import java.io.File;
 import java.util.*;
 
 /**
@@ -10,19 +12,12 @@ import java.util.*;
  */
 public class Scope
 {
+    private static final Logger LOG = Logger.getLogger(Scope.class);
+    private static final boolean RETAIN_ENVIRONMENT_CASE = System.getProperty("pulse.retain.environment.case") != null;
+
     private Scope parent;
 
-    private Map<String, Reference> references = new LinkedHashMap<String, Reference>();
-    /**
-     * Variables to add to the environment when launching child processes in
-     * this scope.
-     */
-    private Map<String, String> environment = new TreeMap<String, String>();
-    /**
-     * Directories search before the PATH when launching child processed in this
-     * scope.
-     */
-    private Map<String, String> pathDirectories = new TreeMap<String, String>();
+    private List<ReferenceInfo> references = new LinkedList<ReferenceInfo>();
 
     public Scope()
     {
@@ -39,52 +34,102 @@ public class Scope
         return parent;
     }
 
-    public Map<String, Reference> getReferences()
-    {
-        return references;
-    }
-
     public boolean containsReference(String name)
     {
-        if (references.containsKey(name))
-        {
-            return true;
-        }
-        else if (parent != null)
-        {
-            return parent.containsReference(name);
-        }
-        return false;
+        return getReference(name) != null;
     }
 
     public Reference getReference(String name)
     {
-        if (references.containsKey(name))
+        if(name.startsWith("env."))
         {
-            return references.get(name);
+            if(name.equalsIgnoreCase("env.path"))
+            {
+                return lookupPath(name);
+            }
+            else
+            {
+                return lookupEnvironment(name);
+            }
         }
-        else if (parent != null)
+
+        ReferenceInfo info = directLookup(name, references);
+        if(info != null)
+        {
+            return info.reference;
+        }
+        else if(parent != null)
         {
             return parent.getReference(name);
         }
+
+        return null;
+    }
+
+    private Reference lookupPath(String name)
+    {
+        List<ReferenceInfo> merged = new LinkedList<ReferenceInfo>();
+        merge(merged);
+
+        ReferenceInfo info = directLookup(name, merged, false);
+        String value;
+        if(info == null || !(info.reference.getValue() instanceof String))
+        {
+            value = "";
+        }
         else
         {
-            return null;
+            value = (String) info.reference.getValue();
+        }
+
+        return new Property(name, getPathPrefix() + value);
+    }
+
+    private Reference lookupEnvironment(String name)
+    {
+        List<ReferenceInfo> merged = new LinkedList<ReferenceInfo>();
+        merge(merged);
+
+        Map<String, String> env = getEnvironment(merged);
+        String var = name.substring(4);
+        String value = env.get(var);
+        
+        if(value == null)
+        {
+            ReferenceInfo info = directLookup(name, merged);
+            if(info == null)
+            {
+                return null;
+            }
+            else
+            {
+                return info.reference;
+            }
+        }
+        else
+        {
+            return new Property(name, value);
         }
     }
 
     public void setReference(Reference reference) throws FileLoadException
     {
-        if (references.containsKey(reference.getName()))
+        if(directLookup(reference.getName(), references) != null)
         {
             throw new FileLoadException("'" + reference.getName() + "' is already defined in this scope.");
         }
+
         add(reference);
     }
 
     public void add(Reference reference)
     {
-        references.put(reference.getName(), reference);
+        add(new ReferenceInfo(reference));
+    }
+
+    private void add(ReferenceInfo info)
+    {
+        references.add(0, info);
     }
 
     public <V extends Reference> void add(List<V> references) throws FileLoadException
@@ -105,26 +150,54 @@ public class Scope
 
     public Map<String, String> getEnvironment()
     {
-        Map<String, String> merged = new TreeMap<String, String>();
-        if(parent != null)
-        {
-            merged.putAll(parent.getEnvironment());
-        }
+        List<ReferenceInfo> merged = new LinkedList<ReferenceInfo>();
+        merge(merged);
 
-        merged.putAll(environment);
-        return merged;
+        return getEnvironment(merged);
     }
 
-    public Map<String, String> getPathDirectories()
+    private Map<String, String> getEnvironment(List<ReferenceInfo> merged)
     {
-        Map<String, String> merged = new TreeMap<String, String>();
-        if(parent != null)
+        Map<String, String> env = new TreeMap<String, String>();
+        for(ReferenceInfo i: merged)
         {
-            merged.putAll(parent.getPathDirectories());
+            if(i.addToEnvironment)
+            {
+                env.put(i.reference.getName(), (String) i.reference.getValue());
+            }
         }
 
-        merged.putAll(pathDirectories);
-        return merged;
+        return env;
+    }
+
+    public List<String> getPathDirectories()
+    {
+        List<ReferenceInfo> merged = new LinkedList<ReferenceInfo>();
+        merge(merged);
+
+        List<String> dirs = new LinkedList<String>();
+        for(ReferenceInfo i: merged)
+        {
+            if(i.addToPath)
+            {
+                dirs.add((String) i.reference.getValue());
+            }
+        }
+
+        return dirs;
+    }
+
+    public String getPathPrefix()
+    {
+        String result = "";
+        
+        for(String dir: getPathDirectories())
+        {
+            result += dir;
+            result += File.pathSeparatorChar;
+        }
+
+        return result;
     }
 
     public void add(Collection<ResourceProperty> properties)
@@ -137,17 +210,103 @@ public class Scope
 
     public void add(ResourceProperty resourceProperty)
     {
-        Property property = new Property(resourceProperty.getName(), resourceProperty.getValue());
-        add(property);
-
-        if(resourceProperty.getAddToEnvironment())
+        try
         {
-            environment.put(property.getName(), property.getValue());
+            add(new ReferenceInfo(resourceProperty));
+        }
+        catch (FileLoadException e)
+        {
+            // Should never happen as we allow unresolved
+            LOG.severe("Internal error: " + e.getMessage(), e);
+        }
+    }
+
+    /**
+     * Adds a special env. property to this scope to store the value of an
+     * environment variable.
+     *
+     * @param name  the name of the environment variable, to which "env." is
+     *              prepended to make the property name
+     * @param value the value of the variable
+     */
+    public void addEnvironmentProperty(String name, String value)
+    {
+        if(!RETAIN_ENVIRONMENT_CASE)
+        {
+            name = name.toUpperCase();
         }
 
-        if(resourceProperty.getAddToPath())
+        add(new Property("env." + name, value));
+    }
+
+    private ReferenceInfo directLookup(String name, List<ReferenceInfo> references)
+    {
+        return directLookup(name, references, true);
+    }
+
+    private ReferenceInfo directLookup(String name, List<ReferenceInfo> references, boolean caseSensitive)
+    {
+        if(!caseSensitive)
         {
-            pathDirectories.put(property.getName(), property.getValue());
+            name = name.toLowerCase();
+        }
+
+        for(ReferenceInfo i: references)
+        {
+            String referenceName = i.reference.getName();
+            if(!caseSensitive)
+            {
+                referenceName = referenceName.toLowerCase();
+            }
+
+            if(referenceName.equals(name))
+            {
+                return i;
+            }
+        }
+
+        return null;
+    }
+
+    private void merge(List<ReferenceInfo> merged)
+    {
+        for(ReferenceInfo i: references)
+        {
+            if(directLookup(i.reference.getName(), merged) == null)
+            {
+                merged.add(i);
+            }
+        }
+
+        if(parent != null)
+        {
+            parent.merge(merged);
+        }
+    }
+
+    private class ReferenceInfo
+    {
+        public Reference reference;
+        public boolean addToPath;
+        public boolean addToEnvironment;
+
+        public ReferenceInfo(Reference reference)
+        {
+            this.reference = reference;
+            addToPath = false;
+            addToEnvironment = false;
+        }
+
+        public ReferenceInfo(ResourceProperty p) throws FileLoadException
+        {
+            this.reference = new Property(p.getName(), VariableHelper.replaceVariables(p.getValue(), Scope.this, true));
+            this.addToPath = p.getAddToPath();
+            this.addToEnvironment = p.getAddToEnvironment();
+        }
+
+        public String toString()
+        {
+            return reference.getName() + " -> " + reference.getValue() + " [path: " + addToPath + ", env: " + addToEnvironment + "]";
         }
     }
 }

@@ -287,7 +287,7 @@ public class ExecutableCommand implements Command, ScopeAware
         File exeFile = new File(exe);
         if (!exeFile.isAbsolute())
         {
-            exeFile = SystemUtils.findInPath(exe, scope == null ? null : scope.getPathDirectories().values());
+            exeFile = SystemUtils.findInPath(exe, scope == null ? null : scope.getPathDirectories());
             if (exeFile != null)
             {
                 binary = exeFile.getAbsolutePath();
@@ -342,14 +342,17 @@ public class ExecutableCommand implements Command, ScopeAware
              * property. This is required because on Windows, the PATH variable is actually in the map as Path, and
              * so is not matched. 
              */
-            String translatedKey = translateKey(ENV_PATH, childEnvironment);
-            String path = childEnvironment.get(translatedKey);
+            String pathKey = ENV_PATH;
+            String pathValue = scope.getPathPrefix();
 
-            for(String dir: scope.getPathDirectories().values())
+            String translatedKey = translateKey(ENV_PATH, childEnvironment);
+            if (translatedKey != null)
             {
-                path = dir + File.pathSeparatorChar + path;
+                String path = childEnvironment.get(translatedKey);
+                pathValue = pathValue + path;
             }
-            childEnvironment.put(translatedKey, path);
+
+            childEnvironment.put(pathKey, pathValue);
         }
 
         for (Environment setting : env)

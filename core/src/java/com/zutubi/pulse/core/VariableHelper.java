@@ -209,8 +209,7 @@ public class VariableHelper
         return replaceVariables(input, properties, false);
     }
 
-    public static String replaceVariables(String input, Scope properties, boolean allowUnresolved)
-            throws FileLoadException
+    public static String replaceVariables(String input, Scope properties, boolean allowUnresolved) throws FileLoadException
     {
         StringBuilder result = new StringBuilder();
 
