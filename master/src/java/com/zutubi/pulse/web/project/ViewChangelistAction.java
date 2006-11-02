@@ -19,9 +19,15 @@ public class ViewChangelistAction extends ActionSupport
     private BuildManager buildManager;
     private ProjectManager projectManager;
     private CommitMessageHelper commitMessageHelper;
-    private long buildId;
+
+    /** If we drilled down from the project, this is the project ID */
+    private long projectId;
+    private Project project;
+
     /** This is the build result we have drilled down from, if any. */
     private BuildResult buildResult;
+    private long buildId;
+
     /** All builds affected by this change. */
     private List<BuildResult> buildResults;
 
@@ -33,6 +39,21 @@ public class ViewChangelistAction extends ActionSupport
     public void setId(long id)
     {
         this.id = id;
+    }
+
+    public long getProjectId()
+    {
+        return projectId;
+    }
+
+    public void setProjectId(long projectId)
+    {
+        this.projectId = projectId;
+    }
+
+    public Project getProject()
+    {
+        return project;
     }
 
     public long getBuildId()
@@ -96,6 +117,11 @@ public class ViewChangelistAction extends ActionSupport
 
     public String execute()
     {
+        if(projectId != 0)
+        {
+            project = projectManager.getProject(projectId);    
+        }
+
         if(buildId != 0)
         {
             // It is valid to have no build ID set: we may not be viewing

@@ -72,7 +72,7 @@
             #dynamicCell($change.user)
             #dateCell($change)
             #commitCommentCell($change)
-            #linkCell("view.$change.id" "view" "viewChangelist.action?id=$change.id&buildId=$result.id")
+            #linkCell("view.$change.id" "view" "viewChangelist.action?id=$change.id&amp;buildId=$result.id")
         </tr>
         #if($change.changes.size() > 0)
         <tr>

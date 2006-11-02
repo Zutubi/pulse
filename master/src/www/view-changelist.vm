@@ -2,14 +2,22 @@
 #authorisationTags($principle)
 #if($buildResult)
     #buildTags($buildResult.project $buildResult)
+#elseif($project)
+    #projectTags($project)
 #end
 <html>
 <head>
     <title>#wwtext("name=changelist") $changelist.revision</title>
 </head>
 <body>
-    <div id="pagecontent">
-    
+#if($buildResult)
+    #buildTabs($buildResult "changes")
+#elseif($project)
+    #projectTabs("home")
+#else
+    #dashboardTabs("homepage")
+#end
+
     <h1>:: #wwtext("name=changelist") $changelist.revision ::</h1>
 
     <table class="content">
@@ -63,5 +71,5 @@
 #end
     </table>
 
-    </div>
+    #tabEnd()
 </html>
