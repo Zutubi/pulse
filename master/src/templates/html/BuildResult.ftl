@@ -182,7 +182,7 @@ pre.feature {
             [@classCell cc=child.result.stateName?lower_case/]
             [@classCell cc=child.result.stamps.prettyStartTime/]
             [@classCell cc=child.result.stamps.prettyElapsed/]
-            [@linkCell cc="view" url="${baseUrl}/commandLog.action?id=${result.id?c}&amp;selectedNode=${child.id?c}"/]
+            [@linkCell cc="view" url="${baseUrl}/viewCommandLog.action?id=${result.id?c}&amp;selectedNode=${child.id?c}"/]
         </tr>
 [/#list]
     </table>
