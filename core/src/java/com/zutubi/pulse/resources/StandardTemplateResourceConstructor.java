@@ -35,7 +35,7 @@ public class StandardTemplateResourceConstructor implements ResourceConstructor
 
     public boolean isResourceHome(File home)
     {
-        if (!home.isDirectory())
+        if (home == null || !home.isDirectory())
         {
             return false;
         }

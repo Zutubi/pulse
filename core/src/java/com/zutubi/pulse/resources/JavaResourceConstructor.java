@@ -22,12 +22,12 @@ public class JavaResourceConstructor implements ResourceConstructor
 
     public boolean isResourceHome(String home)
     {
-        return isResourceHome(new File(home));
+        return home != null && isResourceHome(new File(home));
     }
 
     public boolean isResourceHome(File home)
     {
-        if (!home.isDirectory())
+        if (home == null || !home.isDirectory())
         {
             return false;
         }
