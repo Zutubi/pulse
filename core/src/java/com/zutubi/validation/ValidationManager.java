@@ -5,7 +5,5 @@ package com.zutubi.validation;
  */
 public interface ValidationManager
 {
-    void validate(Object o) throws ValidationException;
-
     void validate(Object o, ValidationContext context) throws ValidationException;
 }

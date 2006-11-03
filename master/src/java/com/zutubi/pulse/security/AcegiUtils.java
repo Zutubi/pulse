@@ -24,6 +24,11 @@ public class AcegiUtils
         SecurityContextHolder.getContext().setAuthentication(targetUserRequest);
     }
 
+    public static void logout()
+    {
+        SecurityContextHolder.getContext().setAuthentication(null);
+    }
+
     /**
      * Returns the username for the currently-logged-in User.
      *

@@ -65,8 +65,6 @@ public class Project extends Entity implements AclObjectIdentity, AclObjectIdent
         this.description = description;
         this.pulseFileDetails = pulseFileDetails;
         this.addCleanupRule(new CleanupRule(true, null, DEFAULT_WORK_DIR_BUILDS, CleanupRule.CleanupUnit.BUILDS));
-
-        aclEntries = new LinkedList<ProjectAclEntry>();
     }
 
     /**
@@ -125,7 +123,7 @@ public class Project extends Entity implements AclObjectIdentity, AclObjectIdent
         }
 
         copy.aclEntries = new LinkedList<ProjectAclEntry>();
-        for(ProjectAclEntry acl: aclEntries)
+        for(ProjectAclEntry acl: getAclEntries())
         {
             copy.aclEntries.add(acl.copy(copy));
         }
@@ -428,6 +426,10 @@ public class Project extends Entity implements AclObjectIdentity, AclObjectIdent
 
     public List<ProjectAclEntry> getAclEntries()
     {
+        if (aclEntries == null)
+        {
+            aclEntries = new LinkedList<ProjectAclEntry>();
+        }
         return aclEntries;
     }
 
@@ -438,7 +440,7 @@ public class Project extends Entity implements AclObjectIdentity, AclObjectIdent
 
     public boolean hasAdmin(String login)
     {
-        for(ProjectAclEntry acl: aclEntries)
+        for(ProjectAclEntry acl: getAclEntries())
         {
             if(acl.getRecipient().equals(login))
             {
@@ -453,14 +455,14 @@ public class Project extends Entity implements AclObjectIdentity, AclObjectIdent
     {
         if(!hasAdmin(recipient))
         {
-            aclEntries.add(new ProjectAclEntry(recipient, this, ProjectAclEntry.WRITE));
+            getAclEntries().add(new ProjectAclEntry(recipient, this, ProjectAclEntry.WRITE));
         }
     }
 
     public void removeAdmin(String login)
     {
         ProjectAclEntry remove = null;
-        for(ProjectAclEntry entry: aclEntries)
+        for(ProjectAclEntry entry: getAclEntries())
         {
             if(entry.getRecipient().equals(login))
             {
@@ -471,7 +473,7 @@ public class Project extends Entity implements AclObjectIdentity, AclObjectIdent
 
         if(remove != null)
         {
-            aclEntries.remove(remove);
+            getAclEntries().remove(remove);
         }
     }
 

@@ -8,9 +8,17 @@ import com.zutubi.pulse.agent.AgentManager;
 import com.zutubi.pulse.bootstrap.ComponentContext;
 import com.zutubi.pulse.core.model.ResultState;
 import com.zutubi.pulse.license.LicenseException;
+import com.zutubi.pulse.license.LicenseHolder;
 import com.zutubi.pulse.model.*;
 import com.zutubi.pulse.scm.SCMConfiguration;
+import com.zutubi.pulse.security.AcegiUtils;
 import com.zutubi.pulse.util.TimeStamps;
+import com.zutubi.pulse.validation.PulseValidationContext;
+import com.zutubi.validation.ValidationContext;
+import com.zutubi.validation.ValidationException;
+import com.zutubi.validation.ValidationManager;
+import ognl.Ognl;
+import ognl.OgnlException;
 
 import java.util.*;
 
@@ -27,6 +35,8 @@ public class RemoteApi
     private ProjectManager projectManager;
     private UserManager userManager;
     private AgentManager agentManager;
+
+    private ValidationManager validationManager;
 
     public RemoteApi()
     {
@@ -107,7 +117,7 @@ public class RemoteApi
         Vector<Hashtable<String, Object>> result = new Vector<Hashtable<String, Object>>(1);
 
         tokenManager.verifyUser(token);
-        Project project = getProject(projectName);
+        Project project = internalGetProject(projectName);
         BuildResult build = buildManager.getByProjectAndNumber(project, id);
         if (build == null)
         {
@@ -121,12 +131,12 @@ public class RemoteApi
     public Vector<Hashtable<String, Object>> getLatestBuildsForProject(String token, String projectName, String buildSpecification, boolean completedOnly, int maxResults) throws AuthenticationException
     {
         tokenManager.verifyUser(token);
-        Project project = getProject(projectName);
+        Project project = internalGetProject(projectName);
 
         String[] specs = null;
         if (TextUtils.stringSet(buildSpecification))
         {
-            specs = new String[] { buildSpecification };
+            specs = new String[]{buildSpecification};
         }
 
         ResultState[] states = null;
@@ -135,7 +145,7 @@ public class RemoteApi
             states = ResultState.getCompletedStates();
         }
 
-        List<BuildResult> builds = buildManager.queryBuilds(new Project[] { project }, states, specs, -1, -1, null, 0, maxResults, true);
+        List<BuildResult> builds = buildManager.queryBuilds(new Project[]{project}, states, specs, -1, -1, null, 0, maxResults, true);
         Vector<Hashtable<String, Object>> result = new Vector<Hashtable<String, Object>>(builds.size());
         for (BuildResult build : builds)
         {
@@ -234,7 +244,7 @@ public class RemoteApi
         try
         {
             tokenManager.loginUser(token);
-            Project project = getProject(projectName);
+            Project project = internalGetProject(projectName);
             getBuildSpecification(project, buildSpecification);
             projectManager.triggerBuild(project, buildSpecification, new RemoteTriggerBuildReason(), null, true);
             return true;
@@ -248,14 +258,14 @@ public class RemoteApi
     public String getProjectState(String token, String projectName) throws AuthenticationException
     {
         tokenManager.verifyUser(token);
-        Project project = getProject(projectName);
+        Project project = internalGetProject(projectName);
         return project.getState().toString().toLowerCase();
     }
 
     public Hashtable<String, String> preparePersonalBuild(String token, String projectName, String buildSpecification) throws AuthenticationException
     {
         tokenManager.verifyRoleIn(token, GrantedAuthority.PERSONAL);
-        Project project = getProject(projectName);
+        Project project = internalGetProject(projectName);
         getBuildSpecification(project, buildSpecification);
 
         Hashtable<String, String> scmDetails = new Hashtable<String, String>();
@@ -269,7 +279,7 @@ public class RemoteApi
         try
         {
             tokenManager.loginUser(token);
-            Project project = getProject(projectName);
+            Project project = internalGetProject(projectName);
             if (project.isPaused())
             {
                 return false;
@@ -291,7 +301,7 @@ public class RemoteApi
         try
         {
             tokenManager.loginUser(token);
-            Project project = getProject(projectName);
+            Project project = internalGetProject(projectName);
             if (project.isPaused())
             {
                 projectManager.resumeProject(project);
@@ -311,6 +321,7 @@ public class RemoteApi
     public boolean addAgent(String token, String name, String host, int port) throws AuthenticationException, LicenseException
     {
         tokenManager.verifyAdmin(token);
+        LicenseHolder.ensureAuthorization(LicenseHolder.AUTH_ADD_AGENT);
 
         if (!TextUtils.stringSet(name) || agentManager.agentExists(name))
         {
@@ -416,12 +427,19 @@ public class RemoteApi
      * @return true if the request is successful
      *
      * @throws AuthenticationException if you are not authorised to execute this action.
+     * @throws LicenseException        if you are not licensed to execute this action.
      */
-    public boolean createUser(String token, Hashtable<String, Object> user) throws AuthenticationException
+    public boolean createUser(String token, Hashtable<String, Object> user) throws AuthenticationException, LicenseException
     {
         tokenManager.verifyAdmin(token);
+        LicenseHolder.ensureAuthorization(LicenseHolder.AUTH_ADD_USER);
 
         // validate the user details.
+        User existingUser = userManager.getUser((String) user.get("login"));
+        if (existingUser != null)
+        {
+            return false;
+        }
 
         User instance = new User();
         instance.setLogin((String) user.get("login"));
@@ -437,26 +455,187 @@ public class RemoteApi
     /**
      * Delete the specified user.
      *
-     * @param token     used to authenticate the request.
-     * @param login     identifies the user to be deleted.
-     *
+     * @param token used to authenticate the request.
+     * @param login identifies the user to be deleted.
      * @return true if the request is successful, false otherwise.
-     *
      * @throws AuthenticationException is you are not authorised to execute this request.
+     *
+     * @throws ValidationException if no user with the specified login exists.
      */
-    public boolean deleteUser(String token, String login) throws AuthenticationException
+    public boolean deleteUser(String token, String login) throws AuthenticationException, ValidationException
     {
         tokenManager.verifyAdmin(token);
 
         User user = userManager.getUser(login);
-        if (user != null)
+        if (user == null)
         {
-            userManager.delete(user);
+            throw new ValidationException(String.format("Unknown user login: '%s'", login));
+        }
+        userManager.delete(user);
+        return true;
+    }
+
+    /**
+     * Create a new project.
+     *
+     * @param token     used to authenticate the request.
+     * @param project   the project details
+     * @param scm       the scm details
+     * @param type      the project type details
+     *
+     * @return true if the request is successful, false otherwise.
+     * 
+     * @throws AuthenticationException  if you are not authorised to execute this action.
+     * @throws LicenseException         if you are not licensed to execute this action.
+     * @throws ValidationException      if a validation error is detected.
+     */
+    public boolean createProject(String token, Hashtable<String, Object> project, Hashtable<String, Object> scm, Hashtable<String, Object> type) throws AuthenticationException, LicenseException, ValidationException
+    {
+        User user = tokenManager.verifyAdmin(token);
+        try
+        {
+            AcegiUtils.loginAs(user);
+
+            Project existingProject = projectManager.getProject((String) project.get("name"));
+            if (existingProject != null)
+            {
+                return false;
+            }
+
+            Project newProject = new Project();
+            setProperties(project, newProject);
+            validate(newProject);
+
+            // lookup scm.
+            Scm newScm = createScm(scm);
+            validate(newScm);
+            newProject.setScm(newScm);
+
+            // set the details.
+            PulseFileDetails newType = createFileDetails(type);
+            validate(newType);
+            newProject.setPulseFileDetails(newType);
+
+            // set the details.
+            projectManager.create(newProject);
+
             return true;
         }
-
-        return false;
+        finally
+        {
+            AcegiUtils.logout();
+        }
     }
+
+    /**
+     * Delete the specified project.
+     *
+     * @param token used to authenticate the request.
+     * @param name  the name of the project to be deleted.
+     * @return true if the request is successful, false otherwise.
+     *
+     * @throws AuthenticationException if you are not authorised to execute this request.
+     *
+     * @throws ValidationException if no project with the specified name exists.
+     */
+    public boolean deleteProject(String token, String name) throws AuthenticationException, ValidationException
+    {
+        tokenManager.loginUser(token);
+        try
+        {
+            Project project = projectManager.getProject(name);
+            if (project == null)
+            {
+                throw new ValidationException(String.format("Unknown project name: '%s'", name));
+            }
+
+            projectManager.delete(project);
+            return true;
+        }
+        finally
+        {
+            tokenManager.logoutUser();
+        }
+    }
+
+    public boolean editProject(String token, String name, Hashtable<String, Object> projectDetails) throws AuthenticationException, ValidationException
+    {
+        tokenManager.loginUser(token);
+        try
+        {
+            Project project = projectManager.getProject(name);
+            if (project == null)
+            {
+                throw new ValidationException(String.format("Unknown project name: '%s'", name));
+            }
+            
+            // are we changing the name of the project? if so, then we need to check that the new name is not already in use.
+            if (projectDetails.containsKey("name"))
+            {
+                String newName = (String) projectDetails.get("name");
+                if (!name.equals(newName) && projectManager.getProject(newName) != null)
+                {
+                    throw new ValidationException(String.format("The name '%s' is already in use by another project. Please select a different name.", newName));
+                }
+            }
+
+            setProperties(projectDetails, project);
+            validate(project);
+
+            projectManager.save(project);
+
+            return true;
+        }
+        finally
+        {
+            tokenManager.logoutUser();
+        }
+    }
+
+    /**
+     * Get the details for the specified project.
+     *
+     * @param name is the name of the project to be retrieved.
+     * @param token used to authenticate the request.
+     *
+     * @return a mapping of the projects details.
+     *
+     * @throws IllegalArgumentException if the specified name does not reference a project.
+     * @throws AuthenticationException if you are not authorised to execute this request.
+     */
+    public Hashtable<String, Object> getProject(String token, String name) throws IllegalArgumentException, AuthenticationException
+    {
+        tokenManager.loginUser(token);
+        try
+        {
+            Project project = projectManager.getProject(name);
+            if (project == null)
+            {
+                throw new IllegalArgumentException(String.format("Unknown project name: '%s'", name));
+            }
+
+            Hashtable<String, Object> details = new Hashtable<String, Object>();
+            details.put("name", project.getName());
+            details.put("description", emptyStringIfNull(project.getDescription()));
+            details.put("url", emptyStringIfNull(project.getUrl()));
+
+            return details;
+        }
+        finally
+        {
+            tokenManager.logoutUser();
+        }
+    }
+
+    private Object emptyStringIfNull(Object obj)
+    {
+        if (obj != null)
+        {
+            return obj;
+        }
+        return "";
+    }
+
 
     /**
      * Deletes all commit message links, primarily for testing purposes.
@@ -477,7 +656,110 @@ public class RemoteApi
         return result;
     }
 
-    private Project getProject(String projectName)
+    private void validate(Object o) throws ValidationException
+    {
+        ValidationContext ctx = new PulseValidationContext(o);
+        validationManager.validate(o, ctx);
+        if (ctx.hasErrors())
+        {
+            if (ctx.hasFieldErrors())
+            {
+                String field = ctx.getFieldErrors().keySet().iterator().next();
+                String message = ctx.getFieldErrors(field).iterator().next();
+                throw new ValidationException(String.format("Field %s is invalid. Reason: %s", field, message));
+            }
+            if (ctx.hasActionErrors())
+            {
+                String message = ctx.getActionErrors().iterator().next();
+                throw new ValidationException(String.format("The following error occured validating your request: %s", message));
+            }
+        }
+    }
+
+    private PulseFileDetails createFileDetails(Hashtable<String, Object> type) throws ValidationException
+    {
+        //TODO: This goes into the project type manager.
+        String projectType = (String) type.remove("type");
+
+        PulseFileDetails details;
+        if ("ant".equals(projectType))
+        {
+            details = new AntPulseFileDetails();
+        }
+        else if ("maven".equals(projectType))
+        {
+            details = new MavenPulseFileDetails();
+        }
+        else if ("maven2".equals(projectType))
+        {
+            details = new Maven2PulseFileDetails();
+        }
+        else if ("xcode".equals(projectType))
+        {
+            details = new XCodePulseFileDetails();
+        }
+        else if ("custom".equals(projectType))
+        {
+            details = new CustomPulseFileDetails();
+        }
+        else if ("versioned".equals(projectType))
+        {
+            details = new VersionedPulseFileDetails();
+        }
+        else
+        {
+            throw new ValidationException("Unknown project type: " + type);
+        }
+        setProperties(type, details);
+        return details;
+    }
+
+    private Scm createScm(Hashtable<String, Object> details) throws ValidationException
+    {
+        //TODO: This goes into the ScmManager.
+        String type = (String) details.remove("type");
+
+        Scm scm;
+        if ("cvs".equals(type))
+        {
+            scm = new Cvs();
+        }
+        else if ("svn".equals(type))
+        {
+            scm = new Svn();
+        }
+        else if ("p4".equals(type))
+        {
+            scm = new P4();
+        }
+        else
+        {
+            throw new ValidationException("Unknown scm type: " + type);
+        }
+
+        setProperties(details, scm);
+
+        return scm;
+    }
+
+    private void setProperties(Hashtable<String, Object> scmDetails, Object object)
+    {
+        Enumeration<String> keys = scmDetails.keys();
+        while (keys.hasMoreElements())
+        {
+            String key = keys.nextElement();
+            try
+            {
+                Ognl.setValue(key, object, scmDetails.get(key));
+            }
+            catch (OgnlException e)
+            {
+                throw new IllegalArgumentException(String.format("Failed to set '%s' on object '%s'. Cause: %s", key, object, e.getMessage()));
+            }
+        }
+    }
+
+    private Project internalGetProject(String projectName)
     {
         Project project = projectManager.getProject(projectName);
         if (project == null)
@@ -501,7 +783,7 @@ public class RemoteApi
     /**
      * Required resource.
      *
-     * @param tokenManager
+     * @param tokenManager instance
      */
     public void setTokenManager(TokenManager tokenManager)
     {
@@ -511,7 +793,7 @@ public class RemoteApi
     /**
      * Required resource.
      *
-     * @param shutdownManager
+     * @param shutdownManager instance
      */
     public void setShutdownManager(ShutdownManager shutdownManager)
     {
@@ -521,7 +803,7 @@ public class RemoteApi
     /**
      * Required resource.
      *
-     * @param userManager
+     * @param userManager instance
      */
     public void setUserManager(UserManager userManager)
     {
@@ -546,5 +828,10 @@ public class RemoteApi
     public void setAgentManager(AgentManager agentManager)
     {
         this.agentManager = agentManager;
+    }
+
+    public void setValidationManager(ValidationManager validationManager)
+    {
+        this.validationManager = validationManager;
     }
 }

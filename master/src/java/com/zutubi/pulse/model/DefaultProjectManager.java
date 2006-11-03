@@ -10,17 +10,15 @@ import com.zutubi.pulse.events.EventManager;
 import com.zutubi.pulse.events.build.BuildRequestEvent;
 import com.zutubi.pulse.events.build.PersonalBuildRequestEvent;
 import com.zutubi.pulse.license.LicenseManager;
+import com.zutubi.pulse.license.LicenseHolder;
+import com.zutubi.pulse.license.LicenseException;
 import com.zutubi.pulse.license.authorisation.AddProjectAuthorisation;
-import com.zutubi.pulse.model.persistence.BuildSpecificationDao;
-import com.zutubi.pulse.model.persistence.CommitMessageTransformerDao;
-import com.zutubi.pulse.model.persistence.ProjectDao;
-import com.zutubi.pulse.model.persistence.TriggerDao;
+import com.zutubi.pulse.model.persistence.*;
 import com.zutubi.pulse.personal.PatchArchive;
-import com.zutubi.pulse.scheduling.Scheduler;
-import com.zutubi.pulse.scheduling.SchedulingException;
-import com.zutubi.pulse.scheduling.Trigger;
+import com.zutubi.pulse.scheduling.*;
 import com.zutubi.pulse.scheduling.tasks.BuildProjectTask;
 import com.zutubi.pulse.scm.SCMException;
+import com.zutubi.pulse.scm.SCMChangeEvent;
 import com.zutubi.pulse.util.logging.Logger;
 import org.acegisecurity.annotation.Secured;
 
@@ -36,6 +34,7 @@ public class DefaultProjectManager implements ProjectManager
 
     private ProjectDao projectDao;
     private BuildSpecificationDao buildSpecificationDao;
+    private BuildSpecificationNodeDao buildSpecificationNodeDao;
     private TriggerDao triggerDao;
     private CommitMessageTransformerDao commitMessageTransformerDao;
     private Scheduler scheduler;
@@ -398,12 +397,44 @@ public class DefaultProjectManager implements ProjectManager
         }
     }
 
-    public void create(Project project)
+    public void create(Project project) throws LicenseException
     {
+        LicenseHolder.ensureAuthorization(LicenseHolder.AUTH_ADD_PROJECT);
+
         for(Group group: userManager.getAdminAllProjectGroups())
         {
             project.addAdmin(group.getDefaultAuthority());
         }
+
+        // setup the project defaults.
+
+        BuildSpecification buildSpec = new BuildSpecification("default");
+        project.addBuildSpecification(buildSpec);
+
+        projectDao.save(project);
+
+        // create a simple build specification that executes the default recipe.
+        BuildSpecificationNode parent = buildSpecificationNodeDao.findById(buildSpec.getRoot().getId());
+        BuildStage stage = new BuildStage("default", new AnyCapableBuildHostRequirements(), null);
+        BuildSpecificationNode node = new BuildSpecificationNode(stage);
+        parent.addChild(node);
+        buildSpecificationNodeDao.save(parent);
+
+        // schedule the event trigger - unique to this project.
+        try
+        {
+            EventTrigger trigger = new EventTrigger(SCMChangeEvent.class, "scm trigger", project.getName(), SCMChangeEventFilter.class);
+            trigger.setProject(project.getId());
+            trigger.setTaskClass(BuildProjectTask.class);
+            trigger.getDataMap().put(BuildProjectTask.PARAM_SPEC, "default");
+
+            scheduler.schedule(trigger);
+        }
+        catch (SchedulingException e)
+        {
+            e.printStackTrace();
+        }
+
         projectDao.save(project);
 
         licenseManager.refreshAuthorisations();
@@ -512,5 +543,10 @@ public class DefaultProjectManager implements ProjectManager
     public void setUserManager(UserManager userManager)
     {
         this.userManager = userManager;
+    }
+
+    public void setBuildSpecificationNodeDao(BuildSpecificationNodeDao buildSpecificationNodeDao)
+    {
+        this.buildSpecificationNodeDao = buildSpecificationNodeDao;
     }
 }

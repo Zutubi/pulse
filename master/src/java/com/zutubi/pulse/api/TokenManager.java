@@ -86,9 +86,9 @@ public class TokenManager
         return true;
     }
 
-    public void verifyAdmin(String token) throws AuthenticationException
+    public User verifyAdmin(String token) throws AuthenticationException
     {
-        verifyRoleIn(token, GrantedAuthority.ADMINISTRATOR);
+        return verifyRoleIn(token, GrantedAuthority.ADMINISTRATOR);
     }
 
     public User verifyUser(String token) throws AuthenticationException

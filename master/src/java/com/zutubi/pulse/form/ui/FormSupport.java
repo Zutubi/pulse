@@ -16,6 +16,7 @@ import com.zutubi.pulse.wizard.Wizard;
 import freemarker.template.Configuration;
 import ognl.Ognl;
 import ognl.OgnlException;
+import ognl.NoSuchPropertyException;
 
 import java.io.StringWriter;
 import java.util.Map;
@@ -109,6 +110,10 @@ public class FormSupport
                 {
                     Object value = squeezer.unsqueeze(paramValue);
                     Ognl.setValue(name, obj, value);
+                }
+                catch (NoSuchPropertyException e)
+                {
+                    // ignore.
                 }
                 catch (OgnlException e)
                 {

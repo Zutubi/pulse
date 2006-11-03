@@ -19,7 +19,13 @@
 
     <bean id="annotationDecorator" class="com.zutubi.pulse.form.descriptor.annotation.AnnotationDecorator"/>
 
-    <bean id="validationManager" class="com.zutubi.validation.DefaultValidationManager">
+    <bean id="validationManager" class="com.zutubi.pulse.validation.HybridValidationManager">
+        <property name="validationManager">
+            <ref local="zutubiValidationManager"/>
+        </property>
+    </bean>
+
+    <bean id="zutubiValidationManager" class="com.zutubi.validation.DefaultValidationManager">
         <property name="providers">
             <list>
                 <ref local="annotationValidatorProvider"/>

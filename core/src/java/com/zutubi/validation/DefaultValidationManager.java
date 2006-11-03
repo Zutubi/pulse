@@ -17,11 +17,6 @@ public class DefaultValidationManager implements ValidationManager
     {
     }
 
-    public void validate(Object o) throws ValidationException
-    {
-        validate(o, new DelegatingValidationContext(o));
-    }
-
     public void validate(Object o, ValidationContext context) throws ValidationException
     {
         verify(providers);

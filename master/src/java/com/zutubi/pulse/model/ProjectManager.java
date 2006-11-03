@@ -4,6 +4,7 @@ import com.zutubi.pulse.core.PulseException;
 import com.zutubi.pulse.core.model.Revision;
 import com.zutubi.pulse.personal.PatchArchive;
 import com.zutubi.pulse.scheduling.SchedulingException;
+import com.zutubi.pulse.license.LicenseException;
 import org.acegisecurity.annotation.Secured;
 
 import java.util.List;
@@ -63,7 +64,7 @@ public interface ProjectManager extends EntityManager<Project>
     void resumeProject(Project project);
 
     @Secured({"ROLE_ADMINISTRATOR"})
-    void create(Project project);
+    void create(Project project) throws LicenseException;
 
     @Secured({"ROLE_ADMINISTRATOR"})
     void delete(Project project);

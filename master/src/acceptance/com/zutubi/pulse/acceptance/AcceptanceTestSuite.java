@@ -15,7 +15,12 @@ public class AcceptanceTestSuite
         suite.addTestSuite(SetupAcceptanceTest.class);
 
         // now we can run the rest of the tests.
+
+        //---( xml rpc acceptance tests )---
         suite.addTestSuite(AdminXmlRpcAcceptanceTest.class);
+        suite.addTestSuite(ProjectXmlRpcAcceptanceTest.class);
+
+        //---( web ui acceptance tests )---
         suite.addTestSuite(LicenseAuthorisationAcceptanceTest.class);
         suite.addTestSuite(LicenseManagementAcceptanceTest.class);
         suite.addTestSuite(ProjectAcceptanceTest.class);

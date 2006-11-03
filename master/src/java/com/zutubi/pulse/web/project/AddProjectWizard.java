@@ -4,20 +4,13 @@ import com.opensymphony.util.TextUtils;
 import com.opensymphony.xwork.Validateable;
 import com.zutubi.pulse.core.ResourceRepository;
 import com.zutubi.pulse.license.Licensed;
+import com.zutubi.pulse.license.LicenseException;
 import com.zutubi.pulse.model.*;
-import com.zutubi.pulse.model.persistence.BuildSpecificationNodeDao;
-import com.zutubi.pulse.scheduling.EventTrigger;
-import com.zutubi.pulse.scheduling.SCMChangeEventFilter;
-import com.zutubi.pulse.scheduling.Scheduler;
-import com.zutubi.pulse.scheduling.SchedulingException;
-import com.zutubi.pulse.scheduling.tasks.BuildProjectTask;
-import com.zutubi.pulse.scm.SCMChangeEvent;
 import com.zutubi.pulse.security.AcegiUtils;
 import com.zutubi.pulse.util.logging.Logger;
 import com.zutubi.pulse.web.wizard.BaseWizard;
 import com.zutubi.pulse.web.wizard.BaseWizardState;
 import com.zutubi.pulse.web.wizard.Wizard;
-import com.zutubi.pulse.web.wizard.WizardCompleteState;
 import org.acegisecurity.AccessDeniedException;
 
 import java.util.Map;
@@ -45,8 +38,6 @@ public class AddProjectWizard extends BaseWizard
     private XCodeDetails xcodeDetails;
 
     private ProjectManager projectManager;
-    private BuildSpecificationNodeDao buildSpecificationNodeDao;
-    private Scheduler scheduler;
 
     private long projectId;
 
@@ -137,36 +128,15 @@ public class AddProjectWizard extends BaseWizard
         }
         project.setPulseFileDetails(details);
 
-        BuildSpecification buildSpec = new BuildSpecification("default");
-        project.addBuildSpecification(buildSpec);
-
-        projectManager.create(project);
-        projectId = project.getId();
-
-        // TODO: All of this should be done within a manager.
-
-        // create a simple build specification that executes the default recipe.
-        BuildSpecificationNode parent = buildSpecificationNodeDao.findById(buildSpec.getRoot().getId());
-        BuildStage stage = new BuildStage("default", new AnyCapableBuildHostRequirements(), null);
-        BuildSpecificationNode node = new BuildSpecificationNode(stage);
-        parent.addChild(node);
-        buildSpecificationNodeDao.save(parent);
-
-        // schedule the event trigger - unique to this project.
-        EventTrigger trigger = new EventTrigger(SCMChangeEvent.class, "scm trigger", project.getName(), SCMChangeEventFilter.class);
-        trigger.setProject(project.getId());
-        trigger.setTaskClass(BuildProjectTask.class);
-        trigger.getDataMap().put(BuildProjectTask.PARAM_SPEC, "default");
-
         try
         {
-            scheduler.schedule(trigger);
+            projectManager.create(project);
+            projectId = project.getId();
         }
-        catch (SchedulingException e)
+        catch (LicenseException e)
         {
-            //CIB-169: need to display this error to the user...
-            addActionError(e.getMessage());
-            LOG.severe(e.getMessage(), e);
+            // we already check for this via annotations.
+            e.printStackTrace();
         }
     }
 
@@ -189,19 +159,9 @@ public class AddProjectWizard extends BaseWizard
         return scm;
     }
 
-    public void setScheduler(Scheduler scheduler)
-    {
-        this.scheduler = scheduler;
-    }
-
     public void setProjectManager(ProjectManager projectManager)
     {
         this.projectManager = projectManager;
-    }
-
-    public void setBuildSpecificationNodeDao(BuildSpecificationNodeDao buildSpecificationNodeDao)
-    {
-        this.buildSpecificationNodeDao = buildSpecificationNodeDao;
     }
 
     public long getProjectId()
