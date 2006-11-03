@@ -41,6 +41,21 @@ public class RemoteApi
 
     private ValidationManager validationManager;
 
+    //---( Define the properties that are visible in structs in the remote api. )---
+    private static final Map<Class, String[]> structDefs = new HashMap<Class, String[]>();
+    {
+        structDefs.put(Project.class, new String[]{"name", "description", "url"});
+        structDefs.put(Cvs.class, new String[]{"root", "module", "password", "branch", "quietPeriod", "monitor", "pollingInterval", "changeViewerUrl"});
+        structDefs.put(Svn.class, new String[]{"url", "username", "password", "keyfile", "passphrase", "monitor", "pollingInterval", "changeViewerUrl"});
+        structDefs.put(P4.class, new String[]{"port", "user", "password", "client", "monitor", "pollingInterval", "changeViewerUrl"});
+        structDefs.put(AntPulseFileDetails.class, new String[]{"buildFile", "targets", "arguments", "workDir"});
+        structDefs.put(MavenPulseFileDetails.class, new String[]{"targets", "workDir", "arguments"});
+        structDefs.put(Maven2PulseFileDetails.class, new String[]{"goals", "workDir", "arguments"});
+        structDefs.put(MakePulseFileDetails.class, new String[]{"makefile", "targets", "arguments", "workDir"});
+        structDefs.put(CustomPulseFileDetails.class, new String[]{"pulseFile"});
+        structDefs.put(VersionedPulseFileDetails.class, new String[]{"pulseFileName"});
+    }
+
     public RemoteApi()
     {
         // can remove this call when we sort out autowiring from the XmlRpcServlet.
@@ -620,76 +635,41 @@ public class RemoteApi
                 throw new IllegalArgumentException(String.format("Unknown project name: '%s'", name));
             }
 
-            return extractProjectDetails(project);
+            return extractDetails(project);
         }
         finally
         {
             tokenManager.logoutUser();
         }
-    }
-
-    private Hashtable<String, Object> extractProjectDetails(Project project)
-    {
-        String[] remoteProperties = new String[]{"name", "description", "url"};
-        return extractDetails(remoteProperties, project);
     }
 
     /**
      * Retrieve the scm details for the specified project.
      *
-     * @param token     used to authorise this request.
-     * @param name      the name of the project for which the scm details are being retrieved.
+     * @param token         used to authorise this request.
+     * @param projectName   the name of the project for which the scm details are being retrieved.
      *
      * @return a scm structure. The contents of this are specific to the type of scm.
      *
      * @throws AuthenticationException if you are not authorised to execute this request.
      */
-    public Hashtable<String, Object> getScm(String token, String name) throws AuthenticationException
+    public Hashtable<String, Object> getScm(String token, String projectName) throws AuthenticationException
     {
         try
         {
             tokenManager.loginUser(token);
 
-            Project project = projectManager.getProject(name);
+            Project project = projectManager.getProject(projectName);
             if (project == null)
             {
-                throw new IllegalArgumentException(String.format("Unknown project name: '%s'", name));
+                throw new IllegalArgumentException(String.format("Unknown project name: '%s'", projectName));
             }
 
-            return extractScmDetails(project.getScm());
+            return extractDetails(project.getScm());
         }
         finally
         {
             tokenManager.logoutUser();
-        }
-    }
-
-    private Hashtable<String, Object> extractScmDetails(Scm scm)
-    {
-        if (scm instanceof Cvs)
-        {
-            String[] remoteProperties = new String[]{
-                    "root", "module", "password", "branch", "quietPeriod", "monitor", "pollingInterval", "changeViewerUrl"
-            };
-            return extractDetails(remoteProperties, scm);
-        }
-        else if (scm instanceof Svn)
-        {
-            String[] remoteProperties = new String[]{
-                    "url", "username", "password", "keyfile", "passphrase", "monitor", "pollingInterval", "changeViewerUrl"
-            };
-            return extractDetails(remoteProperties, scm);
-        }
-        else if (scm instanceof P4)
-        {
-            String[] remoteProperties = new String[]{
-                    "port", "user", "password", "client", "monitor", "pollingInterval", "changeViewerUrl"
-            };
-            return extractDetails(remoteProperties, scm);
-        }
-        else
-        {
-            throw new RuntimeException(String.format("Scm of type '%s' is not supported by the remote interface.", scm.getClass().getName()));
         }
     }
 
@@ -707,6 +687,51 @@ public class RemoteApi
 
             setProperties(scmDetails, project.getScm());
             validate(project.getScm());
+
+            projectManager.save(project);
+
+            return true;
+        }
+        finally
+        {
+            tokenManager.logoutUser();
+        }
+    }
+
+    public Hashtable<String, Object> getSpecifics(String token, String name) throws AuthenticationException
+    {
+        try
+        {
+            tokenManager.loginUser(token);
+
+            Project project = projectManager.getProject(name);
+            if (project == null)
+            {
+                throw new IllegalArgumentException(String.format("Unknown project name: '%s'", name));
+            }
+
+            return extractDetails(project.getPulseFileDetails());
+        }
+        finally
+        {
+            tokenManager.logoutUser();
+        }
+    }
+
+    public boolean editSpecifics(String token, String name, Hashtable<String, Object> specifics) throws AuthenticationException, ValidationException
+    {
+        try
+        {
+            tokenManager.loginUser(token);
+
+            Project project = projectManager.getProject(name);
+            if (project == null)
+            {
+                throw new IllegalArgumentException(String.format("Unknown project name: '%s'", name));
+            }
+
+            setProperties(specifics, project.getPulseFileDetails());
+            validate(project.getPulseFileDetails());
 
             projectManager.save(project);
 
@@ -737,10 +762,15 @@ public class RemoteApi
         return result;
     }
 
-    private Hashtable<String, Object> extractDetails(String[] properties, Object obj)
+    private Hashtable<String, Object> extractDetails(Object obj)
     {
+        if (!structDefs.containsKey(obj.getClass()))
+        {
+            throw new RuntimeException(String.format("Object of type '%s' is not supported by the remote interface.", obj.getClass().getName()));
+        }
+        
         Hashtable<String, Object> details = new Hashtable<String, Object>();
-        for (String property : properties)
+        for (String property : structDefs.get(obj.getClass()))
         {
             try
             {

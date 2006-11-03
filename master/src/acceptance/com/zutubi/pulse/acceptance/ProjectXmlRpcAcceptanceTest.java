@@ -1,6 +1,7 @@
 package com.zutubi.pulse.acceptance;
 
 import com.zutubi.pulse.util.RandomUtils;
+import com.zutubi.pulse.util.Constants;
 import org.apache.xmlrpc.XmlRpcException;
 
 import java.io.IOException;
@@ -122,6 +123,31 @@ public class ProjectXmlRpcAcceptanceTest extends BaseXmlRpcAcceptanceTest
         assertEquals("project", details.get("module"));
         assertEquals("false", details.get("monitor"));
         assertEquals("0", details.get("quietPeriod"));
+    }
+
+    public void testEditScm() throws IOException, XmlRpcException
+    {
+        // create a project with a specific name.
+        String projectName = createProject();
+
+        Hashtable<String, Object> scmDetails = new Hashtable<String, Object>();
+        scmDetails.put("root", ":pserver:me@localhost:/cvsroot");
+        scmDetails.put("module", "myProject");
+        scmDetails.put("monitor", "true");
+        scmDetails.put("quietPeriod", "55555");
+
+        Object result = xmlRpcClient.execute("RemoteApi.editScm", getVector(adminToken, projectName, scmDetails));
+        assertEquals(Boolean.TRUE, result);
+
+        result = xmlRpcClient.execute("RemoteApi.getScm", getVector(adminToken, projectName));
+
+        Hashtable<String, Object> details = (Hashtable<String, Object>) result;
+        assertEquals(4, details.size());
+
+        assertEquals(":pserver:me@localhost:/cvsroot", details.get("root"));
+        assertEquals("myProject", details.get("module"));
+        assertEquals("true", details.get("monitor"));
+        assertEquals("55555", details.get("quietPeriod"));
     }
 
     private String createProject() throws IOException, XmlRpcException
