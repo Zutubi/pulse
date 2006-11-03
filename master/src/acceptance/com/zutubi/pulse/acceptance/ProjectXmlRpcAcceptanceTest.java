@@ -44,6 +44,8 @@ public class ProjectXmlRpcAcceptanceTest extends BaseXmlRpcAcceptanceTest
 
         Hashtable<String, Object> projectDetails = new Hashtable<String, Object>();
         projectDetails.put("name", project);
+        projectDetails.put("description", "project description");
+        projectDetails.put("url", "project url");
 
         Hashtable<String, Object> scmDetails = new Hashtable<String, Object>();
         scmDetails.put("type", "cvs");
@@ -103,8 +105,10 @@ public class ProjectXmlRpcAcceptanceTest extends BaseXmlRpcAcceptanceTest
         Hashtable<String, Object> details = (Hashtable<String, Object>) result;
 
         // check that the necessary entries exist.
-        assertEquals(1, details.size());
+        assertEquals(3, details.size());
         assertEquals(projectName, details.get("name"));
+        assertEquals("cvs", details.get("scm"));
+        assertEquals("ant", details.get("type"));
     }
 
     public void testGetScm() throws IOException, XmlRpcException

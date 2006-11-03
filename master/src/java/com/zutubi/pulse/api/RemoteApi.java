@@ -52,6 +52,7 @@ public class RemoteApi
         structDefs.put(MavenPulseFileDetails.class, new String[]{"targets", "workDir", "arguments"});
         structDefs.put(Maven2PulseFileDetails.class, new String[]{"goals", "workDir", "arguments"});
         structDefs.put(MakePulseFileDetails.class, new String[]{"makefile", "targets", "arguments", "workDir"});
+        structDefs.put(XCodePulseFileDetails.class, new String[]{"workingDir", "project", "config", "target", "action", "settings"});
         structDefs.put(CustomPulseFileDetails.class, new String[]{"pulseFile"});
         structDefs.put(VersionedPulseFileDetails.class, new String[]{"pulseFileName"});
     }
@@ -635,7 +636,12 @@ public class RemoteApi
                 throw new IllegalArgumentException(String.format("Unknown project name: '%s'", name));
             }
 
-            return extractDetails(project);
+            Hashtable<String, Object> details = extractDetails(project);
+            // add the scm and type details.
+            details.put("scm", getScmType(project.getScm()));
+            details.put("type", getProjectType(project.getPulseFileDetails()));
+
+            return details;
         }
         finally
         {
@@ -877,6 +883,56 @@ public class RemoteApi
         setProperties(details, scm);
 
         return scm;
+    }
+
+    private String getScmType(Scm scm)
+    {
+        if (scm instanceof Cvs)
+        {
+            return "cvs";
+        }
+        if (scm instanceof Svn)
+        {
+            return "svn";
+        }
+        if (scm instanceof P4)
+        {
+            return "p4";
+        }
+        throw new RuntimeException(String.format("Unknown scm type: %s", scm.getClass().getName()));
+    }
+
+    private String getProjectType(PulseFileDetails detail)
+    {
+        if (detail instanceof AntPulseFileDetails)
+        {
+            return "ant";
+        }
+        if (detail instanceof MavenPulseFileDetails)
+        {
+            return "maven";
+        }
+        if (detail instanceof Maven2PulseFileDetails)
+        {
+            return "maven2";
+        }
+        if (detail instanceof MakePulseFileDetails)
+        {
+            return "make";
+        }
+        if (detail instanceof CustomPulseFileDetails)
+        {
+            return "custom";
+        }
+        if (detail instanceof VersionedPulseFileDetails)
+        {
+            return "versioned";
+        }
+        if (detail instanceof XCodePulseFileDetails)
+        {
+            return "xcode";
+        }
+        throw new RuntimeException(String.format("Unknown project type: %s", detail.getClass().getName()));
     }
 
     private void setProperties(Hashtable<String, Object> scmDetails, Object object)
