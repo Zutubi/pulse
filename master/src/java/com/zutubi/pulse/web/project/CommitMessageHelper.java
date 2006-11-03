@@ -30,6 +30,11 @@ public class CommitMessageHelper
         {
             result = StringUtils.trimmedString(result, limit);
         }
+        else
+        {
+            //CIB-726: attempt to limit lines to no more than 80 characters long.
+            result = StringUtils.wrapString(result, 80, null, false);
+        }
 
         result = TextUtils.htmlEncode(result);
         for(CommitMessageTransformer transformer: transformers)

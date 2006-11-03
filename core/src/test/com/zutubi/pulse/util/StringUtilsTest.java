@@ -114,6 +114,13 @@ public class StringUtilsTest extends PulseTestCase
         }
     }
 
+    public void testWrapLineOnSpaceOnly()
+    {
+        assertEquals("1234567890", StringUtils.wrapString("1234567890", 5, null, false));
+        assertEquals("12345678\n90", StringUtils.wrapString("12345678\n90", 5, null, false));
+        assertEquals("12345678\n 90", StringUtils.wrapString("12345678 90", 5, null, false));
+    }
+
     public void testGetLineLinefeed()
     {
         assertEquals("string", StringUtils.getLine("some\nstring\nhere", 2));
