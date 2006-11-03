@@ -65,6 +65,11 @@ public class StringUtils
         return s;
     }
 
+    public static String wrapString(String s, int lineLength, String prefix)
+    {
+        return wrapString(s, lineLength, prefix, true);
+    }
+
     /**
      * Returns a version of the given string wrapped if necessary to ensure
      * it does not exceed the line length satisfied.  The string will be
@@ -79,10 +84,15 @@ public class StringUtils
      *                   character.  The returned lines will still not exceed
      *                   lineLength.  Thus the prefix length must be less than
      *                   lineLength - 1.  If null is passed, no prefix is used.
+     * @param splitWord  if set to true, this method will introduce a newline
+     *                   in the middle of a word to ensure the the lineLength is
+     *                   not exceeded. If false, this method will search for the
+     *                   nearest appropriate whitespace at which to split.
+     *
      * @return a version of the given string with newlines inserted to
      *         wrap lines at the given length
      */
-    public static String wrapString(String s, int lineLength, String prefix)
+    public static String wrapString(String s, int lineLength, String prefix, boolean splitWord)
     {
         if (prefix != null && prefix.length() >= lineLength - 1)
         {
@@ -150,14 +160,49 @@ public class StringUtils
 
                 if (j == i)
                 {
-                    // No space found
-                    result.append(s.substring(i, candidate));
-                    result.append('\n');
-                    if (prefix != null)
+                    // No space found.
+                    if (splitWord)
                     {
-                        result.append(prefix);
+                        result.append(s.substring(i, candidate));
+                        result.append('\n');
+                        if (prefix != null)
+                        {
+                            result.append(prefix);
+                        }
+                        i = candidate;
                     }
-                    i = candidate;
+                    else
+                    {
+                        // find the next space and split on it.
+                        for (int k = candidate; k < s.length(); k++)
+                        {
+                            if (Character.isWhitespace(s.charAt(k)))
+                            {
+                                // good point to split.
+                                result.append(s.substring(i, k));
+                                result.append('\n');
+                                if (s.charAt(k) == '\n')
+                                {
+                                    // dont need a second new line.
+                                    k = k + 1;
+                                }
+                                
+                                if (prefix != null)
+                                {
+                                    result.append(prefix);
+                                }
+
+                                i = k;
+                                break;
+                            }
+                        }
+                        if (j == i)
+                        {
+                            // no whitespace located.
+                            result.append(s.substring(i));
+                            break;
+                        }
+                    }
                 }
             }
 
