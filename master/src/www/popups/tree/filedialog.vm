@@ -48,7 +48,12 @@
                 var tree = ZUTUBI.widget.TreeView.getTree('browseTree');
                 if (tree.selected)
                 {
-                    setFormValue(tree.selected.getPath());
+                    var path = tree.selected.getPath();
+                    if ('$separator' == '/' && path.charAt(0) != '/')
+                    {
+                        path = '/' + path;
+                    }
+                    setFormValue(path);
                 }
                 return false;
             }
