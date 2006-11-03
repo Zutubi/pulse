@@ -133,7 +133,7 @@ public abstract class Scm extends Entity implements Cloneable
     /**
      * Set the active status of this scm configuration.
      *
-     * @param b
+     * @param b sets the active status to true or false.
      */
     public void setMonitor(boolean b)
     {
@@ -219,7 +219,8 @@ public abstract class Scm extends Entity implements Cloneable
         }
         catch (CloneNotSupportedException e)
         {
-            // Never happens
+            // Should ever happen, but if it does, we need some trace of it.
+            LOG.error(e);
         }
 
         return null;

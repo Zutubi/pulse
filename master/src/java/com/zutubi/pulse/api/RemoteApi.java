@@ -3,6 +3,9 @@ package com.zutubi.pulse.api;
 import com.opensymphony.util.TextUtils;
 import com.zutubi.pulse.ShutdownManager;
 import com.zutubi.pulse.Version;
+import com.zutubi.pulse.form.squeezer.TypeSqueezer;
+import com.zutubi.pulse.form.squeezer.Squeezers;
+import com.zutubi.pulse.form.squeezer.SqueezeException;
 import com.zutubi.pulse.agent.Agent;
 import com.zutubi.pulse.agent.AgentManager;
 import com.zutubi.pulse.bootstrap.ComponentContext;
@@ -318,7 +321,7 @@ public class RemoteApi
         }
     }
 
-    public boolean addAgent(String token, String name, String host, int port) throws AuthenticationException, LicenseException
+    public boolean createAgent(String token, String name, String host, int port) throws AuthenticationException, LicenseException
     {
         tokenManager.verifyAdmin(token);
         LicenseHolder.ensureAuthorization(LicenseHolder.AUTH_ADD_AGENT);
@@ -491,9 +494,9 @@ public class RemoteApi
      */
     public boolean createProject(String token, Hashtable<String, Object> project, Hashtable<String, Object> scm, Hashtable<String, Object> type) throws AuthenticationException, LicenseException, ValidationException
     {
-        User user = tokenManager.verifyAdmin(token);
         try
         {
+            User user = tokenManager.verifyAdmin(token);
             AcegiUtils.loginAs(user);
 
             Project existingProject = projectManager.getProject((String) project.get("name"));
@@ -540,9 +543,10 @@ public class RemoteApi
      */
     public boolean deleteProject(String token, String name) throws AuthenticationException, ValidationException
     {
-        tokenManager.loginUser(token);
         try
         {
+            tokenManager.loginUser(token);
+            
             Project project = projectManager.getProject(name);
             if (project == null)
             {
@@ -560,9 +564,10 @@ public class RemoteApi
 
     public boolean editProject(String token, String name, Hashtable<String, Object> projectDetails) throws AuthenticationException, ValidationException
     {
-        tokenManager.loginUser(token);
         try
         {
+            tokenManager.loginUser(token);
+            
             Project project = projectManager.getProject(name);
             if (project == null)
             {
@@ -605,21 +610,17 @@ public class RemoteApi
      */
     public Hashtable<String, Object> getProject(String token, String name) throws IllegalArgumentException, AuthenticationException
     {
-        tokenManager.loginUser(token);
         try
         {
+            tokenManager.loginUser(token);
+            
             Project project = projectManager.getProject(name);
             if (project == null)
             {
                 throw new IllegalArgumentException(String.format("Unknown project name: '%s'", name));
             }
 
-            Hashtable<String, Object> details = new Hashtable<String, Object>();
-            details.put("name", project.getName());
-            details.put("description", emptyStringIfNull(project.getDescription()));
-            details.put("url", emptyStringIfNull(project.getUrl()));
-
-            return details;
+            return extractProjectDetails(project);
         }
         finally
         {
@@ -627,15 +628,95 @@ public class RemoteApi
         }
     }
 
-    private Object emptyStringIfNull(Object obj)
+    private Hashtable<String, Object> extractProjectDetails(Project project)
     {
-        if (obj != null)
-        {
-            return obj;
-        }
-        return "";
+        String[] remoteProperties = new String[]{"name", "description", "url"};
+        return extractDetails(remoteProperties, project);
     }
 
+    /**
+     * Retrieve the scm details for the specified project.
+     *
+     * @param token     used to authorise this request.
+     * @param name      the name of the project for which the scm details are being retrieved.
+     *
+     * @return a scm structure. The contents of this are specific to the type of scm.
+     *
+     * @throws AuthenticationException if you are not authorised to execute this request.
+     */
+    public Hashtable<String, Object> getScm(String token, String name) throws AuthenticationException
+    {
+        try
+        {
+            tokenManager.loginUser(token);
+
+            Project project = projectManager.getProject(name);
+            if (project == null)
+            {
+                throw new IllegalArgumentException(String.format("Unknown project name: '%s'", name));
+            }
+
+            return extractScmDetails(project.getScm());
+        }
+        finally
+        {
+            tokenManager.logoutUser();
+        }
+    }
+
+    private Hashtable<String, Object> extractScmDetails(Scm scm)
+    {
+        if (scm instanceof Cvs)
+        {
+            String[] remoteProperties = new String[]{
+                    "root", "module", "password", "branch", "quietPeriod", "monitor", "pollingInterval", "changeViewerUrl"
+            };
+            return extractDetails(remoteProperties, scm);
+        }
+        else if (scm instanceof Svn)
+        {
+            String[] remoteProperties = new String[]{
+                    "url", "username", "password", "keyfile", "passphrase", "monitor", "pollingInterval", "changeViewerUrl"
+            };
+            return extractDetails(remoteProperties, scm);
+        }
+        else if (scm instanceof P4)
+        {
+            String[] remoteProperties = new String[]{
+                    "port", "user", "password", "client", "monitor", "pollingInterval", "changeViewerUrl"
+            };
+            return extractDetails(remoteProperties, scm);
+        }
+        else
+        {
+            throw new RuntimeException(String.format("Scm of type '%s' is not supported by the remote interface.", scm.getClass().getName()));
+        }
+    }
+
+    public boolean editScm(String token, String name, Hashtable<String, Object> scmDetails) throws AuthenticationException, ValidationException
+    {
+        try
+        {
+            tokenManager.loginUser(token);
+
+            Project project = projectManager.getProject(name);
+            if (project == null)
+            {
+                throw new IllegalArgumentException(String.format("Unknown project name: '%s'", name));
+            }
+
+            setProperties(scmDetails, project.getScm());
+            validate(project.getScm());
+
+            projectManager.save(project);
+
+            return true;
+        }
+        finally
+        {
+            tokenManager.logoutUser();
+        }
+    }
 
     /**
      * Deletes all commit message links, primarily for testing purposes.
@@ -654,6 +735,32 @@ public class RemoteApi
             projectManager.delete(t);
         }
         return result;
+    }
+
+    private Hashtable<String, Object> extractDetails(String[] properties, Object obj)
+    {
+        Hashtable<String, Object> details = new Hashtable<String, Object>();
+        for (String property : properties)
+        {
+            try
+            {
+                Object value = Ognl.getValue(property, obj);
+                if (value != null)
+                {
+                    TypeSqueezer squeezer = Squeezers.findSqueezer(value.getClass());
+                    details.put(property, squeezer.squeeze(value));
+                }
+            }
+            catch (OgnlException e)
+            {
+                e.printStackTrace();
+            }
+            catch (SqueezeException e)
+            {
+                e.printStackTrace();
+            }
+        }
+        return details;
     }
 
     private void validate(Object o) throws ValidationException

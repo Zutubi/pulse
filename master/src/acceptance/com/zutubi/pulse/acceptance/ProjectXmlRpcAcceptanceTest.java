@@ -1,19 +1,11 @@
 package com.zutubi.pulse.acceptance;
 
+import com.zutubi.pulse.util.RandomUtils;
 import org.apache.xmlrpc.XmlRpcException;
 
 import java.io.IOException;
 import java.util.Hashtable;
 import java.util.Vector;
-import java.util.List;
-import java.util.LinkedList;
-import java.beans.BeanInfo;
-import java.beans.Introspector;
-import java.beans.PropertyDescriptor;
-import java.beans.IntrospectionException;
-
-import com.zutubi.pulse.util.RandomUtils;
-import com.zutubi.pulse.model.Project;
 
 /**
  * <class comment/>
@@ -54,7 +46,7 @@ public class ProjectXmlRpcAcceptanceTest extends BaseXmlRpcAcceptanceTest
 
         Hashtable<String, Object> scmDetails = new Hashtable<String, Object>();
         scmDetails.put("type", "cvs");
-        scmDetails.put("root", ":pserser:someone@localhost:/cvsroot");
+        scmDetails.put("root", ":pserver:someone@localhost:/cvsroot");
         scmDetails.put("module", "project");
 
         Hashtable<String, Object> typeDetails = new Hashtable<String, Object>();
@@ -99,46 +91,37 @@ public class ProjectXmlRpcAcceptanceTest extends BaseXmlRpcAcceptanceTest
         assertEquals(Boolean.TRUE, result);
     }
 
-    public void testGetProject() throws IOException, XmlRpcException, IntrospectionException
+    public void testGetProject() throws IOException, XmlRpcException
     {
         // create a project with a specific name.
         String projectName = createProject();
 
         Object result = xmlRpcClient.execute("RemoteApi.getProject", getVector(adminToken, projectName));
         assertNotNull(result);
-
+        assertTrue(result instanceof Hashtable);
         Hashtable<String, Object> details = (Hashtable<String, Object>) result;
 
         // check that the necessary entries exist.
-        for (String name : getExpectedProjectKeys())
-        {
-            assertTrue(details.containsKey(name));
-            details.remove(name);
-        }
-        assertEquals(0, details.size());
+        assertEquals(1, details.size());
+        assertEquals(projectName, details.get("name"));
     }
 
-    private List<String> getExpectedProjectKeys() throws IntrospectionException
+    public void testGetScm() throws IOException, XmlRpcException
     {
-        List<String> propertyNames = new LinkedList<String>();
+        // create a project with a specific name.
+        String projectName = createProject();
 
-        BeanInfo beanInfo = Introspector.getBeanInfo(Project.class, Object.class);
+        Object result = xmlRpcClient.execute("RemoteApi.getScm", getVector(adminToken, projectName));
+        assertNotNull(result);
+        assertTrue(result instanceof Hashtable);
 
-        // Handle the first pass analysis.  Here, all of the fields are considered on an individual basis.
-        for (PropertyDescriptor pd : beanInfo.getPropertyDescriptors())
-        {
-            if (pd.getReadMethod() != null && pd.getWriteMethod() != null)
-            {
-                propertyNames.add(pd.getName());
-            }
-        }
-        // currently, these are the project properties that we do not include in the project xml rpc
-        // structure.
-        propertyNames.remove("scm");
-        propertyNames.remove("pulseFileDetails");
-        propertyNames.remove("nextBuildNumber");
-        propertyNames.remove("id");
-        return propertyNames;
+        Hashtable<String, Object> details = (Hashtable<String, Object>) result;
+        assertEquals(4, details.size());
+
+        assertEquals(":pserver:someone@localhost:/cvsroot", details.get("root"));
+        assertEquals("project", details.get("module"));
+        assertEquals("false", details.get("monitor"));
+        assertEquals("0", details.get("quietPeriod"));
     }
 
     private String createProject() throws IOException, XmlRpcException
@@ -150,7 +133,7 @@ public class ProjectXmlRpcAcceptanceTest extends BaseXmlRpcAcceptanceTest
 
         Hashtable<String, Object> scmDetails = new Hashtable<String, Object>();
         scmDetails.put("type", "cvs");
-        scmDetails.put("root", ":pserser:someone@localhost:/cvsroot");
+        scmDetails.put("root", ":pserver:someone@localhost:/cvsroot");
         scmDetails.put("module", "project");
 
         Hashtable<String, Object> typeDetails = new Hashtable<String, Object>();

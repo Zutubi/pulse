@@ -69,7 +69,7 @@ def testNormalUpgrade(agent, master, build):
     
     log('Adding agent...')
     masterProxy = master.getServerProxy()
-    if not masterProxy.RemoteApi.addAgent(master.getAdminToken(), 'upgrade-agent', 'localhost', AGENT_PORT):
+    if not masterProxy.RemoteApi.createAgent(master.getAdminToken(), 'upgrade-agent', 'localhost', AGENT_PORT):
         raise Exception('Unable to add agent')
     log('Agent added')
     
