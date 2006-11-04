@@ -2,7 +2,8 @@ package com.zutubi.pulse.web.setup;
 
 import com.opensymphony.util.TextUtils;
 import com.opensymphony.xwork.Validateable;
-import com.opensymphony.xwork.validator.validators.EmailValidator;
+import com.opensymphony.xwork.validator.ValidationException;
+import com.opensymphony.xwork.validator.DelegatingValidatorContext;
 import com.zutubi.pulse.bootstrap.MasterConfiguration;
 import com.zutubi.pulse.bootstrap.MasterConfigurationManager;
 import com.zutubi.pulse.bootstrap.SetupManager;
@@ -18,10 +19,9 @@ import com.zutubi.pulse.web.wizard.BaseWizard;
 import com.zutubi.pulse.web.wizard.BaseWizardState;
 import com.zutubi.pulse.web.wizard.Wizard;
 import com.zutubi.pulse.web.wizard.WizardCompleteState;
+import com.zutubi.pulse.xwork.validator.validators.EmailValidator;
 
 import java.util.concurrent.Executors;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 /**
  * <class-comment/>
@@ -284,14 +284,21 @@ public class SetupWizard extends BaseWizard
                 {
                     addFieldError("fromAddress", "from address is required when smtp host is provided");
                 }
-                else
+            }
+            
+            // If the from address is specified, then ensure that a valid value is set.
+            if (TextUtils.stringSet(fromAddress))
+            {
+                EmailValidator validator = new EmailValidator();
+                validator.setValidatorContext(new DelegatingValidatorContext(this));
+                validator.setFieldName("fromAddress");
+                try
                 {
-                    Pattern pattern = Pattern.compile(EmailValidator.emailAddressPattern, Pattern.CASE_INSENSITIVE);
-                    Matcher matcher = pattern.matcher(fromAddress);
-                    if (!matcher.matches())
-                    {
-                        addFieldError("fromAddress", "from email address is invalid");
-                    }
+                    validator.validate(this);
+                }
+                catch (ValidationException e)
+                {
+                    addFieldError("fromAddress", e.getMessage());
                 }
             }
         }

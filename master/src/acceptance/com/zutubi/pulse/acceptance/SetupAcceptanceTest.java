@@ -92,7 +92,11 @@ public class SetupAcceptanceTest extends BaseAcceptanceTestCase
         settingsForm.assertFormElements("localhost:8080", "", "", "", "", "");
         assertTextPresent("valid");
 
-        settingsForm.nextFormElements("http://localhost:8080", "some.smtp.host.com", "from@some.host.com", "username", "password", "prefix");
+        // check that the from address is correctly validated.
+        settingsForm.nextFormElements("http://localhost:8080", "", "invalid at email dot com", "", "", "");
+        assertTextPresent("whitespace");
+
+        settingsForm.nextFormElements("http://localhost:8080", "some.smtp.host.com", "Setup <from@localhost.com>", "username", "password", "prefix");
     }
 
     private void checkLicenseDetails()

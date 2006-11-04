@@ -113,7 +113,7 @@ public class UserPreferencesAcceptanceTest extends BaseAcceptanceTestCase
         emailForm.saveFormElements("example", "incorrect email address", "html");
         emailForm.assertFormPresent();
         emailForm.assertFormElements("example", "incorrect email address", "html");
-        assertTextPresent("valid");
+        assertTextPresent("Illegal");
 
         // no need to check the radio box here.
     }
