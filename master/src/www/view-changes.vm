@@ -71,7 +71,7 @@
              </td>
             #dynamicCell($change.user)
             #dateCell($change)
-            #commitCommentCell($change)
+            #commitCommentCell($change "changes")
             #linkCell("view" "viewChangelist.action?id=$change.id&buildId=$result.id")
         </tr>
         #if($change.changes.size() > 0)

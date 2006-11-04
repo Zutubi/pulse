@@ -824,8 +824,8 @@
 ##
 ##
 ##
-#macro(commitCommentCell $changelist)
-    #set($changeId = "${changelist.id}_comment")
+#macro(commitCommentCell $changelist $id_suffix)
+    #set($changeId = "${changelist.id}_comment_${id_suffix}")
     <td class="content" id="${changeId}_cell">
     #if ($changelist.comment.length() > 60)
         $action.transformComment($changelist, 60)
