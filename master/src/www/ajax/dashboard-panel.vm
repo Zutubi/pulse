@@ -1,4 +1,4 @@
-#macro(changesTable $titleKey $changelists $showWho)
+#macro(changesTable $titleKey $changelists $showWho $source)
     <table class="content">
         #headingRow($titleKey 6)
         <tr>
@@ -29,7 +29,7 @@
             #dynamicCell($changelist.revision.author)
     #end
             #dateCell($changelist)
-            #commitCommentCell($changelist)
+            #commitCommentCell($changelist $source)
             #aggregateResultCell($changelist $showWho)
             #linkCell("view.$changelist.id" "view" "viewChangelist.action?id=$changelist.id")
         </tr>
@@ -155,10 +155,10 @@
 
 #if($user.showMyChanges)
     <h2 class="section">#wwtext("name=my.changes")</h2>
-    #changesTable("my.latest.changes" $changelists false)
+    #changesTable("my.latest.changes" $changelists false "my")
 #end
 
 #if($user.showProjectChanges)
     <h2 class="section">#wwtext("name=project.changes")</h2>
-    #changesTable("my.project.changes" $projectChangelists true)
+    #changesTable("my.project.changes" $projectChangelists true "project")
 #end
