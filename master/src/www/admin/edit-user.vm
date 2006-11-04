@@ -13,16 +13,20 @@
 <table class="columns" width="90%">
     <tr>
         <td class="columns" width="40%">
-#if(!$action.isAdminUser($user))
             <table class="fill-content">
-                #wwcform("action=editUser.action" "heading=%{getText('user.edit')}" "method=post")
+                #wwcform("action=editUser.action" "heading=%{getText('user.edit')}" "id=user.edit" "method=post")
                     #wwhidden("name=userId")
                     #wwhidden("name=startPage")
-                    #wwcheckbox("name=ldapAuthentication" "label=%{getText('user.ldap.authentication')}" "tabindex=1" "onclick=setFormEnableState('password.edit', 'editUser_ldapAuthentication', true, true)")
-                    #saveCancel(2)
+                    #wwtextfield("name=newLogin" "label=%{getText('user.login')}" "tabindex=1" "required=true")
+                    #wwtextfield("name=newName" "label=%{getText('user.name')}" "tabindex=2" "required=true")
+#if($action.isAdminUser($user))
+                    #saveCancel(3)
+#else
+                    #wwcheckbox("name=ldapAuthentication" "label=%{getText('user.ldap.authentication')}" "tabindex=3" "onclick=setFormEnableState('password.edit', 'editUser_ldapAuthentication', true, true)")
+                    #saveCancel(4)
+#end
                 #end
             </table>
-#end
             <table class="fill-content">
                 #wwcform("action=editPassword.action" "id=password.edit" "heading=%{getText('password.edit')}" "method=post")
                     #wwhidden("name=userId")

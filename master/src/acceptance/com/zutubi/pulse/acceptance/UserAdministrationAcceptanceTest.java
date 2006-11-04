@@ -1,7 +1,7 @@
 package com.zutubi.pulse.acceptance;
 
-import com.zutubi.pulse.acceptance.forms.admin.EditPasswordForm;
 import com.zutubi.pulse.acceptance.forms.CreateUserForm;
+import com.zutubi.pulse.acceptance.forms.admin.EditPasswordForm;
 import com.zutubi.pulse.util.RandomUtils;
 
 /**
@@ -143,6 +143,29 @@ public class UserAdministrationAcceptanceTest extends BaseAcceptanceTestCase
         login(login, "newPassword");
         assertTextPresent("welcome");
     }
+
+    // Javascript errors be here :|
+    
+//    public void testEditUser()
+//    {
+//        // create a user.
+//        String login = RandomUtils.randomString(7);
+//        String name = login + "_name";
+//        submitCreateUserForm(login, name, login, login);
+//
+//        assertLinkPresent("edit_" + login);
+//        clickLink("edit_" + login);
+//
+//        AdminEditUserForm form = new AdminEditUserForm(tester);
+//        form.assertFormElements(login, name, "false");
+//        String editiedLogin = login + "_edited";
+//        form.saveFormElements(editiedLogin, name + "_edited", "true");
+//
+//        // assert that we are back on the manage users
+//        assertUserExists(editiedLogin);
+//        clickLink("edit_" + editiedLogin);
+//        form.assertFormElements(editiedLogin, name + "_edited", "true");
+//    }
 
     public void testChangeUserPasswordValidation()
     {
