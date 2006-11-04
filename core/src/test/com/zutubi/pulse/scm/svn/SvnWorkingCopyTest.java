@@ -7,6 +7,7 @@ import com.zutubi.pulse.scm.WorkingCopyStatus;
 import com.zutubi.pulse.test.PulseTestCase;
 import com.zutubi.pulse.util.FileSystemUtils;
 import com.zutubi.pulse.util.IOUtils;
+import org.tmatesoft.svn.core.SVNCommitInfo;
 import org.tmatesoft.svn.core.SVNException;
 import org.tmatesoft.svn.core.SVNURL;
 import org.tmatesoft.svn.core.auth.BasicAuthenticationManager;
@@ -31,7 +32,7 @@ public class SvnWorkingCopyTest extends PulseTestCase
     private SVNClientManager clientManager;
     private SVNUpdateClient updateClient;
     private File otherBase;
-    private SVNUpdateClient otherUpdateClient;
+    private File branchBase;
 
     private SvnWorkingCopy wc;
     private SVNWCClient client;
@@ -42,17 +43,22 @@ public class SvnWorkingCopyTest extends PulseTestCase
         SVNRepositoryFactoryImpl.setup();
     }
 
-    //    jsankey@shiny:~/temp/wc$ ls -R
+    //    jsankey@shiny:/tmp/wc/trunk$ ls -R
     //    .:
-    //    bin1  dir2   file2  file4     macfile2  script2    textfile2  unixfile2  winfile2
-    //    dir1  file1  file3  macfile1  script1   textfile1  unixfile1  winfile1
+    //    bin1  dir2  file1  file3  macfile1  script1  textfile1  unixfile1  winfile1
+    //    dir1  dir3  file2  file4  macfile2  script2  textfile2  unixfile2  winfile2
     //
     //    ./dir1:
     //    file1  file2  file3
     //
     //    ./dir2:
     //    file1  file2
-
+    //
+    //    ./dir3:
+    //    file1  nested
+    //
+    //    ./dir3/nested:
+    //    file1  file2
 
     protected void setUp() throws Exception
     {
@@ -67,10 +73,6 @@ public class SvnWorkingCopyTest extends PulseTestCase
 
         // Allow anonymous writes
         File conf = new File(repoDir, FileSystemUtils.composeFilename("conf", "svnserve.conf"));
-        if(!conf.exists())
-        {
-            throw new RuntimeException("i am teh stoopid");
-        }
         FileSystemUtils.createFile(conf, "[general]\nanon-access = write\nauth-access = write\n");
 
         // Restore from dump
@@ -107,8 +109,14 @@ public class SvnWorkingCopyTest extends PulseTestCase
     {
         otherBase = new File(tempDir, "other");
         otherBase.mkdir();
-        otherUpdateClient = new SVNUpdateClient(new BasicAuthenticationManager("anonymous", ""), clientManager.getOptions());
-        otherUpdateClient.doCheckout(SVNURL.parseURIDecoded("svn://localhost/test/trunk"), otherBase, SVNRevision.UNDEFINED, SVNRevision.HEAD, true);
+        updateClient.doCheckout(SVNURL.parseURIDecoded("svn://localhost/test/trunk"), otherBase, SVNRevision.UNDEFINED, SVNRevision.HEAD, true);
+    }
+
+    private void createBranchWC() throws SVNException
+    {
+        branchBase = new File(tempDir, "branch");
+        branchBase.mkdir();
+        updateClient.doCheckout(SVNURL.parseURIDecoded("svn://localhost/test/branches/2"), branchBase, SVNRevision.UNDEFINED, SVNRevision.HEAD, true);
     }
 
     protected void tearDown() throws Exception
@@ -121,7 +129,6 @@ public class SvnWorkingCopyTest extends PulseTestCase
         FileSystemUtils.removeDirectory(tempDir);
 
         updateClient = null;
-        otherUpdateClient = null;
         client = null;
         wc = null;
     }
@@ -150,7 +157,7 @@ public class SvnWorkingCopyTest extends PulseTestCase
     public void testGetStatusNoChanges() throws Exception
     {
         WorkingCopyStatus wcs = wc.getStatus();
-        assertEquals("4", wcs.getRevision().getRevisionString());
+        assertEquals("6", wcs.getRevision().getRevisionString());
         assertEquals(0, wcs.getChanges().size());
     }
 
@@ -170,7 +177,7 @@ public class SvnWorkingCopyTest extends PulseTestCase
         getStatusEdited(true);
     }
 
-    private void getStatusEdited(boolean remote) throws IOException, SCMException
+    private void getStatusEdited(boolean remote) throws Exception
     {
         edit("file1");
         WorkingCopyStatus wcs = assertSimpleStatus("file1", FileStatus.State.MODIFIED, false, remote);
@@ -328,6 +335,182 @@ public class SvnWorkingCopyTest extends PulseTestCase
         assertEOL(wcs, "newfile", FileStatus.EOLStyle.NATIVE);
     }
 
+    public void testGetLocalStatusAddedDirectory() throws Exception
+    {
+        File test = new File(base, "newdir");
+        assertTrue(test.mkdir());
+
+        client.doAdd(test, true, false, false, false);
+        WorkingCopyStatus status = wc.getLocalStatus();
+        assertEquals(1, status.getChanges().size());
+        assertAdded(status, "newdir", true);
+    }
+
+    public void testGetLocalStatusAddedDirectoryChildFile() throws Exception
+    {
+        File dir = new File(base, "newdir");
+        assertTrue(dir.mkdir());
+
+        File child = new File(dir, "newfile");
+        FileSystemUtils.createFile(child, "test");
+
+        client.doAdd(dir, true, false, false, true);
+        WorkingCopyStatus status = wc.getLocalStatus();
+        assertEquals(2, status.getChanges().size());
+        assertAdded(status, "newdir", true);
+        assertAdded(status, "newdir/newfile", false);
+    }
+
+    public void testGetLocalStatusAddedDirectoryChildFileNotAdded() throws Exception
+    {
+        File dir = new File(base, "newdir");
+        assertTrue(dir.mkdir());
+
+        File child = new File(dir, "newfile");
+        FileSystemUtils.createFile(child, "test");
+
+        client.doAdd(dir, true, false, false, false);
+        WorkingCopyStatus status = wc.getLocalStatus();
+        assertEquals(1, status.getChanges().size());
+        assertAdded(status, "newdir", true);
+    }
+
+    public void testGetLocalStatusMoved() throws Exception
+    {
+        move("file1", "movedfile1");
+
+        WorkingCopyStatus status = wc.getLocalStatus();
+        assertEquals(2, status.getChanges().size());
+        assertDeleted(status, "file1", false);
+        assertAdded(status, "movedfile1", false);
+    }
+
+    public void testGetLocalStatusMovedDir() throws Exception
+    {
+        move("dir1", "moveddir1");
+
+        WorkingCopyStatus status = wc.getLocalStatus();
+        assertEquals(8, status.getChanges().size());
+        assertDeleted(status, "dir1", true);
+        assertDeleted(status, "dir1/file1", false);
+        assertDeleted(status, "dir1/file2", false);
+        assertDeleted(status, "dir1/file3", false);
+        assertAdded(status, "moveddir1", true);
+        assertAdded(status, "moveddir1/file1", false);
+        assertAdded(status, "moveddir1/file2", false);
+        assertAdded(status, "moveddir1/file3", false);
+    }
+
+    public void testGetLocalStatusMovedDirNestedChild() throws Exception
+    {
+        move("dir3", "moveddir3");
+
+        WorkingCopyStatus status = wc.getLocalStatus();
+        assertEquals(10, status.getChanges().size());
+        assertDeleted(status, "dir3", true);
+        assertDeleted(status, "dir3/file1", false);
+        assertDeleted(status, "dir3/nested", true);
+        assertDeleted(status, "dir3/nested/file1", false);
+        assertDeleted(status, "dir3/nested/file2", false);
+        assertAdded(status, "moveddir3", true);
+        assertAdded(status, "moveddir3/file1", false);
+        assertAdded(status, "moveddir3/nested", true);
+        assertAdded(status, "moveddir3/nested/file1", false);
+        assertAdded(status, "moveddir3/nested/file2", false);
+    }
+
+    public void testGetLocalStatusMovedDirModifiedChild() throws Exception
+    {
+        move("dir2", "moveddir2");
+        edit("moveddir2/file1");
+
+        WorkingCopyStatus status = wc.getLocalStatus();
+        assertEquals(6, status.getChanges().size());
+        assertDeleted(status, "dir2", true);
+        assertDeleted(status, "dir2/file1", false);
+        assertDeleted(status, "dir2/file2", false);
+        assertAdded(status, "moveddir2", true);
+        assertModified(status, "moveddir2/file1", false);
+        assertAdded(status, "moveddir2/file2", false);
+    }
+
+    public void testGetLocalStatusMovedDirDeletedChild() throws Exception
+    {
+        move("dir2", "moveddir2");
+        delete("moveddir2/file1");
+
+        WorkingCopyStatus status = wc.getLocalStatus();
+        assertEquals(6, status.getChanges().size());
+        assertDeleted(status, "dir2", true);
+        assertDeleted(status, "dir2/file1", false);
+        assertDeleted(status, "dir2/file2", false);
+        assertAdded(status, "moveddir2", true);
+        assertDeleted(status, "moveddir2/file1", false);
+        assertAdded(status, "moveddir2/file2", false);
+    }
+
+    public void getLocalStatusMergeEdited() throws Exception
+    {
+        long rev = branchEdit("file1");
+        doMerge(rev);
+        assertSimpleStatus("file1", FileStatus.State.MODIFIED, false);
+    }
+
+    public void getLocalStatusMergeAdded() throws Exception
+    {
+        long rev = branchAdd("newfile");
+        doMerge(rev);
+        assertSimpleStatus("newfile", FileStatus.State.ADDED, false);
+    }
+
+    public void getLocalStatusMergeDeleted() throws Exception
+    {
+        long rev = branchDelete("file1");
+        doMerge(rev);
+        assertSimpleStatus("file1", FileStatus.State.DELETED, false);
+    }
+
+    public void getLocalStatusMergeMoved() throws Exception
+    {
+        long rev = branchMove("file1", "movedfile1");
+        doMerge(rev);
+        WorkingCopyStatus status = wc.getLocalStatus();
+        assertEquals(2, status.getChanges().size());
+        assertDeleted(status, "file1", false);
+        assertAdded(status, "movedfile1", false);
+    }
+
+    public void getLocalStatusMergeMovedDir() throws Exception
+    {
+        long rev = branchMove("dir2", "moveddir2");
+        doMerge(rev);
+        WorkingCopyStatus status = wc.getLocalStatus();
+        assertEquals(6, status.getChanges().size());
+        assertDeleted(status, "dir2", true);
+        assertDeleted(status, "dir2/file1", false);
+        assertDeleted(status, "dir2/file2", false);
+        assertAdded(status, "moveddir2", true);
+        assertAdded(status, "moveddir2/file1", false);
+        assertAdded(status, "moveddir2/file2", false);
+    }
+
+    public void getLocalStatusMergeConflict() throws Exception
+    {
+        edit("file1");
+        long rev = branchEdit("file1");
+        doMerge(rev);
+        assertSimpleStatus("file1", FileStatus.State.UNRESOLVED, false);
+    }
+
+    public void getLocalStatusMergeEditDeleted() throws Exception
+    {
+        edit("file1");
+        long rev = branchDelete("file1");
+        doMerge(rev);
+        // Forced merge deletes locally edited file
+        assertSimpleStatus("file1", FileStatus.State.DELETED, false);
+    }
+
     public void testGetStatusDeleted() throws Exception
     {
         getStatusDeleted(true);
@@ -444,7 +627,7 @@ public class SvnWorkingCopyTest extends PulseTestCase
 
         wc.update();
         WorkingCopyStatus wcs = wc.getStatus();
-        assertEquals("5", wcs.getRevision().getRevisionString());
+        assertEquals("7", wcs.getRevision().getRevisionString());
         assertEquals(0, wcs.getChanges().size());
     }
 
@@ -456,36 +639,115 @@ public class SvnWorkingCopyTest extends PulseTestCase
         FileSystemUtils.createFile(test, "goodbye");
         wc.update();
         WorkingCopyStatus wcs = assertSimpleStatus("file1", FileStatus.State.UNRESOLVED, false);
-        assertEquals("5", wcs.getRevision().getRevisionString());
+        assertEquals("7", wcs.getRevision().getRevisionString());
     }
 
-    private File edit(String path) throws IOException
+    private File edit(String path) throws IOException, SVNException
     {
-        File test = new File(base, path);
-        FileSystemUtils.createFile(test, "hello");
-        return test;
-    }
-
-    private void delete(String path) throws SVNException
-    {
-        File test = new File(base, path);
-        client.doDelete(test, false, false);
+        doEdit(path, base, false);
+        return new File(base, path);
     }
 
     private void otherEdit(String path) throws SVNException, IOException
     {
         createOtherWC();
-        File test = new File(otherBase, path);
-        FileSystemUtils.createFile(test, "hello");
-        clientManager.getCommitClient().doCommit(new File[] { test }, true, "edit file", false, false);
+        doEdit(path, otherBase, true);
+    }
+
+    private long branchEdit(String path) throws SVNException, IOException
+    {
+        createBranchWC();
+        return doEdit(path, branchBase, true);
+    }
+
+    private long doEdit(String path, File baseDir, boolean commit) throws IOException, SVNException
+    {
+        File test = new File(baseDir, path);
+        FileSystemUtils.createFile(test, test.getAbsolutePath());
+        if(commit)
+        {
+            SVNCommitInfo info = clientManager.getCommitClient().doCommit(new File[] { test }, true, "edit file", false, false);
+            return info.getNewRevision();
+        }
+        return -1;
+    }
+
+    private long branchAdd(String path) throws SVNException, IOException
+    {
+        createBranchWC();
+        return doAdd(path, branchBase, true);
+    }
+
+    private long doAdd(String path, File baseDir, boolean commit) throws IOException, SVNException
+    {
+        File test = new File(baseDir, path);
+        FileSystemUtils.createFile(test, test.getAbsolutePath());
+        clientManager.getWCClient().doAdd(test, true, false, false, true);
+
+        if(commit)
+        {
+            SVNCommitInfo info = clientManager.getCommitClient().doCommit(new File[] { test }, true, "add file", false, false);
+            return info.getNewRevision();
+        }
+        return -1;
+    }
+
+    private void delete(String path) throws SVNException
+    {
+        doDelete(path, base, false);
     }
 
     private void otherDelete(String path) throws SVNException
     {
         createOtherWC();
-        File test = new File(otherBase, path);
+        doDelete(path, otherBase, true);
+    }
+
+    private long branchDelete(String path) throws SVNException
+    {
+        createBranchWC();
+        return doDelete(path, branchBase, true);
+    }
+
+    private long doDelete(String path, File baseDir, boolean commit) throws SVNException
+    {
+        File test = new File(baseDir, path);
         client.doDelete(test, false, false);
-        clientManager.getCommitClient().doCommit(new File[] { test }, true, "delete file", false, false);
+        if(commit)
+        {
+            SVNCommitInfo info = clientManager.getCommitClient().doCommit(new File[] { test }, true, "delete file", false, false);
+            return info.getNewRevision();
+        }
+        return -1;
+    }
+
+    private long move(String srcPath, String destPath) throws SVNException, IOException
+    {
+        return doMove(srcPath, destPath, base, false);
+    }
+
+    private long branchMove(String srcPath, String destPath) throws SVNException, IOException
+    {
+        createBranchWC();
+        return doMove(srcPath, destPath, branchBase, true);
+    }
+
+    private long doMove(String srcPath, String destPath, File baseDir, boolean commit) throws IOException, SVNException
+    {
+        clientManager.getMoveClient().doMove(new File(baseDir, srcPath), new File(baseDir, destPath));
+
+        if(commit)
+        {
+            SVNCommitInfo info = clientManager.getCommitClient().doCommit(new File[] { baseDir }, true, "move", false, true);
+            return info.getNewRevision();
+        }
+        return -1;
+    }
+
+    private void doMerge(long change) throws SVNException
+    {
+        SVNURL branchUrl = SVNURL.parseURIDecoded("svn://localhost/test/branches/2");
+        clientManager.getDiffClient().doMerge(branchUrl, SVNRevision.create(change - 1), branchUrl, SVNRevision.create(change), base, true, false, true, false);
     }
 
     private WorkingCopyStatus assertSimpleStatus(String path, FileStatus.State state, boolean ood) throws SCMException
@@ -511,6 +773,29 @@ public class SvnWorkingCopyTest extends PulseTestCase
         assertFalse(fs.isDirectory());
         assertEquals(ood, fs.isOutOfDate());
         return wcs;
+    }
+
+    private void assertModified(WorkingCopyStatus status, String path, boolean dir)
+    {
+        assertFileState(status, path, dir, FileStatus.State.MODIFIED);
+    }
+
+    private void assertAdded(WorkingCopyStatus status, String path, boolean dir)
+    {
+        assertFileState(status, path, dir, FileStatus.State.ADDED);
+    }
+
+    private void assertDeleted(WorkingCopyStatus status, String path, boolean dir)
+    {
+        assertFileState(status, path, dir, FileStatus.State.DELETED);
+    }
+
+    private void assertFileState(WorkingCopyStatus status, String path, boolean dir, FileStatus.State fileState)
+    {
+        FileStatus fs = status.getFileStatus(path);
+        assertNotNull(fs);
+        assertEquals(dir, fs.isDirectory());
+        assertEquals(fileState, fs.getState());
     }
 
     private void assertNoProperties(WorkingCopyStatus wcs, String path)

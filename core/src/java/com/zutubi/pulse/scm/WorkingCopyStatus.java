@@ -92,6 +92,19 @@ public class WorkingCopyStatus implements Iterable<FileStatus>
         return null;
     }
 
+    public void removeFileStatus(String path)
+    {
+        Iterator<FileStatus> i = changes.iterator();
+        while(i.hasNext())
+        {
+            if(i.next().getPath().equals(path))
+            {
+                i.remove();
+                break;
+            }
+        }
+    }
+
     public boolean hasChanges()
     {
         return changes.size() > 0;

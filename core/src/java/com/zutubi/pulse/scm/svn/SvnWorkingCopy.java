@@ -317,7 +317,16 @@ public class SvnWorkingCopy extends PersonalBuildSupport implements WorkingCopy
 
         if (contentsStatus == SVNStatusType.STATUS_NORMAL)
         {
-            fileState = FileStatus.State.UNCHANGED;
+            // CIB-730: unchanged children of moved directories need to be
+            // marked as added in our status.
+            if(svnStatus.isCopied())
+            {
+                fileState = FileStatus.State.ADDED;
+            }
+            else
+            {
+                fileState = FileStatus.State.UNCHANGED;
+            }
         }
         else if (contentsStatus == SVNStatusType.STATUS_ADDED)
         {
