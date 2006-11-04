@@ -16,7 +16,7 @@
 
         <property name="enableStateName" column="ENABLE_STATE" type="string"/>
         
-        <bag name="resources" cascade="all-delete-orphan" lazy="false">
+        <bag name="resources" cascade="all,delete-orphan" lazy="false">
             <key column="SLAVE_ID"/>
             <one-to-many class="com.zutubi.pulse.model.PersistentResource"/>
         </bag>

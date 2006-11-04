@@ -23,7 +23,7 @@
             </composite-element>
         </map>
 
-        <map name="versions" lazy="false" table="RESOURCE_VERSIONS" cascade="all-delete-orphan">
+        <map name="versions" lazy="false" table="RESOURCE_VERSIONS" cascade="all,delete-orphan">
             <key column="RESOURCE_ID"/>
             <index type="string" column="VERSION_VALUE"/>
             <one-to-many class="com.zutubi.pulse.core.model.ResourceVersion"/>
