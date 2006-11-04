@@ -10,6 +10,12 @@ import javax.mail.internet.InternetAddress;
  */
 public class EmailValidator extends FieldValidatorSupport
 {
+    public EmailValidator()
+    {
+        setDefaultMessageKey(".invalid");
+        setMessageKey("${fieldName}.invalid");
+    }
+
     public void validate(Object obj) throws ValidationException
     {
         Object fieldValue = getFieldValue(getFieldName(), obj);
@@ -29,6 +35,7 @@ public class EmailValidator extends FieldValidatorSupport
             }
             catch (AddressException e)
             {
+                setDefaultMessage(getDefaultMessage());
                 addFieldError(getFieldName());
             }
         }
