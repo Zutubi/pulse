@@ -41,7 +41,7 @@
             <property name="recipe" type="string" length="255"/>
         </component>
 
-        <bag name="resourceRequirements" cascade="all-delete-orphan" table="RESOURCE_REQUIREMENTS" lazy="false">
+        <bag name="resourceRequirements" cascade="all,delete-orphan" table="RESOURCE_REQUIREMENTS" lazy="false">
             <key column="NODE_ID"/>
             <composite-element class="com.zutubi.pulse.model.ResourceRequirement">
                 <property name="resource" type="string" not-null="true"/>
@@ -49,7 +49,7 @@
             </composite-element>
         </bag>
 
-        <list name="children" cascade="all-delete-orphan" lazy="false">
+        <list name="children" cascade="all,delete-orphan" lazy="false">
             <key column="PARENT_ID"/>
             <index column="ORDINAL"/>
             <one-to-many class="com.zutubi.pulse.model.BuildSpecificationNode"/>

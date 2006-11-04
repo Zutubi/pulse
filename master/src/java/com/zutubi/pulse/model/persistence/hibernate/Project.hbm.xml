@@ -19,24 +19,24 @@
         <many-to-one name="pulseFileDetails" class="com.zutubi.pulse.model.PulseFileDetails" column="BOB_FILE_DETAILS"
                      lazy="false" cascade="all"/>
 
-        <bag name="buildSpecifications" cascade="all-delete-orphan" lazy="false">
+        <bag name="buildSpecifications" cascade="all,delete-orphan" lazy="false">
             <key column="PROJECT_ID"/>
             <one-to-many class="com.zutubi.pulse.model.BuildSpecification"/>
         </bag>
 
-        <bag name="postBuildActions" cascade="all-delete-orphan" lazy="false">
+        <bag name="postBuildActions" cascade="all,delete-orphan" lazy="false">
             <key column="PROJECT_ID"/>
             <one-to-many class="com.zutubi.pulse.model.PostBuildAction"/>
         </bag>
 
-        <bag name="cleanupRules" cascade="all-delete-orphan" lazy="false">
+        <bag name="cleanupRules" cascade="all,delete-orphan" lazy="false">
             <key column="PROJECT_ID"/>
             <one-to-many class="com.zutubi.pulse.model.CleanupRule"/>
         </bag>
 
         <many-to-one name="scm" class="com.zutubi.pulse.model.Scm" column="SCM" cascade="all" lazy="false"/>
 
-        <bag name="aclEntries" inverse="true" cascade="all-delete-orphan" lazy="false">
+        <bag name="aclEntries" inverse="true" cascade="all,delete-orphan" lazy="false">
             <key column="PROJECT_ID"/>
             <one-to-many class="com.zutubi.pulse.model.ProjectAclEntry"/>
         </bag>
@@ -74,7 +74,7 @@
         </subclass>
 
         <subclass name="com.zutubi.pulse.model.TemplatePulseFileDetails" lazy="false">
-            <bag name="captures" cascade="all-delete-orphan" lazy="false">
+            <bag name="captures" cascade="all,delete-orphan" lazy="false">
                 <key column="DETAILS_ID"/>
                 <one-to-many class="com.zutubi.pulse.model.Capture"/>
             </bag>

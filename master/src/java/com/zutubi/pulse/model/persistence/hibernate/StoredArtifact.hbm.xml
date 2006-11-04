@@ -12,7 +12,7 @@
 
         <property name="index" column="INDEX" type="string" length="255"/>
 
-        <bag name="children" cascade="all-delete-orphan" lazy="false">
+        <bag name="children" cascade="all,delete-orphan" lazy="false">
             <key column="ARTIFACT_ID" not-null="true"/>
             <one-to-many class="com.zutubi.pulse.core.model.StoredFileArtifact"/>
         </bag>
@@ -29,7 +29,7 @@
 
         <property name="type" column="TYPE" type="string" length="255"/>
 
-        <bag name="features" cascade="all-delete-orphan" lazy="true">
+        <bag name="features" cascade="all,delete-orphan" lazy="true">
             <key column="FILE_ARTIFACT_ID"/>
             <one-to-many class="com.zutubi.pulse.core.model.Feature"/>
         </bag>

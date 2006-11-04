@@ -21,7 +21,7 @@
 
         <property name="outputDir" type="string" length="1023"/>
 
-        <bag name="features" cascade="all-delete-orphan" lazy="true">
+        <bag name="features" cascade="all,delete-orphan" lazy="true">
             <key column="BUILD_RESULT_ID"/>
             <one-to-many class="com.zutubi.pulse.core.model.Feature"/>
         </bag>
@@ -86,7 +86,7 @@
         <many-to-one name="result" class="com.zutubi.pulse.core.model.RecipeResult" column="RECIPE_RESULT_ID"
                      cascade="all" unique="true"/>
 
-        <list name="children" cascade="all-delete-orphan" lazy="false">
+        <list name="children" cascade="all,delete-orphan" lazy="false">
             <key column="PARENT_ID"/>
             <index column="ORDINAL"/>
             <one-to-many class="com.zutubi.pulse.model.RecipeResultNode"/>
@@ -111,14 +111,14 @@
 
         <property name="outputDir" type="string" length="1023"/>
 
-        <bag name="features" cascade="all-delete-orphan" lazy="true">
+        <bag name="features" cascade="all,delete-orphan" lazy="true">
             <key column="RECIPE_RESULT_ID"/>
             <one-to-many class="com.zutubi.pulse.core.model.Feature"/>
         </bag>
 
         <property name="recipeName" column="RECIPE_NAME" type="string" length="255"/>
 
-        <list name="commandResults" cascade="all-delete-orphan" lazy="true">
+        <list name="commandResults" cascade="all,delete-orphan" lazy="true">
             <key column="RECIPE_RESULT_ID"/>
             <index column="ORDINAL"/>
             <one-to-many class="com.zutubi.pulse.core.model.CommandResult"/>
