@@ -5,7 +5,7 @@
     <validator name="date" class="com.opensymphony.xwork.validator.validators.DateRangeFieldValidator"/>
     <validator name="expression" class="com.opensymphony.xwork.validator.validators.ExpressionValidator"/>
     <validator name="fieldexpression" class="com.opensymphony.xwork.validator.validators.FieldExpressionValidator"/>
-    <validator name="email" class="com.opensymphony.xwork.validator.validators.EmailValidator"/>
+    <validator name="email" class="com.zutubi.pulse.xwork.validator.validators.EmailValidator"/>
     <validator name="url" class="com.opensymphony.xwork.validator.validators.URLValidator"/>
     <validator name="visitor" class="com.opensymphony.xwork.validator.validators.VisitorFieldValidator"/>
     <validator name="conversion" class="com.opensymphony.xwork.validator.validators.ConversionErrorFieldValidator"/>

@@ -1,40 +1,37 @@
 package com.zutubi.validation.validators;
 
-import com.zutubi.validation.ShortCircuitableValidator;
+import com.zutubi.validation.ValidationException;
+
+import javax.mail.internet.AddressException;
+import javax.mail.internet.InternetAddress;
 
 /**
  * <class-comment/>
  */
-public class EmailValidator extends RegexValidator
+public class EmailValidator extends FieldValidatorSupport
 {
-    public static final String emailAddressPattern =
-            "\\b(^(\\S+@).+((\\.com)|(\\.net)|(\\.org)|(\\.info)|(\\.edu)|(\\.mil)|(\\.gov)|(\\.biz)|(\\.ws)|" +
-                    "(\\.us)|(\\.tv)|(\\.cc)|(\\.aero)|(\\.arpa)|(\\.coop)|(\\.int)|(\\.jobs)|(\\.museum)|" +
-                    "(\\.name)|(\\.pro)|(\\.travel)|(\\.nato)|(\\..{2,2}))$)\\b";
-
-    public EmailValidator()
+    public void validate(Object obj) throws ValidationException
     {
-        setCaseSensitive(false);
-        setPattern(emailAddressPattern);
+        Object fieldValue = getFieldValue(getFieldName(), obj);
+        if (fieldValue == null)
+        {
+            addFieldError(getFieldName());
+            return;
+        }
+
+        if (fieldValue instanceof String)
+        {
+            String str = ((String) fieldValue);
+
+            try
+            {
+                new InternetAddress(str);
+            }
+            catch (AddressException e)
+            {
+                addFieldError(getFieldName());
+            }
+        }
+
     }
-
-/*
-    public final static boolean verifyEmail(String email) {
-        if (email == null) {
-            return false;
-        }
-
-        if (email.indexOf('@') < 1) {
-            return false;
-        }
-
-        try {
-            new InternetAddress(email);
-
-            return true;
-        } catch (AddressException e) {
-            return false;
-        }
-    }
-*/
 }
