@@ -315,7 +315,7 @@ table.fill-content {
     width: 98%;
 }
 
-h3.heading, div.box, th.heading, th.note, th.content, th.content-row, td.content, td.content-wrap, td.content-centre, td.content-right, td.content-large, td.image, td.success, td.failure, td.test-failure, td.error, td.warning, td.info, td.pending, td.inprogress, td.terminating, td.add, td.success-right, td.failure-right, td.error-right, td.pending-right, td.inprogress-right, td.terminating-right {
+h3.heading, div.box, th.heading, th.group, th.note, th.content, th.content-row, td.content, td.content-wrap, td.content-centre, td.content-right, td.content-large, td.image, td.success, td.failure, td.test-failure, td.error, td.warning, td.info, td.pending, td.inprogress, td.terminating, td.add, td.success-right, td.failure-right, td.error-right, td.pending-right, td.inprogress-right, td.terminating-right {
     border: 1px solid #bbb;
     padding: 4px;
 }
@@ -324,7 +324,7 @@ th {
     white-space: nowrap;
 }
 
-th.form, th.heading, th.note, th.content, th.content-row, td.content, td.content-wrap, td.content-large, td.success, td.failure, td.test-failure, td.error, td.warning, td.info, td.pending, td.inprogress, td.terminating, td.add {
+th.form, th.heading, th.group, th.note, th.content, th.content-row, td.content, td.content-wrap, td.content-large, td.success, td.failure, td.test-failure, td.error, td.warning, td.info, td.pending, td.inprogress, td.terminating, td.add {
     text-align: left;
     vertical-align: top;
 }
@@ -355,9 +355,13 @@ th.content-row {
     white-space: nowrap;
 }
 
-h3.heading, th.heading {
+h3.heading, th.heading, th.group {
     background: #e8e8f3;
     white-space: nowrap;
+}
+
+th.group {
+    padding: 5px;
 }
 
 .note {

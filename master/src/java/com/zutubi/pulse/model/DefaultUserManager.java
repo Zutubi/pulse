@@ -212,6 +212,11 @@ public class DefaultUserManager implements UserManager
         }
     }
 
+    public void removeReferencesToProjectGroup(ProjectGroup projectGroup)
+    {
+        // TODO
+    }
+
     public int getUserCount()
     {
         return userDao.count();

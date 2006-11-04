@@ -105,4 +105,5 @@ public interface UserManager extends EntityManager<User>, UserDetailsService
 
     long getNextBuildNumber(User user);
     void removeReferencesToProject(Project project);
+    void removeReferencesToProjectGroup(ProjectGroup projectGroup);
 }

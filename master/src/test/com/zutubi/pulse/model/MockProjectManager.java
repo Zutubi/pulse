@@ -150,6 +150,31 @@ public class MockProjectManager implements ProjectManager
         throw new RuntimeException("Method not implemented.");
     }
 
+    public List<ProjectGroup> getAllProjectGroups()
+    {
+        throw new RuntimeException("Method not implemented.");
+    }
+
+    public ProjectGroup getProjectGroup(long id)
+    {
+        throw new RuntimeException("Method not implemented.");
+    }
+
+    public ProjectGroup getProjectGroup(String name)
+    {
+        throw new RuntimeException("Method not implemented.");
+    }
+
+    public void save(ProjectGroup projectGroup)
+    {
+        throw new RuntimeException("Method not implemented.");
+    }
+
+    public void delete(ProjectGroup projectGroup)
+    {
+        throw new RuntimeException("Method not implemented.");
+    }
+
     public void updateProjectDetails(Project project, String name, String description, String url)
     {
         throw new RuntimeException("Method not implemented.");

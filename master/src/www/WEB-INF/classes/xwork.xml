@@ -523,6 +523,25 @@
             <result name="success" type="redirect">/configureProject.action?id=${projectId}</result>
         </action>
 
+        <action name="addProjectGroup" class="com.zutubi.pulse.web.project.ProjectGroupAction">
+            <result name="error" type="velocity">generic-error.vm</result>
+            <result name="input" type="velocity">add-project-group.vm</result>
+            <result name="cancel" type="redirect">/viewProjects.action</result>
+            <result name="success" type="redirect">/viewProjects.action</result>
+        </action>
+
+        <action name="editProjectGroup" class="com.zutubi.pulse.web.project.ProjectGroupAction">
+            <result name="error" type="velocity">generic-error.vm</result>
+            <result name="input" type="velocity">edit-project-group.vm</result>
+            <result name="cancel" type="redirect">/viewProjects.action</result>
+            <result name="success" type="redirect">/viewProjects.action</result>
+        </action>
+
+        <action name="deleteProjectGroup" class="com.zutubi.pulse.web.project.DeleteProjectGroupAction">
+            <result name="error" type="velocity">generic-error.vm</result>
+            <result name="success" type="redirect">/viewProjects.action</result>
+        </action>
+
         <action name="addProject" class="com.zutubi.pulse.web.wizard.WizardAction">
             <interceptor-ref name="wizardStack"/>
             <param name="wizardClass">com.zutubi.pulse.web.project.AddProjectWizard</param>

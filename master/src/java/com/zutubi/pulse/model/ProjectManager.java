@@ -2,9 +2,9 @@ package com.zutubi.pulse.model;
 
 import com.zutubi.pulse.core.PulseException;
 import com.zutubi.pulse.core.model.Revision;
+import com.zutubi.pulse.license.LicenseException;
 import com.zutubi.pulse.personal.PatchArchive;
 import com.zutubi.pulse.scheduling.SchedulingException;
-import com.zutubi.pulse.license.LicenseException;
 import org.acegisecurity.annotation.Secured;
 
 import java.util.List;
@@ -158,4 +158,14 @@ public interface ProjectManager extends EntityManager<Project>
     List<CommitMessageTransformer> getCommitMessageTransformers();
     List<CommitMessageTransformer> findCommitMessageTransformersByProject(Project project);
     CommitMessageTransformer findCommitMessageTransformerByName(String name);
+
+    List<ProjectGroup> getAllProjectGroups();
+    ProjectGroup getProjectGroup(long id);
+    ProjectGroup getProjectGroup(String name);
+
+    @Secured({"ROLE_ADMINISTRATOR"})
+    void save(ProjectGroup projectGroup);
+
+    @Secured({"ROLE_ADMINISTRATOR"})
+    void delete(ProjectGroup projectGroup);
 }

@@ -9,16 +9,16 @@ import com.zutubi.pulse.core.model.Revision;
 import com.zutubi.pulse.events.EventManager;
 import com.zutubi.pulse.events.build.BuildRequestEvent;
 import com.zutubi.pulse.events.build.PersonalBuildRequestEvent;
-import com.zutubi.pulse.license.LicenseManager;
-import com.zutubi.pulse.license.LicenseHolder;
 import com.zutubi.pulse.license.LicenseException;
+import com.zutubi.pulse.license.LicenseHolder;
+import com.zutubi.pulse.license.LicenseManager;
 import com.zutubi.pulse.license.authorisation.AddProjectAuthorisation;
 import com.zutubi.pulse.model.persistence.*;
 import com.zutubi.pulse.personal.PatchArchive;
 import com.zutubi.pulse.scheduling.*;
 import com.zutubi.pulse.scheduling.tasks.BuildProjectTask;
-import com.zutubi.pulse.scm.SCMException;
 import com.zutubi.pulse.scm.SCMChangeEvent;
+import com.zutubi.pulse.scm.SCMException;
 import com.zutubi.pulse.util.logging.Logger;
 import org.acegisecurity.annotation.Secured;
 
@@ -33,6 +33,7 @@ public class DefaultProjectManager implements ProjectManager
     private static final Logger LOG = Logger.getLogger(DefaultProjectManager.class);
 
     private ProjectDao projectDao;
+    private ProjectGroupDao projectGroupDao;
     private BuildSpecificationDao buildSpecificationDao;
     private BuildSpecificationNodeDao buildSpecificationNodeDao;
     private TriggerDao triggerDao;
@@ -525,6 +526,33 @@ public class DefaultProjectManager implements ProjectManager
         return commitMessageTransformerDao.findByName(name);
     }
 
+    public List<ProjectGroup> getAllProjectGroups()
+    {
+        return projectGroupDao.findAll();
+    }
+
+    public ProjectGroup getProjectGroup(long id)
+    {
+        return projectGroupDao.findById(id);
+    }
+
+    public ProjectGroup getProjectGroup(String name)
+    {
+        return projectGroupDao.findByName(name);
+    }
+
+    public void save(ProjectGroup projectGroup)
+    {
+        projectGroupDao.save(projectGroup);
+    }
+
+    @Secured({"ROLE_ADMINISTRATOR"})
+    public void delete(ProjectGroup projectGroup)
+    {
+        userManager.removeReferencesToProjectGroup(projectGroup);
+        projectGroupDao.delete(projectGroup);
+    }
+
     public void setCommitMessageTransformerDao(CommitMessageTransformerDao commitMessageTransformerDao)
     {
         this.commitMessageTransformerDao = commitMessageTransformerDao;
@@ -543,6 +571,11 @@ public class DefaultProjectManager implements ProjectManager
     public void setUserManager(UserManager userManager)
     {
         this.userManager = userManager;
+    }
+
+    public void setProjectGroupDao(ProjectGroupDao projectGroupDao)
+    {
+        this.projectGroupDao = projectGroupDao;
     }
 
     public void setBuildSpecificationNodeDao(BuildSpecificationNodeDao buildSpecificationNodeDao)

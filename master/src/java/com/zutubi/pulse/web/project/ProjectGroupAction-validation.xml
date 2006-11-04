@@ -1,0 +1,9 @@
+<!DOCTYPE validators PUBLIC "-//OpenSymphony Group//XWork Validator 1.0//EN"
+        "http://www.opensymphony.com/xwork/xwork-validator-1.0.2.dtd">
+<validators>
+    <field name="name">
+        <field-validator type="requiredstring">
+            <message key="project.group.name.required">group name is required</message>
+        </field-validator>
+    </field>
+</validators>

@@ -6,6 +6,7 @@ import com.sun.syndication.feed.synd.*;
 import com.zutubi.pulse.bootstrap.MasterConfigurationManager;
 import com.zutubi.pulse.model.BuildResult;
 import com.zutubi.pulse.model.Project;
+import com.zutubi.pulse.model.ProjectGroup;
 import com.zutubi.pulse.model.User;
 import com.zutubi.pulse.renderer.BuildResultRenderer;
 import com.zutubi.pulse.search.BuildResultExpressions;
@@ -33,10 +34,16 @@ public class BuildResultsRssAction extends ProjectActionSupport
     private SyndFeed feed;
 
     private long userId = -1;
+    private long groupId = -1;
 
     public void setUserId(long userId)
     {
         this.userId = userId;
+    }
+
+    public void setGroupId(long groupId)
+    {
+        this.groupId = groupId;
     }
 
     public SyndFeed getFeed()
@@ -60,6 +67,11 @@ public class BuildResultsRssAction extends ProjectActionSupport
             {
                 User u = userManager.getUser(userId);
                 feed = generateFeed(new UserDashboardTemplate(u));
+            }
+            else if(groupId != -1)
+            {
+                ProjectGroup g = projectManager.getProjectGroup(groupId);
+                feed = generateFeed(new ProjectGroupTemplate(g));
             }
             else
             {
@@ -193,6 +205,66 @@ public class BuildResultsRssAction extends ProjectActionSupport
         public String getDescription()
         {
             return "This feed contains the latest pulse build results.";
+        }
+
+        public String getLink()
+        {
+            return configurationManager.getAppConfig().getBaseUrl() + "/viewProjects.action";
+        }
+
+        public String getEntryTitle(BuildResult result)
+        {
+            return String.format("Project %s build %s %s",
+                    result.getProject().getName(),
+                    result.getNumber(),
+                    (result.succeeded() ? "succeeded" : "failed")
+            );
+        }
+
+        public String getEntryLink(BuildResult result)
+        {
+            return configurationManager.getAppConfig().getBaseUrl() + "/viewBuild.action?id=" + result.getId();
+        }
+    }
+
+    private class ProjectGroupTemplate implements RssFeedTemplate
+    {
+        private ProjectGroup group;
+
+        public ProjectGroupTemplate(ProjectGroup group)
+        {
+            this.group = group;
+        }
+
+        public SearchQuery<BuildResult> getQuery()
+        {
+            if(group == null)
+            {
+                return null;
+            }
+
+            List<Project> projects = group.getProjects();
+            if (projects.size() == 0)
+            {
+                return null;
+            }
+
+            SearchQuery<BuildResult> query = queries.getBuildResults();
+            query.add(Expression.and(BuildResultExpressions.projectIn(projects), BuildResultExpressions.buildResultCompleted()));
+            query.setFirstResult(0);
+            query.setMaxResults(10);
+            query.add(BuildResultExpressions.orderByDescEndDate());
+            return query;
+        }
+
+        public String getTitle()
+        {
+            return "Pulse build results";
+        }
+
+        public String getDescription()
+        {
+            return "This feed contains the latest pulse build results for project group " + group.getName();
         }
 
         public String getLink()
