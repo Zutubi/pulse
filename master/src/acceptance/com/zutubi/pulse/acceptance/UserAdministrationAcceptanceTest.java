@@ -1,5 +1,6 @@
 package com.zutubi.pulse.acceptance;
 
+import com.zutubi.pulse.acceptance.forms.AdminEditUserForm;
 import com.zutubi.pulse.acceptance.forms.CreateUserForm;
 import com.zutubi.pulse.acceptance.forms.admin.EditPasswordForm;
 import com.zutubi.pulse.util.RandomUtils;
@@ -144,28 +145,63 @@ public class UserAdministrationAcceptanceTest extends BaseAcceptanceTestCase
         assertTextPresent("welcome");
     }
 
-    // Javascript errors be here :|
-    
-//    public void testEditUser()
-//    {
-//        // create a user.
-//        String login = RandomUtils.randomString(7);
-//        String name = login + "_name";
-//        submitCreateUserForm(login, name, login, login);
-//
-//        assertLinkPresent("edit_" + login);
-//        clickLink("edit_" + login);
-//
-//        AdminEditUserForm form = new AdminEditUserForm(tester);
-//        form.assertFormElements(login, name, "false");
-//        String editiedLogin = login + "_edited";
-//        form.saveFormElements(editiedLogin, name + "_edited", "true");
-//
-//        // assert that we are back on the manage users
-//        assertUserExists(editiedLogin);
-//        clickLink("edit_" + editiedLogin);
-//        form.assertFormElements(editiedLogin, name + "_edited", "true");
-//    }
+    public void testEditUser()
+    {
+        // create a user.
+        String login = RandomUtils.randomString(7);
+        String name = login + "_name";
+        submitCreateUserForm(login, name, login, login);
+
+        assertLinkPresent("edit_" + login);
+        clickLink("edit_" + login);
+
+        AdminEditUserForm form = new AdminEditUserForm(tester);
+        form.assertFormElements(login, name, "false");
+        String editedLogin = login + "_edited";
+        form.saveFormElements(editedLogin, name + "_edited", "true");
+
+        // assert that we are back on the manage users
+        assertUserExists(editedLogin);
+        clickLink("edit_" + editedLogin);
+        form.assertFormElements(editedLogin, name + "_edited", "true");
+    }
+
+    public void testEditUserValidation()
+    {
+        // create a user.
+        String login = RandomUtils.randomString(7);
+        String name = login + "_name";
+        submitCreateUserForm(login, name, login, login);
+
+        assertLinkPresent("edit_" + login);
+        clickLink("edit_" + login);
+
+        AdminEditUserForm form = new AdminEditUserForm(tester);
+        form.assertFormElements(login, name, "false");
+        form.saveFormElements("", "", "false");
+
+        form.assertFormPresent();
+        assertTextPresent("name is required");
+        assertTextPresent("login is required");
+    }
+
+    public void testEditUserDuplicate()
+    {
+        // create a user.
+        String login = RandomUtils.randomString(7);
+        String name = login + "_name";
+        submitCreateUserForm(login, name, login, login);
+        submitCreateUserForm(login + "2", name + "2", login, login);
+
+        clickLink("edit_" + login + "2");
+
+        AdminEditUserForm form = new AdminEditUserForm(tester);
+        form.assertFormElements(login + "2", name + "2", "false");
+        form.saveFormElements(login, "hello", "false");
+
+        form.assertFormPresent();
+        assertTextPresent("login " + login + " already in use. please select another login.");
+    }
 
     public void testChangeUserPasswordValidation()
     {

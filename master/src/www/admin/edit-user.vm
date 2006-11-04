@@ -22,7 +22,7 @@
 #if($action.isAdminUser($user))
                     #saveCancel(3)
 #else
-                    #wwcheckbox("name=ldapAuthentication" "label=%{getText('user.ldap.authentication')}" "tabindex=3" "onclick=setFormEnableState('password.edit', 'editUser_ldapAuthentication', true, true)")
+                    #wwcheckbox("name=ldapAuthentication" "label=%{getText('user.ldap.authentication')}" "tabindex=3" "onclick=setFormEnableState('password.edit', 'user.edit_ldapAuthentication', true, true)")
                     #saveCancel(4)
 #end
                 #end
@@ -47,7 +47,7 @@
 
 #if(!$action.isAdminUser($user))
     <script type="text/javascript">
-        setFormEnableState('password.edit', 'editUser_ldapAuthentication', true, true);
+        setFormEnableState('password.edit', 'user.edit_ldapAuthentication', true, true);
     </script>
 #end
 
