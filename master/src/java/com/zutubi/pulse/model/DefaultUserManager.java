@@ -12,6 +12,7 @@ import org.acegisecurity.userdetails.UserDetails;
 import org.acegisecurity.userdetails.UsernameNotFoundException;
 import org.springframework.dao.DataAccessException;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -49,16 +50,6 @@ public class DefaultUserManager implements UserManager
     public void save(ContactPoint contact)
     {
         contactPointDao.save(contact);
-    }
-
-    public Set<Project> getHiddenProjects(User user)
-    {
-        return userDao.getHiddenProjects(user);
-    }
-
-    public List<Project> getVisibleProjects(User user)
-    {
-        return userDao.findVisibleProjectsByUser(user);
     }
 
     public boolean hasAuthority(User user, String authority)
@@ -202,19 +193,43 @@ public class DefaultUserManager implements UserManager
         return number;
     }
 
+    public Set<Project> getUserProjects(User user, ProjectManager projectManager)
+    {
+        Set<Project> projects = new HashSet<Project>();
+        if(user.getShowAllProjects())
+        {
+            projects.addAll(projectManager.getAllProjects());
+        }
+        else
+        {
+            projects.addAll(user.getShownProjects());
+            for(ProjectGroup g: user.getShownGroups())
+            {
+                projects.addAll(g.getProjects());
+            }
+        }
+
+        return projects;
+    }
+
     public void removeReferencesToProject(Project project)
     {
-        List<User> users = userDao.findByHiddenProject(project);
+        List<User> users = userDao.findByShownProject(project);
         for(User u: users)
         {
-            u.getHiddenProjects().remove(project);
+            u.getShownProjects().remove(project);
             userDao.save(u);
         }
     }
 
     public void removeReferencesToProjectGroup(ProjectGroup projectGroup)
     {
-        // TODO
+        List<User> users = userDao.findByShownProjectGroup(projectGroup);
+        for(User u: users)
+        {
+            u.getShownGroups().remove(projectGroup);
+            userDao.save(u);
+        }
     }
 
     public int getUserCount()

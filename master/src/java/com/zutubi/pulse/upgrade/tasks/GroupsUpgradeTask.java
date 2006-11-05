@@ -76,7 +76,7 @@ public class GroupsUpgradeTask extends DatabaseUpgradeTask
         addAuthority(con, 1, "ROLE_ADMINISTRATOR");
         createAdminsGroup(con);
 
-        Map<Long, UserInfo> users = getAllUsers(con);
+        Map<Long, UserInfo> users = getUsers(con);
         addUserAuthorities(con, users);
 
         Map<Long, ProjectInfo> projects = getProjects(con);
@@ -188,7 +188,7 @@ public class GroupsUpgradeTask extends DatabaseUpgradeTask
         }
     }
 
-    private Map<Long, UserInfo> getAllUsers(Connection con) throws SQLException
+    private Map<Long, UserInfo> getUsers(Connection con) throws SQLException
     {
         Map<Long, UserInfo> result = new HashMap<Long, UserInfo>();
 

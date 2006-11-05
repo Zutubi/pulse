@@ -12,6 +12,7 @@ public class Navigation
     public static final String TAB_AGENTS = "tab.agents";
 
     public static final String LINK_LOGOUT = "logout";
+    public static final String LINK_DASHBOARD_CONFIGURE = "configure.dashboard";
 
     public static class Projects
     {

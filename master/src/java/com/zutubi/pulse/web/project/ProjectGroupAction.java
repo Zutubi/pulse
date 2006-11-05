@@ -52,7 +52,7 @@ public class ProjectGroupAction extends ActionSupport implements Preparable
 
     public Map<Long, String> getAllProjects()
     {
-        return helper.getAllProjects();
+        return helper.getAllEntities();
     }
 
     public List<String> getPrepareParameterNames()

@@ -3,13 +3,13 @@ package com.zutubi.pulse.api;
 import com.opensymphony.util.TextUtils;
 import com.zutubi.pulse.ShutdownManager;
 import com.zutubi.pulse.Version;
-import com.zutubi.pulse.form.squeezer.TypeSqueezer;
-import com.zutubi.pulse.form.squeezer.Squeezers;
-import com.zutubi.pulse.form.squeezer.SqueezeException;
 import com.zutubi.pulse.agent.Agent;
 import com.zutubi.pulse.agent.AgentManager;
 import com.zutubi.pulse.bootstrap.ComponentContext;
 import com.zutubi.pulse.core.model.ResultState;
+import com.zutubi.pulse.form.squeezer.SqueezeException;
+import com.zutubi.pulse.form.squeezer.Squeezers;
+import com.zutubi.pulse.form.squeezer.TypeSqueezer;
 import com.zutubi.pulse.license.LicenseException;
 import com.zutubi.pulse.license.LicenseHolder;
 import com.zutubi.pulse.model.*;
@@ -103,32 +103,133 @@ public class RemoteApi
         tokenManager.verifyUser(token);
 
         List<Project> projects = projectManager.getAllProjects();
-        Vector<String> result = new Vector<String>(projects.size());
-        for (Project p : projects)
+        return getNames(projects);
+    }
+
+    public Vector<String> getAllProjectGroups(String token) throws AuthenticationException
+    {
+        tokenManager.verifyUser(token);
+
+        List<ProjectGroup> groups = projectManager.getAllProjectGroups();
+        Vector<String> result = new Vector<String>(groups.size());
+        for (ProjectGroup g : groups)
         {
-            result.add(p.getName());
+            result.add(g.getName());
         }
 
         return result;
     }
 
+    public Hashtable<String, Object> getProjectGroup(String token, String name) throws AuthenticationException, ValidationException
+    {
+        tokenManager.verifyUser(token);
+
+        ProjectGroup group = projectManager.getProjectGroup(name);
+        if(group == null)
+        {
+            throw new ValidationException(String.format("Unknown project group: '%s'", name));
+        }
+
+        Hashtable<String, Object> result = new Hashtable<String, Object>();
+        result.put("name", group.getName());
+        result.put("projects", getNames(group.getProjects()));
+        return result;
+    }
+
+    public boolean createProjectGroup(String token, String name, Vector<String> projects) throws AuthenticationException, ValidationException
+    {
+        tokenManager.verifyAdmin(token);
+
+        if(!TextUtils.stringSet(name))
+        {
+            throw new ValidationException("Name is required");
+        }
+
+        if(projectManager.getProjectGroup(name) != null)
+        {
+            throw new ValidationException(String.format("A project group with name '%s' already exists", name));
+        }
+
+        List<Project> members = getProjectList(projects);
+
+        ProjectGroup group = new ProjectGroup(name);
+        group.setProjects(members);
+
+        try
+        {
+            tokenManager.loginUser(token);
+            projectManager.save(group);
+            return true;
+        }
+        finally
+        {
+            tokenManager.logoutUser();
+        }
+    }
+
+    public boolean editProjectGroup(String token, String name, String newName, Vector<String> projects) throws AuthenticationException, ValidationException
+    {
+        tokenManager.verifyAdmin(token);
+
+        ProjectGroup group = projectManager.getProjectGroup(name);
+        if(group == null)
+        {
+            throw new ValidationException(String.format("Unknown project group '%s'", name));
+        }
+
+        if(!TextUtils.stringSet(newName))
+        {
+            throw new ValidationException("Name is required");
+        }
+
+        if(!newName.equals(name) && projectManager.getProjectGroup(newName) != null)
+        {
+            throw new ValidationException(String.format("A project group with name '%s' already exists", newName));
+        }
+
+        group.setName(newName);
+        List<Project> members = getProjectList(projects);
+        group.setProjects(members);
+
+        try
+        {
+            tokenManager.loginUser(token);
+            projectManager.save(group);
+            return true;
+        }
+        finally
+        {
+            tokenManager.logoutUser();
+        }
+    }
+
+    public boolean deleteProjectGroup(String token, String name) throws AuthenticationException
+    {
+        tokenManager.verifyAdmin(token);
+
+        ProjectGroup group = projectManager.getProjectGroup(name);
+        if(group == null)
+        {
+            return false;
+        }
+        else
+        {
+            projectManager.delete(group);
+            return true;
+        }
+    }
+
     public Vector<String> getMyProjectNames(String token) throws AuthenticationException
     {
         User user = tokenManager.verifyUser(token);
-        List<Project> projects = projectManager.getAllProjects();
+        List<Project> projects = new LinkedList<Project>();
 
         if (user != null)
         {
-            projects.removeAll(userManager.getHiddenProjects(user));
+            projects.addAll(userManager.getUserProjects(user, projectManager));
         }
 
-        Vector<String> result = new Vector<String>(projects.size());
-        for (Project p : projects)
-        {
-            result.add(p.getName());
-        }
-
-        return result;
+        return getNames(projects);
     }
 
     public Vector<Hashtable<String, Object>> getBuild(String token, String projectName, int id) throws AuthenticationException
@@ -768,6 +869,16 @@ public class RemoteApi
         return result;
     }
 
+    private <T extends NamedEntity> Vector<String> getNames(Collection<T> entities)
+    {
+        Vector<String> result = new Vector<String>(entities.size());
+        for (NamedEntity t: entities)
+        {
+            result.add(t.getName());
+        }
+        return result;
+    }
+
     private Hashtable<String, Object> extractDetails(Object obj)
     {
         if (!structDefs.containsKey(obj.getClass()))
@@ -960,6 +1071,16 @@ public class RemoteApi
             throw new IllegalArgumentException("Unknown project '" + projectName + "'");
         }
         return project;
+    }
+
+    private List<Project> getProjectList(Vector<String> projects)
+    {
+        List<Project> members = new ArrayList<Project>(projects.size());
+        for(String s: projects)
+        {
+            members.add(internalGetProject(s));
+        }
+        return members;
     }
 
     private BuildSpecification getBuildSpecification(Project project, String buildSpecification)

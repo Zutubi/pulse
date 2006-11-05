@@ -25,6 +25,7 @@ public class User extends Entity implements UserDetails
     private static final String PROPERTY_TAIL_LINES = "tail.lines";
     private static final String PROPERTY_TAIL_REFRESH_INTERVAL = "tail.refresh.interval";
     private static final String PROPERTY_MY_BUILDS_COUNT = "my.builds.count";
+    public static final String PROPERTY_SHOW_ALL_PROJECTS = "show.all.projects";
 
     /**
      * The login name is used to identify this user.
@@ -52,9 +53,15 @@ public class User extends Entity implements UserDetails
     private List<ContactPoint> contactPoints;
 
     /**
-     * List of projects the user wants to hide from their dashboard.
+     * Set of projects the user wants to show on their dashboard.  Ignored
+     * when PROPERTY_SHOW_ALL_PROJECTS is true.
      */
-    private Set<Project> hiddenProjects = new HashSet<Project>();
+    private Set<Project> shownProjects = new HashSet<Project>();
+
+    /**
+     * Set of project groups the user wants to show on their dashboard.
+     */
+    private Set<ProjectGroup> shownGroups = new HashSet<ProjectGroup>();
 
     /**
      * Authorities granted directly to this user.  Authorities may also be
@@ -344,24 +351,24 @@ public class User extends Entity implements UserDetails
         return aliases.contains(alias);
     }
 
-    public Set<Project> getHiddenProjects()
+    public Set<Project> getShownProjects()
     {
-        return hiddenProjects;
+        return shownProjects;
     }
 
-    public void setHiddenProjects(Set<Project> hiddenProjects)
+    public void setShownProjects(Set<Project> shownProjects)
     {
-        this.hiddenProjects = hiddenProjects;
+        this.shownProjects = shownProjects;
     }
 
-    public void addHiddenProject(Project p)
+    public Set<ProjectGroup> getShownGroups()
     {
-        hiddenProjects.add(p);
+        return shownGroups;
     }
 
-    public void clearProjects()
+    public void setShownGroups(Set<ProjectGroup> shownGroups)
     {
-        hiddenProjects.clear();
+        this.shownGroups = shownGroups;
     }
 
     public void setProperties(Map<String, String> props)
@@ -472,6 +479,16 @@ public class User extends Entity implements UserDetails
     public void setLdapAuthentication(boolean useLdap)
     {
         setBooleanProperty(PROPERTY_LDAP_AUTHENTICATION, useLdap);
+    }
+
+    public boolean getShowAllProjects()
+    {
+        return getBooleanProperty(PROPERTY_SHOW_ALL_PROJECTS, true);
+    }
+
+    public void setShowAllProjects(boolean show)
+    {
+        setBooleanProperty(PROPERTY_SHOW_ALL_PROJECTS, show);
     }
 
     public boolean getShowMyChanges()

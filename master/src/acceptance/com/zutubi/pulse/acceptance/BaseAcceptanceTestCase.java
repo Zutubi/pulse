@@ -240,6 +240,20 @@ public abstract class BaseAcceptanceTestCase extends ExtendedWebTestCase
         }
     }
 
+    protected void ensureProjectGroup(String name, String... members) throws Exception
+    {
+        Vector<String> groups = (Vector<String>) callRemoteApi("getAllProjectGroups");
+        if(!groups.contains(name))
+        {
+            Vector<String> v = new Vector<String>(members.length);
+            for(String m: members)
+            {
+                v.add(m);
+            }
+            callRemoteApi("createProjectGroup", name, v);
+        }
+    }
+
     public void assertAndClick(String name)
     {
         assertLinkPresent(name);

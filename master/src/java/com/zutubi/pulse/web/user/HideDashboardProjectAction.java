@@ -36,9 +36,15 @@ public class HideDashboardProjectAction extends UserActionSupport
         User user = getUser();
 
         Project p = projectManager.getProject(id);
-        if(p != null && !user.getHiddenProjects().contains(p))
+        if(p != null)
         {
-            user.getHiddenProjects().add(p);
+            if(user.getShowAllProjects())
+            {
+                user.setShowAllProjects(false);
+                user.getShownProjects().addAll(projectManager.getAllProjects());
+            }
+
+            user.getShownProjects().remove(p);
         }
 
         getUserManager().save(user);

@@ -1,9 +1,14 @@
 package com.zutubi.pulse.web.user;
 
-import com.zutubi.pulse.model.*;
+import com.zutubi.pulse.model.BuildManager;
+import com.zutubi.pulse.model.ProjectManager;
+import com.zutubi.pulse.model.User;
 import com.zutubi.pulse.security.AcegiUtils;
+import com.zutubi.pulse.web.project.ProjectFormHelper;
+import com.zutubi.pulse.web.project.ProjectGroupFormHelper;
 
-import java.util.*;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Action allowing a user to configure which projects appear on their dashboard.
@@ -13,11 +18,15 @@ public class ConfigureDashboardAction extends UserActionSupport
     private int myBuildsCount;
     private int buildCount;
     private Map<Long, String> allProjects;
+    private boolean showAllProjects;
     private List<Long> projects;
-    private ProjectManager projectManager;
+    private Map<Long, String> allGroups;
+    private List<Long> shownGroups;
     private boolean showMyChanges = false;
     private boolean showProjectChanges = false;
     private BuildManager buildManager;
+    private ProjectFormHelper projectHelper;
+    private ProjectGroupFormHelper groupHelper;
 
     public int getMyBuildsCount()
     {
@@ -63,17 +72,20 @@ public class ConfigureDashboardAction extends UserActionSupport
     {
         if(allProjects == null)
         {
-            List<Project> all = projectManager.getAllProjects();
-            Collections.sort(all, new NamedEntityComparator());
-            allProjects = new LinkedHashMap<Long, String>();
-
-            for(Project p: all)
-            {
-                allProjects.put(p.getId(), p.getName());
-            }
+            allProjects = projectHelper.getAllEntities();
         }
 
         return allProjects;
+    }
+
+    public boolean isShowAllProjects()
+    {
+        return showAllProjects;
+    }
+
+    public void setShowAllProjects(boolean showAllProjects)
+    {
+        this.showAllProjects = showAllProjects;
     }
 
     public List<Long> getProjects()
@@ -84,6 +96,25 @@ public class ConfigureDashboardAction extends UserActionSupport
     public void setProjects(List<Long> projects)
     {
         this.projects = projects;
+    }
+
+    public Map<Long, String> getAllGroups()
+    {
+        if(allGroups == null)
+        {
+            allGroups = groupHelper.getAllEntities();
+        }
+        return allGroups;
+    }
+
+    public List<Long> getShownGroups()
+    {
+        return shownGroups;
+    }
+
+    public void setShownGroups(List<Long> shownGroups)
+    {
+        this.shownGroups = shownGroups;
     }
 
     public String doInput() throws Exception
@@ -108,14 +139,9 @@ public class ConfigureDashboardAction extends UserActionSupport
 
         buildCount = user.getDashboardBuildCount();
 
-        List<Project> all = projectManager.getAllProjects();
-        Set<Project> hidden = user.getHiddenProjects();
-        all.removeAll(hidden);
-        projects = new LinkedList<Long>();
-        for(Project p: all)
-        {
-            projects.add(p.getId());
-        }
+        showAllProjects = user.getShowAllProjects();
+        projects = projectHelper.convertToIds(user.getShownProjects());
+        shownGroups = groupHelper.convertToIds(user.getShownGroups());
 
         showMyChanges = user.getShowMyChanges();
         showProjectChanges = user.getShowProjectChanges();
@@ -139,16 +165,18 @@ public class ConfigureDashboardAction extends UserActionSupport
         buildManager.cleanupBuilds(user);
 
         user.setDashboardBuildCount(buildCount);
-        user.clearProjects();
 
-        List<Project> all = projectManager.getAllProjects();
-        for(Project p: all)
+        user.setShowAllProjects(showAllProjects);
+        if(showAllProjects)
         {
-            if(projects == null || !projects.contains(p.getId()))
-            {
-                user.addHiddenProject(p);
-            }
+            user.getShownProjects().clear();
         }
+        else
+        {
+            projectHelper.convertFromIds(projects, user.getShownProjects());
+        }
+
+        groupHelper.convertFromIds(shownGroups, user.getShownGroups());
 
         user.setShowMyChanges(showMyChanges);
         user.setShowProjectChanges(showProjectChanges);
@@ -160,7 +188,8 @@ public class ConfigureDashboardAction extends UserActionSupport
 
     public void setProjectManager(ProjectManager projectManager)
     {
-        this.projectManager = projectManager;
+        projectHelper = new ProjectFormHelper(projectManager);
+        groupHelper = new ProjectGroupFormHelper(projectManager);
     }
 
     public void setBuildManager(BuildManager buildManager)

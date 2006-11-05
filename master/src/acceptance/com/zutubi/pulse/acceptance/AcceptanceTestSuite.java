@@ -30,6 +30,7 @@ public class AcceptanceTestSuite
         // run this test (that messes with the setting) afterwards.
         suite.addTestSuite(GeneralConfigurationAcceptanceTest.class);
         suite.addTestSuite(ProjectArtifactsAcceptanceTest.class);
+        suite.addTestSuite(ProjectGroupAcceptanceTest.class);
         suite.addTestSuite(ProjectWizardAcceptanceTest.class);
         suite.addTestSuite(RssAcceptanceTest.class);
         suite.addTestSuite(SmtpConfigurationAcceptanceTest.class);

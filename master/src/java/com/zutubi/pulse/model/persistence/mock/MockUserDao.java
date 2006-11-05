@@ -1,8 +1,9 @@
 package com.zutubi.pulse.model.persistence.mock;
 
-import com.zutubi.pulse.model.Project;
-import com.zutubi.pulse.model.User;
 import com.zutubi.pulse.model.Group;
+import com.zutubi.pulse.model.Project;
+import com.zutubi.pulse.model.ProjectGroup;
+import com.zutubi.pulse.model.User;
 import com.zutubi.pulse.model.persistence.UserDao;
 
 import java.util.List;
@@ -34,7 +35,7 @@ public class MockUserDao extends MockEntityDao<User> implements UserDao
         return findAll().size();
     }
 
-    public Set<Project> getHiddenProjects(User user)
+    public Set<Project> getShownProjects(User user)
     {
         throw new RuntimeException("Method not implemented.");
     }
@@ -44,9 +45,14 @@ public class MockUserDao extends MockEntityDao<User> implements UserDao
         throw new RuntimeException("Method not implemented.");
     }
 
-    public List<User> findByHiddenProject(Project project)
+    public List<User> findByShownProject(Project project)
     {
         throw new RuntimeException("Method not implemented.");
+    }
+
+    public List<User> findByShownProjectGroup(ProjectGroup group)
+    {
+        throw new RuntimeException("Method not yet implemented.");
     }
 
     public List<Project> findVisibleProjectsByUser(User user)

@@ -20,6 +20,7 @@ import java.io.StringWriter;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 
 /**
  * <class-comment/>
@@ -345,7 +346,7 @@ public class BuildResultsRssAction extends ProjectActionSupport
 
         public SearchQuery<BuildResult> getQuery()
         {
-            List<Project> projects = userManager.getVisibleProjects(user);
+            Set<Project> projects = userManager.getUserProjects(user, projectManager);
             if (projects.size() == 0)
             {
                 return null;

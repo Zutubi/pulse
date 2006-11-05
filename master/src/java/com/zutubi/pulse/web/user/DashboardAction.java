@@ -8,9 +8,10 @@ import com.zutubi.pulse.security.AcegiUtils;
 import com.zutubi.pulse.web.ActionSupport;
 import com.zutubi.pulse.web.project.CommitMessageHelper;
 
+import java.util.ArrayList;
 import java.util.Collections;
-import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Action to view the user's dashboard: their own Pulse "homepage".
@@ -19,8 +20,8 @@ public class DashboardAction extends ActionSupport
 {
     private User user;
     private List<BuildResult> myBuilds;
-    private List<Project> projects;
-    private List<List<BuildResult>> latestBuilds;
+    private List<Project> shownProjects;
+    private List<ProjectGroup> shownGroups;
     private List<Changelist> changelists;
     private List<Changelist> projectChangelists = null;
 
@@ -40,14 +41,19 @@ public class DashboardAction extends ActionSupport
         return myBuilds;
     }
 
-    public List<Project> getProjects()
+    public List<Project> getShownProjects()
     {
-        return projects;
+        return shownProjects;
     }
 
-    public List<List<BuildResult>> getLatestBuilds()
+    public List<ProjectGroup> getShownGroups()
     {
-        return latestBuilds;
+        return shownGroups;
+    }
+
+    public List<BuildResult> getLatestBuilds(Project p)
+    {
+        return buildManager.getLatestBuildResultsForProject(p, user.getDashboardBuildCount());
     }
 
     public List<Changelist> getChangelists()
@@ -79,21 +85,25 @@ public class DashboardAction extends ActionSupport
         }
 
         myBuilds = buildManager.getPersonalBuilds(user);
-        
-        projects = userManager.getVisibleProjects(user);
 
-        Collections.sort(projects, new NamedEntityComparator());
-        latestBuilds = new LinkedList<List<BuildResult>>();
-
-        int buildCount = user.getDashboardBuildCount();
-        for (Project p : projects)
+        if(user.getShowAllProjects())
         {
-            latestBuilds.add(buildManager.getLatestBuildResultsForProject(p, buildCount));
+            shownProjects = projectManager.getAllProjects();
         }
+        else
+        {
+            shownProjects = new ArrayList<Project>(user.getShownProjects());
+        }
+        
+        Collections.sort(shownProjects, new NamedEntityComparator());
+
+        shownGroups = new ArrayList<ProjectGroup>(user.getShownGroups());
+        Collections.sort(shownGroups, new NamedEntityComparator());
 
         changelists = buildManager.getLatestChangesForUser(user, user.getMyChangesCount());
         Collections.sort(changelists, new ChangelistComparator());
 
+        Set<Project> projects = userManager.getUserProjects(user, projectManager);
         if(projects.size() > 0 && user.getShowProjectChanges())
         {
             projectChangelists = buildManager.getLatestChangesForProjects(projects.toArray(new Project[]{}), user.getProjectChangesCount());

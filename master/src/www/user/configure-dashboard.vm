@@ -17,18 +17,23 @@
     #inlineHelp("dashboard.my.builds.count.help")
     <tr><th class="form" colspan="2">#wwtext("name=my.projects")</th></tr>
     #wwtextfield("name=buildCount" "label=%{getText('dashboard.build.count')}" "size=4" "tabindex=2")
-    #wwcheckboxlist("name=projects" "label=%{getText('dashboard.projects.projects')}" "labelposition=top" "list=allProjects" "multirow=true" "multiple=true" "tabindex=3")
+    #wwcheckbox("name=showAllProjects" "label=%{getText('dashboard.projects.show.all')}" "onclick=setEnableState('dashboard.configuration_projects', 'dashboard.configuration_showAllProjects', true)" "tabindex=3")
+    #wwselect("name=projects" "label=%{getText('dashboard.projects.projects')}" "list=allProjects" "multiple=true" "tabindex=4")
+#if($allGroups.size() > 0)
+    #wwselect("name=shownGroups" "label=%{getText('dashboard.projects.groups')}" "list=allGroups" "multiple=true" "tabindex=5")
+#end
     <tr><th class="form" colspan="2">#wwtext("name=dashboard.panels")</th></tr>
-    #wwcheckbox("name=showMyChanges" "label=%{getText('dashboard.show.my.changes')}" "onclick=setEnableState('dashboard.configuration_user_myChangesCount', 'dashboard.configuration_showMyChanges')" "tabindex=4")
-    #wwtextfield("name=user.myChangesCount" "label=%{getText('dashboard.my.changes.count')}""size=4" "tabindex=5")
-    #wwcheckbox("name=showProjectChanges" "label=%{getText('dashboard.show.project.changes')}" "onclick=setEnableState('dashboard.configuration_user_projectChangesCount', 'dashboard.configuration_showProjectChanges')" "tabindex=6")
-    #wwtextfield("name=user.projectChangesCount" "label=%{getText('dashboard.project.changes.count')}""size=4" "tabindex=7")
+    #wwcheckbox("name=showMyChanges" "label=%{getText('dashboard.show.my.changes')}" "onclick=setEnableState('dashboard.configuration_user_myChangesCount', 'dashboard.configuration_showMyChanges')" "tabindex=6")
+    #wwtextfield("name=user.myChangesCount" "label=%{getText('dashboard.my.changes.count')}""size=4" "tabindex=7")
+    #wwcheckbox("name=showProjectChanges" "label=%{getText('dashboard.show.project.changes')}" "onclick=setEnableState('dashboard.configuration_user_projectChangesCount', 'dashboard.configuration_showProjectChanges')" "tabindex=8")
+    #wwtextfield("name=user.projectChangesCount" "label=%{getText('dashboard.project.changes.count')}""size=4" "tabindex=9")
 
-    #saveCancel(8)
+    #saveCancel(10)
 #end
 
     <script type="text/javascript">
     <!--
+        setEnableState('dashboard.configuration_projects', 'dashboard.configuration_showAllProjects', true)
         setEnableState('dashboard.configuration_user_myChangesCount', 'dashboard.configuration_showMyChanges');
         setEnableState('dashboard.configuration_user_projectChangesCount', 'dashboard.configuration_showProjectChanges');
     -->

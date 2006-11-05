@@ -6,7 +6,7 @@ import org.hibernate.criterion.Criterion;
 import org.hibernate.criterion.Expression;
 import org.hibernate.criterion.Order;
 
-import java.util.List;
+import java.util.Collection;
 
 /**
  * The Build result restrictions provides a set of pre-defined expressions that can be applied to Search Queries
@@ -19,7 +19,7 @@ public class BuildResultExpressions
         return Expression.eq("project", project);
     }
 
-    public static Criterion projectIn(List<Project> projects)
+    public static Criterion projectIn(Collection<Project> projects)
     {
         return Expression.in("project", projects);
     }

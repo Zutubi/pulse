@@ -88,21 +88,31 @@ public abstract class DatabaseUpgradeTask implements UpgradeTask, DataSourceAwar
 
     protected List<Long> getAllProjects(Connection con) throws SQLException
     {
+        return getAllIds(con, "project");
+    }
+
+    protected List<Long> getAllUsers(Connection con) throws SQLException
+    {
+        return getAllIds(con, "user");
+    }
+
+    private List<Long> getAllIds(Connection con, String table) throws SQLException
+    {
         CallableStatement stmt = null;
         ResultSet rs = null;
 
-        List<Long> projects = new LinkedList<Long>();
+        List<Long> all = new LinkedList<Long>();
 
         try
         {
-            stmt = con.prepareCall("SELECT id FROM project");
+            stmt = con.prepareCall("SELECT id FROM " + table);
             rs = stmt.executeQuery();
             while(rs.next())
             {
-                projects.add(rs.getLong("id"));
+                all.add(rs.getLong("id"));
             }
 
-            return projects;
+            return all;
         }
         finally
         {
@@ -111,7 +121,7 @@ public abstract class DatabaseUpgradeTask implements UpgradeTask, DataSourceAwar
         }
     }
 
-    protected byte[] upgradeBlob(ResultSet rs, String columnName, ObjectUpgrader objectUpgrader) throws SQLException, IOException, ClassNotFoundException
+    protected byte[] upgradeBlob(ResultSet rs, String columnName, ObjectUpgrader objectUpgrader) throws SQLException, IOException
     {
         byte[] data = rs.getBytes(columnName);
 
@@ -128,6 +138,10 @@ public abstract class DatabaseUpgradeTask implements UpgradeTask, DataSourceAwar
             oos = new ObjectOutputStream(byteStream);
             oos.writeObject(object);
             data = byteStream.toByteArray();
+        }
+        catch (ClassNotFoundException e)
+        {
+            throw new IOException(e.getMessage());
         }
         finally
         {

@@ -1,3 +1,56 @@
+#macro(buildsTable $project $showHideLink)
+    #set($recentBuilds = $action.getLatestBuilds($project))
+        <tr>
+            <th class="heading" colspan="14">
+    #if($showHideLink)
+                <span class="action">
+                    <a href="$base/user/hideDashboardProject.action?id=$project.id" class="unadorned">X</a>
+                </span>
+    #end
+                <a href="$base/currentBuild.action?id=$project.id" id="home_$!webwork.htmlEncode($project.name)">
+                    <img alt="home" src="$base/images/house.gif">
+                    $!webwork.htmlEncode($project.name)
+                </a>
+            </th>
+        </tr>
+        <tr>
+            #contentHeading("build.id" 1)
+            #contentHeading("build.spec" 1)
+            #contentHeading("build.status" 2)
+            #contentHeading("build.reason" 1)
+            #contentHeading("build.tests" 1)
+            #contentHeading("build.when" 1)
+            #contentHeading("build.elapsed" 1)
+            #contentHeading("actions" 5)
+        </tr>
+    #if($recentBuilds.size() > 0)
+        #foreach($buildResult in $recentBuilds)
+        <tr>
+            #set($cssClass = $buildResult.state.string)
+
+            <td class="content-right"><a href="viewBuild.action?id=$buildResult.id">$buildResult.number</a></td>
+            #classCell($buildResult.buildSpecification)
+            #statusCell($buildResult true)
+            #classCell($buildResult.reason.summary)
+            #testResultsCell($buildResult false $buildResult)
+            #dateClassCell($buildResult)
+            #elapsedCell($buildResult)
+            #viewCell($project $buildResult)
+            #logCell($project $buildResult)
+            #changesCell($project $buildResult)
+            #artifactsCell($project $buildResult)
+#acl("domainObject=project" "hasPermission=4,1")
+            #workingCopyCell($project $buildResult)
+#end
+        </tr>
+        #end
+    #else
+        <tr>
+            <td class="content" colspan="14">#wwtext("name=never.built")</td>
+        </tr>
+    #end
+#end
+
 #macro(changesTable $titleKey $changelists $showWho $source)
     <table class="content">
         #headingRow($titleKey 6)
@@ -49,7 +102,7 @@
 #end
 
 <p style="text-align: right; margin-bottom: 0">
-    <a href="$base/user/configureDashboard!input.action">
+    <a href="$base/user/configureDashboard!input.action" id="configure.dashboard">
         <img alt="configure" src="$base/images/pencil.gif"/> #wwtext("name=configure.dashboard")
     </a>
 </p>
@@ -99,57 +152,24 @@
 #end
 </h2>
 
-    <table id="$id" class="content">
-#foreach($project in $projects)
-    #set($index = $velocityCount - 1)
-    #set($recentBuilds = $latestBuilds.get($index))
+#foreach($group in $shownGroups)
+    <table class="content" id="group_$!webwork.htmlEncode($group.name)">
         <tr>
-            <th class="heading" colspan="14">
+            <th class="group" colspan="14">
                 <span class="action">
-                    <a href="$base/user/hideDashboardProject.action?id=$project.id" class="unadorned">X</a>
+                    <a href="$base/user/hideDashboardGroup.action?id=$group.id" class="unadorned">X</a>
                 </span>
-                <a href="$base/currentBuild.action?id=$project.id">
-                    <img alt="home" src="$base/images/house.gif">
-                    $!webwork.htmlEncode($project.name)
-                </a>
+                $!webwork.htmlEncode($group.name)
             </th>
         </tr>
-        <tr>
-            #contentHeading("build.id" 1)
-            #contentHeading("build.spec" 1)
-            #contentHeading("build.status" 2)
-            #contentHeading("build.reason" 1)
-            #contentHeading("build.tests" 1)
-            #contentHeading("build.when" 1)
-            #contentHeading("build.elapsed" 1)
-            #contentHeading("actions" 5)
-        </tr>
-    #if($recentBuilds.size() > 0)
-        #foreach($buildResult in $recentBuilds)
-        <tr>
-            #set($cssClass = $buildResult.state.string)
-
-            <td class="content-right"><a href="viewBuild.action?id=$buildResult.id">$buildResult.number</a></td>
-            #classCell($buildResult.buildSpecification)
-            #statusCell($buildResult true)
-            #classCell($buildResult.reason.summary)
-            #testResultsCell($buildResult false $buildResult)
-            #dateClassCell($buildResult)
-            #elapsedCell($buildResult)
-            #viewCell($project $buildResult)
-            #logCell($project $buildResult)
-            #changesCell($project $buildResult)
-            #artifactsCell($project $buildResult)
-#acl("domainObject=project" "hasPermission=4,1")
-            #workingCopyCell($project $buildResult)
-#end
-        </tr>
-        #end
-    #else
-        <tr>
-            <td class="content" colspan="14">#wwtext("name=never.built")</td>
-        </tr>
+    #foreach($project in $group.projects)
+        #buildsTable($project false)
     #end
+    </table>
+#end
+    <table class="content">
+#foreach($project in $shownProjects)
+        #buildsTable($project true)
 #end
     </table>
 

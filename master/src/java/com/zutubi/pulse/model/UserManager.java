@@ -62,16 +62,7 @@ public interface UserManager extends EntityManager<User>, UserDetailsService
      */
     int getUserCount();
 
-    /**
-     * Returns a list of projects configured by the user to hide from their
-     * dashboard.
-     *
-     * @param user user to get the projects for
-     * @return the user's hidden projects
-     */
-    Set<Project> getHiddenProjects(User user);
-
-    List<Project> getVisibleProjects(User user);
+    Set<Project> getUserProjects(User user, ProjectManager projectManager);
 
     /**
      * Returns true iff the given user has been granted the given authority,

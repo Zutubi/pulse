@@ -50,9 +50,14 @@
             <element type="string" column="ALIAS" not-null="true"/>
         </bag>
 
-        <set name="hiddenProjects" table="USER_HIDDEN_PROJECTS" lazy="true" cascade="save-update">
+        <set name="shownProjects" table="USER_SHOWN_PROJECTS" lazy="true" cascade="save-update">
             <key column="USER_ID"/>
             <many-to-many class="com.zutubi.pulse.model.Project" column="PROJECT_ID"/>
+        </set>
+
+        <set name="shownGroups" table="USER_SHOWN_GROUPS" lazy="true" cascade="save-update">
+            <key column="USER_ID"/>
+            <many-to-many class="com.zutubi.pulse.model.ProjectGroup" column="PROJECT_GROUP_ID"/>
         </set>
 
         <property name="nextBuildNumber" column="NEXT_BUILD_NUMBER" type="long"/>

@@ -837,6 +837,11 @@
             <result name="success" type="redirect">/dashboard.action</result>
         </action>
 
+        <action name="hideDashboardGroup" class="com.zutubi.pulse.web.user.HideDashboardGroupAction">
+            <result name="error" type="velocity">generic-error.vm</result>
+            <result name="success" type="redirect">/dashboard.action</result>
+        </action>
+
         <action name="editUser" class="com.zutubi.pulse.web.user.EditUserAction">
             <result name="input" type="velocity">edit-user.vm</result>
             <result name="error" type="velocity">edit-user.vm</result>

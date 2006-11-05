@@ -1,12 +1,10 @@
 package com.zutubi.pulse.model.persistence.hibernate;
 
-import com.zutubi.pulse.model.EmailContactPoint;
-import com.zutubi.pulse.model.Project;
-import com.zutubi.pulse.model.User;
-import com.zutubi.pulse.model.Group;
-import com.zutubi.pulse.model.persistence.ProjectDao;
-import com.zutubi.pulse.model.persistence.UserDao;
+import com.zutubi.pulse.model.*;
 import com.zutubi.pulse.model.persistence.GroupDao;
+import com.zutubi.pulse.model.persistence.ProjectDao;
+import com.zutubi.pulse.model.persistence.ProjectGroupDao;
+import com.zutubi.pulse.model.persistence.UserDao;
 
 import java.util.HashSet;
 import java.util.List;
@@ -20,6 +18,7 @@ public class HibernateUserDaoTest extends MasterPersistenceTestCase
     private UserDao userDao;
     private GroupDao groupDao;
     private ProjectDao projectDao;
+    private ProjectGroupDao projectGroupDao;
 
     public void setUp() throws Exception
     {
@@ -27,6 +26,7 @@ public class HibernateUserDaoTest extends MasterPersistenceTestCase
         userDao = (UserDao) context.getBean("userDao");
         groupDao = (GroupDao) context.getBean("groupDao");
         projectDao = (ProjectDao) context.getBean("projectDao");
+        projectGroupDao = (ProjectGroupDao) context.getBean("projectGroupDao");
     }
 
     public void tearDown() throws Exception
@@ -34,6 +34,7 @@ public class HibernateUserDaoTest extends MasterPersistenceTestCase
         userDao = null;
         groupDao = null;
         projectDao = null;
+        projectGroupDao = null;
         super.tearDown();
     }
 
@@ -108,13 +109,13 @@ public class HibernateUserDaoTest extends MasterPersistenceTestCase
         projects.add(p2);
 
         User user = new User();
-        user.setHiddenProjects(projects);
+        user.setShownProjects(projects);
         userDao.save(user);
         commitAndRefreshTransaction();
 
         user = userDao.findById(user.getId());
 
-        Set<Project> otherProjects = userDao.getHiddenProjects(user);
+        Set<Project> otherProjects = userDao.getShownProjects(user);
         assertEquals(2, otherProjects.size());
     }
 
@@ -172,7 +173,7 @@ public class HibernateUserDaoTest extends MasterPersistenceTestCase
         assertEquals(0, users.size());
     }
 
-    public void testFindByHiddenProject()
+    public void testFindByShownProject()
     {
         Set<Project> projects = new HashSet<Project>();
         Project p1 = new Project("1", "project 1");
@@ -182,58 +183,35 @@ public class HibernateUserDaoTest extends MasterPersistenceTestCase
         projects.add(p1);
 
         User user = new User();
-        user.setHiddenProjects(projects);
+        user.setShownProjects(projects);
         userDao.save(user);
         commitAndRefreshTransaction();
 
-        List<User> users = userDao.findByHiddenProject(p1);
+        List<User> users = userDao.findByShownProject(p1);
         assertEquals(1, users.size());
-        users = userDao.findByHiddenProject(p2);
+        users = userDao.findByShownProject(p2);
         assertEquals(0, users.size());
     }
 
-    public void testFindVisibleProjectsByUser()
+    public void testFindByShownGroup()
     {
-        Project p1 = new Project("1", "project 1");
-        Project p2 = new Project("2", "project 2");
-        projectDao.save(p1);
-        projectDao.save(p2);
-
-        // A) Mark project 1 as hidden. Project 2 should be visible.
-
-        Set<Project> projects = new HashSet<Project>();
-        projects.add(p1);
+        Set<ProjectGroup> groups = new HashSet<ProjectGroup>();
+        ProjectGroup g1 = new ProjectGroup("1");
+        ProjectGroup g2 = new ProjectGroup("2");
+        projectGroupDao.save(g1);
+        projectGroupDao.save(g2);
+        groups.add(g1);
 
         User user = new User();
-        user.setHiddenProjects(projects);
+        user.setShownGroups(groups);
         userDao.save(user);
+
         commitAndRefreshTransaction();
 
-        List<Project> visibleProjects = userDao.findVisibleProjectsByUser(user);
-        assertEquals(1, visibleProjects.size());
-        assertEquals(p2, visibleProjects.get(0));
-
-        // B) Mark project 2 as hidden, no projects should be visible.
-
-        projects.add(projectDao.findById(p2.getId()));
-        user.setHiddenProjects(projects);
-        userDao.save(user);
-        commitAndRefreshTransaction();
-
-        // verify that no projects are visible.
-        visibleProjects = userDao.findVisibleProjectsByUser(user);
-        assertEquals(0, visibleProjects.size());
-
-        // C) Mark no projects as hidden. All projects should be visible.
-
-        projects.clear();
-        user.setHiddenProjects(projects);
-        userDao.save(user);
-        commitAndRefreshTransaction();
-
-        // verify that all projects are visible.
-        visibleProjects = userDao.findVisibleProjectsByUser(user);
-        assertEquals(2, visibleProjects.size());
+        List<User> users = userDao.findByShownProjectGroup(g1);
+        assertEquals(1, users.size());
+        users = userDao.findByShownProjectGroup(g2);
+        assertEquals(0, users.size());
     }
 
 /*

@@ -1,8 +1,9 @@
 package com.zutubi.pulse.model.persistence;
 
-import com.zutubi.pulse.model.Project;
-import com.zutubi.pulse.model.User;
 import com.zutubi.pulse.model.Group;
+import com.zutubi.pulse.model.Project;
+import com.zutubi.pulse.model.ProjectGroup;
+import com.zutubi.pulse.model.User;
 
 import java.util.List;
 import java.util.Set;
@@ -17,18 +18,12 @@ public interface UserDao extends EntityDao<User>
 
     List<User> findByLikeLogin(String login);
 
-    Set<Project> getHiddenProjects(User user);
+    Set<Project> getShownProjects(User user);
 
     List<User> findByNotInGroup(Group group);
 
-    List<User> findByHiddenProject(Project project);
+    List<User> findByShownProject(Project project);
 
-    /**
-     * Visible projects are all of those projects that the User has not explicitly marked as hidden.
-     * 
-     * @param user whose visible projects will be retrieved.
-     *
-     * @return a list of projects.
-     */
-    List<Project> findVisibleProjectsByUser(User user);
+    List<User> findByShownProjectGroup(ProjectGroup group);
+
 }
