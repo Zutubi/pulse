@@ -61,7 +61,10 @@ public class VfsManagerFactoryBean implements FactoryBean
 
     public void shutdown()
     {
-        instance.close();
+        if (instance != null)
+        {
+            instance.close();
+        }
     }
 
     public void setSlaveProxyFactory(SlaveProxyFactory proxyFactory)

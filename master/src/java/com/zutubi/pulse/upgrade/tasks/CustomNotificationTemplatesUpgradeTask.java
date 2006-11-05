@@ -94,15 +94,17 @@ public class CustomNotificationTemplatesUpgradeTask extends DatabaseUpgradeTask
                     Properties properties = new Properties();
                     properties.load(new ByteArrayInputStream(rs.getBytes("properties")));
                     String emailType = properties.getProperty("type");
-                    if(emailType.equals("html"))
+                    if (emailType != null)
                     {
-                        result = "html-email";
+                        if(emailType.equals("html"))
+                        {
+                            result = "html-email";
+                        }
+                        else
+                        {
+                            result = "plain-text-email";
+                        }
                     }
-                    else
-                    {
-                        result = "plain-text-email";
-                    }
-
                     updateProperties(con, contactId, properties);
                 }
                 else
