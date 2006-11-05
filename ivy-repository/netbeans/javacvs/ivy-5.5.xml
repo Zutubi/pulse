@@ -14,6 +14,7 @@
 
     <publications>
         <artifact name="org-netbeans-lib-cvsclient" type="jar" conf="default"/>
+        <artifact name="org-netbeans-lib-cvsclient-license" type="txt" conf="default"/>
     </publications>
 
 </ivy-module>
