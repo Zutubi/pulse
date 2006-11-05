@@ -35,7 +35,7 @@
 
         <dependency org="junit" name="junit" rev="3.8.1" conf="external,build->default"/>
 
-        <dependency org="netbeans" name="javacvs" rev="11nov2005" conf="external,build,release->default"/>
+        <dependency org="netbeans" name="javacvs" rev="5.5" conf="external,build,release->default"/>
 
         <dependency org="opensymphony" name="xwork" rev="1.1.1" conf="external,build,release->minimal"/>
         <dependency org="opensymphony" name="oscore" rev="2.2.4" conf="external,build,release->default"/>
