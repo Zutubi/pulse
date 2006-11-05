@@ -120,14 +120,14 @@ public class RemoteApi
         return result;
     }
 
-    public Hashtable<String, Object> getProjectGroup(String token, String name) throws AuthenticationException, ValidationException
+    public Hashtable<String, Object> getProjectGroup(String token, String name) throws AuthenticationException, IllegalArgumentException
     {
         tokenManager.verifyUser(token);
 
         ProjectGroup group = projectManager.getProjectGroup(name);
         if(group == null)
         {
-            throw new ValidationException(String.format("Unknown project group: '%s'", name));
+            throw new IllegalArgumentException(String.format("Unknown project group: '%s'", name));
         }
 
         Hashtable<String, Object> result = new Hashtable<String, Object>();
@@ -136,18 +136,18 @@ public class RemoteApi
         return result;
     }
 
-    public boolean createProjectGroup(String token, String name, Vector<String> projects) throws AuthenticationException, ValidationException
+    public boolean createProjectGroup(String token, String name, Vector<String> projects) throws AuthenticationException, IllegalArgumentException
     {
         tokenManager.verifyAdmin(token);
 
         if(!TextUtils.stringSet(name))
         {
-            throw new ValidationException("Name is required");
+            throw new IllegalArgumentException("Name is required");
         }
 
         if(projectManager.getProjectGroup(name) != null)
         {
-            throw new ValidationException(String.format("A project group with name '%s' already exists", name));
+            throw new IllegalArgumentException(String.format("A project group with name '%s' already exists", name));
         }
 
         List<Project> members = getProjectList(projects);
@@ -167,24 +167,24 @@ public class RemoteApi
         }
     }
 
-    public boolean editProjectGroup(String token, String name, String newName, Vector<String> projects) throws AuthenticationException, ValidationException
+    public boolean editProjectGroup(String token, String name, String newName, Vector<String> projects) throws AuthenticationException, IllegalArgumentException
     {
         tokenManager.verifyAdmin(token);
 
         ProjectGroup group = projectManager.getProjectGroup(name);
         if(group == null)
         {
-            throw new ValidationException(String.format("Unknown project group '%s'", name));
+            throw new IllegalArgumentException(String.format("Unknown project group '%s'", name));
         }
 
         if(!TextUtils.stringSet(newName))
         {
-            throw new ValidationException("Name is required");
+            throw new IllegalArgumentException("Name is required");
         }
 
         if(!newName.equals(name) && projectManager.getProjectGroup(newName) != null)
         {
-            throw new ValidationException(String.format("A project group with name '%s' already exists", newName));
+            throw new IllegalArgumentException(String.format("A project group with name '%s' already exists", newName));
         }
 
         group.setName(newName);
@@ -443,19 +443,12 @@ public class RemoteApi
         tokenManager.verifyAdmin(token);
         LicenseHolder.ensureAuthorization(LicenseHolder.AUTH_ADD_AGENT);
 
+        Slave newSlave = new Slave(name, host, port);
+        validate(newSlave);
+
         if (!TextUtils.stringSet(name) || agentManager.agentExists(name))
         {
-            return false;
-        }
-
-        if (!TextUtils.stringSet(host))
-        {
-            return false;
-        }
-
-        if (port <= 0)
-        {
-            return false;
+            throw new IllegalArgumentException(String.format("An agent by the name '%s' already exists. Please select a different name.", name));
         }
 
         agentManager.addSlave(new Slave(name, host, port));
@@ -531,7 +524,7 @@ public class RemoteApi
         User user = userManager.getUser(login);
         if (user == null)
         {
-            throw new IllegalArgumentException("Unknown username '" + login + "'");
+            throw new IllegalArgumentException(String.format("Unknown username '%s'", login));
         }
         userManager.setPassword(user, password);
         userManager.save(user);
@@ -555,14 +548,15 @@ public class RemoteApi
         LicenseHolder.ensureAuthorization(LicenseHolder.AUTH_ADD_USER);
 
         // validate the user details.
-        User existingUser = userManager.getUser((String) user.get("login"));
+        String login = (String) user.get("login");
+        User existingUser = userManager.getUser(login);
         if (existingUser != null)
         {
-            return false;
+            throw new IllegalArgumentException(String.format("A user with the login '%s' already exists. Please select a different login.", login));
         }
 
         User instance = new User();
-        instance.setLogin((String) user.get("login"));
+        instance.setLogin(login);
         instance.setName((String) user.get("name"));
 
         userManager.save(instance);
@@ -580,16 +574,16 @@ public class RemoteApi
      * @return true if the request is successful, false otherwise.
      * @throws AuthenticationException is you are not authorised to execute this request.
      *
-     * @throws ValidationException if no user with the specified login exists.
+     * @throws IllegalArgumentException if no user with the specified login exists.
      */
-    public boolean deleteUser(String token, String login) throws AuthenticationException, ValidationException
+    public boolean deleteUser(String token, String login) throws AuthenticationException, IllegalArgumentException
     {
         tokenManager.verifyAdmin(token);
 
         User user = userManager.getUser(login);
         if (user == null)
         {
-            throw new ValidationException(String.format("Unknown user login: '%s'", login));
+            throw new IllegalArgumentException(String.format("Unknown user login: '%s'", login));
         }
         userManager.delete(user);
         return true;
@@ -607,19 +601,20 @@ public class RemoteApi
      * 
      * @throws AuthenticationException  if you are not authorised to execute this action.
      * @throws LicenseException         if you are not licensed to execute this action.
-     * @throws ValidationException      if a validation error is detected.
+     * @throws IllegalArgumentException      if a validation error is detected.
      */
-    public boolean createProject(String token, Hashtable<String, Object> project, Hashtable<String, Object> scm, Hashtable<String, Object> type) throws AuthenticationException, LicenseException, ValidationException
+    public boolean createProject(String token, Hashtable<String, Object> project, Hashtable<String, Object> scm, Hashtable<String, Object> type) throws AuthenticationException, LicenseException, IllegalArgumentException
     {
         try
         {
             User user = tokenManager.verifyAdmin(token);
             AcegiUtils.loginAs(user);
 
-            Project existingProject = projectManager.getProject((String) project.get("name"));
+            String name = (String) project.get("name");
+            Project existingProject = projectManager.getProject(name);
             if (existingProject != null)
             {
-                return false;
+                throw new IllegalArgumentException(String.format("A project with the name '%s' already exists. Please use a different name.", name));
             }
 
             Project newProject = new Project();
@@ -656,9 +651,9 @@ public class RemoteApi
      *
      * @throws AuthenticationException if you are not authorised to execute this request.
      *
-     * @throws ValidationException if no project with the specified name exists.
+     * @throws IllegalArgumentException if no project with the specified name exists.
      */
-    public boolean deleteProject(String token, String name) throws AuthenticationException, ValidationException
+    public boolean deleteProject(String token, String name) throws AuthenticationException, IllegalArgumentException
     {
         try
         {
@@ -667,7 +662,7 @@ public class RemoteApi
             Project project = projectManager.getProject(name);
             if (project == null)
             {
-                throw new ValidationException(String.format("Unknown project name: '%s'", name));
+                throw new IllegalArgumentException(String.format("Unknown project name: '%s'", name));
             }
 
             projectManager.delete(project);
@@ -679,7 +674,7 @@ public class RemoteApi
         }
     }
 
-    public boolean editProject(String token, String name, Hashtable<String, Object> projectDetails) throws AuthenticationException, ValidationException
+    public boolean editProject(String token, String name, Hashtable<String, Object> projectDetails) throws AuthenticationException, IllegalArgumentException
     {
         try
         {
@@ -688,7 +683,7 @@ public class RemoteApi
             Project project = projectManager.getProject(name);
             if (project == null)
             {
-                throw new ValidationException(String.format("Unknown project name: '%s'", name));
+                throw new IllegalArgumentException(String.format("Unknown project name: '%s'", name));
             }
             
             // are we changing the name of the project? if so, then we need to check that the new name is not already in use.
@@ -697,7 +692,7 @@ public class RemoteApi
                 String newName = (String) projectDetails.get("name");
                 if (!name.equals(newName) && projectManager.getProject(newName) != null)
                 {
-                    throw new ValidationException(String.format("The name '%s' is already in use by another project. Please select a different name.", newName));
+                    throw new IllegalArgumentException(String.format("The name '%s' is already in use by another project. Please select a different name.", newName));
                 }
             }
 
@@ -780,7 +775,7 @@ public class RemoteApi
         }
     }
 
-    public boolean editScm(String token, String name, Hashtable<String, Object> scmDetails) throws AuthenticationException, ValidationException
+    public boolean editScm(String token, String name, Hashtable<String, Object> scmDetails) throws AuthenticationException, IllegalArgumentException
     {
         try
         {
@@ -825,7 +820,7 @@ public class RemoteApi
         }
     }
 
-    public boolean editSpecifics(String token, String name, Hashtable<String, Object> specifics) throws AuthenticationException, ValidationException
+    public boolean editSpecifics(String token, String name, Hashtable<String, Object> specifics) throws AuthenticationException, IllegalArgumentException
     {
         try
         {
@@ -910,27 +905,34 @@ public class RemoteApi
         return details;
     }
 
-    private void validate(Object o) throws ValidationException
+    private void validate(Object o) throws IllegalArgumentException
     {
         ValidationContext ctx = new PulseValidationContext(o);
-        validationManager.validate(o, ctx);
+        try
+        {
+            validationManager.validate(o, ctx);
+        }
+        catch (ValidationException e)
+        {
+            throw new IllegalArgumentException(e.getMessage());
+        }
         if (ctx.hasErrors())
         {
             if (ctx.hasFieldErrors())
             {
                 String field = ctx.getFieldErrors().keySet().iterator().next();
                 String message = ctx.getFieldErrors(field).iterator().next();
-                throw new ValidationException(String.format("Field %s is invalid. Reason: %s", field, message));
+                throw new IllegalArgumentException(String.format("Field %s is invalid. Reason: %s", field, message));
             }
             if (ctx.hasActionErrors())
             {
                 String message = ctx.getActionErrors().iterator().next();
-                throw new ValidationException(String.format("The following error occured validating your request: %s", message));
+                throw new IllegalArgumentException(String.format("The following error occured validating your request: %s", message));
             }
         }
     }
 
-    private PulseFileDetails createFileDetails(Hashtable<String, Object> type) throws ValidationException
+    private PulseFileDetails createFileDetails(Hashtable<String, Object> type) throws IllegalArgumentException
     {
         //TODO: This goes into the project type manager.
         String projectType = (String) type.remove("type");
@@ -962,13 +964,13 @@ public class RemoteApi
         }
         else
         {
-            throw new ValidationException("Unknown project type: " + type);
+            throw new IllegalArgumentException("Unknown project type: " + type);
         }
         setProperties(type, details);
         return details;
     }
 
-    private Scm createScm(Hashtable<String, Object> details) throws ValidationException
+    private Scm createScm(Hashtable<String, Object> details) throws IllegalArgumentException
     {
         //TODO: This goes into the ScmManager.
         String type = (String) details.remove("type");
@@ -988,7 +990,7 @@ public class RemoteApi
         }
         else
         {
-            throw new ValidationException("Unknown scm type: " + type);
+            throw new IllegalArgumentException("Unknown scm type: " + type);
         }
 
         setProperties(details, scm);
