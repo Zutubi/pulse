@@ -16,6 +16,7 @@ public class TestLdapAction extends ActionSupport
     private String baseDn;
     private String managerDn;
     private String managerPassword;
+    private boolean escapeSpaces;
 
     public void setHost(String host)
     {
@@ -37,6 +38,11 @@ public class TestLdapAction extends ActionSupport
         this.managerPassword = managerPassword;
     }
 
+    public void setEscapeSpaces(boolean escapeSpaces)
+    {
+        this.escapeSpaces = escapeSpaces;
+    }
+
     public String execute() throws Exception
     {
         if(!TextUtils.stringSet(host))
@@ -53,7 +59,7 @@ public class TestLdapAction extends ActionSupport
         {
             try
             {
-                ldapManager.test(host, baseDn, managerDn, managerPassword);
+                ldapManager.test(host, baseDn, managerDn, managerPassword, escapeSpaces);
             }
             catch(Exception e)
             {

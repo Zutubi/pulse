@@ -47,6 +47,13 @@ public class AcegiLdapManager implements LdapManager
             String baseDn = appConfig.getLdapBaseDn();
             String managerDn = appConfig.getLdapManagerDn();
             String managerPassword = appConfig.getLdapManagerPassword();
+            boolean escapeSpaces = appConfig.getLdapEscapeSpaces();
+
+            if(escapeSpaces)
+            {
+                baseDn = escapeSpaces(baseDn);
+                managerDn = escapeSpaces(managerDn);
+            }
 
             contextFactory = createContextFactory(hostUrl, baseDn, managerDn, managerPassword);
 
@@ -195,10 +202,21 @@ public class AcegiLdapManager implements LdapManager
         return result;
     }
 
-    public void test(String hostUrl, String baseDn, String managerDn, String managerPassword)
+    public void test(String hostUrl, String baseDn, String managerDn, String managerPassword, boolean escapeSpaces)
     {
+        if(escapeSpaces)
+        {
+            baseDn = escapeSpaces(baseDn);
+            managerDn = escapeSpaces(managerDn);
+        }
+
         DefaultInitialDirContextFactory contextFactory = createContextFactory(hostUrl, baseDn, managerDn, managerPassword);
         contextFactory.newInitialDirContext();
+    }
+
+    private String escapeSpaces(String dn)
+    {
+        return dn.replaceAll(" ", "\\\\20");
     }
 
     public void setConfigurationManager(MasterConfigurationManager configurationManager)

@@ -18,7 +18,7 @@
             var baseDn = escape($F("ldap.config_ldap_baseDn"));
             var managerDn = escape($F("ldap.config_ldap_managerDn"));
             var managerPassword = escape($F("ldap.config_ldap_managerPassword"));
-            var params = "host=" + host + "&baseDn=" + baseDn + "&managerDn=" + managerDn + "&managerPassword=" + managerPassword;
+            var params = "host=" + host + "&baseDn=" + baseDn + "&managerDn=" + managerDn + "&managerPassword=" + managerPassword + "&escapeSpaces=" + $F("ldap.config_ldap_escapeSpaces");
 
             var updater = new Ajax.Updater({success: 'test-results'},
                                            "/ajax/testLdap.action",
@@ -49,9 +49,11 @@
     #inlineHelp("ldap.manager.password.help")
     #wwtextfield("name=ldap.userFilter" "label=%{getText('ldap.user.filter')}" "size=60" "required=true" "tabindex=6")
     #inlineHelp("ldap.user.filter.help")
-    #wwcheckbox("name=ldap.autoAdd" "label=%{getText('ldap.auto.add')}" "tabindex=7")
+    #wwcheckbox("name=ldap.escapeSpaces" "label=%{getText('ldap.escape.spaces')}" "tabindex=7")
+    #inlineHelp("ldap.escape.spaces.help")
+    #wwcheckbox("name=ldap.autoAdd" "label=%{getText('ldap.auto.add')}" "tabindex=8")
     #inlineHelp("ldap.auto.add.help")
-    #wwtextfield("name=ldap.emailAttribute" "label=%{getText('ldap.email.attribute')}" "tabindex=8")
+    #wwtextfield("name=ldap.emailAttribute" "label=%{getText('ldap.email.attribute')}" "tabindex=9")
     #inlineHelp("ldap.email.attribute.help")
 
     #testSettingsRow()
