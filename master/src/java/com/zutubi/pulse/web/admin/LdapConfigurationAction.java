@@ -83,6 +83,7 @@ public class LdapConfigurationAction extends ActionSupport
         config.setLdapUserFilter("");
         config.setLdapEmailAttribute("");
         config.setLdapAutoAdd(false);
+        config.setLdapEscapeSpaces(false);
         ldapManager.init();
     }
 
@@ -97,6 +98,7 @@ public class LdapConfigurationAction extends ActionSupport
         config.setLdapUserFilter(ldap.getUserFilter());
         config.setLdapAutoAdd(ldap.getAutoAdd());
         config.setLdapEmailAttribute(ldap.getEmailAttribute());
+        config.setLdapEscapeSpaces(ldap.getEscapeSpaces());
         ldapManager.init();
         if(ldap.getEnabled())
         {
@@ -116,6 +118,7 @@ public class LdapConfigurationAction extends ActionSupport
         ldap.setUserFilter(config.getLdapUserFilter());
         ldap.setAutoAdd(config.getLdapAutoAdd());
         ldap.setEmailAttribute(config.getLdapEmailAttribute());
+        ldap.setEscapeSpaces(config.getLdapEscapeSpaces());
     }
 
     /**
@@ -146,6 +149,7 @@ public class LdapConfigurationAction extends ActionSupport
         private String userFilter;
         private Boolean autoAdd = false;
         private String emailAttribute;
+        private Boolean escapeSpaces = false;
 
         public Boolean getEnabled()
         {
@@ -225,6 +229,16 @@ public class LdapConfigurationAction extends ActionSupport
         public void setEmailAttribute(String emailAttribute)
         {
             this.emailAttribute = emailAttribute;
+        }
+
+        public Boolean getEscapeSpaces()
+        {
+            return escapeSpaces;
+        }
+
+        public void setEscapeSpaces(Boolean escapeSpaces)
+        {
+            this.escapeSpaces = escapeSpaces;
         }
     }
 }

@@ -16,5 +16,5 @@ public interface LdapManager
 
     String getStatusMessage();
 
-    void test(String hostUrl, String baseDn, String managerDn, String managerPassword);
+    void test(String hostUrl, String baseDn, String managerDn, String managerPassword, boolean escapeSpaces);
 }

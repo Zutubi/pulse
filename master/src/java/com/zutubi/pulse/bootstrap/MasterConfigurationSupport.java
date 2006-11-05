@@ -260,6 +260,16 @@ public class MasterConfigurationSupport extends ConfigSupport implements MasterC
         setProperty(LDAP_EMAIL_ATTRIBUTE, attribute);
     }
 
+    public Boolean getLdapEscapeSpaces()
+    {
+        return getBooleanProperty(LDAP_ESCAPE_SPACES, true);
+    }
+
+    public void setLdapEscapeSpaces(Boolean escape)
+    {
+        setBooleanProperty(LDAP_ESCAPE_SPACES, escape);
+    }
+
     public String getSmtpPrefix()
     {
         return getProperty(SMTP_PREFIX);

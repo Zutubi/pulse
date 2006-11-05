@@ -64,6 +64,7 @@ public interface MasterConfiguration extends LogConfiguration
     public static final String LDAP_USER_FILTER = "ldap.user.filter";
     public static final String LDAP_AUTO_ADD = "ldap.auto.add";
     public static final String LDAP_EMAIL_ATTRIBUTE = "ldap.email.attribute";
+    public static final String LDAP_ESCAPE_SPACES = "ldap.escape";
 
     String getAdminLogin();
 
@@ -160,6 +161,11 @@ public interface MasterConfiguration extends LogConfiguration
     String getLdapEmailAttribute();
 
     void setLdapEmailAttribute(String attribute);
+
+    Boolean getLdapEscapeSpaces();
+
+    void setLdapEscapeSpaces(Boolean escape);
+
 
     Integer getScmPollingInterval();
 
