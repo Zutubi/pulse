@@ -65,7 +65,7 @@ public class CvsWorkerTest extends PulseTestCase
         Logger.setLogging("system");
 
         // test repository root.
-        String cvsRoot = ":pserver:cvstester:cvs@www.cinnamonbob.com:/cvsroot";
+        String cvsRoot = ":ext:cvstester:cvs@cinnamonbob.com:/cvsroot";
 
         cvs = new CvsWorker();
         cvs.setRoot(cvsRoot);

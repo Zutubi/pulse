@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet type="text/xsl" href="http://www.jayasoft.fr/org/ivyrep/ivy-doc.xsl"?>
+<ivy-module version="1.0">
+
+    <info organisation="netbeans" revision="5.5" module="javacvs" status="release">
+
+        <license name="Sun Public License" url="http://www.netbeans.org/about/legal/spl.html"/>
+        <description homepage="http://javacvs.netbeans.org/">
+            The javacvs package is part of the netbeans platform http://www.netbeans.org.
+            The library implements a CVS client protocol in Java. It allows to access CVS
+            servers without setting up an external cvs program.
+        </description>
+    </info>
+
+    <publications>
+        <artifact name="org-netbeans-lib-cvsclient" type="jar" conf="default"/>
+    </publications>
+
+</ivy-module>
