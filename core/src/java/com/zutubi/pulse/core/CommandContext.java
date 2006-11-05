@@ -1,7 +1,6 @@
 package com.zutubi.pulse.core;
 
 import com.zutubi.pulse.core.model.TestSuiteResult;
-import com.zutubi.pulse.BuildContext;
 
 import java.io.File;
 import java.io.OutputStream;
@@ -36,6 +35,8 @@ public class CommandContext
     private long recipeId;
 
     private long buildNumber = -1;
+
+    private long recipeStartTime;
 
     public CommandContext(RecipePaths paths, File outputDir, TestSuiteResult testResults)
     {
@@ -106,5 +107,15 @@ public class CommandContext
     public void setRecipeId(long recipeId)
     {
         this.recipeId = recipeId;
+    }
+
+    public long getRecipeStartTime()
+    {
+        return recipeStartTime;
+    }
+
+    public void setRecipeStartTime(long recipeStartTime)
+    {
+        this.recipeStartTime = recipeStartTime;
     }
 }
