@@ -38,6 +38,19 @@ public class ComponentContext
         }
     }
 
+    /**
+     * Pop the current context off the context stack.
+     */
+    public static void pop()
+    {
+        ConfigurableApplicationContext top = context;
+        context = (ConfigurableApplicationContext) context.getParent();
+        
+        // not sure if we need to separate the context from the tree.
+        top.setParent(null);
+        top.close();
+    }
+
     private static void publishContext(ConfigurableApplicationContext newContext)
     {
         newContext.refresh();

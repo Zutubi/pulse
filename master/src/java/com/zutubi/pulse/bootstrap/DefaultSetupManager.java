@@ -230,7 +230,10 @@ public class DefaultSetupManager implements SetupManager
     {
         state = SetupState.STARTING;
 
-        // load the setup contexts containing the beans required to continue the setup process.
+        // Remote the upgrade context from the ComponentContext stack / namespace.
+        // They are no longer required.
+        ComponentContext.pop();
+        
         loadContexts(setupContexts);
 
         if (isSetupRequired())
