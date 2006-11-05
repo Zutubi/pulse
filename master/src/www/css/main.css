@@ -35,7 +35,7 @@ pre{
 #header table {
     width: 100%;
     margin: 0;
-    border-spacing: 0px;
+    border-spacing: 0;
 }
 
 #header td {
@@ -65,7 +65,7 @@ pre{
     float: left;
     width: 100%;
     margin: 0;
-    padding: 0px;
+    padding: 0;
     list-style: none;
     background: #667e9f;
     font-size: 14px;
@@ -100,8 +100,8 @@ pre{
 }
 
 #innernav {
-    margin: 0px;
-    padding: 10px 5px 0px 10px;
+    margin: 0;
+    padding: 10px 5px 0 10px;
     list-style: none;
     font-size: 14px;
 }
@@ -109,7 +109,7 @@ pre{
 #innernav li {
     float: left;
     display: block;
-    margin: 0px 5px 0px 0px;
+    margin: 0 5px 0 0;
     padding: 0 1px 0 0;
     list-style: none;
 }
@@ -213,15 +213,15 @@ h2.section, h2.twopane {
 }
 
 h2.twopane {
-    margin-bottom: 0px;
+    margin-bottom: 0;
 }
 
 h2.top {
-    margin-top: 0px;
+    margin-top: 0;
 }
 
 h3 {
-    margin-top: 0px;
+    margin-top: 0;
     font-size: 120%;
 }
 
@@ -361,6 +361,9 @@ h3.heading, th.heading, th.group {
 }
 
 th.group {
+    font-size: 120%;
+    color: #30286e;
+    background: #ffd;
     padding: 5px;
 }
 
@@ -449,7 +452,7 @@ span.action {
     */
 
 h3.heading {
-    margin: 0px;
+    margin: 0;
     border-bottom: 0;
 }
 
@@ -474,9 +477,9 @@ div.floating {
 
 ul {
     list-style: none;
-    padding: 0px;
+    padding: 0;
     padding-left: 20px;
-    margin: 4px 0px;
+    margin: 4px 0;
 }
 
 ul.error, ul.warning, ul.info {
@@ -631,32 +634,31 @@ a.dec {
 td.okaybar {
     background: #eeeeff;
     border: 1px solid #9c9c9c;
-    padding: 0px;
+    padding: 0;
 }
 
 td.errorbar {
     background: #c00000;
     border: 1px solid #9c9c9c;
-    padding: 0px;
+    padding: 0;
 }
 
 td.warningbar {
     background: #f0c000;
     border: 1px solid #9c9c9c;
-    padding: 0px;
+    padding: 0;
 }
 
 td.clearbar {
     background: #ffffff;
     border: 1px solid #9c9c9c;
-    padding: 0px;
+    padding: 0;
 }
 
 #statusmessage {
     margin:1em;
     padding:0.5em;
-    border: 1px solid;
-    border-color: #c00000;
+    border: 1px solid #c00000;
     background-color: #ffdddd;
     text-align:center;
 }
@@ -672,13 +674,13 @@ table.twopane
 
 table.twopane td
 {
-    margin: 0px;
+    margin: 0;
     vertical-align: top;
 }
 
 td.leftpane
 {
-    padding-right: 0px;
+    padding-right: 0;
     white-space: nowrap;
 }
 
@@ -689,8 +691,8 @@ td.leftpane p
 
 ul.panenav
 {
-    margin: 10px 0px 30px 0px;
-    padding: 0px;
+    margin: 10px 0 30px 0;
+    padding: 0;
 }
 
 ul.panenav a {
@@ -713,13 +715,13 @@ ul.panenav a:hover, ul.panenav a.active {
 td.rightpane
 {
     width: 100%;
-    padding: 0px;
+    padding: 0;
     border-left: solid 2px #667e9f;
 }
 
 div.paneheader
 {
-    margin: 0px;
+    margin: 0;
     padding: 7px;
     font-weight: bold;
     background: #d8e0f3;
