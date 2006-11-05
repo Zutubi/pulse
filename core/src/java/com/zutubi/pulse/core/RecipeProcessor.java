@@ -66,12 +66,14 @@ public class RecipeProcessor
 
         try
         {
+            long recipeStartTime = System.currentTimeMillis();
+
             // Wrap bootstrapper in a command and run it.
             BootstrapCommand bootstrapCommand = new BootstrapCommand(request.getBootstrapper());
             CommandResult bootstrapResult = new CommandResult(bootstrapCommand.getName());
             File commandOutput = new File(paths.getOutputDir(), getCommandDirName(0, bootstrapResult));
 
-            executeCommand(request.getId(), bootstrapResult, paths, commandOutput, testResults, bootstrapCommand, capture, context);
+            executeCommand(request.getId(), recipeStartTime, bootstrapResult, paths, commandOutput, testResults, bootstrapCommand, capture, context);
 
             if (bootstrapResult.succeeded())
             {
@@ -95,7 +97,7 @@ public class RecipeProcessor
                     throw new BuildException("Undefined recipe '" + recipeName + "'");
                 }
 
-                build(request.getId(), recipe, paths, testResults, capture, context);
+                build(request.getId(), recipeStartTime, recipe, paths, testResults, capture, context);
             }
         }
         catch (BuildException e)
@@ -139,7 +141,7 @@ public class RecipeProcessor
         }
     }
 
-    public void build(long recipeId, Recipe recipe, RecipePaths paths, TestSuiteResult testResults, boolean capture, BuildContext context) throws BuildException
+    public void build(long recipeId, long recipeStartTime, Recipe recipe, RecipePaths paths, TestSuiteResult testResults, boolean capture, BuildContext context) throws BuildException
     {
         // TODO: support continuing build when errors occur. Take care: exceptions.
         int i = 1;
@@ -159,7 +161,7 @@ public class RecipeProcessor
             runningCommand = command;
             runningLock.unlock();
 
-            executeCommand(recipeId, result, paths, commandOutput, testResults, command, capture, context);
+            executeCommand(recipeId, recipeStartTime, result, paths, commandOutput, testResults, command, capture, context);
 
             switch (result.getState())
             {
@@ -171,7 +173,7 @@ public class RecipeProcessor
         }
     }
 
-    private void executeCommand(long recipeId, CommandResult result, RecipePaths paths, File commandOutput, TestSuiteResult testResults, Command command, boolean capture, BuildContext context)
+    private void executeCommand(long recipeId, long recipeStartTime, CommandResult result, RecipePaths paths, File commandOutput, TestSuiteResult testResults, Command command, boolean capture, BuildContext context)
     {
         result.commence();
         result.setOutputDir(commandOutput.getPath());
@@ -186,6 +188,8 @@ public class RecipeProcessor
             }
 
             CommandContext commandContext = new CommandContext(paths, commandOutput, testResults);
+            commandContext.setRecipeStartTime(recipeStartTime);
+            
             if (context != null && context.getBuildNumber() != -1)
             {
                 commandContext.setBuildContext(context);

@@ -37,6 +37,8 @@ public class CommandContext
 
     private BuildContext buildContext;
 
+    private long recipeStartTime;
+
     public CommandContext(RecipePaths paths, File outputDir, TestSuiteResult testResults)
     {
         this.paths = paths;
@@ -116,5 +118,15 @@ public class CommandContext
     public void setRecipeId(long recipeId)
     {
         this.recipeId = recipeId;
+    }
+
+    public long getRecipeStartTime()
+    {
+        return recipeStartTime;
+    }
+
+    public void setRecipeStartTime(long recipeStartTime)
+    {
+        this.recipeStartTime = recipeStartTime;
     }
 }

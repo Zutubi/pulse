@@ -4,9 +4,9 @@ import com.zutubi.pulse.core.model.CommandResult;
 import com.zutubi.pulse.core.model.StoredArtifact;
 import com.zutubi.pulse.core.model.StoredFileArtifact;
 import com.zutubi.pulse.util.FileSystemUtils;
-import com.zutubi.validation.annotations.Required;
-import com.zutubi.validation.annotations.Name;
 import com.zutubi.pulse.util.IOUtils;
+import com.zutubi.validation.annotations.Name;
+import com.zutubi.validation.annotations.Required;
 
 import java.io.File;
 import java.io.IOException;
@@ -34,6 +34,12 @@ public abstract class Artifact
      * If true, fail the command if the artifact cannot be captured.
      */
     private boolean failIfNotPresent = true;
+
+    /**
+     * If true, files with timestamps earlier than the recipe start time will
+     * not be captured.
+     */
+    private boolean ignoreStale = false;
 
     /**
      * The list of references to processors that will be applied to this artifact.
@@ -86,6 +92,16 @@ public abstract class Artifact
         this.failIfNotPresent = failIfNotPresent;
     }
 
+    public boolean getIgnoreStale()
+    {
+        return ignoreStale;
+    }
+
+    public void setIgnoreStale(boolean ignoreStale)
+    {
+        this.ignoreStale = ignoreStale;
+    }
+
     /**
      * This is a factory method that allows artifact processors to be associated with the artifact.
      *
@@ -108,11 +124,19 @@ public abstract class Artifact
      * @param fromFile  is the source file. That is, the artifact file in the working directory.
      * @param path      is the path relative to the output directory to which the fromFile will be copied.
      * @param result    is the command result instance to which this artifact belongs. If processing of this artifact
-     * identifies any error features, it is this command result that will be marked as failed.
+     *                  identifies any error features, it is this command result that will be marked as failed.
+     * @param context   context for execution of the command
      * @param type      is the mime type of the artifact.
+     *
+     * @return true if captured, false if ingored
      */
-    protected void captureFile(StoredArtifact artifact, File fromFile, String path, CommandResult result, CommandContext context, String type)
+    protected boolean captureFile(StoredArtifact artifact, File fromFile, String path, CommandResult result, CommandContext context, String type)
     {
+        if(ignoreStale && fromFile.lastModified() < context.getRecipeStartTime())
+        {
+            return false;
+        }
+        
         File toFile = new File(context.getOutputDir(), path);
         File parent = toFile.getParentFile();
 
@@ -127,6 +151,8 @@ public abstract class Artifact
             {
                 process.getProcessor().process(fileArtifact, result, context);
             }
+
+            return true;
         }
         catch (IOException e)
         {

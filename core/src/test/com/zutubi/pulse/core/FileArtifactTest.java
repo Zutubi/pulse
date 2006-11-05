@@ -167,12 +167,50 @@ public class FileArtifactTest extends PulseTestCase
         assertCapturedArtifactCount(1);
     }
 
+    public void testIgnoreStaleNotStale()
+    {
+        fileArtifactObject.setIgnoreStale(true);
+        fileArtifactObject.setFile("file.txt");
+        capture(0);
+
+        assertArtifactCaptured("file.txt");
+        assertCapturedArtifactCount(1);
+    }
+
+    public void testIgnoreStaleIsStale()
+    {
+        fileArtifactObject.setIgnoreStale(true);
+        fileArtifactObject.setFile("file.txt");
+        capture(System.currentTimeMillis() + 1);
+
+        assertCapturedArtifactCount(0);
+    }
+
+    public void testIgnoreStaleMultipleStaleFiles()
+    {
+        fileArtifactObject.setIgnoreStale(true);
+        fileArtifactObject.setFile("some/file-*.txt");
+        capture(System.currentTimeMillis() + 1);
+
+        assertCapturedArtifactCount(0);
+    }
+
     private void capture()
+    {
+        capture(-1);
+    }
+
+    private void capture(long recipeStartTime)
     {
         RecipePaths paths = new SimpleRecipePaths(tmpSourceDir, null);
         CommandContext context = new CommandContext(paths, tmpOutputDir, null);
+        if(recipeStartTime > 0)
+        {
+            context.setRecipeStartTime(recipeStartTime);
+        }
         fileArtifactObject.capture(result, context);
     }
+
     private void assertArtifactCaptured(String relativePath)
     {
         // need to add 'test/' since this is the artifact name prefix.

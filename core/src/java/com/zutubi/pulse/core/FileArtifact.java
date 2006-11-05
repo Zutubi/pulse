@@ -31,8 +31,10 @@ public class FileArtifact extends Artifact
             {
                 // excellent, we have the file, we can capture it and continue.
                 StoredArtifact artifact = new StoredArtifact(getName());
-                captureFile(artifact, captureFile, FileSystemUtils.composeFilename(getName(), captureFile.getName()), result, context, type);
-                result.addArtifact(artifact);
+                if(captureFile(artifact, captureFile, FileSystemUtils.composeFilename(getName(), captureFile.getName()), result, context, type))
+                {
+                    result.addArtifact(artifact);
+                }
                 return;
             }
 
