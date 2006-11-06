@@ -4,8 +4,8 @@ import com.zutubi.pulse.core.model.Entity;
 import com.zutubi.pulse.core.model.Revision;
 
 /**
- * Holds build model information for single SCM, e.g. changes committed to
- * that SCM since the last build.
+ * @deprecated This entity is no longer required within the schema. It is the middle man in a one to one mapping
+ * between a build result and the associated revision.
  */
 public class BuildScmDetails extends Entity
 {
@@ -13,7 +13,6 @@ public class BuildScmDetails extends Entity
 
     public BuildScmDetails()
     {
-
     }
 
     public BuildScmDetails(Revision revision)
