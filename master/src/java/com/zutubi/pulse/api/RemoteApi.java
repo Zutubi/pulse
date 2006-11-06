@@ -48,10 +48,10 @@ public class RemoteApi
         structDefs.put(Cvs.class, new String[]{"root", "module", "password", "branch", "quietPeriod", "monitor", "pollingInterval", "changeViewerUrl"});
         structDefs.put(Svn.class, new String[]{"url", "username", "password", "keyfile", "passphrase", "monitor", "pollingInterval", "changeViewerUrl"});
         structDefs.put(P4.class, new String[]{"port", "user", "password", "client", "monitor", "pollingInterval", "changeViewerUrl"});
-        structDefs.put(AntPulseFileDetails.class, new String[]{"buildFile", "targets", "arguments", "workDir"});
-        structDefs.put(MavenPulseFileDetails.class, new String[]{"targets", "workDir", "arguments"});
-        structDefs.put(Maven2PulseFileDetails.class, new String[]{"goals", "workDir", "arguments"});
-        structDefs.put(MakePulseFileDetails.class, new String[]{"makefile", "targets", "arguments", "workDir"});
+        structDefs.put(AntPulseFileDetails.class, new String[]{"buildFile", "targets", "arguments", "workingDir"});
+        structDefs.put(MavenPulseFileDetails.class, new String[]{"targets", "workingDir", "arguments"});
+        structDefs.put(Maven2PulseFileDetails.class, new String[]{"goals", "workingDir", "arguments"});
+        structDefs.put(MakePulseFileDetails.class, new String[]{"makefile", "targets", "arguments", "workingDir"});
         structDefs.put(XCodePulseFileDetails.class, new String[]{"workingDir", "project", "config", "target", "action", "settings"});
         structDefs.put(CustomPulseFileDetails.class, new String[]{"pulseFile"});
         structDefs.put(VersionedPulseFileDetails.class, new String[]{"pulseFileName"});
