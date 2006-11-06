@@ -32,9 +32,7 @@ public interface AgentManager
 
     Agent getAgent(String name);
 
-    void enableMasterAgent()
-            ;
+    void enableMasterAgent();
 
-    void disableMasterAgent()
-            ;
+    void disableMasterAgent();
 }

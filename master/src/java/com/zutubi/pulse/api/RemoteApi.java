@@ -455,6 +455,25 @@ public class RemoteApi
         return true;
     }
 
+/* Refactor DeleteAgentAction, but first, understand what is going on with agents and slaves. 
+    public boolean deleteAgent(String token, String name) throws AuthenticationException
+    {
+        try
+        {
+            AcegiUtils.loginAs(tokenManager.verifyAdmin(token));
+            if (!agentManager.agentExists(name))
+            {
+                throw new IllegalArgumentException(String.format("No agent by the name '%s' exists. Please select a different name.", name));
+            }
+
+        }
+        finally
+        {
+            AcegiUtils.logout();
+        }
+    }
+*/
+
     public String getAgentStatus(String token, String name) throws AuthenticationException
     {
         tokenManager.verifyUser(token);
@@ -800,7 +819,7 @@ public class RemoteApi
         }
     }
 
-    public Hashtable<String, Object> getSpecifics(String token, String name) throws AuthenticationException
+    public Hashtable<String, Object> getProjectType(String token, String name) throws AuthenticationException
     {
         try
         {
@@ -820,7 +839,7 @@ public class RemoteApi
         }
     }
 
-    public boolean editSpecifics(String token, String name, Hashtable<String, Object> specifics) throws AuthenticationException, IllegalArgumentException
+    public boolean editProjectType(String token, String name, Hashtable<String, Object> specifics) throws AuthenticationException, IllegalArgumentException
     {
         try
         {
