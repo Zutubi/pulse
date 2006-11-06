@@ -116,7 +116,7 @@ public class ProjectAcceptanceTest extends ProjectAcceptanceTestBase
 
         // change the root and module, verify updates as expected.
         form.saveFormElements("/loc", "mod", "", "", "1", "1", "${revision} ${branch} ${author} ${time.pulse} ${time.fisheye}", "false");
-        assertProjectCvsTable("cvs", "/loc[mod]", "${revision} ${branch} ${author} ${time.pulse} ${time.fisheye}");
+        assertProjectCvsTable("cvs", "/loc[mod]", "", "${revision} ${branch} ${author} ${time.pulse} ${time.fisheye}");
 
         // check the form again to ensure that the path has been saved.
         clickLink("project.scm.edit");
@@ -943,7 +943,7 @@ public class ProjectAcceptanceTest extends ProjectAcceptanceTestBase
     public void testScmFilterDefaultDisplay()
     {
         assertTablePresent("project.scm");
-        assertTableRowEqual("project.scm", 5, new String[]{"filters", "disabled"});
+        assertTableRowEqual("project.scm", 6, new String[]{"filters", "disabled"});
     }
 
     public void testScmFilterAddDeleteExclusion()
@@ -1250,12 +1250,13 @@ public class ProjectAcceptanceTest extends ProjectAcceptanceTestBase
         });
     }
 
-    private void assertProjectCvsTable(String type, String location, String changeViewerUrl)
+    private void assertProjectCvsTable(String type, String location, String branch, String changeViewerUrl)
     {
         assertTablePresent("project.scm");
         assertTableRowsEqual("project.scm", 1, new String[][]{
                 new String[]{"type", type},
                 new String[]{"location", location},
+                new String[]{"branch", branch},
                 new String[]{"change viewer url", changeViewerUrl}
         });
     }
