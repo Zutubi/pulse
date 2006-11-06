@@ -1,19 +1,31 @@
 package com.zutubi.pulse.web.user;
 
-import com.zutubi.pulse.model.ProjectManager;
-import com.zutubi.pulse.model.User;
-import com.zutubi.pulse.security.AcegiUtils;
-import com.zutubi.pulse.license.LicenseHolder;
 import com.zutubi.pulse.license.License;
+import com.zutubi.pulse.license.LicenseHolder;
+import com.zutubi.pulse.model.*;
+import com.zutubi.pulse.security.AcegiUtils;
+import com.zutubi.pulse.util.Sort;
 
-import java.util.Arrays;
+import java.util.*;
 
 /**
  * <class-comment/>
  */
 public class PreferencesAction extends UserActionSupport
 {
+    private List<ContactPoint> contactPoints;
+    private List<Subscription> subscriptions;
     private ProjectManager projectManager;
+
+    public List<ContactPoint> getContactPoints()
+    {
+        return contactPoints;
+    }
+
+    public List<Subscription> getSubscriptions()
+    {
+        return subscriptions;
+    }
 
     public int getProjectCount()
     {
@@ -55,6 +67,20 @@ public class PreferencesAction extends UserActionSupport
             addUnknownUserActionError();
             return ERROR;
         }
+
+        final Sort.StringComparator comp = new Sort.StringComparator();
+
+        contactPoints = new ArrayList<ContactPoint>(user.getContactPoints());
+        Collections.sort(contactPoints, new NamedEntityComparator());
+        subscriptions = new ArrayList<Subscription>(user.getSubscriptions());
+        Collections.sort(subscriptions, new Comparator<Subscription>()
+        {
+            public int compare(Subscription o1, Subscription o2)
+            {
+                return comp.compare(o1.getContactPoint().getName(), o2.getContactPoint().getName());
+            }
+        });
+        
         return super.doInput();
     }
 

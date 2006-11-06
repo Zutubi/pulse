@@ -51,7 +51,7 @@
                         #contentHeading("actions" 2)
                     </tr>
 
-#foreach ($contact in $user.contactPoints)
+#foreach ($contact in $contactPoints)
                     <tr>
     #set($confirmMessage = $action.getText("contact.delete.confirm", [$contact.name]))
                         <td class="content" #if($contact.lastError) rowspan="2" #end>
@@ -82,7 +82,7 @@
                         #contentHeading("actions" 2)
                     </tr>
 
-#foreach ($subscription in $user.subscriptions)
+#foreach ($subscription in $subscriptions)
     #set($contact = $subscription.contactPoint)
     #set($projects = $subscription.projects)
     #set($confirmMessage = $action.getText("subscription.delete.confirm", [$project.name]))
