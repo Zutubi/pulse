@@ -30,7 +30,7 @@
         <tr>
                 #if($firstRow)
                     #dynamicCellSpan($resource.name $totalPropertyCount)
-                    #dynamicCellSpan("[default]" $resource.properties.size())
+                    #dynamicCellSpan("[globals]" $resource.properties.size())
                 #end
 
                     #dynamicCell($property.name)
@@ -48,7 +48,7 @@
         #else
         <tr>
                     #dynamicCellSpan($resource.name $totalPropertyCount)
-                    #dynamicCell("[default]")
+                    #dynamicCell("[globals]")
                     #contentCell("empty.cell")
                     #contentCell("empty.cell")
                     #authorize("ifAllGranted=ROLE_ADMINISTRATOR")

@@ -23,6 +23,8 @@
             </composite-element>
         </map>
 
+        <property name="defaultVersion" column="DEFAULT_VERSION" type="string" length="1023"/>
+
         <map name="versions" lazy="false" table="RESOURCE_VERSIONS" cascade="all,delete-orphan">
             <key column="RESOURCE_ID"/>
             <index type="string" column="VERSION_VALUE"/>

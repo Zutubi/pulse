@@ -58,6 +58,7 @@ public class JavaResourceConstructor implements ResourceConstructor
 
             ResourceVersion version = new ResourceVersion(home.getName());
             javaResource.add(version);
+            javaResource.setDefaultVersion(version.getValue());
 
             version.addProperty(new ResourceProperty(JAVA_HOME, home.getCanonicalPath(), true, false, false));
 

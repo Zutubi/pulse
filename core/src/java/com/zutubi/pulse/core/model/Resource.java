@@ -12,6 +12,7 @@ public class Resource extends Entity implements NamedEntity
 {
     private String name;
     private Map<String, ResourceProperty> properties = new TreeMap<String, ResourceProperty>();
+    private String defaultVersion;
     private Map<String, ResourceVersion> versions = new TreeMap<String, ResourceVersion>();
 
     public Resource()
@@ -55,6 +56,16 @@ public class Resource extends Entity implements NamedEntity
         }
 
         return null;
+    }
+
+    public String getDefaultVersion()
+    {
+        return defaultVersion;
+    }
+
+    public void setDefaultVersion(String defaultVersion)
+    {
+        this.defaultVersion = defaultVersion;
     }
 
     public Map<String, ResourceVersion> getVersions()

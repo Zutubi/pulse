@@ -2,15 +2,14 @@ package com.zutubi.pulse.web.agents;
 
 import com.zutubi.pulse.core.model.Resource;
 import com.zutubi.pulse.core.model.ResourceVersion;
-import com.zutubi.pulse.model.persistence.ResourceDao;
-import com.zutubi.pulse.model.ResourceManager;
 import com.zutubi.pulse.model.PersistentResource;
+import com.zutubi.pulse.model.ResourceManager;
 import com.zutubi.pulse.util.Sort;
 
-import java.util.List;
-import java.util.LinkedList;
-import java.util.Comparator;
 import java.util.Collections;
+import java.util.Comparator;
+import java.util.LinkedList;
+import java.util.List;
 
 /**
  * 
@@ -62,6 +61,11 @@ public class ViewResourceAction extends AgentActionSupport
     public boolean haveSelectedNode()
     {
         return selectedNode != 0L;
+    }
+
+    public boolean isDefaultVersion(String version)
+    {
+        return version.equals(resource.getDefaultVersion());
     }
 
     public String execute()

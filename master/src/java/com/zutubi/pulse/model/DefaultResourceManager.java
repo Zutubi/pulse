@@ -1,11 +1,11 @@
 package com.zutubi.pulse.model;
 
-import com.zutubi.pulse.resources.ResourceDiscoverer;
+import com.zutubi.pulse.core.ConfigurableResourceRepository;
 import com.zutubi.pulse.core.model.Resource;
 import com.zutubi.pulse.core.model.ResourceVersion;
-import com.zutubi.pulse.core.ConfigurableResourceRepository;
 import com.zutubi.pulse.model.persistence.BuildSpecificationNodeDao;
 import com.zutubi.pulse.model.persistence.ResourceDao;
+import com.zutubi.pulse.resources.ResourceDiscoverer;
 
 import java.util.List;
 import java.util.Map;
@@ -89,7 +89,7 @@ public class DefaultResourceManager implements ResourceManager
         return resourceDao.findAll();
     }
 
-    public void renameResource(PersistentResource resource, String newName)
+    public void editResource(PersistentResource resource, String newName, String defaultVersion)
     {
         List<BuildSpecificationNode> nodes = buildSpecificationNodeDao.findByResourceRequirement(resource.getName());
         for(BuildSpecificationNode node: nodes)
@@ -106,6 +106,7 @@ public class DefaultResourceManager implements ResourceManager
         }
 
         resource.setName(newName);
+        resource.setDefaultVersion(defaultVersion);
         resourceDao.save(resource);
     }
 

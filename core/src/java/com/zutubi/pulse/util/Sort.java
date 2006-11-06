@@ -8,11 +8,11 @@ import java.util.Comparator;
  */
 public class Sort
 {
-    public static class StringComparator implements Comparator
+    public static class StringComparator implements Comparator<String>
     {
         private final Collator collator = Collator.getInstance();
 
-        public int compare(Object o1, Object o2)
+        public int compare(String o1, String o2)
         {
             return collator.compare(o1, o2);
         }

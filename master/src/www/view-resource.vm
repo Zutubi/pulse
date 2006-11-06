@@ -52,7 +52,7 @@
     <h2 style="margin-top: 0" class="section">#wwtext("name=resource") $!webwork.htmlEncode($resource.name)</h2>
 
     <table id="properties_" class="content">
-        #headingRow("resource.default.properties" 7)
+        #headingRow("resource.global.properties" 7)
 #showProperties($resource.properties null)
     </table>
 
@@ -68,7 +68,7 @@
     #foreach($version in $versions)
                     <li>
                         <a href="#" id="nav_$version.id" onclick="selectNode('$version.id'); return false;">
-                            $!webwork.htmlEncode($version.value)
+                            $!webwork.htmlEncode($version.value) #if($action.isDefaultVersion($version.value)) #wwtext("name=resource.version.is.default") #end
                         </a>
                     </li>
     #end

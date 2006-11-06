@@ -18,6 +18,11 @@ public class EditResourceForm extends BaseForm
 
     public String[] getFieldNames()
     {
-        return new String[] { "newName" };
+        return new String[] { "newName", "defaultVersion" };
+    }
+
+    public int[] getFieldTypes()
+    {
+        return new int[] { TEXTFIELD, SELECT };
     }
 }

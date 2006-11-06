@@ -34,6 +34,7 @@ public class PersistentResource extends Resource
         // Shallow copy: we take ownership
         this.setName(resource.getName());
         this.setProperties(resource.getProperties());
+        this.setDefaultVersion(resource.getDefaultVersion());
         this.setVersions(resource.getVersions());
 
         this.slave = slave;

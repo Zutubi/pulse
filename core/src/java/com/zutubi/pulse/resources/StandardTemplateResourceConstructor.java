@@ -65,6 +65,7 @@ public class StandardTemplateResourceConstructor implements ResourceConstructor
             // what is the version of this ant installation? Use the name of the home directory for this.
             ResourceVersion version = new ResourceVersion(home.getName());
             resource.add(version);
+            resource.setDefaultVersion(version.getValue());
 
             version.addProperty(new ResourceProperty((resourceName + "_HOME").toUpperCase(), home.getCanonicalPath(), true, false, false));
 

@@ -1,5 +1,6 @@
 package com.zutubi.pulse.core;
 
+import com.opensymphony.util.TextUtils;
 import com.zutubi.pulse.BuildContext;
 import com.zutubi.pulse.core.model.*;
 import com.zutubi.pulse.events.EventManager;
@@ -279,7 +280,14 @@ public class RecipeProcessor
                 }
 
                 scope.add(resource.getProperties().values());
-                if(requirement.getVersion() != null)
+
+                String importVersion = requirement.getVersion();
+                if(importVersion == null)
+                {
+                    importVersion = resource.getDefaultVersion();
+                }
+
+                if(TextUtils.stringSet(importVersion))
                 {
                     ResourceVersion version = resource.getVersion(requirement.getVersion());
                     if(version == null)

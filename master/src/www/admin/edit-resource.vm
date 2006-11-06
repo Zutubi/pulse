@@ -14,8 +14,9 @@
     #wwhidden("name=resourceId")
     
     #wwtextfield("name=newName" "label=%{getText('resource.name')}" "required=true"  "tabindex=1")
+    #wwselect("name=defaultVersion" "label=%{getText('resource.default.version')}" "list=versions"  "tabindex=2")
 
-    #saveCancel(2)
+    #saveCancel(3)
 #end
 
     #tabEnd()

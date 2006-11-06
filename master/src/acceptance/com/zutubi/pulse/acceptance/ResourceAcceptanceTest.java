@@ -29,7 +29,7 @@ public class ResourceAcceptanceTest extends BaseAcceptanceTestCase
     {
         addResource(resourceName);
         assertTextPresent("resource " + resourceName);
-        assertTextPresent("default properties");
+        assertTextPresent("global properties");
 
         clickLinkWithText("resources");
         assertTextPresent(resourceName);
@@ -83,11 +83,11 @@ public class ResourceAcceptanceTest extends BaseAcceptanceTestCase
         clickLinkWithText("edit resource");
         EditResourceForm form = new EditResourceForm(tester);
         form.assertFormPresent();
-        form.saveFormElements(resourceName + "_edited");
+        form.saveFormElements(resourceName + "_edited", "");
         assertTextPresent("resource " + resourceName + "_edited");
         clickLinkWithText("edit resource");
         form.assertFormPresent();
-        form.assertFormElements(resourceName + "_edited");
+        form.assertFormElements(resourceName + "_edited", "");
     }
 
     public void testEditResourceValidation()
@@ -96,7 +96,7 @@ public class ResourceAcceptanceTest extends BaseAcceptanceTestCase
         clickLinkWithText("edit resource");
         EditResourceForm form = new EditResourceForm(tester);
         form.assertFormPresent();
-        form.saveFormElements("");
+        form.saveFormElements("", "");
         form.assertFormPresent();
         assertTextPresent("name is required");
     }
@@ -109,7 +109,7 @@ public class ResourceAcceptanceTest extends BaseAcceptanceTestCase
         clickLinkWithText("edit resource");
         EditResourceForm form = new EditResourceForm(tester);
         form.assertFormPresent();
-        form.saveFormElements(resourceName);
+        form.saveFormElements(resourceName, "");
         form.assertFormPresent();
         assertTextPresent("this agent already has a resource with name '" + resourceName + "'");
     }
