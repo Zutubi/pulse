@@ -15,7 +15,6 @@ import java.util.Map;
  */
 public class ConfigureDashboardAction extends UserActionSupport
 {
-    private int myBuildsCount;
     private int buildCount;
     private Map<Long, String> allProjects;
     private boolean showAllProjects;
@@ -27,16 +26,6 @@ public class ConfigureDashboardAction extends UserActionSupport
     private BuildManager buildManager;
     private ProjectFormHelper projectHelper;
     private ProjectGroupFormHelper groupHelper;
-
-    public int getMyBuildsCount()
-    {
-        return myBuildsCount;
-    }
-
-    public void setMyBuildsCount(int myBuildsCount)
-    {
-        this.myBuildsCount = myBuildsCount;
-    }
 
     public int getBuildCount()
     {
@@ -135,8 +124,6 @@ public class ConfigureDashboardAction extends UserActionSupport
             return ERROR;
         }
 
-        myBuildsCount = user.getMyBuildsCount();
-
         buildCount = user.getDashboardBuildCount();
 
         showAllProjects = user.getShowAllProjects();
@@ -161,7 +148,6 @@ public class ConfigureDashboardAction extends UserActionSupport
 
         User user = getUser();
 
-        user.setMyBuildsCount(myBuildsCount);
         buildManager.cleanupBuilds(user);
 
         user.setDashboardBuildCount(buildCount);

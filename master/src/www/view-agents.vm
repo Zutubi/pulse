@@ -12,10 +12,31 @@
 <body>
     <div id="pagecontent">
 
-    <h1>:: #wwtext("name=agents") ::</h1>
-    <div id="panel">
-        #parse("ajax/view-agents-panel.vm")
-    </div>
+        <h1>:: #wwtext("name=agents") ::</h1>
+
+        <table class="columns" width="100%">
+            <tr>
+                <td class="columns">
+                    <div id="panel">
+                        #parse("ajax/view-agents-panel.vm")
+                    </div>
+                </td>
+                <td class="columns">
+                    <table class="content" style="float: right">
+                        #headingRow("agent.downloads" 1)
+                        <tr>
+                            #actionCell("download.format.zip" "$base/packages/pulse-agent-${version_number}.zip" "compress.gif")
+                        </tr>
+                        <tr>
+                            #actionCell("download.format.tar" "$base/packages/pulse-agent-${version_number}.tar.gz" "compress.gif")
+                        </tr>
+                        <tr>
+                            #actionCell("download.format.exe" "$base/packages/pulse-agent-${version_number}.exe" "pulse.gif")
+                        </tr>
+                    </table>
+                </td>
+            </tr>
+        </table>
 
     </div>
 </body>

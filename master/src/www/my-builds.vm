@@ -1,0 +1,51 @@
+#helpTag("Dashboard+My+Builds+Tab")
+#authorisationTags($principle)
+<content tag="selectedTab">dashboard</content>
+<html>
+<head>
+    <title>#wwtext("name=my.builds")</title>
+    <script type="text/javascript" src="$base/js/prototype.js"></script>
+    <script type="text/javascript" src="$base/js/scriptaculous/scriptaculous.js"></script>
+    <script type="text/javascript" src="$base/js/main.js"></script>
+    <script type="text/javascript">
+        #updater("$base/ajax/myBuildsPanel.action" "panel" $principle)
+    </script>
+#if ($rssEnabled)
+    <link rel="alternate" type="application/rss+xml" title="RSS" href="$base/rss.action?userId=$principle.id"/>
+#end
+</head>
+<body>
+    #dashboardTabs("my-builds")
+
+    <div id="panel">
+        #parse("ajax/my-builds-panel.vm")
+    </div>
+
+    <h2 class="section">#wwtext("name=personal.builds")</h2>
+    <table class="columns" width="100%">
+        <tr>
+            <td class="columns">
+                <p style="padding-left: 10px; padding-right: 100px">
+                    #wwtext("name=personal.builds.blurb")
+                </p>
+            </td>
+            <td class="columns">
+                <table class="content" style="float: right">
+                    #headingRow("tools.downloads" 1)
+                    <tr>
+                        #actionCell("download.format.zip" "$base/packages/pulse-dev-${version_number}.zip" "compress.gif")
+                    </tr>
+                    <tr>
+                        #actionCell("download.format.tar" "$base/packages/pulse-dev-${version_number}.tar.gz" "compress.gif")
+                    </tr>
+                    <tr>
+                        #actionCell("download.format.exe" "$base/packages/pulse-dev-${version_number}.exe" "pulse.gif")
+                    </tr>
+                </table>
+            </td>
+        </tr>
+    </table>
+
+    #tabEnd()
+</body>
+</html>

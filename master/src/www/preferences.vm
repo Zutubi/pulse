@@ -36,6 +36,7 @@
                 <table id="settings" class="fill-content">
                     #editHeadingRow("settings" 2 "user/editUserSettings!input.action?userId=$user.id" "user.settings")
                     #dynamicRow("user.default.page" $user.defaultAction)
+                    #dynamicRow("my.builds.count" $user.myBuildsCount)
                     #dynamicRow("user.refresh.live.content" $refreshInterval)
                     #dynamicRow("user.recipe.tail.lines" $user.tailLines)
                     #dynamicRow("user.refresh.recipe.tail" $tailRefreshInterval)

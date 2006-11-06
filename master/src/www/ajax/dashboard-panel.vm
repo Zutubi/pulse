@@ -106,47 +106,8 @@
         <img alt="configure" src="$base/images/pencil.gif"/> #wwtext("name=configure.dashboard")
     </a>
 </p>
-#if($myBuilds.size() > 0)
-<h2 style="margin-top: 0" class="section">#wwtext("name=my.builds")</h2>
 
-    <table id="my.builds" class="content">
-        #headingRow("my.builds" 13)
-        <tr>
-            #contentHeading("build.id" 1)
-            #contentHeading("project" 1)
-            #contentHeading("build.spec" 1)
-            #contentHeading("build.status" 2)
-            #contentHeading("build.tests" 1)
-            #contentHeading("build.when" 1)
-            #contentHeading("build.elapsed" 1)
-            #contentHeading("actions" 5)
-        </tr>
-
-    #foreach($buildResult in $myBuilds)
-        <tr>
-            #set($cssClass = $buildResult.state.string)
-            #set($project = $buildResult.project)
-
-            <td class="content-right"><a href="viewBuild.action?id=$buildResult.id">$buildResult.number</a></td>
-            #classCell($project.name)
-            #classCell($buildResult.buildSpecification)
-            #statusCell($buildResult true)
-            #testResultsCell($buildResult false $buildResult)
-            #dateClassCell($buildResult)
-            #elapsedCell($buildResult)
-            #viewCell($project $buildResult)
-            #logCell($project $buildResult)
-            #changesCell($project $buildResult)
-            #artifactsCell($project $buildResult)
-#acl("domainObject=project" "hasPermission=4,1")
-            #workingCopyCell($project $buildResult)
-#end
-        </tr>
-    #end
-    </table>
-#end
-
-<h2 #if($myBuilds.size() == 0) style="margin-top: 0" #end class="section">#wwtext("name=my.projects")
+<h2 style="margin-top: 0" class="section">#wwtext("name=my.projects")
 #if($rssEnabled)
     <a class="unadorned" href="$base/rss.action?userId=$principle.id"><img alt="$action.getText('rss')" src="$base/images/feed-icon-16x16.gif"/></a>
 #end

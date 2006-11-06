@@ -59,7 +59,7 @@ public class UserPreferencesAcceptanceTest extends BaseAcceptanceTestCase
 
         assertAliasesTable();
 
-        assertSettingsTable("welcome", "every 60 seconds", "30", "every 60 seconds");
+        assertSettingsTable("welcome", "5", "every 60 seconds", "30", "every 60 seconds");
 
         assertTablePresent("contacts");
         assertTableRowsEqual("contacts", 1, new String[][]{
@@ -323,14 +323,14 @@ public class UserPreferencesAcceptanceTest extends BaseAcceptanceTestCase
 
         UserSettingsForm form = new UserSettingsForm(tester);
         form.assertFormPresent();
-        form.assertFormElements("welcome", "true", "60", "30", "60");
-        form.saveFormElements("dashboard", "false", "60", "100", "40");
+        form.assertFormElements("welcome", "5", "true", "60", "30", "60");
+        form.saveFormElements("dashboard", "2", "false", "60", "100", "40");
 
-        assertSettingsTable("dashboard", "never", "100", "every 40 seconds");
+        assertSettingsTable("dashboard", "2", "never", "100", "every 40 seconds");
 
         assertAndClick("user.settings");
         form.assertFormPresent();
-        form.assertFormElements("dashboard", "false", "60", "100", "40");
+        form.assertFormElements("dashboard", "2", "false", "60", "100", "40");
     }
 
     public void testEditSettingsCancel()
@@ -339,10 +339,10 @@ public class UserPreferencesAcceptanceTest extends BaseAcceptanceTestCase
 
         UserSettingsForm form = new UserSettingsForm(tester);
         form.assertFormPresent();
-        form.assertFormElements("welcome", "true", "60", "30", "60");
-        form.cancelFormElements("dashboard", "false", null, "10", "30");
+        form.assertFormElements("welcome", "5", "true", "60", "30", "60");
+        form.cancelFormElements("dashboard", "2", "false", null, "10", "30");
 
-        assertSettingsTable("welcome", "every 60 seconds", "30", "every 60 seconds");
+        assertSettingsTable("welcome", "5", "every 60 seconds", "30", "every 60 seconds");
     }
 
     public void testEditSettingsValidation()
@@ -352,11 +352,14 @@ public class UserPreferencesAcceptanceTest extends BaseAcceptanceTestCase
         UserSettingsForm form = new UserSettingsForm(tester);
         form.assertFormPresent();
 
-        form.assertFormElements("welcome", "true", "60", "30", "60");
-        form.saveFormElements("dashboard", "true", "0", "10", "10");
+        form.assertFormElements("welcome", "5", "true", "60", "30", "60");
+        form.saveFormElements("dashboard", "0", "true", "60", "10", "10");
+        form.assertFormPresent();
+        assertTextPresent("personal build count must be positive");
+        form.saveFormElements("dashboard", "5", "true", "0", "10", "10");
         form.assertFormPresent();
         assertTextPresent("refresh interval must be a positive number");
-        form.saveFormElements("dashboard", "true", "10", "0", "0");
+        form.saveFormElements("dashboard", "5", "true", "10", "0", "0");
         form.assertFormPresent();
         assertTextPresent("max lines must be positive");
         assertTextPresent("interval must be positive");
@@ -377,11 +380,12 @@ public class UserPreferencesAcceptanceTest extends BaseAcceptanceTestCase
         assertTableEquals("aliases", expectedTable);
     }
 
-    private void assertSettingsTable(String defaultAction, String refreshInterval, String tailLines, String tailInterval)
+    private void assertSettingsTable(String defaultAction, String myBuildCount, String refreshInterval, String tailLines, String tailInterval)
     {
         assertTablePresent("settings");
         assertTableRowsEqual("settings", 1, new String[][]{
                 new String[]{"default page", defaultAction},
+                new String[]{"number of personal builds", myBuildCount},
                 new String[]{"refresh live content", refreshInterval},
                 new String[]{"recipe log tail max lines", tailLines},
                 new String[]{"refresh recipe log tail", tailInterval}

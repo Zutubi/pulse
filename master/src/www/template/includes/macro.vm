@@ -315,6 +315,7 @@
 #macro(dashboardTabs $selected)
     #openTabs()
         #dashboardTab("homepage" "$base/dashboard" $selected)
+        #dashboardTab("my-builds" "$base/myBuilds" $selected)
         #dashboardTab("preferences" "$base/preferences" $selected)
     #closeTabs()
 #end

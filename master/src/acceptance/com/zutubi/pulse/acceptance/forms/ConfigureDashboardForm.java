@@ -18,11 +18,11 @@ public class ConfigureDashboardForm extends BaseForm
 
     public String[] getFieldNames()
     {
-        return new String[] { "myBuildsCount", "buildCount", "showAllProjects", "projects", "shownGroups", "showMyChanges", "user.myChangesCount", "showProjectChanges", "user.projectChangesCount" };
+        return new String[] { "buildCount", "showAllProjects", "projects", "shownGroups", "showMyChanges", "user.myChangesCount", "showProjectChanges", "user.projectChangesCount" };
     }
 
     public int[] getFieldTypes()
     {
-        return new int[] { TEXTFIELD, TEXTFIELD, CHECKBOX, MULTI_SELECT, MULTI_SELECT, CHECKBOX, TEXTFIELD, CHECKBOX, TEXTFIELD };
+        return new int[] { TEXTFIELD, CHECKBOX, MULTI_SELECT, MULTI_SELECT, CHECKBOX, TEXTFIELD, CHECKBOX, TEXTFIELD };
     }
 }

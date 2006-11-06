@@ -13,6 +13,7 @@ public class EditUserSettingsAction extends UserActionSupport
 {
     private List<String> defaultActions;
     private String defaultAction;
+    private int myBuildsCount;
     private boolean refreshEnabled = false;
     private int refreshInterval;
     private int tailLines;
@@ -38,6 +39,16 @@ public class EditUserSettingsAction extends UserActionSupport
     public void setDefaultAction(String defaultAction)
     {
         this.defaultAction = defaultAction;
+    }
+
+    public int getMyBuildsCount()
+    {
+        return myBuildsCount;
+    }
+
+    public void setMyBuildsCount(int myBuildsCount)
+    {
+        this.myBuildsCount = myBuildsCount;
     }
 
     public boolean getRefreshEnabled()
@@ -94,6 +105,8 @@ public class EditUserSettingsAction extends UserActionSupport
         tailLines = user.getTailLines();
         tailInterval = user.getTailRefreshInterval();
         defaultAction = user.getDefaultAction();
+        myBuildsCount = user.getMyBuildsCount();
+
 
         return super.doInput();
     }
@@ -127,6 +140,7 @@ public class EditUserSettingsAction extends UserActionSupport
         persistentUser.setTailLines(tailLines);
         persistentUser.setTailRefreshInterval(tailInterval);
         persistentUser.setDefaultAction(defaultAction);
+        persistentUser.setMyBuildsCount(myBuildsCount);
         getUserManager().save(persistentUser);
         return SUCCESS;
     }

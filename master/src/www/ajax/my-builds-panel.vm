@@ -1,0 +1,41 @@
+<h2 class="section">#wwtext("name=my.builds")</h2>
+    <table id="my.builds" class="content">
+        #headingRow("my.builds" 13)
+        <tr>
+            #contentHeading("build.id" 1)
+            #contentHeading("project" 1)
+            #contentHeading("build.spec" 1)
+            #contentHeading("build.status" 2)
+            #contentHeading("build.tests" 1)
+            #contentHeading("build.when" 1)
+            #contentHeading("build.elapsed" 1)
+            #contentHeading("actions" 5)
+        </tr>
+#if($myBuilds.size() > 0)
+    #foreach($buildResult in $myBuilds)
+        <tr>
+            #set($cssClass = $buildResult.state.string)
+            #set($project = $buildResult.project)
+
+            <td class="content-right"><a href="viewBuild.action?id=$buildResult.id">$buildResult.number</a></td>
+            #classCell($project.name)
+            #classCell($buildResult.buildSpecification)
+            #statusCell($buildResult true)
+            #testResultsCell($buildResult false $buildResult)
+            #dateClassCell($buildResult)
+            #elapsedCell($buildResult)
+            #viewCell($project $buildResult)
+            #logCell($project $buildResult)
+            #changesCell($project $buildResult)
+            #artifactsCell($project $buildResult)
+#acl("domainObject=project" "hasPermission=4,1")
+            #workingCopyCell($project $buildResult)
+#end
+        </tr>
+    #end
+#else
+        <tr>
+            <td class="content" colspan="13">#wwtext("name=my,builds.none")
+        </tr>
+#end
+    </table>

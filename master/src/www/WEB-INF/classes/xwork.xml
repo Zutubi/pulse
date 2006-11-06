@@ -42,6 +42,13 @@
             <result name="guest" type="redirect">/viewProjects.action</result>
         </action>
 
+        <action name="myBuilds" class="com.zutubi.pulse.web.user.MyBuildsAction">
+            <interceptor-ref name="ajaxStack"/>
+            <result name="success" type="velocity">my-builds.vm</result>
+            <result name="error" type="velocity">generic-error.vm</result>
+            <result name="guest" type="redirect">/viewProjects.action</result>
+        </action>
+
         <action name="preferences" class="com.zutubi.pulse.web.user.PreferencesAction">
             <result name="input" type="velocity">/preferences.vm</result>
             <result name="success" type="velocity">/preferences.vm</result>
@@ -1292,6 +1299,11 @@
 
         <action name="dashboardPanel" class="com.zutubi.pulse.web.user.DashboardAction">
             <result name="success" type="velocity">dashboard-panel.vm</result>
+            <result name="error" type="redirect">/</result>
+        </action>
+
+        <action name="myBuildsPanel" class="com.zutubi.pulse.web.user.MyBuildsAction">
+            <result name="success" type="velocity">my-builds-panel.vm</result>
             <result name="error" type="redirect">/</result>
         </action>
 

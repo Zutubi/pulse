@@ -1,12 +1,6 @@
 <!DOCTYPE validators PUBLIC "-//OpenSymphony Group//XWork Validator 1.0//EN"
         "http://www.opensymphony.com/xwork/xwork-validator-1.0.2.dtd">
 <validators>
-    <field name="myBuildsCount">
-        <field-validator type="int">
-            <param name="min">1</param>
-            <message key="dashboard.my.builds.count.positive">my builds count must be positive.</message>
-        </field-validator>
-    </field>
     <field name="buildCount">
         <field-validator type="int">
             <param name="min">1</param>

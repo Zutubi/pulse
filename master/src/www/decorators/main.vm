@@ -74,7 +74,7 @@
                   <a href="$base/currentBuild.action?id=${projectId}">$projectName</a>
 #end
 #if($personalBuild)
-                 <a href="$base/dashboard.action">my builds</a>
+                 <a href="$base/myBuilds.action">my builds</a>
 #end
 #if($buildId && $buildId != "0")
                   :: <a href="$base/viewBuild.action?id=${buildId}">build $buildNumber</a>

@@ -93,7 +93,7 @@ public class ConfigureDashboardAcceptanceTest extends BaseAcceptanceTestCase
         form.assertFormPresent();
         projects = convertValues(form, "projects", projects);
         groups = convertValues(form, "shownGroups", groups);
-        form.saveFormElements(null, null, Boolean.toString(showAll), projects, groups, null, null, null, null);
+        form.saveFormElements(null, Boolean.toString(showAll), projects, groups, null, null, null, null);
         return form;
     }
 
