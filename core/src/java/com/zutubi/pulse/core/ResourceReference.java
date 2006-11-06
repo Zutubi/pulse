@@ -1,5 +1,6 @@
 package com.zutubi.pulse.core;
 
+import com.opensymphony.util.TextUtils;
 import com.zutubi.pulse.core.model.Resource;
 import com.zutubi.pulse.core.model.ResourceVersion;
 
@@ -54,16 +55,21 @@ public class ResourceReference implements ResourceAware, ScopeAware, InitCompone
         }
 
         scope.getParent().add(resource.getProperties().values());
-
-        if (version != null)
+        String importVersion = version;
+        if(importVersion == null)
         {
-            ResourceVersion resourceVersion = resource.getVersion(version);
+            importVersion = resource.getDefaultVersion();
+        }
+
+        if (TextUtils.stringSet(importVersion))
+        {
+            ResourceVersion resourceVersion = resource.getVersion(importVersion);
 
             if (resourceVersion == null)
             {
                 if (required)
                 {
-                    throw new FileLoadException("Reference to undefined version '" + version + "' of resource '" + name + "'");
+                    throw new FileLoadException("Reference to undefined version '" + importVersion + "' of resource '" + name + "'");
                 }
                 return;
             }

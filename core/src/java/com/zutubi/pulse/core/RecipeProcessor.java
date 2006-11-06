@@ -289,10 +289,10 @@ public class RecipeProcessor
 
                 if(TextUtils.stringSet(importVersion))
                 {
-                    ResourceVersion version = resource.getVersion(requirement.getVersion());
+                    ResourceVersion version = resource.getVersion(importVersion);
                     if(version == null)
                     {
-                        throw new BuildException("Reference to non-existant version '" + requirement.getVersion() + "' of resource '" + requirement.getResource() + "'");
+                        throw new BuildException("Reference to non-existant version '" + importVersion + "' of resource '" + requirement.getResource() + "'");
                     }
 
                     scope.add(version.getProperties().values());

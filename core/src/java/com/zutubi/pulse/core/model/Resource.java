@@ -80,6 +80,11 @@ public class Resource extends Entity implements NamedEntity
 
     public void deleteVersion(ResourceVersion version)
     {
+        if(version.getValue().equals(defaultVersion))
+        {
+            defaultVersion = null;
+        }
+        
         versions.remove(version.getValue());
     }
 
