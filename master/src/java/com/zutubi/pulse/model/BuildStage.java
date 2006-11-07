@@ -25,7 +25,10 @@ public class BuildStage
     {
         BuildStage copy = new BuildStage();
         copy.name = name;
-        copy.hostRequirements = hostRequirements.copy();
+        if (hostRequirements != null)
+        {
+            copy.hostRequirements = hostRequirements.copy();
+        }
         copy.recipe = recipe;
         return copy;
     }
