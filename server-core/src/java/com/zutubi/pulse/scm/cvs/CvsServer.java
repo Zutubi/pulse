@@ -216,6 +216,11 @@ public class CvsServer extends CachingSCMServer
         return FileStatus.EOLStyle.BINARY;
     }
 
+    public FileRevision getFileRevision(String path, Revision repoRevision)
+    {
+        return null;
+    }
+
     public Revision checkout(String id, File toDirectory, Revision revision, List<Change> changes) throws SCMException
     {
         assertRevisionArgValid(revision);

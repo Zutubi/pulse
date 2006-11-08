@@ -5,6 +5,8 @@ import com.zutubi.pulse.core.model.Changelist;
 import com.zutubi.pulse.core.model.NumericalRevision;
 import com.zutubi.pulse.core.model.Revision;
 import com.zutubi.pulse.filesystem.remote.RemoteFile;
+import com.zutubi.pulse.scm.FileRevision;
+import com.zutubi.pulse.scm.NumericalFileRevision;
 import com.zutubi.pulse.scm.SCMException;
 import com.zutubi.pulse.test.PulseTestCase;
 import com.zutubi.pulse.util.FileSystemUtils;
@@ -33,13 +35,21 @@ public class P4ServerTest extends PulseTestCase
         client = new P4Client();
 
         tmpDir = FileSystemUtils.createTempDirectory(getClass().getName(), "");
-
         repoDir = new File(tmpDir, "repo");
-        FileSystemUtils.copyRecursively(new File(getDataRoot(), "repo"), repoDir);
+
+        File repoZip = getTestDataFile("server-core", "repo", "zip");
+        FileSystemUtils.extractZip(repoZip, repoDir);
+
+        // Restore from checkpoint
+        p4dProcess = Runtime.getRuntime().exec(new String[] { "p4d", "-r", repoDir.getAbsolutePath(), "-jr", "checkpoint.1"});
+        p4dProcess.waitFor();
 
         p4dProcess = Runtime.getRuntime().exec(new String[] { "p4d", "-r", repoDir.getAbsolutePath()});
+
         workDir = new File(tmpDir, "work");
         workDir.mkdirs();
+
+        waitForServer(1666);
     }
 
     protected void tearDown() throws Exception
@@ -48,6 +58,7 @@ public class P4ServerTest extends PulseTestCase
         server = null;
 
         p4dProcess.destroy();
+        Thread.sleep(400);
         removeDirectory(tmpDir);
         super.tearDown();
     }
@@ -378,6 +389,33 @@ public class P4ServerTest extends PulseTestCase
             List<Change> changes = new LinkedList<Change>();
             server.update("my-id", workDir, updateRevision, changes);
         }
+    }
+
+    public void testGetFileRevision() throws SCMException
+    {
+        getServer("test-client");
+        FileRevision rev = server.getFileRevision("//depot2/file1", new NumericalRevision(5));
+        assertTrue(rev instanceof NumericalFileRevision);
+        assertEquals("2", rev.getRevisionString());
+    }
+
+    public void testGetFileRevisionUnknownPath() throws SCMException
+    {
+        getServer("test-client");
+        assertNull(server.getFileRevision("//depot2/this/path/is/wrong", new NumericalRevision(5)));
+    }
+
+    public void testGetFileRevisionBeforeFileAdded() throws SCMException
+    {
+        getServer("test-client");
+        assertNull(server.getFileRevision("//depot2/file1", new NumericalRevision(1)));
+    }
+
+    public void testGetFileRevisionAfterFileDeleted() throws SCMException
+    {
+        getServer("test-client");
+        FileRevision fileRevision = server.getFileRevision("//depot2/file10", new NumericalRevision(4));
+        assertNull(fileRevision);
     }
 
     private void getServer(String client)

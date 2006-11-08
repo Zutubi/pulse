@@ -570,6 +570,12 @@ public class SVNServer implements SCMServer
         return FileStatus.EOLStyle.BINARY;
     }
 
+    public FileRevision getFileRevision(String path, Revision repoRevision)
+    {
+        // Subversion does not distinguish between file and repo revisions
+        return new NumericalFileRevision(((NumericalRevision)repoRevision).getRevisionNumber());
+    }
+
     //=======================================================================
     // Testing use only
     //=======================================================================

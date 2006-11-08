@@ -179,4 +179,16 @@ public interface SCMServer
      *         in effect
      */
     FileStatus.EOLStyle getEOLPolicy() throws SCMException;
+
+    /**
+     * Gets the revision of a file at a given point in time, marked by a
+     * repository revision.
+     *
+     * @param path         the path of the file to get the revision for
+     * @param repoRevision the point in repository time to get the revision
+     * @return the revision of the given path at that time, or null if the
+     *         path did not exist at that time
+     */
+    FileRevision getFileRevision(String path, Revision repoRevision) throws SCMException;
+
 }

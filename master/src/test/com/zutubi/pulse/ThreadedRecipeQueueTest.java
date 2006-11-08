@@ -16,10 +16,7 @@ import com.zutubi.pulse.events.build.RecipeErrorEvent;
 import com.zutubi.pulse.filesystem.remote.RemoteFile;
 import com.zutubi.pulse.model.*;
 import com.zutubi.pulse.personal.PatchArchive;
-import com.zutubi.pulse.scm.FileStatus;
-import com.zutubi.pulse.scm.SCMChangeEvent;
-import com.zutubi.pulse.scm.SCMException;
-import com.zutubi.pulse.scm.SCMServer;
+import com.zutubi.pulse.scm.*;
 import com.zutubi.pulse.services.SlaveStatus;
 import com.zutubi.pulse.services.UpgradeStatus;
 import junit.framework.TestCase;
@@ -863,6 +860,11 @@ public class ThreadedRecipeQueueTest extends TestCase implements EventListener
         public FileStatus.EOLStyle getEOLPolicy() throws SCMException
         {
             return FileStatus.EOLStyle.BINARY;
+        }
+
+        public FileRevision getFileRevision(String path, Revision repoRevision)
+        {
+            throw new RuntimeException("Method not implemented.");
         }
     }
 

@@ -639,6 +639,78 @@ public class P4Server extends CachingSCMServer
         return eol[0];
     }
 
+    public FileRevision getFileRevision(String path, Revision repoRevision) throws SCMException
+    {
+        //    jsankey@shiny:~/p4test$ p4 fstat //depot/build.xml@34
+        //    //depot/build.xml@34 - no file(s) at that changelist number.
+        //    jsankey@shiny:~/p4test$ p4 fstat //depot/jsankey/bob.xml@34
+        //    ... depotFile //depot/jsankey/bob.xml
+        //    ... clientFile /home/jsankey/sandbox/bob.xml
+        //    ... isMapped
+        //    ... headAction edit
+        //    ... headType text
+        //    ... headTime 1142667022
+        //    ... headRev 34
+        //    ... headChange 34
+        //    ... headModTime 1142667014
+        //    ... haveRev 36
+        //
+        //    jsankey@shiny:~/p4test$ p4 fstat //depot/build.xml@37
+        //    ... depotFile //depot/build.xml
+        //    ... headAction add
+        //    ... headType text
+        //    ... headTime 1162177253
+        //    ... headRev 1
+        //    ... headChange 37
+        //    ... headModTime 1162177235
+        //    ... ... otherOpen0 jsankey@p4test
+        //    ... ... otherAction0 edit
+        //    ... ... otherChange0 38
+        //    ... ... otherOpen 1
+        String clientName = updateClient(null, null);
+        try
+        {
+            File f = new File(clientRoot.getAbsoluteFile(), path);
+            P4Client.P4Result result = client.runP4(false, null, P4_COMMAND, FLAG_CLIENT, clientName, COMMAND_FSTAT,  f.getAbsolutePath() + "@" + repoRevision.getRevisionString());
+            if(result.stderr.length() > 0)
+            {
+                String error = result.stderr.toString();
+                if(error.contains("no file(s) at that changelist number") || error.contains("no such file(s)"))
+                {
+                    return null;
+                }
+                else
+                {
+                    throw new SCMException("Error running p4 fstat: " + result.stderr);
+                }
+            }
+            else if(result.stdout.toString().contains("... headAction delete"))
+            {
+                return null;
+            }
+            else
+            {
+                Pattern revPattern = Pattern.compile("... headRev ([0-9]+)");
+                for(String line: client.splitLines(result))
+                {
+                    Matcher m = revPattern.matcher(line);
+                    if(m.matches())
+                    {
+                        long number = Long.parseLong(m.group(1));
+                        return new NumericalFileRevision(number);
+                    }
+                }
+
+                return null;
+            }
+        }
+        finally
+        {
+            deleteClient(clientName);
+        }
+
+    }
+
     public boolean labelExists(String client, String name) throws SCMException
     {
         P4Client.P4Result p4Result = this.client.runP4(null, P4_COMMAND, FLAG_CLIENT, client, COMMAND_LABELS);
