@@ -39,6 +39,7 @@ public class AcceptanceTestSuite
         suite.addTestSuite(JabberConfigurationAcceptanceTest.class);
         suite.addTestSuite(LdapConfigurationAcceptanceTest.class);
         suite.addTestSuite(CommitMessageLinkAcceptanceTest.class);
+        suite.addTestSuite(ChangeViewersAcceptanceTest.class);
 //        suite.addTestSuite(StartupShutdownAcceptanceTest.class);
         suite.addTestSuite(UserAdministrationAcceptanceTest.class);
         suite.addTestSuite(UserPreferencesAcceptanceTest.class);
