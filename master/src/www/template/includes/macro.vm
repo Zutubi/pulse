@@ -255,7 +255,7 @@
         #buildTab($result "build-file" "viewBuildFile" $selected)
         #buildTab($result "artifacts" "viewBuildArtifacts" $selected)
 #acl("domainObject=project" "hasPermission=4,1")
-        #tabItem("working-dir" "browseProjectDir.action?buildId=$result.id&amp;recipeId=$result.root.children.get(0).result.id" $selected)
+        #tabItem("build.tab.working-dir" "working-dir" "browseProjectDir.action?buildId=$result.id&amp;recipeId=$result.root.children.get(0).result.id" $selected)
 #end
     #closeTabs()
 #end
