@@ -17,6 +17,9 @@ public class Navigation
     public static class Projects
     {
         public static final String LINK_ADD_PROJECT = "project.add";
+        public static final String LINK_EDIT_CHANGE_VIEWER = "project.change.viewer.edit";
+        public static final String ACTION_PROJECT_HOME = "/currentBuild.action";
+        public static final String ACTION_PROJECT_CONFIG = "/configureProject.action";
     }
 
     public static class Agents

@@ -2,6 +2,8 @@ package com.zutubi.pulse.acceptance;
 
 import com.zutubi.pulse.util.RandomUtils;
 
+import java.util.Hashtable;
+
 /**
  */
 public class ProjectAcceptanceTestBase extends BaseAcceptanceTestCase
@@ -34,26 +36,38 @@ public class ProjectAcceptanceTestBase extends BaseAcceptanceTestCase
         super.setUp();
 
         // create project that will be used during this set of tests.
+        projectName = "project-" + RandomUtils.randomString(5);
+
+        Hashtable<String, Object> projectDetails = new Hashtable<String, Object>();
+        projectDetails.put("name", projectName);
+        projectDetails.put("description", DESCRIPTION);
+        projectDetails.put("url", URL);
+
+        Hashtable<String, Object> scmDetails = new Hashtable<String, Object>();
+        scmDetails.put("type", "cvs");
+        scmDetails.put("root", TEST_CVSROOT);
+        scmDetails.put("module", "module");
+        scmDetails.put("monitor", "false");
+
+        Hashtable<String, Object> typeDetails = new Hashtable<String, Object>();
+        if(type == Type.ANT)
+        {
+            typeDetails.put("type", "ant");
+            typeDetails.put("buildFile", "build.xml");
+        }
+        else
+        {
+            typeDetails.put("type", "versioned");
+            typeDetails.put("pulseFileName", "pulse.xml");
+        }
+        Object result = callRemoteApi("createProject", projectDetails, scmDetails, typeDetails);
+        assertEquals(Boolean.TRUE, result);
+
         loginAsAdmin();
 
         // navigate to the create project wizard.
         // fill in the form details.
-        clickLink(Navigation.TAB_PROJECTS);
-        assertAndClick(Navigation.Projects.LINK_ADD_PROJECT);
-
-        projectName = "project " + RandomUtils.randomString(5);
-        submitProjectBasicsForm(projectName, DESCRIPTION, URL, "cvs", type.toString().toLowerCase());
-        submitCvsSetupForm(TEST_CVSROOT, "module", "", "");
-
-        if(type == Type.ANT)
-        {
-            submitAntSetupForm();
-        }
-        else
-        {
-            submitVersionedSetupForm("pulse.xml");
-        }
-
+        beginAt(Navigation.Projects.ACTION_PROJECT_CONFIG + "?projectName=" + projectName);
         assertTablePresent("project.basics");
     }
 }

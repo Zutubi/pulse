@@ -63,12 +63,27 @@ public class ConfigureProjectAction extends ProjectActionSupport
 
     public void validate()
     {
-        lookupProject(id);
+        if(id != 0)
+        {
+            projectId = id;
+        }
+
+        project = super.getProject();
+        if(project == null)
+        {
+            addUnknownProjectActionError();
+        }
     }
 
     public String execute()
     {
-        project = getProject(id);
+        if(id != 0)
+        {
+            projectId = id;
+        }
+        
+        project = super.getProject();
+        id = project.getId();
         triggers = getScheduler().getTriggers(id);
         return SUCCESS;
     }

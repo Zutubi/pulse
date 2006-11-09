@@ -34,8 +34,6 @@ public class Project extends Entity implements AclObjectIdentity, AclObjectIdent
         PAUSING
     }
 
-    public static final int DEFAULT_WORK_DIR_BUILDS = 10;
-
     private String name;
     private String description;
     private String url;
@@ -65,7 +63,6 @@ public class Project extends Entity implements AclObjectIdentity, AclObjectIdent
         this.name = name;
         this.description = description;
         this.pulseFileDetails = pulseFileDetails;
-        this.addCleanupRule(new CleanupRule(true, null, DEFAULT_WORK_DIR_BUILDS, CleanupRule.CleanupUnit.BUILDS));
     }
 
     /**

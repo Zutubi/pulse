@@ -30,6 +30,8 @@ import java.util.List;
  */
 public class DefaultProjectManager implements ProjectManager
 {
+    public static final int DEFAULT_WORK_DIR_BUILDS = 10;
+
     private static final Logger LOG = Logger.getLogger(DefaultProjectManager.class);
 
     private ProjectDao projectDao;
@@ -411,6 +413,7 @@ public class DefaultProjectManager implements ProjectManager
 
         BuildSpecification buildSpec = new BuildSpecification("default");
         project.addBuildSpecification(buildSpec);
+        project.addCleanupRule(new CleanupRule(true, null, DEFAULT_WORK_DIR_BUILDS, CleanupRule.CleanupUnit.BUILDS));
 
         projectDao.save(project);
 

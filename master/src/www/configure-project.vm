@@ -55,7 +55,7 @@
                 </table>
 
             <!-- Change Viewer configuration -->
-                <table id="project.scm" class="fill-content">
+                <table id="project.change.viewer" class="fill-content">
                     #aclEditHeadingRow("project.change.viewer" 2 "changeViewerWizard.action?projectId=$project.id" "project.change.viewer.edit" "project")
 #if($project.changeViewer)
                     #dynamicRow("project.change.viewer.details" $project.changeViewer.details)
