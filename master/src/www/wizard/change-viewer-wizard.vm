@@ -1,5 +1,6 @@
 #helpTag("Change-Viewers")
-<content tag="selectedTab">dashboard</content>
+<content tag="selectedTab">projects</content>
+#projectTags($project)
 <html>
 <head>
     <title>#wwtext("name=change.viewer.configure")</title>

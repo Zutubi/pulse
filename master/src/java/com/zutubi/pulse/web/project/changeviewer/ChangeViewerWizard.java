@@ -1,9 +1,8 @@
 package com.zutubi.pulse.web.project.changeviewer;
 
+import com.zutubi.pulse.model.*;
 import com.zutubi.pulse.wizard.Wizard;
 import com.zutubi.pulse.wizard.WizardTransition;
-import com.zutubi.pulse.model.*;
-import com.zutubi.pulse.core.ObjectFactory;
 import com.zutubi.validation.Validateable;
 import com.zutubi.validation.ValidationContext;
 
@@ -20,7 +19,6 @@ public class ChangeViewerWizard implements Wizard, Validateable
     private static final String TYPE_VIEW_VC = "ViewVC";
 
     private ProjectManager projectManager;
-    private ObjectFactory objectFactory = null;
 
     private long projectId;
 
@@ -39,6 +37,11 @@ public class ChangeViewerWizard implements Wizard, Validateable
         this.projectId = projectId;
     }
 
+    public Project getProject()
+    {
+        return projectManager.getProject(projectId);
+    }
+    
     public void initialise()
     {
         forms = new LinkedHashMap<String, ChangeViewerForm>();
@@ -175,11 +178,6 @@ public class ChangeViewerWizard implements Wizard, Validateable
         {
             return options;
         }
-    }
-
-    public void setObjectFactory(ObjectFactory objectFactory)
-    {
-        this.objectFactory = objectFactory;
     }
 
     public void setProjectManager(ProjectManager projectManager)
