@@ -286,6 +286,11 @@ public class StringUtilsTest extends PulseTestCase
         assertEquals(",a,,b,", StringUtils.join(",", true, ",", "a", ",", "b", ","));        
     }
 
+    public void testJoinSkipEmpty()
+    {
+        assertEquals("a,b,c", StringUtils.join(",", true, true, "", "", "a", "", "b", "", "", "c", ""));
+    }
+
     private void splitHelper(String s, String... expected)
     {
         List<String> expectedParts = Arrays.asList(expected);

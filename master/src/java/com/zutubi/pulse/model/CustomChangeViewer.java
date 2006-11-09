@@ -1,12 +1,12 @@
 package com.zutubi.pulse.model;
 
-import com.zutubi.pulse.core.model.Revision;
-import com.zutubi.pulse.core.model.Property;
-import com.zutubi.pulse.core.model.FileRevision;
+import com.opensymphony.util.TextUtils;
+import com.zutubi.pulse.core.FileLoadException;
 import com.zutubi.pulse.core.Scope;
 import com.zutubi.pulse.core.VariableHelper;
-import com.zutubi.pulse.core.FileLoadException;
-import com.opensymphony.util.TextUtils;
+import com.zutubi.pulse.core.model.FileRevision;
+import com.zutubi.pulse.core.model.Property;
+import com.zutubi.pulse.core.model.Revision;
 
 import java.text.SimpleDateFormat;
 import java.util.TimeZone;
@@ -21,6 +21,7 @@ public class CustomChangeViewer extends ChangeViewer
     private static final String PROPERTY_PREVIOUS_REVISION = "previous.revision";
     private static final String PROPERTY_AUTHOR = "author";
     private static final String PROPERTY_BRANCH = "branch";
+    private static final String PROPERTY_PATH = "path";
     private static final String PROPERTY_TIMESTAMP_PULSE = "time.pulse";
     private static final String PROPERTY_TIMESTAMP_FISHEYE = "time.fisheye";
 
@@ -120,12 +121,12 @@ public class CustomChangeViewer extends ChangeViewer
 
     public String getFileViewURL(String path, FileRevision revision)
     {
-        return resolveFileURL(fileViewURL, revision);
+        return resolveFileURL(fileViewURL, path, revision);
     }
 
     public String getFileDownloadURL(String path, FileRevision revision)
     {
-        return resolveFileURL(fileViewURL, revision);
+        return resolveFileURL(fileViewURL, path, revision);
     }
 
     public String getFileDiffURL(String path, FileRevision revision)
@@ -135,7 +136,7 @@ public class CustomChangeViewer extends ChangeViewer
             return null;
         }
 
-        return resolveFileURL(fileViewURL, revision);
+        return resolveFileURL(fileViewURL, path, revision);
     }
 
     public ChangeViewer copy()
@@ -171,11 +172,12 @@ public class CustomChangeViewer extends ChangeViewer
         return null;
     }
 
-    private String resolveFileURL(String url, FileRevision revision)
+    private String resolveFileURL(String url, String path, FileRevision revision)
     {
         if(TextUtils.stringSet(url))
         {
             Scope scope = new Scope();
+            scope.add(new Property(PROPERTY_PATH, path));
             scope.add(new Property(PROPERTY_REVISION, revision.getRevisionString()));
             FileRevision previous = revision.getPrevious();
             if(previous != null)
@@ -218,6 +220,7 @@ public class CustomChangeViewer extends ChangeViewer
     public static void validateFileURL(String url)
     {
         Scope scope = new Scope();
+        scope.add(new Property(PROPERTY_PATH, ""));
         scope.add(new Property(PROPERTY_REVISION, ""));
         scope.add(new Property(PROPERTY_PREVIOUS_REVISION, ""));
 

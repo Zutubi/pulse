@@ -28,6 +28,7 @@
                 </table>
                 <table class="fill-content">
                     #headingRow("change.viewer.file.variables" 2)
+                    #docRow("change.viewer.file.variable.path" "change.viewer.file.variable.path.help")
                     #docRow("change.viewer.file.variable.revision" "change.viewer.file.variable.revision.help")
                     #docRow("change.viewer.file.variable.previous.revision" "change.viewer.file.variable.previous.revision.help")
                 </table>

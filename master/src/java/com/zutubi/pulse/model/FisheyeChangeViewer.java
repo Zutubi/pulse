@@ -1,8 +1,8 @@
 package com.zutubi.pulse.model;
 
-import com.zutubi.pulse.core.model.Revision;
 import com.zutubi.pulse.core.model.CvsRevision;
 import com.zutubi.pulse.core.model.FileRevision;
+import com.zutubi.pulse.core.model.Revision;
 import com.zutubi.pulse.util.StringUtils;
 
 /**
@@ -27,17 +27,17 @@ public class FisheyeChangeViewer extends BasePathChangeViewer
 
     public String getChangesetURL(Revision revision)
     {
-        return StringUtils.join("/", true, getBaseURL(), "changelog", getProjectPath(), "?cs=" + getChangesetString(revision));
+        return StringUtils.join("/", true, true, getBaseURL(), "changelog", getProjectPath(), "?cs=" + getChangesetString(revision));
     }
 
     public String getFileViewURL(String path, FileRevision revision)
     {
-        return StringUtils.join("/", true, getBaseURL(), "browse", getProjectPath(), path + "?r=" + revision.getRevisionString());
+        return StringUtils.join("/", true, true, getBaseURL(), "browse", getProjectPath(), path + "?r=" + revision.getRevisionString());
     }
 
     public String getFileDownloadURL(String path, FileRevision revision)
     {
-        return StringUtils.join("/", true, getBaseURL(), "browse", "~raw,r=" + revision.getRevisionString(), getProjectPath(), path);
+        return StringUtils.join("/", true, true, getBaseURL(), "browse", "~raw,r=" + revision.getRevisionString(), getProjectPath(), path);
     }
 
     public String getFileDiffURL(String path, FileRevision revision)
@@ -48,7 +48,7 @@ public class FisheyeChangeViewer extends BasePathChangeViewer
             return null;
         }
 
-        return StringUtils.join("/", true, getBaseURL(), "browse", getProjectPath(), path + "?r1=" + previousRevision.getRevisionString() + "&r2=" + revision.getRevisionString());
+        return StringUtils.join("/", true, true, getBaseURL(), "browse", getProjectPath(), path + "?r1=" + previousRevision.getRevisionString() + "&r2=" + revision.getRevisionString());
     }
 
     public ChangeViewer copy()

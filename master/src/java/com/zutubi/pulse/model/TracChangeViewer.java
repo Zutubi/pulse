@@ -1,11 +1,11 @@
 package com.zutubi.pulse.model;
 
-import com.zutubi.pulse.core.model.Revision;
 import com.zutubi.pulse.core.model.FileRevision;
+import com.zutubi.pulse.core.model.Revision;
 import com.zutubi.pulse.util.StringUtils;
 
-import java.net.URLEncoder;
 import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 
 /**
  * A change viwer implementation for linking to a Trac instance.
@@ -29,12 +29,12 @@ public class TracChangeViewer extends BasePathChangeViewer
 
     public String getChangesetURL(Revision revision)
     {
-        return StringUtils.join("/", true, getBaseURL(), revision.getRevisionString());
+        return StringUtils.join("/", true, true, getBaseURL(), "changeset", revision.getRevisionString());
     }
 
     public String getFileViewURL(String path, FileRevision revision)
     {
-        return StringUtils.join("/", true, getBaseURL(), getProjectPath(), path + "?rev=" + revision.getRevisionString());
+        return StringUtils.join("/", true, true, getBaseURL(), "browser", path + "?rev=" + revision.getRevisionString());
     }
 
     public String getFileDownloadURL(String path, FileRevision revision)
@@ -50,7 +50,7 @@ public class TracChangeViewer extends BasePathChangeViewer
             return null;
         }
 
-        return StringUtils.join("/", true, getBaseURL(), "new=" + getDiffPath(path, revision) + "&old=" + getDiffPath(path, previous));
+        return StringUtils.join("/", true, true, getBaseURL(), "changeset?new=" + getDiffPath(path, revision) + "&old=" + getDiffPath(path, previous));
     }
 
     public ChangeViewer copy()
@@ -60,7 +60,12 @@ public class TracChangeViewer extends BasePathChangeViewer
 
     private String getDiffPath(String path, FileRevision revision)
     {
-        String result = StringUtils.join("/", getProjectPath(), path + "@" + revision.getRevisionString());
+        String result = StringUtils.join("/", path + "@" + revision.getRevisionString());
+        if(result.startsWith("/"))
+        {
+            result = result.substring(1);
+        }
+        
         try
         {
             return URLEncoder.encode(result, "UTF-8");

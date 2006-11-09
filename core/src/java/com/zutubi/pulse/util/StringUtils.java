@@ -1,5 +1,6 @@
 package com.zutubi.pulse.util;
 
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -325,7 +326,12 @@ public class StringUtils
 
     public static String join(String glue, String... pieces)
     {
-        return join(glue, false, pieces);
+        return join(glue, false, false, pieces);
+    }
+
+    public static String join(String glue, boolean glueCheck, String... pieces)
+    {
+        return join(glue, glueCheck, false, pieces);
     }
 
     /**
@@ -338,16 +344,33 @@ public class StringUtils
      *                  with glue it will be stripped, and if the second
      *                  starts with glue it will be stripped), ensuring
      *                  no duplication of glue at join points
+     * @param skipEmpty if true, empty pieces are ignored
      * @param pieces    the pieces of string to join together
      * @return a string made up of the given pieces, joined with the glue
      */
-    public static String join(String glue, boolean glueCheck, String... pieces)
+    public static String join(String glue, boolean glueCheck, boolean skipEmpty, String... pieces)
     {
         StringBuilder result = new StringBuilder();
+
+        if(skipEmpty)
+        {
+            // For total consistency, strip out empty pieces first
+            List<String> list = new ArrayList<String>(pieces.length);
+            for(String piece: pieces)
+            {
+                if (piece.length() > 0)
+                {
+                    list.add(piece);
+                }
+            }
+
+            pieces = list.toArray(new String[list.size()]);
+        }
 
         for(int i = 0; i < pieces.length; i++)
         {
             String piece = pieces[i];
+
             if(glueCheck)
             {
                 if(i > 0 && piece.startsWith(glue))
