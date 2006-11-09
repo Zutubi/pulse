@@ -205,4 +205,17 @@ public class DashboardAction extends ActionSupport
 
         changeUrl = null;
     }
+
+    public boolean canWrite(Project project)
+    {
+        try
+        {
+            projectManager.checkWrite(project);
+            return true;
+        }
+        catch(Exception e)
+        {
+            return false;
+        }
+    }
 }

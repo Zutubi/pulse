@@ -39,7 +39,7 @@
             #logCell($project $buildResult)
             #changesCell($project $buildResult)
             #artifactsCell($project $buildResult)
-#acl("domainObject=project" "hasPermission=4,1")
+#if($action.canWrite($project))
             #workingCopyCell($project $buildResult)
 #end
         </tr>
