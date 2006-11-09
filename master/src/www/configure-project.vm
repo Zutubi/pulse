@@ -31,9 +31,6 @@
 #if($project.scm.class.name == 'com.zutubi.pulse.model.Cvs')
                     #dynamicRow("cvs.branch" $project.scm.branch)
 #end
-#if($project.scm.changeViewerUrl && $project.scm.changeViewerUrl.length() > 0)
-                    #dynamicRow("scm.change.viewer.url" $project.scm.changeViewerUrl)
-#end
                     #dynamicRow("scm.monitor" "$project.scm.monitor")
                     #if (!$project.scm.pollingInterval)
                         #set($defaultSPI = "$defaultScmPollingInterval (default)")
@@ -57,6 +54,16 @@
 #end
                 </table>
 
+            <!-- Change Viewer configuration -->
+                <table id="project.scm" class="fill-content">
+                    #aclEditHeadingRow("project.change.viewer" 2 "changeViewerWizard.action?projectId=$project.id" "project.change.viewer.edit" "project")
+#if($project.changeViewer)
+                    #dynamicRow("project.change.viewer.details" $project.changeViewer.details)
+#else
+                    #contentRow("project.change.viewer.none" 2)
+#end
+                </table>
+                
             <!-- Type-specific details -->
 
                 <table id="project.specifics" class="fill-content">

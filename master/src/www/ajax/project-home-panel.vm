@@ -35,14 +35,14 @@
         #if($latestChanges.size() > 0)
             #foreach($changelist in $latestChanges)
                 #set($index = $velocityCount - 1)
-                #set($url = $action.getChangeUrl($project, $changelist.revision))
+                $action.updateChangeUrl($project, $changelist.revision)
                 <tr>
                     <td class="content-right">
-                #if($url)
-                        <a href="$url">
+                #if($action.getChangeUrl())
+                        <a href="$action.getChangeUrl()">
                 #end
                             $changelist.revision
-                #if($url)
+                #if($action.getChangeUrl())
                         </a>
                 #end
                     </td>

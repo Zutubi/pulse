@@ -31,12 +31,9 @@
     #wwtextfield("name=quiet" "template=controlfooter")
     #inlineHelp("cvs.quiet.help")
 
-    #wwtextfield("name=cvs.changeViewerUrl" "label=%{getText('scm.change.viewer.url')}" "size=60" "tabindex=7" "onkeypress=return submitenter(this,event)")
-    #inlineHelp("scm.change.viewer.url.help")
-    
     #testSettingsRow()
 
-    #previousNextCancel(8)
+    #previousNextCancel(7)
 #end
 
     </div>

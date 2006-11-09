@@ -322,4 +322,53 @@ public class StringUtils
 
         return result;
     }
+
+    public static String join(String glue, String... pieces)
+    {
+        return join(glue, false, pieces);
+    }
+
+    /**
+     * Joins the given string pieces together with the glue in all the
+     * joins.  The result is <piece1><glue><piece2>...<glue><pieceN>.
+     *
+     * @param glue      glue string to insert at all the join points
+     * @param glueCheck if true, both sides of the join will be stripped of
+     *                  any pre-existing glue (i.e. if the first piece ends
+     *                  with glue it will be stripped, and if the second
+     *                  starts with glue it will be stripped), ensuring
+     *                  no duplication of glue at join points
+     * @param pieces    the pieces of string to join together
+     * @return a string made up of the given pieces, joined with the glue
+     */
+    public static String join(String glue, boolean glueCheck, String... pieces)
+    {
+        StringBuilder result = new StringBuilder();
+
+        for(int i = 0; i < pieces.length; i++)
+        {
+            String piece = pieces[i];
+            if(glueCheck)
+            {
+                if(i > 0 && piece.startsWith(glue))
+                {
+                    piece = piece.substring(glue.length());
+                }
+
+                if(i < pieces.length - 1 && piece.endsWith(glue))
+                {
+                    piece = piece.substring(0, piece.length() - glue.length());
+                }
+            }
+
+            if(i > 0)
+            {
+                result.append(glue);
+            }
+
+            result.append(piece);
+        }
+
+        return result.toString();
+    }
 }

@@ -56,17 +56,34 @@
 #end
 
     <table class="content">
-        #headingRow("changelist.files" 3)
+        #headingRow("changelist.files" 4)
         <tr>
             #contentHeading("changelist.file" 1)
             #contentHeading("changelist.revision" 1)
             #contentHeading("changelist.action" 1)
+#if($action.haveChangeViewer())
+            #contentHeading("changelist.links" 1)
+#end
         </tr>
 #foreach($file in $changelist.changes)
+    $action.updateUrls($file)
         <tr>
             #dynamicCell($file.filename)
-            #rightCell($file.revision)
+            #rightCell($file.revision.revisionString)
             #dynamicCell($file.action.toString().toLowerCase())
+#if($action.haveChangeViewer())
+            <td class="content">
+    #if($action.getFileViewUrl())
+                <a class="unadorned" href="$action.getFileViewUrl()" title="view"><img alt="view" src="$base/images/page.gif"/></a>
+    #end
+    #if($action.getFileDownloadUrl())
+                <a class="unadorned" href="$action.getFileDownloadUrl()" title="download"><img alt="download" src="$base/images/page_put.gif"/></a>
+    #end
+    #if($action.getFileDiffUrl())
+                <a class="unadorned" href="$action.getFileDiffUrl()" title="diff"><img alt="diff" src="$base/images/page_diff.gif"/></a>
+    #end
+            </td>
+#end
         </tr>
 #end
     </table>

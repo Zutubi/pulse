@@ -365,6 +365,15 @@
             <result name="error" type="velocity">generic-error.vm</result>
         </action>
 
+        <action name="changeViewerWizard" class="com.zutubi.pulse.web.wizard.auto.WizardAction">
+            <interceptor-ref name="wizStack"/>
+            <param name="wizard">com.zutubi.pulse.web.project.changeviewer.ChangeViewerWizard</param>
+            <result name="input" type="velocity">/wizard/change-viewer-wizard.vm</result>
+            <result name="step" type="velocity">/wizard/change-viewer-wizard.vm</result>
+            <result name="cancel" type="redirect">/configureProject.action?id=${projectId}</result>
+            <result name="success" type="redirect">/configureProject.action?id=${projectId}</result>
+        </action>
+
         <action name="editPulseFileDetails" class="com.zutubi.pulse.web.project.EditPulseFileDetailsAction">
             <result name="custom" type="chain">editCustomDetails!input</result>
             <result name="versioned" type="chain">editVersionedDetails!input</result>

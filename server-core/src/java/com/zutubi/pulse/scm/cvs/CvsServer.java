@@ -1,10 +1,7 @@
 package com.zutubi.pulse.scm.cvs;
 
 import com.opensymphony.util.TextUtils;
-import com.zutubi.pulse.core.model.Change;
-import com.zutubi.pulse.core.model.Changelist;
-import com.zutubi.pulse.core.model.CvsRevision;
-import com.zutubi.pulse.core.model.Revision;
+import com.zutubi.pulse.core.model.*;
 import com.zutubi.pulse.filesystem.remote.CachingRemoteFile;
 import com.zutubi.pulse.scm.*;
 import com.zutubi.pulse.scm.cvs.client.CvsClient;

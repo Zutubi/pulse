@@ -8,6 +8,7 @@ import com.zutubi.pulse.model.BuildScmDetails;
 import com.zutubi.pulse.model.MockBuildManager;
 import com.zutubi.pulse.model.User;
 import com.zutubi.pulse.test.PulseTestCase;
+import com.zutubi.pulse.core.model.NumericalFileRevision;
 
 /**
  */
@@ -66,7 +67,7 @@ public class ChangedByMeNotificationConditionTest extends PulseTestCase
     private Changelist getChangelistBy(String author)
     {
         Changelist change = new Changelist("uid", new Revision(author, "comment", 0, "rev"));
-        change.addChange(new Change("file", "rev", Change.Action.EDIT));
+        change.addChange(new Change("file", new NumericalFileRevision(1), Change.Action.EDIT));
         return change;
     }
 

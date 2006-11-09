@@ -1,9 +1,6 @@
 package com.zutubi.pulse.scm.p4;
 
-import com.zutubi.pulse.core.model.Change;
-import com.zutubi.pulse.core.model.Changelist;
-import com.zutubi.pulse.core.model.NumericalRevision;
-import com.zutubi.pulse.core.model.Revision;
+import com.zutubi.pulse.core.model.*;
 import com.zutubi.pulse.filesystem.remote.CachingRemoteFile;
 import com.zutubi.pulse.scm.*;
 import static com.zutubi.pulse.scm.p4.P4Constants.*;
@@ -179,7 +176,8 @@ public class P4Server extends CachingSCMServer
 
         while (matcher.find())
         {
-            changes.add(new Change(matcher.group(1), matcher.group(2), decodeAction(matcher.group(3))));
+            FileRevision fileRevision = new NumericalFileRevision(Long.parseLong(matcher.group(2)));
+            changes.add(new Change(matcher.group(1), fileRevision, decodeAction(matcher.group(3))));
         }
     }
 
@@ -278,7 +276,8 @@ public class P4Server extends CachingSCMServer
 
         if (matcher.matches())
         {
-            return new Change(matcher.group(1), matcher.group(2), decodeAction(matcher.group(3)));
+            FileRevision fileRevision = new NumericalFileRevision(Long.parseLong(matcher.group(2)));
+            return new Change(matcher.group(1), fileRevision, decodeAction(matcher.group(3)));
         }
         else
         {

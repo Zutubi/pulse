@@ -3,6 +3,7 @@ package com.zutubi.pulse.scm;
 import com.zutubi.pulse.core.model.Change;
 import com.zutubi.pulse.core.model.Changelist;
 import com.zutubi.pulse.core.model.Revision;
+import com.zutubi.pulse.core.model.FileRevision;
 import com.zutubi.pulse.filesystem.remote.RemoteFile;
 
 import java.io.File;

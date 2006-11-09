@@ -88,7 +88,7 @@
             #end
             #foreach($i in [0..$limit])
                 #set($file = $change.changes.get($i))
-                    <li>$!webwork.htmlEncode($file.filename) #$file.revision - $file.action.toString().toLowerCase()</li>
+                    <li>$!webwork.htmlEncode($file.filename) #$file.revision.revisionString - $file.action.toString().toLowerCase()</li>
             #end
             #if($remaining > 0)
                     <li>... ($remaining #wwtext("name=changes.more.files"))</li>

@@ -251,6 +251,41 @@ public class StringUtilsTest extends PulseTestCase
         assertFalse(StringUtils.equals("aaa", "bbb"));
     }
 
+    public void testJoin()
+    {
+        assertEquals("a,b,c", StringUtils.join(",", "a", "b", "c"));
+    }
+
+    public void testJoinGlueAllOver()
+    {
+        assertEquals(",a,,,b,,,c,", StringUtils.join(",", false, ",a,", ",b,", ",c,"));
+    }
+
+    public void testJoinGlueCheckNothingToDo()
+    {
+        assertEquals("a,b,c", StringUtils.join(",", true, "a", "b", "c"));
+    }
+
+    public void testJoinGlueCheckGlueAllOver()
+    {
+        assertEquals(",a,b,c,", StringUtils.join(",", true, ",a,", ",b,", ",c,"));
+    }
+
+    public void testJoinEmptyGlue()
+    {
+        assertEquals("abc", StringUtils.join("", true, "a", "b", "c"));    
+    }
+
+    public void testJoinEmptyPieces()
+    {
+        assertEquals(",,a,,b,,,c,", StringUtils.join(",", true, "", "", "a", "", "b", "", "", "c", ""));
+    }
+
+    public void testJoinGlueCheckGluePieces()
+    {
+        assertEquals(",a,,b,", StringUtils.join(",", true, ",", "a", ",", "b", ","));        
+    }
+
     private void splitHelper(String s, String... expected)
     {
         List<String> expectedParts = Arrays.asList(expected);

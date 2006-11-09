@@ -1,6 +1,7 @@
 package com.zutubi.pulse.test;
 
 import com.zutubi.pulse.MasterBuildPaths;
+import com.zutubi.pulse.core.model.NumericalFileRevision;
 import com.zutubi.pulse.agent.AgentManager;
 import com.zutubi.pulse.bootstrap.MasterConfigurationManager;
 import com.zutubi.pulse.core.*;
@@ -530,7 +531,7 @@ public class SetupFeatureTour implements Runnable
 
         for (String file : files)
         {
-            list.addChange(new Change(file, "3", Change.Action.EDIT));
+            list.addChange(new Change(file, new NumericalFileRevision(3), Change.Action.EDIT));
         }
 
         changelistDao.save(list);

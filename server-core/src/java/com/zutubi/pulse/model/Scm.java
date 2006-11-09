@@ -22,15 +22,6 @@ public abstract class Scm extends Entity implements Cloneable
 {
     private static final Logger LOG = Logger.getLogger(Scm.class);
 
-    private static final SimpleDateFormat PULSE_DATE_FORMAT = new SimpleDateFormat("yyyyMMdd-HH:mm:ss");
-    private static final SimpleDateFormat FISHEYE_DATE_FORMAT = new SimpleDateFormat("yyyyMMddHHmmss");
-
-    static
-    {
-        // fisheye presents its change set ids using GMT times.  By setting the date format timezone to
-        // GMT, we ensure that local server times are converted into GMT times.
-        FISHEYE_DATE_FORMAT.setTimeZone(TimeZone.getTimeZone("GMT"));
-    }
 
     private String path;
     private Properties properties;
@@ -42,13 +33,6 @@ public abstract class Scm extends Entity implements Cloneable
 
     private Integer pollingInterval;
     private Long lastPollTime;
-
-    private static final String CHANGE_VIEWER_URL = "change.viewer.url";
-    private static final String PROPERTY_REVISION = "revision";
-    private static final String PROPERTY_AUTHOR = "author";
-    private static final String PROPERTY_BRANCH = "branch";
-    private static final String PROPERTY_TIMESTAMP_PULSE = "time.pulse";
-    private static final String PROPERTY_TIMESTAMP_FISHEYE = "time.fisheye";
 
     public abstract SCMServer createServer() throws SCMException;
     public abstract String getType();
@@ -108,16 +92,6 @@ public abstract class Scm extends Entity implements Cloneable
     public void setLastPollTime(Long lastPollTime)
     {
         this.lastPollTime = lastPollTime;
-    }
-
-    public String getChangeViewerUrl()
-    {
-        return (String) properties.get(CHANGE_VIEWER_URL);
-    }
-
-    public void setChangeViewerUrl(String url)
-    {
-        properties.put(CHANGE_VIEWER_URL, url);
     }
 
     /**
@@ -221,55 +195,6 @@ public abstract class Scm extends Entity implements Cloneable
         {
             // Should ever happen, but if it does, we need some trace of it.
             LOG.error(e);
-        }
-
-        return null;
-    }
-
-    public static void validateChangeViewerURL(String url)
-    {
-        Scope scope = new Scope();
-        scope.add(new Property(PROPERTY_REVISION, ""));
-        scope.add(new Property(PROPERTY_AUTHOR, ""));
-        scope.add(new Property(PROPERTY_BRANCH, ""));
-        scope.add(new Property(PROPERTY_TIMESTAMP_FISHEYE, ""));
-        scope.add(new Property(PROPERTY_TIMESTAMP_PULSE, ""));
-
-        try
-        {
-            VariableHelper.replaceVariables(url, scope);
-        }
-        catch (FileLoadException e)
-        {
-            throw new IllegalArgumentException(e.getMessage(), e);
-        }
-    }
-
-    public String getChangeUrl(Revision revision)
-    {
-        String url = getChangeViewerUrl();
-        if(TextUtils.stringSet(url))
-        {
-            Scope scope = new Scope();
-            scope.add(new Property(PROPERTY_REVISION, revision.getRevisionString()));
-            scope.add(new Property(PROPERTY_AUTHOR, revision.getAuthor()));
-            scope.add(new Property(PROPERTY_BRANCH, revision.getBranch()));
-
-            if(revision.getDate() != null)
-            {
-                scope.add(new Property(PROPERTY_TIMESTAMP_PULSE, PULSE_DATE_FORMAT.format(revision.getDate())));
-                scope.add(new Property(PROPERTY_TIMESTAMP_FISHEYE, FISHEYE_DATE_FORMAT.format(revision.getDate())));
-            }
-            
-            try
-            {
-                return VariableHelper.replaceVariables(url, scope);
-            }
-            catch (FileLoadException e)
-            {
-
-                LOG.warning("Unable to replace variables in change viewer url: " + e.getMessage(), e);
-            }
         }
 
         return null;

@@ -25,14 +25,14 @@ public class HibernateUtils
     {
         PreparedStatement ps = null;
         ResultSet rs = null;
-        long nextId;
+        long nextHi;
 
         try
         {
             ps = con.prepareStatement("select NEXT_HI from HIBERNATE_UNIQUE_KEY");
             rs = ps.executeQuery();
             rs.next();
-            nextId = rs.getLong(1);
+            nextHi = rs.getLong(1);
         }
         finally
         {
@@ -42,10 +42,10 @@ public class HibernateUtils
 
         try
         {
-            nextId++;
+            nextHi++;
             ps = con.prepareStatement("UPDATE hibernate_unique_key SET next_hi = ? where next_hi = ?");
-            JDBCUtils.setLong(ps, 1, nextId);
-            JDBCUtils.setLong(ps, 2, (nextId - 1));
+            JDBCUtils.setLong(ps, 1, nextHi);
+            JDBCUtils.setLong(ps, 2, (nextHi - 1));
             ps.executeUpdate();
         }
         finally
@@ -53,8 +53,53 @@ public class HibernateUtils
             JDBCUtils.close(ps);
         }
 
-        // Emulate Hibernate's hilo algorithm
-        return nextId * (Short.MAX_VALUE + 1) + 1;
+        return getNextId(nextHi);
     }
 
+    private static long getNextId(long nextHi)
+    {
+        // Emulate Hibernate's hilo algorithm
+        return nextHi * (Short.MAX_VALUE + 1) + 1;
+    }
+
+    public static void ensureNextId(Connection con, long lastId) throws SQLException
+    {
+        PreparedStatement ps = null;
+        ResultSet rs = null;
+        long nextHi;
+
+        try
+        {
+            ps = con.prepareStatement("select NEXT_HI from HIBERNATE_UNIQUE_KEY");
+            rs = ps.executeQuery();
+            rs.next();
+            nextHi = rs.getLong(1);
+        }
+        finally
+        {
+            JDBCUtils.close(ps);
+            JDBCUtils.close(rs);
+        }
+
+        boolean updateRequired = false;
+        while(lastId >= getNextId(nextHi))
+        {
+            updateRequired = true;
+            nextHi++;
+        }
+
+        if (updateRequired)
+        {
+            try
+            {
+                ps = con.prepareStatement("UPDATE hibernate_unique_key SET next_hi = ?");
+                JDBCUtils.setLong(ps, 1, nextHi);
+                ps.executeUpdate();
+            }
+            finally
+            {
+                JDBCUtils.close(ps);
+            }
+        }
+    }
 }

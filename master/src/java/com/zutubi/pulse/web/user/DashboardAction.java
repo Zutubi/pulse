@@ -30,6 +30,7 @@ public class DashboardAction extends ActionSupport
     private UserManager userManager;
     private CommitMessageHelper commitMessageHelper;
     private boolean contactError = false;
+    private String changeUrl;
 
     public User getUser()
     {
@@ -179,22 +180,29 @@ public class DashboardAction extends ActionSupport
         return commitMessageHelper.applyTransforms(changelist, maxChars);
     }
 
-    public String getChangeUrl(Changelist changelist)
+    public String getChangeUrl()
     {
+        return changeUrl;
+    }
+
+    public void updateChangeUrl(Changelist changelist)
+    {
+        // We cache the URL as velocity null handling is brain dead
         Revision revision = changelist.getRevision();
         for(long id: changelist.getProjectIds())
         {
             Project p = projectManager.getProject(id);
-            if(p != null)
+            if(p != null && p.getChangeViewer() != null)
             {
-                String url = p.getScm().getChangeUrl(revision);
+                String url = p.getChangeViewer().getChangesetURL(revision);
                 if(url != null)
                 {
-                    return url;
+                    changeUrl = url;
+                    return;
                 }
             }
         }
 
-        return null;
+        changeUrl = null;
     }
 }

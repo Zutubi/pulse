@@ -1,6 +1,7 @@
 package com.zutubi.pulse.test;
 
 import com.zutubi.pulse.MasterBuildPaths;
+import com.zutubi.pulse.core.model.NumericalFileRevision;
 import com.zutubi.pulse.bootstrap.MasterConfigurationManager;
 import com.zutubi.pulse.core.RecipeProcessor;
 import com.zutubi.pulse.core.model.*;
@@ -219,13 +220,13 @@ public class SetupDummyBuilds implements Runnable
         userRevision.setComment("a short comment");
         userRevision.setDate(new Date(System.currentTimeMillis() - 100000));
         Changelist list = new Changelist("scm", userRevision);
-        list.addChange(new Change("/home/jsankey/some/normal/file", "11", Change.Action.EDIT));
-        list.addChange(new Change("/home/jsankey/some/other/file", "10", Change.Action.EDIT));
-        list.addChange(new Change("/home/jsankey/a/silly/file/with/a/very/very/long/name/to/really/make/life/difficult/for/the/poor/little/UI/lets/see/if/it/gets/wrapped/shall/we", "1", Change.Action.BRANCH));
-        list.addChange(new Change("/home/jsankey/some/branched/file", "1", Change.Action.BRANCH));
-        list.addChange(new Change("/home/jsankey/some/branched/file2", "1", Change.Action.BRANCH));
-        list.addChange(new Change("/home/jsankey/some/branched/file3", "1", Change.Action.BRANCH));
-        list.addChange(new Change("/home/jsankey/some/branched/file4", "1", Change.Action.BRANCH));
+        list.addChange(new Change("/home/jsankey/some/normal/file", new NumericalFileRevision(11), Change.Action.EDIT));
+        list.addChange(new Change("/home/jsankey/some/other/file", new NumericalFileRevision(10), Change.Action.EDIT));
+        list.addChange(new Change("/home/jsankey/a/silly/file/with/a/very/very/long/name/to/really/make/life/difficult/for/the/poor/little/UI/lets/see/if/it/gets/wrapped/shall/we", new NumericalFileRevision(1), Change.Action.BRANCH));
+        list.addChange(new Change("/home/jsankey/some/branched/file", new NumericalFileRevision(1), Change.Action.BRANCH));
+        list.addChange(new Change("/home/jsankey/some/branched/file2", new NumericalFileRevision(1), Change.Action.BRANCH));
+        list.addChange(new Change("/home/jsankey/some/branched/file3", new NumericalFileRevision(1), Change.Action.BRANCH));
+        list.addChange(new Change("/home/jsankey/some/branched/file4", new NumericalFileRevision(1), Change.Action.BRANCH));
         list.addProjectId(result.getProject().getId());
         list.addResultId(result.getId());
 
@@ -234,7 +235,7 @@ public class SetupDummyBuilds implements Runnable
         userRevision.setComment("a very long comment including\nnewlines like that one you just saw dude, not really very friendly at all");
         userRevision.setDate(new Date(System.currentTimeMillis() - 10000));
         list = new Changelist("scm", userRevision);
-        list.addChange(new Change("/home/jsankey/some/branched/file/with/a/very/long/filename/to/test/the/display/handling/of/such/things", "1", Change.Action.BRANCH));
+        list.addChange(new Change("/home/jsankey/some/branched/file/with/a/very/long/filename/to/test/the/display/handling/of/such/things", new NumericalFileRevision(1), Change.Action.BRANCH));
         list.addProjectId(result.getProject().getId());
         list.addResultId(result.getId());
 
@@ -243,7 +244,7 @@ public class SetupDummyBuilds implements Runnable
         userRevision.setComment("short and sweet");
         userRevision.setDate(new Date(System.currentTimeMillis() - 9000));
         list = new Changelist("scm", userRevision);
-        list.addChange(new Change("/home/jsankey/some/file", "120", Change.Action.BRANCH));
+        list.addChange(new Change("/home/jsankey/some/file", new NumericalFileRevision(120), Change.Action.BRANCH));
         list.addProjectId(result.getProject().getId());
         list.addResultId(result.getId());
 

@@ -15,7 +15,7 @@ public abstract class SubversionForm extends BaseForm
 
     public String[] getFieldNames()
     {
-        return new String[]{"svn.username", "svn.password", "svn.url", "svn.keyfile", "svn.passphrase", "svn.changeViewerUrl"};
+        return new String[]{"svn.username", "svn.password", "svn.url", "svn.keyfile", "svn.passphrase" };
     }
 
     /**

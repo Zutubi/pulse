@@ -206,7 +206,7 @@ public abstract class BaseAcceptanceTestCase extends ExtendedWebTestCase
     {
         CvsForm.Create form = new CvsForm.Create(tester);
         form.assertFormPresent();
-        form.nextFormElements(root, module, password, "", "", "", "");
+        form.nextFormElements(root, module, password, "", "", "");
     }
 
     protected void submitProjectBasicsForm(String projectName, String description, String url, String scm, String type)

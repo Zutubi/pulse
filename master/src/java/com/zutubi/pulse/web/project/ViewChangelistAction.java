@@ -1,6 +1,8 @@
 package com.zutubi.pulse.web.project;
 
 import com.zutubi.pulse.core.model.Changelist;
+import com.zutubi.pulse.core.model.Change;
+import com.zutubi.pulse.core.model.FileRevision;
 import com.zutubi.pulse.model.*;
 import com.zutubi.pulse.model.persistence.ChangelistDao;
 import com.zutubi.pulse.web.ActionSupport;
@@ -30,6 +32,14 @@ public class ViewChangelistAction extends ActionSupport
 
     /** All builds affected by this change. */
     private List<BuildResult> buildResults;
+
+    private boolean changeViewerInitialised;
+    private ChangeViewer changeViewer;
+    private Scm scm;
+
+    private String fileViewUrl;
+    private String fileDownloadUrl;
+    private String fileDiffUrl;
 
     public long getId()
     {
@@ -76,29 +86,135 @@ public class ViewChangelistAction extends ActionSupport
         return changelist;
     }
 
-    public String getChangeUrl()
+    public ChangeViewer getChangeViewer()
     {
-        if(buildResult != null)
+        if(!changeViewerInitialised)
         {
-            return buildResult.getProject().getScm().getChangeUrl(changelist.getRevision());
-        }
-        else
-        {
-            for(long id: changelist.getProjectIds())
+            changeViewerInitialised = true;
+            
+            Project p = project;
+            if(buildResult != null)
             {
-                Project p = projectManager.getProject(id);
-                if(p != null)
+                p = buildResult.getProject();
+            }
+
+            if(p != null)
+            {
+                changeViewer = p.getChangeViewer();
+                scm = p.getScm();
+            }
+            else
+            {
+                for(long id: changelist.getProjectIds())
                 {
-                    String url = p.getScm().getChangeUrl(changelist.getRevision());
-                    if(url != null)
+                    p = projectManager.getProject(id);
+                    if(p != null && p.getChangeViewer() != null)
                     {
-                        return url;
+                        changeViewer = p.getChangeViewer();
+                        scm = p.getScm();
+                        break;
                     }
                 }
             }
         }
 
+        return changeViewer;
+    }
+
+    public boolean haveChangeViewer()
+    {
+        return getChangeViewer() != null;
+    }
+    
+    public String getChangeUrl()
+    {
+        ChangeViewer changeViewer = getChangeViewer();
+        if(changeViewer != null && changeViewer.hasCapability(scm, ChangeViewer.Capability.VIEW_CHANGESET))
+        {
+            return changeViewer.getChangesetURL(changelist.getRevision());
+        }
+
         return null;
+    }
+
+    public String getFileViewUrl()
+    {
+        return fileViewUrl;
+    }
+
+    public String getFileDownloadUrl()
+    {
+        return fileDownloadUrl;
+    }
+
+    public String getFileDiffUrl()
+    {
+        return fileDiffUrl;
+    }
+
+    public void updateUrls(Change change)
+    {
+        updateFileViewUrl(change);
+        updateFileDownloadUrl(change);
+        updateFileDiffUrl(change);
+    }
+
+    public void updateFileViewUrl(Change change)
+    {
+        ChangeViewer changeViewer = getChangeViewer();
+        if(changeViewer != null && changeViewer.hasCapability(scm, ChangeViewer.Capability.VIEW_FILE))
+        {
+            fileViewUrl = changeViewer.getFileViewURL(change.getFilename(), change.getRevision());
+        }
+        else
+        {
+            fileViewUrl = null;
+        }
+    }
+
+    public void updateFileDownloadUrl(Change change)
+    {
+        ChangeViewer changeViewer = getChangeViewer();
+        if(changeViewer != null && changeViewer.hasCapability(scm, ChangeViewer.Capability.DOWNLOAD_FILE))
+        {
+            fileDownloadUrl = changeViewer.getFileDownloadURL(change.getFilename(), change.getRevision());
+        }
+        else
+        {
+            fileDownloadUrl = null;
+        }
+    }
+
+    public void updateFileDiffUrl(Change change)
+    {
+        if(diffableAction(change.getAction()))
+        {
+            FileRevision previous = change.getRevision().getPrevious();
+            if(previous != null)
+            {
+                ChangeViewer changeViewer = getChangeViewer();
+                if(changeViewer != null && changeViewer.hasCapability(scm, ChangeViewer.Capability.VIEW_FILE_DIFF))
+                {
+                    fileDiffUrl = changeViewer.getFileDiffURL(change.getFilename(), change.getRevision());
+                    return;
+                }
+            }
+        }
+
+        fileDiffUrl = null;
+    }
+
+    private boolean diffableAction(Change.Action action)
+    {
+        switch(action)
+        {
+            case EDIT:
+            case INTEGRATE:
+            case MERGE:
+                return true;
+            default:
+                return false;
+        }
     }
 
     public void setChangelist(Changelist changelist)

@@ -1,9 +1,6 @@
 package com.zutubi.pulse.scm.svn;
 
-import com.zutubi.pulse.core.model.Change;
-import com.zutubi.pulse.core.model.Changelist;
-import com.zutubi.pulse.core.model.NumericalRevision;
-import com.zutubi.pulse.core.model.Revision;
+import com.zutubi.pulse.core.model.*;
 import com.zutubi.pulse.filesystem.remote.RemoteFile;
 import com.zutubi.pulse.scm.*;
 import com.zutubi.pulse.util.IOUtils;
@@ -320,7 +317,6 @@ public class SVNServer implements SCMServer
             try
             {
                 List<SVNLogEntry> logs = new LinkedList<SVNLogEntry>();
-
                 FilepathFilter filter = new ScmFilepathFilter(excludedPaths);
 
                 repository.log(paths, logs, fromNumber, toNumber, true, true);
@@ -333,6 +329,8 @@ public class SVNServer implements SCMServer
                     // branch??
 
                     Changelist list = new Changelist(getUid(), revision);
+                    FileRevision fileRevision = new NumericalFileRevision(((NumericalRevision)list.getRevision()).getRevisionNumber());
+
                     Map files = entry.getChangedPaths();
 
                     for (Object value : files.values())
@@ -340,7 +338,7 @@ public class SVNServer implements SCMServer
                         SVNLogEntryPath entryPath = (SVNLogEntryPath) value;
                         if (filter.accept(entryPath.getPath()))
                         {
-                            list.addChange(new Change(entryPath.getPath(), list.getRevision().toString(), decodeAction(entryPath.getType())));
+                            list.addChange(new Change(entryPath.getPath(), fileRevision, decodeAction(entryPath.getType())));
                         }
                     }
 
@@ -638,7 +636,7 @@ public class SVNServer implements SCMServer
 
             if(action != null)
             {
-                changes.add(new Change(event.getPath(), Long.toString(event.getRevision()), action));
+                changes.add(new Change(event.getPath(), new NumericalFileRevision(event.getRevision()), action));
             }
         }
 

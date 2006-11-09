@@ -1,11 +1,6 @@
 <!DOCTYPE validators PUBLIC "-//OpenSymphony Group//XWork Validator 1.0//EN"
         "http://www.opensymphony.com/xwork/xwork-validator-1.0.2.dtd">
 <validators>
-    <field name="changeViewerUrl">
-        <field-validator type="changeviewerurl">
-            <message>invalid url</message>
-        </field-validator>
-    </field>
     <field name="pollingInterval">
         <field-validator type="int">
             <param name="min">1</param>

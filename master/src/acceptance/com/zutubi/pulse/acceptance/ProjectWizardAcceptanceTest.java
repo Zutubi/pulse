@@ -190,7 +190,7 @@ public class ProjectWizardAcceptanceTest extends BaseAcceptanceTestCase
         SubversionForm.Create svnForm = new SubversionForm.Create(tester);
         svnForm.assertFormPresent();
         String location = "http://url";
-        svnForm.nextFormElements("username", "password", location, null, null, null);
+        svnForm.nextFormElements("username", "password", location, null, null);
         return location;
     }
 

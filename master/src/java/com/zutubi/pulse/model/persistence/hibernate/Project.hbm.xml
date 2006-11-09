@@ -36,6 +36,8 @@
 
         <many-to-one name="scm" class="com.zutubi.pulse.model.Scm" column="SCM" cascade="all" lazy="false"/>
 
+        <many-to-one name="changeViewer" class="com.zutubi.pulse.model.ChangeViewer" column="CHANGE_VIEWER" cascade="all" lazy="false"/>
+
         <bag name="aclEntries" inverse="true" cascade="all,delete-orphan" lazy="false">
             <key column="PROJECT_ID"/>
             <one-to-many class="com.zutubi.pulse.model.ProjectAclEntry"/>
@@ -43,6 +45,36 @@
 
         <property name="nextBuildNumber" column="NEXT_BUILD_NUMBER" type="long"/>
         
+    </class>
+
+    <class name="com.zutubi.pulse.model.ChangeViewer" table="CHANGE_VIEWER" lazy="false">
+        <id name="id" type="java.lang.Long" column="ID" unsaved-value="0">
+            <generator class="hilo"/>
+        </id>
+
+        <discriminator column="TYPE" type="string" length="63"/>
+
+        <subclass name="com.zutubi.pulse.model.CustomChangeViewer" discriminator-value="CUSTOM" lazy="false">
+            <property name="changesetURL" type="string"/>
+            <property name="fileViewURL" type="string"/>
+            <property name="fileDownloadURL" type="string"/>
+            <property name="fileDiffURL" type="string"/>
+        </subclass>
+
+        <subclass name="com.zutubi.pulse.model.FisheyeChangeViewer" discriminator-value="FISHEYE" lazy="false">
+            <property name="baseURL" type="string"/>
+            <property name="projectPath" type="string"/>
+        </subclass>
+
+        <subclass name="com.zutubi.pulse.model.TracChangeViewer" discriminator-value="TRAC" lazy="false">
+            <property name="baseURL" type="string"/>
+            <property name="projectPath" type="string"/>
+        </subclass>
+
+        <subclass name="com.zutubi.pulse.model.ViewVCChangeViewer" discriminator-value="VIEWVC" lazy="false">
+            <property name="baseURL" type="string"/>
+            <property name="projectPath" type="string"/>
+        </subclass>
     </class>
 
     <class name="com.zutubi.pulse.model.ProjectAclEntry" table="PROJECT_ACL_ENTRY" lazy="false">

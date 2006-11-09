@@ -1,5 +1,7 @@
 package com.zutubi.pulse.core.model;
 
+import com.zutubi.pulse.core.model.FileRevision;
+
 /**
  * A trivial implementation of the Change interface.
  *
@@ -47,7 +49,7 @@ public class Change extends Entity
     }
 
     private String filename;
-    private String revision;
+    private FileRevision revision;
     private Action action;
 
     protected Change()
@@ -55,7 +57,7 @@ public class Change extends Entity
 
     }
 
-    public Change(String filename, String revision, Action action)
+    public Change(String filename, FileRevision revision, Action action)
     {
         this.filename = filename;
         this.revision = revision;
@@ -71,10 +73,9 @@ public class Change extends Entity
     }
 
     /**
-     * @return the revision number of the change, which will be a file revision
-     *         if applicable or the change list revision otherwise
+     * @return the revision number of the change
      */
-    public String getRevision()
+    public FileRevision getRevision()
     {
         return revision;
     }
@@ -92,7 +93,7 @@ public class Change extends Entity
         this.filename = filename;
     }
 
-    private void setRevision(String revision)
+    private void setRevision(FileRevision revision)
     {
         this.revision = revision;
     }

@@ -43,6 +43,7 @@ public class Project extends Entity implements AclObjectIdentity, AclObjectIdent
     private List<PostBuildAction> postBuildActions = new LinkedList<PostBuildAction>();
     private List<CleanupRule> cleanupRules = new LinkedList<CleanupRule>();
     private Scm scm;
+    private ChangeViewer changeViewer;
     private State state = State.IDLE;
     private long nextBuildNumber = 1;
 
@@ -89,6 +90,11 @@ public class Project extends Entity implements AclObjectIdentity, AclObjectIdent
         }
 
         copy.scm = scm.copy();
+        if(changeViewer != null)
+        {
+            copy.changeViewer = changeViewer.copy();
+        }
+
         copy.buildSpecifications = new LinkedList<BuildSpecification>();
         for(BuildSpecification spec: buildSpecifications)
         {
@@ -169,6 +175,16 @@ public class Project extends Entity implements AclObjectIdentity, AclObjectIdent
     public void setScm(Scm scm)
     {
         this.scm = scm;
+    }
+
+    public ChangeViewer getChangeViewer()
+    {
+        return changeViewer;
+    }
+
+    public void setChangeViewer(ChangeViewer changeViewer)
+    {
+        this.changeViewer = changeViewer;
     }
 
     public List<BuildSpecification> getBuildSpecifications()

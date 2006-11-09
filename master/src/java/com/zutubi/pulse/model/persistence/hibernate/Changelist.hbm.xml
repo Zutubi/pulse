@@ -32,7 +32,6 @@
     </class>
 
     <class name="com.zutubi.pulse.core.model.Change" table="CHANGE" lazy="false">
-
         <id name="id" type="long" column="ID" unsaved-value="0">
             <generator class="hilo"/>
         </id>
@@ -41,8 +40,22 @@
 
         <property name="filename" column="FILENAME" type="string" length="4095"/>
 
-        <property name="revision" column="REVISION" type="string" length="63"/>
-
+        <many-to-one name="revision" class="com.zutubi.pulse.core.model.FileRevision" column="REVISION_ID" cascade="all" lazy="false"/>
     </class>
 
+    <class name="com.zutubi.pulse.core.model.FileRevision" table="FILE_REVISION" lazy="false">
+        <id name="id" type="long" column="ID" unsaved-value="0">
+            <generator class="hilo"/>
+        </id>
+
+        <discriminator column="TYPE" type="string" length="15"/>
+
+        <subclass name="com.zutubi.pulse.core.model.CvsFileRevision" discriminator-value="CVS">
+            <property name="revision" type="string"/>
+        </subclass>
+
+        <subclass name="com.zutubi.pulse.core.model.NumericalFileRevision" discriminator-value="NUMERICAL">
+            <property name="number" type="long"/>
+        </subclass>
+    </class>
 </hibernate-mapping>

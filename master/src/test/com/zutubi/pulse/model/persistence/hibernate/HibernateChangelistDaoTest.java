@@ -5,6 +5,8 @@ import com.zutubi.pulse.model.Project;
 import com.zutubi.pulse.model.User;
 import com.zutubi.pulse.model.persistence.ChangelistDao;
 import com.zutubi.pulse.util.Constants;
+import com.zutubi.pulse.core.model.NumericalFileRevision;
+import com.zutubi.pulse.core.model.CvsFileRevision;
 
 import java.util.Date;
 import java.util.List;
@@ -35,7 +37,7 @@ public class HibernateChangelistDaoTest extends MasterPersistenceTestCase
         Date date = new Date(System.currentTimeMillis() - Constants.YEAR);
         CvsRevision revision = new CvsRevision("pulse", "MAIN", "test changelist", date);
         Changelist list = new Changelist("scm", revision);
-        Change change = new Change("some/random/file", "23", Change.Action.EDIT);
+        Change change = new Change("some/random/file", new NumericalFileRevision(23), Change.Action.EDIT);
 
         list.addChange(change);
         changelistDao.save(list);
@@ -219,9 +221,9 @@ public class HibernateChangelistDaoTest extends MasterPersistenceTestCase
         l1.addResultId(12);
         l1.addResultId(13);
         l1.addResultId(14);
-        l1.addChange(new Change("file1", "rev", Change.Action.ADD));
-        l1.addChange(new Change("file2", "rev", Change.Action.ADD));
-        l1.addChange(new Change("file3", "rev", Change.Action.ADD));
+        l1.addChange(new Change("file1", new NumericalFileRevision(1), Change.Action.ADD));
+        l1.addChange(new Change("file2", new NumericalFileRevision(23), Change.Action.ADD));
+        l1.addChange(new Change("file3", new NumericalFileRevision(4), Change.Action.ADD));
         changelistDao.save(l1);
 
         NumericalRevision r2 = new NumericalRevision(100);
@@ -230,9 +232,9 @@ public class HibernateChangelistDaoTest extends MasterPersistenceTestCase
         l2.addResultId(13);
         l2.addResultId(14);
         l2.addResultId(15);
-        l2.addChange(new Change("file1", "rev", Change.Action.ADD));
-        l2.addChange(new Change("file2", "rev", Change.Action.ADD));
-        l2.addChange(new Change("file3", "rev", Change.Action.ADD));
+        l2.addChange(new Change("file1", new NumericalFileRevision(2), Change.Action.ADD));
+        l2.addChange(new Change("file2", new NumericalFileRevision(1), Change.Action.ADD));
+        l2.addChange(new Change("file3", new CvsFileRevision("1.1.2.3"), Change.Action.ADD));
         changelistDao.save(l2);
         commitAndRefreshTransaction();
 

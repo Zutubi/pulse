@@ -1,12 +1,9 @@
 package com.zutubi.pulse.scm.p4;
 
-import com.zutubi.pulse.core.model.Change;
-import com.zutubi.pulse.core.model.Changelist;
-import com.zutubi.pulse.core.model.NumericalRevision;
-import com.zutubi.pulse.core.model.Revision;
+import com.zutubi.pulse.core.model.*;
 import com.zutubi.pulse.filesystem.remote.RemoteFile;
-import com.zutubi.pulse.scm.FileRevision;
-import com.zutubi.pulse.scm.NumericalFileRevision;
+import com.zutubi.pulse.core.model.FileRevision;
+import com.zutubi.pulse.core.model.NumericalFileRevision;
 import com.zutubi.pulse.scm.SCMException;
 import com.zutubi.pulse.test.PulseTestCase;
 import com.zutubi.pulse.util.FileSystemUtils;

@@ -1,12 +1,18 @@
-package com.zutubi.pulse.scm;
+package com.zutubi.pulse.core.model;
+
+import com.zutubi.pulse.core.model.FileRevision;
 
 /**
  * A file revision that is a simple number.  Used for Perforce and Subversion
  * for example.
  */
-public class NumericalFileRevision implements FileRevision
+public class NumericalFileRevision extends FileRevision
 {
     private long number;
+
+    private NumericalFileRevision()
+    {
+    }
 
     public NumericalFileRevision(long number)
     {
@@ -16,6 +22,11 @@ public class NumericalFileRevision implements FileRevision
     public long getNumber()
     {
         return number;
+    }
+
+    public void setNumber(long number)
+    {
+        this.number = number;
     }
 
     public FileRevision getPrevious()

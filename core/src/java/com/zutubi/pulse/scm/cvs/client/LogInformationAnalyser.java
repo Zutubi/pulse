@@ -6,6 +6,8 @@
 package com.zutubi.pulse.scm.cvs.client;
 
 import com.zutubi.pulse.core.model.*;
+import com.zutubi.pulse.core.model.CvsFileRevision;
+
 import java.util.*;
 import org.netbeans.lib.cvsclient.CVSRoot;
 import org.netbeans.lib.cvsclient.command.log.LogInformation;
@@ -162,7 +164,7 @@ public class LogInformationAnalyser
             Changelist changelist = new Changelist(uid, rev);
             for (Revision change : localChanges)
             {
-                changelist.addChange(new Change(change.getFilename(), change.getRevision(), change.getAction()));
+                changelist.addChange(new Change(change.getFilename(), new CvsFileRevision(change.getRevision()), change.getAction()));
             }
             changelists.add(changelist);
         }

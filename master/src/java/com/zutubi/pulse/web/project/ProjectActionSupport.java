@@ -31,6 +31,7 @@ public class ProjectActionSupport extends ActionSupport
     protected String projectName = null;
 
     private CommitMessageHelper commitMessageHelper;
+    private String changeUrl;
 
     public void setProjectManager(ProjectManager manager)
     {
@@ -213,14 +214,21 @@ public class ProjectActionSupport extends ActionSupport
         }
     }
 
-    public String getChangeUrl(Project project, Revision revision)
+    public void updateChangeUrl(Project project, Revision revision)
     {
-        if(project != null)
+        if(project != null && project.getChangeViewer() != null)
         {
-            return project.getScm().getChangeUrl(revision);
+            changeUrl = project.getChangeViewer().getChangesetURL(revision);
         }
+        else
+        {
+            changeUrl = null;
+        }
+    }
 
-        return null;
+    public String getChangeUrl()
+    {
+        return changeUrl;
     }
 
     public void setUserManager(UserManager userManager)

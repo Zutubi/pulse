@@ -24,12 +24,9 @@
     #wwtextfield("name=p4.client" "label=%{getText('p4.client')}" "required=true" "tabindex=4" "onkeypress=return submitenter(this,event)")
     #inlineHelp("p4.client.help")
 
-    #wwtextfield("name=p4.changeViewerUrl" "label=%{getText('scm.change.viewer.url')}" "size=60" "tabindex=5" "onkeypress=return submitenter(this,event)")
-    #inlineHelp("scm.change.viewer.url.help")
-
     #testSettingsRow()
 
-    #previousNextCancel(6)
+    #previousNextCancel(5)
  #end
 
      </div>
