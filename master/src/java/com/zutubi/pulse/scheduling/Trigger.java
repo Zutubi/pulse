@@ -3,6 +3,8 @@ package com.zutubi.pulse.scheduling;
 import com.zutubi.pulse.core.model.Entity;
 import com.zutubi.pulse.model.NamedEntity;
 import com.zutubi.pulse.model.Project;
+import com.zutubi.pulse.model.BuildSpecification;
+import com.zutubi.pulse.scheduling.tasks.BuildProjectTask;
 
 import java.io.Serializable;
 import java.util.*;
@@ -104,7 +106,16 @@ public abstract class Trigger extends Entity implements NamedEntity
         copy.dataMap = new TreeMap<Serializable, Serializable>();
         for(Map.Entry<Serializable, Serializable> entry: dataMap.entrySet())
         {
-            copy.dataMap.put(entry.getKey(), entry.getValue());
+            Serializable key = entry.getKey();
+            Serializable value = entry.getValue();
+
+            if(taskClass == BuildProjectTask.class && key.equals(BuildProjectTask.PARAM_SPEC))
+            {
+                BuildSpecification spec = oldProject.getBuildSpecification((Long)value);
+                value = newProject.getBuildSpecification(spec.getName()).getId();
+            }
+            
+            copy.dataMap.put(key, value);
         }
         copy.taskClass = taskClass;
     }

@@ -4,6 +4,7 @@ import com.zutubi.pulse.core.BuildRevision;
 import com.zutubi.pulse.model.Project;
 import com.zutubi.pulse.model.ProjectManager;
 import com.zutubi.pulse.model.TriggerBuildReason;
+import com.zutubi.pulse.model.BuildSpecification;
 import com.zutubi.pulse.scheduling.Task;
 import com.zutubi.pulse.scheduling.TaskExecutionContext;
 import com.zutubi.pulse.scheduling.Trigger;
@@ -28,7 +29,7 @@ public class BuildProjectTask implements Task
     {
         Trigger trigger = context.getTrigger();
         Map<Serializable, Serializable> dataMap = trigger.getDataMap();
-        String spec = (String) dataMap.get(PARAM_SPEC);
+        long specId = (Long) dataMap.get(PARAM_SPEC);
         long projectId = trigger.getProject();
         boolean force = dataMap.containsKey(PARAM_FORCE);
 
@@ -36,7 +37,8 @@ public class BuildProjectTask implements Task
         if (project != null)
         {
             // generate build request.
-            projectManager.triggerBuild(project, spec, new TriggerBuildReason(trigger.getName()), new BuildRevision(), force);
+            BuildSpecification spec = project.getBuildSpecification(specId);
+            projectManager.triggerBuild(project, spec.getName(), new TriggerBuildReason(trigger.getName()), new BuildRevision(), force);
         }
         else
         {

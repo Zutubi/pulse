@@ -8,9 +8,7 @@ import com.zutubi.pulse.scheduling.Trigger;
 import com.zutubi.pulse.scheduling.tasks.BuildProjectTask;
 import com.zutubi.pulse.xwork.interceptor.Preparable;
 
-import java.util.Arrays;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 
 /**
  *
@@ -19,8 +17,8 @@ public abstract class AbstractEditTriggerAction extends ProjectActionSupport imp
 {
     private long id;
     private Project project;
-    private String specification;
-    private List<String> specifications;
+    private long specification;
+    private Map<Long, String> specifications;
     private static final List<String> ID_PARAMS = Arrays.asList("id", "projectId");
 
     public long getId()
@@ -38,17 +36,17 @@ public abstract class AbstractEditTriggerAction extends ProjectActionSupport imp
         return project;
     }
 
-    public List<String> getSpecifications()
+    public Map<Long, String> getSpecifications()
     {
         return specifications;
     }
 
-    public String getSpecification()
+    public long getSpecification()
     {
         return specification;
     }
 
-    public void setSpecification(String specification)
+    public void setSpecification(long specification)
     {
         this.specification = specification;
     }
@@ -67,14 +65,14 @@ public abstract class AbstractEditTriggerAction extends ProjectActionSupport imp
             return;
         }
 
-        specifications = new LinkedList<String>();
+        specifications = new LinkedHashMap<Long, String>();
         for (BuildSpecification spec : project.getBuildSpecifications())
         {
-            specifications.add(spec.getName());
+            specifications.put(spec.getId(), spec.getName());
         }
 
         Trigger trigger = getTrigger();
-        specification = (String) trigger.getDataMap().get(BuildProjectTask.PARAM_SPEC);
+        specification = (Long) trigger.getDataMap().get(BuildProjectTask.PARAM_SPEC);
     }
 
     public String doInput()

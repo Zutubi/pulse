@@ -162,7 +162,7 @@ public class AddProjectWizard extends BaseWizard
         EventTrigger trigger = new EventTrigger(SCMChangeEvent.class, "scm trigger", project.getName(), SCMChangeEventFilter.class);
         trigger.setProject(project.getId());
         trigger.setTaskClass(BuildProjectTask.class);
-        trigger.getDataMap().put(BuildProjectTask.PARAM_SPEC, "default");
+        trigger.getDataMap().put(BuildProjectTask.PARAM_SPEC, buildSpec.getId());
 
         try
         {

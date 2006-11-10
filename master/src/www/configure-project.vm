@@ -28,9 +28,6 @@
                     #aclEditHeadingRow("project.scm" 2 "editScm!input.action?id=$project.scm.id&amp;projectId=$project.id" "project.scm.edit" "project")
                     #scmRow($project)
                     #dynamicRow("scm.location" $project.scm.createServer().location)
-#if($project.scm.class.name == 'com.zutubi.pulse.model.Cvs')
-                    #dynamicRow("cvs.branch" $project.scm.branch)
-#end
 #if($project.scm.changeViewerUrl && $project.scm.changeViewerUrl.length() > 0)
                     #dynamicRow("scm.change.viewer.url" $project.scm.changeViewerUrl)
 #end
@@ -176,7 +173,7 @@
                     <tr>
                         #dynamicCell($trigger.name)
                         #dynamicCell($trigger.type)
-                        #dynamicCell($trigger.dataMap.spec)
+                        #dynamicCell($action.getSpec($trigger))
         #acl("domainObject=project" "hasPermission=4,1")
                         #editCell("editTrigger!input.action?id=$trigger.id&amp;projectId=$project.id" "edit_$!webwork.htmlEncode($trigger.name)")
                         #deleteCell("delete_$!webwork.htmlEncode($trigger.name)" "deleteTrigger.action?id=$trigger.id" $confirmMessage )

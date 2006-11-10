@@ -14,6 +14,7 @@ import java.sql.CallableStatement;
 import java.sql.ResultSet;
 import java.util.List;
 import java.util.LinkedList;
+import java.io.IOException;
 
 /**
  * <class-comment/>
@@ -61,6 +62,11 @@ public abstract class DatabaseUpgradeTask implements UpgradeTask, DataSourceAwar
             connection = dataSource.getConnection();
             execute(context, connection);
         }
+        catch(IOException e)
+        {
+            LOG.error(e);
+            errors.add("IOException: " + e.getMessage() + ". Please see the log files for details.");            
+        }
         catch (SQLException e)
         {
             LOG.error(e);
@@ -77,7 +83,7 @@ public abstract class DatabaseUpgradeTask implements UpgradeTask, DataSourceAwar
         return getErrors().size() > 0;
     }
 
-    public abstract void execute(UpgradeContext context, Connection con) throws SQLException;
+    public abstract void execute(UpgradeContext context, Connection con) throws SQLException, IOException;
 
     protected List<Long> getAllProjects(Connection con) throws SQLException
     {
