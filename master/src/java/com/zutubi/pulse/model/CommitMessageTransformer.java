@@ -2,12 +2,10 @@ package com.zutubi.pulse.model;
 
 import com.zutubi.pulse.core.model.Changelist;
 import com.zutubi.pulse.core.model.Entity;
-import com.zutubi.pulse.util.logging.Logger;
 
 import java.util.LinkedList;
 import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import java.util.Properties;
 
 /**
  * A CommitMessageTransformer is used to search for a pattern in SCM commit
@@ -15,31 +13,28 @@ import java.util.regex.Pattern;
  * primary use case is to link to external tools (e.g. link "bug 123" to the
  * web UI for the bug tracker).
  */
-public class CommitMessageTransformer extends Entity implements NamedEntity
+public abstract class CommitMessageTransformer extends Entity implements NamedEntity
 {
-    private static final Logger LOG = Logger.getLogger(CommitMessageTransformer.class);
-
     private String name;
     private List<Long> projects = new LinkedList<Long>();
+
     /**
-     * The regular expression to search for in commit messages.
+     * This properties instance holds the custom configuration details for the handler.
      */
-    private String expression;
-    /**
-     * Replacement string (may refer to groups in the expression.
-     */
-    private String replacement;
-    private Pattern pattern = null;
+    private Properties properties;
 
     public CommitMessageTransformer()
     {
     }
 
-    public CommitMessageTransformer(String name, String expression, String replacement)
+    public CommitMessageTransformer(String name)
     {
         this.name = name;
-        this.expression = expression;
-        this.replacement = replacement;
+    }
+    
+    public CommitMessageTransformer(String name, String a, String b)
+    {
+        this.name = name;
     }
 
     public String getName()
@@ -62,24 +57,18 @@ public class CommitMessageTransformer extends Entity implements NamedEntity
         this.projects = projects;
     }
 
-    public String getExpression()
+    protected Properties getProperties()
     {
-        return expression;
+        if (properties == null)
+        {
+            properties = new Properties();
+        }
+        return properties;
     }
 
-    public void setExpression(String expression)
+    private void setProperties(Properties properties)
     {
-        this.expression = expression;
-    }
-
-    public String getReplacement()
-    {
-        return replacement;
-    }
-
-    public void setReplacement(String replacement)
-    {
-        this.replacement = replacement;
+        this.properties = properties;
     }
 
     public boolean appliesToChangelist(Changelist changelist)
@@ -96,29 +85,10 @@ public class CommitMessageTransformer extends Entity implements NamedEntity
                 return true;
             }
         }
-
         return false;
     }
 
-    public String transform(String message)
-    {
-        if(pattern == null)
-        {
-            pattern = Pattern.compile(expression);
-        }
+    public abstract String transform(String message);
 
-        Matcher matcher = pattern.matcher(message);
-        String r = "<a href='" + replacement + "'>$0</a>";
-
-        try
-        {
-            return matcher.replaceAll(r);
-        }
-        catch (IndexOutOfBoundsException e)
-        {
-            LOG.warning("Unable to apply commit message link '" + name + "': " + e.getMessage(), e);
-            return message;
-        }
-    }
-
+    public abstract String getType();
 }

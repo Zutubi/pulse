@@ -827,6 +827,36 @@
             <result name="success" type="velocity">project-reports.vm</result>
             <result name="input" type="velocity">project-reports.vm</result>
         </action>
+
+        <action name="addTransformer" class="com.zutubi.pulse.web.project.AddCommitMessageTransformerWizardAction">
+            <interceptor-ref name="wizStack"/>
+            <param name="wizard">com.zutubi.pulse.committransformers.AddCommitMessageTransformerWizard</param>
+            <result name="input" type="velocity">/wizard/commit-message-wizard.vm</result>
+            <result name="step" type="velocity">/wizard/commit-message-wizard.vm</result>
+            <result name="cancel" type="redirect">/configureProject.action?id=${projectId}</result>
+            <result name="success" type="redirect">/configureProject.action?id=${projectId}</result>
+        </action>
+
+        <action name="removeTransformer" class="com.zutubi.pulse.web.project.RemoveCommitMessageTransformerAction">
+            <result name="input" type="redirect">/configureProject.action?id=${projectId}</result>
+            <result name="success" type="redirect">/configureProject.action?id=${projectId}</result>
+            <result name="error" type="velocity">generic-error.vm</result>
+        </action>
+
+        <action name="addExistingTransformer" class="com.zutubi.pulse.web.project.AddExistingCommitMessageTransformerAction">
+            <result name="input" type="redirect">/configureProject.action?id=${projectId}</result>
+            <result name="cancel" type="redirect">/configureProject.action?id=${projectId}</result>
+            <result name="success" type="redirect">/configureProject.action?id=${projectId}</result>
+            <result name="error" type="velocity">generic-error.vm</result>
+        </action>
+
+        <action name="editCommitMessage" class="com.zutubi.pulse.web.admin.EditCommitMessageTransformerAction">
+            <result name="input" type="velocity">edit-commit-message.vm</result>
+            <result name="cancel" type="redirect">/configureProject.action?id=${projectId}</result>
+            <result name="success" type="redirect">/configureProject.action?id=${projectId}</result>
+            <result name="error" type="velocity">/generic-error.vm</result>
+        </action>
+        
     </package>
 
     <package name="personal" namespace="/personal" extends="webwork-default-package">
@@ -1275,28 +1305,30 @@
             <result name="error" type="velocity">/generic-error.vm</result>
         </action>
 
-        <action name="addCommitMessageLink" class="com.zutubi.pulse.web.admin.CreateCommitMessageLinkAction">
-            <result name="input" type="velocity">/admin/create-commit-message-link.vm</result>
-            <result name="cancel" type="chain">commitMessageRedirect</result>
-            <result name="error" type="velocity">/generic-error.vm</result>
-            <result name="success" type="chain">commitMessageRedirect</result>
-        </action>
-
-        <action name="commitMessageRedirect" class="com.zutubi.pulse.web.admin.CreateCommitMessageLinkAction" method="redirect">
-            <interceptor-ref name="paramsStack"/>
-            <result name="project" type="redirect">/configureProject.action?id=${projectId}</result>
-            <result name="settings" type="redirect">/admin/serverSettings.action</result>
-        </action>
-
-        <action name="editCommitMessageLink" class="com.zutubi.pulse.web.admin.EditCommitMessageLinkAction">
-            <interceptor-ref name="crudStack"/>
-            <result name="input" type="velocity">/admin/edit-commit-message-link.vm</result>
+        <action name="editCommitMessage" class="com.zutubi.pulse.web.admin.EditCommitMessageTransformerAction">
+            <result name="input" type="velocity">edit-commit-message.vm</result>
             <result name="cancel" type="redirect">/admin/serverSettings.action</result>
+            <result name="success" type="redirect">/admin/serverSettings.action</result>
             <result name="error" type="velocity">/generic-error.vm</result>
+        </action>
+
+        <action name="deleteCommitMessageLink" class="com.zutubi.pulse.web.admin.DeleteCommitMessageTransformerAction">
+            <result name="success" type="redirect">/admin/serverSettings.action</result>
+            <result name="error" type="velocity">/generic-error.vm</result>
+        </action>
+
+        <action name="addTransformer" class="com.zutubi.pulse.web.project.AddCommitMessageTransformerWizardAction">
+            <interceptor-ref name="wizStack"/>
+            <param name="wizard">com.zutubi.pulse.committransformers.AddCommitMessageTransformerWizard</param>
+            <result name="input" type="velocity">/wizard/admin/commit-message-wizard.vm</result>
+            <result name="step" type="velocity">/wizard/admin/commit-message-wizard.vm</result>
+            <result name="cancel" type="redirect">/admin/serverSettings.action</result>
             <result name="success" type="redirect">/admin/serverSettings.action</result>
         </action>
 
-        <action name="deleteCommitMessageLink" class="com.zutubi.pulse.web.admin.DeleteCommitMessageLinkAction">
+        <action name="editCommitMessageProjects" class="com.zutubi.pulse.web.admin.EditCommitMessageTranformerProjectsAction">
+            <result name="input" type="velocity">edit-commit-message-projects.vm</result>
+            <result name="cancel" type="redirect">/admin/serverSettings.action</result>
             <result name="success" type="redirect">/admin/serverSettings.action</result>
             <result name="error" type="velocity">/generic-error.vm</result>
         </action>

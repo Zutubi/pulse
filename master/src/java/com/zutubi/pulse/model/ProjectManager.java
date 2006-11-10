@@ -152,13 +152,6 @@ public interface ProjectManager extends EntityManager<Project>
 
     long getNextBuildNumber(Project project);
 
-    void save(CommitMessageTransformer transformer);
-    CommitMessageTransformer getCommitMessageTransformer(long id);
-    void delete(CommitMessageTransformer transformer);
-    List<CommitMessageTransformer> getCommitMessageTransformers();
-    List<CommitMessageTransformer> findCommitMessageTransformersByProject(Project project);
-    CommitMessageTransformer findCommitMessageTransformerByName(String name);
-
     List<ProjectGroup> getAllProjectGroups();
     ProjectGroup getProjectGroup(long id);
     ProjectGroup getProjectGroup(String name);

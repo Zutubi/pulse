@@ -165,6 +165,38 @@
 #end
                 </table>
 
+                <!-- Transformers -->
+                
+                <table id="project.transformers" class="fill-content">
+                    #headingRow("project.commit.message.transformers" 4)
+                    <tr>
+                        #contentHeading("commit.message.transformer.name" 1)
+                        #contentHeading("commit.message.transformer.type" 1)
+#acl("domainObject=project" "hasPermission=4,1")
+                        #contentHeading("actions" 2)
+#end
+                    </tr>
+#if($transformers.size() > 0)
+    #foreach($transformer in $transformers)
+        #set($confirmMessage = $action.getText("commit.message.transformer.confirm.remove", [$transformer.name]))
+                    <tr>
+                        #dynamicCell($transformer.name)
+                        #dynamicCell($transformer.type)
+
+        #acl("domainObject=project" "hasPermission=4,1")
+                        #editCell("editCommitMessage.action?id=$transformer.id&projectId=$project.id" "edit_$!webwork.htmlEncode($transformer.name)")
+                        #removeCell($confirmMessage "removeTransformer.action?id=$transformer.id&projectId=$project.id" "remove_$!webwork.htmlEncode($transformer.name)")
+        #end
+                    </tr>
+    #end
+#else
+                    #contentRow("project.commit.message.transformers.none" 7)
+#end
+#acl("domainObject=project" "hasPermission=4,1")
+                    #addRow("add.commit.message.transformer" 7 "addTransformer.action?projectId=$project.id" "project.transformer.add")
+#end
+                </table>
+
                 <!-- Triggers -->
 
                 <table id="project.triggers" class="fill-content">

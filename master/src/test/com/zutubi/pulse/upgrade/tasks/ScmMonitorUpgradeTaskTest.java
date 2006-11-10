@@ -31,7 +31,7 @@ public class ScmMonitorUpgradeTaskTest extends BaseUpgradeTaskTestCase
         dataSource = (BasicDataSource) ComponentContext.getBean("dataSource");
 
         // initialise required schema.
-        createSchema(dataSource, 1040);
+        createSchema(dataSource, "1040");
 
         // create a couple of test scms configurations.
         generateTestData(dataSource);

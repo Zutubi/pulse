@@ -7,6 +7,7 @@ import com.zutubi.pulse.model.*;
 import com.zutubi.pulse.core.model.Changelist;
 import com.zutubi.pulse.scheduling.Scheduler;
 import com.zutubi.pulse.web.ActionSupport;
+import com.zutubi.pulse.committransformers.CommitMessageTransformerManager;
 import org.acegisecurity.AccessDeniedException;
 
 import java.util.LinkedList;
@@ -18,6 +19,7 @@ import java.util.List;
  */
 public class ProjectActionSupport extends ActionSupport
 {
+    protected CommitMessageTransformerManager commitMessageTransformerManager;
     protected ProjectManager projectManager;
     protected BuildManager buildManager;
     protected ScmManager scmManager;
@@ -236,11 +238,21 @@ public class ProjectActionSupport extends ActionSupport
         this.userManager = userManager;
     }
 
+    public void setCommitMessageTransformerManager(CommitMessageTransformerManager commitMessageTransformerManager)
+    {
+        this.commitMessageTransformerManager = commitMessageTransformerManager;
+    }
+
+    public CommitMessageTransformerManager getTransformerManager()
+    {
+        return commitMessageTransformerManager;
+    }
+
     public String transformComment(Changelist changelist)
     {
         if(commitMessageHelper == null)
         {
-            commitMessageHelper = new CommitMessageHelper(getProjectManager().getCommitMessageTransformers());
+            commitMessageHelper = new CommitMessageHelper(getTransformerManager().getCommitMessageTransformers());
         }
         return commitMessageHelper.applyTransforms(changelist);
     }
@@ -249,7 +261,7 @@ public class ProjectActionSupport extends ActionSupport
     {
         if(commitMessageHelper == null)
         {
-            commitMessageHelper = new CommitMessageHelper(getProjectManager().getCommitMessageTransformers());
+            commitMessageHelper = new CommitMessageHelper(getTransformerManager().getCommitMessageTransformers());
         }
         return commitMessageHelper.applyTransforms(changelist, maxChars);
     }

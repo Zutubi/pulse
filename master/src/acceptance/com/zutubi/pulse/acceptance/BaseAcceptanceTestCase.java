@@ -1,10 +1,7 @@
 package com.zutubi.pulse.acceptance;
 
 import com.meterware.httpunit.*;
-import com.zutubi.pulse.acceptance.forms.AddProjectWizard;
-import com.zutubi.pulse.acceptance.forms.CreateUserForm;
-import com.zutubi.pulse.acceptance.forms.CvsForm;
-import com.zutubi.pulse.acceptance.forms.LoginForm;
+import com.zutubi.pulse.acceptance.forms.*;
 import com.zutubi.pulse.util.Constants;
 import junit.framework.Assert;
 import org.apache.xmlrpc.XmlRpcClient;
@@ -252,6 +249,47 @@ public abstract class BaseAcceptanceTestCase extends ExtendedWebTestCase
             }
             callRemoteApi("createProjectGroup", name, v);
         }
+    }
+
+    protected void createCommitMessageTransformer(String type, String... args)
+    {
+        clickLink(Navigation.TAB_ADMINISTRATION);
+
+        // click the add link.
+        assertAndClick("commit.message.transformer.add");
+
+        // select a type.
+        selectCommitMessageTransformerType(type);
+
+        // fill in the blanks.
+        BaseForm form = null;
+        if (type.equals("standard"))
+        {
+            form = new AddCommitMessageTransformerWizard.Standard(tester);
+        }
+        else if (type.equals("custom"))
+        {
+            form = new AddCommitMessageTransformerWizard.Custom(tester);
+        }
+        else if (type.equals("jira"))
+        {
+            form = new AddCommitMessageTransformerWizard.Jira(tester);
+        }
+
+        form.assertFormPresent();
+        form.finishFormElements(args);
+        form.assertFormNotPresent();
+
+        // ensure that the transformer is listed.
+        assertLinkPresent("edit_" + args[0]);
+    }
+
+    protected void selectCommitMessageTransformerType(String type)
+    {
+        AddCommitMessageTransformerWizard.Select select = new AddCommitMessageTransformerWizard.Select(tester);
+        select.assertFormPresent();
+        select.nextFormElements(type);
+        select.assertFormNotPresent();
     }
 
     public void assertAndClick(String name)

@@ -1,22 +1,18 @@
 package com.zutubi.pulse.upgrade.tasks;
 
-import com.zutubi.pulse.upgrade.ConfigurationAware;
 import com.zutubi.pulse.upgrade.UpgradeContext;
-import com.zutubi.pulse.bootstrap.MasterConfigurationManager;
 import com.zutubi.pulse.util.JDBCUtils;
 
-import java.sql.Connection;
-import java.sql.SQLException;
 import java.sql.CallableStatement;
+import java.sql.Connection;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 
 /**
  * <class-comment/>
  */
-public class SubscriptionProjectsUpgradeTask extends DatabaseUpgradeTask implements ConfigurationAware
+public class SubscriptionProjectsUpgradeTask extends DatabaseUpgradeTask
 {
-    private MasterConfigurationManager configurationManager;
-
     public String getName()
     {
         return "Subscription projects";
@@ -96,10 +92,5 @@ public class SubscriptionProjectsUpgradeTask extends DatabaseUpgradeTask impleme
     public boolean haltOnFailure()
     {
         return true;
-    }
-
-    public void setConfigurationManager(MasterConfigurationManager configurationManager)
-    {
-        this.configurationManager = configurationManager;
     }
 }

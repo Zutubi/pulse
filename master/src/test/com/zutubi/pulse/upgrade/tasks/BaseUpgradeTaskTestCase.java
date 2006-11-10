@@ -25,7 +25,7 @@ public abstract class BaseUpgradeTaskTestCase extends PulseTestCase
         super(name);
     }
 
-    protected void createSchema(BasicDataSource dataSource, int build) throws IOException
+    protected void createSchema(BasicDataSource dataSource, String build) throws IOException
     {
         // manually setup the hibernate configuration
         Configuration config = new Configuration();

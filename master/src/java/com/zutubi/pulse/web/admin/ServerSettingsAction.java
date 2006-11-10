@@ -9,6 +9,7 @@ import com.zutubi.pulse.license.LicenseHolder;
 import com.zutubi.pulse.model.CommitMessageTransformer;
 import com.zutubi.pulse.model.ProjectManager;
 import com.zutubi.pulse.model.UserManager;
+import com.zutubi.pulse.committransformers.CommitMessageTransformerManager;
 import com.zutubi.pulse.security.ldap.LdapManager;
 import com.zutubi.pulse.web.ActionSupport;
 
@@ -28,6 +29,7 @@ public class ServerSettingsAction extends ActionSupport
     private DateFormat dateFormatter = new SimpleDateFormat("EEEEE, dd MMM yyyy");
     private LdapManager ldapManager;
     private List<CommitMessageTransformer> commitMessageTransformers;
+    private CommitMessageTransformerManager commitMessageTransformerManager;
     private ProjectManager projectManager;
     private AgentManager agentManager;
     private UserManager userManager;
@@ -69,7 +71,7 @@ public class ServerSettingsAction extends ActionSupport
     public String execute() throws Exception
     {
         config = configurationManager.getAppConfig();
-        commitMessageTransformers = projectManager.getCommitMessageTransformers();
+        commitMessageTransformers = commitMessageTransformerManager.getCommitMessageTransformers();
 
         license = LicenseHolder.getLicense();
 
@@ -154,6 +156,11 @@ public class ServerSettingsAction extends ActionSupport
     public void setProjectManager(ProjectManager projectManager)
     {
         this.projectManager = projectManager;
+    }
+
+    public void setCommitMessageTransformerManager(CommitMessageTransformerManager commitMessageTransformerManager)
+    {
+        this.commitMessageTransformerManager = commitMessageTransformerManager;
     }
 
     /**

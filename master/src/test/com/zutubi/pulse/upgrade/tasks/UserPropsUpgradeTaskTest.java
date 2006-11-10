@@ -34,7 +34,7 @@ public class UserPropsUpgradeTaskTest extends BaseUpgradeTaskTestCase
         dataSource = (BasicDataSource) ComponentContext.getBean("dataSource");
 
         // initialise required schema.
-        createSchema(dataSource, 1010);
+        createSchema(dataSource, "1010");
         generateTestData(dataSource);
     }
 

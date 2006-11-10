@@ -66,7 +66,8 @@ public abstract class BaseForm
 
     public String[] getSelectOptions(String name)
     {
-        return null;
+        setActive();
+        return tester.getDialog().getOptionsFor(name);
     }
 
     public void addFormElements(String... args)
@@ -89,7 +90,7 @@ public abstract class BaseForm
     public void nextFormElements(String... args)
     {
         setFormElements(args);
-        tester.submit("next");
+        next();
     }
 
     public void finishFormElements(String... args)
@@ -103,10 +104,20 @@ public abstract class BaseForm
         tester.submit("next");
     }
 
+    public void previous()
+    {
+        tester.submit("previous");
+    }
+
+    public void cancel()
+    {
+        tester.submit("cancel");
+    }
+
     public void cancelFormElements(String... args)
     {
         setFormElements(args);
-        tester.submit("cancel");
+        cancel();
     }
 
     /**
@@ -318,4 +329,8 @@ public abstract class BaseForm
         assertCheckboxChecked(name, false);
     }
 
+    public void setActive()
+    {
+        tester.setWorkingForm(getFormName());
+    }
 }

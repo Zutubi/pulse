@@ -1,9 +1,6 @@
 package com.zutubi.pulse.web.project;
 
-import com.zutubi.pulse.model.Project;
-import com.zutubi.pulse.model.ProjectAclEntry;
-import com.zutubi.pulse.model.User;
-import com.zutubi.pulse.model.UserManager;
+import com.zutubi.pulse.model.*;
 import com.zutubi.pulse.scheduling.Trigger;
 
 import java.util.LinkedList;
@@ -17,6 +14,8 @@ public class ConfigureProjectAction extends ProjectActionSupport
     private Project project;
     private List<Trigger> triggers;
     private UserManager userManager;
+
+    private List<CommitMessageTransformer> transformers;
 
     public long getId()
     {
@@ -41,6 +40,11 @@ public class ConfigureProjectAction extends ProjectActionSupport
     public int getDefaultScmPollingInterval()
     {
         return scmManager.getDefaultPollingInterval();
+    }
+
+    public List<CommitMessageTransformer> getTransformers()
+    {
+        return transformers;
     }
 
     public List<User> getProjectAdmins()
@@ -85,6 +89,9 @@ public class ConfigureProjectAction extends ProjectActionSupport
         project = super.getProject();
         id = project.getId();
         triggers = getScheduler().getTriggers(id);
+
+        transformers = commitMessageTransformerManager.getByProject(project);
+
         return SUCCESS;
     }
 

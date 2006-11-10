@@ -4,14 +4,14 @@ import com.zutubi.pulse.model.CommitMessageTransformer;
 
 /**
  */
-public class DeleteCommitMessageLinkAction extends CommitMessageTransformerActionSupport
+public class DeleteCommitMessageTransformerAction extends CommitMessageTransformerActionSupport
 {
     public String execute() throws Exception
     {
-        CommitMessageTransformer transformer = getProjectManager().getCommitMessageTransformer(getId());
+        CommitMessageTransformer transformer = getTransformerManager().getById(getId());
         if(transformer != null)
         {
-            getProjectManager().delete(transformer);
+            getTransformerManager().delete(transformer);
         }
         
         return SUCCESS;

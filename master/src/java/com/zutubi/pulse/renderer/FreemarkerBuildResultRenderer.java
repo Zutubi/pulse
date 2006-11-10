@@ -4,7 +4,7 @@ import com.zutubi.pulse.bootstrap.SystemPaths;
 import com.zutubi.pulse.core.model.Changelist;
 import com.zutubi.pulse.core.model.Feature;
 import com.zutubi.pulse.model.BuildResult;
-import com.zutubi.pulse.model.ProjectManager;
+import com.zutubi.pulse.committransformers.CommitMessageTransformerManager;
 import com.zutubi.pulse.util.FileSystemUtils;
 import com.zutubi.pulse.util.StringUtils;
 import com.zutubi.pulse.util.logging.Logger;
@@ -24,7 +24,7 @@ public class FreemarkerBuildResultRenderer implements BuildResultRenderer
     private Configuration freemarkerConfiguration;
     private SystemPaths systemPaths;
     private CommitMessageHelper commitMessageHelper;
-    private ProjectManager projectManager;
+    private CommitMessageTransformerManager commitMessageTransformerManager;
 
     public void render(String baseUrl, BuildResult result, List<Changelist> changelists, String templateName, Writer writer)
     {
@@ -146,7 +146,7 @@ public class FreemarkerBuildResultRenderer implements BuildResultRenderer
     {
         if(commitMessageHelper == null)
         {
-            commitMessageHelper = new CommitMessageHelper(projectManager.getCommitMessageTransformers());
+            commitMessageHelper = new CommitMessageHelper(commitMessageTransformerManager.getCommitMessageTransformers());
         }
 
         return commitMessageHelper.applyTransforms(changelist, 60);
@@ -162,9 +162,9 @@ public class FreemarkerBuildResultRenderer implements BuildResultRenderer
         this.commitMessageHelper = commitMessageHelper;
     }
 
-    public void setProjectManager(ProjectManager projectManager)
+    public void setCommitMessageTransformerManager(CommitMessageTransformerManager commitMessageTransformerManager)
     {
-        this.projectManager = projectManager;
+        this.commitMessageTransformerManager = commitMessageTransformerManager;
     }
 
     public void setSystemPaths(SystemPaths systemPaths)

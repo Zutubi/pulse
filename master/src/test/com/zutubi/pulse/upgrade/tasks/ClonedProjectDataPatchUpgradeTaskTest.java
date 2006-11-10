@@ -34,7 +34,7 @@ public class ClonedProjectDataPatchUpgradeTaskTest extends BaseUpgradeTaskTestCa
         dataSource = (BasicDataSource) ComponentContext.getBean("dataSource");
 
         // initialise required schema.
-        createSchema(dataSource, 1040);
+        createSchema(dataSource, "1040");
 
         con = dataSource.getConnection();
     }

@@ -1,6 +1,7 @@
 package com.zutubi.pulse.test;
 
 import com.zutubi.pulse.MasterBuildPaths;
+import com.zutubi.pulse.committransformers.StandardCommitMessageTransformer;
 import com.zutubi.pulse.core.model.NumericalFileRevision;
 import com.zutubi.pulse.agent.AgentManager;
 import com.zutubi.pulse.bootstrap.MasterConfigurationManager;
@@ -168,7 +169,9 @@ public class SetupFeatureTour implements Runnable
 
     private void createCommitLinks()
     {
-        CommitMessageTransformer t = new CommitMessageTransformer("Jira", "CIB-[0-9]+", "http://jira.zutubi.com/browse/$0");
+        StandardCommitMessageTransformer t = new StandardCommitMessageTransformer("Jira");
+        t.setExpression("CIB-[0-9]+");
+        t.setLink("http://jira.zutubi.com/browse/$0");
         commitMessageTransformerDao.save(t);
     }
 

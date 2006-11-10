@@ -6,6 +6,7 @@ import com.zutubi.pulse.core.model.FileRevision;
 import com.zutubi.pulse.model.*;
 import com.zutubi.pulse.model.persistence.ChangelistDao;
 import com.zutubi.pulse.web.ActionSupport;
+import com.zutubi.pulse.committransformers.CommitMessageTransformerManager;
 
 import java.util.Collections;
 import java.util.Comparator;
@@ -293,6 +294,10 @@ public class ViewChangelistAction extends ActionSupport
     public void setProjectManager(ProjectManager projectManager)
     {
         this.projectManager = projectManager;
-        commitMessageHelper = new CommitMessageHelper(projectManager.getCommitMessageTransformers());
+    }
+
+    public void setCommitMessageTransformerManager(CommitMessageTransformerManager commitMessageTransformerManager)
+    {
+        commitMessageHelper = new CommitMessageHelper(commitMessageTransformerManager.getCommitMessageTransformers());
     }
 }

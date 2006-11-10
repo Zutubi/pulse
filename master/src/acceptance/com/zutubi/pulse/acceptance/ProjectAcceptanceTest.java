@@ -1196,26 +1196,194 @@ public class ProjectAcceptanceTest extends ProjectAcceptanceTestBase
         assertTextNotPresent("deadtag");
     }
 
-    public void testAddCommitMessageLink() throws Exception
+    public void testAddNewCommitMessageTransformer() throws Exception
     {
         callRemoteApi("deleteAllCommitMessageLinks");
 
-        clickLink("commit.message.link.add");
-        CommitMessageLinkForm form = new CommitMessageLinkForm(tester, true);
-        form.saveFormElements("mylink", "expr", "repl", null);
+        // click add link.
+        assertAndClick("project.transformer.add");
 
-        // Make sure we come back to the project config page
-        assertProjectBasicsTable(projectName, DESCRIPTION, URL);
+        // select standard.
+        selectCommitMessageTransformerType("standard");
+        
+        // fill in the blanks.
+        AddCommitMessageTransformerWizard.Standard standard = new AddCommitMessageTransformerWizard.Standard(tester);
+        standard.assertFormPresent();
+        standard.finishFormElements("name", "expression", "link");
+        standard.assertFormNotPresent();
+
+        // ensure that the transformer is listed.
+        assertLinkPresent("edit_name");
+
+        // ensure that the transformer is in the global list.
+        clickLink(Navigation.TAB_ADMINISTRATION);
+        assertLinkPresent("edit_name");
     }
 
-    public void testCancelCommitMessageLink()
+    public void testAddExistingCommitMessageTransformer() throws Exception
     {
-        clickLink("commit.message.link.add");
-        CommitMessageLinkForm form = new CommitMessageLinkForm(tester, true);
-        form.cancelFormElements("mylink", "expr", "repl", null);
+        callRemoteApi("deleteAllCommitMessageLinks");
 
-        // Make sure we come back to the project config page
-        assertProjectBasicsTable(projectName, DESCRIPTION, URL);
+        // create a transformer via admin.
+        createCommitMessageTransformer("standard", "name", "expression", "link");
+
+        // navigate back to the project.
+        beginAt(Navigation.Projects.ACTION_PROJECT_CONFIG + "?projectName=" + projectName);
+
+        assertLinkNotPresent("edit_name");
+
+        // click add link.
+        assertAndClick("project.transformer.add");
+
+        // select from existing list.
+        AddExistingCommitMessageTransformerForm form = new AddExistingCommitMessageTransformerForm(tester);
+        form.assertFormPresent();
+        form.saveFormElements("name");
+
+        // ensure that the transformer is in the list.
+        assertLinkPresent("edit_name");
+    }
+
+    public void testOnlyUnassignedExistingTransformersDisplayed() throws Exception
+    {
+        // create two transformers via admin.
+        callRemoteApi("deleteAllCommitMessageLinks");
+
+        // create a transformer via admin.
+        createCommitMessageTransformer("standard", "name1", "expression1", "link1");
+        createCommitMessageTransformer("standard", "name2", "expression2", "link2");
+
+        // navigate back to the project.
+        beginAt(Navigation.Projects.ACTION_PROJECT_CONFIG + "?projectName=" + projectName);
+
+        assertLinkNotPresent("edit_name1");
+        assertLinkNotPresent("edit_name2");
+
+        // click add link.
+        assertAndClick("project.transformer.add");
+
+        // select from existing list.
+        AddExistingCommitMessageTransformerForm form = new AddExistingCommitMessageTransformerForm(tester);
+        form.assertFormPresent();
+
+        // select existing transformer. (ensure that two are listed)
+        String[] options = form.getSelectOptions("existing");
+        assertEquals(2, options.length);
+        assertEquals("name1", options[0]);
+        assertEquals("name2", options[1]);
+
+        form.saveFormElements("name1");
+
+        // ensure that the transformer is in the list.
+        assertLinkPresent("edit_name1");
+
+        // click add
+        assertAndClick("project.transformer.add");
+        form.assertFormPresent();
+
+        // select existing transformer. (ensure only one is listed)
+        options = form.getSelectOptions("existing");
+        assertEquals(1, options.length);
+        assertEquals("name2", options[0]);
+        
+        // submit.
+        form.saveFormElements("name2");
+        assertLinkPresent("edit_name2");
+
+        // click add/
+        assertAndClick("project.transformer.add");
+
+        // ensure that no existing transformers are listed.
+        form.assertFormNotPresent();
+    }
+
+    public void testAddValidatedNameUniqueness() throws Exception
+    {
+        callRemoteApi("deleteAllCommitMessageLinks");
+
+        // create a transformer via admin.
+        createCommitMessageTransformer("standard", "name", "expression", "link");
+
+        // navigate back to the project.
+        beginAt(Navigation.Projects.ACTION_PROJECT_CONFIG + "?projectName=" + projectName);
+
+        // click add.
+        assertAndClick("project.transformer.add");
+
+        // select standard, fill in blanks using existing name
+        selectCommitMessageTransformerType("standard");
+        
+        // ensure that form is still present.
+        AddCommitMessageTransformerWizard.Standard standard = new AddCommitMessageTransformerWizard.Standard(tester);
+        standard.assertFormPresent();
+        standard.finishFormElements("name", "expression1", "link2");
+        standard.assertFormPresent();
+    }
+
+    public void testEditCommitMessageTransformer() throws Exception
+    {
+        callRemoteApi("deleteAllCommitMessageLinks");
+
+        // create a transformer
+        assertAndClick("project.transformer.add");
+
+        // select standard.
+        selectCommitMessageTransformerType("standard");
+
+        // fill in the blanks.
+        AddCommitMessageTransformerWizard.Standard standard = new AddCommitMessageTransformerWizard.Standard(tester);
+        standard.assertFormPresent();
+        standard.finishFormElements("name", "expression", "link");
+        standard.assertFormNotPresent();
+
+        // ensure that the transformer is listed.
+        assertLinkPresent("edit_name");
+
+        // click edit transformer.
+        assertAndClick("edit_name");
+
+        // change all the fields.
+        standard = new AddCommitMessageTransformerWizard.Standard(tester);
+        standard.assertFormElements("name", "expression", "link");
+        standard.saveFormElements("name1", "expression1", "link1");
+
+        // ensure that the name has changed.
+        assertLinkNotPresent("edit_name");
+        // click edit.
+        assertAndClick("edit_name1");
+
+        // ensure that all the field values are as expected.
+        standard.assertFormElements("name1", "expression1", "link1");
+    }
+
+    public void testRemoveCommitMessageTransformer() throws Exception
+    {
+        // create transformer.
+        callRemoteApi("deleteAllCommitMessageLinks");
+
+        // create a transformer
+        assertAndClick("project.transformer.add");
+
+        // select standard.
+        selectCommitMessageTransformerType("standard");
+
+        // fill in the blanks.
+        AddCommitMessageTransformerWizard.Standard standard = new AddCommitMessageTransformerWizard.Standard(tester);
+        standard.assertFormPresent();
+        standard.finishFormElements("name", "expression", "link");
+        standard.assertFormNotPresent();
+
+        assertLinkPresent("edit_name");
+
+        // click remove transformer.
+        assertAndClick("remove_name");
+
+        // ensure that it is no longer in the list.
+        assertLinkNotPresent("edit_name");
+
+        // ensure that the transformer still exists in the global list.
+        clickLink(Navigation.TAB_ADMINISTRATION);
+        assertLinkPresent("edit_name");
     }
 
     private String nukeIds(String text)

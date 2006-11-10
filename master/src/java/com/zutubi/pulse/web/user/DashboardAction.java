@@ -7,6 +7,7 @@ import com.zutubi.pulse.model.*;
 import com.zutubi.pulse.security.AcegiUtils;
 import com.zutubi.pulse.web.ActionSupport;
 import com.zutubi.pulse.web.project.CommitMessageHelper;
+import com.zutubi.pulse.committransformers.CommitMessageTransformerManager;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -28,6 +29,7 @@ public class DashboardAction extends ActionSupport
     private ProjectManager projectManager;
     private BuildManager buildManager;
     private UserManager userManager;
+    private CommitMessageTransformerManager commitMessageTransformerManager;
     private CommitMessageHelper commitMessageHelper;
     private boolean contactError = false;
     private String changeUrl;
@@ -166,7 +168,7 @@ public class DashboardAction extends ActionSupport
     {
         if(commitMessageHelper == null)
         {
-            commitMessageHelper = new CommitMessageHelper(projectManager.getCommitMessageTransformers());
+            commitMessageHelper = new CommitMessageHelper(commitMessageTransformerManager.getCommitMessageTransformers());
         }
         return commitMessageHelper.applyTransforms(changelist);
     }
@@ -175,7 +177,7 @@ public class DashboardAction extends ActionSupport
     {
         if(commitMessageHelper == null)
         {
-            commitMessageHelper = new CommitMessageHelper(projectManager.getCommitMessageTransformers());
+            commitMessageHelper = new CommitMessageHelper(commitMessageTransformerManager.getCommitMessageTransformers());
         }
         return commitMessageHelper.applyTransforms(changelist, maxChars);
     }
@@ -204,6 +206,11 @@ public class DashboardAction extends ActionSupport
         }
 
         changeUrl = null;
+    }
+
+    public void setCommitMessageTransformerManager(CommitMessageTransformerManager commitMessageTransformerManager)
+    {
+        this.commitMessageTransformerManager = commitMessageTransformerManager;
     }
 
     public boolean canWrite(Project project)

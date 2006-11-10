@@ -39,7 +39,6 @@ public class DefaultProjectManager implements ProjectManager
     private BuildSpecificationDao buildSpecificationDao;
     private BuildSpecificationNodeDao buildSpecificationNodeDao;
     private TriggerDao triggerDao;
-    private CommitMessageTransformerDao commitMessageTransformerDao;
     private Scheduler scheduler;
     private BuildManager buildManager;
     private SubscriptionManager subscriptionManager;
@@ -499,36 +498,6 @@ public class DefaultProjectManager implements ProjectManager
         this.subscriptionManager = subscriptionManager;
     }
 
-    public void save(CommitMessageTransformer transformer)
-    {
-        commitMessageTransformerDao.save(transformer);
-    }
-
-    public CommitMessageTransformer getCommitMessageTransformer(long id)
-    {
-        return commitMessageTransformerDao.findById(id);
-    }
-
-    public void delete(CommitMessageTransformer transformer)
-    {
-        commitMessageTransformerDao.delete(transformer);
-    }
-
-    public List<CommitMessageTransformer> getCommitMessageTransformers()
-    {
-        return commitMessageTransformerDao.findAll();
-    }
-
-    public List<CommitMessageTransformer> findCommitMessageTransformersByProject(Project project)
-    {
-        return commitMessageTransformerDao.findByProject(project);
-    }
-
-    public CommitMessageTransformer findCommitMessageTransformerByName(String name)
-    {
-        return commitMessageTransformerDao.findByName(name);
-    }
-
     public List<ProjectGroup> getAllProjectGroups()
     {
         return projectGroupDao.findAll();
@@ -554,11 +523,6 @@ public class DefaultProjectManager implements ProjectManager
     {
         userManager.removeReferencesToProjectGroup(projectGroup);
         projectGroupDao.delete(projectGroup);
-    }
-
-    public void setCommitMessageTransformerDao(CommitMessageTransformerDao commitMessageTransformerDao)
-    {
-        this.commitMessageTransformerDao = commitMessageTransformerDao;
     }
 
     public void setEventManager(EventManager eventManager)

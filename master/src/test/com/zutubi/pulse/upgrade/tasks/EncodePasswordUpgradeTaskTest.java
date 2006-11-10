@@ -32,7 +32,7 @@ public class EncodePasswordUpgradeTaskTest extends BaseUpgradeTaskTestCase
         dataSource = (BasicDataSource) ComponentContext.getBean("dataSource");
 
         // initialise required schema.
-        createSchema(dataSource, 1020);
+        createSchema(dataSource, "1020");
     }
 
     protected void tearDown() throws Exception

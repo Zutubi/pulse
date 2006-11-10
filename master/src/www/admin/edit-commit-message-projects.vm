@@ -1,0 +1,24 @@
+#helpTag("Commit+Message+Links")
+#authorisationTags($principle)
+<content tag="selectedTab">administration</content>
+<html>
+<head>
+    <title>#wwtext("name=edit.commit.message.transformer.projects")</title>
+</head>
+<body>
+    #adminTabs("settings")
+
+    #parse("/template/includes/actionerrors.vm")
+
+#wwcform("action=editCommitMessageProjects.action" "heading=%{getText('edit.commit.message.transformer.projects')}" "method=post" "id=edit.commit.message.projects")
+    #wwhidden("name=id")
+
+    #wwselect("name=selectedProjects" "label=%{getText('commit.message.transformer.projects')}" "list=allProjects" "multiple=true" "tabindex=1")
+    #inlineHelp("commit.message.transformer.projects.help")
+
+    #saveCancel("2")
+#end
+
+    #tabEnd()
+</body>
+</html>

@@ -29,27 +29,30 @@
                     #dynamicRow("recipe.queue.timeout" $timeoutValue)
                 </table>
 
-                <table id="commit.message.links" class="fill-content">
-                    #headingRow("commit.message.links" 4)
+                <!-- commit message tranformers -->
+                
+                <table id="commit.message.transformers" class="fill-content">
+                    #headingRow("global.commit.message.transformers" 5)
                     <tr>
-                        #contentHeading("commit.message.link.name" 1)
-                        #contentHeading("commit.message.link.expression" 1)
-                        #contentHeading("actions" 2)
+                        #contentHeading("commit.message.transformer.name" 1)
+                        #contentHeading("commit.message.transformer.type" 1)
+                        #contentHeading("actions" 3)
                     </tr>
 #if($commitMessageTransformers.size() > 0)
-    #foreach($link in $commitMessageTransformers)
-        #set($confirmMessage = $action.getText("commit.message.link.confirm.delete", [$link.name]))
+    #foreach($transformer in $commitMessageTransformers)
+        #set($confirmMessage = $action.getText("commit.message.transformer.confirm.delete", [$transformer.name]))
                     <tr>
-                        #dynamicCell($link.name)
-                        #dynamicCell($link.expression)
-                        #editCell("editCommitMessageLink!input.action?id=$link.id" "edit_$!webwork.htmlEncode($link.name)")
-                        #deleteCell("delete_$!webwork.htmlEncode($link.name)" "deleteCommitMessageLink.action?id=$link.id" $confirmMessage)
+                        #dynamicCell($transformer.name)
+                        #dynamicCell($transformer.type)
+                        #editCell("editCommitMessage.action?id=$transformer.id" "edit_$!webwork.htmlEncode($transformer.name)")
+                        #linkCell("projects_$!webwork.htmlEncode($transformer.name)" "projects" "editCommitMessageProjects!input.action?id=$transformer.id")
+                        #deleteCell("delete_$!webwork.htmlEncode($transformer.name)" "deleteCommitMessageLink.action?id=$transformer.id" $confirmMessage)
                     </tr>
     #end
 #else
-                    #contentRow("commit.message.links.none" 4)
+                    #contentRow("global.commit.message.transformers.none" 5)
 #end
-                    #addRow("commit.message.link.add" 4 "addCommitMessageLink!input.action" "commit.message.link.add")
+                    #addRow("add.commit.message.transformer" 5 "addTransformer.action" "commit.message.transformer.add")
                 </table>
 
                 <table id="logging.config" class="fill-content">

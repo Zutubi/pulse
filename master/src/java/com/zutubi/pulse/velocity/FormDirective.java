@@ -52,9 +52,7 @@ public class FormDirective extends AbstractDirective
         // render the form.
         OgnlValueStack stack = ActionContext.getContext().getValueStack();
         Object instance = stack.findValue(object);
-
         writer.write(internalRender(instance));
-
         return true;
     }
 
@@ -80,7 +78,7 @@ public class FormDirective extends AbstractDirective
         catch (Exception e)
         {
             e.printStackTrace();
-            return null;
+            return e.getMessage();
         }
     }
 

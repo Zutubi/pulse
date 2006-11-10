@@ -249,7 +249,7 @@ public class LicenseEncoder implements LicenseKeyFactory
 
         public static void main(String[] args)
         {
-            String companyName = "Cenqua";
+            String companyName = "insert name here";
 
             new NewStandardLicense().generateKey(companyName);
         }

@@ -55,6 +55,8 @@
                 <ref local="schemaUpgrade0102001004"/>
                 <ref local="schemaUpgrade0102001005"/>
                 <ref local="changeViewer"/>
+                <ref local="schemaUpgrade0102001007"/>
+                <ref local="commitMessageLinkMigrationUpgrade"/>
             </list>
         </property>
     </bean>
@@ -328,4 +330,19 @@
     <bean id="changeViewer" class="com.zutubi.pulse.upgrade.tasks.ChangeViewerUpgradeTask" autowire="byName">
         <property name="buildNumber" value="102001006"/>
     </bean>
+
+    <bean id="schemaUpgrade0102001007" class="com.zutubi.pulse.upgrade.tasks.MigrateSchemaUpgradeTask" autowire="byName">
+        <property name="buildNumber" value="102001007"/>
+        <property name="mappings">
+            <list>
+                <value>com/zutubi/pulse/upgrade/schema/build_0102001005/CommitMessageTransformer.hbm.xml</value>
+            </list>
+        </property>
+    </bean>
+
+    <bean id="commitMessageLinkMigrationUpgrade" class="com.zutubi.pulse.upgrade.tasks.CommitMessageLinkMigrationUpgradeTask" autowire="byName">
+        <property name="buildNumber" value="102001008"/>
+    </bean>
+
+
 </beans>

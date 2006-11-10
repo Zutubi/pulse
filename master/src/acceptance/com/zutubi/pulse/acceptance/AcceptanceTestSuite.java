@@ -38,7 +38,7 @@ public class AcceptanceTestSuite
         suite.addTestSuite(SlaveAcceptanceTest.class);
         suite.addTestSuite(JabberConfigurationAcceptanceTest.class);
         suite.addTestSuite(LdapConfigurationAcceptanceTest.class);
-        suite.addTestSuite(CommitMessageLinkAcceptanceTest.class);
+        suite.addTestSuite(CommitMessageTransformerAcceptanceTest.class);
         suite.addTestSuite(ChangeViewersAcceptanceTest.class);
 //        suite.addTestSuite(StartupShutdownAcceptanceTest.class);
         suite.addTestSuite(UserAdministrationAcceptanceTest.class);

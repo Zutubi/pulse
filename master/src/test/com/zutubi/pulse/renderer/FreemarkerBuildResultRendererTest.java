@@ -5,6 +5,7 @@ import com.zutubi.pulse.model.*;
 import com.zutubi.pulse.test.PulseTestCase;
 import com.zutubi.pulse.util.IOUtils;
 import com.zutubi.pulse.web.project.CommitMessageHelper;
+import com.zutubi.pulse.committransformers.StandardCommitMessageTransformer;
 import freemarker.template.Configuration;
 import freemarker.template.DefaultObjectWrapper;
 
@@ -34,7 +35,10 @@ public class FreemarkerBuildResultRendererTest extends PulseTestCase
         freemarkerConfiguration.addAutoInclude("macro.ftl");
         renderer.setFreemarkerConfiguration(freemarkerConfiguration);
 
-        CommitMessageTransformer tx = new CommitMessageTransformer("wow", "(CIB-[0-9]+)", "http://jira.zutubi.com/browse/$1");
+        StandardCommitMessageTransformer tx = new StandardCommitMessageTransformer("Jira");
+        tx.setExpression("(CIB-[0-9]+)");
+        tx.setLink("http://jira.zutubi.com/browse/$0");
+
         List<CommitMessageTransformer> txs = new ArrayList<CommitMessageTransformer>(1);
         txs.add(tx);
         renderer.setCommitMessageHelper(new CommitMessageHelper(txs));

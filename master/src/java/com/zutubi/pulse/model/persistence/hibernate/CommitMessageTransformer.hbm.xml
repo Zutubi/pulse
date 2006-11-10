@@ -8,16 +8,26 @@
             <generator class="hilo"/>
         </id>
 
+        <discriminator column="TYPE" type="string" length="255"/>
+
         <property name="name" column="NAME" type="string" length="255"/>
 
-        <property name="expression" column="EXPRESSION" type="string" length="1023"/>
-
-        <property name="replacement" column="REPLACEMENT" type="string" length="1023"/>
+        <property name="properties" column="PROPERTIES" type="com.zutubi.pulse.util.PropertiesType" length="4095"/>
 
         <bag name="projects" table="COMMIT_MESSAGE_TRANSFORMER_PROJECTS" lazy="false">
             <key column="TRANSFORMER_ID"/>
             <element type="long" column="PROJECT_ID" not-null="true"/>
         </bag>
+
+        <subclass name="com.zutubi.pulse.committransformers.StandardCommitMessageTransformer" discriminator-value="STANDARD" dynamic-update="false">
+        </subclass>
+
+        <subclass name="com.zutubi.pulse.committransformers.CustomCommitMessageTransformer" discriminator-value="CUSTOM" dynamic-update="false">
+        </subclass>
+
+        <subclass name="com.zutubi.pulse.committransformers.JiraCommitMessageTransformer" discriminator-value="JIRA" dynamic-update="false">
+        </subclass>
+
     </class>
 
 </hibernate-mapping>
