@@ -60,9 +60,7 @@
         <action name="execute" class="com.zutubi.pulse.web.setup.SetupActionSupport">
             <result name="success" type="velocity">/system-setup.vm</result>
         </action>
-
     </package>
-
 
     <package name="upgrade" namespace="/upgrade" extends="webwork-default-package">
         <default-interceptor-ref name="completeStack"/>
@@ -114,6 +112,9 @@
             <result name="success" type="json">license.xml</result>
         </action>
 
+        <action name="testSmtp" class="com.zutubi.pulse.web.ajax.TestSmtpAction">
+            <result name="success" type="velocity">test-smtp-settings.vm</result>
+        </action>
     </package>
 
     <package name="popups" namespace="/popups" extends="webwork-default-package">

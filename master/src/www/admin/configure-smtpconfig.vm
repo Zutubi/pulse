@@ -4,6 +4,34 @@
 <html>
 <head>
     <title>#wwtext("name=smtp.config")</title>
+
+    <script type="text/javascript" src="$base/js/prototype.js"></script>
+    <script type="text/javascript">
+        #ajaxError("test-results")
+
+        function testSettings()
+        {
+            #testInProgress("test-results")
+
+            var host = escape($F("editSmtp!save_smtp_host"));
+            var from = escape($F("editSmtp!save_smtp_from"));
+            var username = escape($F("editSmtp!save_smtp_username"));
+            var password = escape($F("editSmtp!save_smtp_password"));
+            var prefix = escape($F("editSmtp!save_smtp_prefix"));
+            var to = escape($F("test.address"));
+
+            var params = "host=" + host + "&from=" + from + "&username=" + username + "&password=" + password + "&prefix=" + prefix + "&to=" + to;
+
+            var updater = new Ajax.Updater({success: 'test-results'},
+                                           "/ajax/testSmtp.action",
+                                           {
+                                               method: 'get',
+                                               parameters: params,
+                                               onFailure: reportError
+                                           });
+
+        }
+    </script>
 </head>
 <body>
     #adminTabs("settings")
@@ -23,11 +51,32 @@
     #wwtextfield("name=smtp.prefix" "label=%{getText('smtp.prefix')}" "tabindex=5")
     #inlineHelp("smtp.prefix.help")
 
-    #openSubmit()
-        #wwsubmit("name=save" "value=%{getText('save.name')}" "tabindex=6")
-        #wwsubmit("name=cancel" "value=%{getText('cancel.name')}" "tabindex=7")
-    #closeSubmit()
+    #saveCancel(6)
 #end
+
+    <table class="content">
+        #headingRow("settings.test" 2)
+        <tr>
+            <th class="label">
+                <label for="test.address" class="label">test address <span class="required">*</span></label>:
+            </th>
+            <td class="field">
+                <input type="text" name="test address" id="test.address"/>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                &nbsp;
+            </td>
+            <td style="padding: 6px;">
+                <p>
+                    <a href="#" onclick="testSettings(); return false;">#wwtext("name=smtp.settings.test")</a>
+                </p>
+                <div id="test-results">
+                </div>
+            </td>
+        </tr>
+    </table>
 
     #tabEnd()
 </body>

@@ -55,6 +55,13 @@ public class EmailContactPoint extends ContactPoint
     public void internalNotify(BuildResult result, String rendered, String mimeType) throws Exception
     {
         MasterConfiguration config = lookupConfigManager().getAppConfig();
+
+        if (!TextUtils.stringSet(config.getSmtpHost()))
+        {
+            LOG.severe(NO_SMTP_HOST_ERROR);
+            throw new NotificationException(NO_SMTP_HOST_ERROR);
+        }
+
         String prefix = config.getSmtpPrefix();
 
         if (prefix == null)
@@ -68,57 +75,10 @@ public class EmailContactPoint extends ContactPoint
 
         String prelude = result.isPersonal() ? "personal build " : (result.getProject().getName() + ": build ");
         String subject = prefix + prelude + Long.toString(result.getNumber()) + ": " + result.getState().getPrettyString();
-        sendMail(subject, mimeType, rendered, config);
-    }
-
-    private MasterConfigurationManager lookupConfigManager()
-    {
-        return (MasterConfigurationManager) ComponentContext.getBean("configurationManager");
-    }
-
-    private void sendMail(String subject, String mimeType, String body, final MasterConfiguration config) throws Exception
-    {
-        if (!TextUtils.stringSet(config.getSmtpHost()))
-        {
-            LOG.severe(NO_SMTP_HOST_ERROR);
-            throw new NotificationException(NO_SMTP_HOST_ERROR);
-        }
-
-        Properties properties = (Properties) System.getProperties().clone();
-        properties.put(SMTP_HOST_PROPERTY, config.getSmtpHost());
-
-        Authenticator authenticator = null;
-        if (TextUtils.stringSet(config.getSmtpUsername()))
-        {
-            properties.put(SMTP_AUTH_PROPERTY, "true");
-            authenticator = new Authenticator()
-            {
-                protected PasswordAuthentication getPasswordAuthentication()
-                {
-                    return new PasswordAuthentication(config.getSmtpUsername(), config.getSmtpPassword());
-                }
-            };
-        }
-
-        Session session = Session.getInstance(properties, authenticator);
 
         try
         {
-            Message msg = new MimeMessage(session);
-
-            if (config.getSmtpFrom() != null)
-            {
-                String fromAddress = config.getSmtpFrom();
-                msg.setFrom(new InternetAddress(fromAddress));
-            }
-
-            msg.setRecipient(Message.RecipientType.TO, new InternetAddress(getEmail()));
-            msg.setSubject(subject);
-            msg.setContent(body, mimeType);
-            msg.setHeader("X-Mailer", "Zutubi-Pulse");
-            msg.setSentDate(new Date());
-
-            Transport.send(msg);
+            sendMail(subject, getEmail(), mimeType, rendered, config.getSmtpHost(), config.getSmtpUsername(), config.getSmtpPassword(), config.getSmtpFrom());
         }
         catch (Exception e)
         {
@@ -127,5 +87,44 @@ public class EmailContactPoint extends ContactPoint
         }
     }
 
+    private MasterConfigurationManager lookupConfigManager()
+    {
+        return (MasterConfigurationManager) ComponentContext.getBean("configurationManager");
+    }
 
+    public static void sendMail(String email, String subject, String mimeType, String body, String host, final String username, final String password, String from) throws Exception
+    {
+        Properties properties = (Properties) System.getProperties().clone();
+        properties.put(SMTP_HOST_PROPERTY, host);
+
+        Authenticator authenticator = null;
+        if (TextUtils.stringSet(username))
+        {
+            properties.put(SMTP_AUTH_PROPERTY, "true");
+            authenticator = new Authenticator()
+            {
+                protected PasswordAuthentication getPasswordAuthentication()
+                {
+                    return new PasswordAuthentication(username, password);
+                }
+            };
+        }
+
+        Session session = Session.getInstance(properties, authenticator);
+
+        Message msg = new MimeMessage(session);
+
+        if (from != null)
+        {
+            msg.setFrom(new InternetAddress(from));
+        }
+
+        msg.setRecipient(Message.RecipientType.TO, new InternetAddress(email));
+        msg.setSubject(subject);
+        msg.setContent(body, mimeType);
+        msg.setHeader("X-Mailer", "Zutubi-Pulse");
+        msg.setSentDate(new Date());
+
+        Transport.send(msg);
+    }
 }

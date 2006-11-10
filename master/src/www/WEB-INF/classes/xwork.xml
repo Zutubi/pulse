@@ -1390,6 +1390,10 @@
             <result name="success" type="velocity">test-settings.vm</result>
         </action>
 
+        <action name="testSmtp" class="com.zutubi.pulse.web.ajax.TestSmtpAction">
+            <result name="success" type="velocity">test-smtp-settings.vm</result>
+        </action>
+
         <action name="testJabber" class="com.zutubi.pulse.web.ajax.TestJabberAction">
             <result name="success" type="velocity">test-settings.vm</result>
         </action>

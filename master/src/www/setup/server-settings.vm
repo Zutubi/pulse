@@ -1,6 +1,34 @@
 <html>
 <head>
     <title>#wwtext("name=server.settings")</title>
+
+    <script type="text/javascript" src="$base/js/prototype.js"></script>
+    <script type="text/javascript">
+        #ajaxError("test-results")
+
+        function testSettings()
+        {
+            #testInProgress("test-results")
+
+            var host = escape($F("setupWizard_smtpHost"));
+            var from = escape($F("setupWizard_fromAddress"));
+            var username = escape($F("setupWizard_username"));
+            var password = escape($F("setupWizard_password"));
+            var prefix = escape($F("setupWizard_prefix"));
+            var to = escape($F("test.address"));
+
+            var params = "host=" + host + "&from=" + from + "&username=" + username + "&password=" + password + "&prefix=" + prefix + "&to=" + to;
+
+            var updater = new Ajax.Updater({success: 'test-results'},
+                                           "/ajax/testSmtp.action",
+                                           {
+                                               method: 'get',
+                                               parameters: params,
+                                               onFailure: reportError
+                                           });
+
+        }
+    </script>
 </head>
 <body>
     <h1>:: #wwtext("name=server.settings") ::</h1>
@@ -25,5 +53,30 @@
 
     #previousFinish(7)
 #end
+
+    <table class="content">
+        #headingRow("settings.test" 2)
+        <tr>
+            <th class="label">
+                <label for="test.address" class="label">test address <span class="required">*</span></label>:
+            </th>
+            <td class="field">
+                <input type="text" name="test address" id="test.address"/>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                &nbsp;
+            </td>
+            <td style="padding: 6px;">
+                <p>
+                    <a href="#" onclick="testSettings(); return false;">#wwtext("name=smtp.settings.test")</a>
+                </p>
+                <div id="test-results">
+                </div>
+            </td>
+        </tr>
+    </table>
+    
 </body>
 </html>
