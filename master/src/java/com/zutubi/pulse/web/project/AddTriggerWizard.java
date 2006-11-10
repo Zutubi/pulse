@@ -15,10 +15,7 @@ import com.zutubi.pulse.web.wizard.BaseWizardState;
 import com.zutubi.pulse.web.wizard.Wizard;
 import com.zutubi.pulse.web.wizard.WizardCompleteState;
 
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.TreeMap;
+import java.util.*;
 
 /**
  * <class-comment/>
@@ -122,8 +119,8 @@ public class AddTriggerWizard extends BaseWizard
     {
         private Map<String, String> types;
         private String name;
-        private String spec;
-        private List<String> specs;
+        private long spec;
+        private Map<Long, String> specs;
 
         private String type;
 
@@ -152,12 +149,12 @@ public class AddTriggerWizard extends BaseWizard
             this.name = name;
         }
 
-        public String getSpec()
+        public long getSpec()
         {
             return spec;
         }
 
-        public void setSpec(String spec)
+        public void setSpec(long spec)
         {
             this.spec = spec;
         }
@@ -167,7 +164,7 @@ public class AddTriggerWizard extends BaseWizard
             return types;
         }
 
-        public List<String> getSpecs()
+        public Map<Long, String> getSpecs()
         {
             return specs;
         }
@@ -201,10 +198,10 @@ public class AddTriggerWizard extends BaseWizard
                 return;
             }
 
-            specs = new LinkedList<String>();
+            specs = new LinkedHashMap<Long, String>();
             for (BuildSpecification spec : project.getBuildSpecifications())
             {
-                specs.add(spec.getName());
+                specs.put(spec.getId(), spec.getName());
             }
 
             if (specs.size() == 0)

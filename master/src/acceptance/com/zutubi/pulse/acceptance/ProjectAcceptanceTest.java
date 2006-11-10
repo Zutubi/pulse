@@ -709,15 +709,15 @@ public class ProjectAcceptanceTest extends ProjectAcceptanceTestBase
         clickLink(getEditId(TRIGGER_NAME));
 
         form.assertFormPresent();
-        form.assertFormElements(TRIGGER_NAME, "default", CRON_STRING);
-        assertOptionValuesEqual("specification", new String[]{"default", SPEC_NAME});
+        form.assertFormElements(TRIGGER_NAME, form.getOptionValue("specification", "default"), CRON_STRING);
+        assertOptionValuesEqual("specification", new String[]{form.getOptionValue("specification", "default"), form.getOptionValue("specification", SPEC_NAME)});
         return form;
     }
 
     public void testEditCronTrigger()
     {
         CronTriggerEditForm form = editCronTriggerHelper();
-        form.saveFormElements("new name", SPEC_NAME, "0 0 1 * * ?");
+        form.saveFormElements("new name", form.getOptionValue("specification", SPEC_NAME), "0 0 1 * * ?");
 
         assertProjectTriggerTable(new String[][]{
                 getTriggerRow("scm trigger", "event", "default"),
@@ -727,13 +727,13 @@ public class ProjectAcceptanceTest extends ProjectAcceptanceTestBase
         clickLink(getEditId("new name"));
 
         form.assertFormPresent();
-        form.assertFormElements("new name", SPEC_NAME, "0 0 1 * * ?");
+        form.assertFormElements("new name", form.getOptionValue("specification", SPEC_NAME), "0 0 1 * * ?");
     }
 
     public void testEditCronTriggerCancel()
     {
         CronTriggerEditForm form = editCronTriggerHelper();
-        form.cancelFormElements("new name", SPEC_NAME, "0 0 1 * * ?");
+        form.cancelFormElements("new name", form.getOptionValue("specification", SPEC_NAME), "0 0 1 * * ?");
 
         assertProjectTriggerTable(new String[][]{
                 getTriggerRow("scm trigger", "event", "default"),
@@ -746,17 +746,17 @@ public class ProjectAcceptanceTest extends ProjectAcceptanceTestBase
         CronTriggerEditForm form = editCronTriggerHelper();
 
         // Try empty name
-        form.saveFormElements("", SPEC_NAME, "0 0 1 * * ?");
+        form.saveFormElements("", form.getOptionValue("specification", SPEC_NAME), "0 0 1 * * ?");
         form.assertFormPresent();
         assertTextPresent("name is required");
 
         // Try an empty cron string
-        form.saveFormElements("name", SPEC_NAME, "");
+        form.saveFormElements("name", form.getOptionValue("specification", SPEC_NAME), "");
         form.assertFormPresent();
         assertTextPresent("cron expression is required");
 
         // Try an invalid cron string
-        form.saveFormElements("name", SPEC_NAME, "0 0 1 * *");
+        form.saveFormElements("name", form.getOptionValue("specification", SPEC_NAME), "0 0 1 * *");
         form.assertFormPresent();
         assertTextPresent("Unexpected end of expression");
     }
@@ -770,15 +770,15 @@ public class ProjectAcceptanceTest extends ProjectAcceptanceTestBase
         assertAndClick(getEditId("scm trigger"));
 
         form.assertFormPresent();
-        form.assertFormElements("scm trigger", "default");
-        assertOptionValuesEqual("specification", new String[]{"default", SPEC_NAME});
+        form.assertFormElements("scm trigger", form.getOptionValue("specification", "default"));
+        assertOptionValuesEqual("specification", new String[]{form.getOptionValue("specification", "default"), form.getOptionValue("specification", SPEC_NAME)});
         return form;
     }
 
     public void testEditEventTrigger()
     {
         EventTriggerEditForm form = editEventTriggerHelper();
-        form.saveFormElements("new name", SPEC_NAME);
+        form.saveFormElements("new name", form.getOptionValue("specification", SPEC_NAME));
 
         assertProjectTriggerTable(new String[][]{
                 getTriggerRow("new name", "event", SPEC_NAME),
@@ -788,7 +788,7 @@ public class ProjectAcceptanceTest extends ProjectAcceptanceTestBase
     public void testEditEventTriggerCancel()
     {
         EventTriggerEditForm form = editEventTriggerHelper();
-        form.cancelFormElements("new name", SPEC_NAME);
+        form.cancelFormElements("new name", form.getOptionValue("specification", SPEC_NAME));
 
         assertProjectTriggerTable(new String[][]{
                 getTriggerRow("scm trigger", "event", "default"),
@@ -800,7 +800,7 @@ public class ProjectAcceptanceTest extends ProjectAcceptanceTestBase
         EventTriggerEditForm form = editEventTriggerHelper();
 
         // Try empty name
-        form.saveFormElements("", SPEC_NAME);
+        form.saveFormElements("", form.getOptionValue("specification", SPEC_NAME));
         form.assertFormPresent();
         assertTextPresent("name is required");
     }
@@ -851,7 +851,7 @@ public class ProjectAcceptanceTest extends ProjectAcceptanceTestBase
 //        EditBuildCompletedTriggerForm form = editBuildCompletedTriggerHelper();
 //        String id = tester.getDialog().getValueForOption(form.getFieldNames()[2], projectName);
 //        form.assertFormElements(TRIGGER_NAME, "default", id, "default", "FAILURE");
-//        form.saveFormElements("new name", SPEC_NAME, id, "", "SUCCESS");
+//        form.saveFormElements("new name", form.getOptionValue("specification", SPEC_NAME), id, "", "SUCCESS");
 //
 //        assertProjectTriggerTable(new String[][]{
 //                getTriggerRow("new name", "event", SPEC_NAME),
@@ -859,7 +859,7 @@ public class ProjectAcceptanceTest extends ProjectAcceptanceTestBase
 //
 //        assertAndClick(getEditId(TRIGGER_NAME));
 //        form.assertFormPresent();
-//        form.assertFormElements("new name", SPEC_NAME, id, "", "SUCCESS");
+//        form.assertFormElements("new name", form.getOptionValue("specification", SPEC_NAME), id, "", "SUCCESS");
 //    }
 
     public void testCloneProject() throws IOException

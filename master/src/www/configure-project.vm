@@ -216,7 +216,7 @@
                     <tr>
                         #dynamicCell($trigger.name)
                         #dynamicCell($trigger.type)
-                        #dynamicCell($trigger.dataMap.spec)
+                        #dynamicCell($action.getSpec($trigger))
             #if($trigger.paused)
                         #contentCell("trigger.disabled")
             #else

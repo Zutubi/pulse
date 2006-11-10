@@ -16,6 +16,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.LinkedList;
 import java.util.List;
+import java.io.IOException;
 
 /**
  * <class-comment/>
@@ -63,10 +64,10 @@ public abstract class DatabaseUpgradeTask implements UpgradeTask, DataSourceAwar
             connection = dataSource.getConnection();
             execute(context, connection);
         }
-        catch (IOException e)
+        catch(IOException e)
         {
             LOG.error(e);
-            errors.add("IOException: " + e.getMessage() + ". Please see the log files for details.");
+            errors.add("IOException: " + e.getMessage() + ". Please see the log files for details.");            
         }
         catch (SQLException e)
         {

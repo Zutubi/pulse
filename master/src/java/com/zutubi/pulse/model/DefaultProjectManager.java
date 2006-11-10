@@ -312,9 +312,9 @@ public class DefaultProjectManager implements ProjectManager
             Class clazz = trigger.getTaskClass();
             if (clazz.equals(BuildProjectTask.class))
             {
-                String specName = (String) trigger.getDataMap().get(BuildProjectTask.PARAM_SPEC);
+                long triggerSpecId = (Long) trigger.getDataMap().get(BuildProjectTask.PARAM_SPEC);
 
-                if (specName.equals(spec.getName()) && trigger.isScheduled())
+                if (triggerSpecId == specId && trigger.isScheduled())
                 {
                     try
                     {
@@ -429,7 +429,7 @@ public class DefaultProjectManager implements ProjectManager
             EventTrigger trigger = new EventTrigger(SCMChangeEvent.class, "scm trigger", project.getName(), SCMChangeEventFilter.class);
             trigger.setProject(project.getId());
             trigger.setTaskClass(BuildProjectTask.class);
-            trigger.getDataMap().put(BuildProjectTask.PARAM_SPEC, "default");
+            trigger.getDataMap().put(BuildProjectTask.PARAM_SPEC, buildSpec.getId());
 
             scheduler.schedule(trigger);
         }
