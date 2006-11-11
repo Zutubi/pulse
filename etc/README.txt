@@ -17,7 +17,7 @@ Contents
     bin/            Startup and admin scripts for launching Pulse.
     lib/            Pulse bootstrap library files
     logs/           Log files
-    versions/       License files for Pulse and bundled software.
+    versions/
 
         pulse-build-number/
 
@@ -48,7 +48,9 @@ Installation
    you must set the value of PULSE_HOME to the absolute path of the directory.
 
 3. Once the archive is installed, you can start your pulse server by running 
-   the startup.sh script (startup.bat for Windows users) in the bin directory
+   the pulse script (pulse.bat for Windows users) in the bin directory:
+
+     $ ./bin/pulse start
    
    
 For an extended description of the installation process, please see the Getting

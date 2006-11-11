@@ -45,7 +45,14 @@
   
   !insertmacro MUI_PAGE_STARTMENU Application $STARTMENU_FOLDER
   !insertmacro MUI_PAGE_INSTFILES
-  
+
+  !define MUI_FINISHPAGE_RUN
+  !define MUI_FINISHPAGE_RUN_TEXT "Start __SERVICE_NAME__ service"
+  !define MUI_FINISHPAGE_RUN_FUNCTION "StartService"
+  !define MUI_FINISHPAGE_LINK "Getting Started Guide"
+  !define MUI_FINISHPAGE_LINK_LOCATION "http://confluence.zutubi.com/display/pulse0102/Getting+Started+Guide"
+  !insertmacro MUI_PAGE_FINISH
+
   !insertmacro MUI_UNPAGE_CONFIRM
   !insertmacro MUI_UNPAGE_INSTFILES
   
@@ -94,6 +101,10 @@ CheckExit:
   MessageBox MB_YESNO "Could not find a JVM: $1.$\n$\nDownload and install Java now?" IDYES 0 IDNO Exit
   Call InstallJRE
 Exit:
+FunctionEnd
+
+Function StartService
+  nsExec::Exec 'net start "__SERVICE_NAME__"'
 FunctionEnd
 
 ;--------------------------------
