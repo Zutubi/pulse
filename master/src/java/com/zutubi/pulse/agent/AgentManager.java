@@ -1,9 +1,8 @@
 package com.zutubi.pulse.agent;
 
-import com.zutubi.pulse.model.Slave;
-import com.zutubi.pulse.services.UpgradeState;
-import com.zutubi.pulse.services.UpgradeStatus;
 import com.zutubi.pulse.license.LicenseException;
+import com.zutubi.pulse.model.Slave;
+import com.zutubi.pulse.services.UpgradeStatus;
 
 import java.util.List;
 
@@ -21,6 +20,9 @@ public interface AgentManager
     int getAgentCount();
 
     void addSlave(Slave slave) throws LicenseException;
+    void enableSlave(Slave slave);
+    void disableSlave(Slave slave);
+    void setSlaveState(Slave slave, Slave.EnableState state);
 
     void slaveAdded(long id);
     void slaveChanged(long id);

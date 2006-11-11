@@ -3,10 +3,11 @@ package com.zutubi.pulse.api;
 import com.opensymphony.util.TextUtils;
 import com.zutubi.pulse.ShutdownManager;
 import com.zutubi.pulse.Version;
-import com.zutubi.pulse.committransformers.CommitMessageTransformerManager;
 import com.zutubi.pulse.agent.Agent;
 import com.zutubi.pulse.agent.AgentManager;
+import com.zutubi.pulse.agent.SlaveAgent;
 import com.zutubi.pulse.bootstrap.ComponentContext;
+import com.zutubi.pulse.committransformers.CommitMessageTransformerManager;
 import com.zutubi.pulse.core.model.ResultState;
 import com.zutubi.pulse.form.squeezer.SqueezeException;
 import com.zutubi.pulse.form.squeezer.Squeezers;
@@ -488,6 +489,50 @@ public class RemoteApi
         }
 
         return agent.getStatus().getPrettyString();
+    }
+
+    public boolean enableAgent(String token, String name) throws AuthenticationException
+    {
+        tokenManager.verifyAdmin(token);
+
+        Agent agent = agentManager.getAgent(name);
+        if (agent == null)
+        {
+            throw new IllegalArgumentException("Unknown agent '" + name + "'");
+        }
+
+        if(agent.isSlave())
+        {
+            agentManager.enableSlave(((SlaveAgent)agent).getSlave());
+        }
+        else
+        {
+            agentManager.enableMasterAgent();
+        }
+
+        return true;
+    }
+
+    public boolean disableAgent(String token, String name) throws AuthenticationException
+    {
+        tokenManager.verifyAdmin(token);
+
+        Agent agent = agentManager.getAgent(name);
+        if (agent == null)
+        {
+            throw new IllegalArgumentException("Unknown agent '" + name + "'");
+        }
+
+        if(agent.isSlave())
+        {
+            agentManager.disableSlave(((SlaveAgent)agent).getSlave());
+        }
+        else
+        {
+            agentManager.disableMasterAgent();
+        }
+
+        return true;
     }
 
     public boolean shutdown(String token, boolean force, boolean exitJvm) throws AuthenticationException

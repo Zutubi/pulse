@@ -16,7 +16,10 @@ import com.zutubi.pulse.events.build.RecipeErrorEvent;
 import com.zutubi.pulse.filesystem.remote.RemoteFile;
 import com.zutubi.pulse.model.*;
 import com.zutubi.pulse.personal.PatchArchive;
-import com.zutubi.pulse.scm.*;
+import com.zutubi.pulse.scm.FileStatus;
+import com.zutubi.pulse.scm.SCMChangeEvent;
+import com.zutubi.pulse.scm.SCMException;
+import com.zutubi.pulse.scm.SCMServer;
 import com.zutubi.pulse.services.SlaveStatus;
 import com.zutubi.pulse.services.UpgradeStatus;
 import junit.framework.TestCase;
@@ -989,6 +992,21 @@ public class ThreadedRecipeQueueTest extends TestCase implements EventListener
             SlaveAgent agent = new SlaveAgent(slave, null, null, new MockBuildService(slave.getId()));
             agent.updateStatus(new SlaveStatus(Status.IDLE, 0));
             onlineAgents.put(slave.getId(), agent);
+        }
+
+        public void enableSlave(Slave slave)
+        {
+            throw new RuntimeException("Method not yet implemented.");
+        }
+
+        public void disableSlave(Slave slave)
+        {
+            throw new RuntimeException("Method not yet implemented.");
+        }
+
+        public void setSlaveState(Slave slave, Slave.EnableState state)
+        {
+            throw new RuntimeException("Method not yet implemented.");
         }
     }
 

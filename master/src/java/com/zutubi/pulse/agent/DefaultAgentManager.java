@@ -141,6 +141,23 @@ public class DefaultAgentManager implements AgentManager, EventListener, Stoppab
         slaveAdded(slave.getId());
     }
 
+    public void enableSlave(Slave slave)
+    {
+        setSlaveState(slave, Slave.EnableState.ENABLED);
+    }
+
+    public void disableSlave(Slave slave)
+    {
+        setSlaveState(slave, Slave.EnableState.DISABLED);
+    }
+
+    public void setSlaveState(Slave slave, Slave.EnableState state)
+    {
+        slave.setEnableState(state);
+        slaveManager.save(slave);
+        slaveChanged(slave.getId());
+    }
+
     private void pingSlave(SlaveAgent agent)
     {
         if (agent.isEnabled())
