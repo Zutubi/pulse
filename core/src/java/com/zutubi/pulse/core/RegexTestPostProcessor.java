@@ -56,7 +56,7 @@ public class RegexTestPostProcessor extends TestReportPostProcessor
             return;
         }
 
-        // clean up any whitespace from the regex which may have been added via the addText()
+        // clean up any whitespace from the regex which may have been added via the setText()
         if (trim)
         {
             regex = regex.trim();
@@ -157,7 +157,7 @@ public class RegexTestPostProcessor extends TestReportPostProcessor
         this.statusMap.put(status, TestCaseResult.Status.FAILURE);
     }
 
-    public void addText(String txt)
+    public void setText(String txt)
     {
         regex = txt;
     }

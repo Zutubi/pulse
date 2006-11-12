@@ -2,10 +2,12 @@ package com.zutubi.pulse.core;
 
 import com.zutubi.pulse.core.validation.CommandValidationException;
 import com.zutubi.pulse.util.IOUtils;
-import com.zutubi.pulse.validation.PulseValidationManager;
-import com.zutubi.pulse.validation.PulseValidationContext;
 import com.zutubi.pulse.validation.MessagesTextProvider;
-import com.zutubi.validation.*;
+import com.zutubi.pulse.validation.PulseValidationContext;
+import com.zutubi.pulse.validation.PulseValidationManager;
+import com.zutubi.validation.ValidationContext;
+import com.zutubi.validation.ValidationException;
+import com.zutubi.validation.ValidationManager;
 import nu.xom.*;
 
 import java.io.File;
@@ -247,6 +249,8 @@ public class FileLoader
     private void loadSubElements(Element e, Object type, boolean resolveReferences, Scope scope, IntrospectionHelper typeHelper, int depth, ResourceRepository resourceRepository, TypeLoadPredicate predicate)
             throws Exception
     {
+        String text = null;
+
         for (int index = 0; index < e.getChildCount(); index++)
         {
             Node node = e.getChild(index);
@@ -259,11 +263,25 @@ public class FileLoader
             }
             else if (node instanceof Text)
             {
-                if (typeHelper.hasAddText())
+                if (text == null)
                 {
-                    typeHelper.addText(type, node.getValue());
+                    text = node.getValue();
+                }
+                else
+                {
+                    text += node.getValue();
                 }
             }
+        }
+
+        if (text != null && typeHelper.hasSetText())
+        {
+            if (resolveReferences)
+            {
+                text = VariableHelper.replaceVariables(text, scope);
+            }
+            
+            typeHelper.setText(type, text);
         }
     }
 

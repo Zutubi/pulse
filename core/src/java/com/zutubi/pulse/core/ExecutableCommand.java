@@ -409,7 +409,7 @@ public class ExecutableCommand implements Command, ScopeAware
         for (String arg : args.split(" "))
         {
             Arg a = createArg();
-            a.addText(arg);
+            a.setText(arg);
         }
     }
 
@@ -532,14 +532,14 @@ public class ExecutableCommand implements Command, ScopeAware
             this.text = text;
         }
 
-        public void addText(String text)
-        {
-            this.text += text;
-        }
-
         public String getText()
         {
             return text;
+        }
+
+        public void setText(String text)
+        {
+            this.text += text;
         }
     }
 

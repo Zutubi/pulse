@@ -18,5 +18,11 @@
             <arg>here are some spaces</arg>
             <arg>and yet more spaces</arg>
         </executable>
+
+        <property name="foo" value="bar"/>
+
+        <executable name="test" exe="foo" args="${foo}">
+            <arg>ref in text ${foo}</arg>
+        </executable>
     </recipe>
 </project>

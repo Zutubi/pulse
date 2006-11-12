@@ -33,7 +33,7 @@ public class IntrospectionHelper
 
     private final Class bean;
 
-    private Method addText;
+    private Method setText;
 
     /**
      *
@@ -82,12 +82,12 @@ public class IntrospectionHelper
             Class[] paramTypes = method.getParameterTypes();
             Class returnType = method.getReturnType();
 
-            if (name.equals("addText") &&
+            if (name.equals("setText") &&
                     Void.TYPE.equals(returnType) &&
                     paramTypes.length == 1 &&
                     String.class.equals(paramTypes[0]))
             {
-                addText = method;
+                setText = method;
                 continue;
             }
 
@@ -150,9 +150,9 @@ public class IntrospectionHelper
         }
     }
 
-    public boolean hasAddText()
+    public boolean hasSetText()
     {
-        return addText != null;
+        return setText != null;
     }
 
     /**
@@ -410,9 +410,9 @@ public class IntrospectionHelper
         }
     }
     
-    public void addText(Object parent, String txt) throws IllegalAccessException, InvocationTargetException
+    public void setText(Object parent, String txt) throws IllegalAccessException, InvocationTargetException
     {
-        addText.invoke(parent, txt);
+        setText.invoke(parent, txt);
     }
 
     /**

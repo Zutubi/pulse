@@ -58,7 +58,7 @@ public class MakeCommandTest extends CommandTestBase
         command.setMakefile("custom.makefile");
         command.setTargets("build");
         ExecutableCommand.Arg arg = command.createArg();
-        arg.addText("test");
+        arg.setText("test");
         successRun(command, "build target", "test target");
     }
 

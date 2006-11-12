@@ -174,11 +174,11 @@ public class FileLoaderTest extends FileLoaderTestBase
         loader.load(getInput("testExecutableArgs"), bf);
 
         List<Recipe> recipes = bf.getRecipes();
-        assertEquals(recipes.size(), 1);
+        assertEquals(1, recipes.size());
 
         Recipe recipe = recipes.get(0);
         List<Command> commands = recipe.getCommands();
-        assertEquals(commands.size(), 5);
+        assertEquals(6, commands.size());
         assertTrue(commands.get(commandIndex) instanceof ExecutableCommand);
 
         ExecutableCommand command = (ExecutableCommand) commands.get(commandIndex);
@@ -223,6 +223,14 @@ public class FileLoaderTest extends FileLoaderTestBase
         assertEquals(args.get(1).getText(), "two");
         assertEquals(args.get(2).getText(), "here are some spaces");
         assertEquals(args.get(3).getText(), "and yet more spaces");
+    }
+
+    public void testExecutableArgsVariableReferences() throws Exception
+    {
+        List<ExecutableCommand.Arg> args = executableArgsHelper(5);
+        assertEquals(2, args.size());
+        assertEquals("bar", args.get(0).getText());
+        assertEquals("ref in text bar", args.get(1).getText());
     }
 
     public void testValidation() throws Exception
