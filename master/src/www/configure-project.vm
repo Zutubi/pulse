@@ -46,9 +46,6 @@
                             <a href="#" onclick="window.open('$base/popups/viewScmInfo.action?id=$project.id', 'scm info', 'status=yes,resizable=yes,top=100,left=100,width=600,height=400,scrollbars=yes'); return false;">#wwtext("name=scm.info")</a>
                             | <a href="browseProjectScm.action?id=$project.id">#wwtext("name=scm.browse")</a>
                             | <a id="project.scm.filter" href="filterScm.action?id=$project.scm.id&projectId=$project.id">#wwtext("name=scm.filters")</a>
-    #authorize("ifAllGranted=ROLE_ADMINISTRATOR")
-                            | <a id="commit.message.link.add" href="admin/addCommitMessageLink!input.action?projectId=$project.id">#wwtext("name=commit.message.link.add")</a>
-    #end
                         </td>
                     </tr>
 #end
@@ -166,7 +163,6 @@
                 </table>
 
                 <!-- Transformers -->
-                
                 <table id="project.transformers" class="fill-content">
                     #headingRow("project.commit.message.transformers" 5)
                     <tr>
