@@ -1,2 +1,0 @@
-make: NoMakefile: No such file or directory
-make: *** No rule to make target `NoMakefile'.  Stop.

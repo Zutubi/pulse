@@ -1,6 +1,0 @@
-compile:
-[mkdir] Created dir: /usr/pulse/data/recipes/851971/base/webwork/build/java
-[javac] Compiling 476 source files to /usr/pulse/data/recipes/851971/base/webwork/build/java
-[javac] /usr/pulse/data/recipes/851971/base/webwork/src/java/com/opensymphony/webwork/config/DelegatingConfiguration.java:17: warning: unmappable character for encoding UTF8
-[javac] * @author Rickard �berg
-[javac] ^

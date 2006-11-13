@@ -1,4 +1,0 @@
-<?xml version="1.0"?>
-<project default-recipe="default">
-    <make.pp name="basic" fail-on-error="true" leading-context="4" trailing-context="5"/>
-</project>

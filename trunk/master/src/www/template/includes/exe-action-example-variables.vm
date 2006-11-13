@@ -1,9 +1,0 @@
-<table class="fill-content">
-    #headingRow("post.build.action.example.variables" 2)
-#foreach($property in $exampleScope.references)
-        <tr>
-            <th class="content">$property.name</th>
-            #dynamicCell($property.value)
-        </tr>
-#end
-</table>

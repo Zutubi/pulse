@@ -1,3 +1,0 @@
-@echo off
-
-net start "__SERVICE_NAME__"

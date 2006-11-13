@@ -1,2 +1,0 @@
-project test project: build 101: success
-see: http://test.url:8080/viewBuild.action?id=11

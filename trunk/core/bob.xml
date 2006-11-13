@@ -1,9 +1,0 @@
-<?xml version="1.0"?>
-<project defaultRecipe="default">
-  <recipe name="default">
-    <resource name="ant"/>
-    <command name="build">
-      <executable exe="${ant.bin}"/>
-    </command>
-  </recipe>
-</project>

@@ -1,4 +1,0 @@
-gcc foo.c
-gcc: foo.c: No such file or directory
-gcc: no input files
-make: *** [gcc] Error 1

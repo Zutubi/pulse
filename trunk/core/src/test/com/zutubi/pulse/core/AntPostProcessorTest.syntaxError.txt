@@ -1,6 +1,0 @@
-Buildfile: build.xml
-
-BUILD FAILED
-/home/jsankey/svn/oro/trunk/build.xml:-1: Element type "attribute" must be followed by either attribute specifications, ">" or "/>".
-
-Total time: 0 seconds

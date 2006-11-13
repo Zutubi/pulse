@@ -1,1 +1,0 @@
-<#include "/forms/xhtml/controlheader.ftl" />

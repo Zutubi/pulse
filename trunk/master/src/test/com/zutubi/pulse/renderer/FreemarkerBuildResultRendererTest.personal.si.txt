@@ -1,2 +1,0 @@
-project my project: personal build 12: failure
-see: http://host.url/viewBuild.action?id=11

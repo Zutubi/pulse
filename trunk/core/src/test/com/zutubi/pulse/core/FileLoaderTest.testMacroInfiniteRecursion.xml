@@ -1,9 +1,0 @@
-<?xml version="1.0"?>
-<project>
-
-    <macro name="recurse">
-        <macro-ref macro="${recurse}"/>
-    </macro>
-
-    <macro-ref macro="${recurse}"/>
-</project>

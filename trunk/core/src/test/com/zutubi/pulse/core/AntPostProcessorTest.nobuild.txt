@@ -1,2 +1,0 @@
-Buildfile: nobuild.xml does not exist!
-Build failed

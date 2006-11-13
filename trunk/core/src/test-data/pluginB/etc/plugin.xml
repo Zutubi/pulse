@@ -1,8 +1,0 @@
-<plugin name="Sample plugin B" key="com.zutubi.plugins.sampleB">
-    
-    <plugin-info>
-    </plugin-info>
-    
-    <component-b/>
-    
-</plugin>

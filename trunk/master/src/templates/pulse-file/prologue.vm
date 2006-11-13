@@ -1,3 +1,0 @@
-#foreach($pp in $postProcessorTemplates)
-    #parse($pp)
-#end

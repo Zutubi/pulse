@@ -1,7 +1,0 @@
-make -C sm
-make[1]: Entering directory `/home/jason/mt/sm'
-myownerror
-make[1]: myownerror: Command not found
-make[1]: *** [default] Error 127
-make[1]: Leaving directory `/home/jason/mt/sm'
-make: *** [nested] Error 2
