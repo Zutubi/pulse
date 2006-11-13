@@ -36,7 +36,16 @@ public class BuildResult extends Result implements AclObjectIdentityAware, Itera
 
     public BuildResult(BuildReason reason, Project project, String buildSpecification, long number)
     {
-        this.reason = reason;
+        // Clone the build reason to ensure that each build result has its own build reason. 
+        try
+        {
+            this.reason = (BuildReason) reason.clone();
+        }
+        catch (CloneNotSupportedException e)
+        {
+            this.reason = reason;
+        }
+
         this.project = project;
         this.buildSpecification = buildSpecification;
         this.number = number;

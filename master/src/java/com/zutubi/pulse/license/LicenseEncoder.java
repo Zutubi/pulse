@@ -144,7 +144,7 @@ public class LicenseEncoder implements LicenseKeyFactory
             // able to vary them.
             if (license.getType() == LicenseType.ENTERPRISE)
             {
-                license.setSupported(16, License.UNRESTRICTED, License.UNRESTRICTED);
+                license.setSupported(License.UNRESTRICTED, License.UNRESTRICTED, License.UNRESTRICTED);
             }
             else if (license.getType() == LicenseType.EVALUATION)
             {
@@ -233,7 +233,22 @@ public class LicenseEncoder implements LicenseKeyFactory
         {
             String companyName = "insert name here";
 
-            new NewStandardLicense().generateKey(companyName);
+            new NewProfessionalLicense().generateKey(companyName);
+        }
+    }
+
+    private static class NewEnterpriseLicense extends NewCommercialLicense
+    {
+        public void generateKey(String companyName)
+        {
+            super.generateKey(companyName, LicenseType.ENTERPRISE);
+        }
+
+        public static void main(String[] args)
+        {
+            String companyName = "RapidMind";
+
+            new NewEnterpriseLicense().generateKey(companyName);
         }
     }
 }
