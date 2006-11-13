@@ -314,7 +314,7 @@ public class ProjectAcceptanceTest extends ProjectAcceptanceTestBase
     public void testDeleteCleanupPolicy()
     {
         assertProjectCleanupTable(new String[][] { getCleanupRow(true, "any", "10 builds") });
-        clickLinkWithText("delete", 2);
+        clickLinkWithText("delete", 1);
         assertProjectCleanupTable(null);
     }
 
@@ -327,8 +327,8 @@ public class ProjectAcceptanceTest extends ProjectAcceptanceTestBase
         // Check back on the configuration tab: ensure spec appears
         clickLinkWithText("configuration");
         assertProjectBuildSpecTable(new String[][]{
-                createBuildSpecRow("default", "[never]"),
-                createBuildSpecRow(SPEC_NAME, "100 minutes")
+                createBuildSpecRow("default", true),
+                createBuildSpecRow(SPEC_NAME, false)
         });
     }
 
@@ -346,7 +346,7 @@ public class ProjectAcceptanceTest extends ProjectAcceptanceTestBase
         AddBuildSpecForm form = new AddBuildSpecForm(tester);
 
         assertProjectBuildSpecTable(new String[][]{
-                createBuildSpecRow("default", "[never]")
+                createBuildSpecRow("default", true)
         });
 
         assertAndClick("project.buildspec.add");
@@ -385,8 +385,8 @@ public class ProjectAcceptanceTest extends ProjectAcceptanceTestBase
 
         clickLinkWithText("configuration");
         assertProjectBuildSpecTable(new String[][]{
-                createBuildSpecRow("default", "[never]"),
-                createBuildSpecRow(SPEC_NAME + "_edited", "[never]")
+                createBuildSpecRow("default", true),
+                createBuildSpecRow(SPEC_NAME + "_edited", false)
         });
     }
 
@@ -420,11 +420,12 @@ public class ProjectAcceptanceTest extends ProjectAcceptanceTestBase
     public void testDeleteBuildSpec()
     {
         testAddBuildSpec();
-        assertTextPresent("scm trigger");
 
+        assertTextPresent("scm trigger");
+        clickLinkWithText("make default");
         clickLinkWithText("delete");
         assertProjectBuildSpecTable(new String[][]{
-                createBuildSpecRow(SPEC_NAME, "100 minutes")
+                createBuildSpecRow(SPEC_NAME, true)
         });
 
         assertTextNotPresent("scm trigger");
@@ -1503,9 +1504,11 @@ public class ProjectAcceptanceTest extends ProjectAcceptanceTestBase
         assertTableRowsEqual("resources_" + stage, 2, resourceRows);
     }
 
-    private String[] createBuildSpecRow(String name, String timeout)
+    private String[] createBuildSpecRow(String name, boolean isDefault)
     {
-        return new String[]{name, timeout, "trigger", "edit", "delete"};
+        String def = isDefault ? "true" : "false                                        [make default]";
+        String del = isDefault ? "default spec" : "delete";
+        return new String[]{name, def, "trigger", "edit", del};
     }
 
     private void assertProjectTriggerTable(String[][] rows)

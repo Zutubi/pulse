@@ -1,9 +1,8 @@
 package com.zutubi.pulse.web.project;
 
 import com.zutubi.pulse.model.BuildSpecification;
-import com.zutubi.pulse.model.ProjectManager;
 import com.zutubi.pulse.model.Project;
-import com.zutubi.pulse.model.persistence.BuildSpecificationDao;
+import com.zutubi.pulse.model.ProjectManager;
 import com.zutubi.pulse.web.ActionSupport;
 
 /**
@@ -14,10 +13,7 @@ public class DeleteBuildSpecificationAction extends ActionSupport
 {
     private long id;
     private long projectId;
-    private BuildSpecification specification;
-    private BuildSpecificationDao buildSpecificationDao;
     private ProjectManager projectManager;
-    private Project project;
 
     public long getId()
     {
@@ -39,30 +35,24 @@ public class DeleteBuildSpecificationAction extends ActionSupport
         this.projectId = projectId;
     }
 
-    public void validate()
+    public String execute()
     {
-        specification = buildSpecificationDao.findById(id);
-        if (specification == null)
-        {
-            addActionError("Unknown specification [" + id + "]");
-        }
-
-        project = projectManager.getProject(projectId);
+        Project project = projectManager.getProject(projectId);
         if (project == null)
         {
             addActionError("Unknown project [" + id + "]");
+            return ERROR;
         }
-    }
 
-    public String execute()
-    {
+        BuildSpecification specification = project.getBuildSpecification(id);
+        if (specification == null)
+        {
+            addActionError("Unknown specification [" + id + "]");
+            return ERROR;
+        }
+
         projectManager.deleteBuildSpecification(project, id);
         return SUCCESS;
-    }
-
-    public void setBuildSpecificationDao(BuildSpecificationDao buildSpecificationDao)
-    {
-        this.buildSpecificationDao = buildSpecificationDao;
     }
 
     public void setProjectManager(ProjectManager projectManager)

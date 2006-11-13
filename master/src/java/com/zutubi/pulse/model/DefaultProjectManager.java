@@ -93,6 +93,17 @@ public class DefaultProjectManager implements ProjectManager
         buildSpecificationDao.save(specification);
     }
 
+    public void setDefaultBuildSpecification(Project project, long specId)
+    {
+        BuildSpecification spec = project.getBuildSpecification(specId);
+        if(spec == null)
+        {
+            throw new IllegalArgumentException("Unknown build specificaiton [" + specId + "]");
+        }
+
+        project.setDefaultSpecification(spec);
+    }
+
     private void deleteProject(Project entity)
     {
         try
@@ -297,11 +308,16 @@ public class DefaultProjectManager implements ProjectManager
     public void deleteBuildSpecification(Project project, long specId)
     {
         project = projectDao.findById(project.getId());
-        BuildSpecification spec = buildSpecificationDao.findById(specId);
+        BuildSpecification spec = project.getBuildSpecification(specId);
 
         if (spec == null)
         {
-            throw new PulseRuntimeException("Unknown build specification [" + specId + "]");
+            throw new IllegalArgumentException("Unknown build specification [" + specId + "]");
+        }
+
+        if(project.getDefaultSpecification().equals(spec))
+        {
+            throw new IllegalArgumentException("The default build specification cannot be deleted");
         }
 
         List<Trigger> triggers = triggerDao.findByProject(project.getId());
@@ -412,6 +428,7 @@ public class DefaultProjectManager implements ProjectManager
 
         BuildSpecification buildSpec = new BuildSpecification("default");
         project.addBuildSpecification(buildSpec);
+        project.setDefaultSpecification(buildSpec);
         project.addCleanupRule(new CleanupRule(true, null, DEFAULT_WORK_DIR_BUILDS, CleanupRule.CleanupUnit.BUILDS));
 
         projectDao.save(project);

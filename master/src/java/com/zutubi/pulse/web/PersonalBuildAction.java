@@ -1,5 +1,6 @@
 package com.zutubi.pulse.web;
 
+import com.opensymphony.util.TextUtils;
 import com.opensymphony.webwork.ServletActionContext;
 import com.opensymphony.webwork.dispatcher.multipart.MultiPartRequestWrapper;
 import com.opensymphony.xwork.ActionContext;
@@ -99,7 +100,16 @@ public class PersonalBuildAction extends ActionSupport
             return ERROR;
         }
 
-        BuildSpecification spec = p.getBuildSpecification(specification);
+        BuildSpecification spec;
+        if(TextUtils.stringSet(specification))
+        {
+            spec = p.getBuildSpecification(specification);
+        }
+        else
+        {
+            spec = p.getDefaultSpecification();
+        }
+        
         if(spec == null)
         {
             errorMessage = "Unknown build specification '" + specification + "'";

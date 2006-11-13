@@ -76,6 +76,8 @@ public class PersonalBuildConfig implements Config
             defaults.setProperty(PROPERTY_PULSE_USER, userName);
         }
 
+        defaults.setProperty(PROPERTY_SPECIFICATION, "");
+
         return defaults;
     }
 

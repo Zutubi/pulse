@@ -136,7 +136,7 @@
                     #headingRow("project.buildspecs" 5)
                     <tr>
                         #contentHeading("buildspec.name" 1)
-                        #contentHeading("buildspec.timeout" 1)
+                        #contentHeading("buildspec.default" 1)
 #acl("domainObject=project" "hasPermission=4,1")
                         #contentHeading("actions" 3)
 #end
@@ -146,11 +146,24 @@
         #set($confirmMessage = $action.getText("buildspec.confirm.delete", [$buildSpec.name]))
                     <tr>
                         #dynamicCell($buildSpec.name)
-                        #dynamicCell($buildSpec.prettyTimeout)
+        #if($action.isDefault($buildSpec))
+                        #contentCell("buildspec.is.default")
+        #else
+                        <td class="content">
+                            #wwtext("name=buildspec.not.default")
+            #acl("domainObject=project" "hasPermission=4,1")
+                            [<a href="setDefaultBuildSpecification.action?projectId=$project.id&amp;id=$buildSpec.id">#wwtext("name=buildspec.make.default")</a>]
+            #end
+                        </td>
+        #end
         #acl("domainObject=project" "hasPermission=4,1")
                         #actionCell("buildspec.trigger" "triggerBuild.action?id=$buildSpec.id&amp;projectId=$project.id" "lightning.gif")
                         #editCell("viewBuildSpecification.action?projectId=$project.id&amp;id=$buildSpec.id" "edit_$!webwork.htmlEncode($buildSpec.name)")
-                        #deleteCell("delete_$!webwork.htmlEncode($buildSpec.name)" "deleteBuildSpecification.action?projectId=$project.id&amp;id=$buildSpec.id" $confirmMessage )
+            #if($action.isDefault($buildSpec))
+                        #contentCell("buildspec.cannot.delete.default")
+            #else
+                        #deleteCell("delete_$!webwork.htmlEncode($buildSpec.name)" "deleteBuildSpecification.action?projectId=$project.id&amp;id=$buildSpec.id" $confirmMessage)
+            #end
         #end
                     </tr>
     #end

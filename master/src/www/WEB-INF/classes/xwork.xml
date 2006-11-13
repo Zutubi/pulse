@@ -732,6 +732,11 @@
             <result name="success" type="redirect">/viewBuildSpecification.action?id=${id}&amp;projectId=${projectId}</result>
         </action>
 
+        <action name="setDefaultBuildSpecification" class="com.zutubi.pulse.web.project.SetDefaultBuildSpecificationAction">
+            <result name="success" type="redirect">/configureProject.action?id=${projectId}</result>
+            <result name="error" type="velocity">generic-error.vm</result>
+        </action>
+
         <action name="deleteBuildSpecification" class="com.zutubi.pulse.web.project.DeleteBuildSpecificationAction">
             <result name="success" type="redirect">/configureProject.action?id=${projectId}</result>
             <result name="error" type="velocity">generic-error.vm</result>

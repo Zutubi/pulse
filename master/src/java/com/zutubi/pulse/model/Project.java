@@ -46,6 +46,7 @@ public class Project extends Entity implements AclObjectIdentity, AclObjectIdent
     private long nextBuildNumber = 1;
 
     private List<BuildSpecification> buildSpecifications;
+    private BuildSpecification defaultSpecification;
 
     private List<ProjectAclEntry> aclEntries;
 
@@ -95,7 +96,13 @@ public class Project extends Entity implements AclObjectIdentity, AclObjectIdent
         copy.buildSpecifications = new LinkedList<BuildSpecification>();
         for(BuildSpecification spec: buildSpecifications)
         {
-            copy.buildSpecifications.add(spec.copy());
+            BuildSpecification specCopy = spec.copy();
+            copy.buildSpecifications.add(specCopy);
+
+            if(spec.equals(defaultSpecification))
+            {
+                copy.defaultSpecification = specCopy;
+            }
         }
 
         copy.postBuildActions = new LinkedList<PostBuildAction>();
@@ -232,6 +239,16 @@ public class Project extends Entity implements AclObjectIdentity, AclObjectIdent
     public boolean remove(BuildSpecification buildSpecification)
     {
         return buildSpecifications.remove(buildSpecification);
+    }
+
+    public BuildSpecification getDefaultSpecification()
+    {
+        return defaultSpecification;
+    }
+
+    public void setDefaultSpecification(BuildSpecification defaultSpecification)
+    {
+        this.defaultSpecification = defaultSpecification;
     }
 
     public List<Long> getBuildSpecificationIds()

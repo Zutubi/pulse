@@ -24,6 +24,8 @@
             <one-to-many class="com.zutubi.pulse.model.BuildSpecification"/>
         </bag>
 
+        <many-to-one name="defaultSpecification" class="com.zutubi.pulse.model.BuildSpecification" column="DEFAULT_SPECIFICATION" lazy="false" cascade="none"/>
+
         <bag name="postBuildActions" cascade="all,delete-orphan" lazy="false">
             <key column="PROJECT_ID"/>
             <one-to-many class="com.zutubi.pulse.model.PostBuildAction"/>

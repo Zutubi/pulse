@@ -81,6 +81,11 @@ public class ConfigureProjectAction extends ProjectActionSupport
         return "";
     }
 
+    public boolean isDefault(BuildSpecification specification)
+    {
+        return project.getDefaultSpecification().equals(specification);
+    }
+
     public void validate()
     {
         if(id != 0)

@@ -262,8 +262,8 @@ public class ProjectWizardAcceptanceTest extends BaseAcceptanceTestCase
 
         assertTablePresent("project.buildspecs");
         assertTableRowsEqual("project.buildspecs", 1, new String[][]{
-                new String[]{"name", "timeout", "actions", "actions", "actions"},
-                new String[]{"default", "[never]", "trigger", "edit", "delete"},
+                new String[]{"name", "default", "actions", "actions", "actions"},
+                new String[]{"default", "true", "trigger", "edit", "default spec"},
                 new String[]{"add new build specification", "add new build specification",
                         "add new build specification", "add new build specification",
                         "add new build specification"}

@@ -37,6 +37,9 @@ public interface ProjectManager extends EntityManager<Project>
 
     void save(BuildSpecification specification);
 
+    @Secured({"ACL_PROJECT_WRITE"})
+    void setDefaultBuildSpecification(Project project, long specId);
+
     /**
      * Deletes a build specification *and* all triggers that refer to it.
      *
