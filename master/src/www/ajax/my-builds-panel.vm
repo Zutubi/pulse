@@ -33,7 +33,7 @@
     #end
 #else
         <tr>
-            <td class="content" colspan="13">#wwtext("name=my,builds.none")
+            <td class="content" colspan="13">#wwtext("name=my.builds.none")
         </tr>
 #end
     </table>
