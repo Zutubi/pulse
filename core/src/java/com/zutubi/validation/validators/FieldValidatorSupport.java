@@ -2,7 +2,6 @@ package com.zutubi.validation.validators;
 
 import com.zutubi.validation.FieldValidator;
 import com.zutubi.validation.ValidationContext;
-import com.zutubi.validation.ShortCircuitableValidator;
 
 /**
  * <class-comment/>

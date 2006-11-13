@@ -263,9 +263,9 @@ public abstract class BaseAcceptanceTestCase extends ExtendedWebTestCase
 
         // fill in the blanks.
         BaseForm form = null;
-        if (type.equals("standard"))
+        if (type.equals("link"))
         {
-            form = new AddCommitMessageTransformerWizard.Standard(tester);
+            form = new AddCommitMessageTransformerWizard.Link(tester);
         }
         else if (type.equals("custom"))
         {

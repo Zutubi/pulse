@@ -1,18 +1,15 @@
 package com.zutubi.validation.validators;
 
 import com.zutubi.validation.ValidationException;
-import com.zutubi.validation.ShortCircuitableValidator;
 
-import java.util.regex.Pattern;
 import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * <class-comment/>
  */
 public class RegexValidator extends FieldValidatorSupport
 {
-    private static final String INVALID = ".invalid";
-
     private String pattern = ".";
 
     private boolean caseSensitive = true;
@@ -46,7 +43,7 @@ public class RegexValidator extends FieldValidatorSupport
             return;
         }
 
-        Pattern pattern = null;
+        Pattern pattern;
         if (isCaseSensitive())
         {
             pattern = Pattern.compile(getPattern());

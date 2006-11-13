@@ -4,7 +4,7 @@ import com.zutubi.pulse.core.model.Changelist;
 import com.zutubi.pulse.core.model.Revision;
 import com.zutubi.pulse.model.CommitMessageTransformer;
 import com.zutubi.pulse.test.PulseTestCase;
-import com.zutubi.pulse.committransformers.StandardCommitMessageTransformer;
+import com.zutubi.pulse.committransformers.LinkCommitMessageTransformer;
 
 import java.util.Arrays;
 import java.util.LinkedList;
@@ -20,11 +20,11 @@ public class CommitMessageHelperTest extends PulseTestCase
     {
         super.setUp();
         List<CommitMessageTransformer> transformers = new LinkedList<CommitMessageTransformer>();
-        transformers.add(new StandardCommitMessageTransformer("foo", "foo+", "http://foo/$0"));
-        transformers.add(new StandardCommitMessageTransformer("bug", "bug ([0-9]+)", "http://bugs/$1"));
-        transformers.add(new StandardCommitMessageTransformer("bad", "bad", "http://$1"));
-        CommitMessageTransformer limited = new StandardCommitMessageTransformer("limited", "limited", "http://lim/");
-        limited.setProjects(Arrays.asList(new Long[] { Long.valueOf(1), Long.valueOf(3) }));
+        transformers.add(new LinkCommitMessageTransformer("foo", "foo+", "http://foo/$0"));
+        transformers.add(new LinkCommitMessageTransformer("bug", "bug ([0-9]+)", "http://bugs/$1"));
+        transformers.add(new LinkCommitMessageTransformer("bad", "bad", "http://$1"));
+        CommitMessageTransformer limited = new LinkCommitMessageTransformer("limited", "limited", "http://lim/");
+        limited.setProjects(Arrays.asList(new Long[] {(long) 1, (long) 3}));
         transformers.add(limited);
         helper = new CommitMessageHelper(transformers);
     }
@@ -67,7 +67,7 @@ public class CommitMessageHelperTest extends PulseTestCase
 
     public void testTrimmedLink()
     {
-        assertReplacement("bug 123", "bug...", 0, 6);
+        assertReplacement("bug 123", "<a href='http://bugs/123'>bug...</a>", 0, 6);
     }
 
     public void testTrimmedLinkJustFits()

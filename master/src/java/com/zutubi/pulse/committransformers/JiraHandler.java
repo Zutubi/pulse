@@ -1,6 +1,7 @@
 package com.zutubi.pulse.committransformers;
 
 import com.zutubi.pulse.form.descriptor.annotation.Form;
+import com.zutubi.pulse.form.descriptor.annotation.Text;
 import com.zutubi.validation.annotations.Required;
 
 /**
@@ -12,7 +13,7 @@ public class JiraHandler implements CommitMessageHandler
     private String name;
     private String url;
 
-    @Required
+    @Required @Text(size=50)
     public String getName()
     {
         return name;
@@ -23,7 +24,7 @@ public class JiraHandler implements CommitMessageHandler
         this.name = name;
     }
 
-    @Required
+    @Required @Text(size=50)
     public String getUrl()
     {
         return url;

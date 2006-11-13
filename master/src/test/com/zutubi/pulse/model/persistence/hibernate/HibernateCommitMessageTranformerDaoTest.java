@@ -3,7 +3,7 @@ package com.zutubi.pulse.model.persistence.hibernate;
 import com.zutubi.pulse.model.CommitMessageTransformer;
 import com.zutubi.pulse.model.Project;
 import com.zutubi.pulse.model.persistence.CommitMessageTransformerDao;
-import com.zutubi.pulse.committransformers.StandardCommitMessageTransformer;
+import com.zutubi.pulse.committransformers.LinkCommitMessageTransformer;
 
 import java.util.Arrays;
 import java.util.List;
@@ -29,7 +29,7 @@ public class HibernateCommitMessageTranformerDaoTest extends MasterPersistenceTe
 
     public void testSaveAndLoad()
     {
-        CommitMessageTransformer transformer = new StandardCommitMessageTransformer("name");
+        CommitMessageTransformer transformer = new LinkCommitMessageTransformer("name");
         commitMessageTransformerDao.save(transformer);
         commitAndRefreshTransaction();
 
@@ -43,9 +43,9 @@ public class HibernateCommitMessageTranformerDaoTest extends MasterPersistenceTe
 
     public void testFindByProject()
     {
-        CommitMessageTransformer transformer1 = new StandardCommitMessageTransformer("1");
-        CommitMessageTransformer transformer2 = new StandardCommitMessageTransformer("2");
-        CommitMessageTransformer transformer3 = new StandardCommitMessageTransformer("3");
+        CommitMessageTransformer transformer1 = new LinkCommitMessageTransformer("1");
+        CommitMessageTransformer transformer2 = new LinkCommitMessageTransformer("2");
+        CommitMessageTransformer transformer3 = new LinkCommitMessageTransformer("3");
         transformer1.setProjects(Arrays.asList(new Long[] {Long.valueOf(1), Long.valueOf(2)}));
         transformer2.setProjects(Arrays.asList(new Long[] {Long.valueOf(2), Long.valueOf(3)}));
         transformer3.setProjects(Arrays.asList(new Long[] {Long.valueOf(1), Long.valueOf(3)}));
@@ -66,8 +66,8 @@ public class HibernateCommitMessageTranformerDaoTest extends MasterPersistenceTe
 
     public void testFindByName()
     {
-        CommitMessageTransformer transformer1 = new StandardCommitMessageTransformer("1");
-        CommitMessageTransformer transformer2 = new StandardCommitMessageTransformer("2");
+        CommitMessageTransformer transformer1 = new LinkCommitMessageTransformer("1");
+        CommitMessageTransformer transformer2 = new LinkCommitMessageTransformer("2");
 
         commitMessageTransformerDao.save(transformer1);
         commitMessageTransformerDao.save(transformer2);

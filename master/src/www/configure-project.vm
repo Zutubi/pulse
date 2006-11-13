@@ -168,10 +168,11 @@
                 <!-- Transformers -->
                 
                 <table id="project.transformers" class="fill-content">
-                    #headingRow("project.commit.message.transformers" 4)
+                    #headingRow("project.commit.message.transformers" 5)
                     <tr>
                         #contentHeading("commit.message.transformer.name" 1)
                         #contentHeading("commit.message.transformer.type" 1)
+                        #contentHeading("commit.message.transformer.projects" 1)
 #acl("domainObject=project" "hasPermission=4,1")
                         #contentHeading("actions" 2)
 #end
@@ -182,6 +183,9 @@
                     <tr>
                         #dynamicCell($transformer.name)
                         #dynamicCell($transformer.type)
+                        <td class="content">
+                            $action.getText("commit.message.transformers.count", [$transformer.projects.size()])
+                        </td>
 
         #acl("domainObject=project" "hasPermission=4,1")
                         #editCell("editCommitMessage.action?id=$transformer.id&projectId=$project.id" "edit_$!webwork.htmlEncode($transformer.name)")

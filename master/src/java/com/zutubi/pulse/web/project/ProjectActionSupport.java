@@ -19,7 +19,7 @@ import java.util.List;
  */
 public class ProjectActionSupport extends ActionSupport
 {
-    protected CommitMessageTransformerManager commitMessageTransformerManager;
+    protected CommitMessageTransformerManager transformerManager;
     protected ProjectManager projectManager;
     protected BuildManager buildManager;
     protected ScmManager scmManager;
@@ -238,31 +238,32 @@ public class ProjectActionSupport extends ActionSupport
         this.userManager = userManager;
     }
 
-    public void setCommitMessageTransformerManager(CommitMessageTransformerManager commitMessageTransformerManager)
+    public void setCommitMessageTransformerManager(CommitMessageTransformerManager transformerManager)
     {
-        this.commitMessageTransformerManager = commitMessageTransformerManager;
+        this.transformerManager = transformerManager;
     }
 
     public CommitMessageTransformerManager getTransformerManager()
     {
-        return commitMessageTransformerManager;
+        return transformerManager;
     }
 
     public String transformComment(Changelist changelist)
     {
-        if(commitMessageHelper == null)
-        {
-            commitMessageHelper = new CommitMessageHelper(getTransformerManager().getCommitMessageTransformers());
-        }
-        return commitMessageHelper.applyTransforms(changelist);
+        return getHelper().applyTransforms(changelist);
     }
 
     public String transformComment(Changelist changelist, int maxChars)
+    {
+        return getHelper().applyTransforms(changelist, maxChars);
+    }
+
+    protected CommitMessageHelper getHelper()
     {
         if(commitMessageHelper == null)
         {
             commitMessageHelper = new CommitMessageHelper(getTransformerManager().getCommitMessageTransformers());
         }
-        return commitMessageHelper.applyTransforms(changelist, maxChars);
+        return commitMessageHelper;
     }
 }

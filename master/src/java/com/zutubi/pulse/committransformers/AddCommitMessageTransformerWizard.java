@@ -4,7 +4,6 @@ import com.zutubi.pulse.core.ObjectFactory;
 import com.zutubi.pulse.model.*;
 import com.zutubi.pulse.wizard.Wizard;
 import com.zutubi.pulse.wizard.WizardTransition;
-import com.zutubi.pulse.notifications.NotificationHandler;
 import com.zutubi.validation.Validateable;
 import com.zutubi.validation.ValidationContext;
 
@@ -61,10 +60,10 @@ public class AddCommitMessageTransformerWizard implements Wizard, Validateable
     public void doFinish()
     {
         Object o = handlers.get(selectState.getType());
-        if (o instanceof StandardHandler)
+        if (o instanceof LinkHandler)
         {
-            StandardHandler handler = (StandardHandler)o;
-            StandardCommitMessageTransformer transformer = new StandardCommitMessageTransformer();
+            LinkHandler handler = (LinkHandler)o;
+            LinkCommitMessageTransformer transformer = new LinkCommitMessageTransformer();
             transformer.setExpression(handler.getExpression());
             transformer.setLink(handler.getLink());
             transformer.setName(handler.getName());

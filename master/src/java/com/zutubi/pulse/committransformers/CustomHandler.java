@@ -1,7 +1,9 @@
 package com.zutubi.pulse.committransformers;
 
 import com.zutubi.validation.annotations.Required;
+import com.zutubi.validation.annotations.Pattern;
 import com.zutubi.pulse.form.descriptor.annotation.Form;
+import com.zutubi.pulse.form.descriptor.annotation.Text;
 
 /**
  * <class comment/>
@@ -13,7 +15,7 @@ public class CustomHandler implements CommitMessageHandler
     private String expression;
     private String replacement;
 
-    @Required
+    @Required @Text(size=50)
     public String getName()
     {
         return name;
@@ -24,7 +26,7 @@ public class CustomHandler implements CommitMessageHandler
         this.name = name;
     }
 
-    @Required
+    @Required @Pattern @Text(size=50)
     public String getExpression()
     {
         return expression;
@@ -35,7 +37,7 @@ public class CustomHandler implements CommitMessageHandler
         this.expression = expression;
     }
 
-    @Required
+    @Text(size=50)
     public String getReplacement()
     {
         return replacement;

@@ -1,14 +1,8 @@
 package com.zutubi.validation.validators;
 
-import junit.framework.TestCase;
-import com.zutubi.validation.ValidationException;
 import com.zutubi.validation.DelegatingValidationContext;
-import com.zutubi.validation.i18n.TextProvider;
-import com.zutubi.validation.i18n.TextProviderSupport;
 import com.zutubi.validation.i18n.InMemoryTextProvider;
-
-import java.util.Map;
-import java.util.HashMap;
+import junit.framework.TestCase;
 
 /**
  * <class-comment/>

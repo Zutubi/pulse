@@ -26,13 +26,13 @@ public class CommitMessageTransformerAcceptanceTest extends BaseAcceptanceTestCa
         assertAndClick("commit.message.transformer.add");
 
         // select a type.
-        selectCommitMessageTransformerType("standard");
+        selectCommitMessageTransformerType("link");
 
         // fill in the blanks.
-        AddCommitMessageTransformerWizard.Standard standard = new AddCommitMessageTransformerWizard.Standard(tester);
-        standard.assertFormPresent();
-        standard.finishFormElements("name", "expression", "link");
-        standard.assertFormNotPresent();
+        AddCommitMessageTransformerWizard.Link link = new AddCommitMessageTransformerWizard.Link(tester);
+        link.assertFormPresent();
+        link.finishFormElements("name", "expression", "link");
+        link.assertFormNotPresent();
 
         // ensure that the transformer is listed.
         assertLinkPresent("edit_name");
@@ -44,13 +44,13 @@ public class CommitMessageTransformerAcceptanceTest extends BaseAcceptanceTestCa
         assertAndClick("commit.message.transformer.add");
 
         // select a type.
-        selectCommitMessageTransformerType("standard");
+        selectCommitMessageTransformerType("link");
 
         // fill in the blanks.
-        AddCommitMessageTransformerWizard.Standard standard = new AddCommitMessageTransformerWizard.Standard(tester);
-        standard.assertFormPresent();
-        standard.cancelFormElements("name", "expression", "link");
-        standard.assertFormNotPresent();
+        AddCommitMessageTransformerWizard.Link link = new AddCommitMessageTransformerWizard.Link(tester);
+        link.assertFormPresent();
+        link.cancelFormElements("name", "expression", "link");
+        link.assertFormNotPresent();
 
         // ensure that the transformer has is not listed.
         assertLinkNotPresent("edit_name");
@@ -62,18 +62,18 @@ public class CommitMessageTransformerAcceptanceTest extends BaseAcceptanceTestCa
         assertAndClick("commit.message.transformer.add");
 
         // select type STANDARD
-        selectCommitMessageTransformerType("standard");
+        selectCommitMessageTransformerType("link");
 
         // check validation.
-        AddCommitMessageTransformerWizard.Standard standard = new AddCommitMessageTransformerWizard.Standard(tester);
-        standard.assertFormPresent();
-        standard.finishFormElements("", "expression", "link");
-        standard.assertFormPresent();
-        standard.finishFormElements("name", "", "link");
-        standard.assertFormPresent();
-        standard.finishFormElements("name", "expression", "");
-        standard.assertFormPresent();
-        standard.previous();
+        AddCommitMessageTransformerWizard.Link link = new AddCommitMessageTransformerWizard.Link(tester);
+        link.assertFormPresent();
+        link.finishFormElements("", "expression", "link");
+        link.assertFormPresent();
+        link.finishFormElements("name", "", "link");
+        link.assertFormPresent();
+        link.finishFormElements("name", "expression", "");
+        link.assertFormPresent();
+        link.previous();
 
         // select type CUSTOM
         selectCommitMessageTransformerType("custom");
@@ -84,8 +84,6 @@ public class CommitMessageTransformerAcceptanceTest extends BaseAcceptanceTestCa
         custom.finishFormElements("", "expression", "replacement");
         custom.assertFormPresent();
         custom.finishFormElements("name", "", "replacement");
-        custom.assertFormPresent();
-        custom.finishFormElements("name", "expression", "");
         custom.assertFormPresent();
         custom.previous();
 
@@ -104,35 +102,35 @@ public class CommitMessageTransformerAcceptanceTest extends BaseAcceptanceTestCa
     public void testEditExistingTransformer()
     {
         // create transformer.
-        createCommitMessageTransformer("standard", "name", "expression", "link");
+        createCommitMessageTransformer("link", "name", "expression", "link");
 
         // click edit link.
         assertAndClick("edit_name");
 
         // ensure values as expected.
-        AddCommitMessageTransformerWizard.Standard standard = new AddCommitMessageTransformerWizard.Standard(tester);
-        standard.assertFormPresent();
-        standard.assertFormElements("name", "expression", "link");
+        AddCommitMessageTransformerWizard.Link link = new AddCommitMessageTransformerWizard.Link(tester);
+        link.assertFormPresent();
+        link.assertFormElements("name", "expression", "link");
 
         // change the details.
-        standard.saveFormElements("name1", "expression1", "link1");
-        standard.assertFormNotPresent();
+        link.saveFormElements("name1", "expression1", "link1");
+        link.assertFormNotPresent();
 
         // ensure name change as expected.
         assertAndClick("edit_name1");
 
         // select edit again
         // ensure values have been updated.
-        standard.assertFormElements("name1", "expression1", "link1");
+        link.assertFormElements("name1", "expression1", "link1");
 
         // click cancel.
-        standard.cancel();
+        link.cancel();
     }
 
     public void testDeleteExistingTransformer()
     {
         // create transformer
-        createCommitMessageTransformer("standard", "name", "expression", "link");
+        createCommitMessageTransformer("link", "name", "expression", "link");
         assertLinkPresent("edit_name");
 
         // click the delete link.
@@ -145,7 +143,7 @@ public class CommitMessageTransformerAcceptanceTest extends BaseAcceptanceTestCa
     public void testAssignTransformerToProject()
     {
         // create a transformer.
-        createCommitMessageTransformer("standard", "name", "expression", "link");
+        createCommitMessageTransformer("link", "name", "expression", "link");
 
         // click the projects link.
         assertAndClick("projects_name");

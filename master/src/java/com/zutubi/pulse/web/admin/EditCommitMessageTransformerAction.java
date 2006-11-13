@@ -66,12 +66,12 @@ public class EditCommitMessageTransformerAction extends FormAction  implements V
     public Object doLoad()
     {
         CommitMessageTransformer transformer = transformerManager.getById(getId());
-        if (transformer instanceof StandardCommitMessageTransformer)
+        if (transformer instanceof LinkCommitMessageTransformer)
         {
-            StandardHandler handler = new StandardHandler();
+            LinkHandler handler = new LinkHandler();
             handler.setName(transformer.getName());
-            handler.setExpression(((StandardCommitMessageTransformer)transformer).getExpression());
-            handler.setLink(((StandardCommitMessageTransformer)transformer).getLink());
+            handler.setExpression(((LinkCommitMessageTransformer)transformer).getExpression());
+            handler.setLink(((LinkCommitMessageTransformer)transformer).getLink());
             return handler;
         }
         else if (transformer instanceof JiraCommitMessageTransformer)
@@ -95,10 +95,10 @@ public class EditCommitMessageTransformerAction extends FormAction  implements V
     public void doSave(Object obj)
     {
         CommitMessageTransformer transformer = transformerManager.getById(getId());
-        if (obj instanceof StandardHandler)
+        if (obj instanceof LinkHandler)
         {
-            StandardHandler handler = (StandardHandler) obj;
-            StandardCommitMessageTransformer standardTransformer = (StandardCommitMessageTransformer) transformer;
+            LinkHandler handler = (LinkHandler) obj;
+            LinkCommitMessageTransformer standardTransformer = (LinkCommitMessageTransformer) transformer;
             standardTransformer.setName(handler.getName());
             standardTransformer.setExpression(handler.getExpression());
             standardTransformer.setLink(handler.getLink());

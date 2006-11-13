@@ -36,7 +36,8 @@
                     <tr>
                         #contentHeading("commit.message.transformer.name" 1)
                         #contentHeading("commit.message.transformer.type" 1)
-                        #contentHeading("actions" 3)
+                        #contentHeading("commit.message.transformer.projects" 1)
+                        #contentHeading("actions" 2)
                     </tr>
 #if($commitMessageTransformers.size() > 0)
     #foreach($transformer in $commitMessageTransformers)
@@ -44,8 +45,10 @@
                     <tr>
                         #dynamicCell($transformer.name)
                         #dynamicCell($transformer.type)
+                        <td class="content">
+                            <a id="projects_$!webwork.htmlEncode($transformer.name)" href="editCommitMessageProjects!input.action?id=$transformer.id">$action.getText("commit.message.transformers.count", [$transformer.projects.size()])</a>
+                        </td>
                         #editCell("editCommitMessage.action?id=$transformer.id" "edit_$!webwork.htmlEncode($transformer.name)")
-                        #linkCell("projects_$!webwork.htmlEncode($transformer.name)" "projects" "editCommitMessageProjects!input.action?id=$transformer.id")
                         #deleteCell("delete_$!webwork.htmlEncode($transformer.name)" "deleteCommitMessageLink.action?id=$transformer.id" $confirmMessage)
                     </tr>
     #end

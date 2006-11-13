@@ -2,6 +2,7 @@ package com.zutubi.pulse.model;
 
 import com.zutubi.pulse.core.model.Changelist;
 import com.zutubi.pulse.core.model.Entity;
+import com.zutubi.pulse.committransformers.CommitMessageBuilder;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -88,7 +89,7 @@ public abstract class CommitMessageTransformer extends Entity implements NamedEn
         return false;
     }
 
-    public abstract String transform(String message);
+    public abstract CommitMessageBuilder transform(CommitMessageBuilder builder);
 
     public abstract String getType();
 }

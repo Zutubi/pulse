@@ -4,7 +4,7 @@ import com.zutubi.pulse.bootstrap.ComponentContext;
 import com.zutubi.pulse.util.JDBCUtils;
 import com.zutubi.pulse.util.PropertiesType;
 import com.zutubi.pulse.upgrade.UpgradeException;
-import com.zutubi.pulse.committransformers.StandardCommitMessageTransformer;
+import com.zutubi.pulse.committransformers.LinkCommitMessageTransformer;
 import org.apache.commons.dbcp.BasicDataSource;
 
 import java.sql.*;
@@ -82,9 +82,9 @@ public class CommitMessageLinkMigrationUpgradeTaskTest extends BaseUpgradeTaskTe
 
             PropertiesType type = new PropertiesType();
             Properties props = (Properties) type.fromStringValue(rs.getString("PROPERTIES"));
-            assertEquals(expression, props.getProperty(StandardCommitMessageTransformer.EXPRESSION_PROPERTY));
-            assertEquals(link, props.getProperty(StandardCommitMessageTransformer.LINK_PROPERTY));
-            assertEquals("STANDARD", rs.getString("TYPE"));
+            assertEquals(expression, props.getProperty(LinkCommitMessageTransformer.EXPRESSION_PROPERTY));
+            assertEquals(link, props.getProperty(LinkCommitMessageTransformer.LINK_PROPERTY));
+            assertEquals("LINK", rs.getString("TYPE"));
         }
         finally
         {

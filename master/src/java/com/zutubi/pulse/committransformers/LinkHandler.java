@@ -1,23 +1,21 @@
 package com.zutubi.pulse.committransformers;
 
 import com.zutubi.pulse.form.descriptor.annotation.Form;
-import com.zutubi.pulse.util.logging.Logger;
+import com.zutubi.pulse.form.descriptor.annotation.Text;
+import com.zutubi.validation.annotations.Pattern;
 import com.zutubi.validation.annotations.Required;
-
-import java.util.regex.Pattern;
-import java.util.regex.Matcher;
 
 /**
  * <class comment/>
  */
 @Form(fieldOrder = {"name", "expression", "link"})
-public class StandardHandler implements CommitMessageHandler
+public class LinkHandler implements CommitMessageHandler
 {
     private String name;
     private String expression;
     private String link;
     
-    @Required
+    @Required @Text(size=50)
     public String getName()
     {
         return name;
@@ -28,7 +26,7 @@ public class StandardHandler implements CommitMessageHandler
         this.name = name;
     }
 
-    @Required
+    @Required @Pattern @Text(size=50)
     public String getExpression()
     {
         return expression;
@@ -39,7 +37,7 @@ public class StandardHandler implements CommitMessageHandler
         this.expression = expression;
     }
 
-    @Required
+    @Required @Text(size=50)
     public String getLink()
     {
         return link;

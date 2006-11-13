@@ -106,7 +106,7 @@ public class ConfigureProjectAction extends ProjectActionSupport
         id = project.getId();
         triggers = getScheduler().getTriggers(id);
 
-        transformers = commitMessageTransformerManager.getByProject(project);
+        transformers = transformerManager.getByProject(project);
 
         return SUCCESS;
     }

@@ -30,16 +30,16 @@ public class AddCommitMessageTransformerWizard
         }
     }
 
-    public static class Standard extends BaseForm
+    public static class Link extends BaseForm
     {
-        public Standard(WebTester tester)
+        public Link(WebTester tester)
         {
             super(tester);
         }
 
         public String getFormName()
         {
-            return "StandardHandler";
+            return "LinkHandler";
         }
 
         public String[] getFieldNames()

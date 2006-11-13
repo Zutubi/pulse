@@ -149,37 +149,23 @@ public class DashboardAction extends ActionSupport
         return buildManager.getBuildResult(id);
     }
 
-    public void setProjectManager(ProjectManager projectManager)
-    {
-        this.projectManager = projectManager;
-    }
-
-    public void setBuildManager(BuildManager buildManager)
-    {
-        this.buildManager = buildManager;
-    }
-
-    public void setUserManager(UserManager userManager)
-    {
-        this.userManager = userManager;
-    }
-
     public String transformComment(Changelist changelist)
     {
-        if(commitMessageHelper == null)
-        {
-            commitMessageHelper = new CommitMessageHelper(commitMessageTransformerManager.getCommitMessageTransformers());
-        }
-        return commitMessageHelper.applyTransforms(changelist);
+        return getHelper().applyTransforms(changelist);
     }
 
     public String transformComment(Changelist changelist, int maxChars)
     {
+        return getHelper().applyTransforms(changelist, maxChars);
+    }
+
+    protected CommitMessageHelper getHelper()
+    {
         if(commitMessageHelper == null)
         {
             commitMessageHelper = new CommitMessageHelper(commitMessageTransformerManager.getCommitMessageTransformers());
         }
-        return commitMessageHelper.applyTransforms(changelist, maxChars);
+        return commitMessageHelper;
     }
 
     public String getChangeUrl()
@@ -208,11 +194,6 @@ public class DashboardAction extends ActionSupport
         changeUrl = null;
     }
 
-    public void setCommitMessageTransformerManager(CommitMessageTransformerManager commitMessageTransformerManager)
-    {
-        this.commitMessageTransformerManager = commitMessageTransformerManager;
-    }
-
     public boolean canWrite(Project project)
     {
         try
@@ -224,5 +205,45 @@ public class DashboardAction extends ActionSupport
         {
             return false;
         }
+    }
+
+    /**
+     * Required resource.
+     *
+     * @param projectManager instance
+     */
+    public void setProjectManager(ProjectManager projectManager)
+    {
+        this.projectManager = projectManager;
+    }
+
+    /**
+     * Required resource.
+     *
+     * @param buildManager instance
+     */
+    public void setBuildManager(BuildManager buildManager)
+    {
+        this.buildManager = buildManager;
+    }
+
+    /**
+     * Required resource.
+     *
+     * @param userManager instance
+     */
+    public void setUserManager(UserManager userManager)
+    {
+        this.userManager = userManager;
+    }
+
+    /**
+     * Required resource.
+     *
+     * @param transformerManager instance
+     */
+    public void setCommitMessageTransformerManager(CommitMessageTransformerManager transformerManager)
+    {
+        this.commitMessageTransformerManager = transformerManager;
     }
 }

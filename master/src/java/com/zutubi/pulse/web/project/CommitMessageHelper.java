@@ -1,9 +1,9 @@
 package com.zutubi.pulse.web.project;
 
-import com.opensymphony.util.TextUtils;
+import com.zutubi.pulse.committransformers.CommitMessageBuilder;
 import com.zutubi.pulse.core.model.Changelist;
 import com.zutubi.pulse.model.CommitMessageTransformer;
-import com.zutubi.pulse.util.StringUtils;
+import com.zutubi.pulse.util.logging.Logger;
 
 import java.util.List;
 
@@ -11,6 +11,8 @@ import java.util.List;
  */
 public class CommitMessageHelper
 {
+    private static final Logger LOG = Logger.getLogger(CommitMessageHelper.class);
+    
     private List<CommitMessageTransformer> transformers;
 
     public CommitMessageHelper(List<CommitMessageTransformer> transformers)
@@ -25,26 +27,36 @@ public class CommitMessageHelper
     
     public String applyTransforms(Changelist changelist, int limit)
     {
-        String result = changelist.getComment();
-        if(limit > 0)
+        String s = changelist.getComment();
+        try
         {
-            result = StringUtils.trimmedString(result, limit);
-        }
-        else
-        {
-            //CIB-726: attempt to limit lines to no more than 80 characters long.
-            result = StringUtils.wrapString(result, 80, null, false);
-        }
+            CommitMessageBuilder builder = new CommitMessageBuilder(s);
 
-        result = TextUtils.htmlEncode(result);
-        for(CommitMessageTransformer transformer: transformers)
-        {
-            if(transformer.appliesToChangelist(changelist))
+            for(CommitMessageTransformer transformer: transformers)
             {
-                result = transformer.transform(result);
+                if(transformer.appliesToChangelist(changelist))
+                {
+                    builder = transformer.transform(builder);
+                }
             }
-        }
 
-        return result;
+            if (limit > 0)
+            {
+                builder.trim(limit);
+            }
+            else
+            {
+                builder.wrap(80);
+            }
+
+            builder.encode();
+
+            return builder.toString();
+        }
+        catch (Exception e)
+        {
+            LOG.warning(String.format("Failed to process changelist comment. Cause: %s", e.getMessage()), e);
+            return s;
+        }
     }
 }

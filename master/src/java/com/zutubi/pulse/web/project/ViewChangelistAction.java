@@ -261,10 +261,8 @@ public class ViewChangelistAction extends ActionSupport
                 return result;
             }
         });
-
         return SUCCESS;
     }
-
 
     public String transformComment(Changelist changelist)
     {

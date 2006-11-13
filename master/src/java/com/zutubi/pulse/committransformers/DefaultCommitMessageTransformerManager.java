@@ -22,7 +22,7 @@ public class DefaultCommitMessageTransformerManager implements CommitMessageTran
     {
         transformerTypes.put("custom", CustomHandler.class);
         transformerTypes.put("jira", JiraHandler.class);
-        transformerTypes.put("standard", StandardHandler.class);
+        transformerTypes.put("link", LinkHandler.class);
     }
 
     public void save(CommitMessageTransformer entity)
