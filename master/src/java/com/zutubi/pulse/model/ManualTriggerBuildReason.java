@@ -26,6 +26,11 @@ public class ManualTriggerBuildReason extends AbstractBuildReason
         return username;
     }
 
+    /**
+     * Used by hibernate.
+     *
+     * @param username property value.
+     */
     private void setUsername(String username)
     {
         this.username = username;
