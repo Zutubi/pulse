@@ -99,5 +99,10 @@ public class ProjectQueueTest extends PulseTestCase
         {
             return "mock";
         }
+
+        public Object clone() throws CloneNotSupportedException
+        {
+            return null;
+        }
     }
 }
