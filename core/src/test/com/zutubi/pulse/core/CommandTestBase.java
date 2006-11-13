@@ -70,7 +70,7 @@ public abstract class CommandTestBase extends PulseTestCase
         FileInputStream is = null;
         try
         {
-            is = new FileInputStream(new File(outputDir, FileSystemUtils.composeFilename(ExecutableCommand.OUTPUT_NAME, "output.txt")));
+            is = new FileInputStream(new File(outputDir, FileSystemUtils.composeFilename(Command.OUTPUT_ARTIFACT_NAME, "output.txt")));
             String output = IOUtils.inputStreamToString(is);
             for (String content : contents)
             {

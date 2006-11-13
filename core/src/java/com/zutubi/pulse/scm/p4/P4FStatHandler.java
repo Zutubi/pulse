@@ -2,6 +2,7 @@ package com.zutubi.pulse.scm.p4;
 
 import com.zutubi.pulse.personal.PersonalBuildUI;
 import com.zutubi.pulse.scm.FileStatus;
+import com.zutubi.pulse.scm.SCMCancelledException;
 import com.zutubi.pulse.scm.SCMException;
 import com.zutubi.pulse.scm.WorkingCopyStatus;
 import static com.zutubi.pulse.scm.p4.P4Constants.*;
@@ -72,6 +73,10 @@ public class P4FStatHandler extends P4ErrorDetectingHandler
         {
             handleItem();
         }
+    }
+
+    public void checkCancelled() throws SCMCancelledException
+    {
     }
 
     private void handleItem()

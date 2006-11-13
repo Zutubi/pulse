@@ -236,7 +236,7 @@ public class CommandGroupTest extends PulseTestCase
         CommandResult result = new CommandResult("test");
         execute(group, result);
         assertEquals(ResultState.SUCCESS, result.getState());
-        StoredArtifact artifact = result.getArtifact(ExecutableCommand.OUTPUT_NAME);
+        StoredArtifact artifact = result.getArtifact(Command.OUTPUT_ARTIFACT_NAME);
         File outputFile = new File(outputDirectory, artifact.getFile().getPath());
         assertEquals(output, IOUtils.fileToString(outputFile));
 

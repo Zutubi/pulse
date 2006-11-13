@@ -74,9 +74,8 @@ public class RecipeProcessor
             CommandResult bootstrapResult = new CommandResult(bootstrapCommand.getName());
             File commandOutput = new File(paths.getOutputDir(), getCommandDirName(0, bootstrapResult));
 
-            executeCommand(request.getId(), recipeStartTime, bootstrapResult, paths, commandOutput, testResults, bootstrapCommand, capture, context);
-
-            if (bootstrapResult.succeeded())
+            if(executeCommand(request.getId(), recipeStartTime, bootstrapResult, paths, commandOutput, testResults, bootstrapCommand, capture, context) &&
+               bootstrapResult.succeeded())
             {
                 // Now we can load the recipe from the pulse file
                 PulseFile pulseFile = loadPulseFile(request, paths.getBaseDir(), resourceRepository, context);
@@ -152,17 +151,10 @@ public class RecipeProcessor
 
             File commandOutput = new File(paths.getOutputDir(), getCommandDirName(i, result));
 
-            runningLock.lock();
-            if (terminating)
+            if(!executeCommand(recipeId, recipeStartTime, result, paths, commandOutput, testResults, command, capture, context))
             {
-                runningLock.unlock();
                 return;
             }
-
-            runningCommand = command;
-            runningLock.unlock();
-
-            executeCommand(recipeId, recipeStartTime, result, paths, commandOutput, testResults, command, capture, context);
 
             switch (result.getState())
             {
@@ -174,8 +166,18 @@ public class RecipeProcessor
         }
     }
 
-    private void executeCommand(long recipeId, long recipeStartTime, CommandResult result, RecipePaths paths, File commandOutput, TestSuiteResult testResults, Command command, boolean capture, BuildContext context)
+    private boolean executeCommand(long recipeId, long recipeStartTime, CommandResult result, RecipePaths paths, File commandOutput, TestSuiteResult testResults, Command command, boolean capture, BuildContext context)
     {
+        runningLock.lock();
+        if (terminating)
+        {
+            runningLock.unlock();
+            return false;
+        }
+
+        runningCommand = command;
+        runningLock.unlock();
+
         result.commence();
         result.setOutputDir(commandOutput.getPath());
         eventManager.publish(new CommandCommencedEvent(this, recipeId, result.getCommandName(), result.getStamps().getStartTime()));
@@ -218,6 +220,8 @@ public class RecipeProcessor
             result.complete();
             eventManager.publish(new CommandCompletedEvent(this, recipeId, result));
         }
+
+        return true;
     }
 
     private PulseFile loadPulseFile(RecipeRequest request, File baseDir, ResourceRepository resourceRepository, BuildContext buildContext) throws BuildException

@@ -1,7 +1,5 @@
 package com.zutubi.pulse.core.model;
 
-import com.zutubi.pulse.core.model.FileRevision;
-
 /**
  * A file revision that is a simple number.  Used for Perforce and Subversion
  * for example.
@@ -42,5 +40,10 @@ public class NumericalFileRevision extends FileRevision
     public String getRevisionString()
     {
         return Long.toString(number);
+    }
+
+    public String toString()
+    {
+        return getRevisionString();
     }
 }

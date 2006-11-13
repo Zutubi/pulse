@@ -105,7 +105,7 @@ public class ExecutableCommandTest extends PulseTestCase
         execute(command, cmdResult);
         assertEquals(ResultState.FAILURE, cmdResult.getState());
 
-        StoredArtifact artifact = cmdResult.getArtifact(ExecutableCommand.OUTPUT_NAME);
+        StoredArtifact artifact = cmdResult.getArtifact(Command.OUTPUT_ARTIFACT_NAME);
         List<Feature> features = artifact.getFeatures(Feature.Level.ERROR);
         assertEquals(1, features.size());
         Feature feature = features.get(0);
@@ -200,7 +200,7 @@ public class ExecutableCommandTest extends PulseTestCase
 
         artifact = artifacts.get(1);
         StoredFileArtifact outputArtifact = artifact.getChildren().get(0);
-        assertEquals(ExecutableCommand.OUTPUT_NAME + "/output.txt", outputArtifact.getPath());
+        assertEquals(Command.OUTPUT_ARTIFACT_NAME + "/output.txt", outputArtifact.getPath());
         assertEquals("text/plain", outputArtifact.getType());
     }
 
@@ -300,7 +300,7 @@ public class ExecutableCommandTest extends PulseTestCase
 
     private String getOutput() throws IOException
     {
-        return IOUtils.fileToString(new File(outputDirectory, ExecutableCommand.OUTPUT_NAME + "/output.txt"));
+        return IOUtils.fileToString(new File(outputDirectory, Command.OUTPUT_ARTIFACT_NAME + "/output.txt"));
     }
 
     private String getEnv() throws IOException

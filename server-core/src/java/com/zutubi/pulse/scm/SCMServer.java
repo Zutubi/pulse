@@ -1,9 +1,8 @@
 package com.zutubi.pulse.scm;
 
-import com.zutubi.pulse.core.model.Change;
 import com.zutubi.pulse.core.model.Changelist;
-import com.zutubi.pulse.core.model.Revision;
 import com.zutubi.pulse.core.model.FileRevision;
+import com.zutubi.pulse.core.model.Revision;
 import com.zutubi.pulse.filesystem.remote.RemoteFile;
 
 import java.io.File;
@@ -57,13 +56,12 @@ public interface SCMServer
      *                    relationship.
      * @param toDirectory root directory to check the copy out to
      * @param revision    the revision to check out, or null for most recent (HEAD)
-     * @param changes     if not null, receives a list of change objects
-     *                    indicating the files that were checked out (the
-     *                    action will be ADD)
+     * @param handler     if not null, receives notifications of events during the
+     *                    checkout operation
      * @return the revision actually checked out
      * @throws SCMException if an error occurs communicating with the server
      */
-    Revision checkout(String id, File toDirectory, Revision revision, List<Change> changes) throws SCMException;
+    Revision checkout(String id, File toDirectory, Revision revision, SCMCheckoutEventHandler handler) throws SCMException;
 
     /**
      * Checkout the specified file.
@@ -144,13 +142,11 @@ public interface SCMServer
      *                relationship.
      * @param workDir contains a local copy (checkout) of the module.
      * @param rev     revision to which the local copy will be updated.
-     * @param changes if not null, receives a list of change objects
-     *                indicating the files that were checked out (the
-     *                action will be ADD)
-     *
+     * @param handler if not null, receives notifications of events during the
+     *                update operation
      * @throws SCMException
      */
-    void update(String id, File workDir, Revision rev, List<Change> changes) throws SCMException;
+    void update(String id, File workDir, Revision rev, SCMCheckoutEventHandler handler) throws SCMException;
 
     /**
      * Allows the scm server to indicate whether or not it supports the update

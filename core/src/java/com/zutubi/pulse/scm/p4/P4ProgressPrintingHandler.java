@@ -1,6 +1,7 @@
 package com.zutubi.pulse.scm.p4;
 
 import com.zutubi.pulse.personal.PersonalBuildUI;
+import com.zutubi.pulse.scm.SCMCancelledException;
 import com.zutubi.pulse.scm.SCMException;
 
 /**
@@ -21,5 +22,9 @@ public class P4ProgressPrintingHandler extends P4ErrorDetectingHandler
         {
             ui.status(line);
         }
+    }
+
+    public void checkCancelled() throws SCMCancelledException
+    {
     }
 }

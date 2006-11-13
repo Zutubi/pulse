@@ -52,7 +52,7 @@ public class Maven2Command extends ExecutableCommand
 
         super.execute(context, cmdResult);
 
-        StoredArtifact artifact = cmdResult.getArtifact(OUTPUT_NAME);
+        StoredArtifact artifact = cmdResult.getArtifact(OUTPUT_ARTIFACT_NAME);
         if(artifact != null)
         {
             Maven2PostProcessor pp = new Maven2PostProcessor("maven.pp");

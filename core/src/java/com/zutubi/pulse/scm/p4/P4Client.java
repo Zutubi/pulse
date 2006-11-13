@@ -1,6 +1,7 @@
 package com.zutubi.pulse.scm.p4;
 
 import com.zutubi.pulse.core.model.NumericalRevision;
+import com.zutubi.pulse.scm.SCMCancelledException;
 import com.zutubi.pulse.scm.SCMException;
 import static com.zutubi.pulse.scm.p4.P4Constants.*;
 import com.zutubi.pulse.util.IOUtils;
@@ -81,6 +82,10 @@ public class P4Client
                 result.stderr = getStderr();
                 result.exitCode = code;
             }
+
+            public void checkCancelled() throws SCMCancelledException
+            {
+            }
         }, input, commands);
 
         return result;
@@ -128,11 +133,13 @@ public class P4Client
             while((line = stdoutReader.readLine()) != null)
             {
                 handler.handleStdout(line);
+                handler.checkCancelled();
             }
 
             while((line = stderrReader.readLine()) != null)
             {
                 handler.handleStderr(line);
+                handler.checkCancelled();
             }
 
             handler.handleExitCode(child.waitFor());
@@ -144,6 +151,11 @@ public class P4Client
         catch (InterruptedException e)
         {
             // Do nothing
+        }
+        catch(SCMCancelledException e)
+        {
+            child.destroy();
+            throw e;
         }
         finally
         {

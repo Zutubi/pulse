@@ -162,12 +162,12 @@ public class CvsServer extends CachingSCMServer
      *
      * @param workingDirectory
      * @param rev
-     * @param changes
+     * @param handler
      */
-    public void update(String id, File workingDirectory, Revision rev, List<Change> changes) throws SCMException
+    public void update(String id, File workingDirectory, Revision rev, SCMCheckoutEventHandler handler) throws SCMException
     {
         assertRevisionArgValid(rev);
-        changes.addAll(client.update(workingDirectory, (CvsRevision) rev));
+        client.update(workingDirectory, (CvsRevision) rev, handler);
     }
 
     /**
@@ -218,10 +218,10 @@ public class CvsServer extends CachingSCMServer
         return null;
     }
 
-    public Revision checkout(String id, File toDirectory, Revision revision, List<Change> changes) throws SCMException
+    public Revision checkout(String id, File toDirectory, Revision revision, SCMCheckoutEventHandler handler) throws SCMException
     {
         assertRevisionArgValid(revision);
-        changes.addAll(client.checkout(toDirectory, module, (CvsRevision)revision));
+        client.checkout(toDirectory, module, (CvsRevision)revision, handler);
         return revision;
     }
 
@@ -242,7 +242,7 @@ public class CvsServer extends CachingSCMServer
         {
             tmpDir = createTemporaryDirectory();
 
-            client.checkout(tmpDir, file, (CvsRevision)revision);
+            client.checkout(tmpDir, file, (CvsRevision)revision, null);
 
             // read checked out file.
             File checkedOutFile = new File(tmpDir, file);
@@ -478,7 +478,7 @@ public class CvsServer extends CachingSCMServer
             try
             {
                 // non - recursive.
-                client.checkout(tmpDir, module, CvsRevision.HEAD, false);
+                client.checkout(tmpDir, module, CvsRevision.HEAD, false, null);
             }
             catch (SCMException e)
             {

@@ -1,6 +1,7 @@
 package com.zutubi.pulse.scm.p4;
 
 import com.zutubi.pulse.personal.PersonalBuildUI;
+import com.zutubi.pulse.scm.SCMCancelledException;
 import com.zutubi.pulse.scm.SCMException;
 
 /**
@@ -57,6 +58,10 @@ public class P4SyncHandler implements P4Handler
         {
             throw new SCMException("p4 process reported errors");
         }
+    }
+
+    public void checkCancelled() throws SCMCancelledException
+    {
     }
 
     public boolean isResolveRequired()

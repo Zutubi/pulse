@@ -53,7 +53,7 @@ public class MavenCommand extends ExecutableCommand
         super.execute(context, cmdResult);
 
         MavenPostProcessor pp = new MavenPostProcessor("maven.pp");
-        pp.process(cmdResult.getArtifact(OUTPUT_NAME).getFile(), cmdResult, context);
+        pp.process(cmdResult.getArtifact(OUTPUT_ARTIFACT_NAME).getFile(), cmdResult, context);
     }
 
     public String getTargets()

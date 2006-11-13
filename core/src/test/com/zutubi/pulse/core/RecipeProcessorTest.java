@@ -1,5 +1,6 @@
 package com.zutubi.pulse.core;
 
+import com.zutubi.pulse.BuildContext;
 import com.zutubi.pulse.core.model.CommandResult;
 import com.zutubi.pulse.core.model.Feature;
 import com.zutubi.pulse.core.model.ResultState;
@@ -11,7 +12,6 @@ import com.zutubi.pulse.events.build.*;
 import com.zutubi.pulse.test.PulseTestCase;
 import com.zutubi.pulse.util.FileSystemUtils;
 import com.zutubi.pulse.util.IOUtils;
-import com.zutubi.pulse.BuildContext;
 
 import java.io.File;
 import java.io.IOException;
@@ -240,7 +240,7 @@ public class RecipeProcessorTest extends PulseTestCase implements EventListener
         String dirName = RecipeProcessor.getCommandDirName(commandIndex, new CommandResult(commandName));
         File outDir = new File(outputDir, dirName);
         assertTrue(outDir.isDirectory());
-        File outFile = new File(outDir, FileSystemUtils.composeFilename(ExecutableCommand.OUTPUT_NAME, "output.txt"));
+        File outFile = new File(outDir, FileSystemUtils.composeFilename(Command.OUTPUT_ARTIFACT_NAME, "output.txt"));
         assertTrue(outFile.isFile());
         String actualContents = IOUtils.fileToString(outFile);
         assertEquals(contents, actualContents);

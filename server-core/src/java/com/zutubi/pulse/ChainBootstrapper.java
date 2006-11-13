@@ -14,6 +14,7 @@ import java.util.List;
 public class ChainBootstrapper extends BootstrapperSupport
 {
     private List<Bootstrapper> bootstrappers = new LinkedList<Bootstrapper>();
+    private Bootstrapper currentBootstrapper;
 
     public ChainBootstrapper(Bootstrapper ...bootstrappers)
     {
@@ -24,13 +25,24 @@ public class ChainBootstrapper extends BootstrapperSupport
     {
         for (Bootstrapper bootstrapper : bootstrappers)
         {
+            currentBootstrapper = bootstrapper;
             bootstrapper.bootstrap(context);
         }
+
+        currentBootstrapper = null;
     }
 
     public ChainBootstrapper add(Bootstrapper bootstrapper)
     {
         bootstrappers.add(bootstrapper);
         return this;
+    }
+
+    public void terminate()
+    {
+        if(currentBootstrapper != null)
+        {
+            currentBootstrapper.terminate();
+        }
     }
 }

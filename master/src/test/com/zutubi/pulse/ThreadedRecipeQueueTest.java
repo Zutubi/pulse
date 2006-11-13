@@ -16,10 +16,7 @@ import com.zutubi.pulse.events.build.RecipeErrorEvent;
 import com.zutubi.pulse.filesystem.remote.RemoteFile;
 import com.zutubi.pulse.model.*;
 import com.zutubi.pulse.personal.PatchArchive;
-import com.zutubi.pulse.scm.FileStatus;
-import com.zutubi.pulse.scm.SCMChangeEvent;
-import com.zutubi.pulse.scm.SCMException;
-import com.zutubi.pulse.scm.SCMServer;
+import com.zutubi.pulse.scm.*;
 import com.zutubi.pulse.services.SlaveStatus;
 import com.zutubi.pulse.services.UpgradeStatus;
 import junit.framework.TestCase;
@@ -793,7 +790,7 @@ public class ThreadedRecipeQueueTest extends TestCase implements EventListener
             throw new RuntimeException("Method not implemented.");
         }
 
-        public Revision checkout(String id, File toDirectory, Revision revision, List<Change> changes) throws SCMException
+        public Revision checkout(String id, File toDirectory, Revision revision, SCMCheckoutEventHandler handler) throws SCMException
         {
             throw new RuntimeException("Method not implemented.");
         }
@@ -840,7 +837,7 @@ public class ThreadedRecipeQueueTest extends TestCase implements EventListener
             throw new RuntimeException("Method not implemented.");
         }
 
-        public void update(String id, File workDir, Revision rev, List<Change> changes) throws SCMException
+        public void update(String id, File workDir, Revision rev, SCMCheckoutEventHandler handler) throws SCMException
         {
             throw new RuntimeException("Method not implemented.");
         }

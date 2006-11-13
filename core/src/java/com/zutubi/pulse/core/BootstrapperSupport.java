@@ -9,4 +9,9 @@ public abstract class BootstrapperSupport implements Bootstrapper
     {
         // Do nothing by default
     }
+
+    public void terminate()
+    {
+        // Nothing by default
+    }
 }

@@ -6,36 +6,42 @@
 package com.zutubi.pulse.scm.cvs.client.commands;
 
 import com.zutubi.pulse.core.model.Change;
-import java.util.LinkedList;
-import java.util.List;
-import org.netbeans.lib.cvsclient.event.*;
+import com.zutubi.pulse.scm.SCMCheckoutEventHandler;
+import org.netbeans.lib.cvsclient.event.CVSAdapter;
+import org.netbeans.lib.cvsclient.event.FileAddedEvent;
+import org.netbeans.lib.cvsclient.event.FileRemovedEvent;
+import org.netbeans.lib.cvsclient.event.FileUpdatedEvent;
 
 public class UpdateListener extends CVSAdapter
 {
-    public UpdateListener()
+    private SCMCheckoutEventHandler handler;
+
+    public UpdateListener(SCMCheckoutEventHandler handler)
     {
-        changes = new LinkedList<Change>();
+        this.handler = handler;
     }
 
     public void fileAdded(FileAddedEvent e)
     {
-        changes.add(new Change(e.getFilePath(), null, Change.Action.ADD));
+        if (handler != null)
+        {
+            handler.fileCheckedOut(new Change(e.getFilePath(), null, Change.Action.ADD));
+        }
     }
 
     public void fileRemoved(FileRemovedEvent e)
     {
-        changes.add(new Change(e.getFilePath(), null, Change.Action.DELETE));
+        if (handler != null)
+        {
+            handler.fileCheckedOut(new Change(e.getFilePath(), null, Change.Action.DELETE));
+        }
     }
 
     public void fileUpdated(FileUpdatedEvent e)
     {
-        changes.add(new Change(e.getFilePath(), null, Change.Action.EDIT));
+        if (handler != null)
+        {
+            handler.fileCheckedOut(new Change(e.getFilePath(), null, Change.Action.EDIT));
+        }
     }
-
-    public List<Change> getChanges()
-    {
-        return changes;
-    }
-
-    private List<Change> changes;
 }

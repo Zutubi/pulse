@@ -7,15 +7,11 @@ package com.zutubi.pulse.scm.cvs.client;
 
 import com.zutubi.pulse.core.model.Change;
 import com.zutubi.pulse.core.model.CvsRevision;
+import com.zutubi.pulse.scm.SCMChangeAccumulator;
 import com.zutubi.pulse.scm.SCMException;
 import com.zutubi.pulse.test.PulseTestCase;
 import com.zutubi.pulse.util.FileSystemUtils;
 import com.zutubi.pulse.util.IOUtils;
-import java.io.File;
-import java.io.IOException;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.*;
 import org.netbeans.lib.cvsclient.CVSRoot;
 import org.netbeans.lib.cvsclient.command.CommandException;
 import org.netbeans.lib.cvsclient.command.log.LogInformation;
@@ -23,6 +19,15 @@ import org.netbeans.lib.cvsclient.command.status.StatusInformation;
 import org.netbeans.lib.cvsclient.connection.AuthenticationException;
 import org.netbeans.lib.cvsclient.file.FileStatus;
 import org.netbeans.lib.cvsclient.util.Logger;
+
+import java.io.File;
+import java.io.IOException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Properties;
+import java.util.TimeZone;
 
 // Referenced classes of package com.zutubi.pulse.scm.cvs.client:
 //            CvsClient, CvsException
@@ -57,7 +62,7 @@ public class CvsClientTest extends PulseTestCase
         throws Exception
     {
         String module = "unit-test/CvsWorkerTest/testCheckout";
-        List changes = cvs.checkout(workdir, module, CvsRevision.HEAD);
+        List changes = checkoutChanges(module, CvsRevision.HEAD);
         assertTrue((new File(workdir, (new StringBuilder()).append(module).append("/file1.txt").toString())).exists());
         assertTrue((new File(workdir, (new StringBuilder()).append(module).append("/file2.txt").toString())).exists());
         assertTrue((new File(workdir, (new StringBuilder()).append(module).append("/dir1/file3.txt").toString())).exists());
@@ -74,7 +79,7 @@ public class CvsClientTest extends PulseTestCase
     {
         String module = "unit-test/CvsWorkerTest/testCheckout";
         CvsRevision byDate = new CvsRevision(null, null, null, SERVER_DATE.parse("2006-03-11 02:30:00 GMT"));
-        List changes = cvs.checkout(workdir, module, byDate);
+        List changes = checkoutChanges(module, byDate);
         assertFalse((new File(workdir, (new StringBuilder()).append(module).append("/file1.txt").toString())).exists());
         assertFalse((new File(workdir, (new StringBuilder()).append(module).append("/file2.txt").toString())).exists());
         assertFalse((new File(workdir, (new StringBuilder()).append(module).append("/dir1/file3.txt").toString())).exists());
@@ -85,7 +90,7 @@ public class CvsClientTest extends PulseTestCase
         throws SCMException, CvsException, CommandException, AuthenticationException
     {
         String module = "module";
-        List changes = cvs.checkout(workdir, module, CvsRevision.HEAD);
+        List changes = checkoutChanges(module, CvsRevision.HEAD);
         assertTrue((new File(workdir, "unit-test/CvsWorkerTest/testCheckoutModule/dir1/file1.txt")).exists());
         assertTrue((new File(workdir, "unit-test/CvsWorkerTest/testCheckoutModule/dir2/file2.txt")).exists());
         assertEquals(2, changes.size());
@@ -100,14 +105,14 @@ public class CvsClientTest extends PulseTestCase
     {
         String module = "unit-test/CvsWorkerTest/testCheckoutBranch";
         CvsRevision byBranch = new CvsRevision(null, "BRANCH", null, null);
-        List changes = cvs.checkout(workdir, module, byBranch);
+        List changes = checkoutChanges(module, byBranch);
         assertTrue((new File(workdir, (new StringBuilder()).append(module).append("/file1.txt").toString())).exists());
         assertFalse((new File(workdir, (new StringBuilder()).append(module).append("/file2.txt").toString())).exists());
         assertTrue((new File(workdir, (new StringBuilder()).append(module).append("/file3.txt").toString())).exists());
         assertEquals(2, changes.size());
         FileSystemUtils.cleanOutputDir(workdir);
         byBranch.setBranch(null);
-        changes = cvs.checkout(workdir, module, byBranch);
+        changes = checkoutChanges(module, byBranch);
         assertTrue((new File(workdir, (new StringBuilder()).append(module).append("/file1.txt").toString())).exists());
         assertTrue((new File(workdir, (new StringBuilder()).append(module).append("/file2.txt").toString())).exists());
         assertFalse((new File(workdir, (new StringBuilder()).append(module).append("/file3.txt").toString())).exists());
@@ -118,7 +123,7 @@ public class CvsClientTest extends PulseTestCase
         throws Exception
     {
         String file = "unit-test/CvsWorkerTest/testCheckoutRevisionOfFile/file1.txt";
-        List changes = cvs.checkout(workdir, file, CvsRevision.HEAD);
+        List changes = checkoutChanges(file, CvsRevision.HEAD);
         assertContents("file1.txt latests contents", new File(workdir, file));
         assertEquals(1, changes.size());
     }
@@ -128,10 +133,10 @@ public class CvsClientTest extends PulseTestCase
     {
         String file = "unit-test/CvsWorkerTest/testCheckoutRevisionOfFile/file1.txt";
         CvsRevision byRevision = new CvsRevision(null, "1.2", null, null);
-        cvs.checkout(workdir, file, byRevision);
+        cvs.checkout(workdir, file, byRevision, null);
         assertContents("file1.txt revision 1.2 contents", new File(workdir, file));
         byRevision = new CvsRevision(null, "1.1", null, null);
-        cvs.checkout(workdir, file, byRevision);
+        cvs.checkout(workdir, file, byRevision, null);
         assertContents("file1.txt revision 1.1 contents", new File(workdir, file));
     }
 
@@ -140,7 +145,7 @@ public class CvsClientTest extends PulseTestCase
     {
         CvsRevision byDate = new CvsRevision(null, null, null, SERVER_DATE.parse("2006-03-11 03:10:07 GMT"));
         String file = "unit-test/CvsWorkerTest/testCheckoutRevisionOfFile/file1.txt";
-        cvs.checkout(workdir, file, byDate);
+        cvs.checkout(workdir, file, byDate, null);
         assertContents("file1.txt revision 1.2 contents", new File(workdir, file));
     }
 
@@ -149,10 +154,10 @@ public class CvsClientTest extends PulseTestCase
     {
         String module = "unit-test/CvsWorkerTest/testUpdateOnHead";
         CvsRevision byDate = new CvsRevision(null, null, null, SERVER_DATE.parse("2006-05-10 13:33:00 GMT"));
-        cvs.checkout(workdir, module, byDate);
+        cvs.checkout(workdir, module, byDate, null);
         File x = new File(workdir, (new StringBuilder()).append(module).append("/file1.txt").toString());
         assertFalse(x.exists());
-        List changes = cvs.update(new File(workdir, module), CvsRevision.HEAD);
+        List changes = updateChanges(new File(workdir, module), CvsRevision.HEAD);
         assertTrue(x.exists());
         assertEquals(1, changes.size());
     }
@@ -162,11 +167,11 @@ public class CvsClientTest extends PulseTestCase
     {
         String module = "unit-test/CvsWorkerTest/testUpdateOnHead";
         CvsRevision byDate = new CvsRevision(null, null, null, SERVER_DATE.parse("2006-05-10 13:33:00 GMT"));
-        cvs.checkout(workdir, module, byDate);
+        cvs.checkout(workdir, module, byDate, null);
         File x = new File(workdir, (new StringBuilder()).append(module).append("/file1.txt").toString());
         assertFalse(x.exists());
         byDate = new CvsRevision(null, null, null, SERVER_DATE.parse("2006-05-10 13:34:00 GMT"));
-        List changes = cvs.update(new File(workdir, module), byDate);
+        List changes = updateChanges(new File(workdir, module), byDate);
         assertTrue(x.exists());
         assertEquals(1, changes.size());
     }
@@ -180,13 +185,13 @@ public class CvsClientTest extends PulseTestCase
         CvsRevision tag = new CvsRevision(null, tagName, null, null);
         try
         {
-            cvs.checkout(workdir, module, tag);
+            cvs.checkout(workdir, module, tag, null);
             fail();
         }
         catch(SCMException e) { }
         FileSystemUtils.cleanOutputDir(workdir);
         cvs.tag(module, CvsRevision.HEAD, tagName, false);
-        cvs.checkout(workdir, module, tag);
+        cvs.checkout(workdir, module, tag, null);
         assertTrue((new File(baseCheckoutDir, "file.txt")).exists());
     }
 
@@ -197,11 +202,11 @@ public class CvsClientTest extends PulseTestCase
         String tagName = (new StringBuilder()).append("T_").append(String.valueOf(System.currentTimeMillis())).toString();
         cvs.tag(module, CvsRevision.HEAD, tagName, false);
         CvsRevision byTag = new CvsRevision(null, tagName, null, null);
-        cvs.checkout(workdir, module, byTag);
+        cvs.checkout(workdir, module, byTag, null);
         FileSystemUtils.cleanOutputDir(workdir);
         cvs.deleteTag(module, tagName);
         byTag = new CvsRevision(null, tagName, null, null);
-        cvs.checkout(workdir, module, byTag);
+        cvs.checkout(workdir, module, byTag, null);
         assertFalse((new File(workdir, (new StringBuilder()).append(module).append("/file.txt").toString())).exists());
     }
 
@@ -262,7 +267,7 @@ public class CvsClientTest extends PulseTestCase
         throws SCMException, IOException
     {
         String module = "unit-test/CvsWorkerTest/testStatus";
-        cvs.checkout(workdir, module, CvsRevision.HEAD);
+        cvs.checkout(workdir, module, CvsRevision.HEAD, null);
         List statuses = cvs.status(workdir);
         assertEquals(2, statuses.size());
         assertEquals(FileStatus.UNKNOWN, ((StatusInformation)statuses.get(0)).getStatus());
@@ -286,6 +291,20 @@ public class CvsClientTest extends PulseTestCase
         assertEquals(FileStatus.UNKNOWN, ((StatusInformation)statuses.get(0)).getStatus());
         assertEquals(FileStatus.UNKNOWN, ((StatusInformation)statuses.get(1)).getStatus());
         assertEquals(FileStatus.NEEDS_CHECKOUT, ((StatusInformation)statuses.get(2)).getStatus());
+    }
+
+    private List<Change> checkoutChanges(String module, CvsRevision revision) throws SCMException
+    {
+        SCMChangeAccumulator accumulator = new SCMChangeAccumulator();
+        cvs.checkout(workdir, module, revision, accumulator);
+        return accumulator.getChanges();
+    }
+
+    private List<Change> updateChanges(File dir, CvsRevision revision) throws SCMException
+    {
+        SCMChangeAccumulator accumulator = new SCMChangeAccumulator();
+        cvs.update(dir, revision, accumulator);
+        return accumulator.getChanges();
     }
 
     private void assertContents(String expected, File file)

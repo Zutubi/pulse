@@ -57,7 +57,7 @@ public class AntCommand extends ExecutableCommand
 
         super.execute(context, cmdResult);
 
-        StoredArtifact artifact = cmdResult.getArtifact(OUTPUT_NAME);
+        StoredArtifact artifact = cmdResult.getArtifact(OUTPUT_ARTIFACT_NAME);
         if(artifact != null)
         {
             AntPostProcessor pp = new AntPostProcessor("ant.pp");

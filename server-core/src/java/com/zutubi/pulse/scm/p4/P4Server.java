@@ -285,7 +285,7 @@ public class P4Server extends CachingSCMServer
         }
     }
 
-    private Change.Action decodeAction(String action)
+    public static Change.Action decodeAction(String action)
     {
         if (action.equals("add") || action.equals("added as") || action.equals("refreshing"))
         {
@@ -313,7 +313,7 @@ public class P4Server extends CachingSCMServer
         }
     }
 
-    private Revision sync(String id, File toDirectory, Revision revision, List<Change> changes, boolean force) throws SCMException
+    private Revision sync(String id, File toDirectory, Revision revision, SCMCheckoutEventHandler handler, boolean force) throws SCMException
     {
         String clientName = updateClient(id, toDirectory);
 
@@ -325,19 +325,15 @@ public class P4Server extends CachingSCMServer
             }
 
             long number = ((NumericalRevision) revision).getRevisionNumber();
-            P4Client.P4Result result;
+            P4CheckoutHandler p4Handler = new P4CheckoutHandler(force, handler);
+
             if(force)
             {
-                result = client.runP4(null, P4_COMMAND, FLAG_CLIENT, clientName, COMMAND_SYNC, FLAG_FORCE, "@" + Long.toString(number));
+                client.runP4WithHandler(p4Handler, null, P4_COMMAND, FLAG_CLIENT, clientName, COMMAND_SYNC, FLAG_FORCE, "@" + Long.toString(number));
             }
             else
             {
-                result = client.runP4(false, null, P4_COMMAND, FLAG_CLIENT, clientName, COMMAND_SYNC, "@" + Long.toString(number));
-            }
-
-            if (changes != null)
-            {
-                populateChanges(result.stdout, changes);
+                client.runP4WithHandler(p4Handler, null, P4_COMMAND, FLAG_CLIENT, clientName, COMMAND_SYNC, "@" + Long.toString(number));
             }
         }
         finally
@@ -422,9 +418,9 @@ public class P4Server extends CachingSCMServer
         }
     }
 
-    public Revision checkout(String id, File toDirectory, Revision revision, List<Change> changes) throws SCMException
+    public Revision checkout(String id, File toDirectory, Revision revision, SCMCheckoutEventHandler handler) throws SCMException
     {
-        return sync(id, toDirectory, revision, changes, true);
+        return sync(id, toDirectory, revision, handler, true);
     }
 
     public String checkout(Revision revision, String file) throws SCMException
@@ -563,9 +559,9 @@ public class P4Server extends CachingSCMServer
         return false;
     }
 
-    public void update(String id, File workDir, Revision rev, List<Change> changes) throws SCMException
+    public void update(String id, File workDir, Revision rev, SCMCheckoutEventHandler handler) throws SCMException
     {
-        sync(id, workDir, rev, changes, false);
+        sync(id, workDir, rev, handler, false);
     }
 
     public boolean supportsUpdate()
@@ -632,6 +628,10 @@ public class P4Server extends CachingSCMServer
                        eol[0] = FileStatus.EOLStyle.CARRIAGE_RETURN_LINEFEED;
                     }
                 }
+            }
+
+            public void checkCancelled() throws SCMCancelledException
+            {
             }
         }, null, P4_COMMAND, FLAG_CLIENT, templateClient, COMMAND_CLIENT, FLAG_OUTPUT);
 

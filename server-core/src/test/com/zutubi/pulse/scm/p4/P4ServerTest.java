@@ -2,8 +2,7 @@ package com.zutubi.pulse.scm.p4;
 
 import com.zutubi.pulse.core.model.*;
 import com.zutubi.pulse.filesystem.remote.RemoteFile;
-import com.zutubi.pulse.core.model.FileRevision;
-import com.zutubi.pulse.core.model.NumericalFileRevision;
+import com.zutubi.pulse.scm.SCMChangeAccumulator;
 import com.zutubi.pulse.scm.SCMException;
 import com.zutubi.pulse.test.PulseTestCase;
 import com.zutubi.pulse.util.FileSystemUtils;
@@ -11,7 +10,6 @@ import com.zutubi.pulse.util.FileSystemUtils;
 import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
-import java.util.LinkedList;
 import java.util.List;
 
 /**
@@ -75,9 +73,7 @@ public class P4ServerTest extends PulseTestCase
     public void testCheckoutHead() throws Exception
     {
         getServer("depot-client");
-        List<Change> changes = new LinkedList<Change>();
-        NumericalRevision revision = (NumericalRevision) server.checkout(null, workDir, null, changes);
-        assertEquals(8, revision.getRevisionNumber());
+        List<Change> changes = checkoutChanges(null, workDir, null, 8);
 
         assertEquals(10, changes.size());
         for (int i = 0; i < 10; i++)
@@ -353,8 +349,7 @@ public class P4ServerTest extends PulseTestCase
         checkDirectory("checkoutRevision");
 
         NumericalRevision updateRevision = new NumericalRevision(8);
-        List<Change> changes = new LinkedList<Change>();
-        server.update("my-id", workDir, updateRevision, changes);
+        List<Change> changes = updateChanges("my-id", workDir, updateRevision);
         checkDirectory("checkoutHead");
         assertEquals(1, changes.size());
         Change change = changes.get(0);
@@ -367,8 +362,7 @@ public class P4ServerTest extends PulseTestCase
         getServer("depot-client");
         server.checkout("my-id", workDir, null, null);
 
-        List<Change> changes = new LinkedList<Change>();
-        server.update("my-id", workDir, null, changes);
+        List<Change> changes = updateChanges("my-id", workDir, null);
         checkDirectory("checkoutHead");
         assertEquals(0, changes.size());
     }
@@ -383,8 +377,7 @@ public class P4ServerTest extends PulseTestCase
         for(int i = 2; i <= 8; i++)
         {
             NumericalRevision updateRevision = new NumericalRevision(i);
-            List<Change> changes = new LinkedList<Change>();
-            server.update("my-id", workDir, updateRevision, changes);
+            updateChanges("my-id", workDir, updateRevision);
         }
     }
 
@@ -440,5 +433,20 @@ public class P4ServerTest extends PulseTestCase
     private File getDataRoot()
     {
         return new File(getPulseRoot(), FileSystemUtils.composeFilename("server-core", "src", "test", "com", "zutubi", "pulse", "scm", "p4", "data"));
+    }
+
+    private List<Change> checkoutChanges(String id, File dir, NumericalRevision revision, long expectedRevision) throws SCMException
+    {
+        SCMChangeAccumulator accumulator = new SCMChangeAccumulator();
+        NumericalRevision rev = (NumericalRevision) server.checkout(id, dir, revision, accumulator);
+        assertEquals(expectedRevision, rev.getRevisionNumber());
+        return accumulator.getChanges();
+    }
+
+    private List<Change> updateChanges(String id, File dir, NumericalRevision revision) throws SCMException
+    {
+        SCMChangeAccumulator accumulator = new SCMChangeAccumulator();
+        server.update(id, dir, revision, accumulator);
+        return accumulator.getChanges();
     }
 }

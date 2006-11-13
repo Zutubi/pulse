@@ -14,7 +14,6 @@ import java.util.*;
  */
 public class ExecutableCommand implements Command, ScopeAware
 {
-    public static final String OUTPUT_NAME = "command output";
     public static final String ENV_NAME = "environment";
     private static final String ENV_PATH = "PATH";
 
@@ -55,7 +54,7 @@ public class ExecutableCommand implements Command, ScopeAware
             throw new BuildException("Unable to record the process execution environment. ", e);
         }
 
-        File outputFileDir = new File(context.getOutputDir(), OUTPUT_NAME);
+        File outputFileDir = new File(context.getOutputDir(), OUTPUT_ARTIFACT_NAME);
         if (!outputFileDir.mkdir())
         {
             throw new BuildException("Unable to create directory for the output artifact '" + outputFileDir.getAbsolutePath() + "'");
@@ -88,7 +87,7 @@ public class ExecutableCommand implements Command, ScopeAware
             throw new BuildException("Unable to create process: " + message, e);
         }
 
-        File outputFile = new File(outputFileDir, "output.txt");
+        File outputFile = new File(outputFileDir, OUTPUT_FILENAME);
 
         try
         {
@@ -269,10 +268,10 @@ public class ExecutableCommand implements Command, ScopeAware
 
     protected StoredFileArtifact getOutputFileArtifact(CommandResult result)
     {
-        StoredArtifact outputArtifact = result.getArtifact(OUTPUT_NAME);
+        StoredArtifact outputArtifact = result.getArtifact(OUTPUT_ARTIFACT_NAME);
         for (StoredFileArtifact file : outputArtifact.getChildren())
         {
-            if (file.getPath().equals(OUTPUT_NAME + "/output.txt"))
+            if (file.getPath().equals(OUTPUT_ARTIFACT_NAME + "/output.txt"))
             {
                 return file;
             }
@@ -391,7 +390,7 @@ public class ExecutableCommand implements Command, ScopeAware
 
     public List<String> getArtifactNames()
     {
-        return Arrays.asList(OUTPUT_NAME);
+        return Arrays.asList(OUTPUT_ARTIFACT_NAME);
     }
 
     public String getExe()

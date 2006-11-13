@@ -11,6 +11,9 @@ import java.util.List;
  */
 public interface Command
 {
+    String OUTPUT_ARTIFACT_NAME = "command output";
+    String OUTPUT_FILENAME = "output.txt";
+
     void execute(CommandContext context, CommandResult result);
 
     List<String> getArtifactNames();

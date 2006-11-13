@@ -1,24 +1,21 @@
 package com.zutubi.pulse;
 
-import com.zutubi.pulse.core.BootstrapCommand;
-import com.zutubi.pulse.core.Bootstrapper;
-import com.zutubi.pulse.core.BuildRevision;
-import com.zutubi.pulse.core.CommandContext;
+import com.zutubi.pulse.core.*;
 import com.zutubi.pulse.core.model.Change;
 import com.zutubi.pulse.model.Scm;
+import com.zutubi.pulse.scm.SCMCancelledException;
+import com.zutubi.pulse.scm.SCMCheckoutEventHandler;
+import com.zutubi.pulse.util.ForkOutputStream;
 import com.zutubi.pulse.util.IOUtils;
 import com.zutubi.pulse.util.logging.Logger;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.util.List;
+import java.io.*;
 
 /**
  * A bootstrapper that populates the working directory by checking out from one SCM.
  * 
  */
-public abstract class ScmBootstrapper implements Bootstrapper
+public abstract class ScmBootstrapper implements Bootstrapper, SCMCheckoutEventHandler
 {
     private static final Logger LOG = Logger.getLogger(ScmBootstrapper.class);
 
@@ -27,6 +24,8 @@ public abstract class ScmBootstrapper implements Bootstrapper
     protected String spec;
     protected Scm scm;
     protected BuildRevision revision;
+    protected boolean terminated = false;
+    protected PrintWriter outputWriter;
 
     public ScmBootstrapper(String project, String spec, Scm scm, BuildRevision revision)
     {
@@ -57,10 +56,31 @@ public abstract class ScmBootstrapper implements Bootstrapper
         File outDir = new File(context.getOutputDir(), BootstrapCommand.OUTPUT_NAME);
         outDir.mkdirs();
 
-        List<Change> changes = bootstrap(workDir);
-        if (changes.size() > 0)
+        OutputStream out = null;
+        FileOutputStream fout = null;
+
+        try
         {
-            writeChanges(changes, new File(outDir, BootstrapCommand.FILES_FILE));
+            fout = new FileOutputStream(new File(outDir, BootstrapCommand.FILES_FILE));
+            if(context.getOutputStream() == null)
+            {
+                out = fout;
+            }
+            else
+            {
+                out = new ForkOutputStream(fout, context.getOutputStream());
+            }
+
+            outputWriter = new PrintWriter(out);
+            bootstrap(workDir);
+        }
+        catch (IOException e)
+        {
+            throw new BuildException("I/O error running bootstrap: " + e.getMessage(), e);
+        }
+        finally
+        {
+            IOUtils.close(outputWriter);
         }
 
         try
@@ -73,28 +93,17 @@ public abstract class ScmBootstrapper implements Bootstrapper
         }
     }
 
-    private void writeChanges(List<Change> changes, File file)
+    protected String getId()
     {
-        PrintWriter writer = null;
-        try
-        {
-            writer = new PrintWriter(file);
-            for(Change change: changes)
-            {
-                writeChange(change, writer);
-            }
-        }
-        catch (IOException e)
-        {
-            LOG.warning("Unable to capture change information to file '" + file.getAbsolutePath() + "': " + e.getMessage(), e);
-        }
-        finally
-        {
-            IOUtils.close(writer);
-        }
+        return project + "-" + spec + "-" + agent;
     }
 
-    private void writeChange(Change change, PrintWriter writer)
+    public void status(String message)
+    {
+        outputWriter.println(message);
+    }
+
+    public void fileCheckedOut(Change change)
     {
         String revision = "";
         if(change.getRevision() != null)
@@ -102,14 +111,21 @@ public abstract class ScmBootstrapper implements Bootstrapper
             revision = "#" + change.getRevision();
         }
 
-        writer.println(change.getFilename() + revision + " - " + change.getAction().toString());
+        outputWriter.println(change.getFilename() + revision + " - " + change.getAction().toString());
     }
 
-    protected String getId()
+    public void checkCancelled() throws SCMCancelledException
     {
-        return project + "-" + spec + "-" + agent;
+        if(terminated)
+        {
+            throw new SCMCancelledException("Operation cancelled");
+        }
     }
 
-    abstract List<Change> bootstrap(File workDir);
+    public void terminate()
+    {
+        terminated = true;
+    }
 
+    abstract void bootstrap(File workDir);
 }

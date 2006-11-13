@@ -1,8 +1,8 @@
 package com.zutubi.pulse.scm.cvs.client;
 
 import com.opensymphony.util.TextUtils;
-import com.zutubi.pulse.core.model.Change;
 import com.zutubi.pulse.core.model.CvsRevision;
+import com.zutubi.pulse.scm.SCMCheckoutEventHandler;
 import com.zutubi.pulse.scm.SCMException;
 import com.zutubi.pulse.scm.cvs.client.commands.LogListener;
 import com.zutubi.pulse.scm.cvs.client.commands.StatusListener;
@@ -71,11 +71,10 @@ public class CvsClient
         return version.getVersion();
     }
 
-    public List<Change> update(File workingDirectory, CvsRevision revision) throws SCMException
+    public void update(File workingDirectory, CvsRevision revision, SCMCheckoutEventHandler handler) throws SCMException
     {
-        UpdateListener listener = new UpdateListener();
+        UpdateListener listener = new UpdateListener(handler);
         update(workingDirectory, revision, listener);
-        return listener.getChanges();
     }
 
     public void update(File workingDirectory, CvsRevision revision, CVSListener listener) throws SCMException
@@ -102,12 +101,12 @@ public class CvsClient
         }
     }
 
-    public List checkout(File workdir, String module, CvsRevision revision) throws SCMException
+    public void checkout(File workdir, String module, CvsRevision revision, SCMCheckoutEventHandler handler) throws SCMException
     {
-        return checkout(workdir, module, revision, true);
+        checkout(workdir, module, revision, true, handler);
     }
 
-    public List<Change> checkout(File workdir, String module, CvsRevision revision, boolean recursive) throws SCMException
+    public void checkout(File workdir, String module, CvsRevision revision, boolean recursive, SCMCheckoutEventHandler handler) throws SCMException
     {
         CheckoutCommand checkout = new CheckoutCommand();
         checkout.setModule(module);
@@ -122,12 +121,11 @@ public class CvsClient
             checkout.setCheckoutByDate(SERVER_DATE.format(revision.getDate()));
         }
 
-        UpdateListener listener = new UpdateListener();
+        UpdateListener listener = new UpdateListener(handler);
         if (!executeCommand(checkout, workdir, listener))
         {
             throw new SCMException("Failed to checkout.");
         }
-        return listener.getChanges();
     }
 
     public void tag(String module, CvsRevision revision, String name) throws SCMException

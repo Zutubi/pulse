@@ -21,6 +21,7 @@ public class ProjectRepoBootstrapper implements Bootstrapper
     private BuildRevision revision;
     private String agent;
     private boolean forceClean;
+    private ScmBootstrapper childBootstrapper;
 
     public ProjectRepoBootstrapper(String projectName, String specName, Scm scm, BuildRevision revision, boolean forceClean)
     {
@@ -40,10 +41,10 @@ public class ProjectRepoBootstrapper implements Bootstrapper
         }
 
         // run the scm bootstrapper on the local directory,
-        ScmBootstrapper bootstrapper = selectBootstrapper(paths.getPersistentWorkDir());
-        bootstrapper.prepare(agent);
-        
-        bootstrapper.bootstrap(new CommandContext(new RecipePaths()
+        childBootstrapper = selectBootstrapper(paths.getPersistentWorkDir());
+        childBootstrapper.prepare(agent);
+
+        RecipePaths mungedPaths = new RecipePaths()
         {
             public File getPersistentWorkDir()
             {
@@ -59,7 +60,17 @@ public class ProjectRepoBootstrapper implements Bootstrapper
             {
                 return paths.getOutputDir();
             }
-        }, context.getOutputDir(), null));
+        };
+
+        context.setRecipePaths(mungedPaths);
+        try
+        {
+            childBootstrapper.bootstrap(context);
+        }
+        finally
+        {
+            context.setRecipePaths(paths);
+        }
 
         // If the checkout and base differ, then we need to copy over to the base.
         if(!paths.getBaseDir().equals(paths.getPersistentWorkDir()))
@@ -78,6 +89,14 @@ public class ProjectRepoBootstrapper implements Bootstrapper
     public void prepare(String agent)
     {
         this.agent = agent;
+    }
+
+    public void terminate()
+    {
+        if(childBootstrapper != null)
+        {
+            childBootstrapper.terminate();
+        }
     }
 
     private ScmBootstrapper selectBootstrapper(final File localDir)

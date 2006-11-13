@@ -51,6 +51,11 @@ public class CommandContext
         return paths;
     }
 
+    public void setRecipePaths(RecipePaths recipePaths)
+    {
+        this.paths = recipePaths;
+    }
+
     public File getOutputDir()
     {
         return outputDir;
@@ -104,7 +109,7 @@ public class CommandContext
             return buildContext.getBuildNumber();
         }
     }
-    
+
     /**
      * Get the id of the recipe to which this command execution is associated.
      *

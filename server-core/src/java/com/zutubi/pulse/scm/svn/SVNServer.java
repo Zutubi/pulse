@@ -251,10 +251,7 @@ public class SVNServer implements SCMServer
         }
     }
 
-    /**
-     * @see SCMServer#checkout(String, File, Revision, List<Change>)
-     */
-    public Revision checkout(String id, File toDirectory, Revision revision, final List<Change> changes) throws SCMException
+    public Revision checkout(String id, File toDirectory, Revision revision, SCMCheckoutEventHandler handler) throws SCMException
     {
         SVNRevision svnRevision;
         SVNUpdateClient updateClient = new SVNUpdateClient(repository.getAuthenticationManager(), null);
@@ -268,9 +265,9 @@ public class SVNServer implements SCMServer
             svnRevision = convertRevision(revision);
         }
 
-        if (changes != null)
+        if (handler != null)
         {
-            updateClient.setEventHandler(new ChangeEventHandler(changes));
+            updateClient.setEventHandler(new ChangeEventHandler(handler));
         }
 
         try
@@ -465,7 +462,7 @@ public class SVNServer implements SCMServer
         return result;
     }
 
-    public void update(String id, File workDir, Revision rev, List<Change> changes) throws SCMException
+    public void update(String id, File workDir, Revision rev, SCMCheckoutEventHandler handler) throws SCMException
     {
         // CIB-610: cleanup before update in case WC is locked.
         SVNWCClient wcClient = new SVNWCClient(authenticationManager, null);
@@ -480,9 +477,9 @@ public class SVNServer implements SCMServer
 
         SVNUpdateClient client = new SVNUpdateClient(authenticationManager, null);
 
-        if(changes != null)
+        if(handler != null)
         {
-            client.setEventHandler(new ChangeEventHandler(changes));
+            client.setEventHandler(new ChangeEventHandler(handler));
         }
 
         try
@@ -609,11 +606,11 @@ public class SVNServer implements SCMServer
 
     private static class ChangeEventHandler implements ISVNEventHandler
     {
-        private List<Change> changes;
+        private SCMCheckoutEventHandler handler;
 
-        public ChangeEventHandler(List<Change> changes)
+        public ChangeEventHandler(SCMCheckoutEventHandler handler)
         {
-            this.changes = changes;
+            this.handler = handler;
         }
 
         public void handleEvent(SVNEvent event, double progress)
@@ -636,12 +633,20 @@ public class SVNServer implements SCMServer
 
             if(action != null)
             {
-                changes.add(new Change(event.getPath(), new NumericalFileRevision(event.getRevision()), action));
+                handler.fileCheckedOut(new Change(event.getPath(), null, action));
             }
         }
 
-        public void checkCancelled()
+        public void checkCancelled() throws SVNCancelException
         {
+            try
+            {
+                handler.checkCancelled();
+            }
+            catch(SCMCancelledException e)
+            {
+                throw new SVNCancelException();
+            }
         }
     }
 

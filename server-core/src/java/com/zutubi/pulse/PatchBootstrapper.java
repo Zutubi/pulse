@@ -46,4 +46,9 @@ public class PatchBootstrapper implements Bootstrapper
     {
         delegate.prepare(agent);
     }
+
+    public void terminate()
+    {
+        delegate.terminate();
+    }
 }

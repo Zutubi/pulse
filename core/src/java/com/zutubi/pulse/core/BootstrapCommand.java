@@ -64,6 +64,6 @@ public class BootstrapCommand implements Command
 
     public void terminate()
     {
-        // Ignored (at present we have no way to cancel scm operations).
+        bootstrapper.terminate();
     }
 }
