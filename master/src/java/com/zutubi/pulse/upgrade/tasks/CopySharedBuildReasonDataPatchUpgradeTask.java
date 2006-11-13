@@ -130,8 +130,6 @@ public class CopySharedBuildReasonDataPatchUpgradeTask extends DatabaseUpgradeTa
                     JDBCUtils.close(rs);
                 }
             }
-
-            HibernateUtils.ensureNextId(con, nextId);
         }
         finally
         {
