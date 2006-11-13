@@ -78,7 +78,7 @@ public class EmailContactPoint extends ContactPoint
 
         try
         {
-            sendMail(subject, getEmail(), mimeType, rendered, config.getSmtpHost(), config.getSmtpUsername(), config.getSmtpPassword(), config.getSmtpFrom());
+            sendMail(getEmail(), subject, mimeType, rendered, config.getSmtpHost(), config.getSmtpUsername(), config.getSmtpPassword(), config.getSmtpFrom());
         }
         catch (Exception e)
         {
