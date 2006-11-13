@@ -48,7 +48,7 @@ public class LinkCommitMessageTransformer extends CommitMessageTransformer
 
     public String getType()
     {
-        return "Standard";
+        return "Link";
     }
 
     public CommitMessageBuilder transform(CommitMessageBuilder builder)
