@@ -1326,7 +1326,7 @@
             <result name="success" type="redirect">/admin/serverSettings.action</result>
         </action>
 
-        <action name="editCommitMessageProjects" class="com.zutubi.pulse.web.admin.EditCommitMessageTranformerProjectsAction">
+        <action name="editCommitMessageProjects" class="com.zutubi.pulse.web.admin.EditCommitMessageTransformerProjectsAction">
             <result name="input" type="velocity">edit-commit-message-projects.vm</result>
             <result name="cancel" type="redirect">/admin/serverSettings.action</result>
             <result name="success" type="redirect">/admin/serverSettings.action</result>

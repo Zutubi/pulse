@@ -29,7 +29,7 @@
                     #dynamicRow("recipe.queue.timeout" $timeoutValue)
                 </table>
 
-                <!-- commit message tranformers -->
+                <!-- commit message transformers -->
                 
                 <table id="commit.message.transformers" class="fill-content">
                     #headingRow("global.commit.message.transformers" 5)

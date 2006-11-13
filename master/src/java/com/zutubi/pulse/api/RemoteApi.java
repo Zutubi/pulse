@@ -45,7 +45,7 @@ public class RemoteApi
 
     //---( Define the properties that are visible in structs in the remote api. )---
     private static final Map<Class, String[]> structDefs = new HashMap<Class, String[]>();
-    private CommitMessageTransformerManager tranformerManager;
+    private CommitMessageTransformerManager transformerManager;
 
     {
         structDefs.put(Project.class, new String[]{"name", "description", "url"});
@@ -922,11 +922,11 @@ public class RemoteApi
     public int deleteAllCommitMessageLinks(String token) throws AuthenticationException
     {
         tokenManager.verifyAdmin(token);
-        List<CommitMessageTransformer> transformers = tranformerManager.getCommitMessageTransformers();
+        List<CommitMessageTransformer> transformers = transformerManager.getCommitMessageTransformers();
         int result = transformers.size();
         for (CommitMessageTransformer t : transformers)
         {
-            tranformerManager.delete(t);
+            transformerManager.delete(t);
         }
         return result;
     }
@@ -1220,6 +1220,6 @@ public class RemoteApi
 
     public void setCommitMessageTransformerManager(CommitMessageTransformerManager manager)
     {
-        this.tranformerManager = manager;
+        this.transformerManager = manager;
     }
 }

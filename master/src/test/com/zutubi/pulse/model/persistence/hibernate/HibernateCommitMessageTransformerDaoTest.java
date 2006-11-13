@@ -1,9 +1,9 @@
 package com.zutubi.pulse.model.persistence.hibernate;
 
+import com.zutubi.pulse.committransformers.LinkCommitMessageTransformer;
 import com.zutubi.pulse.model.CommitMessageTransformer;
 import com.zutubi.pulse.model.Project;
 import com.zutubi.pulse.model.persistence.CommitMessageTransformerDao;
-import com.zutubi.pulse.committransformers.LinkCommitMessageTransformer;
 
 import java.util.Arrays;
 import java.util.List;
@@ -11,7 +11,7 @@ import java.util.List;
 /**
  * @noinspection FieldCanBeLocal
  */
-public class HibernateCommitMessageTranformerDaoTest extends MasterPersistenceTestCase
+public class HibernateCommitMessageTransformerDaoTest extends MasterPersistenceTestCase
 {
     private CommitMessageTransformerDao commitMessageTransformerDao;
 

@@ -1,17 +1,15 @@
 package com.zutubi.pulse.web.admin;
 
-import com.zutubi.pulse.web.ActionSupport;
-import com.zutubi.pulse.model.ProjectManager;
 import com.zutubi.pulse.model.CommitMessageTransformer;
 import com.zutubi.pulse.xwork.interceptor.Preparable;
 
-import java.util.List;
 import java.util.Arrays;
+import java.util.List;
 
 /**
  * <class comment/>
  */
-public class EditCommitMessageTranformerProjectsAction extends CommitMessageTransformerActionSupport implements Preparable
+public class EditCommitMessageTransformerProjectsAction extends CommitMessageTransformerActionSupport implements Preparable
 {
     private CommitMessageTransformer transformer;
 
