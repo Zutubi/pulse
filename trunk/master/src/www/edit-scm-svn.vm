@@ -1,0 +1,36 @@
+#helpTag("Subversion")
+#authorisationTags($principle)
+#projectTags($project)
+<html>
+<head>
+    <title>#wwtext("name=edit.svn")</title>
+    <script type="text/javascript" src="$base/js/prototype.js"></script>
+    #svnTestScript("editSvn")
+</head>
+<body>
+    #projectTabs("configuration")
+
+    #parse("/template/includes/actionerrors.vm")
+
+#wwcform("action=editSvn.action" "heading=%{getText('edit.svn')}" "method=post")
+    #wwhidden("name=id")
+    #wwhidden("name=projectId")
+
+    #wwtextfield("name=svn.url" "label=%{getText('svn.url')}" "required=true" "size=60" "tabindex=1")
+    #wwtextfield("name=svn.username" "label=%{getText('svn.username')}" "tabindex=2")
+    #wwpassword("name=svn.password" "label=%{getText('svn.password')}" "showPassword=true" "tabindex=3")
+    #wwtextfield("name=svn.keyfile" "label=%{getText('svn.keyfile')}" "size=60" "tabindex=4")
+    #inlineHelp("svn.keyfile.help")
+    #wwpassword("name=svn.passphrase" "label=%{getText('svn.passphrase')}" "showPassword=true" "tabindex=5")
+    #inlineHelp("svn.passphrase.help")
+    #wwcheckbox("name=monitor" "label=%{getText('scm.monitor')}" "tabindex=6")
+    #wwtextfield("name=svn.pollingInterval" "label=%{getText('scm.polling.interval')}" "tabindex=7")
+
+    #testSettingsRow()
+
+    #saveCancel(9)
+ #end
+
+     #tabEnd()
+</body>
+</html>

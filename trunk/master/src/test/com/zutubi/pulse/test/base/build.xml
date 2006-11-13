@@ -1,0 +1,245 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- -->
+<!-- -->
+<!-- -->
+<project name="Pulse" basedir="." xmlns:ivy="antlib:fr.jayasoft.ivy.ant">
+
+    <property file="build.properties"/>
+
+    <target name="clean">
+        <delete dir="build"/>
+    </target>
+
+    <target name="clean.all" depends="clean">
+        <foreach target="clean"/>
+    </target>
+
+    <target name="clean.dev">
+        <delete dir="home"/>
+        <delete dir="master/system"/>
+        <delete file="master/etc/admin.token"/>
+        <delete file="master/etc/pulse-init.properties"/>
+    </target>
+
+    <target name="build.core">
+        <ant inheritAll="false" dir="core" antfile="build.xml" target="build.module"/>
+    </target>
+
+    <target name="build.server-core" depends="build.core">
+        <ant inheritAll="false" dir="server-core" antfile="build.xml" target="build.module"/>
+    </target>
+
+    <target name="build.local" depends="build.core">
+        <ant inheritAll="false" dir="local" antfile="build.xml" target="build.module"/>
+    </target>
+
+    <target name="build.master" depends="build.server-core">
+        <ant inheritAll="false" dir="master" antfile="build.xml" target="build.module"/>
+    </target>
+
+    <target name="build.slave" depends="build.server-core">
+        <ant inheritAll="false" dir="slave" antfile="build.xml" target="build.module"/>
+    </target>
+
+    <target name="build.all" depends="clean">
+        <foreach target="build.module"/>
+
+        <!-- Generate one mega report -->
+        <property name="report.dir" value="build/reports/junit"/>
+        <mkdir dir="${report.dir}/html"/>
+        <junitreport todir="${report.dir}">
+            <fileset dir=".">
+                <include name="*/${report.dir}/xml/*.xml"/>
+            </fileset>
+            <report format="frames" todir="${report.dir}/html"/>
+        </junitreport>
+    </target>
+
+    <target name="package.local" depends="init, build.local">
+
+        <property name="package.root" value="build/package"/>
+        <delete dir="${package.root}"/>
+        <mkdir dir="${package.root}"/>
+
+        <copy todir="${package.root}/bin">
+            <fileset dir="core/src/bin" includes="**/*"/>
+            <fileset dir="local/src/bin" includes="**/*"/>
+        </copy>
+
+        <fixcrlf srcdir="${package.root}/bin" eol="lf" eof="remove" includes="**/*.sh"/>
+        <chmod perm="755" dir="${package.root}/bin" includes="**/*.sh"/>
+
+        <retrieve.dependencies module="." conf="local" dest="${package.root}/lib"/>
+
+        <!-- place holder for package documentation -->
+        <copy todir="${package.root}/docs">
+            <fileset dir="etc" includes="delete-me.txt"/>
+        </copy>
+        <!-- place holder for the log directory -->
+        <copy todir="${package.root}/system/log">
+            <fileset dir="etc" includes="delete-me.txt"/>
+        </copy>
+
+        <zip destfile="build/pulse-local-${pulse.version}.zip">
+            <zipfileset dir="build/package" includes="**/*" prefix="pulse-local-${pulse.version}"/>
+        </zip>
+
+    </target>
+
+    <target name="package.master" depends="init, clean, build.local, build.master">
+
+        <property name="package.name" value="pulse-${pulse.version}"/>
+        <property name="package.root" value="build/package/${package.name}"/>
+
+        <delete dir="${package.root}"/>
+        <mkdir dir="${package.root}"/>
+
+        <copy todir="${package.root}/bin">
+            <fileset dir="core/src/bin" includes="**/*"/>
+            <fileset dir="local/src/bin" includes="**/*"/>
+            <fileset dir="server-core/src/bin" includes="**/*"/>
+            <fileset dir="master/src/bin" includes="**/*"/>
+        </copy>
+
+        <fixcrlf srcdir="${package.root}/bin" eol="lf" eof="remove" includes="**/*.sh"/>
+        <chmod perm="755" dir="${package.root}/bin" includes="**/*.sh" verbose="true"/>
+
+        <retrieve.dependencies module="." conf="local" dest="${package.root}/lib"/>
+        <retrieve.dependencies module="." conf="master" dest="${package.root}/lib"/>
+
+        <!-- place holder for package documentation -->
+        <copy todir="${package.root}/docs">
+            <fileset dir="etc" includes="delete-me.txt"/>
+        </copy>
+        <copy todir="${package.root}/system/templates">
+            <fileset dir="master/src/templates" includes="**/*.vm **/*.ftl"/>
+        </copy>
+        <!-- place holder for the log directory -->
+        <copy todir="${package.root}/system/log">
+            <fileset dir="etc" includes="delete-me.txt"/>
+        </copy>
+        <copy todir="${package.root}/system/www">
+            <fileset dir="server-core/src/www" includes="**/*"/>
+            <fileset dir="master/src/www" includes="**/*"/>
+        </copy>
+
+        <!-- /config is for user configuration properties -->
+        <copy todir="${package.root}/system/config">
+            <fileset dir="master/etc" includes="pulse-defaults.properties,logging.properties"/>
+            <fileset dir="master/etc" includes="logging/*.properties"/>
+        </copy>
+
+        <copy todir="${package.root}/lib">
+            <fileset dir="master/etc" includes="*.xml"/>
+        </copy>
+
+        <!-- the ant zip command doesn't preserve permissions, so we call out to zip -->
+        <exec executable="zip" dir="${package.root}/..">
+            <arg line="-r ../${package.name}.zip ${package.name}"/>
+        </exec>
+
+        <tar destfile="build/${package.name}.tgz" compression="gzip">
+            <tarfileset dir="${package.root}/.." mode="755" username="root" group="root">
+                <include name="${package.name}/bin/*"/>
+            </tarfileset>
+            <tarfileset dir="${package.root}/.." username="root" group="root">
+                <include name="${package.name}/**/*"/>
+                <exclude name="${package.name}/bin/*"/>
+            </tarfileset>
+        </tar>
+    </target>
+
+    <target name="accept.master" depends="package.master">
+        <property name="build.dir" value="master/build"/>
+        <property name="report.dir" value="build/reports/junit"/>
+        <mkdir dir="${report.dir}/xml"/>
+        <mkdir dir="${report.dir}/html"/>
+
+        <exec executable="./acceptance-test-prep.sh">
+            <arg line="build/pulse-${pulse.version}.tgz"/>
+        </exec>
+        <junit printsummary="yes" fork="on" failureProperty="test.failed" errorProperty="test.failed">
+            <sysproperty key="pulse.port" value="8889"/>
+            <classpath>
+                <pathelement location="${build.dir}/classes"/>
+                <pathelement location="${build.dir}/test.classes"/>
+                <pathelement location="${build.dir}/accept.classes"/>
+                <fileset dir="${build.dir}/lib">
+                    <include name="**/*.jar"/>
+                </fileset>
+            </classpath>
+            <formatter type="xml"/>
+            <batchtest todir="${report.dir}/xml">
+                <fileset dir="master/src/acceptance">
+                    <include name="**/AcceptanceTestSuite.java"/>
+                </fileset>
+            </batchtest>
+            <!--<test name="com.zutubi.pulse.acceptance.AcceptanceTestSuite"/>-->
+        </junit>
+        <junitreport todir="${report.dir}">
+            <fileset dir=".">
+                <include name="*/${report.dir}/xml/*.xml"/>
+                <include name="${report.dir}/xml/*.xml"/>
+            </fileset>
+            <report format="frames" todir="${report.dir}/html"/>
+        </junitreport>
+        <exec executable="./acceptance-test-post.sh">
+            <arg line="${pulse.version}"/>
+        </exec>
+        <fail message="One or more acceptance tests failed.  See the reports (${report.dir}) for details." if="test.failed"/>
+    </target>
+
+    <target name="init">
+        <property name="project.root.dir" value="."/>
+        <property name="project.repository" value="${project.root.dir}/build/repository"/>
+    </target>
+
+    <!--
+     Refresh the projects lib directory by retrieving the latest module dependencies.
+    -->
+    <target name="refresh.lib" depends="clean, init">
+
+        <!-- refreshing the lib directory -->
+        <delete dir="lib"/>
+
+	    <!-- use the default ivy configuration properties. -->
+    	<property file="ivy.properties"/>
+        <ivy:configure/>
+        <retrieve.dependencies module="core" dest="lib"/>
+        <retrieve.dependencies module="server-core" dest="lib"/>
+        <retrieve.dependencies module="local" dest="lib"/>
+        <retrieve.dependencies module="master" dest="lib"/>
+        <retrieve.dependencies module="slave" dest="lib"/>
+    </target>
+
+    <!-- 
+     Retrieve the dependencies for the specified module, and place them into the 
+     destination directory.
+    -->
+    <macrodef name="retrieve.dependencies">
+        <attribute name="module"/>
+        <attribute name="conf" default="external"/>
+        <attribute name="dest" default="lib"/>
+        <sequential>
+    	    <!-- resolve the modules ivy file. -->
+            <ivy:resolve file="@{module}/ivy.xml" conf="@{conf}"/>
+            <ivy:deliver deliverpattern="${project.repository}/[module]/ivy-[revision].xml"/>
+            <ivy:retrieve pattern="@{dest}/[artifact]-[revision].[ext]" validate="true" conf="@{conf}"/>
+        </sequential>
+    </macrodef>
+
+    <!--
+     Execute the specified target on each of the modules.
+    -->
+    <macrodef name="foreach">
+        <attribute name="target"/>
+        <sequential>
+            <ant inheritAll="false" dir="core" antfile="build.xml" target="@{target}"/>
+            <ant inheritAll="false" dir="local" antfile="build.xml" target="@{target}"/>
+            <ant inheritAll="false" dir="server-core" antfile="build.xml" target="@{target}"/>
+            <ant inheritAll="false" dir="master" antfile="build.xml" target="@{target}"/>
+            <!--<ant inheritAll="false" dir="slave" antfile="build.xml" target="@{target}"/>-->
+        </sequential>
+    </macrodef>
+
+</project>

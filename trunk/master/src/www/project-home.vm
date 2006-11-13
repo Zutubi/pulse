@@ -1,0 +1,29 @@
+#helpTag("Project+Home+Tab")
+#authorisationTags($principle)
+#projectTags($project)
+<html>
+<head>
+    <title>$!webwork.htmlEncode($project.name)</title>
+    <script type="text/javascript" src="$base/js/prototype.js"></script>
+    <script type="text/javascript" src="$base/js/main.js"></script>
+    <script type="text/javascript">
+        #updater("$base/ajax/projectHomePanel.action?id=$project.id" "panel" $principle)
+    </script>
+</head>
+<body>
+    #projectTabs("home")
+
+    #parse("/template/includes/actionerrors.vm")
+    
+    <div id="panel">
+        #parse("ajax/project-home-panel.vm")
+    </div>
+
+    <div id="commentsWindow" class="floating" style="display: none;">
+        <div id="commentsWindowContent">
+        </div>
+    </div>
+
+    #tabEnd()
+</body>
+</html>

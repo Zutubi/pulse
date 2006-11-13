@@ -1,0 +1,29 @@
+<html>
+<head>
+    <title>Signup</title>
+</head>
+
+<body>
+    <h1>Signup</h1>
+
+    #foreach($error in $action.actionErrors)
+        <h2 style="color:red">$error</h2>
+    #end
+
+    #if ($config.anonymousSignupEnabled)
+        #wwcform("action=signup.action" "id=signup" "heading=%{getText('user.create')}" "method=post")
+            #wwtextfield("name=newUser.login" "label=%{getText('user.login')}" "required=true" "tabindex=1")
+            #wwtextfield("name=newUser.name" "label=%{getText('user.name')}" "required=true" "tabindex=2")
+            #wwpassword("name=newUser.password" "label=%{getText('user.password')}" "tabindex=3")
+            #wwpassword("name=confirm" "label=%{getText('user.confirm')}" "tabindex=4")
+            #saveCancel(5)
+        #end
+    #else
+        <p>
+            Anonymous signup is currently disabled. You will need to contact the system administrator to create an account.
+        </p>
+    #end
+
+
+</body>
+</html>

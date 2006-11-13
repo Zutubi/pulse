@@ -1,0 +1,8 @@
+build:
+	echo "build target"
+
+test:
+	echo "test target"
+
+environment:
+	echo $(TEST_ENV_VAR)

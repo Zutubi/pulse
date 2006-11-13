@@ -1,0 +1,24 @@
+package com.zutubi.pulse.search;
+
+import com.zutubi.pulse.model.BuildResult;
+import org.hibernate.SessionFactory;
+
+/**
+ * The Queries object is a SearchQuery factory that provides a way to create search queries.
+ */
+public class Queries
+{
+    protected SessionFactory sessionFactory;
+
+    public void setSessionFactory(SessionFactory sessionFactory)
+    {
+        this.sessionFactory = sessionFactory;
+    }
+
+    public SearchQuery<BuildResult> getBuildResults()
+    {
+        SearchQuery<BuildResult> q = new SearchQuery<BuildResult>(BuildResult.class);
+        q.setSessionFactory(sessionFactory);
+        return q;
+    }
+}

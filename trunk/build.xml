@@ -1,0 +1,545 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- -->
+<!-- -->
+<!-- -->
+<project name="Pulse" basedir="." xmlns:ivy="antlib:fr.jayasoft.ivy.ant">
+
+    <property file="build.properties"/>
+
+    <condition property="on.windows">
+        <os family="windows"/>
+    </condition>
+
+    <target name="clean" depends="clean.all"/>
+
+    <target name="clean.all">
+        <!-- trigger a clean for each module. -->
+        <foreach target="clean"/>
+
+        <delete dir="build"/>
+    </target>
+
+    <target name="clean.dev">
+        <delete dir="data"/>
+
+        <!-- clean up this annoying log file. -->
+        <delete file="velocity.log"/>
+
+        <!-- clean out the master -->
+        <delete dir="master/system"/>
+        <delete file="master/etc/admin.token"/>
+        <delete file="master/etc/service.token"/>
+        <delete file="master/etc/runtime.properties"/>
+
+        <!-- clean out the slave -->
+        <delete dir="slave/system"/>
+        <delete file="slave/etc/admin.token"/>
+        <delete file="slave/etc/service.token"/>
+        <delete file="slave/etc/runtime.properties"/>
+
+        <!-- clean out the acceptance test playground. -->
+        <delete dir="pulse-accept"/>
+        <delete dir="upgradetest"/>
+
+        <!-- clean out the user.home/.pulse/* directory -->
+        <delete dir="${user.home}/.pulse"/>        
+    </target>
+
+    <target name="build.core">
+        <ant inheritAll="false" dir="core" antfile="build.xml" target="build.module"/>
+    </target>
+
+    <target name="build.server-core" depends="build.core">
+        <ant inheritAll="false" dir="server-core" antfile="build.xml" target="build.module"/>
+    </target>
+
+    <target name="build.local" depends="build.core">
+        <ant inheritAll="false" dir="local" antfile="build.xml" target="build.module"/>
+    </target>
+
+    <target name="build.master" depends="build.server-core">
+        <ant inheritAll="false" dir="master" antfile="build.xml" target="build.module"/>
+    </target>
+
+    <target name="build.slave" depends="build.server-core">
+        <ant inheritAll="false" dir="slave" antfile="build.xml" target="build.module"/>
+    </target>
+
+    <target name="build.all">
+        <foreach target="build.module"/>
+
+        <!-- Generate one mega report -->
+        <property name="report.dir" value="build/reports/junit"/>
+        <mkdir dir="${report.dir}/html"/>
+        <junitreport todir="${report.dir}">
+            <fileset dir=".">
+                <include name="*/${report.dir}/xml/*.xml"/>
+            </fileset>
+            <report format="frames" todir="${report.dir}/html"/>
+        </junitreport>
+    </target>
+
+    <target name="package.local" depends="init, clean, build.local">
+
+        <property name="package.name.local" value="pulse-dev-${pulse.version}"/>
+        <property name="package.root.local" value="build/package/${package.name.local}"/>
+        <property name="version.root.local" value="${package.root.local}/versions/${pulse.build}"/>
+
+        <delete dir="${package.root.local}"/>
+        <mkdir dir="${package.root.local}"/>
+
+        <copy file="core/etc/active-version.txt" todir="${package.root.local}"/>
+        <replace file="${package.root.local}/active-version.txt">
+            <replacefilter token="__BUILD_NUMBER__" value="${pulse.build}"/>
+        </replace>
+
+        <copy todir="${package.root.local}/bin">
+            <fileset dir="core/src/bin" includes="**/*"/>
+            <fileset dir="local/src/bin" includes="**/*"/>
+        </copy>
+
+        <fixcrlf srcdir="${package.root.local}/bin" eol="lf" eof="remove" includes="**/*.sh"/>
+        <chmod perm="755" dir="${package.root.local}/bin" includes="**/*.sh"/>
+
+        <retrieve.dependencies module="." conf="local" dest="${version.root.local}/lib"/>
+
+        <move tofile="${package.root.local}/lib/boot.jar">
+            <fileset dir="${version.root.local}/lib" includes="boot-*.jar"/>
+        </move>
+
+        <copy todir="${version.root.local}/lib">
+            <fileset dir="local/etc" includes="*.xml"/>
+        </copy>
+
+        <copy todir="${version.root.local}/boot">
+            <fileset dir="core/etc" includes="*.commands.properties"/>
+            <fileset dir="local/etc" includes="*.commands.properties"/>
+            <fileset dir="local/etc" includes="classpath.txt"/>
+        </copy>
+
+        <!-- place holder for package documentation -->
+        <!--<copy todir="${version.root.local}/docs">-->
+            <!--<fileset dir="etc" includes="delete-me.txt"/>-->
+        <!--</copy>-->
+
+        <exec executable="zip" dir="${package.root.local}/..">
+            <arg line="-r ../${package.name.local}.zip ${package.name.local}"/>
+        </exec>
+
+        <tar destfile="build/${package.name.local}.tar.gz" compression="gzip">
+            <tarfileset dir="${package.root.local}/.." mode="755" username="root" group="root">
+                <include name="${package.name.local}/bin/*"/>
+            </tarfileset>
+            <tarfileset dir="${package.root.local}/.." username="root" group="root">
+                <include name="${package.name.local}/**/*"/>
+                <exclude name="${package.name.local}/bin/*"/>
+            </tarfileset>
+        </tar>
+
+        <antcall target="nsis.local"/>
+    </target>
+
+    <target name="nsis.local" if="on.windows">
+        <property name="package.name.local" value="pulse-dev-${pulse.version}"/>
+        <property name="package.root.local" value="build/package/${package.name.local}"/>
+
+        <copy file="installer/env.nsh" todir="${package.root.local}"/>
+        <copy file="installer/pulse.ico" todir="${package.root.local}"/>
+        <copy file="installer/dev.nsi.in" tofile="${package.root.local}/dev.nsi"/>
+
+        <replace file="${package.root.local}/dev.nsi">
+            <replacefilter token="__PACKAGE_NAME__" value="${package.name.local}"/>
+            <replacefilter token="__VERSION__" value="${pulse.version}"/>
+        </replace>
+
+        <exec executable="makensis" dir="${package.root.local}">
+            <arg line="dev.nsi"/>
+        </exec>
+    </target>
+
+    <target name="package.slave" depends="init, clean, build.local, build.slave">
+        <property name="package.name.slave" value="pulse-agent-${pulse.version}"/>
+        <property name="package.root.slave" value="build/package/${package.name.slave}"/>
+        <property name="version.root.slave" value="${package.root.slave}/versions/${pulse.build}"/>
+
+        <delete dir="${package.root.slave}"/>
+        <mkdir dir="${package.root.slave}"/>
+
+        <copy file="core/etc/active-version.txt" todir="${package.root.slave}"/>
+        <replace file="${package.root.slave}/active-version.txt">
+            <replacefilter token="__BUILD_NUMBER__" value="${pulse.build}"/>
+        </replace>
+
+        <copy todir="${package.root.slave}/bin">
+            <fileset dir="core/src/bin" includes="**/*"/>
+            <fileset dir="local/src/bin" includes="**/*"/>
+            <fileset dir="server-core/src/bin" includes="**/*"/>
+        </copy>
+
+        <copy todir="${package.root.slave}/lib">
+            <fileset dir="server-core/src/lib" includes="**/*"/>
+        </copy>
+
+        <fixcrlf srcdir="${package.root.slave}/bin" eol="lf" eof="remove" includes="**/*.sh"/>
+        <chmod perm="755" dir="${package.root.slave}/bin" includes="**/*.sh" verbose="true"/>
+
+        <retrieve.dependencies module="." conf="local" dest="${version.root.slave}/lib"/>
+        <retrieve.dependencies module="." conf="slave" dest="${version.root.slave}/lib"/>
+
+        <move tofile="${package.root.slave}/lib/boot.jar">
+            <fileset dir="${version.root.slave}/lib" includes="boot-*.jar"/>
+        </move>
+
+        <!-- place holder for package documentation -->
+<!--
+        <copy todir="${version.root.slave}/docs">
+            <fileset dir="etc" includes="delete-me.txt"/>
+        </copy>
+-->
+        <!-- place holder for the log directory -->
+        <copy todir="${package.root.slave}/logs">
+            <fileset dir="etc" includes="delete-me.txt"/>
+        </copy>
+
+        <!-- copy the readme file. -->
+        <replace dir="${package.root.slave}" token="@VERSION@" value="${pulse.version}">
+            <include name="README.txt"/>
+        </replace>
+
+        <copy todir="${version.root.slave}/system/config">
+            <fileset dir="slave/etc" includes="pulse-agent.properties,logging.properties"/>
+            <fileset dir="slave/etc" includes="logging/*.properties"/>
+        </copy>
+
+        <copy todir="${version.root.slave}/system/www">
+            <fileset dir="slave/src/www" includes="**/*"/>
+        </copy>
+        
+        <copy todir="${version.root.slave}/lib">
+            <fileset dir="slave/etc" includes="*.xml"/>
+        </copy>
+
+        <copy todir="${version.root.slave}/boot">
+            <fileset dir="core/etc" includes="*.commands.properties"/>
+            <fileset dir="local/etc" includes="*.commands.properties"/>
+            <fileset dir="server-core/etc" includes="*.commands.properties"/>
+            <fileset dir="slave/etc" includes="classpath.txt"/>
+        </copy>
+
+        <replace dir="${package.root.slave}/bin" replacefilterfile="slave/subst.properties">
+            <include name="**/*.in"/>
+        </replace>
+
+        <move todir="${package.root.slave}/bin">
+            <fileset dir="${package.root.slave}/bin"/>
+            <mapper type="glob" from="*.in" to="*"/>
+        </move>
+
+        <!-- the ant zip command doesn't preserve permissions, so we call out to zip -->
+        <exec executable="zip" dir="${package.root.slave}/..">
+            <arg line="-r ../${package.name.slave}.zip ${package.name.slave}"/>
+        </exec>
+
+        <tar destfile="build/${package.name.slave}.tar.gz" compression="gzip">
+            <tarfileset dir="${package.root.slave}/.." mode="755" username="root" group="root">
+                <include name="${package.name.slave}/bin/*"/>
+            </tarfileset>
+            <tarfileset dir="${package.root.slave}/.." username="root" group="root">
+                <include name="${package.name.slave}/**/*"/>
+                <exclude name="${package.name.slave}/bin/*"/>
+            </tarfileset>
+        </tar>
+
+        <antcall target="nsis.slave"/>
+    </target>
+
+    <target name="nsis.slave" if="on.windows">
+        <property name="package.name.slave" value="pulse-agent-${pulse.version}"/>
+        <property name="package.root.slave" value="build/package/${package.name.slave}"/>
+
+        <copy file="installer/env.nsh" todir="${package.root.slave}"/>
+        <copy file="installer/pulse.ico" todir="${package.root.slave}"/>
+        <copy file="installer/pulse.nsi.in" tofile="${package.root.slave}/pulse.nsi"/>
+
+        <replace file="${package.root.slave}/pulse.nsi" replacefilterfile="slave/subst.properties">
+            <replacefilter token="__PACKAGE_NAME__" value="${package.name.slave}"/>
+            <replacefilter token="__VERSION__" value="${pulse.version}"/>
+        </replace>
+
+        <exec executable="makensis" dir="${package.root.slave}">
+            <arg line="pulse.nsi"/>
+        </exec>
+    </target>
+
+    <target name="package.master" depends="init, clean, package.local, package.slave, build.master">
+
+        <property name="package.name.master" value="pulse-${pulse.version}"/>
+        <property name="package.root.master" value="build/package/${package.name.master}"/>
+        <property name="version.root.master" value="${package.root.master}/versions/${pulse.build}"/>
+
+        <delete dir="${package.root.master}"/>
+        <mkdir dir="${package.root.master}"/>
+
+        <copy file="core/etc/active-version.txt" todir="${package.root.master}"/>
+        <replace file="${package.root.master}/active-version.txt">
+            <replacefilter token="__BUILD_NUMBER__" value="${pulse.build}"/>
+        </replace>
+
+        <copy todir="${package.root.master}/bin">
+            <fileset dir="core/src/bin" includes="**/*"/>
+            <fileset dir="local/src/bin" includes="**/*"/>
+            <fileset dir="server-core/src/bin" includes="**/*"/>
+            <fileset dir="master/src/bin" includes="**/*"/>
+        </copy>
+
+        <copy todir="${package.root.master}/lib">
+            <fileset dir="server-core/src/lib" includes="**/*"/>
+        </copy>
+
+        <fixcrlf srcdir="${package.root.master}/bin" eol="lf" eof="remove" includes="**/*.sh"/>
+        <chmod perm="755" dir="${package.root.master}/bin" includes="**/*.sh" verbose="true"/>
+
+        <retrieve.dependencies module="." conf="local" dest="${version.root.master}/lib"/>
+        <retrieve.dependencies module="." conf="master" dest="${version.root.master}/lib"/>
+
+        <move tofile="${package.root.master}/lib/boot.jar">
+            <fileset dir="${version.root.master}/lib" includes="boot-*.jar"/>
+        </move>
+
+        <!-- place holder for package documentation -->
+<!--
+        <copy todir="${version.root.master}/docs">
+            <fileset dir="etc" includes="delete-me.txt"/>
+        </copy>
+-->
+        <copy todir="${version.root.master}/system/templates">
+            <fileset dir="master/src/templates" includes="**/*.vm **/*.ftl **/*.properties"/>
+        </copy>
+        <!-- place holder for the log directory -->
+        <copy todir="${package.root.master}/logs">
+            <fileset dir="etc" includes="delete-me.txt"/>
+        </copy>
+        <copy todir="${version.root.master}/system/www">
+            <fileset dir="master/src/www" includes="**/*"/>
+        </copy>
+
+        <!-- copy the readme file. -->
+        <copy todir="${package.root.master}">
+            <fileset dir="etc" includes="README.txt"/>
+        </copy>
+        <replace dir="${package.root.master}" token="@VERSION@" value="${pulse.version}">
+            <include name="README.txt"/>
+        </replace>
+
+        <!-- /config is for user configuration properties -->
+        <copy todir="${version.root.master}/system/config">
+            <fileset dir="master/etc" includes="pulse-defaults.properties,logging.properties"/>
+            <fileset dir="master/etc" includes="logging/*.properties"/>
+            <fileset dir="master/etc" includes="config.properties.template"/>
+        </copy>
+
+        <copy todir="${version.root.master}/lib">
+            <fileset dir="master/etc" includes="*.xml"/>
+        </copy>
+
+        <copy todir="${version.root.master}/boot">
+            <fileset dir="core/etc" includes="*.commands.properties"/>
+            <fileset dir="local/etc" includes="*.commands.properties"/>
+            <fileset dir="server-core/etc" includes="*.commands.properties"/>
+            <fileset dir="master/etc" includes="*.commands.properties"/>
+            <fileset dir="master/etc" includes="classpath.txt"/>
+        </copy>
+
+        <replace dir="${package.root.master}/bin" replacefilterfile="master/subst.properties">
+            <include name="**/*.in"/>
+        </replace>
+
+        <move todir="${package.root.master}/bin">
+            <fileset dir="${package.root.master}/bin"/>
+            <mapper type="glob" from="*.in" to="*"/>
+        </move>
+
+        <copy todir="${version.root.master}/system/packages">
+            <fileset dir="build">
+                <include name="pulse-agent-*"/>
+                <include name="pulse-dev-*"/>
+            </fileset>
+        </copy>
+
+        <!-- the ant zip command doesn't preserve permissions, so we call out to zip -->
+        <exec executable="zip" dir="${package.root.master}/..">
+            <arg line="-r ../${package.name.master}.zip ${package.name.master}"/>
+        </exec>
+
+        <tar destfile="build/${package.name.master}.tar.gz" compression="gzip">
+            <tarfileset dir="${package.root.master}/.." mode="755" username="root" group="root">
+                <include name="${package.name.master}/bin/*"/>
+            </tarfileset>
+            <tarfileset dir="${package.root.master}/.." username="root" group="root">
+                <include name="${package.name.master}/**/*"/>
+                <exclude name="${package.name.master}/bin/*"/>
+            </tarfileset>
+        </tar>
+
+        <antcall target="nsis.master"/>
+    </target>
+
+    <target name="nsis.master" if="on.windows">
+        <property name="package.name.master" value="pulse-${pulse.version}"/>
+        <property name="package.root.master" value="build/package/${package.name.master}"/>
+
+        <copy file="installer/env.nsh" todir="${package.root.master}"/>
+        <copy file="installer/pulse.ico" todir="${package.root.master}"/>
+        <copy file="installer/pulse.nsi.in" tofile="${package.root.master}/pulse.nsi"/>
+
+        <replace file="${package.root.master}/pulse.nsi" replacefilterfile="master/subst.properties">
+            <replacefilter token="__PACKAGE_NAME__" value="${package.name.master}"/>
+            <replacefilter token="__VERSION__" value="${pulse.version}"/>
+        </replace>
+
+        <exec executable="makensis" dir="${package.root.master}">
+            <arg line="pulse.nsi"/>
+        </exec>
+    </target>
+
+    <target name="accept.master" depends="package.master">
+        <property name="build.dir" value="master/build"/>
+        <property name="report.dir" value="build/reports/junit"/>
+        <mkdir dir="${report.dir}/xml"/>
+        <mkdir dir="${report.dir}/html"/>
+
+        <javac srcdir="server-core/src/java" destdir="${build.dir}/classes" includes="**/LicenseEncoder*" debug="true">
+            <classpath>
+                <fileset dir="${build.dir}/lib">
+                    <include name="**/*.jar"/>
+                </fileset>
+            </classpath>
+        </javac>
+
+        <condition property="extension" value="tar.gz" else="zip">
+            <os family="unix"/>
+        </condition>
+
+        <exec executable="bash" spawn="true">
+            <arg line="acceptance-test-prep.sh build/pulse-${pulse.version}.${extension}"/>
+        </exec>
+
+        <exec executable="bash">
+            <arg line="acceptance-test-wait.sh"/>
+        </exec>
+
+        <junit printsummary="yes" fork="on" forkmode="once" maxmemory="512m" failureProperty="test.failed" errorProperty="test.failed">
+            <sysproperty key="pulse.port" value="8889"/>
+            <sysproperty key="bootstrap" value="com/zutubi/pulse/bootstrap/bootstrapContext.xml"/>
+            <classpath>
+                <pathelement location="${build.dir}/classes"/>
+                <pathelement location="${build.dir}/test.classes"/>
+                <pathelement location="${build.dir}/accept.classes"/>
+                <fileset dir="${build.dir}/lib">
+                    <include name="**/*.jar"/>
+                </fileset>
+            </classpath>
+            <formatter type="xml"/>
+            <batchtest todir="${report.dir}/xml">
+                <fileset dir="master/src/acceptance">
+                    <include name="**/AcceptanceTestSuite.java"/>
+                </fileset>
+            </batchtest>
+        </junit>
+        <junitreport todir="${report.dir}">
+            <fileset dir=".">
+                <include name="*/${report.dir}/xml/*.xml"/>
+                <include name="${report.dir}/xml/*.xml"/>
+            </fileset>
+            <report format="frames" todir="${report.dir}/html"/>
+        </junitreport>
+        <exec executable="bash">
+            <arg line="acceptance-test-post.sh ${pulse.version}"/>
+        </exec>
+        <fail message="One or more acceptance tests failed.  See the reports (${report.dir}) for details."
+              if="test.failed"/>
+
+        <antcall target="test.agent.upgrade"/>
+    </target>
+
+    <target name="test.agent.upgrade">
+        <exec executable="python" failonerror="true">
+            <arg line="scripts/upgradetest.py ${pulse.version} ${pulse.build} both"/>
+        </exec>
+    </target>
+    
+    <target name="setup.master" depends="init">
+        <property name="build.dir" value="master/build"/>
+        <junit>
+            <sysproperty key="pulse.port" value="${master.port}"/>
+            <sysproperty key="bootstrap" value="com/zutubi/pulse/bootstrap/bootstrapContext.xml"/>
+            <classpath>
+                <pathelement location="${build.dir}/classes"/>
+                <pathelement location="${build.dir}/test.classes"/>
+                <pathelement location="${build.dir}/accept.classes"/>
+                <fileset dir="${build.dir}/lib">
+                    <include name="**/*.jar"/>
+                </fileset>
+            </classpath>
+            <batchtest todir="fubar">
+                <fileset dir="master/src/acceptance">
+                    <include name="**/SetupAcceptanceTest.java"/>
+                </fileset>
+            </batchtest>
+        </junit>
+    </target>
+    
+    <target name="init">
+        <property name="project.root.dir" value="."/>
+        <property name="project.repository" value="${project.root.dir}/build/repository"/>
+    </target>
+
+    <!--
+     Refresh the projects lib directory by retrieving the latest module dependencies.
+    -->
+    <target name="refresh.lib" depends="clean, init">
+
+        <!-- refreshing the lib directory -->
+        <delete dir="lib"/>
+
+        <!-- use the default ivy configuration properties. -->
+        <property file="ivy.properties"/>
+        <ivy:configure/>
+        <!-- retrieve all of the modules external dependencies -->
+        <retrieve.dependencies module="core" dest="lib" conf="external"/>
+        <retrieve.dependencies module="server-core" dest="lib" conf="external"/>
+        <retrieve.dependencies module="local" dest="lib" conf="external"/>
+        <retrieve.dependencies module="master" dest="lib" conf="external"/>
+        <retrieve.dependencies module="slave" dest="lib" conf="external"/>
+    </target>
+
+    <!--
+     Retrieve the dependencies for the specified module, and place them into the
+     destination directory.
+    -->
+    <macrodef name="retrieve.dependencies">
+        <attribute name="module"/>
+        <attribute name="conf" default="external"/>
+        <attribute name="dest" default="lib"/>
+        <sequential>
+            <!-- resolve the modules ivy file. -->
+            <ivy:resolve file="@{module}/ivy.xml" conf="@{conf}"/>
+            <ivy:deliver deliverpattern="${project.repository}/[module]/ivy-[revision].xml"/>
+            <ivy:retrieve pattern="@{dest}/[artifact]-[revision].[ext]" validate="true" conf="@{conf}"/>
+        </sequential>
+    </macrodef>
+
+    <!--
+     Execute the specified target on each of the modules.
+    -->
+    <macrodef name="foreach">
+        <attribute name="target"/>
+        <sequential>
+            <ant inheritAll="false" dir="core" antfile="build.xml" target="@{target}"/>
+            <ant inheritAll="false" dir="local" antfile="build.xml" target="@{target}"/>
+            <ant inheritAll="false" dir="server-core" antfile="build.xml" target="@{target}"/>
+            <ant inheritAll="false" dir="master" antfile="build.xml" target="@{target}"/>
+            <ant inheritAll="false" dir="slave" antfile="build.xml" target="@{target}"/>
+        </sequential>
+    </macrodef>
+</project>

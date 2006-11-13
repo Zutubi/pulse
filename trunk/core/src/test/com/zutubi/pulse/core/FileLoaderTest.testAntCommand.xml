@@ -1,0 +1,9 @@
+<?xml version="1.0"?>
+<project>
+    <recipe name="wow">
+        <ant name="test"/>
+        <ant name="test" exe="myant"/>
+        <ant name="test" targets="build test"/>
+        <ant name="test" build-file="mybuild.xml"/>
+    </recipe>
+</project>

@@ -1,0 +1,33 @@
+#helpTag("Groups")
+#authorisationTags($principle)
+<content tag="selectedTab">administration</content>
+<html>
+<head>
+#set($title = $action.getText("group.edit", [$group.name]))
+    <title>$title</title>
+</head>
+<body>
+    #adminTabs("groups")
+
+    #parse("/template/includes/actionerrors.vm")
+
+    #wwcform("action=editGroup.action" "id=group.edit" "heading=$title" "method=post")
+        #wwhidden("name=groupId")
+
+        #wwtextfield("name=newName" "label=%{getText('group.name')}" "required=true" "tabindex=1")
+        #wwcheckbox("name=admin" "label=%{getText('group.grant.admin')}" "tabindex=2")
+        #wwcheckbox("name=personal" "label=%{getText('group.grant.personal')}" "tabindex=3")
+        #wwcheckbox("name=adminAllProjects" "label=%{getText('group.admin.all.projects')}" "tabindex=4" "onclick=setEnableState('group.edit_projects', 'group.edit_adminAllProjects', true)")
+        #wwselect("name=projects" "label=%{getText('group.admin.selected.projects')}" "list=allProjects" "multiple=true" "tabindex=5")
+        #saveCancel(6)
+    #end
+
+    <script type="text/javascript">
+        <!--
+        setEnableState('group.edit_projects', 'group.edit_adminAllProjects', true);
+        -->
+    </script>
+    
+    #tabEnd()
+</body>
+</html>

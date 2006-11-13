@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet type="text/xsl" href="http://www.jayasoft.fr/org/ivyrep/ivy-doc.xsl"?>
+<ivy-module version="1.0">
+
+    <info organisation="opensymphony" revision="20060404" module="quartz" status="release">
+        <license name="Apache License, Version 2.0" url="http://www.apache.org/licenses/LICENSE-2.0.txt"/>
+        <description homepage="http://www.opensymphony.com/quartz/">
+            Quartz is a full-featured, open source job scheduling system.
+            NOTE: This release is a patched release containing a fix for
+            http://jira.opensymphony.com/browse/QUARTZ-399 
+        </description>
+    </info>
+
+    <publications>
+        <artifact name="quartz" type="jar" conf="default"/>
+        <artifact name="quartz-license" type="txt" conf="default"/>
+    </publications>
+
+    <dependencies>
+        <dependency org="apache" name="commons-collections" rev="3.1"/>
+        <dependency org="apache" name="commons-logging" rev="1.0.4"/>
+    </dependencies>
+
+</ivy-module>

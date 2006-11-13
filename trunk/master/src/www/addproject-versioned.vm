@@ -1,0 +1,34 @@
+#helpTag("Versioned+Projects")
+#authorisationTags($principle)
+<content tag="selectedTab">projects</content>
+<html>
+<head>
+    <title>#wwtext("name=add.project")</title>
+    <script type="text/javascript" src="$base/js/prototype.js"></script>
+    <script type="text/javascript">
+    <!--
+    	function openFileWindow()
+    	{
+    	    openBrowseWindow('$base', false, "versioned.setup_details_pulseFileName", "");
+    	}
+    -->
+    </script>
+</head>
+<body>
+    <div id="pagecontent">
+    <h1>:: #wwtext("name=add.project") ::</h1>
+
+    #parse("/template/includes/actionerrors.vm")
+
+#wwcform("action=addProject.action" "id=versioned.setup" "heading=%{getText('versioned.setup')}" "method=post")
+    #wwhidden("name=state")
+    #wwhidden("name=submit")
+
+    #wwtextfield("name=details.pulseFileName" "label=%{getText('pulse.filename')}" "after= <a href='#' onclick='openFileWindow(); return false;'>browse</a>" "required=true" "size=40" "tabindex=1" "onkeypress=return submitenter(this,event)")
+    #inlineHelp("pulse.filename.help")
+    #previousFinishCancel(2)
+ #end
+
+     </div>
+</body>
+</html>

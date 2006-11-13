@@ -1,0 +1,8 @@
+<?xml version="1.0"?>
+<project>
+
+    <recipe name="r1">
+        <macro-ref macro="${not-found}"/>
+    </recipe>
+
+</project>

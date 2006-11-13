@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet type="text/xsl" href="http://www.jayasoft.fr/org/ivyrep/ivy-doc.xsl"?>
+<ivy-module version="1.0">
+    <info organisation="caucho" module="hessian" revision="3.0.13" status="release">
+        <license name="..." url="..."/>
+        <description homepage="http://www.caucho.com/hessian/">
+            Hessian is a lightweight, self-describing binary RPC protocol.
+        </description>
+    </info>
+
+    <publications>
+        <artifact name="hessian" type="jar"/>
+        <artifact name="hessian-license" type="txt"/>
+    </publications>
+
+</ivy-module>

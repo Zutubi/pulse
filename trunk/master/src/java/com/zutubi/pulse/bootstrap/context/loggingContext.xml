@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
+<!--
+The logging subsystem context file contains the logging system configuration.
+
+This context exports:
+
+    logConfigurationManager: During initialisation, this manager setups up the configured logging levels.
+                             Prior to the initialisation, the logging level is defined by the systems
+                             startup.
+
+                             By default, the initial logging configuration defined within the ConsoleConfig instance, referenced
+                             on the commandline via -Djava.util.logging.config.class=com.zutubi.pulse.logging.ConsoleConfig
+
+This context requires:
+
+    configurationManager:
+-->
+<beans>
+
+    <!--
+    ideally, we want to initialise the log configuration manager as soon as possible. the problem
+    is that to locate the correct logging.properties file we need the config manager, which requires
+    spring.
+    Leave it here for now until a solution presents itself.
+    -->
+    <bean id="logConfigurationManager" class="com.zutubi.pulse.logging.LogConfigurationManager" init-method="init">
+        <property name="logConfiguration">
+            <ref local="logConfiguration"/>
+        </property>
+        <property name="systemPaths">
+            <ref local="systemPaths"/>
+        </property>
+        <property name="logManager">
+            <ref local="logManager"/>
+        </property>
+        <property name="eventManager">
+            <ref bean="eventManager"/>
+        </property>
+    </bean>
+
+    <bean id="logConfiguration" class="org.springframework.beans.factory.config.PropertyPathFactoryBean">
+        <property name="targetBeanName">
+            <value>configurationManager</value>
+        </property>
+        <property name="propertyPath">
+            <value>appConfig</value>
+        </property>
+    </bean>
+
+    <bean id="systemPaths" class="org.springframework.beans.factory.config.PropertyPathFactoryBean">
+        <property name="targetBeanName">
+            <value>configurationManager</value>
+        </property>
+        <property name="propertyPath">
+            <value>systemPaths</value>
+        </property>
+    </bean>
+
+    <bean id="logManager" class="com.zutubi.pulse.logging.LogManager">
+        <property name="factories">
+            <map>
+                <entry><key><value>FileHandler</value></key><ref local="fileHandlerFactory"/></entry>
+                <entry><key><value>ConsoleHandler</value></key><ref local="consoleHandlerFactory"/></entry>
+                <entry><key><value>MemoryHandler</value></key><ref local="memoryHandlerFactory"/></entry>
+            </map>
+        </property>
+    </bean>
+
+    <bean id="fileHandlerFactory" class="com.zutubi.pulse.logging.FileHandlerFactory">
+        <property name="objectFactory">
+            <ref bean="objectFactory"/>
+        </property>
+    </bean>
+
+    <bean id="consoleHandlerFactory" class="com.zutubi.pulse.logging.ConsoleHandlerFactory"/>
+    <bean id="memoryHandlerFactory" class="com.zutubi.pulse.logging.MemoryHandlerFactory"/>
+
+</beans>

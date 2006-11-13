@@ -1,0 +1,7 @@
+<?xml version="1.0"?>
+<project>
+    <maven2.pp name="empty"/>
+
+    <maven2.pp name="fail" fail-on-error="true"/>
+
+</project>

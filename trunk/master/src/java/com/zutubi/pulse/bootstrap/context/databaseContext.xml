@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
+<!--
+This context provides all of the database related components. In particular, the DataSource object
+that allows other systems to access the database.
+
+This context exports:
+
+    dataSource: provides access to the database. 
+
+-->
+<beans>
+
+    <bean id="dataSource" class="com.zutubi.pulse.bootstrap.DataSourceBeanFactory" destroy-method="close"/>
+
+</beans>

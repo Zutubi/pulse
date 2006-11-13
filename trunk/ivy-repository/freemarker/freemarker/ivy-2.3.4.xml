@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet type="text/xsl" href="http://ivyrep.jayasoft.org/ivy-doc.xsl"?>
+<ivy-module version="1.0">
+    <info organisation="freemarker" module="freemarker" revision="2.3.4" status="release">
+		<license name="BSD"/>
+
+		<description homepage="http://freemarker.sourceforge.net/">
+
+		</description>
+	</info>
+
+    <publications>
+        <artifact name="freemarker" type="jar"/>
+        <artifact name="freemarker-license" type="txt"/>
+    </publications>
+
+</ivy-module>

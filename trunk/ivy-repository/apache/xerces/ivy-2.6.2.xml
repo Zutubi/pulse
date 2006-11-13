@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<?xml-stylesheet type="text/xsl" href="http://www.jayasoft.fr/org/ivyrep/ivy-doc.xsl"?>
+<ivy-module version="1.0">
+    <info organisation="apache" module="xerces" revision="2.6.2" status="release">
+		<license name="Apache" url="http://www.apache.org/licenses/LICENSE-2.0.txt"/>
+		<ivyauthor name="jayasoft" url="http://www.jayasoft.org/"/>
+
+		<description homepage="http://xerces.apache.org/xerces-j/">
+            Xerces Java Parser
+		</description>
+	</info>
+
+    <publications>
+        <artifact name="xercesImpl" type="jar"/>
+        <artifact name="xerces-license" type="txt"/>
+    </publications>
+
+</ivy-module>

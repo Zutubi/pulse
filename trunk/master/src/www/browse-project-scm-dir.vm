@@ -1,0 +1,13 @@
+#authorisationTags($principle)
+#projectTags($project)
+<html>
+<head>
+    <title>$!webwork.htmlEncode($path)</title>
+</head>
+<body>
+    #projectTabs("configuration")
+
+    #showDirectoryListing("$!webwork.htmlEncode($location)" "browseProjectScm.action?id=$project.id&amp;" false false)
+
+    #tabEnd()
+</html>

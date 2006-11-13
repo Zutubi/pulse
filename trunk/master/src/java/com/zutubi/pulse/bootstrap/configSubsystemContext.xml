@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
+<beans>
+
+    <bean id="setupManager" class="com.zutubi.pulse.bootstrap.DefaultSetupManager" autowire="byName">
+        <property name="daoContexts">
+            <list>
+                <value>classpath:/com/zutubi/pulse/bootstrap/context/databaseContext.xml</value>
+                <value>classpath:/com/zutubi/pulse/bootstrap/context/hibernateContext.xml</value>
+            </list>
+        </property>
+        <property name="upgradeContexts">
+            <list>
+                <value>classpath:/com/zutubi/pulse/bootstrap/context/upgradeContext.xml</value>
+            </list>
+        </property>
+        <property name="setupContexts">
+            <list>
+                <value>classpath:/com/zutubi/pulse/bootstrap/context/userContext.xml</value>
+            </list>
+        </property>
+        <property name="startupContexts">
+            <list>
+                <value>classpath:/com/zutubi/pulse/bootstrap/context/schedulingContext.xml</value>
+                <value>classpath:/com/zutubi/pulse/bootstrap/context/builderContext.xml</value>
+                <value>classpath:/com/zutubi/pulse/bootstrap/context/securityContext.xml</value>
+                <value>classpath:/com/zutubi/pulse/bootstrap/context/formsContext.xml</value>
+            </list>
+        </property>
+        <property name="postStartupContexts">
+            <list>
+                <value>classpath:/com/zutubi/pulse/bootstrap/context/pluginContext.xml</value>
+            </list>
+        </property>
+    </bean>
+
+    <!-- this spring object factory will ensure that WebWork Actions are autowired. -->
+    <!-- TODO: DO WE STILL NEED THIS HERE??-->
+    <bean id="xworkObjectFactory" class="com.opensymphony.xwork.spring.SpringObjectFactory" init-method="initObjectFactory"/>
+
+</beans>

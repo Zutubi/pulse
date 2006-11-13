@@ -1,0 +1,176 @@
+package com.zutubi.pulse.model;
+
+import com.zutubi.pulse.MasterBuildPaths;
+import com.zutubi.pulse.bootstrap.MasterConfigurationManager;
+import com.zutubi.pulse.core.FileLoadException;
+import com.zutubi.pulse.core.Scope;
+import com.zutubi.pulse.core.VariableHelper;
+import com.zutubi.pulse.core.model.*;
+import com.zutubi.pulse.util.StringUtils;
+
+import java.util.LinkedList;
+import java.util.List;
+
+/**
+ * A post build action to run an executable.
+ */
+public class RunExecutablePostBuildAction extends PostBuildAction
+{
+    private String command;
+    private String arguments;
+    private MasterConfigurationManager configurationManager;
+
+    public RunExecutablePostBuildAction()
+    {
+    }
+
+    public RunExecutablePostBuildAction(String name, List<BuildSpecification> specifications, List<ResultState> states, boolean failOnError, String command, String arguments)
+    {
+        super(name, specifications, states, failOnError);
+        this.command = command;
+        this.arguments = arguments;
+    }
+
+    protected void internalExecute(BuildResult result)
+    {
+        try
+        {
+            List<String> commandLine = new LinkedList<String>();
+            commandLine.add(command);
+            addArguments(commandLine, result);
+
+            ProcessBuilder builder = new ProcessBuilder(commandLine);
+            Process child = builder.start();
+            int code = child.waitFor();
+            if(code != 0)
+            {
+                addError("Command exited with non-zero exit code (" + code + ")");
+            }
+        }
+        catch (Exception e)
+        {
+            addError(e.getMessage());
+        }
+    }
+
+    public String getType()
+    {
+        return "run executable";
+    }
+
+    public PostBuildAction copy()
+    {
+        RunExecutablePostBuildAction copy = new RunExecutablePostBuildAction();
+        copyCommon(copy);
+        copy.command = command;
+        copy.arguments = arguments;
+
+        return copy;
+    }
+
+    private void addArguments(List<String> commandLine, BuildResult result) throws FileLoadException
+    {
+        List<String> args = StringUtils.split(arguments);
+
+        Scope scope = getScope(result, configurationManager);
+
+        for(String arg: args)
+        {
+            commandLine.add(VariableHelper.replaceVariables(arg, scope, true));
+        }
+    }
+
+    public static Scope getScope(BuildResult result, MasterConfigurationManager configurationManager)
+    {
+        MasterBuildPaths paths = new MasterBuildPaths(configurationManager);
+
+        Scope scope = new Scope();
+        scope.add(new Property("project", result.getProject().getName()));
+        scope.add(new Property("number", Long.toString(result.getNumber())));
+        scope.add(new Property("specification", result.getBuildSpecification()));
+        scope.add(new Property("status", result.getState().getString()));
+        scope.add(new Property("reason", result.getReason().getSummary()));
+
+        TestResultSummary tests = result.getTestSummary();
+        String testSummary;
+        if(tests.getTotal() > 0)
+        {
+            if(tests.allPassed())
+            {
+                testSummary = "all " + tests.getTotal() + " tests passed";
+            }
+            else
+            {
+                testSummary = Integer.toString(tests.getBroken()) + " of " + tests.getTotal() + " tests broken";
+            }
+        }
+        else
+        {
+            testSummary = "no tests";
+        }
+
+        scope.add(new Property("test.summary", testSummary));
+        scope.add(new Property("build.dir", paths.getBuildDir(result).getAbsolutePath()));
+
+        for(RecipeResultNode node: result.getRoot().getChildren())
+        {
+            addStageProperties(result, node, scope, paths, configurationManager);
+        }
+        return scope;
+    }
+
+    private static void addStageProperties(BuildResult result, RecipeResultNode node, Scope scope, MasterBuildPaths paths, MasterConfigurationManager configurationManager)
+    {
+        String name = node.getStage();
+        String prefix = "stage." + name + ".";
+
+        RecipeResult recipeResult = node.getResult();
+        scope.add(new Property(prefix + "agent", node.getHostSafe()));
+        if(result != null)
+        {
+            scope.add(new Property(prefix + "recipe", recipeResult.getRecipeNameSafe()));
+            scope.add(new Property(prefix + "status", recipeResult.getState().getString()));
+            scope.add(new Property(prefix + "dir", paths.getRecipeDir(result, recipeResult.getId()).getAbsolutePath()));
+
+            for(CommandResult command: recipeResult.getCommandResults())
+            {
+                addCommandProperties(node, command, scope, configurationManager);
+            }
+        }
+    }
+
+    private static void addCommandProperties(RecipeResultNode node, CommandResult commandResult, Scope scope, MasterConfigurationManager configurationManager)
+    {
+        String stageName = node.getStage();
+        String commandName = commandResult.getCommandName();
+        String prefix = "stage." + stageName + ".command." + commandName + ".";
+
+        scope.add(new Property(prefix + "status", commandResult.getState().getString()));
+        scope.add(new Property(prefix + "dir", commandResult.getAbsoluteOutputDir(configurationManager.getDataDirectory()).getAbsolutePath()));
+    }
+
+    public String getCommand()
+    {
+        return command;
+    }
+
+    public void setCommand(String command)
+    {
+        this.command = command;
+    }
+
+    public String getArguments()
+    {
+        return arguments;
+    }
+
+    public void setArguments(String arguments)
+    {
+        this.arguments = arguments;
+    }
+
+    public void setConfigurationManager(MasterConfigurationManager configurationManager)
+    {
+        this.configurationManager = configurationManager;
+    }
+}

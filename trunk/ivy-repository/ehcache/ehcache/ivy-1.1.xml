@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<?xml-stylesheet type="text/xsl" href="http://www.jayasoft.fr/org/ivyrep/ivy-doc.xsl"?>
+<ivy-module version="1.0">
+    <info organisation="ehcache" module="ehcache" revision="1.1" status="release" publication="20041122214900">
+		<license name="Apache 1.1" url="http://www.apache.org/licenses/LICENSE-1.1"/>
+		<ivyauthor name="jayasoft" url="http://www.jayasoft.org/"/>
+
+		<description homepage="http://ehcache.sourceforge.net/">
+            Ehcache is a pure Java, in-process cache.<br/><br/>
+	        Revisions of dependencies (commons-logging and commons-collections) are not
+            well defined in the <a href="http://ehcache.sourceforge.net/documentation/index.html#dependencies">dependencies</a>
+            section of the documentation, so revisions have been only guessed.<br/><br/>
+		</description>
+	</info>
+    <configurations>
+        <conf name="default" description="for minimal use"/>
+        <conf name="1.2" extends="default" description="for use in jdk 1.2 or 1.3"/>
+    </configurations>
+
+    <publications>
+        <artifact name="ehcache" type="jar"/>
+        <artifact name="ehcache-license" type="txt"/>
+    </publications>
+
+    <dependencies>
+        <dependency org="apache" name="commons-logging" rev="1.0.4" conf="default"/>
+        <dependency org="apache" name="xerces" rev="2.5.0" conf="1.2->default"/>
+        <dependency org="apache" name="commons-collections" rev="2.1.1" conf="1.2->default"/>
+    </dependencies>
+</ivy-module>

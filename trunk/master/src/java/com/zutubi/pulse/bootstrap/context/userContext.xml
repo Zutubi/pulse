@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
+<!--
+
+This context exports:
+
+    userManager:
+
+    passwordEncoder:
+    
+-->
+<beans>
+
+
+    <!-- Use this for an in memory user manager.
+        <bean id="userManager" class="org.acegisecurity.userdetails.memory.InMemoryDaoImpl">
+            <property name="userMap">
+                <value>
+                    admin=admin,ROLE_ADMINISTRATOR,ROLE_USER
+                    user=user,ROLE_USER
+                </value>
+            </property>
+        </bean>
+    -->
+
+    <bean id="passwordEncoder" class="org.acegisecurity.providers.encoding.Md5PasswordEncoder"/>
+
+    <bean id="userManager" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
+        <property name="transactionManager">
+            <ref bean="transactionManager"/>
+        </property>
+        <property name="target">
+            <ref bean="userManagerTarget"/>
+        </property>
+        <property name="transactionAttributes">
+            <props>
+                <prop key="*">PROPAGATION_REQUIRED</prop>
+            </props>
+        </property>
+    </bean>
+
+    <bean id="userManagerTarget" class="com.zutubi.pulse.model.DefaultUserManager" autowire="byName" init-method="init"/>
+
+</beans>

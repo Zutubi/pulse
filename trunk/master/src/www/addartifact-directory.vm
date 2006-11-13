@@ -1,0 +1,30 @@
+#helpTag("Project+Directory+Artifacts")
+#authorisationTags($principle)
+#projectTags($wizard.project)
+<html>
+<head>
+    <title>#wwtext("name=add.artifact")</title>
+</head>
+<body>
+    #projectTabs("configuration")
+
+    #parse("/template/includes/actionerrors.vm")
+
+#wwcform("action=addArtifact.action" "id=artifact.directory" "heading=%{getText('artifact.directory.step')}" "method=post")
+    #wwhidden("name=state")
+    #wwhidden("name=submit")
+
+    #wwtextfield("name=capture.base" "label=%{getText('artifact.directory.base')}" "tabindex=1" "size=60" "onkeypress=return submitenter(this,event)")
+    #inlineHelp("artifact.directory.base.help")
+    #wwtextfield("name=capture.includes" "label=%{getText('artifact.directory.inclusions')}" "size=60" "tabindex=2" "onkeypress=return submitenter(this,event)")
+    #inlineHelp("artifact.directory.inclusions.help")
+    #wwtextfield("name=capture.excludes" "label=%{getText('artifact.directory.exclusions')}" "size=60" "tabindex=3" "onkeypress=return submitenter(this,event)")
+    #inlineHelp("artifact.directory.exclusions.help")
+    #wwtextfield("name=capture.mimeType" "label=%{getText('artifact.directory.type')}" "tabindex=5" "onkeypress=return submitenter(this,event)")
+    #inlineHelp("artifact.directory.type.help")
+    #previousNextCancel(6)
+#end
+
+    #tabEnd()
+</body>
+</html>

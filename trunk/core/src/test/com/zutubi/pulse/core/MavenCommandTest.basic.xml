@@ -1,0 +1,11 @@
+<project default="mybuild" xmlns:ant="jelly:ant" xmlns:j="jelly:core">
+
+    <goal name="mybuild" description="simple default target">
+        <ant:echo message="build target"/>
+    </goal>
+
+    <goal name="mytest" description="run my tests">
+        <ant:echo message="test target"/>
+    </goal>
+
+</project>

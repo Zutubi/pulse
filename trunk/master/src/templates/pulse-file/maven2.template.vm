@@ -1,0 +1,28 @@
+<?xml version="1.0"?>
+<project defaultRecipe="default">
+
+    #parse("pulse-file/prologue.vm")
+
+    <recipe name="default">
+        <command name="build">
+            <!-- pull in the maven2 resource if configured. -->
+            <resource name="maven2" required="false"/>
+            <maven2
+#if($workingDir)
+                working-dir="${base.dir}/$workingDir"
+#end
+#if($goals)
+                goals="$goals"
+#end
+#if($arguments)
+                args="$arguments"
+#end
+            >
+                #parse("pulse-file/output.processors.vm")
+            </maven2>
+
+            #parse("pulse-file/artifacts.vm")
+
+        </command>
+    </recipe>
+</project>

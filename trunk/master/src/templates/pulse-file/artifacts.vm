@@ -1,0 +1,36 @@
+#macro(processors $capture)
+    #foreach($processor in $capture.processors)
+        <process processor="$details.getReference($processor)"/>
+    #end
+#end
+#foreach($capture in $captures)
+    #if($capture.type.equals("file"))
+<artifact name="$capture.name" file="$capture.file" fail-if-not-present="false"
+        #if($capture.mimeType)
+        type="$capture.mimeType"
+        #end
+        >
+    #processors($capture)
+</artifact>
+    #else
+<dir-artifact name="$capture.name" fail-if-not-present="false"
+        #if($capture.base)
+        base="$capture.base"
+        #end
+        #if($capture.index)
+        base="$capture.index"
+        #end
+        #if($capture.mimeType)
+        type="$capture.mimeType"
+        #end
+        >
+        #foreach($pattern in $capture.includePatterns)
+    <include pattern="$pattern"/>
+        #end
+        #foreach($pattern in $capture.excludePatterns)
+    <exclude pattern="$pattern"/>
+        #end
+    #processors($capture)
+</dir-artifact>
+    #end
+#end

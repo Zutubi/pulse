@@ -1,0 +1,21 @@
+[#ftl]
+Custom project build notification.
+
+Project: ${result.project.name}
+Number : ${result.number?c}
+Status : ${result.state.prettyString}
+Link   : ${buildLink(result)}
+[#if result.reason?exists]
+Reason : ${result.reason.summary}.
+[/#if]
+
+Build stages:
+[@buildStages result=result/]
+
+[@buildChanges/]
+
+[@buildMessages result=result level=errorLevel/]
+
+[@buildMessages result=result level=warningLevel/]
+
+[@buildTestSummary result=result/]

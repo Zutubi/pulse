@@ -1,0 +1,23 @@
+#helpTag("Project+Output+Processors")
+#authorisationTags($principle)
+#projectTags($project)
+<html>
+<head>
+    <title>#wwtext("name=artifact.output.edit")</title>
+</head>
+<body>
+    #projectTabs("configuration")
+
+    #parse("/template/includes/actionerrors.vm")
+
+#wwcform("action=editOutputProcessors.action" "id=edit.output" "heading=%{getText('artifact.output.edit')}" "method=post")
+    #wwhidden("name=projectId")
+
+    #wwcheckboxlist("name=processors" "label=%{getText('artifact.processors')}" "multirow=true" "labelposition=top" "list=processorList" "multiple=true" "size=10" "tabindex=1")
+
+    #saveCancel(2)
+#end
+
+    #tabEnd()
+</body>
+</html>

@@ -1,0 +1,134 @@
+#macro(ownerCell $request)
+    #if($request.personal)
+        <td class="content">
+            <img alt="personal" src="$base/images/user.gif"/>
+            $!webwork.htmlEncode($request.owner.login)
+        </td>
+    #else
+        #dynamicLinkCell($request.owner.name "$base/currentBuild.action?id=$request.owner.id")
+    #end
+#end
+
+    <table class="columns">
+    <tr><td>
+
+    <table class="fill-content">
+        #headingRow("build.queue" 6)
+        <tr>
+            #contentHeading("queue.owner" 1)
+            #contentHeading("build.id" 1)
+            #contentHeading("project" 1)
+            #contentHeading("queue.revision" 1)
+            #contentHeading("build.spec" 1)
+            #contentHeading("queue.when" 1)
+        </tr>
+#if($buildQueue.size() > 0)
+    #foreach($request in $buildQueue)
+        <tr>
+            #ownerCell($request)
+        #if($request.personal)
+            #staticCell($request.number)
+        #else
+            #contentCell("build.id.unknown")
+        #end
+            #dynamicLinkCell($request.project.name "currentBuild.action?id=$request.project.id")
+        #if($request.revision.fixed)
+            #dynamicCell($request.revision.revision)
+        #else
+            #contentCell("queue.revision.floating")
+        #end
+            #dynamicCell($request.specification)
+            #contentCell($request.prettyQueueTime)
+        </tr>
+    #end
+#else
+    <tr>
+        <td class="content" colspan="6">#wwtext("name=build.queue.empty")</td>
+    </tr>
+#end
+    </table>
+
+    </td></tr><tr><td>
+
+    <table class="fill-content">
+        #headingRow("active.builds" 9)
+        <tr>
+            #contentHeading("queue.owner" 1)
+            #contentHeading("project" 1)
+            #contentHeading("build.id" 1)
+            #contentHeading("build.spec" 1)
+            #contentHeading("build.status" 2)
+            #contentHeading("build.when" 1)
+            #contentHeading("build.elapsed" 1)
+            #contentHeading("actions" 1)
+        </tr>
+#if($executingBuilds.size() > 0)
+    #foreach($buildResult in $executingBuilds)
+        #set($cssClass = $buildResult.state.string)
+        #set($project = $buildResult.project)
+
+        <tr>
+            #ownerCell($buildResult)
+            <td class="content"><a href="currentBuild.action?id=$project.id">$!webwork.htmlEncode($project.name)</a></td>
+            <td class="content-right"><a href="viewBuild.action?id=$buildResult.id">$buildResult.number</a></td>
+            #classCell($buildResult.buildSpecification)
+            #statusCell($buildResult true)
+            #dateClassCell($buildResult)
+            #elapsedCell($buildResult)
+
+        #if($action.canCancel($buildResult))
+            #actionCell("cancel" "cancelBuild.action?buildId=$buildResult.id" "cancel.gif")
+        #else
+            #contentCell("empty.cell")
+        #end
+        </tr>
+    #end
+#else
+    <tr>
+        <td class="content" colspan="9">#wwtext("name=no.active.builds")</td>
+    </tr>
+#end
+    </table>
+
+    </td></tr><tr><td>
+
+    <table class="fill-content">
+
+#if($recipeQueueRunning)
+        #restrictedHeadingRow("recipe.queue" 7 "ROLE_ADMINISTRATOR" "queue.pause" "$base/admin/toggleRecipeQueue.action" "control_pause_blue.gif" false)
+#else
+        #restrictedHeadingRow("recipe.queue" 7 "ROLE_ADMINISTRATOR" "queue.resume" "$base/admin/toggleRecipeQueue.action" "control_play_blue.gif" false)
+        #noteRow("queue.paused" 7)
+#end
+        <tr>
+            #contentHeading("queue.owner" 1)
+            #contentHeading("build.id" 1)
+            #contentHeading("project" 1)
+            #contentHeading("build.spec" 1)
+            #contentHeading("queue.recipe" 1)
+            #contentHeading("queue.host" 1)
+            #contentHeading("queue.when" 1)
+        </tr>
+#if($recipeQueueSnapshot.size() > 0)
+    #foreach($dispatchRequest in $recipeQueueSnapshot)
+        #set($build = $dispatchRequest.build)
+        #set($project = $build.project)
+        <tr>
+            #ownerCell($build)
+            #rightCell($build.number)
+            #dynamicLinkCell($project.name "currentBuild.action?id=$project.id")
+            #dynamicCell($build.buildSpecification)
+            #dynamicCell($dispatchRequest.request.recipeNameSafe)
+            #dynamicCell($dispatchRequest.hostRequirements.summary)
+            #contentCell($dispatchRequest.prettyQueueTime)
+        </tr>
+    #end
+#else
+    <tr>
+        <td class="content" colspan="7">#wwtext("name=recipe.queue.empty")</td>
+    </tr>
+#end
+    </table>
+
+    </td></tr>
+    </table>

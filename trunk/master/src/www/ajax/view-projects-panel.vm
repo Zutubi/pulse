@@ -1,0 +1,97 @@
+##
+## Shows a list of recent builds for the given list of projects
+##
+#macro(recentBuilds $group $projects)
+    <table class="content" id="group_$!webwork.htmlEncode($group.name)">
+        <tr>
+            <th class="group" colspan="14">
+#if($group)
+    #if($rssEnabled)
+                <span class="action">
+                    <a class="unadorned" id="rss.builds.$group.id" href="rss.action?groupId=$group.id"><img alt="$action.getText('rss')" src="$base/images/feed-icon-16x16.gif"/></a>
+                </span>
+    #end
+                $!webwork.htmlEncode($group.name)
+#else
+                #wwtext("name=projects")
+#end
+            </th>
+
+        #rssHeadingRow( 14 "$rssEnabled" "rss.action" "rss.builds" )
+        <tr>
+            #contentHeading("project.name" 1)
+            #contentHeading("build.id" 1)
+            #contentHeading("build.spec" 1)
+            #contentHeading("build.status" 2)
+            #contentHeading("build.reason" 1)
+            #contentHeading("build.tests" 1)
+            #contentHeading("build.when" 1)
+            #contentHeading("build.elapsed" 1)
+            #contentHeading("actions" 5)
+        </tr>
+
+    #foreach($project in $projects)
+        #set($index = $velocityCount - 1)
+
+        <tr>
+            <td class="content"><a id="$project.name" href="currentBuild.action?id=$project.id">$!webwork.htmlEncode($project.name)</a></td>
+
+        #set($lastResult = $action.getLatestBuild($project))
+        #if($lastResult)
+            #set($lastResult = $latestBuilds.get($index))
+            #set($cssClass = $lastResult.state.string)
+
+            <td class="content-right"><a href="viewBuild.action?id=$lastResult.id">$lastResult.number</a></td>
+            #classCell($lastResult.buildSpecification)
+            #statusCell($lastResult true)
+            #classCell($lastResult.reason.summary)
+            #testResultsCell($lastResult false $lastResult)
+            #dateClassCell($lastResult)
+            #elapsedCell($lastResult)
+            #viewCell($project $lastResult)
+            #logCell($project $lastResult)
+            #changesCell($project $lastResult)
+            #artifactsCell($project $lastResult)
+#if($action.canWrite($project))
+            #workingCopyCell($project $lastResult)
+#end
+        #else
+            #contentCell("not.applicable")
+            #contentCell("not.applicable")
+            #contentCell("empty.cell")
+            #contentCell("not.applicable")
+            #contentCell("not.applicable")
+            #contentCell("not.applicable")
+            #contentCell("built.never")
+            #contentCell("not.applicable")
+            #contentCell("empty.cell")
+            #contentCell("empty.cell")
+            #contentCell("empty.cell")
+            #contentCell("empty.cell")
+#if($action.canWrite($project))
+            #contentCell("empty.cell")
+#end
+        #end
+        </tr>
+    #end
+#if($group)
+    #authorize("ifAllGranted=ROLE_ADMINISTRATOR")
+            <tr>
+                <td class="add" colspan="14">
+                    <a href="editProjectGroup!input.action?groupId=$group.id" id="edit_$!webwork.htmlEncode($group.name)"><img alt="edit" src="$base/images/pencil.gif"/> #wwtext("name=edit.project.group")</a>
+                    &nbsp;
+                    #set($confirm = $action.getText("project.group.confirm.delete", [ $group.name ]))
+                    <a href="#" id="delete_$!webwork.htmlEncode($group.name)" onclick="confirmUrl('$confirm', 'deleteProjectGroup.action?groupId=$group.id')"><img alt="$action.getText('delete')" src="$base/images/delete.gif"/> #wwtext("name=project.group.delete")</a>
+                </td>
+            </tr>
+    #end
+#end
+        </table>
+#end
+
+#foreach($group in $groups)
+    #recentBuilds($group $group.projects)
+#end
+#if($projects.size() > 0)
+    #recentBuilds(false $projects)
+#end

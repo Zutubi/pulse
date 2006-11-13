@@ -1,0 +1,43 @@
+<ivy-module version="1.0">
+
+    <info organisation="acegisecurity" module="acegisecurity" revision="1.0.0" status="release">
+        <license name="...." url="...."/>
+        <description homepage="http://acegisecurity.org/">
+            Comprehensive security services for The Spring Framework.
+        </description>
+    </info>
+
+    <configurations>
+        <conf name="default"/>
+        <conf extends="default" name="cas"/>
+        <conf extends="default" name="catalina"/>
+        <conf extends="default" name="jboss"/>
+        <conf extends="default" name="jetty"/>
+        <conf extends="default" name="resin"/>
+    </configurations>
+
+    <publications>
+        <artifact name="acegi-security" type="jar" conf="default"/>
+        <artifact name="acegi-security-tiger" type="jar" conf="default"/>
+        <artifact name="acegi-security-cas" type="jar" conf="cas"/>
+        <artifact name="acegi-security-jboss" type="jar" conf="jboss"/>
+        <artifact name="acegi-security-jetty" type="jar" conf="jetty"/>
+        <artifact name="acegi-security-resin" type="jar" conf="resin"/>
+        <artifact name="acegi-security-license" type="txt" conf="default"/>
+        <artifact name="acegi-security-notice" type="txt" conf="default"/>
+    </publications>
+
+    <dependencies>
+
+        <dependency org="apache" name="commons-lang" rev="2.1" conf="default"/>
+        <dependency org="apache" name="commons-codec" rev="1.3" conf="default"/>
+
+        <!--
+        Webapp integration. This is required to provide support for the acegi filters.
+        -->
+        <dependency org="springframework" name="spring" rev="2.0-M5" conf="default->spring-web"/>
+
+    </dependencies>
+
+
+</ivy-module>

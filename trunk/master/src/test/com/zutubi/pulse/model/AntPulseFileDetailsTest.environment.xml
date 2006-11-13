@@ -1,0 +1,18 @@
+<?xml version="1.0"?>
+<project defaultRecipe="ant build">
+
+    
+    <recipe name="ant build">
+        <command name="build">
+            <!-- pull in the ant resource if configured. -->
+            <resource name="ant" required="false"/>
+            <ant
+                    >
+                <environment name="var" value="value"/>
+                <environment name="var2" value="value2"/>
+                            </ant>
+
+            
+        </command>
+    </recipe>
+</project>

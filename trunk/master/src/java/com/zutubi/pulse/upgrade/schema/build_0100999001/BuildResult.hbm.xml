@@ -1,0 +1,36 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD//EN" "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd" >
+<hibernate-mapping>
+
+    <class name="com.zutubi.pulse.model.BuildResult" table="BUILD_RESULT" lazy="false">
+
+        <id name="id" type="java.lang.Long" column="ID" unsaved-value="0">
+            <generator class="hilo"/>
+        </id>
+
+        <many-to-one name="reason" class="com.zutubi.pulse.model.AbstractBuildReason" column="REASON" cascade="all" lazy="false"/>
+
+    </class>
+
+    <class name="com.zutubi.pulse.model.AbstractBuildReason" table="BUILD_REASON" lazy="false">
+        <id name="id" type="java.lang.Long" column="ID" unsaved-value="0">
+            <generator class="hilo"/>
+        </id>
+
+        <discriminator column="REASON_TYPE" type="string"/>
+
+        <subclass name="com.zutubi.pulse.model.ManualTriggerBuildReason" discriminator-value="MANUAL_TRIGGER" lazy="false">
+            <property name="username" type="string" column="DETAILS"/>
+        </subclass>
+
+        <subclass name="com.zutubi.pulse.model.RemoteTriggerBuildReason" discriminator-value="REMOTE_TRIGGER" lazy="false"/>
+
+        <subclass name="com.zutubi.pulse.model.TriggerBuildReason" discriminator-value="TRIGGER" lazy="false">
+            <property name="triggerName" type="string" column="DETAILS"/>
+        </subclass>
+
+        <subclass name="com.zutubi.pulse.model.UnknownBuildReason" discriminator-value="UNKNOWN" lazy="false"/>
+
+    </class>
+
+</hibernate-mapping>

@@ -1,0 +1,17 @@
+<?xml version="1.0"?>
+<project defaultRecipe="maven build">
+
+    
+    <recipe name="maven build">
+        <command name="build">
+            <!-- pull in the maven resource if configured. -->
+            <resource name="maven" required="false"/>
+            <maven
+                args="arg1 arg2"
+            >
+                            </maven>
+
+            
+        </command>
+    </recipe>
+</project>

@@ -1,0 +1,145 @@
+#macro(buildsTable $project $showHideLink)
+    #set($recentBuilds = $action.getLatestBuilds($project))
+        <tr>
+            <th class="heading" colspan="14">
+    #if($showHideLink)
+                <span class="action">
+                    <a href="$base/user/hideDashboardProject.action?id=$project.id" class="unadorned">X</a>
+                </span>
+    #end
+                <a href="$base/currentBuild.action?id=$project.id" id="home_$!webwork.htmlEncode($project.name)">
+                    <img alt="home" src="$base/images/house.gif">
+                    $!webwork.htmlEncode($project.name)
+                </a>
+            </th>
+        </tr>
+        <tr>
+            #contentHeading("build.id" 1)
+            #contentHeading("build.spec" 1)
+            #contentHeading("build.status" 2)
+            #contentHeading("build.reason" 1)
+            #contentHeading("build.tests" 1)
+            #contentHeading("build.when" 1)
+            #contentHeading("build.elapsed" 1)
+            #contentHeading("actions" 5)
+        </tr>
+    #if($recentBuilds.size() > 0)
+        #foreach($buildResult in $recentBuilds)
+        <tr>
+            #set($cssClass = $buildResult.state.string)
+
+            <td class="content-right"><a href="viewBuild.action?id=$buildResult.id">$buildResult.number</a></td>
+            #classCell($buildResult.buildSpecification)
+            #statusCell($buildResult true)
+            #classCell($buildResult.reason.summary)
+            #testResultsCell($buildResult false $buildResult)
+            #dateClassCell($buildResult)
+            #elapsedCell($buildResult)
+            #viewCell($project $buildResult)
+            #logCell($project $buildResult)
+            #changesCell($project $buildResult)
+            #artifactsCell($project $buildResult)
+#if($action.canWrite($project))
+            #workingCopyCell($project $buildResult)
+#end
+        </tr>
+        #end
+    #else
+        <tr>
+            <td class="content" colspan="14">#wwtext("name=never.built")</td>
+        </tr>
+    #end
+#end
+
+#macro(changesTable $titleKey $changelists $showWho $source)
+    <table class="content">
+        #headingRow($titleKey 6)
+        <tr>
+            #contentHeading("change.revision" 1)
+    #if($showWho)
+            #contentHeading("change.who" 1)
+    #end
+            #contentHeading("change.when" 1)
+            #contentHeading("change.comment" 1)
+            #contentHeading("build.results" 1)
+            #contentHeading("actions" 1)
+        </tr>
+    #if($changelists.size() > 0)
+        #foreach($changelist in $changelists)
+            #set($index = $velocityCount - 1)
+            $action.updateChangeUrl($changelist)
+        <tr>
+            <td class="content-right">
+            #if($action.getChangeUrl())
+                <a href="$action.getChangeUrl()">
+            #end
+                    $changelist.revision
+            #if($action.getChangeUrl())
+                </a>
+            #end
+             </td>
+    #if($showWho)
+            #dynamicCell($changelist.revision.author)
+    #end
+            #dateCell($changelist)
+            #commitCommentCell($changelist $source)
+            #aggregateResultCell($changelist $showWho)
+            #linkCell("view.$changelist.id" "view" "viewChangelist.action?id=$changelist.id")
+        </tr>
+        #end
+    #else
+        <tr>
+            <td class="content" colspan="6">#wwtext("name=no.changes")</td>
+        </tr>
+    #end
+    </table>
+#end
+
+#if($contactError)
+<p class="note">
+    #wwtext("name=contact.errors")
+</p>
+#end
+
+<p style="text-align: right; margin-bottom: 0">
+    <a href="$base/user/configureDashboard!input.action" id="configure.dashboard">
+        <img alt="configure" src="$base/images/pencil.gif"/> #wwtext("name=configure.dashboard")
+    </a>
+</p>
+
+<h2 style="margin-top: 0" class="section">#wwtext("name=my.projects")
+#if($rssEnabled)
+    <a class="unadorned" href="$base/rss.action?userId=$principle.id"><img alt="$action.getText('rss')" src="$base/images/feed-icon-16x16.gif"/></a>
+#end
+</h2>
+
+#foreach($group in $shownGroups)
+    <table class="content" id="group_$!webwork.htmlEncode($group.name)">
+        <tr>
+            <th class="group" colspan="14">
+                <span class="action">
+                    <a href="$base/user/hideDashboardGroup.action?id=$group.id" class="unadorned">X</a>
+                </span>
+                $!webwork.htmlEncode($group.name)
+            </th>
+        </tr>
+    #foreach($project in $group.projects)
+        #buildsTable($project false)
+    #end
+    </table>
+#end
+    <table class="content">
+#foreach($project in $shownProjects)
+        #buildsTable($project true)
+#end
+    </table>
+
+#if($user.showMyChanges)
+    <h2 class="section">#wwtext("name=my.changes")</h2>
+    #changesTable("my.latest.changes" $changelists false "my")
+#end
+
+#if($user.showProjectChanges)
+    <h2 class="section">#wwtext("name=project.changes")</h2>
+    #changesTable("my.project.changes" $projectChangelists true "project")
+#end

@@ -1,0 +1,158 @@
+#authorisationTags($principle)
+#buildTags($buildResult.project $buildResult)
+<html>
+<head>
+    <title>$!webwork.htmlEncode($path)</title>
+
+#if ($buildResult.getHasWorkDir())
+    <link rel="stylesheet" type="text/css" href="$base/css/treeview/tree.css"/>
+    <script type="text/javascript" src="$base/js/prototype.js"></script>
+    <script type="text/javascript" src="$base/js/zutubi.js"></script>
+    <script type="text/javascript" src="$base/js/yahoo/yahoo.js"></script>
+    <script type="text/javascript" src="$base/js/yahoo/treeview.js"></script>
+    <script type="text/javascript" src="$base/js/widget/treeview.js"></script>
+    <script type="text/javascript" src="$base/js/main.js"></script>
+    <script type="text/javascript">
+
+        window.onload = initialize;
+
+        function initialize()
+        {
+            // only initialise if the browseTree element exists. If the browse tree element does not
+            // exist, then we do not want to render the node.
+            if (!document.getElementById('browseTree'))
+            {
+                return;
+            }
+
+            var tree = new ZUTUBI.widget.TreeView('browseTree');
+            tree.setSeparator('$separator');
+            tree.setDynamicLoad(function(node, onCompleteCallback)
+            {
+                ls(node, onCompleteCallback, false);
+            }, 1);
+
+            tree.onActivate = function(node)
+            {
+                if (!node.isContainer())
+                {
+                    // display the contents of that node..
+                    document.location = node.href;
+                }
+            };
+
+            // load the root nodes for the file system, then draw the tree.
+            Element.show($('loading'));
+            ls(tree.getRoot(), function()
+            {
+                Element.hide($('loading'));
+                tree.draw();
+            });
+        }
+
+        function ls(node, onCompleteCallback, dirOnly)
+        {
+            // generate id path.
+            var p = node.tree.getIdPath(node);
+
+            var ajax = new Ajax.Request(
+                "$base/lsProjDir.action",
+                {
+                    method: 'get',
+                    onComplete: lsResponse(node, onCompleteCallback),
+                    onFailure: handleFailure,
+                    onException: handleException,
+                    parameters: "path=" + p + "&buildId=$buildResult.id"
+                }
+            );
+        }
+
+        function lsResponse(parentNode, callback)
+        {
+            return function(response)
+            {
+                var jsonObj = eval("(" + response.responseText + ")");
+
+                var results = $A(jsonObj.listing);
+                results.each(function(obj)
+                {
+                    var data = {
+                        "id":obj.id,
+                        "name":obj.file,
+                        "label":obj.file,
+                        "type":obj.type,
+                        "container":obj.container
+                    };
+                    var node = new ZUTUBI.widget.FileNode(data, parentNode, false);
+                    if (!node.isContainer())
+                    {
+                        node.href = "/cat.action?buildId=$buildResult.id&path=" + node.getIdPath();
+                    }
+
+                    // override the default onclick behaviour to trigger the download.
+                    node.onLabelClick = function(me)
+                    {
+                        return (!this.isContainer());
+                    };
+
+                });
+                if (callback)
+                {
+                    callback();
+                }
+            };
+        }
+
+        handleFailure = function(e, e2)
+        {
+            alert("handleFailure");
+        }
+
+        handleException = function(e, e2)
+        {
+            openDebugAlert(e2);
+        }
+
+    </script>
+#end
+</head>
+<body>
+    #buildTabs($buildResult "working-dir")
+
+<h3>#wwtext("name=working.copy")</h3>
+
+#if ($buildResult.getHasWorkDir())
+        <p>
+            The tree below allows you to navigate through the working directory for this build.  To download a file, click on it.
+        </p>
+
+        #if($buildResult.completed())
+            <div id="loading" style="display:none;"><img src="$base/images/treeview/loading.gif" alt="loading..."/></div>
+            <div id="view">
+                <div id="browseTree"></div>
+            </div>
+        #else
+            <p>
+                #wwtext("name=working.dir.pending")
+            </p>
+        #end
+#else
+    <p style="max-width:600px">
+        The working directory for this build is not available.
+        #if ($buildSpecification.getRetainWorkingCopy())
+            This is likely the result of one of the following:
+            <ul>
+                <li><strong>1</strong>&nbsp;&nbsp; The build specification was not configured to retain the working copy at the time of the build.</li>
+                <li><strong>2</strong>&nbsp;&nbsp; The projects <a href="$base/configureProject.action?id=$project.id">cleanup rules</a> have removed this working copy.</li>
+                <li><strong>3</strong>&nbsp;&nbsp; It has been manually deleted from the filesystem.</li>
+            </ul>
+        #else
+            This is because the working directory is not being retained after a build.  If you would like to retain
+            the working copy, you will need to <a href="$base/viewBuildSpecification.action?projectId=$project.id&id=$buildSpecification.id">update the build specification</a> and tick the retain working copy option.
+        #end
+    </p>
+#end
+
+    #tabEnd()
+</body>
+</html>

@@ -1,0 +1,41 @@
+#macro(breadcrumbs)
+    <div style="margin: 10px">
+        :: <a href="$base/default.action">pulse</a> ::
+        <a href="currentBuild.action?id=$buildResult.project.id">$!webwork.htmlEncode($buildResult.project.name)</a> ::
+        <a href="viewBuild.action?id=$buildResult.id">#wwtext("name=build") $buildResult.number</a> ::
+        <a href="viewBuildArtifacts.action?id=$buildResult.id">all artifacts</a>
+    </div>
+#end
+<html>
+<head>
+    <meta http-equiv="Pragma" content="no-cache"/>
+    <meta http-equiv="Expires" content="0"/>
+    <meta http-equiv="Cache-Control" content="no-cache"/>
+    <link href="$base/css/main.css" rel="stylesheet" type="text/css" media="screen"/>
+    <title>#wwtext("name=artifact") $!webwork.htmlEncode($artifact.path)</title>
+</head>
+<body>
+#breadcrumbs()
+<div style="margin: 10px;">
+#if($artifact.hasFeatures())
+    <table class="decorated">
+        #headingRow("decorated.features" 1)
+        <tr>
+            <td class="content-wrap">
+                #fileArtifactFeatures($buildResult $commandResult $artifact)
+            </td>
+        </tr>
+    </table>
+#end
+    
+    <table class="decorated" id="decorated">
+        <tr><th class="heading" style="text-align: left; font-weight: bold;" colspan="2">$!webwork.htmlEncode($artifact.path)</th></tr>
+    ## WARNING: this iterator cannot be reused!
+    ## Apologies for the outrageous formatting, but it saves a lot of space for larger artifacts
+    #foreach($line in $readerIterator)#if($action.notNull($action.getLineLevel($velocityCount)))#set($lineClass = $action.getLineLevel($velocityCount).toString().toLowerCase().charAt(0))#else#set($lineClass = false)#end<tr><th#if($lineClass) class="$lineClass"#end>#if($lineClass)<a name="$velocityCount">#end$velocityCount#if($lineClass)</a>#end</th><td#if($lineClass) class="$lineClass"#end>$line</td></tr>#end
+    </table>
+</div>
+#breadcrumbs()
+<br/>
+</body>
+</html>

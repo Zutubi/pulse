@@ -1,0 +1,18 @@
+#helpTag("Build+Pulse+File+Tab")
+#authorisationTags($principle)
+#buildTags($project $result)
+<html>
+<head>
+    <title>#wwtext("name=build") $result.number</title>
+    <link href="$base/css/highlight.css" rel="stylesheet" type="text/css" media="screen"/>
+</head>
+<body>
+    #buildTabs($result "build-file")
+
+    <h3 class="heading">#wwtext("name=pulse.file") &nbsp;<a href="downloadBuildFile.action?id=$result.id"><img alt="down" src="$base/images/arrow_down.gif"/>#wwtext("name=download")</a></h3>
+    <div class="box">
+        $highlightedFile
+    </div>
+
+    #tabEnd()
+</html>

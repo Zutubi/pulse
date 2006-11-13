@@ -1,0 +1,1458 @@
+<!DOCTYPE xwork PUBLIC "-//OpenSymphony Group//XWork 1.0//EN"
+        "http://www.opensymphony.com/xwork/xwork-1.1.1.dtd">
+<xwork>
+    <include file="webwork-default-package.xml"/>
+
+    <package name="default" extends="webwork-default-package">
+        <default-interceptor-ref name="completeStack"/>
+
+        <action name="default" class="com.zutubi.pulse.web.DefaultAction">
+            <!--<result name="setupAdmin" type="redirect">/setup/setupWizard.action</result>-->
+            <result name="dashboard" type="redirect">/dashboard.action</result>
+            <result name="welcome" type="velocity">/welcome.vm</result>
+            <result name="projects" type="redirect">/viewProjects.action</result>
+        </action>
+
+        <action name="login" class="com.zutubi.pulse.web.LoginAction">
+            <result name="cancel" type="redirect">/</result>
+            <result name="input" type="velocity">login.vm</result>
+            <result name="success" type="velocity">login.vm</result>
+        </action>
+
+        <action name="logout" class="com.zutubi.pulse.web.LogoutAction">
+            <result name="success" type="redirect">/</result>
+        </action>
+
+        <action name="signup" class="com.zutubi.pulse.web.admin.user.SignupUserAction">
+            <result name="cancel" type="redirect">/</result>
+            <result name="input" type="velocity">signup.vm</result>
+            <result name="error" type="velocity">generic-error.vm</result>
+            <result name="success" type="redirect">/</result>
+            <result name="disabled" type="velocity">signup.vm</result>
+        </action>
+
+        <action name="dismissWelcome" class="com.zutubi.pulse.web.DismissWelcomeAction">
+            <result name="success" type="redirect">/default.action</result>
+        </action>
+
+        <action name="dashboard" class="com.zutubi.pulse.web.user.DashboardAction">
+            <interceptor-ref name="ajaxStack"/>
+            <result name="success" type="velocity">dashboard.vm</result>
+            <result name="error" type="velocity">generic-error.vm</result>
+            <result name="guest" type="redirect">/viewProjects.action</result>
+        </action>
+
+        <action name="myBuilds" class="com.zutubi.pulse.web.user.MyBuildsAction">
+            <interceptor-ref name="ajaxStack"/>
+            <result name="success" type="velocity">my-builds.vm</result>
+            <result name="error" type="velocity">generic-error.vm</result>
+            <result name="guest" type="redirect">/viewProjects.action</result>
+        </action>
+
+        <action name="preferences" class="com.zutubi.pulse.web.user.PreferencesAction">
+            <result name="input" type="velocity">/preferences.vm</result>
+            <result name="success" type="velocity">/preferences.vm</result>
+            <result name="error" type="velocity">generic-error.vm</result>
+            <result name="guest" type="redirect">/viewProjects.action</result>
+        </action>
+
+        <action name="preferences!input" class="com.zutubi.pulse.web.user.PreferencesAction" method="doInput">
+            <result name="input" type="velocity">/preferences.vm</result>
+            <result name="guest" type="redirect">/viewProjects.action</result>
+        </action>
+
+        <action name="viewAgents" class="com.zutubi.pulse.web.agents.ViewAgentsAction">
+            <interceptor-ref name="ajaxStack"/>
+            <result name="success" type="velocity">view-agents.vm</result>
+        </action>
+
+        <action name="viewServerQueues" class="com.zutubi.pulse.web.server.ViewServerQueuesAction">
+            <interceptor-ref name="ajaxStack"/>
+            <result name="success" type="velocity">view-server-queues.vm</result>
+            <result name="error" type="velocity">generic-error.vm</result>
+        </action>
+
+        <action name="cancelBuild" class="com.zutubi.pulse.web.server.CancelBuildAction">
+            <result name="success" type="redirect">viewServerQueues.action</result>
+        </action>
+
+        <action name="viewAgentStatus" class="com.zutubi.pulse.web.agents.ViewAgentStatusAction">
+            <result name="success" type="velocity">/view-agent-status.vm</result>
+            <result name="error" type="velocity">/generic-error.vm</result>
+        </action>
+
+        <action name="viewResources" class="com.zutubi.pulse.web.agents.ViewResourcesAction">
+            <result name="success" type="velocity">view-resources.vm</result>
+            <result name="error" type="velocity">generic-error.vm</result>
+        </action>
+
+        <action name="viewResource" class="com.zutubi.pulse.web.agents.ViewResourceAction">
+            <result name="error" type="velocity">/generic-error.vm</result>
+            <result name="success" type="velocity">/view-resource.vm</result>
+        </action>
+
+        <action name="serverMessages" class="com.zutubi.pulse.web.agents.ServerMessagesAction">
+            <result name="success" type="velocity">server-messages.vm</result>
+            <result name="error" type="velocity">generic-error.vm</result>
+        </action>
+
+        <action name="internalError" class="com.zutubi.pulse.web.InternalErrorAction">
+            <result name="success" type="velocity">internal-error.vm</result>
+            <result name="input" type="velocity">internal-error.vm</result>
+            <result name="cancel" type="velocity">internal-error.vm</result>
+            <!-- sheesh, that's harsh -->
+            <result name="error" type="velocity">generic-error.vm</result>
+        </action>
+
+        <action name="404" class="com.zutubi.pulse.web.FourOhFourAction">
+            <result name="success" type="velocity">404.vm</result>
+            <result name="input" type="velocity">404.vm</result>
+            <result name="error" type="velocity">404.vm</result>
+        </action>
+
+        <action name="viewProjects" class="com.zutubi.pulse.web.project.ViewProjectsAction">
+            <interceptor-ref name="ajaxStack"/>
+            <result name="success" type="velocity">view-projects.vm</result>
+        </action>
+
+        <action name="viewBuild" class="com.zutubi.pulse.web.project.ViewBuildAction">
+            <interceptor-ref name="ajaxStack"/>
+            <result name="success" type="velocity">view-build.vm</result>
+            <result name="error" type="velocity">generic-error.vm</result>
+        </action>
+
+        <action name="viewChanges" class="com.zutubi.pulse.web.project.ViewChangesAction">
+            <result name="success" type="velocity">view-changes.vm</result>
+            <result name="input" type="velocity">view-changes.vm</result>
+            <result name="error" type="velocity">generic-error.vm</result>
+        </action>
+
+        <action name="viewPersonalChanges" class="com.zutubi.pulse.web.project.ViewPersonalChangesAction">
+            <result name="success" type="velocity">view-personal-changes.vm</result>
+            <result name="error" type="velocity">generic-error.vm</result>
+        </action>
+
+        <action name="viewTests" class="com.zutubi.pulse.web.project.ViewBuildAction">
+            <result name="success" type="velocity">view-tests.vm</result>
+            <result name="error" type="velocity">generic-error.vm</result>
+        </action>
+
+        <action name="viewTestSuite" class="com.zutubi.pulse.web.project.ViewTestSuiteAction">
+            <result name="success" type="velocity">view-test-suite.vm</result>
+            <result name="error" type="velocity">generic-error.vm</result>
+        </action>
+
+        <action name="viewCommandLog" class="com.zutubi.pulse.web.project.ViewBuildAction">
+            <result name="success" type="velocity">view-command-log.vm</result>
+            <result name="error" type="velocity">generic-error.vm</result>
+        </action>
+
+        <action name="viewBuildArtifacts" class="com.zutubi.pulse.web.project.ViewArtifactsAction">
+            <result name="success" type="velocity">view-artifacts.vm</result>
+            <result name="error" type="velocity">generic-error.vm</result>
+        </action>
+
+        <action name="viewBuildFile" class="com.zutubi.pulse.web.project.ViewBuildFileAction">
+            <result name="success" type="velocity">view-build-file.vm</result>
+            <result name="error" type="velocity">generic-error.vm</result>
+        </action>
+
+        <action name="downloadBuildFile" class="com.zutubi.pulse.web.project.DownloadBuildFileAction">
+            <result name="success" type="stream">
+                <param name="contentType">${contentType}</param>
+                <param name="contentDisposition">filename="pulse.xml"</param>
+            </result>
+            <result name="error" type="velocity">generic-error.vm</result>
+        </action>
+
+        <action name="downloadProjectBuildFile" class="com.zutubi.pulse.web.project.DownloadProjectBuildFileAction">
+            <result name="success" type="stream">
+                <param name="contentType">${contentType}</param>
+            </result>
+            <result name="error" type="velocity">generic-error.vm</result>
+        </action>
+
+        <action name="downloadDirectoryArtifact" class="com.zutubi.pulse.web.project.DownloadDirectoryArtifactAction">
+            <result name="success" type="stream">
+                <param name="contentType">${contentType}</param>
+                <param name="contentDisposition">filename="${filename}"</param>
+            </result>
+            <result name="error" type="velocity">generic-error.vm</result>
+        </action>
+
+        <action name="viewRecipe" class="com.zutubi.pulse.web.project.ViewRecipeAction">
+            <result name="success" type="velocity">view-recipe.vm</result>
+            <result name="error" type="velocity">generic-error.vm</result>
+        </action>
+
+        <action name="tailRecipeLog" class="com.zutubi.pulse.web.project.TailRecipeLogAction">
+            <result name="success" type="velocity">tail-recipe-log.vm</result>
+            <result name="error" type="velocity">generic-error.vm</result>
+        </action>
+
+        <action name="viewRecipeLog" class="com.zutubi.pulse.web.project.ViewRecipeLogAction">
+            <result name="success" type="stream">
+                <param name="contentType">text/plain</param>
+                <param name="contentDisposition">filename="recipe.log"</param>
+            </result>
+            <result name="error" type="velocity">generic-error.vm</result>
+        </action>
+
+        <action name="viewChangelist" class="com.zutubi.pulse.web.project.ViewChangelistAction">
+            <result name="success" type="velocity">view-changelist.vm</result>
+            <result name="error" type="velocity">generic-error.vm</result>
+        </action>
+
+        <action name="triggerBuild" class="com.zutubi.pulse.web.project.TriggerBuildAction">
+            <result name="success" type="redirect">currentBuild.action?id=${projectId}</result>
+            <result name="error" type="velocity">generic-error.vm</result>
+        </action>
+
+        <action name="forceCleanBuild" class="com.zutubi.pulse.web.project.ForceCleanBuildAction">
+            <result name="success" type="redirect">/viewBuildSpecification.action?id=${id}&amp;projectId=${projectId}</result>
+            <result name="error" type="velocity">generic-error.vm</result>
+        </action>
+
+        <action name="viewArtifact" class="com.zutubi.pulse.web.project.ViewArtifactAction">
+            <result name="success" type="velocity">view-artifact.vm</result>
+            <result name="error" type="velocity">generic-error.vm</result>
+        </action>
+
+        <action name="browseProjectDir" class="com.zutubi.pulse.web.project.BrowseProjectDirAction">
+            <result name="success" type="velocity">browse-project-dir.vm</result>
+            <result name="error" type="velocity">generic-error.vm</result>
+        </action>
+
+        <action name="lsProjDir" class="com.zutubi.pulse.web.fs.ListProjectDirectoryAction">
+            <result name="success" type="json">/ajax/ls.xml</result>
+            <result name="error" type="velocity">generic-error.vm</result>
+        </action>
+
+        <action name="cat" class="com.zutubi.pulse.web.fs.StreamWorkingCopyFileAction">
+            <result name="success" type="stream">
+                <param name="contentType">${contentType}</param>
+                <param name="contentDisposition">filename="${filename}"</param>
+            </result>
+            <result name="error" type="velocity">generic-error.vm</result>
+        </action>
+
+        <action name="browseProjectScm" class="com.zutubi.pulse.web.project.BrowseProjectScmAction">
+            <result name="dir" type="velocity">browse-project-scm-dir.vm</result>
+            <result name="file" type="stream">
+                <param name="contentType">${contentType}</param>
+            </result>
+            <result name="error" type="velocity">generic-error.vm</result>
+        </action>
+
+        <action name="index!default" class="com.zutubi.pulse.web.ActionSupport">
+            <result name="success" type="velocity">index.vm</result>
+        </action>
+
+        <action name="findProjects!default" class="com.zutubi.pulse.web.ActionSupport">
+            <interceptor-ref name="defaultStack"/>
+            <result name="success" type="velocity">find-project.vm</result>
+        </action>
+
+        <action name="findProjects" class="com.zutubi.pulse.web.project.FindProjectsAction">
+            <result name="input" type="velocity">find-project.vm</result>
+            <result name="success" type="velocity">find-project.vm</result>
+        </action>
+
+        <action name="cloneProject" class="com.zutubi.pulse.web.project.CloneProjectAction">
+            <result name="input" type="velocity">clone-project.vm</result>
+            <result name="success" type="redirect">/configureProject.action?id=${cloneId}</result>
+            <result name="cancel" type="redirect">/currentBuild.action?id=${id}</result>
+            <result name="error" type="velocity">generic-error.vm</result>
+        </action>
+
+        <action name="deleteProject" class="com.zutubi.pulse.web.project.DeleteProjectAction">
+            <result name="input" type="velocity">confirm-project-delete.vm</result>
+            <result name="success" type="redirect">/viewProjects.action</result>
+            <result name="cancel" type="redirect">/currentBuild.action?id=${id}</result>
+            <result name="error" type="velocity">generic-error.vm</result>
+        </action>
+
+        <action name="editProject" class="com.zutubi.pulse.web.project.EditProjectAction">
+            <interceptor-ref name="crudStack"/>
+            <result name="input" type="velocity">edit-project.vm</result>
+            <result name="cancel" type="redirect">/configureProject.action?id=${id}</result>
+            <result name="success" type="redirect">/configureProject.action?id=${id}</result>
+            <result name="error" type="velocity">generic-error.vm</result>
+        </action>
+
+        <action name="currentBuild" class="com.zutubi.pulse.web.project.ProjectHomeAction">
+            <interceptor-ref name="ajaxStack"/>
+            <result name="success" type="velocity">project-home.vm</result>
+            <result name="error" type="redirect">viewProjects.action</result>
+        </action>
+
+        <action name="projectState" class="com.zutubi.pulse.web.project.ProjectStateAction">
+            <result name="success" type="redirect">/currentBuild.action?id=${id}</result>
+            <result name="error" type="velocity">generic-error.vm</result>
+        </action>
+
+        <action name="history" class="com.zutubi.pulse.web.project.HistoryAction">
+            <result name="success" type="velocity">history.vm</result>
+            <result name="error" type="velocity">generic-error.vm</result>
+        </action>
+
+        <action name="configureProject" class="com.zutubi.pulse.web.project.ConfigureProjectAction">
+            <result name="success" type="velocity">configure-project.vm</result>
+            <result name="error" type="redirect">viewProjects.action</result>
+            <result name="input" type="redirect">viewProjects.action</result>
+        </action>
+
+        <action name="editScm" class="com.zutubi.pulse.web.project.EditScmAction">
+            <result name="svn" type="chain">editSvn!input</result>
+            <result name="cvs" type="chain">editCvs!input</result>
+            <result name="p4" type="chain">editP4!input</result>
+            <result name="error" type="velocity">generic-error.vm</result>
+        </action>
+
+        <!-- Alias is required as WW can't chain to a non-execute method :| -->
+        <action name="editSvn!input" class="com.zutubi.pulse.web.project.EditSvnAction" method="doInput">
+            <interceptor-ref name="crudStack"/>
+            <result name="input" type="velocity">edit-scm-svn.vm</result>
+        </action>
+
+        <action name="editSvn" class="com.zutubi.pulse.web.project.EditSvnAction">
+            <interceptor-ref name="crudStack"/>
+            <result name="input" type="velocity">edit-scm-svn.vm</result>
+            <result name="cancel" type="redirect">/configureProject.action?id=${projectId}</result>
+            <result name="success" type="redirect">/configureProject.action?id=${projectId}</result>
+        </action>
+
+        <!-- Alias is required as WW can't chain to a non-execute method :| -->
+        <action name="editCvs!input" class="com.zutubi.pulse.web.project.EditCvsAction" method="doInput">
+            <interceptor-ref name="crudStack"/>
+            <result name="input" type="velocity">edit-scm-cvs.vm</result>
+        </action>
+
+        <action name="editCvs" class="com.zutubi.pulse.web.project.EditCvsAction">
+            <interceptor-ref name="crudStack"/>
+            <result name="input" type="velocity">edit-scm-cvs.vm</result>
+            <result name="cancel" type="redirect">/configureProject.action?id=${projectId}</result>
+            <result name="success" type="redirect">/configureProject.action?id=${projectId}</result>
+        </action>
+
+        <!-- Alias is required as WW can't chain to a non-execute method :| -->
+        <action name="editP4!input" class="com.zutubi.pulse.web.project.EditP4Action" method="doInput">
+            <interceptor-ref name="crudStack"/>
+            <result name="input" type="velocity">edit-scm-p4.vm</result>
+        </action>
+
+        <action name="editP4" class="com.zutubi.pulse.web.project.EditP4Action">
+            <interceptor-ref name="crudStack"/>
+            <result name="input" type="velocity">edit-scm-p4.vm</result>
+            <result name="cancel" type="redirect">/configureProject.action?id=${projectId}</result>
+            <result name="success" type="redirect">/configureProject.action?id=${projectId}</result>
+        </action>
+
+        <action name="filterScm" class="com.zutubi.pulse.web.project.ManageScmFiltersAction">
+            <result name="success" type="velocity">edit-scm-filters.vm</result>
+            <result name="error" type="velocity">generic-error.vm</result>
+        </action>
+
+        <action name="addExcludedPath" class="com.zutubi.pulse.web.project.ManageScmFiltersAction" method="doAdd">
+            <result name="input" type="velocity">edit-scm-filters.vm</result>
+            <result name="success" type="velocity">edit-scm-filters.vm</result>
+            <result name="error" type="velocity">generic-error.vm</result>
+        </action>
+
+        <action name="deleteExcludedPath" class="com.zutubi.pulse.web.project.ManageScmFiltersAction" method="doDelete">
+            <result name="input" type="velocity">edit-scm-filters.vm</result>
+            <result name="success" type="velocity">edit-scm-filters.vm</result>
+            <result name="error" type="velocity">generic-error.vm</result>
+        </action>
+
+        <action name="changeViewerWizard" class="com.zutubi.pulse.web.wizard.auto.WizardAction">
+            <interceptor-ref name="wizStack"/>
+            <param name="wizard">com.zutubi.pulse.web.project.changeviewer.ChangeViewerWizard</param>
+            <result name="input" type="velocity">/wizard/change-viewer-wizard.vm</result>
+            <result name="step" type="velocity">/wizard/change-viewer-wizard.vm</result>
+            <result name="cancel" type="redirect">/configureProject.action?id=${projectId}</result>
+            <result name="success" type="redirect">/configureProject.action?id=${projectId}</result>
+        </action>
+
+        <action name="editPulseFileDetails" class="com.zutubi.pulse.web.project.EditPulseFileDetailsAction">
+            <result name="custom" type="chain">editCustomDetails!input</result>
+            <result name="versioned" type="chain">editVersionedDetails!input</result>
+            <result name="ant" type="chain">editAntDetails!input</result>
+            <result name="make" type="chain">editMakeDetails!input</result>
+            <result name="maven" type="chain">editMavenDetails!input</result>
+            <result name="maven2" type="chain">editMaven2Details!input</result>
+            <result name="xcode" type="chain">editXCodeDetails!input</result>
+            <result name="error" type="velocity">generic-error.vm</result>
+        </action>
+
+        <!-- Alias is required as WW can't chain to a non-execute method :| -->
+        <action name="editCustomDetails!input" class="com.zutubi.pulse.web.project.EditCustomDetailsAction"
+                method="doInput">
+            <interceptor-ref name="crudStack"/>
+            <result name="input" type="velocity">edit-details-custom.vm</result>
+        </action>
+
+        <action name="editCustomDetails" class="com.zutubi.pulse.web.project.EditCustomDetailsAction">
+            <interceptor-ref name="crudStack"/>
+            <result name="input" type="velocity">edit-details-custom.vm</result>
+            <result name="cancel" type="redirect">/configureProject.action?id=${projectId}</result>
+            <result name="success" type="redirect">/configureProject.action?id=${projectId}</result>
+        </action>
+
+        <!-- Alias is required as WW can't chain to a non-execute method :| -->
+        <action name="editVersionedDetails!input" class="com.zutubi.pulse.web.project.EditVersionedDetailsAction"
+                method="doInput">
+            <interceptor-ref name="crudStack"/>
+            <result name="input" type="velocity">edit-details-versioned.vm</result>
+        </action>
+
+        <action name="editVersionedDetails" class="com.zutubi.pulse.web.project.EditVersionedDetailsAction">
+            <interceptor-ref name="crudStack"/>
+            <result name="input" type="velocity">edit-details-versioned.vm</result>
+            <result name="cancel" type="redirect">/configureProject.action?id=${projectId}</result>
+            <result name="success" type="redirect">/configureProject.action?id=${projectId}</result>
+        </action>
+
+        <!-- Alias is required as WW can't chain to a non-execute method :| -->
+        <action name="editAntDetails!input" class="com.zutubi.pulse.web.project.EditAntDetailsAction" method="doInput">
+            <interceptor-ref name="crudStack"/>
+            <result name="input" type="velocity">edit-details-ant.vm</result>
+        </action>
+
+        <action name="editAntDetails" class="com.zutubi.pulse.web.project.EditAntDetailsAction">
+            <interceptor-ref name="crudStack"/>
+            <result name="input" type="velocity">edit-details-ant.vm</result>
+            <result name="cancel" type="redirect">/configureProject.action?id=${projectId}</result>
+            <result name="success" type="redirect">/configureProject.action?id=${projectId}</result>
+        </action>
+
+        <!-- Alias is required as WW can't chain to a non-execute method :| -->
+        <action name="editMakeDetails!input" class="com.zutubi.pulse.web.project.EditMakeDetailsAction" method="doInput">
+            <interceptor-ref name="crudStack"/>
+            <result name="input" type="velocity">edit-details-make.vm</result>
+        </action>
+
+        <action name="editMakeDetails" class="com.zutubi.pulse.web.project.EditMakeDetailsAction">
+            <interceptor-ref name="crudStack"/>
+            <result name="input" type="velocity">edit-details-make.vm</result>
+            <result name="cancel" type="redirect">/configureProject.action?id=${projectId}</result>
+            <result name="success" type="redirect">/configureProject.action?id=${projectId}</result>
+        </action>
+
+        <!-- Alias is required as WW can't chain to a non-execute method :| -->
+        <action name="editMavenDetails!input" class="com.zutubi.pulse.web.project.EditMavenDetailsAction"
+                method="doInput">
+            <interceptor-ref name="crudStack"/>
+            <result name="input" type="velocity">edit-details-maven.vm</result>
+        </action>
+
+        <action name="editMavenDetails" class="com.zutubi.pulse.web.project.EditMavenDetailsAction">
+            <interceptor-ref name="crudStack"/>
+            <result name="input" type="velocity">edit-details-maven.vm</result>
+            <result name="cancel" type="redirect">
+                /configureProject.action?id=${projectId}&amp;tab=configuration</result>
+            <result name="success" type="redirect">
+                /configureProject.action?id=${projectId}&amp;tab=configuration</result>
+        </action>
+
+        <!-- Alias is required as WW can't chain to a non-execute method :| -->
+        <action name="editMaven2Details!input" class="com.zutubi.pulse.web.project.EditMaven2DetailsAction"
+                method="doInput">
+            <interceptor-ref name="crudStack"/>
+            <result name="input" type="velocity">edit-details-maven2.vm</result>
+        </action>
+
+        <action name="editMaven2Details" class="com.zutubi.pulse.web.project.EditMaven2DetailsAction">
+            <interceptor-ref name="crudStack"/>
+            <result name="input" type="velocity">edit-details-maven2.vm</result>
+            <result name="cancel" type="redirect">
+                /configureProject.action?id=${projectId}&amp;tab=configuration</result>
+            <result name="success" type="redirect">
+                /configureProject.action?id=${projectId}&amp;tab=configuration</result>
+        </action>
+
+        <!-- Alias is required as WW can't chain to a non-execute method :| -->
+        <action name="editXCodeDetails!input" class="com.zutubi.pulse.web.project.EditXCodeDetailsAction" method="doInput">
+            <interceptor-ref name="crudStack"/>
+            <result name="input" type="velocity">edit-details-xcode.vm</result>
+        </action>
+
+        <action name="editXCodeDetails" class="com.zutubi.pulse.web.project.EditXCodeDetailsAction">
+            <interceptor-ref name="crudStack"/>
+            <result name="input" type="velocity">edit-details-xcode.vm</result>
+            <result name="cancel" type="redirect">
+                /configureProject.action?id=${projectId}&amp;tab=configuration</result>
+            <result name="success" type="redirect">
+                /configureProject.action?id=${projectId}&amp;tab=configuration</result>
+        </action>
+
+        <action name="editTrigger" class="com.zutubi.pulse.web.project.EditTriggerAction">
+            <result name="cron" type="chain">editCronTrigger!input</result>
+            <result name="event.SCMChangeEvent" type="chain">editEventTrigger!input</result>
+            <result name="event.BuildCompletedEvent" type="chain">editBuildCompletedTrigger!input</result>
+            <result name="error" type="velocity">generic-error.vm</result>
+        </action>
+
+        <action name="toggleTrigger" class="com.zutubi.pulse.web.project.ToggleTriggerAction">
+            <result name="success" type="redirect">/configureProject.action?id=${projectId}</result>
+            <result name="error" type="velocity">generic-error.vm</result>
+        </action>
+
+        <!-- Alias is required as WW can't chain to a non-execute method :| -->
+        <action name="editCronTrigger!input" class="com.zutubi.pulse.web.project.EditCronTriggerAction" method="doInput">
+            <interceptor-ref name="crudStack"/>
+            <result name="input" type="velocity">edit-trigger-cron.vm</result>
+        </action>
+
+        <action name="editCronTrigger" class="com.zutubi.pulse.web.project.EditCronTriggerAction">
+            <interceptor-ref name="crudStack"/>
+            <result name="input" type="velocity">edit-trigger-cron.vm</result>
+            <result name="cancel" type="redirect">/configureProject.action?id=${projectId}</result>
+            <result name="success" type="redirect">/configureProject.action?id=${projectId}</result>
+        </action>
+
+        <!-- Alias is required as WW can't chain to a non-execute method :| -->
+        <action name="editEventTrigger!input" class="com.zutubi.pulse.web.project.EditEventTriggerAction"
+                method="doInput">
+            <interceptor-ref name="crudStack"/>
+            <result name="input" type="velocity">edit-trigger-event.vm</result>
+        </action>
+
+        <action name="editEventTrigger" class="com.zutubi.pulse.web.project.EditEventTriggerAction">
+            <interceptor-ref name="crudStack"/>
+            <result name="input" type="velocity">edit-trigger-event.vm</result>
+            <result name="cancel" type="redirect">/configureProject.action?id=${projectId}</result>
+            <result name="success" type="redirect">/configureProject.action?id=${projectId}</result>
+        </action>
+
+        <!-- Alias is required as WW can't chain to a non-execute method :| -->
+        <action name="editBuildCompletedTrigger!input" class="com.zutubi.pulse.web.project.EditBuildCompletedTriggerAction"
+                method="doInput">
+            <interceptor-ref name="crudStack"/>
+            <result name="input" type="velocity">edit-trigger-build-completed.vm</result>
+        </action>
+
+        <action name="editBuildCompletedTrigger" class="com.zutubi.pulse.web.project.EditBuildCompletedTriggerAction">
+            <interceptor-ref name="crudStack"/>
+            <result name="input" type="velocity">edit-trigger-build-completed.vm</result>
+            <result name="cancel" type="redirect">/configureProject.action?id=${projectId}</result>
+            <result name="success" type="redirect">/configureProject.action?id=${projectId}</result>
+        </action>
+
+        <action name="addProjectGroup" class="com.zutubi.pulse.web.project.ProjectGroupAction">
+            <result name="error" type="velocity">generic-error.vm</result>
+            <result name="input" type="velocity">add-project-group.vm</result>
+            <result name="cancel" type="redirect">/viewProjects.action</result>
+            <result name="success" type="redirect">/viewProjects.action</result>
+        </action>
+
+        <action name="editProjectGroup" class="com.zutubi.pulse.web.project.ProjectGroupAction">
+            <result name="error" type="velocity">generic-error.vm</result>
+            <result name="input" type="velocity">edit-project-group.vm</result>
+            <result name="cancel" type="redirect">/viewProjects.action</result>
+            <result name="success" type="redirect">/viewProjects.action</result>
+        </action>
+
+        <action name="deleteProjectGroup" class="com.zutubi.pulse.web.project.DeleteProjectGroupAction">
+            <result name="error" type="velocity">generic-error.vm</result>
+            <result name="success" type="redirect">/viewProjects.action</result>
+        </action>
+
+        <action name="addProject" class="com.zutubi.pulse.web.wizard.WizardAction">
+            <interceptor-ref name="wizardStack"/>
+            <param name="wizardClass">com.zutubi.pulse.web.project.AddProjectWizard</param>
+            <result name="project" type="velocity">addproject-project.vm</result>
+            <result name="cvs" type="velocity">addproject-cvs.vm</result>
+            <result name="svn" type="velocity">addproject-svn.vm</result>
+            <result name="p4" type="velocity">addproject-p4.vm</result>
+            <result name="custom" type="velocity">addproject-custom.vm</result>
+            <result name="versioned" type="velocity">addproject-versioned.vm</result>
+            <result name="maven" type="velocity">addproject-maven.vm</result>
+            <result name="maven2" type="velocity">addproject-maven2.vm</result>
+            <result name="ant" type="velocity">addproject-ant.vm</result>
+            <result name="make" type="velocity">addproject-make.vm</result>
+            <result name="xcode" type="velocity">addproject-xcode.vm</result>
+            <result name="success" type="redirect">/configureProject.action?id=${projectId}</result>
+            <result name="cancel" type="redirect">/viewProjects.action</result>
+            <result name="error" type="velocity">generic-error.vm</result>
+        </action>
+
+        <action name="editOutputProcessors" class="com.zutubi.pulse.web.project.EditOutputProcessorsAction">
+            <result name="input" type="velocity">edit-output-processors.vm</result>
+            <result name="cancel" type="redirect">/configureProject.action?id=${projectId}</result>
+            <result name="error" type="velocity">generic-error.vm</result>
+            <result name="success" type="redirect">/configureProject.action?id=${projectId}</result>
+        </action>
+
+        <action name="addArtifact" class="com.zutubi.pulse.web.wizard.WizardAction">
+            <interceptor-ref name="wizardStack"/>
+            <param name="wizardClass">com.zutubi.pulse.web.project.AddArtifactWizard</param>
+            <result name="select" type="velocity">addartifact-artifact.vm</result>
+            <result name="dir" type="velocity">addartifact-directory.vm</result>
+            <result name="file" type="velocity">addartifact-file.vm</result>
+            <result name="processors" type="velocity">addartifact-processors.vm</result>
+            <result name="success" type="redirect">/configureProject.action?id=${wizard.projectId}</result>
+            <result name="cancel" type="redirect">/configureProject.action?id=${wizard.projectId}</result>
+        </action>
+
+        <action name="deleteArtifact" class="com.zutubi.pulse.web.project.DeleteArtifactAction">
+            <result name="success" type="redirect">/configureProject.action?id=${projectId}</result>
+            <result name="error" type="velocity">generic-error.vm</result>
+            <result name="input" type="velocity">generic-error.vm</result>
+        </action>
+
+        <action name="editArtifact" class="com.zutubi.pulse.web.project.EditArtifactAction">
+            <result name="directory" type="chain">editDirectoryArtifact!input</result>
+            <result name="file" type="chain">editFileArtifact!input</result>
+            <result name="error" type="velocity">generic-error.vm</result>
+        </action>
+
+        <!-- Alias is required as WW can't chain to a non-execute method :| -->
+        <action name="editDirectoryArtifact!input" class="com.zutubi.pulse.web.project.EditDirectoryArtifactAction"
+                method="doInput">
+            <interceptor-ref name="crudStack"/>
+            <result name="input" type="velocity">edit-artifact-directory.vm</result>
+        </action>
+
+        <action name="editDirectoryArtifact" class="com.zutubi.pulse.web.project.EditDirectoryArtifactAction">
+            <interceptor-ref name="crudStack"/>
+            <result name="input" type="velocity">edit-artifact-directory.vm</result>
+            <result name="cancel" type="redirect">/configureProject.action?id=${projectId}</result>
+            <result name="success" type="redirect">/configureProject.action?id=${projectId}</result>
+        </action>
+
+        <!-- Alias is required as WW can't chain to a non-execute method :| -->
+        <action name="editFileArtifact!input" class="com.zutubi.pulse.web.project.EditFileArtifactAction"
+                method="doInput">
+            <interceptor-ref name="crudStack"/>
+            <result name="input" type="velocity">edit-artifact-file.vm</result>
+        </action>
+
+        <action name="editFileArtifact" class="com.zutubi.pulse.web.project.EditFileArtifactAction">
+            <interceptor-ref name="crudStack"/>
+            <result name="input" type="velocity">edit-artifact-file.vm</result>
+            <result name="cancel" type="redirect">/configureProject.action?id=${projectId}</result>
+            <result name="success" type="redirect">/configureProject.action?id=${projectId}</result>
+        </action>
+
+        <action name="addTrigger" class="com.zutubi.pulse.web.wizard.WizardAction">
+            <interceptor-ref name="wizardStack"/>
+            <param name="wizardClass">com.zutubi.pulse.web.project.AddTriggerWizard</param>
+            <result name="select" type="velocity">select-trigger.vm</result>
+            <result name="monitor" type="velocity">configure-monitor-trigger.vm</result>
+            <result name="cron" type="velocity">configure-cron-trigger.vm</result>
+            <result name="build.completed" type="velocity">configure-build-completed-trigger.vm</result>
+            <result name="success" type="redirect">/configureProject.action?id=${wizard.projectId}</result>
+            <result name="cancel" type="redirect">/configureProject.action?id=${wizard.projectId}</result>
+        </action>
+
+        <action name="deleteTrigger" class="com.zutubi.pulse.web.project.DeleteTriggerAction">
+            <result name="success" type="redirect">/configureProject.action?id=${projectId}</result>
+        </action>
+
+        <action name="viewTriggers" class="com.zutubi.pulse.web.scheduling.ViewTriggersAction">
+            <result name="success" type="velocity">view-triggers.vm</result>
+        </action>
+
+        <action name="addPostBuildAction" class="com.zutubi.pulse.web.wizard.WizardAction">
+            <interceptor-ref name="wizardStack"/>
+            <param name="wizardClass">com.zutubi.pulse.web.project.AddPostBuildActionWizard</param>
+            <result name="select" type="velocity">select-post-build-action.vm</result>
+            <result name="exe" type="velocity">configure-exe-action.vm</result>
+            <result name="tag" type="velocity">configure-tag-action.vm</result>
+            <result name="success" type="redirect">/configureProject.action?id=${wizard.projectId}</result>
+            <result name="cancel" type="redirect">/configureProject.action?id=${wizard.projectId}</result>
+        </action>
+
+        <action name="deletePostBuildAction" class="com.zutubi.pulse.web.project.DeletePostBuildAction">
+            <result name="success" type="redirect">/configureProject.action?id=${projectId}</result>
+        </action>
+
+        <action name="editPostBuildAction" class="com.zutubi.pulse.web.project.EditPostBuildActionAction">
+            <result name="run executable" type="chain">editExeAction!input</result>
+            <result name="apply tag" type="chain">editTagAction!input</result>
+            <result name="error" type="velocity">generic-error.vm</result>
+        </action>
+
+        <!-- Alias is required as WW can't chain to a non-execute method :| -->
+        <action name="editExeAction!input" class="com.zutubi.pulse.web.project.EditExeActionAction" method="input">
+            <interceptor-ref name="crudStack"/>
+            <result name="input" type="velocity">edit-action-exe.vm</result>
+        </action>
+
+        <action name="editExeAction" class="com.zutubi.pulse.web.project.EditExeActionAction">
+            <interceptor-ref name="crudStack"/>
+            <result name="input" type="velocity">edit-action-exe.vm</result>
+            <result name="cancel" type="redirect">/configureProject.action?id=${projectId}</result>
+            <result name="success" type="redirect">/configureProject.action?id=${projectId}</result>
+        </action>
+
+        <!-- Alias is required as WW can't chain to a non-execute method :| -->
+        <action name="editTagAction!input" class="com.zutubi.pulse.web.project.EditTagActionAction" method="input">
+            <interceptor-ref name="crudStack"/>
+            <result name="input" type="velocity">edit-action-tag.vm</result>
+        </action>
+
+        <action name="editTagAction" class="com.zutubi.pulse.web.project.EditTagActionAction">
+            <interceptor-ref name="crudStack"/>
+            <result name="input" type="velocity">edit-action-tag.vm</result>
+            <result name="cancel" type="redirect">/configureProject.action?id=${projectId}</result>
+            <result name="success" type="redirect">/configureProject.action?id=${projectId}</result>
+        </action>
+
+        <action name="viewSystemInfo" class="com.zutubi.pulse.web.agents.SystemInfoAction">
+            <result name="success" type="velocity">/view-systeminfo.vm</result>
+        </action>
+
+        <action name="garbageCollect" class="com.zutubi.pulse.web.console.GarbageCollectAction">
+            <result name="success" type="redirect">/viewSystemInfo.action</result>
+        </action>
+
+        <action name="quartzSystemInfo" class="com.zutubi.pulse.web.console.QuartzAdminAction">
+            <result name="success" type="velocity">view-quartz.vm</result>
+        </action>
+
+        <action name="createSlave!default" class="com.zutubi.pulse.web.agents.AddAgentAction" method="doDefault">
+            <interceptor-ref name="defaultStack"/>
+            <result name="success" type="velocity">create-slave.vm</result>
+        </action>
+
+        <action name="createBuildSpecification" class="com.zutubi.pulse.web.project.CreateBuildSpecificationAction">
+            <result name="input" type="velocity">create-build-specification.vm</result>
+            <result name="cancel" type="redirect">/configureProject.action?id=${projectId}</result>
+            <result name="error" type="velocity">create-build-specification.vm</result>
+            <result name="success" type="redirect">/viewBuildSpecification.action?id=${specId}&amp;projectId=${projectId}</result>
+        </action>
+
+        <action name="editBuildSpecification" class="com.zutubi.pulse.web.project.EditBuildSpecificationAction">
+            <interceptor-ref name="crudStack"/>
+            <result name="input" type="velocity">edit-build-specification.vm</result>
+            <result name="error" type="velocity">/generic-error.vm</result>
+            <result name="cancel" type="redirect">/viewBuildSpecification.action?id=${id}&amp;projectId=${projectId}</result>
+            <result name="success" type="redirect">/viewBuildSpecification.action?id=${id}&amp;projectId=${projectId}</result>
+        </action>
+
+        <action name="deleteBuildSpecification" class="com.zutubi.pulse.web.project.DeleteBuildSpecificationAction">
+            <result name="success" type="redirect">/configureProject.action?id=${projectId}</result>
+            <result name="error" type="velocity">generic-error.vm</result>
+        </action>
+
+        <action name="createBuildStage" class="com.zutubi.pulse.web.project.CreateBuildStageAction">
+            <result name="input" type="velocity">create-build-stage.vm</result>
+            <result name="cancel" type="redirect">/viewBuildSpecification.action?id=${specId}&amp;projectId=${projectId}</result>
+            <result name="error" type="velocity">/generic-error.vm</result>
+            <result name="success" type="redirect">/viewBuildSpecification.action?id=${specId}&amp;projectId=${projectId}&amp;selectedNode=${id}</result>
+        </action>
+
+        <action name="editBuildStage" class="com.zutubi.pulse.web.project.EditBuildStageAction">
+            <result name="input" type="velocity">edit-build-stage.vm</result>
+            <result name="cancel" type="redirect">/viewBuildSpecification.action?id=${specId}&amp;projectId=${projectId}&amp;selectedNode=${id}</result>
+            <result name="error" type="velocity">/generic-error.vm</result>
+            <result name="success" type="redirect">/viewBuildSpecification.action?id=${specId}&amp;projectId=${projectId}&amp;selectedNode=${id}</result>
+        </action>
+
+        <action name="deleteBuildStage" class="com.zutubi.pulse.web.project.DeleteBuildStageAction">
+            <result name="error" type="velocity">/generic-error.vm</result>
+            <result name="input" type="velocity">view-build-specification.vm</result>
+            <result name="success" type="redirect">/viewBuildSpecification.action?id=${specId}&amp;projectId=${projectId}</result>
+        </action>
+
+        <action name="addBuildStageResource" class="com.zutubi.pulse.web.project.AddBuildStageResourceAction">
+            <result name="input" type="velocity">/add-build-stage-resource.vm</result>
+            <result name="cancel" type="redirect">/viewBuildSpecification.action?id=${specId}&amp;projectId=${projectId}&amp;selectedNode=${id}</result>
+            <result name="error" type="velocity">/generic-error.vm</result>
+            <result name="success" type="redirect">/viewBuildSpecification.action?id=${specId}&amp;projectId=${projectId}&amp;selectedNode=${id}</result>
+        </action>
+
+        <action name="editBuildStageResource" class="com.zutubi.pulse.web.project.EditBuildStageResourceAction">
+            <result name="input" type="velocity">/edit-build-stage-resource.vm</result>
+            <result name="cancel" type="redirect">/viewBuildSpecification.action?id=${specId}&amp;projectId=${projectId}&amp;selectedNode=${id}</result>
+            <result name="error" type="velocity">/generic-error.vm</result>
+            <result name="success" type="redirect">/viewBuildSpecification.action?id=${specId}&amp;projectId=${projectId}&amp;selectedNode=${id}</result>
+        </action>
+
+        <action name="deleteBuildStageResource" class="com.zutubi.pulse.web.project.DeleteBuildStageResourceAction">
+            <result name="error" type="velocity">/generic-error.vm</result>
+            <result name="success" type="redirect">/viewBuildSpecification.action?id=${specId}&amp;projectId=${projectId}&amp;selectedNode=${id}</result>
+        </action>
+
+        <action name="viewBuildSpecification" class="com.zutubi.pulse.web.project.ViewBuildSpecificationAction">
+            <result name="success" type="velocity">view-build-specification.vm</result>
+            <result name="error" type="velocity">generic-error.vm</result>
+        </action>
+
+        <action name="addCleanupRule" class="com.zutubi.pulse.web.project.AddCleanupRuleAction">
+            <result name="input" type="velocity">add-cleanup-rule.vm</result>
+            <result name="cancel" type="redirect">/configureProject.action?id=${projectId}</result>
+            <result name="error" type="velocity">generic-error.vm</result>
+            <result name="success" type="redirect">/configureProject.action?id=${projectId}</result>
+        </action>
+
+        <action name="editCleanupRule" class="com.zutubi.pulse.web.project.EditCleanupRuleAction">
+            <result name="input" type="velocity">edit-cleanup-rule.vm</result>
+            <result name="cancel" type="redirect">/configureProject.action?id=${projectId}</result>
+            <result name="error" type="velocity">generic-error.vm</result>
+            <result name="success" type="redirect">/configureProject.action?id=${projectId}</result>
+        </action>
+
+        <action name="deleteCleanupRule" class="com.zutubi.pulse.web.project.DeleteCleanupRuleAction">
+            <result name="error" type="velocity">generic-error.vm</result>
+            <result name="success" type="redirect">/configureProject.action?id=${projectId}</result>
+        </action>
+
+        <action name="convertToCustomProject" class="com.zutubi.pulse.web.project.ConvertToCustomProjectAction">
+            <result name="input" type="velocity">convert-to-custom-project.vm</result>
+            <result name="cancel" type="redirect">/configureProject.action?id=${id}</result>
+            <result name="error" type="velocity">generic-error.vm</result>
+            <result name="success" type="redirect">/configureProject.action?id=${id}</result>
+        </action>
+
+        <action name="convertToVersionedProject" class="com.zutubi.pulse.web.project.ConvertToVersionedProjectAction">
+            <result name="input" type="velocity">convert-to-versioned-project.vm</result>
+            <result name="cancel" type="redirect">/configureProject.action?id=${id}</result>
+            <result name="error" type="velocity">generic-error.vm</result>
+            <result name="success" type="redirect">/configureProject.action?id=${id}</result>
+        </action>
+
+        <action name="deleteBuild" class="com.zutubi.pulse.web.project.DeleteBuildAction">
+            <result name="success" type="redirect">/currentBuild.action?id=${result.project.id}</result>
+            <result name="error" type="velocity">generic-error.vm</result>
+        </action>
+
+        <action name="rss" class="com.zutubi.pulse.web.rss.BuildResultsRssAction">
+            <result name="disabled" type="velocity">generic-error.vm</result>
+        </action>
+
+        <action name="projectReports" class="com.zutubi.pulse.web.project.ViewReportsAction">
+            <result name="success" type="velocity">project-reports.vm</result>
+            <result name="input" type="velocity">project-reports.vm</result>
+        </action>
+
+        <action name="addTransformer" class="com.zutubi.pulse.web.project.AddCommitMessageTransformerWizardAction">
+            <interceptor-ref name="wizStack"/>
+            <param name="wizard">com.zutubi.pulse.committransformers.AddCommitMessageTransformerWizard</param>
+            <result name="input" type="velocity">/wizard/commit-message-wizard.vm</result>
+            <result name="step" type="velocity">/wizard/commit-message-wizard.vm</result>
+            <result name="cancel" type="redirect">/configureProject.action?id=${projectId}</result>
+            <result name="success" type="redirect">/configureProject.action?id=${projectId}</result>
+        </action>
+
+        <action name="removeTransformer" class="com.zutubi.pulse.web.project.RemoveCommitMessageTransformerAction">
+            <result name="input" type="redirect">/configureProject.action?id=${projectId}</result>
+            <result name="success" type="redirect">/configureProject.action?id=${projectId}</result>
+            <result name="error" type="velocity">generic-error.vm</result>
+        </action>
+
+        <action name="addExistingTransformer" class="com.zutubi.pulse.web.project.AddExistingCommitMessageTransformerAction">
+            <result name="input" type="redirect">/configureProject.action?id=${projectId}</result>
+            <result name="cancel" type="redirect">/configureProject.action?id=${projectId}</result>
+            <result name="success" type="redirect">/configureProject.action?id=${projectId}</result>
+            <result name="error" type="velocity">generic-error.vm</result>
+        </action>
+
+        <action name="editCommitMessage" class="com.zutubi.pulse.web.admin.EditCommitMessageTransformerAction">
+            <result name="input" type="velocity">edit-commit-message.vm</result>
+            <result name="cancel" type="redirect">/configureProject.action?id=${projectId}</result>
+            <result name="success" type="redirect">/configureProject.action?id=${projectId}</result>
+            <result name="error" type="velocity">/generic-error.vm</result>
+        </action>
+        
+    </package>
+
+    <package name="personal" namespace="/personal" extends="webwork-default-package">
+        <default-interceptor-ref name="completeStack"/>
+
+        <action name="personalBuild" class="com.zutubi.pulse.web.PersonalBuildAction">
+            <result name="error" type="velocity">error.vm</result>
+            <result name="success" type="velocity">success.vm</result>
+        </action>
+    </package>
+
+    <package name="user" namespace="/user" extends="webwork-default-package">
+        <default-interceptor-ref name="completeStack"/>
+
+        <action name="configureDashboard" class="com.zutubi.pulse.web.user.ConfigureDashboardAction">
+            <result name="input" type="velocity">configure-dashboard.vm</result>
+            <result name="error" type="velocity">configure-dashboard.vm</result>
+            <result name="cancel" type="redirect">/dashboard.action</result>
+            <result name="success" type="redirect">/dashboard.action</result>
+        </action>
+
+        <action name="hideDashboardProject" class="com.zutubi.pulse.web.user.HideDashboardProjectAction">
+            <result name="error" type="velocity">generic-error.vm</result>
+            <result name="success" type="redirect">/dashboard.action</result>
+        </action>
+
+        <action name="hideDashboardGroup" class="com.zutubi.pulse.web.user.HideDashboardGroupAction">
+            <result name="error" type="velocity">generic-error.vm</result>
+            <result name="success" type="redirect">/dashboard.action</result>
+        </action>
+
+        <action name="editUser" class="com.zutubi.pulse.web.user.EditUserAction">
+            <result name="input" type="velocity">edit-user.vm</result>
+            <result name="error" type="velocity">edit-user.vm</result>
+            <result name="cancel" type="redirect">/preferences.action</result>
+            <result name="success" type="redirect">/preferences.action</result>
+        </action>
+
+        <action name="editPassword" class="com.zutubi.pulse.web.user.EditPasswordAction">
+            <result name="input" type="velocity">edit-user.vm</result>
+            <result name="error" type="velocity">edit-user.vm</result>
+            <result name="cancel" type="redirect">/preferences.action</result>
+            <result name="success" type="redirect">/preferences.action</result>
+        </action>
+
+        <action name="addAlias" class="com.zutubi.pulse.web.user.AddAliasAction">
+            <result name="input" type="velocity">add-alias.vm</result>
+            <result name="error" type="velocity">generic-error.vm</result>
+            <result name="cancel" type="redirect">/preferences.action</result>
+            <result name="success" type="redirect">/preferences.action</result>
+        </action>
+
+        <action name="deleteAlias" class="com.zutubi.pulse.web.user.DeleteAliasAction">
+            <result name="error" type="velocity">generic-error.vm</result>
+            <result name="success" type="redirect">/preferences.action</result>
+        </action>
+
+        <action name="editUserSettings" class="com.zutubi.pulse.web.user.EditUserSettingsAction">
+            <result name="input" type="velocity">edit-user-settings.vm</result>
+            <result name="error" type="velocity">edit-user-settings.vm</result>
+            <result name="cancel" type="redirect">/preferences.action</result>
+            <result name="success" type="redirect">/preferences.action</result>
+        </action>
+
+        <action name="contactWizard" class="com.zutubi.pulse.web.wizard.auto.WizardAction">
+            <interceptor-ref name="wizStack"/>
+            <param name="wizard">com.zutubi.pulse.web.user.contact.ContactPointWizard</param>
+            <result name="input" type="velocity">/wizard/contact-points-wizard.vm</result>
+            <result name="step" type="velocity">/wizard/contact-points-wizard.vm</result>
+            <result name="cancel" type="redirect">/preferences.action</result>
+            <result name="success" type="redirect">/preferences.action</result>
+        </action>
+
+        <action name="deleteContactPoint" class="com.zutubi.pulse.web.user.DeleteContactPointAction">
+            <result name="success" type="redirect">/preferences.action</result>
+        </action>
+
+        <action name="editContactPoint" class="com.zutubi.pulse.web.user.contact.EditContactPointAction">
+            <result name="input" type="velocity">edit-contact.vm</result>
+            <result name="cancel" type="redirect">/preferences.action</result>
+            <result name="success" type="redirect">/preferences.action</result>
+        </action>
+
+        <action name="clearContactPointError" class="com.zutubi.pulse.web.user.ClearContactPointErrorAction">
+            <result name="success" type="redirect">/preferences.action</result>
+        </action>
+
+        <action name="subscriptionWizard" class="com.zutubi.pulse.web.wizard.WizardAction">
+            <interceptor-ref name="wizardStack"/>
+            <param name="wizardClass">com.zutubi.pulse.web.user.SubscriptionWizard</param>
+            <result name="select" type="velocity">create-subscription.vm</result>
+            <result name="personal" type="velocity">create-subscription-personal.vm</result>
+            <result name="project" type="velocity">create-subscription-project.vm</result>
+            <result name="cancel" type="redirect">/preferences.action</result>
+            <result name="success" type="redirect">/preferences.action</result>
+        </action>
+
+        <action name="deleteSubscription" class="com.zutubi.pulse.web.user.DeleteSubscriptionAction">
+            <result name="success" type="redirect">/preferences.action</result>
+        </action>
+
+        <action name="editPersonalBuildSubscription" class="com.zutubi.pulse.web.user.EditPersonalBuildSubscriptionAction">
+            <result name="input" type="velocity">edit-subscription-personal.vm</result>
+            <result name="cancel" type="redirect">/preferences.action</result>
+            <result name="success" type="redirect">/preferences.action</result>
+        </action>
+
+        <action name="editProjectBuildSubscription" class="com.zutubi.pulse.web.user.EditProjectBuildSubscriptionAction">
+            <result name="input" type="velocity">edit-subscription-project.vm</result>
+            <result name="cancel" type="redirect">/preferences.action</result>
+            <result name="success" type="redirect">/preferences.action</result>
+        </action>
+    </package>
+
+    <package name="startup" namespace="/startup" extends="webwork-default-package">
+        <!--
+        a simple redirect to ensure that if the startup requests '/startup/starting.action'
+        from this xwork config, it handles it gracefully.
+         -->
+        <action name="starting" class="com.zutubi.pulse.web.ActionSupport">
+            <result name="success" type="redirect">/</result>
+        </action>
+    </package>
+
+    <package name="setup" namespace="/setup" extends="webwork-default-package">
+        <!--
+        a simple redirect to ensure that if the setup requests '/setup/execute.action'
+        from this xwork config, it handles it gracefully.
+         -->
+        <action name="execute" class="com.zutubi.pulse.web.ActionSupport">
+            <result name="success" type="redirect">/</result>
+        </action>
+    </package>
+
+    <package name="admin" namespace="/admin" extends="webwork-default-package">
+        <default-interceptor-ref name="completeStack"/>
+
+        <action name="serverSettings" class="com.zutubi.pulse.web.admin.ServerSettingsAction">
+            <interceptor-ref name="defaultStack"/>
+            <result name="success" type="velocity">server-settings.vm</result>
+        </action>
+
+        <action name="toggleRecipeQueue" class="com.zutubi.pulse.web.admin.ToggleRecipeQueueAction">
+            <result name="success" type="redirect">/viewServerQueues.action</result>
+        </action>
+
+        <!--
+        USERS
+        -->
+        <action name="userSettings" class="com.zutubi.pulse.web.admin.user.ViewUsersAction">
+            <result name="success" type="velocity">manage-users.vm</result>
+        </action>
+
+        <action name="viewUser" class="com.zutubi.pulse.web.admin.user.ViewUserAction">
+            <result name="input" type="velocity">/generic-error.vm</result>
+            <result name="success" type="velocity">view-user.vm</result>
+        </action>
+
+        <action name="viewUsers" class="com.zutubi.pulse.web.admin.user.ViewUsersAction">
+            <interceptor-ref name="defaultStack"/>
+            <result name="success" type="velocity">manage-users.vm</result>
+        </action>
+
+        <action name="createUser" class="com.zutubi.pulse.web.admin.user.CreateUserAction">
+            <interceptor-ref name="crudStack"/>
+            <result name="input" type="velocity">manage-users.vm</result>
+            <result name="cancel" type="redirect">userSettings.action?startPage=${startPage}</result>
+            <result name="success" type="redirect">userSettings.action?startPage=${startPage}</result>
+        </action>
+
+        <action name="deleteUser" class="com.zutubi.pulse.web.admin.user.DeleteUserAction">
+            <result name="input" type="velocity">manage-users.vm</result>
+            <result name="success" type="redirect">viewUsers.action?startPage=${startPage}</result>
+        </action>
+
+        <action name="disableUser" class="com.zutubi.pulse.web.admin.user.DisableUserAction">
+            <result name="input" type="velocity">undefined.vm</result>
+            <result name="success" type="redirect">viewUsers.action?startPage=${startPage}</result>
+        </action>
+
+        <action name="editPassword" class="com.zutubi.pulse.web.admin.user.EditPasswordAction">
+            <result name="input" type="velocity">edit-user.vm</result>
+            <result name="error" type="velocity">edit-user.vm</result>
+            <result name="reset" type="redirect">viewUsers.action?startPage=${startPage}</result>
+            <result name="cancel" type="redirect">viewUsers.action?startPage=${startPage}</result>
+            <result name="success" type="redirect">viewUsers.action?startPage=${startPage}</result>
+        </action>
+
+        <action name="editUser" class="com.zutubi.pulse.web.admin.user.EditUserAction">
+            <result name="input" type="velocity">edit-user.vm</result>
+            <result name="cancel" type="redirect">viewUsers.action?startPage=${startPage}</result>
+            <result name="success" type="redirect">viewUsers.action?startPage=${startPage}</result>
+        </action>
+
+        <action name="viewGroups" class="com.zutubi.pulse.web.admin.user.ViewGroupsAction">
+            <interceptor-ref name="defaultStack"/>
+            <result name="success" type="velocity">manage-groups.vm</result>
+        </action>
+
+        <action name="createGroup" class="com.zutubi.pulse.web.admin.user.CreateGroupAction">
+            <interceptor-ref name="crudStack"/>
+            <result name="input" type="velocity">create-group.vm</result>
+            <result name="cancel" type="redirect">viewGroups.action?startPage=${startPage}</result>
+            <result name="success" type="redirect">viewGroups.action?startPage=${startPage}</result>
+        </action>
+
+        <action name="deleteGroup" class="com.zutubi.pulse.web.admin.user.DeleteGroupAction">
+            <result name="success" type="redirect">viewGroups.action?startPage=${startPage}</result>
+        </action>
+
+        <action name="editGroup" class="com.zutubi.pulse.web.admin.user.EditGroupAction">
+            <result name="input" type="velocity">edit-group.vm</result>
+            <result name="cancel" type="redirect">viewGroups.action?startPage=${startPage}</result>
+            <result name="success" type="redirect">viewGroups.action?startPage=${startPage}</result>
+        </action>
+
+        <action name="viewGroupMembers" class="com.zutubi.pulse.web.admin.user.ViewGroupMembersAction">
+            <result name="success" type="velocity">view-group-members.vm</result>
+            <result name="error" type="velocity">/generic-error.vm</result>
+        </action>
+
+        <action name="addGroupMembers" class="com.zutubi.pulse.web.admin.user.AddGroupMembersAction">
+            <result name="input" type="velocity">add-group-members.vm</result>
+            <result name="cancel" type="redirect">viewGroupMembers.action?groupId=${groupId}&amp;startPage=${startPage}</result>
+            <result name="success" type="redirect">viewGroupMembers.action?groupId=${groupId}&amp;startPage=${startPage}</result>
+        </action>
+
+        <action name="removeGroupMember" class="com.zutubi.pulse.web.admin.user.RemoveGroupMemberAction">
+            <result name="success" type="redirect">viewGroupMembers.action?groupId=${groupId}&amp;startPage=${startPage}</result>
+            <result name="error" type="velocity">/generic-error.vm</result>
+        </action>
+
+        <action name="smtp" class="com.zutubi.pulse.web.admin.SmtpConfigurationAction">
+            <interceptor-ref name="defaultStack"/>
+            <result name="error" type="velocity">configure-smtpconfig.vm</result>
+            <result name="success" type="redirect">/admin/serverSettings.action</result>
+        </action>
+
+        <action name="editSmtp" class="com.zutubi.pulse.web.admin.SmtpConfigurationAction">
+            <interceptor-ref name="crudStack"/>
+            <result name="input" type="velocity">configure-smtpconfig.vm</result>
+            <result name="error" type="velocity">configure-smtpconfig.vm</result>
+            <result name="cancel" type="redirect">/admin/serverSettings.action</result>
+            <result name="success" type="redirect">/admin/serverSettings.action</result>
+        </action>
+
+        <action name="jabber" class="com.zutubi.pulse.web.admin.JabberConfigurationAction">
+            <interceptor-ref name="defaultStack"/>
+            <result name="error" type="velocity">configure-jabberconfig.vm</result>
+            <result name="success" type="redirect">/admin/serverSettings.action</result>
+        </action>
+
+        <action name="refreshJabber" class="com.zutubi.pulse.web.admin.JabberConfigurationAction" method="doRefresh">
+            <interceptor-ref name="defaultStack"/>
+            <interceptor-ref name="execAndWait"/>
+            <result name="wait" type="velocity">configure-jabberconfig-wait.vm</result>
+            <result name="error" type="redirect">/admin/serverSettings.action</result>
+            <result name="success" type="redirect">/admin/serverSettings.action</result>
+        </action>
+
+        <action name="editJabber" class="com.zutubi.pulse.web.admin.JabberConfigurationAction">
+            <interceptor-ref name="crudStack"/>
+            <result name="input" type="velocity">configure-jabberconfig.vm</result>
+            <result name="error" type="velocity">configure-jabberconfig.vm</result>
+            <result name="cancel" type="redirect">/admin/serverSettings.action</result>
+            <result name="success" type="redirect">/admin/serverSettings.action</result>
+        </action>
+
+        <action name="saveJabber" class="com.zutubi.pulse.web.admin.JabberConfigurationAction">
+            <interceptor-ref name="crudStack"/>
+            <result name="input" type="velocity">configure-jabberconfig.vm</result>
+            <result name="error" type="redirect">/admin/serverSettings.action</result>
+            <result name="cancel" type="redirect">/admin/serverSettings.action</result>
+            <result name="success" type="redirect">/admin/refreshJabber.action</result>
+        </action>
+
+        <action name="ldap" class="com.zutubi.pulse.web.admin.LdapConfigurationAction">
+            <interceptor-ref name="defaultStack"/>
+            <result name="error" type="velocity">configure-ldapconfig.vm</result>
+            <result name="success" type="redirect">/admin/serverSettings.action</result>
+        </action>
+
+        <action name="editLdap" class="com.zutubi.pulse.web.admin.LdapConfigurationAction">
+            <interceptor-ref name="crudStack"/>
+            <result name="input" type="velocity">configure-ldapconfig.vm</result>
+            <result name="error" type="velocity">configure-ldapconfig.vm</result>
+            <result name="cancel" type="redirect">/admin/serverSettings.action</result>
+            <result name="success" type="redirect">/admin/serverSettings.action</result>
+        </action>
+
+        <action name="saveLdap" class="com.zutubi.pulse.web.admin.LdapConfigurationAction">
+            <interceptor-ref name="crudStack"/>
+            <interceptor-ref name="execAndWait"/>
+            <result name="wait" type="velocity">configure-ldapconfig-wait.vm</result>
+            <result name="input" type="velocity">configure-ldapconfig.vm</result>
+            <result name="error" type="redirect">/admin/serverSettings.action</result>
+            <result name="cancel" type="redirect">/admin/serverSettings.action</result>
+            <result name="success" type="redirect">/admin/serverSettings.action</result>
+        </action>
+
+        <action name="general" class="com.zutubi.pulse.web.admin.GeneralConfigurationAction">
+            <interceptor-ref name="defaultStack"/>
+            <result name="error" type="velocity">configure-generalconfig.vm</result>
+            <result name="success" type="redirect">/admin/serverSettings.action</result>
+        </action>
+
+        <action name="editGeneral" class="com.zutubi.pulse.web.admin.GeneralConfigurationAction">
+            <interceptor-ref name="crudStack"/>
+            <result name="input" type="velocity">configure-generalconfig.vm</result>
+            <result name="error" type="velocity">configure-generalconfig.vm</result>
+            <result name="cancel" type="redirect">/admin/serverSettings.action</result>
+            <result name="success" type="redirect">/admin/serverSettings.action</result>
+        </action>
+
+        <action name="logConfig" class="com.zutubi.pulse.web.admin.LogConfigurationAction">
+            <interceptor-ref name="defaultStack"/>
+            <result name="error" type="velocity">configure-logconfig.vm</result>
+            <result name="cancel" type="redirect">/admin/serverSettings.action</result>
+            <result name="success" type="redirect">/admin/serverSettings.action</result>
+        </action>
+
+        <action name="editLogConfig" class="com.zutubi.pulse.web.admin.LogConfigurationAction">
+            <interceptor-ref name="crudStack"/>
+            <result name="input" type="velocity">configure-logconfig.vm</result>
+            <result name="error" type="velocity">configure-logconfig.vm</result>
+            <result name="cancel" type="redirect">/admin/serverSettings.action</result>
+            <result name="success" type="redirect">/admin/serverSettings.action</result>
+        </action>
+
+        <action name="addResource" class="com.zutubi.pulse.web.wizard.WizardAction">
+            <interceptor-ref name="wizardStack"/>
+            <param name="wizardClass">com.zutubi.pulse.web.admin.AddResourceWizard</param>
+            <result name="select" type="velocity">addresource.vm</result>
+            <result name="ant" type="velocity">addresource-ant.vm</result>
+            <result name="java" type="velocity">addresource-java.vm</result>
+            <result name="maven" type="velocity">addresource-maven.vm</result>
+            <result name="maven2" type="velocity">addresource-maven2.vm</result>
+            <result name="custom" type="velocity">addresource-custom.vm</result>
+            <result name="success" type="redirect">/viewResources.action?agentId=${agentId}</result>
+            <result name="cancel" type="redirect">/viewResources.action?agentId=${agentId}</result>
+            <result name="error" type="velocity">/generic-error.vm</result>
+        </action>
+
+        <action name="createResource" class="com.zutubi.pulse.web.admin.CreateResourceAction">
+            <result name="input" type="velocity">create-resource.vm</result>
+            <result name="cancel" type="redirect">/viewResources.action?agentId=${agentId}</result>
+            <result name="error" type="velocity">/generic-error.vm</result>
+            <result name="success" type="redirect">/viewResource.action?resourceId=${resource.id}</result>
+        </action>
+
+        <action name="editResource" class="com.zutubi.pulse.web.admin.EditResourceAction">
+            <result name="input" type="velocity">edit-resource.vm</result>
+            <result name="cancel" type="redirect">/viewResource.action?resourceId=${resourceId}</result>
+            <result name="error" type="velocity">/generic-error.vm</result>
+            <result name="success" type="redirect">/viewResource.action?resourceId=${resource.id}</result>
+        </action>
+
+        <action name="deleteResource" class="com.zutubi.pulse.web.admin.DeleteResourceAction">
+            <result name="error" type="velocity">/generic-error.vm</result>
+            <result name="success" type="redirect">/viewResources.action?agentId=${agentId}</result>
+        </action>
+
+        <action name="createResourceVersion" class="com.zutubi.pulse.web.admin.CreateResourceVersionAction">
+            <interceptor-ref name="crudStack"/>
+            <result name="input" type="velocity">create-resource-version.vm</result>
+            <result name="cancel" type="redirect">/viewResource.action?resourceId=${resourceId}&amp;selectedNode=${versionId}</result>
+            <result name="error" type="velocity">/generic-error.vm</result>
+            <result name="success" type="redirect">/viewResource.action?resourceId=${resourceId}&amp;selectedNode=${versionId}</result>
+        </action>
+
+        <action name="editResourceVersion" class="com.zutubi.pulse.web.admin.EditResourceVersionAction">
+            <interceptor-ref name="crudStack"/>
+            <result name="input" type="velocity">edit-resource-version.vm</result>
+            <result name="cancel" type="redirect">/viewResource.action?resourceId=${resourceId}&amp;selectedNode=${versionId}</result>
+            <result name="error" type="velocity">/generic-error.vm</result>
+            <result name="success" type="redirect">/viewResource.action?resourceId=${resourceId}&amp;selectedNode=${versionId}</result>
+        </action>
+
+        <action name="deleteResourceVersion" class="com.zutubi.pulse.web.admin.DeleteResourceVersionAction">
+            <result name="error" type="velocity">/generic-error.vm</result>
+            <result name="success" type="redirect">/viewResource.action?resourceId=${resourceId}&amp;selectedNode=${versionId}</result>
+        </action>
+
+        <action name="createProperty" class="com.zutubi.pulse.web.admin.CreatePropertyAction">
+            <result name="input" type="velocity">create-property.vm</result>
+            <result name="cancel" type="redirect">/viewResource.action?resourceId=${resourceId}&amp;selectedNode=${versionId}</result>
+            <result name="error" type="velocity">/generic-error.vm</result>
+            <result name="success" type="redirect">/viewResource.action?resourceId=${resourceId}&amp;selectedNode=${versionId}</result>
+        </action>
+
+        <action name="editProperty" class="com.zutubi.pulse.web.admin.EditPropertyAction">
+            <interceptor-ref name="crudStack"/>
+            <result name="input" type="velocity">edit-property.vm</result>
+            <result name="cancel" type="redirect">/viewResource.action?resourceId=${resourceId}&amp;selectedNode=${versionId}</result>
+            <result name="error" type="velocity">/generic-error.vm</result>
+            <result name="success" type="redirect">/viewResource.action?resourceId=${resourceId}&amp;selectedNode=${versionId}</result>
+        </action>
+
+        <action name="deleteProperty" class="com.zutubi.pulse.web.admin.DeletePropertyAction">
+            <result name="error" type="velocity">/generic-error.vm</result>
+            <result name="success" type="redirect">/viewResource.action?resourceId=${resourceId}&amp;selectedNode=${versionId}</result>
+        </action>
+
+        <action name="editLicense" class="com.zutubi.pulse.web.admin.ManageLicenseAction">
+            <result name="error" type="velocity">/generic-error.vm</result>
+            <result name="input" type="velocity">edit-license.vm</result>
+            <result name="success" type="redirect">/admin/serverSettings.action</result>
+            <result name="cancel" type="redirect">/admin/serverSettings.action</result>
+        </action>
+
+        <action name="addAgent" class="com.zutubi.pulse.web.agents.AddAgentAction">
+            <result name="input" type="velocity">/add-agent.vm</result>
+            <result name="cancel" type="redirect">/viewAgents.action</result>
+            <result name="error" type="velocity">/generic-error.vm</result>
+            <result name="success" type="redirect">/viewAgents.action</result>
+        </action>
+
+        <action name="editAgent" class="com.zutubi.pulse.web.agents.EditAgentAction">
+            <result name="error" type="velocity">/edit-agent.vm</result>
+            <result name="input" type="velocity">/edit-agent.vm</result>
+            <result name="cancel" type="redirect">/viewAgents.action</result>
+            <result name="success" type="redirect">/viewAgents.action</result>
+        </action>
+
+        <action name="editMasterAgent" class="com.zutubi.pulse.web.agents.EditMasterAgentAction">
+            <result name="error" type="velocity">/edit-master-agent.vm</result>
+            <result name="input" type="velocity">/edit-master-agent.vm</result>
+            <result name="cancel" type="redirect">/viewAgents.action</result>
+            <result name="success" type="redirect">/viewAgents.action</result>
+        </action>
+
+        <action name="enableAgent" class="com.zutubi.pulse.web.agents.EnableAgentAction">
+            <result name="success" type="redirect">/viewAgents.action</result>
+        </action>
+
+        <action name="enableMaster" class="com.zutubi.pulse.web.agents.EnableMasterAction">
+            <result name="success" type="redirect">/viewAgents.action</result>
+        </action>
+
+        <action name="pingAgent" class="com.zutubi.pulse.web.agents.PingAgentAction">
+            <result name="success" type="redirect">/viewAgents.action</result>
+        </action>
+
+        <action name="deleteAgent" class="com.zutubi.pulse.web.agents.DeleteAgentAction">
+            <result name="success" type="redirect">/viewAgents.action</result>
+            <result name="error" type="velocity">/generic-error.vm</result>
+        </action>
+
+        <action name="editCommitMessage" class="com.zutubi.pulse.web.admin.EditCommitMessageTransformerAction">
+            <result name="input" type="velocity">edit-commit-message.vm</result>
+            <result name="cancel" type="redirect">/admin/serverSettings.action</result>
+            <result name="success" type="redirect">/admin/serverSettings.action</result>
+            <result name="error" type="velocity">/generic-error.vm</result>
+        </action>
+
+        <action name="deleteCommitMessageLink" class="com.zutubi.pulse.web.admin.DeleteCommitMessageTransformerAction">
+            <result name="success" type="redirect">/admin/serverSettings.action</result>
+            <result name="error" type="velocity">/generic-error.vm</result>
+        </action>
+
+        <action name="addTransformer" class="com.zutubi.pulse.web.project.AddCommitMessageTransformerWizardAction">
+            <interceptor-ref name="wizStack"/>
+            <param name="wizard">com.zutubi.pulse.committransformers.AddCommitMessageTransformerWizard</param>
+            <result name="input" type="velocity">/wizard/admin/commit-message-wizard.vm</result>
+            <result name="step" type="velocity">/wizard/admin/commit-message-wizard.vm</result>
+            <result name="cancel" type="redirect">/admin/serverSettings.action</result>
+            <result name="success" type="redirect">/admin/serverSettings.action</result>
+        </action>
+
+        <action name="editCommitMessageProjects" class="com.zutubi.pulse.web.admin.EditCommitMessageTransformerProjectsAction">
+            <result name="input" type="velocity">edit-commit-message-projects.vm</result>
+            <result name="cancel" type="redirect">/admin/serverSettings.action</result>
+            <result name="success" type="redirect">/admin/serverSettings.action</result>
+            <result name="error" type="velocity">/generic-error.vm</result>
+        </action>
+
+    </package>
+
+    <package name="ajax" namespace="/ajax" extends="webwork-default-package">
+        <default-interceptor-ref name="ajaxStack"/>
+
+        <action name="dashboardPanel" class="com.zutubi.pulse.web.user.DashboardAction">
+            <result name="success" type="velocity">dashboard-panel.vm</result>
+            <result name="error" type="redirect">/</result>
+        </action>
+
+        <action name="myBuildsPanel" class="com.zutubi.pulse.web.user.MyBuildsAction">
+            <result name="success" type="velocity">my-builds-panel.vm</result>
+            <result name="error" type="redirect">/</result>
+        </action>
+
+        <action name="viewProjectsPanel" class="com.zutubi.pulse.web.project.ViewProjectsAction">
+            <result name="success" type="velocity">view-projects-panel.vm</result>
+            <result name="error" type="velocity">/generic-error.vm</result>
+        </action>
+
+        <action name="projectHomePanel" class="com.zutubi.pulse.web.project.ProjectHomeAction">
+            <result name="success" type="velocity">project-home-panel.vm</result>
+            <result name="error" type="velocity">/generic-error.vm</result>
+        </action>
+
+        <action name="viewBuildPanel" class="com.zutubi.pulse.web.project.ViewBuildAction">
+            <result name="success" type="velocity">view-build-panel.vm</result>
+            <result name="error" type="velocity">/generic-error.vm</result>
+        </action>
+
+        <action name="tailRecipeLogPanel" class="com.zutubi.pulse.web.project.TailRecipeLogAction">
+            <result name="success" type="velocity">tail-recipe-log-panel.vm</result>
+            <result name="error" type="velocity">/generic-error.vm</result>
+        </action>
+
+        <action name="viewAgentsPanel" class="com.zutubi.pulse.web.agents.ViewAgentsAction">
+            <result name="success" type="velocity">view-agents-panel.vm</result>
+            <result name="error" type="velocity">/generic-error.vm</result>
+        </action>
+
+        <action name="viewServerQueuesPanel" class="com.zutubi.pulse.web.server.ViewServerQueuesAction">
+            <result name="success" type="velocity">view-server-queues-panel.vm</result>
+            <result name="error" type="velocity">/generic-error.vm</result>
+        </action>
+
+        <action name="testCVS" class="com.zutubi.pulse.web.ajax.TestCVSAction">
+            <result name="success" type="velocity">test-settings.vm</result>
+        </action>
+
+        <action name="testP4" class="com.zutubi.pulse.web.ajax.TestP4Action">
+            <result name="success" type="velocity">test-settings.vm</result>
+        </action>
+
+        <action name="testSvn" class="com.zutubi.pulse.web.ajax.TestSvnAction">
+            <result name="success" type="velocity">test-settings.vm</result>
+        </action>
+
+        <action name="testSmtp" class="com.zutubi.pulse.web.ajax.TestSmtpAction">
+            <result name="success" type="velocity">test-smtp-settings.vm</result>
+        </action>
+
+        <action name="testJabber" class="com.zutubi.pulse.web.ajax.TestJabberAction">
+            <result name="success" type="velocity">test-settings.vm</result>
+        </action>
+
+        <action name="testLdap" class="com.zutubi.pulse.web.ajax.TestLdapAction">
+            <result name="success" type="velocity">test-settings.vm</result>
+        </action>
+
+        <action name="ls" class="com.zutubi.pulse.web.vfs.LsAction">
+            <result name="success" type="json">ls.xml</result>
+        </action>
+
+        <action name="mkdir" class="com.zutubi.pulse.web.vfs.MkdirAction">
+            <result name="success" type="json">mkdir.xml</result>
+        </action>
+
+        <action name="rmdir" class="com.zutubi.pulse.web.vfs.RmAction">
+            <result name="success" type="json">rmdir.xml</result>
+        </action>
+
+    </package>
+
+    <package name="popups" namespace="/popups" extends="webwork-default-package">
+        <default-interceptor-ref name="completeStack"/>
+
+        <action name="viewScmInfo" class="com.zutubi.pulse.web.project.ViewScmInfoAction">
+            <result name="success" type="velocity">view-scm-info.vm</result>
+            <result name="error" type="velocity">/generic-error.vm</result>
+        </action>
+
+        <action name="browseScm" class="com.zutubi.pulse.web.project.BrowseScmAction">
+            <result name="dir" type="velocity">browse-scm-dir.vm</result>
+            <result name="error" type="velocity">/generic-error.vm</result>
+        </action>
+
+        <action name="browseResources" class="com.zutubi.pulse.web.project.BrowseResourcesAction">
+            <result name="success" type="velocity">resource-browser.vm</result>
+            <result name="error" type="velocity">/generic-error.vm</result>
+        </action>
+
+        <action name="new-folder" class="com.zutubi.pulse.web.ActionSupport">
+            <result name="success" type="velocity">tree/browse-new-folder.vm</result>
+        </action>
+
+        <action name="fileDialog" class="com.zutubi.pulse.web.admin.AddResourceFileDialogAction">
+            <result name="success" type="velocity">tree/filedialog.vm</result>
+        </action>
+
+    </package>
+
+    <package name="wizard" namespace="/wizard" extends="webwork-default-package">
+        <default-interceptor-ref name="wizStack"/>
+
+        <action name="wizard" class="com.zutubi.pulse.web.wizard.auto.WizardAction">
+            <result name="step" type="velocity">wizard.vm</result>
+            <result name="cancel" type="redirect">/</result>
+            <result name="success" type="redirect">/</result>
+        </action>
+
+    </package>
+
+</xwork>

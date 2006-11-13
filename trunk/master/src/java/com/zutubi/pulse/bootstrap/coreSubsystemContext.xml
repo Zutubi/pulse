@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
+<!--
+
+-->
+<beans>
+
+    <bean id="objectFactory" class="com.zutubi.pulse.spring.SpringObjectFactory"/>
+
+    <!-- Token manager required for scripted access to the remote api. -->
+    <bean id="adminTokenManager" class="com.zutubi.pulse.api.AdminTokenManager" autowire="byName" init-method="init">
+        <property name="configRoot">
+            <bean id="configRoot" class="org.springframework.beans.factory.config.PropertyPathFactoryBean">
+                <property name="targetBeanName">
+                    <value>configurationManager</value>
+                </property>
+                <property name="propertyPath">
+                    <value>systemPaths.configRoot</value>
+                </property>
+            </bean>
+        </property>
+    </bean>
+
+    <!-- TODO: services should register themselves with the shutdown manager as they are started. -->
+    <!--
+    the shutdown manager at this point only needs to shutdown jetty.
+    -->
+    <bean id="shutdownManager" class="com.zutubi.pulse.ShutdownManager">
+        <property name="stoppables">
+            <list>
+                <ref bean="jettyManager"/>
+            </list>
+        </property>
+    </bean>
+
+    <!-- can this be moved into the webserverContext? it does not seem appropriate here... -->
+    <bean id="xworkObjectFactory" class="com.opensymphony.xwork.spring.SpringObjectFactory" init-method="initObjectFactory"/>
+
+    <import resource="classpath:/com/zutubi/pulse/bootstrap/context/loggingContext.xml"/>
+    <import resource="classpath:/com/zutubi/pulse/bootstrap/context/eventContext.xml"/>
+    <import resource="classpath:/com/zutubi/pulse/bootstrap/context/webserverContext.xml"/>
+    <import resource="classpath:/com/zutubi/pulse/bootstrap/context/licenseContext.xml"/>
+
+    <!--
+     define the file system manager here so that it is available during setup. This is also redefined later
+     when other requirements become available.
+     -->
+    <bean id="fileSystemManager" class="com.zutubi.pulse.vfs.VfsManagerFactoryBean" destroy-method="shutdown"/>
+
+</beans>

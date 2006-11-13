@@ -1,0 +1,128 @@
+#helpTag("Build+Command+Log+Tab")
+#authorisationTags($principle)
+#buildTags($project $result)
+<html>
+<head>
+    <title>#wwtext("name=build") $result.number</title>
+    <script type="text/javascript">
+#if($action.haveSelectedNode())
+        var selectedNode = "$selectedNode";
+#else
+        var selectedNode = "$result.root.id";
+#end
+    </script>
+</head>
+<body>
+    #buildTabs($result "detailed-view")
+
+    <table class="twopane">
+        <tr>
+            <td class="leftpane">
+                <p>
+                    Select build/stage/command:
+                </p>
+                <ul class="panenav">
+                    <li>
+                        <a href="#" id="nav_$result.root.id" onclick="selectNode('$result.root.id'); return false;">
+                            #statusImage($result false)
+                            #wwtext("name=build") $result.number
+                        </a>
+    #if($result.root.children.size() > 0)
+                        <ul>
+        #foreach($node in $result.root.children)
+                            <li>
+                                <a href="#" id="nav_$node.id" onclick="selectNode('$node.id'); return false;">
+                                    #statusImage($node.result false)
+                                    $!webwork.htmlEncode($node.stage)
+                                </a>
+            #if($node.result.commandResults.size() > 0)
+                               <ul>
+                #foreach($commandResult in $node.result.commandResults)
+                                   <li>
+                                       <a href="#" id="nav_$commandResult.id" onclick="selectNode('$commandResult.id'); return false;">
+                                           #statusImage($commandResult true)
+                                           $!webwork.htmlEncode($commandResult.commandName)
+                                       </a>
+                                   </li>
+                #end
+                               </ul>
+            #end
+                            </li>
+        #end
+                        </ul>
+    #end
+                    </li>
+                </ul>
+            </td>
+
+
+            <td class="rightpane">
+                <div id="node_$result.root.id" style="display: none">
+                    <div class="panecontent">
+                        #showBuild($result false true)
+                    </div>
+                </div>
+
+    #foreach($node in $result.root.children)
+        #set($recipeResult = $node.result)
+                <div id="node_$node.id" style="display: none">
+                    <div class="panecontent">
+                        <table class="content">
+                            #headingRow("build.stage.summary" 10)
+                            #recipeSummaryHeader()
+                            #recipeSummary($node $result true false)
+                            #directMessages($node.result 10)
+                        </table>
+                        #recipeCommands($node $result)
+                    </div>
+                </div>
+
+        #foreach($commandResult in $recipeResult.commandResults)
+                <div id="node_$commandResult.id" style="display: none">
+                    <div class="panecontent">
+                        <table class="content">
+                            #headingRow("command.summary" 5)
+                            <tr>
+                                #contentHeading("command.name" 1)
+                                #contentHeading("build.status" 2)
+                                #contentHeading("build.when" 1)
+                                #contentHeading("build.elapsed" 1)
+                            </tr>
+                            <tr>
+                                #set($cssClass = $commandResult.state.string)
+                                #contentCell($commandResult.commandName)
+                                #statusCell($commandResult true)
+                                #dateClassCell($commandResult)
+                                #elapsedCell($commandResult)
+                            </tr>
+                            #directMessages($commandResult 5)
+                        </table>
+
+            #if($commandResult.properties.size() > 0)
+                        <table class="content">
+                            #headingRow("command.properties" 2)
+                #foreach($property in $commandResult.properties.entrySet())
+                            #propertyRow($property)
+                #end
+                        </table>
+            #end
+
+            #if($commandResult.hasArtifacts())
+                        <h3>#wwtext("name=command.artifacts")</h3>
+                        #commandArtifacts($result $commandResult true $recipeResult.completed())
+            #end
+
+                    </div>
+                </div>
+        #end
+    #end
+            </td>
+        </tr>
+    </table>
+
+    <script type="text/javascript">
+        selectNode(selectedNode);
+    </script>
+
+    #tabEnd()
+</html>

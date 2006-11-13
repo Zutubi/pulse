@@ -1,0 +1,17 @@
+<?xml version="1.0"?>
+<project name="testProject" defaultRecipe="default">
+
+    <post-processor name="connections.pp">
+        <regex.pp>
+            <pattern category="info" expression=".*TCP.*"/>
+        </regex.pp>
+    </post-processor>
+
+    <recipe name="default">
+        <command name="doSomething">
+            <executable exe="netstat"/>
+            <artifact name="command output" type="text/plain" file="output/file"/>
+        </command>
+    </recipe>
+
+</project>

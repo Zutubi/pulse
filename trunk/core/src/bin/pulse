@@ -1,0 +1,10 @@
+#! /bin/sh
+
+binDir=`dirname "$0"`
+if [ -d "$PULSE_HOME" ]
+then
+    binDir="$PULSE_HOME/bin"
+fi
+
+"$binDir"/common.sh "$@"
+exit $?

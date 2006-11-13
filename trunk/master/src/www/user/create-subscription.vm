@@ -1,0 +1,23 @@
+#helpTag("User+Subscriptions")
+#authorisationTags($principle)
+<content tag="selectedTab">dashboard</content>
+<html>
+<head>
+    <title>#wwtext("name=subscription.create")</title>
+</head>
+<body>
+    #dashboardTabs("preferences")
+
+    #parse("/template/includes/actionerrors.vm")
+
+    #wwcform("action=subscriptionWizard.action" "id=subscription.create" "heading=%{getText('subscription.create.type')}" "method=post")
+        #wwhidden("name=state")
+        #wwhidden("name=submit")
+        #wwselect("name=contactId" "label=%{getText('subscription.contact')}" "list=contacts" "tabindex=1")
+        #wwselect("name=type" "label=%{getText('subscription.type')}" "list=types" "tabindex=2")
+        #nextCancel(3)
+    #end
+
+    #tabEnd()
+</body>
+</html>

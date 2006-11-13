@@ -1,0 +1,16 @@
+<?xml version="1.0"?>
+<project default-recipe="default">
+    <recipe name="default">
+        <command name="basic">
+            <executable exe="jim"/>
+            <artifact name="file-artifact" file="some/file"/>
+            <dir-artifact name="dir-artifact" base="some/base"/>
+        </command>
+
+        <command name="noExistNoFail">
+            <executable exe="jim"/>
+            <artifact name="file-artifact" file="some/file" fail-if-not-present="false"/>
+            <dir-artifact name="dir-artifact" base="some/base" fail-if-not-present="false"/>
+        </command>
+    </recipe>
+</project>

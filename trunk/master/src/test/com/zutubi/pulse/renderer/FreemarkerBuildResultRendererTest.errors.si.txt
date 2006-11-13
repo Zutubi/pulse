@@ -1,0 +1,2 @@
+project test project: build 101: error
+see: http://another.url/viewBuild.action?id=11

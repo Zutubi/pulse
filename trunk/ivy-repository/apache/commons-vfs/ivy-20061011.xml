@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<?xml-stylesheet type="text/xsl" href="http://www.jayasoft.fr/org/ivyrep/ivy-doc.xsl"?>
+<ivy-module version="1.0">
+
+    <info organisation="apache" module="commons-vfs" revision="20061011" status="release">
+
+        <license name="..." url="..."/>
+
+		<description homepage="http://jakarta.apache.org/commons/vfs/">
+            Commons VFS provides a single API for accessing various different file systems. It presents a uniform view
+            of the files from various different sources, such as the files on local disk, on an HTTP server, or inside
+            a Zip archive.
+		</description>
+	</info>
+
+    <configurations>
+        <conf name="default" description="for minimal use"/>
+        <conf name="full" extends="default" description="contains all supported providers"/>
+    </configurations>
+
+    <publications>
+        <artifact name="commons-vfs-core" type="jar" conf="default"/>
+        <artifact name="commons-vfs-provider-ram" type="jar" conf="default"/>
+        <artifact name="commons-vfs-provider-local" type="jar" conf="default"/>
+        
+        <artifact name="commons-vfs-provider-bzip2" type="jar" conf="full"/>
+        <artifact name="commons-vfs-provider-compressed" type="jar" conf="full"/>
+        <artifact name="commons-vfs-provider-ftp" type="jar" conf="full"/>
+        <artifact name="commons-vfs-provider-gzip" type="jar" conf="full"/>
+        <artifact name="commons-vfs-provider-http" type="jar" conf="full"/>
+        <artifact name="commons-vfs-provider-https" type="jar" conf="full"/>
+        <artifact name="commons-vfs-provider-jar" type="jar" conf="full"/>
+        <artifact name="commons-vfs-provider-res" type="jar" conf="full"/>
+        <artifact name="commons-vfs-provider-sftp" type="jar" conf="full"/>
+        <artifact name="commons-vfs-provider-smb" type="jar" conf="full"/>
+        <artifact name="commons-vfs-provider-tar" type="jar" conf="full"/>
+        <artifact name="commons-vfs-provider-temp" type="jar" conf="full"/>
+        <artifact name="commons-vfs-provider-url" type="jar" conf="full"/>
+        <artifact name="commons-vfs-provider-webdav" type="jar" conf="full"/>
+        <artifact name="commons-vfs-provider-zip" type="jar" conf="full"/>
+
+        <artifact name="commons-vfs-license" type="txt" conf="default"/>
+
+    </publications>
+
+    <dependencies>
+        <dependency org="apache" name="commons-logging" rev="1.0.4" conf="default"/>
+        <dependency org="apache" name="commons-collections" rev="2.1.1" conf="default"/>
+        <dependency org="apache" name="commons-httpclient" rev="2.0.2" conf="full"/>
+        <dependency org="apache" name="commons-compress" rev="20050911" conf="full"/>
+        <dependency org="apache" name="commons-net" rev="1.4.1" conf="full"/>
+        <dependency org="jakarta" name="slide" rev="20050629.161100" conf="full"/>
+        <dependency org="samba" name="jcifs" rev="1.2.9" conf="full"/>
+        <dependency org="jdom" name="jdom" rev="1.0" conf="full"/>
+        <dependency org="jcraft" name="jsch" rev="0.1.28" conf="full"/>
+        <dependency org="jakarta" name="oro" rev="2.0.8" conf="full"/>
+    </dependencies>
+
+</ivy-module>

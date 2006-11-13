@@ -1,0 +1,36 @@
+#helpTag("Build+Stage+Log+View")
+#authorisationTags($principle)
+#stageTags($buildResult $resultNode)
+<html>
+<head>
+    <title>#wwtext("name=build") $buildResult.number :: #wwtext("name=build.stage") $resultNode.stage</title>
+    <script type="text/javascript" src="$base/js/prototype.js"></script>
+    <script type="text/javascript">
+        <!--
+        #updater("$base/ajax/tailRecipeLogPanel.action?id=$resultNode.id&buildId=$buildResult.id&maxLines=$maxLines&refreshInterval=$refreshInterval" "panel" $principle)
+        -->
+    </script>
+</head>
+<body>
+    #buildTabs($buildResult "detailed-view")
+
+    #wwcform("action=tailRecipeLog.action" "heading=%{getText('stage.tail.settings')}" "colspan=5" "width=100%" "method=get")
+        #wwhidden("name=id")
+        #wwhidden("name=buildId")
+
+        <tr>
+        #wwtextfield("name=maxLines" "singleRow=true" "label=%{getText('stage.tail.max.lines')}" "size=4" "onchange=submit()" "tabindex=1")
+        #wwtextfield("name=refreshInterval" "singleRow=true" "label=%{getText('stage.tail.refresh.interval')}" "after= seconds" "size=4" "onchange=submit()" "tabindex=2")
+        <td>#wwsubmit("name=go" "value=%{getText('update')}" "tabindex=3")</td>
+        </tr>
+    #end
+
+    <h3 class="heading">#wwtext("name=stage.tail.box") #if($logExists) &nbsp;<a href="viewRecipeLog.action?id=$resultNode.id&amp;buildId=$buildResult.id"><img alt="down" src="$base/images/arrow_down.gif"/>#wwtext("name=stage.full.log")</a> #end </h3>
+    <div class="box">
+        <div id="panel">
+            #parse("ajax/tail-recipe-log-panel.vm")
+        </div>
+    </div>
+
+    #tabEnd()
+</html>

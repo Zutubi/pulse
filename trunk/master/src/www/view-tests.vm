@@ -1,0 +1,51 @@
+#helpTag("Build+Tests+Tab")
+#authorisationTags($principle)
+#buildTags($project $result)
+<html>
+<head>
+    <title>#wwtext("name=build") $result.number</title>
+</head>
+<body>
+    #buildTabs($result "tests")
+
+#if($result.completed())
+    #if($result.hasTests())
+    #testSummaryTable($result.testSummary)
+
+    <table class="fill-content">
+        #headingRow("build.stages" 7)
+        <tr>
+            #contentHeading("build.stage" 1)
+            #contentHeading("test.status" 2)
+            #contentHeading("test.total" 1)
+            #contentHeading("test.failures" 1)
+            #contentHeading("test.errors" 1)
+            #contentHeading("test.success.rate" 1)
+        </tr>
+        #foreach($node in $result.root.children)
+            #set($summary = $node.result.testSummary)
+        <tr>
+            #dynamicLinkCell($node.stage "viewTestSuite.action?id=$result.id&nodeId=$node.id")
+            #testStatusCell($summary)
+            #rightCell($summary.total)
+            #rightCell($summary.failures)
+            #rightCell($summary.errors)
+            #rightCell("${summary.successRate}%")
+        </tr>
+        #end
+    </table>
+
+    #buildTestFailures($result)
+    #else
+    <p>
+        #wwtext("name=build.no.tests")
+    </p>
+    #end
+#else
+    <p>
+        #wwtext("name=tests.build.incomplete")
+    </p>
+#end
+
+    #tabEnd()
+</html>

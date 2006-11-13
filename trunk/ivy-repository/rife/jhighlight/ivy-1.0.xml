@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet type="text/xsl" href="http://ivyrep.jayasoft.org/ivy-doc.xsl"?>
+<ivy-module version="1.0">
+    <info  organisation="rife" module="jhighlight" revision="1.0" status="release">
+		<license name="CDDL" url="http://www.sun.com/cddl"/>
+		<description homepage="https://jhighlight.dev.java.net/"/>
+	</info>
+
+    <publications>
+        <artifact name="jhighlight" type="jar"/>
+        <artifact name="jhighlight-license" type="txt"/>
+    </publications>
+
+</ivy-module>

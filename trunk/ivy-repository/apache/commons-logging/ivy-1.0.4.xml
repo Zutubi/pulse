@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet type="text/xsl" href="http://ivyrep.jayasoft.org/ivy-doc.xsl"?>
+<ivy-module version="1.0">
+    <info  organisation="apache" module="commons-logging" revision="1.0.4" status="release" publication="20040615212900">
+		<license name="Apache" url="http://www.apache.org/licenses/LICENSE-2.0.txt"/>
+
+		<description homepage="http://jakarta.apache.org/commons/logging/">
+	        Commons-Logging is a wrapper around a variety of logging
+            API implementations.<br/>
+		</description>
+	</info>
+
+    <publications>
+        <artifact name="commons-logging" type="jar"/>
+        <artifact name="commons-logging-api" type="jar"/>
+        <artifact name="commons-logging-license" type="txt"/>
+    </publications>
+
+</ivy-module>

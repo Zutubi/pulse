@@ -1,0 +1,46 @@
+#helpTag("Build+Changes+Tab")
+#authorisationTags($principle)
+#buildTags($project $result)
+<html>
+<head>
+    <title>#wwtext("name=build") $result.number</title>
+</head>
+<body>
+    #buildTabs($result "changes")
+
+    #parse("/template/includes/actionerrors.vm")
+
+    <h3>
+        #wwtext("name=checked.out.revision")
+#set($url = $action.getChangeUrl($result.project, $patchArchive.status.revision))
+
+#if($url)
+        <a href="$url">
+#end
+            $patchArchive.status.revision
+#if($url)
+        </a>
+#end
+    </h3>
+    <table class="content">
+        #headingRow("patch.changes" 2)
+#if($patchArchive.status.changes.size() > 0)
+        <tr>
+            #contentHeading("patch.path" 1)
+            #contentHeading("patch.status" 1)
+        </tr>
+    #foreach($fileStatus in $patchArchive.status.changes)
+        <tr>
+            #dynamicCell($fileStatus.path)
+            #dynamicCell($fileStatus.state.toString().toLowerCase())
+        </tr>
+    #end
+#else
+    <tr>
+        <td class="content" colspan="2">#wwtext("name=personal.changes.none")</td>
+    </tr>
+#end
+    </table>
+
+    #tabEnd()
+</html>

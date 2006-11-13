@@ -1,0 +1,32 @@
+#helpTag("Contact+Points")
+<content tag="selectedTab">projects</content>
+<html>
+<head>
+    <title>#wwtext("name=add.commit.message.transformer")</title>
+</head>
+<body>
+    #projectTabs("configuration")
+
+<table>
+<tr>
+<td>
+    #wizard("object=wizardInstance")
+</td>
+</tr>
+#if ($currentState.class.name == 'com.zutubi.pulse.committransformers.SelectType')
+    #if ($existingOptions.size() > 0)
+<tr>
+<td>
+        #wwcform("action=addExistingTransformer.action" "id=transformer.existing.add" "heading=%{getText('select.existing.commit.message.transformer')}" "method=post")
+            #wwhidden("name=projectId")
+            #wwselect("name=existing" "label=%{getText('transformer')}" "list=existingOptions" "required=true" "tabindex=1" "onkeypress=return submitenter(this,event)")
+            #saveCancel(3)
+        #end
+</td>
+</tr>
+    #end
+#end
+</table>
+    #tabEnd()
+</body>
+</html>

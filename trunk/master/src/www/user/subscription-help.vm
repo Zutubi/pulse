@@ -1,0 +1,27 @@
+#macro(condition name)
+    <tr>
+        <th class="content-row">$name</th>
+        #staticWrapCell("condition.help.$name")
+    </tr>
+#end
+<table class="fill-content">
+    #headingRow("conditions.available" 2)
+    #condition("true")
+    #condition("false")
+    #condition("success")
+    #condition("failure")
+    #condition("error")
+    #condition("changed")
+    #condition("changed.by.me")
+    #condition("state.change")
+</table>
+<table class="fill-content">
+    #headingRow("conditions.operators" 2)
+    #condition("or")
+    #condition("and")
+    #condition("not")
+    <tr>
+        #contentRowHeading("conditions.grouping")
+        #staticWrapCell("condition.help.grouping")
+    </tr>
+</table>

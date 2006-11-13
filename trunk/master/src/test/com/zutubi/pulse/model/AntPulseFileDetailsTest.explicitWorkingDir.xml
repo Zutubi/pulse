@@ -1,0 +1,17 @@
+<?xml version="1.0"?>
+<project defaultRecipe="ant build">
+
+    
+    <recipe name="ant build">
+        <command name="build">
+            <!-- pull in the ant resource if configured. -->
+            <resource name="ant" required="false"/>
+            <ant
+                    working-dir="${base.dir}/mywork"
+                    >
+                            </ant>
+
+            
+        </command>
+    </recipe>
+</project>

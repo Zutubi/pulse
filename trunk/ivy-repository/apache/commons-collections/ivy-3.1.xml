@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet type="text/xsl" href="http://ivyrep.jayasoft.org/ivy-doc.xsl"?>
+<ivy-module version="1.0">
+    <info organisation="apache" module="commons-collections" revision="3.1" status="release" publication="20040628200200">
+		<license name="Apache" url="http://www.apache.org/licenses/LICENSE-2.0.txt"/>
+		<ivyauthor name="jayasoft" url="http://www.jayasoft.org/"/>
+
+		<repository name="ivyrep" url="http://www.jayasoft.fr/org/ivyrep/" pattern="[organisation]/[module]/ivy-[revision].xml" ivys="true" artifacts="false"/>
+		<repository name="ibiblio" url="http://www.ibiblio.org/maven/" pattern="[module]/jars/[artifact]-[revision].jar" ivys="false" artifacts="true"/>
+
+		<description homepage="http://jakarta.apache.org/commons/collections/">
+	        Commons-Collections seek to build upon the JDK classes by providing new
+            interfaces, implementations and utilities.<br/>
+		</description>
+	</info>
+
+    <publications>
+        <artifact name="commons-collections" type="jar"/>
+        <artifact name="commons-collections-license" type="txt"/>
+    </publications>
+
+</ivy-module>

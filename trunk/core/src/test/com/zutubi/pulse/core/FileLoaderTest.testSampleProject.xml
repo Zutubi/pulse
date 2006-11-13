@@ -1,0 +1,53 @@
+<?xml version="1.0"?>
+<project defaultRecipe="default">
+
+    <property name="home.dir" value="/home/daniel"/>
+    <property name="ant.bin" value="E:/opt/ant/apache-ant-1.6.2/bin/ant"/>
+
+    <post-processor name="generic.pp">
+        <regex.pp>
+            <pattern category="error" expression=".*[Ee]rror.*"/>
+            <pattern category="warning" expression=".*[Ww]arning.*"/>
+        </regex.pp>
+    </post-processor>
+    <post-processor name="ant.pp">
+        <regex.pp>
+            <pattern category="info" expression=".*BUILD.*"/>
+        </regex.pp>
+    </post-processor>
+    <post-processor name="svn.pp">
+        <regex.pp>
+            <pattern category="info" expression=".*Checked out revision.*"/>
+        </regex.pp>
+    </post-processor>
+    <post-processor name="junit.pp">
+        <regex.pp>
+            <pattern category="info" expression="Tests run.*"/>
+        </regex.pp>
+    </post-processor>
+
+
+    <recipe name="default">
+        <command name="sync">
+            <executable exe="svn" args="checkout svn+ssh://some.host.com/usr/local/svn-repo/pulse"
+                        working-dir="${base.dir}">
+                <process processor="${svn.pp}"/>
+            </executable>
+            <artifact name="wow" file="some/file">
+                <process processor="${generic.pp}"/>
+            </artifact>
+        </command>
+        <command name="build">
+            <executable exe="${ant.bin}" args="build" working-dir="${base.dir}/pulse/trunk"/>
+        </command>
+        <command name="test">
+            <executable exe="${ant.bin}" args="test" working-dir="${base.dir}/pulse/trunk">
+                <environment name="CLASSPATH" value="E:/opt/java/jdk1.5.0/bin/java"/>
+            </executable>
+            <artifact name="junit.report.txt" type="text/plain">
+                <process processor="${generic.pp}"/>
+                <process processor="${junit.pp}"/>
+            </artifact>
+        </command>
+    </recipe>
+</project>

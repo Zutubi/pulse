@@ -1,0 +1,25 @@
+<?xml version="1.0"?>
+<project defaultRecipe="default">
+
+        <junit.pp name="junit"/>
+
+    <recipe name="default">
+        <command name="build">
+            <!-- pull in the maven2 resource if configured. -->
+            <resource name="maven2" required="false"/>
+            <maven2
+            >
+                            </maven2>
+
+                <artifact name="artifact 1" file="filename" fail-if-not-present="false"
+                >
+                <process processor="${junit}"/>
+    </artifact>
+        <artifact name="artifact 2" file="filename" fail-if-not-present="false"
+                >
+                <process processor="${junit}"/>
+    </artifact>
+    
+        </command>
+    </recipe>
+</project>

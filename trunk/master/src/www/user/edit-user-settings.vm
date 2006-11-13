@@ -1,0 +1,34 @@
+#helpTag("User+Settings")
+#authorisationTags($principle)
+<content tag="selectedTab">dashboard</content>
+<html>
+<head>
+    <title>#wwtext("name=user.settings.edit")</title>
+</head>
+<body>
+    #dashboardTabs("preferences")
+
+    #parse("/template/includes/actionerrors.vm")
+
+    #wwcform("action=editUserSettings.action" "id=user.settings.edit" "heading=%{getText('user.settings.edit')}" "method=post")
+        #wwhidden("name=userId")
+        #wwselect("name=defaultAction" "list=defaultActions" "label=%{getText('user.default.page')}" "tabindex=1")
+        #wwtextfield("name=myBuildsCount" "label=%{getText('my.builds.count')}" "size=4" "tabindex=2")
+        #inlineHelp("my.builds.count.help")
+        #wwcheckbox("name=refreshEnabled" "label=%{getText('user.refresh.enabled')}" "fieldValue=true" "onclick=setEnableState('user.settings.edit_refreshInterval', 'user.settings.edit_refreshEnabled')" "tabindex=3")
+        #wwtextfield("name=refreshInterval" "label=%{getText('user.refresh.interval')}" "after= $action.getText('seconds')" "size=6" "required=true" "tabindex=4")
+        #inlineHelp("user.refresh.interval.help")
+        #wwtextfield("name=tailLines" "label=%{getText('user.tail.lines')}" "size=6" "required=true" "tabindex=5")
+        #inlineHelp("user.tail.lines.help")
+        #wwtextfield("name=tailInterval" "label=%{getText('user.tail.refresh.interval')}" "after= $action.getText('seconds')" "size=6" "required=true" "tabindex=6")
+        #inlineHelp("user.tail.refresh.interval.help")
+        #saveCancel(7)
+    #end
+
+    <script type="text/javascript">
+        setEnableState('user.settings.edit_refreshInterval', 'user.settings.edit_refreshEnabled');
+    </script>
+
+    #tabEnd()
+</body>
+</html>

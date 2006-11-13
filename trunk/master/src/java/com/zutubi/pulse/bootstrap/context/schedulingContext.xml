@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
+<!--
+The scheduling subsystem is responsible for configuring the scheduler and any default
+triggers.
+
+This context exports:
+
+    scheduler: the systems scheduling manager. All scheduling request should be made to this interface.
+
+    quartzScheduler: Used by the scheduler, the quartz scheduler provides access to temporal scheduling.
+                     It is recommended that all scheduling be done via the scheduler interface. However,
+                     if this interface is inappropirate, the quartzScheduler is also available.
+
+This context requires:
+
+    objectFactory: the systems object factory.
+
+-->
+<beans>
+
+    <bean id="quartzScheduler" class="org.springframework.scheduling.quartz.SchedulerFactoryBean">
+        <property name="configLocation">
+            <value>classpath:com/zutubi/pulse/bootstrap/quartz/quartz.properties</value>
+        </property>
+    </bean>
+
+    <bean id="quartzJobFactory" class="com.zutubi.pulse.bootstrap.quartz.SpringJobFactory" init-method="init">
+        <property name="scheduler">
+            <ref local="quartzScheduler"/>
+        </property>
+        <property name="objectFactory">
+            <ref bean="objectFactory"/>
+        </property>
+    </bean>
+
+    <!-- We don't initialise the scheduler here: it must wait for the startup event. -->
+    <bean id="schedulerTarget" class="com.zutubi.pulse.scheduling.DefaultScheduler" autowire="byName">
+        <property name="strategies">
+            <list>
+                <ref local="cronSchedulerStrategy"/>
+                <ref local="simpleSchedulerStrategy"/>
+                <ref local="eventSchedulerStrategy"/>
+            </list>
+        </property>
+    </bean>
+    <bean id="scheduler" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
+        <property name="transactionManager">
+            <ref bean="transactionManager"/>
+        </property>
+        <property name="target">
+            <ref bean="schedulerTarget"/>
+        </property>
+        <property name="transactionAttributes">
+            <props>
+                <prop key="*">PROPAGATION_REQUIRED</prop>
+            </props>
+        </property>
+    </bean>
+
+    <bean id="cronSchedulerStrategy" class="com.zutubi.pulse.scheduling.CronSchedulerStrategy">
+        <property name="quartzScheduler">
+            <ref local="quartzScheduler"/>
+        </property>
+    </bean>
+    <bean id="simpleSchedulerStrategy" class="com.zutubi.pulse.scheduling.SimpleSchedulerStrategy">
+        <property name="quartzScheduler">
+            <ref local="quartzScheduler"/>
+        </property>
+    </bean>
+
+    <bean id="eventSchedulerStrategy" class="com.zutubi.pulse.scheduling.EventSchedulerStrategy">
+        <property name="eventManager">
+            <ref bean="eventManager"/>
+        </property>
+        <property name="objectFactory">
+            <ref bean="objectFactory"/>
+        </property>
+    </bean>
+
+    <!--
+    wrap the trigger handler in a transaction to ensure that whatever fires the trigger,
+    any changes to the state of the trigger are persisted.
+     -->
+    <bean id="triggerHandler" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
+        <property name="transactionManager">
+            <ref bean="transactionManager"/>
+        </property>
+        <property name="target">
+            <ref bean="triggerHandlerTarget"/>
+        </property>
+        <property name="transactionAttributes">
+            <props>
+                <prop key="*">PROPAGATION_REQUIRED</prop>
+            </props>
+        </property>
+    </bean>
+
+    <bean id="triggerHandlerTarget" class="com.zutubi.pulse.scheduling.DefaultTriggerHandler">
+        <!-- not sure why this is needs to be wired directly. -->
+        <property name="objectFactory">
+            <ref bean="objectFactory"/>
+        </property>
+        <property name="triggerDao">
+            <ref bean="triggerDao"/>
+        </property>
+    </bean>
+
+</beans>

@@ -1,0 +1,29 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD//EN" "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd" >
+<hibernate-mapping>
+    <class name="com.zutubi.pulse.model.Project" table="PROJECT" lazy="false">
+        <id name="id" type="java.lang.Long" column="ID" unsaved-value="0">
+            <generator class="hilo"/>
+        </id>
+        <property name="nextBuildNumber" column="NEXT_BUILD_NUMBER" type="long"/>
+    </class>
+
+    <class name="com.zutubi.pulse.model.PulseFileDetails" table="BOB_FILE_DETAILS" lazy="false">
+        <id name="id" type="java.lang.Long" column="ID" unsaved-value="0">
+            <generator class="hilo"/>
+        </id>
+
+        <discriminator column="SOURCE_TYPE" type="string" length="63"/>
+
+        <subclass name="com.zutubi.pulse.model.TemplatePulseFileDetails" lazy="false">
+            <subclass name="com.zutubi.pulse.model.XCodePulseFileDetails" discriminator-value="XCODE" lazy="false">
+                <property name="workingDir" column="BASE_DIR" type="string" length="255"/>
+                <property name="target" column="TARGETS" type="string" length="255"/>
+                <property name="project" column="PROJECT" type="string" length="1023"/>
+                <property name="config" column="CONFIG" type="string" length="1023"/>
+                <property name="action" column="BUILDACTION" type="string" length="1023"/>
+                <property name="settings" column="ARGUMENTS" type="string" length="1023"/>
+            </subclass>
+        </subclass>
+    </class>
+</hibernate-mapping>

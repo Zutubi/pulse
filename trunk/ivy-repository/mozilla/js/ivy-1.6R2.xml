@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet type="text/xsl" href="http://www.jayasoft.fr/org/ivyrep/ivy-doc.xsl"?>
+<ivy-module version="1.0">
+
+    <info organisation="mozilla" module="js" revision="1.6R2" status="release" publication="">
+        <license name="NPL 1.1" url="http://www.mozilla.org/NPL/"/>
+        <ivyauthor name="..." url="..."/>
+        <description homepage="http://www.mozilla.org/rhino/">
+            Rhino is an open-source implementation of JavaScript written entirely in Java. It is
+            typically embedded into Java applications to provide scripting to end users.
+        </description>
+    </info>
+
+    <publications>
+        <artifact name="js" type="jar" conf="default"/>
+    </publications>
+
+</ivy-module>

@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
+<beans>
+
+    <bean id="startupManager" class="com.zutubi.pulse.bootstrap.DefaultStartupManager">
+        <property name="coreContexts">
+            <list>
+                <value>com/zutubi/pulse/bootstrap/coreSubsystemContext.xml</value>
+            </list>
+        </property>
+        <property name="setupContexts">
+            <list>
+                <value>com/zutubi/pulse/bootstrap/configSubsystemContext.xml</value>
+            </list>
+        </property>
+        <property name="startupRunnables">
+            <list>
+                <value>com.zutubi.pulse.test.SetupFeatureTour</value>
+            </list>
+        </property>
+        <property name="configurationManager">
+            <ref local="configurationManager"/>
+        </property>
+        <property name="objectFactory">
+            <ref local="objectFactory"/>
+        </property>
+    </bean>
+
+    <bean id="configurationManager" class="com.zutubi.pulse.bootstrap.SimpleMasterConfigurationManager">
+        <property name="systemPaths">
+            <bean class="com.zutubi.pulse.bootstrap.ConfigurableSystemPaths">
+                <property name="systemRootString">
+                    <value>master/system</value>
+                </property>
+                <property name="contentRootString">
+                    <value>master/src/www</value>
+                </property>
+                <property name="configRootString">
+                    <value>master/etc</value>
+                </property>
+                <property name="logRootString">
+                    <value>master/system/log</value>
+                </property>
+                <property name="tmpRootString">
+                    <value>master/system/tmp</value>
+                </property>
+                <property name="templateRootStrings">
+                    <list>
+                        <value>master/src/templates</value>
+                        <value>master/src/www</value>
+                    </list>
+                </property>
+            </bean>
+        </property>
+    </bean>
+
+    <bean id="objectFactory" class="com.zutubi.pulse.spring.SpringObjectFactory"/>
+
+    <bean id="xworkObjectFactory" class="com.opensymphony.xwork.spring.SpringObjectFactory" init-method="initObjectFactory"/>
+    
+</beans>

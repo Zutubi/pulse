@@ -1,0 +1,3 @@
+#foreach($processor in $outputProcessors)
+    <process processor="$details.getReference($processor)"/>
+#end

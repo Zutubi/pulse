@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
+<!--
+
+-->
+<beans>
+
+    <bean id="pluginManager" class="com.zutubi.pulse.plugins.PulsePluginManager" init-method="init" destroy-method="destory">
+        <property name="descriptors">
+            <map>
+                <entry key="event-listener">
+                    <value type="java.lang.Class">com.zutubi.pulse.plugins.descriptors.EventListenerComponentDescriptor</value>
+                </entry>
+                <entry key="object-descriptor">
+                    <value type="java.lang.Class">com.zutubi.pulse.form.persistence.ObjectRegistryComponentDescriptor</value>
+                </entry>
+            </map>
+        </property>
+        <property name="systemPluginDescriptors">
+            <list>
+                <value type="java.lang.String">system-plugins.xml</value>
+            </list>
+        </property>
+        <property name="objectFactory">
+            <ref bean="objectFactory"/>
+        </property>
+    </bean>
+
+</beans>

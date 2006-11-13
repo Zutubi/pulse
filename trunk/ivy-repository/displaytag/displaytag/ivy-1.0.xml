@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet type="text/xsl" href="http://www.jayasoft.fr/org/ivyrep/ivy-doc.xsl"?>
+<ivy-module version="1.0">
+    <info organisation="displaytag" module="displaytag" revision="1.0" status="release">
+        <license name="..." url="..."/>
+        <description homepage="...">
+
+        </description>
+    </info>
+
+    <publications>
+        <artifact name="displaytag" type="jar"/>
+        <artifact name="displaytag-license" type="txt"/>
+    </publications>
+
+</ivy-module>

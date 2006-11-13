@@ -1,0 +1,19 @@
+#helpTag("Project+Groups")
+<content tag="selectedTab">projects</content>
+<html>
+<head>
+    <title>#wwtext("name=add.project.group")</title>
+</head>
+<body>
+    <div id="pagecontent">
+
+    #parse("/template/includes/actionerrors.vm")
+
+    #wwcform("action=addProjectGroup.action" "id=add.project.group" "heading=%{getText('add.project.group')}" "method=post")
+        #wwtextfield("name=name" "label=%{getText('project.group.name')}" "required=true" "tabindex=1")
+        #wwselect("name=projects" "label=%{getText('project.group.projects')}" "list=allProjects" "multiple=true" "tabindex=2")
+        #saveCancel(3)
+    #end
+    </div>
+</body>
+</html>

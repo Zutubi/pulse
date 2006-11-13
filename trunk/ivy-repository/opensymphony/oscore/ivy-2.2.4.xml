@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<?xml-stylesheet type="text/xsl" href="http://www.jayasoft.fr/org/ivyrep/ivy-doc.xsl"?>
+<ivy-module version="1.0">
+    <info organisation="opensymphony" module="oscore" revision="2.2.4" status="release" publication="20040406000000">
+        <license name="Apache" url="http://www.apache.org/licenses/LICENSE-2.0.txt"/>
+        <ivyauthor name="opensymphony" url="http://www.opensymphony.com/"/>
+
+        <description homepage="http://www.opensymphony.com/oscore/">
+            OSCore is a set of utility-classes that are common to the other components of OpenSymphony. Contains essential functionality for any J2EE application.
+            <br/>
+        </description>
+    </info>
+    <configurations>
+        <conf name="default" description="The oscore jar file" visibility="public"/>
+    </configurations>
+    <publications>
+        <artifact name="oscore" type="jar" conf="default"/>
+        <artifact name="oscore-license" type="txt" conf="default"/>
+    </publications>
+</ivy-module>

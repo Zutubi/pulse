@@ -1,0 +1,8 @@
+<?xml version="1.0"?>
+<resources>
+
+    <resource name="aResource">
+        <property name="a" value="b"/>    
+    </resource>
+
+</resources>

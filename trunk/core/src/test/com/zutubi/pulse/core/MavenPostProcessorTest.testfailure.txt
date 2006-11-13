@@ -1,0 +1,43 @@
+ __  __
+|  \/  |__ _Apache__ ___
+| |\/| / _` \ V / -_) ' \  ~ intelligent projects ~
+|_|  |_\__,_|\_/\___|_||_|  v. 1.0.2
+
+build:start:
+
+java:prepare-filesystem:
+
+java:compile:
+    [echo] Compiling to c:\tmp\maven/target/classes
+    [echo]
+==========================================================
+
+  NOTE: Targetting JVM 1.5, classes
+  will not run on earlier JVMs
+
+==========================================================
+
+    [javac] Compiling 1 source file to C:\tmp\maven\target\classes
+
+java:jar-resources:
+
+test:prepare-filesystem:
+
+test:test-resources:
+
+test:compile:
+    [javac] Compiling 1 source file to C:\tmp\maven\target\test-classes
+
+test:test:
+    [junit] Running SimpleTest
+    [junit] Tests run: 1, Failures: 1, Errors: 0, Time elapsed: 0.015 sec
+    [junit] [ERROR] TEST SimpleTest FAILED
+
+BUILD FAILED
+File...... C:\Documents and Settings\daniel\.maven\cache\maven-test-plugin-1.6.2\plugin.jelly
+Element... fail
+Line...... 181
+Column.... 54
+There were test failures.
+Total time: 2 seconds
+Finished at: Mon May 08 22:12:37 EST 2006
