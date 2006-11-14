@@ -46,7 +46,6 @@
                 <ref local="schemaUpgrade0101011001"/>
                 <ref local="testStorage"/>
                 <ref local="triggerBuildSpecification"/>
-                <ref local="buildReasonDataPatchUpgrade"/>
                 <!-- pre 1.2 upgrade tasks -->
                 <ref local="schemaUpgrade0101999001"/>
                 <ref local="slaveEnabledState"/>
@@ -61,7 +60,7 @@
                 <ref local="schemaUpgrade0102001007"/>
                 <ref local="commitMessageLinkMigrationUpgrade"/>
                 <ref local="triggerBuildSpecification2"/>
-                <ref local="buildReasonDataPatchUpgrade2"/>
+                <ref local="buildReasonDataPatchUpgrade"/>
                 <ref local="schemaUpgrade0102002001"/>
                 <ref local="defaultSpecification"/>
             </list>
@@ -267,10 +266,6 @@
         <property name="buildNumber" value="101019001"/>
     </bean>
 
-    <bean id="buildReasonDataPatchUpgrade" class="com.zutubi.pulse.upgrade.tasks.CopySharedBuildReasonDataPatchUpgradeTask" autowire="byName">
-        <property name="buildNumber" value="101019002"/>
-    </bean>
-
     <bean id="schemaUpgrade0101999001" class="com.zutubi.pulse.upgrade.tasks.MigrateSchemaUpgradeTask" autowire="byName">
         <property name="buildNumber" value="101999001"/>
         <property name="mappings">
@@ -363,7 +358,7 @@
         <property name="buildNumber" value="102001009"/>
     </bean>
 
-    <bean id="buildReasonDataPatchUpgrade2" class="com.zutubi.pulse.upgrade.tasks.CopySharedBuildReasonDataPatchUpgradeTask" autowire="byName">
+    <bean id="buildReasonDataPatchUpgrade" class="com.zutubi.pulse.upgrade.tasks.CopySharedBuildReasonDataPatchUpgradeTask" autowire="byName">
         <property name="buildNumber" value="102001010"/>
     </bean>
 
