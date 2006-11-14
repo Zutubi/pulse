@@ -82,7 +82,7 @@ public class CopySharedBuildReasonDataPatchUpgradeTask extends DatabaseUpgradeTa
             String selectBuildResults = "SELECT id FROM build_result WHERE reason = ?";
             select = con.prepareStatement(selectBuildResults);
 
-            String cloneBuildReason = "INSERT INTO build_reason (id, reason_type, details, user) VALUES (?, ?, ?, ?)";
+            String cloneBuildReason = "INSERT INTO build_reason (id, reason_type, details) VALUES (?, ?, ?)";
             clone = con.prepareStatement(cloneBuildReason);
 
             String updateBuildResult = "UPDATE build_result SET reason = ? WHERE id = ?";
@@ -107,7 +107,6 @@ public class CopySharedBuildReasonDataPatchUpgradeTask extends DatabaseUpgradeTa
                         JDBCUtils.setLong(clone, 1, nextId);
                         JDBCUtils.setString(clone, 2, reason.reasonType);
                         JDBCUtils.setString(clone, 3, reason.details);
-                        JDBCUtils.setString(clone, 4, reason.user);
 
                         if (clone.executeUpdate() != 1)
                         {
@@ -159,14 +158,12 @@ public class CopySharedBuildReasonDataPatchUpgradeTask extends DatabaseUpgradeTa
         public long id;
         public String reasonType;
         public String details;
-        public String user;
 
         public Reason(ResultSet rs) throws SQLException
         {
             id = JDBCUtils.getLong(rs, "id");
             reasonType = JDBCUtils.getString(rs, "reason_type");
             details = JDBCUtils.getString(rs, "details");
-            user = JDBCUtils.getString(rs, "user");
         }
     }
 }
