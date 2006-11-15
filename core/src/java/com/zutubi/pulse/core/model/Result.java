@@ -137,6 +137,11 @@ public abstract class Result extends Entity
         addFeature(Feature.Level.ERROR, message);
     }
 
+    public void warning(String message)
+    {
+        addFeature(Feature.Level.WARNING, message);
+    }
+
     public void terminate(boolean timeout)
     {
         state = ResultState.TERMINATING;

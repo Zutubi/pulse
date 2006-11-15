@@ -36,11 +36,22 @@ public abstract class XMLReportPostProcessor extends TestReportPostProcessor
         }
         catch (ParsingException pex)
         {
-            throw new BuildException("Unable to parse " + reportType + " report '" + file.getAbsolutePath() + "': " + pex.getMessage());
+            String message = "Unable to parse " + reportType + " report '" + file.getAbsolutePath() + "'";
+            if(pex.getMessage() != null)
+            {
+                message += ": " + pex.getMessage();
+            }
+
+            result.warning(message);
         }
         catch (IOException e)
         {
-            throw new BuildException("I/O error processing " + reportType + " report '" + file.getAbsolutePath() + "': " + e.getMessage());
+            String message = "I/O error processing " + reportType + " report '" + file.getAbsolutePath() + "'";
+            if(e.getMessage() != null)
+            {
+                message += ": " + e.getMessage();
+            }
+            result.warning(message);
         }
         finally
         {
