@@ -33,14 +33,19 @@ public abstract class XMLReportPostProcessorTestBase extends PulseTestCase
         super.tearDown();
     }
 
-    protected TestSuiteResult runProcessor(String name)
+    protected TestSuiteResult runProcessor(String... names)
     {
         File root = getPulseRoot();
         File outputDir = new File(root, FileSystemUtils.composeFilename("core", "src", "test", "com", "zutubi", "pulse", "core"));
-        StoredFileArtifact artifact = new StoredFileArtifact(getClass().getSimpleName() + "." + name + ".xml");
         TestSuiteResult testResults = new TestSuiteResult();
         CommandContext context = new CommandContext(null, outputDir, testResults);
-        pp.process(artifact, new CommandResult("test"), context);
+
+        for(String name: names)
+        {
+            StoredFileArtifact artifact = new StoredFileArtifact(getClass().getSimpleName() + "." + name + ".xml");
+            pp.process(artifact, new CommandResult("test"), context);
+        }
+        
         return testResults;
     }
 

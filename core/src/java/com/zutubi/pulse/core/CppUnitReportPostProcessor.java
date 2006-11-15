@@ -33,12 +33,15 @@ public class CppUnitReportPostProcessor extends XMLReportPostProcessor
     public CppUnitReportPostProcessor()
     {
         super("CppUnit");
-        suites = new TreeMap<String, TestSuiteResult>();
     }
 
     protected void processDocument(Document doc, TestSuiteResult tests)
     {
         Element root = doc.getRootElement();
+
+        // CIB-755: the post processor must be stateless, as it can be used
+        // to process multiple reports.  Recreate this map each time.
+        suites = new TreeMap<String, TestSuiteResult>();
 
         // We should get FailedTests and SuccessfulTests sections
         Elements testElements = root.getChildElements(ELEMENT_FAILED_TESTS);
