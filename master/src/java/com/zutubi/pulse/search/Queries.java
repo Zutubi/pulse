@@ -21,4 +21,18 @@ public class Queries
         q.setSessionFactory(sessionFactory);
         return q;
     }
+
+    /**
+     * Create a query used for searching for the ids of the specified type of object.
+     * 
+     * @param type of object being searched for.
+     *
+     * @return a configured SearchQuery instance
+     */
+    public SearchQuery<Long> getIds(Class type)
+    {
+        SearchQuery<Long> q = new SearchQuery<Long>(type);
+        q.setSessionFactory(sessionFactory);
+        return q;
+    }
 }
