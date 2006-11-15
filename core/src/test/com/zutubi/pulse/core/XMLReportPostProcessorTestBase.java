@@ -44,13 +44,18 @@ public abstract class XMLReportPostProcessorTestBase extends PulseTestCase
         return new StoredFileArtifact(getClass().getSimpleName() + "." + name + ".xml");
     }
 
-    protected TestSuiteResult runProcessor(String name)
+    protected TestSuiteResult runProcessor(String... names)
     {
         File outputDir = getOutputDir();
-        StoredFileArtifact artifact = getArtifact(name);
         TestSuiteResult testResults = new TestSuiteResult();
         CommandContext context = new CommandContext(null, outputDir, testResults);
-        pp.process(artifact, new CommandResult("test"), context);
+
+        for(String name: names)
+        {
+            StoredFileArtifact artifact = getArtifact(name);
+            pp.process(artifact, new CommandResult("test"), context);
+        }
+        
         return testResults;
     }
 
