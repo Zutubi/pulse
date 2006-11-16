@@ -63,9 +63,17 @@
                 <ref local="buildReasonDataPatchUpgrade"/>
                 <ref local="schemaUpgrade0102002001"/>
                 <ref local="defaultSpecification"/>
+                <ref local="transferExampleTemplatesToDataDirectory"/>
+            </list>
+        </property>
+        <property name="systemTasks">
+            <list>
+                <ref local="backup"/>
             </list>
         </property>
     </bean>
+
+    <bean id="backup" class="com.zutubi.pulse.upgrade.tasks.BackupUpgradeTask" autowire="byName"/>
 
     <bean id="scmUidTask" class="com.zutubi.pulse.upgrade.tasks.MigrateSchemaUpgradeTask" autowire="byName">
         <property name="buildNumber" value="1001"/>
@@ -375,4 +383,9 @@
     <bean id="defaultSpecification" class="com.zutubi.pulse.upgrade.tasks.DefaultSpecificationUpgradeTask" autowire="byName">
         <property name="buildNumber" value="102002002"/>
     </bean>
+
+    <bean id="transferExampleTemplatesToDataDirectory" class="com.zutubi.pulse.upgrade.tasks.TransferExampleTemplatesUpgradeTask" autowire="byName">
+        <property name="buildNumber" value="102004001"/>
+    </bean>
+    
 </beans>

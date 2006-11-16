@@ -5,12 +5,10 @@ import java.util.Comparator;
 /**
  * <class-comment/>
  */
-public class UpgradeTaskComparator implements Comparator
+public class UpgradeTaskComparator implements Comparator<UpgradeTask>
 {
-    public int compare(Object o1, Object o2)
+    public int compare(UpgradeTask a, UpgradeTask b)
     {
-        UpgradeTask a = (UpgradeTask) o1;
-        UpgradeTask b = (UpgradeTask) o2;
         return a.getBuildNumber() - b.getBuildNumber();
     }
 }

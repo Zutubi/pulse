@@ -80,7 +80,7 @@ public class FatController implements EventListener, Stoppable
         quartzScheduler.addJob(detail, true);
 
         // check license: enable the fat controller iff the license is valid.
-        if (LicenseHolder.hasAuthorization("canRunPulse"))
+        if (LicenseHolder.hasAuthorization(LicenseHolder.AUTH_RUN_PULSE))
         {
             enable();
         }
@@ -198,7 +198,7 @@ public class FatController implements EventListener, Stoppable
     private void handleLicenseEvent(LicenseEvent event)
     {
         // the type or detail of the license event does not matter at this stage.
-        if (LicenseHolder.hasAuthorization("canRunPulse"))
+        if (LicenseHolder.hasAuthorization(LicenseHolder.AUTH_RUN_PULSE))
         {
             enable();
         }

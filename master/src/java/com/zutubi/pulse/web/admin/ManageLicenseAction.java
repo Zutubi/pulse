@@ -14,8 +14,6 @@ public class ManageLicenseAction extends ActionSupport
 {
     private LicenseManager licenseManager;
 
-    private EventManager eventManager;
-
     /**
      * The license key
      */
@@ -69,18 +67,14 @@ public class ManageLicenseAction extends ActionSupport
         // update the license string.
         try
         {
-            licenseManager.updateLicenseKey(license);
+            licenseManager.installLicense(license);
+            return SUCCESS;
         }
         catch (LicenseException e)
         {
             addActionError(getText("license.key.update.error", e.getMessage()));
             return ERROR;
         }
-
-        // todo: move this into the business logic layer.. will need to move the updating license
-        // todo: into a system license store / manager object..
-        eventManager.publish(new LicenseUpdateEvent(LicenseHolder.getLicense()));
-        return SUCCESS;
     }
 
     /**
@@ -91,15 +85,5 @@ public class ManageLicenseAction extends ActionSupport
     public void setLicenseManager(LicenseManager licenseManager)
     {
         this.licenseManager = licenseManager;
-    }
-
-    /**
-     * Required resource.
-     *
-     * @param eventManager
-     */
-    public void setEventManager(EventManager eventManager)
-    {
-        this.eventManager = eventManager;
     }
 }

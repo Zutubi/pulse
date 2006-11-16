@@ -18,7 +18,10 @@ import java.io.File;
  *                  \-- (recipe number)
  *                      \-- base
  *                      \-- output
- *
+ *  USERS_ROOT/
+ *     \-- (user-id)
+ *         \-- builds
+ *         \-- patches
  */
 public class MasterBuildPaths
 {

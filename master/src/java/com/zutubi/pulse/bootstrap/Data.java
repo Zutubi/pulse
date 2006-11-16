@@ -1,12 +1,9 @@
 package com.zutubi.pulse.bootstrap;
 
-import com.opensymphony.util.TextUtils;
 import com.zutubi.pulse.Version;
 import com.zutubi.pulse.config.Config;
 import com.zutubi.pulse.config.FileConfig;
-import com.zutubi.pulse.license.License;
-import com.zutubi.pulse.license.LicenseDecoder;
-import com.zutubi.pulse.license.LicenseException;
+import com.zutubi.pulse.util.CopyUtils;
 import com.zutubi.pulse.util.FileSystemUtils;
 import com.zutubi.pulse.util.logging.Logger;
 
@@ -18,15 +15,19 @@ import java.util.Properties;
 /**
  * The data object provides an interface to the configured data directory,
  * its layout and its data.
- * <p/>
+ * <p>
  * The data directory is layed out as follows:
- * <p/>
+ * <pre>
  * data/
- * config/: user configuration files
- * database/: the embedded HSQL database
- * projects/: build artifacts
- * <p/>
+ *     config/      user configuration files
+ *     database/    the embedded HSQL database
+ *     projects/    build artifacts
+ *     backups/     backups directory.     
+ *
  * pulse.config.properties: core configuration properties, contain version and license details amongst other things
+ * </pre>
+ *
+ * </p>
  */
 public class Data implements MasterUserPaths
 {
@@ -41,11 +42,11 @@ public class Data implements MasterUserPaths
     private File databaseRoot;
     private File userTemplateRoot;
 
+    private File backupRoot;
+
     public static final String CONFIG_FILE_NAME = "pulse.config.properties";
 
     private Config config = null;
-    private String licenseKey;
-    private License license;
     private static final String LICENSE_KEY = "license.key";
 
     public Data(File dataDir)
@@ -61,12 +62,7 @@ public class Data implements MasterUserPaths
      */
     public boolean isInitialised()
     {
-        if (!pulseData.exists())
-        {
-            return false;
-        }
-
-        return getConfigFile().exists();
+        return pulseData.exists() && getConfigFile().exists();
     }
 
     /**
@@ -90,23 +86,74 @@ public class Data implements MasterUserPaths
 
         // write the version file.
         Version systemVersion = Version.getVersion();
-        updateVersion(systemVersion, systemPaths);
+        updateVersion(systemVersion);
+
+        transferExampleTemplates(systemPaths);
+    }
+
+    /**
+     * Create a fresh backup of this data directory.
+     *
+     * @param systemPaths instance
+     *
+     * @throws IOException if a problem occurs generating the backup.
+     */
+    public void backup(SystemPaths systemPaths) throws IOException
+    {
+        String filename = String.format("auto-backup-%s.zip", getVersion().getVersionNumber());
+
+        // no need to create a backup is it already exists.
+        File backup = new File(getBackupRoot(), filename);
+        if (backup.isFile() && !backup.delete())
+        {
+            throw new IOException(String.format("Failed to remove previous backup '%s'. This " +
+                    "file prevents a new backup from being generated.", backup.getAbsolutePath()));
+        }
+
+        // copy the files into the system tmpRoot.
+        File tmpBackup = new File(systemPaths.getTmpRoot(), filename);
+
+        // trigger a checkpoint call on the database.
+        DatabaseBootstrap dbBootstrap = (DatabaseBootstrap) ComponentContext.getBean("databaseBootstrap");
+        dbBootstrap.compactDatabase();
+
+        CopyUtils.copy(new File(tmpBackup, "database"),
+                new File(getDatabaseRoot(), "db.backup"),
+                new File(getDatabaseRoot(), "db.log"),
+                new File(getDatabaseRoot(), "db.properties"),
+                new File(getDatabaseRoot(), "db.data"),
+                new File(getDatabaseRoot(), "db.script"));
+        CopyUtils.copy(tmpBackup, getUserConfigRoot());
+        CopyUtils.copy(new File(tmpBackup, CONFIG_FILE_NAME), getConfigFile());
+
+        FileSystemUtils.createZip(backup, tmpBackup, tmpBackup);
+
+        FileSystemUtils.removeDirectory(tmpBackup);
+        // - done.
+    }
+
+    public void restore()
+    {
+        // extract the backed up files.
+        // need to shutdown the database, restore the backed up files, and restart.
+
     }
 
     /**
      * Update the version recorded in the data directory.
      *
-     * @param version
+     * @param version is the new version
      */
-    public void updateVersion(Version version, SystemPaths systemPaths)
+    public void updateVersion(Version version)
     {
-        // we are messing around writing to a properties object first because the Config interface is
-        // not available in the pulse core.
         getConfig().setProperty(Version.BUILD_DATE, version.getBuildDate());
         getConfig().setProperty(Version.BUILD_NUMBER, version.getBuildNumber());
         getConfig().setProperty(Version.RELEASE_DATE, version.getReleaseDate());
         getConfig().setProperty(Version.VERSION_NUMBER, version.getVersionNumber());
+    }
 
+    public void transferExampleTemplates(SystemPaths systemPaths)
+    {
         // Copy across some example template files to the user's template root
         File userTemplateRoot = getUserTemplateRoot();
         if (!userTemplateRoot.isDirectory())
@@ -167,43 +214,17 @@ public class Data implements MasterUserPaths
         return dataVersion;
     }
 
-    public void updateLicenseKey(String key)
-    {
-        getConfig().setProperty(LICENSE_KEY, key);
-        licenseKey = null;
-        license = null;
-    }
-
     public String getLicenseKey()
     {
-        if (licenseKey == null)
-        {
-            licenseKey = getConfig().getProperty(LICENSE_KEY);
-        }
-        return licenseKey;
+        return getConfig().getProperty(LICENSE_KEY);
     }
 
-    public License getLicense()
+    public void setLicenseKey(String licenseKey)
     {
-        if (license == null)
-        {
-            try
-            {
-                String licenseKey = getLicenseKey();
-                if (TextUtils.stringSet(licenseKey))
-                {
-                    LicenseDecoder decoder = new LicenseDecoder();
-                    license = decoder.decode(licenseKey.getBytes());
-                }
-            }
-            catch (LicenseException e)
-            {
-                LOG.severe("Failed to decode the license.", e);
-                return null;
-            }
-        }
-        return license;
+        getConfig().setProperty(LICENSE_KEY, licenseKey);
     }
+
+    //---( implementation of the data resolver interface. )---
 
     /**
      * Retrieve the data directory.
@@ -214,6 +235,8 @@ public class Data implements MasterUserPaths
     {
         return pulseData;
     }
+
+    //---( implementation of the user paths interface )---
 
     /**
      * @see com.zutubi.pulse.bootstrap.MasterUserPaths#getUserConfigRoot()
@@ -276,6 +299,15 @@ public class Data implements MasterUserPaths
             config = new FileConfig(getConfigFile());
         }
         return config;
+    }
+
+    public File getBackupRoot()
+    {
+        if (backupRoot == null)
+        {
+            backupRoot = new File(pulseData, "backups");
+        }
+        return backupRoot;
     }
 
     private File getConfigFile()

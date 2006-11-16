@@ -52,7 +52,7 @@ public class SetupLicenseAction extends SetupActionSupport
     public String execute() throws Exception
     {
         String licenseKey = license.replaceAll("\n", "");
-        licenseManager.updateLicenseKey(licenseKey);
+        licenseManager.installLicense(licenseKey);
         setupManager.requestLicenseComplete();
         return SUCCESS;
     }

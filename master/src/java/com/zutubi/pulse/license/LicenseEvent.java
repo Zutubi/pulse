@@ -14,7 +14,8 @@ public class LicenseEvent extends Event<License>
 
     /**
      * Get the license associated with this event.
-     *  
+     *
+     * @return the license instance associated with this event.
      */
     public License getLicense()
     {

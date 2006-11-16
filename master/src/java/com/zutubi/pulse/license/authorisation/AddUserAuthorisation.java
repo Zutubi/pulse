@@ -35,7 +35,7 @@ public class AddUserAuthorisation implements Authorisation
     /**
      * Required resource.
      *
-     * @param userManager
+     * @param userManager instance
      */
     public void setUserManager(UserManager userManager)
     {

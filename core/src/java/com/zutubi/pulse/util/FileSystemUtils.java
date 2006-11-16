@@ -353,6 +353,19 @@ public class FileSystemUtils
             throw new IOException("Base '" + base.getAbsolutePath() + "' is not a parent of source '" + source.getAbsolutePath() + "'");
         }
 
+        // ensure that the zip file exists.
+        if (!zipFile.exists())
+        {
+            if (!zipFile.getParentFile().isDirectory() && !zipFile.getParentFile().mkdirs())
+            {
+                throw new IOException(String.format("Failed to create the directory '%s'", zipFile.getParentFile().getAbsolutePath()));
+            }
+            if (!zipFile.createNewFile())
+            {
+                throw new IOException(String.format("Failed to create the zip file '%s'", zipFile.getAbsolutePath()));
+            }
+        }
+
         ZipOutputStream os = null;
 
         try

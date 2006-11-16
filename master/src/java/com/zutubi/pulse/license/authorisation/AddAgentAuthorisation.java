@@ -36,7 +36,7 @@ public class AddAgentAuthorisation implements Authorisation
     /**
      * Required resource.
      *
-     * @param agentManager
+     * @param agentManager instance
      */
     public void setAgentManager(AgentManager agentManager)
     {

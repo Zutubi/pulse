@@ -3,13 +3,20 @@
 <beans>
 
     <bean id="licenseManager" class="com.zutubi.pulse.license.LicenseManager" autowire="byName" init-method="init">
-        <property name="resolver">
-            <ref bean="configurationManager"/>
+        <property name="licenseKeyStore">
+            <ref bean="licenseKeyStore"/>
         </property>
         <property name="authorisations">
             <list>
                 <ref local="canRunPulseAuthorisation"/>
             </list>
+        </property>
+    </bean>
+
+    <!-- the current key store is the Data object. -->
+    <bean id="licenseKeyStore" class="com.zutubi.pulse.license.DataLicenseKeyStore">
+        <property name="dataResolver">
+            <ref bean="configurationManager"/>
         </property>
     </bean>
 

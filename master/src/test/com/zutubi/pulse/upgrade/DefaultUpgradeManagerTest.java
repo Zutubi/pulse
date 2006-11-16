@@ -135,6 +135,24 @@ public class DefaultUpgradeManagerTest extends PulseTestCase
         assertEquals(40, tmpData.getBuildNumber());
     }
 
+    public void testSuccessfulUpgradeOfVersionDetails()
+    {
+        List<UpgradeTask> tasks = new LinkedList<UpgradeTask>();
+        tasks.add(new MockUpgradeTask(20));
+        upgradeManager.setTasks(tasks);
+
+        upgradeManager.prepareUpgrade(tmpData);
+        upgradeManager.executeUpgrade();
+
+        Version targetVersion = tmpData.getVersion();
+/*
+        // all of these things are specified for accept.master :|
+        assertEquals("@BUILD_NUMBER@", targetVersion.getBuildNumber());
+        assertEquals("@VERSION@", targetVersion.getVersionNumber());
+        assertEquals("@RELEASE_DATE@", targetVersion.getReleaseDate());
+*/
+    }
+
     private class ErrorOnExecuteUpgradeTask extends MockUpgradeTask
     {
         public ErrorOnExecuteUpgradeTask(int version)

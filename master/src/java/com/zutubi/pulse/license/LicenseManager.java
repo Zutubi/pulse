@@ -1,41 +1,67 @@
 package com.zutubi.pulse.license;
 
-import com.zutubi.pulse.bootstrap.Data;
-import com.zutubi.pulse.bootstrap.DataResolver;
-import com.zutubi.pulse.license.authorisation.Authorisation;
-import com.zutubi.pulse.events.EventManager;
-import com.zutubi.pulse.events.EventListener;
-import com.zutubi.pulse.events.Event;
 import com.zutubi.pulse.events.DataDirectoryChangedEvent;
+import com.zutubi.pulse.events.Event;
+import com.zutubi.pulse.events.EventListener;
+import com.zutubi.pulse.events.EventManager;
+import com.zutubi.pulse.license.authorisation.Authorisation;
+import com.zutubi.pulse.license.authorisation.CanRunPulseAuthorisation;
+import com.zutubi.pulse.util.logging.Logger;
+import com.zutubi.pulse.Version;
 
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 
 /**
- *
+ * The License manager handles all things license related.
  *
  */
 public class LicenseManager
 {
+    private static final Logger LOG = Logger.getLogger(LicenseManager.class);
+
+    /**
+     * Access to the event system
+     */
     private EventManager eventManager;
 
-    private DataResolver resolver;
+    private LicenseKeyStore keyStore;
 
     private List<Authorisation> authorisations = new LinkedList<Authorisation>();
 
-    public void updateLicenseKey(String newKey) throws LicenseException
+    /**
+     * Update the installed license key
+     *
+     * @param newKey the new license key string
+     *
+     * @throws LicenseException if the specified license can not be installed.
+     */
+    public void installLicense(String newKey) throws LicenseException
     {
-        Data data = resolver.getData();
-        data.updateLicenseKey(newKey);
+        // check that the license key is valid.
+        LicenseDecoder decoder = new LicenseDecoder();
+        License license = decoder.decode(newKey.getBytes());
+
+        // persist the license key
+        keyStore.setKey(newKey);
 
         // refresh the authorisations, now that we have a new license.
-        LicenseHolder.setLicense(data.getLicense());
+        LicenseHolder.setLicense(license);
         refreshAuthorisations();
+
+        eventManager.publish(new LicenseUpdateEvent(license));
     }
 
+    /**
+     * Initialise the license manager.
+     */
     public void init()
     {
+        // the license manager monitors for changes in the system data directory. We 'know' this is
+        // where the license is stored, so if there is a change, we need to refresh.  This SHOULD be reflected
+        // in the licenseKeyStore / licenseManager interaction somehow since it is the license key store that
+        // is using the data directory for storage purposes.
         eventManager.register(new EventListener()
         {
             public void handleEvent(Event evt)
@@ -54,11 +80,21 @@ public class LicenseManager
 
     private void refresh()
     {
-        // load the license from disk.
-        Data data = resolver.getData();
-        if (data != null)
+        String key = keyStore.getKey();
+        if (key != null)
         {
-            LicenseHolder.setLicense(data.getLicense());
+            try
+            {
+                LicenseDecoder decoder = new LicenseDecoder();
+                License license = decoder.decode(key.getBytes());
+                LicenseHolder.setLicense(license);
+            }
+            catch (LicenseException e)
+            {
+                // license key is invalid.
+                LOG.warning("Failed to decode the configured license key.", e);
+                LicenseHolder.setLicense(null);
+            }
         }
 
         // refresh the supported authorisations.
@@ -77,15 +113,24 @@ public class LicenseManager
     }
 
     /**
-     * Required resource.
+     * Check whether or not the currently installed license is able to run the specified version of pulse.
      *
-     * @param resolver
+     * @param version to check
+     * 
+     * @return true if the installed license can run the specified version, false otherwise.
      */
-    public void setResolver(DataResolver resolver)
+    public boolean canRun(Version version)
     {
-        this.resolver = resolver;
+        CanRunPulseAuthorisation canRunPulse = new CanRunPulseAuthorisation();
+        List<String> auths = Arrays.asList(canRunPulse.getAuthorisation(LicenseHolder.getLicense(), version));
+        return auths.contains(LicenseHolder.AUTH_RUN_PULSE);
     }
 
+    /**
+     * Configure the list of available authorisations.
+     *
+     * @param a list of authorisations.
+     */
     public void setAuthorisations(List<Authorisation> a)
     {
         this.authorisations = a;
@@ -105,5 +150,15 @@ public class LicenseManager
     public void setEventManager(EventManager eventManager)
     {
         this.eventManager = eventManager;
+    }
+
+    /**
+     * Required resource.
+     *
+     * @param keyStore instance
+     */
+    public void setLicenseKeyStore(LicenseKeyStore keyStore)
+    {
+        this.keyStore = keyStore;
     }
 }

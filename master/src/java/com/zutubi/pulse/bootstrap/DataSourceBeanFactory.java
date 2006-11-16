@@ -138,8 +138,7 @@ public class DataSourceBeanFactory implements FactoryBean, ApplicationContextAwa
     private File getDbRoot()
     {
         MasterConfigurationManager configManager = (MasterConfigurationManager) context.getBean("configurationManager");
-        File dbRoot = configManager.getUserPaths().getDatabaseRoot();
-        return dbRoot;
+        return configManager.getUserPaths().getDatabaseRoot();
     }
 
     public String getUsername()
@@ -172,6 +171,7 @@ public class DataSourceBeanFactory implements FactoryBean, ApplicationContextAwa
         if (dataSource != null)
         {
             dataSource.close();
+            dataSource = null;
         }
     }
 }

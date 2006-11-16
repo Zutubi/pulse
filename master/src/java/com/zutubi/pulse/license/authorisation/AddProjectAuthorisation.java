@@ -35,7 +35,7 @@ public class AddProjectAuthorisation implements Authorisation
     /**
      * Required resource.
      *
-     * @param projectManager
+     * @param projectManager instance
      */
     public void setProjectManager(ProjectManager projectManager)
     {

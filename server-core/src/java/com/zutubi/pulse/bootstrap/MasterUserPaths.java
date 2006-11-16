@@ -23,6 +23,13 @@ public interface MasterUserPaths extends UserPaths
      */
     File getProjectRoot();
 
+    /**
+     * The base directory storing system backups.
+     * 
+     * @return the directory into which backup files will be written.
+     */
+    File getBackupRoot();
+
     File getUserRoot();
 
     File getUserTemplateRoot();

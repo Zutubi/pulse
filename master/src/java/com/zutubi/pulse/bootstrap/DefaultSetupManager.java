@@ -8,6 +8,7 @@ import com.zutubi.pulse.license.LicenseHolder;
 import com.zutubi.pulse.model.UserManager;
 import com.zutubi.pulse.upgrade.UpgradeManager;
 import com.zutubi.pulse.util.IOUtils;
+import com.zutubi.pulse.Version;
 
 import java.io.*;
 import java.util.List;
@@ -204,6 +205,8 @@ public class DefaultSetupManager implements SetupManager
     {
         state = SetupState.STARTING;
 
+        // License is allowed to run this version of pulse. Therefore, it is okay to go ahead with an upgrade.
+
         // load db contexts...
         loadContexts(daoContexts);
 
@@ -222,6 +225,8 @@ public class DefaultSetupManager implements SetupManager
             showPrompt();
             return;
         }
+
+        updateVersionIfNecessary();
 
         requestUpgradeComplete();
     }
@@ -276,7 +281,7 @@ public class DefaultSetupManager implements SetupManager
     private boolean isLicenseRequired()
     {
         // if we are not licensed, then request that a license be provided.
-        return !LicenseHolder.hasAuthorization("canRunPulse");
+        return !LicenseHolder.hasAuthorization(LicenseHolder.AUTH_RUN_PULSE);
     }
 
     private boolean isUpgradeRequired()
@@ -287,6 +292,19 @@ public class DefaultSetupManager implements SetupManager
     private boolean isSetupRequired()
     {
         return userManager.getUserCount() == 0;
+    }
+
+    private void updateVersionIfNecessary()
+    {
+        // is the version reported in the data directory the same as the version reported by this
+        // pulse version?
+        Data d = configurationManager.getData();
+
+        Version dataVersion = d.getVersion();
+        if (dataVersion.getBuildNumberAsInt() < Version.getVersion().getBuildNumberAsInt())
+        {
+            d.updateVersion(Version.getVersion());
+        }
     }
 
     /**

@@ -5,10 +5,10 @@ import com.zutubi.pulse.bootstrap.Data;
 import com.zutubi.pulse.bootstrap.MasterConfigurationManager;
 import com.zutubi.pulse.util.logging.Logger;
 
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Arrays;
 
 /**
  * <class-comment/>
@@ -21,6 +21,8 @@ public class DefaultUpgradeManager implements UpgradeManager
      * The registered upgrade tasks.
      */
     private List<UpgradeTask> upgradeTasks = new LinkedList<UpgradeTask>();
+
+    private List<UpgradeTask> systemTasks = new LinkedList<UpgradeTask>();
 
     /**
      * The upgrade context for the current upgrade. This will be null if no upgrade
@@ -48,7 +50,7 @@ public class DefaultUpgradeManager implements UpgradeManager
      * Set the full list of upgrade tasks. This new set of tasks will override any existing
      * registered tasks.
      *
-     * @param tasks
+     * @param tasks a list of upgrade task instances
      */
     public void setTasks(List<UpgradeTask> tasks)
     {
@@ -59,7 +61,7 @@ public class DefaultUpgradeManager implements UpgradeManager
      * Set the full list of upgrade tasks. This new set of tasks will override any existing
      * registered tasks.
      *
-     * @param tasks
+     * @param tasks a list of upgrade task instances
      */
     public void setTasks(UpgradeTask... tasks)
     {
@@ -67,10 +69,20 @@ public class DefaultUpgradeManager implements UpgradeManager
     }
 
     /**
+     * Set the full list of system upgrade tasks. These tasks are run during every upgrade.
+     * 
+     * @param tasks a list of upgrade task instances
+     */
+    public void setSystemTasks(List<UpgradeTask> tasks)
+    {
+        this.systemTasks = tasks;
+    }
+
+    /**
      * Determine if an upgrade is required between the specified build numbers.
      *
-     * @param fromBuildNumber
-     * @param toBuildNumber
+     * @param fromBuildNumber specifies the lower build number and is not included in the determination.
+     * @param toBuildNumber specifiea the upper build number and is included in the determination.
      *
      * @return true if an upgrade is required, false otherwise.
      */
@@ -80,26 +92,15 @@ public class DefaultUpgradeManager implements UpgradeManager
         // if the latest available, and hence need to upgrade. If our guess is incorrect, then no
         // actual upgrade tasks will be executed, so there is no harm. When is this likely to occur?
         // During development, thats when.
-        boolean required = false;
-        if (toBuildNumber == Version.INVALID)
-        {
-            required = true;
-        }
-        else
-        {
-            required = fromBuildNumber < toBuildNumber;
-        }
+        boolean required;
+        required = toBuildNumber == Version.INVALID || fromBuildNumber < toBuildNumber;
 
-        if (required)
-        {
-            return determineRequiredUpgradeTasks(fromBuildNumber, toBuildNumber).size() > 0;
-        }
-        return false;
+        return required && determineRequiredUpgradeTasks(fromBuildNumber, toBuildNumber).size() > 0;
     }
 
     public List<UpgradeTask> previewUpgrade(int fromBuildNumber, int toBuildNumber)
     {
-        return determineRequiredUpgradeTasks(fromBuildNumber, toBuildNumber);
+        return compileUpgradeTasks(fromBuildNumber, toBuildNumber);
     }
 
     /**
@@ -107,7 +108,7 @@ public class DefaultUpgradeManager implements UpgradeManager
      * indicated versions.
      *
      * @param fromBuildNumber specifies the lower build number and is not included in the determination.
-     * @param toBuildNumber specified the upper build number and is included in the determination.
+     * @param toBuildNumber specifiea the upper build number and is included in the determination.
      *
      * @return a list of upgrade tasks that are required.
      */
@@ -137,10 +138,33 @@ public class DefaultUpgradeManager implements UpgradeManager
     }
 
     /**
+     * This list contains all of the upgrade tasks that need to be executed.
+     *
+     * NOTE: This includes upgrade tasks that are run for every upgrade. DO NOT use this list to
+     * determine whether or not an upgrade is required. Instead, use #determineRequiredUpgradeTasks
+     *
+     * @param fromBuildNumber the build number we are upgrading from
+     * @param toBuildNumber the build number we are upgrading to
+     *
+     * @return an ordered list of all the upgrade tasks that will be run during the upgrade.
+     *
+     * @see #determineRequiredUpgradeTasks(int, int)
+     */
+    protected List<UpgradeTask> compileUpgradeTasks(int fromBuildNumber, int toBuildNumber)
+    {
+        List<UpgradeTask> tasks = determineRequiredUpgradeTasks(fromBuildNumber, toBuildNumber);
+
+        tasks.addAll(systemTasks);
+        Collections.sort(tasks, new UpgradeTaskComparator());
+        
+        return tasks;
+    }
+
+    /**
      * Check if the specified data directory requires an upgrade to be used with the
      * current installation.
      *
-     * @param data
+     * @param data directory being upgraded.
      *
      * @return true if an upgrade is required, false otherwise.
      */
@@ -159,7 +183,7 @@ public class DefaultUpgradeManager implements UpgradeManager
      * the upgrade can be executed and before any specific details about the upgrade
      * are available.
      *
-     * @param data
+     * @param data directory being upgraded
      */
     public void prepareUpgrade(Data data)
     {
@@ -171,7 +195,7 @@ public class DefaultUpgradeManager implements UpgradeManager
         Version from = data.getVersion();
         Version to = Version.getVersion();
 
-        List<UpgradeTask> tasks = determineRequiredUpgradeTasks(from.getBuildNumberAsInt(), to.getBuildNumberAsInt());
+        List<UpgradeTask> tasks = compileUpgradeTasks(from.getBuildNumberAsInt(), to.getBuildNumberAsInt());
         for(UpgradeTask task: tasks)
         {
             if(ConfigurationAware.class.isAssignableFrom(task.getClass()))
@@ -179,8 +203,6 @@ public class DefaultUpgradeManager implements UpgradeManager
                 ((ConfigurationAware)task).setConfigurationManager(configurationManager);
             }
         }
-
-        // copy the tasks...
 
         currentContext = new DefaultUpgradeContext(from, to);
         currentContext.setTasks(tasks);
@@ -195,14 +217,15 @@ public class DefaultUpgradeManager implements UpgradeManager
      * upgrade is triggered.
      *
      * @return a list of upgrade tasks.
+     *
+     * @throws IllegalArgumentException if prepareUpgrade has not been called.
      */
     public List<UpgradeTask> previewUpgrade()
     {
         if (currentContext == null)
         {
-            throw new IllegalArgumentException("no upgrade has been prepared.");
+            throw new IllegalArgumentException("No upgrade has been prepared.");
         }
-
         return currentContext.getTasks();
     }
 
@@ -244,11 +267,16 @@ public class DefaultUpgradeManager implements UpgradeManager
                     if (task.hasFailed())
                     {
                         // use an exception to break out to the task failure handling.
-                        throw new UpgradeException("Task "+task.getName()+" has been marked as failed.");
+                        throw new UpgradeException(String.format("Task %s has been marked as failed.", task.getName()));
                     }
                     monitor.complete(task);
-                    // record task completion, to ensure that it is not run a second time.
-                    upgradeTarget.setBuildNumber(task.getBuildNumber());
+                    
+                    // record task completion, to ensure that it is not run a second time. Any task with a build
+                    // number less than zero are run during each upgrade and do not impact the target build number.
+                    if (task.getBuildNumber() > 0)
+                    {
+                        upgradeTarget.setBuildNumber(task.getBuildNumber());
+                    }
                 }
                 else
                 {
@@ -262,9 +290,14 @@ public class DefaultUpgradeManager implements UpgradeManager
                 {
                     abort = true;
                 }
-                // TODO: propogate this error to the UI via the monitor object.
                 LOG.severe(e);
             }
+        }
+
+        // if the upgrade was successful, upgrade the version details for the data directory.
+        if (monitor.isSuccessful())
+        {
+            upgradeTarget.updateVersion(context.getTo());
         }
 
         monitor.setPercentageComplete(100);
@@ -280,7 +313,7 @@ public class DefaultUpgradeManager implements UpgradeManager
      * Check that the specified data instance if a valid instance to be working
      * with.
      *
-     * @param data
+     * @param data instance
      *
      * @throws IllegalArgumentException if the data instance is not valid.
      */

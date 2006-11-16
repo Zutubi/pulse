@@ -21,7 +21,7 @@ public class UpgradeAcceptanceTest extends BaseAcceptanceTestCase
 
     protected void setUp() throws Exception
     {
-        tmpDir = FileSystemUtils.createTempDirectory("UpgradeAccepanceTest", this.getName());
+        tmpDir = FileSystemUtils.createTempDirectory("UAT", "");
     }
 
     protected void tearDown() throws Exception
@@ -84,7 +84,7 @@ public class UpgradeAcceptanceTest extends BaseAcceptanceTestCase
         assertEquals(0, shutdown.execute(getBootContext("shutdown", "-F", "true", "-p", "8990")));
 
         // allow time for the shutdown to complete.
-        Thread.sleep(2000);
+        Thread.sleep(3000);
     }
 
     private BootContext getBootContext(String... args)
