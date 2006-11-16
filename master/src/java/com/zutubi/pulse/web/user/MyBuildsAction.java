@@ -1,9 +1,6 @@
 package com.zutubi.pulse.web.user;
 
-import com.zutubi.pulse.model.BuildManager;
-import com.zutubi.pulse.model.BuildResult;
-import com.zutubi.pulse.model.User;
-import com.zutubi.pulse.model.UserManager;
+import com.zutubi.pulse.model.*;
 import com.zutubi.pulse.security.AcegiUtils;
 import com.zutubi.pulse.web.ActionSupport;
 
@@ -28,6 +25,11 @@ public class MyBuildsAction extends ActionSupport
     public List<BuildResult> getMyBuilds()
     {
         return myBuilds;
+    }
+
+    public BuildColumns getColumns()
+    {
+        return new BuildColumns(user.getMyBuildsColumns(), projectManager);
     }
 
     public String execute() throws Exception

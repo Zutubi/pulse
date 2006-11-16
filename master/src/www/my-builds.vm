@@ -6,9 +6,16 @@
     <title>#wwtext("name=my.builds")</title>
     <script type="text/javascript" src="$base/js/prototype.js"></script>
     <script type="text/javascript" src="$base/js/scriptaculous/scriptaculous.js"></script>
+    <script type="text/javascript" src="$base/js/yahoo/utilities.js" ></script> 
     <script type="text/javascript" src="$base/js/main.js"></script>
+    <script type="text/javascript" src="$base/js/buildcolumns.js"></script>
     <script type="text/javascript">
+    //<![CDATA[
         #updater("$base/ajax/myBuildsPanel.action" "panel" $principle)
+
+        var popup;
+        YAHOO.util.Event.addListener(window, "load", function() { popup = new BuildColumnPopup("my", "$base", "$base/ajax/myBuildsPanel.action", "panel"); });
+    //]]>
     </script>
 #if ($rssEnabled)
     <link rel="alternate" type="application/rss+xml" title="RSS" href="$base/rss.action?userId=$principle.id"/>
@@ -21,15 +28,17 @@
         #parse("ajax/my-builds-panel.vm")
     </div>
 
+    #buildColumnsPopup("my" "popup")
+    
     <h2 class="section">#wwtext("name=personal.builds")</h2>
-    <table class="columns" width="100%">
+    <table class="columns" width="98%">
         <tr>
             <td class="columns">
                 <p style="padding-left: 10px; padding-right: 100px">
                     #wwtext("name=personal.builds.blurb")
                 </p>
             </td>
-            <td class="columns">
+            <td class="right">
                 <table class="content" style="float: right">
                     #headingRow("tools.downloads" 1)
                     <tr>

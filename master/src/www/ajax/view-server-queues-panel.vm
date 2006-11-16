@@ -1,14 +1,3 @@
-#macro(ownerCell $request)
-    #if($request.personal)
-        <td class="content">
-            <img alt="personal" src="$base/images/user.gif"/>
-            $!webwork.htmlEncode($request.owner.login)
-        </td>
-    #else
-        #dynamicLinkCell($request.owner.name "$base/currentBuild.action?id=$request.owner.id")
-    #end
-#end
-
     <table class="columns">
     <tr><td>
 
@@ -25,7 +14,7 @@
 #if($buildQueue.size() > 0)
     #foreach($request in $buildQueue)
         <tr>
-            #ownerCell($request)
+            #ownerCell($request "content")
         #if($request.personal)
             #staticCell($request.number)
         #else
@@ -68,7 +57,7 @@
         #set($project = $buildResult.project)
 
         <tr>
-            #ownerCell($buildResult)
+            #ownerCell($buildResult "content")
             <td class="content"><a href="currentBuild.action?id=$project.id">$!webwork.htmlEncode($project.name)</a></td>
             <td class="content-right"><a href="viewBuild.action?id=$buildResult.id">$buildResult.number</a></td>
             #classCell($buildResult.buildSpecification)

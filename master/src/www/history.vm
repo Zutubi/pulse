@@ -4,81 +4,26 @@
 <html>
 <head>
     <title>$!webwork.htmlEncode($project.name)</title>
-    <!-- how can we ensure that this link is included by sitemesh?.. -->
+    <script type="text/javascript" src="$base/js/prototype.js"></script>
+    <script type="text/javascript" src="$base/js/scriptaculous/scriptaculous.js"></script>
+    <script type="text/javascript" src="$base/js/yahoo/utilities.js" ></script>
+    <script type="text/javascript" src="$base/js/main.js"></script>
+    <script type="text/javascript" src="$base/js/buildcolumns.js"></script>
+    <script type="text/javascript">
+    //<![CDATA[
+        var popup;
+        YAHOO.util.Event.addListener(window, "load", function() { popup = new BuildColumnPopup("project.history", "$base", "$base/ajax/historyPanel.action?id=$project.id", "panel"); });
+    //]]>
+    </script>
 </head>
 <body>
     #projectTabs("history")
 
-    <table>
-        <tr>
-            <td>
+    <div id="panel">
+        #parse("ajax/history-panel.vm")
+    </div>
 
-    #wwcform("action=history.action" "heading=%{getText('quick.filters')}" "colspan=5" "width=100%" "method=get")
-        #wwhidden("name=id")
-
-        <tr>
-        #wwselect("name=stateFilter" "singleRow=true" "label=%{getText('filter.state')}" "list=stateFilters" "onchange=submit()" "tabindex=1")
-        #wwselect("name=spec" "singleRow=true" "label=%{getText('filter.spec')}" "list=specs" "onchange=submit()" "tabindex=2")
-        <td><a href="history.action?id=$project.id">#wwtext("name=filter.clear")</a></td>
-        </tr>
-    #end
-            </td>
-        </tr>
-        <tr>
-            <td>
-
-    <table width="100%" class="content">
-        #rssHeadingRow("recent.builds" 12 "$rssEnabled" "rss.action?projectId=$project.id" "rss.builds" )
-        <tr>
-            #contentHeading("build.id" 1)
-            #contentHeading("build.status" 2)
-            #contentHeading("build.tests" 1)
-            #contentHeading("build.spec" 1)
-            #contentHeading("build.when" 1)
-            #contentHeading("build.elapsed" 1)
-            #contentHeading("actions" 5)
-        </tr>
-#if($history.size() > 0)
-    #foreach($buildResult in $history)
-            #set($cssClass = $buildResult.state.string)
-        <tr>
-            <td class="content-right"><a href="viewBuild.action?id=$buildResult.id">$buildResult.number</a></td>
-            #statusCell($buildResult true)
-            #testResultsCell($buildResult false $buildResult)
-            #classCell($buildResult.buildSpecification)
-            #dateClassCell($buildResult)
-            #elapsedCell($buildResult)
-            #viewCell($project $buildResult)
-            #logCell($project $buildResult)
-            #changesCell($project $buildResult)
-            #artifactsCell($project $buildResult)
-#acl("domainObject=project" "hasPermission=4,1")
-            #workingCopyCell($project $buildResult)
-#end
-        </tr>
-    #end
-    </table>
-
-            </td>
-        </tr>
-        <tr>
-            <td>
-
-            <table width="100%" class="content">
-                #pagingRow("history.action?id=$project.id&amp;stateFilter=$stateFilter&amp;spec=$spec&amp;" $pagingSupport)
-                <tr><th colspan="5">$action.getText("history.count", ["$pagingSupport.totalItems"])</th></tr>
-            </table>
-#else
-        <tr>
-            <td class="content" colspan="14">
-                #wwtext("name=no.history")
-            </td>
-        </tr>
-    </table>
-#end
-            </td>
-        </tr>
-    </table>
+    #buildColumnsPopup("project.history" "popup")    
 
     #tabEnd()   
 </html>

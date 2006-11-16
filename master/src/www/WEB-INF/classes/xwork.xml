@@ -1373,6 +1373,11 @@
             <result name="error" type="velocity">/generic-error.vm</result>
         </action>
 
+        <action name="historyPanel" class="com.zutubi.pulse.web.project.HistoryAction">
+            <result name="success" type="velocity">history-panel.vm</result>
+            <result name="error" type="velocity">generic-error.vm</result>
+        </action>
+
         <action name="viewAgentsPanel" class="com.zutubi.pulse.web.agents.ViewAgentsAction">
             <result name="success" type="velocity">view-agents-panel.vm</result>
             <result name="error" type="velocity">/generic-error.vm</result>
@@ -1419,6 +1424,9 @@
             <result name="success" type="json">rmdir.xml</result>
         </action>
 
+        <action name="customiseBuildColumns" class="com.zutubi.pulse.web.user.CustomiseBuildColumnsAction">
+            <result name="success" type="velocity">empty.vm</result>
+        </action>
     </package>
 
     <package name="popups" namespace="/popups" extends="webwork-default-package">

@@ -1,13 +1,12 @@
 package com.zutubi.pulse.web.user;
 
+import com.zutubi.pulse.committransformers.CommitMessageTransformerManager;
 import com.zutubi.pulse.core.model.Changelist;
 import com.zutubi.pulse.core.model.ChangelistComparator;
-import com.zutubi.pulse.core.model.Revision;
 import com.zutubi.pulse.model.*;
 import com.zutubi.pulse.security.AcegiUtils;
 import com.zutubi.pulse.web.ActionSupport;
 import com.zutubi.pulse.web.project.CommitMessageHelper;
-import com.zutubi.pulse.committransformers.CommitMessageTransformerManager;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -32,7 +31,6 @@ public class DashboardAction extends ActionSupport
     private CommitMessageTransformerManager commitMessageTransformerManager;
     private CommitMessageHelper commitMessageHelper;
     private boolean contactError = false;
-    private String changeUrl;
 
     public User getUser()
     {
@@ -54,6 +52,11 @@ public class DashboardAction extends ActionSupport
         return shownGroups;
     }
 
+    public BuildColumns getColumns()
+    {
+        return new BuildColumns(user.getMyProjectsColumns(), projectManager);
+    }
+    
     public List<BuildResult> getLatestBuilds(Project p)
     {
         return buildManager.getLatestBuildResultsForProject(p, user.getDashboardBuildCount());
@@ -166,32 +169,6 @@ public class DashboardAction extends ActionSupport
             commitMessageHelper = new CommitMessageHelper(commitMessageTransformerManager.getCommitMessageTransformers());
         }
         return commitMessageHelper;
-    }
-
-    public String getChangeUrl()
-    {
-        return changeUrl;
-    }
-
-    public void updateChangeUrl(Changelist changelist)
-    {
-        // We cache the URL as velocity null handling is brain dead
-        Revision revision = changelist.getRevision();
-        for(long id: changelist.getProjectIds())
-        {
-            Project p = projectManager.getProject(id);
-            if(p != null && p.getChangeViewer() != null)
-            {
-                String url = p.getChangeViewer().getChangesetURL(revision);
-                if(url != null)
-                {
-                    changeUrl = url;
-                    return;
-                }
-            }
-        }
-
-        changeUrl = null;
     }
 
     public boolean canWrite(Project project)

@@ -340,7 +340,7 @@ function openDebugAlert(obj)
     if (obj)
     {
         var temp = "";
-        for (x in obj)
+        for (var x in obj)
         {
             temp += x + ": " + obj[x] + "\n";
         }

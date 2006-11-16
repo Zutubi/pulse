@@ -1,9 +1,6 @@
 package com.zutubi.pulse.web.project;
 
-import com.zutubi.pulse.model.BuildResult;
-import com.zutubi.pulse.model.NamedEntityComparator;
-import com.zutubi.pulse.model.Project;
-import com.zutubi.pulse.model.ProjectGroup;
+import com.zutubi.pulse.model.*;
 
 import java.util.Collections;
 import java.util.List;
@@ -38,6 +35,12 @@ public class ViewProjectsAction extends ProjectActionSupport
         {
             return build.get(0);
         }
+    }
+
+    public BuildColumns getColumns()
+    {
+        User user = getLoggedInUser();
+        return new BuildColumns(user == null ? User.getDefaultAllProjectsColumns() : user.getAllProjectsColumns(), projectManager);
     }
 
     public String execute()

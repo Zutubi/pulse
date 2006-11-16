@@ -894,6 +894,20 @@
 #end
 
 ##
+## Outputs an owner cell for a build request or result
+##
+#macro(ownerCell $rr $cssClass)
+    #if($rr.personal)
+        <td class="$cssClass">
+            <img alt="personal" src="$base/images/user.gif"/>
+            $!webwork.htmlEncode($rr.owner.login)
+        </td>
+    #else
+        #dynamicLinkCell($rr.owner.name "$base/currentBuild.action?id=$rr.owner.id")
+    #end
+#end
+
+##
 ## Outputs an elapsed cell for a result, with progress bar if there is an
 ## estimated time remaining.
 ##
@@ -953,10 +967,16 @@
 ##
 ## Outputs an action cell for viewing the working copy for a build
 ##
-#macro(workingCopyCell $project $result)
-    <td class="content">
-        <a href="browseProjectDir.action?buildId=$result.id" class="unadorned" title="working copy"><img alt="view working copy" src="$base/images/page_gear.gif"/></a>
-    </td>
+#macro(workingCopyCell $project $result $multiProject)
+    #if($action.canWrite($project) || $result.personal)
+        <td class="content">
+            <a href="browseProjectDir.action?buildId=$result.id" class="unadorned" title="working copy"><img alt="view working copy" src="$base/images/page_gear.gif"/></a>
+        </td>
+    #elseif($multiProject)
+        <td class="content">
+            &nbsp;
+        </td>
+    #end
 #end
 
 
@@ -1571,42 +1591,22 @@
 ##
 ## Shows the main build result view (shared with project current build)
 ##
-#macro(showBuild $buildResult $showActions $detailedView)
-    <table class="content">
-        #headingRow("build.summary" 13)
+#macro(showBuild $buildResult $projectHome $detailedView)
+    <table id="build.summary" class="content">
         <tr>
-            #contentHeading("build.id" 1)
-            #contentHeading("build.spec" 1)
-            #contentHeading("build.status" 2)
-            #contentHeading("build.reason" 1)
-            #contentHeading("build.tests" 1)
-            #contentHeading("build.when" 1)
-            #contentHeading("build.elapsed" 1)
-    #if($showActions)
-            #contentHeading("actions" 5)
-    #end
+            <th class="heading" colspan="$summaryColumns.getTotalSpan($project)">
+#if($loggedInUser && $projectHome)
+                <span class="action">
+                    <a class="unadorned" href="#" id="columns-popup-link-project.summary" onclick="summaryPopup.popup(); return false"><img src="$base/images/text_columns.gif"/></a>
+                </span>
+#end
+                #wwtext("name=build.summary")
+            </th>
         </tr>
-        <tr>
-            #set($cssClass = $buildResult.state.string)
-            #rightCell($buildResult.number)
-            #classCell($buildResult.buildSpecification)
-            #statusCell($buildResult false)
-            #classCell($buildResult.reason.summary)
-            #testResultsCell($buildResult false $buildResult)
-            #dateClassCell($buildResult)
-            #elapsedCell($buildResult)
-    #if($showActions)
-            #viewCell($project $buildResult)
-            #logCell($project $buildResult)
-            #changesCell($project $buildResult)
-            #artifactsCell($project $buildResult)
-        #acl("domainObject=project" "hasPermission=4,1")
-            #workingCopyCell($project $buildResult)
-        #end
-    #end
-        </tr>
+        #buildTableHeading($summaryColumns "project.summary" true $project)
+        #buildTableRow($buildResult.project $buildResult $summaryColumns false)
     #if($detailedView)
-        #directMessages($buildResult 13)
+        #directMessages($buildResult $summaryColumns.getTotalSpan($project))
     #end
     </table>
 
@@ -1620,7 +1620,7 @@
     </table>
     #end
 
-    #if(!$detailedView && !$showActions)
+    #if(!$detailedView && !$projectHome)
         #if($buildResult.hasMessages($errorLevel) || $buildResult.hasMessages($warningLevel))
     <h2 class="section">#wwtext("name=build.features")</h2>
     #buildMessageSummary($buildResult $errorLevel)
@@ -1633,39 +1633,24 @@
 #
 # Shows a table with recent builds for a project
 #
-#macro(projectRecentBuilds $id $key $recentBuilds $rssEnabled $projectId)
+#macro(projectRecentBuilds $id $key $recentBuilds $rssEnabled $project)
     <table id="$id" class="content">
-        #rssHeadingRow($key 13 "$rssEnabled" "rss.action?projectId=$projectId" "rss.builds" )
         <tr>
-            #contentHeading("build.id" 1)
-            #contentHeading("build.spec" 1)
-            #contentHeading("build.status" 2)
-            #contentHeading("build.reason" 1)
-            #contentHeading("build.tests" 1)
-            #contentHeading("build.when" 1)
-            #contentHeading("build.elapsed" 1)
-            #contentHeading("actions" 5)
+            <th class="heading" colspan="$recentColumns.getTotalSpan($project)">
+                <span class="action">
+                #if($loggedInUser)
+                    <a class="unadorned" href="#" id="columns-popup-link-project.recent" onclick="recentPopup.popup(); return false"><img src="$base/images/text_columns.gif"/></a>
+                #end
+                #if($rssEnabled == "true")
+                    <a class="unadorned" id="rss.builds" href="rss.action?projectId=$project.id"><img alt="$action.getText('rss')" src="$base/images/feed-icon-16x16.gif"/></a>
+                #end
+                </span>
+                #wwtext("name=$key")
+            </th>
         </tr>
-
+        #buildTableHeading($recentColumns "project.recent" true $project)
     #foreach($buildResult in $recentBuilds)
-        <tr>
-            #set($cssClass = $buildResult.state.string)
-
-            <td class="content-right"><a href="viewBuild.action?id=$buildResult.id">$buildResult.number</a></td>
-            #classCell($buildResult.buildSpecification)
-            #statusCell($buildResult true)
-            #classCell($buildResult.reason.summary)
-            #testResultsCell($buildResult false $buildResult)
-            #dateClassCell($buildResult)
-            #elapsedCell($buildResult)
-            #viewCell($project $buildResult)
-            #logCell($project $buildResult)
-            #changesCell($project $buildResult)
-            #artifactsCell($project $buildResult)
-#acl("domainObject=project" "hasPermission=4,1")
-            #workingCopyCell($project $buildResult)
-#end
-        </tr>
+        #buildTableRow($project $buildResult $recentColumns false)
     #end
     </table>
 #end
@@ -2206,4 +2191,170 @@
             #rightCell("${summary.successRate}%")
         </tr>
     </table>
+#end
+
+##
+## Outputs the heading row for a build results table
+##
+#macro(buildTableHeading $buildColumns $idSuffix $addId $project)
+    <tr #if($addId) id="build-table-${idSuffix}" #end>
+    #foreach($key in $buildColumns.columns)
+        #if($project)
+            #set($colspan = $buildColumns.getSpan($key, $project))
+        #else
+            #set($colspan = $buildColumns.getSpan($key))
+        #end
+        <th class="content" #if($addId) id="build-header-${key}-${idSuffix}" #end #if($colspan > 1) colspan="$colspan" #end>#wwtext("name=build.$key")</th>
+    #end
+    </tr>
+#end
+
+##
+## Outputs a row for a build result in a table of results, based on the given
+## column configuration.
+##
+#macro(buildTableRow $project $buildResult $columns $multiProject)
+    <tr>
+        #set($cssClass = $buildResult.state.string)
+    #foreach($key in $columns.columns)
+        #buildTableCell($project $buildResult $columns $key $multiProject)
+    #end
+    </tr>
+#end
+
+##
+## Outputs a single build result cell, based on the given column key
+##
+#macro(buildTableCell $project $buildResult $columns $key $multiProject)
+    #if($buildResult)
+        #if($key == "id")
+            <td class="content-right"><a href="viewBuild.action?id=$buildResult.id">$buildResult.number</a></td>
+        #elseif($key == "project")
+            <td class="content">
+                <a href="currentBuild.action?id=$project.id" id="$!webwork.htmlEncode($project.name)">$!webwork.htmlEncode($project.name)</a>
+            </td>
+        #elseif($key == "spec")
+            #classCell($buildResult.buildSpecification)
+        #elseif($key == "status")
+            #statusCell($buildResult true)
+        #elseif($key == "reason")
+            #classCell($buildResult.reason.summary)
+        #elseif($key == "tests")
+            #testResultsCell($buildResult false $buildResult)
+        #elseif($key == "owner")
+            #ownerCell($buildResult $cssClass)
+        #elseif($key == "rev")
+            #if($buildResult.personal)
+                #staticCell("personal")
+            #elseif($buildResult.scmDetails.revision)
+                $action.updateChangeUrl($project, $buildResult.scmDetails.revision)
+                    <td class="content-right">
+                #if($action.getChangeUrl())
+                        <a href="$action.getChangeUrl()">
+                #end
+                            $buildResult.scmDetails.revision
+                #if($action.getChangeUrl())
+                        </a>
+                #end
+                    </td>
+            #else
+                #contentCell("revision.none")
+            #end
+        #elseif($key == "version")
+            #classCell("version")
+        #elseif($key == "when")
+            #dateClassCell($buildResult)
+        #elseif($key == "elapsed")
+            #elapsedCell($buildResult)
+        #elseif($key == "actions")
+            #viewCell($project $buildResult)
+            #logCell($project $buildResult)
+            #changesCell($project $buildResult)
+            #artifactsCell($project $buildResult)
+            #workingCopyCell($project $buildResult $multiProject)
+        #else
+            <td class="content">unknown column '$key'</td>
+        #end
+    #else
+        #if($key == "project")
+            <td class="content">
+                <a href="currentBuild.action?id=$project.id" id="$!webwork.htmlEncode($project.name)">$!webwork.htmlEncode($project.name)</a>
+            </td>
+        #else
+            <td class="content" colspan="$columns.getSpan($key)">&nbsp;</td>
+        #end
+    #end
+#end
+
+##
+## Outputs a checkbox for configuring a build table column
+##
+#macro(buildColumnCheckbox $key $idSuffix $popupName)
+    <td>
+        <input type="checkbox" id="build-column-${key}-${idSuffix}" onclick="${popupName}.addRemoveBuildColumn('$key', '$idSuffix');"/>
+    </td>
+    <td>
+        <label for="build-column-${key}-${idSuffix}">#wwtext("name=build.$key")</label>
+    </td>
+#end
+
+##
+## Outputs HTML for a build columns popup window
+##
+#macro(buildColumnsPopup $idSuffix $popupName)
+    <div id="column-arrow-$idSuffix" style="z-index: 102; display: none; position: absolute">
+        <img src="$base/images/arrow_down_small.gif"/>
+    </div>
+
+    <div id="columns-popup-$idSuffix" class="floating" style="display: none;">
+        <table class="content" style="margin: 0">
+            #headingRow("build.columns.configure" 1)
+            <tr>
+                <td class="content" style="padding-top: 0">
+                    <h3 class="popup">#wwtext("name=build.columns.order")</h3>
+                    <table>
+                        <tr id="build-header-row-$idSuffix">
+                        </tr>
+                    </table>
+
+                    <h3 class="popup">#wwtext("name=build.columns.select")</h3>
+                    <table class="columns">
+                        <tr>
+                            #buildColumnCheckbox("id" $idSuffix $popupName)
+                            #buildColumnCheckbox("project" $idSuffix $popupName)
+                            #buildColumnCheckbox("spec" $idSuffix $popupName)
+                            #buildColumnCheckbox("status" $idSuffix $popupName)
+                        </tr>
+                        <tr>
+                            #buildColumnCheckbox("reason" $idSuffix $popupName)
+                            #buildColumnCheckbox("tests" $idSuffix $popupName)
+                            #buildColumnCheckbox("owner" $idSuffix $popupName)
+                            #buildColumnCheckbox("rev" $idSuffix $popupName)
+                        </tr>
+                        <tr>
+                            #buildColumnCheckbox("version" $idSuffix $popupName)
+                            #buildColumnCheckbox("when" $idSuffix $popupName)
+                            #buildColumnCheckbox("elapsed" $idSuffix $popupName)
+                            #buildColumnCheckbox("actions" $idSuffix $popupName)
+                        </tr>
+                    </table>
+
+                    <div class="popup-actions">
+                        <a href="#" onclick="${popupName}.applyBuildColumns(); return false;">
+                            <img alt="accept" src="$base/images/accept.gif"/>
+                            #wwtext("name=build.columns.apply")
+                        </a>
+                        &nbsp;
+                        <a href="#" onclick="${popupName}.cancelBuildColumns(); return false;">
+                            <img alt="cancel" src="$base/images/cancel.gif"/>
+                            #wwtext("name=build.columns.cancel")
+                        </a>
+                    </div>
+
+                    <div id="columns-popup-error-$idSuffix" style="display: none; color: #e33;">
+                    </div>
+                </td>
+            </tr>
+        </table>
+    </div>
 #end

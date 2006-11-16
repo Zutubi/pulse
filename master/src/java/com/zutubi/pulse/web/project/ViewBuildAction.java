@@ -3,8 +3,10 @@ package com.zutubi.pulse.web.project;
 import com.zutubi.pulse.bootstrap.MasterConfigurationManager;
 import com.zutubi.pulse.core.model.Changelist;
 import com.zutubi.pulse.core.model.TestSuiteResult;
+import com.zutubi.pulse.model.BuildColumns;
 import com.zutubi.pulse.model.BuildResult;
 import com.zutubi.pulse.model.Project;
+import com.zutubi.pulse.model.User;
 import com.zutubi.pulse.util.logging.Logger;
 
 import java.util.List;
@@ -65,6 +67,12 @@ public class ViewBuildAction extends ProjectActionSupport
     public BuildResult getResult()
     {
         return result;
+    }
+
+    public BuildColumns getSummaryColumns()
+    {
+        User u = getLoggedInUser();
+        return new BuildColumns(u == null ? User.getDefaultProjectColumns() : u.getProjectSummaryColumns(), projectManager);
     }
 
     public static int getFailureLimit()

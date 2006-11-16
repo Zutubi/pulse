@@ -1,13 +1,11 @@
 package com.zutubi.pulse.web.project;
 
+import com.opensymphony.util.TextUtils;
+import com.zutubi.pulse.bootstrap.MasterConfigurationManager;
 import com.zutubi.pulse.core.model.ResultState;
-import com.zutubi.pulse.model.BuildResult;
-import com.zutubi.pulse.model.HistoryPage;
-import com.zutubi.pulse.model.Project;
+import com.zutubi.pulse.model.*;
 import com.zutubi.pulse.web.PagingSupport;
 import com.zutubi.pulse.xwork.interceptor.Preparable;
-import com.zutubi.pulse.bootstrap.MasterConfigurationManager;
-import com.opensymphony.util.TextUtils;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -110,6 +108,12 @@ public class HistoryAction extends ProjectActionSupport implements Preparable
     public void setSpec(String spec)
     {
         this.spec = spec;
+    }
+
+    public BuildColumns getColumns()
+    {
+        User user = getLoggedInUser();
+        return new BuildColumns(user == null ? User.getDefaultProjectColumns() : user.getProjectHistoryColumns(), projectManager);
     }
 
     public List<String> getPrepareParameterNames()

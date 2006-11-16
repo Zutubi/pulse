@@ -5,8 +5,17 @@
 <head>
     <title>#wwtext("name=projects")</title>
     <script type="text/javascript" src="$base/js/prototype.js"></script>
+    <script type="text/javascript" src="$base/js/scriptaculous/scriptaculous.js"></script>
+    <script type="text/javascript" src="$base/js/yahoo/utilities.js" ></script>
+    <script type="text/javascript" src="$base/js/main.js"></script>
+    <script type="text/javascript" src="$base/js/buildcolumns.js"></script>
     <script type="text/javascript">
+    //<![CDATA[
         #updater("$base/ajax/viewProjectsPanel.action" "panel" $principle)
+
+        var popup;
+        YAHOO.util.Event.addListener(window, "load", function() { popup = new BuildColumnPopup("all.projects", "$base", "$base/ajax/viewProjectsPanel.action", "panel"); });
+    //]]>
     </script>
     #if ($rssEnabled)
         <link rel="alternate" type="application/rss+xml" title="RSS" href="rss.action"/>
@@ -14,17 +23,27 @@
 </head>
 <body>
     <div id="pagecontent">
-
-#if($rssEnabled)
-        <span class="action">
-            <a class="unadorned" id="rss.builds" href="rss.action"><img alt="$action.getText('rss')" src="$base/images/feed-icon-16x16.gif"/></a>
-        </span>
+    <table width="98%">
+        <tr>
+            <td>
+                <h1 style="margin-top: 0">:: #wwtext("name=projects") ::</h1>
+            </td>
+            <td class="right">
+#if($loggedInUser)
+                <a class="unadorned" href="#" id="columns-popup-link-all.projects" onclick="popup.popup(); return false"><img src="$base/images/text_columns.gif"/></a>
 #end
-    <h1>:: #wwtext("name=projects") ::</h1>
+#if($rssEnabled)
+                <a class="unadorned" id="rss.builds" href="rss.action"><img alt="$action.getText('rss')" src="$base/images/feed-icon-16x16.gif"/></a>
+#end
+            </td>
+        </tr>
+    </table>
 
     <div id="panel">
         #parse("ajax/view-projects-panel.vm")
     </div>
+
+    #buildColumnsPopup("all.projects" "popup")
 
 #authorize("ifAllGranted=ROLE_ADMINISTRATOR")
     #licensed("require=canAddProject")

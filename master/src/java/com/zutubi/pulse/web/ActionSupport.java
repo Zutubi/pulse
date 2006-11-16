@@ -4,6 +4,10 @@ import com.opensymphony.util.TextUtils;
 import com.opensymphony.xwork.ActionContext;
 import com.opensymphony.xwork.TextProvider;
 import com.opensymphony.xwork.util.OgnlValueStack;
+import com.zutubi.pulse.core.model.Changelist;
+import com.zutubi.pulse.core.model.Revision;
+import com.zutubi.pulse.model.Project;
+import com.zutubi.pulse.model.ProjectManager;
 import com.zutubi.pulse.security.AcegiUtils;
 import com.zutubi.pulse.util.StringUtils;
 import com.zutubi.pulse.util.TimeStamps;
@@ -36,6 +40,8 @@ public class ActionSupport extends com.opensymphony.xwork.ActionSupport implemen
     private transient final TextProvider textProvider = new TextProviderSupport(getClass(), this);
 
     private String cancel;
+    protected ProjectManager projectManager;
+    protected String changeUrl;
 
     public boolean isCancelled()
     {
@@ -154,5 +160,66 @@ public class ActionSupport extends com.opensymphony.xwork.ActionSupport implemen
         {
             return s;
         }
+    }
+
+    public boolean canWrite(Project project)
+    {
+        try
+        {
+            getProjectManager().checkWrite(project);
+            return true;
+        }
+        catch(Exception e)
+        {
+            return false;
+        }
+    }
+
+    public ProjectManager getProjectManager()
+    {
+        return projectManager;
+    }
+
+    public void setProjectManager(ProjectManager manager)
+    {
+        projectManager = manager;
+    }
+
+    public void updateChangeUrl(Project project, Revision revision)
+    {
+        if(project != null && project.getChangeViewer() != null)
+        {
+            changeUrl = project.getChangeViewer().getChangesetURL(revision);
+        }
+        else
+        {
+            changeUrl = null;
+        }
+    }
+
+    public String getChangeUrl()
+    {
+        return changeUrl;
+    }
+
+    public void updateChangeUrl(Changelist changelist)
+    {
+        // We cache the URL as velocity null handling is brain dead
+        Revision revision = changelist.getRevision();
+        for(long id: changelist.getProjectIds())
+        {
+            Project p = projectManager.getProject(id);
+            if(p != null && p.getChangeViewer() != null)
+            {
+                String url = p.getChangeViewer().getChangesetURL(revision);
+                if(url != null)
+                {
+                    changeUrl = url;
+                    return;
+                }
+            }
+        }
+
+        changeUrl = null;
     }
 }

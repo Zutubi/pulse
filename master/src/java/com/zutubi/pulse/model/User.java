@@ -1,6 +1,7 @@
 package com.zutubi.pulse.model;
 
 import com.zutubi.pulse.core.model.Entity;
+import com.zutubi.pulse.util.StringUtils;
 import com.zutubi.pulse.web.DefaultAction;
 import org.acegisecurity.userdetails.UserDetails;
 
@@ -14,18 +15,24 @@ public class User extends Entity implements UserDetails
 {
     public static int REFRESH_DISABLED = 0;
 
-    private static final String PROPERTY_DASHBOARD_BUILD_COUNT = "user.dashboardBuildCount";
-    private static final String PROPERTY_DEFAULT_ACTION = "user.defaultAction";
-    private static final String PROPERTY_LDAP_AUTHENTICATION = "user.ldapAuthentication";
-    private static final String PROPERTY_SHOW_MY_CHANGES = "show.my.changes";
-    private static final String PROPERTY_MY_CHANGES_COUNT = "my.changes.count";
-    private static final String PROPERTY_SHOW_PROJECT_CHANGES = "show.project.changes";
-    private static final String PROPERTY_PROJECT_CHANGES_COUNT = "project.changes.count";
-    private static final String PROPERTY_REFRESH_INTERVAL = "user.refreshInterval";
-    private static final String PROPERTY_TAIL_LINES = "tail.lines";
-    private static final String PROPERTY_TAIL_REFRESH_INTERVAL = "tail.refresh.interval";
-    private static final String PROPERTY_MY_BUILDS_COUNT = "my.builds.count";
+    public static final String PROPERTY_DASHBOARD_BUILD_COUNT = "user.dashboardBuildCount";
+    public static final String PROPERTY_DEFAULT_ACTION = "user.defaultAction";
+    public static final String PROPERTY_LDAP_AUTHENTICATION = "user.ldapAuthentication";
+    public static final String PROPERTY_SHOW_MY_CHANGES = "show.my.changes";
+    public static final String PROPERTY_MY_CHANGES_COUNT = "my.changes.count";
+    public static final String PROPERTY_SHOW_PROJECT_CHANGES = "show.project.changes";
+    public static final String PROPERTY_PROJECT_CHANGES_COUNT = "project.changes.count";
+    public static final String PROPERTY_REFRESH_INTERVAL = "user.refreshInterval";
+    public static final String PROPERTY_TAIL_LINES = "tail.lines";
+    public static final String PROPERTY_TAIL_REFRESH_INTERVAL = "tail.refresh.interval";
+    public static final String PROPERTY_MY_BUILDS_COUNT = "my.builds.count";
     public static final String PROPERTY_SHOW_ALL_PROJECTS = "show.all.projects";
+    public static final String PROPERTY_MY_BUILDS_COLUMNS = "my.builds.columns";
+    public static final String PROPERTY_MY_PROJECTS_COLUMNS = "my.projects.columns";
+    public static final String PROPERTY_ALL_PROJECTS_COLUMNS = "all.projects.columns";
+    public static final String PROPERTY_PROJECT_SUMMARY_COLUMNS = "project.summary.columns";
+    public static final String PROPERTY_PROJECT_RECENT_COLUMNS = "project.recent.columns";
+    public static final String PROPERTY_PROJECT_HISTORY_COLUMNS = "project.history.columns";
 
     /**
      * The login name is used to identify this user.
@@ -541,6 +548,76 @@ public class User extends Entity implements UserDetails
         setIntProperty(PROPERTY_MY_BUILDS_COUNT, count);
     }
 
+    public String getMyBuildsColumns()
+    {
+        return getStringProperty(PROPERTY_MY_BUILDS_COLUMNS, StringUtils.join(",", BuildColumns.KEY_ID, BuildColumns.KEY_PROJECT, BuildColumns.KEY_SPECIFICATION, BuildColumns.KEY_STATUS, BuildColumns.KEY_TESTS, BuildColumns.KEY_WHEN, BuildColumns.KEY_ELAPSED, BuildColumns.KEY_ACTIONS));
+    }
+
+    public void setMyBuildsColumns(String columns)
+    {
+        setProperty(PROPERTY_MY_BUILDS_COLUMNS, columns);
+    }
+
+    public String getMyProjectsColumns()
+    {
+        return getStringProperty(PROPERTY_MY_PROJECTS_COLUMNS, getDefaultProjectColumns());
+    }
+
+    public void setMyProjectsColumns(String columns)
+    {
+        setProperty(PROPERTY_MY_PROJECTS_COLUMNS, columns);
+    }
+
+    public String getAllProjectsColumns()
+    {
+        return getStringProperty(PROPERTY_ALL_PROJECTS_COLUMNS, getDefaultAllProjectsColumns());
+    }
+
+    public void setAllProjectsColumns(String columns)
+    {
+        setProperty(PROPERTY_ALL_PROJECTS_COLUMNS, columns);
+    }
+
+    public String getProjectSummaryColumns()
+    {
+        return getStringProperty(PROPERTY_PROJECT_SUMMARY_COLUMNS, getDefaultProjectColumns());
+    }
+
+    public void setProjectSummaryColumns(String columns)
+    {
+        setProperty(PROPERTY_PROJECT_SUMMARY_COLUMNS, columns);
+    }
+
+    public String getProjectRecentColumns()
+    {
+        return getStringProperty(PROPERTY_PROJECT_RECENT_COLUMNS, getDefaultProjectColumns());
+    }
+
+    public void setProjectRecentColumns(String columns)
+    {
+        setProperty(PROPERTY_PROJECT_RECENT_COLUMNS, columns);
+    }
+
+    public String getProjectHistoryColumns()
+    {
+        return getStringProperty(PROPERTY_PROJECT_HISTORY_COLUMNS, getDefaultProjectColumns());
+    }
+
+    public void setProjectHistoryColumns(String columns)
+    {
+        setProperty(PROPERTY_PROJECT_HISTORY_COLUMNS, columns);
+    }
+
+    public static String getDefaultProjectColumns()
+    {
+        return StringUtils.join(",", BuildColumns.KEY_ID, BuildColumns.KEY_SPECIFICATION, BuildColumns.KEY_STATUS, BuildColumns.KEY_REASON, BuildColumns.KEY_TESTS, BuildColumns.KEY_WHEN, BuildColumns.KEY_ELAPSED, BuildColumns.KEY_ACTIONS);
+    }
+
+    public static String getDefaultAllProjectsColumns()
+    {
+        return StringUtils.join(",", BuildColumns.KEY_PROJECT, BuildColumns.KEY_ID, BuildColumns.KEY_SPECIFICATION, BuildColumns.KEY_STATUS, BuildColumns.KEY_REASON, BuildColumns.KEY_TESTS, BuildColumns.KEY_WHEN, BuildColumns.KEY_ELAPSED, BuildColumns.KEY_ACTIONS);
+    }
+
     public boolean equals(Object other)
     {
         if(other == null || !(other instanceof User))
@@ -584,6 +661,16 @@ public class User extends Entity implements UserDetails
     private void setIntProperty(String property, int value)
     {
         setProperty(property, Integer.toString(value));
+    }
+
+    private String getStringProperty(String property, String defaultValue)
+    {
+        if(hasProperty(property))
+        {
+            return getProperty(property);
+        }
+
+        return defaultValue;
     }
 
     public Set<Group> getGroups()

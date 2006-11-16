@@ -14,14 +14,14 @@
 
         <h1>:: #wwtext("name=agents") ::</h1>
 
-        <table class="columns" width="100%">
+        <table class="columns" width="98%">
             <tr>
                 <td class="columns">
                     <div id="panel">
                         #parse("ajax/view-agents-panel.vm")
                     </div>
                 </td>
-                <td class="columns">
+                <td class="right">
                     <table class="content" style="float: right">
                         #headingRow("agent.downloads" 1)
                         <tr>

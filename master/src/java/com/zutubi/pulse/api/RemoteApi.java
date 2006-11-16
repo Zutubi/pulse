@@ -1154,7 +1154,16 @@ public class RemoteApi
 
     private BuildSpecification getBuildSpecification(Project project, String buildSpecification)
     {
-        BuildSpecification spec = project.getBuildSpecification(buildSpecification);
+        BuildSpecification spec;
+        if(TextUtils.stringSet(buildSpecification))
+        {
+             spec = project.getBuildSpecification(buildSpecification);
+        }
+        else
+        {
+            spec = project.getDefaultSpecification();
+        }
+        
         if (spec == null)
         {
             throw new IllegalArgumentException("Unknown build specification '" + buildSpecification + "'");

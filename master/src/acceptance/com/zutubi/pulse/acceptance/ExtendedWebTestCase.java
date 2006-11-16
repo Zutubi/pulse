@@ -1,5 +1,6 @@
 package com.zutubi.pulse.acceptance;
 
+import com.meterware.httpunit.HttpUnitOptions;
 import net.sourceforge.jwebunit.WebTestCase;
 
 /**
@@ -14,6 +15,7 @@ public abstract class ExtendedWebTestCase extends WebTestCase
     public ExtendedWebTestCase(String name)
     {
         super(name);
+        HttpUnitOptions.setExceptionsThrownOnScriptError(false);
     }
 
 

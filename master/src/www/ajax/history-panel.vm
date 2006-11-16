@@ -1,0 +1,58 @@
+    <table>
+        <tr>
+            <td>
+
+    #wwcform("action=history.action" "heading=%{getText('quick.filters')}" "colspan=5" "width=100%" "method=get")
+        #wwhidden("name=id")
+
+        <tr>
+        #wwselect("name=stateFilter" "singleRow=true" "label=%{getText('filter.state')}" "list=stateFilters" "onchange=submit()" "tabindex=1")
+        #wwselect("name=spec" "singleRow=true" "label=%{getText('filter.spec')}" "list=specs" "onchange=submit()" "tabindex=2")
+        <td><a href="history.action?id=$project.id">#wwtext("name=filter.clear")</a></td>
+        </tr>
+    #end
+            </td>
+        </tr>
+        <tr>
+            <td>
+    <table width="100%" class="content">
+        <tr>
+            <th class="heading" colspan="$columns.getTotalSpan($project)">
+                <span class="action">
+                #if($loggedInUser)
+                    <a class="unadorned" href="#" id="columns-popup-link-project.history" onclick="popup.popup(); return false"><img src="$base/images/text_columns.gif"/></a>
+                #end
+                #if($rssEnabled)
+                    <a class="unadorned" id="rss.builds" href="rss.action?projectId=$project.id"><img alt="$action.getText('rss')" src="$base/images/feed-icon-16x16.gif"/></a>
+                #end
+                </span>
+                #wwtext("name=historic.builds")
+            </th>
+        </tr>
+        #buildTableHeading($columns "project.history" true $project)
+#if($history.size() > 0)
+    #foreach($buildResult in $history)
+        #buildTableRow($project $buildResult $columns false)
+    #end
+    </table>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+
+            <table width="100%" class="content">
+                #pagingRow("history.action?id=$project.id&amp;stateFilter=$stateFilter&amp;spec=$spec&amp;" $pagingSupport)
+                <tr><th colspan="5">$action.getText("history.count", ["$pagingSupport.totalItems"])</th></tr>
+            </table>
+#else
+        <tr>
+            <td class="content" colspan="$columns.getTotalSpan($project)">
+                #wwtext("name=no.history")
+            </td>
+        </tr>
+    </table>
+#end
+            </td>
+        </tr>
+    </table>

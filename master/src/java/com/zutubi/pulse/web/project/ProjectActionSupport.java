@@ -1,13 +1,12 @@
 package com.zutubi.pulse.web.project;
 
 import com.opensymphony.util.TextUtils;
-import com.zutubi.pulse.core.model.Feature;
-import com.zutubi.pulse.core.model.Revision;
-import com.zutubi.pulse.model.*;
+import com.zutubi.pulse.committransformers.CommitMessageTransformerManager;
 import com.zutubi.pulse.core.model.Changelist;
+import com.zutubi.pulse.core.model.Feature;
+import com.zutubi.pulse.model.*;
 import com.zutubi.pulse.scheduling.Scheduler;
 import com.zutubi.pulse.web.ActionSupport;
-import com.zutubi.pulse.committransformers.CommitMessageTransformerManager;
 import org.acegisecurity.AccessDeniedException;
 
 import java.util.LinkedList;
@@ -20,7 +19,6 @@ import java.util.List;
 public class ProjectActionSupport extends ActionSupport
 {
     protected CommitMessageTransformerManager transformerManager;
-    protected ProjectManager projectManager;
     protected BuildManager buildManager;
     protected ScmManager scmManager;
     protected UserManager userManager;
@@ -33,17 +31,6 @@ public class ProjectActionSupport extends ActionSupport
     protected String projectName = null;
 
     private CommitMessageHelper commitMessageHelper;
-    private String changeUrl;
-
-    public void setProjectManager(ProjectManager manager)
-    {
-        projectManager = manager;
-    }
-
-    public ProjectManager getProjectManager()
-    {
-        return projectManager;
-    }
 
     public BuildManager getBuildManager()
     {
@@ -180,19 +167,6 @@ public class ProjectActionSupport extends ActionSupport
         return p;
     }
 
-    public boolean canWrite(Project project)
-    {
-        try
-        {
-            getProjectManager().checkWrite(project);
-            return true;
-        }
-        catch(Exception e)
-        {
-            return false;
-        }
-    }
-
     public User getLoggedInUser()
     {
         Object principle = getPrinciple();
@@ -214,23 +188,6 @@ public class ProjectActionSupport extends ActionSupport
                 throw new AccessDeniedException("Only the owner can view a personal build");
             }
         }
-    }
-
-    public void updateChangeUrl(Project project, Revision revision)
-    {
-        if(project != null && project.getChangeViewer() != null)
-        {
-            changeUrl = project.getChangeViewer().getChangesetURL(revision);
-        }
-        else
-        {
-            changeUrl = null;
-        }
-    }
-
-    public String getChangeUrl()
-    {
-        return changeUrl;
     }
 
     public void setUserManager(UserManager userManager)

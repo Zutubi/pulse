@@ -2,9 +2,7 @@ package com.zutubi.pulse.web.project;
 
 import com.zutubi.pulse.core.model.Changelist;
 import com.zutubi.pulse.core.model.ResultState;
-import com.zutubi.pulse.model.BuildManager;
-import com.zutubi.pulse.model.BuildResult;
-import com.zutubi.pulse.model.Project;
+import com.zutubi.pulse.model.*;
 
 import java.util.List;
 
@@ -107,6 +105,18 @@ public class ProjectHomeAction extends ProjectActionSupport
     public List<BuildResult> getRecentBuilds()
     {
         return recentBuilds;
+    }
+
+    public BuildColumns getSummaryColumns()
+    {
+        User user = getLoggedInUser();
+        return new BuildColumns(user == null ? User.getDefaultProjectColumns() : user.getProjectSummaryColumns(), projectManager);
+    }
+
+    public BuildColumns getRecentColumns()
+    {
+        User user = getLoggedInUser();
+        return new BuildColumns(user == null ? User.getDefaultProjectColumns() : user.getProjectRecentColumns(), projectManager);
     }
 
     public String execute()

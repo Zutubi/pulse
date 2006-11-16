@@ -17,8 +17,7 @@
 
         #if($recentBuilds.size() > 0)
             <h2 class="section">#wwtext("name=recent.builds")</h2>
-
-            #projectRecentBuilds("recent.builds" "recent.builds" $recentBuilds $rssEnabled $project.id)
+            #projectRecentBuilds("recent.builds" "recent.builds" $recentBuilds $rssEnabled $project)
         #end
 
             <h2 class="section">#wwtext("name=latest.changes")</h2>

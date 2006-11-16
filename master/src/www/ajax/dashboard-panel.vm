@@ -1,54 +1,31 @@
-#macro(buildsTable $project $showHideLink)
+#macro(buildsTable $project $showHideLink $firstTable)
     #set($recentBuilds = $action.getLatestBuilds($project))
         <tr>
-            <th class="heading" colspan="14">
-    #if($showHideLink)
+            <th class="heading" colspan="$columns.totalSpan">
+#if($firstTable)            
                 <span class="action">
-                    <a href="$base/user/hideDashboardProject.action?id=$project.id" class="unadorned">X</a>
+                    <a class="unadorned" href="#" id="columns-popup-link-my.projects" onclick="popup.popup(); return false"><img src="$base/images/text_columns.gif"/></a>
+##    #if($showHideLink)
+##                    <a href="$base/user/hideDashboardProject.action?id=$project.id" class="unadorned">X</a>
+##    #end
                 </span>
-    #end
+#end
                 <a href="$base/currentBuild.action?id=$project.id" id="home_$!webwork.htmlEncode($project.name)">
                     <img alt="home" src="$base/images/house.gif">
                     $!webwork.htmlEncode($project.name)
                 </a>
             </th>
         </tr>
-        <tr>
-            #contentHeading("build.id" 1)
-            #contentHeading("build.spec" 1)
-            #contentHeading("build.status" 2)
-            #contentHeading("build.reason" 1)
-            #contentHeading("build.tests" 1)
-            #contentHeading("build.when" 1)
-            #contentHeading("build.elapsed" 1)
-            #contentHeading("actions" 5)
-        </tr>
-    #if($recentBuilds.size() > 0)
-        #foreach($buildResult in $recentBuilds)
-        <tr>
-            #set($cssClass = $buildResult.state.string)
-
-            <td class="content-right"><a href="viewBuild.action?id=$buildResult.id">$buildResult.number</a></td>
-            #classCell($buildResult.buildSpecification)
-            #statusCell($buildResult true)
-            #classCell($buildResult.reason.summary)
-            #testResultsCell($buildResult false $buildResult)
-            #dateClassCell($buildResult)
-            #elapsedCell($buildResult)
-            #viewCell($project $buildResult)
-            #logCell($project $buildResult)
-            #changesCell($project $buildResult)
-            #artifactsCell($project $buildResult)
-#if($action.canWrite($project))
-            #workingCopyCell($project $buildResult)
-#end
-        </tr>
-        #end
-    #else
-        <tr>
-            <td class="content" colspan="14">#wwtext("name=never.built")</td>
-        </tr>
+        #buildTableHeading($columns "my.projects" $firstTable false)
+#if($recentBuilds.size() > 0)
+    #foreach($buildResult in $recentBuilds)
+        #buildTableRow($project $buildResult $columns true)
     #end
+#else
+        <tr>
+            <td class="content" colspan="$columns.totalSpan">#wwtext("name=never.built")
+        </tr>
+#end
 #end
 
 #macro(changesTable $titleKey $changelists $showWho $source)
@@ -113,10 +90,11 @@
 #end
 </h2>
 
+#set($firstTable = true)
 #foreach($group in $shownGroups)
     <table class="content" id="group_$!webwork.htmlEncode($group.name)">
         <tr>
-            <th class="group" colspan="14">
+            <th class="group" colspan="$columns.totalSpan">
                 <span class="action">
                     <a href="$base/user/hideDashboardGroup.action?id=$group.id" class="unadorned">X</a>
                 </span>
@@ -124,13 +102,15 @@
             </th>
         </tr>
     #foreach($project in $group.projects)
-        #buildsTable($project false)
+        #buildsTable($project false $firstTable)
+        #set($firstTable = false)
     #end
     </table>
 #end
     <table class="content">
 #foreach($project in $shownProjects)
-        #buildsTable($project true)
+        #buildsTable($project true $firstTable)
+        #set($firstTable = false)
 #end
     </table>
 

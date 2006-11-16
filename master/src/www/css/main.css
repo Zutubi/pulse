@@ -447,6 +447,11 @@ span.action {
     float: right;
 }
 
+td.right {
+    text-align: right;
+    vertical-align: top;
+}
+
     /*------------------------------
     Boxes
     */
@@ -730,4 +735,16 @@ div.paneheader
 div.panecontent
 {
     padding: 10px;
+}
+
+h3.popup {
+    font-size: 100%;
+    margin-top: 1em;
+}
+
+div.popup-actions {
+    padding: 5px;
+    margin-top: 5px;
+    border-top: dotted 1px #bbb;
+    text-align: center;
 }

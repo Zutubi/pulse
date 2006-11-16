@@ -6,9 +6,16 @@
     <title>#wwtext("name=dashboard")</title>
     <script type="text/javascript" src="$base/js/prototype.js"></script>
     <script type="text/javascript" src="$base/js/scriptaculous/scriptaculous.js"></script>
+    <script type="text/javascript" src="$base/js/yahoo/utilities.js" ></script>
     <script type="text/javascript" src="$base/js/main.js"></script>
+    <script type="text/javascript" src="$base/js/buildcolumns.js"></script>
     <script type="text/javascript">
+    //<![CDATA[
         #updater("$base/ajax/dashboardPanel.action" "panel" $principle)
+
+        var popup;
+        YAHOO.util.Event.addListener(window, "load", function() { popup = new BuildColumnPopup("my.projects", "$base", "$base/ajax/dashboardPanel.action", "panel"); });
+    //]]>
     </script>
 #if ($rssEnabled)
     <link rel="alternate" type="application/rss+xml" title="RSS" href="$base/rss.action?userId=$principle.id"/>
@@ -20,6 +27,8 @@
     <div id="panel">
         #parse("ajax/dashboard-panel.vm")
     </div>
+
+    #buildColumnsPopup("my.projects" "popup")
 
     <div id="buildsWindow" class="floating" style="display: none;">
         <div id="buildsWindowContent">
