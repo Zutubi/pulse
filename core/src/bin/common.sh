@@ -59,9 +59,9 @@ if [ ! -x "$JAVACMD" ] ; then
   exit 1
 fi
 
-if [ -z "$PULSE_OPTS" ]
+if [ -z "$JAVA_OPTS" ]
 then
-    PULSE_OPTS=-Xmx512m
+    JAVA_OPTS=-Xmx512m
 fi
 
 code=111
@@ -69,9 +69,9 @@ while [ $code -eq 111 ]
 do
     if [ -z "$PULSE_OUT" ]
     then
-        "$JAVACMD" $JAVA_OPTS $PULSE_OPTS -classpath "$BOOT_JAR" -Dpulse.home="$PULSE_HOME" -Djava.awt.headless=true -Djava.util.logging.config.class=com.zutubi.pulse.logging.ConsoleConfig com.zutubi.pulse.command.PulseCtl "$@"
+        "$JAVACMD" $JAVA_OPTS -classpath "$BOOT_JAR" -Dpulse.home="$PULSE_HOME" -Djava.awt.headless=true -Djava.util.logging.config.class=com.zutubi.pulse.logging.ConsoleConfig com.zutubi.pulse.command.PulseCtl "$@"
     else
-        "$JAVACMD" $JAVA_OPTS $PULSE_OPTS -classpath "$BOOT_JAR" -Dpulse.home="$PULSE_HOME" -Djava.awt.headless=true -Djava.util.logging.config.class=com.zutubi.pulse.logging.ConsoleConfig com.zutubi.pulse.command.PulseCtl "$@" >> "$PULSE_OUT" 2>&1
+        "$JAVACMD" $JAVA_OPTS -classpath "$BOOT_JAR" -Dpulse.home="$PULSE_HOME" -Djava.awt.headless=true -Djava.util.logging.config.class=com.zutubi.pulse.logging.ConsoleConfig com.zutubi.pulse.command.PulseCtl "$@" >> "$PULSE_OUT" 2>&1
     fi
     code=$?
 done

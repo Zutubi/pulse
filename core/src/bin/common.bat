@@ -30,11 +30,11 @@ if "%_JAVACMD%" == "" set _JAVACMD=java.exe
 
 :haveJava
 
-if "%PULSE_OPTS%"=="" set PULSE_OPTS=-Xmx512m
+if "%JAVA_OPTS%"=="" set JAVA_OPTS=-Xmx512m
 
 :restart
 
-"%_JAVACMD%" %JAVA_OPTS% %PULSE_OPTS% -classpath "%BOOT_JAR%" -Dpulse.home="%PULSE_HOME%" -Djava.awt.headless=true -Djava.util.logging.config.class=com.zutubi.pulse.logging.ConsoleConfig com.zutubi.pulse.command.PulseCtl %*
+"%_JAVACMD%" %JAVA_OPTS% -classpath "%BOOT_JAR%" -Dpulse.home="%PULSE_HOME%" -Djava.awt.headless=true -Djava.util.logging.config.class=com.zutubi.pulse.logging.ConsoleConfig com.zutubi.pulse.command.PulseCtl %*
 
 set CODE=%ERRORLEVEL%
 if %CODE% equ 111 goto restart
