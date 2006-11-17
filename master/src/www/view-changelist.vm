@@ -69,7 +69,7 @@
         <tr>
             #dynamicCell($file.filename)
             #dynamicRightLinkCell($file.revision.revisionString $action.getFileViewUrl())
-            #dynamicCell($file.action.toString().toLowerCase())
+            #dynamicCell($file.action.getPrettyString())
 #if($action.haveChangeViewer())
             <td class="content">
     #if($action.getFileViewUrl())

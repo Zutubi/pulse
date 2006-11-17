@@ -1,7 +1,5 @@
 package com.zutubi.pulse.core.model;
 
-import com.zutubi.pulse.core.model.FileRevision;
-
 /**
  * A trivial implementation of the Change interface.
  *
@@ -17,35 +15,87 @@ public class Change extends Entity
         /**
          * The file was added to source control.
          */
-        ADD,
+        ADD
+                {
+                    public String getPrettyString()
+                    {
+                        return "added";
+                    }
+                },
         /**
          * The file was branched somewhere.
          */
-        BRANCH,
+        BRANCH
+                {
+                    public String getPrettyString()
+                    {
+                        return "branched";
+                    }
+                },
         /**
          * The file was deleted from source control.
          */
-        DELETE,
+        DELETE
+                {
+                    public String getPrettyString()
+                    {
+                        return "deleted";
+                    }
+                },
         /**
          * The file contents were edited.
          */
-        EDIT,
+        EDIT
+                {
+                public String getPrettyString()
+                    {
+                        return "edited";
+                    }
+                },
         /**
          * Perforce-specific: the file was integrated.
          */
-        INTEGRATE,
+        INTEGRATE
+                {
+                public String getPrettyString()
+                    {
+                        return "integrated";
+                    }
+                },
         /**
          * The file was merged with another.
          */
-        MERGE,
+        MERGE
+                {
+                    public String getPrettyString()
+                    {
+                        return "merged";
+                    }
+                }
+        ,
         /**
          * The file was moved.
          */
-        MOVE,
+        MOVE
+                {
+                    public String getPrettyString()
+                    {
+                        return "moved";
+                    }
+                }
+        ,
         /**
          * An unrecognised action.
          */
         UNKNOWN
+                {
+                    public String getPrettyString()
+                    {
+                        return "unknown";
+                    }
+                };
+
+        public abstract String getPrettyString();
     }
 
     private String filename;
@@ -88,21 +138,41 @@ public class Change extends Entity
         return action;
     }
 
+    /**
+     * Used by hibernate
+     *
+     * @param filename string
+     */
     private void setFilename(String filename)
     {
         this.filename = filename;
     }
 
+    /**
+     * Used by hibernate
+     *
+     * @param revision string
+     */
     private void setRevision(FileRevision revision)
     {
         this.revision = revision;
     }
 
+    /**
+     * Used by hibernate
+     *
+     * @return action name
+     */
     private String getActionName()
     {
         return action.toString();
     }
 
+    /**
+     * Used by hibernate.
+     *
+     * @param action string
+     */
     private void setActionName(String action)
     {
         this.action = Action.valueOf(action);
