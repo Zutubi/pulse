@@ -10,6 +10,7 @@ public abstract class ExtendedWebTestCase extends WebTestCase
 {
     public ExtendedWebTestCase()
     {
+        HttpUnitOptions.setExceptionsThrownOnScriptError(false);
     }
 
     public ExtendedWebTestCase(String name)

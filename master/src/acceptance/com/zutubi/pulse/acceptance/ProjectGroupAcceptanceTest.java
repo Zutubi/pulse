@@ -112,11 +112,11 @@ public class ProjectGroupAcceptanceTest extends BaseAcceptanceTestCase
     {
         WebTable table = getTester().getDialog().getWebTableBySummaryOrId("group_" + name);
         assertNotNull(table);
-        assertEquals(projects.length, table.getRowCount() - 3);
-        for(int i = 2; i < table.getRowCount() - 1; i++)
+        assertEquals(table.getRowCount() - 4, projects.length);
+        for(int i = 3; i < table.getRowCount() - 1; i++)
         {
             TableCell cell = table.getTableCell(i, 0);
-            assertEquals(projects[i - 2], cell.getText());
+            assertEquals(projects[i - 3], cell.getText());
         }
     }
 

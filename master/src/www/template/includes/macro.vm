@@ -636,6 +636,15 @@
 #end
 
 ##
+## Outputs an action cell with an image, and link title but no text
+##
+#macro(actionCellTitle $titleKey $url $image)
+    <td class="content">
+        <a class="unadorned" href="$url" title="$action.getText($titleKey)"><img alt="$action.getText($titleKey)" src="$base/images/$image"/></a>
+    </td>
+#end
+
+##
 ## Outputs a link cell for a content table
 ##
 #macro(linkCell $id $key $url)
@@ -1619,8 +1628,8 @@
                 #wwtext("name=build.summary")
             </th>
         </tr>
-        #buildTableHeading($summaryColumns "project.summary" true $project)
-        #buildTableRow($buildResult.project $buildResult $summaryColumns false)
+        #buildTableHeading($summaryColumns $project)
+        #buildTableRow($buildResult $summaryColumns false)
     #if($detailedView)
         #directMessages($buildResult $summaryColumns.getTotalSpan($project))
     #end
@@ -1664,11 +1673,13 @@
                 #wwtext("name=$key")
             </th>
         </tr>
-        #buildTableHeading($recentColumns "project.recent" true $project)
+        #buildTableHeading($recentColumns $project)
     #foreach($buildResult in $recentBuilds)
-        #buildTableRow($project $buildResult $recentColumns false)
+        #buildTableRow($buildResult $recentColumns false)
     #end
     </table>
+
+    #buildTableColumns($columns "project.recent")
 #end
 
 #macro( contactPointIcon $contact)
@@ -2209,88 +2220,113 @@
     </table>
 #end
 
+#macro(buildTableColumns $buildColumns $idSuffix)
+    <div style="display: none">
+        <table>
+            <tr id="build-table-${idSuffix}">
+    #foreach($key in $buildColumns.columns)
+                <th class="content" id="build-header-${key}-${idSuffix}"></th>
+    #end
+            </tr>
+        </table>
+    </div>
+#end
+
 ##
-## Outputs the heading row for a build results table
+## Outputs the table headers a build results table (but not the row tags).
 ##
-#macro(buildTableHeading $buildColumns $idSuffix $addId $project)
-    <tr #if($addId) id="build-table-${idSuffix}" #end>
+#macro(buildTableHeaders $buildColumns $project)
     #foreach($key in $buildColumns.columns)
         #if($project)
             #set($colspan = $buildColumns.getSpan($key, $project))
         #else
             #set($colspan = $buildColumns.getSpan($key))
         #end
-        <th class="content" #if($addId) id="build-header-${key}-${idSuffix}" #end #if($colspan > 1) colspan="$colspan" #end>#wwtext("name=build.$key")</th>
+        <th class="content" #if($colspan > 1) colspan="$colspan" #end>#wwtext("name=build.$key")</th>
     #end
+#end
+
+##
+## Outputs the heading row for a build results table
+##
+#macro(buildTableHeading $buildColumns $project)
+    <tr>
+        #buildTableHeaders($buildColumns $project)
     </tr>
+#end
+
+##
+## Outputs cells for a build result in a table of results, based on the given
+## column configuration, but without the row tags.
+##
+#macro(buildTableCells $buildResult $columns $multiProject)
+    #set($cssClass = $buildResult.state.string)
+    #foreach($key in $columns.columns)
+        #buildTableCell($buildResult $columns $key $multiProject)
+    #end
 #end
 
 ##
 ## Outputs a row for a build result in a table of results, based on the given
 ## column configuration.
 ##
-#macro(buildTableRow $project $buildResult $columns $multiProject)
+#macro(buildTableRow $buildResult $columns $multiProject)
     <tr>
-        #set($cssClass = $buildResult.state.string)
-    #foreach($key in $columns.columns)
-        #buildTableCell($project $buildResult $columns $key $multiProject)
-    #end
+        #buildTableCells($buildResult $columns $multiProject)
     </tr>
+#end
+
+##
+## Outputs a project cell for a build result table.
+##
+#macro(projectCell $project)
+    <td class="content">
+        <a href="currentBuild.action?id=$project.id" id="$!webwork.htmlEncode($project.name)">$!webwork.htmlEncode($project.name)</a>
+    </td>
 #end
 
 ##
 ## Outputs a single build result cell, based on the given column key
 ##
-#macro(buildTableCell $project $buildResult $columns $key $multiProject)
-    #if($buildResult)
-        #if($key == "id")
-            #dynamicRightLinkCell($buildResult.number "viewBuild.action?id=$buildResult.id")
-        #elseif($key == "project")
-            <td class="content">
-                <a href="currentBuild.action?id=$project.id" id="$!webwork.htmlEncode($project.name)">$!webwork.htmlEncode($project.name)</a>
-            </td>
-        #elseif($key == "spec")
-            #classCell($buildResult.buildSpecification)
-        #elseif($key == "status")
-            #statusCell($buildResult true)
-        #elseif($key == "reason")
-            #classCell($buildResult.reason.summary)
-        #elseif($key == "tests")
-            #testResultsCell($buildResult false $buildResult)
-        #elseif($key == "owner")
-            #ownerCell($buildResult $cssClass)
-        #elseif($key == "rev")
-            #if($buildResult.personal)
-                #staticCell("personal")
-            #elseif($buildResult.scmDetails.revision)
-                $action.updateChangeUrl($project, $buildResult.scmDetails.revision)
-                    #dynamicRightLinkCell($buildResult.scmDetails.revision $action.getChangeUrl())
-            #else
-                #contentCell("revision.none")
-            #end
-        #elseif($key == "version")
-            #classCell("version")
-        #elseif($key == "when")
-            #dateClassCell($buildResult)
-        #elseif($key == "elapsed")
-            #elapsedCell($buildResult)
-        #elseif($key == "actions")
-            #viewCell($project $buildResult)
-            #logCell($project $buildResult)
-            #changesCell($project $buildResult)
-            #artifactsCell($project $buildResult)
-            #workingCopyCell($project $buildResult $multiProject)
+#macro(buildTableCell $buildResult $columns $key $multiProject)
+    #set($project = $buildResult.project)
+    #if($key == "id")
+        #dynamicRightLinkCell($buildResult.number "viewBuild.action?id=$buildResult.id")
+    #elseif($key == "project")
+        #projectCell($project)
+    #elseif($key == "spec")
+        #classCell($buildResult.buildSpecification)
+    #elseif($key == "status")
+        #statusCell($buildResult true)
+    #elseif($key == "reason")
+        #classCell($buildResult.reason.summary)
+    #elseif($key == "tests")
+        #testResultsCell($buildResult false $buildResult)
+    #elseif($key == "owner")
+        #ownerCell($buildResult $cssClass)
+    #elseif($key == "rev")
+        #if($buildResult.personal)
+            #staticCell("personal")
+        #elseif($buildResult.scmDetails.revision)
+            $action.updateChangeUrl($project, $buildResult.scmDetails.revision)
+            #dynamicRightLinkCell($buildResult.scmDetails.revision $action.getChangeUrl())
         #else
-            <td class="content">unknown column '$key'</td>
+            #contentCell("revision.none")
         #end
+    #elseif($key == "version")
+        #classCell("version")
+    #elseif($key == "when")
+        #dateClassCell($buildResult)
+    #elseif($key == "elapsed")
+        #elapsedCell($buildResult)
+    #elseif($key == "actions")
+        #viewCell($project $buildResult)
+        #logCell($project $buildResult)
+        #changesCell($project $buildResult)
+        #artifactsCell($project $buildResult)
+        #workingCopyCell($project $buildResult $multiProject)
     #else
-        #if($key == "project")
-            <td class="content">
-                <a href="currentBuild.action?id=$project.id" id="$!webwork.htmlEncode($project.name)">$!webwork.htmlEncode($project.name)</a>
-            </td>
-        #else
-            <td class="content" colspan="$columns.getSpan($key)">&nbsp;</td>
-        #end
+        <td class="content">unknown column '$key'</td>
     #end
 #end
 

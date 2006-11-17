@@ -29,10 +29,10 @@
                 #wwtext("name=historic.builds")
             </th>
         </tr>
-        #buildTableHeading($columns "project.history" true $project)
+        #buildTableHeading($columns $project)
 #if($history.size() > 0)
     #foreach($buildResult in $history)
-        #buildTableRow($project $buildResult $columns false)
+        #buildTableRow($buildResult $columns false)
     #end
     </table>
 
@@ -56,3 +56,5 @@
             </td>
         </tr>
     </table>
+
+#buildTableColumns($columns "project.history")

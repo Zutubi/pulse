@@ -1,23 +1,26 @@
 <h2 class="section">
     #wwtext("name=my.builds")
 </h2>
-    <table id="my.builds" class="content">
-        <tr>
-            <th class="heading" colspan="$columns.totalSpan">
-                <span class="action">
-                    <a class="unadorned" href="#" id="columns-popup-link-my" onclick="popup.popup(); return false"><img src="$base/images/text_columns.gif"/></a>
-                </span>
-                #wwtext("name=my.builds")
-            </th>
-        </tr>
-        #buildTableHeading($columns "my" true false)
+
+<table id="my.builds" class="content">
+    <tr>
+        <th class="heading" colspan="$columns.totalSpan">
+            <span class="action">
+                <a class="unadorned" href="#" id="columns-popup-link-my" onclick="popup.popup(); return false"><img src="$base/images/text_columns.gif"/></a>
+            </span>
+            #wwtext("name=my.builds")
+        </th>
+    </tr>
+    #buildTableHeading($columns false)
 #if($myBuilds.size() > 0)
     #foreach($buildResult in $myBuilds)
-        #buildTableRow($buildResult.project $buildResult $columns false)
+        #buildTableRow($buildResult $columns false)
     #end
 #else
-        <tr>
-            <td class="content" colspan="$columns.totalSpan">#wwtext("name=my.builds.none")
-        </tr>
+    <tr>
+        <td class="content" colspan="$columns.totalSpan">#wwtext("name=my.builds.none")
+    </tr>
 #end
-    </table>
+</table>
+
+#buildTableColumns($columns "my")

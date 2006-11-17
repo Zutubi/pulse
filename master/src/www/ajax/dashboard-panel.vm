@@ -16,10 +16,10 @@
                 </a>
             </th>
         </tr>
-        #buildTableHeading($columns "my.projects" $firstTable false)
+        #buildTableHeading($columns false)
 #if($recentBuilds.size() > 0)
     #foreach($buildResult in $recentBuilds)
-        #buildTableRow($project $buildResult $columns true)
+        #buildTableRow($buildResult $columns true)
     #end
 #else
         <tr>
@@ -115,3 +115,5 @@
     <h2 class="section">#wwtext("name=project.changes")</h2>
     #changesTable("my.project.changes" $projectChangelists true "project")
 #end
+
+#buildTableColumns($columns "my.projects")

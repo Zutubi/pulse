@@ -2,9 +2,10 @@
 ## Shows a list of recent builds for the given list of projects
 ##
 #macro(recentBuilds $group $projects $firstTable)
+    #set($fullSpan = $columns.totalSpan + 6)
     <table class="content" id="group_$!webwork.htmlEncode($group.name)">
         <tr>
-            <th class="group" colspan="$columns.totalSpan">
+            <th class="group" colspan="$fullSpan">
 #if($group)
     #if($rssEnabled)
                 <span class="action">
@@ -16,20 +17,48 @@
                 #wwtext("name=projects")
 #end
             </th>
-
-        #rssHeadingRow( 14 "$rssEnabled" "rss.action" "rss.builds" )
-        #buildTableHeading($columns "all.projects" $firstTable false)
-
+        </tr>
+        <tr>
+            <th class="heading" colspan="6">#wwtext("name=project")</th>
+            <th class="heading" colspan="$columns.totalSpan">
+#if($firstTable && $loggedInUser)
+                <span class="action">
+                    <a class="unadorned" href="#" id="columns-popup-link-all.projects" onclick="popup.popup(); return false"><img src="$base/images/text_columns.gif"/></a>
+                </span>
+#end
+                #wwtext("name=latest.build")
+            </th>
+        </tr>
+        <tr>
+            #contentHeading("project.name" 1)
+            #contentHeading("actions" 5)
+            #buildTableHeaders($columns false)
+        </tr>
     #foreach($project in $projects)
         #set($lastResult = false)
         #set($lastResult = $action.getLatestBuild($project))
-        #buildTableRow($project $lastResult $columns true)
-        </tr>
+            <tr>
+                #projectCell($project)
+                #actionCellTitle("home.tab" "currentBuild.action?id=$project.id" "house.gif")
+                #actionCellTitle("reporting.tab" "projectReports.action?id=$project.id" "chart_bar.gif")
+                #actionCellTitle("history.tab" "history.action?id=$project.id" "time.gif")
+                #actionCellTitle("configuration.tab" "configureProject.action?id=$project.id" "pencil.gif")
+            #if($action.canWrite($project))
+                #actionCellTitle("buildspec.trigger" "triggerBuild.action?projectId=$project.id" "lightning.gif")
+            #else
+                <td class="content">&nbsp;</td>
+            #end
+        #if($lastResult)
+                #buildTableCells($lastResult $columns true)
+        #else
+                <td class="content" colspan="$columns.totalSpan">#wwtext("name=never.built")
+        #end
+            </tr>
     #end
 #if($group)
     #authorize("ifAllGranted=ROLE_ADMINISTRATOR")
             <tr>
-                <td class="add" colspan="$columns.totalSpan">
+                <td class="add" colspan="$fullSpan">
                     <a href="editProjectGroup!input.action?groupId=$group.id" id="edit_$!webwork.htmlEncode($group.name)"><img alt="edit" src="$base/images/pencil.gif"/> #wwtext("name=edit.project.group")</a>
                     &nbsp;
                     #set($confirm = $action.getText("project.group.confirm.delete", [ $group.name ]))
@@ -49,3 +78,5 @@
 #if($projects.size() > 0)
     #recentBuilds(false $projects $firstTable)
 #end
+
+#buildTableColumns($columns "all.projects")

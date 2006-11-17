@@ -4,11 +4,9 @@ import com.zutubi.pulse.model.BuildSpecification;
 import com.zutubi.pulse.model.ManualTriggerBuildReason;
 import com.zutubi.pulse.model.Project;
 
-import java.util.List;
-
 public class TriggerBuildAction extends ProjectActionSupport
 {
-    private long id;
+    private long id = -1;
 
     public long getId()
     {
@@ -30,22 +28,20 @@ public class TriggerBuildAction extends ProjectActionSupport
 
         if (project == null)
         {
-            addActionError("Trigger build request for unknown project ID '" + projectId + "'");
+            addActionError("Trigger build request for unknown project [" + projectId + "]");
             return ERROR;
         }
 
         getProjectManager().checkWrite(project);
 
-        List<BuildSpecification> specs = project.getBuildSpecifications();
-        BuildSpecification spec = null;
-
-        for (BuildSpecification s : specs)
+        BuildSpecification spec;
+        if(id > 0)
         {
-            if (s.getId() == id)
-            {
-                spec = s;
-                break;
-            }
+            spec = project.getBuildSpecification(id);
+        }
+        else
+        {
+            spec = project.getDefaultSpecification();
         }
 
         if (spec == null)
@@ -63,6 +59,7 @@ public class TriggerBuildAction extends ProjectActionSupport
         }
         catch (InterruptedException e)
         {
+            // Empty
         }
 
         return SUCCESS;
