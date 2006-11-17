@@ -62,16 +62,16 @@ if [ ! -x "$JAVACMD" ] ; then
   exit 1
 fi
 
-if [ -z "$PULSE_OPTS" ]
+if [ -z "$JAVA_OPTS" ]
 then
-    PULSE_OPTS=-Xmx512m
+    JAVA_OPTS=-Xmx512m
 fi
 
 if [ -z "$PULSE_PID" ]
 then
-    exec "$JAVACMD" $JAVA_OPTS $PULSE_OPTS -classpath "$LOCALCLASSPATH" -Dpulse.home="$PULSE_HOME" -Djava.awt.headless=true $@
+    exec "$JAVACMD" $JAVA_OPTS -classpath "$LOCALCLASSPATH" -Dpulse.home="$PULSE_HOME" -Djava.awt.headless=true $@
 else
-    "$JAVACMD" $JAVA_OPTS $PULSE_OPTS -classpath "$LOCALCLASSPATH" -Dpulse.home="$PULSE_HOME" -Djava.awt.headless=true $@ >> "$PULSE_HOME"/pulse.out 2>&1 &
+    "$JAVACMD" $JAVA_OPTS -classpath "$LOCALCLASSPATH" -Dpulse.home="$PULSE_HOME" -Djava.awt.headless=true $@ >> "$PULSE_HOME"/pulse.out 2>&1 &
     echo $! > $PULSE_PID
     exit 0
 fi

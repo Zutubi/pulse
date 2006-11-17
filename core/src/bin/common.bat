@@ -41,9 +41,9 @@ set _EXECCMD=start "Pulse" "%_JAVACMD%"
 rem setup the classpath.
 for %%i in ("%PULSE_HOME%\lib\boot-*.jar") do call "%PULSE_HOME%\bin\lcp.bat" %%i
 
-if "%PULSE_OPTS%"=="" set PULSE_OPTS=-Xmx512m
+if "%JAVA_OPTS%"=="" set JAVA_OPTS=-Xmx512m
 
-%_EXECCMD% %JAVA_OPTS% %PULSE_OPTS% -classpath "%LOCALCLASSPATH%" -Dpulse.home="%PULSE_HOME%" -Djava.awt.headless=true %*
+%_EXECCMD% %JAVA_OPTS% -classpath "%LOCALCLASSPATH%" -Dpulse.home="%PULSE_HOME%" -Djava.awt.headless=true %*
 
 rem if "%1" == "start" goto end
 rem if errorlevel 1 pause
