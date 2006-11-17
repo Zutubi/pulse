@@ -74,7 +74,7 @@ public class FileLoader
             }
             catch (ParsingException pex)
             {
-                throw new ParseException(pex);
+                throw new ParseException(pex.getLineNumber(), pex.getColumnNumber(), pex);
             }
             catch (IOException e)
             {

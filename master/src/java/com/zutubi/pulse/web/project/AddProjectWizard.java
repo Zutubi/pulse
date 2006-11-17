@@ -3,8 +3,8 @@ package com.zutubi.pulse.web.project;
 import com.opensymphony.util.TextUtils;
 import com.opensymphony.xwork.Validateable;
 import com.zutubi.pulse.core.ResourceRepository;
-import com.zutubi.pulse.license.Licensed;
 import com.zutubi.pulse.license.LicenseException;
+import com.zutubi.pulse.license.Licensed;
 import com.zutubi.pulse.model.*;
 import com.zutubi.pulse.security.AcegiUtils;
 import com.zutubi.pulse.util.logging.Logger;
@@ -528,6 +528,7 @@ public class AddProjectWizard extends BaseWizard
     private class CustomDetails extends BaseWizardState implements Validateable
     {
         private CustomPulseFileDetails details = new CustomPulseFileDetails("<?xml version=\"1.0\"?>\n<project>\n</project>\n");
+        private CustomDetailsHelper detailsHelper = new CustomDetailsHelper();
         private ResourceRepository resourceRepository;
 
         public CustomDetails(Wizard wizard, String name)
@@ -545,9 +546,14 @@ public class AddProjectWizard extends BaseWizard
             return details;
         }
 
+        public CustomDetailsHelper getDetailsHelper()
+        {
+            return detailsHelper;
+        }
+
         public void validate()
         {
-            CustomDetailsHelper.validate(getWizard(), details.getPulseFile(), resourceRepository);
+            detailsHelper.validate(getWizard(), details.getPulseFile(), resourceRepository);
         }
 
         public void setResourceRepository(ResourceRepository resourceRepository)

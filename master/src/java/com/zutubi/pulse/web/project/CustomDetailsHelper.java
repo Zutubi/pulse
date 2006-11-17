@@ -12,7 +12,26 @@ import java.io.ByteArrayInputStream;
  */
 public class CustomDetailsHelper
 {
-    public static void validate(ValidationAware action, String pulseFile, ResourceRepository resourceRepository)
+    private int lineNumber;
+    private String line;
+    private int lineOffset;
+
+    public int getLineNumber()
+    {
+        return lineNumber;
+    }
+
+    public String getLine()
+    {
+        return line;
+    }
+
+    public int getLineOffset()
+    {
+        return lineOffset;
+    }
+
+    public void validate(ValidationAware action, String pulseFile, ResourceRepository resourceRepository)
     {
         if(!TextUtils.stringSet(pulseFile))
         {
@@ -32,9 +51,11 @@ public class CustomDetailsHelper
             action.addActionError(pe.getMessage());
             if(pe.getLine() > 0)
             {
-                String line = StringUtils.getLine(pulseFile, pe.getLine());
+                line = StringUtils.getLine(pulseFile, pe.getLine());
                 if(line != null)
                 {
+                    lineNumber = pe.getLine();
+                    lineOffset = StringUtils.getLineOffset(pulseFile, lineNumber);
                     action.addActionError("First line of offending element: " + line);
                 }
             }

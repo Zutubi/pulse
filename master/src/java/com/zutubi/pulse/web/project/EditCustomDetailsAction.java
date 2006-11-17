@@ -12,6 +12,7 @@ import com.zutubi.pulse.xwork.interceptor.Preparable;
 public class EditCustomDetailsAction extends AbstractEditDetailsAction implements Preparable
 {
     private CustomPulseFileDetails details = new CustomPulseFileDetails();
+    private CustomDetailsHelper detailsHelper = new CustomDetailsHelper();
     private ResourceRepository resourceRepository;
 
     public void prepare()
@@ -24,6 +25,11 @@ public class EditCustomDetailsAction extends AbstractEditDetailsAction implement
         return details;
     }
 
+    public CustomDetailsHelper getDetailsHelper()
+    {
+        return detailsHelper;
+    }
+
     public void validate()
     {
         super.validate();
@@ -32,7 +38,7 @@ public class EditCustomDetailsAction extends AbstractEditDetailsAction implement
             return;
         }
 
-        CustomDetailsHelper.validate(this, details.getPulseFile(), resourceRepository);
+        detailsHelper.validate(this, details.getPulseFile(), resourceRepository);
     }
 
     public void setResourceRepository(ResourceRepository resourceRepository)

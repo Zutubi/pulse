@@ -423,3 +423,22 @@ function showHideBuildsFloat(id)
         window.style.display = 'none';
     }
 }
+
+// Selects the given range of text in a text area
+function setSelectionRange(id, start, end)
+{
+    var t = getElement(id);
+    if(t.setSelectionRange)
+    {
+        // FF
+        t.setSelectionRange(start, end);
+    }
+    else if(t.createTextRange)
+    {
+        // IE
+        var r = t.createTextRange();
+        r.move("character", start);
+        r.moveEnd("character", end - start);
+        r.select();
+    }
+}

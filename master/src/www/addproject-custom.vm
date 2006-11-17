@@ -4,11 +4,11 @@
 <html>
 <head>
     <title>#wwtext("name=add.project")</title>
+    #customErrorsScript("custom.setup_details_pulseFile" $detailsHelper)
 </head>
 <body>
     <div id="pagecontent">
     <h1>:: #wwtext("name=add.project") ::</h1>
-
 
 <table class="columns">
     <tr><td class="columns" width="100%">

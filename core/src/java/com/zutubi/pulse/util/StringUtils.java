@@ -237,6 +237,36 @@ public class StringUtils
         }
     }
 
+    public static int getLineOffset(String s, int line)
+    {
+        s = s.replace("\r\n", "\n");
+        s = s.replace("\r", "\n");
+
+        int currentLine = 1;
+        for(int i = 0; i < s.length(); i++)
+        {
+            if(currentLine == line)
+            {
+                return i;
+            }
+
+            if(s.charAt(i) == '\r')
+            {
+                currentLine++;
+                if(i + 1 < s.length() && s.charAt(i + 1) == '\n')
+                {
+                    i++;
+                }
+            }
+            else if(s.charAt(i) == '\n')
+            {
+                currentLine++;
+            }
+        }
+
+        return -1;
+    }
+
     /**
      * Splits the given string at spaces, allowing use of quoting to override
      * spaces (i.e. foo bar is split into [foo, bar] but "foo bar" gives

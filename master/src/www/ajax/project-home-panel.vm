@@ -9,7 +9,7 @@
 
         #if($currentBuild)
             #showBuild($currentBuild true false)
-            #buildTableColumns($columns "project.summary")            
+            #buildTableColumns($summaryColumns "project.summary")            
         #else
             <p>
                 #wwtext("name=never.built")

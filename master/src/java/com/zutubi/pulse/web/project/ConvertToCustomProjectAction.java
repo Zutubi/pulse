@@ -13,6 +13,7 @@ public class ConvertToCustomProjectAction extends ProjectActionSupport
 {
     private long id;
     private CustomPulseFileDetails details = new CustomPulseFileDetails();
+    private CustomDetailsHelper detailsHelper = new CustomDetailsHelper();
     private Project project;
     private ResourceRepository resourceRepository;
 
@@ -29,6 +30,11 @@ public class ConvertToCustomProjectAction extends ProjectActionSupport
     public CustomPulseFileDetails getDetails()
     {
         return details;
+    }
+
+    public CustomDetailsHelper getDetailsHelper()
+    {
+        return detailsHelper;
     }
 
     public Project getProject()
@@ -60,7 +66,7 @@ public class ConvertToCustomProjectAction extends ProjectActionSupport
             return;
         }
 
-        CustomDetailsHelper.validate(this, details.getPulseFile(), resourceRepository);
+        detailsHelper.validate(this, details.getPulseFile(), resourceRepository);
     }
 
     public String execute()

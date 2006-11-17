@@ -49,6 +49,13 @@ public class ParseException extends PulseException
         this.column = column;
     }
 
+    public ParseException(int line, int column, Throwable cause)
+    {
+        super(cause);
+        this.line = line;
+        this.column = column;
+    }
+
     public int getLine()
     {
         return line;

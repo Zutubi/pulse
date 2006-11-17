@@ -1679,7 +1679,7 @@
     #end
     </table>
 
-    #buildTableColumns($columns "project.recent")
+    #buildTableColumns($recentColumns "project.recent")
 #end
 
 #macro( contactPointIcon $contact)
@@ -2401,4 +2401,21 @@
             </tr>
         </table>
     </div>
+#end
+
+##
+## A script to highlight errors when editing custom project details.
+##
+#macro(customErrorsScript $id $detailsHelper)
+    <script type="text/javascript">
+#if($detailsHelper.line && $detailsHelper.lineOffset >= 0)
+    #set($endOffset = $detailsHelper.lineOffset + $detailsHelper.line.length())
+        function select()
+        {
+            setSelectionRange("$id", $detailsHelper.lineOffset, $endOffset);
+        }
+
+        window.onload = select;
+#end
+    </script>
 #end
