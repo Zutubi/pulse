@@ -59,7 +59,7 @@
         <tr>
             #ownerCell($buildResult "content")
             <td class="content"><a href="currentBuild.action?id=$project.id">$!webwork.htmlEncode($project.name)</a></td>
-            <td class="content-right"><a href="viewBuild.action?id=$buildResult.id">$buildResult.number</a></td>
+            #dynamicRightLinkCell($buildResult.number "viewBuild.action?id=$buildResult.id")
             #classCell($buildResult.buildSpecification)
             #statusCell($buildResult true)
             #dateClassCell($buildResult)

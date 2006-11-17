@@ -47,9 +47,8 @@
             <td class="content"><a href="currentBuild.action?id=$result.project.id">$!webwork.htmlEncode($result.project.name)</a></td>
 
             #set($result = $latestBuilds.get($index))
-            #set($cssClass = $result.state.string)
 
-            <td class="content-right"><a href="viewBuild.action?id=$result.id">$result.number</a></td>
+            #dynamicRightLinkCell($result.number "viewBuild.action?id=$result.id")
             #classCell($result.buildSpecification)
             #statusCell($result true)
         </tr>
@@ -69,7 +68,7 @@
     $action.updateUrls($file)
         <tr>
             #dynamicCell($file.filename)
-            #rightCell($file.revision.revisionString)
+            #dynamicRightLinkCell($file.revision.revisionString $action.getFileViewUrl())
             #dynamicCell($file.action.toString().toLowerCase())
 #if($action.haveChangeViewer())
             <td class="content">

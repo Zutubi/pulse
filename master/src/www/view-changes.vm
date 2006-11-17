@@ -60,15 +60,7 @@
         </tr>
         #set($url = $action.getChangeUrl($project, $change.revision))
         <tr>
-            <td class="content-right">
-        #if($url)
-                <a href="$url">
-        #end
-                    $change.revision
-        #if($url)
-                </a>
-        #end
-             </td>
+            #dynamicRightLinkCell($change.revision $url)
             #dynamicCell($change.user)
             #dateCell($change)
             #commitCommentCell($change "changes")

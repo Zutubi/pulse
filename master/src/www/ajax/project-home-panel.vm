@@ -36,15 +36,7 @@
                 #set($index = $velocityCount - 1)
                 $action.updateChangeUrl($project, $changelist.revision)
                 <tr>
-                    <td class="content-right">
-                #if($action.getChangeUrl())
-                        <a href="$action.getChangeUrl()">
-                #end
-                            $changelist.revision
-                #if($action.getChangeUrl())
-                        </a>
-                #end
-                    </td>
+                    #dynamicRightLinkCell($changelist.revision $action.getChangeUrl())
                     #dynamicCell($changelist.user)
                     #dateCell($changelist)
                     #commitCommentCell($changelist "project")
