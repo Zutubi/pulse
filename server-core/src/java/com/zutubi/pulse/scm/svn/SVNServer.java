@@ -3,7 +3,9 @@ package com.zutubi.pulse.scm.svn;
 import com.zutubi.pulse.core.model.*;
 import com.zutubi.pulse.filesystem.remote.RemoteFile;
 import com.zutubi.pulse.scm.*;
+import com.zutubi.pulse.util.FileSystemUtils;
 import com.zutubi.pulse.util.IOUtils;
+import com.zutubi.pulse.util.StringUtils;
 import com.zutubi.pulse.util.logging.Logger;
 import org.tmatesoft.svn.core.*;
 import org.tmatesoft.svn.core.auth.ISVNAuthenticationManager;
@@ -13,10 +15,7 @@ import org.tmatesoft.svn.core.io.SVNRepository;
 import org.tmatesoft.svn.core.io.SVNRepositoryFactory;
 import org.tmatesoft.svn.core.wc.*;
 
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
+import java.io.*;
 import java.util.*;
 
 /**
@@ -29,9 +28,18 @@ public class SVNServer implements SCMServer
     private static final Logger LOG = Logger.getLogger(SCMServer.class);
     private static final int CHECKOUT_RETRIES = 1;
 
+    /**
+     * A list of paths within the main repository for which we will check the
+     * svn:externals property.  If any externals are set to paths within the
+     * *same* repository, they will be taken into account in checkout, update
+     * and change checking operations.
+     */
+    private List<String> externalsPaths = new LinkedList<String>();
+    private boolean verifyExternals = true;
     private List<String> excludedPaths;
     private SVNRepository repository;
-    ISVNAuthenticationManager authenticationManager;
+    private ISVNAuthenticationManager authenticationManager;
+    private String uid;
 
     //=======================================================================
     // Implementation
@@ -77,13 +85,13 @@ public class SVNServer implements SCMServer
     {
         switch (type)
         {
-            case 'A':
+            case'A':
                 return Change.Action.ADD;
-            case 'D':
+            case'D':
                 return Change.Action.DELETE;
-            case 'M':
+            case'M':
                 return Change.Action.EDIT;
-            case 'R':
+            case'R':
                 return Change.Action.MOVE;
             default:
                 return Change.Action.UNKNOWN;
@@ -104,7 +112,7 @@ public class SVNServer implements SCMServer
 
         try
         {
-            repository = SVNRepositoryFactory.create(SVNURL.parseURIEncoded(url));
+            repository = SVNRepositoryFactory.create(SVNURL.parseURIDecoded(url));
             repository.setAuthenticationManager(authenticationManager);
         }
         catch (SVNException e)
@@ -209,6 +217,16 @@ public class SVNServer implements SCMServer
         this.excludedPaths = excludedPaths;
     }
 
+    public void addExternalPath(String path)
+    {
+        externalsPaths.add(path);
+    }
+
+    public void setVerifyExternals(boolean verifyExternals)
+    {
+        this.verifyExternals = verifyExternals;
+    }
+
     //=======================================================================
     // SCMServer interface
     //=======================================================================
@@ -224,14 +242,19 @@ public class SVNServer implements SCMServer
 
     public String getUid() throws SCMException
     {
-        String id = repository.getRepositoryUUID();
-        if(id == null)
+        if (uid == null)
         {
-            // We have to connect to the server to get the id.
-            testConnection();
-            id = repository.getRepositoryUUID();
+            try
+            {
+                uid = repository.getRepositoryUUID(true);
+            }
+            catch (SVNException e)
+            {
+                throw convertException(e);
+            }
         }
-        return id;
+
+        return uid;
     }
 
     public String getLocation()
@@ -273,6 +296,7 @@ public class SVNServer implements SCMServer
         try
         {
             updateClient.doCheckout(repository.getLocation(), toDirectory, svnRevision, svnRevision, true);
+            updateExternals(toDirectory, revision, updateClient, handler);
         }
         catch (SVNException e)
         {
@@ -280,6 +304,25 @@ public class SVNServer implements SCMServer
         }
 
         return new NumericalRevision(svnRevision.getNumber());
+    }
+
+    private void updateExternals(File toDirectory, Revision revision, SVNUpdateClient client, SCMCheckoutEventHandler handler) throws SCMException
+    {
+        List<ExternalDefinition> externals = getExternals(revision);
+        for (ExternalDefinition external : externals)
+        {
+            if (handler != null)
+            {
+                handler.status("Processing external '" + external.path + "'");
+            }
+
+            update(new File(toDirectory, FileSystemUtils.denormaliseSeparators(external.path)), convertRevision(revision), client);
+
+            if (handler != null)
+            {
+                handler.status("External updated to revision " + revision.getRevisionString());
+            }
+        }
     }
 
     public String checkout(Revision revision, String file) throws SCMException
@@ -298,14 +341,13 @@ public class SVNServer implements SCMServer
         return os.toString();
     }
 
-    public List<Changelist> getChanges(Revision from, Revision to, String ...paths) throws SCMException
+    private boolean reportChanges(ChangeHandler handler, Revision from, Revision to, String... paths) throws SCMException
     {
-        if(to == null)
+        if (to == null)
         {
             to = getLatestRevision();
         }
-        
-        List<Changelist>  result = new LinkedList<Changelist>();
+
         long fromNumber = convertRevision(from).getNumber() + 1;
         long toNumber = convertRevision(to).getNumber();
 
@@ -313,35 +355,19 @@ public class SVNServer implements SCMServer
         {
             try
             {
-                List<SVNLogEntry> logs = new LinkedList<SVNLogEntry>();
-                FilepathFilter filter = new ScmFilepathFilter(excludedPaths);
-
-                repository.log(paths, logs, fromNumber, toNumber, true, true);
-                for (SVNLogEntry entry : logs)
+                if (log(repository, fromNumber, toNumber, handler, paths))
                 {
-                    NumericalRevision revision = new NumericalRevision(entry.getRevision());
-                    revision.setAuthor(entry.getAuthor());
-                    revision.setComment(entry.getMessage());
-                    revision.setDate(entry.getDate());
-                    // branch??
+                    return true;
+                }
 
-                    Changelist list = new Changelist(getUid(), revision);
-                    FileRevision fileRevision = new NumericalFileRevision(((NumericalRevision)list.getRevision()).getRevisionNumber());
-
-                    Map files = entry.getChangedPaths();
-
-                    for (Object value : files.values())
+                List<ExternalDefinition> externals = getExternals(to);
+                for (ExternalDefinition external : externals)
+                {
+                    SVNRepository repo = SVNRepositoryFactory.create(external.url);
+                    repo.setAuthenticationManager(authenticationManager);
+                    if (log(repo, fromNumber, toNumber, handler, paths))
                     {
-                        SVNLogEntryPath entryPath = (SVNLogEntryPath) value;
-                        if (filter.accept(entryPath.getPath()))
-                        {
-                            list.addChange(new Change(entryPath.getPath(), fileRevision, decodeAction(entryPath.getType())));
-                        }
-                    }
-
-                    if (list.getChanges().size() > 0)
-                    {
-                        result.add(list);
+                        return true;
                     }
                 }
             }
@@ -351,7 +377,129 @@ public class SVNServer implements SCMServer
             }
         }
 
+        handler.complete();
+        return false;
+    }
+
+    private boolean log(SVNRepository repository, long fromNumber, long toNumber, ChangeHandler handler, String... paths) throws SVNException, SCMException
+    {
+        List<SVNLogEntry> logs = new LinkedList<SVNLogEntry>();
+        FilepathFilter filter = new ScmFilepathFilter(excludedPaths);
+
+        repository.log(paths, logs, fromNumber, toNumber, true, true);
+        for (SVNLogEntry entry : logs)
+        {
+            NumericalRevision revision = new NumericalRevision(entry.getRevision());
+            revision.setAuthor(entry.getAuthor());
+            revision.setComment(entry.getMessage());
+            revision.setDate(entry.getDate());
+            // branch??
+
+            Changelist list = new Changelist(getUid(), revision);
+            handler.handle(list);
+
+            FileRevision fileRevision = new NumericalFileRevision(((NumericalRevision) list.getRevision()).getRevisionNumber());
+
+            Map files = entry.getChangedPaths();
+
+            for (Object value : files.values())
+            {
+                SVNLogEntryPath entryPath = (SVNLogEntryPath) value;
+                if (filter.accept(entryPath.getPath()))
+                {
+                    if (handler.handle(new Change(entryPath.getPath(), fileRevision, decodeAction(entryPath.getType()))))
+                    {
+                        return true;
+                    }
+                }
+            }
+        }
+
+        return false;
+    }
+
+    List<ExternalDefinition> getExternals(Revision revision) throws SCMException
+    {
+        List<ExternalDefinition> result = new LinkedList<ExternalDefinition>();
+        if (externalsPaths.size() > 0)
+        {
+            try
+            {
+                SVNWCClient wcClient = new SVNWCClient(repository.getAuthenticationManager(), null);
+                for (String externalPath : externalsPaths)
+                {
+                    SVNURL url = repository.getLocation().appendPath(externalPath, false);
+                    SVNPropertyData data = wcClient.doGetProperty(url, SVNProperty.EXTERNALS, SVNRevision.HEAD, convertRevision(revision), false);
+                    addExternalsFromProperty(StringUtils.join("/", true, true, externalPath, data.getValue()), result);
+                }
+            }
+            catch (IOException e)
+            {
+                throw new SCMException("I/O error checking externals: " + e.getMessage(), e);
+            }
+            catch (SVNException e)
+            {
+                throw convertException(e);
+            }
+        }
+
         return result;
+    }
+
+    private void addExternalsFromProperty(String value, List<ExternalDefinition> externals) throws IOException, SVNException
+    {
+        BufferedReader reader = new BufferedReader(new StringReader(value));
+        String line;
+        while ((line = reader.readLine()) != null)
+        {
+            line = line.trim();
+            if (line.length() == 0 || line.startsWith("#"))
+            {
+                continue;
+            }
+
+            String[] parts = line.split("\\s+");
+            if (parts.length == 2)
+            {
+                // Restriciting to 2 parts means we ignore fixed revision
+                // externals (as intended).
+                ExternalDefinition external = new ExternalDefinition(parts[0], parts[1]);
+
+                if (verifyExternals)
+                {
+                    SVNRepository repo = SVNRepositoryFactory.create(external.url);
+                    repo.setAuthenticationManager(authenticationManager);
+
+                    try
+                    {
+                        String uid = repo.getRepositoryUUID(true);
+                        if (uid.equals(getUid()))
+                        {
+                            externals.add(external);
+                        }
+                        else
+                        {
+                            LOG.warning("Ignoring external at URL '" + external.url.toDecodedString() + "': UID does not match");
+                        }
+                    }
+                    catch (Exception e)
+                    {
+                        LOG.warning("Ignoring external at URL '" + external.url.toDecodedString() + "'", e);
+                    }
+                }
+                else
+                {
+                    externals.add(external);
+                }
+            }
+        }
+    }
+
+    public List<Changelist> getChanges(Revision from, Revision to, String... paths) throws SCMException
+    {
+        ChangelistAccumulator accumulator = new ChangelistAccumulator();
+        reportChanges(accumulator, from, to, paths);
+        return accumulator.getChangelists();
     }
 
     public List<Revision> getRevisionsSince(Revision from) throws SCMException
@@ -366,7 +514,7 @@ public class SVNServer implements SCMServer
         });
 
         List<Revision> result = new LinkedList<Revision>();
-        for(Changelist change: changes)
+        for (Changelist change : changes)
         {
             result.add(change.getRevision());
         }
@@ -379,7 +527,9 @@ public class SVNServer implements SCMServer
         NumericalRevision latestRevision = getLatestRevision();
         if (latestRevision.getRevisionNumber() != ((NumericalRevision) since).getRevisionNumber())
         {
-            return getChanges(since, latestRevision, "").size() > 0;
+            ChangeDetector detector = new ChangeDetector();
+            reportChanges(detector, since, latestRevision, "");
+            return detector.isChanged();
         }
         else
         {
@@ -476,15 +626,20 @@ public class SVNServer implements SCMServer
         }
 
         SVNUpdateClient client = new SVNUpdateClient(authenticationManager, null);
-
-        if(handler != null)
+        if (handler != null)
         {
             client.setEventHandler(new ChangeEventHandler(handler));
         }
 
+        update(workDir, convertRevision(rev), client);
+        updateExternals(workDir, rev, client, handler);
+    }
+
+    private void update(File workDir, SVNRevision rev, SVNUpdateClient client) throws SCMException
+    {
         try
         {
-            client.doUpdate(workDir, convertRevision(rev), true);
+            client.doUpdate(workDir, rev, true);
         }
         catch (SVNException e)
         {
@@ -518,15 +673,15 @@ public class SVNServer implements SCMServer
     {
         try
         {
-            SVNURL svnUrl = SVNURL.parseURIEncoded(name);
+            SVNURL svnUrl = SVNURL.parseURIDecoded(name);
 
-            if(pathExists(revision, svnUrl))
+            if (pathExists(revision, svnUrl))
             {
-                if(moveExisting)
+                if (moveExisting)
                 {
                     // Delete existing path
                     SVNCommitClient commitClient = new SVNCommitClient(authenticationManager, null);
-                    commitClient.doDelete(new SVNURL[]{ svnUrl }, "[pulse] deleting old tag");
+                    commitClient.doDelete(new SVNURL[] { svnUrl }, "[pulse] deleting old tag");
                 }
                 else
                 {
@@ -568,7 +723,7 @@ public class SVNServer implements SCMServer
     public FileRevision getFileRevision(String path, Revision repoRevision)
     {
         // Subversion does not distinguish between file and repo revisions
-        return new NumericalFileRevision(((NumericalRevision)repoRevision).getRevisionNumber());
+        return new NumericalFileRevision(((NumericalRevision) repoRevision).getRevisionNumber());
     }
 
     //=======================================================================
@@ -618,20 +773,20 @@ public class SVNServer implements SCMServer
             Change.Action action = null;
 
             SVNEventAction svnAction = event.getAction();
-            if(svnAction == SVNEventAction.UPDATE_ADD)
+            if (svnAction == SVNEventAction.UPDATE_ADD)
             {
                 action = Change.Action.ADD;
             }
-            else if(svnAction == SVNEventAction.UPDATE_DELETE)
+            else if (svnAction == SVNEventAction.UPDATE_DELETE)
             {
                 action = Change.Action.DELETE;
             }
-            else if(svnAction == SVNEventAction.UPDATE_UPDATE)
+            else if (svnAction == SVNEventAction.UPDATE_UPDATE)
             {
                 action = Change.Action.EDIT;
             }
 
-            if(action != null)
+            if (action != null)
             {
                 handler.fileCheckedOut(new Change(event.getPath(), null, action));
             }
@@ -643,11 +798,101 @@ public class SVNServer implements SCMServer
             {
                 handler.checkCancelled();
             }
-            catch(SCMCancelledException e)
+            catch (SCMCancelledException e)
             {
                 throw new SVNCancelException();
             }
         }
     }
 
+    private interface ChangeHandler
+    {
+        void handle(Changelist list);
+
+        boolean handle(Change change);
+
+        void complete();
+    }
+
+    private class ChangelistAccumulator implements ChangeHandler
+    {
+        private List<Changelist> changelists = new LinkedList<Changelist>();
+        private Changelist current;
+
+        public List<Changelist> getChangelists()
+        {
+            return changelists;
+        }
+
+        public void handle(Changelist list)
+        {
+            checkCurrent();
+            current = list;
+        }
+
+        public boolean handle(Change change)
+        {
+            current.addChange(change);
+            return false;
+        }
+
+        public void complete()
+        {
+            checkCurrent();
+        }
+
+        private void checkCurrent()
+        {
+            if (current != null && current.getChanges().size() > 0)
+            {
+                String currentRevision = current.getRevision().getRevisionString();
+                for (Changelist list : changelists)
+                {
+                    if (list.getRevision().getRevisionString().equals(currentRevision))
+                    {
+                        // We have already seen this log entry in another external
+                        return;
+                    }
+                }
+
+                changelists.add(current);
+            }
+        }
+    }
+
+    private class ChangeDetector implements ChangeHandler
+    {
+        private boolean changed = false;
+
+        public boolean isChanged()
+        {
+            return changed;
+        }
+
+        public void handle(Changelist list)
+        {
+        }
+
+        public boolean handle(Change change)
+        {
+            changed = true;
+            return true;
+        }
+
+        public void complete()
+        {
+        }
+    }
+
+    class ExternalDefinition
+    {
+        String path;
+        SVNURL url;
+
+        public ExternalDefinition(String path, String url) throws SVNException
+        {
+            this.path = path;
+            this.url = SVNURL.parseURIDecoded(url);
+        }
+    }
 }

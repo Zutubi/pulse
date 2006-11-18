@@ -23,12 +23,16 @@
     #inlineHelp("svn.keyfile.help")
     #wwpassword("name=svn.passphrase" "label=%{getText('svn.passphrase')}" "showPassword=true" "tabindex=5")
     #inlineHelp("svn.passphrase.help")
-    #wwcheckbox("name=monitor" "label=%{getText('scm.monitor')}" "tabindex=6")
-    #wwtextfield("name=svn.pollingInterval" "label=%{getText('scm.polling.interval')}" "tabindex=7")
+    #wwtextfield("name=svn.externalPaths" "label=%{getText('svn.external.paths')}" "size=60" "tabindex=6")
+    #inlineHelp("svn.external.paths.help")
+    #wwcheckbox("name=verifyExternals" "label=%{getText('svn.verify.externals')}" "tabindex=7")
+    #inlineHelp("svn.verify.externals.help")
+    #wwcheckbox("name=monitor" "label=%{getText('scm.monitor')}" "tabindex=8")
+    #wwtextfield("name=svn.pollingInterval" "label=%{getText('scm.polling.interval')}" "tabindex=9")
 
     #testSettingsRow()
 
-    #saveCancel(9)
+    #saveCancel(10)
  #end
 
      #tabEnd()

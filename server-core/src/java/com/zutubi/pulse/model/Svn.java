@@ -6,6 +6,7 @@ import com.zutubi.pulse.scm.SCMException;
 import com.zutubi.pulse.scm.SCMServer;
 import com.zutubi.pulse.scm.svn.SVNServer;
 import com.zutubi.pulse.scm.svn.SvnConstants;
+import com.zutubi.pulse.util.StringUtils;
 
 import java.util.Map;
 import java.util.TreeMap;
@@ -42,7 +43,18 @@ public class Svn extends Scm
                 server = new SVNServer(getUrl(), getUsername(), getPassword(), getKeyfile());
             }
         }
+        
         server.setExcludedPaths(this.getFilteredPaths());
+        if(TextUtils.stringSet(getExternalPaths()))
+        {
+            for(String path: StringUtils.split(getExternalPaths()))
+            {
+                server.addExternalPath(path);
+            }
+        }
+
+
+        server.setVerifyExternals(getVerifyExternals());
         return server;
     }
 
@@ -106,5 +118,25 @@ public class Svn extends Scm
     public void setPassphrase(String passphrase)
     {
         getProperties().put(SvnConstants.PROPERTY_PASSPHRASE, passphrase);
+    }
+
+    public String getExternalPaths()
+    {
+        return getProperties().getProperty(SvnConstants.PROPERTY_EXTERNAL_PATHS);
+    }
+
+    public void setExternalPaths(String paths)
+    {
+        getProperties().setProperty(SvnConstants.PROPERTY_EXTERNAL_PATHS, paths);
+    }
+
+    public boolean getVerifyExternals()
+    {
+        return Boolean.valueOf(getProperties().getProperty(SvnConstants.PROPERTY_VERIFY_EXTERNALS, "true"));
+    }
+
+    public void setVerifyExternals(boolean verify)
+    {
+        getProperties().setProperty(SvnConstants.PROPERTY_VERIFY_EXTERNALS, Boolean.toString(verify));
     }
 }
