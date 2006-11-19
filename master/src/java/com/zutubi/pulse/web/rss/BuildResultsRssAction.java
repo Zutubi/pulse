@@ -452,7 +452,7 @@ public class BuildResultsRssAction extends ProjectActionSupport
         }
     }
 
-    private List<SyndEntry> fetch(String key, List<Long> ids, SyndFeedEntryFactory factory)
+    private synchronized List<SyndEntry> fetch(String key, List<Long> ids, SyndFeedEntryFactory factory)
     {
         Cache cache = cacheManager.getCache("BuildResultsRss");
         LinkedList<CacheEntry> entries = (LinkedList<CacheEntry>) cache.get(key);
