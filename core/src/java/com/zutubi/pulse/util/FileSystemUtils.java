@@ -6,6 +6,8 @@ import com.zutubi.pulse.util.logging.Logger;
 import java.io.*;
 import java.net.URLConnection;
 import java.util.Arrays;
+import java.util.List;
+import java.util.LinkedList;
 import java.util.zip.CRC32;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
@@ -47,9 +49,10 @@ public class FileSystemUtils
      * Recursively delete a directory and its contents.
      *
      * @param dir the directory to delete
-     * @return true iff the whole directory was successfully delete
+     * 
+     * @return true iff the whole directory was successfully deleted
      */
-    public static boolean removeDirectory(File dir)
+    public static boolean rmdir(File dir)
     {
         if (dir == null)
         {
@@ -59,6 +62,11 @@ public class FileSystemUtils
         if (!dir.exists())
         {
             return true;
+        }
+
+        if (dir.isFile())
+        {
+            throw new IllegalArgumentException(String.format("removeDirectory can only be used on directories. %s is not a directory.", dir));
         }
 
         if (!dir.isDirectory())
@@ -103,7 +111,7 @@ public class FileSystemUtils
                 // path for the directory too).
                 if (file.isDirectory() && canonicalFile.startsWith(canonicalDir))
                 {
-                    if (!removeDirectory(file))
+                    if (!rmdir(file))
                     {
                         return false;
                     }
@@ -125,7 +133,7 @@ public class FileSystemUtils
     {
         if (output.isDirectory())
         {
-            if (!FileSystemUtils.removeDirectory(output))
+            if (!FileSystemUtils.rmdir(output))
             {
                 throw new IOException("Unable to remove existing output directory '" + output.getPath() + "'");
             }
@@ -144,34 +152,34 @@ public class FileSystemUtils
      * @return a File object for the created directory
      * @throws IOException if the directory cannot be created
      */
-    public static File createTempDirectory() throws IOException
+    public static File createTempDir() throws IOException
     {
-        return createTempDirectory("dir", null);
+        return createTempDir("dir", null);
     }
 
-    public static File createTempDirectory(String prefix, String suffix) throws IOException
+    public static File createTempDir(String prefix, String suffix) throws IOException
     {
-        return createTempDirectory(prefix, suffix, null);
+        return createTempDir(prefix, suffix, null);
     }
 
-    public static File createTempDirectory(String prefix, String suffix, File base) throws IOException
+    public static File createTempDir(String prefix, String suffix, File base) throws IOException
     {
         if (base != null && !base.exists() && !base.mkdirs())
         {
-            throw new IOException();
+            throw new IOException("Failed to create temporary directory. Base directory does not exist: " + base.getAbsolutePath());
         }
         File file = File.createTempFile(prefix, suffix, base);
         if (!file.exists())
         {
-            throw new IOException();
+            throw new IOException("Failed to create temporary directory. Reason: File.createTempFile failed.");
         }
         if (!file.delete())
         {
-            throw new IOException();
+            throw new IOException("Failed to create temporary directory. Reason: tmpFile.delete failed.");
         }
         if (!file.mkdirs())
         {
-            throw new IOException();
+            throw new IOException("Failed to create temporary directory. Reason: tmpDir.mkdirs failed.");
         }
         return file;
     }
@@ -182,13 +190,13 @@ public class FileSystemUtils
         {
             if (!file.isDirectory())
             {
-                throw new IOException("Can not create directory. File '" + file + "' already exists.");
+                throw new IOException(String.format("Can not create directory. File '%s' already exists.", file));
             }
             return;
         }
         if (!file.mkdirs())
         {
-            throw new IOException("Failed to create directory '" + file + "'");
+            throw new IOException(String.format("Failed to create directory '%s'", file));
         }
     }
 
@@ -251,7 +259,7 @@ public class FileSystemUtils
             }
             else
             {
-                LOG.warning("Unable to get permissions for '" + file.getAbsolutePath() + "': stat exited with code " + exitCode);
+                LOG.warning("Unable to get permissions for '%s': stat exited with code %s", file.getAbsolutePath(), exitCode);
             }
         }
         catch (Exception e)
@@ -275,7 +283,7 @@ public class FileSystemUtils
      *
      * @param file        the file to set permissions on
      * @param permissions the permissions to set, as encoded by
- *                    {@link #getPermissions(java.io.File)}
+     *                    {@link #getPermissions(java.io.File)}
      * @return true if the operation succeeded
      */
     public static boolean setPermissions(File file, int permissions)
@@ -601,16 +609,25 @@ public class FileSystemUtils
     }
 
     /**
+     *
      * @param src  source file
      * @param dest detination file
      * @param force delete the destination directory if it already exists before renaming.
+     *
      * @return true if the rename was successful, false otherwise.
      */
     public static boolean rename(File src, File dest, boolean force)
     {
-        if (dest.exists() && force)
+        if (force && dest.exists())
         {
-            removeDirectory(dest);
+            if(dest.isDirectory())
+            {
+                rmdir(dest);
+            }
+            else
+            {
+                dest.delete();
+            }
         }
 
         return src.renameTo(dest);
@@ -713,32 +730,12 @@ public class FileSystemUtils
 
     public static String composeFilename(String... parts)
     {
-        return composeParts(File.separatorChar, parts);
+        return StringUtils.join(File.separator, parts);
     }
 
     public static String composeSearchPath(String ...parts)
     {
-        return composeParts(File.pathSeparatorChar, parts);        
-    }
-
-    private static String composeParts(char separatorChar, String... parts)
-    {
-        String result = "";
-        boolean first = true;
-
-        for (String part : parts)
-        {
-            if (first)
-            {
-                first = false;
-                result = part;
-            }
-            else
-            {
-                result = result + separatorChar + part;
-            }
-        }
-        return result;
+        return StringUtils.join(File.pathSeparator, parts);
     }
 
     public static String normaliseSeparators(String path)
@@ -780,87 +777,6 @@ public class FileSystemUtils
         }
     }
 
-    public static void copyRecursively(File from, File to) throws IOException
-    {
-        if (!SystemUtils.IS_WINDOWS && SystemUtils.findInPath("cp") != null)
-        {
-            // Use the Unix cp command because it:
-            //   - preserves permissions; and
-            //   - is likely to be faster when it matters (i.e. large copy)
-            String flags = "-p";
-            if (from.isDirectory())
-            {
-                if (to.exists())
-                {
-                    if (to.isDirectory())
-                    {
-                        if (!removeDirectory(to))
-                        {
-                            throw new IOException("Cannot remove existing directory '" + to.getAbsolutePath() + "'");
-                        }
-                    }
-                    else
-                    {
-                        if (!to.delete())
-                        {
-                            throw new IOException("Cannot remove existing file '" + to.getAbsolutePath() + "'");
-                        }
-                    }
-                }
-
-                flags += "r";
-            }
-
-            Process child = Runtime.getRuntime().exec(new String[] { "cp", flags, from.getAbsolutePath(), to.getAbsolutePath() });
-            try
-            {
-                int exit = child.waitFor();
-                if (exit != 0)
-                {
-                    // Attempt to copy ourselves.
-                    LOG.info("Copy using cp from '" + from.getAbsolutePath() + "' to '" + to.getAbsolutePath() + "' failed, trying internal copy");
-                    removeDirectory(to);
-                    internalCopy(from, to);
-                }
-            }
-            catch (InterruptedException e)
-            {
-                IOException ioe = new IOException("Interrupted while copying from '" + from.getAbsolutePath() + "' to '" + to.getAbsolutePath() + "'");
-                ioe.initCause(e);
-                throw ioe;
-            }
-        }
-        else
-        {
-            internalCopy(from, to);
-        }
-    }
-
-    // WARNING: will not handle recursive symlinks
-    private static void internalCopy(File from, File to) throws IOException
-    {
-        if (from.isDirectory())
-        {
-            ensureDirectory(to);
-
-            for (String file : from.list())
-            {
-                internalCopy(new File(from, file), new File(to, file));
-            }
-        }
-        else
-        {
-            IOUtils.copyFile(from, to);
-        }
-    }
-
-    private static void ensureDirectory(File to) throws IOException
-    {
-        if (!to.isDirectory() && !to.mkdirs())
-        {
-            throw new IOException("Unable to create destination directory '" + to.getAbsolutePath() + "'");
-        }
-    }
 
     /**
      * This method returns true if the specified file is the root of a file system.
@@ -1070,6 +986,151 @@ public class FileSystemUtils
             {
                 tempFile.delete();
             }
+        }
+    }
+
+    // WARNING: will not handle recursive symlinks
+    public static void copy(File dest, File... src) throws IOException
+    {
+        if (!SystemUtils.IS_WINDOWS && SystemUtils.findInPath("cp") != null)
+        {
+            unixCopy(dest, src);
+        }
+        else
+        {
+            javaCopy(dest, src);
+        }
+    }
+
+    private static void unixCopy(File to, File... from) throws IOException
+    {
+        // Use the Unix cp command because it:
+        //   - preserves permissions; and
+        //   - is likely to be faster when it matters (i.e. large copy)
+        String flags = "-p";
+        if (from.length == 1 && from[0].isDirectory())
+        {
+            if (to.exists())
+            {
+                if (to.isDirectory())
+                {
+                    if (!rmdir(to))
+                    {
+                        throw new IOException("Cannot remove existing directory '" + to.getAbsolutePath() + "'");
+                    }
+                }
+                else
+                {
+                    if (!to.delete())
+                    {
+                        throw new IOException("Cannot remove existing file '" + to.getAbsolutePath() + "'");
+                    }
+                }
+            }
+            flags += "r";
+        }
+
+        List<String> argsList = new LinkedList<String>();
+        argsList.add("cp");
+        argsList.add(flags);
+        for (File f : from)
+        {
+            argsList.add(f.getAbsolutePath());
+        }
+        argsList.add(to.getAbsolutePath());
+
+        String[] args = argsList.toArray(new String[argsList.size()]);
+
+        Process child = Runtime.getRuntime().exec(args);
+        try
+        {
+            int exit = child.waitFor();
+            if (exit != 0)
+            {
+                // Attempt to copy ourselves.
+                LOG.info("Copy using '"+StringUtils.join(" ", args)+"' failed, trying internal copy");
+                rmdir(to);
+                javaCopy(to, from);
+            }
+        }
+        catch (InterruptedException e)
+        {
+            IOException ioe = new IOException("Interrupted while executing '"+StringUtils.join(" ", args)+"'");
+            ioe.initCause(e);
+            throw ioe;
+        }
+    }
+
+    private static void javaCopy(File dest, File... src)
+            throws IOException
+    {
+        if (dest.isFile())
+        {
+            // fail.
+            throw new IllegalArgumentException(String.format("Copy failed. Can not copy to '%s', it is a file.", dest.getAbsolutePath()));
+        }
+
+        if (src.length == 0)
+        {
+            return;
+        }
+
+        // copy a source file to a destination file.
+        if (src.length == 1 && !dest.exists())
+        {
+            // copy as a file.
+            if (!dest.getParentFile().exists() && !dest.getParentFile().mkdirs())
+            {
+                throw new IOException(String.format("Copy failed. Failed to create dir %s", dest.getParentFile().getAbsolutePath()));
+            }
+            internalCopy(src[0], dest);
+            return;
+        }
+
+        if (src.length == 1 && src[0].isDirectory())
+        {
+            internalCopy(src[0], dest);
+            return;
+        }
+
+        if (!dest.exists() && !dest.mkdirs())
+        {
+            throw new IOException(String.format("Copy failed. Failed to create dir %s", dest.getAbsolutePath()));
+        }
+        for (File f : src)
+        {
+            // copy into dest directory.
+            internalCopy(f, new File(dest, f.getName()));
+        }
+    }
+
+    // WARNING: will not handle recursive symlinks
+    protected static void internalCopy(File src, File dest) throws IOException
+    {
+        if (src.isDirectory())
+        {
+            if (!dest.isDirectory() && !dest.mkdirs())
+            {
+                throw new IOException(String.format("Copy failed. Failed to create dir %s", dest.getAbsolutePath()));
+            }
+
+            for (String file : src.list())
+            {
+                internalCopy(new File(src, file), new File(dest, file));
+            }
+        }
+        else
+        {
+            if (dest.isFile())
+            {
+                // trouble..
+                throw new IOException(String.format("Copy failed. Failed to copy to file %s, it already exists.", dest.getAbsolutePath()));
+            }
+            if (!dest.createNewFile())
+            {
+                throw new IOException(String.format("Copy failed. Failed to create file %s", dest.getAbsolutePath()));
+            }
+            IOUtils.copyFile(src, dest);
         }
     }
 }

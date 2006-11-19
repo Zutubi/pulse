@@ -21,14 +21,14 @@ public class CommandGroupTest extends PulseTestCase
     public void setUp() throws Exception
     {
         super.setUp();
-        baseDirectory = FileSystemUtils.createTempDirectory(ExecutableCommandTest.class.getName(), ".base");
-        outputDirectory = FileSystemUtils.createTempDirectory(ExecutableCommandTest.class.getName(), ".out");
+        baseDirectory = FileSystemUtils.createTempDir(ExecutableCommandTest.class.getName(), ".base");
+        outputDirectory = FileSystemUtils.createTempDir(ExecutableCommandTest.class.getName(), ".out");
     }
 
     public void tearDown() throws Exception
     {
-        FileSystemUtils.removeDirectory(outputDirectory);
-        FileSystemUtils.removeDirectory(baseDirectory);
+        FileSystemUtils.rmdir(outputDirectory);
+        FileSystemUtils.rmdir(baseDirectory);
         super.tearDown();
     }
 

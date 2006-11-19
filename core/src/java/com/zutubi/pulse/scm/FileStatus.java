@@ -370,7 +370,7 @@ public class FileStatus
             File f = new File(base, path);
             if(directory)
             {
-                FileSystemUtils.removeDirectory(f);
+                FileSystemUtils.rmdir(f);
             }
             else
             {

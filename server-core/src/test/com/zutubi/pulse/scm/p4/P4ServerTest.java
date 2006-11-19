@@ -29,7 +29,7 @@ public class P4ServerTest extends PulseTestCase
         super.setUp();
         client = new P4Client();
 
-        tmpDir = FileSystemUtils.createTempDirectory(getClass().getName(), "");
+        tmpDir = FileSystemUtils.createTempDir(getClass().getName(), "");
         repoDir = new File(tmpDir, "repo");
 
         File repoZip = getTestDataFile("server-core", "repo", "zip");

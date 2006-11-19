@@ -47,7 +47,7 @@ public class StartupShutdownAcceptanceTest extends TestCase
         sys.putAll(System.getProperties());
 
         // create a temporary user home.
-        tmpDir = FileSystemUtils.createTempDirectory(getClass().getSimpleName() + ".", "." + getName());
+        tmpDir = FileSystemUtils.createTempDir(getClass().getSimpleName() + ".", "." + getName());
         dataDir = new File(tmpDir, "data");
         configFile = new File(tmpDir, "crazy.config.file.name");
 
@@ -60,7 +60,7 @@ public class StartupShutdownAcceptanceTest extends TestCase
 
     protected void tearDown() throws Exception
     {
-        assertTrue(FileSystemUtils.removeDirectory(tmpDir));
+        assertTrue(FileSystemUtils.rmdir(tmpDir));
         tmpDir = null;
         dataDir = null;
         defaultDataDir = null;

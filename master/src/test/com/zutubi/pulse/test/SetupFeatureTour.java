@@ -414,7 +414,7 @@ public class SetupFeatureTour implements Runnable
         {
             for (RecipeResult recipe: recipes)
             {
-                FileSystemUtils.copyRecursively(f, new File(recipe.getAbsoluteOutputDir(configManager.getDataDirectory()), "base"));
+                FileSystemUtils.copy(new File(recipe.getAbsoluteOutputDir(configManager.getDataDirectory()), "base"), f);
             }
         }
         catch (IOException e)

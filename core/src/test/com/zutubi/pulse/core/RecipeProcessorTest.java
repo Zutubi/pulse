@@ -39,8 +39,8 @@ public class RecipeProcessorTest extends PulseTestCase implements EventListener
     public void setUp() throws Exception
     {
         super.setUp();
-        baseDir = FileSystemUtils.createTempDirectory(getClass().getName(), ".base");
-        outputDir = FileSystemUtils.createTempDirectory(getClass().getName(), ".out");
+        baseDir = FileSystemUtils.createTempDir(getClass().getName(), ".base");
+        outputDir = FileSystemUtils.createTempDir(getClass().getName(), ".out");
         recipeProcessor = new RecipeProcessor();
         eventManager = new DefaultEventManager();
         recipeProcessor.setEventManager(eventManager);

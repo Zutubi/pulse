@@ -19,8 +19,8 @@ public class Maven2CommandTest extends PulseTestCase
 
     public void setUp() throws IOException
     {
-        baseDir = FileSystemUtils.createTempDirectory(getClass().getName(), ".base");
-        outputDir = FileSystemUtils.createTempDirectory(getClass().getName(), ".out");
+        baseDir = FileSystemUtils.createTempDir(getClass().getName(), ".base");
+        outputDir = FileSystemUtils.createTempDir(getClass().getName(), ".out");
     }
 
     public void tearDown() throws IOException
@@ -105,8 +105,8 @@ public class Maven2CommandTest extends PulseTestCase
     private CommandResult runMaven(String inName, Maven2Command command) throws Exception
     {
         File sourceDir = getSource(inName);
-        FileSystemUtils.removeDirectory(baseDir);
-        FileSystemUtils.copyRecursively(sourceDir, baseDir);
+        FileSystemUtils.rmdir(baseDir);
+        FileSystemUtils.copy(baseDir, sourceDir);
 
         // Remove the .in extension from all files
         removeInExtension(baseDir);

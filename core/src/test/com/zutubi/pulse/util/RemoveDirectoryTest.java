@@ -11,7 +11,7 @@ public class RemoveDirectoryTest extends PulseTestCase
 {
     public void testRemoveNonExistant()
     {
-        assertTrue(FileSystemUtils.removeDirectory(new File("/this/directory/does/not/exist")));
+        assertTrue(FileSystemUtils.rmdir(new File("/this/directory/does/not/exist")));
     }
 
     public void testRemoveFile() throws IOException
@@ -22,7 +22,7 @@ public class RemoveDirectoryTest extends PulseTestCase
         try
         {
             FileSystemUtils.createFile(aFile, "some data");
-            assertFalse(FileSystemUtils.removeDirectory(aFile));
+            assertFalse(FileSystemUtils.rmdir(aFile));
         }
         finally
         {
@@ -34,7 +34,7 @@ public class RemoveDirectoryTest extends PulseTestCase
     public void testRemoveEmpty() throws IOException
     {
         File tmpDir = createTmpDir();
-        assertTrue(FileSystemUtils.removeDirectory(tmpDir));
+        assertTrue(FileSystemUtils.rmdir(tmpDir));
         assertFalse(tmpDir.exists());
     }
 
@@ -47,7 +47,7 @@ public class RemoveDirectoryTest extends PulseTestCase
         FileSystemUtils.createFile(aFile, "content");
         FileSystemUtils.createFile(anotherFile, "content");
 
-        assertTrue(FileSystemUtils.removeDirectory(tmpDir));
+        assertTrue(FileSystemUtils.rmdir(tmpDir));
         assertFalse(tmpDir.exists());
         assertFalse(aFile.exists());
         assertFalse(anotherFile.exists());
@@ -66,7 +66,7 @@ public class RemoveDirectoryTest extends PulseTestCase
         File nestedFile = new File(nestedDir, "aFile");
         FileSystemUtils.createFile(nestedFile, "data");
 
-        assertTrue(FileSystemUtils.removeDirectory(tmpDir));
+        assertTrue(FileSystemUtils.rmdir(tmpDir));
         assertFalse(tmpDir.exists());
         assertFalse(nestedDir.exists());
     }
@@ -79,19 +79,19 @@ public class RemoveDirectoryTest extends PulseTestCase
 
         if (FileSystemUtils.createSymlink(symlink, linkDestination))
         {
-            assertTrue(FileSystemUtils.removeDirectory(tmpDir));
+            assertTrue(FileSystemUtils.rmdir(tmpDir));
             assertTrue(linkDestination.isDirectory());
         }
         else
         {
-            FileSystemUtils.removeDirectory(tmpDir);
+            FileSystemUtils.rmdir(tmpDir);
         }
 
-        assertTrue(FileSystemUtils.removeDirectory(linkDestination));
+        assertTrue(FileSystemUtils.rmdir(linkDestination));
     }
 
     private File createTmpDir() throws IOException
     {
-        return FileSystemUtils.createTempDirectory(RemoveDirectoryTest.class.getName(), "");
+        return FileSystemUtils.createTempDir(RemoveDirectoryTest.class.getName(), "");
     }
 }

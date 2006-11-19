@@ -62,7 +62,7 @@ public class SvnWorkingCopyTest extends PulseTestCase
 
     protected void setUp() throws Exception
     {
-        tempDir = FileSystemUtils.createTempDirectory(getName(), "");
+        tempDir = FileSystemUtils.createTempDir(getName(), "");
         tempDir = tempDir.getCanonicalFile();
 
         // Create empty repo
@@ -126,7 +126,7 @@ public class SvnWorkingCopyTest extends PulseTestCase
         svnProcess = null;
         Thread.sleep(100);
 
-        FileSystemUtils.removeDirectory(tempDir);
+        FileSystemUtils.rmdir(tempDir);
 
         updateClient = null;
         client = null;

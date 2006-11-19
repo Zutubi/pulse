@@ -27,13 +27,13 @@ public abstract class TemplatePulseFileDetailsTestBase extends PulseTestCase
         engine.setProperty("file.resource.loader.path", pulseRoot.getAbsolutePath());
         engine.init();
         getDetails().setVelocityEngine(engine);
-        tmpDir = FileSystemUtils.createTempDirectory(getClass().getName(), "");
+        tmpDir = FileSystemUtils.createTempDir(getClass().getName(), "");
     }
 
     protected void tearDown() throws Exception
     {
         engine = null;
-        FileSystemUtils.removeDirectory(tmpDir);
+        FileSystemUtils.rmdir(tmpDir);
         super.tearDown();
     }
 

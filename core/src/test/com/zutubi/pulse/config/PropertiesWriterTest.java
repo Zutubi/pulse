@@ -31,7 +31,7 @@ public class PropertiesWriterTest extends PulseTestCase
     {
         super.setUp();
 
-        tmpDir = FileSystemUtils.createTempDirectory(getClass().getName(), getName());
+        tmpDir = FileSystemUtils.createTempDir(getClass().getName(), getName());
 
         // copy contents of original file into the temporary directory.
         config = new File(tmpDir, "tmp.config.properties");

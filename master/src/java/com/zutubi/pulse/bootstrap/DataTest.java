@@ -27,7 +27,7 @@ public class DataTest extends PulseTestCase
     {
         super.setUp();
 
-        dataDir = FileSystemUtils.createTempDirectory(DataTest.class.getName(), "");
+        dataDir = FileSystemUtils.createTempDir(DataTest.class.getName(), "");
         dataDir.delete();
     }
 

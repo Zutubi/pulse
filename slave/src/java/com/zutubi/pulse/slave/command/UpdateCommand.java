@@ -183,7 +183,7 @@ public class UpdateCommand implements Runnable
         }
         finally
         {
-            FileSystemUtils.removeDirectory(tempDir);
+            FileSystemUtils.rmdir(tempDir);
         }
     }
 

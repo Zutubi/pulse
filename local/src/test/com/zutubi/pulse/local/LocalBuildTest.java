@@ -22,7 +22,7 @@ public class LocalBuildTest extends PulseTestCase
     {
         super.setUp();
         // Create a temporary base directory
-        tmpDir = FileSystemUtils.createTempDirectory(LocalBuildTest.class.getName(), "");
+        tmpDir = FileSystemUtils.createTempDir(LocalBuildTest.class.getName(), "");
         builder = new LocalBuild();
     }
 

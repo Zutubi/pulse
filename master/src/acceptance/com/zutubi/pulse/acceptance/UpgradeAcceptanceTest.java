@@ -21,12 +21,12 @@ public class UpgradeAcceptanceTest extends BaseAcceptanceTestCase
 
     protected void setUp() throws Exception
     {
-        tmpDir = FileSystemUtils.createTempDirectory("UAT", "");
+        tmpDir = FileSystemUtils.createTempDir("UAT", "");
     }
 
     protected void tearDown() throws Exception
     {
-        if (!FileSystemUtils.removeDirectory(tmpDir))
+        if (!FileSystemUtils.rmdir(tmpDir))
         {
             throw new RuntimeException("Failed to remove the temporary directory: " + tmpDir.getAbsolutePath());
         }

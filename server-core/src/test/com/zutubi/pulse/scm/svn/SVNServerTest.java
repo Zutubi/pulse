@@ -94,7 +94,7 @@ public class SVNServerTest extends PulseTestCase
     {
         super.setUp();
         File dataFile = getTestDataFile("server-core", "data", "zip");
-        tmpDir = FileSystemUtils.createTempDirectory(getClass().getName(), "");
+        tmpDir = FileSystemUtils.createTempDir(getClass().getName(), "");
         repoDir = new File(tmpDir, "repo");
         repoDir.mkdirs();
 

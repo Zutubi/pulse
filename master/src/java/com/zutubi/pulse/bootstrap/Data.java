@@ -3,7 +3,6 @@ package com.zutubi.pulse.bootstrap;
 import com.zutubi.pulse.Version;
 import com.zutubi.pulse.config.Config;
 import com.zutubi.pulse.config.FileConfig;
-import com.zutubi.pulse.util.CopyUtils;
 import com.zutubi.pulse.util.FileSystemUtils;
 import com.zutubi.pulse.util.logging.Logger;
 
@@ -117,18 +116,18 @@ public class Data implements MasterUserPaths
         DatabaseBootstrap dbBootstrap = (DatabaseBootstrap) ComponentContext.getBean("databaseBootstrap");
         dbBootstrap.compactDatabase();
 
-        CopyUtils.copy(new File(tmpBackup, "database"),
+        FileSystemUtils.copy(new File(tmpBackup, "database"),
                 new File(getDatabaseRoot(), "db.backup"),
                 new File(getDatabaseRoot(), "db.log"),
                 new File(getDatabaseRoot(), "db.properties"),
                 new File(getDatabaseRoot(), "db.data"),
                 new File(getDatabaseRoot(), "db.script"));
-        CopyUtils.copy(tmpBackup, getUserConfigRoot());
-        CopyUtils.copy(new File(tmpBackup, CONFIG_FILE_NAME), getConfigFile());
+        FileSystemUtils.copy(tmpBackup, getUserConfigRoot());
+        FileSystemUtils.copy(new File(tmpBackup, CONFIG_FILE_NAME), getConfigFile());
 
         FileSystemUtils.createZip(backup, tmpBackup, tmpBackup);
 
-        FileSystemUtils.removeDirectory(tmpBackup);
+        FileSystemUtils.rmdir(tmpBackup);
         // - done.
     }
 
@@ -171,7 +170,7 @@ public class Data implements MasterUserPaths
                 {
                     try
                     {
-                        FileSystemUtils.copyRecursively(examplesDir, userTemplateRoot);
+                        FileSystemUtils.copy(userTemplateRoot, examplesDir);
                         break;
                     }
                     catch (IOException e)

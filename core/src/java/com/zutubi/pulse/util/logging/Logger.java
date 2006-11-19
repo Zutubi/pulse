@@ -81,7 +81,12 @@ public class Logger
 
     public void warning(String msg)
     {
-        warning(msg, null);
+        warning(msg, (Throwable)null);
+    }
+
+    public void warning(String msg, Object... args)
+    {
+        warning(String.format(msg, args), (Throwable)null);
     }
 
     public void warning(String msg, Throwable t)

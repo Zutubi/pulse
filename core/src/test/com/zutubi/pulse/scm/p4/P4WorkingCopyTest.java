@@ -39,7 +39,7 @@ public class P4WorkingCopyTest extends PulseTestCase implements PersonalBuildUI
 
     protected void setUp() throws Exception
     {
-        tempDir = FileSystemUtils.createTempDirectory(P4WorkingCopyTest.class.getName(), "");
+        tempDir = FileSystemUtils.createTempDir(P4WorkingCopyTest.class.getName(), "");
         tempDir = tempDir.getCanonicalFile();
         File repoDir = new File(tempDir, "repo");
         repoDir.mkdir();
@@ -100,7 +100,7 @@ public class P4WorkingCopyTest extends PulseTestCase implements PersonalBuildUI
         p4dProcess = null;
         Thread.sleep(100);
 
-        FileSystemUtils.removeDirectory(tempDir);
+        FileSystemUtils.rmdir(tempDir);
 
         statuses = null;
         errors = null;

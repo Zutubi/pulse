@@ -33,7 +33,7 @@ public class OCUnitReportPostProcessorTest extends PulseTestCase
     {
         super.setUp();
 
-        tmpDir = FileSystemUtils.createTempDirectory("OCUnitReportPostProcessorTest", getName());
+        tmpDir = FileSystemUtils.createTempDir("OCUnitReportPostProcessorTest", getName());
 
         artifact = prepareArtifact(this.getName());
 

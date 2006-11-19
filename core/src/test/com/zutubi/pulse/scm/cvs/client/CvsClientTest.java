@@ -47,7 +47,7 @@ public class CvsClientTest extends PulseTestCase
         String cvsRoot = ":ext:cvstester:cvs@www.cinnamonbob.com:/cvsroot";
         cvs = new CvsClient();
         cvs.setRoot(CVSRoot.parse(cvsRoot));
-        workdir = FileSystemUtils.createTempDirectory(CvsClientTest.class.getName(), "");
+        workdir = FileSystemUtils.createTempDir(CvsClientTest.class.getName(), "");
     }
 
     protected void tearDown()

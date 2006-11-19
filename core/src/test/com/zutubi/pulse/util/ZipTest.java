@@ -23,7 +23,7 @@ public class ZipTest extends PulseTestCase
     {
         super.setUp();
         // Create a temporary working directory
-        tmpDir = FileSystemUtils.createTempDirectory(ZipTest.class.getName(), "");
+        tmpDir = FileSystemUtils.createTempDir(ZipTest.class.getName(), "");
         inDir = new File(tmpDir, "in");
         inDir.mkdir();
         outDir = new File(tmpDir, "out");

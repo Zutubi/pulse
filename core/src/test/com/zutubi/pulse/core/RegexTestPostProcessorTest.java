@@ -33,7 +33,7 @@ public class RegexTestPostProcessorTest extends PulseTestCase
     {
         super.setUp();
 
-        tmpDir = FileSystemUtils.createTempDirectory("RegexTestPostProcessorTest", getName());
+        tmpDir = FileSystemUtils.createTempDir("RegexTestPostProcessorTest", getName());
 
         artifact = prepareArtifact(this.getName());
 

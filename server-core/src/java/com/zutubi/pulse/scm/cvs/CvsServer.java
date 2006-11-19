@@ -259,7 +259,7 @@ public class CvsServer extends CachingSCMServer
         }
         finally
         {
-            if (!FileSystemUtils.removeDirectory(tmpDir))
+            if (!FileSystemUtils.rmdir(tmpDir))
             {
                 LOG.severe("failed to remove temporary directory " + tmpDir);
             }
@@ -492,13 +492,13 @@ public class CvsServer extends CachingSCMServer
         finally
         {
             // and lets not forget to clean up after ourselves.
-            FileSystemUtils.removeDirectory(tmpDir);
+            FileSystemUtils.rmdir(tmpDir);
         }
     }
 
     private File createTemporaryDirectory() throws IOException
     {
-        return FileSystemUtils.createTempDirectory("cvs", "checkout", tmpSpace);
+        return FileSystemUtils.createTempDir("cvs", "checkout", tmpSpace);
     }
 
     /**

@@ -21,7 +21,7 @@ public class FileKeyGeneratorTest extends PulseTestCase
     {
         super.setUp();
 
-        tmpDir = FileSystemUtils.createTempDirectory(FileKeyGenerator.class.getName(), "tmp");
+        tmpDir = FileSystemUtils.createTempDir(FileKeyGenerator.class.getName(), "tmp");
 
         keyGenerator = new FileKeyGenerator(tmpDir);
 

@@ -1,6 +1,5 @@
 package com.zutubi.pulse.test;
 
-import com.zutubi.pulse.Version;
 import com.zutubi.pulse.util.FileSystemUtils;
 import com.zutubi.pulse.util.IOUtils;
 import junit.framework.AssertionFailedError;
@@ -293,7 +292,7 @@ public abstract class PulseTestCase extends TestCase
 
     protected void removeDirectory(File dir) throws IOException
     {
-        if (!FileSystemUtils.removeDirectory(dir))
+        if (!FileSystemUtils.rmdir(dir))
         {
             throw new IOException("Failed to remove " + dir);
         }

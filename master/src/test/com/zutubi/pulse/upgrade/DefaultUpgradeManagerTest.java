@@ -35,7 +35,7 @@ public class DefaultUpgradeManagerTest extends PulseTestCase
         upgradeManager.addTask(new MockUpgradeTask(40));
         upgradeManager.addTask(new MockUpgradeTask(20));
 
-        tmpDir = FileSystemUtils.createTempDirectory("DefaultUpgradeManagerTest", getName());
+        tmpDir = FileSystemUtils.createTempDir("DefaultUpgradeManagerTest", getName());
         tmpData = new Data(tmpDir);
         tmpData.init(new DefaultSystemPaths(new File("."), new File(".")));
         tmpData.setBuildNumber(0);

@@ -24,7 +24,7 @@ public class PatchArchiveTest extends PulseTestCase
     protected void setUp() throws Exception
     {
         super.setUp();
-        tempDir = FileSystemUtils.createTempDirectory(PatchArchiveTest.class.getName(), "");
+        tempDir = FileSystemUtils.createTempDir(PatchArchiveTest.class.getName(), "");
         baseDir = new File(tempDir, "base");
         baseDir.mkdir();
         extractDir = new File(tempDir, "extract");
@@ -37,7 +37,7 @@ public class PatchArchiveTest extends PulseTestCase
 
     protected void tearDown() throws Exception
     {
-        FileSystemUtils.removeDirectory(tempDir);
+        FileSystemUtils.rmdir(tempDir);
         super.tearDown();
     }
 

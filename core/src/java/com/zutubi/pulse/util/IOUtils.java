@@ -38,13 +38,10 @@ public class IOUtils
 
     public static void write(Properties properties, File dest) throws IOException
     {
-        write(properties, new FileOutputStream(dest));
-    }
-
-    public static void write(Properties properties, OutputStream out) throws IOException
-    {
+        FileOutputStream out = null;
         try
         {
+            out = new FileOutputStream(dest);
             properties.store(out, "");
         }
         finally

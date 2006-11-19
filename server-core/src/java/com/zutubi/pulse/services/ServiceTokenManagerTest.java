@@ -23,7 +23,7 @@ public class ServiceTokenManagerTest extends PulseTestCase
     protected void setUp() throws Exception
     {
         super.setUp();
-        tempDir = FileSystemUtils.createTempDirectory(ServiceTokenManager.class.getName(), "");
+        tempDir = FileSystemUtils.createTempDir(ServiceTokenManager.class.getName(), "");
         tokenManager = new ServiceTokenManager();
         DefaultSystemPaths paths = new DefaultSystemPaths(tempDir, tempDir);
         paths.getConfigRoot().mkdirs();

@@ -22,12 +22,12 @@ public abstract class PostProcessorTestBase extends PulseTestCase
 
     public void setUp() throws IOException
     {
-        tempDir = FileSystemUtils.createTempDirectory(getClass().getName(), "");
+        tempDir = FileSystemUtils.createTempDir(getClass().getName(), "");
     }
 
     public void tearDown()
     {
-        FileSystemUtils.removeDirectory(tempDir);
+        FileSystemUtils.rmdir(tempDir);
         artifact = null;
     }
 

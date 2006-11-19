@@ -142,7 +142,7 @@ public class SlaveBuildService implements BuildService
 
             if(tempDir != null)
             {
-                FileSystemUtils.removeDirectory(tempDir);
+                FileSystemUtils.rmdir(tempDir);
             }
         }
     }

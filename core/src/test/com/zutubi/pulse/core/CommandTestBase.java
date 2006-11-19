@@ -27,8 +27,8 @@ public abstract class CommandTestBase extends PulseTestCase
 
     public void setUp() throws IOException
     {
-        baseDir = FileSystemUtils.createTempDirectory(getClass().getName(), ".base");
-        outputDir = FileSystemUtils.createTempDirectory(getClass().getName(), ".out");
+        baseDir = FileSystemUtils.createTempDir(getClass().getName(), ".base");
+        outputDir = FileSystemUtils.createTempDir(getClass().getName(), ".out");
     }
 
     public void tearDown() throws IOException

@@ -43,7 +43,7 @@ public class AgentUpdaterTest extends PulseTestCase implements EventListener
         super.setUp();
 
         // Create dummy paths and package file
-        tempDir = FileSystemUtils.createTempDirectory(AgentUpdaterTest.class.getName(), "");
+        tempDir = FileSystemUtils.createTempDir(AgentUpdaterTest.class.getName(), "");
         systemPaths = new DefaultSystemPaths(tempDir, tempDir);
         File packageDir = DownloadPackageServlet.getPackageDir(systemPaths);
         packageDir.mkdirs();
@@ -62,7 +62,7 @@ public class AgentUpdaterTest extends PulseTestCase implements EventListener
 
     protected void tearDown() throws Exception
     {
-        FileSystemUtils.removeDirectory(tempDir);
+        FileSystemUtils.rmdir(tempDir);
         super.tearDown();
     }
 

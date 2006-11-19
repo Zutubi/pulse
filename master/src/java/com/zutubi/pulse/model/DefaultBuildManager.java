@@ -298,7 +298,7 @@ public class DefaultBuildManager implements BuildManager, EventListener
 
         MasterBuildPaths paths = new MasterBuildPaths(configurationManager);
         File projectDir = paths.getProjectDir(project);
-        if (!FileSystemUtils.removeDirectory(projectDir))
+        if (!FileSystemUtils.rmdir(projectDir))
         {
             LOG.warning("Unable to remove project directory '" + projectDir.getAbsolutePath() + "'");
         }
@@ -318,7 +318,7 @@ public class DefaultBuildManager implements BuildManager, EventListener
     {
         MasterBuildPaths paths = new MasterBuildPaths(configurationManager);
         File userDir = paths.getUserDir(user.getId());
-        if (!FileSystemUtils.removeDirectory(userDir))
+        if (!FileSystemUtils.rmdir(userDir))
         {
             LOG.warning("Unable to remove user directory '" + userDir.getAbsolutePath() + "'");
         }
@@ -436,7 +436,7 @@ public class DefaultBuildManager implements BuildManager, EventListener
     {
         MasterBuildPaths paths = new MasterBuildPaths(configurationManager);
         File buildDir = paths.getBuildDir(build);
-        if (buildDir.exists() && !FileSystemUtils.removeDirectory(buildDir))
+        if (buildDir.exists() && !FileSystemUtils.rmdir(buildDir))
         {
             LOG.warning("Unable to clean up build directory '" + buildDir.getAbsolutePath() + "'");
             return;
@@ -478,7 +478,7 @@ public class DefaultBuildManager implements BuildManager, EventListener
         for (RecipeResultNode node : nodes)
         {
             File workDir = paths.getBaseDir(build, node.getResult().getId());
-            if (!FileSystemUtils.removeDirectory(workDir))
+            if (!FileSystemUtils.rmdir(workDir))
             {
                 LOG.warning("Unable to clean up build directory '" + workDir.getAbsolutePath() + "'");
             }

@@ -38,7 +38,7 @@ public class CvsServerTest extends PulseTestCase
         cvsRoot = ":ext:cvstester:cvs@www.cinnamonbob.com:/cvsroot";
 
         // cleanup the working directory.
-        workdir = FileSystemUtils.createTempDirectory("CvsServer", "Test");
+        workdir = FileSystemUtils.createTempDir("CvsServer", "Test");
     }
 
     public void tearDown() throws Exception

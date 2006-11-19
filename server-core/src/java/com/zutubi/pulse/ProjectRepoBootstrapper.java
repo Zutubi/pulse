@@ -77,7 +77,7 @@ public class ProjectRepoBootstrapper implements Bootstrapper
         {
             try
             {
-                FileSystemUtils.copyRecursively(paths.getPersistentWorkDir(), paths.getBaseDir());
+                FileSystemUtils.copy(paths.getBaseDir(), paths.getPersistentWorkDir());
             }
             catch (IOException e)
             {
@@ -103,7 +103,7 @@ public class ProjectRepoBootstrapper implements Bootstrapper
     {
         if(forceClean && localDir.exists())
         {
-            if(!FileSystemUtils.removeDirectory(localDir))
+            if(!FileSystemUtils.rmdir(localDir))
             {
                 throw new BuildException("Unable to remove local scm directory: " + localDir.getAbsolutePath());
             }

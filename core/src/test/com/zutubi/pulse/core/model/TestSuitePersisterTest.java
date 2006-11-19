@@ -17,13 +17,13 @@ public class TestSuitePersisterTest extends PulseTestCase
     protected void setUp() throws Exception
     {
         super.setUp();
-        tempDir = FileSystemUtils.createTempDirectory(TestSuitePersisterTest.class.getName(), "");
+        tempDir = FileSystemUtils.createTempDir(TestSuitePersisterTest.class.getName(), "");
         persister = new TestSuitePersister();
     }
 
     protected void tearDown() throws Exception
     {
-        FileSystemUtils.removeDirectory(tempDir);
+        FileSystemUtils.rmdir(tempDir);
     }
 
     public void testEmptySuite() throws Exception

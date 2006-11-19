@@ -71,7 +71,7 @@ public class MasterBuildService implements BuildService
             {
                 try
                 {
-                    FileSystemUtils.copyRecursively(workDir, workDest);
+                    FileSystemUtils.copy(workDest, workDir);
                 }
                 catch(IOException e)
                 {
@@ -94,7 +94,7 @@ public class MasterBuildService implements BuildService
         ServerRecipePaths recipePaths = new ServerRecipePaths(project, spec, recipeId, configurationManager.getUserPaths().getData(), incremental);
         File recipeRoot = recipePaths.getRecipeRoot();
 
-        if (!FileSystemUtils.removeDirectory(recipeRoot))
+        if (!FileSystemUtils.rmdir(recipeRoot))
         {
             throw new BuildException("Unable to remove recipe directory '" + recipeRoot.getAbsolutePath() + "'");
         }

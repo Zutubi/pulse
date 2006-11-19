@@ -33,7 +33,7 @@ public class FileArtifactTest extends PulseTestCase
     {
         super.setUp();
 
-        tmpSourceDir = FileSystemUtils.createTempDirectory();
+        tmpSourceDir = FileSystemUtils.createTempDir();
 
         // setup the contents of the source directory - the output of a sample build.
         createBuildArtifact("file.txt");
@@ -42,7 +42,7 @@ public class FileArtifactTest extends PulseTestCase
         createBuildArtifact("some/file-2.txt");
         createBuildArtifact("some/directory/file-xyz.txt");
 
-        tmpOutputDir = FileSystemUtils.createTempDirectory();
+        tmpOutputDir = FileSystemUtils.createTempDir();
 
         fileArtifactObject = new FileArtifact();
         fileArtifactObject.setName("test");

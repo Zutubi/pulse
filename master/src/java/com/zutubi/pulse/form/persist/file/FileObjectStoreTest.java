@@ -25,7 +25,7 @@ public class FileObjectStoreTest extends PulseTestCase
     {
         super.setUp();
 
-        baseDir = FileSystemUtils.createTempDirectory(getClass().getName(), ".tmp");
+        baseDir = FileSystemUtils.createTempDir(getClass().getName(), ".tmp");
 
         objectStore = new FileObjectStore();
         objectStore.setBaseDir(baseDir);

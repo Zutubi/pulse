@@ -2,8 +2,6 @@ package com.zutubi.pulse.model;
 
 import com.zutubi.pulse.util.FileSystemUtils;
 
-import java.io.IOException;
-
 /**
  */
 public class MakePulseFileDetailsTest extends TemplatePulseFileDetailsTestBase
@@ -20,7 +18,7 @@ public class MakePulseFileDetailsTest extends TemplatePulseFileDetailsTestBase
     protected void tearDown() throws Exception
     {
         super.tearDown();
-        FileSystemUtils.removeDirectory(tmpDir);
+        FileSystemUtils.rmdir(tmpDir);
     }
 
     public TemplatePulseFileDetails getDetails()

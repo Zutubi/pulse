@@ -23,13 +23,13 @@ public class RenameDirectoryTest extends PulseTestCase
         super.setUp();
 
         // add setup code here.
-        tmpDir = FileSystemUtils.createTempDirectory(ZipTest.class.getName(), "");
+        tmpDir = FileSystemUtils.createTempDir(ZipTest.class.getName(), "");
     }
 
     public void tearDown() throws Exception
     {
         // add tear down code here.
-        if (!FileSystemUtils.removeDirectory(tmpDir))
+        if (!FileSystemUtils.rmdir(tmpDir))
         {
             throw new IllegalStateException("Unable to delete this tests tmp directory. Is there an open " +
                     "file handle preventing this?");

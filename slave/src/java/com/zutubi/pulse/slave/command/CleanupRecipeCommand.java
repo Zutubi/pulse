@@ -31,7 +31,7 @@ public class CleanupRecipeCommand implements Runnable
     {
         ServerRecipePaths recipeProcessorPaths = new ServerRecipePaths(project, spec, recipeId, configurationManager.getUserPaths().getData(), incremental);
         File recipeRoot = recipeProcessorPaths.getRecipeRoot();
-        if (!FileSystemUtils.removeDirectory(recipeRoot))
+        if (!FileSystemUtils.rmdir(recipeRoot))
         {
             LOG.warning("Unable to remove recipe directory '" + recipeRoot + "'");
         }

@@ -16,7 +16,7 @@ public class FileSystemUtilsTest extends PulseTestCase
     {
         super.setUp();
 
-        tmpDir = FileSystemUtils.createTempDirectory("FileSystemUtilsTest", getName());
+        tmpDir = FileSystemUtils.createTempDir("FileSystemUtilsTest", getName());
     }
 
     protected void tearDown() throws Exception
@@ -40,11 +40,11 @@ public class FileSystemUtilsTest extends PulseTestCase
     {
         if (!SystemUtils.IS_WINDOWS)
         {
-            File tmpDir = FileSystemUtils.createTempDirectory(getClass().getName(), "");
+            File tmpDir = FileSystemUtils.createTempDir(getClass().getName(), "");
             FileSystemUtils.setPermissions(tmpDir, 0);
             int permissions = FileSystemUtils.getPermissions(tmpDir);
             assertEquals(permissions, 0);
-            assertTrue(FileSystemUtils.removeDirectory(tmpDir));
+            assertTrue(FileSystemUtils.rmdir(tmpDir));
         }
     }
 
@@ -93,8 +93,8 @@ public class FileSystemUtilsTest extends PulseTestCase
 
         // ensure that the expected directories exist.
         assertTrue(new File(tmpDir, "dir").isDirectory());
-        assertTrue(new File(tmpDir, asPath("dir", "subdirectory")).isDirectory());
-        assertTrue(new File(tmpDir, asPath("dir", "subdirectory", "emptyfile")).isFile());
+        assertTrue(new File(tmpDir, FileSystemUtils.composeFilename("dir", "subdirectory")).isDirectory());
+        assertTrue(new File(tmpDir, FileSystemUtils.composeFilename("dir", "subdirectory", "emptyfile")).isFile());
     }
 
     public void testExtractNonEmptyFiles() throws Exception
@@ -102,9 +102,9 @@ public class FileSystemUtilsTest extends PulseTestCase
         extractTestZipToTmp();
 
         // ensure that the expected directories exist.
-        assertTrue(new File(tmpDir, asPath("config")).isDirectory());
-        assertTrue(new File(tmpDir, asPath("pulse.config.properties")).isFile());
-        assertTrue(new File(tmpDir, asPath("config", "pulse.properties")).isFile());
+        assertTrue(new File(tmpDir, FileSystemUtils.composeFilename("config")).isDirectory());
+        assertTrue(new File(tmpDir, FileSystemUtils.composeFilename("pulse.config.properties")).isFile());
+        assertTrue(new File(tmpDir, FileSystemUtils.composeFilename("config", "pulse.properties")).isFile());
     }
 
     public void testCopyFileToFile() throws Exception
@@ -113,65 +113,8 @@ public class FileSystemUtilsTest extends PulseTestCase
         File to = new File(tmpDir, "to");
 
         FileSystemUtils.createFile(from, "test");
-        FileSystemUtils.copyRecursively(from, to);
+        FileSystemUtils.copy(to, from);
         assertFilesEqual(from, to);
-    }
-
-    public void testCopyDirectoryToDirectory() throws Exception
-    {
-        File fromDir = new File(tmpDir, "from");
-        File toDir = new File(tmpDir, "to");
-        File f1 = new File(fromDir, "f1");
-        File dir = new File(fromDir, "dir");
-        File f2 = new File(dir, "f2");
-        File f3 = new File(dir, "f3");
-        File nested = new File(dir, "nested");
-        File f4 = new File(nested, "f4");
-
-        assertTrue(nested.mkdirs());
-        FileSystemUtils.createFile(f1, "test f1");
-        FileSystemUtils.createFile(f2, "test f2");
-        FileSystemUtils.createFile(f3, "test f3");
-        FileSystemUtils.createFile(f4, "test f4");
-
-        FileSystemUtils.copyRecursively(fromDir, toDir);
-        assertDirectoriesEqual(fromDir, toDir);
-    }
-
-    public void testCopyDirectoryToExistingDirectory() throws Exception
-    {
-        File fromDir = new File(tmpDir, "from");
-        File toDir = new File(tmpDir, "to");
-        File f1 = new File(fromDir, "f1");
-        File dir = new File(fromDir, "dir");
-        File f2 = new File(dir, "f2");
-        File f3 = new File(dir, "f3");
-        File nested = new File(dir, "nested");
-        File f4 = new File(nested, "f4");
-
-        assertTrue(toDir.mkdirs());
-        assertTrue(nested.mkdirs());
-        FileSystemUtils.createFile(f1, "test f1");
-        FileSystemUtils.createFile(f2, "test f2");
-        FileSystemUtils.createFile(f3, "test f3");
-        FileSystemUtils.createFile(f4, "test f4");
-
-        FileSystemUtils.copyRecursively(fromDir, toDir);
-        assertDirectoriesEqual(fromDir, toDir);
-    }
-
-    public void testRecursiveCopyPreservesPermissions() throws Exception
-    {
-        if (SystemUtils.IS_LINUX)
-        {
-            File from = new File(tmpDir, "from");
-            File to = new File(tmpDir, "to");
-
-            FileSystemUtils.createFile(from, "test");
-            FileSystemUtils.setPermissions(from, 777);
-            FileSystemUtils.copyRecursively(from, to);
-            assertEquals(777, FileSystemUtils.getPermissions(to));
-        }
     }
 
     public void testFilesMatchBothEmpty() throws IOException
@@ -445,6 +388,121 @@ public class FileSystemUtilsTest extends PulseTestCase
         }
     }
 
+    public void testCopyDirectoryToDirectory() throws Exception
+    {
+        File fromDir = new File(tmpDir, "from");
+        File toDir = new File(tmpDir, "to");
+        File f1 = new File(fromDir, "f1");
+        File dir = new File(fromDir, "dir");
+        File f2 = new File(dir, "f2");
+        File f3 = new File(dir, "f3");
+        File nested = new File(dir, "nested");
+        File f4 = new File(nested, "f4");
+
+        assertTrue(nested.mkdirs());
+        FileSystemUtils.createFile(f1, "test f1");
+        FileSystemUtils.createFile(f2, "test f2");
+        FileSystemUtils.createFile(f3, "test f3");
+        FileSystemUtils.createFile(f4, "test f4");
+
+        FileSystemUtils.copy(toDir, fromDir);
+        assertDirectoriesEqual(fromDir, toDir);
+    }
+
+    public void testCopyDirectoryToExistingDirectory() throws Exception
+    {
+        File fromDir = new File(tmpDir, "from");
+        File toDir = new File(tmpDir, "to");
+        File f1 = new File(fromDir, "f1");
+        File dir = new File(fromDir, "dir");
+        File f2 = new File(dir, "f2");
+        File f3 = new File(dir, "f3");
+        File nested = new File(dir, "nested");
+        File f4 = new File(nested, "f4");
+
+        assertTrue(toDir.mkdirs());
+        assertTrue(nested.mkdirs());
+        FileSystemUtils.createFile(f1, "test f1");
+        FileSystemUtils.createFile(f2, "test f2");
+        FileSystemUtils.createFile(f3, "test f3");
+        FileSystemUtils.createFile(f4, "test f4");
+
+        FileSystemUtils.copy(toDir, fromDir);
+        assertDirectoriesEqual(fromDir, toDir);
+    }
+
+    public void testRecursiveCopyPreservesPermissions() throws Exception
+    {
+        if (SystemUtils.IS_LINUX)
+        {
+            File from = new File(tmpDir, "from");
+            File to = new File(tmpDir, "to");
+
+            FileSystemUtils.createFile(from, "test");
+            FileSystemUtils.setPermissions(from, 777);
+            FileSystemUtils.copy(to, from);
+            assertEquals(777, FileSystemUtils.getPermissions(to));
+        }
+    }
+
+    public void testCopyFileToNonExistantFile() throws IOException
+    {
+        File src = new File(tmpDir, "src.txt");
+        FileSystemUtils.createFile(src, "Some text.");
+
+        File dest = new File(tmpDir, "dest.txt");
+
+        assertFalse(dest.isFile());
+        FileSystemUtils.copy(dest, src);
+        assertTrue(dest.isFile());
+    }
+
+    public void testCopyFileToDirectory() throws IOException
+    {
+        File src = new File(tmpDir, "src.txt");
+        FileSystemUtils.createFile(src, "Some text.");
+
+        File dest = new File(tmpDir, "dest");
+        assertTrue(dest.mkdirs());
+
+        assertTrue(dest.isDirectory());
+        FileSystemUtils.copy(dest, src);
+        assertTrue(new File(dest, "src.txt").isFile());
+    }
+
+    public void testCopyMultipleFiles() throws IOException
+    {
+        File srcA = new File(tmpDir, "srca.txt");
+        FileSystemUtils.createFile(srcA, "Some text.");
+        File srcB = new File(tmpDir, "srcb.txt");
+        FileSystemUtils.createFile(srcB, "Some text.");
+
+        File dest = new File(tmpDir, "dest");
+
+        assertFalse(dest.isDirectory());
+        FileSystemUtils.copy(dest, srcA, srcB);
+
+        assertTrue(dest.isDirectory());
+        assertTrue(new File(dest, "srca.txt").isFile());
+        assertTrue(new File(dest, "srcb.txt").isFile());
+    }
+
+    public void testCopyDirectoryToNonExistantFile() throws IOException
+    {
+        File dir = new File(tmpDir, "dir");
+        dir.mkdirs();
+
+        FileSystemUtils.createFile(new File(dir, "a.txt"), "Text file a");
+        FileSystemUtils.createFile(new File(dir, "b.txt"), "Text file a");
+
+        File dest = new File(tmpDir, "dest");
+        assertFalse(dest.exists());
+        FileSystemUtils.copy(dest, dir);
+        assertTrue(dest.isDirectory());
+        assertTrue(new File(dest, "a.txt").isFile());
+        assertTrue(new File(dest, "b.txt").isFile());
+    }
+
     private void simpleEOLTest(byte[] eol, String out) throws IOException
     {
         File test = null;
@@ -472,19 +530,6 @@ public class FileSystemUtilsTest extends PulseTestCase
         FileSystemUtils.createFile(f2, s2);
 
         assertEquals(expected, FileSystemUtils.filesMatch(f1, f2));
-    }
-
-    public String asPath(String... pathElements)
-    {
-        StringBuffer buff = new StringBuffer();
-        String sep = "";
-        for (String pathElement : pathElements)
-        {
-            buff.append(sep);
-            buff.append(pathElement);
-            sep = File.separator;
-        }
-        return buff.toString();
     }
 
     private void extractTestZipToTmp() throws IOException
