@@ -14,6 +14,7 @@ public class RemoveDirectoryTest extends PulseTestCase
         assertTrue(FileSystemUtils.rmdir(new File("/this/directory/does/not/exist")));
     }
 
+/*
     public void testRemoveFile() throws IOException
     {
         File tmpDir = createTmpDir();
@@ -30,6 +31,7 @@ public class RemoveDirectoryTest extends PulseTestCase
             tmpDir.delete();
         }
     }
+*/
 
     public void testRemoveEmpty() throws IOException
     {
