@@ -65,10 +65,10 @@ public class SshConnection extends ExtConnection
             setInputStream(new LoggedDataInputStream(channelClient.getInputStream()));
             setOutputStream(new LoggedDataOutputStream(channelClient.getOutputStream()));
 
-        } catch (IOException e)
+        }
+        catch (IOException e)
         {
-            e.printStackTrace();
-            throw new AuthenticationException(e, "");
+            throw new AuthenticationException(e, e.getMessage());
         }
     }
 

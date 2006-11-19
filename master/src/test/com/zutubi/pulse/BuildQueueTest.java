@@ -88,6 +88,15 @@ public class BuildQueueTest extends PulseTestCase
         assertNull(queue.buildCompleted(p1));
     }
 
+    public void testCancelQueuedBuild()
+    {
+        assertTrue(queue.buildRequested(createEvent(p1, "spec1")));
+        BuildRequestEvent request2 = createEvent(p1, "spec2");
+        assertFalse(queue.buildRequested(request2));
+        queue.cancelBuild(request2.getId());
+        assertNull(queue.buildCompleted(p1));
+    }
+
     private BuildRequestEvent createEvent(Project project, String spec)
     {
         return new BuildRequestEvent(this, new MockBuildReason(), project, spec, new BuildRevision());

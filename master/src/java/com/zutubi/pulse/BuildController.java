@@ -278,7 +278,7 @@ public class BuildController implements EventListener
 
     private void handleBuildTerminationRequest(BuildTerminationRequestEvent event)
     {
-        long id = event.getId();
+        long id = event.getBuildId();
         
         if (id == buildResult.getId() || id == -1)
         {

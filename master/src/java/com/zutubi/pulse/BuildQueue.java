@@ -43,15 +43,18 @@ public class BuildQueue
         checkEntity(entity);
 
         List<AbstractBuildRequestEvent> entityRequests = requests.get(entity);
-        if (entityRequests.size() > 0)
+        synchronized(entityRequests)
         {
-            enqueueRequest(entityRequests, event);
-            return false;
-        }
-        else
-        {
-            entityRequests.add(event);
-            return true;
+            if (entityRequests.size() > 0)
+            {
+                enqueueRequest(entityRequests, event);
+                return false;
+            }
+            else
+            {
+                entityRequests.add(event);
+                return true;
+            }
         }
     }
 
@@ -96,15 +99,19 @@ public class BuildQueue
     {
         List<AbstractBuildRequestEvent> entityRequests = requests.get(owner);
         assert(entityRequests.size() > 0);
-        entityRequests.remove(0);
+        
+        synchronized(entityRequests)
+        {
+            entityRequests.remove(0);
 
-        if (entityRequests.size() > 0)
-        {
-            return entityRequests.get(0);
-        }
-        else
-        {
-            return null;
+            if (entityRequests.size() > 0)
+            {
+                return entityRequests.get(0);
+            }
+            else
+            {
+                return null;
+            }
         }
     }
 
@@ -118,5 +125,26 @@ public class BuildQueue
         }
 
         return queue;
+    }
+
+    public boolean cancelBuild(long id)
+    {
+        // locate build request and remove it. If it does not exist, return false.
+        for (Map.Entry<Entity, List<AbstractBuildRequestEvent>> entry : requests.entrySet())
+        {
+            List<AbstractBuildRequestEvent> events = entry.getValue();
+            synchronized(events)
+            {
+                for (AbstractBuildRequestEvent evt : events)
+                {
+                    if (evt.getId() == id)
+                    {
+                        events.remove(evt);
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
     }
 }

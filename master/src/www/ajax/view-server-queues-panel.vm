@@ -2,7 +2,7 @@
     <tr><td>
 
     <table class="fill-content">
-        #headingRow("build.queue" 6)
+        #headingRow("build.queue" 7)
         <tr>
             #contentHeading("queue.owner" 1)
             #contentHeading("build.id" 1)
@@ -10,6 +10,7 @@
             #contentHeading("queue.revision" 1)
             #contentHeading("build.spec" 1)
             #contentHeading("queue.when" 1)
+            #contentHeading("actions" 1)
         </tr>
 #if($buildQueue.size() > 0)
     #foreach($request in $buildQueue)
@@ -28,11 +29,13 @@
         #end
             #dynamicCell($request.specification)
             #contentCell($request.prettyQueueTime)
+
+            #actionCell("cancel" "cancelQueuedBuild.action?id=$request.id" "cancel.gif")
         </tr>
     #end
 #else
     <tr>
-        <td class="content" colspan="6">#wwtext("name=build.queue.empty")</td>
+        <td class="content" colspan="7">#wwtext("name=build.queue.empty")</td>
     </tr>
 #end
     </table>

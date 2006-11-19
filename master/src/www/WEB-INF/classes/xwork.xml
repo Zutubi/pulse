@@ -76,6 +76,10 @@
             <result name="success" type="redirect">viewServerQueues.action</result>
         </action>
 
+        <action name="cancelQueuedBuild" class="com.zutubi.pulse.web.server.CancelQueuedBuildAction">
+            <result name="success" type="redirect">viewServerQueues.action</result>
+        </action>
+
         <action name="viewAgentStatus" class="com.zutubi.pulse.web.agents.ViewAgentStatusAction">
             <result name="success" type="velocity">/view-agent-status.vm</result>
             <result name="error" type="velocity">/generic-error.vm</result>

@@ -10,13 +10,14 @@ public class BuildTerminationRequestEvent extends Event
     /**
      * ID of the build to terminate, or -1 to terminate all builds.
      */
-    private long id;
+    private long buildId;
+    
     private boolean timeout;
 
-    public BuildTerminationRequestEvent(Object source, long id, boolean timeout)
+    public BuildTerminationRequestEvent(Object source, long buildId, boolean timeout)
     {
         super(source);
-        this.id = id;
+        this.buildId = buildId;
         this.timeout = timeout;
     }
 
@@ -25,13 +26,13 @@ public class BuildTerminationRequestEvent extends Event
         return timeout;
     }
 
-    public long getId()
+    public long getBuildId()
     {
-        return id;
+        return buildId;
     }
 
     public String toString()
     {
-        return "Build Termination Request Event: " + id;
+        return String.format("Build Termination Request Event[buildId: %s]", buildId);
     }
 }

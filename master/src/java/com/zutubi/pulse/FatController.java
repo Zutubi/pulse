@@ -409,4 +409,16 @@ public class FatController implements EventListener, Stoppable
     {
         this.userManager = userManager;
     }
+
+    /**
+     * Cancel the queued build.
+     *
+     * @param id uniquely representing the queued build.
+     *
+     * @return true if the build has been cancelled, false otherwise.
+     */
+    public boolean cancelQueuedBuild(long id)
+    {
+        return buildQueue.cancelBuild(id);
+    }
 }
