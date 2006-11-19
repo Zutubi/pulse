@@ -97,7 +97,7 @@ public class SVNExternalsTest extends PulseTestCase
     protected void setUp() throws Exception
     {
         super.setUp();
-        tempDir = FileSystemUtils.createTempDirectory(getName(), "");
+        tempDir = FileSystemUtils.createTempDir(getName(), "");
         tempDir = tempDir.getCanonicalFile();
 
         checkoutDir = new File(tempDir, "checkout");
