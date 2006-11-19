@@ -224,7 +224,7 @@ ZUTUBI.widget.GoToToolbarItem.prototype = new ZUTUBI.widget.ToolbarItem();
 
 ZUTUBI.widget.GoToToolbarItem.prototype.onClick = function()
 {
-    ZUTUBI.widget.TreeView.getTree(this.treeId).expandToPath(this.path);
+    YAHOO.widget.TreeView.getTree(this.treeId).expandToPath(this.path);
 };
 
 

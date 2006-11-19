@@ -9,10 +9,10 @@
     <script type="text/javascript" src="$base/js/prototype.js"></script>
     <script type="text/javascript" src="$base/js/zutubi.js"></script>
     <script type="text/javascript" src="$base/js/yahoo/yahoo.js"></script>
-    <script type="text/javascript" src="$base/js/yahoo/treeview.js"></script>
-    <script type="text/javascript" src="$base/js/yahoo/animation.js"></script>
     <script type="text/javascript" src="$base/js/yahoo/event.js"></script>
+    <script type="text/javascript" src="$base/js/yahoo/animation.js"></script>
     <script type="text/javascript" src="$base/js/yahoo/dom.js"></script>
+    <script type="text/javascript" src="$base/js/yahoo/treeview.js"></script>
     <script type="text/javascript" src="$base/js/widget/treeview.js"></script>
     <script type="text/javascript" src="$base/js/widget/toolbar.js"></script>
     <script type="text/javascript" src="$base/js/main.js"></script>
@@ -45,7 +45,7 @@
 
             function copySelectedToParentForm()
             {
-                var tree = ZUTUBI.widget.TreeView.getTree('browseTree');
+                var tree = YAHOO.widget.TreeView.getTree('browseTree');
                 if (tree.selected)
                 {
                     var path = tree.selected.getPath();
@@ -60,7 +60,7 @@
 
             function ensureVisible()
             {
-                var tree = ZUTUBI.widget.TreeView.getTree('browseTree');
+                var tree = YAHOO.widget.TreeView.getTree('browseTree');
                 var s = (tree.selected && tree.selected.getLabelEl() || null);
 
                 if (s)
@@ -166,7 +166,7 @@
                 deleteFolder.setTooltip('Delete folder');
                 deleteFolder.onClick = function()
                 {
-                    var tree = ZUTUBI.widget.TreeView.getTree('browseTree');
+                    var tree = YAHOO.widget.TreeView.getTree('browseTree');
                     var n = tree.selected;
                     if (n)
                     {
@@ -182,7 +182,7 @@
                 refreshFolder.setTooltip('Refresh folder');
                 refreshFolder.onClick = function()
                 {
-                    var tree = ZUTUBI.widget.TreeView.getTree('browseTree');
+                    var tree = YAHOO.widget.TreeView.getTree('browseTree');
                     var selectedNode = tree.selected;
                     if (selectedNode)
                     {
@@ -230,7 +230,12 @@
             function ls(node, onCompleteCallback, showFiles, showHidden)
             {
                 // generate id path.
-                var p = node.getPath();
+                var p = "";
+                if (node.getPath)
+                {
+                    // not available for Yahoo.widget.RootNodes
+                    p = node.getPath();
+                }
 
                 var ajax = new Ajax.Request(
                     "$base/ajax/ls.action",
@@ -280,7 +285,7 @@
             function mkdir(name)
             {
                 // grab selected file.
-                var node = ZUTUBI.widget.TreeView.getTree('browseTree').selected;
+                var node = YAHOO.widget.TreeView.getTree('browseTree').selected;
                 if (!node)
                 {
                     // should not be getting here... the mkdir toolbar item should not be
@@ -307,7 +312,7 @@
             {
                 return function(response)
                 {
-                    var tree = ZUTUBI.widget.TreeView.getTree('browseTree');
+                    var tree = YAHOO.widget.TreeView.getTree('browseTree');
 
                     // if response indicates success, refresh the folder response.
 
@@ -337,7 +342,7 @@
             function rmdir()
             {
                 // grab selected file.
-                var node = ZUTUBI.widget.TreeView.getTree('browseTree').selected;
+                var node = YAHOO.widget.TreeView.getTree('browseTree').selected;
 
                 // generate id path.
                 var p = node.getPath();
@@ -359,7 +364,7 @@
                 return function(response)
                 {
                     // check response. if success, remove the node from the tree.
-                    var tree = ZUTUBI.widget.TreeView.getTree('browseTree');
+                    var tree = YAHOO.widget.TreeView.getTree('browseTree');
                     tree.removeNode(node, true);
 
                     // if error, present the error to the user.
