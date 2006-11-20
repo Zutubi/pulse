@@ -1430,13 +1430,13 @@ public class ProjectAcceptanceTest extends ProjectAcceptanceTestBase
         assertTablePresent("project.cleanup");
         if(rows != null)
         {
-            String[][] allRows = new String[rows.length + 2][5];
-            allRows[0] = new String[]{"what", "with state(s)", "retain for up to", "actions", "actions"};
+            String[][] allRows = new String[rows.length + 2][6];
+            allRows[0] = new String[]{"what", "with state(s)", "retain for up to", "actions", "actions", "actions"};
             for(int i = 1; i <= rows.length; i++)
             {
                 allRows[i] = rows[i - 1];
             }
-            allRows[rows.length + 1] = new String[]{"add new cleanup rule", "add new cleanup rule", "add new cleanup rule", "add new cleanup rule", "add new cleanup rule"};
+            allRows[rows.length + 1] = new String[]{"add new cleanup rule", "add new cleanup rule", "add new cleanup rule", "add new cleanup rule", "add new cleanup rule", "add new cleanup rule"};
             assertTableRowsEqual("project.cleanup", 1, allRows);
         }
         else
@@ -1451,7 +1451,7 @@ public class ProjectAcceptanceTest extends ProjectAcceptanceTestBase
 
     private String[] getCleanupRow(boolean workDirsOnly, String states, String limit)
     {
-        return new String[]{workDirsOnly ? "working directories" : "whole build results", states, limit, "edit", "delete"};
+        return new String[]{workDirsOnly ? "working directories" : "whole build results", states, limit, "trigger", "edit", "delete"};
     }
 
     private void assertProjectBuildSpecTable(String[][] rows)

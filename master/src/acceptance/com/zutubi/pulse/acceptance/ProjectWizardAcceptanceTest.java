@@ -255,9 +255,9 @@ public class ProjectWizardAcceptanceTest extends BaseAcceptanceTestCase
     {
         assertTablePresent("project.cleanup");
         assertTableRowsEqual("project.cleanup", 1, new String[][]{
-                new String[]{"what", "with state(s)", "retain for up to", "actions", "actions"},
-                new String[]{"working directories", "any", "10 builds", "edit", "delete"},
-                new String[]{"add new cleanup rule", "add new cleanup rule", "add new cleanup rule", "add new cleanup rule", "add new cleanup rule"},
+                new String[]{"what", "with state(s)", "retain for up to", "actions", "actions", "actions"},
+                new String[]{"working directories", "any", "10 builds", "trigger", "edit", "delete"},
+                new String[]{"add new cleanup rule", "add new cleanup rule", "add new cleanup rule", "add new cleanup rule", "add new cleanup rule", "add new cleanup rule"},
         });
 
         assertTablePresent("project.buildspecs");
