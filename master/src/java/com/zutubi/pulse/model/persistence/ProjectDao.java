@@ -41,4 +41,6 @@ public interface ProjectDao extends EntityDao<Project>
     RunExecutablePostBuildAction findRunExecutablePostBuildAction(long id);
 
     List<Project> findByAdminAuthority(String authority);
+
+    Project findByCleanupRule(CleanupRule rule);
 }

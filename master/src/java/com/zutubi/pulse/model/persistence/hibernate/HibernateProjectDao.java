@@ -98,4 +98,9 @@ public class HibernateProjectDao extends HibernateEntityDao<Project> implements 
     {
         return findByNamedQuery("findByAcl", "recipient", recipient);
     }
+
+    public Project findByCleanupRule(CleanupRule rule)
+    {
+        return (Project) findUniqueByNamedQuery("findProjectByCleanupRule", "cleanupRule", rule);
+    }
 }

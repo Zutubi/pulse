@@ -809,6 +809,11 @@
             <result name="success" type="redirect">/configureProject.action?id=${projectId}</result>
         </action>
 
+        <action name="triggerCleanupRule" class="com.zutubi.pulse.web.project.TriggerCleanupRuleAction">
+            <result name="error" type="velocity">generic-error.vm</result>
+            <result name="success" type="redirect">/configureProject.action?id=${projectId}</result>
+        </action>
+
         <action name="convertToCustomProject" class="com.zutubi.pulse.web.project.ConvertToCustomProjectAction">
             <result name="input" type="velocity">convert-to-custom-project.vm</result>
             <result name="cancel" type="redirect">/configureProject.action?id=${id}</result>

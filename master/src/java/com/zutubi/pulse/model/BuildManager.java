@@ -119,7 +119,13 @@ public interface BuildManager
 
     boolean isSpaceAvailableForBuild();
 
+    boolean canCancel(BuildResult build, User user);
+
     void cleanupBuilds(User user);
 
-    boolean canCancel(BuildResult build, User user);
+    void cleanupBuilds(Project project);
+
+    void cleanupBuilds(CleanupRule rule);
+
+    boolean isCleanupInProgress(Project project);
 }

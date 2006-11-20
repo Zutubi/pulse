@@ -291,13 +291,18 @@
                 <!-- Cleanup rules -->
 
                 <table id="project.cleanup" class="fill-content">
-                    #headingRow("project.cleanup" 5)
+                    #headingRow("project.cleanup" 6)
+#if($cleanupInProgress)
+                    <tr>
+                        <th class="note" colspan="6">$action.getText("cleanup.in.progress")</th>
+                    </tr>
+#end
                     <tr>
                         #contentHeading("cleanup.what" 1)
                         #contentHeading("cleanup.states" 1)
                         #contentHeading("cleanup.retain" 1)
 #acl("domainObject=project" "hasPermission=4,1")
-                        #contentHeading("actions" 2)
+                        #contentHeading("actions" 3)
 #end
                     </tr>
 #if($project.cleanupRules.size() > 0)
@@ -312,16 +317,17 @@
                         #contentCell($rule.prettyStateNames)
                         #contentCell($rule.prettyWhen)
         #acl("domainObject=project" "hasPermission=4,1")
+                        #actionCellId("cleanup.trigger" "triggerCleanupRule.action?id=$rule.id&projectId=$project.id" "lightning.gif" "trigger_cleanup_$rule.id" 1)
                         #editCell("editCleanupRule!input.action?projectId=$project.id&amp;id=$rule.id" "edit_cleanup_$rule.id")
                         #deleteCell("delete_cleanup_$rule.id" "deleteCleanupRule.action?projectId=$project.id&amp;id=$rule.id" $confirmMessage)
         #end
                     </tr>
     #end
 #else
-                    #contentRow("cleanup.none" 5)
+                    #contentRow("cleanup.none" 6)
 #end
 #acl("domainObject=project" "hasPermission=4,1")
-                    #addRow("cleanup.rule.add" 5 "addCleanupRule!input.action?projectId=$project.id" "project.cleanup.add")
+                    #addRow("cleanup.rule.add" 6 "addCleanupRule!input.action?projectId=$project.id" "project.cleanup.add")
 #end
                 </table>
 

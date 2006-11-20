@@ -256,6 +256,23 @@ public class HibernateProjectDaoTest extends MasterPersistenceTestCase
         assertEquals(p1.getId(), found.getId());
     }
 
+    public void testFindByCleanupRule()
+    {
+        Project p1 = new Project("p1", "This is a test project");
+        Project p2 = new Project("p2", "This is a test project");
+        CleanupRule r1 = new CleanupRule(true, null, 5, CleanupRule.CleanupUnit.BUILDS);
+        CleanupRule r2 = new CleanupRule(true, null, 5, CleanupRule.CleanupUnit.BUILDS);
+        p1.addCleanupRule(r1);
+        p2.addCleanupRule(r2);
+        projectDao.save(p1);
+        projectDao.save(p2);
+        commitAndRefreshTransaction();
+
+        Project found = projectDao.findByCleanupRule(r1);
+        assertNotNull(found);
+        assertEquals(p1.getId(), found.getId());
+    }
+
     public void testFindByAdminAuthority()
     {
         addAdminProject("justA1");

@@ -16,6 +16,8 @@ public class ConfigureProjectAction extends ProjectActionSupport
     private List<Trigger> triggers;
     private UserManager userManager;
 
+    private boolean cleanupInProgress = false;
+
     private List<CommitMessageTransformer> transformers;
 
     public long getId()
@@ -36,6 +38,11 @@ public class ConfigureProjectAction extends ProjectActionSupport
     public List<Trigger> getTriggers()
     {
         return triggers;
+    }
+
+    public boolean isCleanupInProgress()
+    {
+        return cleanupInProgress;
     }
 
     public int getDefaultScmPollingInterval()
@@ -112,6 +119,8 @@ public class ConfigureProjectAction extends ProjectActionSupport
         triggers = getScheduler().getTriggers(id);
 
         transformers = transformerManager.getByProject(project);
+
+        cleanupInProgress = buildManager.isCleanupInProgress(project);
 
         return SUCCESS;
     }

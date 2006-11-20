@@ -542,6 +542,11 @@ public class DefaultProjectManager implements ProjectManager
         projectGroupDao.delete(projectGroup);
     }
 
+    public Project getProjectByCleanupRule(CleanupRule rule)
+    {
+        return projectDao.findByCleanupRule(rule);
+    }
+
     public void setEventManager(EventManager eventManager)
     {
         this.eventManager = eventManager;

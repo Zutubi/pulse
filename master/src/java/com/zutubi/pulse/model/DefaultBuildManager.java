@@ -23,6 +23,8 @@ import com.zutubi.pulse.util.logging.Logger;
 
 import java.io.File;
 import java.util.List;
+import java.util.Map;
+import java.util.HashMap;
 
 /**
  *
@@ -46,6 +48,8 @@ public class DefaultBuildManager implements BuildManager, EventListener
     private static final String CLEANUP_NAME = "cleanup";
     private static final String CLEANUP_GROUP = "services";
     private static final long CLEANUP_FREQUENCY = Constants.HOUR;
+
+    private static final Map<Project, Object> runningCleanups = new HashMap<Project, Object>();
 
     public void init()
     {
@@ -376,25 +380,53 @@ public class DefaultBuildManager implements BuildManager, EventListener
         return buildResultDao.findPreviousBuildResult(result);
     }
 
-    private synchronized void cleanupBuilds(Project project)
+    /**
+     * Returns true if a cleanup is being run for the specified project, false otherwise.
+     *
+     * @param project being queried.
+     *
+     * @return true iff a cleanup is in progress.
+     */
+    public boolean isCleanupInProgress(Project project)
     {
-        List<CleanupRule> rules = project.getCleanupRules();
+        return runningCleanups.containsKey(project);
+    }
 
-        for (CleanupRule rule : rules)
+    /**
+     * Execute the configured cleanup rules for the specified project.
+     * @param project
+     */
+    public void cleanupBuilds(Project project)
+    {
+        try
         {
-            List<BuildResult> oldBuilds = rule.getMatchingResults(project, buildResultDao);
+            runningCleanups.put(project, null);
 
-            for (BuildResult build : oldBuilds)
+            List<CleanupRule> rules = project.getCleanupRules();
+
+            for (CleanupRule rule : rules)
             {
-                if (rule.getWorkDirOnly())
-                {
-                    cleanupWork(build);
-                }
-                else
-                {
-                    cleanupResult(build);
-                }
+                cleanupBuilds(rule, project);
             }
+        }
+        finally
+        {
+            runningCleanups.remove(project);
+        }
+    }
+
+    public void cleanupBuilds(CleanupRule rule)
+    {
+        // locate the project associated with the cleanup rule.
+        Project project = projectManager.getProjectByCleanupRule(rule);
+        try
+        {
+            runningCleanups.put(project, null);
+            cleanupBuilds(rule, project);
+        }
+        finally
+        {
+            runningCleanups.remove(project);
         }
     }
 
@@ -408,6 +440,23 @@ public class DefaultBuildManager implements BuildManager, EventListener
             for(BuildResult result: results)
             {
                 cleanupResult(result);
+            }
+        }
+    }
+
+    private synchronized void cleanupBuilds(CleanupRule rule, Project project)
+    {
+        List<BuildResult> oldBuilds = rule.getMatchingResults(project, buildResultDao);
+
+        for (BuildResult build : oldBuilds)
+        {
+            if (rule.getWorkDirOnly())
+            {
+                cleanupWork(build);
+            }
+            else
+            {
+                cleanupResult(build);
             }
         }
     }

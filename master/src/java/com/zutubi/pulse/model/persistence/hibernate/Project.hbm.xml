@@ -262,6 +262,11 @@
         where :buildSpecification in elements(project.buildSpecifications)
     ]]></query>
 
+    <query name="findProjectByCleanupRule"><![CDATA[
+        from Project project
+        where :cleanupRule in elements(project.cleanupRules)
+    ]]></query>
+
     <query name="findByAcl"><![CDATA[
         select project
         from Project project

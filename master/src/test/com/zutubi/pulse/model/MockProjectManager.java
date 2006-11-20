@@ -180,6 +180,11 @@ public class MockProjectManager implements ProjectManager
         throw new RuntimeException("Method not implemented.");
     }
 
+    public Project getProjectByCleanupRule(CleanupRule rule)
+    {
+        throw new RuntimeException("Method not implemented.");
+    }
+
     public void updateProjectDetails(Project project, String name, String description, String url)
     {
         throw new RuntimeException("Method not implemented.");
