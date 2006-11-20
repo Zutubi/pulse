@@ -1,7 +1,7 @@
 package com.zutubi.pulse.cache;
 
 /**
- * The Cache abstracts the cache implementation from Confluence.
+ * The Cache abstracts the cache implementation.
  *
  */
 public interface Cache
