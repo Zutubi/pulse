@@ -12,6 +12,8 @@ public interface ScmManager extends EntityManager<Scm>
 
     List<Scm> getActiveScms();
 
+    void pollActiveScms();
+
     /**
      * Retrieve the default scm polling interval.
      *
