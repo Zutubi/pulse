@@ -50,6 +50,7 @@ public abstract class BaseAcceptanceTestCase extends ExtendedWebTestCase
 
     protected void tearDown() throws Exception
     {
+        tester = null;
         super.tearDown();
     }
 
