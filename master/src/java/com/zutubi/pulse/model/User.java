@@ -262,7 +262,7 @@ public class User extends Entity implements UserDetails
         return result;
     }
 
-    public List<String> getGrantedAuthorities()
+    private List<String> getGrantedAuthorities()
     {
         if (authorities == null)
         {
@@ -615,7 +615,7 @@ public class User extends Entity implements UserDetails
 
     public static String getDefaultAllProjectsColumns()
     {
-        return StringUtils.join(",", BuildColumns.KEY_PROJECT, BuildColumns.KEY_ID, BuildColumns.KEY_SPECIFICATION, BuildColumns.KEY_STATUS, BuildColumns.KEY_REASON, BuildColumns.KEY_TESTS, BuildColumns.KEY_WHEN, BuildColumns.KEY_ELAPSED, BuildColumns.KEY_ACTIONS);
+        return StringUtils.join(",", BuildColumns.KEY_ID, BuildColumns.KEY_SPECIFICATION, BuildColumns.KEY_STATUS, BuildColumns.KEY_REASON, BuildColumns.KEY_TESTS, BuildColumns.KEY_WHEN, BuildColumns.KEY_ELAPSED, BuildColumns.KEY_ACTIONS);
     }
 
     public boolean equals(Object other)
