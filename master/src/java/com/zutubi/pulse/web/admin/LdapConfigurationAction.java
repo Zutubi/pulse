@@ -83,6 +83,10 @@ public class LdapConfigurationAction extends ActionSupport
         config.setLdapUserFilter("");
         config.setLdapEmailAttribute("");
         config.setLdapAutoAdd(false);
+        config.setLdapGroupBaseDn("");
+        config.setLdapGroupFilter("");
+        config.setLdapGroupRoleAttribute("");
+        config.setLdapGroupSearchSubtree(false);
         config.setLdapEscapeSpaces(false);
         ldapManager.init();
     }
@@ -98,6 +102,10 @@ public class LdapConfigurationAction extends ActionSupport
         config.setLdapUserFilter(ldap.getUserFilter());
         config.setLdapAutoAdd(ldap.getAutoAdd());
         config.setLdapEmailAttribute(ldap.getEmailAttribute());
+        config.setLdapGroupBaseDn(ldap.getGroupBaseDn());
+        config.setLdapGroupFilter(ldap.getGroupFilter());
+        config.setLdapGroupRoleAttribute(ldap.getGroupRoleAttribute());
+        config.setLdapGroupSearchSubtree(ldap.getGroupSearchSubtree());
         config.setLdapEscapeSpaces(ldap.getEscapeSpaces());
         ldapManager.init();
         if(ldap.getEnabled())
@@ -118,6 +126,10 @@ public class LdapConfigurationAction extends ActionSupport
         ldap.setUserFilter(config.getLdapUserFilter());
         ldap.setAutoAdd(config.getLdapAutoAdd());
         ldap.setEmailAttribute(config.getLdapEmailAttribute());
+        ldap.setGroupBaseDn(config.getLdapGroupBaseDn());
+        ldap.setGroupFilter(config.getLdapGroupFilter());
+        ldap.setGroupRoleAttribute(config.getLdapGroupRoleAttribute());
+        ldap.setGroupSearchSubtree(config.getLdapGroupSearchSubtree());
         ldap.setEscapeSpaces(config.getLdapEscapeSpaces());
     }
 
@@ -149,6 +161,10 @@ public class LdapConfigurationAction extends ActionSupport
         private String userFilter;
         private Boolean autoAdd = false;
         private String emailAttribute;
+        private String groupBaseDn;
+        private String groupFilter;
+        private String groupRoleAttribute;
+        private Boolean groupSearchSubtree = false;
         private Boolean escapeSpaces = false;
 
         public Boolean getEnabled()
@@ -229,6 +245,46 @@ public class LdapConfigurationAction extends ActionSupport
         public void setEmailAttribute(String emailAttribute)
         {
             this.emailAttribute = emailAttribute;
+        }
+
+        public String getGroupBaseDn()
+        {
+            return groupBaseDn;
+        }
+
+        public void setGroupBaseDn(String groupBaseDn)
+        {
+            this.groupBaseDn = groupBaseDn;
+        }
+
+        public String getGroupFilter()
+        {
+            return groupFilter;
+        }
+
+        public void setGroupFilter(String groupFilter)
+        {
+            this.groupFilter = groupFilter;
+        }
+
+        public String getGroupRoleAttribute()
+        {
+            return groupRoleAttribute;
+        }
+
+        public void setGroupRoleAttribute(String groupRoleAttribute)
+        {
+            this.groupRoleAttribute = groupRoleAttribute;
+        }
+
+        public Boolean getGroupSearchSubtree()
+        {
+            return groupSearchSubtree;
+        }
+
+        public void setGroupSearchSubtree(Boolean groupSearchSubtree)
+        {
+            this.groupSearchSubtree = groupSearchSubtree;
         }
 
         public Boolean getEscapeSpaces()

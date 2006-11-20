@@ -29,6 +29,9 @@ The beans defined within the security subsystem need not be accessed by other co
         <property name="configurationManager">
             <ref bean="configurationManager"/>
         </property>
+        <property name="userManager">
+            <ref bean="userManager"/>
+        </property>
     </bean>
 
     <!-- ============================================================= -->

@@ -3,7 +3,6 @@ package com.zutubi.pulse.model;
 import com.zutubi.pulse.core.model.Entity;
 import com.zutubi.pulse.util.StringUtils;
 import com.zutubi.pulse.web.DefaultAction;
-import org.acegisecurity.userdetails.UserDetails;
 
 import java.util.*;
 
@@ -11,7 +10,7 @@ import java.util.*;
  * 
  *
  */
-public class User extends Entity implements UserDetails
+public class User extends Entity
 {
     public static int REFRESH_DISABLED = 0;
 
@@ -234,35 +233,13 @@ public class User extends Entity implements UserDetails
         return null;
     }
 
-    public GrantedAuthority[] getAuthorities()
-    {
-        List<String> directAuthorities = getGrantedAuthorities();
-        int total = directAuthorities.size();
-
-        for(Group g: groups)
-        {
-            total += g.getAuthorityCount();
-        }
-
-        GrantedAuthority[] result = new GrantedAuthority[total];
-        int i = 0;
-        for(String authority: directAuthorities)
-        {
-            result[i++] = new GrantedAuthority(authority);
-        }
-
-        for(Group g: groups)
-        {
-            for(GrantedAuthority authority: g.getAuthorities())
-            {
-                result[i++] = authority;
-            }
-        }
-
-        return result;
-    }
-
-    private List<String> getGrantedAuthorities()
+    /**
+     * Only returns authorities directly given to the user.  To get full
+     * authority information, ask the UserManager for UserDetails.
+     *
+     * @return authorities granted directly to this user
+     */
+    List<String> getGrantedAuthorities()
     {
         if (authorities == null)
         {
@@ -294,35 +271,6 @@ public class User extends Entity implements UserDetails
     public boolean hasAuthority(String authority)
     {
         return getGrantedAuthorities().contains(authority);
-    }
-
-    public String getUsername()
-    {
-        return getLogin();
-    }
-
-    /**
-     * @see org.acegisecurity.userdetails.UserDetails#isAccountNonExpired()
-     */
-    public boolean isAccountNonExpired()
-    {
-        return true;
-    }
-
-    /**
-     * @see org.acegisecurity.userdetails.UserDetails#isAccountNonLocked()
-     */
-    public boolean isAccountNonLocked()
-    {
-        return true;
-    }
-
-    /**
-     * @see org.acegisecurity.userdetails.UserDetails#isCredentialsNonExpired()
-     */
-    public boolean isCredentialsNonExpired()
-    {
-        return true;
     }
 
     public List<String> getAliases()

@@ -36,16 +36,16 @@ public class LdapConfigurationAcceptanceTest extends BaseAcceptanceTestCase
         assertAndClick(Navigation.Administration.LINK_EDIT_LDAP);
         form.assertFormPresent();
 
-        form.saveFormElements("true", "ldap://dummy/", "dc=example,dc=com", "uid=admin", "password", "(uid={0})", "true", "mail");
+        form.saveFormElements("true", "ldap://dummy/", "dc=example,dc=com", "uid=admin", "password", "(uid={0})", "true", "mail", "ou=groups", "(member=${user.dn})", "cn", "true", "false");
 
         // The ldap config throws up a wait page, run around it :)
         navigateToLdapConfiguration();
 
-        assertLdapTable("true", "ldap://dummy/", "dc=example,dc=com", "uid=admin", "(uid={0})", "true", "mail");
+        assertLdapTable("ldap://dummy/", "dc=example,dc=com");
 
         assertAndClick(Navigation.Administration.LINK_EDIT_LDAP);
-        form.assertFormElements("true", "ldap://dummy/", "dc=example,dc=com", "uid=admin", "password", "(uid={0})", "true", "mail");
-        form.cancelFormElements("true", "ldap://dummy/", "dc=example,dc=com", "uid=admin", "password", "(uid={0})", "true", "mail");
+        form.assertFormElements("true", "ldap://dummy/", "dc=example,dc=com", "uid=admin", "password", "(uid={0})", "true", "mail", "ou=groups", "(member=${user.dn})", "cn", "true", "false");
+        form.cancelFormElements("true", "ldap://dummy/", "dc=example,dc=com", "uid=admin", "password", "(uid={0})", "true", "mail", "ou=groups", "(member=${user.dn})", "cn", "true", "false");
     }
 
     public void testReset() throws Exception
@@ -54,7 +54,7 @@ public class LdapConfigurationAcceptanceTest extends BaseAcceptanceTestCase
         testEdit();
 
         assertAndClick(Navigation.Administration.LINK_RESET_LDAP);
-        assertLdapTable("false", "", "", "", "", "false", "");
+        assertLdapTable("", "");
     }
 
     public void testCancel() throws Exception
@@ -64,7 +64,7 @@ public class LdapConfigurationAcceptanceTest extends BaseAcceptanceTestCase
         assertAndClick(Navigation.Administration.LINK_EDIT_LDAP);
         LdapConfigurationForm form = new LdapConfigurationForm(tester);
         form.assertFormPresent();
-        form.cancelFormElements("true", "oogie", "oogie", "oogie", "oogie", "boogie", "false", "boogie");
+        form.cancelFormElements("true", "oogie", "oogie", "oogie", "oogie", "boogie", "false", "boogie", "oogie", "oogie", "oogie", "false", "false");
 
         assertTextNotPresent("oogie");
     }
@@ -76,20 +76,18 @@ public class LdapConfigurationAcceptanceTest extends BaseAcceptanceTestCase
         assertAndClick(Navigation.Administration.LINK_EDIT_LDAP);
         LdapConfigurationForm form = new LdapConfigurationForm(tester);
         form.assertFormPresent();
-        form.saveFormElements("true", "", "", "", "", "", "false", "");
+        form.saveFormElements("true", "", "", "", "", "", "false", "", "", "", "", "false", "false");
         form.assertFormPresent();
         assertTextPresent("host is required");
         assertTextPresent("base dn is required");
         assertTextPresent("user filter is required");
     }
 
-    private void assertLdapTable(String enabled, String host, String baseDn, String managerDn, String userFilter, String autoAdd, String emailAttribute)
+    private void assertLdapTable(String host, String baseDn)
     {
         assertTablePresent("ldap.config");
         // Can't assert directly on the table as it may or may not have a note row
+        assertTextPresent(host);
         assertTextPresent(baseDn);
-        assertTextPresent(managerDn);
-        assertTextPresent(userFilter);
-        assertTextPresent(emailAttribute);
     }
 }

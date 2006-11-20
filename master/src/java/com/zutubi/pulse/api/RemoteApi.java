@@ -16,7 +16,6 @@ import com.zutubi.pulse.license.LicenseException;
 import com.zutubi.pulse.license.LicenseHolder;
 import com.zutubi.pulse.model.*;
 import com.zutubi.pulse.scm.SCMConfiguration;
-import com.zutubi.pulse.security.AcegiUtils;
 import com.zutubi.pulse.util.TimeStamps;
 import com.zutubi.pulse.validation.PulseValidationContext;
 import com.zutubi.validation.ValidationContext;
@@ -24,6 +23,7 @@ import com.zutubi.validation.ValidationException;
 import com.zutubi.validation.ValidationManager;
 import ognl.Ognl;
 import ognl.OgnlException;
+import org.acegisecurity.AuthenticationManager;
 
 import java.util.*;
 
@@ -40,6 +40,7 @@ public class RemoteApi
     private ProjectManager projectManager;
     private UserManager userManager;
     private AgentManager agentManager;
+    private AuthenticationManager authenticationManager;
 
     private ValidationManager validationManager;
 
@@ -674,8 +675,7 @@ public class RemoteApi
     {
         try
         {
-            User user = tokenManager.verifyAdmin(token);
-            AcegiUtils.loginAs(user);
+            tokenManager.loginUser(token);
 
             String name = (String) project.get("name");
             Project existingProject = projectManager.getProject(name);
@@ -705,7 +705,7 @@ public class RemoteApi
         }
         finally
         {
-            AcegiUtils.logout();
+            tokenManager.logoutUser();
         }
     }
 
@@ -1230,5 +1230,10 @@ public class RemoteApi
     public void setCommitMessageTransformerManager(CommitMessageTransformerManager manager)
     {
         this.transformerManager = manager;
+    }
+
+    public void setAuthenticationManager(AuthenticationManager authenticationManager)
+    {
+        this.authenticationManager = authenticationManager;
     }
 }

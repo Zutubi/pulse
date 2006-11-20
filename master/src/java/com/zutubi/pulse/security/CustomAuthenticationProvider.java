@@ -1,5 +1,6 @@
 package com.zutubi.pulse.security;
 
+import com.zutubi.pulse.model.AcegiUser;
 import com.zutubi.pulse.model.User;
 import com.zutubi.pulse.model.UserManager;
 import com.zutubi.pulse.security.ldap.LdapManager;
@@ -57,19 +58,21 @@ public class CustomAuthenticationProvider extends DaoAuthenticationProvider
 
     protected void additionalAuthenticationChecks(UserDetails userDetails, UsernamePasswordAuthenticationToken authentication) throws AuthenticationException
     {
-        User user = (User) userDetails;
-        if(user.getLdapAuthentication())
+        AcegiUser user = (AcegiUser) userDetails;
+        if(user.getUser().getLdapAuthentication())
         {
-            LOG.debug("Authenticating user '" + user.getLogin() + "' via LDAP");
+            LOG.debug("Authenticating user '" + user.getUsername() + "' via LDAP");
             if(ldapManager.authenticate(authentication.getName(), authentication.getCredentials().toString()) == null)
             {
-                LOG.debug("Authentication failed for user '" + user.getLogin() + "' via LDAP");
+                LOG.debug("Authentication failed for user '" + user.getUsername() + "' via LDAP");
                 throw new BadCredentialsException("Bad credentials");
             }
+
+            ldapManager.addLdapRoles(user);
         }
         else
         {
-            LOG.debug("Authenticating user '" + user.getLogin() + "' via stored password");
+            LOG.debug("Authenticating user '" + user.getUsername() + "' via stored password");
             super.additionalAuthenticationChecks(userDetails, authentication);
         }
     }

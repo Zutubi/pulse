@@ -6,6 +6,7 @@ import com.zutubi.pulse.license.authorisation.AddUserAuthorisation;
 import com.zutubi.pulse.model.persistence.ContactPointDao;
 import com.zutubi.pulse.model.persistence.GroupDao;
 import com.zutubi.pulse.model.persistence.UserDao;
+import com.zutubi.pulse.security.ldap.LdapManager;
 import com.zutubi.pulse.web.DefaultAction;
 import org.acegisecurity.providers.encoding.PasswordEncoder;
 import org.acegisecurity.userdetails.UserDetails;
@@ -33,6 +34,11 @@ public class DefaultUserManager implements UserManager
      * is initialised on demand (not available when this manager is created).
      */
     private BuildManager buildManager;
+    /**
+     * Do not access directly, always use getLdapManager().  This dependency
+     * is initialised on demand (not available when this manager is created).
+     */
+    private LdapManager ldapManager;
 
     public void init()
     {
@@ -212,6 +218,15 @@ public class DefaultUserManager implements UserManager
         return projects;
     }
 
+    public AcegiUser getPrinciple(User user)
+    {
+        AcegiUser principle = new AcegiUser(user);
+        // Force initialisation of groups
+        user.getGroups();
+        getLdapManager().addLdapRoles(principle);
+        return principle;
+    }
+
     public void removeReferencesToProject(Project project)
     {
         List<User> users = userDao.findByShownProject(project);
@@ -237,14 +252,25 @@ public class DefaultUserManager implements UserManager
         return userDao.count();
     }
 
+    /**
+     * Only for use by Acegi.  Calling this method directly is dangerous, as
+     * the returned details are not fully initialised!  Use #getUserDetails
+     * instead.
+     *
+     * @param username
+     * @return
+     * @throws UsernameNotFoundException
+     * @throws DataAccessException
+     */
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException, DataAccessException
     {
-        UserDetails details = userDao.findByLogin(username);
-        if (details == null)
+        User user = userDao.findByLogin(username);
+        if (user == null)
         {
             throw new UsernameNotFoundException("Unknown user");
         }
 
+        UserDetails details = new AcegiUser(user);
         return details;
     }
 
@@ -302,5 +328,19 @@ public class DefaultUserManager implements UserManager
     public void setBuildManager(BuildManager buildManager)
     {
         this.buildManager = buildManager;
+    }
+
+    public LdapManager getLdapManager()
+    {
+        if(ldapManager == null)
+        {
+            ldapManager = (LdapManager) ComponentContext.getBean("ldapManager");
+        }
+        return ldapManager;
+    }
+
+    public void setLdapManager(LdapManager ldapManager)
+    {
+        this.ldapManager = ldapManager;
     }
 }

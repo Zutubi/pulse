@@ -64,16 +64,7 @@ public interface UserManager extends EntityManager<User>, UserDetailsService
 
     Set<Project> getUserProjects(User user, ProjectManager projectManager);
 
-    /**
-     * Returns true iff the given user has been granted the given authority,
-     * either directly or by being a member of a group that has been granted
-     * the authority.
-     *
-     * @param user      the user to test
-     * @param authority the authority to test for
-     * @return true iff the user has been gratned the authority
-     */
-    boolean hasAuthority(User user, String authority);
+    AcegiUser getPrinciple(User user);
 
     void setPassword(User user, String rawPassword);
 

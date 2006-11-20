@@ -1,5 +1,6 @@
 package com.zutubi.pulse.api;
 
+import com.zutubi.pulse.license.LicenseManager;
 import com.zutubi.pulse.model.DefaultUserManager;
 import com.zutubi.pulse.model.GrantedAuthority;
 import com.zutubi.pulse.model.MockBuildManager;
@@ -8,9 +9,9 @@ import com.zutubi.pulse.model.persistence.GroupDao;
 import com.zutubi.pulse.model.persistence.UserDao;
 import com.zutubi.pulse.model.persistence.mock.MockGroupDao;
 import com.zutubi.pulse.model.persistence.mock.MockUserDao;
+import com.zutubi.pulse.security.ldap.AcegiLdapManager;
 import com.zutubi.pulse.test.PulseTestCase;
 import com.zutubi.pulse.util.Constants;
-import com.zutubi.pulse.license.LicenseManager;
 import org.acegisecurity.providers.encoding.PlaintextPasswordEncoder;
 
 /**
@@ -35,6 +36,7 @@ public class TokenManagerTest extends PulseTestCase
         userManager.setGroupDao(groupDao);
         userManager.setLicenseManager(new LicenseManager());
         userManager.setBuildManager(new MockBuildManager());
+        userManager.setLdapManager(new AcegiLdapManager());
 
         tokenManager = new TokenManager();
         tokenManager.setUserManager(userManager);

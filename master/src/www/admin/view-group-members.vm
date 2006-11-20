@@ -41,6 +41,11 @@
               </td>
           </tr>
           <tr>
+              <td style="padding-bottom: 15px">
+                  <img alt="info" src="$base/images/information.gif"/> #wwtext("name=ldap.members.not.shown")
+              </td>
+          </tr>
+          <tr>
               <td>
                   <img alt="edit" src="$base/images/pencil.gif"/> <a href="editGroup!input.action?groupId=$groupId">#wwtext("name=edit group")</a>
                   <img alt="return" src="$base/images/group_go.gif"/> <a href="viewGroups.action?startPage=$startPage">#wwtext("name=return.to.groups.view")</a>

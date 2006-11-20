@@ -74,7 +74,7 @@ public class PersonalBuildAction extends ActionSupport
             return ERROR;
         }
 
-        if(!userManager.hasAuthority(user, GrantedAuthority.PERSONAL))
+        if(!userManager.getPrinciple(user).hasAuthority(GrantedAuthority.PERSONAL))
         {
             throw new AccessDeniedException("User does not have authority to submit personal build requests.");
         }

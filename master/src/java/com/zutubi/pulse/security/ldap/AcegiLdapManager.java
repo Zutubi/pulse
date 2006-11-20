@@ -4,17 +4,22 @@ import com.opensymphony.util.TextUtils;
 import com.zutubi.pulse.bootstrap.MasterConfiguration;
 import com.zutubi.pulse.bootstrap.MasterConfigurationManager;
 import com.zutubi.pulse.license.LicenseHolder;
-import com.zutubi.pulse.model.EmailContactPoint;
-import com.zutubi.pulse.model.User;
+import com.zutubi.pulse.model.*;
 import com.zutubi.pulse.util.logging.Logger;
 import org.acegisecurity.BadCredentialsException;
+import org.acegisecurity.GrantedAuthority;
 import org.acegisecurity.ldap.DefaultInitialDirContextFactory;
 import org.acegisecurity.ldap.search.FilterBasedLdapUserSearch;
 import org.acegisecurity.providers.ldap.authenticator.BindAuthenticator;
+import org.acegisecurity.providers.ldap.populator.DefaultLdapAuthoritiesPopulator;
 import org.acegisecurity.userdetails.ldap.LdapUserDetails;
 
 import javax.naming.NamingException;
 import javax.naming.directory.Attribute;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
 
 /**
  */
@@ -22,15 +27,19 @@ public class AcegiLdapManager implements LdapManager
 {
     private static final Logger LOG = Logger.getLogger(AcegiLdapManager.class);
 
-    private boolean initialised = false;
+    private static final String EMAIL_CONTACT_NAME = "LDAP email";
 
+    private boolean initialised = false;
     private MasterConfigurationManager configurationManager;
     private boolean enabled = false;
     private DefaultInitialDirContextFactory contextFactory;
     private BindAuthenticator authenticator;
+    private DefaultLdapAuthoritiesPopulator populator = null;
     private boolean autoAdd = false;
     private String statusMessage = null;
     private String emailAttribute = null;
+    private UserManager userManager;
+    private Map<String, LdapUserDetails> detailsMap = new HashMap<String, LdapUserDetails>();
 
     public void init()
     {
@@ -41,7 +50,7 @@ public class AcegiLdapManager implements LdapManager
         autoAdd = appConfig.getLdapAutoAdd();
         emailAttribute = appConfig.getLdapEmailAttribute();
 
-        if(enabled)
+        if (enabled)
         {
             String hostUrl = appConfig.getLdapHostUrl();
             String baseDn = appConfig.getLdapBaseDn();
@@ -49,19 +58,8 @@ public class AcegiLdapManager implements LdapManager
             String managerPassword = appConfig.getLdapManagerPassword();
             boolean escapeSpaces = appConfig.getLdapEscapeSpaces();
 
-            if(escapeSpaces)
-            {
-                baseDn = escapeSpaces(baseDn);
-                managerDn = escapeSpaces(managerDn);
-            }
-
-            contextFactory = createContextFactory(hostUrl, baseDn, managerDn, managerPassword);
-
-            FilterBasedLdapUserSearch search = new FilterBasedLdapUserSearch("", convertFilter(appConfig), contextFactory);
-            search.setSearchSubtree(true);
-
-            authenticator = new BindAuthenticator(contextFactory);
-            authenticator.setUserSearch(search);
+            contextFactory = createContextFactory(hostUrl, baseDn, managerDn, managerPassword, escapeSpaces);
+            authenticator = createAuthenticator(appConfig.getLdapUserFilter(), contextFactory);
 
             try
             {
@@ -73,19 +71,93 @@ public class AcegiLdapManager implements LdapManager
                 statusMessage = e.getMessage();
                 return;
             }
+
+            if (TextUtils.stringSet(appConfig.getLdapGroupBaseDn()))
+            {
+                populator = createPopulator(appConfig.getLdapGroupBaseDn(), appConfig.getLdapGroupFilter(), appConfig.getLdapGroupRoleAttribute(), appConfig.getLdapGroupSearchSubtree(), escapeSpaces, contextFactory);
+            }
         }
         else
         {
             contextFactory = null;
             authenticator = null;
+            populator = null;
         }
 
         initialised = true;
     }
 
-    private String convertFilter(MasterConfiguration appConfig)
+    private DefaultInitialDirContextFactory createContextFactory(String hostUrl, String baseDn, String managerDn, String managerPassword, boolean escapeSpaces)
     {
-        return appConfig.getLdapUserFilter().replace("${login}", "{0}");
+        if (escapeSpaces)
+        {
+            baseDn = escapeSpaces(baseDn);
+            managerDn = escapeSpaces(managerDn);
+        }
+
+
+        if (!hostUrl.endsWith("/"))
+        {
+            hostUrl += '/';
+        }
+
+        DefaultInitialDirContextFactory result = new DefaultInitialDirContextFactory(hostUrl + baseDn);
+
+        if (TextUtils.stringSet(managerDn))
+        {
+            result.setManagerDn(managerDn);
+
+            if (TextUtils.stringSet(managerPassword))
+            {
+                result.setManagerPassword(managerPassword);
+            }
+        }
+
+        return result;
+    }
+
+    private BindAuthenticator createAuthenticator(String userFilter, DefaultInitialDirContextFactory contextFactory)
+    {
+        FilterBasedLdapUserSearch search = new FilterBasedLdapUserSearch("", convertUserFilter(userFilter), contextFactory);
+        search.setSearchSubtree(true);
+
+        BindAuthenticator authenticator = new BindAuthenticator(contextFactory);
+        authenticator.setUserSearch(search);
+        return authenticator;
+    }
+
+    private DefaultLdapAuthoritiesPopulator createPopulator(String groupDn, String groupFilter, String groupRoleAttribute, boolean searchSubtree, boolean escapeSpaces, DefaultInitialDirContextFactory contextFactory)
+    {
+        if (escapeSpaces)
+        {
+            groupDn = escapeSpaces(groupDn);
+        }
+
+        DefaultLdapAuthoritiesPopulator populator = new DefaultLdapAuthoritiesPopulator(contextFactory, groupDn);
+        if (TextUtils.stringSet(groupFilter))
+        {
+            populator.setGroupSearchFilter(convertGroupFilter(groupFilter));
+        }
+
+        if (TextUtils.stringSet(groupRoleAttribute))
+        {
+            populator.setGroupRoleAttribute(groupRoleAttribute);
+        }
+
+        populator.setSearchSubtree(searchSubtree);
+        populator.setRolePrefix("");
+        populator.setConvertToUpperCase(false);
+        return populator;
+    }
+
+    private String convertUserFilter(String userFilter)
+    {
+        return userFilter.replace("${login}", "{0}");
+    }
+
+    private String convertGroupFilter(String groupFilter)
+    {
+        return groupFilter.replace("${user.dn}", "{0}").replace("${login}", "{1}");
     }
 
     public void connect()
@@ -95,7 +167,7 @@ public class AcegiLdapManager implements LdapManager
         {
             contextFactory.newInitialDirContext();
         }
-        catch(Exception e)
+        catch (Exception e)
         {
             LOG.warning("Unable to connect to LDAP server: " + e.getMessage());
             statusMessage = e.getMessage();
@@ -110,25 +182,26 @@ public class AcegiLdapManager implements LdapManager
             {
                 LdapUserDetails details = authenticator.authenticate(username, password);
                 String name = getStringAttribute(details, "cn", username);
-                if(name == null)
+                if (name == null)
                 {
                     name = username;
                 }
 
                 User user = new User(username, name);
 
-                if(TextUtils.stringSet(emailAttribute))
+                if (TextUtils.stringSet(emailAttribute))
                 {
                     addContact(user, details);
                 }
 
+                detailsMap.put(username, details);
                 return user;
             }
-            catch(BadCredentialsException e)
+            catch (BadCredentialsException e)
             {
                 LOG.info("LDAP login failure: user: " + username + " : " + e.getMessage(), e);
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 LOG.warning("Error contacting LDAP server: " + e.getMessage());
                 statusMessage = e.getMessage();
@@ -138,33 +211,79 @@ public class AcegiLdapManager implements LdapManager
         return null;
     }
 
+    public void addLdapRoles(AcegiUser user)
+    {
+        if (populator != null)
+        {
+            LdapUserDetails details = detailsMap.get(user.getUsername());
+            if (details != null)
+            {
+                try
+                {
+                    List<Group> groups = getLdapGroups(details, populator);
+                    for(Group group: groups)
+                    {
+                        LOG.debug("Adding user '" + details.getUsername() + "' to group '" + group.getName() + "' via LDAP");
+                        for (GrantedAuthority a : group.getAuthorities())
+                        {
+                            user.addTransientAuthority(a.getAuthority());
+                        }
+                    }
+                }
+                catch (Exception e)
+                {
+                    LOG.severe("Error retrieving group roles from LDAP server: " + e.getMessage(), e);
+                }
+            }
+        }
+    }
+
+    private List<Group> getLdapGroups(LdapUserDetails details, DefaultLdapAuthoritiesPopulator populator)
+    {
+        List<Group> groups = new LinkedList<Group>();
+        GrantedAuthority[] ldapAuthorities = populator.getGrantedAuthorities(details);
+        for (GrantedAuthority authority : ldapAuthorities)
+        {
+            Group group = userManager.getGroup(authority.getAuthority());
+            if (group != null)
+            {
+                groups.add(group);
+            }
+        }
+
+        return groups;
+    }
+
     private void addContact(User user, LdapUserDetails details)
     {
-        String email = getStringAttribute(details, emailAttribute, user.getLogin());
-        if(email != null)
+        if (user.getContactPoint(EMAIL_CONTACT_NAME) == null)
         {
-            EmailContactPoint point = new EmailContactPoint(email);
-            point.setName("LDAP email");
-            user.add(point);
+            String email = getStringAttribute(details, emailAttribute, user.getLogin());
+            if (email != null)
+            {
+                EmailContactPoint point = new EmailContactPoint(email);
+                point.setName(EMAIL_CONTACT_NAME);
+                user.add(point);
+            }
         }
     }
 
     private String getStringAttribute(LdapUserDetails details, String attribute, String username)
     {
         Attribute att = details.getAttributes().get(attribute);
-        if(att != null)
+        if (att != null)
         {
             try
             {
                 Object value = att.get();
-                if(value instanceof String)
+                if (value instanceof String)
                 {
                     return (String) value;
                 }
             }
             catch (NamingException e)
             {
-                LOG.debug("Unable to get attribute '" + attribute + "' for user '" + username + "': " + e.getMessage(),  e);
+                LOG.debug("Unable to get attribute '" + attribute + "' for user '" + username + "': " + e.getMessage(), e);
             }
         }
         else
@@ -180,38 +299,18 @@ public class AcegiLdapManager implements LdapManager
         return enabled && initialised && autoAdd && LicenseHolder.hasAuthorization("canAddUser");
     }
 
-    private DefaultInitialDirContextFactory createContextFactory(String hostUrl, String baseDn, String managerDn, String managerPassword)
+    public List<Group> testAuthenticate(String hostUrl, String baseDn, String managerDn, String managerPassword, String userFilter,
+                                         String groupDn, String groupFilter, String groupRoleAttribute, boolean groupSearchSubtree, boolean escapeSpaces,
+                                         String testLogin, String testPassword)
     {
-        if(!hostUrl.endsWith("/"))
-        {
-            hostUrl += '/';
-        }
-
-        DefaultInitialDirContextFactory result = new DefaultInitialDirContextFactory(hostUrl + baseDn);
-
-        if(TextUtils.stringSet(managerDn))
-        {
-            result.setManagerDn(managerDn);
-
-            if(TextUtils.stringSet(managerPassword))
-            {
-                result.setManagerPassword(managerPassword);
-            }
-        }
-
-        return result;
-    }
-
-    public void test(String hostUrl, String baseDn, String managerDn, String managerPassword, boolean escapeSpaces)
-    {
-        if(escapeSpaces)
-        {
-            baseDn = escapeSpaces(baseDn);
-            managerDn = escapeSpaces(managerDn);
-        }
-
-        DefaultInitialDirContextFactory contextFactory = createContextFactory(hostUrl, baseDn, managerDn, managerPassword);
+        DefaultInitialDirContextFactory contextFactory = createContextFactory(hostUrl, baseDn, managerDn, managerPassword, escapeSpaces);
         contextFactory.newInitialDirContext();
+
+        BindAuthenticator authenticator = createAuthenticator(userFilter, contextFactory);
+        LdapUserDetails details = authenticator.authenticate(testLogin, testPassword);
+
+        DefaultLdapAuthoritiesPopulator populator = createPopulator(groupDn, groupFilter, groupRoleAttribute, groupSearchSubtree, escapeSpaces, contextFactory);
+        return getLdapGroups(details, populator);
     }
 
     private String escapeSpaces(String dn)
@@ -227,5 +326,10 @@ public class AcegiLdapManager implements LdapManager
     public String getStatusMessage()
     {
         return statusMessage;
+    }
+
+    public void setUserManager(UserManager userManager)
+    {
+        this.userManager = userManager;
     }
 }

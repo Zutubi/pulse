@@ -1,0 +1,27 @@
+#if($actionErrors && $actionErrors.size() > 0)
+    <ul class="error">
+    #foreach($error in $actionErrors)
+        <li class="error">$!webwork.htmlEncode($error)</li>
+    #end
+    </ul>
+#elseif($fieldErrors && $fieldErrors.size() > 0)
+    <ul class="error">
+    #foreach($error in $fieldErrors)
+        <li class="error">$!webwork.htmlEncode($error)</li>
+    #end
+    </ul>
+#else
+    <img src="$base/images/accept.gif"/> #wwtext("name=ldap.settings.ok")
+    <p>
+    #if($groups.size() > 0)
+        $action.getText("ldap.user.groups", [$groups.size()])
+        <ul>
+        #foreach($group in $groups)
+            <li>$!webwork.htmlEncode($group.name)</li>
+        #end
+        </ul>
+    #else
+        #wwtext("name=ldap.user.no.groups")
+    #end
+    </p>
+#end

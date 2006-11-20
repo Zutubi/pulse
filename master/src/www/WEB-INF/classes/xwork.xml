@@ -1418,7 +1418,7 @@
         </action>
 
         <action name="testLdap" class="com.zutubi.pulse.web.ajax.TestLdapAction">
-            <result name="success" type="velocity">test-settings.vm</result>
+            <result name="success" type="velocity">test-ldap-settings.vm</result>
         </action>
 
         <action name="ls" class="com.zutubi.pulse.web.vfs.LsAction">

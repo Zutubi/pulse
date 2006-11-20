@@ -124,11 +124,6 @@
                     #dynamicRow("ldap.enabled" $config.ldapEnabled)
                     #dynamicRow("ldap.host.url" $config.ldapHostUrl)
                     #dynamicRow("ldap.base.dn" $config.ldapBaseDn)
-                    #dynamicRow("ldap.manager.dn" $config.ldapManagerDn)
-                    <!-- Probably best we don't show the password -->
-                    #dynamicRow("ldap.user.filter" $config.ldapUserFilter)
-                    #dynamicRow("ldap.auto.add" $config.ldapAutoAdd.toString().toLowerCase())
-                    #dynamicRow("ldap.email.attribute" $config.ldapEmailAttribute)
                 </table>
             </td>
         </tr>

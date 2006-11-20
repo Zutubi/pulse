@@ -1,11 +1,12 @@
 package com.zutubi.pulse.api;
 
+import com.zutubi.pulse.model.AcegiUser;
 import com.zutubi.pulse.model.GrantedAuthority;
 import com.zutubi.pulse.model.User;
 import com.zutubi.pulse.model.UserManager;
+import com.zutubi.pulse.security.AcegiUtils;
 import com.zutubi.pulse.util.Constants;
 import org.acegisecurity.context.SecurityContextHolder;
-import org.acegisecurity.providers.UsernamePasswordAuthenticationToken;
 import org.acegisecurity.providers.encoding.PasswordEncoder;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.codec.digest.DigestUtils;
@@ -105,7 +106,8 @@ public class TokenManager
         }
 
         User user = verifyToken(token);
-        for (GrantedAuthority authority : user.getAuthorities())
+        AcegiUser principle = userManager.getPrinciple(user);
+        for (org.acegisecurity.GrantedAuthority authority : principle.getAuthorities())
         {
             for (String allowedAuthority : allowedAuthorities)
             {
@@ -127,7 +129,8 @@ public class TokenManager
     public void loginUser(String token) throws AuthenticationException
     {
         User user = verifyToken(token);
-        SecurityContextHolder.getContext().setAuthentication(new UsernamePasswordAuthenticationToken(user, user.getPassword(), user.getAuthorities()));
+        AcegiUser principle = userManager.getPrinciple(user);
+        AcegiUtils.loginAs(principle);
     }
 
     public void logoutUser()

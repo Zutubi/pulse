@@ -15,7 +15,7 @@ public class AcegiUtils
      * A utility method to 'log in' the specified user. After this call, all authentication
      * requests will be made against the new user.
      *
-     * @param targetUser
+     * @param targetUser user to log in as
      */
     public static void loginAs(UserDetails targetUser)
     {

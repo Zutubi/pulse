@@ -18,7 +18,15 @@
             var baseDn = escape($F("ldap.config_ldap_baseDn"));
             var managerDn = escape($F("ldap.config_ldap_managerDn"));
             var managerPassword = escape($F("ldap.config_ldap_managerPassword"));
-            var params = "host=" + host + "&baseDn=" + baseDn + "&managerDn=" + managerDn + "&managerPassword=" + managerPassword + "&escapeSpaces=" + $F("ldap.config_ldap_escapeSpaces");
+            var userFilter = escape($F("ldap.config_ldap_userFilter"));
+            var groupDn = escape($F("ldap.config_ldap_groupBaseDn"));
+            var groupFilter = escape($F("ldap.config_ldap_groupFilter"));
+            var groupRoleAttribute = escape($F("ldap.config_ldap_groupRoleAttribute"));
+            var groupSearchSubtree = escape($F("ldap.config_ldap_groupSearchSubtree"));
+            var escapeSpaces = escape($F("ldap.config_ldap_escapeSpaces"));
+            var login = escape($F("test.login"));
+            var password = escape($F("test.password"));
+            var params = "host=" + host + "&baseDn=" + baseDn + "&managerDn=" + managerDn + "&managerPassword=" + managerPassword + "&userFilter=" + userFilter + "&groupDn=" + groupDn + "&groupFilter=" + groupFilter + "&groupRoleAttribute=" + groupRoleAttribute + "&groupSearchSubtree=" + groupSearchSubtree + "&escapeSpaces=" + escapeSpaces + "&login=" + login + "&password=" + password;
 
             var updater = new Ajax.Updater({success: 'test-results'},
                                            "/ajax/testLdap.action",
@@ -36,6 +44,10 @@
 
     #parse("/template/includes/actionerrors.vm")
 
+    <table class="columns">
+        <tr>
+            <td class="columns">
+
 #wwcform("action=saveLdap!save.action" "heading=%{getText('ldap.config')}" "id=ldap.config" "method=post")
 
     #wwcheckbox("name=ldap.enabled" "label=%{getText('ldap.enabled')}" "tabindex=1" "onclick=setFormEnableState('ldap.config', 'ldap.config_ldap_enabled', false)")
@@ -49,21 +61,67 @@
     #inlineHelp("ldap.manager.password.help")
     #wwtextfield("name=ldap.userFilter" "label=%{getText('ldap.user.filter')}" "size=60" "required=true" "tabindex=6")
     #inlineHelp("ldap.user.filter.help")
-    #wwcheckbox("name=ldap.escapeSpaces" "label=%{getText('ldap.escape.spaces')}" "tabindex=7")
-    #inlineHelp("ldap.escape.spaces.help")
-    #wwcheckbox("name=ldap.autoAdd" "label=%{getText('ldap.auto.add')}" "tabindex=8")
+    #wwcheckbox("name=ldap.autoAdd" "label=%{getText('ldap.auto.add')}" "tabindex=7")
     #inlineHelp("ldap.auto.add.help")
-    #wwtextfield("name=ldap.emailAttribute" "label=%{getText('ldap.email.attribute')}" "tabindex=9")
+    #wwtextfield("name=ldap.emailAttribute" "label=%{getText('ldap.email.attribute')}" "tabindex=8")
     #inlineHelp("ldap.email.attribute.help")
+    #wwtextfield("name=ldap.groupBaseDn" "label=%{getText('ldap.group.base.dn')}" "size=60" "tabindex=9")
+    #inlineHelp("ldap.group.base.dn.help")
+    #wwtextfield("name=ldap.groupFilter" "label=%{getText('ldap.group.search.filter')}" "size=60" "tabindex=10")
+    #inlineHelp("ldap.group.search.filter.help")
+    #wwtextfield("name=ldap.groupRoleAttribute" "label=%{getText('ldap.group.role.attribute')}" "tabindex=11")
+    #inlineHelp("ldap.group.role.attribute.help")
+    #wwcheckbox("name=ldap.groupSearchSubtree" "label=%{getText('ldap.group.search.subtree')}" "tabindex=12")
+    #inlineHelp("ldap.group.search.subtree.help")
+    #wwcheckbox("name=ldap.escapeSpaces" "label=%{getText('ldap.escape.spaces')}" "tabindex=13")
+    #inlineHelp("ldap.escape.spaces.help")
 
-    #testSettingsRow()
-
-    #saveCancel(9)
+    #saveCancel(14)
 #end
 
+            </td>
+            <td class="columns">
+
+                <table class="content">
+                    #headingRow("settings.test" 2)
+                    <tr>
+                        <th class="label">
+                            <label for="test.login" class="label">test login <span class="required">*</span></label>:
+                        </th>
+                        <td class="field">
+                            <input type="text" name="test login" id="test.login"/>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th class="label">
+                            <label for="test.password" class="label">test password <span class="required">*</span></label>:
+                        </th>
+                        <td class="field">
+                            <input type="text" name="test password" id="test.password"/>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            &nbsp;
+                        </td>
+                        <td style="padding: 6px;">
+                            <p>
+                                <a href="#" onclick="testSettings(); return false;">#wwtext("name=ldap.settings.test")</a>
+                            </p>
+                            <div id="test-results">
+                            </div>
+                        </td>
+                    </tr>
+                </table>
+
+            </td>
+        </tr>
+    </table>
+    
     <script type="text/javascript">
         setFormEnableState('ldap.config', 'ldap.config_ldap_enabled', false);
     </script>
+
     #tabEnd()
 </body>
 </html>

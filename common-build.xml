@@ -174,8 +174,6 @@
 
     <!-- run test cases -->
     <target name="common-test" unless="skip.tests">
-
-
         <echo message="-----------------------------------"/>
         <echo message="    Component: testing ${module}"/>
         <echo message="-----------------------------------"/>
@@ -192,10 +190,8 @@
                     <include name="**/*Test.java"/>
                     <exclude name="**/Cvs*"/>
                     <exclude name="**/LogInformationAnalyserTest*"/>
-                    <!-- temporarily exclude this test since it relies on a repo not located on windows. -->
                     <exclude name="**/SVN*"/>
                     <exclude name="**/*WorkingCopyTest*"/>
-                    <!-- temporarily exclude this test since maven is not available on the build box.. -->
                 </fileset>
             </batchtest>
         </junit>

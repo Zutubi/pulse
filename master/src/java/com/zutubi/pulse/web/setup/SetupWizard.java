@@ -2,16 +2,13 @@ package com.zutubi.pulse.web.setup;
 
 import com.opensymphony.util.TextUtils;
 import com.opensymphony.xwork.Validateable;
-import com.opensymphony.xwork.validator.ValidationException;
 import com.opensymphony.xwork.validator.DelegatingValidatorContext;
+import com.opensymphony.xwork.validator.ValidationException;
 import com.zutubi.pulse.bootstrap.MasterConfiguration;
 import com.zutubi.pulse.bootstrap.MasterConfigurationManager;
 import com.zutubi.pulse.bootstrap.SetupManager;
 import com.zutubi.pulse.bootstrap.SystemConfigurationSupport;
-import com.zutubi.pulse.model.GrantedAuthority;
-import com.zutubi.pulse.model.Group;
-import com.zutubi.pulse.model.User;
-import com.zutubi.pulse.model.UserManager;
+import com.zutubi.pulse.model.*;
 import com.zutubi.pulse.security.AcegiUtils;
 import com.zutubi.pulse.util.logging.Logger;
 import com.zutubi.pulse.web.DefaultAction;
@@ -91,8 +88,9 @@ public class SetupWizard extends BaseWizard
         config.setSmtpPassword(serverSettingsState.getPassword());
         config.setSmtpPrefix(serverSettingsState.getPrefix());
 
-        // login as the admin user.
-        AcegiUtils.loginAs(admin);
+        // login as the admin user.  safe to directly create AcegiUser as
+        // we know the user has no external authorities
+        AcegiUtils.loginAs(new AcegiUser(admin));
 
         try
         {

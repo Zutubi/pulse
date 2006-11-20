@@ -250,6 +250,26 @@ public class MasterConfigurationSupport extends ConfigSupport implements MasterC
         setProperty(LDAP_USER_FILTER, userFilter);
     }
 
+    public String getLdapGroupFilter()
+    {
+        return getProperty(LDAP_GROUP_FILTER);
+    }
+
+    public void setLdapGroupFilter(String groupFilter)
+    {
+        setProperty(LDAP_GROUP_FILTER, groupFilter);
+    }
+
+    public String getLdapGroupRoleAttribute()
+    {
+        return getProperty(LDAP_GROUP_ROLE_ATTRIBUTE);
+    }
+
+    public void setLdapGroupRoleAttribute(String attribute)
+    {
+        setProperty(LDAP_GROUP_ROLE_ATTRIBUTE, attribute);
+    }
+
     public Boolean getLdapAutoAdd()
     {
         return getBooleanProperty(LDAP_AUTO_ADD, false);
@@ -278,6 +298,26 @@ public class MasterConfigurationSupport extends ConfigSupport implements MasterC
     public void setLdapEscapeSpaces(Boolean escape)
     {
         setBooleanProperty(LDAP_ESCAPE_SPACES, escape);
+    }
+
+    public String getLdapGroupBaseDn()
+    {
+        return getProperty(LDAP_GROUP_BASE_DN);
+    }
+
+    public void setLdapGroupBaseDn(String dn)
+    {
+        setProperty(LDAP_GROUP_BASE_DN, dn);
+    }
+
+    public boolean getLdapGroupSearchSubtree()
+    {
+        return getBooleanProperty(LDAP_GROUP_SEARCH_SUBTREE, false);
+    }
+
+    public void setLdapGroupSearchSubtree(boolean search)
+    {
+        setBooleanProperty(LDAP_GROUP_SEARCH_SUBTREE, search);
     }
 
     public String getSmtpPrefix()

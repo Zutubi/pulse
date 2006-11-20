@@ -70,6 +70,10 @@ public interface MasterConfiguration extends LogConfiguration
     public static final String LDAP_MANAGER_DN = "ldap.manager.dn";
     public static final String LDAP_MANAGER_PASSWORD = "ldap.manager.password";
     public static final String LDAP_USER_FILTER = "ldap.user.filter";
+    public static final String LDAP_GROUP_BASE_DN = "ldap.group.base.dn";
+    public static final String LDAP_GROUP_SEARCH_SUBTREE = "ldap.group.search.subtree";
+    public static final String LDAP_GROUP_FILTER = "ldap.group.filter";
+    public static final String LDAP_GROUP_ROLE_ATTRIBUTE = "ldap.group.role.attribute";
     public static final String LDAP_AUTO_ADD = "ldap.auto.add";
     public static final String LDAP_EMAIL_ATTRIBUTE = "ldap.email.attribute";
     public static final String LDAP_ESCAPE_SPACES = "ldap.escape";
@@ -178,6 +182,21 @@ public interface MasterConfiguration extends LogConfiguration
 
     void setLdapEscapeSpaces(Boolean escape);
 
+    String getLdapGroupBaseDn();
+
+    void setLdapGroupBaseDn(String dn);
+
+    boolean getLdapGroupSearchSubtree();
+
+    void setLdapGroupSearchSubtree(boolean search);
+
+    String getLdapGroupFilter();
+
+    void setLdapGroupFilter(String groupFilter);
+
+    String getLdapGroupRoleAttribute();
+
+    void setLdapGroupRoleAttribute(String attribute);
 
     Integer getScmPollingInterval();
 

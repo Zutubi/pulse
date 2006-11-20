@@ -1,5 +1,6 @@
 package com.zutubi.pulse.web.admin.user;
 
+import com.zutubi.pulse.model.AcegiUser;
 import com.zutubi.pulse.security.AcegiUtils;
 
 /**
@@ -17,7 +18,7 @@ public class SignupUserAction extends CreateUserAction
         getUserManager().addUser(newUser, false, false);
 
         // log the new user in.
-        AcegiUtils.loginAs(newUser);
+        AcegiUtils.loginAs(new AcegiUser(newUser));
 
         return SUCCESS;
     }
