@@ -144,7 +144,7 @@ public class ResourceAcceptanceTest extends BaseAcceptanceTestCase
     {
         addResource(resourceName);
         clickLink("property.add_");
-        CreateResourcePropertyForm form = new CreateResourcePropertyForm(tester);
+        CreatePropertyForm form = new CreatePropertyForm(tester, false);
         form.assertFormPresent();
         form.saveFormElements("", "", "false", "false", "false");
         form.assertFormPresent();
@@ -166,7 +166,7 @@ public class ResourceAcceptanceTest extends BaseAcceptanceTestCase
         helperPreamble(version);
         addProperty(version, propertyName);
         clickLink("property.add_" + version);
-        CreateResourcePropertyForm form = new CreateResourcePropertyForm(tester);
+        CreatePropertyForm form = new CreatePropertyForm(tester, false);
         form.assertFormPresent();
         form.saveFormElements(propertyName, "", "true", "true", "true");
         form.assertFormPresent();
@@ -191,7 +191,7 @@ public class ResourceAcceptanceTest extends BaseAcceptanceTestCase
         addProperty(version, propertyName);
         clickLink("edit_" + propertyName);
 
-        EditResourcePropertyForm form = new EditResourcePropertyForm(tester);
+        EditPropertyForm form = new EditPropertyForm(tester, false);
         form.assertFormPresent();
         form.assertFormElements(propertyName, getPropertyValue(propertyName), "true", "true", "true");
         form.saveFormElements(propertyName + "_edited", getPropertyValue(propertyName + "_edited"), "false", "false", "false");
@@ -204,7 +204,7 @@ public class ResourceAcceptanceTest extends BaseAcceptanceTestCase
         addProperty("", propertyName);
         clickLink("edit_" + propertyName);
 
-        EditResourcePropertyForm form = new EditResourcePropertyForm(tester);
+        EditPropertyForm form = new EditPropertyForm(tester, false);
         form.assertFormPresent();
         form.saveFormElements("", "", "false", "false", "false");
         form.assertFormPresent();
@@ -228,7 +228,7 @@ public class ResourceAcceptanceTest extends BaseAcceptanceTestCase
         addProperty(version, propertyName + "2");
         clickLink("edit_" + propertyName + "2");
 
-        EditResourcePropertyForm form = new EditResourcePropertyForm(tester);
+        EditPropertyForm form = new EditPropertyForm(tester, false);
         form.assertFormPresent();
         form.saveFormElements(propertyName, "", "false", "false", "false");
         form.assertFormPresent();
@@ -347,7 +347,7 @@ public class ResourceAcceptanceTest extends BaseAcceptanceTestCase
     private void addProperty(String version, String name)
     {
         clickLink("property.add_" + version);
-        CreateResourcePropertyForm form = new CreateResourcePropertyForm(tester);
+        CreatePropertyForm form = new CreatePropertyForm(tester, false);
         form.assertFormPresent();
         form.saveFormElements(name, getPropertyValue(name), "true", "true", "true");
     }

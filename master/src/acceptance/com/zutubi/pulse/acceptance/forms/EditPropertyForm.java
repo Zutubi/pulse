@@ -4,16 +4,26 @@ import net.sourceforge.jwebunit.WebTester;
 
 /**
  */
-public class EditResourcePropertyForm extends BaseForm
+public class EditPropertyForm extends BaseForm
 {
-    public EditResourcePropertyForm(WebTester tester)
+    private boolean spec;
+
+    public EditPropertyForm(WebTester tester, boolean spec)
     {
         super(tester);
+        this.spec = spec;
     }
 
     public String getFormName()
     {
-        return "editProperty";
+        if(spec)
+        {
+            return "editBuildSpecificationProperty";
+        }
+        else
+        {
+            return "editProperty";
+        }
     }
 
     public String[] getFieldNames()

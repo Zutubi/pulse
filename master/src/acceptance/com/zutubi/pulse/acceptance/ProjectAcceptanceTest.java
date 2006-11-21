@@ -18,6 +18,7 @@ public class ProjectAcceptanceTest extends ProjectAcceptanceTestBase
     private static final String NEW_RECIPE = "new-recipe";
     private static final String VERSION_VALUE = "version-value";
     private static final String RESOURCE_NAME = "resource-name";
+    private static final String PROPERTY_NAME = "pname";
 
     public ProjectAcceptanceTest()
     {
@@ -531,6 +532,94 @@ public class ProjectAcceptanceTest extends ProjectAcceptanceTestBase
 //        assertTextPresent("deleta");
 //        clickLink("delete_deleta");
 //        assertTextNotPresent("deleta");
+    }
+
+    public void testAddBuildSpecProperty()
+    {
+        clickLink("edit_default");
+        addBuildSpecProperty(PROPERTY_NAME);
+
+        assertBuildSpecProperties(getPropertyRow(PROPERTY_NAME, "pvalue", true, true, true));
+    }
+
+    private CreatePropertyForm addBuildSpecProperty(String name)
+    {
+        clickLink("add_property");
+
+        CreatePropertyForm form = new CreatePropertyForm(tester, true);
+        form.assertFormPresent();
+        form.saveFormElements(name, "pvalue", "true", "true", "true");
+        return form;
+    }
+
+    public void testAddBuildSpecPropertyValidation()
+    {
+        clickLink("edit_default");
+        clickLink("add_property");
+
+        CreatePropertyForm form = new CreatePropertyForm(tester, true);
+        form.assertFormPresent();
+        form.saveFormElements("", "pvalue", "true", "true", "true");
+        form.assertFormPresent();
+        assertTextPresent("name is required");
+    }
+
+    public void testAddBuildSpecPropertyDuplicate()
+    {
+        clickLink("edit_default");
+        addBuildSpecProperty(PROPERTY_NAME);
+
+        CreatePropertyForm form = addBuildSpecProperty(PROPERTY_NAME);
+        form.assertFormPresent();
+        assertTextPresent("This specification already contains a property with name '" + PROPERTY_NAME + "'");
+    }
+
+    public void testEditBuildSpecProperty()
+    {
+        clickLink("edit_default");
+        addBuildSpecProperty(PROPERTY_NAME);
+
+        clickLink("edit_property_" + PROPERTY_NAME);
+        EditPropertyForm form = new EditPropertyForm(tester, true);
+        form.assertFormPresent();
+        form.saveFormElements("edited", "editedvalue", "false", "false", "false");
+        assertBuildSpecProperties(getPropertyRow("edited", "editedvalue", false, false, false));
+    }
+
+    public void testEditBuildSpecPropertyValidation()
+    {
+        clickLink("edit_default");
+        addBuildSpecProperty(PROPERTY_NAME);
+
+        clickLink("edit_property_" + PROPERTY_NAME);
+        EditPropertyForm form = new EditPropertyForm(tester, true);
+        form.assertFormPresent();
+        form.saveFormElements("", "editedvalue", "false", "false", "false");
+        form.assertFormPresent();
+        assertTextPresent("name is required");
+    }
+
+    public void testEditBuildSpecPropertyDuplicate()
+    {
+        clickLink("edit_default");
+        addBuildSpecProperty("thefuzz");
+        addBuildSpecProperty(PROPERTY_NAME);
+
+        clickLink("edit_property_" + PROPERTY_NAME);
+        EditPropertyForm form = new EditPropertyForm(tester, true);
+        form.assertFormPresent();
+        form.saveFormElements("thefuzz", "editedvalue", "false", "false", "false");
+        form.assertFormPresent();
+        assertTextPresent("this specification already contains a property with name 'thefuzz'");
+    }
+
+    public void testDeleteBuildSpecProperty()
+    {
+        clickLink("edit_default");
+        addBuildSpecProperty(PROPERTY_NAME);
+
+        clickLink("delete_property_" + PROPERTY_NAME);
+        assertTextNotPresent(PROPERTY_NAME);
     }
 
     public void testAddBuildSpecResource()
@@ -1554,4 +1643,15 @@ public class ProjectAcceptanceTest extends ProjectAcceptanceTestBase
     {
         return new String[]{name, type, "edit", "delete"};
     }
+
+    private void assertBuildSpecProperties(String[]... props)
+    {
+        assertTableRowsEqual("spec.properties", 2, props);
+    }
+
+    private String[] getPropertyRow(String name, String value, boolean addToEnv, boolean addToPath, boolean resolve)
+    {
+        return new String[] { name, value, Boolean.toString(addToEnv), Boolean.toString(addToPath), Boolean.toString(resolve), "edit", "delete" };
+    }
+
 }

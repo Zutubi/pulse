@@ -1,0 +1,6 @@
+<?xml version="1.0"?>
+<project default-recipe="default">
+    <recipe name="default">
+        <print name="property1" message="${property1}"/>
+    </recipe>
+</project>

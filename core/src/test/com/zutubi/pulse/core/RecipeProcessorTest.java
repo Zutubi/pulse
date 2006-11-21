@@ -3,6 +3,7 @@ package com.zutubi.pulse.core;
 import com.zutubi.pulse.BuildContext;
 import com.zutubi.pulse.core.model.CommandResult;
 import com.zutubi.pulse.core.model.Feature;
+import com.zutubi.pulse.core.model.ResourceProperty;
 import com.zutubi.pulse.core.model.ResultState;
 import com.zutubi.pulse.events.DefaultEventManager;
 import com.zutubi.pulse.events.Event;
@@ -15,6 +16,8 @@ import com.zutubi.pulse.util.IOUtils;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.Semaphore;
@@ -233,6 +236,21 @@ public class RecipeProcessorTest extends PulseTestCase implements EventListener
         // remove directory call in the tearDown. So, we sleep briefly here to give the
         // terminated child process (?) a chance to release its resources.
         Thread.sleep(100);
+    }
+
+    public void testPropertiesImported() throws Exception
+    {
+        List<ResourceProperty> properties = new ArrayList<ResourceProperty>(1);
+        properties.add(new ResourceProperty("property1", "propvalue", true, true, true));
+        recipeProcessor.build(new RecipeRequest("project", "spec", 1, new SimpleBootstrapper(), getPulseFile("properties"), "default", false, null, properties), new SimpleRecipePaths(baseDir, outputDir), resourceRepository, false, new BuildContext());
+        assertRecipeCommenced(1, "default");
+        assertCommandCommenced(1, "bootstrap");
+        assertCommandCompleted(1, ResultState.SUCCESS);
+        assertCommandCommenced(1, "property1");
+        assertCommandCompleted(1, ResultState.SUCCESS);
+        assertRecipeCompleted(1, ResultState.SUCCESS);
+        assertNoMoreEvents();
+        assertOutputFile(1, "property1", "propvalue" + System.getProperty("line.separator"));
     }
 
     private void assertOutputFile(int commandIndex, String commandName, String contents) throws IOException
