@@ -2,6 +2,7 @@ package com.zutubi.pulse.model;
 
 import com.zutubi.pulse.bootstrap.MasterConfigurationManager;
 import com.zutubi.pulse.core.model.Revision;
+import com.zutubi.pulse.core.Stoppable;
 import com.zutubi.pulse.events.EventManager;
 import com.zutubi.pulse.model.persistence.ScmDao;
 import com.zutubi.pulse.scheduling.Scheduler;
@@ -15,6 +16,7 @@ import com.zutubi.pulse.scm.SCMServer;
 import com.zutubi.pulse.util.Constants;
 import com.zutubi.pulse.util.Pair;
 import com.zutubi.pulse.util.logging.Logger;
+import com.zutubi.pulse.ShutdownManager;
 
 import java.util.HashMap;
 import java.util.List;
@@ -27,13 +29,14 @@ import java.util.concurrent.TimeUnit;
  *
  *
  */
-public class DefaultScmManager implements ScmManager
+public class DefaultScmManager implements ScmManager, Stoppable
 {
     private static final Logger LOG = Logger.getLogger(DefaultScmManager.class);
 
     private ScmDao scmDao = null;
 
     private EventManager eventManager;
+    private ShutdownManager shutdownManager;
 
     private Scheduler scheduler;
     private static final String MONITOR_NAME = "poll";
@@ -76,6 +79,8 @@ public class DefaultScmManager implements ScmManager
 
         executor = new ThreadPoolExecutor(pollThreadCount, pollThreadCount, 0L, TimeUnit.MILLISECONDS, new LinkedBlockingQueue<Runnable>());
 
+        shutdownManager.addStoppable(this);
+
         // check if the trigger exists. if not, create and schedule.
         Trigger trigger = scheduler.getTrigger(MONITOR_NAME, MONITOR_GROUP);
         if (trigger != null)
@@ -101,8 +106,14 @@ public class DefaultScmManager implements ScmManager
     {
         if (executor != null)
         {
-            executor.shutdown();
+            executor.shutdownNow();
         }
+    }
+
+
+    public void stop(boolean force)
+    {
+        shutdown();
     }
 
     public List<Scm> getActiveScms()
@@ -284,8 +295,23 @@ public class DefaultScmManager implements ScmManager
         configManager.getAppConfig().setScmPollingInterval(interval);
     }
 
+    /**
+     * Required resource
+     *
+     * @param eventManager instance
+     */
     public void setEventManager(EventManager eventManager)
     {
         this.eventManager = eventManager;
+    }
+
+    /**
+     * Required resource
+     *
+     * @param shutdownManager instance
+     */
+    public void setShutdownManager(ShutdownManager shutdownManager)
+    {
+        this.shutdownManager = shutdownManager;
     }
 }

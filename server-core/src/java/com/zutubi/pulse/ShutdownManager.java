@@ -1,11 +1,11 @@
 package com.zutubi.pulse;
 
-import com.zutubi.pulse.core.Stoppable;
 import com.zutubi.pulse.bootstrap.ComponentContext;
+import com.zutubi.pulse.core.Stoppable;
 
-import java.util.List;
 import java.lang.reflect.Method;
-import java.lang.reflect.InvocationTargetException;
+import java.util.LinkedList;
+import java.util.List;
 
 /**
  * Manages orderly shutdown of the system.  The order is determined by a list
@@ -124,6 +124,15 @@ public class ShutdownManager
     public void setStoppables(List<Stoppable> stoppables)
     {
         this.stoppables = stoppables;
+    }
+
+    public void addStoppable(Stoppable stoppable)
+    {
+        if (stoppables == null)
+        {
+            stoppables = new LinkedList<Stoppable>();
+        }
+        stoppables.add(stoppable);
     }
 
     public void reboot()
