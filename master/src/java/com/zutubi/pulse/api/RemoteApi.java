@@ -16,6 +16,7 @@ import com.zutubi.pulse.license.LicenseException;
 import com.zutubi.pulse.license.LicenseHolder;
 import com.zutubi.pulse.model.*;
 import com.zutubi.pulse.scm.SCMConfiguration;
+import com.zutubi.pulse.util.OgnlUtils;
 import com.zutubi.pulse.util.TimeStamps;
 import com.zutubi.pulse.validation.PulseValidationContext;
 import com.zutubi.validation.ValidationContext;
@@ -50,9 +51,9 @@ public class RemoteApi
 
     {
         structDefs.put(Project.class, new String[]{"name", "description", "url"});
-        structDefs.put(Cvs.class, new String[]{"root", "module", "password", "branch", "quietPeriod", "monitor", "pollingInterval", "changeViewerUrl"});
-        structDefs.put(Svn.class, new String[]{"url", "username", "password", "keyfile", "passphrase", "monitor", "pollingInterval", "changeViewerUrl"});
-        structDefs.put(P4.class, new String[]{"port", "user", "password", "client", "monitor", "pollingInterval", "changeViewerUrl"});
+        structDefs.put(Cvs.class, new String[]{"root", "module", "password", "branch", "quietPeriod", "monitor", "pollingInterval"});
+        structDefs.put(Svn.class, new String[]{"url", "username", "password", "keyfile", "passphrase", "monitor", "pollingInterval"});
+        structDefs.put(P4.class, new String[]{"port", "user", "password", "client", "monitor", "pollingInterval"});
         structDefs.put(AntPulseFileDetails.class, new String[]{"buildFile", "targets", "arguments", "workingDir"});
         structDefs.put(MavenPulseFileDetails.class, new String[]{"targets", "workingDir", "arguments"});
         structDefs.put(Maven2PulseFileDetails.class, new String[]{"goals", "workingDir", "arguments"});
@@ -1117,19 +1118,7 @@ public class RemoteApi
 
     private void setProperties(Hashtable<String, Object> scmDetails, Object object)
     {
-        Enumeration<String> keys = scmDetails.keys();
-        while (keys.hasMoreElements())
-        {
-            String key = keys.nextElement();
-            try
-            {
-                Ognl.setValue(key, object, scmDetails.get(key));
-            }
-            catch (OgnlException e)
-            {
-                throw new IllegalArgumentException(String.format("Failed to set '%s' on object '%s'. Cause: %s", key, object, e.getMessage()));
-            }
-        }
+        OgnlUtils.setProperties(scmDetails, object);
     }
 
     private Project internalGetProject(String projectName)

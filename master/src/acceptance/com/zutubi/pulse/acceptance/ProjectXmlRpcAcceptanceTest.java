@@ -152,6 +152,17 @@ public class ProjectXmlRpcAcceptanceTest extends BaseXmlRpcAcceptanceTest
         assertEquals("myProject", details.get("module"));
         assertEquals("true", details.get("monitor"));
         assertEquals("55555", details.get("quietPeriod"));
+
+        // return the monitor to false.
+        scmDetails.put("monitor", "false");
+
+        result = xmlRpcClient.execute("RemoteApi.editScm", getVector(adminToken, projectName, scmDetails));
+        assertEquals(Boolean.TRUE, result);
+
+        result = xmlRpcClient.execute("RemoteApi.getScm", getVector(adminToken, projectName));
+        details = (Hashtable<String, Object>) result;
+        assertEquals("false", details.get("monitor"));
+        
     }
 
     private String createProject() throws IOException, XmlRpcException

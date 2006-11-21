@@ -112,15 +112,18 @@ public class ProjectAcceptanceTest extends ProjectAcceptanceTestBase
         assertLinkPresent("project.scm.edit");
         clickLink("project.scm.edit");
 
-        form.assertFormElements(TEST_CVSROOT, "module", "", "", "", "", "true");
+        form.assertFormElements(TEST_CVSROOT, "module", "", "", "", "", "false");
 
         // change the root and module, verify updates as expected.
-        form.saveFormElements("/loc", "mod", "", "", "1", "1", "false");
+        form.saveFormElements("/loc", "mod", "", "", "1", "1", "true");
         assertProjectCvsTable("cvs", "/loc[mod]", "");
 
         // check the form again to ensure that the path has been saved.
         clickLink("project.scm.edit");
-        form.assertFormElements("/loc", "mod", "", "", "1", "1", "false");
+        form.assertFormElements("/loc", "mod", "", "", "1", "1", "true");
+
+        // turn off monitoring.
+        form.saveFormElements("/loc", "mod", "", "", "1", "1", "false");
     }
 
     public void testEditScmPasswordValue()
@@ -141,7 +144,7 @@ public class ProjectAcceptanceTest extends ProjectAcceptanceTestBase
     {
         CvsForm.Edit form = new CvsForm.Edit(tester);
         clickLink("project.scm.edit");
-        form.assertFormElements(TEST_CVSROOT, "module", "", "", "", "", "true");
+        form.assertFormElements(TEST_CVSROOT, "module", "", "", "", "", "false");
 
         // check that the cvs root is a required field.
         form.saveFormElements("", "module", "", "", "", "", "false");
@@ -181,11 +184,11 @@ public class ProjectAcceptanceTest extends ProjectAcceptanceTestBase
     {
         CvsForm.Edit form = new CvsForm.Edit(tester);
         clickLink("project.scm.edit");
-        form.assertFormElements(TEST_CVSROOT, "module", "", "", "", "", "true");
-        form.saveFormElements(TEST_CVSROOT, "module", "", "", "", "", "false");
-        clickLink("project.scm.edit");
         form.assertFormElements(TEST_CVSROOT, "module", "", "", "", "", "false");
         form.saveFormElements(TEST_CVSROOT, "module", "", "", "", "", "true");
+        clickLink("project.scm.edit");
+        form.assertFormElements(TEST_CVSROOT, "module", "", "", "", "", "true");
+        form.saveFormElements(TEST_CVSROOT, "module", "", "", "", "", "false");
 
         // verify data in table.
     }
