@@ -234,6 +234,11 @@ public class RecipeProcessor
         }
 
         addEnvironment(globalScope);
+        if(request.getProperties() != null)
+        {
+            globalScope.add(request.getProperties());
+        }
+        
         importResources(resourceRepository, request.getResourceRequirements(), globalScope);
 
         InputStream stream = null;

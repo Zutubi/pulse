@@ -54,17 +54,57 @@
     </span>
     <h2 class="section">#wwtext("name=buildspec") $!webwork.htmlEncode($specification.name)</h2>
 
-    <table id="spec.basics" class="content">
-        #aclEditHeadingRow("buildspec.basics" 2 "editBuildSpecification!input.action?projectId=$project.id&amp;id=$specification.id" "edit_basics" "project")
-        #dynamicRow("buildspec.name" $specification.name)
-        #dynamicRow("buildspec.isolate.changelists" $specification.isolateChangelists)
-        #dynamicRow("buildspec.retain.working.copy" $specification.retainWorkingCopy)
-        #dynamicRow("buildspec.checkout.scheme" $action.getText("buildspec.checkout.scheme.$specification.checkoutScheme.toString()"))
-        #dynamicRow("buildspec.timeout" $specification.prettyTimeout)
+    <table class="columns">
+        <tr>
+            <td class="columns">
+
+                <table id="spec.basics" class="content">
+                    #aclEditHeadingRow("buildspec.basics" 2 "editBuildSpecification!input.action?projectId=$project.id&amp;id=$specification.id" "edit_basics" "project")
+                    #dynamicRow("buildspec.name" $specification.name)
+                    #dynamicRow("buildspec.isolate.changelists" $specification.isolateChangelists)
+                    #dynamicRow("buildspec.retain.working.copy" $specification.retainWorkingCopy)
+                    #dynamicRow("buildspec.checkout.scheme" $action.getText("buildspec.checkout.scheme.$specification.checkoutScheme.toString()"))
+                    #dynamicRow("buildspec.timeout" $specification.prettyTimeout)
+                    #dynamicRow("buildspec.prompt" $specification.prompt)
+                </table>
+            </td>
+
+            <td class="columns">
+                <table id="spec.properties" class="content">
+                    #headingRow("buildspec.properties" 7)
+                    <tr>
+                        #contentHeading("property.name" 1)
+                        #contentHeading("property.value" 1)
+                        #contentHeading("property.environment" 1)
+                        #contentHeading("property.path" 1)
+                        #contentHeading("property.resolve" 1)
+                    #acl("domainObject=project" "hasPermission=4,1")
+                        #contentHeading("actions" 2)
+                    #end
+                    </tr>
+                    #foreach($property in $properties)
+                        #set($confirmMessage = $action.getText("property.confirm.delete", [$property.name]))
+                    <tr>
+                        #dynamicCell($property.name)
+                        #dynamicCell($property.value)
+                        #dynamicCell($property.addToEnvironment)
+                        #dynamicCell($property.addToPath)
+                        #dynamicCell($property.resolveVariables)
+                        #acl("domainObject=project" "hasPermission=4,1")
+                            #editCell("editBuildSpecificationProperty!input.action?projectId=$project.id&amp;specId=$specification.id&amp;id=$property.id" "edit_property_$!webwork.htmlEncode($property.name)")
+                            #deleteCell("delete_property_$!webwork.htmlEncode($property.name)" "deleteBuildSpecificationProperty.action?projectId=$project.id&amp;specId=$specification.id&amp;id=$property.id" $confirmMessage)
+                        #end
+                    </tr>
+                    #end
+                    #addRow("property.add" 7 "$base/createBuildSpecificationProperty!input.action?projectId=$project.id&amp;specId=$specification.id" "add_property")
+                </table>
+
+                #nodeResources($specification.root)
+
+            </td>
+        </tr>
     </table>
-
-    #nodeResources($specification.root)
-
+    
     <h2 class="twopane">#wwtext("name=buildspec.stages")</h2>
 
     <table class="twopane">
@@ -95,13 +135,26 @@
         #set($confirmMessage = $action.getText("buildspec.stage.confirm.delete", [$node.stage.name]))
                 <div id="node_$node.id" style="display: none">
                     <div class="panecontent">
-                        <table id="stage_$!webwork.htmlEncode($node.stage.name)" class="content">
-                            #aclEditHeadingRow("buildspec.stage.basics" 2 "editBuildStage!input.action?projectId=$project.id&amp;specId=$specification.id&amp;id=$node.id" "edit_$node.id" "project")
-                            #dynamicRow("buildspec.stage.name" $node.stage.name)
-                            #dynamicRow("buildspec.stage.recipe" $node.stage.recipeSafe)
-                            #dynamicRow("buildspec.stage.agent" $node.stage.hostRequirements.summary)
+                        <table class="columns">
+                            <tr>
+                                <td class="columns">
+
+                                    <table id="stage_$!webwork.htmlEncode($node.stage.name)" class="content">
+                                        #aclEditHeadingRow("buildspec.stage.basics" 2 "editBuildStage!input.action?projectId=$project.id&amp;specId=$specification.id&amp;id=$node.id" "edit_$node.id" "project")
+                                        #dynamicRow("buildspec.stage.name" $node.stage.name)
+                                        #dynamicRow("buildspec.stage.recipe" $node.stage.recipeSafe)
+                                        #dynamicRow("buildspec.stage.agent" $node.stage.hostRequirements.summary)
+                                    </table>
+
+                                </td>
+                                <td class="columns">
+
+                                    #nodeResources($node)
+
+                                </td>
+                            </tr>
                         </table>
-                        #nodeResources($node)
+                        
         #acl("domainObject=project" "hasPermission=4,1")
                         <a href="#" id="delete_$!webwork.htmlEncode($node.stage.name)" onclick="confirmUrl('$confirmMessage', 'deleteBuildStage.action?projectId=$project.id&amp;specId=$specification.id&amp;id=$node.id')">
                             <img alt="$action.getText('delete')" src="$base/images/delete.gif"/> #wwtext("name=buildspec.stage.delete")

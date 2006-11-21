@@ -1,6 +1,12 @@
 package com.zutubi.pulse.model;
 
 import com.zutubi.pulse.core.model.Entity;
+import com.zutubi.pulse.core.model.ResourceProperty;
+
+import java.util.List;
+import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.Iterator;
 
 /**
  * Describes the steps (recipes) required for a build, and where they should
@@ -40,6 +46,8 @@ public class BuildSpecification extends Entity implements NamedEntity
     private CheckoutScheme checkoutScheme = CheckoutScheme.CLEAN_CHECKOUT;
     private BuildSpecificationNode root = new BuildSpecificationNode(null);
     private boolean forceClean;
+    private List<ResourceProperty> properties = new LinkedList<ResourceProperty>();
+    private boolean prompt = false;
 
     public BuildSpecification()
     {
@@ -59,6 +67,8 @@ public class BuildSpecification extends Entity implements NamedEntity
         copy.isolateChangelists = isolateChangelists;
         copy.checkoutScheme = checkoutScheme;
         copy.root = root.copy();
+        copy.properties = copyProperties();
+        copy.prompt = prompt;
         return copy;
     }
 
@@ -173,5 +183,86 @@ public class BuildSpecification extends Entity implements NamedEntity
     public void setForceClean(boolean forceClean)
     {
         this.forceClean = forceClean;
+    }
+
+    public List<ResourceProperty> getProperties()
+    {
+        return properties;
+    }
+
+    public void setProperties(List<ResourceProperty> properties)
+    {
+        this.properties = properties;
+    }
+
+    public ResourceProperty getProperty(long id)
+    {
+        for(ResourceProperty p: properties)
+        {
+            if(p.getId() == id)
+            {
+                return p;
+            }
+        }
+
+        return null;
+    }
+
+    public ResourceProperty getProperty(String name)
+    {
+        for(ResourceProperty p: properties)
+        {
+            if(p.getName().equals(name))
+            {
+                return p;
+            }
+        }
+
+        return null;
+    }
+
+    public boolean hasProperty(String name)
+    {
+        return getProperty(name) != null;
+    }
+
+    public void removeProperty(long id)
+    {
+        Iterator<ResourceProperty> it = properties.iterator();
+        while(it.hasNext())
+        {
+            if(it.next().getId() == id)
+            {
+                it.remove();
+                return;
+            }
+        }
+    }
+
+    public void addProperty(ResourceProperty property)
+    {
+        properties.add(property);
+    }
+
+    public List<ResourceProperty> copyProperties()
+    {
+        List<ResourceProperty> result = new ArrayList<ResourceProperty>(properties.size());
+        for(ResourceProperty property: properties)
+        {
+            ResourceProperty copyProperty = property.copy();
+            result.add(copyProperty);
+        }
+
+        return result;
+    }
+
+    public boolean getPrompt()
+    {
+        return prompt;
+    }
+
+    public void setPrompt(boolean prompt)
+    {
+        this.prompt = prompt;
     }
 }

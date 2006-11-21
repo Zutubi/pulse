@@ -17,6 +17,7 @@ public class CreateBuildSpecificationAction extends BuildSpecificationActionSupp
     private BuildSpecification spec = new BuildSpecification();
     private int timeout = 60;
     private boolean timeoutEnabled = false;
+    private boolean prompt = false;
     private long specId;
 
     public BuildSpecification getSpec()
@@ -52,6 +53,16 @@ public class CreateBuildSpecificationAction extends BuildSpecificationActionSupp
     public void setTimeoutEnabled(boolean timeoutEnabled)
     {
         this.timeoutEnabled = timeoutEnabled;
+    }
+
+    public boolean isPrompt()
+    {
+        return prompt;
+    }
+
+    public void setPrompt(boolean prompt)
+    {
+        this.prompt = prompt;
     }
 
     public String doInput()
@@ -96,6 +107,8 @@ public class CreateBuildSpecificationAction extends BuildSpecificationActionSupp
             spec.setTimeout(BuildSpecification.TIMEOUT_NEVER);
         }
 
+        spec.setPrompt(prompt);
+        
         BuildSpecificationNode node = new BuildSpecificationNode(stage);
         spec.getRoot().addChild(node);
         addFieldsToStage();

@@ -1,8 +1,10 @@
 package com.zutubi.pulse.core.model;
 
+import com.zutubi.pulse.model.NamedEntity;
+
 /**
  */
-public class ResourceProperty
+public class ResourceProperty extends Entity implements NamedEntity
 {
     private String name;
     private String value;
@@ -21,6 +23,11 @@ public class ResourceProperty
         this.addToEnvironment = addToEnvironment;
         this.addToPath = addToPath;
         this.resolveVariables = resolveVariables;
+    }
+
+    public ResourceProperty copy()
+    {
+        return new ResourceProperty(name, value, addToEnvironment, addToPath, resolveVariables);
     }
 
     public String getName()

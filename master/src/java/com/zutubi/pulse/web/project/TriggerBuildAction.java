@@ -50,6 +50,11 @@ public class TriggerBuildAction extends ProjectActionSupport
             return ERROR;
         }
 
+        if(spec.getPrompt())
+        {
+            return "prompt";
+        }
+        
         getProjectManager().triggerBuild(project, spec.getName(), new ManualTriggerBuildReason((String)getPrinciple()), null, true);
 
         try

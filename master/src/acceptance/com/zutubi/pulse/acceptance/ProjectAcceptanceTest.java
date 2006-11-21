@@ -325,7 +325,7 @@ public class ProjectAcceptanceTest extends ProjectAcceptanceTestBase
     {
         addSpec(SPEC_NAME);
 
-        assertBuildSpecification(SPEC_NAME, true, true, "clean checkout", true, 100, new String[] { STAGE_NAME, RECIPE_NAME, "master"});
+        assertBuildSpecification(SPEC_NAME, true, true, "clean checkout", true, 100, true, new String[] { STAGE_NAME, RECIPE_NAME, "master"});
 
         // Check back on the configuration tab: ensure spec appears
         clickLinkWithText("configuration");
@@ -341,7 +341,7 @@ public class ProjectAcceptanceTest extends ProjectAcceptanceTestBase
 
         assertAndClick("project.buildspec.add");
         form.assertFormPresent();
-        form.saveFormElements(name, "true", "true", "true", "100", STAGE_NAME, RECIPE_NAME, "1");
+        form.saveFormElements(name, "true", "true", "true", "100", "true", STAGE_NAME, RECIPE_NAME, "1");
     }
 
     public void testAddBuildSpecValidation()
@@ -354,7 +354,7 @@ public class ProjectAcceptanceTest extends ProjectAcceptanceTestBase
 
         assertAndClick("project.buildspec.add");
         form.assertFormPresent();
-        form.saveFormElements("", "true", "true", "true", "-100", "", "", "1");
+        form.saveFormElements("", "true", "true", "true", "-100", "true", "", "", "1");
         form.assertFormPresent();
 
         assertTextPresent("name is required");
@@ -368,7 +368,7 @@ public class ProjectAcceptanceTest extends ProjectAcceptanceTestBase
 
         assertAndClick("project.buildspec.add");
         form.assertFormPresent();
-        form.saveFormElements("default", "false", "false", "true", "100", STAGE_NAME, RECIPE_NAME, "1");
+        form.saveFormElements("default", "false", "false", "true", "100", "true", STAGE_NAME, RECIPE_NAME, "1");
         form.assertFormPresent();
 
         assertTextPresent("'default' already exists");
@@ -381,10 +381,10 @@ public class ProjectAcceptanceTest extends ProjectAcceptanceTestBase
 
         EditBuildSpecForm form = new EditBuildSpecForm(tester);
         form.assertFormPresent();
-        form.assertFormElements(SPEC_NAME, "true", "true", "CLEAN_CHECKOUT", "true", "100");
-        form.saveFormElements(SPEC_NAME + "_edited", "false", "false", "INCREMENTAL_UPDATE", null, null);
+        form.assertFormElements(SPEC_NAME, "true", "true", "CLEAN_CHECKOUT", "true", "100", "true");
+        form.saveFormElements(SPEC_NAME + "_edited", "false", "false", "INCREMENTAL_UPDATE", null, null, "false");
 
-        assertBuildSpecification(SPEC_NAME + "_edited", false, false, "incremental update", false, 0);
+        assertBuildSpecification(SPEC_NAME + "_edited", false, false, "incremental update", false, 0, false);
 
         clickLinkWithText("configuration");
         assertProjectBuildSpecTable(new String[][]{
@@ -400,7 +400,7 @@ public class ProjectAcceptanceTest extends ProjectAcceptanceTestBase
 
         EditBuildSpecForm form = new EditBuildSpecForm(tester);
         form.assertFormPresent();
-        form.saveFormElements("", "true", "true", "INCREMENTAL_UPDATE", "true", "-100");
+        form.saveFormElements("", "true", "true", "INCREMENTAL_UPDATE", "true", "-100", "true");
         form.assertFormPresent();
 
         assertTextPresent("name is required");
@@ -414,7 +414,7 @@ public class ProjectAcceptanceTest extends ProjectAcceptanceTestBase
 
         EditBuildSpecForm form = new EditBuildSpecForm(tester);
         form.assertFormPresent();
-        form.saveFormElements("default", "true", "true", "INCREMENTAL_UPDATE", "true", "100");
+        form.saveFormElements("default", "true", "true", "INCREMENTAL_UPDATE", "true", "100", "true");
         form.assertFormPresent();
 
         assertTextPresent("'default' already exists");
@@ -1463,7 +1463,7 @@ public class ProjectAcceptanceTest extends ProjectAcceptanceTestBase
         assertTableRowsEqual("project.buildspecs", 2, rows);
     }
 
-    private void assertBuildSpecification(String specName, boolean isolateChangelists, boolean retainWorkingCopy, String checkoutScheme, boolean timeoutEnabled, int timeout, String[]... stages)
+    private void assertBuildSpecification(String specName, boolean isolateChangelists, boolean retainWorkingCopy, String checkoutScheme, boolean timeoutEnabled, int timeout, boolean prompt, String[]... stages)
     {
         String timeoutText = "[never]";
 
@@ -1477,7 +1477,8 @@ public class ProjectAcceptanceTest extends ProjectAcceptanceTestBase
                 new String[]{ "isolate changelists", Boolean.toString(isolateChangelists) },
                 new String[]{ "retain working copy", Boolean.toString(retainWorkingCopy) },
                 new String[]{ "checkout scheme", checkoutScheme },
-                new String[]{ "timeout", timeoutText }
+                new String[]{ "timeout", timeoutText },
+                new String[]{ "prompt", Boolean.toString(prompt) }
         });
 
         for(String[] stage: stages)

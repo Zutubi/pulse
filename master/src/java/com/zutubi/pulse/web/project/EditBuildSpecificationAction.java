@@ -22,6 +22,7 @@ public class EditBuildSpecificationAction extends BuildSpecificationActionSuppor
     private boolean isolateChangelists;
     private boolean retainWorkingCopy;
     private boolean timeoutEnabled;
+    private boolean prompt;
     private String checkoutSchemeName;
     private int timeout = 60;
     private static final List<String> PREPARE_PARAMS = Arrays.asList("id", "projectId");
@@ -90,6 +91,16 @@ public class EditBuildSpecificationAction extends BuildSpecificationActionSuppor
     public void setTimeout(int timeout)
     {
         this.timeout = timeout;
+    }
+
+    public boolean isPrompt()
+    {
+        return prompt;
+    }
+
+    public void setPrompt(boolean prompt)
+    {
+        this.prompt = prompt;
     }
 
     public boolean checkSpec()
@@ -205,11 +216,15 @@ public class EditBuildSpecificationAction extends BuildSpecificationActionSuppor
             timeout = 60;
         }
 
+        prompt = spec.getPrompt();
+
         return INPUT;
     }
 
     public String execute()
     {
+        projectManager.checkWrite(project);
+        
         spec.setIsolateChangelists(isolateChangelists);
         spec.setRetainWorkingCopy(retainWorkingCopy);
         BuildSpecification.CheckoutScheme newScheme = BuildSpecification.CheckoutScheme.valueOf(checkoutSchemeName);
@@ -228,6 +243,7 @@ public class EditBuildSpecificationAction extends BuildSpecificationActionSuppor
             spec.setTimeout(BuildSpecification.TIMEOUT_NEVER);
         }
 
+        spec.setPrompt(prompt);
         buildSpecificationDao.save(spec);
         return SUCCESS;
     }

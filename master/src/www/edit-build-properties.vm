@@ -1,0 +1,31 @@
+#helpTag("Build+Properties")
+#authorisationTags($principle)
+#projectTags($project)
+<html>
+<head>
+    <title>#wwtext("name=build.properties.specify")</title>
+</head>
+<body>
+    #projectTabs("configuration")
+
+    #parse("/template/includes/actionerrors.vm")
+
+#wwcform("action=editBuildProperties.action" "heading=%{getText('build.properties.specify')}" "method=post")
+    #wwhidden("name=projectId")
+    #wwhidden("name=id")
+
+    #foreach($property in $properties)
+        #wwtextfield("name=property.${property.name}" "value=$property.value" "label=$property.name" "tabindex=$velocityCount")
+    #end
+
+    #set($tabIndex = $properties.size() + 1)
+    #openSubmit()
+        #wwsubmit("name=save" "value=%{getText('buildspec.trigger')}" "tabindex=$tabIndex")
+        #set($tabIndex = $tabIndex + 1)
+        #wwsubmit("name=cancel" "value=%{getText('cancel.name')}" "tabindex=$tabIndex")
+    #closeSubmit()
+#end
+
+    #tabEnd()
+</body>
+</html>

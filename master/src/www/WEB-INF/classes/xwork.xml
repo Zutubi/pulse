@@ -209,6 +209,18 @@
 
         <action name="triggerBuild" class="com.zutubi.pulse.web.project.TriggerBuildAction">
             <result name="success" type="redirect">currentBuild.action?id=${projectId}</result>
+            <result name="prompt" type="chain">editBuildProperties!input</result>
+            <result name="error" type="velocity">generic-error.vm</result>
+        </action>
+
+        <action name="editBuildProperties!input" class="com.zutubi.pulse.web.project.EditBuildPropertiesAction" method="doInput">
+            <result name="input" type="velocity">edit-build-properties.vm</result>
+            <result name="error" type="velocity">generic-error.vm</result>
+        </action>
+
+        <action name="editBuildProperties" class="com.zutubi.pulse.web.project.EditBuildPropertiesAction">
+            <result name="input" type="velocity">edit-build-properties.vm</result>
+            <result name="success" type="redirect">currentBuild.action?id=${projectId}</result>
             <result name="error" type="velocity">generic-error.vm</result>
         </action>
 
@@ -744,6 +756,25 @@
         <action name="deleteBuildSpecification" class="com.zutubi.pulse.web.project.DeleteBuildSpecificationAction">
             <result name="success" type="redirect">/configureProject.action?id=${projectId}</result>
             <result name="error" type="velocity">generic-error.vm</result>
+        </action>
+
+        <action name="createBuildSpecificationProperty" class="com.zutubi.pulse.web.project.CreatePropertyAction">
+            <result name="input" type="velocity">create-specification-property.vm</result>
+            <result name="cancel" type="redirect">/viewBuildSpecification.action?id=${specId}&amp;projectId=${projectId}</result>
+            <result name="error" type="velocity">/generic-error.vm</result>
+            <result name="success" type="redirect">/viewBuildSpecification.action?id=${specId}&amp;projectId=${projectId}&amp;selectedNode=${id}</result>
+        </action>
+
+        <action name="editBuildSpecificationProperty" class="com.zutubi.pulse.web.project.EditPropertyAction">
+            <result name="input" type="velocity">edit-specification-property.vm</result>
+            <result name="cancel" type="redirect">/viewBuildSpecification.action?id=${specId}&amp;projectId=${projectId}</result>
+            <result name="error" type="velocity">/generic-error.vm</result>
+            <result name="success" type="redirect">/viewBuildSpecification.action?id=${specId}&amp;projectId=${projectId}&amp;selectedNode=${id}</result>
+        </action>
+
+        <action name="deleteBuildSpecificationProperty" class="com.zutubi.pulse.web.project.DeletePropertyAction">
+            <result name="error" type="velocity">/generic-error.vm</result>
+            <result name="success" type="redirect">/viewBuildSpecification.action?id=${specId}&amp;projectId=${projectId}</result>
         </action>
 
         <action name="createBuildStage" class="com.zutubi.pulse.web.project.CreateBuildStageAction">

@@ -24,12 +24,14 @@
     #wwcheckbox("name=timeoutEnabled" "label=%{getText('enable.timeout')}" "fieldValue=true" "onclick=setEnableState('spec.edit_timeout', 'spec.edit_timeoutEnabled')" "tabindex=5")
     #set($minutes = $action.getText('spec.timeout.minutes'))
     #wwtextfield("name=timeout" "label=%{getText('spec.timeout')}" "size=6" "after= $minutes" "tabindex=6")
+    #wwcheckbox("name=prompt" "label=%{getText('buildspec.prompt')}" "tabindex=7")
+    #inlineHelp("buildspec.prompt.help")
 
     <script type="text/javascript">
         setEnableState('spec.edit_timeout', 'spec.edit_timeoutEnabled');
     </script>
 
-    #saveCancel(7)
+    #saveCancel(8)
 #end
 
     #tabEnd()

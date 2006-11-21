@@ -24,7 +24,7 @@
         #dynamicCell($property.addToPath)
         #dynamicCell($property.resolveVariables)
         #editCell("$base/admin/editProperty!input.action?resourceId=$resource.id$versionLink&amp;name=$!webwork.htmlEncode($property.name)" "edit_$!webwork.htmlEncode($property.name)")
-        #deleteCell("delete_$!webwork.htmlEncode($property.name)" "$base/admin/deleteProperty.action?resourceId=$resource.id$versionLink&amp;name=$!webwork.htmlEncode($property.name)" $confirmMessage )
+        #deleteCell("delete_$!webwork.htmlEncode($property.name)" "$base/admin/deleteProperty.action?resourceId=$resource.id$versionLink&amp;name=$!webwork.htmlEncode($property.name)" $confirmMessage)
     <tr>
     #end
     #addRow("property.add" 7 "$base/admin/createProperty!input.action?resourceId=$resource.id$versionLink" "property.add_$!webwork.htmlEncode($version.value)")

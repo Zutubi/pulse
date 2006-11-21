@@ -1,6 +1,7 @@
 package com.zutubi.pulse.core;
 
 import com.zutubi.pulse.model.ResourceRequirement;
+import com.zutubi.pulse.core.model.ResourceProperty;
 
 import java.util.List;
 
@@ -36,28 +37,32 @@ public class RecipeRequest
      * some requirements may be added at that time.
      */
     private List<ResourceRequirement> resourceRequirements;
+    /**
+     * Properties to import into the global scope.
+     */
+    private List<ResourceProperty> properties;
 
     public RecipeRequest(String project, String spec, long id, String recipeName, boolean incremental)
     {
-        this(project, spec, id, recipeName, incremental, null);
+        this(project, spec, id, recipeName, incremental, null, null);
     }
 
-    public RecipeRequest(String project, String spec, long id, String recipeName, boolean incremental, List<ResourceRequirement> resourceRequirements)
+    public RecipeRequest(String project, String spec, long id, String recipeName, boolean incremental, List<ResourceRequirement> resourceRequirements, List<ResourceProperty> properties)
     {
-        this(project, spec, id, null, null, recipeName, incremental, resourceRequirements);
+        this(project, spec, id, null, null, recipeName, incremental, resourceRequirements, properties);
     }
 
     public RecipeRequest(long id, Bootstrapper bootstrapper, String pulseFileSource, String recipeName)
     {
-        this(null, null, id, bootstrapper, pulseFileSource, recipeName, false, null);
+        this(null, null, id, bootstrapper, pulseFileSource, recipeName, false, null, null);
     }
 
     public RecipeRequest(String project, String spec, long id, Bootstrapper bootstrapper, String pulseFileSource, String recipeName, boolean incremental)
     {
-        this(project, spec, id, bootstrapper, pulseFileSource, recipeName, incremental, null);
+        this(project, spec, id, bootstrapper, pulseFileSource, recipeName, incremental, null, null);
     }
 
-    public RecipeRequest(String project, String spec, long id, Bootstrapper bootstrapper, String pulseFileSource, String recipeName, boolean incremental, List<ResourceRequirement> resourceRequirements)
+    public RecipeRequest(String project, String spec, long id, Bootstrapper bootstrapper, String pulseFileSource, String recipeName, boolean incremental, List<ResourceRequirement> resourceRequirements, List<ResourceProperty> properties)
     {
         this.project = project;
         this.spec = spec;
@@ -67,6 +72,7 @@ public class RecipeRequest
         this.recipeName = recipeName;
         this.incremental = incremental;
         this.resourceRequirements = resourceRequirements;
+        this.properties = properties;
     }
 
     public String getProject()
@@ -134,6 +140,16 @@ public class RecipeRequest
     public void setResourceRequirements(List<ResourceRequirement> resourceRequirements)
     {
         this.resourceRequirements = resourceRequirements;
+    }
+
+    public List<ResourceProperty> getProperties()
+    {
+        return properties;
+    }
+
+    public void setProperties(List<ResourceProperty> properties)
+    {
+        this.properties = properties;
     }
 
     public void prepare(String agent)
