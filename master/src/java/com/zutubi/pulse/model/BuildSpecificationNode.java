@@ -3,6 +3,7 @@ package com.zutubi.pulse.model;
 import com.zutubi.pulse.core.model.Entity;
 import com.zutubi.pulse.util.Predicate;
 
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -15,6 +16,7 @@ public class BuildSpecificationNode extends Entity
     private BuildStage stage;
     private List<BuildSpecificationNode> children = new LinkedList<BuildSpecificationNode>();
     private List<ResourceRequirement> resourceRequirements = new LinkedList<ResourceRequirement>();
+    private List<PostBuildAction> postActions = new LinkedList<PostBuildAction>();
 
     public BuildSpecificationNode()
     {
@@ -48,6 +50,12 @@ public class BuildSpecificationNode extends Entity
         for(BuildSpecificationNode child: children)
         {
             copy.children.add(child.copy());
+        }
+
+        copy.postActions = new LinkedList<PostBuildAction>();
+        for(PostBuildAction action: postActions)
+        {
+            copy.postActions.add(action.copy());
         }
 
         return copy;
@@ -164,6 +172,60 @@ public class BuildSpecificationNode extends Entity
     public void addResourceRequirement(ResourceRequirement resourceRequirement)
     {
         resourceRequirements.add(resourceRequirement);
+    }
+
+    public List<PostBuildAction> getPostActions()
+    {
+        return postActions;
+    }
+
+    private void setPostActions(List<PostBuildAction> postActions)
+    {
+        this.postActions = postActions;
+    }
+
+    public void addPostAction(PostBuildAction action)
+    {
+        postActions.add(action);
+    }
+
+    public void removePostAction(long id)
+    {
+        Iterator<PostBuildAction> it = postActions.iterator();
+        while(it.hasNext())
+        {
+            if(it.next().getId() == id)
+            {
+                it.remove();
+                return;
+            }
+        }
+    }
+
+    public PostBuildAction getPostAction(String name)
+    {
+        for(PostBuildAction p: postActions)
+        {
+            if(p.getName().equals(name))
+            {
+                return p;
+            }
+        }
+
+        return null;
+    }
+
+    public PostBuildAction getPostAction(long id)
+    {
+        for(PostBuildAction a: postActions)
+        {
+            if(a.getId() == id)
+            {
+                return a;
+            }
+        }
+
+        return null;
     }
 
 }

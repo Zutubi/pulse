@@ -1,6 +1,7 @@
 package com.zutubi.pulse.model;
 
 import com.zutubi.pulse.core.model.Entity;
+import com.zutubi.pulse.core.model.ResourceProperty;
 import com.zutubi.pulse.core.model.ResultState;
 import com.zutubi.pulse.util.logging.Logger;
 
@@ -41,18 +42,25 @@ public abstract class PostBuildAction extends Entity
         copy.failOnError = failOnError;
     }
 
-    public void execute(BuildResult result)
+    public void execute(BuildResult build, RecipeResultNode recipe, List<ResourceProperty> properties)
     {
         errors = new LinkedList<String>();
 
-        if(resultMatches(result))
+        if(resultMatches(build))
         {
-            internalExecute(result);
+            internalExecute(build, recipe, properties);
             for(String error: errors)
             {
                 if(failOnError)
                 {
-                    result.error(error);
+                    if(recipe == null)
+                    {
+                        build.error(error);
+                    }
+                    else
+                    {
+                        recipe.getResult().error(error);
+                    }
                 }
                 else
                 {
@@ -169,7 +177,7 @@ public abstract class PostBuildAction extends Entity
         errors.add("Executing post build action '" + name + "': " + error);
     }
 
-    protected abstract void internalExecute(BuildResult result);
+    protected abstract void internalExecute(BuildResult build, RecipeResultNode recipe, List<ResourceProperty> properties);
 
     public abstract String getType();
 

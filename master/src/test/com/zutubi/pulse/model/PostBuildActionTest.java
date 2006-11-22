@@ -1,10 +1,13 @@
 package com.zutubi.pulse.model;
 
 import com.zutubi.pulse.core.model.Feature;
+import com.zutubi.pulse.core.model.ResourceProperty;
 import com.zutubi.pulse.core.model.ResultState;
 import com.zutubi.pulse.test.PulseTestCase;
 
 import java.util.Arrays;
+import java.util.LinkedList;
+import java.util.List;
 
 /**
  */
@@ -57,7 +60,7 @@ public class PostBuildActionTest extends PulseTestCase
     private BuildResult testResult(String spec)
     {
         BuildResult result = new BuildResult(new UnknownBuildReason(), null, spec, 1);
-        action.execute(result);
+        action.execute(result, null, new LinkedList<ResourceProperty>());
         return result;
     }
 
@@ -65,7 +68,7 @@ public class PostBuildActionTest extends PulseTestCase
     {
         BuildResult result = new BuildResult(new UnknownBuildReason(), null, "foo", 1);
         result.setState(state);
-        action.execute(result);
+        action.execute(result, null, new LinkedList<ResourceProperty>());
         return result;
     }
 
@@ -78,7 +81,7 @@ public class PostBuildActionTest extends PulseTestCase
             setName("mock");
         }
 
-        protected void internalExecute(BuildResult result)
+        protected void internalExecute(BuildResult result, RecipeResultNode recipe, List<ResourceProperty> properties)
         {
             executed = true;
             if(error != null)

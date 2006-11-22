@@ -4,12 +4,12 @@ import com.opensymphony.util.TextUtils;
 import com.opensymphony.xwork.Validateable;
 import com.zutubi.pulse.bootstrap.MasterConfigurationManager;
 import com.zutubi.pulse.core.Scope;
+import com.zutubi.pulse.core.model.ResourceProperty;
 import com.zutubi.pulse.core.model.ResultState;
 import com.zutubi.pulse.model.*;
 import com.zutubi.pulse.web.wizard.BaseWizard;
 import com.zutubi.pulse.web.wizard.BaseWizardState;
 import com.zutubi.pulse.web.wizard.Wizard;
-import com.zutubi.pulse.web.wizard.WizardCompleteState;
 
 import java.util.*;
 
@@ -21,8 +21,9 @@ public class AddPostBuildActionWizard extends BaseWizard
     private static final String EXE_STATE = "exe";
     private static final String TAG_STATE = "tag";
 
-
     private long projectId;
+    private long specId = 0;
+    private long nodeId = 0;
 
     private ProjectManager projectManager;
     private BuildManager buildManager;
@@ -53,11 +54,36 @@ public class AddPostBuildActionWizard extends BaseWizard
         this.projectId = projectId;
     }
 
+    public long getSpecId()
+    {
+        return specId;
+    }
+
+    public void setSpecId(long specId)
+    {
+        this.specId = specId;
+    }
+
+    public long getNodeId()
+    {
+        return nodeId;
+    }
+
+    public void setNodeId(long nodeId)
+    {
+        this.nodeId = nodeId;
+    }
+
     public Project getProject()
     {
         return projectManager.getProject(projectId);
     }
 
+    public boolean isStage()
+    {
+        return specId > 0;
+    }
+    
     public boolean isExe()
     {
         return EXE_STATE.equals(selectState.getType());
@@ -66,6 +92,10 @@ public class AddPostBuildActionWizard extends BaseWizard
     public void process()
     {
         Project project = getProject();
+        if(project == null)
+        {
+            return;
+        }
 
         PostBuildAction action = null;
         if (TAG_STATE.equals(selectState.getType()))
@@ -87,8 +117,27 @@ public class AddPostBuildActionWizard extends BaseWizard
                     configExe.getArguments());
         }
 
+        if(specId > 0)
+        {
+            BuildSpecification spec = project.getBuildSpecification(specId);
+            if(spec == null)
+            {
+                return;
+            }
 
-        project.addPostBuildAction(action);
+            BuildSpecificationNode node = spec.getNode(nodeId);
+            if(node == null)
+            {
+                return;
+            }
+
+            node.addPostAction(action);
+        }
+        else
+        {
+            project.addPostBuildAction(action);
+        }
+
         projectManager.save(project);
     }
 
@@ -204,9 +253,31 @@ public class AddPostBuildActionWizard extends BaseWizard
                 return;
             }
 
-            if(project.getPostBuildAction(name) != null)
+            if(specId > 0)
             {
-                addFieldError("name", "This project already has a post build action with name '" + name + "'");
+                BuildSpecification spec = project.getBuildSpecification(specId);
+                if(spec == null)
+                {
+                    return;
+                }
+
+                BuildSpecificationNode node = spec.getNode(nodeId);
+                if(node == null)
+                {
+                    return;
+                }
+
+                if(node.getPostAction(name) != null)
+                {
+                    addFieldError("name", "This stage already has a post stage action with name '" + name + "'");
+                }
+            }
+            else
+            {
+                if(project.getPostBuildAction(name) != null)
+                {
+                    addFieldError("name", "This project already has a post build action with name '" + name + "'");
+                }
             }
         }
 
@@ -222,12 +293,15 @@ public class AddPostBuildActionWizard extends BaseWizard
                 return;
             }
 
-            specs = new LinkedHashMap<Long, String>();
-            List<BuildSpecification> buildSpecifications = project.getBuildSpecifications();
-            Collections.sort(buildSpecifications, new NamedEntityComparator());
-            for (BuildSpecification spec : buildSpecifications)
+            if (specId == 0)
             {
-                specs.put(spec.getId(), spec.getName());
+                specs = new LinkedHashMap<Long, String>();
+                List<BuildSpecification> buildSpecifications = project.getBuildSpecifications();
+                Collections.sort(buildSpecifications, new NamedEntityComparator());
+                for (BuildSpecification spec : buildSpecifications)
+                {
+                    specs.put(spec.getId(), spec.getName());
+                }
             }
 
             states = ResultState.getCompletedStatesMap();
@@ -264,13 +338,22 @@ public class AddPostBuildActionWizard extends BaseWizard
 
         public void initialise()
         {
+            // TODO: different for post-stage actions
             super.initialise();
 
             List<BuildResult> lastBuild = buildManager.queryBuilds(new Project[] { getProject() }, new ResultState[] { ResultState.SUCCESS }, null, -1, -1, null, 0, 1, true);
             if(!lastBuild.isEmpty())
             {
                 BuildResult result = lastBuild.get(0);
-                exampleScope = RunExecutablePostBuildAction.getScope(result, configurationManager);
+                List<RecipeResultNode> stages = result.getRoot().getChildren();
+                RecipeResultNode node = null;
+
+                if(isStage() && stages.size() > 0)
+                {
+                    node = stages.get(0);
+                }
+
+                exampleScope = RunExecutablePostBuildAction.getScope(result, node, new LinkedList<ResourceProperty>(), configurationManager);
             }
         }
 
@@ -305,7 +388,7 @@ public class AddPostBuildActionWizard extends BaseWizard
         }
     }
 
-    public class ConfigureTag extends BaseWizardState implements Validateable
+    public class ConfigureTag extends BaseWizardState
     {
         private String tagName;
         private boolean moveExisting = false;
@@ -338,18 +421,6 @@ public class AddPostBuildActionWizard extends BaseWizard
         public String getNextStateName()
         {
             return "success";
-        }
-
-        public void validate()
-        {
-            try
-            {
-                TagPostBuildAction.validateTag(tagName);
-            }
-            catch (Exception e)
-            {
-                addFieldError("tagName", e.getMessage());
-            }
         }
     }
 }

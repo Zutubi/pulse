@@ -2,12 +2,11 @@ package com.zutubi.pulse.web.project;
 
 import com.zutubi.pulse.bootstrap.MasterConfigurationManager;
 import com.zutubi.pulse.core.Scope;
+import com.zutubi.pulse.core.model.ResourceProperty;
 import com.zutubi.pulse.core.model.ResultState;
-import com.zutubi.pulse.model.BuildResult;
-import com.zutubi.pulse.model.PostBuildAction;
-import com.zutubi.pulse.model.Project;
-import com.zutubi.pulse.model.RunExecutablePostBuildAction;
+import com.zutubi.pulse.model.*;
 
+import java.util.LinkedList;
 import java.util.List;
 
 /**
@@ -37,10 +36,10 @@ public class EditExeActionAction extends AbstractEditPostBuildActionAction
             return;
         }
 
-        PostBuildAction a = getProject().getPostBuildAction(getId());
-        if (a == null)
+        PostBuildAction a = lookupAction();
+
+        if(a == null)
         {
-            addActionError("Unknown post build action [" + getId() + "]");
             return;
         }
 
@@ -56,7 +55,15 @@ public class EditExeActionAction extends AbstractEditPostBuildActionAction
         if(!lastBuild.isEmpty())
         {
             BuildResult result = lastBuild.get(0);
-            exampleScope = RunExecutablePostBuildAction.getScope(result, configurationManager);
+            List<RecipeResultNode> stages = result.getRoot().getChildren();
+            RecipeResultNode node = null;
+
+            if(isStage() && stages.size() > 0)
+            {
+                node = stages.get(0);
+            }
+            
+            exampleScope = RunExecutablePostBuildAction.getScope(result, node, new LinkedList<ResourceProperty>(), configurationManager);
         }
     }
 

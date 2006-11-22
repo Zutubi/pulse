@@ -680,8 +680,22 @@
             <result name="cancel" type="redirect">/configureProject.action?id=${wizard.projectId}</result>
         </action>
 
+        <action name="addPostStageAction" class="com.zutubi.pulse.web.wizard.WizardAction">
+            <interceptor-ref name="wizardStack"/>
+            <param name="wizardClass">com.zutubi.pulse.web.project.AddPostBuildActionWizard</param>
+            <result name="select" type="velocity">select-post-stage-action.vm</result>
+            <result name="exe" type="velocity">configure-exe-action.vm</result>
+            <result name="tag" type="velocity">configure-tag-action.vm</result>
+            <result name="success" type="redirect">/viewBuildSpecification.action?id=${wizard.specId}&amp;projectId=${wizard.projectId}&amp;selectedNode=${wizard.nodeId}</result>
+            <result name="cancel" type="redirect">/viewBuildSpecification.action?id=${wizard.specId}&amp;projectId=${wizard.projectId}&amp;selectedNode=${wizard.nodeId}</result>
+        </action>
+
         <action name="deletePostBuildAction" class="com.zutubi.pulse.web.project.DeletePostBuildAction">
             <result name="success" type="redirect">/configureProject.action?id=${projectId}</result>
+        </action>
+
+        <action name="deletePostStageAction" class="com.zutubi.pulse.web.project.DeletePostBuildAction">
+            <result name="success" type="redirect">/viewBuildSpecification.action?id=${specId}&amp;projectId=${projectId}&amp;selectedNode=${nodeId}</result>
         </action>
 
         <action name="editPostBuildAction" class="com.zutubi.pulse.web.project.EditPostBuildActionAction">
@@ -714,6 +728,38 @@
             <result name="input" type="velocity">edit-action-tag.vm</result>
             <result name="cancel" type="redirect">/configureProject.action?id=${projectId}</result>
             <result name="success" type="redirect">/configureProject.action?id=${projectId}</result>
+        </action>
+
+        <action name="editPostStageAction" class="com.zutubi.pulse.web.project.EditPostBuildActionAction">
+            <result name="run executable" type="chain">editExeStageAction!input</result>
+            <result name="apply tag" type="chain">editTagStageAction!input</result>
+            <result name="error" type="velocity">generic-error.vm</result>
+        </action>
+
+        <!-- Alias is required as WW can't chain to a non-execute method :| -->
+        <action name="editExeStageAction!input" class="com.zutubi.pulse.web.project.EditExeActionAction" method="input">
+            <interceptor-ref name="crudStack"/>
+            <result name="input" type="velocity">edit-stage-action-exe.vm</result>
+        </action>
+
+        <action name="editExeStageAction" class="com.zutubi.pulse.web.project.EditExeActionAction">
+            <interceptor-ref name="crudStack"/>
+            <result name="input" type="velocity">edit-stage-action-exe.vm</result>
+            <result name="cancel" type="redirect">/viewBuildSpecification.action?id=${specId}&amp;projectId=${projectId}&amp;selectedNode=${nodeId}</result>
+            <result name="success" type="redirect">/viewBuildSpecification.action?id=${specId}&amp;projectId=${projectId}&amp;selectedNode=${nodeId}</result>
+        </action>
+
+        <!-- Alias is required as WW can't chain to a non-execute method :| -->
+        <action name="editTagStageAction!input" class="com.zutubi.pulse.web.project.EditTagActionAction" method="input">
+            <interceptor-ref name="crudStack"/>
+            <result name="input" type="velocity">edit-stage-action-tag.vm</result>
+        </action>
+
+        <action name="editTagStageAction" class="com.zutubi.pulse.web.project.EditTagActionAction">
+            <interceptor-ref name="crudStack"/>
+            <result name="input" type="velocity">edit-stage-action-tag.vm</result>
+            <result name="cancel" type="redirect">/viewBuildSpecification.action?id=${specId}&amp;projectId=${projectId}&amp;selectedNode=${nodeId}</result>
+            <result name="success" type="redirect">/viewBuildSpecification.action?id=${specId}&amp;projectId=${projectId}&amp;selectedNode=${nodeId}</result>
         </action>
 
         <action name="viewSystemInfo" class="com.zutubi.pulse.web.agents.SystemInfoAction">

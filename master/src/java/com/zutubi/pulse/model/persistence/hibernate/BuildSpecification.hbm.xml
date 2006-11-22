@@ -54,12 +54,16 @@
             </composite-element>
         </bag>
 
+        <bag name="postActions" cascade="all,delete-orphan" lazy="false">
+            <key column="SPECIFICATION_NODE_ID"/>
+            <one-to-many class="com.zutubi.pulse.model.PostBuildAction"/>
+        </bag>
+
         <list name="children" cascade="all,delete-orphan" lazy="false">
             <key column="PARENT_ID"/>
             <index column="ORDINAL"/>
             <one-to-many class="com.zutubi.pulse.model.BuildSpecificationNode"/>
         </list>
-
     </class>
 
     <class name="com.zutubi.pulse.model.AbstractBuildHostRequirements" table="BUILD_HOST_REQUIREMENTS" lazy="false">

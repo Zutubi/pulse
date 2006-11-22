@@ -10,7 +10,13 @@
 
     #parse("/template/includes/actionerrors.vm")
 
-#wwcform("action=addPostBuildAction.action" "id=post.build.action.exe" "heading=%{getText('post.build.action.exe.step')}" "method=post")
+#if($stage)
+    #set($actionName = "addPostStageAction")
+#else
+    #set($actionName = "addPostBuildAction")
+#end
+
+#wwcform("action=${actionName}.action" "id=post.build.action.exe" "heading=%{getText('post.build.action.exe.step')}" "method=post")
     #wwhidden("name=state")
     #wwhidden("name=submit")
 

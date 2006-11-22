@@ -61,6 +61,7 @@ public class BuildController implements EventListener
     private Scheduler quartzScheduler;
     private ServiceTokenManager serviceTokenManager;
     private BuildResult previousSuccessful;
+    private List<ResourceProperty> buildProperties;
 
     public BuildController(AbstractBuildRequestEvent event, BuildSpecification specification, EventManager eventManager, ProjectManager projectManager, UserManager userManager, BuildManager buildManager, RecipeQueue queue, RecipeResultCollector collector, Scheduler quartScheduler, MasterConfigurationManager configManager, ServiceTokenManager serviceTokenManager)
     {
@@ -141,11 +142,12 @@ public class BuildController implements EventListener
             recipeResult.setAbsoluteOutputDir(configurationManager.getDataDirectory(), recipeOutputDir);
 
             boolean incremental = !request.isPersonal() && specification.getCheckoutScheme() == BuildSpecification.CheckoutScheme.INCREMENTAL_UPDATE;
-            RecipeRequest recipeRequest = new RecipeRequest(project.getName(), specification.getName(), recipeResult.getId(), stage.getRecipe(), incremental, getResourceRequirements(specification, node), specification.copyProperties());
+            buildProperties = specification.copyProperties();
+            RecipeRequest recipeRequest = new RecipeRequest(project.getName(), specification.getName(), recipeResult.getId(), stage.getRecipe(), incremental, getResourceRequirements(specification, node), buildProperties);
             RecipeDispatchRequest dispatchRequest = new RecipeDispatchRequest(stage.getHostRequirements(), request.getRevision(), recipeRequest, buildResult);
             DefaultRecipeLogger logger = new DefaultRecipeLogger(new File(paths.getRecipeDir(buildResult, recipeResult.getId()), RecipeResult.RECIPE_LOG));
             RecipeResultNode previousRecipe = previousSuccessful == null ? null : previousSuccessful.findResultNode(stage.getName());
-            RecipeController rc = new RecipeController(childResultNode, dispatchRequest, incremental, previousRecipe, logger, collector, queue, buildManager, serviceTokenManager);
+            RecipeController rc = new RecipeController(buildResult, node, childResultNode, dispatchRequest, buildProperties, request.isPersonal(), incremental, previousRecipe, logger, collector, queue, buildManager, serviceTokenManager);
             TreeNode<RecipeController> child = new TreeNode<RecipeController>(rc);
             rcNode.add(child);
             pendingRecipes++;
@@ -594,7 +596,7 @@ public class BuildController implements EventListener
             for(PostBuildAction action: buildResult.getProject().getPostBuildActions())
             {
                 ComponentContext.autowire(action);
-                action.execute(buildResult);
+                action.execute(buildResult, null, buildProperties);
             }
         }
 

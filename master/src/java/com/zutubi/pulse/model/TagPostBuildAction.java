@@ -4,6 +4,7 @@ import com.zutubi.pulse.core.FileLoadException;
 import com.zutubi.pulse.core.Scope;
 import com.zutubi.pulse.core.VariableHelper;
 import com.zutubi.pulse.core.model.Property;
+import com.zutubi.pulse.core.model.ResourceProperty;
 import com.zutubi.pulse.core.model.ResultState;
 import com.zutubi.pulse.scm.SCMServer;
 
@@ -29,11 +30,11 @@ public class TagPostBuildAction extends PostBuildAction
         this.moveExisting = moveExisting;
     }
 
-    protected void internalExecute(BuildResult result)
+    protected void internalExecute(BuildResult result, RecipeResultNode recipe, List<ResourceProperty> properties)
     {
         try
         {
-            String tagName = substituteVariables(tag, result);
+            String tagName = substituteVariables(tag, result, recipe, properties);
             SCMServer server = result.getProject().getScm().createServer();
             server.tag(result.getScmDetails().getRevision(), tagName, moveExisting);
         }
@@ -58,13 +59,25 @@ public class TagPostBuildAction extends PostBuildAction
         return copy;
     }
 
-    private String substituteVariables(String tag, BuildResult result) throws FileLoadException
+    private String substituteVariables(String tag, BuildResult build, RecipeResultNode recipe, List<ResourceProperty> properties) throws FileLoadException
     {
         Scope scope = new Scope();
-        scope.add(new Property("project", result.getProject().getName()));
-        scope.add(new Property("number", Long.toString(result.getNumber())));
-        scope.add(new Property("specification", result.getBuildSpecification()));
-        scope.add(new Property("status", result.getState().getString()));
+        scope.add(properties);
+
+        scope.add(new Property("project", build.getProject().getName()));
+        scope.add(new Property("number", Long.toString(build.getNumber())));
+        scope.add(new Property("specification", build.getBuildSpecification()));
+
+        // Build or stage
+        if(recipe == null)
+        {
+            scope.add(new Property("status", build.getState().getString()));
+        }
+        else
+        {
+            scope.add(new Property("status", recipe.getResult().getState().getString()));
+        }
+
         return VariableHelper.replaceVariables(tag, scope);
     }
 
@@ -86,17 +99,5 @@ public class TagPostBuildAction extends PostBuildAction
     public void setMoveExisting(boolean moveExisting)
     {
         this.moveExisting = moveExisting;
-    }
-
-    public static void validateTag(String tag) throws Exception
-    {
-        // Populate a dummy scope to validate variables.
-        Scope scope = new Scope();
-        scope.add(new Property("project", "project"));
-        scope.add(new Property("number", "number"));
-        scope.add(new Property("specification", "specification"));
-        scope.add(new Property("status", "status"));
-
-        VariableHelper.replaceVariables(tag, scope);
     }
 }

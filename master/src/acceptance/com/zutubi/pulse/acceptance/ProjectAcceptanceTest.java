@@ -1134,10 +1134,6 @@ public class ProjectAcceptanceTest extends ProjectAcceptanceTestBase
         tagForm.nextFormElements("", "true");
         tagForm.assertFormPresent();
         assertTextPresent("tag name is required");
-
-        tagForm.nextFormElements("${unknown}", "true");
-        tagForm.assertFormPresent();
-        assertTextPresent("Reference to unknown variable 'unknown'");
     }
 
     public void testAddTagActionDuplicate()
@@ -1180,9 +1176,8 @@ public class ProjectAcceptanceTest extends ProjectAcceptanceTestBase
         form.assertFormPresent();
         assertTextPresent("tag name is required");
 
-        form.saveFormElements("", null, null, "false", "${unknown}", "false");
+        form.saveFormElements("", null, null, "false", "tagname", "false");
         assertTextPresent("name is required");
-        assertTextPresent("Reference to unknown variable 'unknown'");
     }
 
     public void testEditTagActionDuplicate()
@@ -1286,6 +1281,217 @@ public class ProjectAcceptanceTest extends ProjectAcceptanceTestBase
         addTagAction("deadtag");
         assertTextPresent("deadtag");
         assertAndClick("delete_deadtag");
+        assertTextNotPresent("deadtag");
+    }
+
+    public void testAddTagStageAction()
+    {
+        clickLink("edit_default");
+        addTagStageAction("test-action");
+
+        assertStageActionTable("default", new String[][] { getActionRow("test-action", "apply tag") });
+
+        assertAndClick("edit_post_default_test-action");
+        EditTagActionForm editForm = new EditTagActionForm(tester, true);
+        editForm.assertFormPresent();
+        editForm.assertFormElements("test-action", null, "true", "my tag", "true");
+    }
+
+    private void addTagStageAction(String name)
+    {
+        assertAndClick("add_post_action_default");
+
+        AddPostBuildActionForm typeForm = new AddPostBuildActionForm(tester, true);
+        typeForm.assertFormPresent();
+        typeForm.nextFormElements(name, "tag", null, "true");
+
+        AddTagActionForm tagForm = new AddTagActionForm(tester);
+        tagForm.assertFormPresent();
+        tagForm.nextFormElements("my tag", "true");
+    }
+
+    public void testAddTagStageStates()
+    {
+        clickLink("edit_default");
+        assertAndClick("add_post_action_default");
+
+        AddPostBuildActionForm typeForm = new AddPostBuildActionForm(tester, true);
+        typeForm.assertFormPresent();
+        typeForm.nextFormElements("test-action", "tag", "FAILURE", "false");
+
+        AddTagActionForm tagForm = new AddTagActionForm(tester);
+        tagForm.assertFormPresent();
+        tagForm.nextFormElements("my tag", "false");
+
+        assertStageActionTable("default", new String[][] { getActionRow("test-action", "apply tag") });
+
+        assertAndClick("edit_post_default_test-action");
+        EditTagActionForm editForm = new EditTagActionForm(tester, true);
+        editForm.assertFormPresent();
+        editForm.assertFormElements("test-action", "FAILURE", "false", "my tag", "false");
+    }
+
+    public void testAddTagStageActionValidation()
+    {
+        clickLink("edit_default");
+        assertAndClick("add_post_action_default");
+
+        AddPostBuildActionForm typeForm = new AddPostBuildActionForm(tester, true);
+        typeForm.assertFormPresent();
+        typeForm.nextFormElements("", "tag", null, "true");
+        typeForm.assertFormPresent();
+        assertTextPresent("name is required");
+
+        typeForm.nextFormElements("my-action", "tag", null, "true");
+        AddTagActionForm tagForm = new AddTagActionForm(tester);
+        tagForm.assertFormPresent();
+        tagForm.nextFormElements("", "true");
+        tagForm.assertFormPresent();
+        assertTextPresent("tag name is required");
+    }
+
+    public void testAddTagStageActionDuplicate()
+    {
+        clickLink("edit_default");
+        addTagStageAction("dupit");
+
+        assertAndClick("add_post_action_default");
+
+        AddPostBuildActionForm typeForm = new AddPostBuildActionForm(tester, true);
+        typeForm.assertFormPresent();
+        typeForm.nextFormElements("dupit", "tag", null, "true");
+        typeForm.assertFormPresent();
+        assertTextPresent("This stage already has a post stage action with name 'dupit'");
+    }
+
+    public void testEditTagStageAction()
+    {
+        clickLink("edit_default");
+        addTagStageAction("mytag");
+
+        assertAndClick("edit_post_default_mytag");
+        EditTagActionForm form = new EditTagActionForm(tester, true);
+        form.assertFormPresent();
+        form.saveFormElements("editedtag", "SUCCESS", "false", "${project}", "false");
+
+        assertStageActionTable("default", new String[][] { getActionRow("editedtag", "apply tag") });
+        assertAndClick("edit_post_default_editedtag");
+        form.assertFormPresent();
+        form.assertFormElements("editedtag", "SUCCESS", "false", "${project}", "false");
+    }
+
+    public void testEditTagStageActionValidation()
+    {
+        clickLink("edit_default");
+        addTagStageAction("mytag");
+
+        assertAndClick("edit_post_default_mytag");
+        EditTagActionForm form = new EditTagActionForm(tester, true);
+        form.assertFormPresent();
+        form.saveFormElements("name", null, "false", "", "false");
+        form.assertFormPresent();
+        assertTextPresent("tag name is required");
+
+        form.saveFormElements("", null, "false", "tagname", "false");
+        assertTextPresent("name is required");
+    }
+
+    public void testEditTagStageActionDuplicate()
+    {
+        clickLink("edit_default");
+        addTagStageAction("mytag");
+        addTagStageAction("dupit");
+
+        assertAndClick("edit_post_default_mytag");
+        EditTagActionForm form = new EditTagActionForm(tester, true);
+        form.assertFormPresent();
+        form.saveFormElements("dupit", null, "false", "${status}", "false");
+        form.assertFormPresent();
+        assertTextPresent("This stage already has a post stage action with name 'dupit'");
+    }
+
+    public void testAddExeStageAction()
+    {
+        clickLink("edit_default");
+        addExeStageAction("test-action");
+
+        assertStageActionTable("default", new String[][] { getActionRow("test-action", "run executable") });
+
+        assertAndClick("edit_post_default_test-action");
+        EditExeActionForm editForm = new EditExeActionForm(tester, true);
+        editForm.assertFormPresent();
+        editForm.assertFormElements("test-action", null, "true", "thecommand", "theargs");
+    }
+
+    private void addExeStageAction(String name)
+    {
+        assertAndClick("add_post_action_default");
+
+        AddPostBuildActionForm typeForm = new AddPostBuildActionForm(tester, true);
+        typeForm.assertFormPresent();
+        typeForm.nextFormElements(name, "exe", null, "true");
+
+        AddExeActionForm exeForm = new AddExeActionForm(tester);
+        exeForm.assertFormPresent();
+        exeForm.nextFormElements("thecommand", "theargs");
+    }
+
+    public void testAddExeStageActionValidation()
+    {
+        clickLink("edit_default");
+        assertAndClick("add_post_action_default");
+
+        AddPostBuildActionForm typeForm = new AddPostBuildActionForm(tester, true);
+        typeForm.assertFormPresent();
+        typeForm.nextFormElements("", "exe", null, "true");
+        typeForm.assertFormPresent();
+        assertTextPresent("name is required");
+        typeForm.nextFormElements("my-action", "exe", null, "true");
+
+        AddExeActionForm exeForm = new AddExeActionForm(tester);
+        exeForm.assertFormPresent();
+        exeForm.nextFormElements("", "theargs");
+        exeForm.assertFormPresent();
+        assertTextPresent("command is required");
+    }
+
+    public void testEditExeStageAction()
+    {
+        clickLink("edit_default");
+        addExeStageAction("myexe");
+
+        assertAndClick("edit_post_default_myexe");
+        EditExeActionForm form = new EditExeActionForm(tester, true);
+        form.assertFormPresent();
+        form.saveFormElements("editedexe", "SUCCESS", "false", "command", "${project} ${number} ${status}");
+
+        assertStageActionTable("default", new String[][] { getActionRow("editedexe", "run executable") });
+        assertAndClick("edit_post_default_editedexe");
+        form.assertFormPresent();
+        form.assertFormElements("editedexe", "SUCCESS", "false", "command", "${project} ${number} ${status}");
+    }
+
+    public void testEditExeStageActionValidation()
+    {
+        clickLink("edit_default");
+        addExeStageAction("myexe");
+
+        assertAndClick("edit_post_default_myexe");
+        EditExeActionForm form = new EditExeActionForm(tester, true);
+        form.assertFormPresent();
+        form.saveFormElements("", null, "false", "", "");
+        form.assertFormPresent();
+        assertTextPresent("name is required");
+        assertTextPresent("command is required");
+    }
+
+    public void testDeletePostStageAction()
+    {
+        clickLink("edit_default");
+        addExeStageAction("deadexe");
+        assertTextPresent("deadexe");
+        assertAndClick("delete_post_default_deadexe");
+        assertTablePresent("post.actions.default");
         assertTextNotPresent("deadtag");
     }
 
@@ -1637,6 +1843,13 @@ public class ProjectAcceptanceTest extends ProjectAcceptanceTestBase
     {
         assertTablePresent("project.post.build.actions");
         assertTableRowsEqual("project.post.build.actions", 2, rows);
+    }
+
+    private void assertStageActionTable(String stage, String[][] rows)
+    {
+        String id = "post.actions." + stage;
+        assertTablePresent(id);
+        assertTableRowsEqual(id, 2, rows);
     }
 
     private String[] getActionRow(String name, String type)

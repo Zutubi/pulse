@@ -5,10 +5,7 @@ import com.zutubi.pulse.agent.Status;
 import com.zutubi.pulse.core.Bootstrapper;
 import com.zutubi.pulse.core.BuildRevision;
 import com.zutubi.pulse.core.RecipeRequest;
-import com.zutubi.pulse.core.model.CommandResult;
-import com.zutubi.pulse.core.model.Feature;
-import com.zutubi.pulse.core.model.RecipeResult;
-import com.zutubi.pulse.core.model.ResultState;
+import com.zutubi.pulse.core.model.*;
 import com.zutubi.pulse.events.build.*;
 import com.zutubi.pulse.logging.CustomLogRecord;
 import com.zutubi.pulse.model.*;
@@ -55,8 +52,10 @@ public class RecipeControllerTest extends PulseTestCase
         rootNode.addChild(childNode);
 
         recipeRequest = new RecipeRequest("project", "spec", rootResult.getId(), rootResult.getRecipeName(), false);
+        BuildResult build = new BuildResult();
+        BuildSpecificationNode specificationNode = new BuildSpecificationNode();
         dispatchRequest = new RecipeDispatchRequest(new MasterBuildHostRequirements(), new BuildRevision(), recipeRequest, null);
-        recipeController = new RecipeController(rootNode, dispatchRequest, false, null, logger, resultCollector, recipeQueue, buildManager, null);
+        recipeController = new RecipeController(build, specificationNode, rootNode, dispatchRequest, new LinkedList<ResourceProperty>(), false, false, null, logger, resultCollector, recipeQueue, buildManager, null);
     }
 
     protected void tearDown() throws Exception

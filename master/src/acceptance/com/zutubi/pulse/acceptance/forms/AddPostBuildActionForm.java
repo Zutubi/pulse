@@ -6,9 +6,17 @@ import net.sourceforge.jwebunit.WebTester;
  */
 public class AddPostBuildActionForm extends BaseForm
 {
+    private boolean stage = false;
+
     public AddPostBuildActionForm(WebTester tester)
     {
         super(tester);
+    }
+
+    public AddPostBuildActionForm(WebTester tester, boolean stage)
+    {
+        super(tester);
+        this.stage = stage;
     }
 
     public String getFormName()
@@ -18,12 +26,26 @@ public class AddPostBuildActionForm extends BaseForm
 
     public String[] getFieldNames()
     {
-        return new String[]{ "name", "type", "specIds", "stateNames", "failOnError" };
+        if(stage)
+        {
+            return new String[]{ "name", "type", "stateNames", "failOnError" };
+        }
+        else
+        {
+            return new String[]{ "name", "type", "specIds", "stateNames", "failOnError" };
+        }
     }
 
     public int[] getFieldTypes()
     {
-        return new int[] { TEXTFIELD, SELECT, SELECT, SELECT, CHECKBOX };
+        if(stage)
+        {
+            return new int[] { TEXTFIELD, SELECT, SELECT, CHECKBOX };
+        }
+        else
+        {
+            return new int[] { TEXTFIELD, SELECT, SELECT, SELECT, CHECKBOX };
+        }
     }
 
     public void assertFormPresent()

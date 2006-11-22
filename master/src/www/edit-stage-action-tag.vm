@@ -1,0 +1,49 @@
+#helpTag("Project+Tag+Post+Build+Actions")
+#authorisationTags($principle)
+#projectTags($project)
+<html>
+<head>
+    <title>#wwtext("name=edit.tag.post.stage.action")</title>
+</head>
+<body>
+    #projectTabs("configuration")
+
+<table class="columns">
+    <tr><td class="columns">
+
+    #parse("/template/includes/actionerrors.vm")
+
+#wwcform("action=editTagStageAction.action" "id=edit.tag.post.build.action" "heading=%{getText('edit.tag.post.stage.action')}" "method=post")
+    #wwhidden("name=id")
+    #wwhidden("name=projectId")
+    #wwhidden("name=specId")
+    #wwhidden("name=nodeId")
+
+    #wwtextfield("name=newName" "label=%{getText('post.build.action.name')}" "required=true" "tabindex=1" "onkeypress=return submitenter(this,event)")
+    #wwselect("name=stateNames" "label=%{getText('post.build.action.states')}" "list=states" "multiple=true" "tabindex=2" "onkeypress=return submitenter(this,event)")
+    #inlineHelp("post.build.action.states.help")
+    #wwcheckbox("name=failOnError" "label=%{getText('post.stage.action.fail.on.error')}" "tabindex=3")
+    #inlineHelp("post.stage.action.fail.on.error.help")
+    #wwtextfield("name=postBuildAction.tag" "label=%{getText('post.build.action.tag.name')}" "required=true" "size=60" "tabindex=4" "onkeypress=return submitenter(this,event)")
+#if ($project.scm.class.name == 'com.zutubi.pulse.model.Svn')
+    #inlineHelp("post.build.action.tag.name.help.svn")
+#else
+    #inlineHelp("post.build.action.tag.name.help")
+#end
+    #wwcheckbox("name=moveExisting" "label=%{getText('post.build.action.tag.move')}" "tabindex=5")
+    #inlineHelp("post.build.action.tag.move.help")
+
+    #saveCancel(6)
+
+#end
+
+    </td><td class="columns">
+
+    #parse("/template/includes/post-build-action-variables.vm")
+
+    </td>
+</table>
+
+    #tabEnd()
+</body>
+</html>

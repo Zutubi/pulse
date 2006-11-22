@@ -2,6 +2,7 @@ package com.zutubi.pulse.core;
 
 import com.zutubi.pulse.core.model.Property;
 import com.zutubi.pulse.core.model.ResourceProperty;
+import com.zutubi.pulse.util.Sort;
 import com.zutubi.pulse.util.logging.Logger;
 
 import java.io.File;
@@ -32,6 +33,26 @@ public class Scope
     public Scope getParent()
     {
         return parent;
+    }
+
+    public List<Reference> getReferences()
+    {
+        List<Reference> result = new ArrayList<Reference>(references.size());
+        for(ReferenceInfo info: references)
+        {
+            result.add(info.reference);
+        }
+
+        final Sort.StringComparator stringComp = new Sort.StringComparator();
+        Collections.sort(result, new Comparator<Reference>()
+        {
+            public int compare(Reference r1, Reference r2)
+            {
+                return stringComp.compare(r1.getName(), r2.getName());
+            }
+        });
+        
+        return result;
     }
 
     public boolean containsReference(String name)

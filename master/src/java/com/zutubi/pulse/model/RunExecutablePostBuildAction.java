@@ -31,13 +31,13 @@ public class RunExecutablePostBuildAction extends PostBuildAction
         this.arguments = arguments;
     }
 
-    protected void internalExecute(BuildResult result)
+    protected void internalExecute(BuildResult build, RecipeResultNode recipe, List<ResourceProperty> properties)
     {
         try
         {
             List<String> commandLine = new LinkedList<String>();
             commandLine.add(command);
-            addArguments(commandLine, result);
+            addArguments(commandLine, build, recipe, properties);
 
             ProcessBuilder builder = new ProcessBuilder(commandLine);
             Process child = builder.start();
@@ -68,11 +68,11 @@ public class RunExecutablePostBuildAction extends PostBuildAction
         return copy;
     }
 
-    private void addArguments(List<String> commandLine, BuildResult result) throws FileLoadException
+    private void addArguments(List<String> commandLine, BuildResult build, RecipeResultNode recipe, List<ResourceProperty> properties) throws FileLoadException
     {
         List<String> args = StringUtils.split(arguments);
 
-        Scope scope = getScope(result, configurationManager);
+        Scope scope = getScope(build, recipe, properties, configurationManager);
 
         for(String arg: args)
         {
@@ -80,49 +80,65 @@ public class RunExecutablePostBuildAction extends PostBuildAction
         }
     }
 
-    public static Scope getScope(BuildResult result, MasterConfigurationManager configurationManager)
+    public static Scope getScope(BuildResult result, RecipeResultNode recipe, List<ResourceProperty> properties, MasterConfigurationManager configurationManager)
     {
         MasterBuildPaths paths = new MasterBuildPaths(configurationManager);
 
         Scope scope = new Scope();
+        scope.add(properties);
+        
         scope.add(new Property("project", result.getProject().getName()));
         scope.add(new Property("number", Long.toString(result.getNumber())));
         scope.add(new Property("specification", result.getBuildSpecification()));
-        scope.add(new Property("status", result.getState().getString()));
-        scope.add(new Property("reason", result.getReason().getSummary()));
+        scope.add(new Property("build.dir", paths.getBuildDir(result).getAbsolutePath()));
 
-        TestResultSummary tests = result.getTestSummary();
-        String testSummary;
-        if(tests.getTotal() > 0)
+        if(recipe == null)
         {
-            if(tests.allPassed())
+            scope.add(new Property("status", result.getState().getString()));
+            scope.add(new Property("reason", result.getReason().getSummary()));
+
+            TestResultSummary tests = result.getTestSummary();
+            String testSummary;
+            if(tests.getTotal() > 0)
             {
-                testSummary = "all " + tests.getTotal() + " tests passed";
+                if(tests.allPassed())
+                {
+                    testSummary = "all " + tests.getTotal() + " tests passed";
+                }
+                else
+                {
+                    testSummary = Integer.toString(tests.getBroken()) + " of " + tests.getTotal() + " tests broken";
+                }
             }
             else
             {
-                testSummary = Integer.toString(tests.getBroken()) + " of " + tests.getTotal() + " tests broken";
+                testSummary = "no tests";
+            }
+
+            scope.add(new Property("test.summary", testSummary));
+
+            for(RecipeResultNode node: result.getRoot().getChildren())
+            {
+                addStageProperties(result, node, scope, paths, configurationManager, true);
             }
         }
         else
         {
-            testSummary = "no tests";
+            addStageProperties(result, recipe, scope, paths, configurationManager, false);
         }
 
-        scope.add(new Property("test.summary", testSummary));
-        scope.add(new Property("build.dir", paths.getBuildDir(result).getAbsolutePath()));
-
-        for(RecipeResultNode node: result.getRoot().getChildren())
-        {
-            addStageProperties(result, node, scope, paths, configurationManager);
-        }
         return scope;
     }
 
-    private static void addStageProperties(BuildResult result, RecipeResultNode node, Scope scope, MasterBuildPaths paths, MasterConfigurationManager configurationManager)
+    private static void addStageProperties(BuildResult result, RecipeResultNode node, Scope scope, MasterBuildPaths paths, MasterConfigurationManager configurationManager, boolean includeName)
     {
         String name = node.getStage();
-        String prefix = "stage." + name + ".";
+        String prefix = "stage.";
+
+        if(includeName)
+        {
+            prefix += name + ".";
+        }
 
         RecipeResult recipeResult = node.getResult();
         scope.add(new Property(prefix + "agent", node.getHostSafe()));
@@ -134,16 +150,23 @@ public class RunExecutablePostBuildAction extends PostBuildAction
 
             for(CommandResult command: recipeResult.getCommandResults())
             {
-                addCommandProperties(node, command, scope, configurationManager);
+                addCommandProperties(node, command, scope, configurationManager, includeName);
             }
         }
     }
 
-    private static void addCommandProperties(RecipeResultNode node, CommandResult commandResult, Scope scope, MasterConfigurationManager configurationManager)
+    private static void addCommandProperties(RecipeResultNode node, CommandResult commandResult, Scope scope, MasterConfigurationManager configurationManager, boolean includeName)
     {
         String stageName = node.getStage();
         String commandName = commandResult.getCommandName();
-        String prefix = "stage." + stageName + ".command." + commandName + ".";
+        String prefix = "";
+
+        if(includeName)
+        {
+            prefix = "stage." + stageName + ".";
+        }
+
+        prefix += "command." + commandName + ".";
 
         scope.add(new Property(prefix + "status", commandResult.getState().getString()));
         scope.add(new Property(prefix + "dir", commandResult.getAbsoluteOutputDir(configurationManager.getDataDirectory()).getAbsolutePath()));

@@ -151,6 +151,35 @@
 
                                     #nodeResources($node)
 
+                                    <table id="post.actions.$!webwork.htmlEncode($node.stage.name)">
+                                        #headingRow("buildspec.stage.post.actions" 4)
+                                        <tr>
+                                            #contentHeading("post.build.action.name" 1)
+                                            #contentHeading("post.build.action.type" 1)
+                    #acl("domainObject=project" "hasPermission=4,1")
+                                            #contentHeading("actions" 2)
+                    #end
+                                        </tr>
+                    #if($node.postActions.size() > 0)
+                        #foreach($post in $node.postActions)
+                            #set($confirmMessage = $action.getText("buildspec.stage.post.action.confirm.delete", [$post.name]))
+                                        <tr>
+                                            #dynamicCell($post.name)
+                                            #dynamicCell($post.type)
+                            #acl("domainObject=project" "hasPermission=4,1")
+                                            #editCell("editPostStageAction!input.action?id=$post.id&amp;projectId=$project.id&amp;specId=$specification.id&amp;nodeId=$node.id" "edit_post_$!webwork.htmlEncode($node.stage.name)_$!webwork.htmlEncode($post.name)")
+                                            #deleteCell("delete_post_$!webwork.htmlEncode($node.stage.name)_$!webwork.htmlEncode($post.name)" "deletePostStageAction.action?id=$post.id&amp;projectId=$project.id&amp;specId=$specification.id&amp;nodeId=$node.id" $confirmMessage)
+                            #end
+                                        </tr>
+                        #end
+                    #else
+                                        #contentRow("buildspec.stage.post.actions.none" 4)
+                    #end
+                    #acl("domainObject=project" "hasPermission=4,1")
+                                        #addRow("buildspec.stage.post.action.add" 4 "addPostStageAction.action?projectId=$project.id&amp;specId=$specification.id&amp;nodeId=$node.id" "add_post_action_$!webwork.htmlEncode($node.stage.name)")
+                    #end
+                                    </table>
+
                                 </td>
                             </tr>
                         </table>

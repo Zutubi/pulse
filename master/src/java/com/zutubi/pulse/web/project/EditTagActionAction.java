@@ -29,10 +29,9 @@ public class EditTagActionAction extends AbstractEditPostBuildActionAction
             return;
         }
 
-        PostBuildAction a = getProject().getPostBuildAction(getId());
+        PostBuildAction a = lookupAction();
         if (a == null)
         {
-            addActionError("Unknown post build action [" + getId() + "]");
             return;
         }
 
@@ -49,20 +48,6 @@ public class EditTagActionAction extends AbstractEditPostBuildActionAction
     {
         moveExisting = action.getMoveExisting();        
         return super.doInput();
-    }
-
-    public void validate()
-    {
-        super.validate();
-
-        try
-        {
-            TagPostBuildAction.validateTag(action.getTag());
-        }
-        catch (Exception e)
-        {
-            addFieldError("postBuildAction.tag", e.getMessage());
-        }
     }
 
     public String execute()

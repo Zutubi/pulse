@@ -1,15 +1,17 @@
 package com.zutubi.pulse;
 
+import com.zutubi.pulse.bootstrap.ComponentContext;
 import com.zutubi.pulse.core.Bootstrapper;
 import com.zutubi.pulse.core.BuildException;
 import com.zutubi.pulse.core.model.CommandResult;
 import com.zutubi.pulse.core.model.RecipeResult;
+import com.zutubi.pulse.core.model.ResourceProperty;
 import com.zutubi.pulse.events.build.*;
-import com.zutubi.pulse.model.BuildManager;
-import com.zutubi.pulse.model.BuildResult;
-import com.zutubi.pulse.model.RecipeResultNode;
+import com.zutubi.pulse.model.*;
 import com.zutubi.pulse.services.ServiceTokenManager;
 import com.zutubi.pulse.util.logging.Logger;
+
+import java.util.List;
 
 /**
  *
@@ -18,9 +20,13 @@ public class RecipeController
 {
     private static final Logger LOG = Logger.getLogger(RecipeController.class);
 
+    private BuildResult buildResult;
+    private BuildSpecificationNode specNode;
     private RecipeResultNode recipeResultNode;
     private RecipeResult recipeResult;
     private RecipeDispatchRequest dispatchRequest;
+    private List<ResourceProperty> buildProperties;
+    private boolean personal;
     private boolean incremental;
     private RecipeResultNode previousSuccessful;
     private RecipeLogger logger;
@@ -32,11 +38,15 @@ public class RecipeController
     private RecipeQueue queue;
     private BuildService buildService;
 
-    public RecipeController(RecipeResultNode recipeResultNode, RecipeDispatchRequest dispatchRequest, boolean incremental, RecipeResultNode previousSuccessful, RecipeLogger logger, RecipeResultCollector collector, RecipeQueue queue, BuildManager manager, ServiceTokenManager serviceTokenManager)
+    public RecipeController(BuildResult buildResult, BuildSpecificationNode specNode, RecipeResultNode recipeResultNode, RecipeDispatchRequest dispatchRequest, List<ResourceProperty> buildProperties, boolean personal, boolean incremental, RecipeResultNode previousSuccessful, RecipeLogger logger, RecipeResultCollector collector, RecipeQueue queue, BuildManager manager, ServiceTokenManager serviceTokenManager)
     {
+        this.buildResult = buildResult;
+        this.specNode = specNode;
         this.recipeResultNode = recipeResultNode;
         this.recipeResult = recipeResultNode.getResult();
         this.dispatchRequest = dispatchRequest;
+        this.buildProperties = buildProperties;
+        this.personal = personal;
         this.incremental = incremental;
         this.previousSuccessful = previousSuccessful;
         this.logger = logger;
@@ -211,6 +221,16 @@ public class RecipeController
     {
         recipeResult.complete();
         recipeResult.abortUnfinishedCommands();
+
+        if (!personal)
+        {
+            for(PostBuildAction action: specNode.getPostActions())
+            {
+                ComponentContext.autowire(action);
+                action.execute(buildResult, recipeResultNode, buildProperties);
+            }
+        }
+
         buildManager.save(recipeResult);
         logger.complete(recipeResult);
         finished = true;

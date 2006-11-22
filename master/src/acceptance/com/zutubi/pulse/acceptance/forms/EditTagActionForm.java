@@ -6,9 +6,17 @@ import net.sourceforge.jwebunit.WebTester;
  */
 public class EditTagActionForm extends BaseForm
 {
+    private boolean stage = false;
+
     public EditTagActionForm(WebTester tester)
     {
         super(tester);
+    }
+
+    public EditTagActionForm(WebTester tester, boolean stage)
+    {
+        super(tester);
+        this.stage = stage;
     }
 
     public String getFormName()
@@ -18,12 +26,26 @@ public class EditTagActionForm extends BaseForm
 
     public String[] getFieldNames()
     {
-        return new String[]{ "newName", "specIds", "stateNames", "failOnError", "postBuildAction.tag", "moveExisting" };
+        if(stage)
+        {
+            return new String[]{ "newName", "stateNames", "failOnError", "postBuildAction.tag", "moveExisting" };
+        }
+        else
+        {
+            return new String[]{ "newName", "specIds", "stateNames", "failOnError", "postBuildAction.tag", "moveExisting" };
+        }
     }
 
     public int[] getFieldTypes()
     {
-        return new int[] { TEXTFIELD, SELECT, SELECT, CHECKBOX, TEXTFIELD, CHECKBOX };
+        if(stage)
+        {
+            return new int[] { TEXTFIELD, SELECT, CHECKBOX, TEXTFIELD, CHECKBOX };
+        }
+        else
+        {
+            return new int[] { TEXTFIELD, SELECT, SELECT, CHECKBOX, TEXTFIELD, CHECKBOX };
+        }
     }
 
     public void assertFormPresent()
