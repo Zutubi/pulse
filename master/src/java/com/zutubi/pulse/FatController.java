@@ -232,17 +232,7 @@ public class FatController implements EventListener, Stoppable
     private void startBuild(AbstractBuildRequestEvent event)
     {
         final Project project = event.getProject();
-        String specName = event.getSpecification();
-
-        BuildSpecification buildSpec = project.getBuildSpecification(specName);
-        if (buildSpec == null)
-        {
-            // the build spec was deleted / renamed between the project build request being created and
-            // the request triggering a start build.
-            LOG.warning("Request to build unknown specification '" + specName + "' for project '" + project.getName() + "'");
-            buildQueue.buildCompleted(project);
-            return;
-        }
+        BuildSpecification buildSpec = event.getSpecification();
 
         lock.lock();
         try

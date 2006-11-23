@@ -1,12 +1,13 @@
 package com.zutubi.pulse.model;
 
+import com.zutubi.pulse.core.model.PersistentName;
 import com.zutubi.pulse.core.model.RecipeResult;
 
 /**
  */
 public class BuildStage
 {
-    private String name;
+    private PersistentName pname;
     private BuildHostRequirements hostRequirements;
     private String recipe;
 
@@ -16,7 +17,7 @@ public class BuildStage
 
     public BuildStage(String name, BuildHostRequirements hostRequirements, String recipe)
     {
-        this.name = name;
+        this.pname = new PersistentName(name);
         this.hostRequirements = hostRequirements;
         this.recipe = recipe;
     }
@@ -24,7 +25,7 @@ public class BuildStage
     public BuildStage copy()
     {
         BuildStage copy = new BuildStage();
-        copy.name = name;
+        copy.pname = new PersistentName(pname.getName());
         if (hostRequirements != null)
         {
             copy.hostRequirements = hostRequirements.copy();
@@ -35,12 +36,36 @@ public class BuildStage
 
     public String getName()
     {
-        return name;
+        if(pname == null)
+        {
+            return null;
+        }
+        else
+        {
+            return pname.getName();
+        }
     }
 
     public void setName(String name)
     {
-        this.name = name;
+        if(pname == null)
+        {
+            pname = new PersistentName(name);
+        }
+        else
+        {
+            pname.setName(name);
+        }
+    }
+
+    public PersistentName getPname()
+    {
+        return pname;
+    }
+
+    public void setPname(PersistentName pname)
+    {
+        this.pname = pname;
     }
 
     public BuildHostRequirements getHostRequirements()

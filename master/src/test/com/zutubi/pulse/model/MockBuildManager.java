@@ -88,12 +88,12 @@ public class MockBuildManager implements BuildManager
         throw new RuntimeException("Method not implemented.");
     }
 
-    public List<BuildResult> queryBuilds(Project[] projects, ResultState[] states, String[] specs, long earliestStartTime, long latestStartTime, Boolean hasWorkDir, int first, int max, boolean mostRecentFirst)
+    public List<BuildResult> queryBuilds(Project[] projects, ResultState[] states, PersistentName[] specs, long earliestStartTime, long latestStartTime, Boolean hasWorkDir, int first, int max, boolean mostRecentFirst)
     {
         throw new RuntimeException("Method not implemented.");
     }
 
-    public List<BuildResult> querySpecificationBuilds(Project project, String spec, ResultState[] states, long lowestNumber, long highestNumber, int first, int max, boolean mostRecentFirst, boolean initialise)
+    public List<BuildResult> querySpecificationBuilds(Project project, PersistentName spec, ResultState[] states, long lowestNumber, long highestNumber, int first, int max, boolean mostRecentFirst, boolean initialise)
     {
         throw new RuntimeException("Method not implemented.");
     }
@@ -103,7 +103,7 @@ public class MockBuildManager implements BuildManager
         throw new RuntimeException("Method not implemented.");
     }
 
-    public int getBuildCount(Project project, ResultState[] states, String spec)
+    public int getBuildCount(Project project, ResultState[] states, PersistentName spec)
     {
         throw new RuntimeException("Method not implemented.");
     }
@@ -113,22 +113,22 @@ public class MockBuildManager implements BuildManager
         throw new RuntimeException("Method not implemented.");
     }
 
-    public void fillHistoryPage(HistoryPage page, ResultState[] states, String spec)
+    public void fillHistoryPage(HistoryPage page, ResultState[] states, PersistentName spec)
     {
         throw new RuntimeException("Method not implemented.");
     }
 
-    public List<String> getBuildSpecifications(Project project)
+    public List<PersistentName> getBuildSpecifications(Project project)
     {
         throw new RuntimeException("Method not implemented.");
     }
 
-    public List<BuildResult> getLatestCompletedBuildResults(Project project, String spec, int max)
+    public List<BuildResult> getLatestCompletedBuildResults(Project project, PersistentName spec, int max)
     {
         throw new RuntimeException("Method not implemented.");
     }
 
-    public List<BuildResult> getLatestCompletedBuildResults(Project project, String spec, int first, int max)
+    public List<BuildResult> getLatestCompletedBuildResults(Project project, PersistentName spec, int first, int max)
     {
         throw new RuntimeException("Method not implemented.");
     }
@@ -176,7 +176,7 @@ public class MockBuildManager implements BuildManager
         throw new RuntimeException("Method not implemented.");
     }
 
-    public Revision getPreviousRevision(Project project, String specification)
+    public Revision getPreviousRevision(Project project, PersistentName specification)
     {
         throw new RuntimeException("Method not implemented.");
     }

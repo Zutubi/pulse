@@ -1,8 +1,10 @@
 package com.zutubi.pulse;
 
 import com.zutubi.pulse.core.BuildRevision;
+import com.zutubi.pulse.core.model.PersistentName;
 import com.zutubi.pulse.events.build.BuildRequestEvent;
 import com.zutubi.pulse.model.BuildReason;
+import com.zutubi.pulse.model.BuildSpecification;
 import com.zutubi.pulse.model.Project;
 import com.zutubi.pulse.test.PulseTestCase;
 
@@ -24,22 +26,22 @@ public class BuildQueueTest extends PulseTestCase
 
     public void testSimpleQueue()
     {
-        assertTrue(queue.buildRequested(createEvent(p1, "spec1")));
+        assertTrue(queue.buildRequested(createEvent(p1, "spec1", 1)));
         assertNull(queue.buildCompleted(p1));
     }
 
     public void testQueueTwice()
     {
-        assertTrue(queue.buildRequested(createEvent(p1, "spec1")));
+        assertTrue(queue.buildRequested(createEvent(p1, "spec1", 1)));
         assertNull(queue.buildCompleted(p1));
-        assertTrue(queue.buildRequested(createEvent(p1, "spec1")));
+        assertTrue(queue.buildRequested(createEvent(p1, "spec1", 1)));
         assertNull(queue.buildCompleted(p1));
     }
 
     public void testSimpleWait()
     {
-        assertTrue(queue.buildRequested(createEvent(p1, "spec1")));
-        BuildRequestEvent request2 = createEvent(p1, "spec2");
+        assertTrue(queue.buildRequested(createEvent(p1, "spec1", 1)));
+        BuildRequestEvent request2 = createEvent(p1, "spec2", 2);
         assertFalse(queue.buildRequested(request2));
         assertEquals(request2, queue.buildCompleted(p1));
         assertNull(queue.buildCompleted(p1));
@@ -47,8 +49,8 @@ public class BuildQueueTest extends PulseTestCase
 
     public void testWaitSameSpec()
     {
-        assertTrue(queue.buildRequested(createEvent(p1, "spec1")));
-        BuildRequestEvent request2 = createEvent(p1, "spec1");
+        assertTrue(queue.buildRequested(createEvent(p1, "spec1", 1)));
+        BuildRequestEvent request2 = createEvent(p1, "spec1", 1);
         request2.getRevision().fix();
         assertFalse(queue.buildRequested(request2));
         assertEquals(request2, queue.buildCompleted(p1));
@@ -57,18 +59,18 @@ public class BuildQueueTest extends PulseTestCase
 
     public void testMultiProjects()
     {
-        assertTrue(queue.buildRequested(createEvent(p1, "spec1-1")));
-        assertTrue(queue.buildRequested(createEvent(p2, "spec2-1")));
+        assertTrue(queue.buildRequested(createEvent(p1, "spec1-1", 11)));
+        assertTrue(queue.buildRequested(createEvent(p2, "spec2-1", 21)));
         assertNull(queue.buildCompleted(p1));
         assertNull(queue.buildCompleted(p2));
     }
 
     public void testQueueMultipleSpecs()
     {
-        assertTrue(queue.buildRequested(createEvent(p1, "spec1")));
-        BuildRequestEvent request2 = createEvent(p1, "spec2");
+        assertTrue(queue.buildRequested(createEvent(p1, "spec1", 1)));
+        BuildRequestEvent request2 = createEvent(p1, "spec2", 2);
         assertFalse(queue.buildRequested(request2));
-        BuildRequestEvent request3 = createEvent(p1, "spec3");
+        BuildRequestEvent request3 = createEvent(p1, "spec3", 3);
         assertFalse(queue.buildRequested(request2));
         assertFalse(queue.buildRequested(request3));
         assertEquals(request2, queue.buildCompleted(p1));
@@ -78,10 +80,10 @@ public class BuildQueueTest extends PulseTestCase
 
     public void testQueueSameSpecTwice()
     {
-        assertTrue(queue.buildRequested(createEvent(p1, "spec1")));
-        BuildRequestEvent request2 = createEvent(p1, "spec2");
+        assertTrue(queue.buildRequested(createEvent(p1, "spec1", 1)));
+        BuildRequestEvent request2 = createEvent(p1, "spec2", 2);
         assertFalse(queue.buildRequested(request2));
-        BuildRequestEvent request3 = createEvent(p1, "spec2");
+        BuildRequestEvent request3 = createEvent(p1, "spec2", 2);
         assertFalse(queue.buildRequested(request2));
         assertFalse(queue.buildRequested(request3));
         assertEquals(request2, queue.buildCompleted(p1));
@@ -90,16 +92,21 @@ public class BuildQueueTest extends PulseTestCase
 
     public void testCancelQueuedBuild()
     {
-        assertTrue(queue.buildRequested(createEvent(p1, "spec1")));
-        BuildRequestEvent request2 = createEvent(p1, "spec2");
+        assertTrue(queue.buildRequested(createEvent(p1, "spec1", 1)));
+        BuildRequestEvent request2 = createEvent(p1, "spec2", 2);
         assertFalse(queue.buildRequested(request2));
         queue.cancelBuild(request2.getId());
         assertNull(queue.buildCompleted(p1));
     }
 
-    private BuildRequestEvent createEvent(Project project, String spec)
+    private BuildRequestEvent createEvent(Project project, String spec, long specId)
     {
-        return new BuildRequestEvent(this, new MockBuildReason(), project, spec, new BuildRevision());
+        PersistentName specName = new PersistentName(spec);
+        specName.setId(specId);
+        BuildSpecification specification = new BuildSpecification();
+        specification.setId(specId * 100);
+        specification.setPname(specName);
+        return new BuildRequestEvent(this, new MockBuildReason(), project, specification, new BuildRevision());
     }
 
     private class MockBuildReason implements BuildReason

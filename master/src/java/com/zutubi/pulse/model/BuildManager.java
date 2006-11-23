@@ -34,13 +34,13 @@ public interface BuildManager
 
     BuildResult getLatestBuildResult(User user);
 
-    List<BuildResult> queryBuilds(Project[] projects, ResultState[] states, String[] specs, long earliestStartTime, long latestStartTime, Boolean hasWorkDir, int first, int max, boolean mostRecentFirst);
+    List<BuildResult> queryBuilds(Project[] projects, ResultState[] states, PersistentName[] specs, long earliestStartTime, long latestStartTime, Boolean hasWorkDir, int first, int max, boolean mostRecentFirst);
 
-    List<BuildResult> querySpecificationBuilds(Project project, String spec, ResultState[] states, long lowestNumber, long highestNumber, int first, int max, boolean mostRecentFirst, boolean initialise);
+    List<BuildResult> querySpecificationBuilds(Project project, PersistentName spec, ResultState[] states, long lowestNumber, long highestNumber, int first, int max, boolean mostRecentFirst, boolean initialise);
 
     List<BuildResult> getLatestBuildResultsForProject(Project project, int max);
 
-    public int getBuildCount(Project project, ResultState[] states, String spec);
+    public int getBuildCount(Project project, ResultState[] states, PersistentName spec);
 
     /**
      * Fills out the list in the given history page based on the page offset.
@@ -58,18 +58,18 @@ public interface BuildManager
      * @param states if not null, restrict to results in one of these states
      * @param spec   if no null, restrict to results of the given spec
      */
-    void fillHistoryPage(HistoryPage page, ResultState[] states, String spec);
+    void fillHistoryPage(HistoryPage page, ResultState[] states, PersistentName spec);
 
     /**
      * @param project the project to search for
      * @return all build specification names referred to by build results of
      *         the given project
      */
-    List<String> getBuildSpecifications(Project project);
+    List<PersistentName> getBuildSpecifications(Project project);
 
-    List<BuildResult> getLatestCompletedBuildResults(Project project, String spec, int max);
+    List<BuildResult> getLatestCompletedBuildResults(Project project, PersistentName spec, int max);
 
-    List<BuildResult> getLatestCompletedBuildResults(Project project, String spec, int first, int max);
+    List<BuildResult> getLatestCompletedBuildResults(Project project, PersistentName spec, int first, int max);
 
     BuildResult getLatestBuildResult(Project project);
 
@@ -88,7 +88,7 @@ public interface BuildManager
 
     void cleanupBuilds();
 
-    Revision getPreviousRevision(Project project, String specification);
+    Revision getPreviousRevision(Project project, PersistentName specification);
 
     /**
      * Returns the most recent changelists submitted by the given user.

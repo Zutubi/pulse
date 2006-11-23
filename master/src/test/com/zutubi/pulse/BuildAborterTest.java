@@ -44,7 +44,7 @@ public class BuildAborterTest extends PulseTestCase
     public void testCompletedBuild()
     {
         Project project = new Project("test", "project");
-        BuildResult result = new BuildResult(new TriggerBuildReason("scm trigger"), project, null, 1);
+        BuildResult result = new BuildResult(new TriggerBuildReason("scm trigger"), project, new BuildSpecification("foo"), 1);
         result.commence(10);
         result.complete();
 
@@ -59,7 +59,7 @@ public class BuildAborterTest extends PulseTestCase
     public void testIncompleteBuild()
     {
         Project project = new Project("test", "project");
-        BuildResult result = new BuildResult(new TriggerBuildReason("scm trigger"), project, null, 1);
+        BuildResult result = new BuildResult(new TriggerBuildReason("scm trigger"), project, new BuildSpecification("foo"), 1);
         result.commence(10);
 
         projectManager.create(project);
@@ -76,7 +76,7 @@ public class BuildAborterTest extends PulseTestCase
     {
         Project project = new Project("test", "project");
         User user = new User("u", "u");
-        BuildResult result = new BuildResult(user, project, null, 1);
+        BuildResult result = new BuildResult(user, project, new BuildSpecification("foo"), 1);
         result.commence(10);
         result.complete();
 
@@ -96,7 +96,7 @@ public class BuildAborterTest extends PulseTestCase
     {
         Project project = new Project("test", "project");
         User user = new User("u", "u");
-        BuildResult result = new BuildResult(user, project, null, 1);
+        BuildResult result = new BuildResult(user, project, new BuildSpecification("foo"), 1);
         result.commence(10);
 
         buildManager.save(result);

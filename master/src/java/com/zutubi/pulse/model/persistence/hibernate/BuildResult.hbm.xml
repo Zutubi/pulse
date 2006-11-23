@@ -32,7 +32,7 @@
 
         <many-to-one name="user" column="USER" class="com.zutubi.pulse.model.User" cascade="none" not-null="false"/>
 
-        <property name="buildSpecification" column="BUILD_SPEC" type="string" length="255"/>
+        <many-to-one name="specName" column="SPEC_NAME" class="com.zutubi.pulse.core.model.PersistentName" cascade="none" lazy="false"/>
 
         <many-to-one name="scmDetails" class="com.zutubi.pulse.model.BuildScmDetails" column="SCM_DETAILS"
                      cascade="all" lazy="false"/>
@@ -85,8 +85,8 @@
             <generator class="hilo"/>
         </id>
 
-        <property name="stage" type="string"/>
-        
+        <many-to-one name="stageName" column="STAGE_NAME" class="com.zutubi.pulse.core.model.PersistentName" cascade="none" lazy="false"/>
+
         <property name="host" type="string" length="255"/>
 
         <many-to-one name="result" class="com.zutubi.pulse.core.model.RecipeResult" column="RECIPE_RESULT_ID"

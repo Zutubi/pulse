@@ -22,9 +22,9 @@ import com.zutubi.pulse.util.FileSystemUtils;
 import com.zutubi.pulse.util.logging.Logger;
 
 import java.io.File;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.HashMap;
 
 /**
  *
@@ -127,7 +127,7 @@ public class DefaultBuildManager implements BuildManager, EventListener
         return buildResultDao.findLatestByProject(project, max);
     }
 
-    public int getBuildCount(Project project, ResultState[] states, String spec)
+    public int getBuildCount(Project project, ResultState[] states, PersistentName spec)
     {
         return buildResultDao.getBuildCount(project, states, spec);
     }
@@ -137,23 +137,23 @@ public class DefaultBuildManager implements BuildManager, EventListener
         fillHistoryPage(page, new ResultState[]{ResultState.ERROR, ResultState.FAILURE, ResultState.SUCCESS}, null);
     }
 
-    public List<String> getBuildSpecifications(Project project)
+    public List<PersistentName> getBuildSpecifications(Project project)
     {
         return buildResultDao.findAllSpecifications(project);
     }
 
-    public void fillHistoryPage(HistoryPage page, ResultState[] states, String spec)
+    public void fillHistoryPage(HistoryPage page, ResultState[] states, PersistentName spec)
     {
         page.setTotalBuilds(buildResultDao.getBuildCount(page.getProject(), states, spec));
         page.setResults(buildResultDao.findLatestByProject(page.getProject(), states, spec, page.getFirst(), page.getMax()));
     }
 
-    public List<BuildResult> getLatestCompletedBuildResults(Project project, String spec, int max)
+    public List<BuildResult> getLatestCompletedBuildResults(Project project, PersistentName spec, int max)
     {
         return getLatestCompletedBuildResults(project, spec, 0, max);
     }
 
-    public List<BuildResult> getLatestCompletedBuildResults(Project project, String spec, int first, int max)
+    public List<BuildResult> getLatestCompletedBuildResults(Project project, PersistentName spec, int first, int max)
     {
         return buildResultDao.findLatestCompleted(project, spec, first, max);        
     }
@@ -221,12 +221,12 @@ public class DefaultBuildManager implements BuildManager, EventListener
         }
     }
 
-    public List<BuildResult> queryBuilds(Project[] projects, ResultState[] states, String[] specs, long earliestStartTime, long latestStartTime, Boolean hasWorkDir, int first, int max, boolean mostRecentFirst)
+    public List<BuildResult> queryBuilds(Project[] projects, ResultState[] states, PersistentName[] specs, long earliestStartTime, long latestStartTime, Boolean hasWorkDir, int first, int max, boolean mostRecentFirst)
     {
         return buildResultDao.queryBuilds(projects, states, specs, earliestStartTime, latestStartTime, hasWorkDir, first, max, mostRecentFirst);
     }
 
-    public List<BuildResult> querySpecificationBuilds(Project project, String spec, ResultState[] states, long lowestNumber, long highestNumber, int first, int max, boolean mostRecentFirst, boolean initialise)
+    public List<BuildResult> querySpecificationBuilds(Project project, PersistentName spec, ResultState[] states, long lowestNumber, long highestNumber, int first, int max, boolean mostRecentFirst, boolean initialise)
     {
         return buildResultDao.querySpecificationBuilds(project, spec, states, lowestNumber, highestNumber, first, max, mostRecentFirst, initialise);
     }
@@ -247,7 +247,7 @@ public class DefaultBuildManager implements BuildManager, EventListener
         }
     }
 
-    public Revision getPreviousRevision(Project project, String specification)
+    public Revision getPreviousRevision(Project project, PersistentName specification)
     {
         Revision previousRevision = null;
         int offset = 0;

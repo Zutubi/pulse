@@ -153,7 +153,7 @@ public class ViewChangesAction extends ProjectActionSupport
         int offset = 0;
         while(true)
         {
-            List<BuildResult> previousResults = getBuildManager().querySpecificationBuilds(project, result.getBuildSpecification(), states, -1, toBuild - 1, offset, 1, true, false);
+            List<BuildResult> previousResults = getBuildManager().querySpecificationBuilds(project, result.getSpecName(), states, -1, toBuild - 1, offset, 1, true, false);
             if(previousResults.size() > 0)
             {
                 if(previousResults.get(0).getScmDetails() != null)
@@ -179,7 +179,7 @@ public class ViewChangesAction extends ProjectActionSupport
         // Get changes for all results after since, up to and including to.
         if (sinceBuild != 0)
         {
-            List<BuildResult> resultRange = getBuildManager().querySpecificationBuilds(project, result.getBuildSpecification(), ResultState.getCompletedStates(), sinceBuild + 1, toBuild - 1, 0, -1, true, false);
+            List<BuildResult> resultRange = getBuildManager().querySpecificationBuilds(project, result.getSpecName(), ResultState.getCompletedStates(), sinceBuild + 1, toBuild - 1, 0, -1, true, false);
             for(BuildResult r: resultRange)
             {
                 changelists.addAll(getBuildManager().getChangesForBuild(r));

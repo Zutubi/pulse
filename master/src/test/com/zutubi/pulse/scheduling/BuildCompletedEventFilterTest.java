@@ -2,10 +2,7 @@ package com.zutubi.pulse.scheduling;
 
 import com.zutubi.pulse.core.model.ResultState;
 import com.zutubi.pulse.events.build.BuildCompletedEvent;
-import com.zutubi.pulse.model.BuildResult;
-import com.zutubi.pulse.model.Project;
-import com.zutubi.pulse.model.UnknownBuildReason;
-import com.zutubi.pulse.model.User;
+import com.zutubi.pulse.model.*;
 import com.zutubi.pulse.test.PulseTestCase;
 
 /**
@@ -91,7 +88,7 @@ public class BuildCompletedEventFilterTest extends PulseTestCase
     {
         Project project = new Project();
         project.setId(PROJECT);
-        BuildResult result = new BuildResult(new User(), project, SPEC, 1);
+        BuildResult result = new BuildResult(new User(), project, new BuildSpecification(SPEC), 1);
         result.setState(ResultState.SUCCESS);
         assertFalse(filter.accept(createTrigger("SUCCESS"), new BuildCompletedEvent(this, result)));
     }
@@ -131,7 +128,7 @@ public class BuildCompletedEventFilterTest extends PulseTestCase
     {
         Project project = new Project();
         project.setId(id);
-        BuildResult result = new BuildResult(new UnknownBuildReason(), project, SPEC, 1);
+        BuildResult result = new BuildResult(new UnknownBuildReason(), project, new BuildSpecification(SPEC), 1);
         result.setState(state);
         return new BuildCompletedEvent(this, result);
     }

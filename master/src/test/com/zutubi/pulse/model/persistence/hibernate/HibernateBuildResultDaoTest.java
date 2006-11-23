@@ -93,13 +93,15 @@ public class HibernateBuildResultDaoTest extends MasterPersistenceTestCase
         projectDao.save(project);
 
         // Ditto for spec
-        BuildSpecification spec = new BuildSpecification();
+        BuildSpecification spec = new BuildSpecification("specname");
+        BuildSpecificationNode node = new BuildSpecificationNode(new BuildStage("name", new AnyCapableBuildHostRequirements(), null));
+        spec.getRoot().addChild(node);
         buildSpecificationDao.save(spec);
 
-        BuildResult buildResult = new BuildResult(new TriggerBuildReason("scm trigger"), project, spec.getName(), 11);
+        BuildResult buildResult = new BuildResult(new TriggerBuildReason("scm trigger"), project, spec, 11);
         buildResult.commence();
         buildResult.setScmDetails(scmDetails);
-        RecipeResultNode recipeNode = new RecipeResultNode("test", recipeResult);
+        RecipeResultNode recipeNode = new RecipeResultNode(node.getStage().getPname(), recipeResult);
         recipeNode.setHost("test host");
         buildResult.getRoot().addChild(recipeNode);
 
@@ -252,7 +254,7 @@ public class HibernateBuildResultDaoTest extends MasterPersistenceTestCase
         Project p1 = new Project();
         projectDao.save(p1);
 
-        BuildResult result = new BuildResult(new TriggerBuildReason("scm trigger"), p1, null, 1);
+        BuildResult result = new BuildResult(new TriggerBuildReason("scm trigger"), p1, makeSpec(), 1);
         buildResultDao.save(result);
 
         commitAndRefreshTransaction();
@@ -266,7 +268,7 @@ public class HibernateBuildResultDaoTest extends MasterPersistenceTestCase
         Project p1 = new Project();
         projectDao.save(p1);
 
-        BuildResult result = new BuildResult(new TriggerBuildReason("scm trigger"), p1, null, 1);
+        BuildResult result = new BuildResult(new TriggerBuildReason("scm trigger"), p1, makeSpec(), 1);
         result.commence(0);
         buildResultDao.save(result);
 
@@ -330,11 +332,11 @@ public class HibernateBuildResultDaoTest extends MasterPersistenceTestCase
         Project p1 = new Project();
         projectDao.save(p1);
 
-        BuildResult resultA = new BuildResult(new TriggerBuildReason("scm trigger"), p1, null, 1);
+        BuildResult resultA = new BuildResult(new TriggerBuildReason("scm trigger"), p1, makeSpec(), 1);
         buildResultDao.save(resultA);
-        BuildResult resultB = new BuildResult(new TriggerBuildReason("scm trigger"), p1, null, 2);
+        BuildResult resultB = new BuildResult(new TriggerBuildReason("scm trigger"), p1, makeSpec(), 2);
         buildResultDao.save(resultB);
-        BuildResult resultC = new BuildResult(new TriggerBuildReason("scm trigger"), p1, null, 3);
+        BuildResult resultC = new BuildResult(new TriggerBuildReason("scm trigger"), p1, makeSpec(), 3);
         buildResultDao.save(resultC);
 
         commitAndRefreshTransaction();
@@ -368,7 +370,7 @@ public class HibernateBuildResultDaoTest extends MasterPersistenceTestCase
 
         commitAndRefreshTransaction();
 
-        List<BuildResult> latestCompleted = buildResultDao.findLatestCompleted(p1, b1.getName(), 0, 10);
+        List<BuildResult> latestCompleted = buildResultDao.findLatestCompleted(p1, b1.getPname(), 0, 10);
         assertEquals(2, latestCompleted.size());
         assertPropertyEquals(r2, latestCompleted.get(0));
         assertPropertyEquals(r1, latestCompleted.get(1));
@@ -383,14 +385,14 @@ public class HibernateBuildResultDaoTest extends MasterPersistenceTestCase
         buildSpecificationDao.save(b1);
 
         BuildResult r1 = createCompletedBuild(p1, b1, 1);
-        BuildResult r2 = new BuildResult(new TriggerBuildReason("scm trigger"), p1, b1.getName(), 2);
+        BuildResult r2 = new BuildResult(new TriggerBuildReason("scm trigger"), p1, b1, 2);
 
         buildResultDao.save(r1);
         buildResultDao.save(r2);
 
         commitAndRefreshTransaction();
 
-        List<BuildResult> latestCompleted = buildResultDao.findLatestCompleted(p1, b1.getName(), 0, 10);
+        List<BuildResult> latestCompleted = buildResultDao.findLatestCompleted(p1, b1.getPname(), 0, 10);
         assertEquals(1, latestCompleted.size());
         assertPropertyEquals(r1, latestCompleted.get(0));
     }
@@ -404,7 +406,7 @@ public class HibernateBuildResultDaoTest extends MasterPersistenceTestCase
         buildSpecificationDao.save(b1);
 
         BuildResult r1 = createCompletedBuild(p1, b1, 1);
-        BuildResult r2 = new BuildResult(new TriggerBuildReason("scm trigger"), p1, b1.getName(), 2);
+        BuildResult r2 = new BuildResult(new TriggerBuildReason("scm trigger"), p1, b1, 2);
         r2.commence();
 
         buildResultDao.save(r1);
@@ -412,7 +414,7 @@ public class HibernateBuildResultDaoTest extends MasterPersistenceTestCase
 
         commitAndRefreshTransaction();
 
-        List<BuildResult> latestCompleted = buildResultDao.findLatestCompleted(p1, b1.getName(), 0, 10);
+        List<BuildResult> latestCompleted = buildResultDao.findLatestCompleted(p1, b1.getPname(), 0, 10);
         assertEquals(1, latestCompleted.size());
         assertPropertyEquals(r1, latestCompleted.get(0));
     }
@@ -437,7 +439,7 @@ public class HibernateBuildResultDaoTest extends MasterPersistenceTestCase
 
         commitAndRefreshTransaction();
 
-        List<BuildResult> latestCompleted = buildResultDao.findLatestCompleted(p1, b1.getName(), 0, 2);
+        List<BuildResult> latestCompleted = buildResultDao.findLatestCompleted(p1, b1.getPname(), 0, 2);
         assertEquals(2, latestCompleted.size());
         assertPropertyEquals(r4, latestCompleted.get(0));
         assertPropertyEquals(r3, latestCompleted.get(1));
@@ -463,7 +465,7 @@ public class HibernateBuildResultDaoTest extends MasterPersistenceTestCase
 
         commitAndRefreshTransaction();
 
-        List<BuildResult> latestCompleted = buildResultDao.findLatestCompleted(p1, b1.getName(), 1, 4);
+        List<BuildResult> latestCompleted = buildResultDao.findLatestCompleted(p1, b1.getPname(), 1, 4);
         assertEquals(3, latestCompleted.size());
         assertPropertyEquals(r3, latestCompleted.get(0));
         assertPropertyEquals(r2, latestCompleted.get(1));
@@ -662,12 +664,20 @@ public class HibernateBuildResultDaoTest extends MasterPersistenceTestCase
 
     private BuildResult createCompletedBuild(Project project, long number)
     {
-        return createCompletedBuild(project, new BuildSpecification("test spec"), number);
+        BuildSpecification spec = makeSpec();
+        return createCompletedBuild(project, spec, number);
+    }
+
+    private BuildSpecification makeSpec()
+    {
+        BuildSpecification spec = new BuildSpecification("test spec");
+        buildSpecificationDao.save(spec);
+        return spec;
     }
 
     private BuildResult createCompletedBuild(Project project, BuildSpecification spec, long number)
     {
-        BuildResult result = new BuildResult(new TriggerBuildReason("scm trigger"), project, spec.getName(), number);
+        BuildResult result = new BuildResult(new TriggerBuildReason("scm trigger"), project, spec, number);
         result.commence(0);
         result.complete();
         return result;
@@ -682,7 +692,7 @@ public class HibernateBuildResultDaoTest extends MasterPersistenceTestCase
 
     private BuildResult createIncompletePersonalBuild(User user, Project project, long number)
     {
-        BuildResult result = new BuildResult(user, project, "spec", number);
+        BuildResult result = new BuildResult(user, project, makeSpec(), number);
         result.commence(0);
         return result;
     }

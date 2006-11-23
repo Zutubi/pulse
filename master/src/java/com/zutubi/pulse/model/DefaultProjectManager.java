@@ -179,7 +179,7 @@ public class DefaultProjectManager implements ProjectManager
                     List<Revision> revisions = changelistIsolator.getRevisionsToRequest(project, spec, force);
                     for(Revision r: revisions)
                     {
-                        requestBuildOfRevision(reason, project, specification, r);
+                        requestBuildOfRevision(reason, project, spec, r);
                     }
                 }
                 catch (SCMException e)
@@ -189,13 +189,13 @@ public class DefaultProjectManager implements ProjectManager
             }
             else
             {
-                eventManager.publish(new BuildRequestEvent(this, reason, project, specification, new BuildRevision()));
+                eventManager.publish(new BuildRequestEvent(this, reason, project, spec, new BuildRevision()));
             }
         }
         else
         {
             // Just raise one request.
-            requestBuildOfRevision(reason, project, specification, revision);
+            requestBuildOfRevision(reason, project, spec, revision);
         }
     }
 
@@ -205,7 +205,7 @@ public class DefaultProjectManager implements ProjectManager
         try
         {
             String pulseFile = getPulseFile(project, revision, archive);
-            eventManager.publish(new PersonalBuildRequestEvent(this, number, new BuildRevision(revision, pulseFile), user, archive, project, specification.getName()));
+            eventManager.publish(new PersonalBuildRequestEvent(this, number, new BuildRevision(revision, pulseFile), user, archive, project, specification));
         }
         catch (BuildException e)
         {
@@ -222,7 +222,7 @@ public class DefaultProjectManager implements ProjectManager
         return number;
     }
 
-    private void requestBuildOfRevision(BuildReason reason, Project project, String specification, Revision revision)
+    private void requestBuildOfRevision(BuildReason reason, Project project, BuildSpecification specification, Revision revision)
     {
         try
         {

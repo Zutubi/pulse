@@ -13,7 +13,7 @@ public class PersonalBuildRequestEvent extends AbstractBuildRequestEvent
     private User user;
     private PatchArchive patch;
 
-    public PersonalBuildRequestEvent(Object source, long number, BuildRevision revision, User user, PatchArchive patch, Project project, String specification)
+    public PersonalBuildRequestEvent(Object source, long number, BuildRevision revision, User user, PatchArchive patch, Project project, BuildSpecification specification)
     {
         super(source, revision, project, specification);
         this.number = number;

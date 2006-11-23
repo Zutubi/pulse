@@ -7,7 +7,7 @@
             <generator class="hilo"/>
         </id>
 
-        <property name="name" column="NAME" type="string" length="255"/>
+        <many-to-one name="pname" column="PNAME" class="com.zutubi.pulse.core.model.PersistentName" cascade="save-update" lazy="false"/>
 
         <property name="isolateChangelists" column="ISOLATE_CHANGELISTS" type="boolean"/>
 
@@ -37,7 +37,7 @@
         </id>
 
         <component name="stage" class="com.zutubi.pulse.model.BuildStage">
-            <property name="name" type="string" length="255"/>
+            <many-to-one name="pname" column="PNAME" class="com.zutubi.pulse.core.model.PersistentName" cascade="save-update" lazy="false"/>
 
             <many-to-one name="hostRequirements" class="com.zutubi.pulse.model.AbstractBuildHostRequirements"
                          column="BUILD_HOST_REQUIREMENTS_ID"
@@ -64,6 +64,14 @@
             <index column="ORDINAL"/>
             <one-to-many class="com.zutubi.pulse.model.BuildSpecificationNode"/>
         </list>
+    </class>
+
+    <class name="com.zutubi.pulse.core.model.PersistentName" table="PERSISTENT_NAME">
+        <id name="id" type="java.lang.Long" column="ID" unsaved-value="0">
+            <generator class="hilo"/>
+        </id>
+
+        <property name="name" type="string" column="NAME"/>
     </class>
 
     <class name="com.zutubi.pulse.model.AbstractBuildHostRequirements" table="BUILD_HOST_REQUIREMENTS" lazy="false">
@@ -94,10 +102,4 @@
         <property name="addToPath" column="ADD_TO_PATH" type="boolean"/>
         <property name="resolveVariables" column="RESOLVE_VARIABLES" type="boolean"/>
     </class>
-
-    <query name="findBuildSpecificationByName"><![CDATA[
-        from BuildSpecification spec
-        where spec.name = :name
-    ]]></query>
-
 </hibernate-mapping>

@@ -685,7 +685,7 @@ public class ThreadedRecipeQueueTest extends TestCase implements EventListener
     {
         Project project = new Project("test", "test description", new MockPulseFileDetails());
         project.setScm(scm);
-        BuildResult result = new BuildResult(new UnknownBuildReason(), project, "spec", 100);
+        BuildResult result = new BuildResult(new UnknownBuildReason(), project, new BuildSpecification("spec"), 100);
         BuildHostRequirements requirements = new MockBuildHostRequirements(type);
         RecipeRequest request = new RecipeRequest("project", "spec", id, null, false);
         request.setBootstrapper(new ChainBootstrapper());

@@ -119,7 +119,7 @@ public class BuildController implements EventListener
     private BuildResult getPreviousSuccessfulBuild()
     {
         BuildResult previousSuccessful = null;
-        List<BuildResult> previousSuccess = buildManager.querySpecificationBuilds(project, specification.getName(), new ResultState[] { ResultState.SUCCESS }, -1, -1, 0, 1, true, true);
+        List<BuildResult> previousSuccess = buildManager.querySpecificationBuilds(project, specification.getPname(), new ResultState[] { ResultState.SUCCESS }, -1, -1, 0, 1, true, true);
         if(previousSuccess.size() > 0)
         {
             previousSuccessful = previousSuccess.get(0);
@@ -133,7 +133,7 @@ public class BuildController implements EventListener
         {
             BuildStage stage = node.getStage();
             RecipeResult recipeResult = new RecipeResult(stage.getRecipe());
-            RecipeResultNode childResultNode = new RecipeResultNode(stage.getName(), recipeResult);
+            RecipeResultNode childResultNode = new RecipeResultNode(stage.getPname(), recipeResult);
             resultNode.addChild(childResultNode);
             buildManager.save(resultNode);
 
@@ -146,7 +146,7 @@ public class BuildController implements EventListener
             RecipeRequest recipeRequest = new RecipeRequest(project.getName(), specification.getName(), recipeResult.getId(), stage.getRecipe(), incremental, getResourceRequirements(specification, node), buildProperties);
             RecipeDispatchRequest dispatchRequest = new RecipeDispatchRequest(stage.getHostRequirements(), request.getRevision(), recipeRequest, buildResult);
             DefaultRecipeLogger logger = new DefaultRecipeLogger(new File(paths.getRecipeDir(buildResult, recipeResult.getId()), RecipeResult.RECIPE_LOG));
-            RecipeResultNode previousRecipe = previousSuccessful == null ? null : previousSuccessful.findResultNode(stage.getName());
+            RecipeResultNode previousRecipe = previousSuccessful == null ? null : previousSuccessful.findResultNode(stage.getPname());
             RecipeController rc = new RecipeController(buildResult, node, childResultNode, dispatchRequest, buildProperties, request.isPersonal(), incremental, previousRecipe, logger, collector, queue, buildManager, serviceTokenManager);
             TreeNode<RecipeController> child = new TreeNode<RecipeController>(rc);
             rcNode.add(child);
@@ -480,7 +480,7 @@ public class BuildController implements EventListener
     {
         Scm scm = project.getScm();
         Revision revision = buildRevision.getRevision();
-        Revision previousRevision = buildManager.getPreviousRevision(project, specification.getName());
+        Revision previousRevision = buildManager.getPreviousRevision(project, specification.getPname());
 
         if (previousRevision != null)
         {

@@ -10,7 +10,7 @@ public class BuildRequestEvent extends AbstractBuildRequestEvent
 {
     private BuildReason reason;
 
-    public BuildRequestEvent(Object source, BuildReason reason, Project project, String specification, BuildRevision revision)
+    public BuildRequestEvent(Object source, BuildReason reason, Project project, BuildSpecification specification, BuildRevision revision)
     {
         super(source, revision, project, specification);
         this.reason = reason;

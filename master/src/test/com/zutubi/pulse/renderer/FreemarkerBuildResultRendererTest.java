@@ -1,11 +1,11 @@
 package com.zutubi.pulse.renderer;
 
+import com.zutubi.pulse.committransformers.LinkCommitMessageTransformer;
 import com.zutubi.pulse.core.model.*;
 import com.zutubi.pulse.model.*;
 import com.zutubi.pulse.test.PulseTestCase;
 import com.zutubi.pulse.util.IOUtils;
 import com.zutubi.pulse.web.project.CommitMessageHelper;
-import com.zutubi.pulse.committransformers.LinkCommitMessageTransformer;
 import freemarker.template.Configuration;
 import freemarker.template.DefaultObjectWrapper;
 
@@ -268,7 +268,7 @@ public class FreemarkerBuildResultRendererTest extends PulseTestCase
     private void personalBuildHelper(String type) throws Exception
     {
         User user = new User("jason", "Jason Sankey");
-        BuildResult result = new BuildResult(user, new Project("my project", "project description"), "nightly", 12);
+        BuildResult result = new BuildResult(user, new Project("my project", "project description"), new BuildSpecification("nightly"), 12);
         initialiseResult(result);
 
         result.failure("test failed tests");
@@ -341,7 +341,7 @@ public class FreemarkerBuildResultRendererTest extends PulseTestCase
 
     private BuildResult createSuccessfulBuild()
     {
-        BuildResult result = new BuildResult(new TriggerBuildReason("scm trigger"), new Project("test project", "test description"), "test spec", 101);
+        BuildResult result = new BuildResult(new TriggerBuildReason("scm trigger"), new Project("test project", "test description"), new BuildSpecification("test spec"), 101);
         initialiseResult(result);
         return result;
     }
@@ -355,19 +355,19 @@ public class FreemarkerBuildResultRendererTest extends PulseTestCase
         RecipeResult recipeResult = new RecipeResult("first recipe");
         recipeResult.commence();
         recipeResult.complete();
-        RecipeResultNode node = new RecipeResultNode("first stage", recipeResult);
+        RecipeResultNode node = new RecipeResultNode(new PersistentName("first stage"), recipeResult);
         result.getRoot().addChild(node);
 
         recipeResult = new RecipeResult("second recipe");
         recipeResult.commence();
         recipeResult.complete();
-        node = new RecipeResultNode("second stage", recipeResult);
+        node = new RecipeResultNode(new PersistentName("second stage"), recipeResult);
         result.getRoot().addChild(node);
 
         recipeResult = new RecipeResult("nested recipe");
         recipeResult.commence();
         recipeResult.complete();
-        node = new RecipeResultNode("nested stage", recipeResult);
+        node = new RecipeResultNode(new PersistentName("nested stage"), recipeResult);
         result.getRoot().getChildren().get(0).addChild(node);
 
         result.complete();

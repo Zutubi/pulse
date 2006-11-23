@@ -43,11 +43,11 @@ public class RecipeControllerTest extends PulseTestCase
 
         rootResult = new RecipeResult("root recipe");
         rootResult.setId(100);
-        rootNode = new RecipeResultNode("root stage", rootResult);
+        rootNode = new RecipeResultNode(new PersistentName("root stage"), rootResult);
         rootNode.setId(101);
         childResult = new RecipeResult("child recipe");
         childResult.setId(102);
-        childNode = new RecipeResultNode("child stage", childResult);
+        childNode = new RecipeResultNode(new PersistentName("child stage"), childResult);
         childNode.setId(103);
         rootNode.addChild(childNode);
 

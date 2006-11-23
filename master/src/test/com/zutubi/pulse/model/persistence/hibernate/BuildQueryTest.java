@@ -1,7 +1,9 @@
 package com.zutubi.pulse.model.persistence.hibernate;
 
+import com.zutubi.pulse.core.model.PersistentName;
 import com.zutubi.pulse.core.model.ResultState;
 import com.zutubi.pulse.model.BuildResult;
+import com.zutubi.pulse.model.BuildSpecification;
 import com.zutubi.pulse.model.Project;
 import com.zutubi.pulse.model.UnknownBuildReason;
 import com.zutubi.pulse.model.persistence.BuildResultDao;
@@ -10,10 +12,7 @@ import com.zutubi.pulse.model.persistence.ProjectDao;
 import com.zutubi.pulse.util.ListUtils;
 import com.zutubi.pulse.util.Predicate;
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 
 /**
  */
@@ -24,12 +23,18 @@ public class BuildQueryTest extends MasterPersistenceTestCase
     private BuildSpecificationDao buildSpecificationDao;
     private Project p1;
     private Project p2;
+    private BuildSpecification default1;
+    private BuildSpecification default2;
+    private BuildSpecification overnight1;
+    private BuildSpecification overnight2;
+    private BuildSpecification borken2;
     private List<BuildResult> allResults;
 
     protected void setUp() throws Exception
     {
         super.setUp();
         buildResultDao = (BuildResultDao) context.getBean("buildResultDao");
+        buildSpecificationDao = (BuildSpecificationDao) context.getBean("buildSpecificationDao");
         projectDao = (ProjectDao) context.getBean("projectDao");
         createProjects();
         setupBuilds();
@@ -38,8 +43,19 @@ public class BuildQueryTest extends MasterPersistenceTestCase
     private void createProjects()
     {
         p1 = new Project("p1", "p1 description");
+        default1 = new BuildSpecification("default");
+        overnight1 = new BuildSpecification("overnight");
+        p1.addBuildSpecification(default1);
+        p1.addBuildSpecification(overnight1);
         projectDao.save(p1);
+
         p2 = new Project("p2", "p2 description");
+        default2 = new BuildSpecification("default");
+        overnight2 = new BuildSpecification("overnight");
+        borken2 = new BuildSpecification("borken");
+        p2.addBuildSpecification(default2);
+        p2.addBuildSpecification(overnight2);
+        p2.addBuildSpecification(borken2);
         projectDao.save(p2);
     }
 
@@ -47,33 +63,33 @@ public class BuildQueryTest extends MasterPersistenceTestCase
     {
         allResults = new LinkedList<BuildResult>();
 
-        createBuild(p1, "default", 1, ResultState.SUCCESS, 10000, 11000, false);
-        createBuild(p2, "default", 2, ResultState.SUCCESS, 11500, 11900);
-        createBuild(p1, "overnight", 3, ResultState.SUCCESS, 12000, 13000, false);
-        createBuild(p2, "overnight", 4, ResultState.SUCCESS, 13333, 13999);
-        createBuild(p1, "default", 5, ResultState.FAILURE, 14000, 15000);
-        createBuild(p2, "borken", 6, ResultState.ERROR, 15000, 15821);
-        createBuild(p1, "default", 7, ResultState.SUCCESS, 16000, 17000);
-        createBuild(p2, "borken", 8, ResultState.ERROR, 17777, 17777);
-        createBuild(p1, "default", 9, ResultState.ERROR, 18000, 19000);
-        createBuild(p2, "borken", 10, ResultState.ERROR, 19005, 19006);
-        createBuild(p1, "overnight", 11, ResultState.ERROR, 20000, 21000, false);
-        createBuild(p2, "borken", 12, ResultState.ERROR, 21100, 21900);
-        createBuild(p1, "default", 13, ResultState.SUCCESS, 22000, 23000);
-        createBuild(p2, "default", 14, ResultState.SUCCESS, 23332, 23880);
-        createBuild(p1, "default", 15, ResultState.SUCCESS, 24000, 25000);
-        createBuild(p2, "default", 16, ResultState.SUCCESS, 29001, 29999);
-        createBuild(p1, "overnight", 17, ResultState.FAILURE, 26000, 27000);
-        createBuild(p2, "overnight", 18, ResultState.FAILURE, 30000, 31000);
-        createBuild(p1, "default", 19, ResultState.SUCCESS, 28000, 29000);
+        createBuild(p1, default1, 1, ResultState.SUCCESS, 10000, 11000, false);
+        createBuild(p2, default2, 2, ResultState.SUCCESS, 11500, 11900);
+        createBuild(p1, overnight1, 3, ResultState.SUCCESS, 12000, 13000, false);
+        createBuild(p2, overnight2, 4, ResultState.SUCCESS, 13333, 13999);
+        createBuild(p1, default1, 5, ResultState.FAILURE, 14000, 15000);
+        createBuild(p2, borken2, 6, ResultState.ERROR, 15000, 15821);
+        createBuild(p1, default1, 7, ResultState.SUCCESS, 16000, 17000);
+        createBuild(p2, borken2, 8, ResultState.ERROR, 17777, 17777);
+        createBuild(p1, default1, 9, ResultState.ERROR, 18000, 19000);
+        createBuild(p2, borken2, 10, ResultState.ERROR, 19005, 19006);
+        createBuild(p1, overnight1, 11, ResultState.ERROR, 20000, 21000, false);
+        createBuild(p2, borken2, 12, ResultState.ERROR, 21100, 21900);
+        createBuild(p1, default1, 13, ResultState.SUCCESS, 22000, 23000);
+        createBuild(p2, default2, 14, ResultState.SUCCESS, 23332, 23880);
+        createBuild(p1, default1, 15, ResultState.SUCCESS, 24000, 25000);
+        createBuild(p2, default2, 16, ResultState.SUCCESS, 29001, 29999);
+        createBuild(p1, overnight1, 17, ResultState.FAILURE, 26000, 27000);
+        createBuild(p2, overnight2, 18, ResultState.FAILURE, 30000, 31000);
+        createBuild(p1, default1, 19, ResultState.SUCCESS, 28000, 29000);
     }
 
-    private void createBuild(Project project, String spec, int number, ResultState state, int start, int end)
+    private void createBuild(Project project, BuildSpecification spec, int number, ResultState state, int start, int end)
     {
         createBuild(project, spec, number, state, start, end, true);
     }
 
-    private void createBuild(Project project, String spec, int number, ResultState state, int start, int end, boolean hasWorkDir)
+    private void createBuild(Project project, BuildSpecification spec, int number, ResultState state, int start, int end, boolean hasWorkDir)
     {
         BuildResult result = new BuildResult(new UnknownBuildReason(), project, spec, number);
         result.commence(start);
@@ -114,20 +130,20 @@ public class BuildQueryTest extends MasterPersistenceTestCase
 
     public void testAllSpecs()
     {
-        List<String> specs = buildResultDao.findAllSpecificationsForProjects(null);
-        assertEquals(getStringList("borken", "default", "overnight"), specs);
+        List<PersistentName> specs = buildResultDao.findAllSpecificationsForProjects(null);
+        assertEquals(getStringList("default", "overnight", "default", "overnight", "borken"), getNames(specs));
     }
 
     public void testAllSpecsForP1()
     {
-        List<String> specs = buildResultDao.findAllSpecificationsForProjects(new Project[] { p1 });
-        assertEquals(getStringList("default", "overnight"), specs);
+        List<PersistentName> specs = buildResultDao.findAllSpecificationsForProjects(new Project[] { p1 });
+        assertEquals(getStringList("default", "overnight"), getNames(specs));
     }
 
     public void testAllSpecsForBoth()
     {
-        List<String> specs = buildResultDao.findAllSpecificationsForProjects(new Project[] { p1, p2 });
-        assertEquals(getStringList("borken", "default", "overnight"), specs);
+        List<PersistentName> specs = buildResultDao.findAllSpecificationsForProjects(new Project[] { p1, p2 });
+        assertEquals(getStringList("default", "overnight", "default", "overnight", "borken"), getNames(specs));
     }
 
     public void testQueryAll()
@@ -168,20 +184,20 @@ public class BuildQueryTest extends MasterPersistenceTestCase
 
     public void testSpecDefault()
     {
-        List<BuildResult> results = buildResultDao.queryBuilds(null, null, new String[] { "default" }, 0, 0, null, -1, -1, true);
-        assertEquals(getFiltered("default"), results);
+        List<BuildResult> results = buildResultDao.queryBuilds(null, null, new PersistentName[] { default1.getPname() }, 0, 0, null, -1, -1, true);
+        assertEquals(getFiltered(default1.getPname()), results);
     }
 
     public void testSpecOvernight()
     {
-        List<BuildResult> results = buildResultDao.queryBuilds(null, null, new String[] { "overnight" }, 0, 0, null, -1, -1, true);
-        assertEquals(getFiltered("overnight"), results);
+        List<BuildResult> results = buildResultDao.queryBuilds(null, null, new PersistentName[] { overnight1.getPname() }, 0, 0, null, -1, -1, true);
+        assertEquals(getFiltered(overnight1.getPname()), results);
     }
 
     public void testProjectP1SpecDefault()
     {
-        List<BuildResult> results = buildResultDao.queryBuilds(new Project[] { p1 }, null, new String[] { "default" }, 0, 0, null, -1, -1, true);
-        assertEquals(getFiltered(p1, "default"), results);
+        List<BuildResult> results = buildResultDao.queryBuilds(new Project[] { p1 }, null, new PersistentName[] { default1.getPname() }, 0, 0, null, -1, -1, true);
+        assertEquals(getFiltered(p1, default1.getPname()), results);
     }
 
     public void testEarliestTime()
@@ -271,22 +287,33 @@ public class BuildQueryTest extends MasterPersistenceTestCase
         });
     }
 
-    private List<BuildResult> getFiltered(final String spec)
+    private List<String> getNames(List<PersistentName> specs)
+    {
+        List<String> result = new ArrayList<String>(specs.size());
+        for(PersistentName n: specs)
+        {
+            result.add(n.getName());
+        }
+
+        return result;
+    }
+
+    private List<BuildResult> getFiltered(final PersistentName spec)
     {
         return new ListUtils<BuildResult>().filter(allResults, new Predicate<BuildResult>() {
             public boolean satisfied(BuildResult t)
             {
-                return t.getBuildSpecification().equals(spec);
+                return t.getSpecName().equals(spec);
             }
         });
     }
 
-    private List<BuildResult> getFiltered(final Project project, final String spec)
+    private List<BuildResult> getFiltered(final Project project, final PersistentName spec)
     {
         return new ListUtils<BuildResult>().filter(allResults, new Predicate<BuildResult>() {
             public boolean satisfied(BuildResult t)
             {
-                return t.getProject().equals(project) && t.getBuildSpecification().equals(spec);
+                return t.getProject().equals(project) && t.getSpecName().equals(spec);
             }
         });
     }

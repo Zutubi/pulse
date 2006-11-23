@@ -8,6 +8,7 @@ import com.zutubi.pulse.agent.AgentManager;
 import com.zutubi.pulse.agent.SlaveAgent;
 import com.zutubi.pulse.bootstrap.ComponentContext;
 import com.zutubi.pulse.committransformers.CommitMessageTransformerManager;
+import com.zutubi.pulse.core.model.PersistentName;
 import com.zutubi.pulse.core.model.ResultState;
 import com.zutubi.pulse.form.squeezer.SqueezeException;
 import com.zutubi.pulse.form.squeezer.Squeezers;
@@ -259,10 +260,11 @@ public class RemoteApi
         tokenManager.verifyUser(token);
         Project project = internalGetProject(projectName);
 
-        String[] specs = null;
+        PersistentName[] specs = null;
         if (TextUtils.stringSet(buildSpecification))
         {
-            specs = new String[]{buildSpecification};
+            BuildSpecification spec = getBuildSpecification(project, buildSpecification);
+            specs = new PersistentName[]{ spec.getPname() };
         }
 
         ResultState[] states = null;

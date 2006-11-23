@@ -66,6 +66,8 @@
                 <ref local="transferExampleTemplatesToDataDirectory"/>
                 <ref local="schemaUpgrade0102004002"/>
                 <ref local="schemaUpgrade0102004003"/>
+                <ref local="schemaUpgrade0102004004"/>
+                <ref local="persistentName"/>
             </list>
         </property>
         <property name="systemTasks">
@@ -407,5 +409,19 @@
                 <value>com/zutubi/pulse/upgrade/schema/build_0102004003/Project.hbm.xml</value>
             </list>
         </property>
+    </bean>
+
+    <bean id="schemaUpgrade0102004004" class="com.zutubi.pulse.upgrade.tasks.MigrateSchemaUpgradeTask" autowire="byName">
+        <property name="buildNumber" value="102004004"/>
+        <property name="mappings">
+            <list>
+                <value>com/zutubi/pulse/upgrade/schema/build_0102004004/BuildResult.hbm.xml</value>
+                <value>com/zutubi/pulse/upgrade/schema/build_0102004004/BuildSpecification.hbm.xml</value>
+            </list>
+        </property>
+    </bean>
+
+    <bean id="persistentName" class="com.zutubi.pulse.upgrade.tasks.PersistentNameUpgradeTask" autowire="byName">
+        <property name="buildNumber" value="102004005"/>
     </bean>
 </beans>

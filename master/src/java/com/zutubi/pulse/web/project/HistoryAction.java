@@ -1,16 +1,13 @@
 package com.zutubi.pulse.web.project;
 
-import com.opensymphony.util.TextUtils;
 import com.zutubi.pulse.bootstrap.MasterConfigurationManager;
+import com.zutubi.pulse.core.model.PersistentName;
 import com.zutubi.pulse.core.model.ResultState;
 import com.zutubi.pulse.model.*;
 import com.zutubi.pulse.web.PagingSupport;
 import com.zutubi.pulse.xwork.interceptor.Preparable;
 
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.TreeMap;
+import java.util.*;
 
 /**
  */
@@ -32,8 +29,8 @@ public class HistoryAction extends ProjectActionSupport implements Preparable
     private Map<String, ResultState[]> nameToStates;
     private String stateFilter = STATE_ANY;
     private List<String> stateFilters;
-    private List<String> specs;
-    private String spec = "";
+    private Map<Long, String> specs;
+    private Long spec;
 
     /**
      * The system configuration manager.
@@ -95,17 +92,17 @@ public class HistoryAction extends ProjectActionSupport implements Preparable
         this.stateFilter = stateFilter;
     }
 
-    public List<String> getSpecs()
+    public Map<Long, String> getSpecs()
     {
         return specs;
     }
 
-    public String getSpec()
+    public Long getSpec()
     {
         return spec;
     }
 
-    public void setSpec(String spec)
+    public void setSpec(Long spec)
     {
         this.spec = spec;
     }
@@ -147,9 +144,14 @@ public class HistoryAction extends ProjectActionSupport implements Preparable
             return ERROR;
         }
 
-        specs = new LinkedList<String>();
-        specs.add("");
-        specs.addAll(getBuildManager().getBuildSpecifications(project));
+        Map<Long, PersistentName> specNames = new HashMap<Long, PersistentName>();
+        specs = new LinkedHashMap<Long, String>();
+        specs.put(0L, "");
+        for(PersistentName pname: getBuildManager().getBuildSpecifications(project))
+        {
+            specs.put(pname.getId(), pname.getName());
+            specNames.put(pname.getId(), pname);
+        }
 
         if (pagingSupport.getStartPage() < 0)
         {
@@ -159,7 +161,7 @@ public class HistoryAction extends ProjectActionSupport implements Preparable
 
         HistoryPage page = new HistoryPage(project, pagingSupport.getStartOffset(), pagingSupport.getItemsPerPage());
 
-        if (stateFilter.equals(STATE_ANY) && !TextUtils.stringSet(spec))
+        if (stateFilter.equals(STATE_ANY) && spec == null || spec == 0L)
         {
             // Common case
             getBuildManager().fillHistoryPage(page);
@@ -173,14 +175,14 @@ public class HistoryAction extends ProjectActionSupport implements Preparable
                 return ERROR;
             }
 
-            String specName;
-            if (!TextUtils.stringSet(spec))
+            PersistentName specName;
+            if (spec == null || spec == 0L)
             {
                 specName = null;
             }
             else
             {
-                specName = spec;
+                specName = specNames.get(spec);
             }
 
             getBuildManager().fillHistoryPage(page, states, specName);

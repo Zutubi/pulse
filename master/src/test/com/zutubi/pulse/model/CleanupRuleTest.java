@@ -3,6 +3,7 @@ package com.zutubi.pulse.model;
 import com.zutubi.pulse.bootstrap.ComponentContext;
 import com.zutubi.pulse.core.model.ResultState;
 import com.zutubi.pulse.model.persistence.BuildResultDao;
+import com.zutubi.pulse.model.persistence.BuildSpecificationDao;
 import com.zutubi.pulse.model.persistence.ProjectDao;
 import com.zutubi.pulse.model.persistence.hibernate.MasterPersistenceTestCase;
 import com.zutubi.pulse.util.Constants;
@@ -16,6 +17,7 @@ public class CleanupRuleTest extends MasterPersistenceTestCase
 {
     private ProjectDao projectDao;
     private BuildResultDao buildResultDao;
+    private BuildSpecificationDao buildSpecificationDao;
     private Project p1;
     private Project p2;
     private BuildResult b1;
@@ -29,6 +31,7 @@ public class CleanupRuleTest extends MasterPersistenceTestCase
         super.setUp();
         projectDao = (ProjectDao) ComponentContext.getBean("projectDao");
         buildResultDao = (BuildResultDao) ComponentContext.getBean("buildResultDao");
+        buildSpecificationDao = (BuildSpecificationDao) ComponentContext.getBean("buildSpecificationDao");
 
         p1 = new Project("p1", "desc");
         p2 = new Project("p2", "desc");
@@ -108,7 +111,9 @@ public class CleanupRuleTest extends MasterPersistenceTestCase
 
     private BuildResult createBuild(Project project, String spec, long number, long startTime, ResultState state, boolean hasWorkDir)
     {
-        BuildResult result = new BuildResult(new TriggerBuildReason("scm trigger"), project, spec, number);
+        BuildSpecification specification = new BuildSpecification(spec);
+        buildSpecificationDao.save(specification);
+        BuildResult result = new BuildResult(new TriggerBuildReason("scm trigger"), project, specification, number);
         if(startTime >= 0)
         {
             result.commence(startTime);

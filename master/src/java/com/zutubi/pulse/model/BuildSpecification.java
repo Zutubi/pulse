@@ -1,12 +1,13 @@
 package com.zutubi.pulse.model;
 
 import com.zutubi.pulse.core.model.Entity;
+import com.zutubi.pulse.core.model.PersistentName;
 import com.zutubi.pulse.core.model.ResourceProperty;
 
-import java.util.List;
 import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
 
 /**
  * Describes the steps (recipes) required for a build, and where they should
@@ -39,7 +40,7 @@ public class BuildSpecification extends Entity implements NamedEntity
         INCREMENTAL_UPDATE
     }
 
-    private String name;
+    private PersistentName pname;
     private boolean isolateChangelists = false;
     private boolean retainWorkingCopy = false;
     private int timeout = TIMEOUT_NEVER;
@@ -56,12 +57,12 @@ public class BuildSpecification extends Entity implements NamedEntity
 
     public BuildSpecification(String name)
     {
-        this.name = name;
+        this.pname = new PersistentName(name);
     }
 
     public BuildSpecification copy()
     {
-        BuildSpecification copy = new BuildSpecification(name);
+        BuildSpecification copy = new BuildSpecification(pname.getName());
         copy.timeout = timeout;
         copy.retainWorkingCopy = retainWorkingCopy;
         copy.isolateChangelists = isolateChangelists;
@@ -74,12 +75,34 @@ public class BuildSpecification extends Entity implements NamedEntity
 
     public String getName()
     {
-        return name;
+        if(pname == null)
+        {
+            return null;
+        }
+        
+        return pname.getName();
     }
 
     public void setName(String name)
     {
-        this.name = name;
+        if(pname == null)
+        {
+            pname = new PersistentName(name);
+        }
+        else
+        {
+            pname.setName(name);
+        }
+    }
+
+    public PersistentName getPname()
+    {
+        return pname;
+    }
+
+    public void setPname(PersistentName pname)
+    {
+        this.pname = pname;
     }
 
     public Boolean getIsolateChangelists()
@@ -264,5 +287,11 @@ public class BuildSpecification extends Entity implements NamedEntity
     public void setPrompt(boolean prompt)
     {
         this.prompt = prompt;
+    }
+
+
+    public boolean equals(Object other)
+    {
+        return super.equals(other);    //To change body of overridden methods use File | Settings | File Templates.
     }
 }

@@ -10,7 +10,5 @@ import java.util.List;
  */
 public interface BuildSpecificationDao extends EntityDao<BuildSpecification>
 {
-    BuildSpecification findByName(String name);
-
     List<BuildSpecification> findBySlave(Slave slave);
 }

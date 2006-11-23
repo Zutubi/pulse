@@ -10,7 +10,7 @@ import java.util.List;
  */
 public class RecipeResultNode extends Entity
 {
-    private String stage;
+    private PersistentName stageName;
     private String host;
     private RecipeResult result;
     private List<RecipeResultNode> children;
@@ -19,21 +19,26 @@ public class RecipeResultNode extends Entity
     {
     }
 
-    public RecipeResultNode(String stage, RecipeResult result)
+    public RecipeResultNode(PersistentName stageName, RecipeResult result)
     {
-        this.stage = stage;
+        this.stageName = stageName;
         this.result = result;
         children = new LinkedList<RecipeResultNode>();
     }
 
     public String getStage()
     {
-        return stage;
+        return stageName.getName();
     }
 
-    public void setStage(String stage)
+    public PersistentName getStageName()
     {
-        this.stage = stage;
+        return stageName;
+    }
+
+    private void setStageName(PersistentName stageName)
+    {
+        this.stageName = stageName;
     }
 
     public String getHost()
@@ -190,16 +195,16 @@ public class RecipeResultNode extends Entity
         return null;
     }
 
-    public RecipeResultNode findNode(String stage)
+    public RecipeResultNode findNode(PersistentName stageName)
     {
-        if(stage.equals(this.stage))
+        if(stageName.equals(this.stageName))
         {
             return this;
         }
 
         for(RecipeResultNode child: children)
         {
-            RecipeResultNode found = child.findNode(stage);
+            RecipeResultNode found = child.findNode(stageName);
             if(found != null)
             {
                 return found;

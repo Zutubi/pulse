@@ -1,5 +1,6 @@
 package com.zutubi.pulse.model;
 
+import com.zutubi.pulse.core.model.PersistentName;
 import com.zutubi.pulse.core.model.Revision;
 import com.zutubi.pulse.scm.SCMException;
 
@@ -73,7 +74,7 @@ public class ChangelistIsolator
     {
         for (int first = 0; /* forever */; first++)
         {
-            List<BuildResult> latest = buildManager.queryBuilds(new Project[]{project}, null, new String[]{specification.getName()}, -1, -1, null, first, 1, true);
+            List<BuildResult> latest = buildManager.queryBuilds(new Project[]{project}, null, new PersistentName[]{specification.getPname()}, -1, -1, null, first, 1, true);
             if (latest.size() > 0)
             {
                 BuildScmDetails scmDetails = latest.get(0).getScmDetails();

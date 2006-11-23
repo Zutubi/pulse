@@ -1,10 +1,9 @@
 package com.zutubi.pulse.test;
 
 import com.zutubi.pulse.MasterBuildPaths;
-import com.zutubi.pulse.committransformers.JiraCommitMessageTransformer;
-import com.zutubi.pulse.core.model.NumericalFileRevision;
 import com.zutubi.pulse.agent.AgentManager;
 import com.zutubi.pulse.bootstrap.MasterConfigurationManager;
+import com.zutubi.pulse.committransformers.JiraCommitMessageTransformer;
 import com.zutubi.pulse.core.*;
 import com.zutubi.pulse.core.model.*;
 import com.zutubi.pulse.model.*;
@@ -271,13 +270,13 @@ public class SetupFeatureTour implements Runnable
     private void addBuildResult()
     {
         BuildResult previous = build;
-        build = new BuildResult(new TriggerBuildReason("scm trigger"), project, "default", ++buildNumber);
+        BuildSpecification spec = project.getBuildSpecifications().get(0);
+        build = new BuildResult(new TriggerBuildReason("scm trigger"), project, spec, ++buildNumber);
         buildResultDao.save(build);
 
         project.setNextBuildNumber(buildNumber);
         projectDao.save(project);
 
-        BuildSpecification spec = project.getBuildSpecifications().get(0);
         int i = 0;
         recipes = new RecipeResult[spec.getRoot().getChildren().size()];
 
@@ -289,7 +288,7 @@ public class SetupFeatureTour implements Runnable
             File recipeDir = masterBuildPaths.getRecipeDir(build, recipes[i].getId());
             recipes[i].commence();
             recipes[i].setAbsoluteOutputDir(configManager.getDataDirectory(), recipeDir);
-            RecipeResultNode node = new RecipeResultNode(specNode.getStage().getName(), recipes[i]);
+            RecipeResultNode node = new RecipeResultNode(specNode.getStage().getPname(), recipes[i]);
             node.setHost(specNode.getStage().getHostRequirements().getSummary());
             build.getRoot().addChild(node);
             i++;

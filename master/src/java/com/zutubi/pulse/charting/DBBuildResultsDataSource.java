@@ -30,7 +30,7 @@ public class DBBuildResultsDataSource implements BuildResultsDataSource
 
     public BuildResultsResultSet getLastByBuilds(int builds)
     {
-        List<BuildResult> results = buildResultDao.findLatestCompleted(project, spec.getName(), 0, builds);
+        List<BuildResult> results = buildResultDao.findLatestCompleted(project, spec.getPname(), 0, builds);
         return new BuildResultsResultSet(results);
     }
 
@@ -43,7 +43,7 @@ public class DBBuildResultsDataSource implements BuildResultsDataSource
         cal.set(Calendar.SECOND, 0);
         cal.set(Calendar.MILLISECOND, 0);
         
-        List<BuildResult> results = buildResultDao.findSinceByProject(project, spec.getName(), cal.getTime());
+        List<BuildResult> results = buildResultDao.findSinceByProject(project, spec.getPname(), cal.getTime());
         return new BuildResultsResultSet(results);
     }
 

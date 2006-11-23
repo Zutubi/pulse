@@ -17,11 +17,6 @@ public class HibernateBuildSpecificationDao extends HibernateEntityDao<BuildSpec
         return BuildSpecification.class;
     }
 
-    public BuildSpecification findByName(String name)
-    {
-        return (BuildSpecification) findUniqueByNamedQuery("findBuildSpecificationByName", "name", name, true);
-    }
-
     public List<BuildSpecification> findBySlave(final Slave slave)
     {
         List<BuildSpecification> all = findAll();
