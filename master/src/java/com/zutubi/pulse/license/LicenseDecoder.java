@@ -104,12 +104,16 @@ public class LicenseDecoder
             }
 
 
-            LicenseType type = LicenseType.valueOf(code);
-            if (type == null)
+            LicenseType type;
+            try
+            {
+                type = LicenseType.valueOf(code);
+            }
+            catch(IllegalArgumentException e)
             {
                 return null;
             }
-            
+
             Date expiryDate = null;
             if (!expiryString.equals("Never"))
             {
