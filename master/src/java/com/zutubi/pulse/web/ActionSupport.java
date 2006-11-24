@@ -11,8 +11,10 @@ import com.zutubi.pulse.model.ProjectManager;
 import com.zutubi.pulse.security.AcegiUtils;
 import com.zutubi.pulse.util.StringUtils;
 import com.zutubi.pulse.util.TimeStamps;
+import com.zutubi.pulse.util.logging.Logger;
 import com.zutubi.pulse.xwork.TextProviderSupport;
 import com.zutubi.pulse.xwork.interceptor.Cancelable;
+import com.zutubi.pulse.bootstrap.ComponentContext;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
@@ -27,6 +29,8 @@ import java.util.ResourceBundle;
  */
 public class ActionSupport extends com.opensymphony.xwork.ActionSupport implements Cancelable
 {
+    private static final Logger LOG = Logger.getLogger(ActionSupport.class);
+
     protected static final String ERROR_REQUEST_URI = "javax.servlet.error.request_uri";
     protected static final String ERROR_MESSAGE = "javax.servlet.error.message";
     protected static final String ERROR_STATUS_CODE = "javax.servlet.error.status_code";
@@ -177,24 +181,31 @@ public class ActionSupport extends com.opensymphony.xwork.ActionSupport implemen
 
     public ProjectManager getProjectManager()
     {
-        return projectManager;
-    }
+        // Sorry, a hack on a hack, but Tasmania calls
+        if(projectManager == null)
+        {
+            projectManager = (ProjectManager) ComponentContext.getBean("projectManager");
+        }
 
-    public void setProjectManager(ProjectManager manager)
-    {
-        projectManager = manager;
+        return projectManager;
     }
 
     public void updateChangeUrl(Project project, Revision revision)
     {
-        if(project != null && project.getChangeViewer() != null)
+        try
         {
-            changeUrl = project.getChangeViewer().getChangesetURL(revision);
+            if(revision != null && project != null && project.getChangeViewer() != null)
+            {
+                changeUrl = project.getChangeViewer().getChangesetURL(revision);
+                return;
+            }
         }
-        else
+        catch (Exception e)
         {
-            changeUrl = null;
+            LOG.severe(e);
         }
+
+        changeUrl = null;
     }
 
     public String getChangeUrl()
@@ -205,19 +216,32 @@ public class ActionSupport extends com.opensymphony.xwork.ActionSupport implemen
     public void updateChangeUrl(Changelist changelist)
     {
         // We cache the URL as velocity null handling is brain dead
-        Revision revision = changelist.getRevision();
-        for(long id: changelist.getProjectIds())
+        try
         {
-            Project p = projectManager.getProject(id);
-            if(p != null && p.getChangeViewer() != null)
+            if (changelist != null)
             {
-                String url = p.getChangeViewer().getChangesetURL(revision);
-                if(url != null)
+                Revision revision = changelist.getRevision();
+                if (revision != null)
                 {
-                    changeUrl = url;
-                    return;
+                    for(long id: changelist.getProjectIds())
+                    {
+                        Project p = getProjectManager().getProject(id);
+                        if(p != null && p.getChangeViewer() != null)
+                        {
+                            String url = p.getChangeViewer().getChangesetURL(revision);
+                            if(url != null)
+                            {
+                                changeUrl = url;
+                                return;
+                            }
+                        }
+                    }
                 }
             }
+        }
+        catch (Exception e)
+        {
+            LOG.severe(e);
         }
 
         changeUrl = null;
