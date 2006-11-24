@@ -43,4 +43,4 @@ if %CODE% equ 111 goto restart
 
 @endlocal
 
-exit %CODE%
+exit /B %CODE%
