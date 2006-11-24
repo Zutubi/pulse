@@ -50,6 +50,7 @@ public class BuildController implements EventListener
     private ProjectManager projectManager;
     private UserManager userManager;
     private BuildManager buildManager;
+    private TestManager testManager;
     private MasterConfigurationManager configurationManager;
     private RecipeQueue queue;
     private RecipeResultCollector collector;
@@ -63,7 +64,7 @@ public class BuildController implements EventListener
     private BuildResult previousSuccessful;
     private List<ResourceProperty> buildProperties;
 
-    public BuildController(AbstractBuildRequestEvent event, BuildSpecification specification, EventManager eventManager, ProjectManager projectManager, UserManager userManager, BuildManager buildManager, RecipeQueue queue, RecipeResultCollector collector, Scheduler quartScheduler, MasterConfigurationManager configManager, ServiceTokenManager serviceTokenManager)
+    public BuildController(AbstractBuildRequestEvent event, BuildSpecification specification, EventManager eventManager, ProjectManager projectManager, UserManager userManager, BuildManager buildManager, TestManager testManager, RecipeQueue queue, RecipeResultCollector collector, Scheduler quartScheduler, MasterConfigurationManager configManager, ServiceTokenManager serviceTokenManager)
     {
         this.request = event;
         this.project = event.getProject();
@@ -72,6 +73,7 @@ public class BuildController implements EventListener
         this.projectManager = projectManager;
         this.userManager = userManager;
         this.buildManager = buildManager;
+        this.testManager = testManager;
         this.queue = queue;
         this.collector = collector;
         this.quartzScheduler = quartScheduler;
@@ -600,6 +602,7 @@ public class BuildController implements EventListener
             }
         }
 
+        testManager.index(buildResult);
         buildManager.save(buildResult);
 
         tree.cleanup(buildResult);

@@ -20,6 +20,11 @@ public abstract class TestReportPostProcessor implements PostProcessor
         this.name = name;
     }
 
+    public boolean getFailOnFailure()
+    {
+        return failOnFailure;
+    }
+
     public void setFailOnFailure(boolean failOnFailure)
     {
         this.failOnFailure = failOnFailure;

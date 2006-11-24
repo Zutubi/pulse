@@ -1592,16 +1592,17 @@
             #if($recipeNode.hasBrokenTests())
     <table class="fill-content">
         <tr>
-            <th class="heading" colspan="3">
+            <th class="heading" colspan="5">
                 #wwtext("name=build.stage") :: $!webwork.htmlEncode($recipeNode.stage) :: $!webwork.htmlEncode("$recipeNode.result.recipeNameSafe@$recipeNode.hostSafe")
             </th>
         </tr>
         #set($excess = $recipeNode.result.excessFailureCount)
         #if($excess > 0)
-            #noteRow($action.getText("test.excess.failures", [$excess]) 3)
+            #noteRow($action.getText("test.excess.failures", [$excess]) 5)
         #end
         <tr>
             #contentHeading("test.name" 1)
+            #contentHeading("test.status" 2)
             #contentHeading("test.details" 1)
             #contentHeading("test.duration" 1)
         </tr>
@@ -1764,23 +1765,32 @@
 #end
 
 ##
+## Shows a test status cell for a broken case.
+##
+#macro(brokenTestStatusCell $test $key)
+    <td class="test-failure">
+    #if($test.wasBrokenPreviously())
+        <img alt="broken test" src="$base/images/exclamation-bw.gif"/>
+    #else
+        <img alt="broken test" src="$base/images/exclamation.gif"/>
+    #end
+    </td>
+    <td class="test-failure">
+        #wwtext("name=$key")
+        #if($test.wasBrokenPreviously())
+            <br/>(<a href="viewBuild.action?id=$test.brokenSince">#wwtext("name=test.broken.since") $test.brokenNumber</a>)
+        #end
+    </td>
+#end
+
+##
 ## Outputs a status cell for a test result
 ##
 #macro(testStatusCell $test)
     #if($test.errors > 0)
-    <td class="test-failure">
-        <img alt="failure" src="$base/images/exclamation.gif"/>
-    </td>
-    <td class="test-failure">
-        #wwtext("name=test.error")
-    </td>
+        #brokenTestStatusCell($test "test.error")
     #elseif($test.failures > 0)
-    <td class="test-failure">
-        <img alt="failure" src="$base/images/exclamation.gif"/>
-    </td>
-    <td class="test-failure">
-        #wwtext("name=test.failure")
-    </td>
+        #brokenTestStatusCell($test "test.failure")
     #elseif($tests.total == 0)
     <td>
         <img alt="success" src="$base/images/none_blue.gif"/>
@@ -1794,6 +1804,9 @@
     </td>
     <td class="success">
         #wwtext("name=test.passed")
+        #if($test.fixed)
+            <br/>(#wwtext("name=test.fixed"))
+        #end
     </td>
     #end
 #end
@@ -1853,7 +1866,8 @@
     <tr>
         <td class="test-failure content-nowrap">
              ${indent}$!webwork.htmlEncode($test.name)
-         </td>
+        </td>
+        #testStatusCell($test) 
     #if($test.message)
         <td class="content-wrap">
             $action.plainToHtml($test.message)
@@ -1879,6 +1893,8 @@
         <td class="test-failure content-nowrap">
              ${indent}<a href='viewTestSuite.action?id=$build.id&amp;nodeId=$recipe.id&amp;path=$action.urlEncode($path)'>$!webwork.htmlEncode($test.name)</a>
          </td>
+        #contentCell("empty.cell")
+        #contentCell("empty.cell")
         #contentCell("empty.cell")
         <td class="content" width="10%">
             $!webwork.htmlEncode($test.prettyDuration)

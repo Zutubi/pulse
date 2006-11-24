@@ -26,6 +26,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import ognl.OgnlParser;
+
 /**
  *
  *
@@ -44,6 +46,7 @@ public class DefaultBuildManager implements BuildManager, EventListener
     private Scheduler scheduler;
     private MasterConfigurationManager configurationManager;
     private EventManager eventManager;
+    private TestManager testManager;
 
     private static final String CLEANUP_NAME = "cleanup";
     private static final String CLEANUP_GROUP = "services";
@@ -366,6 +369,7 @@ public class DefaultBuildManager implements BuildManager, EventListener
             build.abortUnfinishedRecipes();
             build.error(message);
             build.complete();
+            testManager.index(build);
             save(build);
         }
     }
@@ -588,5 +592,10 @@ public class DefaultBuildManager implements BuildManager, EventListener
     public void setEventManager(EventManager eventManager)
     {
         this.eventManager = eventManager;
+    }
+
+    public void setTestManager(TestManager testManager)
+    {
+        this.testManager = testManager;
     }
 }

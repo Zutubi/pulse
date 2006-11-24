@@ -325,6 +325,26 @@ This context requires:
     </bean>
 
 
+    <bean id="testCaseIndexDaoTarget" class="com.zutubi.pulse.model.persistence.hibernate.HibernateTestCaseIndexDao">
+        <property name="sessionFactory">
+            <ref bean="sessionFactory"/>
+        </property>
+    </bean>
+    <bean id="testCaseIndexDao" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
+        <property name="transactionManager">
+            <ref bean="transactionManager"/>
+        </property>
+        <property name="target">
+            <ref bean="testCaseIndexDaoTarget"/>
+        </property>
+        <property name="transactionAttributes">
+            <props>
+                <prop key="*">PROPAGATION_REQUIRED</prop>
+            </props>
+        </property>
+    </bean>
+
+
     <bean id="scmDaoTarget" class="com.zutubi.pulse.model.persistence.hibernate.HibernateScmDao">
         <property name="sessionFactory">
             <ref bean="sessionFactory"/>

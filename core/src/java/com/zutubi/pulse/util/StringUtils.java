@@ -3,6 +3,8 @@ package com.zutubi.pulse.util;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
+import java.net.URLEncoder;
+import java.io.UnsupportedEncodingException;
 
 /**
  */
@@ -423,5 +425,18 @@ public class StringUtils
         }
 
         return result.toString();
+    }
+
+
+    public static String urlEncode(String s)
+    {
+        try
+        {
+            return URLEncoder.encode(s, "UTF-8");
+        }
+        catch (UnsupportedEncodingException e)
+        {
+            return s;
+        }
     }
 }

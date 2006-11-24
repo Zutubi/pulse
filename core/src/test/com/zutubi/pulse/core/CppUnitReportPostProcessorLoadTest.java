@@ -8,4 +8,10 @@ public class CppUnitReportPostProcessorLoadTest extends FileLoaderTestBase
     {
         referenceHelper("cppunit");
     }
+
+    public void testNoFail() throws PulseException
+    {
+        CppUnitReportPostProcessor pp = referenceHelper("nofail");
+        assertFalse(pp.getFailOnFailure());
+    }
 }

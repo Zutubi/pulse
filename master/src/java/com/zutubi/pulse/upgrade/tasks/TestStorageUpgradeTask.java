@@ -21,7 +21,7 @@ public class TestStorageUpgradeTask extends DatabaseUpgradeTask implements Confi
     private static final Logger LOG = Logger.getLogger(TestStorageUpgradeTask.class);
     private MasterConfigurationManager configurationManager;
     private long nextId;
-    private TestSuitePersister persister = new TestSuitePersister();
+    private OriginalTestSuitePersister persister = new OriginalTestSuitePersister();
 
     public String getName()
     {

@@ -46,6 +46,7 @@ public class FatController implements EventListener, Stoppable
     private EventManager eventManager;
     private AsynchronousDelegatingListener asyncListener;
     private BuildManager buildManager;
+    private TestManager testManager;
     private MasterConfigurationManager configManager;
     private RecipeQueue recipeQueue;
 
@@ -245,7 +246,7 @@ public class FatController implements EventListener, Stoppable
                 }
                 
                 RecipeResultCollector collector = new DefaultRecipeResultCollector(configManager);
-                BuildController controller = new BuildController(event, buildSpec, eventManager, projectManager, userManager, buildManager, recipeQueue, collector, quartzScheduler, configManager, serviceTokenManager);
+                BuildController controller = new BuildController(event, buildSpec, eventManager, projectManager, userManager, buildManager, testManager, recipeQueue, collector, quartzScheduler, configManager, serviceTokenManager);
                 controller.run();
                 runningBuilds.add(controller);
             }
@@ -410,5 +411,10 @@ public class FatController implements EventListener, Stoppable
     public boolean cancelQueuedBuild(long id)
     {
         return buildQueue.cancelBuild(id);
+    }
+
+    public void setTestManager(TestManager testManager)
+    {
+        this.testManager = testManager;
     }
 }

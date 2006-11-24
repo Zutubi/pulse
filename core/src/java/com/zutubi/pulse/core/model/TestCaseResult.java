@@ -20,7 +20,22 @@ public class TestCaseResult extends TestResult
      * Error/failure message when things have gone pear-shaped.
      */
     private String message;
+    /**
+     * If broken in an earlier build, id of that build.  Only available after
+     * indexing.
+     */
+    private long brokenSince = 0;
+    /**
+     * If broken in an earlier build, number of that build.  Only available
+     * after indexing.
+     */
+    private long brokenNumber = 0;
+    /**
+     * True if fixed in this build.  Only available after indexing.
+     */
+    private boolean fixed = false;
 
+    
     public TestCaseResult()
     {
     }
@@ -90,6 +105,41 @@ public class TestCaseResult extends TestResult
     public boolean isSuite()
     {
         return false;
+    }
+
+    public boolean wasBrokenPreviously()
+    {
+        return brokenSince != 0;
+    }
+
+    public long getBrokenSince()
+    {
+        return brokenSince;
+    }
+
+    public void setBrokenSince(long brokenSince)
+    {
+        this.brokenSince = brokenSince;
+    }
+
+    public long getBrokenNumber()
+    {
+        return brokenNumber;
+    }
+
+    public void setBrokenNumber(long brokenNumber)
+    {
+        this.brokenNumber = brokenNumber;
+    }
+
+    public boolean isFixed()
+    {
+        return fixed;
+    }
+
+    public void setFixed(boolean fixed)
+    {
+        this.fixed = fixed;
     }
 
     public boolean isEquivalent(TestResult otherResult)
