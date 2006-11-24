@@ -161,7 +161,7 @@ public class HistoryAction extends ProjectActionSupport implements Preparable
 
         HistoryPage page = new HistoryPage(project, pagingSupport.getStartOffset(), pagingSupport.getItemsPerPage());
 
-        if (stateFilter.equals(STATE_ANY) && spec == null || spec == 0L)
+        if (stateFilter.equals(STATE_ANY) && (spec == null || spec == 0L))
         {
             // Common case
             getBuildManager().fillHistoryPage(page);

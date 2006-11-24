@@ -113,6 +113,7 @@ public class BuildController implements EventListener
         buildResult = request.createResult(projectManager, userManager);
         buildManager.save(buildResult);
         previousSuccessful = getPreviousSuccessfulBuild();
+        buildProperties = specification.copyProperties();
         configure(root, buildResult.getRoot(), specification, specification.getRoot());
 
         return tree;
@@ -144,7 +145,6 @@ public class BuildController implements EventListener
             recipeResult.setAbsoluteOutputDir(configurationManager.getDataDirectory(), recipeOutputDir);
 
             boolean incremental = !request.isPersonal() && specification.getCheckoutScheme() == BuildSpecification.CheckoutScheme.INCREMENTAL_UPDATE;
-            buildProperties = specification.copyProperties();
             RecipeRequest recipeRequest = new RecipeRequest(project.getName(), specification.getName(), recipeResult.getId(), stage.getRecipe(), incremental, getResourceRequirements(specification, node), buildProperties);
             RecipeDispatchRequest dispatchRequest = new RecipeDispatchRequest(stage.getHostRequirements(), request.getRevision(), recipeRequest, buildResult);
             DefaultRecipeLogger logger = new DefaultRecipeLogger(new File(paths.getRecipeDir(buildResult, recipeResult.getId()), RecipeResult.RECIPE_LOG));

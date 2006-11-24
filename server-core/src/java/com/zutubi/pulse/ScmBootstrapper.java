@@ -25,7 +25,7 @@ public abstract class ScmBootstrapper implements Bootstrapper, SCMCheckoutEventH
     protected Scm scm;
     protected BuildRevision revision;
     protected boolean terminated = false;
-    protected PrintWriter outputWriter;
+    protected transient PrintWriter outputWriter;
 
     public ScmBootstrapper(String project, String spec, Scm scm, BuildRevision revision)
     {
