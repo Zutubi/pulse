@@ -35,8 +35,7 @@ ZUTUBI.widget.Toolbar.prototype = {
 
     draw: function()
     {
-        var html = this.getHtml();
-        document.getElementById(this.id).innerHTML = html;
+        document.getElementById(this.id).innerHTML = this.getHtml();
     },
 
     getElId: function()
@@ -335,7 +334,7 @@ ZUTUBI.widget.Tooltip.prototype = {
     monitorMouseMovement: function(event)
     {
         var mLoc = {"x":Event.pointerX(event), "y":Event.pointerY(event)};
-        // todo: this should be the window offset so this works when the window scrollbars are out.
+        // todo: this should be the window offset so this works when the window scrollbars are visible.
         var wLoc = {"x":0, "y":0};
         var offset = {"x":12, "y":8};
 

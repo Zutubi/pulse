@@ -151,10 +151,12 @@ public class DefaultScmManager implements ScmManager, Stoppable
             }
         }
 
+/*
         if (executor.getPoolSize() < 10)
         {
             LOG.error("Scm polling pool size has dropped below minimum. Size is now: " + executor.getPoolSize());
         }
+*/
     }
 
     private void process(Scm scm)

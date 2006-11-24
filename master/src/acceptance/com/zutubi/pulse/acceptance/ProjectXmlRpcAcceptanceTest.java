@@ -1,7 +1,6 @@
 package com.zutubi.pulse.acceptance;
 
 import com.zutubi.pulse.util.RandomUtils;
-import com.zutubi.pulse.util.Constants;
 import org.apache.xmlrpc.XmlRpcException;
 
 import java.io.IOException;

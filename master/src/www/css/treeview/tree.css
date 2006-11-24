@@ -54,7 +54,7 @@
 }
 
 /*---( Treeview node styles )---*/
-.file {
+.file, .file_o {
     background: url(../../images/treeview/file.gif) 0 0 no-repeat; width:16px; height:22px; cursor:pointer;
 }
 
@@ -64,6 +64,54 @@
 
 .folder_o {
     background: url(../../images/treeview/o.gif) 0 0 no-repeat; width:16px; height:22px; cursor:pointer;
+}
+
+/*---( Actions )---*/
+
+td.archive {
+    background: url(../../images/compress.gif) 0 4px no-repeat; width:16px; height:22px; cursor:pointer;
+}
+
+td.decorate {
+    background: url(../../images/page_white_paint.png) 0 4px no-repeat; width:16px; height:22px; cursor:pointer;
+}
+
+td.download {
+    background: url(../../images/arrow_down.gif) 0 4px no-repeat; width:16px; height:22px; cursor:pointer;
+}
+
+
+#legend {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+li.decorate
+{
+    background-image: url(../../images/page_white_paint.png);
+    background-repeat: no-repeat;
+    background-position: 0 50%;
+    padding: 3px 0 3px 20px;
+    margin: .4em 0;
+}
+
+li.archive
+{
+    background-image: url(../../images/compress.gif);
+    background-repeat: no-repeat;
+    background-position: 0 50%;
+    padding: 3px 0 3px 20px;
+    margin: .4em 0;
+}
+
+li.download
+{
+    background-image: url(../../images/arrow_down.gif);
+    background-repeat: no-repeat;
+    background-position: 0 50%;
+    padding: 3px 0 3px 20px;
+    margin: .4em 0;
 }
 
 /* TODO: view reference needs to be removed, and replaced with a generic reference defined within the treeview.js */
@@ -77,3 +125,22 @@
     color:white;
 }
 
+/*--- ( Artifact tree view. ) ---*/
+#artifactTree a, #artifactTree a:hover {
+    border-bottom: none;
+    font-weight: normal;
+}
+
+#artifactTree .selected {
+    color:black;
+}
+
+/*--- ( Working Copy tree view. ) ---*/
+#wcTree a, #wcTree a:hover {
+    border-bottom: none;
+    font-weight: normal;
+}
+
+#wcTree .selected {
+    color:black;
+}

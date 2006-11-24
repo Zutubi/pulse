@@ -3,6 +3,8 @@ package com.zutubi.pulse.web.project;
 import com.zutubi.pulse.model.BuildResult;
 import com.zutubi.pulse.model.Project;
 
+import java.io.File;
+
 /**
  *
  *
@@ -30,6 +32,11 @@ public class ViewArtifactsAction extends ProjectActionSupport
     public BuildResult getResult()
     {
         return result;
+    }
+
+    public String getSeparator()
+    {
+        return File.separator.replace("\\", "\\\\");
     }
 
     public String execute()

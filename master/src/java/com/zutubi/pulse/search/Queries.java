@@ -35,4 +35,11 @@ public class Queries
         q.setSessionFactory(sessionFactory);
         return q;
     }
+
+    public SearchQuery<String> getStrings(Class type)
+    {
+        SearchQuery<String> q = new SearchQuery<String>(type);
+        q.setSessionFactory(sessionFactory);
+        return q;
+    }
 }

@@ -26,92 +26,18 @@
                 return;
             }
 
-            var tree = new ZUTUBI.widget.TreeView('browseTree');
+            var tree = new ZUTUBI.widget.PulseTreeView('browseTree');
             tree.setSeparator('$separator');
-            tree.setDynamicLoad(function(node, onCompleteCallback)
-            {
-                ls(node, onCompleteCallback, false);
-            }, 1);
-
-            tree.onActivate = function(node)
-            {
-                if (!node.isContainer())
-                {
-                    // display the contents of that node..
-                    document.location = node.href;
-                }
-            };
+            tree.setFSRoot('pulse:///projects/$project.name/builds/$buildResult.id/wc/');
+            tree.setBase('$base');
 
             // load the root nodes for the file system, then draw the tree.
             Element.show($('loading'));
-            ls(tree.getRoot(), function()
+            tree.ls(tree.getRoot(), function()
             {
                 Element.hide($('loading'));
                 tree.draw();
-            });
-        }
-
-        function ls(node, onCompleteCallback, dirOnly)
-        {
-            // generate id path.
-            var p = node.tree.getIdPath(node);
-
-            var ajax = new Ajax.Request(
-                "$base/lsProjDir.action",
-                {
-                    method: 'get',
-                    onComplete: lsResponse(node, onCompleteCallback),
-                    onFailure: handleFailure,
-                    onException: handleException,
-                    parameters: "path=" + p + "&buildId=$buildResult.id"
-                }
-            );
-        }
-
-        function lsResponse(parentNode, callback)
-        {
-            return function(response)
-            {
-                var jsonObj = eval("(" + response.responseText + ")");
-
-                var results = $A(jsonObj.listing);
-                results.each(function(obj)
-                {
-                    var data = {
-                        "id":obj.id,
-                        "name":obj.file,
-                        "label":obj.file,
-                        "type":obj.type,
-                        "container":obj.container
-                    };
-                    var node = new ZUTUBI.widget.FileNode(data, parentNode, false);
-                    if (!node.isContainer())
-                    {
-                        node.href = "/cat.action?buildId=$buildResult.id&path=" + node.getIdPath();
-                    }
-
-                    // override the default onclick behaviour to trigger the download.
-                    node.onLabelClick = function(me)
-                    {
-                        return (!this.isContainer());
-                    };
-
-                });
-                if (callback)
-                {
-                    callback();
-                }
-            };
-        }
-
-        handleFailure = function(e, e2)
-        {
-            alert("handleFailure");
-        }
-
-        handleException = function(e, e2)
-        {
-            openDebugAlert(e2);
+            }, true, false);
         }
 
     </script>
@@ -124,12 +50,12 @@
 
 #if ($buildResult.getHasWorkDir())
         <p>
-            The tree below allows you to navigate through the working directory for this build.  To download a file, click on it.
+            The tree below allows you to navigate through the working directory for this build.  Click on the <img src="$base/images/arrow_down.gif"/> to download it.
         </p>
 
         #if($buildResult.completed())
             <div id="loading" style="display:none;"><img src="$base/images/treeview/loading.gif" alt="loading..."/></div>
-            <div id="view">
+            <div id="wcTree">
                 <div id="browseTree"></div>
             </div>
         #else

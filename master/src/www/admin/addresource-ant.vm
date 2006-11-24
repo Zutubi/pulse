@@ -11,7 +11,7 @@
     	{
     	    if ($agentId == -1)
     	    {
-    	        openFileDialog('$base/popups/fileDialog.action', 'resource.add.ant', 'dir', 'file:///', false, false, false);
+    	        openFileDialog('$base/popups/fileDialog.action', 'resource.add.ant', 'dir', 'local:///', false, false, false);
     	    }
     	    else
     	    {

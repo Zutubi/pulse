@@ -5,6 +5,10 @@ import org.apache.commons.vfs.FileType;
 import org.apache.commons.vfs.FileSystemException;
 
 import java.io.File;
+import java.util.List;
+import java.util.Collections;
+
+import com.zutubi.pulse.vfs.pulse.PulseFileObject;
 
 /**
  * <class comment/>
@@ -23,6 +27,10 @@ public class FileObjectWrapper
      */
     public String getName()
     {
+        if (fo instanceof PulseFileObject)
+        {
+            return ((PulseFileObject)fo).getDisplayName();
+        }
         return fo.getName().getBaseName();
     }
 
@@ -56,7 +64,7 @@ public class FileObjectWrapper
      */
     public String getId()
     {
-        return getName();
+        return fo.getName().getBaseName();
     }
 
     /**
@@ -77,5 +85,14 @@ public class FileObjectWrapper
     public String getSeparator()
     {
         return File.separator;
-    }    
+    }
+
+    public List<String> getActions()
+    {
+        if (fo instanceof PulseFileObject)
+        {
+            return ((PulseFileObject)fo).getActions();
+        }
+        return Collections.EMPTY_LIST;
+    }
 }

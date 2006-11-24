@@ -89,6 +89,18 @@ YAHOO.extend(ZUTUBI.widget.TreeView, YAHOO.widget.TreeView, {
         }
     },
 
+    /**
+     * Override this method to receive onAction callbacks.
+     *
+     * node:    the node on which the action is being executed.
+     * action:  the action string identifying the action
+     *
+     */
+    onAction: function(node, action)
+    {
+
+    },
+
     // --- ( utility methods. ) ---
 
     /**
@@ -296,13 +308,19 @@ YAHOO.extend(ZUTUBI.widget.RootNode, YAHOO.widget.RootNode, {
 ZUTUBI.widget.FileNode = function(oData, oParent, expanded) {
 
     this.type = "FileNode";
-	if (oParent) {
+	if (oParent)
+    {
 		this.init(oData, oParent, expanded);
 	}
     this.setUpLabel(oData);
 };
 
 YAHOO.extend(ZUTUBI.widget.FileNode, YAHOO.widget.TextNode, {
+
+    getActions: function()
+    {
+        return this.data.actions;    
+    },
 
     isRoot: function()
     {
@@ -387,6 +405,18 @@ YAHOO.extend(ZUTUBI.widget.FileNode, YAHOO.widget.TextNode, {
         return false;
     },
 
+    onActionClick: function(action)
+    {
+        this.tree.onAction(this, action);
+        return false;
+    },
+
+    getActionLink: function(action)
+    {
+        return "YAHOO.widget.TreeView.getNode(\'" + this.tree.id + "\'," +
+            this.index + ").onActionClick(\'"+action+"\')";
+    },
+
     // overrides YAHOO.widget.TextNode
     getNodeHtml: function()
     {
@@ -448,10 +478,137 @@ YAHOO.extend(ZUTUBI.widget.FileNode, YAHOO.widget.TextNode, {
         sb[sb.length] = ' >';
         sb[sb.length] = this.label;
         sb[sb.length] = '</a>';
+        sb[sb.length] = '&nbsp;';
         sb[sb.length] = '</td>';
+
+        // render the actions.
+        var actions = $A(this.getActions());
+        var self = this;
+        actions.each(function(action)
+        {
+            sb[sb.length] = '<td class="'+action+'"';
+            sb[sb.length] = ' onclick="javascript:' + self.getActionLink(action) + '"';
+            sb[sb.length] = '>';
+            sb[sb.length] = '&nbsp;';
+            sb[sb.length] = '</td>';
+        });
+
         sb[sb.length] = '</tr>';
         sb[sb.length] = '</table>';
 
         return sb.join("");
     }
 });
+
+ZUTUBI.widget.PulseTreeView = function(id)
+{
+    if (id)
+    {
+        this.init(id);
+        var self = this;
+        this.setDynamicLoad(function(node, onCompleteCallback)
+        {
+            self.ls(node, onCompleteCallback, true, false);
+        }, 1);
+    }
+};
+
+YAHOO.extend(ZUTUBI.widget.PulseTreeView, ZUTUBI.widget.TreeView, {
+
+    fsRoot:null,
+
+    base:null,
+
+    setFSRoot: function(root)
+    {
+        this.fsRoot = root;
+    },
+
+    setBase: function(base)
+    {
+        this.base = base;
+    },
+
+    onAction: function(node, action)
+    {
+        if (action == "download")
+        {
+            document.location = this.base+"/cat.action?root="+this.fsRoot+"&path=" + node.getIdPath();
+        }
+        if (action == "decorate")
+        {
+            document.location = this.base+"/viewArtifact.action?root="+this.fsRoot+"&path=" + node.getIdPath();
+        }
+        if (action == "archive")
+        {
+            document.location = this.base+"/zip.action?root="+this.fsRoot+"&path=" + node.getIdPath();
+        }
+    },
+
+    ls: function(node, onCompleteCallback, showFiles, showHidden)
+    {
+        // generate id path.
+        var p = "";
+        if (node.tree.getIdPath)
+        {
+            // not available for Yahoo.widget.RootNodes
+            p = node.tree.getIdPath(node);
+        }
+
+        var ajax = new Ajax.Request(
+            this.base+"/ajax/ls.action",
+            {
+                method: 'post',
+                onComplete: this.lsResponse(node, onCompleteCallback),
+                onFailure: this.handleFailure,
+                onException: this.handleException,
+                parameters: "root="+this.fsRoot+"&path=" + p +
+                             (showFiles && "&showFiles=" + showFiles || "") +
+                             (showHidden && "&showHidden=" + showHidden || "")
+            }
+        );
+    },
+
+    lsResponse: function(parentNode, callback)
+    {
+        return function(response)
+        {
+            var jsonObj = eval("(" + response.responseText + ")");
+
+            var results = $A(jsonObj.listing);
+            results.each(function(obj)
+            {
+                var data = {
+                    "id":obj.id,
+                    "name":obj.file,
+                    "label":obj.file,
+                    "type":obj.type,
+                    "container":obj.container,
+                    "actions":obj.actions
+                };
+                var node = new ZUTUBI.widget.FileNode(data, parentNode, false);
+
+                // override the default onclick behaviour to trigger the download.
+                node.onLabelClick = function(me)
+                {
+                    return this.isContainer();
+                };
+
+            });
+            if (callback)
+            {
+                callback();
+            }
+        };
+    },
+
+    handleFailure: function(e, e2)
+    {
+        alert("handleFailure");
+    },
+
+    handleException: function(e, e2)
+    {
+        openDebugAlert(e2);
+    }
+})

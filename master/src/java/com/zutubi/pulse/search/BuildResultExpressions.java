@@ -19,6 +19,11 @@ public class BuildResultExpressions
         return Expression.eq("project", project);
     }
 
+    public static Criterion projectEq(long projectId)
+    {
+        return Expression.eq("project.id", projectId);
+    }
+
     public static Criterion projectIn(Collection<Project> projects)
     {
         return Expression.in("project", projects);

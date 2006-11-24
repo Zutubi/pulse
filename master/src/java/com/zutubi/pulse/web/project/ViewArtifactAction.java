@@ -1,12 +1,18 @@
 package com.zutubi.pulse.web.project;
 
-import com.zutubi.pulse.bootstrap.MasterConfigurationManager;
 import com.zutubi.pulse.core.model.CommandResult;
 import com.zutubi.pulse.core.model.Feature;
 import com.zutubi.pulse.core.model.PlainFeature;
 import com.zutubi.pulse.core.model.StoredFileArtifact;
 import com.zutubi.pulse.model.BuildResult;
 import com.zutubi.pulse.util.logging.Logger;
+import com.zutubi.pulse.vfs.pulse.BuildResultNode;
+import com.zutubi.pulse.vfs.pulse.CommandResultNode;
+import com.zutubi.pulse.vfs.pulse.PulseFileObject;
+import com.zutubi.pulse.vfs.pulse.StoredFileArtifactNode;
+import com.zutubi.pulse.web.vfs.VFSActionSupport;
+import org.apache.commons.vfs.FileObject;
+import org.apache.commons.vfs.FileSystemException;
 
 import java.io.*;
 import java.util.Iterator;
@@ -17,48 +23,32 @@ import java.util.TreeMap;
  * 
  *
  */
-public class ViewArtifactAction extends ProjectActionSupport
+public class ViewArtifactAction extends VFSActionSupport
 {
     private static final Logger LOG = Logger.getLogger(ViewArtifactAction.class);
 
+/*
     private long id;
     private long buildId;
     private long commandId;
+*/
     private BuildResult buildResult;
     private CommandResult commandResult;
     private StoredFileArtifact artifact;
     private BufferedReader reader;
     private Map<Long, Feature.Level> lineLevels;
-    private MasterConfigurationManager configurationManager;
 
-    public long getId()
+    private String path;
+    private String root;
+
+    public void setPath(String path)
     {
-        return id;
+        this.path = path;
     }
 
-    public void setId(long id)
+    public void setRoot(String root)
     {
-        this.id = id;
-    }
-
-    public long getBuildId()
-    {
-        return buildId;
-    }
-
-    public void setBuildId(long buildId)
-    {
-        this.buildId = buildId;
-    }
-
-    public long getCommandId()
-    {
-        return commandId;
-    }
-
-    public void setCommandId(long commandId)
-    {
-        this.commandId = commandId;
+        this.root = root;
     }
 
     public BuildResult getBuildResult()
@@ -108,33 +98,24 @@ public class ViewArtifactAction extends ProjectActionSupport
                 return;
             }
         }
-
         lineLevels.put(n, level);
     }
 
-    public void validate()
+    public String execute() throws FileSystemException
     {
-        buildResult = getBuildManager().getBuildResult(buildId);
-        if(buildResult == null)
+        FileObject fo = getFS().resolveFile(root + path);
+        if (!StoredFileArtifactNode.class.isAssignableFrom(fo.getClass()))
         {
-            addActionError("Unknown build result [" + buildId + "]");
-        }
-        commandResult = getBuildManager().getCommandResult(commandId);
-        if (commandResult == null)
-        {
-            addActionError("Unknown command result [" + commandId + "]");
+            return ERROR;
         }
 
-        artifact = getBuildManager().getFileArtifact(id);
-        if (artifact == null)
-        {
-            addActionError("Unknown artifact [" + id + "]");
-        }
-    }
+        PulseFileObject pfo = (PulseFileObject) fo;
 
-    public String execute()
-    {
-        File artifactFile = new File(commandResult.getAbsoluteOutputDir(configurationManager.getDataDirectory()), artifact.getPath());
+        buildResult = ((BuildResultNode)pfo.getAncestor(BuildResultNode.class)).getBuildResult();
+        commandResult = ((CommandResultNode)pfo.getAncestor(CommandResultNode.class)).getCommandResult();
+        artifact = ((StoredFileArtifactNode)pfo).getFileArtifact();
+
+        File artifactFile = ((StoredFileArtifactNode)pfo).getFile();
         if(!artifactFile.isFile())
         {
             addActionError("Artifact file '" + artifactFile.getAbsolutePath() + "' does not exist");
@@ -154,11 +135,6 @@ public class ViewArtifactAction extends ProjectActionSupport
         determineLineLevels();
 
         return SUCCESS;
-    }
-
-    public void setConfigurationManager(MasterConfigurationManager configurationManager)
-    {
-        this.configurationManager = configurationManager;
     }
 
     class ReaderIterator implements Iterator
