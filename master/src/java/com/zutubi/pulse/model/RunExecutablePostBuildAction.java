@@ -89,6 +89,13 @@ public class RunExecutablePostBuildAction extends PostBuildAction
         
         scope.add(new Property("project", result.getProject().getName()));
         scope.add(new Property("number", Long.toString(result.getNumber())));
+
+        BuildScmDetails buildScmDetails = result.getScmDetails();
+        if(buildScmDetails != null && buildScmDetails.getRevision() != null)
+        {
+            scope.add(new Property("revision", buildScmDetails.getRevision().getRevisionString()));
+        }
+        
         scope.add(new Property("specification", result.getBuildSpecification()));
         scope.add(new Property("build.dir", paths.getBuildDir(result).getAbsolutePath()));
 

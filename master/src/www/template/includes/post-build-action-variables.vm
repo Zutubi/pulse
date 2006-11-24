@@ -10,6 +10,7 @@
     #docRow("post.build.action.variable.status" "post.build.action.variable.status.help")
 #end
 #if($exe)
+    #docRow("post.build.action.variable.revision" "post.build.action.variable.revision.help")
     #docRow("post.build.action.variable.build.dir" "post.build.action.variable.build.dir.help")
     #if($stage)
         #docRow("post.stage.action.variable.stage.agent" "post.build.action.variable.stage.agent.help")
