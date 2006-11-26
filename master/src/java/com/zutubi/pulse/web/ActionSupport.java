@@ -14,7 +14,6 @@ import com.zutubi.pulse.util.TimeStamps;
 import com.zutubi.pulse.util.logging.Logger;
 import com.zutubi.pulse.xwork.TextProviderSupport;
 import com.zutubi.pulse.xwork.interceptor.Cancelable;
-import com.zutubi.pulse.bootstrap.ComponentContext;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
@@ -181,15 +180,14 @@ public class ActionSupport extends com.opensymphony.xwork.ActionSupport implemen
 
     public ProjectManager getProjectManager()
     {
-        // Sorry, a hack on a hack, but Tasmania calls
-        if(projectManager == null)
-        {
-            projectManager = (ProjectManager) ComponentContext.getBean("projectManager");
-        }
-
         return projectManager;
     }
 
+    public void setProjectManager(ProjectManager projectManager)
+    {
+        this.projectManager = projectManager;
+    }
+    
     public void updateChangeUrl(Project project, Revision revision)
     {
         try
@@ -243,7 +241,6 @@ public class ActionSupport extends com.opensymphony.xwork.ActionSupport implemen
         {
             LOG.severe(e);
         }
-
         changeUrl = null;
     }
 }

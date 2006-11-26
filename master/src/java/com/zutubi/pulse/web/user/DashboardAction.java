@@ -25,7 +25,6 @@ public class DashboardAction extends ActionSupport
     private List<Changelist> changelists;
     private List<Changelist> projectChangelists = null;
 
-    private ProjectManager projectManager;
     private BuildManager buildManager;
     private UserManager userManager;
     private CommitMessageTransformerManager commitMessageTransformerManager;
@@ -182,16 +181,6 @@ public class DashboardAction extends ActionSupport
         {
             return false;
         }
-    }
-
-    /**
-     * Required resource.
-     *
-     * @param projectManager instance
-     */
-    public void setProjectManager(ProjectManager projectManager)
-    {
-        this.projectManager = projectManager;
     }
 
     /**

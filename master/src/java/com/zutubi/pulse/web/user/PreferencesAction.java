@@ -15,7 +15,6 @@ public class PreferencesAction extends UserActionSupport
 {
     private List<ContactPoint> contactPoints;
     private List<Subscription> subscriptions;
-    private ProjectManager projectManager;
 
     public List<ContactPoint> getContactPoints()
     {
@@ -105,10 +104,5 @@ public class PreferencesAction extends UserActionSupport
             return SUCCESS;
         }
         return result;
-    }
-
-    public void setProjectManager(ProjectManager projectManager)
-    {
-        this.projectManager = projectManager;
     }
 }

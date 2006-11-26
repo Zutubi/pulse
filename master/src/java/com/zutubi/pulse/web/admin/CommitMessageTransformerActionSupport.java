@@ -14,7 +14,6 @@ public class CommitMessageTransformerActionSupport extends ActionSupport
 {
     private long id;
     private CommitMessageTransformerManager transformerManager;
-    private ProjectManager projectManager;
     private Map<Long, String> allProjects;
     private List<Long> selectedProjects = new LinkedList<Long>();
 
@@ -68,8 +67,4 @@ public class CommitMessageTransformerActionSupport extends ActionSupport
         this.transformerManager = transformerManager;
     }
 
-    public void setProjectManager(ProjectManager projectManager)
-    {
-        this.projectManager = projectManager;
-    }
 }
