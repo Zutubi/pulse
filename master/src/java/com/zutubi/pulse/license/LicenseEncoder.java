@@ -254,4 +254,19 @@ public class LicenseEncoder implements LicenseKeyFactory
             new NewStandardLicense().generateKey(companyName);
         }
     }
+
+    private static class NewEnterpriseLicense extends NewCommercialLicense
+    {
+        public void generateKey(String companyName)
+        {
+            super.generateKey(companyName, LicenseType.ENTERPRISE);
+        }
+
+        public static void main(String[] args)
+        {
+            String companyName = "insert name here";
+
+            new NewEnterpriseLicense().generateKey(companyName);
+        }
+    }
 }

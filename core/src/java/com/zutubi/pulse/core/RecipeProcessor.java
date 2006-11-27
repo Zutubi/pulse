@@ -67,7 +67,7 @@ public class RecipeProcessor
 
         try
         {
-            long recipeStartTime = System.currentTimeMillis();
+            long recipeStartTime = result.getStamps().getStartTime();
 
             // Wrap bootstrapper in a command and run it.
             BootstrapCommand bootstrapCommand = new BootstrapCommand(request.getBootstrapper());

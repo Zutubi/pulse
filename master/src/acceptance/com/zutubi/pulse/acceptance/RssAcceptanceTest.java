@@ -96,17 +96,10 @@ public class RssAcceptanceTest extends BaseAcceptanceTestCase
     private SyndFeed readResponseAsFeed() throws FeedException, IOException
     {
         // validate the response using Rome.
-        try
-        {
-            ByteArrayOutputStream baos = new ByteArrayOutputStream();
-            dumpResponse(new PrintStream(baos));
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        dumpResponse(new PrintStream(baos));
 
-            SyndFeedInput input = new SyndFeedInput();
-            return input.build(new XmlReader(new ByteArrayInputStream(baos.toByteArray())));
-        }
-        finally
-        {
-            dumpResponse(System.out);
-        }
+        SyndFeedInput input = new SyndFeedInput();
+        return input.build(new XmlReader(new ByteArrayInputStream(baos.toByteArray())));
     }
 }
