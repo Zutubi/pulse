@@ -6,6 +6,7 @@ import com.zutubi.pulse.core.model.StoredFileArtifact;
 import com.zutubi.pulse.util.*;
 
 import java.io.*;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 /**
@@ -29,6 +30,11 @@ public class ExecutableCommand implements Command, ScopeAware
     private Process child;
     private CancellableReader reader;
     private volatile boolean terminated = false;
+
+    private static final String PULSE_BUILD_NUMBER = "PULSE_BUILD_NUMBER";
+    private static final String PULSE_BUILD_TIMESTAMP = "PULSE_BUILD_TIMESTAMP";
+
+    private static final SimpleDateFormat PULSE_BUILD_TIMESTAMP_FORMAT = new SimpleDateFormat("yyyy-MM-dd HH:mm");
 
 
     public void execute(CommandContext context, CommandResult cmdResult)
@@ -354,7 +360,11 @@ public class ExecutableCommand implements Command, ScopeAware
 
         if (context.getBuildNumber() != -1)
         {
-            childEnvironment.put("PULSE_BUILD_NUMBER", Long.toString(context.getBuildNumber()));
+            childEnvironment.put(PULSE_BUILD_NUMBER, Long.toString(context.getBuildNumber()));
+        }
+        if (context.getRecipeStartTime() != -1)
+        {
+            childEnvironment.put(PULSE_BUILD_TIMESTAMP, PULSE_BUILD_TIMESTAMP_FORMAT.format(new Date(context.getRecipeStartTime())));
         }
     }
 

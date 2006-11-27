@@ -36,7 +36,7 @@ public class CommandContext
 
     private long buildNumber = -1;
 
-    private long recipeStartTime;
+    private long recipeStartTime = -1;
 
     public CommandContext(RecipePaths paths, File outputDir, TestSuiteResult testResults)
     {

@@ -1,16 +1,16 @@
 package com.zutubi.pulse.acceptance;
 
-import com.zutubi.pulse.util.RandomUtils;
-import com.zutubi.pulse.acceptance.forms.GeneralConfigurationForm;
 import com.sun.syndication.feed.synd.SyndFeed;
+import com.sun.syndication.io.FeedException;
 import com.sun.syndication.io.SyndFeedInput;
 import com.sun.syndication.io.XmlReader;
-import com.sun.syndication.io.FeedException;
+import com.zutubi.pulse.acceptance.forms.GeneralConfigurationForm;
+import com.zutubi.pulse.util.RandomUtils;
 
-import java.io.ByteArrayOutputStream;
-import java.io.PrintStream;
 import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.PrintStream;
 
 /**
  * <class-comment/>
@@ -94,17 +94,10 @@ public class RssAcceptanceTest extends BaseAcceptanceTestCase
     private SyndFeed readResponseAsFeed() throws FeedException, IOException
     {
         // validate the response using Rome.
-        try
-        {
-            ByteArrayOutputStream baos = new ByteArrayOutputStream();
-            dumpResponse(new PrintStream(baos));
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        dumpResponse(new PrintStream(baos));
 
-            SyndFeedInput input = new SyndFeedInput();
-            return input.build(new XmlReader(new ByteArrayInputStream(baos.toByteArray())));
-        }
-        finally
-        {
-            dumpResponse(System.out);
-        }
+        SyndFeedInput input = new SyndFeedInput();
+        return input.build(new XmlReader(new ByteArrayInputStream(baos.toByteArray())));
     }
 }
