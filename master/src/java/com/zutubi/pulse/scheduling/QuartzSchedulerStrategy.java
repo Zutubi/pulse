@@ -16,6 +16,8 @@ public abstract class QuartzSchedulerStrategy implements SchedulerStrategy
 
     protected static final String CALLBACK_JOB_GROUP = "cron.trigger.job.group";
 
+    protected static final String QUARTZ_GROUP = Scheduler.DEFAULT_GROUP;
+
     private Scheduler quartzScheduler;
 
     private TriggerHandler triggerHandler;
@@ -34,7 +36,7 @@ public abstract class QuartzSchedulerStrategy implements SchedulerStrategy
     {
         try
         {
-            getQuartzScheduler().pauseTrigger(trigger.getName(), trigger.getGroup());
+            getQuartzScheduler().pauseTrigger(Long.toString(trigger.getId()), QUARTZ_GROUP);
             trigger.setState(TriggerState.PAUSED);
         }
         catch (SchedulerException e)
@@ -47,7 +49,7 @@ public abstract class QuartzSchedulerStrategy implements SchedulerStrategy
     {
         try
         {
-            getQuartzScheduler().resumeTrigger(trigger.getName(), trigger.getGroup());
+            getQuartzScheduler().resumeTrigger(Long.toString(trigger.getId()), QUARTZ_GROUP);
             trigger.setState(TriggerState.SCHEDULED);
         }
         catch (SchedulerException e)
@@ -75,7 +77,7 @@ public abstract class QuartzSchedulerStrategy implements SchedulerStrategy
     {
         try
         {
-            getQuartzScheduler().unscheduleJob(trigger.getName(), trigger.getGroup());
+            getQuartzScheduler().unscheduleJob(Long.toString(trigger.getId()), QUARTZ_GROUP);
             trigger.setState(TriggerState.NONE);
         }
         catch (SchedulerException e)
