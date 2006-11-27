@@ -43,13 +43,15 @@ public class CronSchedulerStrategyTest extends SchedulerStrategyTestBase
     {
         try
         {
-            org.quartz.Trigger t = quartzScheduler.getTrigger(trigger.getName(), trigger.getGroup());
+            String name = Long.toString(trigger.getId());
+            String group = CronSchedulerStrategy.QUARTZ_GROUP;
+            org.quartz.Trigger t = quartzScheduler.getTrigger(name, group);
             if (t != null)
             {
                 // if the quartz trigger is currently paused, then we should not trigger since this
                 // is not what quartz itself would do. Remember, we are just trying to imitate quartz
                 // in a controlled fashion.
-                int state = quartzScheduler.getTriggerState(t.getName(), t.getGroup());
+                int state = quartzScheduler.getTriggerState(name, group);
                 if (state == org.quartz.Trigger.STATE_PAUSED)
                 {
                     return;

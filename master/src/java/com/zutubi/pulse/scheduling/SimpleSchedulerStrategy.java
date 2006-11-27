@@ -14,8 +14,8 @@ public class SimpleSchedulerStrategy extends QuartzSchedulerStrategy
     protected org.quartz.Trigger createTrigger(Trigger trigger) throws SchedulingException
     {
         SimpleTrigger simpleTrigger = (SimpleTrigger) trigger;
-        return new org.quartz.SimpleTrigger(simpleTrigger.getName(),
-                simpleTrigger.getGroup(),
+        return new org.quartz.SimpleTrigger(Long.toString(simpleTrigger.getId()),
+                QUARTZ_GROUP,
                 simpleTrigger.getStartTime(),
                 null,
                 simpleTrigger.getRepeatCount(),
