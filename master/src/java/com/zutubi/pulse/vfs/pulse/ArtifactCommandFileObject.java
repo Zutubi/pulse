@@ -75,7 +75,7 @@ public class ArtifactCommandFileObject extends AbstractPulseFileObject implement
 
     public CommandResult getCommandResult()
     {
-        return pfs.getBuildManager().getCommandResult(getCommandResultId());
+        return buildManager.getCommandResult(getCommandResultId());
     }
 
     public long getCommandResultId()

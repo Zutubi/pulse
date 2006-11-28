@@ -27,7 +27,7 @@ public class WorkingCopyRootFileObject extends AbstractPulseFileObject
         // this is a recipe node.
         long recipeNodeId = Long.parseLong(fileName.getBaseName());
 
-        long recipeId = pfs.getBuildManager().getRecipeResultNode(recipeNodeId).getResult().getId();
+        long recipeId = buildManager.getRecipeResultNode(recipeNodeId).getResult().getId();
 
         // find the base.
         File base = ((PulseFileSystem)getFileSystem()).getBaseDir(getBuildResultId(), recipeId);

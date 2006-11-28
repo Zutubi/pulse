@@ -2,6 +2,7 @@ package com.zutubi.pulse.vfs.pulse;
 
 import com.zutubi.pulse.model.Project;
 import com.zutubi.pulse.search.SearchQuery;
+import com.zutubi.pulse.search.Queries;
 import org.apache.commons.vfs.FileName;
 import org.apache.commons.vfs.FileType;
 import org.apache.commons.vfs.provider.AbstractFileSystem;
@@ -16,6 +17,8 @@ import java.util.LinkedList;
  */
 public class ProjectsFileObject extends AbstractPulseFileObject
 {
+    private Queries queries;
+
     public ProjectsFileObject(final FileName name, final AbstractFileSystem fs)
     {
         super(name, fs);
@@ -38,7 +41,7 @@ public class ProjectsFileObject extends AbstractPulseFileObject
 
     protected String[] doListChildren() throws Exception
     {
-        SearchQuery<Long> query = pfs.getQueries().getIds(Project.class);
+        SearchQuery<Long> query = queries.getIds(Project.class);
         query.setProjection(Projections.id());
         List<String> children = new LinkedList<String>();
         for (long id : query.list())
@@ -56,5 +59,10 @@ public class ProjectsFileObject extends AbstractPulseFileObject
     protected InputStream doGetInputStream() throws Exception
     {
         return null;
+    }
+
+    public void setQueries(Queries queries)
+    {
+        this.queries = queries;
     }
 }

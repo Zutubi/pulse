@@ -93,7 +93,7 @@ public class StoredArtifactFileObject extends AbstractPulseFileObject implements
 
     public StoredArtifact getArtifact()
     {
-        return pfs.getBuildManager().getArtifact(getArtifactId());
+        return buildManager.getArtifact(getArtifactId());
     }
 
     public long getArtifactId()

@@ -39,7 +39,7 @@ public class WorkingCopyFileObject extends AbstractPulseFileObject
     {
         if (recipeNodeId != -1)
         {
-            RecipeResultNode node = pfs.getBuildManager().getRecipeResultNode(recipeNodeId);
+            RecipeResultNode node = buildManager.getRecipeResultNode(recipeNodeId);
             displayName = String.format(STAGE_FORMAT, node.getStage(), node.getResult().getRecipeNameSafe(), node.getHostSafe());
         }
         else

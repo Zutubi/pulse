@@ -3,6 +3,7 @@ package com.zutubi.pulse.vfs.pulse;
 import com.zutubi.pulse.model.BuildResult;
 import com.zutubi.pulse.search.BuildResultExpressions;
 import com.zutubi.pulse.search.SearchQuery;
+import com.zutubi.pulse.search.Queries;
 import org.apache.commons.vfs.FileName;
 import org.apache.commons.vfs.FileType;
 import org.apache.commons.vfs.provider.AbstractFileSystem;
@@ -16,6 +17,8 @@ import java.util.List;
  */
 public class BuildsFileObject extends AbstractPulseFileObject
 {
+    private Queries queries;
+
     private long projectId;
 
     public BuildsFileObject(final FileName name, final long projectId, final AbstractFileSystem fs)
@@ -41,7 +44,7 @@ public class BuildsFileObject extends AbstractPulseFileObject
 
     protected String[] doListChildren() throws Exception
     {
-        SearchQuery<Long> query = pfs.getQueries().getIds(BuildResult.class);
+        SearchQuery<Long> query = queries.getIds(BuildResult.class);
         query.setProjection(Projections.id());
         query.add(BuildResultExpressions.projectEq(projectId));
 
@@ -70,5 +73,10 @@ public class BuildsFileObject extends AbstractPulseFileObject
     protected InputStream doGetInputStream() throws Exception
     {
         return null;
+    }
+
+    public void setQueries(Queries queries)
+    {
+        this.queries = queries;
     }
 }

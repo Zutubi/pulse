@@ -43,7 +43,7 @@ public class ArtifactRecipeFileObject extends AbstractPulseFileObject
 
     protected void doAttach() throws Exception
     {
-        node = pfs.getBuildManager().getRecipeResultNode(recipeNodeId);
+        node = buildManager.getRecipeResultNode(recipeNodeId);
         displayName = String.format(STAGE_FORMAT, node.getStage(), node.getResult().getRecipeNameSafe(), node.getHostSafe());
     }
 

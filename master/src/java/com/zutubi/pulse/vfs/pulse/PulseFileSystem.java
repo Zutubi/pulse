@@ -1,18 +1,18 @@
 package com.zutubi.pulse.vfs.pulse;
 
-import org.apache.commons.vfs.*;
+import com.zutubi.pulse.MasterBuildPaths;
+import com.zutubi.pulse.bootstrap.MasterConfigurationManager;
+import com.zutubi.pulse.core.ObjectFactory;
+import com.zutubi.pulse.model.BuildManager;
+import com.zutubi.pulse.model.BuildResult;
+import org.apache.commons.vfs.FileName;
+import org.apache.commons.vfs.FileObject;
+import org.apache.commons.vfs.FileSystemException;
+import org.apache.commons.vfs.FileSystemOptions;
 import org.apache.commons.vfs.provider.AbstractFileSystem;
 
-import java.util.Collection;
 import java.io.File;
-
-import com.zutubi.pulse.model.BuildManager;
-import com.zutubi.pulse.model.ProjectManager;
-import com.zutubi.pulse.model.BuildResult;
-import com.zutubi.pulse.search.Queries;
-import com.zutubi.pulse.bootstrap.MasterConfigurationManager;
-import com.zutubi.pulse.MasterBuildPaths;
-import com.zutubi.pulse.core.ObjectFactory;
+import java.util.Collection;
 
 /**
  * The pulse file system provides access to the pulse via a file system style interface.
@@ -23,8 +23,6 @@ public class PulseFileSystem extends AbstractFileSystem
 {
     private ObjectFactory objectFactory;
     private BuildManager buildManager;
-    private ProjectManager projectManager;
-    private Queries queries;
     private MasterConfigurationManager configurationManager;
 
     public PulseFileSystem(final FileName rootName, final FileObject parentLayer, final FileSystemOptions fileSystemOptions)
@@ -97,41 +95,6 @@ public class PulseFileSystem extends AbstractFileSystem
     public void setBuildManager(BuildManager buildManager)
     {
         this.buildManager = buildManager;
-    }
-
-    public BuildManager getBuildManager()
-    {
-        return buildManager;
-    }
-
-    /**
-     * Required resource.
-     *
-     * @param projectManager instance.
-     */
-    public void setProjectManager(ProjectManager projectManager)
-    {
-        this.projectManager = projectManager;
-    }
-
-    public ProjectManager getProjectManager()
-    {
-        return projectManager;
-    }
-
-    /**
-     * Required resource.
-     *
-     * @param queries instance
-     */
-    public void setQueries(Queries queries)
-    {
-        this.queries = queries;
-    }
-
-    public Queries getQueries()
-    {
-        return queries;
     }
 
     /**

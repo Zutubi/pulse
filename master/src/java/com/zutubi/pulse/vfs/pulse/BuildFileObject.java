@@ -65,7 +65,7 @@ public class BuildFileObject extends AbstractPulseFileObject implements BuildRes
     
     public BuildResult getBuildResult()
     {
-        return pfs.getBuildManager().getBuildResult(getBuildResultId());
+        return buildManager.getBuildResult(getBuildResultId());
     }
 
     public long getBuildResultId()

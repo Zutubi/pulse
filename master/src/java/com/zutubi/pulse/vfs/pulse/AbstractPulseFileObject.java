@@ -10,6 +10,7 @@ import java.util.LinkedList;
 import java.io.File;
 
 import com.zutubi.pulse.core.ObjectFactory;
+import com.zutubi.pulse.model.BuildManager;
 
 /**
  * The Pulse File Object is the base class for all the file objects handled by the Pulse File System.
@@ -19,6 +20,8 @@ import com.zutubi.pulse.core.ObjectFactory;
 public abstract class AbstractPulseFileObject extends AbstractFileObject
 {
     protected ObjectFactory objectFactory;
+
+    protected BuildManager buildManager;
 
     /**
      * A reference to the containing pulse file system instance.
@@ -112,5 +115,16 @@ public abstract class AbstractPulseFileObject extends AbstractFileObject
     public void setObjectFactory(ObjectFactory objectFactory)
     {
         this.objectFactory = objectFactory;
+    }
+
+    /**
+     * Required resource. Enough of the subclasses use the build manager for it to be
+     * generally useful.
+     *
+     * @param buildManager instance.
+     */
+    public void setBuildManager(BuildManager buildManager)
+    {
+        this.buildManager = buildManager;
     }
 }
