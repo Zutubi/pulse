@@ -1,23 +1,20 @@
 package com.zutubi.pulse.vfs.pulse;
 
+import com.zutubi.pulse.model.RecipeResultNode;
 import org.apache.commons.vfs.FileName;
 import org.apache.commons.vfs.FileType;
-import org.apache.commons.vfs.FileSystemException;
 import org.apache.commons.vfs.provider.AbstractFileSystem;
 
-import java.io.InputStream;
 import java.io.File;
 import java.io.FileInputStream;
-import java.util.List;
+import java.io.InputStream;
 import java.util.LinkedList;
-
-import com.zutubi.pulse.model.RecipeResultNode;
-import com.zutubi.pulse.core.model.StoredFileArtifact;
+import java.util.List;
 
 /**
  * <class comment/>
  */
-public class WorkingCopyFileObject extends PulseFileObject
+public class WorkingCopyFileObject extends AbstractPulseFileObject
 {
     private final String STAGE_FORMAT = "stage :: %s :: %s@%s";
 
@@ -56,7 +53,7 @@ public class WorkingCopyFileObject extends PulseFileObject
         return this.displayName;
     }
 
-    public PulseFileObject createFile(final FileName fileName) throws Exception
+    public AbstractPulseFileObject createFile(final FileName fileName) throws Exception
     {
         File newBase = new File(base, fileName.getBaseName());
         return new WorkingCopyFileObject(fileName, newBase, pfs);
@@ -100,4 +97,25 @@ public class WorkingCopyFileObject extends PulseFileObject
     {
         return new FileInputStream(base);
     }
+
+/*
+    protected boolean doIsReadable() throws Exception
+    {
+        try
+        {
+            ProjectNode node = (ProjectNode) getAncestor(ProjectNode.class);
+            Project project = node.getProject();
+            pfs.getProjectManager().checkWrite(project);
+            return true;
+        }
+        catch (FileSystemException e)
+        {
+            throw e;
+        }
+        catch (Exception e)
+        {
+            return false;
+        }
+    }
+*/
 }

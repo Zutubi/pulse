@@ -11,7 +11,7 @@ import com.zutubi.pulse.model.Project;
 /**
  * <class comment/>
  */
-public class ProjectFileObject extends PulseFileObject implements ProjectNode
+public class ProjectFileObject extends AbstractPulseFileObject implements ProjectNode
 {
     private final String projectName;
 
@@ -23,7 +23,7 @@ public class ProjectFileObject extends PulseFileObject implements ProjectNode
         this.projectName = projectName;
     }
 
-    public PulseFileObject createFile(final FileName fileName) throws Exception
+    public AbstractPulseFileObject createFile(final FileName fileName) throws Exception
     {
         String path = fileName.getPath();
         if (path.endsWith("builds"))

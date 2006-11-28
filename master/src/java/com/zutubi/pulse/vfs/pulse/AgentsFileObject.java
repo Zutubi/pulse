@@ -9,14 +9,14 @@ import java.io.InputStream;
 /**
  * <class comment/>
  */
-public class AgentsFileObject extends PulseFileObject
+public class AgentsFileObject extends AbstractPulseFileObject
 {
     public AgentsFileObject(final FileName name, final AbstractFileSystem fs)
     {
         super(name, fs);
     }
 
-    public PulseFileObject createFile(final FileName fileName) throws Exception
+    public AbstractPulseFileObject createFile(final FileName fileName) throws Exception
     {
         return null;
     }

@@ -11,19 +11,18 @@ import java.util.LinkedList;
 
 import com.zutubi.pulse.model.RecipeResultNode;
 import com.zutubi.pulse.model.BuildResult;
-import com.zutubi.pulse.core.model.CommandResult;
 
 /**
  * <class comment/>
  */
-public class ArtifactsRootFileObject extends PulseFileObject
+public class ArtifactsRootFileObject extends AbstractPulseFileObject
 {
     public ArtifactsRootFileObject(final FileName name, final AbstractFileSystem fs)
     {
         super(name, fs);
     }
 
-    public PulseFileObject createFile(final FileName fileName) throws Exception
+    public AbstractPulseFileObject createFile(final FileName fileName) throws Exception
     {
         // this is a recipe node.
         long recipeNodeId = Long.parseLong(fileName.getBaseName());

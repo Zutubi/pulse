@@ -13,7 +13,7 @@ import java.util.List;
 /**
  * <class comment/>
  */
-public class ArtifactCommandFileObject extends PulseFileObject implements CommandResultNode
+public class ArtifactCommandFileObject extends AbstractPulseFileObject implements CommandResultNode
 {
     private final long commandResultId;
 
@@ -26,7 +26,7 @@ public class ArtifactCommandFileObject extends PulseFileObject implements Comman
         this.commandResultId = commandResultId;
     }
 
-    public PulseFileObject createFile(final FileName fileName) throws Exception
+    public AbstractPulseFileObject createFile(final FileName fileName) throws Exception
     {
         long artifactId = Long.parseLong(fileName.getBaseName());
 

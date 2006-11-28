@@ -11,7 +11,7 @@ import com.zutubi.pulse.util.RandomUtils;
 import com.zutubi.pulse.util.FileSystemUtils;
 import com.zutubi.pulse.util.TempFileInputStream;
 import com.zutubi.pulse.bootstrap.MasterConfigurationManager;
-import com.zutubi.pulse.vfs.pulse.PulseFileObject;
+import com.zutubi.pulse.vfs.pulse.AbstractPulseFileObject;
 
 /**
  * <class comment/>
@@ -63,8 +63,8 @@ public class ZipAction extends VFSActionSupport
     {
         FileObject fo = getFS().resolveFile(root + path);
 
-        PulseFileObject pfo = (PulseFileObject) fo;
-        File base = pfo.getBase();
+        AbstractPulseFileObject pfo = (AbstractPulseFileObject) fo;
+        File base = pfo.toFile();
 
         // what if base is null or does not exist?....
 

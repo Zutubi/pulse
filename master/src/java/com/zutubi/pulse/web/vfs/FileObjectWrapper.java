@@ -8,7 +8,7 @@ import java.io.File;
 import java.util.List;
 import java.util.Collections;
 
-import com.zutubi.pulse.vfs.pulse.PulseFileObject;
+import com.zutubi.pulse.vfs.pulse.AbstractPulseFileObject;
 
 /**
  * <class comment/>
@@ -27,9 +27,9 @@ public class FileObjectWrapper
      */
     public String getName()
     {
-        if (fo instanceof PulseFileObject)
+        if (fo instanceof AbstractPulseFileObject)
         {
-            return ((PulseFileObject)fo).getDisplayName();
+            return ((AbstractPulseFileObject)fo).getDisplayName();
         }
         return fo.getName().getBaseName();
     }
@@ -89,9 +89,9 @@ public class FileObjectWrapper
 
     public List<String> getActions()
     {
-        if (fo instanceof PulseFileObject)
+        if (fo instanceof AbstractPulseFileObject)
         {
-            return ((PulseFileObject)fo).getActions();
+            return ((AbstractPulseFileObject)fo).getActions();
         }
         return Collections.EMPTY_LIST;
     }

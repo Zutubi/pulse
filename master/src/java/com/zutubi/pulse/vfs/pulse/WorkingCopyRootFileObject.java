@@ -15,7 +15,7 @@ import java.util.List;
 /**
  * <class comment/>
  */
-public class WorkingCopyRootFileObject extends PulseFileObject
+public class WorkingCopyRootFileObject extends AbstractPulseFileObject
 {
     private String displayName;
 
@@ -24,7 +24,7 @@ public class WorkingCopyRootFileObject extends PulseFileObject
         super(name, fs);
     }
 
-    public PulseFileObject createFile(final FileName fileName) throws Exception
+    public AbstractPulseFileObject createFile(final FileName fileName) throws Exception
     {
         // this is a recipe node.
         long recipeNodeId = Long.parseLong(fileName.getBaseName());

@@ -14,7 +14,7 @@ import java.util.List;
 /**
  * <class comment/>
  */
-public class BuildsFileObject extends PulseFileObject
+public class BuildsFileObject extends AbstractPulseFileObject
 {
     private long projectId;
 
@@ -25,7 +25,7 @@ public class BuildsFileObject extends PulseFileObject
         this.projectId = projectId;
     }
 
-    public PulseFileObject createFile(final FileName fileName) throws Exception
+    public AbstractPulseFileObject createFile(final FileName fileName) throws Exception
     {
         String buildId = fileName.getBaseName();
         return new BuildFileObject(fileName, Long.parseLong(buildId), pfs);

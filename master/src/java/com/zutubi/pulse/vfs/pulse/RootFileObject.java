@@ -9,7 +9,7 @@ import java.io.InputStream;
 /**
  * <class comment/>
  */
-public class RootFileObject extends PulseFileObject
+public class RootFileObject extends AbstractPulseFileObject
 {
     public RootFileObject(final FileName name, final AbstractFileSystem fs)
     {
@@ -36,7 +36,7 @@ public class RootFileObject extends PulseFileObject
         return null;
     }
 
-    public PulseFileObject createFile(final FileName fileName) throws Exception
+    public AbstractPulseFileObject createFile(final FileName fileName) throws Exception
     {
         String path = fileName.getPath();
         if (path.endsWith("projects"))

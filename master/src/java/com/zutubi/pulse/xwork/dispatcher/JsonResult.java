@@ -126,7 +126,11 @@ public class JsonResult extends WebWorkResultSupport
         // expecting data to be a collection or array. If not, treat it as a single element in a list.
 
         Object[] array;
-        if (newData instanceof Collection)
+        if (newData == null)
+        {
+            array = new Object[0];
+        }
+        else if (newData instanceof Collection)
         {
             Collection<Object> c = (Collection<Object>) newData;
             array = c.toArray(new Object[c.size()]);

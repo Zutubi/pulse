@@ -17,7 +17,7 @@ import java.util.List;
 /**
  * <class comment/>
  */
-public class ArtifactFileObject extends PulseFileObject implements StoredFileArtifactNode
+public class ArtifactFileObject extends AbstractPulseFileObject implements StoredFileArtifactNode
 {
     private File file;
 
@@ -28,7 +28,7 @@ public class ArtifactFileObject extends PulseFileObject implements StoredFileArt
         this.file = base;
     }
 
-    public PulseFileObject createFile(final FileName fileName) throws Exception
+    public AbstractPulseFileObject createFile(final FileName fileName) throws Exception
     {
         return new ArtifactFileObject(fileName, new File(file, fileName.getBaseName()), pfs);
     }
@@ -46,7 +46,7 @@ public class ArtifactFileObject extends PulseFileObject implements StoredFileArt
         return null;
     }
 
-    public File getBase()
+    public File toFile()
     {
         return this.file;
     }

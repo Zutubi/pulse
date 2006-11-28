@@ -15,7 +15,7 @@ import com.zutubi.pulse.core.model.CommandResult;
 /**
  * <class comment/>
  */
-public class StoredArtifactFileObject extends PulseFileObject implements StoredArtifactNode
+public class StoredArtifactFileObject extends AbstractPulseFileObject implements StoredArtifactNode
 {
     private final long artifactId;
 
@@ -43,7 +43,7 @@ public class StoredArtifactFileObject extends PulseFileObject implements StoredA
         base = new File(outputDir, artifact.getName());
     }
 
-    public PulseFileObject createFile(final FileName fileName) throws Exception
+    public AbstractPulseFileObject createFile(final FileName fileName) throws Exception
     {
         return new ArtifactFileObject(fileName, new File(base, fileName.getBaseName()), pfs);
     }
@@ -82,7 +82,7 @@ public class StoredArtifactFileObject extends PulseFileObject implements StoredA
         return super.getDisplayName();
     }
 
-    public File getBase()
+    public File toFile()
     {
         return base;
     }

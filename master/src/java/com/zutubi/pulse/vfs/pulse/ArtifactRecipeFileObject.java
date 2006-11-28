@@ -14,7 +14,7 @@ import java.util.List;
 /**
  * <class comment/>
  */
-public class ArtifactRecipeFileObject extends PulseFileObject
+public class ArtifactRecipeFileObject extends AbstractPulseFileObject
 {
     private final String STAGE_FORMAT = "build stage :: %s :: %s@%s";
 
@@ -30,7 +30,7 @@ public class ArtifactRecipeFileObject extends PulseFileObject
         this.recipeNodeId = recipeNodeId;
     }
 
-    public PulseFileObject createFile(final FileName fileName) throws Exception
+    public AbstractPulseFileObject createFile(final FileName fileName) throws Exception
     {
         long commandResultId = Long.parseLong(fileName.getBaseName());
         return new ArtifactCommandFileObject(fileName, commandResultId, pfs);

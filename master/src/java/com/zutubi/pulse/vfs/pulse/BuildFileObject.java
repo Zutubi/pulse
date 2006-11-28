@@ -11,7 +11,7 @@ import com.zutubi.pulse.model.BuildResult;
 /**
  * <class comment/>
  */
-public class BuildFileObject extends PulseFileObject implements BuildResultNode
+public class BuildFileObject extends AbstractPulseFileObject implements BuildResultNode
 {
     private final long buildId;
 
@@ -21,7 +21,7 @@ public class BuildFileObject extends PulseFileObject implements BuildResultNode
         this.buildId = buildId;
     }
 
-    public PulseFileObject createFile(final FileName fileName) throws Exception
+    public AbstractPulseFileObject createFile(final FileName fileName) throws Exception
     {
         String base = fileName.getBaseName();
         if (base.endsWith("wc"))

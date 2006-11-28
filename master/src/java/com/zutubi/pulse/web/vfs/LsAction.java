@@ -54,6 +54,19 @@ public class LsAction extends VFSActionSupport
     {
         FileObject fo = getFS().resolveFile(root + path);
 
+        // can only list a file object if
+        // a) it is a directory
+        if (fo.getType() != FileType.FOLDER)
+        {
+            return;
+        }
+
+        // b) the user has read permissions.
+        if (!fo.isReadable())
+        {
+            return;
+        }
+
         Collection<FileType> acceptedTypes = new HashSet<FileType>();
         acceptedTypes.add(FileType.FOLDER);
         if (showFiles)

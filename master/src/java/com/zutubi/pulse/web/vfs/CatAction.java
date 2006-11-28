@@ -48,6 +48,12 @@ public class CatAction extends VFSActionSupport
     {
         FileObject fo = getFS().resolveFile(root + path);
 
+        // can only cat a file if it is readable.
+        if (!fo.isReadable())
+        {
+            return ERROR;
+        }
+
         filename = fo.getName().getBaseName();
         contentType = fo.getContent().getContentInfo().getContentType();
         inputStream = fo.getContent().getInputStream();

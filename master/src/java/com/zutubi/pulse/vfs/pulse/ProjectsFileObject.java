@@ -13,14 +13,14 @@ import java.util.List;
 /**
  * <class comment/>
  */
-public class ProjectsFileObject extends PulseFileObject
+public class ProjectsFileObject extends AbstractPulseFileObject
 {
     public ProjectsFileObject(final FileName name, final AbstractFileSystem fs)
     {
         super(name, fs);
     }
 
-    public PulseFileObject createFile(final FileName fileName) throws Exception
+    public AbstractPulseFileObject createFile(final FileName fileName) throws Exception
     {
         String projectName = fileName.getBaseName();
         return new ProjectFileObject(fileName, projectName, pfs);

@@ -40,7 +40,7 @@ public class PulseFileSystem extends AbstractFileSystem
         }
 
         // as the parent to create this node since it holds all of the contextual information.
-        PulseFileObject pfo = (PulseFileObject) this.resolveFile(fileName.getParent());
+        AbstractPulseFileObject pfo = (AbstractPulseFileObject) this.resolveFile(fileName.getParent());
         return pfo.createFile(fileName);
     }
 

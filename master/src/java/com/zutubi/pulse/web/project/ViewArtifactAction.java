@@ -8,7 +8,7 @@ import com.zutubi.pulse.model.BuildResult;
 import com.zutubi.pulse.util.logging.Logger;
 import com.zutubi.pulse.vfs.pulse.BuildResultNode;
 import com.zutubi.pulse.vfs.pulse.CommandResultNode;
-import com.zutubi.pulse.vfs.pulse.PulseFileObject;
+import com.zutubi.pulse.vfs.pulse.AbstractPulseFileObject;
 import com.zutubi.pulse.vfs.pulse.StoredFileArtifactNode;
 import com.zutubi.pulse.web.vfs.VFSActionSupport;
 import org.apache.commons.vfs.FileObject;
@@ -109,7 +109,7 @@ public class ViewArtifactAction extends VFSActionSupport
             return ERROR;
         }
 
-        PulseFileObject pfo = (PulseFileObject) fo;
+        AbstractPulseFileObject pfo = (AbstractPulseFileObject) fo;
 
         buildResult = ((BuildResultNode)pfo.getAncestor(BuildResultNode.class)).getBuildResult();
         commandResult = ((CommandResultNode)pfo.getAncestor(CommandResultNode.class)).getCommandResult();
