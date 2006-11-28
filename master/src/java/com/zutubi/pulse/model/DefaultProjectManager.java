@@ -118,6 +118,13 @@ public class DefaultProjectManager implements ProjectManager
         buildManager.deleteAllBuilds(entity);
         subscriptionManager.deleteAllSubscriptions(entity);
         userManager.removeReferencesToProject(entity);
+
+        // cleanup the associated project groups.
+        for (ProjectGroup group: projectGroupDao.findByProject(entity))
+        {
+            group.remove(entity);
+        }
+        
         projectDao.delete(entity);
     }
 

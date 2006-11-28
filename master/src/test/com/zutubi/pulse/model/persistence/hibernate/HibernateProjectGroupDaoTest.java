@@ -59,4 +59,34 @@ public class HibernateProjectGroupDaoTest extends MasterPersistenceTestCase
 
         assertNull(projectGroupDao.findByName("none"));
     }
+
+    public void testFindByProject()
+    {
+        Project project = new Project("test-project", "This is a test project");
+        projectDao.save(project);
+
+        ProjectGroup g1 = new ProjectGroup("g1");
+        g1.add(project);
+        projectGroupDao.save(g1);
+        
+        ProjectGroup g2 = new ProjectGroup("g2");
+        g2.add(project);
+        projectGroupDao.save(g2);
+
+        commitAndRefreshTransaction();
+
+        assertEquals(2, projectGroupDao.findByProject(project).size());
+
+        g2 = projectGroupDao.findByName("g2");
+        g2.remove(project);
+        commitAndRefreshTransaction();
+
+        assertEquals(1, projectGroupDao.findByProject(project).size());
+
+        g1 = projectGroupDao.findByName("g1");
+        g1.remove(project);
+        commitAndRefreshTransaction();
+
+        assertEquals(0, projectGroupDao.findByProject(project).size());
+    }
 }

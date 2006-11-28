@@ -19,4 +19,10 @@
         from ProjectGroup model
         where model.name = :name
     ]]></query>
+
+    <query name="findProjectGroupByProject"><![CDATA[
+        from ProjectGroup model
+        where :project in elements(model.projects)
+    ]]></query>
+
 </hibernate-mapping>

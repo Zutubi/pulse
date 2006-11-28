@@ -109,6 +109,6 @@ public class ProjectGroupAction extends ActionSupport implements Preparable
     public void setProjectManager(ProjectManager projectManager)
     {
         this.projectManager = projectManager;
-        helper = new ProjectFormHelper(projectManager);
+        this.helper = new ProjectFormHelper(projectManager);
     }
 }
