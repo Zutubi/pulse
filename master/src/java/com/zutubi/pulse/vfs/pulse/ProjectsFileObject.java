@@ -9,6 +9,7 @@ import org.hibernate.criterion.Projections;
 
 import java.io.InputStream;
 import java.util.List;
+import java.util.LinkedList;
 
 /**
  * <class comment/>
@@ -22,8 +23,12 @@ public class ProjectsFileObject extends AbstractPulseFileObject
 
     public AbstractPulseFileObject createFile(final FileName fileName) throws Exception
     {
-        String projectName = fileName.getBaseName();
-        return new ProjectFileObject(fileName, projectName, pfs);
+        Long projectId = Long.parseLong(fileName.getBaseName());
+
+        return objectFactory.buildBean(ProjectFileObject.class,
+                new Class[]{FileName.class, Long.TYPE, AbstractFileSystem.class},
+                new Object[]{fileName, projectId, pfs}
+        );
     }
 
     protected FileType doGetType() throws Exception
@@ -33,10 +38,14 @@ public class ProjectsFileObject extends AbstractPulseFileObject
 
     protected String[] doListChildren() throws Exception
     {
-        SearchQuery<String> query = pfs.getQueries().getStrings(Project.class);
-        query.setProjection(Projections.property("name"));
-        List<String> projectNames = query.list();
-        return projectNames.toArray(new String[projectNames.size()]);
+        SearchQuery<Long> query = pfs.getQueries().getIds(Project.class);
+        query.setProjection(Projections.id());
+        List<String> children = new LinkedList<String>();
+        for (long id : query.list())
+        {
+            children.add(Long.toString(id));
+        }
+        return children.toArray(new String[children.size()]);
     }
 
     protected long doGetContentSize() throws Exception

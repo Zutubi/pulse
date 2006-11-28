@@ -212,10 +212,7 @@
         <property name="slaveManager"><ref local="slaveManager"/></property>
         <property name="slaveProxyFactory"><ref local="slaveProxyFactory"/></property>
         <property name="serviceTokenManager"><ref local="serviceTokenManager"/></property>
-        <property name="configurationManager"><ref bean="configurationManager"/></property>
-        <property name="buildManager"><ref local="buildManager"/></property>
-        <property name="projectManager"><ref local="projectManager"/></property>
-        <property name="queries"><ref bean="queries"/></property>
+        <property name="objectFactory"><ref bean="objectFactory"/></property>
     </bean>
 
 </beans>

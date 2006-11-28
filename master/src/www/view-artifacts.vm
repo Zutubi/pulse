@@ -21,7 +21,7 @@
         {
             var tree = new ZUTUBI.widget.PulseTreeView('browseTree');
             tree.setSeparator('$separator');
-            tree.setFSRoot('pulse:///projects/$project.name/builds/$result.id/artifacts/');
+            tree.setFSRoot('pulse:///projects/$project.id/builds/$result.id/artifacts/');
             tree.setBase('$base');
 
             // load the root nodes for the file system, then draw the tree.

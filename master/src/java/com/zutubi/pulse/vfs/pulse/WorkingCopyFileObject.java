@@ -56,7 +56,10 @@ public class WorkingCopyFileObject extends AbstractPulseFileObject
     public AbstractPulseFileObject createFile(final FileName fileName) throws Exception
     {
         File newBase = new File(base, fileName.getBaseName());
-        return new WorkingCopyFileObject(fileName, newBase, pfs);
+        return objectFactory.buildBean(WorkingCopyFileObject.class,
+                new Class[]{FileName.class, File.class, AbstractFileSystem.class},
+                new Object[]{fileName, newBase, pfs}
+        );
     }
 
     protected FileType doGetType() throws Exception

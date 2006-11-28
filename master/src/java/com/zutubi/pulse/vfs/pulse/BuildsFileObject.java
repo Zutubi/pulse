@@ -27,8 +27,11 @@ public class BuildsFileObject extends AbstractPulseFileObject
 
     public AbstractPulseFileObject createFile(final FileName fileName) throws Exception
     {
-        String buildId = fileName.getBaseName();
-        return new BuildFileObject(fileName, Long.parseLong(buildId), pfs);
+        long buildId = Long.parseLong(fileName.getBaseName());
+        return objectFactory.buildBean(BuildFileObject.class,
+                new Class[]{FileName.class, Long.TYPE, AbstractFileSystem.class},
+                new Object[]{fileName, buildId, pfs}
+        );
     }
 
     protected FileType doGetType() throws Exception
@@ -52,6 +55,11 @@ public class BuildsFileObject extends AbstractPulseFileObject
         }
 
         return children;
+    }
+
+    protected void doDetach() throws Exception
+    {
+        super.doDetach();
     }
 
     protected long doGetContentSize() throws Exception

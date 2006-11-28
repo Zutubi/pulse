@@ -30,9 +30,10 @@ public class ArtifactCommandFileObject extends AbstractPulseFileObject implement
     {
         long artifactId = Long.parseLong(fileName.getBaseName());
 
-        StoredArtifact artifact = pfs.getBuildManager().getArtifact(artifactId);
-
-        return new StoredArtifactFileObject(fileName, artifactId, pfs);
+        return objectFactory.buildBean(StoredArtifactFileObject.class,
+                new Class[]{FileName.class, Long.TYPE, AbstractFileSystem.class},
+                new Object[]{fileName, artifactId, pfs}
+        );
     }
 
     protected FileType doGetType() throws Exception

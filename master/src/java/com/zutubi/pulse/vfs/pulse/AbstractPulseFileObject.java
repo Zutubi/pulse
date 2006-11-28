@@ -9,6 +9,8 @@ import java.util.List;
 import java.util.LinkedList;
 import java.io.File;
 
+import com.zutubi.pulse.core.ObjectFactory;
+
 /**
  * The Pulse File Object is the base class for all the file objects handled by the Pulse File System.
  *
@@ -16,6 +18,8 @@ import java.io.File;
  */
 public abstract class AbstractPulseFileObject extends AbstractFileObject
 {
+    protected ObjectFactory objectFactory;
+
     /**
      * A reference to the containing pulse file system instance.
      */
@@ -98,5 +102,15 @@ public abstract class AbstractPulseFileObject extends AbstractFileObject
             return parent.getAncestor(type);
         }
         return null;
+    }
+
+    /**
+     * Required resource.
+     *
+     * @param objectFactory instance.
+     */
+    public void setObjectFactory(ObjectFactory objectFactory)
+    {
+        this.objectFactory = objectFactory;
     }
 }

@@ -73,16 +73,22 @@ public class SpringAutowireSupport implements ApplicationContextAware
     public Object createWiredBean(Class beanClass) throws Exception
     {
         if (autoWiringFactory == null)
+        {
             throw new UnsupportedOperationException("Unable to create beans at this stage.");
+        }
 
         Object bean = autoWiringFactory.autowire(beanClass, autowireStrategy, false);
 
         if (bean instanceof ApplicationContextAware)
+        {
             ((ApplicationContextAware) bean).setApplicationContext(context);
+        }
 
         // not sure why spring does not call these methods itself...
         if (bean instanceof InitializingBean)
+        {
             ((InitializingBean)bean).afterPropertiesSet();
+        }
 
         return bean;
     }

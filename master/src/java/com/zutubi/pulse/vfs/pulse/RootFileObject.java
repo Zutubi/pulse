@@ -2,6 +2,7 @@ package com.zutubi.pulse.vfs.pulse;
 
 import org.apache.commons.vfs.FileName;
 import org.apache.commons.vfs.FileType;
+import org.apache.commons.vfs.FileSystem;
 import org.apache.commons.vfs.provider.AbstractFileSystem;
 
 import java.io.InputStream;
@@ -41,11 +42,17 @@ public class RootFileObject extends AbstractPulseFileObject
         String path = fileName.getPath();
         if (path.endsWith("projects"))
         {
-            return new ProjectsFileObject(fileName, pfs);
+            return objectFactory.buildBean(ProjectsFileObject.class,
+                    new Class[]{FileName.class, AbstractFileSystem.class},
+                    new Object[]{fileName, pfs}
+            );
         }
         if (path.endsWith("agents"))
         {
-            return new AgentsFileObject(fileName, pfs);
+            return objectFactory.buildBean(AgentsFileObject.class,
+                    new Class[]{FileName.class, AbstractFileSystem.class},
+                    new Object[]{fileName, pfs}
+            );
         }
         return null;
     }

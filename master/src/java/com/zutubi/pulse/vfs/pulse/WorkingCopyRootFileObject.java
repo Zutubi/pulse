@@ -17,8 +17,6 @@ import java.util.List;
  */
 public class WorkingCopyRootFileObject extends AbstractPulseFileObject
 {
-    private String displayName;
-
     public WorkingCopyRootFileObject(final FileName name, final AbstractFileSystem fs)
     {
         super(name, fs);
@@ -34,7 +32,10 @@ public class WorkingCopyRootFileObject extends AbstractPulseFileObject
         // find the base.
         File base = ((PulseFileSystem)getFileSystem()).getBaseDir(getBuildResultId(), recipeId);
 
-        WorkingCopyFileObject fo = new WorkingCopyFileObject(fileName, base, pfs);
+        WorkingCopyFileObject fo = objectFactory.buildBean(WorkingCopyFileObject.class,
+                new Class[]{FileName.class, File.class, AbstractFileSystem.class},
+                new Object[]{fileName, base, pfs}
+        );
         fo.setRecipeNodeId(recipeNodeId);
         return fo;
     }

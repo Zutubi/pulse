@@ -8,6 +8,7 @@ import org.apache.commons.vfs.FileType;
 import org.apache.commons.vfs.provider.AbstractFileSystem;
 
 import java.io.InputStream;
+import java.io.File;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -33,7 +34,11 @@ public class ArtifactRecipeFileObject extends AbstractPulseFileObject
     public AbstractPulseFileObject createFile(final FileName fileName) throws Exception
     {
         long commandResultId = Long.parseLong(fileName.getBaseName());
-        return new ArtifactCommandFileObject(fileName, commandResultId, pfs);
+
+        return objectFactory.buildBean(ArtifactCommandFileObject.class,
+                new Class[]{FileName.class, Long.TYPE, AbstractFileSystem.class},
+                new Object[]{fileName, commandResultId, pfs}
+        );
     }
 
     protected void doAttach() throws Exception

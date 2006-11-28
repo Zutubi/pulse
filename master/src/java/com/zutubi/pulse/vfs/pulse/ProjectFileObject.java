@@ -7,20 +7,23 @@ import org.apache.commons.vfs.provider.AbstractFileSystem;
 import java.io.InputStream;
 
 import com.zutubi.pulse.model.Project;
+import com.zutubi.pulse.model.ProjectManager;
 
 /**
  * <class comment/>
  */
 public class ProjectFileObject extends AbstractPulseFileObject implements ProjectNode
 {
-    private final String projectName;
+    private ProjectManager projectManager;
+
+    private String displayName;
 
     private long projectId;
 
-    public ProjectFileObject(final FileName name, final String projectName, final AbstractFileSystem fs)
+    public ProjectFileObject(final FileName name, final long projectId, final AbstractFileSystem fs)
     {
         super(name, fs);
-        this.projectName = projectName;
+        this.projectId = projectId;
     }
 
     public AbstractPulseFileObject createFile(final FileName fileName) throws Exception
@@ -28,15 +31,18 @@ public class ProjectFileObject extends AbstractPulseFileObject implements Projec
         String path = fileName.getPath();
         if (path.endsWith("builds"))
         {
-            return new BuildsFileObject(fileName, projectId, pfs);
+            return objectFactory.buildBean(BuildsFileObject.class,
+                    new Class[]{FileName.class, Long.TYPE, AbstractFileSystem.class},
+                    new Object[]{fileName, projectId, pfs}
+            );
         }
         return null;
     }
 
     protected void doAttach() throws Exception
     {
-        Project project = pfs.getProjectManager().getProject(projectName);
-        projectId = project.getId();
+        Project project = getProject();
+        displayName = project.getName();
     }
 
     protected FileType doGetType() throws Exception
@@ -59,13 +65,28 @@ public class ProjectFileObject extends AbstractPulseFileObject implements Projec
         return null;
     }
 
+    public String getDisplayName()
+    {
+        return displayName;
+    }
+
     public Project getProject()
     {
-        return null;
+        return projectManager.getProject(projectId);
     }
 
     public long getProjectId()
     {
-        return 0;
+        return projectId;
+    }
+
+    /**
+     * Required resource.
+     *
+     * @param projectManager instance.
+     */
+    public void setProjectManager(ProjectManager projectManager)
+    {
+        this.projectManager = projectManager;
     }
 }

@@ -26,11 +26,17 @@ public class BuildFileObject extends AbstractPulseFileObject implements BuildRes
         String base = fileName.getBaseName();
         if (base.endsWith("wc"))
         {
-            return new WorkingCopyRootFileObject(fileName, pfs);
+            return objectFactory.buildBean(WorkingCopyRootFileObject.class,
+                    new Class[]{FileName.class, AbstractFileSystem.class},
+                    new Object[]{fileName, pfs}
+            );
         }
         if (base.endsWith("artifacts"))
         {
-            return new ArtifactsRootFileObject(fileName, pfs);
+            return objectFactory.buildBean(ArtifactsRootFileObject.class,
+                    new Class[]{FileName.class, AbstractFileSystem.class},
+                    new Object[]{fileName, pfs}
+            );
         }
         return null;
     }

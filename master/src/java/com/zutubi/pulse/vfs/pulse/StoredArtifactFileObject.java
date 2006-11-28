@@ -45,7 +45,11 @@ public class StoredArtifactFileObject extends AbstractPulseFileObject implements
 
     public AbstractPulseFileObject createFile(final FileName fileName) throws Exception
     {
-        return new ArtifactFileObject(fileName, new File(base, fileName.getBaseName()), pfs);
+        File child = new File(base, fileName.getBaseName());
+        return objectFactory.buildBean(ArtifactFileObject.class,
+                new Class[]{FileName.class, File.class, AbstractFileSystem.class},
+                new Object[]{fileName, child, pfs}
+        );
     }
 
     protected FileType doGetType() throws Exception

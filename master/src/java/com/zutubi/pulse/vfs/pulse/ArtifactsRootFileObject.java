@@ -26,7 +26,10 @@ public class ArtifactsRootFileObject extends AbstractPulseFileObject
     {
         // this is a recipe node.
         long recipeNodeId = Long.parseLong(fileName.getBaseName());
-        return new ArtifactRecipeFileObject(fileName, recipeNodeId, pfs);
+        return objectFactory.buildBean(ArtifactRecipeFileObject.class,
+                new Class[]{FileName.class, Long.TYPE, AbstractFileSystem.class},
+                new Object[]{fileName, recipeNodeId, pfs}
+        );
     }
 
     protected FileType doGetType() throws Exception
