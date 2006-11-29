@@ -526,6 +526,9 @@ YAHOO.extend(ZUTUBI.widget.PulseTreeView, ZUTUBI.widget.TreeView, {
         this.fsRoot = root;
     },
 
+    /**
+     * Specify the base context path, needed for any links that are generated.
+     */
     setBase: function(base)
     {
         this.base = base;
@@ -540,15 +543,15 @@ YAHOO.extend(ZUTUBI.widget.PulseTreeView, ZUTUBI.widget.TreeView, {
     {
         if (action == "download")
         {
-            document.location = this.base+"/cat.action?root="+this.fsRoot+"&path=" + node.getIdPath();
+            document.location = this.base+"/cat.action?path=" + this.fsRoot + node.getIdPath();
         }
         if (action == "decorate")
         {
-            document.location = this.base+"/viewArtifact.action?root="+this.fsRoot+"&path=" + node.getIdPath();
+            document.location = this.base+"/viewArtifact.action?path=" + this.fsRoot + node.getIdPath();
         }
         if (action == "archive")
         {
-            document.location = this.base+"/zip.action?root="+this.fsRoot+"&path=" + node.getIdPath();
+            document.location = this.base+"/zip.action?path=" + this.fsRoot + node.getIdPath();
         }
     },
 
@@ -571,7 +574,7 @@ YAHOO.extend(ZUTUBI.widget.PulseTreeView, ZUTUBI.widget.TreeView, {
                 onComplete: this.lsResponse(node, onCompleteCallback),
                 onFailure: this.handleFailure,
                 onException: this.handleException,
-                parameters: "root="+this.fsRoot+"&path=" + p +
+                parameters: "path=" + this.fsRoot + p +
                              (showFiles && "&showFiles=" + showFiles || "") +
                              (showHidden && "&showHidden=" + showHidden || "")
             }
@@ -580,7 +583,7 @@ YAHOO.extend(ZUTUBI.widget.PulseTreeView, ZUTUBI.widget.TreeView, {
 
     lsResponse: function(parentNode, callback)
     {
-        var self = this;
+        var self = this; // does this cause a js memory leak?...
         return function(response)
         {
             var jsonObj = eval("(" + response.responseText + ")");
@@ -603,12 +606,6 @@ YAHOO.extend(ZUTUBI.widget.PulseTreeView, ZUTUBI.widget.TreeView, {
                     "actions":obj.actions
                 };
                 var node = new ZUTUBI.widget.FileNode(data, parentNode, false);
-
-                // override the default onclick behaviour to trigger the download.
-                node.onLabelClick = function(me)
-                {
-                    return this.isContainer();
-                };
 
             });
             if (callback)
@@ -642,7 +639,11 @@ YAHOO.extend(ZUTUBI.widget.PulseTreeView, ZUTUBI.widget.TreeView, {
 
     hideActionErrors: function()
     {
-        Element.hide($(this.error));
+        var element = $(this.error);
+        if (element)
+        {
+            Element.hide(element);
+        }
     },
 
     handleFailure: function(e, e2)

@@ -4,8 +4,11 @@ import org.apache.commons.vfs.*;
 
 import java.util.*;
 
+import com.opensymphony.util.TextUtils;
+
 /**
- * <class comment/>
+ * The ls action provides access to 'ls' style functionality for the web ui.
+ * 
  */
 public class LsAction extends VFSActionSupport
 {
@@ -13,30 +16,69 @@ public class LsAction extends VFSActionSupport
 
     private boolean showHidden = false;
 
+    private int depth = 1;
+
+    /**
+     * @deprecated 
+     */
     private String root;
 
     private String path;
 
     private List listing = null;
 
+    /**
+     * @deprecated just use the path instead.
+     */
     public void setRoot(String root)
     {
         this.root = root;
     }
 
+    /**
+     * Show files indicates whether or not the listing should include files. The default value is false.
+     *
+     * @param showFiles     if true, files will be included in the listing.
+     */
     public void setShowFiles(boolean showFiles)
     {
         this.showFiles = showFiles;
     }
 
+    /**
+     * Show files that are marked as hidden. The default value for this is false.
+     *
+     * @param showHidden    if true, hidden files will be included in the listing.
+     */
     public void setShowHidden(boolean showHidden)
     {
         this.showHidden = showHidden;
     }
 
+    /**
+     * Specify the base path that will be listed. This path should define a directory. It does not make sense to
+     * list a file since, by definition, it has no children.
+     *
+     * @param path
+     */
     public void setPath(String path)
     {
         this.path = path;
+    }
+
+    /**
+     * The depth defines how many child directories will be traversed and listed. By default, the depth is 1.
+     *
+     * For example, a depth of 1 will result in the base path being listed. A depth of 2 will list the base path
+     * and all of the directories in that listing.
+     *
+     * This is useful for expanding multiple levels of the directory tree at one time.
+     *
+     * @param depth
+     */
+    public void setDepth(int depth)
+    {
+        this.depth = depth;
     }
 
     public List getListing()
@@ -52,7 +94,13 @@ public class LsAction extends VFSActionSupport
 
     public void doList() throws FileSystemException
     {
-        FileObject fo = getFS().resolveFile(root + path);
+        // provide temporary backwards compatibility for the deprecated root variable. 
+        if (TextUtils.stringSet(root))
+        {
+            path = root + path;
+        }
+        
+        FileObject fo = getFS().resolveFile(path);
 
         // can only list a file object if
         // a) it is a directory

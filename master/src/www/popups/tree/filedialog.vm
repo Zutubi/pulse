@@ -246,7 +246,7 @@
                         onComplete: lsResponse(node, onCompleteCallback),
                         onFailure: handleFailure,
                         onException: handleException,
-                        parameters: "root=$root&path=" + p + (showFiles && "&showFiles=" + showFiles || "") + (showHidden && "&showHidden=" + showHidden || "")
+                        parameters: "path=$root" + p + (showFiles && "&showFiles=" + showFiles || "") + (showHidden && "&showHidden=" + showHidden || "")
                     }
                 );
             }
@@ -315,7 +315,7 @@
                         onComplete: mkdirResponse(node, name),
                         onFailure: handleFailure,
                         onException: handleException,
-                        parameters: "root=$root&path=" + p + "&name=" + name
+                        parameters: "path=$root" + p + "&name=" + name
                     }
                 );
             }
@@ -378,7 +378,7 @@
                         onComplete: rmdirResponse(node),
                         onFailure: handleFailure,
                         onException: handleException,
-                        parameters: "root=$root&path=" + p
+                        parameters: "path=$root" + p
                     }
                 );
             }

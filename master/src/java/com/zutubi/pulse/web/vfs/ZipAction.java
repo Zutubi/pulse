@@ -12,18 +12,21 @@ import com.zutubi.pulse.util.FileSystemUtils;
 import com.zutubi.pulse.util.TempFileInputStream;
 import com.zutubi.pulse.bootstrap.MasterConfigurationManager;
 import com.zutubi.pulse.vfs.pulse.AbstractPulseFileObject;
+import com.opensymphony.util.TextUtils;
 
 /**
  * <class comment/>
  */
 public class ZipAction extends VFSActionSupport
 {
+    /**
+     * @deprecated  use path instead.
+     */
     private String root;
+
     private String path;
 
     private InputStream inputStream;
-
-    private String contentType;
 
     private String filename;
     private MasterConfigurationManager configurationManager;
@@ -39,16 +42,14 @@ public class ZipAction extends VFSActionSupport
         return inputStream;
     }
 
-    public String getContentType()
-    {
-        return contentType;
-    }
-
     public long getContentLength()
     {
         return contentLength;
     }
 
+    /**
+     * @deprecated
+     */
     public void setRoot(String root)
     {
         this.root = root;
@@ -61,7 +62,12 @@ public class ZipAction extends VFSActionSupport
 
     public String execute() throws FileSystemException
     {
-        FileObject fo = getFS().resolveFile(root + path);
+        if (TextUtils.stringSet(root))
+        {
+            path = root + path;
+        }
+        
+        FileObject fo = getFS().resolveFile(path);
 
         AbstractPulseFileObject pfo = (AbstractPulseFileObject) fo;
         File base = pfo.toFile();

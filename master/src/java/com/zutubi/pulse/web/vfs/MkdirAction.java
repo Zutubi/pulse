@@ -4,15 +4,24 @@ import org.apache.commons.vfs.FileObject;
 
 import java.io.File;
 
+import com.opensymphony.util.TextUtils;
+
 /**
  * <class comment/>
  */
 public class MkdirAction extends VFSActionSupport
 {
+    /**
+     * @deprecated
+     */
     private String root;
+
     private String path;
     private String name;
 
+    /**
+     * @deprecated
+     */
     public void setRoot(String root)
     {
         this.root = root;
@@ -30,7 +39,12 @@ public class MkdirAction extends VFSActionSupport
 
     public String execute() throws Exception
     {
-        FileObject fo = getFS().resolveFile(root + path);
+        if (TextUtils.stringSet(root))
+        {
+            path = root + path;
+        }
+
+        FileObject fo = getFS().resolveFile(path);
 
         FileObject newFolder = fo.resolveFile(name);
         if (newFolder.exists())

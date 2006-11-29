@@ -11,6 +11,7 @@ import com.zutubi.pulse.vfs.pulse.CommandResultNode;
 import com.zutubi.pulse.vfs.pulse.AbstractPulseFileObject;
 import com.zutubi.pulse.vfs.pulse.StoredFileArtifactNode;
 import com.zutubi.pulse.web.vfs.VFSActionSupport;
+import com.opensymphony.util.TextUtils;
 import org.apache.commons.vfs.FileObject;
 import org.apache.commons.vfs.FileSystemException;
 
@@ -27,11 +28,6 @@ public class ViewArtifactAction extends VFSActionSupport
 {
     private static final Logger LOG = Logger.getLogger(ViewArtifactAction.class);
 
-/*
-    private long id;
-    private long buildId;
-    private long commandId;
-*/
     private BuildResult buildResult;
     private CommandResult commandResult;
     private StoredFileArtifact artifact;
@@ -39,6 +35,10 @@ public class ViewArtifactAction extends VFSActionSupport
     private Map<Long, Feature.Level> lineLevels;
 
     private String path;
+
+    /**
+     * @deprecated
+     */
     private String root;
 
     public void setPath(String path)
@@ -46,6 +46,9 @@ public class ViewArtifactAction extends VFSActionSupport
         this.path = path;
     }
 
+    /**
+     * @deprecated
+     */
     public void setRoot(String root)
     {
         this.root = root;
@@ -103,7 +106,12 @@ public class ViewArtifactAction extends VFSActionSupport
 
     public String execute() throws FileSystemException
     {
-        FileObject fo = getFS().resolveFile(root + path);
+        if (TextUtils.stringSet(root))
+        {
+            path = root + path;
+        }
+
+        FileObject fo = getFS().resolveFile(path);
         if (!StoredFileArtifactNode.class.isAssignableFrom(fo.getClass()))
         {
             return ERROR;

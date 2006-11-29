@@ -2,15 +2,23 @@ package com.zutubi.pulse.web.vfs;
 
 import org.apache.commons.vfs.FileObject;
 import org.apache.commons.vfs.FileType;
+import com.opensymphony.util.TextUtils;
 
 /**
  * <class comment/>
  */
 public class RmAction extends VFSActionSupport
 {
+    /**
+     * @deprecated
+     */
     private String root;
+
     private String path;
 
+    /**
+     * @deprecated
+     */
     public void setRoot(String root)
     {
         this.root = root;
@@ -23,7 +31,12 @@ public class RmAction extends VFSActionSupport
 
     public String execute() throws Exception
     {
-        FileObject fo = getFS().resolveFile(root + path);
+        if (TextUtils.stringSet(root))
+        {
+            path = root + path;
+        }
+
+        FileObject fo = getFS().resolveFile(path);
 
         // we only support deleting empty directories for safety.
         FileType type = fo.getType();

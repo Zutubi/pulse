@@ -44,6 +44,7 @@
         The tree below allows you to navigate through the artifacts for this build.
     </p>
     <div id="loading" style="display:none;"><img src="$base/images/treeview/loading.gif" alt="loading..."/></div>
+    <div id="error"></div>
     <div id="artifactTree">
         <div id="browseTree"></div>
     </div>

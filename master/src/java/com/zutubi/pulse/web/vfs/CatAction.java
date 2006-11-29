@@ -5,12 +5,18 @@ import org.apache.commons.vfs.FileSystemException;
 
 import java.io.InputStream;
 
+import com.opensymphony.util.TextUtils;
+
 /**
  * <class comment/>
  */
 public class CatAction extends VFSActionSupport
 {
+    /**
+     * @deprecated use path instead.
+     */
     private String root;
+
     private String path;
 
     private InputStream inputStream;
@@ -46,11 +52,17 @@ public class CatAction extends VFSActionSupport
 
     public String execute() throws FileSystemException
     {
-        FileObject fo = getFS().resolveFile(root + path);
+        if (TextUtils.stringSet(root))
+        {
+            path = root + path;
+        }
+        
+        FileObject fo = getFS().resolveFile(path);
 
         // can only cat a file if it is readable.
         if (!fo.isReadable())
         {
+            addActionError("You do not have permission to view this file.");
             return ERROR;
         }
 
