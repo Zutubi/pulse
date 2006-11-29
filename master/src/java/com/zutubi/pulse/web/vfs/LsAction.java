@@ -64,6 +64,7 @@ public class LsAction extends VFSActionSupport
         // b) the user has read permissions.
         if (!fo.isReadable())
         {
+            addActionError("You do not have permission to view list this folder.");
             return;
         }
 

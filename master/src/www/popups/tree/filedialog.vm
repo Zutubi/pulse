@@ -229,6 +229,8 @@
 
             function ls(node, onCompleteCallback, showFiles, showHidden)
             {
+                hideActionErrors();
+
                 // generate id path.
                 var p = "";
                 if (node.getPath)
@@ -255,21 +257,29 @@
                 {
                     var jsonObj = eval("(" + response.responseText + ")");
 
-                    var results = $A(jsonObj.listing);
-                    results.each(function(obj)
+                    if (jsonObj.actionErrors && $A(jsonObj.actionErrors).length > 0)
                     {
-                        var data = {
-                            "id":obj.id,
-                            "name":obj.file,            // name of the file.
-                            "label":obj.file,           // Yahoo reads the label field and uses it as the display text.
-                            "type":obj.type,            // the type of this file, used to define the class associated with this node.
-                            "container":obj.container
-                        };
-                        new ZUTUBI.widget.FileNode(data, parentNode, false);
-                    });
-                    if (callback)
+                        // an error has occured, present the error to the user.
+                        showActionErrors(jsonObj.actionErrors);
+                    }
+                    else
                     {
-                        callback();
+                        var results = $A(jsonObj.listing);
+                        results.each(function(obj)
+                        {
+                            var data = {
+                                "id":obj.id,
+                                "name":obj.file,            // name of the file.
+                                "label":obj.file,           // Yahoo reads the label field and uses it as the display text.
+                                "type":obj.type,            // the type of this file, used to define the class associated with this node.
+                                "container":obj.container
+                            };
+                            new ZUTUBI.widget.FileNode(data, parentNode, false);
+                        });
+                        if (callback)
+                        {
+                            callback();
+                        }
                     }
                 };
             }
@@ -284,6 +294,8 @@
 
             function mkdir(name)
             {
+                hideActionErrors();
+
                 // grab selected file.
                 var node = YAHOO.widget.TreeView.getTree('browseTree').selected;
                 if (!node)
@@ -312,35 +324,47 @@
             {
                 return function(response)
                 {
-                    var tree = YAHOO.widget.TreeView.getTree('browseTree');
-
-                    // if response indicates success, refresh the folder response.
-
-                    if (!node.expanded)
+                    var jsonObj = eval("(" + response.responseText + ")");
+                    if (jsonObj.actionErrors && $A(jsonObj.actionErrors).length > 0)
                     {
-                        node.toggle();
-                        // need to delay the node creation and selection until after the
-                        // node has been expanded. can anyone say PITA?
+                        // an error has occured, present the error to the user.
+                        showActionErrors(jsonObj.actionErrors);
+
                     }
+                    else
+                    {
+                        var tree = YAHOO.widget.TreeView.getTree('browseTree');
 
-                    var data = {
-                        "id":name,
-                        "name":name,
-                        "label":name,
-                        "type":"folder",
-                        "container":true
-                    };
+                        // if response indicates success, refresh the folder response.
 
-                    var newFolder = new ZUTUBI.widget.FileNode(data, node, false);
-                    node.refresh();
+                        if (!node.expanded)
+                        {
+                            node.toggle();
+                            // need to delay the node creation and selection until after the
+                            // node has been expanded. can anyone say PITA?
+                        }
 
-                    // need to select the newly created folder.
-                    tree.select(newFolder);
+                        var data = {
+                            "id":name,
+                            "name":name,
+                            "label":name,
+                            "type":"folder",
+                            "container":true
+                        };
+
+                        var newFolder = new ZUTUBI.widget.FileNode(data, node, false);
+                        node.refresh();
+
+                        // need to select the newly created folder.
+                        tree.select(newFolder);
+                    }
                 };
             }
 
             function rmdir()
             {
+                hideActionErrors();
+
                 // grab selected file.
                 var node = YAHOO.widget.TreeView.getTree('browseTree').selected;
 
@@ -364,16 +388,51 @@
                 return function(response)
                 {
                     // check response. if success, remove the node from the tree.
-                    var tree = YAHOO.widget.TreeView.getTree('browseTree');
-                    tree.removeNode(node, true);
-
-                    // if error, present the error to the user.
+                    var jsonObj = eval("(" + response.responseText + ")");
+                    if (jsonObj.actionErrors && $A(jsonObj.actionErrors).length > 0)
+                    {
+                        // an error has occured, present the error to the user.
+                        showActionErrors(jsonObj.actionErrors);
+                        
+                    }
+                    else
+                    {
+                        // remove the node.
+                        var tree = YAHOO.widget.TreeView.getTree('browseTree');
+                        tree.removeNode(node, true);
+                    }
                 }
+            }
+
+            /**
+             * Display the provided list of action error messages within the configured error div.
+             *
+             * actionErrors:    an array of error messages.
+             */
+            function showActionErrors(actionErrors)
+            {
+                var sb = [];
+                sb[sb.length] = "<div class=\"error\">";
+                $A(actionErrors).each(function(msg)
+                {
+                    sb[sb.length] = msg;
+                    sb[sb.length] = "<br/>";
+                });
+                sb[sb.length] = "</div>";
+
+                var element = $('error');
+                element.innerHTML = sb.join("");
+                Element.show(element);
+            }
+
+            function hideActionErrors()
+            {
+                Element.hide($('error'));
             }
 
             handleFailure = function(e, e2)
             {
-                alert("handleFailure");
+                openDebugAlert(e2);
             }
 
             handleException = function(e, e2)
@@ -401,7 +460,7 @@
     <div style="clear:both;"></div>
 
     <!-- error message -->
-    <div class="error" id="error">
+    <div id="error">
     </div>
 
     <!--toolbar-->

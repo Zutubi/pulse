@@ -519,6 +519,8 @@ YAHOO.extend(ZUTUBI.widget.PulseTreeView, ZUTUBI.widget.TreeView, {
 
     base:null,
 
+    error:"error",
+
     setFSRoot: function(root)
     {
         this.fsRoot = root;
@@ -527,6 +529,11 @@ YAHOO.extend(ZUTUBI.widget.PulseTreeView, ZUTUBI.widget.TreeView, {
     setBase: function(base)
     {
         this.base = base;
+    },
+
+    setErrorId: function(id)
+    {
+        this.error = id;
     },
 
     onAction: function(node, action)
@@ -547,6 +554,8 @@ YAHOO.extend(ZUTUBI.widget.PulseTreeView, ZUTUBI.widget.TreeView, {
 
     ls: function(node, onCompleteCallback, showFiles, showHidden)
     {
+        this.hideActionErrors();
+            
         // generate id path.
         var p = "";
         if (node.tree.getIdPath)
@@ -571,9 +580,16 @@ YAHOO.extend(ZUTUBI.widget.PulseTreeView, ZUTUBI.widget.TreeView, {
 
     lsResponse: function(parentNode, callback)
     {
+        var self = this;
         return function(response)
         {
             var jsonObj = eval("(" + response.responseText + ")");
+
+            if (jsonObj.actionErrors && $A(jsonObj.actionErrors).length > 0)
+            {
+                // display the action error messages.
+                self.showActionErrors(jsonObj.actionErrors);
+            }
 
             var results = $A(jsonObj.listing);
             results.each(function(obj)
@@ -602,9 +618,36 @@ YAHOO.extend(ZUTUBI.widget.PulseTreeView, ZUTUBI.widget.TreeView, {
         };
     },
 
+    /**
+     * Display the provided list of action error messages within the configured error div.
+     *
+     * actionErrors:    an array of error messages.
+     */
+    showActionErrors: function(actionErrors)
+    {
+        var sb = [];
+        sb[sb.length] = "<ul class=\"error\">";
+        $A(actionErrors).each(function(msg)
+        {
+            sb[sb.length] = "<li class=\"error\">";
+            sb[sb.length] = msg;
+            sb[sb.length] = "</li>";
+        });
+        sb[sb.length] = "</ul>";
+
+        var element = $(this.error);
+        element.innerHTML = sb.join("");
+        Element.show(element);
+    },
+
+    hideActionErrors: function()
+    {
+        Element.hide($(this.error));
+    },
+
     handleFailure: function(e, e2)
     {
-        alert("handleFailure");
+        openDebugAlert(e2);
     },
 
     handleException: function(e, e2)

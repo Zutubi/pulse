@@ -27,6 +27,7 @@ import java.io.*;
 import java.util.Collection;
 import java.util.List;
 import java.util.LinkedList;
+import java.util.Map;
 
 /**
  * <class-comment/>
@@ -122,7 +123,11 @@ public class JsonResult extends WebWorkResultSupport
         // take the data, extract the appropriate value and loop over the elements.
         String ref = e.getAttribute("ref");
 
-        Object newData = evaluateReference(ref, data);
+        Object newData = data;
+        if (TextUtils.stringSet(ref))
+        {
+            newData = evaluateReference(ref, data);
+        }
         // expecting data to be a collection or array. If not, treat it as a single element in a list.
 
         Object[] array;
@@ -150,6 +155,26 @@ public class JsonResult extends WebWorkResultSupport
             handleValue(e, jw, o);
         }
         jw.endArray();
+    }
+
+    private void handleMap(Element e, JSONWriter jw, Object data) throws JSONException
+    {
+        String ref = e.getAttribute("ref");
+        Object newData = evaluateReference(ref, data);
+
+        if (!(newData instanceof Map))
+        {
+            return;
+        }
+        
+        Map map = (Map) newData;
+        jw.object();
+        for (Object o : map.keySet())
+        {
+            jw.key(o.toString());
+            handleValue(e, jw, map.get(o));
+        }
+        jw.endObject();
     }
 
     private void handlePair(Element e, JSONWriter jw, Object data) throws JSONException
@@ -189,6 +214,10 @@ public class JsonResult extends WebWorkResultSupport
                 else if (child.getLocalName().equals("array"))
                 {
                     handleArray(child, jw, data);
+                }
+                else if (child.getLocalName().equals("map"))
+                {
+                    handleMap(child, jw, data);
                 }
                 else // unknown.
                 {

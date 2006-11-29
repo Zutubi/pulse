@@ -55,6 +55,7 @@
 
         #if($buildResult.completed())
             <div id="loading" style="display:none;"><img src="$base/images/treeview/loading.gif" alt="loading..."/></div>
+            <div id="error"></div>
             <div id="wcTree">
                 <div id="browseTree"></div>
             </div>

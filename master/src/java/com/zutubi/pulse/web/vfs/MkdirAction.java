@@ -35,12 +35,11 @@ public class MkdirAction extends VFSActionSupport
         FileObject newFolder = fo.resolveFile(name);
         if (newFolder.exists())
         {
-            // already exists.
+            addActionError(String.format("The folder '%s' already exists. Please use a different name", name));
             return ERROR;
         }
 
         newFolder.createFolder();
-        
         return SUCCESS;
     }
 }

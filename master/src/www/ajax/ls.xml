@@ -19,6 +19,19 @@ Create an object of the following format:
 
 -->
 <object>
+    <!-- action error handling -->
+    <pair key="actionErrors">
+        <array ref="actionErrors"></array>
+    </pair>
+    <pair key="actionMessages">
+        <array ref="actionMessages"></array>
+    </pair>
+    <pair key="fieldErrors">
+        <map ref="fieldErrors">
+            <array/>
+        </map>
+    </pair>
+    <!-- the listing definition -->
     <pair key="listing">
         <array ref="listing">
             <object>

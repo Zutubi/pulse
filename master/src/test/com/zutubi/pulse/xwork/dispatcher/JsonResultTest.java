@@ -4,10 +4,10 @@ import com.opensymphony.webwork.ServletActionContext;
 import com.opensymphony.xwork.MockActionInvocation;
 import com.opensymphony.xwork.util.OgnlValueStack;
 import com.zutubi.pulse.test.PulseTestCase;
+import com.zutubi.pulse.web.ActionSupport;
 import com.mockobjects.servlet.MockHttpServletResponse;
 
-import java.util.List;
-import java.util.LinkedList;
+import java.util.*;
 import java.io.InputStream;
 import java.io.ByteArrayInputStream;
 
@@ -229,6 +229,79 @@ public class JsonResultTest extends PulseTestCase
         result.execute(ai);
 
         assertEquals("{\"key\":[{\"akey\":\"A\",\"bkey\":\"a\"},{\"akey\":\"B\",\"bkey\":\"b\"}]}", response.getOutputStreamContents());
+    }
+
+    public void testMapOfStrings() throws Exception
+    {
+        stack.push(new TestDataSource()
+        {
+            public Object getA()
+            {
+                Map<String, String> map = new HashMap<String, String>();
+                map.put("A", "B");
+                map.put("C", "D");
+                return map;
+            }
+        });
+        result.setDefinitionLoader(new SJDL("<?xml version=\"1.0\"?><object><pair key=\"key\"><map ref=\"a\"></map></pair></object>"));
+        result.execute(ai);
+        assertEquals("{\"key\":{\"A\":\"B\",\"C\":\"D\"}}", response.getOutputStreamContents());
+    }
+
+    public void testMapOfLists() throws Exception
+    {
+        stack.push(new TestDataSource()
+        {
+            public Object getA()
+            {
+                Map<String, List<String>> map = new HashMap<String, List<String>>();
+                map.put("A", Arrays.asList("A", "B", "C"));
+                map.put("C", Arrays.asList("D", "E", "F"));
+                return map;
+            }
+        });
+        result.setDefinitionLoader(new SJDL("<?xml version=\"1.0\"?>" +
+                "<object>" +
+                    "<pair key=\"key\"><map ref=\"a\"><array/></map></pair>" +
+                "</object>"
+        ));
+        result.execute(ai);
+        assertEquals("{\"key\":{\"A\":[\"A\",\"B\",\"C\"],\"C\":[\"D\",\"E\",\"F\"]}}", response.getOutputStreamContents());
+    }
+
+    public void testActionErrorDefinition() throws Exception
+    {
+        ActionSupport action = new ActionSupport();
+        action.addActionError("action error a");
+        action.addActionError("action error b");
+        stack.push(action);
+
+        result.setDefinitionLoader(new SJDL("<?xml version=\"1.0\"?>" +
+                "<object>" +
+                    "<pair key=\"actionError\">" +
+                        "<array ref=\"actionErrors\"></array>" +
+                    "</pair>" +
+                "</object>"));
+        result.execute(ai);
+
+        assertEquals("{\"actionError\":[\"action error a\",\"action error b\"]}", response.getOutputStreamContents());
+    }
+
+    public void testActionFieldErrors() throws Exception
+    {
+        ActionSupport action = new ActionSupport();
+        action.addFieldError("a", "error a 1");
+        action.addFieldError("a", "error a 2");
+        action.addFieldError("b", "error b");
+        stack.push(action);
+
+        result.setDefinitionLoader(new SJDL("<?xml version=\"1.0\"?>" +
+                "<object>" +
+                    "<pair key=\"fieldError\"><map ref=\"fieldErrors\"><array/></map></pair>" +
+                "</object>"));
+        result.execute(ai);
+
+        assertEquals("{\"fieldError\":{\"a\":[\"error a 1\",\"error a 2\"],\"b\":[\"error b\"]}}", response.getOutputStreamContents());
     }
 
     interface TestDataSource

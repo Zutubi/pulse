@@ -98,14 +98,17 @@
 
         <action name="ls" class="com.zutubi.pulse.web.vfs.LsAction">
             <result name="success" type="json">ls.xml</result>
+            <result name="error" type="json">error.xml</result>
         </action>
 
         <action name="mkdir" class="com.zutubi.pulse.web.vfs.MkdirAction">
             <result name="success" type="json">mkdir.xml</result>
+            <result name="error" type="json">error.xml</result>
         </action>
 
         <action name="rmdir" class="com.zutubi.pulse.web.vfs.RmAction">
             <result name="success" type="json">rmdir.xml</result>
+            <result name="error" type="json">error.xml</result>
         </action>
 
         <action name="requestEvaluation" class="com.zutubi.pulse.web.ajax.RequestEvaluationAction">
