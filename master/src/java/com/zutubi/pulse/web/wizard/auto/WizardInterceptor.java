@@ -86,6 +86,7 @@ public class WizardInterceptor implements Interceptor
                 else
                 {
                     wizardAction.addActionError(wizardAction.getText("wizard.state.lost"));
+                    wizardAction.initWizardIfRequired();
                     wizardAction.getWizardInstance().doRestart();
                     shortCircuit = "step";
                 }

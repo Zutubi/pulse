@@ -188,7 +188,7 @@ public class WizardAction extends ActionSupport
         }
     }
 
-    private void initWizardIfRequired()
+    protected void initWizardIfRequired()
     {
         Wizard wizard = getWizardInstance();
         if (wizardRequiresLazyInitialisation)
