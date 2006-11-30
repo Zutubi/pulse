@@ -2,13 +2,13 @@ package com.zutubi.pulse.bootstrap;
 
 import com.opensymphony.util.TextUtils;
 import com.opensymphony.xwork.spring.SpringObjectFactory;
+import com.zutubi.pulse.Version;
 import com.zutubi.pulse.bootstrap.conf.EnvConfig;
 import com.zutubi.pulse.config.PropertiesWriter;
 import com.zutubi.pulse.license.LicenseHolder;
 import com.zutubi.pulse.model.UserManager;
 import com.zutubi.pulse.upgrade.UpgradeManager;
 import com.zutubi.pulse.util.IOUtils;
-import com.zutubi.pulse.Version;
 
 import java.io.*;
 import java.util.List;
@@ -235,7 +235,7 @@ public class DefaultSetupManager implements SetupManager
     {
         state = SetupState.STARTING;
 
-        // Remote the upgrade context from the ComponentContext stack / namespace.
+        // Remove the upgrade context from the ComponentContext stack / namespace.
         // They are no longer required.
         ComponentContext.pop();
         

@@ -9,8 +9,8 @@ import org.mortbay.jetty.servlet.WebApplicationHandler;
 import org.mortbay.util.MultiException;
 
 import java.io.File;
-import java.util.List;
 import java.net.BindException;
+import java.util.List;
 
 /**
  * The Jetty Manager provides access to the runtime configuration of the jetty server, and hence

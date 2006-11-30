@@ -19,7 +19,7 @@ import org.acegisecurity.providers.encoding.PlaintextPasswordEncoder;
 public class TokenManagerTest extends PulseTestCase
 {
     DefaultUserManager userManager;
-    TokenManager tokenManager;
+    DefaultTokenManager tokenManager;
 
     protected void setUp() throws Exception
     {
@@ -38,7 +38,7 @@ public class TokenManagerTest extends PulseTestCase
         userManager.setBuildManager(new MockBuildManager());
         userManager.setLdapManager(new AcegiLdapManager());
 
-        tokenManager = new TokenManager();
+        tokenManager = new DefaultTokenManager();
         tokenManager.setUserManager(userManager);
         tokenManager.setPasswordEncoder(new PlaintextPasswordEncoder());
     }

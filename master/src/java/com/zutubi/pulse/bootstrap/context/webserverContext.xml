@@ -34,4 +34,9 @@ This context exports:
         </property>
     </bean>
 
+    <bean id="tokenManager" class="com.zutubi.pulse.bootstrap.StartupTokenManager">
+        <property name="adminTokenManager">
+            <ref bean="adminTokenManager"/>
+        </property>
+    </bean>
 </beans>

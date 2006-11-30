@@ -10,6 +10,9 @@ import com.zutubi.pulse.bootstrap.ComponentContext;
 import com.zutubi.pulse.committransformers.CommitMessageTransformerManager;
 import com.zutubi.pulse.core.model.PersistentName;
 import com.zutubi.pulse.core.model.ResultState;
+import com.zutubi.pulse.events.Event;
+import com.zutubi.pulse.events.EventManager;
+import com.zutubi.pulse.events.system.SystemStartedEvent;
 import com.zutubi.pulse.form.squeezer.SqueezeException;
 import com.zutubi.pulse.form.squeezer.Squeezers;
 import com.zutubi.pulse.form.squeezer.TypeSqueezer;
@@ -32,9 +35,8 @@ import java.util.*;
 /**
  * Implements a simple API for remote monitoring and control.
  */
-public class RemoteApi
+public class RemoteApi implements com.zutubi.pulse.events.EventListener
 {
-    private AdminTokenManager adminTokenManager;
     private TokenManager tokenManager;
 
     private ShutdownManager shutdownManager;
@@ -43,6 +45,7 @@ public class RemoteApi
     private UserManager userManager;
     private AgentManager agentManager;
     private AuthenticationManager authenticationManager;
+    private EventManager eventManager;
 
     private ValidationManager validationManager;
 
@@ -541,19 +544,7 @@ public class RemoteApi
 
     public boolean shutdown(String token, boolean force, boolean exitJvm) throws AuthenticationException
     {
-        // check the tokenmanager. If we have one, then lets us it. If not, then its very early in
-        // the setup process, so fallback to the admin token manager.
-        if (tokenManager != null)
-        {
-            tokenManager.verifyAdmin(token);
-        }
-        else
-        {
-            if (!adminTokenManager.checkAdminToken(token))
-            {
-                throw new AuthenticationException("Invalid token");
-            }
-        }
+        tokenManager.verifyAdmin(token);
 
         // Sigh ... this is tricky, because if we shutdown here Jetty dies
         // before this request is complete and the client gets an error :-|.
@@ -563,18 +554,7 @@ public class RemoteApi
 
     public boolean stopService(String token) throws AuthenticationException
     {
-        if (tokenManager != null)
-        {
-            tokenManager.verifyAdmin(token);
-        }
-        else
-        {
-            if (!adminTokenManager.checkAdminToken(token))
-            {
-                throw new AuthenticationException("Invalid token");
-            }
-        }
-
+        tokenManager.verifyAdmin(token);
         shutdownManager.delayedStop();
         return true;
     }
@@ -1203,11 +1183,6 @@ public class RemoteApi
         this.projectManager = projectManager;
     }
 
-    public void setAdminTokenManager(AdminTokenManager adminTokenManager)
-    {
-        this.adminTokenManager = adminTokenManager;
-    }
-
     public void setAgentManager(AgentManager agentManager)
     {
         this.agentManager = agentManager;
@@ -1226,5 +1201,23 @@ public class RemoteApi
     public void setAuthenticationManager(AuthenticationManager authenticationManager)
     {
         this.authenticationManager = authenticationManager;
+    }
+
+    public void setEventManager(EventManager eventManager)
+    {
+        this.eventManager = eventManager;
+        eventManager.register(this);
+    }
+
+    public void handleEvent(Event evt)
+    {
+        // Rewire on startup to get the full token manager.
+        ComponentContext.autowire(this);
+        eventManager.unregister(this);
+    }
+
+    public Class[] getHandledEvents()
+    {
+        return new Class[] { SystemStartedEvent.class } ;
     }
 }
