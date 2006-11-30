@@ -368,7 +368,7 @@
     </bean>
 
     <bean id="triggerBuildSpecification2" class="com.zutubi.pulse.upgrade.tasks.TriggerBuildSpecificationUpgradeTask" autowire="byName">
-To        <property name="buildNumber" value="102001009"/>
+        <property name="buildNumber" value="102001009"/>
     </bean>
 
     <bean id="buildReasonDataPatchUpgrade" class="com.zutubi.pulse.upgrade.tasks.CopySharedBuildReasonDataPatchUpgradeTask" autowire="byName">
