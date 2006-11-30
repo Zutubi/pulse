@@ -68,6 +68,11 @@
             <property name="projectPath" type="string"/>
         </subclass>
 
+        <subclass name="com.zutubi.pulse.model.P4WebChangeViewer" discriminator-value="P4WEB" lazy="false">
+            <property name="baseURL" type="string"/>
+            <property name="projectPath" type="string"/>
+        </subclass>
+
         <subclass name="com.zutubi.pulse.model.TracChangeViewer" discriminator-value="TRAC" lazy="false">
             <property name="baseURL" type="string"/>
             <property name="projectPath" type="string"/>

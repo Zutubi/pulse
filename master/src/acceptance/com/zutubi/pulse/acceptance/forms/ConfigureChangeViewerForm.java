@@ -29,6 +29,6 @@ public class ConfigureChangeViewerForm extends BaseForm
     public void assertFormPresent()
     {
         super.assertFormPresent();
-        tester.assertOptionValuesEqual("type", new String[]{ "custom", "Fisheye", "Trac", "ViewVC" });
+        tester.assertOptionValuesEqual("type", new String[]{ "custom", "Fisheye", "P4Web", "Trac", "ViewVC" });
     }
 }

@@ -15,6 +15,7 @@ public class ChangeViewerWizard implements Wizard, Validateable
 {
     private static final String TYPE_CUSTOM = "custom";
     private static final String TYPE_FISHEYE = "Fisheye";
+    private static final String TYPE_P4WEB = "P4Web";
     private static final String TYPE_TRAC = "Trac";
     private static final String TYPE_VIEW_VC = "ViewVC";
 
@@ -49,6 +50,8 @@ public class ChangeViewerWizard implements Wizard, Validateable
         forms.put(TYPE_CUSTOM, custom);
         FisheyeChangeViewerForm fisheye = new FisheyeChangeViewerForm();
         forms.put(TYPE_FISHEYE, fisheye);
+        P4WebChangeViewerForm p4 = new P4WebChangeViewerForm();
+        forms.put(TYPE_P4WEB, p4);
         TracChangeViewerForm trac = new TracChangeViewerForm();
         forms.put(TYPE_TRAC, trac);
         ViewVCChangeViewerForm viewVc = new ViewVCChangeViewerForm();
@@ -74,6 +77,12 @@ public class ChangeViewerWizard implements Wizard, Validateable
                     fisheye.initialise((FisheyeChangeViewer)currentViewer);
                     selectState.setType(TYPE_FISHEYE);
                     currentState = fisheye;
+                }
+                else if(currentViewer instanceof P4WebChangeViewer)
+                {
+                    p4.initialise((P4WebChangeViewer) currentViewer);
+                    selectState.setType(TYPE_P4WEB);
+                    currentState = p4;
                 }
                 else if(currentViewer instanceof TracChangeViewer)
                 {

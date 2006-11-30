@@ -103,6 +103,37 @@ public class ChangeViewersAcceptanceTest extends ProjectAcceptanceTestBase
         assertTextPresent("base trac url is required");
     }
 
+    public void testAddP4WebChangeViewer()
+    {
+        clickLink(Navigation.Projects.LINK_EDIT_CHANGE_VIEWER);
+        ConfigureChangeViewerForm form = new ConfigureChangeViewerForm(tester);
+        form.assertFormPresent();
+        form.nextFormElements("P4Web");
+
+        ConfigureP4WebChangeViewerForm p4 = new ConfigureP4WebChangeViewerForm(tester);
+        p4.assertFormPresent();
+        p4.finishFormElements("baseurl");
+        assertChangeViewerTable("details", "P4Web [baseurl]");
+
+        clickLink(Navigation.Projects.LINK_EDIT_CHANGE_VIEWER);
+        p4.assertFormPresent();
+        p4.assertFormElements("baseurl");
+    }
+
+    public void testAddP4WebChangeViewerValidation()
+    {
+        clickLink(Navigation.Projects.LINK_EDIT_CHANGE_VIEWER);
+        ConfigureChangeViewerForm form = new ConfigureChangeViewerForm(tester);
+        form.assertFormPresent();
+        form.nextFormElements("P4Web");
+
+        ConfigureP4WebChangeViewerForm p4 = new ConfigureP4WebChangeViewerForm(tester);
+        p4.assertFormPresent();
+        p4.finishFormElements("");
+        p4.assertFormPresent();
+        assertTextPresent("base p4web url is required");
+    }
+
     public void testAddViewVCChangeViewer()
     {
         clickLink(Navigation.Projects.LINK_EDIT_CHANGE_VIEWER);
