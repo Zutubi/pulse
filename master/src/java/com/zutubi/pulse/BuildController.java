@@ -602,6 +602,10 @@ public class BuildController implements EventListener
             }
         }
 
+        // calculate the feature counts at the end of the build so that the result hierarchy does not need to
+        // be traversed when this information is required.
+        buildResult.calculateFeatureCounts();
+
         testManager.index(buildResult);
         buildManager.save(buildResult);
 

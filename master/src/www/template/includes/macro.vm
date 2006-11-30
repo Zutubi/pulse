@@ -460,11 +460,19 @@
     <td class="content">#wwtext("name=$key")</td>
 #end
 
+#macro(contentClassCell $key)
+    <td class="$cssClass">#wwtext("name=$key")</td>
+#end
+
 ##
 ## Outputs a static cell for a content table
 ##
 #macro(staticCell $cc)
     <td class="content">$cc</td>
+#end
+
+#macro(staticClassCell $cc)
+    <td class="$cssClass">$cc</td>
 #end
 
 ##
@@ -521,6 +529,18 @@
 ##
 #macro(dynamicRightLinkCell $content $url)
     <td class="content-right">
+    #if($url)
+        <a href="$url">
+    #end
+            $!webwork.htmlEncode($content)
+    #if($url)
+        </a>
+    #end
+     </td>
+#end
+
+#macro(dynamicRightLinkClassCell $content $url)
+    <td class="${cssClass}-right">
     #if($url)
         <a href="$url">
     #end
@@ -771,17 +791,30 @@
 ## Outputs a build/project status cell
 ##
 #macro(statusCell $result $showAnimated)
-    <td class="$result.state.string">
-        #statusImage($result $showAnimated)
-    </td>
-    <td class="$result.state.string">
-        $result.state.prettyString
-    </td>
+    #if($result.succeeded() && $result.warningFeatureCount > 0)
+        <td class="warning">
+            #statusImage($result $showAnimated)
+        </td>
+        <td class="warning">
+            $result.state.prettyString
+        </td>
+    #else
+        <td class="$result.state.string">
+            #statusImage($result $showAnimated)
+        </td>
+        <td class="$result.state.string">
+            $result.state.prettyString
+        </td>
+    #end
 #end
 
 #macro(statusImage $result $showAnimated)
     #if($result.succeeded())
-        <img alt="success" src="$base/images/accept.gif"/>
+        #if($result.warningFeatureCount > 0)
+            <img alt="warning" src="$base/images/error.gif"/>
+        #else
+            <img alt="success" src="$base/images/accept.gif"/>
+        #end
     #elseif($result.inProgress())
         #if($showAnimated)
             <img alt="in progress" src="$base/images/inprogress.gif"/>
@@ -796,6 +829,17 @@
         <img alt="failure" src="$base/images/exclamation.gif"/>
     #else
         &nbsp;
+    #end
+#end
+
+##
+##
+##
+#macro(assignGlobalResultCssClass $result)
+    #if($result.warningFeatureCount > 0)
+        #set($cssClass = "warning")
+    #else
+        #set($cssClass = $result.state.string)
     #end
 #end
 
@@ -853,7 +897,7 @@
             <tr>
             #set($result = $action.getResult($id))
                 <td class="content"><a href="currentBuild.action?id=$result.project.id">$!webwork.htmlEncode($result.project.name)</a></td>
-                #set($cssClass = $result.state.string)
+                #assignGlobalResultCssClass($result)
                 #dynamicRightLinkCell($result.number "viewBuild.action?id=$result.id")
                 #classCell($result.buildSpecification)
                 #statusCell($result true)
@@ -898,7 +942,12 @@
 ## Outputs a result test summary cell
 ##
 #macro(testResultsCell $build $recipe $result)
-    <td class="$result.state.string">
+    #if($result.succeeded() && $result.warningFeatureCount > 0)
+        <td class="warning">
+    #else
+        <td class="$result.state.string">
+    #end
+    
     #set($summary = $result.testSummary)
     #if($summary.total == 0)
         #wwtext("name=tests.none")
@@ -928,7 +977,11 @@
             $!webwork.htmlEncode($rr.owner.login)
         </td>
     #else
-        #dynamicLinkCell($rr.owner.name "$base/currentBuild.action?id=$rr.owner.id")
+        <td class="$cssClass">
+            <a href="$base/currentBuild.action?id=$rr.owner.id">
+                $!webwork.htmlEncode($rr.owner.name)
+            </a>
+         </td>
     #end
 #end
 
@@ -1259,7 +1312,7 @@
     <tr>
         #set($id = $resultNode.id)
         #set($recipe = $resultNode.result)
-        #set($cssClass = $recipe.state.string)
+        #assignGlobalResultCssClass($result)
     #if($detailedView)
         <td class="content">
             <a href="#" onclick="selectNode('$resultNode.id'); return false">
@@ -1297,7 +1350,7 @@
         </tr>
     #foreach($command in $recipe.commandResults)
         <tr>
-            #set($cssClass = $command.state.string)
+            #assignGlobalResultCssClass($command)
             <td class="content">
                 <a href="#" onclick="selectNode('$command.id'); return false;">
                     $!webwork.htmlEncode($command.commandName)
@@ -2276,7 +2329,7 @@
 ## column configuration, but without the row tags.
 ##
 #macro(buildTableCells $buildResult $columns $multiProject)
-    #set($cssClass = $buildResult.state.string)
+    #assignGlobalResultCssClass($buildResult)
     #foreach($key in $columns.columns)
         #buildTableCell($buildResult $columns $key $multiProject)
     #end
@@ -2301,6 +2354,12 @@
     </td>
 #end
 
+#macro(projectClassCell $project)
+    <td class="$cssClass">
+        <a href="currentBuild.action?id=$project.id" id="$!webwork.htmlEncode($project.name)">$!webwork.htmlEncode($project.name)</a>
+    </td>
+#end
+
 ##
 ## Outputs a single build result cell, based on the given column key
 ##
@@ -2309,7 +2368,7 @@
     #if($key == "id")
         #dynamicRightLinkCell($buildResult.number "viewBuild.action?id=$buildResult.id")
     #elseif($key == "project")
-        #projectCell($project)
+        #projectClassCell($project)
     #elseif($key == "spec")
         #classCell($buildResult.buildSpecification)
     #elseif($key == "status")
@@ -2322,12 +2381,12 @@
         #ownerCell($buildResult $cssClass)
     #elseif($key == "rev")
         #if($buildResult.personal)
-            #staticCell("personal")
+            #staticClassCell("personal")
         #elseif($buildResult.scmDetails.revision)
             $action.updateChangeUrl($project, $buildResult.scmDetails.revision)
-            #dynamicRightLinkCell($buildResult.scmDetails.revision $action.getChangeUrl())
+            #dynamicRightLinkClassCell($buildResult.scmDetails.revision $action.getChangeUrl())
         #else
-            #contentCell("revision.none")
+            #contentClassCell("revision.none")
         #end
     #elseif($key == "version")
         #classCell("version")
@@ -2341,6 +2400,10 @@
         #changesCell($project $buildResult)
         #artifactsCell($project $buildResult)
         #workingCopyCell($project $buildResult $multiProject)
+    #elseif($key == "warnings")
+        #rightClassCell($buildResult.warningFeatureCount)
+    #elseif($key == "errors")
+        #rightClassCell($buildResult.errorFeatureCount)
     #else
         <td class="content">unknown column '$key'</td>
     #end
@@ -2396,6 +2459,10 @@
                             #buildColumnCheckbox("when" $idSuffix $popupName)
                             #buildColumnCheckbox("elapsed" $idSuffix $popupName)
                             #buildColumnCheckbox("actions" $idSuffix $popupName)
+                        </tr>
+                        <tr>
+                            #buildColumnCheckbox("warnings" $idSuffix $popupName)
+                            #buildColumnCheckbox("errors" $idSuffix $popupName)
                         </tr>
                     </table>
 

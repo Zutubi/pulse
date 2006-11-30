@@ -315,7 +315,7 @@ table.fill-content {
     width: 98%;
 }
 
-h3.heading, div.box, th.heading, th.group, th.note, th.content, th.content-row, td.content, td.content-wrap, td.content-centre, td.content-right, td.content-large, td.image, td.success, td.failure, td.test-failure, td.error, td.warning, td.info, td.pending, td.inprogress, td.terminating, td.add, td.success-right, td.failure-right, td.error-right, td.pending-right, td.inprogress-right, td.terminating-right {
+h3.heading, div.box, th.heading, th.group, th.note, th.content, th.content-row, td.content, td.content-wrap, td.content-centre, td.content-right, td.content-large, td.image, td.success, td.failure, td.test-failure, td.error, td.warning, td.info, td.pending, td.inprogress, td.terminating, td.add, td.success-right, td.warning-right, td.failure-right, td.error-right, td.pending-right, td.inprogress-right, td.terminating-right {
     border: 1px solid #bbb;
     padding: 4px;
 }
@@ -337,7 +337,7 @@ td.content-centre {
     text-align: center;
 }
 
-td.content-right, td.success-right, td.failure-right, td.error-right, td.pending-right, td.inprogress-right, td.terminating-right {
+td.content-right, td.success-right, td.warning-right, td.failure-right, td.error-right, td.pending-right, td.inprogress-right, td.terminating-right {
     text-align: right;
     vertical-align: top;
 }
@@ -389,14 +389,16 @@ td.success, td.success-right {
     color: #383;
 }
 
+td.warning, td.warning-right {
+    color: #d08000;
+    font-weight:bold;
+    background-color: #ffffce;
+}
+
 td.failure, td.error, td.failure-right, td.error-right {
     color: #b22;
     font-weight: bold;
     background: #fff0f0;
-}
-
-td.warning {
-    background-color: #ffffce;
 }
 
 td.info {

@@ -111,6 +111,9 @@ public class RecipeProcessor
         }
         finally
         {
+            // compile the feature counts for the results.
+
+
             writeTestResults(paths, testResults);
             result.setTestSummary(testResults.getSummary());
             result.complete();

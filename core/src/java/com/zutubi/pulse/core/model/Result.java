@@ -8,6 +8,10 @@ import java.io.*;
 import java.util.LinkedList;
 import java.util.List;
 
+/**
+ *
+ *
+ */
 public abstract class Result extends Entity
 {
     private static final String EXCEPTION_FILE = "exception";
@@ -17,6 +21,24 @@ public abstract class Result extends Entity
     private File outputDir;
     protected List<Feature> features = new LinkedList<Feature>();
 
+    protected static final int UNDEFINED = -1;
+
+    /**
+     * A count of the number of warning features associated with this result.
+     */
+    protected int warningFeatureCount = UNDEFINED;
+
+    /**
+     * A count of the number of error features associated with this result.  
+     */
+    protected int errorFeatureCount = UNDEFINED;
+
+    /**
+     * A result that is pending is waiting to for processing to commence. Pending is the
+     * initial state for a result.
+     *
+     * @return true if this result is pending.
+     */
     public boolean pending()
     {
         return ResultState.INITIAL == getState();
@@ -47,6 +69,11 @@ public abstract class Result extends Entity
         return ResultState.ERROR == getState();
     }
 
+    /**
+     * A result is marked as commenced if it is 'inProcess|terminating|completed'. 
+     *
+     * @return true if the process has commenced, false otherwise.
+     */
     public boolean commenced()
     {
         return inProgress() || terminating() || completed();
@@ -94,7 +121,7 @@ public abstract class Result extends Entity
             // CIB-234: if an error occurs before starting the stamps, make
             // sure we still get a start time (otherwise there is no
             // information about when this result happened!)
-            stamps.setStartTime(System.currentTimeMillis());
+            stamps.start();
         }
         stamps.end();
     }
@@ -339,5 +366,66 @@ public abstract class Result extends Entity
     public Feature.Level getLevel(String name)
     {
         return Feature.Level.valueOf(name);
+    }
+
+    /**
+     * Getter for the warning feature count property.
+     *
+     * @return the warning feature count.
+     */
+    public int getWarningFeatureCount()
+    {
+        return warningFeatureCount;
+    }
+
+    /**
+     * Setter for the warning feature count property.
+     *
+     * @param count     warning feature count.
+     */
+    public void setWarningFeatureCount(int count)
+    {
+        this.warningFeatureCount = count;
+    }
+
+    /**
+     * Getter for the error feature count property.
+     *
+     * @return the error feature count.
+     */
+    public int getErrorFeatureCount()
+    {
+        return errorFeatureCount;
+    }
+
+    /**
+     * Setter for the error feature count property.
+     *
+     * @param count     error feature count.
+     */
+    public void setErrorFeatureCount(int count)
+    {
+        this.errorFeatureCount = count;
+    }
+
+    /**
+     * Calculate the feature counts for this result instance.
+     */
+    public void calculateFeatureCounts()
+    {
+        warningFeatureCount = 0;
+        errorFeatureCount = 0;
+
+        for (Feature f : features)
+        {
+            if (f.getLevel() == Feature.Level.ERROR)
+            {
+                errorFeatureCount++;
+            }
+            if (f.getLevel() == Feature.Level.WARNING)
+            {
+                warningFeatureCount++;
+            }
+        }
     }
 }

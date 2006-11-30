@@ -51,6 +51,11 @@ public class TimeStamps
         endTime = System.currentTimeMillis();
     }
 
+    public void start()
+    {
+        startTime = System.currentTimeMillis();
+    }
+
     public long getQueueTime()
     {
         return queueTime;

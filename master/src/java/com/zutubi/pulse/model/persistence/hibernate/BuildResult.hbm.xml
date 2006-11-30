@@ -28,6 +28,14 @@
 
         <property name="number" column="NUMBER" type="long" not-null="true"/>
 
+        <property name="warningFeatureCount" type="int">
+            <column name="WARNING_FEATURE_COUNT" default="-1"/>
+        </property>
+
+        <property name="errorFeatureCount" type="int">
+            <column name="ERROR_FEATURE_COUNT" default="-1"/>
+        </property>
+
         <many-to-one name="project" column="PROJECT" class="com.zutubi.pulse.model.Project" cascade="none"/>
 
         <many-to-one name="user" column="USER" class="com.zutubi.pulse.model.User" cascade="none" not-null="false"/>
@@ -121,6 +129,14 @@
             <key column="RECIPE_RESULT_ID"/>
             <one-to-many class="com.zutubi.pulse.core.model.Feature"/>
         </bag>
+
+        <property name="warningFeatureCount" type="int">
+            <column name="WARNING_FEATURE_COUNT" default="-1"/>
+        </property>
+
+        <property name="errorFeatureCount" type="int">
+            <column name="ERROR_FEATURE_COUNT" default="-1"/>
+        </property>
 
         <property name="recipeName" column="RECIPE_NAME" type="string" length="255"/>
 

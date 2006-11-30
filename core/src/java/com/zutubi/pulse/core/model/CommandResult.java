@@ -99,4 +99,15 @@ public class CommandResult extends Result
     {
         return artifacts.size() > 0;
     }
+
+    public void calculateFeatureCounts()
+    {
+        super.calculateFeatureCounts();
+
+        for (StoredArtifact artifact : artifacts)
+        {
+            warningFeatureCount = artifact.getFeatures(Feature.Level.WARNING).size();
+            errorFeatureCount = artifact.getFeatures(Feature.Level.ERROR).size();
+        }
+    }
 }

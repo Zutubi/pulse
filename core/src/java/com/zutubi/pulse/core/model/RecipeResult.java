@@ -276,4 +276,19 @@ public class RecipeResult extends Result
     {
         return testSummary != null && testSummary.getBroken() > 0;
     }
+
+    /**
+     * Calculate the feature counts for this result instance.
+     */
+    public void calculateFeatureCounts()
+    {
+        super.calculateFeatureCounts();
+
+        for (CommandResult result: results)
+        {
+            result.calculateFeatureCounts();
+            warningFeatureCount += result.getWarningFeatureCount();
+            errorFeatureCount += result.getErrorFeatureCount();
+        }
+    }
 }

@@ -26,8 +26,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import ognl.OgnlParser;
-
 /**
  *
  *
@@ -369,6 +367,7 @@ public class DefaultBuildManager implements BuildManager, EventListener
             build.abortUnfinishedRecipes();
             build.error(message);
             build.complete();
+            build.calculateFeatureCounts();
             testManager.index(build);
             save(build);
         }
@@ -398,7 +397,8 @@ public class DefaultBuildManager implements BuildManager, EventListener
 
     /**
      * Execute the configured cleanup rules for the specified project.
-     * @param project
+     *
+     * @param project   the project to be cleaned up.
      */
     public void cleanupBuilds(Project project)
     {

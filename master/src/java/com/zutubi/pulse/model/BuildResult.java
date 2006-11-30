@@ -290,4 +290,31 @@ public class BuildResult extends Result implements AclObjectIdentityAware, Itera
     {
         return getTestSummary().getBroken() > 0;
     }
+
+    public void calculateFeatureCounts()
+    {
+        super.calculateFeatureCounts();
+
+        // determine the feature counts for the attached node hierarchy.
+        calculateNodeFeatureCounts(root);
+    }
+
+    private void calculateNodeFeatureCounts(RecipeResultNode node)
+    {
+        // extract the information from the current node.
+        RecipeResult result = node.getResult();
+        if (result != null)
+        {
+            result.calculateFeatureCounts();
+
+            warningFeatureCount += result.getWarningFeatureCount();
+            errorFeatureCount += result.getErrorFeatureCount();
+        }
+        
+        // recurse to the child nodes.
+        for (RecipeResultNode child : node.getChildren())
+        {
+            calculateNodeFeatureCounts(child);
+        }
+    }
 }

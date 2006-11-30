@@ -69,6 +69,8 @@
                 <ref local="schemaUpgrade0102004004"/>
                 <ref local="persistentName"/>
                 <ref local="schemaUpgrade0102004006"/>
+                <ref local="schemaUpgrade0102004009"/>
+                <ref local="featureCountUpgradeTask"/>
             </list>
         </property>
         <property name="systemTasks">
@@ -433,6 +435,20 @@
                 <value>com/zutubi/pulse/upgrade/schema/build_0102004006/TestCaseIndex.hbm.xml</value>
             </list>
         </property>
+    </bean>
+
+    <bean id="schemaUpgrade0102004009" class="com.zutubi.pulse.upgrade.tasks.MigrateSchemaUpgradeTask" autowire="byName">
+        <property name="buildNumber" value="102004009"/>
+        <property name="mappings">
+            <list>
+                <value>com/zutubi/pulse/upgrade/schema/build_0102004009/BuildResult.hbm.xml</value>
+                <value>com/zutubi/pulse/upgrade/schema/build_0102004009/CommandResult.hbm.xml</value>
+            </list>
+        </property>
+    </bean>
+
+    <bean id="featureCountUpgradeTask" class="com.zutubi.pulse.upgrade.tasks.FeatureCountUpgradeTask" autowire="byName">
+        <property name="buildNumber" value="1020040010"/>
     </bean>
 
 </beans>

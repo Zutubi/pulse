@@ -10,8 +10,10 @@ var keyToText = {
         'status': 'status',
         'tests': 'tests',
         'version': 'version',
-        'when': 'when'
-    };
+        'when': 'when',
+        'warnings': 'warnings',
+        'errors': 'errors'
+};
 
 /**
  * @class a YAHOO.util.DDProxy implementation for dragging column
