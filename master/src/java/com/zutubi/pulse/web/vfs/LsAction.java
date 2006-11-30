@@ -155,7 +155,6 @@ public class LsAction extends VFSActionSupport
             }
             catch (FileSystemException e)
             {
-                e.printStackTrace();
                 return false;
             }
         }
@@ -165,6 +164,35 @@ public class LsAction extends VFSActionSupport
             FileTypeFilter filter = new FileTypeFilter();
             filter.acceptedTypes.addAll(types);
             return filter;
+        }
+    }
+
+    /**
+     * A simple holder for the path:listing data pair
+     */
+    private static class ListingPair
+    {
+        private String path;
+        private List<String> listing;
+
+        public String getPath()
+        {
+            return path;
+        }
+
+        public void setPath(String path)
+        {
+            this.path = path;
+        }
+
+        public List<String> getListing()
+        {
+            return listing;
+        }
+
+        public void setListing(List<String> listing)
+        {
+            this.listing = listing;
         }
     }
 }

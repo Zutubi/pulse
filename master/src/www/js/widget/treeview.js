@@ -101,7 +101,75 @@ YAHOO.extend(ZUTUBI.widget.TreeView, YAHOO.widget.TreeView, {
 
     },
 
-    // --- ( utility methods. ) ---
+    // ---( utility methods. )---
+
+    /**
+     * Retrieve the node defined by the path relative to the base node.
+     *
+     * baseNode:        the starting point of the path search. If no base node is specified, the trees root node is used.
+     * requestPath:     the path specifying the node being retrieved.
+     *
+     * This method will return the requested node, or null if the node could not be located. This method will
+     * not dynamically load nodes.
+     */
+    getNodeByPath: function(baseNode, requestPath)
+    {
+        var node = baseNode;
+        if (!node)
+        {
+            node = this.getRoot();
+        }
+
+        // a: normalize the path so that it does not matter which separator is being used.
+        requestPath = requestPath.replace('\\', '/');
+
+        // search for node with name initPath.
+        requestPath = requestPath.split('/');
+
+        var p = null; // previous node.
+        for (var i = 0; i < requestPath.length; i++)
+        {
+            var path = requestPath[i];
+            if (path == "")
+            {
+                // happens when the path begins with a '/'
+                continue;
+            }
+
+            // we are only interested in nodes that are available locally.
+            if (!node.isDynamic() || node.dynamicLoadComplete)
+            {
+                // Attempt to locate the child node specified by the current path element.
+                node = $A(node.children).find(function(child)
+                {
+                    var n = child.data.name;
+                    // normalise the name to ensure we are using '/' as the path separator.
+                    n = n.replace('\\', '/');
+
+                    // ensure that trailing '\\' are removed.
+                    if (n.indexOf('/') == n.length - 1)
+                    {
+                        n = n.substring(0, n.length - 1);
+                    }
+                    return n == path;
+                });
+                
+                if (!node)
+                {
+                    // the requested path node does not exist.
+                    return null;
+                }
+                p = node;
+            }
+            else
+            {
+                // this node has not been loaded, so we can not traverse any further.
+                return null;
+            }
+        }
+
+        return node;
+    },
 
     /**
      * Select the currently selected nodes parent. If there is no selected node
@@ -123,7 +191,7 @@ YAHOO.extend(ZUTUBI.widget.TreeView, YAHOO.widget.TreeView, {
     /**
      * Expand the tree to the node defined by the requested path.
      *
-     * If this tree is dynamically loaded (which it is), there may be a delay in expanding
+     * If this tree is dynamically loaded, there may be a delay in expanding
      * to the requested path due to loading of the data. As a result, this method returns
      * 3 response codes.
      *
@@ -204,22 +272,26 @@ YAHOO.extend(ZUTUBI.widget.TreeView, YAHOO.widget.TreeView, {
         // split the request path into its components.
 
         var status = this.expandTo(requestPath);
+        if (status == 0)
+        {
+            // complete.
+            return;
+        }
+
         if (status == 1)
         {
             // node does not exist.
+            return;
         }
-        else if (status == 2)
+
+        if (status == 2)
         {
-            // still loading.
+            // still loading, so lets try again in 250 milliseconds
             var self = this;
             setTimeout(function()
             {
                 self.expandToPath(requestPath);
             }, 250);
-        }
-        else if (status == 0)
-        {
-            // complete.
         }
     },
 
