@@ -1,7 +1,6 @@
 package com.zutubi.pulse.web.user;
 
 import com.zutubi.pulse.model.BuildManager;
-import com.zutubi.pulse.model.ProjectManager;
 import com.zutubi.pulse.model.User;
 import com.zutubi.pulse.security.AcegiUtils;
 import com.zutubi.pulse.web.project.ProjectFormHelper;
@@ -61,7 +60,7 @@ public class ConfigureDashboardAction extends UserActionSupport
     {
         if(allProjects == null)
         {
-            allProjects = projectHelper.getAllEntities();
+            allProjects = getProjectHelper().getAllEntities();
         }
 
         return allProjects;
@@ -91,7 +90,7 @@ public class ConfigureDashboardAction extends UserActionSupport
     {
         if(allGroups == null)
         {
-            allGroups = groupHelper.getAllEntities();
+            allGroups = getGroupHelper().getAllEntities();
         }
         return allGroups;
     }
@@ -127,8 +126,8 @@ public class ConfigureDashboardAction extends UserActionSupport
         buildCount = user.getDashboardBuildCount();
 
         showAllProjects = user.getShowAllProjects();
-        projects = projectHelper.convertToIds(user.getShownProjects());
-        shownGroups = groupHelper.convertToIds(user.getShownGroups());
+        projects = getProjectHelper().convertToIds(user.getShownProjects());
+        shownGroups = getGroupHelper().convertToIds(user.getShownGroups());
 
         showMyChanges = user.getShowMyChanges();
         showProjectChanges = user.getShowProjectChanges();
@@ -159,10 +158,10 @@ public class ConfigureDashboardAction extends UserActionSupport
         }
         else
         {
-            projectHelper.convertFromIds(projects, user.getShownProjects());
+            getProjectHelper().convertFromIds(projects, user.getShownProjects());
         }
 
-        groupHelper.convertFromIds(shownGroups, user.getShownGroups());
+        getGroupHelper().convertFromIds(shownGroups, user.getShownGroups());
 
         user.setShowMyChanges(showMyChanges);
         user.setShowProjectChanges(showProjectChanges);
@@ -172,14 +171,26 @@ public class ConfigureDashboardAction extends UserActionSupport
         return SUCCESS;
     }
 
-    public void setProjectManager(ProjectManager projectManager)
-    {
-        projectHelper = new ProjectFormHelper(projectManager);
-        groupHelper = new ProjectGroupFormHelper(projectManager);
-    }
-
     public void setBuildManager(BuildManager buildManager)
     {
         this.buildManager = buildManager;
+    }
+
+    public ProjectFormHelper getProjectHelper()
+    {
+        if (projectHelper == null)
+        {
+            projectHelper = new ProjectFormHelper(projectManager);
+        }
+        return projectHelper;
+    }
+
+    public ProjectGroupFormHelper getGroupHelper()
+    {
+        if (groupHelper == null)
+        {
+            groupHelper = new ProjectGroupFormHelper(projectManager);
+        }
+        return groupHelper;
     }
 }

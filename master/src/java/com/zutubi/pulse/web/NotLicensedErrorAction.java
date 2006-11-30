@@ -17,7 +17,6 @@ public class NotLicensedErrorAction extends ActionSupport
     private LinkedList<LicenseRestriction> restrictions;
 
     private AgentManager agentManager;
-    private ProjectManager projectManager;
     private UserManager userManager;
 
     public String doInput() throws Exception
@@ -49,16 +48,6 @@ public class NotLicensedErrorAction extends ActionSupport
     public void setAgentManager(AgentManager agentManager)
     {
         this.agentManager = agentManager;
-    }
-
-    /**
-     * Required resource.
-     *
-     * @param projectManager
-     */
-    public void setProjectManager(ProjectManager projectManager)
-    {
-        this.projectManager = projectManager;
     }
 
     /**

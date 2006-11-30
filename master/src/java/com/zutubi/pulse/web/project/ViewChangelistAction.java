@@ -20,7 +20,6 @@ public class ViewChangelistAction extends ActionSupport
     private Changelist changelist;
     private ChangelistDao changelistDao;
     private BuildManager buildManager;
-    private ProjectManager projectManager;
     private CommitMessageHelper commitMessageHelper;
 
     /** If we drilled down from the project, this is the project ID */
@@ -287,11 +286,6 @@ public class ViewChangelistAction extends ActionSupport
     public List<BuildResult> getBuildResults()
     {
         return buildResults;
-    }
-
-    public void setProjectManager(ProjectManager projectManager)
-    {
-        this.projectManager = projectManager;
     }
 
     public void setCommitMessageTransformerManager(CommitMessageTransformerManager commitMessageTransformerManager)

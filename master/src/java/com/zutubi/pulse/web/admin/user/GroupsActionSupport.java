@@ -11,7 +11,6 @@ import java.util.List;
 public class GroupsActionSupport extends ActionSupport
 {
     private UserManager userManager;
-    private ProjectManager projectManager;
 
     public UserManager getUserManager()
     {
@@ -21,16 +20,6 @@ public class GroupsActionSupport extends ActionSupport
     public void setUserManager(UserManager userManager)
     {
         this.userManager = userManager;
-    }
-
-    public ProjectManager getProjectManager()
-    {
-        return projectManager;
-    }
-
-    public void setProjectManager(ProjectManager projectManager)
-    {
-        this.projectManager = projectManager;
     }
 
     public boolean hasAdminAuthority(Group group)

@@ -52,11 +52,6 @@ public class CommitMessageTransformerActionSupport extends ActionSupport
         this.selectedProjects = selectedProjects;
     }
 
-    public ProjectManager getProjectManager()
-    {
-        return projectManager;
-    }
-
     public CommitMessageTransformerManager getTransformerManager()
     {
         return transformerManager;

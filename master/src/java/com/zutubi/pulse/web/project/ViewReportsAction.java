@@ -21,7 +21,6 @@ public class ViewReportsAction extends ActionSupport
     private long id;
     private Project project;
     private long specId = 0;
-    private ProjectManager projectManager;
     private Map<Long, String> buildSpecifications;
 
     private Map buildResultsChart;
@@ -166,11 +165,6 @@ public class ViewReportsAction extends ActionSupport
     public Map getStageTimesChart()
     {
         return stageTimesChart;
-    }
-
-    public void setProjectManager(ProjectManager projectManager)
-    {
-        this.projectManager = projectManager;
     }
 
     public void setBuildResultDao(BuildResultDao buildResultDao)

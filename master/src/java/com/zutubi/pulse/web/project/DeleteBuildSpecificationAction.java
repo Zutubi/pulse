@@ -13,7 +13,6 @@ public class DeleteBuildSpecificationAction extends ActionSupport
 {
     private long id;
     private long projectId;
-    private ProjectManager projectManager;
 
     public long getId()
     {
@@ -53,10 +52,5 @@ public class DeleteBuildSpecificationAction extends ActionSupport
 
         projectManager.deleteBuildSpecification(project, id);
         return SUCCESS;
-    }
-
-    public void setProjectManager(ProjectManager projectManager)
-    {
-        this.projectManager = projectManager;
     }
 }

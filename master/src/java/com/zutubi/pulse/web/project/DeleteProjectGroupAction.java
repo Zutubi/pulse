@@ -9,7 +9,6 @@ import com.zutubi.pulse.web.ActionSupport;
 public class DeleteProjectGroupAction extends ActionSupport
 {
     private long groupId;
-    private ProjectManager projectManager;
 
     public void setGroupId(long groupId)
     {
@@ -25,10 +24,5 @@ public class DeleteProjectGroupAction extends ActionSupport
         }
 
         return SUCCESS;
-    }
-
-    public void setProjectManager(ProjectManager projectManager)
-    {
-        this.projectManager = projectManager;
     }
 }

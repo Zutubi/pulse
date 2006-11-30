@@ -6,7 +6,6 @@ import com.opensymphony.webwork.dispatcher.multipart.MultiPartRequestWrapper;
 import com.opensymphony.xwork.ActionContext;
 import com.zutubi.pulse.MasterBuildPaths;
 import com.zutubi.pulse.bootstrap.MasterConfigurationManager;
-import com.zutubi.pulse.events.EventManager;
 import com.zutubi.pulse.model.*;
 import com.zutubi.pulse.personal.PatchArchive;
 import com.zutubi.pulse.util.logging.Logger;
@@ -26,8 +25,6 @@ public class PersonalBuildAction extends ActionSupport
     private String version;
     private long number;
     private String errorMessage;
-    private EventManager eventManager;
-    private ProjectManager projectManager;
     private UserManager userManager;
     private MasterConfigurationManager configurationManager;
 
@@ -140,16 +137,6 @@ public class PersonalBuildAction extends ActionSupport
         }
 
         return SUCCESS;
-    }
-
-    public void setProjectManager(ProjectManager projectManager)
-    {
-        this.projectManager = projectManager;
-    }
-
-    public void setEventManager(EventManager eventManager)
-    {
-        this.eventManager = eventManager;
     }
 
     public void setUserManager(UserManager userManager)

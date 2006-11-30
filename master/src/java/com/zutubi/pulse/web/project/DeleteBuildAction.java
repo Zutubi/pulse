@@ -11,7 +11,6 @@ public class DeleteBuildAction extends ActionSupport
 {
     private long id;
     private BuildManager buildManager;
-    private ProjectManager projectManager;
     private BuildResult result;
 
     public long getId()
@@ -47,11 +46,6 @@ public class DeleteBuildAction extends ActionSupport
         projectManager.checkWrite(result.getProject());
         buildManager.delete(result);
         return SUCCESS;
-    }
-
-    public void setProjectManager(ProjectManager projectManager)
-    {
-        this.projectManager = projectManager;
     }
 
     public void setBuildManager(BuildManager buildManager)

@@ -12,7 +12,6 @@ import com.opensymphony.xwork.Validateable;
 public class EditCommitMessageTransformerAction extends FormAction  implements Validateable
 {
     private CommitMessageTransformerManager transformerManager;
-    private ProjectManager projectManager;
 
     private long id;
     private long projectId;
@@ -129,10 +128,5 @@ public class EditCommitMessageTransformerAction extends FormAction  implements V
     public void setCommitMessageTransformerManager(CommitMessageTransformerManager commitMessageTransformerManager)
     {
         this.transformerManager = commitMessageTransformerManager;
-    }
-
-    public void setProjectManager(ProjectManager projectManager)
-    {
-        this.projectManager = projectManager;
     }
 }

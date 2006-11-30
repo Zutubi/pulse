@@ -25,7 +25,6 @@ public abstract class SubscriptionActionSupport extends UserActionSupport
     protected String template;
     protected SubscriptionHelper helper;
 
-    private ProjectManager projectManager;
     private NotifyConditionFactory notifyConditionFactory;
     private BuildResultRenderer buildResultRenderer;
 
@@ -137,11 +136,6 @@ public abstract class SubscriptionActionSupport extends UserActionSupport
         {
             addFieldError("contactPointId", "Unknown contact point '" + contactPointId + "' for user '" + user.getName() + "'");
         }
-    }
-
-    public void setProjectManager(ProjectManager projectManager)
-    {
-        this.projectManager = projectManager;
     }
 
     public void setNotifyConditionFactory(NotifyConditionFactory notifyConditionFactory)

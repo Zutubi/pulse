@@ -11,7 +11,6 @@ import com.zutubi.pulse.security.AcegiUtils;
 public class HideDashboardGroupAction extends UserActionSupport
 {
     private long id;
-    private ProjectManager projectManager;
 
     public long getId()
     {
@@ -43,10 +42,5 @@ public class HideDashboardGroupAction extends UserActionSupport
 
         getUserManager().save(user);
         return SUCCESS;
-    }
-
-    public void setProjectManager(ProjectManager projectManager)
-    {
-        this.projectManager = projectManager;
     }
 }

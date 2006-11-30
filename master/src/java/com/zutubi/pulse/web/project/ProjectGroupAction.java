@@ -16,7 +16,6 @@ public class ProjectGroupAction extends ActionSupport implements Preparable
     private long groupId;
     private String name;
     private List<Long> projects;
-    private ProjectManager projectManager;
     private ProjectFormHelper helper;
     private ProjectGroup group = new ProjectGroup();
 
@@ -52,7 +51,7 @@ public class ProjectGroupAction extends ActionSupport implements Preparable
 
     public Map<Long, String> getAllProjects()
     {
-        return helper.getAllEntities();
+        return getHelper().getAllEntities();
     }
 
     public List<String> getPrepareParameterNames()
@@ -78,7 +77,7 @@ public class ProjectGroupAction extends ActionSupport implements Preparable
         if(group != null)
         {
             name = group.getName();
-            projects = helper.convertToIds(group.getProjects());
+            projects = getHelper().convertToIds(group.getProjects());
         }
 
         return INPUT;
@@ -101,14 +100,17 @@ public class ProjectGroupAction extends ActionSupport implements Preparable
     public String execute() throws Exception
     {
         group.setName(name);
-        helper.convertFromIds(projects, group.getProjects());
+        getHelper().convertFromIds(projects, group.getProjects());
         projectManager.save(group);
         return SUCCESS;
     }
 
-    public void setProjectManager(ProjectManager projectManager)
+    public ProjectFormHelper getHelper()
     {
-        this.projectManager = projectManager;
-        this.helper = new ProjectFormHelper(projectManager);
+        if (helper == null)
+        {
+            this.helper = new ProjectFormHelper(projectManager);
+        }
+        return helper;
     }
 }

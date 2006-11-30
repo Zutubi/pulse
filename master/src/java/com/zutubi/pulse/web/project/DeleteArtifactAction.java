@@ -10,7 +10,6 @@ public class DeleteArtifactAction extends ActionSupport
 {
     private long id;
     private long projectId;
-    private ProjectManager projectManager;
     private Project project;
 
     public long getId()
@@ -55,8 +54,4 @@ public class DeleteArtifactAction extends ActionSupport
         return SUCCESS;
     }
 
-    public void setProjectManager(ProjectManager projectManager)
-    {
-        this.projectManager = projectManager;
-    }
 }

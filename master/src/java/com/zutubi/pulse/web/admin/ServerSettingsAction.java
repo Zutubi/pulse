@@ -30,7 +30,6 @@ public class ServerSettingsAction extends ActionSupport
     private LdapManager ldapManager;
     private List<CommitMessageTransformer> commitMessageTransformers;
     private CommitMessageTransformerManager commitMessageTransformerManager;
-    private ProjectManager projectManager;
     private AgentManager agentManager;
     private UserManager userManager;
 
@@ -146,16 +145,6 @@ public class ServerSettingsAction extends ActionSupport
     public void setAgentManager(AgentManager agentManager)
     {
         this.agentManager = agentManager;
-    }
-
-    /**
-     * Required resource.
-     *
-     * @param projectManager
-     */
-    public void setProjectManager(ProjectManager projectManager)
-    {
-        this.projectManager = projectManager;
     }
 
     public void setCommitMessageTransformerManager(CommitMessageTransformerManager commitMessageTransformerManager)
