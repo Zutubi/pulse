@@ -234,6 +234,11 @@
             <result name="error" type="velocity">generic-error.vm</result>
         </action>
 
+        <action name="viewArtifactt" class="com.zutubi.pulse.web.project.TemporaryViewArtifactAction">
+            <result name="success" type="velocity">view-artifact.vm</result>
+            <result name="error" type="velocity">generic-error.vm</result>
+        </action>
+
         <action name="browseProjectDir" class="com.zutubi.pulse.web.project.BrowseProjectDirAction">
             <result name="success" type="velocity">browse-project-dir.vm</result>
             <result name="error" type="velocity">generic-error.vm</result>

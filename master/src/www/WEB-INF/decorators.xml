@@ -8,6 +8,7 @@
         <pattern>/popups/*</pattern>
         <pattern>/view/*</pattern>
         <pattern>/viewArtifact.action*</pattern>
+        <pattern>/viewArtifactt.action*</pattern>
         <pattern>/selenium/*</pattern>
     </excludes>
 

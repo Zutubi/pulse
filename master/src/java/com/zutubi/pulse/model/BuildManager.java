@@ -22,6 +22,8 @@ public interface BuildManager
 
     RecipeResultNode getRecipeResultNode(long id);
 
+    RecipeResultNode getResultNodeByResultId(long id);
+
     RecipeResult getRecipeResult(long id);
 
     CommandResult getCommandResult(long id);

@@ -118,6 +118,11 @@ public class DefaultBuildManager implements BuildManager, EventListener
         return buildResultDao.findRecipeResultNode(id);
     }
 
+    public RecipeResultNode getResultNodeByResultId(long id)
+    {
+        return buildResultDao.findResultNodeByResultId(id);
+    }
+
     public RecipeResult getRecipeResult(long id)
     {
         return buildResultDao.findRecipeResult(id);

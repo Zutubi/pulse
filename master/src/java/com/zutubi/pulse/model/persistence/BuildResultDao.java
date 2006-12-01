@@ -16,6 +16,8 @@ public interface BuildResultDao extends EntityDao<BuildResult>
 {
     void save(RecipeResultNode node);
 
+    void save(PersistentName name);
+
     void save(RecipeResult result);
 
     void save(CommandResult result);
@@ -65,4 +67,6 @@ public interface BuildResultDao extends EntityDao<BuildResult>
     int getCompletedResultCount(User user);
 
     List<BuildResult> getOldestCompletedBuilds(User user, int max);
+
+    RecipeResultNode findResultNodeByResultId(long id);
 }

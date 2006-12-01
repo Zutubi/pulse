@@ -25,10 +25,10 @@ public class ArtifactsRootFileObject extends AbstractPulseFileObject
     public AbstractPulseFileObject createFile(final FileName fileName) throws Exception
     {
         // this is a recipe node.
-        long recipeNodeId = Long.parseLong(fileName.getBaseName());
+        long recipeId = Long.parseLong(fileName.getBaseName());
         return objectFactory.buildBean(ArtifactRecipeFileObject.class,
                 new Class[]{FileName.class, Long.TYPE, AbstractFileSystem.class},
-                new Object[]{fileName, recipeNodeId, pfs}
+                new Object[]{fileName, recipeId, pfs}
         );
     }
 
@@ -45,7 +45,7 @@ public class ArtifactsRootFileObject extends AbstractPulseFileObject
         RecipeResultNode node = getBuildResult().getRoot();
         for (final RecipeResultNode child : node.getChildren())
         {
-            results.add(String.format("%s", child.getId()));
+            results.add(String.format("%s", child.getResult().getId()));
         }
         return results.toArray(new String[results.size()]);
     }

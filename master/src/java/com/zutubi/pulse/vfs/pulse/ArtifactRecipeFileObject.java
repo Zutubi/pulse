@@ -8,7 +8,6 @@ import org.apache.commons.vfs.FileType;
 import org.apache.commons.vfs.provider.AbstractFileSystem;
 
 import java.io.InputStream;
-import java.io.File;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -19,16 +18,15 @@ public class ArtifactRecipeFileObject extends AbstractPulseFileObject
 {
     private final String STAGE_FORMAT = "build stage :: %s :: %s@%s";
 
-    private final long recipeNodeId;
+    private final long recipeId;
 
     private String displayName;
-    private RecipeResultNode node;
 
-    public ArtifactRecipeFileObject(final FileName name, final long recipeNodeId, final AbstractFileSystem fs)
+    public ArtifactRecipeFileObject(final FileName name, final long recipeId, final AbstractFileSystem fs)
     {
         super(name, fs);
         
-        this.recipeNodeId = recipeNodeId;
+        this.recipeId = recipeId;
     }
 
     public AbstractPulseFileObject createFile(final FileName fileName) throws Exception
@@ -43,7 +41,7 @@ public class ArtifactRecipeFileObject extends AbstractPulseFileObject
 
     protected void doAttach() throws Exception
     {
-        node = buildManager.getRecipeResultNode(recipeNodeId);
+        RecipeResultNode node = buildManager.getResultNodeByResultId(recipeId);
         displayName = String.format(STAGE_FORMAT, node.getStage(), node.getResult().getRecipeNameSafe(), node.getHostSafe());
     }
 
@@ -56,7 +54,7 @@ public class ArtifactRecipeFileObject extends AbstractPulseFileObject
     {
         List<String> children = new LinkedList<String>();
 
-        RecipeResult recipeResult = node.getResult();
+        RecipeResult recipeResult = buildManager.getRecipeResult(recipeId);
         for (CommandResult commandResult : recipeResult.getCommandResults())
         {
             children.add(Long.toString(commandResult.getId()));
@@ -76,10 +74,6 @@ public class ArtifactRecipeFileObject extends AbstractPulseFileObject
 
     public String getDisplayName()
     {
-        if (this.displayName != null)
-        {
-            return this.displayName;
-        }
-        return super.getDisplayName();
+        return this.displayName;
     }
 }

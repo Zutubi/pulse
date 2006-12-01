@@ -159,4 +159,10 @@
         <property name="failures" column="FAILURES" type="int"/>
         <property name="total" column="TOTAL" type="int"/>
     </class>
+
+    <query name="findResultNodeByResultId"><![CDATA[
+        from RecipeResultNode n
+        where n.result.id = :id
+    ]]></query>
+
 </hibernate-mapping>

@@ -119,6 +119,22 @@ public class HibernateBuildResultDaoTest extends MasterPersistenceTestCase
         result.setTestSummary(summary);
         saveAndLoadRecipe(result);
     }
+
+    public void testFindResultNodeByResultId()
+    {
+        PersistentName name = new PersistentName("name");
+        buildResultDao.save(name);
+
+        RecipeResult result = createRecipe();
+        RecipeResultNode node = new RecipeResultNode(name, result);
+        buildResultDao.save(node);
+        commitAndRefreshTransaction();
+
+        RecipeResultNode persistentNode = buildResultDao.findResultNodeByResultId(result.getId());
+        assertNotNull(persistentNode);
+        assertEquals(node.getId(), persistentNode.getId());
+    }
+
     private RecipeResult createRecipe()
     {
         RecipeResult recipeResult = new RecipeResult("project");

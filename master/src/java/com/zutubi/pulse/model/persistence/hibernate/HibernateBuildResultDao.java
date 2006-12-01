@@ -1,10 +1,7 @@
 package com.zutubi.pulse.model.persistence.hibernate;
 
 import com.zutubi.pulse.core.model.*;
-import com.zutubi.pulse.model.BuildResult;
-import com.zutubi.pulse.model.Project;
-import com.zutubi.pulse.model.RecipeResultNode;
-import com.zutubi.pulse.model.User;
+import com.zutubi.pulse.model.*;
 import com.zutubi.pulse.model.persistence.BuildResultDao;
 import com.zutubi.pulse.util.logging.Logger;
 import org.hibernate.*;
@@ -426,6 +423,11 @@ public class HibernateBuildResultDao extends HibernateEntityDao<BuildResult> imp
         });
     }
 
+    public RecipeResultNode findResultNodeByResultId(long id)
+    {
+        return (RecipeResultNode) findUniqueByNamedQuery("findResultNodeByResultId", "id", id, true);
+    }
+
     private void intialise(BuildResult result)
     {
         Hibernate.initialize(result.getFeatures());
@@ -529,6 +531,11 @@ public class HibernateBuildResultDao extends HibernateEntityDao<BuildResult> imp
     public void save(RecipeResultNode node)
     {
         getHibernateTemplate().saveOrUpdate(node);
+    }
+
+    public void save(PersistentName name)
+    {
+        getHibernateTemplate().saveOrUpdate(name);
     }
 
     public void save(RecipeResult result)

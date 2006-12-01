@@ -1403,7 +1403,7 @@
                     #end
                 #end
                 </span>
-                <a class="unadorned" href="viewArtifact.action?id=$fileArtifact.id&amp;buildId=$build.id&amp;commandId=$command.id#$feature.lineNumber">
+                <a class="unadorned" href="viewArtifactt.action?id=$fileArtifact.id&amp;buildId=$build.id&amp;commandId=$command.id#$feature.lineNumber">
                     <span class="small">#wwtext("name=jump.to")</span> <img src="$base/images/go_small.gif"/>
                 </a>
             #else
@@ -1523,7 +1523,7 @@
     #if($showArtifactLink)
         <a href="$base/view/$result.id/$artifact.id/$action.escapeSpaces($fileArtifact.path)">$trimmedPath</a>
         #if($fileArtifact.canDecorate())
-            [<a href="viewArtifact.action?id=$fileArtifact.id&amp;buildId=$build.id&amp;commandId=$result.id">decorated</a>]
+            [<a href="viewArtifactt.action?id=$fileArtifact.id&amp;buildId=$build.id&amp;commandId=$result.id">decorated</a>]
         #end
     #else
         $trimmedPath

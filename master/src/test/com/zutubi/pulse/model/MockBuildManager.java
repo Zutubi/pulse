@@ -73,6 +73,11 @@ public class MockBuildManager implements BuildManager
         throw new RuntimeException("Method not implemented.");
     }
 
+    public RecipeResultNode getResultNodeByResultId(long id)
+    {
+        throw new RuntimeException("Method not implemented.");
+    }
+
     public StoredFileArtifact getFileArtifact(long id)
     {
         throw new RuntimeException("Method not implemented.");
