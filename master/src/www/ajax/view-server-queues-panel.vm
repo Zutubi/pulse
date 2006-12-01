@@ -27,7 +27,7 @@
         #else
             #contentCell("queue.revision.floating")
         #end
-            #dynamicCell($request.specification)
+            #dynamicCell($request.specification.name)
             #contentCell($request.prettyQueueTime)
 
             #actionCell("cancel" "cancelQueuedBuild.action?id=$request.id" "cancel.gif")
