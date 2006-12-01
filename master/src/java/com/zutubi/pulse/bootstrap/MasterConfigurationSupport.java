@@ -112,7 +112,7 @@ public class MasterConfigurationSupport extends ConfigSupport implements MasterC
 
     public String getHelpUrl()
     {
-        return getProperty(HELP_URL, "http://confluence.zutubi.com/display/pulse0101");
+        return getProperty(HELP_URL, "http://confluence.zutubi.com/display/pulse0102");
     }
 
     public void setHelpUrl(String helpUrl)
