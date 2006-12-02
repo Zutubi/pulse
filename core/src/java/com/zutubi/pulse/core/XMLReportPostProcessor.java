@@ -61,10 +61,13 @@ public abstract class XMLReportPostProcessor extends TestReportPostProcessor
 
     protected String getText(Element element)
     {
-        Node child = element.getChild(0);
-        if(child != null && child instanceof Text)
+        if (element.getChildCount() > 0)
         {
-            return child.getValue().trim();
+            Node child = element.getChild(0);
+            if(child != null && child instanceof Text)
+            {
+                return child.getValue().trim();
+            }
         }
 
         return null;

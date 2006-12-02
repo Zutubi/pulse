@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding='ISO-8859-1' standalone='yes' ?>
+<TestRun>
+  <FailedTests>
+    <FailedTest id="1">
+      <Name>build/test/cppunit/programs/binding::all</Name>
+      <FailureType>Error</FailureType>
+      <Location>
+        <File></File>
+        <Line></Line>
+      </Location>
+      <Message>Actual cppunit test results not produced!</Message>
+    </FailedTest>
+  </FailedTests>
+  <SuccessfulTests></SuccessfulTests>
+  <Statistics>
+    <Tests>1</Tests>
+    <FailuresTotal>1</FailuresTotal>
+    <Errors>1</Errors>
+    <Failures>0</Failures>
+  </Statistics>
+</TestRun>

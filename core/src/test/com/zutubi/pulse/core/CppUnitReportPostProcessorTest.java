@@ -58,6 +58,20 @@ public class CppUnitReportPostProcessorTest extends XMLReportPostProcessorTestBa
         assertTest(suite, "Test");
     }
 
+    public void testEmptyTags()
+    {
+        TestSuiteResult tests = runProcessor("emptytags");
+
+        assertEquals(1, tests.getSuites().size());
+
+        TestSuiteResult suite = tests.getSuites().get(0);
+        assertEquals(1, suite.getCases().size());
+
+        TestCaseResult caseResult = suite.getCases().get(0);
+        assertEquals("all", caseResult.getName());
+        assertEquals(1, caseResult.getErrors());
+    }
+
     private void assertHelloWorld(TestSuiteResult suite, String name)
     {
         checkSuite(suite, name, 1, 0, 0);
