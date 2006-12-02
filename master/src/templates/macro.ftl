@@ -633,7 +633,7 @@ Outputs failing test cases for the given recipe node.
 ---------------------------------------------------------------------------->
 [#macro recipeNodeFailedTestsHTML node]
     [#if node.result?exists]
-        [#if node.result.hasBrokenTests()]
+        [#if node.result.hasBrokenTests() && node.result.failedTestResults?exists]
             [#local summary = node.result.testSummary/]
                 <tr><td>
                     [@openTable/]

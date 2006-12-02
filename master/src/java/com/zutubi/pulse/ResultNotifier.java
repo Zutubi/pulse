@@ -63,7 +63,7 @@ public class ResultNotifier implements EventListener
         List<Subscription> subscriptions = subscriptionManager.getSubscriptions(buildResult.getProject());
         for (Subscription subscription : subscriptions)
         {
-            // filter out contact points that we have alredy notified.
+            // filter out contact points that we have already notified.
             ContactPoint contactPoint = subscription.getContactPoint();
             if (notifiedContactPoints.contains(contactPoint.getUid()))
             {
