@@ -78,7 +78,7 @@ public class DefaultAgentManager implements AgentManager, EventListener, Stoppab
             slaveAgents = new TreeMap<Long, SlaveAgent>();
             for (Slave slave : slaveManager.getAll())
             {
-                addSlaveAgent(slave);
+                addSlaveAgent(slave, false);
             }
         }
         finally
@@ -87,7 +87,7 @@ public class DefaultAgentManager implements AgentManager, EventListener, Stoppab
         }
     }
 
-    private void addSlaveAgent(Slave slave)
+    private void addSlaveAgent(Slave slave, boolean ping)
     {
         try
         {
@@ -104,7 +104,11 @@ public class DefaultAgentManager implements AgentManager, EventListener, Stoppab
 
             SlaveAgent agent = new SlaveAgent(slave, service, serviceTokenManager, buildService);
             slaveAgents.put(slave.getId(), agent);
-            pingSlave(agent);
+
+            if (ping)
+            {
+                pingSlave(agent);
+            }
         }
         catch (MalformedURLException e)
         {
@@ -451,7 +455,7 @@ public class DefaultAgentManager implements AgentManager, EventListener, Stoppab
             lock.lock();
             try
             {
-                addSlaveAgent(slave);
+                addSlaveAgent(slave, true);
 
                 licenseManager.refreshAuthorisations();
             }
@@ -471,7 +475,7 @@ public class DefaultAgentManager implements AgentManager, EventListener, Stoppab
             try
             {
                 removeSlaveAgent(id);
-                addSlaveAgent(slave);
+                addSlaveAgent(slave, true);
             }
             finally
             {
