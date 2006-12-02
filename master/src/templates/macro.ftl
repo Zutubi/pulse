@@ -317,7 +317,7 @@ results as a HTML nested list.
 
 [#macro recipeNodeFailedTestsHTML node]
     [#if node.result?exists]
-        [#if node.result.hasBrokenTests()]
+        [#if node.result.hasBrokenTests() && node.result.failedTestResults?exists]
             [#local summary = node.result.testSummary/]
                 <tr><td>
                     <table class="content" style="border-collapse: collapse; border: 1px solid #bbb; margin-bottom: 16px;">
