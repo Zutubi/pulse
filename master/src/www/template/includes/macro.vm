@@ -740,7 +740,7 @@
 ##
 #macro(dateCellContent $entity $date $time)
     <a href="#" class="unadorned" title="$date" onclick="toggleDisplay('${entity.id}_time'); toggleDisplay('${entity.id}_date'); return false;">
-        <img alt="toggle format" src="images/calendar.gif"/>
+        <img alt="toggle format" src="$base/images/calendar.gif"/>
     </a>
     <span id="${entity.id}_time">$time</span>
     <span id="${entity.id}_date" style="display: none">$date</span>

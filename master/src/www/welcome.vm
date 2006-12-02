@@ -60,7 +60,7 @@
     </div>
 
     <p>
-        <a href="dismissWelcome.action"><img alt="$!webwork.getText('delete')" src="images/delete.gif">dismiss this page</a>
+        <a href="dismissWelcome.action"><img alt="$!webwork.getText('delete')" src="$base/images/delete.gif">dismiss this page</a>
     </p>
 
     </div>
