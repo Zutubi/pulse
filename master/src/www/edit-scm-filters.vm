@@ -49,25 +49,35 @@
                 </p>
             </td>
             <td class="columns" width="50%">
-                <p>The Scm Filter allows you to filter out modifications that are used to trigger a build. If for example,
+                <p>SCM filters allow you to filter out modifications that are used to trigger a build. If, for example,
                    you have certain files (such as web pages or document files) under source control that you don't want
-                   to have trigger the build, you can use an Scm Filter to ensure that their changes will not trigger a new build.
+                   to have trigger the build, you can add an SCM filter that matches those files.  Files matched by any
+                   filter will not trigger a new build.
+                </p>
+                <h3>Format:</h3>
+                <p>
+                    The format of the SCM filter string is the same as that used by Apache Ant patterns.
                 </p>
                 <p>
-                    <h3>Format:</h3>
-                    The format of the Scm Filter string is the same as that used by Apache Ant patterns.
-                    <ul>
-                        <li><b>**</b> matches any number of directories.</li>
-                        <li><b>*</b> matches any number of characters within a particular directory.</li>
-                        <li><b>/</b> is a directory separator.</li>
-                    </ul>
+                    <table class="content">
+                        <tr><th class="content">?</th><td class="content-wrap">matches any single character.</td></tr>
+                        <tr><th class="content">**</th><td class="content-wrap">matches any string of characters, possibly including multiple path elements (directory or file names).</td></tr>
+                        <tr><th class="content">*</th><td class="content-wrap">matches any number of characters within a particular path element (directory or file name).</td></tr>
+                        <tr><th class="content">/</th><td class="content-wrap">is a directory separator.</td></tr>
+                    </table>
                 </p>
+                <h3>Note:</h3>
                 <p>
-                   <h3>Examples:</h3>
-                    <ul>
-                        <li>The following scm filter will exclude all html files. <b>**/*.html</b></li>
-                        <li>The following scm filter will exclude the contents of the docs directory <b>**/docs/**/*</b></li>
-                    </ul>
+                    The file paths that are matched against these filters are the same paths shown in the changelist
+                    view.  These paths are not necessarily relative to the base directory for a build.  For example,
+                    Subversion paths are relative to the root of the repository.
+                </p>
+                <h3>Examples:</h3>
+                <p>
+                    <table class="content">
+                        <tr><th class="content">**/*.html</th><td class="content-wrap">excludes all html files.</td></tr>
+                        <tr><th class="content">**/docs/**</th><td class="content-wrap">excludes the contents of all docs directories.</td></tr>
+                    </table>
                 </p>
             </td>
 
