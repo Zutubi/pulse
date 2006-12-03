@@ -448,7 +448,7 @@
     </bean>
 
     <bean id="featureCountUpgradeTask" class="com.zutubi.pulse.upgrade.tasks.FeatureCountUpgradeTask" autowire="byName">
-        <property name="buildNumber" value="102004010"/>
+        <property name="buildNumber" value="102006001"/>
     </bean>
 
 </beans>
