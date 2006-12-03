@@ -61,6 +61,12 @@ public class Version implements Comparable
 
     private String releaseDate;
 
+    public Version()
+    {
+        // For hessian.  Better to have this empty default, as otherwise
+        // using a passed-in value can lead to NPEs (see CIB-804).
+    }
+
     public Version(String versionNumber, String buildDate, String buildNumber, String releaseDate)
     {
         this.versionNumber = versionNumber;
