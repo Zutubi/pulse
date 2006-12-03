@@ -11,7 +11,7 @@
 
     #wwcform("action=editProjectGroup.action" "id=edit.project.group" "heading=%{getText('edit.project.group')}" "method=post")
         #wwhidden("name=groupId")
-        #wwtextfield("name=name" "label=%{getText('project.group.name')}" "required=true" "tabindex=1")
+        #wwtextfield("name=name" "label=%{getText('project.group.name')}" "required=true" "size=60" "tabindex=1")
         #wwselect("name=projects" "label=%{getText('project.group.projects')}" "list=allProjects" "multiple=true" "tabindex=2")
         #saveCancel(3)
     #end

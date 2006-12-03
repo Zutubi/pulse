@@ -10,7 +10,7 @@
     #parse("/template/includes/actionerrors.vm")
 
     #wwcform("action=addProjectGroup.action" "id=add.project.group" "heading=%{getText('add.project.group')}" "method=post")
-        #wwtextfield("name=name" "label=%{getText('project.group.name')}" "required=true" "tabindex=1")
+        #wwtextfield("name=name" "label=%{getText('project.group.name')}" "required=true" "size=60" "tabindex=1")
         #wwselect("name=projects" "label=%{getText('project.group.projects')}" "list=allProjects" "multiple=true" "tabindex=2")
         #saveCancel(3)
     #end
