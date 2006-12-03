@@ -1,9 +1,6 @@
 #! /usr/bin/env bash
 
-set -e
-
-tmpFile=$$.tmp
-trap "rm -f $tmpFile" ERR
+#set -e
 
 count=0
 ok=0
@@ -21,15 +18,14 @@ do
         tag=${tag#*\"}
         tag=${tag%\"*}
 
-        wget -O $tmpFile "http://confluence.zutubi.com/display/pulse0101/$tag" -o /dev/null
-        if grep "Page Not Found" $tmpFile > /dev/null
+        if wget "http://confluence.zutubi.com/display/pulse0102/$tag" -o /dev/null
         then
+            ok=$((ok + 1))
+            status="$tag: ok"
+        else
             failed=$((failed + 1))
             status="$tag: FAILED"
             failures="$failures\n$filename"
-        else
-            ok=$((ok + 1))
-            status="$tag: ok"
         fi
     else
         notag=$((notag + 1))
@@ -38,9 +34,6 @@ do
 
     echo "${filename#master/src/www/}: $status"
 done
-
-rm -f $tmpFile
-trap ERR
 
 echo
 echo "Total: $count, ok: $ok, FAILED: $failed, No Tag: $notag"

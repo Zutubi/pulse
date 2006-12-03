@@ -1,4 +1,4 @@
-#helpTag("Build+Command+Log+Tab")
+#helpTag("Build+Detailed+View+Tab")
 #authorisationTags($principle)
 #buildTags($project $result)
 <html>

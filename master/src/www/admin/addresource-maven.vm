@@ -1,4 +1,4 @@
-#helpTag("Add+Resource+Wizard")
+#helpTag("Resource+Repository")
 #authorisationTags($principle)
 <content tag="selectedTab">agents</content>
 <html>

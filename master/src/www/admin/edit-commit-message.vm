@@ -1,4 +1,4 @@
-#helpTag("Commit+Message+Links")
+#helpTag("Project+Commit+Message+Transformers")
 #authorisationTags($principle)
 <content tag="selectedTab">administration</content>
 <html>

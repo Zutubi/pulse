@@ -1,4 +1,4 @@
-#helpTag("Change-Viewers")
+#helpTag("Project+Change+Viewers")
 <content tag="selectedTab">projects</content>
 #projectTags($project)
 <html>
