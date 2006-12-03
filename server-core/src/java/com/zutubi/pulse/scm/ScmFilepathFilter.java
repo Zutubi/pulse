@@ -10,14 +10,17 @@ import java.util.List;
  */
 public class ScmFilepathFilter implements FilepathFilter
 {
-    private List<String> excludedPaths;
+    private List<String> excludedPaths = null;
 
     public ScmFilepathFilter(List<String> excludedPaths)
     {
-        this.excludedPaths = new ArrayList<String>(excludedPaths.size());
-        for(String pattern: excludedPaths)
+        if (excludedPaths != null)
         {
-            this.excludedPaths.add(transformPath(pattern));
+            this.excludedPaths = new ArrayList<String>(excludedPaths.size());
+            for(String pattern: excludedPaths)
+            {
+                this.excludedPaths.add(transformPath(pattern));
+            }
         }
     }
 
