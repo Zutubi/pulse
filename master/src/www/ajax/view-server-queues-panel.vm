@@ -106,7 +106,7 @@
         #set($build = $dispatchRequest.build)
         #set($project = $build.project)
         <tr>
-            #ownerCell($build)
+            #ownerCell($build "content")
             #rightCell($build.number)
             #dynamicLinkCell($project.name "currentBuild.action?id=$project.id")
             #dynamicCell($build.buildSpecification)
