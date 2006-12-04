@@ -1,6 +1,6 @@
 <html>
 <head>
-    <meta http-equiv="refresh" content='5;/'/>
+    <meta http-equiv="refresh" content='5;$base'/>
     <title>#wwtext("name=startup.heading")</title>
 </head>
 
