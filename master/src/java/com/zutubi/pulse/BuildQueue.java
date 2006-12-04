@@ -3,10 +3,7 @@ package com.zutubi.pulse;
 import com.zutubi.pulse.core.model.Entity;
 import com.zutubi.pulse.events.build.AbstractBuildRequestEvent;
 
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * The build queue manages multiple build requests for a single project or
@@ -129,18 +126,24 @@ public class BuildQueue
 
     public boolean cancelBuild(long id)
     {
-        // locate build request and remove it. If it does not exist, return false.
+        // Locate build request and remove it.  If it does not exist, return false.
         for (Map.Entry<Entity, List<AbstractBuildRequestEvent>> entry : requests.entrySet())
         {
             List<AbstractBuildRequestEvent> events = entry.getValue();
             synchronized(events)
             {
-                for (AbstractBuildRequestEvent evt : events)
+                // Ingore the first in the list: it is alreayd running
+                Iterator<AbstractBuildRequestEvent> it = events.iterator();
+                if(it.hasNext())
                 {
-                    if (evt.getId() == id)
+                    it.next();
+                    while(it.hasNext())
                     {
-                        events.remove(evt);
-                        return true;
+                        if (it.next().getId() == id)
+                        {
+                            it.remove();
+                            return true;
+                        }
                     }
                 }
             }
