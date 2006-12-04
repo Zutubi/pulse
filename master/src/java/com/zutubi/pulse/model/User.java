@@ -188,7 +188,7 @@ public class User extends Entity
 
     public ContactPoint getContactPoint(String name)
     {
-        for (ContactPoint cp : contactPoints)
+        for (ContactPoint cp : getContactPoints())
         {
             if (cp.getName().compareTo(name) == 0)
             {

@@ -16,10 +16,7 @@ import org.acegisecurity.userdetails.ldap.LdapUserDetails;
 
 import javax.naming.NamingException;
 import javax.naming.directory.Attribute;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  */
@@ -169,7 +166,7 @@ public class AcegiLdapManager implements LdapManager
         }
         catch (Exception e)
         {
-            LOG.warning("Unable to connect to LDAP server: " + e.getMessage());
+            LOG.warning("Unable to connect to LDAP server: " + e.getMessage(), e);
             statusMessage = e.getMessage();
         }
     }
@@ -203,7 +200,7 @@ public class AcegiLdapManager implements LdapManager
             }
             catch (Exception e)
             {
-                LOG.warning("Error contacting LDAP server: " + e.getMessage());
+                LOG.warning("Error contacting LDAP server: " + e.getMessage(), e);
                 statusMessage = e.getMessage();
             }
         }
@@ -309,8 +306,15 @@ public class AcegiLdapManager implements LdapManager
         BindAuthenticator authenticator = createAuthenticator(userFilter, contextFactory);
         LdapUserDetails details = authenticator.authenticate(testLogin, testPassword);
 
-        DefaultLdapAuthoritiesPopulator populator = createPopulator(groupDn, groupFilter, groupRoleAttribute, groupSearchSubtree, escapeSpaces, contextFactory);
-        return getLdapGroups(details, populator);
+        if(TextUtils.stringSet(groupDn))
+        {
+            DefaultLdapAuthoritiesPopulator populator = createPopulator(groupDn, groupFilter, groupRoleAttribute, groupSearchSubtree, escapeSpaces, contextFactory);
+            return getLdapGroups(details, populator);
+        }
+        else
+        {
+            return new ArrayList<Group>(0);
+        }
     }
 
     private String escapeSpaces(String dn)

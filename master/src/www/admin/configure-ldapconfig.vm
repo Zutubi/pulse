@@ -89,7 +89,7 @@
                             <label for="test.login" class="label">test login <span class="required">*</span></label>:
                         </th>
                         <td class="field">
-                            <input type="text" name="test login" id="test.login"/>
+                            <input type="text" name="test login" id="test.login" tabindex="16"/>
                         </td>
                     </tr>
                     <tr>
@@ -97,7 +97,7 @@
                             <label for="test.password" class="label">test password <span class="required">*</span></label>:
                         </th>
                         <td class="field">
-                            <input type="text" name="test password" id="test.password"/>
+                            <input type="password" name="test password" id="test.password" tabindex="17"/>
                         </td>
                     </tr>
                     <tr>
