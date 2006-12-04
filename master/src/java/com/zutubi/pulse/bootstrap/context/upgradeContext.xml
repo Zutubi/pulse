@@ -70,7 +70,7 @@
                 <ref local="persistentName"/>
                 <ref local="schemaUpgrade0102004006"/>
                 <ref local="schemaUpgrade0102004009"/>
-                <ref local="featureCountUpgradeTask"/>
+                <!--<ref local="featureCountUpgradeTask"/>-->
                 <ref local="schemaUpgrade0102006003"/>
             </list>
         </property>
@@ -448,9 +448,9 @@
         </property>
     </bean>
 
-    <bean id="featureCountUpgradeTask" class="com.zutubi.pulse.upgrade.tasks.FeatureCountUpgradeTask" autowire="byName">
-        <property name="buildNumber" value="102006001"/>
-    </bean>
+    <!--<bean id="featureCountUpgradeTask" class="com.zutubi.pulse.upgrade.tasks.FeatureCountUpgradeTask" autowire="byName">-->
+        <!--<property name="buildNumber" value="102006001"/>-->
+    <!--</bean>-->
 
     <bean id="schemaUpgrade0102006003" class="com.zutubi.pulse.upgrade.tasks.MigrateSchemaUpgradeTask" autowire="byName">
         <property name="buildNumber" value="102006003"/>
