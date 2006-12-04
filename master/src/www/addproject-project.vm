@@ -40,6 +40,10 @@
                 #staticWrapCell("project.type.custom.description")
             </tr>
             <tr>
+                #contentRowHeading("project.type.executable")
+                #staticWrapCell("project.type.executable.description")
+            </tr>
+            <tr>
                 #contentRowHeading("project.type.make")
                 #staticWrapCell("project.type.make.description")
             </tr>

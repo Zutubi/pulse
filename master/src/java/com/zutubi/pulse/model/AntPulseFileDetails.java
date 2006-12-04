@@ -17,11 +17,11 @@ public class AntPulseFileDetails extends TemplatePulseFileDetails
      */
     private String targets;
     /**
-     * Extra arguments to pass to make.
+     * Extra arguments to pass to Ant.
      */
     private String arguments;
     /**
-     * Path relative to work.dir in which to execute the make.
+     * Path relative to base.dir in which to execute Ant.
      */
     private String workingDir;
 

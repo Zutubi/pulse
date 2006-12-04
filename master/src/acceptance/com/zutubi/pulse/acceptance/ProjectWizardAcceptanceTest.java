@@ -1,9 +1,6 @@
 package com.zutubi.pulse.acceptance;
 
-import com.zutubi.pulse.acceptance.forms.AddProjectWizard;
-import com.zutubi.pulse.acceptance.forms.CustomDetailsForm;
-import com.zutubi.pulse.acceptance.forms.Maven2DetailsForm;
-import com.zutubi.pulse.acceptance.forms.SubversionForm;
+import com.zutubi.pulse.acceptance.forms.*;
 import com.zutubi.pulse.util.RandomUtils;
 
 import java.util.Map;
@@ -148,6 +145,54 @@ public class ProjectWizardAcceptanceTest extends BaseAcceptanceTestCase
 
         properties.clear();
         properties.put("working directory", "newwork");
+        assertSpecifics(type, properties);
+
+        // ensure that it appears in your list of projects.
+        clickLink(Navigation.TAB_PROJECTS);
+        assertLinkPresentWithText(projectName);
+    }
+
+    public void testCreateExecutableProject()
+    {
+        // navigate to project panel.
+        startAddProjectWizard();
+
+        String projectName = "exe project " + RandomUtils.randomString(3);
+        String description = "this is an exe project created by the automated project wizard acceptance test.";
+        String url = "http://exe/url";
+        String scm = "svn";
+        String type = "executable";
+
+        submitProjectBasicsForm(projectName, description, url, scm, type);
+
+        String location = submitSubversion();
+
+        ExecutableDetailsForm detailsForm = new ExecutableDetailsForm(tester, true);
+        detailsForm.assertFormPresent();
+        detailsForm.nextFormElements("my exe", "arg1 arg2", "workdir");
+
+        // assert that all of the expected tables have the expected data.
+        assertBasics(projectName, description, url);
+
+        Properties properties = new Properties();
+        properties.put("executable", "my exe");
+        properties.put("arguments", "arg1 arg2");
+        properties.put("working directory", "workdir");
+        assertSpecifics(type, properties);
+
+        assertScm("subversion", location);
+
+        assertDefaultSetup(projectName);
+
+        // edit it
+        clickLink("project.specifics.edit");
+        detailsForm = new ExecutableDetailsForm(tester,  false);
+        detailsForm.assertFormPresent();
+        detailsForm.assertFormElements("my exe", "arg1 arg2", "workdir");
+        detailsForm.saveFormElements("edited exe", "", "");
+
+        properties.clear();
+        properties.put("executable", "edited exe");
         assertSpecifics(type, properties);
 
         // ensure that it appears in your list of projects.

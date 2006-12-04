@@ -135,6 +135,18 @@
                 </map>
             </subclass>
 
+            <subclass name="com.zutubi.pulse.model.ExecutablePulseFileDetails" discriminator-value="EXE" lazy="false">
+                <!-- Overlap columns with other subtypes -->
+                <property name="executable" column="BUILD_FILE" type="string" length="255"/>
+                <property name="arguments" column="ARGUMENTS" type="string" length="1023"/>
+                <property name="workingDir" column="WORKING_DIR" type="string" length="255"/>
+                <map name="environment" lazy="false" table="EXE_SOURCE_ENVIRONMENT" cascade="all">
+                    <key column="SOURCE_ID"/>
+                    <index column="NAME" type="string"/>
+                    <element type="string" column="VALUE"/>
+                </map>
+            </subclass>
+
             <subclass name="com.zutubi.pulse.model.MakePulseFileDetails" discriminator-value="MAKE" lazy="false">
                 <property name="makefile" column="MAKEFILE" type="string" length="255"/>
                 <property name="targets" column="TARGETS" type="string" length="255"/>
