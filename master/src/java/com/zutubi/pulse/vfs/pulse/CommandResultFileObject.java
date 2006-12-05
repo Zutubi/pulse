@@ -1,8 +1,7 @@
 package com.zutubi.pulse.vfs.pulse;
 
 import com.zutubi.pulse.core.model.CommandResult;
-import com.zutubi.pulse.core.model.RecipeResult;
-import com.zutubi.pulse.model.RecipeResultNode;
+import com.zutubi.pulse.core.model.StoredArtifact;
 import org.apache.commons.vfs.FileName;
 import org.apache.commons.vfs.FileType;
 import org.apache.commons.vfs.provider.AbstractFileSystem;
@@ -14,35 +13,27 @@ import java.util.List;
 /**
  * <class comment/>
  */
-public class ArtifactRecipeFileObject extends AbstractPulseFileObject
+public class CommandResultFileObject extends AbstractPulseFileObject implements CommandResultProvider
 {
-    private final String STAGE_FORMAT = "build stage :: %s :: %s@%s";
-
-    private final long recipeId;
+    private final long commandResultId;
 
     private String displayName;
 
-    public ArtifactRecipeFileObject(final FileName name, final long recipeId, final AbstractFileSystem fs)
+    public CommandResultFileObject(final FileName name, final long commandResultId, final AbstractFileSystem fs)
     {
         super(name, fs);
-        
-        this.recipeId = recipeId;
+
+        this.commandResultId = commandResultId;
     }
 
     public AbstractPulseFileObject createFile(final FileName fileName) throws Exception
     {
-        long commandResultId = Long.parseLong(fileName.getBaseName());
+        long artifactId = Long.parseLong(fileName.getBaseName());
 
-        return objectFactory.buildBean(ArtifactCommandFileObject.class,
+        return objectFactory.buildBean(ArtifactFileObject.class,
                 new Class[]{FileName.class, Long.TYPE, AbstractFileSystem.class},
-                new Object[]{fileName, commandResultId, pfs}
+                new Object[]{fileName, artifactId, pfs}
         );
-    }
-
-    protected void doAttach() throws Exception
-    {
-        RecipeResultNode node = buildManager.getResultNodeByResultId(recipeId);
-        displayName = String.format(STAGE_FORMAT, node.getStage(), node.getResult().getRecipeNameSafe(), node.getHostSafe());
     }
 
     protected FileType doGetType() throws Exception
@@ -54,10 +45,9 @@ public class ArtifactRecipeFileObject extends AbstractPulseFileObject
     {
         List<String> children = new LinkedList<String>();
 
-        RecipeResult recipeResult = buildManager.getRecipeResult(recipeId);
-        for (CommandResult commandResult : recipeResult.getCommandResults())
+        for (StoredArtifact artifact : getCommandResult().getArtifacts())
         {
-            children.add(Long.toString(commandResult.getId()));
+            children.add(Long.toString(artifact.getId()));
         }
         return children.toArray(new String[children.size()]);
     }
@@ -74,6 +64,21 @@ public class ArtifactRecipeFileObject extends AbstractPulseFileObject
 
     public String getDisplayName()
     {
-        return this.displayName;
+        if (displayName == null)
+        {
+            CommandResult commandResult = getCommandResult();
+            displayName = String.format("command :: %s", commandResult.getCommandName());
+        }
+        return displayName;
+    }
+
+    public CommandResult getCommandResult()
+    {
+        return buildManager.getCommandResult(getCommandResultId());
+    }
+
+    public long getCommandResultId()
+    {
+        return commandResultId;
     }
 }

@@ -1,68 +1,74 @@
 package com.zutubi.pulse.vfs.pulse;
 
-import com.zutubi.pulse.model.BuildResult;
-import com.zutubi.pulse.search.BuildResultExpressions;
-import com.zutubi.pulse.search.SearchQuery;
-import com.zutubi.pulse.search.Queries;
 import org.apache.commons.vfs.FileName;
 import org.apache.commons.vfs.FileType;
+import org.apache.commons.vfs.FileSystemException;
 import org.apache.commons.vfs.provider.AbstractFileSystem;
-import org.hibernate.criterion.Projections;
 
 import java.io.InputStream;
-import java.util.List;
+
+import com.zutubi.pulse.model.BuildResult;
+import com.zutubi.pulse.model.Project;
 
 /**
  * <class comment/>
  */
 public class BuildsFileObject extends AbstractPulseFileObject
 {
-    private Queries queries;
-
-    private long projectId;
-
-    public BuildsFileObject(final FileName name, final long projectId, final AbstractFileSystem fs)
+    public BuildsFileObject(final FileName name, final AbstractFileSystem fs)
     {
         super(name, fs);
-        
-        this.projectId = projectId;
     }
 
     public AbstractPulseFileObject createFile(final FileName fileName) throws Exception
     {
-        long buildId = Long.parseLong(fileName.getBaseName());
-        return objectFactory.buildBean(BuildFileObject.class,
-                new Class[]{FileName.class, Long.TYPE, AbstractFileSystem.class},
-                new Object[]{fileName, buildId, pfs}
-        );
+        long buildId = convertToBuildId(fileName.getBaseName());
+        if (buildId != -1)
+        {
+            return objectFactory.buildBean(BuildFileObject.class,
+                    new Class[]{FileName.class, Long.TYPE, AbstractFileSystem.class},
+                    new Object[]{fileName, buildId, pfs}
+            );
+        }
+        // need an error place holder.
+        return null;
+    }
+
+    private long convertToBuildId(String str) throws FileSystemException
+    {
+        long id = Long.parseLong(str);
+
+        // else, is it a build number?
+        ProjectProvider provider = (ProjectProvider) getAncestor(ProjectProvider.class);
+        if (provider != null)
+        {
+            Project project = provider.getProject();
+
+            BuildResult result = buildManager.getByProjectAndNumber(project, id);
+            if (result != null)
+            {
+                return result.getId();
+            }
+        }
+
+        BuildResult result = buildManager.getBuildResult(id);
+        if (result != null)
+        {
+            return id;
+        }
+        return -1;
     }
 
     protected FileType doGetType() throws Exception
     {
+        // this object does allow traversal.
         return FileType.FOLDER;
     }
 
     protected String[] doListChildren() throws Exception
     {
-        SearchQuery<Long> query = queries.getIds(BuildResult.class);
-        query.setProjection(Projections.id());
-        query.add(BuildResultExpressions.projectEq(projectId));
-
-        List<Long> buildIds = query.list();
-
-        String[] children = new String[buildIds.size()];
-        int i = 0;
-        for (Long id : buildIds)
-        {
-            children[i++] = Long.toString(id);
-        }
-
-        return children;
-    }
-
-    protected void doDetach() throws Exception
-    {
-        super.doDetach();
+        // do not support listing of the builds.
+        return new String[0];
     }
 
     protected long doGetContentSize() throws Exception
@@ -73,10 +79,5 @@ public class BuildsFileObject extends AbstractPulseFileObject
     protected InputStream doGetInputStream() throws Exception
     {
         return null;
-    }
-
-    public void setQueries(Queries queries)
-    {
-        this.queries = queries;
     }
 }

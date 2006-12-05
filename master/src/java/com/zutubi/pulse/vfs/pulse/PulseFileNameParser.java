@@ -39,8 +39,6 @@ public class PulseFileNameParser extends AbstractFileNameParser
 
         // extract the instance and port details.
 
-        // 
-
         // Decode and normalise the file name
         UriParser.canonicalizePath(name, 0, name.length(), this);
         UriParser.fixSeparators(name);

@@ -46,10 +46,12 @@ public class PulseFileSystem extends AbstractFileSystem
         String path = fileName.getPath();
         if (path.equals(FileName.ROOT_PATH))
         {
-            return objectFactory.buildBean(RootFileObject.class,
+            AbstractPulseFileObject newFile = objectFactory.buildBean(RootFileObject.class,
                     new Class[]{FileName.class, AbstractFileSystem.class},
                     new Object[]{fileName, this}
             );
+            newFile.init();
+            return newFile;
         }
 
         // Delegate the creation of a file object to its parent.
@@ -57,12 +59,17 @@ public class PulseFileSystem extends AbstractFileSystem
         AbstractPulseFileObject pfo = (AbstractPulseFileObject) this.resolveFile(parentFileName);
         if (pfo != null)
         {
-            return pfo.createFile(fileName);
+            AbstractPulseFileObject newFile = pfo.createFile(fileName);
+            if (newFile != null)
+            {
+                newFile.init();
+                return newFile;
+            }
         }
 
         // We were unable to resolve the parent file. This means we have no way of knowing what we should be creating.
         // It is best to fail cleanly in this situation.
-        throw new FileSystemException(String.format("failed to resolve the requested file: '%s'", parentFileName.getPath()));
+        throw new FileSystemException(String.format("failed to resolve the requested file: '%s'", fileName.getPath()));
     }
 
     protected void addCapabilities(Collection caps)

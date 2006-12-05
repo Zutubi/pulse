@@ -11,7 +11,7 @@ import com.zutubi.pulse.model.BuildResult;
 /**
  * <class comment/>
  */
-public class BuildFileObject extends AbstractPulseFileObject implements BuildResultNode
+public class BuildFileObject extends AbstractPulseFileObject implements BuildResultProvider, AddressableFileObject
 {
     private final long buildId;
 
@@ -23,17 +23,17 @@ public class BuildFileObject extends AbstractPulseFileObject implements BuildRes
 
     public AbstractPulseFileObject createFile(final FileName fileName) throws Exception
     {
-        String base = fileName.getBaseName();
-        if (base.endsWith("wc"))
+        String name = fileName.getBaseName();
+        if (name.equals("wc"))
         {
-            return objectFactory.buildBean(WorkingCopyRootFileObject.class,
+            return objectFactory.buildBean(WorkingCopyContextFileObject.class,
                     new Class[]{FileName.class, AbstractFileSystem.class},
                     new Object[]{fileName, pfs}
             );
         }
-        if (base.endsWith("artifacts"))
+        if (name.equals("artifacts"))
         {
-            return objectFactory.buildBean(ArtifactsRootFileObject.class,
+            return objectFactory.buildBean(ArtifactsContextFileObject.class,
                     new Class[]{FileName.class, AbstractFileSystem.class},
                     new Object[]{fileName, pfs}
             );
@@ -59,6 +59,11 @@ public class BuildFileObject extends AbstractPulseFileObject implements BuildRes
     protected InputStream doGetInputStream() throws Exception
     {
         return null;
+    }
+
+    public String getUrlPath()
+    {
+        return "/viewBuild.action?id=" + buildId;
     }
 
     //---( this node is backed by a build result object. )---

@@ -40,6 +40,7 @@ Create an object of the following format:
                 <pair key="type">type</pair>
                 <pair key="container">container</pair>
                 <pair key="actions"><array ref="actions"/></pair>
+                <pair key="url">url</pair>
             </object>
         </array>
     </pair>

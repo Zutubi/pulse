@@ -133,6 +133,16 @@
     </servlet>
 
     <servlet>
+        <servlet-name>display</servlet-name>
+        <servlet-class>com.zutubi.pulse.servlet.DisplayServlet</servlet-class>
+    </servlet>
+
+    <servlet>
+        <servlet-name>file</servlet-name>
+        <servlet-class>com.zutubi.pulse.servlet.FileServlet</servlet-class>
+    </servlet>
+
+    <servlet>
         <servlet-name>package</servlet-name>
         <servlet-class>com.zutubi.pulse.servlet.DownloadPackageServlet</servlet-class>
     </servlet>
@@ -171,6 +181,16 @@
         <servlet-name>ViewFileServlet</servlet-name>
         <servlet-class>com.zutubi.pulse.servlet.ViewFileServlet</servlet-class>
     </servlet>
+
+    <servlet-mapping>
+        <servlet-name>display</servlet-name>
+        <url-pattern>/display/*</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>file</servlet-name>
+        <url-pattern>/file/*</url-pattern>
+    </servlet-mapping>
 
     <servlet-mapping>
         <servlet-name>default</servlet-name>

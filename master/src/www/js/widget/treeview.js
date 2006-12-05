@@ -613,9 +613,9 @@ YAHOO.extend(ZUTUBI.widget.PulseTreeView, ZUTUBI.widget.TreeView, {
 
     onAction: function(node, action)
     {
-        if (action == "download")
+        if (action == "download" || action == "html")
         {
-            document.location = this.base+"/cat.action?path=" + this.fsRoot + node.getIdPath();
+            document.location = this.base + node.data.url;
         }
         if (action == "decorate")
         {
@@ -675,7 +675,8 @@ YAHOO.extend(ZUTUBI.widget.PulseTreeView, ZUTUBI.widget.TreeView, {
                     "label":obj.file,
                     "type":obj.type,
                     "container":obj.container,
-                    "actions":obj.actions
+                    "actions":obj.actions,
+                    "url":obj.url
                 };
                 var node = new ZUTUBI.widget.FileNode(data, parentNode, false);
 

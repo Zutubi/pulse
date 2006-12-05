@@ -11,6 +11,7 @@ import java.io.File;
 
 import com.zutubi.pulse.core.ObjectFactory;
 import com.zutubi.pulse.model.BuildManager;
+import com.zutubi.pulse.model.ProjectManager;
 
 /**
  * The Pulse File Object is the base class for all the file objects handled by the Pulse File System.
@@ -22,6 +23,8 @@ public abstract class AbstractPulseFileObject extends AbstractFileObject
     protected ObjectFactory objectFactory;
 
     protected BuildManager buildManager;
+
+    protected ProjectManager projectManager;
 
     /**
      * A reference to the containing pulse file system instance.
@@ -84,6 +87,16 @@ public abstract class AbstractPulseFileObject extends AbstractFileObject
     }
 
     /**
+     * Override this method if you need a post creation callback in which the wiried depenedencies are
+     * available.
+     *  
+     */
+    public void init()
+    {
+        
+    }
+
+    /**
      * This method searches through the file object hierarchy looking for, and returning when found, a file object
      * that matches the specified type.
      *
@@ -93,7 +106,7 @@ public abstract class AbstractPulseFileObject extends AbstractFileObject
      *
      * @throws FileSystemException if there are any problems that prevent searching the hierarchy.
      */
-    public Object getAncestor(Class type) throws FileSystemException
+    public AbstractPulseFileObject getAncestor(Class type) throws FileSystemException
     {
         if (type.isAssignableFrom(this.getClass()))
         {
@@ -126,5 +139,15 @@ public abstract class AbstractPulseFileObject extends AbstractFileObject
     public void setBuildManager(BuildManager buildManager)
     {
         this.buildManager = buildManager;
+    }
+
+    /**
+     * Required resource.
+     *
+     * @param projectManager instance
+     */
+    public void setProjectManager(ProjectManager projectManager)
+    {
+        this.projectManager = projectManager;
     }
 }

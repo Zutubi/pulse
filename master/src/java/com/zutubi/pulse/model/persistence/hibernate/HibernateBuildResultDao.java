@@ -428,6 +428,38 @@ public class HibernateBuildResultDao extends HibernateEntityDao<BuildResult> imp
         return (RecipeResultNode) findUniqueByNamedQuery("findResultNodeByResultId", "id", id, true);
     }
 
+    public BuildResult findLatest()
+    {
+        return (BuildResult) getHibernateTemplate().execute(new HibernateCallback()
+        {
+            public Object doInHibernate(Session session) throws HibernateException
+            {
+                Query queryObject = session.createQuery("from BuildResult result order by result.stamps.endTime desc");
+                queryObject.setMaxResults(1);
+                SessionFactoryUtils.applyTransactionTimeout(queryObject, getSessionFactory());
+                return queryObject.uniqueResult();
+            }
+        });
+    }
+
+    public CommandResult findCommandResultByArtifact(final long artifactId)
+    {
+        return (CommandResult) getHibernateTemplate().execute(new HibernateCallback()
+        {
+            public Object doInHibernate(Session session) throws HibernateException
+            {
+                Query queryObject = session.createQuery("SELECT result " +
+                        "FROM CommandResult result, StoredArtifact artifact, StoredFileArtifact fileArtifact " +
+                        "WHERE :id = artifact.id " +
+                        "AND artifact in elements(result.artifacts)");
+                queryObject.setLong("id", artifactId);
+                queryObject.setMaxResults(1);
+                SessionFactoryUtils.applyTransactionTimeout(queryObject, getSessionFactory());
+                return queryObject.uniqueResult();
+            }
+        });
+    }
+
     private void intialise(BuildResult result)
     {
         Hibernate.initialize(result.getFeatures());

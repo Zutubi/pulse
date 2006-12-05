@@ -6,10 +6,10 @@ import com.zutubi.pulse.core.model.PlainFeature;
 import com.zutubi.pulse.core.model.StoredFileArtifact;
 import com.zutubi.pulse.model.BuildResult;
 import com.zutubi.pulse.util.logging.Logger;
-import com.zutubi.pulse.vfs.pulse.BuildResultNode;
-import com.zutubi.pulse.vfs.pulse.CommandResultNode;
+import com.zutubi.pulse.vfs.pulse.BuildResultProvider;
+import com.zutubi.pulse.vfs.pulse.CommandResultProvider;
 import com.zutubi.pulse.vfs.pulse.AbstractPulseFileObject;
-import com.zutubi.pulse.vfs.pulse.StoredFileArtifactNode;
+import com.zutubi.pulse.vfs.pulse.FileArtifactProvider;
 import com.zutubi.pulse.web.vfs.VFSActionSupport;
 import com.opensymphony.util.TextUtils;
 import org.apache.commons.vfs.FileObject;
@@ -112,18 +112,18 @@ public class ViewArtifactAction extends VFSActionSupport
         }
 
         FileObject fo = getFS().resolveFile(path);
-        if (!StoredFileArtifactNode.class.isAssignableFrom(fo.getClass()))
+        if (!FileArtifactProvider.class.isAssignableFrom(fo.getClass()))
         {
             return ERROR;
         }
 
         AbstractPulseFileObject pfo = (AbstractPulseFileObject) fo;
 
-        buildResult = ((BuildResultNode)pfo.getAncestor(BuildResultNode.class)).getBuildResult();
-        commandResult = ((CommandResultNode)pfo.getAncestor(CommandResultNode.class)).getCommandResult();
-        artifact = ((StoredFileArtifactNode)pfo).getFileArtifact();
+        buildResult = ((BuildResultProvider)pfo.getAncestor(BuildResultProvider.class)).getBuildResult();
+        commandResult = ((CommandResultProvider)pfo.getAncestor(CommandResultProvider.class)).getCommandResult();
+        artifact = ((FileArtifactProvider)pfo).getFileArtifact();
 
-        File artifactFile = ((StoredFileArtifactNode)pfo).getFile();
+        File artifactFile = ((FileArtifactProvider)pfo).getFile();
         if(!artifactFile.isFile())
         {
             addActionError("Artifact file '" + artifactFile.getAbsolutePath() + "' does not exist");

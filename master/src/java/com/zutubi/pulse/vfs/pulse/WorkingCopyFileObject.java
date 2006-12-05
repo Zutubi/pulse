@@ -1,8 +1,8 @@
 package com.zutubi.pulse.vfs.pulse;
 
-import com.zutubi.pulse.model.RecipeResultNode;
 import org.apache.commons.vfs.FileName;
 import org.apache.commons.vfs.FileType;
+import org.apache.commons.vfs.FileSystemException;
 import org.apache.commons.vfs.provider.AbstractFileSystem;
 
 import java.io.File;
@@ -14,43 +14,15 @@ import java.util.List;
 /**
  * <class comment/>
  */
-public class WorkingCopyFileObject extends AbstractPulseFileObject
+public class WorkingCopyFileObject extends AbstractPulseFileObject implements AddressableFileObject
 {
-    private final String STAGE_FORMAT = "stage :: %s :: %s@%s";
-
     private final File base;
-
-    private long recipeNodeId = -1;
-    private String displayName;
 
     public WorkingCopyFileObject(final FileName name, final File base, final AbstractFileSystem fs)
     {
         super(name, fs);
 
         this.base = base;
-    }
-
-    public void setRecipeNodeId(long recipeNodeId)
-    {
-        this.recipeNodeId = recipeNodeId;
-    }
-
-    protected void doAttach() throws Exception
-    {
-        if (recipeNodeId != -1)
-        {
-            RecipeResultNode node = buildManager.getRecipeResultNode(recipeNodeId);
-            displayName = String.format(STAGE_FORMAT, node.getStage(), node.getResult().getRecipeNameSafe(), node.getHostSafe());
-        }
-        else
-        {
-            displayName = base.getName();
-        }
-    }
-
-    public String getDisplayName()
-    {
-        return this.displayName;
     }
 
     public AbstractPulseFileObject createFile(final FileName fileName) throws Exception
@@ -68,11 +40,7 @@ public class WorkingCopyFileObject extends AbstractPulseFileObject
         {
             return FileType.FOLDER;
         }
-        if (base.isFile())
-        {
-            return FileType.FILE;
-        }
-        return null;
+        return FileType.FILE;
     }
 
     public List<String> getActions()
@@ -99,6 +67,37 @@ public class WorkingCopyFileObject extends AbstractPulseFileObject
     protected InputStream doGetInputStream() throws Exception
     {
         return new FileInputStream(base);
+    }
+
+    public String getUrlPath()
+    {
+        try
+        {
+            return "/file/builds/" + getBuildId() + "/wc/" + getRecipeId() + "/" + getWorkingCopyPath();
+        }
+        catch (FileSystemException e)
+        {
+            e.printStackTrace();
+            return "";
+        }
+    }
+
+    private long getBuildId() throws FileSystemException
+    {
+        BuildResultProvider provider = (BuildResultProvider) getAncestor(BuildResultProvider.class);
+        return provider.getBuildResultId();
+    }
+
+    private long getRecipeId() throws FileSystemException
+    {
+        RecipeResultProvider provider = (RecipeResultProvider) getAncestor(RecipeResultProvider.class);
+        return provider.getRecipeResultId();
+    }
+
+    protected String getWorkingCopyPath() throws FileSystemException
+    {
+        AbstractPulseFileObject fo = getAncestor(WorkingCopyStageFileObject.class);
+        return fo.getName().getRelativeName(getName());
     }
 
 /*

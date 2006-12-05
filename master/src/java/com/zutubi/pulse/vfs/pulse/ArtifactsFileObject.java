@@ -9,26 +9,32 @@ import java.io.InputStream;
 /**
  * <class comment/>
  */
-public class AgentsFileObject extends AbstractPulseFileObject
+public class ArtifactsFileObject extends AbstractPulseFileObject
 {
-    public AgentsFileObject(final FileName name, final AbstractFileSystem fs)
+    public ArtifactsFileObject(final FileName name, final AbstractFileSystem fs)
     {
         super(name, fs);
     }
 
     public AbstractPulseFileObject createFile(final FileName fileName) throws Exception
     {
-        return null;
+        long artifactId = Long.parseLong(fileName.getBaseName());
+        return objectFactory.buildBean(ArtifactFileObject.class,
+                new Class[]{FileName.class, Long.TYPE, AbstractFileSystem.class},
+                new Object[]{fileName, artifactId, pfs}
+        );
     }
 
     protected FileType doGetType() throws Exception
     {
+        // this object does allow traversal.
         return FileType.FOLDER;
     }
 
     protected String[] doListChildren() throws Exception
     {
-        return new String[0];  //To change body of implemented methods use File | Settings | File Templates.
+        // this object does not support listing.
+        return new String[0];
     }
 
     protected long doGetContentSize() throws Exception

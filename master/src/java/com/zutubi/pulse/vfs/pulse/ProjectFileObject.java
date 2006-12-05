@@ -1,21 +1,25 @@
 package com.zutubi.pulse.vfs.pulse;
 
+import com.zutubi.pulse.model.Project;
 import org.apache.commons.vfs.FileName;
 import org.apache.commons.vfs.FileType;
 import org.apache.commons.vfs.provider.AbstractFileSystem;
 
 import java.io.InputStream;
-
-import com.zutubi.pulse.model.Project;
-import com.zutubi.pulse.model.ProjectManager;
+import java.util.Map;
+import java.util.HashMap;
+import java.util.Set;
 
 /**
  * <class comment/>
  */
-public class ProjectFileObject extends AbstractPulseFileObject implements ProjectNode
+public class ProjectFileObject extends AbstractPulseFileObject implements ProjectProvider, AddressableFileObject
 {
-    private ProjectManager projectManager;
-
+    private static final Map<String, Class> nodesDefinitions = new HashMap<String, Class>();
+    {
+        nodesDefinitions.put("builds", BuildsFileObject.class);
+        nodesDefinitions.put("latest", LatestBuildFileObject.class);
+    }
     private String displayName;
 
     private long projectId;
@@ -28,12 +32,13 @@ public class ProjectFileObject extends AbstractPulseFileObject implements Projec
 
     public AbstractPulseFileObject createFile(final FileName fileName) throws Exception
     {
-        String path = fileName.getPath();
-        if (path.endsWith("builds"))
+        String name = fileName.getBaseName();
+        if (nodesDefinitions.containsKey(name))
         {
-            return objectFactory.buildBean(BuildsFileObject.class,
-                    new Class[]{FileName.class, Long.TYPE, AbstractFileSystem.class},
-                    new Object[]{fileName, projectId, pfs}
+            Class clazz = nodesDefinitions.get(name);
+            return objectFactory.buildBean(clazz,
+                    new Class[]{FileName.class, AbstractFileSystem.class},
+                    new Object[]{fileName, pfs}
             );
         }
         return null;
@@ -52,7 +57,8 @@ public class ProjectFileObject extends AbstractPulseFileObject implements Projec
 
     protected String[] doListChildren() throws Exception
     {
-        return new String[]{"builds"};
+        Set<String> children = nodesDefinitions.keySet();
+        return children.toArray(new String[children.size()]);
     }
 
     protected long doGetContentSize() throws Exception
@@ -80,13 +86,8 @@ public class ProjectFileObject extends AbstractPulseFileObject implements Projec
         return projectId;
     }
 
-    /**
-     * Required resource.
-     *
-     * @param projectManager instance.
-     */
-    public void setProjectManager(ProjectManager projectManager)
+    public String getUrlPath()
     {
-        this.projectManager = projectManager;
+        return "/currentBuild.action?id=" + getProjectId();
     }
 }

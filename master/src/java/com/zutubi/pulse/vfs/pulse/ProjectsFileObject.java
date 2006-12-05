@@ -1,54 +1,76 @@
 package com.zutubi.pulse.vfs.pulse;
 
 import com.zutubi.pulse.model.Project;
-import com.zutubi.pulse.search.SearchQuery;
-import com.zutubi.pulse.search.Queries;
 import org.apache.commons.vfs.FileName;
 import org.apache.commons.vfs.FileType;
 import org.apache.commons.vfs.provider.AbstractFileSystem;
-import org.hibernate.criterion.Projections;
 
 import java.io.InputStream;
-import java.util.List;
-import java.util.LinkedList;
 
 /**
  * <class comment/>
  */
-public class ProjectsFileObject extends AbstractPulseFileObject
+public class ProjectsFileObject extends AbstractPulseFileObject implements AddressableFileObject
 {
-    private Queries queries;
-
     public ProjectsFileObject(final FileName name, final AbstractFileSystem fs)
     {
         super(name, fs);
     }
 
-    public AbstractPulseFileObject createFile(final FileName fileName) throws Exception
+    public AbstractPulseFileObject createFile(FileName fileName) throws Exception
     {
-        Long projectId = Long.parseLong(fileName.getBaseName());
+        // the fileName may be project name or the project id.
+        long projectId = convertToProjectId(fileName.getBaseName());
+        if (projectId != -1)
+        {
+            // Within the pulse file system, we use the projects id, not the projects name. So
+            // lets reconstruct the adjusted name.
+            String absPath = fileName.getParent().getPath() + "/" + projectId;
 
-        return objectFactory.buildBean(ProjectFileObject.class,
-                new Class[]{FileName.class, Long.TYPE, AbstractFileSystem.class},
-                new Object[]{fileName, projectId, pfs}
-        );
+            fileName = new PulseFileName(fileName.getScheme(), absPath, fileName.getType());
+
+            return objectFactory.buildBean(ProjectFileObject.class,
+                    new Class[]{FileName.class, Long.TYPE, AbstractFileSystem.class},
+                    new Object[]{fileName, projectId, pfs}
+            );
+        }
+        
+        // we need to return a place holder here.
+        return null;
+    }
+
+    private long convertToProjectId(String str)
+    {
+        try
+        {
+            return Long.parseLong(str);
+        }
+        catch (NumberFormatException e)
+        {
+            Project project = projectManager.getProject(str);
+            if (project != null)
+            {
+                return project.getId();
+            }
+        }
+        return -1;
     }
 
     protected FileType doGetType() throws Exception
     {
+        // allow traversal of this node.
         return FileType.FOLDER;
     }
 
     protected String[] doListChildren() throws Exception
     {
-        SearchQuery<Long> query = queries.getIds(Project.class);
-        query.setProjection(Projections.id());
-        List<String> children = new LinkedList<String>();
-        for (long id : query.list())
-        {
-            children.add(Long.toString(id));
-        }
-        return children.toArray(new String[children.size()]);
+        // do not support listing.
+        return new String[0];
+    }
+
+    public String getUrlPath()
+    {
+        return "/viewProjects.action";
     }
 
     protected long doGetContentSize() throws Exception
@@ -59,10 +81,5 @@ public class ProjectsFileObject extends AbstractPulseFileObject
     protected InputStream doGetInputStream() throws Exception
     {
         return null;
-    }
-
-    public void setQueries(Queries queries)
-    {
-        this.queries = queries;
     }
 }

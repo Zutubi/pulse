@@ -3,10 +3,9 @@ package com.zutubi.pulse.upgrade.tasks;
 import com.zutubi.pulse.upgrade.UpgradeContext;
 import com.zutubi.pulse.util.JDBCUtils;
 import com.zutubi.pulse.util.logging.Logger;
-import com.zutubi.pulse.core.model.TestSuiteResult;
 
-import java.sql.*;
 import java.io.IOException;
+import java.sql.*;
 
 /**
  * <class comment/>
@@ -53,7 +52,7 @@ public class FeatureCountUpgradeTask extends DatabaseUpgradeTask
         {
             stmt = con.prepareCall("SELECT id, recipe_result_id FROM BUILD_RESULT");
             rs = stmt.executeQuery();
-            while(rs.next())
+            while (rs.next())
             {
                 processBuildResult(con, JDBCUtils.getLong(rs, "id"), JDBCUtils.getLong(rs, "recipe_result_id"));
             }
@@ -87,7 +86,7 @@ public class FeatureCountUpgradeTask extends DatabaseUpgradeTask
             stmt.setLong(1, id);
 
             rs = stmt.executeQuery();
-            while(rs.next())
+            while (rs.next())
             {
                 processRecipe(con, JDBCUtils.getLong(rs, "recipe_result_id"), count);
             }
@@ -113,7 +112,7 @@ public class FeatureCountUpgradeTask extends DatabaseUpgradeTask
             stmt = con.prepareCall("SELECT id FROM command_result where recipe_result_id = ?");
             JDBCUtils.setLong(stmt, 1, id);
             rs = stmt.executeQuery();
-            while(rs.next())
+            while (rs.next())
             {
                 processCommand(con, JDBCUtils.getLong(rs, "id"), recipeCount);
             }
@@ -150,7 +149,7 @@ public class FeatureCountUpgradeTask extends DatabaseUpgradeTask
 
             JDBCUtils.setLong(stmt, 1, id);
             rs = stmt.executeQuery();
-            while(rs.next())
+            while (rs.next())
             {
                 String level = JDBCUtils.getString(rs, "level");
                 if (level.equals("WARNING"))
@@ -182,7 +181,7 @@ public class FeatureCountUpgradeTask extends DatabaseUpgradeTask
         ResultSet rs = null;
         try
         {
-            stmt = con.prepareCall("UPDATE "+tableName+" SET error_feature_count = ?, warning_feature_count = ? WHERE id = ?");
+            stmt = con.prepareCall("UPDATE " + tableName + " SET error_feature_count = ?, warning_feature_count = ? WHERE id = ?");
             JDBCUtils.setInt(stmt, 1, count.errorCount);
             JDBCUtils.setInt(stmt, 2, count.warningCount);
             JDBCUtils.setLong(stmt, 3, id);
@@ -204,7 +203,7 @@ public class FeatureCountUpgradeTask extends DatabaseUpgradeTask
             stmt = con.prepareCall("SELECT level FROM feature WHERE " + foreignKeyCol + " = ?");
             JDBCUtils.setLong(stmt, 1, id);
             rs = stmt.executeQuery();
-            while(rs.next())
+            while (rs.next())
             {
                 String level = JDBCUtils.getString(rs, "level");
                 if (level.equals("WARNING"))

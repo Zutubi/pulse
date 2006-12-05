@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Collections;
 
 import com.zutubi.pulse.vfs.pulse.AbstractPulseFileObject;
+import com.zutubi.pulse.vfs.pulse.AddressableFileObject;
 
 /**
  * <class comment/>
@@ -32,6 +33,15 @@ public class FileObjectWrapper
             return ((AbstractPulseFileObject)fo).getDisplayName();
         }
         return fo.getName().getBaseName();
+    }
+
+    public String getUrl()
+    {
+        if (fo instanceof AddressableFileObject)
+        {
+            return ((AddressableFileObject)fo).getUrlPath();
+        }
+        return "";
     }
 
     /**

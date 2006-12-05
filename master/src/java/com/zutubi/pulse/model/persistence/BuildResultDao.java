@@ -69,4 +69,8 @@ public interface BuildResultDao extends EntityDao<BuildResult>
     List<BuildResult> getOldestCompletedBuilds(User user, int max);
 
     RecipeResultNode findResultNodeByResultId(long id);
+
+    BuildResult findLatest();
+
+    CommandResult findCommandResultByArtifact(long artifactId);
 }

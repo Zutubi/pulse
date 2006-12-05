@@ -161,6 +161,11 @@ public class MockBuildManager implements BuildManager
         return result;
     }
 
+    public BuildResult getLatestBuildResult()
+    {
+        throw new RuntimeException("Method not implemented.");
+    }
+
     public BuildResult getByProjectAndNumber(final Project project, final long number)
     {
         throw new RuntimeException("Method not implemented.");
@@ -284,6 +289,11 @@ public class MockBuildManager implements BuildManager
     }
 
     public boolean isCleanupInProgress(Project project)
+    {
+        throw new RuntimeException("Method not implemented.");
+    }
+
+    public CommandResult getCommandResultByArtifact(long artifactId)
     {
         throw new RuntimeException("Method not implemented.");
     }

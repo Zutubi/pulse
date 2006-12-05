@@ -18,6 +18,7 @@ import java.io.IOException;
 import java.net.URLConnection;
 
 /**
+ * @deprecated replaced by the FileServlet which is based upon the vfs system.
  */
 public class ViewFileServlet extends HttpServlet
 {

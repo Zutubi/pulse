@@ -184,6 +184,11 @@ public class DefaultBuildManager implements BuildManager, EventListener
         return null;
     }
 
+    public BuildResult getLatestBuildResult()
+    {
+        return buildResultDao.findLatest();
+    }
+
     public BuildResult getByProjectAndNumber(final Project project, final long number)
     {
         return buildResultDao.findByProjectAndNumber(project, number);
@@ -398,6 +403,11 @@ public class DefaultBuildManager implements BuildManager, EventListener
     public boolean isCleanupInProgress(Project project)
     {
         return runningCleanups.containsKey(project);
+    }
+
+    public CommandResult getCommandResultByArtifact(long artifactId)
+    {
+        return buildResultDao.findCommandResultByArtifact(artifactId);
     }
 
     /**

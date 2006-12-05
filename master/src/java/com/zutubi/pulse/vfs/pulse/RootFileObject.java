@@ -2,16 +2,28 @@ package com.zutubi.pulse.vfs.pulse;
 
 import org.apache.commons.vfs.FileName;
 import org.apache.commons.vfs.FileType;
-import org.apache.commons.vfs.FileSystem;
 import org.apache.commons.vfs.provider.AbstractFileSystem;
 
 import java.io.InputStream;
+import java.util.Map;
+import java.util.HashMap;
+import java.util.Set;
 
 /**
- * <class comment/>
+ * The root file object of the pulse file system. This file object defines the root
+ * 'directories/folders' available within the file system.
+ *
  */
 public class RootFileObject extends AbstractPulseFileObject
 {
+    private static final Map<String, Class> nodesDefinitions = new HashMap<String, Class>();
+    {
+        // setup the default root node definitions.
+        nodesDefinitions.put("artifacts", ArtifactsFileObject.class);
+        nodesDefinitions.put("builds", BuildsFileObject.class);
+        nodesDefinitions.put("projects", ProjectsFileObject.class);
+    }
+
     public RootFileObject(final FileName name, final AbstractFileSystem fs)
     {
         super(name, fs);
@@ -24,7 +36,8 @@ public class RootFileObject extends AbstractPulseFileObject
 
     protected String[] doListChildren() throws Exception
     {
-        return new String[]{"projects", "agents"};
+        Set<String> rootPaths = nodesDefinitions.keySet();
+        return rootPaths.toArray(new String[rootPaths.size()]);
     }
 
     protected long doGetContentSize() throws Exception
@@ -39,17 +52,11 @@ public class RootFileObject extends AbstractPulseFileObject
 
     public AbstractPulseFileObject createFile(final FileName fileName) throws Exception
     {
-        String path = fileName.getPath();
-        if (path.endsWith("projects"))
+        String name = fileName.getBaseName();
+        if (nodesDefinitions.containsKey(name))
         {
-            return objectFactory.buildBean(ProjectsFileObject.class,
-                    new Class[]{FileName.class, AbstractFileSystem.class},
-                    new Object[]{fileName, pfs}
-            );
-        }
-        if (path.endsWith("agents"))
-        {
-            return objectFactory.buildBean(AgentsFileObject.class,
+            Class clazz = nodesDefinitions.get(name);
+            return objectFactory.buildBean(clazz,
                     new Class[]{FileName.class, AbstractFileSystem.class},
                     new Object[]{fileName, pfs}
             );

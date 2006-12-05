@@ -15,9 +15,9 @@ import com.zutubi.pulse.model.BuildResult;
 /**
  * <class comment/>
  */
-public class ArtifactsRootFileObject extends AbstractPulseFileObject
+public class ArtifactsContextFileObject extends AbstractPulseFileObject implements AddressableFileObject
 {
-    public ArtifactsRootFileObject(final FileName name, final AbstractFileSystem fs)
+    public ArtifactsContextFileObject(final FileName name, final AbstractFileSystem fs)
     {
         super(name, fs);
     }
@@ -26,7 +26,7 @@ public class ArtifactsRootFileObject extends AbstractPulseFileObject
     {
         // this is a recipe node.
         long recipeId = Long.parseLong(fileName.getBaseName());
-        return objectFactory.buildBean(ArtifactRecipeFileObject.class,
+        return objectFactory.buildBean(ArtifactStageFileObject.class,
                 new Class[]{FileName.class, Long.TYPE, AbstractFileSystem.class},
                 new Object[]{fileName, recipeId, pfs}
         );
@@ -42,12 +42,18 @@ public class ArtifactsRootFileObject extends AbstractPulseFileObject
         // return a list of the recipes.
         List<String> results = new LinkedList<String>();
 
-        RecipeResultNode node = getBuildResult().getRoot();
-        for (final RecipeResultNode child : node.getChildren())
+        BuildResult result = getBuildResult();
+        if (result != null)
         {
-            results.add(String.format("%s", child.getResult().getId()));
+            RecipeResultNode node = getBuildResult().getRoot();
+            for (final RecipeResultNode child : node.getChildren())
+            {
+                results.add(Long.toString(child.getResult().getId()));
+            }
+            return results.toArray(new String[results.size()]);
         }
-        return results.toArray(new String[results.size()]);
+
+        return new String[0];
     }
 
     protected long doGetContentSize() throws Exception
@@ -62,11 +68,33 @@ public class ArtifactsRootFileObject extends AbstractPulseFileObject
 
     protected BuildResult getBuildResult() throws FileSystemException
     {
-        BuildResultNode node = (BuildResultNode) getAncestor(BuildResultNode.class);
-        if (node != null)
+        BuildResultProvider provider = (BuildResultProvider) getAncestor(BuildResultProvider.class);
+        if (provider != null)
         {
-            return node.getBuildResult();
+            return provider.getBuildResult();
         }
         return null;
+    }
+
+    protected long getBuildResultId()
+    {
+        try
+        {
+            BuildResultProvider provider = (BuildResultProvider) getAncestor(BuildResultProvider.class);
+            if (provider != null)
+            {
+                return provider.getBuildResultId();
+            }
+            return -1;
+        }
+        catch (FileSystemException e)
+        {
+            return -1;
+        }
+    }
+
+    public String getUrlPath()
+    {
+        return "/viewBuildArtifacts.action?id=" + getBuildResultId();
     }
 }

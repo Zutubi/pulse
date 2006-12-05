@@ -80,6 +80,10 @@ td.download {
     background: url(../../images/arrow_down.gif) 0 4px no-repeat; width:16px; height:22px; cursor:pointer;
 }
 
+td.html {
+    background: url(../../images/page_world.gif) 0 4px no-repeat; width:16px; height:22px; cursor:pointer;
+}
+
 /*---( action legend. )---*/
 #legend {
     list-style: none;
@@ -108,6 +112,15 @@ li.archive
 li.download
 {
     background-image: url(../../images/arrow_down.gif);
+    background-repeat: no-repeat;
+    background-position: 0 50%;
+    padding: 3px 0 3px 20px;
+    margin: .4em 0;
+}
+
+li.html
+{
+    background-image: url(../../images/page_world.gif);
     background-repeat: no-repeat;
     background-position: 0 50%;
     padding: 3px 0 3px 20px;

@@ -5,6 +5,7 @@ import org.apache.commons.vfs.*;
 import java.util.*;
 
 import com.opensymphony.util.TextUtils;
+import com.zutubi.pulse.util.logging.Logger;
 
 /**
  * The ls action provides access to 'ls' style functionality for the web ui.
@@ -12,6 +13,8 @@ import com.opensymphony.util.TextUtils;
  */
 public class LsAction extends VFSActionSupport
 {
+    private static final Logger LOG = Logger.getLogger(LsAction.class);
+
     private boolean showFiles = false;
 
     private boolean showHidden = false;
@@ -88,8 +91,17 @@ public class LsAction extends VFSActionSupport
 
     public String execute() throws Exception
     {
-        doList();
-        return SUCCESS;
+        try
+        {
+            doList();
+            return SUCCESS;
+        }
+        catch (FileSystemException e)
+        {
+            LOG.error(e);
+            addActionError(e.getMessage());
+            return ERROR;
+        }
     }
 
     public void doList() throws FileSystemException

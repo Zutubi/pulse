@@ -6,11 +6,15 @@ import org.apache.commons.vfs.FileSystemException;
 import java.io.File;
 
 /**
- * <class comment/>
+ * A provider interface that indicates the current node represents a stored file artifact instance.
+ *
+ * @see com.zutubi.pulse.core.model.StoredFileArtifact
  */
-public interface StoredFileArtifactNode
+public interface FileArtifactProvider
 {
     StoredFileArtifact getFileArtifact() throws FileSystemException;
+
+    long getFileArtifactId() throws FileSystemException;
 
     File getFile();
 }

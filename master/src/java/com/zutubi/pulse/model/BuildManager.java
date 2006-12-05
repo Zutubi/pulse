@@ -36,6 +36,8 @@ public interface BuildManager
 
     BuildResult getLatestBuildResult(User user);
 
+    BuildResult getLatestBuildResult();
+    
     List<BuildResult> queryBuilds(Project[] projects, ResultState[] states, PersistentName[] specs, long earliestStartTime, long latestStartTime, Boolean hasWorkDir, int first, int max, boolean mostRecentFirst);
 
     List<BuildResult> querySpecificationBuilds(Project project, PersistentName spec, ResultState[] states, long lowestNumber, long highestNumber, int first, int max, boolean mostRecentFirst, boolean initialise);
@@ -130,4 +132,6 @@ public interface BuildManager
     void cleanupBuilds(CleanupRule rule);
 
     boolean isCleanupInProgress(Project project);
+
+    CommandResult getCommandResultByArtifact(long artifactId);
 }
