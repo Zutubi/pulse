@@ -17,6 +17,7 @@ import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.locks.Lock;
@@ -74,11 +75,12 @@ public class RecipeProcessor
             CommandResult bootstrapResult = new CommandResult(bootstrapCommand.getName());
             File commandOutput = new File(paths.getOutputDir(), getCommandDirName(0, bootstrapResult));
 
-            if(executeCommand(request.getId(), recipeStartTime, bootstrapResult, paths, commandOutput, testResults, bootstrapCommand, capture, context) &&
+            if(executeCommand(request.getId(), null, recipeStartTime, bootstrapResult, paths, commandOutput, testResults, bootstrapCommand, capture, context) &&
                bootstrapResult.succeeded())
             {
                 // Now we can load the recipe from the pulse file
-                PulseFile pulseFile = loadPulseFile(request, paths.getBaseDir(), resourceRepository, context);
+                Scope globalScope = new Scope();
+                PulseFile pulseFile = loadPulseFile(request, paths.getBaseDir(), resourceRepository, globalScope, context, recipeStartTime);
                 Recipe recipe;
 
                 String recipeName = request.getRecipeName();
@@ -97,7 +99,7 @@ public class RecipeProcessor
                     throw new BuildException("Undefined recipe '" + recipeName + "'");
                 }
 
-                build(request.getId(), recipeStartTime, recipe, paths, testResults, capture, context);
+                build(request.getId(), globalScope, recipeStartTime, recipe, paths, testResults, capture, context);
             }
         }
         catch (BuildException e)
@@ -144,7 +146,7 @@ public class RecipeProcessor
         }
     }
 
-    public void build(long recipeId, long recipeStartTime, Recipe recipe, RecipePaths paths, TestSuiteResult testResults, boolean capture, BuildContext context) throws BuildException
+    public void build(long recipeId, Scope globalScope, long recipeStartTime, Recipe recipe, RecipePaths paths, TestSuiteResult testResults, boolean capture, BuildContext context) throws BuildException
     {
         // TODO: support continuing build when errors occur. Take care: exceptions.
         int i = 1;
@@ -154,7 +156,7 @@ public class RecipeProcessor
 
             File commandOutput = new File(paths.getOutputDir(), getCommandDirName(i, result));
 
-            if(!executeCommand(recipeId, recipeStartTime, result, paths, commandOutput, testResults, command, capture, context))
+            if(!executeCommand(recipeId, globalScope, recipeStartTime, result, paths, commandOutput, testResults, command, capture, context))
             {
                 return;
             }
@@ -169,7 +171,7 @@ public class RecipeProcessor
         }
     }
 
-    private boolean executeCommand(long recipeId, long recipeStartTime, CommandResult result, RecipePaths paths, File commandOutput, TestSuiteResult testResults, Command command, boolean capture, BuildContext context)
+    private boolean executeCommand(long recipeId, Scope globalScope, long recipeStartTime, CommandResult result, RecipePaths paths, File commandOutput, TestSuiteResult testResults, Command command, boolean capture, BuildContext context)
     {
         runningLock.lock();
         if (terminating)
@@ -194,8 +196,9 @@ public class RecipeProcessor
             }
 
             CommandContext commandContext = new CommandContext(paths, commandOutput, testResults);
+            commandContext.setGlobalScope(globalScope);
             commandContext.setRecipeStartTime(recipeStartTime);
-            
+
             if (context != null && context.getBuildNumber() != -1)
             {
                 commandContext.setBuildContext(context);
@@ -227,13 +230,17 @@ public class RecipeProcessor
         return true;
     }
 
-    private PulseFile loadPulseFile(RecipeRequest request, File baseDir, ResourceRepository resourceRepository, BuildContext buildContext) throws BuildException
+    private PulseFile loadPulseFile(RecipeRequest request, File baseDir, ResourceRepository resourceRepository, Scope globalScope, BuildContext buildContext, long recipeStartTime) throws BuildException
     {
-        Scope globalScope = new Scope();
         globalScope.add(new Property("base.dir", baseDir.getAbsolutePath()));
+        globalScope.add(new Property("recipe.timestamp", BuildContext.PULSE_BUILD_TIMESTAMP_FORMAT.format(new Date(recipeStartTime))));
+        globalScope.add(new Property("recipe.timestamp.millis", Long.toString(recipeStartTime)));
         if(buildContext != null)
         {
             globalScope.add(new Property("build.number", Long.toString(buildContext.getBuildNumber())));
+            globalScope.add(new Property("build.revision", buildContext.getBuildRevision()));
+            globalScope.add(new Property("build.timestamp", BuildContext.PULSE_BUILD_TIMESTAMP_FORMAT.format(new Date(buildContext.getBuildTimestamp()))));
+            globalScope.add(new Property("build.timestamp.millis", Long.toString(buildContext.getBuildTimestamp())));
         }
 
         addEnvironment(globalScope);

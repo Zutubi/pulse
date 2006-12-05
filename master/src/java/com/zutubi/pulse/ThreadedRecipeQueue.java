@@ -5,6 +5,7 @@ import com.zutubi.pulse.agent.AgentManager;
 import com.zutubi.pulse.bootstrap.MasterConfigurationManager;
 import com.zutubi.pulse.core.BuildException;
 import com.zutubi.pulse.core.BuildRevision;
+import com.zutubi.pulse.core.RecipeRequest;
 import com.zutubi.pulse.core.Stoppable;
 import com.zutubi.pulse.core.model.Revision;
 import com.zutubi.pulse.events.*;
@@ -475,31 +476,37 @@ public class ThreadedRecipeQueue implements Runnable, RecipeQueue, EventListener
 
     private boolean dispatchRequest(RecipeDispatchRequest request, Agent agent, List<Agent> unavailableAgents, List<RecipeDispatchRequest> dispatchedRequests)
     {
-        request.getRevision().apply(request.getRequest());
+        BuildRevision buildRevision = request.getRevision();
+        RecipeRequest recipeRequest = request.getRequest();
 
-        request.getRequest().prepare(agent.getName());
+        // This must be called before publishing the event.
+        // We can no longer update the revision once we have dispatched a
+        // request: it is fixed here if not already.
+        buildRevision.apply(recipeRequest);
+        recipeRequest.prepare(agent.getName());
+
         // TODO: this code cannot handle an agent rejecting the build
         // (the handling was backed outdue to CIB-553 and the fact that
         // agents do not currently reject builds)
-        eventManager.publish(new RecipeDispatchedEvent(this, request.getRequest(), agent));
+        eventManager.publish(new RecipeDispatchedEvent(this, recipeRequest, agent));
         dispatchedRequests.add(request);
-        // We can no longer update the revision once we have dispatched a request.
-        request.getRevision().fix();
 
         try
         {
             // Generate the build context.
             BuildContext context = new BuildContext();
             context.setBuildNumber(request.getBuild().getNumber());
-
-            agent.getBuildService().build(request.getRequest(), context);
+            context.setBuildRevision(buildRevision.getRevision().getRevisionString());
+            context.setBuildTimestamp(buildRevision.getTimestamp());
+            
+            agent.getBuildService().build(recipeRequest, context);
             unavailableAgents.add(agent);
-            executingAgents.put(request.getRequest().getId(), agent);
+            executingAgents.put(recipeRequest.getId(), agent);
         }
         catch (Exception e)
         {
             LOG.warning("Unable to dispatch recipe: " + e.getMessage(), e);
-            eventManager.publish(new RecipeErrorEvent(this, request.getRequest().getId(), "Unable to dispatch recipe: " + e.getMessage()));
+            eventManager.publish(new RecipeErrorEvent(this, recipeRequest.getId(), "Unable to dispatch recipe: " + e.getMessage()));
         }
 
         return true;

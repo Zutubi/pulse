@@ -23,6 +23,11 @@ public class BuildRevision
      * now on.
      */
     private boolean fixed;
+    /**
+     * The time at which the first recipe is dispatched: which is when the
+     * build is said to have commenced.
+     */
+    private long timestamp = -1;
 
     /**
      * Construct a new revision that will be determined lazily, and thus is
@@ -67,6 +72,11 @@ public class BuildRevision
         return fixed;
     }
 
+    public long getTimestamp()
+    {
+        return timestamp;
+    }
+
     /**
      * Update to a new revision, with the corresponding pulse file.  The
      * revision must not be fixed.
@@ -82,15 +92,10 @@ public class BuildRevision
     }
 
     /**
-     * Fix the revision to its current value.
-     */
-    public void fix()
-    {
-        this.fixed = true;
-    }
-
-    /**
      * Applies this revision, updating the given recipe request.
+     *
+     * Called when a recipe for the build is dispatched.  At the first
+     * dispatch the revision must be fixed, and the timestamp is set.
      *
      * @param request recipe request for the build, which will take on
      *                revision-specific information in this call
@@ -98,5 +103,11 @@ public class BuildRevision
     public void apply(RecipeRequest request)
     {
         request.setPulseFileSource(pulseFile);
+
+        this.fixed = true;
+        if(timestamp < 0)
+        {
+            timestamp = System.currentTimeMillis();
+        }
     }
 }

@@ -6,7 +6,6 @@ import com.zutubi.pulse.core.model.StoredFileArtifact;
 import com.zutubi.pulse.util.*;
 
 import java.io.*;
-import java.text.SimpleDateFormat;
 import java.util.*;
 
 /**
@@ -30,10 +29,13 @@ public class ExecutableCommand implements Command, ScopeAware
     private CancellableReader reader;
     private volatile boolean terminated = false;
 
+    private static final String PULSE_BASE_DIR = "PULSE_BASE_DIR";
     private static final String PULSE_BUILD_NUMBER = "PULSE_BUILD_NUMBER";
+    private static final String PULSE_BUILD_REVISION = "PULSE_BUILD_REVISION";
     private static final String PULSE_BUILD_TIMESTAMP = "PULSE_BUILD_TIMESTAMP";
-
-    private static final SimpleDateFormat PULSE_BUILD_TIMESTAMP_FORMAT = new SimpleDateFormat("yyyy-MM-dd HH:mm");
+    private static final String PULSE_BUILD_TIMESTAMP_MILLIS = "PULSE_BUILD_TIMESTAMP_MILLIS";
+    private static final String PULSE_RECIPE_TIMESTAMP = "PULSE_RECIPE_TIMESTAMP";
+    private static final String PULSE_RECIPE_TIMESTAMP_MILLIS = "PULSE_RECIPE_TIMESTAMP_MILLIS";
 
 
     public void execute(CommandContext context, CommandResult cmdResult)
@@ -365,14 +367,36 @@ public class ExecutableCommand implements Command, ScopeAware
             childEnvironment.put(setting.getName(), setting.getValue());
         }
 
-        if (context.getBuildNumber() != -1)
+        Scope globalScope = context.getGlobalScope();
+        if(globalScope != null)
         {
-            childEnvironment.put(PULSE_BUILD_NUMBER, Long.toString(context.getBuildNumber()));
+            for(Reference reference: globalScope.getReferences())
+            {
+                if(acceptableName(reference.getName()) && reference.getValue() instanceof String)
+                {
+                    String value = (String) reference.getValue();
+
+                    childEnvironment.put(convertName(reference.getName()), value);
+                }
+            }
         }
-        if (context.getRecipeStartTime() != -1)
+    }
+
+    private boolean acceptableName(String name)
+    {
+        if(name.startsWith("env."))
         {
-            childEnvironment.put(PULSE_BUILD_TIMESTAMP, PULSE_BUILD_TIMESTAMP_FORMAT.format(new Date(context.getRecipeStartTime())));
+            return false;
         }
+
+        return name.matches("[-a-zA-Z._]+");
+    }
+
+    private String convertName(String name)
+    {
+        name = name.toUpperCase();
+        name = name.replaceAll("\\.", "_");
+        return "PULSE_" + name;
     }
 
     /**

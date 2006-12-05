@@ -382,11 +382,6 @@ public class BuildController implements EventListener
             {
                 pendingRecipes--;
 
-                if (!buildResult.commenced())
-                {
-                    handleFirstCommenced(foundNode.getData());
-                }
-
                 if(pendingRecipes == 0)
                 {
                     handleLastCommenced();
@@ -397,8 +392,14 @@ public class BuildController implements EventListener
                     scheduleTimeout(e.getRecipeId());
                 }
             }
-
-            if (e instanceof RecipeCompletedEvent || e instanceof RecipeErrorEvent)
+            else if(e instanceof RecipeDispatchedEvent)
+            {
+                if (!buildResult.commenced())
+                {
+                    handleFirstDispatch(foundNode.getData());
+                }
+            }
+            else if (e instanceof RecipeCompletedEvent || e instanceof RecipeErrorEvent)
             {
                 try
                 {
@@ -447,11 +448,10 @@ public class BuildController implements EventListener
     }
 
     /**
-     * Called when the first recipe for this build is successfully
-     * commenced.  It is at this point that the build is said to have
-     * commenced.
+     * Called when the first recipe for this build is dispatched.  It is at
+     * this point that the build is said to have commenced.
      */
-    private void handleFirstCommenced(RecipeController controller)
+    private void handleFirstDispatch(RecipeController controller)
     {
         RecipeDispatchRequest dispatchRequest = controller.getDispatchRequest();
         RecipeRequest request = dispatchRequest.getRequest();
@@ -470,7 +470,7 @@ public class BuildController implements EventListener
             getChanges(dispatchRequest.getRevision());
         }
         
-        buildResult.commence(controller.getResult().getStamps().getStartTime());
+        buildResult.commence(dispatchRequest.getRevision().getTimestamp());
         if(previousSuccessful != null)
         {
             buildResult.getStamps().setEstimatedRunningTime(previousSuccessful.getStamps().getElapsed());

@@ -1,6 +1,7 @@
 package com.zutubi.pulse;
 
 import com.zutubi.pulse.core.BuildRevision;
+import com.zutubi.pulse.core.RecipeRequest;
 import com.zutubi.pulse.core.model.PersistentName;
 import com.zutubi.pulse.events.build.BuildRequestEvent;
 import com.zutubi.pulse.model.BuildReason;
@@ -51,7 +52,7 @@ public class BuildQueueTest extends PulseTestCase
     {
         assertTrue(queue.buildRequested(createEvent(p1, "spec1", 1)));
         BuildRequestEvent request2 = createEvent(p1, "spec1", 1);
-        request2.getRevision().fix();
+        request2.getRevision().apply(new RecipeRequest("project", "spec", 1, null, false));
         assertFalse(queue.buildRequested(request2));
         assertEquals(request2, queue.buildCompleted(p1));
         assertNull(queue.buildCompleted(p1));

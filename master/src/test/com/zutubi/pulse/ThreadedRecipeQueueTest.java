@@ -422,7 +422,7 @@ public class ThreadedRecipeQueueTest extends TestCase implements EventListener
     {
         RecipeDispatchRequest request = createDispatchRequest(0);
         request.getRevision().update(new NumericalRevision(88), getPulseFileForRevision(88));
-        request.getRevision().fix();
+        request.getRevision().apply(request.getRequest());
 
         queue.online(createAvailableAgent(0));
         queue.enqueue(request);
@@ -479,7 +479,7 @@ public class ThreadedRecipeQueueTest extends TestCase implements EventListener
 
         RecipeDispatchRequest request = createDispatchRequest(0, 1001);
         request.getRevision().update(new NumericalRevision(5), getPulseFileForRevision(5));
-        request.getRevision().fix();
+        request.getRevision().apply(request.getRequest());
         queue.enqueue(request);
 
         queue.handleEvent(new SCMChangeEvent(scm, new NumericalRevision(98), new NumericalRevision(1)));

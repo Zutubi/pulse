@@ -320,6 +320,13 @@ public class ExecutableCommandTest extends PulseTestCase
         buildContext.setBuildNumber(buildNumber);
         CommandContext context = new CommandContext(new SimpleRecipePaths(baseDirectory, null), outputDirectory, null);
         context.setBuildContext(buildContext);
+
+        if(buildNumber > 0)
+        {
+            Scope scope = new Scope();
+            scope.add(new Property("build.number", Long.toString(buildNumber)));
+            context.setGlobalScope(scope);
+        }
         command.execute(context, result);
     }
 }

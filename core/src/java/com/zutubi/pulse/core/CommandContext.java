@@ -37,6 +37,7 @@ public class CommandContext
 
     private BuildContext buildContext;
 
+    private Scope globalScope;
     private long recipeStartTime = -1;
 
     public CommandContext(RecipePaths paths, File outputDir, TestSuiteResult testResults)
@@ -98,18 +99,6 @@ public class CommandContext
         this.buildContext = buildContext;
     }
 
-    public long getBuildNumber()
-    {
-        if(buildContext == null)
-        {
-            return -1;
-        }
-        else
-        {
-            return buildContext.getBuildNumber();
-        }
-    }
-
     /**
      * Get the id of the recipe to which this command execution is associated.
      *
@@ -133,5 +122,15 @@ public class CommandContext
     public void setRecipeStartTime(long recipeStartTime)
     {
         this.recipeStartTime = recipeStartTime;
+    }
+
+    public Scope getGlobalScope()
+    {
+        return globalScope;
+    }
+
+    public void setGlobalScope(Scope globalScope)
+    {
+        this.globalScope = globalScope;
     }
 }
