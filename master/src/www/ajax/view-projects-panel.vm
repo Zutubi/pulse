@@ -1,7 +1,7 @@
 ##
 ## Shows a list of recent builds for the given list of projects
 ##
-#macro(recentBuilds $group $projects $firstTable)
+#macro(recentBuilds $group $projects)
     #set($fullSpan = $columns.totalSpan + 6)
     <table class="content" id="group_$!webwork.htmlEncode($group.name)">
         <tr>
@@ -21,11 +21,6 @@
         <tr>
             <th class="heading" colspan="6">#wwtext("name=project")</th>
             <th class="heading" colspan="$columns.totalSpan">
-#if($firstTable && $loggedInUser)
-                <span class="action">
-                    <a class="unadorned" href="#" id="columns-popup-link-all.projects" onclick="popup.popup(); return false"><img src="$base/images/text_columns.gif"/></a>
-                </span>
-#end
                 #wwtext("name=latest.build")
             </th>
         </tr>
@@ -70,13 +65,11 @@
         </table>
 #end
 
-#set($firstTable = true)
 #foreach($group in $groups)
-    #recentBuilds($group $group.projects $firstTable)
-    #set($firstTable = false)
+    #recentBuilds($group $group.projects)
 #end
 #if($projects.size() > 0)
-    #recentBuilds(false $projects $firstTable)
+    #recentBuilds(false $projects)
 #end
 
 #buildTableColumns($columns "all.projects")

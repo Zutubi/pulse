@@ -29,6 +29,9 @@
                 <h1 style="margin-top: 0">:: #wwtext("name=projects") ::</h1>
             </td>
             <td class="right">
+#if($loggedInUser)
+                <a class="unadorned" href="#" id="columns-popup-link-all.projects" onclick="popup.popup(); return false"><img src="$base/images/text_columns.gif"/></a>
+#end
 #if($rssEnabled)
                 <a class="unadorned" id="rss.builds" href="rss.action"><img alt="$action.getText('rss')" src="$base/images/feed-icon-16x16.gif"/></a>
 #end
