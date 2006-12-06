@@ -1,4 +1,5 @@
 <project default="mybuild" xmlns:ant="jelly:ant" xmlns:j="jelly:core">
+    <currentVersion>1.0-SNAPSHOT</currentVersion>
 
     <goal name="mybuild" description="simple default target">
         <ant:echo message="build target"/>

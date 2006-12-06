@@ -25,6 +25,7 @@ public class BuildResult extends Result implements AclObjectIdentityAware, Itera
     private long number;
     private BuildScmDetails scmDetails;
     private RecipeResultNode root;
+    private String version;
     /**
      * Set to false when the working directory is cleaned up.
      */
@@ -247,6 +248,16 @@ public class BuildResult extends Result implements AclObjectIdentityAware, Itera
     public void loadFailedTestResults(File dataRoot, int limitPerRecipe)
     {
         root.loadFailedTestResults(dataRoot, limitPerRecipe);
+    }
+
+    public String getVersion()
+    {
+        return version;
+    }
+
+    public void setVersion(String version)
+    {
+        this.version = version;
     }
 
     private class ResultIterator implements Iterator<RecipeResultNode>

@@ -5,6 +5,7 @@ import com.zutubi.pulse.core.model.ResultState;
 import com.zutubi.pulse.test.PulseTestCase;
 import com.zutubi.pulse.util.FileSystemUtils;
 import com.zutubi.pulse.util.IOUtils;
+import com.zutubi.pulse.BuildContext;
 
 import java.io.*;
 
@@ -56,11 +57,17 @@ public abstract class CommandTestBase extends PulseTestCase
         checkOutput(commandResult, contents);
     }
 
-    private CommandResult runCommand(ExecutableCommand command)
+    protected CommandResult runCommand(ExecutableCommand command)
+    {
+        return runCommand(command, null);
+    }
+
+    protected CommandResult runCommand(ExecutableCommand command, BuildContext buildContext)
     {
         command.setWorkingDir(baseDir);
         CommandResult commandResult = new CommandResult("test");
         CommandContext context = new CommandContext(new SimpleRecipePaths(baseDir, null), outputDir, null);
+        context.setBuildContext(buildContext);
         command.execute(context, commandResult);
         return commandResult;
     }

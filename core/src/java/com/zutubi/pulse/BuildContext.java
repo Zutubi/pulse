@@ -16,6 +16,11 @@ public class BuildContext
     private long buildNumber = -1;
     private long buildTimestamp = -1;
     private String buildRevision = null;
+    /**
+     * The version can be extracted while executing a command, and is
+     * communicated back out by setting it here.
+     */
+    private String buildVersion = null;
     private FileRepository fileRepository;
 
     public long getBuildNumber()
@@ -48,6 +53,16 @@ public class BuildContext
         this.buildRevision = buildRevision;
     }
 
+    public String getBuildVersion()
+    {
+        return buildVersion;
+    }
+
+    public void setBuildVersion(String buildVersion)
+    {
+        this.buildVersion = buildVersion;
+    }
+
     public FileRepository getFileRepository()
     {
         return fileRepository;
@@ -57,4 +72,5 @@ public class BuildContext
     {
         this.fileRepository = fileRepository;
     }
+
 }

@@ -29,19 +29,10 @@ public class ExecutableCommand implements Command, ScopeAware
     private CancellableReader reader;
     private volatile boolean terminated = false;
 
-    private static final String PULSE_BASE_DIR = "PULSE_BASE_DIR";
-    private static final String PULSE_BUILD_NUMBER = "PULSE_BUILD_NUMBER";
-    private static final String PULSE_BUILD_REVISION = "PULSE_BUILD_REVISION";
-    private static final String PULSE_BUILD_TIMESTAMP = "PULSE_BUILD_TIMESTAMP";
-    private static final String PULSE_BUILD_TIMESTAMP_MILLIS = "PULSE_BUILD_TIMESTAMP_MILLIS";
-    private static final String PULSE_RECIPE_TIMESTAMP = "PULSE_RECIPE_TIMESTAMP";
-    private static final String PULSE_RECIPE_TIMESTAMP_MILLIS = "PULSE_RECIPE_TIMESTAMP_MILLIS";
-
-
     public void execute(CommandContext context, CommandResult cmdResult)
     {
         ProcessBuilder builder = new ProcessBuilder(constructCommand());
-        updateWorkingDir(builder, context.getPaths());
+        builder.directory(getWorkingDir(context.getPaths()));
         updateChildEnvironment(builder, context);
 
         builder.redirectErrorStream(true);
@@ -314,21 +305,21 @@ public class ExecutableCommand implements Command, ScopeAware
         return command;
     }
 
-    private void updateWorkingDir(ProcessBuilder builder, RecipePaths paths)
+    protected File getWorkingDir(RecipePaths paths)
     {
         if (workingDir == null)
         {
-            builder.directory(paths.getBaseDir());
+            return paths.getBaseDir();
         }
         else
         {
             if (workingDir.isAbsolute())
             {
-                builder.directory(workingDir);
+                return workingDir;
             }
             else
             {
-                builder.directory(new File(paths.getBaseDir(), workingDir.getPath()));
+                return new File(paths.getBaseDir(), workingDir.getPath());
             }
         }
     }

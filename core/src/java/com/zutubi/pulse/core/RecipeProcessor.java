@@ -113,13 +113,16 @@ public class RecipeProcessor
         }
         finally
         {
-            // compile the feature counts for the results.
-
-
             writeTestResults(paths, testResults);
             result.setTestSummary(testResults.getSummary());
             result.complete();
-            eventManager.publish(new RecipeCompletedEvent(this, result));
+            RecipeCompletedEvent completedEvent = new RecipeCompletedEvent(this, result);
+            if(context != null)
+            {
+                completedEvent.setBuildVersion(context.getBuildVersion());
+            }
+            
+            eventManager.publish(completedEvent);
 
             runningLock.lock();
             runningRecipe = 0;

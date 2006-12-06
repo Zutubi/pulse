@@ -8,6 +8,10 @@ import com.zutubi.pulse.core.model.RecipeResult;
 public class RecipeCompletedEvent extends RecipeEvent
 {
     private RecipeResult result;
+    /**
+     * If non-null, the build version as extracted when running this recipe.
+     */
+    private String buildVersion;
 
     private RecipeCompletedEvent()
     {
@@ -24,6 +28,16 @@ public class RecipeCompletedEvent extends RecipeEvent
     public RecipeResult getResult()
     {
         return result;
+    }
+
+    public String getBuildVersion()
+    {
+        return buildVersion;
+    }
+
+    public void setBuildVersion(String buildVersion)
+    {
+        this.buildVersion = buildVersion;
     }
 
     public String toString()

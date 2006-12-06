@@ -1,5 +1,7 @@
 package com.zutubi.pulse.core;
 
+import com.zutubi.pulse.BuildContext;
+
 import java.io.IOException;
 
 /**
@@ -38,6 +40,15 @@ public class MavenCommandTest extends CommandTestBase
         MavenCommand command = new MavenCommand();
         command.setWorkingDir(baseDir);
         successRun(command, "BUILD SUCCESSFUL", "build target", "_Apache_", "v. 1.0.2");
+    }
+
+    public void testExtractVersion() throws IOException
+    {
+        copyBuildFile("basic");
+        MavenCommand command = new MavenCommand();
+        BuildContext buildContext = new BuildContext();
+        runCommand(command, buildContext);
+        assertEquals("1.0-SNAPSHOT", buildContext.getBuildVersion());
     }
 
     public void testRunSpecificTarget() throws IOException

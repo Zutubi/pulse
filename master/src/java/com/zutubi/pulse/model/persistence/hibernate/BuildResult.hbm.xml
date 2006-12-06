@@ -48,6 +48,8 @@
         <many-to-one name="root" class="com.zutubi.pulse.model.RecipeResultNode" column="RECIPE_RESULT_ID"
                      cascade="all"/>
 
+        <property name="version" column="VERSION" type="string"/>
+
         <property name="hasWorkDir" type="boolean"/>
     </class>
 

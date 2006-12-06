@@ -5,6 +5,7 @@ import com.zutubi.pulse.core.model.Feature;
 import com.zutubi.pulse.test.PulseTestCase;
 import com.zutubi.pulse.util.FileSystemUtils;
 import com.zutubi.pulse.util.IOUtils;
+import com.zutubi.pulse.BuildContext;
 
 import java.io.*;
 import java.util.List;
@@ -34,6 +35,15 @@ public class Maven2CommandTest extends PulseTestCase
         Maven2Command command = new Maven2Command();
         command.setGoals("compile");
         successRun("basic", command, "[compiler:compile]", "BUILD SUCCESSFUL");
+    }
+
+    public void testExtractVersion() throws Exception
+    {
+        Maven2Command command = new Maven2Command();
+        command.setGoals("compile");
+        BuildContext buildContext = new BuildContext();
+        runMaven("basic", command, buildContext);
+        assertEquals("1.0-SNAPSHOT", buildContext.getBuildVersion());
     }
 
     public void testNoTarget() throws Exception
@@ -88,7 +98,7 @@ public class Maven2CommandTest extends PulseTestCase
 
     private CommandResult successRun(String inName, Maven2Command command, String ...contents) throws Exception
     {
-        CommandResult result = runMaven(inName, command);
+        CommandResult result = runMaven(inName, command, null);
         assertTrue(result.succeeded());
         checkOutput(contents);
         return result;
@@ -96,13 +106,13 @@ public class Maven2CommandTest extends PulseTestCase
 
     private CommandResult failedRun(String inName, Maven2Command command, String ...contents) throws Exception
     {
-        CommandResult result = runMaven(inName, command);
+        CommandResult result = runMaven(inName, command, null);
         assertTrue(result.failed());
         checkOutput(contents);
         return result;
     }
 
-    private CommandResult runMaven(String inName, Maven2Command command) throws Exception
+    private CommandResult runMaven(String inName, Maven2Command command, BuildContext buildContext) throws Exception
     {
         File sourceDir = getSource(inName);
         FileSystemUtils.rmdir(baseDir);
@@ -113,6 +123,7 @@ public class Maven2CommandTest extends PulseTestCase
 
         CommandResult result = new CommandResult("maven2-test");
         CommandContext context = new CommandContext(new SimpleRecipePaths(baseDir, null), outputDir, null);
+        context.setBuildContext(buildContext);
         command.execute(context, result);
 
         return result;

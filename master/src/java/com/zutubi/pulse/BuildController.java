@@ -414,6 +414,17 @@ public class BuildController implements EventListener
                 {
                     LOG.warning("Unable to unschedule timeout trigger: " + ex.getMessage(), ex);
                 }
+
+                if(e instanceof RecipeCompletedEvent)
+                {
+                    RecipeCompletedEvent completedEvent = (RecipeCompletedEvent) e;
+                    String version = completedEvent.getBuildVersion();
+                    if(version != null)
+                    {
+                        buildResult.setVersion(version);
+                        buildManager.save(buildResult);
+                    }
+                }
             }
 
             checkNodeStatus(foundNode);

@@ -2393,7 +2393,11 @@
             #contentClassCell("revision.none")
         #end
     #elseif($key == "version")
-        #classCell("version")
+        #if($buildResult.version)
+            #classCell($buildResult.version)
+        #else
+            #classCell("none")
+        #end
     #elseif($key == "when")
         #dateClassCell($buildResult)
     #elseif($key == "elapsed")

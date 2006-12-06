@@ -4,6 +4,8 @@ import com.zutubi.pulse.core.model.CommandResult;
 import com.zutubi.pulse.core.model.StoredArtifact;
 import com.zutubi.pulse.util.SystemUtils;
 
+import java.io.File;
+
 /**
  * <class-comment/>
  */
@@ -51,6 +53,8 @@ public class Maven2Command extends ExecutableCommand
         }
 
         super.execute(context, cmdResult);
+
+        MavenUtils.extractVersion(context, cmdResult, new File(getWorkingDir(context.getPaths()), "pom.xml"), "version");
 
         StoredArtifact artifact = cmdResult.getArtifact(OUTPUT_ARTIFACT_NAME);
         if(artifact != null)
