@@ -875,33 +875,37 @@
         #else
             &nbsp;
         #end
-        $selectedResult.state.prettyString
-        <a href="#" id="${changeId}_link" onclick="showHideBuildsFloat('$changeId'); return false">+</a>
-        <div id="$changeId" style="display: none">
-        <table class="content" style="margin: 0">
-            <tr>
-                <th class="heading" colspan="5">
-                    <span class="action">
-                        <a href="#" onclick="showHideBuildsFloat('$changeId'); return false;"><img alt="$action.getText('close')" src="$base/images/delete.gif"/>#wwtext("name=close")</a>
-                    </span>
-                    #wwtext("name=build.results")
-                </th>
-            </tr>
-            <tr>
-                #contentHeading("project" 1)
-                #contentHeading("build id" 1)
-                #contentHeading("build.spec" 1)
-                #contentHeading("status" 2)
-            </tr>
-        #foreach($id in $changelist.resultIds)
-            <tr>
-            #set($result = $action.getResult($id))
-                <td class="content"><a href="currentBuild.action?id=$result.project.id">$!webwork.htmlEncode($result.project.name)</a></td>
-                #assignGlobalResultCssClass($result)
-                #dynamicRightLinkCell($result.number "viewBuild.action?id=$result.id")
-                #classCell($result.buildSpecification)
-                #statusCell($result true)
-            </tr>
+        #if ($selectedResult == "n")
+            #wwtext("builds.none")
+        #else
+            $selectedResult.state.prettyString
+            <a href="#" id="${changeId}_link" onclick="showHideBuildsFloat('$changeId'); return false">+</a>
+            <div id="$changeId" style="display: none">
+            <table class="content" style="margin: 0">
+                <tr>
+                    <th class="heading" colspan="5">
+                        <span class="action">
+                            <a href="#" onclick="showHideBuildsFloat('$changeId'); return false;"><img alt="$action.getText('close')" src="$base/images/delete.gif"/>#wwtext("name=close")</a>
+                        </span>
+                        #wwtext("name=build.results")
+                    </th>
+                </tr>
+                <tr>
+                    #contentHeading("project" 1)
+                    #contentHeading("build id" 1)
+                    #contentHeading("build.spec" 1)
+                    #contentHeading("status" 2)
+                </tr>
+            #foreach($id in $changelist.resultIds)
+                <tr>
+                #set($result = $action.getResult($id))
+                    <td class="content"><a href="currentBuild.action?id=$result.project.id">$!webwork.htmlEncode($result.project.name)</a></td>
+                    #assignGlobalResultCssClass($result)
+                    #dynamicRightLinkCell($result.number "viewBuild.action?id=$result.id")
+                    #classCell($result.buildSpecification)
+                    #statusCell($result true)
+                </tr>
+            #end
         #end
         </table>
         </div>
