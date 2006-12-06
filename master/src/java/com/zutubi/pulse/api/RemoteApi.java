@@ -59,6 +59,7 @@ public class RemoteApi implements com.zutubi.pulse.events.EventListener
         structDefs.put(Svn.class, new String[]{"url", "username", "password", "keyfile", "passphrase", "monitor", "pollingInterval"});
         structDefs.put(P4.class, new String[]{"port", "user", "password", "client", "monitor", "pollingInterval"});
         structDefs.put(AntPulseFileDetails.class, new String[]{"buildFile", "targets", "arguments", "workingDir"});
+        structDefs.put(ExecutablePulseFileDetails.class, new String[]{"executable", "arguments", "workingDir"});
         structDefs.put(MavenPulseFileDetails.class, new String[]{"targets", "workingDir", "arguments"});
         structDefs.put(Maven2PulseFileDetails.class, new String[]{"goals", "workingDir", "arguments"});
         structDefs.put(MakePulseFileDetails.class, new String[]{"makefile", "targets", "arguments", "workingDir"});
@@ -784,8 +785,8 @@ public class RemoteApi implements com.zutubi.pulse.events.EventListener
 
             Hashtable<String, Object> details = extractDetails(project);
             // add the scm and type details.
-            details.put("scm", getScmType(project.getScm()));
-            details.put("type", getProjectType(project.getPulseFileDetails()));
+            details.put("scm", project.getScm().getType());
+            details.put("type", project.getPulseFileDetails().getType());
 
             return details;
         }
@@ -992,6 +993,10 @@ public class RemoteApi implements com.zutubi.pulse.events.EventListener
         {
             details = new AntPulseFileDetails();
         }
+        else if ("executable".equals(projectType))
+        {
+            details = new ExecutablePulseFileDetails();
+        }
         else if ("maven".equals(projectType))
         {
             details = new MavenPulseFileDetails();
@@ -1046,56 +1051,6 @@ public class RemoteApi implements com.zutubi.pulse.events.EventListener
         setProperties(details, scm);
 
         return scm;
-    }
-
-    private String getScmType(Scm scm)
-    {
-        if (scm instanceof Cvs)
-        {
-            return "cvs";
-        }
-        if (scm instanceof Svn)
-        {
-            return "svn";
-        }
-        if (scm instanceof P4)
-        {
-            return "p4";
-        }
-        throw new RuntimeException(String.format("Unknown scm type: %s", scm.getClass().getName()));
-    }
-
-    private String getProjectType(PulseFileDetails detail)
-    {
-        if (detail instanceof AntPulseFileDetails)
-        {
-            return "ant";
-        }
-        if (detail instanceof MavenPulseFileDetails)
-        {
-            return "maven";
-        }
-        if (detail instanceof Maven2PulseFileDetails)
-        {
-            return "maven2";
-        }
-        if (detail instanceof MakePulseFileDetails)
-        {
-            return "make";
-        }
-        if (detail instanceof CustomPulseFileDetails)
-        {
-            return "custom";
-        }
-        if (detail instanceof VersionedPulseFileDetails)
-        {
-            return "versioned";
-        }
-        if (detail instanceof XCodePulseFileDetails)
-        {
-            return "xcode";
-        }
-        throw new RuntimeException(String.format("Unknown project type: %s", detail.getClass().getName()));
     }
 
     private void setProperties(Hashtable<String, Object> scmDetails, Object object)

@@ -13,6 +13,8 @@ import java.util.Vector;
 public class ProjectXmlRpcAcceptanceTest extends BaseXmlRpcAcceptanceTest
 {
     private String adminToken;
+    private static final String PROJECT_DESCRIPTION = "project description";
+    private static final String PROJECT_URL = "project url";
 
     public ProjectXmlRpcAcceptanceTest()
     {
@@ -39,24 +41,12 @@ public class ProjectXmlRpcAcceptanceTest extends BaseXmlRpcAcceptanceTest
 
     public void testCreateProject() throws IOException, XmlRpcException
     {
-        String project = String.format("project-%s", RandomUtils.randomString(4));
+        createProject();
+    }
 
-        Hashtable<String, Object> projectDetails = new Hashtable<String, Object>();
-        projectDetails.put("name", project);
-        projectDetails.put("description", "project description");
-        projectDetails.put("url", "project url");
-
-        Hashtable<String, Object> scmDetails = new Hashtable<String, Object>();
-        scmDetails.put("type", "cvs");
-        scmDetails.put("root", ":pserver:someone@localhost:/cvsroot");
-        scmDetails.put("module", "project");
-
-        Hashtable<String, Object> typeDetails = new Hashtable<String, Object>();
-        typeDetails.put("type", "ant");
-        typeDetails.put("buildFile", "build.xml");
-
-        Object result = xmlRpcClient.execute("RemoteApi.createProject", getVector(adminToken, projectDetails, scmDetails, typeDetails));
-        assertEquals(Boolean.TRUE, result);
+    public void testCreateExeProject() throws IOException, XmlRpcException
+    {
+        createProject("executable", "executable", "scons.bat", "arguments", "arg1 arg2", "workingDir", "workit");
     }
 
     public void testDeleteProject() throws IOException, XmlRpcException
@@ -104,8 +94,10 @@ public class ProjectXmlRpcAcceptanceTest extends BaseXmlRpcAcceptanceTest
         Hashtable<String, Object> details = (Hashtable<String, Object>) result;
 
         // check that the necessary entries exist.
-        assertEquals(3, details.size());
+        assertEquals(5, details.size());
         assertEquals(projectName, details.get("name"));
+        assertEquals(PROJECT_DESCRIPTION, details.get("description"));
+        assertEquals(PROJECT_URL, details.get("url"));
         assertEquals("cvs", details.get("scm"));
         assertEquals("ant", details.get("type"));
     }
@@ -166,10 +158,17 @@ public class ProjectXmlRpcAcceptanceTest extends BaseXmlRpcAcceptanceTest
 
     private String createProject() throws IOException, XmlRpcException
     {
+        return createProject("ant", "buildFile", "build.xml");
+    }
+
+    private String createProject(String type, String... typeArgs) throws IOException, XmlRpcException
+    {
         String project = String.format("project-%s", RandomUtils.randomString(4));
 
         Hashtable<String, Object> projectDetails = new Hashtable<String, Object>();
         projectDetails.put("name", project);
+        projectDetails.put("description", PROJECT_DESCRIPTION);
+        projectDetails.put("url", PROJECT_URL);
 
         Hashtable<String, Object> scmDetails = new Hashtable<String, Object>();
         scmDetails.put("type", "cvs");
@@ -177,8 +176,11 @@ public class ProjectXmlRpcAcceptanceTest extends BaseXmlRpcAcceptanceTest
         scmDetails.put("module", "project");
 
         Hashtable<String, Object> typeDetails = new Hashtable<String, Object>();
-        typeDetails.put("type", "ant");
-        typeDetails.put("buildFile", "build.xml");
+        typeDetails.put("type", type);
+        for(int i = 0; i < typeArgs.length; i += 2)
+        {
+            typeDetails.put(typeArgs[i], typeArgs[i + 1]);
+        }
 
         Object result = xmlRpcClient.execute("RemoteApi.createProject", getVector(adminToken, projectDetails, scmDetails, typeDetails));
         assertEquals(Boolean.TRUE, result);
