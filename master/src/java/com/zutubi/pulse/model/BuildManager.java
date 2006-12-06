@@ -134,4 +134,6 @@ public interface BuildManager
     boolean isCleanupInProgress(Project project);
 
     CommandResult getCommandResultByArtifact(long artifactId);
+
+    BuildResult getLatestBuildResult(BuildSpecification spec);
 }

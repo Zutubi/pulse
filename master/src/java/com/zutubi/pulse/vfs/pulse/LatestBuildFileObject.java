@@ -1,16 +1,13 @@
 package com.zutubi.pulse.vfs.pulse;
 
+import com.zutubi.pulse.model.BuildResult;
+import com.zutubi.pulse.model.Project;
 import org.apache.commons.vfs.FileName;
-import org.apache.commons.vfs.FileType;
 import org.apache.commons.vfs.FileSystemException;
+import org.apache.commons.vfs.FileType;
 import org.apache.commons.vfs.provider.AbstractFileSystem;
 
 import java.io.InputStream;
-import java.util.List;
-import java.util.Arrays;
-
-import com.zutubi.pulse.model.Project;
-import com.zutubi.pulse.model.BuildResult;
 
 /**
  * <class comment/>
@@ -58,7 +55,16 @@ public class LatestBuildFileObject extends AbstractPulseFileObject implements Ad
             if (provider != null)
             {
                 Project project = provider.getProject();
-                build = buildManager.getLatestBuildResult(project);
+
+                BuildSpecificationProvider buildSpecProvider = (BuildSpecificationProvider) getAncestor(BuildSpecificationProvider.class);
+                if (buildSpecProvider != null)
+                {
+                    build = buildManager.getLatestBuildResult(buildSpecProvider.getBuildSpecification());   
+                }
+                else
+                {
+                    build = buildManager.getLatestBuildResult(project);
+                }
             }
             else
             {
@@ -71,10 +77,5 @@ public class LatestBuildFileObject extends AbstractPulseFileObject implements Ad
         {
             return null;
         }
-    }
-
-    public List<String> getActions()
-    {
-        return Arrays.asList("view");
     }
 }

@@ -554,6 +554,11 @@ public class DefaultProjectManager implements ProjectManager
         return projectDao.findByCleanupRule(rule);
     }
 
+    public BuildSpecification getBuildSpecification(long id)
+    {
+        return buildSpecificationDao.findById(id);
+    }
+
     public void setEventManager(EventManager eventManager)
     {
         this.eventManager = eventManager;

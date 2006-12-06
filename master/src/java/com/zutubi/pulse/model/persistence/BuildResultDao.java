@@ -4,10 +4,7 @@ import com.zutubi.pulse.core.model.CommandResult;
 import com.zutubi.pulse.core.model.PersistentName;
 import com.zutubi.pulse.core.model.RecipeResult;
 import com.zutubi.pulse.core.model.ResultState;
-import com.zutubi.pulse.model.BuildResult;
-import com.zutubi.pulse.model.Project;
-import com.zutubi.pulse.model.RecipeResultNode;
-import com.zutubi.pulse.model.User;
+import com.zutubi.pulse.model.*;
 
 import java.util.Date;
 import java.util.List;
@@ -73,4 +70,6 @@ public interface BuildResultDao extends EntityDao<BuildResult>
     BuildResult findLatest();
 
     CommandResult findCommandResultByArtifact(long artifactId);
+
+    BuildResult findLatestByBuildSpec(BuildSpecification spec);
 }

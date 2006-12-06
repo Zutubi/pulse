@@ -410,6 +410,11 @@ public class DefaultBuildManager implements BuildManager, EventListener
         return buildResultDao.findCommandResultByArtifact(artifactId);
     }
 
+    public BuildResult getLatestBuildResult(BuildSpecification spec)
+    {
+        return buildResultDao.findLatestByBuildSpec(spec);
+    }
+
     /**
      * Execute the configured cleanup rules for the specified project.
      *
