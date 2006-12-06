@@ -26,7 +26,7 @@
         </tr>
         <tr>
             #contentHeading("project.name" 1)
-            #contentHeading("actions" 5)
+            #contentHeading("project.actions" 5)
             #buildTableHeaders($columns false)
         </tr>
     #foreach($project in $projects)
