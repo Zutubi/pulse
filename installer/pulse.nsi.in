@@ -121,8 +121,8 @@ Section "Pulse" SecMain
 
   Call EnsureJre
   
-  nsExec::Exec '"$INSTDIR\bin\wrapper.exe" -r "$INSTDIR\bin\wrapper.conf"'
-  nsExec::ExecToStack '"$INSTDIR\bin\wrapper.exe" -i "$INSTDIR\bin\wrapper.conf"'
+  nsExec::Exec '"$INSTDIR\bin\wrapper-windows-x86-32.exe" -r "$INSTDIR\bin\wrapper.conf"'
+  nsExec::ExecToStack '"$INSTDIR\bin\wrapper-windows-x86-32.exe" -i "$INSTDIR\bin\wrapper.conf"'
   Pop $0
 CheckExit:
   StrCmp $0 "0" ServiceOK 0
@@ -163,7 +163,7 @@ Section "un.Uninstall"
   Push "PULSE_HOME"
   Call un.DeleteEnvStr
 
-  nsExec::Exec '"$INSTDIR\bin\wrapper.exe" -r "$INSTDIR\bin\wrapper.conf"'
+  nsExec::Exec '"$INSTDIR\bin\wrapper-windows-x86-32.exe" -r "$INSTDIR\bin\wrapper.conf"'
 
   !insertmacro MUI_STARTMENU_GETFOLDER Application $STARTMENU_FOLDER
   DetailPrint "$STARTMENU_FOLDER"
