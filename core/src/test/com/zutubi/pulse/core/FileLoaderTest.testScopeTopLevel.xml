@@ -1,0 +1,18 @@
+<?xml version="1.0"?>
+<project>
+    <macro name="m1">
+        <recipe name="${indirect}"/>
+    </macro>
+
+    <property name="indirect" value="outer"/>
+
+    <scope>
+        <property name="indirect" value="first"/>
+        <macro-ref macro="${m1}"/>
+    </scope>
+
+    <scope>
+        <property name="indirect" value="second"/>
+        <macro-ref macro="${m1}"/>
+    </scope>
+</project>

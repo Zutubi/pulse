@@ -92,6 +92,26 @@ public class FileLoaderTest extends FileLoaderTestBase
         assertEquals("b", recipe.getDependencies().get(0).getVersion());
     }
 
+    public void testScope() throws Exception
+    {
+        PulseFile pf = new PulseFile();
+        loader.load(getInput("testScope"), pf);
+
+        Recipe recipe = pf.getRecipe("r1");
+        assertNotNull(recipe);
+        assertNotNull(recipe.getCommand("scope1"));
+        assertNotNull(recipe.getCommand("scope2"));
+    }
+
+    public void testScopeTopLevel() throws Exception
+    {
+        PulseFile pf = new PulseFile();
+        loader.load(getInput("testScopeTopLevel"), pf);
+
+        assertNotNull(pf.getRecipe("first"));
+        assertNotNull(pf.getRecipe("second"));
+    }
+
     public void testScoping() throws Exception
     {
         PulseFile pf = new PulseFile();

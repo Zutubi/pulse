@@ -357,6 +357,12 @@ public class FileLoader
 
             return true;
         }
+        else if(localName.equals("scope"))
+        {
+            // Just load children in new scope and redirect to parent
+            loadSubElements(element, type, resolveReferences, new Scope(scope), typeHelper, depth, resourceRepository, predicate);
+            return true;
+        }
 
         return false;
     }
