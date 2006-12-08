@@ -6,8 +6,9 @@ import com.zutubi.pulse.model.User;
 import com.zutubi.pulse.model.UserManager;
 import com.zutubi.pulse.security.AcegiUtils;
 import com.zutubi.pulse.util.Constants;
+import org.acegisecurity.AuthenticationManager;
 import org.acegisecurity.context.SecurityContextHolder;
-import org.acegisecurity.providers.encoding.PasswordEncoder;
+import org.acegisecurity.providers.UsernamePasswordAuthenticationToken;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.codec.digest.DigestUtils;
 
@@ -24,7 +25,7 @@ public class DefaultTokenManager implements TokenManager
     private int loginCount = 0;
     private Set<String> validTokens = new TreeSet<String>();
     private UserManager userManager;
-    private PasswordEncoder passwordEncoder;
+    private AuthenticationManager authenticationManager;
     private AdminTokenManager adminTokenManager;
 
     public synchronized String login(String username, String password) throws AuthenticationException
@@ -49,27 +50,25 @@ public class DefaultTokenManager implements TokenManager
             checkForExpiredTokens();
         }
 
-        User user = userManager.getUser(username);
-        if (user == null)
+        try
         {
-            // This allows guessing of usernames: do we care?
-            throw new AuthenticationException("Invalid username");
-        }
+            authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(username, password));
+            logoutUser();
 
-        if (!passwordEncoder.isPasswordValid(user.getPassword(), password,  null))
+            // Generate a token which is good for 30 minutes for this user
+            long expiryTime = System.currentTimeMillis() + expiry;
+            String signatureValue = getTokenSignature(username, expiryTime, password);
+            String tokenValue = username + ":" + expiryTime + ":" + signatureValue;
+            String encoded = new String(Base64.encodeBase64(tokenValue.getBytes()));
+
+            validTokens.add(encoded);
+
+            return encoded;
+        }
+        catch(Exception e)
         {
-            throw new AuthenticationException("Invalid password");
+            throw new AuthenticationException(e.getMessage());
         }
-
-        // Generate a token which is good for 30 minutes for this user
-        long expiryTime = System.currentTimeMillis() + expiry;
-        String signatureValue = getTokenSignature(username, expiryTime, password);
-        String tokenValue = username + ":" + expiryTime + ":" + signatureValue;
-        String encoded = new String(Base64.encodeBase64(tokenValue.getBytes()));
-
-        validTokens.add(encoded);
-
-        return encoded;
     }
 
     public synchronized boolean logout(String token)
@@ -231,14 +230,9 @@ public class DefaultTokenManager implements TokenManager
         this.userManager = userManager;
     }
 
-    /**
-     * Required resource.
-     *
-     * @param passwordEncoder
-     */
-    public void setPasswordEncoder(PasswordEncoder passwordEncoder)
+    public void setAuthenticationManager(AuthenticationManager authenticationManager)
     {
-        this.passwordEncoder = passwordEncoder;
+        this.authenticationManager = authenticationManager;
     }
 
     /**

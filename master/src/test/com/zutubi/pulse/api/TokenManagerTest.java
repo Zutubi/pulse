@@ -12,7 +12,11 @@ import com.zutubi.pulse.model.persistence.mock.MockUserDao;
 import com.zutubi.pulse.security.ldap.AcegiLdapManager;
 import com.zutubi.pulse.test.PulseTestCase;
 import com.zutubi.pulse.util.Constants;
-import org.acegisecurity.providers.encoding.PlaintextPasswordEncoder;
+import org.acegisecurity.Authentication;
+import org.acegisecurity.AuthenticationManager;
+import org.acegisecurity.BadCredentialsException;
+import org.acegisecurity.providers.UsernamePasswordAuthenticationToken;
+import org.acegisecurity.userdetails.UserDetails;
 
 /**
  */
@@ -40,7 +44,26 @@ public class TokenManagerTest extends PulseTestCase
 
         tokenManager = new DefaultTokenManager();
         tokenManager.setUserManager(userManager);
-        tokenManager.setPasswordEncoder(new PlaintextPasswordEncoder());
+        tokenManager.setAuthenticationManager(new AuthenticationManager()
+        {
+            public Authentication authenticate(Authentication authentication) throws org.acegisecurity.AuthenticationException
+            {
+                UsernamePasswordAuthenticationToken token = (UsernamePasswordAuthenticationToken) authentication;
+                User u = userManager.getUser(token.getName());
+                if(u == null)
+                {
+                    throw new BadCredentialsException("Invalid username");
+                }
+
+                if(!u.getPassword().equals(token.getCredentials()))
+                {
+                    throw new BadCredentialsException("Invalid password");
+                }
+
+                UserDetails details = userManager.getPrinciple(u);
+                return new UsernamePasswordAuthenticationToken(token.getPrincipal(), token.getCredentials(), details.getAuthorities());
+            }
+        });
     }
 
     public void testLoginUnknownUser() throws Exception
