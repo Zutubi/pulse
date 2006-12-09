@@ -16,7 +16,7 @@ import java.util.List;
  */
 public class ArtifactStageFileObject extends AbstractPulseFileObject implements RecipeResultProvider
 {
-    private final String STAGE_FORMAT = "build stage :: %s :: %s@%s";
+    private final String STAGE_FORMAT = "stage :: %s :: %s@%s";
 
     private final long recipeId;
 
