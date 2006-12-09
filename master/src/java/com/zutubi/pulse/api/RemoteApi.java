@@ -611,10 +611,7 @@ public class RemoteApi implements com.zutubi.pulse.events.EventListener
         instance.setLogin(login);
         instance.setName((String) user.get("name"));
 
-        userManager.save(instance);
-
-        userManager.setPassword(instance, (String) user.get("password"));
-
+        userManager.addUser(instance, false, false);
         return true;
     }
 
