@@ -1316,7 +1316,7 @@
     <tr>
         #set($id = $resultNode.id)
         #set($recipe = $resultNode.result)
-        #assignGlobalResultCssClass($result)
+        #assignGlobalResultCssClass($recipe)
     #if($detailedView)
         <td class="content">
             <a href="#" onclick="selectNode('$resultNode.id'); return false">
