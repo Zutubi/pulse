@@ -452,7 +452,7 @@ public class BuildResultsRssAction extends ProjectActionSupport
         }
     }
 
-    private synchronized List<SyndEntry> fetch(String key, List<Long> ids, SyndFeedEntryFactory factory)
+    private List<SyndEntry> fetch(String key, List<Long> ids, SyndFeedEntryFactory factory)
     {
         Cache cache = cacheManager.getCache("BuildResultsRss");
         LinkedList<CacheEntry> entries = (LinkedList<CacheEntry>) cache.get(key);
@@ -462,64 +462,68 @@ public class BuildResultsRssAction extends ProjectActionSupport
             cache.put(key, entries);
         }
 
-        boolean requiresSorting = false;
-        for (long id : ids)
+        synchronized (entries)
         {
-            // does this exist in the cache?
-            boolean found = false;
+
+            boolean requiresSorting = false;
+            for (long id : ids)
+            {
+                // does this exist in the cache?
+                boolean found = false;
+                for (CacheEntry entry : entries)
+                {
+                    if (entry.id == id)
+                    {
+                        found = true;
+                        break;
+                    }
+                }
+                if (!found)
+                {
+                    // create
+                    BuildResult result = buildManager.getBuildResult(id);
+                    SyndEntry entry = factory.createEntry(result);
+
+                    // and add.
+                    CacheEntry cacheEntry = new CacheEntry(result.getId(), entry);
+                    entries.add(cacheEntry);
+                    requiresSorting = true;
+                }
+            }
+
+            if (requiresSorting)
+            {
+                Collections.sort(entries, new Comparator<CacheEntry>()
+                {
+                    public int compare(CacheEntry o1, CacheEntry o2)
+                    {
+                        if (o2.id > o1.id)
+                        {
+                            return 1;
+                        }
+                        if (o2.id == o1.id)
+                        {
+                            return 0;
+                        }
+                        return -1;
+                    }
+                });
+            }
+
+            // trim.
+            while (entries.size() > 10)
+            {
+                entries.removeLast();
+            }
+
+            List<SyndEntry> syndEntries = new LinkedList<SyndEntry>();
             for (CacheEntry entry : entries)
             {
-                if (entry.id == id)
-                {
-                    found = true;
-                    break;
-                }
+                syndEntries.add(entry.entry);
             }
-            if (!found)
-            {
-                // create
-                BuildResult result = buildManager.getBuildResult(id);
-                SyndEntry entry = factory.createEntry(result);
 
-                // and add.
-                CacheEntry cacheEntry = new CacheEntry(result.getId(), entry);
-                entries.add(cacheEntry);
-                requiresSorting = true;
-            }
+            return syndEntries;
         }
-
-        if (requiresSorting)
-        {
-            Collections.sort(entries, new Comparator<CacheEntry>()
-            {
-                public int compare(CacheEntry o1, CacheEntry o2)
-                {
-                    if (o2.id > o1.id)
-                    {
-                        return 1;
-                    }
-                    if (o2.id == o1.id)
-                    {
-                        return 0;
-                    }
-                    return -1;
-                }
-            });
-        }
-
-        // trim.
-        while (entries.size() > 10)
-        {
-            entries.removeLast();
-        }
-
-        List<SyndEntry> syndEntries = new LinkedList<SyndEntry>();
-        for (CacheEntry entry : entries)
-        {
-            syndEntries.add(entry.entry);
-        }
-
-        return syndEntries;
     }
 
     private class CacheEntry

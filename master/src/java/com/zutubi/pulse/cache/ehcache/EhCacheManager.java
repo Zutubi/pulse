@@ -23,7 +23,7 @@ public class EhCacheManager implements com.zutubi.pulse.cache.CacheManager
         }
     }
 
-    public Cache getCache(String name)
+    public synchronized Cache getCache(String name)
     {
         if (!cacheManager.cacheExists(name))
         {
