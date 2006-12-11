@@ -11,6 +11,8 @@ import java.io.InputStream;
 import java.util.LinkedList;
 import java.util.List;
 
+import com.zutubi.pulse.model.Project;
+
 /**
  * <class comment/>
  */
@@ -100,14 +102,13 @@ public class WorkingCopyFileObject extends AbstractPulseFileObject implements Ad
         return fo.getName().getRelativeName(getName());
     }
 
-/*
     protected boolean doIsReadable() throws Exception
     {
         try
         {
-            ProjectNode node = (ProjectNode) getAncestor(ProjectNode.class);
+            ProjectProvider node = (ProjectProvider) getAncestor(ProjectProvider.class);
             Project project = node.getProject();
-            pfs.getProjectManager().checkWrite(project);
+            projectManager.checkWrite(project);
             return true;
         }
         catch (FileSystemException e)
@@ -119,5 +120,4 @@ public class WorkingCopyFileObject extends AbstractPulseFileObject implements Ad
             return false;
         }
     }
-*/
 }
