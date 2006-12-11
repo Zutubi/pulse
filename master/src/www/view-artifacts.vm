@@ -30,7 +30,7 @@
             {
                 Element.hide($('loading'));
                 tree.draw();
-            }, true, false);
+            }, true, false, 3);
         }
 
     </script>
@@ -38,28 +38,36 @@
 <body>
     #buildTabs($result "artifacts")
 
-    <div style="float:left">
     <h3>#wwtext("name=artifacts.all")</h3>
-    <p>
-        The tree below allows you to navigate through the artifacts for this build.
-    </p>
-    <div id="loading" style="display:none;"><img src="$base/images/treeview/loading.gif" alt="loading..."/></div>
-    <div id="error"></div>
-    <div id="artifactTree">
-        <div id="browseTree"></div>
-    </div>
-    </div>
 
-    <div style="float:right">
-    <p><strong>Legend:</strong>
-        <ul class="legend">
-            <li class="download">Download an artifact file.</li>
-            <li class="archive">Download an archive file containing the nested artifacts.</li>
-            <li class="decorate">View a decorated view of the artifact.</li>
-        </ul>
-    </p>
-    </div>
+    <table>
+        <tr>
+            <td class="columns" width="75%">
 
+                <p>
+                    The tree below allows you to navigate through the artifacts for this build.
+                </p>
+                <div id="loading" style="display:none;"><img src="$base/images/treeview/loading.gif" alt="loading..."/></div>
+                <div id="error"></div>
+                <div id="artifactTree">
+                    <div id="browseTree"></div>
+                </div>
+
+            </td>
+            <td class="columns">
+
+                <p><strong>Legend:</strong>
+                    <ul class="legend">
+                        <li class="download">Download an artifact file.</li>
+                        <li class="archive">Download an archive file containing the nested artifacts.</li>
+                        <li class="decorate">View a decorated view of the artifact.</li>
+                        <li class="broken">The artifact does not exist on disk.</li>
+                    </ul>
+                </p>
+
+            </td>
+        </tr>
+    </table>
 
 
     #tabEnd()

@@ -109,8 +109,7 @@ YAHOO.extend(ZUTUBI.widget.TreeView, YAHOO.widget.TreeView, {
      * baseNode:        the starting point of the path search. If no base node is specified, the trees root node is used.
      * requestPath:     the path specifying the node being retrieved.
      *
-     * This method will return the requested node, or null if the node could not be located. This method will
-     * not dynamically load nodes.
+     * This method will return the requested node, or null if the node could not be located.
      */
     getNodeByPath: function(baseNode, requestPath)
     {
@@ -136,36 +135,27 @@ YAHOO.extend(ZUTUBI.widget.TreeView, YAHOO.widget.TreeView, {
                 continue;
             }
 
-            // we are only interested in nodes that are available locally.
-            if (!node.isDynamic() || node.dynamicLoadComplete)
+            // Attempt to locate the child node specified by the current path element.
+            node = $A(node.children).find(function(child)
             {
-                // Attempt to locate the child node specified by the current path element.
-                node = $A(node.children).find(function(child)
-                {
-                    var n = child.data.name;
-                    // normalise the name to ensure we are using '/' as the path separator.
-                    n = n.replace('\\', '/');
+                var n = child.data.id;
+                // normalise the name to ensure we are using '/' as the path separator.
+                n = n.replace('\\', '/');
 
-                    // ensure that trailing '\\' are removed.
-                    if (n.indexOf('/') == n.length - 1)
-                    {
-                        n = n.substring(0, n.length - 1);
-                    }
-                    return n == path;
-                });
-                
-                if (!node)
+                // ensure that trailing '\\' are removed.
+                if (n.indexOf('/') == n.length - 1)
                 {
-                    // the requested path node does not exist.
-                    return null;
+                    n = n.substring(0, n.length - 1);
                 }
-                p = node;
-            }
-            else
+                return n == path;
+            });
+
+            if (!node)
             {
-                // this node has not been loaded, so we can not traverse any further.
+                // the requested path node does not exist.
                 return null;
             }
+            p = node;
         }
 
         return node;
@@ -617,7 +607,7 @@ YAHOO.extend(ZUTUBI.widget.PulseTreeView, ZUTUBI.widget.TreeView, {
         this.error = id;
     },
 
-    ls: function(node, onCompleteCallback, showFiles, showHidden)
+    ls: function(node, onCompleteCallback, showFiles, showHidden, depth)
     {
         this.hideActionErrors();
             
@@ -638,12 +628,13 @@ YAHOO.extend(ZUTUBI.widget.PulseTreeView, ZUTUBI.widget.TreeView, {
                 onException: this.handleException,
                 parameters: "path=" + this.fsRoot + p +
                              (showFiles && "&showFiles=" + showFiles || "") +
-                             (showHidden && "&showHidden=" + showHidden || "")
+                             (showHidden && "&showHidden=" + showHidden || "") +
+                             (depth && "&depth=" + depth || "")
             }
         );
     },
 
-    lsResponse: function(parentNode, callback)
+    lsResponse: function(baseNode, callback)
     {
         var self = this; // does this cause a js memory leak?...
         return function(response)
@@ -668,6 +659,14 @@ YAHOO.extend(ZUTUBI.widget.PulseTreeView, ZUTUBI.widget.TreeView, {
                     "actions":obj.actions,
                     "url":obj.url
                 };
+
+                var parentNode = self.getNodeByPath(baseNode, obj.relativeParentPath);
+                if(parentNode != baseNode)
+                {
+                    parentNode.expanded = true;
+                    parentNode.dynamicLoadComplete = true;
+                }
+                
                 var node = new ZUTUBI.widget.FileNode(data, parentNode, false);
 
             });

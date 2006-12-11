@@ -41,6 +41,7 @@ Create an object of the following format:
                 <pair key="container">container</pair>
                 <pair key="actions"><array ref="actions"/></pair>
                 <pair key="url">url</pair>
+                <pair key="relativeParentPath">relativeParentPath</pair>
             </object>
         </array>
     </pair>

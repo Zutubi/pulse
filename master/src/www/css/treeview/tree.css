@@ -78,6 +78,10 @@
     background: url(../../images/information.gif) 0 0 no-repeat; width:18px; height:22px; cursor:pointer;
 }
 
+.treeview_broken, .treeview_broken_o {
+    background: url(../../images/treeview/folder_error.gif) 0 0 no-repeat; width:18px; height:22px; cursor:pointer;
+}
+
 /*---( Actions )---*/
 
 td.archive, div.archive {
@@ -126,6 +130,14 @@ li.download
     margin: .4em 0;
 }
 
+li.broken
+{
+    background-image: url(../../images/treeview/folder_error.gif);
+    background-repeat: no-repeat;
+    background-position: 0 50%;
+    padding: 3px 0 3px 20px;
+    margin: .4em 0;
+}
 
 /* TODO: view reference needs to be removed, and replaced with a generic reference defined within the treeview.js */
 

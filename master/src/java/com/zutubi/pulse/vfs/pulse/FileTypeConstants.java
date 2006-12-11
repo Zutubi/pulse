@@ -11,4 +11,5 @@ public class FileTypeConstants
     public static final String IN_PROGRESS = "progress";
     public static final String UNKNOWN = "unknown";
     public static final String HTML_REPORT = "html";
+    public static final String BROKEN = "broken";
 }

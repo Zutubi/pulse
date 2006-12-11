@@ -136,7 +136,7 @@ public class LsAction extends VFSActionSupport
         }
 
         listing = new LinkedList<FileObjectWrapper>();
-        FileObject[] children = fo.findFiles(new FileFilterSelector(FileTypeFilter.accept(acceptedTypes)));
+        FileObject[] children = fo.findFiles(new FileDepthFilterSelector(FileTypeFilter.accept(acceptedTypes), depth));
 
         if (children != null)
         {
@@ -149,7 +149,7 @@ public class LsAction extends VFSActionSupport
             {
                 if (showHidden || !child.isHidden())
                 {
-                    listing.add(new FileObjectWrapper(child));
+                    listing.add(new FileObjectWrapper(child, fo));
                 }
             }
         }

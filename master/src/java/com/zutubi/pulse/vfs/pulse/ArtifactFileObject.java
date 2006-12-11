@@ -61,7 +61,7 @@ public class ArtifactFileObject extends AbstractPulseFileObject implements Artif
 
     protected FileType doGetType() throws Exception
     {
-        if (isHtmlArtifact)
+        if (isHtmlArtifact || !getArtifactBase().isDirectory())
         {
             return FileType.FILE;
         }
@@ -74,16 +74,27 @@ public class ArtifactFileObject extends AbstractPulseFileObject implements Artif
         {
             return new String[0];
         }
-        return getArtifactBase().list();
+
+        File base = getArtifactBase();
+        if(base.isDirectory())
+        {
+            return base.list();
+        }
+        return new String[0];
     }
 
 
     public String getFileType() throws FileSystemException
     {
-        if (isHtmlArtifact)
+        if(!getArtifactBase().isDirectory())
+        {
+            return FileTypeConstants.BROKEN;
+        }
+        else if (isHtmlArtifact)
         {
             return FileTypeConstants.HTML_REPORT;
         }
+
         return super.getFileType();
     }
 
@@ -95,11 +106,14 @@ public class ArtifactFileObject extends AbstractPulseFileObject implements Artif
     public List<String> getActions()
     {
         List<String> actions = new LinkedList<String>();
-        if (isHtmlArtifact)
+        if (getArtifactBase().isDirectory())
         {
-            actions.add("download");
+            if (isHtmlArtifact)
+            {
+                actions.add("download");
+            }
+            actions.add("archive");
         }
-        actions.add("archive");
         return actions;
     }
 

@@ -3,6 +3,7 @@ package com.zutubi.pulse.web.vfs;
 import org.apache.commons.vfs.FileObject;
 import org.apache.commons.vfs.FileType;
 import org.apache.commons.vfs.FileSystemException;
+import org.apache.commons.vfs.FileName;
 
 import java.io.File;
 import java.util.List;
@@ -21,10 +22,12 @@ public class FileObjectWrapper
     private static final Logger LOG = Logger.getLogger(FileObjectWrapper.class);
 
     private FileObject fo;
+    private FileObject base;
 
-    public FileObjectWrapper(FileObject fo)
+    public FileObjectWrapper(FileObject fo, FileObject base)
     {
         this.fo = fo;
+        this.base = base;
     }
 
     /**
@@ -86,6 +89,28 @@ public class FileObjectWrapper
     public String getId()
     {
         return fo.getName().getBaseName();
+    }
+
+    public String getRelativeParentPath()
+    {
+        try
+        {
+            FileObject parent = fo.getParent();
+            if(parent != null)
+            {
+                String path = base.getName().getRelativeName(parent.getName());
+                if(path.equals("."))
+                {
+                    path = "";
+                }
+                return path;
+            }
+        }
+        catch (FileSystemException e)
+        {
+            LOG.severe(e);
+        }
+        return "";
     }
 
     /**
