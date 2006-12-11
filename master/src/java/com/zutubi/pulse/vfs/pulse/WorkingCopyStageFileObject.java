@@ -23,7 +23,7 @@ public class WorkingCopyStageFileObject extends AbstractPulseFileObject implemen
 
     private final long recipeId;
 
-    private String displayName;
+    private static final String NO_WORKING_COPY_AVAILABLE = "no working copy available";
 
     public WorkingCopyStageFileObject(final FileName name, final long recipeId, final AbstractFileSystem fs)
     {
@@ -34,7 +34,16 @@ public class WorkingCopyStageFileObject extends AbstractPulseFileObject implemen
 
     public AbstractPulseFileObject createFile(final FileName fileName) throws Exception
     {
-        File newBase = new File(getWorkingCopyBase(), fileName.getBaseName());
+        String child = fileName.getBaseName();
+        if (child.equals(NO_WORKING_COPY_AVAILABLE))
+        {
+            return objectFactory.buildBean(TextMessageFileObject.class,
+                    new Class[]{FileName.class, AbstractFileSystem.class},
+                    new Object[]{fileName, pfs}
+            );
+        }
+
+        File newBase = new File(getWorkingCopyBase(), child);
 
         return objectFactory.buildBean(WorkingCopyFileObject.class,
                 new Class[]{FileName.class, File.class, AbstractFileSystem.class},
@@ -55,7 +64,13 @@ public class WorkingCopyStageFileObject extends AbstractPulseFileObject implemen
             return new String[0];
         }
 
-        return getWorkingCopyBase().list();
+        File copyBase = getWorkingCopyBase();
+        if (copyBase.isDirectory())
+        {
+            return copyBase.list();
+        }
+        
+        return new String[]{NO_WORKING_COPY_AVAILABLE};
     }
 
     protected File getWorkingCopyBase() throws FileSystemException
@@ -73,12 +88,8 @@ public class WorkingCopyStageFileObject extends AbstractPulseFileObject implemen
 
     public String getDisplayName()
     {
-        if (displayName == null)
-        {
-            RecipeResultNode node = buildManager.getResultNodeByResultId(recipeId);
-            displayName = String.format(STAGE_FORMAT, node.getStage(), node.getResult().getRecipeNameSafe(), node.getHostSafe());
-        }
-        return this.displayName;
+        RecipeResultNode node = buildManager.getResultNodeByResultId(recipeId);
+        return String.format(STAGE_FORMAT, node.getStage(), node.getResult().getRecipeNameSafe(), node.getHostSafe());
     }
 
     public RecipeResult getRecipeResult()
