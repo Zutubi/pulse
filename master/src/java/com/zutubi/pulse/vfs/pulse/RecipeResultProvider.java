@@ -1,6 +1,7 @@
 package com.zutubi.pulse.vfs.pulse;
 
 import com.zutubi.pulse.core.model.RecipeResult;
+import org.apache.commons.vfs.FileSystemException;
 
 /**
  * A provider interface that indicates the current node represents a recipe result instance.
@@ -9,7 +10,7 @@ import com.zutubi.pulse.core.model.RecipeResult;
  */
 public interface RecipeResultProvider
 {
-    RecipeResult getRecipeResult();
+    RecipeResult getRecipeResult() throws FileSystemException;
 
-    long getRecipeResultId();
+    long getRecipeResultId() throws FileSystemException;
 }

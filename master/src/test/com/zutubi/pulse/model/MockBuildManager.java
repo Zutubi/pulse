@@ -221,6 +221,11 @@ public class MockBuildManager implements BuildManager
         throw new RuntimeException("Method not implemented.");
     }
 
+    public StoredArtifact getCommandResultByArtifact(long commandResultId, String artifactName)
+    {
+        throw new RuntimeException("Method not implemented.");
+    }
+
     public List<Changelist> getLatestChangesForProject(Project project, int max)
     {
         throw new RuntimeException("Method not implemented.");
@@ -319,6 +324,11 @@ public class MockBuildManager implements BuildManager
     }
 
     public CommandResult getCommandResultByArtifact(long artifactId)
+    {
+        throw new RuntimeException("Method not implemented.");
+    }
+
+    public CommandResult getCommandResult(long id, String commandName)
     {
         throw new RuntimeException("Method not implemented.");
     }

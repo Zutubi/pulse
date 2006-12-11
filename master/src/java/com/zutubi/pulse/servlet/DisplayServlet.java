@@ -42,7 +42,7 @@ public class DisplayServlet extends HttpServlet
             AbstractPulseFileObject pfo = (AbstractPulseFileObject) getFS().resolveFile(path);
             if (!(pfo instanceof AddressableFileObject))
             {
-                response.sendRedirect(request.getContextPath());
+                response.sendError(404, String.format("The path '%s' does not represent an addressable resource.", request.getPathInfo()));
                 return;
             }
             
@@ -54,6 +54,16 @@ public class DisplayServlet extends HttpServlet
             }
             url = request.getContextPath() + url;
             response.sendRedirect(url);
+        }
+        catch (FileSystemException e)
+        {
+            LOG.error(e);
+            String message = e.getMessage();
+            if (message.startsWith("Unknown message with code"))
+            {
+                message = e.getCode();
+            }
+            response.sendError(404, message);
         }
         catch (Exception e)
         {

@@ -40,7 +40,11 @@ public class LatestSuccessfulBuildFileObject extends AbstractPulseFileObject imp
                     new Object[]{fileName, pfs}
             );
         }
-        return null;
+        
+        return objectFactory.buildBean(NamedStageFileObject.class,
+                new Class[]{FileName.class, String.class, AbstractFileSystem.class},
+                new Object[]{fileName, name, pfs}
+        );
     }
 
     protected FileType doGetType() throws Exception

@@ -395,10 +395,20 @@ public class DefaultBuildManager implements BuildManager, EventListener
         return buildResultDao.findCommandResultByArtifact(artifactId);
     }
 
+    public CommandResult getCommandResult(long recipeResultId, String commandName)
+    {
+        return buildResultDao.findRecipeResult(recipeResultId).getCommandResult(commandName);
+    }
+
     public StoredArtifact getArtifact(long buildId, String artifactName)
     {
         BuildResult result = buildResultDao.findById(buildId);
         return result.findArtifact(artifactName);
+    }
+
+    public StoredArtifact getCommandResultByArtifact(long commandResultId, String artifactName)
+    {
+        return buildResultDao.findCommandResult(commandResultId).getArtifact(artifactName);
     }
 
     public BuildResult getLatestBuildResult(BuildSpecification spec)

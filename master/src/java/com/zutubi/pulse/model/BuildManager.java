@@ -143,5 +143,9 @@ public interface BuildManager
 
     CommandResult getCommandResultByArtifact(long artifactId);
 
+    CommandResult getCommandResult(long id, String commandName);
+
     StoredArtifact getArtifact(long buildId, String artifactName);
+
+    StoredArtifact getCommandResultByArtifact(long commandResultId, String artifactName);
 }

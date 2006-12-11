@@ -6,24 +6,33 @@ import org.apache.commons.vfs.FileSystemException;
 import org.apache.commons.vfs.provider.AbstractFileSystem;
 import com.zutubi.pulse.model.BuildResult;
 import com.zutubi.pulse.core.model.StoredArtifact;
+import com.zutubi.pulse.core.model.CommandResult;
+
+import java.io.File;
 
 /**
  * <class comment/>
  */
-public class NamedArtifactFileObject extends AbstractPulseFileObject implements AddressableFileObject
+public class NamedArtifactFileObject extends AbstractPulseFileObject implements AddressableFileObject, ArtifactProvider
 {
     private final String artifactName;
 
     public NamedArtifactFileObject(final FileName name, final String artifactName, final AbstractFileSystem fs)
     {
-        super(name, fs);
+        super(name, fs);        
 
         this.artifactName = artifactName;
     }
 
     public AbstractPulseFileObject createFile(final FileName fileName) throws Exception
     {
-        return null;
+        String name = fileName.getBaseName();
+        File newFile = new File(getArtifactBase(), name);
+
+        return objectFactory.buildBean(NamedFileArtifactFileObject.class,
+                new Class[]{FileName.class, File.class, AbstractFileSystem.class},
+                new Object[]{fileName, newFile, pfs}
+        );
     }
 
     protected FileType doGetType() throws Exception
@@ -36,35 +45,60 @@ public class NamedArtifactFileObject extends AbstractPulseFileObject implements 
         return new String[0];
     }
 
-    public String getUrlPath()
+    public String getUrlPath() throws FileSystemException
     {
-        // locate the artifact.
-        try
+        // do we have a command result in the context?
+        StoredArtifact artifact = getArtifact();
+        if (artifact == null)
         {
-            BuildResult result = getBuildResult();
+            throw new FileSystemException(String.format("There is no artifact by name '%s' available.", artifactName));
+        }
 
-            // need to execute this call within the context of a transaction else lazy loading issues occur when
-            // this node is traversed by servlet.
-            StoredArtifact artifact = buildManager.getArtifact(result.getId(), artifactName);
-            if (artifact != null)
-            {
-                // is html artifact.
-                if (artifact.hasIndexFile() && !artifact.isSingleFile())
-                {
-                    return "/file/artifacts/" + artifact.getId() + "/" + artifact.findIndexFile();
-                }
-            }
-            return null;
-        }
-        catch (FileSystemException e)
+        // is html artifact.
+        if (artifact.hasIndexFile() && !artifact.isSingleFile())
         {
-            return null;
+            return "/file/artifacts/" + artifact.getId() + "/" + artifact.findIndexFile();
         }
+        return "";
+    }
+
+    private File getArtifactBase() throws FileSystemException
+    {
+        CommandResult result = getCommandResult();
+        StoredArtifact artifact = getArtifact();
+
+        File outputDir = result.getAbsoluteOutputDir(pfs.getConfigurationManager().getDataDirectory());
+        return new File(outputDir, artifact.getName());
     }
 
     protected BuildResult getBuildResult() throws FileSystemException
     {
         BuildResultProvider provider = (BuildResultProvider) getAncestor(BuildResultProvider.class);
+        if (provider == null)
+        {
+            throw new FileSystemException("Missing build result context");
+        }
         return provider.getBuildResult();
+    }
+
+    protected CommandResult getCommandResult() throws FileSystemException
+    {
+        CommandResultProvider provider = (CommandResultProvider) getAncestor(CommandResultProvider.class);
+        if (provider == null)
+        {
+            throw new FileSystemException("Missing command result context");
+        }
+        return provider.getCommandResult();
+    }
+
+    public StoredArtifact getArtifact() throws FileSystemException
+    {
+        CommandResult commandResult = getCommandResult();
+        return buildManager.getCommandResultByArtifact(commandResult.getId(), artifactName);
+    }
+
+    public long getArtifactId() throws FileSystemException
+    {
+        return getArtifact().getId();
     }
 }

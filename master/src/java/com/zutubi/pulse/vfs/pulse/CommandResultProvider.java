@@ -1,6 +1,7 @@
 package com.zutubi.pulse.vfs.pulse;
 
 import com.zutubi.pulse.core.model.CommandResult;
+import org.apache.commons.vfs.FileSystemException;
 
 /**
  * A provider interface that indicates the current node represents a command result instance.
@@ -9,7 +10,7 @@ import com.zutubi.pulse.core.model.CommandResult;
  */
 public interface CommandResultProvider
 {
-    CommandResult getCommandResult();
+    CommandResult getCommandResult() throws FileSystemException;
 
-    long getCommandResultId();
+    long getCommandResultId() throws FileSystemException;
 }

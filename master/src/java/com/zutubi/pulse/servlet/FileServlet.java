@@ -85,7 +85,7 @@ public class FileServlet extends HttpServlet
 
         writer.flush();
 */
-        response.sendRedirect(request.getContextPath());
+        response.sendError(404, "Can not display requested resource '" + request.getPathInfo() + "', this resource it is not a file.");
     }
 
     private void doDownload(HttpServletRequest request, HttpServletResponse response, AbstractPulseFileObject pfo) throws IOException
@@ -104,8 +104,8 @@ public class FileServlet extends HttpServlet
 
         InputStream is = null;
         try
-                {
-                    is = pfo.getContent().getInputStream();
+        {
+            is = pfo.getContent().getInputStream();
             IOUtils.joinStreams(is, response.getOutputStream());
         }
         finally

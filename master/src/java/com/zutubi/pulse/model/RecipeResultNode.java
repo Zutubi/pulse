@@ -214,6 +214,24 @@ public class RecipeResultNode extends Entity
         return null;
     }
 
+    public RecipeResultNode findNode(String stageName)
+    {
+        if(this.stageName != null && stageName.equals(this.stageName.getName()))
+        {
+            return this;
+        }
+
+        for(RecipeResultNode child: children)
+        {
+            RecipeResultNode found = child.findNode(stageName);
+            if(found != null)
+            {
+                return found;
+            }
+        }
+        return null;
+    }
+
     public ResultState getWorstState(ResultState worst)
     {
         if(result != null)

@@ -1,5 +1,7 @@
 package com.zutubi.pulse.vfs.pulse;
 
+import org.apache.commons.vfs.FileSystemException;
+
 /**
  * An addressable file object is one that has a physical URL representation.
  *
@@ -19,6 +21,9 @@ public interface AddressableFileObject
      * prefix the web app context.
      *
      * @return url path string
+     *
+     * @throws FileSystemException if there is a problem constructing the url path. This will typically occur when
+     * the addressable file object represents a non-existance resource.
      */
-    String getUrlPath();
+    String getUrlPath() throws FileSystemException;
 }

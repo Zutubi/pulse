@@ -1,6 +1,7 @@
 package com.zutubi.pulse.vfs.pulse;
 
 import com.zutubi.pulse.model.Project;
+import org.apache.commons.vfs.FileSystemException;
 
 /**
  * A provider interface that indicates the current node represents a project instance.
@@ -9,7 +10,7 @@ import com.zutubi.pulse.model.Project;
  */
 public interface ProjectProvider
 {
-    Project getProject();
+    Project getProject() throws FileSystemException;
 
-    long getProjectId();
+    long getProjectId() throws FileSystemException;
 }

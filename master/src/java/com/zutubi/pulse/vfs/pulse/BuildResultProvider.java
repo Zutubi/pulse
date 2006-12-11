@@ -1,6 +1,7 @@
 package com.zutubi.pulse.vfs.pulse;
 
 import com.zutubi.pulse.model.BuildResult;
+import org.apache.commons.vfs.FileSystemException;
 
 /**
  * A provider interface that indicates the current node represents a build result instance.
@@ -9,7 +10,7 @@ import com.zutubi.pulse.model.BuildResult;
  */
 public interface BuildResultProvider
 {
-    BuildResult getBuildResult();
+    BuildResult getBuildResult() throws FileSystemException;
 
-    long getBuildResultId();
+    long getBuildResultId() throws FileSystemException;
 }

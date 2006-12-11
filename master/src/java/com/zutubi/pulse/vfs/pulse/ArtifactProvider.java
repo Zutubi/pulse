@@ -1,6 +1,7 @@
 package com.zutubi.pulse.vfs.pulse;
 
 import com.zutubi.pulse.core.model.StoredArtifact;
+import org.apache.commons.vfs.FileSystemException;
 
 /**
  * A provider interface that indicates the current node represents a StoredArtifact instance.
@@ -9,7 +10,7 @@ import com.zutubi.pulse.core.model.StoredArtifact;
  */
 public interface ArtifactProvider
 {
-    StoredArtifact getArtifact();
+    StoredArtifact getArtifact() throws FileSystemException;
 
-    long getArtifactId();
+    long getArtifactId() throws FileSystemException;
 }

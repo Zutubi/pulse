@@ -44,9 +44,16 @@ public class FileObjectWrapper
 
     public String getUrl()
     {
-        if (fo instanceof AddressableFileObject)
+        try
         {
-            return ((AddressableFileObject)fo).getUrlPath();
+            if (fo instanceof AddressableFileObject)
+            {
+                return ((AddressableFileObject)fo).getUrlPath();
+            }
+        }
+        catch (FileSystemException e)
+        {
+            //noop.
         }
         return "";
     }
