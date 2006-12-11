@@ -477,16 +477,20 @@ YAHOO.extend(ZUTUBI.widget.FileNode, YAHOO.widget.TextNode, {
         return false;
     },
 
-    onActionClick: function(action)
-    {
-        this.tree.onAction(this, action);
-        return false;
-    },
-
     getActionLink: function(action)
     {
-        return "YAHOO.widget.TreeView.getNode(\'" + this.tree.id + "\'," +
-            this.index + ").onActionClick(\'"+action+"\')";
+        if (action == "download" || action == "html")
+        {
+            return this.tree.base + this.data.url;
+        }
+        if (action == "decorate")
+        {
+            return this.tree.base+"/viewArtifact.action?path=" + this.tree.fsRoot + this.getIdPath();
+        }
+        if (action == "archive")
+        {
+            return this.tree.base+"/zip.action?path=" + this.tree.fsRoot + this.getIdPath();
+        }
     },
 
     // overrides YAHOO.widget.TextNode
@@ -558,10 +562,12 @@ YAHOO.extend(ZUTUBI.widget.FileNode, YAHOO.widget.TextNode, {
         var self = this;
         actions.each(function(action)
         {
-            sb[sb.length] = '<td class="'+action+'"';
-            sb[sb.length] = ' onclick="javascript:' + self.getActionLink(action) + '"';
-            sb[sb.length] = '>';
+            sb[sb.length] = '<td>';
+            sb[sb.length] = '<a href="' +self.getActionLink(action)+ '">';
+            sb[sb.length] = '<div class="'+action+'">';
             sb[sb.length] = '&nbsp;';
+            sb[sb.length] = '</div>';
+            sb[sb.length] = '</a>';
             sb[sb.length] = '</td>';
         });
 
@@ -609,22 +615,6 @@ YAHOO.extend(ZUTUBI.widget.PulseTreeView, ZUTUBI.widget.TreeView, {
     setErrorId: function(id)
     {
         this.error = id;
-    },
-
-    onAction: function(node, action)
-    {
-        if (action == "download" || action == "html")
-        {
-            document.location = this.base + node.data.url;
-        }
-        if (action == "decorate")
-        {
-            document.location = this.base+"/viewArtifact.action?path=" + this.fsRoot + node.getIdPath();
-        }
-        if (action == "archive")
-        {
-            document.location = this.base+"/zip.action?path=" + this.fsRoot + node.getIdPath();
-        }
     },
 
     ls: function(node, onCompleteCallback, showFiles, showHidden)

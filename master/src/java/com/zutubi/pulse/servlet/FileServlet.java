@@ -3,6 +3,7 @@ package com.zutubi.pulse.servlet;
 import com.opensymphony.util.TextUtils;
 import com.zutubi.pulse.bootstrap.ComponentContext;
 import com.zutubi.pulse.util.IOUtils;
+import com.zutubi.pulse.util.logging.Logger;
 import com.zutubi.pulse.vfs.pulse.AbstractPulseFileObject;
 import org.apache.commons.vfs.*;
 
@@ -18,6 +19,8 @@ import java.net.URLConnection;
  */
 public class FileServlet extends HttpServlet
 {
+    private static final Logger LOG = Logger.getLogger(FileServlet.class);
+
     private FileSystemManager fsManager;
 
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException
@@ -49,6 +52,7 @@ public class FileServlet extends HttpServlet
         }
         catch (IOException e)
         {
+            LOG.error(e);
             throw e;
         }
         catch (Exception e)

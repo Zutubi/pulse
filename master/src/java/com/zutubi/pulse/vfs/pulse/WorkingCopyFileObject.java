@@ -117,6 +117,7 @@ public class WorkingCopyFileObject extends AbstractPulseFileObject implements Ad
         }
         catch (Exception e)
         {
+            e.printStackTrace();
             return false;
         }
     }

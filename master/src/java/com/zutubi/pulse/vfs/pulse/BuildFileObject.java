@@ -1,6 +1,7 @@
 package com.zutubi.pulse.vfs.pulse;
 
 import com.zutubi.pulse.model.BuildResult;
+import com.zutubi.pulse.model.Project;
 import org.apache.commons.vfs.FileName;
 import org.apache.commons.vfs.FileType;
 import org.apache.commons.vfs.provider.AbstractFileSystem;
@@ -8,7 +9,7 @@ import org.apache.commons.vfs.provider.AbstractFileSystem;
 /**
  * <class comment/>
  */
-public class BuildFileObject extends AbstractPulseFileObject implements BuildResultProvider, AddressableFileObject
+public class BuildFileObject extends AbstractPulseFileObject implements BuildResultProvider, AddressableFileObject, ProjectProvider
 {
     private final long buildId;
 
@@ -63,5 +64,15 @@ public class BuildFileObject extends AbstractPulseFileObject implements BuildRes
     public long getBuildResultId()
     {
         return buildId;
+    }
+
+    public Project getProject()
+    {
+        return getBuildResult().getProject();
+    }
+
+    public long getProjectId()
+    {
+        return getProject().getId();
     }
 }

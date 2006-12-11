@@ -68,19 +68,19 @@
 
 /*---( Actions )---*/
 
-td.archive {
+td.archive, div.archive {
     background: url(../../images/compress.gif) 0 4px no-repeat; width:16px; height:22px; cursor:pointer;
 }
 
-td.decorate {
+td.decorate, div.decorate {
     background: url(../../images/page_white_paint.png) 0 4px no-repeat; width:16px; height:22px; cursor:pointer;
 }
 
-td.download {
+td.download, div.download {
     background: url(../../images/arrow_down.gif) 0 4px no-repeat; width:16px; height:22px; cursor:pointer;
 }
 
-td.html {
+td.html, div.html {
     background: url(../../images/page_world.gif) 0 4px no-repeat; width:16px; height:22px; cursor:pointer;
 }
 
