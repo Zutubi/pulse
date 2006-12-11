@@ -24,7 +24,7 @@ import java.util.*;
  */
 public class BuildResultsRssAction extends ProjectActionSupport
 {
-    private static final Map<Long, LinkedList<CacheEntry>> cache = new HashMap<Long, LinkedList<CacheEntry>>();
+    private static final Map<Long, LinkedList<CacheEntry>> cache = Collections.synchronizedMap(new HashMap<Long, LinkedList<CacheEntry>>());
 
     private BuildResultRenderer buildResultRenderer;
     private MasterConfigurationManager configurationManager;
@@ -263,78 +263,81 @@ public class BuildResultsRssAction extends ProjectActionSupport
         {
             cache.put(key, new LinkedList<CacheEntry>());
         }
+        
         LinkedList<CacheEntry> entries = cache.get(key);
-
-        boolean requiresSorting = false;
-        for (long id : ids)
+        synchronized(entries)
         {
-            // does this exist in the cache?
-            boolean found = false;
+
+            boolean requiresSorting = false;
+            for (long id : ids)
+            {
+                // does this exist in the cache?
+                boolean found = false;
+                for (CacheEntry entry : entries)
+                {
+                    if (entry.id == id)
+                    {
+                        found = true;
+                        break;
+                    }
+                }
+                if (!found)
+                {
+                    // create
+                    SyndEntry entry;
+
+                    BuildResult result = buildManager.getBuildResult(id);
+
+                    if (key > 0)
+                    {
+                        // we have a project.
+                        entry = createBuildResultFeedEntry(result);
+                    }
+                    else
+                    {
+                        // no project
+                        entry = createProjectBuildResultFeedEntry(result);
+                    }
+
+                    // and add.
+                    CacheEntry cacheEntry = new CacheEntry(result.getId(), entry);
+                    entries.add(cacheEntry);
+                    requiresSorting = true;
+                }
+            }
+
+            if (requiresSorting)
+            {
+                Collections.sort(entries, new Comparator<CacheEntry>()
+                {
+                    public int compare(CacheEntry o1, CacheEntry o2)
+                    {
+                        if (o2.id > o1.id)
+                        {
+                            return 1;
+                        }
+                        if (o2.id == o1.id)
+                        {
+                            return 0;
+                        }
+                        return -1;
+                    }
+                });
+            }
+
+            // trim.
+            while (entries.size() > 10)
+            {
+                entries.removeLast();
+            }
+
+            List<SyndEntry> syndEntries = new LinkedList<SyndEntry>();
             for (CacheEntry entry : entries)
             {
-                if (entry.id == id)
-                {
-                    found = true;
-                    break;
-                }
+                syndEntries.add(entry.entry);
             }
-            if (!found)
-            {
-                // create
-                SyndEntry entry;
-
-                BuildResult result = buildManager.getBuildResult(id);
-
-                if (key > 0)
-                {
-                    // we have a project.
-                    entry = createBuildResultFeedEntry(result);
-                }
-                else
-                {
-                    // no project
-                    entry = createProjectBuildResultFeedEntry(result);
-                }
-
-                // and add.
-                CacheEntry cacheEntry = new CacheEntry(result.getId(), entry);
-                entries.add(cacheEntry);
-                requiresSorting = true;
-            }
+            return syndEntries;
         }
-
-        if (requiresSorting)
-        {
-            Collections.sort(entries, new Comparator<CacheEntry>()
-            {
-                public int compare(CacheEntry o1, CacheEntry o2)
-                {
-                    if (o2.id > o1.id)
-                    {
-                        return 1;
-                    }
-                    if (o2.id == o1.id)
-                    {
-                        return 0;
-                    }
-                    return -1;
-                }
-            });
-        }
-
-        // trim.
-        while (entries.size() > 10)
-        {
-            entries.removeLast();
-        }
-
-        List<SyndEntry> syndEntries = new LinkedList<SyndEntry>();
-        for (CacheEntry entry : entries)
-        {
-            syndEntries.add(entry.entry);
-        }
-
-        return syndEntries;
     }
 
     private class CacheEntry
