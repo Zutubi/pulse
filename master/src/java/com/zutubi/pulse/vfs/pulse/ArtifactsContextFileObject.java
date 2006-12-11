@@ -35,6 +35,11 @@ public class ArtifactsContextFileObject extends AbstractPulseFileObject implemen
         return FileType.FOLDER;
     }
 
+    protected void doAttach() throws Exception
+    {
+        childrenChanged(null, null);
+    }
+
     protected String[] doListChildren() throws Exception
     {
         // return a list of the recipes.

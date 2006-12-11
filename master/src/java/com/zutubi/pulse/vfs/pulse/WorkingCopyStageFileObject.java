@@ -49,6 +49,12 @@ public class WorkingCopyStageFileObject extends AbstractPulseFileObject implemen
 
     protected String[] doListChildren() throws Exception
     {
+        if (!getRecipeResult().completed())
+        {
+            // only look at the commands is the recipe is complete.
+            return new String[0];
+        }
+
         return getWorkingCopyBase().list();
     }
 

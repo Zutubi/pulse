@@ -19,7 +19,7 @@ public class ArtifactStageFileObject extends AbstractPulseFileObject implements 
 
     private final long recipeId;
 
-    private String displayName;
+    private static final String IN_PROGRESS = "this stage is currently in progress";
 
     public ArtifactStageFileObject(final FileName name, final long recipeId, final AbstractFileSystem fs)
     {
@@ -30,6 +30,15 @@ public class ArtifactStageFileObject extends AbstractPulseFileObject implements 
 
     public AbstractPulseFileObject createFile(final FileName fileName) throws Exception
     {
+        String childName = fileName.getBaseName();
+        if (childName.equals(IN_PROGRESS))
+        {
+            return objectFactory.buildBean(TextMessageFileObject.class,
+                    new Class[]{FileName.class, AbstractFileSystem.class},
+                    new Object[]{fileName, pfs}
+            );
+        }
+
         long commandResultId = Long.parseLong(fileName.getBaseName());
 
         return objectFactory.buildBean(CommandResultFileObject.class,
@@ -43,11 +52,22 @@ public class ArtifactStageFileObject extends AbstractPulseFileObject implements 
         return FileType.FOLDER;
     }
 
+    protected void doAttach() throws Exception
+    {
+        childrenChanged(null, null);
+    }
+
     protected String[] doListChildren() throws Exception
     {
         List<String> children = new LinkedList<String>();
 
         RecipeResult recipeResult = buildManager.getRecipeResult(recipeId);
+        if (!recipeResult.completed())
+        {
+            // only look at the commands is the recipe is complete.
+            return new String[]{IN_PROGRESS};
+        }
+
         for (CommandResult commandResult : recipeResult.getCommandResults())
         {
             children.add(Long.toString(commandResult.getId()));
@@ -57,12 +77,8 @@ public class ArtifactStageFileObject extends AbstractPulseFileObject implements 
 
     public String getDisplayName()
     {
-        if (displayName == null)
-        {
-            RecipeResultNode node = buildManager.getResultNodeByResultId(recipeId);
-            displayName = String.format(STAGE_FORMAT, node.getStage(), node.getResult().getRecipeNameSafe(), node.getHostSafe());
-        }
-        return this.displayName;
+        RecipeResultNode node = buildManager.getResultNodeByResultId(recipeId);
+        return String.format(STAGE_FORMAT, node.getStage(), node.getResult().getRecipeNameSafe(), node.getHostSafe());
     }
 
     public RecipeResult getRecipeResult()
