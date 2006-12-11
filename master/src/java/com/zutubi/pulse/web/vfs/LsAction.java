@@ -1,11 +1,10 @@
 package com.zutubi.pulse.web.vfs;
 
+import com.opensymphony.util.TextUtils;
+import com.zutubi.pulse.util.logging.Logger;
 import org.apache.commons.vfs.*;
 
 import java.util.*;
-
-import com.opensymphony.util.TextUtils;
-import com.zutubi.pulse.util.logging.Logger;
 
 /**
  * The ls action provides access to 'ls' style functionality for the web ui.
@@ -124,7 +123,7 @@ public class LsAction extends VFSActionSupport
         // b) the user has read permissions.
         if (!fo.isReadable())
         {
-            addActionError("You do not have permission to view list this folder.");
+            addActionError("You do not have permission to list this folder.");
             return;
         }
 
