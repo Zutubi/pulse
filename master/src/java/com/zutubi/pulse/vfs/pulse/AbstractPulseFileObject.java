@@ -2,6 +2,7 @@ package com.zutubi.pulse.vfs.pulse;
 
 import org.apache.commons.vfs.FileName;
 import org.apache.commons.vfs.FileSystemException;
+import org.apache.commons.vfs.FileType;
 import org.apache.commons.vfs.provider.AbstractFileObject;
 import org.apache.commons.vfs.provider.AbstractFileSystem;
 
@@ -174,5 +175,19 @@ public abstract class AbstractPulseFileObject extends AbstractFileObject
     public void setProjectManager(ProjectManager projectManager)
     {
         this.projectManager = projectManager;
+    }
+
+    public String getFileType() throws FileSystemException
+    {
+        FileType type = getType();
+        if (type == FileType.FOLDER)
+        {
+            return FileTypeConstants.FOLDER;
+        }
+        if (type == FileType.FILE)
+        {
+            return FileTypeConstants.FILE;
+        }
+        return FileTypeConstants.UNKNOWN;
     }
 }

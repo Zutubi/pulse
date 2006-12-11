@@ -10,12 +10,16 @@ import java.util.Collections;
 
 import com.zutubi.pulse.vfs.pulse.AbstractPulseFileObject;
 import com.zutubi.pulse.vfs.pulse.AddressableFileObject;
+import com.zutubi.pulse.vfs.pulse.FileTypeConstants;
+import com.zutubi.pulse.util.logging.Logger;
 
 /**
  * <class comment/>
  */
 public class FileObjectWrapper
 {
+    private static final Logger LOG = Logger.getLogger(FileObjectWrapper.class);
+
     private FileObject fo;
 
     public FileObjectWrapper(FileObject fo)
@@ -51,21 +55,28 @@ public class FileObjectWrapper
     {
         try
         {
-            FileType type = fo.getType();
-            if (type == FileType.FOLDER)
+            if (fo instanceof AbstractPulseFileObject)
             {
-                return "folder";
+                return ((AbstractPulseFileObject)fo).getFileType();
             }
-            if (type == FileType.FILE)
+            else
             {
-                return "file";
+                FileType type = fo.getType();
+                if (type == FileType.FOLDER)
+                {
+                    return FileTypeConstants.FOLDER;
+                }
+                if (type == FileType.FILE)
+                {
+                    return FileTypeConstants.FILE;
+                }
+                return FileTypeConstants.UNKNOWN;
             }
-            return "root";
         }
         catch (FileSystemException e)
         {
-            e.printStackTrace();
-            return "unknown";
+            LOG.warning(e);
+            return FileTypeConstants.UNKNOWN;
         }
     }
 

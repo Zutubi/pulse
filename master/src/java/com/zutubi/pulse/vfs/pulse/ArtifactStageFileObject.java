@@ -34,8 +34,8 @@ public class ArtifactStageFileObject extends AbstractPulseFileObject implements 
         if (childName.equals(IN_PROGRESS))
         {
             return objectFactory.buildBean(TextMessageFileObject.class,
-                    new Class[]{FileName.class, AbstractFileSystem.class},
-                    new Object[]{fileName, pfs}
+                    new Class[]{FileName.class, String.class, AbstractFileSystem.class},
+                    new Object[]{fileName, FileTypeConstants.IN_PROGRESS, pfs}
             );
         }
 

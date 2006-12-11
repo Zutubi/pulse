@@ -38,8 +38,8 @@ public class WorkingCopyStageFileObject extends AbstractPulseFileObject implemen
         if (child.equals(NO_WORKING_COPY_AVAILABLE))
         {
             return objectFactory.buildBean(TextMessageFileObject.class,
-                    new Class[]{FileName.class, AbstractFileSystem.class},
-                    new Object[]{fileName, pfs}
+                    new Class[]{FileName.class, String.class, AbstractFileSystem.class},
+                    new Object[]{fileName, FileTypeConstants.MESSAGE, pfs}
             );
         }
 

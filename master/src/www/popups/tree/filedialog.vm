@@ -269,9 +269,9 @@
                         {
                             var data = {
                                 "id":obj.id,
-                                "name":obj.file,            // name of the file.
-                                "label":obj.file,           // Yahoo reads the label field and uses it as the display text.
-                                "type":obj.type,            // the type of this file, used to define the class associated with this node.
+                                "name":obj.file,                // name of the file.
+                                "label":obj.file,               // Yahoo reads the label field and uses it as the display text.
+                                "type":"treeview_" + obj.type,  // the type of this file, used to define the class associated with this node.
                                 "container":obj.container
                             };
                             new ZUTUBI.widget.FileNode(data, parentNode, false);

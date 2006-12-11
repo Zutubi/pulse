@@ -56,7 +56,6 @@
             <li class="download">Download an artifact file.</li>
             <li class="archive">Download an archive file containing the nested artifacts.</li>
             <li class="decorate">View a decorated view of the artifact.</li>
-            <li class="html">View the html artifact.</li>
         </ul>
     </p>
     </div>

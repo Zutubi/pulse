@@ -464,7 +464,6 @@ public class BuildResultsRssAction extends ProjectActionSupport
 
         synchronized (entries)
         {
-
             boolean requiresSorting = false;
             for (long id : ids)
             {

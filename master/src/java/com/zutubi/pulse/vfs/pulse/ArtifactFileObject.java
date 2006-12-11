@@ -4,6 +4,7 @@ import com.zutubi.pulse.core.model.CommandResult;
 import com.zutubi.pulse.core.model.StoredArtifact;
 import org.apache.commons.vfs.FileName;
 import org.apache.commons.vfs.FileType;
+import org.apache.commons.vfs.FileSystemException;
 import org.apache.commons.vfs.provider.AbstractFileSystem;
 
 import java.io.File;
@@ -76,6 +77,16 @@ public class ArtifactFileObject extends AbstractPulseFileObject implements Artif
         return getArtifactBase().list();
     }
 
+
+    public String getFileType() throws FileSystemException
+    {
+        if (isHtmlArtifact)
+        {
+            return FileTypeConstants.HTML_REPORT;
+        }
+        return super.getFileType();
+    }
+
     public String getDisplayName()
     {
         return getArtifact().getName();
@@ -84,11 +95,11 @@ public class ArtifactFileObject extends AbstractPulseFileObject implements Artif
     public List<String> getActions()
     {
         List<String> actions = new LinkedList<String>();
-        actions.add("archive");
         if (isHtmlArtifact)
         {
-            actions.add("html");
+            actions.add("download");
         }
+        actions.add("archive");
         return actions;
     }
 

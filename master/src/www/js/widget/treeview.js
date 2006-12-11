@@ -663,7 +663,7 @@ YAHOO.extend(ZUTUBI.widget.PulseTreeView, ZUTUBI.widget.TreeView, {
                     "id":obj.id,
                     "name":obj.file,
                     "label":obj.file,
-                    "type":obj.type,
+                    "type":"treeview_" + obj.type,
                     "container":obj.container,
                     "actions":obj.actions,
                     "url":obj.url

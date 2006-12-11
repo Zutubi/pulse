@@ -54,16 +54,28 @@
 }
 
 /*---( Treeview node styles )---*/
-.file, .file_o {
+.treeview_file, .treeview_file_o {
     background: url(../../images/treeview/file.gif) 0 0 no-repeat; width:16px; height:22px; cursor:pointer;
 }
 
-.folder {
+.treeview_folder {
     background: url(../../images/treeview/c.gif) 0 0 no-repeat; width:16px; height:22px; cursor:pointer;
 }
 
-.folder_o {
+.treeview_folder_o {
     background: url(../../images/treeview/o.gif) 0 0 no-repeat; width:16px; height:22px; cursor:pointer;
+}
+
+.treeview_html, .treeview_html_o {
+    background: url(../../images/page_world.gif) 0 0 no-repeat; width:16px; height:22px; cursor:pointer;
+}
+
+.treeview_progress, .treeview_progress_o {
+    background: url(../../images/cog.gif) 0 0 no-repeat; width:18px; height:22px; cursor:pointer;
+}
+
+.treeview_message, .treeview_message_o {
+    background: url(../../images/information.gif) 0 0 no-repeat; width:18px; height:22px; cursor:pointer;
 }
 
 /*---( Actions )---*/
@@ -78,10 +90,6 @@ td.decorate, div.decorate {
 
 td.download, div.download {
     background: url(../../images/arrow_down.gif) 0 4px no-repeat; width:16px; height:22px; cursor:pointer;
-}
-
-td.html, div.html {
-    background: url(../../images/page_world.gif) 0 4px no-repeat; width:16px; height:22px; cursor:pointer;
 }
 
 /*---( action legend. )---*/
@@ -118,14 +126,6 @@ li.download
     margin: .4em 0;
 }
 
-li.html
-{
-    background-image: url(../../images/page_world.gif);
-    background-repeat: no-repeat;
-    background-position: 0 50%;
-    padding: 3px 0 3px 20px;
-    margin: .4em 0;
-}
 
 /* TODO: view reference needs to be removed, and replaced with a generic reference defined within the treeview.js */
 
