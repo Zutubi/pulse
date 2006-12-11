@@ -102,6 +102,19 @@ public class ProjectXmlRpcAcceptanceTest extends BaseXmlRpcAcceptanceTest
         assertEquals("ant", details.get("type"));
     }
 
+    public void testGetProjectBuildSpecifications() throws IOException, XmlRpcException
+    {
+        String projectName = createProject();
+
+        Object result = xmlRpcClient.execute("RemoteApi.getProjectBuildSpecifications", getVector(adminToken, projectName));
+        assertNotNull(result);
+        assertTrue(result instanceof Vector);
+
+        Vector<String> names = (Vector<String>) result;
+        assertEquals(1, names.size());
+        assertEquals("default", names.get(0));
+    }
+
     public void testGetScm() throws IOException, XmlRpcException
     {
         // create a project with a specific name.

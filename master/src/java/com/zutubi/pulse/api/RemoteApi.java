@@ -387,6 +387,13 @@ public class RemoteApi implements com.zutubi.pulse.events.EventListener
         }
     }
 
+    public Vector<String> getProjectBuildSpecifications(String token, String projectName) throws AuthenticationException
+    {
+        tokenManager.verifyUser(token);
+        Project project = internalGetProject(projectName);
+        return getNames(project.getBuildSpecifications());
+    }
+
     public String getProjectState(String token, String projectName) throws AuthenticationException
     {
         tokenManager.verifyUser(token);
