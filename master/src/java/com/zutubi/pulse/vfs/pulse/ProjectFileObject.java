@@ -5,9 +5,8 @@ import org.apache.commons.vfs.FileName;
 import org.apache.commons.vfs.FileType;
 import org.apache.commons.vfs.provider.AbstractFileSystem;
 
-import java.io.InputStream;
-import java.util.Map;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -19,6 +18,8 @@ public class ProjectFileObject extends AbstractPulseFileObject implements Projec
     {
         nodesDefinitions.put("builds", BuildsFileObject.class);
         nodesDefinitions.put("latest", LatestBuildFileObject.class);
+        nodesDefinitions.put("successful", LatestSuccessfulBuildFileObject.class);
+        nodesDefinitions.put("latestsuccessful", LatestSuccessfulBuildFileObject.class);
         nodesDefinitions.put("specs", BuildSpecificationsFileObject.class);
     }
     private String displayName;
@@ -60,16 +61,6 @@ public class ProjectFileObject extends AbstractPulseFileObject implements Projec
     {
         Set<String> children = nodesDefinitions.keySet();
         return children.toArray(new String[children.size()]);
-    }
-
-    protected long doGetContentSize() throws Exception
-    {
-        return 0;
-    }
-
-    protected InputStream doGetInputStream() throws Exception
-    {
-        return null;
     }
 
     public String getDisplayName()

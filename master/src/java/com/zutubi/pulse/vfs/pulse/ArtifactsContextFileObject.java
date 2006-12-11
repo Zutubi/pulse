@@ -1,16 +1,14 @@
 package com.zutubi.pulse.vfs.pulse;
 
+import com.zutubi.pulse.model.BuildResult;
+import com.zutubi.pulse.model.RecipeResultNode;
 import org.apache.commons.vfs.FileName;
-import org.apache.commons.vfs.FileType;
 import org.apache.commons.vfs.FileSystemException;
+import org.apache.commons.vfs.FileType;
 import org.apache.commons.vfs.provider.AbstractFileSystem;
 
-import java.io.InputStream;
-import java.util.List;
 import java.util.LinkedList;
-
-import com.zutubi.pulse.model.RecipeResultNode;
-import com.zutubi.pulse.model.BuildResult;
+import java.util.List;
 
 /**
  * <class comment/>
@@ -54,16 +52,6 @@ public class ArtifactsContextFileObject extends AbstractPulseFileObject implemen
         }
 
         return new String[0];
-    }
-
-    protected long doGetContentSize() throws Exception
-    {
-        return 0;
-    }
-
-    protected InputStream doGetInputStream() throws Exception
-    {
-        return null;
     }
 
     protected BuildResult getBuildResult() throws FileSystemException

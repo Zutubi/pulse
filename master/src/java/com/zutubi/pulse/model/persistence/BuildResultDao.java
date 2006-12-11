@@ -72,4 +72,10 @@ public interface BuildResultDao extends EntityDao<BuildResult>
     CommandResult findCommandResultByArtifact(long artifactId);
 
     BuildResult findLatestByBuildSpec(BuildSpecification spec);
+
+    BuildResult findLatestSuccessfulBySpecification(BuildSpecification spec);
+
+    BuildResult findLatestSuccessfulByProject(Project project);
+
+    BuildResult findLatestSuccessful();
 }

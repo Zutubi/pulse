@@ -167,4 +167,30 @@
         where n.result.id = :id
     ]]></query>
 
+    <query name="findLatestByBuildSpec"><![CDATA[
+        from BuildResult result
+        where result.specName = :name
+        order by result.stamps.endTime desc
+    ]]></query>
+
+    <query name="findLatestSuccessfulBySpecification"><![CDATA[
+        from BuildResult result
+        where result.specName = :specName
+        and result.stateName = 'SUCCESS'
+        order by result.stamps.endTime desc
+    ]]></query>
+
+    <query name="findLatestSuccessfulByProject"><![CDATA[
+        from BuildResult result
+        where result.project = :project
+        and result.stateName = 'SUCCESS'
+        order by result.stamps.endTime desc
+    ]]></query>
+
+    <query name="findLatestSuccessful"><![CDATA[
+        from BuildResult result
+        where result.stateName = 'SUCCESS'
+        order by result.stamps.endTime desc
+    ]]></query>
+
 </hibernate-mapping>

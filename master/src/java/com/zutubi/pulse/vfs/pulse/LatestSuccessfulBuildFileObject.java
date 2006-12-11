@@ -1,21 +1,20 @@
 package com.zutubi.pulse.vfs.pulse;
 
+import com.zutubi.pulse.util.logging.Logger;
 import com.zutubi.pulse.model.BuildResult;
 import com.zutubi.pulse.model.Project;
-import com.zutubi.pulse.util.logging.Logger;
 import org.apache.commons.vfs.FileName;
-import org.apache.commons.vfs.FileSystemException;
 import org.apache.commons.vfs.FileType;
+import org.apache.commons.vfs.FileSystemException;
 import org.apache.commons.vfs.provider.AbstractFileSystem;
 
 import java.util.Map;
 import java.util.HashMap;
-import java.util.Set;
 
 /**
  * <class comment/>
  */
-public class LatestBuildFileObject extends AbstractPulseFileObject implements AddressableFileObject, BuildResultProvider
+public class LatestSuccessfulBuildFileObject extends AbstractPulseFileObject implements AddressableFileObject, BuildResultProvider
 {
     private static final Map<String, Class> nodesDefinitions = new HashMap<String, Class>();
     {
@@ -23,9 +22,9 @@ public class LatestBuildFileObject extends AbstractPulseFileObject implements Ad
         nodesDefinitions.put("artifacts", NamedArtifactsFileObject.class);
     }
 
-    private static final Logger LOG = Logger.getLogger(LatestBuildFileObject.class);
+    private static final Logger LOG = Logger.getLogger(LatestSuccessfulBuildFileObject.class);
 
-    public LatestBuildFileObject(final FileName name, final AbstractFileSystem fs)
+    public LatestSuccessfulBuildFileObject(final FileName name, final AbstractFileSystem fs)
     {
         super(name, fs);
     }
@@ -51,8 +50,7 @@ public class LatestBuildFileObject extends AbstractPulseFileObject implements Ad
 
     protected String[] doListChildren() throws Exception
     {
-        Set<String> rootPaths = nodesDefinitions.keySet();
-        return rootPaths.toArray(new String[rootPaths.size()]);
+        return new String[0];
     }
 
     public String getUrlPath()
@@ -72,16 +70,16 @@ public class LatestBuildFileObject extends AbstractPulseFileObject implements Ad
                 BuildSpecificationProvider buildSpecProvider = (BuildSpecificationProvider) getAncestor(BuildSpecificationProvider.class);
                 if (buildSpecProvider != null)
                 {
-                    return buildManager.getLatestBuildResult(buildSpecProvider.getBuildSpecification());
+                    return buildManager.getLatestSuccessfulBuildResult(buildSpecProvider.getBuildSpecification());
                 }
                 else
                 {
-                    return buildManager.getLatestBuildResult(project);
+                    return buildManager.getLatestSuccessfulBuildResult(project);
                 }
             }
             else
             {
-                return buildManager.getLatestBuildResult();
+                return buildManager.getLatestSuccessfulBuildResult();
             }
         }
         catch (FileSystemException e)

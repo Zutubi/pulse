@@ -7,31 +7,30 @@ import org.apache.commons.vfs.provider.AbstractFileSystem;
 /**
  * <class comment/>
  */
-public class ArtifactsFileObject extends AbstractPulseFileObject
+public class NamedArtifactsFileObject extends AbstractPulseFileObject
 {
-    public ArtifactsFileObject(final FileName name, final AbstractFileSystem fs)
+    public NamedArtifactsFileObject(final FileName name, final AbstractFileSystem fs)
     {
         super(name, fs);
     }
 
     public AbstractPulseFileObject createFile(final FileName fileName) throws Exception
     {
-        long artifactId = Long.parseLong(fileName.getBaseName());
-        return objectFactory.buildBean(ArtifactFileObject.class,
-                new Class[]{FileName.class, Long.TYPE, AbstractFileSystem.class},
-                new Object[]{fileName, artifactId, pfs}
+        String artifactName = fileName.getBaseName();
+        return objectFactory.buildBean(NamedArtifactFileObject.class,
+                new Class[]{FileName.class, String.class, AbstractFileSystem.class},
+                new Object[]{fileName, artifactName, pfs}
         );
     }
 
     protected FileType doGetType() throws Exception
     {
-        // this object does allow traversal.
-        return FileType.FOLDER;
+        return FileType.IMAGINARY;
     }
 
     protected String[] doListChildren() throws Exception
     {
-        // this object does not support listing.
+        // do not list
         return new String[0];
     }
 }

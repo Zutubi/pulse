@@ -7,7 +7,6 @@ import org.apache.commons.vfs.FileType;
 import org.apache.commons.vfs.provider.AbstractFileSystem;
 
 import java.io.File;
-import java.io.InputStream;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -75,16 +74,6 @@ public class ArtifactFileObject extends AbstractPulseFileObject implements Artif
             return new String[0];
         }
         return getArtifactBase().list();
-    }
-
-    protected long doGetContentSize() throws Exception
-    {
-        return 0;
-    }
-
-    protected InputStream doGetInputStream() throws Exception
-    {
-        return null;
     }
 
     public String getDisplayName()

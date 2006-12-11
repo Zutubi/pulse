@@ -1,15 +1,13 @@
 package com.zutubi.pulse.vfs.pulse;
 
+import com.zutubi.pulse.model.BuildSpecification;
 import org.apache.commons.vfs.FileName;
 import org.apache.commons.vfs.FileType;
 import org.apache.commons.vfs.provider.AbstractFileSystem;
 
-import java.io.InputStream;
-import java.util.Map;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.Set;
-
-import com.zutubi.pulse.model.BuildSpecification;
 
 /**
  * <class comment/>
@@ -20,7 +18,8 @@ public class BuildSpecificationFileObject extends AbstractPulseFileObject implem
     {
         // setup the default root node definitions.
         nodesDefinitions.put("latest", LatestBuildFileObject.class);
-//        nodesDefinitions.put("successful", LatestSuccessfulBuildFileObject.class);
+        nodesDefinitions.put("latestsuccessful", LatestSuccessfulBuildFileObject.class);
+        nodesDefinitions.put("successful", LatestSuccessfulBuildFileObject.class);
     }
 
     private long buildSpecificationId;
@@ -55,16 +54,6 @@ public class BuildSpecificationFileObject extends AbstractPulseFileObject implem
     {
         Set<String> rootPaths = nodesDefinitions.keySet();
         return rootPaths.toArray(new String[rootPaths.size()]);
-    }
-
-    protected long doGetContentSize() throws Exception
-    {
-        return 0;
-    }
-
-    protected InputStream doGetInputStream() throws Exception
-    {
-        return null;
     }
 
     public BuildSpecification getBuildSpecification()

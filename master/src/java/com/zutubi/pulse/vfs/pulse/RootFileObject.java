@@ -4,9 +4,8 @@ import org.apache.commons.vfs.FileName;
 import org.apache.commons.vfs.FileType;
 import org.apache.commons.vfs.provider.AbstractFileSystem;
 
-import java.io.InputStream;
-import java.util.Map;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -38,16 +37,6 @@ public class RootFileObject extends AbstractPulseFileObject
     {
         Set<String> rootPaths = nodesDefinitions.keySet();
         return rootPaths.toArray(new String[rootPaths.size()]);
-    }
-
-    protected long doGetContentSize() throws Exception
-    {
-        return 0;
-    }
-
-    protected InputStream doGetInputStream() throws Exception
-    {
-        return null;
     }
 
     public AbstractPulseFileObject createFile(final FileName fileName) throws Exception

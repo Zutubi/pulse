@@ -98,6 +98,21 @@ public class MockBuildManager implements BuildManager
         throw new RuntimeException("Method not implemented.");
     }
 
+    public BuildResult getLatestSuccessfulBuildResult(BuildSpecification specification)
+    {
+        throw new RuntimeException("Method not implemented.");
+    }
+
+    public BuildResult getLatestSuccessfulBuildResult(Project project)
+    {
+        throw new RuntimeException("Method not implemented.");
+    }
+
+    public BuildResult getLatestSuccessfulBuildResult()
+    {
+        throw new RuntimeException("Method not implemented.");
+    }
+
     public List<BuildResult> queryBuilds(Project[] projects, ResultState[] states, PersistentName[] specs, long earliestStartTime, long latestStartTime, Boolean hasWorkDir, int first, int max, boolean mostRecentFirst)
     {
         throw new RuntimeException("Method not implemented.");
@@ -197,6 +212,11 @@ public class MockBuildManager implements BuildManager
     }
 
     public List<Changelist> getLatestChangesForUser(User user, int max)
+    {
+        throw new RuntimeException("Method not implemented.");
+    }
+
+    public StoredArtifact getArtifact(long buildId, String artifactName)
     {
         throw new RuntimeException("Method not implemented.");
     }

@@ -6,7 +6,6 @@ import org.apache.commons.vfs.FileName;
 import org.apache.commons.vfs.FileType;
 import org.apache.commons.vfs.provider.AbstractFileSystem;
 
-import java.io.InputStream;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -50,16 +49,6 @@ public class CommandResultFileObject extends AbstractPulseFileObject implements 
             children.add(Long.toString(artifact.getId()));
         }
         return children.toArray(new String[children.size()]);
-    }
-
-    protected long doGetContentSize() throws Exception
-    {
-        return 0;
-    }
-
-    protected InputStream doGetInputStream() throws Exception
-    {
-        return null;
     }
 
     public String getDisplayName()

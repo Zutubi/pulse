@@ -174,21 +174,6 @@ public class DefaultBuildManager implements BuildManager, EventListener
         return buildResultDao.findOldestByProject(project, first, max, false);
     }
 
-    public BuildResult getLatestBuildResult(Project project)
-    {
-        List<BuildResult> results = getLatestBuildResultsForProject(project, 1);
-        if (results.size() > 0)
-        {
-            return results.get(0);
-        }
-        return null;
-    }
-
-    public BuildResult getLatestBuildResult()
-    {
-        return buildResultDao.findLatest();
-    }
-
     public BuildResult getByProjectAndNumber(final Project project, final long number)
     {
         return buildResultDao.findByProjectAndNumber(project, number);
@@ -410,9 +395,45 @@ public class DefaultBuildManager implements BuildManager, EventListener
         return buildResultDao.findCommandResultByArtifact(artifactId);
     }
 
+    public StoredArtifact getArtifact(long buildId, String artifactName)
+    {
+        BuildResult result = buildResultDao.findById(buildId);
+        return result.findArtifact(artifactName);
+    }
+
     public BuildResult getLatestBuildResult(BuildSpecification spec)
     {
         return buildResultDao.findLatestByBuildSpec(spec);
+    }
+
+    public BuildResult getLatestBuildResult(Project project)
+    {
+        List<BuildResult> results = getLatestBuildResultsForProject(project, 1);
+        if (results.size() > 0)
+        {
+            return results.get(0);
+        }
+        return null;
+    }
+
+    public BuildResult getLatestBuildResult()
+    {
+        return buildResultDao.findLatest();
+    }
+
+    public BuildResult getLatestSuccessfulBuildResult(BuildSpecification specification)
+    {
+        return buildResultDao.findLatestSuccessfulBySpecification(specification);
+    }
+
+    public BuildResult getLatestSuccessfulBuildResult(Project project)
+    {
+        return buildResultDao.findLatestSuccessfulByProject(project);
+    }
+
+    public BuildResult getLatestSuccessfulBuildResult()
+    {
+        return buildResultDao.findLatestSuccessful();
     }
 
     /**

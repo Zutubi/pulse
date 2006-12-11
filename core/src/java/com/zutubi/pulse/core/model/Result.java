@@ -106,6 +106,11 @@ public abstract class Result extends Entity
 
     public void complete()
     {
+        complete(System.currentTimeMillis());
+    }
+
+    public void complete(long endTime)
+    {
         if (state == ResultState.IN_PROGRESS)
         {
             // Phew, nothing went wrong.
@@ -121,9 +126,9 @@ public abstract class Result extends Entity
             // CIB-234: if an error occurs before starting the stamps, make
             // sure we still get a start time (otherwise there is no
             // information about when this result happened!)
-            stamps.start();
+            stamps.setStartTime(endTime);
         }
-        stamps.end();
+        stamps.setEndTime(endTime);
     }
 
     public void success()

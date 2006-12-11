@@ -462,17 +462,22 @@ public class HibernateBuildResultDao extends HibernateEntityDao<BuildResult> imp
 
     public BuildResult findLatestByBuildSpec(final BuildSpecification spec)
     {
-        return (BuildResult) getHibernateTemplate().execute(new HibernateCallback()
-        {
-            public Object doInHibernate(Session session) throws HibernateException
-            {
-                Query queryObject = session.createQuery("from BuildResult result where result.specName = :name order by result.stamps.endTime desc");
-                queryObject.setEntity("name", spec.getPname());
-                queryObject.setMaxResults(1);
-                SessionFactoryUtils.applyTransactionTimeout(queryObject, getSessionFactory());
-                return queryObject.uniqueResult();
-            }
-        });
+       return (BuildResult)findFirstByNamedQuery("findLatestByBuildSpec", "name", spec.getPname(), false);
+    }
+
+    public BuildResult findLatestSuccessfulBySpecification(BuildSpecification spec)
+    {
+        return (BuildResult)findFirstByNamedQuery("findLatestSuccessfulBySpecification", "specName", spec.getPname(), false);
+    }
+
+    public BuildResult findLatestSuccessfulByProject(Project project)
+    {
+        return (BuildResult)findFirstByNamedQuery("findLatestSuccessfulByProject", "project", project, false);
+    }
+
+    public BuildResult findLatestSuccessful()
+    {
+        return (BuildResult)findFirstByNamedQuery("findLatestSuccessful", false);
     }
 
     private void intialise(BuildResult result)

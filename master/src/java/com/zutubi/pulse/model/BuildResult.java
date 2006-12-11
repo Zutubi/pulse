@@ -214,6 +214,19 @@ public class BuildResult extends Result implements AclObjectIdentityAware, Itera
         return root.findNode(stage);
     }
 
+    public StoredArtifact findArtifact(String artifactName)
+    {
+        for(RecipeResultNode child: root.getChildren())
+        {
+            StoredArtifact artifact = child.findArtifact(artifactName);
+            if(artifact != null)
+            {
+                return artifact;
+            }
+        }
+        return null;
+    }
+
     public void complete()
     {
         // Check the recipe results, if there are any failures/errors

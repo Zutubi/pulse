@@ -8,6 +8,7 @@ import org.apache.commons.vfs.provider.AbstractFileSystem;
 import java.util.List;
 import java.util.LinkedList;
 import java.io.File;
+import java.io.InputStream;
 
 import com.zutubi.pulse.core.ObjectFactory;
 import com.zutubi.pulse.model.BuildManager;
@@ -117,6 +118,30 @@ public abstract class AbstractPulseFileObject extends AbstractFileObject
         {
             return parent.getAncestor(type);
         }
+        return null;
+    }
+
+    /**
+     * Simple noop implementation of the required interface method. Override this method if required.
+     *
+     * @return 0
+     *
+     * @throws Exception
+     */
+    protected long doGetContentSize() throws Exception
+    {
+        return 0;
+    }
+
+    /**
+     * Simple noop implementation of the required interface method. Override this method if required.
+     *
+     * @return null
+     *
+     * @throws Exception
+     */
+    protected InputStream doGetInputStream() throws Exception
+    {
         return null;
     }
 

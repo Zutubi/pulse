@@ -77,6 +77,14 @@ public interface BuildManager
 
     BuildResult getLatestBuildResult(Project project);
 
+    BuildResult getLatestBuildResult(BuildSpecification spec);
+
+    BuildResult getLatestSuccessfulBuildResult(BuildSpecification specification);
+
+    BuildResult getLatestSuccessfulBuildResult(Project project);
+
+    BuildResult getLatestSuccessfulBuildResult();
+
     BuildResult getByProjectAndNumber(final Project project, final long number);
 
     BuildResult getByUserAndNumber(User user, long id);
@@ -135,5 +143,5 @@ public interface BuildManager
 
     CommandResult getCommandResultByArtifact(long artifactId);
 
-    BuildResult getLatestBuildResult(BuildSpecification spec);
+    StoredArtifact getArtifact(long buildId, String artifactName);
 }

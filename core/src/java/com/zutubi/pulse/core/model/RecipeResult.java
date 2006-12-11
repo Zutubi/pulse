@@ -192,6 +192,19 @@ public class RecipeResult extends Result
         return false;
     }
 
+    public StoredArtifact getArtifact(String name)
+    {
+        for (CommandResult result : results)
+        {
+            StoredArtifact artifact = result.getArtifact(name);
+            if (artifact != null)
+            {
+                return artifact;
+            }
+        }
+        return null;
+    }
+
     public void accumulateTestSummary(TestResultSummary summary)
     {
         if (testSummary != null)

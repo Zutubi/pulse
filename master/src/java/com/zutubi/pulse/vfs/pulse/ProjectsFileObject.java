@@ -5,8 +5,6 @@ import org.apache.commons.vfs.FileName;
 import org.apache.commons.vfs.FileType;
 import org.apache.commons.vfs.provider.AbstractFileSystem;
 
-import java.io.InputStream;
-
 /**
  * <class comment/>
  */
@@ -71,15 +69,5 @@ public class ProjectsFileObject extends AbstractPulseFileObject implements Addre
     public String getUrlPath()
     {
         return "/viewProjects.action";
-    }
-
-    protected long doGetContentSize() throws Exception
-    {
-        return 0;
-    }
-
-    protected InputStream doGetInputStream() throws Exception
-    {
-        return null;
     }
 }

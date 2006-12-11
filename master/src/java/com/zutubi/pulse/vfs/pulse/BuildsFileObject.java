@@ -1,14 +1,11 @@
 package com.zutubi.pulse.vfs.pulse;
 
-import org.apache.commons.vfs.FileName;
-import org.apache.commons.vfs.FileType;
-import org.apache.commons.vfs.FileSystemException;
-import org.apache.commons.vfs.provider.AbstractFileSystem;
-
-import java.io.InputStream;
-
 import com.zutubi.pulse.model.BuildResult;
 import com.zutubi.pulse.model.Project;
+import org.apache.commons.vfs.FileName;
+import org.apache.commons.vfs.FileSystemException;
+import org.apache.commons.vfs.FileType;
+import org.apache.commons.vfs.provider.AbstractFileSystem;
 
 /**
  * <class comment/>
@@ -69,15 +66,5 @@ public class BuildsFileObject extends AbstractPulseFileObject
     {
         // do not support listing of the builds.
         return new String[0];
-    }
-
-    protected long doGetContentSize() throws Exception
-    {
-        return 0;
-    }
-
-    protected InputStream doGetInputStream() throws Exception
-    {
-        return null;
     }
 }

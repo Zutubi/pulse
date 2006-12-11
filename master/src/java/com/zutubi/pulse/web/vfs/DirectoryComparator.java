@@ -1,6 +1,7 @@
 package com.zutubi.pulse.web.vfs;
 
 import com.zutubi.pulse.util.FileSystemUtils;
+import com.zutubi.pulse.util.logging.Logger;
 
 import java.io.File;
 import java.util.Comparator;
@@ -15,6 +16,8 @@ import org.apache.commons.vfs.FileSystemException;
  */
 public class DirectoryComparator implements Comparator<FileObject>
 {
+    private static final Logger LOG = Logger.getLogger(DirectoryComparator.class);
+
     private Collator c = Collator.getInstance();
 
     public int compare(FileObject o1, FileObject o2)
@@ -37,11 +40,11 @@ public class DirectoryComparator implements Comparator<FileObject>
             }
 
             // then sort alphabetically
-            return c.compare(o1.getName().getBaseName(), o2.getName().getBaseName());
+            return c.compare(o1.getName().getPath(), o2.getName().getPath());
         }
         catch (FileSystemException e)
         {
-            e.printStackTrace();
+            LOG.error(e);
             return 0;
         }
     }

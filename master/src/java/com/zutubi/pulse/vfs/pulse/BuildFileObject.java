@@ -1,12 +1,9 @@
 package com.zutubi.pulse.vfs.pulse;
 
+import com.zutubi.pulse.model.BuildResult;
 import org.apache.commons.vfs.FileName;
 import org.apache.commons.vfs.FileType;
 import org.apache.commons.vfs.provider.AbstractFileSystem;
-
-import java.io.InputStream;
-
-import com.zutubi.pulse.model.BuildResult;
 
 /**
  * <class comment/>
@@ -49,16 +46,6 @@ public class BuildFileObject extends AbstractPulseFileObject implements BuildRes
     protected String[] doListChildren() throws Exception
     {
         return new String[]{"wc", "artifacts"};
-    }
-
-    protected long doGetContentSize() throws Exception
-    {
-        return 0;
-    }
-
-    protected InputStream doGetInputStream() throws Exception
-    {
-        return null;
     }
 
     public String getUrlPath()

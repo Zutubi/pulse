@@ -241,4 +241,22 @@ public class RecipeResultNode extends Entity
             child.loadFailedTestResults(dataRoot, limit);
         }
     }
+
+    public StoredArtifact findArtifact(String artifactName)
+    {
+        StoredArtifact artifact = result.getArtifact(artifactName);
+        if (artifact != null)
+        {
+            return artifact;
+        }
+        for(RecipeResultNode child: children)
+        {
+            artifact = child.findArtifact(artifactName);
+            if (artifact != null)
+            {
+                return artifact;
+            }
+        }
+        return null;
+    }
 }

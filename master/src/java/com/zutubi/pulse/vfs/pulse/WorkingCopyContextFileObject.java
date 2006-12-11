@@ -7,7 +7,6 @@ import org.apache.commons.vfs.FileSystemException;
 import org.apache.commons.vfs.FileType;
 import org.apache.commons.vfs.provider.AbstractFileSystem;
 
-import java.io.InputStream;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -49,16 +48,6 @@ public class WorkingCopyContextFileObject extends AbstractPulseFileObject implem
 
         // can not list this node.
         return recipeIds.toArray(new String[recipeIds.size()]);
-    }
-
-    protected long doGetContentSize() throws Exception
-    {
-        return 0;
-    }
-
-    protected InputStream doGetInputStream() throws Exception
-    {
-        return null;
     }
 
     private BuildResult getBuildResult() throws FileSystemException

@@ -77,6 +77,46 @@ public abstract class HibernateEntityDao<T extends Entity> extends HibernateDaoS
         });
     }
 
+    public Object findFirstByNamedQuery(final String queryName)
+    {
+        return findFirstByNamedQuery(queryName, false);
+    }
+
+    public Object findFirstByNamedQuery(final String queryName, final boolean cachable)
+    {
+        return findFirstByNamedQuery(queryName, null, null, cachable);
+    }
+
+    public Object findFirstByNamedQuery(final String queryName, final String propertyName, final Object propertyValue)
+    {
+        return findFirstByNamedQuery(queryName, propertyName, propertyValue, false);
+    }
+
+    public Object findFirstByNamedQuery(final String queryName, final String propertyName, final Object propertyValue, final boolean cacheable)
+    {
+        List<Object> results = (List<Object>) getHibernateTemplate().execute(new HibernateCallback()
+        {
+            public Object doInHibernate(Session session) throws HibernateException
+            {
+                Query queryObject = session.getNamedQuery(queryName);
+                if (propertyName != null)
+                {
+                    queryObject.setParameter(propertyName, propertyValue);
+                }
+                queryObject.setMaxResults(1);
+                queryObject.setCacheable(cacheable);
+
+                SessionFactoryUtils.applyTransactionTimeout(queryObject, getSessionFactory());
+                return queryObject.list();
+            }
+        });
+        if (results != null && results.size() > 0)
+        {
+            return results.get(0);
+        }
+        return null;
+    }
+
     public <U> List<U> findByNamedQuery(final String queryName)
     {
         return findByNamedQuery(queryName, 0);
