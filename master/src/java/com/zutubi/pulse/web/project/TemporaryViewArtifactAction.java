@@ -102,7 +102,7 @@ public class TemporaryViewArtifactAction extends ProjectActionSupport
     {
         if(lineLevels.containsKey(n))
         {
-            if(!level.isGreaterThan(lineLevels.get(n)))
+            if(level.compareTo(lineLevels.get(n)) > 0)
             {
                 return;
             }

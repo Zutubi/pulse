@@ -4,28 +4,11 @@ public class Feature extends Entity
 {
     public enum Level
     {
-        ERROR
-                {
-                    public String getPrettyString()
-                    {
-                        return "error";
-                    }
-
-                    public boolean isGreaterThan(Level level)
-                    {
-                        return level != ERROR;
-                    }
-                },
         INFO
                 {
                     public String getPrettyString()
                     {
                         return "info";
-                    }
-
-                    public boolean isGreaterThan(Level level)
-                    {
-                        return false;
                     }
                 },
         WARNING
@@ -34,15 +17,14 @@ public class Feature extends Entity
                     {
                         return "warning";
                     }
-
-                    public boolean isGreaterThan(Level level)
+                },
+        ERROR
+                {
+                    public String getPrettyString()
                     {
-                        return level == INFO;
+                        return "error";
                     }
                 };
-
-
-        public abstract boolean isGreaterThan(Level level);
     }
 
     private Level level;

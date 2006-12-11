@@ -16,9 +16,7 @@ import org.apache.commons.vfs.FileObject;
 import org.apache.commons.vfs.FileSystemException;
 
 import java.io.*;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.TreeMap;
+import java.util.*;
 
 /**
  * 
@@ -92,11 +90,18 @@ public class ViewArtifactAction extends VFSActionSupport
         }
     }
 
+    public List<Feature.Level> getFeatureLevels()
+    {
+        List<Feature.Level> list = Arrays.asList(Feature.Level.values());
+        Collections.reverse(list);
+        return list;
+    }
+
     private void updateLevel(long n, Feature.Level level)
     {
         if(lineLevels.containsKey(n))
         {
-            if(!level.isGreaterThan(lineLevels.get(n)))
+            if(level.compareTo(lineLevels.get(n)) > 0)
             {
                 return;
             }

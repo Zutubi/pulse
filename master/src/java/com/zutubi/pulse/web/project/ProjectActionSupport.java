@@ -9,7 +9,9 @@ import com.zutubi.pulse.scheduling.Scheduler;
 import com.zutubi.pulse.web.ActionSupport;
 import org.acegisecurity.AccessDeniedException;
 
-import java.util.LinkedList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 /**
@@ -74,11 +76,9 @@ public class ProjectActionSupport extends ActionSupport
 
     public List<Feature.Level> getFeatureLevels()
     {
-        List<Feature.Level> levels = new LinkedList<Feature.Level>();
-        levels.add(Feature.Level.ERROR);
-        levels.add(Feature.Level.WARNING);
-        levels.add(Feature.Level.INFO);
-        return levels;
+        List<Feature.Level> list = Arrays.asList(Feature.Level.values());
+        Collections.reverse(list);
+        return list;
     }
 
     public long getProjectId()
