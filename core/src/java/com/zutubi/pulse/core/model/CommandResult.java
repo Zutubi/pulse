@@ -106,8 +106,8 @@ public class CommandResult extends Result
 
         for (StoredArtifact artifact : artifacts)
         {
-            warningFeatureCount = artifact.getFeatures(Feature.Level.WARNING).size();
-            errorFeatureCount = artifact.getFeatures(Feature.Level.ERROR).size();
+            warningFeatureCount += artifact.getFeatures(Feature.Level.WARNING).size();
+            errorFeatureCount += artifact.getFeatures(Feature.Level.ERROR).size();
         }
     }
 }
