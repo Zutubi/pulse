@@ -9,10 +9,14 @@
 <body>
     #buildTabs($result "build-file")
 
+#if($highlightedFile)
     <h3 class="heading">#wwtext("name=pulse.file") &nbsp;<a href="downloadBuildFile.action?id=$result.id"><img alt="down" src="$base/images/arrow_down.gif"/>#wwtext("name=download")</a></h3>
     <div class="box">
         $highlightedFile
     </div>
+#else
+    <p>No pulse file available.</p>
+#end
 
     #tabEnd()
 </html>
