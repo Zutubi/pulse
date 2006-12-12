@@ -449,7 +449,7 @@ public class HibernateBuildResultDao extends HibernateEntityDao<BuildResult> imp
             public Object doInHibernate(Session session) throws HibernateException
             {
                 Query queryObject = session.createQuery("SELECT result " +
-                        "FROM CommandResult result, StoredArtifact artifact, StoredFileArtifact fileArtifact " +
+                        "FROM CommandResult result, StoredArtifact artifact " +
                         "WHERE :id = artifact.id " +
                         "AND artifact in elements(result.artifacts)");
                 queryObject.setLong("id", artifactId);

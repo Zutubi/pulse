@@ -3,8 +3,8 @@ package com.zutubi.pulse.vfs.pulse;
 import com.zutubi.pulse.core.model.CommandResult;
 import com.zutubi.pulse.core.model.StoredArtifact;
 import org.apache.commons.vfs.FileName;
-import org.apache.commons.vfs.FileType;
 import org.apache.commons.vfs.FileSystemException;
+import org.apache.commons.vfs.FileType;
 import org.apache.commons.vfs.provider.AbstractFileSystem;
 
 import java.io.File;
@@ -20,6 +20,7 @@ public class ArtifactFileObject extends AbstractPulseFileObject implements Artif
     private final long artifactId;
 
     private boolean isHtmlArtifact;
+    private File artifactBase;
 
     public ArtifactFileObject(final FileName name, final long artifactId, final AbstractFileSystem fs)
     {
@@ -52,11 +53,16 @@ public class ArtifactFileObject extends AbstractPulseFileObject implements Artif
 
     private File getArtifactBase()
     {
-        CommandResult result = getCommandResult();
-        StoredArtifact artifact = getArtifact();
+        if(artifactBase == null)
+        {
+            CommandResult result = getCommandResult();
+            StoredArtifact artifact = getArtifact();
 
-        File outputDir = result.getAbsoluteOutputDir(pfs.getConfigurationManager().getDataDirectory());
-        return new File(outputDir, artifact.getName());
+            File outputDir = result.getAbsoluteOutputDir(pfs.getConfigurationManager().getDataDirectory());
+            artifactBase = new File(outputDir, artifact.getName());
+        }
+
+        return artifactBase;
     }
 
     protected FileType doGetType() throws Exception
