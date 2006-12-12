@@ -30,7 +30,7 @@ public class HistoryAction extends ProjectActionSupport implements Preparable
     private String stateFilter = STATE_ANY;
     private List<String> stateFilters;
     private Map<Long, String> specs;
-    private Long spec;
+    private Long spec = 0L;
 
     /**
      * The system configuration manager.
