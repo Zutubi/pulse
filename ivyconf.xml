@@ -14,7 +14,7 @@
             </chain>
             <chain name="artifact">
                 <filesystem name="local-repository" checkmodified="true">
-                    <artifact pattern="e:/work/repository/[organisation]/[module]/[type]s/[artifact]-[revision].[type]"/>
+                    <artifact pattern="c:/projects/repository/[organisation]/[module]/[type]s/[artifact]-[revision].[type]"/>
                 </filesystem>
                 <url name="artifact-repository">
                     <artifact pattern="http://220.233.100.30/repository/[organisation]/[module]/[type]s/[artifact]-[revision].[type]"/>

@@ -1,8 +1,0 @@
-<plugin name="Sample plugin C" key="com.zutubi.plugins.sampleC">
-    
-    <plugin-info>
-    </plugin-info>
-    
-    <component-C/>
-    
-</plugin>
