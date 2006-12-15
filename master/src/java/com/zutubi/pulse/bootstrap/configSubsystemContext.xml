@@ -28,11 +28,13 @@
                 <value>classpath:/com/zutubi/pulse/bootstrap/context/formsContext.xml</value>
             </list>
         </property>
+<!--
         <property name="postStartupContexts">
             <list>
                 <value>classpath:/com/zutubi/pulse/bootstrap/context/pluginContext.xml</value>
             </list>
         </property>
+-->
     </bean>
 
     <!-- this spring object factory will ensure that WebWork Actions are autowired. -->
