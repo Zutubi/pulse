@@ -11,6 +11,9 @@ import java.util.List;
  */
 public abstract class CommandSupport implements Command
 {
+    /**
+     * The name of the command.
+     */
     private String name;
 
     public CommandSupport()
@@ -26,16 +29,27 @@ public abstract class CommandSupport implements Command
     {
     }
 
-    public List<String> getArtifactNames()
+    public List<Artifact> getArtifacts()
     {
-        return new LinkedList<String>();
+        return new LinkedList<Artifact>();
     }
 
+    /**
+     * The name of the command is used to uniquely identify the command
+     * within its execution context.
+     *
+     * @return the name of the command.
+     */
     public String getName()
     {
         return name;
     }
 
+    /**
+     * Setter for the commands name property.
+     *
+     * @param name of this command.
+     */
     public void setName(String name)
     {
         this.name = name;

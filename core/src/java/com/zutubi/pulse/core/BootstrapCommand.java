@@ -8,6 +8,7 @@ import com.zutubi.pulse.util.FileSystemUtils;
 import java.io.File;
 import java.util.Arrays;
 import java.util.List;
+import java.util.LinkedList;
 
 /**
  * An adaptation between the command and Bootstrap interfaces that allows
@@ -45,6 +46,16 @@ public class BootstrapCommand implements Command
                 result.addArtifact(artifact);
             }
         }
+    }
+
+    public List<Artifact> getArtifacts()
+    {
+        DirectoryArtifact artifact = new DirectoryArtifact();
+        artifact.setName(OUTPUT_NAME);
+        
+        List<Artifact> artifacts = new LinkedList<Artifact>();
+        artifacts.add(artifact);
+        return artifacts;
     }
 
     public List<String> getArtifactNames()

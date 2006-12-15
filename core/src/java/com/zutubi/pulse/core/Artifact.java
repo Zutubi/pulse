@@ -116,6 +116,11 @@ public abstract class Artifact
         return p;
     }
 
+    public void setProcesses(List<ProcessArtifact> processes)
+    {
+        this.processes.addAll(processes);
+    }
+
     /**
      * This method is a utility method available to handle the coping of an artifact into persistent storage and
      * running its post processors
@@ -147,16 +152,21 @@ public abstract class Artifact
             StoredFileArtifact fileArtifact = new StoredFileArtifact(path, type);
             artifact.add(fileArtifact);
 
-            for(ProcessArtifact process: processes)
-            {
-                process.getProcessor().process(fileArtifact, result, context);
-            }
+            processArtifact(fileArtifact, result, context);
 
             return true;
         }
         catch (IOException e)
         {
             throw new BuildException("Unable to collect file '" + fromFile.getAbsolutePath() + "' for artifact '" + getName() + "': " + e.getMessage(), e);
+        }
+    }
+
+    protected void processArtifact(StoredFileArtifact fileArtifact, CommandResult result, CommandContext context)
+    {
+        for(ProcessArtifact process: processes)
+        {
+            process.getProcessor().process(fileArtifact, result, context);
         }
     }
 

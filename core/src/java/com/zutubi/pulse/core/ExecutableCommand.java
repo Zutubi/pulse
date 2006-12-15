@@ -1,33 +1,49 @@
 package com.zutubi.pulse.core;
 
 import com.zutubi.pulse.core.model.CommandResult;
-import com.zutubi.pulse.core.model.StoredArtifact;
-import com.zutubi.pulse.core.model.StoredFileArtifact;
-import com.zutubi.pulse.util.*;
+import com.zutubi.pulse.util.Constants;
+import com.zutubi.pulse.util.ForkOutputStream;
+import com.zutubi.pulse.util.IOUtils;
+import com.zutubi.pulse.util.SystemUtils;
 
 import java.io.*;
 import java.util.*;
 
 /**
+ * The executable command represents a os command invocation.
  *
+ * It exposes two built in artifacts. The commands output and the commands execution
+ * environment.
  *
  */
-public class ExecutableCommand implements Command, ScopeAware
+public class ExecutableCommand extends CommandSupport implements ScopeAware
 {
-    public static final String ENV_NAME = "environment";
+    /**
+     * The name of the execution environment artifact.
+     */
+    public static final String ENV_ARTIFACT_NAME = "environment";
     private static final String ENV_PATH = "PATH";
 
-    private String name;
     private String exe;
     private List<Arg> args = new LinkedList<Arg>();
     private File workingDir;
     private List<Environment> env = new LinkedList<Environment>();
-    private List<ProcessArtifact> processes = new LinkedList<ProcessArtifact>();
+
     private Scope scope;
 
     private Process child;
     private CancellableReader reader;
     private volatile boolean terminated = false;
+
+    private FileArtifact outputArtifact;
+    private FileArtifact envArtifact;
+    private static final String ENV_FILENAME = "env.txt";
+    private List<ProcessArtifact> processes = new LinkedList<ProcessArtifact>();
+
+    public ExecutableCommand()
+    {
+
+    }
 
     public void execute(CommandContext context, CommandResult cmdResult)
     {
@@ -37,16 +53,10 @@ public class ExecutableCommand implements Command, ScopeAware
 
         builder.redirectErrorStream(true);
 
-        File envFileDir = new File(context.getOutputDir(), ENV_NAME);
-        if (!envFileDir.mkdir())
-        {
-            throw new BuildException("Unable to create directory for the environment artifact '" + envFileDir.getAbsolutePath() + "'");
-        }
-
         // record the commands execution environment as an artifact.
         try
         {
-            recordExecutionEnvironment(builder, cmdResult, envFileDir);
+            captureExecutionEnvironmentArtifact(builder, context.getOutputDir());
         }
         catch (IOException e)
         {
@@ -86,10 +96,14 @@ public class ExecutableCommand implements Command, ScopeAware
             throw new BuildException("Unable to create process: " + message, e);
         }
 
+        // capture the command output.
         File outputFile = new File(outputFileDir, OUTPUT_FILENAME);
 
         try
         {
+            // initialise the output artifacts.
+            initialiseOutputArtifact();
+
             FileOutputStream outputFileStream = new FileOutputStream(outputFile);
             OutputStream output;
 
@@ -139,7 +153,7 @@ public class ExecutableCommand implements Command, ScopeAware
                 cmdResult.error("Unable to cleanly terminate the child process tree.  It is likely that some orphaned processes remain.");
             }
 
-            String commandLine = constructCommandLine(builder);
+            String commandLine = extractCommandLine(builder);
 
             if (result == 0)
             {
@@ -169,15 +183,32 @@ public class ExecutableCommand implements Command, ScopeAware
                 throw new BuildException(e);
             }
         }
-        finally
+    }
+
+    private void initialiseOutputArtifact()
+    {
+        outputArtifact = new FileArtifact();
+        outputArtifact.setName(OUTPUT_ARTIFACT_NAME);
+        outputArtifact.setFailIfNotPresent(false);
+        outputArtifact.setIgnoreStale(false);
+        outputArtifact.setOutputArtifact(true);
+        outputArtifact.setFile(OUTPUT_FILENAME);
+        outputArtifact.setType("text/plain");
+        outputArtifact.setProcesses(processes);
+    }
+
+    public List<Artifact> getArtifacts()
+    {
+        List<Artifact> artifacts = new LinkedList<Artifact>();
+        if (envArtifact != null)
         {
-            // In finally so that any output gathered will be captured as an
-            // artifact, even if the command failed.
-            if(outputFile.exists())
-            {
-                ProcessSupport.postProcess(processes, outputFileDir, outputFile, cmdResult, context);
-            }
+            artifacts.add(envArtifact);
         }
+        if (outputArtifact != null)
+        {
+            artifacts.add(outputArtifact);
+        }
+        return artifacts;
     }
 
     private boolean terminatedCheck(CommandResult commandResult)
@@ -191,9 +222,25 @@ public class ExecutableCommand implements Command, ScopeAware
         return false;
     }
 
-    private void recordExecutionEnvironment(ProcessBuilder builder, CommandResult cmdResult, File outputDir) throws IOException
+    /**
+     * This method records the execution environment and adds it as an artifact to the command result.
+     *
+     * @param builder is the configured builder used to execute the command.
+     * @param outputDir is the artifact output directory.
+     *
+     * @throws IOException if there are problems recording the execution environment.
+     */
+    private void captureExecutionEnvironmentArtifact(ProcessBuilder builder, File outputDir) throws IOException
     {
-        File file = new File(outputDir, "env.txt");
+        initialiseEnvironmentArtifact();
+
+        File envFileDir = new File(outputDir, ENV_ARTIFACT_NAME);
+        if (!envFileDir.mkdir())
+        {
+            throw new BuildException("Unable to create directory for the environment artifact '" + envFileDir.getAbsolutePath() + "'");
+        }
+
+        File file = new File(envFileDir, ENV_FILENAME);
 
         final String separator = Constants.LINE_SEPARATOR;
 
@@ -202,7 +249,7 @@ public class ExecutableCommand implements Command, ScopeAware
 
         buffer.append("Command Line:").append(separator);
         buffer.append("-------------").append(separator);
-        buffer.append(constructCommandLine(builder)).append(separator);
+        buffer.append(extractCommandLine(builder)).append(separator);
 
         buffer.append(separator);
         buffer.append("Process Environment:").append(separator);
@@ -257,25 +304,18 @@ public class ExecutableCommand implements Command, ScopeAware
         {
             IOUtils.close(writer);
         }
-
-        // capture the artifact.
-        String path = FileSystemUtils.composeFilename(outputDir.getName(), file.getName());
-
-        StoredArtifact envArtifact = new StoredArtifact(ENV_NAME, new StoredFileArtifact(path, "text/plain"));
-        cmdResult.addArtifact(envArtifact);
     }
 
-    protected StoredFileArtifact getOutputFileArtifact(CommandResult result)
+    private void initialiseEnvironmentArtifact()
     {
-        StoredArtifact outputArtifact = result.getArtifact(OUTPUT_ARTIFACT_NAME);
-        for (StoredFileArtifact file : outputArtifact.getChildren())
-        {
-            if (file.getPath().equals(OUTPUT_ARTIFACT_NAME + "/output.txt"))
-            {
-                return file;
-            }
-        }
-        return null;
+        // Configure the environment artifact.
+        envArtifact = new FileArtifact();
+        envArtifact.setName(ENV_ARTIFACT_NAME);
+        envArtifact.setFailIfNotPresent(false);
+        envArtifact.setIgnoreStale(false);
+        envArtifact.setOutputArtifact(true);
+        envArtifact.setFile(ENV_FILENAME);
+        envArtifact.setType("text/plain");
     }
 
     private List<String> constructCommand()
@@ -305,6 +345,17 @@ public class ExecutableCommand implements Command, ScopeAware
         return command;
     }
 
+    /**
+     * The working directory for this command is calculated as follows:
+     * 1) defaults to the recipe paths base directory.
+     * 2) if working dir is specified, then
+     *   a) if it is absolute, this is the working directory.
+     *   b) if it is relative, then it is taken as the directory relative to the base directory.
+     *
+     * @param paths
+     *
+     * @return working directory for the command.
+     */
     protected File getWorkingDir(RecipePaths paths)
     {
         if (workingDir == null)
@@ -343,7 +394,7 @@ public class ExecutableCommand implements Command, ScopeAware
             String pathKey = ENV_PATH;
             String pathValue = scope.getPathPrefix();
 
-            String translatedKey = translateKey(ENV_PATH, childEnvironment);
+            String translatedKey = locateCaseInsensitiveMatch(ENV_PATH, childEnvironment);
             if (translatedKey != null)
             {
                 String path = childEnvironment.get(translatedKey);
@@ -373,6 +424,15 @@ public class ExecutableCommand implements Command, ScopeAware
         }
     }
 
+    /**
+     * Is the specified name an acceptable name for adding to the child processes environment.
+     * If it is already in the environment (env. prefix), then we return false.
+     *
+     * @param name
+     *
+     * @return return false if the name contains the 'env.' prefix, or contains an unsupported
+     * character
+     */
     private boolean acceptableName(String name)
     {
         if(name.startsWith("env."))
@@ -393,8 +453,12 @@ public class ExecutableCommand implements Command, ScopeAware
     /**
      * Take the specified key, and find a case insensitive match in the maps key set. Return this match,
      * or null if no match is found.
+     *
+     * This is important when we are looking for environment variables (such as PATH) that may be
+     * specified in lowercase, as so happens when we use the environment variables from the process
+     * builder.
      */
-    private String translateKey(String propertyName, Map<String, String> map)
+    private String locateCaseInsensitiveMatch(String propertyName, Map<String, String> map)
     {
         // case insensitive lookup.
         propertyName = propertyName.toLowerCase();
@@ -428,6 +492,11 @@ public class ExecutableCommand implements Command, ScopeAware
         this.exe = exe;
     }
 
+    /**
+     * Allow the setting of arguments in the form of a space separated list.
+     *
+     * @param args is a space separated list of arguments.
+     */
     public void setArgs(String args)
     {
         for (String arg : args.split(" "))
@@ -449,12 +518,17 @@ public class ExecutableCommand implements Command, ScopeAware
         return arg;
     }
 
+    /**
+     * Convenience method for programatically adding arguments to this command.
+     *
+     * @param arguments to be added.
+     */
     protected void addArguments(String ...arguments)
     {
         for (String arg : arguments)
         {
-            Arg argument = new Arg(arg);
-            args.add(argument);
+            Arg argument = createArg();
+            argument.setText(arg);
         }
     }
 
@@ -472,7 +546,7 @@ public class ExecutableCommand implements Command, ScopeAware
         return p;
     }
 
-    private String constructCommandLine(ProcessBuilder builder)
+    private String extractCommandLine(ProcessBuilder builder)
     {
         StringBuffer result = new StringBuffer();
         boolean first = true;
@@ -506,16 +580,6 @@ public class ExecutableCommand implements Command, ScopeAware
         return result.toString();
     }
 
-    public String getName()
-    {
-        return name;
-    }
-
-    public void setName(String name)
-    {
-        this.name = name;
-    }
-
     public void terminate()
     {
         terminated = true;
@@ -541,6 +605,7 @@ public class ExecutableCommand implements Command, ScopeAware
     }
 
     /**
+     *
      */
     public class Arg
     {
@@ -568,30 +633,82 @@ public class ExecutableCommand implements Command, ScopeAware
     }
 
     /**
+     * The nested environment tag definition.  Instances of this class are added
+     * to the execution environment of ths command.
      */
     public class Environment
     {
+        /**
+         * The name of the environment property.
+         */
         private String name;
+
+        /**
+         * The value of the environment property.
+         */
         private String value;
 
+        public Environment()
+        {
+            value = "";
+        }
+
+        /**
+         * Getter for the name property.
+         *
+         * @return the environment variable name.
+         */
         public String getName()
         {
             return name;
         }
 
+        /**
+         * Setter for the name property.
+         *
+         * @param name the environment variable name.
+         */
         public void setName(String name)
         {
             this.name = name;
         }
 
+        /**
+         * Getter for the value property.
+         *
+         * @return the environment variable value.
+         */
         public String getValue()
         {
             return value;
         }
 
+        /**
+         * Setter for the value property.
+         *
+         * @param value the environment variable value.
+         */
         public void setValue(String value)
         {
             this.value = value;
+        }
+
+        /**
+         * This setter supports defining the value of this environment variable as the
+         * body text of the tag. For example:
+         *
+         * <env name="foo">bar</env>
+         *
+         * @param text the environment variable value.
+         */
+        public void setText(String text)
+        {
+            this.value += text;
+        }
+
+        public String getText()
+        {
+            return this.value;
         }
     }
 

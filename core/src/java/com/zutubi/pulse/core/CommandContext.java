@@ -73,7 +73,7 @@ public class CommandContext
      *
      * This may be null.
      *
-     * @return
+     * @return the output stream.
      */
     public OutputStream getOutputStream()
     {

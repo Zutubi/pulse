@@ -13,7 +13,7 @@ import java.util.TreeSet;
 
 
 /**
- * 
+ * A command group represents a command and a set of artifact definitions.
  *
  */
 public class CommandGroup implements Command, Validateable
@@ -21,6 +21,7 @@ public class CommandGroup implements Command, Validateable
     private String name;
 
     private Command command = null;
+
     private List<Artifact> artifacts = new LinkedList<Artifact>();
 
     public void add(Command cmd) throws FileLoadException
@@ -68,30 +69,47 @@ public class CommandGroup implements Command, Validateable
 
     public void execute(CommandContext context, CommandResult result)
     {
-        command.execute(context, result);
-        for(Artifact artifact: artifacts)
+        try
         {
-            artifact.capture(result, context);
+            command.execute(context, result);
+        }
+        finally
+        {
+            processArtifacts(context, result);
         }
     }
 
-    // For testing
-    List<Artifact> getArtifacts()
+    //TODO: move this out of the command group and into the recipe processing.
+    private void processArtifacts(CommandContext context, CommandResult result)
     {
-        return artifacts;
+        for(Artifact artifact: getArtifacts())
+        {
+            try
+            {
+                artifact.capture(result, context);
+            }
+            catch (Exception e)
+            {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    public List<Artifact> getArtifacts()
+    {
+        List<Artifact> allArtifacts = new LinkedList<Artifact>();
+        allArtifacts.addAll(artifacts);
+        allArtifacts.addAll(getCommand().getArtifacts());
+        return allArtifacts;
     }
 
     public List<String> getArtifactNames()
     {
         List<String> names = new LinkedList<String>();
-        for (Artifact artifact : artifacts)
+        for (Artifact artifact : getArtifacts())
         {
             names.add(artifact.getName());
         }
-
-        // dont forget about our nested friend. he may have some artifacts as well.
-        names.addAll(getCommand().getArtifactNames());
-
         return names;
     }
 

@@ -16,8 +16,13 @@ public interface Command
 
     void execute(CommandContext context, CommandResult result);
 
-    List<String> getArtifactNames();
+    List<Artifact> getArtifacts();
 
+    /**
+     * The name of the command is used to identify it.
+     *
+     * @return name of the command.
+     */
     @Required String getName();
 
     void setName(String name);

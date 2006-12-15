@@ -2,6 +2,7 @@ package com.zutubi.pulse.core;
 
 import com.zutubi.pulse.core.model.CommandResult;
 import com.zutubi.pulse.core.model.StoredArtifact;
+import com.zutubi.pulse.core.model.StoredFileArtifact;
 import com.zutubi.pulse.util.FileSystemUtils;
 import org.apache.tools.ant.DirectoryScanner;
 
@@ -15,9 +16,26 @@ public class FileArtifact extends Artifact
     private String file;
     private String type = null;
 
+    /**
+     * Indicates whether or not this artifact is located in the output directory. If true,
+     * the artifact does not need to be 'copied' into the output directory since it is
+     * already there.
+     */
+    private boolean outputArtifact = false;
+
     public FileArtifact()
     {
 
+    }
+
+    /**
+     * Indicates whether or not the artifact is located in the output directory.
+     *
+     * @param b
+     */
+    protected void setOutputArtifact(boolean b)
+    {
+        outputArtifact = b;
     }
 
     public void capture(CommandResult result, CommandContext context)
@@ -72,7 +90,24 @@ public class FileArtifact extends Artifact
         else
         {
             // The file path is relative, we have our base directory, lets get to work.
-            scanAndCaptureFiles(context.getPaths().getBaseDir(), file, result, context);
+            File baseDir = context.getPaths().getBaseDir();
+            if (outputArtifact)
+            {
+                // no capture required, just create the stored artifact and process it.
+                StoredArtifact artifact = new StoredArtifact(getName());
+                String path = FileSystemUtils.composeFilename(getName(), file);
+                StoredFileArtifact fileArtifact = new StoredFileArtifact(path, type);
+                artifact.add(fileArtifact);
+                processArtifact(fileArtifact, result, context);
+                if (artifact.getChildren().size() > 0)
+                {
+                    result.addArtifact(artifact);
+                }
+            }
+            else
+            {
+                scanAndCaptureFiles(baseDir, file, result, context);
+            }
         }
     }
 
