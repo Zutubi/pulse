@@ -124,7 +124,10 @@ public class Maven2CommandTest extends PulseTestCase
         CommandResult result = new CommandResult("maven2-test");
         CommandContext context = new CommandContext(new SimpleRecipePaths(baseDir, null), outputDir, null);
         context.setBuildContext(buildContext);
-        command.execute(context, result);
+
+        CommandGroup commandGroup = new CommandGroup();
+        commandGroup.add(command);
+        commandGroup.execute(context, result);
 
         return result;
     }

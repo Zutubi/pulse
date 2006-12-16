@@ -28,13 +28,13 @@ public class MavenCommandTest extends CommandTestBase
         return "xml";
     }
 
-    public void testNoBuildFileNoTargets() throws IOException
+    public void testNoBuildFileNoTargets() throws IOException, FileLoadException
     {
         MavenCommand command = new MavenCommand();
         successRun(command, "BUILD SUCCESSFUL", "Total time", "_Apache_", "v. 1.0.2");
     }
 
-    public void testDefaultTarget() throws IOException
+    public void testDefaultTarget() throws IOException, FileLoadException
     {
         copyBuildFile("basic");
         MavenCommand command = new MavenCommand();
@@ -42,7 +42,7 @@ public class MavenCommandTest extends CommandTestBase
         successRun(command, "BUILD SUCCESSFUL", "build target", "_Apache_", "v. 1.0.2");
     }
 
-    public void testExtractVersion() throws IOException
+    public void testExtractVersion() throws IOException, FileLoadException
     {
         copyBuildFile("basic");
         MavenCommand command = new MavenCommand();
@@ -51,7 +51,7 @@ public class MavenCommandTest extends CommandTestBase
         assertEquals("1.0-SNAPSHOT", buildContext.getBuildVersion());
     }
 
-    public void testRunSpecificTarget() throws IOException
+    public void testRunSpecificTarget() throws IOException, FileLoadException
     {
         copyBuildFile("basic");
         MavenCommand command = new MavenCommand();
@@ -60,7 +60,7 @@ public class MavenCommandTest extends CommandTestBase
         successRun(command, "BUILD SUCCESSFUL", "test target", "_Apache_", "v. 1.0.2");
     }
 
-    public void testRunMultipleTargets() throws IOException
+    public void testRunMultipleTargets() throws IOException, FileLoadException
     {
         copyBuildFile("basic");
         MavenCommand command = new MavenCommand();
@@ -69,7 +69,7 @@ public class MavenCommandTest extends CommandTestBase
         successRun(command, "BUILD SUCCESSFUL", "build target", "test target", "_Apache_", "v. 1.0.2");
     }
 
-    public void testMissingTarget() throws IOException
+    public void testMissingTarget() throws IOException, FileLoadException
     {
         copyBuildFile("basic");
         MavenCommand command = new MavenCommand();
@@ -78,7 +78,7 @@ public class MavenCommandTest extends CommandTestBase
         failedRun(command, "BUILD FAILED");
     }
 
-    public void testExtraArgument() throws IOException
+    public void testExtraArgument() throws IOException, FileLoadException
     {
         copyBuildFile("basic");
         MavenCommand command = new MavenCommand();

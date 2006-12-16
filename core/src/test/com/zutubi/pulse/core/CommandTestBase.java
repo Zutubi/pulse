@@ -43,32 +43,35 @@ public abstract class CommandTestBase extends PulseTestCase
         // a dummy test method so that junit does not complain... sigh.
     }
 
-    protected void failedRun(ExecutableCommand command, String message) throws IOException
+    protected void failedRun(ExecutableCommand command, String message) throws IOException, FileLoadException
     {
         CommandResult commandResult = runCommand(command);
         assertEquals(ResultState.FAILURE, commandResult.getState());
         checkOutput(commandResult, message);
     }
 
-    protected void successRun(ExecutableCommand command, String ...contents) throws IOException
+    protected void successRun(ExecutableCommand command, String ...contents) throws IOException, FileLoadException
     {
         CommandResult commandResult = runCommand(command);
         assertEquals(ResultState.SUCCESS, commandResult.getState());
         checkOutput(commandResult, contents);
     }
 
-    protected CommandResult runCommand(ExecutableCommand command)
+    protected CommandResult runCommand(ExecutableCommand command) throws FileLoadException
     {
         return runCommand(command, null);
     }
 
-    protected CommandResult runCommand(ExecutableCommand command, BuildContext buildContext)
+    protected CommandResult runCommand(ExecutableCommand command, BuildContext buildContext) throws FileLoadException
     {
         command.setWorkingDir(baseDir);
         CommandResult commandResult = new CommandResult("test");
         CommandContext context = new CommandContext(new SimpleRecipePaths(baseDir, null), outputDir, null);
         context.setBuildContext(buildContext);
-        command.execute(context, commandResult);
+
+        CommandGroup commandGroup = new CommandGroup();
+        commandGroup.add(command);
+        commandGroup.execute(context, commandResult);
         return commandResult;
     }
 
