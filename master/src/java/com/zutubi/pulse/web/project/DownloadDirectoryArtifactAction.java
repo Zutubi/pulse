@@ -74,7 +74,7 @@ public class DownloadDirectoryArtifactAction extends ProjectActionSupport
 
         if(!artifactDir.isDirectory())
         {
-            addActionError("Artifact directory '" + artifactDir.getAbsolutePath() + "' does not exist.");
+            addActionError("LocalArtifact directory '" + artifactDir.getAbsolutePath() + "' does not exist.");
             return ERROR;
         }
 

@@ -20,10 +20,10 @@ public class CommandGroupLoadTest extends FileLoaderTestBase
     {
         CommandGroup group = loadGroup("basic", "noExistNoFail");
         assertEquals(2, group.getArtifacts().size());
-        Artifact a = group.getArtifacts().get(0);
+        LocalArtifact a = (LocalArtifact) group.getArtifacts().get(0);
         assertTrue(a instanceof FileArtifact);
         assertFalse(a.getFailIfNotPresent());
-        a = group.getArtifacts().get(1);
+        a = (LocalArtifact) group.getArtifacts().get(1);
         assertTrue(a instanceof DirectoryArtifact);
         assertFalse(a.getFailIfNotPresent());
     }

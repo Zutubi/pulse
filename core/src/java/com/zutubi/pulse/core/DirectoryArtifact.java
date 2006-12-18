@@ -12,7 +12,7 @@ import java.util.List;
 /**
  * Information about a directory artifact to be captured.
  */
-public class DirectoryArtifact extends Artifact
+public class DirectoryArtifact extends LocalArtifact
 {
     private File base;
     private String index;

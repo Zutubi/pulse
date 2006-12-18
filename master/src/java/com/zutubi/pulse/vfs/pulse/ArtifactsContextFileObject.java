@@ -86,6 +86,11 @@ public class ArtifactsContextFileObject extends AbstractPulseFileObject implemen
         }
     }
 
+    public boolean isLocal()
+    {
+        return true;
+    }
+
     public String getUrlPath()
     {
         return "/viewBuildArtifacts.action?id=" + getBuildResultId();

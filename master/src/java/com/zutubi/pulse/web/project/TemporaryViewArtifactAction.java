@@ -136,7 +136,7 @@ public class TemporaryViewArtifactAction extends ProjectActionSupport
         File artifactFile = new File(commandResult.getAbsoluteOutputDir(configurationManager.getDataDirectory()), artifact.getPath());
         if(!artifactFile.isFile())
         {
-            addActionError("Artifact file '" + artifactFile.getAbsolutePath() + "' does not exist");
+            addActionError("LocalArtifact file '" + artifactFile.getAbsolutePath() + "' does not exist");
             return ERROR;
         }
 

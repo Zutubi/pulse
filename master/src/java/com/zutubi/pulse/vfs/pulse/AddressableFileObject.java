@@ -16,9 +16,18 @@ import org.apache.commons.vfs.FileSystemException;
 public interface AddressableFileObject
 {
     /**
-     * Get the URL path representation for this file object. This path should represent the path from
-     * the application context. That is, it should not include the url scheme, nor should it attempt to
-     * prefix the web app context.
+     * Indicates if the address is a local URL (i.e. within Pulse), or an
+     * external URL.
+     *
+     * @return true iff the address of this file is a local URL.
+     */
+    boolean isLocal() throws FileSystemException;
+
+    /**
+     * Get the URL path representation for this file object. If this file is local, this path should
+     * represent the path from the application context. That is, it should not include the url
+     * scheme, nor should it attempt to prefix the web app context.  If this file is not local, this
+     * path should be the full URL.
      *
      * @return url path string
      *

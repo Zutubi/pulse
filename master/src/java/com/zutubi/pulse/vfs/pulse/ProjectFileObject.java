@@ -78,6 +78,11 @@ public class ProjectFileObject extends AbstractPulseFileObject implements Projec
         return projectId;
     }
 
+    public boolean isLocal()
+    {
+        return true;
+    }
+
     public String getUrlPath()
     {
         return "/currentBuild.action?id=" + getProjectId();

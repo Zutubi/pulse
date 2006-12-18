@@ -469,15 +469,19 @@ YAHOO.extend(ZUTUBI.widget.FileNode, YAHOO.widget.TextNode, {
 
     getActionLink: function(action)
     {
-        if (action == "download" || action == "html")
+        if(action == "link")
+        {
+            return this.data.url;
+        }
+        else if (action == "download" || action == "html")
         {
             return this.tree.base + this.data.url;
         }
-        if (action == "decorate")
+        else if (action == "decorate")
         {
             return this.tree.base+"/viewArtifact.action?path=" + this.tree.fsRoot + this.getIdPath();
         }
-        if (action == "archive")
+        else if (action == "archive")
         {
             return this.tree.base+"/zip.action?path=" + this.tree.fsRoot + this.getIdPath();
         }

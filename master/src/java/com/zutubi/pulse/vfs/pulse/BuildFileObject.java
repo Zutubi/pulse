@@ -49,6 +49,11 @@ public class BuildFileObject extends AbstractPulseFileObject implements BuildRes
         return new String[]{"wc", "artifacts"};
     }
 
+    public boolean isLocal()
+    {
+        return true;
+    }
+
     public String getUrlPath()
     {
         return "/viewBuild.action?id=" + buildId;

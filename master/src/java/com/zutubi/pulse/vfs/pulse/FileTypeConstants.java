@@ -12,4 +12,5 @@ public class FileTypeConstants
     public static final String UNKNOWN = "unknown";
     public static final String HTML_REPORT = "html";
     public static final String BROKEN = "broken";
+    public static final String LINK = "link";
 }

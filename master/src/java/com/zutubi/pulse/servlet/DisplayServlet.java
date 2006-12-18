@@ -1,8 +1,9 @@
 package com.zutubi.pulse.servlet;
 
 import com.zutubi.pulse.bootstrap.ComponentContext;
-import com.zutubi.pulse.vfs.pulse.*;
 import com.zutubi.pulse.util.logging.Logger;
+import com.zutubi.pulse.vfs.pulse.AbstractPulseFileObject;
+import com.zutubi.pulse.vfs.pulse.AddressableFileObject;
 import org.apache.commons.vfs.FileSystemException;
 import org.apache.commons.vfs.FileSystemManager;
 
@@ -48,11 +49,14 @@ public class DisplayServlet extends HttpServlet
             
             AddressableFileObject afo = (AddressableFileObject) pfo;
             String url = afo.getUrlPath();
-            if (!url.startsWith("/"))
+            if (afo.isLocal())
             {
-                url = "/" + url;
+                if (!url.startsWith("/"))
+                {
+                    url = "/" + url;
+                }
+                url = request.getContextPath() + url;
             }
-            url = request.getContextPath() + url;
             response.sendRedirect(url);
         }
         catch (FileSystemException e)

@@ -1,15 +1,15 @@
 package com.zutubi.pulse.vfs.pulse;
 
-import com.zutubi.pulse.util.logging.Logger;
 import com.zutubi.pulse.model.BuildResult;
 import com.zutubi.pulse.model.Project;
+import com.zutubi.pulse.util.logging.Logger;
 import org.apache.commons.vfs.FileName;
-import org.apache.commons.vfs.FileType;
 import org.apache.commons.vfs.FileSystemException;
+import org.apache.commons.vfs.FileType;
 import org.apache.commons.vfs.provider.AbstractFileSystem;
 
-import java.util.Map;
 import java.util.HashMap;
+import java.util.Map;
 
 /**
  * <class comment/>
@@ -55,6 +55,11 @@ public class LatestSuccessfulBuildFileObject extends AbstractPulseFileObject imp
     protected String[] doListChildren() throws Exception
     {
         return new String[0];
+    }
+
+    public boolean isLocal()
+    {
+        return true;
     }
 
     public String getUrlPath()

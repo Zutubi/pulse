@@ -61,6 +61,7 @@
                         <li class="download">Download an artifact file.</li>
                         <li class="archive">Download an archive file containing the nested artifacts.</li>
                         <li class="decorate">View a decorated view of the artifact.</li>
+                        <li class="link">Navigate to an external artifact.</li>
                         <li class="broken">The artifact does not exist on disk.</li>
                     </ul>
                 </p>

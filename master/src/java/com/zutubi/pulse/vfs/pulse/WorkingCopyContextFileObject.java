@@ -69,6 +69,11 @@ public class WorkingCopyContextFileObject extends AbstractPulseFileObject implem
         }
     }
 
+    public boolean isLocal()
+    {
+        return true;
+    }
+
     public String getUrlPath()
     {
         return "/browseProjectDir.action?buildId=" + getBuildResultId();   
