@@ -12,7 +12,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 /**
- * The Artifact File Object represents a StoredArtifact instance.
+ * The LocalArtifact File Object represents a StoredArtifact instance.
  * 
  */
 public class ArtifactFileObject extends AbstractPulseFileObject implements ArtifactProvider, AddressableFileObject
@@ -20,7 +20,10 @@ public class ArtifactFileObject extends AbstractPulseFileObject implements Artif
     private final long artifactId;
 
     private boolean isHtmlArtifact;
+    private boolean isLinkArtifact;
     private File artifactBase;
+    private StoredArtifact artifact;
+    private CommandResult commandResult;
 
     public ArtifactFileObject(final FileName name, final long artifactId, final AbstractFileSystem fs)
     {
@@ -49,6 +52,7 @@ public class ArtifactFileObject extends AbstractPulseFileObject implements Artif
     {
         StoredArtifact artifact = getArtifact();
         isHtmlArtifact = artifact.hasIndexFile() && !getArtifact().isSingleFile();
+        isLinkArtifact = artifact.isLink();
     }
 
     private File getArtifactBase()
@@ -67,7 +71,7 @@ public class ArtifactFileObject extends AbstractPulseFileObject implements Artif
 
     protected FileType doGetType() throws Exception
     {
-        if (isHtmlArtifact || !getArtifactBase().isDirectory())
+        if (isHtmlArtifact || isLinkArtifact || !getArtifactBase().isDirectory())
         {
             return FileType.FILE;
         }
@@ -76,7 +80,7 @@ public class ArtifactFileObject extends AbstractPulseFileObject implements Artif
 
     protected String[] doListChildren() throws Exception
     {
-        if (isHtmlArtifact)
+        if (isHtmlArtifact || isLinkArtifact)
         {
             return new String[0];
         }
@@ -92,7 +96,11 @@ public class ArtifactFileObject extends AbstractPulseFileObject implements Artif
 
     public String getFileType() throws FileSystemException
     {
-        if(!getArtifactBase().isDirectory())
+        if(isLinkArtifact)
+        {
+            return FileTypeConstants.LINK;
+        }
+        else if(!getArtifactBase().isDirectory())
         {
             return FileTypeConstants.BROKEN;
         }
@@ -112,7 +120,11 @@ public class ArtifactFileObject extends AbstractPulseFileObject implements Artif
     public List<String> getActions()
     {
         List<String> actions = new LinkedList<String>();
-        if (getArtifactBase().isDirectory())
+        if(isLinkArtifact)
+        {
+            actions.add("link");
+        }
+        else if (getArtifactBase().isDirectory())
         {
             if (isHtmlArtifact)
             {
@@ -123,18 +135,32 @@ public class ArtifactFileObject extends AbstractPulseFileObject implements Artif
         return actions;
     }
 
+    public boolean isLocal()
+    {
+        return !isLinkArtifact;
+    }
+
     public String getUrlPath()
     {
         if (isHtmlArtifact)
         {
             return "/file/artifacts/" + artifactId + "/" + getArtifact().findIndexFile();
         }
+        else if(isLinkArtifact)
+        {
+            return getArtifact().getUrl();
+        }
+        
         return null;
     }
 
     public StoredArtifact getArtifact()
     {
-        return buildManager.getArtifact(artifactId);
+        if(artifact == null)
+        {
+            artifact = buildManager.getArtifact(artifactId);
+        }
+        return artifact;
     }
 
     public long getArtifactId()
@@ -144,7 +170,11 @@ public class ArtifactFileObject extends AbstractPulseFileObject implements Artif
 
     public CommandResult getCommandResult()
     {
-        return buildManager.getCommandResultByArtifact(artifactId);
+        if (commandResult == null)
+        {
+            commandResult = buildManager.getCommandResultByArtifact(artifactId);
+        }
+        return commandResult;
     }
 
     public long getCommandResultId()

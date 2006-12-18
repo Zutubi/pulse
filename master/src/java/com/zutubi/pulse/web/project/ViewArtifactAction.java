@@ -1,17 +1,17 @@
 package com.zutubi.pulse.web.project;
 
+import com.opensymphony.util.TextUtils;
 import com.zutubi.pulse.core.model.CommandResult;
 import com.zutubi.pulse.core.model.Feature;
 import com.zutubi.pulse.core.model.PlainFeature;
 import com.zutubi.pulse.core.model.StoredFileArtifact;
 import com.zutubi.pulse.model.BuildResult;
 import com.zutubi.pulse.util.logging.Logger;
+import com.zutubi.pulse.vfs.pulse.AbstractPulseFileObject;
 import com.zutubi.pulse.vfs.pulse.BuildResultProvider;
 import com.zutubi.pulse.vfs.pulse.CommandResultProvider;
-import com.zutubi.pulse.vfs.pulse.AbstractPulseFileObject;
 import com.zutubi.pulse.vfs.pulse.FileArtifactProvider;
 import com.zutubi.pulse.web.vfs.VFSActionSupport;
-import com.opensymphony.util.TextUtils;
 import org.apache.commons.vfs.FileObject;
 import org.apache.commons.vfs.FileSystemException;
 
@@ -131,7 +131,7 @@ public class ViewArtifactAction extends VFSActionSupport
         File artifactFile = ((FileArtifactProvider)pfo).getFile();
         if(!artifactFile.isFile())
         {
-            addActionError("Artifact file '" + artifactFile.getAbsolutePath() + "' does not exist");
+            addActionError("LocalArtifact file '" + artifactFile.getAbsolutePath() + "' does not exist");
             return ERROR;
         }
 

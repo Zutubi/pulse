@@ -1,12 +1,12 @@
 package com.zutubi.pulse.vfs.pulse;
 
-import org.apache.commons.vfs.FileName;
-import org.apache.commons.vfs.FileType;
-import org.apache.commons.vfs.FileSystemException;
-import org.apache.commons.vfs.provider.AbstractFileSystem;
-import com.zutubi.pulse.model.BuildResult;
-import com.zutubi.pulse.core.model.StoredArtifact;
 import com.zutubi.pulse.core.model.CommandResult;
+import com.zutubi.pulse.core.model.StoredArtifact;
+import com.zutubi.pulse.model.BuildResult;
+import org.apache.commons.vfs.FileName;
+import org.apache.commons.vfs.FileSystemException;
+import org.apache.commons.vfs.FileType;
+import org.apache.commons.vfs.provider.AbstractFileSystem;
 
 import java.io.File;
 
@@ -45,6 +45,11 @@ public class NamedArtifactFileObject extends AbstractPulseFileObject implements 
         return new String[0];
     }
 
+    public boolean isLocal() throws FileSystemException
+    {
+        return !getArtifact().isLink();
+    }
+
     public String getUrlPath() throws FileSystemException
     {
         // do we have a command result in the context?
@@ -55,10 +60,15 @@ public class NamedArtifactFileObject extends AbstractPulseFileObject implements 
         }
 
         // is html artifact.
-        if (artifact.hasIndexFile() && !artifact.isSingleFile())
+        if(artifact.isLink())
+        {
+            return artifact.getUrl();
+        }
+        else if (artifact.hasIndexFile() && !artifact.isSingleFile())
         {
             return "/file/artifacts/" + artifact.getId() + "/" + artifact.findIndexFile();
         }
+
         return "";
     }
 

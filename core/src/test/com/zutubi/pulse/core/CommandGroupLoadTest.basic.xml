@@ -12,5 +12,10 @@
             <artifact name="file-artifact" file="some/file" fail-if-not-present="false"/>
             <dir-artifact name="dir-artifact" base="some/base" fail-if-not-present="false"/>
         </command>
+
+        <command name="linkage">
+            <executable exe="jim"/>
+            <link-artifact name="link" url="http://my/url"/>
+        </command>
     </recipe>
 </project>

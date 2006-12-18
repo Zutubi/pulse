@@ -2,9 +2,9 @@ package com.zutubi.pulse.core;
 
 import com.opensymphony.util.TextUtils;
 import com.zutubi.pulse.core.model.CommandResult;
-import com.zutubi.validation.annotations.Required;
 import com.zutubi.validation.Validateable;
 import com.zutubi.validation.ValidationContext;
+import com.zutubi.validation.annotations.Required;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -65,6 +65,13 @@ public class CommandGroup implements Command, Validateable
         DirectoryArtifact customArtifact = new DirectoryArtifact();
         artifacts.add(customArtifact);
         return customArtifact;
+    }
+
+    public LinkArtifact createLinkArtifact()
+    {
+        LinkArtifact linkArtifact = new LinkArtifact();
+        artifacts.add(linkArtifact);
+        return linkArtifact;
     }
 
     public void execute(CommandContext context, CommandResult result)

@@ -73,6 +73,7 @@
                 <!--<ref local="featureCountUpgradeTask"/>-->
                 <ref local="schemaUpgrade0102006003"/>
                 <ref local="schemaUpgrade0102007001"/>
+                <ref local="schemaUpgrade0102009001"/>
             </list>
         </property>
         <property name="systemTasks">
@@ -467,6 +468,15 @@
         <property name="mappings">
             <list>
                 <value>com/zutubi/pulse/upgrade/schema/build_0102007001/BuildResult.hbm.xml</value>
+            </list>
+        </property>
+    </bean>
+
+    <bean id="schemaUpgrade0102009001" class="com.zutubi.pulse.upgrade.tasks.MigrateSchemaUpgradeTask" autowire="byName">
+        <property name="buildNumber" value="102009001"/>
+        <property name="mappings">
+            <list>
+                <value>com/zutubi/pulse/upgrade/schema/build_0102009001/StoredArtifact.hbm.xml</value>
             </list>
         </property>
     </bean>

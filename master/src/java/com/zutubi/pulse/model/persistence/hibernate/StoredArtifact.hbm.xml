@@ -12,6 +12,8 @@
 
         <property name="index" column="INDEX" type="string" length="255"/>
 
+        <property name="url" column="URL" type="string" length="1023"/>
+
         <bag name="children" cascade="all,delete-orphan" lazy="false">
             <key column="ARTIFACT_ID" not-null="true"/>
             <one-to-many class="com.zutubi.pulse.core.model.StoredFileArtifact"/>

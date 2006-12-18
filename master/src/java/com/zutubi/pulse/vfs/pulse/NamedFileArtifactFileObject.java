@@ -52,6 +52,11 @@ public class NamedFileArtifactFileObject extends AbstractPulseFileObject impleme
         return new String[0];
     }
 
+    public boolean isLocal()
+    {
+        return true;
+    }
+
     public String getUrlPath() throws FileSystemException
     {
         if (file.isDirectory())

@@ -8,8 +8,8 @@ import org.apache.commons.vfs.FileSystemException;
 import org.apache.commons.vfs.FileType;
 import org.apache.commons.vfs.provider.AbstractFileSystem;
 
-import java.util.Map;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -57,6 +57,11 @@ public class LatestBuildFileObject extends AbstractPulseFileObject implements Ad
     {
         Set<String> rootPaths = nodesDefinitions.keySet();
         return rootPaths.toArray(new String[rootPaths.size()]);
+    }
+
+    public boolean isLocal()
+    {
+        return true;
     }
 
     public String getUrlPath()

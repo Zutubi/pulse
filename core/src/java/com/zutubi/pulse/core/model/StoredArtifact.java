@@ -26,6 +26,12 @@ public class StoredArtifact extends Entity
      */
     private String index;
 
+    /**
+     * A special case for link artifacts.  If the URL is non-null, this
+     * artifact is a link to an external location.
+     */
+    private String url;
+
     public StoredArtifact()
     {
     }
@@ -33,6 +39,12 @@ public class StoredArtifact extends Entity
     public StoredArtifact(String name)
     {
         this.name = name;
+    }
+
+    public StoredArtifact(String name, String url)
+    {
+        this.name = name;
+        this.url = url;
     }
 
     public StoredArtifact(String name, StoredFileArtifact file)
@@ -163,6 +175,16 @@ public class StoredArtifact extends Entity
         this.index = index;
     }
 
+    public String getUrl()
+    {
+        return url;
+    }
+
+    public void setUrl(String url)
+    {
+        this.url = url;
+    }
+
     public StoredFileArtifact findFile(String filePath)
     {
         for (StoredFileArtifact a : children)
@@ -203,5 +225,10 @@ public class StoredArtifact extends Entity
         }
 
         return null;
+    }
+
+    public boolean isLink()
+    {
+        return url != null;
     }
 }

@@ -82,6 +82,10 @@
     background: url(../../images/treeview/folder_error.gif) 0 0 no-repeat; width:18px; height:22px; cursor:pointer;
 }
 
+.treeview_link, .treeview_link_o {
+    background: url(../../images/page_link.gif) 0 0 no-repeat; width:18px; height:22px; cursor:pointer;
+}
+
 /*---( Actions )---*/
 
 td.archive, div.archive {
@@ -94,6 +98,10 @@ td.decorate, div.decorate {
 
 td.download, div.download {
     background: url(../../images/arrow_down.gif) 0 4px no-repeat; width:16px; height:22px; cursor:pointer;
+}
+
+td.link, div.link {
+    background: url(../../images/link_go.gif) 0 4px no-repeat; width:16px; height:22px; cursor:pointer;
 }
 
 /*---( action legend. )---*/
@@ -133,6 +141,15 @@ li.download
 li.broken
 {
     background-image: url(../../images/treeview/folder_error.gif);
+    background-repeat: no-repeat;
+    background-position: 0 50%;
+    padding: 3px 0 3px 20px;
+    margin: .4em 0;
+}
+
+li.link
+{
+    background-image: url(../../images/link_go.gif);
     background-repeat: no-repeat;
     background-position: 0 50%;
     padding: 3px 0 3px 20px;

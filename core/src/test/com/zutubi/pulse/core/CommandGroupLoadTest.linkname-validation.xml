@@ -1,0 +1,9 @@
+<?xml version="1.0"?>
+<project default-recipe="default">
+    <recipe name="default">
+        <command name="basic">
+            <executable exe="jim"/>
+            <link-artifact url="url"/>
+        </command>
+    </recipe>
+</project>

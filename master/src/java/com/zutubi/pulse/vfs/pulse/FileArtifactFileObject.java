@@ -1,5 +1,8 @@
 package com.zutubi.pulse.vfs.pulse;
 
+import com.zutubi.pulse.core.model.StoredArtifact;
+import com.zutubi.pulse.core.model.StoredFileArtifact;
+import com.zutubi.pulse.util.logging.Logger;
 import org.apache.commons.vfs.FileName;
 import org.apache.commons.vfs.FileSystemException;
 import org.apache.commons.vfs.FileType;
@@ -8,12 +11,8 @@ import org.apache.commons.vfs.provider.AbstractFileSystem;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
-import java.util.List;
 import java.util.LinkedList;
-
-import com.zutubi.pulse.core.model.StoredArtifact;
-import com.zutubi.pulse.core.model.StoredFileArtifact;
-import com.zutubi.pulse.util.logging.Logger;
+import java.util.List;
 
 /**
  * <class comment/>
@@ -88,6 +87,11 @@ public class FileArtifactFileObject extends AbstractPulseFileObject implements A
     public File toFile()
     {
         return base;
+    }
+
+    public boolean isLocal()
+    {
+        return true;
     }
 
     public String getUrlPath()

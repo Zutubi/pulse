@@ -1,8 +1,9 @@
 package com.zutubi.pulse.vfs.pulse;
 
+import com.zutubi.pulse.model.Project;
 import org.apache.commons.vfs.FileName;
-import org.apache.commons.vfs.FileType;
 import org.apache.commons.vfs.FileSystemException;
+import org.apache.commons.vfs.FileType;
 import org.apache.commons.vfs.provider.AbstractFileSystem;
 
 import java.io.File;
@@ -10,8 +11,6 @@ import java.io.FileInputStream;
 import java.io.InputStream;
 import java.util.LinkedList;
 import java.util.List;
-
-import com.zutubi.pulse.model.Project;
 
 /**
  * <class comment/>
@@ -69,6 +68,11 @@ public class WorkingCopyFileObject extends AbstractPulseFileObject implements Ad
     protected InputStream doGetInputStream() throws Exception
     {
         return new FileInputStream(base);
+    }
+
+    public boolean isLocal()
+    {
+        return true;
     }
 
     public String getUrlPath()

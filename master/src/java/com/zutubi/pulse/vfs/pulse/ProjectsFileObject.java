@@ -66,6 +66,11 @@ public class ProjectsFileObject extends AbstractPulseFileObject implements Addre
         return new String[0];
     }
 
+    public boolean isLocal()
+    {
+        return true;
+    }
+
     public String getUrlPath()
     {
         return "/viewProjects.action";

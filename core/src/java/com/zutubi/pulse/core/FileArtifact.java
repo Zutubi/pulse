@@ -11,7 +11,7 @@ import java.io.File;
 /**
  * Information about a single file artifact to be captured.
  */
-public class FileArtifact extends Artifact
+public class FileArtifact extends LocalArtifact
 {
     private String file;
     private String type = null;
