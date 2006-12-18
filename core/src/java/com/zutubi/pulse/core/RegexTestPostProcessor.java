@@ -99,13 +99,20 @@ public class RegexTestPostProcessor extends TestReportPostProcessor
             if (m.matches())
             {
                 String statusString = m.group(statusGroup);
-                String testName = m.group(nameGroup);
-                
-                TestCaseResult result = new TestCaseResult();
-                result.setName(testName);
-                result.setStatus(statusMap.get(statusString));
+                if(statusMap.containsKey(statusString))
+                {
+                    String testName = m.group(nameGroup);
 
-                tests.add(result);
+                    TestCaseResult result = new TestCaseResult();
+                    result.setName(testName);
+                    result.setStatus(statusMap.get(statusString));
+
+                    tests.add(result);
+                }
+                else
+                {
+                    LOG.warning("Test with unrecognised status '" + statusString + "'");
+                }
             }
             currentLine = nextLine();
         }
@@ -147,9 +154,35 @@ public class RegexTestPostProcessor extends TestReportPostProcessor
         return nameGroup;
     }
 
+    public String getPassStatus()
+    {
+        for(Map.Entry<String, TestCaseResult.Status> entry: statusMap.entrySet())
+        {
+            if(entry.getValue().equals(TestCaseResult.Status.PASS))
+            {
+                return entry.getKey();
+            }
+        }
+
+        return null;
+    }
+
     public void setPassStatus(String status)
     {
         this.statusMap.put(status, TestCaseResult.Status.PASS);
+    }
+
+    public String getFailureStatus()
+    {
+        for(Map.Entry<String, TestCaseResult.Status> entry: statusMap.entrySet())
+        {
+            if(entry.getValue().equals(TestCaseResult.Status.FAILURE))
+            {
+                return entry.getKey();
+            }
+        }
+
+        return null;
     }
 
     public void setFailureStatus(String status)
