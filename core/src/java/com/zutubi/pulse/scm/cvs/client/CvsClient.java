@@ -18,6 +18,7 @@ import org.netbeans.lib.cvsclient.command.CommandException;
 import org.netbeans.lib.cvsclient.command.GlobalOptions;
 import org.netbeans.lib.cvsclient.command.checkout.CheckoutCommand;
 import org.netbeans.lib.cvsclient.command.log.RlogCommand;
+import org.netbeans.lib.cvsclient.command.log.LogInformation;
 import org.netbeans.lib.cvsclient.command.status.StatusCommand;
 import org.netbeans.lib.cvsclient.command.status.StatusInformation;
 import org.netbeans.lib.cvsclient.command.tag.RtagCommand;
@@ -171,12 +172,12 @@ public class CvsClient
         }
     }
 
-    public List rlog(String module, CvsRevision from, CvsRevision to) throws SCMException
+    public List<LogInformation> rlog(String module, CvsRevision from, CvsRevision to) throws SCMException
     {
         return rlog(module, from, to, false);
     }
 
-    public List rlog(String module, CvsRevision from, CvsRevision to, boolean verbose)
+    public List<LogInformation> rlog(String module, CvsRevision from, CvsRevision to, boolean verbose)
             throws SCMException
     {
         RlogCommand rlog = new RlogCommand();

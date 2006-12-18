@@ -13,6 +13,7 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 import org.netbeans.lib.cvsclient.CVSRoot;
 import org.netbeans.lib.cvsclient.command.CommandException;
+import org.netbeans.lib.cvsclient.command.log.LogInformation;
 import org.netbeans.lib.cvsclient.connection.AuthenticationException;
 import org.netbeans.lib.cvsclient.util.Logger;
 
@@ -55,7 +56,7 @@ public class LogInformationAnalyserTest extends PulseTestCase
         Change change = (Change)changelist.getChanges().get(0);
         assertEquals("/unit-test/CvsWorkerTest/testChangeDetails/Attic/file1.txt", change.getFilename());
         assertEquals(com.zutubi.pulse.core.model.Change.Action.EDIT, change.getAction());
-        assertEquals("1.2", change.getRevision());
+        assertEquals("1.2", change.getRevision().toString());
         changelist = (Changelist)changes.get(1);
         assertEquals("daniel", changelist.getUser());
         assertEquals("file1.txt deleted by author a\n", changelist.getComment());
@@ -64,7 +65,7 @@ public class LogInformationAnalyserTest extends PulseTestCase
         change = (Change)changelist.getChanges().get(0);
         assertEquals("/unit-test/CvsWorkerTest/testChangeDetails/Attic/file1.txt", change.getFilename());
         assertEquals(com.zutubi.pulse.core.model.Change.Action.DELETE, change.getAction());
-        assertEquals("1.3", change.getRevision());
+        assertEquals("1.3", change.getRevision().toString());
     }
 
     public void testChangeDetails()
@@ -85,7 +86,7 @@ public class LogInformationAnalyserTest extends PulseTestCase
         Change change = (Change)changelist.getChanges().get(0);
         assertEquals("/unit-test/CvsWorkerTest/testChangeDetails/Attic/file1.txt", change.getFilename());
         assertEquals(com.zutubi.pulse.core.model.Change.Action.ADD, change.getAction());
-        assertEquals("1.1", change.getRevision());
+        assertEquals("1.1", change.getRevision().toString());
         changelist = (Changelist)changes.get(1);
         assertEquals("daniel", changelist.getUser());
         assertEquals("file1.txt modified by author a\n", changelist.getComment());
@@ -94,7 +95,7 @@ public class LogInformationAnalyserTest extends PulseTestCase
         change = (Change)changelist.getChanges().get(0);
         assertEquals("/unit-test/CvsWorkerTest/testChangeDetails/Attic/file1.txt", change.getFilename());
         assertEquals(com.zutubi.pulse.core.model.Change.Action.EDIT, change.getAction());
-        assertEquals("1.2", change.getRevision());
+        assertEquals("1.2", change.getRevision().toString());
         changelist = (Changelist)changes.get(2);
         assertEquals("daniel", changelist.getUser());
         assertEquals("file1.txt deleted by author a\n", changelist.getComment());
@@ -103,7 +104,7 @@ public class LogInformationAnalyserTest extends PulseTestCase
         change = (Change)changelist.getChanges().get(0);
         assertEquals("/unit-test/CvsWorkerTest/testChangeDetails/Attic/file1.txt", change.getFilename());
         assertEquals(com.zutubi.pulse.core.model.Change.Action.DELETE, change.getAction());
-        assertEquals("1.3", change.getRevision());
+        assertEquals("1.3", change.getRevision().toString());
         changelist = (Changelist)changes.get(3);
         assertEquals("daniel", changelist.getUser());
         assertEquals("file2.txt checked in by author a\n", changelist.getComment());
@@ -112,7 +113,7 @@ public class LogInformationAnalyserTest extends PulseTestCase
         change = (Change)changelist.getChanges().get(0);
         assertEquals("/unit-test/CvsWorkerTest/testChangeDetails/file2.txt", change.getFilename());
         assertEquals(com.zutubi.pulse.core.model.Change.Action.ADD, change.getAction());
-        assertEquals("1.1", change.getRevision());
+        assertEquals("1.1", change.getRevision().toString());
     }
 
     public void testChangesByDifferentAuthors()
@@ -256,6 +257,31 @@ public class LogInformationAnalyserTest extends PulseTestCase
         assertCvsRevision(changelist.getRevision(), "daniel", "BRANCH", "file1.txt modified on BRANCH by author a\n");
     }
 
+    public void testAddToBranchDoesNotAppearOnHead() throws SCMException, ParseException
+    {
+        // In testChangesWithBranch, file1 and file2 are added to head. We then branch, add file3
+        // to the branch and edit file1.
+        // a) expect 2 changes on branch - the add and the edit.
+        // b) expect 1 change on head - initial add
+
+        CvsRevision fromRevision = new CvsRevision(null, "BRANCH", null, SERVER_DATE.parse("2006-01-10 00:00:00 GMT"));
+        CvsRevision toRevision = new CvsRevision(null, "BRANCH", null, SERVER_DATE.parse("2006-04-10 00:00:00 GMT"));
+
+        String module = "unit-test/CvsWorkerTest/testChangesWithBranch";
+
+        List<LogInformation> infos = cvs.rlog(module, fromRevision, toRevision);
+        List changes = analyser.extract(infos, "BRANCH");
+        assertEquals(2, changes.size());
+
+        fromRevision.setBranch(null);
+        toRevision.setBranch(null);
+
+        infos = cvs.rlog(module, fromRevision, toRevision);
+        changes = analyser.extract(infos, "BRANCH");
+
+        assertEquals(1, changes.size());
+    }
+
     public void testChangesOnHeadAndBranch()
         throws SCMException, ParseException, CommandException, AuthenticationException
     {
@@ -306,7 +332,7 @@ public class LogInformationAnalyserTest extends PulseTestCase
     {
         assertEndsWith(file, change.getFilename());
         assertEquals(action, change.getAction());
-        assertEquals(revision, change.getRevision());
+        assertEquals(revision, change.getRevision().toString());
     }
 
     private static void assertValidChangeSets(List changelists)

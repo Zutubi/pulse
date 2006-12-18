@@ -56,4 +56,9 @@ public class CvsFileRevision extends FileRevision
     {
         return revision;
     }
+
+    public String toString()
+    {
+        return getRevisionString();
+    }
 }
