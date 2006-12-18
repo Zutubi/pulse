@@ -68,6 +68,14 @@ public class LogAnalyser
             {
                 LogInformation.Revision rev = (LogInformation.Revision) obj;
 
+                // CIB-831: Ignore revisions that indicate deleted as being the first state for the file.
+                //          This happens when a file is added to a branch for the first time - that same file
+                //          appears on head in the Attic. It should be safe to ignore.
+                if ("dead".equals(rev.getState()) && rev.getNumber().endsWith(".1"))
+                {
+                    continue;
+                }
+
                 Revision revision = new Revision(rev, root);
                 revision.setTag(tag);
                 revisions.add(revision);

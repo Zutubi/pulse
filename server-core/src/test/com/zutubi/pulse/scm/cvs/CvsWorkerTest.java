@@ -96,7 +96,7 @@ public class CvsWorkerTest extends PulseTestCase
 
         Date before = new Date();
         CvsRevision revision = cvs.getLatestChange("test");
-        Date after = new Date();
+//        Date after = new Date();
 
         assertNotNull(revision);
 
@@ -650,6 +650,29 @@ public class CvsWorkerTest extends PulseTestCase
         // because we have created the tag in the past, the subsequent checkout will succeed, but should
         // generate an empty checkout directory.
         assertFalse(new File(workdir, module + "/file.txt").exists());
+    }
+
+    //---( CIB-831 )---
+
+    public void testAddToBranchDoesNotAppearOnHead() throws SCMException
+    {
+        // In testChangesWithBranch, file1 and file2 are added to head. We then branch, add file3
+        // to the branch and edit file1.
+        // a) expect 2 changes on branch - the add and the edit.
+        // b) expect 1 change on head - initial add
+
+        String module = "unit-test/CvsWorkerTest/testChangesWithBranch";
+        cvs.setModule(module);
+        cvs.setBranch("BRANCH");
+
+        List<Changelist> changes = cvs.getChangesBetween("test", fromRevision, toRevision);
+
+        assertEquals(2, changes.size());
+
+        cvs.setBranch(null);
+
+        changes = cvs.getChangesBetween("test", fromRevision, toRevision);
+        assertEquals(1, changes.size());
     }
 
     private void assertContents(String expected, File file) throws IOException
