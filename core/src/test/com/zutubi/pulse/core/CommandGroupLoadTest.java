@@ -28,6 +28,17 @@ public class CommandGroupLoadTest extends FileLoaderTestBase
         assertFalse(a.getFailIfNotPresent());
     }
 
+    public void testLinkageCommandGroup() throws Exception
+    {
+        CommandGroup group = loadGroup("basic", "linkage");
+        assertEquals(1, group.getArtifacts().size());
+        Artifact a = group.getArtifacts().get(0);
+        assertTrue(a instanceof LinkArtifact);
+        LinkArtifact link = (LinkArtifact) a;
+        assertEquals("link", link.getName());
+        assertEquals("http://my/url", link.getUrl());
+    }
+
     public void testMissingNestedCommandValidation()
     {
         try
@@ -51,6 +62,32 @@ public class CommandGroupLoadTest extends FileLoaderTestBase
         catch (PulseException e)
         {
             assertTrue(e.getMessage().contains("A name must be provided for the command (possibly on a surrounding 'command' tag)."));
+        }
+    }
+
+    public void testMissingLinkNameValidation()
+    {
+        try
+        {
+            loadGroup("linkname-validation", null);
+            fail();
+        }
+        catch (PulseException e)
+        {
+            assertTrue(e.getMessage().contains("Required attribute name not specified"));
+        }
+    }
+
+    public void testMissingLinkUrlValidation()
+    {
+        try
+        {
+            loadGroup("linkurl-validation", null);
+            fail();
+        }
+        catch (PulseException e)
+        {
+            assertTrue(e.getMessage().contains("Required attribute url not specified"));
         }
     }
 
