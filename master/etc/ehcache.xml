@@ -49,4 +49,11 @@
         diskPersistent="false"
         diskExpiryThreadIntervalSeconds="120"
         />
+
+    <cache name="BuildResultsRss"
+        maxElementsInMemory="2000"
+        eternal="true"
+        overflowToDisk="false"
+        />
+    
 </ehcache>
