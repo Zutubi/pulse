@@ -9,6 +9,7 @@ import com.zutubi.pulse.scm.cvs.client.commands.StatusListener;
 import com.zutubi.pulse.scm.cvs.client.commands.UpdateListener;
 import com.zutubi.pulse.scm.cvs.client.commands.VersionCommand;
 import com.zutubi.pulse.scm.cvs.client.util.CvsUtils;
+import com.zutubi.pulse.util.logging.Logger;
 import org.netbeans.lib.cvsclient.CVSRoot;
 import org.netbeans.lib.cvsclient.Client;
 import org.netbeans.lib.cvsclient.admin.StandardAdminHandler;
@@ -37,6 +38,8 @@ import java.util.TimeZone;
  */
 public class CvsClient
 {
+    private static final Logger LOG = Logger.getLogger(CvsClient.class);
+
     private static final SimpleDateFormat SERVER_DATE;
     static
     {
@@ -80,6 +83,7 @@ public class CvsClient
 
     public void update(File workingDirectory, CvsRevision revision, CVSListener listener) throws SCMException
     {
+
         UpdateCommand update = new UpdateCommand();
         update.setPruneDirectories(true);
         update.setBuildDirectories(true);
@@ -296,7 +300,7 @@ public class CvsClient
             {
                 if (!client.executeCommand(command, globalOptions))
                 {
-//                    LOG.warning("Cvs command: -d "+root+" '" + command.getCVSCommand() + "' has failed.");
+                    LOG.warning("Cvs command: -d "+root+" '" + command.getCVSCommand() + "' has failed.");
                     return false;
                 }
                 return true;

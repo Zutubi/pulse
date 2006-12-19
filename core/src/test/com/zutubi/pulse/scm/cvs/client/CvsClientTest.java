@@ -12,6 +12,7 @@ import com.zutubi.pulse.scm.SCMException;
 import com.zutubi.pulse.test.PulseTestCase;
 import com.zutubi.pulse.util.FileSystemUtils;
 import com.zutubi.pulse.util.IOUtils;
+import com.zutubi.pulse.util.StringUtils;
 import org.netbeans.lib.cvsclient.CVSRoot;
 import org.netbeans.lib.cvsclient.command.CommandException;
 import org.netbeans.lib.cvsclient.command.log.LogInformation;
@@ -162,8 +163,7 @@ public class CvsClientTest extends PulseTestCase
         assertEquals(1, changes.size());
     }
 
-    public void testUpdateToDate()
-        throws SCMException, ParseException, CvsException, CommandException, AuthenticationException
+    public void testUpdateToDate() throws SCMException, ParseException, CvsException, CommandException, AuthenticationException
     {
         String module = "unit-test/CvsWorkerTest/testUpdateOnHead";
         CvsRevision byDate = new CvsRevision(null, null, null, SERVER_DATE.parse("2006-05-10 13:33:00 GMT"));
@@ -174,6 +174,28 @@ public class CvsClientTest extends PulseTestCase
         List changes = updateChanges(new File(workdir, module), byDate);
         assertTrue(x.exists());
         assertEquals(1, changes.size());
+    }
+
+    /**
+     * When updating, file edits should be returned in the list of changes.
+     */
+    public void testUpdateWithEditsReceivesChange() throws SCMException, ParseException
+    {
+/*
+        String module = "unit-test/CvsWorkerTest/testUpdateWithEditsReceivesChange";
+        CvsRevision byDate = new CvsRevision(null, null, null, SERVER_DATE.parse("2006-12-19 01:30:00 GMT"));
+        cvs.checkout(workdir, module, byDate, null);
+        
+        File x = new File(workdir, StringUtils.join("/", module, "file.txt"));
+        assertTrue(x.exists());
+
+        byDate = new CvsRevision(null, null, null, SERVER_DATE.parse("2006-12-19 01:31:00 GMT"));
+        List changes = updateChanges(new File(workdir, module), byDate);
+        assertTrue(x.exists());
+        assertEquals(1, changes.size());
+
+        //TODO: need to ensure that we see an EDIT, not an ADD.
+*/
     }
 
     public void testTagContent()
