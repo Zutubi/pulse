@@ -102,4 +102,24 @@ public class RssAcceptanceTest extends BaseAcceptanceTestCase
         SyndFeedInput input = new SyndFeedInput();
         return input.build(new XmlReader(new ByteArrayInputStream(baos.toByteArray())));
     }
+/*
+    public void testPerformance() throws FeedException, IOException
+    {
+        long time = 0;
+        for (int i = 0; i < 5; i++)
+        {
+            System.out.println(i);
+            long startTime = System.currentTimeMillis();
+            beginAt("rss.action");
+            SyndFeed feed = readResponseAsFeed();
+            long endTime = System.currentTimeMillis();
+
+            time += (endTime - startTime);
+
+            assertNotNull(feed);
+        }
+
+        System.out.println("Average: " + (time/50));
+    }
+*/
 }

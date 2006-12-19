@@ -3,11 +3,12 @@ package com.zutubi.pulse.util;
 import java.text.DateFormat;
 import java.util.Date;
 import java.util.Locale;
+import java.io.Serializable;
 
 /**
  * A time stamp pair to mark the start and end times for something.
  */
-public class TimeStamps
+public class TimeStamps implements Serializable
 {
     public static final long UNINITIALISED_TIME = -1;
 

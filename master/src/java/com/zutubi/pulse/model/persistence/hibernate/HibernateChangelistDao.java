@@ -134,7 +134,7 @@ public class HibernateChangelistDao extends HibernateEntityDao<Changelist> imple
         {
             public Object doInHibernate(Session session) throws HibernateException
             {
-                Query queryObject = session.createQuery("from Changelist model left join fetch model.changes where :resultId in elements(model.resultIds) order by model.revision.time desc");
+                Query queryObject = session.createQuery("from Changelist model where :resultId in elements(model.resultIds) order by model.revision.time desc");
                 queryObject.setParameter("resultId", id);
 
                 SessionFactoryUtils.applyTransactionTimeout(queryObject, getSessionFactory());
@@ -145,6 +145,12 @@ public class HibernateChangelistDao extends HibernateEntityDao<Changelist> imple
 
         // Using the fetch join means we no longer get distinct results!
         LinkedHashSet<Changelist> set = new LinkedHashSet<Changelist>(all);
+        for (Changelist changelist : all)
+        {
+            changelist.getChanges().size();
+            set.add(changelist);
+        }
+
         return new LinkedList<Changelist>(set);
     }
 }
