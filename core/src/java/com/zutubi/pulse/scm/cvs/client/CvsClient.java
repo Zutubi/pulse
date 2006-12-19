@@ -9,6 +9,7 @@ import com.zutubi.pulse.scm.cvs.client.commands.StatusListener;
 import com.zutubi.pulse.scm.cvs.client.commands.UpdateListener;
 import com.zutubi.pulse.scm.cvs.client.commands.VersionCommand;
 import com.zutubi.pulse.scm.cvs.client.util.CvsUtils;
+import com.zutubi.pulse.util.logging.Logger;
 import org.netbeans.lib.cvsclient.CVSRoot;
 import org.netbeans.lib.cvsclient.Client;
 import org.netbeans.lib.cvsclient.admin.StandardAdminHandler;
@@ -18,6 +19,7 @@ import org.netbeans.lib.cvsclient.command.CommandException;
 import org.netbeans.lib.cvsclient.command.GlobalOptions;
 import org.netbeans.lib.cvsclient.command.checkout.CheckoutCommand;
 import org.netbeans.lib.cvsclient.command.log.RlogCommand;
+import org.netbeans.lib.cvsclient.command.log.LogInformation;
 import org.netbeans.lib.cvsclient.command.status.StatusCommand;
 import org.netbeans.lib.cvsclient.command.status.StatusInformation;
 import org.netbeans.lib.cvsclient.command.tag.RtagCommand;
@@ -36,6 +38,8 @@ import java.util.TimeZone;
  */
 public class CvsClient
 {
+    private static final Logger LOG = Logger.getLogger(CvsClient.class);
+
     private static final SimpleDateFormat SERVER_DATE;
     static
     {
@@ -79,6 +83,7 @@ public class CvsClient
 
     public void update(File workingDirectory, CvsRevision revision, CVSListener listener) throws SCMException
     {
+
         UpdateCommand update = new UpdateCommand();
         update.setPruneDirectories(true);
         update.setBuildDirectories(true);
@@ -171,12 +176,12 @@ public class CvsClient
         }
     }
 
-    public List rlog(String module, CvsRevision from, CvsRevision to) throws SCMException
+    public List<LogInformation> rlog(String module, CvsRevision from, CvsRevision to) throws SCMException
     {
         return rlog(module, from, to, false);
     }
 
-    public List rlog(String module, CvsRevision from, CvsRevision to, boolean verbose)
+    public List<LogInformation> rlog(String module, CvsRevision from, CvsRevision to, boolean verbose)
             throws SCMException
     {
         RlogCommand rlog = new RlogCommand();
@@ -295,7 +300,7 @@ public class CvsClient
             {
                 if (!client.executeCommand(command, globalOptions))
                 {
-//                    LOG.warning("Cvs command: -d "+root+" '" + command.getCVSCommand() + "' has failed.");
+                    LOG.warning("Cvs command: -d "+root+" '" + command.getCVSCommand() + "' has failed.");
                     return false;
                 }
                 return true;

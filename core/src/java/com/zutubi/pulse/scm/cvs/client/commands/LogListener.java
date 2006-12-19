@@ -29,7 +29,7 @@ public class LogListener extends CVSAdapter
         infos.add((LogInformation)e.getInfoContainer());
     }
 
-    public List getLogInfo()
+    public List<LogInformation> getLogInfo()
     {
         return infos;
     }
