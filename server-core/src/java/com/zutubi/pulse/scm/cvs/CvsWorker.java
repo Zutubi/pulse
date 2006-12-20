@@ -366,7 +366,15 @@ public class CvsWorker
 
         // ensure that we get the information back in a timely fashion. Without this,
         // we receive a full log which takes too long to come across the wire.
-        log.setSuppressHeader(true);
+        boolean useSuppressHeader = true;
+        if (System.getProperties().containsKey("cvs.rlog.suppressHeader"))
+        {
+            useSuppressHeader = Boolean.getBoolean("cvs.rlog.suppressHeader");
+        }
+        if (useSuppressHeader)
+        {
+            log.setSuppressHeader(true);
+        }
 
         // configure branch.
         if (TextUtils.stringSet(branch))

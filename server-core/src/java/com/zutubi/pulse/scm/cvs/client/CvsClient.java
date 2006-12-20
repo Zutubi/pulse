@@ -153,7 +153,16 @@ public class CvsClient
 
         RlogCommand log = new RlogCommand();
         log.setModule(module);
-        log.setSuppressHeader(true);
+
+        boolean useSuppressHeader = true;
+        if (System.getProperties().containsKey("cvs.rlog.suppressHeader"))
+        {
+            useSuppressHeader = Boolean.getBoolean("cvs.rlog.suppressHeader");
+        }
+        if (useSuppressHeader && headersOnly)
+        {
+            log.setSuppressHeader(true);
+        }
 
         String dateFilter = "";
         String del = "<=";
