@@ -104,11 +104,6 @@ public abstract class Result extends Entity
         }
     }
 
-    public long getStartTime()
-    {
-        return stamps.getStartTime();
-    }
-
     public void complete()
     {
         complete(System.currentTimeMillis());

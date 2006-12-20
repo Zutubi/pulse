@@ -6,7 +6,6 @@ import com.zutubi.pulse.events.build.CommandOutputEvent;
 import java.io.OutputStream;
 
 /**
- *
  */
 public class CommandOutputStream extends OutputStream implements Runnable
 {
@@ -23,12 +22,6 @@ public class CommandOutputStream extends OutputStream implements Runnable
     private byte[] buffer;
     private int offset;
     private Thread flusher;
-
-    /**
-     * The default auto flush interval. When auto flushing is enabled, the output stream
-     * will be actively flushed once every interval.
-     */
-    private static final int AUTO_FLUSH_INTERVAL = 5000;
 
     public CommandOutputStream(EventManager eventManager, long recipeId, boolean autoflush)
     {
@@ -115,7 +108,7 @@ public class CommandOutputStream extends OutputStream implements Runnable
         {
             try
             {
-                Thread.sleep(AUTO_FLUSH_INTERVAL);
+                Thread.sleep(5000);
             }
             catch (InterruptedException e)
             {

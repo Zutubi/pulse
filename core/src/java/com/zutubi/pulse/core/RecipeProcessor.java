@@ -58,27 +58,24 @@ public class RecipeProcessor
         // This result holds only the recipe details (stamps, state etc), not
         // the command results.  A full recipe result with command results is
         // assembled elsewhere.
-        RecipeResult recipeResult = new RecipeResult(request.getRecipeName());
-        recipeResult.setId(request.getId());
-        recipeResult.commence();
-        
+        RecipeResult result = new RecipeResult(request.getRecipeName());
         TestSuiteResult testResults = new TestSuiteResult();
+        result.setId(request.getId());
+        result.commence();
 
-        runningRecipe = recipeResult.getId();
-        eventManager.publish(new RecipeCommencedEvent(this, recipeResult.getId(), recipeResult.getRecipeName(), recipeResult.getStartTime()));
+        runningRecipe = request.getId();
+        eventManager.publish(new RecipeCommencedEvent(this, request.getId(), request.getRecipeName(), result.getStamps().getStartTime()));
 
         try
         {
-            long recipeStartTime = recipeResult.getStartTime();
+            long recipeStartTime = result.getStamps().getStartTime();
 
             // Wrap bootstrapper in a command and run it.
             BootstrapCommand bootstrapCommand = new BootstrapCommand(request.getBootstrapper());
             CommandResult bootstrapResult = new CommandResult(bootstrapCommand.getName());
             File commandOutput = new File(paths.getOutputDir(), getCommandDirName(0, bootstrapResult));
 
-            CommandContext commandContext = createCommandContext(paths, commandOutput, testResults, null, recipeStartTime, context, request.getId());
-
-            if(executeCommand(commandContext, bootstrapResult, commandOutput, bootstrapCommand, capture) &&
+            if(executeCommand(request.getId(), null, recipeStartTime, bootstrapResult, paths, commandOutput, testResults, bootstrapCommand, capture, context) &&
                bootstrapResult.succeeded())
             {
                 // Now we can load the recipe from the pulse file
@@ -107,19 +104,19 @@ public class RecipeProcessor
         }
         catch (BuildException e)
         {
-            recipeResult.error(e);
+            result.error(e);
         }
         catch (Exception e)
         {
             LOG.severe(e);
-            recipeResult.error(new BuildException("Unexpected error: " + e.getMessage(), e));
+            result.error(new BuildException("Unexpected error: " + e.getMessage(), e));
         }
         finally
         {
             writeTestResults(paths, testResults);
-            recipeResult.setTestSummary(testResults.getSummary());
-            recipeResult.complete();
-            RecipeCompletedEvent completedEvent = new RecipeCompletedEvent(this, recipeResult);
+            result.setTestSummary(testResults.getSummary());
+            result.complete();
+            RecipeCompletedEvent completedEvent = new RecipeCompletedEvent(this, result);
             if(context != null)
             {
                 completedEvent.setBuildVersion(context.getBuildVersion());
@@ -162,9 +159,7 @@ public class RecipeProcessor
 
             File commandOutput = new File(paths.getOutputDir(), getCommandDirName(i, result));
 
-            CommandContext commandContext = createCommandContext(paths, commandOutput, testResults, globalScope, recipeStartTime, context, recipeId);
-
-            if(!executeCommand(commandContext, result, commandOutput, command, capture))
+            if(!executeCommand(recipeId, globalScope, recipeStartTime, result, paths, commandOutput, testResults, command, capture, context))
             {
                 return;
             }
@@ -179,10 +174,8 @@ public class RecipeProcessor
         }
     }
 
-    private boolean executeCommand(CommandContext commandContext, CommandResult commandResult, File commandOutput, Command command, boolean capture)
+    private boolean executeCommand(long recipeId, Scope globalScope, long recipeStartTime, CommandResult result, RecipePaths paths, File commandOutput, TestSuiteResult testResults, Command command, boolean capture, BuildContext context)
     {
-        // support synchronization around the running command to ensure that
-        // command termination is clean.
         runningLock.lock();
         if (terminating)
         {
@@ -193,10 +186,9 @@ public class RecipeProcessor
         runningCommand = command;
         runningLock.unlock();
 
-        commandResult.commence();
-        commandResult.setOutputDir(commandOutput.getPath());
-        eventManager.publish(new CommandCommencedEvent(this, commandContext.getRecipeId(), commandResult.getCommandName(), commandResult.getStartTime()));
-
+        result.commence();
+        result.setOutputDir(commandOutput.getPath());
+        eventManager.publish(new CommandCommencedEvent(this, recipeId, result.getCommandName(), result.getStamps().getStartTime()));
         CommandOutputStream outputStream = null;
 
         try
@@ -206,56 +198,39 @@ public class RecipeProcessor
                 throw new BuildException("Could not create command output directory '" + commandOutput.getAbsolutePath() + "'");
             }
 
+            CommandContext commandContext = new CommandContext(paths, commandOutput, testResults);
+            commandContext.setGlobalScope(globalScope);
+            commandContext.setRecipeStartTime(recipeStartTime);
+
+            if (context != null && context.getBuildNumber() != -1)
+            {
+                commandContext.setBuildContext(context);
+            }
             if(capture)
             {
-                outputStream = new CommandOutputStream(eventManager, commandContext.getRecipeId(), true);
+                outputStream = new CommandOutputStream(eventManager, recipeId, true);
                 commandContext.setOutputStream(outputStream);
             }
 
-            command.execute(commandContext, commandResult);
+            command.execute(commandContext, result);
         }
         catch (BuildException e)
         {
-            commandResult.error(e);
+            result.error(e);
         }
         catch (Exception e)
         {
             LOG.severe(e);
-            commandResult.error(new BuildException("Unexpected error: " + e.getMessage(), e));
+            result.error(new BuildException("Unexpected error: " + e.getMessage(), e));
         }
         finally
         {
             IOUtils.close(outputStream);
-            commandResult.complete();
-            eventManager.publish(new CommandCompletedEvent(this, commandContext.getRecipeId(), commandResult));
+            result.complete();
+            eventManager.publish(new CommandCompletedEvent(this, recipeId, result));
         }
 
         return true;
-    }
-
-    /**
-     * Utility method for constructing and configuring a command context instance.
-     *
-     * @param paths
-     * @param commandOutput
-     * @param testResults
-     * @param globalScope
-     * @param recipeStartTime
-     * @param buildContext
-     * @param recipeId
-     *
-     * @return configured command context instance.
-     */
-    private CommandContext createCommandContext(RecipePaths paths, File commandOutput, TestSuiteResult testResults, Scope globalScope, long recipeStartTime, BuildContext buildContext, long recipeId) {
-        CommandContext commandContext = new CommandContext(paths, commandOutput, testResults);
-        commandContext.setGlobalScope(globalScope);
-        commandContext.setRecipeStartTime(recipeStartTime);
-        commandContext.setRecipeId(recipeId);
-        if (buildContext != null && buildContext.getBuildNumber() != -1)
-        {
-            commandContext.setBuildContext(buildContext);
-        }
-        return commandContext;
     }
 
     private PulseFile loadPulseFile(RecipeRequest request, File baseDir, ResourceRepository resourceRepository, Scope globalScope, BuildContext buildContext, long recipeStartTime) throws BuildException

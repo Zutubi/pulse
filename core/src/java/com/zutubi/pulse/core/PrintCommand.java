@@ -28,7 +28,6 @@ public class PrintCommand extends CommandSupport
     private List<ProcessArtifact> processes = new LinkedList<ProcessArtifact>();
 
     private boolean terminated = false;
-    private FileArtifact outputArtifact;
 
     public void execute(CommandContext context, CommandResult result)
     {
@@ -43,8 +42,6 @@ public class PrintCommand extends CommandSupport
         {
             throw new BuildException("Unable to create directory for output artifact '" + outputFileDir.getAbsolutePath() + "'");
         }
-
-        initialiseOutputArtifact();
 
         File outputFile = new File(outputFileDir, "output.txt");
         PrintWriter writer = null;
@@ -65,28 +62,8 @@ public class PrintCommand extends CommandSupport
         {
             IOUtils.close(writer);
         }
-    }
 
-    private void initialiseOutputArtifact()
-    {
-        outputArtifact = new FileArtifact();
-        outputArtifact.setName(OUTPUT_ARTIFACT_NAME);
-        outputArtifact.setFailIfNotPresent(false);
-        outputArtifact.setIgnoreStale(false);
-        outputArtifact.setOutputArtifact(true);
-        outputArtifact.setFile(OUTPUT_FILENAME);
-        outputArtifact.setType("text/plain");
-        outputArtifact.setProcesses(processes);
-    }
-
-    public List<Artifact> getArtifacts()
-    {
-        List<Artifact> artifacts = new LinkedList<Artifact>();
-        if (outputArtifact != null)
-        {
-            artifacts.add(outputArtifact);
-        }
-        return artifacts;
+        ProcessSupport.postProcess(processes, outputFileDir, outputFile, result, context);
     }
 
     public void setMessage(String message)

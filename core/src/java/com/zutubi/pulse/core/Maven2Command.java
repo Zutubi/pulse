@@ -1,6 +1,7 @@
 package com.zutubi.pulse.core;
 
 import com.zutubi.pulse.core.model.CommandResult;
+import com.zutubi.pulse.core.model.StoredArtifact;
 import com.zutubi.pulse.util.SystemUtils;
 
 import java.io.File;
@@ -51,12 +52,16 @@ public class Maven2Command extends ExecutableCommand
             cmdResult.getProperties().put("goals", goals);
         }
 
-        ProcessArtifact pa = createProcess();
-        pa.setProcessor(new Maven2PostProcessor("maven.pp"));
-
         super.execute(context, cmdResult);
 
         MavenUtils.extractVersion(context, cmdResult, new File(getWorkingDir(context.getPaths()), "pom.xml"), "version");
+
+        StoredArtifact artifact = cmdResult.getArtifact(OUTPUT_ARTIFACT_NAME);
+        if(artifact != null)
+        {
+            Maven2PostProcessor pp = new Maven2PostProcessor("maven.pp");
+            pp.process(artifact.getFile(), cmdResult, context);
+        }
     }
 
     public String getGoals()

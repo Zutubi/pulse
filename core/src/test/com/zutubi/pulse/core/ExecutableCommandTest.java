@@ -71,9 +71,7 @@ public class ExecutableCommandTest extends PulseTestCase
         CommandResult result = new CommandResult("exception");
         try
         {
-            CommandGroup commandGroup = new CommandGroup();
-            commandGroup.add(command);
-            execute(commandGroup, result);
+            execute(command, result);
             fail();
         }
         catch (BuildException e)
@@ -86,7 +84,7 @@ public class ExecutableCommandTest extends PulseTestCase
         StoredArtifact artifact = result.getArtifacts().get(0);
         assertEquals(1, artifact.getChildren().size());
         StoredFileArtifact fileArtifact = artifact.getChildren().get(0);
-        assertEquals(ExecutableCommand.ENV_ARTIFACT_NAME + "/env.txt", fileArtifact.getPath());
+        assertEquals(ExecutableCommand.ENV_NAME + "/env.txt", fileArtifact.getPath());
     }
 
     public void testPostProcess() throws FileLoadException
@@ -103,13 +101,8 @@ public class ExecutableCommandTest extends PulseTestCase
         processor.addRegexPattern(regex);
         processArtifact.setProcessor(processor);
 
-        // wrap the executable command in a command group so that the artifacts
-        // are processed.
-        CommandGroup commandGroup = new CommandGroup();
-        commandGroup.add(command);
-
         CommandResult cmdResult = new CommandResult("processed");
-        execute(commandGroup, cmdResult);
+        execute(command, cmdResult);
         assertEquals(ResultState.FAILURE, cmdResult.getState());
 
         StoredArtifact artifact = cmdResult.getArtifact(Command.OUTPUT_ARTIFACT_NAME);
@@ -182,17 +175,13 @@ public class ExecutableCommandTest extends PulseTestCase
         assertTrue(output.contains("test variable value"));
     }
 
-    public void testEnvironmentDetailsAreCaptured() throws IOException, FileLoadException
+    public void testEnvironmentDetailsAreCaptured() throws IOException
     {
         ExecutableCommand command = new ExecutableCommand();
         command.setExe("echo");
         command.setArgs("hello world");
-
-        CommandGroup commandGroup = new CommandGroup();
-        commandGroup.add(command);
-
         CommandResult result = new CommandResult("success");
-        execute(commandGroup, result);
+        execute(command, result);
 
         List<StoredArtifact> artifacts = result.getArtifacts();
         assertEquals(2, artifacts.size());
@@ -201,7 +190,7 @@ public class ExecutableCommandTest extends PulseTestCase
         assertEquals(1, artifact.getChildren().size());
 
         StoredFileArtifact envArtifact = artifact.getChildren().get(0);
-        assertEquals(ExecutableCommand.ENV_ARTIFACT_NAME + "/env.txt", envArtifact.getPath());
+        assertEquals(ExecutableCommand.ENV_NAME + "/env.txt", envArtifact.getPath());
         assertEquals("text/plain", envArtifact.getType());
 
         String output = getEnv();
@@ -316,12 +305,12 @@ public class ExecutableCommandTest extends PulseTestCase
 
     private String getEnv() throws IOException
     {
-        return IOUtils.fileToString(new File(outputDirectory, ExecutableCommand.ENV_ARTIFACT_NAME + "/env.txt"));
+        return IOUtils.fileToString(new File(outputDirectory, ExecutableCommand.ENV_NAME + "/env.txt"));
     }
 
-    private void execute(Command command, CommandResult result)
+    private void execute(ExecutableCommand command, CommandResult result)
     {
-        CommandContext context = new CommandContext(new SimpleRecipePaths(baseDirectory, outputDirectory), outputDirectory, null);
+        CommandContext context = new CommandContext(new SimpleRecipePaths(baseDirectory, null), outputDirectory, null);
         command.execute(context, result);
     }
 

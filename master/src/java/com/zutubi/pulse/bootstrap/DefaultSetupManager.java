@@ -13,7 +13,6 @@ import com.zutubi.pulse.util.IOUtils;
 import java.io.*;
 import java.util.List;
 import java.util.Properties;
-import java.util.LinkedList;
 
 /**
  * <class-comment/>
@@ -28,24 +27,24 @@ public class DefaultSetupManager implements SetupManager
     /**
      * Contexts for Stage A: the database.
      */
-    private List<String> daoContexts = new LinkedList<String>();
+    private List<String> daoContexts;
 
     /**
      * Contexts for Stage B: the upgrade system.
      */
-    private List<String> upgradeContexts = new LinkedList<String>();
+    private List<String> upgradeContexts;
 
     /**
      * Contexts for Stage C: setup / configuration.
      */
-    private List<String> setupContexts = new LinkedList<String>();
+    private List<String> setupContexts;
 
     /**
      * Contexts for Stage D: application startup.
      */
-    private List<String> startupContexts = new LinkedList<String>();
+    private List<String> startupContexts;
 
-    private List<String> postStartupContexts = new LinkedList<String>();
+    private List<String> postStartupContexts;
 
     private SetupState state = SetupState.STARTING;
 

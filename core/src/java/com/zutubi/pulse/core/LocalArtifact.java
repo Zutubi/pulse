@@ -16,11 +16,11 @@ import java.util.List;
 /**
  * An artifact represents a by product of the build process that is considered important enough persist beyond the
  * lifecycle of a build.
- * <p/>
+ *
  * This LocalArtifact class defines the base class for artifact element definitions that are used within the pulse file.
- * <p/>
+ *
  * For example:  <artifact name='myOutput' fail-if-not-present='false'/>
- * <p/>
+ *
  * The name of the artifact needs to be unique (todo: check the scope of the required uniquness...)
  */
 public abstract class LocalArtifact implements Artifact
@@ -43,7 +43,7 @@ public abstract class LocalArtifact implements Artifact
 
     /**
      * The list of references to processors that will be applied to this artifact.
-     * <p/>
+     *
      * These processors will later be responsible for extracting features from the artifact.
      */
     private List<ProcessArtifact> processes = new LinkedList<ProcessArtifact>();
@@ -62,9 +62,7 @@ public abstract class LocalArtifact implements Artifact
      *
      * @return the name of the artifact.
      */
-    @Required
-    @Name
-    public String getName()
+    @Required @Name public String getName()
     {
         return name;
     }
@@ -106,7 +104,7 @@ public abstract class LocalArtifact implements Artifact
 
     /**
      * This is a factory method that allows artifact processors to be associated with the artifact.
-     * <p/>
+     *
      * This allows the <process/> child element to be used with artifacts.
      *
      * @return the new instance of the processor reference.
@@ -118,31 +116,27 @@ public abstract class LocalArtifact implements Artifact
         return p;
     }
 
-    public void setProcesses(List<ProcessArtifact> processes)
-    {
-        this.processes = processes;
-    }
-
     /**
      * This method is a utility method available to handle the coping of an artifact into persistent storage and
      * running its post processors
      *
-     * @param artifact is the artifact entity to which the file belongs.
-     * @param fromFile is the source file. That is, the artifact file in the working directory.
-     * @param path     is the path relative to the output directory to which the fromFile will be copied.
-     * @param result   is the command result instance to which this artifact belongs. If processing of this artifact
-     *                 identifies any error features, it is this command result that will be marked as failed.
-     * @param context  context for execution of the command
-     * @param type     is the mime type of the artifact.
+     * @param artifact  is the artifact entity to which the file belongs.
+     * @param fromFile  is the source file. That is, the artifact file in the working directory.
+     * @param path      is the path relative to the output directory to which the fromFile will be copied.
+     * @param result    is the command result instance to which this artifact belongs. If processing of this artifact
+     *                  identifies any error features, it is this command result that will be marked as failed.
+     * @param context   context for execution of the command
+     * @param type      is the mime type of the artifact.
+     *
      * @return true if captured, false if ingored
      */
     protected boolean captureFile(StoredArtifact artifact, File fromFile, String path, CommandResult result, CommandContext context, String type)
     {
-        if (ignoreStale && fromFile.lastModified() < context.getRecipeStartTime())
+        if(ignoreStale && fromFile.lastModified() < context.getRecipeStartTime())
         {
             return false;
         }
-
+        
         File toFile = new File(context.getOutputDir(), path);
         File parent = toFile.getParentFile();
 
@@ -153,7 +147,7 @@ public abstract class LocalArtifact implements Artifact
             StoredFileArtifact fileArtifact = new StoredFileArtifact(path, type);
             artifact.add(fileArtifact);
 
-            for (ProcessArtifact process : processes)
+            for(ProcessArtifact process: processes)
             {
                 process.getProcessor().process(fileArtifact, result, context);
             }
@@ -163,14 +157,6 @@ public abstract class LocalArtifact implements Artifact
         catch (IOException e)
         {
             throw new BuildException("Unable to collect file '" + fromFile.getAbsolutePath() + "' for artifact '" + getName() + "': " + e.getMessage(), e);
-        }
-    }
-
-    protected void processArtifact(StoredFileArtifact fileArtifact, CommandResult result, CommandContext context)
-    {
-        for (ProcessArtifact process : processes)
-        {
-            process.getProcessor().process(fileArtifact, result, context);
         }
     }
 }

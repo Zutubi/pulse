@@ -13,7 +13,7 @@ public class SleepCommand extends CommandSupport
     /**
      * Number of milliseconds to sleep.
      */
-    private long interval;
+    private int interval;
     private Semaphore terminatedSemaphore = new Semaphore(0);
 
     public void execute(CommandContext context, CommandResult result)
@@ -31,12 +31,7 @@ public class SleepCommand extends CommandSupport
         }
     }
 
-    /**
-     * The sleep interval in milliseconds.
-     *
-     * @param interval value.
-     */
-    public void setInterval(long interval)
+    public void setInterval(int interval)
     {
         this.interval = interval;
     }
