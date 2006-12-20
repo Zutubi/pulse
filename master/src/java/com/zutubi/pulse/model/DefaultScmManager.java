@@ -132,7 +132,7 @@ public class DefaultScmManager implements ScmManager, Stoppable
                     long start = System.currentTimeMillis();
                     process(scm);
                     long end = System.currentTimeMillis();
-//                    System.out.println("MONITOR TOOK: " + ((end - start)/Constants.SECOND));
+                    LOG.debug("Scm polling took " + ((end - start)/Constants.SECOND) + " seconds.");
                 }
             });
         }
@@ -142,7 +142,6 @@ public class DefaultScmManager implements ScmManager, Stoppable
             try
             {
                 Thread.sleep(Constants.SECOND);
-//                System.out.println("_q: " + executor.getQueue().size() + " _a: " + executor.getActiveCount());
             }
             catch (InterruptedException e)
             {
@@ -150,13 +149,6 @@ public class DefaultScmManager implements ScmManager, Stoppable
                 LOG.debug(e);
             }
         }
-
-/*
-        if (executor.getPoolSize() < 10)
-        {
-            LOG.error("Scm polling pool size has dropped below minimum. Size is now: " + executor.getPoolSize());
-        }
-*/
     }
 
     private void process(Scm scm)
@@ -244,7 +236,7 @@ public class DefaultScmManager implements ScmManager, Stoppable
             // warning and move on.
             // This needs to be brought to the attention of the user since its likely to
             // be the result of a configuration problem.
-            LOG.warning(e.getMessage());
+            LOG.warning(e.getMessage(), e);
         }
     }
 

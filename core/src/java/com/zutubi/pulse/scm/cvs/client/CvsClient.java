@@ -10,6 +10,7 @@ import com.zutubi.pulse.scm.cvs.client.commands.UpdateListener;
 import com.zutubi.pulse.scm.cvs.client.commands.VersionCommand;
 import com.zutubi.pulse.scm.cvs.client.util.CvsUtils;
 import com.zutubi.pulse.util.logging.Logger;
+import com.zutubi.pulse.util.Constants;
 import org.netbeans.lib.cvsclient.CVSRoot;
 import org.netbeans.lib.cvsclient.Client;
 import org.netbeans.lib.cvsclient.admin.StandardAdminHandler;
@@ -18,8 +19,8 @@ import org.netbeans.lib.cvsclient.command.CommandAbortedException;
 import org.netbeans.lib.cvsclient.command.CommandException;
 import org.netbeans.lib.cvsclient.command.GlobalOptions;
 import org.netbeans.lib.cvsclient.command.checkout.CheckoutCommand;
-import org.netbeans.lib.cvsclient.command.log.RlogCommand;
 import org.netbeans.lib.cvsclient.command.log.LogInformation;
+import org.netbeans.lib.cvsclient.command.log.RlogCommand;
 import org.netbeans.lib.cvsclient.command.status.StatusCommand;
 import org.netbeans.lib.cvsclient.command.status.StatusInformation;
 import org.netbeans.lib.cvsclient.command.tag.RtagCommand;
@@ -27,28 +28,54 @@ import org.netbeans.lib.cvsclient.command.update.UpdateCommand;
 import org.netbeans.lib.cvsclient.connection.AuthenticationException;
 import org.netbeans.lib.cvsclient.connection.Connection;
 import org.netbeans.lib.cvsclient.event.CVSListener;
+import org.netbeans.lib.cvsclient.event.CVSAdapter;
+import org.netbeans.lib.cvsclient.event.MessageEvent;
 
 import java.io.File;
+import java.lang.reflect.Field;
 import java.text.SimpleDateFormat;
 import java.util.List;
 import java.util.TimeZone;
+import java.util.logging.Level;
 
 /**
  *
  */
 public class CvsClient
 {
-    private static final Logger LOG = Logger.getLogger(CvsClient.class);
+    public static final Logger LOG = Logger.getLogger(CvsClient.class);
+
+    private static int COMMAND_COUNT = 0;
 
     private static final SimpleDateFormat SERVER_DATE;
     static
     {
         SERVER_DATE = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss z");
         SERVER_DATE.setTimeZone(TimeZone.getTimeZone("GMT"));
+
+        try
+        {
+            Field outLogStream = org.netbeans.lib.cvsclient.util.Logger.class.getDeclaredField("outLogStream");
+            Field inLogStream = org.netbeans.lib.cvsclient.util.Logger.class.getDeclaredField("inLogStream");
+            Field logging = org.netbeans.lib.cvsclient.util.Logger.class.getDeclaredField("logging");
+
+            outLogStream.setAccessible(true);
+            inLogStream.setAccessible(true);
+            logging.setAccessible(true);
+
+            outLogStream.set(org.netbeans.lib.cvsclient.util.Logger.class, new LoggingOutputStream(CvsClient.LOG, Level.FINER));
+            inLogStream.set(org.netbeans.lib.cvsclient.util.Logger.class, new LoggingOutputStream(CvsClient.LOG, Level.FINEST));
+            logging.set(org.netbeans.lib.cvsclient.util.Logger.class, Boolean.TRUE);
+        }
+        catch (Exception e)
+        {
+            LOG.warning(e);
+        }
     }
 
     private CVSRoot root;
     private String password;
+    private static final String RLOG_SUPPRESS_HEADER = "cvs.rlog.suppressHeader";
 
     public CvsClient()
     {
@@ -83,7 +110,6 @@ public class CvsClient
 
     public void update(File workingDirectory, CvsRevision revision, CVSListener listener) throws SCMException
     {
-
         UpdateCommand update = new UpdateCommand();
         update.setPruneDirectories(true);
         update.setBuildDirectories(true);
@@ -186,7 +212,17 @@ public class CvsClient
     {
         RlogCommand rlog = new RlogCommand();
         rlog.setModule(module);
-        rlog.setSuppressHeader(!verbose);
+
+        // allow users to bypass 
+        boolean useSuppressHeader = true;
+        if (System.getProperties().containsKey(RLOG_SUPPRESS_HEADER))
+        {
+            useSuppressHeader = Boolean.getBoolean(RLOG_SUPPRESS_HEADER);
+        }
+        if (useSuppressHeader && !verbose)
+        {
+            rlog.setSuppressHeader(true);
+        }
 
         String branch = from == null ? to == null ? null : to.getBranch() : from.getBranch();
         if (TextUtils.stringSet(branch))
@@ -294,10 +330,18 @@ public class CvsClient
                 client.setLocalPath(localPath.getAbsolutePath());
             }
 
-//            LOG.info("Executing cvs command: " + command.getCVSCommand());
+            client.getEventManager().addCVSListener(new CVSAdapter()
+            {
+                public void messageSent(MessageEvent e)
+                {
+                    LOG.finer(e.getMessage() + "\n");
+                }
+            });
+
             long time = System.currentTimeMillis();
             try
             {
+                CvsDebugFormatter.contextHolder.set("" + (++COMMAND_COUNT)); // include the id of the scm?..
                 if (!client.executeCommand(command, globalOptions))
                 {
                     LOG.warning("Cvs command: -d "+root+" '" + command.getCVSCommand() + "' has failed.");
@@ -307,7 +351,8 @@ public class CvsClient
             }
             finally
             {
-//                LOG.info("Elapsed time: " + ((System.currentTimeMillis() - time)/ Constants.SECOND) + " second(s)");
+                LOG.finer("Elapsed time: " + ((System.currentTimeMillis() - time)/ Constants.SECOND) + " second(s)");
+                CvsDebugFormatter.contextHolder.set(null);
             }
         }
         catch (AuthenticationException ae)
