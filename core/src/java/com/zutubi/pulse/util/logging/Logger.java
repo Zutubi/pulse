@@ -159,6 +159,16 @@ public class Logger
         delegate.logp(Level.FINEST, sourceClass, sourceMethod, msg, t);
     }
 
+    public void log(Level level, String msg)
+    {
+        if (!isLoggable(level))
+        {
+            return;
+        }
+        inferCaller();
+        delegate.log(level, msg);
+    }
+
     public void debug(String msg)
     {
         finest(msg);

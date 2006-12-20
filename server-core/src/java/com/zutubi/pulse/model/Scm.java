@@ -1,17 +1,10 @@
 package com.zutubi.pulse.model;
 
-import com.opensymphony.util.TextUtils;
-import com.zutubi.pulse.core.FileLoadException;
-import com.zutubi.pulse.core.Scope;
-import com.zutubi.pulse.core.VariableHelper;
 import com.zutubi.pulse.core.model.Entity;
-import com.zutubi.pulse.core.model.Property;
-import com.zutubi.pulse.core.model.Revision;
 import com.zutubi.pulse.scm.SCMException;
 import com.zutubi.pulse.scm.SCMServer;
 import com.zutubi.pulse.util.logging.Logger;
 
-import java.text.SimpleDateFormat;
 import java.util.*;
 
 /**
@@ -21,7 +14,6 @@ import java.util.*;
 public abstract class Scm extends Entity implements Cloneable
 {
     private static final Logger LOG = Logger.getLogger(Scm.class);
-
 
     private String path;
     private Properties properties;

@@ -18,7 +18,7 @@ public class MemoryHandlerFactory implements HandlerFactory
             size = 1000;
         }
 
-        Handler target = null;
+        Handler target;
         try
         {
             String clsName = config.getProperty(name + ".target");
@@ -33,7 +33,6 @@ public class MemoryHandlerFactory implements HandlerFactory
         Level pushLevel = LogUtils.getLevel(config, name+".push", Level.SEVERE);
 
         MemoryHandler handler = new MemoryHandler(target, size, pushLevel);
-
 
         handler.setLevel(LogUtils.getLevel(config, name + ".level", Level.ALL));
         handler.setFilter(LogUtils.getFilter(config, name +".filter", null));
