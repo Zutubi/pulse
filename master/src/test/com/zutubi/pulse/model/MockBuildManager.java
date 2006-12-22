@@ -226,6 +226,11 @@ public class MockBuildManager implements BuildManager
         throw new RuntimeException("Method not implemented.");
     }
 
+    public Boolean canDecorateArtifact(StoredFileArtifact artifact)
+    {
+        throw new RuntimeException("Method not implemented.");
+    }
+
     public List<Changelist> getLatestChangesForProject(Project project, int max)
     {
         throw new RuntimeException("Method not implemented.");
