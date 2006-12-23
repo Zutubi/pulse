@@ -287,7 +287,7 @@ public class CvsServer extends CachingSCMServer
         LogInformationAnalyser analyser = new LogInformationAnalyser(getUid(), CVSRoot.parse(root));
 
         String branch = (from != null) ? from.getBranch() : (to != null) ? to.getBranch() : null;
-        List<Changelist> changes = analyser.extract(info, branch);
+        List<Changelist> changes = analyser.extractChangelists(info, branch);
 
         // process excludes from the changelist.
         changes = filterExcludes(changes, new ScmFilepathFilter(excludedPaths));
@@ -381,20 +381,15 @@ public class CvsServer extends CachingSCMServer
         LogInformationAnalyser analyser = new LogInformationAnalyser(getUid(), CVSRoot.parse(root));
 
         Calendar cal = Calendar.getInstance();
-        for (int hour = 1; hour < 24; hour = hour * 2)
+        cal.add(Calendar.DAY_OF_YEAR, -1);
+
+        CvsRevision since = new CvsRevision("", branch, "", cal.getTime());
+
+        Date latestUpdate = analyser.latestUpdate(client.rlog(module, since, null));
+        if (latestUpdate != null)
         {
-            // the longer its been without a change, the longer bigger the jumps we
-            // can take since the repo is less and less used..
-            cal.add(Calendar.HOUR, -1 * hour);
-
-            CvsRevision since = new CvsRevision("", branch, "", cal.getTime());
-
-            Date latestUpdate = analyser.latestUpdate(client.rlog(module, since, null));
-            if (latestUpdate != null)
-            {
-                // should we be returning the author and comment of the latest update as well?... probably :|
-                return new CvsRevision("", branch, "", latestUpdate);
-            }
+            // should we be returning the author and comment of the latest update as well?... probably :|
+            return new CvsRevision("", branch, "", latestUpdate);
         }
 
         // If the cvs server is ahead of this host, then any changes would have been picked
@@ -403,7 +398,6 @@ public class CvsServer extends CachingSCMServer
         // Assuming that the time is no more then 24 hours behind, we can assume
         // that the latest calendar time will give us a reasonable starting point.
 
-        // need to ensure that the specified date is server centric.
         CvsRevision result = new CvsRevision("", branch, "", cal.getTime());
         LOG.exiting(result);
         return result;

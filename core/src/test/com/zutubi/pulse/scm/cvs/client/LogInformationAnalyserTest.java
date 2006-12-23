@@ -1,8 +1,3 @@
-// Decompiled by Jad v1.5.8f. Copyright 2001 Pavel Kouznetsov.
-// Jad home page: http://www.kpdus.com/jad.html
-// Decompiler options: packimports(3) 
-// Source File Name:   LogInformationAnalyserTest.java
-
 package com.zutubi.pulse.scm.cvs.client;
 
 import com.zutubi.pulse.core.model.*;
@@ -17,243 +12,255 @@ import org.netbeans.lib.cvsclient.command.log.LogInformation;
 import org.netbeans.lib.cvsclient.connection.AuthenticationException;
 import org.netbeans.lib.cvsclient.util.Logger;
 
-// Referenced classes of package com.zutubi.pulse.scm.cvs.client:
-//            CvsClient, LogInformationAnalyser
-
+/**
+ *
+ * 
+ */
 public class LogInformationAnalyserTest extends PulseTestCase
 {
+    private static final SimpleDateFormat LOCAL_DATE;
+    private static final SimpleDateFormat SERVER_DATE;
+
+    static 
+    {
+        LOCAL_DATE = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        LOCAL_DATE.setTimeZone(TimeZone.getTimeZone("EST"));
+        SERVER_DATE = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss z");
+        SERVER_DATE.setTimeZone(TimeZone.getTimeZone("GMT"));
+    }
+
+    private CvsClient cvs;
+    private LogInformationAnalyser analyser;
 
     public LogInformationAnalyserTest()
     {
     }
 
-    protected void setUp()
-        throws Exception
+    protected void setUp() throws Exception
     {
         super.setUp();
         Logger.setLogging("system");
-        String cvsRoot = ":ext:cvstester:cvs@www.cinnamonbob.com:/cvsroot";
+
+        String cvsRoot = ":ext:cvstester:cvs@192.168.1.99:/cvsroot";
         cvs = new CvsClient();
         cvs.setRoot(CVSRoot.parse(cvsRoot));
         analyser = new LogInformationAnalyser("test", CVSRoot.parse(cvsRoot));
     }
 
-    public void testGetChangesBetween()
-        throws Exception
+    protected void tearDown() throws Exception
+    {
+        cvs = null;
+        analyser = null;
+    }
+
+    public void testGetChangesBetween() throws Exception
     {
         String module = "unit-test/CvsWorkerTest/testChangeDetails";
         CvsRevision fromRevision = new CvsRevision(null, null, null, SERVER_DATE.parse("2006-03-10 00:59:00 GMT"));
         CvsRevision toRevision = new CvsRevision(null, null, null, SERVER_DATE.parse("2006-03-10 01:00:00 GMT"));
-        List infos = cvs.rlog(module, fromRevision, toRevision);
-        List changes = analyser.extract(infos, null);
+        List<LogInformation> infos = cvs.rlog(module, fromRevision, toRevision);
+        List<Changelist> changes = analyser.extractChangelists(infos, null);
         assertEquals(2, changes.size());
         assertValidChangeSets(changes);
-        Changelist changelist = (Changelist)changes.get(0);
+        Changelist changelist = changes.get(0);
         assertEquals("daniel", changelist.getUser());
         assertEquals("file1.txt modified by author a\n", changelist.getComment());
         assertEquals(1, changelist.getChanges().size());
         assertCvsRevision(changelist.getRevision(), "daniel", "", "file1.txt modified by author a\n");
-        Change change = (Change)changelist.getChanges().get(0);
+        Change change = changelist.getChanges().get(0);
         assertEquals("/unit-test/CvsWorkerTest/testChangeDetails/Attic/file1.txt", change.getFilename());
         assertEquals(com.zutubi.pulse.core.model.Change.Action.EDIT, change.getAction());
         assertEquals("1.2", change.getRevision().toString());
-        changelist = (Changelist)changes.get(1);
+        changelist = changes.get(1);
         assertEquals("daniel", changelist.getUser());
         assertEquals("file1.txt deleted by author a\n", changelist.getComment());
         assertEquals(1, changelist.getChanges().size());
         assertCvsRevision(changelist.getRevision(), "daniel", "", "file1.txt deleted by author a\n");
-        change = (Change)changelist.getChanges().get(0);
+        change = changelist.getChanges().get(0);
         assertEquals("/unit-test/CvsWorkerTest/testChangeDetails/Attic/file1.txt", change.getFilename());
         assertEquals(com.zutubi.pulse.core.model.Change.Action.DELETE, change.getAction());
         assertEquals("1.3", change.getRevision().toString());
     }
 
-    public void testChangeDetails()
-        throws SCMException, ParseException, CommandException, AuthenticationException
+    public void testChangeDetails() throws Exception
     {
         String module = "unit-test/CvsWorkerTest/testChangeDetails";
         CvsRevision fromRevision = new CvsRevision(null, null, null, SERVER_DATE.parse("2006-02-10 00:59:00 GMT"));
         CvsRevision toRevision = new CvsRevision(null, null, null, SERVER_DATE.parse("2006-04-10 01:00:00 GMT"));
-        List infos = cvs.rlog(module, fromRevision, toRevision);
-        List changes = analyser.extract(infos, null);
+        List<LogInformation> infos = cvs.rlog(module, fromRevision, toRevision);
+        List<Changelist> changes = analyser.extractChangelists(infos, null);
         assertEquals(4, changes.size());
         assertValidChangeSets(changes);
-        Changelist changelist = (Changelist)changes.get(0);
+        Changelist changelist = changes.get(0);
         assertEquals("daniel", changelist.getUser());
         assertEquals("file1.txt checked in by author a\n", changelist.getComment());
         assertEquals(1, changelist.getChanges().size());
         assertCvsRevision(changelist.getRevision(), "daniel", "", "file1.txt checked in by author a\n");
-        Change change = (Change)changelist.getChanges().get(0);
+        Change change = changelist.getChanges().get(0);
         assertEquals("/unit-test/CvsWorkerTest/testChangeDetails/Attic/file1.txt", change.getFilename());
         assertEquals(com.zutubi.pulse.core.model.Change.Action.ADD, change.getAction());
         assertEquals("1.1", change.getRevision().toString());
-        changelist = (Changelist)changes.get(1);
+        changelist = changes.get(1);
         assertEquals("daniel", changelist.getUser());
         assertEquals("file1.txt modified by author a\n", changelist.getComment());
         assertEquals(1, changelist.getChanges().size());
         assertCvsRevision(changelist.getRevision(), "daniel", "", "file1.txt modified by author a\n");
-        change = (Change)changelist.getChanges().get(0);
+        change = changelist.getChanges().get(0);
         assertEquals("/unit-test/CvsWorkerTest/testChangeDetails/Attic/file1.txt", change.getFilename());
         assertEquals(com.zutubi.pulse.core.model.Change.Action.EDIT, change.getAction());
         assertEquals("1.2", change.getRevision().toString());
-        changelist = (Changelist)changes.get(2);
+        changelist = changes.get(2);
         assertEquals("daniel", changelist.getUser());
         assertEquals("file1.txt deleted by author a\n", changelist.getComment());
         assertEquals(1, changelist.getChanges().size());
         assertCvsRevision(changelist.getRevision(), "daniel", "", "file1.txt deleted by author a\n");
-        change = (Change)changelist.getChanges().get(0);
+        change = changelist.getChanges().get(0);
         assertEquals("/unit-test/CvsWorkerTest/testChangeDetails/Attic/file1.txt", change.getFilename());
         assertEquals(com.zutubi.pulse.core.model.Change.Action.DELETE, change.getAction());
         assertEquals("1.3", change.getRevision().toString());
-        changelist = (Changelist)changes.get(3);
+        changelist = changes.get(3);
         assertEquals("daniel", changelist.getUser());
         assertEquals("file2.txt checked in by author a\n", changelist.getComment());
         assertEquals(1, changelist.getChanges().size());
         assertCvsRevision(changelist.getRevision(), "daniel", "", "file2.txt checked in by author a\n");
-        change = (Change)changelist.getChanges().get(0);
+        change = changelist.getChanges().get(0);
         assertEquals("/unit-test/CvsWorkerTest/testChangeDetails/file2.txt", change.getFilename());
         assertEquals(com.zutubi.pulse.core.model.Change.Action.ADD, change.getAction());
         assertEquals("1.1", change.getRevision().toString());
     }
 
-    public void testChangesByDifferentAuthors()
-        throws Exception
+    public void testChangesByDifferentAuthors() throws Exception
     {
         String module = "unit-test/CvsWorkerTest/testChangesByDifferentAuthors";
         CvsRevision fromRevision = new CvsRevision(null, null, null, SERVER_DATE.parse("2006-01-10 00:00:00 GMT"));
         CvsRevision toRevision = new CvsRevision(null, null, null, SERVER_DATE.parse("2006-04-10 00:00:00 GMT"));
-        List infos = cvs.rlog(module, fromRevision, toRevision);
-        List changes = analyser.extract(infos, null);
+        List<LogInformation> infos = cvs.rlog(module, fromRevision, toRevision);
+        List<Changelist> changes = analyser.extractChangelists(infos, null);
         assertEquals(2, changes.size());
         assertValidChangeSets(changes);
-        Changelist changelist = (Changelist)changes.get(0);
+        Changelist changelist = changes.get(0);
         assertChangelistValues(changelist, "daniel", "file1.txt checked in by author a\n");
         assertEquals(1, changelist.getChanges().size());
-        assertChangeValues((Change)changelist.getChanges().get(0), "file1.txt", com.zutubi.pulse.core.model.Change.Action.ADD, "1.1");
+        assertChangeValues(changelist.getChanges().get(0), "file1.txt", com.zutubi.pulse.core.model.Change.Action.ADD, "1.1");
         assertCvsRevision(changelist.getRevision(), "daniel", "", "file1.txt checked in by author a\n");
-        changelist = (Changelist)changes.get(1);
+        changelist = changes.get(1);
         assertChangelistValues(changelist, "jason", "file2.txt checked in by author b\n");
         assertEquals(1, changelist.getChanges().size());
-        assertChangeValues((Change)changelist.getChanges().get(0), "file2.txt", com.zutubi.pulse.core.model.Change.Action.ADD, "1.1");
+        assertChangeValues(changelist.getChanges().get(0), "file2.txt", com.zutubi.pulse.core.model.Change.Action.ADD, "1.1");
         assertCvsRevision(changelist.getRevision(), "jason", "", "file2.txt checked in by author b\n");
     }
 
-    public void testChangesByOverlappingCommits()
-        throws SCMException, ParseException, CommandException, AuthenticationException
+    public void testChangesByOverlappingCommits() throws Exception
     {
         String module = "unit-test/CvsWorkerTest/testChangesByOverlappingCommits";
         CvsRevision fromRevision = new CvsRevision(null, null, null, SERVER_DATE.parse("2006-01-10 00:00:00 GMT"));
         CvsRevision toRevision = new CvsRevision(null, null, null, SERVER_DATE.parse("2006-04-10 00:00:00 GMT"));
-        List infos = cvs.rlog(module, fromRevision, toRevision);
-        List changes = analyser.extract(infos, null);
+        List<LogInformation> infos = cvs.rlog(module, fromRevision, toRevision);
+        List<Changelist> changes = analyser.extractChangelists(infos, null);
         assertEquals(3, changes.size());
         assertValidChangeSets(changes);
-        Changelist changelist = (Changelist)changes.get(0);
+        Changelist changelist = changes.get(0);
         assertChangelistValues(changelist, "daniel", "file1.txt and file2.txt and file3.txt and file4.txt are checked in by author a\n");
-        assertChangeValues((Change)changelist.getChanges().get(0), "file1.txt", com.zutubi.pulse.core.model.Change.Action.ADD, "1.1");
-        assertChangeValues((Change)changelist.getChanges().get(1), "file2.txt", com.zutubi.pulse.core.model.Change.Action.ADD, "1.1");
-        assertChangeValues((Change)changelist.getChanges().get(2), "file3.txt", com.zutubi.pulse.core.model.Change.Action.ADD, "1.1");
-        assertChangeValues((Change)changelist.getChanges().get(3), "file4.txt", com.zutubi.pulse.core.model.Change.Action.ADD, "1.1");
+        assertChangeValues(changelist.getChanges().get(0), "file1.txt", com.zutubi.pulse.core.model.Change.Action.ADD, "1.1");
+        assertChangeValues(changelist.getChanges().get(1), "file2.txt", com.zutubi.pulse.core.model.Change.Action.ADD, "1.1");
+        assertChangeValues(changelist.getChanges().get(2), "file3.txt", com.zutubi.pulse.core.model.Change.Action.ADD, "1.1");
+        assertChangeValues(changelist.getChanges().get(3), "file4.txt", com.zutubi.pulse.core.model.Change.Action.ADD, "1.1");
         assertCvsRevision(changelist.getRevision(), "daniel", "", "file1.txt and file2.txt and file3.txt and file4.txt are checked in by author a\n");
-        changelist = (Changelist)changes.get(1);
+        changelist = changes.get(1);
         assertChangelistValues(changelist, "daniel", "x\n");
-        assertChangeValues((Change)changelist.getChanges().get(0), "file1.txt", com.zutubi.pulse.core.model.Change.Action.EDIT, "1.2");
-        assertChangeValues((Change)changelist.getChanges().get(1), "file3.txt", com.zutubi.pulse.core.model.Change.Action.EDIT, "1.2");
+        assertChangeValues(changelist.getChanges().get(0), "file1.txt", com.zutubi.pulse.core.model.Change.Action.EDIT, "1.2");
+        assertChangeValues(changelist.getChanges().get(1), "file3.txt", com.zutubi.pulse.core.model.Change.Action.EDIT, "1.2");
         assertCvsRevision(changelist.getRevision(), "daniel", "", "x\n");
-        changelist = (Changelist)changes.get(2);
+        changelist = changes.get(2);
         assertChangelistValues(changelist, "jason", "y\n");
-        assertChangeValues((Change)changelist.getChanges().get(0), "file2.txt", com.zutubi.pulse.core.model.Change.Action.EDIT, "1.2");
-        assertChangeValues((Change)changelist.getChanges().get(1), "file4.txt", com.zutubi.pulse.core.model.Change.Action.EDIT, "1.2");
+        assertChangeValues(changelist.getChanges().get(0), "file2.txt", com.zutubi.pulse.core.model.Change.Action.EDIT, "1.2");
+        assertChangeValues(changelist.getChanges().get(1), "file4.txt", com.zutubi.pulse.core.model.Change.Action.EDIT, "1.2");
         assertCvsRevision(changelist.getRevision(), "jason", "", "y\n");
     }
 
-    public void testChangesWithRemoval()
-        throws SCMException, ParseException, CommandException, AuthenticationException
+    public void testChangesWithRemoval() throws Exception
     {
         String module = "unit-test/CvsWorkerTest/testChangesWithRemoval";
         CvsRevision fromRevision = new CvsRevision(null, null, null, SERVER_DATE.parse("2006-01-10 00:00:00 GMT"));
         CvsRevision toRevision = new CvsRevision(null, null, null, SERVER_DATE.parse("2006-04-10 00:00:00 GMT"));
-        List infos = cvs.rlog(module, fromRevision, toRevision);
-        List changes = analyser.extract(infos, null);
+        List<LogInformation> infos = cvs.rlog(module, fromRevision, toRevision);
+        List<Changelist> changes = analyser.extractChangelists(infos, null);
         assertEquals(4, changes.size());
         assertValidChangeSets(changes);
-        Changelist changelist = (Changelist)changes.get(0);
+        Changelist changelist = changes.get(0);
         assertChangelistValues(changelist, "daniel", "file1.txt checked in by author a\n");
-        assertChangeValues((Change)changelist.getChanges().get(0), "file1.txt", com.zutubi.pulse.core.model.Change.Action.ADD, "1.1");
+        assertChangeValues(changelist.getChanges().get(0), "file1.txt", com.zutubi.pulse.core.model.Change.Action.ADD, "1.1");
         assertCvsRevision(changelist.getRevision(), "daniel", "", "file1.txt checked in by author a\n");
-        changelist = (Changelist)changes.get(1);
+        changelist = changes.get(1);
         assertChangelistValues(changelist, "daniel", "file1.txt removed by author a\n");
-        assertChangeValues((Change)changelist.getChanges().get(0), "file1.txt", com.zutubi.pulse.core.model.Change.Action.DELETE, "1.2");
+        assertChangeValues(changelist.getChanges().get(0), "file1.txt", com.zutubi.pulse.core.model.Change.Action.DELETE, "1.2");
         assertCvsRevision(changelist.getRevision(), "daniel", "", "file1.txt removed by author a\n");
-        changelist = (Changelist)changes.get(2);
+        changelist = changes.get(2);
         assertChangelistValues(changelist, "daniel", "file1.txt re-checked in by author a\n");
-        assertChangeValues((Change)changelist.getChanges().get(0), "file1.txt", com.zutubi.pulse.core.model.Change.Action.ADD, "1.3");
+        assertChangeValues(changelist.getChanges().get(0), "file1.txt", com.zutubi.pulse.core.model.Change.Action.ADD, "1.3");
         assertCvsRevision(changelist.getRevision(), "daniel", "", "file1.txt re-checked in by author a\n");
-        changelist = (Changelist)changes.get(3);
+        changelist = changes.get(3);
         assertChangelistValues(changelist, "daniel", "file1.txt re-removed by author a\n");
-        assertChangeValues((Change)changelist.getChanges().get(0), "file1.txt", com.zutubi.pulse.core.model.Change.Action.DELETE, "1.4");
+        assertChangeValues(changelist.getChanges().get(0), "file1.txt", com.zutubi.pulse.core.model.Change.Action.DELETE, "1.4");
         assertCvsRevision(changelist.getRevision(), "daniel", "", "file1.txt re-removed by author a\n");
     }
 
-    public void testChangesWithAdd()
-        throws SCMException, ParseException, CommandException, AuthenticationException
+    public void testChangesWithAdd() throws Exception
     {
         String module = "unit-test/CvsWorkerTest/testChangesWithAdd";
         CvsRevision fromRevision = new CvsRevision(null, null, null, SERVER_DATE.parse("2006-01-10 00:00:00 GMT"));
         CvsRevision toRevision = new CvsRevision(null, null, null, SERVER_DATE.parse("2006-04-10 00:00:00 GMT"));
-        List infos = cvs.rlog(module, fromRevision, toRevision);
-        List changes = analyser.extract(infos, null);
+        List<LogInformation> infos = cvs.rlog(module, fromRevision, toRevision);
+        List<Changelist> changes = analyser.extractChangelists(infos, null);
         assertEquals(1, changes.size());
         assertValidChangeSets(changes);
-        Changelist changelist = (Changelist)changes.get(0);
+        Changelist changelist = changes.get(0);
         assertChangelistValues(changelist, "daniel", "file1.txt and file2.txt and dir/file3.txt checked in by author a\n");
-        assertChangeValues((Change)changelist.getChanges().get(0), "file1.txt", com.zutubi.pulse.core.model.Change.Action.ADD, "1.1");
-        assertChangeValues((Change)changelist.getChanges().get(1), "file2.txt", com.zutubi.pulse.core.model.Change.Action.ADD, "1.1");
-        assertChangeValues((Change)changelist.getChanges().get(2), "dir/file3.txt", com.zutubi.pulse.core.model.Change.Action.ADD, "1.1");
+        assertChangeValues(changelist.getChanges().get(0), "file1.txt", com.zutubi.pulse.core.model.Change.Action.ADD, "1.1");
+        assertChangeValues(changelist.getChanges().get(1), "file2.txt", com.zutubi.pulse.core.model.Change.Action.ADD, "1.1");
+        assertChangeValues(changelist.getChanges().get(2), "dir/file3.txt", com.zutubi.pulse.core.model.Change.Action.ADD, "1.1");
         assertCvsRevision(changelist.getRevision(), "daniel", "", "file1.txt and file2.txt and dir/file3.txt checked in by author a\n");
     }
 
-    public void testChangesWithModify()
-        throws SCMException, ParseException, CommandException, AuthenticationException
+    public void testChangesWithModify() throws Exception
     {
         String module = "unit-test/CvsWorkerTest/testChangesWithModify";
         CvsRevision fromRevision = new CvsRevision(null, null, null, SERVER_DATE.parse("2006-01-10 00:00:00 GMT"));
         CvsRevision toRevision = new CvsRevision(null, null, null, SERVER_DATE.parse("2006-04-10 00:00:00 GMT"));
-        List infos = cvs.rlog(module, fromRevision, toRevision);
-        List changes = analyser.extract(infos, null);
+        List<LogInformation> infos = cvs.rlog(module, fromRevision, toRevision);
+        List<Changelist> changes = analyser.extractChangelists(infos, null);
         assertEquals(3, changes.size());
         assertValidChangeSets(changes);
-        Changelist changelist = (Changelist)changes.get(0);
+        Changelist changelist = changes.get(0);
         assertChangelistValues(changelist, "daniel", "file1.txt checked in by author a\n");
-        assertChangeValues((Change)changelist.getChanges().get(0), "file1.txt", com.zutubi.pulse.core.model.Change.Action.ADD, "1.1");
+        assertChangeValues(changelist.getChanges().get(0), "file1.txt", com.zutubi.pulse.core.model.Change.Action.ADD, "1.1");
         assertCvsRevision(changelist.getRevision(), "daniel", "", "file1.txt checked in by author a\n");
-        changelist = (Changelist)changes.get(1);
+        changelist = changes.get(1);
         assertChangelistValues(changelist, "daniel", "file1.txt modified by author a\n");
-        assertChangeValues((Change)changelist.getChanges().get(0), "file1.txt", com.zutubi.pulse.core.model.Change.Action.EDIT, "1.2");
+        assertChangeValues(changelist.getChanges().get(0), "file1.txt", com.zutubi.pulse.core.model.Change.Action.EDIT, "1.2");
         assertCvsRevision(changelist.getRevision(), "daniel", "", "file1.txt modified by author a\n");
-        changelist = (Changelist)changes.get(2);
+        changelist = changes.get(2);
         assertChangelistValues(changelist, "daniel", "file1.txt modified by author a\n");
-        assertChangeValues((Change)changelist.getChanges().get(0), "file1.txt", com.zutubi.pulse.core.model.Change.Action.EDIT, "1.3");
+        assertChangeValues(changelist.getChanges().get(0), "file1.txt", com.zutubi.pulse.core.model.Change.Action.EDIT, "1.3");
         assertCvsRevision(changelist.getRevision(), "daniel", "", "file1.txt modified by author a\n");
     }
 
-    public void testChangesWithBranch()
-        throws SCMException, ParseException, CommandException, AuthenticationException
+    public void testChangesWithBranch() throws Exception
     {
         String module = "unit-test/CvsWorkerTest/testChangesWithBranch";
         CvsRevision fromRevision = new CvsRevision(null, "BRANCH", null, SERVER_DATE.parse("2006-01-10 00:00:00 GMT"));
         CvsRevision toRevision = new CvsRevision(null, "BRANCH", null, SERVER_DATE.parse("2006-04-10 00:00:00 GMT"));
-        List infos = cvs.rlog(module, fromRevision, toRevision);
-        List changes = analyser.extract(infos, "BRANCH");
+        List<LogInformation> infos = cvs.rlog(module, fromRevision, toRevision);
+        List<Changelist> changes = analyser.extractChangelists(infos, "BRANCH");
         assertEquals(2, changes.size());
         assertValidChangeSets(changes);
-        Changelist changelist = (Changelist)changes.get(0);
+        Changelist changelist = changes.get(0);
         assertChangelistValues(changelist, "daniel", "file3.txt checked in on BRANCH by author a\n");
-        assertChangeValues((Change)changelist.getChanges().get(0), "file3.txt", com.zutubi.pulse.core.model.Change.Action.ADD, "1.1.2.1");
+        assertChangeValues(changelist.getChanges().get(0), "file3.txt", com.zutubi.pulse.core.model.Change.Action.ADD, "1.1.2.1");
         assertCvsRevision(changelist.getRevision(), "daniel", "BRANCH", "file3.txt checked in on BRANCH by author a\n");
-        changelist = (Changelist)changes.get(1);
+        changelist = changes.get(1);
         assertChangelistValues(changelist, "daniel", "file1.txt modified on BRANCH by author a\n");
-        assertChangeValues((Change)changelist.getChanges().get(0), "file1.txt", com.zutubi.pulse.core.model.Change.Action.EDIT, "1.1.2.1");
+        assertChangeValues(changelist.getChanges().get(0), "file1.txt", com.zutubi.pulse.core.model.Change.Action.EDIT, "1.1.2.1");
         assertCvsRevision(changelist.getRevision(), "daniel", "BRANCH", "file1.txt modified on BRANCH by author a\n");
     }
 
@@ -264,61 +271,68 @@ public class LogInformationAnalyserTest extends PulseTestCase
         // a) expect 2 changes on branch - the add and the edit.
         // b) expect 1 change on head - initial add
 
-        CvsRevision fromRevision = new CvsRevision(null, "BRANCH", null, SERVER_DATE.parse("2006-01-10 00:00:00 GMT"));
-        CvsRevision toRevision = new CvsRevision(null, "BRANCH", null, SERVER_DATE.parse("2006-04-10 00:00:00 GMT"));
+        CvsRevision fromRevision = new CvsRevision(null, "BRANCH", null, SERVER_DATE.parse("2006-12-10 00:00:00 GMT"));
+        CvsRevision toRevision = new CvsRevision(null, "BRANCH", null, SERVER_DATE.parse("2006-12-30 00:00:00 GMT"));
 
-        String module = "unit-test/CvsWorkerTest/testChangesWithBranch";
+        String module = "unit-test/CvsWorkerTest/testAddToBranchDoesNotAppearOnHead";
 
         List<LogInformation> infos = cvs.rlog(module, fromRevision, toRevision);
-        List changes = analyser.extract(infos, "BRANCH");
-        assertEquals(2, changes.size());
+        List changes = analyser.extractChangelists(infos, "BRANCH");
+        assertEquals(1, changes.size());
 
         fromRevision.setBranch(null);
         toRevision.setBranch(null);
 
         infos = cvs.rlog(module, fromRevision, toRevision);
-        changes = analyser.extract(infos, "BRANCH");
+        changes = analyser.extractChangelists(infos, null);
 
-        assertEquals(1, changes.size());
+        assertEquals(0, changes.size());
     }
 
-    public void testChangesOnHeadAndBranch()
-        throws SCMException, ParseException, CommandException, AuthenticationException
+    public void testChangesOnHeadAndBranch() throws SCMException, ParseException, CommandException, AuthenticationException
     {
         String module = "unit-test/CvsWorkerTest/testChangesOnHeadAndBranch";
+
         CvsRevision fromRevision = new CvsRevision(null, null, null, SERVER_DATE.parse("2006-10-10 00:00:00 GMT"));
         CvsRevision toRevision = new CvsRevision(null, null, null, SERVER_DATE.parse("2006-10-18 00:00:00 GMT"));
-        List infos = cvs.rlog(module, fromRevision, toRevision);
-        List changes = analyser.extract(infos, null);
+
+        List<LogInformation> infos = cvs.rlog(module, fromRevision, toRevision);
+        List<Changelist> changes = analyser.extractChangelists(infos, null);
         assertEquals(2, changes.size());
-        Changelist changelist = (Changelist)changes.get(0);
+
+        Changelist changelist = changes.get(0);
         assertEquals("", changelist.getRevision().getBranch());
-        changelist = (Changelist)changes.get(1);
+        changelist = changes.get(1);
         assertEquals("", changelist.getRevision().getBranch());
+        
         fromRevision.setBranch("BRANCH");
         toRevision.setBranch("BRANCH");
+        
         infos = cvs.rlog(module, fromRevision, toRevision);
-        changes = analyser.extract(infos, "BRANCH");
+        changes = analyser.extractChangelists(infos, "BRANCH");
+
         assertEquals(1, changes.size());
-        changelist = (Changelist)changes.get(0);
-        assertEquals("BRANCH", changelist.getRevision().getBranch());
+        assertEquals("BRANCH", changes.get(0).getRevision().getBranch());
     }
 
-    public void testGetLatestRevisionSince()
-        throws SCMException, ParseException, CommandException, AuthenticationException
+    public void testGetLatestRevisionSince() throws Exception
     {
         String module = "unit-test/CvsWorkerTest/testGetLatestRevisionSince";
+
         CvsRevision since = new CvsRevision("", "", "", LOCAL_DATE.parse("2006-03-01 02:00:00"));
-        java.util.Date latestUpdate = analyser.latestUpdate(cvs.rlog(module, since, null));
+        Date latestUpdate = analyser.latestUpdate(cvs.rlog(module, since, null));
         assertEquals("2006-03-10 04:00:00 GMT", SERVER_DATE.format(latestUpdate));
+
         since = new CvsRevision("", "", "", LOCAL_DATE.parse("2006-03-12 02:00:00"));
         latestUpdate = analyser.latestUpdate(cvs.rlog(module, since, null));
         assertNull(latestUpdate);
+
         since = new CvsRevision("", "", "", SERVER_DATE.parse("2006-03-10 03:59:59 GMT"));
         latestUpdate = analyser.latestUpdate(cvs.rlog(module, since, null));
         assertEquals("2006-03-10 04:00:00 GMT", SERVER_DATE.format(latestUpdate));
+
         since = new CvsRevision("", "", "", latestUpdate);
-        java.util.Date otherLatest = analyser.latestUpdate(cvs.rlog(module, since, null));
+        Date otherLatest = analyser.latestUpdate(cvs.rlog(module, since, null));
         assertEquals(latestUpdate, otherLatest);
     }
 
@@ -335,27 +349,26 @@ public class LogInformationAnalyserTest extends PulseTestCase
         assertEquals(revision, change.getRevision().toString());
     }
 
-    private static void assertValidChangeSets(List changelists)
+    private static void assertValidChangeSets(List<Changelist> changelists)
     {
-        Changelist changelist;
-        for(Iterator i$ = changelists.iterator(); i$.hasNext(); assertValidChangeSet(changelist))
-            changelist = (Changelist)i$.next();
-
+        for(Changelist changelist : changelists)
+        {
+            assertValidChangeSet(changelist);
+        }
     }
 
     private static void assertValidChangeSet(Changelist changelist)
     {
-        List changes = changelist.getChanges();
-        Map filenames = new HashMap();
-        Change change;
-        for(Iterator i$ = changes.iterator(); i$.hasNext(); assertNotNull(change.getAction()))
+        List<Change> changes = changelist.getChanges();
+        Map<String, String> filenames = new HashMap<String, String>();
+
+        for(Change change : changes)
         {
-            change = (Change)i$.next();
             assertFalse(filenames.containsKey(change.getFilename()));
             filenames.put(change.getFilename(), change.getFilename());
             assertNotNull(change.getRevision());
+            assertNotNull(change.getAction());
         }
-
     }
 
     private static void assertCvsRevision(Revision revision, String author, String branch, String comment)
@@ -366,16 +379,4 @@ public class LogInformationAnalyserTest extends PulseTestCase
         assertEquals(comment, cvsRev.getComment());
     }
 
-    private static final SimpleDateFormat LOCAL_DATE;
-    private static final SimpleDateFormat SERVER_DATE;
-    private CvsClient cvs;
-    private LogInformationAnalyser analyser;
-
-    static 
-    {
-        LOCAL_DATE = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-        LOCAL_DATE.setTimeZone(TimeZone.getTimeZone("EST"));
-        SERVER_DATE = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss z");
-        SERVER_DATE.setTimeZone(TimeZone.getTimeZone("GMT"));
-    }
 }

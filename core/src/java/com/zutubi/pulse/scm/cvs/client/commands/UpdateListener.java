@@ -1,47 +1,44 @@
-// Decompiled by Jad v1.5.8f. Copyright 2001 Pavel Kouznetsov.
-// Jad home page: http://www.kpdus.com/jad.html
-// Decompiler options: packimports(3) 
-// Source File Name:   UpdateListener.java
-
 package com.zutubi.pulse.scm.cvs.client.commands;
 
 import com.zutubi.pulse.core.model.Change;
 import com.zutubi.pulse.scm.SCMCheckoutEventHandler;
-import org.netbeans.lib.cvsclient.event.CVSAdapter;
-import org.netbeans.lib.cvsclient.event.FileAddedEvent;
-import org.netbeans.lib.cvsclient.event.FileRemovedEvent;
-import org.netbeans.lib.cvsclient.event.FileUpdatedEvent;
+import org.netbeans.lib.cvsclient.event.*;
+import org.netbeans.lib.cvsclient.command.DefaultFileInfoContainer;
+import org.netbeans.lib.cvsclient.command.FileInfoContainer;
 
+/**
+ * <class comment/>
+ */
 public class UpdateListener extends CVSAdapter
 {
-    private SCMCheckoutEventHandler handler;
+    private final SCMCheckoutEventHandler handler;
 
     public UpdateListener(SCMCheckoutEventHandler handler)
     {
-        this.handler = handler;
-    }
-
-    public void fileAdded(FileAddedEvent e)
-    {
-        if (handler != null)
+        if (handler == null)
         {
-            handler.fileCheckedOut(new Change(e.getFilePath(), null, Change.Action.ADD));
+            throw new IllegalArgumentException("handler is a required argument.");
         }
+        this.handler = handler;
     }
 
     public void fileRemoved(FileRemovedEvent e)
     {
-        if (handler != null)
-        {
-            handler.fileCheckedOut(new Change(e.getFilePath(), null, Change.Action.DELETE));
-        }
+        handler.fileCheckedOut(new Change(e.getFilePath(), null, Change.Action.DELETE));
     }
 
-    public void fileUpdated(FileUpdatedEvent e)
+    public void fileInfoGenerated(FileInfoEvent e)
     {
-        if (handler != null)
+        FileInfoContainer c = e.getInfoContainer();
+        if (!(c instanceof DefaultFileInfoContainer))
         {
-            handler.fileCheckedOut(new Change(e.getFilePath(), null, Change.Action.EDIT));
+            return;
+        }
+        
+        DefaultFileInfoContainer infoContainer = (DefaultFileInfoContainer) e.getInfoContainer();
+        if ("U".equals(infoContainer.getType()))
+        {
+            handler.fileCheckedOut(new Change(infoContainer.getFile().getPath(), null, Change.Action.EDIT));
         }
     }
 }

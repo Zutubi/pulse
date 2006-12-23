@@ -28,13 +28,18 @@ public class CvsRevision extends Revision
         setDate(date);
 
         // construct the revision string.
+        setRevisionString(generateRevisionString());
+    }
+
+    private String generateRevisionString()
+    {
         StringBuffer buffer = new StringBuffer();
         buffer.append(getAuthor() != null ? getAuthor() : "");
         buffer.append(":");
         buffer.append(getBranch() != null ? getBranch() : "");
         buffer.append(":");
-        buffer.append((date != null) ? DATE_FORMAT.format(date) : "");
-        setRevisionString(buffer.toString());
+        buffer.append((getDate() != null) ? DATE_FORMAT.format(getDate()) : "");
+        return buffer.toString();
     }
 
     public Revision copy()
