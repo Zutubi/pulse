@@ -52,22 +52,29 @@ public class LogInformationAnalyser
             return null;
         }
         // need to ensure that the log information is ordered by date...
+        Collections.sort(revisions, new RevisionDateComparator());
+
         Revision latestChange = revisions.get(revisions.size() - 1);
         return latestChange.getDate();
     }
 
     /**
+     * Process the response from the rlog command and extract the cvs revisions.
      *
-     * @param rlogResponse
+     * @param logInformation is the response from the rlog command
+     * @param tag is the tag name for which the rlog command was executed. This tag is
+     * used when constructing the revision objects since the branch information is not
+     * immediately obvious. (read difficult to determine)
      *
+     * @return a list of cvs revisions`
      */
-    private List<Revision> extractRevisions(List<LogInformation> rlogResponse, String tag)
+    private List<Revision> extractRevisions(List<LogInformation> logInformation, String tag)
     {
         // The rlog response will contain a reference for each relevant file. Those
         // files that have changed will contain revisions that we will extract and analyse.
         List<Revision> revisions = new LinkedList<Revision>();
 
-        for (LogInformation logInfo : rlogResponse)
+        for (LogInformation logInfo : logInformation)
         {
             for (Object obj : logInfo.getRevisionList())
             {
@@ -87,18 +94,10 @@ public class LogInformationAnalyser
             }
         }
 
-        // and order them chronologically.
-        Collections.sort(revisions, new Comparator<Revision>()
-        {
-            public int compare(Revision o1, Revision o2)
-            {
-                return o1.getDate().compareTo(o2.getDate());
-            }
-        });
         return revisions;
     }
 
-    public List<Changelist> extract(List<LogInformation> rlogResponse, String tag)
+    public List<Changelist> extractChangelists(List<LogInformation> rlogResponse, String tag)
     {
         // retrieve the log info for all of the files that have been modified.
         List<Revision> simpleChanges = extractRevisions(rlogResponse, tag);
@@ -343,4 +342,11 @@ public class LogInformationAnalyser
 
     }
 
+    private class RevisionDateComparator implements Comparator<Revision>
+    {
+        public int compare(Revision o1, Revision o2)
+        {
+            return o1.getDate().compareTo(o2.getDate());
+        }
+    }
 }

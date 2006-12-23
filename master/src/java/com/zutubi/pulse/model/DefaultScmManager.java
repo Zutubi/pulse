@@ -186,7 +186,8 @@ public class DefaultScmManager implements ScmManager, Stoppable
                     long quietTime = waiting.get(scm.getId()).first;
                     if (quietTime < System.currentTimeMillis())
                     {
-                        if (server.hasChangedSince(waiting.get(scm.getId()).second))
+                        Revision lastChange = waiting.get(scm.getId()).second;
+                        if (server.hasChangedSince(lastChange))
                         {
                             // there has been a commit during the 'quiet period', lets reset the timer.
                             Revision latest = server.getLatestRevision();
@@ -195,9 +196,7 @@ public class DefaultScmManager implements ScmManager, Stoppable
                         else
                         {
                             // there have been no commits during the 'quiet period', trigger a change.
-                            Revision latest = server.getLatestRevision();
-                            eventManager.publish(new SCMChangeEvent(scm, latest, previous));
-                            latestRevisions.put(scm.getId(), latest);
+                            sendScmChangeEvent(scm, lastChange, previous);
                             waiting.remove(scm.getId());
                         }
                     }
@@ -213,8 +212,7 @@ public class DefaultScmManager implements ScmManager, Stoppable
                         }
                         else
                         {
-                            eventManager.publish(new SCMChangeEvent(scm, latest, previous));
-                            latestRevisions.put(scm.getId(), latest);
+                            sendScmChangeEvent(scm, latest, previous);
                         }
                     }
                 }
@@ -224,9 +222,7 @@ public class DefaultScmManager implements ScmManager, Stoppable
                 if (server.hasChangedSince(previous))
                 {
                     Revision latest = server.getLatestRevision();
-                    LOG.finer("publishing scm change event for " + scm + " revision " + latest);
-                    eventManager.publish(new SCMChangeEvent(scm, latest, previous));
-                    latestRevisions.put(scm.getId(), latest);
+                    sendScmChangeEvent(scm, latest, previous);
                 }
             }
         }
@@ -238,6 +234,13 @@ public class DefaultScmManager implements ScmManager, Stoppable
             // be the result of a configuration problem.
             LOG.warning(e.getMessage(), e);
         }
+    }
+
+    private void sendScmChangeEvent(Scm scm, Revision latest, Revision previous)
+    {
+        LOG.finer("publishing scm change event for " + scm + " revision " + latest);
+        eventManager.publish(new SCMChangeEvent(scm, latest, previous));
+        latestRevisions.put(scm.getId(), latest);
     }
 
     private boolean checkPollingInterval(Scm scm, long now)

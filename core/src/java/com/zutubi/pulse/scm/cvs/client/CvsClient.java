@@ -4,10 +4,7 @@ import com.opensymphony.util.TextUtils;
 import com.zutubi.pulse.core.model.CvsRevision;
 import com.zutubi.pulse.scm.SCMCheckoutEventHandler;
 import com.zutubi.pulse.scm.SCMException;
-import com.zutubi.pulse.scm.cvs.client.commands.LogListener;
-import com.zutubi.pulse.scm.cvs.client.commands.StatusListener;
-import com.zutubi.pulse.scm.cvs.client.commands.UpdateListener;
-import com.zutubi.pulse.scm.cvs.client.commands.VersionCommand;
+import com.zutubi.pulse.scm.cvs.client.commands.*;
 import com.zutubi.pulse.scm.cvs.client.util.CvsUtils;
 import com.zutubi.pulse.util.logging.Logger;
 import com.zutubi.pulse.util.Constants;
@@ -104,7 +101,11 @@ public class CvsClient
 
     public void update(File workingDirectory, CvsRevision revision, SCMCheckoutEventHandler handler) throws SCMException
     {
-        UpdateListener listener = new UpdateListener(handler);
+        UpdateListener listener = null;
+        if (handler != null)
+        {
+            listener = new UpdateListener(handler);
+        }
         update(workingDirectory, revision, listener);
     }
 
@@ -152,7 +153,12 @@ public class CvsClient
             checkout.setCheckoutByDate(SERVER_DATE.format(revision.getDate()));
         }
 
-        UpdateListener listener = new UpdateListener(handler);
+        CheckoutListener listener = null;
+        if (handler != null)
+        {
+            listener = new CheckoutListener(handler);
+        }
+        
         if (!executeCommand(checkout, workdir, listener))
         {
             throw new SCMException("Failed to checkout.");
