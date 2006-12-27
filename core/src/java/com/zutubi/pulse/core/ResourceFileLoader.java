@@ -28,9 +28,11 @@ public class ResourceFileLoader
     {
         FileLoader loader = new FileLoader();
         loader.setObjectFactory(new ObjectFactory());
-        loader.register("resource", Resource.class);
-        loader.register("version", ResourceVersion.class);
-        loader.register("property", ResourceProperty.class);
+        ComponentRegistry registry = new ComponentRegistry();
+        registry.register("resource", Resource.class);
+        registry.register("version", ResourceVersion.class);
+        registry.register("property", ResourceProperty.class);
+        loader.setRegistry(registry);
         return loader;
     }
 }
