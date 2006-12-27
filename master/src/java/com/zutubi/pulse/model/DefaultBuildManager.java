@@ -411,6 +411,11 @@ public class DefaultBuildManager implements BuildManager, EventListener
         return buildResultDao.findCommandResult(commandResultId).getArtifact(artifactName);
     }
 
+    public Boolean canDecorateArtifact(StoredFileArtifact artifact)
+    {
+        return artifact != null && artifact.canDecorate();
+    }
+
     public BuildResult getLatestBuildResult(BuildSpecification spec)
     {
         return buildResultDao.findLatestByBuildSpec(spec);
