@@ -123,7 +123,7 @@ public class FileLoader
         {
             if(depth > MAX_RECURSION_DEPTH)
             {
-                throw new FileLoadException("Maximum recursion depth exceeded");
+                throw new FileLoadException(String.format("Maximum recursion depth %s exceeded", MAX_RECURSION_DEPTH));
             }
 
             if(handleInternalElement(e, parent, resolveReferences, scope, parentHelper, depth, resourceRepository, predicate))

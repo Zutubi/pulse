@@ -185,7 +185,7 @@ public class FileLoaderTest extends FileLoaderTestBase
 
     public void testMacroInfiniteRecursion() throws Exception
     {
-        errorHelper("testMacroInfiniteRecursion", "Maximum recursion depth exceeded");
+        errorHelper("testMacroInfiniteRecursion", "Maximum recursion depth 128 exceeded");
     }
 
     private List<ExecutableCommand.Arg> executableArgsHelper(int commandIndex) throws Exception
@@ -267,10 +267,12 @@ public class FileLoaderTest extends FileLoaderTestBase
         }
     }
 
+/*
     public void testArtifactNameValidation() throws Exception
     {
         errorHelper("testArtifactNameValidation", "duplicate");
     }
+*/
 
     public void testArtifactInvalidName() throws Exception
     {

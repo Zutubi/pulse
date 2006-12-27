@@ -86,11 +86,13 @@ public class RecipeProcessor
                 PulseFile pulseFile = loadPulseFile(request, paths.getBaseDir(), resourceRepository, globalScope, context, recipeStartTime);
                 Recipe recipe;
 
+                //TODO: rather than requiring a recipe, allow any reference that implements a required interface to
+                //      be extracted via pulseFile.get(name); The entity extracted must be executable and ..?
                 String recipeName = request.getRecipeName();
-                if (recipeName == null)
+                if (!TextUtils.stringSet(recipeName))
                 {
                     recipeName = pulseFile.getDefaultRecipe();
-                    if (recipeName == null)
+                    if (!TextUtils.stringSet(recipeName))
                     {
                         throw new BuildException("Please specify a default recipe for your project.");
                     }
@@ -246,7 +248,8 @@ public class RecipeProcessor
      *
      * @return configured command context instance.
      */
-    private CommandContext createCommandContext(RecipePaths paths, File commandOutput, TestSuiteResult testResults, Scope globalScope, long recipeStartTime, BuildContext buildContext, long recipeId) {
+    private CommandContext createCommandContext(RecipePaths paths, File commandOutput, TestSuiteResult testResults, Scope globalScope, long recipeStartTime, BuildContext buildContext, long recipeId)
+    {
         CommandContext commandContext = new CommandContext(paths, commandOutput, testResults);
         commandContext.setGlobalScope(globalScope);
         commandContext.setRecipeStartTime(recipeStartTime);

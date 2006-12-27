@@ -153,10 +153,7 @@ public abstract class LocalArtifact implements Artifact
             StoredFileArtifact fileArtifact = new StoredFileArtifact(path, type);
             artifact.add(fileArtifact);
 
-            for (ProcessArtifact process : processes)
-            {
-                process.getProcessor().process(fileArtifact, result, context);
-            }
+            processArtifact(fileArtifact, result, context);
 
             return true;
         }

@@ -24,5 +24,6 @@ package com.zutubi.pulse.core;
 public interface Reference
 {
     String getName();
+    
     Object getValue();
 }

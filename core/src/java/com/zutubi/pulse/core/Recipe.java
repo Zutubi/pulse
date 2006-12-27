@@ -10,16 +10,37 @@ import java.util.List;
  */
 public class Recipe implements Reference
 {
+    /**
+     * The name uniquely identifying this recipe.
+     */
     private String name;
 
+    /**
+     * The ordered list of commands that are executed by this recipe.
+     */
     private List<Command> commands = new LinkedList<Command>();
+
+    /**
+     * The list of resource dependencies that need to be resolved prior to
+     * being able to execute this recipe.
+     */
     private List<Dependency> dependencies = new LinkedList<Dependency>();
 
+    /**
+     * Getter for the recipes name.
+     *
+     * @return the recipies name.
+     */
     public String getName()
     {
         return name;
     }
 
+    /**
+     * Implementation of the value getter for the Reference interface.
+     *
+     * @return this
+     */
     public Object getValue()
     {
         return this;
@@ -29,12 +50,24 @@ public class Recipe implements Reference
     {
         this.name = name;
     }
-    
-    public void add(Command c)
+
+    /**
+     * Add a new command instance to this recipe.
+     *
+     * @param command instance
+     */
+    public void add(Command command)
     {
-        commands.add(c);
+        commands.add(command);
     }
 
+    /**
+     * Get the named command instance.
+     *
+     * @param name 
+     *
+     * @return the named command instance, or null if no matching command was found.
+     */
     public Command getCommand(String name)
     {
         for(Command c: commands)

@@ -125,6 +125,12 @@ public class CommandGroup implements Command, Validateable
         return command;
     }
 
+    /**
+     * Validate the configuration of this command group, ensuring that the artifact names are
+     * unique.
+     *
+     * @param context instance.
+     */
     public void validate(ValidationContext context)
     {
         // ensure that our artifacts have unique names.

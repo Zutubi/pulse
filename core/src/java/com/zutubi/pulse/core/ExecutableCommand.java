@@ -38,8 +38,12 @@ public class ExecutableCommand extends CommandSupport implements ScopeAware
     private FileArtifact outputArtifact;
     private FileArtifact envArtifact;
     private static final String ENV_FILENAME = "env.txt";
+
     private List<ProcessArtifact> processes = new LinkedList<ProcessArtifact>();
 
+    /**
+     * Required no arg constructor.
+     */
     public ExecutableCommand()
     {
 
