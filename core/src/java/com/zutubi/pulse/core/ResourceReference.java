@@ -107,7 +107,6 @@ public class ResourceReference implements ResourceAware, ScopeAware, InitCompone
         this.name = name;
     }
 
-    @Required
     public String getVersion()
     {
         return version;
