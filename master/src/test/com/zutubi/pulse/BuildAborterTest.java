@@ -15,13 +15,13 @@ public class BuildAborterTest extends PulseTestCase
 {
     private MockProjectManager projectManager;
     private MockBuildManager buildManager;
-    private BuildAborter aborter;
+    private BuildAborterStartupTask aborter;
 
     protected void setUp() throws Exception
     {
         projectManager = new MockProjectManager();
         buildManager = new MockBuildManager();
-        aborter = new BuildAborter();
+        aborter = new BuildAborterStartupTask();
         aborter.setProjectManager(projectManager);
         aborter.setBuildManager(buildManager);
 
@@ -32,13 +32,13 @@ public class BuildAborterTest extends PulseTestCase
 
     public void testNoProjects()
     {
-        aborter.run();
+        aborter.execute();
     }
 
     public void testNoBuilds()
     {
         projectManager.create(new Project("hello", "test project"));
-        aborter.run();
+        aborter.execute();
     }
 
     public void testCompletedBuild()
@@ -52,7 +52,7 @@ public class BuildAborterTest extends PulseTestCase
         buildManager.save(result);
 
         assertTrue(result.succeeded());
-        aborter.run();
+        aborter.execute();
         assertTrue(result.succeeded());
     }
 
@@ -67,7 +67,7 @@ public class BuildAborterTest extends PulseTestCase
 
         assertTrue(result.commenced());
         assertFalse(result.completed());
-        aborter.run();
+        aborter.execute();
         assertTrue(result.errored());
         assertTrue(result.getFeatures(Feature.Level.ERROR).get(0).getSummary().contains("shut down"));
     }
@@ -87,7 +87,7 @@ public class BuildAborterTest extends PulseTestCase
         Mock mockUserManager = new Mock(UserManager.class);
         mockUserManager.expectAndReturn("getAllUsers", C.ANY_ARGS, Arrays.asList(new User[] { user }));
         aborter.setUserManager((UserManager) mockUserManager.proxy());
-        aborter.run();
+        aborter.execute();
 
         assertTrue(result.succeeded());
     }
@@ -107,7 +107,7 @@ public class BuildAborterTest extends PulseTestCase
         Mock mockUserManager = new Mock(UserManager.class);
         mockUserManager.expectAndReturn("getAllUsers", C.ANY_ARGS, Arrays.asList(new User[] { user }));
         aborter.setUserManager((UserManager) mockUserManager.proxy());
-        aborter.run();
+        aborter.execute();
 
         assertTrue(result.errored());
         assertTrue(result.getFeatures(Feature.Level.ERROR).get(0).getSummary().contains("shut down"));

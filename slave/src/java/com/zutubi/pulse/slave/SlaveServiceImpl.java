@@ -5,13 +5,14 @@ import com.zutubi.pulse.SystemInfo;
 import com.zutubi.pulse.Version;
 import com.zutubi.pulse.agent.Status;
 import com.zutubi.pulse.bootstrap.ComponentContext;
+import com.zutubi.pulse.bootstrap.StartupManager;
 import com.zutubi.pulse.core.RecipeRequest;
 import com.zutubi.pulse.core.model.Resource;
 import com.zutubi.pulse.filesystem.FileInfo;
 import com.zutubi.pulse.logging.CustomLogRecord;
 import com.zutubi.pulse.logging.ServerMessagesHandler;
-import com.zutubi.pulse.resources.ResourceDiscoverer;
 import com.zutubi.pulse.resources.ResourceConstructor;
+import com.zutubi.pulse.resources.ResourceDiscoverer;
 import com.zutubi.pulse.services.InvalidTokenException;
 import com.zutubi.pulse.services.ServiceTokenManager;
 import com.zutubi.pulse.services.SlaveService;
@@ -36,7 +37,7 @@ public class SlaveServiceImpl implements SlaveService
     private SlaveQueue slaveQueue;
     private SlaveThreadPool threadPool;
     private SlaveConfigurationManager configurationManager;
-    private SlaveStartupManager startupManager;
+    private StartupManager startupManager;
     private SlaveRecipeProcessor slaveRecipeProcessor;
     private ServerMessagesHandler serverMessagesHandler;
 
@@ -214,7 +215,7 @@ public class SlaveServiceImpl implements SlaveService
      *
      * @param startupManager instance
      */
-    public void setStartupManager(SlaveStartupManager startupManager)
+    public void setStartupManager(StartupManager startupManager)
     {
         this.startupManager = startupManager;
     }

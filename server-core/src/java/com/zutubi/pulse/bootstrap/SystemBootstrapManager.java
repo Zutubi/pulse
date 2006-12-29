@@ -53,7 +53,7 @@ public class SystemBootstrapManager
     public void bootstrapSystem()
     {
         loadBootstrapContext();
-        ((Startup) ComponentContext.getBean(STARTUP_MANAGER_BEAN)).init();
+        ((StartupManager) ComponentContext.getBean(STARTUP_MANAGER_BEAN)).init();
     }
 
     /**

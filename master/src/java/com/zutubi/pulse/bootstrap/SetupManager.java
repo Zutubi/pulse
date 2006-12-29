@@ -13,8 +13,6 @@ public interface SetupManager
 {
     SetupState getCurrentState();
 
-    void startSetupWorkflow() throws IOException;
-
     void requestDataComplete() throws IOException;
 
     void requestLicenseComplete();
@@ -22,4 +20,6 @@ public interface SetupManager
     void requestUpgradeComplete();
 
     void requestSetupComplete();
+
+    void startSetupWorkflow(ProcessSetupStartupTask processSetupStartupTask);
 }

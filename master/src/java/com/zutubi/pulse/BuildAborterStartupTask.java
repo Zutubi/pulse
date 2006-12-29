@@ -1,19 +1,20 @@
 package com.zutubi.pulse;
 
+import com.zutubi.pulse.bootstrap.StartupTask;
 import com.zutubi.pulse.model.*;
 
 import java.util.List;
 
 /**
  */
-public class BuildAborter implements Runnable
+public class BuildAborterStartupTask implements StartupTask
 {
     private ProjectManager projectManager;
     private BuildManager buildManager;
     private UserManager userManager;
     private static final String ABORT_MESSAGE = "Server shut down while build in progress";
 
-    public void run()
+    public void execute()
     {
         List<Project> projects = projectManager.getAllProjects();
         for (Project project : projects)
@@ -30,6 +31,11 @@ public class BuildAborter implements Runnable
         {
             buildManager.abortUnfinishedBuilds(user, ABORT_MESSAGE);
         }
+    }
+
+    public boolean haltOnFailure()
+    {
+        return false;
     }
 
     public void setProjectManager(ProjectManager projectManager)

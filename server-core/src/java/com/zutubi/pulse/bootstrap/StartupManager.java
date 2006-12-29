@@ -1,13 +1,14 @@
 package com.zutubi.pulse.bootstrap;
 
 /**
- * <class-comment/>
  */
-public interface StartupManager extends Startup
+public interface StartupManager
 {
+    void init() throws StartupException;
+
     boolean isSystemStarted();
 
     long getStartTime();
 
-    void continueApplicationStartup();
+    long getUptime();
 }

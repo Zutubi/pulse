@@ -1,7 +1,7 @@
 package com.zutubi.pulse.util.logging;
 
-import java.util.logging.Level;
 import java.util.logging.Filter;
+import java.util.logging.Level;
 
 /**
  * Simple wrapper around the java.util.logging.Logger to provide some utility methods.
@@ -167,6 +167,16 @@ public class Logger
         }
         inferCaller();
         delegate.log(level, msg);
+    }
+
+    public void log(Level level, String msg, Throwable t)
+    {
+        if (!isLoggable(level))
+        {
+            return;
+        }
+        inferCaller();
+        delegate.log(level, msg, t);
     }
 
     public void debug(String msg)

@@ -2,27 +2,19 @@
 <!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
 <beans>
 
-    <bean id="startupManager" class="com.zutubi.pulse.bootstrap.DefaultStartupManager">
-        <property name="coreContexts">
+    <bean id="startupManager" class="com.zutubi.pulse.bootstrap.DefaultStartupManager" autowire="byName">
+        <property name="startupTasks">
             <list>
-                <value>com/zutubi/pulse/bootstrap/coreSubsystemContext.xml</value>
-            </list>
-        </property>
-        <property name="setupContexts">
-            <list>
-                <value>com/zutubi/pulse/bootstrap/configSubsystemContext.xml</value>
-            </list>
-        </property>
-        <property name="startupRunnables">
-            <list>
+                <value>com.zutubi.pulse.bootstrap.FreemarkerLoggingStartupTask</value>
+                <value>com.zutubi.pulse.bootstrap.ProcessSetupStartupTask</value>
+                <value>com.zutubi.pulse.bootstrap.DeployMainWebappStartupTask</value>
                 <value>com.zutubi.pulse.test.SetupFeatureTour</value>
             </list>
         </property>
-        <property name="configurationManager">
-            <ref local="configurationManager"/>
-        </property>
-        <property name="objectFactory">
-            <ref local="objectFactory"/>
+        <property name="postStartupTasks">
+            <list>
+                <value>com.zutubi.pulse.bootstrap.SystemStartedMessageStartupTask</value>
+            </list>
         </property>
     </bean>
 

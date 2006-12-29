@@ -11,9 +11,9 @@ import com.zutubi.pulse.upgrade.UpgradeManager;
 import com.zutubi.pulse.util.IOUtils;
 
 import java.io.*;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Properties;
-import java.util.LinkedList;
 
 /**
  * <class-comment/>
@@ -21,7 +21,6 @@ import java.util.LinkedList;
 public class DefaultSetupManager implements SetupManager
 {
     private MasterConfigurationManager configurationManager;
-    private StartupManager startupManager;
     private UserManager userManager;
     private UpgradeManager upgradeManager;
 
@@ -51,6 +50,8 @@ public class DefaultSetupManager implements SetupManager
 
     private boolean promptShown = false;
 
+    private ProcessSetupStartupTask setupCallback;
+
     public SetupState getCurrentState()
     {
         return state;
@@ -76,8 +77,10 @@ public class DefaultSetupManager implements SetupManager
         }
     }
 
-    public void startSetupWorkflow() throws IOException
+    public void startSetupWorkflow(ProcessSetupStartupTask processSetupStartupTask)
     {
+        this.setupCallback = processSetupStartupTask;
+
         state = SetupState.STARTING;
 
         try
@@ -179,7 +182,7 @@ public class DefaultSetupManager implements SetupManager
         }
     }
 
-    public void requestDataComplete() throws IOException
+    public void requestDataComplete()
     {
         // If this is the first time this directory is being used as a data directory, then we need
         // to ensure that it is initialised. If we are working with an already existing directory,
@@ -258,7 +261,7 @@ public class DefaultSetupManager implements SetupManager
         loadContexts(startupContexts);
         loadContexts(postStartupContexts);
 
-        startupManager.continueApplicationStartup();
+        setupCallback.finaliseSetup();
     }
 
     private void loadContexts(List<String> contexts)
@@ -316,16 +319,6 @@ public class DefaultSetupManager implements SetupManager
     public void setUserManager(UserManager userManager)
     {
         this.userManager = userManager;
-    }
-
-    /**
-     * Required resource.
-     *
-     * @param startupManager
-     */
-    public void setStartupManager(StartupManager startupManager)
-    {
-        this.startupManager = startupManager;
     }
 
     /**

@@ -5,12 +5,10 @@ import com.zutubi.pulse.config.FileConfig;
 import com.zutubi.pulse.core.ObjectFactory;
 import com.zutubi.pulse.events.EventManager;
 import com.zutubi.pulse.events.system.SystemStartedEvent;
-import com.zutubi.pulse.freemarker.CustomFreemarkerManager;
-import com.zutubi.pulse.security.AcegiSecurityManager;
 import com.zutubi.pulse.util.logging.Logger;
 
 import java.io.File;
-import java.util.LinkedList;
+import java.util.Collections;
 import java.util.List;
 import java.util.logging.Level;
 
@@ -24,7 +22,7 @@ public class DefaultStartupManager implements StartupManager
     /**
      * The systems configuration manager.
      */
-    private MasterConfigurationManager configurationManager;
+    private ConfigurationManager configurationManager;
 
     /**
      * The systems object factory.
@@ -47,18 +45,15 @@ public class DefaultStartupManager implements StartupManager
      */
     private boolean starting = false;
 
-    private List<String> coreContexts;
-
-    private List<String> setupContexts;
-
-    private List<String> startupRunnables = new LinkedList<String>();
+    private List<String> startupTasks = Collections.emptyList();
+    private List<String> postStartupTasks = Collections.emptyList();
 
     /**
      * Required resource.
      *
      * @param configurationManager
      */
-    public void setConfigurationManager(MasterConfigurationManager configurationManager)
+    public void setConfigurationManager(ConfigurationManager configurationManager)
     {
         this.configurationManager = configurationManager;
     }
@@ -73,30 +68,14 @@ public class DefaultStartupManager implements StartupManager
         this.objectFactory = objectFactory;
     }
 
-    /**
-     * Specify the spring contexts that need to be loaded to initialise the configuration
-     * mode of this system.
-     *
-     * @param setupContexts
-     */
-    public void setSetupContexts(List<String> setupContexts)
+    public void setStartupTasks(List<String> startupTasks)
     {
-        this.setupContexts = setupContexts;
+        this.startupTasks = startupTasks;
     }
 
-    /**
-     * Specify the spring contexts that make up the core of the system.
-     *
-     * @param coreContexts
-     */
-    public void setCoreContexts(List<String> coreContexts)
+    public void setPostStartupTasks(List<String> postStartupTasks)
     {
-        this.coreContexts = coreContexts;
-    }
-
-    public void setStartupRunnables(List<String> startupRunnables)
-    {
-        this.startupRunnables = startupRunnables;
+        this.postStartupTasks = postStartupTasks;
     }
 
     /**
@@ -126,8 +105,6 @@ public class DefaultStartupManager implements StartupManager
             startupConfig.setProperty(SystemConfiguration.CONTEXT_PATH, config.getContextPath());
             startupConfig.setInteger(SystemConfiguration.WEBAPP_PORT, config.getServerPort());
 
-            CustomFreemarkerManager.initialiseLogging();
-
             Thread.setDefaultUncaughtExceptionHandler(new Thread.UncaughtExceptionHandler()
             {
                 public void uncaughtException(Thread t, Throwable e)
@@ -136,7 +113,18 @@ public class DefaultStartupManager implements StartupManager
                 }
             });
 
-            startApplicationSetup();
+            // application contexts have finished loading
+            // i) run startup tasks
+            runStartupTasks(startupTasks);
+
+            // record the start time
+            startTime = System.currentTimeMillis();
+
+            // send a message to the rest of the system that all is good to go.
+            EventManager eventManager = (EventManager) ComponentContext.getBean("eventManager");
+            eventManager.publish(new SystemStartedEvent(this));
+
+            runStartupTasks(postStartupTasks);
         }
         catch (Exception e)
         {
@@ -144,73 +132,35 @@ public class DefaultStartupManager implements StartupManager
         }
     }
 
-    /**
-     * Start the configuration context.
-     *
-     * @throws Exception
-     */
-    private void startApplicationSetup() throws Exception
-    {
-        // load the core context, common to all of the system configurations.
-        ComponentContext.addClassPathContextDefinitions(coreContexts.toArray(new String[coreContexts.size()]));
-
-        // load the setup context. we do not expect this to take long, so we dont worry about a holding page here.
-        ComponentContext.addClassPathContextDefinitions(setupContexts.toArray(new String[setupContexts.size()]));
-
-        // startup the web server.
-        WebManager webManager = (WebManager) ComponentContext.getBean("webManager");
-
-        // i) set the system starting pages (periodically refresh)
-        webManager.deploySetup();
-
-        SetupManager setupManager = (SetupManager) ComponentContext.getBean("setupManager");
-        setupManager.startSetupWorkflow();
-    }
-
-    public void continueApplicationStartup()
-    {
-        WebManager webManager = (WebManager) ComponentContext.getBean("webManager");
-
-        // handle the initialisation of the security manager, since this can not be done within the spring context file.
-        AcegiSecurityManager securityManager = (AcegiSecurityManager) ComponentContext.getBean("securityManager");
-        securityManager.init();
-
-        // application contexts have finished loading
-        // i) run startup tasks
-        runStartupTasks();
-
-        // ii) time to deploy the may application.
-        webManager.deployMain();
-
-        // record the start time
-        startTime = System.currentTimeMillis();
-
-        // send a message to the rest of the system that all is good to go.
-        EventManager eventManager = (EventManager) ComponentContext.getBean("eventManager");
-        eventManager.publish(new SystemStartedEvent(this));
-
-        // let the user know that the system is now up and running.
-        MasterConfiguration appConfig = configurationManager.getAppConfig();
-        SystemConfiguration sysConfig = configurationManager.getSystemConfig();
-
-        //TODO: I18N this message.
-        String str = "The server is now available on port %s at context path '%s' [base URL configured as: %s]";
-        String msg = String.format(str, sysConfig.getServerPort(), sysConfig.getContextPath(), appConfig.getBaseUrl());
-        System.err.println(msg);
-    }
-
-    private void runStartupTasks()
+    private void runStartupTasks(List<String> startupRunnables)
     {
         for (String name : startupRunnables)
         {
+            StartupTask instance = null;
+
             try
             {
-                Runnable instance = objectFactory.buildBean(name);
-                instance.run();
+                instance = objectFactory.buildBean(name);
+                instance.execute();
             }
             catch (Exception e)
             {
-                LOG.warning("Failed to run startup task "+name+". Reason: " + e.getMessage(), e);
+                boolean halt = true;
+
+                if(instance == null)
+                {
+                    LOG.severe("Unable to create startup task '" + name + "': " + e.getMessage(), e);
+                }
+                else
+                {
+                    halt = instance.haltOnFailure();
+                    LOG.log(halt ? Level.SEVERE : Level.WARNING, "Failed to run startup task " + name + ". Reason: " + e.getMessage(), e);
+                }
+
+                if(halt)
+                {
+                    throw new StartupException(e);
+                }
             }
         }
     }

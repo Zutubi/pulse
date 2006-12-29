@@ -1,7 +1,7 @@
 package com.zutubi.pulse;
 
 import com.zutubi.pulse.bootstrap.ConfigurationManager;
-import com.zutubi.pulse.bootstrap.Startup;
+import com.zutubi.pulse.bootstrap.StartupManager;
 import com.zutubi.pulse.bootstrap.conf.EnvConfig;
 import com.zutubi.pulse.util.Constants;
 
@@ -22,7 +22,7 @@ public class SystemInfo
     private long usedMemory;
     private long freeMemory;
 
-    public static SystemInfo getSystemInfo(ConfigurationManager configurationManager, Startup startupManager)
+    public static SystemInfo getSystemInfo(ConfigurationManager configurationManager, StartupManager startupManager)
     {
         DateFormat dateFormatter = new SimpleDateFormat("EEEEE, dd MMM yyyy");
         DateFormat timeFormatter = new SimpleDateFormat("HH:mm:ss z");

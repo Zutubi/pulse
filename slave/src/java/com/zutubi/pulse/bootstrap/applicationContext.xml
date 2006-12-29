@@ -54,6 +54,21 @@
         </property>
     </bean>
 
+    <bean id="jettyManager" class="com.zutubi.pulse.jetty.JettyManager">
+        <property name="jettyServer">
+            <ref local="jettyServer"/>
+        </property>
+        <property name="configurationManager">
+            <ref bean="configurationManager"/>
+        </property>
+    </bean>
+
+    <bean id="jettyServer" class="com.zutubi.pulse.jetty.JettyServerFactoryBean" destroy-method="shutdown">
+        <property name="configurationManager">
+            <ref bean="configurationManager"/>
+        </property>
+    </bean>
+
     <bean id="fileHandlerFactory" class="com.zutubi.pulse.logging.FileHandlerFactory">
         <property name="objectFactory">
             <ref bean="objectFactory"/>
@@ -99,7 +114,7 @@
         <property name="stoppables">
             <list>
                 <ref bean="slaveQueue"/>
-                <ref bean="startupManager"/>
+                <ref bean="jettyManager"/>
             </list>
         </property>
     </bean>
