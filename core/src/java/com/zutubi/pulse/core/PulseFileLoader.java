@@ -14,34 +14,31 @@ public class PulseFileLoader extends FileLoader
 {
     public PulseFileLoader()
     {
-        ComponentRegistry registry = new ComponentRegistry();
-        registry.register("property", Property.class);
-        registry.register("recipe", Recipe.class);
-        registry.register("def", ComponentDefinition.class);
-        registry.register("post-processor", PostProcessorGroup.class);
-        registry.register("command", CommandGroup.class);
-        registry.register("ant.pp", AntPostProcessor.class);
-        registry.register("cppunit.pp", CppUnitReportPostProcessor.class);
-        registry.register("junit.pp", JUnitReportPostProcessor.class);
-        registry.register("junit.summary.pp", JUnitSummaryPostProcessor.class);
-        registry.register("ocunit.pp", OCUnitReportPostProcessor.class);
-        registry.register("regex-test.pp", RegexTestPostProcessor.class);
-        registry.register("make.pp", MakePostProcessor.class);
-        registry.register("maven.pp", MavenPostProcessor.class);
-        registry.register("maven2.pp", Maven2PostProcessor.class);
-        registry.register("regex.pp", RegexPostProcessor.class);
-        registry.register("xcodebuild.pp", XCodePostProcessor.class);
-        registry.register("ant", AntCommand.class);
-        registry.register("maven", MavenCommand.class);
-        registry.register("maven2", Maven2Command.class);
-        registry.register("executable", ExecutableCommand.class);
-        registry.register("print", PrintCommand.class);
-        registry.register("sleep", SleepCommand.class);
-        registry.register("make", MakeCommand.class);
-        registry.register("xcodebuild", XCodeCommand.class);
-        registry.register("resource", ResourceReference.class);
-
-        setRegistry(registry);
+        register("property", Property.class);
+        register("recipe", Recipe.class);
+        register("def", ComponentDefinition.class);
+        register("post-processor", PostProcessorGroup.class);
+        register("command", CommandGroup.class);
+        register("ant.pp", AntPostProcessor.class);
+        register("cppunit.pp", CppUnitReportPostProcessor.class);
+        register("junit.pp", JUnitReportPostProcessor.class);
+        register("junit.summary.pp", JUnitSummaryPostProcessor.class);
+        register("ocunit.pp", OCUnitReportPostProcessor.class);
+        register("regex-test.pp", RegexTestPostProcessor.class);
+        register("make.pp", MakePostProcessor.class);
+        register("maven.pp", MavenPostProcessor.class);
+        register("maven2.pp", Maven2PostProcessor.class);
+        register("regex.pp", RegexPostProcessor.class);
+        register("xcodebuild.pp", XCodePostProcessor.class);
+        register("ant", AntCommand.class);
+        register("maven", MavenCommand.class);
+        register("maven2", Maven2Command.class);
+        register("executable", ExecutableCommand.class);
+        register("print", PrintCommand.class);
+        register("sleep", SleepCommand.class);
+        register("make", MakeCommand.class);
+        register("xcodebuild", XCodeCommand.class);
+        register("resource", ResourceReference.class);
     }
 
     public List<ResourceRequirement> loadRequiredResources(String pulseFile, String recipe) throws PulseException

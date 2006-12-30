@@ -105,7 +105,7 @@ public class RecipeProcessor
                     throw new BuildException("Undefined recipe '" + recipeName + "'");
                 }
 
-                build(request.getId(), pulseFile.getScope(), recipeStartTime, recipe, paths, testResults, capture, context);
+                build(request.getId(), pulseFile.getGlobalScope(), recipeStartTime, recipe, paths, testResults, capture, context);
             }
         }
         catch (BuildException e)

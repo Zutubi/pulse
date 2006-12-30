@@ -9,7 +9,7 @@ public class MakePostProcessorLoadTest extends FileLoaderTestBase
         PulseFile bf = new PulseFile();
         loader.load(getInput("basic"), bf);
 
-        Scope globalScope = bf.getScope();
+        Scope globalScope = bf.getGlobalScope();
         assertTrue(globalScope.containsReference(ppName));
         assertTrue(globalScope.getReference(ppName) instanceof MakePostProcessor);
 

@@ -37,6 +37,7 @@ public class RecipeProcessorTest extends PulseTestCase implements EventListener
     private BlockingQueue<Event> events;
     private boolean waitMode = false;
     private Semaphore semaphore = new Semaphore(0);
+    private Semaphore eventSemaphore = new Semaphore(0);
     private ResourceRepository resourceRepository = new FileResourceRepository();
 
     public void setUp() throws Exception
@@ -56,10 +57,9 @@ public class RecipeProcessorTest extends PulseTestCase implements EventListener
         fileLoader.setObjectFactory(new ObjectFactory());
         recipeProcessor.setFileLoader(fileLoader);
 
-        ComponentRegistry registry = fileLoader.getRegistry();
-        registry.register("failure", FailureCommand.class);
-        registry.register("exception", ExceptionCommand.class);
-        registry.register("unexpected-exception", UnexpectedExceptionCommand.class);
+        fileLoader.register("failure", FailureCommand.class);
+        fileLoader.register("exception", ExceptionCommand.class);
+        fileLoader.register("unexpected-exception", UnexpectedExceptionCommand.class);
     }
 
     protected void tearDown() throws Exception

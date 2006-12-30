@@ -80,13 +80,10 @@ public class FileLoaderTest extends FileLoaderTestBase
         PulseFile bf = new PulseFile();
         loader.load(getInput("testDependency"), bf);
 
-/*
-    PulseFile level dependencies are currently not implemented.
         assertNotNull(bf.getDependencies());
         assertEquals(1, bf.getDependencies().size());
         assertEquals("1", bf.getDependencies().get(0).getName());
         assertEquals("2", bf.getDependencies().get(0).getVersion());
-*/
 
         Recipe recipe = bf.getRecipe(bf.getDefaultRecipe());
         assertNotNull(recipe);

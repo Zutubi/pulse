@@ -10,9 +10,13 @@ import com.zutubi.validation.ValidationException;
 import com.zutubi.validation.ValidationManager;
 import nu.xom.*;
 
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.InvocationTargetException;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * 
@@ -22,11 +26,10 @@ public class FileLoader
 {
     private static final int MAX_RECURSION_DEPTH = 128;
 
+    private final Map<String, Class> typeDefinitions = new HashMap<String, Class>();
     private ObjectFactory factory;
 
     private ValidationManager validationManager;
-    
-    private ComponentRegistry registry;
 
     public FileLoader()
     {
@@ -46,6 +49,11 @@ public class FileLoader
     public void setObjectFactory(ObjectFactory factory)
     {
         this.factory = factory;
+    }
+
+    public void load(File file, Object root) throws PulseException, IOException, IllegalAccessException, InvocationTargetException
+    {
+        load(new FileInputStream(file), root);
     }
 
     public void load(InputStream input, Object root) throws PulseException
@@ -86,11 +94,6 @@ public class FileLoader
                 ((ScopeAware) root).setScope(globalScope);
             }
 
-            if (predicate == null)
-            {
-                predicate = new DefaultTypeLoadPredicate();
-            }
-
             mapAttributesToProperties(rootElement, root, true, globalScope);
 
             for (int index = 0; index < rootElement.getChildCount(); index++)
@@ -111,7 +114,7 @@ public class FileLoader
 
     private void loadType(Element e, Object parent, boolean resolveReferences, Scope scope, int depth, ResourceRepository resourceRepository, TypeLoadPredicate predicate) throws PulseException
     {
-        IntrospectionHelper parentHelper = IntrospectionHelper.getHelper(parent.getClass(), registry.getTypeDefinitions());
+        IntrospectionHelper parentHelper = IntrospectionHelper.getHelper(parent.getClass(), typeDefinitions);
         String name = e.getLocalName();
 
         Object type;
@@ -141,9 +144,12 @@ public class FileLoader
                 type = create(name);
             }
 
-            resolveReferences = resolveReferences && predicate.resolveReferences(type, e);
+            if(predicate != null)
+            {
+                resolveReferences = resolveReferences && predicate.resolveReferences(type, e);
+            }
 
-            IntrospectionHelper typeHelper = IntrospectionHelper.getHelper(type.getClass(), registry.getTypeDefinitions());
+            IntrospectionHelper typeHelper = IntrospectionHelper.getHelper(type.getClass(), typeDefinitions);
 
             // initialise attributes
             mapAttributesToProperties(e, type, resolveReferences, scope);
@@ -158,7 +164,7 @@ public class FileLoader
                 }
             }
 
-            boolean loadType = predicate.loadType(type, e);
+            boolean loadType = predicate == null || predicate.loadType(type, e);
             if(loadType)
             {
                 scope = new Scope(scope);
@@ -390,7 +396,7 @@ public class FileLoader
 
     private Object create(String name) throws FileLoadException
     {
-        Class clz = registry.getTypeDefinitions().get(name);
+        Class clz = typeDefinitions.get(name);
         if (clz != null)
         {
             try
@@ -423,7 +429,7 @@ public class FileLoader
 
     private void mapAttributesToProperties(Element source, Object target, boolean resolveReferences, Scope scope) throws FileLoadException
     {
-        IntrospectionHelper helper = IntrospectionHelper.getHelper(target.getClass(), registry.getTypeDefinitions());
+        IntrospectionHelper helper = IntrospectionHelper.getHelper(target.getClass(), typeDefinitions);
 
         for (int i = 0; i < source.getAttributeCount(); i++)
         {
@@ -449,13 +455,8 @@ public class FileLoader
         }
     }
 
-    public void setRegistry(ComponentRegistry registry)
+    public void register(String name, Class type)
     {
-        this.registry = registry;
-    }
-
-    public ComponentRegistry getRegistry()
-    {
-        return registry;
+        typeDefinitions.put(name, type);
     }
 }

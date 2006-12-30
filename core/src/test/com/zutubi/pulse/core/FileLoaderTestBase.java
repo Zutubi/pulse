@@ -1,5 +1,6 @@
 package com.zutubi.pulse.core;
 
+import com.zutubi.pulse.core.model.Property;
 import com.zutubi.pulse.test.PulseTestCase;
 
 /**
@@ -18,13 +19,12 @@ public abstract class FileLoaderTestBase extends PulseTestCase
         loader.setObjectFactory(factory);
 
         // initialise the loader some test objects.
-        ComponentRegistry registry = loader.getRegistry();
-        registry.register("dependency", Dependency.class);
-        registry.register("reference", SimpleReference.class);
-        registry.register("nested", SimpleNestedType.class);
-        registry.register("type", SimpleType.class);
-        registry.register("some-reference", SomeReference.class);
-        registry.register("validateable", SimpleValidateable.class);
+        loader.register("dependency", Dependency.class);
+        loader.register("reference", SimpleReference.class);
+        loader.register("nested", SimpleNestedType.class);
+        loader.register("type", SimpleType.class);
+        loader.register("some-reference", SomeReference.class);
+        loader.register("validateable", SimpleValidateable.class);
     }
 
     public void tearDown() throws Exception
@@ -48,7 +48,7 @@ public abstract class FileLoaderTestBase extends PulseTestCase
         PulseFile bf = new PulseFile();
         loader.load(getInput("basic"), bf);
 
-        Scope globalScope = bf.getScope();
+        Scope globalScope = bf.getGlobalScope();
         assertTrue(globalScope.containsReference(name));
         return (T) globalScope.getReference(name);
     }
