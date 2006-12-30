@@ -153,7 +153,7 @@ public class LocalBuild
             processor.setFileLoader(fileLoader);
 
             RecipeRequest request = new RecipeRequest(0, bootstrapper, loadPulseFile(baseDir, pulseFileName), recipe);
-            processor.build(request, paths, repository, false, new BuildContext());
+            processor.build(new BuildContext(), request, paths, repository, false);
         }
         catch (FileNotFoundException e)
         {

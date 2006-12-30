@@ -41,7 +41,7 @@ public class MasterRecipeRunner implements Runnable
 
         try
         {
-            recipeProcessor.build(request, recipePaths, resourceRepository, true, context);
+            recipeProcessor.build(context, request, recipePaths, resourceRepository, true);
         }
         catch (BuildException e)
         {

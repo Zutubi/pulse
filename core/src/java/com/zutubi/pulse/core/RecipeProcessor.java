@@ -24,6 +24,8 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
 /**
+ * The recipe processor, as the name suggests, is responsible for running recipies.
+ *
  */
 public class RecipeProcessor
 {
@@ -53,7 +55,7 @@ public class RecipeProcessor
         return String.format("%08d-%s", i, result.getCommandName());
     }
 
-    public void build(RecipeRequest request, RecipePaths paths, ResourceRepository resourceRepository, boolean capture, BuildContext context)
+    public void build(BuildContext context, RecipeRequest request, RecipePaths paths, ResourceRepository resourceRepository, boolean capture)
     {
         // This result holds only the recipe details (stamps, state etc), not
         // the command results.  A full recipe result with command results is
@@ -82,8 +84,7 @@ public class RecipeProcessor
                bootstrapResult.succeeded())
             {
                 // Now we can load the recipe from the pulse file
-                Scope globalScope = new Scope();
-                PulseFile pulseFile = loadPulseFile(request, paths.getBaseDir(), resourceRepository, globalScope, context, recipeStartTime);
+                PulseFile pulseFile = loadPulseFile(request, paths.getBaseDir(), resourceRepository, context, recipeStartTime);
                 Recipe recipe;
 
                 //TODO: rather than requiring a recipe, allow any reference that implements a required interface to
@@ -104,7 +105,7 @@ public class RecipeProcessor
                     throw new BuildException("Undefined recipe '" + recipeName + "'");
                 }
 
-                build(request.getId(), globalScope, recipeStartTime, recipe, paths, testResults, capture, context);
+                build(request.getId(), pulseFile.getScope(), recipeStartTime, recipe, paths, testResults, capture, context);
             }
         }
         catch (BuildException e)
@@ -154,7 +155,7 @@ public class RecipeProcessor
         }
     }
 
-    public void build(long recipeId, Scope globalScope, long recipeStartTime, Recipe recipe, RecipePaths paths, TestSuiteResult testResults, boolean capture, BuildContext context) throws BuildException
+    private void build(long recipeId, Scope globalScope, long recipeStartTime, Recipe recipe, RecipePaths paths, TestSuiteResult testResults, boolean capture, BuildContext context) throws BuildException
     {
         // TODO: support continuing build when errors occur. Take care: exceptions.
         int i = 1;
@@ -261,8 +262,10 @@ public class RecipeProcessor
         return commandContext;
     }
 
-    private PulseFile loadPulseFile(RecipeRequest request, File baseDir, ResourceRepository resourceRepository, Scope globalScope, BuildContext buildContext, long recipeStartTime) throws BuildException
+    private PulseFile loadPulseFile(RecipeRequest request, File baseDir, ResourceRepository resourceRepository, BuildContext buildContext, long recipeStartTime) throws BuildException
     {
+        // prepare the global scope for the pulse file.
+        Scope globalScope = new Scope();
         globalScope.add(new Property("base.dir", baseDir.getAbsolutePath()));
         globalScope.add(new Property("recipe.timestamp", BuildContext.PULSE_BUILD_TIMESTAMP_FORMAT.format(new Date(recipeStartTime))));
         globalScope.add(new Property("recipe.timestamp.millis", Long.toString(recipeStartTime)));
@@ -274,25 +277,31 @@ public class RecipeProcessor
             globalScope.add(new Property("build.timestamp.millis", Long.toString(buildContext.getBuildTimestamp())));
         }
 
-        addEnvironment(globalScope);
+        Map<String, String> env = System.getenv();
+        for(Map.Entry<String, String> var: env.entrySet())
+        {
+            globalScope.addEnvironmentProperty(var.getKey(), var.getValue());
+        }
+
         if(request.getProperties() != null)
         {
             globalScope.add(request.getProperties());
         }
-        
+
+        // import the required resources into the pulse files scope.
         importResources(resourceRepository, request.getResourceRequirements(), globalScope);
 
-        InputStream stream = null;
+        // CIB-286: special case empty file for better reporting
+        String pulseFileSource = request.getPulseFileSource();
+        if(!TextUtils.stringSet(pulseFileSource))
+        {
+            throw new BuildException("Unable to parse pulse file: File is empty");
+        }
 
+        // load the pulse file from the source.
+        InputStream stream = null;
         try
         {
-            // CIB-286: special case empty file for better reporting
-            String pulseFileSource = request.getPulseFileSource();
-            if(pulseFileSource.trim().length() == 0)
-            {
-                throw new ParseException("File is empty");
-            }
-
             stream = new ByteArrayInputStream(pulseFileSource.getBytes());
             PulseFile result = new PulseFile();
             fileLoader.load(stream, result, globalScope, resourceRepository, new RecipeLoadPredicate(result, request.getRecipeName()));
@@ -305,15 +314,6 @@ public class RecipeProcessor
         finally
         {
             IOUtils.close(stream);
-        }
-    }
-
-    private void addEnvironment(Scope globalScope)
-    {
-        Map<String, String> env = System.getenv();
-        for(Map.Entry<String, String> var: env.entrySet())
-        {
-            globalScope.addEnvironmentProperty(var.getKey(), var.getValue());
         }
     }
 
@@ -351,26 +351,6 @@ public class RecipeProcessor
         }
     }
 
-    /**
-     * The event manager is a required reference.
-     *
-     * @param eventManager
-     */
-    public void setEventManager(EventManager eventManager)
-    {
-        this.eventManager = eventManager;
-    }
-
-    public FileLoader getFileLoader()
-    {
-        return fileLoader;
-    }
-
-    public void setFileLoader(FileLoader fileLoader)
-    {
-        this.fileLoader = fileLoader;
-    }
-
     public void terminateRecipe(long id) throws InterruptedException
     {
         // Preconditions:
@@ -404,5 +384,20 @@ public class RecipeProcessor
     public long getBuildingRecipe()
     {
         return runningRecipe;
+    }
+
+    /**
+     * The event manager is a required reference.
+     *
+     * @param eventManager
+     */
+    public void setEventManager(EventManager eventManager)
+    {
+        this.eventManager = eventManager;
+    }
+
+    public void setFileLoader(FileLoader fileLoader)
+    {
+        this.fileLoader = fileLoader;
     }
 }

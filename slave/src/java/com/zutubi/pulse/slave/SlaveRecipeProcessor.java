@@ -70,7 +70,7 @@ public class SlaveRecipeProcessor
 
             try
             {
-                recipeProcessor.build(request, processorPaths, repo, true, context);
+                recipeProcessor.build(context, request, processorPaths, repo, true);
             }
             catch (BuildException e)
             {
