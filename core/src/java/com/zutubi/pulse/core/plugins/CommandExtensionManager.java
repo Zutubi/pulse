@@ -1,16 +1,16 @@
 package com.zutubi.pulse.core.plugins;
 
-import com.zutubi.pulse.plugins.PluginManager;
-import com.zutubi.pulse.core.Command;
 import com.zutubi.pulse.core.PulseFileLoaderFactory;
-import org.eclipse.core.runtime.*;
-import org.eclipse.core.runtime.spi.RegistryContributor;
-import org.eclipse.core.runtime.dynamichelpers.ExtensionTracker;
-import org.eclipse.core.runtime.dynamichelpers.IFilter;
-import org.eclipse.core.runtime.dynamichelpers.IExtensionTracker;
-import org.eclipse.core.runtime.dynamichelpers.IExtensionChangeHandler;
-import org.eclipse.core.internal.registry.ExtensionRegistry;
+import com.zutubi.pulse.plugins.PluginManager;
 import org.eclipse.core.internal.registry.osgi.OSGIUtils;
+import org.eclipse.core.runtime.IConfigurationElement;
+import org.eclipse.core.runtime.IExtension;
+import org.eclipse.core.runtime.IExtensionPoint;
+import org.eclipse.core.runtime.IExtensionRegistry;
+import org.eclipse.core.runtime.dynamichelpers.ExtensionTracker;
+import org.eclipse.core.runtime.dynamichelpers.IExtensionChangeHandler;
+import org.eclipse.core.runtime.dynamichelpers.IExtensionTracker;
+import org.eclipse.core.runtime.dynamichelpers.IFilter;
 import org.osgi.framework.Bundle;
 
 /**
@@ -22,7 +22,7 @@ public class CommandExtensionManager implements IExtensionChangeHandler
 
     public void init()
     {
-        ExtensionRegistry registry = pluginManager.getExtenstionRegistry();
+        IExtensionRegistry registry = pluginManager.getExtenstionRegistry();
         IExtensionTracker tracker = pluginManager.getExtenstionTracker();
 
         IExtensionPoint extensionPoint = registry.getExtensionPoint("com.zutubi.pulse.core.commands");

@@ -1,24 +1,27 @@
 package com.zutubi.pulse.plugins;
 
 import com.zutubi.pulse.util.logging.Logger;
-
-import java.io.File;
-import java.util.*;
-
-import org.eclipse.core.internal.registry.ExtensionRegistry;
 import org.eclipse.core.runtime.IExtensionRegistry;
+import org.eclipse.core.runtime.RegistryFactory;
 import org.eclipse.core.runtime.adaptor.EclipseStarter;
 import org.eclipse.core.runtime.dynamichelpers.ExtensionTracker;
 import org.eclipse.core.runtime.dynamichelpers.IExtensionTracker;
-import org.osgi.framework.*;
+import org.osgi.framework.Bundle;
+import org.osgi.framework.BundleContext;
+import org.osgi.framework.BundleException;
+import org.osgi.framework.ServiceReference;
 import org.osgi.service.packageadmin.PackageAdmin;
+
+import java.io.File;
+import java.util.LinkedList;
+import java.util.List;
 
 public class DefaultPluginManager implements PluginManager
 {
     private static final Logger LOG = Logger.getLogger(DefaultPluginManager.class);
     private PluginPaths pluginPaths;
     private BundleContext context;
-    private ExtensionRegistry extensionRegistry;
+    private IExtensionRegistry extensionRegistry;
     private IExtensionTracker extensionTracker;
 
     public DefaultPluginManager()
@@ -32,12 +35,10 @@ public class DefaultPluginManager implements PluginManager
         LOG.info("Starting plugin manager...");
         try
         {
-            context = EclipseStarter.startup(new String[0], null);
-
+            context = EclipseStarter.startup(new String[]{ "-clean" }, null);
             loadInternalPlugins();
 
-            ServiceReference registryRef = context.getServiceReference(IExtensionRegistry.class.getName());
-            extensionRegistry = (ExtensionRegistry) context.getService(registryRef);
+            extensionRegistry = RegistryFactory.getRegistry();
             extensionTracker = new ExtensionTracker(extensionRegistry);
 
             loadPrepackagedPlugins();
@@ -47,6 +48,18 @@ public class DefaultPluginManager implements PluginManager
         catch (Exception e)
         {
             LOG.severe("Unable to start plugin manager: " + e.getMessage(), e);
+        }
+    }
+
+    public void destroy()
+    {
+        try
+        {
+            EclipseStarter.shutdown();
+        }
+        catch (Exception e)
+        {
+            LOG.warning("Unable to shut down plugin manager: " + e.getMessage(), e);
         }
     }
 
@@ -128,7 +141,7 @@ public class DefaultPluginManager implements PluginManager
     }
 
 
-    public ExtensionRegistry getExtenstionRegistry()
+    public IExtensionRegistry getExtenstionRegistry()
     {
         return extensionRegistry;
     }

@@ -3,7 +3,7 @@
 
 <beans>
 
-    <bean id="pluginManager" class="com.zutubi.pulse.plugins.DefaultPluginManager" init-method="init" autowire="byName"/>
+    <bean id="pluginManager" class="com.zutubi.pulse.plugins.DefaultPluginManager" init-method="init" destroy-method="destroy" autowire="byName"/>
     <bean id="commandExtensionManager" class="com.zutubi.pulse.core.plugins.CommandExtensionManager" init-method="init" autowire="byName"/>
 
 </beans>

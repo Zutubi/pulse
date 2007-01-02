@@ -1,4 +1,4 @@
-Bundle-SymbolicName: com.zutubi.pulse.core
+Bundle-SymbolicName: com.zutubi.pulse.core; singleton:=true
 Bundle-Name: com.zutubi.pulse.core
 Bundle-Description: The pulse core subsystem.
 Bundle-Vendor: Zutubi
