@@ -4,8 +4,6 @@ import com.opensymphony.util.TextUtils;
 import com.zutubi.pulse.BuildContext;
 import com.zutubi.pulse.core.model.*;
 import com.zutubi.pulse.events.EventManager;
-import com.zutubi.pulse.events.build.CommandCommencedEvent;
-import com.zutubi.pulse.events.build.CommandCompletedEvent;
 import com.zutubi.pulse.events.build.RecipeCommencedEvent;
 import com.zutubi.pulse.events.build.RecipeCompletedEvent;
 import com.zutubi.pulse.model.ResourceRequirement;
@@ -34,7 +32,7 @@ public class RecipeProcessor
     private EventManager eventManager;
     private Lock runningLock = new ReentrantLock();
     private long runningRecipe = 0;
-    private Command runningCommand = null;
+    private Recipe runningRecipeInstance = null;
     private boolean terminating = false;
     private PulseFileLoaderFactory fileLoaderFactory;
 
@@ -45,14 +43,6 @@ public class RecipeProcessor
     public void init()
     {
         
-    }
-
-    public static String getCommandDirName(int i, CommandResult result)
-    {
-        // Use the command name because:
-        // a) we do not have an id for the command model
-        // b) for local builds, this is a lot friendlier for the developer
-        return String.format("%08d-%s", i, result.getCommandName());
     }
 
     public void build(BuildContext context, RecipeRequest request, RecipePaths paths, ResourceRepository resourceRepository, boolean capture)
@@ -69,44 +59,45 @@ public class RecipeProcessor
         runningRecipe = recipeResult.getId();
         eventManager.publish(new RecipeCommencedEvent(this, recipeResult.getId(), recipeResult.getRecipeName(), recipeResult.getStartTime()));
 
+        CommandOutputStream outputStream = null;
         try
         {
             long recipeStartTime = recipeResult.getStartTime();
 
+            RecipeContext recipeContext = createRecipeContext(paths, testResults, null, recipeStartTime, context, request.getId());
+            if(capture)
+            {
+                outputStream = new CommandOutputStream(eventManager, runningRecipe, true);
+                recipeContext.setOutputStream(outputStream);
+            }
+
             // Wrap bootstrapper in a command and run it.
             BootstrapCommand bootstrapCommand = new BootstrapCommand(request.getBootstrapper());
-            CommandResult bootstrapResult = new CommandResult(bootstrapCommand.getName());
-            File commandOutput = new File(paths.getOutputDir(), getCommandDirName(0, bootstrapResult));
 
-            CommandContext commandContext = createCommandContext(paths, commandOutput, testResults, null, recipeStartTime, context, request.getId());
+            // Now we can load the recipe from the pulse file
+            PulseFile pulseFile = loadPulseFile(request, paths.getBaseDir(), resourceRepository, context, recipeStartTime);
 
-            if(executeCommand(commandContext, bootstrapResult, commandOutput, bootstrapCommand, capture) &&
-               bootstrapResult.succeeded())
+            String recipeName = request.getRecipeName();
+            if (!TextUtils.stringSet(recipeName))
             {
-                // Now we can load the recipe from the pulse file
-                PulseFile pulseFile = loadPulseFile(request, paths.getBaseDir(), resourceRepository, context, recipeStartTime);
-                Recipe recipe;
-
-                //TODO: rather than requiring a recipe, allow any reference that implements a required interface to
-                //      be extracted via pulseFile.get(name); The entity extracted must be executable and ..?
-                String recipeName = request.getRecipeName();
+                recipeName = pulseFile.getDefaultRecipe();
                 if (!TextUtils.stringSet(recipeName))
                 {
-                    recipeName = pulseFile.getDefaultRecipe();
-                    if (!TextUtils.stringSet(recipeName))
-                    {
-                        throw new BuildException("Please specify a default recipe for your project.");
-                    }
+                    throw new BuildException("Please specify a default recipe for your project.");
                 }
-
-                recipe = pulseFile.getRecipe(recipeName);
-                if (recipe == null)
-                {
-                    throw new BuildException("Undefined recipe '" + recipeName + "'");
-                }
-
-                build(request.getId(), pulseFile.getGlobalScope(), recipeStartTime, recipe, paths, testResults, capture, context);
             }
+
+            Recipe recipe = pulseFile.getRecipe(recipeName);
+            if (recipe == null)
+            {
+                throw new BuildException("Undefined recipe '" + recipeName + "'");
+            }
+
+            recipe.addFirstCommand(bootstrapCommand);
+
+            runningRecipeInstance = recipe;
+
+            recipe.execute(recipeContext);
         }
         catch (BuildException e)
         {
@@ -119,6 +110,8 @@ public class RecipeProcessor
         }
         finally
         {
+            IOUtils.close(outputStream);
+            
             writeTestResults(paths, testResults);
             recipeResult.setTestSummary(testResults.getSummary());
             recipeResult.complete();
@@ -155,111 +148,19 @@ public class RecipeProcessor
         }
     }
 
-    private void build(long recipeId, Scope globalScope, long recipeStartTime, Recipe recipe, RecipePaths paths, TestSuiteResult testResults, boolean capture, BuildContext context) throws BuildException
+    private RecipeContext createRecipeContext(RecipePaths paths, TestSuiteResult testResults, Scope globalScope, long recipeStartTime, BuildContext buildContext, long recipeId)
     {
-        // TODO: support continuing build when errors occur. Take care: exceptions.
-        int i = 1;
-        for (Command command : recipe.getCommands())
-        {
-            CommandResult result = new CommandResult(command.getName());
-
-            File commandOutput = new File(paths.getOutputDir(), getCommandDirName(i, result));
-
-            CommandContext commandContext = createCommandContext(paths, commandOutput, testResults, globalScope, recipeStartTime, context, recipeId);
-
-            if(!executeCommand(commandContext, result, commandOutput, command, capture))
-            {
-                return;
-            }
-
-            switch (result.getState())
-            {
-                case FAILURE:
-                case ERROR:
-                    return;
-            }
-            i++;
-        }
-    }
-
-    private boolean executeCommand(CommandContext commandContext, CommandResult commandResult, File commandOutput, Command command, boolean capture)
-    {
-        // support synchronization around the running command to ensure that
-        // command termination is clean.
-        runningLock.lock();
-        if (terminating)
-        {
-            runningLock.unlock();
-            return false;
-        }
-
-        runningCommand = command;
-        runningLock.unlock();
-
-        commandResult.commence();
-        commandResult.setOutputDir(commandOutput.getPath());
-        eventManager.publish(new CommandCommencedEvent(this, commandContext.getRecipeId(), commandResult.getCommandName(), commandResult.getStartTime()));
-
-        CommandOutputStream outputStream = null;
-
-        try
-        {
-            if (!commandOutput.mkdirs())
-            {
-                throw new BuildException("Could not create command output directory '" + commandOutput.getAbsolutePath() + "'");
-            }
-
-            if(capture)
-            {
-                outputStream = new CommandOutputStream(eventManager, commandContext.getRecipeId(), true);
-                commandContext.setOutputStream(outputStream);
-            }
-
-            command.execute(commandContext, commandResult);
-        }
-        catch (BuildException e)
-        {
-            commandResult.error(e);
-        }
-        catch (Exception e)
-        {
-            LOG.severe(e);
-            commandResult.error(new BuildException("Unexpected error: " + e.getMessage(), e));
-        }
-        finally
-        {
-            IOUtils.close(outputStream);
-            commandResult.complete();
-            eventManager.publish(new CommandCompletedEvent(this, commandContext.getRecipeId(), commandResult));
-        }
-
-        return true;
-    }
-
-    /**
-     * Utility method for constructing and configuring a command context instance.
-     *
-     * @param paths
-     * @param commandOutput
-     * @param testResults
-     * @param globalScope
-     * @param recipeStartTime
-     * @param buildContext
-     * @param recipeId
-     *
-     * @return configured command context instance.
-     */
-    private CommandContext createCommandContext(RecipePaths paths, File commandOutput, TestSuiteResult testResults, Scope globalScope, long recipeStartTime, BuildContext buildContext, long recipeId)
-    {
-        CommandContext commandContext = new CommandContext(paths, commandOutput, testResults);
-        commandContext.setGlobalScope(globalScope);
-        commandContext.setRecipeStartTime(recipeStartTime);
-        commandContext.setRecipeId(recipeId);
+        RecipeContext context = new RecipeContext();
+        context.setTestResults(testResults);
+        context.setRecipePaths(paths);
+        context.setGlobalScope(globalScope);
+        context.setRecipeStartTime(recipeStartTime);
+        context.setRecipeId(recipeId);
         if (buildContext != null && buildContext.getBuildNumber() != -1)
         {
-            commandContext.setBuildContext(buildContext);
+            context.setBuildContext(buildContext);
         }
-        return commandContext;
+        return context;
     }
 
     private PulseFile loadPulseFile(RecipeRequest request, File baseDir, ResourceRepository resourceRepository, BuildContext buildContext, long recipeStartTime) throws BuildException
@@ -370,9 +271,9 @@ public class RecipeProcessor
             if (runningRecipe == id)
             {
                 terminating = true;
-                if (runningCommand != null)
+                if (runningRecipeInstance != null)
                 {
-                    runningCommand.terminate();
+                    runningRecipeInstance.terminate();
                 }
             }
         }

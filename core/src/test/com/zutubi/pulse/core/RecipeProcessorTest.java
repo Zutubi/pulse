@@ -37,7 +37,6 @@ public class RecipeProcessorTest extends PulseTestCase implements EventListener
     private BlockingQueue<Event> events;
     private boolean waitMode = false;
     private Semaphore semaphore = new Semaphore(0);
-    private Semaphore eventSemaphore = new Semaphore(0);
     private ResourceRepository resourceRepository = new FileResourceRepository();
 
     public void setUp() throws Exception
@@ -53,8 +52,22 @@ public class RecipeProcessorTest extends PulseTestCase implements EventListener
         events = new LinkedBlockingQueue<Event>(10);
         eventManager.register(this);
 
+// just a little bit of wiring tomfoolary.
+        ObjectFactory factory = new ObjectFactory()
+        {
+            public Object buildBean(Class clazz) throws Exception
+            {
+                Object bean = super.buildBean(clazz);
+                if (bean instanceof Recipe)
+                {
+                    ((Recipe)bean).setEventManager(eventManager);
+                }
+                return bean;
+            }
+        };
+
         PulseFileLoaderFactory fileLoaderFactory = new PulseFileLoaderFactory();
-        fileLoaderFactory.setObjectFactory(new ObjectFactory());
+        fileLoaderFactory.setObjectFactory(factory);
         fileLoaderFactory.register("failure", FailureCommand.class);
         fileLoaderFactory.register("exception", ExceptionCommand.class);
         fileLoaderFactory.register("unexpected-exception", UnexpectedExceptionCommand.class);
@@ -103,8 +116,6 @@ public class RecipeProcessorTest extends PulseTestCase implements EventListener
     {
         recipeProcessor.build(new BuildContext(), new RecipeRequest(1, new SimpleBootstrapper(), getPulseFile("nodefault"), null), paths, resourceRepository, false);
         assertRecipeCommenced(1, null);
-        assertCommandCommenced(1, "bootstrap");
-        assertCommandCompleted(1, ResultState.SUCCESS);
         assertRecipeError(1, "Please specify a default recipe for your project.");
         assertNoMoreEvents();
     }
@@ -259,7 +270,7 @@ public class RecipeProcessorTest extends PulseTestCase implements EventListener
 
     private void assertOutputFile(int commandIndex, String commandName, String contents) throws IOException
     {
-        String dirName = RecipeProcessor.getCommandDirName(commandIndex, new CommandResult(commandName));
+        String dirName = Recipe.getCommandDirName(commandIndex, new CommandResult(commandName));
         File outDir = new File(outputDir, dirName);
         assertTrue(outDir.isDirectory());
         File outFile = new File(outDir, FileSystemUtils.composeFilename(Command.OUTPUT_ARTIFACT_NAME, "output.txt"));

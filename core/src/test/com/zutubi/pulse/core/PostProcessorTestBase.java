@@ -36,7 +36,11 @@ public abstract class PostProcessorTestBase extends PulseTestCase
         createArtifact(name);
         CommandResult commandResult = new CommandResult("test");
         commandResult.commence();
-        pp.process(artifact, commandResult, new CommandContext(null, tempDir, null));
+
+        CommandContext commandContext = new CommandContext();
+        commandContext.setOutputDir(tempDir);
+        
+        pp.process(artifact, commandResult, commandContext);
         commandResult.complete();
         return commandResult;
     }

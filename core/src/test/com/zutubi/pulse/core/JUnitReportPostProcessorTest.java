@@ -126,7 +126,14 @@ public class JUnitReportPostProcessorTest extends XMLReportPostProcessorTestBase
         File outputDir = getOutputDir();
         StoredFileArtifact artifact = getArtifact("simple");
         TestSuiteResult testResults = new TestSuiteResult();
-        CommandContext context = new CommandContext(null, outputDir, testResults);
+
+        RecipeContext recipeContext = new RecipeContext();
+        recipeContext.setTestResults(testResults);
+
+        CommandContext context = new CommandContext();
+        context.setRecipeContext(recipeContext);
+        context.setOutputDir(outputDir);
+
         pp.process(artifact, result, context);
     }
 }

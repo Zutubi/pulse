@@ -78,7 +78,12 @@ public class RegexTestPostProcessorTest extends PulseTestCase
         pp.setFailureStatus("FAIL");
 
         TestSuiteResult testResults = new TestSuiteResult();
-        CommandContext context = new CommandContext(null, tmpDir, testResults);
+        RecipeContext recipeContext = new RecipeContext();
+        recipeContext.setTestResults(testResults);
+        CommandContext context = new CommandContext();
+        context.setOutputDir(tmpDir);
+        context.setRecipeContext(recipeContext);
+        
         pp.process(artifact, result, context);
         return testResults;
     }    

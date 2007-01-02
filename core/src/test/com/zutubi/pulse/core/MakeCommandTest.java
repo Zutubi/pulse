@@ -8,33 +8,32 @@ import java.io.IOException;
  */
 public class MakeCommandTest extends CommandTestBase
 {
-
-    public void testBasicDefault() throws IOException, FileLoadException
+    public void testBasicDefault() throws Exception
     {
-        copyBuildFile("basic");
+        copyBuildFileToBaseDir("basic");
         MakeCommand command = new MakeCommand();
         successRun(command, "build target");
     }
 
-    public void testBasicTargets() throws IOException, FileLoadException
+    public void testBasicTargets() throws Exception
     {
-        copyBuildFile("basic");
+        copyBuildFileToBaseDir("basic");
         MakeCommand command = new MakeCommand();
         command.setTargets("build test");
         successRun(command, "build target", "test target");
     }
 
-    public void testDoubleSpaceTargets() throws IOException, FileLoadException
+    public void testDoubleSpaceTargets() throws Exception
     {
-        copyBuildFile("basic");
+        copyBuildFileToBaseDir("basic");
         MakeCommand command = new MakeCommand();
         command.setTargets("build  test");
         successRun(command, "build target", "test target");
     }
 
-    public void testEnvironment() throws IOException, FileLoadException
+    public void testEnvironment() throws Exception
     {
-        copyBuildFile("basic");
+        copyBuildFileToBaseDir("basic");
         MakeCommand command = new MakeCommand();
         command.setTargets("environment");
         ExecutableCommand.Environment env = command.createEnvironment();
@@ -43,7 +42,7 @@ public class MakeCommandTest extends CommandTestBase
         successRun(command, "test variable value");
     }
 
-    public void testExplicitBuildfile() throws IOException, FileLoadException
+    public void testExplicitBuildfile() throws Exception
     {
         copyBuildFile("basic", "custom.makefile");
         MakeCommand command = new MakeCommand();
@@ -51,7 +50,7 @@ public class MakeCommandTest extends CommandTestBase
         successRun(command, "build target");
     }
 
-    public void testExplicitArguments() throws IOException, FileLoadException
+    public void testExplicitArguments() throws Exception
     {
         copyBuildFile("basic", "custom.makefile");
         MakeCommand command = new MakeCommand();
@@ -62,13 +61,13 @@ public class MakeCommandTest extends CommandTestBase
         successRun(command, "build target", "test target");
     }
 
-    public void testRunNoBuildFile() throws IOException, FileLoadException
+    public void testRunNoBuildFile() throws Exception
     {
         MakeCommand command = new MakeCommand();
         failedRun(command, "No targets specified and no makefile found");
     }
 
-    public void testRunNonExistantBuildFile() throws IOException, FileLoadException
+    public void testRunNonExistantBuildFile() throws Exception
     {
         MakeCommand command = new MakeCommand();
         command.setMakefile("nope.makefile");

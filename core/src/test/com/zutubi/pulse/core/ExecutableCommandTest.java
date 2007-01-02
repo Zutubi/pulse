@@ -2,7 +2,6 @@ package com.zutubi.pulse.core;
 
 import com.zutubi.pulse.BuildContext;
 import com.zutubi.pulse.core.model.*;
-import com.zutubi.pulse.test.PulseTestCase;
 import com.zutubi.pulse.util.FileSystemUtils;
 import com.zutubi.pulse.util.IOUtils;
 import com.zutubi.pulse.util.SystemUtils;
@@ -15,22 +14,15 @@ import java.util.List;
  * 
  *
  */
-public class ExecutableCommandTest extends PulseTestCase
+public class ExecutableCommandTest extends CommandTestBase
 {
-    private File baseDirectory;
-    private File outputDirectory;
-
-    public void setUp() throws Exception
+    public void setUp() throws IOException
     {
         super.setUp();
-        baseDirectory = FileSystemUtils.createTempDir(ExecutableCommandTest.class.getName(), ".base");
-        outputDirectory = FileSystemUtils.createTempDir(ExecutableCommandTest.class.getName(), ".out");
     }
 
-    public void tearDown() throws Exception
+    public void tearDown() throws IOException
     {
-        FileSystemUtils.rmdir(outputDirectory);
-        FileSystemUtils.rmdir(baseDirectory);
         super.tearDown();
     }
 
@@ -39,8 +31,7 @@ public class ExecutableCommandTest extends PulseTestCase
         ExecutableCommand command = new ExecutableCommand();
         command.setExe("echo");
         command.setArgs("hello world");
-        CommandResult result = new CommandResult("success");
-        execute(command, result);
+        CommandResult result = runCommand(command);
         assertEquals(result.getState(), ResultState.SUCCESS);
     }
 
@@ -49,8 +40,7 @@ public class ExecutableCommandTest extends PulseTestCase
         ExecutableCommand command = new ExecutableCommand();
         command.setExe("dir");
         command.setArgs("wtfisgoingon");
-        CommandResult result = new CommandResult("failure");
-        execute(command, result);
+        CommandResult result = runCommand(command);
         assertEquals(ResultState.FAILURE, result.getState());
     }
 
@@ -58,8 +48,7 @@ public class ExecutableCommandTest extends PulseTestCase
     {
         ExecutableCommand command = new ExecutableCommand();
         command.setExe("netstat");
-        CommandResult result = new CommandResult("no arg");
-        execute(command, result);
+        CommandResult result = runCommand(command);
         assertEquals(result.getState(), ResultState.SUCCESS);
     }
 
@@ -68,13 +57,12 @@ public class ExecutableCommandTest extends PulseTestCase
         ExecutableCommand command = new ExecutableCommand();
         command.setExe("unknown");
         command.setArgs("command");
-        CommandResult result = new CommandResult("exception");
+
+        CommandResult result = null;
         try
         {
-            CommandGroup commandGroup = new CommandGroup();
-            commandGroup.add(command);
-            execute(commandGroup, result);
-            fail();
+            result = runCommand(command);
+            assertTrue(result.errored());
         }
         catch (BuildException e)
         {
@@ -89,7 +77,7 @@ public class ExecutableCommandTest extends PulseTestCase
         assertEquals(ExecutableCommand.ENV_ARTIFACT_NAME + "/env.txt", fileArtifact.getPath());
     }
 
-    public void testPostProcess() throws FileLoadException
+    public void testPostProcess() throws Exception
     {
         ExecutableCommand command = new ExecutableCommand();
         command.setExe("echo");
@@ -103,13 +91,7 @@ public class ExecutableCommandTest extends PulseTestCase
         processor.addRegexPattern(regex);
         processArtifact.setProcessor(processor);
 
-        // wrap the executable command in a command group so that the artifacts
-        // are processed.
-        CommandGroup commandGroup = new CommandGroup();
-        commandGroup.add(command);
-
-        CommandResult cmdResult = new CommandResult("processed");
-        execute(commandGroup, cmdResult);
+        CommandResult cmdResult = runCommand(command);
         assertEquals(ResultState.FAILURE, cmdResult.getState());
 
         StoredArtifact artifact = cmdResult.getArtifact(Command.OUTPUT_ARTIFACT_NAME);
@@ -120,9 +102,9 @@ public class ExecutableCommandTest extends PulseTestCase
         assertEquals("error: badness", feature.getSummary());
     }
 
-    public void testWorkingDir() throws IOException
+    public void testWorkingDir() throws Exception
     {
-        File dir = new File(baseDirectory, "nested");
+        File dir = new File(baseDir, "nested");
         File file;
 
         assertTrue(dir.mkdir());
@@ -144,12 +126,11 @@ public class ExecutableCommandTest extends PulseTestCase
         command.setWorkingDir(new File("nested"));
         command.setExe(file.getPath());
 
-        CommandResult result = new CommandResult("work");
-        execute(command, result);
+        CommandResult result = runCommand(command);
         assertTrue(result.succeeded());
     }
 
-    public void testExtraPathInScope() throws IOException
+    public void testExtraPathInScope() throws Exception
     {
         File data = getTestDataFile("core", "scope", "bin");
         Scope scope = new Scope();
@@ -159,12 +140,11 @@ public class ExecutableCommandTest extends PulseTestCase
         command.setExe("custom");
         command.setScope(scope);
 
-        CommandResult result = new CommandResult("work");
-        execute(command, result);
+        CommandResult result = runCommand(command);
         assertTrue(result.succeeded());
     }
 
-    public void testEnvironmentVariableFromScope() throws IOException
+    public void testEnvironmentVariableFromScope() throws Exception
     {
         File data = getTestDataFile("core", "scope", "bin");
         Scope scope = new Scope();
@@ -175,24 +155,19 @@ public class ExecutableCommandTest extends PulseTestCase
         command.setExe("custom");
         command.setScope(scope);
 
-        CommandResult result = new CommandResult("work");
-        execute(command, result);
+        CommandResult result = runCommand(command);
         assertTrue(result.succeeded());
-        String output = getOutput();
-        assertTrue(output.contains("test variable value"));
+
+        checkOutput(result, "test variable value");
     }
 
-    public void testEnvironmentDetailsAreCaptured() throws IOException, FileLoadException
+    public void testEnvironmentDetailsAreCaptured() throws Exception
     {
         ExecutableCommand command = new ExecutableCommand();
         command.setExe("echo");
         command.setArgs("hello world");
 
-        CommandGroup commandGroup = new CommandGroup();
-        commandGroup.add(command);
-
-        CommandResult result = new CommandResult("success");
-        execute(commandGroup, result);
+        CommandResult result = runCommand(command);
 
         List<StoredArtifact> artifacts = result.getArtifacts();
         assertEquals(2, artifacts.size());
@@ -204,10 +179,7 @@ public class ExecutableCommandTest extends PulseTestCase
         assertEquals(ExecutableCommand.ENV_ARTIFACT_NAME + "/env.txt", envArtifact.getPath());
         assertEquals("text/plain", envArtifact.getType());
 
-        String output = getEnv();
-        assertTrue(output.contains("Command Line:"));
-        assertTrue(output.contains("Process Environment:"));
-        assertTrue(output.contains("Resources:"));
+        checkEnv(result, "Command Line:", "Process Environment:", "Resources:");
 
         artifact = artifacts.get(1);
         StoredFileArtifact outputArtifact = artifact.getChildren().get(0);
@@ -219,14 +191,13 @@ public class ExecutableCommandTest extends PulseTestCase
     {
         ExecutableCommand command = new ExecutableCommand();
         command.setExe("echo");
-        CommandResult result = new CommandResult("success");
-        execute(command, result, 1234);
 
-        String output = getEnv();
-        assertTrue(output.contains("PULSE_BUILD_NUMBER=1234"));
+        CommandResult result = runCommand(command, 1234);
+
+        checkEnv(result, "PULSE_BUILD_NUMBER=1234");
     }
 
-    public void testBuildNumberNotAddedToEnvironmentWhenNotSpecified() throws IOException
+    public void testBuildNumberNotAddedToEnvironmentWhenNotSpecified() throws Exception
     {
         // if we are running in pulse, then PULSE_BUILD_NUMBER will already
         // be added to the environment.
@@ -234,10 +205,9 @@ public class ExecutableCommandTest extends PulseTestCase
 
         ExecutableCommand command = new ExecutableCommand();
         command.setExe("echo");
-        CommandResult result = new CommandResult("success");
-        execute(command, result);
+        CommandResult result = runCommand(command);
 
-        String output = getEnv();
+        String output = IOUtils.fileToString(getCommandEnv(result));
 
         if (runningInPulse)
         {
@@ -249,7 +219,6 @@ public class ExecutableCommandTest extends PulseTestCase
             // does not appear.
             assertFalse(output.contains("PULSE_BUILD_NUMBER"));
         }
-
     }
 
     public void testResourcePathsAddedToEnvironment() throws IOException
@@ -261,83 +230,77 @@ public class ExecutableCommandTest extends PulseTestCase
         command.setScope(scope);
         command.setExe("echo");
 
-        CommandResult result = new CommandResult("success");
-        execute(command, result, 1234);
+        CommandResult result = runCommand(command, 1234);
 
-        String output = getEnv();
-        assertTrue(output.toLowerCase().contains("path=somedir" + File.pathSeparator));
+        checkEnv(result, "path=somedir" + File.pathSeparator);
     }
 
     public void testNoSuchExecutableOnWindows()
     {
-        if(SystemUtils.IS_WINDOWS)
+        if(!SystemUtils.IS_WINDOWS)
         {
-            ExecutableCommand command = new ExecutableCommand();
-            command.setExe("thisfiledoesnotexist");
-
-            try
-            {
-                CommandResult result = new CommandResult("success");
-                execute(command, result, 1234);
-                fail();
-            }
-            catch (BuildException e)
-            {
-                assertTrue(e.getMessage().contains("No such executable 'thisfiledoesnotexist'"));
-            }
+            return;
         }
+
+        ExecutableCommand command = new ExecutableCommand();
+        command.setExe("thisfiledoesnotexist");
+
+        CommandResult result = runCommand(command, 1234);
+        assertTrue(result.errored());
+
+        List<Feature> features = result.getFeatures(Feature.Level.ERROR);
+        assertEquals(1, features.size());
+        assertTrue(features.get(0).getSummary().contains("No such executable 'thisfiledoesnotexist'"));
     }
 
     public void testNoSuchWorkDirOnWindows()
     {
-        if(SystemUtils.IS_WINDOWS)
+        if(!SystemUtils.IS_WINDOWS)
         {
-            ExecutableCommand command = new ExecutableCommand();
-            command.setExe("dir");
-            command.setWorkingDir(new File("nosuchworkdir"));
-
-            try
-            {
-                CommandResult result = new CommandResult("success");
-                execute(command, result, 1234);
-                fail();
-            }
-            catch (BuildException e)
-            {
-                assertTrue(e.getMessage().contains("Working directory 'nosuchworkdir' does not exist"));
-            }
+            return;
         }
-    }
 
-    private String getOutput() throws IOException
-    {
-        return IOUtils.fileToString(new File(outputDirectory, Command.OUTPUT_ARTIFACT_NAME + "/output.txt"));
+        ExecutableCommand command = new ExecutableCommand();
+        command.setExe("dir");
+        command.setWorkingDir(new File("nosuchworkdir"));
+
+        CommandResult result = runCommand(command, 1234);
+        assertTrue(result.errored());
+
+        List<Feature> features = result.getFeatures(Feature.Level.ERROR);
+        assertEquals(1, features.size());
+        assertTrue(features.get(0).getSummary().contains("Working directory 'nosuchworkdir' does not exist"));
     }
 
     private String getEnv() throws IOException
     {
-        return IOUtils.fileToString(new File(outputDirectory, ExecutableCommand.ENV_ARTIFACT_NAME + "/env.txt"));
+        return IOUtils.fileToString(new File(outputDir, ExecutableCommand.ENV_ARTIFACT_NAME + "/env.txt"));
     }
 
-    private void execute(Command command, CommandResult result)
-    {
-        CommandContext context = new CommandContext(new SimpleRecipePaths(baseDirectory, outputDirectory), outputDirectory, null);
-        command.execute(context, result);
-    }
-
-    private void execute(ExecutableCommand command, CommandResult result, long buildNumber)
+    private CommandResult runCommand(ExecutableCommand command, long buildNumber)
     {
         BuildContext buildContext = new BuildContext();
         buildContext.setBuildNumber(buildNumber);
-        CommandContext context = new CommandContext(new SimpleRecipePaths(baseDirectory, null), outputDirectory, null);
-        context.setBuildContext(buildContext);
 
+/*
         if(buildNumber > 0)
         {
             Scope scope = new Scope();
             scope.add(new Property("build.number", Long.toString(buildNumber)));
-            context.setGlobalScope(scope);
+            recipeContext.setGlobalScope(scope);
         }
-        command.execute(context, result);
+*/
+        return super.runCommand(command, buildContext);
+    }
+
+
+    protected String getBuildFileName()
+    {
+        return null;
+    }
+
+    protected String getBuildFileExt()
+    {
+        return null;
     }
 }

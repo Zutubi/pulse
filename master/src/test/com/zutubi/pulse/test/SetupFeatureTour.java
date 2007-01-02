@@ -365,7 +365,7 @@ public class SetupFeatureTour implements Runnable
         for(RecipeResult recipe: recipes)
         {
             commands[i] = new CommandResult(name);
-            File commandDir = new File(recipe.getAbsoluteOutputDir(configManager.getDataDirectory()), RecipeProcessor.getCommandDirName(commandIndex, commands[i]));
+            File commandDir = new File(recipe.getAbsoluteOutputDir(configManager.getDataDirectory()), Recipe.getCommandDirName(commandIndex, commands[i]));
             File outputDir = new File(commandDir, "output");
             commands[i].commence();
             commands[i].setAbsoluteOutputDir(configManager.getDataDirectory(), outputDir);
@@ -433,7 +433,12 @@ public class SetupFeatureTour implements Runnable
             {
                 StoredFileArtifact fileArtifact = addArtifact(command, dummy, "output.txt", "command output", "text/plain");
                 TestSuiteResult testResults = new TestSuiteResult();
-                CommandContext context = new CommandContext(null, command.getAbsoluteOutputDir(configManager.getDataDirectory()), testResults);
+                RecipeContext recipeContext = new RecipeContext();
+                recipeContext.setTestResults(testResults);
+                CommandContext context = new CommandContext();
+                context.setOutputDir(command.getAbsoluteOutputDir(configManager.getDataDirectory()));
+                context.setRecipeContext(recipeContext);
+                
                 pp.process(fileArtifact, command, context);
             }
             catch (Exception e)
@@ -456,7 +461,12 @@ public class SetupFeatureTour implements Runnable
             {
                 StoredFileArtifact fileArtifact = addArtifact(command, dummy, "TESTS-TestSuites.xml", "JUnit XML Report", "text/html");
                 TestSuiteResult testResults = new TestSuiteResult();
-                CommandContext context = new CommandContext(null, command.getAbsoluteOutputDir(configManager.getDataDirectory()), testResults);
+                RecipeContext recipeContext = new RecipeContext();
+                recipeContext.setTestResults(testResults);
+                CommandContext context = new CommandContext();
+                context.setOutputDir(command.getAbsoluteOutputDir(configManager.getDataDirectory()));
+                context.setRecipeContext(recipeContext);
+                
                 pp.process(fileArtifact, command, context);
 
                 recipes[i].setTestSummary(testResults.getSummary());
@@ -482,7 +492,14 @@ public class SetupFeatureTour implements Runnable
             da.setName("JUnit HTML Report");
             RecipePaths paths = new SimpleRecipePaths(dir, null);
             TestSuiteResult tests = new TestSuiteResult();
-            CommandContext context = new CommandContext(paths, command.getAbsoluteOutputDir(configManager.getDataDirectory()), tests);
+            
+            RecipeContext recipeContext = new RecipeContext();
+            recipeContext.setTestResults(tests);
+            recipeContext.setRecipePaths(paths);
+            CommandContext context = new CommandContext();
+            context.setOutputDir(command.getAbsoluteOutputDir(configManager.getDataDirectory()));
+            context.setRecipeContext(recipeContext);
+
             da.capture(command, context);
         }
     }

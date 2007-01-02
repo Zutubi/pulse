@@ -1,39 +1,35 @@
 package com.zutubi.pulse.core;
 
-import com.zutubi.pulse.core.model.CommandResult;
-
-import java.io.IOException;
-
 /**
  */
 public class AntCommandTest extends CommandTestBase
 {
-    public void testBasicDefault() throws IOException, FileLoadException
+    public void testBasicDefault() throws Exception
     {
-        copyBuildFile("basic");
+        copyBuildFileToBaseDir("basic");
         AntCommand command = new AntCommand();
         successRun(command, "build target");
     }
 
-    public void testBasicTargets() throws IOException, FileLoadException
+    public void testBasicTargets() throws Exception
     {
-        copyBuildFile("basic");
+        copyBuildFileToBaseDir("basic");
         AntCommand command = new AntCommand();
         command.setTargets("build test");
         successRun(command, "build target", "test target");
     }
 
-    public void testDoubleSpaceTargets() throws IOException, FileLoadException
+    public void testDoubleSpaceTargets() throws Exception
     {
-        copyBuildFile("basic");
+        copyBuildFileToBaseDir("basic");
         AntCommand command = new AntCommand();
         command.setTargets("build  test");
         successRun(command, "build target", "test target");
     }
 
-    public void testEnvironment() throws IOException, FileLoadException
+    public void testEnvironment() throws Exception
     {
-        copyBuildFile("basic");
+        copyBuildFileToBaseDir("basic");
         AntCommand command = new AntCommand();
         command.setTargets("environment");
         ExecutableCommand.Environment env = command.createEnvironment();
@@ -42,7 +38,7 @@ public class AntCommandTest extends CommandTestBase
         successRun(command, "test variable value");
     }
 
-    public void testExplicitBuildfile() throws IOException, FileLoadException
+    public void testExplicitBuildfile() throws Exception
     {
         copyBuildFile("basic", "custom.xml");
         AntCommand command = new AntCommand();
@@ -50,7 +46,7 @@ public class AntCommandTest extends CommandTestBase
         successRun(command, "build target");
     }
 
-    public void testExplicitArguments() throws IOException, FileLoadException
+    public void testExplicitArguments() throws Exception
     {
         copyBuildFile("basic", "custom.xml");
         AntCommand command = new AntCommand();
@@ -61,13 +57,13 @@ public class AntCommandTest extends CommandTestBase
         successRun(command, "build target", "test target");
     }
 
-    public void testRunNoBuildFile() throws IOException, FileLoadException
+    public void testRunNoBuildFile() throws Exception
     {
         AntCommand command = new AntCommand();
         failedRun(command, "Buildfile: build.xml does not exist!");
     }
 
-    public void testRunNonExistantBuildFile() throws IOException, FileLoadException
+    public void testRunNonExistantBuildFile() throws Exception
     {
         AntCommand command = new AntCommand();
         command.setBuildFile("nope.xml");
@@ -82,10 +78,5 @@ public class AntCommandTest extends CommandTestBase
     protected String getBuildFileExt()
     {
         return "xml";
-    }
-
-    protected void checkOutput(CommandResult commandResult, String ...contents) throws IOException
-    {
-        super.checkOutput(commandResult, contents);
     }
 }

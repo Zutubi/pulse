@@ -289,7 +289,9 @@ public class RegexPostProcessorTest extends PulseTestCase
         pp.setLeadingContext(1);
 
         CommandResult result = new CommandResult("test");
-        pp.process(artifact, result, new CommandContext(null, tempDir, null));
+        CommandContext commandContext = new CommandContext();
+        commandContext.setOutputDir(tempDir);
+        pp.process(artifact, result, commandContext);
         List<Feature> features = artifact.getFeatures();
         assertEquals(2, features.size());
         assertEquals(Feature.Level.WARNING, features.get(0).getLevel());
@@ -353,7 +355,9 @@ public class RegexPostProcessorTest extends PulseTestCase
     private CommandResult simpleFeatures(RegexPostProcessor pp, Feature.Level level, String... lines)
     {
         CommandResult result = new CommandResult("test");
-        pp.process(artifact, result, new CommandContext(null, tempDir, null));
+        CommandContext commandContext = new CommandContext();
+        commandContext.setOutputDir(tempDir);
+        pp.process(artifact, result, commandContext);
         List<Feature> features = artifact.getFeatures();
 
         assertEquals(lines.length, features.size());

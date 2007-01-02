@@ -3,32 +3,22 @@ package com.zutubi.pulse.core;
 import com.zutubi.pulse.core.model.CommandResult;
 import com.zutubi.pulse.core.model.ResultState;
 import com.zutubi.pulse.core.model.StoredArtifact;
-import com.zutubi.pulse.core.model.StoredFileArtifact;
-import com.zutubi.pulse.test.PulseTestCase;
 import com.zutubi.pulse.util.FileSystemUtils;
-import com.zutubi.pulse.util.IOUtils;
 
 import java.io.File;
 import java.io.IOException;
 
 /**
  */
-public class CommandGroupTest extends PulseTestCase
+public class CommandGroupTest extends CommandTestBase
 {
-    private File baseDirectory;
-    private File outputDirectory;
-
-    public void setUp() throws Exception
+    public void setUp() throws IOException
     {
         super.setUp();
-        baseDirectory = FileSystemUtils.createTempDir(ExecutableCommandTest.class.getName(), ".base");
-        outputDirectory = FileSystemUtils.createTempDir(ExecutableCommandTest.class.getName(), ".out");
     }
 
-    public void tearDown() throws Exception
+    public void tearDown() throws IOException
     {
-        FileSystemUtils.rmdir(outputDirectory);
-        FileSystemUtils.rmdir(baseDirectory);
         super.tearDown();
     }
 
@@ -40,7 +30,7 @@ public class CommandGroupTest extends PulseTestCase
 
     public void testCaptureFile() throws Exception
     {
-        File file = new File(baseDirectory, "testfile");
+        File file = new File(baseDir, "testfile");
         fileCaptureHelper(file.getAbsolutePath());
     }
 
@@ -68,9 +58,9 @@ public class CommandGroupTest extends PulseTestCase
         testSuccess(group);
     }
 
-    private void fileCaptureHelper(String file) throws IOException, FileLoadException
+    private void fileCaptureHelper(String file) throws Exception
     {
-        File inFile = new File(baseDirectory, "testfile");
+        File inFile = new File(baseDir, "testfile");
         FileSystemUtils.createFile(inFile, "some data");
 
         CommandGroup group = createEchoCommand();
@@ -80,12 +70,7 @@ public class CommandGroupTest extends PulseTestCase
         CommandResult result = testSuccess(group);
 
         // Now check the artifact was captured
-        StoredArtifact artifact = result.getArtifact("test-artifact");
-        assertNotNull(artifact);
-        StoredFileArtifact fileArtifact = artifact.getFile();
-        File expectedFile = new File(outputDirectory, fileArtifact.getPath());
-        assertTrue(expectedFile.isFile());
-        assertEquals("some data", IOUtils.fileToString(expectedFile));
+        checkArtifact(result, result.getArtifact("test-artifact"), "some data");
     }
 
     public void testCaptureDir() throws Exception
@@ -179,7 +164,7 @@ public class CommandGroupTest extends PulseTestCase
 
     public void testBaseDir() throws Exception
     {
-        baseDirHelper(new File(baseDirectory, "testdir"));
+        baseDirHelper(new File(baseDir, "testdir"));
     }
 
     public void testBaseDirRelative() throws Exception
@@ -187,7 +172,7 @@ public class CommandGroupTest extends PulseTestCase
         baseDirHelper(new File("testdir"));
     }
 
-    private void baseDirHelper(File base) throws IOException, FileLoadException
+    private void baseDirHelper(File base) throws Exception
     {
         createSomeFiles();
         CommandGroup group = createEchoCommand();
@@ -196,14 +181,14 @@ public class CommandGroupTest extends PulseTestCase
         artifact.setBase(base);
         CommandResult result = testSuccess(group);
 
-        checkCapturedDir("test-dir-artifact", 3, new File(baseDirectory, "testdir"), result);
+        checkCapturedDir("test-dir-artifact", 3, new File(baseDir, "testdir"), result);
     }
 
     private CommandGroup createEchoCommand() throws FileLoadException
     {
         CommandGroup group = new CommandGroup();
         ExecutableCommand command = new ExecutableCommand();
-        command.setWorkingDir(baseDirectory);
+        command.setWorkingDir(baseDir);
         command.setExe("echo");
         command.setArgs("hello world");
         group.add(command);
@@ -219,9 +204,9 @@ public class CommandGroupTest extends PulseTestCase
         //     file1.txt
         //     file2.txt
         //     file3.foo
-        File file = new File(baseDirectory, "testfile.txt");
+        File file = new File(baseDir, "testfile.txt");
         FileSystemUtils.createFile(file, "some data");
-        File nested = new File(baseDirectory, "testdir");
+        File nested = new File(baseDir, "testdir");
         assertTrue(nested.mkdir());
         File nest1 = new File(nested, "file1.txt");
         FileSystemUtils.createFile(nest1, "file1 data");
@@ -231,25 +216,32 @@ public class CommandGroupTest extends PulseTestCase
         FileSystemUtils.createFile(nest3, "file3 data");
     }
 
-    private CommandResult testSuccessWithOutput(CommandGroup group, String output) throws IOException
+    private CommandResult testSuccessWithOutput(CommandGroup group, String output) throws Exception
     {
-        CommandResult result = new CommandResult("test");
-        execute(group, result);
+        CommandResult result = runCommand(group);
         assertEquals(ResultState.SUCCESS, result.getState());
+        checkOutput(result, output);
+/*
         StoredArtifact artifact = result.getArtifact(Command.OUTPUT_ARTIFACT_NAME);
-        File outputFile = new File(outputDirectory, artifact.getFile().getPath());
+        File outputFile = new File(outputDir, artifact.getFile().getPath());
         assertEquals(output, IOUtils.fileToString(outputFile));
+*/
 
         return result;
     }
 
     private void execute(CommandGroup group, CommandResult result)
     {
-        CommandContext context = new CommandContext(new SimpleRecipePaths(baseDirectory, null), outputDirectory, null);
+        RecipeContext recipeContext = new RecipeContext();
+        recipeContext.setRecipePaths(new SimpleRecipePaths(baseDir, null));
+        CommandContext context = new CommandContext();
+        context.setOutputDir(outputDir);
+        context.setRecipeContext(recipeContext);
+        
         group.execute(context, result);
     }
 
-    private CommandResult testSuccess(CommandGroup group) throws IOException
+    private CommandResult testSuccess(CommandGroup group) throws Exception
     {
         return testSuccessWithOutput(group, "hello world\n");
     }
@@ -272,7 +264,7 @@ public class CommandGroupTest extends PulseTestCase
 
     private void checkCapturedDir(String name, int count, CommandResult result) throws IOException
     {
-        checkCapturedDir(name, count, baseDirectory, result);
+        checkCapturedDir(name, count, baseDir, result);
     }
 
     private void checkCapturedDir(String name, int count, File base, CommandResult result) throws IOException
@@ -280,7 +272,9 @@ public class CommandGroupTest extends PulseTestCase
         StoredArtifact storedArtifact = result.getArtifact(name);
         assertNotNull(storedArtifact);
         assertEquals(count, storedArtifact.getChildren().size());
-        File destDir = new File(outputDirectory, storedArtifact.getName());
+
+        String commandDirName = String.format("00000000-%s", result.getCommandName());
+        File destDir = new File(outputDir, FileSystemUtils.composeFilename(commandDirName, storedArtifact.getName()));
         assertTrue(destDir.isDirectory());
         assertDirectoriesEqual(base, destDir);
     }
@@ -288,8 +282,19 @@ public class CommandGroupTest extends PulseTestCase
     private void checkAllButFoo(CommandResult result) throws IOException
     {
         // Check all but testdir/file3.foo was captured
-        File file = new File(baseDirectory, FileSystemUtils.composeFilename("testdir", "file3.foo"));
+        File file = new File(baseDir, FileSystemUtils.composeFilename("testdir", "file3.foo"));
         assertTrue(file.delete());
         checkCapturedDir("test-dir-artifact", 3, result);
+    }
+
+
+    protected String getBuildFileName()
+    {
+        return null;
+    }
+
+    protected String getBuildFileExt()
+    {
+        return null;
     }
 }

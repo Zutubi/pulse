@@ -76,16 +76,21 @@ public class CommandGroup implements Command, Validateable
 
     public void execute(CommandContext context, CommandResult result)
     {
+/*
         try
         {
+*/
             command.execute(context, result);
+/*
         }
         finally
         {
             processArtifacts(context, result);
         }
+*/
     }
 
+/*
     //TODO: move this out of the command group and into the recipe processing.
     private void processArtifacts(CommandContext context, CommandResult result)
     {
@@ -101,7 +106,8 @@ public class CommandGroup implements Command, Validateable
             }
         }
     }
-
+*/
+    
     public List<Artifact> getArtifacts()
     {
         List<Artifact> allArtifacts = new LinkedList<Artifact>();

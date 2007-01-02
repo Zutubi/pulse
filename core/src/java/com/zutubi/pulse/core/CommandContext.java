@@ -16,45 +16,22 @@ import java.io.OutputStream;
  */
 public class CommandContext
 {
-    /**
-     * Paths for the recipe being executed.
-     */
-    private RecipePaths paths;
-    /**
-     * Output directory for the command being executed.
-     */
+    private RecipeContext recipeContext;
+
     private File outputDir;
-    /**
-     * Test results being accumulated for the recipe.
-     */
-    private TestSuiteResult testResults;
-    /**
-     * If not null, stream to write command output to (in addition to any output artifact).
-     */
-    private OutputStream outputStream;
 
-    private long recipeId;
-
-    private BuildContext buildContext;
-
-    private Scope globalScope;
-    private long recipeStartTime = -1;
-
-    public CommandContext(RecipePaths paths, File outputDir, TestSuiteResult testResults)
+    public CommandContext()
     {
-        this.paths = paths;
-        this.outputDir = outputDir;
-        this.testResults = testResults;
+    }
+
+    public void setRecipeContext(RecipeContext recipeContext)
+    {
+        this.recipeContext = recipeContext;
     }
 
     public RecipePaths getPaths()
     {
-        return paths;
-    }
-
-    public void setRecipePaths(RecipePaths recipePaths)
-    {
-        this.paths = recipePaths;
+        return recipeContext.getPaths();
     }
 
     public File getOutputDir()
@@ -62,9 +39,14 @@ public class CommandContext
         return outputDir;
     }
 
+    public void setOutputDir(File outputDir)
+    {
+        this.outputDir = outputDir;
+    }
+
     public TestSuiteResult getTestResults()
     {
-        return testResults;
+        return recipeContext.getTestResults();
     }
 
     /**
@@ -77,12 +59,7 @@ public class CommandContext
      */
     public OutputStream getOutputStream()
     {
-        return outputStream;
-    }
-
-    public void setOutputStream(OutputStream outputStream)
-    {
-        this.outputStream = outputStream;
+        return recipeContext.getOutputStream();
     }
 
     /**
@@ -91,12 +68,7 @@ public class CommandContext
      */
     public BuildContext getBuildContext()
     {
-        return buildContext;
-    }
-
-    public void setBuildContext(BuildContext buildContext)
-    {
-        this.buildContext = buildContext;
+        return recipeContext.getBuildContext();
     }
 
     /**
@@ -106,31 +78,21 @@ public class CommandContext
      */
     public long getRecipeId()
     {
-        return recipeId;
-    }
-
-    public void setRecipeId(long recipeId)
-    {
-        this.recipeId = recipeId;
+        return recipeContext.getRecipeId();
     }
 
     public long getRecipeStartTime()
     {
-        return recipeStartTime;
-    }
-
-    public void setRecipeStartTime(long recipeStartTime)
-    {
-        this.recipeStartTime = recipeStartTime;
+        return recipeContext.getRecipeStartTime();
     }
 
     public Scope getGlobalScope()
     {
-        return globalScope;
+        return recipeContext.getGlobalScope();
     }
 
-    public void setGlobalScope(Scope globalScope)
+    public void setRecipePaths(RecipePaths mungedPaths)
     {
-        this.globalScope = globalScope;
+        recipeContext.setRecipePaths(mungedPaths);
     }
 }

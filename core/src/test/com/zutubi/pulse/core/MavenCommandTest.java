@@ -2,8 +2,6 @@ package com.zutubi.pulse.core;
 
 import com.zutubi.pulse.BuildContext;
 
-import java.io.IOException;
-
 /**
  * <class-comment/>
  */
@@ -28,59 +26,59 @@ public class MavenCommandTest extends CommandTestBase
         return "xml";
     }
 
-    public void testNoBuildFileNoTargets() throws IOException, FileLoadException
+    public void testNoBuildFileNoTargets() throws Exception
     {
         MavenCommand command = new MavenCommand();
         successRun(command, "BUILD SUCCESSFUL", "Total time", "_Apache_", "v. 1.0.2");
     }
 
-    public void testDefaultTarget() throws IOException, FileLoadException
+    public void testDefaultTarget() throws Exception
     {
-        copyBuildFile("basic");
+        copyBuildFileToBaseDir("basic");
         MavenCommand command = new MavenCommand();
         command.setWorkingDir(baseDir);
         successRun(command, "BUILD SUCCESSFUL", "build target", "_Apache_", "v. 1.0.2");
     }
 
-    public void testExtractVersion() throws IOException, FileLoadException
+    public void testExtractVersion() throws Exception
     {
-        copyBuildFile("basic");
+        copyBuildFileToBaseDir("basic");
         MavenCommand command = new MavenCommand();
         BuildContext buildContext = new BuildContext();
         runCommand(command, buildContext);
         assertEquals("1.0-SNAPSHOT", buildContext.getBuildVersion());
     }
 
-    public void testRunSpecificTarget() throws IOException, FileLoadException
+    public void testRunSpecificTarget() throws Exception
     {
-        copyBuildFile("basic");
+        copyBuildFileToBaseDir("basic");
         MavenCommand command = new MavenCommand();
         command.setTargets("mytest");
         command.setWorkingDir(baseDir);
         successRun(command, "BUILD SUCCESSFUL", "test target", "_Apache_", "v. 1.0.2");
     }
 
-    public void testRunMultipleTargets() throws IOException, FileLoadException
+    public void testRunMultipleTargets() throws Exception
     {
-        copyBuildFile("basic");
+        copyBuildFileToBaseDir("basic");
         MavenCommand command = new MavenCommand();
         command.setTargets("mybuild mytest");
         command.setWorkingDir(baseDir);
         successRun(command, "BUILD SUCCESSFUL", "build target", "test target", "_Apache_", "v. 1.0.2");
     }
 
-    public void testMissingTarget() throws IOException, FileLoadException
+    public void testMissingTarget() throws Exception
     {
-        copyBuildFile("basic");
+        copyBuildFileToBaseDir("basic");
         MavenCommand command = new MavenCommand();
         command.setTargets("missingTarget");
         command.setWorkingDir(baseDir);
         failedRun(command, "BUILD FAILED");
     }
 
-    public void testExtraArgument() throws IOException, FileLoadException
+    public void testExtraArgument() throws Exception
     {
-        copyBuildFile("basic");
+        copyBuildFileToBaseDir("basic");
         MavenCommand command = new MavenCommand();
         command.setTargets("mybuild");
         command.setWorkingDir(baseDir);

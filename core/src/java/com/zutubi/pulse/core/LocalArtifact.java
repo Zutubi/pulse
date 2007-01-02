@@ -23,13 +23,8 @@ import java.util.List;
  * <p/>
  * The name of the artifact needs to be unique (todo: check the scope of the required uniquness...)
  */
-public abstract class LocalArtifact implements Artifact
+public abstract class LocalArtifact extends ArtifactSupport
 {
-    /**
-     * The name of this artifact allows it to be referenced by name.
-     */
-    private String name;
-
     /**
      * If true, fail the command if the artifact cannot be captured.
      */
@@ -50,33 +45,11 @@ public abstract class LocalArtifact implements Artifact
 
     public LocalArtifact(String name)
     {
-        this.name = name;
+        setName(name);
     }
 
     public LocalArtifact()
     {
-    }
-
-    /**
-     * Get the name of this artifact.
-     *
-     * @return the name of the artifact.
-     */
-    @Required
-    @Name
-    public String getName()
-    {
-        return name;
-    }
-
-    /**
-     * Set the name of this artifact.
-     *
-     * @param name of this artifact.
-     */
-    public void setName(String name)
-    {
-        this.name = name;
     }
 
     /**
@@ -153,21 +126,13 @@ public abstract class LocalArtifact implements Artifact
             StoredFileArtifact fileArtifact = new StoredFileArtifact(path, type);
             artifact.add(fileArtifact);
 
-            processArtifact(fileArtifact, result, context);
+            processArtifact(fileArtifact, result, context, processes);
 
             return true;
         }
         catch (IOException e)
         {
             throw new BuildException("Unable to collect file '" + fromFile.getAbsolutePath() + "' for artifact '" + getName() + "': " + e.getMessage(), e);
-        }
-    }
-
-    protected void processArtifact(StoredFileArtifact fileArtifact, CommandResult result, CommandContext context)
-    {
-        for (ProcessArtifact process : processes)
-        {
-            process.getProcessor().process(fileArtifact, result, context);
         }
     }
 }

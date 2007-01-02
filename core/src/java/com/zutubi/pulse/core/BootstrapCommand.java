@@ -31,26 +31,11 @@ public class BootstrapCommand implements Command
     public void execute(CommandContext context, CommandResult result)
     {
         bootstrapper.bootstrap(context);
-
-        File artifactDir = new File(context.getOutputDir(), OUTPUT_NAME);
-        if(artifactDir.isDirectory())
-        {
-            String[] files = artifactDir.list();
-            if(files.length > 0)
-            {
-                StoredArtifact artifact = new StoredArtifact(OUTPUT_NAME);
-                for(String file: files)
-                {
-                    artifact.add(new StoredFileArtifact(FileSystemUtils.composeFilename(OUTPUT_NAME, file)));
-                }
-                result.addArtifact(artifact);
-            }
-        }
     }
 
     public List<Artifact> getArtifacts()
     {
-        DirectoryArtifact artifact = new DirectoryArtifact();
+        PrecapturedArtifact artifact = new PrecapturedArtifact();
         artifact.setName(OUTPUT_NAME);
         
         List<Artifact> artifacts = new LinkedList<Artifact>();

@@ -28,7 +28,7 @@ public class PrintCommand extends CommandSupport
     private List<ProcessArtifact> processes = new LinkedList<ProcessArtifact>();
 
     private boolean terminated = false;
-    private FileArtifact outputArtifact;
+    private PrecapturedArtifact outputArtifact;
 
     public void execute(CommandContext context, CommandResult result)
     {
@@ -69,12 +69,8 @@ public class PrintCommand extends CommandSupport
 
     private void initialiseOutputArtifact()
     {
-        outputArtifact = new FileArtifact();
+        outputArtifact = new PrecapturedArtifact();
         outputArtifact.setName(OUTPUT_ARTIFACT_NAME);
-        outputArtifact.setFailIfNotPresent(false);
-        outputArtifact.setIgnoreStale(false);
-        outputArtifact.setOutputArtifact(true);
-        outputArtifact.setFile(OUTPUT_FILENAME);
         outputArtifact.setType("text/plain");
         outputArtifact.setProcesses(processes);
     }

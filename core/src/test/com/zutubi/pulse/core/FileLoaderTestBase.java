@@ -7,7 +7,7 @@ import com.zutubi.pulse.test.PulseTestCase;
  */
 public abstract class FileLoaderTestBase extends PulseTestCase
 {
-    protected FileLoader loader;
+    protected PulseFileLoader loader;
 
     public void setUp() throws Exception
     {

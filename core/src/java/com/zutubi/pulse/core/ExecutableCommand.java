@@ -35,8 +35,8 @@ public class ExecutableCommand extends CommandSupport implements ScopeAware
     private CancellableReader reader;
     private volatile boolean terminated = false;
 
-    private FileArtifact outputArtifact;
-    private FileArtifact envArtifact;
+    private PrecapturedArtifact outputArtifact;
+    private PrecapturedArtifact envArtifact;
     private static final String ENV_FILENAME = "env.txt";
 
     private List<ProcessArtifact> processes = new LinkedList<ProcessArtifact>();
@@ -191,12 +191,8 @@ public class ExecutableCommand extends CommandSupport implements ScopeAware
 
     private void initialiseOutputArtifact()
     {
-        outputArtifact = new FileArtifact();
+        outputArtifact = new PrecapturedArtifact();
         outputArtifact.setName(OUTPUT_ARTIFACT_NAME);
-        outputArtifact.setFailIfNotPresent(false);
-        outputArtifact.setIgnoreStale(false);
-        outputArtifact.setOutputArtifact(true);
-        outputArtifact.setFile(OUTPUT_FILENAME);
         outputArtifact.setType("text/plain");
         outputArtifact.setProcesses(processes);
     }
@@ -313,12 +309,8 @@ public class ExecutableCommand extends CommandSupport implements ScopeAware
     private void initialiseEnvironmentArtifact()
     {
         // Configure the environment artifact.
-        envArtifact = new FileArtifact();
+        envArtifact = new PrecapturedArtifact();
         envArtifact.setName(ENV_ARTIFACT_NAME);
-        envArtifact.setFailIfNotPresent(false);
-        envArtifact.setIgnoreStale(false);
-        envArtifact.setOutputArtifact(true);
-        envArtifact.setFile(ENV_FILENAME);
         envArtifact.setType("text/plain");
     }
 
