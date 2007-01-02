@@ -36,7 +36,7 @@ public class RecipeProcessor
     private long runningRecipe = 0;
     private Command runningCommand = null;
     private boolean terminating = false;
-    private FileLoader fileLoader;
+    private PulseFileLoaderFactory fileLoaderFactory;
 
     public RecipeProcessor()
     {
@@ -304,6 +304,7 @@ public class RecipeProcessor
         {
             stream = new ByteArrayInputStream(pulseFileSource.getBytes());
             PulseFile result = new PulseFile();
+            PulseFileLoader fileLoader = fileLoaderFactory.createLoader();
             fileLoader.load(stream, result, globalScope, resourceRepository, new RecipeLoadPredicate(result, request.getRecipeName()));
             return result;
         }
@@ -396,8 +397,8 @@ public class RecipeProcessor
         this.eventManager = eventManager;
     }
 
-    public void setFileLoader(FileLoader fileLoader)
+    public void setFileLoaderFactory(PulseFileLoaderFactory fileLoaderFactory)
     {
-        this.fileLoader = fileLoader;
+        this.fileLoaderFactory = fileLoaderFactory;
     }
 }

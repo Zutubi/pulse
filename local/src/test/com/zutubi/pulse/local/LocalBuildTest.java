@@ -4,6 +4,8 @@ import com.zutubi.pulse.core.PulseException;
 import com.zutubi.pulse.test.PulseTestCase;
 import com.zutubi.pulse.util.FileSystemUtils;
 import com.zutubi.pulse.util.IOUtils;
+import com.zutubi.pulse.bootstrap.ComponentContext;
+import com.zutubi.pulse.dev.bootstrap.DevBootstrapManager;
 
 import java.io.*;
 import java.net.URISyntaxException;
@@ -23,12 +25,15 @@ public class LocalBuildTest extends PulseTestCase
         super.setUp();
         // Create a temporary base directory
         tmpDir = FileSystemUtils.createTempDir(LocalBuildTest.class.getName(), "");
-        builder = new LocalBuild();
+        System.setProperty("bootstrap", "com/zutubi/pulse/dev/bootstrap/context/ideaBootstrapContext.xml");
+        DevBootstrapManager.bootstrapAndLoadContexts("com/zutubi/pulse/local/bootstrap/context/applicationContext.xml");
+        builder = ComponentContext.getBean("localBuild");
     }
 
     @Override
     protected void tearDown() throws Exception
     {
+        ComponentContext.closeAll();
         removeDirectory(tmpDir);
 
         super.tearDown();
@@ -175,7 +180,7 @@ public class LocalBuildTest extends PulseTestCase
             FileOutputStream output = null;
             try
             {
-                output  = new FileOutputStream(cleaned);
+                output = new FileOutputStream(cleaned);
                 output.write(cleanedContent.toString().getBytes());
             }
             finally

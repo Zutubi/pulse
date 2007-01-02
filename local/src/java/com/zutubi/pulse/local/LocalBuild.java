@@ -2,7 +2,12 @@ package com.zutubi.pulse.local;
 
 import com.zutubi.pulse.resources.ResourceDiscoverer;
 import com.zutubi.pulse.BuildContext;
+import com.zutubi.pulse.dev.bootstrap.DevBootstrapManager;
+import com.zutubi.pulse.bootstrap.ComponentContext;
+import com.zutubi.pulse.plugins.PluginManager;
+import com.zutubi.pulse.plugins.DefaultPluginManager;
 import com.zutubi.pulse.core.*;
+import com.zutubi.pulse.core.plugins.CommandExtensionManager;
 import com.zutubi.pulse.core.model.Resource;
 import com.zutubi.pulse.events.DefaultEventManager;
 import com.zutubi.pulse.events.EventManager;
@@ -17,6 +22,9 @@ import java.util.List;
  */
 public class LocalBuild
 {
+    private EventManager eventManager;
+    private RecipeProcessor recipeProcessor;
+
     @SuppressWarnings({ "ACCESS_STATIC_VIA_INSTANCE", "AccessStaticViaInstance" })
     public static void main(String argv[])
     {
@@ -70,7 +78,9 @@ public class LocalBuild
                 outputDir = commandLine.getOptionValue('o');
             }
 
-            LocalBuild b = new LocalBuild();
+            DevBootstrapManager.bootstrapAndLoadContexts("com/zutubi/pulse/local/bootstrap/context/applicationContext.xml");
+
+            LocalBuild b = ComponentContext.getBean("localBuild");
             File baseDir = new File(System.getProperty("user.dir"));
             b.runBuild(baseDir, pulseFile, recipe, resourcesFile, outputDir);
         }
@@ -139,21 +149,11 @@ public class LocalBuild
         {
             logStream = new FileOutputStream(logFile);
 
-            // manually write these components.
-            EventManager manager = new DefaultEventManager();
-            ObjectFactory objectFactory = new ObjectFactory();
-            FileLoader fileLoader = new PulseFileLoader();
-            fileLoader.setObjectFactory(objectFactory);
-
-            manager.register(new BuildStatusPrinter(paths.getBaseDir(), logStream));
+            eventManager.register(new BuildStatusPrinter(paths.getBaseDir(), logStream));
 
             Bootstrapper bootstrapper = new LocalBootstrapper();
-            RecipeProcessor processor = new RecipeProcessor();
-            processor.setEventManager(manager);
-            processor.setFileLoader(fileLoader);
-
             RecipeRequest request = new RecipeRequest(0, bootstrapper, loadPulseFile(baseDir, pulseFileName), recipe);
-            processor.build(new BuildContext(), request, paths, repository, false);
+            recipeProcessor.build(null, request, paths, repository, false);
         }
         catch (FileNotFoundException e)
         {
@@ -227,5 +227,15 @@ public class LocalBuild
     {
         System.err.println(throwable.getMessage());
         System.exit(1);
+    }
+
+    public void setEventManager(EventManager eventManager)
+    {
+        this.eventManager = eventManager;
+    }
+
+    public void setRecipeProcessor(RecipeProcessor recipeProcessor)
+    {
+        this.recipeProcessor = recipeProcessor;
     }
 }

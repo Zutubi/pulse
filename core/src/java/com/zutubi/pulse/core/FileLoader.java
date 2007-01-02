@@ -459,4 +459,9 @@ public class FileLoader
     {
         typeDefinitions.put(name, type);
     }
+
+    public boolean registered(String name)
+    {
+        return typeDefinitions.containsKey(name);
+    }
 }

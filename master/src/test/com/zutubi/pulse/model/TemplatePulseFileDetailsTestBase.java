@@ -64,9 +64,10 @@ public abstract class TemplatePulseFileDetailsTestBase extends PulseTestCase
         }
 
         // Ensure syntactic correctness
-        PulseFileLoader loader = new PulseFileLoader();
-        loader.setObjectFactory(new ObjectFactory());
-        
+        PulseFileLoaderFactory fileLoaderFactory = new PulseFileLoaderFactory();
+        fileLoaderFactory.setObjectFactory(new ObjectFactory());
+        PulseFileLoader loader = fileLoaderFactory.createLoader();
+
         Scope scope = new Scope();
         scope.add(new Property("base.dir", "testbase"));
         FileInputStream input = null;

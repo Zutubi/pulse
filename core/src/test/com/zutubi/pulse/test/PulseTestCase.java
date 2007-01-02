@@ -41,7 +41,7 @@ public abstract class PulseTestCase extends TestCase
 
         if (a instanceof Map)
         {
-            assertEquals(msg, (Map) a, (Map) b);
+            assertEquals(msg, (Map<?, ?>) a, (Map<?, ?>) b);
         }
         else if (a instanceof List)
         {

@@ -14,6 +14,7 @@
         <conf name="release" description="Defines those packages that are included in the final release."/>
         <conf name="external" description="All of those packages that are external to Pulse."/>
         <conf name="build" description="All of the packages required during the build."/>
+        <conf name="bundles" description="Internal bundles required by Pulse."/>
     </configurations>
 
     <publications>
@@ -26,6 +27,7 @@
         <dependency org="zutubi" name="pulse-core" rev="latest.integration" conf="external->external"/>
         <dependency org="zutubi" name="pulse-core" rev="latest.integration" conf="release->release"/>
         <dependency org="zutubi" name="pulse-core" rev="latest.integration" conf="build->build"/>
+        <dependency org="zutubi" name="pulse-core" rev="latest.integration" conf="bundles->bundles"/>
 
         <dependency org="apache" name="commons-collections" rev="3.1" conf="external,build,release->default"/>
         <dependency org="apache" name="commons-cli" rev="1.0" conf="external,build,release->default"/>
@@ -34,8 +36,6 @@
         <dependency org="caucho" name="hessian" rev="3.0.13" conf="external,build,release->default"/>
 
         <dependency org="jetty" name="org.mortbay.jetty" rev="5.1.6" conf="external,build,release->default"/>
-
-        <dependency org="springframework" name="spring" rev="2.0" conf="external,build,release->spring-beans,spring-context,spring-core"/>
 
         <dependency org="sun" name="servlet" rev="2.4" conf="external,build,release->default"/>
 

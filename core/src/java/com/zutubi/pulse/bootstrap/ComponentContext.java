@@ -57,11 +57,11 @@ public class ComponentContext
         context = newContext;
     }
 
-    public static Object getBean(String name)
+    public static <U> U getBean(String name)
     {
         if (getContext() != null)
         {
-            return getContext().getBean(name);
+            return (U) getContext().getBean(name);
         }
         return null;
     }

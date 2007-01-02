@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
+<beans>
+    <bean id="devPaths" class="com.zutubi.pulse.dev.bootstrap.ConfigurableDevPaths">
+        <property name="pluginConfigurationRootString" value="master/etc/osgi"/>
+        <property name="internalPluginRootString" value="plugins/internal"/>
+        <property name="prepackagedPluginRootString" value="plugins/prepackaged"/>
+        <property name="userPluginRootString" value="user/plugins"/>
+        <property name="userRootString" value="user"/>
+    </bean>
+</beans>

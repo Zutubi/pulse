@@ -1,6 +1,7 @@
 package com.zutubi.pulse.web.project;
 
 import com.zutubi.pulse.core.ResourceRepository;
+import com.zutubi.pulse.core.PulseFileLoaderFactory;
 import com.zutubi.pulse.model.CustomPulseFileDetails;
 import com.zutubi.pulse.model.PulseFileDetails;
 import com.zutubi.pulse.xwork.interceptor.Preparable;
@@ -12,7 +13,7 @@ import com.zutubi.pulse.xwork.interceptor.Preparable;
 public class EditCustomDetailsAction extends AbstractEditDetailsAction implements Preparable
 {
     private CustomPulseFileDetails details = new CustomPulseFileDetails();
-    private CustomDetailsHelper detailsHelper = new CustomDetailsHelper();
+    private CustomDetailsHelper detailsHelper;
     private ResourceRepository resourceRepository;
 
     public void prepare()
@@ -44,5 +45,10 @@ public class EditCustomDetailsAction extends AbstractEditDetailsAction implement
     public void setResourceRepository(ResourceRepository resourceRepository)
     {
         this.resourceRepository = resourceRepository;
+    }
+
+    public void setFileLoaderFactory(PulseFileLoaderFactory fileLoaderFactory)
+    {
+        detailsHelper = new CustomDetailsHelper(fileLoaderFactory);
     }
 }

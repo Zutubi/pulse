@@ -49,6 +49,13 @@
         </property>
     </bean>
 
+    <bean id="pluginPaths" class="com.zutubi.pulse.plugins.ConfigurablePluginPaths">
+        <property name="pluginConfigurationRootString" value="master/etc/osgi"/>
+        <property name="internalPluginRootString" value="plugins/internal"/>
+        <property name="prepackagedPluginRootString" value="plugins/prepackaged"/>
+        <property name="userPluginRootString" value="user/plugins"/>
+    </bean>
+
     <bean id="objectFactory" class="com.zutubi.pulse.spring.SpringObjectFactory"/>
 
     <!-- TODO: Do we still require this here? We dont really need it until the webapp is up... -->

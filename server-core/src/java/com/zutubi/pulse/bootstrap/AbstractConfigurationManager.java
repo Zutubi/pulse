@@ -2,6 +2,7 @@ package com.zutubi.pulse.bootstrap;
 
 import com.zutubi.pulse.bootstrap.conf.EnvConfig;
 import com.zutubi.pulse.config.PropertiesConfig;
+import com.zutubi.pulse.plugins.PluginPaths;
 
 import java.io.File;
 
@@ -11,7 +12,7 @@ import java.io.File;
 public abstract class AbstractConfigurationManager implements ConfigurationManager
 {
     private SystemPaths systemPaths = null;
-
+    private PluginPaths pluginPaths = null;
     protected EnvConfig envConfig;
 
     /**
@@ -62,5 +63,10 @@ public abstract class AbstractConfigurationManager implements ConfigurationManag
     public void setSystemPaths(SystemPaths paths)
     {
         this.systemPaths = paths;
+    }
+
+    public void setPluginPaths(PluginPaths pluginPaths)
+    {
+        this.pluginPaths = pluginPaths;
     }
 }

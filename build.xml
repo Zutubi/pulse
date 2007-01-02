@@ -501,6 +501,7 @@
 
         <!-- refreshing the lib directory -->
         <delete dir="lib"/>
+        <delete dir="plugins/internal"/>
 
         <!-- use the default ivy configuration properties. -->
         <property file="ivy.properties"/>
@@ -511,6 +512,8 @@
         <retrieve.dependencies module="local" dest="lib" conf="external"/>
         <retrieve.dependencies module="master" dest="lib" conf="external"/>
         <retrieve.dependencies module="slave" dest="lib" conf="external"/>
+
+        <retrieve.dependencies module="core" dest="plugins/internal" conf="bundles"/>
     </target>
 
     <!--

@@ -55,12 +55,4 @@ public class SystemBootstrapManager
         loadBootstrapContext();
         ((StartupManager) ComponentContext.getBean(STARTUP_MANAGER_BEAN)).init();
     }
-
-    /**
-     * @deprecated use StartCommand instead.
-     */
-    public static void main(String argv[])
-    {
-        new SystemBootstrapManager().bootstrapSystem();
-    }
 }

@@ -5,6 +5,8 @@ import com.opensymphony.xwork.ValidationAware;
 import com.zutubi.pulse.core.*;
 import com.zutubi.pulse.model.CustomProjectValidationPredicate;
 import com.zutubi.pulse.util.StringUtils;
+import com.zutubi.pulse.bootstrap.ComponentContext;
+import com.sun.javaws.security.JNLPClassPath;
 
 import java.io.ByteArrayInputStream;
 
@@ -15,6 +17,12 @@ public class CustomDetailsHelper
     private int lineNumber;
     private String line;
     private int lineOffset;
+    private PulseFileLoaderFactory fileLoaderFactory;
+
+    public CustomDetailsHelper(PulseFileLoaderFactory fileLoaderFactory)
+    {
+        this.fileLoaderFactory = fileLoaderFactory;
+    }
 
     public int getLineNumber()
     {
@@ -41,7 +49,7 @@ public class CustomDetailsHelper
 
         try
         {
-            PulseFileLoader loader = new PulseFileLoader();
+            PulseFileLoader loader = fileLoaderFactory.createLoader();
             loader.setObjectFactory(new ObjectFactory());
             
             loader.load(new ByteArrayInputStream(pulseFile.getBytes()), new PulseFile(), new Scope(), resourceRepository, new CustomProjectValidationPredicate());

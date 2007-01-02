@@ -53,13 +53,13 @@ public class RecipeProcessorTest extends PulseTestCase implements EventListener
         events = new LinkedBlockingQueue<Event>(10);
         eventManager.register(this);
 
-        FileLoader fileLoader = new PulseFileLoader();
-        fileLoader.setObjectFactory(new ObjectFactory());
-        recipeProcessor.setFileLoader(fileLoader);
+        PulseFileLoaderFactory fileLoaderFactory = new PulseFileLoaderFactory();
+        fileLoaderFactory.setObjectFactory(new ObjectFactory());
+        fileLoaderFactory.register("failure", FailureCommand.class);
+        fileLoaderFactory.register("exception", ExceptionCommand.class);
+        fileLoaderFactory.register("unexpected-exception", UnexpectedExceptionCommand.class);
 
-        fileLoader.register("failure", FailureCommand.class);
-        fileLoader.register("exception", ExceptionCommand.class);
-        fileLoader.register("unexpected-exception", UnexpectedExceptionCommand.class);
+        recipeProcessor.setFileLoaderFactory(fileLoaderFactory);
     }
 
     protected void tearDown() throws Exception

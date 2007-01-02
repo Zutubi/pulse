@@ -6,6 +6,8 @@ import com.zutubi.pulse.util.logging.Logger;
 import com.zutubi.pulse.core.PulseFileLoader;
 import com.zutubi.pulse.core.ObjectFactory;
 import com.zutubi.pulse.core.PulseException;
+import com.zutubi.pulse.core.PulseFileLoaderFactory;
+import com.sun.javaws.security.JNLPClassPath;
 
 import java.util.List;
 
@@ -14,6 +16,8 @@ import java.util.List;
 public class AnyCapableBuildHostRequirements extends AbstractBuildHostRequirements
 {
     private static final Logger LOG = Logger.getLogger(AnyCapableBuildHostRequirements.class);
+
+    private PulseFileLoaderFactory fileLoaderFactory;
 
     public BuildHostRequirements copy()
     {
@@ -31,8 +35,7 @@ public class AnyCapableBuildHostRequirements extends AbstractBuildHostRequiremen
             }
         }
 
-        PulseFileLoader fileLoader = new PulseFileLoader();
-        fileLoader.setObjectFactory(new ObjectFactory());
+        PulseFileLoader fileLoader = fileLoaderFactory.createLoader();
         try
         {
             requirements = fileLoader.loadRequiredResources(request.getRevision().getPulseFile(), request.getRequest().getRecipeName());
@@ -56,5 +59,10 @@ public class AnyCapableBuildHostRequirements extends AbstractBuildHostRequiremen
     public String getSummary()
     {
         return "[any]";
+    }
+
+    public void setFileLoaderFactory(PulseFileLoaderFactory fileLoaderFactory)
+    {
+        this.fileLoaderFactory = fileLoaderFactory;
     }
 }

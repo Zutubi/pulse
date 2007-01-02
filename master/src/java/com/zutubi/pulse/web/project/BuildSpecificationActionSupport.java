@@ -5,6 +5,7 @@ import com.zutubi.pulse.bootstrap.ComponentContext;
 import com.zutubi.pulse.core.*;
 import com.zutubi.pulse.model.*;
 import com.zutubi.pulse.util.logging.Logger;
+import com.sun.javaws.security.JNLPClassPath;
 
 import java.io.ByteArrayInputStream;
 import java.util.LinkedHashMap;
@@ -24,8 +25,9 @@ public class BuildSpecificationActionSupport extends ProjectActionSupport
     protected ResourceRepository resourceRepository;
     protected Project project;
     private SlaveManager slaveManager;
-    private Map<Long, String> buildHosts;
+    private PulseFileLoaderFactory fileLoaderFactory;
 
+    private Map<Long, String> buildHosts;
     protected String name;
     protected Long buildHost = 0L;
     protected BuildStage stage = new BuildStage();
@@ -59,8 +61,8 @@ public class BuildSpecificationActionSupport extends ProjectActionSupport
         {
             public void run()
             {
-                FileLoader fileLoader = new PulseFileLoader();
-                fileLoader.setObjectFactory(new ObjectFactory());
+                PulseFileLoader fileLoader = fileLoaderFactory.createLoader();
+
                 try
                 {
                     PulseFileDetails details = getProject().getPulseFileDetails();
@@ -177,5 +179,10 @@ public class BuildSpecificationActionSupport extends ProjectActionSupport
     public void setSlaveManager(SlaveManager slaveManager)
     {
         this.slaveManager = slaveManager;
+    }
+
+    public void setFileLoaderFactory(PulseFileLoaderFactory fileLoaderFactory)
+    {
+        this.fileLoaderFactory = fileLoaderFactory;
     }
 }

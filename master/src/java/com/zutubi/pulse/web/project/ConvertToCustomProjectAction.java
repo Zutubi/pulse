@@ -2,6 +2,7 @@ package com.zutubi.pulse.web.project;
 
 import com.zutubi.pulse.bootstrap.ComponentContext;
 import com.zutubi.pulse.core.ResourceRepository;
+import com.zutubi.pulse.core.PulseFileLoaderFactory;
 import com.zutubi.pulse.model.CustomPulseFileDetails;
 import com.zutubi.pulse.model.Project;
 import com.zutubi.pulse.model.PulseFileDetails;
@@ -13,7 +14,7 @@ public class ConvertToCustomProjectAction extends ProjectActionSupport
 {
     private long id;
     private CustomPulseFileDetails details = new CustomPulseFileDetails();
-    private CustomDetailsHelper detailsHelper = new CustomDetailsHelper();
+    private CustomDetailsHelper detailsHelper;
     private Project project;
     private ResourceRepository resourceRepository;
 
@@ -80,5 +81,10 @@ public class ConvertToCustomProjectAction extends ProjectActionSupport
     public void setResourceRepository(ResourceRepository resourceRepository)
     {
         this.resourceRepository = resourceRepository;
+    }
+
+    public void setFileLoaderFactory(PulseFileLoaderFactory fileLoaderFactory)
+    {
+        detailsHelper = new CustomDetailsHelper(fileLoaderFactory);
     }
 }
