@@ -1,6 +1,5 @@
 package com.zutubi.pulse.core;
 
-import com.zutubi.pulse.core.model.Property;
 import com.zutubi.pulse.test.PulseTestCase;
 
 /**
@@ -14,17 +13,19 @@ public abstract class FileLoaderTestBase extends PulseTestCase
     {
         super.setUp();
 
-        ObjectFactory factory = new ObjectFactory();
-        loader = new PulseFileLoader();
-        loader.setObjectFactory(factory);
+        ObjectFactory objectFactory = new ObjectFactory();
+        PulseFileLoaderFactory fileLoaderFactory = new PulseFileLoaderFactory();
+        fileLoaderFactory.setObjectFactory(objectFactory);
 
         // initialise the loader some test objects.
-        loader.register("dependency", Dependency.class);
-        loader.register("reference", SimpleReference.class);
-        loader.register("nested", SimpleNestedType.class);
-        loader.register("type", SimpleType.class);
-        loader.register("some-reference", SomeReference.class);
-        loader.register("validateable", SimpleValidateable.class);
+        fileLoaderFactory.register("dependency", Dependency.class);
+        fileLoaderFactory.register("reference", SimpleReference.class);
+        fileLoaderFactory.register("nested", SimpleNestedType.class);
+        fileLoaderFactory.register("type", SimpleType.class);
+        fileLoaderFactory.register("some-reference", SomeReference.class);
+        fileLoaderFactory.register("validateable", SimpleValidateable.class);
+
+        loader = fileLoaderFactory.createLoader();
     }
 
     public void tearDown() throws Exception
