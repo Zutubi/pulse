@@ -9,6 +9,13 @@ import java.util.List;
  */
 public class AntCommandLoaderTest extends FileLoaderTestBase
 {
+    public void setUp() throws Exception
+    {
+        super.setUp();
+
+        loader.register("ant", AntCommand.class);
+    }
+
     private AntCommand antCommandHelper(int commandIndex) throws Exception
     {
         PulseFile bf = new PulseFile();
