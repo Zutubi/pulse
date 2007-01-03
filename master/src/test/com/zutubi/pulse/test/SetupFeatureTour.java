@@ -396,7 +396,7 @@ public class SetupFeatureTour implements Runnable
     {
         addBuildResult();
         addCommandResult("build");
-        addAntFailedArtifact();
+//        addAntFailedArtifact();
         addFailedTestArtifact();
         addTestReportArtifact();
         completeCommandResult();
@@ -422,6 +422,7 @@ public class SetupFeatureTour implements Runnable
         }
     }
 
+/*
     private void addAntFailedArtifact()
     {
         AntPostProcessor pp = new AntPostProcessor();
@@ -447,6 +448,7 @@ public class SetupFeatureTour implements Runnable
             }
         }
     }
+*/
 
     private void addFailedTestArtifact()
     {

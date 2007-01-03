@@ -1,4 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<!--
+Ant Project file used by the AntCommandTest 
+-->
 <project name="Test" default="build">
     <target name="build">
         <echo message="build target"/>
