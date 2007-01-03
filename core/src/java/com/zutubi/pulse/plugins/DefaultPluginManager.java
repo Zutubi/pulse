@@ -13,12 +13,19 @@ import org.osgi.framework.ServiceReference;
 import org.osgi.service.packageadmin.PackageAdmin;
 
 import java.io.File;
+import java.net.URL;
+import java.util.Dictionary;
 import java.util.LinkedList;
 import java.util.List;
 
 public class DefaultPluginManager implements PluginManager
 {
     private static final Logger LOG = Logger.getLogger(DefaultPluginManager.class);
+
+    private static final String HEADER_VERSION = "Bundle-Version";
+    private static final String HEADER_DESCRIPTION = "Bundle-Description";
+    private static final String HEADER_VENDOR = "Bundle-Vendor";
+
     private PluginPaths pluginPaths;
     private BundleContext context;
     private IExtensionRegistry extensionRegistry;
@@ -140,6 +147,17 @@ public class DefaultPluginManager implements PluginManager
         context.ungetService(packageAdminRef);
     }
 
+    private Plugin createPlugin(Bundle bundle)
+    {
+        Plugin p = new Plugin(bundle.getSymbolicName(), Plugin.State.ENABLED);
+
+        Dictionary headers = bundle.getHeaders();
+        p.setVersion((String) headers.get(HEADER_VERSION));
+        p.setDescription((String) headers.get(HEADER_DESCRIPTION));
+        p.setVendor((String) headers.get(HEADER_VENDOR));
+
+        return p;
+    }
 
     public IExtensionRegistry getExtenstionRegistry()
     {
@@ -149,6 +167,41 @@ public class DefaultPluginManager implements PluginManager
     public IExtensionTracker getExtenstionTracker()
     {
         return extensionTracker;
+    }
+
+    public List<Plugin> getAllPlugins()
+    {
+        throw new RuntimeException("Method not yet implemented.");
+    }
+
+    public Plugin getPlugin(String name)
+    {
+        throw new RuntimeException("Method not yet implemented.");
+    }
+
+    public Plugin installPlugin(String name, URL url) throws PluginException
+    {
+        throw new RuntimeException("Method not yet implemented.");
+    }
+
+    public Plugin installPlugin(URL url) throws PluginException
+    {
+        throw new RuntimeException("Method not yet implemented.");
+    }
+
+    public void uninstallPlugin(Plugin plugin) throws PluginException
+    {
+        throw new RuntimeException("Method not yet implemented.");
+    }
+
+    public void enablePlugin(Plugin plugin) throws PluginException
+    {
+        throw new RuntimeException("Method not yet implemented.");
+    }
+
+    public void disablePlugin(Plugin plugin) throws PluginException
+    {
+        throw new RuntimeException("Method not yet implemented.");
     }
 
     public void setPluginPaths(PluginPaths pluginPaths)
