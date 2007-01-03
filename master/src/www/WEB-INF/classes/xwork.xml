@@ -1454,6 +1454,29 @@
         <action name="removeSystemProperty" class="com.zutubi.pulse.web.admin.SystemPropertiesAction" method="doRemove">
             <result name="success" type="redirect">/admin/serverSettings.action</result>
         </action>
+
+        <action name="plugins" class="com.zutubi.pulse.web.admin.plugins.PluginsAction">
+            <result name="success" type="velocity">plugins.vm</result>
+        </action>
+
+        <action name="installPlugin" class="com.zutubi.pulse.web.admin.plugins.InstallPluginAction">
+            <result name="input" type="velocity">plugins.vm</result>
+            <result name="error" type="velocity">plugins.vm</result>
+            <result name="success" type="redirect">/admin/plugins.action</result>
+        </action>
+
+        <action name="uninstallPlugin" class="com.zutubi.pulse.web.admin.plugins.UnInstallPluginAction">
+            <result name="success" type="redirect">/admin/plugins.action</result>
+        </action>
+
+        <action name="enablePlugin" class="com.zutubi.pulse.web.admin.plugins.EnablePluginAction">
+            <result name="success" type="redirect">/admin/plugins.action</result>
+        </action>
+
+        <action name="disablePlugin" class="com.zutubi.pulse.web.admin.plugins.DisablePluginAction">
+            <result name="success" type="redirect">/admin/plugins.action</result>
+        </action>
+
     </package>
 
     <package name="ajax" namespace="/ajax" extends="webwork-default-package">

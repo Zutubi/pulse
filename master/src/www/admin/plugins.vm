@@ -1,0 +1,49 @@
+#helpTag("Plugins+Tab")
+#authorisationTags($principle)
+<content tag="selectedTab">administration</content>
+<html>
+<head>
+    <title>#wwtext("name=plugins")</title>
+</head>
+<body>
+    #adminTabs("plugins")
+
+    <h2>Installed plugins</h2>
+
+        <table class="fill-content">
+            #headingRow("plugins" 4)
+            <tr>
+                #contentHeading("name" 1)
+                #contentHeading("actions" 3)
+            </tr>
+            #foreach($plugin in $plugins)
+            <tr>
+                #if ($plugin.enabled)
+                    #set($cssClass = "success")
+                #else
+                    #set($cssClass = "failure")
+                #end
+                #classCell($plugin.name)
+                #if ($plugin.enabled)
+                    #dynamicLinkCell("disable" "disablePlugin.action?name=$plugin.name")
+                #end
+                #if ($plugin.disabled)
+                    #dynamicLinkCell("enable" "enablePlugin.action?name=$plugin.name")
+                #end
+                #dynamicLinkCell("uninstall" "uninstallPlugin.action?name=$plugin.name")
+            </tr>
+            #end
+        </table>
+
+    <h2>Install a new plugin</h2>
+    <p>
+        #wwcform("action=installPlugin.action" "name=plugin.install" "heading=%{getText('plugin.install')}" "method=post" "enctype=multipart/form-data")
+            #wwfile("name=plugin" "label=path" "required=true" "tabindex=1")
+            #upload(2)
+        #end
+    </p>
+
+
+    #tabEnd()
+</body>
+</html>

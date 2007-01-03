@@ -299,6 +299,7 @@
         #adminTab("settings" "$base/admin/serverSettings" $selected)
         #adminTab("users" "$base/admin/userSettings" $selected)
         #adminTab("groups" "$base/admin/viewGroups" $selected)
+        #adminTab("plugins" "$base/admin/plugins" $selected)
     #closeTabs()
 #end
 
@@ -1167,6 +1168,24 @@
 #macro(continue $tabIndex)
     #openSubmit()
         #wwsubmit("name=continue" "value=%{getText('continue.name')}" "tabindex=$tabIndex")
+    #closeSubmit()
+#end
+
+##
+## Shows a standard Upload submit row, given the first tab index.
+##
+#macro(upload $tabIndex)
+    #openSubmit()
+        #wwsubmit("name=upload" "value=%{getText('upload.name')}" "tabindex=$tabIndex")
+    #closeSubmit()
+#end
+
+##
+## Shows a standard Install submit row, given the first tab index.
+##
+#macro(install $tabIndex)
+    #openSubmit()
+        #wwsubmit("name=install" "value=%{getText('install.name')}" "tabindex=$tabIndex")
     #closeSubmit()
 #end
 
