@@ -6,8 +6,8 @@ import com.zutubi.pulse.core.model.StoredFileArtifact;
 import com.zutubi.pulse.util.FileSystemUtils;
 
 import java.io.File;
-import java.util.List;
 import java.util.LinkedList;
+import java.util.List;
 
 /**
  * <class comment/>
@@ -28,16 +28,19 @@ public class PrecapturedArtifact extends ArtifactSupport
         
         StoredArtifact storedArtifact = new StoredArtifact(getName());
 
-        for (File file : dir.listFiles())
+        if (dir.isDirectory())
         {
-            StoredFileArtifact fileArtifact = new StoredFileArtifact(FileSystemUtils.composeFilename(getName(), file.getName()), type);
-            storedArtifact.add(fileArtifact);
+            for (File file : dir.listFiles())
+            {
+                StoredFileArtifact fileArtifact = new StoredFileArtifact(FileSystemUtils.composeFilename(getName(), file.getName()), type);
+                storedArtifact.add(fileArtifact);
 
-            processArtifact(fileArtifact, result, context, processes);
-        }
-        if (storedArtifact.getChildren().size() > 0)
-        {
-            result.addArtifact(storedArtifact);
+                processArtifact(fileArtifact, result, context, processes);
+            }
+            if (storedArtifact.getChildren().size() > 0)
+            {
+                result.addArtifact(storedArtifact);
+            }
         }
     }
 
