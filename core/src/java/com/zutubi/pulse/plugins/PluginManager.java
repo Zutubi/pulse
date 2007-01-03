@@ -13,9 +13,9 @@ public interface PluginManager
     IExtensionRegistry getExtenstionRegistry();
     IExtensionTracker getExtenstionTracker();
 
-    List<Plugin> getAllPlugins();
-    Plugin getPlugin(String name);
-    Plugin installPlugin(String name, URL url) throws PluginException;
+    List<? extends Plugin> getAllPlugins();
+    Plugin getPlugin(String id);
+    Plugin installPlugin(String filename, URL url) throws PluginException;
     Plugin installPlugin(URL url) throws PluginException;
     void uninstallPlugin(Plugin plugin) throws PluginException;
     void enablePlugin(Plugin plugin) throws PluginException;

@@ -3,7 +3,7 @@ package com.zutubi.pulse.plugins;
 /**
  * Metadata that describes a plugin and its current state.
  */
-public class Plugin
+public interface Plugin
 {
     public enum State
     {
@@ -24,85 +24,47 @@ public class Plugin
     }
 
     /**
-     * The plugin name, which is the OSGi bundle symbolic name.  This is
-     * unique for every plugin, and by convention is in the style of a Java
-     * package name (e.g. com.zutubi.pulse.core).
+     * @return the plugin id, which is the OSGi bundle symbolic name.  This
+     * is unique for every plugin, and by convention is in the style of a
+     * Java package name (e.g. com.zutubi.pulse.core).
      */
-    private String name;
-    /**
-     * Th plugin version, which is the OSGi bundle version.  The format is a
-     * dotted-decimal style string (e.g. 2.0.0).
-     */
-    private String version;
-    /**
-     * Optional description for the plugin, displayed to users.  Matches the
-     * OSGi Bundle-Description.
-     */
-    private String description;
-    /**
-     * Optional vendor of the plugin, displayed to users.  Matches the OSGi
-     * Bundle-Vendor.
-     */
-    private String vendor;
-    /**
-     * Current state of the plugin.
-     */
-    private State state;
+    String getId();
 
     /**
-     * Creates a plugin with the given name and state.
-     *
-     * @param name  the plugin name
-     * @param state the current state of the plugin
+     * @return the name of the plugin, for display to users
      */
-    public Plugin(String name, State state)
-    {
-        this.name = name;
-        this.state = state;
-    }
+    String getName();
 
-    public String getName()
-    {
-        return name;
-    }
+    /**
+     * @return the plugin version, which is the OSGi bundle version.  The
+     * format is a dotted-decimal style string (e.g. 2.0.0).
+     */
+    String getDescription();
 
-    public String getDescription()
-    {
-        return description;
-    }
+    /**
+     * @return an optional description for the plugin, displayed to users.
+     * Matches the OSGi Bundle-Description.
+     */
+    String getVersion();
 
-    void setDescription(String description)
-    {
-        this.description = description;
-    }
+    /**
+     * @return an optional vendor of the plugin, displayed to users.  Matches
+     * the OSGi Bundle-Vendor.
+     */
+    String getVendor();
 
-    public String getVersion()
-    {
-        return version;
-    }
+    /**
+     * @return the current state of the plugin.
+     */
+    State getState();
 
-    void setVersion(String version)
-    {
-        this.version = version;
-    }
+    /**
+     * @return the error message associated with this plugin.  Only valid
+     * when state is ERROR.
+     */
+    String getErrorMessage();
 
-    public String getVendor()
-    {
-        return vendor;
-    }
+    boolean isEnabled();
 
-    void setVendor(String vendor)
-    {
-        this.vendor = vendor;
-    }
-
-    public State getState()
-    {
-        return state;
-    }
-
-    void setState(State state)
-    {
-        this.state = state;
-    }
+    boolean isDisabled();
 }

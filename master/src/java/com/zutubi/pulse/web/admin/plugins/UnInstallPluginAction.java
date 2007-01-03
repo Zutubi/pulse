@@ -7,16 +7,16 @@ import com.zutubi.pulse.plugins.Plugin;
  */
 public class UnInstallPluginAction extends PluginActionSupport
 {
-    private String name;
+    private String id;
 
-    public void setName(String name)
+    public void setId(String id)
     {
-        this.name = name;
+        this.id = id;
     }
 
     public String execute() throws Exception
     {
-        Plugin plugin = pluginManager.getPlugin(name);
+        Plugin plugin = pluginManager.getPlugin(id);
         pluginManager.uninstallPlugin(plugin);
 
         return SUCCESS;

@@ -9,9 +9,9 @@ import java.util.List;
  */
 public class PluginsAction extends PluginActionSupport
 {
-    private List<Plugin> plugins;
+    private List<? extends Plugin> plugins;
 
-    public List<Plugin> getPlugins()
+    public List<? extends Plugin> getPlugins()
     {
         return plugins;
     }

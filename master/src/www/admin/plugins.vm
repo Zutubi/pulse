@@ -11,9 +11,11 @@
     <h2>Installed plugins</h2>
 
         <table class="fill-content">
-            #headingRow("plugins" 4)
+            #headingRow("plugins" 6)
             <tr>
                 #contentHeading("name" 1)
+                #contentHeading("id" 1)
+                #contentHeading("state" 1)
                 #contentHeading("actions" 3)
             </tr>
             #foreach($plugin in $plugins)
@@ -24,13 +26,15 @@
                     #set($cssClass = "failure")
                 #end
                 #classCell($plugin.name)
+                #classCell($plugin.id)
+                #classCell($plugin.state.toString().toLowerCase())
                 #if ($plugin.enabled)
-                    #dynamicLinkCell("disable" "disablePlugin.action?name=$plugin.name")
+                    #dynamicLinkCell("disable" "disablePlugin.action?id=$plugin.id")
                 #end
                 #if ($plugin.disabled)
-                    #dynamicLinkCell("enable" "enablePlugin.action?name=$plugin.name")
+                    #dynamicLinkCell("enable" "enablePlugin.action?id=$plugin.id")
                 #end
-                #dynamicLinkCell("uninstall" "uninstallPlugin.action?name=$plugin.name")
+                #dynamicLinkCell("uninstall" "uninstallPlugin.action?id=$plugin.id")
             </tr>
             #end
         </table>
