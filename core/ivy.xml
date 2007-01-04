@@ -46,7 +46,7 @@
 
         <dependency org="xstream" name="xstream" rev="1.2" conf="external,build,release->default"/>
 
-        <dependency org="eclipse" name="equinox" rev="3.3M3" conf="external,build,release->default"/>
+        <dependency org="eclipse" name="equinox" rev="3.3M4" conf="external,build,release->default"/>
         <dependency org="eclipse" name="equinox-bundles" rev="3.3M4" conf="build,bundles->default"/>
 
         <dependency org="springframework" name="spring" rev="2.0" conf="external,build,release->spring-beans,spring-context,spring-core"/>

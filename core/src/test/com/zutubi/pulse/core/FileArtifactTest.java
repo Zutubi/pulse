@@ -28,6 +28,8 @@ public class FileArtifactTest extends PulseTestCase
      */
     private FileArtifact fileArtifactObject;
     private CommandResult result;
+    private File fileTxt;
+    private File someFile;
 
     protected void setUp() throws Exception
     {
@@ -36,10 +38,10 @@ public class FileArtifactTest extends PulseTestCase
         tmpSourceDir = FileSystemUtils.createTempDir();
 
         // setup the contents of the source directory - the output of a sample build.
-        createBuildArtifact("file.txt");
+        fileTxt = createBuildArtifact("file.txt");
         createBuildArtifact("file.tmp");
         createBuildArtifact("some/file-1.txt");
-        createBuildArtifact("some/file-2.txt");
+        someFile = createBuildArtifact("some/file-2.txt");
         createBuildArtifact("some/directory/file-xyz.txt");
 
         tmpOutputDir = FileSystemUtils.createTempDir();
@@ -55,6 +57,8 @@ public class FileArtifactTest extends PulseTestCase
         removeDirectory(tmpSourceDir);
         removeDirectory(tmpOutputDir);
 
+        someFile = null;
+        fileTxt = null;
         tmpSourceDir = null;
         tmpOutputDir = null;
         fileArtifactObject = null;
@@ -63,11 +67,12 @@ public class FileArtifactTest extends PulseTestCase
         super.tearDown();
     }
 
-    private void createBuildArtifact(String relativePath) throws IOException
+    private File createBuildArtifact(String relativePath) throws IOException
     {
         File f = new File(tmpSourceDir, relativePath);
         assertTrue(f.getParentFile().isDirectory() || f.getParentFile().mkdirs());
         assertTrue(f.createNewFile());
+        return f;
     }
 
     public void testCapturesExplicitFile()
@@ -181,7 +186,7 @@ public class FileArtifactTest extends PulseTestCase
     {
         fileArtifactObject.setIgnoreStale(true);
         fileArtifactObject.setFile("file.txt");
-        capture(System.currentTimeMillis() + 1);
+        capture(fileTxt.lastModified()  + 1);
 
         assertCapturedArtifactCount(0);
     }
@@ -190,7 +195,7 @@ public class FileArtifactTest extends PulseTestCase
     {
         fileArtifactObject.setIgnoreStale(true);
         fileArtifactObject.setFile("some/file-*.txt");
-        capture(System.currentTimeMillis() + 1);
+        capture(someFile.lastModified() + 1);
 
         assertCapturedArtifactCount(0);
     }
