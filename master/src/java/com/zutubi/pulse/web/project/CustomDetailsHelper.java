@@ -5,8 +5,6 @@ import com.opensymphony.xwork.ValidationAware;
 import com.zutubi.pulse.core.*;
 import com.zutubi.pulse.model.CustomProjectValidationPredicate;
 import com.zutubi.pulse.util.StringUtils;
-import com.zutubi.pulse.bootstrap.ComponentContext;
-import com.sun.javaws.security.JNLPClassPath;
 
 import java.io.ByteArrayInputStream;
 

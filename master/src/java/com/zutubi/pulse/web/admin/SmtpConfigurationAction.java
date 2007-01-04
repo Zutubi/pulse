@@ -53,6 +53,8 @@ public class SmtpConfigurationAction extends ActionSupport
         config.setSmtpPrefix(null);
         config.setSmtpFrom(null);
         config.setSmtpHost(null);
+        config.setSmtpSSL(false);
+        config.setSmtpPort(-1);
         config.setSmtpUsername(null);
         config.setSmtpPassword(null);
     }
@@ -63,8 +65,18 @@ public class SmtpConfigurationAction extends ActionSupport
         config.setSmtpPrefix(smtp.getPrefix());
         config.setSmtpFrom(smtp.getFrom());
         config.setSmtpHost(smtp.getHost());
+        config.setSmtpSSL(smtp.getSsl());
         config.setSmtpUsername(smtp.getUsername());
         config.setSmtpPassword(smtp.getPassword());
+
+        if(smtp.getCustomPort())
+        {
+            config.setSmtpPort(smtp.getPort());
+        }
+        else
+        {
+            config.setSmtpPort(-1);
+        }
     }
 
     private void loadConfig()
@@ -73,8 +85,21 @@ public class SmtpConfigurationAction extends ActionSupport
         smtp.setPrefix(config.getSmtpPrefix());
         smtp.setFrom(config.getSmtpFrom());
         smtp.setHost(config.getSmtpHost());
+        smtp.setSsl(config.getSmtpSSL());
         smtp.setUsername(config.getSmtpUsername());
         smtp.setPassword(config.getSmtpPassword());
+        int port = config.getSmtpPort();
+
+        if(port > 0)
+        {
+            smtp.setCustomPort(true);
+            smtp.setPort(port);
+        }
+        else
+        {
+            smtp.setCustomPort(false);
+            smtp.setPort(config.getSmtpSSL() ? 465 : 25);
+        }
     }
 
     /**
@@ -93,10 +118,13 @@ public class SmtpConfigurationAction extends ActionSupport
     public class SmtpConfig
     {
         private String from;
+        private boolean ssl;
         private String prefix;
         private String host;
         private String username;
         private String password;
+        private boolean customPort;
+        private int port;
 
         public String getFrom()
         {
@@ -106,6 +134,16 @@ public class SmtpConfigurationAction extends ActionSupport
         public void setFrom(String from)
         {
             this.from = from;
+        }
+
+        public boolean getSsl()
+        {
+            return ssl;
+        }
+
+        public void setSsl(boolean ssl)
+        {
+            this.ssl = ssl;
         }
 
         public String getHost()
@@ -146,6 +184,26 @@ public class SmtpConfigurationAction extends ActionSupport
         public void setUsername(String username)
         {
             this.username = username;
+        }
+
+        public boolean getCustomPort()
+        {
+            return customPort;
+        }
+
+        public void setCustomPort(boolean customPort)
+        {
+            this.customPort = customPort;
+        }
+
+        public int getPort()
+        {
+            return port;
+        }
+
+        public void setPort(int port)
+        {
+            this.port = port;
         }
     }
 }

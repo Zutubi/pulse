@@ -3,6 +3,7 @@ package com.zutubi.pulse.web.ajax;
 import com.opensymphony.util.TextUtils;
 import com.zutubi.pulse.model.EmailContactPoint;
 import com.zutubi.pulse.web.ActionSupport;
+import com.zutubi.pulse.util.logging.Logger;
 
 /**
  * An ajax request to test SMTP settings and send a fragment of HTML
@@ -10,7 +11,12 @@ import com.zutubi.pulse.web.ActionSupport;
  */
 public class TestSmtpAction extends ActionSupport
 {
+    private static final Logger LOG = Logger.getLogger(TestSmtpAction.class);
+    
     private String host;
+    private boolean customPort;
+    private int port;
+    private boolean ssl;
     private String from;
     private String username;
     private String password;
@@ -47,6 +53,21 @@ public class TestSmtpAction extends ActionSupport
         this.to = to;
     }
 
+    public void setCustomPort(boolean customPort)
+    {
+        this.customPort = customPort;
+    }
+
+    public void setPort(int port)
+    {
+        this.port = port;
+    }
+
+    public void setSsl(boolean ssl)
+    {
+        this.ssl = ssl;
+    }
+
     public String execute() throws Exception
     {
         if(!TextUtils.stringSet(host))
@@ -68,11 +89,16 @@ public class TestSmtpAction extends ActionSupport
         {
             try
             {
-                EmailContactPoint.sendMail(to, prefix + " Test Email", "text/plain", "Welcome to Zutubi Pulse!", host, username, password, from);
+                if(!customPort)
+                {
+                    port = -1;
+                }
+                EmailContactPoint.sendMail(to, prefix + " Test Email", "text/plain", "Welcome to Zutubi Pulse!", host, port, ssl, username, password, from);
             }
             catch(Exception e)
             {
-                addActionError(e.getMessage());
+                LOG.severe("Unable to send test email: " + e.getMessage(), e);
+                addActionError(e.getMessage() + " (see logs for further details)");
             }
         }
 

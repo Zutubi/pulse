@@ -11,13 +11,16 @@
             #testInProgress("test-results")
 
             var host = escape($F("setupWizard_smtpHost"));
+            var ssl = escape($F("setupWizard_smtpSSL"));
             var from = escape($F("setupWizard_fromAddress"));
             var username = escape($F("setupWizard_username"));
             var password = escape($F("setupWizard_password"));
             var prefix = escape($F("setupWizard_prefix"));
             var to = escape($F("test.address"));
+            var customPort = escape($F("setupWizard_smtpCustomPort"));
+            var port = escape($F("setupWizard_smtpPort"));
 
-            var params = "host=" + host + "&from=" + from + "&username=" + username + "&password=" + password + "&prefix=" + prefix + "&to=" + to;
+            var params = "host=" + host + "&ssl=" + ssl + "&from=" + from + "&username=" + username + "&password=" + password + "&prefix=" + prefix + "&to=" + to + "&customPort=" + customPort + "&port=" + port;
 
             var updater = new Ajax.Updater({success: 'test-results'},
                                            "/ajax/testSmtp.action",
@@ -42,16 +45,21 @@
 
     #wwtextfield("name=smtpHost" "label=%{getText('smtp.host')}" "size=40" "tabindex=2"  "onkeypress=return submitenter(this,event)")
     #inlineHelp("smtp.host.help")
-    #wwtextfield("name=fromAddress" "label=%{getText('smtp.from')}" "size=40" "tabindex=3"  "onkeypress=return submitenter(this,event)")
+    #wwcheckbox("name=smtpSSL" "label=%{getText('smtp.ssl')}" "tabindex=3")
+    #inlineHelp("smtp.ssl.help")
+    #wwtextfield("name=fromAddress" "label=%{getText('smtp.from')}" "size=40" "tabindex=4"  "onkeypress=return submitenter(this,event)")
     #inlineHelp("smtp.from.help")
-    #wwtextfield("name=username" "label=%{getText('smtp.username')}" "tabindex=4" "onkeypress=return submitenter(this,event)")
+    #wwtextfield("name=username" "label=%{getText('smtp.username')}" "tabindex=5" "onkeypress=return submitenter(this,event)")
     #inlineHelp("smtp.username.help")
-    #wwpassword("name=password" "label=%{getText('smtp.password')}" "showPassword=true" "tabindex=5" "onkeypress=return submitenter(this,event)")
+    #wwpassword("name=password" "label=%{getText('smtp.password')}" "showPassword=true" "tabindex=6" "onkeypress=return submitenter(this,event)")
     #inlineHelp("smtp.password.help")
-    #wwtextfield("name=prefix" "label=%{getText('smtp.prefix')}" "size=60" "tabindex=6" "onkeypress=return submitenter(this,event)")
+    #wwtextfield("name=prefix" "label=%{getText('smtp.prefix')}" "size=60" "tabindex=7" "onkeypress=return submitenter(this,event)")
     #inlineHelp("smtp.prefix.help")
+    #wwcheckbox("name=smtpCustomPort" "label=%{getText('smtp.custom.port')}" "onclick=setEnableState('setupWizard_smtpPort', 'setupWizard_smtpCustomPort')" "tabindex=8")
+    #wwtextfield("name=smtpPort" "label=%{getText('smtp.port')}" "tabindex=9")
+    #inlineHelp("smtp.port.help")
 
-    #previousFinish(7)
+    #previousFinish(10)
 #end
 
     <table class="content">
@@ -77,6 +85,10 @@
             </td>
         </tr>
     </table>
+
+    <script type="text/javascript">
+        setEnableState('setupWizard_smtpPort', 'setupWizard_smtpCustomPort')
+    </script>
     
 </body>
 </html>

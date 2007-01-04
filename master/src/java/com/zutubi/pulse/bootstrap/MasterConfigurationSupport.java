@@ -130,6 +130,26 @@ public class MasterConfigurationSupport extends ConfigSupport implements MasterC
         setProperty(SMTP_HOST, host);
     }
 
+    public int getSmtpPort()
+    {
+        return getInteger(SMTP_PORT, -1);
+    }
+
+    public void setSmtpPort(int port)
+    {
+        setInteger(SMTP_PORT, port);
+    }
+
+    public boolean getSmtpSSL()
+    {
+        return getBooleanProperty(SMTP_SSL, false);
+    }
+
+    public void setSmtpSSL(boolean ssl)
+    {
+        setBooleanProperty(SMTP_SSL, ssl);
+    }
+
     public String getSmtpFrom()
     {
         return getProperty(SMTP_FROM);

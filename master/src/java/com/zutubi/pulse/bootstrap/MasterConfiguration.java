@@ -28,6 +28,10 @@ public interface MasterConfiguration extends LogConfiguration
 
     public static final String SMTP_HOST = "mail.smtp.host";
 
+    public static final String SMTP_SSL = "mail.smtp.ssl";
+
+    public static final String SMTP_PORT = "mail.smtp.port";
+
     public static final String SMTP_FROM = "mail.smtp.from";
 
     public static final String SMTP_PREFIX = "mail.smtp.prefix";
@@ -97,6 +101,14 @@ public interface MasterConfiguration extends LogConfiguration
     String getSmtpHost();
 
     void setSmtpHost(String host);
+
+    int getSmtpPort();
+
+    void setSmtpPort(int port);
+
+    boolean getSmtpSSL();
+
+    void setSmtpSSL(boolean ssl);
 
     String getSmtpFrom();
 

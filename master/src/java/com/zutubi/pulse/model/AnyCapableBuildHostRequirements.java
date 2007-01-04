@@ -2,12 +2,10 @@ package com.zutubi.pulse.model;
 
 import com.zutubi.pulse.BuildService;
 import com.zutubi.pulse.RecipeDispatchRequest;
-import com.zutubi.pulse.util.logging.Logger;
-import com.zutubi.pulse.core.PulseFileLoader;
-import com.zutubi.pulse.core.ObjectFactory;
 import com.zutubi.pulse.core.PulseException;
+import com.zutubi.pulse.core.PulseFileLoader;
 import com.zutubi.pulse.core.PulseFileLoaderFactory;
-import com.sun.javaws.security.JNLPClassPath;
+import com.zutubi.pulse.util.logging.Logger;
 
 import java.util.List;
 

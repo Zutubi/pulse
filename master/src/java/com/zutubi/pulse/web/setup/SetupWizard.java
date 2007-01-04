@@ -84,6 +84,12 @@ public class SetupWizard extends BaseWizard
         config.setBaseUrl(serverSettingsState.getBaseUrl());
         config.setSmtpFrom(serverSettingsState.getFromAddress());
         config.setSmtpHost(serverSettingsState.getSmtpHost());
+        config.setSmtpSSL(serverSettingsState.getSmtpSSL());
+        if(serverSettingsState.getSmtpCustomPort())
+        {
+            config.setSmtpPort(serverSettingsState.getSmtpPort());
+        }
+        config.setSmtpSSL(serverSettingsState.getSmtpSSL());
         config.setSmtpUsername(serverSettingsState.getUsername());
         config.setSmtpPassword(serverSettingsState.getPassword());
         config.setSmtpPrefix(serverSettingsState.getPrefix());
@@ -207,6 +213,9 @@ public class SetupWizard extends BaseWizard
         private String baseUrl;
         private String fromAddress;
         private String smtpHost;
+        private boolean smtpSSL;
+        private boolean smtpCustomPort;
+        private int smtpPort = 25;
         private String username;
         private String password;
         private String prefix;
@@ -275,6 +284,36 @@ public class SetupWizard extends BaseWizard
         public void setPassword(String password)
         {
             this.password = password;
+        }
+
+        public boolean getSmtpSSL()
+        {
+            return smtpSSL;
+        }
+
+        public void setSmtpSSL(boolean smtpSSL)
+        {
+            this.smtpSSL = smtpSSL;
+        }
+
+        public boolean getSmtpCustomPort()
+        {
+            return smtpCustomPort;
+        }
+
+        public void setSmtpCustomPort(boolean smtpCustomPort)
+        {
+            this.smtpCustomPort = smtpCustomPort;
+        }
+
+        public int getSmtpPort()
+        {
+            return smtpPort;
+        }
+
+        public void setSmtpPort(int smtpPort)
+        {
+            this.smtpPort = smtpPort;
         }
 
         public void validate()
