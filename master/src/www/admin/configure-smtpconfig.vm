@@ -14,13 +14,16 @@
             #testInProgress("test-results")
 
             var host = escape($F("editSmtp!save_smtp_host"));
+            var ssl = escape($F("editSmtp!save_smtp_ssl"));
             var from = escape($F("editSmtp!save_smtp_from"));
             var username = escape($F("editSmtp!save_smtp_username"));
             var password = escape($F("editSmtp!save_smtp_password"));
             var prefix = escape($F("editSmtp!save_smtp_prefix"));
             var to = escape($F("test.address"));
+            var customPort = escape($F("editSmtp!save_smtp_customPort"));
+            var port = escape($F("editSmtp!save_smtp_port"));
 
-            var params = "host=" + host + "&from=" + from + "&username=" + username + "&password=" + password + "&prefix=" + prefix + "&to=" + to;
+            var params = "host=" + host + "&ssl=" + ssl + "&from=" + from + "&username=" + username + "&password=" + password + "&prefix=" + prefix + "&to=" + to + "&customPort=" + customPort + "&port=" + port;
 
             var updater = new Ajax.Updater({success: 'test-results'},
                                            "/ajax/testSmtp.action",
@@ -42,16 +45,21 @@
 
     #wwtextfield("name=smtp.host" "label=%{getText('smtp.host')}" "required=true" "tabindex=1")
     #inlineHelp("smtp.host.help")
-    #wwtextfield("name=smtp.from" "label=%{getText('smtp.from')}" "required=true" "tabindex=2")
+    #wwcheckbox("name=smtp.ssl" "label=%{getText('smtp.ssl')}" "tabindex=2")
+    #inlineHelp("smtp.ssl.help")
+    #wwtextfield("name=smtp.from" "label=%{getText('smtp.from')}" "required=true" "tabindex=3")
     #inlineHelp("smtp.from.help")
-    #wwtextfield("name=smtp.username" "label=%{getText('smtp.username')}" "tabindex=3")
+    #wwtextfield("name=smtp.username" "label=%{getText('smtp.username')}" "tabindex=4")
     #inlineHelp("smtp.username.help")
-    #wwpassword("name=smtp.password" "label=%{getText('smtp.password')}" "showPassword=true" "tabindex=4")
+    #wwpassword("name=smtp.password" "label=%{getText('smtp.password')}" "showPassword=true" "tabindex=5")
     #inlineHelp("smtp.password.help")
-    #wwtextfield("name=smtp.prefix" "label=%{getText('smtp.prefix')}" "tabindex=5")
+    #wwtextfield("name=smtp.prefix" "label=%{getText('smtp.prefix')}" "tabindex=6")
     #inlineHelp("smtp.prefix.help")
+    #wwcheckbox("name=smtp.customPort" "label=%{getText('smtp.custom.port')}" "onclick=setEnableState('editSmtp!save_smtp_port', 'editSmtp!save_smtp_customPort')" "tabindex=7")
+    #wwtextfield("name=smtp.port" "label=%{getText('smtp.port')}" "tabindex=8")
+    #inlineHelp("smtp.port.help")
 
-    #saveCancel(6)
+    #saveCancel(9)
 #end
 
     <table class="content">
@@ -77,6 +85,10 @@
             </td>
         </tr>
     </table>
+
+    <script type="text/javascript">
+        setEnableState('editSmtp!save_smtp_port', 'editSmtp!save_smtp_customPort');
+    </script>
 
     #tabEnd()
 </body>

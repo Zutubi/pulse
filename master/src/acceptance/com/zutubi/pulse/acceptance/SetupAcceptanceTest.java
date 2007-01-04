@@ -78,25 +78,25 @@ public class SetupAcceptanceTest extends BaseAcceptanceTestCase
 
         // local host is required, and while we are at it, verify that all of the other form fields
         // are correctly returned to the user when there is a validation failure.
-        settingsForm.nextFormElements("", "some.smtp.host.com", "from@some.host.com", "username", "password", "prefix");
-        settingsForm.assertFormElements("", "some.smtp.host.com", "from@some.host.com", "username", "password", "prefix");
+        settingsForm.nextFormElements("", "some.smtp.host.com", "false", "from@some.host.com", "username", "password", "prefix", "false", null);
+        settingsForm.assertFormElements("", "some.smtp.host.com", "false", "from@some.host.com", "username", "password", "prefix", "false", "25");
         assertTextPresent("required");
 
         // if smtp host is set, then smtp from is also required.
-        settingsForm.nextFormElements("localhost:8080", "some.smtp.host.com", "", "", "", "");
-        settingsForm.assertFormElements("localhost:8080", "some.smtp.host.com", "", "", "", "");
+        settingsForm.nextFormElements("localhost:8080", "some.smtp.host.com", "false", "", "", "", "", "false", null);
+        settingsForm.assertFormElements("localhost:8080", "some.smtp.host.com", "false", "", "", "", "", "false", "25");
         assertTextPresent("required");
 
         // ensure that the base url setting is a valid url.
-        settingsForm.nextFormElements("localhost:8080", "", "", "", "", "");
-        settingsForm.assertFormElements("localhost:8080", "", "", "", "", "");
+        settingsForm.nextFormElements("localhost:8080", "false", "", "", "", "", "", "false", null);
+        settingsForm.assertFormElements("localhost:8080", "false", "", "", "", "", "", "false", "25");
         assertTextPresent("valid");
 
         // check that the from address is correctly validated.
-        settingsForm.nextFormElements("http://localhost:8080", "", "invalid at email dot com", "", "", "");
+        settingsForm.nextFormElements("http://localhost:8080", "false", "", "invalid at email dot com", "", "", "", "false", null);
         assertTextPresent("whitespace");
 
-        settingsForm.nextFormElements("http://localhost:8080", "some.smtp.host.com", "Setup <from@localhost.com>", "username", "password", "prefix");
+        settingsForm.nextFormElements("http://localhost:8080", "some.smtp.host.com", "true", "Setup <from@localhost.com>", "username", "password", "prefix", "true", "123");
     }
 
     private void checkLicenseDetails()

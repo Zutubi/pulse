@@ -24,6 +24,10 @@ public class EmailContactPoint extends ContactPoint
 
     private static final String SMTP_HOST_PROPERTY = "mail.smtp.host";
     private static final String SMTP_AUTH_PROPERTY = "mail.smtp.auth";
+    private static final String SMTP_PORT_PROPERTY = "mail.smtp.port";
+    private static final String SMTPS_HOST_PROPERTY = "mail.smtps.host";
+    private static final String SMTPS_AUTH_PROPERTY = "mail.smtps.auth";
+    private static final String SMTPS_PORT_PROPERTY = "mail.smtps.port";
 
     private static final String NO_SMTP_HOST_ERROR = "Unable to deliver email: SMTP host not configured.";
 
@@ -78,7 +82,7 @@ public class EmailContactPoint extends ContactPoint
 
         try
         {
-            sendMail(getEmail(), subject, mimeType, rendered, config.getSmtpHost(), config.getSmtpUsername(), config.getSmtpPassword(), config.getSmtpFrom());
+            sendMail(getEmail(), subject, mimeType, rendered, config.getSmtpHost(), config.getSmtpPort(), config.getSmtpSSL(), config.getSmtpUsername(), config.getSmtpPassword(), config.getSmtpFrom());
         }
         catch (Exception e)
         {
@@ -92,15 +96,44 @@ public class EmailContactPoint extends ContactPoint
         return (MasterConfigurationManager) ComponentContext.getBean("configurationManager");
     }
 
-    public static void sendMail(String email, String subject, String mimeType, String body, String host, final String username, final String password, String from) throws Exception
+    public static void sendMail(String email, String subject, String mimeType, String body, String host, int port, boolean ssl, final String username, final String password, String from) throws Exception
     {
         Properties properties = (Properties) System.getProperties().clone();
-        properties.put(SMTP_HOST_PROPERTY, host);
+        if(ssl)
+        {
+            properties.put(SMTPS_HOST_PROPERTY, host);
+        }
+        else
+        {
+            properties.put(SMTP_HOST_PROPERTY, host);
+        }
+
+        if(port > 0)
+        {
+            if(ssl)
+            {
+                properties.put(SMTPS_PORT_PROPERTY, Integer.toString(port));
+            }
+            else
+            {
+                properties.put(SMTP_PORT_PROPERTY, Integer.toString(port));
+            }
+        }
+
+//        properties.put("mail.smtp.starttls.enable","true");
 
         Authenticator authenticator = null;
         if (TextUtils.stringSet(username))
         {
-            properties.put(SMTP_AUTH_PROPERTY, "true");
+            if(ssl)
+            {
+                properties.put(SMTPS_AUTH_PROPERTY, "true");
+            }
+            else
+            {
+                properties.put(SMTP_AUTH_PROPERTY, "true");
+            }
+            
             authenticator = new Authenticator()
             {
                 protected PasswordAuthentication getPasswordAuthentication()
@@ -119,12 +152,23 @@ public class EmailContactPoint extends ContactPoint
             msg.setFrom(new InternetAddress(from));
         }
 
-        msg.setRecipient(Message.RecipientType.TO, new InternetAddress(email));
+        InternetAddress toAddress = new InternetAddress(email);
+        msg.setRecipient(Message.RecipientType.TO, toAddress);
         msg.setSubject(subject);
         msg.setContent(body, mimeType);
         msg.setHeader("X-Mailer", "Zutubi-Pulse");
         msg.setSentDate(new Date());
 
-        Transport.send(msg);
+        Transport transport = session.getTransport(ssl ? "smtps" : "smtp");
+        try
+        {
+            transport.connect();
+            msg.saveChanges();
+            transport.sendMessage(msg, msg.getAllRecipients());
+        }
+        finally
+        {
+            transport.close();
+        }
     }
 }
