@@ -10,6 +10,19 @@ import java.util.List;
  */
 public class FileLoaderTest extends FileLoaderTestBase
 {
+    public void setUp() throws Exception 
+    {
+        super.setUp();
+
+        // initialise the loader some test objects.
+        loader.register("dependency", Dependency.class);
+        loader.register("reference", SimpleReference.class);
+        loader.register("nested", SimpleNestedType.class);
+        loader.register("type", SimpleType.class);
+        loader.register("some-reference", SomeReference.class);
+        loader.register("validateable", SimpleValidateable.class);
+    }
+
     public void testSimpleReference() throws Exception
     {
         SimpleRoot root = new SimpleRoot();

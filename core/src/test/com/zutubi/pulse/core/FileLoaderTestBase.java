@@ -17,14 +17,6 @@ public abstract class FileLoaderTestBase extends PulseTestCase
         PulseFileLoaderFactory fileLoaderFactory = new PulseFileLoaderFactory();
         fileLoaderFactory.setObjectFactory(objectFactory);
 
-        // initialise the loader some test objects.
-        fileLoaderFactory.register("dependency", Dependency.class);
-        fileLoaderFactory.register("reference", SimpleReference.class);
-        fileLoaderFactory.register("nested", SimpleNestedType.class);
-        fileLoaderFactory.register("type", SimpleType.class);
-        fileLoaderFactory.register("some-reference", SomeReference.class);
-        fileLoaderFactory.register("validateable", SimpleValidateable.class);
-
         loader = fileLoaderFactory.createLoader();
     }
 
