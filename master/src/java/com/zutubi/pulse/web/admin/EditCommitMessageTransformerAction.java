@@ -1,18 +1,15 @@
 package com.zutubi.pulse.web.admin;
 
+import com.opensymphony.xwork.Validateable;
 import com.zutubi.pulse.committransformers.*;
 import com.zutubi.pulse.model.CommitMessageTransformer;
-import com.zutubi.pulse.model.ProjectManager;
 import com.zutubi.pulse.model.Project;
 import com.zutubi.pulse.web.user.contact.FormAction;
-import com.opensymphony.xwork.Validateable;
 
 /**
  */
 public class EditCommitMessageTransformerAction extends FormAction  implements Validateable
 {
-    private CommitMessageTransformerManager transformerManager;
-
     private long id;
     private long projectId;
 
@@ -55,7 +52,7 @@ public class EditCommitMessageTransformerAction extends FormAction  implements V
             return;
         }
 
-        CommitMessageTransformer t = transformerManager.getByName(name);
+        CommitMessageTransformer t = commitMessageTransformerManager.getByName(name);
         if(t != null && t.getId() != getId())
         {
             addFieldError("newName", "A commit message link with name '" + name + "' already exists");
@@ -64,7 +61,7 @@ public class EditCommitMessageTransformerAction extends FormAction  implements V
 
     public Object doLoad()
     {
-        CommitMessageTransformer transformer = transformerManager.getById(getId());
+        CommitMessageTransformer transformer = commitMessageTransformerManager.getById(getId());
         if (transformer instanceof LinkCommitMessageTransformer)
         {
             LinkHandler handler = new LinkHandler();
@@ -93,7 +90,7 @@ public class EditCommitMessageTransformerAction extends FormAction  implements V
 
     public void doSave(Object obj)
     {
-        CommitMessageTransformer transformer = transformerManager.getById(getId());
+        CommitMessageTransformer transformer = commitMessageTransformerManager.getById(getId());
         if (obj instanceof LinkHandler)
         {
             LinkHandler handler = (LinkHandler) obj;
@@ -102,7 +99,7 @@ public class EditCommitMessageTransformerAction extends FormAction  implements V
             standardTransformer.setExpression(handler.getExpression());
             standardTransformer.setLink(handler.getLink());
 
-            transformerManager.save(standardTransformer);
+            commitMessageTransformerManager.save(standardTransformer);
         }
         else if (obj instanceof JiraHandler)
         {
@@ -111,7 +108,7 @@ public class EditCommitMessageTransformerAction extends FormAction  implements V
             jiraTransformer.setName(handler.getName());
             jiraTransformer.setUrl(handler.getUrl());
 
-            transformerManager.save(jiraTransformer);
+            commitMessageTransformerManager.save(jiraTransformer);
         }
         else if (obj instanceof CustomHandler)
         {
@@ -121,12 +118,7 @@ public class EditCommitMessageTransformerAction extends FormAction  implements V
             customTransformer.setExpression(handler.getExpression());
             customTransformer.setReplacement(handler.getReplacement());
 
-            transformerManager.save(customTransformer);
+            commitMessageTransformerManager.save(customTransformer);
         }
-    }
-
-    public void setCommitMessageTransformerManager(CommitMessageTransformerManager commitMessageTransformerManager)
-    {
-        this.transformerManager = commitMessageTransformerManager;
     }
 }

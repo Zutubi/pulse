@@ -7,9 +7,7 @@ import com.zutubi.pulse.jabber.JabberManager;
 import com.zutubi.pulse.license.License;
 import com.zutubi.pulse.license.LicenseHolder;
 import com.zutubi.pulse.model.CommitMessageTransformer;
-import com.zutubi.pulse.model.ProjectManager;
 import com.zutubi.pulse.model.UserManager;
-import com.zutubi.pulse.committransformers.CommitMessageTransformerManager;
 import com.zutubi.pulse.security.ldap.LdapManager;
 import com.zutubi.pulse.web.ActionSupport;
 
@@ -29,7 +27,6 @@ public class ServerSettingsAction extends ActionSupport
     private DateFormat dateFormatter = new SimpleDateFormat("EEEEE, dd MMM yyyy");
     private LdapManager ldapManager;
     private List<CommitMessageTransformer> commitMessageTransformers;
-    private CommitMessageTransformerManager commitMessageTransformerManager;
     private AgentManager agentManager;
     private UserManager userManager;
 
@@ -110,7 +107,7 @@ public class ServerSettingsAction extends ActionSupport
     /**
      * Required resource.
      *
-     * @param configurationManager
+     * @param configurationManager instance
      */
     public void setConfigurationManager(MasterConfigurationManager configurationManager)
     {
@@ -120,7 +117,7 @@ public class ServerSettingsAction extends ActionSupport
     /**
      * Required resource.
      *
-     * @param jabberManager
+     * @param jabberManager instance
      */
     public void setJabberManager(JabberManager jabberManager)
     {
@@ -130,7 +127,7 @@ public class ServerSettingsAction extends ActionSupport
     /**
      * Required resource.
      *
-     * @param ldapManager
+     * @param ldapManager instance
      */
     public void setLdapManager(LdapManager ldapManager)
     {
@@ -140,22 +137,17 @@ public class ServerSettingsAction extends ActionSupport
     /**
      * Required resource.
      *
-     * @param agentManager
+     * @param agentManager instance
      */
     public void setAgentManager(AgentManager agentManager)
     {
         this.agentManager = agentManager;
     }
 
-    public void setCommitMessageTransformerManager(CommitMessageTransformerManager commitMessageTransformerManager)
-    {
-        this.commitMessageTransformerManager = commitMessageTransformerManager;
-    }
-
     /**
      * Required resource.
      *
-     * @param userManager
+     * @param userManager instance
      */
     public void setUserManager(UserManager userManager)
     {

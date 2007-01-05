@@ -1,11 +1,12 @@
 package com.zutubi.pulse.renderer;
 
+import com.mockobjects.dynamic.Mock;
+import com.zutubi.pulse.committransformers.CommitMessageTransformerManager;
 import com.zutubi.pulse.committransformers.LinkCommitMessageTransformer;
 import com.zutubi.pulse.core.model.*;
 import com.zutubi.pulse.model.*;
 import com.zutubi.pulse.test.PulseTestCase;
 import com.zutubi.pulse.util.IOUtils;
-import com.zutubi.pulse.web.project.CommitMessageHelper;
 import freemarker.template.Configuration;
 import freemarker.template.DefaultObjectWrapper;
 
@@ -21,7 +22,7 @@ public class FreemarkerBuildResultRendererTest extends PulseTestCase
 {
     private boolean generate = false;
 
-    FreemarkerBuildResultRenderer renderer;
+    private FreemarkerBuildResultRenderer renderer;
 
     protected void setUp() throws Exception
     {
@@ -41,7 +42,10 @@ public class FreemarkerBuildResultRendererTest extends PulseTestCase
 
         List<CommitMessageTransformer> txs = new ArrayList<CommitMessageTransformer>(1);
         txs.add(tx);
-        renderer.setCommitMessageHelper(new CommitMessageHelper(txs));
+
+        Mock commitMessageTransformerManager = new Mock(CommitMessageTransformerManager.class);
+        renderer.setCommitMessageTransformerManager((CommitMessageTransformerManager) commitMessageTransformerManager.proxy());
+        commitMessageTransformerManager.matchAndReturn("getCommitMessageTransformers", txs);
     }
 
     protected void tearDown() throws Exception

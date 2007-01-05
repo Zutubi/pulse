@@ -2,7 +2,6 @@ package com.zutubi.pulse.web.project;
 
 import com.opensymphony.util.TextUtils;
 import com.zutubi.pulse.committransformers.CommitMessageTransformerManager;
-import com.zutubi.pulse.core.model.Changelist;
 import com.zutubi.pulse.core.model.Feature;
 import com.zutubi.pulse.model.*;
 import com.zutubi.pulse.scheduling.Scheduler;
@@ -11,7 +10,6 @@ import org.acegisecurity.AccessDeniedException;
 
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 
 /**
@@ -20,7 +18,6 @@ import java.util.List;
  */
 public class ProjectActionSupport extends ActionSupport
 {
-    protected CommitMessageTransformerManager transformerManager;
     protected BuildManager buildManager;
     protected ScmManager scmManager;
     protected UserManager userManager;
@@ -31,8 +28,6 @@ public class ProjectActionSupport extends ActionSupport
     protected long projectId = NONE_SPECIFIED;
 
     protected String projectName = null;
-
-    private CommitMessageHelper commitMessageHelper;
 
     public BuildManager getBuildManager()
     {
@@ -195,32 +190,8 @@ public class ProjectActionSupport extends ActionSupport
         this.userManager = userManager;
     }
 
-    public void setCommitMessageTransformerManager(CommitMessageTransformerManager transformerManager)
-    {
-        this.transformerManager = transformerManager;
-    }
-
     public CommitMessageTransformerManager getTransformerManager()
     {
-        return transformerManager;
-    }
-
-    public String transformComment(Changelist changelist)
-    {
-        return getHelper().applyTransforms(changelist);
-    }
-
-    public String transformComment(Changelist changelist, int maxChars)
-    {
-        return getHelper().applyTransforms(changelist, maxChars);
-    }
-
-    protected CommitMessageHelper getHelper()
-    {
-        if(commitMessageHelper == null)
-        {
-            commitMessageHelper = new CommitMessageHelper(getTransformerManager().getCommitMessageTransformers());
-        }
-        return commitMessageHelper;
+        return commitMessageTransformerManager;
     }
 }
