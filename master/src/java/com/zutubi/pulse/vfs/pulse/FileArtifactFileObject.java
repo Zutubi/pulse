@@ -102,7 +102,7 @@ public class FileArtifactFileObject extends AbstractPulseFileObject implements A
         }
         catch (FileSystemException e)
         {
-            e.printStackTrace();
+            LOG.warning(e);
             return "";
         }
     }
