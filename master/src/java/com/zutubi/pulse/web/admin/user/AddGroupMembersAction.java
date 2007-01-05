@@ -3,16 +3,15 @@ package com.zutubi.pulse.web.admin.user;
 import com.zutubi.pulse.model.Group;
 import com.zutubi.pulse.model.User;
 
-import java.util.Map;
-import java.util.List;
-import java.util.LinkedHashMap;
+import java.util.*;
+import java.text.Collator;
 
 /**
  * An action to add new members (users) to a group.
  */
 public class AddGroupMembersAction extends GroupActionSupport
 {
-    private Map<Long, String> nonMembers;
+    private LinkedHashMap<Long, String> nonMembers;
     private List<Long> members;
     private int startPage;
 
@@ -25,6 +24,17 @@ public class AddGroupMembersAction extends GroupActionSupport
             if(group != null)
             {
                 List<User> nons = getUserManager().getUsersNotInGroup(group);
+
+                // sort the nons list so that they appear in a predictable order in the UI.
+                final Collator collator = Collator.getInstance();
+                Collections.sort(nons, new Comparator<User>()
+                {
+                    public int compare(User user1, User user2)
+                    {
+                        return collator.compare(user1.getName(), user2.getName());
+                    }
+                });
+
                 for(User u: nons)
                 {
                     nonMembers.put(u.getId(), u.getLogin() + " (" + u.getName() + ")");
