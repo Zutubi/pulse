@@ -30,6 +30,6 @@
 <#include "/forms/simple/scripting-events.ftl" />
 ><#rt/>
 <#if parameters.value?exists>
-${parameters.value}<#t/>
+${parameters.value?html}<#t/>
 </#if>
 </textarea>

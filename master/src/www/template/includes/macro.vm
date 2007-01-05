@@ -695,7 +695,7 @@
 #macro(deleteCell $id $url $message)
     <td class="content">
         #if ($message && $message.length() > 0)
-        <a href="#" id="$id" onclick="confirmUrl('$message', '$url')"><img alt="$action.getText('delete')" src="$base/images/delete.gif"/> #wwtext("name=delete")</a>
+        <a href="#" id="$id" onclick="confirmUrl('$action.jsStringEncode($message)', '$url')"><img alt="$action.getText('delete')" src="$base/images/delete.gif"/> #wwtext("name=delete")</a>
         #else
         <a href="$url" id="$id"><img alt="$action.getText('delete')" src="$base/images/delete.gif"/> #wwtext("name=delete")</a>
         #end
@@ -707,7 +707,7 @@
 ##
 #macro(removeCell $message $url $id)
     <td class="content">
-        <a href="#" id="$id" onclick="confirmUrl('$message', '$url')"><img alt="$action.getText('remove')" src="$base/images/delete.gif"/> #wwtext("name=remove")</a>
+        <a href="#" id="$id" onclick="confirmUrl('$action.jsStringEncode($message)', '$url')"><img alt="$action.getText('remove')" src="$base/images/delete.gif"/> #wwtext("name=remove")</a>
     </td>
 #end
 
@@ -717,7 +717,7 @@
 ##
 #macro(deleteCellSpan $message $url $id $span)
     <td class="content" rowspan="$span">
-        <a href="#" id="$id" onclick="confirmUrl('$message', '$url')"><img alt="$action.getText('delete')" src="$base/images/delete.gif"/> #wwtext("name=delete")</a>
+        <a href="#" id="$id" onclick="confirmUrl('$action.jsStringEncode($message)', '$url')"><img alt="$action.getText('delete')" src="$base/images/delete.gif"/> #wwtext("name=delete")</a>
     </td>
 #end
 

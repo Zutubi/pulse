@@ -1,7 +1,7 @@
 <input type="hidden"<#rt/>
  name="${parameters.name?default("")?html}"<#rt/>
 <#if parameters.value?exists>
- value="${parameters.value}"<#rt/>
+ value="${parameters.value?html}"<#rt/>
 </#if>
 <#if parameters.id?exists>
  id="${parameters.id?html}"<#rt/>

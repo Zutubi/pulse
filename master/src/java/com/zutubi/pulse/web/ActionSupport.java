@@ -153,6 +153,11 @@ public class ActionSupport extends com.opensymphony.xwork.ActionSupport implemen
         }
     }
 
+    public String jsStringEncode(String s)
+    {
+        return TextUtils.htmlEncode(s).replace("'", "\\'");
+    }
+    
     public String urlDecode(String s)
     {
         try
