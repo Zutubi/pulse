@@ -40,7 +40,18 @@ public class DisplayServlet extends HttpServlet
                 path = "pulse:///" + path;
             }
 
-            AbstractPulseFileObject pfo = (AbstractPulseFileObject) getFS().resolveFile(path);
+            AbstractPulseFileObject pfo;
+            try
+            {
+                pfo = (AbstractPulseFileObject) getFS().resolveFile(path);
+            }
+            catch(FileSystemException e)
+            {
+                // OK, try replacing pluses with spaces
+                path = path.replace('+', ' ');
+                pfo = (AbstractPulseFileObject) getFS().resolveFile(path);
+            }
+
             if (!(pfo instanceof AddressableFileObject))
             {
                 response.sendError(404, String.format("The path '%s' does not represent an addressable resource.", request.getPathInfo()));
