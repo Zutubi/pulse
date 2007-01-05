@@ -8,6 +8,7 @@ import com.zutubi.pulse.util.logging.Logger;
 import java.util.List;
 
 /**
+ * @deprecated use CommitMessageSupport instead.
  */
 public class CommitMessageHelper
 {
