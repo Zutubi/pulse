@@ -6,6 +6,7 @@ import com.zutubi.pulse.core.model.Feature;
 import com.zutubi.pulse.core.model.PlainFeature;
 import com.zutubi.pulse.core.model.StoredFileArtifact;
 import com.zutubi.pulse.model.BuildResult;
+import com.zutubi.pulse.model.BuildManager;
 import com.zutubi.pulse.util.logging.Logger;
 import com.zutubi.pulse.vfs.pulse.AbstractPulseFileObject;
 import com.zutubi.pulse.vfs.pulse.BuildResultProvider;
@@ -25,6 +26,8 @@ import java.util.*;
 public class ViewArtifactAction extends VFSActionSupport
 {
     private static final Logger LOG = Logger.getLogger(ViewArtifactAction.class);
+
+    private BuildManager buildManager;
 
     private BuildResult buildResult;
     private CommandResult commandResult;
@@ -126,7 +129,7 @@ public class ViewArtifactAction extends VFSActionSupport
 
         buildResult = ((BuildResultProvider)pfo.getAncestor(BuildResultProvider.class)).getBuildResult();
         commandResult = ((CommandResultProvider)pfo.getAncestor(CommandResultProvider.class)).getCommandResult();
-        artifact = ((FileArtifactProvider)pfo).getFileArtifact();
+        artifact = buildManager.getFileArtifact(((FileArtifactProvider)pfo).getFileArtifactId());
 
         File artifactFile = ((FileArtifactProvider)pfo).getFile();
         if(!artifactFile.isFile())
@@ -148,6 +151,11 @@ public class ViewArtifactAction extends VFSActionSupport
         determineLineLevels();
 
         return SUCCESS;
+    }
+
+    public void setBuildManager(BuildManager buildManager)
+    {
+        this.buildManager = buildManager;
     }
 
     class ReaderIterator implements Iterator
