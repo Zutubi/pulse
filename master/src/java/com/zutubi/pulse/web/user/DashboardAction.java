@@ -1,12 +1,10 @@
 package com.zutubi.pulse.web.user;
 
-import com.zutubi.pulse.committransformers.CommitMessageTransformerManager;
 import com.zutubi.pulse.core.model.Changelist;
 import com.zutubi.pulse.core.model.ChangelistComparator;
 import com.zutubi.pulse.model.*;
 import com.zutubi.pulse.security.AcegiUtils;
 import com.zutubi.pulse.web.ActionSupport;
-import com.zutubi.pulse.web.project.CommitMessageHelper;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -27,8 +25,7 @@ public class DashboardAction extends ActionSupport
 
     private BuildManager buildManager;
     private UserManager userManager;
-    private CommitMessageTransformerManager commitMessageTransformerManager;
-    private CommitMessageHelper commitMessageHelper;
+
     private boolean contactError = false;
 
     public User getUser()
@@ -151,25 +148,6 @@ public class DashboardAction extends ActionSupport
         return buildManager.getBuildResult(id);
     }
 
-    public String transformComment(Changelist changelist)
-    {
-        return getHelper().applyTransforms(changelist);
-    }
-
-    public String transformComment(Changelist changelist, int maxChars)
-    {
-        return getHelper().applyTransforms(changelist, maxChars);
-    }
-
-    protected CommitMessageHelper getHelper()
-    {
-        if(commitMessageHelper == null)
-        {
-            commitMessageHelper = new CommitMessageHelper(commitMessageTransformerManager.getCommitMessageTransformers());
-        }
-        return commitMessageHelper;
-    }
-
     public boolean canWrite(Project project)
     {
         try
@@ -201,15 +179,5 @@ public class DashboardAction extends ActionSupport
     public void setUserManager(UserManager userManager)
     {
         this.userManager = userManager;
-    }
-
-    /**
-     * Required resource.
-     *
-     * @param transformerManager instance
-     */
-    public void setCommitMessageTransformerManager(CommitMessageTransformerManager transformerManager)
-    {
-        this.commitMessageTransformerManager = transformerManager;
     }
 }

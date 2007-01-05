@@ -12,21 +12,21 @@ import java.util.List;
 
 /**
  */
-public class CommitMessageHelperTest extends PulseTestCase
+public class CommitMessageSupportTest extends PulseTestCase
 {
-    private CommitMessageHelper helper;
+    private List<CommitMessageTransformer> transformers;
 
     protected void setUp() throws Exception
     {
         super.setUp();
-        List<CommitMessageTransformer> transformers = new LinkedList<CommitMessageTransformer>();
+
+        transformers = new LinkedList<CommitMessageTransformer>();
         transformers.add(new LinkCommitMessageTransformer("foo", "foo+", "http://foo/$0"));
         transformers.add(new LinkCommitMessageTransformer("bug", "bug ([0-9]+)", "http://bugs/$1"));
         transformers.add(new LinkCommitMessageTransformer("bad", "bad", "http://$1"));
         CommitMessageTransformer limited = new LinkCommitMessageTransformer("limited", "limited", "http://lim/");
         limited.setProjects(Arrays.asList(new Long[] {(long) 1, (long) 3}));
         transformers.add(limited);
-        helper = new CommitMessageHelper(transformers);
     }
 
     public void testBasicReplacement()
@@ -85,13 +85,16 @@ public class CommitMessageHelperTest extends PulseTestCase
         Revision rev = new Revision("author", input, 0, "rev");
         Changelist list = new Changelist("uid", rev);
         list.addProjectId(project);
+
+        CommitMessageSupport support = new CommitMessageSupport(list, transformers);
+
         if(limit == 0)
         {
-            assertEquals(replacement, helper.applyTransforms(list));
+            assertEquals(replacement, support.wrap(80));
         }
         else
         {
-            assertEquals(replacement, helper.applyTransforms(list, limit));
+            assertEquals(replacement, support.trim(limit));
         }
     }
 }

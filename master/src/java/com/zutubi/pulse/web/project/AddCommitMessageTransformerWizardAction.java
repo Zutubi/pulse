@@ -13,8 +13,6 @@ import java.util.LinkedList;
  */
 public class AddCommitMessageTransformerWizardAction extends WizardAction
 {
-    private CommitMessageTransformerManager transformerManager;
-
     private List<String> existingOptions;
 
     public List<String> getExistingOptions()
@@ -24,7 +22,7 @@ public class AddCommitMessageTransformerWizardAction extends WizardAction
             existingOptions = new LinkedList<String>();
             long projectId = ((AddCommitMessageTransformerWizard)getWizardInstance()).getProjectId();
                     
-            for (CommitMessageTransformer t : transformerManager.getCommitMessageTransformers())
+            for (CommitMessageTransformer t : commitMessageTransformerManager.getCommitMessageTransformers())
             {
                 // filter out the transformers that are already applied to this project.
                 if (!t.getProjects().contains(projectId))
@@ -34,10 +32,5 @@ public class AddCommitMessageTransformerWizardAction extends WizardAction
             }
         }
         return existingOptions;
-    }
-
-    public void setCommitMessageTransformerManager(CommitMessageTransformerManager commitMessageTransformerManager)
-    {
-        this.transformerManager = commitMessageTransformerManager;
     }
 }

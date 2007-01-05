@@ -118,7 +118,7 @@ public class ConfigureProjectAction extends ProjectActionSupport
         id = project.getId();
         triggers = getScheduler().getTriggers(id);
 
-        transformers = transformerManager.getByProject(project);
+        transformers = commitMessageTransformerManager.getByProject(project);
 
         cleanupInProgress = buildManager.isCleanupInProgress(project);
 

@@ -9,6 +9,7 @@ import com.zutubi.pulse.util.FileSystemUtils;
 import com.zutubi.pulse.util.StringUtils;
 import com.zutubi.pulse.util.logging.Logger;
 import com.zutubi.pulse.web.project.CommitMessageHelper;
+import com.zutubi.pulse.web.project.CommitMessageSupport;
 import freemarker.template.Configuration;
 import freemarker.template.Template;
 
@@ -23,7 +24,6 @@ public class FreemarkerBuildResultRenderer implements BuildResultRenderer
 
     private Configuration freemarkerConfiguration;
     private SystemPaths systemPaths;
-    private CommitMessageHelper commitMessageHelper;
     private CommitMessageTransformerManager commitMessageTransformerManager;
 
     public void render(String baseUrl, BuildResult result, List<Changelist> changelists, String templateName, Writer writer)
@@ -144,22 +144,13 @@ public class FreemarkerBuildResultRenderer implements BuildResultRenderer
 
     public String transformComment(Changelist changelist)
     {
-        if(commitMessageHelper == null)
-        {
-            commitMessageHelper = new CommitMessageHelper(commitMessageTransformerManager.getCommitMessageTransformers());
-        }
-
-        return commitMessageHelper.applyTransforms(changelist, 60);
+        CommitMessageSupport support = new CommitMessageSupport(changelist, commitMessageTransformerManager.getCommitMessageTransformers());
+        return support.trim(60);
     }
 
     public void setFreemarkerConfiguration(Configuration freemarkerConfiguration)
     {
         this.freemarkerConfiguration = freemarkerConfiguration;
-    }
-
-    public void setCommitMessageHelper(CommitMessageHelper commitMessageHelper)
-    {
-        this.commitMessageHelper = commitMessageHelper;
     }
 
     public void setCommitMessageTransformerManager(CommitMessageTransformerManager commitMessageTransformerManager)

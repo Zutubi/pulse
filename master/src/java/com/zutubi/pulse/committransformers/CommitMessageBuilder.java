@@ -172,7 +172,7 @@ public class CommitMessageBuilder
         }
 
         message = result.toString();
-        mods = new LinkedList(mods.subList(0, message.length()));
+        mods = new LinkedList<Boolean>(mods.subList(0, message.length()));
 
         return toString();
     }
@@ -225,6 +225,12 @@ public class CommitMessageBuilder
         message = modifiedMessage.toString();
 
         return message;
+    }
+
+    public int getLength()
+    {
+        recalculateVisibleIndicies();
+        return visibleLength();
     }
 
     private int visibleLength()

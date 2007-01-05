@@ -1,12 +1,11 @@
 package com.zutubi.pulse.web.project;
 
-import com.zutubi.pulse.core.model.Changelist;
 import com.zutubi.pulse.core.model.Change;
+import com.zutubi.pulse.core.model.Changelist;
 import com.zutubi.pulse.core.model.FileRevision;
 import com.zutubi.pulse.model.*;
 import com.zutubi.pulse.model.persistence.ChangelistDao;
 import com.zutubi.pulse.web.ActionSupport;
-import com.zutubi.pulse.committransformers.CommitMessageTransformerManager;
 
 import java.util.Collections;
 import java.util.Comparator;
@@ -20,7 +19,6 @@ public class ViewChangelistAction extends ActionSupport
     private Changelist changelist;
     private ChangelistDao changelistDao;
     private BuildManager buildManager;
-    private CommitMessageHelper commitMessageHelper;
 
     /** If we drilled down from the project, this is the project ID */
     private long projectId;
@@ -263,16 +261,6 @@ public class ViewChangelistAction extends ActionSupport
         return SUCCESS;
     }
 
-    public String transformComment(Changelist changelist)
-    {
-        return commitMessageHelper.applyTransforms(changelist);
-    }
-
-    public String transformComment(Changelist changelist, int maxChars)
-    {
-        return commitMessageHelper.applyTransforms(changelist, maxChars);
-    }
-
     public void setChangelistDao(ChangelistDao changelistDao)
     {
         this.changelistDao = changelistDao;
@@ -286,10 +274,5 @@ public class ViewChangelistAction extends ActionSupport
     public List<BuildResult> getBuildResults()
     {
         return buildResults;
-    }
-
-    public void setCommitMessageTransformerManager(CommitMessageTransformerManager commitMessageTransformerManager)
-    {
-        commitMessageHelper = new CommitMessageHelper(commitMessageTransformerManager.getCommitMessageTransformers());
     }
 }

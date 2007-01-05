@@ -30,7 +30,7 @@
         </tr>
         <tr>
             #contentRowHeading("changelist.comment")
-            <td class="content-wrap"><pre>$action.transformComment($changelist)</pre></td>
+            <td class="content-wrap"><pre>$action.getCommitMessageSupport($changelist).wrap(80)</pre></td>
         </tr>
     </table>
 

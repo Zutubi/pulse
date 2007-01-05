@@ -918,8 +918,11 @@
 #macro(commitCommentCell $changelist $id_suffix)
     #set($changeId = "${changelist.id}_comment_${id_suffix}")
     <td class="content" id="${changeId}_cell">
-    #if ($changelist.comment.length() > 60)
-        $action.transformComment($changelist, 60)
+
+    #set($commitMessageSupport = $action.getCommitMessageSupport($changelist))
+
+    #if ($commitMessageSupport.length > 60)
+        $commitMessageSupport.trim(60)
         <a href="#" id="${changeId}_link" onclick="showHideCommentsWindow('$changeId'); return false;">+</a>
         <div id="$changeId" style="display: none">
             <table class="content" style="margin: 0">
@@ -932,12 +935,12 @@
                     </th>
                 </tr>
                 <tr>
-                    <td><pre>$action.transformComment($changelist)</pre></td>
+                    <td><pre>$commitMessageSupport.wrap(80)</pre></td>
                 </tr>
             </table>
         </div>
     #else
-        $action.transformComment($changelist)
+        $commitMessageSupport.wrap(80)
     #end
     </td>
 #end
