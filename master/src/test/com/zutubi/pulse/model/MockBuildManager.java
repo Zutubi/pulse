@@ -226,7 +226,7 @@ public class MockBuildManager implements BuildManager
         throw new RuntimeException("Method not implemented.");
     }
 
-    public Boolean canDecorateArtifact(StoredFileArtifact artifact)
+    public Boolean canDecorateArtifact(long artifactId)
     {
         throw new RuntimeException("Method not implemented.");
     }

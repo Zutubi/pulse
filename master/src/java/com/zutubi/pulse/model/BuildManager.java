@@ -149,5 +149,5 @@ public interface BuildManager
 
     StoredArtifact getCommandResultByArtifact(long commandResultId, String artifactName);
 
-    Boolean canDecorateArtifact(StoredFileArtifact artifact);
+    Boolean canDecorateArtifact(long artifactId);
 }

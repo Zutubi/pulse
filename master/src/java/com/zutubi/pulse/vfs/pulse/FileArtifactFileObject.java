@@ -39,7 +39,7 @@ public class FileArtifactFileObject extends AbstractPulseFileObject implements A
             try
             {
                 StoredFileArtifact artifact = getFileArtifact();
-                canDecorate = buildManager.canDecorateArtifact(artifact);
+                canDecorate = buildManager.canDecorateArtifact(artifact.getId());
             }
             catch (FileSystemException e)
             {
