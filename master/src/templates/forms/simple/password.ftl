@@ -7,7 +7,7 @@
  maxlength="${parameters.maxlength?html}"<#rt/>
 </#if>
 <#if parameters.value?exists && parameters.showPassword?default(false)>
- value="${parameters.value}"/>"<#rt/>
+ value="${parameters.value?html}"/>"<#rt/>
 </#if>
 <#if parameters.disabled?default(false)>
  disabled="disabled"<#rt/>
