@@ -21,25 +21,15 @@ public class PulseFileLoaderFactory
         register("def", ComponentDefinition.class);
         register("post-processor", PostProcessorGroup.class);
         register("command", CommandGroup.class);
-//        register("ant.pp", AntPostProcessor.class);
         register("cppunit.pp", CppUnitReportPostProcessor.class);
         register("junit.pp", JUnitReportPostProcessor.class);
         register("junit.summary.pp", JUnitSummaryPostProcessor.class);
         register("ocunit.pp", OCUnitReportPostProcessor.class);
         register("regex-test.pp", RegexTestPostProcessor.class);
-        register("make.pp", MakePostProcessor.class);
-        register("maven.pp", MavenPostProcessor.class);
-        register("maven2.pp", Maven2PostProcessor.class);
         register("regex.pp", RegexPostProcessor.class);
-//        register("xcodebuild.pp", XCodePostProcessor.class);
-//        register("ant", AntCommand.class);
-        register("maven", MavenCommand.class);
-        register("maven2", Maven2Command.class);
         register("executable", ExecutableCommand.class);
         register("print", PrintCommand.class);
         register("sleep", SleepCommand.class);
-        register("make", MakeCommand.class);
-//        register("xcodebuild", XCodeCommand.class);
         register("resource", ResourceReference.class);
     }
 

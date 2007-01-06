@@ -1,0 +1,5 @@
+Bundle-SymbolicName: com.zutubi.pulse.core.commands.maven; singleton:=true
+Bundle-Name: com.zutubi.pulse.core.commands.maven
+Bundle-Description: The prepackaged pulse maven command support.
+Bundle-Vendor: Zutubi
+Bundle-Version: 2.0.0
