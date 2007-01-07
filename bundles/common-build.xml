@@ -22,16 +22,16 @@
         <property name="javac.debug" value="true"/>
         <property name="javac.deprecation" value="off"/>
 
+        <dirname property="current.dir" file="ivy.xml"/>
+
         <!-- INTERNAL: project structural properties -->
-        <property name="build.dir" value="build"/>
+        <property name="build.dir" value="${current.dir}/build"/>
         <property name="build.lib.dir" value="${build.dir}/lib"/>
         <property name="classes.dir" value="${build.dir}/classes"/>
         <property name="test.classes.dir" value="${build.dir}/test.classes"/>
         <property name="report.dir" value="${build.dir}/report"/>
 
         <property name="project.repository" value="${project.root.dir}/build/repository"/>
-        
-        <dirname property="current.dir" file="ivy.xml"/>
 
         <property file="${project.root.dir}/ivy.properties"/>
         <ivy:configure file="${project.root.dir}/ivyconf.xml"/>

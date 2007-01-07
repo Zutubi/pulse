@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns:ivy="antlib:fr.jayasoft.ivy.ant" name="bundle build file" basedir=".">
+
+    <!-- initialise configuration -->
+    <target name="init">
+
+        <path id="custom.task.path">
+            <fileset dir="../etc">
+                <include name="**/*.jar"/>
+            </fileset>
+        </path>
+
+        <taskdef resource="net/sf/antcontrib/antlib.xml" classpathref="custom.task.path"/>
+
+    </target>
+
+
+    <target name="clean" depends="init">
+
+        <foreach target="for-each-module-clean" param="module.base">
+            <path>
+                <dirset dir=".">
+                    <include name="*"/>
+                </dirset>
+            </path>
+        </foreach>
+
+    </target>
+
+    <target name="for-each-module-clean">
+
+        <ant inheritAll="false" dir="${module.base}" antfile="build.xml" target="clean"/>
+
+    </target>
+
+    <!-- prepare for new build -->
+    <target name="prepare" depends="init"/>
+
+    <!-- prepare for new build -->
+    <target name="build" depends="init">
+
+        <foreach target="for-each-module-build" param="module.base">
+            <path>
+                <dirset dir=".">
+                    <include name="*"/>
+                </dirset>
+            </path>
+        </foreach>
+
+    </target>
+
+    <target name="for-each-module-build">
+
+        <ant inheritAll="false" dir="${module.base}" antfile="build.xml" target="build.module"/>
+
+    </target>
+
+    <!-- prepare for new build -->
+    <target name="test" depends="init"/>
+
+    <target name="package" depends="init"/>
+
+    <!-- publish the artifacts to the defined repository. -->
+    <target name="publish" depends="init"/>
+
+</project>
