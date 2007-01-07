@@ -7,6 +7,7 @@ import com.zutubi.pulse.util.FileSystemUtils;
 import com.zutubi.pulse.util.IOUtils;
 
 import java.io.*;
+import java.net.URL;
 import java.util.List;
 
 /**
@@ -135,7 +136,10 @@ public class Maven2CommandTest extends CommandTestBase
 
     private File getSource(String name)
     {
-        return new File(getPulseRoot(), FileSystemUtils.composeFilename("core", "src", "test", "com", "zutubi", "pulse", "core", getClass().getSimpleName() + "." + name));
+        URL resource = getClass().getResource("Maven2CommandLoadTest.basic.xml");
+        File moduleDir = new File(resource.getPath().replaceFirst("command-maven2.*", "command-maven2"));
+
+        return new File(moduleDir, FileSystemUtils.composeFilename("src", "test", "com", "zutubi", "pulse", "core", getClass().getSimpleName() + "." + name));
     }
 
     protected File getCommandOutput(CommandResult commandResult) throws IOException
