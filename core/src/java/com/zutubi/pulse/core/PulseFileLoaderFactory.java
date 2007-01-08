@@ -21,10 +21,8 @@ public class PulseFileLoaderFactory
         register("def", ComponentDefinition.class);
         register("post-processor", PostProcessorGroup.class);
         register("command", CommandGroup.class);
-        register("cppunit.pp", CppUnitReportPostProcessor.class);
         register("junit.pp", JUnitReportPostProcessor.class);
         register("junit.summary.pp", JUnitSummaryPostProcessor.class);
-        register("ocunit.pp", OCUnitReportPostProcessor.class);
         register("regex-test.pp", RegexTestPostProcessor.class);
         register("regex.pp", RegexPostProcessor.class);
         register("executable", ExecutableCommand.class);
