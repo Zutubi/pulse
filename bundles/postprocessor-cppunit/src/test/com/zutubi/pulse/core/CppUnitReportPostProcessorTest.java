@@ -3,7 +3,8 @@ package com.zutubi.pulse.core;
 import com.zutubi.pulse.core.model.TestCaseResult;
 import com.zutubi.pulse.core.model.TestSuiteResult;
 
-import java.io.IOException;
+import java.io.File;
+import java.net.URL;
 import java.util.List;
 
 /**
@@ -20,13 +21,10 @@ public class CppUnitReportPostProcessorTest extends XMLReportPostProcessorTestBa
         super(name, new CppUnitReportPostProcessor());
     }
 
-    public void setUp() throws IOException
+    protected File getOutputDir()
     {
-    }
-
-    public void tearDown() throws Exception
-    {
-        super.tearDown();
+        URL resource = getClass().getResource("CppUnitReportPostProcessorTest.basic.xml");
+        return new File(resource.getPath()).getParentFile();
     }
 
     public void testBasic()
