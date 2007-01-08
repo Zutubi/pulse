@@ -2,7 +2,7 @@
 <?xml-stylesheet type="text/xsl" href="http://www.jayasoft.fr/org/ivyrep/ivy-doc.xsl"?>
 <ivy-module version="1.0">
 
-    <info organisation="zutubi" module="cppunit-postprocessor-bundle" status="integration">
+    <info organisation="zutubi" module="postprocessor-cppunit" status="integration">
         <ivyauthor name="Zutubi" url="http://www.zutubi.com/"/>
         <description homepage="http://www.zutubi.com/">
 
@@ -14,11 +14,11 @@
     </configurations>
 
     <publications>
-        <artifact name="cppunit-postprocessor-bundle" type="jar" conf="default"/>
-        <artifact name="cppunit-postprocessor-bundle-src" type="jar" conf="default"/>
+        <artifact name="postprocessor-cppunit" type="jar" conf="default"/>
+        <artifact name="postprocessor-cppunit-src" type="jar" conf="default"/>
         
-        <artifact name="cppunit-postprocessor-bundle-test" type="jar" conf="default"/>
-        <artifact name="cppunit-postprocessor-bundle-test-src" type="jar" conf="default"/>
+        <artifact name="postprocessor-cppunit-test" type="jar" conf="default"/>
+        <artifact name="postprocessor-cppunit-test-src" type="jar" conf="default"/>
     </publications>
 
     <dependencies>

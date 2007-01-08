@@ -37,9 +37,13 @@
         <ivy:configure file="${project.root.dir}/ivyconf.xml"/>
 
         <path id="custom.task.path">
-            <pathelement path="${project.root.dir}/etc/copyrighttask.jar"/>
+            <fileset dir="${project.root.dir}/etc">
+                <include name="**/*.jar"/>
+            </fileset>
         </path>
+
         <taskdef name="copyright" classname="com.zutubi.pulse.CopyrightTask" classpathref="custom.task.path"/>
+        <taskdef resource="net/sf/antcontrib/antlib.xml" classpathref="custom.task.path"/>
 
         <path id="lib.path">
             <fileset id="module.libs" dir="${build.lib.dir}">
@@ -125,9 +129,16 @@
         <mkdir dir="${report.dir}/junit/xml"/>
         <mkdir dir="${report.dir}/junit/html"/>
 
+        <!-- build the dependencies. -->
+        <foreach target="build.dependency" param="module.name" list="${dependencies}"/>
+
         <!-- resolve the dependencies, into the build/lib directory. -->
         <retrieve.dependencies dest="${build.lib.dir}"/>
 
+    </target>
+
+    <target name="build.dependency">
+        <ant inheritAll="false" dir="../${module.name}" antfile="build.xml" target="build.module"/>
     </target>
 
     <!-- prepare for new build -->
@@ -284,6 +295,6 @@
     </macrodef>
 
     <!-- build this module. -->
-    <target name="build.module" depends="clean, prepare, build, test, package, publish"/>
+    <target name="build.module" depends="prepare, build, test, package, publish"/>
 
 </project>

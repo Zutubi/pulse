@@ -2,7 +2,7 @@
 <?xml-stylesheet type="text/xsl" href="http://www.jayasoft.fr/org/ivyrep/ivy-doc.xsl"?>
 <ivy-module version="1.0">
 
-    <info organisation="zutubi" module="make-command-bundle" status="integration">
+    <info organisation="zutubi" module="command-make" status="integration">
         <ivyauthor name="Zutubi" url="http://www.zutubi.com/"/>
         <description homepage="http://www.zutubi.com/">
 
@@ -14,11 +14,11 @@
     </configurations>
 
     <publications>
-        <artifact name="make-command-bundle" type="jar" conf="default"/>
-        <artifact name="make-command-bundle-src" type="jar" conf="default"/>
+        <artifact name="command-make" type="jar" conf="default"/>
+        <artifact name="command-make-src" type="jar" conf="default"/>
 
-        <artifact name="make-command-bundle-test" type="jar" conf="default"/>
-        <artifact name="make-command-bundle-test-src" type="jar" conf="default"/>
+        <artifact name="command-make-test" type="jar" conf="default"/>
+        <artifact name="command-make-test-src" type="jar" conf="default"/>
     </publications>
 
     <dependencies>

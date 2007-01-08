@@ -2,7 +2,7 @@
 <?xml-stylesheet type="text/xsl" href="http://www.jayasoft.fr/org/ivyrep/ivy-doc.xsl"?>
 <ivy-module version="1.0">
 
-    <info organisation="zutubi" module="maven2-command-bundle" status="integration">
+    <info organisation="zutubi" module="command-maven2" status="integration">
         <ivyauthor name="Zutubi" url="http://www.zutubi.com/"/>
         <description homepage="http://www.zutubi.com/">
 
@@ -14,11 +14,11 @@
     </configurations>
 
     <publications>
-        <artifact name="maven2-command-bundle" type="jar" conf="default"/>
-        <artifact name="maven2-command-bundle-src" type="jar" conf="default"/>
+        <artifact name="command-maven2" type="jar" conf="default"/>
+        <artifact name="command-maven2-src" type="jar" conf="default"/>
 
-        <artifact name="maven2-command-bundle-test" type="jar" conf="default"/>
-        <artifact name="maven2-command-bundle-test-src" type="jar" conf="default"/>
+        <artifact name="command-maven2-test" type="jar" conf="default"/>
+        <artifact name="command-maven2-test-src" type="jar" conf="default"/>
     </publications>
 
     <dependencies>

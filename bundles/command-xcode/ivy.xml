@@ -2,7 +2,7 @@
 <?xml-stylesheet type="text/xsl" href="http://www.jayasoft.fr/org/ivyrep/ivy-doc.xsl"?>
 <ivy-module version="1.0">
 
-    <info organisation="zutubi" module="xcode-command-bundle" status="integration">
+    <info organisation="zutubi" module="command-xcode" status="integration">
         <ivyauthor name="Zutubi" url="http://www.zutubi.com/"/>
         <description homepage="http://www.zutubi.com/">
 
@@ -14,8 +14,8 @@
     </configurations>
 
     <publications>
-        <artifact name="xcode-command-bundle" type="jar" conf="default"/>
-        <artifact name="xcode-command-bundle-src" type="jar" conf="default"/>
+        <artifact name="command-xcode" type="jar" conf="default"/>
+        <artifact name="command-xcode-src" type="jar" conf="default"/>
     </publications>
 
     <dependencies>
