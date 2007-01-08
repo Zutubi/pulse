@@ -2,6 +2,7 @@ package com.zutubi.pulse.core;
 
 import com.zutubi.pulse.core.model.CommandResult;
 import com.zutubi.pulse.util.SystemUtils;
+import com.zutubi.pulse.BuildContext;
 
 import java.io.File;
 
@@ -57,7 +58,19 @@ public class MavenCommand extends ExecutableCommand
 
         super.execute(context, cmdResult);
 
-        MavenUtils.extractVersion(context, cmdResult, new File(getWorkingDir(context.getPaths()), "maven.xml"), "currentVersion");
+        try
+        {
+            BuildContext buildContext = context.getBuildContext();
+            if (buildContext != null)
+            {
+                String buildVersion = MavenUtils.extractVersion(new File(getWorkingDir(context.getPaths()), "maven.xml"), "currentVersion");
+                buildContext.setBuildVersion(buildVersion);
+            }
+        }
+        catch (PulseException e)
+        {
+            cmdResult.warning(e.getMessage());
+        }
     }
 
     public String getTargets()
