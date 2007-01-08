@@ -2,7 +2,7 @@
 <?xml-stylesheet type="text/xsl" href="http://www.jayasoft.fr/org/ivyrep/ivy-doc.xsl"?>
 <ivy-module version="1.0">
 
-    <info organisation="zutubi" module="pulse-local" status="integration">
+    <info organisation="zutubi" module="pulse-local" status="release" revision="1.2.11">
         <ivyauthor name="zutubi" url="http://www.zutubi.com/"/>
         <description homepage="http://www.zutubi.com/">
             The pulse local module contains the local build functionality. The local
@@ -23,9 +23,9 @@
 
     <dependencies>
 
-        <dependency org="zutubi" name="pulse-core" rev="latest.integration" conf="build->build"/>
-        <dependency org="zutubi" name="pulse-core" rev="latest.integration" conf="release->release"/>
-        <dependency org="zutubi" name="pulse-core" rev="latest.integration" conf="external->external"/>
+        <dependency org="zutubi" name="pulse-core" rev="1.2.11" conf="build->build"/>
+        <dependency org="zutubi" name="pulse-core" rev="1.2.11" conf="release->release"/>
+        <dependency org="zutubi" name="pulse-core" rev="1.2.11" conf="external->external"/>
 
         <dependency org="apache" name="commons-httpclient" rev="3.0" conf="external,build,release->default"/>
 
