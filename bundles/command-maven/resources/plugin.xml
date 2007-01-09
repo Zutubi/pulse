@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?eclipse version="3.2"?>
 <plugin>
-    <command name="maven" class="com.zutubi.pulse.core.MavenCommand"/>
-    <command name="maven.pp" class="com.zutubi.pulse.core.MavenPostProcessor"/>
+    <extension point="com.zutubi.pulse.core.commands">
+        <command name="maven" class="com.zutubi.pulse.core.MavenCommand"/>
+        <command name="maven.pp" class="com.zutubi.pulse.core.MavenPostProcessor"/>
+    </extension>
 </plugin>

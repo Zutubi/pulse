@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?eclipse version="3.2"?>
 <plugin>
-    <command name="xcode" class="com.zutubi.pulse.core.XCodeCommand"/>
-    <command name="xcode.pp" class="com.zutubi.pulse.core.XCodePostProcessor"/>
+    <extension point="com.zutubi.pulse.core.commands">
+        <command name="xcode" class="com.zutubi.pulse.core.XCodeCommand"/>
+        <command name="xcode.pp" class="com.zutubi.pulse.core.XCodePostProcessor"/>
+    </extension>
 </plugin>

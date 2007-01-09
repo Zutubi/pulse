@@ -2,6 +2,7 @@ package com.zutubi.pulse.model;
 
 import com.zutubi.pulse.BuildService;
 import com.zutubi.pulse.RecipeDispatchRequest;
+import com.zutubi.pulse.bootstrap.ComponentContext;
 import com.zutubi.pulse.core.PulseException;
 import com.zutubi.pulse.core.PulseFileLoader;
 import com.zutubi.pulse.core.PulseFileLoaderFactory;
@@ -16,6 +17,11 @@ public class AnyCapableBuildHostRequirements extends AbstractBuildHostRequiremen
     private static final Logger LOG = Logger.getLogger(AnyCapableBuildHostRequirements.class);
 
     private PulseFileLoaderFactory fileLoaderFactory;
+
+    public AnyCapableBuildHostRequirements()
+    {
+        ComponentContext.autowire(this);
+    }
 
     public BuildHostRequirements copy()
     {

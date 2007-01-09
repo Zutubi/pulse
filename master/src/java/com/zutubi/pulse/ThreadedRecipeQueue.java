@@ -172,6 +172,7 @@ public class ThreadedRecipeQueue implements Runnable, RecipeQueue, EventListener
         }
         catch (Exception e)
         {
+            LOG.error(e);
             error = new RecipeErrorEvent(this, dispatchRequest.getRequest().getId(), "Unable to determine revision to build: " + e.getMessage());
         }
 
