@@ -1,9 +1,9 @@
 package com.zutubi.pulse.core;
 
+import com.zutubi.pulse.core.model.Property;
+
 import java.util.Map;
 import java.util.HashMap;
-
-import com.zutubi.pulse.core.model.Property;
 
 /**
  * A factory for creating PulseFileLoader objects that are aware of the
@@ -19,16 +19,6 @@ public class PulseFileLoaderFactory
         register("property", Property.class);
         register("recipe", Recipe.class);
         register("def", ComponentDefinition.class);
-        register("post-processor", PostProcessorGroup.class);
-        register("command", CommandGroup.class);
-        register("junit.pp", JUnitReportPostProcessor.class);
-        register("junit.summary.pp", JUnitSummaryPostProcessor.class);
-        register("regex-test.pp", RegexTestPostProcessor.class);
-        register("regex.pp", RegexPostProcessor.class);
-        register("executable", ExecutableCommand.class);
-        register("print", PrintCommand.class);
-        register("sleep", SleepCommand.class);
-        register("resource", ResourceReference.class);
     }
 
     public PulseFileLoader createLoader()

@@ -452,6 +452,7 @@ public class SetupFeatureTour implements Runnable
 
     private void addFailedTestArtifact()
     {
+/*
         File dummy = getDataFile("junit-failed.xml");
         JUnitReportPostProcessor pp = new JUnitReportPostProcessor();
 
@@ -482,6 +483,7 @@ public class SetupFeatureTour implements Runnable
                 e.printStackTrace();
             }
         }
+*/
     }
 
     private void addTestReportArtifact()

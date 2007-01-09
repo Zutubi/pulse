@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <project default-recipe="default">
     <recipe name="default">
-        <print name="greeting" message="hello world"/>
+        <noop name="greeting"/>
     </recipe>
 
     <recipe name="failure">

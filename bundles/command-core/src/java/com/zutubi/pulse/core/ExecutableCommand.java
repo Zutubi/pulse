@@ -18,11 +18,16 @@ import java.util.*;
  */
 public class ExecutableCommand extends CommandSupport implements ScopeAware
 {
+    private static final String ENV_PATH = "PATH";
+
     /**
      * The name of the execution environment artifact.
      */
-    public static final String ENV_ARTIFACT_NAME = "environment";
-    private static final String ENV_PATH = "PATH";
+    static final String ENV_ARTIFACT_NAME = "environment";
+    static final String ENV_FILENAME = "env.txt";
+
+    static final String OUTPUT_ARTIFACT_NAME = "command output";
+    static final String OUTPUT_FILENAME = "output.txt";
 
     private String exe;
     private List<Arg> args = new LinkedList<Arg>();
@@ -37,7 +42,6 @@ public class ExecutableCommand extends CommandSupport implements ScopeAware
 
     private PrecapturedArtifact outputArtifact;
     private PrecapturedArtifact envArtifact;
-    private static final String ENV_FILENAME = "env.txt";
 
     private List<ProcessArtifact> processes = new LinkedList<ProcessArtifact>();
 

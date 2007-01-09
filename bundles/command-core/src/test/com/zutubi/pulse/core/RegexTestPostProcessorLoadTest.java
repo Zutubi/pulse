@@ -4,6 +4,13 @@ package com.zutubi.pulse.core;
  */
 public class RegexTestPostProcessorLoadTest extends FileLoaderTestBase
 {
+    public void setUp() throws Exception
+    {
+        super.setUp();
+
+        loader.register("regex-test.pp", RegexTestPostProcessor.class);
+    }
+
     public void testStandard() throws PulseException
     {
         RegexTestPostProcessor pp = referenceHelper("tests.pp");

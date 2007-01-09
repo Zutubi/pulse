@@ -2,7 +2,7 @@
 <?xml-stylesheet type="text/xsl" href="http://www.jayasoft.fr/org/ivyrep/ivy-doc.xsl"?>
 <ivy-module version="1.0">
 
-    <info organisation="zutubi" module="ocunit-postprocessor-bundle" status="integration">
+    <info organisation="zutubi" module="postprocessor-ocunit" status="integration" revision="dev">
         <ivyauthor name="Zutubi" url="http://www.zutubi.com/"/>
         <description homepage="http://www.zutubi.com/">
 
@@ -14,15 +14,16 @@
     </configurations>
 
     <publications>
-        <artifact name="ocunit-postprocessor-bundle" type="jar" conf="default"/>
-        <artifact name="ocunit-postprocessor-bundle-src" type="jar" conf="default"/>
+        <artifact name="postprocessor-ocunit" type="jar" conf="default"/>
+        <artifact name="postprocessor-ocunit-src" type="jar" conf="default"/>
 
-        <artifact name="ocunit-postprocessor-bundle-test" type="jar" conf="default"/>
-        <artifact name="ocunit-postprocessor-bundle-test-src" type="jar" conf="default"/>
+        <artifact name="postprocessor-ocunit-test" type="jar" conf="default"/>
+        <artifact name="postprocessor-ocunit-test-src" type="jar" conf="default"/>
     </publications>
 
     <dependencies>
         <dependency org="zutubi" name="pulse-core" rev="latest.integration" conf="default->build"/>
+        <dependency org="zutubi" name="command-core" rev="dev" conf="default->default"/>
     </dependencies>
 
 </ivy-module>

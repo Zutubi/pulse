@@ -4,6 +4,7 @@ import com.zutubi.pulse.core.model.*;
 
 import java.io.File;
 import java.util.List;
+import java.net.URL;
 
 /**
  */
@@ -19,14 +20,10 @@ public class JUnitReportPostProcessorTest extends XMLReportPostProcessorTestBase
         super(name, new JUnitReportPostProcessor());
     }
 
-    public void setUp() throws Exception
+    protected File getOutputDir()
     {
-        super.setUp();
-    }
-
-    public void tearDown() throws Exception
-    {
-        super.tearDown();
+        URL resource = getClass().getResource("JUnitReportPostProcessorTest.simple.xml");
+        return new File(resource.getPath()).getParentFile();
     }
 
     public void testSimple()

@@ -7,12 +7,4 @@
         <dirname property="project.root.dir" file="../../ivy.xml"/>
     </target>
 
-<!--
-    <target name="module-pre-prepare">
-
-        <ant inheritAll="false" dir="../command-maven" antfile="build.xml" target="build.module"/>
-
-    </target>
--->
-
 </project>

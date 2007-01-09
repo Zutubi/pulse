@@ -1,9 +1,7 @@
 package com.zutubi.pulse.core;
 
-import com.zutubi.pulse.util.FileSystemUtils;
 import com.zutubi.pulse.core.model.CommandResult;
 
-import java.io.File;
 import java.io.IOException;
 
 /**

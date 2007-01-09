@@ -53,22 +53,6 @@ public abstract class CommandTestBase extends PulseTestCase implements EventList
         removeDirectory(outputDir);
     }
 
-    protected CommandResult failedRun(Command command, String ...contents) throws Exception
-    {
-        CommandResult commandResult = runCommand(command);
-        assertEquals(ResultState.FAILURE, commandResult.getState());
-        checkOutput(commandResult, contents);
-        return commandResult;
-    }
-
-    protected CommandResult successRun(Command command, String ...contents) throws Exception
-    {
-        CommandResult commandResult = runCommand(command);
-        assertEquals(ResultState.SUCCESS, commandResult.getState());
-        checkOutput(commandResult, contents);
-        return commandResult;
-    }
-
     protected CommandResult runCommand(Command command) throws Exception
     {
         return runCommand(command, null);
@@ -107,26 +91,6 @@ public abstract class CommandTestBase extends PulseTestCase implements EventList
         return event.getResult();
     }
 
-    /**
-     * Verify that the output associated with the command result contains the specified contents.
-     *
-     * @param commandResult being checked.
-     * @param contents that much exist in the command results output.
-     *
-     * @throws IOException if there is a problem extracting the output contents.
-     */
-    protected void checkOutput(CommandResult commandResult, String ...contents) throws IOException
-    {
-        File outputFile = getCommandOutput(commandResult);
-        checkContents(outputFile, contents);
-    }
-
-    protected void checkEnv(CommandResult commandResult, String ...contents) throws IOException
-    {
-        File outputFile =  getCommandEnv(commandResult);
-        checkContents(outputFile, false, contents);
-    }
-
     protected void checkContents(File outputFile, String... contents) throws IOException
     {
         checkContents(outputFile, true, contents);
@@ -151,40 +115,6 @@ public abstract class CommandTestBase extends PulseTestCase implements EventList
         finally
         {
             IOUtils.close(is);
-        }
-    }
-
-    /**
-     * The default build filename.
-     *
-     */
-    protected abstract String getBuildFileName();
-
-    /**
-     * The template build file extension.
-     *
-     */
-    protected abstract String getBuildFileExt();
-
-    protected void copyBuildFileToBaseDir(String name) throws IOException
-    {
-        copyBuildFile(name, getBuildFileName());
-    }
-
-    protected void copyBuildFile(String name, String filename) throws IOException
-    {
-        InputStream is = null;
-        OutputStream os = null;
-        try
-        {
-            is = getInput(name, getBuildFileExt());
-            os = new FileOutputStream(new File(baseDir, filename));
-            IOUtils.joinStreams(is, os);
-        }
-        finally
-        {
-            IOUtils.close(is);
-            IOUtils.close(os);
         }
     }
 
@@ -252,16 +182,6 @@ public abstract class CommandTestBase extends PulseTestCase implements EventList
         CommandCompletedEvent ce = (CommandCompletedEvent) e;
         assertEquals(commandName, ce.getResult().getCommandName());
         return ce;
-    }
-
-    protected File getCommandOutput(CommandResult commandResult) throws IOException
-    {
-        return getCommandArtifact(commandResult, commandResult.getArtifact(Command.OUTPUT_ARTIFACT_NAME));
-    }
-
-    protected File getCommandEnv(CommandResult commandResult) throws IOException
-    {
-        return getCommandArtifact(commandResult, commandResult.getArtifact(ExecutableCommand.ENV_ARTIFACT_NAME));
     }
 
     protected File getCommandArtifact(CommandResult result, StoredFileArtifact fileArtifact)

@@ -4,6 +4,14 @@ package com.zutubi.pulse.core;
  */
 public class CommandGroupLoadTest extends FileLoaderTestBase
 {
+    public void setUp() throws Exception
+    {
+        super.setUp();
+
+        loader.register("command", CommandGroup.class);
+        loader.register("executable", ExecutableCommand.class);
+    }
+
     public void testBasicCommandGroup() throws Exception
     {
         CommandGroup group = loadGroup("basic", "basic");

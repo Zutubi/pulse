@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.2"?>
+<plugin>
+    <command name="make" class="com.zutubi.pulse.core.MakeCommand"/>
+    <command name="make.pp" class="com.zutubi.pulse.core.MakePostProcessor"/>
+</plugin>

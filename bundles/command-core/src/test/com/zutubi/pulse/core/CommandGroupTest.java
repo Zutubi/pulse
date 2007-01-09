@@ -12,15 +12,6 @@ import java.io.IOException;
  */
 public class CommandGroupTest extends CommandTestBase
 {
-    public void setUp() throws IOException
-    {
-        super.setUp();
-    }
-
-    public void tearDown() throws IOException
-    {
-        super.tearDown();
-    }
 
     public void testSimpleNestedCommand() throws Exception
     {
@@ -220,12 +211,7 @@ public class CommandGroupTest extends CommandTestBase
     {
         CommandResult result = runCommand(group);
         assertEquals(ResultState.SUCCESS, result.getState());
-        checkOutput(result, output);
-/*
-        StoredArtifact artifact = result.getArtifact(Command.OUTPUT_ARTIFACT_NAME);
-        File outputFile = new File(outputDir, artifact.getFile().getPath());
-        assertEquals(output, IOUtils.fileToString(outputFile));
-*/
+        checkArtifact(result, result.getArtifact(ExecutableCommand.OUTPUT_ARTIFACT_NAME), output);
 
         return result;
     }

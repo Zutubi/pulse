@@ -70,7 +70,7 @@ public class PrintCommand extends CommandSupport
     private void initialiseOutputArtifact()
     {
         outputArtifact = new PrecapturedArtifact();
-        outputArtifact.setName(OUTPUT_ARTIFACT_NAME);
+        outputArtifact.setName(ExecutableCommand.OUTPUT_ARTIFACT_NAME);
         outputArtifact.setType("text/plain");
         outputArtifact.setProcesses(processes);
     }

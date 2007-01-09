@@ -9,6 +9,7 @@ import com.zutubi.pulse.util.SystemUtils;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
+import java.net.URL;
 
 /**
  * 
@@ -16,16 +17,6 @@ import java.util.List;
  */
 public class ExecutableCommandTest extends CommandTestBase
 {
-    public void setUp() throws IOException
-    {
-        super.setUp();
-    }
-
-    public void tearDown() throws IOException
-    {
-        super.tearDown();
-    }
-
     public void testExecuteSuccessExpected() throws Exception
     {
         ExecutableCommand command = new ExecutableCommand();
@@ -66,7 +57,7 @@ public class ExecutableCommandTest extends CommandTestBase
         }
         catch (BuildException e)
         {
-            // noop            
+            fail(e.getMessage());      
         }
 
         // verify that the env output is captured even with the command failing.
@@ -94,7 +85,7 @@ public class ExecutableCommandTest extends CommandTestBase
         CommandResult cmdResult = runCommand(command);
         assertEquals(ResultState.FAILURE, cmdResult.getState());
 
-        StoredArtifact artifact = cmdResult.getArtifact(Command.OUTPUT_ARTIFACT_NAME);
+        StoredArtifact artifact = cmdResult.getArtifact(ExecutableCommand.OUTPUT_ARTIFACT_NAME);
         List<Feature> features = artifact.getFeatures(Feature.Level.ERROR);
         assertEquals(1, features.size());
         Feature feature = features.get(0);
@@ -132,7 +123,10 @@ public class ExecutableCommandTest extends CommandTestBase
 
     public void testExtraPathInScope() throws Exception
     {
-        File data = getTestDataFile("core", "scope", "bin");
+        File data = getTestDataFile("scope", "bin");
+        System.out.println(data.getAbsolutePath());
+        assertTrue(data.isDirectory());
+
         Scope scope = new Scope();
         scope.add(new ResourceProperty("mypath", data.getAbsolutePath(), false, true, false));
 
@@ -146,7 +140,9 @@ public class ExecutableCommandTest extends CommandTestBase
 
     public void testEnvironmentVariableFromScope() throws Exception
     {
-        File data = getTestDataFile("core", "scope", "bin");
+        File data = getTestDataFile("scope", "bin");
+        assertTrue(data.isDirectory());
+
         Scope scope = new Scope();
         scope.add(new ResourceProperty("mypath", data.getAbsolutePath(), false, true, false));
         scope.add(new ResourceProperty("TESTVAR", "test variable value", true, false, false));
@@ -158,7 +154,8 @@ public class ExecutableCommandTest extends CommandTestBase
         CommandResult result = runCommand(command);
         assertTrue(result.succeeded());
 
-        checkOutput(result, "test variable value");
+        checkArtifact(result, result.getArtifact(ExecutableCommand.OUTPUT_ARTIFACT_NAME), "test variable value");
+//        checkOutput(result, "test variable value");
     }
 
     public void testEnvironmentDetailsAreCaptured() throws Exception
@@ -183,7 +180,7 @@ public class ExecutableCommandTest extends CommandTestBase
 
         artifact = artifacts.get(1);
         StoredFileArtifact outputArtifact = artifact.getChildren().get(0);
-        assertEquals(Command.OUTPUT_ARTIFACT_NAME + "/output.txt", outputArtifact.getPath());
+        assertEquals(ExecutableCommand.OUTPUT_ARTIFACT_NAME + "/output.txt", outputArtifact.getPath());
         assertEquals("text/plain", outputArtifact.getType());
     }
 
@@ -272,24 +269,11 @@ public class ExecutableCommandTest extends CommandTestBase
         assertTrue(features.get(0).getSummary().contains("Working directory 'nosuchworkdir' does not exist"));
     }
 
-    private String getEnv() throws IOException
-    {
-        return IOUtils.fileToString(new File(outputDir, ExecutableCommand.ENV_ARTIFACT_NAME + "/env.txt"));
-    }
-
     private CommandResult runCommand(ExecutableCommand command, long buildNumber)
     {
         BuildContext buildContext = new BuildContext();
         buildContext.setBuildNumber(buildNumber);
 
-/*
-        if(buildNumber > 0)
-        {
-            Scope scope = new Scope();
-            scope.add(new Property("build.number", Long.toString(buildNumber)));
-            recipeContext.setGlobalScope(scope);
-        }
-*/
         return super.runCommand(command, buildContext);
     }
 
@@ -302,5 +286,23 @@ public class ExecutableCommandTest extends CommandTestBase
     protected String getBuildFileExt()
     {
         return null;
+    }
+
+    protected File getTestDataFile(String testName, String extension)
+    {
+        URL resource = getClass().getResource("ExecutableCommandLoaderTest.testExecutableArgs.xml");
+        File moduleDir = new File(resource.getPath().substring(0, resource.getPath().lastIndexOf("command-core") + 12));
+        return new File(moduleDir, FileSystemUtils.composeFilename("src", "test", getClass().getName().replace('.', File.separatorChar) + "." + testName + "." + extension));
+    }
+
+    protected void checkEnv(CommandResult commandResult, String ...contents) throws IOException
+    {
+        File outputFile =  getCommandEnv(commandResult);
+        checkContents(outputFile, false, contents);
+    }
+
+    protected File getCommandEnv(CommandResult commandResult) throws IOException
+    {
+        return getCommandArtifact(commandResult, commandResult.getArtifact(ExecutableCommand.ENV_ARTIFACT_NAME));
     }
 }

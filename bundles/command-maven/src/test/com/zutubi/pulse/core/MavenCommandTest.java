@@ -5,7 +5,7 @@ import com.zutubi.pulse.BuildContext;
 /**
  * <class-comment/>
  */
-public class MavenCommandTest extends CommandTestBase
+public class MavenCommandTest extends ExecutableCommandTestBase
 {
     public MavenCommandTest()
     {

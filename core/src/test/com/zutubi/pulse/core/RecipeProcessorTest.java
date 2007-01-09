@@ -1,9 +1,7 @@
 package com.zutubi.pulse.core;
 
 import com.zutubi.pulse.BuildContext;
-import com.zutubi.pulse.core.model.CommandResult;
 import com.zutubi.pulse.core.model.Feature;
-import com.zutubi.pulse.core.model.ResourceProperty;
 import com.zutubi.pulse.core.model.ResultState;
 import com.zutubi.pulse.events.DefaultEventManager;
 import com.zutubi.pulse.events.Event;
@@ -16,8 +14,6 @@ import com.zutubi.pulse.util.IOUtils;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.Semaphore;
@@ -52,7 +48,7 @@ public class RecipeProcessorTest extends PulseTestCase implements EventListener
         events = new LinkedBlockingQueue<Event>(10);
         eventManager.register(this);
 
-// just a little bit of wiring tomfoolary.
+        // just a little bit of wiring tomfoolary to inject the event manager into the recipe.
         ObjectFactory factory = new ObjectFactory()
         {
             public Object buildBean(Class clazz) throws Exception
@@ -68,6 +64,7 @@ public class RecipeProcessorTest extends PulseTestCase implements EventListener
 
         PulseFileLoaderFactory fileLoaderFactory = new PulseFileLoaderFactory();
         fileLoaderFactory.setObjectFactory(factory);
+        fileLoaderFactory.register("noop", NoopCommand.class);
         fileLoaderFactory.register("failure", FailureCommand.class);
         fileLoaderFactory.register("exception", ExceptionCommand.class);
         fileLoaderFactory.register("unexpected-exception", UnexpectedExceptionCommand.class);
@@ -96,7 +93,6 @@ public class RecipeProcessorTest extends PulseTestCase implements EventListener
         assertCommandCompleted(1, ResultState.SUCCESS);
         assertRecipeCompleted(1, ResultState.SUCCESS);
         assertNoMoreEvents();
-        assertOutputFile(1, "greeting", "hello world" + System.getProperty("line.separator"));
     }
 
     public void testExceptionDuringBootstrap() throws Exception
@@ -251,32 +247,6 @@ public class RecipeProcessorTest extends PulseTestCase implements EventListener
         // remove directory call in the tearDown. So, we sleep briefly here to give the
         // terminated child process (?) a chance to release its resources.
         Thread.sleep(100);
-    }
-
-    public void testPropertiesImported() throws Exception
-    {
-        List<ResourceProperty> properties = new ArrayList<ResourceProperty>(1);
-        properties.add(new ResourceProperty("property1", "propvalue", true, true, true));
-        recipeProcessor.build(new BuildContext(), new RecipeRequest("project", "spec", 1, new SimpleBootstrapper(), getPulseFile("properties"), "default", false, null, properties), paths, resourceRepository, false);
-        assertRecipeCommenced(1, "default");
-        assertCommandCommenced(1, "bootstrap");
-        assertCommandCompleted(1, ResultState.SUCCESS);
-        assertCommandCommenced(1, "property1");
-        assertCommandCompleted(1, ResultState.SUCCESS);
-        assertRecipeCompleted(1, ResultState.SUCCESS);
-        assertNoMoreEvents();
-        assertOutputFile(1, "property1", "propvalue" + System.getProperty("line.separator"));
-    }
-
-    private void assertOutputFile(int commandIndex, String commandName, String contents) throws IOException
-    {
-        String dirName = Recipe.getCommandDirName(commandIndex, new CommandResult(commandName));
-        File outDir = new File(outputDir, dirName);
-        assertTrue(outDir.isDirectory());
-        File outFile = new File(outDir, FileSystemUtils.composeFilename(Command.OUTPUT_ARTIFACT_NAME, "output.txt"));
-        assertTrue(outFile.isFile());
-        String actualContents = IOUtils.fileToString(outFile);
-        assertEquals(contents, actualContents);
     }
 
     private void assertNoMoreEvents()

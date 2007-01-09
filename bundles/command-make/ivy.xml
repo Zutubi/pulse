@@ -2,7 +2,7 @@
 <?xml-stylesheet type="text/xsl" href="http://www.jayasoft.fr/org/ivyrep/ivy-doc.xsl"?>
 <ivy-module version="1.0">
 
-    <info organisation="zutubi" module="command-make" status="integration">
+    <info organisation="zutubi" module="command-make" status="integration" revision="dev">
         <ivyauthor name="Zutubi" url="http://www.zutubi.com/"/>
         <description homepage="http://www.zutubi.com/">
 
@@ -23,6 +23,7 @@
 
     <dependencies>
         <dependency org="zutubi" name="pulse-core" rev="latest.integration" conf="default->build"/>
+        <dependency org="zutubi" name="command-core" rev="dev" conf="default->default"/>
     </dependencies>
 
 </ivy-module>

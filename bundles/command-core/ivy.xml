@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet type="text/xsl" href="http://www.jayasoft.fr/org/ivyrep/ivy-doc.xsl"?>
+<ivy-module version="1.0">
+
+    <info organisation="zutubi" module="command-core" status="integration" revision="dev">
+        <ivyauthor name="Zutubi" url="http://www.zutubi.com/"/>
+        <description homepage="http://www.zutubi.com/">
+
+        </description>
+    </info>
+
+    <configurations>
+        <conf name="default" description="Default configuration."/>
+    </configurations>
+
+    <publications>
+        <artifact name="command-core" type="jar" conf="default"/>
+        <artifact name="command-core-src" type="jar" conf="default"/>
+
+        <artifact name="command-core-test" type="jar" conf="default"/>
+        <artifact name="command-core-test-src" type="jar" conf="default"/>
+    </publications>
+
+    <dependencies>
+        <dependency org="zutubi" name="pulse-core" rev="latest.integration" conf="default->build"/>
+    </dependencies>
+
+</ivy-module>

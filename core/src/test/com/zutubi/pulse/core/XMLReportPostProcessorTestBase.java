@@ -2,7 +2,6 @@ package com.zutubi.pulse.core;
 
 import com.zutubi.pulse.core.model.*;
 import com.zutubi.pulse.test.PulseTestCase;
-import com.zutubi.pulse.util.FileSystemUtils;
 
 import java.io.File;
 
@@ -33,11 +32,7 @@ public abstract class XMLReportPostProcessorTestBase extends PulseTestCase
         super.tearDown();
     }
 
-    protected File getOutputDir()
-    {
-        File root = getPulseRoot();
-        return new File(root, FileSystemUtils.composeFilename("core", "src", "test", "com", "zutubi", "pulse", "core"));
-    }
+    protected abstract File getOutputDir();
 
     protected StoredFileArtifact getArtifact(String name)
     {

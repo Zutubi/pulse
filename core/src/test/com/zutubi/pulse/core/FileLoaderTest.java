@@ -133,8 +133,10 @@ public class FileLoaderTest extends FileLoaderTestBase
         assertNotNull(recipe);
         Command command = recipe.getCommand("in recipe");
         assertNotNull(command);
+/*
         ExecutableCommand exe = (ExecutableCommand) ((CommandGroup)command).getCommand();
         assertEquals("in command", exe.getExe());
+*/
     }
 
     public void testMacro() throws Exception
@@ -200,71 +202,6 @@ public class FileLoaderTest extends FileLoaderTestBase
         errorHelper("testMacroInfiniteRecursion", "Maximum recursion depth 128 exceeded");
     }
 
-    private List<ExecutableCommand.Arg> executableArgsHelper(int commandIndex) throws Exception
-    {
-        PulseFile bf = new PulseFile();
-        loader.load(getInput("testExecutableArgs"), bf);
-
-        List<Recipe> recipes = bf.getRecipes();
-        assertEquals(1, recipes.size());
-
-        Recipe recipe = recipes.get(0);
-        List<Command> commands = recipe.getCommands();
-        assertEquals(6, commands.size());
-        assertTrue(commands.get(commandIndex) instanceof ExecutableCommand);
-
-        ExecutableCommand command = (ExecutableCommand) commands.get(commandIndex);
-        return command.getArgs();
-    }
-
-    public void testExecutableArgsOne() throws Exception
-    {
-        List<ExecutableCommand.Arg> args = executableArgsHelper(0);
-        assertEquals(args.size(), 1);
-        assertEquals(args.get(0).getText(), "one");
-    }
-
-    public void testExecutableArgsOneTwo() throws Exception
-    {
-        List<ExecutableCommand.Arg> args = executableArgsHelper(1);
-        assertEquals(args.size(), 2);
-        assertEquals(args.get(0).getText(), "one");
-        assertEquals(args.get(1).getText(), "two");
-    }
-
-    public void testExecutableArgsNested() throws Exception
-    {
-        List<ExecutableCommand.Arg> args = executableArgsHelper(2);
-        assertEquals(args.size(), 1);
-        assertEquals(args.get(0).getText(), "here are some spaces");
-    }
-
-    public void testExecutableArgsMultiNested() throws Exception
-    {
-        List<ExecutableCommand.Arg> args = executableArgsHelper(3);
-        assertEquals(args.size(), 2);
-        assertEquals(args.get(0).getText(), "here are some spaces");
-        assertEquals(args.get(1).getText(), "and yet more spaces");
-    }
-
-    public void testExecutableArgsAttributeAndNested() throws Exception
-    {
-        List<ExecutableCommand.Arg> args = executableArgsHelper(4);
-        assertEquals(args.size(), 4);
-        assertEquals(args.get(0).getText(), "one");
-        assertEquals(args.get(1).getText(), "two");
-        assertEquals(args.get(2).getText(), "here are some spaces");
-        assertEquals(args.get(3).getText(), "and yet more spaces");
-    }
-
-    public void testExecutableArgsVariableReferences() throws Exception
-    {
-        List<ExecutableCommand.Arg> args = executableArgsHelper(5);
-        assertEquals(2, args.size());
-        assertEquals("bar", args.get(0).getText());
-        assertEquals("ref in text bar", args.get(1).getText());
-    }
-
     public void testValidation() throws Exception
     {
         try
@@ -278,13 +215,6 @@ public class FileLoaderTest extends FileLoaderTestBase
             assertEquals(e.getMessage(), "Processing element 'validateable': starting at line 4 column 5: error\n");
         }
     }
-
-/*
-    public void testArtifactNameValidation() throws Exception
-    {
-        errorHelper("testArtifactNameValidation", "duplicate");
-    }
-*/
 
     public void testArtifactInvalidName() throws Exception
     {

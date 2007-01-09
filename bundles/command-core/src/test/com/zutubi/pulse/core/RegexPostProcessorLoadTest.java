@@ -3,9 +3,17 @@ package com.zutubi.pulse.core;
 import com.zutubi.pulse.core.model.Feature;
 
 /**
+ *
  */
 public class RegexPostProcessorLoadTest extends FileLoaderTestBase
 {
+    public void setUp() throws Exception
+    {
+        super.setUp();
+
+        loader.register("regex.pp", RegexPostProcessor.class);
+    }
+
     public void testEmpty() throws PulseException
     {
         RegexPostProcessor pp = referenceHelper("empty");

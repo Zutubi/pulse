@@ -2,7 +2,7 @@ package com.zutubi.pulse.core;
 
 /**
  */
-public class AntCommandTest extends CommandTestBase
+public class AntCommandTest extends ExecutableCommandTestBase
 {
     public void testBasicDefault() throws Exception
     {

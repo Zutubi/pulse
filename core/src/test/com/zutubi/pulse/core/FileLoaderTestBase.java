@@ -20,11 +20,6 @@ public abstract class FileLoaderTestBase extends PulseTestCase
         loader = fileLoaderFactory.createLoader();
     }
 
-    public void tearDown() throws Exception
-    {
-        super.tearDown();
-    }
-
     //-----------------------------------------------------------------------
     // Generic helpers
     //-----------------------------------------------------------------------

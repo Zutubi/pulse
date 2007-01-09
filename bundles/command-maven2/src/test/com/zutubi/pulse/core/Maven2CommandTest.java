@@ -13,7 +13,7 @@ import java.util.List;
 /**
  * <class-comment/>
  */
-public class Maven2CommandTest extends CommandTestBase
+public class Maven2CommandTest extends ExecutableCommandTestBase
 {
     public void testBasic() throws Exception
     {
@@ -144,7 +144,7 @@ public class Maven2CommandTest extends CommandTestBase
 
     protected File getCommandOutput(CommandResult commandResult) throws IOException
     {
-        File output = super.getCommandOutput(commandResult);
+        File output = getCommandArtifact(commandResult, commandResult.getArtifact(Maven2Command.OUTPUT_ARTIFACT_NAME));
 
         File cleaned = new File(output.getAbsolutePath() + ".cleaned");
 

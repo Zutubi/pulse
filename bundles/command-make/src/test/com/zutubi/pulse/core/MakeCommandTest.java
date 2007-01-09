@@ -6,7 +6,7 @@ import java.io.IOException;
 
 /**
  */
-public class MakeCommandTest extends CommandTestBase
+public class MakeCommandTest extends ExecutableCommandTestBase
 {
     public void testBasicDefault() throws Exception
     {
@@ -84,10 +84,10 @@ public class MakeCommandTest extends CommandTestBase
         return "txt";
     }
 
-    protected void checkOutput(CommandResult commandResult, String ...contents) throws IOException
+    protected void checkOutput(CommandResult result, String ...contents) throws IOException
     {
-        assertTrue(commandResult.getProperties().containsKey("command line"));
-        assertTrue(commandResult.getProperties().get("command line").toString().contains("make"));
-        super.checkOutput(commandResult, contents);
+        assertTrue(result.getProperties().containsKey("command line"));
+        assertTrue(result.getProperties().get("command line").toString().contains("make"));
+        super.checkOutput(result, contents);
     }
 }

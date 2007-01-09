@@ -2,7 +2,7 @@
 <?xml-stylesheet type="text/xsl" href="http://www.jayasoft.fr/org/ivyrep/ivy-doc.xsl"?>
 <ivyconf>
 
-    <conf defaultResolver="resolvers" checkUpToDate="true"/>
+    <conf defaultResolver="resolvers"/>
 
     <resolvers>
 
@@ -13,16 +13,13 @@
                 </filesystem>
             </chain>
             <chain name="artifact">
-                <filesystem name="local-repository" checkmodified="true">
-                    <artifact pattern="c:/projects/repository/[organisation]/[module]/[type]s/[artifact]-[revision].[type]"/>
-                </filesystem>
                 <url name="artifact-repository">
-                    <artifact pattern="http://220.233.100.30/repository/[organisation]/[module]/[type]s/[artifact]-[revision].[type]"/>
+                    <artifact pattern="http://www.cinnamonbob.com/repository/[organisation]/[module]/[type]s/[artifact]-[revision].[type]"/>
                 </url>
             </chain>
         </dual>
 
-        <filesystem name="build" checkmodified="true">
+        <filesystem name="build" local="true">
             <ivy pattern="${ivy.conf.dir}/build/repository/[module]/ivy-[revision].xml"/>
             <artifact pattern="${ivy.conf.dir}/build/repository/[module]/[type]s/[artifact]-[revision].[type]"/>
         </filesystem>
@@ -30,9 +27,10 @@
     </resolvers>
 
     <modules>
-        <!-- we know where all of the pulse packages are located, no
-             point searching through the others -->
+<!-- we know where all of the pulse packages are located, no point searching through the others -->
         <module organisation="zutubi" name="pulse-.*" resolver="build"/>
+        <module organisation="zutubi" name="command-.*" resolver="build"/>
+        <module organisation="zutubi" name="postprocessor-.*" resolver="build"/>
     </modules>
 
 </ivyconf>

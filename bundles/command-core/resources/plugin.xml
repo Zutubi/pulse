@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.2"?>
+<plugin>
+    <command name="post-processor" class="com.zutubi.pulse.core.PostProcessorGroup"/>
+    <command name="command" class="com.zutubi.pulse.core.CommandGroup"/>
+    <command name="junit.pp" class="com.zutubi.pulse.core.JUnitReportPostProcessor"/>
+    <command name="junit.summary.pp" class="com.zutubi.pulse.core.JUnitSummaryPostProcessor"/>
+    <command name="regex-test.pp" class="com.zutubi.pulse.core.RegexTestPostProcessor"/>
+    <command name="regex.pp" class="com.zutubi.pulse.core.RegexPostProcessor"/>
+    <command name="executable" class="com.zutubi.pulse.core.ExecutableCommand"/>
+    <command name="print" class="com.zutubi.pulse.core.PrintCommand"/>
+    <command name="sleep" class="com.zutubi.pulse.core.SleepCommand"/>
+    <command name="resource" class="com.zutubi.pulse.core.ResourceReference"/>
+</plugin>
