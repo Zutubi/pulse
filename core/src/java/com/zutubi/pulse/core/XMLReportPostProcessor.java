@@ -4,7 +4,9 @@ import com.zutubi.pulse.core.model.CommandResult;
 import com.zutubi.pulse.core.model.StoredFileArtifact;
 import com.zutubi.pulse.core.model.TestSuiteResult;
 import com.zutubi.pulse.util.IOUtils;
-import nu.xom.*;
+import nu.xom.Builder;
+import nu.xom.Document;
+import nu.xom.ParsingException;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -57,20 +59,6 @@ public abstract class XMLReportPostProcessor extends TestReportPostProcessor
         {
             IOUtils.close(input);
         }
-    }
-
-    protected String getText(Element element)
-    {
-        if (element.getChildCount() > 0)
-        {
-            Node child = element.getChild(0);
-            if(child != null && child instanceof Text)
-            {
-                return child.getValue().trim();
-            }
-        }
-
-        return null;
     }
 
     protected abstract void processDocument(Document doc, TestSuiteResult tests);

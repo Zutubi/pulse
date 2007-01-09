@@ -3,6 +3,7 @@ package com.zutubi.pulse.core;
 import com.zutubi.pulse.core.model.TestCaseResult;
 import com.zutubi.pulse.core.model.TestResult;
 import com.zutubi.pulse.core.model.TestSuiteResult;
+import com.zutubi.pulse.util.XMLUtils;
 import nu.xom.Document;
 import nu.xom.Element;
 import nu.xom.Elements;
@@ -122,7 +123,7 @@ public class CppUnitReportPostProcessor extends XMLReportPostProcessor
             return null;
         }
 
-        String name = getText(nameElement);
+        String name = XMLUtils.getText(nameElement);
         if(name == null)
         {
             return null;
@@ -146,7 +147,7 @@ public class CppUnitReportPostProcessor extends XMLReportPostProcessor
         Element typeElement = element.getFirstChildElement(ELEMENT_FAILURE_TYPE);
         if(typeElement != null)
         {
-            String type = getText(typeElement);
+            String type = XMLUtils.getText(typeElement);
             if(type != null && type.equals(FAILURE_TYPE_ERROR))
             {
                 status = TestCaseResult.Status.ERROR;
@@ -168,7 +169,7 @@ public class CppUnitReportPostProcessor extends XMLReportPostProcessor
             Element fileElement = locationElement.getFirstChildElement(ELEMENT_FILE);
             if(fileElement != null)
             {
-                String file = getText(fileElement);
+                String file = XMLUtils.getText(fileElement);
                 if(file != null)
                 {
                     location += " file " + file;
@@ -178,7 +179,7 @@ public class CppUnitReportPostProcessor extends XMLReportPostProcessor
             Element lineElement = locationElement.getFirstChildElement(ELEMENT_LINE);
             if(lineElement != null)
             {
-                String line = getText(lineElement);
+                String line = XMLUtils.getText(lineElement);
                 if(line != null)
                 {
                     location += " line " + line;
@@ -191,7 +192,7 @@ public class CppUnitReportPostProcessor extends XMLReportPostProcessor
         Element messageElement = element.getFirstChildElement(ELEMENT_MESSAGE);
         if(messageElement != null)
         {
-            String text = getText(messageElement);
+            String text = XMLUtils.getText(messageElement);
             if(text != null)
             {
                 message += text;

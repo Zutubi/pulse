@@ -1,10 +1,10 @@
 package com.zutubi.pulse.util;
 
-import nu.xom.Builder;
-import nu.xom.Document;
-import nu.xom.Serializer;
+import nu.xom.*;
 
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.io.StringReader;
 
 /**
@@ -37,4 +37,52 @@ public class XMLUtils
         }
     }
 
+    public static String getText(Element element)
+    {
+        if (element.getChildCount() > 0)
+        {
+            Node child = element.getChild(0);
+            if(child != null && child instanceof Text)
+            {
+                return child.getValue().trim();
+            }
+        }
+
+        return null;
+    }
+
+    public static String getRequiredAttribute(Element e, String attribute) throws ParsingException
+    {
+        String result = e.getAttributeValue(attribute);
+        if (result == null)
+        {
+            throw new ParsingException("Invalid " + e.getLocalName() + ": missing required attribute '" + attribute + "'");
+        }
+
+        return result;
+    }
+
+    public static String getAttributeDefault(Element e, String attribute, String defaultValue) throws ParsingException
+    {
+        String result = e.getAttributeValue(attribute);
+        if (result == null)
+        {
+            return defaultValue;
+        }
+
+        return result;
+    }
+
+    public static Document streamToDoc(InputStream in) throws ParsingException, IOException
+    {
+        try
+        {
+            Builder builder = new Builder();
+            return builder.build(in);
+        }
+        finally
+        {
+            IOUtils.close(in);
+        }
+    }
 }

@@ -65,6 +65,9 @@ public class DefaultPluginManager implements PluginManager
 
             loadPrepackagedPlugins();
 
+            UpdateSite site = new UpdateSite();
+            site.doIt();
+            
             // Ensure we have a user plugins directory
             File userPlugins = pluginPaths.getUserPluginRoot();
             if (!userPlugins.isDirectory())
