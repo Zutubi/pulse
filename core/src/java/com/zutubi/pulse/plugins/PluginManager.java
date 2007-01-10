@@ -1,6 +1,7 @@
 package com.zutubi.pulse.plugins;
 
 import org.eclipse.core.runtime.IExtensionRegistry;
+import org.eclipse.core.runtime.IExtension;
 import org.eclipse.core.runtime.dynamichelpers.IExtensionTracker;
 
 import java.net.URL;
@@ -20,4 +21,6 @@ public interface PluginManager
     void uninstallPlugin(Plugin plugin) throws PluginException;
     void enablePlugin(Plugin plugin) throws PluginException;
     void disablePlugin(Plugin plugin) throws PluginException;
+
+    Plugin getPlugin(IExtension extension);
 }

@@ -1,5 +1,6 @@
+Bundle-Name: Make command support. 
 Bundle-SymbolicName: com.zutubi.pulse.core.commands.make; singleton:=true
-Bundle-Name: com.zutubi.pulse.core.commands.make
 Bundle-Description: The prepackaged pulse make command support.
 Bundle-Vendor: Zutubi
 Bundle-Version: 2.0.0
+Require-Bundle:com.zutubi.pulse.core.commands.core

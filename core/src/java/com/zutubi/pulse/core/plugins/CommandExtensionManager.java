@@ -1,7 +1,9 @@
 package com.zutubi.pulse.core.plugins;
 
 import com.zutubi.pulse.core.PulseFileLoaderFactory;
+import com.zutubi.pulse.plugins.Plugin;
 import com.zutubi.pulse.plugins.PluginManager;
+import com.zutubi.pulse.util.logging.Logger;
 import org.eclipse.core.internal.registry.osgi.OSGIUtils;
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IExtension;
@@ -17,6 +19,8 @@ import org.osgi.framework.Bundle;
  */
 public class CommandExtensionManager implements IExtensionChangeHandler
 {
+    private static final Logger LOG = Logger.getLogger(CommandExtensionManager.class);
+
     private PluginManager pluginManager;
     private PulseFileLoaderFactory fileLoaderFactory;
 
@@ -40,24 +44,49 @@ public class CommandExtensionManager implements IExtensionChangeHandler
         IConfigurationElement[] configs = extension.getConfigurationElements();
         for (IConfigurationElement config : configs)
         {
+            String name = config.getAttribute("name");
+            String cls = config.getAttribute("class");
             try
             {
-                String name = config.getAttribute("name");
+                LOG.info(String.format("addExtension: %s -> %s", name, cls));
+                
                 Bundle bundle = OSGIUtils.getDefault().getBundle(extension.getNamespaceIdentifier());
-                Class clazz = bundle.loadClass(config.getAttribute("class"));
+                Class clazz = bundle.loadClass(cls);
                 fileLoaderFactory.register(name, clazz);
                 tracker.registerObject(extension, name, IExtensionTracker.REF_WEAK);
             }
             catch (ClassNotFoundException e)
             {
-                e.printStackTrace();
+                LOG.warning("Failed to add extension, name: " + name + ", class: " + cls + ". Cause: " + e.getMessage(), e);
+                handleExtensionError(extension, e);
             }
+            catch (NoClassDefFoundError e)
+            {
+                LOG.warning("Failed to add extension, name: " + name + ", class: " + cls + ". Cause: " + e.getMessage(), e);
+                handleExtensionError(extension, e);
+            }
+        }
+    }
+
+    private void handleExtensionError(IExtension extension, Throwable t)
+    {
+        try
+        {
+            // now lets record it for the UI.
+            Plugin plugin = pluginManager.getPlugin(extension);
+            pluginManager.disablePlugin(plugin);
+            // add the error message to the plugin...
+            t.getMessage();
+        }
+        catch (Throwable e)
+        {
+            LOG.error(e);
         }
     }
 
     public void removeExtension(IExtension extension, Object[] objects)
     {
-        for(Object o: objects)
+        for (Object o : objects)
         {
             fileLoaderFactory.unregister((String) o);
         }

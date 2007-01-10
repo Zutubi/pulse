@@ -6,9 +6,11 @@ import com.zutubi.pulse.util.logging.Logger;
 import nu.xom.*;
 import org.eclipse.core.runtime.IExtensionRegistry;
 import org.eclipse.core.runtime.RegistryFactory;
+import org.eclipse.core.runtime.IExtension;
 import org.eclipse.core.runtime.adaptor.EclipseStarter;
 import org.eclipse.core.runtime.dynamichelpers.ExtensionTracker;
 import org.eclipse.core.runtime.dynamichelpers.IExtensionTracker;
+import org.eclipse.core.internal.registry.osgi.OSGIUtils;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.BundleException;
@@ -678,5 +680,31 @@ public class DefaultPluginManager implements PluginManager
     public void setPluginPaths(PluginPaths pluginPaths)
     {
         this.pluginPaths = pluginPaths;
+    }
+
+    /**
+     * Retrieve the plugin that defines the specified extension.
+     *
+     * @param extension is the extension whose plugin we are retrieving.
+     *
+     * @return the plugin from which the extension was loaded, or null.
+     */
+    public Plugin getPlugin(IExtension extension)
+    {
+        if (!extension.isValid())
+        {
+            return null;
+        }
+        Bundle bundle = OSGIUtils.getDefault().getBundle(extension.getNamespaceIdentifier());
+        long requiredBundleId = bundle.getBundleId();
+
+        for (PluginImpl plugin : plugins)
+        {
+            if (plugin.getBundle().getBundleId() == requiredBundleId)
+            {
+                return plugin;
+            }
+        }
+        return null;
     }
 }
