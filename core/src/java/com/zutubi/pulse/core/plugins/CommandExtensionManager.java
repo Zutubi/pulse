@@ -5,10 +5,7 @@ import com.zutubi.pulse.plugins.Plugin;
 import com.zutubi.pulse.plugins.PluginManager;
 import com.zutubi.pulse.util.logging.Logger;
 import org.eclipse.core.internal.registry.osgi.OSGIUtils;
-import org.eclipse.core.runtime.IConfigurationElement;
-import org.eclipse.core.runtime.IExtension;
-import org.eclipse.core.runtime.IExtensionPoint;
-import org.eclipse.core.runtime.IExtensionRegistry;
+import org.eclipse.core.runtime.*;
 import org.eclipse.core.runtime.dynamichelpers.ExtensionTracker;
 import org.eclipse.core.runtime.dynamichelpers.IExtensionChangeHandler;
 import org.eclipse.core.runtime.dynamichelpers.IExtensionTracker;
@@ -44,26 +41,34 @@ public class CommandExtensionManager implements IExtensionChangeHandler
         IConfigurationElement[] configs = extension.getConfigurationElements();
         for (IConfigurationElement config : configs)
         {
-            String name = config.getAttribute("name");
-            String cls = config.getAttribute("class");
             try
             {
-                LOG.info(String.format("addExtension: %s -> %s", name, cls));
-                
-                Bundle bundle = OSGIUtils.getDefault().getBundle(extension.getNamespaceIdentifier());
-                Class clazz = bundle.loadClass(cls);
-                fileLoaderFactory.register(name, clazz);
-                tracker.registerObject(extension, name, IExtensionTracker.REF_WEAK);
+                String name = config.getAttribute("name");
+                String cls = config.getAttribute("class");
+                try
+                {
+                    System.out.println(String.format("addExtension: %s -> %s", name, cls));
+
+                    Bundle bundle = OSGIUtils.getDefault().getBundle(extension.getNamespaceIdentifier());
+                    Class clazz = bundle.loadClass(cls);
+                    fileLoaderFactory.register(name, clazz);
+                    tracker.registerObject(extension, name, IExtensionTracker.REF_WEAK);
+                }
+                catch (ClassNotFoundException e)
+                {
+                    LOG.warning("Failed to add extension, name: " + name + ", class: " + cls + ". Cause: " + e.getMessage(), e);
+                    handleExtensionError(extension, e);
+                }
+                catch (NoClassDefFoundError e)
+                {
+                    LOG.warning("Failed to add extension, name: " + name + ", class: " + cls + ". Cause: " + e.getMessage(), e);
+                    handleExtensionError(extension, e);
+                }
             }
-            catch (ClassNotFoundException e)
+            catch (InvalidRegistryObjectException e)
             {
-                LOG.warning("Failed to add extension, name: " + name + ", class: " + cls + ". Cause: " + e.getMessage(), e);
-                handleExtensionError(extension, e);
-            }
-            catch (NoClassDefFoundError e)
-            {
-                LOG.warning("Failed to add extension, name: " + name + ", class: " + cls + ". Cause: " + e.getMessage(), e);
-                handleExtensionError(extension, e);
+                // what causes this?
+                LOG.error(e);
             }
         }
     }
