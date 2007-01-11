@@ -1,0 +1,18 @@
+<?xml version="1.0"?>
+<project>
+
+    <macro name="m1">
+        <executable name="${prop}" exe="exe"/>
+    </macro>
+
+    <recipe name="r1">
+        <scope>
+            <property name="prop" value="scope1"/>
+            <macro-ref macro="${m1}"/>
+        </scope>
+        <scope>
+            <property name="prop" value="scope2"/>
+            <macro-ref macro="${m1}"/>
+        </scope>
+    </recipe>
+</project>

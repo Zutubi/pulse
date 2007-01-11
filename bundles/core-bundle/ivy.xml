@@ -11,6 +11,7 @@
 
     <configurations>
         <conf name="default" description="Default configuration."/>
+        <conf name="build" description=""/>
     </configurations>
 
     <publications>
@@ -19,7 +20,7 @@
     </publications>
 
     <dependencies>
-        <dependency org="zutubi" name="pulse-core" rev="latest.integration" conf="default->build"/>
+        <dependency org="zutubi" name="pulse-core" rev="latest.integration" conf="default,build->build"/>
     </dependencies>
 
 </ivy-module>

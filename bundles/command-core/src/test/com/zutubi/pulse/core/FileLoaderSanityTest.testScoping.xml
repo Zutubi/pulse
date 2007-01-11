@@ -1,0 +1,11 @@
+<?xml version="1.0"?>
+<project>
+    <property name="p" value="global"/>
+    <recipe name="${p}">
+        <property name="p" value="in recipe"/>
+        <command name="${p}">
+            <property name="p" value="in command"/>
+            <executable exe="${p}"/>
+        </command>
+    </recipe>
+</project>
