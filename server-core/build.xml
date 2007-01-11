@@ -4,8 +4,25 @@
     <import file="../common-build.xml" />
 
     <target name="module-pre-init">
-        <property name="module" value="server-core"/>
-        <dirname property="project.root.dir" file="../build.xml"/>
+        <dirname property="project.root.dir" file="../common-build.xml"/>
     </target>
+
+    <target name="module-post-init">
+
+        <path id="test.run.selection">
+            <fileset dir="src/test">
+                <include name="**/*Test.java"/>
+                <exclude name="**/Cvs*Test.java"/>
+                <exclude name="**/SVN*Test.java"/>
+                <exclude name="**/P4*Test.java"/>
+            </fileset>
+        </path>
+
+        <path id="test.export.selection">
+            <path refid="test.run.selection"/>
+        </path>
+
+    </target>
+
 
 </project>
