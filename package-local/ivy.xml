@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet type="text/xsl" href="http://www.jayasoft.fr/org/ivyrep/ivy-doc.xsl"?>
+<ivy-module version="1.0">
+
+    <info organisation="zutubi" module="pulse-local-package" status="integration">
+        <ivyauthor name="zutubi" url="http://www.zutubi.com/"/>
+        <description homepage="http://www.zutubi.com/">
+        </description>
+    </info>
+
+    <configurations>
+        <conf name="build" description=""/>
+    </configurations>
+
+    <publications>
+        <artifact name="local" type="jar" conf="release,build"/>
+    </publications>
+
+    <dependencies>
+
+        <!--<dependency org="zutubi" name="pulse-core" rev="latest.integration" conf="build->release"/>-->
+        <dependency org="zutubi" name="pulse-local" rev="latest.integration" conf="build->release"/>
+
+    </dependencies>
+
+
+</ivy-module>
