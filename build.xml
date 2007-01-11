@@ -12,10 +12,7 @@
 
     <target name="clean" depends="clean.all"/>
 
-    <target name="clean.all">
-        <!-- trigger a clean for each module. -->
-        <foreach target="clean"/>
-
+    <target name="clean.all" depends="clean.modules">
         <delete dir="build"/>
     </target>
 
@@ -65,8 +62,7 @@
         <ant inheritAll="false" dir="slave" antfile="build.xml" target="build.module"/>
     </target>
 
-    <target name="build.all">
-        <foreach target="build.module"/>
+    <target name="build.all" depends="build.modules">
 
         <!-- Generate one mega report -->
         <property name="report.dir" value="build/reports/junit"/>
@@ -85,17 +81,17 @@
         <property name="package.root.local" value="build/package/${package.name.local}"/>
         <property name="version.root.local" value="${package.root.local}/versions/${pulse.build}"/>
 
-        <delete dir="${package.root.local}"/>
+        <!-- preparation work... -->
         <mkdir dir="${package.root.local}"/>
 
-        <copy file="core/etc/active-version.txt" todir="${package.root.local}"/>
+        <copy file="${project.root.dir}/etc/active-version.txt" todir="${package.root.local}"/>
         <replace file="${package.root.local}/active-version.txt">
             <replacefilter token="__BUILD_NUMBER__" value="${pulse.build}"/>
         </replace>
 
         <copy todir="${package.root.local}/bin">
-            <fileset dir="core/src/bin" includes="**/*"/>
-            <fileset dir="local/src/bin" includes="**/*"/>
+            <fileset dir="${project.root.dir}/core/src/bin" includes="**/*"/>
+            <fileset dir="${project.root.dir}/local/src/bin" includes="**/*"/>
         </copy>
 
         <fixcrlf srcdir="${package.root.local}/bin" eol="lf" eof="remove" includes="**/*.sh"/>
@@ -103,6 +99,7 @@
 
         <retrieve.dependencies module="." conf="local" dest="${version.root.local}/lib"/>
 
+        <!-- handle the boot jar specially -->
         <move tofile="${package.root.local}/lib/boot.jar">
             <fileset dir="${version.root.local}/lib" includes="boot-*.jar"/>
         </move>
@@ -165,7 +162,7 @@
         <delete dir="${package.root.slave}"/>
         <mkdir dir="${package.root.slave}"/>
 
-        <copy file="core/etc/active-version.txt" todir="${package.root.slave}"/>
+        <copy file="${project.root.dir}/etc/active-version.txt" todir="${package.root.slave}"/>
         <replace file="${package.root.slave}/active-version.txt">
             <replacefilter token="__BUILD_NUMBER__" value="${pulse.build}"/>
         </replace>
@@ -280,7 +277,7 @@
         <delete dir="${package.root.master}"/>
         <mkdir dir="${package.root.master}"/>
 
-        <copy file="core/etc/active-version.txt" todir="${package.root.master}"/>
+        <copy file="${project.root.dir}/etc/active-version.txt" todir="${package.root.master}"/>
         <replace file="${package.root.master}/active-version.txt">
             <replacefilter token="__BUILD_NUMBER__" value="${pulse.build}"/>
         </replace>
@@ -489,11 +486,6 @@
         </junit>
     </target>
     
-    <target name="init">
-        <property name="project.root.dir" value="."/>
-        <property name="project.repository" value="${project.root.dir}/build/repository"/>
-    </target>
-
     <!--
      Refresh the projects lib directory by retrieving the latest module dependencies.
     -->
@@ -535,6 +527,7 @@
     <!--
      Execute the specified target on each of the modules.
     -->
+<!--
     <macrodef name="foreach">
         <attribute name="target"/>
         <sequential>
@@ -545,4 +538,50 @@
             <ant inheritAll="false" dir="slave" antfile="build.xml" target="@{target}"/>
         </sequential>
     </macrodef>
+-->
+
+    <target name="init">
+
+        <property name="project.root.dir" value="."/>
+        <property name="project.repository" value="${project.root.dir}/build/repository"/>
+
+        <path id="custom.task.path">
+            <fileset dir="etc">
+                <include name="**/*.jar"/>
+            </fileset>
+        </path>
+        <taskdef resource="net/sf/antcontrib/antlib.xml" classpathref="custom.task.path"/>
+    </target>
+
+    <target name="clean.modules" depends="init">
+        <foreachbundle target="clean"/>
+    </target>
+
+    <target name="build.modules" depends="init">
+        <foreachbundle target="build.module"/>
+    </target>
+
+    <macrodef name="foreachbundle">
+        <attribute name="target"/>
+        <sequential>
+            <foreach target="delegate-to-bundle-script" param="module.base" list="${pulse.bundles.other}" trim="true">
+                <param name="target" value="@{target}"/>
+            </foreach>
+            <foreach target="delegate-to-bundle-script" param="module.base" list="${pulse.bundles.internal}" trim="true">
+                <param name="target" value="@{target}"/>
+            </foreach>
+            <foreach target="delegate-to-bundle-script" param="module.base" list="${pulse.bundles.pre-packaged}" trim="true">
+                <param name="target" value="@{target}"/>
+            </foreach>
+        </sequential>
+    </macrodef>
+
+    <target name="delegate-to-bundle-script">
+
+        <ant inheritAll="false" dir="${module.base}" antfile="build.xml" target="${target}">
+            <property name="skip.dependencies" value="true"/>
+        </ant>
+
+    </target>
+
 </project>

@@ -1,0 +1,158 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- -->
+<!-- -->
+<!-- -->
+<project name="Pulse" basedir="." xmlns:ivy="antlib:fr.jayasoft.ivy.ant">
+
+    <condition property="on.windows">
+        <os family="windows"/>
+    </condition>
+
+    <target name="init" depends="module-pre-init, common-init, module-post-init"/>
+
+    <target name="module-pre-init"/>
+    
+    <target name="module-post-init"/>
+
+    <target name="common-init">
+
+        <property file="build.properties"/>
+        <property name="project.repository" value="${project.root.dir}/build/repository"/>
+
+        <dirname property="current.dir" file="ivy.xml"/>
+
+        <path id="custom.task.path">
+            <fileset dir="${project.root.dir}/etc">
+                <include name="**/*.jar"/>
+            </fileset>
+        </path>
+        <taskdef resource="net/sf/antcontrib/antlib.xml" classpathref="custom.task.path"/>
+
+        <!-- ivy configuration -->
+        <property file="${project.root.dir}/ivy.properties"/>
+        <ivy:configure file="${project.root.dir}/ivyconf.xml"/>
+        
+    </target>
+
+    
+    <target name="clean" depends="init, module-pre-clean, common-clean, module-post-clean"/>
+
+    <target name="module-pre-clean"/>
+
+    <target name="module-post-clean"/>
+
+    <target name="common-clean">
+
+        <delete dir="${current.dir}/build"/>
+        
+    </target>
+
+    
+    <target name="package" depends="init, module-pre-package, common-package, module-post-package"/>
+
+    <target name="module-pre-package"/>
+
+    <target name="module-post-package"/>
+
+    <target name="common-package">
+
+        <property name="package.root" value="build/package/${package.name}"/>
+        <property name="version.root" value="${package.root}/versions/${pulse.build}"/>
+
+        <!-- preparation work... -->
+        <mkdir dir="${package.root}"/>
+
+        <copy file="${project.root.dir}/etc/active-version.txt" todir="${package.root}"/>
+        <replace file="${package.root}/active-version.txt">
+            <replacefilter token="__BUILD_NUMBER__" value="${pulse.build}"/>
+        </replace>
+
+        <!-- foreach. -->
+        <foreach target="_copy-package-sources" param="module.name" list="${package.sources}" trim="true">
+            <param name="project.root.dir" value="${project.root.dir}"/>
+            <param name="package.root" value="${package.root}"/>
+        </foreach>
+
+        <move toDir="${version.root}">
+            <fileset dir="${package.root}/version"/>
+        </move>
+
+        <replace dir="${package.root}" replacefilterfile="${current.dir}/subst.properties">
+            <include name="**/*.in"/>
+        </replace>
+        <move todir="${package.root}">
+            <fileset dir="${package.root}"/>
+            <mapper type="glob" from="*.in" to="*"/>
+        </move>
+
+        <fixcrlf srcdir="${package.root}/bin" eol="lf" eof="remove" includes="**/*.sh"/>
+        <chmod perm="755" dir="${package.root}/bin" includes="**/*.sh"/>
+
+        <retrieve.dependencies module="." conf="build" dest="${version.root}/lib"/>
+
+        <!-- handle the boot jar specially -->
+        <move tofile="${package.root}/lib/boot.jar">
+            <fileset dir="${version.root}/lib" includes="boot-*.jar"/>
+        </move>
+
+        <exec executable="zip" dir="${package.root}/..">
+            <arg line="-r ../${package.name}.zip ${package.name}"/>
+        </exec>
+
+        <tar destfile="build/${package.name}.tar.gz" compression="gzip">
+            <tarfileset dir="${package.root}/.." mode="755" username="root" group="root">
+                <include name="${package.name}/bin/*"/>
+            </tarfileset>
+            <tarfileset dir="${package.root}/.." username="root" group="root">
+                <include name="${package.name}/**/*"/>
+                <exclude name="${package.name}/bin/*"/>
+            </tarfileset>
+        </tar>
+
+        <!-- conditionally build the nsis package, dependant on whether or not the build is running on windows. -->
+        <antcall target="_nsis"/>
+
+    </target>
+
+    <target name="_copy-package-sources">
+        <copy todir="${package.root}">
+            <fileset dir="${project.root.dir}/${module.name}/package" includes="**/*"/>
+        </copy>
+    </target>
+
+
+    <target name="_nsis" if="on.windows">
+        
+        <property name="package.root" value="build/package/${package.name}"/>
+
+        <copy file="${project.root.dir}/installer/env.nsh" todir="${package.root}"/>
+        <copy file="${project.root.dir}/installer/pulse.ico" todir="${package.root}"/>
+        
+<!--
+        <copy file="${project.root.dir}/installer/dev.nsi.in" tofile="${package.root}/dev.nsi"/>
+
+        <replace file="${package.root}/dev.nsi">
+            <replacefilter token="__PACKAGE_NAME__" value="${package.name}"/>
+            <replacefilter token="__VERSION__" value="${pulse.version}"/>
+        </replace>
+
+        <exec executable="makensis" dir="${package.root}">
+            <arg line="dev.nsi"/>
+        </exec>
+-->
+    </target>
+
+    
+    <macrodef name="retrieve.dependencies">
+        <attribute name="module"/>
+        <attribute name="conf" default="external"/>
+        <attribute name="dest" default="lib"/>
+        <sequential>
+            <!-- resolve the modules ivy file. -->
+            <ivy:resolve file="@{module}/ivy.xml" conf="@{conf}"/>
+            <ivy:deliver deliverpattern="${project.repository}/[module]/ivy-[revision].xml"/>
+            <ivy:retrieve pattern="@{dest}/[artifact]-[revision].[ext]" validate="true" conf="@{conf}"/>
+        </sequential>
+    </macrodef>
+
+</project>
