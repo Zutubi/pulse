@@ -12,10 +12,11 @@
     <configurations>
         <conf name="default" description="Default configuration."/>
         <conf name="build" description=""/>
+        <conf name="package" description=""/>
     </configurations>
 
     <publications>
-        <artifact name="command-ant" type="jar" conf="default"/>
+        <artifact name="command-ant" type="jar" conf="default, package"/>
         <artifact name="command-ant-src" type="jar" conf="default"/>
         
         <artifact name="command-ant-test" type="jar" conf="default"/>

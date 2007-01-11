@@ -89,6 +89,9 @@
         <chmod perm="755" dir="${package.root}/bin" includes="**/*.sh"/>
 
         <retrieve.dependencies module="." conf="build" dest="${version.root}/lib"/>
+        
+        <retrieve.dependencies module="." conf="internal" dest="${version.root}/system/plugins/internal"/>
+        <retrieve.dependencies module="." conf="prepackaged" dest="${version.root}/system/plugins/prepackaged"/>
 
         <!-- handle the boot jar specially -->
         <move tofile="${package.root}/lib/boot.jar">

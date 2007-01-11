@@ -10,6 +10,9 @@
 
     <configurations>
         <conf name="build" description=""/>
+
+        <conf name="internal" description=""/>
+        <conf name="prepackaged" description=""/>
     </configurations>
 
     <publications>
@@ -19,6 +22,17 @@
     <dependencies>
 
         <dependency org="zutubi" name="pulse-master" rev="latest.integration" conf="build->release"/>
+
+        <dependency org="zutubi" name="pulse-master" rev="latest.integration" conf="internal->bundles"/>
+        <dependency org="zutubi" name="core-bundle" rev="latest.integration" conf="internal->package"/>
+
+        <dependency org="zutubi" name="command-ant" rev="latest.integration" conf="prepackaged->package"/>
+        <dependency org="zutubi" name="command-make" rev="latest.integration" conf="prepackaged->package"/>
+        <dependency org="zutubi" name="command-maven" rev="latest.integration" conf="prepackaged->package"/>
+        <dependency org="zutubi" name="command-maven2" rev="latest.integration" conf="prepackaged->package"/>
+        <dependency org="zutubi" name="command-xcode" rev="latest.integration" conf="prepackaged->package"/>
+        <dependency org="zutubi" name="postprocessor-ocunit" rev="latest.integration" conf="prepackaged->package"/>
+        <dependency org="zutubi" name="postprocessor-cppunit" rev="latest.integration" conf="prepackaged->package"/>
 
     </dependencies>
 

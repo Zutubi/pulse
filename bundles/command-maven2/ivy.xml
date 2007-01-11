@@ -12,10 +12,11 @@
     <configurations>
         <conf name="default" description="Default configuration."/>
         <conf name="build" description=""/>
+        <conf name="package" description=""/>
     </configurations>
 
     <publications>
-        <artifact name="command-maven2" type="jar" conf="default"/>
+        <artifact name="command-maven2" type="jar" conf="default, package"/>
         <artifact name="command-maven2-src" type="jar" conf="default"/>
 
         <artifact name="command-maven2-test" type="jar" conf="default"/>
@@ -25,6 +26,9 @@
     <dependencies>
         <dependency org="zutubi" name="pulse-core" rev="latest.integration" conf="default, build->build"/>
         <dependency org="zutubi" name="command-core" rev="dev" conf="default, build->default"/>
+        
+        <dependency org="zutubi" name="command-core" rev="dev" conf="package->package"/>
+
     </dependencies>
 
 </ivy-module>

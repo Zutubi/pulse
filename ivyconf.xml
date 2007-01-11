@@ -31,6 +31,7 @@
         <module organisation="zutubi" name="pulse-.*" resolver="build"/>
         <module organisation="zutubi" name="command-.*" resolver="build"/>
         <module organisation="zutubi" name="postprocessor-.*" resolver="build"/>
+        <module organisation="zutubi" name="core-.*" resolver="build"/>
     </modules>
 
 </ivyconf>

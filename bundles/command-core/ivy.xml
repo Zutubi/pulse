@@ -12,10 +12,11 @@
     <configurations>
         <conf name="default" description=""/>
         <conf name="build" description=""/>
+        <conf name="package" description=""/>
     </configurations>
 
     <publications>
-        <artifact name="command-core" type="jar" conf="default"/>
+        <artifact name="command-core" type="jar" conf="default, package"/>
         <artifact name="command-core-src" type="jar" conf="default"/>
 
         <artifact name="command-core-test" type="jar" conf="default"/>

@@ -12,10 +12,11 @@
     <configurations>
         <conf name="default" description="Default configuration."/>
         <conf name="build" description=""/>
+        <conf name="package" description=""/>
     </configurations>
 
     <publications>
-        <artifact name="command-make" type="jar" conf="default"/>
+        <artifact name="command-make" type="jar" conf="default, package"/>
         <artifact name="command-make-src" type="jar" conf="default"/>
 
         <artifact name="command-make-test" type="jar" conf="default"/>

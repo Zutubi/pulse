@@ -12,10 +12,11 @@
     <configurations>
         <conf name="default" description="Default configuration."/>
         <conf name="build" description=""/>
+        <conf name="package" description=""/>
     </configurations>
 
     <publications>
-        <artifact name="command-maven" type="jar" conf="default"/>
+        <artifact name="command-maven" type="jar" conf="default, package"/>
         <artifact name="command-maven-src" type="jar" conf="default"/>
 
         <artifact name="command-maven-test" type="jar" conf="default"/>
