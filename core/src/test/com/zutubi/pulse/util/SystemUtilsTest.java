@@ -67,7 +67,9 @@ public class SystemUtilsTest extends PulseTestCase
     public void testFindInPathExtraPaths() throws IOException
     {
         File extraPath = getTestDataFile("core", "findInPathExtraPaths", "data");
+        System.out.println("ExtraPath: " + extraPath.getAbsolutePath());
         File bin = SystemUtils.findInPath("dir", Arrays.asList(new String [] { extraPath.getAbsolutePath() } ));
+        System.out.println("Found path: " + bin.getAbsolutePath());
         assertNotNull(bin);
         assertEquals(extraPath.getCanonicalPath(), bin.getParentFile().getCanonicalPath());
     }

@@ -4,9 +4,31 @@
     <import file="../common-build.xml"/>
 
     <target name="module-pre-init">
-        <property name="module" value="core"/>
-        <dirname property="project.root.dir" file="../build.xml"/>
-        <property file="${project.root.dir}/build.properties"/>
+        <dirname property="project.root.dir" file="../common-build.xml"/>
+    </target>
+
+    <target name="module-post-init">
+
+        <path id="src.export.selection">
+            <fileset dir="src/java">
+                <exclude name="**/LicenseEncoder.java"/>
+            </fileset>
+        </path>
+
+        <path id="test.run.selection">
+            <fileset dir="src/test">
+                <include name="**/*Test.java"/>
+                <exclude name="**/LogInformationAnalyserTest.java"/>
+                <exclude name="**/Cvs*Test.java"/>
+                <exclude name="**/Svn*Test.java"/>
+                <exclude name="**/P4*Test.java"/>
+            </fileset>
+        </path>
+
+        <path id="test.export.selection">
+            <path refid="test.run.selection"/>
+        </path>
+
     </target>
 
     <target name="module-post-test">
@@ -20,6 +42,7 @@
         <replace file="${version.properties}" token="@BUILD_DATE@" value="${build.date}"/>
         <replace file="${version.properties}" token="@BUILD_NUMBER@" value="${pulse.build}"/>
         <replace file="${version.properties}" token="@RELEASE_DATE@" value="${pulse.release.date}"/>
+
     </target>
 
 </project>

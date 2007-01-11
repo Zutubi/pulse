@@ -1,12 +1,9 @@
 package com.zutubi.pulse.core;
 
-import com.zutubi.pulse.test.PulseTestCase;
-import com.zutubi.pulse.core.model.CommandResult;
 import com.zutubi.pulse.events.DefaultEventManager;
+import com.zutubi.pulse.test.PulseTestCase;
 import com.zutubi.pulse.util.FileSystemUtils;
-import com.zutubi.validation.annotations.Required;
 
-import java.util.List;
 import java.io.File;
 
 /**
@@ -65,23 +62,4 @@ public class RecipeTest extends PulseTestCase
             assertTrue(((NoopCommand)command).hasExecuted());
         }
     }
-
-    /**
-     * Test command that records its execution details. 
-     */
-    private class NoopCommand extends CommandSupport
-    {
-        private boolean executed;
-
-        public void execute(CommandContext context, CommandResult result)
-        {
-            executed = true;
-        }
-
-        public boolean hasExecuted()
-        {
-            return executed;
-        }
-    }
-    
 }
