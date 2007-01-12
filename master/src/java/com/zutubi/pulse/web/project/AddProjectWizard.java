@@ -12,6 +12,7 @@ import com.zutubi.pulse.util.logging.Logger;
 import com.zutubi.pulse.web.wizard.BaseWizard;
 import com.zutubi.pulse.web.wizard.BaseWizardState;
 import com.zutubi.pulse.web.wizard.Wizard;
+import com.zutubi.pulse.bootstrap.ComponentContext;
 import org.acegisecurity.AccessDeniedException;
 
 import java.util.Map;
@@ -62,6 +63,8 @@ public class AddProjectWizard extends BaseWizard
         customDetails = new CustomDetails(this, "custom");
         versionedDetails = new VersionedDetails(this, "versioned");
         xcodeDetails = new XCodeDetails(this, "xcode");
+
+        ComponentContext.autowire(customDetails);
 
         addInitialState(projectDetails);
         addState(cvsDetails);
