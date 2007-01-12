@@ -10,23 +10,23 @@
     </info>
 
     <configurations>
-        <conf name="default" description="Default configuration."/>
-        <conf name="build" description=""/>
-        <conf name="package" description=""/>
+        <conf name="default"/>
+        <conf name="source"/>
+        <conf name="bundle"/>
+        <conf name="external"/>
     </configurations>
 
     <publications>
-        <artifact name="postprocessor-cppunit" type="jar" conf="default, package"/>
-        <artifact name="postprocessor-cppunit-src" type="jar" conf="default"/>
-        
+        <!-- The runtime artifacts for this module. -->
+        <artifact name="postprocessor-cppunit" type="jar" conf="bundle,default"/>
         <artifact name="postprocessor-cppunit-test" type="jar" conf="default"/>
-        <artifact name="postprocessor-cppunit-test-src" type="jar" conf="default"/>
+        <!-- The source artifacts for this module. -->
+        <artifact name="postprocessor-cppunit-src" type="jar" conf="source"/>
+        <artifact name="postprocessor-cppunit-test-src" type="jar" conf="source"/>
     </publications>
 
     <dependencies>
-        <dependency org="zutubi" name="pulse-core" rev="latest.integration" conf="default,build->build"/>
-        <dependency org="zutubi" name="command-core" rev="dev" conf="default,build->default"/>
-        <dependency org="zutubi" name="command-core" rev="dev" conf="package->package"/>
+        <dependency org="zutubi" name="command-core" rev="dev" conf="*->@"/>
     </dependencies>
 
 </ivy-module>

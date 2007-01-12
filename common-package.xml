@@ -2,7 +2,7 @@
 <!-- -->
 <!-- -->
 <!-- -->
-<project name="Pulse" basedir="." xmlns:ivy="antlib:fr.jayasoft.ivy.ant">
+<project name="common build script" basedir="." xmlns:ivy="antlib:fr.jayasoft.ivy.ant">
 
     <condition property="on.windows">
         <os family="windows"/>
@@ -18,6 +18,10 @@
 
         <property file="build.properties"/>
         <property name="project.repository" value="${project.root.dir}/build/repository"/>
+
+        <echo message="----------------------------------------------"/>
+        <echo message="    Component: init ${module}"/>
+        <echo message="----------------------------------------------"/>
 
         <dirname property="current.dir" file="ivy.xml"/>
 
@@ -46,8 +50,11 @@
 
     <target name="common-clean">
 
-        <delete dir="${current.dir}/build"/>
-        <delete dir="${current.dir}/pulse-accept"/>
+        <echo message="----------------------------------------------"/>
+        <echo message="    Component: clean ${module}"/>
+        <echo message="----------------------------------------------"/>
+
+        <delete dir="build"/>
 
     </target>
 
@@ -59,6 +66,10 @@
     <target name="module-post-prepare"/>
 
     <target name="common-prepare">
+
+        <echo message="----------------------------------------------"/>
+        <echo message="    Component: prepare ${module}"/>
+        <echo message="----------------------------------------------"/>
 
         <!-- preparation work... -->
         <mkdir dir="${package.root}"/>
@@ -73,6 +84,10 @@
     <target name="module-post-build"/>
 
     <target name="common-build">
+
+        <echo message="----------------------------------------------"/>
+        <echo message="    Component: build ${module}"/>
+        <echo message="----------------------------------------------"/>
 
         <copy file="${project.root.dir}/etc/active-version.txt" todir="${package.root}"/>
         <replace file="${package.root}/active-version.txt">
@@ -101,9 +116,9 @@
         <chmod perm="755" dir="${package.root}/bin" includes="**/*.sh"/>
 
         <!-- import all of the external dependencies, and plonk them into the appropriate directories. -->
-        <retrieve.dependencies ivyfile="ivy.xml" conf="build" dest="${version.root}/lib"/>
-        <retrieve.dependencies ivyfile="ivy.xml" conf="internal" dest="${version.root}/system/plugins/internal"/>
-        <retrieve.dependencies ivyfile="ivy.xml" conf="prepackaged" dest="${version.root}/system/plugins/prepackaged"/>
+        <_retrieve.dependencies ivyfile="ivy.xml" conf="build" dest="${version.root}/lib"/>
+        <_retrieve.dependencies ivyfile="ivy.xml" conf="internal" dest="${version.root}/system/plugins/internal"/>
+        <_retrieve.dependencies ivyfile="ivy.xml" conf="prepackaged" dest="${version.root}/system/plugins/prepackaged"/>
 
         <!-- handle the boot jar specially -->
         <move tofile="${package.root}/lib/boot.jar">
@@ -167,9 +182,8 @@
     <target name="common-test">
 
     </target>
-
     
-    <macrodef name="retrieve.dependencies">
+    <macrodef name="_retrieve.dependencies">
         <attribute name="ivyfile"/>
         <attribute name="conf" default="external"/>
         <attribute name="dest" default="lib"/>

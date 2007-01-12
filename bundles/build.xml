@@ -1,8 +1,44 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project name="bundle" basedir=".">
 
-    <target name="clean">
-        
+    <target name="init">
+
+        <property file="build.properties"/>
+        <property name="project.root.dir" value="../"/>
+
+        <path id="custom.task.path">
+            <fileset dir="${project.root.dir}/etc">
+                <include name="**/*.jar"/>
+            </fileset>
+        </path>
+        <taskdef resource="net/sf/antcontrib/antlib.xml" classpathref="custom.task.path"/>
+
     </target>
+
+    <target name="clean" depends="init">
+        <foreachbundle target="clean"/>
+    </target>
+
+    <target name="build" depends="init">
+        <foreachbundle target="build.module"/>        
+    </target>
+
+    <macrodef name="foreachbundle">
+        <attribute name="target"/>
+        <sequential>
+            <foreach target="delegate-to-bundle-script" param="bundle.base" list="${bundles}" trim="true">
+                <param name="target" value="@{target}"/>
+            </foreach>
+        </sequential>
+    </macrodef>
+
+    <target name="delegate-to-bundle-script">
+
+        <ant inheritAll="false" dir="${bundle.base}" antfile="build.xml" target="${target}">
+            <property name="skip.dependencies" value="true"/>
+        </ant>
+
+    </target>
+
 
 </project>

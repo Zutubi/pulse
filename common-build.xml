@@ -132,15 +132,17 @@
         <mkdir dir="${report.dir}/junit/html"/>
 
         <!-- build the dependencies. -->
-        <foreach target="prepare-dependencies" param="module.name" list="${dependencies}"/>
+        <foreach target="prepare-dependencies" param="module.name" list="${dependencies}">
+            <param name="project.root.dir" value="${project.root.dir}"/>
+        </foreach>
 
         <!-- resolve the dependencies, into the build/lib directory. -->
-        <retrieve-dependencies dest="${build.lib.dir}" conf="build"/>
+        <retrieve-dependencies dest="${build.lib.dir}" conf="default"/>
 
     </target>
 
     <target name="prepare-dependencies" unless="skip.dependencies">
-        <ant inheritAll="false" dir="../${module.name}" antfile="build.xml" target="build.module">
+        <ant inheritAll="false" dir="${project.root.dir}/${module.name}" antfile="build.xml" target="build.module">
             <property name="skip.tests" value="true"/>
         </ant>
     </target>

@@ -10,18 +10,19 @@
     </info>
 
     <configurations>
-        <conf name="default" description="Default configuration."/>
-        <conf name="build" description=""/>
-        <conf name="package" description=""/>
+        <conf name="default"/>
+        <conf name="source"/>
+        <conf name="bundle"/>
+        <conf name="external"/>
     </configurations>
 
     <publications>
-        <artifact name="core-bundle" type="jar" conf="default, package"/>
+        <artifact name="core-bundle" type="jar" conf="default,bundle"/>
         <artifact name="core-bundle-src" type="jar" conf="default"/>
     </publications>
 
     <dependencies>
-        <dependency org="zutubi" name="pulse-core" rev="latest.integration" conf="default,build->build"/>
+        <dependency org="zutubi" name="pulse-core" rev="latest.integration" conf="default->build;external->external"/>
     </dependencies>
 
 </ivy-module>

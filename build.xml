@@ -557,6 +557,13 @@
         <foreachbundle target="clean"/>
     </target>
 
+    <target name="_clean" depends="clean.modules">
+        <delete dir="build"/>
+        <ant inheritAll="false" dir="package-local" antfile="build.xml" target="clean"/>
+        <ant inheritAll="false" dir="package-master" antfile="build.xml" target="clean"/>
+        <ant inheritAll="false" dir="package-slave" antfile="build.xml" target="clean"/>
+    </target>
+
     <target name="build.modules" depends="init">
         <foreachbundle target="build.module"/>
     </target>
