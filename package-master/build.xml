@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns:ivy="antlib:fr.jayasoft.ivy.ant" name="local module" basedir=".">
 
-    <import file="../common-package.xml" />
+    <import file="../common-package.xml"/>
 
     <target name="module-pre-init">
 
@@ -9,6 +9,85 @@
 
         <property file="${project.root.dir}/build.properties"/>
         <property name="package.name" value="pulse-${pulse.version}"/>
+
+    </target>
+
+    <target name="common-test">
+
+        <property name="build.dir" value="build"/>
+        <property name="report.dir" value="build/reports/junit"/>
+
+        <!-- prepare -->
+        <mkdir dir="build/classes"/>
+        <mkdir dir="${report.dir}/xml"/>
+        <mkdir dir="${report.dir}/html"/>
+
+        <!-- build the test cases. -->
+        <retrieve.dependencies ivyfile="ivy.xml" conf="test" dest="build/lib"/>
+
+        <javac srcdir="src/test" destdir="build/classes">
+            <classpath>
+                <fileset dir="build/lib" includes="**/*.jar"/>
+            </classpath>
+        </javac>
+
+        <!-- options: compile or copy from master/classes ... -->
+        <javac srcdir="${project.root.dir}/master/src/java" destdir="build/classes">
+            <classpath>
+                <fileset dir="build/lib" includes="**/*.jar"/>
+            </classpath>
+            <include name="**/LicenseEncoder.java"/>
+        </javac>
+
+        <condition property="extension" value="tar.gz" else="zip">
+            <os family="unix"/>
+        </condition>
+
+        <!-- extract and start the package. -->
+        <exec executable="bash" spawn="true">
+            <arg line="acceptance-test-prep.sh build/pulse-${pulse.version}.${extension}"/>
+        </exec>
+
+        <!-- wait for the pulse server to start up. -->
+        <exec executable="bash">
+            <arg line="acceptance-test-wait.sh"/>
+        </exec>
+
+        <!-- run the acceptance test suite. -->
+        <junit printsummary="yes" fork="on" forkmode="once" maxmemory="512m" failureProperty="test.failed"
+               errorProperty="test.failed">
+            <sysproperty key="pulse.port" value="8889"/>
+            <sysproperty key="bootstrap" value="com/zutubi/pulse/bootstrap/bootstrapContext.xml"/>
+            <classpath>
+                <pathelement location="${build.dir}/classes"/>
+                <fileset dir="build/lib" includes="**/*.jar"/>
+            </classpath>
+            <formatter type="xml"/>
+            <batchtest todir="${report.dir}/xml">
+                <fileset dir="src/test">
+                    <include name="**/AcceptanceTestSuite.java"/>
+                </fileset>
+            </batchtest>
+        </junit>
+
+        <!-- generate the report. -->
+        <junitreport todir="${report.dir}">
+            <fileset dir=".">
+                <include name="*/${report.dir}/xml/*.xml"/>
+                <include name="${report.dir}/xml/*.xml"/>
+            </fileset>
+            <report format="frames" todir="${report.dir}/html"/>
+        </junitreport>
+
+        <!-- stop the running server. -->
+        <exec executable="bash">
+            <arg line="acceptance-test-post.sh ${pulse.version}"/>
+        </exec>
+
+        <fail if="test.failed" message="One or more acceptance tests failed.  See the reports (${report.dir}) for details."/>
+
+        <!-- test the upgrading of the agent package. -->
+        <!--<antcall target="test.agent.upgrade"/>-->
 
     </target>
 

@@ -1,0 +1,180 @@
+!include env.nsh
+
+;--------------------------------
+;Include Modern UI
+
+  !include "MUI.nsh"
+
+;--------------------------------
+;Variables
+
+  Var STARTMENU_FOLDER
+
+;--------------------------------
+;General
+
+  ;Name and file
+  Name "Zutubi __SERVICE_NAME__"
+  OutFile "../__PACKAGE_NAME__.exe"
+
+  ;Default installation folder
+  InstallDir "$PROGRAMFILES\Zutubi\__SERVICE_NAME__"
+  
+  ;Get installation folder from registry if available
+  InstallDirRegKey HKCU "Software\Zutubi\__SERVICE_NAME__" ""
+
+;--------------------------------
+;Interface Settings
+
+  !define MUI_ICON "..\..\..\installer\pulse.ico"
+  !define MUI_UNICON "..\..\..\installer\pulse.ico"
+  !define MUI_HEADERIMAGE
+  !define MUI_HEADERIMAGE_BITMAP "..\..\..\installer\pulse-banner.bmp"
+  !define MUI_ABORTWARNING
+
+;--------------------------------
+;Pages
+
+;  !insertmacro MUI_PAGE_LICENSE "${NSISDIR}\Docs\Modern UI\License.txt"
+;  !insertmacro MUI_PAGE_COMPONENTS
+  !insertmacro MUI_PAGE_DIRECTORY
+
+  !define MUI_STARTMENUPAGE_REGISTRY_ROOT "HKCU" 
+  !define MUI_STARTMENUPAGE_REGISTRY_KEY "Software\Zutubi\__SERVICE_NAME__"
+  !define MUI_STARTMENUPAGE_REGISTRY_VALUENAME "Start Menu Folder"
+  
+  !insertmacro MUI_PAGE_STARTMENU Application $STARTMENU_FOLDER
+  !insertmacro MUI_PAGE_INSTFILES
+
+  !define MUI_FINISHPAGE_RUN
+  !define MUI_FINISHPAGE_RUN_TEXT "Start __SERVICE_NAME__ service"
+  !define MUI_FINISHPAGE_RUN_FUNCTION "StartService"
+  !define MUI_FINISHPAGE_LINK "Getting Started Guide"
+  !define MUI_FINISHPAGE_LINK_LOCATION "http://confluence.zutubi.com/display/pulse0102/Getting+Started+Guide"
+  !insertmacro MUI_PAGE_FINISH
+
+  !insertmacro MUI_UNPAGE_CONFIRM
+  !insertmacro MUI_UNPAGE_INSTFILES
+  
+;--------------------------------
+;Languages
+ 
+  !insertmacro MUI_LANGUAGE "English"
+
+;--------------------------------
+; Functions
+
+Function InstallJRE
+  DetailPrint "Downloading the JRE setup"
+  NSISdl::download /TIMEOUT=30000 http://zutubi.com/download/jre.exe "$TEMP\pulse_jre_setup.exe"
+  Pop $0 ;Get the return value
+  StrCmp $0 "success" RunInstall 0
+  StrCmp $0 "cancel" 0 +3
+  Push "Download cancelled."
+  Goto Error
+  Push "Unknown error during download."
+  Goto Error
+
+RunInstall:
+  DetailPrint "Launching JRE setup"
+  ExecWait "$TEMP\pulse_jre_setup.exe" $0
+  DetailPrint "Setup finished"
+  Delete "$TEMP\pulse_jre_setup.exe"
+  StrCmp $0 "0" Exit 0
+  Push "The JRE setup has been abnormally interrupted."
+  Goto Error
+
+Error:
+  Pop $2
+  MessageBox MB_OK "Unable to install Java runtime: $2"
+Exit:
+FunctionEnd
+
+Function EnsureJRE
+  nsExec::ExecToStack '"$INSTDIR\bin\findjvm"'
+  Pop $0
+  Pop $1
+  StrCmp $0 "error" 0 CheckExit
+  StrCpy $1 "Unable to run JVM locator."
+CheckExit:
+  StrCmp $0 "0" Exit 0
+  MessageBox MB_YESNO "Could not find a JVM: $1.$\n$\nDownload and install Java now?" IDYES 0 IDNO Exit
+  Call InstallJRE
+Exit:
+FunctionEnd
+
+Function StartService
+  nsExec::Exec 'net start "__SERVICE_NAME__"'
+FunctionEnd
+
+;--------------------------------
+;Installer Sections
+
+Section "Pulse" SecMain
+  SetOutPath "$INSTDIR"
+  
+  Push "PULSE_HOME"
+  Push "$INSTDIR"
+  Call WriteEnvStr
+
+  File /r /x pulse.nsi /x env.nsh *
+
+  Call EnsureJre
+  
+  nsExec::Exec '"$INSTDIR\bin\wrapper-windows-x86-32.exe" -r "$INSTDIR\bin\wrapper.conf"'
+  nsExec::ExecToStack '"$INSTDIR\bin\wrapper-windows-x86-32.exe" -i "$INSTDIR\bin\wrapper.conf"'
+  Pop $0
+CheckExit:
+  StrCmp $0 "0" ServiceOK 0
+ServiceFailed:
+  MessageBox MB_OK "Unable to install pulse service.$\n$\nTry installing manually using $INSTDIR\bin\install-service.bat.  Shortcuts will not work until the service is installed."
+ServiceOK:
+  ;Store installation folder
+  WriteRegStr HKCU "Software\Zutubi\__SERVICE_NAME__" "" $INSTDIR
+  
+  !insertmacro MUI_STARTMENU_WRITE_BEGIN Application
+    CreateDirectory "$SMPROGRAMS\$STARTMENU_FOLDER"
+    CreateShortCut "$SMPROGRAMS\$STARTMENU_FOLDER\Start Service.lnk" "$INSTDIR\bin\start-service.bat" "" "$INSTDIR\pulse.ico" 0
+    CreateShortCut "$SMPROGRAMS\$STARTMENU_FOLDER\Stop Service.lnk" "$INSTDIR\bin\stop-service.bat" "" "$INSTDIR\pulse.ico" 0
+    CreateShortCut "$SMPROGRAMS\$STARTMENU_FOLDER\Uninstall.lnk" "$INSTDIR\Uninstall.exe" "" "$INSTDIR\Uninstall.exe" 0
+  !insertmacro MUI_STARTMENU_WRITE_END
+
+  ;Create uninstaller
+  WriteUninstaller "$INSTDIR\Uninstall.exe"
+
+SectionEnd
+
+;--------------------------------
+;Descriptions
+
+  ;Language strings
+  LangString DESC_SecMain ${LANG_ENGLISH} "Install pulse."
+
+  ;Assign language strings to sections
+  !insertmacro MUI_FUNCTION_DESCRIPTION_BEGIN
+    !insertmacro MUI_DESCRIPTION_TEXT ${SecMain} $(DESC_SecMain)
+  !insertmacro MUI_FUNCTION_DESCRIPTION_END
+
+;--------------------------------
+;Uninstaller Section
+
+Section "un.Uninstall"
+
+  Push "PULSE_HOME"
+  Call un.DeleteEnvStr
+
+  nsExec::Exec '"$INSTDIR\bin\wrapper-windows-x86-32.exe" -r "$INSTDIR\bin\wrapper.conf"'
+
+  !insertmacro MUI_STARTMENU_GETFOLDER Application $STARTMENU_FOLDER
+  DetailPrint "$STARTMENU_FOLDER"
+
+  Delete "$SMPROGRAMS\$STARTMENU_FOLDER\Start Service.lnk"
+  Delete "$SMPROGRAMS\$STARTMENU_FOLDER\Stop Service.lnk"
+  Delete "$SMPROGRAMS\$STARTMENU_FOLDER\Uninstall.lnk"
+  RMDir "$SMPROGRAMS\$STARTMENU_FOLDER"
+
+  RMDir /r "$INSTDIR"
+
+  DeleteRegKey /ifempty HKCU "Software\Zutubi\__SERVICE_NAME__"
+
+SectionEnd

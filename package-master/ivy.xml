@@ -13,6 +13,8 @@
 
         <conf name="internal" description=""/>
         <conf name="prepackaged" description=""/>
+
+        <conf name="test" description=""/>
     </configurations>
 
     <publications>
@@ -33,6 +35,9 @@
         <dependency org="zutubi" name="command-xcode" rev="latest.integration" conf="prepackaged->package"/>
         <dependency org="zutubi" name="postprocessor-ocunit" rev="latest.integration" conf="prepackaged->package"/>
         <dependency org="zutubi" name="postprocessor-cppunit" rev="latest.integration" conf="prepackaged->package"/>
+
+        <dependency org="jwebunit" name="jwebunit" rev="1.2" conf="test->default"/>
+        <dependency org="zutubi" name="pulse-master" rev="latest.integration" conf="test->build"/>
 
     </dependencies>
 

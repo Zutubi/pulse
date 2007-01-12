@@ -15,7 +15,7 @@
 
   ;Name and file
   Name "Zutubi __SERVICE_NAME__"
-  OutFile "..\..\__PACKAGE_NAME__.exe"
+  OutFile "../__PACKAGE_NAME__.exe"
 
   ;Default installation folder
   InstallDir "$PROGRAMFILES\Zutubi\__SERVICE_NAME__"
@@ -26,10 +26,10 @@
 ;--------------------------------
 ;Interface Settings
 
-  !define MUI_ICON "..\..\..\installer\pulse.ico"
-  !define MUI_UNICON "..\..\..\installer\pulse.ico"
+  !define MUI_ICON "__PROJECT_ROOT__\installer\pulse.ico"
+  !define MUI_UNICON "__PROJECT_ROOT__\installer\pulse.ico"
   !define MUI_HEADERIMAGE
-  !define MUI_HEADERIMAGE_BITMAP "..\..\..\installer\pulse-banner.bmp"
+  !define MUI_HEADERIMAGE_BITMAP "__PROJECT_ROOT__\installer\pulse-banner.bmp"
   !define MUI_ABORTWARNING
 
 ;--------------------------------

@@ -22,7 +22,7 @@ then
 fi
 
 # Prepare a temp directory to test within
-tmpDir=pulse-accept
+tmpDir=build/pulse-accept
 rm -rf $tmpDir
 mkdir $tmpDir
 

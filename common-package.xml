@@ -21,6 +21,9 @@
 
         <dirname property="current.dir" file="ivy.xml"/>
 
+        <property name="package.root" value="build/package/${package.name}"/>
+        <property name="version.root" value="${package.root}/versions/${pulse.build}"/>
+
         <path id="custom.task.path">
             <fileset dir="${project.root.dir}/etc">
                 <include name="**/*.jar"/>
@@ -44,23 +47,32 @@
     <target name="common-clean">
 
         <delete dir="${current.dir}/build"/>
-        
+        <delete dir="${current.dir}/pulse-accept"/>
+
     </target>
 
     
-    <target name="package" depends="init, module-pre-package, common-package, module-post-package"/>
+    <target name="prepare" depends="init, module-pre-prepare, common-prepare, module-post-prepare"/>
 
-    <target name="module-pre-package"/>
+    <target name="module-pre-prepare"/>
 
-    <target name="module-post-package"/>
+    <target name="module-post-prepare"/>
 
-    <target name="common-package">
-
-        <property name="package.root" value="build/package/${package.name}"/>
-        <property name="version.root" value="${package.root}/versions/${pulse.build}"/>
+    <target name="common-prepare">
 
         <!-- preparation work... -->
         <mkdir dir="${package.root}"/>
+
+    </target>
+
+
+    <target name="build" depends="init, module-pre-build, common-build, module-post-build"/>
+
+    <target name="module-pre-build"/>
+
+    <target name="module-post-build"/>
+
+    <target name="common-build">
 
         <copy file="${project.root.dir}/etc/active-version.txt" todir="${package.root}"/>
         <replace file="${package.root}/active-version.txt">
@@ -88,21 +100,23 @@
         <fixcrlf srcdir="${package.root}/bin" eol="lf" eof="remove" includes="**/*.sh"/>
         <chmod perm="755" dir="${package.root}/bin" includes="**/*.sh"/>
 
-        <retrieve.dependencies module="." conf="build" dest="${version.root}/lib"/>
-        
-        <retrieve.dependencies module="." conf="internal" dest="${version.root}/system/plugins/internal"/>
-        <retrieve.dependencies module="." conf="prepackaged" dest="${version.root}/system/plugins/prepackaged"/>
+        <!-- import all of the external dependencies, and plonk them into the appropriate directories. -->
+        <retrieve.dependencies ivyfile="ivy.xml" conf="build" dest="${version.root}/lib"/>
+        <retrieve.dependencies ivyfile="ivy.xml" conf="internal" dest="${version.root}/system/plugins/internal"/>
+        <retrieve.dependencies ivyfile="ivy.xml" conf="prepackaged" dest="${version.root}/system/plugins/prepackaged"/>
 
         <!-- handle the boot jar specially -->
         <move tofile="${package.root}/lib/boot.jar">
             <fileset dir="${version.root}/lib" includes="boot-*.jar"/>
         </move>
 
+        <!-- create the zip -->
         <exec executable="zip" dir="${package.root}/..">
-            <arg line="-r ../${package.name}.zip ${package.name}"/>
+            <arg line="-r ${package.name}.zip ${package.name}"/>
         </exec>
 
-        <tar destfile="build/${package.name}.tar.gz" compression="gzip">
+        <!-- create the tarball -->
+        <tar destfile="build/package/${package.name}.tar.gz" compression="gzip">
             <tarfileset dir="${package.root}/.." mode="755" username="root" group="root">
                 <include name="${package.name}/bin/*"/>
             </tarfileset>
@@ -123,36 +137,45 @@
         </copy>
     </target>
 
-
-    <target name="_nsis" if="on.windows">
+    <target name="_nsis" depends="init" if="on.windows">
         
-        <property name="package.root" value="build/package/${package.name}"/>
-
         <copy file="${project.root.dir}/installer/env.nsh" todir="${package.root}"/>
         <copy file="${project.root.dir}/installer/pulse.ico" todir="${package.root}"/>
         
-<!--
-        <copy file="${project.root.dir}/installer/dev.nsi.in" tofile="${package.root}/dev.nsi"/>
+        <copy file="pulse.nsi.in" tofile="${package.root}/pulse.nsi"/>
 
-        <replace file="${package.root}/dev.nsi">
+        <replace file="${package.root}/pulse.nsi"  replacefilterfile="subst.properties">
             <replacefilter token="__PACKAGE_NAME__" value="${package.name}"/>
             <replacefilter token="__VERSION__" value="${pulse.version}"/>
+            <replacefilter token="__PROJECT_ROOT__" value="${project.root.dir}"/>
         </replace>
 
+        <!-- execute the packaging. -->
         <exec executable="makensis" dir="${package.root}">
-            <arg line="dev.nsi"/>
+            <arg line="pulse.nsi"/>
         </exec>
--->
+        
+    </target>
+
+
+    <target name="test" depends="init, module-pre-test, common-test, module-post-test"/>
+
+    <target name="module-pre-test"/>
+
+    <target name="module-post-test"/>
+
+    <target name="common-test">
+
     </target>
 
     
     <macrodef name="retrieve.dependencies">
-        <attribute name="module"/>
+        <attribute name="ivyfile"/>
         <attribute name="conf" default="external"/>
         <attribute name="dest" default="lib"/>
         <sequential>
             <!-- resolve the modules ivy file. -->
-            <ivy:resolve file="@{module}/ivy.xml" conf="@{conf}"/>
+            <ivy:resolve file="@{ivyfile}" conf="@{conf}"/>
             <ivy:deliver deliverpattern="${project.repository}/[module]/ivy-[revision].xml"/>
             <ivy:retrieve pattern="@{dest}/[artifact]-[revision].[ext]" validate="true" conf="@{conf}"/>
         </sequential>
