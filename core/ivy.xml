@@ -15,6 +15,7 @@
         <conf name="external" description="All of those packages that are external to Pulse."/>
         <conf name="build" description="All of the packages required during the build."/>
         <conf name="bundles" description="Internal bundles required by Pulse."/>
+        <conf name="default" extends="build"/>
     </configurations>
 
     <publications>

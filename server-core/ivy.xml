@@ -15,6 +15,7 @@
         <conf name="external" description="All of those packages that are external to Pulse."/>
         <conf name="build" description="All of the packages required during the build."/>
         <conf name="bundles" description="Internal bundles required by Pulse."/>
+        <conf name="default" extends="build"/>
     </configurations>
 
     <publications>
@@ -24,10 +25,7 @@
 
     <dependencies>
 
-        <dependency org="zutubi" name="pulse-core" rev="latest.integration" conf="external->external"/>
-        <dependency org="zutubi" name="pulse-core" rev="latest.integration" conf="release->release"/>
-        <dependency org="zutubi" name="pulse-core" rev="latest.integration" conf="build->build"/>
-        <dependency org="zutubi" name="pulse-core" rev="latest.integration" conf="bundles->bundles"/>
+        <dependency org="zutubi" name="pulse-core" rev="latest.integration" conf="*->@"/>
 
         <dependency org="apache" name="commons-collections" rev="3.1" conf="external,build,release->default"/>
         <dependency org="apache" name="commons-cli" rev="1.0" conf="external,build,release->default"/>
