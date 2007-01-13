@@ -1,0 +1,295 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns:ivy="antlib:fr.jayasoft.ivy.ant" name="command bundle">
+
+    <import file="../macros.xml"/>
+
+    <!-- initialise configuration -->
+    <target name="init" depends="module-pre-init, common-init, module-post-init"/>
+
+    <target name="module-pre-init"/>
+
+    <target name="module-post-init"/>
+
+    <target name="common-init">
+
+        <!-- load the modules properties first to allow them to override the default root level properties. -->
+        <property file="build.properties"/>
+        <property file="${project.root.dir}/build.properties"/>
+
+        <echo message="----------------------------------------------"/>
+        <echo message="    Component: init ${module}                 "/>
+        <echo message="----------------------------------------------"/>
+
+        <!-- behavioural properties -->
+        <property name="javac.debug" value="true"/>
+        <property name="javac.deprecation" value="off"/>
+
+        <dirname property="current.dir" file="ivy.xml"/>
+
+        <!-- INTERNAL: project structural properties -->
+        <property name="build.dir" value="${current.dir}/build"/>
+        <property name="build.lib.dir" value="${build.dir}/lib"/>
+        <property name="classes.dir" value="${build.dir}/classes"/>
+        <property name="test.classes.dir" value="${build.dir}/test.classes"/>
+        <property name="report.dir" value="${build.dir}/report"/>
+
+        <property name="project.repository" value="${project.root.dir}/build/repository"/>
+
+        <!-- Define custom ant tasks -->
+
+        <path id="custom.task.path">
+            <fileset dir="${project.root.dir}/etc">
+                <include name="**/*.jar"/>
+            </fileset>
+        </path>
+        <taskdef name="copyright" classname="com.zutubi.pulse.CopyrightTask" classpathref="custom.task.path"/>
+        <taskdef resource="net/sf/antcontrib/antlib.xml" classpathref="custom.task.path"/>
+
+        <!-- Define lib path -->
+        <path id="lib.path">
+            <fileset id="module.libs" dir="${build.lib.dir}">
+                <include name="**/*.jar"/>
+            </fileset>
+        </path>
+
+        <!-- Define source paths -->
+        <path id="src.paths">
+            <pathelement path="src/java"/>
+        </path>
+
+        <path id="src.resources">
+            <fileset dir="src/java">
+                <exclude name="**/*.java"/>
+            </fileset>
+        </path>
+
+        <path id="src.export.selection">
+            <fileset dir="src/java">
+                <include name="**/*"/>
+            </fileset>
+        </path>
+
+        <!-- Define test paths -->
+        <path id="test.paths">
+            <pathelement path="src/test"/>
+        </path>
+
+        <path id="test.resources">
+            <fileset dir="src/test">
+                <exclude name="**/*.java"/>
+            </fileset>
+        </path>
+
+        <path id="test.export.selection">
+            <fileset dir="src/test">
+                <include name="**/*"/>
+            </fileset>
+        </path>
+
+        <path id="test.run.selection">
+            <fileset dir="src/test">
+                <include name="**/*Test.java"/>
+            </fileset>
+        </path>
+
+        <!-- ivy configuration -->
+        <property file="${project.root.dir}/ivy.properties"/>
+        <ivy:configure file="${project.root.dir}/ivyconf.xml"/>
+
+    </target>
+
+    <target name="clean" depends="init, module-pre-clean, common-clean, module-post-clean"/>
+
+    <target name="module-pre-clean"/>
+
+    <target name="module-post-clean"/>
+
+    <target name="common-clean">
+
+        <echo message="----------------------------------------------"/>
+        <echo message="    Component: clean ${module}                "/>
+        <echo message="----------------------------------------------"/>
+
+        <delete dir="${build.dir}"/>
+
+    </target>
+
+    <!-- prepare for new build -->
+    <target name="prepare" depends="init, module-pre-prepare, common-prepare, module-post-prepare"/>
+
+    <target name="module-pre-prepare"/>
+
+    <target name="module-post-prepare"/>
+
+    <target name="common-prepare">
+
+        <echo message="----------------------------------------------"/>
+        <echo message="    Component: prepare ${module}              "/>
+        <echo message="----------------------------------------------"/>
+
+        <mkdir dir="${classes.dir}"/>
+        <mkdir dir="${build.lib.dir}"/>
+        <mkdir dir="${test.classes.dir}"/>
+        <mkdir dir="${report.dir}/junit/xml"/>
+        <mkdir dir="${report.dir}/junit/html"/>
+
+        <!-- build the dependencies. -->
+        <foreach target="prepare-dependencies" param="module.name" list="${dependencies}">
+            <param name="project.root.dir" value="${project.root.dir}"/>
+        </foreach>
+
+        <!-- resolve the dependencies, into the build/lib directory. -->
+        <retrieve-dependencies dest="${build.lib.dir}" conf="default"/>
+
+    </target>
+
+    <target name="prepare-dependencies" unless="skip.dependencies">
+        <ant inheritAll="false" dir="${project.root.dir}/${module.name}" antfile="build.xml" target="build.module">
+            <property name="skip.tests" value="true"/>
+        </ant>
+    </target>
+
+    <!-- prepare for new build -->
+    <target name="build" depends="init, module-pre-build, common-build, module-post-build"/>
+
+    <target name="module-pre-build"/>
+
+    <target name="module-post-build"/>
+
+    <target name="common-build">
+
+        <echo message="----------------------------------------------"/>
+        <echo message="    Component: build ${module}                "/>
+        <echo message="----------------------------------------------"/>
+
+        <javac destdir="${classes.dir}" debug="${javac.debug}" deprecation="${javac.deprecation}">
+            <classpath refid="lib.path"/>
+            <src refid="src.paths"/>
+        </javac>
+
+        <copy todir="${classes.dir}" overwrite="true">
+            <path refid="src.resources"/>
+        </copy>
+
+        <javac destdir="${test.classes.dir}" debug="${javac.debug}" deprecation="${javac.deprecation}">
+            <classpath refid="lib.path"/>
+            <classpath location="${classes.dir}"/>
+            <src refid="test.paths"/>
+        </javac>
+
+        <copy todir="${test.classes.dir}" overwrite="true">
+            <path refid="test.resources"/>
+        </copy>
+
+    </target>
+
+    <!-- prepare for new build -->
+    <target name="test" depends="init, module-pre-test, common-test, module-post-test"/>
+
+    <target name="module-pre-test"/>
+
+    <target name="module-post-test"/>
+
+    <target name="common-test" unless="skip.tests">
+
+        <echo message="----------------------------------------------"/>
+        <echo message="    Component: testing ${module}              "/>
+        <echo message="----------------------------------------------"/>
+
+        <junit printsummary="yes" fork="on" failureProperty="test.failed" errorProperty="test.failed">
+            <sysproperty key="pulse.root" value="${project.root.dir}"/>
+            <classpath>
+                <pathelement location="${classes.dir}"/>
+                <pathelement location="${test.classes.dir}"/>
+                <path refid="lib.path"/>
+            </classpath>
+            <formatter type="xml"/>
+            <batchtest todir="${report.dir}/junit/xml">
+                <path refid="test.run.selection"/>
+            </batchtest>
+        </junit>
+        <!-- generate the junit html report. -->
+        <junitreport todir="${report.dir}/junit">
+            <fileset dir="${report.dir}/junit/xml">
+                <include name="*.xml"/>
+            </fileset>
+            <report format="frames" todir="${report.dir}/junit/html"/>
+        </junitreport>
+
+        <!--<fail if="test.failed" message="One or more tests failed.  See the reports (${report.dir}) for details."/>-->
+
+    </target>
+
+    <!-- package artifacts -->
+    <target name="package" depends="init, module-pre-package, common-package, module-post-package"/>
+
+    <target name="module-pre-package"/>
+
+    <target name="module-post-package"/>
+
+    <target name="common-package">
+
+        <echo message="----------------------------------------------"/>
+        <echo message="    Component: package ${module}              "/>
+        <echo message="----------------------------------------------"/>
+
+        <jar file="build/${module}.jar" manifest="resources/META-INF/MANIFEST.MF">
+            <fileset dir="${classes.dir}"/>
+            <fileset dir="resources" excludes="resources/META-INF/MANIFEST.MF"/>
+            <path refid="src.export.selection"/>
+        </jar>
+
+        <jar file="build/${module}-test.jar">
+            <fileset dir="${test.classes.dir}"/>
+            <path refid="test.export.selection"/>
+        </jar>
+
+        <package-src name="${module}-src.jar" pathref="src.export.selection"/>
+        <package-src name="${module}-test-src.jar" pathref="test.export.selection"/>
+
+    </target>
+
+    <!-- publish the artifacts to the defined repository. -->
+    <target name="publish" depends="init, module-pre-publish, common-publish, module-post-publish"/>
+
+    <target name="module-pre-publish"/>
+
+    <target name="module-post-publish"/>
+
+    <target name="common-publish">
+        <dirname property="current.dir" file="ivy.xml"/>
+        <!-- copy built artifacts to the build/repository -->
+        <ivy:publish resolver="build" artifactspattern="${current.dir}/build/[artifact].[ext]"/>
+    </target>
+
+    <!-- refresh this modules dependencies lib. -->
+    <target name="refresh.lib">
+        <!-- resolve the dependencies into the lib directory. -->
+        <retrieve-dependencies dest="lib"/>
+    </target>
+
+    <macrodef name="package-src">
+        <attribute name="pathref"/>
+        <attribute name="name"/>
+        <sequential>
+            <delete dir="build/tmp"/>
+            <mkdir dir="build/tmp"/>
+
+            <copy todir="build/tmp" overwrite="true">
+                <path refid="@{pathref}"/>
+            </copy>
+
+            <copyright src="build/tmp" value="${copyright.statement}">
+                <include name="**/*.java"/>
+            </copyright>
+
+            <jar file="build/@{name}">
+                <fileset dir="build/tmp"/>
+            </jar>
+        </sequential>
+    </macrodef>
+
+    <!-- build this module. -->
+    <target name="build.module" depends="clean, prepare, build, test, package, publish"/>
+
+</project>

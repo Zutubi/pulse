@@ -1,0 +1,4 @@
+lib/
+lib/.*\.xml
+lib/.*\.jar
+system/plugins/internal/org\.eclipse\..*\.jar

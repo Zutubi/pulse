@@ -4,15 +4,28 @@
 <!-- -->
 <project name="Pulse" basedir="." xmlns:ivy="antlib:fr.jayasoft.ivy.ant">
 
+    <!-- Import general purpose macros. -->
+    <import file="macros.xml"/>
+
     <property file="build.properties"/>
 
     <condition property="on.windows">
         <os family="windows"/>
     </condition>
 
+    <target name="init">
+
+        <dirname property="project.root.dir" file="./build.xml"/>
+        <property name="project.repository" value="${project.root.dir}/build/repository"/>
+
+    </target>
+
     <target name="clean" depends="clean.all"/>
 
-    <target name="clean.all" depends="clean.modules">
+    <target name="clean.all">
+        <!-- trigger a clean for each module. -->
+        <foreach target="clean"/>
+
         <delete dir="build"/>
     </target>
 
@@ -42,27 +55,8 @@
         <delete dir="${user.home}/.pulse"/>        
     </target>
 
-    <target name="build.core">
-        <ant inheritAll="false" dir="core" antfile="build.xml" target="build.module"/>
-    </target>
-
-    <target name="build.server-core" depends="build.core">
-        <ant inheritAll="false" dir="server-core" antfile="build.xml" target="build.module"/>
-    </target>
-
-    <target name="build.local" depends="build.core">
-        <ant inheritAll="false" dir="local" antfile="build.xml" target="build.module"/>
-    </target>
-
-    <target name="build.master" depends="build.server-core">
-        <ant inheritAll="false" dir="master" antfile="build.xml" target="build.module"/>
-    </target>
-
-    <target name="build.slave" depends="build.server-core">
-        <ant inheritAll="false" dir="slave" antfile="build.xml" target="build.module"/>
-    </target>
-
-    <target name="build.all" depends="build.modules">
+    <target name="build.all">
+        <foreach target="build.module"/>
 
         <!-- Generate one mega report -->
         <property name="report.dir" value="build/reports/junit"/>
@@ -75,31 +69,65 @@
         </junitreport>
     </target>
 
-    <target name="package.local" depends="init, clean, build.local">
+    <!--
+     Leave the following build targets separate so that we can use ants dependency mapping to ensure that
+     targets are only built once.
+    -->
+    
+    <target name="build.core" depends="init">
+        <ant inheritAll="false" dir="core" antfile="build.xml" target="build.module"/>
+    </target>
+
+    <target name="build.server-core" depends="init, build.core">
+        <ant inheritAll="false" dir="server-core" antfile="build.xml" target="build.module"/>
+    </target>
+
+    <target name="build.bundles" depends="init, build.core">
+        <ant inheritAll="false" dir="bundles" antfile="build.xml"/>
+    </target>
+
+    <target name="build.local" depends="init, build.core">
+        <ant inheritAll="false" dir="local" antfile="build.xml" target="build.module"/>
+    </target>
+
+    <target name="build.master" depends="init, build.core, build.server-core">
+        <ant inheritAll="false" dir="master" antfile="build.xml" target="build.module"/>
+    </target>
+
+    <target name="build.slave" depends="init, build.core, build.server-core">
+        <ant inheritAll="false" dir="slave" antfile="build.xml" target="build.module"/>
+    </target>
+
+    <target name="package.local" depends="init, build.local, build.bundles">
 
         <property name="package.name.local" value="pulse-dev-${pulse.version}"/>
         <property name="package.root.local" value="build/package/${package.name.local}"/>
         <property name="version.root.local" value="${package.root.local}/versions/${pulse.build}"/>
 
-        <!-- preparation work... -->
+        <delete dir="${package.root.local}"/>
         <mkdir dir="${package.root.local}"/>
 
-        <copy file="${project.root.dir}/etc/active-version.txt" todir="${package.root.local}"/>
+        <copy file="etc/active-version.txt" todir="${package.root.local}"/>
         <replace file="${package.root.local}/active-version.txt">
             <replacefilter token="__BUILD_NUMBER__" value="${pulse.build}"/>
         </replace>
 
         <copy todir="${package.root.local}/bin">
-            <fileset dir="${project.root.dir}/core/src/bin" includes="**/*"/>
-            <fileset dir="${project.root.dir}/local/src/bin" includes="**/*"/>
+            <fileset dir="core/src/bin" includes="**/*"/>
+            <fileset dir="local/src/bin" includes="**/*"/>
         </copy>
 
         <fixcrlf srcdir="${package.root.local}/bin" eol="lf" eof="remove" includes="**/*.sh"/>
         <chmod perm="755" dir="${package.root.local}/bin" includes="**/*.sh"/>
 
-        <retrieve.dependencies module="." conf="local" dest="${version.root.local}/lib"/>
+        <retrieve-dependencies ivyfile="ivy.xml" conf="local" dest="${version.root.local}/lib"/>        
+        <retrieve-dependencies ivyfile="ivy.xml" conf="local-bundles" dest="${version.root.local}/system/plugins/internal"/>
+        <retrieve-dependencies ivyfile="ivy.xml" conf="prepackaged-bundles" dest="${version.root.local}/system/plugins/prepackaged"/>        
 
-        <!-- handle the boot jar specially -->
+        <copy todir="${version.root.local}/system/plugins/config">
+            <fileset dir="master/etc/osgi" includes="config.ini"/>
+        </copy>
+
         <move tofile="${package.root.local}/lib/boot.jar">
             <fileset dir="${version.root.local}/lib" includes="boot-*.jar"/>
         </move>
@@ -113,11 +141,6 @@
             <fileset dir="local/etc" includes="*.commands.properties"/>
             <fileset dir="local/etc" includes="classpath.txt"/>
         </copy>
-
-        <!-- place holder for package documentation -->
-        <!--<copy todir="${version.root.local}/docs">-->
-            <!--<fileset dir="etc" includes="delete-me.txt"/>-->
-        <!--</copy>-->
 
         <exec executable="zip" dir="${package.root.local}/..">
             <arg line="-r ../${package.name.local}.zip ${package.name.local}"/>
@@ -154,7 +177,8 @@
         </exec>
     </target>
 
-    <target name="package.slave" depends="init, clean, build.local, build.slave">
+    <target name="package.slave" depends="init, build.slave, build.bundles">
+        
         <property name="package.name.slave" value="pulse-agent-${pulse.version}"/>
         <property name="package.root.slave" value="build/package/${package.name.slave}"/>
         <property name="version.root.slave" value="${package.root.slave}/versions/${pulse.build}"/>
@@ -162,7 +186,7 @@
         <delete dir="${package.root.slave}"/>
         <mkdir dir="${package.root.slave}"/>
 
-        <copy file="${project.root.dir}/etc/active-version.txt" todir="${package.root.slave}"/>
+        <copy file="etc/active-version.txt" todir="${package.root.slave}"/>
         <replace file="${package.root.slave}/active-version.txt">
             <replacefilter token="__BUILD_NUMBER__" value="${pulse.build}"/>
         </replace>
@@ -180,25 +204,24 @@
         <fixcrlf srcdir="${package.root.slave}/bin" eol="lf" eof="remove" includes="**/*.sh"/>
         <chmod perm="755" dir="${package.root.slave}/bin" includes="**/*.sh" verbose="true"/>
 
-        <retrieve.dependencies module="." conf="local" dest="${version.root.slave}/lib"/>
-        <retrieve.dependencies module="." conf="slave" dest="${version.root.slave}/lib"/>
+        <retrieve-dependencies ivyfile="ivy.xml" conf="local" dest="${version.root.slave}/lib"/>
+        <retrieve-dependencies ivyfile="ivy.xml" conf="slave" dest="${version.root.slave}/lib"/>
+        <retrieve-dependencies ivyfile="ivy.xml" conf="slave-bundles" dest="${version.root.slave}/system/plugins/internal"/>
+        <retrieve-dependencies ivyfile="ivy.xml" conf="prepackaged-bundles" dest="${version.root.slave}/system/plugins/prepackaged"/>
+
+        <copy todir="${version.root.slave}/system/plugins/config">
+            <fileset dir="master/etc/osgi" includes="config.ini"/>
+        </copy>
+
 
         <move tofile="${package.root.slave}/lib/boot.jar">
             <fileset dir="${version.root.slave}/lib" includes="boot-*.jar"/>
         </move>
 
-        <!-- place holder for package documentation -->
-<!--
-        <copy todir="${version.root.slave}/docs">
-            <fileset dir="etc" includes="delete-me.txt"/>
-        </copy>
--->
-        <!-- place holder for the log directory -->
         <copy todir="${package.root.slave}/logs">
             <fileset dir="etc" includes="delete-me.txt"/>
         </copy>
 
-        <!-- copy the readme file. -->
         <replace dir="${package.root.slave}" token="@VERSION@" value="${pulse.version}">
             <include name="README.txt"/>
         </replace>
@@ -268,8 +291,8 @@
         </exec>
     </target>
 
-    <target name="package.master" depends="init, clean, package.local, package.slave, build.master">
-
+    <target name="package.master" depends="init, package.local, package.slave, build.master">
+        
         <property name="package.name.master" value="pulse-${pulse.version}"/>
         <property name="package.root.master" value="build/package/${package.name.master}"/>
         <property name="version.root.master" value="${package.root.master}/versions/${pulse.build}"/>
@@ -277,7 +300,7 @@
         <delete dir="${package.root.master}"/>
         <mkdir dir="${package.root.master}"/>
 
-        <copy file="${project.root.dir}/etc/active-version.txt" todir="${package.root.master}"/>
+        <copy file="etc/active-version.txt" todir="${package.root.master}"/>
         <replace file="${package.root.master}/active-version.txt">
             <replacefilter token="__BUILD_NUMBER__" value="${pulse.build}"/>
         </replace>
@@ -296,23 +319,22 @@
         <fixcrlf srcdir="${package.root.master}/bin" eol="lf" eof="remove" includes="**/*.sh"/>
         <chmod perm="755" dir="${package.root.master}/bin" includes="**/*.sh" verbose="true"/>
 
-        <retrieve.dependencies module="." conf="local" dest="${version.root.master}/lib"/>
-        <retrieve.dependencies module="." conf="master" dest="${version.root.master}/lib"/>
+        <retrieve-dependencies ivyfile="ivy.xml" conf="local" dest="${version.root.master}/lib"/>
+        <retrieve-dependencies ivyfile="ivy.xml" conf="master" dest="${version.root.master}/lib"/>
+        <retrieve-dependencies ivyfile="ivy.xml" conf="master-bundles" dest="${version.root.master}/system/plugins/internal"/>
+        <retrieve-dependencies ivyfile="ivy.xml" conf="prepackaged-bundles" dest="${version.root.master}/system/plugins/prepackaged"/>
+
+        <copy todir="${version.root.master}/system/plugins/config">
+            <fileset dir="master/etc/osgi" includes="config.ini"/>
+        </copy>
 
         <move tofile="${package.root.master}/lib/boot.jar">
             <fileset dir="${version.root.master}/lib" includes="boot-*.jar"/>
         </move>
 
-        <!-- place holder for package documentation -->
-<!--
-        <copy todir="${version.root.master}/docs">
-            <fileset dir="etc" includes="delete-me.txt"/>
-        </copy>
--->
         <copy todir="${version.root.master}/system/templates">
             <fileset dir="master/src/templates" includes="**/*.vm **/*.ftl **/*.properties"/>
         </copy>
-        <!-- place holder for the log directory -->
         <copy todir="${package.root.master}/logs">
             <fileset dir="etc" includes="delete-me.txt"/>
         </copy>
@@ -498,36 +520,19 @@
         <!-- use the default ivy configuration properties. -->
         <property file="ivy.properties"/>
         <ivy:configure/>
+        
         <!-- retrieve all of the modules external dependencies -->
-        <retrieve.dependencies module="core" dest="lib" conf="external"/>
-        <retrieve.dependencies module="server-core" dest="lib" conf="external"/>
-        <retrieve.dependencies module="local" dest="lib" conf="external"/>
-        <retrieve.dependencies module="master" dest="lib" conf="external"/>
-        <retrieve.dependencies module="slave" dest="lib" conf="external"/>
-
-        <retrieve.dependencies module="core" dest="plugins/internal" conf="bundles"/>
+        <retrieve-dependencies ivyfile="core/ivy.xml" dest="lib" conf="external"/>
+        <retrieve-dependencies ivyfile="server-core/ivy.xml" dest="lib" conf="external"/>
+        <retrieve-dependencies ivyfile="local/ivy.xml" dest="lib" conf="external"/>
+        <retrieve-dependencies ivyfile="master/ivy.xml" dest="lib" conf="external"/>
+        <retrieve-dependencies ivyfile="slave/ivy.xml" dest="lib" conf="external"/>
+        <retrieve-dependencies ivyfile="core/ivy.xml" dest="plugins/internal" conf="bundles"/>
     </target>
-
-    <!--
-     Retrieve the dependencies for the specified module, and place them into the
-     destination directory.
-    -->
-    <macrodef name="retrieve.dependencies">
-        <attribute name="module"/>
-        <attribute name="conf" default="external"/>
-        <attribute name="dest" default="lib"/>
-        <sequential>
-            <!-- resolve the modules ivy file. -->
-            <ivy:resolve file="@{module}/ivy.xml" conf="@{conf}"/>
-            <ivy:deliver deliverpattern="${project.repository}/[module]/ivy-[revision].xml"/>
-            <ivy:retrieve pattern="@{dest}/[artifact]-[revision].[ext]" validate="true" conf="@{conf}"/>
-        </sequential>
-    </macrodef>
 
     <!--
      Execute the specified target on each of the modules.
     -->
-<!--
     <macrodef name="foreach">
         <attribute name="target"/>
         <sequential>
@@ -538,57 +543,4 @@
             <ant inheritAll="false" dir="slave" antfile="build.xml" target="@{target}"/>
         </sequential>
     </macrodef>
--->
-
-    <target name="init">
-
-        <property name="project.root.dir" value="."/>
-        <property name="project.repository" value="${project.root.dir}/build/repository"/>
-
-        <path id="custom.task.path">
-            <fileset dir="etc">
-                <include name="**/*.jar"/>
-            </fileset>
-        </path>
-        <taskdef resource="net/sf/antcontrib/antlib.xml" classpathref="custom.task.path"/>
-    </target>
-
-    <target name="clean.modules" depends="init">
-        <foreachbundle target="clean"/>
-    </target>
-
-    <target name="_clean" depends="clean.modules">
-        <delete dir="build"/>
-        <ant inheritAll="false" dir="package-local" antfile="build.xml" target="clean"/>
-        <ant inheritAll="false" dir="package-master" antfile="build.xml" target="clean"/>
-        <ant inheritAll="false" dir="package-slave" antfile="build.xml" target="clean"/>
-    </target>
-
-    <target name="build.modules" depends="init">
-        <foreachbundle target="build.module"/>
-    </target>
-
-    <macrodef name="foreachbundle">
-        <attribute name="target"/>
-        <sequential>
-            <foreach target="delegate-to-bundle-script" param="module.base" list="${pulse.bundles.other}" trim="true">
-                <param name="target" value="@{target}"/>
-            </foreach>
-            <foreach target="delegate-to-bundle-script" param="module.base" list="${pulse.bundles.internal}" trim="true">
-                <param name="target" value="@{target}"/>
-            </foreach>
-            <foreach target="delegate-to-bundle-script" param="module.base" list="${pulse.bundles.pre-packaged}" trim="true">
-                <param name="target" value="@{target}"/>
-            </foreach>
-        </sequential>
-    </macrodef>
-
-    <target name="delegate-to-bundle-script">
-
-        <ant inheritAll="false" dir="${module.base}" antfile="build.xml" target="${target}">
-            <property name="skip.dependencies" value="true"/>
-        </ant>
-
-    </target>
-
 </project>

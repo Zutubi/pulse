@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project name="bundle" basedir=".">
+<project name="bundle" basedir="." default="build.bundles">
+
+    <property file="build.properties"/>
+    <property name="project.root.dir" value="../"/>
 
     <target name="init">
-
-        <property file="build.properties"/>
-        <property name="project.root.dir" value="../"/>
 
         <path id="custom.task.path">
             <fileset dir="${project.root.dir}/etc">
@@ -40,5 +40,6 @@
 
     </target>
 
+    <target name="build.bundles" depends="clean, build"/>
 
 </project>

@@ -1,5 +1,0 @@
-lib/
-lib/.*\.xml
-lib/.*\.jar
-system/www/WEB-INF/classes/
-system/plugins/internal/org\.eclipse\..*\.jar

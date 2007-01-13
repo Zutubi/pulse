@@ -4,24 +4,8 @@
     <import file="../common-build.xml" />
 
     <target name="module-pre-init">
-
-        <dirname property="project.root.dir" file="../common-build.xml"/>
-        
-    </target>
-
-    <target name="module-post-init">
-
-        <path id="test.run.selection">
-            <fileset dir="src/test">
-                <include name="**/*Test.java"/>
-                <exclude name="**/LocalBuildTest.java"/> <!-- this needs to be moved to the acceptance test suite. -->
-            </fileset>
-        </path>
-
-        <path id="test.export.selection">
-            <path refid="test.run.selection"/>
-        </path>
-
+        <property name="module" value="local"/>
+        <dirname property="project.root.dir" file="../build.xml"/>
     </target>
 
 </project>

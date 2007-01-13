@@ -18,6 +18,9 @@
         <conf name="local-bundles" description="Bundles for the local package"/>
         <conf name="master-bundles" description="Bundles for the master package"/>
         <conf name="slave-bundles" description="Bundles for the slave package"/>
+
+        <conf name="prepackaged-bundles"/>
+
     </configurations>
 
     <dependencies>
@@ -27,6 +30,14 @@
         <dependency org="zutubi" name="pulse-local" rev="latest.integration" conf="local-bundles->bundles"/>
         <dependency org="zutubi" name="pulse-master" rev="latest.integration" conf="master-bundles->bundles"/>
         <dependency org="zutubi" name="pulse-slave" rev="latest.integration" conf="slave-bundles->bundles"/>
+
+        <dependency org="zutubi" name="core-bundle" rev="latest.integration" conf="local-bundles, master-bundles, slave-bundles->bundle"/>
+        <dependency org="zutubi" name="command-ant" rev="latest.integration" conf="prepackaged-bundles->bundle"/>
+        <dependency org="zutubi" name="command-make" rev="latest.integration" conf="prepackaged-bundles->bundle"/>
+        <dependency org="zutubi" name="command-maven" rev="latest.integration" conf="prepackaged-bundles->bundle"/>
+        <dependency org="zutubi" name="command-maven2" rev="latest.integration" conf="prepackaged-bundles->bundle"/>
+        <dependency org="zutubi" name="command-xcode" rev="latest.integration" conf="prepackaged-bundles->bundle"/>
+
     </dependencies>
 
 </ivy-module>
