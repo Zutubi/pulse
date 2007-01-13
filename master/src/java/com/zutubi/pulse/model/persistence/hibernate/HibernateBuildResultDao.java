@@ -376,7 +376,7 @@ public class HibernateBuildResultDao extends HibernateEntityDao<BuildResult> imp
 
                 if (states != null)
                 {
-                    criteria.add(Expression.in("stateNames", getStateNames(states)));
+                    criteria.add(Expression.in("stateName", getStateNames(states)));
                 }
 
                 if(max > 0)
