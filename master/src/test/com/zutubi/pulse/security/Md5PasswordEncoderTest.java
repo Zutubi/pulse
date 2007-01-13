@@ -42,4 +42,10 @@ public class Md5PasswordEncoderTest extends PulseTestCase
         String encodedPassword = encoder.encodePassword(password, null);
         assertTrue(encoder.isPasswordValid(encodedPassword, password, null));
     }
+
+    public void testEncode()
+    {
+        String encoded = encoder.encodePassword("admin", null);
+        System.out.println(encoded);
+    }
 }

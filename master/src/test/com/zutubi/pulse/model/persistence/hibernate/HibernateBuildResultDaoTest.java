@@ -230,41 +230,18 @@ public class HibernateBuildResultDaoTest extends MasterPersistenceTestCase
 
         commitAndRefreshTransaction();
 
-        List<BuildResult> oldest = buildResultDao.findOldestByProject(p1, 1, false);
+        List<BuildResult> oldest = buildResultDao.findOldestByProject(p1, null, 1, false);
         assertEquals(1, oldest.size());
         assertPropertyEquals(r1, oldest.get(0));
 
-        oldest = buildResultDao.findOldestByProject(p1, 3, false);
+        oldest = buildResultDao.findOldestByProject(p1, null, 3, false);
         assertEquals(3, oldest.size());
         assertPropertyEquals(r1, oldest.get(0));
         assertPropertyEquals(r2, oldest.get(1));
         assertPropertyEquals(r3, oldest.get(2));
 
-        oldest = buildResultDao.findOldestByProject(p1, 100, false);
+        oldest = buildResultDao.findOldestByProject(p1, null, 100, false);
         assertEquals(4, oldest.size());
-    }
-
-    public void testGetOldestBuildsPaged()
-    {
-        Project p1 = new Project();
-        projectDao.save(p1);
-
-        BuildResult r1 = createCompletedBuild(p1, 1);
-        BuildResult r2 = createCompletedBuild(p1, 2);
-        BuildResult r3 = createCompletedBuild(p1, 3);
-        BuildResult r4 = createCompletedBuild(p1, 4);
-
-        buildResultDao.save(r1);
-        buildResultDao.save(r2);
-        buildResultDao.save(r3);
-        buildResultDao.save(r4);
-
-        commitAndRefreshTransaction();
-
-        List<BuildResult> oldest = buildResultDao.findOldestByProject(p1, 1, 2, false);
-        assertEquals(2, oldest.size());
-        assertPropertyEquals(r2, oldest.get(0));
-        assertPropertyEquals(r3, oldest.get(1));
     }
 
     public void testGetOldestBuildsInitial()
@@ -277,7 +254,7 @@ public class HibernateBuildResultDaoTest extends MasterPersistenceTestCase
 
         commitAndRefreshTransaction();
 
-        List<BuildResult> oldest = buildResultDao.findOldestByProject(p1, 1, false);
+        List<BuildResult> oldest = buildResultDao.findOldestByProject(p1, ResultState.getCompletedStates(), 1, false);
         assertEquals(0, oldest.size());
     }
 
@@ -292,7 +269,7 @@ public class HibernateBuildResultDaoTest extends MasterPersistenceTestCase
 
         commitAndRefreshTransaction();
 
-        List<BuildResult> oldest = buildResultDao.findOldestByProject(p1, 1, false);
+        List<BuildResult> oldest = buildResultDao.findOldestByProject(p1, ResultState.getCompletedStates(), 1, false);
         assertEquals(0, oldest.size());
     }
 
@@ -314,7 +291,7 @@ public class HibernateBuildResultDaoTest extends MasterPersistenceTestCase
 
         commitAndRefreshTransaction();
 
-        List<BuildResult> oldest = buildResultDao.findOldestByProject(p1, 3, false);
+        List<BuildResult> oldest = buildResultDao.findOldestByProject(p1, null, 3, false);
         assertEquals(2, oldest.size());
         assertPropertyEquals(r1, oldest.get(0));
         assertPropertyEquals(r2, oldest.get(1));
@@ -338,7 +315,7 @@ public class HibernateBuildResultDaoTest extends MasterPersistenceTestCase
 
         commitAndRefreshTransaction();
 
-        List<BuildResult> oldest = buildResultDao.findOldestByProject(p1, 3, true);
+        List<BuildResult> oldest = buildResultDao.findOldestByProject(p1, null, 3, true);
         assertEquals(3, oldest.size());
         assertPropertyEquals(r1, oldest.get(0));
         assertPropertyEquals(r2, oldest.get(1));
@@ -606,11 +583,11 @@ public class HibernateBuildResultDaoTest extends MasterPersistenceTestCase
 
         commitAndRefreshTransaction();
 
-        List<BuildResult> results = buildResultDao.getLatestByUser(u1, 1);
+        List<BuildResult> results = buildResultDao.getLatestByUser(u1, null, 1);
         assertEquals(1, results.size());
         assertEquals(u1, results.get(0).getUser());
 
-        results = buildResultDao.getLatestByUser(u2, 1);
+        results = buildResultDao.getLatestByUser(u2, null, 1);
         assertEquals(1, results.size());
         assertEquals(u2, results.get(0).getUser());
         assertEquals(2, results.get(0).getNumber());

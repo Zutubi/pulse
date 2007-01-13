@@ -164,16 +164,6 @@ public class DefaultBuildManager implements BuildManager, EventListener
         return buildResultDao.findLatestCompleted(project, spec, first, max);        
     }
 
-    public List<BuildResult> getOldestBuildsForProject(Project project, int max)
-    {
-        return buildResultDao.findOldestByProject(project, max, false);
-    }
-
-    public List<BuildResult> getOldestBuildsForProject(Project project, int first, int max)
-    {
-        return buildResultDao.findOldestByProject(project, first, max, false);
-    }
-
     public BuildResult getByProjectAndNumber(final Project project, final long number)
     {
         return buildResultDao.findByProjectAndNumber(project, number);
@@ -206,7 +196,7 @@ public class DefaultBuildManager implements BuildManager, EventListener
 
     public BuildResult getLatestBuildResult(User user)
     {
-        List<BuildResult> results = buildResultDao.getLatestByUser(user, 1);
+        List<BuildResult> results = buildResultDao.getLatestByUser(user, null, 1);
         if(results.size() > 0)
         {
             return results.get(0);
@@ -305,7 +295,7 @@ public class DefaultBuildManager implements BuildManager, EventListener
 
         do
         {
-            results = buildResultDao.findOldestByProject(project, 100, true);
+            results = buildResultDao.findOldestByProject(project, null, 100, true);
             for (BuildResult r : results)
             {
                 cleanupResult(r);
@@ -342,16 +332,19 @@ public class DefaultBuildManager implements BuildManager, EventListener
 
     public void abortUnfinishedBuilds(Project project, String message)
     {
-        BuildResult lastBuild = getLatestBuildResult(project);
-        abortBuild(lastBuild, message);
+        List<BuildResult> incompleteBuilds = queryBuilds(new Project[]{ project}, ResultState.getIncompleteStates(), null, -1, -1, null, -1, -1, true);
+        for(BuildResult r: incompleteBuilds)
+        {
+            abortBuild(r, message);
+        }
     }
 
     public void abortUnfinishedBuilds(User user, String message)
     {
-        List<BuildResult> results = buildResultDao.getLatestByUser(user, 1);
-        if(results.size() > 0)
+        List<BuildResult> incompleteBuilds = buildResultDao.getLatestByUser(user, ResultState.getIncompleteStates(), -1);
+        for(BuildResult r: incompleteBuilds)
         {
-            abortBuild(results.get(0), message);
+            abortBuild(r, message);
         }
     }
 
