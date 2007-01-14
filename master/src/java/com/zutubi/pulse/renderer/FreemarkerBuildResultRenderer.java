@@ -8,7 +8,6 @@ import com.zutubi.pulse.committransformers.CommitMessageTransformerManager;
 import com.zutubi.pulse.util.FileSystemUtils;
 import com.zutubi.pulse.util.StringUtils;
 import com.zutubi.pulse.util.logging.Logger;
-import com.zutubi.pulse.web.project.CommitMessageHelper;
 import com.zutubi.pulse.web.project.CommitMessageSupport;
 import freemarker.template.Configuration;
 import freemarker.template.Template;
