@@ -18,18 +18,44 @@
         <dirname property="project.root.dir" file="./build.xml"/>
         <property name="project.repository" value="${project.root.dir}/build/repository"/>
 
+        <path id="custom.task.path">
+            <fileset dir="${project.root.dir}/etc">
+                <include name="**/*.jar"/>
+            </fileset>
+        </path>
+        <taskdef name="copyright" classname="com.zutubi.pulse.CopyrightTask" classpathref="custom.task.path"/>
+        <taskdef resource="net/sf/antcontrib/antlib.xml" classpathref="custom.task.path"/>
+
     </target>
 
     <target name="clean" depends="clean.all"/>
 
-    <target name="clean.all">
-        <!-- trigger a clean for each module. -->
-        <foreach target="clean"/>
+    <target name="clean.all" depends="init">
+
+        <for-all target="clean"/>
 
         <delete dir="build"/>
+
     </target>
 
-    <target name="clean.dev">
+    <target name="build.all" depends="init">
+
+        <for-all target="build.module"/>
+
+        <!-- Generate one mega report -->
+        <property name="report.dir" value="build/reports/junit"/>
+        <mkdir dir="${report.dir}/html"/>
+        <junitreport todir="${report.dir}">
+            <fileset dir=".">
+                <include name="*/${report.dir}/xml/*.xml"/>
+            </fileset>
+            <report format="frames" todir="${report.dir}/html"/>
+        </junitreport>
+
+    </target>
+
+    <target name="clean.dev" description="Cleanup data created during development.">
+        
         <delete dir="data"/>
 
         <!-- clean up this annoying log file. -->
@@ -53,20 +79,6 @@
 
         <!-- clean out the user.home/.pulse/* directory -->
         <delete dir="${user.home}/.pulse"/>        
-    </target>
-
-    <target name="build.all">
-        <foreach target="build.module"/>
-
-        <!-- Generate one mega report -->
-        <property name="report.dir" value="build/reports/junit"/>
-        <mkdir dir="${report.dir}/html"/>
-        <junitreport todir="${report.dir}">
-            <fileset dir=".">
-                <include name="*/${report.dir}/xml/*.xml"/>
-            </fileset>
-            <report format="frames" todir="${report.dir}/html"/>
-        </junitreport>
     </target>
 
     <!--
@@ -421,7 +433,10 @@
         </exec>
     </target>
 
-    <target name="accept.master" depends="package.master">
+    <target name="accept.master" depends="package.master, run.accept.master"/>
+
+    <target name="run.accept.master" depends="init">
+
         <property name="build.dir" value="master/build"/>
         <property name="report.dir" value="build/reports/junit"/>
         <mkdir dir="${report.dir}/xml"/>
@@ -439,6 +454,7 @@
             <os family="unix"/>
         </condition>
 
+        <echo message="Extract and start pulse-${pulse.version}.${extension}"/>
         <exec executable="bash" spawn="true">
             <arg line="acceptance-test-prep.sh build/pulse-${pulse.version}.${extension}"/>
         </exec>
@@ -447,6 +463,7 @@
             <arg line="acceptance-test-wait.sh"/>
         </exec>
 
+        <echo message="Start acceptance test suite."/>
         <junit printsummary="yes" fork="on" forkmode="once" maxmemory="512m" failureProperty="test.failed" errorProperty="test.failed">
             <sysproperty key="pulse.port" value="8889"/>
             <sysproperty key="bootstrap" value="com/zutubi/pulse/bootstrap/bootstrapContext.xml"/>
@@ -530,17 +547,26 @@
         <retrieve-dependencies ivyfile="core/ivy.xml" dest="plugins/internal" conf="bundles"/>
     </target>
 
-    <!--
-     Execute the specified target on each of the modules.
-    -->
-    <macrodef name="foreach">
+    <macrodef name="for-all">
         <attribute name="target"/>
         <sequential>
-            <ant inheritAll="false" dir="core" antfile="build.xml" target="@{target}"/>
-            <ant inheritAll="false" dir="local" antfile="build.xml" target="@{target}"/>
-            <ant inheritAll="false" dir="server-core" antfile="build.xml" target="@{target}"/>
-            <ant inheritAll="false" dir="master" antfile="build.xml" target="@{target}"/>
-            <ant inheritAll="false" dir="slave" antfile="build.xml" target="@{target}"/>
+            <foreach target="delegate-ant-script" param="base.dir" list="${core.modules}" trim="true">
+                <param name="project.root.dir" value="${project.root.dir}"/>
+                <param name="target" value="@{target}"/>
+            </foreach>
+            <foreach target="delegate-ant-script" param="base.dir" list="${internal.bundles}" trim="true">
+                <param name="project.root.dir" value="${project.root.dir}"/>
+                <param name="target" value="@{target}"/>
+            </foreach>
+            <foreach target="delegate-ant-script" param="base.dir" list="${prepackaged.bundles}" trim="true">
+                <param name="project.root.dir" value="${project.root.dir}"/>
+                <param name="target" value="@{target}"/>
+            </foreach>
         </sequential>
     </macrodef>
+
+    <target name="delegate-ant-script">
+        <ant inheritAll="false" dir="${base.dir}" antfile="build.xml" target="${target}"/>
+    </target>
+    
 </project>

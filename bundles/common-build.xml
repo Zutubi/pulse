@@ -17,7 +17,7 @@
         <property file="${project.root.dir}/build.properties"/>
 
         <echo message="----------------------------------------------"/>
-        <echo message="    Component: init ${module}                 "/>
+        <echo message="    Component: ${module}"/>
         <echo message="----------------------------------------------"/>
 
         <!-- behavioural properties -->
@@ -106,10 +106,6 @@
 
     <target name="common-clean">
 
-        <echo message="----------------------------------------------"/>
-        <echo message="    Component: clean ${module}                "/>
-        <echo message="----------------------------------------------"/>
-
         <delete dir="${build.dir}"/>
 
     </target>
@@ -122,10 +118,6 @@
     <target name="module-post-prepare"/>
 
     <target name="common-prepare">
-
-        <echo message="----------------------------------------------"/>
-        <echo message="    Component: prepare ${module}              "/>
-        <echo message="----------------------------------------------"/>
 
         <mkdir dir="${classes.dir}"/>
         <mkdir dir="${build.lib.dir}"/>
