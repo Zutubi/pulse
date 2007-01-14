@@ -7,9 +7,11 @@ public class TestCaseResult extends TestResult
 {
     public enum Status
     {
+        // These are deliberately ordered from least to most "severe".
+        // Keep it that way! :)
+        PASS,
         FAILURE,
-        ERROR,
-        PASS
+        ERROR
     }
 
     /**
