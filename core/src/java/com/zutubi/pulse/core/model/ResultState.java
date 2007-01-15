@@ -212,4 +212,8 @@ public enum ResultState
         }
     }
 
+    public static ResultState[] getIncompleteStates()
+    {
+        return new ResultState[] { INITIAL, IN_PROGRESS, TERMINATING };
+    }
 }

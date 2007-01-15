@@ -837,7 +837,7 @@
 ##
 ##
 #macro(assignGlobalResultCssClass $result)
-    #if($result.warningFeatureCount > 0)
+    #if($result.succeeded() && $result.warningFeatureCount > 0)
         #set($cssClass = "warning")
     #else
         #set($cssClass = $result.state.string)

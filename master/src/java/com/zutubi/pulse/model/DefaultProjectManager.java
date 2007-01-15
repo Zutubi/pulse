@@ -6,6 +6,7 @@ import com.zutubi.pulse.core.BuildRevision;
 import com.zutubi.pulse.core.PulseException;
 import com.zutubi.pulse.core.PulseRuntimeException;
 import com.zutubi.pulse.core.model.Revision;
+import com.zutubi.pulse.core.model.TestCaseIndex;
 import com.zutubi.pulse.events.EventManager;
 import com.zutubi.pulse.events.build.BuildRequestEvent;
 import com.zutubi.pulse.events.build.PersonalBuildRequestEvent;
@@ -39,6 +40,7 @@ public class DefaultProjectManager implements ProjectManager
     private BuildSpecificationDao buildSpecificationDao;
     private BuildSpecificationNodeDao buildSpecificationNodeDao;
     private TriggerDao triggerDao;
+    private TestCaseIndexDao testCaseIndexDao;
     private Scheduler scheduler;
     private BuildManager buildManager;
     private SubscriptionManager subscriptionManager;
@@ -118,6 +120,18 @@ public class DefaultProjectManager implements ProjectManager
         buildManager.deleteAllBuilds(entity);
         subscriptionManager.deleteAllSubscriptions(entity);
         userManager.removeReferencesToProject(entity);
+
+        // Remove test case index
+        List<TestCaseIndex> tests;
+        do
+        {
+            tests = testCaseIndexDao.findByProject(entity.getId(), 100);
+            for(TestCaseIndex index: tests)
+            {
+                testCaseIndexDao.delete(index);
+            }
+        }
+        while(tests.size() > 0);
 
         // cleanup the associated project groups.
         for (ProjectGroup group: projectGroupDao.findByProject(entity))
@@ -582,5 +596,10 @@ public class DefaultProjectManager implements ProjectManager
     public void setBuildSpecificationNodeDao(BuildSpecificationNodeDao buildSpecificationNodeDao)
     {
         this.buildSpecificationNodeDao = buildSpecificationNodeDao;
+    }
+
+    public void setTestCaseIndexDao(TestCaseIndexDao testCaseIndexDao)
+    {
+        this.testCaseIndexDao = testCaseIndexDao;
     }
 }

@@ -118,19 +118,13 @@ public class HibernateBuildResultDao extends HibernateEntityDao<BuildResult> imp
         });
     }
 
-    public List<BuildResult> findOldestByProject(Project project, int max, boolean includePersonal)
-    {
-        return findOldestByProject(project, 0, max, includePersonal);
-    }
-
-    public List<BuildResult> findOldestByProject(final Project project, final int first, final int max, final boolean includePersonal)
+    public List<BuildResult> findOldestByProject(final Project project, final ResultState[] states, final int max, final boolean includePersonal)
     {
         return (List<BuildResult>) getHibernateTemplate().execute(new HibernateCallback()
         {
             public Object doInHibernate(Session session) throws HibernateException
             {
-                Criteria criteria = getBuildResultCriteria(session, project, ResultState.getCompletedStates(), null, includePersonal);
-                criteria.setFirstResult(first);
+                Criteria criteria = getBuildResultCriteria(session, project, states, null, includePersonal);
                 criteria.setMaxResults(max);
                 criteria.addOrder(Order.asc("id"));
                 return criteria.list();
@@ -368,23 +362,31 @@ public class HibernateBuildResultDao extends HibernateEntityDao<BuildResult> imp
 
     public List<BuildResult> findByUser(final User user)
     {
-        return getLatestByUser(user, -1);
+        return getLatestByUser(user, null, -1);
     }
 
-    public List<BuildResult> getLatestByUser(final User user, final int max)
+    public List<BuildResult> getLatestByUser(final User user, final ResultState[] states, final int max)
     {
         return (List<BuildResult>) getHibernateTemplate().execute(new HibernateCallback()
         {
             public Object doInHibernate(Session session) throws HibernateException
             {
-                Query queryObject = session.createQuery("from BuildResult model where model.user = :user order by model.number desc");
-                queryObject.setEntity("user", user);
+                Criteria criteria = session.createCriteria(BuildResult.class);
+                criteria.add(Expression.eq("user", user));
+
+                if (states != null)
+                {
+                    criteria.add(Expression.in("stateNames", getStateNames(states)));
+                }
+
                 if(max > 0)
                 {
-                    queryObject.setMaxResults(max);
+                    criteria.setMaxResults(max);
                 }
-                SessionFactoryUtils.applyTransactionTimeout(queryObject, getSessionFactory());
-                return queryObject.list();
+                
+                criteria.addOrder(Order.desc("number"));
+
+                return criteria.list();
             }
         });
     }
@@ -534,14 +536,18 @@ public class HibernateBuildResultDao extends HibernateEntityDao<BuildResult> imp
     {
         if (states != null)
         {
-            String[] stateNames = new String[states.length];
-            for (int i = 0; i < states.length; i++)
-            {
-                stateNames[i] = states[i].toString();
-            }
-
-            criteria.add(Expression.in("stateName", stateNames));
+            criteria.add(Expression.in("stateName", getStateNames(states)));
         }
+    }
+
+    private String[] getStateNames(ResultState[] states)
+    {
+        String[] stateNames = new String[states.length];
+        for (int i = 0; i < states.length; i++)
+        {
+            stateNames[i] = states[i].toString();
+        }
+        return stateNames;
     }
 
     private void addSpecsToCriteria(PersistentName[] specs, Criteria criteria)

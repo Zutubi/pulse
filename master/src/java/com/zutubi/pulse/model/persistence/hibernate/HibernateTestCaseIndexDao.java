@@ -1,15 +1,14 @@
 package com.zutubi.pulse.model.persistence.hibernate;
 
-import com.zutubi.pulse.core.model.StoredFileArtifact;
 import com.zutubi.pulse.core.model.TestCaseIndex;
-import com.zutubi.pulse.core.model.Changelist;
-import com.zutubi.pulse.model.persistence.FileArtifactDao;
 import com.zutubi.pulse.model.persistence.TestCaseIndexDao;
-import org.springframework.orm.hibernate3.HibernateCallback;
-import org.springframework.orm.hibernate3.SessionFactoryUtils;
-import org.hibernate.Session;
 import org.hibernate.HibernateException;
 import org.hibernate.Query;
+import org.hibernate.Session;
+import org.springframework.orm.hibernate3.HibernateCallback;
+import org.springframework.orm.hibernate3.SessionFactoryUtils;
+
+import java.util.List;
 
 /**
  */
@@ -33,6 +32,22 @@ public class HibernateTestCaseIndexDao extends HibernateEntityDao<TestCaseIndex>
                 SessionFactoryUtils.applyTransactionTimeout(queryObject, getSessionFactory());
 
                 return queryObject.uniqueResult();
+            }
+        });
+    }
+
+    public List<TestCaseIndex> findByProject(final long projectId, final int max)
+    {
+        return (List<TestCaseIndex>) getHibernateTemplate().execute(new HibernateCallback()
+        {
+            public Object doInHibernate(Session session) throws HibernateException
+            {
+                Query queryObject = session.createQuery("from TestCaseIndex model where model.projectId = :projectId");
+                queryObject.setParameter("projectId", projectId);
+                queryObject.setMaxResults(max);
+                SessionFactoryUtils.applyTransactionTimeout(queryObject, getSessionFactory());
+
+                return queryObject.list();
             }
         });
     }
