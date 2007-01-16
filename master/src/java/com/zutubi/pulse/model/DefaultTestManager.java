@@ -1,17 +1,19 @@
 package com.zutubi.pulse.model;
 
+import com.opensymphony.util.TextUtils;
+import com.zutubi.pulse.bootstrap.MasterConfigurationManager;
 import com.zutubi.pulse.core.model.*;
 import com.zutubi.pulse.model.persistence.TestCaseIndexDao;
-import com.zutubi.pulse.bootstrap.MasterConfigurationManager;
 import com.zutubi.pulse.util.StringUtils;
 import com.zutubi.pulse.util.logging.Logger;
-import com.opensymphony.util.TextUtils;
+import nu.xom.Attribute;
+import nu.xom.Element;
 
 import java.io.File;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.Stack;
-
-import nu.xom.Element;
-import nu.xom.Attribute;
 
 /**
  */
@@ -67,6 +69,7 @@ public class DefaultTestManager implements TestManager
         private long specNameId;
         private long stageNameId;
         private String path;
+        private Map<String, TestCaseIndex> allCases;
 
         public IndexingHandler(long projectId, long buildId, long buildNumber, long specNameId, long stageNameId)
         {
@@ -75,6 +78,13 @@ public class DefaultTestManager implements TestManager
             this.buildNumber = buildNumber;
             this.specNameId = specNameId;
             this.stageNameId = stageNameId;
+
+            List<TestCaseIndex> cases = testCaseIndexDao.findByStage(stageNameId);
+            allCases = new HashMap<String, TestCaseIndex>(cases.size());
+            for(TestCaseIndex i: cases)
+            {
+                allCases.put(i.getName(), i);
+            }
         }
 
         public void startSuite(TestSuiteResult suiteResult)
@@ -128,7 +138,7 @@ public class DefaultTestManager implements TestManager
         public void handleCase(TestCaseResult caseResult, Element element)
         {
             String casePath = getCasePath(caseResult.getName());
-            TestCaseIndex caseIndex = testCaseIndexDao.findByCase(stageNameId, casePath);
+            TestCaseIndex caseIndex = allCases.get(casePath);
             if (caseIndex == null)
             {
                 caseIndex = new TestCaseIndex(projectId, specNameId, stageNameId, casePath);

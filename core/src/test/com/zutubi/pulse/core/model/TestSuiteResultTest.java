@@ -26,7 +26,7 @@ public class TestSuiteResultTest extends PulseTestCase
         TestCaseResult childCase = new TestCaseResult("acase", 100, TestCaseResult.Status.PASS, "test message");
         suite.add(childCase);
         assertEquals(1, suite.getTotal());
-        assertTrue(suite.getCases().get(0) == childCase);
+        assertTrue(suite.getCases().iterator().next() == childCase);
     }
 
     public void testAddSuite()
@@ -45,9 +45,9 @@ public class TestSuiteResultTest extends PulseTestCase
         suite.add(childCase);
         suite.add(childCase2);
         
-        List<TestCaseResult> childCases = suite.getCases();
-        assertEquals(1, childCases.size());
-        assertTrue(childCases.get(0).isEquivalent(childCase));
+        TestCaseResult[] children = suite.getCases().toArray(new TestCaseResult[suite.getCases().size()]);
+        assertEquals(1, children.length);
+        assertTrue(children[0].isEquivalent(childCase));
     }
 
     public void testAddCaseLessSevereAlreadyExists()
@@ -57,10 +57,10 @@ public class TestSuiteResultTest extends PulseTestCase
         suite.add(childCase);
         suite.add(childCase2);
 
-        List<TestCaseResult> childCases = suite.getCases();
-        assertEquals(1, childCases.size());
-        assertFalse(childCases.get(0).isEquivalent(childCase));
-        assertTrue(childCases.get(0).isEquivalent(childCase2));
+        TestCaseResult[] children = suite.getCases().toArray(new TestCaseResult[suite.getCases().size()]);
+        assertEquals(1, children.length);
+        assertFalse(children[0].isEquivalent(childCase));
+        assertTrue(children[0].isEquivalent(childCase2));
     }
 
     public void testAddCaseMoreSevereAlreadyExists()
@@ -70,10 +70,10 @@ public class TestSuiteResultTest extends PulseTestCase
         suite.add(childCase);
         suite.add(childCase2);
 
-        List<TestCaseResult> childCases = suite.getCases();
-        assertEquals(1, childCases.size());
-        assertTrue(childCases.get(0).isEquivalent(childCase));
-        assertFalse(childCases.get(0).isEquivalent(childCase2));
+        TestCaseResult[] children = suite.getCases().toArray(new TestCaseResult[suite.getCases().size()]);
+        assertEquals(1, children.length);
+        assertTrue(children[0].isEquivalent(childCase));
+        assertFalse(children[0].isEquivalent(childCase2));
     }
 
     public void testAddSuiteAlreadyExists()
@@ -110,6 +110,7 @@ public class TestSuiteResultTest extends PulseTestCase
         assertEquals(1, children.size());
         TestSuiteResult suiteResult = children.get(0);
         assertEquals(1, suiteResult.getCases().size());
-        assertTrue(suiteResult.getCases().get(0).isEquivalent(childCase2));
+        TestCaseResult[] cases = suiteResult.getCases().toArray(new TestCaseResult[suiteResult.getCases().size()]);
+        assertTrue(cases[0].isEquivalent(childCase2));
     }
 }
