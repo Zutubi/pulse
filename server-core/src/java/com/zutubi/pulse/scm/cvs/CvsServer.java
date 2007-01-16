@@ -296,13 +296,28 @@ public class CvsServer extends CachingSCMServer
             return changes;
         }
 
-        // ensure that the lower bound of the changes is excluded.
-        Changelist firstChange = changes.get(0);
-        if (firstChange.getRevision().getDate().equals(from.getDate()))
+        // ensure that the lower bound of the changes is excluded. Of course, if there is no lower bound, then
+        // just return what we have.
+        if (from == null || from.getDate() == null)
         {
-            return changes.subList(1, changes.size());
+            return changes;
         }
-        return changes;
+        
+        // there are known occasions when the firstChange date is null - although the cause of the null (a date parse exception)
+        // is still a mystery. Regardless, we need to cater for that case.
+        try
+        {
+            Changelist firstChange = changes.get(0);
+            if (from.getDate().equals(firstChange.getRevision().getDate()))
+            {
+                return changes.subList(1, changes.size());
+            }
+            return changes;
+        }
+        catch (NullPointerException npe)
+        {
+            throw new SCMException("CVS changelist revision contains a null revision date.");            
+        }
     }
 
     public List<Revision> getRevisionsSince(Revision from) throws SCMException
@@ -364,7 +379,6 @@ public class CvsServer extends CachingSCMServer
         }
 
         List<Changelist> changelists = getChanges(since, null);
-        changelists = filterExcludes(changelists, new ScmFilepathFilter(excludedPaths));
         return changelists.size() > 0;
     }
 

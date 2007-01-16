@@ -238,6 +238,13 @@ public class DefaultScmManager implements ScmManager, Stoppable
 
     private void sendScmChangeEvent(Scm scm, Revision latest, Revision previous)
     {
+        if (latest != null && previous != null && latest.compareTo(previous) == 0)
+        {
+            LOG.warning("Scm monitoring detected that the previous change revision '"+ previous +"' is the same as " +
+                    "the latest change revision '" + latest +"', and will therefore ignore this change.");
+            return;
+        }
+
         LOG.finer("publishing scm change event for " + scm + " revision " + latest);
         eventManager.publish(new SCMChangeEvent(scm, latest, previous));
         latestRevisions.put(scm.getId(), latest);
