@@ -2442,7 +2442,11 @@
 
     <div id="columns-popup-$idSuffix" class="floating" style="display: none;">
         <table class="content" style="margin: 0">
-            #headingRow("build.columns.configure" 1)
+            <tr id="columns-popup-handle-$idSuffix">
+                <th class="heading" colspan="1">
+                    #wwtext("name=build.columns.configure")
+                </th>
+            </tr>
             <tr>
                 <td class="content" style="padding-top: 0">
                     <h3 class="popup">#wwtext("name=build.columns.order")</h3>

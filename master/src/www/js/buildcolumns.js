@@ -121,7 +121,8 @@ BuildColumnPopup.prototype.popup = function()
     var link = $("columns-popup-link-" + this.suffix);
     YAHOO.util.Dom.setX(popup, Math.max(0, YAHOO.util.Dom.getX(link) - popup.offsetWidth));
     YAHOO.util.Dom.setY(popup, YAHOO.util.Dom.getY(link) + 16);
-    new YAHOO.util.DD(popup);
+    var dd = new YAHOO.util.DD(popup);
+    dd.setHandleElId("columns-popup-handle-" + this.suffix);
 }
 
 BuildColumnPopup.prototype.createConfigureRow = function()
