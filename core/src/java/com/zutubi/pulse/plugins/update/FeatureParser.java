@@ -40,31 +40,31 @@ public class FeatureParser
     private static final String ELEMENT_UPDATE = "update";
     private static final String ELEMENT_URL = "url";
 
-    private Feature parse(URL url, InputStream in) throws IOException, ParsingException
+    public FeatureManifest parse(URL url, InputStream in) throws IOException, ParsingException
     {
         Document doc = XMLUtils.streamToDoc(in);
         Element root = doc.getRootElement();
         String id = XMLUtils.getRequiredAttribute(root, ATTRIBUTE_ID);
-        String version = XMLUtils.getRequiredAttribute(root, ATTRIBUTE_VERSION);
+        Version version = getVersion(root, true);
         String label = XMLUtils.getAttributeDefault(root, ATTRIBUTE_LABEL, id);
         String description = getOptionalText(root, ELEMENT_DESCRIPTION);
         String providerName = root.getAttributeValue(ATTRIBUTE_PROVIDER_NAME);
         String image = root.getAttributeValue(ATTRIBUTE_IMAGE);
 
-        Feature feature = new Feature(id, version, label, description, providerName, UpdateParserUtils.resolveURL(image, url));
-        feature.setCopyright(getOptionalText(root, ELEMENT_COPYRIGHT));
-        feature.setLicense(getOptionalText(root, ELEMENT_LICENSE));
+        FeatureManifest featureManifest = new FeatureManifest(id, version, label, description, providerName, UpdateParserUtils.resolveURL(image, url));
+        featureManifest.setCopyright(getOptionalText(root, ELEMENT_COPYRIGHT));
+        featureManifest.setLicense(getOptionalText(root, ELEMENT_LICENSE));
 
         Elements children = root.getChildElements(ELEMENT_URL);
         if(children.size() > 0)
         {
-            processURL(feature, children.get(0));
+            processURL(featureManifest, children.get(0));
         }
 
         children = root.getChildElements(ELEMENT_INCLUDES);
         for(int i = 0; i < children.size(); i++)
         {
-            processInclude(feature, children.get(i));
+            processInclude(featureManifest, children.get(i));
         }
 
         children = root.getChildElements(ELEMENT_REQUIRES);
@@ -73,20 +73,20 @@ public class FeatureParser
             children = children.get(0).getChildElements(ELEMENT_IMPORT);
             for(int i = 0; i < children.size(); i++)
             {
-                processImport(feature, children.get(i));
+                processImport(featureManifest, children.get(i));
             }
         }
 
         children = root.getChildElements(ELEMENT_PLUGIN);
         for(int i = 0; i < children.size(); i++)
         {
-            processPlugin(feature, children.get(i));
+            processPlugin(featureManifest, children.get(i));
         }
 
-        return feature;
+        return featureManifest;
     }
 
-    private void processURL(Feature feature, Element element) throws ParsingException
+    private void processURL(FeatureManifest featureManifest, Element element) throws ParsingException
     {
         Elements children = element.getChildElements(ELEMENT_UPDATE);
         if(children.size() > 0)
@@ -94,7 +94,7 @@ public class FeatureParser
             Element e = children.get(0);
             URL url = getRequiredURL(null, e);
             String label = XMLUtils.getAttributeDefault(e, ATTRIBUTE_LABEL, url.getHost());
-            feature.setUpdateSite(new UpdateSiteReference(url, label));
+            featureManifest.setUpdateSite(new UpdateSiteReference(url, label));
         }
 
         children = element.getChildElements(ELEMENT_DISCOVERY);
@@ -104,21 +104,21 @@ public class FeatureParser
             URL url = getRequiredURL(null, e);
             String label = XMLUtils.getAttributeDefault(e, ATTRIBUTE_LABEL, url.getHost());
             boolean web = "web".equals(e.getAttributeValue(ATTRIBUTE_TYPE));
-            feature.addDiscoverySite(new DiscoverySiteReference(url, label, web));
+            featureManifest.addDiscoverySite(new DiscoverySiteReference(url, label, web));
         }
     }
 
-    private void processInclude(Feature feature, Element element) throws ParsingException
+    private void processInclude(FeatureManifest featureManifest, Element element) throws ParsingException
     {
         String id = XMLUtils.getRequiredAttribute(element, ATTRIBUTE_ID);
         String version = XMLUtils.getRequiredAttribute(element, ATTRIBUTE_VERSION);
         String name = XMLUtils.getAttributeDefault(element, ATTRIBUTE_NAME, id);
         boolean optional = Boolean.valueOf(element.getAttributeValue(ATTRIBUTE_OPTIONAL));
 
-        feature.addInclusion(new FeatureInclusion(id, version, name, optional));
+        featureManifest.addInclusion(new FeatureInclusion(id, version, name, optional));
     }
 
-    private void processImport(Feature feature, Element element) throws ParsingException
+    private void processImport(FeatureManifest featureManifest, Element element) throws ParsingException
     {
         String id = element.getAttributeValue(ATTRIBUTE_PLUGIN);
         boolean isFeature = false;
@@ -132,7 +132,7 @@ public class FeatureParser
             }
         }
 
-        String version = element.getAttributeValue(ATTRIBUTE_VERSION);
+        Version version = getVersion(element, false);
         VersionMatch match = VersionMatch.COMPATIBLE;
         String matchString = element.getAttributeValue(ATTRIBUTE_MATCH);
 
@@ -148,10 +148,10 @@ public class FeatureParser
             }
         }
 
-        feature.addRequirement(new FeatureRequirement(isFeature, id, version, match));
+        featureManifest.addRequirement(new FeatureRequirement(isFeature, id, version, match));
     }
 
-    private void processPlugin(Feature feature, Element element) throws ParsingException
+    private void processPlugin(FeatureManifest featureManifest, Element element) throws ParsingException
     {
         String id = XMLUtils.getRequiredAttribute(element, ATTRIBUTE_ID);
         String version = XMLUtils.getRequiredAttribute(element, ATTRIBUTE_VERSION);
@@ -159,7 +159,7 @@ public class FeatureParser
         int installSize = getSize(element, ATTRIBUTE_INSTALL_SIZE);
         boolean unpack = Boolean.valueOf(element.getAttributeValue(ATTRIBUTE_UNPACK));
 
-        feature.addPlugin(new PluginReference(id, version, downloadSize, installSize, unpack));
+        featureManifest.addPlugin(new PluginReference(id, version, downloadSize, installSize, unpack));
     }
 
     private int getSize(Element element, String attribute) throws ParsingException
@@ -187,7 +187,7 @@ public class FeatureParser
         try
         {
             URL url = new URL(argv[0]);
-            Feature f = parser.parse(new URL("http://dummy/feature.xml"), url.openStream());
+            FeatureManifest f = parser.parse(new URL("http://dummy/feature.xml"), url.openStream());
             System.out.println(f);
         }
         catch (IOException e)

@@ -50,8 +50,7 @@ public class PluginImpl implements Plugin
      */
     private File pluginFile;
     /**
-     * If true, this is an internal plugin (which is required for Pulse to
-     * function and thus cannot be disabled/uninstalled).
+     * The type of the plugin, for example it may be internal to Pulse.
      */
     private Type type;
     /**
@@ -84,6 +83,11 @@ public class PluginImpl implements Plugin
     public String getName()
     {
         return name;
+    }
+
+    void setName(String name)
+    {
+        this.name = name;
     }
 
     public String getDescription()
@@ -124,6 +128,10 @@ public class PluginImpl implements Plugin
     void setState(PluginImpl.State state)
     {
         this.state = state;
+        if(state != State.DISABLED)
+        {
+            errorMessage = null;
+        }
     }
 
     public String getErrorMessage()
@@ -178,6 +186,6 @@ public class PluginImpl implements Plugin
 
     public boolean isDisabled()
     {
-        return !isEnabled();
+        return state == State.DISABLED;
     }
 }

@@ -9,18 +9,26 @@ public interface Plugin
     {
         /**
          * The plugin is currently disabled: it is not loaded or available
-         * for use, but remains installed.
+         * for use, but remains on disk.
          */
         DISABLED,
         /**
-         * The plugin could not be loaded.  See the errorMessage field for
-         * details.
+         * The plugin will be disabled on restart, and is no longer valid.
          */
-        ERROR,
+        DISABLING,
         /**
          * The plugin is loaded and available for use.
          */
-        ENABLED
+        ENABLED,
+        /**
+         * The plugin will be uninstalled on restart, and is no longer valid.
+         */
+        UNINSTALLING,
+        /**
+         * A new version of the plugin is ready to install, the current
+         * version should be removed.
+         */
+        UPDATING
     }
 
     /**
@@ -36,14 +44,14 @@ public interface Plugin
     String getName();
 
     /**
-     * @return the plugin version, which is the OSGi bundle version.  The
-     * format is a dotted-decimal style string (e.g. 2.0.0).
+     * @return an optional description for the plugin, displayed to users.
+     * Matches the OSGi Bundle-Description.
      */
     String getDescription();
 
     /**
-     * @return an optional description for the plugin, displayed to users.
-     * Matches the OSGi Bundle-Description.
+     * @return the plugin version, which is the OSGi bundle version.  The
+     * format is a dotted-decimal style string (e.g. 2.0.0).
      */
     String getVersion();
 
@@ -60,7 +68,9 @@ public interface Plugin
 
     /**
      * @return the error message associated with this plugin.  Only valid
-     * when state is ERROR.
+     * when state is DISABLED.  If DISABLED and this message is non-null, the
+     * message indicates a problem with the plugin that caused it to be
+     * automatically disabled.
      */
     String getErrorMessage();
 

@@ -1,21 +1,28 @@
 package com.zutubi.pulse.plugins;
 
+import com.zutubi.pulse.util.CollectionUtils;
 import com.zutubi.pulse.util.FileSystemUtils;
 import com.zutubi.pulse.util.IOUtils;
+import com.zutubi.pulse.util.Predicate;
 import com.zutubi.pulse.util.logging.Logger;
 import nu.xom.*;
+import org.eclipse.core.internal.registry.osgi.OSGIUtils;
+import org.eclipse.core.runtime.IExtension;
 import org.eclipse.core.runtime.IExtensionRegistry;
 import org.eclipse.core.runtime.RegistryFactory;
-import org.eclipse.core.runtime.IExtension;
 import org.eclipse.core.runtime.adaptor.EclipseStarter;
 import org.eclipse.core.runtime.dynamichelpers.ExtensionTracker;
 import org.eclipse.core.runtime.dynamichelpers.IExtensionTracker;
-import org.eclipse.core.internal.registry.osgi.OSGIUtils;
+import org.eclipse.osgi.service.resolver.BundleDescription;
+import org.eclipse.osgi.service.resolver.BundleSpecification;
+import org.eclipse.osgi.service.resolver.PlatformAdmin;
+import org.eclipse.osgi.service.resolver.State;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.BundleException;
 import org.osgi.framework.ServiceReference;
 import org.osgi.service.packageadmin.PackageAdmin;
+import org.osgi.service.packageadmin.RequiredBundle;
 
 import java.io.*;
 import java.net.URL;
@@ -23,6 +30,9 @@ import java.util.Collections;
 import java.util.Dictionary;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.jar.Attributes;
+import java.util.jar.JarFile;
+import java.util.jar.Manifest;
 
 public class DefaultPluginManager implements PluginManager
 {
@@ -38,15 +48,19 @@ public class DefaultPluginManager implements PluginManager
     private static final String ATTRIBUTE_ID = "id";
     private static final String ATTRIBUTE_NAME = "name";
     private static final String ATTRIBUTE_FILE = "file";
-    private static final String ATTRIBUTE_ENABLED = "enabled";
+    private static final String ATTRIBUTE_STATE = "state";
+    private static final String ATTRIBUTE_VERSION = "version";
 
     private PluginPaths pluginPaths;
     private BundleContext context;
     private IExtensionRegistry extensionRegistry;
-    private IExtensionTracker extensionTracker;
+    private ServiceReference packageAdminRef;
+    private PackageAdmin packageAdmin;
+    private ServiceReference platformAdminRef;
+    private PlatformAdmin platformAdmin;
 
-    private List<PluginImpl> internalPlugins = new LinkedList<PluginImpl>();
-    private List<PluginImpl> plugins = Collections.synchronizedList(new LinkedList<PluginImpl>());
+    private IExtensionTracker extensionTracker;
+    private List<PluginImpl> plugins;
 
     public DefaultPluginManager()
     {
@@ -54,12 +68,38 @@ public class DefaultPluginManager implements PluginManager
 
     public void init()
     {
+        plugins = Collections.synchronizedList(new LinkedList<PluginImpl>());
         System.setProperty("osgi.configuration.area", pluginPaths.getPluginConfigurationRoot().getAbsolutePath());
 
         LOG.info("Starting plugin manager...");
         try
         {
             context = EclipseStarter.startup(new String[] { "-clean" }, null);
+
+            packageAdminRef = context.getServiceReference(PackageAdmin.class.getName());
+            if (packageAdminRef != null)
+            {
+                packageAdmin = (PackageAdmin) context.getService(packageAdminRef);
+            }
+
+            if (packageAdmin == null)
+            {
+                LOG.severe("Could not access package admin service");
+                return;
+            }
+
+            platformAdminRef = context.getServiceReference(PlatformAdmin.class.getName());
+            if (platformAdminRef != null)
+            {
+                platformAdmin = (PlatformAdmin) context.getService(platformAdminRef);
+            }
+
+            if (platformAdmin == null)
+            {
+                LOG.severe("Could not access platform admin service");
+                return;
+            }
+
             loadInternalPlugins();
 
             extensionRegistry = RegistryFactory.getRegistry();
@@ -67,9 +107,6 @@ public class DefaultPluginManager implements PluginManager
 
             loadPrepackagedPlugins();
 
-            UpdateSite site = new UpdateSite();
-            site.doIt();
-            
             // Ensure we have a user plugins directory
             File userPlugins = pluginPaths.getUserPluginRoot();
             if (!userPlugins.isDirectory())
@@ -91,6 +128,16 @@ public class DefaultPluginManager implements PluginManager
     {
         try
         {
+            if (packageAdminRef != null)
+            {
+                context.ungetService(packageAdminRef);
+            }
+
+            if (platformAdminRef != null)
+            {
+                context.ungetService(platformAdminRef);
+            }
+
             EclipseStarter.shutdown();
         }
         catch (Exception e)
@@ -102,8 +149,7 @@ public class DefaultPluginManager implements PluginManager
     private void loadInternalPlugins()
     {
         LOG.info("Loading internal plugins...");
-        List<PluginImpl> foundPlugins = loadPlugins(pluginPaths.getInternalPluginRoot(), PluginImpl.Type.INTERNAL);
-        internalPlugins.addAll(foundPlugins);
+        loadPlugins(pluginPaths.getInternalPluginRoot(), PluginImpl.Type.INTERNAL);
         LOG.info("Internal plugins loaded.");
     }
 
@@ -169,16 +215,18 @@ public class DefaultPluginManager implements PluginManager
             resolveBundles(new Bundle[] { bundle });
         }
 
+        LOG.info("Starting plugin " + bundle.getSymbolicName());
         try
         {
-            LOG.info("Starting plugin " + bundle.getSymbolicName());
             bundle.start(Bundle.START_TRANSIENT);
         }
         catch (BundleException e)
         {
-            plugin.setState(Plugin.State.ERROR);
+            // Setting the in memory state is sufficient as the
+            // file is rewritten below.
+            plugin.setState(Plugin.State.DISABLED);
             plugin.setErrorMessage("Unable to start plugin: " + e.getMessage() + " (see logs for trace)");
-            LOG.warning("Unable to start plugin '" + bundle.getSymbolicName() + "': " + e.getMessage(), e);
+            LOG.warning("Unable to start plugin '" + plugin.getName() + "': " + e.getMessage(), e);
         }
     }
 
@@ -230,7 +278,7 @@ public class DefaultPluginManager implements PluginManager
             String id = pluginElement.getAttributeValue(ATTRIBUTE_ID);
             String name = pluginElement.getAttributeValue(ATTRIBUTE_NAME);
             String file = pluginElement.getAttributeValue(ATTRIBUTE_FILE);
-            boolean enabled = Boolean.valueOf(pluginElement.getAttributeValue(ATTRIBUTE_ENABLED));
+            String stateString = pluginElement.getAttributeValue(ATTRIBUTE_STATE);
 
             if (name == null)
             {
@@ -244,37 +292,127 @@ public class DefaultPluginManager implements PluginManager
                 continue;
             }
 
-            File pluginFile = new File(pluginDir, file);
-            if (enabled)
+            if (stateString == null)
             {
-                if (pluginFile.exists())
-                {
-                    try
-                    {
-                        foundPlugins.add(loadPluginFile(pluginFile, type));
-                    }
-                    catch (BundleException e)
-                    {
-                        LOG.warning("Unable to load plugin '" + name + "': " + e.getMessage(), e);
+                LOG.warning("Ignoring listed plugin '" + name + "' with missing 'state' attribute");
+                continue;
+            }
 
-                        PluginImpl plugin = new PluginImpl(id, name, pluginFile, Plugin.State.ERROR, type);
-                        plugin.setErrorMessage("Unable to load plugin '" + name + "': " + e.getMessage() + "(check logs for trace)");
+            Plugin.State state;
+            try
+            {
+                state = Plugin.State.valueOf(stateString.toUpperCase());
+            }
+            catch (IllegalArgumentException e)
+            {
+                LOG.warning("Ignoring listed plugin '" + name + "' with invalid 'state' attribute '" + stateString + "'");
+                continue;
+            }
+
+            File pluginFile = new File(pluginDir, file);
+
+            // If the file no longer exists, the plugin is just forgotten.
+            if (pluginFile.exists())
+            {
+                switch (state)
+                {
+                    case DISABLED:
+                    case DISABLING:
+                        PluginImpl plugin = new PluginImpl(id, name, pluginFile, Plugin.State.DISABLED, type);
+                        fillPluginFromManifest(plugin);
                         foundPlugins.add(plugin);
-                    }
-                }
-                else
-                {
-                    PluginImpl p = new PluginImpl(id, name, pluginFile, Plugin.State.ERROR, type);
-                    p.setErrorMessage("Plugin file '" + pluginFile.getAbsolutePath() + "' does not exist");
-                    foundPlugins.add(p);
+                        break;
+                    case ENABLED:
+                        try
+                        {
+                            foundPlugins.add(loadPluginFile(pluginFile, type, false));
+                        }
+                        catch (BundleException e)
+                        {
+                            LOG.warning("Unable to load plugin '" + name + "': " + e.getMessage(), e);
 
-                    LOG.warning("File '" + pluginFile.getAbsolutePath() + "' not found for listed plugin '" + name + "'");
+                            plugin = new PluginImpl(id, name, pluginFile, Plugin.State.DISABLED, type);
+                            plugin.setErrorMessage("Unable to load plugin '" + name + "': " + e.getMessage() + "(check logs for trace)");
+                            foundPlugins.add(plugin);
+                        }
+                        break;
+                    case UNINSTALLING:
+                    case UPDATING:
+                        if (pluginFile.isDirectory())
+                        {
+                            FileSystemUtils.rmdir(pluginFile);
+                        }
+                        else
+                        {
+                            pluginFile.delete();
+                        }
+                        break;
+                }
+            }
+        }
+    }
+
+    private void fillPluginFromManifest(PluginImpl plugin)
+    {
+        try
+        {
+            File pluginFile = plugin.getPluginFile();
+            Manifest manifest;
+
+            if (pluginFile.isDirectory())
+            {
+                InputStream manifestIn = new FileInputStream(new File(pluginFile, FileSystemUtils.composeFilename("META_INF", "MANIFEST.MF")));
+                try
+                {
+                    manifest = new Manifest(manifestIn);
+                }
+                finally
+                {
+                    IOUtils.close(manifestIn);
                 }
             }
             else
             {
-                foundPlugins.add(new PluginImpl(id, name, pluginFile, Plugin.State.DISABLED, type));
+                JarFile jarFile = null;
+                try
+                {
+                    jarFile =  new JarFile(pluginFile);
+                    manifest = jarFile.getManifest();
+                }
+                finally
+                {
+                    IOUtils.close(jarFile);
+                }
             }
+
+            Attributes attributes = manifest.getMainAttributes();
+            String name = attributes.getValue("Bundle-Name");
+            if(name != null)
+            {
+                plugin.setName(name);
+            }
+
+            String description = attributes.getValue("Bundle-Description");
+            if(description != null)
+            {
+                plugin.setDescription(description);
+            }
+
+            String version = attributes.getValue("Bundle-Version");
+            if(version != null)
+            {
+                plugin.setVersion(version);
+            }
+
+            String vendor = attributes.getValue("Bundle-Vendor");
+            if(vendor != null)
+            {
+                plugin.setVendor(vendor);
+            }
+        }
+        catch (IOException e)
+        {
+            LOG.warning("Unable to read manifest for plugin '" + plugin.getName() + "': " + e.getMessage(), e);
         }
     }
 
@@ -286,7 +424,7 @@ public class DefaultPluginManager implements PluginManager
             {
                 try
                 {
-                    PluginImpl plugin = loadPluginFile(pluginFile, type);
+                    PluginImpl plugin = loadPluginFile(pluginFile, type, false);
                     foundPlugins.add(plugin);
                 }
                 catch (BundleException e)
@@ -323,11 +461,17 @@ public class DefaultPluginManager implements PluginManager
         }
     }
 
-    private PluginImpl loadPluginFile(File pluginFile, PluginImpl.Type type) throws BundleException
+    private PluginImpl loadPluginFile(File pluginFile, PluginImpl.Type type, boolean update) throws BundleException
     {
         Bundle bundle = installBundle(pluginFile);
+        if (!update && getPlugin(bundle.getSymbolicName()) != null)
+        {
+            bundle.uninstall();
+            throw new BundleException("A plugin with the same identifier (" + bundle.getSymbolicName() + ") already exists.");
+        }
+
         PluginImpl plugin = new PluginImpl(bundle.getSymbolicName(), getBundleName(bundle), pluginFile, Plugin.State.ENABLED, type);
-        postInstall(plugin, bundle);
+        fillPluginFromBundle(plugin, bundle);
 
         return plugin;
     }
@@ -337,6 +481,7 @@ public class DefaultPluginManager implements PluginManager
         Bundle bundle = context.installBundle("reference:file:" + pluginFile.getAbsolutePath());
         if (bundle.getSymbolicName() == null)
         {
+            bundle.uninstall();
             throw new BundleException("Bundle missing required header Bundle-SymbolicName");
         }
 
@@ -355,7 +500,7 @@ public class DefaultPluginManager implements PluginManager
         return name;
     }
 
-    private void postInstall(PluginImpl plugin, Bundle bundle)
+    private void fillPluginFromBundle(PluginImpl plugin, Bundle bundle)
     {
         plugin.setBundle(bundle);
         Dictionary headers = bundle.getHeaders();
@@ -382,7 +527,7 @@ public class DefaultPluginManager implements PluginManager
         element.addAttribute(new Attribute(ATTRIBUTE_ID, plugin.getId()));
         element.addAttribute(new Attribute(ATTRIBUTE_NAME, plugin.getName()));
         element.addAttribute(new Attribute(ATTRIBUTE_FILE, plugin.getPluginFile().getName()));
-        element.addAttribute(new Attribute(ATTRIBUTE_ENABLED, Boolean.toString(plugin.isEnabled())));
+        element.addAttribute(new Attribute(ATTRIBUTE_STATE, plugin.getState().toString().toLowerCase()));
         root.appendChild(element);
     }
 
@@ -415,20 +560,7 @@ public class DefaultPluginManager implements PluginManager
             return;
         }
 
-        ServiceReference packageAdminRef = context.getServiceReference(PackageAdmin.class.getName());
-        PackageAdmin packageAdmin = null;
-        if (packageAdminRef != null)
-        {
-            packageAdmin = (PackageAdmin) context.getService(packageAdminRef);
-        }
-
-        if (packageAdmin == null)
-        {
-            return;
-        }
-
         packageAdmin.resolveBundles(bundles);
-        context.ungetService(packageAdminRef);
     }
 
     public IExtensionRegistry getExtenstionRegistry()
@@ -446,7 +578,41 @@ public class DefaultPluginManager implements PluginManager
         return plugins;
     }
 
-    public Plugin getPlugin(String id)
+    public List<? extends Plugin> getDependentPlugins(Plugin plugin)
+    {
+        return getDependentPlugins((PluginImpl) plugin);
+    }
+
+    private List<PluginImpl> getDependentPlugins(PluginImpl pluginImpl)
+    {
+        List<PluginImpl> result = new LinkedList<PluginImpl>();
+        RequiredBundle[] required = packageAdmin.getRequiredBundles(pluginImpl.getId());
+        if (required != null)
+        {
+            for (RequiredBundle r : required)
+            {
+                if (r.getBundle() == pluginImpl.getBundle())
+                {
+                    Bundle[] dependents = r.getRequiringBundles();
+                    if (dependents != null)
+                    {
+                        for (Bundle b : dependents)
+                        {
+                            PluginImpl p = getPluginByBundle(b);
+                            if (p != null)
+                            {
+                                result.add(p);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        return result;
+    }
+
+    public PluginImpl getPlugin(String id)
     {
         for (PluginImpl plugin : plugins)
         {
@@ -461,23 +627,39 @@ public class DefaultPluginManager implements PluginManager
 
     public Plugin installPlugin(URL url) throws PluginException
     {
+        return installPlugin(deriveName(url), url);
+    }
+
+    String deriveName(URL url)
+    {
         String name = url.getPath();
         int index = name.lastIndexOf('/');
         if (index >= 0)
         {
             name = name.substring(index + 1);
         }
-
-        return installPlugin(name, url);
+        return name;
     }
 
     public Plugin installPlugin(String name, URL url) throws PluginException
     {
-        if (getPlugin(name) != null)
-        {
-            throw new PluginException("A plugin with name '" + name + "' already exists");
-        }
+        // Load it up.  Errors before loading are thrown.  Afterwards, they
+        // are recorded on the plugin itself.
+        File pluginFile = copyInPlugin(name, url);
+        PluginImpl plugin = loadPlugin(pluginFile, false);
 
+        // And start it
+        startPlugin(plugin);
+
+        // Add the plugin to the list (in memory and file)
+        plugins.add(plugin);
+        addToPluginsFile(plugin);
+
+        return plugin;
+    }
+
+    File copyInPlugin(String name, URL url) throws PluginException
+    {
         File pluginFile = new File(pluginPaths.getUserPluginRoot(), name);
         if (pluginFile.exists())
         {
@@ -517,29 +699,25 @@ public class DefaultPluginManager implements PluginManager
             throw new PluginException("Unable to rename plugin temp file '" + tmpFile.getAbsolutePath() + "' to '" + pluginFile.getAbsolutePath() + "'");
         }
 
-        PluginImpl plugin;
+        return pluginFile;
+    }
 
+    private PluginImpl loadPlugin(File pluginFile, boolean update) throws PluginException
+    {
         try
         {
-            plugin = loadPluginFile(pluginFile, PluginImpl.Type.USER);
+            return loadPluginFile(pluginFile, PluginImpl.Type.USER, update);
         }
         catch (BundleException e)
         {
             LOG.warning("Unable to load plugin from file '" + pluginFile.getAbsolutePath() + "': " + e.getMessage(), e);
             throw new PluginException("Unable to load plugin: " + e.getMessage(), e);
         }
-
-        // Add the plugin to the list (in memory and file)
-        plugins.add(plugin);
-        addToPluginsFile(pluginPaths.getUserPluginRoot(), plugin);
-
-        // Finally, start it up.
-        startPlugin(plugin);
-        return plugin;
     }
 
-    private void addToPluginsFile(File pluginDir, PluginImpl plugin)
+    private void addToPluginsFile(PluginImpl plugin)
     {
+        File pluginDir = getPluginDir(plugin);
         Document doc = readPluginsFile(pluginDir);
         if (doc != null)
         {
@@ -548,9 +726,74 @@ public class DefaultPluginManager implements PluginManager
         }
     }
 
+    public void updatePlugin(Plugin plugin, URL url) throws PluginException
+    {
+        updatePlugin(plugin, deriveName(url), url);
+    }
+
+    public void updatePlugin(Plugin plugin, String name, URL url) throws PluginException
+    {
+        PluginImpl currentPlugin = (PluginImpl) plugin;
+        if (currentPlugin.isInternal())
+        {
+            throw new PluginException("Cannot update an internal plugin");
+        }
+
+        switch (currentPlugin.getState())
+        {
+            case UNINSTALLING:
+                throw new PluginException("Unable to update plugin: already marked for uninstall");
+            case UPDATING:
+                throw new PluginException("Unable to update plugin: already marked for update");
+        }
+
+        // Ensure that any plugins which depend on this plugin will still be
+        // satisfied by the new version.  To do so, load this plugin.
+        File pluginFile = copyInPlugin(name, url);
+        PluginImpl newPlugin = new PluginImpl(currentPlugin.getId(), currentPlugin.getName(), pluginFile, currentPlugin.isEnabled() ? Plugin.State.ENABLED : Plugin.State.DISABLED, PluginImpl.Type.USER);
+        addToPluginsFile(newPlugin);
+
+        // Mark the old version for removal.
+        changeState(currentPlugin, Plugin.State.UPDATING);
+    }
+
+    private void checkUpdateDependencies(PluginImpl currentPlugin, PluginImpl newPlugin) throws PluginException
+    {
+        try
+        {
+            // Now use the platform admin service to check dependents
+            State state = platformAdmin.getState(false);
+            long bundleId = currentPlugin.getBundle().getBundleId();
+            BundleDescription currentDescription = state.getBundle(bundleId);
+            BundleDescription newDescription = state.getBundle(newPlugin.getBundle().getBundleId());
+            BundleDescription[] dependents = currentDescription.getDependents();
+            for (BundleDescription dependent : dependents)
+            {
+                BundleSpecification[] requirements = dependent.getRequiredBundles();
+                for (BundleSpecification requirement : requirements)
+                {
+                    if (requirement.getSupplier().getSupplier().getBundleId() == bundleId)
+                    {
+                        // Check if this requirement is satisfied by the new
+                        // version
+                        if (!requirement.isSatisfiedBy(newDescription))
+                        {
+                            PluginImpl dependentPlugin = getPluginByBundleId(dependent.getBundleId());
+                            throw new PluginException("Unable to update bundle: new version does not satisfy dependency from plugin '" + dependentPlugin.getName() + "'");
+                        }
+                    }
+                }
+            }
+        }
+        finally
+        {
+            // Always remove it: we install purely to check deps.
+            uninstallBundle(newPlugin);
+        }
+    }
+
     public void uninstallPlugin(Plugin plugin) throws PluginException
     {
-        // Uninstall the bundle is necessary
         PluginImpl pluginImpl = (PluginImpl) plugin;
 
         if (pluginImpl.isInternal())
@@ -558,27 +801,43 @@ public class DefaultPluginManager implements PluginManager
             throw new PluginException("Cannot uninstall an internal plugin");
         }
 
-        if (pluginImpl.isEnabled())
+        switch(pluginImpl.getState())
         {
-            uninstallBundle(pluginImpl);
+            case UNINSTALLING:
+                throw new PluginException("Cannot uninstall plugin: already marked for uninstall");
+            case UPDATING:
+                throw new PluginException("Cannot uninstall plugin: already marked for update");
         }
 
-        // Remove the actual bundle file
-        File pluginFile = pluginImpl.getPluginFile();
-        if (pluginFile.isDirectory())
-        {
-            FileSystemUtils.rmdir(pluginFile);
-        }
-        else
-        {
-            pluginFile.delete();
-        }
+        changeState(pluginImpl, Plugin.State.UNINSTALLING);
+    }
 
-        // Remove from the list of plugins (in memory and file)
-        plugins.remove(pluginImpl);
-        File pluginDir = getPluginDir(pluginImpl);
+    private void changeState(PluginImpl plugin, Plugin.State newState)
+    {
+        plugin.setState(newState);
+        saveState(plugin);
+    }
 
-        removeFromPluginsFile(pluginDir, pluginImpl);
+    private void saveState(PluginImpl plugin)
+    {
+        removeFromPluginsFile(plugin);
+        addToPluginsFile(plugin);
+    }
+
+    private PluginImpl getPluginByBundle(final Bundle b)
+    {
+        return getPluginByBundleId(b.getBundleId());
+    }
+
+    private PluginImpl getPluginByBundleId(final long id)
+    {
+        return CollectionUtils.find(plugins, new Predicate<PluginImpl>()
+        {
+            public boolean satisfied(PluginImpl plugin)
+            {
+                return id == plugin.getBundle().getBundleId();
+            }
+        });
     }
 
     private void uninstallBundle(PluginImpl pluginImpl) throws PluginException
@@ -594,8 +853,9 @@ public class DefaultPluginManager implements PluginManager
         }
     }
 
-    private void removeFromPluginsFile(File pluginDir, PluginImpl plugin)
+    private void removeFromPluginsFile(PluginImpl plugin)
     {
+        File pluginDir = getPluginDir(plugin);
         Document doc = readPluginsFile(pluginDir);
         if (doc != null)
         {
@@ -625,68 +885,65 @@ public class DefaultPluginManager implements PluginManager
     public void enablePlugin(Plugin plugin) throws PluginException
     {
         PluginImpl pluginImpl = (PluginImpl) plugin;
-        if (pluginImpl.isDisabled())
+        switch(plugin.getState())
         {
-            try
-            {
-                Bundle bundle = installBundle(pluginImpl.getPluginFile());
-                postInstall(pluginImpl, bundle);
-            }
-            catch (BundleException e)
-            {
-                LOG.severe("Unable to load plugin '" + pluginImpl.getName() + "': " + e.getMessage(), e);
-                throw new PluginException("Unable to load plugin '" + pluginImpl.getName() + "': " + e.getMessage(), e);
-            }
+            case DISABLED:
+                // Start the plugin if possible
+                pluginImpl.setState(Plugin.State.ENABLED);
 
-            pluginImpl.setState(Plugin.State.ENABLED);
+                try
+                {
+                    Bundle bundle = installBundle(pluginImpl.getPluginFile());
+                    fillPluginFromBundle(pluginImpl, bundle);
 
-            // Rewrite plugins file
-            removeFromPluginsFile(getPluginDir(pluginImpl), pluginImpl);
-            addToPluginsFile(getPluginDir(pluginImpl), pluginImpl);
+                    startPlugin(pluginImpl);
+                }
+                catch (BundleException e)
+                {
+                    LOG.severe("Unable to load plugin '" + pluginImpl.getName() + "': " + e.getMessage(), e);
+                    pluginImpl.setState(Plugin.State.DISABLED);
+                    pluginImpl.setErrorMessage("Unable to load plugin: " + e.getMessage());
+                }
 
-            startPlugin(pluginImpl);
+                saveState(pluginImpl);
+                break;
+            case DISABLING:
+                // Unmark for disable
+                changeState(pluginImpl, Plugin.State.ENABLED);
+                break;
+            case ENABLED:
+                // Do nothing
+                break;
+            case UNINSTALLING:
+                throw new PluginException("Unable to enable plugin: already marked for uninstall");
+            case UPDATING:
+                throw new PluginException("Unable to enable plugin: already marked for update");
         }
     }
 
     public void disablePlugin(Plugin plugin) throws PluginException
     {
         PluginImpl pluginImpl = (PluginImpl) plugin;
-        if (pluginImpl.isEnabled())
+        switch(pluginImpl.getState())
         {
-            uninstallBundle(pluginImpl);
-
-            pluginImpl.setState(Plugin.State.DISABLED);
-
-            // Rewrite plugins file
-            removeFromPluginsFile(getPluginDir(pluginImpl), pluginImpl);
-            addToPluginsFile(getPluginDir(pluginImpl), pluginImpl);
+            case DISABLED:
+            case DISABLING:
+                // Nothing to do.
+                break;
+            case ENABLED:
+                changeState(pluginImpl, Plugin.State.DISABLING);
+                break;
+            case UNINSTALLING:
+                throw new PluginException("Unable to disable plugin: already marked for uninstall");
+            case UPDATING:
+                throw new PluginException("Unable to disable plugin: already marked for update");
         }
-    }
-
-    private File getPluginDir(PluginImpl pluginImpl)
-    {
-        File pluginDir;
-        if (pluginImpl.getType() == PluginImpl.Type.PREPACKAGED)
-        {
-            pluginDir = pluginPaths.getPrepackagedPluginRoot();
-        }
-        else
-        {
-            pluginDir = pluginPaths.getUserPluginRoot();
-        }
-        return pluginDir;
-    }
-
-    public void setPluginPaths(PluginPaths pluginPaths)
-    {
-        this.pluginPaths = pluginPaths;
     }
 
     /**
      * Retrieve the plugin that defines the specified extension.
      *
      * @param extension is the extension whose plugin we are retrieving.
-     *
      * @return the plugin from which the extension was loaded, or null.
      */
     public Plugin getPlugin(IExtension extension)
@@ -706,5 +963,24 @@ public class DefaultPluginManager implements PluginManager
             }
         }
         return null;
+    }
+
+    private File getPluginDir(PluginImpl pluginImpl)
+    {
+        File pluginDir;
+        if (pluginImpl.getType() == PluginImpl.Type.PREPACKAGED)
+        {
+            pluginDir = pluginPaths.getPrepackagedPluginRoot();
+        }
+        else
+        {
+            pluginDir = pluginPaths.getUserPluginRoot();
+        }
+        return pluginDir;
+    }
+
+    public void setPluginPaths(PluginPaths pluginPaths)
+    {
+        this.pluginPaths = pluginPaths;
     }
 }

@@ -280,6 +280,11 @@ public abstract class PulseTestCase extends TestCase
         return getClass().getResource(getClass().getSimpleName() + "." + testName + "." + extension);
     }
 
+    protected File getTestDataDir(String module, String name)
+    {
+        return new File(getPulseRoot(), FileSystemUtils.composeFilename(module, "src", "test", getClass().getPackage().getName().replace('.', File.separatorChar), name));
+    }
+
     protected File getTestDataFile(String module, String testName, String extension)
     {
         File root = getPulseRoot();

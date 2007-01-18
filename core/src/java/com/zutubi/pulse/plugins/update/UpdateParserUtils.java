@@ -14,6 +14,7 @@ public class UpdateParserUtils
 {
     static final String ELEMENT_DESCRIPTION = "description";
     static final String ATTRIBUTE_URL = "url";
+    static final String ATTRIBUTE_VERSION = "version";
 
     static String getOptionalText(Element element, String name)
     {
@@ -59,5 +60,31 @@ public class UpdateParserUtils
     {
         String urlString = XMLUtils.getRequiredAttribute(e, ATTRIBUTE_URL);
         return resolveURL(urlString, site == null ? null : site.getURL());
+    }
+
+    static Version getVersion(Element e, boolean required) throws ParsingException
+    {
+        String versionString;
+        if(required)
+        {
+            versionString = XMLUtils.getRequiredAttribute(e, ATTRIBUTE_VERSION);
+        }
+        else
+        {
+            versionString = e.getAttributeValue(ATTRIBUTE_VERSION);
+            if(versionString == null)
+            {
+                return null;
+            }
+        }        
+
+        try
+        {
+            return new Version(versionString);
+        }
+        catch(IllegalArgumentException ex)
+        {
+            throw new ParsingException("Invalid version: " + ex.getMessage());
+        }
     }
 }

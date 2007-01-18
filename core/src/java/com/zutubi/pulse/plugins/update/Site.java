@@ -1,9 +1,10 @@
 package com.zutubi.pulse.plugins.update;
 
+import com.zutubi.pulse.util.CollectionUtils;
+import com.zutubi.pulse.util.Predicate;
+
 import java.net.URL;
-import java.util.Collection;
-import java.util.Map;
-import java.util.TreeMap;
+import java.util.*;
 
 /**
  * Represents an Eclipse-compatible update site containing plugins and
@@ -14,7 +15,7 @@ public class Site
 {
     private URL url;
     private String description;
-    private Map<String, FeatureReference> featureReferences = new TreeMap<String, FeatureReference>();
+    private List<FeatureReference> featureReferences = new LinkedList<FeatureReference>();
     private Map<String, Category> categories = new TreeMap<String, Category>();
     private Map<String, URL> archives = new TreeMap<String, URL>();
 
@@ -37,17 +38,23 @@ public class Site
 
     public Collection<FeatureReference> getFeatureReferences()
     {
-        return featureReferences.values();
+        return featureReferences;
     }
 
-    public FeatureReference getFeatureReference(String id)
+    public FeatureReference getFeatureReference(final String id, final String version)
     {
-        return featureReferences.get(id);
+        return CollectionUtils.find(featureReferences, new Predicate<FeatureReference>()
+        {
+            public boolean satisfied(FeatureReference featureReference)
+            {
+                return featureReference.getId().equals(id) && featureReference.getVersion().equals(version);
+            }
+        });
     }
 
     public void addFeatureReference(FeatureReference featureReference)
     {
-        featureReferences.put(featureReference.getId(), featureReference);
+        featureReferences.add(featureReference);
     }
 
     public Collection<Category> getCategories()
@@ -87,7 +94,7 @@ public class Site
             sb.append(c).append('\n');
         }
         sb.append("  features   :\n");
-        for(FeatureReference f: featureReferences.values())
+        for(FeatureReference f: featureReferences)
         {
             sb.append(f).append('\n');
         }

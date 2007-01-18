@@ -6,14 +6,13 @@ import java.util.List;
 
 /**
  * A feature is a grouping of plugins and other features.  Features are used
- * to organise plugins into logical units for installation.
- *
- * Currently only the default "packaged" type of feature is supported.
+ * to organise plugins into logical units for installation.  The manifest
+ * contains all metadata about a feature.
  */
-public class Feature
+public class FeatureManifest
 {
     private String id;
-    private String version;
+    private Version version;
     private String label;
     private String providerName;
     private URL image;
@@ -27,7 +26,7 @@ public class Feature
     private List<FeatureRequirement> requirements = new LinkedList<FeatureRequirement>();
 
 
-    public Feature(String id, String version, String label, String description, String providerName, URL image)
+    public FeatureManifest(String id, Version version, String label, String description, String providerName, URL image)
     {
         this.id = id;
         this.version = version;
@@ -42,7 +41,7 @@ public class Feature
         return id;
     }
 
-    public String getVersion()
+    public Version getVersion()
     {
         return version;
     }

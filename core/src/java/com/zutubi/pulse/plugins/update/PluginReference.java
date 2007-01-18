@@ -2,7 +2,7 @@ package com.zutubi.pulse.plugins.update;
 
 /**
  * A reference from a feature to a plugin that is included in that feature.
- * @see Feature
+ * @see FeatureManifest
  */
 public class PluginReference
 {

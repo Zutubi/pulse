@@ -9,7 +9,7 @@ import com.zutubi.pulse.model.UnknownBuildReason;
 import com.zutubi.pulse.model.persistence.BuildResultDao;
 import com.zutubi.pulse.model.persistence.BuildSpecificationDao;
 import com.zutubi.pulse.model.persistence.ProjectDao;
-import com.zutubi.pulse.util.ListUtils;
+import com.zutubi.pulse.util.CollectionUtils;
 import com.zutubi.pulse.util.Predicate;
 
 import java.util.*;
@@ -251,7 +251,7 @@ public class BuildQueryTest extends MasterPersistenceTestCase
 
     private List<BuildResult> getFiltered(final Project project)
     {
-        return new ListUtils<BuildResult>().filter(allResults, new Predicate<BuildResult>() {
+        return CollectionUtils.filter(allResults, new Predicate<BuildResult>() {
             public boolean satisfied(BuildResult t)
             {
                 return t.getProject().equals(project);
@@ -261,7 +261,7 @@ public class BuildQueryTest extends MasterPersistenceTestCase
 
     private List<BuildResult> getFiltered(final ResultState state)
     {
-        return new ListUtils<BuildResult>().filter(allResults, new Predicate<BuildResult>() {
+        return CollectionUtils.filter(allResults, new Predicate<BuildResult>() {
             public boolean satisfied(BuildResult t)
             {
                 return t.getState().equals(state);
@@ -271,7 +271,7 @@ public class BuildQueryTest extends MasterPersistenceTestCase
 
     private List<BuildResult> getFiltered(final ResultState... states)
     {
-        return new ListUtils<BuildResult>().filter(allResults, new Predicate<BuildResult>() {
+        return CollectionUtils.filter(allResults, new Predicate<BuildResult>() {
             public boolean satisfied(BuildResult t)
             {
                 for(ResultState s: states)
@@ -300,7 +300,7 @@ public class BuildQueryTest extends MasterPersistenceTestCase
 
     private List<BuildResult> getFiltered(final PersistentName spec)
     {
-        return new ListUtils<BuildResult>().filter(allResults, new Predicate<BuildResult>() {
+        return CollectionUtils.filter(allResults, new Predicate<BuildResult>() {
             public boolean satisfied(BuildResult t)
             {
                 return t.getSpecName().equals(spec);
@@ -310,7 +310,7 @@ public class BuildQueryTest extends MasterPersistenceTestCase
 
     private List<BuildResult> getFiltered(final Project project, final PersistentName spec)
     {
-        return new ListUtils<BuildResult>().filter(allResults, new Predicate<BuildResult>() {
+        return CollectionUtils.filter(allResults, new Predicate<BuildResult>() {
             public boolean satisfied(BuildResult t)
             {
                 return t.getProject().equals(project) && t.getSpecName().equals(spec);
@@ -320,7 +320,7 @@ public class BuildQueryTest extends MasterPersistenceTestCase
 
     private List<BuildResult> getFiltered(final int earliestStart, final int latestStart)
     {
-        return new ListUtils<BuildResult>().filter(allResults, new Predicate<BuildResult>() {
+        return CollectionUtils.filter(allResults, new Predicate<BuildResult>() {
             public boolean satisfied(BuildResult t)
             {
                 if(earliestStart > 0 && t.getStamps().getStartTime() < earliestStart)
@@ -340,7 +340,7 @@ public class BuildQueryTest extends MasterPersistenceTestCase
 
     private List<BuildResult> getFiltered(final boolean hasWorkDir)
     {
-        return new ListUtils<BuildResult>().filter(allResults, new Predicate<BuildResult>() {
+        return CollectionUtils.filter(allResults, new Predicate<BuildResult>() {
             public boolean satisfied(BuildResult t)
             {
                 return t.getHasWorkDir() == hasWorkDir;

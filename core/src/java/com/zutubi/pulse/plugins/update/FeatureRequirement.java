@@ -7,10 +7,10 @@ public class FeatureRequirement
 {
     private boolean feature;
     private String id;
-    private String version;
+    private Version version;
     private VersionMatch match = VersionMatch.COMPATIBLE;
 
-    public FeatureRequirement(boolean feature, String id, String version, VersionMatch match)
+    public FeatureRequirement(boolean feature, String id, Version version, VersionMatch match)
     {
         this.feature = feature;
         this.id = id;
@@ -28,7 +28,7 @@ public class FeatureRequirement
         return id;
     }
 
-    public String getVersion()
+    public Version getVersion()
     {
         return version;
     }
@@ -36,5 +36,33 @@ public class FeatureRequirement
     public VersionMatch getMatch()
     {
         return match;
+    }
+
+    public boolean satisfied(Version installed)
+    {
+        return version == null || match == null || match.versionsMatch(installed, version);
+    }
+
+
+    public String toString()
+    {
+        String result = (feature ? "Feature" : "Plugin") + " '" + id + "'";
+        if(version != null)
+        {
+            result += " version " + version.toString();
+            switch(match)
+            {
+                case COMPATIBLE:
+                    result += " or compatible (same major)";
+                    break;
+                case EQUIVALENT:
+                    result += " or equivalent (same major.minor)";
+                    break;
+                case GREATER_OR_EQUAL:
+                    result += " or greater";
+            }
+        }
+
+        return result;
     }
 }

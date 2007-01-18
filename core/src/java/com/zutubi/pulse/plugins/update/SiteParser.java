@@ -96,7 +96,7 @@ public class SiteParser
             Category category = site.getCategory(name);
             if(category == null)
             {
-                throw new ParsingException("Feature '" + id + "' refers to unknown category '" + name + "'");
+                throw new ParsingException("FeatureManifest '" + id + "' refers to unknown category '" + name + "'");
             }
 
             category.addFeatureReference(featureReference);
