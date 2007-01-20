@@ -3,11 +3,12 @@ package com.zutubi.pulse.form.ui;
 import com.zutubi.pulse.form.TextProvider;
 import com.zutubi.pulse.form.descriptor.FormDescriptor;
 import com.zutubi.pulse.form.descriptor.FieldDescriptor;
+import com.zutubi.pulse.form.descriptor.DescriptorDecorator;
 
 /**
  * <class-comment/>
  */
-public class PropertiesFormDecorator
+public class PropertiesFormDecorator implements DescriptorDecorator
 {
     private TextProvider textProvider;
 
