@@ -8,10 +8,9 @@ public class SubmitTest extends ComponentTestCase
     public void testComponentRendering() throws Exception
     {
         Submit field = new Submit();
-        renderer.render(field);
+        field.render(context, templateRenderer);
 
         String content = writer.toString();
-
-        System.out.println(content);
+        assertTrue(content.contains("type=\"submit\""));
     }
 }

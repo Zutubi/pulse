@@ -1108,6 +1108,10 @@
     <package name="admin" namespace="/admin" extends="webwork-default-package">
         <default-interceptor-ref name="completeStack"/>
 
+        <action name="prototype" class="com.zutubi.pulse.web.admin.prototype.PrototypeAction">
+            <result name="success" type="velocity">prototype.vm</result>
+        </action>
+
         <action name="serverSettings" class="com.zutubi.pulse.web.admin.ServerSettingsAction">
             <interceptor-ref name="defaultStack"/>
             <result name="success" type="velocity">server-settings.vm</result>

@@ -1,31 +1,31 @@
 package com.zutubi.pulse.form.ui.components;
 
-import com.zutubi.pulse.test.PulseTestCase;
-import com.zutubi.pulse.form.ui.renderers.FreemarkerTemplateRenderer;
-import com.zutubi.pulse.form.ui.ComponentRenderer;
-import com.zutubi.pulse.form.ui.RenderContext;
 import com.zutubi.pulse.form.NoopTextProvider;
-import freemarker.cache.TemplateLoader;
+import com.zutubi.pulse.form.ui.RenderContext;
+import com.zutubi.pulse.form.ui.renderers.FreemarkerTemplateRenderer;
+import com.zutubi.pulse.test.PulseTestCase;
 import freemarker.cache.FileTemplateLoader;
 import freemarker.cache.MultiTemplateLoader;
+import freemarker.cache.TemplateLoader;
 import freemarker.template.Configuration;
 import freemarker.template.DefaultObjectWrapper;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.Writer;
 import java.io.StringWriter;
-import java.util.List;
+import java.io.Writer;
 import java.util.Arrays;
+import java.util.List;
 
 /**
  * <class-comment/>
  */
 public abstract class ComponentTestCase extends PulseTestCase
 {
-    protected ComponentRenderer renderer;
+//    protected ComponentRenderer renderer;
     protected Writer writer;
     protected FreemarkerTemplateRenderer templateRenderer;
+    protected RenderContext context;
 
     protected void setUp() throws Exception
     {
@@ -41,18 +41,18 @@ public abstract class ComponentTestCase extends PulseTestCase
         templateRenderer = new FreemarkerTemplateRenderer();
         templateRenderer.setConfiguration(config);
 
-        renderer = new ComponentRenderer();
+//        renderer = new ComponentRenderer();
 
-        RenderContext context = new RenderContext(templateRenderer, new NoopTextProvider());
+        context = new RenderContext(templateRenderer, new NoopTextProvider());
         context.setWriter(writer);
 
-        renderer.setContext(context);
+//        renderer.setContext(context);
     }
 
     protected void tearDown() throws Exception
     {
         templateRenderer = null;
-        renderer = null;
+        context = null;
         writer = null;
 
         super.tearDown();

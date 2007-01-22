@@ -1,8 +1,8 @@
 package com.zutubi.pulse.form.ui.components;
 
 import java.util.Arrays;
-import java.util.Map;
 import java.util.HashMap;
+import java.util.Map;
 
 /**
  * <class-comment/>
@@ -13,7 +13,7 @@ public class RadioFieldTest extends ComponentTestCase
     {
         RadioField field = new RadioField();
         field.setList(Arrays.asList("a", "b"));
-        renderer.render(field);
+        field.render(context, templateRenderer);
 
         String content = writer.toString();
 
@@ -30,7 +30,8 @@ public class RadioFieldTest extends ComponentTestCase
         field.setLabel("Label");
         field.setName("name");
         field.setList(list);
-        renderer.render(field);
+        field.setContext(context);
+        field.render(context, templateRenderer);
 
         String content = writer.toString();
         System.out.println(content);

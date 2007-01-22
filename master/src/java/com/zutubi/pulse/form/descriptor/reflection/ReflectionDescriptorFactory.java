@@ -1,16 +1,15 @@
 package com.zutubi.pulse.form.descriptor.reflection;
 
-import com.zutubi.pulse.form.descriptor.*;
 import com.zutubi.pulse.form.FieldType;
+import com.zutubi.pulse.form.descriptor.*;
+import com.zutubi.pulse.form.descriptor.annotation.Summary;
 
 import java.beans.BeanInfo;
 import java.beans.IntrospectionException;
 import java.beans.Introspector;
 import java.beans.PropertyDescriptor;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import java.lang.annotation.Annotation;
+import java.util.*;
 
 /**
  * <class-comment/>
@@ -38,6 +37,13 @@ public class ReflectionDescriptorFactory implements DescriptorFactory
         formDescriptor.setFieldDescriptors(buildFieldDescriptors(type));
 
         return applyDecorators(formDescriptor);
+    }
+
+    public TableDescriptor createTableDescriptor(Class type)
+    {
+        DefaultTableDescriptor tableDescriptor = new DefaultTableDescriptor();
+        tableDescriptor.setColumnDescriptors(buildColumnDerscriptors(type));
+        return tableDescriptor;
     }
 
     private FormDescriptor applyDecorators(FormDescriptor formDescriptor)
@@ -130,4 +136,28 @@ public class ReflectionDescriptorFactory implements DescriptorFactory
             throw new ReflectionException(e);
         }
     }
+
+    private List<ColumnDescriptor> buildColumnDerscriptors(Class type)
+    {
+        List<ColumnDescriptor> columns = new ArrayList<ColumnDescriptor>();
+
+        Annotation[] classAnnotations = type.getAnnotations();
+
+        for (Annotation annotation : classAnnotations)
+        {
+            if (annotation instanceof Summary)
+            {
+                Summary summary = (Summary) annotation;
+                for (String field : summary.fields())
+                {
+                    DefaultColumnDescriptor column = new DefaultColumnDescriptor();
+                    column.setName(field);
+                    columns.add(column);
+                }
+            }
+        }
+
+        return columns;
+    }
+
 }

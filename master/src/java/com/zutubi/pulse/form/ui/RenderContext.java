@@ -1,8 +1,8 @@
 package com.zutubi.pulse.form.ui;
 
-import com.zutubi.pulse.form.TextProvider;
-import com.opensymphony.xwork.util.OgnlValueStack;
 import com.opensymphony.xwork.ActionContext;
+import com.opensymphony.xwork.util.OgnlValueStack;
+import com.zutubi.pulse.form.TextProvider;
 
 import java.io.Writer;
 
@@ -38,6 +38,16 @@ public class RenderContext
     public Object get(String key)
     {
         return getValueStack().findValue(key);
+    }
+
+    public void push(Object obj)
+    {
+        getValueStack().push(obj);
+    }
+
+    public void pop()
+    {
+        getValueStack().pop();
     }
 
     private OgnlValueStack getValueStack()

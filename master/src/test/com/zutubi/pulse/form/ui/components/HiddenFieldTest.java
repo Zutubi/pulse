@@ -8,7 +8,7 @@ public class HiddenFieldTest extends ComponentTestCase
     public void testComponentRendering() throws Exception
     {
         HiddenField field = new HiddenField();
-        renderer.render(field);
+        field.render(context, templateRenderer);
 
         String content = writer.toString();
 

@@ -1,8 +1,8 @@
 package com.zutubi.pulse.form.ui.components;
 
 import java.util.Arrays;
-import java.util.Map;
 import java.util.HashMap;
+import java.util.Map;
 
 /**
  * <class-comment/>
@@ -13,7 +13,7 @@ public class SelectFieldTest extends ComponentTestCase
     {
         SelectField field = new SelectField();
         field.setList(Arrays.asList("a", "b"));
-        renderer.render(field);
+        field.render(context, templateRenderer);
 
         String content = writer.toString();
 
@@ -27,11 +27,12 @@ public class SelectFieldTest extends ComponentTestCase
         list.put("b", "B");
 
         SelectField field = new SelectField();
+        field.setContext(context);
         field.setLabel("Label");
         field.setName("name");
         field.setList(list);
         field.setValue("a");
-        renderer.render(field);
+        field.render(context, templateRenderer);
 
         String content = writer.toString();
         System.out.println(content);

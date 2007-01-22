@@ -4,7 +4,10 @@ import com.zutubi.pulse.prototype.record.Record;
 import com.zutubi.pulse.util.CollectionUtils;
 import com.zutubi.pulse.util.Predicate;
 
+import java.util.Collection;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * <class comment/>
@@ -22,9 +25,9 @@ public class TemplateRecord implements Record
         this.templateChain = templateChain;
     }
 
-    public String get(String name)
+    public String get(Object name)
     {
-        OwnedRecord record = getOwnedRecord(name);
+        OwnedRecord record = getOwnedRecord((String) name);
         if (record != null)
         {
             return record.getRecord().get(name);
@@ -43,7 +46,7 @@ public class TemplateRecord implements Record
 
         if(record == null)
         {
-            record = templateChain.get(templateChain.size());
+            record = templateChain.get(templateChain.size() - 1);
         }
 
         return record.getOwner();
@@ -63,5 +66,61 @@ public class TemplateRecord implements Record
     public String getOwner()
     {
         return owner;
+    }
+
+
+    public int size()
+    {
+        throw new RuntimeException("Method not yet implemented.");
+    }
+
+    public boolean isEmpty()
+    {
+        throw new RuntimeException("Method not yet implemented.");
+    }
+
+    public boolean containsKey(Object key)
+    {
+        return get(key) != null;
+    }
+
+    public boolean containsValue(Object value)
+    {
+        throw new RuntimeException("Method not yet implemented.");
+    }
+
+    public String put(String key, String value)
+    {
+        throw new RuntimeException("Method not yet implemented.");
+    }
+
+    public String remove(Object key)
+    {
+        throw new RuntimeException("Method not yet implemented.");
+    }
+
+    public void putAll(Map<? extends String, ? extends String> t)
+    {
+        throw new RuntimeException("Method not yet implemented.");
+    }
+
+    public void clear()
+    {
+        throw new RuntimeException("Method not yet implemented.");
+    }
+
+    public Set<String> keySet()
+    {
+        throw new RuntimeException("Method not yet implemented.");
+    }
+
+    public Collection<String> values()
+    {
+        throw new RuntimeException("Method not yet implemented.");
+    }
+
+    public Set<Entry<String, String>> entrySet()
+    {
+        throw new RuntimeException("Method not yet implemented.");
     }
 }

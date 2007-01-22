@@ -1,11 +1,13 @@
 package com.zutubi.pulse.prototype.record;
 
+import java.util.Map;
+
 /**
  * <class comment/>
  */
-public interface Record
+public interface Record extends Map<String, String>
 {
-    String get(String name);
+    String get(Object name);
 
     String getSymbolicName();
 }

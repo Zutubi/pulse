@@ -11,10 +11,10 @@ public class SubmitGroupTest extends ComponentTestCase
         field.addNestedComponent(new Submit());
         field.addNestedComponent(new Submit());
         field.addNestedComponent(new Submit());
-        renderer.render(field);
+        field.render(context, templateRenderer);
 
         String content = writer.toString();
 
-        System.out.println(content);
+        assertTrue(content.contains("<input type=\"submit\" class=\"submit\"/><input type=\"submit\" class=\"submit\"/><input type=\"submit\" class=\"submit\"/>"));
     }
 }

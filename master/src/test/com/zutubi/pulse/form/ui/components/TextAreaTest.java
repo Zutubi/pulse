@@ -8,9 +8,9 @@ public class TextAreaTest extends ComponentTestCase
     public void testComponentRendering() throws Exception
     {
         TextArea field = new TextArea();
-        renderer.render(field);
+        field.render(context, templateRenderer);
 
         String content = writer.toString();
-        System.out.println(content);
+        assertTrue(content.contains("<textarea name=\"\"></textarea>"));
     }
 }

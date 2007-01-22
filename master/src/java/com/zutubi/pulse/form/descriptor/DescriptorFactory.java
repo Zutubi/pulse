@@ -10,4 +10,6 @@ public interface DescriptorFactory
     FormDescriptor createFormDescriptor(Class type);
 
     void setDecorators(List<DescriptorDecorator> decorators);
+
+    TableDescriptor createTableDescriptor(Class type);
 }

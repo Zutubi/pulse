@@ -12,7 +12,7 @@ public class RecordTypeRegistry
 
     public Class getType(String symbolicName)
     {
-        return null;
+        return SvnConfiguration.class;
     }
 
 }

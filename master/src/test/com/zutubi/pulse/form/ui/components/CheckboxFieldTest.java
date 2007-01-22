@@ -8,10 +8,10 @@ public class CheckboxFieldTest extends ComponentTestCase
     public void testComponentRendering() throws Exception
     {
         CheckboxField field = new CheckboxField();
-        renderer.render(field);
+        field.render(context, templateRenderer);
 
         String content = writer.toString();
 
-        System.out.println(content);
+        assertTrue(content.contains("type=\"checkbox\""));
     }
 }

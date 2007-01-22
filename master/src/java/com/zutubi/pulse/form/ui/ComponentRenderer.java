@@ -18,22 +18,5 @@ public class ComponentRenderer
     {
         component.setContext(context);
 
-        if (component.start())
-        {
-            evaluateBody(component);
-        }
-
-        while (component.end())
-        {
-            evaluateBody(component);
-        }
-    }
-
-    private void evaluateBody(Component component) throws Exception
-    {
-        for (Component nestedComponent : component.getNestedComponents())
-        {
-            render(nestedComponent);
-        }
     }
 }

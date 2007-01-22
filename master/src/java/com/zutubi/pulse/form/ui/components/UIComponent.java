@@ -1,5 +1,7 @@
 package com.zutubi.pulse.form.ui.components;
 
+import com.zutubi.pulse.form.ui.RenderContext;
+import com.zutubi.pulse.form.ui.TemplateRenderer;
 import com.zutubi.pulse.form.ui.TemplateRendererContext;
 
 /**
@@ -34,15 +36,16 @@ public abstract class UIComponent extends Component
     protected String onselect;
     protected String onchange;
 
-    public boolean end() throws Exception
+
+    public void render(RenderContext context, TemplateRenderer renderer) throws Exception
     {
+        setContext(context);
+
         // generate the template renderer context
         evaluateParameters();
 
         TemplateRendererContext templateContext = new TemplateRendererContext(getDefaultTemplate(), getParameters(), context);
-        context.getRenderer().render(templateContext);
-
-        return false;
+        renderer.render(templateContext);
     }
 
     public abstract String getDefaultTemplate();

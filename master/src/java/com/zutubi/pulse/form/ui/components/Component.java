@@ -1,11 +1,10 @@
 package com.zutubi.pulse.form.ui.components;
 
 import com.zutubi.pulse.form.ui.RenderContext;
+import com.zutubi.pulse.form.ui.TemplateRenderer;
 
-import java.util.List;
-import java.util.LinkedList;
-import java.util.Map;
 import java.util.HashMap;
+import java.util.Map;
 
 /**
  * <class-comment/>
@@ -16,39 +15,35 @@ public class Component
 
     protected Map<String, Object> parameters;
 
-    private Component parent;
-    private List<Component> nestedComponents;
+    Component parent;
 
     public void setContext(RenderContext context)
     {
         this.context = context;
     }
 
-    public boolean start() throws Exception
+    public void render(RenderContext context, TemplateRenderer renderer) throws Exception
+    {
+
+    }
+
+/*
+    public boolean start(ComponentRenderer renderer) throws Exception
     {
         return true;
     }
 
-    public boolean end() throws Exception
+    public void body(ComponentRenderer renderer) throws Exception
+    {
+        
+    }
+
+    public boolean end(ComponentRenderer renderer) throws Exception
     {
         return false;
     }
 
-    public List<Component> getNestedComponents()
-    {
-        if (nestedComponents == null)
-        {
-            nestedComponents = new LinkedList<Component>();
-        }
-        return nestedComponents;
-    }
-
-    public void addNestedComponent(Component component)
-    {
-        component.parent = this;
-        getNestedComponents().add(component);
-    }
-
+*/
     protected Map<String, Object> getParameters()
     {
         if (parameters == null)
@@ -66,22 +61,6 @@ public class Component
     public void addParameters(Map<String, Object> params)
     {
         getParameters().putAll(params);
-    }
-
-    public Component getNestedComponent(String id)
-    {
-        if (id == null)
-        {
-            return null;
-        }
-        for (Component component : getNestedComponents())
-        {
-            if (id.equals(component.getId()))
-            {
-                return component;
-            }
-        }
-        return null;
     }
 
     protected Component findAncestor(Class clazz)

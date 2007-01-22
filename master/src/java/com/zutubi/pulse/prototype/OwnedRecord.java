@@ -10,6 +10,11 @@ public class OwnedRecord
     Record record;
     String owner;
 
+    public OwnedRecord(Record record, String owner)
+    {
+        this.record = record;
+        this.owner = owner;
+    }
 
     public Record getRecord()
     {

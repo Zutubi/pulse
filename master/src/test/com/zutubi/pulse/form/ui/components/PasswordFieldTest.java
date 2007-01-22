@@ -8,7 +8,7 @@ public class PasswordFieldTest extends ComponentTestCase
     public void testComponentRendering() throws Exception
     {
         PasswordField field = new PasswordField();
-        renderer.render(field);
+        field.render(context, templateRenderer);
 
         String content = writer.toString();
 
