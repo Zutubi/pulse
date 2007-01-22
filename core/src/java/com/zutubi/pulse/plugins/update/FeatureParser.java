@@ -31,7 +31,7 @@ public class FeatureParser
     private static final String ATTRIBUTE_VERSION = "version";
 
     private static final String ELEMENT_COPYRIGHT = "copyright";
-    private static final String ELEMENT_DISCOVERY = "disocvery";
+    private static final String ELEMENT_DISCOVERY = "discovery";
     private static final String ELEMENT_IMPORT = "import";
     private static final String ELEMENT_INCLUDES = "includes";
     private static final String ELEMENT_LICENSE = "license";
