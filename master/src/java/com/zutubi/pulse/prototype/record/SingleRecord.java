@@ -1,26 +1,24 @@
 package com.zutubi.pulse.prototype.record;
 
-import com.zutubi.pulse.prototype.Scope;
-
 import java.util.Collection;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
 
 /**
- * <class comment/>
+ * A Record is an object graph converted to a simpified data structure for
+ * the purpose of persistence and templating.
  */
 public class SingleRecord implements Record
 {
-    private Scope scope;
-    private String id;
     private String symbolicName;
 
-    Map<String, String> data = new TreeMap<String, String>();
+    Map<String, Object> data = new TreeMap<String, Object>();
 
-    public Map<String, String> getData()
+
+    public SingleRecord(String symbolicName)
     {
-        return this;
+        this.symbolicName = symbolicName;
     }
 
     public String getSymbolicName()
@@ -28,7 +26,7 @@ public class SingleRecord implements Record
         return symbolicName;
     }
 
-    public String get(String name)
+    public Object get(String name)
     {
         return data.get(name);
     }
@@ -53,22 +51,22 @@ public class SingleRecord implements Record
         return data.containsValue(value);
     }
 
-    public String get(Object key)
+    public Object get(Object key)
     {
         return data.get(key);
     }
 
-    public String put(String key, String value)
+    public Object put(String key, Object value)
     {
         return data.put(key, value);
     }
 
-    public String remove(Object key)
+    public Object remove(Object key)
     {
         return data.remove(key);
     }
 
-    public void putAll(Map<? extends String, ? extends String> t)
+    public void putAll(Map<? extends String, ? extends Object> t)
     {
         data.putAll(t);
     }
@@ -83,12 +81,12 @@ public class SingleRecord implements Record
         return data.keySet();
     }
 
-    public Collection<String> values()
+    public Collection<Object> values()
     {
         return data.values();
     }
 
-    public Set<Entry<String, String>> entrySet()
+    public Set<Entry<String, Object>> entrySet()
     {
         return data.entrySet();
     }

@@ -34,6 +34,8 @@ public class PrototypeAction extends ActionSupport
     {
         TemplateRecord scm = templateManager.load(Scopes.PROJECTS, Long.toString(projectId), recordName);
 
+        typeRegistry.register("svnConfiguration", SvnConfiguration.class);
+        
         Class scmConfigType = typeRegistry.getType(scm.getSymbolicName());
 
         FormSupport support = new FormSupport();

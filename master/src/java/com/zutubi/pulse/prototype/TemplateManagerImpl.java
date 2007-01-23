@@ -13,7 +13,7 @@ public class TemplateManagerImpl implements TemplateManager
     public TemplateRecord load(Scope scope, String id, String recordName)
     {
         List<OwnedRecord> records = new ArrayList<OwnedRecord>();
-        SingleRecord record = new SingleRecord();
+        SingleRecord record = new SingleRecord("svnConfiguration");
         record.put("url", "test url");
         OwnedRecord baseRecord = new OwnedRecord(record, id);
         records.add(baseRecord);

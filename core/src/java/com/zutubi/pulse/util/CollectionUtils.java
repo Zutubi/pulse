@@ -26,6 +26,21 @@ public class CollectionUtils
         }
     }
 
+    public static <T, U> List<U> map(List<T> l, Mapping<T, U> m)
+    {
+        List<U> result = new LinkedList<U>();
+        map(l, m, result);
+        return result;
+    }
+
+    public static <T, U> void map(Collection<T> in, Mapping<T, U> m, Collection<U> out)
+    {
+        for(T t: in)
+        {
+            out.add(m.map(t));
+        }
+    }
+
     public static <T> T find(Collection<T> c, Predicate<T> p)
     {
         for(T t: c)

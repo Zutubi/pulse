@@ -5,9 +5,9 @@ import java.util.Map;
 /**
  * <class comment/>
  */
-public interface Record extends Map<String, String>
+public interface Record extends Map<String, Object>
 {
-    String get(Object name);
+    Object get(Object name);
 
     String getSymbolicName();
 }

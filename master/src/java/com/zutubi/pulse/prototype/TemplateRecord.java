@@ -25,7 +25,7 @@ public class TemplateRecord implements Record
         this.templateChain = templateChain;
     }
 
-    public String get(Object name)
+    public Object get(Object name)
     {
         OwnedRecord record = getOwnedRecord((String) name);
         if (record != null)
@@ -89,7 +89,7 @@ public class TemplateRecord implements Record
         throw new RuntimeException("Method not yet implemented.");
     }
 
-    public String put(String key, String value)
+    public String put(String key, Object value)
     {
         throw new RuntimeException("Method not yet implemented.");
     }
@@ -99,7 +99,7 @@ public class TemplateRecord implements Record
         throw new RuntimeException("Method not yet implemented.");
     }
 
-    public void putAll(Map<? extends String, ? extends String> t)
+    public void putAll(Map<? extends String, ? extends Object> t)
     {
         throw new RuntimeException("Method not yet implemented.");
     }
@@ -114,12 +114,12 @@ public class TemplateRecord implements Record
         throw new RuntimeException("Method not yet implemented.");
     }
 
-    public Collection<String> values()
+    public Collection<Object> values()
     {
         throw new RuntimeException("Method not yet implemented.");
     }
 
-    public Set<Entry<String, String>> entrySet()
+    public Set<Entry<String, Object>> entrySet()
     {
         throw new RuntimeException("Method not yet implemented.");
     }
