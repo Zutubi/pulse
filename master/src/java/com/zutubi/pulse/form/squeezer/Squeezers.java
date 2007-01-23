@@ -2,8 +2,8 @@ package com.zutubi.pulse.form.squeezer;
 
 import com.zutubi.pulse.form.squeezer.squeezers.*;
 
-import java.util.Map;
 import java.util.HashMap;
+import java.util.Map;
 
 /**
  * <class-comment/>
@@ -18,6 +18,10 @@ public class Squeezers
         register(String.class, StringSqueezer.class);
         register(Boolean.class, BooleanSqueezer.class);
         register(Boolean.TYPE, BooleanSqueezer.class);
+        register(Byte.class, ByteSqueezer.class);
+        register(Byte.TYPE, ByteSqueezer.class);
+        register(Character.class, CharacterSqueezer.class);
+        register(Character.TYPE, CharacterSqueezer.class);
         register(Integer.class, IntegerSqueezer.class);
         register(Integer.TYPE, IntegerSqueezer.class);
         register(Long.class, LongSqueezer.class);

@@ -1,8 +1,6 @@
 package com.zutubi.pulse.util;
 
-import java.util.Collection;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 
 /**
  */
@@ -38,6 +36,21 @@ public class CollectionUtils
         for(T t: in)
         {
             out.add(m.map(t));
+        }
+    }
+
+    public static <K, T, U> Map<K, U> map(Map<K, T> in, Mapping<T, U> m)
+    {
+        Map<K, U> result = new HashMap<K,U>(in.size());
+        map(in, m, result);
+        return result;
+    }
+
+    public static <K, T, U> void map(Map<K, T> in, Mapping<T, U> m, Map<K, U> out)
+    {
+        for(Map.Entry<K, T> e: in.entrySet())
+        {
+            out.put(e.getKey(), m.map(in.get(e.getKey())));
         }
     }
 

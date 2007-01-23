@@ -14,16 +14,17 @@ import java.util.Map;
  */
 public class RecordTypeRegistry
 {
-    private Map<String, Class> nameToType = new HashMap<String, Class>();
-    private Map<Class, String> typeToName = new HashMap<Class, String>();
+    private Map<String, RecordTypeInfo> nameToInfo = new HashMap<String, RecordTypeInfo>();
+    private Map<Class, RecordTypeInfo> typeToInfo = new HashMap<Class, RecordTypeInfo>();
 
-    public void register(String symbolicName, Class type)
+    public void register(String symbolicName, Class type) throws InvalidRecordTypeException
     {
-        nameToType.put(symbolicName, type);
-        typeToName.put(type, symbolicName);
+        RecordTypeInfo info = new RecordTypeInfo(symbolicName, type);
+        nameToInfo.put(symbolicName, info);
+        typeToInfo.put(type, info);
     }
 
-    public void register(Class type)
+    public void register(Class type) throws InvalidRecordTypeException
     {
         // TODO: why does Intellij insist on this cast?
         SymbolicName a = (SymbolicName) type.getAnnotation(SymbolicName.class);
@@ -37,11 +38,21 @@ public class RecordTypeRegistry
 
     public Class getType(String symbolicName)
     {
-        return nameToType.get(symbolicName);
+        return nameToInfo.get(symbolicName).getType();
+    }
+
+    public RecordTypeInfo getInfo(String symbolicName)
+    {
+        return nameToInfo.get(symbolicName);
     }
 
     public String getSymbolicName(Class type)
     {
-        return typeToName.get(type);
+        return typeToInfo.get(type).getSymbolicName();
+    }
+
+    public RecordTypeInfo getInfo(Class type)
+    {
+        return typeToInfo.get(type);
     }
 }
