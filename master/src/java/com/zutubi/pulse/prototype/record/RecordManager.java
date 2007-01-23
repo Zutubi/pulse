@@ -7,7 +7,7 @@ import com.zutubi.pulse.prototype.Scope;
  */
 public interface RecordManager
 {
-    Record load(Scope scope, String id);
+    Record load(Scope scope, String path);
 
     void store(Record record);
 

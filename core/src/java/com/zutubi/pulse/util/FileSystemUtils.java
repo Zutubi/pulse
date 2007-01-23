@@ -6,8 +6,9 @@ import com.zutubi.pulse.util.logging.Logger;
 import java.io.*;
 import java.net.URLConnection;
 import java.util.Arrays;
-import java.util.List;
+import java.util.Collection;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.zip.CRC32;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
@@ -729,6 +730,11 @@ public class FileSystemUtils
     }
 
     public static String composeFilename(String... parts)
+    {
+        return StringUtils.join(File.separator, parts);
+    }
+
+    public static String composeFilename(Collection<String> parts)
     {
         return StringUtils.join(File.separator, parts);
     }

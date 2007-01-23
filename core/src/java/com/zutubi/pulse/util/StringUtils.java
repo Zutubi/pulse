@@ -1,10 +1,11 @@
 package com.zutubi.pulse.util;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
-import java.net.URLEncoder;
-import java.io.UnsupportedEncodingException;
 
 /**
  */
@@ -427,6 +428,10 @@ public class StringUtils
         return result.toString();
     }
 
+    public static String join(String separator, Collection<String> parts)
+    {
+        return join(separator, parts.toArray(new String[parts.size()]));
+    }
 
     public static String urlEncode(String s)
     {

@@ -1,5 +1,8 @@
 package com.zutubi.pulse.prototype;
 
+import java.util.LinkedList;
+import java.util.List;
+
 /**
  * <class comment/>
  */
@@ -28,5 +31,22 @@ public class Scope
     public Scope getParent()
     {
         return parent;
+    }
+
+    public List<String> getPath()
+    {
+        List<String> result = new LinkedList<String>();
+        getPath(result);
+        return result;
+    }
+
+    private void getPath(List<String> result)
+    {
+        if(parent != null)
+        {
+            parent.getPath(result);
+        }
+
+        result.add(name);
     }
 }
