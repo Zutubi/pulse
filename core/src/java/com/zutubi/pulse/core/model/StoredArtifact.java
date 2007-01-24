@@ -198,10 +198,17 @@ public class StoredArtifact extends Entity
         return null;
     }
 
-    private StoredFileArtifact findFileBase(String file)
+    /**
+     * Retrieve a file artifact associated with this artifact.
+     *
+     * @param path identifying the requested file artifact.
+     * 
+     * @return a stored file artifact instance, or null.
+     */
+    public StoredFileArtifact findFileBase(String path)
     {
         // Forward slash OK: paths are normalised in these artifacts
-        return findFile(name + "/" + file);
+        return findFile(name + "/" + path);
     }
 
     public boolean hasIndexFile()

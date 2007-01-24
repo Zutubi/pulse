@@ -82,13 +82,13 @@ public class ViewFileServlet extends HttpServlet
         File file = new File(result.getAbsoluteOutputDir(configurationManager.getDataDirectory()), filePath);
         if (filePath.equals(artifact.getName()))
         {
-            String index = artifact.findIndexFile();
-            if (index == null)
+            if (!artifact.hasIndexFile())
             {
                 httpServletResponse.sendError(404);
                 return;
             }
 
+            String index = artifact.findIndexFile();
             filePath = filePath + "/" + index;
             file = new File(file, index);
         }

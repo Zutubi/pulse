@@ -39,7 +39,39 @@ public class FileArtifactFileObject extends AbstractPulseFileObject implements A
             try
             {
                 StoredFileArtifact artifact = getFileArtifact();
-                canDecorate = buildManager.canDecorateArtifact(artifact.getId());
+                if (artifact != null)
+                {
+                    canDecorate = buildManager.canDecorateArtifact(artifact.getId());
+                }
+                //else
+                {
+                    // CIB-882: still unsure under what exact conditions this occurs, although it implies a problem
+                    // with the artifact path. Attempt to log as enough information to work out what is going on.
+                    LOG.warning("Failed to locate file artifact: %s", getArtifactPath());
+                    final long storedArtifactId = getArtifact().getId();
+                    buildManager.executeInTransaction(new Runnable()
+                    {
+                        public void run()
+                        {
+                            try
+                            {
+                                StringBuilder builder = new StringBuilder();
+                                builder.append("Available file artifacts are:\n");
+                                StoredArtifact artifact = buildManager.getArtifact(storedArtifactId);
+                                for (StoredFileArtifact fileArtifact : artifact.getChildren())
+                                {
+                                    builder.append("    ").append(fileArtifact.getPath()).append("\n");
+                                }
+                                LOG.warning(builder.toString());
+                            }
+                            catch (Exception e)
+                            {
+                                LOG.warning(e);
+                            }
+                        }
+                    });
+                    canDecorate = false;
+                }
             }
             catch (FileSystemException e)
             {
@@ -123,7 +155,7 @@ public class FileArtifactFileObject extends AbstractPulseFileObject implements A
 
     public StoredFileArtifact getFileArtifact() throws FileSystemException
     {
-        return getArtifact().findFile(getArtifact().getName() + "/" + getArtifactPath());
+        return getArtifact().findFileBase(getArtifactPath());
     }
 
     public File getFile()
@@ -138,7 +170,7 @@ public class FileArtifactFileObject extends AbstractPulseFileObject implements A
 
     protected StoredArtifact getArtifact() throws FileSystemException
     {
-        return ((ArtifactProvider)getAncestor(ArtifactProvider.class)).getArtifact();
+        return ((ArtifactProvider) getAncestor(ArtifactProvider.class)).getArtifact();
     }
 
     protected String getArtifactPath() throws FileSystemException
