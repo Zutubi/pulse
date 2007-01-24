@@ -67,6 +67,11 @@ public class CollectionUtils
         return null;
     }
 
+    public static <T> T find(T[] c, Predicate<T> p)
+    {
+        return find(Arrays.asList(c), p);
+    }
+
     public static <T> boolean containsIdentity(T[] a, T x)
     {
         for(T t: a)
