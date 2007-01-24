@@ -57,6 +57,9 @@ public class DefaultAgentManager implements AgentManager, EventListener, Stoppab
     private Map<Long, AgentUpdater> updaters = new TreeMap<Long, AgentUpdater>();
     private ReentrantLock updatersLock = new ReentrantLock();
 
+    // ping timeout in seconds.
+    private static final int PING_TIMEOUT = Integer.getInteger("pulse.agent.ping.timeout", 45);
+
     public void init()
     {
         MasterBuildService masterService = new MasterBuildService(masterRecipeProcessor, configurationManager, resourceManager);
@@ -118,17 +121,22 @@ public class DefaultAgentManager implements AgentManager, EventListener, Stoppab
 
     public void pingSlaves()
     {
+        Collection<SlaveAgent> copyOfSlaveAgents = null;
+
         lock.lock();
         try
         {
-            for (SlaveAgent agent: slaveAgents.values())
-            {
-                pingSlave(agent);
-            }
+            copyOfSlaveAgents = new ArrayList<SlaveAgent>(slaveAgents.values());
         }
         finally
         {
             lock.unlock();
+        }
+
+        // pinging the slave agents may take a while, so lets do this outside the lock.
+        for (SlaveAgent agent: copyOfSlaveAgents)
+        {
+            pingSlave(agent);
         }
     }
 
@@ -175,7 +183,7 @@ public class DefaultAgentManager implements AgentManager, EventListener, Stoppab
 
             try
             {
-                status = future.get(10, TimeUnit.SECONDS);
+                status = future.get(PING_TIMEOUT, TimeUnit.SECONDS);
             }
             catch (TimeoutException e)
             {
@@ -532,12 +540,20 @@ public class DefaultAgentManager implements AgentManager, EventListener, Stoppab
             return masterAgent;
         }
 
-        for(SlaveAgent s: slaveAgents.values())
+        try // synchronize access to the slaveAgents map.
         {
-            if(s.getName().equals(name))
+            lock.lock();
+            for(SlaveAgent s: slaveAgents.values())
             {
-                return s;
+                if(s.getName().equals(name))
+                {
+                    return s;
+                }
             }
+        }
+        finally
+        {
+            lock.unlock();
         }
 
         return null;
