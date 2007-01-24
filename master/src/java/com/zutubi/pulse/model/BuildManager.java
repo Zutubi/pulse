@@ -150,4 +150,7 @@ public interface BuildManager
     StoredArtifact getCommandResultByArtifact(long commandResultId, String artifactName);
 
     Boolean canDecorateArtifact(long artifactId);
+
+    // debugging hack: need to work out a better way
+    void executeInTransaction(Runnable r);
 }

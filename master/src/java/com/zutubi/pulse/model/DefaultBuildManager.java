@@ -410,6 +410,12 @@ public class DefaultBuildManager implements BuildManager, EventListener
         return artifact != null && artifact.canDecorate();
     }
 
+    // debugging hack: need to work out a better way
+    public void executeInTransaction(Runnable runnable)
+    {
+        runnable.run();
+    }
+
     public BuildResult getLatestBuildResult(BuildSpecification spec)
     {
         return buildResultDao.findLatestByBuildSpec(spec);
