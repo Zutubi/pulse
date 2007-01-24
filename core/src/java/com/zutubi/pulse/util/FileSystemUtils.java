@@ -6,8 +6,8 @@ import com.zutubi.pulse.util.logging.Logger;
 import java.io.*;
 import java.net.URLConnection;
 import java.util.Arrays;
-import java.util.List;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.zip.CRC32;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
@@ -44,6 +44,13 @@ public class FileSystemUtils
     public static final int PERMISSION_ALL_WRITE     = PERMISSION_OWNER_WRITE | PERMISSION_GROUP_WRITE | PERMISSION_OTHER_WRITE;
     public static final int PERMISSION_ALL_EXECUTE   = PERMISSION_OWNER_EXECUTE | PERMISSION_GROUP_EXECUTE | PERMISSION_OTHER_EXECUTE;
     public static final int PERMISSION_ALL_FULL      = PERMISSION_OWNER_FULL | PERMISSION_GROUP_FULL | PERMISSION_OTHER_FULL;
+
+    static final boolean USE_UNIX_COPY;
+
+    static
+    {
+        USE_UNIX_COPY = !SystemUtils.IS_WINDOWS && SystemUtils.findInPath("cp") != null;
+    }
 
     /**
      * Recursively delete a directory and its contents.
@@ -989,10 +996,33 @@ public class FileSystemUtils
         }
     }
 
-    // WARNING: will not handle recursive symlinks
+    /**
+     * Copies source the source file(s) to the destination.  A few modes are
+     * supported:
+     *
+     * Single source:
+     *   File -> File: copies a file to a file, overwriting an existing dest
+     *   File -> Dir : copy file into an existing dest directory, overwriting
+     *                 any existing child file (but not existing child dir!)
+     *   Dir  -> Dir : recursive copy of directory, overwrites existing dest,
+     *                 (even if it is a file) creates dest if necessary
+     *
+     * Multiple sources (must all be files):
+     *   File(s) -> Dir: copies files into existing dest dir, overwrites
+     *                   existing dest, creates dest if necessary
+     * 
+     * @param dest
+     * @param src
+     * @throws IOException
+     */
     public static void copy(File dest, File... src) throws IOException
     {
-        if (!SystemUtils.IS_WINDOWS && SystemUtils.findInPath("cp") != null)
+        if (src.length == 0)
+        {
+            return;
+        }
+
+        if (USE_UNIX_COPY)
         {
             unixCopy(dest, src);
         }
@@ -1002,45 +1032,79 @@ public class FileSystemUtils
         }
     }
 
-    private static void unixCopy(File to, File... from) throws IOException
+    public static void delete(File f) throws IOException
+    {
+        if (f.exists())
+        {
+            if (f.isDirectory())
+            {
+                if (!rmdir(f))
+                {
+                    throw new IOException("Cannot remove existing directory '" + f.getAbsolutePath() + "'");
+                }
+            }
+            else
+            {
+                if (!f.delete())
+                {
+                    throw new IOException("Cannot remove existing file '" + f.getAbsolutePath() + "'");
+                }
+            }
+        }
+    }
+
+    public static void ensureEmptyDirectory(File dir) throws IOException
+    {
+        delete(dir);
+        if(!dir.mkdirs())
+        {
+            throw new IOException("Unable to create destination directory '" + dir.getAbsolutePath() + "'");
+        }
+    }
+
+    private static void ensureNoDirectories(File[] files) throws IOException
+    {
+        for(File f: files)
+        {
+            if(f.isDirectory())
+            {
+                throw new IOException("Copy failed: multiple sources including an existing directory '" + f.getAbsolutePath() + "'");
+            }
+        }
+    }
+
+    static void unixCopy(File dest, File... src) throws IOException
     {
         // Use the Unix cp command because it:
         //   - preserves permissions; and
         //   - is likely to be faster when it matters (i.e. large copy)
         String flags = "-p";
-        if (from.length == 1 && from[0].isDirectory())
+        if (src.length == 1)
         {
-            if (to.exists())
+            // cp handles file->file and file->dir as expected.  Help is
+            // required for dir->dir, we need to eliminate an existing dest.
+            if(src[0].isDirectory())
             {
-                if (to.isDirectory())
-                {
-                    if (!rmdir(to))
-                    {
-                        throw new IOException("Cannot remove existing directory '" + to.getAbsolutePath() + "'");
-                    }
-                }
-                else
-                {
-                    if (!to.delete())
-                    {
-                        throw new IOException("Cannot remove existing file '" + to.getAbsolutePath() + "'");
-                    }
-                }
+                delete(dest);
+                flags += "r";
             }
-            flags += "r";
+        }
+        else
+        {
+            ensureNoDirectories(src);
+            ensureEmptyDirectory(dest);
         }
 
         List<String> argsList = new LinkedList<String>();
         argsList.add("cp");
         argsList.add(flags);
-        for (File f : from)
+        for (File f : src)
         {
             argsList.add(f.getAbsolutePath());
         }
-        argsList.add(to.getAbsolutePath());
+        argsList.add(dest.getAbsolutePath());
 
         String[] args = argsList.toArray(new String[argsList.size()]);
-
         Process child = Runtime.getRuntime().exec(args);
         try
         {
@@ -1048,9 +1112,9 @@ public class FileSystemUtils
             if (exit != 0)
             {
                 // Attempt to copy ourselves.
-                LOG.info("Copy using '"+StringUtils.join(" ", args)+"' failed, trying internal copy");
-                rmdir(to);
-                javaCopy(to, from);
+                LOG.warning("Copy using '"+StringUtils.join(" ", args)+"' failed, trying internal copy");
+                rmdir(dest);
+                javaCopy(dest, src);
             }
         }
         catch (InterruptedException e)
@@ -1061,46 +1125,45 @@ public class FileSystemUtils
         }
     }
 
-    private static void javaCopy(File dest, File... src)
-            throws IOException
+    static void javaCopy(File dest, File... src) throws IOException
     {
-        if (dest.isFile())
+        if(src.length == 1)
         {
-            // fail.
-            throw new IllegalArgumentException(String.format("Copy failed. Can not copy to '%s', it is a file.", dest.getAbsolutePath()));
-        }
-
-        if (src.length == 0)
-        {
-            return;
-        }
-
-        // copy a source file to a destination file.
-        if (src.length == 1 && !dest.exists())
-        {
-            // copy as a file.
-            if (!dest.getParentFile().exists() && !dest.getParentFile().mkdirs())
+            File singleSource = src[0];
+            if(singleSource.isFile())
             {
-                throw new IOException(String.format("Copy failed. Failed to create dir %s", dest.getParentFile().getAbsolutePath()));
+                if(dest.isDirectory())
+                {
+                    dest = new File(dest, singleSource.getName());
+                    if(dest.isDirectory())
+                    {
+                        throw new IOException("Copy failed: destination directory contains existing directory '" + dest.getAbsolutePath() + "' with same name as source file");
+                    }
+                }
+
+                delete(dest);
+                IOUtils.copyFile(singleSource, dest);
             }
-            internalCopy(src[0], dest);
-            return;
+            else if(singleSource.isDirectory())
+            {
+                ensureEmptyDirectory(dest);
+                internalCopy(singleSource, dest);
+            }
+            else
+            {
+                throw new IOException(("Copy failed: source '" + singleSource.getAbsolutePath() + "' does not exist"));
+            }
         }
+        else
+        {
+            ensureNoDirectories(src);
+            ensureEmptyDirectory(dest);
 
-        if (src.length == 1 && src[0].isDirectory())
-        {
-            internalCopy(src[0], dest);
-            return;
-        }
-
-        if (!dest.exists() && !dest.mkdirs())
-        {
-            throw new IOException(String.format("Copy failed. Failed to create dir %s", dest.getAbsolutePath()));
-        }
-        for (File f : src)
-        {
-            // copy into dest directory.
-            internalCopy(f, new File(dest, f.getName()));
+            for (File f : src)
+            {
+                // copy into dest directory.
+                internalCopy(f, new File(dest, f.getName()));
+            }
         }
     }
 
