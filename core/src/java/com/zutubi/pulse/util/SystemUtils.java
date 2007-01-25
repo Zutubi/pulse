@@ -1,6 +1,11 @@
 package com.zutubi.pulse.util;
 
+import com.zutubi.pulse.util.logging.Logger;
+
 import java.io.File;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.StringWriter;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.LinkedList;
@@ -10,6 +15,8 @@ import java.util.List;
  */
 public class SystemUtils
 {
+    private static final Logger LOG = Logger.getLogger(SystemUtils.class);
+    
     public static final boolean IS_WINDOWS = System.getProperty("os.name").toLowerCase().startsWith("win");
     public static final boolean IS_LINUX = System.getProperty("os.name").toLowerCase().startsWith("linux");
 
@@ -47,6 +54,35 @@ public class SystemUtils
     public static File findInPath(String name)
     {
         return findInPath(name, null);
+    }
+
+    public static String runCommand(String... command) throws IOException
+    {
+        Process process;
+        process = Runtime.getRuntime().exec(command);
+
+        InputStreamReader stdoutReader = new InputStreamReader(process.getInputStream());
+        StringWriter stdoutWriter = new StringWriter();
+        IOUtils.joinReaderToWriter(stdoutReader, stdoutWriter);
+
+        int exitCode = 0;
+        try
+        {
+            exitCode = process.waitFor();
+        }
+        catch (InterruptedException e)
+        {
+            LOG.warning(e);
+        }
+
+        if (exitCode == 0)
+        {
+            return stdoutWriter.getBuffer().toString();
+        }
+        else
+        {
+            throw new IOException(String.format("Command '%s' exited with code %d", command[0], exitCode));
+        }
     }
 
     /**
