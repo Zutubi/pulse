@@ -1,20 +1,23 @@
 package com.zutubi.pulse.upgrade.tasks;
 
 import com.zutubi.pulse.bootstrap.MasterConfigurationManager;
-import com.zutubi.pulse.upgrade.UpgradeTask;
 import com.zutubi.pulse.upgrade.ConfigurationAware;
 import com.zutubi.pulse.upgrade.UpgradeContext;
 import com.zutubi.pulse.upgrade.UpgradeException;
+import com.zutubi.pulse.upgrade.UpgradeTask;
+import com.zutubi.pulse.util.logging.Logger;
 
-import java.util.List;
-import java.util.LinkedList;
 import java.io.IOException;
+import java.util.LinkedList;
+import java.util.List;
 
 /**
  * <class comment/>
  */
 public class BackupUpgradeTask implements UpgradeTask, ConfigurationAware
 {
+    private static final Logger LOG = Logger.getLogger(BackupUpgradeTask.class);
+    
     private MasterConfigurationManager configurationManager;
 
     private List<String> errors = new LinkedList<String>();
@@ -43,6 +46,7 @@ public class BackupUpgradeTask implements UpgradeTask, ConfigurationAware
         }
         catch (IOException e)
         {
+            LOG.severe(e);
             errors.add(e.getMessage());
         }
     }

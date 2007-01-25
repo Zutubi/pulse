@@ -116,13 +116,13 @@ public class Data implements MasterUserPaths
         DatabaseBootstrap dbBootstrap = (DatabaseBootstrap) ComponentContext.getBean("databaseBootstrap");
         dbBootstrap.compactDatabase();
 
+        FileSystemUtils.copy(tmpBackup, getUserConfigRoot());
         FileSystemUtils.copy(new File(tmpBackup, "database"),
                 new File(getDatabaseRoot(), "db.backup"),
                 new File(getDatabaseRoot(), "db.log"),
                 new File(getDatabaseRoot(), "db.properties"),
                 new File(getDatabaseRoot(), "db.data"),
                 new File(getDatabaseRoot(), "db.script"));
-        FileSystemUtils.copy(tmpBackup, getUserConfigRoot());
         FileSystemUtils.copy(new File(tmpBackup, CONFIG_FILE_NAME), getConfigFile());
 
         FileSystemUtils.createZip(backup, tmpBackup, tmpBackup);
