@@ -6,6 +6,7 @@ import java.beans.Introspector;
 import java.beans.PropertyDescriptor;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
+import java.lang.reflect.Constructor;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -24,6 +25,8 @@ public class RecordTypeInfo
     {
         this.symbolicName = symbolicName;
         this.type = type;
+
+        validateRecordType(type);
         BeanInfo info;
         
         try
@@ -39,6 +42,18 @@ public class RecordTypeInfo
         catch (IntrospectionException e)
         {
             throw new InvalidRecordTypeException("Unable to introspect on record type '" + type.getName() + "': " + e.getMessage(), e);
+        }
+    }
+
+    private void validateRecordType(Class type) throws InvalidRecordTypeException
+    {
+        try
+        {
+            type.getConstructor();
+        }
+        catch (NoSuchMethodException e)
+        {
+            throw new InvalidRecordTypeException("Record types must have a public, zero-argument constructor");
         }
     }
 
