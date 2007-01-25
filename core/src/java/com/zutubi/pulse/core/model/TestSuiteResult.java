@@ -73,7 +73,34 @@ public class TestSuiteResult extends TestResult
 
     public void add(TestCaseResult childCase)
     {
-        cases.add(childCase);
+        TestCaseResult existing = getCase(childCase.getName());
+        if (existing == null)
+        {
+            cases.add(childCase);
+        }
+        else
+        {
+            if(childCase.getStatus().compareTo(existing.getStatus()) > 0)
+            {
+                // The new is more severe.  Although we can't keep all info,
+                // be nice and keep the worst result.
+                cases.remove(existing);
+                cases.add(childCase);
+            }
+        }
+    }
+
+    public TestCaseResult getCase(String name)
+    {
+        for(TestCaseResult c: cases)
+        {
+            if(c.getName().equals(name))
+            {
+                return c;
+            }
+        }
+
+        return null;
     }
 
     public int getErrors()
