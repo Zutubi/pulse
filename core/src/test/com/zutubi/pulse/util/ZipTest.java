@@ -271,7 +271,7 @@ public class ZipTest extends PulseTestCase
         createExtractAndVerify("simpleDir");
     }
 
-    public void testZipWithSymlink() throws IOException
+    public void testZipWithExternalSymlink() throws IOException
     {
         if (SystemUtils.IS_LINUX)
         {
@@ -283,6 +283,26 @@ public class ZipTest extends PulseTestCase
             File topDir = new File(inDir, "top");
             File symlink = new File(topDir, "link");
             if (FileSystemUtils.createSymlink(symlink, tmpDir))
+            {
+                createAndExtract("top");
+                assertTrue(symlink.delete());
+                assertDirectoriesEqual(inDir, unzipDir);
+            }
+        }
+    }
+
+    public void testZipWithInternalSymlink() throws IOException
+    {
+        if (SystemUtils.IS_LINUX)
+        {
+            Map<String, String> files = new TreeMap<String, String>();
+            files.put("top", null);
+            files.put(composePath("top", "file1"), "content of file 1");
+            createDataFiles(files);
+
+            File topDir = new File(inDir, "top");
+            File symlink = new File(topDir, "link");
+            if (FileSystemUtils.createSymlink(symlink, new File(topDir, "file1")))
             {
                 createAndExtract("top");
                 assertTrue(symlink.delete());

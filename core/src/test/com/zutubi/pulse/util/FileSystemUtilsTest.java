@@ -588,6 +588,83 @@ public class FileSystemUtilsTest extends PulseTestCase
         }
     }
 
+    public void testIsSymlinkRegularFile() throws IOException
+    {
+        if(FileSystemUtils.LN_AVAILABLE)
+        {
+            File file = new File(tmpDir, "file");
+            FileSystemUtils.createFile(file, "data");
+            assertFalse(FileSystemUtils.isSymlink(file));
+        }
+    }
+
+    public void testIsSymlinkRegularDir() throws IOException
+    {
+        if(FileSystemUtils.LN_AVAILABLE)
+        {
+            assertFalse(FileSystemUtils.isSymlink(tmpDir));
+        }
+    }
+
+    public void testIsSymlinkSimpleLink() throws IOException
+    {
+        if(FileSystemUtils.LN_AVAILABLE)
+        {
+            File file = new File(tmpDir, "file");
+            File link = new File(tmpDir, "link");
+            FileSystemUtils.createFile(file, "data");
+            FileSystemUtils.createSymlink(link, file);
+
+            assertTrue(FileSystemUtils.isSymlink(link));
+        }
+    }
+
+    public void testIsSymlinkDirLink() throws IOException
+    {
+        if(FileSystemUtils.LN_AVAILABLE)
+        {
+            File dir = new File(tmpDir, "file");
+            File link = new File(tmpDir, "link");
+            dir.mkdir();
+            FileSystemUtils.createSymlink(link, dir);
+            assertTrue(FileSystemUtils.isSymlink(link));
+        }
+    }
+
+    public void testIsSymlinkFileWithParentLink() throws IOException
+    {
+        if(FileSystemUtils.LN_AVAILABLE)
+        {
+            File dir = new File(tmpDir, "dir");
+            File link = new File(tmpDir, "link");
+            File file = new File(link, "file");
+            dir.mkdir();
+            FileSystemUtils.createSymlink(link, dir);
+            FileSystemUtils.createFile(file, "data");
+
+            assertTrue(FileSystemUtils.isSymlink(link));
+            assertFalse(FileSystemUtils.isSymlink(file));
+        }
+    }
+
+    public void testIsSymlinkLinkWithParentLink() throws IOException
+    {
+        if(FileSystemUtils.LN_AVAILABLE)
+        {
+            File dir = new File(tmpDir, "dir");
+            File dirLink = new File(tmpDir, "dirlink");
+            File file = new File(dirLink, "file");
+            File fileLink = new File(dirLink, "filelink");
+            dir.mkdir();
+            FileSystemUtils.createSymlink(dirLink, dir);
+            FileSystemUtils.createFile(file, "data");
+            FileSystemUtils.createSymlink(fileLink, file);
+
+            assertTrue(FileSystemUtils.isSymlink(dirLink));
+            assertTrue(FileSystemUtils.isSymlink(fileLink));
+        }
+    }
+
     private void simpleEOLTest(byte[] eol, String out) throws IOException
     {
         File test = null;

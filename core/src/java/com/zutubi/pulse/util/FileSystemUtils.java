@@ -46,10 +46,14 @@ public class FileSystemUtils
     public static final int PERMISSION_ALL_FULL      = PERMISSION_OWNER_FULL | PERMISSION_GROUP_FULL | PERMISSION_OTHER_FULL;
 
     static final boolean USE_UNIX_COPY;
+    static final boolean LN_AVAILABLE;
+    static final boolean STAT_AVAILABLE;
 
     static
     {
         USE_UNIX_COPY = !SystemUtils.IS_WINDOWS && SystemUtils.findInPath("cp") != null;
+        LN_AVAILABLE = !SystemUtils.IS_WINDOWS && SystemUtils.findInPath("ln") != null;
+        STAT_AVAILABLE = !SystemUtils.IS_WINDOWS && SystemUtils.findInPath("stat") != null;
     }
 
     /**
@@ -215,7 +219,36 @@ public class FileSystemUtils
         return childPath.startsWith(parentPath);
     }
 
-    public static boolean isSymlink(File file) throws IOException
+    public static boolean isSymlink(File file)
+    {
+        if(!SystemUtils.IS_WINDOWS)
+        {
+            // Try testing the canonical path then.
+            File parent = file.getParentFile();
+            if(parent != null)
+            {
+                try
+                {
+                    String parentCanonical = parent.getCanonicalPath() + "/";
+                    String fileCanonical = file.getCanonicalPath();
+
+                    if(fileCanonical.startsWith(parentCanonical))
+                    {
+                        String canonicalName = fileCanonical.substring(parentCanonical.length());
+                        return !canonicalName.equals(file.getName());
+                    }
+                }
+                catch (IOException e)
+                {
+                    LOG.warning(e);
+                }
+            }
+        }
+
+        return false;
+    }
+
+    public static boolean pathContainsSymlink(File file) throws IOException
     {
         return !SystemUtils.IS_WINDOWS && !file.getCanonicalPath().equals(file.getAbsolutePath());
     }
@@ -266,7 +299,7 @@ public class FileSystemUtils
             }
             else
             {
-                LOG.warning("Unable to get permissions for '%s': stat exited with code %s", file.getAbsolutePath(), exitCode);
+                LOG.warning("Unable to get permissions for '%s': stat exited with code %d", file.getAbsolutePath(), exitCode);
             }
         }
         catch (Exception e)
@@ -408,7 +441,7 @@ public class FileSystemUtils
     {
         File source = new File(base, sourcePath);
 
-        if (isSymlink(source))
+        if (!isParentOf(base, source) || isSymlink(source))
         {
             return;
         }
@@ -710,20 +743,10 @@ public class FileSystemUtils
 
     public static boolean createSymlink(File symlink, File destination) throws IOException
     {
-        if (SystemUtils.IS_LINUX)
+        if (LN_AVAILABLE)
         {
-            Process p = Runtime.getRuntime().exec("ln -s " + destination.getAbsolutePath() + " " + symlink.getAbsolutePath());
-            int result = 0;
-            try
-            {
-                result = p.waitFor();
-            }
-            catch (InterruptedException e)
-            {
-                e.printStackTrace();
-            }
-
-            return result == 0;
+            SystemUtils.runCommand("ln", "-s", destination.getAbsolutePath(), symlink.getAbsolutePath());
+            return true;
         }
 
         return false;
