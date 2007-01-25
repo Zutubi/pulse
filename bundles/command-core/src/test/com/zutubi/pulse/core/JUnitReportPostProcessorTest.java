@@ -3,7 +3,6 @@ package com.zutubi.pulse.core;
 import com.zutubi.pulse.core.model.*;
 
 import java.io.File;
-import java.util.List;
 import java.net.URL;
 
 /**
@@ -38,13 +37,13 @@ public class JUnitReportPostProcessorTest extends XMLReportPostProcessorTestBase
         assertEquals("com.zutubi.pulse.junit.SimpleTest", suite.getName());
         assertEquals(90, suite.getDuration());
 
-        List<TestCaseResult> children = suite.getCases();
-        assertEquals(3, children.size());
-        checkCase(children.get(0), "testSimple", TestCaseResult.Status.PASS, 0, null);
-        checkCase(children.get(1), "testAssertionFailure", TestCaseResult.Status.FAILURE, 10,
+        TestCaseResult[] children = suite.getCases().toArray(new TestCaseResult[suite.getCases().size()]);
+        assertEquals(3, children.length);
+        checkCase(children[0], "testSimple", TestCaseResult.Status.PASS, 0, null);
+        checkCase(children[1], "testAssertionFailure", TestCaseResult.Status.FAILURE, 10,
                 "junit.framework.AssertionFailedError: expected:<1> but was:<2>\n" +
                 "\tat com.zutubi.pulse.junit.SimpleTest.testAssertionFailure(Unknown Source)");
-        checkCase(children.get(2), "testThrowException", TestCaseResult.Status.ERROR, 10,
+        checkCase(children[2], "testThrowException", TestCaseResult.Status.ERROR, 10,
                 "java.lang.RuntimeException: random message\n" +
                 "\tat com.zutubi.pulse.junit.SimpleTest.testThrowException(Unknown Source)");
     }
@@ -59,13 +58,13 @@ public class JUnitReportPostProcessorTest extends XMLReportPostProcessorTestBase
         assertEquals("com.zutubi.pulse.core.JUnitReportPostProcessorTest", suite.getName());
         assertEquals(391, suite.getDuration());
 
-        List<TestCaseResult> children = suite.getCases();
-        assertEquals(3, children.size());
-        checkCase(children.get(0), "testSimple", TestCaseResult.Status.PASS, 291, null);
-        checkCase(children.get(1), "testFailure", TestCaseResult.Status.FAILURE, 10,
+        TestCaseResult[] children = suite.getCases().toArray(new TestCaseResult[suite.getCases().size()]);
+        assertEquals(3, children.length);
+        checkCase(children[0], "testSimple", TestCaseResult.Status.PASS, 291, null);
+        checkCase(children[1], "testFailure", TestCaseResult.Status.FAILURE, 10,
                 "junit.framework.AssertionFailedError\n" +
                         "\tat com.zutubi.pulse.core.JUnitReportPostProcessorTest.testFailure(JUnitReportPostProcessorTest.java:63)");
-        checkCase(children.get(2), "testError", TestCaseResult.Status.ERROR, 0,
+        checkCase(children[2], "testError", TestCaseResult.Status.ERROR, 0,
                 "java.lang.RuntimeException: whoops!\n" +
                         "\tat com.zutubi.pulse.core.JUnitReportPostProcessorTest.testError(JUnitReportPostProcessorTest.java:68)");
     }
@@ -110,9 +109,9 @@ public class JUnitReportPostProcessorTest extends XMLReportPostProcessorTestBase
         assertEquals(name, suite.getName());
         assertEquals(duration, suite.getDuration());
 
-        List<TestCaseResult> children = suite.getCases();
-        assertEquals(1, children.size());
-        TestCaseResult caseResult = children.get(0);
+        TestCaseResult[] children = suite.getCases().toArray(new TestCaseResult[suite.getCases().size()]);
+        assertEquals(1, children.length);
+        TestCaseResult caseResult = children[0];
         assertEquals("warning", caseResult.getName());
         assertEquals(10, caseResult.getDuration());
         assertTrue(caseResult.getMessage().contains(contents));

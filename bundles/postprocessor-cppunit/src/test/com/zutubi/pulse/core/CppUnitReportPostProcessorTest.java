@@ -71,7 +71,8 @@ public class CppUnitReportPostProcessorTest extends XMLReportPostProcessorTestBa
         TestSuiteResult suite = tests.getSuites().get(0);
         assertEquals(1, suite.getCases().size());
 
-        TestCaseResult caseResult = suite.getCases().get(0);
+        TestCaseResult[] children = suite.getCases().toArray(new TestCaseResult[suite.getCases().size()]);
+        TestCaseResult caseResult = children[0];
         assertEquals("all", caseResult.getName());
         assertEquals(1, caseResult.getErrors());
     }
@@ -98,32 +99,32 @@ public class CppUnitReportPostProcessorTest extends XMLReportPostProcessorTestBa
     {
         checkSuite(suite, name, 1, 0, 0);
 
-        List<TestCaseResult> children = suite.getCases();
-        checkPassCase(children.get(0), "testHelloWorld");
+        TestCaseResult[] children = suite.getCases().toArray(new TestCaseResult[suite.getCases().size()]);
+        checkPassCase(children[0], "testHelloWorld");
     }
 
     private void assertTest(TestSuiteResult suite, String name)
     {
         checkSuite(suite, name, 6, 2, 1);
 
-        List<TestCaseResult> children = suite.getCases();
-        checkFailureCase(children.get(0), "testFailure", "At file cppunit.cpp line 34\n" +
+        TestCaseResult[] children = suite.getCases().toArray(new TestCaseResult[suite.getCases().size()]);
+        checkFailureCase(children[0], "testFailure", "At file cppunit.cpp line 34\n" +
                                                          "assertion failed\n" +
                                                          "- Expression: 1 == 2");
-        checkErrorCase(children.get(1), "testThrow", "uncaught exception of type std::exception\n" +
+        checkErrorCase(children[1], "testThrow", "uncaught exception of type std::exception\n" +
                                                      "- St9exception");
-        checkFailureCase(children.get(2), "testDidntThrow", "expected exception not thrown\n" +
+        checkFailureCase(children[2], "testDidntThrow", "expected exception not thrown\n" +
                                                             "- Expected exception type: std::exception");
-        checkPassCase(children.get(3), "testHelloWorld");
-        checkPassCase(children.get(4), "testExpectedThrow");
-        checkPassCase(children.get(5), "testExpectedFailure");
+        checkPassCase(children[3], "testHelloWorld");
+        checkPassCase(children[4], "testExpectedThrow");
+        checkPassCase(children[5], "testExpectedFailure");
     }
 
     private void assertAnotherTest(TestSuiteResult suite, String name)
     {
         checkSuite(suite, name, 1, 0, 0);
 
-        List<TestCaseResult> children = suite.getCases();
-        checkPassCase(children.get(0), "testIt");
+        TestCaseResult[] children = suite.getCases().toArray(new TestCaseResult[suite.getCases().size()]);
+        checkPassCase(children[0], "testIt");
     }
 }

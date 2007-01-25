@@ -1,8 +1,6 @@
 package com.zutubi.pulse.core.model;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
 /**
  * Represents the results of a test suite: a group of child test suites and
@@ -17,7 +15,7 @@ public class TestSuiteResult extends TestResult
     /**
      * Child cases, stored in the order added.
      */
-    private List<TestCaseResult> cases;
+    private LinkedHashMap<String, TestCaseResult> cases;
     private TestResultComparator comparator = new TestResultComparator();
 
     private int total;
@@ -38,7 +36,7 @@ public class TestSuiteResult extends TestResult
     {
         this(name, duration, -1, -1, -1);
         suites = new ArrayList<TestSuiteResult>();
-        cases = new ArrayList<TestCaseResult>();
+        cases = new LinkedHashMap<String, TestCaseResult>();
     }
 
     public TestSuiteResult(String name, long duration, int total, int errors, int failures)
@@ -76,7 +74,7 @@ public class TestSuiteResult extends TestResult
         TestCaseResult existing = getCase(childCase.getName());
         if (existing == null)
         {
-            cases.add(childCase);
+            cases.put(childCase.getName(), childCase);
         }
         else
         {
@@ -84,23 +82,14 @@ public class TestSuiteResult extends TestResult
             {
                 // The new is more severe.  Although we can't keep all info,
                 // be nice and keep the worst result.
-                cases.remove(existing);
-                cases.add(childCase);
+                cases.put(childCase.getName(), childCase);
             }
         }
     }
 
     public TestCaseResult getCase(String name)
     {
-        for(TestCaseResult c: cases)
-        {
-            if(c.getName().equals(name))
-            {
-                return c;
-            }
-        }
-
-        return null;
+        return cases.get(name);
     }
 
     public int getErrors()
@@ -114,7 +103,7 @@ public class TestSuiteResult extends TestResult
                 result += child.getErrors();
             }
 
-            for (TestCaseResult child : cases)
+            for (TestCaseResult child : cases.values())
             {
                 result += child.getErrors();
             }
@@ -138,7 +127,7 @@ public class TestSuiteResult extends TestResult
                 result += child.getFailures();
             }
 
-            for (TestCaseResult child : cases)
+            for (TestCaseResult child : cases.values())
             {
                 result += child.getFailures();
             }
@@ -162,7 +151,7 @@ public class TestSuiteResult extends TestResult
                 result += child.getTotal();
             }
 
-            for (TestCaseResult child : cases)
+            for (TestCaseResult child : cases.values())
             {
                 result += child.getTotal();
             }
@@ -185,9 +174,9 @@ public class TestSuiteResult extends TestResult
         return suites;
     }
 
-    public List<TestCaseResult> getCases()
+    public Collection<TestCaseResult> getCases()
     {
-        return cases;
+        return cases.values();
     }
 
     public boolean isEquivalent(TestResult otherResult)
@@ -217,15 +206,17 @@ public class TestSuiteResult extends TestResult
             }
         }
 
-        List<TestCaseResult> otherCases = other.getCases();
+        Collection<TestCaseResult> otherCases = other.getCases();
         if(cases.size() != otherCases.size())
         {
             return false;
         }
 
-        for(int i = 0; i < cases.size(); i++)
+        Iterator<TestCaseResult> ourIt = cases.values().iterator();
+        Iterator<TestCaseResult> otherIt = otherCases.iterator();
+        while(ourIt.hasNext())
         {
-            if(!cases.get(i).isEquivalent(otherCases.get(i)))
+            if(!ourIt.next().isEquivalent(otherIt.next()))
             {
                 return false;
             }

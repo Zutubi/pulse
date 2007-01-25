@@ -36,6 +36,38 @@ public class HibernateTestCaseIndexDao extends HibernateEntityDao<TestCaseIndex>
         });
     }
 
+    public List<TestCaseIndex> findBySuite(final long stageNameId, final String suite)
+    {
+        return (List<TestCaseIndex>) getHibernateTemplate().execute(new HibernateCallback()
+        {
+            public Object doInHibernate(Session session) throws HibernateException
+            {
+                Query queryObject = session.createQuery("from TestCaseIndex model where model.stageNameId = :stageNameId and model.name like :suite");
+                queryObject.setParameter("stageNameId", stageNameId);
+                queryObject.setParameter("suite", suite + "%");
+
+                SessionFactoryUtils.applyTransactionTimeout(queryObject, getSessionFactory());
+
+                return queryObject.list();
+            }
+        });
+    }
+
+    public List<TestCaseIndex> findByStage(final long stageNameId)
+    {
+        return (List<TestCaseIndex>) getHibernateTemplate().execute(new HibernateCallback()
+        {
+            public Object doInHibernate(Session session) throws HibernateException
+            {
+                Query queryObject = session.createQuery("from TestCaseIndex model where model.stageNameId = :stageNameId");
+                queryObject.setParameter("stageNameId", stageNameId);
+                SessionFactoryUtils.applyTransactionTimeout(queryObject, getSessionFactory());
+
+                return queryObject.list();
+            }
+        });
+    }
+
     public List<TestCaseIndex> findByProject(final long projectId, final int max)
     {
         return (List<TestCaseIndex>) getHibernateTemplate().execute(new HibernateCallback()
