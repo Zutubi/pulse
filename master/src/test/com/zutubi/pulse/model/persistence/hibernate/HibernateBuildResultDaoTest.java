@@ -593,6 +593,27 @@ public class HibernateBuildResultDaoTest extends MasterPersistenceTestCase
         assertEquals(2, results.get(0).getNumber());
     }
 
+    public void testGetLatestByUserStates()
+    {
+        Project p = new Project("p", "test");
+        projectDao.save(p);
+
+        User u1 = new User("u1", "u1");
+        userDao.save(u1);
+
+        BuildResult r1 = createPersonalBuild(u1, p, 1);
+        BuildResult r2 = createIncompletePersonalBuild(u1, p, 2);
+        buildResultDao.save(r1);
+        buildResultDao.save(r2);
+
+        commitAndRefreshTransaction();
+
+        List<BuildResult> results = buildResultDao.getLatestByUser(u1, ResultState.getCompletedStates(), 1);
+        assertEquals(1, results.size());
+        assertEquals(1, results.get(0).getNumber());
+        assertEquals(u1, results.get(0).getUser());
+    }
+
     public void testGetCompletedPersonalBuildCount()
     {
         Project p = new Project("p", "test");
