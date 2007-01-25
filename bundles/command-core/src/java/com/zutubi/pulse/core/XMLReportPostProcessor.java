@@ -1,7 +1,6 @@
 package com.zutubi.pulse.core;
 
 import com.zutubi.pulse.core.model.CommandResult;
-import com.zutubi.pulse.core.model.StoredFileArtifact;
 import com.zutubi.pulse.core.model.TestSuiteResult;
 import com.zutubi.pulse.util.IOUtils;
 import nu.xom.Builder;
@@ -23,9 +22,8 @@ public abstract class XMLReportPostProcessor extends TestReportPostProcessor
         this.reportType = reportType;
     }
 
-    protected void internalProcess(StoredFileArtifact artifact, CommandResult result, CommandContext context)
+    protected void internalProcess(CommandResult result, File file, TestSuiteResult suite)
     {
-        File file = new File(context.getOutputDir(), artifact.getPath());
         FileInputStream input = null;
 
         try
@@ -34,7 +32,7 @@ public abstract class XMLReportPostProcessor extends TestReportPostProcessor
             Builder builder = new Builder();
             Document doc;
             doc = builder.build(input);
-            processDocument(doc, context.getTestResults());
+            processDocument(doc, suite);
         }
         catch (ParsingException pex)
         {

@@ -4,6 +4,7 @@ import com.zutubi.pulse.core.model.TestCaseResult;
 import com.zutubi.pulse.core.model.TestSuiteResult;
 
 import java.io.File;
+import java.io.IOException;
 import java.net.URL;
 import java.util.List;
 
@@ -19,6 +20,11 @@ public class CppUnitReportPostProcessorTest extends XMLReportPostProcessorTestBa
     public CppUnitReportPostProcessorTest(String name)
     {
         super(name, new CppUnitReportPostProcessor());
+    }
+
+    public void setUp() throws IOException
+    {
+        pp = new CppUnitReportPostProcessor();
     }
 
     protected File getOutputDir()
@@ -68,6 +74,24 @@ public class CppUnitReportPostProcessorTest extends XMLReportPostProcessorTestBa
         TestCaseResult caseResult = suite.getCases().get(0);
         assertEquals("all", caseResult.getName());
         assertEquals(1, caseResult.getErrors());
+    }
+
+    public void testParentSuite()
+    {
+        pp.setSuite("parent");
+        TestSuiteResult tests = runProcessor("basic");
+
+        List<TestSuiteResult> topLevelSuites = tests.getSuites();
+        assertEquals(1, topLevelSuites.size());
+        assertEquals("parent", topLevelSuites.get(0).getName());
+        
+        tests = topLevelSuites.get(0);
+        assertEquals(2, tests.getSuites().size());
+        TestSuiteResult suite = tests.getSuites().get(0);
+        assertAnotherTest(suite, "AnotherTest");
+
+        suite = tests.getSuites().get(1);
+        assertTest(suite, "Test");
     }
 
     private void assertHelloWorld(TestSuiteResult suite, String name)

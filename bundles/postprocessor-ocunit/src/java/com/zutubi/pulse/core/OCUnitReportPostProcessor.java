@@ -1,7 +1,6 @@
 package com.zutubi.pulse.core;
 
 import com.zutubi.pulse.core.model.CommandResult;
-import com.zutubi.pulse.core.model.StoredFileArtifact;
 import com.zutubi.pulse.core.model.TestCaseResult;
 import com.zutubi.pulse.core.model.TestSuiteResult;
 import com.zutubi.pulse.util.IOUtils;
@@ -39,14 +38,8 @@ public class OCUnitReportPostProcessor extends TestReportPostProcessor
         setName(name);
     }
     
-    protected void internalProcess(StoredFileArtifact artifact, CommandResult result, CommandContext context)
+    protected void internalProcess(CommandResult result, File file, TestSuiteResult suite)
     {
-        File file = new File(context.getOutputDir(), artifact.getPath());
-        if (!file.isFile())
-        {
-            return;
-        }
-
         try
         {
             reader = new BufferedReader(new FileReader(file));
@@ -54,7 +47,7 @@ public class OCUnitReportPostProcessor extends TestReportPostProcessor
             // read until you locate the start of a test suite.
             try
             {
-                processFile(context.getTestResults());
+                processFile(suite);
             }
             catch (IllegalStateException e)
             {
