@@ -253,6 +253,7 @@ public class DefaultUpgradeManager implements UpgradeManager
                     monitor.start(task);
                     try
                     {
+                        LOG.info("Executing upgrade task: " + task.getName());
                         task.execute(context);
                     }
                     catch (UpgradeException e)
