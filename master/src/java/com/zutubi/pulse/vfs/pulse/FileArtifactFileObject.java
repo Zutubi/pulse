@@ -43,7 +43,7 @@ public class FileArtifactFileObject extends AbstractPulseFileObject implements A
                 {
                     canDecorate = buildManager.canDecorateArtifact(artifact.getId());
                 }
-                //else
+                else
                 {
                     // CIB-882: still unsure under what exact conditions this occurs, although it implies a problem
                     // with the artifact path. Attempt to log as enough information to work out what is going on.
