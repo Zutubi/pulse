@@ -25,7 +25,7 @@ public class TransferAPI
         {
             connection = dataSource.getConnection();
             source = new TransferDb(connection, traceable);
-            target = new TransferSQLText(out.getAbsolutePath(), traceable);
+            target = new CustomTransferSQLText(out.getAbsolutePath(), traceable);
 
             doTransfer(source, target);
         }
@@ -58,7 +58,7 @@ public class TransferAPI
         try
         {
             connection = dataSource.getConnection();
-            source = new TransferSQLText(in.getAbsolutePath(), traceable);
+            source = new CustomTransferSQLText(in.getAbsolutePath(), traceable);
             target = new TransferDb(connection, traceable);
 
             doTransfer(source, target);
@@ -90,6 +90,10 @@ public class TransferAPI
             t.setDest(null, target);
             t.extractTableStructure(source, target);
 
+            t.Stmts.bDelete = false;
+            t.Stmts.bDrop = false;
+            t.Stmts.bDropIndex = false;
+
             // Needs to be done after changing flags in the ttable
             source.getTableStructure(t, target);
         }
@@ -99,7 +103,7 @@ public class TransferAPI
             TransferTable t = (TransferTable) tables.elementAt(i);
 
             t.transferStructure();
-            t.transferData(1000000);
+            t.transferData(0);
         }
 
         for (int i = 0; i < tables.size(); i++)
