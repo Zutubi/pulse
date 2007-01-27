@@ -40,7 +40,7 @@
 
         <dependency org="hibernate" name="hibernate" rev="3.1.1" conf="external,build,release->default"/>
 
-        <dependency org="hsqldb" name="hsqldb" rev="1.8.0.5" conf="external,build,release->default"/>
+        <dependency org="hsqldb" name="hsqldb" rev="1.8.0.7" conf="external,build,release->default"/>
 
         <dependency org="jive" name="smack" rev="2.2.1" conf="external,build,release->default"/>
 
