@@ -80,4 +80,17 @@ public class SetPasswordCommand extends AdminCommand
                 new Object[]{adminToken, user, password})));
         return 0;
     }
+
+    public static void main(String argv[])
+    {
+        SetPasswordCommand command = new SetPasswordCommand();
+        try
+        {
+            command.execute(new BootContext(null, argv, null, null, null));
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+    }
 }
