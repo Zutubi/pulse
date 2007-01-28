@@ -54,6 +54,7 @@ public class VariableHelper
         LexerState state = LexerState.INITIAL;
         StringBuilder current = new StringBuilder();
         boolean quoted = false;
+        boolean haveData = false;
 
         for (int i = 0; i < input.length(); i++)
         {
@@ -74,11 +75,20 @@ public class VariableHelper
                         {
                             if(split)
                             {
-                                quoted = !quoted;
+                                if(quoted)
+                                {
+                                    quoted = false;
+                                }
+                                else
+                                {
+                                    quoted = true;
+                                    haveData = true;
+                                }
                             }
                             else
                             {
                                 current.append(inputChar);
+                                haveData = true;
                             }
                             break;
                         }
@@ -89,16 +99,19 @@ public class VariableHelper
                                 if(quoted)
                                 {
                                     current.append(inputChar);
+                                    haveData = true;
                                 }
                                 else
                                 {
-                                    addCurrent(current, result);
+                                    addCurrent(current, haveData, result);
+                                    haveData = false;
                                     result.add(new Token(TokenType.SPACE, " "));
                                 }
                             }
                             else
                             {
                                 current.append(inputChar);
+                                haveData = true;
                             }
                             break;
                         }
@@ -106,12 +119,14 @@ public class VariableHelper
                         {
                             state = LexerState.DOLLAR;
                             // only add a token if there is something to add.
-                            addCurrent(current, result);
+                            addCurrent(current, haveData, result);
+                            haveData = false;
                             break;
                         }
                         default:
                         {
                             current.append(inputChar);
+                            haveData = true;
                             break;
                         }
                     }
@@ -120,6 +135,7 @@ public class VariableHelper
                 case ESCAPED:
                 {
                     current.append(inputChar);
+                    haveData = true;
                     state = LexerState.INITIAL;
                     break;
                 }
@@ -153,7 +169,7 @@ public class VariableHelper
 
                             result.add(new Token(TokenType.VARIABLE_REFERENCE, current.toString()));
                             state = LexerState.INITIAL;
-                            current = new StringBuilder();
+                            current.delete(0, current.length());
                             break;
                         }
                         default:
@@ -176,7 +192,7 @@ public class VariableHelper
                     throw new FileLoadException("Syntax error: unexpected end of input looking for closing quotes (\")");
                 }
                 
-                addCurrent(current, result);
+                addCurrent(current, haveData, result);
                 break;
             }
             case ESCAPED:
@@ -196,9 +212,9 @@ public class VariableHelper
         return result;
     }
 
-    private static void addCurrent(StringBuilder current, List<Token> result)
+    private static void addCurrent(StringBuilder current, boolean haveData, List<Token> result)
     {
-        if (current.length() > 0)
+        if (haveData)
         {
             result.add(new Token(TokenType.TEXT, current.toString()));
             current.delete(0, current.length());
@@ -257,7 +273,7 @@ public class VariableHelper
                 }
                 case VARIABLE_REFERENCE:
                 {
-                    resolveReference(properties, token, result, allowUnresolved);
+                    result.append(resolveReference(properties, token, allowUnresolved));
                     break;
                 }
             }
@@ -269,6 +285,7 @@ public class VariableHelper
     {
         List<String> result = new LinkedList<String>();
         StringBuilder current = new StringBuilder();
+        boolean haveData = false;
 
         List<Token> tokens = tokenise(input, true);
 
@@ -278,27 +295,34 @@ public class VariableHelper
             {
                 case SPACE:
                 {
-                    if(current.length() > 0)
+                    if(haveData)
                     {
                         result.add(current.toString());
                         current.delete(0, current.length());
+                        haveData = false;
                     }
                     break;
                 }
                 case TEXT:
                 {
                     current.append(token.value);
+                    haveData = true;
                     break;
                 }
                 case VARIABLE_REFERENCE:
                 {
-                    resolveReference(properties, token, current, allowUnresolved);
+                    String value = resolveReference(properties, token, allowUnresolved);
+                    if(value.length() > 0)
+                    {
+                        current.append(value);
+                        haveData = true;
+                    }
                     break;
                 }
             }
         }
 
-        if(current.length() > 0)
+        if(haveData)
         {
             result.add(current.toString());
         }
@@ -306,7 +330,7 @@ public class VariableHelper
         return result;
     }
 
-    private static void resolveReference(Scope properties, Token token, StringBuilder result, boolean allowUnresolved) throws FileLoadException
+    private static String resolveReference(Scope properties, Token token, boolean allowUnresolved) throws FileLoadException
     {
         if (properties.containsReference(token.value))
         {
@@ -315,13 +339,11 @@ public class VariableHelper
             {
                 throw new FileLoadException("Reference to non string variable '" + token.value + "'");
             }
-            result.append(obj.toString());
+            return obj.toString();
         }
         else if(allowUnresolved)
         {
-            result.append("${");
-            result.append(token.value);
-            result.append("}");
+            return "${" + token.value + "}";
         }
         else
         {

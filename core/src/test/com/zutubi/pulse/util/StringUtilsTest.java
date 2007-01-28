@@ -156,6 +156,11 @@ public class StringUtilsTest extends PulseTestCase
         splitHelper("");
     }
 
+    public void testUnsplitEmpty()
+    {
+        unsplitHelper("");
+    }
+
     public void testSplitSpace()
     {
         splitHelper(" ");
@@ -171,9 +176,19 @@ public class StringUtilsTest extends PulseTestCase
         splitHelper("one two", "one", "two");
     }
 
+    public void testUnsplitSimple()
+    {
+        unsplitHelper("one two", "one", "two");
+    }
+
     public void testSplitMore()
     {
         splitHelper("one two  three   four", "one", "two", "three", "four");
+    }
+
+    public void testUnsplitMore()
+    {
+        unsplitHelper("one two three four", "one", "two", "three", "four");
     }
 
     public void testSplitEscape()
@@ -186,9 +201,19 @@ public class StringUtilsTest extends PulseTestCase
         splitHelper("one\\\\ two", "one\\", "two");
     }
 
+    public void testUnsplitEscapeBackslash()
+    {
+        unsplitHelper("one\\\\ two", "one\\", "two");
+    }
+
     public void testSplitQuotes()
     {
         splitHelper("hello \"you idiot\" there", "hello", "you idiot", "there");
+    }
+
+    public void testUnsplitQuotes()
+    {
+        unsplitHelper("hello \"you idiot\" there", "hello", "you idiot", "there");
     }
 
     public void testSplitEscapeQuote()
@@ -196,19 +221,44 @@ public class StringUtilsTest extends PulseTestCase
         splitHelper("one\\\" two", "one\"", "two");
     }
 
+    public void testUnsplitEscapeQuote()
+    {
+        unsplitHelper("one\\\" two", "one\"", "two");
+    }
+
     public void testSplitEscapeQuoteInQuotes()
     {
         splitHelper("\"one\\\"two\"", "one\"two");
     }
 
-    public void testQuoteEmpty()
+    public void testSplitQuoteInMiddle()
+    {
+        splitHelper("word\"quoted words\"another word", "wordquoted wordsanother", "word");
+    }
+
+    public void testSplitEmptyQuotesInMiddle()
+    {
+        splitHelper("word\"\"another word", "wordanother", "word");
+    }
+
+    public void testSplitQuoteEmpty()
     {
         splitHelper("\"\"", "");
     }
 
-    public void testQuoteEmptyAmongst()
+    public void testUnsplitQuoteEmpty()
+    {
+        unsplitHelper("\"\"", "");
+    }
+
+    public void testSplitQuoteEmptyAmongst()
     {
         splitHelper("wow \"\" empty", "wow", "", "empty");
+    }
+
+    public void testUnsplitQuoteEmptyAmongst()
+    {
+        unsplitHelper("wow \"\" empty", "wow", "", "empty");
     }
 
     public void testEndsInBackslash()
@@ -296,5 +346,11 @@ public class StringUtilsTest extends PulseTestCase
         List<String> expectedParts = Arrays.asList(expected);
         List<String> gotParts = StringUtils.split(s);
         assertEquals(expectedParts, gotParts);
+    }
+
+    private void unsplitHelper(String expected, String... pieces)
+    {
+        String got = StringUtils.unsplit(Arrays.asList(pieces));
+        assertEquals(expected, got);
     }
 }
