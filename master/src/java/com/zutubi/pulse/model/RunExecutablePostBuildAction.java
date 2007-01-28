@@ -6,7 +6,7 @@ import com.zutubi.pulse.core.FileLoadException;
 import com.zutubi.pulse.core.Scope;
 import com.zutubi.pulse.core.VariableHelper;
 import com.zutubi.pulse.core.model.*;
-import com.zutubi.pulse.util.StringUtils;
+import com.zutubi.pulse.util.IOUtils;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -41,6 +41,7 @@ public class RunExecutablePostBuildAction extends PostBuildAction
 
             ProcessBuilder builder = new ProcessBuilder(commandLine);
             Process child = builder.start();
+            IOUtils.joinStreams(child.getInputStream(), System.out);
             int code = child.waitFor();
             if(code != 0)
             {
@@ -70,14 +71,8 @@ public class RunExecutablePostBuildAction extends PostBuildAction
 
     private void addArguments(List<String> commandLine, BuildResult build, RecipeResultNode recipe, List<ResourceProperty> properties) throws FileLoadException
     {
-        List<String> args = StringUtils.split(arguments);
-
         Scope scope = getScope(build, recipe, properties, configurationManager);
-
-        for(String arg: args)
-        {
-            commandLine.add(VariableHelper.replaceVariables(arg, scope, true));
-        }
+        commandLine.addAll(VariableHelper.splitAndReplaceVariables(arguments, scope, true));
     }
 
     public static Scope getScope(BuildResult result, RecipeResultNode recipe, List<ResourceProperty> properties, MasterConfigurationManager configurationManager)

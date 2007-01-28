@@ -17,6 +17,7 @@ public class VariableHelper
      */
     private enum TokenType
     {
+        SPACE,
         TEXT,
         VARIABLE_REFERENCE
     }
@@ -47,11 +48,12 @@ public class VariableHelper
         }
     }
 
-    private static List<Token> tokenise(String input) throws FileLoadException
+    private static List<Token> tokenise(String input, boolean split) throws FileLoadException
     {
         List<Token> result = new LinkedList<Token>();
         LexerState state = LexerState.INITIAL;
         StringBuilder current = new StringBuilder();
+        boolean quoted = false;
 
         for (int i = 0; i < input.length(); i++)
         {
@@ -68,16 +70,43 @@ public class VariableHelper
                             state = LexerState.ESCAPED;
                             break;
                         }
+                        case '"':
+                        {
+                            if(split)
+                            {
+                                quoted = !quoted;
+                            }
+                            else
+                            {
+                                current.append(inputChar);
+                            }
+                            break;
+                        }
+                        case ' ':
+                        {
+                            if(split)
+                            {
+                                if(quoted)
+                                {
+                                    current.append(inputChar);
+                                }
+                                else
+                                {
+                                    addCurrent(current, result);
+                                    result.add(new Token(TokenType.SPACE, " "));
+                                }
+                            }
+                            else
+                            {
+                                current.append(inputChar);
+                            }
+                            break;
+                        }
                         case '$':
                         {
                             state = LexerState.DOLLAR;
                             // only add a token if there is something to add.
-                            String str = current.toString();
-                            if (str.length() > 0)
-                            {
-                                result.add(new Token(TokenType.TEXT, str));
-                            }
-                            current = new StringBuilder();
+                            addCurrent(current, result);
                             break;
                         }
                         default:
@@ -142,11 +171,12 @@ public class VariableHelper
         {
             case INITIAL:
             {
-                String str = current.toString();
-                if (str.length() > 0)
+                if(quoted)
                 {
-                    result.add(new Token(TokenType.TEXT, current.toString()));
+                    throw new FileLoadException("Syntax error: unexpected end of input looking for closing quotes (\")");
                 }
+                
+                addCurrent(current, result);
                 break;
             }
             case ESCAPED:
@@ -166,9 +196,18 @@ public class VariableHelper
         return result;
     }
 
+    private static void addCurrent(StringBuilder current, List<Token> result)
+    {
+        if (current.length() > 0)
+        {
+            result.add(new Token(TokenType.TEXT, current.toString()));
+            current.delete(0, current.length());
+        }
+    }
+
     public static boolean containsVariables(String input) throws FileLoadException
     {
-        List<Token> tokens = tokenise(input);
+        List<Token> tokens = tokenise(input, false);
         for (Token token : tokens)
         {
             switch (token.type)
@@ -182,7 +221,7 @@ public class VariableHelper
 
     public static Object replaceVariable(String input, Scope properties) throws FileLoadException
     {
-        List<Token> tokens = tokenise(input);
+        List<Token> tokens = tokenise(input, false);
         if (tokens.size() != 1 || tokens.get(0).type != TokenType.VARIABLE_REFERENCE)
         {
             throw new FileLoadException("Expected single variable reference. Instead found '"+input+"'"); //TODO
@@ -205,7 +244,7 @@ public class VariableHelper
     {
         StringBuilder result = new StringBuilder();
 
-        List<Token> tokens = tokenise(input);
+        List<Token> tokens = tokenise(input, false);
 
         for (Token token : tokens)
         {
@@ -218,30 +257,76 @@ public class VariableHelper
                 }
                 case VARIABLE_REFERENCE:
                 {
-                    if (properties.containsReference(token.value))
-                    {
-                        Object obj = properties.getReference(token.value).getValue();
-                        if (!(obj instanceof String))
-                        {
-                            throw new FileLoadException("Reference to non string variable '" + token.value + "'");
-                        }
-                        result.append(obj.toString());
-                    }
-                    else if(allowUnresolved)
-                    {
-                        result.append("${");
-                        result.append(token.value);
-                        result.append("}");
-                    }
-                    else
-                    {
-                        throw new FileLoadException("Reference to unknown variable '" + token.value + "'");
-                    }
+                    resolveReference(properties, token, result, allowUnresolved);
                     break;
                 }
             }
         }
         return result.toString();
+    }
+
+    public static List<String> splitAndReplaceVariables(String input, Scope properties, boolean allowUnresolved) throws FileLoadException
+    {
+        List<String> result = new LinkedList<String>();
+        StringBuilder current = new StringBuilder();
+
+        List<Token> tokens = tokenise(input, true);
+
+        for (Token token : tokens)
+        {
+            switch (token.type)
+            {
+                case SPACE:
+                {
+                    if(current.length() > 0)
+                    {
+                        result.add(current.toString());
+                        current.delete(0, current.length());
+                    }
+                    break;
+                }
+                case TEXT:
+                {
+                    current.append(token.value);
+                    break;
+                }
+                case VARIABLE_REFERENCE:
+                {
+                    resolveReference(properties, token, current, allowUnresolved);
+                    break;
+                }
+            }
+        }
+
+        if(current.length() > 0)
+        {
+            result.add(current.toString());
+        }
+
+        return result;
+    }
+
+    private static void resolveReference(Scope properties, Token token, StringBuilder result, boolean allowUnresolved) throws FileLoadException
+    {
+        if (properties.containsReference(token.value))
+        {
+            Object obj = properties.getReference(token.value).getValue();
+            if (!(obj instanceof String))
+            {
+                throw new FileLoadException("Reference to non string variable '" + token.value + "'");
+            }
+            result.append(obj.toString());
+        }
+        else if(allowUnresolved)
+        {
+            result.append("${");
+            result.append(token.value);
+            result.append("}");
+        }
+        else
+        {
+            throw new FileLoadException("Reference to unknown variable '" + token.value + "'");
+        }
     }
 
 }
