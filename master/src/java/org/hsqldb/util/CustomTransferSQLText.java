@@ -51,14 +51,14 @@ class CustomTransferSQLText extends DataAccessPoint {
     BufferedReader      WTextRead              = null;
     protected boolean   StructureAlreadyParsed = false;
     Hashtable           DbStmts                = null;
-    protected JDBCTypes JDBCT                  = null;
+    protected CustomJDBCTypes JDBCT                  = null;
 
     CustomTransferSQLText(String _FileName, Traceable t) throws DataAccessPointException {
 
         super(t);
 
         sFileName = _FileName;
-        JDBCT     = new JDBCTypes();
+        JDBCT     = new CustomJDBCTypes();
 
         if (sFileName == null) {
             throw new DataAccessPointException("File name not initialized");
@@ -312,7 +312,7 @@ class CustomTransferSQLText extends DataAccessPoint {
                           throws DataAccessPointException {
 
         String    translatedLine = "";
-        JDBCTypes JDBCT          = new JDBCTypes();
+        CustomJDBCTypes JDBCT          = new CustomJDBCTypes();
         int       currentPos     = 0;
         String    columnName     = "";
         String    columnType     = "";
@@ -877,7 +877,16 @@ class CustomTransferSQLText extends DataAccessPoint {
             case java.sql.Types.VARCHAR:
             case java.sql.Types.LONGVARCHAR:
                 return new String(Base64.decode(token), "UTF-8");
+            case java.sql.Types.BIGINT:
+                return Long.valueOf(token);
+            case java.sql.Types.BOOLEAN:
+                System.out.println("BooleanType: value='" + token+"'");
+                return Boolean.valueOf(token);
+            case java.sql.Types.BIT:
+                System.out.println("BitType: value='" + token+"'");
+                return Boolean.valueOf(token);
             default:
+                System.out.println("default: token='" + token+"', type=" + type);
                 return token;
         }
     }
