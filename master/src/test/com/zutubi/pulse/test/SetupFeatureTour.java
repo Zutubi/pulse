@@ -243,7 +243,8 @@ public class SetupFeatureTour implements Runnable
         BuildSpecificationNode simpleNode = new BuildSpecificationNode(simpleStage);
         simpleSpec.getRoot().addChild(simpleNode);
         project.addBuildSpecification(simpleSpec);
-
+        project.setDefaultSpecification(simpleSpec);
+        
         simpleSpec = new BuildSpecification("nightly");
         simpleSpec.setTimeout(120);
         simpleStage = new BuildStage("default", new MasterBuildHostRequirements(), "nightly-build");

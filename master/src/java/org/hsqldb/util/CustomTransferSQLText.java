@@ -35,6 +35,9 @@
 package org.hsqldb.util;
 
 import org.apache.ws.commons.util.Base64;
+import org.hsqldb.Column;
+import org.hsqldb.HsqlDateTime;
+import org.hsqldb.HsqlException;
 
 import java.io.*;
 import java.sql.SQLException;
@@ -160,11 +163,12 @@ class CustomTransferSQLText extends DataAccessPoint {
             }
         }
 
+        Hashtable types = helper.getSupportedTypes();
         for (int i = 0; i < len; i++) {
             int t = r.getColumnType(i + 1);
 
             sLast = "column=" + r.getColumnName(i + 1) + " datatype="
-                    + (String) helper.getSupportedTypes().get(new Integer(t));
+                    + (String) JDBCT.toString(t);
 
             Object o = r.getObject(i + 1);
 
@@ -859,6 +863,10 @@ class CustomTransferSQLText extends DataAccessPoint {
                 } catch (IndexOutOfBoundsException IOBe) {
                     continue;
                 }
+                catch (HsqlException e)
+                {
+                    tracer.trace("*** ERROR: " + e.getMessage());
+                }
             }
         } catch (IOException IOe) {
             throw new DataAccessPointException(IOe.getMessage());
@@ -867,7 +875,7 @@ class CustomTransferSQLText extends DataAccessPoint {
         return trsData;
     }
 
-    private Object deserialiseValue(String token, int type) throws Base64.DecodingException, UnsupportedEncodingException
+    private Object deserialiseValue(String token, int type) throws Base64.DecodingException, UnsupportedEncodingException, HsqlException
     {
         switch(type)
         {
@@ -880,14 +888,16 @@ class CustomTransferSQLText extends DataAccessPoint {
             case java.sql.Types.BIGINT:
                 return Long.valueOf(token);
             case java.sql.Types.BOOLEAN:
-                System.out.println("BooleanType: value='" + token+"'");
                 return Boolean.valueOf(token);
             case java.sql.Types.BIT:
-                System.out.println("BitType: value='" + token+"'");
                 return Boolean.valueOf(token);
+            case java.sql.Types.CHAR:
+                return token.charAt(0);
+            case java.sql.Types.DATE:
+                return HsqlDateTime.dateValue(token);
             default:
-                System.out.println("default: token='" + token+"', type=" + type);
-                return token;
+//                System.out.println("default: token='" + token+"', type=" + type);
+                return Column.convertObject(token, type);
         }
     }
 }

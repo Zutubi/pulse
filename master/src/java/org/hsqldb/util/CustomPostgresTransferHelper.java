@@ -139,6 +139,8 @@ class CustomPostgresTransferHelper extends TransferHelper {
             t.Stmts.sDestDrop += DropSequence;
         }
 
+        columnType = columnType.replace("VARBINARY", "BYTEA");
+
         for (int Idx = 0; Idx < Funcs.length; Idx++) {
             String HSQLDB_func = Funcs[Idx][HSQLDB];
             int    iStartPos   = columnType.indexOf(HSQLDB_func);
