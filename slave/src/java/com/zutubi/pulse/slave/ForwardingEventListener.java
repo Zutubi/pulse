@@ -13,12 +13,14 @@ public class ForwardingEventListener implements EventListener
 {
     private static final Logger LOG = Logger.getLogger(ForwardingEventListener.class);
 
+    private String master;
     private MasterService service;
     private ServiceTokenManager serviceTokenManager;
     private long id;
 
-    public ForwardingEventListener(MasterService service, ServiceTokenManager serviceTokenManager, long id)
+    public ForwardingEventListener(String master, MasterService service, ServiceTokenManager serviceTokenManager, long id)
     {
+        this.master = master;
         this.serviceTokenManager = serviceTokenManager;
         this.service = service;
         this.id = id;
@@ -36,9 +38,9 @@ public class ForwardingEventListener implements EventListener
             }
             catch (Exception e)
             {
-                // TODO abort the recipe execution
+                // TODO abort the recipe execution?
                 // TODO support retrying events
-                LOG.severe("Could not forward event for recipe '" + Long.toString(id) + "' to master", e);
+                LOG.severe("Could not forward event for recipe '" + Long.toString(id) + "' to master.  Check master location (" + master + ") is accessible from this agent", e);
             }
         }
     }
