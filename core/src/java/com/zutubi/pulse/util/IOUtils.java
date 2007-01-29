@@ -206,4 +206,53 @@ public class IOUtils
         }
 
     }
+
+    /**
+     * Copy the contents of the template file to the destination file.  This copy will filter out any lines
+     * that begin with '###'
+     * 
+     * @param template
+     * @param destination
+     *
+     * @throws IOException if there is a problem copying the template.
+     */
+    public static void copyTemplate(File template, File destination) throws IOException
+    {
+        File parentFile = destination.getParentFile();
+        if (!parentFile.isDirectory() && !parentFile.mkdirs())
+        {
+            throw new IOException("Unable to create parent directory '" + parentFile.getAbsolutePath() + "' for config file");
+        }
+        if (!destination.createNewFile())
+        {
+            throw new IOException("Unable to create config file '" + destination.getAbsolutePath() + "'");
+        }
+
+        BufferedReader reader = null;
+        BufferedWriter writer = null;
+
+        try
+        {
+            reader = new BufferedReader(new FileReader(template));
+            writer = new BufferedWriter(new FileWriter(destination));
+
+            String line;
+            boolean doneSkipping = false;
+
+            while((line = reader.readLine()) != null)
+            {
+                if(doneSkipping || !line.startsWith("###"))
+                {
+                    doneSkipping = true;
+                    writer.write(line);
+                    writer.write('\n');
+                }
+            }
+        }
+        finally
+        {
+            IOUtils.close(reader);
+            IOUtils.close(writer);
+        }
+    }
 }

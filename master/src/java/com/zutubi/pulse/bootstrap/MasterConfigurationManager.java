@@ -1,6 +1,7 @@
 package com.zutubi.pulse.bootstrap;
 
 import java.io.File;
+import java.io.IOException;
 
 /**
  * 
@@ -25,4 +26,6 @@ public interface MasterConfigurationManager extends ConfigurationManager, DataRe
     Data getData();
 
     File getHomeDirectory();
+
+    DatabaseConfig getDatabaseConfig() throws IOException;
 }

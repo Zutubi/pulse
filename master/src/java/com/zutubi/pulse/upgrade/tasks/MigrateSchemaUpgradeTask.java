@@ -1,11 +1,10 @@
 package com.zutubi.pulse.upgrade.tasks;
 
+import com.zutubi.pulse.bootstrap.DatabaseConsole;
 import com.zutubi.pulse.upgrade.DataSourceAware;
 import com.zutubi.pulse.upgrade.UpgradeContext;
 import com.zutubi.pulse.upgrade.UpgradeException;
 import com.zutubi.pulse.upgrade.UpgradeTask;
-import org.hibernate.cfg.Configuration;
-import org.hibernate.tool.hbm2ddl.SchemaUpdate;
 import org.springframework.core.io.ClassPathResource;
 
 import javax.sql.DataSource;
@@ -24,6 +23,8 @@ public class MigrateSchemaUpgradeTask implements DataSourceAware, UpgradeTask
     private List<String> errors = new LinkedList<String>();
 
     protected DataSource dataSource;
+
+    protected DatabaseConsole databaseConsole;
 
     private int buildNumber;
 
@@ -67,12 +68,11 @@ public class MigrateSchemaUpgradeTask implements DataSourceAware, UpgradeTask
         try
         {
             // manually setup the hibernate configuration
-            Configuration config = new Configuration();
+            MutableConfiguration config = new MutableConfiguration();
 
             // load these properties from the context, same place that all the other
             // properties are defined.
-            Properties props = new Properties();
-            props.put("hibernate.dialect", "org.hibernate.dialect.HSQLDialect");
+            Properties props = databaseConsole.getConfig().getHibernateProperties();
             props.put("hibernate.connection.provider_class", "com.zutubi.pulse.upgrade.tasks.HackyUpgradeTaskConnectionProvider");
 
             // slight hack to provide hibernate with access to the configured datasource.
@@ -86,20 +86,14 @@ public class MigrateSchemaUpgradeTask implements DataSourceAware, UpgradeTask
             }
 
             // run the schema update.
-            SchemaUpdate schemaUpdate = new SchemaUpdate(config, props);
-            schemaUpdate.execute(true, true);
+            SchemaRefactor refactor = new SchemaRefactor(config, props);
+            refactor.sync();
 
-            List<Exception> exceptions = schemaUpdate.getExceptions();
+            List<Exception> exceptions = refactor.getExceptions();
             for (Exception e : exceptions)
             {
                 getErrors().add(e.getClass().getName() + ": Cause: " + e.getMessage());
             }
-/*
-            Dialect dialect = Dialect.getDialect(props);
-            Connection connection = dataSource.getConnection();
-            DatabaseMetadata meta = new DatabaseMetadata(connection, dialect);
-            String[] createSQL = config.generateSchemaUpdateScript(dialect, meta);
-*/
         }
         catch (IOException e)
         {
@@ -121,10 +115,20 @@ public class MigrateSchemaUpgradeTask implements DataSourceAware, UpgradeTask
     /**
      * Required resource.
      *
-     * @param dataSource
+     * @param dataSource reference
      */
     public void setDataSource(DataSource dataSource)
     {
         this.dataSource = dataSource;
+    }
+
+    /**
+     * Required resource.
+     *
+     * @param databaseConsole reference
+     */
+    public void setDatabaseConsole(DatabaseConsole databaseConsole)
+    {
+        this.databaseConsole = databaseConsole;
     }
 }

@@ -4,8 +4,10 @@ import com.zutubi.pulse.Version;
 import com.zutubi.pulse.config.Config;
 import com.zutubi.pulse.config.FileConfig;
 import com.zutubi.pulse.util.FileSystemUtils;
+import com.zutubi.pulse.util.IOUtils;
 import com.zutubi.pulse.util.logging.Logger;
 
+import javax.sql.DataSource;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
@@ -88,6 +90,7 @@ public class Data implements MasterUserPaths
         updateVersion(systemVersion);
 
         transferExampleTemplates(systemPaths);
+        transferDatabaseConfig(systemPaths);
     }
 
     /**
@@ -112,17 +115,20 @@ public class Data implements MasterUserPaths
         // copy the files into the system tmpRoot.
         File tmpBackup = new File(systemPaths.getTmpRoot(), filename);
 
-        // trigger a checkpoint call on the database.
-        DatabaseBootstrap dbBootstrap = (DatabaseBootstrap) ComponentContext.getBean("databaseBootstrap");
-        dbBootstrap.compactDatabase();
+        // Are we running an embedded database? If so, we need to back it up.
+        DatabaseConsole databaseConsole = (DatabaseConsole) ComponentContext.getBean("databaseConsole");
+        if (databaseConsole.isEmbedded())
+        {
+            // trigger a checkpoint call on the database to compact the data.
+            HSQLDBUtils.compactDatabase((DataSource) ComponentContext.getBean("dataSource"));
+            FileSystemUtils.copy(new File(tmpBackup, "database"),
+                    new File(getDatabaseRoot(), "db.backup"),
+                    new File(getDatabaseRoot(), "db.log"),
+                    new File(getDatabaseRoot(), "db.properties"),
+                    new File(getDatabaseRoot(), "db.data"),
+                    new File(getDatabaseRoot(), "db.script"));
+        }
 
-        FileSystemUtils.copy(tmpBackup, getUserConfigRoot());
-        FileSystemUtils.copy(new File(tmpBackup, "database"),
-                new File(getDatabaseRoot(), "db.backup"),
-                new File(getDatabaseRoot(), "db.log"),
-                new File(getDatabaseRoot(), "db.properties"),
-                new File(getDatabaseRoot(), "db.data"),
-                new File(getDatabaseRoot(), "db.script"));
         FileSystemUtils.copy(new File(tmpBackup, CONFIG_FILE_NAME), getConfigFile());
 
         FileSystemUtils.createZip(backup, tmpBackup, tmpBackup);
@@ -179,6 +185,28 @@ public class Data implements MasterUserPaths
                     }
                 }
             }
+        }
+    }
+
+    /**
+     * Transfer the database.properties.template file into the data directory so that it is available for pulse
+     * to create the database connection.
+     *
+     * @param systemPaths
+     *
+     * @throws IOException if there is a problem transferring the template.
+     */
+    private void transferDatabaseConfig(SystemPaths systemPaths) throws StartupException
+    {
+        try
+        {
+            File databaseConfig = new File(getUserConfigRoot(), "database.properties");
+            File databaseConfigTemplate = new File(systemPaths.getConfigRoot(), "database.properties.template");
+            IOUtils.copyTemplate(databaseConfigTemplate, databaseConfig);
+        }
+        catch (IOException e)
+        {
+            throw new StartupException("Failed to create the database configuration file.", e);
         }
     }
 

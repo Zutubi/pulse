@@ -54,6 +54,7 @@ public class UserPropsUpgradeTaskTest extends BaseUpgradeTaskTestCase
         // upgrade schema
         UserPropsSchemaUpgradeTask schemaUpgrade = new UserPropsSchemaUpgradeTask();
         schemaUpgrade.setDataSource(dataSource);
+//        schemaUpgrade.setDatabaseConsole(con);
         schemaUpgrade.execute(new MockUpgradeContext());
 
         // check that the new table exists as expected

@@ -1,7 +1,5 @@
 package com.zutubi.pulse.bootstrap;
 
-import com.zutubi.pulse.util.IOUtils;
-import com.zutubi.pulse.util.JDBCUtils;
 import org.apache.commons.dbcp.BasicDataSource;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.FactoryBean;
@@ -10,17 +8,12 @@ import org.springframework.context.ApplicationContextAware;
 
 import javax.sql.DataSource;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.Properties;
+import java.util.Map;
 
 /**
- * 
+ *
  *
  */
 public class DataSourceBeanFactory implements FactoryBean, ApplicationContextAware
@@ -28,6 +21,8 @@ public class DataSourceBeanFactory implements FactoryBean, ApplicationContextAwa
     private ApplicationContext context;
 
     private BasicDataSource dataSource;
+
+    private MasterConfigurationManager configurationManager;
 
     public Object getObject() throws Exception
     {
@@ -37,10 +32,13 @@ public class DataSourceBeanFactory implements FactoryBean, ApplicationContextAwa
             {
                 if (dataSource == null)
                 {
-                    createDataSource();
-                    if(maxSizeUpdateRequired())
+                    dataSource = createDataSource();
+
+                    // handle some custom processing for embedded databases.
+                    DatabaseConfig config = configurationManager.getDatabaseConfig();
+                    if (config.isEmbedded())
                     {
-                        updateMaxSize();
+                        checkEmbeddedSizeRequirements();
                     }
                 }
             }
@@ -48,107 +46,43 @@ public class DataSourceBeanFactory implements FactoryBean, ApplicationContextAwa
         return dataSource;
     }
 
-    private void createDataSource()
+    private void checkEmbeddedSizeRequirements() throws IOException, SQLException
     {
-        dataSource = new BasicDataSource();
-        dataSource.setDriverClassName(getDriverClassName());
-        dataSource.setUrl(getUrl());
-        dataSource.setUsername(getUsername());
-        dataSource.setPassword(getPassword());
+        if (HSQLDBUtils.updateMaxSizeRequired(dataSource))
+        {
+            HSQLDBUtils.shutdown(dataSource);
+            close();
+            HSQLDBUtils.updateMaxSize(getDbRoot());
+            dataSource = createDataSource();
+        }
     }
 
-    private boolean maxSizeUpdateRequired()
+    private BasicDataSource createDataSource() throws IOException
     {
-        Connection con = null;
-        PreparedStatement stmt = null;
-        ResultSet rs = null;
+        DatabaseConfig databaseConfig = configurationManager.getDatabaseConfig();
 
-        try
+        BasicDataSource dataSource = new BasicDataSource();
+        dataSource.setDriverClassName(databaseConfig.getDriverClassName());
+
+        //TODO: move this into the database config instance.
+        String url = databaseConfig.getUrl();
+        url = url.replace("DB_ROOT", getDbRoot().getAbsolutePath());
+        dataSource.setUrl(url);
+
+        dataSource.setUsername(databaseConfig.getUsername());
+        dataSource.setPassword(databaseConfig.getPassword());
+
+        Map<String, String> connectionProperties = databaseConfig.getConnectionProperties();
+        for (String key : connectionProperties.keySet())
         {
-            con = dataSource.getConnection();
-            stmt = con.prepareCall("SELECT property_value FROM information_schema.system_properties WHERE property_name = 'hsqldb.cache_file_scale'");
-            rs = stmt.executeQuery();
-            if(rs.next())
-            {
-                Long scale = JDBCUtils.getLong(rs, "property_value");
-                if(scale != null && scale == 1)
-                {
-                    return true;
-                }
-            }
+            dataSource.addConnectionProperty(key, connectionProperties.get(key));
         }
-        catch (SQLException e)
-        {
-            e.printStackTrace();
-        }
-        finally
-        {
-            JDBCUtils.close(rs);
-            JDBCUtils.close(stmt);
-            JDBCUtils.close(con);
-        }
-
-        return false;
-    }
-
-    private void updateMaxSize() throws SQLException
-    {
-        JDBCUtils.execute(dataSource, "SHUTDOWN SCRIPT");
-        close();
-
-        File dbPropertiesFile = new File(getDbRoot(), "db.properties");
-        FileInputStream inStream = null;
-        FileOutputStream outStream = null;
-
-        try
-        {
-            inStream = new FileInputStream(dbPropertiesFile);
-            Properties properties = new Properties();
-            properties.load(inStream);
-            properties.put("hsqldb.cache_file_scale", "8");
-            inStream.close();
-
-            outStream = new FileOutputStream(dbPropertiesFile);
-            properties.store(outStream, "Updated cache_file_scale");
-        }
-        catch (IOException e)
-        {
-            e.printStackTrace();
-        }
-        finally
-        {
-            IOUtils.close(inStream);
-            IOUtils.close(outStream);
-        }
-
-        createDataSource();
-    }
-
-    public String getDriverClassName()
-    {
-        return "org.hsqldb.jdbcDriver";
-    }
-
-    public String getUrl()
-    {
-        File dbRoot = getDbRoot();
-        return "jdbc:hsqldb:" + dbRoot.getAbsolutePath() + File.separator + "db";
+        return dataSource;
     }
 
     private File getDbRoot()
     {
-        MasterConfigurationManager configManager = (MasterConfigurationManager) context.getBean("configurationManager");
-        return configManager.getUserPaths().getDatabaseRoot();
-    }
-
-    public String getUsername()
-    {
-        return "sa";
-    }
-
-    public String getPassword()
-    {
-        return "";
+        return getConfigurationManager().getUserPaths().getDatabaseRoot();
     }
 
     public Class getObjectType()
@@ -173,5 +107,20 @@ public class DataSourceBeanFactory implements FactoryBean, ApplicationContextAwa
             dataSource.close();
             dataSource = null;
         }
+    }
+
+    public void setConfigurationManager(MasterConfigurationManager configurationManager)
+    {
+        this.configurationManager = configurationManager;
+    }
+
+    public MasterConfigurationManager getConfigurationManager()
+    {
+        if (configurationManager == null)
+        {
+            // look it up manually
+            configurationManager = (MasterConfigurationManager) context.getBean("configurationManager");
+        }
+        return configurationManager;
     }
 }

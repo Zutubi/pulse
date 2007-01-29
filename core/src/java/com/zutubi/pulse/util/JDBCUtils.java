@@ -151,6 +151,32 @@ public class JDBCUtils
         }
     }
 
+    public static boolean columnExists(DataSource dataSource, String tableName, String columnName)
+    {
+        try
+        {
+            JDBCUtils.execute(dataSource, "SELECT COUNT("+columnName+") FROM " + tableName);
+            return true;
+        }
+        catch (SQLException e)
+        {
+            return false;
+        }
+    }
+
+    public static boolean columnExists(Connection con, String tableName, String columnName)
+    {
+        try
+        {
+            JDBCUtils.execute(con, "SELECT COUNT("+columnName+") FROM " + tableName);
+            return true;
+        }
+        catch (SQLException e)
+        {
+            return false;
+        }
+    }
+
     public static String[] getSchemaTableNames(Connection con)
     {
         try
@@ -436,4 +462,5 @@ public class JDBCUtils
             JDBCUtils.close(ps);
         }
     }
+
 }

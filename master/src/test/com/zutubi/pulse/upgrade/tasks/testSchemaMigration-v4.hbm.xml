@@ -1,0 +1,42 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD//EN" "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd" >
+<hibernate-mapping>
+
+    <!-- -->
+    <class name="x" table="BASE" lazy="false">
+
+        <id name="id" type="java.lang.Long" column="ID" unsaved-value="0">
+            <generator class="hilo"/>
+        </id>
+
+        <property name="a" column="A" type="string"/>
+
+        <map name="properties" table="SECONDARY_A">
+            <key column="BASE_ID"/>
+            <index column="KEY" type="string" length="1000"/>
+            <element column="VALUE" type="string" length="4000"/>
+        </map>
+
+        <bag name="contactPoints" inverse="true" cascade="all" lazy="false">
+            <key column="BASE_ID"/>
+            <one-to-many class="y"/>
+        </bag>
+
+        <bag name="aliases" lazy="false" table="SECONDARY_B">
+            <key column="BASE_ID"/>
+            <element type="string" column="ALIAS" not-null="true"/>
+        </bag>
+
+    </class>
+
+    <class name="y" table="SECONDARY_C" lazy="false">
+
+        <id name="id" type="java.lang.Long" column="ID" unsaved-value="0">
+            <generator class="hilo"/>
+        </id>
+
+        <many-to-one name="user" column="BASE_ID" class="x" insert="true" lazy="false"/>
+
+    </class>
+
+</hibernate-mapping>

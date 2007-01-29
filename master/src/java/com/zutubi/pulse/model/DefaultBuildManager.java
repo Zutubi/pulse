@@ -1,7 +1,7 @@
 package com.zutubi.pulse.model;
 
 import com.zutubi.pulse.MasterBuildPaths;
-import com.zutubi.pulse.bootstrap.DatabaseBootstrap;
+import com.zutubi.pulse.bootstrap.DatabaseConsole;
 import com.zutubi.pulse.bootstrap.MasterConfigurationManager;
 import com.zutubi.pulse.core.model.*;
 import com.zutubi.pulse.events.Event;
@@ -34,8 +34,6 @@ public class DefaultBuildManager implements BuildManager, EventListener
 {
     private static final Logger LOG = Logger.getLogger(DefaultBuildManager.class);
 
-    // Forces the dependency in spring (CIB-166)
-    private DatabaseBootstrap databaseBootstrap;
     private BuildResultDao buildResultDao;
     private ArtifactDao artifactDao;
     private FileArtifactDao fileArtifactDao;
@@ -45,6 +43,8 @@ public class DefaultBuildManager implements BuildManager, EventListener
     private MasterConfigurationManager configurationManager;
     private EventManager eventManager;
     private TestManager testManager;
+
+    private DatabaseConsole databaseConsole;
 
     private static final String CLEANUP_NAME = "cleanup";
     private static final String CLEANUP_GROUP = "services";
@@ -227,9 +227,12 @@ public class DefaultBuildManager implements BuildManager, EventListener
         }
 
         // Now check the database is not too close to full
-        if(databaseBootstrap.getDatabaseUsagePercent() > 95.0)
+        if (databaseConsole.isEmbedded())
         {
-            LOG.warning("The internal database is close to reaching its size limit.  Consider adding more cleanup rules to remove old build information.");
+            if(databaseConsole.getDatabaseUsagePercent() > 95.0)
+            {
+                LOG.warning("The internal database is close to reaching its size limit.  Consider adding more cleanup rules to remove old build information.");
+            }
         }
     }
 
@@ -363,7 +366,11 @@ public class DefaultBuildManager implements BuildManager, EventListener
 
     public boolean isSpaceAvailableForBuild()
     {
-        return databaseBootstrap.getDatabaseUsagePercent() < 99.5;
+        if (databaseConsole.isEmbedded())
+        {
+            return databaseConsole.getDatabaseUsagePercent() < 99.5;
+        }
+        return true;
     }
 
     public BuildResult getPreviousBuildResult(BuildResult result)
@@ -630,11 +637,6 @@ public class DefaultBuildManager implements BuildManager, EventListener
         this.changelistDao = changelistDao;
     }
 
-    public void setDatabaseBootstrap(DatabaseBootstrap databaseBootstrap)
-    {
-        this.databaseBootstrap = databaseBootstrap;
-    }
-
     public void setFileArtifactDao(FileArtifactDao fileArtifactDao)
     {
         this.fileArtifactDao = fileArtifactDao;
@@ -653,5 +655,10 @@ public class DefaultBuildManager implements BuildManager, EventListener
     public void setTestManager(TestManager testManager)
     {
         this.testManager = testManager;
+    }
+
+    public void setDatabaseConsole(DatabaseConsole databaseConsole)
+    {
+        this.databaseConsole = databaseConsole;
     }
 }

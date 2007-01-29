@@ -1,7 +1,8 @@
 package com.zutubi.pulse.model.persistence.hibernate;
 
 import com.zutubi.pulse.bootstrap.ComponentContext;
-import com.zutubi.pulse.bootstrap.DatabaseBootstrap;
+import com.zutubi.pulse.bootstrap.DatabaseConfig;
+import com.zutubi.pulse.bootstrap.EmbeddedHSQLDBConsole;
 import com.zutubi.pulse.test.PulseTestCase;
 import com.zutubi.pulse.util.JDBCUtils;
 import org.hibernate.SessionFactory;
@@ -12,13 +13,13 @@ import org.springframework.transaction.support.DefaultTransactionDefinition;
 
 import javax.sql.DataSource;
 import java.beans.BeanInfo;
+import java.beans.IntrospectionException;
 import java.beans.Introspector;
 import java.beans.PropertyDescriptor;
-import java.beans.IntrospectionException;
 import java.lang.reflect.Method;
-import java.lang.reflect.InvocationTargetException;
 import java.sql.Connection;
 import java.sql.Statement;
+import java.util.Properties;
 
 /**
  * 
@@ -34,6 +35,7 @@ public abstract class PersistenceTestCase extends PulseTestCase
 
     protected SessionFactory sessionFactory;
     protected DataSource dataSource;
+    protected EmbeddedHSQLDBConsole console;
 
     public PersistenceTestCase()
     {
@@ -56,10 +58,13 @@ public abstract class PersistenceTestCase extends PulseTestCase
 
         dataSource = (DataSource) context.getBean("dataSource");
 
-        DatabaseBootstrap dbBootstrap = new DatabaseBootstrap();
-        dbBootstrap.setDataSource(dataSource);
-        dbBootstrap.setApplicationContext(context);
-        dbBootstrap.initialiseDatabase();
+        Properties props = new Properties();
+        props.setProperty("hibernate.dialect", "org.hibernate.dialect.HSQLDialect");
+        DatabaseConfig config = new DatabaseConfig(props);
+        console = new EmbeddedHSQLDBConsole(config);
+        console.setDataSource(dataSource);
+        console.setApplicationContext(context);
+        console.createSchema();
 
         transactionManager = (PlatformTransactionManager) context.getBean("transactionManager");
         transactionDefinition = new DefaultTransactionDefinition(DefaultTransactionDefinition.PROPAGATION_REQUIRED);
@@ -96,6 +101,7 @@ public abstract class PersistenceTestCase extends PulseTestCase
         }
 
         dataSource = null;
+        console = null;
         transactionStatus = null;
         transactionDefinition = null;
         transactionManager = null;

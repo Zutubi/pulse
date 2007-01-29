@@ -7,8 +7,10 @@ import com.zutubi.pulse.config.Config;
 import com.zutubi.pulse.config.FileConfig;
 import com.zutubi.pulse.events.EventManager;
 import com.zutubi.pulse.events.DataDirectoryChangedEvent;
+import com.zutubi.pulse.util.IOUtils;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.Properties;
 
 /**
@@ -86,6 +88,19 @@ public class SimpleMasterConfigurationManager extends AbstractConfigurationManag
         }
         // this is expected in a dev environment.
         return null;
+    }
+
+    public DatabaseConfig getDatabaseConfig() throws IOException
+    {
+        File configFile = new File(getUserPaths().getUserConfigRoot(), "database.properties");
+        if (configFile.exists())
+        {
+            return new DatabaseConfig(IOUtils.read(configFile));
+        }
+
+        // It is an existing installation, fallback to the defaults.
+        configFile = new File(getSystemPaths().getConfigRoot(), "database.properties.template");
+        return new DatabaseConfig(IOUtils.read(configFile));
     }
 
     public Data getData()

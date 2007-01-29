@@ -175,7 +175,7 @@
                 <ref bean="agentManager"/>
                 <ref bean="jabberManager"/>
                 <ref bean="jettyManager"/>
-                <ref bean="databaseBootstrap"/>
+                <ref bean="databaseConsole"/>
             </list>
         </property>
     </bean>

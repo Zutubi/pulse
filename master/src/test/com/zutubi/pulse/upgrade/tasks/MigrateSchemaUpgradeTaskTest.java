@@ -4,8 +4,6 @@ import com.zutubi.pulse.model.persistence.hibernate.PersistenceTestCase;
 import com.zutubi.pulse.upgrade.UpgradeTask;
 import com.zutubi.pulse.util.JDBCUtils;
 
-import java.sql.CallableStatement;
-import java.sql.Connection;
 import java.sql.SQLException;
 
 /**
@@ -73,47 +71,120 @@ public class MigrateSchemaUpgradeTaskTest extends PersistenceTestCase
         assertTrue(checkColumnExists("TEST", "NEW_COLUMN"));
     }
 
+/*
+    public void testFK() throws SQLException, UpgradeException, IOException
+    {
+        MutableConfiguration config = new MutableConfiguration();
+
+        Properties props = console.getConfig().getHibernateProperties();
+        props.put("hibernate.connection.provider_class", "com.zutubi.pulse.upgrade.tasks.HackyUpgradeTaskConnectionProvider");
+
+        // slight hack to provide hibernate with access to the configured datasource.
+        HackyUpgradeTaskConnectionProvider.dataSource = dataSource;
+
+        String[] mappings = new String[]{"com/zutubi/pulse/upgrade/tasks/testSchemaMigration-v4.hbm.xml"};
+
+        // use spring to help load the classpath resources. Rather useful actually.
+        for (String mapping : mappings)
+        {
+            ClassPathResource resource = new ClassPathResource(mapping);
+            config.addInputStream(resource.getInputStream());
+        }
+
+        // before, test that table is not there.
+        assertFalse(checkTableExists("BASE"));
+
+        SchemaUpdate schemaUpdate = new SchemaUpdate(config, props);
+        schemaUpdate.execute(true, true);
+
+        assertTrue(checkTableExists("BASE"));
+        assertTrue(checkTableExists("SECONDARY_A"));
+        assertTrue(checkTableExists("SECONDARY_B"));
+        assertTrue(checkTableExists("SECONDARY_C"));
+
+        SchemaRefactor refactor = new SchemaRefactor(config, props);
+        refactor.renameTable("BASE", "BASE_RENAME");
+
+        assertTrue(checkTableExists("BASE_RENAME"));
+
+        // transfer data...
+
+        assertFalse(checkTableExists("BASE"));
+        assertTrue(checkTableExists("SECONDARY_A"));
+        assertTrue(checkTableExists("SECONDARY_B"));
+        assertTrue(checkTableExists("SECONDARY_C"));
+
+        assertTrue(checkColumnExists("BASE_RENAME", "A"));
+        assertFalse(checkColumnExists("BASE_RENAME", "B"));
+        
+        refactor.renameColumn("BASE_RENAME", "A", "B");
+
+        assertFalse(checkColumnExists("BASE_RENAME", "A"));
+        assertTrue(checkColumnExists("BASE_RENAME", "B"));
+    }
+
+    private void processSchemaModification(String ...mappings) throws IOException
+    {
+        Configuration config = new Configuration();
+
+        Properties props = console.getConfig().getHibernateProperties();
+        props.put("hibernate.connection.provider_class", "com.zutubi.pulse.upgrade.tasks.HackyUpgradeTaskConnectionProvider");
+
+        // slight hack to provide hibernate with access to the configured datasource.
+        HackyUpgradeTaskConnectionProvider.dataSource = dataSource;
+
+        // use spring to help load the classpath resources. Rather useful actually.
+        for (String mapping : mappings)
+        {
+            ClassPathResource resource = new ClassPathResource(mapping);
+            config.addInputStream(resource.getInputStream());
+        }
+
+        // run the schema update.
+        SchemaUpdate schemaUpdate = new SchemaUpdate(config, props);
+        schemaUpdate.execute(true, true);
+
+        List<Exception> exceptions = schemaUpdate.getExceptions();
+        assertEquals(0, exceptions.size());
+    }
+
+    private void dropConstraints(String tableName, String ...mappings) throws IOException, SQLException
+    {
+        Configuration config = new Configuration();
+
+        Properties props = console.getConfig().getHibernateProperties();
+        props.put("hibernate.connection.provider_class", "com.zutubi.pulse.upgrade.tasks.HackyUpgradeTaskConnectionProvider");
+
+        // slight hack to provide hibernate with access to the configured datasource.
+        HackyUpgradeTaskConnectionProvider.dataSource = dataSource;
+
+        // use spring to help load the classpath resources. Rather useful actually.
+        for (String mapping : mappings)
+        {
+            ClassPathResource resource = new ClassPathResource(mapping);
+            config.addInputStream(resource.getInputStream());
+        }
+
+        HibernateUtils.dropConstraints(config, dataSource, tableName);
+    }
+*/
+
     private UpgradeTask newSchemaUpgrade(String mapping)
     {
         MigrateSchemaUpgradeTask task = new MigrateSchemaUpgradeTask();
         task.setMapping(mapping);
         task.setDataSource(dataSource);
+        task.setDatabaseConsole(console);
         return task;
     }
 
     private boolean checkTableExists(String tableName) throws SQLException
     {
-        Connection con = null;
-        try
-        {
-            con = dataSource.getConnection();
-            return JDBCUtils.tableExists(con, tableName);
-        }
-        finally
-        {
-            JDBCUtils.close(con);
-        }
+        return JDBCUtils.tableExists(dataSource, tableName);
     }
 
-    private boolean checkColumnExists(String tableName, String columnName)
+    private boolean checkColumnExists(String tableName, String columnName) throws SQLException
     {
-        Connection con = null;
-        CallableStatement stmt = null;
-        try
-        {
-            con = dataSource.getConnection();
-            stmt = con.prepareCall("SELECT COUNT("+columnName+") FROM " + tableName);
-            stmt.execute();
-            return true;
-        }
-        catch (SQLException e)
-        {
-            return false;
-        }
-        finally
-        {
-            JDBCUtils.close(stmt);
-            JDBCUtils.close(con);
-        }
+        return JDBCUtils.columnExists(dataSource, tableName, columnName);
     }
 }
