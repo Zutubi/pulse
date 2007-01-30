@@ -18,7 +18,7 @@ public class FileSystemUtilsTest extends PulseTestCase
         super.setUp();
         tmpDir = FileSystemUtils.createTempDir("FileSystemUtilsTest", getName());
 
-        if(FileSystemUtils.USE_UNIX_COPY)
+        if(FileSystemUtils.CP_AVAILABLE)
         {
             copiers = new Copier[]{ new DefaultCopier(), new JavaCopier(), new UnixCopier() };
         }

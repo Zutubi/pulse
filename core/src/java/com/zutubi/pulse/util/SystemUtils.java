@@ -193,4 +193,16 @@ public class SystemUtils
 
         return false;
     }
+
+    /**
+     * Returns true if this is a Unix-like system with the given binary
+     * available in the path.
+     *
+     * @param binary the name of the binary to search for
+     * @return true iff the binary is available
+     */
+    public static boolean unixBinaryAvailable(String binary)
+    {
+        return !IS_WINDOWS && findInPath(binary) != null;
+    }
 }

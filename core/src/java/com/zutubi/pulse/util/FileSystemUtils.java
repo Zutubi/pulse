@@ -46,15 +46,15 @@ public class FileSystemUtils
     public static final int PERMISSION_ALL_EXECUTE   = PERMISSION_OWNER_EXECUTE | PERMISSION_GROUP_EXECUTE | PERMISSION_OTHER_EXECUTE;
     public static final int PERMISSION_ALL_FULL      = PERMISSION_OWNER_FULL | PERMISSION_GROUP_FULL | PERMISSION_OTHER_FULL;
 
-    static final boolean USE_UNIX_COPY;
+    static final boolean CP_AVAILABLE;
     static final boolean LN_AVAILABLE;
     static final boolean STAT_AVAILABLE;
 
     static
     {
-        USE_UNIX_COPY = !SystemUtils.IS_WINDOWS && SystemUtils.findInPath("cp") != null;
-        LN_AVAILABLE = !SystemUtils.IS_WINDOWS && SystemUtils.findInPath("ln") != null;
-        STAT_AVAILABLE = !SystemUtils.IS_WINDOWS && SystemUtils.findInPath("stat") != null;
+        CP_AVAILABLE = SystemUtils.unixBinaryAvailable("cp");
+        LN_AVAILABLE = SystemUtils.unixBinaryAvailable("ln");
+        STAT_AVAILABLE = SystemUtils.unixBinaryAvailable("stat");
     }
 
     /**
@@ -1051,7 +1051,7 @@ public class FileSystemUtils
             return;
         }
 
-        if (USE_UNIX_COPY)
+        if (CP_AVAILABLE)
         {
             unixCopy(dest, src);
         }
