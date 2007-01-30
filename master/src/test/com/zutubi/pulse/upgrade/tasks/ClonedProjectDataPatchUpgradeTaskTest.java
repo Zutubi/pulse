@@ -1,8 +1,11 @@
 package com.zutubi.pulse.upgrade.tasks;
 
 import com.zutubi.pulse.bootstrap.ComponentContext;
-import com.zutubi.pulse.util.JDBCUtils;
+import com.zutubi.pulse.bootstrap.DatabaseConfig;
+import com.zutubi.pulse.bootstrap.DatabaseConsole;
+import com.zutubi.pulse.bootstrap.DatabaseConsoleBeanFactory;
 import com.zutubi.pulse.upgrade.UpgradeException;
+import com.zutubi.pulse.util.JDBCUtils;
 import org.apache.commons.dbcp.BasicDataSource;
 
 import java.sql.Connection;
@@ -16,6 +19,7 @@ public class ClonedProjectDataPatchUpgradeTaskTest extends BaseUpgradeTaskTestCa
 {
     private BasicDataSource dataSource;
     private Connection con;
+    private DatabaseConsole databaseConsole;
 
     public ClonedProjectDataPatchUpgradeTaskTest()
     {
@@ -33,8 +37,13 @@ public class ClonedProjectDataPatchUpgradeTaskTest extends BaseUpgradeTaskTestCa
         ComponentContext.addClassPathContextDefinitions("com/zutubi/pulse/bootstrap/testBootstrapContext.xml");
         dataSource = (BasicDataSource) ComponentContext.getBean("dataSource");
 
-        // initialise required schema.
-        createSchema(dataSource, "1040");
+        DatabaseConsoleBeanFactory factory = new DatabaseConsoleBeanFactory();
+        factory.setDatabaseConfig((DatabaseConfig) ComponentContext.getBean("databaseConfig"));
+        factory.setDataSource(dataSource);
+        factory.setHibernateMappings(getMappings("1040"));
+
+        databaseConsole = (DatabaseConsole) factory.getObject();
+        databaseConsole.createSchema();
 
         con = dataSource.getConnection();
     }
@@ -45,6 +54,7 @@ public class ClonedProjectDataPatchUpgradeTaskTest extends BaseUpgradeTaskTestCa
 
         JDBCUtils.execute(dataSource, "SHUTDOWN");
         dataSource.close();
+        databaseConsole = null;
 
         super.tearDown();
     }

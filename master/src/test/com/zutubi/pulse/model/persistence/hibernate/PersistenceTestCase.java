@@ -1,10 +1,8 @@
 package com.zutubi.pulse.model.persistence.hibernate;
 
 import com.zutubi.pulse.bootstrap.ComponentContext;
-import com.zutubi.pulse.bootstrap.DatabaseConfig;
-import com.zutubi.pulse.bootstrap.EmbeddedHSQLDBConsole;
+import com.zutubi.pulse.bootstrap.DatabaseConsole;
 import com.zutubi.pulse.test.PulseTestCase;
-import com.zutubi.pulse.util.JDBCUtils;
 import org.hibernate.SessionFactory;
 import org.springframework.context.ApplicationContext;
 import org.springframework.transaction.PlatformTransactionManager;
@@ -17,9 +15,6 @@ import java.beans.IntrospectionException;
 import java.beans.Introspector;
 import java.beans.PropertyDescriptor;
 import java.lang.reflect.Method;
-import java.sql.Connection;
-import java.sql.Statement;
-import java.util.Properties;
 
 /**
  * 
@@ -35,7 +30,7 @@ public abstract class PersistenceTestCase extends PulseTestCase
 
     protected SessionFactory sessionFactory;
     protected DataSource dataSource;
-    protected EmbeddedHSQLDBConsole console;
+    protected DatabaseConsole console;
 
     public PersistenceTestCase()
     {
@@ -57,13 +52,12 @@ public abstract class PersistenceTestCase extends PulseTestCase
         context = ComponentContext.getContext();
 
         dataSource = (DataSource) context.getBean("dataSource");
+        console = (DatabaseConsole) context.getBean("databaseConsole");
 
-        Properties props = new Properties();
-        props.setProperty("hibernate.dialect", "org.hibernate.dialect.HSQLDialect");
-        DatabaseConfig config = new DatabaseConfig(props);
-        console = new EmbeddedHSQLDBConsole(config);
-        console.setDataSource(dataSource);
-        console.setApplicationContext(context);
+        if (console.schemaExists())
+        {
+            console.dropSchema();
+        }
         console.createSchema();
 
         transactionManager = (PlatformTransactionManager) context.getBean("transactionManager");
@@ -87,18 +81,7 @@ public abstract class PersistenceTestCase extends PulseTestCase
             e.printStackTrace();
         }
 
-        Connection con = dataSource.getConnection();
-        Statement stmt = null;
-        try
-        {
-            stmt = con.createStatement();
-            stmt.execute("SHUTDOWN");
-        }
-        finally
-        {
-            JDBCUtils.close(stmt);
-            JDBCUtils.close(con);
-        }
+        console.stop(false);
 
         dataSource = null;
         console = null;
@@ -106,6 +89,8 @@ public abstract class PersistenceTestCase extends PulseTestCase
         transactionDefinition = null;
         transactionManager = null;
         ComponentContext.closeAll();
+        context = null;
+        
         super.tearDown();
     }
 

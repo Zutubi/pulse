@@ -26,7 +26,6 @@ public class DefaultSystemPaths implements SystemPaths
         this.versionHome = versionHome;
     }
 
-    
     public File getSystemRoot()
     {
         if (systemRoot == null)

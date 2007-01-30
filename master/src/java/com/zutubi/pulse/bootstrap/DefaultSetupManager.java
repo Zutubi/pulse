@@ -13,6 +13,7 @@ import com.zutubi.pulse.util.IOUtils;
 import java.io.*;
 import java.util.List;
 import java.util.Properties;
+import java.sql.SQLException;
 
 /**
  * <class-comment/>
@@ -171,7 +172,14 @@ public class DefaultSetupManager implements SetupManager
         DatabaseConsole databaseConsole = (DatabaseConsole) ComponentContext.getBean("databaseConsole");
         if (!databaseConsole.schemaExists())
         {
-            databaseConsole.createSchema();
+            try
+            {
+                databaseConsole.createSchema();
+            }
+            catch (SQLException e)
+            {
+                throw new StartupException("Failed to create the database schema. Cause: " + e.getMessage());
+            }
         }
 
         loadContexts(upgradeContexts);

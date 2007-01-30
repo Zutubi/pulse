@@ -54,23 +54,14 @@ public class SchemaRefactor
 
     public String[] generateSyncSql() throws SQLException
     {
-        ConnectionProvider connectionProvider = null;
-        Connection connection = null;
-        try
+        return (String[]) executeWithConnection(new Callback()
         {
-            connectionProvider = ConnectionProviderFactory.newConnectionProvider(connectionProperties);
-            connection = connectionProvider.getConnection();
-            DatabaseMetadata meta = new DatabaseMetadata(connection, dialect);
-            return config.generateSchemaUpdateScript(dialect, meta);
-        }
-        finally
-        {
-            JDBCUtils.close(connection);
-            if (connectionProvider != null)
+            public Object execute(Connection con) throws SQLException
             {
-                connectionProvider.close();
+                DatabaseMetadata meta = new DatabaseMetadata(con, dialect);
+                return config.generateSchemaUpdateScript(dialect, meta);
             }
-        }
+        });
     }
 
     /**
@@ -83,36 +74,25 @@ public class SchemaRefactor
         return exceptions;
     }
 
-    public void renameTable(String fromTableName, String toTableName) throws SQLException
+    public void renameTable(final String fromTableName, final String toTableName) throws SQLException
     {
-        ConnectionProvider connectionProvider = null;
-        Connection connection = null;
-        try
+        executeWithConnection(new Callback()
         {
-            connectionProvider = ConnectionProviderFactory.newConnectionProvider(connectionProperties);
-            connection = connectionProvider.getConnection();
-
-            conditionalBuildMappings();
-
-            Table fromTable = getTable(fromTableName);
-
-            // copy schema
-            Table toTable = copyTable(connection, fromTable, toTableName);
-
-            // reassign fks.
-            transferForeignKeys(connection, fromTable, toTable);
-
-            // drop original
-            dropTable(connection, fromTable);
-        }
-        finally
-        {
-            JDBCUtils.close(connection);
-            if (connectionProvider != null)
+            public Object execute(Connection con) throws SQLException
             {
-                connectionProvider.close();
+                Table fromTable = getTable(fromTableName);
+
+                // copy schema
+                Table toTable = copyTable(con, fromTable, toTableName);
+
+                // reassign fks.
+                transferForeignKeys(con, fromTable, toTable);
+
+                // drop original
+                dropTable(con, fromTable);
+                return null;
             }
-        }
+        });
     }
 
     private void transferForeignKeys(Connection connection, Table fromTable, Table toTable) throws SQLException
@@ -160,29 +140,52 @@ public class SchemaRefactor
         }
     }
 
-    public void renameColumn(String tableName, String fromColumnName, String toColumnName) throws SQLException
+    public void renameColumn(final String tableName, final String fromColumnName, final String toColumnName) throws SQLException
     {
-        ConnectionProvider connectionProvider = null;
-        Connection connection = null;
-        try
+        executeWithConnection(new Callback()
         {
-            connectionProvider = ConnectionProviderFactory.newConnectionProvider(connectionProperties);
-            connection = connectionProvider.getConnection();
-
-            conditionalBuildMappings();
-
-            Table table = getTable(tableName);
-            Column column = getColumn(table, fromColumnName);
-            renameColumn(connection, table, column, toColumnName);
-        }
-        finally
-        {
-            JDBCUtils.close(connection);
-            if (connectionProvider != null)
+            public Object execute(Connection con) throws SQLException
             {
-                connectionProvider.close();
+                Table table = getTable(tableName);
+                Column column = getColumn(table, fromColumnName);
+                renameColumn(con, table, column, toColumnName);
+                return null;
             }
-        }
+        });
+    }
+
+    public void dropSchema() throws SQLException
+    {
+        executeWithConnection(new Callback()
+        {
+            public Object execute(Connection con) throws SQLException
+            {
+                String[] sql = config.generateDropSchemaScript(dialect);
+                for (String s : sql)
+                {
+                    System.out.println(s);
+                }
+                JDBCUtils.executeSchemaScript(con, sql);
+                return null;
+            }
+        });
+    }
+
+    public void createSchema() throws SQLException
+    {
+        executeWithConnection(new Callback()
+        {
+            public Object execute(Connection con) throws SQLException
+            {
+                String[] sql = config.generateSchemaCreationScript(dialect);
+                for (String s : sql)
+                {
+                    System.out.println(s);
+                }
+                JDBCUtils.executeSchemaScript(con, sql);
+                return null;
+            }
+        });
     }
 
     private Column getColumn(Table table, String columnName)
@@ -261,7 +264,7 @@ public class SchemaRefactor
         JDBCUtils.execute(connection, sql);
 
         // if there is data to transfer..
-//        if (JDBCUtils.executeCount(connection, "select * from " + fromTable.getName()) > 0)
+        if (JDBCUtils.executeCount(connection, "select * from " + fromTable.getName()) > 0)
         {
             String columnSql = "";
             String sep = "";
@@ -325,5 +328,33 @@ public class SchemaRefactor
             }
         }
         return null;
+    }
+
+    protected Object executeWithConnection(Callback c) throws SQLException
+    {
+        ConnectionProvider connectionProvider = null;
+        Connection connection = null;
+        try
+        {
+            connectionProvider = ConnectionProviderFactory.newConnectionProvider(connectionProperties);
+            connection = connectionProvider.getConnection();
+
+            conditionalBuildMappings();
+            
+            return c.execute(connection);
+        }
+        finally
+        {
+            JDBCUtils.close(connection);
+            if (connectionProvider != null)
+            {
+                connectionProvider.close();
+            }
+        }
+    }
+
+    protected interface Callback
+    {
+        Object execute(Connection con) throws SQLException;
     }
 }

@@ -3,13 +3,18 @@ package com.zutubi.pulse.upgrade;
 import com.zutubi.pulse.Version;
 import com.zutubi.pulse.bootstrap.Data;
 import com.zutubi.pulse.bootstrap.DefaultSystemPaths;
+import com.zutubi.pulse.bootstrap.ComponentContext;
+import com.zutubi.pulse.bootstrap.MasterConfigurationManager;
 import com.zutubi.pulse.test.PulseTestCase;
 import com.zutubi.pulse.upgrade.tasks.MockUpgradeTask;
 import com.zutubi.pulse.util.FileSystemUtils;
 
+import javax.sql.DataSource;
 import java.io.File;
 import java.util.LinkedList;
 import java.util.List;
+
+import org.springframework.context.ApplicationContext;
 
 /**
  * <class-comment/>
@@ -19,6 +24,8 @@ public class DefaultUpgradeManagerTest extends PulseTestCase
     private DefaultUpgradeManager upgradeManager;
     private File tmpDir;
     private Data tmpData;
+
+    private ApplicationContext context = null;
 
     public DefaultUpgradeManagerTest(String testName)
     {
@@ -35,9 +42,13 @@ public class DefaultUpgradeManagerTest extends PulseTestCase
         upgradeManager.addTask(new MockUpgradeTask(40));
         upgradeManager.addTask(new MockUpgradeTask(20));
 
+        ComponentContext.addClassPathContextDefinitions("com/zutubi/pulse/bootstrap/testBootstrapContext.xml");
+        context = ComponentContext.getContext();
+        MasterConfigurationManager configurationManager = (MasterConfigurationManager) context.getBean("configurationManager");
+
         tmpDir = FileSystemUtils.createTempDir("DefaultUpgradeManagerTest", getName());
         tmpData = new Data(tmpDir);
-        tmpData.init(new DefaultSystemPaths(new File("."), new File(".")));
+        tmpData.init(configurationManager.getSystemPaths());
         tmpData.setBuildNumber(0);
     }
 
@@ -48,6 +59,10 @@ public class DefaultUpgradeManagerTest extends PulseTestCase
         upgradeManager = null;
 
         removeDirectory(tmpDir);
+
+        context = null;
+        
+        ComponentContext.closeAll();
 
         super.tearDown();
     }

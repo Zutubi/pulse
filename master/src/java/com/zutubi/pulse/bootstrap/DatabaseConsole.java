@@ -2,6 +2,8 @@ package com.zutubi.pulse.bootstrap;
 
 import com.zutubi.pulse.core.Stoppable;
 
+import java.sql.SQLException;
+
 /**
  *
  *
@@ -12,7 +14,9 @@ public interface DatabaseConsole extends Stoppable
 
     boolean schemaExists();
 
-    void createSchema();
+    void createSchema() throws SQLException;
+
+    void dropSchema() throws SQLException;
 
     DatabaseConfig getConfig();
 

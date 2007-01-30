@@ -1,6 +1,9 @@
 package com.zutubi.pulse.upgrade.tasks;
 
 import com.zutubi.pulse.bootstrap.ComponentContext;
+import com.zutubi.pulse.bootstrap.DatabaseConsole;
+import com.zutubi.pulse.bootstrap.DatabaseConsoleBeanFactory;
+import com.zutubi.pulse.bootstrap.DatabaseConfig;
 import com.zutubi.pulse.upgrade.UpgradeException;
 import com.zutubi.pulse.util.JDBCUtils;
 import org.apache.commons.dbcp.BasicDataSource;
@@ -13,6 +16,7 @@ import java.sql.*;
 public class ScmMonitorUpgradeTaskTest extends BaseUpgradeTaskTestCase
 {
     private BasicDataSource dataSource;
+    private DatabaseConsole databaseConsole;
 
     public ScmMonitorUpgradeTaskTest()
     {
@@ -31,7 +35,13 @@ public class ScmMonitorUpgradeTaskTest extends BaseUpgradeTaskTestCase
         dataSource = (BasicDataSource) ComponentContext.getBean("dataSource");
 
         // initialise required schema.
-        createSchema(dataSource, "1040");
+        DatabaseConsoleBeanFactory factory = new DatabaseConsoleBeanFactory();
+        factory.setDatabaseConfig((DatabaseConfig) ComponentContext.getBean("databaseConfig"));
+        factory.setDataSource(dataSource);
+        factory.setHibernateMappings(getMappings("1040"));
+
+        databaseConsole = (DatabaseConsole) factory.getObject();
+        databaseConsole.createSchema();
 
         // create a couple of test scms configurations.
         generateTestData(dataSource);
@@ -41,6 +51,7 @@ public class ScmMonitorUpgradeTaskTest extends BaseUpgradeTaskTestCase
     {
         JDBCUtils.execute(dataSource, "SHUTDOWN");
         dataSource.close();
+        databaseConsole = null;
 
         super.tearDown();
     }
@@ -50,6 +61,7 @@ public class ScmMonitorUpgradeTaskTest extends BaseUpgradeTaskTestCase
         // upgrade schema
         ScmMonitorSchemaUpgradeTask schemaUpgrade = new ScmMonitorSchemaUpgradeTask();
         schemaUpgrade.setDataSource(dataSource);
+        schemaUpgrade.setDatabaseConsole(databaseConsole);
         schemaUpgrade.execute(new MockUpgradeContext());
 
         // run the data migration.

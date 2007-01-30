@@ -1,13 +1,15 @@
 package com.zutubi.pulse.bootstrap;
 
+import com.zutubi.pulse.upgrade.tasks.MutableConfiguration;
+import com.zutubi.pulse.upgrade.tasks.SchemaRefactor;
 import com.zutubi.pulse.util.JDBCUtils;
+import org.springframework.beans.BeansException;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationContextAware;
 
 import javax.sql.DataSource;
-
-import org.springframework.orm.hibernate3.LocalSessionFactoryBean;
-import org.springframework.context.ApplicationContextAware;
-import org.springframework.context.ApplicationContext;
-import org.springframework.beans.BeansException;
+import java.sql.SQLException;
+import java.util.Properties;
 
 /**
  *
@@ -18,6 +20,8 @@ public class RemoteDatabaseConsole implements DatabaseConsole, ApplicationContex
     private DatabaseConfig config;
     private ApplicationContext context;
     private DataSource dataSource;
+    private MutableConfiguration hibernateConfig;
+    private Properties hibernateProps;
 
     public RemoteDatabaseConsole(DatabaseConfig config)
     {
@@ -29,10 +33,16 @@ public class RemoteDatabaseConsole implements DatabaseConsole, ApplicationContex
         return JDBCUtils.tableExists(dataSource, "RESOURCE");
     }
 
-    public void createSchema()
+    public void createSchema() throws SQLException
     {
-        LocalSessionFactoryBean factoryBean = (LocalSessionFactoryBean) context.getBean("&sessionFactory");
-        factoryBean.createDatabaseSchema();
+        SchemaRefactor refactor = new SchemaRefactor(hibernateConfig, hibernateProps);
+        refactor.createSchema();
+    }
+
+    public void dropSchema() throws SQLException
+    {
+        SchemaRefactor refactor = new SchemaRefactor(hibernateConfig, hibernateProps);
+        refactor.dropSchema();
     }
 
     public boolean isEmbedded()
@@ -63,5 +73,15 @@ public class RemoteDatabaseConsole implements DatabaseConsole, ApplicationContex
     public void setApplicationContext(ApplicationContext applicationContext) throws BeansException
     {
         context = applicationContext;
+    }
+
+    public void setHibernateConfig(MutableConfiguration config)
+    {
+        this.hibernateConfig = config;
+    }
+
+    public void setHibernateProperties(Properties props)
+    {
+        this.hibernateProps = props;
     }
 }

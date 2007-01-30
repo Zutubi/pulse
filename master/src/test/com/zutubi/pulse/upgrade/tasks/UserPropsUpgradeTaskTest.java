@@ -1,12 +1,17 @@
 package com.zutubi.pulse.upgrade.tasks;
 
 import com.zutubi.pulse.bootstrap.ComponentContext;
+import com.zutubi.pulse.bootstrap.DatabaseConfig;
+import com.zutubi.pulse.bootstrap.DatabaseConsole;
+import com.zutubi.pulse.bootstrap.DatabaseConsoleBeanFactory;
 import com.zutubi.pulse.upgrade.UpgradeException;
 import com.zutubi.pulse.util.JDBCUtils;
 import org.apache.commons.dbcp.BasicDataSource;
 
 import javax.sql.DataSource;
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.SQLException;
+import java.sql.Types;
 
 /**
  * Test case for the User Property upgrade process.
@@ -16,6 +21,7 @@ import java.sql.*;
 public class UserPropsUpgradeTaskTest extends BaseUpgradeTaskTestCase
 {
     private BasicDataSource dataSource;
+    private DatabaseConsole databaseConsole;
 
     public UserPropsUpgradeTaskTest()
     {
@@ -34,12 +40,21 @@ public class UserPropsUpgradeTaskTest extends BaseUpgradeTaskTestCase
         dataSource = (BasicDataSource) ComponentContext.getBean("dataSource");
 
         // initialise required schema.
-        createSchema(dataSource, "1010");
+        DatabaseConsoleBeanFactory factory = new DatabaseConsoleBeanFactory();
+        factory.setDatabaseConfig((DatabaseConfig) ComponentContext.getBean("databaseConfig"));
+        factory.setDataSource(dataSource);
+        factory.setHibernateMappings(getMappings("1010"));
+
+        databaseConsole = (DatabaseConsole) factory.getObject();
+        databaseConsole.createSchema();
+
         generateTestData(dataSource);
     }
 
     protected void tearDown() throws Exception
     {
+        databaseConsole = null;
+
         JDBCUtils.execute(dataSource, "SHUTDOWN");
         dataSource.close();
 
@@ -54,7 +69,7 @@ public class UserPropsUpgradeTaskTest extends BaseUpgradeTaskTestCase
         // upgrade schema
         UserPropsSchemaUpgradeTask schemaUpgrade = new UserPropsSchemaUpgradeTask();
         schemaUpgrade.setDataSource(dataSource);
-//        schemaUpgrade.setDatabaseConsole(con);
+        schemaUpgrade.setDatabaseConsole(databaseConsole);
         schemaUpgrade.execute(new MockUpgradeContext());
 
         // check that the new table exists as expected

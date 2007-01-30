@@ -20,6 +20,10 @@ This context requires:
 
     <import resource="classpath:/com/zutubi/pulse/bootstrap/context/hibernateMappingsContext.xml"/>
 
+    <bean id="databaseConsole" class="com.zutubi.pulse.bootstrap.DatabaseConsoleBeanFactory" autowire="byName">
+        <property name="hibernateMappings"><ref bean="hibernateMappings"/></property>
+    </bean>
+
     <bean id="sessionFactory" class="org.springframework.orm.hibernate3.LocalSessionFactoryBean">
         <property name="mappingResources">
             <ref bean="hibernateMappings"/>
@@ -34,10 +38,10 @@ This context requires:
 
     <bean id="hibernateProperties" class="org.springframework.beans.factory.config.PropertyPathFactoryBean">
         <property name="targetBeanName">
-            <value>databaseConsole</value>
+            <value>databaseConfig</value>
         </property>
         <property name="propertyPath">
-            <value>config.hibernateProperties</value>
+            <value>hibernateProperties</value>
         </property>
     </bean>
 
@@ -47,7 +51,6 @@ This context requires:
         </property>
     </bean>
 
-    <bean id="databaseConsole" class="com.zutubi.pulse.bootstrap.DatabaseConsoleBeanFactory" autowire="byName"/>
 
     <bean id="anyTypeDaoTarget" class="com.zutubi.pulse.model.persistence.hibernate.HibernateAnyTypeDao">
         <property name="sessionFactory">

@@ -1,15 +1,16 @@
 package com.zutubi.pulse.bootstrap;
 
+import com.zutubi.pulse.upgrade.tasks.MutableConfiguration;
+import com.zutubi.pulse.upgrade.tasks.SchemaRefactor;
 import com.zutubi.pulse.util.JDBCUtils;
 import com.zutubi.pulse.util.logging.Logger;
+import org.springframework.beans.BeansException;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationContextAware;
 
 import javax.sql.DataSource;
 import java.sql.SQLException;
-
-import org.springframework.context.ApplicationContextAware;
-import org.springframework.context.ApplicationContext;
-import org.springframework.orm.hibernate3.LocalSessionFactoryBean;
-import org.springframework.beans.BeansException;
+import java.util.Properties;
 
 /**
  *
@@ -19,13 +20,15 @@ public class EmbeddedHSQLDBConsole implements DatabaseConsole, ApplicationContex
 {
     private static final Logger LOG = Logger.getLogger(EmbeddedHSQLDBConsole.class);
 
-    private DatabaseConfig config;
+    private DatabaseConfig databaseConfig;
     private DataSource dataSource;
     private ApplicationContext context;
+    private MutableConfiguration hibernateConfig;
+    private Properties hibernateProps;
 
     public EmbeddedHSQLDBConsole(DatabaseConfig config)
     {
-        this.config = config;
+        this.databaseConfig = config;
     }
 
     public boolean isEmbedded()
@@ -38,7 +41,7 @@ public class EmbeddedHSQLDBConsole implements DatabaseConsole, ApplicationContex
         return JDBCUtils.tableExists(dataSource, "RESOURCE");
     }
 
-    public void createSchema()
+    public void createSchema() throws SQLException
     {
         try
         {
@@ -50,8 +53,8 @@ public class EmbeddedHSQLDBConsole implements DatabaseConsole, ApplicationContex
             LOG.error(e);
         }
 
-        LocalSessionFactoryBean factoryBean = (LocalSessionFactoryBean) context.getBean("&sessionFactory");
-        factoryBean.createDatabaseSchema();
+        SchemaRefactor refactor = new SchemaRefactor(hibernateConfig, hibernateProps);
+        refactor.createSchema();
 
         // add custom configuration of the hsql database here.
         try
@@ -66,9 +69,15 @@ public class EmbeddedHSQLDBConsole implements DatabaseConsole, ApplicationContex
         }
     }
 
+    public void dropSchema() throws SQLException
+    {
+        SchemaRefactor refactor = new SchemaRefactor(hibernateConfig, hibernateProps);
+        refactor.dropSchema();
+    }
+
     public DatabaseConfig getConfig()
     {
-        return config;
+        return databaseConfig;
     }
 
     public double getDatabaseUsagePercent()
@@ -96,5 +105,15 @@ public class EmbeddedHSQLDBConsole implements DatabaseConsole, ApplicationContex
     public void setApplicationContext(ApplicationContext applicationContext) throws BeansException
     {
         context = applicationContext;
+    }
+
+    public void setHibernateConfig(MutableConfiguration config)
+    {
+        this.hibernateConfig = config;
+    }
+
+    public void setHibernateProperties(Properties props)
+    {
+        this.hibernateProps = props;
     }
 }

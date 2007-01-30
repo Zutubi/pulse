@@ -42,8 +42,7 @@ public class UpgradeAcceptanceTest extends BaseAcceptanceTestCase
         try
         {
             File root = TestUtils.getPulseRoot();
-//            File data = new File(root, FileSystemUtils.composeFilename("master", "src", "acceptance", "data", "pulse-1.1.0-data.zip"));
-            File data = new File(root, FileSystemUtils.composeFilename("master", "src", "acceptance", "data", "pulse-1.2.12-data.zip"));
+            File data = new File(root, FileSystemUtils.composeFilename("master", "src", "acceptance", "data", "pulse-1.1.0-data.zip"));
             is = new FileInputStream(data);
             
             assertNotNull(is);
@@ -65,8 +64,8 @@ public class UpgradeAcceptanceTest extends BaseAcceptanceTestCase
 
         // check that we have received the upgrade preview, and that the data is as expected.
         assertTextPresent("Upgrade Preview");
-//        assertTextPresent("0101000000");
-//        assertTextPresent("1.1.0");
+        assertTextPresent("0101000000");
+        assertTextPresent("1.1.0");
 
         // we expect at least 11 upgrade tasks to be offered.
         tester.submit("continue");

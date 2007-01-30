@@ -1,6 +1,9 @@
 package com.zutubi.pulse.upgrade.tasks;
 
 import com.zutubi.pulse.bootstrap.ComponentContext;
+import com.zutubi.pulse.bootstrap.DatabaseConsole;
+import com.zutubi.pulse.bootstrap.DatabaseConsoleBeanFactory;
+import com.zutubi.pulse.bootstrap.DatabaseConfig;
 import com.zutubi.pulse.util.JDBCUtils;
 import com.zutubi.pulse.util.PropertiesType;
 import com.zutubi.pulse.upgrade.UpgradeException;
@@ -19,6 +22,7 @@ public class CommitMessageLinkMigrationUpgradeTaskTest extends BaseUpgradeTaskTe
 {
     private BasicDataSource dataSource;
     private Connection con;
+    private DatabaseConsole databaseConsole;
 
     protected void setUp() throws Exception
     {
@@ -27,8 +31,13 @@ public class CommitMessageLinkMigrationUpgradeTaskTest extends BaseUpgradeTaskTe
         ComponentContext.addClassPathContextDefinitions("com/zutubi/pulse/bootstrap/testBootstrapContext.xml");
         dataSource = (BasicDataSource) ComponentContext.getBean("dataSource");
 
-        // initialise required schema.
-        createSchema(dataSource, "0102001000");
+        DatabaseConsoleBeanFactory factory = new DatabaseConsoleBeanFactory();
+        factory.setDatabaseConfig((DatabaseConfig) ComponentContext.getBean("databaseConfig"));
+        factory.setDataSource(dataSource);
+        factory.setHibernateMappings(getMappings("0102001000"));
+
+        databaseConsole = (DatabaseConsole) factory.getObject();
+        databaseConsole.createSchema();
 
         con = dataSource.getConnection();
     }
@@ -39,6 +48,7 @@ public class CommitMessageLinkMigrationUpgradeTaskTest extends BaseUpgradeTaskTe
 
         JDBCUtils.execute(dataSource, "SHUTDOWN");
         dataSource.close();
+        databaseConsole = null;
 
         super.tearDown();
     }
@@ -108,6 +118,7 @@ public class CommitMessageLinkMigrationUpgradeTaskTest extends BaseUpgradeTaskTe
         MigrateSchemaUpgradeTask schemaUpgrade = new MigrateSchemaUpgradeTask();
         schemaUpgrade.setMapping("com/zutubi/pulse/upgrade/schema/build_0102001007/CommitMessageTransformer.hbm.xml");
         schemaUpgrade.setDataSource(dataSource);
+        schemaUpgrade.setDatabaseConsole(databaseConsole);
         schemaUpgrade.setBuildNumber(102001007);
         schemaUpgrade.execute(new MockUpgradeContext());
 
