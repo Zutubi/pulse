@@ -150,7 +150,15 @@ public class FileLoaderTest extends FileLoaderTestBase
 
     public void testMacroExpandError() throws Exception
     {
-        errorHelper("testMacroExpandError", "While expanding macro defined at line 4 column 5: Processing element 'no-such-type': starting at line 5 column 9: Undefined type 'no-such-type'");
+        try
+        {
+            load(getName());
+            fail();
+        }
+        catch (PulseException e)
+        {
+            assertMatches("Processing element 'macro-ref': starting at line 9 column (9|10): While expanding macro defined at line 4 column (5|6): Processing element 'no-such-type': starting at line 5 column (9|10): Undefined type 'no-such-type'", e.getMessage());
+        }
     }
 
     public void testMacroNoName() throws Exception
@@ -263,7 +271,7 @@ public class FileLoaderTest extends FileLoaderTestBase
         }
         catch (ParseException e)
         {
-            assertEquals(e.getMessage(), "Processing element 'validateable': starting at line 4 column 5: error\n");
+            assertMatches("Processing element 'validateable': starting at line 4 column [56]: error\n", e.getMessage());
         }
     }
 

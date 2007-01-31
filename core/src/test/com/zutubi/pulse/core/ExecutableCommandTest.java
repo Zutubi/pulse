@@ -272,7 +272,12 @@ public class ExecutableCommandTest extends PulseTestCase
             }
             catch (BuildException e)
             {
-                assertTrue(e.getMessage().contains("No such executable 'thisfiledoesnotexist'"));
+                String message = e.getMessage();
+                boolean java15 = message.contains("No such executable 'thisfiledoesnotexist'");
+                // In Java 1.6, the error reporting is better, so we are
+                // happy to pass it on through.
+                boolean java16 = message.endsWith("The system cannot find the file specified");
+                assertTrue(java15 || java16);
             }
         }
     }
@@ -293,7 +298,10 @@ public class ExecutableCommandTest extends PulseTestCase
             }
             catch (BuildException e)
             {
-                assertTrue(e.getMessage().contains("Working directory 'nosuchworkdir' does not exist"));
+                String message = e.getMessage();
+                boolean java15 = message.contains("Working directory 'nosuchworkdir' does not exist");
+                boolean jaav16 = message.endsWith("The directory name is invalid");
+                assertTrue(java15 || jaav16);
             }
         }
     }

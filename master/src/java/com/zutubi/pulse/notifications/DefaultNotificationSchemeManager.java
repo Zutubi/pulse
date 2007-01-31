@@ -1,16 +1,14 @@
 package com.zutubi.pulse.notifications;
 
-import java.util.List;
-import java.util.Map;
-import java.util.HashMap;
-import java.util.LinkedList;
+import java.util.*;
 
 /**
  * <class-comment/>
  */
 public class DefaultNotificationSchemeManager implements NotificationSchemeManager
 {
-    private Map<String, Class<? extends NotificationHandler>> handlers = new HashMap<String, Class<? extends NotificationHandler>>();
+    // Use a tree map to order by key
+    private Map<String, Class<? extends NotificationHandler>> handlers = new TreeMap<String, Class<? extends NotificationHandler>>();
 
     public DefaultNotificationSchemeManager()
     {

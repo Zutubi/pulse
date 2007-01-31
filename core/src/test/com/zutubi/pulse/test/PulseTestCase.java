@@ -10,6 +10,7 @@ import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.net.URL;
 import java.util.*;
+import java.util.regex.Pattern;
 
 /**
  * Base class for test cases.
@@ -258,6 +259,12 @@ public abstract class PulseTestCase extends TestCase
             IOUtils.close(is1);
             IOUtils.close(is2);
         }
+    }
+
+    public void assertMatches(String expression, String got)
+    {
+        Pattern p = Pattern.compile(expression);
+        assertTrue("'" + got + "' does not match expression '" + expression + "'", p.matcher(got).matches());
     }
 
     protected InputStream getInput(String testName)
