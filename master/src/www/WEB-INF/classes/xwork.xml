@@ -1481,6 +1481,10 @@
             <result name="success" type="redirect">/admin/plugins.action</result>
         </action>
 
+        <action name="dumpData" class="com.zutubi.pulse.web.admin.DumpDataAction">
+            <result name="success" type="redirect">/admin/serverSettings.action</result>
+        </action>
+
     </package>
 
     <package name="ajax" namespace="/ajax" extends="webwork-default-package">

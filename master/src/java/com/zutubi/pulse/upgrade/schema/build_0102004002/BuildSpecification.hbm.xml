@@ -27,4 +27,12 @@
         <property name="addToPath" column="ADD_TO_PATH" type="boolean"/>
         <property name="resolveVariables" column="RESOLVE_VARIABLES" type="boolean"/>
     </class>
+
+    <class name="com.zutubi.pulse.core.model.ResourcePropertyB" table="RESOURCE_PROPERTIES">
+        <id name="id" type="java.lang.Long" column="ID" unsaved-value="0">
+            <generator class="hilo"/>
+        </id>
+        <property name="resolveVariables" column="RESOLVE_VARIABLES" type="boolean"/>
+    </class>
+
 </hibernate-mapping>
