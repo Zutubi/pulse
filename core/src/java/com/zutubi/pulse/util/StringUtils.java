@@ -284,6 +284,7 @@ public class StringUtils
         List<String> result = new LinkedList<String>();
         boolean inQuotes = false;
         boolean escaped = false;
+        boolean haveData = false;
         StringBuilder current = new StringBuilder();
 
         for (int i = 0; i < s.length(); i++)
@@ -291,6 +292,7 @@ public class StringUtils
             char c = s.charAt(i);
             if (escaped)
             {
+                haveData = true;
                 current.append(c);
                 escaped = false;
             }
@@ -309,10 +311,11 @@ public class StringUtils
                         {
                             current.append(c);
                         }
-                        else if (current.length() > 0)
+                        else if (haveData)
                         {
                             result.add(current.toString());
                             current.delete(0, current.length());
+                            haveData = false;
                         }
 
                         break;
@@ -321,13 +324,14 @@ public class StringUtils
                     {
                         if (inQuotes)
                         {
-                            result.add(current.toString());
-                            current.delete(0, current.length());
                             inQuotes = false;
                         }
                         else
                         {
                             inQuotes = true;
+                            // We always have data if we see quotes, which
+                            // allows expression of the empty string as ""
+                            haveData = true;
                         }
 
                         break;
@@ -335,6 +339,7 @@ public class StringUtils
                     default:
                     {
                         current.append(c);
+                        haveData = true;
                     }
                 }
             }
@@ -349,12 +354,75 @@ public class StringUtils
             throw new IllegalArgumentException("Unexpected end of input looking for end of quote (\")");
         }
 
-        if (current.length() > 0)
+        if (haveData)
         {
             result.add(current.toString());
         }
 
         return result;
+    }
+
+    /**
+     * The inverse of split, which is *not* the same as joining.  Returns a
+     * string that if passed to split would return the given list.  This
+     * involves quoting any piece that contains a space or is empty, and
+     * escaping any quote characters or backslashes.
+     *
+     * @param pieces pieces of string to unsplit
+     * @return the inverse of split, as applied to pieces
+     * @see StringUtils#split(String)
+     */
+    public static String unsplit(List<String> pieces)
+    {
+        StringBuilder result = new StringBuilder();
+        StringBuilder current = new StringBuilder();
+        boolean first = true;
+
+        for(String piece: pieces)
+        {
+            boolean quote = piece.length() == 0;
+            current.delete(0, current.length());
+
+            for(int i = 0; i < piece.length(); i++)
+            {
+                char c = piece.charAt(i);
+                switch(c)
+                {
+                    case '\\':
+                    case '\"':
+                        current.append('\\');
+                        break;
+                    case ' ':
+                        quote = true;
+                        break;
+                }
+
+                current.append(c);
+            }
+
+            if(first)
+            {
+                first = false;
+            }
+            else
+            {
+                result.append(' ');
+            }
+
+            if(quote)
+            {
+                result.append('\"');
+            }
+
+            result.append(current);
+
+            if(quote)
+            {
+                result.append('\"');
+            }
+        }
+
+        return result.toString();
     }
 
     public static String join(String glue, String... pieces)

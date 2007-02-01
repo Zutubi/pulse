@@ -3,6 +3,9 @@ package com.zutubi.pulse.core;
 import com.opensymphony.util.TextUtils;
 import com.zutubi.pulse.core.model.CommandResult;
 import com.zutubi.pulse.core.model.StoredArtifact;
+import com.zutubi.pulse.util.StringUtils;
+
+import java.util.List;
 
 /**
  * <class-comment/>
@@ -14,7 +17,7 @@ public class XCodeCommand extends ExecutableCommand
     private String project;
 
     private String buildaction;
-    private String settings;
+    private List<String> settings;
 
     private void checkExe()
     {
@@ -65,10 +68,10 @@ public class XCodeCommand extends ExecutableCommand
             cmdResult.getProperties().put("build action", buildaction);
         }
 
-        if (TextUtils.stringSet(settings))
+        if (settings != null && settings.size() > 0)
         {
-            addArguments(settings);
-            cmdResult.getProperties().put("settings", settings);
+            addArguments(settings.toArray(new String[settings.size()]));
+            cmdResult.getProperties().put("settings", StringUtils.unsplit(settings));
         }
 
         super.execute(context, cmdResult);
@@ -81,9 +84,19 @@ public class XCodeCommand extends ExecutableCommand
         }
     }
 
+    public String getTarget()
+    {
+        return target;
+    }
+
     public void setTarget(String target)
     {
         this.target = target;
+    }
+
+    public String getConfig()
+    {
+        return config;
     }
 
     public void setConfig(String config)
@@ -91,9 +104,19 @@ public class XCodeCommand extends ExecutableCommand
         this.config = config;
     }
 
+    public String getProject()
+    {
+        return project;
+    }
+
     public void setProject(String project)
     {
         this.project = project;
+    }
+
+    public String getBuildaction()
+    {
+        return buildaction;
     }
 
     public void setBuildaction(String buildaction)
@@ -101,7 +124,12 @@ public class XCodeCommand extends ExecutableCommand
         this.buildaction = buildaction;
     }
 
-    public void setSettings(String settings)
+    public List<String> getSettings()
+    {
+        return settings;
+    }
+
+    public void setSettings(List<String> settings)
     {
         this.settings = settings;
     }

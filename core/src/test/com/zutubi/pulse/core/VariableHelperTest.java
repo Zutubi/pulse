@@ -21,6 +21,7 @@ public class VariableHelperTest extends TestCase
         scope.setReference(new Property("foo", "foo"));
         scope.setReference(new Property("bar", "baz"));
         scope.setReference(new Property("a\\b", "slashed"));
+        scope.setReference(new Property("empty", ""));
     }
 
     private void errorTest(String input, String expectedError)
@@ -185,6 +186,21 @@ public class VariableHelperTest extends TestCase
         successSplitTest("multiple   spaces", "multiple", "spaces");
     }
 
+    public void testSplitEmptyString() throws Exception
+    {
+        successSplitTest("");
+    }
+
+    public void testSplitSpace() throws Exception
+    {
+        successSplitTest(" ");
+    }
+
+    public void testSplitSpaces() throws Exception
+    {
+        successSplitTest("   ");
+    }
+
     public void testSplitManyPieces() throws Exception
     {
         successSplitTest("this string  has   many pieces in it", "this", "string", "has", "many", "pieces", "in", "it");
@@ -260,6 +276,36 @@ public class VariableHelperTest extends TestCase
     public void testSplitQuotesAtEnd() throws Exception
     {
         successSplitTest("quotes \"at end\"", "quotes", "at end");
+    }
+
+    public void testSplitEmptyQuotedString() throws Exception
+    {
+        successSplitTest("\"\"", "");
+    }
+
+    public void testSplitEmptyStringInMiddle() throws Exception
+    {
+        successSplitTest("in \"\" middle", "in", "", "middle");
+    }
+
+    public void testSplitEmptyStringAdjacent() throws Exception
+    {
+        successSplitTest("empty\"\" adjacent", "empty", "adjacent");
+    }
+
+    public void testSplitEmptyVariable() throws Exception
+    {
+        successSplitTest("${empty}");
+    }
+
+    public void testSplitQuotedEmptyVariable() throws Exception
+    {
+        successSplitTest("\"${empty}\"", "");
+    }
+
+    public void testSplitEmptyVariableAdjacent() throws Exception
+    {
+        successSplitTest("adjacent${empty} variable", "adjacent", "variable");
     }
 
     public void testSplitUnterminatedQuotes() throws Exception

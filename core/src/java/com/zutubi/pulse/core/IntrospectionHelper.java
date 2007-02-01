@@ -1,5 +1,7 @@
 package com.zutubi.pulse.core;
 
+import com.zutubi.pulse.util.StringUtils;
+
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -204,9 +206,9 @@ public class IntrospectionHelper
         final Class reflectedArg = PRIMITIVE_TYPE_MAP.containsKey(arg)
                 ? (Class) PRIMITIVE_TYPE_MAP.get(arg) : arg;
 
-        // String argument requires no conversion.
         if (String.class.equals(reflectedArg))
         {
+            // String argument requires no conversion.
             return new AttributeSetter()
             {
                 public void set(Object parent, String value, boolean resolveReferences, Scope scope)
@@ -215,11 +217,10 @@ public class IntrospectionHelper
                     method.invoke(parent, resolveReferences ? VariableHelper.replaceVariables(value, scope) : value);
                 }
             };
-
         }
-        // Boolean argument uses custom conversion.
         else if (Boolean.class.equals(reflectedArg))
         {
+            // Boolean argument uses custom conversion.
             return new AttributeSetter()
             {
                 public void set(Object parent, String value, boolean resolveReferences, Scope scope)
@@ -231,9 +232,9 @@ public class IntrospectionHelper
             };
 
         }
-        // char and Character get special treatment - take the first character
         else if (Character.class.equals(reflectedArg))
         {
+            // char and Character get special treatment - take the first character
             return new AttributeSetter()
             {
                 public void set(Object parent, String value, boolean resolveReferences, Scope scope)
@@ -248,9 +249,9 @@ public class IntrospectionHelper
 
             };
         }
-        // Class argument uses Class.forName() conversion.
         else if (Class.class.equals(reflectedArg))
         {
+            // Class argument uses Class.forName() conversion.
             return new AttributeSetter()
             {
                 public void set(Object parent, String value, boolean resolveReferences, Scope scope)
@@ -316,10 +317,21 @@ public class IntrospectionHelper
                 }
             };
         }
-        // The default conversion is using the single string argument constructor, if it
-        // exists. This is how most of the primitive types will be handled.
+        else if(List.class.equals(reflectedArg))
+        {
+            return new AttributeSetter()
+            {
+                public void set(Object parent, String value, boolean resolveReferences, Scope scope)
+                        throws InvocationTargetException, IllegalAccessException, FileLoadException
+                {
+                    method.invoke(parent, resolveReferences ? VariableHelper.splitAndReplaceVariables(value, scope, false) : StringUtils.split(value));
+                }
+            };
+        }
         else
         {
+            // The default conversion is using the single string argument constructor, if it
+            // exists. This is how most of the primitive types will be handled.
             try
             {
                 final Constructor c = reflectedArg.getConstructor(new Class[]{String.class});
