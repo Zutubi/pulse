@@ -1,6 +1,9 @@
 package com.zutubi.pulse.upgrade.tasks;
 
 import com.zutubi.pulse.bootstrap.ComponentContext;
+import com.zutubi.pulse.bootstrap.DatabaseConsole;
+import com.zutubi.pulse.bootstrap.DatabaseConsoleBeanFactory;
+import com.zutubi.pulse.bootstrap.DatabaseConfig;
 import com.zutubi.pulse.util.JDBCUtils;
 import com.zutubi.pulse.upgrade.UpgradeException;
 import org.apache.commons.dbcp.BasicDataSource;
@@ -14,6 +17,7 @@ import java.sql.*;
 public class EncodePasswordUpgradeTaskTest extends BaseUpgradeTaskTestCase
 {
     private BasicDataSource dataSource;
+    private DatabaseConsole databaseConsole;
 
     public EncodePasswordUpgradeTaskTest()
     {
@@ -32,13 +36,20 @@ public class EncodePasswordUpgradeTaskTest extends BaseUpgradeTaskTestCase
         dataSource = (BasicDataSource) ComponentContext.getBean("dataSource");
 
         // initialise required schema.
-        createSchema(dataSource, "1020");
+        DatabaseConsoleBeanFactory factory = new DatabaseConsoleBeanFactory();
+        factory.setDatabaseConfig((DatabaseConfig) ComponentContext.getBean("databaseConfig"));
+        factory.setDataSource(dataSource);
+        factory.setHibernateMappings(getMappings("1020"));
+
+        databaseConsole = (DatabaseConsole) factory.getObject();
+        databaseConsole.createSchema();
     }
 
     protected void tearDown() throws Exception
     {
         JDBCUtils.execute(dataSource, "SHUTDOWN");
         dataSource.close();
+        databaseConsole = null;
 
         super.tearDown();
     }

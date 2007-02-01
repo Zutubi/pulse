@@ -249,7 +249,7 @@
 
         <property name="stateNames" type="string"/>
 
-        <property name="limit" type="int"/>
+        <property name="limit" column="RULE_LIMIT" type="int"/>
 
         <property name="unitName" type="string"/>
     </class>

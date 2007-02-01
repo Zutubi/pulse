@@ -20,20 +20,28 @@ This context requires:
 
     <import resource="classpath:/com/zutubi/pulse/bootstrap/context/hibernateMappingsContext.xml"/>
 
+    <bean id="databaseConsole" class="com.zutubi.pulse.bootstrap.DatabaseConsoleBeanFactory" autowire="byName">
+        <property name="hibernateMappings"><ref bean="hibernateMappings"/></property>
+    </bean>
+
     <bean id="sessionFactory" class="org.springframework.orm.hibernate3.LocalSessionFactoryBean">
         <property name="mappingResources">
             <ref bean="hibernateMappings"/>
         </property>
         <property name="hibernateProperties">
-            <props>
-                <prop key="hibernate.dialect">org.hibernate.dialect.HSQLDialect</prop>
-                <!--<prop key="hibernate.show_sql">true</prop>-->
-                <prop key="hibernate.jdbc.batch_size">0</prop>
-                <prop key="hibernate.jdbc.use_scrollable_resultsets">false</prop>
-            </props>
+            <ref bean="hibernateProperties"/>
         </property>
         <property name="dataSource">
             <ref bean="dataSource"/>
+        </property>
+    </bean>
+
+    <bean id="hibernateProperties" class="org.springframework.beans.factory.config.PropertyPathFactoryBean">
+        <property name="targetBeanName">
+            <value>databaseConfig</value>
+        </property>
+        <property name="propertyPath">
+            <value>hibernateProperties</value>
         </property>
     </bean>
 
@@ -43,7 +51,6 @@ This context requires:
         </property>
     </bean>
 
-    <bean id="databaseBootstrap" class="com.zutubi.pulse.bootstrap.DatabaseBootstrap" autowire="byName"/>
 
     <bean id="anyTypeDaoTarget" class="com.zutubi.pulse.model.persistence.hibernate.HibernateAnyTypeDao">
         <property name="sessionFactory">

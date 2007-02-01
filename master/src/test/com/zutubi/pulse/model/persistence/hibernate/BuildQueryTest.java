@@ -7,7 +7,6 @@ import com.zutubi.pulse.model.BuildSpecification;
 import com.zutubi.pulse.model.Project;
 import com.zutubi.pulse.model.UnknownBuildReason;
 import com.zutubi.pulse.model.persistence.BuildResultDao;
-import com.zutubi.pulse.model.persistence.BuildSpecificationDao;
 import com.zutubi.pulse.model.persistence.ProjectDao;
 import com.zutubi.pulse.util.CollectionUtils;
 import com.zutubi.pulse.util.Predicate;
@@ -20,7 +19,6 @@ public class BuildQueryTest extends MasterPersistenceTestCase
 {
     private BuildResultDao buildResultDao;
     private ProjectDao projectDao;
-    private BuildSpecificationDao buildSpecificationDao;
     private Project p1;
     private Project p2;
     private BuildSpecification default1;
@@ -34,7 +32,6 @@ public class BuildQueryTest extends MasterPersistenceTestCase
     {
         super.setUp();
         buildResultDao = (BuildResultDao) context.getBean("buildResultDao");
-        buildSpecificationDao = (BuildSpecificationDao) context.getBean("buildSpecificationDao");
         projectDao = (ProjectDao) context.getBean("projectDao");
         createProjects();
         setupBuilds();
@@ -117,6 +114,12 @@ public class BuildQueryTest extends MasterPersistenceTestCase
         p1 = null;
         p2 = null;
         allResults = null;
+
+        default1 = null;
+        default2 = null;
+        overnight1 = null;
+        overnight2 = null;
+        borken2 = null;
 
         try
         {

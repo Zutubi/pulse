@@ -1,6 +1,7 @@
 package com.zutubi.pulse.upgrade.tasks;
 
 import com.zutubi.pulse.test.PulseTestCase;
+import com.zutubi.pulse.bootstrap.DatabaseConfig;
 import org.apache.commons.dbcp.BasicDataSource;
 import org.hibernate.cfg.Configuration;
 import org.hibernate.tool.hbm2ddl.SchemaUpdate;
@@ -10,6 +11,8 @@ import java.io.File;
 import java.io.FilenameFilter;
 import java.io.IOException;
 import java.util.Properties;
+import java.util.List;
+import java.util.LinkedList;
 
 /**
  * <class-comment/>
@@ -25,7 +28,22 @@ public abstract class BaseUpgradeTaskTestCase extends PulseTestCase
         super(name);
     }
 
-    protected void createSchema(BasicDataSource dataSource, String build) throws IOException
+    protected List<String> getMappings(String build)
+    {
+        List<String> mappings = new LinkedList<String>();
+
+        String path = "master/src/test/com/zutubi/pulse/upgrade/schema/build_" + build;
+        File mappingDir = new File(getPulseRoot(), path);
+        for (File f : mappingDir.listFiles(new XMLFilenameFilter()))
+        {
+            mappings.add("com/zutubi/pulse/upgrade/schema/build_" + build + "/" + f.getName());
+        }
+        
+        return mappings;
+    }
+
+/*
+    protected void createSchema(BasicDataSource dataSource, DatabaseConfig databaseConfig, String build) throws IOException
     {
         // manually setup the hibernate configuration
         Configuration config = new Configuration();
@@ -33,7 +51,7 @@ public abstract class BaseUpgradeTaskTestCase extends PulseTestCase
         // load these properties from the context, same place that all the other
         // properties are defined.
         Properties props = new Properties();
-        props.put("hibernate.dialect", "org.hibernate.dialect.HSQLDialect");
+        props.putAll(databaseConfig.getProperties());
         props.put("hibernate.connection.provider_class", "com.zutubi.pulse.upgrade.tasks.HackyUpgradeTaskConnectionProvider");
 
         // a) retrieve hibernate mappings for schema generation.
@@ -51,6 +69,7 @@ public abstract class BaseUpgradeTaskTestCase extends PulseTestCase
         // c) create database
         new SchemaUpdate(config, props).execute(true, true);
     }
+*/
 
     public class XMLFilenameFilter implements FilenameFilter
     {

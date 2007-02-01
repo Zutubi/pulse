@@ -32,9 +32,9 @@ public class SlaveRecipeProcessor
         // TODO on startup, clean out any existing working/output directories left around
     }
 
-    private EventListener registerMasterListener(MasterService service, long id)
+    private EventListener registerMasterListener(String master, MasterService service, long id)
     {
-        EventListener listener = new ForwardingEventListener(service, serviceTokenManager, id);
+        EventListener listener = new ForwardingEventListener(master, service, serviceTokenManager, id);
         eventManager.register(listener);
         return listener;
     }
@@ -60,7 +60,7 @@ public class SlaveRecipeProcessor
         MasterService masterProxy = getMasterProxy(master);
         if(masterProxy != null)
         {
-            EventListener listener = registerMasterListener(masterProxy, request.getId());
+            EventListener listener = registerMasterListener(master, masterProxy, request.getId());
             ResourceRepository repo = new RemoteResourceRepository(slaveId, masterProxy, serviceTokenManager);
             ServerRecipePaths processorPaths = new ServerRecipePaths(request.getProject(), request.getSpec(), request.getId(), configurationManager.getUserPaths().getData(), request.isIncremental());
 

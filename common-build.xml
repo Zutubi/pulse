@@ -197,6 +197,7 @@
                     <exclude name="**/P4ServerTest.java"/>
                     <exclude name="**/*PulseFileDetailsTest.java"/>
                     <exclude name="**/LocalBuildTest.java"/>
+                    <exclude name="**/*P4*Test*"/>
                 </fileset>
             </batchtest>
         </junit>

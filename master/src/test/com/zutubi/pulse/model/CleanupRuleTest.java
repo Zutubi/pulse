@@ -52,6 +52,7 @@ public class CleanupRuleTest extends MasterPersistenceTestCase
     {
         projectDao = null;
         buildResultDao = null;
+        buildSpecificationDao = null;
         p1 = null;
         p2 = null;
         b1 = null;

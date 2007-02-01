@@ -102,4 +102,46 @@ public class HibernateUtils
             }
         }
     }
+
+/*
+    public static void dropConstraints(Configuration config, DataSource dataSource, String targetTableName) throws SQLException
+    {
+        if (!config.getTableMappings().hasNext())
+        {
+            config.buildMappings();
+        }
+
+        Iterator i = config.getTableMappings();
+        while (i.hasNext())
+        {
+            Table t = (Table) i.next();
+            Iterator fki = t.getForeignKeyIterator();
+            while (fki.hasNext())
+            {
+                ForeignKey fk = (ForeignKey) fki.next();
+                Table referencedTable = fk.getReferencedTable();
+                if (referencedTable != null && referencedTable.getName().equals(targetTableName))
+                {
+                    fk.sqlDropString(null, null, null);
+                    fk.setReferencedTable(null);
+                    fk.sqlCreateString(null, null, null, null);
+                }
+                else
+                {
+                    System.out.println("skipping fk, no referenced table available... " + fk.getName());
+                }
+            }
+        }
+    }
+
+    public static void copyTable(DataSource dataSource, String source, String destination) throws SQLException
+    {
+        JDBCUtils.execute(dataSource, "insert into " + destination + " values (select * from " + source + ")");
+    }
+
+    public static void copyColumn(DataSource dataSource, String tableName, String source, String destination) throws SQLException
+    {
+        JDBCUtils.execute(dataSource, "update "+tableName+" set " + destination + " = " + source);
+    }
+*/
 }

@@ -14,6 +14,7 @@ import java.io.*;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Properties;
+import java.sql.SQLException;
 
 /**
  * <class-comment/>
@@ -114,30 +115,17 @@ public class DefaultSetupManager implements SetupManager
         {
             externalConfig = envConfig.getDefaultPulseConfig(MasterConfigurationManager.CONFIG_DIR);
         }
-        File f = new File(externalConfig);
-        if (!f.isAbsolute())
+        File configFile = new File(externalConfig);
+        if (!configFile.isAbsolute())
         {
-            f = f.getCanonicalFile();
+            configFile = configFile.getCanonicalFile();
         }
-        if (!f.isFile())
+        if (!configFile.isFile())
         {
             // copy the template file into the config location.
             SystemPaths paths = configurationManager.getSystemPaths();
             File configTemplate = new File(paths.getConfigRoot(), "config.properties.template");
-            File parentFile = f.getParentFile();
-/*
-            System.out.println("File: " + f);
-            System.out.println("ParentFile: " + parentFile);
-*/
-            if (!parentFile.isDirectory() && !parentFile.mkdirs())
-            {
-                throw new IOException("Unable to create parent directory '" + parentFile.getAbsolutePath() + "' for config file");
-            }
-            if (!f.createNewFile())
-            {
-                throw new IOException("Unable to create config file '" + f.getAbsolutePath() + "'");
-            }
-            copyTemplateConfig(configTemplate, f);
+            IOUtils.copyTemplate(configTemplate, configFile);
 
             // write the default configuration to this template file.
             // There needs to be a way to do this without duplicating the default configuration data.
@@ -148,37 +136,7 @@ public class DefaultSetupManager implements SetupManager
             props.setProperty(SystemConfiguration.PULSE_DATA, (sysConfig.getDataPath() != null ? sysConfig.getDataPath() : ""));
 
             PropertiesWriter writer = new PropertiesWriter();
-            writer.write(f, props);
-        }
-    }
-
-    private void copyTemplateConfig(File template, File destination) throws IOException
-    {
-        BufferedReader reader = null;
-        BufferedWriter writer = null;
-
-        try
-        {
-            reader = new BufferedReader(new FileReader(template));
-            writer = new BufferedWriter(new FileWriter(destination));
-
-            String line;
-            boolean doneSkipping = false;
-
-            while((line = reader.readLine()) != null)
-            {
-                if(doneSkipping || !line.startsWith("###"))
-                {
-                    doneSkipping = true;
-                    writer.write(line);
-                    writer.write('\n');
-                }
-            }
-        }
-        finally
-        {
-            IOUtils.close(reader);
-            IOUtils.close(writer);
+            writer.write(configFile, props);
         }
     }
 
@@ -215,10 +173,17 @@ public class DefaultSetupManager implements SetupManager
         loadContexts(daoContexts);
 
         // create the database based on the hibernate configuration.
-        DatabaseBootstrap dbBootstrap = (DatabaseBootstrap) ComponentContext.getBean("databaseBootstrap");
-        if (!dbBootstrap.schemaExists())
+        DatabaseConsole databaseConsole = (DatabaseConsole) ComponentContext.getBean("databaseConsole");
+        if (!databaseConsole.schemaExists())
         {
-            dbBootstrap.initialiseDatabase();
+            try
+            {
+                databaseConsole.createSchema();
+            }
+            catch (SQLException e)
+            {
+                throw new StartupException("Failed to create the database schema. Cause: " + e.getMessage());
+            }
         }
 
         loadContexts(upgradeContexts);

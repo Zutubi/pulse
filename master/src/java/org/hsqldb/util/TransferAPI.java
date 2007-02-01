@@ -60,6 +60,7 @@ public class TransferAPI
             connection = dataSource.getConnection();
             source = new CustomTransferSQLText(in.getAbsolutePath(), traceable);
             target = new TransferDb(connection, traceable);
+            target.helper = new CustomPostgresTransferHelper();
 
             doTransfer(source, target);
         }

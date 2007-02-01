@@ -25,6 +25,7 @@ public class HibernateFileArtifactDaoTest extends MasterPersistenceTestCase
     protected void tearDown() throws Exception
     {
         fileArtifactDao = null;
+        artifactDao = null;
         super.tearDown();
     }
 

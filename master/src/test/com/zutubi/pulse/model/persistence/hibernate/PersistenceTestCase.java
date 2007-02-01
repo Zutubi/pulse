@@ -1,9 +1,8 @@
 package com.zutubi.pulse.model.persistence.hibernate;
 
 import com.zutubi.pulse.bootstrap.ComponentContext;
-import com.zutubi.pulse.bootstrap.DatabaseBootstrap;
+import com.zutubi.pulse.bootstrap.DatabaseConsole;
 import com.zutubi.pulse.test.PulseTestCase;
-import com.zutubi.pulse.util.JDBCUtils;
 import org.hibernate.SessionFactory;
 import org.springframework.context.ApplicationContext;
 import org.springframework.transaction.PlatformTransactionManager;
@@ -12,13 +11,10 @@ import org.springframework.transaction.support.DefaultTransactionDefinition;
 
 import javax.sql.DataSource;
 import java.beans.BeanInfo;
+import java.beans.IntrospectionException;
 import java.beans.Introspector;
 import java.beans.PropertyDescriptor;
-import java.beans.IntrospectionException;
 import java.lang.reflect.Method;
-import java.lang.reflect.InvocationTargetException;
-import java.sql.Connection;
-import java.sql.Statement;
 
 /**
  * 
@@ -34,6 +30,7 @@ public abstract class PersistenceTestCase extends PulseTestCase
 
     protected SessionFactory sessionFactory;
     protected DataSource dataSource;
+    protected DatabaseConsole console;
 
     public PersistenceTestCase()
     {
@@ -55,11 +52,13 @@ public abstract class PersistenceTestCase extends PulseTestCase
         context = ComponentContext.getContext();
 
         dataSource = (DataSource) context.getBean("dataSource");
+        console = (DatabaseConsole) context.getBean("databaseConsole");
 
-        DatabaseBootstrap dbBootstrap = new DatabaseBootstrap();
-        dbBootstrap.setDataSource(dataSource);
-        dbBootstrap.setApplicationContext(context);
-        dbBootstrap.initialiseDatabase();
+        if (console.schemaExists())
+        {
+            console.dropSchema();
+        }
+        console.createSchema();
 
         transactionManager = (PlatformTransactionManager) context.getBean("transactionManager");
         transactionDefinition = new DefaultTransactionDefinition(DefaultTransactionDefinition.PROPAGATION_REQUIRED);
@@ -82,24 +81,16 @@ public abstract class PersistenceTestCase extends PulseTestCase
             e.printStackTrace();
         }
 
-        Connection con = dataSource.getConnection();
-        Statement stmt = null;
-        try
-        {
-            stmt = con.createStatement();
-            stmt.execute("SHUTDOWN");
-        }
-        finally
-        {
-            JDBCUtils.close(stmt);
-            JDBCUtils.close(con);
-        }
+        console.stop(false);
 
         dataSource = null;
+        console = null;
         transactionStatus = null;
         transactionDefinition = null;
         transactionManager = null;
         ComponentContext.closeAll();
+        context = null;
+        
         super.tearDown();
     }
 
