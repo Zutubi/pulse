@@ -8,13 +8,11 @@ import com.zutubi.pulse.notifications.NotificationHandler;
 import com.zutubi.pulse.notifications.NotificationSchemeManager;
 import com.zutubi.pulse.wizard.Wizard;
 import com.zutubi.pulse.wizard.WizardTransition;
+import com.zutubi.pulse.util.Sort;
 import com.zutubi.validation.Validateable;
 import com.zutubi.validation.ValidationContext;
 
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * <class comment/>
@@ -113,6 +111,8 @@ public class ContactPointWizard implements Wizard, Validateable
     public void initialise()
     {
         List<String> schemes = schemeManager.getNotificationSchemes();
+        Collections.sort(schemes, new Sort.StringComparator());
+
         selectState = new SelectContact(schemes);
         
         currentState = selectState;

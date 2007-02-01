@@ -241,12 +241,26 @@ public class ExecutableCommandTest extends ExecutableCommandTestBase
         {
             return;
         }
-
         ExecutableCommand command = new ExecutableCommand();
         command.setExe("thisfiledoesnotexist");
 
-        CommandResult result = runCommand(command, 1234);
-        assertTrue(result.errored());
+        CommandResult result = null;
+        try
+        {
+            result = runCommand(command, 1234);
+            assertTrue(result.errored());
+            fail();
+        }
+        catch (BuildException e)
+        {
+            String message = e.getMessage();
+            boolean java15 = message.contains("No such executable 'thisfiledoesnotexist'");
+            // In Java 1.6, the error reporting is better, so we are
+            // happy to pass it on through.
+            boolean java16 = message.endsWith("The system cannot find the file specified");
+            assertTrue(java15 || java16);
+        }
+
 
         List<Feature> features = result.getFeatures(Feature.Level.ERROR);
         assertEquals(1, features.size());
@@ -264,9 +278,21 @@ public class ExecutableCommandTest extends ExecutableCommandTestBase
         command.setExe("dir");
         command.setWorkingDir(new File("nosuchworkdir"));
 
-        CommandResult result = runCommand(command, 1234);
-        assertTrue(result.errored());
+        CommandResult result = null;
+        try
+        {
+            result = runCommand(command, 1234);
+            fail();
+        }
+        catch (BuildException e)
+        {
+            String message = e.getMessage();
+            boolean java15 = message.contains("Working directory 'nosuchworkdir' does not exist");
+            boolean jaav16 = message.endsWith("The directory name is invalid");
+            assertTrue(java15 || jaav16);
+        }
 
+        assertTrue(result.errored());
         List<Feature> features = result.getFeatures(Feature.Level.ERROR);
         assertEquals(1, features.size());
         assertTrue(features.get(0).getSummary().contains("Working directory 'nosuchworkdir' does not exist"));

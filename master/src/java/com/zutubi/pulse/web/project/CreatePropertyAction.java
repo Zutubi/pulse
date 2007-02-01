@@ -1,11 +1,8 @@
 package com.zutubi.pulse.web.project;
 
-import com.zutubi.pulse.web.admin.ResourceActionSupport;
 import com.zutubi.pulse.core.model.ResourceProperty;
-import com.zutubi.pulse.core.FileLoadException;
 import com.zutubi.pulse.model.BuildSpecification;
 import com.zutubi.pulse.model.Project;
-import com.sun.java_cup.internal.version;
 
 /**
  */

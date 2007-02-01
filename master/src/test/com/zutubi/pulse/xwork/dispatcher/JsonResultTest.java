@@ -301,7 +301,9 @@ public class JsonResultTest extends PulseTestCase
                 "</object>"));
         result.execute(ai);
 
-        assertEquals("{\"fieldError\":{\"a\":[\"error a 1\",\"error a 2\"],\"b\":[\"error b\"]}}", response.getOutputStreamContents());
+        String contents = response.getOutputStreamContents();
+        assertTrue(contents.contains("\"b\":[\"error b\"]"));
+        assertTrue(contents.contains("\"a\":[\"error a 1\",\"error a 2\"]"));
     }
 
     interface TestDataSource
