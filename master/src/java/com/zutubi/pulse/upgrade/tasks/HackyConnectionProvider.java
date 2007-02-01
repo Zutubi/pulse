@@ -26,7 +26,7 @@ import java.util.Properties;
  * will be used.
  * 
  */
-public class HackyUpgradeTaskConnectionProvider implements ConnectionProvider
+public class HackyConnectionProvider implements ConnectionProvider
 {
     public static DataSource dataSource;
 
@@ -34,7 +34,7 @@ public class HackyUpgradeTaskConnectionProvider implements ConnectionProvider
     {
         if (dataSource == null)
         {
-            throw new HibernateException("DataSource must be set.");
+            throw new HibernateException("DataSource must be set statically.");
         }
     }
 

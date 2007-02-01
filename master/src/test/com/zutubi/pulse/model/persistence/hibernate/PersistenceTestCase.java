@@ -3,6 +3,8 @@ package com.zutubi.pulse.model.persistence.hibernate;
 import com.zutubi.pulse.bootstrap.ComponentContext;
 import com.zutubi.pulse.bootstrap.DatabaseConsole;
 import com.zutubi.pulse.test.PulseTestCase;
+import com.zutubi.pulse.util.logging.Logger;
+import com.zutubi.pulse.util.JDBCUtils;
 import org.hibernate.SessionFactory;
 import org.springframework.context.ApplicationContext;
 import org.springframework.transaction.PlatformTransactionManager;
@@ -15,9 +17,12 @@ import java.beans.IntrospectionException;
 import java.beans.Introspector;
 import java.beans.PropertyDescriptor;
 import java.lang.reflect.Method;
+import java.util.logging.Filter;
+import java.util.logging.LogRecord;
+import java.util.logging.Level;
 
 /**
- * 
+ *
  *
  */
 public abstract class PersistenceTestCase extends PulseTestCase
@@ -45,6 +50,13 @@ public abstract class PersistenceTestCase extends PulseTestCase
     protected void setUp() throws Exception
     {
         super.setUp();
+
+        // cleanup the logging output, in turn reducing the memory requirements of the junit report processing
+        // and helping the build to succeed on limited memory resources.
+        Logger.getLogger(JDBCUtils.class).setFilter(new IgnoreInfoFilter());
+        Logger.getLogger("org.hibernate.cfg.HbmBinder").setFilter(new IgnoreInfoFilter());
+        Logger.getLogger("org.hibernate.cfg.SettingsFactory").setFilter(new IgnoreInfoFilter());
+        Logger.getLogger("org.springframework.beans.factory.xml.XmlBeanDefinitionReader").setFilter(new IgnoreInfoFilter());
 
         String[] configLocations = getConfigLocations();
 
@@ -90,7 +102,7 @@ public abstract class PersistenceTestCase extends PulseTestCase
         transactionManager = null;
         ComponentContext.closeAll();
         context = null;
-        
+
         super.tearDown();
     }
 
@@ -104,15 +116,14 @@ public abstract class PersistenceTestCase extends PulseTestCase
 
     protected void assertPropertyEquals(Object a, Object b)
     {
-        if(a == null)
+        if (a == null)
         {
             assertNull(b);
-        }
-        else
+        } else
         {
             assertNotNull(b);
         }
-        
+
         BeanInfo beanInfo = null;
         try
         {
@@ -139,6 +150,14 @@ public abstract class PersistenceTestCase extends PulseTestCase
                     throw new RuntimeException("Checking property '" + getterName + "': " + e.getMessage(), e);
                 }
             }
+        }
+    }
+
+    private static class IgnoreInfoFilter implements Filter
+    {
+        public boolean isLoggable(LogRecord record)
+        {
+            return record.getLevel().intValue() > Level.INFO.intValue(); 
         }
     }
 }

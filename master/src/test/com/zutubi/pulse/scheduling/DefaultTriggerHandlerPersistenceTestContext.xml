@@ -33,8 +33,6 @@
         </property>
     </bean>
 
-    <bean name="objectFactory" class="com.zutubi.pulse.spring.SpringObjectFactory"/>
-
     <bean id="triggerDaoTarget" class="com.zutubi.pulse.model.persistence.hibernate.HibernateTriggerDao">
         <property name="sessionFactory">
             <ref bean="sessionFactory"/>

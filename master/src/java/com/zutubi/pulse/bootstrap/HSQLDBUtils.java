@@ -64,21 +64,26 @@ public class HSQLDBUtils
         return false;
     }
 
-    public static void updateMaxSize(File dbRoot)
+    public static void updateMaxSize(String url)
     {
-        File dbPropertiesFile = new File(dbRoot, "db.properties");
+        if (!url.startsWith("jdbc:hsqldb:"))
+        {
+            throw new IllegalArgumentException("Unexpected embedded hsqldb url: " + url);
+        }
+        String databasePath = url.substring(12);
+        File databasePropertiesFile = new File(databasePath + ".properties");
+        
         FileInputStream inStream = null;
         FileOutputStream outStream = null;
-
         try
         {
-            inStream = new FileInputStream(dbPropertiesFile);
+            inStream = new FileInputStream(databasePropertiesFile);
             Properties properties = new Properties();
             properties.load(inStream);
             properties.put("hsqldb.cache_file_scale", "8");
             inStream.close();
 
-            outStream = new FileOutputStream(dbPropertiesFile);
+            outStream = new FileOutputStream(databasePropertiesFile);
             properties.store(outStream, "Updated cache_file_scale");
         }
         catch (IOException e)

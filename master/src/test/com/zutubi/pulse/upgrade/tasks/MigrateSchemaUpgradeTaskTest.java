@@ -1,17 +1,17 @@
 package com.zutubi.pulse.upgrade.tasks;
 
-import com.zutubi.pulse.model.persistence.hibernate.PersistenceTestCase;
 import com.zutubi.pulse.upgrade.UpgradeTask;
 import com.zutubi.pulse.util.JDBCUtils;
 
 import java.sql.SQLException;
+import java.util.LinkedList;
+import java.util.List;
 
 /**
  * <class-comment/>
  */
-public class MigrateSchemaUpgradeTaskTest extends PersistenceTestCase
+public class MigrateSchemaUpgradeTaskTest extends BaseUpgradeTaskTestCase
 {
-
     public MigrateSchemaUpgradeTaskTest(String testName)
     {
         super(testName);
@@ -19,25 +19,21 @@ public class MigrateSchemaUpgradeTaskTest extends PersistenceTestCase
 
     public void setUp() throws Exception
     {
-//        super.setUp();
-
-        // add setup code here.s
+        super.setUp();
     }
 
     public void tearDown() throws Exception
     {
         // add tear down code here.
-
-//        super.tearDown();
+        super.tearDown();
     }
 
-    protected String[] getConfigLocations()
+    protected List<String> getTestMappings()
     {
-        return new String[]{"com/zutubi/pulse/bootstrap/testBootstrapContext.xml",
-                "com/zutubi/pulse/upgrade/tasks/testSchemaUpgradeTaskContext.xml"};
+        // we are handling our own map processing.. 
+        return new LinkedList<String>();
     }
 
-/*
     public void testAddTableWithColumn() throws Exception
     {
         UpgradeTask upgrade;
@@ -71,7 +67,6 @@ public class MigrateSchemaUpgradeTaskTest extends PersistenceTestCase
 
         assertTrue(checkColumnExists("TEST", "NEW_COLUMN"));
     }
-*/
 
 /*
     public void testFK() throws SQLException, UpgradeException, IOException
@@ -79,10 +74,10 @@ public class MigrateSchemaUpgradeTaskTest extends PersistenceTestCase
         MutableConfiguration config = new MutableConfiguration();
 
         Properties props = console.getConfig().getHibernateProperties();
-        props.put("hibernate.connection.provider_class", "com.zutubi.pulse.upgrade.tasks.HackyUpgradeTaskConnectionProvider");
+        props.put("hibernate.connection.provider_class", "com.zutubi.pulse.upgrade.tasks.HackyConnectionProvider");
 
         // slight hack to provide hibernate with access to the configured datasource.
-        HackyUpgradeTaskConnectionProvider.dataSource = dataSource;
+        HackyConnectionProvider.dataSource = dataSource;
 
         String[] mappings = new String[]{"com/zutubi/pulse/upgrade/tasks/testSchemaMigration-v4.hbm.xml"};
 
@@ -130,10 +125,10 @@ public class MigrateSchemaUpgradeTaskTest extends PersistenceTestCase
         Configuration config = new Configuration();
 
         Properties props = console.getConfig().getHibernateProperties();
-        props.put("hibernate.connection.provider_class", "com.zutubi.pulse.upgrade.tasks.HackyUpgradeTaskConnectionProvider");
+        props.put("hibernate.connection.provider_class", "com.zutubi.pulse.upgrade.tasks.HackyConnectionProvider");
 
         // slight hack to provide hibernate with access to the configured datasource.
-        HackyUpgradeTaskConnectionProvider.dataSource = dataSource;
+        HackyConnectionProvider.dataSource = dataSource;
 
         // use spring to help load the classpath resources. Rather useful actually.
         for (String mapping : mappings)
@@ -155,10 +150,10 @@ public class MigrateSchemaUpgradeTaskTest extends PersistenceTestCase
         Configuration config = new Configuration();
 
         Properties props = console.getConfig().getHibernateProperties();
-        props.put("hibernate.connection.provider_class", "com.zutubi.pulse.upgrade.tasks.HackyUpgradeTaskConnectionProvider");
+        props.put("hibernate.connection.provider_class", "com.zutubi.pulse.upgrade.tasks.HackyConnectionProvider");
 
         // slight hack to provide hibernate with access to the configured datasource.
-        HackyUpgradeTaskConnectionProvider.dataSource = dataSource;
+        HackyConnectionProvider.dataSource = dataSource;
 
         // use spring to help load the classpath resources. Rather useful actually.
         for (String mapping : mappings)
@@ -170,17 +165,12 @@ public class MigrateSchemaUpgradeTaskTest extends PersistenceTestCase
         HibernateUtils.dropConstraints(config, dataSource, tableName);
     }
 */
-    public void test()
-    {
-        // empty
-    }
-
     private UpgradeTask newSchemaUpgrade(String mapping)
     {
         MigrateSchemaUpgradeTask task = new MigrateSchemaUpgradeTask();
         task.setMapping(mapping);
         task.setDataSource(dataSource);
-        task.setDatabaseConsole(console);
+        task.setDatabaseConfig(databaseConfig);
         return task;
     }
 

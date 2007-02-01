@@ -1,20 +1,17 @@
 package com.zutubi.pulse.upgrade;
 
 import com.zutubi.pulse.Version;
-import com.zutubi.pulse.bootstrap.Data;
-import com.zutubi.pulse.bootstrap.DefaultSystemPaths;
 import com.zutubi.pulse.bootstrap.ComponentContext;
+import com.zutubi.pulse.bootstrap.Data;
 import com.zutubi.pulse.bootstrap.MasterConfigurationManager;
 import com.zutubi.pulse.test.PulseTestCase;
 import com.zutubi.pulse.upgrade.tasks.MockUpgradeTask;
 import com.zutubi.pulse.util.FileSystemUtils;
+import org.springframework.context.ApplicationContext;
 
-import javax.sql.DataSource;
 import java.io.File;
 import java.util.LinkedList;
 import java.util.List;
-
-import org.springframework.context.ApplicationContext;
 
 /**
  * <class-comment/>

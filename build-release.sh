@@ -47,7 +47,7 @@ sed -e "s/pulse.version=.*/pulse.version=$version/" \
 mv $tmpFile build.properties
 
 # Build that mofo
-ant clean.all package.master
+ant clean.all accept.master
 
 echo "If you be happy, svn commit what I hath wrought."
 

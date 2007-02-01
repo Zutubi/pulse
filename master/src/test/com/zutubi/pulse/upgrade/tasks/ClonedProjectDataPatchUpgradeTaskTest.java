@@ -1,25 +1,19 @@
 package com.zutubi.pulse.upgrade.tasks;
 
-import com.zutubi.pulse.bootstrap.ComponentContext;
-import com.zutubi.pulse.bootstrap.DatabaseConfig;
-import com.zutubi.pulse.bootstrap.DatabaseConsole;
-import com.zutubi.pulse.bootstrap.DatabaseConsoleBeanFactory;
 import com.zutubi.pulse.upgrade.UpgradeException;
 import com.zutubi.pulse.util.JDBCUtils;
-import org.apache.commons.dbcp.BasicDataSource;
 
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Types;
+import java.util.List;
 
 /**
  * <class-comment/>
  */
 public class ClonedProjectDataPatchUpgradeTaskTest extends BaseUpgradeTaskTestCase
 {
-    private BasicDataSource dataSource;
     private Connection con;
-    private DatabaseConsole databaseConsole;
 
     public ClonedProjectDataPatchUpgradeTaskTest()
     {
@@ -34,17 +28,6 @@ public class ClonedProjectDataPatchUpgradeTaskTest extends BaseUpgradeTaskTestCa
     {
         super.setUp();
 
-        ComponentContext.addClassPathContextDefinitions("com/zutubi/pulse/bootstrap/testBootstrapContext.xml");
-        dataSource = (BasicDataSource) ComponentContext.getBean("dataSource");
-
-        DatabaseConsoleBeanFactory factory = new DatabaseConsoleBeanFactory();
-        factory.setDatabaseConfig((DatabaseConfig) ComponentContext.getBean("databaseConfig"));
-        factory.setDataSource(dataSource);
-        factory.setHibernateMappings(getMappings("1040"));
-
-        databaseConsole = (DatabaseConsole) factory.getObject();
-        databaseConsole.createSchema();
-
         con = dataSource.getConnection();
     }
 
@@ -52,16 +35,15 @@ public class ClonedProjectDataPatchUpgradeTaskTest extends BaseUpgradeTaskTestCa
     {
         JDBCUtils.close(con);
 
-        JDBCUtils.execute(dataSource, "SHUTDOWN");
-        dataSource.close();
-        databaseConsole = null;
-
         super.tearDown();
     }
 
-    /**
-     * Ensure that those projects that are okay remain that way.
-     */
+    protected List<String> getTestMappings()
+    {
+        return getMappings("1040");
+    }
+
+    // Ensure that those projects that are okay remain that way.
     public void testSingleProject() throws SQLException, UpgradeException
     {
         // create a single scm and project pair. No upgrade is required for these.
