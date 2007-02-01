@@ -193,7 +193,6 @@
                     <exclude name="**/SVN*"/>
                     <exclude name="**/*WorkingCopyTest*"/>
                     <exclude name="**/*P4*Test*"/>
-                    <exclude name="**/*DaoTest*"/>
                 </fileset>
             </batchtest>
         </junit>

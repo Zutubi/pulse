@@ -1,18 +1,13 @@
 package com.zutubi.pulse.upgrade.tasks;
 
-import com.zutubi.pulse.bootstrap.ComponentContext;
-import com.zutubi.pulse.bootstrap.DatabaseConsole;
-import com.zutubi.pulse.bootstrap.DatabaseConsoleBeanFactory;
-import com.zutubi.pulse.bootstrap.DatabaseConfig;
+import com.zutubi.pulse.committransformers.LinkCommitMessageTransformer;
+import com.zutubi.pulse.upgrade.UpgradeException;
 import com.zutubi.pulse.util.JDBCUtils;
 import com.zutubi.pulse.util.PropertiesType;
-import com.zutubi.pulse.upgrade.UpgradeException;
-import com.zutubi.pulse.committransformers.LinkCommitMessageTransformer;
-import org.apache.commons.dbcp.BasicDataSource;
 
 import java.sql.*;
-import java.util.List;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Properties;
 
 /**
@@ -20,24 +15,11 @@ import java.util.Properties;
  */
 public class CommitMessageLinkMigrationUpgradeTaskTest extends BaseUpgradeTaskTestCase
 {
-    private BasicDataSource dataSource;
     private Connection con;
-    private DatabaseConsole databaseConsole;
 
     protected void setUp() throws Exception
     {
         super.setUp();
-
-        ComponentContext.addClassPathContextDefinitions("com/zutubi/pulse/bootstrap/testBootstrapContext.xml");
-        dataSource = (BasicDataSource) ComponentContext.getBean("dataSource");
-
-        DatabaseConsoleBeanFactory factory = new DatabaseConsoleBeanFactory();
-        factory.setDatabaseConfig((DatabaseConfig) ComponentContext.getBean("databaseConfig"));
-        factory.setDataSource(dataSource);
-        factory.setHibernateMappings(getMappings("0102001000"));
-
-        databaseConsole = (DatabaseConsole) factory.getObject();
-        databaseConsole.createSchema();
 
         con = dataSource.getConnection();
     }
@@ -45,12 +27,12 @@ public class CommitMessageLinkMigrationUpgradeTaskTest extends BaseUpgradeTaskTe
     protected void tearDown() throws Exception
     {
         JDBCUtils.close(con);
-
-        JDBCUtils.execute(dataSource, "SHUTDOWN");
-        dataSource.close();
-        databaseConsole = null;
-
         super.tearDown();
+    }
+
+    protected List<String> getTestMappings()
+    {
+        return getMappings("0102001000");
     }
 
     public void testNoData() throws UpgradeException
@@ -118,7 +100,7 @@ public class CommitMessageLinkMigrationUpgradeTaskTest extends BaseUpgradeTaskTe
         MigrateSchemaUpgradeTask schemaUpgrade = new MigrateSchemaUpgradeTask();
         schemaUpgrade.setMapping("com/zutubi/pulse/upgrade/schema/build_0102001007/CommitMessageTransformer.hbm.xml");
         schemaUpgrade.setDataSource(dataSource);
-        schemaUpgrade.setDatabaseConsole(databaseConsole);
+        schemaUpgrade.setDatabaseConfig(databaseConfig);
         schemaUpgrade.setBuildNumber(102001007);
         schemaUpgrade.execute(new MockUpgradeContext());
 

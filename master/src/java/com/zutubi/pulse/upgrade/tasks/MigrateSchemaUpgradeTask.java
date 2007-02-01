@@ -1,6 +1,6 @@
 package com.zutubi.pulse.upgrade.tasks;
 
-import com.zutubi.pulse.bootstrap.DatabaseConsole;
+import com.zutubi.pulse.bootstrap.DatabaseConfig;
 import com.zutubi.pulse.upgrade.DataSourceAware;
 import com.zutubi.pulse.upgrade.UpgradeContext;
 import com.zutubi.pulse.upgrade.UpgradeException;
@@ -24,9 +24,9 @@ public class MigrateSchemaUpgradeTask implements DataSourceAware, UpgradeTask
 
     protected DataSource dataSource;
 
-    protected DatabaseConsole databaseConsole;
-
     private int buildNumber;
+
+    private DatabaseConfig databaseConfig;
 
     public int getBuildNumber()
     {
@@ -72,11 +72,11 @@ public class MigrateSchemaUpgradeTask implements DataSourceAware, UpgradeTask
 
             // load these properties from the context, same place that all the other
             // properties are defined.
-            Properties props = databaseConsole.getConfig().getHibernateProperties();
-            props.put("hibernate.connection.provider_class", "com.zutubi.pulse.upgrade.tasks.HackyUpgradeTaskConnectionProvider");
+            Properties props = databaseConfig.getHibernateProperties();
+            props.put("hibernate.connection.provider_class", "com.zutubi.pulse.upgrade.tasks.HackyConnectionProvider");
 
             // slight hack to provide hibernate with access to the configured datasource.
-            HackyUpgradeTaskConnectionProvider.dataSource = dataSource;
+            HackyConnectionProvider.dataSource = dataSource;
 
             // use spring to help load the classpath resources. Rather useful actually.
             for (String mapping : mappings)
@@ -122,13 +122,8 @@ public class MigrateSchemaUpgradeTask implements DataSourceAware, UpgradeTask
         this.dataSource = dataSource;
     }
 
-    /**
-     * Required resource.
-     *
-     * @param databaseConsole reference
-     */
-    public void setDatabaseConsole(DatabaseConsole databaseConsole)
+    public void setDatabaseConfig(DatabaseConfig config)
     {
-        this.databaseConsole = databaseConsole;
+        this.databaseConfig = config;
     }
 }

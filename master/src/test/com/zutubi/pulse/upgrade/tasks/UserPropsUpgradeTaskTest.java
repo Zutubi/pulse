@@ -1,17 +1,13 @@
 package com.zutubi.pulse.upgrade.tasks;
 
-import com.zutubi.pulse.bootstrap.ComponentContext;
-import com.zutubi.pulse.bootstrap.DatabaseConfig;
-import com.zutubi.pulse.bootstrap.DatabaseConsole;
-import com.zutubi.pulse.bootstrap.DatabaseConsoleBeanFactory;
 import com.zutubi.pulse.upgrade.UpgradeException;
 import com.zutubi.pulse.util.JDBCUtils;
-import org.apache.commons.dbcp.BasicDataSource;
 
 import javax.sql.DataSource;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Types;
+import java.util.List;
 
 /**
  * Test case for the User Property upgrade process.
@@ -20,9 +16,6 @@ import java.sql.Types;
  */
 public class UserPropsUpgradeTaskTest extends BaseUpgradeTaskTestCase
 {
-    private BasicDataSource dataSource;
-    private DatabaseConsole databaseConsole;
-
     public UserPropsUpgradeTaskTest()
     {
     }
@@ -36,28 +29,16 @@ public class UserPropsUpgradeTaskTest extends BaseUpgradeTaskTestCase
     {
         super.setUp();
 
-        ComponentContext.addClassPathContextDefinitions("com/zutubi/pulse/bootstrap/testBootstrapContext.xml");
-        dataSource = (BasicDataSource) ComponentContext.getBean("dataSource");
-
-        // initialise required schema.
-        DatabaseConsoleBeanFactory factory = new DatabaseConsoleBeanFactory();
-        factory.setDatabaseConfig((DatabaseConfig) ComponentContext.getBean("databaseConfig"));
-        factory.setDataSource(dataSource);
-        factory.setHibernateMappings(getMappings("1010"));
-
-        databaseConsole = (DatabaseConsole) factory.getObject();
-        databaseConsole.createSchema();
-
         generateTestData(dataSource);
+    }
+
+    protected List<String> getTestMappings()
+    {
+        return getMappings("1010");
     }
 
     protected void tearDown() throws Exception
     {
-        databaseConsole = null;
-
-        JDBCUtils.execute(dataSource, "SHUTDOWN");
-        dataSource.close();
-
         super.tearDown();
     }
 
@@ -69,7 +50,7 @@ public class UserPropsUpgradeTaskTest extends BaseUpgradeTaskTestCase
         // upgrade schema
         UserPropsSchemaUpgradeTask schemaUpgrade = new UserPropsSchemaUpgradeTask();
         schemaUpgrade.setDataSource(dataSource);
-        schemaUpgrade.setDatabaseConsole(databaseConsole);
+        schemaUpgrade.setDatabaseConfig(databaseConfig);
         schemaUpgrade.execute(new MockUpgradeContext());
 
         // check that the new table exists as expected

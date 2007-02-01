@@ -2,11 +2,7 @@
 <!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
 <beans>
 
-    <bean id="dataSource" class="com.zutubi.pulse.bootstrap.DataSourceBeanFactory" destroy-method="close" autowire="byName">
-        <property name="configurationManager">
-            <ref local="configurationManager"/>
-        </property>
-    </bean>
+    <bean id="dataSource" class="com.zutubi.pulse.bootstrap.DataSourceBeanFactory" destroy-method="close" autowire="byName"/>
     
     <bean id="databaseConfig" class="com.zutubi.pulse.bootstrap.DatabaseConfig">
         <constructor-arg index="0">
@@ -20,8 +16,7 @@
         </constructor-arg>
     </bean>
 
- <!--
-    <bean id="databaseConfig" class="com.zutubi.pulse.bootstrap.DatabaseConfig">
+    <bean id="postgresDatabaseConfig" class="com.zutubi.pulse.bootstrap.DatabaseConfig">
         <constructor-arg index="0">
             <props>
                 <prop key="jdbc.driverClassName">org.postgresql.Driver</prop>
@@ -32,7 +27,6 @@
             </props>
         </constructor-arg>
     </bean>
--->
 
     <bean id="configurationManager" class="com.zutubi.pulse.bootstrap.SimpleMasterConfigurationManager">
         <property name="systemPaths">
@@ -62,4 +56,12 @@
         </property>
     </bean>
 
+    <bean name="objectFactory" class="com.zutubi.pulse.spring.SpringObjectFactory"/>
+
+    <bean id="eventManager" class="com.zutubi.pulse.events.DefaultEventManager">
+        <constructor-arg index="0" ref="eventDispatcher"/>
+    </bean>
+
+    <bean id="eventDispatcher" class="com.zutubi.pulse.events.SynchronousDispatcher"/>
+    
 </beans>

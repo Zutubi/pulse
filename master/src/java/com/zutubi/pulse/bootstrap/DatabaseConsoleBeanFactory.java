@@ -1,7 +1,7 @@
 package com.zutubi.pulse.bootstrap;
 
 import com.zutubi.pulse.upgrade.tasks.MutableConfiguration;
-import com.zutubi.pulse.upgrade.tasks.HackyUpgradeTaskConnectionProvider;
+import com.zutubi.pulse.upgrade.tasks.HackyConnectionProvider;
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
@@ -22,6 +22,8 @@ public class DatabaseConsoleBeanFactory implements FactoryBean
 
     private DataSource dataSource;
     
+    // awkard... having the console know about the hibernate mappings means we can not use it
+    // as easily for tasks that do not require mappings.
     private List<String> mappings;
 
     public Object getObject() throws Exception
@@ -32,7 +34,7 @@ public class DatabaseConsoleBeanFactory implements FactoryBean
 
             Properties props = new Properties();
             props.putAll(databaseConfig.getProperties());
-            props.put("hibernate.connection.provider_class", "com.zutubi.pulse.upgrade.tasks.HackyUpgradeTaskConnectionProvider");
+            props.put("hibernate.connection.provider_class", "com.zutubi.pulse.upgrade.tasks.HackyConnectionProvider");
 
             // a) retrieve hibernate mappings for schema generation.
             for (String mapping : mappings)
@@ -42,9 +44,12 @@ public class DatabaseConsoleBeanFactory implements FactoryBean
             }
 
             // slight hack to provide hibernate with access to the configured datasource.
-            HackyUpgradeTaskConnectionProvider.dataSource = dataSource;
+            HackyConnectionProvider.dataSource = dataSource;
 
-            if (databaseConfig.isEmbedded())
+            // awkard... having the console know about the hibernate mappings means we can not use it 
+            // as easily for tasks that do not require mappings.
+
+            if (databaseConfig.getDriverClassName().contains(".hsqldb."))
             {
                 EmbeddedHSQLDBConsole console = new EmbeddedHSQLDBConsole(databaseConfig);
                 console.setDataSource(dataSource);
