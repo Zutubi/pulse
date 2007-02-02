@@ -6,7 +6,6 @@ import java.beans.Introspector;
 import java.beans.PropertyDescriptor;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
-import java.lang.reflect.Constructor;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -35,7 +34,7 @@ public class RecordTypeInfo
             for(PropertyDescriptor descriptor: info.getPropertyDescriptors())
             {
                 RecordPropertyInfo property = new RecordPropertyInfo(descriptor.getName(), descriptor.getReadMethod(), descriptor.getWriteMethod());
-                validatePropertyType(property.getName(), property.getType());
+                validateProperty(property);
                 properties.put(property.getName(), property);
             }
         }
@@ -57,8 +56,11 @@ public class RecordTypeInfo
         }
     }
 
-    private void validatePropertyType(String propertyName, Type type) throws InvalidRecordTypeException
+    private void validateProperty(RecordPropertyInfo property) throws InvalidRecordTypeException
     {
+        String propertyName = property.getName();
+        Type type = property.getType();
+
         if(type instanceof Class)
         {
             // We support any classes, but they must be registered.

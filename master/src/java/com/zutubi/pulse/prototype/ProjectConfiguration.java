@@ -41,6 +41,7 @@ public class ProjectConfiguration
 
     private PulseFileDetails pulseFileDetails;
     // Will change...
+
     private Scm scm;
     private ChangeViewer changeViewer;
     private Map<String, CommitMessageTransformer> commitMessageTransformers;

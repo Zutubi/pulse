@@ -1112,6 +1112,10 @@
             <result name="success" type="velocity">prototype.vm</result>
         </action>
 
+        <action name="prototype-test" class="com.zutubi.pulse.web.ActionSupport">
+            <result name="success" type="velocity">prototype-test.vm</result>
+        </action>
+
         <action name="serverSettings" class="com.zutubi.pulse.web.admin.ServerSettingsAction">
             <interceptor-ref name="defaultStack"/>
             <result name="success" type="velocity">server-settings.vm</result>

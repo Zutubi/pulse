@@ -1,0 +1,14 @@
+<html>
+<body>
+
+<h1>Test links</h1>
+
+<p>
+    <a href="prototype.action?projectId=1&path=some/path">edit project a svn</a>
+</p>
+<p>
+    <a href="prototype.action?projectId=1&path=some/other/path">edit project b cvs</a>
+</p>
+
+</body>
+</html>

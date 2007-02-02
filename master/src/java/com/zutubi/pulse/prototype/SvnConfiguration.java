@@ -5,7 +5,7 @@ import com.zutubi.pulse.form.descriptor.annotation.Summary;
 /**
  */
 @Summary(fields = {"name", "url"})
-public class SvnConfiguration
+public class SvnConfiguration extends BaseScmConfiguration
 {
     private String url;
 

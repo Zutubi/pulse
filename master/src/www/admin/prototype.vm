@@ -33,12 +33,9 @@ $action.formHtml
 </p>
 <p>example text</p>
 
-<p>
-$action.tableHtml
-</p>
-
-
 </div>
+
+<a href="prototype-test.action">test page</a>
 
     #tabEnd()
 </body>
