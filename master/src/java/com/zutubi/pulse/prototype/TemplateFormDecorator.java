@@ -21,8 +21,8 @@ public class TemplateFormDecorator
 
         for (FieldDescriptor field : descriptor.getFieldDescriptors())
         {
-            String id = record.getOwner(field.getName());
-            if(id.equals(concreteId))
+            String id = record.getFieldOwner(field.getName());
+            if(!id.equals(concreteId))
             {
                 field.getParameters().put("inheritedFrom", id);
             }

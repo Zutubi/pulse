@@ -1,66 +1,141 @@
 package com.zutubi.pulse.prototype;
 
 import com.zutubi.pulse.prototype.record.Record;
-import com.zutubi.pulse.util.CollectionUtils;
-import com.zutubi.pulse.util.Predicate;
 
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 /**
  * <class comment/>
  */
 public class TemplateRecord implements Record
 {
-    private List<OwnedRecord> templateChain;
-
-    private String symbolicName;
-
+    private TemplateRecord parent;
     private String owner;
+    private Record record;
 
-    public TemplateRecord(List<OwnedRecord> templateChain)
+    public TemplateRecord(Record record, String owner)
     {
-        this.templateChain = templateChain;
+        this(null, owner, record);
     }
 
-    public Object get(Object name)
+    public TemplateRecord(TemplateRecord parent, String owner, Record record)
     {
-        OwnedRecord record = getOwnedRecord((String) name);
-        if (record != null)
+        linkToParent(parent);
+        this.owner = owner;
+        this.record = record;
+    }
+
+    void linkToParent(TemplateRecord parent)
+    {
+        this.parent = parent;
+
+        if (parent != null)
         {
-            return record.getRecord().get(name);
+            // We need to do a deep link: find all child records and link them to
+            // their corresponding parent.  We can assume that the layout of
+            // fields is identical, but within maps and lists the items in our
+            // parent are arbitrary.  It is also guaranteed that every list and
+            // map field has a value (i.e. is not null), it just may be an empty
+            // list or map.
+            for(Entry<String, Object> entry: record.entrySet())
+            {
+                Object value = entry.getValue();
+
+                // Check for TemplateRecord first as it is also a Map!
+                if(value instanceof TemplateRecord)
+                {
+                    // Subrecords, link to record in the parent of the same name.
+                    TemplateRecord parentRecord = (TemplateRecord) parent.get(entry.getKey());
+                    if(parentRecord != null)
+                    {
+                        ((TemplateRecord)value).linkToParent(parentRecord);
+                    }
+                }
+                else if(value instanceof Map)
+                {
+                    // Link entries of the map that have the same key.
+                    linkMapToParent(entry.getKey(), (Map<String, TemplateRecord>) value);
+                }
+            }
         }
-        return null;
+    }
+
+    private void linkMapToParent(String name, Map<String, TemplateRecord> map)
+    {
+        Map<String, TemplateRecord> parentMap = (Map<String, TemplateRecord>) parent.get(name);
+        for(Map.Entry<String, TemplateRecord> entry: map.entrySet())
+        {
+            TemplateRecord parentRecord = parentMap.get(entry.getKey());
+            if(parentRecord != null)
+            {
+                entry.getValue().linkToParent(parentRecord);
+            }
+        }
+    }
+
+    public Object get(Object key)
+    {
+        String name = (String) key;
+        Object immediateValue = record.get(name);
+
+        // The result will only ever be null for simple values.  These are
+        // inherited directly from the parent.
+        if(immediateValue == null && parent != null)
+        {
+            return parent.get(name);
+        }
+        else if(immediateValue instanceof List)
+        {
+            return getList(name, (List) immediateValue);
+        }
+        else if(immediateValue instanceof TemplateRecord)
+        {
+            // Important to check for TemplateRecord, and before map, as
+            // records implement Map.
+            return immediateValue;
+        }
+        else if(immediateValue instanceof Map)
+        {
+            return getMap(name, (Map<String, TemplateRecord>) immediateValue);
+        }
+        else
+        {
+            // Non-null simple value.
+            return immediateValue;
+        }
+    }
+
+    private List getList(String name, List list)
+    {
+        if(parent == null)
+        {
+            return list;
+        }
+        else
+        {
+            List inherited = new LinkedList((List) parent.get(name));
+            inherited.addAll(list);
+            return inherited;
+        }
+    }
+
+    private Map<String, TemplateRecord> getMap(String name, Map<String, TemplateRecord> map)
+    {
+        if(parent == null)
+        {
+            return map;
+        }
+        else
+        {
+            Map<String, TemplateRecord> inherited = (Map<String, TemplateRecord>) parent.get(name);
+            inherited.putAll(map);
+            return inherited;
+        }
     }
 
     public String getSymbolicName()
     {
-        return symbolicName;
-    }
-
-    public String getOwner(final String name)
-    {
-        OwnedRecord record = getOwnedRecord(name);
-
-        if(record == null)
-        {
-            record = templateChain.get(templateChain.size() - 1);
-        }
-
-        return record.getOwner();
-    }
-
-    private OwnedRecord getOwnedRecord(final String name)
-    {
-        return CollectionUtils.find(templateChain, new Predicate<OwnedRecord>()
-        {
-            public boolean satisfied(OwnedRecord ownedRecord)
-            {
-                return ownedRecord.getRecord().get(name) != null;
-            }
-        });
+        return record.getSymbolicName();
     }
 
     public String getOwner()
@@ -68,6 +143,32 @@ public class TemplateRecord implements Record
         return owner;
     }
 
+    public String getFieldOwner(final String name)
+    {
+        TemplateRecord owner = getOwningRecord(name);
+        if(owner == null)
+        {
+            owner = this;
+        }
+
+        return owner.getOwner();
+    }
+
+    private TemplateRecord getOwningRecord(final String name)
+    {
+        if(record.get(name) != null)
+        {
+            return this;
+        }
+        else if(parent != null)
+        {
+            return parent.getOwningRecord(name);
+        }
+        else
+        {
+            return null;
+        }
+    }
 
     public int size()
     {
@@ -89,24 +190,24 @@ public class TemplateRecord implements Record
         throw new RuntimeException("Method not yet implemented.");
     }
 
-    public String put(String key, Object value)
+    public Object put(String key, Object value)
     {
-        throw new RuntimeException("Method not yet implemented.");
+        return record.put(key, value);
     }
 
-    public String remove(Object key)
+    public Object remove(Object key)
     {
-        throw new RuntimeException("Method not yet implemented.");
+        return record.remove(key);
     }
 
     public void putAll(Map<? extends String, ? extends Object> t)
     {
-        throw new RuntimeException("Method not yet implemented.");
+        record.putAll(t);
     }
 
     public void clear()
     {
-        throw new RuntimeException("Method not yet implemented.");
+        record.clear();
     }
 
     public Set<String> keySet()

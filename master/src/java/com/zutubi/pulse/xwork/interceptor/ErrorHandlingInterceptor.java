@@ -5,6 +5,8 @@ import com.opensymphony.xwork.Action;
 import com.opensymphony.xwork.ActionInvocation;
 import com.opensymphony.xwork.interceptor.Interceptor;
 import com.zutubi.pulse.util.logging.Logger;
+import com.zutubi.pulse.web.ActionSupport;
+import com.zutubi.pulse.web.LookupErrorException;
 import org.acegisecurity.AccessDeniedException;
 
 import javax.servlet.http.HttpServletResponse;
@@ -34,6 +36,13 @@ public class ErrorHandlingInterceptor implements Interceptor
             LOG.info(e);
             HttpServletResponse response = ServletActionContext.getResponse();
             response.sendError(401);
+            return Action.ERROR;
+        }
+        catch(LookupErrorException e)
+        {
+            LOG.info(e);
+            ActionSupport action = (ActionSupport) invocation.getAction();
+            action.addActionError(e.getMessage());
             return Action.ERROR;
         }
     }

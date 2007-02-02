@@ -7,7 +7,5 @@ import java.util.Map;
  */
 public interface Record extends Map<String, Object>
 {
-    Object get(Object name);
-
     String getSymbolicName();
 }

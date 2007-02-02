@@ -12,8 +12,14 @@ public class DefaultRecordManager implements RecordManager
 {
     // Records are stored in the user config root (i.e. PULSE_DATA/config/<scope>)
     private File configRoot;
+    private RecordFactory defaultFactory = new DefaultRecordFactory();
 
     public Record load(Scope scope, String path)
+    {
+        return load(scope, path, defaultFactory);
+    }
+
+    public Record load(Scope scope, String path, RecordFactory factory)
     {
         File recordDir = getRecordDir(scope, path);
         return null;

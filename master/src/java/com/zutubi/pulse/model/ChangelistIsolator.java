@@ -46,7 +46,7 @@ public class ChangelistIsolator
         {
             // The spec has never been built or even requested.  Just build
             // the latest (we need to start somewhere!).
-            result = Arrays.asList(new Revision[]{project.getScm().createServer().getLatestRevision()});
+            result = Arrays.asList(project.getScm().createServer().getLatestRevision());
         }
         else
         {
@@ -64,7 +64,7 @@ public class ChangelistIsolator
         {
             // Force a build of the latest revision anyway
             // We need to copy the revision as they are unique in the BUILD_SCM table!
-            result = Arrays.asList(new Revision[]{ latestBuiltRevision.copy() });
+            result = Arrays.asList(latestBuiltRevision.copy());
         }
 
         return result;
