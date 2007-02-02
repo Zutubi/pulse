@@ -1,22 +1,20 @@
 package com.zutubi.prototype.form;
 
 import com.zutubi.prototype.form.annotation.Table;
+import com.zutubi.pulse.prototype.record.RecordPropertyInfo;
+import com.zutubi.pulse.prototype.record.RecordTypeInfo;
+import com.zutubi.pulse.prototype.record.RecordTypeRegistry;
+import com.zutubi.pulse.util.AnnotationUtils;
 import com.zutubi.pulse.util.CollectionUtils;
 import com.zutubi.pulse.util.Predicate;
-import com.zutubi.pulse.prototype.RecordTypeRegistry;
-import com.zutubi.pulse.prototype.RecordTypeInfo;
-import com.zutubi.pulse.prototype.RecordPropertyInfo;
 
-import java.util.List;
-import java.util.LinkedList;
-import java.util.Arrays;
-import java.lang.annotation.Annotation;
-import java.lang.reflect.ParameterizedType;
-import java.lang.reflect.Type;
 import java.beans.BeanInfo;
+import java.beans.IntrospectionException;
 import java.beans.Introspector;
 import java.beans.PropertyDescriptor;
-import java.beans.IntrospectionException;
+import java.lang.annotation.Annotation;
+import java.util.LinkedList;
+import java.util.List;
 
 /**
  *
@@ -37,7 +35,7 @@ public class TableDescriptorFactory
         // Handle the first pass analysis.  Here, all of the fields are considered on an individual basis.
         for (PropertyDescriptor propertyDescriptor : beanInfo.getPropertyDescriptors())
         {
-            List<Annotation> annotations = AnnotationUtils.annotationsFromField(propertyDescriptor);
+            List<Annotation> annotations = AnnotationUtils.annotationsFromProperty(propertyDescriptor);
             Annotation tableAnnotation = CollectionUtils.find(annotations, new Predicate<Annotation>()
             {
                 public boolean satisfied(Annotation annotation)

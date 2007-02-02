@@ -2,13 +2,13 @@ package com.zutubi.prototype.form;
 
 import com.zutubi.prototype.form.annotation.AnnotationHandler;
 import com.zutubi.prototype.form.annotation.Handler;
+import com.zutubi.pulse.util.AnnotationUtils;
 
 import java.beans.BeanInfo;
 import java.beans.IntrospectionException;
 import java.beans.Introspector;
 import java.beans.PropertyDescriptor;
 import java.lang.annotation.Annotation;
-import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
@@ -55,7 +55,7 @@ public class FormDescriptorFactory
 
     private void handleAnnotations(Descriptor descriptor, PropertyDescriptor propertyDescriptor) throws IntrospectionException, IllegalAccessException, InstantiationException
     {
-        handleAnnotations(descriptor, AnnotationUtils.annotationsFromField(propertyDescriptor));
+        handleAnnotations(descriptor, AnnotationUtils.annotationsFromProperty(propertyDescriptor));
     }
 
     private void handleAnnotations(Descriptor descriptor, List<Annotation> annotations) throws IntrospectionException, IllegalAccessException, InstantiationException

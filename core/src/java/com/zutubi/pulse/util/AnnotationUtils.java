@@ -1,20 +1,18 @@
-package com.zutubi.prototype.form;
+package com.zutubi.pulse.util;
 
+import java.beans.IntrospectionException;
+import java.beans.PropertyDescriptor;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
-import java.util.List;
-import java.util.LinkedList;
 import java.util.Arrays;
-import java.beans.PropertyDescriptor;
-import java.beans.IntrospectionException;
+import java.util.LinkedList;
+import java.util.List;
 
 /**
- *
- *
  */
 public class AnnotationUtils
 {
-    public static List<Annotation> annotationsFromField(PropertyDescriptor property) throws IntrospectionException
+    public static List<Annotation> annotationsFromProperty(PropertyDescriptor property) throws IntrospectionException
     {
         List<Annotation> annotations = new LinkedList<Annotation>();
 
@@ -29,8 +27,6 @@ public class AnnotationUtils
         {
             annotations.addAll(Arrays.asList(writeMethod.getAnnotations()));
         }
-
-        // get the field definition as well if it exists?
 
         return annotations;
     }

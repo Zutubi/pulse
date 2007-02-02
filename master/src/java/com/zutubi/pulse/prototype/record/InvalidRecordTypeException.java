@@ -1,4 +1,4 @@
-package com.zutubi.pulse.prototype;
+package com.zutubi.pulse.prototype.record;
 
 import com.zutubi.pulse.core.PulseException;
 

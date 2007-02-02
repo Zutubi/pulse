@@ -1,6 +1,7 @@
 package com.zutubi.pulse.prototype;
 
 import com.zutubi.pulse.prototype.record.Record;
+import com.zutubi.pulse.prototype.record.RecordTypeRegistry;
 
 /**
  * <class comment/>

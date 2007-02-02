@@ -1,6 +1,5 @@
 package com.zutubi.pulse.prototype.record;
 
-import com.zutubi.pulse.prototype.RecordTypeRegistry;
 import com.zutubi.pulse.prototype.record.types.*;
 import com.zutubi.pulse.test.PulseTestCase;
 
@@ -22,15 +21,15 @@ public class DefaultRecordMapperTest extends PulseTestCase
         typeRegistry.register(ChildType2.class);
         typeRegistry.register(GrandchildType.class);
         typeRegistry.register(ParentType.class);
-        typeRegistry.register(PolymorphicList.class);
+        //typeRegistry.register(PolymorphicList.class);
         typeRegistry.register(PolymorphicMap.class);
         typeRegistry.register(PolymorphicReference.class);
         typeRegistry.register(SingleEnum.class);
         typeRegistry.register(StringList.class);
-        typeRegistry.register(StringMap.class);
+        //typeRegistry.register(StringMap.class);
         typeRegistry.register(SingleReference.class);
         typeRegistry.register(SingleString.class);
-        typeRegistry.register(SingleStringList.class);
+        //typeRegistry.register(SingleStringList.class);
         typeRegistry.register(SingleStringMap.class);
         mapper = new DefaultRecordMapper();
         mapper.setRecordTypeRegistry(typeRegistry);
@@ -88,48 +87,48 @@ public class DefaultRecordMapperTest extends PulseTestCase
         assertEquals(Arrays.asList("s1", "s2", "s3"), s.getList());
     }
 
-    public void testObjectList() throws Exception
-    {
-        SingleStringList ssl = new SingleStringList("one", "two");
-        Record r = mapper.toRecord(ssl);
-        assertEquals("singlestringlist", r.getSymbolicName());
-        assertEquals(1, r.size());
-        Object o = r.get("list");
-        assertNotNull(o);
-        assertTrue(o instanceof List);
-        List list = (List)o;
-        assertEquals(2, list.size());
-        assertSingleStringRecord((Record) list.get(0), "one");
-        assertSingleStringRecord((Record) list.get(1), "two");
+//    public void testObjectList() throws Exception
+//    {
+//        SingleStringList ssl = new SingleStringList("one", "two");
+//        Record r = mapper.toRecord(ssl);
+//        assertEquals("singlestringlist", r.getSymbolicName());
+//        assertEquals(1, r.size());
+//        Object o = r.get("list");
+//        assertNotNull(o);
+//        assertTrue(o instanceof List);
+//        List list = (List)o;
+//        assertEquals(2, list.size());
+//        assertSingleStringRecord((Record) list.get(0), "one");
+//        assertSingleStringRecord((Record) list.get(1), "two");
+//
+//        o = mapper.fromRecord(r);
+//        assertTrue(o instanceof SingleStringList);
+//        assertEquals(ssl, o);
+//    }
 
-        o = mapper.fromRecord(r);
-        assertTrue(o instanceof SingleStringList);
-        assertEquals(ssl, o);
-    }
-
-    public void testStringMap() throws Exception
-    {
-        StringMap sm = new StringMap();
-        sm.put("foo", "bar");
-        sm.put("baz", "quux");
-
-        Record r = mapper.toRecord(sm);
-        assertEquals("stringmap", r.getSymbolicName());
-        assertEquals(1, r.size());
-        Object mo = r.get("map");
-        assertNotNull(mo);
-        assertTrue(mo instanceof Map);
-        Map map = (Map) mo;
-        assertEquals(2, map.size());
-        assertEquals("bar", map.get("foo"));
-        assertEquals("quux", map.get("baz"));
-
-        Object o = mapper.fromRecord(r);
-        assertTrue(o instanceof StringMap);
-        StringMap s = (StringMap) o;
-        assertEquals("bar", s.get("foo"));
-        assertEquals("quux", s.get("baz"));
-    }
+//    public void testStringMap() throws Exception
+//    {
+//        StringMap sm = new StringMap();
+//        sm.put("foo", "bar");
+//        sm.put("baz", "quux");
+//
+//        Record r = mapper.toRecord(sm);
+//        assertEquals("stringmap", r.getSymbolicName());
+//        assertEquals(1, r.size());
+//        Object mo = r.get("map");
+//        assertNotNull(mo);
+//        assertTrue(mo instanceof Map);
+//        Map map = (Map) mo;
+//        assertEquals(2, map.size());
+//        assertEquals("bar", map.get("foo"));
+//        assertEquals("quux", map.get("baz"));
+//
+//        Object o = mapper.fromRecord(r);
+//        assertTrue(o instanceof StringMap);
+//        StringMap s = (StringMap) o;
+//        assertEquals("bar", s.get("foo"));
+//        assertEquals("quux", s.get("baz"));
+//    }
 
     public void testObjectMap() throws Exception
     {
@@ -187,10 +186,10 @@ public class DefaultRecordMapperTest extends PulseTestCase
         testRoundTrip(new PolymorphicReference(new GrandchildType(1, "one", 2L)));
     }
 
-    public void testPolymorphicList() throws Exception
-    {
-        testRoundTrip(new PolymorphicList(new ParentType(1), new ChildType1(2, "3"), new ChildType2(4, "5", "6"), new GrandchildType(7, "8", 9L)));
-    }
+//    public void testPolymorphicList() throws Exception
+//    {
+//        testRoundTrip(new PolymorphicList(new ParentType(1), new ChildType1(2, "3"), new ChildType2(4, "5", "6"), new GrandchildType(7, "8", 9L)));
+//    }
 
     public void testPolymorphicMap() throws Exception
     {
