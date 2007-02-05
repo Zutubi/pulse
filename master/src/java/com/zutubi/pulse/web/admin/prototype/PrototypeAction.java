@@ -1,9 +1,7 @@
 package com.zutubi.pulse.web.admin.prototype;
 
 import com.opensymphony.xwork.ActionContext;
-import com.zutubi.prototype.form.FieldDescriptor;
-import com.zutubi.prototype.form.FormDescriptor;
-import com.zutubi.prototype.form.FormDescriptorFactory;
+import com.zutubi.prototype.form.*;
 import com.zutubi.prototype.freemarker.GetTextMethod;
 import com.zutubi.pulse.prototype.CvsConfiguration;
 import com.zutubi.pulse.prototype.SvnConfiguration;
@@ -11,15 +9,10 @@ import com.zutubi.pulse.prototype.record.InvalidRecordTypeException;
 import com.zutubi.pulse.prototype.record.Record;
 import com.zutubi.pulse.prototype.record.RecordTypeRegistry;
 import com.zutubi.pulse.web.admin.record.RecordActionSupport;
-import freemarker.cache.FileTemplateLoader;
-import freemarker.cache.MultiTemplateLoader;
-import freemarker.cache.TemplateLoader;
 import freemarker.core.DelegateBuiltin;
 import freemarker.template.Configuration;
 import freemarker.template.Template;
 
-import java.io.File;
-import java.io.IOException;
 import java.io.StringWriter;
 import java.util.*;
 
@@ -30,27 +23,32 @@ public class PrototypeAction extends RecordActionSupport
     private Configuration configuration;
 
     // input: data to be loaded - path / id  from the template manager -> templateRecord.
-//    private TemplateManager templateManager = new TemplateManagerImpl();
-    private RecordTypeRegistry typeRegistry = new RecordTypeRegistry();
+    private static RecordTypeRegistry typeRegistry = new RecordTypeRegistry();
+    static
+    {
+        try
+        {
+            typeRegistry.register("svnConfiguration", SvnConfiguration.class);
+            typeRegistry.register("cvsConfiguration", CvsConfiguration.class);
+        }
+        catch (InvalidRecordTypeException e)
+        {
+            e.printStackTrace();
+        }
+    }
 
     private String formHtml;
 
-    private String[] tableHtml = new String[0];
-
-    public PrototypeAction() throws InvalidRecordTypeException
-    {
-        typeRegistry.register("svnConfiguration", SvnConfiguration.class);
-        typeRegistry.register("cvsConfiguration", CvsConfiguration.class);
-    }
+    private List<String> tableHtml = new LinkedList<String>();
 
     public String getFormHtml()
     {
         return formHtml;
     }
 
-    public void setTypeRegistry(RecordTypeRegistry typeRegistry)
+    public List<String> getTableHtml()
     {
-        this.typeRegistry = typeRegistry;
+        return tableHtml;
     }
 
     public void setFreemarkerConfiguration(Configuration configuration)
@@ -75,6 +73,7 @@ public class PrototypeAction extends RecordActionSupport
                 data.put(key, parameters.get(key)[0]);
             }
         }
+        
         projectConfigurationManager.setRecord(getProjectId(), getPath(), data);
 
         // regenerate the form html.
@@ -85,7 +84,6 @@ public class PrototypeAction extends RecordActionSupport
 
     public String execute() throws Exception
     {
-
         // we have a project id and path.
         generateHtml();
         return SUCCESS;
@@ -95,13 +93,10 @@ public class PrototypeAction extends RecordActionSupport
     {
         Record r = getRecord();
 
-        Class type = typeRegistry.getType(r.getSymbolicName());
-
-        FormDescriptorFactory factory = new FormDescriptorFactory();
-        FormDescriptor formDescriptor = factory.createDescriptor(type);
+        FormDescriptorFactory formFactory = new FormDescriptorFactory();
+        formFactory.setTypeRegistry(typeRegistry);
+        FormDescriptor formDescriptor = formFactory.createDescriptor(r.getSymbolicName());
         addHiddenFields(formDescriptor);
-
-        
 
         Map<String, Object> context = new HashMap<String, Object>();
         context.put("form", formDescriptor.instantiate(r));
@@ -117,6 +112,26 @@ public class PrototypeAction extends RecordActionSupport
         template.process(context, writer);
 
         formHtml = writer.toString();
+
+        TableDescriptorFactory tableFactory = new TableDescriptorFactory();
+        tableFactory.setTypeRegistry(typeRegistry);
+        for (TableDescriptor tableDescriptor : tableFactory.createDescriptors(r.getSymbolicName()))
+        {
+            context = new HashMap<String, Object>();
+            context.put("table", tableDescriptor.instantiate(r.get(tableDescriptor.getName())));
+            context.put("i18nText", new GetTextMethod());
+
+            // provide some syntactic sweetener by linking the i18n text method to the ?i18n builtin function.
+            DelegateBuiltin.conditionalRegistration("i18n", "i18nText");
+
+            // handle rendering of the freemarker template.
+            writer = new StringWriter();
+
+            template = configuration.getTemplate("table.ftl");
+            template.process(context, writer);
+
+            tableHtml.add(writer.toString());
+        }
     }
 
     private void addHiddenFields(FormDescriptor formDescriptor)
@@ -133,25 +148,4 @@ public class PrototypeAction extends RecordActionSupport
         hiddenRecordPath.getParameters().put("value", getPath());
         formDescriptor.add(hiddenRecordPath);
     }
-
-    private static TemplateLoader getMultiLoader()
-    {
-        File root = new File("c:/projects/pulse/trunk");
-        List<String> templateRoots = Arrays.asList("master/src/templates", "master/src/www");
-
-        FileTemplateLoader loaders[] = new FileTemplateLoader[templateRoots.size()];
-        for (int i = 0; i < loaders.length; i++)
-        {
-            try
-            {
-                loaders[i] = new FileTemplateLoader(new File(root, templateRoots.get(i)));
-            }
-            catch (IOException e)
-            {
-                e.printStackTrace();
-            }
-        }
-        return new MultiTemplateLoader(loaders);
-    }
-
 }

@@ -1,17 +1,11 @@
 package com.zutubi.prototype.form;
 
 import com.zutubi.prototype.form.annotation.Table;
-import com.zutubi.pulse.prototype.record.RecordPropertyInfo;
 import com.zutubi.pulse.prototype.record.RecordTypeInfo;
 import com.zutubi.pulse.prototype.record.RecordTypeRegistry;
-import com.zutubi.pulse.util.AnnotationUtils;
-import com.zutubi.pulse.util.CollectionUtils;
-import com.zutubi.pulse.util.Predicate;
+import com.zutubi.pulse.prototype.record.ValueListRecordPropertyInfo;
 
-import java.beans.BeanInfo;
 import java.beans.IntrospectionException;
-import java.beans.Introspector;
-import java.beans.PropertyDescriptor;
 import java.lang.annotation.Annotation;
 import java.util.LinkedList;
 import java.util.List;
@@ -26,43 +20,55 @@ public class TableDescriptorFactory
 
     public List<TableDescriptor> createDescriptors(Class type) throws IntrospectionException
     {
+        RecordTypeInfo typeInfo = typeRegistry.getInfo(type);
+        return createDescriptors(typeInfo);
+    }
+
+    public List<TableDescriptor> createDescriptors(String symbolicName) throws IntrospectionException
+    {
+        RecordTypeInfo typeInfo = typeRegistry.getInfo(symbolicName);
+        return createDescriptors(typeInfo);
+    }
+
+    public List<TableDescriptor> createDescriptors(RecordTypeInfo typeInfo) throws IntrospectionException
+    {
         List<TableDescriptor> tableDescriptors = new LinkedList<TableDescriptor>();
 
-        BeanInfo beanInfo = Introspector.getBeanInfo(type, Object.class);
-
-        RecordTypeInfo typeInfo = typeRegistry.getInfo(type);
-
         // Handle the first pass analysis.  Here, all of the fields are considered on an individual basis.
-        for (PropertyDescriptor propertyDescriptor : beanInfo.getPropertyDescriptors())
+        for (ValueListRecordPropertyInfo propertyInfo : typeInfo.getValueListInfos())
         {
-            List<Annotation> annotations = AnnotationUtils.annotationsFromProperty(propertyDescriptor);
-            Annotation tableAnnotation = CollectionUtils.find(annotations, new Predicate<Annotation>()
-            {
-                public boolean satisfied(Annotation annotation)
-                {
-                    return annotation instanceof Table;
-                }
-            });
-            
-            if (tableAnnotation != null)
-            {
-                tableDescriptors.add(createTableDescriptor(propertyDescriptor, tableAnnotation, typeInfo));
-            }
+            tableDescriptors.add(createTableDescriptor(propertyInfo));
         }
         return tableDescriptors;
     }
 
-    public TableDescriptor createTableDescriptor(PropertyDescriptor propertyDescriptor, Annotation tableAnnotation, RecordTypeInfo typeInfo)
+    private TableDescriptor createTableDescriptor(ValueListRecordPropertyInfo propertyInfo)
     {
+        Annotation tableAnnotation = propertyInfo.getAnnotation(Table.class);
+        if (tableAnnotation != null)
+        {
+            // if there is a table annotation, use it to augment.
+        }
+
         TableDescriptor tableDescriptor = new TableDescriptor();
-        tableDescriptor.setName(propertyDescriptor.getName());
+        tableDescriptor.setName(propertyInfo.getName());
 
         // generate columns...
+        ColumnDescriptor columnDescriptor = new ColumnDescriptor();
+        columnDescriptor.setFormatter(new SimpleColumnFormatter());
+        columnDescriptor.setName(propertyInfo.getName() + ".header");
+        tableDescriptor.addDescriptor(columnDescriptor);    
 
-        RecordPropertyInfo propertyInfo = typeInfo.getProperty(propertyDescriptor.getName());
-        propertyInfo.getType();
+        //TODO: check that the user has the necessary Auth to view / execute these actions.
 
+        // column b: actions (remove, edit)
+        ColumnDescriptor actionColumnDescriptor = new ActionColumnDescriptor("edit", propertyInfo);
+        tableDescriptor.addDescriptor(actionColumnDescriptor);
 
+        actionColumnDescriptor = new ActionColumnDescriptor("delete", propertyInfo);
+        tableDescriptor.addDescriptor(actionColumnDescriptor);
+
+        //TODO: add the add action row to the base of this table.
 
         return tableDescriptor;
     }

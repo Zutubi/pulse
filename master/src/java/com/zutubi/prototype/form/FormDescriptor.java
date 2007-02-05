@@ -4,6 +4,7 @@ import com.zutubi.prototype.form.model.Field;
 import com.zutubi.prototype.form.model.Form;
 import com.zutubi.pulse.util.CollectionUtils;
 import com.zutubi.pulse.util.Predicate;
+import com.zutubi.pulse.prototype.record.RecordTypeInfo;
 
 import java.util.*;
 
@@ -15,16 +16,11 @@ public class FormDescriptor implements Descriptor
 {
     private List<FieldDescriptor> fieldDescriptors = new LinkedList<FieldDescriptor>();
 
-    private Class type;
+    private RecordTypeInfo type;
 
     private Map<String, Object> parameters = new HashMap<String, Object>();
 
-    public Class getType()
-    {
-        return type;
-    }
-
-    public void setType(Class type)
+    public void setType(RecordTypeInfo type)
     {
         this.type = type;
     }
@@ -73,7 +69,7 @@ public class FormDescriptor implements Descriptor
     public Form instantiate(Object data)
     {
         Form form = new Form();
-        form.setId(type.getSimpleName());    
+        form.setId(type.getType().getSimpleName());    
 
         List<String> fieldOrder = evaluateFieldOrder();
 

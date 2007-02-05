@@ -33,6 +33,12 @@ $action.formHtml
 </p>
 <p>example text</p>
 
+#foreach($html in $action.tableHtml)
+<p>
+    $html
+</p>
+#end
+
 </div>
 
 <a href="prototype-test.action">test page</a>

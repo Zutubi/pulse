@@ -4,9 +4,9 @@ import com.zutubi.pulse.form.descriptor.FormDescriptor;
 import com.zutubi.pulse.form.descriptor.FieldDescriptor;
 import com.zutubi.pulse.form.descriptor.DescriptorDecorator;
 import com.zutubi.pulse.form.descriptor.Descriptor;
+import com.zutubi.pulse.util.AnnotationUtils;
 import com.zutubi.validation.bean.BeanUtils;
 import com.zutubi.validation.bean.BeanException;
-import com.zutubi.validation.bean.AnnotationUtils;
 import com.zutubi.validation.annotations.Required;
 
 import java.lang.annotation.Annotation;

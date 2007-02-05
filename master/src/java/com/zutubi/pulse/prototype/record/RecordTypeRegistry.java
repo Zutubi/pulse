@@ -13,6 +13,7 @@ import java.lang.reflect.Type;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Arrays;
 
 /**
  * A registry that maps from record symbolic names to classes and vice-versa.
@@ -29,7 +30,7 @@ public class RecordTypeRegistry
     {
         RecordTypeInfo info = new RecordTypeInfo(symbolicName, type);
 
-        validateRecordType(type);
+        validateRecordType(info);
         BeanInfo beanInfo;
 
         try
@@ -50,16 +51,20 @@ public class RecordTypeRegistry
         return info;
     }
 
-    private void validateRecordType(Class type) throws InvalidRecordTypeException
+    private void validateRecordType(RecordTypeInfo type) throws InvalidRecordTypeException
     {
+        Class clzz = type.getType();
+
         try
         {
-            type.getConstructor();
+            clzz.getConstructor();
         }
         catch (NoSuchMethodException e)
         {
             throw new InvalidRecordTypeException("Record types must have a public, zero-argument constructor");
         }
+
+        type.addAnnotations(Arrays.asList(clzz.getAnnotations()));
     }
 
     private void validateAndAddProperty(RecordTypeInfo info, PropertyDescriptor descriptor) throws InvalidRecordTypeException, IntrospectionException

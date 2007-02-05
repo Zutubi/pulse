@@ -11,8 +11,30 @@ public class Table
 {
     private List<Column> columns = new LinkedList<Column>();
 
+    private List<Row> rows = new LinkedList<Row>();
+
     public void addColumn(Column column)
     {
         columns.add(column);
+    }
+
+    public List<Column> getColumns()
+    {
+        return columns;
+    }
+
+    public void addRow(Row row)
+    {
+        rows.add(row);
+    }
+
+    public List<Row> getRows()
+    {
+        return rows;
+    }
+
+    public int getColspan()
+    {
+        return columns.size();
     }
 }

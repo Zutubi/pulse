@@ -1,20 +1,26 @@
 <table>
     <tr>
+        <th colspan="1">&nbsp;</th>
         <#list table.columns as column>
-            <th>${column.name}</th>
+            <th colspan="${column.span}">${column.name?i18n}</th>
         </#list>
     </tr>
-    <#if table.rows.size &gt; 0>
+    <#if table.rows?size &gt; 0>
         <#list table.rows as row>
         <tr>
-            <#list row.columns as column>
-                <td span="1">${column.value}</td>
+            <td colspan="1">${row.index}</td>
+            <#list row.cells as cell>
+                <#if cell.parameters.type?exists>
+                    <td colspan="${cell.span}"><a href="">${cell.parameters.label?i18n}</a></td>
+                <#else>
+                    <td colspan="${cell.span}">${cell.value}</td>
+                </#if>
             </#list>
         </tr>
         </#list>
     <#else>
         <tr>
-            <td>no data duuude</td>
+            <td>problem generating table.</td>
         </tr>
     </#if>
 </table>

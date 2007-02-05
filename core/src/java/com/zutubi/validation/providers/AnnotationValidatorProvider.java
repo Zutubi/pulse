@@ -5,8 +5,8 @@ import com.zutubi.validation.Validator;
 import com.zutubi.validation.FieldValidator;
 import com.zutubi.validation.annotations.Constraint;
 import com.zutubi.validation.bean.ObjectFactory;
-import com.zutubi.validation.bean.AnnotationUtils;
 import com.zutubi.validation.bean.DefaultObjectFactory;
+import com.zutubi.pulse.util.AnnotationUtils;
 
 import java.util.*;
 import java.lang.reflect.Method;

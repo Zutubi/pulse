@@ -16,6 +16,6 @@ public class GetTextMethod implements TemplateMethodModel
         {
             throw new TemplateModelException("Wrong arguments");
         }
-        return new SimpleScalar((String)args.get(0));
+        return new SimpleScalar((String) args.get(0));
     }
 }

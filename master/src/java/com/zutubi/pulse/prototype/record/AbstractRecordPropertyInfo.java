@@ -1,5 +1,9 @@
 package com.zutubi.pulse.prototype.record;
 
+import com.zutubi.pulse.util.CollectionUtils;
+import com.zutubi.pulse.util.Predicate;
+import com.zutubi.prototype.form.annotation.Table;
+
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
@@ -48,6 +52,28 @@ public abstract class AbstractRecordPropertyInfo implements RecordPropertyInfo
     public List<Annotation> getAnnotations()
     {
         return annotations;
+    }
+
+    public <T extends Annotation> T getAnnotation(final Class<T> type)
+    {
+        return (T) CollectionUtils.find(annotations, new Predicate<Annotation>()
+        {
+            public boolean satisfied(Annotation annotation)
+            {
+                return annotation.getClass() == type;
+            }
+        });
+    }
+
+    public <T extends Annotation> List<T> getAnnotations(final Class<T> type)
+    {
+        return (List<T>) CollectionUtils.filter(annotations, new Predicate<Annotation>()
+        {
+            public boolean satisfied(Annotation annotation)
+            {
+                return annotation.getClass() == type;
+            }
+        });
     }
 
     void addAnnotations(List<Annotation> annotations)

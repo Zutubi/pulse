@@ -2,6 +2,7 @@ package com.zutubi.prototype.form;
 
 import com.zutubi.prototype.mock.Sample;
 import com.zutubi.prototype.freemarker.GetTextMethod;
+import com.zutubi.pulse.prototype.record.RecordTypeRegistry;
 import freemarker.cache.FileTemplateLoader;
 import freemarker.cache.MultiTemplateLoader;
 import freemarker.cache.TemplateLoader;

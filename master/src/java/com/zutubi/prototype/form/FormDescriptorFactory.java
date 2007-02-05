@@ -2,12 +2,11 @@ package com.zutubi.prototype.form;
 
 import com.zutubi.prototype.form.annotation.AnnotationHandler;
 import com.zutubi.prototype.form.annotation.Handler;
-import com.zutubi.pulse.util.AnnotationUtils;
+import com.zutubi.pulse.prototype.record.RecordTypeInfo;
+import com.zutubi.pulse.prototype.record.RecordTypeRegistry;
+import com.zutubi.pulse.prototype.record.SimpleRecordPropertyInfo;
 
-import java.beans.BeanInfo;
 import java.beans.IntrospectionException;
-import java.beans.Introspector;
-import java.beans.PropertyDescriptor;
 import java.lang.annotation.Annotation;
 import java.util.Arrays;
 import java.util.LinkedList;
@@ -19,43 +18,49 @@ import java.util.List;
  */
 public class FormDescriptorFactory
 {
+    private RecordTypeRegistry typeRegistry;
+
+    public FormDescriptor createDescriptor(String symbolicName) throws IntrospectionException, IllegalAccessException, InstantiationException
+    {
+        RecordTypeInfo typeInfo = typeRegistry.getInfo(symbolicName);
+        return createDescriptor(typeInfo);
+    }
+
     public FormDescriptor createDescriptor(Class type) throws IntrospectionException, IllegalAccessException, InstantiationException
     {
+        RecordTypeInfo typeInfo = typeRegistry.getInfo(type);
+        return createDescriptor(typeInfo);
+    }
+
+    public FormDescriptor createDescriptor(RecordTypeInfo typeInfo) throws IllegalAccessException, InstantiationException, IntrospectionException
+    {
         FormDescriptor descriptor = new FormDescriptor();
-        descriptor.setType(type);
-        
-        List<Annotation> annotations = Arrays.asList(type.getAnnotations());
+        descriptor.setType(typeInfo);
+
+        List<Annotation> annotations = typeInfo.getAnnotations();
         handleAnnotations(descriptor, annotations);
 
-        descriptor.setFieldDescriptors(buildFieldDescriptors(type));
+        descriptor.setFieldDescriptors(buildFieldDescriptors(typeInfo));
 
         return descriptor;
     }
 
-    private List<FieldDescriptor> buildFieldDescriptors(Class type) throws IntrospectionException, IllegalAccessException, InstantiationException
+    private List<FieldDescriptor> buildFieldDescriptors(RecordTypeInfo typeInfo) throws IntrospectionException, IllegalAccessException, InstantiationException
     {
         List<FieldDescriptor> fieldDescriptors = new LinkedList<FieldDescriptor>();
 
-        BeanInfo beanInfo = Introspector.getBeanInfo(type, Object.class);
-
         // Handle the first pass analysis.  Here, all of the fields are considered on an individual basis.
-        for (PropertyDescriptor propertyDescriptor : beanInfo.getPropertyDescriptors())
+        for (SimpleRecordPropertyInfo propertyInfo : typeInfo.getSimpleInfos())
         {
             FieldDescriptor fieldDescriptor = new FieldDescriptor();
-            fieldDescriptor.setName(propertyDescriptor.getName());
+            fieldDescriptor.setName(propertyInfo.getName());
 
-            handleAnnotations(fieldDescriptor, propertyDescriptor);
+            handleAnnotations(fieldDescriptor, propertyInfo.getAnnotations());
 
             fieldDescriptors.add(fieldDescriptor);
         }
 
         return fieldDescriptors;
-    }
-
-
-    private void handleAnnotations(Descriptor descriptor, PropertyDescriptor propertyDescriptor) throws IntrospectionException, IllegalAccessException, InstantiationException
-    {
-        handleAnnotations(descriptor, AnnotationUtils.annotationsFromProperty(propertyDescriptor));
     }
 
     private void handleAnnotations(Descriptor descriptor, List<Annotation> annotations) throws IntrospectionException, IllegalAccessException, InstantiationException
@@ -65,7 +70,7 @@ public class FormDescriptorFactory
         {
             if (annotation.annotationType().getName().startsWith("java.lang"))
             {
-                // ignore standard annotations.
+                // ignore standard ann10otations.
                 continue;
             }
 
@@ -79,5 +84,15 @@ public class FormDescriptorFactory
                 handler.process(annotation, descriptor);
             }
         }
+    }
+
+    /**
+     * Required resource
+     *
+     * @param typeRegistry instance.
+     */
+    public void setTypeRegistry(RecordTypeRegistry typeRegistry)
+    {
+        this.typeRegistry = typeRegistry;
     }
 }

@@ -8,6 +8,7 @@ import com.zutubi.pulse.web.LookupErrorException;
 
 import java.util.Map;
 import java.util.HashMap;
+import java.util.Arrays;
 
 /**
  * The base for actions dealing with project (and template) records.
@@ -79,11 +80,10 @@ public class RecordActionSupport extends ActionSupport
             r.put("url", "http://www.zutubi.com");
             r.put("password", "secret");
             r.put("name", "Duuude");
+            r.put("filterPaths", Arrays.asList("a", "b", "c"));
 
             TemplateRecord tr = new TemplateRecord(r, "1");
             store.put("some/path", tr);
-
-            
 
             r = new SingleRecord("cvsConfiguration");
             r.put("branch", "BRANCH");

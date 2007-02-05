@@ -1,7 +1,7 @@
 package com.zutubi.prototype.form.annotation;
 
 import com.zutubi.prototype.form.Descriptor;
-import com.zutubi.validation.bean.AnnotationUtils;
+import com.zutubi.pulse.util.AnnotationUtils;
 
 import java.lang.annotation.Annotation;
 
