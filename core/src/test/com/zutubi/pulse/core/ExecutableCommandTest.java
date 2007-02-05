@@ -132,10 +132,40 @@ public class ExecutableCommandTest extends PulseTestCase
             FileSystemUtils.setPermissions(file, FileSystemUtils.PERMISSION_ALL_FULL);
         }
 
-
         ExecutableCommand command = new ExecutableCommand();
         command.setWorkingDir(new File("nested"));
         command.setExe(file.getPath());
+
+        CommandResult result = new CommandResult("work");
+        execute(command, result);
+        assertTrue(result.succeeded());
+    }
+
+    public void testRelativeExe() throws IOException
+    {
+        File dir = new File(baseDirectory, "nested");
+        File file;
+        String exe;
+
+        assertTrue(dir.mkdir());
+
+        if (SystemUtils.IS_WINDOWS)
+        {
+            exe = "list.bat";
+            file = new File(dir, exe);
+            FileSystemUtils.createFile(file, "dir");
+        }
+        else
+        {
+            exe = "list.sh";
+            file = new File(dir, exe);
+            FileSystemUtils.createFile(file, "#! /bin/sh\nls");
+            FileSystemUtils.setPermissions(file, FileSystemUtils.PERMISSION_ALL_FULL);
+        }
+
+        ExecutableCommand command = new ExecutableCommand();
+        command.setWorkingDir(new File("nested"));
+        command.setExe(exe);
 
         CommandResult result = new CommandResult("work");
         execute(command, result);

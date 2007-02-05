@@ -31,8 +31,9 @@ public class ExecutableCommand implements Command, ScopeAware
 
     public void execute(CommandContext context, CommandResult cmdResult)
     {
-        ProcessBuilder builder = new ProcessBuilder(constructCommand());
-        builder.directory(getWorkingDir(context.getPaths()));
+        File workingDir = getWorkingDir(context.getPaths());
+        ProcessBuilder builder = new ProcessBuilder(constructCommand(workingDir));
+        builder.directory(workingDir);
         updateChildEnvironment(builder, context);
 
         builder.redirectErrorStream(true);
@@ -80,7 +81,7 @@ public class ExecutableCommand implements Command, ScopeAware
             }
             else if (message.endsWith("error=267"))
             {
-                message = "Working directory '" + workingDir.getPath() + "' does not exist";
+                message = "Working directory '" + this.workingDir.getPath() + "' does not exist";
             }
 
             throw new BuildException("Unable to create process: " + message, e);
@@ -278,17 +279,27 @@ public class ExecutableCommand implements Command, ScopeAware
         return null;
     }
 
-    private List<String> constructCommand()
+    private List<String> constructCommand(File workingDir)
     {
         String binary = exe;
 
         File exeFile = new File(exe);
         if (!exeFile.isAbsolute())
         {
-            exeFile = SystemUtils.findInPath(exe, scope == null ? null : scope.getPathDirectories());
-            if (exeFile != null)
+            // CIB-902: search relative to the working directory before going
+            // to the path.
+            File relativeToWork = new File(workingDir, exe);
+            if(relativeToWork.exists())
             {
-                binary = exeFile.getAbsolutePath();
+                binary = relativeToWork.getAbsolutePath();
+            }
+            else
+            {
+                exeFile = SystemUtils.findInPath(exe, scope == null ? null : scope.getPathDirectories());
+                if (exeFile != null)
+                {
+                    binary = exeFile.getAbsolutePath();
+                }
             }
         }
 
