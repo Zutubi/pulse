@@ -31,8 +31,12 @@ public class PulseFile implements ScopeAware
         return globalScope;
     }
 
-    public void addRecipe(Recipe r)
+    public void addRecipe(Recipe r) throws FileLoadException
     {
+        if(getRecipe(r.getName()) != null)
+        {
+            throw new FileLoadException("A recipe with name '" + r.getName() + "' already exists");
+        }
         recipes.add(r);
     }
 

@@ -338,6 +338,20 @@ public class FileLoaderTest extends FileLoaderTestBase
         }
     }
 
+    public void testDuplicateRecipe() throws PulseException
+    {
+        try
+        {
+            PulseFile bf = new PulseFile();
+            loader.load(getInput("testDuplicateRecipe"), bf, null, new FileResourceRepository(), new RecipeLoadPredicate(bf, "don't load!"));
+            fail();
+        }
+        catch (PulseException e)
+        {
+            assertEquals("Processing element 'recipe': starting at line 7 column 9: A recipe with name 'a' already exists", e.getMessage());
+        }
+    }
+
     public void testUnknownAttribute()
     {
         try
