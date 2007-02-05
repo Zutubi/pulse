@@ -22,6 +22,8 @@ public class SimpleMasterConfigurationManager extends AbstractConfigurationManag
 
     private MasterConfiguration appConfig;
 
+    private DatabaseConfig dbConfig;
+
     private Data data;
 
     public SystemConfiguration getSystemConfig()
@@ -92,15 +94,19 @@ public class SimpleMasterConfigurationManager extends AbstractConfigurationManag
 
     public DatabaseConfig getDatabaseConfig() throws IOException
     {
-        File configFile = new File(getUserPaths().getUserConfigRoot(), "database.properties");
-        if (configFile.exists())
+        if (dbConfig == null)
         {
-            return new DatabaseConfig(IOUtils.read(configFile));
-        }
+            File configFile = new File(getUserPaths().getUserConfigRoot(), "database.properties");
+            if (!configFile.exists())
+            {
+                configFile = new File(getSystemPaths().getConfigRoot(), "database.properties.template");
+            }
 
-        // It is an existing installation, fallback to the defaults.
-        configFile = new File(getSystemPaths().getConfigRoot(), "database.properties.template");
-        return new DatabaseConfig(IOUtils.read(configFile));
+            // It is an existing installation, fallback to the defaults.
+            dbConfig = new DatabaseConfig(IOUtils.read(configFile));
+            dbConfig.setUserPaths(getUserPaths());
+        }
+        return dbConfig;
     }
 
     public Data getData()
