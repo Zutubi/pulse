@@ -1,0 +1,9 @@
+<?xml version="1.0"?>
+<project>
+    <scope>
+        <recipe name="a"/>
+    </scope>
+    <scope>
+        <recipe name="a"/>
+    </scope>
+</project>
