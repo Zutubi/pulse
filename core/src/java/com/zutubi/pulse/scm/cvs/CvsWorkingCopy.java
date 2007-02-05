@@ -41,7 +41,12 @@ public class CvsWorkingCopy extends PersonalBuildSupport implements WorkingCopy
         CVSRoot cvsRoot;
         try
         {
-            cvsRoot = CVSRoot.parse(loadLocalWorkingRoot());
+            String localWorkingRoot = loadLocalWorkingRoot();
+            if (localWorkingRoot == null)
+            {
+                throw new IOException("Failed to retrieve the cvs.root from " + workingDir.getAbsolutePath() + "CVS/Root");
+            }
+            cvsRoot = CVSRoot.parse(localWorkingRoot);
         }
         catch (IOException e)
         {
@@ -55,6 +60,12 @@ public class CvsWorkingCopy extends PersonalBuildSupport implements WorkingCopy
                         "the cvs.root property to the .pulse.properties file.");
             }
         }
+        catch (Exception e)
+        {
+            throw new PersonalBuildException("Unexpected exception generated whilst attempting to determine the " +
+                    "local working copies cvs.root. Cause: " + e.getClass() + ": " + e.getMessage());
+        }
+        
         client.setRoot(cvsRoot);
 
         // is the password specified?
