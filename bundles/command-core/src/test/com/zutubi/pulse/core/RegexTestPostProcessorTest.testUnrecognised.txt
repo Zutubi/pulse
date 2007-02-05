@@ -1,0 +1,6 @@
+[PASS] 10/16/2006:18:19:12:EDT:test1
+[ERROR] 10/16/2006:18:19:12:EDT:test2
+[Some random message] 10/16/2006:18:19:12:EDT:test3
+[FAILURE] 10/16/2006:18:19:12:EDT:test4
+[] 10/16/2006:18:19:13:EDT:test5
+smoketests/smoke complete(5 commands, 1 passed, 4 failed)

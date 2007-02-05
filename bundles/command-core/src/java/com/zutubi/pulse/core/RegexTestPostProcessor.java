@@ -20,6 +20,13 @@ import java.util.regex.Pattern;
  */
 public class RegexTestPostProcessor extends TestReportPostProcessor
 {
+    enum Resolution
+    {
+        APPEND,
+        OFF,
+        PREPEND
+    }
+
     private static final Logger LOG = Logger.getLogger(RegexTestPostProcessor.class);
 
     private BufferedReader reader;
@@ -30,8 +37,10 @@ public class RegexTestPostProcessor extends TestReportPostProcessor
     private int statusGroup;
     private int nameGroup;
 
+    private boolean autoFail = false;
     private boolean trim = true;
-
+    private Resolution resolveConflicts = Resolution.OFF;
+    
     private Map<String, TestCaseResult.Status> statusMap = new HashMap<String, TestCaseResult.Status>();
 
     public RegexTestPostProcessor()
@@ -92,13 +101,32 @@ public class RegexTestPostProcessor extends TestReportPostProcessor
             if (m.matches())
             {
                 String statusString = m.group(statusGroup);
-                if(statusMap.containsKey(statusString))
+                if(autoFail || statusMap.containsKey(statusString))
                 {
                     String testName = m.group(nameGroup);
 
                     TestCaseResult result = new TestCaseResult();
                     result.setName(testName);
-                    result.setStatus(statusMap.get(statusString));
+
+                    TestCaseResult.Status status = statusMap.get(statusString);
+                    if(status == null)
+                    {
+                        // Must be auto-fail case
+                        status = TestCaseResult.Status.FAILURE;
+                    }
+
+                    result.setStatus(status);
+
+                    if(resolveConflicts != Resolution.OFF && tests.hasCase(result.getName()))
+                    {
+                        int addition = 2;
+                        while(tests.hasCase(makeCaseName(result.getName(), addition, resolveConflicts)))
+                        {
+                            addition++;
+                        }
+
+                        result.setName(makeCaseName(result.getName(), addition, resolveConflicts));
+                    }
 
                     tests.add(result);
                 }
@@ -115,6 +143,18 @@ public class RegexTestPostProcessor extends TestReportPostProcessor
     {
         currentLine = reader.readLine();
         return currentLine;
+    }
+
+    private String makeCaseName(String name, int addition, Resolution resolveConflicts)
+    {
+        if(resolveConflicts == Resolution.APPEND)
+        {
+            return name + addition;
+        }
+        else
+        {
+            return Integer.toString(addition) + name;
+        }
     }
 
     public void setRegex(String regex)
@@ -188,8 +228,30 @@ public class RegexTestPostProcessor extends TestReportPostProcessor
         regex = txt;
     }
 
+    public void setAutoFail(boolean autoFail)
+    {
+        this.autoFail = autoFail;
+    }
+
     public void setTrim(boolean trim)
     {
         this.trim = trim;
+    }
+
+    public Resolution getResolveConflicts()
+    {
+        return resolveConflicts;
+    }
+
+    public void setResolveConflicts(String resolution) throws FileLoadException
+    {
+        try
+        {
+            resolveConflicts = Resolution.valueOf(resolution.toUpperCase());
+        }
+        catch(IllegalArgumentException e)
+        {
+            throw new FileLoadException("Unrecognised conflict resolution '" + resolution + "'");
+        }
     }
 }

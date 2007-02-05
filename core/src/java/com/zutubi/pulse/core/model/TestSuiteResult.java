@@ -92,6 +92,11 @@ public class TestSuiteResult extends TestResult
         return cases.get(name);
     }
 
+    public boolean hasCase(String name)
+    {
+        return getCase(name) != null;
+    }
+
     public int getErrors()
     {
         if (errors < 0)
