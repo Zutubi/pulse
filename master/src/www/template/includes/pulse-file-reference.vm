@@ -96,6 +96,9 @@
                                     #refLink("resource")
                                 </li>
                                 <li>
+                                    #refLink("sleep")
+                                </li>
+                                <li>
                                     #refLink("xcodebuild")
                                 </li>
                             </ul>
@@ -111,6 +114,9 @@
                                     </ul>
                                 </li>
                             </ul>
+                        </li>
+                        <li>
+                            #refLink("regex-test.pp")
                         </li>
                         <li>
                             #refLink("xcodebuild.pp")
