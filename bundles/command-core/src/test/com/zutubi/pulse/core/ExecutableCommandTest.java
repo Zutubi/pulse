@@ -112,10 +112,39 @@ public class ExecutableCommandTest extends ExecutableCommandTestBase
             FileSystemUtils.setPermissions(file, FileSystemUtils.PERMISSION_ALL_FULL);
         }
 
-
         ExecutableCommand command = new ExecutableCommand();
         command.setWorkingDir(new File("nested"));
         command.setExe(file.getPath());
+
+        CommandResult result = runCommand(command);
+        assertTrue(result.succeeded());
+    }
+
+    public void testRelativeExe() throws Exception
+    {
+        File dir = new File(baseDir, "nested");
+        File file;
+        String exe;
+
+        assertTrue(dir.mkdir());
+
+        if (SystemUtils.IS_WINDOWS)
+        {
+            exe = "list.bat";
+            file = new File(dir, exe);
+            FileSystemUtils.createFile(file, "dir");
+        }
+        else
+        {
+            exe = "list.sh";
+            file = new File(dir, exe);
+            FileSystemUtils.createFile(file, "#! /bin/sh\nls");
+            FileSystemUtils.setPermissions(file, FileSystemUtils.PERMISSION_ALL_FULL);
+        }
+
+        ExecutableCommand command = new ExecutableCommand();
+        command.setWorkingDir(new File("nested"));
+        command.setExe(exe);
 
         CommandResult result = runCommand(command);
         assertTrue(result.succeeded());
@@ -245,26 +274,17 @@ public class ExecutableCommandTest extends ExecutableCommandTestBase
         command.setExe("thisfiledoesnotexist");
 
         CommandResult result = null;
-        try
-        {
-            result = runCommand(command, 1234);
-            assertTrue(result.errored());
-            fail();
-        }
-        catch (BuildException e)
-        {
-            String message = e.getMessage();
-            boolean java15 = message.contains("No such executable 'thisfiledoesnotexist'");
-            // In Java 1.6, the error reporting is better, so we are
-            // happy to pass it on through.
-            boolean java16 = message.endsWith("The system cannot find the file specified");
-            assertTrue(java15 || java16);
-        }
-
+        result = runCommand(command, 1234);
+        assertTrue(result.errored());
 
         List<Feature> features = result.getFeatures(Feature.Level.ERROR);
         assertEquals(1, features.size());
-        assertTrue(features.get(0).getSummary().contains("No such executable 'thisfiledoesnotexist'"));
+        String message = features.get(0).getSummary();
+        boolean java15 = message.contains("No such executable 'thisfiledoesnotexist'");
+        // In Java 1.6, the error reporting is better, so we are
+        // happy to pass it on through.
+        boolean java16 = message.endsWith("The system cannot find the file specified");
+        assertTrue(java15 || java16);
     }
 
     public void testNoSuchWorkDirOnWindows()
@@ -279,23 +299,16 @@ public class ExecutableCommandTest extends ExecutableCommandTestBase
         command.setWorkingDir(new File("nosuchworkdir"));
 
         CommandResult result = null;
-        try
-        {
-            result = runCommand(command, 1234);
-            fail();
-        }
-        catch (BuildException e)
-        {
-            String message = e.getMessage();
-            boolean java15 = message.contains("Working directory 'nosuchworkdir' does not exist");
-            boolean jaav16 = message.endsWith("The directory name is invalid");
-            assertTrue(java15 || jaav16);
-        }
+        result = runCommand(command, 1234);
 
         assertTrue(result.errored());
         List<Feature> features = result.getFeatures(Feature.Level.ERROR);
         assertEquals(1, features.size());
-        assertTrue(features.get(0).getSummary().contains("Working directory 'nosuchworkdir' does not exist"));
+        String message = features.get(0).getSummary();
+        assertTrue(message.contains("Working directory 'nosuchworkdir' does not exist"));
+        boolean java15 = message.contains("Working directory 'nosuchworkdir' does not exist");
+        boolean jaav16 = message.endsWith("The directory name is invalid");
+        assertTrue(java15 || jaav16);
     }
 
     private CommandResult runCommand(ExecutableCommand command, long buildNumber)
