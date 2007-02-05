@@ -27,7 +27,8 @@ public class EventLogFormatter extends Formatter
         args[0] = date;
         StringBuffer text = new StringBuffer();
 
-        if (formatter == null) {
+        if (formatter == null)
+        {
             formatter = new MessageFormat(format);
         }
 

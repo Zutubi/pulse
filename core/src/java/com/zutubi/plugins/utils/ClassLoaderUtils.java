@@ -6,14 +6,8 @@ import java.net.URL;
 import java.util.Enumeration;
 
 /**
- * This class is extremely useful for loading resources and classes in a fault tolerant manner
- * that works across different applications servers.
- * <p>
- * It has come out of many months of frustrating use of multiple application servers at Atlassian,
- * please don't change things unless you're sure they're not going to break in one server or another!
+ * ClassLoaderUtils a copy of an open source class.
  *
- * @author $Author: mcannon $
- * @version $Revision: 1.1 $
  */
 public class ClassLoaderUtils
 {

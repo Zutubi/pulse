@@ -1,5 +1,7 @@
 package com.zutubi.pulse.logging;
 
+import com.zutubi.plugins.utils.ClassLoaderUtils;
+
 import java.util.Properties;
 import java.util.List;
 import java.util.LinkedList;
@@ -86,12 +88,12 @@ class LogUtils
         }
         try
         {
-            Class clz = ClassLoader.getSystemClassLoader().loadClass(clsName);
+            Class clz = ClassLoaderUtils.loadClass(clsName, config.getClass());
             return (Formatter) clz.newInstance();
         }
         catch (Exception e)
         {
-            return defaultValue;
+            return defaultValue;            
         }
     }
 

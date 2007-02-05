@@ -1,6 +1,7 @@
 package com.zutubi.pulse.upgrade.tasks;
 
 import com.zutubi.pulse.util.JDBCUtils;
+import com.zutubi.pulse.util.logging.Logger;
 import org.hibernate.cfg.Environment;
 import org.hibernate.connection.ConnectionProvider;
 import org.hibernate.connection.ConnectionProviderFactory;
@@ -24,6 +25,8 @@ import java.util.Properties;
  */
 public class SchemaRefactor
 {
+    private static final Logger LOG = Logger.getLogger(SchemaRefactor.class);
+
     private MutableConfiguration config = null;
     private Dialect dialect = null;
     private Properties connectionProperties;
@@ -120,12 +123,12 @@ public class SchemaRefactor
                     }
 
                     String sql = fk.sqlDropString(dialect, defaultCatalog, defaultSchema);
-                    System.out.println(sql);
+                    LOG.info(sql);
                     JDBCUtils.execute(connection, sql);
                     fk.setReferencedTable(toTable);
 
                     sql = fk.sqlCreateString(dialect, null, defaultCatalog, defaultSchema);
-                    System.out.println(sql);
+                    LOG.info(sql);
                     JDBCUtils.execute(connection, sql);
                 }
             }
@@ -163,7 +166,7 @@ public class SchemaRefactor
                 String[] sql = config.generateDropSchemaScript(dialect);
                 for (String s : sql)
                 {
-                    System.out.println(s);
+                    LOG.info(s);
                 }
                 JDBCUtils.executeSchemaScript(con, sql);
                 return null;
@@ -180,7 +183,7 @@ public class SchemaRefactor
                 String[] sql = config.generateSchemaCreationScript(dialect);
                 for (String s : sql)
                 {
-                    System.out.println(s);
+                    LOG.info(s);
                 }
                 JDBCUtils.executeSchemaScript(con, sql);
                 return null;
@@ -217,7 +220,7 @@ public class SchemaRefactor
             {
                 columnKey = fk;
                 String sql = fk.sqlDropString(dialect, defaultCatalog, defaultSchema);
-                System.out.println(sql);
+                LOG.info(sql);
                 JDBCUtils.execute(connection, sql);
             }
         }
@@ -230,25 +233,25 @@ public class SchemaRefactor
         while (alterSqls.hasNext())
         {
             String sql = (String) alterSqls.next();
-            System.out.println(sql);
+            LOG.info(sql);
             JDBCUtils.execute(connection, sql);
         }
 
         // copy column data.
         String sql = "update " + table.getName() + " set " + toColumnName + " = " + fromColumnName;
-        System.out.println(sql);
+        LOG.info(sql);
         JDBCUtils.execute(connection, sql);
 
         if (columnKey != null)
         {
             sql = columnKey.sqlCreateString(dialect, config.getMapping(), defaultCatalog, defaultSchema);
-            System.out.println(sql);
+            LOG.info(sql);
             JDBCUtils.execute(connection, sql);
         }
 
         // d) drop the column.
         sql = "alter table " + table.getName() + " drop column " + fromColumnName;
-        System.out.println(sql);
+        LOG.info(sql);
         JDBCUtils.execute(connection, sql);
     }
 
@@ -260,7 +263,7 @@ public class SchemaRefactor
         toTable.setName(toTableName);
 
         String sql = toTable.sqlCreateString(dialect, null, defaultCatalog, defaultSchema);
-        System.out.println(sql);
+        LOG.info(sql);
         JDBCUtils.execute(connection, sql);
 
         // if there is data to transfer..
@@ -277,7 +280,7 @@ public class SchemaRefactor
             }
 
             sql = "insert into " + toTableName + "(" + columnSql + ") select " + columnSql + " from " + fromTable.getName();
-            System.out.println(sql);
+            LOG.info(sql);
             JDBCUtils.execute(connection, sql);
         }
 
@@ -311,7 +314,7 @@ public class SchemaRefactor
     protected void dropTable(Connection connection, Table table) throws SQLException
     {
         String sql = table.sqlDropString(dialect, defaultCatalog, defaultSchema);
-        System.out.println(sql);
+        LOG.info(sql);
         JDBCUtils.execute(connection, sql);
         config.removeTable(table);
     }
