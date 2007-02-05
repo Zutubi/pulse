@@ -190,7 +190,7 @@ public class DefaultScmManager implements ScmManager, Stoppable
                         if (server.hasChangedSince(lastChange))
                         {
                             // there has been a commit during the 'quiet period', lets reset the timer.
-                            Revision latest = server.getLatestRevision();
+                            Revision latest = getLatestRevisionSince(lastChange, server);
                             waiting.put(scm.getId(), new Pair<Long, Revision>(System.currentTimeMillis() + cvs.getQuietPeriod(), latest));
                         }
                         else
@@ -205,7 +205,7 @@ public class DefaultScmManager implements ScmManager, Stoppable
                 {
                     if (server.hasChangedSince(previous))
                     {
-                        Revision latest = server.getLatestRevision();
+                        Revision latest = getLatestRevisionSince(previous, server);
                         if (cvs.getQuietPeriod() != 0)
                         {
                             waiting.put(scm.getId(), new Pair<Long, Revision>(System.currentTimeMillis() + cvs.getQuietPeriod(), latest));
@@ -221,7 +221,7 @@ public class DefaultScmManager implements ScmManager, Stoppable
             {
                 if (server.hasChangedSince(previous))
                 {
-                    Revision latest = server.getLatestRevision();
+                    Revision latest = getLatestRevisionSince(previous, server);
                     sendScmChangeEvent(scm, latest, previous);
                 }
             }
@@ -234,6 +234,17 @@ public class DefaultScmManager implements ScmManager, Stoppable
             // be the result of a configuration problem.
             LOG.warning(e.getMessage(), e);
         }
+    }
+
+    private Revision getLatestRevisionSince(Revision revision, SCMServer server) throws SCMException
+    {
+        List<Revision> revisions = server.getRevisionsSince(revision);
+        if (revisions.size() > 0)
+        {
+            // get the latest revision.
+            return revisions.get(revisions.size() - 1);
+        }
+        return null;
     }
 
     private void sendScmChangeEvent(Scm scm, Revision latest, Revision previous)
