@@ -2,6 +2,7 @@ package com.zutubi.pulse.core;
 
 import com.zutubi.pulse.core.model.CommandResult;
 import com.zutubi.pulse.core.model.StoredFileArtifact;
+import com.zutubi.pulse.core.model.TestCaseResult;
 import com.zutubi.pulse.core.model.TestSuiteResult;
 import com.zutubi.pulse.test.PulseTestCase;
 import com.zutubi.pulse.util.FileSystemUtils;
@@ -70,7 +71,7 @@ public class RegexTestPostProcessorTest extends PulseTestCase
 
     public void testConflictsAppend() throws FileLoadException
     {
-        TestSuiteResult tests = process("append");
+        TestSuiteResult tests = process("append", false);
         assertEquals(5, tests.getTotal());
         assertTrue(tests.hasCase(" <TEST COMMAND0>"));
         assertTrue(tests.hasCase(" <TEST COMMAND1>"));
@@ -90,7 +91,7 @@ public class RegexTestPostProcessorTest extends PulseTestCase
 
     public void testConflictsPrepend() throws FileLoadException
     {
-        TestSuiteResult tests = process("prepend");
+        TestSuiteResult tests = process("prepend", false);
         assertEquals(5, tests.getTotal());
         assertTrue(tests.hasCase(" <TEST COMMAND0>"));
         assertTrue(tests.hasCase(" <TEST COMMAND1>"));
@@ -99,12 +100,38 @@ public class RegexTestPostProcessorTest extends PulseTestCase
         assertTrue(tests.hasCase(" <TEST COMMAND2>"));
     }
 
-    private TestSuiteResult process() throws FileLoadException
+    public void testAutoFail() throws FileLoadException
     {
-        return process("off");
+        TestSuiteResult tests = process("off", true);
+        assertEquals(5, tests.getTotal());
+        assertEquals(3, tests.getFailures());
+        assertEquals(1, tests.getErrors());
+        assertEquals(TestCaseResult.Status.PASS, tests.getCase("test1").getStatus());
+        assertEquals(TestCaseResult.Status.ERROR, tests.getCase("test2").getStatus());
+        assertEquals(TestCaseResult.Status.FAILURE, tests.getCase("test3").getStatus());
+        assertEquals(TestCaseResult.Status.FAILURE, tests.getCase("test4").getStatus());
+        assertEquals(TestCaseResult.Status.FAILURE, tests.getCase("test5").getStatus());
     }
 
-    private TestSuiteResult process(String resolution) throws FileLoadException
+    public void testUnrecognised() throws FileLoadException
+    {
+        TestSuiteResult tests = process();
+        assertEquals(3, tests.getTotal());
+        assertEquals(1, tests.getFailures());
+        assertEquals(1, tests.getErrors());
+        assertEquals(TestCaseResult.Status.PASS, tests.getCase("test1").getStatus());
+        assertEquals(TestCaseResult.Status.ERROR, tests.getCase("test2").getStatus());
+        assertEquals(TestCaseResult.Status.FAILURE, tests.getCase("test4").getStatus());
+        assertFalse(tests.hasCase("test3"));
+        assertFalse(tests.hasCase("test5"));
+    }
+
+    private TestSuiteResult process() throws FileLoadException
+    {
+        return process("off", false);
+    }
+
+    private TestSuiteResult process(String resolution, boolean autoFail) throws FileLoadException
     {
         RegexTestPostProcessor pp = new RegexTestPostProcessor();
         pp.setRegex("\\[(.*)\\] .*EDT:(.*)");
@@ -113,6 +140,7 @@ public class RegexTestPostProcessorTest extends PulseTestCase
         pp.setPassStatus("PASS");
         pp.setFailureStatus("FAIL");
         pp.setResolveConflicts(resolution);
+        pp.setAutoFail(autoFail);
 
         TestSuiteResult testResults = new TestSuiteResult();
         CommandContext context = new CommandContext(null, tmpDir, testResults);

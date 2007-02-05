@@ -37,6 +37,7 @@ public class RegexTestPostProcessor extends TestReportPostProcessor
     private int statusGroup;
     private int nameGroup;
 
+    private boolean autoFail = false;
     private boolean trim = true;
     private Resolution resolveConflicts = Resolution.OFF;
     
@@ -100,13 +101,21 @@ public class RegexTestPostProcessor extends TestReportPostProcessor
             if (m.matches())
             {
                 String statusString = m.group(statusGroup);
-                if(statusMap.containsKey(statusString))
+                if(autoFail || statusMap.containsKey(statusString))
                 {
                     String testName = m.group(nameGroup);
 
                     TestCaseResult result = new TestCaseResult();
                     result.setName(testName);
-                    result.setStatus(statusMap.get(statusString));
+
+                    TestCaseResult.Status status = statusMap.get(statusString);
+                    if(status == null)
+                    {
+                        // Must be auto-fail case
+                        status = TestCaseResult.Status.FAILURE;
+                    }
+
+                    result.setStatus(status);
 
                     if(resolveConflicts != Resolution.OFF && tests.hasCase(result.getName()))
                     {
@@ -217,6 +226,11 @@ public class RegexTestPostProcessor extends TestReportPostProcessor
     public void setText(String txt)
     {
         regex = txt;
+    }
+
+    public void setAutoFail(boolean autoFail)
+    {
+        this.autoFail = autoFail;
     }
 
     public void setTrim(boolean trim)
