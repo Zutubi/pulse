@@ -4,6 +4,7 @@ import com.zutubi.pulse.config.Config;
 import com.zutubi.pulse.scm.p4.P4WorkingCopy;
 import com.zutubi.pulse.scm.svn.SvnWorkingCopy;
 import com.zutubi.pulse.scm.cvs.CvsWorkingCopy;
+import com.zutubi.pulse.personal.PersonalBuildException;
 
 import java.io.File;
 import java.lang.reflect.Constructor;
@@ -30,7 +31,7 @@ public class WorkingCopyFactory
         }
     }
 
-    public static WorkingCopy create(String type, File base, Config config)
+    public static WorkingCopy create(String type, File base, Config config) throws PersonalBuildException
     {
         Constructor constructor = typeMap.get(type);
         if(constructor != null)
@@ -41,6 +42,14 @@ public class WorkingCopyFactory
             }
             catch (Exception e)
             {
+                if (e instanceof PersonalBuildException)
+                {
+                    throw (PersonalBuildException)e;
+                }
+                if (e.getCause() instanceof PersonalBuildException)
+                {
+                    throw (PersonalBuildException)e.getCause();
+                }
                 return null;
             }
         }
