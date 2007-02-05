@@ -195,7 +195,7 @@ public class FileLoaderTest extends FileLoaderTestBase
         }
         catch (PulseException e)
         {
-            assertEquals("Processing element 'recipe': starting at line 7 column 9: A recipe with name 'a' already exists", e.getMessage());
+            assertTrue(e.getMessage().contains("A recipe with name 'a' already exists"));
         }
     }
 
