@@ -13,5 +13,6 @@ public class RegexTestPostProcessorLoadTest extends FileLoaderTestBase
         assertEquals(2, pp.getNameGroup());
         assertEquals("PASS", pp.getPassStatus());
         assertEquals("FAIL", pp.getFailureStatus());
+        assertEquals(RegexTestPostProcessor.Resolution.APPEND, pp.getResolveConflicts());
     }
 }

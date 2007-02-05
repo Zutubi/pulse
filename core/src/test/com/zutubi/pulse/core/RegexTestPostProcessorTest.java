@@ -1,15 +1,15 @@
 package com.zutubi.pulse.core;
 
-import com.zutubi.pulse.test.PulseTestCase;
-import com.zutubi.pulse.core.model.StoredFileArtifact;
 import com.zutubi.pulse.core.model.CommandResult;
+import com.zutubi.pulse.core.model.StoredFileArtifact;
 import com.zutubi.pulse.core.model.TestSuiteResult;
+import com.zutubi.pulse.test.PulseTestCase;
 import com.zutubi.pulse.util.FileSystemUtils;
 import com.zutubi.pulse.util.IOUtils;
 
 import java.io.File;
-import java.io.IOException;
 import java.io.FileOutputStream;
+import java.io.IOException;
 
 /**
  * <class comment/>
@@ -60,7 +60,7 @@ public class RegexTestPostProcessorTest extends PulseTestCase
         return new StoredFileArtifact( name + ".txt");
     }
 
-    public void testSmokeTest()
+    public void testSmokeTest() throws FileLoadException
     {
         TestSuiteResult tests = process();
         assertEquals(5, tests.getFailures());
@@ -68,7 +68,43 @@ public class RegexTestPostProcessorTest extends PulseTestCase
         assertEquals(0, tests.getErrors());
     }
 
-    private TestSuiteResult process()
+    public void testConflictsAppend() throws FileLoadException
+    {
+        TestSuiteResult tests = process("append");
+        assertEquals(5, tests.getTotal());
+        assertTrue(tests.hasCase(" <TEST COMMAND0>"));
+        assertTrue(tests.hasCase(" <TEST COMMAND1>"));
+        assertTrue(tests.hasCase(" <TEST COMMAND1>2"));
+        assertTrue(tests.hasCase(" <TEST COMMAND1>3"));
+        assertTrue(tests.hasCase(" <TEST COMMAND2>"));
+    }
+
+    public void testConflictsOff() throws FileLoadException
+    {
+        TestSuiteResult tests = process();
+        assertEquals(3, tests.getTotal());
+        assertTrue(tests.hasCase(" <TEST COMMAND0>"));
+        assertTrue(tests.hasCase(" <TEST COMMAND1>"));
+        assertTrue(tests.hasCase(" <TEST COMMAND2>"));
+    }
+
+    public void testConflictsPrepend() throws FileLoadException
+    {
+        TestSuiteResult tests = process("prepend");
+        assertEquals(5, tests.getTotal());
+        assertTrue(tests.hasCase(" <TEST COMMAND0>"));
+        assertTrue(tests.hasCase(" <TEST COMMAND1>"));
+        assertTrue(tests.hasCase("2 <TEST COMMAND1>"));
+        assertTrue(tests.hasCase("3 <TEST COMMAND1>"));
+        assertTrue(tests.hasCase(" <TEST COMMAND2>"));
+    }
+
+    private TestSuiteResult process() throws FileLoadException
+    {
+        return process("off");
+    }
+
+    private TestSuiteResult process(String resolution) throws FileLoadException
     {
         RegexTestPostProcessor pp = new RegexTestPostProcessor();
         pp.setRegex("\\[(.*)\\] .*EDT:(.*)");
@@ -76,10 +112,11 @@ public class RegexTestPostProcessorTest extends PulseTestCase
         pp.setNameGroup(2);
         pp.setPassStatus("PASS");
         pp.setFailureStatus("FAIL");
+        pp.setResolveConflicts(resolution);
 
         TestSuiteResult testResults = new TestSuiteResult();
         CommandContext context = new CommandContext(null, tmpDir, testResults);
         pp.process(artifact, result, context);
         return testResults;
-    }    
+    }
 }
