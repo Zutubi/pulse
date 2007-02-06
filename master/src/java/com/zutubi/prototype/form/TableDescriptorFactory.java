@@ -47,28 +47,30 @@ public class TableDescriptorFactory
         Annotation tableAnnotation = propertyInfo.getAnnotation(Table.class);
         if (tableAnnotation != null)
         {
-            // if there is a table annotation, use it to augment.
+            // if there is a table annotation, use it to augment the table description...
         }
 
         TableDescriptor tableDescriptor = new TableDescriptor();
         tableDescriptor.setName(propertyInfo.getName());
 
-        // generate columns...
-        ColumnDescriptor columnDescriptor = new ColumnDescriptor();
-        columnDescriptor.setFormatter(new SimpleColumnFormatter());
-        columnDescriptor.setName(propertyInfo.getName() + ".header");
-        tableDescriptor.addDescriptor(columnDescriptor);    
+        // generate the header row.
+        RowDescriptor headerRow = new RowDescriptor();
+        headerRow.addDescriptor(new HeaderColumnDescriptor(propertyInfo.getName()));
+        headerRow.addDescriptor(new HeaderColumnDescriptor("action", 2));
+        tableDescriptor.addDescriptor(headerRow);
 
         //TODO: check that the user has the necessary Auth to view / execute these actions.
 
-        // column b: actions (remove, edit)
-        ColumnDescriptor actionColumnDescriptor = new ActionColumnDescriptor("edit", propertyInfo);
-        tableDescriptor.addDescriptor(actionColumnDescriptor);
+        // generate data row.
+        RowDescriptor dataRow = new ValueListRowDescriptor();
+        dataRow.addDescriptor(new ColumnDescriptor());
+        dataRow.addDescriptor(new ActionColumnDescriptor("edit", propertyInfo));
+        dataRow.addDescriptor(new ActionColumnDescriptor("delete", propertyInfo));
+        tableDescriptor.addDescriptor(dataRow);
 
-        actionColumnDescriptor = new ActionColumnDescriptor("delete", propertyInfo);
-        tableDescriptor.addDescriptor(actionColumnDescriptor);
-
-        //TODO: add the add action row to the base of this table.
+        RowDescriptor addRowDescriptor = new RowDescriptor();
+        addRowDescriptor.addDescriptor(new ActionColumnDescriptor("add", propertyInfo, 3));
+        tableDescriptor.addDescriptor(addRowDescriptor);
 
         return tableDescriptor;
     }

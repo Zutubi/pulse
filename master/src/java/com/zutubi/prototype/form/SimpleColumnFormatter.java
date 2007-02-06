@@ -6,8 +6,12 @@ package com.zutubi.prototype.form;
  */
 public class SimpleColumnFormatter implements ColumnFormatter
 {
-    public String format(int index, Object obj)
+    public String format(Object obj)
     {
-        return obj.toString();
+        if (obj != null)
+        {
+            return obj.toString();
+        }
+        return "";
     }
 }

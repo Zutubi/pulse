@@ -28,6 +28,11 @@ public class Table
         rows.add(row);
     }
 
+    public void addRows(List<Row> rows)
+    {
+        this.rows.addAll(rows);
+    }
+
     public List<Row> getRows()
     {
         return rows;

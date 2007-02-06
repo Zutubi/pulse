@@ -13,6 +13,8 @@ public class ColumnDescriptor
 {
     private String name;
 
+    private int colspan = 1;
+
     private ColumnFormatter formatter = new SimpleColumnFormatter();
 
     private Map<String, Object> parameters = new HashMap<String, Object>();
@@ -32,11 +34,12 @@ public class ColumnDescriptor
         this.formatter = formatter;
     }
 
-    public Object instantiate(int index, Object value)
+    public Column instantiate(Object value)
     {
         Column c = new Column();
+        c.setSpan(colspan);
         c.setParameters(getParameters());
-        c.setValue(formatter.format(index, value));
+        c.setValue(formatter.format(value));
         return c;
     }
 
@@ -48,5 +51,10 @@ public class ColumnDescriptor
     public void setName(String name)
     {
         this.name = name;
+    }
+
+    public void setColspan(int colspan)
+    {
+        this.colspan = colspan;
     }
 }
