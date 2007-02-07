@@ -1,13 +1,17 @@
 <html>
 <body>
 
-<h1>Test links</h1>
+<h1>Test index</h1>
 
 <p>
     <a href="prototype.action?projectId=1&path=some/path">edit project a svn</a>
 </p>
 <p>
     <a href="prototype.action?projectId=1&path=some/other/path">edit project b cvs</a>
+</p>
+
+<p>
+    <a href="summary.action?scope=project/1">project 1 summary</a>
 </p>
 
 </body>

@@ -1,0 +1,44 @@
+<html>
+<head>
+    <title>project x configuration</title>
+    <link href="$base/css/prototype.css" rel="stylesheet" type="text/css" media="screen"/>
+</head>
+<body>
+
+    <div id="options">
+        <h1>options nav</h1>
+        <ul>
+        #foreach($path in $action.paths)
+            <li><a href="config.action?scope=$action.scope&path=$path">${path}.label?i18n</a></li>
+        #end
+        </ul>
+    </div>
+
+    <div id="content">
+        <h1>Project x configuration</h1>
+        <p>
+            Vestibulum aliquam, erat in nonummy varius, nisi lectus faucibus pede, ac scelerisque
+            sem mi at ligula. Duis hendrerit. Quisque porttitor diam vitae dolor. Morbi eget nisi
+            ac felis nonummy congue. Ut interdum orci non felis. Aliquam sed sapien. Praesent mollis
+            gravida leo. Nunc quis lectus. Quisque egestas quam vitae dolor. Curabitur molestie
+            laoreet tortor. Mauris rhoncus libero nec turpis. Suspendisse nisi. In cursus metus.
+            Duis a risus convallis lacus volutpat suscipit. Aenean egestas, elit feugiat eleifend
+            dignissim, metus magna sollicitudin tellus, eget pharetra metus dui dictum metus. Class
+            aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos hymenaeos.
+        </p>
+
+        <p>
+        #foreach($path in $action.paths)
+            <div class="summary">
+                <h3>${path}.label?i18n</h3>
+                Vestibulum tortor nisl, tincidunt id, suscipit non, vulputate eget, sem. Pellentesque vitae
+                sed convallis tempus, mi risus tincidunt metus, et suscipit libero metus id felis. Mauris
+                felis augue, interdum sit amet, tristique id, consequat porttitor, leo. Praesent non neque.
+                Sed vitae dui. Sed sagittis sodales eros., click <a href="config.action?scope=$action.scope&path=$path">here</a>
+            </div>
+        #end
+        </p>
+    </div>
+    
+</body>
+</html>

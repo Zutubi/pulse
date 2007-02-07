@@ -1,5 +1,4 @@
-<!DOCTYPE xwork PUBLIC "-//OpenSymphony Group//XWork 1.0//EN"
-        "http://www.opensymphony.com/xwork/xwork-1.1.1.dtd">
+<!DOCTYPE xwork PUBLIC "-//OpenSymphony Group//XWork 1.0//EN" "http://www.opensymphony.com/xwork/xwork-1.1.1.dtd">
 <xwork>
     <include file="webwork-default-package.xml"/>
 
@@ -1108,14 +1107,6 @@
     <package name="admin" namespace="/admin" extends="webwork-default-package">
         <default-interceptor-ref name="completeStack"/>
 
-        <action name="prototype" class="com.zutubi.pulse.web.admin.prototype.PrototypeAction">
-            <result name="success" type="velocity">prototype.vm</result>
-        </action>
-
-        <action name="prototype-test" class="com.zutubi.pulse.web.ActionSupport">
-            <result name="success" type="velocity">prototype-test.vm</result>
-        </action>
-
         <action name="serverSettings" class="com.zutubi.pulse.web.admin.ServerSettingsAction">
             <interceptor-ref name="defaultStack"/>
             <result name="success" type="velocity">server-settings.vm</result>
@@ -1487,6 +1478,23 @@
 
         <action name="dumpData" class="com.zutubi.pulse.web.admin.DumpDataAction">
             <result name="success" type="redirect">/admin/serverSettings.action</result>
+        </action>
+
+    </package>
+
+    <package name="prototype" namespace="/prototype" extends="webwork-default-package">
+        <default-interceptor-ref name="completeStack"/>
+
+        <action name="index" class="com.zutubi.pulse.web.ActionSupport">
+            <result name="success" type="velocity">index.vm</result>
+        </action>
+
+        <action name="summary" class="com.zutubi.pulse.web.prototype.SummaryAction">
+            <result name="success" type="velocity">summary.vm</result>
+        </action>
+
+        <action name="config" class="com.zutubi.pulse.web.prototype.ConfigAction">
+            <result name="success" type="velocity">config.vm</result>
         </action>
 
     </package>

@@ -1,8 +1,10 @@
 package com.zutubi.pulse.prototype;
 
 /**
+ *
+ *
  */
-public class CleanupConfiguration
+public class CleanupRuleConfiguration
 {
     private String name;
 

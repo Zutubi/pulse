@@ -1,11 +1,8 @@
-package com.zutubi.pulse.web.admin.prototype;
+package com.zutubi.pulse.web.prototype;
 
 import com.opensymphony.xwork.ActionContext;
 import com.zutubi.prototype.form.*;
 import com.zutubi.prototype.freemarker.GetTextMethod;
-import com.zutubi.pulse.prototype.CvsConfiguration;
-import com.zutubi.pulse.prototype.SvnConfiguration;
-import com.zutubi.pulse.prototype.record.InvalidRecordTypeException;
 import com.zutubi.pulse.prototype.record.Record;
 import com.zutubi.pulse.prototype.record.RecordTypeRegistry;
 import com.zutubi.pulse.web.admin.record.RecordActionSupport;
@@ -23,19 +20,7 @@ public class PrototypeAction extends RecordActionSupport
     private Configuration configuration;
 
     // input: data to be loaded - path / id  from the template manager -> templateRecord.
-    private static RecordTypeRegistry typeRegistry = new RecordTypeRegistry();
-    static
-    {
-        try
-        {
-            typeRegistry.register("svnConfiguration", SvnConfiguration.class);
-            typeRegistry.register("cvsConfiguration", CvsConfiguration.class);
-        }
-        catch (InvalidRecordTypeException e)
-        {
-            e.printStackTrace();
-        }
-    }
+    private RecordTypeRegistry typeRegistry;
 
     private String formHtml;
 
@@ -101,6 +86,7 @@ public class PrototypeAction extends RecordActionSupport
         Map<String, Object> context = new HashMap<String, Object>();
         context.put("form", formDescriptor.instantiate(r));
         context.put("i18nText", new GetTextMethod());
+        context.put("path", getPath());
 
         // provide some syntactic sweetener by linking the i18n text method to the ?i18n builtin function.
         DelegateBuiltin.conditionalRegistration("i18n", "i18nText");
@@ -120,6 +106,7 @@ public class PrototypeAction extends RecordActionSupport
             context = new HashMap<String, Object>();
             context.put("table", tableDescriptor.instantiate(r.get(tableDescriptor.getName())));
             context.put("i18nText", new GetTextMethod());
+            context.put("path", getPath() + "/" + tableDescriptor.getName());
 
             // provide some syntactic sweetener by linking the i18n text method to the ?i18n builtin function.
             DelegateBuiltin.conditionalRegistration("i18n", "i18nText");
@@ -147,5 +134,10 @@ public class PrototypeAction extends RecordActionSupport
         hiddenRecordPath.getParameters().put("type", "hidden");
         hiddenRecordPath.getParameters().put("value", getPath());
         formDescriptor.add(hiddenRecordPath);
+    }
+
+    public void setRecordTypeRegistry(RecordTypeRegistry typeRegistry)
+    {
+        this.typeRegistry = typeRegistry;
     }
 }

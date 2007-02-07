@@ -55,8 +55,11 @@ public class FieldDescriptor implements Descriptor
         {
             if (!field.getParameters().containsKey("value"))
             {
-                Map context = Ognl.createDefaultContext(obj);
-                field.getParameters().put("value", Ognl.getValue(getName(), context, obj));
+                if (obj != null)
+                {
+                    Map context = Ognl.createDefaultContext(obj);
+                    field.getParameters().put("value", Ognl.getValue(getName(), context, obj));
+                }
             }
         }
         catch (OgnlException e)

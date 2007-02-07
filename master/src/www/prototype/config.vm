@@ -1,0 +1,64 @@
+<html>
+<head>
+    <link href="$base/css/prototype.css" rel="stylesheet" type="text/css" media="screen"/>
+</head>
+<body>
+
+    <div id="options">
+        <h1>options nav</h1>
+        <p>show the full option tree...</p>
+    </div>
+
+    <div id="content">
+
+        <h1>Project x configuration</h1>
+        
+        <div>
+            <a href="summary.action?scope=$action.scope">$action.scope</a>
+            #set($breadcrumbPath = "")
+            #set($breadcrumbPathSep = "")
+            #foreach($pathElement in $action.pathElements)
+                #set($breadcrumbPath = "${breadcrumbPath}${breadcrumbPathSep}${pathElement}")
+                #set($breadcrumbPathSep = "/")
+                > <a href="config.action?scope=project/1&path=${breadcrumbPath}">${pathElement}</a>
+            #end
+        </div>
+        <h2>introduction</h2>
+        <p>
+            Vestibulum aliquam, erat in nonummy varius, nisi lectus faucibus pede, ac scelerisque
+            sem mi at ligula. Duis hendrerit. Quisque porttitor diam vitae dolor. Morbi eget nisi
+            ac felis nonummy congue. Ut interdum orci non felis. Aliquam sed sapien.
+        </p>
+
+        <h2>inline form</h2>
+        <p>
+            $action.formHtml
+        </p>
+
+        <p>
+            <a href="summary.action?scope=$action.scope">apply</a> or <a href="summary.action?scope=$action.scope">done</a> (see <a href="#notes">notes</a> below)
+        </p>
+        
+        <h2>example</h2>
+        <p>
+            Vestibulum aliquam, erat in nonummy varius, nisi lectus faucibus pede, ac scelerisque
+            sem mi at ligula. Duis hendrerit. Quisque porttitor diam vitae dolor. Morbi eget nisi
+            ac felis nonummy congue. Ut interdum orci non felis. Aliquam sed sapien.
+        </p>
+
+        <h2 id="notes">notes</h2>
+        <p>
+            navigation link to click once you have finished. you could also use the breadcrumbs. This link
+            needs to be prominent as it will be what is used to indicate that a this page is no longer required,
+            i am finished here. Options include
+            <ul>
+                <li>done: take me back to the summary page, i have finished updating this page.</li>
+                <li>apply: commonly understood idiom, will require form rearrangement since it implies a submit.</li>
+            </ul>
+        </p>
+
+    </div>
+    
+</body>
+</html>
+

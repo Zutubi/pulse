@@ -1,6 +1,6 @@
 <#-- render form -->
 <#if form?exists>
-    <form id="${form.id}" method="post" action="prototype!save.action">
+    <form id="${form.id}" method="post" action="config.action?scope=${scope}&path=${path}">
         <ul>
         <#list form.fields as field>
         <li>
@@ -9,7 +9,7 @@
         </li>
         </#list>
         <li>
-            <input type="submit"/>
+            <input type="submit" name="submit" value="save"/> <input type="submit" name="submit" value="cancel"/>
         </li>
         </ul>
     </form>

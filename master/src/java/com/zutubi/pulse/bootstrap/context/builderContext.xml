@@ -215,4 +215,8 @@
         <property name="objectFactory"><ref bean="objectFactory"/></property>
     </bean>
 
+    <bean id="projectConfigurationManager" class="com.zutubi.pulse.prototype.DummyProjectConfigurationManager" autowire="byName" init-method="init"/>
+
+    <bean id="recordTypeRegistry" class="com.zutubi.pulse.prototype.record.RecordTypeRegistry" autowire="byName"/>
+
 </beans>
