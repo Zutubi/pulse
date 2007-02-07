@@ -4,6 +4,9 @@ import com.opensymphony.util.TextUtils;
 import com.opensymphony.xwork.ActionContext;
 import com.zutubi.prototype.FormDescriptor;
 import com.zutubi.prototype.FormDescriptorFactory;
+import com.zutubi.prototype.ConfigurationDescriptorFactory;
+import com.zutubi.prototype.ConfigurationDescriptor;
+import com.zutubi.prototype.model.Config;
 import com.zutubi.prototype.freemarker.GetTextMethod;
 import com.zutubi.pulse.prototype.ProjectConfigurationManager;
 import com.zutubi.pulse.prototype.TemplateRecord;
@@ -30,6 +33,8 @@ public class ConfigAction extends ActionSupport
     private Configuration configuration;
 
     private String formHtml;
+
+    private Config config;
 
     private String submit;
 
@@ -68,6 +73,11 @@ public class ConfigAction extends ActionSupport
     public String getFormHtml()
     {
         return formHtml;
+    }
+
+    public Config getConfig()
+    {
+        return config;
     }
 
     public String execute() throws Exception
@@ -143,6 +153,11 @@ public class ConfigAction extends ActionSupport
 
     private String render(String symbolicName, Map data) throws Exception
     {
+        ConfigurationDescriptorFactory configurationDescriptorFactory = new ConfigurationDescriptorFactory();
+        configurationDescriptorFactory.setRecordTypeRegistry(recordTypeRegistry);
+        ConfigurationDescriptor configDescriptor = configurationDescriptorFactory.createDescriptor(symbolicName);
+        config = configDescriptor.instantiate(data);
+
         FormDescriptorFactory formFactory = new FormDescriptorFactory();
         formFactory.setTypeRegistry(recordTypeRegistry);
         FormDescriptor formDescriptor = formFactory.createDescriptor(symbolicName);

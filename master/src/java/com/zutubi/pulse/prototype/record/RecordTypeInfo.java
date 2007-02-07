@@ -76,4 +76,9 @@ public class RecordTypeInfo
     {
         return (List<ValueListRecordPropertyInfo>) typeMap.get(ValueListRecordPropertyInfo.class);
     }
+
+    public List<SubrecordRecordPropertyInfo> getSubrecordInfos()
+    {
+        return (List<SubrecordRecordPropertyInfo>) typeMap.get(SubrecordRecordPropertyInfo.class);
+    }
 }

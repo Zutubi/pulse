@@ -1,11 +1,55 @@
+#helpTag("Administration+Projects+Tab")
+#authorisationTags($principle)
+<content tag="selectedTab">administration</content>
 <html>
 <head>
     <title>project x configuration</title>
+	<script type="text/javascript">
+        Layout = function(){
+                var layout;
+                return {
+                    init : function(){
+                        nestedLayout.addRegion('north', {
+                            split: false,
+                            titlebar: false
+                        });
+
+                        nestedLayout.addRegion('west', {
+                            split:true,
+                            initialSize: 200,
+                            minSize: 175,
+                            maxSize: 400,
+                            titlebar: true,
+                            collapsible: true,
+                            animate: true,
+                            tabPosition: 'top'
+                        });
+
+                        nestedLayout.beginUpdate();
+                        nestedLayout.add('north', new YAHOO.ext.ContentPanel('innernorth', {title: 'Inner North'}));
+                        nestedLayout.add('west', new YAHOO.ext.ContentPanel('project-tree', {title: 'Projects'}));
+                        nestedLayout.add('west', new YAHOO.ext.ContentPanel('config-tree', {title: 'Configuration'}));
+                        nestedLayout.endUpdate();
+                   }
+             }
+        }();
+        YAHOO.ext.EventManager.onDocumentReady(Layout.init, Layout, true);
+	</script>
     <link href="$base/css/prototype.css" rel="stylesheet" type="text/css" media="screen"/>
 </head>
 <body>
+    #adminTabs("projects")
 
-    <div id="options">
+    #parse("/template/includes/actionerrors.vm")
+
+    <div id="innernorth" style="padding: 4px; padding-bottom: 12px; border-bottom: 1px solid #ccc">
+    </div>
+
+    <div id="project-tree" class="ylayout-inactive-content">
+        A tree of templates/projects.
+    </div>
+
+    <div id="config-tree" class="ylayout-inactive-content">
         <h1>options nav</h1>
         <ul>
         #foreach($path in $action.paths)
@@ -14,7 +58,7 @@
         </ul>
     </div>
 
-    <div id="content">
+    <p>
         <h1>Project x configuration</h1>
         <p>
             Vestibulum aliquam, erat in nonummy varius, nisi lectus faucibus pede, ac scelerisque
@@ -38,7 +82,6 @@
             </div>
         #end
         </p>
-    </div>
-    
+    </p>
 </body>
 </html>

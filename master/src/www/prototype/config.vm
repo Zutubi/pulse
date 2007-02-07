@@ -1,64 +1,126 @@
+#helpTag("Administration+Projects+Tab")
+#authorisationTags($principle)
+<content tag="selectedTab">administration</content>
 <html>
 <head>
+    <title>#wwtext("name=administration")</title>
+	<script type="text/javascript">
+        Layout = function(){
+                var layout;
+                return {
+                    init : function(){
+                        nestedLayout.addRegion('north', {
+                            split: false,
+                            titlebar: false
+                        });
+
+                        nestedLayout.addRegion('west', {
+                            split:true,
+                            initialSize: 200,
+                            minSize: 175,
+                            maxSize: 400,
+                            titlebar: true,
+                            collapsible: true,
+                            animate: true,
+                            tabPosition: 'top'
+                        });
+
+                        nestedLayout.beginUpdate();
+                        nestedLayout.add('north', new YAHOO.ext.ContentPanel('innernorth', {title: 'Inner North'}));
+                        nestedLayout.add('west', new YAHOO.ext.ContentPanel('project-tree', {title: 'Projects'}));
+                        nestedLayout.add('west', new YAHOO.ext.ContentPanel('config-tree', {title: 'Configuration'}));
+                        nestedLayout.endUpdate();
+                   }
+             }
+        }();
+        YAHOO.ext.EventManager.onDocumentReady(Layout.init, Layout, true);
+	</script>
     <link href="$base/css/prototype.css" rel="stylesheet" type="text/css" media="screen"/>
 </head>
 <body>
+    #adminTabs("projects")
 
-    <div id="options">
+    #parse("/template/includes/actionerrors.vm")
+
+    <div id="innernorth" style="padding: 4px; padding-bottom: 12px; border-bottom: 1px solid #ccc">
+    </div>
+
+    <div id="project-tree" class="ylayout-inactive-content">
+        A tree of templates/projects.
+    </div>
+
+    <div id="config-tree" class="ylayout-inactive-content">
         <h1>options nav</h1>
         <p>show the full option tree...</p>
     </div>
 
-    <div id="fiink">
+    <h1>Project x configuration</h1>
 
-        <h1>Project x configuration</h1>
-        
-        <div>
-            <a href="summary.action?scope=$action.scope">$action.scope</a>
-            #set($breadcrumbPath = "")
-            #set($breadcrumbPathSep = "")
-            #foreach($pathElement in $action.pathElements)
-                #set($breadcrumbPath = "${breadcrumbPath}${breadcrumbPathSep}${pathElement}")
-                #set($breadcrumbPathSep = "/")
-                > <a href="config.action?scope=project/1&path=${breadcrumbPath}">${pathElement}</a>
-            #end
-        </div>
-        <h2>introduction</h2>
-        <p>
-            Vestibulum aliquam, erat in nonummy varius, nisi lectus faucibus pede, ac scelerisque
-            sem mi at ligula. Duis hendrerit. Quisque porttitor diam vitae dolor. Morbi eget nisi
-            ac felis nonummy congue. Ut interdum orci non felis. Aliquam sed sapien.
-        </p>
-
-        <h2>inline form</h2>
-        <p>
-            $action.formHtml
-        </p>
-
-        <p>
-            <a href="summary.action?scope=$action.scope">apply</a> or <a href="summary.action?scope=$action.scope">done</a> (see <a href="#notes">notes</a> below)
-        </p>
-        
-        <h2>example</h2>
-        <p>
-            Vestibulum aliquam, erat in nonummy varius, nisi lectus faucibus pede, ac scelerisque
-            sem mi at ligula. Duis hendrerit. Quisque porttitor diam vitae dolor. Morbi eget nisi
-            ac felis nonummy congue. Ut interdum orci non felis. Aliquam sed sapien.
-        </p>
-
-        <h2 id="notes">notes</h2>
-        <p>
-            navigation link to click once you have finished. you could also use the breadcrumbs. This link
-            needs to be prominent as it will be what is used to indicate that a this page is no longer required,
-            i am finished here. Options include
-            <ul>
-                <li>done: take me back to the summary page, i have finished updating this page.</li>
-                <li>apply: commonly understood idiom, will require form rearrangement since it implies a submit.</li>
-            </ul>
-        </p>
-
+    <div>
+        <a href="summary.action?scope=$action.scope">$action.scope</a>
+        #set($breadcrumbPath = "")
+        #set($breadcrumbPathSep = "")
+        #foreach($pathElement in $action.pathElements)
+            #set($breadcrumbPath = "${breadcrumbPath}${breadcrumbPathSep}${pathElement}")
+            #set($breadcrumbPathSep = "/")
+            > <a href="config.action?scope=$action.scope&path=${breadcrumbPath}">${pathElement}</a>
+        #end
     </div>
-    
+    <h2>introduction</h2>
+    <p>
+        Vestibulum aliquam, erat in nonummy varius, nisi lectus faucibus pede, ac scelerisque
+        sem mi at ligula. Duis hendrerit. Quisque porttitor diam vitae dolor. Morbi eget nisi
+        ac felis nonummy congue. Ut interdum orci non felis. Aliquam sed sapien.
+    </p>
+
+    <h2>inline form</h2>
+    <p>
+        $action.formHtml
+    </p>
+
+    <p>
+        <a href="summary.action?scope=$action.scope">apply</a> or <a href="summary.action?scope=$action.scope">done</a> (see <a href="#notes">notes</a> below)
+    </p>
+
+    #if($action.config.nestedProperties.size() > 0)
+    <p>
+        <h2>nested</h2>
+        <ul>
+            #foreach($subrecord in $action.config.nestedProperties)
+            <li><a href="config.action?scope=$action.scope&path=${action.path}/${subrecord}">$subrecord</a></li>
+            #end
+        </ul>
+    </p>
+    #end
+
+    #if($action.config.valueListProperties.size() > 0)
+    <p>
+        <h2>value</h2>
+        <ul>
+            #foreach($valuelist in $action.config.valueListProperties)
+            <li>$valuelist</li>
+            #end
+        </ul>
+    </p>
+    #end
+
+    <h2>example</h2>
+    <p>
+        Vestibulum aliquam, erat in nonummy varius, nisi lectus faucibus pede, ac scelerisque
+        sem mi at ligula. Duis hendrerit. Quisque porttitor diam vitae dolor. Morbi eget nisi
+        ac felis nonummy congue. Ut interdum orci non felis. Aliquam sed sapien.
+    </p>
+
+    <h2 id="notes">notes</h2>
+    <p>
+        navigation link to click once you have finished. you could also use the breadcrumbs. This link
+        needs to be prominent as it will be what is used to indicate that a this page is no longer required,
+        i am finished here. Options include
+        <ul>
+            <li>done: take me back to the summary page, i have finished updating this page.</li>
+            <li>apply: commonly understood idiom, will require form rearrangement since it implies a submit.</li>
+        </ul>
+    </p>
 </body>
 </html>
 

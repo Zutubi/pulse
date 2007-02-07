@@ -1,9 +1,6 @@
 package com.zutubi.pulse.prototype;
 
-import com.zutubi.pulse.prototype.record.Record;
-import com.zutubi.pulse.prototype.record.SingleRecord;
-import com.zutubi.pulse.prototype.record.RecordTypeRegistry;
-import com.zutubi.pulse.prototype.record.InvalidRecordTypeException;
+import com.zutubi.pulse.prototype.record.*;
 
 import java.util.*;
 
@@ -74,7 +71,35 @@ public class DummyProjectConfigurationManager implements ProjectConfigurationMan
 
     public String getSymbolicName(String path)
     {
-        return projectConfigurationRoot.get(path);
+        // resolve the path into an associated info, and if it is the correct type, return its symbolic name.
+        String[] pathElements = path.split("/");
+
+        // the path starts with the built in project root configurations.
+        String symbolicName = projectConfigurationRoot.get(pathElements[0]);
+        if (pathElements.length == 1)
+        {
+            return symbolicName;
+        }
+
+        // navigate through the type tree extracting the info as we go.
+        RecordTypeInfo typeInfo = recordTypeRegistry.getInfo(symbolicName);
+        for (int i = 1; i < pathElements.length; i++)
+        {
+            RecordPropertyInfo propertyInfo = typeInfo.getProperty(pathElements[i]);
+            if (propertyInfo instanceof SubrecordRecordPropertyInfo)
+            {
+                typeInfo = ((SubrecordRecordPropertyInfo)propertyInfo).getSubrecordType();
+            }
+            else if (propertyInfo instanceof RecordMapRecordPropertyInfo)
+            {
+                typeInfo = ((RecordMapRecordPropertyInfo)propertyInfo).getRecordType();
+            }
+            else
+            {
+                return null;
+            }
+        }
+        return typeInfo.getSymbolicName();
     }
 
     // Get a specific record within a project, referenced by a path made up
