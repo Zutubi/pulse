@@ -1,8 +1,8 @@
 package com.zutubi.prototype.mock;
 
-import com.zutubi.prototype.form.annotation.Password;
-import com.zutubi.prototype.form.annotation.Text;
-import com.zutubi.prototype.form.annotation.Form;
+import com.zutubi.prototype.annotation.Password;
+import com.zutubi.prototype.annotation.Text;
+import com.zutubi.prototype.annotation.Form;
 
 /**
  *

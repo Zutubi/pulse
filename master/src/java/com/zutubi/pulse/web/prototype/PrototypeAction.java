@@ -1,8 +1,8 @@
 package com.zutubi.pulse.web.prototype;
 
 import com.opensymphony.xwork.ActionContext;
-import com.zutubi.prototype.form.*;
 import com.zutubi.prototype.freemarker.GetTextMethod;
+import com.zutubi.prototype.*;
 import com.zutubi.pulse.prototype.record.Record;
 import com.zutubi.pulse.prototype.record.RecordTypeRegistry;
 import com.zutubi.pulse.web.admin.record.RecordActionSupport;

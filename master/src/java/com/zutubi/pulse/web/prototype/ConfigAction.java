@@ -2,8 +2,8 @@ package com.zutubi.pulse.web.prototype;
 
 import com.opensymphony.util.TextUtils;
 import com.opensymphony.xwork.ActionContext;
-import com.zutubi.prototype.form.FormDescriptor;
-import com.zutubi.prototype.form.FormDescriptorFactory;
+import com.zutubi.prototype.FormDescriptor;
+import com.zutubi.prototype.FormDescriptorFactory;
 import com.zutubi.prototype.freemarker.GetTextMethod;
 import com.zutubi.pulse.prototype.ProjectConfigurationManager;
 import com.zutubi.pulse.prototype.TemplateRecord;

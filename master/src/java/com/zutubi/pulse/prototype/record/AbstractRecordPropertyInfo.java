@@ -2,7 +2,6 @@ package com.zutubi.pulse.prototype.record;
 
 import com.zutubi.pulse.util.CollectionUtils;
 import com.zutubi.pulse.util.Predicate;
-import com.zutubi.prototype.form.annotation.Table;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;

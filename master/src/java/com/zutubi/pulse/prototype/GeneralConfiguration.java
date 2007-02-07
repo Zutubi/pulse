@@ -1,6 +1,6 @@
 package com.zutubi.pulse.prototype;
 
-import com.zutubi.prototype.form.annotation.Form;
+import com.zutubi.prototype.annotation.Form;
 
 /**
  *

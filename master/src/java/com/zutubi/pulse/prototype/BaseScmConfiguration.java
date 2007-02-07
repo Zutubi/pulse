@@ -1,6 +1,6 @@
 package com.zutubi.pulse.prototype;
 
-import com.zutubi.prototype.form.annotation.Table;
+import com.zutubi.prototype.annotation.Table;
 
 import java.util.List;
 
