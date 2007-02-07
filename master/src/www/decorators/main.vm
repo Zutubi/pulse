@@ -51,12 +51,71 @@
 		<title>:: pulse :: #if ($title) $title #end</title>
         <link rel="shortcut icon" href="$base/favicon.ico"/>
         <link rel="icon" type="image/png" href="$base/favicon.png"/>
-        <link href="$base/css/main.css" rel="stylesheet" type="text/css" media="screen"/>
-		<link href="$base/css/form.css" rel="stylesheet" type="text/css" media="screen"/>
+        <link rel="stylesheet" type="text/css" href="/css/yui-ext.css"/>
+        <link rel="stylesheet" type="text/css" href="$base/css/main.css" media="screen"/>
+		<link rel="stylesheet" type="text/css" href="$base/css/form.css" media="screen"/>
 #if ($rssEnabled && $projectId && $projectId != "0")
         <link rel="alternate" type="application/rss+xml" title="RSS" href="$base/rss.action?projectId=$projectId"/>
 #end
+        <script type="text/javascript" src="/js/yahoo/utilities.js"></script>
+        <script type="text/javascript" src="/js/yui-ext.js"></script>
         <script type="text/javascript" src="$base/js/main.js"></script>
+        <script type="text/javascript">
+            var layout;
+            var nestedLayout;
+
+            PageLayout = function(){
+                return {
+                    init : function(){
+                        // If there is a tab bar, drop it in to the north div.
+                        var tabbar = getEl('tabbar');
+                        if(tabbar)
+                        {
+                            var north = getEl('north');
+                            north.appendChild(tabbar);
+                        }
+
+                        layout = new YAHOO.ext.BorderLayout(document.body, {
+                            hideOnLayout: true,
+                            north: {
+                                split: false,
+                                titlebar: false
+                            },
+                            south: {
+                                split: false,
+                                titlebar: false,
+                                collapsible: false,
+                                animate: true
+                            },
+                            center: {
+                               autoScroll: false
+                            }
+                        });
+
+                        nestedLayout = new YAHOO.ext.BorderLayout('content', {
+                            hideOnLayout: true,
+                            center: {
+                                autoScroll: true
+                            }
+                        });
+
+                        nestedLayout.beginUpdate();
+                        nestedLayout.add('center', new YAHOO.ext.ContentPanel('center', {title: 'Close Me', closable: true}));
+                        nestedLayout.endUpdate();
+
+                        layout.beginUpdate();
+                        layout.add('north', new YAHOO.ext.ContentPanel('north', 'North'));
+                        layout.add('south', new YAHOO.ext.ContentPanel('south', 'South'));
+                        layout.add('center', new YAHOO.ext.NestedLayoutPanel(nestedLayout));
+                        layout.endUpdate();
+                    }
+                }
+            }();
+
+            YAHOO.ext.EventManager.onDocumentReady(PageLayout.init, PageLayout, true);
+            window.nestedLayout = nestedLayout;
+        </script>
+
 		$head
 	</head>
 
@@ -65,6 +124,7 @@
           onload="$page.getProperty('page.onLoad')"
 #end
       >
+      <div id="north">
       <div id="header">
         <table>
             <tr>
@@ -129,14 +189,17 @@
       #end
       </ul>
       <div class="clear"></div>
+      </div>
 
-      <div class="content">
+     <div id="content" class="ylayout-inactive-content"></div>
+     
+      <div id="center">
           $body
           #if($license.expired)
             <div id="statusmessage">#wwtext("name=license.expiry.notice")</div>
           #end
       </div>
-      <div id="footer">
+      <div id="south">
          <b>::</b> <a href="http://zutubi.com/products/pulse/">pulse</a> ($version_number #$build_number) <b>::</b>
          copyright &copy; 2005-2006 <a href="http://zutubi.com/">zutubi pty ltd</a> <b>::</b>
          <a href="http://jira.zutubi.com/">report bug/request feature</a>

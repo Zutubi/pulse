@@ -7,7 +7,6 @@
     #customErrorsScript("custom.setup_details_pulseFile" $detailsHelper)
 </head>
 <body>
-    <div id="pagecontent">
     <h1>:: #wwtext("name=add.project") ::</h1>
 
 <table class="columns">
@@ -29,7 +28,5 @@
 
     </td></tr>
 </table>
-
-    </div>
 </body>
 </html>

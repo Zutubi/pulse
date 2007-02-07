@@ -12,7 +12,6 @@
     <script type="text/javascript" src="$base/js/yahoo/event.js"></script>
     <script type="text/javascript" src="$base/js/yahoo/treeview.js"></script>
     <script type="text/javascript" src="$base/js/widget/treeview.js"></script>
-    <script type="text/javascript" src="$base/js/main.js"></script>
     <script type="text/javascript">
 
         window.onload = initialize;
@@ -81,6 +80,6 @@
     </p>
 #end
 
-    #tabEnd()
+
 </body>
 </html>

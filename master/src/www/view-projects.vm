@@ -6,8 +6,6 @@
     <title>#wwtext("name=projects")</title>
     <script type="text/javascript" src="$base/js/prototype.js"></script>
     <script type="text/javascript" src="$base/js/scriptaculous/scriptaculous.js"></script>
-    <script type="text/javascript" src="$base/js/yahoo/utilities.js" ></script>
-    <script type="text/javascript" src="$base/js/main.js"></script>
     <script type="text/javascript" src="$base/js/buildcolumns.js"></script>
     <script type="text/javascript">
     //<![CDATA[
@@ -22,7 +20,6 @@
     #end
 </head>
 <body>
-    <div id="pagecontent">
     <table width="98%">
         <tr>
             <td>
@@ -52,7 +49,5 @@
     #end
     <a href="addProjectGroup!input.action" id="project.group.add"><img alt="add" src="$base/images/add.gif"/> #wwtext("name=add.project.group")</a>
 #end
-
-    </div>
 </body>
 </html>

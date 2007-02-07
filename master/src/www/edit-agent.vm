@@ -6,8 +6,6 @@
     <title>#wwtext("name=agent.edit")</title>
 </head>
 <body>
-    <div id="pagecontent">
-
     #parse("/template/includes/actionerrors.vm")
 
 #wwcform("action=editAgent.action" "heading=%{getText('agent.edit')}" "method=post")
@@ -19,7 +17,5 @@
 
     #saveCancel(4)
 #end
-
-    </div>
 </body>
 </html>

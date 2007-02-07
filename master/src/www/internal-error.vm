@@ -4,7 +4,7 @@
     <title>#wwtext("name=internal.error")</title>
 </head>
 <body>
-    <div id="pagecontent">
+    <div style="padding: 12px">
     <h1 style="color: #c04040">:: #wwtext("name=internal.error") ::</h1>
 
     <p class="error">

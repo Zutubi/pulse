@@ -1112,6 +1112,11 @@
             <result name="success" type="velocity">server-settings.vm</result>
         </action>
 
+        <action name="projectConfiguration" class="com.zutubi.pulse.web.admin.ProjectConfigurationAction">
+            <interceptor-ref name="defaultStack"/>
+            <result name="success" type="velocity">project-configuration.vm</result>
+        </action>
+
         <action name="toggleRecipeQueue" class="com.zutubi.pulse.web.admin.ToggleRecipeQueueAction">
             <result name="success" type="redirect">/viewServerQueues.action</result>
         </action>

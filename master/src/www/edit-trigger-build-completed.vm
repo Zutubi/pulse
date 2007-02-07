@@ -31,6 +31,6 @@
         #tiedSelect("spec" $filterProjects.keySet() $filterSpecifications $filterSpecification "editBuildCompletedTrigger_filterProject" "editBuildCompletedTrigger_filterSpecification")
     </script>
 
-    #tabEnd()
+
 </body>
 </html>

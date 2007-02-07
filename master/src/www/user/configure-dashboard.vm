@@ -35,6 +35,6 @@
         setEnableState('dashboard.configuration_user_projectChangesCount', 'dashboard.configuration_showProjectChanges');
     -->
     </script>
-    #tabEnd()
+
 </body>
 </html>

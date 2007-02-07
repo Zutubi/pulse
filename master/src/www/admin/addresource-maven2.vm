@@ -4,7 +4,6 @@
 <html>
 <head>
     <title>#wwtext("name=add.maven2.resource")</title>
-    <script type="text/javascript" src="$base/js/main.js"></script>
     <script type="text/javascript">
     <!--
     	function openBrowseFileDialog()
@@ -36,7 +35,7 @@
     #previousFinishCancel(2)
 #end
 
-#tabEnd()
+
 
 </body>
 </html>

@@ -5,7 +5,6 @@
     <link href="$base/css/main.css" rel="stylesheet" type="text/css" media="screen"/>
 </head>
 <body>
-    <div id="pagecontent">
     <h1>:: #wwtext("name=not.licensed.error") ::</h1>
     <p>
         You are not licensed to execute the requested action. If you believe this to be a mistake, please
@@ -14,7 +13,7 @@
     <p>
         The currently installed license contains the following restrictions:
     </p>
-    <table>
+    <table class="content">
         #headingRow("license.restrictions" 4)
         <tr>
             #contentHeading("licensed.restriction" 1)
@@ -45,6 +44,5 @@
         For more information about our licenseing structure, go to <a href="http://www.zutubi.com/">http://www.zutubi.com/</a>
         and follow the links to sales and licensing.
     </p>
-    </div>
 </body>
 </html>

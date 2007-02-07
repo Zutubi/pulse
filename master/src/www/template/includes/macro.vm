@@ -186,14 +186,6 @@
     </ul>
     <div class="clear"></div>
 </div>
-<div id="pagecontent">
-#end
-
-##
-## Marks the end of the tab content
-##
-#macro(tabEnd)
-</div>
 #end
 
 ##
@@ -296,6 +288,7 @@
 ##
 #macro(adminTabs $selected)
     #openTabs()
+        #adminTab("projects" "$base/admin/projectConfiguration" $selected)
         #adminTab("settings" "$base/admin/serverSettings" $selected)
         #adminTab("users" "$base/admin/userSettings" $selected)
         #adminTab("groups" "$base/admin/viewGroups" $selected)

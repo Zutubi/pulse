@@ -6,8 +6,6 @@
     <title>#wwtext("name=agent.add")</title>
 </head>
 <body>
-    <div id="pagecontent">
-
     #parse("/template/includes/actionerrors.vm")
 
 #wwcform("action=addAgent.action" "heading=%{getText('agent.add')}" "method=post")
@@ -16,7 +14,5 @@
     #wwtextfield("name=slave.port" "label=%{getText('agent.port')}" "required=true"  "tabindex=3")
     #saveCancel(4)
 #end
-
-    </div>
 </body>
 </html>

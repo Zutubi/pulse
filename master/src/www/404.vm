@@ -4,7 +4,7 @@
     <link href="$base/css/main.css" rel="stylesheet" type="text/css" media="screen"/>
 </head>
 <body>
-    <div id="pagecontent">
+    <div style="padding: 16px;">
         <h1 style="color: #c04040">:: HTTP ERROR: $action.errorStatusCode ::</h1>
 
         <p>The resource '$action.errorRequestUri' was not found and resulted in the following error message:</p>

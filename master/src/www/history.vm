@@ -6,8 +6,6 @@
     <title>$!webwork.htmlEncode($project.name)</title>
     <script type="text/javascript" src="$base/js/prototype.js"></script>
     <script type="text/javascript" src="$base/js/scriptaculous/scriptaculous.js"></script>
-    <script type="text/javascript" src="$base/js/yahoo/utilities.js" ></script>
-    <script type="text/javascript" src="$base/js/main.js"></script>
     <script type="text/javascript" src="$base/js/buildcolumns.js"></script>
     <script type="text/javascript">
     //<![CDATA[
@@ -25,5 +23,5 @@
 
     #buildColumnsPopup("project.history" "popup")    
 
-    #tabEnd()   
+
 </html>

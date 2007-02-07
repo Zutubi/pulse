@@ -12,6 +12,6 @@
         <img alt="waiting..." src="$base/images/inprogress.gif"/> #wwtext("name=jabber.applying")
     </p>
 
-    #tabEnd()
+
 </body>
 </html>

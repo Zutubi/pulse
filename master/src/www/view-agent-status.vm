@@ -54,5 +54,5 @@
 #if(!$agent.isSlave())
     <a href="$base/viewServerQueues.action">#wwtext("name=view.server.queues")</a>
 #end
-    #tabEnd()
+
 </html>

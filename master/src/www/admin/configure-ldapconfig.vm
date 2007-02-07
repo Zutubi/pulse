@@ -122,6 +122,6 @@
         setFormEnableState('ldap.config', 'ldap.config_ldap_enabled', false);
     </script>
 
-    #tabEnd()
+
 </body>
 </html>

@@ -20,7 +20,7 @@
     </script>
 </head>
 <body>
-    <div class="pagecontent">
+    <div style="padding: 12px">
 #if($selectDir)
     <h1>:: #wwtext("name=select.dir") ::</h1>
     #set($dirAction = "selectFile")

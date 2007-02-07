@@ -5,7 +5,6 @@
 <head>
     <title>#wwtext("name=build") $result.number</title>
     <script type="text/javascript" src="$base/js/prototype.js"></script>
-    <script type="text/javascript" src="$base/js/main.js"></script>
 </head>
 <body>
     #buildTabs($result "changes")
@@ -102,5 +101,5 @@
         </div>
     </div>
     
-    #tabEnd()
+
 </html>

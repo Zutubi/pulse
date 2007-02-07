@@ -135,7 +135,7 @@ pre{
     font-weight: bold;
 }
 
-#pagecontent {
+#center {
     clear: both;
     margin: 16px;
 }
@@ -144,18 +144,20 @@ pre{
     Footer
     */
 
-#footer {
-    clear: both;
+.ylayout-panel , .ylayout-nested-layout .ylayout-panel {
+    border: 0 none;
+}
+
+#south {
     border-top: solid 1px #c0c0c0;
     color: #c0c0c0;
     font-size: 10px;
     padding-top: 4px;
     padding-bottom: 4px;
     text-align: center;
-    width: 100%;
 }
 
-#footer a {
+#south a {
     color: #c0c0c0;
     border-color: #c0c0c0;
 }
@@ -195,9 +197,9 @@ h1 a:hover, h2 a:hover {
     border-bottom: solid 2px #bbb;
 }
 
-
 h1 {
     margin-top: 6px;
+    margin-bottom: 12px;
     font-size: 24px;
 }
 
@@ -207,6 +209,7 @@ h2 {
 
 h2.section, h2.twopane {
     margin-top: 1.5em;
+    margin-bottom: 1em;
     color: #3e4e6a;
     font-size: 20px;
     border-bottom: solid 2px #667e9f;
@@ -230,6 +233,19 @@ h4 {
     margin: 6px;
 }
 
+p {
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
+
+em {
+    font-style: italic;
+}
+
+strong {
+    font-weight: bold;
+}
+
 a:link, a:visited {
     color: #668;
     text-decoration: none;
@@ -246,7 +262,7 @@ a {
     border-bottom: dotted 1px #336;
 }
 
-a.unadorned, a.unadorned:hover {
+a.unadorned, a.unadorned:hover, a.ytab-right, a.ytab-right:hover {
     border-bottom: none;
 }
 
@@ -289,11 +305,10 @@ img.centre {
     margin-left: 69%;
 }
 
-div.content {
+#content {
     clear: both;
     background: #fff;
     position: relative;
-    min-height: 88%;
 }
 
 table.columns {
@@ -321,6 +336,7 @@ h3.heading, div.box, th.heading, th.group, th.note, th.content, th.content-row, 
 }
 
 th {
+    font-weight: bold;
     white-space: nowrap;
 }
 

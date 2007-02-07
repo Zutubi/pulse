@@ -5,8 +5,6 @@
     <title>#wwtext("name=edit.project.group")</title>
 </head>
 <body>
-    <div id="pagecontent">
-
     #parse("/template/includes/actionerrors.vm")
 
     #wwcform("action=editProjectGroup.action" "id=edit.project.group" "heading=%{getText('edit.project.group')}" "method=post")
@@ -15,6 +13,5 @@
         #wwselect("name=projects" "label=%{getText('project.group.projects')}" "list=allProjects" "multiple=true" "tabindex=2")
         #saveCancel(3)
     #end
-    </div>
 </body>
 </html>

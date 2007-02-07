@@ -29,6 +29,6 @@
         setEnableState('user.settings.edit_refreshInterval', 'user.settings.edit_refreshEnabled');
     </script>
 
-    #tabEnd()
+
 </body>
 </html>

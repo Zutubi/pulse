@@ -6,7 +6,6 @@
     <title>#wwtext("name=add.project")</title>
 </head>
 <body>
-    <div id="pagecontent">
     <h1>:: #wwtext("name=add.project") ::</h1>
 
     #parse("/template/includes/actionerrors.vm")
@@ -29,7 +28,5 @@
     #inlineHelp("xcode.settings.help")
     #previousFinishCancel(7)
 #end
-
-    </div>
 </body>
 </html>

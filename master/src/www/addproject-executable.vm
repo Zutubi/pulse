@@ -15,8 +15,6 @@
     </script>
 </head>
 <body>
-    <div id="pagecontent">
-
     <h1>:: #wwtext("name=add.project") ::</h1>
 
     #parse("/template/includes/actionerrors.vm")
@@ -34,7 +32,5 @@
 
     #previousFinishCancel(4)
 #end
-
-    </div>
 </body>
 </html>

@@ -10,14 +10,10 @@
     </script>
 </head>
 <body>
-    <div id="pagecontent">
-
     <h1>:: #wwtext("name=queues") ::</h1>
     
     <div id="panel">
         #parse("ajax/view-server-queues-panel.vm")
-    </div>
-
     </div>
 </body>
 </html>
