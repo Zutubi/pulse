@@ -52,8 +52,8 @@
     <div id="config-tree" class="ylayout-inactive-content">
         <h1>options nav</h1>
         <ul>
-        #foreach($path in $action.paths)
-            <li><a href="config.action?scope=$action.scope&path=$path">${path}.label?i18n</a></li>
+        #foreach($nestedProperty in $action.config.nestedProperties)
+            <li><a href="config.action?scope=$action.scope&path=$nestedProperty">#i18n("path=${nestedProperty}" "key=label")</a></li>
         #end
         </ul>
     </div>
@@ -72,13 +72,11 @@
         </p>
 
         <p>
-        #foreach($path in $action.paths)
+        #foreach($nestedProperty in $action.config.nestedProperties)
             <div class="summary">
-                <h3>${path}.label?i18n</h3>
-                Vestibulum tortor nisl, tincidunt id, suscipit non, vulputate eget, sem. Pellentesque vitae
-                sed convallis tempus, mi risus tincidunt metus, et suscipit libero metus id felis. Mauris
-                felis augue, interdum sit amet, tristique id, consequat porttitor, leo. Praesent non neque.
-                Sed vitae dui. Sed sagittis sodales eros., click <a href="config.action?scope=$action.scope&path=$path">here</a>
+                <h3>#i18n("path=${nestedProperty}" "key=label")</h3>
+                #i18n("path=${nestedProperty}" "key=summary")
+                For more, click <a href="config.action?scope=$action.scope&path=$nestedProperty">here</a>
             </div>
         #end
         </p>

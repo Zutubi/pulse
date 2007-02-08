@@ -2,6 +2,7 @@ package com.zutubi.pulse.web.prototype;
 
 import com.zutubi.pulse.web.ActionSupport;
 import com.zutubi.pulse.prototype.ProjectConfigurationManager;
+import com.zutubi.prototype.model.Config;
 
 import java.util.List;
 import java.util.Arrays;
@@ -16,7 +17,7 @@ public class SummaryAction extends ActionSupport
 
     private ProjectConfigurationManager projectConfigurationManager;
 
-    private List<String> paths;
+    private Config config;
 
     public void setScope(String scope)
     {
@@ -28,9 +29,9 @@ public class SummaryAction extends ActionSupport
         return scope;
     }
 
-    public List<String> getPaths()
+    public Config getConfig()
     {
-        return paths;
+        return config;
     }
 
     public String execute() throws Exception
@@ -38,7 +39,11 @@ public class SummaryAction extends ActionSupport
         // use the scope to identify the configuration data.
 
         // load the root level configuration from the project configuration manager..
-        paths = projectConfigurationManager.getProjectConfigurationRoot();
+        config = new Config();
+        for (String s : projectConfigurationManager.getProjectConfigurationRoot())
+        {
+            config.addNestedProperty(s);
+        }
 
         return SUCCESS;
     }

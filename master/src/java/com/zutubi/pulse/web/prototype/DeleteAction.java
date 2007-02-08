@@ -1,15 +1,15 @@
 package com.zutubi.pulse.web.prototype;
 
-import com.opensymphony.util.TextUtils;
-import com.opensymphony.xwork.ActionContext;
-import com.zutubi.prototype.ConfigurationDescriptor;
-import com.zutubi.prototype.ConfigurationDescriptorFactory;
-import com.zutubi.prototype.model.Config;
+import com.zutubi.pulse.web.ActionSupport;
 import com.zutubi.pulse.prototype.ProjectConfigurationManager;
 import com.zutubi.pulse.prototype.TemplateRecord;
 import com.zutubi.pulse.prototype.record.RecordTypeRegistry;
-import com.zutubi.pulse.web.ActionSupport;
 import com.zutubi.pulse.i18n.Messages;
+import com.zutubi.prototype.model.Config;
+import com.zutubi.prototype.ConfigurationDescriptorFactory;
+import com.zutubi.prototype.ConfigurationDescriptor;
+import com.opensymphony.util.TextUtils;
+import com.opensymphony.xwork.ActionContext;
 
 import java.util.*;
 
@@ -17,7 +17,7 @@ import java.util.*;
  *
  *
  */
-public class ConfigAction extends ActionSupport
+public class DeleteAction extends ActionSupport
 {
     private String scope;
     private String path;

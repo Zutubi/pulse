@@ -4,6 +4,7 @@ import com.zutubi.prototype.annotation.Table;
 import com.zutubi.pulse.prototype.record.RecordTypeInfo;
 import com.zutubi.pulse.prototype.record.RecordTypeRegistry;
 import com.zutubi.pulse.prototype.record.ValueListRecordPropertyInfo;
+import com.zutubi.pulse.prototype.record.RecordPropertyInfo;
 
 import java.beans.IntrospectionException;
 import java.lang.annotation.Annotation;
@@ -28,6 +29,17 @@ public class TableDescriptorFactory
     {
         RecordTypeInfo typeInfo = typeRegistry.getInfo(symbolicName);
         return createDescriptors(typeInfo);
+    }
+
+    public TableDescriptor createDescriptor(String symbolicName, String propertyName)
+    {
+        RecordTypeInfo typeInfo = typeRegistry.getInfo(symbolicName);
+        RecordPropertyInfo propertyInfo = typeInfo.getProperty(propertyName);
+        if (propertyInfo instanceof ValueListRecordPropertyInfo)
+        {
+            return createTableDescriptor((ValueListRecordPropertyInfo) propertyInfo);
+        }
+        return null;
     }
 
     public List<TableDescriptor> createDescriptors(RecordTypeInfo typeInfo) throws IntrospectionException

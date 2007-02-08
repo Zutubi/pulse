@@ -77,7 +77,7 @@ public abstract class AbstractDirective extends Directive
      * @throws org.apache.velocity.exception.ParseErrorException
      *          if the was an error in the format of the property
      */
-    protected Map createPropertyMap(InternalContextAdapter contextAdapter, Node node) throws ParseErrorException, MethodInvocationException
+    protected Map createPropertyMap(InternalContextAdapter contextAdapter, Node node) throws ParseErrorException
     {
         Map<String, String> propertyMap = new HashMap<String, String>();
 
@@ -89,7 +89,14 @@ public abstract class AbstractDirective extends Directive
 
         for (int index = 0, length = children; index < length; index++)
         {
-            this.putProperty(propertyMap, contextAdapter, node.jjtGetChild(index));
+            try
+            {
+                this.putProperty(propertyMap, contextAdapter, node.jjtGetChild(index));
+            }
+            catch (MethodInvocationException e)
+            {
+                throw new ParseErrorException("Failed to retrieve the requested property.");
+            }
         }
 
         return propertyMap;

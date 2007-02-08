@@ -54,7 +54,7 @@
         <p>show the full option tree...</p>
     </div>
 
-    <h1>Project x configuration</h1>
+    <h1>#i18n("path=$action.path" "key=label")</h1>
 
     <div>
         <a href="summary.action?scope=$action.scope">$action.scope</a>
@@ -67,20 +67,25 @@
         #end
     </div>
     <h2>introduction</h2>
-    <p>
-        Vestibulum aliquam, erat in nonummy varius, nisi lectus faucibus pede, ac scelerisque
-        sem mi at ligula. Duis hendrerit. Quisque porttitor diam vitae dolor. Morbi eget nisi
-        ac felis nonummy congue. Ut interdum orci non felis. Aliquam sed sapien.
-    </p>
+    <p>#i18n("path=$action.path" "key=introduction")</p>
 
     <h2>inline form</h2>
     <p>
-        $action.formHtml
+        #pform("path=$action.path" "scope=$action.scope")
     </p>
 
     <p>
-        <a href="summary.action?scope=$action.scope">apply</a> or <a href="summary.action?scope=$action.scope">done</a> (see <a href="#notes">notes</a> below)
+        <a href="summary.action?scope=$action.scope">apply</a> or <a href="summary.action?scope=$action.scope">done</a>
     </p>
+
+    #if($action.config.valueListProperties.size() > 0)
+        <h2>value lists</h2>
+        #foreach($valuelist in $action.config.valueListProperties)
+        <p>
+            #plist("path=$action.path" "scope=$action.scope" "propertyName=$valuelist")
+        </p>
+        #end
+    #end
 
     #if($action.config.nestedProperties.size() > 0)
     <p>
@@ -93,17 +98,6 @@
     </p>
     #end
 
-    #if($action.config.valueListProperties.size() > 0)
-    <p>
-        <h2>value</h2>
-        <ul>
-            #foreach($valuelist in $action.config.valueListProperties)
-            <li>$valuelist</li>
-            #end
-        </ul>
-    </p>
-    #end
-
     <h2>example</h2>
     <p>
         Vestibulum aliquam, erat in nonummy varius, nisi lectus faucibus pede, ac scelerisque
@@ -111,16 +105,6 @@
         ac felis nonummy congue. Ut interdum orci non felis. Aliquam sed sapien.
     </p>
 
-    <h2 id="notes">notes</h2>
-    <p>
-        navigation link to click once you have finished. you could also use the breadcrumbs. This link
-        needs to be prominent as it will be what is used to indicate that a this page is no longer required,
-        i am finished here. Options include
-        <ul>
-            <li>done: take me back to the summary page, i have finished updating this page.</li>
-            <li>apply: commonly understood idiom, will require form rearrangement since it implies a submit.</li>
-        </ul>
-    </p>
 </body>
 </html>
 

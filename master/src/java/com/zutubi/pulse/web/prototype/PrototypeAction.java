@@ -85,7 +85,7 @@ public class PrototypeAction extends RecordActionSupport
 
         Map<String, Object> context = new HashMap<String, Object>();
         context.put("form", formDescriptor.instantiate(r));
-        context.put("i18nText", new GetTextMethod());
+//        context.put("i18nText", new GetTextMethod());
         context.put("path", getPath());
 
         // provide some syntactic sweetener by linking the i18n text method to the ?i18n builtin function.
@@ -105,7 +105,7 @@ public class PrototypeAction extends RecordActionSupport
         {
             context = new HashMap<String, Object>();
             context.put("table", tableDescriptor.instantiate(r.get(tableDescriptor.getName())));
-            context.put("i18nText", new GetTextMethod());
+//            context.put("i18nText", new GetTextMethod());
             context.put("path", getPath() + "/" + tableDescriptor.getName());
 
             // provide some syntactic sweetener by linking the i18n text method to the ?i18n builtin function.

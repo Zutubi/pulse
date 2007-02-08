@@ -5,8 +5,8 @@ import com.zutubi.prototype.annotation.Handler;
 import com.zutubi.pulse.prototype.record.RecordTypeInfo;
 import com.zutubi.pulse.prototype.record.RecordTypeRegistry;
 import com.zutubi.pulse.prototype.record.SimpleRecordPropertyInfo;
+import com.zutubi.pulse.util.logging.Logger;
 
-import java.beans.IntrospectionException;
 import java.lang.annotation.Annotation;
 import java.util.Arrays;
 import java.util.LinkedList;
@@ -18,21 +18,23 @@ import java.util.List;
  */
 public class FormDescriptorFactory
 {
+    private static final Logger LOG = Logger.getLogger(FormDescriptorFactory.class);
+
     private RecordTypeRegistry typeRegistry;
 
-    public FormDescriptor createDescriptor(String symbolicName) throws IntrospectionException, IllegalAccessException, InstantiationException
+    public FormDescriptor createDescriptor(String symbolicName) 
     {
         RecordTypeInfo typeInfo = typeRegistry.getInfo(symbolicName);
         return createDescriptor(typeInfo);
     }
 
-    public FormDescriptor createDescriptor(Class type) throws IntrospectionException, IllegalAccessException, InstantiationException
+    public FormDescriptor createDescriptor(Class type)
     {
         RecordTypeInfo typeInfo = typeRegistry.getInfo(type);
         return createDescriptor(typeInfo);
     }
 
-    public FormDescriptor createDescriptor(RecordTypeInfo typeInfo) throws IllegalAccessException, InstantiationException, IntrospectionException
+    public FormDescriptor createDescriptor(RecordTypeInfo typeInfo)
     {
         FormDescriptor descriptor = new FormDescriptor();
         descriptor.setType(typeInfo);
@@ -45,7 +47,7 @@ public class FormDescriptorFactory
         return descriptor;
     }
 
-    private List<FieldDescriptor> buildFieldDescriptors(RecordTypeInfo typeInfo) throws IntrospectionException, IllegalAccessException, InstantiationException
+    private List<FieldDescriptor> buildFieldDescriptors(RecordTypeInfo typeInfo)
     {
         List<FieldDescriptor> fieldDescriptors = new LinkedList<FieldDescriptor>();
 
@@ -63,7 +65,7 @@ public class FormDescriptorFactory
         return fieldDescriptors;
     }
 
-    private void handleAnnotations(Descriptor descriptor, List<Annotation> annotations) throws IntrospectionException, IllegalAccessException, InstantiationException
+    private void handleAnnotations(Descriptor descriptor, List<Annotation> annotations)
     {
         // need to recurse over annotations, ignoring the java.lang annotations.
         for (Annotation annotation : annotations)
@@ -80,8 +82,19 @@ public class FormDescriptorFactory
             if (annotation.annotationType().isAnnotationPresent(Handler.class))
             {
                 Handler handlerAnnotation = annotation.annotationType().getAnnotation(Handler.class);
-                AnnotationHandler handler = handlerAnnotation.value().newInstance();
-                handler.process(annotation, descriptor);
+                try
+                {
+                    AnnotationHandler handler = handlerAnnotation.value().newInstance();
+                    handler.process(annotation, descriptor);
+                }
+                catch (InstantiationException e)
+                {
+                    LOG.warning(e); // failed to instantiate the annotation handler.
+                }
+                catch (IllegalAccessException e)
+                {
+                    LOG.warning(e); // failed to instantiate the annotation handler.
+                }
             }
         }
     }
