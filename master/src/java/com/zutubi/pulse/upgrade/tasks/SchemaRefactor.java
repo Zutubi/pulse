@@ -262,7 +262,7 @@ public class SchemaRefactor
         Table toTable = clone(fromTable);
         toTable.setName(toTableName);
 
-        String sql = toTable.sqlCreateString(dialect, null, defaultCatalog, defaultSchema);
+        String sql = toTable.sqlCreateString(dialect, config.getMapping(), defaultCatalog, defaultSchema);
         LOG.info(sql);
         JDBCUtils.execute(connection, sql);
 
@@ -306,6 +306,13 @@ public class SchemaRefactor
         {
             Column column = (Column) columns.next();
             clone.addColumn(column);
+        }
+
+        Iterator foreignKeys = table.getForeignKeyIterator();
+        while (foreignKeys.hasNext())
+        {
+            ForeignKey key = (ForeignKey) foreignKeys.next();
+            clone.createForeignKey(key.getName(), key.getColumns(), key.getReferencedEntityName(), key.getReferencedColumns());
         }
 
         return clone;

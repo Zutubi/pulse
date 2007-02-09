@@ -21,10 +21,10 @@
 
         <property name="refreshInterval" type="int"/>
 
-        <map name="properties" table="USER_PROPS">
+        <map name="properties" table="USER_PROPERTIES">
             <key column="USER_ID"/>
-            <index column="KEY" type="string" length="1000"/>
-            <element column="VALUE" type="string" length="4000"/>
+            <index column="PROPERTY_KEY" type="string" length="255"/>
+            <element column="PROPERTY_VALUE" type="string" length="4000"/>
         </map>
 
         <idbag name="grantedAuthorities" table="USER_AUTHORITIES" cascade="all,delete-orphan" lazy="false">
@@ -112,7 +112,7 @@
         <subclass name="com.zutubi.pulse.model.PersonalBuildSubscription" discriminator-value="PERSONAL"/>
 
         <subclass name="com.zutubi.pulse.model.ProjectBuildSubscription" discriminator-value="PROJECT">    
-            <property name="condition" column="CONDITION" type="string" length="255"/>
+            <property name="condition" column="NOTIFY_CONDITION" type="string" length="255"/>
 
             <bag name="projects" table="SUBSCRIPTION_PROJECTS" cascade="none" lazy="false">
                 <key column="SUBSCRIPTION_ID"/>
