@@ -258,7 +258,7 @@ public class CvsClient
         LogListener listener = new LogListener();
         if (!executeCommand(rlog, null, listener))
         {
-            throw new SCMException("Failed to retrieve the cvs server changes between details.");
+            throw new SCMException("Failed to retrieve the cvs server changes between revisions.");
         }
         return listener.getLogInfo();
     }
@@ -348,9 +348,10 @@ public class CvsClient
             try
             {
                 CvsDebugFormatter.contextHolder.set("" + (++COMMAND_COUNT)); // include the id of the scm?..
+                LOG.info("Executing command: 'cvs -d "+root+" " + command.getCVSCommand() + "'.");
                 if (!client.executeCommand(command, globalOptions))
                 {
-                    LOG.warning("Cvs command: -d "+root+" '" + command.getCVSCommand() + "' has failed.");
+                    LOG.warning("Command 'cvs -d "+root+" " + command.getCVSCommand() + "' has failed.");
                     return false;
                 }
                 return true;

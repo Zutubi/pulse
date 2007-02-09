@@ -46,6 +46,13 @@ public class CvsServer extends CachingSCMServer
         client.setPassword(password);
 
         this.module = module;
+        
+        // CIB-911: ensure that we trim any whitespace from the module, else the cvs command will return false.
+        if (module != null)
+        {
+            this.module = this.module.trim();
+        }
+        
         this.branch = branch;
         this.root = root;
         this.password = password;
