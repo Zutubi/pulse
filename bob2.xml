@@ -26,4 +26,16 @@
         <property name="targets" value="accept.master"/>
         <macro-ref macro="${ant-build}"/>
     </recipe>
+
+    <recipe name="dbtest">
+        <ant name="package" args="-Dskip.tests=true" targets="package.master"/>
+        <command name="build">
+            <ant targets="accept.master.nodeps"/>
+            <dir-artifact name="junit" base="build/reports/junit/html" fail-if-not-present="false"/>
+            <dir-artifact name="junit xml reports">
+                <include pattern="**/build/reports/junit/xml/*.xml"/>
+                <process processor="${junit.pp}"/>
+            </dir-artifact>
+        </command>
+    </recipe>
 </project>
