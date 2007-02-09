@@ -201,8 +201,14 @@ public class Data implements MasterUserPaths
         try
         {
             File databaseConfig = new File(getUserConfigRoot(), "database.properties");
-            File databaseConfigTemplate = new File(systemPaths.getConfigRoot(), "database.properties.template");
-            IOUtils.copyTemplate(databaseConfigTemplate, databaseConfig);
+            
+            // if the database.properties file already exists in the database directory, do not over write it.
+            // This allows pre-configured database.properties files to be used when pulse starts up.
+            if (!databaseConfig.exists())
+            {
+                File databaseConfigTemplate = new File(systemPaths.getConfigRoot(), "database.properties.template");
+                IOUtils.copyTemplate(databaseConfigTemplate, databaseConfig);
+            }
         }
         catch (IOException e)
         {

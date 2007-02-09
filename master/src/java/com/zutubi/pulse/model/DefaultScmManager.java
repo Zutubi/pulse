@@ -175,6 +175,13 @@ public class DefaultScmManager implements ScmManager, Stoppable
             }
 
             Revision previous = latestRevisions.get(scm.getId());
+            
+            // slightly paranoid, but we can not rely on the scm implementations to behave as expected.
+            if (previous == null)
+            {
+                latestRevisions.put(scm.getId(), server.getLatestRevision());
+                return;
+            }
 
             // We need to move this CVS specific code into the cvs implementation specific code.
             if (scm instanceof Cvs)
@@ -187,10 +194,10 @@ public class DefaultScmManager implements ScmManager, Stoppable
                     if (quietTime < System.currentTimeMillis())
                     {
                         Revision lastChange = waiting.get(scm.getId()).second;
-                        if (server.hasChangedSince(lastChange))
+                        Revision latest = getLatestRevisionSince(lastChange, server);
+                        if (latest != null)
                         {
                             // there has been a commit during the 'quiet period', lets reset the timer.
-                            Revision latest = getLatestRevisionSince(lastChange, server);
                             waiting.put(scm.getId(), new Pair<Long, Revision>(System.currentTimeMillis() + cvs.getQuietPeriod(), latest));
                         }
                         else
@@ -203,9 +210,9 @@ public class DefaultScmManager implements ScmManager, Stoppable
                 }
                 else
                 {
-                    if (server.hasChangedSince(previous))
+                    Revision latest = getLatestRevisionSince(previous, server);
+                    if (latest != null)
                     {
-                        Revision latest = getLatestRevisionSince(previous, server);
                         if (cvs.getQuietPeriod() != 0)
                         {
                             waiting.put(scm.getId(), new Pair<Long, Revision>(System.currentTimeMillis() + cvs.getQuietPeriod(), latest));
@@ -219,9 +226,9 @@ public class DefaultScmManager implements ScmManager, Stoppable
             }
             else
             {
-                if (server.hasChangedSince(previous))
+                Revision latest = getLatestRevisionSince(previous, server);
+                if (latest != null)
                 {
-                    Revision latest = getLatestRevisionSince(previous, server);
                     sendScmChangeEvent(scm, latest, previous);
                 }
             }
