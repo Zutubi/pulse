@@ -49,11 +49,11 @@ case "$PULSE_DB" in
         PULSE_DB_PASSWORD=pulsetest
         PULSE_DB_DIALECT=org.hibernate.dialect.PostgreSQLDialect
 
-        if echo 'SELECT * FROM pg_database;' | PGPASSWORD=pulsetest psql -U pulsetest -d template1 |grep pulse_accept
+        if echo 'SELECT * FROM pg_database;' | PGPASSWORD=pulsetest psql -h localhost -U pulsetest -d template1 |grep pulse_accept
         then
-            echo 'DROP DATABASE pulse_accept;' | PGPASSWORD=pulsetest psql -U pulsetest -d template1
+            echo 'DROP DATABASE pulse_accept;' | PGPASSWORD=pulsetest psql -h localhost -U pulsetest -d template1
         fi
-        echo 'CREATE DATABASE pulse_accept;' | PGPASSWORD=pulsetest psql -U pulsetest -d template1
+        echo 'CREATE DATABASE pulse_accept;' | PGPASSWORD=pulsetest psql -h localhost -U pulsetest -d template1
         ;;
     mysql)
         PULSE_DB_DRIVER=com.mysql.jdbc.Driver
