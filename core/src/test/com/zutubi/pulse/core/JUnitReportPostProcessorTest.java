@@ -54,7 +54,25 @@ public class JUnitReportPostProcessorTest extends XMLReportPostProcessorTestBase
     public void testSingle()
     {
         TestSuiteResult tests = runProcessor("single");
+        assertSingleSuite(tests);
+    }
 
+    public void testCustom()
+    {
+        JUnitReportPostProcessor pp = (JUnitReportPostProcessor) this.pp;
+        pp.setSuiteElement("customtestsuite");
+        pp.setCaseElement("customtestcase");
+        pp.setFailureElement("customfailure");
+        pp.setErrorElement("customerror");
+        pp.setNameAttribute("customname");
+        pp.setPackageAttribute("custompackage");
+        pp.setTimeAttribute("customtime");
+        TestSuiteResult tests = runProcessor("custom");
+        assertSingleSuite(tests);
+    }
+
+    private void assertSingleSuite(TestSuiteResult tests)
+    {
         assertEquals(1, tests.getSuites().size());
 
         TestSuiteResult suite = tests.getSuites().get(0);

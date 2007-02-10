@@ -18,6 +18,14 @@ public class JUnitReportPostProcessor extends XMLReportPostProcessor
     private static final String ATTRIBUTE_PACKAGE = "package";
     private static final String ATTRIBUTE_TIME = "time";
 
+    private String suiteElement = ELEMENT_SUITE;
+    private String caseElement = ELEMENT_CASE;
+    private String errorElement = ELEMENT_ERROR;
+    private String failureElement = ELEMENT_FAILURE;
+    private String nameAttribute = ATTRIBUTE_NAME;
+    private String packageAttribute = ATTRIBUTE_PACKAGE;
+    private String timeAttribute = ATTRIBUTE_TIME;
+
     public JUnitReportPostProcessor()
     {
         super("JUnit");
@@ -26,7 +34,7 @@ public class JUnitReportPostProcessor extends XMLReportPostProcessor
     protected void processDocument(Document doc, TestSuiteResult tests)
     {
         Element root = doc.getRootElement();
-        if(root.getLocalName().equals(ELEMENT_SUITE))
+        if(root.getLocalName().equals(suiteElement))
         {
             // A single suite
             processSuite(root, tests);
@@ -34,7 +42,7 @@ public class JUnitReportPostProcessor extends XMLReportPostProcessor
         else
         {
             // Looks like a full report, search for suites
-            Elements suiteElements = root.getChildElements(ELEMENT_SUITE);
+            Elements suiteElements = root.getChildElements(suiteElement);
             for(int i = 0; i < suiteElements.size(); i++)
             {
                 processSuite(suiteElements.get(i), tests);
@@ -46,13 +54,13 @@ public class JUnitReportPostProcessor extends XMLReportPostProcessor
     {
         String name = "";
 
-        String attr = element.getAttributeValue(ATTRIBUTE_PACKAGE);
+        String attr = element.getAttributeValue(packageAttribute);
         if(attr != null)
         {
             name += attr + '.';
         }
 
-        attr = element.getAttributeValue(ATTRIBUTE_NAME);
+        attr = element.getAttributeValue(nameAttribute);
         if(attr != null)
         {
             name += attr;
@@ -67,7 +75,7 @@ public class JUnitReportPostProcessor extends XMLReportPostProcessor
         long duration = getDuration(element);
 
         TestSuiteResult suite = new TestSuiteResult(name, duration);
-        Elements cases = element.getChildElements(ELEMENT_CASE);
+        Elements cases = element.getChildElements(caseElement);
         for(int i = 0; i < cases.size(); i++)
         {
             processCase(cases.get(i), suite);
@@ -78,7 +86,7 @@ public class JUnitReportPostProcessor extends XMLReportPostProcessor
 
     private void processCase(Element element, TestSuiteResult suite)
     {
-        String name = element.getAttributeValue(ATTRIBUTE_NAME);
+        String name = element.getAttributeValue(nameAttribute);
         if(name == null)
         {
             // Ignore nameless tests
@@ -89,7 +97,7 @@ public class JUnitReportPostProcessor extends XMLReportPostProcessor
         TestCaseResult caseResult = new TestCaseResult(name, duration);
         suite.add(caseResult);
 
-        Element child = element.getFirstChildElement(ELEMENT_ERROR);
+        Element child = element.getFirstChildElement(errorElement);
         if(child != null)
         {
             caseResult.setStatus(TestCaseResult.Status.ERROR);
@@ -101,7 +109,7 @@ public class JUnitReportPostProcessor extends XMLReportPostProcessor
             return;
         }
 
-        child = element.getFirstChildElement(ELEMENT_FAILURE);
+        child = element.getFirstChildElement(failureElement);
         if(child != null)
         {
             caseResult.setStatus(TestCaseResult.Status.FAILURE);
@@ -121,7 +129,7 @@ public class JUnitReportPostProcessor extends XMLReportPostProcessor
     private long getDuration(Element element)
     {
         long duration = TestResult.UNKNOWN_DURATION;
-        String attr = element.getAttributeValue(ATTRIBUTE_TIME);
+        String attr = element.getAttributeValue(timeAttribute);
 
         if(attr != null)
         {
@@ -137,5 +145,40 @@ public class JUnitReportPostProcessor extends XMLReportPostProcessor
         }
 
         return duration;
+    }
+
+    public void setSuiteElement(String suiteElement)
+    {
+        this.suiteElement = suiteElement;
+    }
+
+    public void setCaseElement(String caseElement)
+    {
+        this.caseElement = caseElement;
+    }
+
+    public void setErrorElement(String errorElement)
+    {
+        this.errorElement = errorElement;
+    }
+
+    public void setFailureElement(String failureElement)
+    {
+        this.failureElement = failureElement;
+    }
+
+    public void setNameAttribute(String nameAttribute)
+    {
+        this.nameAttribute = nameAttribute;
+    }
+
+    public void setPackageAttribute(String packageAttribute)
+    {
+        this.packageAttribute = packageAttribute;
+    }
+
+    public void setTimeAttribute(String timeAttribute)
+    {
+        this.timeAttribute = timeAttribute;
     }
 }
