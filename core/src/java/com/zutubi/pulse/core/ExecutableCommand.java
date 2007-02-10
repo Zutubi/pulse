@@ -358,6 +358,7 @@ public class ExecutableCommand implements Command, ScopeAware
             if (translatedKey != null)
             {
                 String path = childEnvironment.get(translatedKey);
+                pathKey = translatedKey;
                 pathValue = pathValue + path;
             }
 
