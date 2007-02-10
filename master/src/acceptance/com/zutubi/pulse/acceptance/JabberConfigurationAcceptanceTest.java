@@ -51,7 +51,7 @@ public class JabberConfigurationAcceptanceTest extends BaseAcceptanceTestCase
     public void testJabberReset() throws Exception
     {
         navigateToJabberConfiguration();
-        testEdit();
+        testJabberEdit();
 
         assertAndClick(Navigation.Administration.LINK_RESET_JABBER);
         assertJabberTable("", "5222", "");
