@@ -265,7 +265,7 @@ public class PersonalBuildClient extends PersonalBuildSupport
             PatchArchive patchArchive;
             try
             {
-                patchArchive = new PatchArchive(status, config.getBase(), patchFile, getUi());
+                patchArchive = new PatchArchive(status, patchFile, getUi());
             }
             finally
             {

@@ -23,6 +23,7 @@ public class P4Client
     private ProcessBuilder p4Builder;
     private Pattern changesPattern;
     private Pattern lineSplitterPattern;
+    private static final String ROOT_PREFIX = "Root:";
 
     public class P4Result
     {
@@ -174,6 +175,28 @@ public class P4Client
         clientSpec = clientSpec.replaceAll("\nClient:.*" + templateClient, Matcher.quoteReplacement("\nClient: " + clientName));
         clientSpec = clientSpec.replaceAll("//" + templateClient + "/", Matcher.quoteReplacement("//" + clientName + "/"));
         runP4(clientSpec, P4_COMMAND, COMMAND_CLIENT, FLAG_INPUT);
+    }
+
+    public File getClientRoot() throws SCMException
+    {
+        final File[] result = new File[1];
+
+        runP4WithHandler(new P4ErrorDetectingHandler(true)
+        {
+            public void handleStdout(String line) throws SCMException
+            {
+                if(line.startsWith(ROOT_PREFIX))
+                {
+                    result[0] = new File(line.substring(ROOT_PREFIX.length()).trim());
+                }
+            }
+
+            public void checkCancelled() throws SCMCancelledException
+            {
+            }
+        }, null, P4_COMMAND, COMMAND_CLIENT, FLAG_OUTPUT);
+
+        return result[0];
     }
 
     public Map<String, String> getServerInfo(String client) throws SCMException

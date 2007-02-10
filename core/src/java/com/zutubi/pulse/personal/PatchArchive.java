@@ -37,18 +37,17 @@ public class PatchArchive
      * working copy is established and the patch created based on that state.
      *
      * @param status    status of the working copy based at base
-     * @param base      the base directory for the working copy
      * @param patchFile the destination of the patch file created
      * @throws PersonalBuildException in the event of any error creating the patch
      */
-    public PatchArchive(WorkingCopyStatus status, File base, File patchFile, PersonalBuildUI ui) throws PersonalBuildException
+    public PatchArchive(WorkingCopyStatus status, File patchFile, PersonalBuildUI ui) throws PersonalBuildException
     {
         this.patchFile = patchFile;
         this.status = status;
 
         try
         {
-            createPatchArchive(base, ui);
+            createPatchArchive(status.getBase(), ui);
         }
         catch (IOException e)
         {

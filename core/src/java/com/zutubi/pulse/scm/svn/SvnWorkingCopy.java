@@ -174,7 +174,7 @@ public class SvnWorkingCopy extends PersonalBuildSupport implements WorkingCopy
             initAuthenticationManager();
         }
         
-        StatusHandler handler = new StatusHandler();
+        StatusHandler handler = new StatusHandler(base);
 
         try
         {
@@ -384,8 +384,13 @@ public class SvnWorkingCopy extends PersonalBuildSupport implements WorkingCopy
 
     private class StatusHandler implements ISVNEventHandler, ISVNStatusHandler
     {
-        WorkingCopyStatus status = new WorkingCopyStatus();
+        WorkingCopyStatus status;
         List<String> propertyChangedPaths = new LinkedList<String>();
+
+        public StatusHandler(File base)
+        {
+            status = new WorkingCopyStatus(base);
+        }
 
         public void handleEvent(SVNEvent event, double progress)
         {

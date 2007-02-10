@@ -84,7 +84,7 @@ public class P4WorkingCopy extends PersonalBuildSupport implements WorkingCopy
         do
         {
             revision = client.getLatestRevisionForFiles(null);
-            status = new WorkingCopyStatus(revision);
+            status = new WorkingCopyStatus(client.getClientRoot(), revision);
             P4FStatHandler handler = new P4FStatHandler(getUi(), status);
             client.runP4WithHandler(handler, null, P4_COMMAND, COMMAND_FSTAT, FLAG_PATH_IN_DEPOT_FORMAT, "//...");
 
@@ -96,7 +96,7 @@ public class P4WorkingCopy extends PersonalBuildSupport implements WorkingCopy
 
     public WorkingCopyStatus getLocalStatus(String... spec) throws SCMException
     {
-        WorkingCopyStatus status = new WorkingCopyStatus();
+        WorkingCopyStatus status = new WorkingCopyStatus(client.getClientRoot());
         P4FStatHandler handler = new P4FStatHandler(getUi(), status, false);
 
         // Spec can be either a changelist # or a list of files
