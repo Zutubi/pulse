@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <project default-recipe="default">
-    <junit.pp name="junit.pp"/>
+    <junit.pp name="junit.pp" resolve-conflicts="append"/>
 
     <macro name="ant-build">
         <command name="build">
