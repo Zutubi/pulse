@@ -358,15 +358,31 @@ public class FileSystemUtils
         return setWritable(file, true);
     }
 
-    public static boolean setWritable(File file, boolean executable)
+    public static boolean setWritable(File file, boolean writable)
     {
-        if(executable)
+        if(writable)
         {
-            return runChmod(file, "a+w");
+            if(SystemUtils.IS_WINDOWS)
+            {
+                try
+                {
+                    SystemUtils.runCommand("attrib", "-R", file.getAbsolutePath());
+                    return true;
+                }
+                catch (IOException e)
+                {
+                    LOG.warning(e);
+                    return false;
+                }
+            }
+            else
+            {
+                return runChmod(file, "a+w");
+            }
         }
         else
         {
-            return runChmod(file, "a-w");
+            return file.setReadOnly();
         }
     }
 
