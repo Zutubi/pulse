@@ -48,7 +48,7 @@ public class LdapConfigurationAcceptanceTest extends BaseAcceptanceTestCase
         form.cancelFormElements("true", "ldap://dummy/", "dc=example,dc=com", "uid=admin", "password", "(uid={0})", "true", "mail", "ou=groups", "(member=${user.dn})", "cn", "true", "false");
     }
 
-    public void testReset() throws Exception
+    public void testLdapReset() throws Exception
     {
         navigateToLdapConfiguration();
         testEdit();
@@ -57,7 +57,7 @@ public class LdapConfigurationAcceptanceTest extends BaseAcceptanceTestCase
         assertLdapTable("", "");
     }
 
-    public void testCancel() throws Exception
+    public void testLdapCancel() throws Exception
     {
         navigateToLdapConfiguration();
 
@@ -69,7 +69,7 @@ public class LdapConfigurationAcceptanceTest extends BaseAcceptanceTestCase
         assertTextNotPresent("oogie");
     }
 
-    public void testValidate() throws Exception
+    public void testLdapValidate() throws Exception
     {
         navigateToLdapConfiguration();
 

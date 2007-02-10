@@ -2,9 +2,9 @@ package com.zutubi.pulse.logging;
 
 import com.zutubi.pulse.test.PulseTestCase;
 
-import java.util.Properties;
-import java.util.Map;
 import java.util.HashMap;
+import java.util.Map;
+import java.util.Properties;
 import java.util.logging.*;
 
 /**
@@ -85,7 +85,7 @@ public class LogManagerTest extends PulseTestCase
         assertEquals(Level.FINE, l.getLevel());
     }
 
-    public void testResetValuesToDefaults()
+    public void testLogResetValuesToDefaults()
     {
         Properties props = new Properties();
         props.put("a.b.c.level", "FINE");
@@ -99,7 +99,7 @@ public class LogManagerTest extends PulseTestCase
         assertEquals(null, l.getLevel());
     }
 
-    public void testConfig()
+    public void testLogConfig()
     {
         Properties props = new Properties();
         props.put("config", "com.zutubi.pulse.logging.TestConfigObject");
@@ -187,7 +187,7 @@ public class LogManagerTest extends PulseTestCase
         assertEquals(2, l.getHandlers().length);
     }
 
-    public void testReset()
+    public void testLogReset()
     {
         Properties props = new Properties();
         props.put("handlers", "myConsoleHandler");

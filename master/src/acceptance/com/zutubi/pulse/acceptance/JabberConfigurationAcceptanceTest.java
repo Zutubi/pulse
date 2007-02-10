@@ -27,7 +27,7 @@ public class JabberConfigurationAcceptanceTest extends BaseAcceptanceTestCase
         super.tearDown();
     }
 
-    public void testEdit() throws Exception
+    public void testJabberEdit() throws Exception
     {
         navigateToJabberConfiguration();
 
@@ -48,7 +48,7 @@ public class JabberConfigurationAcceptanceTest extends BaseAcceptanceTestCase
         form.cancelFormElements("testhost", "10101", "testuser", "testpassword");
     }
 
-    public void testReset() throws Exception
+    public void testJabberReset() throws Exception
     {
         navigateToJabberConfiguration();
         testEdit();
@@ -57,7 +57,7 @@ public class JabberConfigurationAcceptanceTest extends BaseAcceptanceTestCase
         assertJabberTable("", "5222", "");
     }
 
-    public void testCancel() throws Exception
+    public void testJabberCancel() throws Exception
     {
         navigateToJabberConfiguration();
 
@@ -69,7 +69,7 @@ public class JabberConfigurationAcceptanceTest extends BaseAcceptanceTestCase
         assertTextNotPresent("boohoo");
     }
 
-    public void testValidate() throws Exception
+    public void testJabberValidate() throws Exception
     {
         navigateToJabberConfiguration();
 
