@@ -44,7 +44,7 @@ public class JDBCTransferTarget implements TransferTarget
             createSchema(configuration);
 
             originalAutoCommitSetting = connection.getAutoCommit();
-            connection.setAutoCommit(true);
+            connection.setAutoCommit(false);
         }
         catch (SQLException e)
         {
@@ -83,7 +83,7 @@ public class JDBCTransferTarget implements TransferTarget
             LOG.fine(String.format(sql, data.toArray()));
             insert.execute();
 
-            if(rowCount++ % 1000 == 0)
+            if(++rowCount % 1000 == 0)
             {
                 connection.commit();
             }
@@ -169,7 +169,6 @@ public class JDBCTransferTarget implements TransferTarget
         {
             JDBCUtils.close(stmt);
         }
-        connection.commit();
     }
 
     private void createSchemaConstraints(MutableConfiguration configuration) throws SQLException
@@ -193,6 +192,5 @@ public class JDBCTransferTarget implements TransferTarget
         {
             JDBCUtils.close(stmt);
         }
-        connection.commit();
     }
 }
