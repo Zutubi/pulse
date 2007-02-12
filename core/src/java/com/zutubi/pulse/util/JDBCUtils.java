@@ -113,11 +113,47 @@ public class JDBCUtils
 
     public static void execute(Connection con, String sql) throws SQLException
     {
-        CallableStatement stmt = null;
+        PreparedStatement stmt = null;
         try
         {
-            stmt = con.prepareCall(sql);
+            stmt = con.prepareStatement(sql);
             stmt.execute();
+        }
+        finally
+        {
+            JDBCUtils.close(stmt);
+        }
+    }
+
+    public static Object executeSimpleQuery(DataSource ds, String sql) throws SQLException
+    {
+        Connection con = null;
+        try
+        {
+            con = ds.getConnection();
+            return executeSimpleQuery(con, sql);
+        }
+        finally
+        {
+            JDBCUtils.close(con);
+        }
+    }
+
+    public static Object executeSimpleQuery(Connection con, String sql) throws SQLException
+    {
+        PreparedStatement stmt = null;
+        try
+        {
+            stmt = con.prepareStatement(sql);
+            ResultSet rs = stmt.executeQuery();
+            if(rs.next())
+            {
+                return rs.getObject(1);                
+            }
+            else
+            {
+                return null;
+            }
         }
         finally
         {

@@ -1,21 +1,15 @@
 package com.zutubi.pulse.transfer;
 
-import com.zutubi.pulse.transfer.MappingUtils;
 import com.zutubi.pulse.upgrade.tasks.MutableConfiguration;
 import com.zutubi.pulse.util.JDBCUtils;
 import org.hibernate.engine.Mapping;
 import org.hibernate.mapping.Column;
 import org.hibernate.mapping.Table;
+import org.hibernate.mapping.SimpleValue;
 
 import javax.sql.DataSource;
-import java.sql.CallableStatement;
-import java.sql.Connection;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
+import java.sql.*;
+import java.util.*;
 
 /**
  *
@@ -58,38 +52,19 @@ public class JDBCTransferSource implements TransferSource
                     List<Column> columns = MappingUtils.getColumns(table);
                     for (Column column : columns)
                     {
-                        column.setSqlTypeCode(column.getSqlTypeCode(mapping));
-                    }
-
-                    target.startTable(table);
-
-                    String sql = MappingUtils.sqlSelectAll(table);
-
-                    CallableStatement statement = null;
-                    ResultSet rows = null;
-                    try
-                    {
-                        statement = con.prepareCall(sql);
-
-                        rows = statement.executeQuery();
-                        while (rows.next())
+                        if (column.getSqlTypeCode() == null)
                         {
-                            Map<String, Object> row = new HashMap<String, Object>();
-                            for (Column column : columns)
-                            {
-                                row.put(column.getName(), rows.getObject(column.getName()));
-                            }
-                            target.row(row);
+                            column.setSqlTypeCode(column.getSqlTypeCode(mapping));
                         }
                     }
-                    finally
-                    {
-                        JDBCUtils.close(rows);
-                        JDBCUtils.close(statement);
-                    }
 
-                    target.endTable();
+                    exportTable(target, table, con, columns);
                 }
+
+                // handle the special case.
+                Table table = HibernateUniqueKeyTable.getMapping();
+                exportTable(target, table, con, MappingUtils.getColumns(table));
+
             }
             finally
             {
@@ -102,5 +77,38 @@ public class JDBCTransferSource implements TransferSource
         {
             throw new TransferException(e);
         }
+    }
+
+    private void exportTable(TransferTarget target, Table table, Connection con, List<Column> columns)
+            throws TransferException, SQLException
+    {
+        target.startTable(table);
+
+        String sql = MappingUtils.sqlSelectAll(table);
+
+        PreparedStatement statement = null;
+        ResultSet rows = null;
+        try
+        {
+            statement = con.prepareStatement(sql);
+
+            rows = statement.executeQuery();
+            while (rows.next())
+            {
+                Map<String, Object> row = new HashMap<String, Object>();
+                for (Column column : columns)
+                {
+                    row.put(column.getName(), rows.getObject(column.getName()));
+                }
+                target.row(row);
+            }
+        }
+        finally
+        {
+            JDBCUtils.close(rows);
+            JDBCUtils.close(statement);
+        }
+
+        target.endTable();
     }
 }

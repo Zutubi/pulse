@@ -1,22 +1,21 @@
 package com.zutubi.pulse.transfer;
 
-import org.apache.commons.dbcp.BasicDataSource;
-import org.springframework.core.io.Resource;
-import org.springframework.core.io.ClassPathResource;
-import org.hibernate.dialect.Dialect;
-
-import java.io.IOException;
-import java.io.ByteArrayOutputStream;
-import java.io.ByteArrayInputStream;
-import java.sql.SQLException;
-import java.util.List;
-import java.util.LinkedList;
-import java.util.Properties;
-
-import nu.xom.ParsingException;
 import com.zutubi.pulse.upgrade.tasks.MutableConfiguration;
 import com.zutubi.pulse.util.JDBCUtils;
 import junit.framework.TestCase;
+import nu.xom.ParsingException;
+import org.apache.commons.dbcp.BasicDataSource;
+import org.hibernate.dialect.Dialect;
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.core.io.Resource;
+
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.sql.SQLException;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Properties;
 
 /**
  *
@@ -72,6 +71,8 @@ public class TransferAPITest extends TestCase
 
         // SETUP TEST DATA.
         JDBCUtils.execute(dataSource, "insert into TYPES (ID, STRING_TYPE, BOOLEAN_TYPE) values (1, 'string', '1')");
+        JDBCUtils.execute(dataSource, "insert into TYPES (ID, STRING_TYPE, BOOLEAN_TYPE) values (2, '', '1')");
+        JDBCUtils.execute(dataSource, "insert into TYPES (ID, STRING_TYPE, BOOLEAN_TYPE) values (3, null, '1')");
         JDBCUtils.execute(dataSource, "insert into RELATED_TYPES (ID, TYPE) values (1, 1)");
 
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
@@ -87,7 +88,9 @@ public class TransferAPITest extends TestCase
 
         transferAPI.restore(configuration, dataSource, bais);
 
-        assertEquals(1, JDBCUtils.executeCount(dataSource, "select * from TYPES"));
+        assertEquals(3, JDBCUtils.executeCount(dataSource, "select * from TYPES"));
+        assertEquals("", JDBCUtils.executeSimpleQuery(dataSource, "select STRING_TYPE from TYPES where ID = 2"));
+        assertNull(JDBCUtils.executeSimpleQuery(dataSource, "select STRING_TYPE from TYPES where ID = 3"));
         assertEquals(1, JDBCUtils.executeCount(dataSource, "select * from RELATED_TYPES"));
     }
 

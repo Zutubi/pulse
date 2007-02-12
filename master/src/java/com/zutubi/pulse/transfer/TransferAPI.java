@@ -3,9 +3,13 @@ package com.zutubi.pulse.transfer;
 import com.zutubi.pulse.Version;
 import com.zutubi.pulse.upgrade.tasks.MutableConfiguration;
 import com.zutubi.pulse.util.IOUtils;
+import org.hibernate.mapping.Column;
+import org.hibernate.mapping.SimpleValue;
+import org.hibernate.mapping.Table;
 
 import javax.sql.DataSource;
 import java.io.*;
+import java.sql.Types;
 
 /**
  *
