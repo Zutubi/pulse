@@ -1,6 +1,5 @@
 package com.zutubi.pulse.transfer;
 
-import com.zutubi.pulse.transfer.MappingUtils;
 import com.zutubi.pulse.upgrade.tasks.MutableConfiguration;
 import com.zutubi.pulse.util.JDBCUtils;
 import org.hibernate.engine.Mapping;

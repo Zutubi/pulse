@@ -32,11 +32,15 @@ public class JDBCTransferTarget implements TransferTarget
     private DataSource dataSource;
     private MutableConfiguration configuration;
 
+    private boolean autocommit = false;
+
     public void start() throws TransferException
     {
         try
         {
             connection = dataSource.getConnection();
+            autocommit = connection.getAutoCommit();
+            connection.setAutoCommit(false);
             createSchema(configuration);
         }
         catch (SQLException e)
@@ -92,6 +96,7 @@ public class JDBCTransferTarget implements TransferTarget
         try
         {
             createSchemaConstraints(configuration);
+            connection.setAutoCommit(autocommit);
         }
         catch (SQLException e)
         {
