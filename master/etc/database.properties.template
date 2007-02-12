@@ -14,6 +14,7 @@
 #
 jdbc.driverClassName=org.hsqldb.jdbcDriver
 #jdbc.driverClassName=org.postgresql.Driver
+#jdbc.driverClassName=com.mysql.jdbc.Driver
 
 #
 # The jdbc connection url.
@@ -27,6 +28,7 @@ jdbc.driverClassName=org.hsqldb.jdbcDriver
 #
 jdbc.url=jdbc:hsqldb:DB_ROOT/db
 #jdbc.url=jdbc:postgresql://localhost:5432/pulse
+#jdbc.url=jdbc:mysql://localhost:3306/pulse
 
 #
 # The jdbc connection username. This is used to authenticate the jdbc
@@ -34,7 +36,7 @@ jdbc.url=jdbc:hsqldb:DB_ROOT/db
 #
 jdbc.username=sa
 #jdbc.username=postgres
-
+#jdbc.username=pulse
 
 #
 # The jdbc connection password. This is used to authenticate the jdbc
@@ -42,6 +44,7 @@ jdbc.username=sa
 #
 jdbc.password=
 #jdbc.password=postgres
+#jdbc.password=pulse
 
 #
 # Hibernate properties
@@ -53,6 +56,7 @@ jdbc.password=
 #
 hibernate.dialect=org.hibernate.dialect.HSQLDialect
 #hibernate.dialect=org.hibernate.dialect.PostgreSQLDialect
+#hibernate.dialect=org.hibernate.dialect.MySQLDialect
 hibernate.show_sql=false
 hibernate.jdbc.batch_size=0
 hibernate.jdbc.use_scrollable_resultsets=false

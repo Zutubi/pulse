@@ -437,6 +437,10 @@
 
     <target name="run.accept.master" depends="init">
 
+        <antcall target="accept.master.nodeps"/>
+    </target>
+
+    <target name="accept.master.nodeps">
         <property name="build.dir" value="master/build"/>
         <property name="report.dir" value="build/reports/junit"/>
         <mkdir dir="${report.dir}/xml"/>

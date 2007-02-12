@@ -10,7 +10,7 @@
 
         <property name="name" column="NAME" type="string" length="255"/>
 
-        <property name="index" column="INDEX" type="string" length="255"/>
+        <property name="index" column="INDEX_FILE" type="string" length="255"/>
 
         <property name="url" column="URL" type="string" length="1023"/>
 
