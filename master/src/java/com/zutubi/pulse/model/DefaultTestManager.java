@@ -27,12 +27,15 @@ public class DefaultTestManager implements TestManager
 
     public void index(BuildResult result)
     {
-        for (RecipeResultNode node : result)
+        if (!result.isPersonal())
         {
-            File testDir = new File(node.getResult().getAbsoluteOutputDir(configurationManager.getDataDirectory()), RecipeResult.TEST_DIR);
-            if (testDir.isDirectory())
+            for (RecipeResultNode node : result)
             {
-                indexTestsForStage(result, result.getSpecName().getId(), node.getStageName().getId(), testDir);
+                File testDir = new File(node.getResult().getAbsoluteOutputDir(configurationManager.getDataDirectory()), RecipeResult.TEST_DIR);
+                if (testDir.isDirectory())
+                {
+                    indexTestsForStage(result, result.getSpecName().getId(), node.getStageName().getId(), testDir);
+                }
             }
         }
     }
