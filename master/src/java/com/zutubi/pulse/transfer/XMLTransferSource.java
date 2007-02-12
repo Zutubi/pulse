@@ -1,7 +1,7 @@
 package com.zutubi.pulse.transfer;
 
-import com.zutubi.pulse.util.JDBCTypes;
 import com.zutubi.pulse.upgrade.tasks.MutableConfiguration;
+import com.zutubi.pulse.util.JDBCTypes;
 import nu.xom.Builder;
 import nu.xom.NodeFactory;
 import org.hibernate.mapping.Table;
@@ -107,6 +107,10 @@ public class XMLTransferSource extends XMLTransferSupport implements TransferSou
     protected void startColumn(String uri, String localName, String qName, Attributes atts)
     {
         columnName = columnIterator.next();
+        if(atts.getValue("null") == null)
+        {
+            row.put(columnName, "");
+        }
     }
 
     protected void endColumn(String uri, String localName, String qName)

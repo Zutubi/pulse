@@ -140,6 +140,10 @@ public class XMLTransferTarget extends XMLTransferSupport implements TransferTar
                     String value = toText(columnTypes.get(columnName), row.get(columnName));
                     columnElement.appendChild(value);
                 }
+                else
+                {
+                    columnElement.addAttribute(new Attribute("null", "t"));
+                }
 
                 serializer.write(columnElement);
 

@@ -1,5 +1,7 @@
 package com.zutubi.pulse.transfer;
 
+import org.apache.ws.commons.util.Base64;
+
 import java.math.BigDecimal;
 import java.sql.Date;
 import java.sql.Timestamp;
@@ -13,11 +15,44 @@ public class XMLTransferSupport
 {
     public String toText(int type, Object obj)
     {
-        return obj.toString();
+        switch (type)
+        {
+            case Types.BIGINT:
+            case Types.TINYINT:
+            case Types.INTEGER:
+            case Types.SMALLINT:
+            case Types.REAL :
+            case Types.FLOAT :
+            case Types.DOUBLE :
+            case Types.NUMERIC:
+            case Types.DECIMAL:
+            case Types.BOOLEAN:
+            case Types.BIT:
+            case Types.VARCHAR:
+            case Types.CHAR:
+            case Types.LONGVARCHAR:
+            case Types.TIMESTAMP:
+            case Types.DATE:
+                return obj.toString();
+            case Types.NULL:
+                return null;
+            case Types.BINARY :
+            case Types.VARBINARY :
+            case Types.LONGVARBINARY :
+                byte[] data = (byte[]) obj;
+                return Base64.encode(data, 0, data.length, 0, null);
+            default:
+                throw new RuntimeException("unsupported type: " + type + " value: " + obj.toString());
+        }
     }
 
-    public Object fromText(int type, String str)
+    public Object fromText(int type, String str) throws TransferException
     {
+        if(str == null)
+        {
+            return null;
+        }
+        
         switch (type)
         {
             case Types.BIGINT:
@@ -45,7 +80,14 @@ public class XMLTransferSupport
             case Types.BINARY :
             case Types.VARBINARY :
             case Types.LONGVARBINARY :
-                return str.getBytes();
+                try
+                {
+                    return Base64.decode(str);
+                }
+                catch (Base64.DecodingException e)
+                {
+                    throw new TransferException(e);
+                }
             case Types.TIMESTAMP:
                 return Timestamp.valueOf(str);
             case Types.DATE:
