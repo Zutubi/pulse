@@ -84,35 +84,21 @@ public class ExportImportSanityTest extends TestCase
 
         BasicDataSource source = new BasicDataSource();
         source.setDriverClassName("org.postgresql.Driver");
-        source.setUrl("jdbc:postgresql://localhost:5432/pulse");
+        source.setUrl("jdbc:postgresql://localhost:5432/postgres");
         source.setUsername("postgres");
         source.setPassword("postgres");
 
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+
+        TransferAPI transferAPI = new TransferAPI();
+        transferAPI.dump(configuration, source, out);
+
         BasicDataSource target = new BasicDataSource();
         target.setDriverClassName("org.postgresql.Driver");
-        target.setUrl("jdbc:postgresql://localhost:5432/pulse2");
+        target.setUrl("jdbc:postgresql://localhost:5432/pulse");
         target.setUsername("postgres");
         target.setPassword("postgres");
 
-        JDBCTransferSource jdbcSource = new JDBCTransferSource();
-        jdbcSource.setConfiguration(configuration);
-        jdbcSource.setDataSource(source);
-
-        ByteArrayOutputStream out = new ByteArrayOutputStream();
-
-        XMLTransferTarget xmlTarget = new XMLTransferTarget();
-        xmlTarget.setOutput(out);
-
-        jdbcSource.transferTo(xmlTarget);
-
-        XMLTransferSource xmlSource = new XMLTransferSource();
-        xmlSource.setSource(new ByteArrayInputStream(out.toByteArray()));
-        xmlSource.setConfiguration(configuration);
-
-        JDBCTransferTarget jdbcTarget = new JDBCTransferTarget();
-        jdbcTarget.setConfiguration(configuration);
-        jdbcTarget.setDataSource(target);
-
-        xmlSource.transferTo(jdbcTarget);
+        transferAPI.restore(configuration, target, new ByteArrayInputStream(out.toByteArray()));
     }
 }

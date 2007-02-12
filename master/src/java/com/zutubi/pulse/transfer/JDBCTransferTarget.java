@@ -11,6 +11,7 @@ import javax.sql.DataSource;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -32,7 +33,7 @@ public class JDBCTransferTarget implements TransferTarget
     private DataSource dataSource;
     private MutableConfiguration configuration;
 
-    private boolean autocommit = false;
+    private boolean originalAutoCommitSetting = false;
     private int rowCount = 0;
 
     public void start() throws TransferException
@@ -40,9 +41,10 @@ public class JDBCTransferTarget implements TransferTarget
         try
         {
             connection = dataSource.getConnection();
-            autocommit = connection.getAutoCommit();
-            connection.setAutoCommit(false);
             createSchema(configuration);
+
+            originalAutoCommitSetting = connection.getAutoCommit();
+            connection.setAutoCommit(true);
         }
         catch (SQLException e)
         {
@@ -109,8 +111,9 @@ public class JDBCTransferTarget implements TransferTarget
     {
         try
         {
+            connection.setAutoCommit(originalAutoCommitSetting);
+            
             createSchemaConstraints(configuration);
-            connection.setAutoCommit(autocommit);
         }
         catch (SQLException e)
         {
@@ -149,27 +152,47 @@ public class JDBCTransferTarget implements TransferTarget
 
         Dialect dialect = Dialect.getDialect(configuration.getProperties());
         String[] sqlCreate = configuration.generateSchemaCreationScript(dialect);
-        for (String sql : sqlCreate)
+        Statement stmt = null;
+        try
         {
-            if (sql.startsWith("create"))
+            stmt = connection.createStatement();
+            for (String sql : sqlCreate)
             {
-                LOG.info(sql);
-                JDBCUtils.execute(connection, sql);
+                if (sql.startsWith("create"))
+                {
+                    LOG.info(sql);
+                    stmt.executeUpdate(sql);
+                }
             }
         }
+        finally
+        {
+            JDBCUtils.close(stmt);
+        }
+        connection.commit();
     }
 
     private void createSchemaConstraints(MutableConfiguration configuration) throws SQLException
     {
         Dialect dialect = Dialect.getDialect(configuration.getProperties());
         String[] sqlAlter = configuration.generateSchemaCreationScript(dialect);
-        for (String sql : sqlAlter)
+        Statement stmt = null;
+        try
         {
-            if (sql.startsWith("alter"))
+            stmt = connection.createStatement();
+            for (String sql : sqlAlter)
             {
-                LOG.info(sql);
-                JDBCUtils.execute(connection, sql);
+                if (sql.startsWith("alter"))
+                {
+                    LOG.info(sql);
+                    stmt.executeUpdate(sql);
+                }
             }
         }
+        finally
+        {
+            JDBCUtils.close(stmt);
+        }
+        connection.commit();
     }
 }

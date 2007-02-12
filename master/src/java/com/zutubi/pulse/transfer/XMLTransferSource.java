@@ -129,6 +129,10 @@ public class XMLTransferSource extends XMLTransferSupport implements TransferSou
                 return table;
             }
         }
+        if (HibernateUniqueKeyTable.isTable(tableName))
+        {
+            return HibernateUniqueKeyTable.getMapping();
+        }
         return null;
     }
 
