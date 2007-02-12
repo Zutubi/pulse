@@ -4,10 +4,10 @@ import com.zutubi.pulse.upgrade.tasks.MutableConfiguration;
 import com.zutubi.pulse.util.JDBCUtils;
 import junit.framework.TestCase;
 import nu.xom.ParsingException;
-import org.apache.commons.dbcp.BasicDataSource;
 import org.hibernate.dialect.Dialect;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
+import org.apache.commons.dbcp.BasicDataSource;
 
 import javax.sql.DataSource;
 import java.io.ByteArrayInputStream;
