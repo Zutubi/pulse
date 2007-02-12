@@ -3,16 +3,21 @@ package com.zutubi.pulse.command;
 import com.opensymphony.util.TextUtils;
 import com.zutubi.pulse.bootstrap.ComponentContext;
 import com.zutubi.pulse.bootstrap.SystemBootstrapManager;
+import com.zutubi.pulse.bootstrap.DatabaseConfig;
 import com.zutubi.pulse.bootstrap.conf.EnvConfig;
+import com.zutubi.pulse.upgrade.tasks.MutableConfiguration;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.OptionBuilder;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.ClassPathResource;
 
 import javax.sql.DataSource;
 import java.io.IOException;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.List;
 
 /**
  * The abstract base command for commands used to import/export data.
@@ -22,6 +27,7 @@ public abstract class DataCommand implements Command
     private static final String ENV_PULSE_CONFIG = "PULSE_CONFIG";
     private String pulseConfig;
     protected DataSource dataSource;
+    protected MutableConfiguration configuration;
 
     public void setConfig(String path)
     {
@@ -42,8 +48,22 @@ public abstract class DataCommand implements Command
         SystemBootstrapManager sbm = new SystemBootstrapManager();
         sbm.loadBootstrapContext();
         ComponentContext.addClassPathContextDefinitions("classpath:/com/zutubi/pulse/bootstrap/context/databaseContext.xml");
+        ComponentContext.addClassPathContextDefinitions("classpath:/com/zutubi/pulse/bootstrap/context/hibernateMappingsContext.xml");
 
         dataSource = (DataSource) ComponentContext.getBean("dataSource");
+
+        configuration = new MutableConfiguration();
+
+        List<String> mappings = (List<String>) ComponentContext.getBean("hibernateMappings");
+        for (String mapping : mappings)
+        {
+            Resource resource = new ClassPathResource(mapping);
+            configuration.addInputStream(resource.getInputStream());
+        }
+
+        DatabaseConfig databaseConfig = (DatabaseConfig) ComponentContext.getBean("databaseConfig");
+        configuration.setProperties(databaseConfig.getHibernateProperties());
+
         return doExecute(context);
    }
 

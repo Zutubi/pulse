@@ -96,8 +96,12 @@ public class SimpleMasterConfigurationManager extends AbstractConfigurationManag
     {
         if (dbConfig == null)
         {
-            File configFile = new File(getUserPaths().getUserConfigRoot(), "database.properties");
-            if (!configFile.exists())
+            File configFile = null;
+            if (getUserPaths() != null && getUserPaths().getUserConfigRoot() != null)
+            {
+                configFile = new File(getUserPaths().getUserConfigRoot(), "database.properties");
+            }
+            if (configFile == null || !configFile.exists())
             {
                 configFile = new File(getSystemPaths().getConfigRoot(), "database.properties.template");
             }

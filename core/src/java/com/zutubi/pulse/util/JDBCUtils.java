@@ -458,8 +458,22 @@ public class JDBCUtils
         }
         finally
         {
-            JDBCUtils.close(rs);
-            JDBCUtils.close(ps);
+            close(rs);
+            close(ps);
+        }
+    }
+
+    public static int executeCount(DataSource dataSource, String sql) throws SQLException
+    {
+        Connection con = null;
+        try
+        {
+            con = dataSource.getConnection();
+            return executeCount(con, sql);
+        }
+        finally
+        {
+            close(con);
         }
     }
 

@@ -4,12 +4,13 @@ import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.ParseException;
 import org.apache.commons.cli.PosixParser;
-import org.hsqldb.util.TransferAPI;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
+
+import com.zutubi.pulse.transfer.TransferAPI;
 
 /**
  */
@@ -38,7 +39,7 @@ public class ImportCommand extends DataCommand
         TransferAPI transferAPI = new TransferAPI();
         try
         {
-            transferAPI.restore(inFile, dataSource);
+            transferAPI.restore(configuration, inFile, dataSource);
         }
         catch (Exception e)
         {
