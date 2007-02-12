@@ -2,6 +2,7 @@ package com.zutubi.pulse.scm;
 
 import com.zutubi.pulse.core.model.Revision;
 
+import java.io.File;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -12,13 +13,20 @@ public class WorkingCopyStatus implements Iterable<FileStatus>
 {
     private Revision revision;
     private List<FileStatus> changes = new LinkedList<FileStatus>();
+    private transient File base;
 
     public WorkingCopyStatus()
     {
     }
 
-    public WorkingCopyStatus(Revision revision)
+    public WorkingCopyStatus(File base)
     {
+        this.base = base;
+    }
+
+    public WorkingCopyStatus(File base, Revision revision)
+    {
+        this(base);
         this.revision = revision;
     }
 
@@ -108,5 +116,10 @@ public class WorkingCopyStatus implements Iterable<FileStatus>
     public boolean hasChanges()
     {
         return changes.size() > 0;
+    }
+
+    public File getBase()
+    {
+        return base;
     }
 }

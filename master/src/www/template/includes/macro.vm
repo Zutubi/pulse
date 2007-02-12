@@ -1408,7 +1408,7 @@
         <ul>
         #foreach($feature in $fileArtifact.getFeatures($level))
             <li class="$level.toString().toLowerCase()">
-            #if($feature.isPlain() && $feature.hasContext())
+            #if($feature.hasContext())
                 <span class="context">
                 #foreach($line in $feature.summaryLines)
                     #if($velocityCount == $feature.lineOffset())
@@ -1422,12 +1422,12 @@
                     #end
                 #end
                 </span>
+            #else
+                $action.plainToHtml($feature.summary)<br/>
+            #end
                 <a class="unadorned" href="viewArtifactt.action?id=$fileArtifact.id&amp;buildId=$build.id&amp;commandId=$command.id#$feature.lineNumber">
                     <span class="small">#wwtext("name=jump.to")</span> <img src="$base/images/go_small.gif"/>
                 </a>
-            #else
-                $action.plainToHtml($feature.summary)
-            #end
             </li>
         #end
         </ul>

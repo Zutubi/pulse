@@ -25,7 +25,7 @@ public class SmtpConfigurationAcceptanceTest extends BaseAcceptanceTestCase
         super.tearDown();
     }
 
-    public void testReset() throws Exception
+    public void testSmtpReset() throws Exception
     {
         navigateToSmtpConfiguration();
 
@@ -41,7 +41,7 @@ public class SmtpConfigurationAcceptanceTest extends BaseAcceptanceTestCase
 
     }
 
-    public void testEdit() throws Exception
+    public void testSmtpEdit() throws Exception
     {
         navigateToSmtpConfiguration();
         // ensure that we are not starting with the email address we using for this test.
@@ -57,7 +57,7 @@ public class SmtpConfigurationAcceptanceTest extends BaseAcceptanceTestCase
         assertTextPresent("someone@somewhere.net");
     }
 
-    public void testCancel() throws Exception
+    public void testSmtpCancel() throws Exception
     {
         navigateToSmtpConfiguration();
         // ensure that we are not starting with the email address we using for this test.

@@ -119,7 +119,7 @@ public class CvsWorkingCopy extends PersonalBuildSupport implements WorkingCopy
 
     public WorkingCopyStatus getStatus() throws SCMException
     {
-        WorkingCopyStatus status = new WorkingCopyStatus();
+        WorkingCopyStatus status = new WorkingCopyStatus(workingDir);
         StatusHandler statusHandler = new StatusHandler(status);
 
         client.status(workingDir, null, statusHandler);
@@ -130,7 +130,7 @@ public class CvsWorkingCopy extends PersonalBuildSupport implements WorkingCopy
     public WorkingCopyStatus getLocalStatus(String... spec) throws SCMException
     {
         File[] files = SCMUtils.specToFiles(workingDir, spec);
-        WorkingCopyStatus status = new WorkingCopyStatus();
+        WorkingCopyStatus status = new WorkingCopyStatus(workingDir);
         StatusHandler statusHandler = new StatusHandler(status, false);
 
         client.status(workingDir, files, statusHandler);

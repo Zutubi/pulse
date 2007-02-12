@@ -28,7 +28,7 @@ public class GeneralConfigurationAcceptanceTest extends BaseAcceptanceTestCase
         super.tearDown();
     }
 
-    public void testReset() throws Exception
+    public void testGeneralReset() throws Exception
     {
         navigateToGeneralConfiguration();
 
@@ -36,7 +36,7 @@ public class GeneralConfigurationAcceptanceTest extends BaseAcceptanceTestCase
         assertTextPresent("http://confluence.zutubi.com/display/");
     }
 
-    public void testEdit() throws Exception
+    public void testGeneralEdit() throws Exception
     {
         navigateToGeneralConfiguration();
         // ensure that we are not starting with the email address we using for this test.
@@ -61,7 +61,7 @@ public class GeneralConfigurationAcceptanceTest extends BaseAcceptanceTestCase
         form.assertFormElements("http://saved.base.url.net", "saved.help.url", "true", "false", "false", "4", "true", "0");
     }
 
-    public void testCancel() throws Exception
+    public void testGeneralCancel() throws Exception
     {
         navigateToGeneralConfiguration();
         // ensure that we are not starting with the email address we using for this test.
@@ -80,7 +80,7 @@ public class GeneralConfigurationAcceptanceTest extends BaseAcceptanceTestCase
         assertTextNotPresent("after 100 minutes");
     }
 
-    public void testValidation() throws Exception
+    public void testGeneralValidation() throws Exception
     {
         navigateToGeneralConfiguration();
         clickLink(Navigation.Administration.LINK_EDIT_GENERAL);

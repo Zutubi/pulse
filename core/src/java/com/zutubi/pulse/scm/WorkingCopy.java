@@ -11,8 +11,6 @@ public interface WorkingCopy extends PersonalBuildWorker
 {
     boolean matchesRepository(Properties repositoryDetails) throws SCMException;
 
-    WorkingCopyStatus getStatus() throws SCMException;
-
     WorkingCopyStatus getLocalStatus(String... spec) throws SCMException;
 
     Revision update() throws SCMException;
