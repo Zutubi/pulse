@@ -9,6 +9,7 @@ import org.hibernate.dialect.Dialect;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
 
+import javax.sql.DataSource;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -23,7 +24,7 @@ import java.util.Properties;
  */
 public class TransferAPITest extends TestCase
 {
-    private BasicDataSource dataSource;
+    private DataSource dataSource;
 
     protected void setUp() throws Exception
     {
@@ -33,7 +34,7 @@ public class TransferAPITest extends TestCase
         dataSource = createDataSource();
     }
 
-    private BasicDataSource createDataSource()
+    private DataSource createDataSource()
     {
         BasicDataSource dataSource = new BasicDataSource();
 
@@ -48,7 +49,7 @@ public class TransferAPITest extends TestCase
     protected void tearDown() throws Exception
     {
         // cleanup the database.
-        dataSource.close();
+        ((BasicDataSource)dataSource).close();
 
         super.tearDown();
     }
