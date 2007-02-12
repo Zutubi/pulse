@@ -11,10 +11,10 @@ import javax.sql.DataSource;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Iterator;
 
 /**
  *
@@ -33,6 +33,7 @@ public class JDBCTransferTarget implements TransferTarget
     private MutableConfiguration configuration;
 
     private boolean autocommit = false;
+    private int rowCount = 0;
 
     public void start() throws TransferException
     {
@@ -79,6 +80,11 @@ public class JDBCTransferTarget implements TransferTarget
             String sql = insertSql.replace("?", "%s");
             LOG.fine(String.format(sql, data.toArray()));
             insert.execute();
+
+            if(rowCount++ % 1000 == 0)
+            {
+                connection.commit();
+            }
         }
         catch (SQLException e)
         {
@@ -86,8 +92,16 @@ public class JDBCTransferTarget implements TransferTarget
         }
     }
 
-    public void endTable()
+    public void endTable() throws TransferException
     {
+        try
+        {
+            connection.commit();
+        }
+        catch (SQLException e)
+        {
+            throw new TransferException(e);
+        }
         JDBCUtils.close(insert);
     }
 

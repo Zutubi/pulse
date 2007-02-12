@@ -20,5 +20,5 @@ public class Constants
 
     // Line separator string.  This is the value of the line.separator
     // property at the moment that the StdOutErrReader was created.
-    public static final String LINE_SEPARATOR = (String) java.security.AccessController.doPrivileged(new sun.security.action.GetPropertyAction("line.separator"));
+    public static final String LINE_SEPARATOR = (String) System.getProperty("line.separator");
 }

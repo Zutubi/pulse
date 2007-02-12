@@ -61,6 +61,7 @@ public class MySQLSchemaRefactorUpgradeTask extends DatabaseUpgradeTask
         refactor.renameTable("CHANGE", "FILE_CHANGE");
         refactor.renameTable("TRIGGER", "LOCAL_TRIGGER");
         refactor.renameColumn("ARTIFACT", "INDEX", "INDEX_FILE");
+        refactor.renameColumn("SUBSCRIPTION", "CONDITION", "NOTIFY_CONDITION");
 
         transferUserProperties(con);
     }

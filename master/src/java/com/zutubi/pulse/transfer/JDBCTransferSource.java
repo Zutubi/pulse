@@ -7,8 +7,8 @@ import org.hibernate.mapping.Column;
 import org.hibernate.mapping.Table;
 
 import javax.sql.DataSource;
-import java.sql.CallableStatement;
 import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.HashMap;
@@ -64,11 +64,11 @@ public class JDBCTransferSource implements TransferSource
 
                     String sql = MappingUtils.sqlSelectAll(table);
 
-                    CallableStatement statement = null;
+                    PreparedStatement statement = null;
                     ResultSet rows = null;
                     try
                     {
-                        statement = con.prepareCall(sql);
+                        statement = con.prepareStatement(sql);
 
                         rows = statement.executeQuery();
                         while (rows.next())

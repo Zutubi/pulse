@@ -1,6 +1,18 @@
 <?xml version="1.0"?>
 <!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD//EN" "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd" >
 <hibernate-mapping>
+    <class name="com.zutubi.pulse.core.model.Changelist" table="CHANGELIST" lazy="false">
+        <id name="id" type="long" column="ID" unsaved-value="0">
+            <generator class="hilo"/>
+        </id>
+
+        <list name="changes" cascade="all,delete-orphan" lazy="true">
+            <key column="CHANGELIST_ID"/>
+            <index column="ORDINAL"/>
+            <one-to-many class="com.zutubi.pulse.core.model.Change"/>
+        </list>
+    </class>
+
     <class name="com.zutubi.pulse.core.model.Change" table="CHANGE" lazy="false">
         <id name="id" type="long" column="ID" unsaved-value="0">
             <generator class="hilo"/>

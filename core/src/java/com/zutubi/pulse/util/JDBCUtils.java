@@ -113,10 +113,10 @@ public class JDBCUtils
 
     public static void execute(Connection con, String sql) throws SQLException
     {
-        CallableStatement stmt = null;
+        PreparedStatement stmt = null;
         try
         {
-            stmt = con.prepareCall(sql);
+            stmt = con.prepareStatement(sql);
             stmt.execute();
         }
         finally
