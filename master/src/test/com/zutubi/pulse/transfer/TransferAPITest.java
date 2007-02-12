@@ -4,10 +4,10 @@ import com.zutubi.pulse.upgrade.tasks.MutableConfiguration;
 import com.zutubi.pulse.util.JDBCUtils;
 import junit.framework.TestCase;
 import nu.xom.ParsingException;
+import org.apache.commons.dbcp.BasicDataSource;
 import org.hibernate.dialect.Dialect;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
-import org.apache.commons.dbcp.BasicDataSource;
 
 import javax.sql.DataSource;
 import java.io.ByteArrayInputStream;
@@ -90,10 +90,8 @@ public class TransferAPITest extends TestCase
         transferAPI.restore(configuration, dataSource, bais);
 
         assertEquals(3, JDBCUtils.executeCount(dataSource, "select * from TYPES"));
-/*
         assertEquals("", JDBCUtils.executeSimpleQuery(dataSource, "select STRING_TYPE from TYPES where ID = 2"));
         assertNull(JDBCUtils.executeSimpleQuery(dataSource, "select STRING_TYPE from TYPES where ID = 3"));
-*/
         assertEquals(1, JDBCUtils.executeCount(dataSource, "select * from RELATED_TYPES"));
     }
 

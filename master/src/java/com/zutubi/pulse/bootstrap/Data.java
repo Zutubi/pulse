@@ -3,6 +3,7 @@ package com.zutubi.pulse.bootstrap;
 import com.zutubi.pulse.Version;
 import com.zutubi.pulse.config.Config;
 import com.zutubi.pulse.config.FileConfig;
+import com.zutubi.pulse.transfer.TransferException;
 import com.zutubi.pulse.util.FileSystemUtils;
 import com.zutubi.pulse.util.IOUtils;
 import com.zutubi.pulse.util.logging.Logger;
@@ -100,7 +101,7 @@ public class Data implements MasterUserPaths
      *
      * @throws IOException if a problem occurs generating the backup.
      */
-    public void backup(SystemPaths systemPaths) throws IOException
+    public void backup(SystemPaths systemPaths) throws IOException, TransferException
     {
         String filename = String.format("auto-backup-%s.zip", getVersion().getVersionNumber());
 
@@ -127,6 +128,24 @@ public class Data implements MasterUserPaths
                     new File(getDatabaseRoot(), "db.properties"),
                     new File(getDatabaseRoot(), "db.data"),
                     new File(getDatabaseRoot(), "db.script"));
+        }
+        else
+        {
+            tmpBackup.mkdirs();
+
+//            DataSource dataSource = (DataSource) ComponentContext.getBean("dataSource");
+//            MutableConfiguration configuration = new MutableConfiguration();
+//            List<String> mappings = (List<String>) ComponentContext.getBean("hibernateMappings");
+//            for (String mapping : mappings)
+//            {
+//                Resource resource = new ClassPathResource(mapping);
+//                configuration.addInputStream(resource.getInputStream());
+//            }
+//
+//            configuration.setProperties(databaseConsole.getConfig().getHibernateProperties());
+//            TransferAPI transferAPI = new TransferAPI();
+//            File exportFile = new File(tmpBackup, "export.xml");
+//            transferAPI.dump(configuration, dataSource, exportFile);
         }
 
         FileSystemUtils.copy(new File(tmpBackup, CONFIG_FILE_NAME), getConfigFile());
