@@ -219,4 +219,6 @@
 
     <bean id="recordTypeRegistry" class="com.zutubi.pulse.prototype.record.RecordTypeRegistry" autowire="byName"/>
 
+    <bean id="configRegistry" class="com.zutubi.pulse.prototype.PrototypeConfigRegistry" autowire="byName"/>
+
 </beans>

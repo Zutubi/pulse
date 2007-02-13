@@ -53,7 +53,8 @@
         <h1>options nav</h1>
         <ul>
         #foreach($nestedProperty in $action.config.nestedProperties)
-            <li><a href="config.action?scope=$action.scope&path=$nestedProperty">#i18n("path=${nestedProperty}" "key=label")</a></li>
+            #set($propertyPath = "${action.path}/${nestedProperty}")
+            <li><a href="config.action?path=$propertyPath">#i18n("path=${propertyPath}" "key=label")</a></li>
         #end
         </ul>
     </div>
@@ -73,10 +74,11 @@
 
         <p>
         #foreach($nestedProperty in $action.config.nestedProperties)
+            #set($propertyPath = "${action.path}/${nestedProperty}")
             <div class="summary">
-                <h3>#i18n("path=${nestedProperty}" "key=label")</h3>
-                #i18n("path=${nestedProperty}" "key=summary")
-                For more, click <a href="config.action?scope=$action.scope&path=$nestedProperty">here</a>
+                <h3>#i18n("path=${propertyPath}" "key=label")</h3>
+                #i18n("path=${propertyPath}" "key=summary")
+                For more, click <a href="config.action?path=$propertyPath">here</a>
             </div>
         #end
         </p>

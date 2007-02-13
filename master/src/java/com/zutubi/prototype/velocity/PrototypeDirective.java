@@ -4,6 +4,7 @@ import com.zutubi.pulse.velocity.AbstractDirective;
 import com.zutubi.pulse.bootstrap.ComponentContext;
 import com.zutubi.pulse.prototype.record.RecordTypeRegistry;
 import com.zutubi.pulse.prototype.ProjectConfigurationManager;
+import com.zutubi.prototype.PrototypePath;
 import freemarker.template.Configuration;
 
 /**
@@ -18,9 +19,7 @@ public abstract class PrototypeDirective extends AbstractDirective
 
     protected ProjectConfigurationManager projectConfigurationManager;
 
-    protected String path;
-
-    protected String scope;
+    protected PrototypePath path;
 
     public PrototypeDirective()
     {
@@ -37,14 +36,9 @@ public abstract class PrototypeDirective extends AbstractDirective
         this.recordTypeRegistry = recordTypeRegistry;
     }
 
-    public void setScope(String scope)
-    {
-        this.scope = scope;
-    }
-
     public void setPath(String path)
     {
-        this.path = path;
+        this.path = new PrototypePath(path);
     }
 
     public void setProjectConfigurationManager(ProjectConfigurationManager projectConfigurationManager)

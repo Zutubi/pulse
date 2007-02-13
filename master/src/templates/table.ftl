@@ -11,7 +11,7 @@
                         <#if cell.parameters.label == "edit">
                             <a href="edit">${cell.parameters.label?i18n}</a>
                         <#elseif cell.parameters.label == "delete">
-                            <a href="delete.action?submit=delete&index=${row.index}&path=${path}&scope=${scope}">${cell.parameters.label?i18n}</a>
+                            <a href="delete.action?submit=delete&path=${path}/${row.index}">${cell.parameters.label?i18n}</a>
                         <#else>
                             ${cell.parameters.label?i18n}
                         </#if>

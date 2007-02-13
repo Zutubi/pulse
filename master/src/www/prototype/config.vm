@@ -57,13 +57,11 @@
     <h1>#i18n("path=$action.path" "key=label")</h1>
 
     <div>
-        <a href="summary.action?scope=$action.scope">$action.scope</a>
-        #set($breadcrumbPath = "")
-        #set($breadcrumbPathSep = "")
+        <a href="summary.action?path=$action.basePath">$action.basePath</a>
+        #set($breadcrumbPath = $action.basePath)
         #foreach($pathElement in $action.pathElements)
-            #set($breadcrumbPath = "${breadcrumbPath}${breadcrumbPathSep}${pathElement}")
-            #set($breadcrumbPathSep = "/")
-            > <a href="config.action?scope=$action.scope&path=${breadcrumbPath}">${pathElement}</a>
+            #set($breadcrumbPath = "${breadcrumbPath}/${pathElement}")
+            > <a href="config.action?path=${breadcrumbPath}">${pathElement}</a>
         #end
     </div>
     <h2>introduction</h2>
@@ -71,7 +69,7 @@
 
     <h2>inline form</h2>
     <p>
-        #pform("path=$action.path" "scope=$action.scope")
+        #pform("path=$action.path")
     </p>
 
     <p>
@@ -82,7 +80,7 @@
         <h2>value lists</h2>
         #foreach($valuelist in $action.config.valueListProperties)
         <p>
-            #plist("path=$action.path" "scope=$action.scope" "propertyName=$valuelist")
+            #plist("path=$action.path" "propertyName=$valuelist")
         </p>
         #end
     #end

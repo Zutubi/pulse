@@ -1,5 +1,7 @@
 package com.zutubi.prototype.model;
 
+import com.zutubi.pulse.prototype.record.RecordTypeInfo;
+
 import java.util.List;
 import java.util.LinkedList;
 
@@ -12,6 +14,7 @@ public class Config
     private List<String> valueListProperties = new LinkedList<String>();
     private List<String> simpleProperties = new LinkedList<String>();
     private List<String> nestedProperties = new LinkedList<String>();
+    private List<RecordTypeInfo> extensions = new LinkedList<RecordTypeInfo>();
 
     public void addValueListProperty(String s)
     {
@@ -41,5 +44,20 @@ public class Config
     public List<String> getNestedProperties()
     {
         return nestedProperties;
+    }
+
+    public boolean hasSimpleProperties()
+    {
+        return simpleProperties.size() > 0;
+    }
+
+    public void addExtension(RecordTypeInfo extension)
+    {
+        extensions.add(extension);
+    }
+
+    public boolean hasExtensions()
+    {
+        return extensions.size() > 0;
     }
 }

@@ -1,11 +1,9 @@
 package com.zutubi.pulse.web.prototype;
 
-import com.zutubi.pulse.web.ActionSupport;
-import com.zutubi.pulse.prototype.ProjectConfigurationManager;
 import com.zutubi.prototype.model.Config;
-
-import java.util.List;
-import java.util.Arrays;
+import com.zutubi.prototype.PrototypePath;
+import com.zutubi.pulse.prototype.ProjectConfigurationManager;
+import com.zutubi.pulse.web.ActionSupport;
 
 /**
  *
@@ -13,20 +11,20 @@ import java.util.Arrays;
  */
 public class SummaryAction extends ActionSupport
 {
-    private String scope;
-
     private ProjectConfigurationManager projectConfigurationManager;
 
     private Config config;
 
-    public void setScope(String scope)
+    private PrototypePath path;
+
+    public String getPath()
     {
-        this.scope = scope;
+        return path.toString();
     }
 
-    public String getScope()
+    public void setPath(String path)
     {
-        return scope;
+        this.path = new PrototypePath(path);
     }
 
     public Config getConfig()

@@ -50,6 +50,15 @@ public class ConfigurationDescriptor
                 config.addNestedProperty(info.getName());
             }
         }
+
+        List<RecordTypeInfo> extensionInfos = typeInfo.getExtensions();
+        if (extensionInfos != null)
+        {
+            for (RecordTypeInfo extension : extensionInfos)
+            {
+                config.addExtension(extension);
+            }
+        }
         return config;
     }
 

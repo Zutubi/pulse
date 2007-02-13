@@ -1,6 +1,6 @@
 <#-- render form -->
 <#if form?exists>
-    <form id="${form.id}" method="post" action="config.action?scope=${scope}&path=${path}">
+    <form id="${form.id}" method="post" action="config.action?path=${path}">
         <ul>
         <#list form.fields as field>
         <li>

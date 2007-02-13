@@ -11,6 +11,7 @@ import java.io.IOException;
 import java.util.Map;
 
 import com.zutubi.pulse.i18n.Messages;
+import com.zutubi.pulse.prototype.TemplateRecord;
 import com.opensymphony.util.TextUtils;
 
 /**
@@ -37,6 +38,12 @@ public class I18NDirective extends PrototypeDirective
         wireParams(params);
 
         String symbolicName = projectConfigurationManager.getSymbolicName(path);
+        TemplateRecord record = projectConfigurationManager.getRecord(path);
+        if (record != null)
+        {
+            symbolicName = record.getSymbolicName();
+        }
+        
         Messages messages = Messages.getInstance(recordTypeRegistry.getType(symbolicName));
 
         String value = messages.format(this.key);

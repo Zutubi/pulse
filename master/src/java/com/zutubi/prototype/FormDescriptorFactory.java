@@ -22,7 +22,7 @@ public class FormDescriptorFactory
 
     private RecordTypeRegistry typeRegistry;
 
-    public FormDescriptor createDescriptor(String symbolicName) 
+    public FormDescriptor createDescriptor(String symbolicName)
     {
         RecordTypeInfo typeInfo = typeRegistry.getInfo(symbolicName);
         return createDescriptor(typeInfo);
@@ -52,14 +52,18 @@ public class FormDescriptorFactory
         List<FieldDescriptor> fieldDescriptors = new LinkedList<FieldDescriptor>();
 
         // Handle the first pass analysis.  Here, all of the fields are considered on an individual basis.
-        for (SimpleRecordPropertyInfo propertyInfo : typeInfo.getSimpleInfos())
+        List<SimpleRecordPropertyInfo> simpleInfos = typeInfo.getSimpleInfos();
+        if (simpleInfos != null && simpleInfos.size() > 0)
         {
-            FieldDescriptor fieldDescriptor = new FieldDescriptor();
-            fieldDescriptor.setName(propertyInfo.getName());
+            for (SimpleRecordPropertyInfo propertyInfo : typeInfo.getSimpleInfos())
+            {
+                FieldDescriptor fieldDescriptor = new FieldDescriptor();
+                fieldDescriptor.setName(propertyInfo.getName());
 
-            handleAnnotations(fieldDescriptor, propertyInfo.getAnnotations());
+                handleAnnotations(fieldDescriptor, propertyInfo.getAnnotations());
 
-            fieldDescriptors.add(fieldDescriptor);
+                fieldDescriptors.add(fieldDescriptor);
+            }
         }
 
         return fieldDescriptors;

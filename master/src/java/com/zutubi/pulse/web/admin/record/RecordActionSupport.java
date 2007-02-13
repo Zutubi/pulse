@@ -1,17 +1,11 @@
 package com.zutubi.pulse.web.admin.record;
 
-import com.zutubi.pulse.prototype.*;
-import com.zutubi.pulse.prototype.record.Record;
-import com.zutubi.pulse.prototype.record.SingleRecord;
 import com.zutubi.pulse.web.ActionSupport;
-import com.zutubi.pulse.web.LookupErrorException;
-
-import java.util.Map;
-import java.util.HashMap;
-import java.util.Arrays;
 
 /**
  * The base for actions dealing with project (and template) records.
+ *
+ * @deprecated
  */
 public class RecordActionSupport extends ActionSupport
 {
@@ -24,6 +18,7 @@ public class RecordActionSupport extends ActionSupport
      */
     private String path;
 
+/*
     protected TemplateRecord record;
 
     protected ProjectConfigurationManager projectConfigurationManager;
@@ -69,4 +64,5 @@ public class RecordActionSupport extends ActionSupport
     {
         this.projectConfigurationManager = pcm;
     }
+*/
 }

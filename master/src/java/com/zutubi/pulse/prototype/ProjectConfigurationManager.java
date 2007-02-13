@@ -1,5 +1,7 @@
 package com.zutubi.pulse.prototype;
 
+import com.zutubi.prototype.PrototypePath;
+
 import java.util.Map;
 import java.util.List;
 
@@ -11,11 +13,11 @@ public interface ProjectConfigurationManager
 {
     ProjectConfiguration getProject(long projectId);
 
-    TemplateRecord getRecord(long projectId, String path);
+    TemplateRecord getRecord(PrototypePath path);
 
-    void setRecord(long projectId, String path, Map data);
+    void setRecord(PrototypePath path, Map data);
 
     List<String> getProjectConfigurationRoot();
 
-    String getSymbolicName(String path);
+    String getSymbolicName(PrototypePath path);
 }

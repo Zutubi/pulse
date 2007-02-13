@@ -19,6 +19,13 @@ public class RecordTypeInfo
     
     private Map<Class, List<? extends RecordPropertyInfo>> typeMap = new HashMap<Class, List<? extends RecordPropertyInfo>>();
 
+    /**
+     * The extensions are RecordTypeInfo objects that extend this record type info, in a similar way that
+     * a class can be extended by a subclass. Where ever this RecordTypeInfo is used, one of its extensions
+     * can also be used.
+     */
+    private List<RecordTypeInfo> extensions = new LinkedList<RecordTypeInfo>();
+
     public RecordTypeInfo(String symbolicName, Class type) throws InvalidRecordTypeException
     {
         this.symbolicName = symbolicName;
@@ -65,6 +72,26 @@ public class RecordTypeInfo
     public void addAnnotations(List<Annotation> annotations)
     {
         this.annotations.addAll(annotations);
+    }
+
+    public void addExtension(RecordTypeInfo typeInfo)
+    {
+        this.extensions.add(typeInfo);
+    }
+
+    public void addExtensions(List<RecordTypeInfo> typeInfos)
+    {
+        this.extensions.addAll(typeInfos);
+    }
+
+    public List<RecordTypeInfo> getExtensions()
+    {
+        return this.extensions;
+    }
+
+    public boolean hasExtensions()
+    {
+        return this.extensions.size() > 0;
     }
 
     public List<SimpleRecordPropertyInfo> getSimpleInfos()

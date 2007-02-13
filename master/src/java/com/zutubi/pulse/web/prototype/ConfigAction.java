@@ -4,6 +4,7 @@ import com.opensymphony.util.TextUtils;
 import com.opensymphony.xwork.ActionContext;
 import com.zutubi.prototype.ConfigurationDescriptor;
 import com.zutubi.prototype.ConfigurationDescriptorFactory;
+import com.zutubi.prototype.PrototypePath;
 import com.zutubi.prototype.model.Config;
 import com.zutubi.pulse.prototype.ProjectConfigurationManager;
 import com.zutubi.pulse.prototype.TemplateRecord;
@@ -19,8 +20,7 @@ import java.util.*;
  */
 public class ConfigAction extends ActionSupport
 {
-    private String scope;
-    private String path;
+    private PrototypePath path;
 
     private ProjectConfigurationManager projectConfigurationManager;
     private RecordTypeRegistry recordTypeRegistry;
@@ -36,31 +36,26 @@ public class ConfigAction extends ActionSupport
         this.submit = submit;
     }
 
-    public String getScope()
-    {
-        return scope;
-    }
-
-    public void setScope(String scope)
-    {
-        this.scope = scope;
-    }
-
     public List<String> getPathElements()
     {
         List<String> elements = new LinkedList<String>();
-        elements.addAll(Arrays.asList(path.split("/")));
+        elements.addAll(path.getPathElements());
         return elements;
+    }
+
+    public String getBasePath()
+    {
+        return path.getBasePath();
     }
 
     public String getPath()
     {
-        return path;
+        return path.toString();
     }
 
     public void setPath(String path)
     {
-        this.path = path;
+        this.path = new PrototypePath(path);
     }
 
     public Config getConfig()
@@ -92,20 +87,19 @@ public class ConfigAction extends ActionSupport
     public String doDefault() throws Exception
     {
         // extract the scope details.
-        if (scope.startsWith("project"))
+        String symbolicName = projectConfigurationManager.getSymbolicName(path);
+        TemplateRecord record = projectConfigurationManager.getRecord(path);
+        if (record != null)
         {
-            long projectId = Long.valueOf(scope.substring(8));
-
-            String symbolicName = projectConfigurationManager.getSymbolicName(path);
-            TemplateRecord record = projectConfigurationManager.getRecord(projectId, path);
-
-            ConfigurationDescriptorFactory configurationDescriptorFactory = new ConfigurationDescriptorFactory();
-            configurationDescriptorFactory.setRecordTypeRegistry(recordTypeRegistry);
-            ConfigurationDescriptor configDescriptor = configurationDescriptorFactory.createDescriptor(symbolicName);
-            config = configDescriptor.instantiate(record);
-
-            messages = Messages.getInstance(recordTypeRegistry.getType(symbolicName));
+            symbolicName = record.getSymbolicName();
         }
+
+        ConfigurationDescriptorFactory configurationDescriptorFactory = new ConfigurationDescriptorFactory();
+        configurationDescriptorFactory.setRecordTypeRegistry(recordTypeRegistry);
+        ConfigurationDescriptor configDescriptor = configurationDescriptorFactory.createDescriptor(symbolicName);
+        config = configDescriptor.instantiate(record);
+
+        messages = Messages.getInstance(recordTypeRegistry.getType(symbolicName));
 
         return SUCCESS;
     }
@@ -134,11 +128,10 @@ public class ConfigAction extends ActionSupport
         }
 
         // extract project id from scope.
-        long projectId = Long.valueOf(scope.substring(8));
-        projectConfigurationManager.setRecord(projectId, getPath(), data);
+        projectConfigurationManager.setRecord(path, data);
 
         String symbolicName = projectConfigurationManager.getSymbolicName(path);
-        TemplateRecord record = projectConfigurationManager.getRecord(projectId, path);
+        TemplateRecord record = projectConfigurationManager.getRecord(path);
 
         ConfigurationDescriptorFactory configurationDescriptorFactory = new ConfigurationDescriptorFactory();
         configurationDescriptorFactory.setRecordTypeRegistry(recordTypeRegistry);

@@ -1,6 +1,7 @@
 package com.zutubi.pulse.prototype;
 
 import com.zutubi.pulse.prototype.record.*;
+import com.zutubi.prototype.PrototypePath;
 
 import java.util.*;
 
@@ -12,8 +13,8 @@ public class DummyProjectConfigurationManager implements ProjectConfigurationMan
 {
     private Map<String, Map<String, TemplateRecord>> store = new HashMap<String, Map<String, TemplateRecord>>();
 
-    private Map<String, String> projectConfigurationRoot = new HashMap<String, String>();
-
+    private PrototypeConfigRegistry configRegistry;
+    
     private RecordTypeRegistry recordTypeRegistry;
 
     public DummyProjectConfigurationManager()
@@ -26,6 +27,12 @@ public class DummyProjectConfigurationManager implements ProjectConfigurationMan
         recordTypeRegistry.register("cvsConfig", CvsConfiguration.class);
         recordTypeRegistry.register("cleanupRuleConfig", CleanupRuleConfiguration.class);
         recordTypeRegistry.register("generalConfig", GeneralConfiguration.class);
+        recordTypeRegistry.register("scmConfig", ScmConfiguration.class);
+        
+        // this is behaviour that will be moved into the scm configuration extension point manager.
+        RecordTypeInfo scmTypeInfo = recordTypeRegistry.getInfo("scmConfig");
+        scmTypeInfo.addExtension(recordTypeRegistry.getInfo("svnConfig"));
+        scmTypeInfo.addExtension(recordTypeRegistry.getInfo("cvsConfig"));
 
         Record r = new SingleRecord("svnConfig");
         r.put("url", "http://www.zutubi.com");
@@ -34,16 +41,7 @@ public class DummyProjectConfigurationManager implements ProjectConfigurationMan
         r.put("filterPaths", Arrays.asList("a", "b", "c"));
 
         TemplateRecord tr = new TemplateRecord(r, "1");
-        getProjectStore("1").put("svn", tr);
-
-        r = new SingleRecord("cvsConfig");
-        r.put("branch", "BRANCH");
-        r.put("root", ":ext:cvstester@cinnamonbob.com:/cvsroots");
-        r.put("password", "cvs");
-        r.put("module", "a");
-
-        tr = new TemplateRecord(r, "1");
-        getProjectStore("1").put("cvs", tr);
+        getProjectStore("1").put("scm", tr);
 
         r = new SingleRecord("generalConfig");
         r.put("name", "project name");
@@ -53,10 +51,11 @@ public class DummyProjectConfigurationManager implements ProjectConfigurationMan
         tr = new TemplateRecord(r, "1");
         getProjectStore("1").put("general", tr);
 
-        projectConfigurationRoot.put("general", "generalConfig");
-        projectConfigurationRoot.put("cleanup", "cleanupRuleConfig");
-        projectConfigurationRoot.put("svn", "svnConfig");
-        projectConfigurationRoot.put("cvs", "cvsConfig");
+        // configuration setup.
+        Map<String, String> projectScope = configRegistry.addScope("project");
+        projectScope.put("general", "generalConfig");
+        projectScope.put("cleanup", "cleanupRuleConfig");
+        projectScope.put("scm", "scmConfig");
     }
 
     public ProjectConfiguration getProject(long projectId)
@@ -66,26 +65,26 @@ public class DummyProjectConfigurationManager implements ProjectConfigurationMan
 
     public List<String> getProjectConfigurationRoot()
     {
-        return new LinkedList<String>(projectConfigurationRoot.keySet());
+        return configRegistry.getRoot("project");
     }
 
-    public String getSymbolicName(String path)
+    public String getSymbolicName(PrototypePath path)
     {
         // resolve the path into an associated info, and if it is the correct type, return its symbolic name.
-        String[] pathElements = path.split("/");
+        List<String> pathElements = path.getPathElements();
 
         // the path starts with the built in project root configurations.
-        String symbolicName = projectConfigurationRoot.get(pathElements[0]);
-        if (pathElements.length == 1)
+        String symbolicName = configRegistry.getScope("project").get(pathElements.get(0));
+        if (pathElements.size() == 1)
         {
             return symbolicName;
         }
 
         // navigate through the type tree extracting the info as we go.
         RecordTypeInfo typeInfo = recordTypeRegistry.getInfo(symbolicName);
-        for (int i = 1; i < pathElements.length; i++)
+        for (int i = 1; i < pathElements.size(); i++)
         {
-            RecordPropertyInfo propertyInfo = typeInfo.getProperty(pathElements[i]);
+            RecordPropertyInfo propertyInfo = typeInfo.getProperty(pathElements.get(i));
             if (propertyInfo instanceof SubrecordRecordPropertyInfo)
             {
                 typeInfo = ((SubrecordRecordPropertyInfo)propertyInfo).getSubrecordType();
@@ -104,19 +103,19 @@ public class DummyProjectConfigurationManager implements ProjectConfigurationMan
 
     // Get a specific record within a project, referenced by a path made up
     // of field names and map keys (i.e. subrecord names)
-    public TemplateRecord getRecord(long projectId, String path)
+    public TemplateRecord getRecord(PrototypePath path)
     {
-        return getProjectStore(String.valueOf(projectId)).get(path);
+        return getProjectStore(String.valueOf(path.getScopeId())).get(path.getPath());
     }
 
-    public void setRecord(long projectId, String path, Map data)
+    public void setRecord(PrototypePath path, Map data)
     {
-        TemplateRecord record = getRecord(projectId, path);
+        TemplateRecord record = getRecord(path);
         if (record == null)
         {
             Record r = new SingleRecord(getSymbolicName(path));
-            record = new TemplateRecord(r, String.valueOf(projectId));
-            getProjectStore(String.valueOf(projectId)).put(path, record);
+            record = new TemplateRecord(r, String.valueOf(path.getScopeId()));
+            getProjectStore(String.valueOf(path.getScopeId())).put(path.getPath(), record);
         }
         record.putAll(data);
     }
@@ -133,5 +132,10 @@ public class DummyProjectConfigurationManager implements ProjectConfigurationMan
     public void setRecordTypeRegistry(RecordTypeRegistry recordTypeRegistry)
     {
         this.recordTypeRegistry = recordTypeRegistry;
+    }
+
+    public void setConfigRegistry(PrototypeConfigRegistry configRegistry)
+    {
+        this.configRegistry = configRegistry;
     }
 }

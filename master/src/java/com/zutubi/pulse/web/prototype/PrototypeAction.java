@@ -1,22 +1,13 @@
 package com.zutubi.pulse.web.prototype;
 
-import com.opensymphony.xwork.ActionContext;
-import com.zutubi.prototype.freemarker.GetTextMethod;
-import com.zutubi.prototype.*;
-import com.zutubi.pulse.prototype.record.Record;
-import com.zutubi.pulse.prototype.record.RecordTypeRegistry;
 import com.zutubi.pulse.web.admin.record.RecordActionSupport;
-import freemarker.core.DelegateBuiltin;
-import freemarker.template.Configuration;
-import freemarker.template.Template;
-
-import java.io.StringWriter;
-import java.util.*;
 
 /**
+ * @deprecated
  */
 public class PrototypeAction extends RecordActionSupport
 {
+/*
     private Configuration configuration;
 
     // input: data to be loaded - path / id  from the template manager -> templateRecord.
@@ -140,4 +131,5 @@ public class PrototypeAction extends RecordActionSupport
     {
         this.typeRegistry = typeRegistry;
     }
+*/
 }

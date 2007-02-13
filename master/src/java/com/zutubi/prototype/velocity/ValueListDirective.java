@@ -42,10 +42,12 @@ public class ValueListDirective extends PrototypeDirective
         Map params = createPropertyMap(context, node);
         wireParams(params);
 
-        long projectId = Long.valueOf(scope.substring(8));
-
         String symbolicName = projectConfigurationManager.getSymbolicName(path);
-        TemplateRecord record = projectConfigurationManager.getRecord(projectId, path);
+        TemplateRecord record = projectConfigurationManager.getRecord(path);
+        if (record != null)
+        {
+            symbolicName = record.getSymbolicName();
+        }
 
         // render the form.
         writer.write(internalRender(symbolicName, propertyName, record.get(propertyName)));
@@ -69,8 +71,7 @@ public class ValueListDirective extends PrototypeDirective
             Map<String, Object> context = new HashMap<String, Object>();
             context.put("table", tableDescriptor.instantiate(subject));
             context.put("i18nText", new GetTextMethod(messages));
-            context.put("path", path);
-            context.put("scope", scope);
+            context.put("path", path.toString() + "/" + propertyName);
 
             // provide some syntactic sweetener by linking the i18n text method to the ?i18n builtin function.
             DelegateBuiltin.conditionalRegistration("i18n", "i18nText"); //TODO: Move this where it is only run once.
