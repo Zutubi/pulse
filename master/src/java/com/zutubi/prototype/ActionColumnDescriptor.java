@@ -1,19 +1,17 @@
 package com.zutubi.prototype;
 
-import com.zutubi.pulse.prototype.record.RecordPropertyInfo;
-
 /**
  *
  *
  */
 public class ActionColumnDescriptor extends ColumnDescriptor
 {
-    public ActionColumnDescriptor(String actionName, RecordPropertyInfo propertyInfo)
+    public ActionColumnDescriptor(String actionName)
     {
-        this(actionName, propertyInfo, 1);
+        this(actionName, 1);
     }
     
-    public ActionColumnDescriptor(String actionName, RecordPropertyInfo propertyInfo, int colspan)
+    public ActionColumnDescriptor(String actionName, int colspan)
     {
         setName("actions");
         setColspan(colspan);

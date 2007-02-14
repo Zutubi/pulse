@@ -1,7 +1,7 @@
 package com.zutubi.pulse.prototype;
 
 import com.zutubi.pulse.prototype.record.*;
-import com.zutubi.prototype.PrototypePath;
+import com.zutubi.prototype.Path;
 
 import java.util.*;
 
@@ -11,11 +11,11 @@ import java.util.*;
  */
 public class DummyProjectConfigurationManager implements ProjectConfigurationManager
 {
-    private Map<String, Map<String, TemplateRecord>> store = new HashMap<String, Map<String, TemplateRecord>>();
-
     private PrototypeConfigRegistry configRegistry;
     
     private RecordTypeRegistry recordTypeRegistry;
+
+    private RecordManager recordManager;
 
     public DummyProjectConfigurationManager()
     {
@@ -34,22 +34,24 @@ public class DummyProjectConfigurationManager implements ProjectConfigurationMan
         scmTypeInfo.addExtension(recordTypeRegistry.getInfo("svnConfig"));
         scmTypeInfo.addExtension(recordTypeRegistry.getInfo("cvsConfig"));
 
-        Record r = new SingleRecord("svnConfig");
-        r.put("url", "http://www.zutubi.com");
-        r.put("password", "secret");
-        r.put("name", "Duuude");
-        r.put("filterPaths", Arrays.asList("a", "b", "c"));
+        Record scm = new SingleRecord("svnConfig");
+        scm.put("url", "http://www.zutubi.com");
+        scm.put("password", "secret");
+        scm.put("name", "Duuude");
+        Record filters = new SingleRecord("");
+        filters.put("0", "a");
+        filters.put("1", "b");
+        filters.put("2", "c");
+        scm.put("filterPaths", filters);
 
-        TemplateRecord tr = new TemplateRecord(r, "1");
-        getProjectStore("1").put("scm", tr);
+        recordManager.store("project/1/scm", scm);
 
-        r = new SingleRecord("generalConfig");
-        r.put("name", "project name");
-        r.put("description", "a simple dummy project for testing");
-        r.put("url", "http://www.zutubi.com/roxor");
+        Record general = new SingleRecord("generalConfig");
+        general.put("name", "project name");
+        general.put("description", "a simple dummy project for testing");
+        general.put("url", "http://www.zutubi.com/roxor");
 
-        tr = new TemplateRecord(r, "1");
-        getProjectStore("1").put("general", tr);
+        recordManager.store("project/1/general", general);
 
         // configuration setup.
         Map<String, String> projectScope = configRegistry.addScope("project");
@@ -58,31 +60,26 @@ public class DummyProjectConfigurationManager implements ProjectConfigurationMan
         projectScope.put("scm", "scmConfig");
     }
 
-    public ProjectConfiguration getProject(long projectId)
-    {
-        return null;
-    }
-
     public List<String> getProjectConfigurationRoot()
     {
         return configRegistry.getRoot("project");
     }
 
-    public String getSymbolicName(PrototypePath path)
+    public String getSymbolicName(Path path)
     {
         // resolve the path into an associated info, and if it is the correct type, return its symbolic name.
         List<String> pathElements = path.getPathElements();
 
         // the path starts with the built in project root configurations.
-        String symbolicName = configRegistry.getScope("project").get(pathElements.get(0));
-        if (pathElements.size() == 1)
+        String symbolicName = configRegistry.getScope("project").get(pathElements.get(2));
+        if (pathElements.size() == 3)
         {
             return symbolicName;
         }
 
         // navigate through the type tree extracting the info as we go.
         RecordTypeInfo typeInfo = recordTypeRegistry.getInfo(symbolicName);
-        for (int i = 1; i < pathElements.size(); i++)
+        for (int i = 3; i < pathElements.size(); i++)
         {
             RecordPropertyInfo propertyInfo = typeInfo.getProperty(pathElements.get(i));
             if (propertyInfo instanceof SubrecordRecordPropertyInfo)
@@ -103,30 +100,20 @@ public class DummyProjectConfigurationManager implements ProjectConfigurationMan
 
     // Get a specific record within a project, referenced by a path made up
     // of field names and map keys (i.e. subrecord names)
-    public TemplateRecord getRecord(PrototypePath path)
+    public Record getRecord(Path path)
     {
-        return getProjectStore(String.valueOf(path.getScopeId())).get(path.getPath());
+        return recordManager.load(path.toString());
     }
 
-    public void setRecord(PrototypePath path, Map data)
+    public void setRecord(Path path, Map data)
     {
-        TemplateRecord record = getRecord(path);
+        Record record = getRecord(path);
         if (record == null)
         {
-            Record r = new SingleRecord(getSymbolicName(path));
-            record = new TemplateRecord(r, String.valueOf(path.getScopeId()));
-            getProjectStore(String.valueOf(path.getScopeId())).put(path.getPath(), record);
+            record = new SingleRecord(getSymbolicName(path));
+            recordManager.store(path.toString(), record);
         }
         record.putAll(data);
-    }
-
-    private Map<String, TemplateRecord> getProjectStore(String scope)
-    {
-        if (!store.containsKey(scope))
-        {
-            store.put(scope, new HashMap<String, TemplateRecord>());
-        }
-        return store.get(scope);
     }
 
     public void setRecordTypeRegistry(RecordTypeRegistry recordTypeRegistry)
@@ -137,5 +124,10 @@ public class DummyProjectConfigurationManager implements ProjectConfigurationMan
     public void setConfigRegistry(PrototypeConfigRegistry configRegistry)
     {
         this.configRegistry = configRegistry;
+    }
+
+    public void setRecordManager(RecordManager recordManager)
+    {
+        this.recordManager = recordManager;
     }
 }

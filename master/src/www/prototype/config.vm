@@ -57,13 +57,16 @@
     <h1>#i18n("path=$action.path" "key=label")</h1>
 
     <div>
-        <a href="summary.action?path=$action.basePath">$action.basePath</a>
-        #set($breadcrumbPath = $action.basePath)
+        #set($breadcrumbPath = "")
+        #set($sep = "")
         #foreach($pathElement in $action.pathElements)
             #set($breadcrumbPath = "${breadcrumbPath}/${pathElement}")
-            > <a href="config.action?path=${breadcrumbPath}">${pathElement}</a>
+            ${sep} <a href="config.action?path=${breadcrumbPath}">${pathElement}</a>
+            #set($sep = ">")
         #end
     </div>
+    <p>todo: do not link the last breadcrumb, we are on that page already.</p>
+    <p>todo: fix the links at the start of the breadcrumbs - the scope.</p>
     <h2>introduction</h2>
     <p>#i18n("path=$action.path" "key=introduction")</p>
 
@@ -73,7 +76,7 @@
     </p>
 
     <p>
-        <a href="summary.action?scope=$action.scope">apply</a> or <a href="summary.action?scope=$action.scope">done</a>
+        <a href="summary.action?path=$action.parentPath">apply</a> or <a href="summary.action?path=$action.parentPath">done</a>
     </p>
 
     #if($action.config.valueListProperties.size() > 0)
@@ -90,7 +93,7 @@
         <h2>nested</h2>
         <ul>
             #foreach($subrecord in $action.config.nestedProperties)
-            <li><a href="config.action?scope=$action.scope&path=${action.path}/${subrecord}">$subrecord</a></li>
+            <li><a href="config.action?path=${action.path}/${subrecord}">$subrecord</a></li>
             #end
         </ul>
     </p>

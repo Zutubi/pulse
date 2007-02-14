@@ -1,6 +1,6 @@
 package com.zutubi.pulse.prototype;
 
-import com.zutubi.prototype.PrototypePath;
+import com.zutubi.prototype.Path;
 
 import java.util.List;
 import java.util.Map;
@@ -13,7 +13,6 @@ import java.util.LinkedList;
  */
 public class PrototypeConfigRegistry
 {
-
     // Mapping -> scopeName : {rootProperty:symbolicName}
     private Map<String, Map<String, String>> scopeDefs = new HashMap<String, Map<String, String>>();
 
@@ -42,10 +41,8 @@ public class PrototypeConfigRegistry
         return scopeDefs.get(s);
     }
 
-    public Object get(PrototypePath path)
+    public Object get(Path path)
     {
-        Map<String, String> scope = getScope(path.getScope());
-
         return null;
     }
 }

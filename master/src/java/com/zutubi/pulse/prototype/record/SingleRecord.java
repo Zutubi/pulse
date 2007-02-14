@@ -15,7 +15,6 @@ public class SingleRecord implements Record
 
     Map<String, Object> data = new TreeMap<String, Object>();
 
-
     public SingleRecord(String symbolicName)
     {
         this.symbolicName = symbolicName;

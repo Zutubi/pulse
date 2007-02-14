@@ -1,48 +1,80 @@
 package com.zutubi.pulse.prototype.record;
 
-import com.zutubi.pulse.bootstrap.UserPaths;
-import com.zutubi.pulse.prototype.Scope;
-import com.zutubi.pulse.util.FileSystemUtils;
-
-import java.io.File;
+import java.util.StringTokenizer;
 
 /**
+ * 
  */
 public class DefaultRecordManager implements RecordManager
 {
-    // Records are stored in the user config root (i.e. PULSE_DATA/config/<scope>)
-    private File configRoot;
-    private RecordFactory defaultFactory = new DefaultRecordFactory();
-
-    public Record load(Scope scope, String path)
+    private Record baseRecord = new SingleRecord("root");
+    
+    public Record load(String path)
     {
-        return load(scope, path, defaultFactory);
+        Record record = baseRecord;
+        StringTokenizer tokens = new StringTokenizer(path, "/", false);
+        while (tokens.hasMoreTokens())
+        {
+            String pathElement = tokens.nextToken();
+            Object data = record.get(pathElement);
+            if (data == null)
+            {
+                return null;
+            }
+            
+            if (!(data instanceof Record))
+            {
+                throw new IllegalArgumentException("Invalid path: '"+path+"'");
+            }
+            record = (Record) record.get(pathElement);
+        }
+        return record;
     }
 
-    public Record load(Scope scope, String path, RecordFactory factory)
+    public void store(String path, Record newRecord)
     {
-        File recordDir = getRecordDir(scope, path);
-        return null;
+        Record record = load(path);
+        if(record == null)
+        {
+            // create the record.
+            record = baseRecord;        
+            StringTokenizer tokens = new StringTokenizer(path, "/", false);
+            while (tokens.hasMoreTokens())
+            {
+                String pathElement = tokens.nextToken();
+                if (record.get(pathElement) == null)
+                {
+                    SingleRecord r;
+                    if (tokens.hasMoreTokens())
+                    {
+                        r = new SingleRecord("");
+                    }
+                    else
+                    {
+                        r = new SingleRecord(newRecord.getSymbolicName());
+                    }
+                    record.put(pathElement, r);
+                }
+                record = (Record) record.get(pathElement);
+            }
+        }
+
+        record.putAll(newRecord);
     }
 
-    public void store(Record record)
+    public Record delete(String path)
     {
-        throw new RuntimeException("Method not implemented.");
-    }
+        Record record = baseRecord;
+        StringTokenizer tokens = new StringTokenizer(path, "/", false);
 
-    public void delete(Record record)
-    {
-        throw new RuntimeException("Method not implemented.");
-    }
-
-    private File getRecordDir(Scope scope, String path)
-    {
-        File scopeRoot = new File(configRoot, FileSystemUtils.composeFilename(scope.getPath()));
-        return new File(scopeRoot, FileSystemUtils.denormaliseSeparators(path));
-    }
-
-    public void setUserPaths(UserPaths userPaths)
-    {
-        configRoot = userPaths.getUserConfigRoot();
+        Record parent = null;
+        String pathElement = null;
+        while (tokens.hasMoreTokens())
+        {
+            pathElement = tokens.nextToken();
+            parent = record;
+            record = (Record) record.get(pathElement);
+        }
+        return (Record) parent.remove(pathElement);
     }
 }

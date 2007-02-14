@@ -13,17 +13,7 @@ public class TemplateManagerImpl implements TemplateManager
 
     public TemplateRecord load(final Scope scope, String id, String recordName)
     {
-        List<String> idChain = getChain(id);
-        TemplateRecord parent = null;
-
-        for(String currentId: idChain)
-        {
-            TemplateRecord record = (TemplateRecord) recordManager.load(scope, currentId, new TemplateRecordFactory(currentId));
-            record.linkToParent(parent);
-            parent = record;
-        }
-
-        return parent;
+        throw new RuntimeException("Method not yet implemented.");
     }
 
     /**

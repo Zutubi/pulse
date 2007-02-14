@@ -3,8 +3,8 @@ package com.zutubi.prototype.velocity;
 import com.zutubi.prototype.FormDescriptor;
 import com.zutubi.prototype.FormDescriptorFactory;
 import com.zutubi.prototype.freemarker.GetTextMethod;
-import com.zutubi.pulse.prototype.TemplateRecord;
 import com.zutubi.pulse.i18n.Messages;
+import com.zutubi.pulse.prototype.record.Record;
 import freemarker.core.DelegateBuiltin;
 import freemarker.template.Template;
 import freemarker.template.TemplateException;
@@ -37,7 +37,7 @@ public class FormDirective extends PrototypeDirective
         wireParams(params);
 
         String symbolicName = projectConfigurationManager.getSymbolicName(path);
-        TemplateRecord record = projectConfigurationManager.getRecord(path);
+        Record record = projectConfigurationManager.getRecord(path);
 
         // ... understanding of symbolic name mappings and that the default symbolic name may not be the same as the
         // that of the actual record.
@@ -53,7 +53,7 @@ public class FormDirective extends PrototypeDirective
         return true;
     }
 
-    private String internalRender(String symbolicName, TemplateRecord subject) throws IOException, ParseErrorException
+    private String internalRender(String symbolicName, Record subject) throws IOException, ParseErrorException
     {
         FormDescriptorFactory formFactory = new FormDescriptorFactory();
         formFactory.setTypeRegistry(recordTypeRegistry);

@@ -4,15 +4,22 @@ import com.opensymphony.util.TextUtils;
 import com.opensymphony.xwork.ActionContext;
 import com.zutubi.prototype.ConfigurationDescriptor;
 import com.zutubi.prototype.ConfigurationDescriptorFactory;
-import com.zutubi.prototype.PrototypePath;
+import com.zutubi.prototype.Path;
 import com.zutubi.prototype.model.Config;
-import com.zutubi.pulse.prototype.ProjectConfigurationManager;
-import com.zutubi.pulse.prototype.TemplateRecord;
-import com.zutubi.pulse.prototype.record.RecordTypeRegistry;
-import com.zutubi.pulse.web.ActionSupport;
 import com.zutubi.pulse.i18n.Messages;
+import com.zutubi.pulse.prototype.ProjectConfigurationManager;
+import com.zutubi.pulse.prototype.record.Record;
+import com.zutubi.pulse.prototype.record.RecordTypeRegistry;
+import com.zutubi.pulse.prototype.record.RecordManager;
+import com.zutubi.pulse.prototype.record.SingleRecord;
+import com.zutubi.pulse.web.ActionSupport;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  *
@@ -20,10 +27,12 @@ import java.util.*;
  */
 public class ConfigAction extends ActionSupport
 {
-    private PrototypePath path;
+    private Path path;
 
     private ProjectConfigurationManager projectConfigurationManager;
     private RecordTypeRegistry recordTypeRegistry;
+
+    private RecordManager recordManager;
 
     private Config config;
 
@@ -43,11 +52,6 @@ public class ConfigAction extends ActionSupport
         return elements;
     }
 
-    public String getBasePath()
-    {
-        return path.getBasePath();
-    }
-
     public String getPath()
     {
         return path.toString();
@@ -55,7 +59,12 @@ public class ConfigAction extends ActionSupport
 
     public void setPath(String path)
     {
-        this.path = new PrototypePath(path);
+        this.path = new Path(path);
+    }
+
+    public String getParentPath()
+    {
+        return this.path.getParent().toString();
     }
 
     public Config getConfig()
@@ -86,20 +95,18 @@ public class ConfigAction extends ActionSupport
 
     public String doDefault() throws Exception
     {
-        // extract the scope details.
-        String symbolicName = projectConfigurationManager.getSymbolicName(path);
-        TemplateRecord record = projectConfigurationManager.getRecord(path);
+        // if we have a record, then display the page for it. Otherwise, it is a new page.
+        Record record = recordManager.load(path.toString());
         if (record != null)
         {
-            symbolicName = record.getSymbolicName();
+            String symbolicName = record.getSymbolicName();
+            prepareConfigDescriptor(symbolicName, record);
         }
-
-        ConfigurationDescriptorFactory configurationDescriptorFactory = new ConfigurationDescriptorFactory();
-        configurationDescriptorFactory.setRecordTypeRegistry(recordTypeRegistry);
-        ConfigurationDescriptor configDescriptor = configurationDescriptorFactory.createDescriptor(symbolicName);
-        config = configDescriptor.instantiate(record);
-
-        messages = Messages.getInstance(recordTypeRegistry.getType(symbolicName));
+        else
+        {
+            String symbolicName = null;
+            prepareConfigDescriptor(symbolicName, record);
+        }
 
         return SUCCESS;
     }
@@ -115,9 +122,9 @@ public class ConfigAction extends ActionSupport
         Map<String, String[]> parameters = ActionContext.getContext().getParameters();
 
         Set<String> hiddenFields = new HashSet<String>();
-        hiddenFields.add("scope");
         hiddenFields.add("path");
 
+        // Extract the submit data.
         Map<String, String> data = new HashMap<String, String>();
         for (String key : parameters.keySet())
         {
@@ -127,20 +134,32 @@ public class ConfigAction extends ActionSupport
             }
         }
 
-        // extract project id from scope.
-        projectConfigurationManager.setRecord(path, data);
+        // extract the record and update - need to create a new record if one does not exist...
+        Record record = recordManager.load(path.toString());
+        if (record == null)
+        {
+            record = new SingleRecord("");
+            recordManager.store(path.toString(), record);
+        }
+        record.putAll(data);
 
-        String symbolicName = projectConfigurationManager.getSymbolicName(path);
-        TemplateRecord record = projectConfigurationManager.getRecord(path);
+        String symbolicName = record.getSymbolicName();
 
+        // we can only show config pages for objects that have symbolicNames...
+        prepareConfigDescriptor(symbolicName, record);
+
+        return SUCCESS;
+    }
+
+    private void prepareConfigDescriptor(String symbolicName, Record record)
+    {
+        // Setup the config object so that we can render the page.
         ConfigurationDescriptorFactory configurationDescriptorFactory = new ConfigurationDescriptorFactory();
         configurationDescriptorFactory.setRecordTypeRegistry(recordTypeRegistry);
         ConfigurationDescriptor configDescriptor = configurationDescriptorFactory.createDescriptor(symbolicName);
         config = configDescriptor.instantiate(record);
 
         messages = Messages.getInstance(recordTypeRegistry.getType(symbolicName));
-
-        return SUCCESS;
     }
 
     public void setProjectConfigurationManager(ProjectConfigurationManager projectConfigurationManager)
@@ -151,5 +170,10 @@ public class ConfigAction extends ActionSupport
     public void setRecordTypeRegistry(RecordTypeRegistry recordTypeRegistry)
     {
         this.recordTypeRegistry = recordTypeRegistry;
+    }
+
+    public void setRecordManager(RecordManager recordManager)
+    {
+        this.recordManager = recordManager;
     }
 }

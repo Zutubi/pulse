@@ -1,13 +1,11 @@
 package com.zutubi.prototype;
 
-import com.zutubi.prototype.annotation.Table;
 import com.zutubi.pulse.prototype.record.RecordTypeInfo;
 import com.zutubi.pulse.prototype.record.RecordTypeRegistry;
 import com.zutubi.pulse.prototype.record.ValueListRecordPropertyInfo;
 import com.zutubi.pulse.prototype.record.RecordPropertyInfo;
 
 import java.beans.IntrospectionException;
-import java.lang.annotation.Annotation;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -56,11 +54,13 @@ public class TableDescriptorFactory
 
     private TableDescriptor createTableDescriptor(ValueListRecordPropertyInfo propertyInfo)
     {
+/*
         Annotation tableAnnotation = propertyInfo.getAnnotation(Table.class);
         if (tableAnnotation != null)
         {
             // if there is a table annotation, use it to augment the table description...
         }
+*/
 
         TableDescriptor tableDescriptor = new TableDescriptor();
         tableDescriptor.setName(propertyInfo.getName());
@@ -76,12 +76,12 @@ public class TableDescriptorFactory
         // generate data row.
         RowDescriptor dataRow = new ValueListRowDescriptor();
         dataRow.addDescriptor(new ColumnDescriptor());
-        dataRow.addDescriptor(new ActionColumnDescriptor("edit", propertyInfo));
-        dataRow.addDescriptor(new ActionColumnDescriptor("delete", propertyInfo));
+        dataRow.addDescriptor(new ActionColumnDescriptor("edit"));
+        dataRow.addDescriptor(new ActionColumnDescriptor("delete"));
         tableDescriptor.addDescriptor(dataRow);
 
         RowDescriptor addRowDescriptor = new RowDescriptor();
-        addRowDescriptor.addDescriptor(new ActionColumnDescriptor("add", propertyInfo, 3));
+        addRowDescriptor.addDescriptor(new ActionColumnDescriptor("add", 3));
         tableDescriptor.addDescriptor(addRowDescriptor);
 
         return tableDescriptor;

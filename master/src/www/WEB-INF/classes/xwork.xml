@@ -1502,10 +1502,6 @@
             <result name="success" type="velocity">config.vm</result>
         </action>
 
-        <action name="delete" class="com.zutubi.pulse.web.prototype.DeleteAction">
-            <result name="success" type="redirect">summary.action?path=${basePath}</result>
-        </action>
-
     </package>
 
     <package name="ajax" namespace="/ajax" extends="webwork-default-package">

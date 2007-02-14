@@ -2,6 +2,7 @@ package com.zutubi.prototype;
 
 import com.zutubi.prototype.model.Row;
 import com.zutubi.prototype.model.Column;
+import com.zutubi.pulse.prototype.record.Record;
 
 import java.util.List;
 import java.util.LinkedList;
@@ -16,6 +17,27 @@ public class ValueListRowDescriptor extends RowDescriptor
     {
         List<Row> rows = new LinkedList<Row>();
 
+        if (value instanceof List)
+        {
+            handleList(value, rows);
+        }
+        else
+        {
+            Record record = (Record) value;
+
+            List<Object> list = new LinkedList<Object>();
+            for (int i = 0; i < record.size(); i++)
+            {
+                Object o = record.get(String.valueOf(i));
+                list.add(o);
+            }
+            handleList(list, rows);
+        }
+        return rows;
+    }
+
+    private void handleList(Object value, List<Row> rows)
+    {
         List<Object> list = (List<Object>) value;
         if (list == null || list.size() == 0)
         {
@@ -41,6 +63,5 @@ public class ValueListRowDescriptor extends RowDescriptor
                 rows.add(row);
             }
         }
-        return rows;
     }
 }

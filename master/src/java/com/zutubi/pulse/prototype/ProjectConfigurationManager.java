@@ -1,6 +1,7 @@
 package com.zutubi.pulse.prototype;
 
-import com.zutubi.prototype.PrototypePath;
+import com.zutubi.prototype.Path;
+import com.zutubi.pulse.prototype.record.Record;
 
 import java.util.Map;
 import java.util.List;
@@ -11,13 +12,15 @@ import java.util.List;
  */
 public interface ProjectConfigurationManager
 {
-    ProjectConfiguration getProject(long projectId);
+    // should be moved into the record manager.
+    Record getRecord(Path path);
 
-    TemplateRecord getRecord(PrototypePath path);
+    // should be moved into the record manager.
+    void setRecord(Path path, Map data);
 
-    void setRecord(PrototypePath path, Map data);
-
+    // should be moved into the configuration manager.
     List<String> getProjectConfigurationRoot();
 
-    String getSymbolicName(PrototypePath path);
+    // should be moved: recordManager.getRecord(path).getSymbolicName() | registry.getType(path).getSymbolicName();
+    String getSymbolicName(Path path);
 }

@@ -1,7 +1,6 @@
 package com.zutubi.pulse.web.prototype;
 
 import com.zutubi.prototype.model.Config;
-import com.zutubi.prototype.PrototypePath;
 import com.zutubi.pulse.prototype.ProjectConfigurationManager;
 import com.zutubi.pulse.web.ActionSupport;
 
@@ -15,16 +14,16 @@ public class SummaryAction extends ActionSupport
 
     private Config config;
 
-    private PrototypePath path;
+    private String path;
 
     public String getPath()
     {
-        return path.toString();
+        return path;
     }
 
     public void setPath(String path)
     {
-        this.path = new PrototypePath(path);
+        this.path = path;
     }
 
     public Config getConfig()
