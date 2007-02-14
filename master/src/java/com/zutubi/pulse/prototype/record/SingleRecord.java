@@ -25,6 +25,11 @@ public class SingleRecord implements Record
         return symbolicName;
     }
 
+    public void setSymbolicName(String symbolicName)
+    {
+        this.symbolicName = symbolicName;
+    }
+
     public Object get(String name)
     {
         return data.get(name);

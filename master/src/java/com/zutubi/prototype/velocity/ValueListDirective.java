@@ -44,7 +44,7 @@ public class ValueListDirective extends PrototypeDirective
         Map params = createPropertyMap(context, node);
         wireParams(params);
 
-        Record parent = projectConfigurationManager.getRecord(path);
+        Record parent = recordManager.load(path.toString());
 
         String symbolicName = parent.getSymbolicName();
         if (!TextUtils.stringSet(symbolicName))
@@ -52,7 +52,7 @@ public class ValueListDirective extends PrototypeDirective
             symbolicName = projectConfigurationManager.getSymbolicName(path);
         }
 
-        Record record = projectConfigurationManager.getRecord(new Path(path, propertyName));
+        Record record = recordManager.load(new Path(path, propertyName).toString());
 
         // render the form.
         writer.write(internalRender(symbolicName, record));

@@ -1,8 +1,10 @@
 package com.zutubi.pulse.web.prototype;
 
 import com.zutubi.prototype.model.Config;
-import com.zutubi.pulse.prototype.ProjectConfigurationManager;
+import com.zutubi.pulse.prototype.PrototypeConfigRegistry;
 import com.zutubi.pulse.web.ActionSupport;
+
+import java.util.StringTokenizer;
 
 /**
  *
@@ -10,7 +12,7 @@ import com.zutubi.pulse.web.ActionSupport;
  */
 public class SummaryAction extends ActionSupport
 {
-    private ProjectConfigurationManager projectConfigurationManager;
+    private PrototypeConfigRegistry configRegistry;
 
     private Config config;
 
@@ -33,11 +35,12 @@ public class SummaryAction extends ActionSupport
 
     public String execute() throws Exception
     {
-        // use the scope to identify the configuration data.
+        // identify the data available at this path, and present a summary.
 
-        // load the root level configuration from the project configuration manager..
         config = new Config();
-        for (String s : projectConfigurationManager.getProjectConfigurationRoot())
+
+        // TODO: need to handle this via the type system, look up the symbolicName based on the path.
+        for (String s : configRegistry.getRoot(getRootScope()))
         {
             config.addNestedProperty(s);
         }
@@ -45,8 +48,14 @@ public class SummaryAction extends ActionSupport
         return SUCCESS;
     }
 
-    public void setProjectConfigurationManager(ProjectConfigurationManager projectConfigurationManager)
+    private String getRootScope()
     {
-        this.projectConfigurationManager = projectConfigurationManager;
+        StringTokenizer tokens = new StringTokenizer(path, "/", false);
+        return tokens.nextToken();
+    }
+
+    public void setConfigRegistry(PrototypeConfigRegistry configRegistry)
+    {
+        this.configRegistry = configRegistry;
     }
 }

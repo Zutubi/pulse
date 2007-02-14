@@ -9,9 +9,8 @@ import com.zutubi.prototype.model.Config;
 import com.zutubi.pulse.i18n.Messages;
 import com.zutubi.pulse.prototype.ProjectConfigurationManager;
 import com.zutubi.pulse.prototype.record.Record;
-import com.zutubi.pulse.prototype.record.RecordTypeRegistry;
 import com.zutubi.pulse.prototype.record.RecordManager;
-import com.zutubi.pulse.prototype.record.SingleRecord;
+import com.zutubi.pulse.prototype.record.RecordTypeRegistry;
 import com.zutubi.pulse.web.ActionSupport;
 
 import java.util.HashMap;
@@ -104,7 +103,7 @@ public class ConfigAction extends ActionSupport
         }
         else
         {
-            String symbolicName = null;
+            String symbolicName = projectConfigurationManager.getSymbolicName(path);
             prepareConfigDescriptor(symbolicName, record);
         }
 
@@ -136,11 +135,6 @@ public class ConfigAction extends ActionSupport
 
         // extract the record and update - need to create a new record if one does not exist...
         Record record = recordManager.load(path.toString());
-        if (record == null)
-        {
-            record = new SingleRecord("");
-            recordManager.store(path.toString(), record);
-        }
         record.putAll(data);
 
         String symbolicName = record.getSymbolicName();

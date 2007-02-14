@@ -36,19 +36,21 @@ public class I18NDirective extends PrototypeDirective
         Map params = createPropertyMap(context, node);
         wireParams(params);
 
-/*
-        String symbolicName = projectConfigurationManager.getSymbolicName(path);
-        Record record = projectConfigurationManager.getRecord(path);
+        // we need the symbolic name for the entity we are talking about. It may not have a record yet.
+        String symbolicName;
+        Record record = recordManager.load(path.toString());
         if (record != null)
         {
             symbolicName = record.getSymbolicName();
         }
-        
+        else
+        {
+            symbolicName = projectConfigurationManager.getSymbolicName(path);
+        }
+
         Messages messages = Messages.getInstance(recordTypeRegistry.getType(symbolicName));
         String value = messages.format(this.key);
-*/
 
-        String value = null;//messages.format(this.key);
         if (!TextUtils.stringSet(value))
         {
             value = key + ".i18n";

@@ -37,7 +37,7 @@ public class FormDirective extends PrototypeDirective
         wireParams(params);
 
         String symbolicName = projectConfigurationManager.getSymbolicName(path);
-        Record record = projectConfigurationManager.getRecord(path);
+        Record record = recordManager.load(path.toString());
 
         // ... understanding of symbolic name mappings and that the default symbolic name may not be the same as the
         // that of the actual record.

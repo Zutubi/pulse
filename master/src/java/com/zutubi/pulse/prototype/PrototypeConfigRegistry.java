@@ -40,9 +40,4 @@ public class PrototypeConfigRegistry
     {
         return scopeDefs.get(s);
     }
-
-    public Object get(Path path)
-    {
-        return null;
-    }
 }
