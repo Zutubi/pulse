@@ -8,6 +8,7 @@ import com.zutubi.pulse.MasterBuildPaths;
 import com.zutubi.pulse.bootstrap.MasterConfigurationManager;
 import com.zutubi.pulse.model.*;
 import com.zutubi.pulse.personal.PatchArchive;
+import com.zutubi.pulse.util.IOUtils;
 import com.zutubi.pulse.util.logging.Logger;
 import org.acegisecurity.AccessDeniedException;
 
@@ -90,6 +91,19 @@ public class PersonalBuildAction extends ActionSupport
             return ERROR;
         }
 
+        File uploadedPatch = files[0];
+        if(!uploadedPatch.exists())
+        {
+            errorMessage = "Uploaded patch file '" + uploadedPatch.getAbsolutePath() + "' does not exist";
+            return ERROR;
+        }
+
+        if(!uploadedPatch.isFile())
+        {
+            errorMessage = "Uploaded patch file '" + uploadedPatch.getAbsolutePath() + "' is not a regular file";
+            return ERROR;
+        }
+
         Project p = projectManager.getProject(project);
         if(p == null)
         {
@@ -120,12 +134,19 @@ public class PersonalBuildAction extends ActionSupport
         {
             patchDir.mkdirs();
         }
+
         File patchFile = paths.getUserPatchFile(user.getId(), number);
-        files[0].renameTo(patchFile);
+        if(patchFile.exists())
+        {
+            errorMessage = "Patch file '" + patchFile.getAbsolutePath() + "' already exists.  Retry the build.";
+        }
 
         PatchArchive archive = null;
         try
         {
+            IOUtils.copyFile(uploadedPatch, patchFile);
+            uploadedPatch.delete();
+            
             archive = new PatchArchive(patchFile);
             projectManager.triggerBuild(number, p, spec, user, archive);
         }

@@ -531,7 +531,11 @@ public class SvnWorkingCopy extends PersonalBuildSupport implements WorkingCopy
                 lockLabel = "B";
             }
 
-            status(pathChangeType + propertiesChangeType + lockLabel + "       " + event.getPath());
+            String message = pathChangeType + propertiesChangeType + lockLabel + "       " + event.getPath();
+            if(message.trim().length() > 0)
+            {
+                status(message);
+            }
         }
 
         /*
