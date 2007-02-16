@@ -74,12 +74,12 @@ public class RecipeProcessor
             BootstrapCommand bootstrapCommand = new BootstrapCommand(request.getBootstrapper());
             CommandResult bootstrapResult = new CommandResult(bootstrapCommand.getName());
             File commandOutput = new File(paths.getOutputDir(), getCommandDirName(0, bootstrapResult));
+            Scope globalScope = new Scope();
 
-            if(executeCommand(request.getId(), null, recipeStartTime, bootstrapResult, paths, commandOutput, testResults, bootstrapCommand, capture, context) &&
+            if(executeCommand(request.getId(), globalScope, recipeStartTime, bootstrapResult, paths, commandOutput, testResults, bootstrapCommand, capture, context) &&
                bootstrapResult.succeeded())
             {
                 // Now we can load the recipe from the pulse file
-                Scope globalScope = new Scope();
                 PulseFile pulseFile = loadPulseFile(request, paths.getBaseDir(), resourceRepository, globalScope, context, recipeStartTime);
                 Recipe recipe;
 

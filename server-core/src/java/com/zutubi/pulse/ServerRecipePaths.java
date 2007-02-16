@@ -4,6 +4,8 @@ import com.zutubi.pulse.core.RecipePaths;
 import com.zutubi.pulse.util.FileSystemUtils;
 
 import java.io.File;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 
 /**
  * The server recipe paths:
@@ -42,7 +44,19 @@ public class ServerRecipePaths implements RecipePaths
 
     public File getPersistentWorkDir()
     {
-        return new File(dataDir, FileSystemUtils.composeFilename("work", project, spec));
+        return new File(dataDir, FileSystemUtils.composeFilename("work", encode(project), encode(spec)));
+    }
+
+    private String encode(String s)
+    {
+        try
+        {
+            return URLEncoder.encode(s, "UTF-8");
+        }
+        catch (UnsupportedEncodingException e)
+        {
+            return s;
+        }
     }
 
     public File getBaseDir()

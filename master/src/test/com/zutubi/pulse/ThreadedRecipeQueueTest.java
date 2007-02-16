@@ -852,6 +852,11 @@ public class ThreadedRecipeQueueTest extends TestCase implements EventListener
             throw new RuntimeException("Method not implemented");
         }
 
+        public Map<String, String> getConnectionProperties(String id, File dir) throws SCMException
+        {
+            throw new RuntimeException("Method not yet implemented.");
+        }
+
         public void writeConnectionDetails(File outputDir) throws SCMException, IOException
         {
             throw new RuntimeException("Method not implemented.");

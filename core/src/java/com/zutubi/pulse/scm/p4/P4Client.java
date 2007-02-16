@@ -7,10 +7,7 @@ import static com.zutubi.pulse.scm.p4.P4Constants.*;
 import com.zutubi.pulse.util.IOUtils;
 
 import java.io.*;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.TreeMap;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -20,6 +17,7 @@ public class P4Client
 {
     private static final String ASCII_CHARSET = "US-ASCII";
 
+    private Map<String, String> p4Env = new HashMap<String, String>();
     private ProcessBuilder p4Builder;
     private Pattern changesPattern;
     private Pattern lineSplitterPattern;
@@ -47,10 +45,16 @@ public class P4Client
         lineSplitterPattern = Pattern.compile("\r?\n");
     }
 
+    public Map<String, String> getEnv()
+    {
+        return p4Env;
+    }
+
     public void setEnv(String variable, String value)
     {
         if (value != null)
         {
+            p4Env.put(variable, value);
             p4Builder.environment().put(variable, value);
         }
     }

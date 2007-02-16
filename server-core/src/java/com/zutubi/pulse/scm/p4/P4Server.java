@@ -9,6 +9,8 @@ import com.zutubi.pulse.util.logging.Logger;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -72,6 +74,17 @@ public class P4Server extends CachingSCMServer
             clientRoot = toDirectory;
         }
 
+        String clientName = getClientName(id);
+
+        // If the client exists, perforce will just update the details.  This
+        // is important in case the template is changed.
+        createClient(clientName, toDirectory);
+
+        return clientName;
+    }
+
+    private String getClientName(String id)
+    {
         String clientName;
 
         if (id == null)
@@ -81,13 +94,15 @@ public class P4Server extends CachingSCMServer
         }
         else
         {
+            try
+            {
+                id = URLEncoder.encode(id, "UTF-8");
+            }
+            catch (UnsupportedEncodingException e)
+            {
+            }
             clientName = "pulse-" + id;
         }
-
-        // If the client exists, perforce will just update the details.  This
-        // is important in case the template is changed.
-        createClient(clientName, toDirectory);
-
         return clientName;
     }
 
@@ -589,6 +604,13 @@ public class P4Server extends CachingSCMServer
         {
             deleteClient(clientName);
         }
+    }
+
+    public Map<String, String> getConnectionProperties(String id, File dir) throws SCMException
+    {
+        Map<String, String> result = client.getEnv();
+        result.put("P4CLIENT", getClientName(id));
+        return result;
     }
 
     public void writeConnectionDetails(File outputDir) throws SCMException, IOException

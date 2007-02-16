@@ -167,6 +167,7 @@ public interface SCMServer
      */
     void tag(Revision revision, String name, boolean moveExisting) throws SCMException;
 
+    Map<String, String> getConnectionProperties(String id, File dir) throws SCMException;
     void writeConnectionDetails(File outputDir) throws SCMException, IOException;
 
     /**
@@ -187,5 +188,4 @@ public interface SCMServer
      *         path did not exist at that time
      */
     FileRevision getFileRevision(String path, Revision repoRevision) throws SCMException;
-
 }

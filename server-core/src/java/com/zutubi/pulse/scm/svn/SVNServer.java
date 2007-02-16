@@ -698,6 +698,11 @@ public class SVNServer implements SCMServer
         }
     }
 
+    public Map<String, String> getConnectionProperties(String id, File dir) throws SCMException
+    {
+        return Collections.EMPTY_MAP;
+    }
+
     public void writeConnectionDetails(File outputDir) throws SCMException, IOException
     {
         Properties props = new Properties();
