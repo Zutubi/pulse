@@ -1,10 +1,9 @@
 package com.zutubi.prototype;
 
-import com.zutubi.pulse.prototype.record.RecordTypeInfo;
-import com.zutubi.pulse.prototype.record.SimpleRecordPropertyInfo;
-import com.zutubi.pulse.prototype.record.ValueListRecordPropertyInfo;
-import com.zutubi.pulse.prototype.record.SubrecordRecordPropertyInfo;
 import com.zutubi.prototype.model.Config;
+import com.zutubi.prototype.type.CompositeType;
+import com.zutubi.prototype.type.ListType;
+import com.zutubi.prototype.type.PrimitiveType;
 
 import java.util.List;
 
@@ -14,51 +13,40 @@ import java.util.List;
  */
 public class ConfigurationDescriptor
 {
-    private RecordTypeInfo typeInfo;
+    private CompositeType type;
 
-    public void setTypeInfo(RecordTypeInfo typeInfo)
+    public void setType(CompositeType type)
     {
-        this.typeInfo = typeInfo;
+        this.type = type;
     }
 
     public Config instantiate(Object value)
     {
         Config config = new Config();
-        List<SimpleRecordPropertyInfo> simpleInfos = typeInfo.getSimpleInfos();
-        if (simpleInfos != null)
+        List<String> simpleInfos = type.getProperties(PrimitiveType.class);
+        for (String name : simpleInfos)
         {
-            for (SimpleRecordPropertyInfo info : simpleInfos)
-            {
-                config.addSimpleProperty(info.getName());
-            }
+            config.addSimpleProperty(name);
         }
 
-        List<ValueListRecordPropertyInfo> valueListInfos = typeInfo.getValueListInfos();
-        if (valueListInfos != null)
+        List<String> valueListInfos = type.getProperties(ListType.class);
+        for (String name : valueListInfos)
         {
-            for (ValueListRecordPropertyInfo info : valueListInfos)
-            {
-                config.addValueListProperty(info.getName());
-            }
+            config.addValueListProperty(name);
         }
 
-        List<SubrecordRecordPropertyInfo> subrecordInfos = typeInfo.getSubrecordInfos();
-        if (subrecordInfos != null)
+        List<String> subrecordInfos = type.getProperties(CompositeType.class);
+        for (String name: subrecordInfos)
         {
-            for (SubrecordRecordPropertyInfo info: subrecordInfos)
-            {
-                config.addNestedProperty(info.getName());
-            }
+            config.addNestedProperty(name);
         }
 
-        List<RecordTypeInfo> extensionInfos = typeInfo.getExtensions();
-        if (extensionInfos != null)
+        List<String> extensionInfos = type.getExtensions();
+        for (String name : extensionInfos)
         {
-            for (RecordTypeInfo extension : extensionInfos)
-            {
-                config.addExtension(extension);
-            }
+            config.addExtension(name);
         }
+
         return config;
     }
 

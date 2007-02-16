@@ -1,12 +1,11 @@
 package com.zutubi.prototype;
 
 import com.zutubi.prototype.model.Field;
+import ognl.Ognl;
+import ognl.OgnlException;
 
 import java.util.HashMap;
 import java.util.Map;
-
-import ognl.Ognl;
-import ognl.OgnlException;
 
 /**
  *
@@ -33,6 +32,11 @@ public class FieldDescriptor implements Descriptor
         parameters.put(key, value);
     }
 
+    public Object getParameter(String key)
+    {
+        return parameters.get(key);
+    }
+
     public Map<String, Object> getParameters()
     {
         return parameters;
@@ -43,7 +47,7 @@ public class FieldDescriptor implements Descriptor
         this.parameters = parameters;
     }
 
-    public Field instantiate(Object obj)
+    public Field instantiate(Object instance)
     {
         Field field = new Field();
         field.getParameters().put("name", getName());
@@ -55,10 +59,15 @@ public class FieldDescriptor implements Descriptor
         {
             if (!field.getParameters().containsKey("value"))
             {
-                if (obj != null)
+                if (instance != null)
                 {
-                    Map context = Ognl.createDefaultContext(obj);
-                    field.getParameters().put("value", Ognl.getValue(getName(), context, obj));
+                    Map context = Ognl.createDefaultContext(instance);
+                    field.getParameters().put("value", Ognl.getValue(getName(), context, instance));
+
+                    if (getParameter("type").equals("select"))
+                    {
+                        field.getParameters().put("list", Ognl.getValue(getName() + "Options", context, instance));
+                    }
                 }
             }
         }

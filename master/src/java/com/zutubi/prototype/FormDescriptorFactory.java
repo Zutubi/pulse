@@ -2,15 +2,19 @@ package com.zutubi.prototype;
 
 import com.zutubi.prototype.annotation.AnnotationHandler;
 import com.zutubi.prototype.annotation.Handler;
-import com.zutubi.pulse.prototype.record.RecordTypeInfo;
-import com.zutubi.pulse.prototype.record.RecordTypeRegistry;
-import com.zutubi.pulse.prototype.record.SimpleRecordPropertyInfo;
+import com.zutubi.prototype.type.PrimitiveType;
+import com.zutubi.prototype.type.Type;
+import com.zutubi.prototype.type.TypeRegistry;
+import com.zutubi.prototype.type.ListType;
+import com.zutubi.prototype.type.CompositeType;
 import com.zutubi.pulse.util.logging.Logger;
 
 import java.lang.annotation.Annotation;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
+import java.util.HashMap;
 
 /**
  *
@@ -20,49 +24,84 @@ public class FormDescriptorFactory
 {
     private static final Logger LOG = Logger.getLogger(FormDescriptorFactory.class);
 
-    private RecordTypeRegistry typeRegistry;
+    private static final Map<Class, String> defaultFieldTypeMapping = new HashMap<Class, String>();
+    static
+    {
+        defaultFieldTypeMapping.put(String.class, "text");
+        defaultFieldTypeMapping.put(Boolean.class, "checkbox");
+        defaultFieldTypeMapping.put(Boolean.TYPE, "checkbox");
+    }
+
+    private TypeRegistry typeRegistry;
+
+    public FormDescriptor createDescriptor(Class clazz)
+    {
+        CompositeType type = typeRegistry.getType(clazz);
+        return createDescriptor(type);
+    }
 
     public FormDescriptor createDescriptor(String symbolicName)
     {
-        RecordTypeInfo typeInfo = typeRegistry.getInfo(symbolicName);
-        return createDescriptor(typeInfo);
+        CompositeType type = typeRegistry.getType(symbolicName);
+        return createDescriptor(type);
     }
 
-    public FormDescriptor createDescriptor(Class type)
-    {
-        RecordTypeInfo typeInfo = typeRegistry.getInfo(type);
-        return createDescriptor(typeInfo);
-    }
-
-    public FormDescriptor createDescriptor(RecordTypeInfo typeInfo)
+    public FormDescriptor createDescriptor(CompositeType type)
     {
         FormDescriptor descriptor = new FormDescriptor();
-        descriptor.setType(typeInfo);
+        descriptor.setType(type);
 
-        List<Annotation> annotations = typeInfo.getAnnotations();
+        List<Annotation> annotations = type.getAnnotations();
         handleAnnotations(descriptor, annotations);
 
-        descriptor.setFieldDescriptors(buildFieldDescriptors(typeInfo));
+        descriptor.setFieldDescriptors(buildFieldDescriptors(type));
 
         return descriptor;
     }
 
-    private List<FieldDescriptor> buildFieldDescriptors(RecordTypeInfo typeInfo)
+    private List<FieldDescriptor> buildFieldDescriptors(CompositeType type)
     {
         List<FieldDescriptor> fieldDescriptors = new LinkedList<FieldDescriptor>();
 
         // Handle the first pass analysis.  Here, all of the fields are considered on an individual basis.
-        List<SimpleRecordPropertyInfo> simpleInfos = typeInfo.getSimpleInfos();
-        if (simpleInfos != null && simpleInfos.size() > 0)
+        for (String propertyName : type.getProperties(PrimitiveType.class))
         {
-            for (SimpleRecordPropertyInfo propertyInfo : typeInfo.getSimpleInfos())
+            Type propertyType = type.getProperty(propertyName);
+            FieldDescriptor fd = new FieldDescriptor();
+            fd.setName(propertyName);
+
+            // some little bit of magic, take a guess at any property called password. If we come up with any
+            // other magical cases, then we can refactor this a bit.
+            if (fd.getName().equals("password"))
             {
-                FieldDescriptor fieldDescriptor = new FieldDescriptor();
-                fieldDescriptor.setName(propertyInfo.getName());
+                fd.addParameter("type", "password");
+            }
+            else
+            {
+                fd.addParameter("type", defaultFieldTypeMapping.get(propertyType.getClazz()));
+            }
 
-                handleAnnotations(fieldDescriptor, propertyInfo.getAnnotations());
+            handleAnnotations(fd, type.getProperty(propertyName).getAnnotations());
 
-                fieldDescriptors.add(fieldDescriptor);
+            fieldDescriptors.add(fd);
+        }
+
+        for (FieldDescriptor fd : fieldDescriptors)
+        {
+            String propertyName = fd.getName();
+            if (type.hasProperty(propertyName + "Options"))
+            {
+                Type optionsProperty = type.getProperty(propertyName + "Options");
+                if (optionsProperty instanceof ListType)
+                {
+                    Type propertyType = type.getProperty(propertyName);
+                    // ensure that the option type is the same as the field type.
+                    ListType listType = (ListType) optionsProperty;
+                    if (listType.getCollectionType().getClazz() == propertyType.getClazz())
+                    {
+                        fd.addParameter("type", "select");
+                    }
+                }
             }
         }
 
@@ -108,7 +147,7 @@ public class FormDescriptorFactory
      *
      * @param typeRegistry instance.
      */
-    public void setTypeRegistry(RecordTypeRegistry typeRegistry)
+    public void setTypeRegistry(TypeRegistry typeRegistry)
     {
         this.typeRegistry = typeRegistry;
     }

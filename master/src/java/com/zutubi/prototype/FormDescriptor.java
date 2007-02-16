@@ -2,11 +2,15 @@ package com.zutubi.prototype;
 
 import com.zutubi.prototype.model.Field;
 import com.zutubi.prototype.model.Form;
+import com.zutubi.prototype.type.CompositeType;
 import com.zutubi.pulse.util.CollectionUtils;
 import com.zutubi.pulse.util.Predicate;
-import com.zutubi.pulse.prototype.record.RecordTypeInfo;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
 
 /**
  *
@@ -16,11 +20,11 @@ public class FormDescriptor implements Descriptor
 {
     private List<FieldDescriptor> fieldDescriptors = new LinkedList<FieldDescriptor>();
 
-    private RecordTypeInfo type;
+    private CompositeType type;
 
     private Map<String, Object> parameters = new HashMap<String, Object>();
 
-    public void setType(RecordTypeInfo type)
+    public void setType(CompositeType type)
     {
         this.type = type;
     }
@@ -69,7 +73,7 @@ public class FormDescriptor implements Descriptor
     public Form instantiate(Object data)
     {
         Form form = new Form();
-        form.setId(type.getType().getSimpleName());    
+        form.setId(type.getClazz().getSimpleName());    
 
         List<String> fieldOrder = evaluateFieldOrder();
 

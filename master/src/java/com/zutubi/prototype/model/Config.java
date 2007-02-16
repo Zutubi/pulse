@@ -14,7 +14,7 @@ public class Config
     private List<String> valueListProperties = new LinkedList<String>();
     private List<String> simpleProperties = new LinkedList<String>();
     private List<String> nestedProperties = new LinkedList<String>();
-    private List<RecordTypeInfo> extensions = new LinkedList<RecordTypeInfo>();
+    private List<String> extensions = new LinkedList<String>();
 
     public void addValueListProperty(String s)
     {
@@ -51,9 +51,14 @@ public class Config
         return simpleProperties.size() > 0;
     }
 
-    public void addExtension(RecordTypeInfo extension)
+    public void addExtension(String extension)
     {
         extensions.add(extension);
+    }
+
+    public List<String> getExtensions()
+    {
+        return extensions;
     }
 
     public boolean hasExtensions()

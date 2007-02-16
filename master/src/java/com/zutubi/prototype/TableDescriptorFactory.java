@@ -1,9 +1,9 @@
 package com.zutubi.prototype;
 
-import com.zutubi.pulse.prototype.record.RecordTypeInfo;
-import com.zutubi.pulse.prototype.record.RecordTypeRegistry;
-import com.zutubi.pulse.prototype.record.ValueListRecordPropertyInfo;
-import com.zutubi.pulse.prototype.record.RecordPropertyInfo;
+import com.zutubi.prototype.type.CompositeType;
+import com.zutubi.prototype.type.ListType;
+import com.zutubi.prototype.type.Type;
+import com.zutubi.prototype.type.TypeRegistry;
 
 import java.beans.IntrospectionException;
 import java.util.LinkedList;
@@ -15,44 +15,34 @@ import java.util.List;
  */
 public class TableDescriptorFactory
 {
-    private RecordTypeRegistry typeRegistry;
-
-    public List<TableDescriptor> createDescriptors(Class type) throws IntrospectionException
-    {
-        RecordTypeInfo typeInfo = typeRegistry.getInfo(type);
-        return createDescriptors(typeInfo);
-    }
+    private TypeRegistry typeRegistry;
 
     public List<TableDescriptor> createDescriptors(String symbolicName) throws IntrospectionException
     {
-        RecordTypeInfo typeInfo = typeRegistry.getInfo(symbolicName);
-        return createDescriptors(typeInfo);
+        CompositeType type = typeRegistry.getType(symbolicName);
+        return createDescriptors(type);
     }
 
     public TableDescriptor createDescriptor(String symbolicName, String propertyName)
     {
-        RecordTypeInfo typeInfo = typeRegistry.getInfo(symbolicName);
-        RecordPropertyInfo propertyInfo = typeInfo.getProperty(propertyName);
-        if (propertyInfo instanceof ValueListRecordPropertyInfo)
-        {
-            return createTableDescriptor((ValueListRecordPropertyInfo) propertyInfo);
-        }
-        return null;
+        CompositeType type = typeRegistry.getType(symbolicName);
+        Type propertyInfo = type.getProperty(propertyName);
+        return createTableDescriptor(propertyName, propertyInfo);
     }
 
-    public List<TableDescriptor> createDescriptors(RecordTypeInfo typeInfo) throws IntrospectionException
+    public List<TableDescriptor> createDescriptors(CompositeType type) throws IntrospectionException
     {
         List<TableDescriptor> tableDescriptors = new LinkedList<TableDescriptor>();
 
         // Handle the first pass analysis.  Here, all of the fields are considered on an individual basis.
-        for (ValueListRecordPropertyInfo propertyInfo : typeInfo.getValueListInfos())
+        for (String name : type.getProperties(ListType.class))
         {
-            tableDescriptors.add(createTableDescriptor(propertyInfo));
+            tableDescriptors.add(createTableDescriptor(name, type.getProperty(name)));
         }
         return tableDescriptors;
     }
 
-    private TableDescriptor createTableDescriptor(ValueListRecordPropertyInfo propertyInfo)
+    private TableDescriptor createTableDescriptor(String name, Type propertyInfo)
     {
 /*
         Annotation tableAnnotation = propertyInfo.getAnnotation(Table.class);
@@ -63,18 +53,18 @@ public class TableDescriptorFactory
 */
 
         TableDescriptor tableDescriptor = new TableDescriptor();
-        tableDescriptor.setName(propertyInfo.getName());
+        tableDescriptor.setName(name);
 
         // generate the header row.
         RowDescriptor headerRow = new RowDescriptor();
-        headerRow.addDescriptor(new HeaderColumnDescriptor(propertyInfo.getName()));
+        headerRow.addDescriptor(new HeaderColumnDescriptor(name));
         headerRow.addDescriptor(new HeaderColumnDescriptor("action", 2));
         tableDescriptor.addDescriptor(headerRow);
 
         //TODO: check that the user has the necessary Auth to view / execute these actions.
 
         // generate data row.
-        RowDescriptor dataRow = new ValueListRowDescriptor();
+        RowDescriptor dataRow = new ListRowDescriptor();
         dataRow.addDescriptor(new ColumnDescriptor());
         dataRow.addDescriptor(new ActionColumnDescriptor("edit"));
         dataRow.addDescriptor(new ActionColumnDescriptor("delete"));
@@ -87,7 +77,7 @@ public class TableDescriptorFactory
         return tableDescriptor;
     }
 
-    public void setTypeRegistry(RecordTypeRegistry typeRegistry)
+    public void setTypeRegistry(TypeRegistry typeRegistry)
     {
         this.typeRegistry = typeRegistry;
     }

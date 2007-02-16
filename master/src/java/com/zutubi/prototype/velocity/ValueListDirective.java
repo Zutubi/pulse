@@ -4,9 +4,8 @@ import com.zutubi.prototype.Path;
 import com.zutubi.prototype.TableDescriptor;
 import com.zutubi.prototype.TableDescriptorFactory;
 import com.zutubi.prototype.freemarker.GetTextMethod;
+import com.zutubi.prototype.type.record.Record;
 import com.zutubi.pulse.i18n.Messages;
-import com.zutubi.pulse.prototype.record.Record;
-import com.opensymphony.util.TextUtils;
 import freemarker.core.DelegateBuiltin;
 import freemarker.template.Template;
 import freemarker.template.TemplateException;
@@ -44,14 +43,7 @@ public class ValueListDirective extends PrototypeDirective
         Map params = createPropertyMap(context, node);
         wireParams(params);
 
-        Record parent = recordManager.load(path.toString());
-
-        String symbolicName = parent.getSymbolicName();
-        if (!TextUtils.stringSet(symbolicName))
-        {
-            symbolicName = projectConfigurationManager.getSymbolicName(path);
-        }
-
+        String symbolicName = lookupSymbolicName();
         Record record = recordManager.load(new Path(path, propertyName).toString());
 
         // render the form.
@@ -63,7 +55,7 @@ public class ValueListDirective extends PrototypeDirective
     private String internalRender(String symbolicName, Record subject) throws IOException, ParseErrorException
     {
         TableDescriptorFactory tableFactory = new TableDescriptorFactory();
-        tableFactory.setTypeRegistry(recordTypeRegistry);
+        tableFactory.setTypeRegistry(typeRegistry);
         TableDescriptor tableDescriptor = tableFactory.createDescriptor(symbolicName, propertyName);
 
         // handle rendering of the freemarker template.
@@ -71,7 +63,7 @@ public class ValueListDirective extends PrototypeDirective
 
         try
         {
-            Messages messages = Messages.getInstance(recordTypeRegistry.getType(symbolicName));
+            Messages messages = Messages.getInstance(typeRegistry.getType(symbolicName));
 
             Map<String, Object> context = new HashMap<String, Object>();
             context.put("table", tableDescriptor.instantiate(subject));

@@ -51,7 +51,12 @@
 
     <div id="config-tree" class="ylayout-inactive-content">
         <h1>options nav</h1>
-        <p>show the full option tree...</p>
+        <ul>
+            <li>insert</li>
+            <li>something</li>
+            <li>here</li>
+            <li>please</li>
+        </ul>
     </div>
 
     <h1>#i18n("path=$action.path" "key=label")</h1>
@@ -70,14 +75,15 @@
     <h2>introduction</h2>
     <p>#i18n("path=$action.path" "key=introduction")</p>
 
-    <h2>inline form</h2>
-    <p>
-        #pform("path=$action.path")
-    </p>
-
-    <p>
-        <a href="summary.action?path=$action.parentPath">apply</a> or <a href="summary.action?path=$action.parentPath">done</a>
-    </p>
+    #if ($action.config.simpleProperties.size() > 0)
+        <h2>inline form</h2>
+        <p>
+            #pform("path=$action.path")
+        </p>
+        <p>
+            <a href="summary.action?path=$action.parentPath">apply</a> or <a href="summary.action?path=$action.parentPath">done</a>
+        </p>
+    #end
 
     #if($action.config.valueListProperties.size() > 0)
         <h2>value lists</h2>
@@ -89,14 +95,17 @@
     #end
 
     #if($action.config.nestedProperties.size() > 0)
-    <p>
         <h2>nested</h2>
         <ul>
             #foreach($subrecord in $action.config.nestedProperties)
             <li><a href="config.action?path=${action.path}/${subrecord}">$subrecord</a></li>
             #end
         </ul>
-    </p>
+    #end
+
+    #if($action.config.extensions.size() > 0)
+        <h2>extensions available.</h2>
+        <a href="wizard.action?path=${action.path}">link to config wizard</a>
     #end
 
     <h2>example</h2>

@@ -1,7 +1,8 @@
 package com.zutubi.prototype;
 
-import com.zutubi.pulse.prototype.record.RecordTypeRegistry;
-import com.zutubi.pulse.prototype.record.RecordTypeInfo;
+import com.zutubi.prototype.type.Type;
+import com.zutubi.prototype.type.TypeRegistry;
+import com.zutubi.prototype.type.CompositeType;
 
 /**
  *
@@ -9,19 +10,19 @@ import com.zutubi.pulse.prototype.record.RecordTypeInfo;
  */
 public class ConfigurationDescriptorFactory
 {
-    private RecordTypeRegistry recordTypeRegistry;
+    private TypeRegistry typeRegistry;
 
     public ConfigurationDescriptor createDescriptor(String symbolicName)
     {
-        RecordTypeInfo typeInfo = recordTypeRegistry.getInfo(symbolicName);
+        CompositeType typeInfo = typeRegistry.getType(symbolicName);
 
         ConfigurationDescriptor descriptor = new ConfigurationDescriptor();
-        descriptor.setTypeInfo(typeInfo);
+        descriptor.setType(typeInfo);
         return descriptor;
     }
 
-    public void setRecordTypeRegistry(RecordTypeRegistry recordTypeRegistry)
+    public void setTypeRegistry(TypeRegistry typeRegistry)
     {
-        this.recordTypeRegistry = recordTypeRegistry;
+        this.typeRegistry = typeRegistry;
     }
 }

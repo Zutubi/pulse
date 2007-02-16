@@ -9,11 +9,11 @@
                     <#elseif cell.parameters.type == "action">
                         <td colspan="${cell.span}">
                         <#if cell.parameters.label == "edit">
-                            <a href="edit">${cell.parameters.label?i18n}</a>
+                            &nbsp;<a href="edit">${cell.parameters.label?i18n}</a>
                         <#elseif cell.parameters.label == "delete">
-                            <a href="delete.action?path=${path}&property=${row.index}">${cell.parameters.label?i18n}</a>
+                            &nbsp;<a href="config.action?submit=delete&path=${path}/${cell.parameters.key}">${cell.parameters.label?i18n}</a>
                         <#else>
-                            ${cell.parameters.label?i18n}
+                            &nbsp;${cell.parameters.label?i18n}
                         </#if>
                         </td>
                     </#if>

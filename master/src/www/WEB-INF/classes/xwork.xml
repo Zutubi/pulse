@@ -1494,12 +1494,20 @@
             <result name="success" type="velocity">index.vm</result>
         </action>
 
-        <action name="summary" class="com.zutubi.pulse.web.prototype.SummaryAction">
+        <action name="summary" class="com.zutubi.prototype.webwork.SummaryAction">
             <result name="success" type="velocity">summary.vm</result>
         </action>
 
-        <action name="config" class="com.zutubi.pulse.web.prototype.ConfigAction">
+        <action name="config" class="com.zutubi.prototype.webwork.CrudAction">
             <result name="success" type="velocity">config.vm</result>
+        </action>
+
+        <action name="wizard" class="com.zutubi.prototype.webwork.WizardAction">
+            <interceptor-ref name="prototypeWizardStack"/>
+            <result name="step" type="velocity">wizard.vm</result>
+            <result name="input" type="velocity">wizard.vm</result>
+            <result name="cancel" type="redirect">config.action?path=${path}</result>
+            <result name="success" type="redirect">config.action?path=${path}</result>
         </action>
 
     </package>

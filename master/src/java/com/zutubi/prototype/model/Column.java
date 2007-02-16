@@ -59,6 +59,6 @@ public class Column
 
     public void setParameters(Map<String, Object> parameters)
     {
-        this.parameters = parameters;
+        this.parameters = new HashMap<String, Object>(parameters);
     }
 }

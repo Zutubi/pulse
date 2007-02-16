@@ -52,36 +52,20 @@
     <div id="config-tree" class="ylayout-inactive-content">
         <h1>options nav</h1>
         <ul>
-        #foreach($nestedProperty in $action.nestedTypes)
-            #set($propertyPath = "${action.path}/${nestedProperty}")
-            <li><a href="config.action?path=$propertyPath"> #i18n("path=$propertyPath" "key=label") </a></li>
-        #end
+            <li>insert</li>
+            <li>something</li>
+            <li>here</li>
+            <li>please</li>
         </ul>
     </div>
 
     <p>
-        <h1>Project X configuration</h1>
+        <h2>blah wizard blah</h2>
         <p>
-            Vestibulum aliquam, erat in nonummy varius, nisi lectus faucibus pede, ac scelerisque
-            sem mi at ligula. Duis hendrerit. Quisque porttitor diam vitae dolor. Morbi eget nisi
-            ac felis nonummy congue. Ut interdum orci non felis. Aliquam sed sapien. Praesent mollis
-            gravida leo. Nunc quis lectus. Quisque egestas quam vitae dolor. Curabitur molestie
-            laoreet tortor. Mauris rhoncus libero nec turpis. Suspendisse nisi. In cursus metus.
-            Duis a risus convallis lacus volutpat suscipit. Aenean egestas, elit feugiat eleifend
-            dignissim, metus magna sollicitudin tellus, eget pharetra metus dui dictum metus. Class
-            aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos hymenaeos.
+            show the current form.
+            #pwizard("path=$action.path" "action=wizard.action?path=$action.path")
         </p>
-
-        <p>
-        #foreach($nestedProperty in $action.nestedTypes)
-            #set($propertyPath = "${action.path}/${nestedProperty}")
-            <div class="summary">
-                <h3>#i18n("path=${propertyPath}" "key=label")</h3>
-                #i18n("path=${propertyPath}" "key=summary")
-                For more, click <a href="config.action?path=$propertyPath">here</a>
-            </div>
-        #end
-        </p>
+        
     </p>
 </body>
 </html>

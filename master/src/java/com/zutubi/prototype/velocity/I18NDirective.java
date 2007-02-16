@@ -2,7 +2,7 @@ package com.zutubi.prototype.velocity;
 
 import com.opensymphony.util.TextUtils;
 import com.zutubi.pulse.i18n.Messages;
-import com.zutubi.pulse.prototype.record.Record;
+import com.zutubi.prototype.type.record.Record;
 import org.apache.velocity.context.InternalContextAdapter;
 import org.apache.velocity.exception.MethodInvocationException;
 import org.apache.velocity.exception.ParseErrorException;
@@ -37,27 +37,18 @@ public class I18NDirective extends PrototypeDirective
         wireParams(params);
 
         // we need the symbolic name for the entity we are talking about. It may not have a record yet.
-        String symbolicName;
-        Record record = recordManager.load(path.toString());
-        if (record != null)
-        {
-            symbolicName = record.getSymbolicName();
-        }
-        else
-        {
-            symbolicName = projectConfigurationManager.getSymbolicName(path);
-        }
+        String symbolicName = lookupSymbolicName();
 
-        Messages messages = Messages.getInstance(recordTypeRegistry.getType(symbolicName));
+        Class type = typeRegistry.getType(symbolicName).getClazz();
+        Messages messages = Messages.getInstance(type);
         String value = messages.format(this.key);
 
         if (!TextUtils.stringSet(value))
         {
-            value = key + ".i18n";
+            value = key;
         }
-        
         writer.write(value);
-        
+
         return true;
     }
 

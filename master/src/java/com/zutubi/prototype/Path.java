@@ -59,6 +59,11 @@ public class Path
         return path;
     }
 
+    public String getName()
+    {
+        return path;
+    }
+
     public List<String> getPathElements()
     {
         List<String> pathElements = new LinkedList<String>();
