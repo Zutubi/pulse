@@ -2,7 +2,7 @@
 <!-- -->
 <!-- -->
 <!-- -->
-<project name="Pulse" basedir="." xmlns:ivy="antlib:fr.jayasoft.ivy.ant">
+<project name="Pulse" basedir="." xmlns:ivy="antlib:fr.jayasoft.ivy.ant" xmlns:zutubi="antlib:com.zutubi.ant">
 
     <!-- Import general purpose macros. -->
     <import file="macros.xml"/>
@@ -25,7 +25,8 @@
         </path>
         <taskdef name="copyright" classname="com.zutubi.pulse.CopyrightTask" classpathref="custom.task.path"/>
         <taskdef resource="net/sf/antcontrib/antlib.xml" classpathref="custom.task.path"/>
-
+        <taskdef uri="antlib:com.zutubi.ant" resource="com/zutubi/ant/antlib.xml" classpathref="custom.task.path"/>
+	<taskdef name="ideamodule" classname="configurator.task.IdeaJavaModuleTask" classpathref="custom.task.path"/>
     </target>
 
     <target name="clean" depends="clean.all"/>
@@ -436,11 +437,6 @@
     <target name="accept.master" depends="package.master, run.accept.master"/>
 
     <target name="run.accept.master" depends="init">
-
-        <antcall target="accept.master.nodeps"/>
-    </target>
-
-    <target name="accept.master.nodeps">
         <property name="build.dir" value="master/build"/>
         <property name="report.dir" value="build/reports/junit"/>
         <mkdir dir="${report.dir}/xml"/>
@@ -529,40 +525,38 @@
         </junit>
     </target>
     
-    <!--
-     Refresh the projects lib directory by retrieving the latest module dependencies.
-    -->
-    <target name="refresh.lib" depends="clean, init">
+    <target name="idea" depends="build.all">
+        <zutubi:ivytoidea conf="build" projectFile="pulse.ipr" propertiesFile="build.properties">
+            <fileset dir="${project.root.dir}/">
+	        <include name="*/ivy.xml"/>
+	        <include name="bundles/*/ivy.xml"/>
+	    </fileset>
+        </zutubi:ivytoidea>
+    </target>
 
-        <!-- refreshing the lib directory -->
-        <delete dir="lib"/>
+    <target name="refresh.plugins" depends="init">
+        <!-- retrieve the internal plugins -->
         <delete dir="plugins/internal"/>
 
         <!-- use the default ivy configuration properties. -->
         <property file="ivy.properties"/>
         <ivy:configure/>
         
-        <!-- retrieve all of the modules external dependencies -->
-        <retrieve-dependencies ivyfile="core/ivy.xml" dest="lib" conf="external"/>
-        <retrieve-dependencies ivyfile="server-core/ivy.xml" dest="lib" conf="external"/>
-        <retrieve-dependencies ivyfile="local/ivy.xml" dest="lib" conf="external"/>
-        <retrieve-dependencies ivyfile="master/ivy.xml" dest="lib" conf="external"/>
-        <retrieve-dependencies ivyfile="slave/ivy.xml" dest="lib" conf="external"/>
         <retrieve-dependencies ivyfile="core/ivy.xml" dest="plugins/internal" conf="bundles"/>
     </target>
 
     <macrodef name="for-all">
         <attribute name="target"/>
         <sequential>
-            <foreach target="delegate-ant-script" param="base.dir" list="${core.modules}" trim="true">
+            <foreach target="delegate-ant-script" param="module.dir" list="${core.modules}" trim="true">
                 <param name="project.root.dir" value="${project.root.dir}"/>
                 <param name="target" value="@{target}"/>
             </foreach>
-            <foreach target="delegate-ant-script" param="base.dir" list="${internal.bundles}" trim="true">
+            <foreach target="delegate-ant-script" param="module.dir" list="${internal.bundles}" trim="true">
                 <param name="project.root.dir" value="${project.root.dir}"/>
                 <param name="target" value="@{target}"/>
             </foreach>
-            <foreach target="delegate-ant-script" param="base.dir" list="${prepackaged.bundles}" trim="true">
+            <foreach target="delegate-ant-script" param="module.dir" list="${prepackaged.bundles}" trim="true">
                 <param name="project.root.dir" value="${project.root.dir}"/>
                 <param name="target" value="@{target}"/>
             </foreach>
@@ -570,7 +564,9 @@
     </macrodef>
 
     <target name="delegate-ant-script">
-        <ant inheritAll="false" dir="${base.dir}" antfile="build.xml" target="${target}"/>
+        <ant inheritAll="false" antfile="${module.dir}/build.xml" target="${target}">
+            <property name="skip.dependencies" value="true"/>
+        </ant>
     </target>
     
 </project>

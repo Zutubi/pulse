@@ -2,7 +2,7 @@
 <?xml-stylesheet type="text/xsl" href="http://www.jayasoft.fr/org/ivyrep/ivy-doc.xsl"?>
 <ivy-module version="1.0">
 
-    <info organisation="zutubi" module="command-xcode" status="integration" revision="dev">
+    <info organisation="zutubi" module="com.zutubi.pulse.core.commands.xcode" status="integration" revision="dev">
         <ivyauthor name="Zutubi" url="http://www.zutubi.com/"/>
         <description homepage="http://www.zutubi.com/">
 
@@ -10,19 +10,19 @@
     </info>
 
     <configurations>
-        <conf name="default"/>
+        <conf name="build"/>
         <conf name="source"/>
         <conf name="bundle"/>
         <conf name="external"/>
     </configurations>
 
     <publications>
-        <artifact name="command-xcode" type="jar" conf="bundle,default"/>
-        <artifact name="command-xcode-src" type="jar" conf="source"/>
+        <artifact type="jar" conf="bundle,build"/>
+        <artifact name="com.zutubi.pulse.core.commands.xcode-src" type="jar" conf="source"/>
     </publications>
 
     <dependencies>
-        <dependency org="zutubi" name="command-core" rev="dev" conf="*->@"/>
+        <dependency org="zutubi" name="com.zutubi.pulse.core.commands.core" rev="dev" conf="*->@"/>
     </dependencies>
 
 </ivy-module>

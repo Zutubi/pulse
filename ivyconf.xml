@@ -27,11 +27,9 @@
     </resolvers>
 
     <modules>
-<!-- we know where all of the pulse packages are located, no point searching through the others -->
+        <!-- we know where all of the pulse packages are located, no point searching through the others -->
         <module organisation="zutubi" name="pulse-.*" resolver="build"/>
-        <module organisation="zutubi" name="command-.*" resolver="build"/>
-        <module organisation="zutubi" name="postprocessor-.*" resolver="build"/>
-        <module organisation="zutubi" name="core-.*" resolver="build"/>
+        <module organisation="zutubi" name="com.zutubi.*" resolver="build"/>
     </modules>
 
 </ivyconf>

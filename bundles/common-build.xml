@@ -11,13 +11,25 @@
     <target name="module-post-init"/>
 
     <target name="common-init">
+        <!-- Define custom ant tasks -->
+
+        <path id="custom.task.path">
+            <fileset dir="${project.root.dir}/etc">
+                <include name="**/*.jar"/>
+            </fileset>
+        </path>
+        <taskdef name="copyright" classname="com.zutubi.pulse.CopyrightTask" classpathref="custom.task.path"/>
+        <taskdef resource="net/sf/antcontrib/antlib.xml" classpathref="custom.task.path"/>
 
         <!-- load the modules properties first to allow them to override the default root level properties. -->
         <property file="build.properties"/>
         <property file="${project.root.dir}/build.properties"/>
 
+	<!-- Grab module info from Ivy -->
+	<ivy:info file="ivy.xml"/>
+
         <echo message="----------------------------------------------"/>
-        <echo message="    Component: ${module}"/>
+        <echo message="    Component: ${ivy.module}"/>
         <echo message="----------------------------------------------"/>
 
         <!-- behavioural properties -->
@@ -35,15 +47,6 @@
 
         <property name="project.repository" value="${project.root.dir}/build/repository"/>
 
-        <!-- Define custom ant tasks -->
-
-        <path id="custom.task.path">
-            <fileset dir="${project.root.dir}/etc">
-                <include name="**/*.jar"/>
-            </fileset>
-        </path>
-        <taskdef name="copyright" classname="com.zutubi.pulse.CopyrightTask" classpathref="custom.task.path"/>
-        <taskdef resource="net/sf/antcontrib/antlib.xml" classpathref="custom.task.path"/>
 
         <!-- Define lib path -->
         <path id="lib.path">
@@ -126,19 +129,22 @@
         <mkdir dir="${report.dir}/junit/html"/>
 
         <!-- build the dependencies. -->
-        <foreach target="prepare-dependencies" param="module.name" list="${dependencies}">
-            <param name="project.root.dir" value="${project.root.dir}"/>
-        </foreach>
+	<antcall target="prepare-dependencies"/>
 
         <!-- resolve the dependencies, into the build/lib directory. -->
-        <retrieve-dependencies dest="${build.lib.dir}" conf="default"/>
+        <retrieve-dependencies dest="${build.lib.dir}" conf="build"/>
 
     </target>
 
     <target name="prepare-dependencies" unless="skip.dependencies">
-        <ant inheritAll="false" dir="${project.root.dir}/${module.name}" antfile="build.xml" target="build.module">
+        <ivy:buildlist reference="build.path.${ivy.module}" root="${ivy.module}" excluderoot="true" skipbuildwithoutivy="true">
+            <fileset dir="${project.root.dir}" includes="*/build.xml"/>
+            <fileset dir="${project.root.dir}/bundles" includes="*/build.xml"/>
+        </ivy:buildlist>
+
+	<subant inheritAll="false" target="build.module" buildpathref="build.path.${ivy.module}">
             <property name="skip.tests" value="true"/>
-        </ant>
+        </subant>
     </target>
 
     <!-- prepare for new build -->
@@ -151,7 +157,7 @@
     <target name="common-build">
 
         <echo message="----------------------------------------------"/>
-        <echo message="    Component: build ${module}                "/>
+        <echo message="    Component: build ${ivy.module}                "/>
         <echo message="----------------------------------------------"/>
 
         <javac destdir="${classes.dir}" debug="${javac.debug}" deprecation="${javac.deprecation}">
@@ -185,7 +191,7 @@
     <target name="common-test" unless="skip.tests">
 
         <echo message="----------------------------------------------"/>
-        <echo message="    Component: testing ${module}              "/>
+        <echo message="    Component: testing ${ivy.module}              "/>
         <echo message="----------------------------------------------"/>
 
         <junit printsummary="yes" fork="on" failureProperty="test.failed" errorProperty="test.failed">
@@ -222,22 +228,22 @@
     <target name="common-package">
 
         <echo message="----------------------------------------------"/>
-        <echo message="    Component: package ${module}              "/>
+        <echo message="    Component: package ${ivy.module}              "/>
         <echo message="----------------------------------------------"/>
 
-        <jar file="build/${module}.jar" manifest="resources/META-INF/MANIFEST.MF">
+        <jar file="build/${ivy.module}.jar" manifest="resources/META-INF/MANIFEST.MF">
             <fileset dir="${classes.dir}"/>
             <fileset dir="resources" excludes="resources/META-INF/MANIFEST.MF"/>
             <path refid="src.export.selection"/>
         </jar>
 
-        <jar file="build/${module}-test.jar">
+        <jar file="build/${ivy.module}-test.jar">
             <fileset dir="${test.classes.dir}"/>
             <path refid="test.export.selection"/>
         </jar>
 
-        <package-src name="${module}-src.jar" pathref="src.export.selection"/>
-        <package-src name="${module}-test-src.jar" pathref="test.export.selection"/>
+        <package-src name="${ivy.module}-src.jar" pathref="src.export.selection"/>
+        <package-src name="${ivy.module}-test-src.jar" pathref="test.export.selection"/>
 
     </target>
 

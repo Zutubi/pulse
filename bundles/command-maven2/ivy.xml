@@ -2,7 +2,7 @@
 <?xml-stylesheet type="text/xsl" href="http://www.jayasoft.fr/org/ivyrep/ivy-doc.xsl"?>
 <ivy-module version="1.0">
 
-    <info organisation="zutubi" module="command-maven2" status="integration" revision="dev">
+    <info organisation="zutubi" module="com.zutubi.pulse.core.commands.maven2" status="integration" revision="dev">
         <ivyauthor name="Zutubi" url="http://www.zutubi.com/"/>
         <description homepage="http://www.zutubi.com/">
 
@@ -10,7 +10,7 @@
     </info>
 
     <configurations>
-        <conf name="default"/>
+        <conf name="build"/>
         <conf name="source"/>
         <conf name="bundle"/>
         <conf name="external"/>
@@ -18,15 +18,15 @@
 
     <publications>
         <!-- The runtime artifacts for this module. -->
-        <artifact name="command-maven2" type="jar" conf="bundle,default"/>
-        <artifact name="command-maven2-test" type="jar" conf="default"/>
+        <artifact type="jar" conf="bundle,build"/>
+        <artifact name="com.zutubi.pulse.core.commands.maven2-test" type="jar" conf="build"/>
         <!-- The source artifacts for this module. -->
-        <artifact name="command-maven2-src" type="jar" conf="source"/>
-        <artifact name="command-maven2-test-src" type="jar" conf="source"/>
+        <artifact name="com.zutubi.pulse.core.commands.maven2-src" type="jar" conf="source"/>
+        <artifact name="com.zutubi.pulse.core.commands.maven2-test-src" type="jar" conf="source"/>
     </publications>
 
     <dependencies>
-        <dependency org="zutubi" name="command-core" rev="dev" conf="*->@"/>
+        <dependency org="zutubi" name="com.zutubi.pulse.core.commands.core" rev="dev" conf="*->@"/>
     </dependencies>
 
 </ivy-module>
