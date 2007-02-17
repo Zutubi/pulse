@@ -77,6 +77,8 @@
                 <ref local="schemaUpgrade0102012001"/> <!-- postgres schema refactoring -->
                 <ref local="schemaUpgrade0102014001"/> <!-- mysql schema refactoring preparation -->
                 <ref local="schemaUpgrade0102014002"/> <!-- mysql schema refactoring -->
+                <ref local="schemaUpgrade0102015001"/>
+                <ref local="schemaUpgrade0102015002"/>
             </list>
         </property>
         <property name="systemTasks">
@@ -518,4 +520,23 @@
         </property>
     </bean>
 
+    <bean id="schemaUpgrade0102015001" class="com.zutubi.pulse.upgrade.tasks.MigrateSchemaUpgradeTask" autowire="byName">
+        <property name="buildNumber" value="102015001"/>
+        <property name="mappings">
+            <list>
+                <value>com/zutubi/pulse/upgrade/schema/build_0102015001/BuildSpecification.hbm.xml</value>
+                <value>com/zutubi/pulse/upgrade/schema/build_0102015001/Project.hbm.xml</value>
+            </list>
+        </property>
+    </bean>
+
+    <bean id="schemaUpgrade0102015002" class="com.zutubi.pulse.upgrade.tasks.PostBuildActionSpecificationsUpgradeTask" autowire="byName">
+        <property name="buildNumber" value="102015002"/>
+        <property name="mappings">
+            <list>
+                <value>com/zutubi/pulse/upgrade/schema/build_0102015002/BuildSpecification.hbm.xml</value>
+                <value>com/zutubi/pulse/upgrade/schema/build_0102015002/Project.hbm.xml</value>
+            </list>
+        </property>
+    </bean>
 </beans>

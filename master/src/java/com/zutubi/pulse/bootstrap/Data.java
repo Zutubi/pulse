@@ -115,6 +115,7 @@ public class Data implements MasterUserPaths
 
         // copy the files into the system tmpRoot.
         File tmpBackup = new File(systemPaths.getTmpRoot(), filename);
+        tmpBackup.mkdirs();
 
         // Are we running an embedded database? If so, we need to back it up.
         DatabaseConsole databaseConsole = (DatabaseConsole) ComponentContext.getBean("databaseConsole");
@@ -122,17 +123,16 @@ public class Data implements MasterUserPaths
         {
             // trigger a checkpoint call on the database to compact the data.
             HSQLDBUtils.compactDatabase((DataSource) ComponentContext.getBean("dataSource"));
-            FileSystemUtils.copy(new File(tmpBackup, "database"),
-                    new File(getDatabaseRoot(), "db.backup"),
-                    new File(getDatabaseRoot(), "db.log"),
-                    new File(getDatabaseRoot(), "db.properties"),
-                    new File(getDatabaseRoot(), "db.data"),
-                    new File(getDatabaseRoot(), "db.script"));
+            File dest = new File(tmpBackup, "database");
+            dest.mkdir();
+            conditionalCopy(dest, new File(getDatabaseRoot(), "db.backup"));
+            conditionalCopy(dest, new File(getDatabaseRoot(), "db.log"));
+            conditionalCopy(dest, new File(getDatabaseRoot(), "db.properties"));
+            conditionalCopy(dest, new File(getDatabaseRoot(), "db.data"));
+            conditionalCopy(dest, new File(getDatabaseRoot(), "db.script"));
         }
         else
         {
-            tmpBackup.mkdirs();
-
 //            DataSource dataSource = (DataSource) ComponentContext.getBean("dataSource");
 //            MutableConfiguration configuration = new MutableConfiguration();
 //            List<String> mappings = (List<String>) ComponentContext.getBean("hibernateMappings");
@@ -154,6 +154,14 @@ public class Data implements MasterUserPaths
 
         FileSystemUtils.rmdir(tmpBackup);
         // - done.
+    }
+
+    private void conditionalCopy(File dest, File file) throws IOException
+    {
+        if(file.exists())
+        {
+            FileSystemUtils.copy(dest, file);
+        }
     }
 
     public void restore()
