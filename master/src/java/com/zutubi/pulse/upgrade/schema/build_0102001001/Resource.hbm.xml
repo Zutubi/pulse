@@ -13,7 +13,7 @@
 
     </class>
 
-    <class name="com.zutubi.pulse.core.model.ResourcePropertyB" table="RESOURCE_VERSION" lazy="false">
+    <class name="com.zutubi.pulse.core.model.ResourcePropertyB" table="RESOURCE_PROPERTIES" lazy="false">
         <id name="id" type="java.lang.Long" column="RESOURCE_VERSION_ID" unsaved-value="0">
             <generator class="hilo"/>
         </id>
