@@ -6,6 +6,7 @@ import com.opensymphony.xwork.ActionInvocation;
 import com.opensymphony.xwork.interceptor.Interceptor;
 import com.zutubi.pulse.util.logging.Logger;
 import org.acegisecurity.AccessDeniedException;
+import org.mortbay.http.EOFException;
 
 import javax.servlet.http.HttpServletResponse;
 
@@ -35,6 +36,11 @@ public class ErrorHandlingInterceptor implements Interceptor
             HttpServletResponse response = ServletActionContext.getResponse();
             response.sendError(401);
             return Action.ERROR;
+        }
+        catch(EOFException e)
+        {
+            // Harmless
+            return Action.NONE;
         }
     }
 }
