@@ -698,6 +698,11 @@ public class SVNServer implements SCMServer
         }
     }
 
+    public Map<String, String> getConnectionProperties(String id, File dir) throws SCMException
+    {
+        return Collections.EMPTY_MAP;
+    }
+
     public void writeConnectionDetails(File outputDir) throws SCMException, IOException
     {
         Properties props = new Properties();
@@ -724,6 +729,28 @@ public class SVNServer implements SCMServer
     {
         // Subversion does not distinguish between file and repo revisions
         return new NumericalFileRevision(((NumericalRevision) repoRevision).getRevisionNumber());
+    }
+
+    public Revision getRevision(String revision) throws SCMException
+    {
+        try
+        {
+            long revisionNumber = Long.parseLong(revision);
+            if(revisionNumber > repository.getLatestRevision())
+            {
+                throw new SCMException("Revision '" + revision + "' does not exist in this repository");
+            }
+
+            return new NumericalRevision(revisionNumber);
+        }
+        catch(NumberFormatException e)
+        {
+            throw new SCMException("Invalid revision '" + revision + ": must be a valid revision number");
+        }
+        catch (SVNException e)
+        {
+            throw convertException(e);
+        }
     }
 
     //=======================================================================

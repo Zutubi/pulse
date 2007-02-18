@@ -167,6 +167,7 @@ public interface SCMServer
      */
     void tag(Revision revision, String name, boolean moveExisting) throws SCMException;
 
+    Map<String, String> getConnectionProperties(String id, File dir) throws SCMException;
     void writeConnectionDetails(File outputDir) throws SCMException, IOException;
 
     /**
@@ -188,4 +189,15 @@ public interface SCMServer
      */
     FileRevision getFileRevision(String path, Revision repoRevision) throws SCMException;
 
+    /**
+     * Converts a string into a revision.  The string is input from the user,
+     * and thus should be validated.  If it is invalid, an SCMException
+     * should be thrown.
+     *
+     * @param revision revision input string to be converted into an actual
+     *                 revision
+     * @return a valid revision derived from the string
+     * @throws SCMException if the given revision is invalid
+     */
+    Revision getRevision(String revision) throws SCMException;
 }

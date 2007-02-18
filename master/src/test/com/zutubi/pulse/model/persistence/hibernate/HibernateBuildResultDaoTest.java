@@ -100,7 +100,7 @@ public class HibernateBuildResultDaoTest extends MasterPersistenceTestCase
         spec.getRoot().addChild(node);
         buildSpecificationDao.save(spec);
 
-        BuildResult buildResult = new BuildResult(new TriggerBuildReason("scm trigger"), project, spec, 11);
+        BuildResult buildResult = new BuildResult(new TriggerBuildReason("scm trigger"), project, spec, 11, false);
         buildResult.commence();
         buildResult.setScmDetails(scmDetails);
         RecipeResultNode recipeNode = new RecipeResultNode(node.getStage().getPname(), recipeResult);
@@ -249,7 +249,7 @@ public class HibernateBuildResultDaoTest extends MasterPersistenceTestCase
         Project p1 = new Project();
         projectDao.save(p1);
 
-        BuildResult result = new BuildResult(new TriggerBuildReason("scm trigger"), p1, makeSpec(), 1);
+        BuildResult result = new BuildResult(new TriggerBuildReason("scm trigger"), p1, makeSpec(), 1, false);
         buildResultDao.save(result);
 
         commitAndRefreshTransaction();
@@ -263,7 +263,7 @@ public class HibernateBuildResultDaoTest extends MasterPersistenceTestCase
         Project p1 = new Project();
         projectDao.save(p1);
 
-        BuildResult result = new BuildResult(new TriggerBuildReason("scm trigger"), p1, makeSpec(), 1);
+        BuildResult result = new BuildResult(new TriggerBuildReason("scm trigger"), p1, makeSpec(), 1, false);
         result.commence(0);
         buildResultDao.save(result);
 
@@ -327,11 +327,11 @@ public class HibernateBuildResultDaoTest extends MasterPersistenceTestCase
         Project p1 = new Project();
         projectDao.save(p1);
 
-        BuildResult resultA = new BuildResult(new TriggerBuildReason("scm trigger"), p1, makeSpec(), 1);
+        BuildResult resultA = new BuildResult(new TriggerBuildReason("scm trigger"), p1, makeSpec(), 1, false);
         buildResultDao.save(resultA);
-        BuildResult resultB = new BuildResult(new TriggerBuildReason("scm trigger"), p1, makeSpec(), 2);
+        BuildResult resultB = new BuildResult(new TriggerBuildReason("scm trigger"), p1, makeSpec(), 2, false);
         buildResultDao.save(resultB);
-        BuildResult resultC = new BuildResult(new TriggerBuildReason("scm trigger"), p1, makeSpec(), 3);
+        BuildResult resultC = new BuildResult(new TriggerBuildReason("scm trigger"), p1, makeSpec(), 3, false);
         buildResultDao.save(resultC);
 
         commitAndRefreshTransaction();
@@ -380,7 +380,7 @@ public class HibernateBuildResultDaoTest extends MasterPersistenceTestCase
         buildSpecificationDao.save(b1);
 
         BuildResult r1 = createCompletedBuild(p1, b1, 1);
-        BuildResult r2 = new BuildResult(new TriggerBuildReason("scm trigger"), p1, b1, 2);
+        BuildResult r2 = new BuildResult(new TriggerBuildReason("scm trigger"), p1, b1, 2, false);
 
         buildResultDao.save(r1);
         buildResultDao.save(r2);
@@ -401,7 +401,7 @@ public class HibernateBuildResultDaoTest extends MasterPersistenceTestCase
         buildSpecificationDao.save(b1);
 
         BuildResult r1 = createCompletedBuild(p1, b1, 1);
-        BuildResult r2 = new BuildResult(new TriggerBuildReason("scm trigger"), p1, b1, 2);
+        BuildResult r2 = new BuildResult(new TriggerBuildReason("scm trigger"), p1, b1, 2, false);
         r2.commence();
 
         buildResultDao.save(r1);
@@ -778,7 +778,7 @@ public class HibernateBuildResultDaoTest extends MasterPersistenceTestCase
 
     private BuildResult createCompletedBuild(Project project, BuildSpecification spec, long number)
     {
-        BuildResult result = new BuildResult(new TriggerBuildReason("scm trigger"), project, spec, number);
+        BuildResult result = new BuildResult(new TriggerBuildReason("scm trigger"), project, spec, number, false);
         result.commence(time++);
         result.complete(time++);
         return result;
@@ -786,7 +786,7 @@ public class HibernateBuildResultDaoTest extends MasterPersistenceTestCase
 
     private BuildResult createFailedBuild(Project project, BuildSpecification spec, long number)
     {
-        BuildResult result = new BuildResult(new TriggerBuildReason("scm trigger"), project, spec, number);
+        BuildResult result = new BuildResult(new TriggerBuildReason("scm trigger"), project, spec, number, false);
         result.commence(time++);
         result.failure();
         result.complete(time++);

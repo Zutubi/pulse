@@ -23,6 +23,12 @@ public class BuildResult extends Result implements AclObjectIdentityAware, Itera
     private User user;
     private PersistentName specName;
     private long number;
+    /**
+     * If true, this build was triggered by a user at a fixed revision.
+     * This build will be ignored for the purposes of calculating changes
+     * between builds. 
+     */
+    private boolean userRevision;
     private BuildScmDetails scmDetails;
     private RecipeResultNode root;
     private String version;
@@ -36,7 +42,7 @@ public class BuildResult extends Result implements AclObjectIdentityAware, Itera
 
     }
 
-    public BuildResult(BuildReason reason, Project project, BuildSpecification spec, long number)
+    public BuildResult(BuildReason reason, Project project, BuildSpecification spec, long number, boolean userRevision)
     {
         // Clone the build reason to ensure that each build result has its own build reason. 
         try
@@ -52,6 +58,7 @@ public class BuildResult extends Result implements AclObjectIdentityAware, Itera
         this.user = null;
         this.specName = spec.getPname();
         this.number = number;
+        this.userRevision = userRevision;
         state = ResultState.INITIAL;
         root = new RecipeResultNode(null, null);
         hasWorkDir = true;
@@ -59,7 +66,7 @@ public class BuildResult extends Result implements AclObjectIdentityAware, Itera
 
     public BuildResult(User user, Project project, BuildSpecification spec, long number)
     {
-        this(new PersonalBuildReason(user.getLogin()), project, spec, number);
+        this(new PersonalBuildReason(user.getLogin()), project, spec, number, false);
         this.user = user;
     }
 
@@ -116,6 +123,16 @@ public class BuildResult extends Result implements AclObjectIdentityAware, Itera
     private void setNumber(long number)
     {
         this.number = number;
+    }
+
+    public boolean isUserRevision()
+    {
+        return userRevision;
+    }
+
+    private void setUserRevision(boolean userRevision)
+    {
+        this.userRevision = userRevision;
     }
 
     public RecipeResultNode getRoot()

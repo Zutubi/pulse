@@ -8,6 +8,7 @@ import com.zutubi.pulse.util.logging.Logger;
 import com.zutubi.pulse.web.ActionSupport;
 import com.zutubi.pulse.web.LookupErrorException;
 import org.acegisecurity.AccessDeniedException;
+import org.mortbay.http.EOFException;
 
 import javax.servlet.http.HttpServletResponse;
 
@@ -44,6 +45,11 @@ public class ErrorHandlingInterceptor implements Interceptor
             ActionSupport action = (ActionSupport) invocation.getAction();
             action.addActionError(e.getMessage());
             return Action.ERROR;
+        }
+        catch(EOFException e)
+        {
+            // Harmless
+            return Action.NONE;
         }
     }
 }

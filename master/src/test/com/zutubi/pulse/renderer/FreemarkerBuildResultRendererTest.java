@@ -345,7 +345,7 @@ public class FreemarkerBuildResultRendererTest extends PulseTestCase
 
     private BuildResult createSuccessfulBuild()
     {
-        BuildResult result = new BuildResult(new TriggerBuildReason("scm trigger"), new Project("test project", "test description"), new BuildSpecification("test spec"), 101);
+        BuildResult result = new BuildResult(new TriggerBuildReason("scm trigger"), new Project("test project", "test description"), new BuildSpecification("test spec"), 101, false);
         initialiseResult(result);
         return result;
     }

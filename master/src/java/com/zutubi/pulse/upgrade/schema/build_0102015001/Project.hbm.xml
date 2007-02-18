@@ -1,0 +1,14 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD//EN" "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd" >
+<hibernate-mapping>
+    <class name="com.zutubi.pulse.model.PostBuildAction" table="POST_BUILD_ACTION">
+        <id name="id" type="java.lang.Long" column="ID" unsaved-value="0">
+            <generator class="hilo"/>
+        </id>
+
+        <bag name="specifications" table="POST_BUILD_ACTION_SPECIFICATIONS" lazy="false">
+            <key column="ACTION_ID"/>
+            <many-to-many class="com.zutubi.pulse.model.BuildSpecification" column="SPECIFICATION_ID"/>
+        </bag>
+    </class>
+</hibernate-mapping>

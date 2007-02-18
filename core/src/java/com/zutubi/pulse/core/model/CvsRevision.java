@@ -1,6 +1,9 @@
 package com.zutubi.pulse.core.model;
 
+import com.zutubi.pulse.scm.SCMException;
+
 import java.text.DateFormat;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
@@ -29,6 +32,59 @@ public class CvsRevision extends Revision
 
         // construct the revision string.
         setRevisionString(generateRevisionString());
+    }
+
+    public CvsRevision(String revisionString) throws SCMException
+    {
+        String[] parts = revisionString.split(":");
+        if (parts.length == 1)
+        {
+            // Try a date without a time: yyyymmdd
+            setDate(revisionString, revisionString, new SimpleDateFormat("yyyyMMdd"));
+        }
+        else if (parts.length == 3)
+        {
+            // Should just be a date, in DATE_FORMAT format
+            setDate(revisionString, revisionString, DATE_FORMAT);
+        }
+        else if (parts.length == 5)
+        {
+            // Should be the output of generateRevisionString
+            parts = revisionString.split(":", 3);
+
+            if (parts[0].length() > 0)
+            {
+                setAuthor(parts[0]);
+            }
+
+            if (parts[1].length() > 0)
+            {
+                setBranch(parts[1]);
+            }
+
+            if (parts[2].length() > 0)
+            {
+                setDate(parts[2], revisionString, DATE_FORMAT);
+            }
+        }
+        else
+        {
+            throw new SCMException("Invalid CVS revision '" + revisionString + "' (must be a date, or <author>:<branch>:<date>)");
+        }
+
+        setRevisionString(generateRevisionString());
+    }
+
+    private void setDate(String s, String revisionString, DateFormat dateFormat) throws SCMException
+    {
+        try
+        {
+            setDate(dateFormat.parse(s));
+        }
+        catch (ParseException e)
+        {
+            throw new SCMException("Invalid CVS revision '" + revisionString + "': date is invalid: " + e.getMessage());
+        }
     }
 
     private String generateRevisionString()

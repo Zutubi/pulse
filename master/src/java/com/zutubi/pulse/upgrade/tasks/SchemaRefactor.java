@@ -157,6 +157,21 @@ public class SchemaRefactor
         });
     }
 
+    public void dropColumn(final String tableName, final String columnName) throws SQLException
+    {
+        executeWithConnection(new Callback()
+        {
+            public Object execute(Connection con) throws SQLException
+            {
+                Table table = getTable(tableName);
+                Column column = getColumn(table, columnName);
+                dropColumnConstraints(con, table, column);
+                dropColumn(con, table, columnName);
+                return null;
+            }
+        });
+    }
+
     public void dropSchema() throws SQLException
     {
         executeWithConnection(new Callback()
@@ -211,19 +226,7 @@ public class SchemaRefactor
         TableMetadata tableInfo = meta.getTableMetadata(table.getName(), defaultSchema, defaultCatalog);
 
         // a) identify foreign key references.
-        ForeignKey columnKey = null;
-        Iterator fks = table.getForeignKeyIterator();
-        while (fks.hasNext())
-        {
-            ForeignKey fk = (ForeignKey) fks.next();
-            if (fk.getColumns().contains(fromColumn))
-            {
-                columnKey = fk;
-                String sql = fk.sqlDropString(dialect, defaultCatalog, defaultSchema);
-                LOG.info(sql);
-                JDBCUtils.execute(connection, sql);
-            }
-        }
+        ForeignKey columnKey = dropColumnConstraints(connection, table, fromColumn);
 
         // update table model.
         String fromColumnName = fromColumn.getName();
@@ -250,7 +253,32 @@ public class SchemaRefactor
         }
 
         // d) drop the column.
-        sql = "alter table " + table.getName() + " drop column " + fromColumnName;
+        dropColumn(connection, table, fromColumnName);
+    }
+
+    private ForeignKey dropColumnConstraints(Connection connection, Table table, Column column) throws SQLException
+    {
+        ForeignKey columnKey = null;
+        Iterator fks = table.getForeignKeyIterator();
+        while (fks.hasNext())
+        {
+            ForeignKey fk = (ForeignKey) fks.next();
+            if (fk.getColumns().contains(column))
+            {
+                columnKey = fk;
+                String sql = fk.sqlDropString(dialect, defaultCatalog, defaultSchema);
+                LOG.info(sql);
+                JDBCUtils.execute(connection, sql);
+            }
+        }
+
+        return columnKey;
+    }
+
+    private void dropColumn(Connection connection, Table table, String columnName) throws SQLException
+    {
+        String sql;
+        sql = "alter table " + table.getName() + " drop column " + columnName;
         LOG.info(sql);
         JDBCUtils.execute(connection, sql);
     }

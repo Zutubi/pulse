@@ -193,6 +193,11 @@ public class CvsServer extends CachingSCMServer
         client.tag(module, (CvsRevision) revision, name, moveExisting);
     }
 
+    public Map<String, String> getConnectionProperties(String id, File dir) throws SCMException
+    {
+        return Collections.EMPTY_MAP;
+    }
+
     public void writeConnectionDetails(File outputDir) throws SCMException, IOException
     {
         Properties props = new Properties();
@@ -223,6 +228,19 @@ public class CvsServer extends CachingSCMServer
     public FileRevision getFileRevision(String path, Revision repoRevision)
     {
         return null;
+    }
+
+    public CvsRevision getRevision(String revision) throws SCMException
+    {
+        CvsRevision cvsRevision = new CvsRevision(revision);
+        if(cvsRevision.getBranch() == null)
+        {
+            // As this is a user-specified value, we set the right branch for
+            // them when it is left unspecified.
+            cvsRevision.setBranch(branch);
+        }
+        
+        return cvsRevision;
     }
 
     public Revision checkout(String id, File toDirectory, Revision revision, SCMCheckoutEventHandler handler) throws SCMException

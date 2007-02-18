@@ -28,6 +28,8 @@
 
         <property name="number" column="NUMBER" type="long" not-null="true"/>
 
+        <property name="userRevision" column="USER_REVISION" type="boolean"/>
+
         <property name="warningFeatureCount" type="int">
             <column name="WARNING_FEATURE_COUNT" default="-1"/>
         </property>

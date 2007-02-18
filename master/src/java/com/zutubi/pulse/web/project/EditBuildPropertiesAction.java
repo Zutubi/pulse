@@ -1,22 +1,29 @@
 package com.zutubi.pulse.web.project;
 
-import com.zutubi.pulse.model.Project;
+import com.opensymphony.util.TextUtils;
+import com.opensymphony.xwork.ActionContext;
+import com.zutubi.pulse.core.model.ResourceProperty;
+import com.zutubi.pulse.core.model.Revision;
 import com.zutubi.pulse.model.BuildSpecification;
 import com.zutubi.pulse.model.ManualTriggerBuildReason;
 import com.zutubi.pulse.model.NamedEntityComparator;
-import com.zutubi.pulse.core.model.ResourceProperty;
-import com.opensymphony.xwork.ActionContext;
+import com.zutubi.pulse.model.Project;
+import com.zutubi.pulse.scm.SCMException;
+import com.zutubi.pulse.util.logging.Logger;
 
-import java.util.List;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 
 public class EditBuildPropertiesAction extends ProjectActionSupport
 {
+    private static final Logger LOG = Logger.getLogger(EditBuildPropertiesAction.class);
+
     private long id = -1;
     private Project project;
     private BuildSpecification spec;
+    private String revision;
     private List<ResourceProperty> properties;
     private static final String PROPERTY_PREFIX = "property.";
 
@@ -43,6 +50,16 @@ public class EditBuildPropertiesAction extends ProjectActionSupport
     public List<ResourceProperty> getProperties()
     {
         return properties;
+    }
+
+    public String getRevision()
+    {
+        return revision;
+    }
+
+    public void setRevision(String revision)
+    {
+        this.revision = revision;
     }
 
     public void validate()
@@ -104,7 +121,22 @@ public class EditBuildPropertiesAction extends ProjectActionSupport
         mapProperties();
         projectManager.save(project);
 
-        projectManager.triggerBuild(project, spec.getName(), new ManualTriggerBuildReason((String)getPrinciple()), null, true);
+        Revision r = null;
+        if(TextUtils.stringSet(revision))
+        {
+            try
+            {
+                r = project.getScm().createServer().getRevision(revision);
+            }
+            catch (SCMException e)
+            {
+                addFieldError("revision", "Unable to verify revision: " + e.getMessage());
+                LOG.severe(e);
+                return INPUT;
+            }
+        }
+        
+        projectManager.triggerBuild(project, spec.getName(), new ManualTriggerBuildReason((String)getPrinciple()), r, true);
 
         try
         {

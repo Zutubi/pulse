@@ -14,11 +14,14 @@
     #wwhidden("name=projectId")
     #wwhidden("name=id")
 
+    #wwtextfield("name=revision" "label=%{getText('revision.to.build')}" "size=40" "tabindex=1")
+    #inlineHelp("revision.to.build.help")
     #foreach($property in $properties)
-        #wwtextfield("name=property.${property.name}" "value=$property.value" "label=$property.name" "tabindex=$velocityCount")
+        #set($tabIndex = $velocityCount + 1)
+        #wwtextfield("name=property.${property.name}" "value=$property.value" "label=$property.name" "tabindex=$tabIndex")
     #end
 
-    #set($tabIndex = $properties.size() + 1)
+    #set($tabIndex = $tabIndex + 1)
     #openSubmit()
         #wwsubmit("name=save" "value=%{getText('buildspec.trigger')}" "tabindex=$tabIndex")
         #set($tabIndex = $tabIndex + 1)

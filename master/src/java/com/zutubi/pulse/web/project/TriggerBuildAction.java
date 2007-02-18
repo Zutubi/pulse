@@ -50,7 +50,7 @@ public class TriggerBuildAction extends ProjectActionSupport
             return ERROR;
         }
 
-        if(spec.getPrompt() && spec.getProperties().size() > 0)
+        if(spec.getPrompt())
         {
             return "prompt";
         }

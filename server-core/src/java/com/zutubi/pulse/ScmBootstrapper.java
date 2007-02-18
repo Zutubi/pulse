@@ -2,18 +2,20 @@ package com.zutubi.pulse;
 
 import com.zutubi.pulse.core.*;
 import com.zutubi.pulse.core.model.Change;
+import com.zutubi.pulse.core.model.ResourceProperty;
 import com.zutubi.pulse.model.Scm;
 import com.zutubi.pulse.scm.SCMCancelledException;
 import com.zutubi.pulse.scm.SCMCheckoutEventHandler;
+import com.zutubi.pulse.scm.SCMServer;
 import com.zutubi.pulse.util.ForkOutputStream;
 import com.zutubi.pulse.util.IOUtils;
 import com.zutubi.pulse.util.logging.Logger;
 
 import java.io.*;
+import java.util.Map;
 
 /**
  * A bootstrapper that populates the working directory by checking out from one SCM.
- * 
  */
 public abstract class ScmBootstrapper implements Bootstrapper, SCMCheckoutEventHandler
 {
@@ -58,11 +60,12 @@ public abstract class ScmBootstrapper implements Bootstrapper, SCMCheckoutEventH
 
         OutputStream out = null;
         FileOutputStream fout = null;
+        SCMServer server = null;
 
         try
         {
             fout = new FileOutputStream(new File(outDir, BootstrapCommand.FILES_FILE));
-            if(context.getOutputStream() == null)
+            if (context.getOutputStream() == null)
             {
                 out = fout;
             }
@@ -72,7 +75,7 @@ public abstract class ScmBootstrapper implements Bootstrapper, SCMCheckoutEventH
             }
 
             outputWriter = new PrintWriter(out);
-            bootstrap(workDir);
+            server = bootstrap(workDir);
         }
         catch (IOException e)
         {
@@ -83,13 +86,20 @@ public abstract class ScmBootstrapper implements Bootstrapper, SCMCheckoutEventH
             IOUtils.close(outputWriter);
         }
 
-        try
+        if (server != null)
         {
-            scm.createServer().writeConnectionDetails(outDir);
-        }
-        catch (Exception e)
-        {
-            LOG.warning("Unable to capture SCM connection details: " + e.getMessage(), e);
+            try
+            {
+                server.writeConnectionDetails(outDir);
+                for(Map.Entry<String, String> entry: server.getConnectionProperties(getId(), workDir).entrySet())
+                {
+                    context.getGlobalScope().add(new ResourceProperty(entry.getKey(), entry.getValue(), true, false, false));
+                }
+            }
+            catch (Exception e)
+            {
+                LOG.warning("Unable to capture SCM connection details: " + e.getMessage(), e);
+            }
         }
     }
 
@@ -106,7 +116,7 @@ public abstract class ScmBootstrapper implements Bootstrapper, SCMCheckoutEventH
     public void fileCheckedOut(Change change)
     {
         String revision = "";
-        if(change.getRevision() != null)
+        if (change.getRevision() != null)
         {
             revision = "#" + change.getRevision();
         }
@@ -116,7 +126,7 @@ public abstract class ScmBootstrapper implements Bootstrapper, SCMCheckoutEventH
 
     public void checkCancelled() throws SCMCancelledException
     {
-        if(terminated)
+        if (terminated)
         {
             throw new SCMCancelledException("Operation cancelled");
         }
@@ -127,5 +137,5 @@ public abstract class ScmBootstrapper implements Bootstrapper, SCMCheckoutEventH
         terminated = true;
     }
 
-    abstract void bootstrap(File workDir);
+    abstract SCMServer bootstrap(File workDir);
 }
