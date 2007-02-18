@@ -1,20 +1,19 @@
 package com.zutubi.pulse.scm.cvs;
 
+import com.zutubi.pulse.core.model.Changelist;
+import com.zutubi.pulse.core.model.CvsRevision;
+import com.zutubi.pulse.core.model.Revision;
+import com.zutubi.pulse.filesystem.remote.RemoteFile;
+import com.zutubi.pulse.scm.SCMException;
 import com.zutubi.pulse.test.PulseTestCase;
 import com.zutubi.pulse.util.FileSystemUtils;
-import com.zutubi.pulse.scm.SCMException;
-import com.zutubi.pulse.filesystem.remote.RemoteFile;
-import com.zutubi.pulse.core.model.CvsRevision;
-import com.zutubi.pulse.core.model.Changelist;
-import com.zutubi.pulse.core.model.Revision;
+import org.netbeans.lib.cvsclient.util.Logger;
 
 import java.io.File;
-import java.text.SimpleDateFormat;
 import java.text.ParseException;
-import java.util.List;
+import java.text.SimpleDateFormat;
 import java.util.Arrays;
-
-import org.netbeans.lib.cvsclient.util.Logger;
+import java.util.List;
 
 public class CvsServerTest extends PulseTestCase
 {
@@ -197,4 +196,78 @@ public class CvsServerTest extends PulseTestCase
         assertNotNull(revisions);
         assertEquals(1, revisions.size());
     }
+
+    public void testGetRevision() throws SCMException, ParseException
+    {
+        CvsServer cvsServer = new CvsServer(cvsRoot, "unit-test", null, null);
+        CvsRevision revision = cvsServer.getRevision("author:BRANCH:20070201-01:02:33");
+        assertEquals("author", revision.getAuthor());
+        assertEquals("BRANCH", revision.getBranch());
+        assertEquals(CvsRevision.DATE_FORMAT.parse("20070201-01:02:33"), revision.getDate());
+    }
+
+    public void testGetRevisionNoAuthor() throws SCMException, ParseException
+    {
+        CvsServer cvsServer = new CvsServer(cvsRoot, "unit-test", null, null);
+        CvsRevision revision = cvsServer.getRevision(":BRANCH:20070201-01:02:33");
+        assertNull(revision.getAuthor());
+        assertEquals("BRANCH", revision.getBranch());
+        assertEquals(CvsRevision.DATE_FORMAT.parse("20070201-01:02:33"), revision.getDate());
+    }
+
+    public void testGetRevisionNoBranch() throws SCMException, ParseException
+    {
+        CvsServer cvsServer = new CvsServer(cvsRoot, "unit-test", null, null);
+        CvsRevision revision = cvsServer.getRevision("author::20070201-01:02:33");
+        assertEquals("author", revision.getAuthor());
+        assertNull(revision.getBranch());
+        assertEquals(CvsRevision.DATE_FORMAT.parse("20070201-01:02:33"), revision.getDate());
+    }
+
+    public void testGetRevisionDateOnly() throws SCMException, ParseException
+    {
+        CvsServer cvsServer = new CvsServer(cvsRoot, "unit-test", null, null);
+        CvsRevision revision = cvsServer.getRevision("20070201-01:02:33");
+        assertNull(revision.getAuthor());
+        assertNull(revision.getBranch());
+        assertEquals(CvsRevision.DATE_FORMAT.parse("20070201-01:02:33"), revision.getDate());
+    }
+
+    public void testGetRevisionDayOnly() throws SCMException, ParseException
+    {
+        CvsServer cvsServer = new CvsServer(cvsRoot, "unit-test", null, null);
+        CvsRevision revision = cvsServer.getRevision("20070201");
+        assertNull(revision.getAuthor());
+        assertNull(revision.getBranch());
+        assertEquals(CvsRevision.DATE_FORMAT.parse("20070201-00:00:00"), revision.getDate());
+    }
+
+    public void testGetRevisionTooManyPieces() throws SCMException, ParseException
+    {
+        CvsServer cvsServer = new CvsServer(cvsRoot, "unit-test", null, null);
+        try
+        {
+            cvsServer.getRevision("1:2:3:4:5:6:7");
+            fail();
+        }
+        catch (SCMException e)
+        {
+            assertEquals("Invalid CVS revision '1:2:3:4:5:6:7' (must be a date, or <author>:<branch>:<date>)", e.getMessage());
+        }
+    }
+
+    public void testGetRevisionInvalidDate() throws SCMException, ParseException
+    {
+        CvsServer cvsServer = new CvsServer(cvsRoot, "unit-test", null, null);
+        try
+        {
+            cvsServer.getRevision("baddate");
+            fail();
+        }
+        catch (SCMException e)
+        {
+            assertEquals("Invalid CVS revision 'baddate': date is invalid: Unparseable date: \"baddate\"", e.getMessage());
+        }
+    }
+
 }

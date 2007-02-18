@@ -491,25 +491,28 @@ public class BuildController implements EventListener
 
     private void getChanges(BuildRevision buildRevision)
     {
-        Scm scm = project.getScm();
         Revision revision = buildRevision.getRevision();
-        Revision previousRevision = buildManager.getPreviousRevision(project, specification.getPname());
-
-        if (previousRevision != null)
-        {
-            try
-            {
-                SCMServer server = scm.createServer();
-                getChangeSince(server, previousRevision, revision);
-            }
-            catch (SCMException e)
-            {
-                LOG.warning("Unable to retrieve changelist details from SCM server: " + e.getMessage(), e);
-            }
-        }
-
         BuildScmDetails scmDetails = new BuildScmDetails(revision);
         buildResult.setScmDetails(scmDetails);
+
+        if (!buildResult.isUserRevision())
+        {
+            Scm scm = project.getScm();
+            Revision previousRevision = buildManager.getPreviousRevision(project, specification.getPname());
+
+            if (previousRevision != null)
+            {
+                try
+                {
+                    SCMServer server = scm.createServer();
+                    getChangeSince(server, previousRevision, revision);
+                }
+                catch (SCMException e)
+                {
+                    LOG.warning("Unable to retrieve changelist details from SCM server: " + e.getMessage(), e);
+                }
+            }
+        }
     }
 
     private List<Changelist> getChangeSince(SCMServer server, Revision previousRevision, Revision revision) throws SCMException

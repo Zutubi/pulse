@@ -37,9 +37,11 @@
     <table class="content">
         #headingRow("changes.revisions" 2)
         #revisionCell("changes.build.revision" $result false)
+#if(!$result.userRevision)
         #revisionCell("changes.previous.revision" $previous true)
         #revisionCell("changes.previous.successful.revision" $previousSuccessful true)
         #revisionCell("changes.previous.unsuccessful.revision" $previousUnsuccessful true)
+#end
     </table>
 
 #if($changelists.size() > 0)
@@ -93,7 +95,13 @@
     </table>
 #else
     <p>
-        <td class="content" colspan="5">#wwtext("name=changes.none")</td>
+        <td class="content" colspan="5">
+    #if($result.userRevision)
+            #wwtext("name=changes.user.revision")
+    #else
+            #wwtext("name=changes.none")
+    #end
+        </td>
     </p>
 #end
 

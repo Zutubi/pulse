@@ -128,7 +128,7 @@ public class BuildCompletedEventFilterTest extends PulseTestCase
     {
         Project project = new Project();
         project.setId(id);
-        BuildResult result = new BuildResult(new UnknownBuildReason(), project, new BuildSpecification(SPEC), 1);
+        BuildResult result = new BuildResult(new UnknownBuildReason(), project, new BuildSpecification(SPEC), 1, false);
         result.setState(state);
         return new BuildCompletedEvent(this, result);
     }

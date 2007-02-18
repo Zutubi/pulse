@@ -24,6 +24,11 @@ public class BuildRevision
      */
     private boolean fixed;
     /**
+     * True if this is a revision explicitly specified by the user, when
+     * triggering the build.
+     */
+    private boolean user;
+    /**
      * The time at which the first recipe is dispatched: which is when the
      * build is said to have commenced.
      */
@@ -36,6 +41,7 @@ public class BuildRevision
     public BuildRevision()
     {
         fixed = false;
+        user = false;
     }
 
     /**
@@ -44,12 +50,13 @@ public class BuildRevision
      * @param revision the revision to build, which will not change.
      * @param pulseFile the pulse file corresponding to the revision
      */
-    public BuildRevision(Revision revision, String pulseFile)
+    public BuildRevision(Revision revision, String pulseFile, boolean user)
     {
         assert(revision != null);
         this.revision = revision;
         this.pulseFile = pulseFile;
         fixed = true;
+        this.user = user;
     }
 
     public Revision getRevision()
@@ -70,6 +77,11 @@ public class BuildRevision
     public boolean isFixed()
     {
         return fixed;
+    }
+
+    public boolean isUser()
+    {
+        return user;
     }
 
     public long getTimestamp()

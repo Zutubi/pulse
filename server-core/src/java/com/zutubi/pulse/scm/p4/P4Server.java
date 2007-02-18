@@ -732,6 +732,29 @@ public class P4Server extends CachingSCMServer
 
     }
 
+    public NumericalRevision getRevision(String revision) throws SCMException
+    {
+        String clientName = updateClient(null, null);
+        try
+        {
+            try
+            {
+                long revisionNumber = Long.parseLong(revision);
+                // Run a quick check to ensure that the change exists.
+                client.runP4(true, null, P4_COMMAND, FLAG_CLIENT, clientName, COMMAND_CHANGE, FLAG_OUTPUT, revision);
+                return new NumericalRevision(revisionNumber);
+            }
+            catch (NumberFormatException e)
+            {
+                throw new SCMException("Invalid revision '" + revision + "': must be a valid Perforce changelist number");
+            }
+        }
+        finally
+        {
+            deleteClient(clientName);
+        }
+    }
+
     public boolean labelExists(String client, String name) throws SCMException
     {
         P4Client.P4Result p4Result = this.client.runP4(null, P4_COMMAND, FLAG_CLIENT, client, COMMAND_LABELS);

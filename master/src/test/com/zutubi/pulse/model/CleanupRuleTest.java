@@ -114,7 +114,7 @@ public class CleanupRuleTest extends MasterPersistenceTestCase
     {
         BuildSpecification specification = new BuildSpecification(spec);
         buildSpecificationDao.save(specification);
-        BuildResult result = new BuildResult(new TriggerBuildReason("scm trigger"), project, specification, number);
+        BuildResult result = new BuildResult(new TriggerBuildReason("scm trigger"), project, specification, number, false);
         if(startTime >= 0)
         {
             result.commence(startTime);

@@ -88,7 +88,7 @@ public class BuildQueryTest extends MasterPersistenceTestCase
 
     private void createBuild(Project project, BuildSpecification spec, int number, ResultState state, int start, int end, boolean hasWorkDir)
     {
-        BuildResult result = new BuildResult(new UnknownBuildReason(), project, spec, number);
+        BuildResult result = new BuildResult(new UnknownBuildReason(), project, spec, number, false);
         result.commence(start);
         switch (state)
         {

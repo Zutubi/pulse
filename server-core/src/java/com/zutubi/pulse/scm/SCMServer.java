@@ -188,4 +188,16 @@ public interface SCMServer
      *         path did not exist at that time
      */
     FileRevision getFileRevision(String path, Revision repoRevision) throws SCMException;
+
+    /**
+     * Converts a string into a revision.  The string is input from the user,
+     * and thus should be validated.  If it is invalid, an SCMException
+     * should be thrown.
+     *
+     * @param revision revision input string to be converted into an actual
+     *                 revision
+     * @return a valid revision derived from the string
+     * @throws SCMException if the given revision is invalid
+     */
+    Revision getRevision(String revision) throws SCMException;
 }

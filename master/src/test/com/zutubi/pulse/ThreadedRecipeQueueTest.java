@@ -685,7 +685,7 @@ public class ThreadedRecipeQueueTest extends TestCase implements EventListener
     {
         Project project = new Project("test", "test description", new MockPulseFileDetails());
         project.setScm(scm);
-        BuildResult result = new BuildResult(new UnknownBuildReason(), project, new BuildSpecification("spec"), 100);
+        BuildResult result = new BuildResult(new UnknownBuildReason(), project, new BuildSpecification("spec"), 100, false);
         BuildHostRequirements requirements = new MockBuildHostRequirements(type);
         RecipeRequest request = new RecipeRequest("project", "spec", id, null, false);
         request.setBootstrapper(new ChainBootstrapper());
@@ -870,6 +870,11 @@ public class ThreadedRecipeQueueTest extends TestCase implements EventListener
         public FileRevision getFileRevision(String path, Revision repoRevision)
         {
             throw new RuntimeException("Method not implemented.");
+        }
+
+        public Revision getRevision(String revision) throws SCMException
+        {
+            throw new RuntimeException("Method not yet implemented.");
         }
     }
 

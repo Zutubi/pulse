@@ -226,7 +226,7 @@ public class DefaultProjectManager implements ProjectManager
         try
         {
             String pulseFile = getPulseFile(project, revision, archive);
-            eventManager.publish(new PersonalBuildRequestEvent(this, number, new BuildRevision(revision, pulseFile), user, archive, project, specification));
+            eventManager.publish(new PersonalBuildRequestEvent(this, number, new BuildRevision(revision, pulseFile, false), user, archive, project, specification));
         }
         catch (BuildException e)
         {
@@ -248,16 +248,11 @@ public class DefaultProjectManager implements ProjectManager
         try
         {
             String pulseFile = getPulseFile(project, revision, null);
-            eventManager.publish(new BuildRequestEvent(this, reason, project, specification, new BuildRevision(revision, pulseFile)));
+            eventManager.publish(new BuildRequestEvent(this, reason, project, specification, new BuildRevision(revision, pulseFile, reason instanceof ManualTriggerBuildReason)));
         }
         catch (BuildException e)
         {
-            String message = "Unable to obtain pulse file for project '" + project.getName();
-            if(revision != null)
-            {
-                message += "', revision '" + revision.getRevisionString();
-            }
-            LOG.severe(message + "': " + e.getMessage(), e);
+            LOG.severe("Unable to obtain pulse file for project '" + project.getName() + "', revision '" + revision.getRevisionString() + "': " + e.getMessage(), e);
         }
     }
 

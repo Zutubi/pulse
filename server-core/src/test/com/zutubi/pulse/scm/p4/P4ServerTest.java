@@ -39,12 +39,12 @@ public class P4ServerTest extends PulseTestCase
         p4dProcess = Runtime.getRuntime().exec(new String[] { "p4d", "-r", repoDir.getAbsolutePath(), "-jr", "checkpoint.1"});
         p4dProcess.waitFor();
 
-        p4dProcess = Runtime.getRuntime().exec(new String[] { "p4d", "-r", repoDir.getAbsolutePath()});
+        p4dProcess = Runtime.getRuntime().exec(new String[] { "p4d", "-r", repoDir.getAbsolutePath(), "-p", "6666"});
 
         workDir = new File(tmpDir, "work");
         workDir.mkdirs();
 
-        waitForServer(1666);
+        waitForServer(6666);
     }
 
     protected void tearDown() throws Exception
@@ -61,7 +61,7 @@ public class P4ServerTest extends PulseTestCase
     public void testGetLocation()
     {
         getServer("test-client");
-        assertEquals(server.getLocation(), "test-client@:1666");
+        assertEquals(server.getLocation(), "test-client@:6666");
     }
 
     public void testGetLatestRevision() throws SCMException
@@ -159,12 +159,12 @@ public class P4ServerTest extends PulseTestCase
 
     public void testGetChanges() throws Exception
     {
-        // [{ uid: :1666, rev: 7, changes: [//depot2/test-branch/file9#2 - INTEGRATE] },
-        //  { uid: :1666, rev: 6, changes: [//depot2/file9#2 - EDIT] },
-        //  { uid: :1666, rev: 5, changes: [//depot2/test-branch/file1#1 - BRANCH, //depot2/test-branch/file2#1 - BRANCH, //depot2/test-branch/file3#1 - BRANCH, //depot2/test-branch/file4#1 - BRANCH, //depot2/test-branch/file5#1 - BRANCH, //depot2/test-branch/file6#1 - BRANCH, //depot2/test-branch/file7#1 - BRANCH, //depot2/test-branch/file8#1 - BRANCH, //depot2/test-branch/file9#1 - BRANCH] },
-        //  { uid: :1666, rev: 4, changes: [//depot/file2#2 - EDIT, //depot2/file2#2 - EDIT] },
-        //  { uid: :1666, rev: 3, changes: [//depot2/file1#2 - EDIT, //depot2/file10#2 - DELETE] },
-        //  { uid: :1666, rev: 2, changes: [//depot2/file1#1 - ADD, //depot2/file10#1 - ADD, //depot2/file2#1 - ADD, //depot2/file3#1 - ADD, //depot2/file4#1 - ADD, //depot2/file5#1 - ADD, //depot2/file6#1 - ADD, //depot2/file7#1 - ADD, //depot2/file8#1 - ADD, //depot2/file9#1 - ADD] }]
+        // [{ uid: :6666, rev: 7, changes: [//depot2/test-branch/file9#2 - INTEGRATE] },
+        //  { uid: :6666, rev: 6, changes: [//depot2/file9#2 - EDIT] },
+        //  { uid: :6666, rev: 5, changes: [//depot2/test-branch/file1#1 - BRANCH, //depot2/test-branch/file2#1 - BRANCH, //depot2/test-branch/file3#1 - BRANCH, //depot2/test-branch/file4#1 - BRANCH, //depot2/test-branch/file5#1 - BRANCH, //depot2/test-branch/file6#1 - BRANCH, //depot2/test-branch/file7#1 - BRANCH, //depot2/test-branch/file8#1 - BRANCH, //depot2/test-branch/file9#1 - BRANCH] },
+        //  { uid: :6666, rev: 4, changes: [//depot/file2#2 - EDIT, //depot2/file2#2 - EDIT] },
+        //  { uid: :6666, rev: 3, changes: [//depot2/file1#2 - EDIT, //depot2/file10#2 - DELETE] },
+        //  { uid: :6666, rev: 2, changes: [//depot2/file1#1 - ADD, //depot2/file10#1 - ADD, //depot2/file2#1 - ADD, //depot2/file3#1 - ADD, //depot2/file4#1 - ADD, //depot2/file5#1 - ADD, //depot2/file6#1 - ADD, //depot2/file7#1 - ADD, //depot2/file8#1 - ADD, //depot2/file9#1 - ADD] }]
         getServer("test-client");
         List<Changelist> changes = server.getChanges(new NumericalRevision(1), new NumericalRevision(7), "");
         assertEquals(6, changes.size());
@@ -408,10 +408,54 @@ public class P4ServerTest extends PulseTestCase
         assertNull(fileRevision);
     }
 
+    public void testGetRevision() throws SCMException
+    {
+        getServer("test-client");
+        NumericalRevision rev = server.getRevision("3");
+        assertEquals(3, rev.getRevisionNumber());
+    }
+
+    public void testGetRevisionLatest() throws SCMException
+    {
+        getServer("test-client");
+        NumericalRevision latest = server.getLatestRevision();
+        NumericalRevision rev = server.getRevision(latest.getRevisionString());
+        assertEquals(latest.getRevisionNumber(), rev.getRevisionNumber());
+    }
+
+    public void testGetRevisionPostLatest() throws SCMException
+    {
+        getServer("test-client");
+        NumericalRevision latest = server.getLatestRevision();
+        try
+        {
+            server.getRevision(Long.toString(latest.getRevisionNumber() + 1));
+            fail();
+        }
+        catch (SCMException e)
+        {
+            assertTrue(e.getMessage().matches(".*Change [0-9]+ unknown.*"));
+        }
+    }
+
+    public void testGetRevisionInvalid() throws SCMException
+    {
+        getServer("test-client");
+        try
+        {
+            server.getRevision("bullet");
+            fail();
+        }
+        catch (SCMException e)
+        {
+            assertEquals("Invalid revision 'bullet': must be a valid Perforce changelist number", e.getMessage());
+        }
+    }
+
     private void getServer(String client)
     {
-        server = new P4Server(":1666", "test-user", "", client);
-        this.client.setEnv(P4Constants.ENV_PORT, ":1666");
+        server = new P4Server(":6666", "test-user", "", client);
+        this.client.setEnv(P4Constants.ENV_PORT, ":6666");
         this.client.setEnv(P4Constants.ENV_USER, "test-user");
     }
 

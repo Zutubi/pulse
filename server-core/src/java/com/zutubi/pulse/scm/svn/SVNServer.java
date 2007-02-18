@@ -731,6 +731,28 @@ public class SVNServer implements SCMServer
         return new NumericalFileRevision(((NumericalRevision) repoRevision).getRevisionNumber());
     }
 
+    public Revision getRevision(String revision) throws SCMException
+    {
+        try
+        {
+            long revisionNumber = Long.parseLong(revision);
+            if(revisionNumber > repository.getLatestRevision())
+            {
+                throw new SCMException("Revision '" + revision + "' does not exist in this repository");
+            }
+
+            return new NumericalRevision(revisionNumber);
+        }
+        catch(NumberFormatException e)
+        {
+            throw new SCMException("Invalid revision '" + revision + ": must be a valid revision number");
+        }
+        catch (SVNException e)
+        {
+            throw convertException(e);
+        }
+    }
+
     //=======================================================================
     // Testing use only
     //=======================================================================

@@ -272,7 +272,7 @@ public class SetupFeatureTour implements Runnable
     {
         BuildResult previous = build;
         BuildSpecification spec = project.getBuildSpecifications().get(0);
-        build = new BuildResult(new TriggerBuildReason("scm trigger"), project, spec, ++buildNumber);
+        build = new BuildResult(new TriggerBuildReason("scm trigger"), project, spec, ++buildNumber, false);
         buildResultDao.save(build);
 
         project.setNextBuildNumber(buildNumber);

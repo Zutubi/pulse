@@ -156,9 +156,10 @@ public class ViewChangesAction extends ProjectActionSupport
             List<BuildResult> previousResults = getBuildManager().querySpecificationBuilds(project, result.getSpecName(), states, -1, toBuild - 1, offset, 1, true, false);
             if(previousResults.size() > 0)
             {
-                if(previousResults.get(0).getScmDetails() != null)
+                BuildResult buildResult = previousResults.get(0);
+                if(!buildResult.isUserRevision() && buildResult.getScmDetails() != null)
                 {
-                    return previousResults.get(0);
+                    return buildResult;
                 }
             }
             else

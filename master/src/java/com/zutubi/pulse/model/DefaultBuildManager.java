@@ -247,11 +247,15 @@ public class DefaultBuildManager implements BuildManager, EventListener
 
             if (previousBuildResults.size() == 1)
             {
-                BuildScmDetails previousScmDetails = previousBuildResults.get(0).getScmDetails();
-                if (previousScmDetails != null)
+                BuildResult previous = previousBuildResults.get(0);
+                if (!previous.isUserRevision())
                 {
-                    previousRevision = previousScmDetails.getRevision();
-                    break;
+                    BuildScmDetails previousScmDetails = previous.getScmDetails();
+                    if (previousScmDetails != null)
+                    {
+                        previousRevision = previousScmDetails.getRevision();
+                        break;
+                    }
                 }
             }
             else

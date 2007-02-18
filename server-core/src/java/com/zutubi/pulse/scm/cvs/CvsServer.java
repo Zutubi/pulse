@@ -230,6 +230,19 @@ public class CvsServer extends CachingSCMServer
         return null;
     }
 
+    public CvsRevision getRevision(String revision) throws SCMException
+    {
+        CvsRevision cvsRevision = new CvsRevision(revision);
+        if(cvsRevision.getBranch() == null)
+        {
+            // As this is a user-specified value, we set the right branch for
+            // them when it is left unspecified.
+            cvsRevision.setBranch(branch);
+        }
+        
+        return cvsRevision;
+    }
+
     public Revision checkout(String id, File toDirectory, Revision revision, SCMCheckoutEventHandler handler) throws SCMException
     {
         assertRevisionArgValid(revision);
