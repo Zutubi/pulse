@@ -11,6 +11,7 @@ import java.lang.reflect.Method;
 import java.util.Map;
 
 /**
+ * @deprecated
  */
 public class DefaultRecordMapper implements RecordMapper
 {

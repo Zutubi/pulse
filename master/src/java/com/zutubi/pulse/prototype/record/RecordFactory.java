@@ -5,6 +5,7 @@ package com.zutubi.pulse.prototype.record;
  * type of instance to be controlled when loading via the RecordManager.
  *
  * @see RecordManager
+ * @deprecated
  */
 public interface RecordFactory
 {

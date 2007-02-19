@@ -6,7 +6,7 @@ import java.util.Set;
 import java.util.Collection;
 
 /**
- *
+ * Simple record that holds key:value data, along with meta data.
  *
  */
 public class Record implements Map<String, Object>
@@ -19,12 +19,22 @@ public class Record implements Map<String, Object>
     {
     }
 
-    public void putMetaProperty(String key, String value)
+    public void setSymbolicName(String name)
+    {
+        meta.put("symbolicName", name);
+    }
+
+    public String getSymbolicName()
+    {
+        return meta.get("symbolicName");
+    }
+
+    public void putMeta(String key, String value)
     {
         meta.put(key, value);
     }
 
-    public String getMetaProperty(String key)
+    public String getMeta(String key)
     {
         return meta.get(key);
     }

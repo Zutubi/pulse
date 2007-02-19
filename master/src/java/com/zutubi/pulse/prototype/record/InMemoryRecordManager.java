@@ -5,7 +5,7 @@ import java.util.List;
 import java.util.LinkedList;
 
 /**
- * 
+ * @deprecated
  */
 public class InMemoryRecordManager implements RecordManager
 {

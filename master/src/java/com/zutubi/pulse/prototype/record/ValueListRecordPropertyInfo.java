@@ -8,6 +8,7 @@ import java.util.List;
 
 /**
  * Information for a property that stores a list of primitive values.
+ * @deprecated
  */
 public class ValueListRecordPropertyInfo extends AbstractRecordPropertyInfo
 {

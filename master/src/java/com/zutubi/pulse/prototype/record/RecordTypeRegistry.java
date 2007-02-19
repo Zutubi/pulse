@@ -20,6 +20,8 @@ import java.util.Arrays;
  * It is used to store the type information with a record without tying it to
  * a specific class - the symbolic name adds a level of indirection so that
  * the class can change over time.
+ *
+ * @deprecated
  */
 public class RecordTypeRegistry
 {

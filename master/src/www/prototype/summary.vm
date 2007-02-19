@@ -82,6 +82,19 @@
             </div>
         #end
         </p>
+
+        <p>
+        #foreach($listProperty in $action.listTypes)
+            #set($propertyPath = "${action.path}/${listProperty}")
+            <div class="summary">
+                <h3>#i18n("path=${propertyPath}" "key=label")</h3>
+                #i18n("path=${propertyPath}" "key=summary")
+                For more, click <a href="config.action?path=$propertyPath">here</a>
+            </div>
+        #end
+        </p>
+
+
     </p>
 </body>
 </html>

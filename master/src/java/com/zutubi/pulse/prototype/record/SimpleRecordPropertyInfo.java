@@ -5,6 +5,7 @@ import java.lang.reflect.Method;
 /**
  * Information for a simple property, which is used to store a primitive type
  * or enumeration.
+ * @deprecated
  */
 public class SimpleRecordPropertyInfo extends AbstractRecordPropertyInfo
 {

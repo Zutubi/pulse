@@ -1,7 +1,7 @@
 package com.zutubi.pulse.prototype.record;
 
 /**
- * <class comment/>
+ * @deprecated
  */
 public interface RecordManager
 {

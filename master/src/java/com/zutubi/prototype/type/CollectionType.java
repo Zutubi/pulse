@@ -10,11 +10,14 @@ public abstract class CollectionType extends AbstractType implements Type, Trave
 {
     private Type collectionType;
 
-    private Class clazz;
-
     public CollectionType(Class type)
     {
-        this.clazz = type;
+        super(type);
+    }
+
+    public CollectionType(Class type, String symbolicName)
+    {
+        super(type, symbolicName);
     }
 
     public Type getCollectionType()
@@ -25,11 +28,6 @@ public abstract class CollectionType extends AbstractType implements Type, Trave
     public void setCollectionType(Type collectionType)
     {
         this.collectionType = collectionType;
-    }
-
-    public Class getClazz()
-    {
-        return clazz;
     }
 
     public Type getType(List<String> path)

@@ -1,11 +1,9 @@
 package com.zutubi.prototype.type;
 
 import java.lang.annotation.Annotation;
-import java.util.HashMap;
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
-import java.util.Collections;
 
 /**
  *
@@ -13,7 +11,28 @@ import java.util.Collections;
  */
 public abstract class AbstractType implements Type
 {
+    protected TypeRegistry typeRegistry;
+
     private List<Annotation> annotations = new LinkedList<Annotation>();
+
+    private Class clazz;
+    private String symbolicName;
+
+    public AbstractType(Class clazz)
+    {
+        this(clazz, null);
+    }
+
+    public AbstractType(Class type, String symbolicName)
+    {
+        this.clazz = type;
+        this.symbolicName = symbolicName;
+    }
+
+    public Class getClazz()
+    {
+        return clazz;
+    }
 
     public void setAnnotations(List<Annotation> annotations)
     {
@@ -28,5 +47,15 @@ public abstract class AbstractType implements Type
     public void addAnnotation(Annotation annotation)
     {
         this.annotations.add(annotation);
+    }
+
+    public String getSymbolicName()
+    {
+        return symbolicName;
+    }
+
+    public void setTypeRegistry(TypeRegistry typeRegistry)
+    {
+        this.typeRegistry = typeRegistry;
     }
 }

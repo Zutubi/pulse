@@ -42,13 +42,27 @@ public class WizardDirective extends PrototypeDirective
         Map params = createPropertyMap(context, node);
         wireParams(params);
 
-        Wizard wizardInstance = (Wizard) ActionContext.getContext().getSession().get(path.toString());
+        String sessionKey = normalizePath(path);
+        Wizard wizardInstance = (Wizard) ActionContext.getContext().getSession().get(sessionKey);
 
         WizardState currentState = wizardInstance.getCurrentState();
 
         writer.write(internalRender(currentState));
 
         return true;
+    }
+
+    private String normalizePath(String path)
+    {
+        if (path.startsWith("/"))
+        {
+            path = path.substring(1);
+        }
+        if (path.endsWith("/"))
+        {
+            path = path.substring(0, path.length() -1);
+        }
+        return path;
     }
 
     private String internalRender(WizardState state) throws IOException, ParseErrorException

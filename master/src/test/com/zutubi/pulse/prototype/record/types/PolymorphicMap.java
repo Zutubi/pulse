@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
+ * @deprecated
  */
 @SymbolicName("polymap")
 public class PolymorphicMap

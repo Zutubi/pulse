@@ -4,6 +4,7 @@ import java.lang.reflect.Method;
 
 /**
  * Information about a property that holds a single subrecord.
+ * @deprecated
  */
 public class SubrecordRecordPropertyInfo extends AbstractRecordPropertyInfo
 {

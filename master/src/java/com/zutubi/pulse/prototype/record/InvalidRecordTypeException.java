@@ -3,6 +3,7 @@ package com.zutubi.pulse.prototype.record;
 import com.zutubi.pulse.core.PulseException;
 
 /**
+ * @deprecated
  */
 public class InvalidRecordTypeException extends PulseException
 {

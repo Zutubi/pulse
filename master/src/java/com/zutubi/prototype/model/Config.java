@@ -1,9 +1,8 @@
 package com.zutubi.prototype.model;
 
-import com.zutubi.pulse.prototype.record.RecordTypeInfo;
-
-import java.util.List;
 import java.util.LinkedList;
+import java.util.List;
+import java.util.Collections;
 
 /**
  *
@@ -11,39 +10,34 @@ import java.util.LinkedList;
  */
 public class Config
 {
-    private List<String> valueListProperties = new LinkedList<String>();
+    private List<String> listProperties = new LinkedList<String>();
     private List<String> simpleProperties = new LinkedList<String>();
     private List<String> nestedProperties = new LinkedList<String>();
-    private List<String> extensions = new LinkedList<String>();
+    private List<String> mapProperties = new LinkedList<String>();
 
-    public void addValueListProperty(String s)
+    public void addListProperty(String propertyName)
     {
-        valueListProperties.add(s);
+        listProperties.add(propertyName);
     }
 
-    public void addNestedProperty(String s)
+    public List<String> getListProperties()
     {
-        nestedProperties.add(s);
+        return Collections.unmodifiableList(listProperties);
     }
 
-    public void addSimpleProperty(String s)
+    public boolean hasListProperties()
     {
-        simpleProperties.add(s);
+        return listProperties.size() > 0;
     }
 
-    public List<String> getValueListProperties()
+    public void addSimpleProperty(String propertyName)
     {
-        return valueListProperties;
+        simpleProperties.add(propertyName);
     }
 
     public List<String> getSimpleProperties()
     {
-        return simpleProperties;
-    }
-
-    public List<String> getNestedProperties()
-    {
-        return nestedProperties;
+        return Collections.unmodifiableList(simpleProperties);
     }
 
     public boolean hasSimpleProperties()
@@ -51,18 +45,28 @@ public class Config
         return simpleProperties.size() > 0;
     }
 
-    public void addExtension(String extension)
+    public void addNestedProperty(String propertyName)
     {
-        extensions.add(extension);
+        nestedProperties.add(propertyName);
     }
 
-    public List<String> getExtensions()
+    public List<String> getNestedProperties()
     {
-        return extensions;
+        return Collections.unmodifiableList(nestedProperties);
     }
 
-    public boolean hasExtensions()
+    public boolean hasNestedProperties()
     {
-        return extensions.size() > 0;
+        return nestedProperties.size() > 0;
+    }
+
+    public void addMapProperty(String propertyName)
+    {
+        mapProperties.add(propertyName);
+    }
+
+    public List<String> getMapProperties()
+    {
+        return Collections.unmodifiableList(mapProperties);
     }
 }

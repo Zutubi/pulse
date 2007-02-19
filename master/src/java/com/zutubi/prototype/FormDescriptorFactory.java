@@ -30,31 +30,42 @@ public class FormDescriptorFactory
         defaultFieldTypeMapping.put(String.class, "text");
         defaultFieldTypeMapping.put(Boolean.class, "checkbox");
         defaultFieldTypeMapping.put(Boolean.TYPE, "checkbox");
+        defaultFieldTypeMapping.put(Integer.class, "text");
+        defaultFieldTypeMapping.put(Integer.TYPE, "text");
+        defaultFieldTypeMapping.put(Long.class, "text");
+        defaultFieldTypeMapping.put(Long.TYPE, "text");
     }
 
     private TypeRegistry typeRegistry;
 
     public FormDescriptor createDescriptor(Class clazz)
     {
-        CompositeType type = typeRegistry.getType(clazz);
+        Type type = typeRegistry.getType(clazz);
         return createDescriptor(type);
     }
 
     public FormDescriptor createDescriptor(String symbolicName)
     {
-        CompositeType type = typeRegistry.getType(symbolicName);
+        Type type = typeRegistry.getType(symbolicName);
         return createDescriptor(type);
     }
 
-    public FormDescriptor createDescriptor(CompositeType type)
+    public FormDescriptor createDescriptor(Type type)
     {
+        if (!(type instanceof CompositeType))
+        {
+            throw new IllegalArgumentException("Can not create a form for a non-composite type.");
+        }
+
+        CompositeType ctype = (CompositeType) type;
+
         FormDescriptor descriptor = new FormDescriptor();
-        descriptor.setType(type);
+        descriptor.setType(ctype);
 
         List<Annotation> annotations = type.getAnnotations();
         handleAnnotations(descriptor, annotations);
 
-        descriptor.setFieldDescriptors(buildFieldDescriptors(type));
+        descriptor.setFieldDescriptors(buildFieldDescriptors(ctype));
 
         return descriptor;
     }
@@ -63,6 +74,12 @@ public class FormDescriptorFactory
     {
         List<FieldDescriptor> fieldDescriptors = new LinkedList<FieldDescriptor>();
 
+        FieldDescriptor hiddenFieldDescriptor = new FieldDescriptor();
+        hiddenFieldDescriptor.setName("symbolicName");
+        hiddenFieldDescriptor.addParameter("value", type.getSymbolicName());
+        hiddenFieldDescriptor.addParameter("type", "hidden");
+        fieldDescriptors.add(hiddenFieldDescriptor);
+        
         // Handle the first pass analysis.  Here, all of the fields are considered on an individual basis.
         for (String propertyName : type.getProperties(PrimitiveType.class))
         {

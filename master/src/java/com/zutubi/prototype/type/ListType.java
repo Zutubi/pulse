@@ -2,11 +2,10 @@ package com.zutubi.prototype.type;
 
 import com.zutubi.prototype.type.record.Record;
 
-import java.util.List;
-import java.util.LinkedList;
-import java.util.Map;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.LinkedList;
+import java.util.List;
 
 /**
  *
@@ -14,18 +13,36 @@ import java.util.Comparator;
  */
 public class ListType extends CollectionType
 {
+    public ListType()
+    {
+        this(LinkedList.class);
+    }
+
     public ListType(Class type)
     {
         super(type);
     }
 
+    public ListType(Class type, String symbolicName)
+    {
+        super(type, symbolicName);
+    }
+
     public List<Object> instantiate(Object data) throws TypeException
     {
-        Map<String, Object> record = (Map<String, Object>) data;
-        if (record == null)
+        if (data == null)
         {
             return null;
         }
+
+        if (!(data instanceof Record))
+        {
+            throw new TypeConversionException("Expected a map type, instead received " + data.getClass());
+        }
+
+        Record record = (Record)data;
+        
+        // read list order meta-data
 
         List<String> keys = new LinkedList<String>(record.keySet());
         Collections.sort(keys, new Comparator<String>()
@@ -36,27 +53,64 @@ public class ListType extends CollectionType
             }
         });
 
-        List<Object> instance = new LinkedList<Object>();
-        for (String key : keys)
+        Type defaultType = getCollectionType();
+        if (defaultType == null && record.getMeta("type") != null)
         {
-            Object value = getCollectionType().instantiate(record.get(key));
-            instance.add(value);
+            defaultType = typeRegistry.getType(record.getMeta("type"));
         }
 
+        List<Object> instance = instantiate();
+        for (String key : keys)
+        {
+            Object child = record.get(key);
+            Type type = defaultType;
+            if (child instanceof Record)
+            {
+                Record childRecord = (Record) child;
+                type = typeRegistry.getType(childRecord.getSymbolicName());
+            }
+            Object value = type.instantiate(child);
+            instance.add(value);
+        }
         return instance;
+    }
+
+    public List<Object> instantiate() throws TypeConversionException
+    {
+        return new LinkedList<Object>();
     }
 
     public Record unstantiate(Object data) throws TypeException
     {
-        Record record = new Record();
+        if (data == null)
+        {
+            return null;
+        }
 
         List<Object> list = (List<Object>) data;
+
+        Record record = new Record();
+        record.setSymbolicName(getSymbolicName());
+
+        // write list order meta-data...
+
+        // write type data.
+        if (list.size() > 0)
+        {
+            Object first = list.get(0);
+            Type type = typeRegistry.getType(first.getClass());
+            if (type instanceof PrimitiveType)
+            {
+                record.putMeta("type", type.getSymbolicName());
+            }
+        }
+
         for (int i = 0; i < list.size(); i++)
         {
             Object obj = list.get(i);
-            record.put(String.valueOf(i), getCollectionType().unstantiate(obj));
+            Type objectType = typeRegistry.getType(obj.getClass());
+            record.put(String.valueOf(i), objectType.unstantiate(obj));
         }
-
         return record;
     }
 }

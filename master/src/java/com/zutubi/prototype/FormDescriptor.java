@@ -73,7 +73,7 @@ public class FormDescriptor implements Descriptor
     public Form instantiate(Object data)
     {
         Form form = new Form();
-        form.setId(type.getClazz().getSimpleName());    
+        form.setId(type.getSymbolicName());    
 
         List<String> fieldOrder = evaluateFieldOrder();
 

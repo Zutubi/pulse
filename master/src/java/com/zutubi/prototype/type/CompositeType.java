@@ -15,8 +15,6 @@ import java.util.Map;
  */
 public class CompositeType extends AbstractType implements Traversable, Type
 {
-    private String symbolicName;
-
     private Map<String, Type> properties = new HashMap<String, Type>();
     private Map<Class, List<String>> propertiesByClass = new HashMap<Class, List<String>>();
 
@@ -25,27 +23,14 @@ public class CompositeType extends AbstractType implements Traversable, Type
     private Map<String, Method> setters = new HashMap<String, Method>();
     private Map<String, Method> getters = new HashMap<String, Method>();
 
-    private Class clazz;
-
     public CompositeType(Class type)
     {
-        this(type, null);
+        super(type);
     }
 
     public CompositeType(Class type, String symbolicName)
     {
-        this.symbolicName = symbolicName;
-        this.clazz = type;
-    }
-
-    public Class getClazz()
-    {
-        return clazz;
-    }
-
-    public String getSymbolicName()
-    {
-        return symbolicName;
+        super(type, symbolicName);
     }
 
     public void addProperty(String name, Type type, Method setter, Method getter)
@@ -111,42 +96,32 @@ public class CompositeType extends AbstractType implements Traversable, Type
         this.extensions = extensions;
     }
 
-    public Object instantiate(Object data) throws TypeConversionException
+    public Object instantiate(Object data) throws TypeException
     {
-        Record record = (Record) data;
-        if (record == null)
+        if (data == null)
         {
             return null;
         }
-        try
+
+        if (!Map.class.isAssignableFrom(data.getClass()))
         {
-            Object instance = getClazz().newInstance();
-            populateInstance(record, instance);
-            return instance;
+            throw new TypeConversionException("Expected a map type, instead received " + data.getClass());
         }
-        catch (TypeConversionException e)
-        {
-            throw e;
-        }
-        catch (Exception e)
-        {
-            throw new TypeConversionException(e);
-        }
+
+        Map<String, Object> record = (Map<String, Object>)data;
+
+        Object instance = instantiate();
+
+        populateInstance(record, instance);
+
+        return instance;
     }
 
-    public void populateInstance(Map map, Object instance) throws TypeException
+    public Object instantiate() throws TypeConversionException
     {
         try
         {
-            for (Map.Entry<String, Type> entry : properties.entrySet())
-            {
-                String name = entry.getKey();
-                Type type = entry.getValue();
-
-                Object value = type.instantiate(map.get(name));
-                Method setter = setters.get(name);
-                setter.invoke(instance, value);
-            }
+            return getClazz().newInstance();
         }
         catch (Exception e)
         {
@@ -160,21 +135,11 @@ public class CompositeType extends AbstractType implements Traversable, Type
         {
             return null;
         }
-        Record record = new Record();
-        populateRecord(instance, record);
-        return record;
-    }
 
-    public void populateRecord(Object instance, Record record) throws TypeConversionException
-    {
-        record.putMetaProperty("symbolicName", symbolicName);
-        populateMap(instance, record);
-    }
-
-    public void populateMap(Object instance, Map<String, Object> map) throws TypeConversionException
-    {
         try
         {
+            Record record = new Record();
+            record.setSymbolicName(getSymbolicName());
             for (Map.Entry<String, Type> entry : properties.entrySet())
             {
                 String name = entry.getKey();
@@ -182,13 +147,73 @@ public class CompositeType extends AbstractType implements Traversable, Type
 
                 Method getter = getters.get(name);
                 Object value = getter.invoke(instance);
-
-                map.put(name, type.unstantiate(value));
+                if (value != null)
+                {
+                    Object propertyValue = type.unstantiate(value);
+                    if (propertyValue != null)
+                    {
+                        record.put(name, propertyValue);
+                    }
+                }
+            }
+            return record;
+        }
+        catch (Exception e)
+        {
+            throw new TypeConversionException(e);
+        }
+    }
+    
+    public void populateInstance(Map<String, Object> source, Object target) throws TypeException
+    {
+        try
+        {
+            for (Map.Entry<String, Type> entry : properties.entrySet())
+            {
+                String name = entry.getKey();
+                Type type = entry.getValue();
+                Method setter = setters.get(name);
+                setter.invoke(target, type.instantiate(source.get(name)));
             }
         }
         catch (Exception e)
         {
-            throw new TypeConversionException();
+            throw new TypeException(e);
+        }
+    }
+
+    /**
+     * This method extracts the details from the instance and populates the map, based on this
+     * typs definition.
+     *
+     * @param source the instance from which the data is being extracted.
+     * @param target the map to which the data is being copied.
+     *
+     * @throws TypeConversionException if there is a problem converting the data into a form appropriate
+     * for the map.
+     */
+    public void populateMap(Object source, Map<String, Object> target) throws TypeConversionException
+    {
+        try
+        {
+            for (Map.Entry<String, Type> entry : properties.entrySet())
+            {
+                String name = entry.getKey();
+                Type type = entry.getValue();
+                if (type instanceof PrimitiveType)
+                {
+                    Method getter = getters.get(name);
+                    Object value = getter.invoke(source);
+                    if (value != null)
+                    {
+                        target.put(name, value);
+                    }
+                }
+            }
+        }
+        catch (Exception e)
+        {
+            throw new TypeConversionException(e);
         }
     }
 
@@ -211,6 +236,7 @@ public class CompositeType extends AbstractType implements Traversable, Type
         {
             return type;
         }
+        
         // we have a non - composite type yet we are trying to navigate into it. No can do.
         throw new IllegalArgumentException("Invalid path");
     }

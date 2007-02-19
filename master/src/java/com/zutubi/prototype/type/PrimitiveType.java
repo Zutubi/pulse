@@ -3,6 +3,9 @@ package com.zutubi.prototype.type;
 import com.zutubi.pulse.form.squeezer.SqueezeException;
 import com.zutubi.pulse.form.squeezer.Squeezers;
 import com.zutubi.pulse.form.squeezer.TypeSqueezer;
+import com.zutubi.prototype.type.record.Record;
+
+import java.util.Map;
 
 /**
  *
@@ -10,20 +13,18 @@ import com.zutubi.pulse.form.squeezer.TypeSqueezer;
  */
 public class PrimitiveType extends AbstractType implements Type
 {
-    private Class clazz;
-
     public PrimitiveType(Class type)
     {
+        this(type, null);
+    }
+
+    public PrimitiveType(Class type, String symbolicName)
+    {
+        super(type, symbolicName);
         if (Squeezers.findSqueezer(type) == null)
         {
             throw new IllegalArgumentException("Unsupported primitive type: " + type);
         }
-        this.clazz = type;
-    }
-
-    public Class getClazz()
-    {
-        return clazz;
     }
 
     public Object instantiate(Object data) throws TypeException
@@ -49,6 +50,11 @@ public class PrimitiveType extends AbstractType implements Type
 
     public Object unstantiate(Object data) throws TypeException
     {
+        if (data == null)
+        {
+            return null;
+        }
+        
         TypeSqueezer squeezer = Squeezers.findSqueezer(getClazz());
         try
         {
@@ -58,5 +64,11 @@ public class PrimitiveType extends AbstractType implements Type
         {
             throw new TypeConversionException(e);
         }
+    }
+
+    public Object instantiate() throws TypeConversionException
+    {
+        // should not need to instantiate a primitive type.
+        throw new RuntimeException("not yet implemented.");
     }
 }

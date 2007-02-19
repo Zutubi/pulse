@@ -3,7 +3,7 @@ package com.zutubi.pulse.prototype.record;
 import java.util.Map;
 
 /**
- * <class comment/>
+ * @deprecated
  */
 public interface Record extends Map<String, Object>
 {

@@ -11,6 +11,7 @@ import java.util.List;
 
 /**
  * Stores information about a single property from a record type.
+ * @deprecated
  */
 public abstract class AbstractRecordPropertyInfo implements RecordPropertyInfo
 {

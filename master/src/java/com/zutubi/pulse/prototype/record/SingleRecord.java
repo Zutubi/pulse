@@ -8,6 +8,7 @@ import java.util.TreeMap;
 /**
  * A Record is an object graph converted to a simpified data structure for
  * the purpose of persistence and templating.
+ * @deprecated
  */
 public class SingleRecord implements Record
 {

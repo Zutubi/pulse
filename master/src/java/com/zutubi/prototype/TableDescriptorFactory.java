@@ -19,15 +19,25 @@ public class TableDescriptorFactory
 
     public List<TableDescriptor> createDescriptors(String symbolicName) throws IntrospectionException
     {
-        CompositeType type = typeRegistry.getType(symbolicName);
-        return createDescriptors(type);
+        Type type = typeRegistry.getType(symbolicName);
+        if (!(type instanceof CompositeType))
+        {
+            throw new IllegalArgumentException("Can not create a table from a non-composite type: " + symbolicName);
+        }
+        CompositeType ctype = (CompositeType) type;
+        return createDescriptors(ctype);
     }
 
     public TableDescriptor createDescriptor(String symbolicName, String propertyName)
     {
-        CompositeType type = typeRegistry.getType(symbolicName);
-        Type propertyInfo = type.getProperty(propertyName);
-        return createTableDescriptor(propertyName, propertyInfo);
+        Type type = typeRegistry.getType(symbolicName);
+        if (!(type instanceof CompositeType))
+        {
+            throw new IllegalArgumentException("Can not retrieve a property from a non-composite type: " + symbolicName);
+        }
+        CompositeType ctype = (CompositeType) type;
+        Type propertyType = ctype.getProperty(propertyName);
+        return createTableDescriptor(propertyName, propertyType);
     }
 
     public List<TableDescriptor> createDescriptors(CompositeType type) throws IntrospectionException

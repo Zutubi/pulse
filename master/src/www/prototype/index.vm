@@ -4,7 +4,7 @@
 <h1>Test index</h1>
 
 <p>
-    <a href="summary.action?path=/project/1">project 1 summary</a>
+    <a href="configuration.action?path=/project/1">project 1 summary</a>
 </p>
 
 </body>

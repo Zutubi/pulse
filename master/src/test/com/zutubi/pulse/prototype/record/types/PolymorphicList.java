@@ -6,6 +6,7 @@ import java.util.Arrays;
 import java.util.List;
 
 /**
+ * @deprecated
  */
 @SymbolicName("polylist")
 public class PolymorphicList

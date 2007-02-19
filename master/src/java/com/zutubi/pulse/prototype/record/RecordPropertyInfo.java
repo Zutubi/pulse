@@ -6,6 +6,7 @@ import java.lang.reflect.Type;
 import java.util.List;
 
 /**
+ * @deprecated
  */
 public interface RecordPropertyInfo
 {

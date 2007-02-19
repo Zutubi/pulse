@@ -3,6 +3,7 @@ package com.zutubi.pulse.prototype.record.types;
 import com.zutubi.pulse.prototype.record.SymbolicName;
 
 /**
+ * @deprecated
  */
 @SymbolicName("Boy George")
 public class SingleReference

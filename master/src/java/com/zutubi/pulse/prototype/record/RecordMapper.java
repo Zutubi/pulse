@@ -1,6 +1,7 @@
 package com.zutubi.pulse.prototype.record;
 
 /**
+ * @deprecated
  */
 public interface RecordMapper
 {

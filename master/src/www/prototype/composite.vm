@@ -1,0 +1,139 @@
+<html>
+<body>
+
+#set($config = $action.configuration)
+
+<div>
+    #set($breadcrumbPath = "")
+    #set($sep = "")
+    #foreach($pathElement in $config.parentPathElements)
+        #set($breadcrumbPath = "${breadcrumbPath}/${pathElement}")
+        ${sep} <a href="configuration.action?path=${breadcrumbPath}">${pathElement}</a>
+        #set($sep = ">")
+    #end
+    ${sep} $!config.currentPath
+</div>
+
+<h2>composite</h2>
+
+<p>
+    <ul>
+        <li>path: $!config.path</li>
+        <li>parent path: $!config.parentPath</li>
+        <li>current path: $!config.currentPath</li>
+    </ul>
+    <ul>
+        <li>instance symbolic name: $!config.instanceTypeSymbolicName</li>
+        <li>type symbolic name: $!config.typeSymbolicName</li>
+        <li>parent symbolic name: $!config.parentTypeSymbolicName</li>
+    </ul>
+</p>
+<p>
+    Current data size: $!config.record.size()
+</p>
+#if($config.record)
+<p>
+<table>
+#foreach($key in $config.record.keySet())
+    <tr>
+        <td> $key </td><td>&nbsp;</td><td> $config.record.get($key) </td>
+    </tr>
+#end
+</table>
+</p>
+<p>
+    <a href="reset.action?path=$config.path">reset</a>
+</p>
+#end
+
+#if( $config.extensions.size() > 0)
+<p>
+    <h3>extensions to the base type</h3>
+    <ul>
+    #foreach($prop in $config.extensions)
+        <li>$prop</li>
+    #end
+    </ul>
+</p>
+#end
+
+#if( $config.simpleProperties.size() > 0)
+<p>
+    <h3>simple properties</h3>
+    <ul>
+    #foreach($prop in $config.simpleProperties)
+        <li>$prop</li>
+    #end
+    </ul>
+</p>
+#end
+
+#if( $config.listProperties.size() > 0)
+<p>
+    <h3>list properties</h3>
+    <ul>
+    #foreach($prop in $config.listProperties)
+        <li><a href="configuration.action?path=${config.path}/${prop}">$prop</a> $!config.record.get($prop)</li>
+    #end
+    </ul>
+</p>
+#end
+
+#if( $config.mapProperties.size() > 0)
+<p>
+    <h3>map properties</h3>
+    <ul>
+    #foreach($prop in $config.mapProperties)
+        <li><a href="configuration.action?path=${config.path}/${prop}">$prop</a> $!config.record.get($prop)</li>
+    #end
+    </ul>
+</p>
+#end
+
+#if( $config.nestedProperties.size() > 0)
+<p>
+    <h3>nested properties</h3>
+    <ul>
+    #foreach($prop in $config.nestedProperties)
+        <li><a href="configuration.action?path=${config.path}/${prop}">$prop</a>  #if($config.record.get($prop)) (edit) #else (not configured) #end</li>
+    #end
+    </ul>
+</p>
+#end
+
+#if($config.record)
+
+    #if($config.simpleProperties.size() > 0)
+        <h3>edit</h3>
+        <p>
+            #pform("path=$config.path" "action=save.action?path=$config.path")
+        </p>
+    #end
+
+#else
+
+    #if( $config.extensions.size() > 0)
+        #if($config.extensions.size() == 1)
+            #pform("path=$config.path" "action=save.action?path=$config.path" "symbolicName=$config.extensions.get(0)")
+        #else
+            <a href="wizard.action?path=$config.path">create...</a>
+        #end
+    #else
+        #if($config.simpleProperties.size() > 0)
+            <h3>create</h3>
+            <p>
+                #pform("path=$config.path" "action=save.action?path=$config.path")
+            </p>
+        #end
+    #end
+
+#end
+
+<p>
+    #if($config.pathElements.size() > 2)
+        <a href="configuration.action?path=${config.parentPath}">done</a>
+    #end
+</p>
+
+</body>
+</html>

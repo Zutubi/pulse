@@ -6,6 +6,7 @@ import java.util.Arrays;
 import java.util.List;
 
 /**
+ * @deprecated
  */
 @SymbolicName("child2")
 public class ChildType2 extends ParentType

@@ -40,7 +40,7 @@
             <interceptor name="cancel" class="com.zutubi.pulse.xwork.interceptor.CancelWorkflowInterceptor"/>
             <interceptor name="wizard" class="com.zutubi.pulse.web.wizard.WizardInterceptor"/>
             <interceptor name="wiz" class="com.zutubi.pulse.web.wizard.auto.WizardInterceptor"/>
-            <interceptor name="prototypeWizard" class="com.zutubi.prototype.webwork.WizardInterceptor"/>
+            <interceptor name="prototypeWizard" class="com.zutubi.prototype.wizard.webwork.WizardInterceptor"/>
             <interceptor name="ajax" class="com.zutubi.pulse.xwork.interceptor.AjaxInterceptor"/>
             <interceptor name="errorHanding" class="com.zutubi.pulse.xwork.interceptor.ErrorHandlingInterceptor"/>
             <interceptor name="hibernateSession" class="com.zutubi.pulse.xwork.interceptor.HibernateSessionInterceptor"/>

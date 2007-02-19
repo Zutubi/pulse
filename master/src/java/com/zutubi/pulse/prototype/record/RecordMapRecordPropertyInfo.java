@@ -8,6 +8,7 @@ import java.util.Map;
 
 /**
  * Information for a property that stores a map of records.
+ * @deprecated
  */
 public class RecordMapRecordPropertyInfo extends AbstractRecordPropertyInfo
 {

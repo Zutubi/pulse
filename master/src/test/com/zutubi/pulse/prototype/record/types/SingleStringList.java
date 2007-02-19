@@ -8,6 +8,7 @@ import java.util.Arrays;
 import java.util.List;
 
 /**
+ * @deprecated
  */
 @SymbolicName("singlestringlist")
 public class SingleStringList

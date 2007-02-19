@@ -1,27 +1,32 @@
 package com.zutubi.prototype.velocity;
 
+import com.zutubi.prototype.FormDescriptor;
+import com.zutubi.prototype.FormDescriptorFactory;
+import com.zutubi.prototype.freemarker.GetTextMethod;
+import com.zutubi.prototype.model.Form;
+import com.zutubi.prototype.type.Type;
+import com.zutubi.prototype.type.TypeConversionException;
+import com.zutubi.prototype.type.TypeException;
+import com.zutubi.prototype.webwork.Configuration;
+import com.zutubi.pulse.i18n.Messages;
+import freemarker.core.DelegateBuiltin;
+import freemarker.template.Template;
+import freemarker.template.TemplateException;
 import org.apache.velocity.context.InternalContextAdapter;
 import org.apache.velocity.exception.ParseErrorException;
 import org.apache.velocity.exception.ResourceNotFoundException;
 import org.apache.velocity.runtime.parser.node.Node;
 
 import java.io.IOException;
-import java.io.Writer;
 import java.io.StringWriter;
-import java.util.Map;
+import java.io.Writer;
 import java.util.HashMap;
-
-import com.zutubi.prototype.type.record.Record;
-import com.zutubi.prototype.FormDescriptor;
-import com.zutubi.prototype.FormDescriptorFactory;
-import com.zutubi.prototype.freemarker.GetTextMethod;
-import com.zutubi.pulse.i18n.Messages;
-import freemarker.template.TemplateException;
-import freemarker.template.Template;
-import freemarker.core.DelegateBuiltin;
+import java.util.Map;
 
 public class FormDirective extends PrototypeDirective
 {
+    private String action;
+
     public String getName()
     {
         return "pform";
@@ -32,27 +37,40 @@ public class FormDirective extends PrototypeDirective
         return LINE;
     }
 
-    public boolean render(InternalContextAdapter context, Writer writer, Node node) throws IOException, ResourceNotFoundException, ParseErrorException
+    public void setAction(String action)
     {
-        Map params = createPropertyMap(context, node);
-        wireParams(params);
-
-        String symbolicName = lookupSymbolicName();
-        Record record = recordManager.load(path.toString());
-
-        if (record != null)
-        {
-            writer.write(internalRender(symbolicName, record));
-        }
-        else
-        {
-            writer.write(internalRender(symbolicName, null));
-        }
-
-        return true;
+        this.action = action;
     }
 
-    private String internalRender(String symbolicName, Record subject) throws IOException, ParseErrorException
+    public boolean render(InternalContextAdapter context, Writer writer, Node node) throws IOException, ResourceNotFoundException, ParseErrorException
+    {
+        try
+        {
+            Map params = createPropertyMap(context, node);
+            wireParams(params);
+
+            Configuration configuration = new Configuration(path);
+            configuration.setConfigurationRegistry(configurationRegistry);
+            configuration.setRecordManager(recordManager);
+            configuration.setTypeRegistry(typeRegistry);
+            configuration.analyse();
+
+            String symbolicName = configuration.getTargetSymbolicName();
+
+            Object data = persistenceManager.load(path);
+
+            writer.write(internalRender(symbolicName, data));
+
+            return true;
+        }
+        catch (TypeException e)
+        {
+            e.printStackTrace();
+            throw new IOException(e.getMessage());
+        }
+    }
+
+    private String internalRender(String symbolicName, Object data) throws IOException, ParseErrorException, TypeConversionException
     {
         FormDescriptorFactory formFactory = new FormDescriptorFactory();
         formFactory.setTypeRegistry(typeRegistry);
@@ -61,14 +79,17 @@ public class FormDirective extends PrototypeDirective
         // handle rendering of the freemarker template.
         StringWriter writer = new StringWriter();
 
+        Type type = typeRegistry.getType(symbolicName);
+
         try
         {
-            Messages messages = Messages.getInstance(typeRegistry.getType(symbolicName));
+            Messages messages = Messages.getInstance(type.getClazz());
+            Form form = formDescriptor.instantiate(data);
+            form.setAction(action);
 
             Map<String, Object> context = new HashMap<String, Object>();
-            context.put("form", formDescriptor.instantiate(subject));
+            context.put("form", form);
             context.put("i18nText", new GetTextMethod(messages));
-            context.put("path", path.toString());
 
             // provide some syntactic sweetener by linking the i18n text method to the ?i18n builtin function.
             DelegateBuiltin.conditionalRegistration("i18n", "i18nText");
