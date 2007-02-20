@@ -26,6 +26,7 @@ public class EditUserSettingsAction extends UserActionSupport
             defaultActions = new LinkedList<String>();
             defaultActions.add(DefaultAction.DASHBOARD_ACTION);
             defaultActions.add(DefaultAction.WELCOME_ACTION);
+            defaultActions.add(DefaultAction.PROJECT_DASHBOARD_ACTION);
         }
 
         return defaultActions;
