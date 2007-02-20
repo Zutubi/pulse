@@ -4,12 +4,15 @@ import com.opensymphony.util.TextUtils;
 import com.zutubi.pulse.bootstrap.ComponentContext;
 import com.zutubi.pulse.bootstrap.SystemBootstrapManager;
 import com.zutubi.pulse.bootstrap.DatabaseConfig;
+import com.zutubi.pulse.bootstrap.SystemConfiguration;
 import com.zutubi.pulse.bootstrap.conf.EnvConfig;
 import com.zutubi.pulse.upgrade.tasks.MutableConfiguration;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.OptionBuilder;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
+import org.apache.commons.cli.CommandLineParser;
+import org.apache.commons.cli.PosixParser;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ClassPathResource;
 
@@ -25,17 +28,51 @@ import java.util.List;
 public abstract class DataCommand implements Command
 {
     private static final String ENV_PULSE_CONFIG = "PULSE_CONFIG";
+
+    /**
+     * The pulse data directory
+     */
+    private String pulseData = null;
+
+    /**
+     * The pulse configuration file.
+     */
     private String pulseConfig;
+
     protected DataSource dataSource;
+    protected DatabaseConfig databaseConfig;
     protected MutableConfiguration configuration;
 
+    /**
+     * The path to the configuration file that is used to configure the pulse configuration details.
+     *
+     * @param path
+     */
     public void setConfig(String path)
     {
         this.pulseConfig = path;
     }
 
+    /**
+     * The path to the pulse data directory
+     *
+     * @param data directory
+     */
+    public void setData(String data)
+    {
+        this.pulseData = data;
+    }
+
     public int execute(BootContext context) throws ParseException, IOException
     {
+        parse(context.getCommandArgv());
+
+        // update the system properties
+        if (TextUtils.stringSet(pulseData))
+        {
+            System.setProperty(SystemConfiguration.PULSE_DATA, pulseData);
+        }
+
         if (TextUtils.stringSet(pulseConfig))
         {
             System.setProperty(EnvConfig.PULSE_CONFIG, pulseConfig);
@@ -61,7 +98,7 @@ public abstract class DataCommand implements Command
             configuration.addInputStream(resource.getInputStream());
         }
 
-        DatabaseConfig databaseConfig = (DatabaseConfig) ComponentContext.getBean("databaseConfig");
+        databaseConfig = (DatabaseConfig) ComponentContext.getBean("databaseConfig");
         configuration.setProperties(databaseConfig.getHibernateProperties());
 
         return doExecute(context);
@@ -71,6 +108,7 @@ public abstract class DataCommand implements Command
     {
         Map<String, String> options = new LinkedHashMap<String, String>();
         options.put("-f [--config] file", "specify an alternate config file");
+        options.put("-d [--data] dir", "use the specified directory for all pulse data");
         return options;
     }
 
@@ -93,6 +131,9 @@ public abstract class DataCommand implements Command
         options.addOption(OptionBuilder.withLongOpt("config")
                 .hasArg()
                 .create('f'));
+        options.addOption(OptionBuilder.withLongOpt("data")
+                .hasArg()
+                .create('d'));
         return options;
     }
 
@@ -102,5 +143,19 @@ public abstract class DataCommand implements Command
         {
             setConfig(commandLine.getOptionValue('f'));
         }
+        if (commandLine.hasOption('d'))
+        {
+            setData(commandLine.getOptionValue('d'));
+        }
+    }
+
+    public void parse(String... argv) throws ParseException
+    {
+        Options options = getSharedOptions();
+        
+        CommandLineParser parser = new PosixParser();
+        CommandLine commandLine = parser.parse(options, argv, true);
+
+        processSharedOptions(commandLine);
     }
 }

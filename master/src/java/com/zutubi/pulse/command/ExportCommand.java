@@ -11,6 +11,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import com.zutubi.pulse.transfer.TransferAPI;
+import com.zutubi.pulse.transfer.JDBCTransferException;
 
 /**
  */
@@ -54,6 +55,12 @@ public class ExportCommand extends DataCommand
         try
         {
             transferAPI.dump(configuration, dataSource, outFile);
+        }
+        catch (JDBCTransferException e)
+        {
+            System.err.println("Error exporting data from database located at "+ databaseConfig.getUrl() +".  Trace below:");
+            e.printStackTrace(System.err);
+            return 2;
         }
         catch (Exception e)
         {
@@ -99,5 +106,4 @@ public class ExportCommand extends DataCommand
             e.printStackTrace();
         }
     }
-
 }

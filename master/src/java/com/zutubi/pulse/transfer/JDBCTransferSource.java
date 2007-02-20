@@ -5,11 +5,16 @@ import com.zutubi.pulse.util.JDBCUtils;
 import org.hibernate.engine.Mapping;
 import org.hibernate.mapping.Column;
 import org.hibernate.mapping.Table;
-import org.hibernate.mapping.SimpleValue;
 
 import javax.sql.DataSource;
-import java.sql.*;
-import java.util.*;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 
 /**
  *
@@ -75,7 +80,7 @@ public class JDBCTransferSource implements TransferSource
         }
         catch (SQLException e)
         {
-            throw new TransferException(e);
+            throw new JDBCTransferException(e);
         }
     }
 
