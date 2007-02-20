@@ -48,7 +48,7 @@ public class JDBCTransferTarget implements TransferTarget
         }
         catch (SQLException e)
         {
-            throw new TransferException(e);
+            throw new JDBCTransferException(e);
         }
     }
 
@@ -63,7 +63,7 @@ public class JDBCTransferTarget implements TransferTarget
         }
         catch (SQLException e)
         {
-            throw new TransferException(e);
+            throw new JDBCTransferException(e);
         }
     }
 
@@ -90,7 +90,7 @@ public class JDBCTransferTarget implements TransferTarget
         }
         catch (SQLException e)
         {
-            throw new TransferException(e);
+            throw new JDBCTransferException(e);
         }
     }
 
@@ -102,7 +102,7 @@ public class JDBCTransferTarget implements TransferTarget
         }
         catch (SQLException e)
         {
-            throw new TransferException(e);
+            throw new JDBCTransferException(e);
         }
         JDBCUtils.close(insert);
     }
@@ -117,7 +117,7 @@ public class JDBCTransferTarget implements TransferTarget
         }
         catch (SQLException e)
         {
-            throw new TransferException(e);
+            throw new JDBCTransferException(e);
         }
     }
 

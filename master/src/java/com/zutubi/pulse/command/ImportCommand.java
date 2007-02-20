@@ -11,6 +11,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import com.zutubi.pulse.transfer.TransferAPI;
+import com.zutubi.pulse.transfer.JDBCTransferException;
 
 /**
  */
@@ -40,6 +41,12 @@ public class ImportCommand extends DataCommand
         try
         {
             transferAPI.restore(configuration, inFile, dataSource);
+        }
+        catch (JDBCTransferException e)
+        {
+            System.err.println("Error importing data from database located at "+ databaseConfig.getUrl() +".  Trace below:");
+            e.printStackTrace(System.err);
+            return 2;
         }
         catch (Exception e)
         {

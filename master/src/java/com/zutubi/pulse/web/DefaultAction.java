@@ -25,6 +25,11 @@ public class DefaultAction extends ActionSupport
     public static final String DASHBOARD_ACTION = "dashboard";
 
     /**
+     * The projects dashboard result. See xwork config for details.
+     */
+    public static final String PROJECT_DASHBOARD_ACTION = "projects";
+
+    /**
      * The setup result. See the xwork config for details.
      */
     private static final String SETUP_ADMIN = "setupAdmin";
@@ -41,7 +46,7 @@ public class DefaultAction extends ActionSupport
         String login = AcegiUtils.getLoggedInUser();
         if(login == null)
         {
-            return "projects";
+            return PROJECT_DASHBOARD_ACTION;
         }
         else
         {

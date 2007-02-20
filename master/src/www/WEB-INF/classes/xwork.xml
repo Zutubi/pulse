@@ -6,7 +6,6 @@
         <default-interceptor-ref name="completeStack"/>
 
         <action name="default" class="com.zutubi.pulse.web.DefaultAction">
-            <!--<result name="setupAdmin" type="redirect">/setup/setupWizard.action</result>-->
             <result name="dashboard" type="redirect">/dashboard.action</result>
             <result name="welcome" type="velocity">/welcome.vm</result>
             <result name="projects" type="redirect">/viewProjects.action</result>
@@ -1492,10 +1491,6 @@
 
         <action name="index" class="com.zutubi.pulse.web.ActionSupport">
             <result name="success" type="velocity">index.vm</result>
-        </action>
-
-        <action name="config" class="com.zutubi.prototype.webwork.CrudAction">
-            <result name="success" type="velocity">config.vm</result>
         </action>
 
         <action name="wizard" class="com.zutubi.prototype.wizard.webwork.WizardAction">
