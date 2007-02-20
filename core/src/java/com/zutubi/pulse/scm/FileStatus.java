@@ -272,6 +272,15 @@ public class FileStatus
     private String path;
     private State state;
     private boolean directory;
+
+    /**
+     * Path of the file relative to the base directory on the pulse server.  In particular, this is required by
+     * cvs to map truncated local working copy paths to the full repository path used on the pulse server.
+     *
+     * This is also the path into which the file is placed within the zip.  
+     */
+    private String targetPath;
+
     /**
      * True iff there is a more recent revision of the file on the server.
      */
@@ -294,6 +303,29 @@ public class FileStatus
         this.state = state;
         this.directory = directory;
         this.outOfDate = false;
+    }
+
+    /**
+     * The path into which this file is stored within the zip file (and hence extracted to in the servers
+     * working directory). By default, this is the same as the local working copy path.
+     *
+     * @return
+     */
+    public String getTargetPath()
+    {
+        if (targetPath != null)
+        {
+            return targetPath;
+        }
+        return path;
+    }
+
+    public void setTargetPath(String targetPath)
+    {
+        if (targetPath != null)
+        {
+            this.targetPath = FileSystemUtils.normaliseSeparators(targetPath);
+        }
     }
 
     public String getPath()
@@ -367,7 +399,7 @@ public class FileStatus
         // requires ordering or normalisation or something...
         if(state == State.DELETED || state == State.REPLACED)
         {
-            File f = new File(base, path);
+            File f = new File(base, getTargetPath());
             if(directory)
             {
                 FileSystemUtils.rmdir(f);
@@ -381,7 +413,7 @@ public class FileStatus
 
     public void postApply(File base, EOLStyle localEOL) throws IOException
     {
-        file = new File(base, path);
+        file = new File(base, getTargetPath());
 
         // Apply line ending settings
         String eolName = properties.get(PROPERTY_EOL_STYLE);

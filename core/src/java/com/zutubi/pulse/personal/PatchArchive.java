@@ -38,6 +38,8 @@ public class PatchArchive
      *
      * @param status    status of the working copy based at base
      * @param patchFile the destination of the patch file created
+     * @param ui the ui reference to allow logging to the command output.
+     * 
      * @throws PersonalBuildException in the event of any error creating the patch
      */
     public PatchArchive(WorkingCopyStatus status, File patchFile, PersonalBuildUI ui) throws PersonalBuildException
@@ -119,6 +121,7 @@ public class PatchArchive
         os.putNextEntry(entry);
         XStream xstream = createXStream();
         xstream.toXML(status, os);
+        xstream.toXML(status, System.out);
     }
 
     private XStream createXStream()
@@ -145,7 +148,7 @@ public class PatchArchive
             if (fs.getState().requiresFile() && !fs.isDirectory())
             {
                 File f = new File(base, FileSystemUtils.denormaliseSeparators(fs.getPath()));
-                String path = FILES_PATH + fs.getPath();
+                String path = FILES_PATH + fs.getTargetPath();
                 addFile(os, f, path, ui);
             }
         }

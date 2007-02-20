@@ -23,6 +23,9 @@ public class FileStatusConverter implements Converter
         writer.startNode("path");
         context.convertAnother(status.getPath());
         writer.endNode();
+        writer.startNode("targetPath");
+        context.convertAnother(status.getTargetPath());
+        writer.endNode();
         writer.startNode("state");
         writer.setValue(status.getState().toString());
         writer.endNode();
@@ -57,6 +60,10 @@ public class FileStatusConverter implements Converter
             if(fieldName.equals("path"))
             {
                 result.setPath((String) context.convertAnother(result, String.class));
+            }
+            else if(fieldName.equals("targetPath"))
+            {
+                result.setTargetPath((String) context.convertAnother(result, String.class));
             }
             else if(fieldName.equals("state"))
             {
