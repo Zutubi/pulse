@@ -1043,7 +1043,7 @@ public class RemoteApi implements com.zutubi.pulse.events.EventListener
         {
             scm = new Svn();
         }
-        else if ("p4".equals(type))
+        else if ("perforce".equals(type))
         {
             scm = new P4();
         }
