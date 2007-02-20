@@ -31,7 +31,7 @@ public class UserSettingsForm extends BaseForm
     {
         if (name.equals("defaultAction"))
         {
-            return new String[]{"dashboard", "welcome"};
+            return new String[]{"dashboard", "welcome", "projects"};
         }
         else
         {
