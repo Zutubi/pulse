@@ -1482,7 +1482,7 @@
             <result name="success" type="velocity">index.vm</result>
         </action>
 
-        <action name="wizard" class="com.zutubi.prototype.wizard.webwork.WizardAction">
+        <action name="wizard" class="com.zutubi.prototype.wizard.webwork.ConfigurationWizardAction">
             <interceptor-ref name="prototypeWizardStack"/>
             <result name="step" type="velocity">wizard.vm</result>
             <result name="input" type="velocity">wizard.vm</result>

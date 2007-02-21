@@ -12,9 +12,7 @@ public interface WizardState
 {
     String name();
 
-    Object data();
-
-    CompositeType type();
+    Object getData();
 
     Form getForm(Object data);
 }

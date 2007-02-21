@@ -2,6 +2,7 @@ package com.zutubi.prototype.wizard.webwork;
 
 import com.opensymphony.util.TextUtils;
 import com.opensymphony.xwork.ActionContext;
+import com.opensymphony.xwork.ValidationAware;
 import com.zutubi.prototype.config.ConfigurationCrudSupport;
 import com.zutubi.prototype.type.TypeException;
 import com.zutubi.prototype.wizard.Wizard;
@@ -9,8 +10,13 @@ import com.zutubi.prototype.wizard.WizardState;
 import com.zutubi.pulse.bootstrap.ComponentContext;
 import com.zutubi.pulse.core.ObjectFactory;
 import com.zutubi.pulse.util.logging.Logger;
+import com.zutubi.pulse.validation.MessagesTextProvider;
 import com.zutubi.pulse.web.ActionSupport;
+import com.zutubi.validation.DelegatingValidationContext;
+import com.zutubi.validation.ValidationContext;
+import com.zutubi.validation.ValidationException;
 import com.zutubi.validation.ValidationManager;
+import com.zutubi.validation.XWorkValidationAdapter;
 
 import java.util.Map;
 
@@ -18,19 +24,20 @@ import java.util.Map;
  *
  *
  */
-public class WizardAction extends ActionSupport
+public class ConfigurationWizardAction extends ActionSupport
 {
-    private static final Logger LOG = Logger.getLogger(WizardAction.class);
+    private static final Logger LOG = Logger.getLogger(ConfigurationWizardAction.class);
 
     /**
-     * Identifier of wizard implementation.
+     * The path to the configuration type that defines this wizard.
      */
     private String path;
-
     private boolean wizardRequiresLazyInitialisation = false;
 
+//    private boolean wizardRequiresLazyInitialisation = true;
+
     /**
-     * Setter for the wizard identifier.
+     * Setter for the configuration path.
      *
      * @param path identification.
      */
@@ -67,7 +74,8 @@ public class WizardAction extends ActionSupport
     /**
      * The submit field value is used as an override for the next, previous and
      * cancel fields, and is set by a javascript function when the user hits enter
-     * on a form. Without this, the first submit button would always be the one used.
+     * on a form. Without this (and the associated javascript), the first submit
+     * button would always be the one used.
      */
     private String submit;
 
@@ -135,6 +143,10 @@ public class WizardAction extends ActionSupport
         this.submit = submit;
     }
 
+    /**
+     *
+     * @return
+     */
     public boolean isInitialised()
     {
         // ensure that the wizard instance is available / instantiated.
@@ -190,57 +202,30 @@ public class WizardAction extends ActionSupport
         }
     }
 
-    protected void initWizardIfRequired()
-    {
-        Wizard wizard = getWizardInstance();
-        if (wizardRequiresLazyInitialisation)
-        {
-            wizard.initialise();
-            wizardRequiresLazyInitialisation = false;
-        }
-    }
-
     private boolean validateState()
     {
         // popupate the state, extract the type details.
         try
         {
-            Object instance = getState().data();
+            Object instance = getState().getData();
 
+            // copy the parameters to the state instance... maybe this should be done separately so that it is
+            // not a byproduct of the validation process
             ConfigurationCrudSupport crud = new ConfigurationCrudSupport();
             crud.apply(ActionContext.getContext().getParameters(), instance);
-
-            return true;
-        }
-        catch (TypeException e)
-        {
-            e.printStackTrace();
-            return false;
-        }
-
-/*
-        try
-        {
-            Object state = getState();
-            FormSupport support = createFormSupport(state);
-            ValidationContext validationContext = createValidationContext(state, this);
-
-            support.populateObject(state);
-            validationManager.validate(state, validationContext);
+            crud.validate(instance, this);
 
             return !hasErrors();
         }
-        catch (ValidationException e)
+        catch (TypeException e)
         {
             addActionError(e.getMessage());
             return false;
         }
-*/
     }
 
     private boolean validateWizard()
     {
-/*
         try
         {
             Object wizard = getWizardInstance();
@@ -257,17 +242,22 @@ public class WizardAction extends ActionSupport
             addActionError(e.getMessage());
             return false;
         }
-*/
-        return true;
+    }
+
+    private ValidationContext createValidationContext(Object subject, ValidationAware action)
+    {
+        MessagesTextProvider textProvider = new MessagesTextProvider(subject);
+        return new DelegatingValidationContext(new XWorkValidationAdapter(action), textProvider);
     }
 
     public String execute()
     {
-        // validation.
+        // only validate when we are moving forwards in the wizard
         if (isNextSelected() || isFinishSelected())
         {
             if (!validateState() || !validateWizard())
             {
+                // if there is a validation failure, then we stay where we are.
                 return "step";
             }
         }
@@ -275,20 +265,20 @@ public class WizardAction extends ActionSupport
         try
         {
             initWizardIfRequired();
-
+            
             if (isCancelSelected())
             {
                 return doCancel();
             }
-            if (isNextSelected())
+            else  if (isNextSelected())
             {
                 return doNext();
             }
-            if (isPreviousSelected())
+            else if (isPreviousSelected())
             {
                 return doPrevious();
             }
-            if (isFinishSelected())
+            else if (isFinishSelected())
             {
                 return doFinish();
             }
@@ -304,72 +294,45 @@ public class WizardAction extends ActionSupport
 
     private String doFinish()
     {
-        try
-        {
-            initWizardIfRequired();
-
-            getWizardInstance().doFinish();
-
-            removeWizard();
-
-            return SUCCESS;
-        }
-        catch (Exception e)
-        {
-            handleException(e);
-            return ERROR;
-        }
+        getWizardInstance().doFinish();
+        removeWizard();
+        return SUCCESS;
     }
 
     private String doPrevious()
     {
-        try
-        {
-            initWizardIfRequired();
-
-            getWizardInstance().doPrevious();
-
-            return "step";
-        }
-        catch (Exception e)
-        {
-            handleException(e);
-            return ERROR;
-        }
+        getWizardInstance().doPrevious();
+        return "step";
     }
 
     private String doNext()
     {
-        try
-        {
-            initWizardIfRequired();
-
-            getWizardInstance().doNext();
-
-            return "step";
-        }
-        catch (Exception e)
-        {
-            handleException(e);
-            return ERROR;
-        }
+        getWizardInstance().doNext();
+        return "step";
     }
 
     private String doCancel()
     {
+        getWizardInstance().doCancel();
+        removeWizard();
+        return "cancel";
+    }
+
+    protected void initWizardIfRequired()
+    {
         try
         {
-            initWizardIfRequired();
-
-            getWizardInstance().doCancel();
-            removeWizard();
-
-            return "cancel";
+            Wizard wizard = getWizardInstance();
+            if (wizardRequiresLazyInitialisation)
+            {
+                wizard.initialise();
+                wizardRequiresLazyInitialisation = false;
+            }
         }
         catch (Exception e)
         {
-            handleException(e);
-            return ERROR;
+            removeWizard();
+            throw (RuntimeException)e;
         }
     }
 
@@ -396,15 +359,13 @@ public class WizardAction extends ActionSupport
     {
         try
         {
-            Map<String, Object> session = ActionContext.getContext().getSession();
-
             // normalise the path by stripping leading and trailing '/' chars
             String sessionKey = normalizePath(this.path);
+            
+            Map<String, Object> session = ActionContext.getContext().getSession();
             if (!session.containsKey(sessionKey))
             {
-                DefaultTypeWizard wizardInstance = new DefaultTypeWizard(path);
-                ComponentContext.autowire(wizardInstance);
-                wizardRequiresLazyInitialisation = true;
+                Wizard wizardInstance = doCreateWizard();
                 session.put(sessionKey, wizardInstance);
             }
             return (Wizard) session.get(sessionKey);
@@ -414,6 +375,14 @@ public class WizardAction extends ActionSupport
             e.printStackTrace();
             return null;
         }
+    }
+
+    protected Wizard doCreateWizard()
+    {
+        Wizard wizardInstance = new ExtendedTypeWizard(path);
+        ComponentContext.autowire(wizardInstance);
+        wizardRequiresLazyInitialisation = true;        
+        return wizardInstance;
     }
 
     private String normalizePath(String path)

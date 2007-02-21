@@ -9,8 +9,7 @@ import com.zutubi.prototype.type.CompositeType;
 import com.zutubi.prototype.type.Type;
 import com.zutubi.prototype.type.TypeException;
 import com.zutubi.prototype.type.TypeRegistry;
-import com.zutubi.prototype.type.record.Record;
-import com.zutubi.prototype.webwork.Configuration;
+import com.zutubi.prototype.type.CollectionType;
 import com.zutubi.prototype.wizard.Wizard;
 import com.zutubi.prototype.wizard.WizardState;
 import com.zutubi.prototype.wizard.WizardTransition;
@@ -23,11 +22,14 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * An implementation of the wizard interface based on the type details specified by a given configuration path.
- * 
+ * An implementation of the wizard interface that generates a simple 2 step wizard for types that have
+ * extensions.
+ *
+ * The first step displayed to the UI is a selection for which of the extensions is being selected. The second
+ * step is the configuration form for the selected type.
  *
  */
-public class DefaultTypeWizard implements Wizard
+public class ExtendedTypeWizard implements Wizard
 {
     private ConfigurationPersistenceManager configurationPersistenceManager;
 
@@ -41,7 +43,7 @@ public class DefaultTypeWizard implements Wizard
 
     private Map<String, WizardState> stateCache = new HashMap<String, WizardState>();
 
-    public DefaultTypeWizard(String path)
+    public ExtendedTypeWizard(String path)
     {
         this.path = path;
     }
@@ -51,6 +53,13 @@ public class DefaultTypeWizard implements Wizard
         return currentState;
     }
 
+    /**
+     * This is a simple two step wizard. Either we are in the selection state, in which case the NEXT and CANCEL
+     * transitions are available, or we are in the data form state, in which case PREVIOUS, FINISH and CANCEL
+     * are available.
+     *
+     * @return the list of wizard transitions available for the current state.
+     */
     public List<WizardTransition> getAvailableActions()
     {
         if (currentState == selectState)
@@ -65,7 +74,7 @@ public class DefaultTypeWizard implements Wizard
         // conver the data into a record based on its type, and then record that record.
         try
         {
-            configurationPersistenceManager.setInstance(path, currentState.data());
+            configurationPersistenceManager.setInstance(path, currentState.getData());
         }
         catch (TypeException e)
         {
@@ -84,7 +93,7 @@ public class DefaultTypeWizard implements Wizard
                 {
                     CompositeType type = (CompositeType) typeRegistry.getType(currentSymbolicName);
                     Object state = type.getClazz().newInstance();
-                    stateCache.put(currentSymbolicName, new ConfigurationState(state, type));
+                    stateCache.put(currentSymbolicName, new ConfigurationState(state));
                 }
                 currentState = stateCache.get(currentSymbolicName);
             }
@@ -104,63 +113,91 @@ public class DefaultTypeWizard implements Wizard
 
     public void doCancel()
     {
+        // cleanup any resources.
     }
 
     public void initialise()
     {
-        Configuration configuration = new Configuration(path);
-        configuration.analyse();
+        Type type = (Type) configurationPersistenceManager.getType(path);
+        if (type instanceof CollectionType)
+        {
+            type = ((CollectionType)type).getCollectionType();
+        }
+        if (!(type instanceof CompositeType))
+        {
+            throw new RuntimeException("Can not initialise ExtendedTypeWizard for a non-composite type.");
+        }
 
-        CompositeType type = (CompositeType) configuration.getTargetType();
+        CompositeType compositeType = (CompositeType) type;
 
-        selectState = new SelectState(type.getExtensions());
-        
-        currentState = selectState;
+        List<String> extensions = compositeType.getExtensions();
+        if (extensions.size() == 0)
+        {
+            throw new RuntimeException("No extension definitions available for the path: " + path);
+        }
+
+        if (extensions.size() > 1)
+        {
+            selectState = new SelectState(extensions);
+            currentState = selectState;
+        }
+        else
+        {
+            try
+            {
+                CompositeType availableType = (CompositeType) typeRegistry.getType(extensions.get(0));
+                Object instance = availableType.getClazz().newInstance();
+                currentState = new ConfigurationState(instance);
+            }
+            catch (Exception e)
+            {
+                throw new RuntimeException(e);
+            }
+        }
     }
 
     public WizardState doRestart()
     {
-        currentState = selectState;
-
+        if (selectState != null)
+        {
+            // ... clear out the cache ?
+            currentState = selectState;
+        }
         return currentState;
     }
 
+    /**
+     * Required resource
+     *
+     * @param typeRegistry instance
+     */
     public void setTypeRegistry(TypeRegistry typeRegistry)
     {
         this.typeRegistry = typeRegistry;
     }
 
-    public void setConfigurationPersistenceManager(ConfigurationPersistenceManager configurationPersistenceManager)
+    /**
+     * Required resource
+     *
+     * @param persistenceManager instance
+     */
+    public void setConfigurationPersistenceManager(ConfigurationPersistenceManager persistenceManager)
     {
-        this.configurationPersistenceManager = configurationPersistenceManager;
+        this.configurationPersistenceManager = persistenceManager;
     }
 
     public class SelectState implements WizardState
     {
         private List<String> options;
 
-        private Type type;
-
         public SelectState(List<String> options)
         {
             this.options = options;
         }
 
-        public Object data()
+        public Object getData()
         {
             return this;
-        }
-
-        public CompositeType type()
-        {
-            try
-            {
-                return typeRegistry.register(getClass());
-            }
-            catch (TypeException e)
-            {
-                throw new PulseRuntimeException(e);
-            }
         }
 
         public String name()
@@ -177,6 +214,10 @@ public class DefaultTypeWizard implements Wizard
             field.addParameter("type", "select");
             field.addParameter("label", "selection");
             field.addParameter("list", options);
+            if (selection != null)
+            {
+                field.addParameter("value", selection);
+            }
             field.setTabindex(1);
             form.add(field);
             field = new Field();
@@ -204,12 +245,10 @@ public class DefaultTypeWizard implements Wizard
     public class ConfigurationState implements WizardState
     {
         private Object dataObject;
-        private CompositeType type;
 
-        public ConfigurationState(Object obj, CompositeType type)
+        public ConfigurationState(Object obj)
         {
             this.dataObject = obj;
-            this.type = type;
         }
 
         public String name()
@@ -217,14 +256,9 @@ public class DefaultTypeWizard implements Wizard
             return dataObject.getClass().getSimpleName();
         }
 
-        public Object data()
+        public Object getData()
         {
             return dataObject;
-        }
-
-        public CompositeType type()
-        {
-            return type;
         }
 
         public Form getForm(Object data)
@@ -236,8 +270,7 @@ public class DefaultTypeWizard implements Wizard
             FormDescriptor formDescriptor = formFactory.createDescriptor(stateType);
 
             // where do we get the data from?
-            Record record = new Record();
-            Form form = formDescriptor.instantiate(record);
+            Form form = formDescriptor.instantiate(data);
 
             List<String> actions = new LinkedList<String>();
             for (WizardTransition transition : getAvailableActions())

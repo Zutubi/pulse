@@ -1,9 +1,12 @@
 package com.zutubi.prototype.velocity;
 
 import com.opensymphony.xwork.ActionContext;
+import com.opensymphony.util.TextUtils;
 import com.zutubi.prototype.wizard.Wizard;
 import com.zutubi.prototype.wizard.WizardState;
 import com.zutubi.prototype.model.Form;
+import com.zutubi.prototype.freemarker.GetTextMethod;
+import com.zutubi.pulse.i18n.Messages;
 import freemarker.core.DelegateBuiltin;
 import freemarker.template.Template;
 import freemarker.template.TemplateException;
@@ -44,9 +47,17 @@ public class WizardDirective extends PrototypeDirective
 
         String sessionKey = normalizePath(path);
         Wizard wizardInstance = (Wizard) ActionContext.getContext().getSession().get(sessionKey);
+        if (wizardInstance == null)
+        {
+            return false;
+        }
 
         WizardState currentState = wizardInstance.getCurrentState();
-
+        if (currentState == null)
+        {
+            return false;
+        }
+        
         writer.write(internalRender(currentState));
 
         return true;
@@ -54,13 +65,16 @@ public class WizardDirective extends PrototypeDirective
 
     private String normalizePath(String path)
     {
-        if (path.startsWith("/"))
+        if (TextUtils.stringSet(path))
         {
-            path = path.substring(1);
-        }
-        if (path.endsWith("/"))
-        {
-            path = path.substring(0, path.length() -1);
+            if (path.startsWith("/"))
+            {
+                path = path.substring(1);
+            }
+            if (path.endsWith("/"))
+            {
+                path = path.substring(0, path.length() -1);
+            }
         }
         return path;
     }
@@ -72,15 +86,15 @@ public class WizardDirective extends PrototypeDirective
 
         try
         {
-//            Messages messages = Messages.getInstance(type);
+            Messages messages = Messages.getInstance(state.getData().getClass());
 
             Map<String, Object> context = new HashMap<String, Object>();
-            Form form = state.getForm(null);
+            Form form = state.getForm(state.getData());
             form.setAction(action);
             
             context.put("form", form);
-//            context.put("i18nText", new GetTextMethod(messages));
-            context.put("path", path.toString());
+            context.put("i18nText", new GetTextMethod(messages));
+            context.put("path", path);
 
             // provide some syntactic sweetener by linking the i18n text method to the ?i18n builtin function.
             DelegateBuiltin.conditionalRegistration("i18n", "i18nText");

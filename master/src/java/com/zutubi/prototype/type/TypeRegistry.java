@@ -78,8 +78,8 @@ public class TypeRegistry
         if (type == null)
         {
             CompositeType ctype = new CompositeType(clazz, symbolicName);
-            classMapping.put(clazz, ctype);
             buildType(ctype);
+            classMapping.put(clazz, ctype);
             type = ctype;
         }
 
@@ -109,7 +109,7 @@ public class TypeRegistry
             prototype.setAnnotations(Arrays.asList(typeClass.getAnnotations()));
 
             BeanInfo beanInfo = null;
-            if (typeClass.isInterface())
+            if (typeClass.isInterface() || typeClass == Object.class)
             {
                 beanInfo = Introspector.getBeanInfo(typeClass);
             }

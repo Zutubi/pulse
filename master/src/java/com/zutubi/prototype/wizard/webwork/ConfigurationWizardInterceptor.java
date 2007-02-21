@@ -9,9 +9,10 @@ import com.zutubi.prototype.wizard.Wizard;
 import java.util.Map;
 
 /**
- * <class comment/>
+ *
+ * 
  */
-public class WizardInterceptor implements Interceptor
+public class ConfigurationWizardInterceptor implements Interceptor
 {
     public void destroy()
     {
@@ -41,9 +42,9 @@ public class WizardInterceptor implements Interceptor
         // short circuit the wizard if circumstances require it.
         String shortCircuit = null;
 
-        if (action instanceof com.zutubi.pulse.web.wizard.auto.WizardAction)
+        if (action instanceof ConfigurationWizardAction)
         {
-            WizardAction wizardAction = (WizardAction) action;
+            ConfigurationWizardAction wizardAction = (ConfigurationWizardAction) action;
 
             // if an action has been requested, then we need to ensure that the state for which the action was
             // requests matches the state of the wizard. If the user has used the browser back button for example,

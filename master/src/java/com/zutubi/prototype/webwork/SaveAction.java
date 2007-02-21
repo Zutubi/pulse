@@ -2,8 +2,13 @@ package com.zutubi.prototype.webwork;
 
 import com.opensymphony.util.TextUtils;
 import com.opensymphony.xwork.ActionContext;
+import com.opensymphony.xwork.ValidationAware;
 import com.zutubi.prototype.config.ConfigurationCrudSupport;
 import com.zutubi.pulse.web.ActionSupport;
+import com.zutubi.pulse.validation.MessagesTextProvider;
+import com.zutubi.validation.ValidationContext;
+import com.zutubi.validation.DelegatingValidationContext;
+import com.zutubi.validation.XWorkValidationAdapter;
 
 /**
  *
@@ -42,16 +47,19 @@ public class SaveAction extends ActionSupport
 
     public String execute() throws Exception
     {
+        configuration = new Configuration(path);
+        configuration.analyse();
+
         if (!TextUtils.stringSet(symbolicName))
         {
             return INPUT;
         }
 
         ConfigurationCrudSupport crud = new ConfigurationCrudSupport();
-        crud.save(symbolicName, path, ActionContext.getContext().getParameters());
-
-        configuration = new Configuration(path);
-        configuration.analyse();
+        if (!crud.save(symbolicName, path, ActionContext.getContext().getParameters(), this))
+        {
+            return INPUT;
+        }
 
         return SUCCESS;
     }

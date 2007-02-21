@@ -24,5 +24,6 @@
     </form>
 
     <#-- use jscript to wire up the event handlers for supporting inline form validation -->
+    <#-- use jscript to wire up the event handlers for handling the on 'enter' form submission -->
 
 </#if>
