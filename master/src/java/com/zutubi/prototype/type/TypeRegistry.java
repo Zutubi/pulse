@@ -1,7 +1,5 @@
 package com.zutubi.prototype.type;
 
-import com.zutubi.pulse.core.PulseRuntimeException;
-import com.zutubi.pulse.prototype.record.SymbolicName;
 import com.zutubi.pulse.util.AnnotationUtils;
 import com.zutubi.pulse.util.CollectionUtils;
 
@@ -9,12 +7,12 @@ import java.beans.BeanInfo;
 import java.beans.IntrospectionException;
 import java.beans.Introspector;
 import java.beans.PropertyDescriptor;
-import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.LinkedList;
 
 /**
  *
@@ -25,10 +23,8 @@ public class TypeRegistry
     private static final Class[] BUILT_IN_TYPES = {Boolean.class, Boolean.TYPE, Byte.class, Byte.TYPE, Character.class, Character.TYPE, Double.class, Double.TYPE, Float.class, Float.TYPE, Integer.class, Integer.TYPE, Long.class, Long.TYPE, Short.class, Short.TYPE, String.class};
 
     private Map<String, Type> symbolicNameMapping = new HashMap<String, Type>();
-    
-    private Map<Class, Type> classMapping = new HashMap<Class, Type>();
 
-    private Map<Class, Type> anonymousMapping = new HashMap<Class, Type>();
+    private Map<Class, Type> classMapping = new HashMap<Class, Type>();
 
     public TypeRegistry()
     {
@@ -52,164 +48,144 @@ public class TypeRegistry
         builtInTypes.add(new PrimitiveType(Short.TYPE, "short"));
         builtInTypes.add(new PrimitiveType(String.class, "String"));
 
+/*
         builtInTypes.add(new MapType(HashMap.class, "mapType"));
         builtInTypes.add(new ListType(LinkedList.class, "listType"));
+*/
 
         for (Type type : builtInTypes)
         {
             classMapping.put(type.getClazz(), type);
             symbolicNameMapping.put(type.getSymbolicName(), type);
-            ((AbstractType)type).setTypeRegistry(this);
+            ((AbstractType) type).setTypeRegistry(this);
         }
     }
 
-    public CompositeType register(Class type) throws TypeException
+    public CompositeType register(Class clazz) throws TypeException
     {
-        // extract the symbolicName from an annotation.
-        SymbolicName a = (SymbolicName) type.getAnnotation(SymbolicName.class);
-        if(a == null)
-        {
-            throw new PulseRuntimeException("Unable to register class '" + type + "': no SymbolicName annotation");
-        }
-
-        // register
-        return register(a.value(), type);
+        return register(null, clazz);
     }
 
     public CompositeType register(String symbolicName, Class clazz) throws TypeException
     {
-        if (isSimple(clazz))
+        if (symbolicName != null && symbolicNameMapping.containsKey(symbolicName))
         {
-            throw new IllegalArgumentException("Can not register simple types.");
+            throw new TypeException("Symbolic name " + symbolicName + " is already in use, can not be assigned " +
+                    "to a different type " + clazz.getName());
         }
 
-        if (getType(symbolicName) != null)
+        Type type = classMapping.get(clazz);
+        if (type == null)
         {
-            throw new IllegalArgumentException("Symbolic name '"+symbolicName+"' already in use");
+            CompositeType ctype = new CompositeType(clazz, symbolicName);
+            classMapping.put(clazz, ctype);
+            buildType(ctype);
+            type = ctype;
         }
 
-        // convert class into Type, and store.
-        CompositeType type = new CompositeType(clazz, symbolicName);
+        if (symbolicName != null)
+        {
+            symbolicNameMapping.put(symbolicName, type);
+        }
 
+        return (CompositeType) type;
+    }
+
+    public CompositeType register(String symbolicName, CompositeType type) throws TypeException
+    {
+        if (symbolicNameMapping.containsKey(symbolicName))
+        {
+            throw new TypeException("Symbolic name " + symbolicName + " is already in use.");
+        }
         symbolicNameMapping.put(symbolicName, type);
-        classMapping.put(clazz, type);
-
-        buildType(type, true);
-
         return type;
     }
 
-    private CompositeType buildType(CompositeType protoType, boolean recurse) throws TypeException
+    private CompositeType buildType(CompositeType prototype) throws TypeException
     {
         try
         {
-            BeanInfo beanInfo = Introspector.getBeanInfo(protoType.getClazz(), Object.class);
-            for(PropertyDescriptor descriptor: beanInfo.getPropertyDescriptors())
+            Class typeClass = prototype.getClazz();
+            prototype.setAnnotations(Arrays.asList(typeClass.getAnnotations()));
+
+            BeanInfo beanInfo = null;
+            if (typeClass.isInterface())
             {
-                String propertyName = descriptor.getName();
+                beanInfo = Introspector.getBeanInfo(typeClass);
+            }
+            else
+            {
+                beanInfo = Introspector.getBeanInfo(typeClass, Object.class);
+            }
+            
+            for (PropertyDescriptor descriptor : beanInfo.getPropertyDescriptors())
+            {
+                TypeProperty property = new TypeProperty();
+                property.setName(descriptor.getName());
+                property.setGetter(descriptor.getReadMethod());
+                property.setSetter(descriptor.getWriteMethod());
 
-                Method readMethod = descriptor.getReadMethod();
-                Method writeMethod = descriptor.getWriteMethod();
-                java.lang.reflect.Type type = readMethod.getGenericReturnType();
+                // extract annotations for this property, from the getter, setter
+                property.setAnnotations(AnnotationUtils.annotationsFromProperty(descriptor));
 
-                if(type instanceof Class)
+                // analyse the java type
+                java.lang.reflect.Type type = descriptor.getReadMethod().getGenericReturnType();
+
+                if (type instanceof Class)
                 {
                     Class clazz = (Class) type;
-                    if(isSimple(clazz))
+                    if (classMapping.containsKey(clazz))
                     {
-                        protoType.addProperty(propertyName, new PrimitiveType(clazz), writeMethod, readMethod);
+                        property.setType(classMapping.get(clazz));
                     }
                     else
                     {
-                        if (recurse)
-                        {
-                            Type subType = getType(clazz);
-                            if (subType == null)
-                            {
-                                subType = register(clazz);
-                            }
-                            protoType.addProperty(propertyName, subType, writeMethod, readMethod);
-                        }
+                        property.setType(register(clazz));
                     }
                 }
-                else if(type instanceof ParameterizedType)
+                else if (type instanceof ParameterizedType)
                 {
+                    // have we seen this class yet?
                     ParameterizedType parameterizedType = (ParameterizedType) type;
-                    java.lang.reflect.Type rawType = parameterizedType.getRawType();
-                    if(rawType instanceof Class)
+                    Class clazz = (Class) parameterizedType.getRawType();
+
+                    Class valueClass = null;
+                    CollectionType collection = null;
+                    if (List.class.isAssignableFrom(clazz))
                     {
-                        Class clazz = (Class) rawType;
-
-                        if (List.class.isAssignableFrom(clazz))
-                        {
-                            Class valueClass = (Class) parameterizedType.getActualTypeArguments()[0];
-                            Type collectionType;
-                            if(isSimple(valueClass))
-                            {
-                                collectionType = new PrimitiveType(valueClass);
-                            }
-                            else
-                            {
-                                collectionType = getType(valueClass);
-                                if (collectionType == null && recurse)
-                                {
-                                    collectionType = register(valueClass.getName(), valueClass);
-                                }
-                            }
-
-                            ListType listType = new ListType(clazz);
-                            listType.setCollectionType(collectionType);
-                            listType.setTypeRegistry(this);
-
-                            protoType.addProperty(propertyName, listType, writeMethod, readMethod);
-                        }
-                        else if(Map.class.isAssignableFrom(clazz))
-                        {
-                            java.lang.reflect.Type[] typeArguments = parameterizedType.getActualTypeArguments();
-                            java.lang.reflect.Type valueType = typeArguments[1];
-
-                            Class valueClass = (Class) valueType;
-                            Type collectionType;
-                            if(isSimple(valueClass))
-                            {
-                                collectionType = new PrimitiveType(valueClass);
-                            }
-                            else
-                            {
-                                collectionType = getType(valueClass);
-                                if (collectionType == null && recurse)
-                                {
-                                    collectionType = register(valueClass.getName(), valueClass);
-                                }
-                            }
-
-                            MapType mapType = new MapType((Class) valueType);
-                            mapType.setCollectionType(collectionType);
-                            mapType.setTypeRegistry(this);
-                            
-                            protoType.addProperty(propertyName, mapType, writeMethod, readMethod);
-                        }
+                        valueClass = (Class) parameterizedType.getActualTypeArguments()[0];
+                        collection = new ListType();
                     }
+                    else if (Map.class.isAssignableFrom(clazz))
+                    {
+                        valueClass = (Class) parameterizedType.getActualTypeArguments()[1];
+                        collection = new MapType();
+                    }
+
+                    if (collection == null)
+                    {
+                        continue;
+                    }
+
+                    collection.setTypeRegistry(this);
+                    if (classMapping.containsKey(valueClass))
+                    {
+                        collection.setCollectionType(classMapping.get(valueClass));
+                    }
+                    else
+                    {
+                        collection.setCollectionType(register(valueClass));
+                    }
+                    property.setType(collection);
                 }
-                AnnotationUtils.annotationsFromProperty(descriptor);
+                prototype.addProperty(property);
             }
-            return protoType;
+            return prototype;
         }
         catch (IntrospectionException e)
         {
             throw new TypeException(e);
         }
-    }
-
-    public CompositeType registerAnonymous(Class clazz) throws TypeException
-    {
-        if (!anonymousMapping.containsKey(clazz))
-        {
-            CompositeType type = new CompositeType(clazz);
-            anonymousMapping.put(clazz, type);
-            buildType(type, false);
-        }
-        return (CompositeType) anonymousMapping.get(clazz);
     }
 
     public Type getType(String symbolicName)
@@ -222,47 +198,9 @@ public class TypeRegistry
         return classMapping.get(type);
     }
 
-/*
-    public Type getBuiltIn(Class type)
-    {
-        if (isSimple(type))
-        {
-            return new PrimitiveType(type);
-        }
-        if (List.class.isAssignableFrom(type))
-        {
-            ListType listType = new ListType(type);
-            listType.setTypeRegistry(this);
-            return listType;
-        }
-        if (Map.class.isAssignableFrom(type))
-        {
-            MapType mapType = new MapType(type);
-            mapType.setTypeRegistry(this);
-            return mapType;
-        }
-        return null;
-    }
-*/
-
     public static boolean isSimple(Class type)
     {
         return CollectionUtils.containsIdentity(BUILT_IN_TYPES, type) || type.isEnum();
     }
 
-    public CompositeType register(String symbolicName, CompositeType type)
-    {
-        symbolicNameMapping.put(symbolicName, type);
-        Class clz = type.getClazz();
-        if (clz != null)
-        {
-            if (classMapping.containsKey(clz))
-            {
-                throw new IllegalArgumentException("Attempting to override existing class mapping for: " +
-                        clz + " with '"+symbolicName+"' type");
-            }
-            classMapping.put(type.getClazz(), type);
-        }
-        return type;
-    }
 }

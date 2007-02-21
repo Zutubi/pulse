@@ -3,7 +3,8 @@ package com.zutubi.prototype.velocity;
 import com.zutubi.prototype.TableDescriptor;
 import com.zutubi.prototype.TableDescriptorFactory;
 import com.zutubi.prototype.freemarker.GetTextMethod;
-import com.zutubi.prototype.type.record.Record;
+import com.zutubi.prototype.type.CollectionType;
+import com.zutubi.prototype.type.TypeException;
 import com.zutubi.prototype.webwork.Configuration;
 import com.zutubi.pulse.i18n.Messages;
 import freemarker.core.DelegateBuiltin;
@@ -24,7 +25,7 @@ import java.util.Map;
  *
  *
  */
-public class ValueListDirective extends PrototypeDirective
+public class ListDirective extends PrototypeDirective
 {
     public String getName()
     {
@@ -36,33 +37,38 @@ public class ValueListDirective extends PrototypeDirective
         return LINE;
     }
 
-    private String propertyName;
-
     public boolean render(InternalContextAdapter context, Writer writer, Node node) throws IOException, ResourceNotFoundException, ParseErrorException
     {
-        Map params = createPropertyMap(context, node);
-        wireParams(params);
+        try
+        {
+            Map params = createPropertyMap(context, node);
+            wireParams(params);
 
-        Configuration configuration = new Configuration(path);
-        configuration.setConfigurationRegistry(configurationRegistry);
-        configuration.setRecordManager(recordManager);
-        configuration.setTypeRegistry(typeRegistry);
-        configuration.analyse();
+            Configuration configuration = new Configuration(path);
+            configuration.analyse();
 
-        String symbolicName = configuration.getTargetSymbolicName();
-        Record record = recordManager.load(path);
+            CollectionType type = (CollectionType)configuration.getType();
 
-        // render the form.
-        writer.write(internalRender(symbolicName, record));
+            symbolicName = configuration.getTargetSymbolicName();
 
-        return true;
+            Object collection = configurationPersistenceManager.getInstance(path);
+
+            writer.write(internalRender(type, collection));
+
+            return true;
+        }
+        catch (TypeException e)
+        {
+            e.printStackTrace();
+            return false;
+        }
     }
 
-    private String internalRender(String symbolicName, Record subject) throws IOException, ParseErrorException
+    private String internalRender(CollectionType type, Object data) throws IOException, ParseErrorException
     {
         TableDescriptorFactory tableFactory = new TableDescriptorFactory();
         tableFactory.setTypeRegistry(typeRegistry);
-        TableDescriptor tableDescriptor = tableFactory.createDescriptor(symbolicName, propertyName);
+        TableDescriptor tableDescriptor = tableFactory.createTableDescriptor(type);
 
         // handle rendering of the freemarker template.
         StringWriter writer = new StringWriter();
@@ -72,7 +78,7 @@ public class ValueListDirective extends PrototypeDirective
             Messages messages = Messages.getInstance(typeRegistry.getType(symbolicName).getClazz());
 
             Map<String, Object> context = new HashMap<String, Object>();
-            context.put("table", tableDescriptor.instantiate(subject));
+            context.put("table", tableDescriptor.instantiate(data));
             context.put("i18nText", new GetTextMethod(messages));
             context.put("path", path);
 
@@ -87,10 +93,5 @@ public class ValueListDirective extends PrototypeDirective
         {
             throw new ParseErrorException(e.getMessage());
         }
-    }
-
-    public void setPropertyName(String propertyName)
-    {
-        this.propertyName = propertyName;
     }
 }

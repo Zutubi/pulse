@@ -2,9 +2,7 @@ package com.zutubi.prototype.wizard.webwork;
 
 import com.opensymphony.util.TextUtils;
 import com.opensymphony.xwork.ActionContext;
-import com.zutubi.prototype.config.ConfigurationRegistry;
-import com.zutubi.prototype.type.TypeRegistry;
-import com.zutubi.prototype.type.PersistenceManager;
+import com.zutubi.prototype.config.ConfigurationCrudSupport;
 import com.zutubi.prototype.type.TypeException;
 import com.zutubi.prototype.wizard.Wizard;
 import com.zutubi.prototype.wizard.WizardState;
@@ -76,10 +74,6 @@ public class WizardAction extends ActionSupport
     private ObjectFactory objectFactory;
 
     private ValidationManager validationManager;
-
-    private ConfigurationRegistry configurationRegistry;
-    private TypeRegistry typeRegistry;
-    private PersistenceManager persistenceManager;
 
     /**
      * Required resource.
@@ -212,9 +206,9 @@ public class WizardAction extends ActionSupport
         try
         {
             Object instance = getState().data();
-            Map<String, Object> parameters = ActionContext.getContext().getParameters();
 
-            persistenceManager.saveToInstance(parameters, instance);
+            ConfigurationCrudSupport crud = new ConfigurationCrudSupport();
+            crud.apply(ActionContext.getContext().getParameters(), instance);
 
             return true;
         }
@@ -438,20 +432,5 @@ public class WizardAction extends ActionSupport
     public void setValidationManager(ValidationManager validationManager)
     {
         this.validationManager = validationManager;
-    }
-
-    public void setConfigurationRegistry(ConfigurationRegistry configurationRegistry)
-    {
-        this.configurationRegistry = configurationRegistry;
-    }
-
-    public void setTypeRegistry(TypeRegistry typeRegistry)
-    {
-        this.typeRegistry = typeRegistry;
-    }
-
-    public void setPersistenceManager(PersistenceManager persistenceManager)
-    {
-        this.persistenceManager = persistenceManager;
     }
 }

@@ -1,20 +1,18 @@
 package com.zutubi.prototype.webwork;
 
-import com.zutubi.prototype.config.ConfigurationRegistry;
-import com.zutubi.prototype.type.Traversable;
-import com.zutubi.prototype.type.Type;
-import com.zutubi.prototype.type.TypeRegistry;
+import com.opensymphony.util.TextUtils;
+import com.zutubi.prototype.config.ConfigurationPersistenceManager;
 import com.zutubi.prototype.type.CollectionType;
-import com.zutubi.prototype.type.PrimitiveType;
 import com.zutubi.prototype.type.CompositeType;
 import com.zutubi.prototype.type.ListType;
 import com.zutubi.prototype.type.MapType;
+import com.zutubi.prototype.type.PrimitiveType;
+import com.zutubi.prototype.type.Type;
 import com.zutubi.prototype.type.record.Record;
 import com.zutubi.prototype.type.record.RecordManager;
+import com.zutubi.pulse.bootstrap.ComponentContext;
 import com.zutubi.pulse.util.StringUtils;
-import com.opensymphony.util.TextUtils;
 
-import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.StringTokenizer;
@@ -26,24 +24,14 @@ import java.util.StringTokenizer;
 public class Configuration
 {
     private RecordManager recordManager;
-    private TypeRegistry typeRegistry;
-    private ConfigurationRegistry configurationRegistry;
+    private ConfigurationPersistenceManager configurationPersistenceManager;
 
     private Record record;
-    private Type instanceType;
-    private String instanceTypeSymbolicName;
     private Type type;
     private String typeSymbolicName;
 
-    private Type collectionType;
-    private String collectionSymbolicName;
-
     private Type targetType;
     private String targetSymbolicName;
-
-    private Record parentRecord;
-    private Type parentType;
-    private String parentTypeSymbolicName;
 
     private String path;
     private List<String> pathElements;
@@ -64,6 +52,8 @@ public class Configuration
         }
 
         this.path = normalizePath(path);
+
+        ComponentContext.autowire(this);
     }
 
     private String normalizePath(String path)
@@ -88,7 +78,6 @@ public class Configuration
         {
             pathElements.add(tokens.nextToken());
         }
-
         if (pathElements.size() == 0)
         {
             return;
@@ -99,78 +88,26 @@ public class Configuration
         parentPath = StringUtils.join("/", parentPathElements);
         currentPath = StringUtils.join("", pathElements.subList(pathElements.size() - 1, pathElements.size()));
 
-
-        // if we have a record, is it a specific instance, and if so, analyse it.
         record = recordManager.load(path);
-        if (record != null)
-        {
-            instanceTypeSymbolicName = record.getSymbolicName();
-            if (instanceTypeSymbolicName != null)
-            {
-                instanceType = typeRegistry.getType(instanceTypeSymbolicName);
 
-                // we have a record, and we have all of the type information that we need.
-            }
-            // else, it could be list/map data.
-        }
+        parentPath = configurationPersistenceManager.getParentPath(path);
 
-        // analyse the parent...
-        parentRecord = recordManager.load(parentPath);
-        parentType = configurationRegistry.getType(parentPath);
+        type = (Type) configurationPersistenceManager.getType(path);
 
-        if (parentRecord != null)
-        {
-            String symbolicName = parentRecord.getSymbolicName();
-            if (symbolicName != null)
-            {
-                parentType = typeRegistry.getType(symbolicName);
-            }
-        }
+        typeSymbolicName = (type).getSymbolicName();
 
-        if (parentType instanceof CompositeType)
-        {
-            parentTypeSymbolicName = ((CompositeType)parentType).getSymbolicName();
-        }
-
-        // using the parent context, we can navigate to the current paths type.
-        if (parentType != null)
-        {
-            type = ((Traversable)parentType).getType(Arrays.asList(currentPath));
-        }
-        else
-        {
-            type = configurationRegistry.getType(path);
-        }
-        
-        if (type instanceof CompositeType)
-        {
-            typeSymbolicName = ((CompositeType)type).getSymbolicName();
-        }
+        targetType = type;
         if (type instanceof CollectionType)
         {
-            collectionType = ((CollectionType)type).getCollectionType();
-            if (collectionType instanceof CompositeType)
-            {
-                collectionSymbolicName = ((CompositeType)collectionType).getSymbolicName();
-            }
+            targetType = ((CollectionType)type).getCollectionType();
         }
 
-        // analysis of the current type.
-        targetType = type;
-        if (instanceType != null)
-        {
-            targetType = instanceType;
-        }
-        if (collectionType != null)
-        {
-            targetType = collectionType;
-        }
+        targetSymbolicName = targetType.getSymbolicName();
         
         if (targetType instanceof CompositeType)
         {
             CompositeType compositeType = (CompositeType) targetType;
-            targetSymbolicName = compositeType.getSymbolicName();
-            
+
             for (String propertyName : compositeType.getProperties(PrimitiveType.class))
             {
                 simpleProperties.add(propertyName);
@@ -191,19 +128,9 @@ public class Configuration
         }
     }
 
-    public String getInstanceTypeSymbolicName()
-    {
-        return instanceTypeSymbolicName;
-    }
-
     public String getTypeSymbolicName()
     {
         return typeSymbolicName;
-    }
-
-    public String getParentTypeSymbolicName()
-    {
-        return parentTypeSymbolicName;
     }
 
     public String getPath()
@@ -236,34 +163,14 @@ public class Configuration
         return record;
     }
 
-    public Type getInstanceType()
-    {
-        return instanceType;
-    }
-
     public Type getType()
     {
         return type;
     }
 
-    public Type getCollectionType()
-    {
-        return collectionType;
-    }
-
     public Type getTargetType()
     {
         return targetType;
-    }
-
-    public Record getParentRecord()
-    {
-        return parentRecord;
-    }
-
-    public Type getParentType()
-    {
-        return parentType;
     }
 
     public List<String> getSimpleProperties()
@@ -296,23 +203,13 @@ public class Configuration
         this.recordManager = recordManager;
     }
 
-    public void setTypeRegistry(TypeRegistry typeRegistry)
-    {
-        this.typeRegistry = typeRegistry;
-    }
-
-    public void setConfigurationRegistry(ConfigurationRegistry configurationRegistry)
-    {
-        this.configurationRegistry = configurationRegistry;
-    }
-
-    public String getCollectionSymbolicName()
-    {
-        return collectionSymbolicName;
-    }
-
     public String getTargetSymbolicName()
     {
         return targetSymbolicName;
+    }
+
+    public void setConfigurationPersistenceManager(ConfigurationPersistenceManager configurationPersistenceManager)
+    {
+        this.configurationPersistenceManager = configurationPersistenceManager;
     }
 }

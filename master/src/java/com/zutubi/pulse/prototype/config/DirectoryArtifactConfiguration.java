@@ -6,15 +6,15 @@ package com.zutubi.pulse.prototype.config;
  */
 public class DirectoryArtifactConfiguration
 {
-    private String path;
+    private String directoryPath;
 
-    public String getPath()
+    public String getDirectoryPath()
     {
-        return path;
+        return directoryPath;
     }
 
-    public void setPath(String path)
+    public void setDirectoryPath(String directoryPath)
     {
-        this.path = path;
+        this.directoryPath = directoryPath;
     }
 }

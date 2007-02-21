@@ -3,15 +3,16 @@ package com.zutubi.prototype.config;
 import com.zutubi.prototype.type.CompositeType;
 import com.zutubi.prototype.type.ListType;
 import com.zutubi.prototype.type.MapType;
-import com.zutubi.prototype.type.PersistenceManager;
 import com.zutubi.prototype.type.Traversable;
 import com.zutubi.prototype.type.Type;
 import com.zutubi.prototype.type.TypeException;
+import com.zutubi.prototype.type.TypeProperty;
 import com.zutubi.prototype.type.TypeRegistry;
+import com.zutubi.prototype.type.record.Record;
+import com.zutubi.prototype.type.record.RecordManager;
 import com.zutubi.pulse.model.Project;
 import com.zutubi.pulse.prototype.config.*;
 
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -25,7 +26,8 @@ import java.util.StringTokenizer;
 public class ConfigurationRegistry
 {
     private TypeRegistry typeRegistry;
-    private PersistenceManager persistenceManager;
+    private RecordManager recordManager;
+    private ConfigurationPersistenceManager configurationPersistenceManager;
 
     private Map<String, Traversable> scopes = new HashMap<String, Traversable>();
 
@@ -74,20 +76,20 @@ public class ConfigurationRegistry
 
         // generated dynamically as new components are registered.
         CompositeType projectConfig = new CompositeType(Project.class, "projectConfig");
-        projectConfig.addProperty("scm", typeRegistry.getType("scmConfig"), null, null);
-        projectConfig.addProperty("general", typeRegistry.getType("generalConfig"), null, null);
-        projectConfig.addProperty("cleanup", typeRegistry.getType("cleanupRuleConfig"), null, null);
-        projectConfig.addProperty("changeViewer", typeRegistry.getType("changeViewerConfig"), null, null);
+        projectConfig.addProperty(new TypeProperty("scm", typeRegistry.getType("scmConfig")));
+        projectConfig.addProperty(new TypeProperty("general", typeRegistry.getType("generalConfig")));
+        projectConfig.addProperty(new TypeProperty("cleanup", typeRegistry.getType("cleanupRuleConfig")));
+        projectConfig.addProperty(new TypeProperty("changeViewer", typeRegistry.getType("changeViewerConfig")));
         
         ListType artifacts = new ListType();
         artifacts.setTypeRegistry(typeRegistry);
         artifacts.setCollectionType(typeRegistry.getType("artifactConfig"));
-        projectConfig.addProperty("artifact", artifacts, null, null);
+        projectConfig.addProperty(new TypeProperty("artifact", artifacts));
 
         MapType commitTransformers = new MapType();
         commitTransformers.setTypeRegistry(typeRegistry);
         commitTransformers.setCollectionType(typeRegistry.getType("commitConfig"));
-        projectConfig.addProperty("commit", commitTransformers, null, null);
+        projectConfig.addProperty(new TypeProperty("commit", commitTransformers));
 
         // define the root level scope.
         MapType projectCollection = new MapType(HashMap.class);
@@ -95,6 +97,11 @@ public class ConfigurationRegistry
         projectCollection.setCollectionType(projectConfig);
 
         typeRegistry.register("projectConfig", projectConfig);
+
+        configurationPersistenceManager.register("project", projectCollection);
+        Record project = new Record();
+        project.setSymbolicName("projectConfig");
+        recordManager.store("project", project);
 
         scopes.put("project", projectCollection);
     }
@@ -134,8 +141,13 @@ public class ConfigurationRegistry
         this.typeRegistry = typeRegistry;
     }
 
-    public void setPersistenceManager(PersistenceManager persistenceManager)
+    public void setConfigurationPersistenceManager(ConfigurationPersistenceManager configurationPersistenceManager)
     {
-        this.persistenceManager = persistenceManager;
+        this.configurationPersistenceManager = configurationPersistenceManager;
+    }
+
+    public void setRecordManager(RecordManager recordManager)
+    {
+        this.recordManager = recordManager;
     }
 }

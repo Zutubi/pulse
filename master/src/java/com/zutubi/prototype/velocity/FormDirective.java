@@ -50,14 +50,11 @@ public class FormDirective extends PrototypeDirective
             wireParams(params);
 
             Configuration configuration = new Configuration(path);
-            configuration.setConfigurationRegistry(configurationRegistry);
-            configuration.setRecordManager(recordManager);
-            configuration.setTypeRegistry(typeRegistry);
             configuration.analyse();
 
-            String symbolicName = configuration.getTargetSymbolicName();
+            String symbolicName = configuration.getTypeSymbolicName();
 
-            Object data = persistenceManager.load(path);
+            Object data = configurationPersistenceManager.getInstance(path);
 
             writer.write(internalRender(symbolicName, data));
 

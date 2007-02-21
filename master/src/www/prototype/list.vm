@@ -18,14 +18,11 @@
 
 <p>
     <ul>
-        <li>path: $!action.configuration.path</li>
-        <li>parent path: $!action.configuration.parentPath</li>
-        <li>current path: $!action.configuration.currentPath</li>
+        <li>path: $!config.path</li>
     </ul>
     <ul>
-        <li>instance symbolic name: $!action.configuration.instanceTypeSymbolicName</li>
-        <li>type symbolic name: $!action.configuration.typeSymbolicName</li>
-        <li>parent symbolic name: $!action.configuration.parentTypeSymbolicName</li>
+        <li>type symbolic name: $!config.typeSymbolicName</li>
+        <li>target symbolic name: $!config.targetSymbolicName</li>
     </ul>
 </p>
 <p>
@@ -54,7 +51,6 @@
 </p>
 #end
 
-
 <p>
     <h2>show list, empty or not.</h2>
 </p>
@@ -73,6 +69,10 @@
     #end
 </p>
 
+
+<p>
+    #plist("path=$config.path")
+</p>
 
 <p>
     #if($action.configuration.pathElements.size() > 2)

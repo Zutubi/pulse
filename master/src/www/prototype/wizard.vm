@@ -6,6 +6,9 @@
         show the current form.
         #pwizard("path=$action.path" "action=wizard.action?path=$action.path")
     </p>
+<p>
+    path=$action.path
+</p>
 
 </body>
 </html>

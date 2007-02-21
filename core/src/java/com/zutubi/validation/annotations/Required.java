@@ -11,7 +11,7 @@ import java.lang.annotation.RetentionPolicy;
  * <class-comment/>
  */
 @Constraint(RequiredValidator.class)
-@Target(ElementType.METHOD)
+@Target({ElementType.METHOD, ElementType.FIELD})
 @Retention(RetentionPolicy.RUNTIME)
 public @interface Required
 {

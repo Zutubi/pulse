@@ -1,20 +1,19 @@
 package com.zutubi.pulse.form.descriptor.annotation;
 
-import com.zutubi.pulse.form.descriptor.FormDescriptor;
-import com.zutubi.pulse.form.descriptor.FieldDescriptor;
 import com.zutubi.pulse.form.descriptor.DescriptorDecorator;
-import com.zutubi.pulse.form.descriptor.Descriptor;
+import com.zutubi.pulse.form.descriptor.FieldDescriptor;
+import com.zutubi.pulse.form.descriptor.FormDescriptor;
 import com.zutubi.pulse.util.AnnotationUtils;
-import com.zutubi.validation.bean.BeanUtils;
-import com.zutubi.validation.bean.BeanException;
 import com.zutubi.validation.annotations.Required;
+import com.zutubi.validation.bean.BeanException;
+import com.zutubi.validation.bean.BeanUtils;
 
+import java.beans.PropertyDescriptor;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
-import java.beans.PropertyDescriptor;
-import java.util.List;
-import java.util.LinkedList;
 import java.util.Arrays;
+import java.util.LinkedList;
+import java.util.List;
 
 /**
  * <class-comment/>

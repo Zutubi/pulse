@@ -38,9 +38,6 @@ public class I18NDirective extends PrototypeDirective
 
         // we need the symbolic name for the entity we are talking about. It may not have a record yet.
         Configuration configuration = new Configuration(path);
-        configuration.setConfigurationRegistry(configurationRegistry);
-        configuration.setRecordManager(recordManager);
-        configuration.setTypeRegistry(typeRegistry);
         configuration.analyse();
 
         Class type = configuration.getTargetType().getClazz();

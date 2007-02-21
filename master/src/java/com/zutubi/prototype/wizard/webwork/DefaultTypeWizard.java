@@ -2,17 +2,15 @@ package com.zutubi.prototype.wizard.webwork;
 
 import com.zutubi.prototype.FormDescriptor;
 import com.zutubi.prototype.FormDescriptorFactory;
-import com.zutubi.prototype.webwork.Configuration;
-import com.zutubi.prototype.config.ConfigurationRegistry;
+import com.zutubi.prototype.config.ConfigurationPersistenceManager;
 import com.zutubi.prototype.model.Field;
 import com.zutubi.prototype.model.Form;
 import com.zutubi.prototype.type.CompositeType;
-import com.zutubi.prototype.type.PersistenceManager;
 import com.zutubi.prototype.type.Type;
 import com.zutubi.prototype.type.TypeException;
 import com.zutubi.prototype.type.TypeRegistry;
 import com.zutubi.prototype.type.record.Record;
-import com.zutubi.prototype.type.record.RecordManager;
+import com.zutubi.prototype.webwork.Configuration;
 import com.zutubi.prototype.wizard.Wizard;
 import com.zutubi.prototype.wizard.WizardState;
 import com.zutubi.prototype.wizard.WizardTransition;
@@ -31,17 +29,15 @@ import java.util.Map;
  */
 public class DefaultTypeWizard implements Wizard
 {
-    private PersistenceManager persistenceManager;
-    private ConfigurationRegistry configurationRegistry;
+    private ConfigurationPersistenceManager configurationPersistenceManager;
+
     private TypeRegistry typeRegistry;
-    private RecordManager recordManager;
 
     private String path;
 
     private SelectState selectState;
 
     private WizardState currentState;
-    private String currentSymbolicName;
 
     private Map<String, WizardState> stateCache = new HashMap<String, WizardState>();
 
@@ -69,7 +65,7 @@ public class DefaultTypeWizard implements Wizard
         // conver the data into a record based on its type, and then record that record.
         try
         {
-            persistenceManager.saveToStore(path, currentState.data());
+            configurationPersistenceManager.setInstance(path, currentState.data());
         }
         catch (TypeException e)
         {
@@ -83,7 +79,7 @@ public class DefaultTypeWizard implements Wizard
         {
             if (currentState == selectState)
             {
-                currentSymbolicName = selectState.getSelection();
+                String currentSymbolicName = selectState.getSelection();
                 if (!stateCache.containsKey(currentSymbolicName))
                 {
                     CompositeType type = (CompositeType) typeRegistry.getType(currentSymbolicName);
@@ -113,15 +109,11 @@ public class DefaultTypeWizard implements Wizard
     public void initialise()
     {
         Configuration configuration = new Configuration(path);
-        configuration.setConfigurationRegistry(configurationRegistry);
-        configuration.setTypeRegistry(typeRegistry);
-        configuration.setRecordManager(recordManager);
         configuration.analyse();
 
         CompositeType type = (CompositeType) configuration.getTargetType();
 
         selectState = new SelectState(type.getExtensions());
-        selectState.setType(type);
         
         currentState = selectState;
     }
@@ -133,24 +125,14 @@ public class DefaultTypeWizard implements Wizard
         return currentState;
     }
 
-    public void setConfigurationRegistry(ConfigurationRegistry configurationRegistry)
-    {
-        this.configurationRegistry = configurationRegistry;
-    }
-
     public void setTypeRegistry(TypeRegistry typeRegistry)
     {
         this.typeRegistry = typeRegistry;
     }
 
-    public void setRecordManager(RecordManager recordManager)
+    public void setConfigurationPersistenceManager(ConfigurationPersistenceManager configurationPersistenceManager)
     {
-        this.recordManager = recordManager;
-    }
-
-    public void setPersistenceManager(PersistenceManager persistenceManager)
-    {
-        this.persistenceManager = persistenceManager;
+        this.configurationPersistenceManager = configurationPersistenceManager;
     }
 
     public class SelectState implements WizardState
@@ -173,7 +155,7 @@ public class DefaultTypeWizard implements Wizard
         {
             try
             {
-                return typeRegistry.registerAnonymous(getClass());
+                return typeRegistry.register(getClass());
             }
             catch (TypeException e)
             {
@@ -184,16 +166,6 @@ public class DefaultTypeWizard implements Wizard
         public String name()
         {
             return getClass().getName();
-        }
-
-        public Type getType()
-        {
-            return type;
-        }
-
-        public void setType(Type type)
-        {
-            this.type = type;
         }
 
         public Form getForm(Object data)

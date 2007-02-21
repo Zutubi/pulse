@@ -19,14 +19,10 @@
 <p>
     <ul>
         <li>path: $!config.path</li>
-        <li>parent path: $!config.parentPath</li>
-        <li>current path: $!config.currentPath</li>
     </ul>
     <ul>
-        <li>instance symbolic name: $!config.instanceTypeSymbolicName</li>
         <li>type symbolic name: $!config.typeSymbolicName</li>
-        <li>parent symbolic name: $!config.parentTypeSymbolicName</li>
-        <li>collection symbolic name: $!config.collectionSymbolicName</li>
+        <li>target symbolic name: $!config.targetSymbolicName</li>
     </ul>
 </p>
 <p>
@@ -59,6 +55,10 @@
     <h2>show map, empty or not.</h2>
 </p>
 <p>
+    #plist("path=$config.path")
+</p>
+
+<p>
     <h2>show add new link.</h2>
     #if( $config.extensions.size() > 0)
         #if($config.extensions.size() == 1)
@@ -68,8 +68,6 @@
         #end
     #end
 </p>
-
-
 
 <p>
     #if($action.configuration.pathElements.size() > 2)

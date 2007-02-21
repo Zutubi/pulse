@@ -15,13 +15,11 @@ import java.util.Map;
  */
 public class CompositeType extends AbstractType implements Traversable, Type
 {
-    private Map<String, Type> properties = new HashMap<String, Type>();
     private Map<Class, List<String>> propertiesByClass = new HashMap<Class, List<String>>();
 
     private List<String> extensions = new LinkedList<String>();
 
-    private Map<String, Method> setters = new HashMap<String, Method>();
-    private Map<String, Method> getters = new HashMap<String, Method>();
+    private Map<String, TypeProperty> properties = new HashMap<String, TypeProperty>();
 
     public CompositeType(Class type)
     {
@@ -33,19 +31,17 @@ public class CompositeType extends AbstractType implements Traversable, Type
         super(type, symbolicName);
     }
 
-    public void addProperty(String name, Type type, Method setter, Method getter)
+    public void addProperty(TypeProperty property)
     {
-        properties.put(name, type);
-
-        if (!propertiesByClass.containsKey(type.getClass()))
+        this.properties.put(property.getName(), property);
+        Class typeClass = property.getType().getClass();
+        if (!propertiesByClass.containsKey(typeClass))
         {
-            propertiesByClass.put(type.getClass(), new LinkedList<String>());
+            propertiesByClass.put(typeClass, new LinkedList<String>());
         }
-        List<String> props = propertiesByClass.get(type.getClass());
-        props.add(name);
+        List<String> props = propertiesByClass.get(typeClass);
+        props.add(property.getName());
 
-        setters.put(name, setter);
-        getters.put(name, getter);
     }
 
     public List<String> getProperties()
@@ -53,11 +49,11 @@ public class CompositeType extends AbstractType implements Traversable, Type
         return Collections.unmodifiableList(new LinkedList<String>(properties.keySet()));
     }
 
-    public Type getProperty(String propertyName)
+    public TypeProperty getProperty(String propertyName)
     {
         return properties.get(propertyName);
     }
-
+    
     /**
      * Retrieve all of the property names of properties of a specific type.
      *
@@ -140,12 +136,12 @@ public class CompositeType extends AbstractType implements Traversable, Type
         {
             Record record = new Record();
             record.setSymbolicName(getSymbolicName());
-            for (Map.Entry<String, Type> entry : properties.entrySet())
+            for (Map.Entry<String, TypeProperty> entry : properties.entrySet())
             {
                 String name = entry.getKey();
-                Type type = entry.getValue();
+                Type type = entry.getValue().getType();
 
-                Method getter = getters.get(name);
+                Method getter = properties.get(name).getGetter();
                 Object value = getter.invoke(instance);
                 if (value != null)
                 {
@@ -168,11 +164,16 @@ public class CompositeType extends AbstractType implements Traversable, Type
     {
         try
         {
-            for (Map.Entry<String, Type> entry : properties.entrySet())
+            for (Map.Entry<String, TypeProperty> entry : properties.entrySet())
             {
                 String name = entry.getKey();
-                Type type = entry.getValue();
-                Method setter = setters.get(name);
+                if (!source.containsKey(name))
+                {
+                    continue;
+                }
+                
+                Type type = entry.getValue().getType();
+                Method setter = properties.get(name).getSetter();
                 setter.invoke(target, type.instantiate(source.get(name)));
             }
         }
@@ -196,13 +197,13 @@ public class CompositeType extends AbstractType implements Traversable, Type
     {
         try
         {
-            for (Map.Entry<String, Type> entry : properties.entrySet())
+            for (Map.Entry<String, TypeProperty> entry : properties.entrySet())
             {
                 String name = entry.getKey();
-                Type type = entry.getValue();
+                Type type = entry.getValue().getType();
                 if (type instanceof PrimitiveType)
                 {
-                    Method getter = getters.get(name);
+                    Method getter = properties.get(name).getGetter();
                     Object value = getter.invoke(source);
                     if (value != null)
                     {
@@ -225,7 +226,7 @@ public class CompositeType extends AbstractType implements Traversable, Type
         }
 
         String propertyName = path.get(0);
-        Type type = getProperty(propertyName);
+        Type type = getProperty(propertyName).getType();
         if (type instanceof CompositeType)
         {
             CompositeType ctype = (CompositeType) type;

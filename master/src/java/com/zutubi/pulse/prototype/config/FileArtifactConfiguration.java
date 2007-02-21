@@ -6,15 +6,15 @@ package com.zutubi.pulse.prototype.config;
  */
 public class FileArtifactConfiguration
 {
-    private String path;
+    private String artifactPath;
 
-    public String getPath()
+    public String getArtifactPath()
     {
-        return path;
+        return artifactPath;
     }
 
-    public void setPath(String path)
+    public void setArtifactPath(String artifactPath)
     {
-        this.path = path;
+        this.artifactPath = artifactPath;
     }
 }

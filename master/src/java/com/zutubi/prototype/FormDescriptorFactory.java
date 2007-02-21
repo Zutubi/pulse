@@ -83,7 +83,7 @@ public class FormDescriptorFactory
         // Handle the first pass analysis.  Here, all of the fields are considered on an individual basis.
         for (String propertyName : type.getProperties(PrimitiveType.class))
         {
-            Type propertyType = type.getProperty(propertyName);
+            Type propertyType = type.getProperty(propertyName).getType();
             FieldDescriptor fd = new FieldDescriptor();
             fd.setName(propertyName);
 
@@ -108,10 +108,10 @@ public class FormDescriptorFactory
             String propertyName = fd.getName();
             if (type.hasProperty(propertyName + "Options"))
             {
-                Type optionsProperty = type.getProperty(propertyName + "Options");
+                Type optionsProperty = type.getProperty(propertyName + "Options").getType();
                 if (optionsProperty instanceof ListType)
                 {
-                    Type propertyType = type.getProperty(propertyName);
+                    Type propertyType = type.getProperty(propertyName).getType();
                     // ensure that the option type is the same as the field type.
                     ListType listType = (ListType) optionsProperty;
                     if (listType.getCollectionType().getClazz() == propertyType.getClazz())

@@ -19,13 +19,10 @@
 <p>
     <ul>
         <li>path: $!config.path</li>
-        <li>parent path: $!config.parentPath</li>
-        <li>current path: $!config.currentPath</li>
     </ul>
     <ul>
-        <li>instance symbolic name: $!config.instanceTypeSymbolicName</li>
         <li>type symbolic name: $!config.typeSymbolicName</li>
-        <li>parent symbolic name: $!config.parentTypeSymbolicName</li>
+        <li>target symbolic name: $!config.targetSymbolicName</li>
     </ul>
 </p>
 <p>

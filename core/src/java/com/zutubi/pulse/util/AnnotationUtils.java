@@ -121,7 +121,7 @@ public class AnnotationUtils
         internalMethods.add("equals");
     }
 
-    public static final boolean isUserDeclared(Method annotationMethod)
+    public static boolean isUserDeclared(Method annotationMethod)
     {
         return !internalMethods.contains(annotationMethod.getName());
     }
