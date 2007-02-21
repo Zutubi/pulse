@@ -13,4 +13,8 @@ public class FileTypeConstants
     public static final String HTML_REPORT = "html";
     public static final String BROKEN = "broken";
     public static final String LINK = "link";
+
+    public static final String PLUGIN = "plugin";
+    public static final String PLUGIN_DISABLED = "plugin_disabled";
+    public static final String PLUGIN_ERROR = "plugin_error";
 }

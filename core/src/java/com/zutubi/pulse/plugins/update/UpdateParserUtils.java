@@ -1,6 +1,7 @@
 package com.zutubi.pulse.plugins.update;
 
 import com.zutubi.pulse.util.XMLUtils;
+import com.zutubi.pulse.plugins.Version;
 import nu.xom.Element;
 import nu.xom.Elements;
 import nu.xom.ParsingException;

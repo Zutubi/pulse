@@ -2,6 +2,8 @@ package com.zutubi.pulse.web.vfs;
 
 import com.opensymphony.util.TextUtils;
 import com.zutubi.pulse.util.logging.Logger;
+import com.zutubi.pulse.vfs.CompoundFileFilter;
+import com.zutubi.pulse.vfs.FilePrefixFilter;
 import org.apache.commons.vfs.*;
 
 import java.util.*;
@@ -15,9 +17,8 @@ public class LsAction extends VFSActionSupport
     private static final Logger LOG = Logger.getLogger(LsAction.class);
 
     private boolean showFiles = false;
-
     private boolean showHidden = false;
-
+    private String prefix = null;
     private int depth = 1;
 
     /**
@@ -55,6 +56,11 @@ public class LsAction extends VFSActionSupport
     public void setShowHidden(boolean showHidden)
     {
         this.showHidden = showHidden;
+    }
+
+    public void setPrefix(String prefix)
+    {
+        this.prefix = prefix;
     }
 
     /**
@@ -135,7 +141,7 @@ public class LsAction extends VFSActionSupport
         }
 
         listing = new LinkedList<FileObjectWrapper>();
-        FileObject[] children = fo.findFiles(new FileDepthFilterSelector(FileTypeFilter.accept(acceptedTypes), depth));
+        FileObject[] children = fo.findFiles(new FileDepthFilterSelector(new CompoundFileFilter(FileTypeFilter.accept(acceptedTypes), new FilePrefixFilter(prefix)), depth));
 
         if (children != null)
         {

@@ -1,4 +1,4 @@
-package com.zutubi.pulse.plugins.update;
+package com.zutubi.pulse.plugins;
 
 import com.zutubi.pulse.test.PulseTestCase;
 

@@ -1,5 +1,7 @@
 package com.zutubi.pulse.plugins.update;
 
+import com.zutubi.pulse.plugins.Version;
+
 /**
  * Constants to specify how strictly to compare versions in dependency
  * resolution.

@@ -498,7 +498,7 @@ YAHOO.extend(ZUTUBI.widget.FileNode, YAHOO.widget.TextNode, {
         // depth rendering.
         for (i=0;i<this.depth;++i)
         {
-            sb[sb.length] = '<td class="' + this.getDepthStyle(i) + '">&nbsp;</td>';
+            sb[sb.length] = '<td class="' + this.getDepthStyle(i) + '"><img width="17" height="22" src="/images/transparent.gif"/></td>';
         }
 
         var getNode = 'YAHOO.widget.TreeView.getNode(\'' + this.tree.id + '\',' + this.index + ')';
@@ -515,7 +515,7 @@ YAHOO.extend(ZUTUBI.widget.FileNode, YAHOO.widget.TextNode, {
         }
         sb[sb.length] = ' onclick="javascript:' + this.getToggleLink() + '">';
 
-        sb[sb.length] = '&nbsp;';
+        sb[sb.length] = '<img width="17" height="22" src="/images/transparent.gif"/>';
 
         sb[sb.length] = '</td>';
 
@@ -533,7 +533,7 @@ YAHOO.extend(ZUTUBI.widget.FileNode, YAHOO.widget.TextNode, {
             sb[sb.length] = this.getToggleElId() + '\').className=';
             sb[sb.length] = getNode + '.getStyle()"';
         }
-        sb[sb.length] = '>';
+        sb[sb.length] = '><img width="16" height="22" src="/images/transparent.gif"/>';
         sb[sb.length] = '</td>';
 
         // label rendering.
@@ -611,7 +611,7 @@ YAHOO.extend(ZUTUBI.widget.PulseTreeView, ZUTUBI.widget.TreeView, {
         this.error = id;
     },
 
-    ls: function(node, onCompleteCallback, showFiles, showHidden, depth)
+    ls: function(node, onCompleteCallback, showFiles, showHidden, depth, prefix)
     {
         this.hideActionErrors();
             
@@ -633,7 +633,8 @@ YAHOO.extend(ZUTUBI.widget.PulseTreeView, ZUTUBI.widget.TreeView, {
                 parameters: "path=" + this.fsRoot + p +
                              (showFiles && "&showFiles=" + showFiles || "") +
                              (showHidden && "&showHidden=" + showHidden || "") +
-                             (depth && "&depth=" + depth || "")
+                             (depth && "&depth=" + depth || "") +
+                             (prefix && "&prefix=" + prefix || "")
             }
         );
     },
@@ -670,7 +671,7 @@ YAHOO.extend(ZUTUBI.widget.PulseTreeView, ZUTUBI.widget.TreeView, {
                     parentNode.expanded = true;
                     parentNode.dynamicLoadComplete = true;
                 }
-                
+
                 var node = new ZUTUBI.widget.FileNode(data, parentNode, false);
 
             });

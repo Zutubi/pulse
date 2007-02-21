@@ -1,5 +1,7 @@
 package com.zutubi.pulse.plugins.update;
 
+import com.zutubi.pulse.plugins.Version;
+
 import java.net.URL;
 import java.util.LinkedList;
 import java.util.List;

@@ -5,15 +5,29 @@ import com.zutubi.pulse.plugins.Plugin;
 import java.util.List;
 
 /**
- * <class comment/>
+ An action showing for the administration > plugins page.
  */
 public class PluginsAction extends PluginActionSupport
 {
-    private List<? extends Plugin> plugins;
+    private List<Plugin> plugins;
+    /**
+     * Path of the currently-selected tree node.
+     */
+    private String path;
 
-    public List<? extends Plugin> getPlugins()
+    public List<Plugin> getPlugins()
     {
         return plugins;
+    }
+
+    public String getPath()
+    {
+        return path;
+    }
+
+    public void setPath(String path)
+    {
+        this.path = path;
     }
 
     public String execute() throws Exception

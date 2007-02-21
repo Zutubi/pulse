@@ -17,7 +17,10 @@ public class DisablePluginAction extends PluginActionSupport
     public String execute() throws Exception
     {
         Plugin plugin = pluginManager.getPlugin(id);
-        pluginManager.disablePlugin(plugin);
+        if (plugin != null)
+        {
+            pluginManager.disablePlugin(plugin);
+        }
 
         return SUCCESS;
     }

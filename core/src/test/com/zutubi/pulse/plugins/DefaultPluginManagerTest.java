@@ -746,6 +746,42 @@ public class DefaultPluginManagerTest extends PulseTestCase
         }
     }
 
+    public void testGetDependentPlugins() throws PluginException
+    {
+        pluginManager.init();
+        try
+        {
+            Plugin plugin = installProducer1();
+            installConsumer1();
+            List<Plugin> deps = pluginManager.getDependentPlugins(plugin);
+            assertEquals(1, deps.size());
+            assertEquals(CONSUMER_ID, deps.get(0).getId());
+        }
+        finally
+        {
+            pluginManager.destroy();
+        }
+    }
+
+    public void testGetRequiredPlugins() throws PluginException
+    {
+        pluginManager.init();
+        try
+        {
+            Plugin producer = installProducer1();
+            Plugin consumer = installConsumer1();
+            List<PluginRequirement> reqs = pluginManager.getRequiredPlugins(consumer);
+            assertEquals(1, reqs.size());
+            assertEquals(PRODUCER_ID, reqs.get(0).getId());
+            assertEquals("[1.0.0, 2.0.0)", reqs.get(0).getVersionRange().toString());
+            assertEquals(producer, reqs.get(0).getSupplier());
+        }
+        finally
+        {
+            pluginManager.destroy();
+        }
+    }
+
     private PluginImpl assertDisabledProducer1()
     {
         PluginImpl plugin;

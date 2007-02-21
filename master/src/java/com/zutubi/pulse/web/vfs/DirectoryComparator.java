@@ -2,6 +2,7 @@ package com.zutubi.pulse.web.vfs;
 
 import com.zutubi.pulse.util.FileSystemUtils;
 import com.zutubi.pulse.util.logging.Logger;
+import com.zutubi.pulse.vfs.pulse.AbstractPulseFileObject;
 
 import java.io.File;
 import java.util.Comparator;
@@ -40,6 +41,11 @@ public class DirectoryComparator implements Comparator<FileObject>
             }
 
             // then sort alphabetically
+            if(o1 instanceof AbstractPulseFileObject)
+            {
+                return c.compare(((AbstractPulseFileObject)o1).getDisplayName(), ((AbstractPulseFileObject)o2).getDisplayName());
+            }
+
             return c.compare(o1.getName().getPath(), o2.getName().getPath());
         }
         catch (FileSystemException e)

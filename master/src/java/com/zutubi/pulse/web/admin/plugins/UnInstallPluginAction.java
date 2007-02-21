@@ -17,7 +17,10 @@ public class UnInstallPluginAction extends PluginActionSupport
     public String execute() throws Exception
     {
         Plugin plugin = pluginManager.getPlugin(id);
-        pluginManager.uninstallPlugin(plugin);
+        if (plugin != null)
+        {
+            pluginManager.uninstallPlugin(plugin);
+        }
 
         return SUCCESS;
     }

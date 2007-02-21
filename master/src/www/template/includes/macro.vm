@@ -1173,6 +1173,8 @@
 #macro(upload $tabIndex)
     #openSubmit()
         #wwsubmit("name=upload" "value=%{getText('upload.name')}" "tabindex=$tabIndex")
+        #set($tabIndex = $tabIndex + 1)
+        #wwsubmit("name=cancel" "value=%{getText('cancel.name')}" "tabindex=$tabIndex")
     #closeSubmit()
 #end
 
@@ -2528,4 +2530,36 @@
         window.onload = select;
 #end
     </script>
+#end
+
+#macro(pluginStateImage $plugin)
+    #if($plugin.disabled || $plugin.disabling)
+        #set($image = "exclamation-bw.gif")
+    #elseif($plugin.enabled)
+        #set($image = "accept.gif")
+    #elseif($plugin.uninstalling)
+        #set($image = "delete.gif")
+    #elseif($plugin.upgrading)
+        #set($image = "arrow-refresh.gif")
+    #end
+
+    <img alt="plugin state" src="$base/images/$image"/>
+#end
+
+#macro(pluginLink $plugin)
+    <a href="#" onclick="selectPlugin('$plugin.id'); return false;">
+        $!webwork.htmlEncode($plugin.name)
+    </a>
+#end
+
+#macro(pluginDisable $plugin)
+    <img alt="disable" src="$base/images/cancel.gif"/> <a href="#" onclick="pluginAction('$plugin.id', 'disable'); return false;">#wwtext("name=plugin.disable")</a>
+#end
+
+#macro(pluginEnable $plugin)
+    <img alt="enable" src="$base/images/accept.gif"/> <a href="#" onclick="pluginAction('$plugin.id', 'enable'); return false;">#wwtext("name=plugin.enable")</a>
+#end
+
+#macro(pluginUninstall $plugin)
+    <img alt="delete" src="$base/images/delete.gif"/> <a href="#" onclick="pluginAction('$plugin.id', 'uninstall'); return false;">#wwtext("name=plugin.uninstall")</a>
 #end

@@ -1,6 +1,8 @@
 package com.zutubi.pulse.plugins;
 
 import org.osgi.framework.Bundle;
+import org.eclipse.osgi.service.resolver.BundleDescription;
+import org.eclipse.osgi.framework.util.Headers;
 
 import java.io.File;
 
@@ -9,6 +11,12 @@ import java.io.File;
  */
 public class PluginImpl implements Plugin
 {
+    private static final String HEADER_NAME = "Bundle-Name";
+    private static final String HEADER_VERSION = "Bundle-Version";
+    private static final String HEADER_DESCRIPTION = "Bundle-Description";
+    private static final String HEADER_REQUIRE = "Require-Bundle";
+    private static final String HEADER_VENDOR = "Bundle-Vendor";
+
     enum Type
     {
         INTERNAL,
@@ -16,26 +24,8 @@ public class PluginImpl implements Plugin
         USER
     }
 
-    /**
-     * @see com.zutubi.pulse.plugins.Plugin#getId()
-     */
-    private String id;
-    /**
-     * @see com.zutubi.pulse.plugins.Plugin#getVersion()
-     */
-    private String version;
-    /**
-     * @see com.zutubi.pulse.plugins.Plugin#getName()
-     */
-    private String name;
-    /**
-     * @see com.zutubi.pulse.plugins.Plugin#getDescription()
-     */
-    private String description;
-    /**
-     * @see com.zutubi.pulse.plugins.Plugin#getVendor()
-     */
-    private String vendor;
+    private Headers manifest;
+    private BundleDescription bundleDescription;
     /**
      * @see com.zutubi.pulse.plugins.Plugin#getState()
      */
@@ -58,66 +48,49 @@ public class PluginImpl implements Plugin
      */
     private Bundle bundle;
 
-    /**
-     * Creates a plugin with the given details.
-     *
-     * @param id    the plugin id
-     * @param name  the plugin name
-     * @param state the current state of the plugin
-     * @param type  the type of the plugin
-     */
-    public PluginImpl(String id, String name, File pluginFile, PluginImpl.State state, Type type)
+    public PluginImpl(Headers manifest, BundleDescription bundleDescription, File pluginFile, State state, Type type)
     {
-        this.id = id;
-        this.name = name;
+        this.manifest = manifest;
+        this.bundleDescription = bundleDescription;
         this.pluginFile = pluginFile;
         this.state = state;
         this.type = type;
     }
 
+    Headers getManifest()
+    {
+        return manifest;
+    }
+
+    BundleDescription getBundleDescription()
+    {
+        return bundleDescription;
+    }
+
     public String getId()
     {
-        return id;
+        return bundleDescription.getSymbolicName();
     }
 
     public String getName()
     {
-        return name;
-    }
-
-    void setName(String name)
-    {
-        this.name = name;
+        String name = (String) manifest.get(HEADER_NAME);
+        return name == null ? getId() : name;
     }
 
     public String getDescription()
     {
-        return description;
-    }
-
-    void setDescription(String description)
-    {
-        this.description = description;
+        return (String) manifest.get(HEADER_DESCRIPTION);
     }
 
     public String getVersion()
     {
-        return version;
-    }
-
-    void setVersion(String version)
-    {
-        this.version = version;
+        return bundleDescription.getVersion().toString();
     }
 
     public String getVendor()
     {
-        return vendor;
-    }
-
-    void setVendor(String vendor)
-    {
-        this.vendor = vendor;
+        return (String) manifest.get(HEADER_VENDOR);
     }
 
     public Plugin.State getState()
@@ -184,8 +157,43 @@ public class PluginImpl implements Plugin
         return state == State.ENABLED;
     }
 
+    public boolean canEnable()
+    {
+        return isDisabled() || isDisabling();
+    }
+
     public boolean isDisabled()
     {
         return state == State.DISABLED;
+    }
+
+    public boolean canDisable()
+    {
+        return isEnabled();
+    }
+
+    public boolean isDisabling()
+    {
+        return state == State.DISABLING;
+    }
+
+    public boolean isUninstalling()
+    {
+        return state == State.UNINSTALLING;
+    }
+
+    public boolean canUninstall()
+    {
+        return isEnabled() || isDisabled();
+    }
+
+    public boolean isUpdating()
+    {
+        return state == State.UPDATING;
+    }
+
+    public boolean canUpdate()
+    {
+        return isEnabled() || isDisabled();
     }
 }

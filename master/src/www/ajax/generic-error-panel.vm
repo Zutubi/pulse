@@ -1,0 +1,7 @@
+<h1>:: #wwtext("name=error") ::</h1>
+
+#parse("/template/includes/actionerrors.vm")
+
+<p>
+    #wwtext("name=error.advice")
+</p>

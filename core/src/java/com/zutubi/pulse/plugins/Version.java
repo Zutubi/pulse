@@ -1,9 +1,14 @@
-package com.zutubi.pulse.plugins.update;
+package com.zutubi.pulse.plugins;
+
+import com.opensymphony.util.TextUtils;
 
 /**
  */
 public class Version implements Comparable<Version>
 {
+    public static final Version NONE = new Version(0, 0, 0, null);
+    public static final Version MAX = new Version(Integer.MAX_VALUE, Integer.MAX_VALUE, Integer.MAX_VALUE, null);
+    
     private int major;
     private int minor;
     private int service;
@@ -100,7 +105,7 @@ public class Version implements Comparable<Version>
 
     public String toString()
     {
-        return String.format("%d.%d.%d", major, minor, service) + (qualifier == null ? "" : ("." + qualifier));
+        return String.format("%d.%d.%d", major, minor, service) + (TextUtils.stringSet(qualifier) ? ("." + qualifier) : "");
     }
 
     public int compareTo(Version o)

@@ -17,8 +17,11 @@ public class EnablePluginAction extends PluginActionSupport
     public String execute() throws Exception
     {
         Plugin plugin = pluginManager.getPlugin(id);
-        pluginManager.enablePlugin(plugin);
-        
+        if (plugin != null)
+        {
+            pluginManager.enablePlugin(plugin);
+        }
+
         return SUCCESS;
     }
 }

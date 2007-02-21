@@ -3,6 +3,7 @@ package com.zutubi.pulse.plugins.update;
 import com.zutubi.pulse.plugins.Plugin;
 import com.zutubi.pulse.plugins.PluginException;
 import com.zutubi.pulse.plugins.PluginManager;
+import com.zutubi.pulse.plugins.Version;
 import com.zutubi.pulse.util.CollectionUtils;
 import com.zutubi.pulse.util.Predicate;
 import com.zutubi.pulse.util.logging.Logger;

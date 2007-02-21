@@ -2,6 +2,7 @@ package com.zutubi.pulse.plugins.update;
 
 import com.zutubi.pulse.test.PulseTestCase;
 import com.zutubi.pulse.util.CollectionUtils;
+import com.zutubi.pulse.plugins.Version;
 
 /**
  */

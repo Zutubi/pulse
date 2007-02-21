@@ -1,9 +1,6 @@
 package com.zutubi.pulse.plugins;
 
-import com.zutubi.pulse.util.CollectionUtils;
-import com.zutubi.pulse.util.FileSystemUtils;
-import com.zutubi.pulse.util.IOUtils;
-import com.zutubi.pulse.util.Predicate;
+import com.zutubi.pulse.util.*;
 import com.zutubi.pulse.util.logging.Logger;
 import nu.xom.*;
 import org.eclipse.core.internal.registry.osgi.OSGIUtils;
@@ -13,35 +10,21 @@ import org.eclipse.core.runtime.RegistryFactory;
 import org.eclipse.core.runtime.adaptor.EclipseStarter;
 import org.eclipse.core.runtime.dynamichelpers.ExtensionTracker;
 import org.eclipse.core.runtime.dynamichelpers.IExtensionTracker;
-import org.eclipse.osgi.service.resolver.BundleDescription;
-import org.eclipse.osgi.service.resolver.BundleSpecification;
-import org.eclipse.osgi.service.resolver.PlatformAdmin;
-import org.eclipse.osgi.service.resolver.State;
-import org.osgi.framework.Bundle;
-import org.osgi.framework.BundleContext;
-import org.osgi.framework.BundleException;
-import org.osgi.framework.ServiceReference;
+import org.eclipse.osgi.service.resolver.*;
+import org.eclipse.osgi.framework.util.Headers;
+import org.eclipse.osgi.framework.internal.core.FrameworkProperties;
+import org.osgi.framework.*;
 import org.osgi.service.packageadmin.PackageAdmin;
-import org.osgi.service.packageadmin.RequiredBundle;
 
 import java.io.*;
 import java.net.URL;
-import java.util.Collections;
-import java.util.Dictionary;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.jar.Attributes;
+import java.util.*;
 import java.util.jar.JarFile;
-import java.util.jar.Manifest;
+import java.util.jar.JarEntry;
 
 public class DefaultPluginManager implements PluginManager
 {
     private static final Logger LOG = Logger.getLogger(DefaultPluginManager.class);
-
-    private static final String HEADER_NAME = "Bundle-Name";
-    private static final String HEADER_VERSION = "Bundle-Version";
-    private static final String HEADER_DESCRIPTION = "Bundle-Description";
-    private static final String HEADER_VENDOR = "Bundle-Vendor";
 
     private static final String ELEMENT_PLUGINS = "plugins";
     private static final String ELEMENT_PLUGIN = "plugin";
@@ -58,6 +41,8 @@ public class DefaultPluginManager implements PluginManager
     private PackageAdmin packageAdmin;
     private ServiceReference platformAdminRef;
     private PlatformAdmin platformAdmin;
+    private State offlineState;
+    private int offlineId = 1;
 
     private IExtensionTracker extensionTracker;
     private List<PluginImpl> plugins;
@@ -100,6 +85,9 @@ public class DefaultPluginManager implements PluginManager
                 return;
             }
 
+            offlineState = platformAdmin.getFactory().createState(platformAdmin.getState());
+            offlineState.setResolver(platformAdmin.getResolver());
+            offlineState.setPlatformProperties(FrameworkProperties.getProperties());
             loadInternalPlugins();
 
             extensionRegistry = RegistryFactory.getRegistry();
@@ -275,7 +263,6 @@ public class DefaultPluginManager implements PluginManager
         for (int i = 0; i < pluginElements.size(); i++)
         {
             Element pluginElement = pluginElements.get(i);
-            String id = pluginElement.getAttributeValue(ATTRIBUTE_ID);
             String name = pluginElement.getAttributeValue(ATTRIBUTE_NAME);
             String file = pluginElement.getAttributeValue(ATTRIBUTE_FILE);
             String stateString = pluginElement.getAttributeValue(ATTRIBUTE_STATE);
@@ -309,110 +296,40 @@ public class DefaultPluginManager implements PluginManager
                 continue;
             }
 
-            File pluginFile = new File(pluginDir, file);
-
-            // If the file no longer exists, the plugin is just forgotten.
-            if (pluginFile.exists())
+            try
             {
-                switch (state)
-                {
-                    case DISABLED:
-                    case DISABLING:
-                        PluginImpl plugin = new PluginImpl(id, name, pluginFile, Plugin.State.DISABLED, type);
-                        fillPluginFromManifest(plugin);
-                        foundPlugins.add(plugin);
-                        break;
-                    case ENABLED:
-                        try
-                        {
-                            foundPlugins.add(loadPluginFile(pluginFile, type, false));
-                        }
-                        catch (BundleException e)
-                        {
-                            LOG.warning("Unable to load plugin '" + name + "': " + e.getMessage(), e);
+                File pluginFile = new File(pluginDir, file);
 
-                            plugin = new PluginImpl(id, name, pluginFile, Plugin.State.DISABLED, type);
-                            plugin.setErrorMessage("Unable to load plugin '" + name + "': " + e.getMessage() + "(check logs for trace)");
-                            foundPlugins.add(plugin);
-                        }
-                        break;
-                    case UNINSTALLING:
-                    case UPDATING:
-                        if (pluginFile.isDirectory())
-                        {
-                            FileSystemUtils.rmdir(pluginFile);
-                        }
-                        else
-                        {
-                            pluginFile.delete();
-                        }
-                        break;
+                // If the file no longer exists, the plugin is just forgotten.
+                if (pluginFile.exists())
+                {
+                    switch (state)
+                    {
+                        case DISABLED:
+                        case DISABLING:
+                            foundPlugins.add(loadPluginFile(pluginFile, type, false, Plugin.State.DISABLED));
+                            break;
+                        case ENABLED:
+                            foundPlugins.add(loadPluginFile(pluginFile, type, false, Plugin.State.ENABLED));
+                            break;
+                        case UNINSTALLING:
+                        case UPDATING:
+                            if (pluginFile.isDirectory())
+                            {
+                                FileSystemUtils.rmdir(pluginFile);
+                            }
+                            else
+                            {
+                                pluginFile.delete();
+                            }
+                            break;
+                    }
                 }
             }
-        }
-    }
-
-    private void fillPluginFromManifest(PluginImpl plugin)
-    {
-        try
-        {
-            File pluginFile = plugin.getPluginFile();
-            Manifest manifest;
-
-            if (pluginFile.isDirectory())
+            catch (PluginException e)
             {
-                InputStream manifestIn = new FileInputStream(new File(pluginFile, FileSystemUtils.composeFilename("META_INF", "MANIFEST.MF")));
-                try
-                {
-                    manifest = new Manifest(manifestIn);
-                }
-                finally
-                {
-                    IOUtils.close(manifestIn);
-                }
+                LOG.warning("Unable to load plugin '" + name + "': " + e.getMessage());
             }
-            else
-            {
-                JarFile jarFile = null;
-                try
-                {
-                    jarFile =  new JarFile(pluginFile);
-                    manifest = jarFile.getManifest();
-                }
-                finally
-                {
-                    IOUtils.close(jarFile);
-                }
-            }
-
-            Attributes attributes = manifest.getMainAttributes();
-            String name = attributes.getValue("Bundle-Name");
-            if(name != null)
-            {
-                plugin.setName(name);
-            }
-
-            String description = attributes.getValue("Bundle-Description");
-            if(description != null)
-            {
-                plugin.setDescription(description);
-            }
-
-            String version = attributes.getValue("Bundle-Version");
-            if(version != null)
-            {
-                plugin.setVersion(version);
-            }
-
-            String vendor = attributes.getValue("Bundle-Vendor");
-            if(vendor != null)
-            {
-                plugin.setVendor(vendor);
-            }
-        }
-        catch (IOException e)
-        {
-            LOG.warning("Unable to read manifest for plugin '" + plugin.getName() + "': " + e.getMessage(), e);
         }
     }
 
@@ -424,10 +341,10 @@ public class DefaultPluginManager implements PluginManager
             {
                 try
                 {
-                    PluginImpl plugin = loadPluginFile(pluginFile, type, false);
+                    PluginImpl plugin = loadPluginFile(pluginFile, type, false, Plugin.State.ENABLED);
                     foundPlugins.add(plugin);
                 }
-                catch (BundleException e)
+                catch (PluginException e)
                 {
                     LOG.warning("Unable to load plugin from file '" + pluginFile.getAbsolutePath() + "': " + e.getMessage(), e);
                 }
@@ -461,24 +378,111 @@ public class DefaultPluginManager implements PluginManager
         }
     }
 
-    private PluginImpl loadPluginFile(File pluginFile, PluginImpl.Type type, boolean update) throws BundleException
+    private PluginImpl loadPluginFile(File pluginFile, PluginImpl.Type type, boolean update, Plugin.State state) throws PluginException
     {
-        Bundle bundle = installBundle(pluginFile);
-        if (!update && getPlugin(bundle.getSymbolicName()) != null)
+        Headers manifest = loadBundleManifest(pluginFile);
+        BundleDescription bundleDescription;
+
+        try
         {
-            bundle.uninstall();
-            throw new BundleException("A plugin with the same identifier (" + bundle.getSymbolicName() + ") already exists.");
+            bundleDescription = platformAdmin.getFactory().createBundleDescription(offlineState, manifest, getBundleLocation(pluginFile), offlineId++);
+            offlineState.addBundle(bundleDescription);
+            offlineState.resolve();
+        }
+        catch (BundleException e)
+        {
+            LOG.warning(e);
+            throw new PluginException(e);
         }
 
-        PluginImpl plugin = new PluginImpl(bundle.getSymbolicName(), getBundleName(bundle), pluginFile, Plugin.State.ENABLED, type);
-        fillPluginFromBundle(plugin, bundle);
+        PluginImpl plugin = new PluginImpl(manifest, bundleDescription, pluginFile, state, type);
+        if(!update)
+        {
+            if (getPlugin(bundleDescription.getSymbolicName()) != null)
+            {
+                throw new PluginException("A plugin with the same identifier (" + bundleDescription.getSymbolicName() + ") already exists.");
+            }
+
+            if(state == Plugin.State.ENABLED)
+            {
+                try
+                {
+                    Bundle bundle = installBundle(pluginFile);
+                    plugin.setBundle(bundle);
+                }
+                catch (BundleException e)
+                {
+                    LOG.warning(e);
+                    plugin.setState(Plugin.State.DISABLED);
+                    plugin.setErrorMessage("Unable to install plugin: " + e.getMessage());
+                }
+            }
+        }
 
         return plugin;
     }
 
+    private Headers loadBundleManifest(File pluginFile) throws PluginException
+    {
+        try
+        {
+            Headers manifest;
+
+            if (pluginFile.isDirectory())
+            {
+                InputStream manifestIn = new FileInputStream(new File(pluginFile, FileSystemUtils.composeFilename("META-INF", "MANIFEST.MF")));
+                try
+                {
+                    manifest = Headers.parseManifest(manifestIn);
+                }
+                finally
+                {
+                    IOUtils.close(manifestIn);
+                }
+            }
+            else
+            {
+                JarFile jarFile = null;
+                try
+                {
+                    jarFile = new JarFile(pluginFile);
+                    JarEntry entry = jarFile.getJarEntry("META-INF/MANIFEST.MF");
+                    if(entry == null)
+                    {
+                        throw new PluginException("No manifest found");
+                    }
+
+                    InputStream manifestIn = jarFile.getInputStream(entry);
+                    try
+                    {
+                        manifest = Headers.parseManifest(manifestIn);
+                    }
+                    finally
+                    {
+                        IOUtils.close(manifestIn);
+                    }
+                }
+                finally
+                {
+                    IOUtils.close(jarFile);
+                }
+            }
+
+            return manifest;
+        }
+        catch (IOException e)
+        {
+            throw new PluginException(e);
+        }
+        catch (BundleException e)
+        {
+            throw new PluginException(e);
+        }
+    }
+
     private Bundle installBundle(File pluginFile) throws BundleException
     {
-        Bundle bundle = context.installBundle("reference:file:" + pluginFile.getAbsolutePath());
+        Bundle bundle = context.installBundle(getBundleLocation(pluginFile));
         if (bundle.getSymbolicName() == null)
         {
             bundle.uninstall();
@@ -488,25 +492,9 @@ public class DefaultPluginManager implements PluginManager
         return bundle;
     }
 
-    private String getBundleName(Bundle bundle)
+    private String getBundleLocation(File pluginFile)
     {
-        Dictionary headers = bundle.getHeaders();
-        String name = (String) headers.get(HEADER_NAME);
-        if (name == null)
-        {
-            name = bundle.getSymbolicName();
-        }
-
-        return name;
-    }
-
-    private void fillPluginFromBundle(PluginImpl plugin, Bundle bundle)
-    {
-        plugin.setBundle(bundle);
-        Dictionary headers = bundle.getHeaders();
-        plugin.setVersion((String) headers.get(HEADER_VERSION));
-        plugin.setDescription((String) headers.get(HEADER_DESCRIPTION));
-        plugin.setVendor((String) headers.get(HEADER_VENDOR));
+        return "reference:file:" + pluginFile.getAbsolutePath();
     }
 
     private void writePluginsFile(File pluginDir, List<PluginImpl> foundPlugins)
@@ -573,38 +561,66 @@ public class DefaultPluginManager implements PluginManager
         return extensionTracker;
     }
 
-    public List<? extends Plugin> getAllPlugins()
+    public List<Plugin> getAllPlugins()
     {
-        return plugins;
+        List<Plugin> result = new ArrayList<Plugin>(plugins.size());
+        for (PluginImpl p : plugins)
+        {
+            result.add(p);
+        }
+
+        // Return in name order by default.
+        final Comparator<String> nameComparator = new Sort.StringComparator();
+        Collections.sort(result, new Comparator<Plugin>()
+        {
+            public int compare(Plugin o1, Plugin o2)
+            {
+                return nameComparator.compare(o1.getName(), o2.getName());
+            }
+        });
+        return result;
     }
 
-    public List<? extends Plugin> getDependentPlugins(Plugin plugin)
+    public List<PluginRequirement> getRequiredPlugins(Plugin plugin)
+    {
+        final PluginImpl pluginImpl = (PluginImpl) plugin;
+        BundleSpecification[] requiredBundles = pluginImpl.getBundleDescription().getRequiredBundles();
+        return CollectionUtils.map(requiredBundles, new Mapping<BundleSpecification, PluginRequirement>()
+        {
+            public PluginRequirement map(BundleSpecification bundleSpecification)
+            {
+                return new PluginRequirement(bundleSpecification.getName(), convertVersionRange(bundleSpecification.getVersionRange()), getPlugin(bundleSpecification.getName()));
+            }
+        });
+    }
+
+    private VersionRange convertVersionRange(org.eclipse.osgi.service.resolver.VersionRange versionRange)
+    {
+        return new VersionRange(convertVersion(versionRange.getMinimum()), versionRange.getIncludeMinimum(), convertVersion(versionRange.getMaximum()), versionRange.getIncludeMaximum());
+    }
+
+    private Version convertVersion(org.osgi.framework.Version version)
+    {
+        return new Version(version.getMajor(), version.getMinor(), version.getMicro(), version.getQualifier());
+    }
+
+    public List<Plugin> getDependentPlugins(Plugin plugin)
     {
         return getDependentPlugins((PluginImpl) plugin);
     }
 
-    private List<PluginImpl> getDependentPlugins(PluginImpl pluginImpl)
+    private List<Plugin> getDependentPlugins(PluginImpl pluginImpl)
     {
-        List<PluginImpl> result = new LinkedList<PluginImpl>();
-        RequiredBundle[] required = packageAdmin.getRequiredBundles(pluginImpl.getId());
+        List<Plugin> result = new LinkedList<Plugin>();
+        BundleDescription[] required = pluginImpl.getBundleDescription().getDependents();
         if (required != null)
         {
-            for (RequiredBundle r : required)
+            for (BundleDescription r : required)
             {
-                if (r.getBundle() == pluginImpl.getBundle())
+                PluginImpl p = getPlugin(r.getSymbolicName());
+                if (p != null)
                 {
-                    Bundle[] dependents = r.getRequiringBundles();
-                    if (dependents != null)
-                    {
-                        for (Bundle b : dependents)
-                        {
-                            PluginImpl p = getPluginByBundle(b);
-                            if (p != null)
-                            {
-                                result.add(p);
-                            }
-                        }
-                    }
+                    result.add(p);
                 }
             }
         }
@@ -706,9 +722,9 @@ public class DefaultPluginManager implements PluginManager
     {
         try
         {
-            return loadPluginFile(pluginFile, PluginImpl.Type.USER, update);
+            return loadPluginFile(pluginFile, PluginImpl.Type.USER, update, Plugin.State.ENABLED);
         }
-        catch (BundleException e)
+        catch (PluginException e)
         {
             LOG.warning("Unable to load plugin from file '" + pluginFile.getAbsolutePath() + "': " + e.getMessage(), e);
             throw new PluginException("Unable to load plugin: " + e.getMessage(), e);
@@ -747,10 +763,8 @@ public class DefaultPluginManager implements PluginManager
                 throw new PluginException("Unable to update plugin: already marked for update");
         }
 
-        // Ensure that any plugins which depend on this plugin will still be
-        // satisfied by the new version.  To do so, load this plugin.
         File pluginFile = copyInPlugin(name, url);
-        PluginImpl newPlugin = new PluginImpl(currentPlugin.getId(), currentPlugin.getName(), pluginFile, currentPlugin.isEnabled() ? Plugin.State.ENABLED : Plugin.State.DISABLED, PluginImpl.Type.USER);
+        PluginImpl newPlugin = loadPluginFile(pluginFile, PluginImpl.Type.USER, true, currentPlugin.isEnabled() ? Plugin.State.ENABLED : Plugin.State.DISABLED);
         addToPluginsFile(newPlugin);
 
         // Mark the old version for removal.
@@ -801,7 +815,7 @@ public class DefaultPluginManager implements PluginManager
             throw new PluginException("Cannot uninstall an internal plugin");
         }
 
-        switch(pluginImpl.getState())
+        switch (pluginImpl.getState())
         {
             case UNINSTALLING:
                 throw new PluginException("Cannot uninstall plugin: already marked for uninstall");
@@ -885,7 +899,7 @@ public class DefaultPluginManager implements PluginManager
     public void enablePlugin(Plugin plugin) throws PluginException
     {
         PluginImpl pluginImpl = (PluginImpl) plugin;
-        switch(plugin.getState())
+        switch (plugin.getState())
         {
             case DISABLED:
                 // Start the plugin if possible
@@ -893,9 +907,7 @@ public class DefaultPluginManager implements PluginManager
 
                 try
                 {
-                    Bundle bundle = installBundle(pluginImpl.getPluginFile());
-                    fillPluginFromBundle(pluginImpl, bundle);
-
+                    pluginImpl.setBundle(installBundle(pluginImpl.getPluginFile()));
                     startPlugin(pluginImpl);
                 }
                 catch (BundleException e)
@@ -924,7 +936,7 @@ public class DefaultPluginManager implements PluginManager
     public void disablePlugin(Plugin plugin) throws PluginException
     {
         PluginImpl pluginImpl = (PluginImpl) plugin;
-        switch(pluginImpl.getState())
+        switch (pluginImpl.getState())
         {
             case DISABLED:
             case DISABLING:

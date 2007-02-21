@@ -1,5 +1,7 @@
 package com.zutubi.pulse.plugins.update;
 
+import com.zutubi.pulse.plugins.Version;
+
 /**
  * A dependency of a feature on either another feature or plugin.
  */

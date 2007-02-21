@@ -1463,21 +1463,10 @@
         </action>
 
         <action name="installPlugin" class="com.zutubi.pulse.web.admin.plugins.InstallPluginAction">
-            <result name="input" type="velocity">plugins.vm</result>
-            <result name="error" type="velocity">plugins.vm</result>
+            <result name="input" type="velocity">addplugin.vm</result>
+            <result name="error" type="velocity">addplugin.vm</result>
             <result name="success" type="redirect">/admin/plugins.action</result>
-        </action>
-
-        <action name="uninstallPlugin" class="com.zutubi.pulse.web.admin.plugins.UnInstallPluginAction">
-            <result name="success" type="redirect">/admin/plugins.action</result>
-        </action>
-
-        <action name="enablePlugin" class="com.zutubi.pulse.web.admin.plugins.EnablePluginAction">
-            <result name="success" type="redirect">/admin/plugins.action</result>
-        </action>
-
-        <action name="disablePlugin" class="com.zutubi.pulse.web.admin.plugins.DisablePluginAction">
-            <result name="success" type="redirect">/admin/plugins.action</result>
+            <result name="cancel" type="redirect">/admin/plugins.action</result>
         </action>
 
         <action name="dumpData" class="com.zutubi.pulse.web.admin.DumpDataAction">
@@ -1510,7 +1499,6 @@
         <action name="save" class="com.zutubi.prototype.webwork.SaveAction">
             <result name="success" type="redirect">configuration.action?path=${configuration.path}</result>
         </action>
-
         <action name="reset" class="com.zutubi.prototype.webwork.ResetAction">
             <result name="success" type="redirect">configuration.action?path=${configuration.parentPath}</result>
         </action>
@@ -1519,6 +1507,10 @@
 
     <package name="ajax" namespace="/ajax" extends="webwork-default-package">
         <default-interceptor-ref name="ajaxStack"/>
+
+        <global-results>
+            <result name="error" type="velocity">/ajax/generic-error-panel.vm</result>
+        </global-results>
 
         <action name="dashboardPanel" class="com.zutubi.pulse.web.user.DashboardAction">
             <result name="success" type="velocity">dashboard-panel.vm</result>
@@ -1605,6 +1597,30 @@
         </action>
 
         <action name="customiseBuildColumns" class="com.zutubi.pulse.web.user.CustomiseBuildColumnsAction">
+            <result name="success" type="httpheader">200</result>
+        </action>
+    </package>
+
+    <package name="adminAjax" namespace="/ajax/admin" extends="admin">
+        <default-interceptor-ref name="ajaxStack"/>
+
+        <action name="allPlugins" class="com.zutubi.pulse.web.admin.plugins.PluginsAction">
+            <result name="success" type="velocity">/ajax/all-plugins.vm</result>
+        </action>
+
+        <action name="viewPlugin" class="com.zutubi.pulse.web.admin.plugins.ViewPluginAction">
+            <result name="success" type="velocity">/ajax/view-plugin.vm</result>
+        </action>
+
+        <action name="uninstallPlugin" class="com.zutubi.pulse.web.admin.plugins.UnInstallPluginAction">
+            <result name="success" type="httpheader">200</result>
+        </action>
+
+        <action name="enablePlugin" class="com.zutubi.pulse.web.admin.plugins.EnablePluginAction">
+            <result name="success" type="redirect">/admin/plugins.action</result>
+        </action>
+
+        <action name="disablePlugin" class="com.zutubi.pulse.web.admin.plugins.DisablePluginAction">
             <result name="success" type="velocity">empty.vm</result>
         </action>
     </package>

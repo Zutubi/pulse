@@ -14,8 +14,9 @@ public interface PluginManager
     IExtensionRegistry getExtenstionRegistry();
     IExtensionTracker getExtenstionTracker();
 
-    List<? extends Plugin> getAllPlugins();
-    List<? extends Plugin> getDependentPlugins(Plugin plugin);
+    List<Plugin> getAllPlugins();
+    List<PluginRequirement> getRequiredPlugins(Plugin plugin);
+    List<Plugin> getDependentPlugins(Plugin plugin);
     Plugin getPlugin(String id);
 
     /**

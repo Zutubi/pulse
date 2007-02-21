@@ -100,7 +100,7 @@
                         });
 
                         nestedLayout.beginUpdate();
-                        nestedLayout.add('center', new YAHOO.ext.ContentPanel('center', {title: 'Close Me', closable: true}));
+                        nestedLayout.add('center', new YAHOO.ext.ContentPanel('center', {title: 'Close Me', closable: false}));
                         nestedLayout.endUpdate();
 
                         layout.beginUpdate();

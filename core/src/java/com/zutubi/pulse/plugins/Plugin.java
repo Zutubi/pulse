@@ -75,6 +75,12 @@ public interface Plugin
     String getErrorMessage();
 
     boolean isEnabled();
-
+    boolean canEnable();
     boolean isDisabled();
+    boolean canDisable();
+    boolean isDisabling();
+    boolean isUninstalling();
+    boolean canUninstall();
+    boolean isUpdating();
+    boolean canUpdate();
 }

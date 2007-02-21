@@ -57,7 +57,7 @@
 #if($users.size() > 0)
                   <table class="fill-content">
                       #pagingRow("viewUsers.action?" $pagingSupport)
-                      <tr><th colspan="5">$action.getText("users.count", ["$pagingSupport.totalItems"])</td></tr>
+                      <tr><th class="content centre" colspan="5">$action.getText("users.count", ["$pagingSupport.totalItems"])</td></tr>
                   </table>
 #end
               </td>

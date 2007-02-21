@@ -1,6 +1,7 @@
 package com.zutubi.pulse.core.plugins;
 
 import com.zutubi.pulse.core.PulseFileLoaderFactory;
+import com.zutubi.pulse.core.PulseRuntimeException;
 import com.zutubi.pulse.plugins.Plugin;
 import com.zutubi.pulse.plugins.PluginManager;
 import com.zutubi.pulse.util.logging.Logger;
@@ -27,6 +28,12 @@ public class CommandExtensionManager implements IExtensionChangeHandler
         IExtensionTracker tracker = pluginManager.getExtenstionTracker();
 
         IExtensionPoint extensionPoint = registry.getExtensionPoint("com.zutubi.pulse.core.commands");
+        if(extensionPoint == null)
+        {
+            LOG.severe("Commands extension point not found.");
+            return;
+        }
+
         IFilter filter = ExtensionTracker.createExtensionPointFilter(extensionPoint);
         tracker.registerHandler(this, filter);
         IExtension[] extensions = extensionPoint.getExtensions();

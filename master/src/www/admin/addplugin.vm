@@ -1,0 +1,20 @@
+#helpTag("Plugins")
+#authorisationTags($principle)
+<content tag="selectedTab">administration</content>
+<html>
+<head>
+    <title>#wwtext("name=add.plugin")</title>
+</head>
+<body>
+    #adminTabs("plugins")
+
+    <h1>:: #wwtext("name=add.plugin") ::</h1>
+
+    #parse("/template/includes/actionerrors.vm")
+
+    #wwcform("action=installPlugin.action" "name=plugin.install" "heading=%{getText('add.plugin')}" "method=post" "enctype=multipart/form-data")
+        #wwfile("name=plugin" "label=path" "required=true" "size=60" "tabindex=1")
+        #upload(2)
+    #end
+</body>
+</html>

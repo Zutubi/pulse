@@ -4,50 +4,162 @@
 <html>
 <head>
     <title>#wwtext("name=plugins")</title>
+    <link rel="stylesheet" type="text/css" href="$base/css/treeview/tree.css"/>
+    <script type="text/javascript" src="$base/js/prototype.js"></script>
+    <script type="text/javascript" src="$base/js/zutubi.js"></script>
+    <script type="text/javascript" src="$base/js/yahoo/treeview.js"></script>
+    <script type="text/javascript" src="$base/js/widget/treeview.js"></script>
+	<script type="text/javascript">
+        Layout = function() {
+                var tree;
+                var centerRegion;
+#if($path)
+                var path = '$path';
+#else
+                var path = 'plugins';
+#end
+
+                return {
+                    init : function() {
+                        centerRegion = nestedLayout.getRegion('center');
+                        var centerPanel = centerRegion.getPanel(0);
+                        centerPanel.setTitle('all plugins');
+                        centerPanel.getEl().setStyle('margin', '0');
+                        centerRegion.titleEl.show();
+                        
+                        nestedLayout.addRegion('north', {
+                            split: false,
+                            titlebar: false
+                        });
+
+                        nestedLayout.addRegion('west', {
+                            split:true,
+                            initialSize: 300,
+                            titlebar: true,
+                            collapsible: true,
+                            animate: true,
+                            tabPosition: 'top',
+                            autoScroll: true
+                        });
+
+                        nestedLayout.beginUpdate();
+                        nestedLayout.add('north', new YAHOO.ext.ContentPanel('innernorth', {title: 'inner north'}));
+                        nestedLayout.add('west', new YAHOO.ext.ContentPanel('plugin-tree', {title: 'plugins'}));
+                        nestedLayout.endUpdate();
+
+                        this.createTree();
+                   },
+
+                   createTree: function()
+                   {
+                       Element.show($('loading'));
+
+                       tree = new ZUTUBI.widget.PulseTreeView('tree');
+                       tree.setSeparator('/');
+                       tree.setFSRoot('pulse:///');
+                       tree.setBase('$base');
+
+                       tree.onSelect = function(node)
+                       {
+                           var url;
+
+                           path = node.getIdPath();
+                           if(path == 'plugins')
+                           {
+                               centerRegion.getPanel(0).setTitle('all plugins');
+                               url = '$base/ajax/admin/allPlugins.action';
+                           }
+                           else
+                           {
+                               centerRegion.getPanel(0).setTitle('plugin details');
+                               url = '$base/ajax/admin/viewPlugin.action?id=' + node.data.id;
+                           }
+
+                           new Ajax.Updater({ success: 'detail-pane' }, url, {
+                               method: 'get',
+                               
+                               on403: function()
+                               {
+                                   this.redirectToLogin();
+                               }
+                           });
+                           
+                           this.selected = node;
+                       };
+
+                       // load the root nodes for the file system, then draw the tree.
+                       tree.ls(tree.getRoot(), function()
+                       {
+                           Element.hide($('loading'));
+                           tree.draw();
+
+                           var node = tree.getNodeByPath(tree.getRoot(), path);
+                           if(!node)
+                           {
+                               node = tree.getRoot().children[0];
+                           }
+
+                           tree.select(node);
+                           Element.show('tree');
+                       }, true, false, 2, '/plugins');
+                   },
+
+                   reload: function()
+                   {
+                       Element.hide('tree');
+                       this.createTree();
+                   },
+
+                   selectNode: function(id)
+                   {
+                       var node = tree.getNodeByPath(tree.getRoot(), 'plugins/' + id);
+                       if(node)
+                       {
+                           tree.select(node);
+                       }
+                   },
+
+                   redirectToLogin: function()
+                   {
+                       document.location = '$base/admin/plugins.action?path=' + path;
+                   }
+             }
+        }();
+        YAHOO.ext.EventManager.onDocumentReady(Layout.init, Layout, true);
+
+        function pluginAction(id, action)
+        {
+            new Ajax.Request('$base/ajax/admin/' + action + 'Plugin.action?id=' + id, {
+                onSuccess: function()
+                {
+                    Layout.reload();
+                },
+
+                on403: function()
+                {
+                    Layout.redirectToLogin();
+                }
+            });
+        }
+
+        function selectPlugin(id)
+        {
+            Layout.selectNode(id);
+        }
+	</script>
 </head>
 <body>
     #adminTabs("plugins")
 
-    <h2>Installed plugins</h2>
+    <div id="innernorth" style="padding: 4px; padding-bottom: 12px; border-bottom: 1px solid #ccc">
+    </div>
 
-        <table class="fill-content">
-            #headingRow("plugins" 6)
-            <tr>
-                #contentHeading("name" 1)
-                #contentHeading("id" 1)
-                #contentHeading("state" 1)
-                #contentHeading("actions" 3)
-            </tr>
-            #foreach($plugin in $plugins)
-            <tr>
-                #if ($plugin.enabled)
-                    #set($cssClass = "success")
-                #else
-                    #set($cssClass = "failure")
-                #end
-                #classCell($plugin.name)
-                #classCell($plugin.id)
-                #classCell($plugin.state.toString().toLowerCase())
-                #if ($plugin.enabled)
-                    #dynamicLinkCell("disable" "disablePlugin.action?id=$plugin.id")
-                #end
-                #if ($plugin.disabled)
-                    #dynamicLinkCell("enable" "enablePlugin.action?id=$plugin.id")
-                #end
-                #dynamicLinkCell("uninstall" "uninstallPlugin.action?id=$plugin.id")
-            </tr>
-            #end
-        </table>
+    <div id="plugin-tree">
+        <div id="error"></div>
+        <div id="loading" style="display:none;"><img src="$base/images/treeview/loading.gif" alt="loading..."/></div>
+        <div id="tree"></div>
+    </div>
 
-    <h2>Install a new plugin</h2>
-    <p>
-        #wwcform("action=installPlugin.action" "name=plugin.install" "heading=%{getText('plugin.install')}" "method=post" "enctype=multipart/form-data")
-            #wwfile("name=plugin" "label=path" "required=true" "tabindex=1")
-            #upload(2)
-        #end
-    </p>
-
-
-
+    <div id="detail-pane" style="min-height: 100%"></div>
 </body>
 </html>

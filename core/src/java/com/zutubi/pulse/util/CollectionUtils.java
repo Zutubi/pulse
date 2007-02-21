@@ -1,5 +1,8 @@
 package com.zutubi.pulse.util;
 
+import com.zutubi.pulse.plugins.PluginImpl;
+import com.zutubi.pulse.plugins.Plugin;
+
 import java.util.*;
 
 /**
@@ -24,6 +27,24 @@ public class CollectionUtils
         }
     }
 
+    public static <T> List<T> filter(T[] l, Predicate<T> p)
+    {
+        List<T> result = new LinkedList<T>();
+        filter(l, p, result);
+        return result;
+    }
+
+    public static <T> void filter(T[] in, Predicate<T> p, Collection<T> out)
+    {
+        for(T t: in)
+        {
+            if(p.satisfied(t))
+            {
+                out.add(t);
+            }
+        }
+    }
+
     public static <T, U> List<U> map(List<T> l, Mapping<T, U> m)
     {
         List<U> result = new LinkedList<U>();
@@ -37,6 +58,32 @@ public class CollectionUtils
         {
             out.add(m.map(t));
         }
+    }
+
+    public static <T, U> List<U> map(T[] in, Mapping<T, U> m)
+    {
+        List<U> result = new LinkedList<U>();
+        map(in, m, result);
+        return result;
+    }
+
+    public static <T, U> void map(T[] in, Mapping<T, U> m, Collection<U> out)
+    {
+        for(T t: in)
+        {
+            out.add(m.map(t));
+        }
+    }
+
+    public static <T, U> U[] mapToArray(Iterable<T> iterable, Mapping<T, U> m, U[] out)
+    {
+        int i = 0;
+        for(T t: iterable)
+        {
+            out[i++] = m.map(t);
+        }
+
+        return out;
     }
 
     public static <K, T, U> Map<K, U> map(Map<K, T> in, Mapping<T, U> m)
@@ -83,5 +130,16 @@ public class CollectionUtils
         }
 
         return false;
+    }
+
+    public static <T> Mapping<? extends T, T> identityMapping()
+    {
+        return new Mapping<T, T>()
+        {
+            public T map(T t)
+            {
+                return t;
+            }
+        };
     }
 }

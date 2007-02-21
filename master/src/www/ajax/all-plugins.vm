@@ -1,0 +1,36 @@
+<table style="width: 100%">
+    <tr>
+        #contentHeading("name" 1)
+        #contentHeading("id" 1)
+        #contentHeading("state" 1)
+        #contentHeading("actions" 3)
+    </tr>
+#foreach($plugin in $plugins)
+    <tr>
+        <td class="content">
+            #pluginLink($plugin)
+        </td>
+        #contentCell($plugin.id)
+        <td class="content">
+            #pluginStateImage($plugin) $plugin.state.toString().toLowerCase()
+        </td>
+        <td class="content">
+    #if($plugin.canDisable())
+            #pluginDisable($plugin)
+    #elseif($plugin.canEnable())
+            #pluginEnable($plugin)
+    #else
+            &nbsp;
+    #end
+        </td>
+        <td class="content">
+    #if ($plugin.canUninstall())
+            #pluginUninstall($plugin)
+    #else
+            &nbsp;
+    #end
+        </td>
+    </tr>
+#end
+    #addRow("plugin.add" 6 "installPlugin!input.action" "plugin.add")
+</table>
