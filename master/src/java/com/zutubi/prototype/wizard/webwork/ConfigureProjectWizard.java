@@ -120,7 +120,7 @@ public class ConfigureProjectWizard implements Wizard
         {
             Project project = new Project();
             
-            project.setName("test");
+            project.setName("test" + System.currentTimeMillis());
             project.setDescription("description");
             
             projectManager.create(project);

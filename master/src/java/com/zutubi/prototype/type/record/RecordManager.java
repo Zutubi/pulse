@@ -25,19 +25,28 @@ public class RecordManager
      */
     public Record load(String path)
     {
-        Record record = baseRecord;
-        StringTokenizer tokens = new StringTokenizer(path, PATH_SEPARATOR, false);
-        while (tokens.hasMoreTokens())
+        try
         {
-            String pathElement = tokens.nextToken();
-            Object data = record.get(pathElement);
-            if (data == null || !(data instanceof Record))
+            Record record = baseRecord;
+            StringTokenizer tokens = new StringTokenizer(path, PATH_SEPARATOR, false);
+            while (tokens.hasMoreTokens())
             {
-                return null;
+                String pathElement = tokens.nextToken();
+                Object data = record.get(pathElement);
+                if (data == null || !(data instanceof Record))
+                {
+                    return null;
+                }
+                record = (Record) record.get(pathElement);
             }
-            record = (Record) record.get(pathElement);
+            return record.clone();
         }
-        return record;
+        catch (CloneNotSupportedException e)
+        {
+            // should not happen, record implements cloneable.
+            e.printStackTrace();
+            return null;
+        }
     }
 
     public boolean containsRecord(String path)
@@ -126,5 +135,29 @@ public class RecordManager
             }
         }
         return null;
+    }
+
+    /**
+     * Copy the record contents from the source path to the destination path
+     * 
+     * @param sourcePath
+     * @param destinationPath
+     */
+    public void copy(String sourcePath, String destinationPath)
+    {
+        try
+        {
+            Record record = load(sourcePath);
+            if (record != null)
+            {
+                Record copy = record.clone();
+                store(destinationPath, copy);
+            }
+        }
+        catch (CloneNotSupportedException e)
+        {
+            // Will not happen since record is cloneable.
+            e.printStackTrace();
+        }
     }
 }

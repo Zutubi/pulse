@@ -1,6 +1,8 @@
 package com.zutubi.prototype.type;
 
 import com.zutubi.prototype.type.record.Record;
+import com.zutubi.pulse.util.CollectionUtils;
+import com.zutubi.pulse.util.Mapping;
 
 import java.lang.reflect.Method;
 import java.util.Collections;
@@ -75,6 +77,22 @@ public class CompositeType extends AbstractType implements Traversable, Type
             return properties;
         }
         return Collections.EMPTY_LIST;
+    }
+
+    public List<String> getPropertyNames(Class<? extends Type> type)
+    {
+        return CollectionUtils.map(getProperties(type), new Mapping<TypeProperty, String>()
+        {
+            public String map(TypeProperty property)
+            {
+                return property.getName();
+            }
+        });
+    }
+
+    public List<String> getPropertyNames()
+    {
+        return Collections.unmodifiableList(new LinkedList<String>(properties.keySet()));
     }
 
     public boolean hasProperty(String propertyName)
@@ -178,8 +196,11 @@ public class CompositeType extends AbstractType implements Traversable, Type
                 }
                 
                 Type type = entry.getValue().getType();
-                Method setter = properties.get(name).getSetter();
-                setter.invoke(target, type.instantiate(source.get(name)));
+                if (type.hasProperty(name))
+                {
+                    Method setter = properties.get(name).getSetter();
+                    setter.invoke(target, type.instantiate(source.get(name)));
+                }
             }
         }
         catch (Exception e)

@@ -9,7 +9,7 @@ import java.util.Collection;
  * Simple record that holds key:value data, along with meta data.
  *
  */
-public class Record implements Map<String, Object>
+public class Record implements Map<String, Object>, Cloneable
 {
     private Map<String, String> meta = new HashMap<String, String>();
     
@@ -103,5 +103,35 @@ public class Record implements Map<String, Object>
     public Set<Entry<String, Object>> entrySet()
     {
         return data.entrySet();
+    }
+
+    public Record clone() throws CloneNotSupportedException
+    {
+        super.clone();
+
+        Record clone = new Record();
+
+        for (Map.Entry<String, String> entry : meta.entrySet())
+        {
+            String key = new String(entry.getKey());
+            String value = new String(entry.getValue());
+            clone.putMeta(key, value);
+        }
+
+        for (Map.Entry<String, Object> entry : data.entrySet())
+        {
+            String key = new String(entry.getKey());
+            Object value = entry.getValue();
+            if (value instanceof String)
+            {
+                value = new String((String)value);
+            }
+            else if (value instanceof Record)
+            {
+                value = ((Record)value).clone();
+            }
+            clone.put(key, value);
+        }
+        return clone;
     }
 }

@@ -90,4 +90,55 @@ public class RecordManagerTest extends TestCase
         assertNotNull(recordManager.load("another"));
         assertNotNull(recordManager.load("another/"));
     }
+
+    public void testCopy()
+    {
+        Record original = new Record();
+        original.put("key", "value");
+
+        recordManager.store("sourcePath", original);
+        assertNull(recordManager.load("destinationPath"));
+        recordManager.copy("sourcePath", "destinationPath");
+
+        Record copy = recordManager.load("destinationPath");
+        assertNotNull(copy);
+        assertEquals(original.get("key"), copy.get("key"));
+
+        // ensure that changing the original does not change the copy
+        original.put("anotherKey", "anotherValue");
+        recordManager.store("sourcePath", original);
+
+        copy = recordManager.load("destinationPath");
+        assertFalse(copy.containsKey("anotherKey"));
+    }
+
+    public void testCopyOnStore()
+    {
+        Record original = new Record();
+        original.put("key", "value");
+
+        recordManager.store("path", original);
+
+        // update the external record.
+        original.put("key", "changedValue");
+
+        Record storedRecord = recordManager.load("path");
+        assertEquals("value", storedRecord.get("key"));
+    }
+
+    public void testCopyOnLoad()
+    {
+        Record original = new Record();
+        original.put("key", "value");
+
+        recordManager.store("path", original);
+
+        Record storedRecord = recordManager.load("path");
+
+        // now check the returned record.
+        storedRecord.put("key", "newValue");
+
+        Record anotherStoredRecord = recordManager.load("path");
+        assertEquals("value", anotherStoredRecord.get("key"));
+    }
 }
