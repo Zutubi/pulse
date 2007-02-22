@@ -48,11 +48,6 @@ public class TypeRegistry
         builtInTypes.add(new PrimitiveType(Short.TYPE, "short"));
         builtInTypes.add(new PrimitiveType(String.class, "String"));
 
-/*
-        builtInTypes.add(new MapType(HashMap.class, "mapType"));
-        builtInTypes.add(new ListType(LinkedList.class, "listType"));
-*/
-
         for (Type type : builtInTypes)
         {
             classMapping.put(type.getClazz(), type);
@@ -61,12 +56,12 @@ public class TypeRegistry
         }
     }
 
-    public CompositeType register(Class clazz) throws TypeException
+    public Type register(Class clazz) throws TypeException
     {
         return register(null, clazz);
     }
 
-    public CompositeType register(String symbolicName, Class clazz) throws TypeException
+    public Type register(String symbolicName, Class clazz) throws TypeException
     {
         if (symbolicName != null && symbolicNameMapping.containsKey(symbolicName))
         {
@@ -88,10 +83,10 @@ public class TypeRegistry
             symbolicNameMapping.put(symbolicName, type);
         }
 
-        return (CompositeType) type;
+        return type;
     }
 
-    public CompositeType register(String symbolicName, CompositeType type) throws TypeException
+    public Type register(String symbolicName, Type type) throws TypeException
     {
         if (symbolicNameMapping.containsKey(symbolicName))
         {

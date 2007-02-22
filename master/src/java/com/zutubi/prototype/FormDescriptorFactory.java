@@ -2,19 +2,20 @@ package com.zutubi.prototype;
 
 import com.zutubi.prototype.annotation.AnnotationHandler;
 import com.zutubi.prototype.annotation.Handler;
+import com.zutubi.prototype.type.CompositeType;
+import com.zutubi.prototype.type.ListType;
 import com.zutubi.prototype.type.PrimitiveType;
 import com.zutubi.prototype.type.Type;
+import com.zutubi.prototype.type.TypeProperty;
 import com.zutubi.prototype.type.TypeRegistry;
-import com.zutubi.prototype.type.ListType;
-import com.zutubi.prototype.type.CompositeType;
 import com.zutubi.pulse.util.logging.Logger;
 
 import java.lang.annotation.Annotation;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.HashMap;
 
 /**
  *
@@ -57,20 +58,18 @@ public class FormDescriptorFactory
             throw new IllegalArgumentException("Can not create a form for a non-composite type.");
         }
 
-        CompositeType ctype = (CompositeType) type;
-
         FormDescriptor descriptor = new FormDescriptor();
-        descriptor.setType(ctype);
+        descriptor.setType(type);
 
         List<Annotation> annotations = type.getAnnotations();
         handleAnnotations(descriptor, annotations);
 
-        descriptor.setFieldDescriptors(buildFieldDescriptors(ctype));
+        descriptor.setFieldDescriptors(buildFieldDescriptors(type));
 
         return descriptor;
     }
 
-    private List<FieldDescriptor> buildFieldDescriptors(CompositeType type)
+    private List<FieldDescriptor> buildFieldDescriptors(Type type)
     {
         List<FieldDescriptor> fieldDescriptors = new LinkedList<FieldDescriptor>();
 
@@ -81,11 +80,11 @@ public class FormDescriptorFactory
         fieldDescriptors.add(hiddenFieldDescriptor);
         
         // Handle the first pass analysis.  Here, all of the fields are considered on an individual basis.
-        for (String propertyName : type.getProperties(PrimitiveType.class))
+        for (TypeProperty property : type.getProperties(PrimitiveType.class))
         {
-            Type propertyType = type.getProperty(propertyName).getType();
+            Type propertyType = property.getType();
             FieldDescriptor fd = new FieldDescriptor();
-            fd.setName(propertyName);
+            fd.setName(property.getName());
 
             // some little bit of magic, take a guess at any property called password. If we come up with any
             // other magical cases, then we can refactor this a bit.
@@ -98,7 +97,7 @@ public class FormDescriptorFactory
                 fd.addParameter("type", defaultFieldTypeMapping.get(propertyType.getClazz()));
             }
 
-            handleAnnotations(fd, type.getProperty(propertyName).getAnnotations());
+            handleAnnotations(fd, property.getAnnotations());
 
             fieldDescriptors.add(fd);
         }
@@ -106,7 +105,7 @@ public class FormDescriptorFactory
         for (FieldDescriptor fd : fieldDescriptors)
         {
             String propertyName = fd.getName();
-            if (type.hasProperty(propertyName + "Options"))
+            if (type.getProperty(propertyName + "Options") != null)
             {
                 Type optionsProperty = type.getProperty(propertyName + "Options").getType();
                 if (optionsProperty instanceof ListType)

@@ -92,7 +92,7 @@ public class ExtendedTypeWizard implements Wizard
                 String currentSymbolicName = selectState.getSelection();
                 if (!stateCache.containsKey(currentSymbolicName))
                 {
-                    CompositeType type = (CompositeType) typeRegistry.getType(currentSymbolicName);
+                    Type type = typeRegistry.getType(currentSymbolicName);
                     Object state = type.getClazz().newInstance();
                     stateCache.put(currentSymbolicName, new ConfigurationState(state));
                 }

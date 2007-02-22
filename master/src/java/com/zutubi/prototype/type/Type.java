@@ -52,4 +52,16 @@ public interface Type
     Object unstantiate(Object instance) throws TypeException;
 
     String getSymbolicName();
+
+    List<TypeProperty> getProperties();
+
+    List<String> getPropertyNames();
+
+    TypeProperty getProperty(String name);
+
+    List<TypeProperty> getProperties(Class<? extends Type> type);
+
+    List<String> getPropertyNames(Class<? extends Type> type);
+
+    boolean hasProperty(String propertyName);
 }

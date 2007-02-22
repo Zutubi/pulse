@@ -36,12 +36,11 @@ public class TypeRegistryTest extends TestCase
 
         assertTrue(type instanceof CompositeType);
 
-        CompositeType compositeType = (CompositeType) type;
-        assertTrue(compositeType.hasProperty("name"));
-        assertTrue(compositeType.hasProperty("names"));
-        assertTrue(compositeType.hasProperty("mock"));
-        assertTrue(compositeType.hasProperty("mocks"));
-        assertTrue(compositeType.hasProperty("anotherMock"));
+        assertTrue(type.hasProperty("name"));
+        assertTrue(type.hasProperty("names"));
+        assertTrue(type.hasProperty("mock"));
+        assertTrue(type.hasProperty("mocks"));
+        assertTrue(type.hasProperty("anotherMock"));
     }
 
     public void testSimpleInterfaceHolder() throws TypeException
@@ -50,14 +49,13 @@ public class TypeRegistryTest extends TestCase
 
         assertTrue(type instanceof CompositeType);
 
-        CompositeType compositeType = (CompositeType) type;
-        assertTrue(compositeType.hasProperty("simpleInterface"));
-        assertEquals(1, compositeType.getProperties().size());
+        assertTrue(type.hasProperty("simpleInterface"));
+        assertEquals(1, type.getProperties().size());
     }
 
     public void testAnnotations() throws TypeException
     {
-        CompositeType type = typeRegistry.register("mockName", Mock.class);
+        Type type = typeRegistry.register("mockName", Mock.class);
         assertEquals(1, type.getAnnotations().size());
         TypeProperty propertyType = type.getProperty("name");
         assertEquals(1, propertyType.getAnnotations().size());
@@ -69,21 +67,21 @@ public class TypeRegistryTest extends TestCase
 
     public void testPropertyTypes() throws TypeException
     {
-        CompositeType type = typeRegistry.register("mockName", Mock.class);
+        Type type = typeRegistry.register("mockName", Mock.class);
 
-        List<String> mapProperties = type.getProperties(MapType.class);
+        List<String> mapProperties = type.getPropertyNames(MapType.class);
         assertEquals(1, mapProperties.size());
         assertEquals("mocks", mapProperties.get(0));
 
-        List<String> listProperties = type.getProperties(ListType.class);
+        List<String> listProperties = type.getPropertyNames(ListType.class);
         assertEquals(1, listProperties.size());
         assertEquals("names", listProperties.get(0));
 
-        List<String> simpleProperties = type.getProperties(PrimitiveType.class);
+        List<String> simpleProperties = type.getPropertyNames(PrimitiveType.class);
         assertEquals(1, simpleProperties.size());
         assertEquals("name", simpleProperties.get(0));
 
-        List<String> nestedProperties = type.getProperties(CompositeType.class);
+        List<String> nestedProperties = type.getPropertyNames(CompositeType.class);
         assertEquals(2, nestedProperties.size());
         assertTrue(nestedProperties.contains("mock"));
         assertTrue(nestedProperties.contains("anotherMock"));
@@ -117,8 +115,6 @@ public class TypeRegistryTest extends TestCase
         {
         }
     }
-
-
 
     @SymbolicName("mockName")
     public static class Mock

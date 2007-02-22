@@ -16,19 +16,18 @@ public class TypeConversionSupport
 
     public void applyToMap(Object instance, Map<String, Object> map) throws TypeException
     {
-        CompositeType type = (CompositeType) typeRegistry.getType(instance.getClass());
+        Type type = typeRegistry.getType(instance.getClass());
         if (type == null)
         {
             type = typeRegistry.register(instance.getClass());
         }
-        for (String propertyName : type.getProperties(PrimitiveType.class))
+        for (TypeProperty property : type.getProperties(PrimitiveType.class))
         {
             try
             {
-                TypeProperty property = type.getProperty(propertyName);
                 TypeSqueezer squeezer = Squeezers.findSqueezer(property.getClazz());
                 Object value = property.getGetter().invoke(instance);
-                map.put(propertyName, squeezer.squeeze(value));
+                map.put(property.getName(), squeezer.squeeze(value));
             }
             catch (Exception e)
             {
@@ -39,13 +38,14 @@ public class TypeConversionSupport
 
     public void applyMapTo(Map<String, Object> map, Object instance) throws TypeException
     {
-        CompositeType type = (CompositeType) typeRegistry.getType(instance.getClass());
+        Type type = typeRegistry.getType(instance.getClass());
         if (type == null)
         {
             type = typeRegistry.register(instance.getClass());
         }
-        for (String propertyName : type.getProperties(PrimitiveType.class))
+        for (TypeProperty property : type.getProperties(PrimitiveType.class))
         {
+            String propertyName = property.getName();
             if (!map.containsKey(propertyName))
             {
                 continue;
@@ -53,8 +53,6 @@ public class TypeConversionSupport
             try
             {
                 Object value = map.get(propertyName);
-
-                TypeProperty property = type.getProperty(propertyName);
                 TypeSqueezer squeezer = Squeezers.findSqueezer(property.getClazz());
 
                 if (value instanceof String)

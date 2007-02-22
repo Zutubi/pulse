@@ -2,7 +2,7 @@ package com.zutubi.prototype;
 
 import com.zutubi.prototype.model.Field;
 import com.zutubi.prototype.model.Form;
-import com.zutubi.prototype.type.CompositeType;
+import com.zutubi.prototype.type.Type;
 import com.zutubi.pulse.util.CollectionUtils;
 import com.zutubi.pulse.util.Predicate;
 
@@ -20,11 +20,11 @@ public class FormDescriptor implements Descriptor
 {
     private List<FieldDescriptor> fieldDescriptors = new LinkedList<FieldDescriptor>();
 
-    private CompositeType type;
+    private Type type;
 
     private Map<String, Object> parameters = new HashMap<String, Object>();
 
-    public void setType(CompositeType type)
+    public void setType(Type type)
     {
         this.type = type;
     }

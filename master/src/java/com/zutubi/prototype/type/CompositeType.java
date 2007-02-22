@@ -44,9 +44,9 @@ public class CompositeType extends AbstractType implements Traversable, Type
 
     }
 
-    public List<String> getProperties()
+    public List<TypeProperty> getProperties()
     {
-        return Collections.unmodifiableList(new LinkedList<String>(properties.keySet()));
+        return Collections.unmodifiableList(new LinkedList<TypeProperty>(properties.values()));
     }
 
     public TypeProperty getProperty(String propertyName)
@@ -62,12 +62,17 @@ public class CompositeType extends AbstractType implements Traversable, Type
      * @return a list of property names, or an empty list if no properties of the requested type can
      * be located.
      */
-    public List<String> getProperties(Class<? extends Type> type)
+    public List<TypeProperty> getProperties(Class<? extends Type> type)
     {
         List<String> list = propertiesByClass.get(type);
         if (list != null)
         {
-            return Collections.unmodifiableList(list);
+            List<TypeProperty> properties = new LinkedList<TypeProperty>();
+            for (String propertyName : list)
+            {
+                properties.add(getProperty(propertyName));
+            }
+            return properties;
         }
         return Collections.EMPTY_LIST;
     }

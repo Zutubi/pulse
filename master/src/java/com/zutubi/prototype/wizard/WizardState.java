@@ -1,8 +1,6 @@
 package com.zutubi.prototype.wizard;
 
 import com.zutubi.prototype.model.Form;
-import com.zutubi.prototype.type.Type;
-import com.zutubi.prototype.type.CompositeType;
 
 /**
  *

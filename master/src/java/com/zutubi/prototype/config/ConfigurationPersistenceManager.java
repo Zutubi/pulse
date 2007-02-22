@@ -50,9 +50,9 @@ public class ConfigurationPersistenceManager
      *
      * @return the type definition, or null if none exists.
      */
-    public Object getType(String path)
+    public Type getType(String path)
     {
-        Object type = getTypeByRecord(path);
+        Type type = getTypeByRecord(path);
         if (type == null)
         {
             type = getTypeByConfig(path);
@@ -61,7 +61,7 @@ public class ConfigurationPersistenceManager
         return type;
     }
 
-    protected Object getTypeByConfig(String path)
+    protected Type getTypeByConfig(String path)
     {
         Type type = null;
         StringTokenizer tokens = new StringTokenizer(path, "/", false);
@@ -92,7 +92,7 @@ public class ConfigurationPersistenceManager
         return type;
     }
 
-    protected Object getTypeByRecord(String fullPath)
+    protected Type getTypeByRecord(String fullPath)
     {
         // a) locate the longest path segment with a record and an associated type.
         String path = fullPath;
@@ -133,7 +133,7 @@ public class ConfigurationPersistenceManager
     public List<String> getListing(String path)
     {
         LinkedList<String> list = new LinkedList<String>();
-        Object type = getType(path);
+        Type type = getType(path);
         if (type instanceof CollectionType)
         {
             // load the record
@@ -145,10 +145,9 @@ public class ConfigurationPersistenceManager
         }
         else if (type instanceof CompositeType)
         {
-            CompositeType ctype = (CompositeType) type;
-            list.addAll(ctype.getProperties(CompositeType.class));
-            list.addAll(ctype.getProperties(MapType.class));
-            list.addAll(ctype.getProperties(ListType.class));
+            list.addAll(type.getPropertyNames(CompositeType.class));
+            list.addAll(type.getPropertyNames(MapType.class));
+            list.addAll(type.getPropertyNames(ListType.class));
             return list;
         }
         return list;
@@ -249,16 +248,11 @@ public class ConfigurationPersistenceManager
     public TypeProperty getKeyProperty(Object obj)
     {
         Type type = typeRegistry.getType(obj.getClass());
-        if (type instanceof CompositeType)
+        for (TypeProperty property : type.getProperties(PrimitiveType.class))
         {
-            CompositeType ctype = (CompositeType) type;
-            for (String propertyName : ctype.getProperties(PrimitiveType.class))
+            if (property.getAnnotation(ID.class) != null)
             {
-                TypeProperty property = ctype.getProperty(propertyName);
-                if (property.getAnnotation(ID.class) != null)
-                {
-                    return property;
-                }
+                return property;
             }
         }
         return null;
@@ -275,8 +269,7 @@ public class ConfigurationPersistenceManager
 
     private Type getProperty(Type type, String path)
     {
-        CompositeType ctype = (CompositeType) type;
-        TypeProperty property = ctype.getProperty(path);
+        TypeProperty property = type.getProperty(path);
         if (property != null)
         {
             return property.getType();

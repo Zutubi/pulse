@@ -104,27 +104,25 @@ public class Configuration
 
         targetSymbolicName = targetType.getSymbolicName();
         
+        for (String propertyName : targetType.getPropertyNames(PrimitiveType.class))
+        {
+            simpleProperties.add(propertyName);
+        }
+        for (String propertyName : targetType.getPropertyNames(CompositeType.class))
+        {
+            nestedProperties.add(propertyName);
+        }
+        for (String propertyName : targetType.getPropertyNames(ListType.class))
+        {
+            listProperties.add(propertyName);
+        }
+        for (String propertyName : targetType.getPropertyNames(MapType.class))
+        {
+            mapProperties.add(propertyName);
+        }
         if (targetType instanceof CompositeType)
         {
-            CompositeType compositeType = (CompositeType) targetType;
-
-            for (String propertyName : compositeType.getProperties(PrimitiveType.class))
-            {
-                simpleProperties.add(propertyName);
-            }
-            for (String propertyName : compositeType.getProperties(CompositeType.class))
-            {
-                nestedProperties.add(propertyName);
-            }
-            for (String propertyName : compositeType.getProperties(ListType.class))
-            {
-                listProperties.add(propertyName);
-            }
-            for (String propertyName : compositeType.getProperties(MapType.class))
-            {
-                mapProperties.add(propertyName);
-            }
-            extensions.addAll(compositeType.getExtensions());
+            extensions.addAll(((CompositeType)targetType).getExtensions());
         }
     }
 
