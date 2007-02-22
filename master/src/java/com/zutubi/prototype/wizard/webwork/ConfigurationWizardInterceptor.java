@@ -65,7 +65,7 @@ public class ConfigurationWizardInterceptor implements Interceptor
                 {
                     String[] actualStates = (String[]) parameters.get("state");
                     String actualState = (actualStates.length > 0) ? actualStates[0] : null;
-                    String expectedState = wizardAction.getState().name();
+                    String expectedState = wizardAction.getState().getName();
                     if (!expectedState.equals(actualState))
                     {
                         String previousExpected = null;
@@ -79,7 +79,7 @@ public class ConfigurationWizardInterceptor implements Interceptor
                                 break;
                             }
                             wizard.doPrevious();
-                            expectedState = wizard.getCurrentState().name();
+                            expectedState = wizard.getCurrentState().getName();
                             previousExpected = expectedState;
                         }
                     }

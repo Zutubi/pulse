@@ -2,6 +2,7 @@ package com.zutubi.prototype.type;
 
 import com.zutubi.pulse.form.squeezer.Squeezers;
 import com.zutubi.pulse.form.squeezer.TypeSqueezer;
+import com.opensymphony.util.TextUtils;
 
 import java.util.Map;
 

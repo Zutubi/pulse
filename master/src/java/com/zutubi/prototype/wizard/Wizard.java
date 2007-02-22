@@ -9,6 +9,12 @@ import java.util.List;
 public interface Wizard
 {
     /**
+     * Initialise this wizard. This will be called sometime after the wizard is instantiated
+     * but before traverse is requested.
+     */
+    void initialise();
+
+    /**
      * Retrieve the current state of the wizard.
      *
      * @return the current wizard state.
@@ -23,12 +29,6 @@ public interface Wizard
      * @return a list of wizard actions.
      */
     List<WizardTransition> getAvailableActions();
-
-    /**
-     * The process method is called when the wizard is complete and no more data / input
-     * is required. This method is called iff the wizard is completed successfully.
-     */
-    void doFinish();
 
     /**
      * Request that the wizard move to the next state, as determined by the current
@@ -46,16 +46,16 @@ public interface Wizard
     WizardState doPrevious();
 
     /**
+     * The process method is called when the wizard is complete and no more data / input
+     * is required. This method is called iff the wizard is completed successfully.
+     */
+    void doFinish();
+
+    /**
      * Notify the wizard that it has been cancelled.
      *
      */
     void doCancel();
-
-    /**
-     * Initialise this wizard. This will be called sometime after the wizard is instantiated
-     * but before traverse is requested.
-     */
-    void initialise();
 
     /**
      * Restart this wizard.

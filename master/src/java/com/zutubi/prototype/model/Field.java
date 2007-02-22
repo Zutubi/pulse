@@ -13,6 +13,19 @@ public class Field
 
     private Map<String, Object> parameters = new HashMap<String, Object>();
 
+    public Field()
+    {
+
+    }
+    
+    public Field(String name, String label, String type, Object value)
+    {
+        addParameter("name", name);
+        addParameter("label", label);
+        addParameter("type", type);
+        addParameter("value", value);
+    }
+
     public int getTabindex()
     {
         return tabindex;

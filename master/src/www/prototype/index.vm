@@ -7,5 +7,9 @@
     <a href="configuration.action?path=/project/1">project 1 summary</a>
 </p>
 
+<p>
+    <a href="wizard.action?path=project">new project wizard</a>
+</p>
+
 </body>
 </html>

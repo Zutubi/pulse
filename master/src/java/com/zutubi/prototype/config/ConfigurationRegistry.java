@@ -3,8 +3,6 @@ package com.zutubi.prototype.config;
 import com.zutubi.prototype.type.CompositeType;
 import com.zutubi.prototype.type.ListType;
 import com.zutubi.prototype.type.MapType;
-import com.zutubi.prototype.type.Traversable;
-import com.zutubi.prototype.type.Type;
 import com.zutubi.prototype.type.TypeException;
 import com.zutubi.prototype.type.TypeProperty;
 import com.zutubi.prototype.type.TypeRegistry;
@@ -14,10 +12,6 @@ import com.zutubi.pulse.model.Project;
 import com.zutubi.pulse.prototype.config.*;
 
 import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.StringTokenizer;
 
 /**
  *
@@ -28,8 +22,6 @@ public class ConfigurationRegistry
     private TypeRegistry typeRegistry;
     private RecordManager recordManager;
     private ConfigurationPersistenceManager configurationPersistenceManager;
-
-    private Map<String, Traversable> scopes = new HashMap<String, Traversable>();
 
     public void init() throws TypeException
     {
@@ -43,6 +35,13 @@ public class ConfigurationRegistry
         scmConfig.addExtension("svnConfig");
         scmConfig.addExtension("cvsConfig");
         scmConfig.addExtension("perforceConfig");
+
+        CompositeType typeConfig = typeRegistry.register("typeConfig", ProjectTypeConfiguration.class);
+        typeRegistry.register("antConfig", AntTypeConfiguration.class);
+        typeRegistry.register("mavenConfig", MavenTypeConfiguration.class);
+
+        typeConfig.addExtension("antConfig");
+        typeConfig.addExtension("mavenConfig");
 
         // general project configuration
         typeRegistry.register("generalConfig", GeneralConfiguration.class);
@@ -77,6 +76,7 @@ public class ConfigurationRegistry
         // generated dynamically as new components are registered.
         CompositeType projectConfig = new CompositeType(Project.class, "projectConfig");
         projectConfig.addProperty(new TypeProperty("scm", typeRegistry.getType("scmConfig")));
+        projectConfig.addProperty(new TypeProperty("type", typeRegistry.getType("typeConfig")));
         projectConfig.addProperty(new TypeProperty("general", typeRegistry.getType("generalConfig")));
         projectConfig.addProperty(new TypeProperty("cleanup", typeRegistry.getType("cleanupRuleConfig")));
         projectConfig.addProperty(new TypeProperty("changeViewer", typeRegistry.getType("changeViewerConfig")));
@@ -99,41 +99,6 @@ public class ConfigurationRegistry
         typeRegistry.register("projectConfig", projectConfig);
 
         configurationPersistenceManager.register("project", projectCollection);
-        Record project = new Record();
-        project.setSymbolicName("projectConfig");
-        recordManager.store("project", project);
-
-        scopes.put("project", projectCollection);
-    }
-
-    public String getSymbolicName(String path)
-    {
-        Type type = getType(path);
-        if (type != null && type instanceof CompositeType)
-        {
-            return type.getSymbolicName();
-        }
-        return null;
-    }
-
-    public Type getType(String path)
-    {
-        List<String> pathElements = new LinkedList<String>();
-        StringTokenizer tokens = new StringTokenizer(path, "/", false);
-        while (tokens.hasMoreTokens())
-        {
-            pathElements.add(tokens.nextToken());
-        }
-
-        if (pathElements.size() == 0)
-        {
-            return null;
-        }
-        
-        String scope = pathElements.get(0);
-        Traversable traversableType = scopes.get(scope);
-
-        return traversableType.getType(pathElements.subList(1, pathElements.size()));
     }
 
     public void setTypeRegistry(TypeRegistry typeRegistry)

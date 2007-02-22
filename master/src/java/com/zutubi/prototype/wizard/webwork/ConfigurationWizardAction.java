@@ -32,9 +32,8 @@ public class ConfigurationWizardAction extends ActionSupport
      * The path to the configuration type that defines this wizard.
      */
     private String path;
-    private boolean wizardRequiresLazyInitialisation = false;
 
-//    private boolean wizardRequiresLazyInitialisation = true;
+    private boolean wizardRequiresLazyInitialisation = false;
 
     /**
      * Setter for the configuration path.
@@ -379,7 +378,16 @@ public class ConfigurationWizardAction extends ActionSupport
 
     protected Wizard doCreateWizard()
     {
-        Wizard wizardInstance = new ExtendedTypeWizard(path);
+        Wizard wizardInstance;
+        if (path.equals("project"))
+        {
+            wizardInstance = new ConfigureProjectWizard();
+        }
+        else
+        {
+            wizardInstance = new ExtendedTypeWizard(path);
+        }
+
         ComponentContext.autowire(wizardInstance);
         wizardRequiresLazyInitialisation = true;        
         return wizardInstance;

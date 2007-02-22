@@ -1,7 +1,5 @@
 package com.zutubi.prototype.wizard.webwork;
 
-import com.zutubi.prototype.FormDescriptor;
-import com.zutubi.prototype.FormDescriptorFactory;
 import com.zutubi.prototype.config.ConfigurationPersistenceManager;
 import com.zutubi.prototype.model.Field;
 import com.zutubi.prototype.model.Form;
@@ -13,13 +11,16 @@ import com.zutubi.prototype.type.CollectionType;
 import com.zutubi.prototype.wizard.Wizard;
 import com.zutubi.prototype.wizard.WizardState;
 import com.zutubi.prototype.wizard.WizardTransition;
+import static com.zutubi.prototype.wizard.WizardTransition.*;
+import com.zutubi.prototype.FormDescriptorFactory;
+import com.zutubi.prototype.FormDescriptor;
 import com.zutubi.pulse.core.PulseRuntimeException;
 
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.LinkedList;
 
 /**
  * An implementation of the wizard interface that generates a simple 2 step wizard for types that have
@@ -64,9 +65,9 @@ public class ExtendedTypeWizard implements Wizard
     {
         if (currentState == selectState)
         {
-            return Arrays.asList(WizardTransition.NEXT, WizardTransition.CANCEL);
+            return Arrays.asList(NEXT, CANCEL);
         }
-        return Arrays.asList(WizardTransition.PREVIOUS, WizardTransition.FINISH, WizardTransition.CANCEL);
+        return Arrays.asList(PREVIOUS, FINISH, CANCEL);
     }
 
     public void doFinish()
@@ -200,7 +201,7 @@ public class ExtendedTypeWizard implements Wizard
             return this;
         }
 
-        public String name()
+        public String getName()
         {
             return getClass().getName();
         }
@@ -209,22 +210,15 @@ public class ExtendedTypeWizard implements Wizard
         {
             Form form = new Form();
             form.setId(getClass().getName());
-            Field field = new Field();
-            field.addParameter("name", "selection");
-            field.addParameter("type", "select");
-            field.addParameter("label", "selection");
-            field.addParameter("list", options);
-            if (selection != null)
-            {
-                field.addParameter("value", selection);
-            }
-            field.setTabindex(1);
-            form.add(field);
-            field = new Field();
-            field.addParameter("name", "state");
-            field.addParameter("type", "hidden");
-            field.addParameter("value", name());
-            form.add(field);
+
+            Field selectField = new Field("selection", "selection", "select", selection);
+            selectField.addParameter("list", options);
+            selectField.setTabindex(1);
+            form.add(selectField);
+            
+            Field hiddenStateField = new Field("state", "state", "hidden", getName());
+            form.add(hiddenStateField);
+            
             form.setActions(Arrays.asList("next"));
             return form;
         }
@@ -251,7 +245,7 @@ public class ExtendedTypeWizard implements Wizard
             this.dataObject = obj;
         }
 
-        public String name()
+        public String getName()
         {
             return dataObject.getClass().getSimpleName();
         }
@@ -275,15 +269,15 @@ public class ExtendedTypeWizard implements Wizard
             List<String> actions = new LinkedList<String>();
             for (WizardTransition transition : getAvailableActions())
             {
-                actions.add(transition.name().toLowerCase());   
+                actions.add(transition.name().toLowerCase());
             }
 
             Field state = new Field();
             state.addParameter("name", "state");
             state.addParameter("type", "hidden");
-            state.addParameter("value", name());
+            state.addParameter("value", getName());
             form.add(state);
-            
+
             form.setActions(actions);
             return form;
         }
