@@ -208,6 +208,8 @@ public class DefaultUserManager implements UserManager
         }
         else
         {
+            // Reload the user so we get the lazy-loaded projects
+            user = userDao.findById(user.getId());
             projects.addAll(user.getShownProjects());
             for(ProjectGroup g: user.getShownGroups())
             {
