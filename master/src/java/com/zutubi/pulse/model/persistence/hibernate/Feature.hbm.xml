@@ -8,9 +8,9 @@
             <generator class="hilo"/>
         </id>
         
-        <discriminator column="FEATURE_TYPE" type="string" length="63"/>
+        <discriminator column="FEATURE_TYPE" type="string" length="255"/>
                 
-        <property name="levelName" column="LEVEL" type="string" length="63"/>
+        <property name="levelName" column="LEVEL" type="string" length="255"/>
         
         <property name="summary" column="SUMMARY" type="string" length="4095"/>
         

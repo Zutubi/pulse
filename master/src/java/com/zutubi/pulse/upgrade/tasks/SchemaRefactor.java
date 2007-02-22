@@ -18,6 +18,7 @@ import java.sql.SQLException;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Properties;
+import java.util.LinkedList;
 
 /**
  *
@@ -143,6 +144,33 @@ public class SchemaRefactor
         }
     }
 
+    /**
+     * When a schema change is made to a column, hibernates alter will not update the column. This method handles
+     * what hibernate avoids, by synchronizing the definition of the column in the database with the definition
+     * in the hibernate mapping. Tricky. 
+     *
+     * NOTE: The mapping definition should represent what you want to column to look like AFTER the refresh.  This is
+     * a little different from the other methods which need to know what the mappings are BEFORE the refactor.
+     *
+     * @param tableName
+     * @param columnName
+     * 
+     * @throws SQLException
+     */
+    public void refreshColumn(final String tableName, final String columnName) throws SQLException
+    {
+        executeWithConnection(new Callback()
+        {
+            public Object execute(Connection con) throws SQLException
+            {
+                Table table = getTable(tableName);
+                Column column = getColumn(table, columnName);
+                refreshColumn(con, table, column);
+                return null;
+            }
+        });
+    }
+
     public void renameColumn(final String tableName, final String fromColumnName, final String toColumnName) throws SQLException
     {
         executeWithConnection(new Callback()
@@ -166,7 +194,7 @@ public class SchemaRefactor
                 Table table = getTable(tableName);
                 Column column = getColumn(table, columnName);
                 dropColumnConstraints(con, table, column);
-                dropColumn(con, table, columnName);
+                sqlDropColumn(con, table, columnName);
                 return null;
             }
         });
@@ -222,15 +250,57 @@ public class SchemaRefactor
 
     private void renameColumn(Connection connection, Table table, Column fromColumn, String toColumnName) throws SQLException
     {
-        DatabaseMetadata meta = new DatabaseMetadata(connection, dialect);
-        TableMetadata tableInfo = meta.getTableMetadata(table.getName(), defaultSchema, defaultCatalog);
-
         // a) identify foreign key references.
-        ForeignKey columnKey = dropColumnConstraints(connection, table, fromColumn);
+        List<ForeignKey> droppedConstraints = dropColumnConstraints(connection, table, fromColumn);
 
         // update table model.
         String fromColumnName = fromColumn.getName();
         fromColumn.setName(toColumnName);
+
+        // add the new column to the table - synchronize the database with the updated schema.
+        updateTableSchema(table, connection);
+
+        // copy column data.
+        sqlCopyColumn(connection, table.getName(), toColumnName, fromColumnName);
+
+        // recreate the foreign key constraint if it exists.
+        recreatedDroppedConstraints(droppedConstraints, connection);
+
+        // d) drop the original column.
+        sqlDropColumn(connection, table, fromColumnName);
+    }
+
+    private void recreatedDroppedConstraints(List<ForeignKey> droppedConstraints, Connection connection)
+            throws SQLException
+    {
+        for (ForeignKey columnKey : droppedConstraints)
+        {
+            String sql = columnKey.sqlCreateString(dialect, config.getMapping(), defaultCatalog, defaultSchema);
+            LOG.info(sql);
+            JDBCUtils.execute(connection, sql);
+        }
+    }
+
+    private void sqlCopyColumn(Connection connection, String tableName, String toColumnName, String fromColumnName) throws SQLException
+    {
+        String sql = "update " + tableName + " set " + toColumnName + " = " + fromColumnName;
+        LOG.info(sql);
+        JDBCUtils.execute(connection, sql);
+    }
+
+    /**
+     * Executes a set of alter table statements to synchronize the underlying database table with the hibernate schema.
+     * NOTE: This will only add columns that do not already exist.
+     * 
+     * @param table
+     * @param connection
+     * 
+     * @throws SQLException
+     */
+    private void updateTableSchema(Table table, Connection connection) throws SQLException
+    {
+        DatabaseMetadata meta = new DatabaseMetadata(connection, dialect);
+        TableMetadata tableInfo = meta.getTableMetadata(table.getName(), defaultSchema, defaultCatalog);
 
         Iterator alterSqls = table.sqlAlterStrings(dialect, config.getMapping(), tableInfo, defaultCatalog, defaultSchema);
         while (alterSqls.hasNext())
@@ -239,43 +309,64 @@ public class SchemaRefactor
             LOG.info(sql);
             JDBCUtils.execute(connection, sql);
         }
-
-        // copy column data.
-        String sql = "update " + table.getName() + " set " + toColumnName + " = " + fromColumnName;
-        LOG.info(sql);
-        JDBCUtils.execute(connection, sql);
-
-        if (columnKey != null)
-        {
-            sql = columnKey.sqlCreateString(dialect, config.getMapping(), defaultCatalog, defaultSchema);
-            LOG.info(sql);
-            JDBCUtils.execute(connection, sql);
-        }
-
-        // d) drop the column.
-        dropColumn(connection, table, fromColumnName);
     }
 
-    private ForeignKey dropColumnConstraints(Connection connection, Table table, Column column) throws SQLException
+    private void refreshColumn(Connection connection, Table table, Column column) throws SQLException
     {
-        ForeignKey columnKey = null;
+        // create a temporary column. Make a temporary change to the in-memory schema to allow this.
+        String columnName = column.getName();
+        String tmpColumnName = "temporary_" + columnName;
+        try
+        {
+            column.setName(tmpColumnName);
+            updateTableSchema(table, connection);
+        }
+        finally
+        {
+            column.setName(columnName);            
+        }
+
+        // copy data to the temporary column.
+        sqlCopyColumn(connection, table.getName(), tmpColumnName, columnName);
+
+        // drop the existing column constraints.
+        List<ForeignKey> droppedConstraints = dropColumnConstraints(connection, table, column);
+
+        // drop original column.
+        sqlDropColumn(connection, table, columnName);
+
+        // recreate column - with the refreshed schema.
+        updateTableSchema(table, connection);
+        
+        // copy the data back to the refreshed column.
+        sqlCopyColumn(connection, table.getName(), columnName, tmpColumnName);
+
+        // re-enable the foreign key constraints.
+        recreatedDroppedConstraints(droppedConstraints, connection);
+
+        // drop the temporary column.
+        sqlDropColumn(connection, table, tmpColumnName);
+    }
+
+    private List<ForeignKey> dropColumnConstraints(Connection connection, Table table, Column column) throws SQLException
+    {
+        List<ForeignKey> droppedConstraints = new LinkedList<ForeignKey>();
         Iterator fks = table.getForeignKeyIterator();
         while (fks.hasNext())
         {
             ForeignKey fk = (ForeignKey) fks.next();
             if (fk.getColumns().contains(column))
             {
-                columnKey = fk;
                 String sql = fk.sqlDropString(dialect, defaultCatalog, defaultSchema);
                 LOG.info(sql);
                 JDBCUtils.execute(connection, sql);
+                droppedConstraints.add(fk);
             }
         }
-
-        return columnKey;
+        return droppedConstraints;
     }
 
-    private void dropColumn(Connection connection, Table table, String columnName) throws SQLException
+    private void sqlDropColumn(Connection connection, Table table, String columnName) throws SQLException
     {
         String sql;
         sql = "alter table " + table.getName() + " drop column " + columnName;

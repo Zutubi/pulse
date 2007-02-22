@@ -50,7 +50,7 @@
         <many-to-one name="root" class="com.zutubi.pulse.model.RecipeResultNode" column="RECIPE_RESULT_ID"
                      cascade="all"/>
 
-        <property name="version" column="VERSION" type="string"/>
+        <property name="version" column="VERSION" type="string" length="255"/>
 
         <property name="hasWorkDir" type="boolean"/>
     </class>
@@ -60,20 +60,20 @@
             <generator class="hilo"/>
         </id>
 
-        <discriminator column="REASON_TYPE" type="string"/>
+        <discriminator column="REASON_TYPE" type="string" length="255"/>
 
         <subclass name="com.zutubi.pulse.model.ManualTriggerBuildReason" discriminator-value="MANUAL_TRIGGER" lazy="false">
-            <property name="username" type="string" column="DETAILS"/>
+            <property name="username" type="string" column="DETAILS" length="255"/>
         </subclass>
 
         <subclass name="com.zutubi.pulse.model.PersonalBuildReason" discriminator-value="PERSONAL" lazy="false">
-            <property name="user" type="string" column="LOCAL_USER"/>
+            <property name="user" type="string" column="LOCAL_USER" length="255"/>
         </subclass>
 
         <subclass name="com.zutubi.pulse.model.RemoteTriggerBuildReason" discriminator-value="REMOTE_TRIGGER" lazy="false"/>
 
         <subclass name="com.zutubi.pulse.model.TriggerBuildReason" discriminator-value="TRIGGER" lazy="false">
-            <property name="triggerName" type="string" column="DETAILS"/>
+            <property name="triggerName" type="string" column="DETAILS" length="255"/>
         </subclass>
 
         <subclass name="com.zutubi.pulse.model.UnknownBuildReason" discriminator-value="UNKNOWN" lazy="false"/>
@@ -86,8 +86,7 @@
             <generator class="hilo"/>
         </id>
 
-        <many-to-one name="revision" class="com.zutubi.pulse.core.model.Revision" column="REVISION_ID" cascade="all"
-                     unique="true"/>
+        <many-to-one name="revision" class="com.zutubi.pulse.core.model.Revision" column="REVISION_ID" cascade="all" unique="true"/>
         
     </class>
 
@@ -101,8 +100,7 @@
 
         <property name="host" type="string" length="255"/>
 
-        <many-to-one name="result" class="com.zutubi.pulse.core.model.RecipeResult" column="RECIPE_RESULT_ID"
-                     cascade="all" unique="true"/>
+        <many-to-one name="result" class="com.zutubi.pulse.core.model.RecipeResult" column="RECIPE_RESULT_ID" cascade="all" unique="true"/>
 
         <list name="children" cascade="all,delete-orphan" lazy="false">
             <key column="PARENT_ID"/>
@@ -125,7 +123,7 @@
             <column name="ESTIMATED_RUNNING_TIME" sql-type="BIGINT"/>
         </property>
 
-        <property name="stateName" column="STATE" type="string" length="127"/>
+        <property name="stateName" column="STATE" type="string" length="255"/>
 
         <property name="outputDir" type="string" length="1023"/>
 

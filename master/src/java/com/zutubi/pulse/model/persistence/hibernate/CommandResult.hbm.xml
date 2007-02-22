@@ -17,7 +17,7 @@
             <column name="ESTIMATED_RUNNING_TIME" sql-type="BIGINT"/>
         </property>
 
-        <property name="stateName" type="string" length="31" not-null="true"/>
+        <property name="stateName" type="string" length="255" not-null="true"/>
 
         <property name="outputDir" type="string" length="1023"/>
 
@@ -34,7 +34,7 @@
             <column name="ERROR_FEATURE_COUNT" default="-1"/>
         </property>
 
-        <property name="properties" column="PROPERTIES" type="com.zutubi.pulse.util.PropertiesType" length="4096"/>
+        <property name="properties" column="PROPERTIES" type="com.zutubi.pulse.util.PropertiesType" length="4095"/>
 
         <list name="artifacts" cascade="all,delete-orphan" lazy="true">
             <key column="COMMAND_RESULT_ID"/>
