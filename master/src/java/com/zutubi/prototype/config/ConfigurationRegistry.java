@@ -6,7 +6,6 @@ import com.zutubi.prototype.type.MapType;
 import com.zutubi.prototype.type.TypeException;
 import com.zutubi.prototype.type.TypeProperty;
 import com.zutubi.prototype.type.TypeRegistry;
-import com.zutubi.prototype.type.record.Record;
 import com.zutubi.prototype.type.record.RecordManager;
 import com.zutubi.pulse.model.Project;
 import com.zutubi.pulse.prototype.config.*;
@@ -26,7 +25,7 @@ public class ConfigurationRegistry
     public void init() throws TypeException
     {
         // scm configuration
-        CompositeType scmConfig = typeRegistry.register("scmConfig", ScmConfiguration.class);
+        CompositeType scmConfig = (CompositeType) typeRegistry.register("scmConfig", ScmConfiguration.class);
         typeRegistry.register("svnConfig", SvnConfiguration.class);
         typeRegistry.register("cvsConfig", CvsConfiguration.class);
         typeRegistry.register("perforceConfig", PerforceConfiguration.class);
@@ -36,7 +35,7 @@ public class ConfigurationRegistry
         scmConfig.addExtension("cvsConfig");
         scmConfig.addExtension("perforceConfig");
 
-        CompositeType typeConfig = typeRegistry.register("typeConfig", ProjectTypeConfiguration.class);
+        CompositeType typeConfig = (CompositeType) typeRegistry.register("typeConfig", ProjectTypeConfiguration.class);
         typeRegistry.register("antConfig", AntTypeConfiguration.class);
         typeRegistry.register("mavenConfig", MavenTypeConfiguration.class);
 
@@ -50,7 +49,7 @@ public class ConfigurationRegistry
         typeRegistry.register("cleanupRuleConfig", CleanupRuleConfiguration.class);
 
         // commit message processors.
-        CompositeType commitConfig = typeRegistry.register("commitConfig", CommitMessageConfiguration.class);
+        CompositeType commitConfig = (CompositeType) typeRegistry.register("commitConfig", CommitMessageConfiguration.class);
         typeRegistry.register("jiraCommitConfig", JiraCommitMessageConfiguration.class);
         typeRegistry.register("customCommitConfig", CustomCommitMessageConfiguration.class);
 
@@ -58,14 +57,14 @@ public class ConfigurationRegistry
         commitConfig.addExtension("customCommitConfig");
 
         // change view configuration
-        CompositeType changeViewerConfig = typeRegistry.register("changeViewerConfig", ChangeViewerConfiguration.class);
+        CompositeType changeViewerConfig = (CompositeType) typeRegistry.register("changeViewerConfig", ChangeViewerConfiguration.class);
         typeRegistry.register("fisheyeChangeViewerConfig", FisheyeConfiguration.class);
         typeRegistry.register("customChangeViewerConfig", CustomChangeViewerConfiguration.class);
 
         changeViewerConfig.addExtension("fisheyeChangeViewerConfig");
         changeViewerConfig.addExtension("customChangeViewerConfig");
         
-        CompositeType artifactConfig = typeRegistry.register("artifactConfig", ArtifactConfiguration.class);
+        CompositeType artifactConfig = (CompositeType) typeRegistry.register("artifactConfig", ArtifactConfiguration.class);
         typeRegistry.register("fileArtifactConfig", FileArtifactConfiguration.class);
         typeRegistry.register("directoryArtifactConfig", DirectoryArtifactConfiguration.class);
 
