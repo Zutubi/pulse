@@ -14,6 +14,7 @@ public class JUnitReportPostProcessor extends XMLReportPostProcessor
     private static final String ELEMENT_ERROR = "error";
     private static final String ELEMENT_FAILURE = "failure";
 
+    private static final String ATTRIBUTE_CLASS = "classname";
     private static final String ATTRIBUTE_NAME = "name";
     private static final String ATTRIBUTE_PACKAGE = "package";
     private static final String ATTRIBUTE_TIME = "time";
@@ -22,6 +23,7 @@ public class JUnitReportPostProcessor extends XMLReportPostProcessor
     private String caseElement = ELEMENT_CASE;
     private String errorElement = ELEMENT_ERROR;
     private String failureElement = ELEMENT_FAILURE;
+    private String classAttribute = ATTRIBUTE_CLASS;
     private String nameAttribute = ATTRIBUTE_NAME;
     private String packageAttribute = ATTRIBUTE_PACKAGE;
     private String timeAttribute = ATTRIBUTE_TIME;
@@ -91,6 +93,12 @@ public class JUnitReportPostProcessor extends XMLReportPostProcessor
         {
             // Ignore nameless tests
             return;
+        }
+
+        String className = element.getAttributeValue(classAttribute);
+        if(className != null && !suite.getName().equals(className))
+        {
+            name = className + "." + name;
         }
 
         long duration = getDuration(element);
@@ -165,6 +173,11 @@ public class JUnitReportPostProcessor extends XMLReportPostProcessor
     public void setFailureElement(String failureElement)
     {
         this.failureElement = failureElement;
+    }
+
+    public void setClassAttribute(String classAttribute)
+    {
+        this.classAttribute = classAttribute;
     }
 
     public void setNameAttribute(String nameAttribute)

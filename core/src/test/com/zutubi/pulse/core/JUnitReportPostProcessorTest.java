@@ -57,6 +57,13 @@ public class JUnitReportPostProcessorTest extends XMLReportPostProcessorTestBase
         assertSingleSuite(tests);
     }
 
+    public void testSuite()
+    {
+        TestSuiteResult tests = runProcessor("suite");
+        assertEquals(274, tests.getTotal());
+        assertNotNull(tests.getSuite("com.zutubi.pulse.acceptance.AcceptanceTestSuite").getCase("com.zutubi.pulse.acceptance.LicenseAuthorisationAcceptanceTest.testAddProjectLinkOnlyAvailableWhenLicensed"));
+    }
+
     public void testCustom()
     {
         JUnitReportPostProcessor pp = (JUnitReportPostProcessor) this.pp;
