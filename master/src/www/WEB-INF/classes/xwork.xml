@@ -220,6 +220,7 @@
         <action name="editBuildProperties" class="com.zutubi.pulse.web.project.EditBuildPropertiesAction">
             <result name="input" type="velocity">edit-build-properties.vm</result>
             <result name="success" type="redirect">currentBuild.action?id=${projectId}</result>
+            <result name="cancel" type="redirect">currentBuild.action?id=${projectId}</result>
             <result name="error" type="velocity">generic-error.vm</result>
         </action>
 
