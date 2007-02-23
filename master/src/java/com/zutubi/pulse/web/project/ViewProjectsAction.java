@@ -1,6 +1,7 @@
 package com.zutubi.pulse.web.project;
 
 import com.zutubi.pulse.model.*;
+import org.hibernate.SessionFactory;
 
 import java.util.Collections;
 import java.util.List;
@@ -13,6 +14,8 @@ public class ViewProjectsAction extends ProjectActionSupport
 {
     private List<ProjectGroup> groups;
     private List<Project> projects;
+    private BuildColumns buildColumns;
+    private SessionFactory sessionFactory;
 
     public List<Project> getProjects()
     {
@@ -39,22 +42,30 @@ public class ViewProjectsAction extends ProjectActionSupport
 
     public BuildColumns getColumns()
     {
-        User user = getLoggedInUser();
-        return new BuildColumns(user == null ? User.getDefaultAllProjectsColumns() : user.getAllProjectsColumns(), projectManager);
+        return buildColumns;
     }
 
     public String execute()
     {
-        groups = projectManager.getAllProjectGroups();
+        groups = projectManager.getAllProjectGroupsLazy();
         Collections.sort(groups, new NamedEntityComparator());
 
-        projects = getProjectManager().getAllProjects();
+        projects = getProjectManager().getAllProjectsLazy();
         for(ProjectGroup g: groups)
         {
             projects.removeAll(g.getProjects());
         }
         
         Collections.sort(projects, new NamedEntityComparator());
+
+        User user = getLoggedInUser();
+        buildColumns = new BuildColumns(user == null ? User.getDefaultAllProjectsColumns() : user.getAllProjectsColumns(), projectManager);
+
         return SUCCESS;
+    }
+
+    public void setSessionFactory(SessionFactory sessionFactory)
+    {
+        this.sessionFactory = sessionFactory;
     }
 }

@@ -49,6 +49,11 @@ public class MockProjectManager implements ProjectManager
         return new LinkedList<Project>(projects.values());
     }
 
+    public List<Project> getAllProjectsLazy()
+    {
+        return getAllProjects();
+    }
+
     public List<Project> getProjectsWithNameLike(String s)
     {
         throw new RuntimeException("Method not implemented.");
@@ -158,6 +163,11 @@ public class MockProjectManager implements ProjectManager
     public List<ProjectGroup> getAllProjectGroups()
     {
         throw new RuntimeException("Method not implemented.");
+    }
+
+    public List<ProjectGroup> getAllProjectGroupsLazy()
+    {
+        throw new RuntimeException("Method not yet implemented.");
     }
 
     public ProjectGroup getProjectGroup(long id)

@@ -35,20 +35,21 @@
         </action>
 
         <action name="dashboard" class="com.zutubi.pulse.web.user.DashboardAction">
-            <interceptor-ref name="ajaxStack"/>
+            <interceptor-ref name="ajaxReadOnlyStack"/>
             <result name="success" type="velocity">dashboard.vm</result>
             <result name="error" type="velocity">generic-error.vm</result>
             <result name="guest" type="redirect">/viewProjects.action</result>
         </action>
 
         <action name="myBuilds" class="com.zutubi.pulse.web.user.MyBuildsAction">
-            <interceptor-ref name="ajaxStack"/>
+            <interceptor-ref name="ajaxReadOnlyStack"/>
             <result name="success" type="velocity">my-builds.vm</result>
             <result name="error" type="velocity">generic-error.vm</result>
             <result name="guest" type="redirect">/viewProjects.action</result>
         </action>
 
         <action name="preferences" class="com.zutubi.pulse.web.user.PreferencesAction">
+            <interceptor-ref name="completeReadOnlyStack"/>
             <result name="input" type="velocity">/preferences.vm</result>
             <result name="success" type="velocity">/preferences.vm</result>
             <result name="error" type="velocity">generic-error.vm</result>
@@ -61,12 +62,12 @@
         </action>
 
         <action name="viewAgents" class="com.zutubi.pulse.web.agents.ViewAgentsAction">
-            <interceptor-ref name="ajaxStack"/>
+            <interceptor-ref name="ajaxReadOnlyStack"/>
             <result name="success" type="velocity">view-agents.vm</result>
         </action>
 
         <action name="viewServerQueues" class="com.zutubi.pulse.web.server.ViewServerQueuesAction">
-            <interceptor-ref name="ajaxStack"/>
+            <interceptor-ref name="ajaxReadOnlyStack"/>
             <result name="success" type="velocity">view-server-queues.vm</result>
             <result name="error" type="velocity">generic-error.vm</result>
         </action>
@@ -80,21 +81,25 @@
         </action>
 
         <action name="viewAgentStatus" class="com.zutubi.pulse.web.agents.ViewAgentStatusAction">
+            <interceptor-ref name="completeReadOnlyStack"/>
             <result name="success" type="velocity">/view-agent-status.vm</result>
             <result name="error" type="velocity">/generic-error.vm</result>
         </action>
 
         <action name="viewResources" class="com.zutubi.pulse.web.agents.ViewResourcesAction">
+            <interceptor-ref name="completeReadOnlyStack"/>
             <result name="success" type="velocity">view-resources.vm</result>
             <result name="error" type="velocity">generic-error.vm</result>
         </action>
 
         <action name="viewResource" class="com.zutubi.pulse.web.agents.ViewResourceAction">
+            <interceptor-ref name="completeReadOnlyStack"/>
             <result name="error" type="velocity">/generic-error.vm</result>
             <result name="success" type="velocity">/view-resource.vm</result>
         </action>
 
         <action name="serverMessages" class="com.zutubi.pulse.web.agents.ServerMessagesAction">
+            <interceptor-ref name="completeReadOnlyStack"/>
             <result name="success" type="velocity">server-messages.vm</result>
             <result name="error" type="velocity">generic-error.vm</result>
         </action>
@@ -114,53 +119,61 @@
         </action>
 
         <action name="viewProjects" class="com.zutubi.pulse.web.project.ViewProjectsAction">
-            <interceptor-ref name="ajaxStack"/>
+            <interceptor-ref name="ajaxReadOnlyStack"/>
             <result name="success" type="velocity">view-projects.vm</result>
         </action>
 
         <action name="viewBuild" class="com.zutubi.pulse.web.project.ViewBuildAction">
-            <interceptor-ref name="ajaxStack"/>
+            <interceptor-ref name="ajaxReadOnlyStack"/>
             <result name="success" type="velocity">view-build.vm</result>
             <result name="error" type="velocity">generic-error.vm</result>
         </action>
 
         <action name="viewChanges" class="com.zutubi.pulse.web.project.ViewChangesAction">
+            <interceptor-ref name="completeReadOnlyStack"/>
             <result name="success" type="velocity">view-changes.vm</result>
             <result name="input" type="velocity">view-changes.vm</result>
             <result name="error" type="velocity">generic-error.vm</result>
         </action>
 
         <action name="viewPersonalChanges" class="com.zutubi.pulse.web.project.ViewPersonalChangesAction">
+            <interceptor-ref name="completeReadOnlyStack"/>
             <result name="success" type="velocity">view-personal-changes.vm</result>
             <result name="error" type="velocity">generic-error.vm</result>
         </action>
 
         <action name="viewTests" class="com.zutubi.pulse.web.project.ViewBuildAction">
+            <interceptor-ref name="completeReadOnlyStack"/>
             <result name="success" type="velocity">view-tests.vm</result>
             <result name="error" type="velocity">generic-error.vm</result>
         </action>
 
         <action name="viewTestSuite" class="com.zutubi.pulse.web.project.ViewTestSuiteAction">
+            <interceptor-ref name="completeReadOnlyStack"/>
             <result name="success" type="velocity">view-test-suite.vm</result>
             <result name="error" type="velocity">generic-error.vm</result>
         </action>
 
         <action name="viewCommandLog" class="com.zutubi.pulse.web.project.ViewBuildAction">
+            <interceptor-ref name="completeReadOnlyStack"/>
             <result name="success" type="velocity">view-command-log.vm</result>
             <result name="error" type="velocity">generic-error.vm</result>
         </action>
 
         <action name="viewBuildArtifacts" class="com.zutubi.pulse.web.project.ViewArtifactsAction">
+            <interceptor-ref name="completeReadOnlyStack"/>
             <result name="success" type="velocity">view-artifacts.vm</result>
             <result name="error" type="velocity">generic-error.vm</result>
         </action>
 
         <action name="viewBuildFile" class="com.zutubi.pulse.web.project.ViewBuildFileAction">
+            <interceptor-ref name="completeReadOnlyStack"/>
             <result name="success" type="velocity">view-build-file.vm</result>
             <result name="error" type="velocity">generic-error.vm</result>
         </action>
 
         <action name="downloadBuildFile" class="com.zutubi.pulse.web.project.DownloadBuildFileAction">
+            <interceptor-ref name="completeReadOnlyStack"/>
             <result name="success" type="stream">
                 <param name="contentType">${contentType}</param>
                 <param name="contentDisposition">filename="pulse.xml"</param>
@@ -169,6 +182,7 @@
         </action>
 
         <action name="downloadProjectBuildFile" class="com.zutubi.pulse.web.project.DownloadProjectBuildFileAction">
+            <interceptor-ref name="completeReadOnlyStack"/>
             <result name="success" type="stream">
                 <param name="contentType">${contentType}</param>
             </result>
@@ -176,6 +190,7 @@
         </action>
 
         <action name="downloadDirectoryArtifact" class="com.zutubi.pulse.web.project.DownloadDirectoryArtifactAction">
+            <interceptor-ref name="completeReadOnlyStack"/>
             <result name="success" type="stream">
                 <param name="contentType">${contentType}</param>
                 <param name="contentDisposition">filename="${filename}"</param>
@@ -184,16 +199,19 @@
         </action>
 
         <action name="viewRecipe" class="com.zutubi.pulse.web.project.ViewRecipeAction">
+            <interceptor-ref name="completeReadOnlyStack"/>
             <result name="success" type="velocity">view-recipe.vm</result>
             <result name="error" type="velocity">generic-error.vm</result>
         </action>
 
         <action name="tailRecipeLog" class="com.zutubi.pulse.web.project.TailRecipeLogAction">
+            <interceptor-ref name="completeReadOnlyStack"/>
             <result name="success" type="velocity">tail-recipe-log.vm</result>
             <result name="error" type="velocity">generic-error.vm</result>
         </action>
 
         <action name="viewRecipeLog" class="com.zutubi.pulse.web.project.ViewRecipeLogAction">
+            <interceptor-ref name="completeReadOnlyStack"/>
             <result name="success" type="stream">
                 <param name="contentType">text/plain</param>
                 <param name="contentDisposition">filename="recipe.log"</param>
@@ -202,6 +220,7 @@
         </action>
 
         <action name="viewChangelist" class="com.zutubi.pulse.web.project.ViewChangelistAction">
+            <interceptor-ref name="completeReadOnlyStack"/>
             <result name="success" type="velocity">view-changelist.vm</result>
             <result name="error" type="velocity">generic-error.vm</result>
         </action>
@@ -230,21 +249,25 @@
         </action>
 
         <action name="viewArtifact" class="com.zutubi.pulse.web.project.ViewArtifactAction">
+            <interceptor-ref name="completeReadOnlyStack"/>
             <result name="success" type="velocity">view-artifact.vm</result>
             <result name="error" type="velocity">generic-error.vm</result>
         </action>
 
         <action name="viewArtifactt" class="com.zutubi.pulse.web.project.TemporaryViewArtifactAction">
+            <interceptor-ref name="completeReadOnlyStack"/>
             <result name="success" type="velocity">view-artifact.vm</result>
             <result name="error" type="velocity">generic-error.vm</result>
         </action>
 
         <action name="browseProjectDir" class="com.zutubi.pulse.web.project.BrowseProjectDirAction">
+            <interceptor-ref name="completeReadOnlyStack"/>
             <result name="success" type="velocity">browse-project-dir.vm</result>
             <result name="error" type="velocity">generic-error.vm</result>
         </action>
 
         <action name="cat" class="com.zutubi.pulse.web.vfs.CatAction">
+            <interceptor-ref name="completeReadOnlyStack"/>
             <result name="success" type="stream">
                 <param name="contentType">${contentType}</param>
                 <param name="contentDisposition">filename="${filename}"</param>
@@ -253,6 +276,7 @@
         </action>
 
         <action name="zip" class="com.zutubi.pulse.web.vfs.ZipAction">
+            <interceptor-ref name="completeReadOnlyStack"/>
             <result name="success" type="stream">
                 <param name="contentType">${contentType}</param>
                 <param name="contentDisposition">filename="${filename}"</param>
@@ -261,6 +285,7 @@
         </action>
 
         <action name="browseProjectScm" class="com.zutubi.pulse.web.project.BrowseProjectScmAction">
+            <interceptor-ref name="completeReadOnlyStack"/>
             <result name="dir" type="velocity">browse-project-scm-dir.vm</result>
             <result name="file" type="stream">
                 <param name="contentType">${contentType}</param>
@@ -305,7 +330,7 @@
         </action>
 
         <action name="currentBuild" class="com.zutubi.pulse.web.project.ProjectHomeAction">
-            <interceptor-ref name="ajaxStack"/>
+            <interceptor-ref name="ajaxReadOnlyStack"/>
             <result name="success" type="velocity">project-home.vm</result>
             <result name="error" type="redirect">viewProjects.action</result>
         </action>
@@ -316,11 +341,13 @@
         </action>
 
         <action name="history" class="com.zutubi.pulse.web.project.HistoryAction">
+            <interceptor-ref name="completeReadOnlyStack"/>
             <result name="success" type="velocity">history.vm</result>
             <result name="error" type="velocity">generic-error.vm</result>
         </action>
 
         <action name="configureProject" class="com.zutubi.pulse.web.project.ConfigureProjectAction">
+            <interceptor-ref name="completeReadOnlyStack"/>
             <result name="success" type="velocity">configure-project.vm</result>
             <result name="error" type="redirect">viewProjects.action</result>
             <result name="input" type="redirect">viewProjects.action</result>
@@ -786,6 +813,7 @@
         </action>
 
         <action name="viewSystemInfo" class="com.zutubi.pulse.web.agents.SystemInfoAction">
+            <interceptor-ref name="completeReadOnlyStack"/>
             <result name="success" type="velocity">/view-systeminfo.vm</result>
         </action>
 
@@ -886,6 +914,7 @@
         </action>
 
         <action name="viewBuildSpecification" class="com.zutubi.pulse.web.project.ViewBuildSpecificationAction">
+            <interceptor-ref name="completeReadOnlyStack"/>
             <result name="success" type="velocity">view-build-specification.vm</result>
             <result name="error" type="velocity">generic-error.vm</result>
         </action>
@@ -934,10 +963,12 @@
         </action>
 
         <action name="rss" class="com.zutubi.pulse.web.rss.BuildResultsRssAction">
+            <interceptor-ref name="completeReadOnlyStack"/>
             <result name="disabled" type="velocity">generic-error.vm</result>
         </action>
 
         <action name="projectReports" class="com.zutubi.pulse.web.project.ViewReportsAction">
+            <interceptor-ref name="completeReadOnlyStack"/>
             <result name="success" type="velocity">project-reports.vm</result>
             <result name="input" type="velocity">project-reports.vm</result>
         </action>
@@ -1109,7 +1140,7 @@
         <default-interceptor-ref name="completeStack"/>
 
         <action name="serverSettings" class="com.zutubi.pulse.web.admin.ServerSettingsAction">
-            <interceptor-ref name="defaultStack"/>
+            <interceptor-ref name="defaultReadOnlyStack"/>
             <result name="success" type="velocity">server-settings.vm</result>
         </action>
 
@@ -1121,16 +1152,18 @@
         USERS
         -->
         <action name="userSettings" class="com.zutubi.pulse.web.admin.user.ViewUsersAction">
+            <interceptor-ref name="completeReadOnlyStack"/>
             <result name="success" type="velocity">manage-users.vm</result>
         </action>
 
         <action name="viewUser" class="com.zutubi.pulse.web.admin.user.ViewUserAction">
+            <interceptor-ref name="completeReadOnlyStack"/>
             <result name="input" type="velocity">/generic-error.vm</result>
             <result name="success" type="velocity">view-user.vm</result>
         </action>
 
         <action name="viewUsers" class="com.zutubi.pulse.web.admin.user.ViewUsersAction">
-            <interceptor-ref name="defaultStack"/>
+            <interceptor-ref name="defaultReadOnlyStack"/>
             <result name="success" type="velocity">manage-users.vm</result>
         </action>
 
@@ -1166,7 +1199,7 @@
         </action>
 
         <action name="viewGroups" class="com.zutubi.pulse.web.admin.user.ViewGroupsAction">
-            <interceptor-ref name="defaultStack"/>
+            <interceptor-ref name="defaultReadOnlyStack"/>
             <result name="success" type="velocity">manage-groups.vm</result>
         </action>
 
@@ -1188,6 +1221,7 @@
         </action>
 
         <action name="viewGroupMembers" class="com.zutubi.pulse.web.admin.user.ViewGroupMembersAction">
+            <interceptor-ref name="completeReadOnlyStack"/>
             <result name="success" type="velocity">view-group-members.vm</result>
             <result name="error" type="velocity">/generic-error.vm</result>
         </action>
@@ -1461,7 +1495,7 @@
     </package>
 
     <package name="ajax" namespace="/ajax" extends="webwork-default-package">
-        <default-interceptor-ref name="ajaxStack"/>
+        <default-interceptor-ref name="ajaxReadOnlyStack"/>
 
         <action name="dashboardPanel" class="com.zutubi.pulse.web.user.DashboardAction">
             <result name="success" type="velocity">dashboard-panel.vm</result>
@@ -1548,12 +1582,13 @@
         </action>
 
         <action name="customiseBuildColumns" class="com.zutubi.pulse.web.user.CustomiseBuildColumnsAction">
+            <interceptor-ref name="ajaxStack"/>
             <result name="success" type="velocity">empty.vm</result>
         </action>
     </package>
 
     <package name="popups" namespace="/popups" extends="webwork-default-package">
-        <default-interceptor-ref name="completeStack"/>
+        <default-interceptor-ref name="completeReadOnlyStack"/>
 
         <action name="viewScmInfo" class="com.zutubi.pulse.web.project.ViewScmInfoAction">
             <result name="success" type="velocity">view-scm-info.vm</result>

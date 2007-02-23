@@ -4,7 +4,8 @@
 
     <!-- -->
     <class name="com.zutubi.pulse.model.User" table="LOCAL_USER" lazy="false">
-
+        <cache usage="read-write"/>
+        
         <id name="id" type="java.lang.Long" column="ID" unsaved-value="0">
             <generator class="hilo"/>
         </id>
@@ -41,6 +42,7 @@
         </set>
         
         <bag name="contactPoints" inverse="true" cascade="all" lazy="false">
+            <cache usage="read-write"/>
             <key column="USER_ID"/>
             <one-to-many class="com.zutubi.pulse.model.ContactPoint"/>
         </bag>
@@ -51,11 +53,13 @@
         </bag>
 
         <set name="shownProjects" table="USER_SHOWN_PROJECTS" lazy="true" cascade="save-update">
+            <cache usage="read-write"/>
             <key column="USER_ID"/>
             <many-to-many class="com.zutubi.pulse.model.Project" column="PROJECT_ID"/>
         </set>
 
         <set name="shownGroups" table="USER_SHOWN_GROUPS" lazy="true" cascade="save-update">
+            <cache usage="read-write"/>
             <key column="USER_ID"/>
             <many-to-many class="com.zutubi.pulse.model.ProjectGroup" column="PROJECT_GROUP_ID"/>
         </set>
@@ -65,6 +69,7 @@
 
     <!-- Contact points. -->
     <class name="com.zutubi.pulse.model.ContactPoint" table="CONTACT_POINT" lazy="false">
+        <cache usage="read-write"/>
 
         <id name="id" type="java.lang.Long" column="ID" unsaved-value="0">
             <generator class="hilo"/>
@@ -80,6 +85,7 @@
         <many-to-one name="user" column="USER_ID" class="com.zutubi.pulse.model.User" insert="true" lazy="false"/>
 
         <bag name="subscriptions" inverse="true" cascade="all,delete-orphan" lazy="false">
+            <cache usage="read-write"/>
             <key column="CONTACT_ID"/>
             <one-to-many class="com.zutubi.pulse.model.Subscription"/>
         </bag>
@@ -97,6 +103,7 @@
 
     <!-- Subscription. -->
     <class name="com.zutubi.pulse.model.Subscription" table="SUBSCRIPTION" lazy="false">
+        <cache usage="read-write"/>
 
         <id name="id" type="java.lang.Long" column="ID" unsaved-value="0">
             <generator class="hilo"/>
@@ -114,13 +121,14 @@
             <property name="condition" column="NOTIFY_CONDITION" type="string" length="255"/>
 
             <bag name="projects" table="SUBSCRIPTION_PROJECTS" cascade="none" lazy="false">
+                <cache usage="read-write"/>
                 <key column="SUBSCRIPTION_ID"/>
                 <many-to-many class="com.zutubi.pulse.model.Project" column="PROJECT_ID"/>
             </bag>
         </subclass>
     </class>
 
-    <query name="subscription.findByProject"><![CDATA[
+    <query name="subscription.findByProject" cacheable="true"><![CDATA[
         from Subscription s
         where :project in elements(s.projects)
     ]]></query>

@@ -363,7 +363,6 @@ public class DefaultBuildManager implements BuildManager, EventListener
             build.error(message);
             build.complete();
             build.calculateFeatureCounts();
-            testManager.index(build);
             save(build);
         }
     }

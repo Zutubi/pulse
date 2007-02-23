@@ -41,19 +41,220 @@
         -->
 
     <defaultCache
-        maxElementsInMemory="10000"
-        eternal="false"
-        overflowToDisk="true"
-        timeToIdleSeconds="120"
-        timeToLiveSeconds="120"
-        diskPersistent="false"
-        diskExpiryThreadIntervalSeconds="120"
-        />
+            maxElementsInMemory="10000"
+            eternal="false"
+            overflowToDisk="true"
+            timeToIdleSeconds="120"
+            timeToLiveSeconds="120"
+            diskPersistent="false"
+            diskExpiryThreadIntervalSeconds="120"
+            />
+
+    <cache name="AclEntries"
+           maxElementsInMemory="1000"
+           eternal="false"
+           timeToIdleSeconds="100"
+           timeToLiveSeconds="200"
+           overflowToDisk="false"/>
 
     <cache name="BuildResultsRss"
-        maxElementsInMemory="2000"
-        eternal="true"
-        overflowToDisk="false"
-        />
-    
+           maxElementsInMemory="2000"
+           eternal="true"
+           overflowToDisk="false"
+            />
+
+    <!-- Hibernate built in caches -->
+
+    <cache name="org.hibernate.cache.StandardQueryCache"
+           maxElementsInMemory="5"
+           eternal="false"
+           timeToLiveSeconds="120"
+           overflowToDisk="true"/>
+
+    <cache name="org.hibernate.cache.UpdateTimestampsCache"
+           maxElementsInMemory="5000"
+           eternal="true"
+           overflowToDisk="true"/>
+
+    <!-- Hibernate entities and associations -->
+
+    <cache name="com.zutubi.pulse.model.Group"
+           maxElementsInMemory="100"
+           eternal="true"
+           overflowToDisk="false"/>
+
+    <cache name="com.zutubi.pulse.model.Group.users"
+           maxElementsInMemory="100"
+           eternal="true"
+           overflowToDisk="false"/>
+
+    <cache name="com.zutubi.pulse.model.User"
+           maxElementsInMemory="100"
+           eternal="true"
+           overflowToDisk="false"/>
+
+    <cache name="com.zutubi.pulse.model.User.contactPoints"
+           maxElementsInMemory="100"
+           eternal="true"
+           overflowToDisk="false"/>
+
+    <cache name="com.zutubi.pulse.model.User.shownProjects"
+           maxElementsInMemory="100"
+           eternal="true"
+           overflowToDisk="false"/>
+
+    <cache name="com.zutubi.pulse.model.User.shownGroups"
+           maxElementsInMemory="100"
+           eternal="true"
+           overflowToDisk="false"/>
+
+    <cache name="com.zutubi.pulse.model.ContactPoint"
+           maxElementsInMemory="1000"
+           eternal="true"
+           overflowToDisk="false"/>
+
+    <cache name="com.zutubi.pulse.model.ContactPoint.subscriptions"
+           maxElementsInMemory="1000"
+           eternal="true"
+           overflowToDisk="false"/>
+
+    <cache name="com.zutubi.pulse.model.Subscription"
+           maxElementsInMemory="1000"
+           eternal="true"
+           overflowToDisk="false"/>
+
+    <cache name="com.zutubi.pulse.model.ProjectBuildSubscription.projects"
+           maxElementsInMemory="1000"
+           eternal="true"
+           overflowToDisk="false"/>
+
+    <cache name="com.zutubi.pulse.model.ProjectGroup"
+           maxElementsInMemory="100"
+           eternal="true"
+           overflowToDisk="false"/>
+
+    <cache name="com.zutubi.pulse.model.ProjectGroup.projects"
+           maxElementsInMemory="100"
+           eternal="true"
+           overflowToDisk="false"/>
+
+    <cache name="com.zutubi.pulse.model.Project"
+           maxElementsInMemory="500"
+           eternal="true"
+           overflowToDisk="false"/>
+
+    <cache name="com.zutubi.pulse.model.Project.buildSpecifications"
+           maxElementsInMemory="500"
+           eternal="true"
+           overflowToDisk="false"/>
+
+    <cache name="com.zutubi.pulse.model.Project.postBuildActions"
+           maxElementsInMemory="500"
+           eternal="true"
+           overflowToDisk="false"/>
+
+    <cache name="com.zutubi.pulse.model.Project.cleanupRules"
+           maxElementsInMemory="500"
+           eternal="true"
+           overflowToDisk="false"/>
+
+    <cache name="com.zutubi.pulse.model.Project.aclEntries"
+           maxElementsInMemory="500"
+           eternal="true"
+           overflowToDisk="false"/>
+
+    <cache name="com.zutubi.pulse.model.Scm"
+           maxElementsInMemory="500"
+           eternal="true"
+           overflowToDisk="false"/>
+
+    <cache name="com.zutubi.pulse.model.ChangeViewer"
+           maxElementsInMemory="500"
+           eternal="true"
+           overflowToDisk="false"/>
+
+    <cache name="com.zutubi.pulse.model.PulseFileDetails"
+           maxElementsInMemory="500"
+           eternal="true"
+           overflowToDisk="false"/>
+
+    <cache name="com.zutubi.pulse.model.TemplatePulseFileDetails.captures"
+           maxElementsInMemory="500"
+           eternal="true"
+           overflowToDisk="false"/>
+
+    <cache name="com.zutubi.pulse.model.Capture"
+           maxElementsInMemory="2000"
+           eternal="true"
+           overflowToDisk="false"/>
+
+    <cache name="com.zutubi.pulse.model.PostBuildAction"
+           maxElementsInMemory="2000"
+           eternal="true"
+           overflowToDisk="false"/>
+
+    <cache name="com.zutubi.pulse.model.PostBuildAction.specifications"
+           maxElementsInMemory="2000"
+           eternal="true"
+           overflowToDisk="false"/>
+
+    <cache name="com.zutubi.pulse.model.CleanupRule"
+           maxElementsInMemory="1000"
+           eternal="true"
+           overflowToDisk="false"/>
+
+    <cache name="com.zutubi.pulse.model.BuildSpecification"
+           maxElementsInMemory="2000"
+           eternal="true"
+           overflowToDisk="false"/>
+
+    <cache name="com.zutubi.pulse.model.BuildSpecification.properties"
+           maxElementsInMemory="2000"
+           eternal="true"
+           overflowToDisk="false"/>
+
+    <cache name="com.zutubi.pulse.model.BuildSpecificationNode"
+           maxElementsInMemory="5000"
+           eternal="true"
+           overflowToDisk="false"/>
+
+    <cache name="com.zutubi.pulse.model.BuildSpecificationNode.postActions"
+           maxElementsInMemory="5000"
+           eternal="true"
+           overflowToDisk="false"/>
+
+    <cache name="com.zutubi.pulse.model.BuildSpecificationNode.children"
+           maxElementsInMemory="5000"
+           eternal="true"
+           overflowToDisk="false"/>
+
+    <cache name="com.zutubi.pulse.core.model.PersistentName"
+           maxElementsInMemory="5000"
+           eternal="true"
+           overflowToDisk="false"/>
+
+    <cache name="com.zutubi.pulse.model.AbstractBuildHostRequirements"
+           maxElementsInMemory="5000"
+           eternal="true"
+           overflowToDisk="false"/>
+
+    <cache name="com.zutubi.pulse.core.model.ResourceProperty"
+           maxElementsInMemory="5000"
+           eternal="true"
+           overflowToDisk="false"/>
+
+    <cache name="com.zutubi.pulse.model.PersistentResource"
+           maxElementsInMemory="500"
+           eternal="true"
+           overflowToDisk="false"/>
+
+    <cache name="com.zutubi.pulse.model.PersistentResource.versions"
+           maxElementsInMemory="500"
+           eternal="true"
+           overflowToDisk="false"/>
+
+    <cache name="com.zutubi.pulse.core.model.ResourceVersion"
+           maxElementsInMemory="1000"
+           eternal="true"
+           overflowToDisk="false"/>
 </ehcache>

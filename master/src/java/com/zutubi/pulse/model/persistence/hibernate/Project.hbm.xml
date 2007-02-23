@@ -3,6 +3,7 @@
 <hibernate-mapping>
 
     <class name="com.zutubi.pulse.model.Project" table="PROJECT" lazy="false">
+        <cache usage="read-write"/>
 
         <id name="id" type="java.lang.Long" column="ID" unsaved-value="0">
             <generator class="hilo"/>
@@ -19,6 +20,7 @@
         <many-to-one name="pulseFileDetails" class="com.zutubi.pulse.model.PulseFileDetails" column="BOB_FILE_DETAILS" lazy="false" cascade="all"/>
 
         <bag name="buildSpecifications" cascade="all,delete-orphan" lazy="false">
+            <cache usage="read-write"/>
             <key column="PROJECT_ID"/>
             <one-to-many class="com.zutubi.pulse.model.BuildSpecification"/>
         </bag>
@@ -26,11 +28,13 @@
         <many-to-one name="defaultSpecification" class="com.zutubi.pulse.model.BuildSpecification" column="DEFAULT_SPECIFICATION" lazy="false" cascade="none"/>
 
         <bag name="postBuildActions" cascade="all,delete-orphan" lazy="false">
+            <cache usage="read-write"/>
             <key column="PROJECT_ID"/>
             <one-to-many class="com.zutubi.pulse.model.PostBuildAction"/>
         </bag>
 
         <bag name="cleanupRules" cascade="all,delete-orphan" lazy="false">
+            <cache usage="read-write"/>
             <key column="PROJECT_ID"/>
             <one-to-many class="com.zutubi.pulse.model.CleanupRule"/>
         </bag>
@@ -40,6 +44,7 @@
         <many-to-one name="changeViewer" class="com.zutubi.pulse.model.ChangeViewer" column="CHANGE_VIEWER" cascade="all" lazy="false"/>
 
         <bag name="aclEntries" inverse="true" cascade="all,delete-orphan" lazy="false">
+            <cache usage="read-write"/>
             <key column="PROJECT_ID"/>
             <one-to-many class="com.zutubi.pulse.model.ProjectAclEntry"/>
         </bag>
@@ -49,6 +54,8 @@
     </class>
 
     <class name="com.zutubi.pulse.model.ChangeViewer" table="CHANGE_VIEWER" lazy="false">
+        <cache usage="read-write"/>
+
         <id name="id" type="java.lang.Long" column="ID" unsaved-value="0">
             <generator class="hilo"/>
         </id>
@@ -96,6 +103,7 @@
     </class>
 
     <class name="com.zutubi.pulse.model.PulseFileDetails" table="BOB_FILE_DETAILS" lazy="false">
+        <cache usage="read-write"/>
 
         <id name="id" type="java.lang.Long" column="ID" unsaved-value="0">
             <generator class="hilo"/>
@@ -113,6 +121,7 @@
 
         <subclass name="com.zutubi.pulse.model.TemplatePulseFileDetails" lazy="false">
             <bag name="captures" cascade="all,delete-orphan" lazy="false">
+                <cache usage="read-write"/>
                 <key column="DETAILS_ID"/>
                 <one-to-many class="com.zutubi.pulse.model.Capture"/>
             </bag>
@@ -184,6 +193,8 @@
     </class>
 
     <class name="com.zutubi.pulse.model.Capture" table="CAPTURE">
+        <cache usage="read-write"/>
+
         <id name="id" type="java.lang.Long" column="ID" unsaved-value="0">
             <generator class="hilo"/>
         </id>
@@ -211,6 +222,8 @@
     </class>
 
     <class name="com.zutubi.pulse.model.PostBuildAction" table="POST_BUILD_ACTION">
+        <cache usage="read-write"/>
+
         <id name="id" type="java.lang.Long" column="ID" unsaved-value="0">
             <generator class="hilo"/>
         </id>
@@ -220,6 +233,7 @@
         <property name="name" type="string" length="255"/>
 
         <bag name="specifications" table="POST_BUILD_ACTION_SPECIFICATIONS" lazy="false">
+            <cache usage="read-write"/>
             <key column="ACTION_ID"/>
             <many-to-many class="com.zutubi.pulse.model.BuildSpecification" column="SPECIFICATION_ID"/>
         </bag>
@@ -240,6 +254,8 @@
     </class>
 
     <class name="com.zutubi.pulse.model.CleanupRule" table="CLEANUP_RULE" lazy="false">
+        <cache usage="read-write"/>
+
         <id name="id" type="java.lang.Long" column="ID" unsaved-value="0">
             <generator class="hilo"/>
         </id>
@@ -253,12 +269,16 @@
         <property name="unitName" type="string" length="255"/>
     </class>
 
+    <query name="findAllProjectsLazy" cacheable="true"><![CDATA[
+        from Project project
+    ]]></query>
+
     <query name="findByLikeName"><![CDATA[
         from Project project
         where project.name like :name
     ]]></query>
 
-    <query name="findByName"><![CDATA[
+    <query name="findByName" cacheable="true"><![CDATA[
         from Project project
         where project.name = :name
     ]]></query>
@@ -273,7 +293,7 @@
         where project.scm.id = :scmId
     ]]></query>
 
-    <query name="findProjectByBuildSpecification"><![CDATA[
+    <query name="findProjectByBuildSpecification" cacheable="true"><![CDATA[
         from Project project
         where :buildSpecification in elements(project.buildSpecifications)
     ]]></query>

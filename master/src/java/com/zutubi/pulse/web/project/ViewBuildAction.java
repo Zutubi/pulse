@@ -27,6 +27,7 @@ public class ViewBuildAction extends ProjectActionSupport
     private BuildResult result;
     private List<Changelist> changelists;
     private long selectedNode;
+    private BuildColumns summaryColumns;
 
     private MasterConfigurationManager configurationManager;
     /**
@@ -71,8 +72,13 @@ public class ViewBuildAction extends ProjectActionSupport
 
     public BuildColumns getSummaryColumns()
     {
-        User u = getLoggedInUser();
-        return new BuildColumns(u == null ? User.getDefaultProjectColumns() : u.getProjectSummaryColumns(), projectManager);
+        // Lazy init: not always used.
+        if(summaryColumns == null)
+        {
+            User u = getLoggedInUser();
+            summaryColumns = new BuildColumns(u == null ? User.getDefaultProjectColumns() : u.getProjectSummaryColumns(), projectManager);
+        }
+        return summaryColumns;
     }
 
     public static int getFailureLimit()

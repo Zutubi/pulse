@@ -16,6 +16,7 @@ public class MyBuildsAction extends ActionSupport
 
     private BuildManager buildManager;
     private UserManager userManager;
+    private BuildColumns columns;
 
     public User getUser()
     {
@@ -29,7 +30,11 @@ public class MyBuildsAction extends ActionSupport
 
     public BuildColumns getColumns()
     {
-        return new BuildColumns(user.getMyBuildsColumns(), projectManager);
+        if (columns == null)
+        {
+            columns = new BuildColumns(user.getMyBuildsColumns(), projectManager);
+        }
+        return columns;
     }
 
     public String execute() throws Exception
@@ -39,6 +44,7 @@ public class MyBuildsAction extends ActionSupport
         {
             return "guest";
         }
+        
         user = userManager.getUser(login);
         if (user == null)
         {

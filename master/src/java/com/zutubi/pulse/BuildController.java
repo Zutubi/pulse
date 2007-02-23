@@ -620,7 +620,14 @@ public class BuildController implements EventListener
         // be traversed when this information is required.
         buildResult.calculateFeatureCounts();
 
+        long start = System.currentTimeMillis();
         testManager.index(buildResult);
+        long duration = System.currentTimeMillis() - start;
+        if(duration > 300000)
+        {
+            LOG.warning("Test case indexing for project %s specification %s took %f seconds", project.getName(), specification.getName(), duration / 1000.0);
+        }
+
         buildManager.save(buildResult);
 
         tree.cleanup(buildResult);

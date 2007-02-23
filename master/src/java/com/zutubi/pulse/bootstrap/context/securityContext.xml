@@ -315,8 +315,13 @@ The beans defined within the security subsystem need not be accessed by other co
 
     <bean id="basicAclProvider" class="org.acegisecurity.acl.basic.BasicAclProvider">
         <property name="basicAclDao" ref="projectAclDao"/>
+        <property name="basicAclEntryCache" ref="projectAclEntryCache"/>
     </bean>
 
+    <bean id="projectAclEntryCache" class="com.zutubi.pulse.cache.ehcache.CustomAclEntryCache">
+        <property name="cacheManager" ref="cacheManager"/>
+    </bean>
+    
     <!-- An access decision voter that reads ROLE_* configuration settings -->
     <bean id="roleVoter" class="org.acegisecurity.vote.RoleVoter"/>
 

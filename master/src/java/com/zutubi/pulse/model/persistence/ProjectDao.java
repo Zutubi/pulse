@@ -43,4 +43,6 @@ public interface ProjectDao extends EntityDao<Project>
     List<Project> findByAdminAuthority(String authority);
 
     Project findByCleanupRule(CleanupRule rule);
+
+    List<Project> findAllLazy();
 }

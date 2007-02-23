@@ -1,15 +1,14 @@
 package com.zutubi.pulse.cache.ehcache;
 
-import net.sf.ehcache.Element;
-import net.sf.ehcache.CacheException;
-import net.sf.ehcache.Cache;
-
-import java.io.Serializable;
-import java.io.IOException;
-import java.util.List;
-import java.util.Collections;
-
 import com.zutubi.pulse.util.logging.Logger;
+import net.sf.ehcache.Cache;
+import net.sf.ehcache.CacheException;
+import net.sf.ehcache.Element;
+
+import java.io.IOException;
+import java.io.Serializable;
+import java.util.Collections;
+import java.util.List;
 
 /**
  * <class comment/>
@@ -85,5 +84,10 @@ public class EhCache implements com.zutubi.pulse.cache.Cache
         {
             LOG.error("Error removing all elements from the cache("+getName()+"). Reason: " + e.getMessage(), e);
         }
+    }
+
+    Cache getDelegate()
+    {
+        return delegate;
     }
 }
