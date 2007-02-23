@@ -36,46 +36,20 @@ public class FileArtifactFileObject extends AbstractPulseFileObject implements A
     {
         if (canDecorate == null)
         {
+            canDecorate = false;
             try
             {
-                StoredFileArtifact artifact = getFileArtifact();
-                if (artifact != null)
+                if(base.isFile())
                 {
-                    canDecorate = buildManager.canDecorateArtifact(artifact.getId());
-                }
-                else
-                {
-                    // CIB-882: still unsure under what exact conditions this occurs, although it implies a problem
-                    // with the artifact path. Attempt to log as enough information to work out what is going on.
-                    LOG.warning("Failed to locate file artifact: %s", getArtifactPath());
-                    final long storedArtifactId = getArtifact().getId();
-                    buildManager.executeInTransaction(new Runnable()
+                    StoredFileArtifact artifact = getFileArtifact();
+                    if (artifact != null)
                     {
-                        public void run()
-                        {
-                            try
-                            {
-                                StringBuilder builder = new StringBuilder();
-                                builder.append("Available file artifacts are:\n");
-                                StoredArtifact artifact = buildManager.getArtifact(storedArtifactId);
-                                for (StoredFileArtifact fileArtifact : artifact.getChildren())
-                                {
-                                    builder.append("    ").append(fileArtifact.getPath()).append("\n");
-                                }
-                                LOG.warning(builder.toString());
-                            }
-                            catch (Exception e)
-                            {
-                                LOG.warning(e);
-                            }
-                        }
-                    });
-                    canDecorate = false;
+                        canDecorate = buildManager.canDecorateArtifact(artifact.getId());
+                    }
                 }
             }
             catch (FileSystemException e)
             {
-                canDecorate = false;
                 LOG.error(e);
             }
         }
