@@ -3,9 +3,7 @@ package com.zutubi.prototype.type;
 import com.zutubi.pulse.form.squeezer.SqueezeException;
 import com.zutubi.pulse.form.squeezer.Squeezers;
 import com.zutubi.pulse.form.squeezer.TypeSqueezer;
-import com.zutubi.prototype.type.record.Record;
 
-import java.util.Map;
 import java.util.List;
 import java.util.Collections;
 

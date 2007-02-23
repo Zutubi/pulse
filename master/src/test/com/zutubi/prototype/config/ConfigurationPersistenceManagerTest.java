@@ -5,8 +5,9 @@ import com.zutubi.prototype.type.CompositeType;
 import com.zutubi.prototype.type.Type;
 import com.zutubi.prototype.type.TypeException;
 import com.zutubi.prototype.type.TypeRegistry;
-import com.zutubi.prototype.type.record.Record;
+import com.zutubi.prototype.type.record.MutableRecord;
 import com.zutubi.prototype.type.record.RecordManager;
+import com.zutubi.prototype.type.record.Record;
 import junit.framework.TestCase;
 
 import java.util.List;
@@ -104,11 +105,11 @@ public class ConfigurationPersistenceManagerTest extends TestCase
         assertEquals(0, manager.getListing("simpleCollection/simpleList").size());
 
         // now lets add some records.
-        Record listData = new Record();
+        Record listData = new MutableRecord();
         listData.put("1", "a");
         listData.put("2", "b");
 
-        Record scoRecord = new Record();
+        MutableRecord scoRecord = new MutableRecord();
         scoRecord.put("simpleList", listData);
         recordManager.store("simpleCollection", scoRecord);
 
@@ -126,7 +127,7 @@ public class ConfigurationPersistenceManagerTest extends TestCase
     {
         manager.register("simpleObject", typeRegistry.register("simpleObject", SimpleObject.class));
 
-        Record simpleObject = new Record();
+        Record simpleObject = new MutableRecord();
         simpleObject.setSymbolicName("simpleObject");
         simpleObject.put("strA", "a");
         simpleObject.put("strB", "b");

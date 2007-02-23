@@ -12,7 +12,7 @@ public class RecordManager
      * The base record is the 'anchor' point for all of the records held in memory. All searches for
      * records start from here.
      */
-    private Record baseRecord = new Record();
+    private MutableRecord baseRecord = new MutableRecord();
 
     private static final String PATH_SEPARATOR = "/";
 
@@ -25,43 +25,34 @@ public class RecordManager
      */
     public Record load(String path)
     {
-        try
-        {
-            Record record = baseRecord;
-            StringTokenizer tokens = new StringTokenizer(path, PATH_SEPARATOR, false);
-            while (tokens.hasMoreTokens())
-            {
-                String pathElement = tokens.nextToken();
-                Object data = record.get(pathElement);
-                if (data == null || !(data instanceof Record))
-                {
-                    return null;
-                }
-                record = (Record) record.get(pathElement);
-            }
-            return record.clone();
-        }
-        catch (CloneNotSupportedException e)
-        {
-            // should not happen, record implements cloneable.
-            e.printStackTrace();
-            return null;
-        }
-    }
-
-    public boolean containsRecord(String path)
-    {
         Record record = baseRecord;
         StringTokenizer tokens = new StringTokenizer(path, PATH_SEPARATOR, false);
         while (tokens.hasMoreTokens())
         {
             String pathElement = tokens.nextToken();
             Object data = record.get(pathElement);
-            if (data == null || !(data instanceof Record))
+            if (data == null || !(data instanceof MutableRecord))
+            {
+                return null;
+            }
+            record = (Record) record.get(pathElement);
+        }
+        return record;
+    }
+
+    public boolean containsRecord(String path)
+    {
+        MutableRecord record = baseRecord;
+        StringTokenizer tokens = new StringTokenizer(path, PATH_SEPARATOR, false);
+        while (tokens.hasMoreTokens())
+        {
+            String pathElement = tokens.nextToken();
+            Object data = record.get(pathElement);
+            if (data == null || !(data instanceof MutableRecord))
             {
                 return false;
             }
-            record = (Record) record.get(pathElement);
+            record = (MutableRecord) record.get(pathElement);
         }
         return record != null;
     }
@@ -75,7 +66,7 @@ public class RecordManager
      */
     public void store(String path, Record newRecord)
     {
-        Record record = baseRecord;
+        MutableRecord record = baseRecord;
         StringTokenizer tokens = new StringTokenizer(path, PATH_SEPARATOR, false);
         while (tokens.hasMoreTokens())
         {
@@ -83,23 +74,23 @@ public class RecordManager
             // if a record in the path does not exist, create it. An empty record is fine. 
             if (record.get(pathElement) == null)
             {
-                record.put(pathElement, new Record());
+                record.put(pathElement, new MutableRecord());
             }
             Object obj = record.get(pathElement);
-            if (!(obj instanceof Record))
+            if (!(obj instanceof MutableRecord))
             {
                 // ok, problem. We have a non-record entry, meaning that we are inside
                 // a record that contains data.
                 throw new IllegalArgumentException("Invalid path.");
             }
-            record = (Record) record.get(pathElement);
+            record = (MutableRecord) record.get(pathElement);
         }
-        record.putAll(newRecord);
+        record.putAll((MutableRecord)newRecord);
     }
 
     public Record delete(String path)
     {
-        Record record = baseRecord;
+        MutableRecord record = baseRecord;
         StringTokenizer tokens = new StringTokenizer(path, PATH_SEPARATOR, false);
         
         String pathElement = null;
@@ -118,18 +109,18 @@ public class RecordManager
                 return null;
             }
             Object obj = record.get(pathElement);
-            if (!(obj instanceof Record))
+            if (!(obj instanceof MutableRecord))
             {
                 return null;
             }
             
-            record = (Record) record.get(pathElement);
+            record = (MutableRecord) record.get(pathElement);
         }
 
         if (record.containsKey(pathElement))
         {
             Object obj = record.get(pathElement);
-            if (obj instanceof Record)
+            if (obj instanceof MutableRecord)
             {
                 return (Record) record.remove(pathElement);
             }
@@ -150,7 +141,7 @@ public class RecordManager
             Record record = load(sourcePath);
             if (record != null)
             {
-                Record copy = record.clone();
+                Record copy = (Record) record.clone();
                 store(destinationPath, copy);
             }
         }

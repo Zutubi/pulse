@@ -1,5 +1,6 @@
 package com.zutubi.prototype.type;
 
+import com.zutubi.prototype.type.record.MutableRecord;
 import com.zutubi.prototype.type.record.Record;
 
 import java.util.Collections;
@@ -64,7 +65,7 @@ public class ListType extends CollectionType
         {
             Object child = record.get(key);
             Type type = defaultType;
-            if (child instanceof Record)
+            if (child instanceof MutableRecord)
             {
                 Record childRecord = (Record) child;
                 type = typeRegistry.getType(childRecord.getSymbolicName());
@@ -89,7 +90,7 @@ public class ListType extends CollectionType
 
         List<Object> list = (List<Object>) data;
 
-        Record record = new Record();
+        Record record = new MutableRecord();
         record.setSymbolicName(getSymbolicName());
 
         // write list order meta-data...

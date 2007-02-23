@@ -22,4 +22,9 @@ public class TypeTestCase extends TestCase
         typeRegistry = null;
         super.tearDown();
     }
+
+    public void test()
+    {
+        // 
+    }
 }

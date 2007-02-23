@@ -73,8 +73,18 @@ public class TypeRegistry
         if (type == null)
         {
             CompositeType ctype = new CompositeType(clazz, symbolicName);
-            buildType(ctype);
             classMapping.put(clazz, ctype);
+
+            try
+            {
+                buildType(ctype);
+            }
+            catch (RuntimeException e)
+            {
+                classMapping.remove(clazz);
+                throw e;
+            }
+            
             type = ctype;
         }
 

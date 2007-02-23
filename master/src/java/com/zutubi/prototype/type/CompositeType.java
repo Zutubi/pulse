@@ -1,5 +1,6 @@
 package com.zutubi.prototype.type;
 
+import com.zutubi.prototype.type.record.MutableRecord;
 import com.zutubi.prototype.type.record.Record;
 import com.zutubi.pulse.util.CollectionUtils;
 import com.zutubi.pulse.util.Mapping;
@@ -157,7 +158,7 @@ public class CompositeType extends AbstractType implements Traversable, Type
 
         try
         {
-            Record record = new Record();
+            MutableRecord record = new MutableRecord();
             record.setSymbolicName(getSymbolicName());
             for (Map.Entry<String, TypeProperty> entry : properties.entrySet())
             {
@@ -195,12 +196,10 @@ public class CompositeType extends AbstractType implements Traversable, Type
                     continue;
                 }
                 
-                Type type = entry.getValue().getType();
-                if (type.hasProperty(name))
-                {
-                    Method setter = properties.get(name).getSetter();
-                    setter.invoke(target, type.instantiate(source.get(name)));
-                }
+                TypeProperty property = entry.getValue();
+                Method setter = property.getSetter();
+                Type type = property.getType();
+                setter.invoke(target, type.instantiate(source.get(name)));
             }
         }
         catch (Exception e)

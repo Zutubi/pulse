@@ -26,9 +26,9 @@ public class RecordManagerTest extends TestCase
 
     public void testStore()
     {
-        recordManager.store("hello", new Record());
+        recordManager.store("hello", new MutableRecord());
 
-        Record record = new Record();
+        Record record = new MutableRecord();
         record.put("key", "value");
         recordManager.store("hello/world", record);
 
@@ -37,7 +37,7 @@ public class RecordManagerTest extends TestCase
 
         try
         {
-            recordManager.store("hello/world/key", new Record());
+            recordManager.store("hello/world/key", new MutableRecord());
             fail();
         }
         catch (IllegalArgumentException e)
@@ -47,7 +47,7 @@ public class RecordManagerTest extends TestCase
 
     public void testLoad()
     {
-        Record record = new Record();
+        MutableRecord record = new MutableRecord();
         record.putMeta("key", "value");
 
         recordManager.store("hello/world", record);
@@ -58,7 +58,7 @@ public class RecordManagerTest extends TestCase
 
     public void testDelete()
     {
-        Record record = new Record();
+        MutableRecord record = new MutableRecord();
         record.putMeta("key", "value");
 
         recordManager.store("hello/world", record);
@@ -71,17 +71,17 @@ public class RecordManagerTest extends TestCase
 
     public void testMetaProperties()
     {
-        Record record = new Record();
+        Record record = new MutableRecord();
         record.putMeta("key", "value");
-        recordManager.store("another/path/to/record", record);
+        recordManager.store("path/to/record", record);
 
-        Record loadedRecord = recordManager.load("another/path/to/record");
+        Record loadedRecord = recordManager.load("path/to/record");
         assertEquals(record.getMeta("key"), loadedRecord.getMeta("key"));
     }
 
     public void testTrimmingPath()
     {
-        Record record = new Record();
+        MutableRecord record = new MutableRecord();
         record.putMeta("key", "value");
 
         recordManager.store("another", record);
@@ -93,7 +93,7 @@ public class RecordManagerTest extends TestCase
 
     public void testCopy()
     {
-        Record original = new Record();
+        MutableRecord original = new MutableRecord();
         original.put("key", "value");
 
         recordManager.store("sourcePath", original);
@@ -114,7 +114,7 @@ public class RecordManagerTest extends TestCase
 
     public void testCopyOnStore()
     {
-        Record original = new Record();
+        MutableRecord original = new MutableRecord();
         original.put("key", "value");
 
         recordManager.store("path", original);
@@ -124,21 +124,5 @@ public class RecordManagerTest extends TestCase
 
         Record storedRecord = recordManager.load("path");
         assertEquals("value", storedRecord.get("key"));
-    }
-
-    public void testCopyOnLoad()
-    {
-        Record original = new Record();
-        original.put("key", "value");
-
-        recordManager.store("path", original);
-
-        Record storedRecord = recordManager.load("path");
-
-        // now check the returned record.
-        storedRecord.put("key", "newValue");
-
-        Record anotherStoredRecord = recordManager.load("path");
-        assertEquals("value", anotherStoredRecord.get("key"));
     }
 }

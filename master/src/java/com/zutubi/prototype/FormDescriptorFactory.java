@@ -73,12 +73,14 @@ public class FormDescriptorFactory
     {
         List<FieldDescriptor> fieldDescriptors = new LinkedList<FieldDescriptor>();
 
+/*
         FieldDescriptor hiddenFieldDescriptor = new FieldDescriptor();
         hiddenFieldDescriptor.setName("symbolicName");
         hiddenFieldDescriptor.addParameter("value", type.getSymbolicName());
         hiddenFieldDescriptor.addParameter("type", "hidden");
         fieldDescriptors.add(hiddenFieldDescriptor);
-        
+*/
+
         // Handle the first pass analysis.  Here, all of the fields are considered on an individual basis.
         for (TypeProperty property : type.getProperties(PrimitiveType.class))
         {

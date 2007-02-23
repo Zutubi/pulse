@@ -8,8 +8,8 @@ import com.zutubi.prototype.type.ListType;
 import com.zutubi.prototype.type.MapType;
 import com.zutubi.prototype.type.PrimitiveType;
 import com.zutubi.prototype.type.Type;
-import com.zutubi.prototype.type.record.Record;
 import com.zutubi.prototype.type.record.RecordManager;
+import com.zutubi.prototype.type.record.Record;
 import com.zutubi.pulse.bootstrap.ComponentContext;
 import com.zutubi.pulse.util.StringUtils;
 

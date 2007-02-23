@@ -1,13 +1,10 @@
 package com.zutubi.prototype.type;
 
+import com.zutubi.prototype.type.record.MutableRecord;
 import com.zutubi.prototype.type.record.Record;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.List;
-import java.util.LinkedList;
-import java.util.Collections;
-import java.util.Comparator;
 
 /**
  *
@@ -82,7 +79,7 @@ public class MapType extends CollectionType
 
         Map<String, Object> map = (Map<String, Object>) data;
 
-        Record record = new Record();
+        Record record = new MutableRecord();
         record.setSymbolicName("mapType");
 
         // write type data.

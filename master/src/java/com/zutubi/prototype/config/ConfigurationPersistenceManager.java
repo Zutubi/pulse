@@ -10,8 +10,9 @@ import com.zutubi.prototype.type.Type;
 import com.zutubi.prototype.type.TypeException;
 import com.zutubi.prototype.type.TypeProperty;
 import com.zutubi.prototype.type.TypeRegistry;
-import com.zutubi.prototype.type.record.Record;
+import com.zutubi.prototype.type.record.MutableRecord;
 import com.zutubi.prototype.type.record.RecordManager;
+import com.zutubi.prototype.type.record.Record;
 
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -168,7 +169,7 @@ public class ConfigurationPersistenceManager
             return null;
         }
 
-        Type type = (Type) getType(path);
+        Type type = getType(path);
         if (type != null)
         {
             return type.instantiate(record);
@@ -224,7 +225,7 @@ public class ConfigurationPersistenceManager
             }
         }
 
-        Record record = (Record) type.unstantiate(obj);
+        MutableRecord record = (MutableRecord) type.unstantiate(obj);
         recordManager.store(path, record);
     }
 

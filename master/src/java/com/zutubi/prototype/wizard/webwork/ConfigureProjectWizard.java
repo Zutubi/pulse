@@ -9,7 +9,7 @@ import com.zutubi.prototype.type.CompositeType;
 import com.zutubi.prototype.type.Type;
 import com.zutubi.prototype.type.TypeException;
 import com.zutubi.prototype.type.TypeRegistry;
-import com.zutubi.prototype.type.record.Record;
+import com.zutubi.prototype.type.record.MutableRecord;
 import com.zutubi.prototype.type.record.RecordManager;
 import com.zutubi.prototype.wizard.Wizard;
 import com.zutubi.prototype.wizard.WizardState;
@@ -130,7 +130,7 @@ public class ConfigureProjectWizard implements Wizard
 
             // need a better way to handle this first part..
 
-            Record projectRecord = new Record();
+            MutableRecord projectRecord = new MutableRecord();
             projectRecord.setSymbolicName("projectConfig");
             recordManager.store(projectPath, projectRecord);
 
