@@ -44,5 +44,5 @@ public interface ProjectDao extends EntityDao<Project>
 
     Project findByCleanupRule(CleanupRule rule);
 
-    List<Project> findAllLazy();
+    List<Project> findAllProjectsCached();
 }

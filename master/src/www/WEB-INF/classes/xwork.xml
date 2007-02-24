@@ -1144,6 +1144,16 @@
             <result name="success" type="velocity">server-settings.vm</result>
         </action>
 
+        <action name="hibernateStatistics" class="com.zutubi.pulse.web.admin.debug.DumpHibernateStatisticsAction">
+            <interceptor-ref name="defaultReadOnlyStack"/>
+            <result name="success" type="velocity">hibernate-statistics.vm</result>
+        </action>
+
+        <action name="toggleHibernateStatistics" class="com.zutubi.pulse.web.admin.debug.ToggleHibernateStatisticsAction">
+            <interceptor-ref name="defaultReadOnlyStack"/>
+            <result name="success" type="redirect">hibernateStatistics.action</result>
+        </action>
+
         <action name="toggleRecipeQueue" class="com.zutubi.pulse.web.admin.ToggleRecipeQueueAction">
             <result name="success" type="redirect">/viewServerQueues.action</result>
         </action>

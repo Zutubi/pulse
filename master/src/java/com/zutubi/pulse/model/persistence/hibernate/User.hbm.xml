@@ -23,12 +23,14 @@
         <property name="refreshInterval" type="int"/>
 
         <map name="properties" table="USER_PROPERTIES">
+            <cache usage="read-write"/>
             <key column="USER_ID"/>
             <index column="PROPERTY_KEY" type="string" length="255"/>
             <element column="PROPERTY_VALUE" type="string" length="4095"/>
         </map>
 
         <idbag name="grantedAuthorities" table="USER_AUTHORITIES" cascade="all,delete-orphan" lazy="false">
+            <cache usage="read-write"/>
             <collection-id column="ID" type="long">
                 <generator class="hilo"/>
             </collection-id>
@@ -37,6 +39,7 @@
         </idbag>
 
         <set name="groups" table="GROUP_USERS" lazy="false" inverse="true" cascade="none">
+            <cache usage="read-write"/>
             <key column="USER_ID"/>
             <many-to-many class="com.zutubi.pulse.model.Group" column="GROUP_ID"/>
         </set>
@@ -48,6 +51,7 @@
         </bag>
 
         <bag name="aliases" lazy="false" table="USER_ALIASES">
+            <cache usage="read-write"/>
             <key column="USER_ID"/>
             <element type="string" column="ALIAS" not-null="true" length="255"/>
         </bag>

@@ -47,10 +47,10 @@ public class ViewProjectsAction extends ProjectActionSupport
 
     public String execute()
     {
-        groups = projectManager.getAllProjectGroupsLazy();
+        groups = projectManager.getAllProjectGroupsCached();
         Collections.sort(groups, new NamedEntityComparator());
 
-        projects = getProjectManager().getAllProjectsLazy();
+        projects = getProjectManager().getAllProjectsCached();
         for(ProjectGroup g: groups)
         {
             projects.removeAll(g.getProjects());

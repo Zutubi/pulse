@@ -49,9 +49,9 @@ public class MockProjectManager implements ProjectManager
         return new LinkedList<Project>(projects.values());
     }
 
-    public List<Project> getAllProjectsLazy()
+    public List<Project> getAllProjectsCached()
     {
-        return getAllProjects();
+        throw new RuntimeException("Method not implemented.");
     }
 
     public List<Project> getProjectsWithNameLike(String s)
@@ -165,7 +165,7 @@ public class MockProjectManager implements ProjectManager
         throw new RuntimeException("Method not implemented.");
     }
 
-    public List<ProjectGroup> getAllProjectGroupsLazy()
+    public List<ProjectGroup> getAllProjectGroupsCached()
     {
         throw new RuntimeException("Method not yet implemented.");
     }

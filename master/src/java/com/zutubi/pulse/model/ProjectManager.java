@@ -31,7 +31,7 @@ public interface ProjectManager extends EntityManager<Project>
 
     List<Project> getAllProjects();
 
-    List<Project> getAllProjectsLazy();
+    List<Project> getAllProjectsCached();
 
     List<Project> getProjectsWithNameLike(String s);
 
@@ -158,7 +158,7 @@ public interface ProjectManager extends EntityManager<Project>
     long getNextBuildNumber(Project project);
 
     List<ProjectGroup> getAllProjectGroups();
-    List<ProjectGroup> getAllProjectGroupsLazy();
+    List<ProjectGroup> getAllProjectGroupsCached();
     ProjectGroup getProjectGroup(long id);
     ProjectGroup getProjectGroup(String name);
 

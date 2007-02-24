@@ -95,7 +95,7 @@ public class DashboardAction extends ActionSupport
 
         if(user.getShowAllProjects())
         {
-            shownProjects = projectManager.getAllProjectsLazy();
+            shownProjects = projectManager.getAllProjectsCached();
         }
         else
         {

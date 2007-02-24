@@ -22,11 +22,11 @@ public class HibernateProjectGroupDao extends HibernateEntityDao<ProjectGroup> i
 
     public List<ProjectGroup> findByProject(Project project)
     {
-        return findByNamedQuery("findProjectGroupByProject", "project", project);
+        return findByNamedQuery("findProjectGroupByProject", "project", project, 0, true);
     }
 
-    public List<ProjectGroup> findAllLazy()
+    public List<ProjectGroup> findAllCached()
     {
-        return findByNamedQuery("findAllProjectGroupsLazy");
+        return findByNamedQuery("findAllProjectGroupsCached", 0, true);
     }
 }

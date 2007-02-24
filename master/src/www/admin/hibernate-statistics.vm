@@ -1,0 +1,87 @@
+#macro(statRow $stat $value)
+    <tr>
+        <th class="content">$stat</th>
+        <td class="content-right">$value</th>
+    </tr>
+#end
+
+
+#helpTag("Administration+Settings+Tab")
+#authorisationTags($principle)
+<content tag="selectedTab">administration</content>
+<html>
+<head>
+    <title>#wwtext("name=administration")</title>
+</head>
+<body>
+    #adminTabs("settings")
+
+    #parse("/template/includes/actionerrors.vm")
+
+    <h1>:: hibernate statistics ::</h1>
+
+    <h2 class="section">Second-Level Cache</h2>
+    <p>Total size of second level cache: $secondLevelCacheSizeKB KB ($secondLevelCacheSizeMB MB)</p>
+
+    #set($regions = $secondLevelCacheStats.keySet())
+    #foreach($region in $regions)
+    <table class="content">
+        #headingRow($region 2)
+        #set($cacheStats = $secondLevelCacheStats.get($region))
+        #statRow("element count in memory" $cacheStats.elementCountInMemory)
+        #statRow("element count on disk" $cacheStats.elementCountOnDisk)
+        #statRow("hit count" $cacheStats.hitCount)
+        #statRow("miss count" $cacheStats.missCount)
+        #statRow("put count" $cacheStats.putCount)
+        #statRow("size in memory" $cacheStats.sizeInMemory)
+##        #statRow("entries" $cacheStats.entries)
+    </table>
+    #end
+
+    <h2 class="section">Queries</h2>
+
+    #set($queries = $queryStats.keySet())
+    #foreach($query in $queries)
+    <table class="content">
+        #headingRow($query 2)
+        #set($queryStats = $queryStats.get($query))
+        #statRow("cache hit" $queryStats.cacheHitCount)
+        #statRow("cache miss" $queryStats.cacheMissCount)
+        #statRow("cache put" $queryStats.cachePutCount)
+        #statRow("execution count" $queryStats.executionCount)
+        #statRow("execution average time" $queryStats.executionAvgTime)
+        #statRow("execution max time" $queryStats.executionMaxTime)
+        #statRow("execution min time" $queryStats.executionMinTime)
+        #statRow("execution row count" $queryStats.executionRowCount)
+    </table>
+    #end
+
+    <h2 class="section">Entities</h2>
+
+    #set($entities = $entityStats.keySet())
+    #foreach($entity in $entities)
+    <table class="content">
+        #headingRow($entity 2)
+        #set($entityStats = $entityStats.get($entity))
+        #statRow("fetch count" $entityStats.fetchCount)
+        #statRow("load count" $entityStats.loadCount)
+        #statRow("insert count" $entityStats.insertCount)
+        #statRow("update count" $entityStats.updateCount)
+        #statRow("delete count" $entityStats.deleteCount)
+    </table>
+    #end
+
+    <p>
+        Hibernate statistics are now #if($on) on. #else off. #end
+    </p>
+    <p>
+#if($on)
+    <a href="$base/admin/toggleHibernateStatistics.action?on=true">Switch off</a>
+#else
+    <a href="$base/admin/toggleHibernateStatistics.action?on=true">Switch on</a>
+#end
+    </p>
+    
+    #tabEnd()
+</body>
+</html>

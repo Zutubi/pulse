@@ -13,5 +13,5 @@ public interface ProjectGroupDao extends EntityDao<ProjectGroup>
     
     List<ProjectGroup> findByProject(Project project);
 
-    List<ProjectGroup> findAllLazy();
+    List<ProjectGroup> findAllCached();
 }

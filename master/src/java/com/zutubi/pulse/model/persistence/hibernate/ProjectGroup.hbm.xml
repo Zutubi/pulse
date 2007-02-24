@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD//EN" "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd" >
 <hibernate-mapping>
-    <class name="com.zutubi.pulse.model.ProjectGroup" table="PROJECT_GROUP" lazy="false">
+    <class name="com.zutubi.pulse.model.ProjectGroup" table="PROJECT_GROUP">
         <cache usage="read-write"/>
         
         <id name="id" type="java.lang.Long" column="ID" unsaved-value="0">
@@ -10,15 +10,15 @@
 
         <property name="name" column="NAME" type="string" length="255"/>
 
-        <list name="projects" table="PROJECT_GROUP_PROJECTS" lazy="false" cascade="none">
+        <list name="projects" table="PROJECT_GROUP_PROJECTS" cascade="none" outer-join="true">
             <cache usage="read-write"/>
             <key column="GROUP_ID"/>
             <index column="ORDINAL"/>
-            <many-to-many class="com.zutubi.pulse.model.Project" column="PROJECT_ID"/>
+            <many-to-many class="com.zutubi.pulse.model.Project" column="PROJECT_ID" />
         </list>
     </class>
 
-    <query name="findAllProjectGroupsLazy" cacheable="true"><![CDATA[
+    <query name="findAllProjectGroupsCached" cacheable="true"><![CDATA[
         from ProjectGroup model
     ]]></query>
 

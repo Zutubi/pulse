@@ -93,6 +93,26 @@
            eternal="true"
            overflowToDisk="false"/>
 
+    <cache name="com.zutubi.pulse.model.User.properties"
+           maxElementsInMemory="500"
+           eternal="true"
+           overflowToDisk="false"/>
+
+    <cache name="com.zutubi.pulse.model.User.grantedAuthorities"
+           maxElementsInMemory="500"
+           eternal="true"
+           overflowToDisk="false"/>
+
+    <cache name="com.zutubi.pulse.model.User.groups"
+           maxElementsInMemory="500"
+           eternal="true"
+           overflowToDisk="false"/>
+
+    <cache name="com.zutubi.pulse.model.User.aliases"
+           maxElementsInMemory="100"
+           eternal="true"
+           overflowToDisk="false"/>
+
     <cache name="com.zutubi.pulse.model.User.contactPoints"
            maxElementsInMemory="100"
            eternal="true"
@@ -143,6 +163,11 @@
            eternal="true"
            overflowToDisk="false"/>
 
+    <cache name="com.zutubi.pulse.model.ProjectAclEntry"
+           maxElementsInMemory="2000"
+           eternal="true"
+           overflowToDisk="false"/>
+
     <cache name="com.zutubi.pulse.model.Project.buildSpecifications"
            maxElementsInMemory="500"
            eternal="true"
@@ -178,12 +203,37 @@
            eternal="true"
            overflowToDisk="false"/>
 
+    <cache name="com.zutubi.pulse.model.TemplatePulseFileDetails.outputProcessors"
+           maxElementsInMemory="500"
+           eternal="true"
+           overflowToDisk="false"/>
+
     <cache name="com.zutubi.pulse.model.TemplatePulseFileDetails.captures"
            maxElementsInMemory="500"
            eternal="true"
            overflowToDisk="false"/>
 
+    <cache name="com.zutubi.pulse.model.AntPulseFileDetails.environment"
+           maxElementsInMemory="500"
+           eternal="true"
+           overflowToDisk="false"/>
+
+    <cache name="com.zutubi.pulse.model.ExecutablePulseFileDetails.environment"
+           maxElementsInMemory="500"
+           eternal="true"
+           overflowToDisk="false"/>
+
+    <cache name="com.zutubi.pulse.model.MakePulseFileDetails.environment"
+           maxElementsInMemory="500"
+           eternal="true"
+           overflowToDisk="false"/>
+
     <cache name="com.zutubi.pulse.model.Capture"
+           maxElementsInMemory="2000"
+           eternal="true"
+           overflowToDisk="false"/>
+
+    <cache name="com.zutubi.pulse.model.Capture.processors"
            maxElementsInMemory="2000"
            eternal="true"
            overflowToDisk="false"/>
@@ -219,6 +269,11 @@
            overflowToDisk="false"/>
 
     <cache name="com.zutubi.pulse.model.BuildSpecificationNode.postActions"
+           maxElementsInMemory="5000"
+           eternal="true"
+           overflowToDisk="false"/>
+
+    <cache name="com.zutubi.pulse.model.BuildSpecificationNode.resourceRequirements"
            maxElementsInMemory="5000"
            eternal="true"
            overflowToDisk="false"/>

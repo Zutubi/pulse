@@ -91,6 +91,8 @@
     </class>
 
     <class name="com.zutubi.pulse.model.ProjectAclEntry" table="PROJECT_ACL_ENTRY" lazy="false">
+        <cache usage="read-write"/>
+
         <id name="id" type="java.lang.Long" column="ID" unsaved-value="0">
             <generator class="hilo"/>
         </id>
@@ -127,6 +129,7 @@
             </bag>
 
             <bag name="outputProcessors" table="OUTPUT_PROCESSORS" lazy="false">
+                <cache usage="read-write"/>
                 <key column="DETAILS_ID"/>
                 <element type="string" column="PROCESSOR" not-null="true"/>
             </bag>
@@ -137,6 +140,7 @@
                 <property name="arguments" column="ARGUMENTS" type="string" length="1023"/>
                 <property name="workingDir" column="WORKING_DIR" type="string" length="255"/>
                 <map name="environment" lazy="false" table="ANT_SOURCE_ENVIRONMENT" cascade="all">
+                    <cache usage="read-write"/>
                     <key column="SOURCE_ID"/>
                     <index column="NAME" type="string" length="255"/>
                     <element type="text" column="VALUE"/>
@@ -149,6 +153,7 @@
                 <property name="arguments" column="ARGUMENTS" type="string" length="1023"/>
                 <property name="workingDir" column="WORKING_DIR" type="string" length="255"/>
                 <map name="environment" lazy="false" table="EXE_SOURCE_ENVIRONMENT" cascade="all">
+                    <cache usage="read-write"/>
                     <key column="SOURCE_ID"/>
                     <index column="NAME" type="string" length="255"/>
                     <element type="text" column="VALUE"/>
@@ -161,6 +166,7 @@
                 <property name="arguments" column="ARGUMENTS" type="string" length="1023"/>
                 <property name="workingDir" column="WORKING_DIR" type="string" length="1023"/>
                 <map name="environment" lazy="false" table="MAKE_SOURCE_ENVIRONMENT" cascade="all">
+                    <cache usage="read-write"/>
                     <key column="SOURCE_ID"/>
                     <index column="NAME" type="string" length="255"/>
                     <element type="text" column="VALUE"/>
@@ -204,6 +210,7 @@
         <property name="name" type="string" length="255"/>
 
         <bag name="processors" table="CAPTURE_PROCESSORS" lazy="false">
+            <cache usage="read-write"/>
             <key column="CAPTURE_ID"/>
             <element type="string" column="PROCESSOR" not-null="true" length="255"/>
         </bag>
@@ -269,7 +276,7 @@
         <property name="unitName" type="string" length="255"/>
     </class>
 
-    <query name="findAllProjectsLazy" cacheable="true"><![CDATA[
+    <query name="findAllProjectsCached" cacheable="true"><![CDATA[
         from Project project
     ]]></query>
 

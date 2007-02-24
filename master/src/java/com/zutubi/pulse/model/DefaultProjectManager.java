@@ -82,9 +82,9 @@ public class DefaultProjectManager implements ProjectManager
         return projectDao.findAll();
     }
 
-    public List<Project> getAllProjectsLazy()
+    public List<Project> getAllProjectsCached()
     {
-        return projectDao.findAllLazy();
+        return projectDao.findAllProjectsCached();
     }
 
     public List<Project> getProjectsWithNameLike(String name)
@@ -545,9 +545,9 @@ public class DefaultProjectManager implements ProjectManager
         return projectGroupDao.findAll();
     }
 
-    public List<ProjectGroup> getAllProjectGroupsLazy()
+    public List<ProjectGroup> getAllProjectGroupsCached()
     {
-        return projectGroupDao.findAllLazy();
+        return projectGroupDao.findAllCached();
     }
 
     public ProjectGroup getProjectGroup(long id)
