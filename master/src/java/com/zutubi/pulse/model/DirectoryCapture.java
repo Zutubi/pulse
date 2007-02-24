@@ -2,9 +2,9 @@ package com.zutubi.pulse.model;
 
 import com.opensymphony.util.TextUtils;
 
-import java.util.List;
 import java.util.Arrays;
 import java.util.LinkedList;
+import java.util.List;
 
 /**
  * A capture for multi files nested under a directory.
@@ -37,6 +37,18 @@ public class DirectoryCapture extends Capture
     public DirectoryCapture(String name)
     {
         this(name, null, null);
+    }
+
+    public DirectoryCapture copy()
+    {
+        DirectoryCapture copy = new DirectoryCapture();
+        copyCommon(copy);
+        copy.base = base;
+        copy.excludes = excludes;
+        copy.includes = includes;
+        copy.mimeType = mimeType;
+
+        return copy;
     }
 
     public DirectoryCapture(String name, String base)

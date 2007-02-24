@@ -267,6 +267,22 @@ public class ProjectArtifactsAcceptanceTest extends ProjectAcceptanceTestBase
         assertTextPresent(name + " is already being used");
     }
 
+    public void testCloneArtifacts()
+    {
+        String name = RandomUtils.randomString(5);
+        addDirectoryArtifact(name);
+
+        clickLinkWithText("home");
+        clickLinkWithText("clone project");
+
+        CloneProjectForm form = new CloneProjectForm(tester);
+        form.assertFormPresent();
+        String clone = "clone " + RandomUtils.randomString(5);
+        form.saveFormElements(clone, DESCRIPTION);
+
+        assertProjectArtifactsTable(new String[][] { getArtifactRow(name, "directory") });
+    }
+
     private String[] getArtifactRow(String name, String type)
     {
         return new String[]{name, type, "edit", "delete"};

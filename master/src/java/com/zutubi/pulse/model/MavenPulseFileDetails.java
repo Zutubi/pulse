@@ -32,7 +32,9 @@ public class MavenPulseFileDetails extends TemplatePulseFileDetails
 
     public MavenPulseFileDetails copy()
     {
-        return new MavenPulseFileDetails(targets, workingDir, arguments);
+        MavenPulseFileDetails copy = new MavenPulseFileDetails(targets, workingDir, arguments);
+        copyCommon(copy);
+        return copy;
     }
 
     protected String getTemplateName()

@@ -1,12 +1,11 @@
 package com.zutubi.pulse.model;
 
+import com.opensymphony.util.TextUtils;
 import org.apache.velocity.VelocityContext;
 
 import java.util.Map;
-import java.util.TreeMap;
 import java.util.Properties;
-
-import com.opensymphony.util.TextUtils;
+import java.util.TreeMap;
 
 /**
  */
@@ -45,7 +44,9 @@ public class ExecutablePulseFileDetails extends TemplatePulseFileDetails
     public ExecutablePulseFileDetails copy()
     {
         Map<String, String> env = new TreeMap<String, String>(environment);
-        return new ExecutablePulseFileDetails(executable, arguments, workingDir, env);
+        ExecutablePulseFileDetails copy = new ExecutablePulseFileDetails(executable, arguments, workingDir, env);
+        copyCommon(copy);
+        return copy;
     }
 
     protected String getTemplateName()

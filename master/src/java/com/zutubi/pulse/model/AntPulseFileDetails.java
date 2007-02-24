@@ -46,7 +46,9 @@ public class AntPulseFileDetails extends TemplatePulseFileDetails
     public AntPulseFileDetails copy()
     {
         Map<String, String> env = new TreeMap<String, String>(environment);
-        return new AntPulseFileDetails(buildFile, targets, arguments, workingDir, env);
+        AntPulseFileDetails copy = new AntPulseFileDetails(buildFile, targets, arguments, workingDir, env);
+        copyCommon(copy);
+        return copy;
     }
 
     protected String getTemplateName()
