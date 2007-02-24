@@ -171,4 +171,6 @@ public interface ProjectManager extends EntityManager<Project>
     Project getProjectByCleanupRule(CleanupRule rule);
 
     BuildSpecification getBuildSpecification(long id);
+
+    void delete(BuildHostRequirements hostRequirements);
 }

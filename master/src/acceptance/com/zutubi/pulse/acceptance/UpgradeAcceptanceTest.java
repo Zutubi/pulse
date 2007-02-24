@@ -45,9 +45,14 @@ public class UpgradeAcceptanceTest extends BaseAcceptanceTestCase
         }
     }
 
-    public void testFromOneTwoFifteen() throws Exception
+    public void testPostBuildActionSpecifications() throws Exception
     {
         importAndUpgradeTest("0102015000");
+    }
+
+    public void testDanglingSlaveHostRequirements() throws Exception
+    {
+        importAndUpgradeTest("0102017001");
     }
 
     public void importAndUpgradeTest(String build) throws Exception

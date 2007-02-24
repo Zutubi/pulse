@@ -200,6 +200,11 @@ public class MockProjectManager implements ProjectManager
         throw new RuntimeException("Method not implemented.");
     }
 
+    public void delete(BuildHostRequirements hostRequirements)
+    {
+        throw new RuntimeException("Method not yet implemented.");
+    }
+
     public void updateProjectDetails(Project project, String name, String description, String url)
     {
         throw new RuntimeException("Method not implemented.");

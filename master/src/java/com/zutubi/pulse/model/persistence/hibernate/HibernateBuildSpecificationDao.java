@@ -52,4 +52,9 @@ public class HibernateBuildSpecificationDao extends HibernateEntityDao<BuildSpec
 
         return referringToSlave;
     }
+
+    public void delete(BuildHostRequirements hostRequirements)
+    {
+        getHibernateTemplate().delete(hostRequirements);
+    }
 }

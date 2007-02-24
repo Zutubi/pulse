@@ -582,6 +582,11 @@ public class DefaultProjectManager implements ProjectManager
         return buildSpecificationDao.findById(id);
     }
 
+    public void delete(BuildHostRequirements hostRequirements)
+    {
+        buildSpecificationDao.delete(hostRequirements);
+    }
+
     public void setEventManager(EventManager eventManager)
     {
         this.eventManager = eventManager;
