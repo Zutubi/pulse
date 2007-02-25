@@ -2,7 +2,7 @@ package com.zutubi.prototype;
 
 import com.zutubi.prototype.model.Field;
 import com.zutubi.prototype.model.Form;
-import com.zutubi.prototype.type.Type;
+import com.zutubi.prototype.model.SubmitField;
 import com.zutubi.pulse.util.CollectionUtils;
 import com.zutubi.pulse.util.Predicate;
 
@@ -11,6 +11,7 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Collections;
 
 /**
  *
@@ -20,13 +21,15 @@ public class FormDescriptor implements Descriptor
 {
     private List<FieldDescriptor> fieldDescriptors = new LinkedList<FieldDescriptor>();
 
-    private Type type;
+    private String id;
 
     private Map<String, Object> parameters = new HashMap<String, Object>();
 
-    public void setType(Type type)
+    private List<String> actions = new LinkedList<String>();
+
+    public void setId(String id)
     {
-        this.type = type;
+        this.id = id;
     }
 
     public void add(FieldDescriptor descriptor)
@@ -70,10 +73,21 @@ public class FormDescriptor implements Descriptor
         this.parameters = parameters;
     }
 
+    public List<String> getActions()
+    {
+        return Collections.unmodifiableList(actions);
+    }
+
+    public void setActions(List<String> actions)
+    {
+        this.actions.clear();
+        this.actions.addAll(actions);
+    }
+
     public Form instantiate(Object data)
     {
         Form form = new Form();
-        form.setId(type.getSymbolicName());    
+        form.setId(id);    
 
         List<String> fieldOrder = evaluateFieldOrder();
 
@@ -85,7 +99,13 @@ public class FormDescriptor implements Descriptor
             field.setTabindex(tabindex++);
             form.add(field);
         }
-        
+
+        // add the submit fields.
+        for (String action : actions)
+        {
+            form.add(new SubmitField(action).setTabindex(tabindex++));
+        }
+
         return form;
     }
 

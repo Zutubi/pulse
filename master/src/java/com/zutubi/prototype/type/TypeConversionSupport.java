@@ -2,8 +2,8 @@ package com.zutubi.prototype.type;
 
 import com.zutubi.pulse.form.squeezer.Squeezers;
 import com.zutubi.pulse.form.squeezer.TypeSqueezer;
-import com.opensymphony.util.TextUtils;
 
+import java.lang.reflect.Method;
 import java.util.Map;
 
 /**
@@ -46,22 +46,30 @@ public class TypeConversionSupport
         for (TypeProperty property : type.getProperties(PrimitiveType.class))
         {
             String propertyName = property.getName();
-            if (!map.containsKey(propertyName))
-            {
-                continue;
-            }
             try
             {
-                Object value = map.get(propertyName);
-                TypeSqueezer squeezer = Squeezers.findSqueezer(property.getClazz());
-
-                if (value instanceof String)
+                Method setter = property.getSetter();
+                if (setter != null) // is a writable field.
                 {
-                    property.getSetter().invoke(instance, squeezer.unsqueeze((String)value));
-                }
-                else if (value instanceof String[])
-                {
-                    property.getSetter().invoke(instance, squeezer.unsqueeze((String[])value));
+                    Object value = map.get(propertyName);
+                    TypeSqueezer squeezer = Squeezers.findSqueezer(property.getClazz());
+                    if (squeezer == null)
+                    {
+                        throw new TypeConversionException("Unknown convertable type: " + property.getClazz());
+                    }
+                    
+                    if (value instanceof String)
+                    {
+                        setter.invoke(instance, squeezer.unsqueeze((String)value));
+                    }
+                    else if (value instanceof String[])
+                    {
+                        setter.invoke(instance, squeezer.unsqueeze((String[])value));
+                    }
+                    else
+                    {
+                        setter.invoke(instance, squeezer.unsqueeze((String)value));
+                    }
                 }
             }
             catch (Exception e)

@@ -50,10 +50,10 @@ public class FieldDescriptor implements Descriptor
     public Field instantiate(Object instance)
     {
         Field field = new Field();
-        field.getParameters().put("name", getName());
-        field.getParameters().put("id", getName());
-        field.getParameters().put("label", getName() + ".label");
-        field.getParameters().putAll(getParameters());
+        field.setName(getName());
+        field.setId(getName());
+        field.setLabel(getName() + ".label");
+        field.addAll(getParameters());
 
         try
         {
@@ -62,18 +62,18 @@ public class FieldDescriptor implements Descriptor
                 if (instance != null)
                 {
                     Map context = Ognl.createDefaultContext(instance);
-                    field.getParameters().put("value", Ognl.getValue(getName(), context, instance));
+                    field.setValue(Ognl.getValue(getName(), context, instance));
 
                     if (getParameter("type").equals("select"))
                     {
-                        field.getParameters().put("list", Ognl.getValue(getName() + "Options", context, instance));
+                        field.addParameter("list", Ognl.getValue(getName() + "Options", context, instance));
                     }
                 }
             }
         }
         catch (OgnlException e)
         {
-            field.getParameters().put("value", e.getMessage());
+            field.setValue(e.getMessage());
         }
 
         return field;

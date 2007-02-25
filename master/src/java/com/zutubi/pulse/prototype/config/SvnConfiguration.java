@@ -1,15 +1,17 @@
 package com.zutubi.pulse.prototype.config;
 
 import com.zutubi.pulse.form.descriptor.annotation.Summary;
+import com.zutubi.prototype.annotation.Form;
 
 /**
  */
 @Summary(fields = {"name", "url"})
+@Form(fieldOrder = { "url", "username", "password", "keyfile", "keyfilePassphrase"})
 public class SvnConfiguration extends BaseScmConfiguration
 {
     private String url;
 
-    private String name;
+    private String username;
 
     private String password;
 
@@ -24,7 +26,7 @@ public class SvnConfiguration extends BaseScmConfiguration
     public SvnConfiguration(String url, String name, String password)
     {
         this.url = url;
-        this.name = name;
+        this.username = name;
         this.password = password;
     }
 
@@ -38,14 +40,14 @@ public class SvnConfiguration extends BaseScmConfiguration
         this.url = url;
     }
 
-    public String getName()
+    public String getUsername()
     {
-        return name;
+        return username;
     }
 
-    public void setName(String name)
+    public void setUsername(String username)
     {
-        this.name = name;
+        this.username = username;
     }
 
     public String getPassword()

@@ -2,74 +2,78 @@ package com.zutubi.prototype.model;
 
 import java.util.List;
 import java.util.LinkedList;
+import java.util.Collections;
 
 /**
  *
  *
  */
-public class Form
+public class Form extends UIComponent
 {
+    /**
+     * Ordered list of fields that make up this form.
+     */
     private List<Field> fields = new LinkedList<Field>();
 
-    private List<String> actions = new LinkedList<String>();
-
-    private String id;
-
-    private String action = "config.action";
+    /**
+     * The submit fields
+     */
+    private List<Field> submitFields = new LinkedList<Field>();
 
     public Form()
     {
-        actions.add("save");
-        actions.add("cancel");
     }
 
     public String getId()
     {
-        return id;
+        return (String) parameters.get("id");
     }
 
     public void setId(String id)
     {
-        this.id = id;
+        parameters.put("id", id);
     }
 
     public String getAction()
     {
-        return action;
+        return (String) parameters.get("action");
     }
 
     public void setAction(String action)
     {
-        this.action = action;
+        parameters.put("action", action);
     }
 
     public void add(Field field)
     {
-        this.fields.add(field);
+        if ("submit".equals(field.getType()))
+        {
+            this.submitFields.add(field);
+        }
+        else
+        {
+            this.fields.add(field);
+        }
     }
 
     public List<Field> getFields()
     {
-        return fields;
+        return Collections.unmodifiableList(fields);
     }
 
     public void setFields(List<Field> fields)
     {
-        this.fields = fields;
+        this.fields.clear();
+        this.submitFields.clear();
+        
+        for (Field field : fields)
+        {
+            add(field);
+        }
     }
 
-    public void addAction(String action)
+    public List<Field> getSubmitFields()
     {
-        this.actions.add(action);
-    }
-    
-    public List<String> getActions()
-    {
-        return actions;
-    }
-
-    public void setActions(List<String> actions)
-    {
-        this.actions = actions;
+        return Collections.unmodifiableList(submitFields);
     }
 }

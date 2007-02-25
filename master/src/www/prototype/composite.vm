@@ -14,34 +14,11 @@
     ${sep} $!config.currentPath
 </div>
 
-<h2>composite</h2>
-
+<h2>#i18n("path=$config.path" "key=label")</h2>
+<h4>composite</h4>
 <p>
-    <ul>
-        <li>path: $!config.path</li>
-    </ul>
-    <ul>
-        <li>type symbolic name: $!config.typeSymbolicName</li>
-        <li>target symbolic name: $!config.targetSymbolicName</li>
-    </ul>
+    #i18n("path=$config.path" "key=introduction")
 </p>
-<p>
-    Current data size: $!config.record.size()
-</p>
-#if($config.record)
-<p>
-<table>
-#foreach($key in $config.record.keySet())
-    <tr>
-        <td> $key </td><td>&nbsp;</td><td> $config.record.get($key) </td>
-    </tr>
-#end
-</table>
-</p>
-<p>
-    <a href="reset.action?path=$config.path">reset</a>
-</p>
-#end
 
 #if( $config.extensions.size() > 0)
 <p>
@@ -59,9 +36,13 @@
     <h3>simple properties</h3>
     <ul>
     #foreach($prop in $config.simpleProperties)
-        <li>$prop</li>
+        <li>$prop : #i18n("path=$config.path" "key=${prop}.description")</li>
     #end
     </ul>
+
+    <p>
+        #pform("path=$config.path" "action=save.action?path=$config.path")
+    </p>
 </p>
 #end
 
@@ -98,39 +79,47 @@
 </p>
 #end
 
-#if($config.record)
-
-    #if($config.simpleProperties.size() > 0)
-        <h3>edit</h3>
-        <p>
-            #pform("path=$config.path" "action=save.action?path=$config.path")
-        </p>
-    #end
-
-#else
-
-    #if( $config.extensions.size() > 0)
-        #if($config.extensions.size() == 1)
-            #pform("path=$config.path" "action=save.action?path=$config.path" "symbolicName=$config.extensions.get(0)")
-        #else
-            <a href="wizard.action?path=$config.path">create...</a>
-        #end
-    #else
-        #if($config.simpleProperties.size() > 0)
-            <h3>create</h3>
-            <p>
-                #pform("path=$config.path" "action=save.action?path=$config.path")
-            </p>
-        #end
-    #end
-
+#if( $config.extensions.size() > 0)
+<p>
+    <h3>extension</h3>
+    <a href="wizard.action?path=$config.path">create...</a>
+</p>
 #end
 
 <p>
-    #if($config.pathElements.size() > 2)
+    #if($config.pathElements.size() > 1)
         <a href="configuration.action?path=${config.parentPath}">done</a>
     #end
 </p>
+
+
+<h2>debugging</h2>
+<p>
+    <ul>
+        <li>path: $!config.path</li>
+    </ul>
+    <ul>
+        <li>type symbolic name: $!config.typeSymbolicName</li>
+        <li>target symbolic name: $!config.targetSymbolicName</li>
+    </ul>
+</p>
+<p>
+    Current data size: $!config.record.size()
+</p>
+#if($config.record)
+<p>
+<table>
+#foreach($key in $config.record.keySet())
+    <tr>
+        <td> $key </td><td>&nbsp;</td><td> $config.record.get($key) </td>
+    </tr>
+#end
+</table>
+</p>
+<p>
+    <a href="reset.action?path=$config.path">reset</a>
+</p>
+#end
 
 </body>
 </html>

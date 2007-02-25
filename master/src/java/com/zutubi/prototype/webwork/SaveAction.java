@@ -20,11 +20,6 @@ public class SaveAction extends ActionSupport
     private String path;
     private Configuration configuration;
 
-    public Configuration getConfiguration()
-    {
-        return configuration;
-    }
-
     public String getSymbolicName()
     {
         return symbolicName;
@@ -47,9 +42,6 @@ public class SaveAction extends ActionSupport
 
     public String execute() throws Exception
     {
-        configuration = new Configuration(path);
-        configuration.analyse();
-
         if (!TextUtils.stringSet(symbolicName))
         {
             return INPUT;

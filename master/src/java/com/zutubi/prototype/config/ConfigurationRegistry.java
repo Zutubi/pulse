@@ -9,6 +9,11 @@ import com.zutubi.prototype.type.TypeRegistry;
 import com.zutubi.prototype.type.record.RecordManager;
 import com.zutubi.pulse.model.Project;
 import com.zutubi.pulse.prototype.config.*;
+import com.zutubi.pulse.prototype.config.admin.LoggingConfiguration;
+import com.zutubi.pulse.prototype.config.admin.EmailConfiguration;
+import com.zutubi.pulse.prototype.config.admin.LDAPConfiguration;
+import com.zutubi.pulse.prototype.config.admin.JabberConfiguration;
+import com.zutubi.pulse.prototype.config.admin.LicenseConfiguration;
 
 import java.util.HashMap;
 
@@ -19,7 +24,6 @@ import java.util.HashMap;
 public class ConfigurationRegistry
 {
     private TypeRegistry typeRegistry;
-    private RecordManager recordManager;
     private ConfigurationPersistenceManager configurationPersistenceManager;
 
     public void init() throws TypeException
@@ -98,6 +102,22 @@ public class ConfigurationRegistry
         typeRegistry.register("projectConfig", projectConfig);
 
         configurationPersistenceManager.register("project", projectCollection);
+
+        // setup the global configuration options.
+        typeRegistry.register("loggingConfig", LoggingConfiguration.class);
+        typeRegistry.register("emailConfig", EmailConfiguration.class);
+        typeRegistry.register("ldapConfig", LDAPConfiguration.class);
+        typeRegistry.register("jabberConfig", JabberConfiguration.class);
+        typeRegistry.register("licenseConfig", LicenseConfiguration.class);
+
+        CompositeType globalConfig = new CompositeType(Object.class, "globalConfig");
+        globalConfig.addProperty(new TypeProperty("logging", typeRegistry.getType("loggingConfig")));
+        globalConfig.addProperty(new TypeProperty("email", typeRegistry.getType("emailConfig")));
+        globalConfig.addProperty(new TypeProperty("ldap", typeRegistry.getType("ldapConfig")));
+        globalConfig.addProperty(new TypeProperty("jabber", typeRegistry.getType("jabberConfig")));
+        globalConfig.addProperty(new TypeProperty("license", typeRegistry.getType("licenseConfig")));
+
+        configurationPersistenceManager.register("global", globalConfig);
     }
 
     public void setTypeRegistry(TypeRegistry typeRegistry)
@@ -108,10 +128,5 @@ public class ConfigurationRegistry
     public void setConfigurationPersistenceManager(ConfigurationPersistenceManager configurationPersistenceManager)
     {
         this.configurationPersistenceManager = configurationPersistenceManager;
-    }
-
-    public void setRecordManager(RecordManager recordManager)
-    {
-        this.recordManager = recordManager;
     }
 }

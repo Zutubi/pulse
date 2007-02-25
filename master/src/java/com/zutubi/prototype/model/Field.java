@@ -1,53 +1,86 @@
 package com.zutubi.prototype.model;
 
-import java.util.Map;
-import java.util.HashMap;
-
 /**
  *
  *
  */
-public class Field
+public class Field extends UIComponent
 {
-    private int tabindex;
-
-    private Map<String, Object> parameters = new HashMap<String, Object>();
-
     public Field()
     {
-
     }
     
     public Field(String name, String label, String type, Object value)
     {
-        addParameter("name", name);
-        addParameter("label", label);
-        addParameter("type", type);
-        addParameter("value", value);
+        setName(name);
+        setLabel(label);
+        setType(type);
+        setValue(value);
     }
 
     public int getTabindex()
     {
-        return tabindex;
+        return (Integer)parameters.get("tabindex");
     }
 
-    public void setTabindex(int tabindex)
+    public Field setTabindex(int tabindex)
     {
-        this.tabindex = tabindex;
+        parameters.put("tabindex", tabindex);
+        return this;
     }
 
-    public void addParameter(String key, Object value)
+    public Field setName(String name)
     {
-        parameters.put(key, value);
-    }
-    
-    public Map<String, Object> getParameters()
-    {
-        return parameters;
+        parameters.put("name", name);
+        return this;
     }
 
-    public void setParameters(Map<String, Object> parameters)
+    public String getName()
     {
-        this.parameters = parameters;
+        return (String) parameters.get("name");
+    }
+
+    public Field setType(String type)
+    {
+        parameters.put("type", type);
+        return this;
+    }
+
+    public String getType()
+    {
+        return (String) parameters.get("type");
+    }
+
+    public Field setLabel(String label)
+    {
+        parameters.put("label", label);
+        return this;
+    }
+
+    public String getLabel()
+    {
+        return (String)parameters.get("label");
+    }
+
+    public Field setValue(Object value)
+    {
+        parameters.put("value", value);
+        return this;
+    }
+
+    public Object getValue()
+    {
+        return parameters.get("value");
+    }
+
+    public Field setId(String id)
+    {
+        parameters.put("id", id);
+        return this;
+    }
+
+    public String getId()
+    {
+        return (String) parameters.get("id");
     }
 }

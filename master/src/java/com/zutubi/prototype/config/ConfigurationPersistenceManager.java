@@ -81,9 +81,12 @@ public class ConfigurationPersistenceManager
             {
                 if (type instanceof CollectionType)
                 {
-                    return null;
+                    type = ((CollectionType)type).getCollectionType();
                 }
-                type = getProperty(type, pathElement);
+                else
+                {
+                    type = getProperty(type, pathElement);
+                }
                 if (type == null)
                 {
                     return null;

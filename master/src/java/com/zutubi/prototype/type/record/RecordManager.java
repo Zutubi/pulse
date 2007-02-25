@@ -14,6 +14,9 @@ public class RecordManager
      */
     private MutableRecord baseRecord = new MutableRecord();
 
+    /**
+     * The path separator used for paths that identify records.
+     */
     private static final String PATH_SEPARATOR = "/";
 
     /**
@@ -40,6 +43,13 @@ public class RecordManager
         return record;
     }
 
+    /**
+     * Returns true if a record exists at the specified path.
+     *
+     * @param path uniquely identifying a record.
+     *
+     * @return true if a record exists, false otherwise.
+     */
     public boolean containsRecord(String path)
     {
         MutableRecord record = baseRecord;
@@ -61,8 +71,8 @@ public class RecordManager
      * Store the provided record at the requested path. If a record already exists at this location,
      * the two records are merged.
      * 
-     * @param path
-     * @param newRecord
+     * @param path identifying the path at which to store the record.
+     * @param newRecord the new record data to be stored.
      */
     public void store(String path, Record newRecord)
     {
@@ -88,6 +98,13 @@ public class RecordManager
         record.putAll((MutableRecord)newRecord);
     }
 
+    /**
+     * Delete the record at the specified path.
+     *
+     * @param path identifying the record to be deleted.
+     *
+     * @return an instance of the record just deleted, or null if no record exists at the specified path.
+     */
     public Record delete(String path)
     {
         MutableRecord record = baseRecord;

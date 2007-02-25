@@ -59,12 +59,13 @@ public class FormDescriptorFactory
         }
 
         FormDescriptor descriptor = new FormDescriptor();
-        descriptor.setType(type);
+        descriptor.setId(type.getSymbolicName());
 
         List<Annotation> annotations = type.getAnnotations();
         handleAnnotations(descriptor, annotations);
 
         descriptor.setFieldDescriptors(buildFieldDescriptors(type));
+        descriptor.setActions(Arrays.asList("save", "cancel"));
 
         return descriptor;
     }
@@ -73,15 +74,6 @@ public class FormDescriptorFactory
     {
         List<FieldDescriptor> fieldDescriptors = new LinkedList<FieldDescriptor>();
 
-/*
-        FieldDescriptor hiddenFieldDescriptor = new FieldDescriptor();
-        hiddenFieldDescriptor.setName("symbolicName");
-        hiddenFieldDescriptor.addParameter("value", type.getSymbolicName());
-        hiddenFieldDescriptor.addParameter("type", "hidden");
-        fieldDescriptors.add(hiddenFieldDescriptor);
-*/
-
-        // Handle the first pass analysis.  Here, all of the fields are considered on an individual basis.
         for (TypeProperty property : type.getProperties(PrimitiveType.class))
         {
             Type propertyType = property.getType();

@@ -1,3 +1,0 @@
-<th>
-header
-</th>

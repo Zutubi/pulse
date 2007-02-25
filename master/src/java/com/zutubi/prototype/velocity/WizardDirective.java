@@ -7,9 +7,12 @@ import com.zutubi.prototype.wizard.WizardState;
 import com.zutubi.prototype.model.Form;
 import com.zutubi.prototype.freemarker.GetTextMethod;
 import com.zutubi.pulse.i18n.Messages;
+import com.zutubi.pulse.velocity.AbstractDirective;
+import com.zutubi.pulse.bootstrap.ComponentContext;
 import freemarker.core.DelegateBuiltin;
 import freemarker.template.Template;
 import freemarker.template.TemplateException;
+import freemarker.template.Configuration;
 import org.apache.velocity.context.InternalContextAdapter;
 import org.apache.velocity.exception.MethodInvocationException;
 import org.apache.velocity.exception.ParseErrorException;
@@ -26,9 +29,17 @@ import java.util.Map;
  *
  *
  */
-public class WizardDirective extends PrototypeDirective
+public class WizardDirective extends AbstractDirective
 {
     private String action;
+    private String path;
+    
+    private Configuration configuration;
+
+    public WizardDirective()
+    {
+        ComponentContext.autowire(this);
+    }
 
     public String getName()
     {
@@ -99,7 +110,7 @@ public class WizardDirective extends PrototypeDirective
             // provide some syntactic sweetener by linking the i18n text method to the ?i18n builtin function.
             DelegateBuiltin.conditionalRegistration("i18n", "i18nText");
 
-            Template template = configuration.getTemplate("form.ftl");
+            Template template = configuration.getTemplate("prototype/xhtml/form.ftl");
             template.process(context, writer);
 
             return writer.toString();
@@ -110,8 +121,18 @@ public class WizardDirective extends PrototypeDirective
         }
     }
 
+    public void setFreemarkerConfiguration(Configuration configuration)
+    {
+        this.configuration = configuration;
+    }
+
     public void setAction(String action)
     {
         this.action = action;
+    }
+
+    public void setPath(String path)
+    {
+        this.path = path;
     }
 }

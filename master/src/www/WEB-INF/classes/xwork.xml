@@ -1497,8 +1497,11 @@
         </action>
 
         <action name="save" class="com.zutubi.prototype.webwork.SaveAction">
-            <result name="success" type="redirect">configuration.action?path=${configuration.path}</result>
+            <result name="input" type="redirect">configuration.action?path=${path}</result>
+            <result name="cancel" type="redirect">configuration.action?path=${path}</result>
+            <result name="success" type="redirect">configuration.action?path=${path}</result>
         </action>
+        
         <action name="reset" class="com.zutubi.prototype.webwork.ResetAction">
             <result name="success" type="redirect">configuration.action?path=${configuration.parentPath}</result>
         </action>

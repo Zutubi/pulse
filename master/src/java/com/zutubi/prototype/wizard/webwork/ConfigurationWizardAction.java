@@ -8,7 +8,6 @@ import com.zutubi.prototype.type.TypeException;
 import com.zutubi.prototype.wizard.Wizard;
 import com.zutubi.prototype.wizard.WizardState;
 import com.zutubi.pulse.bootstrap.ComponentContext;
-import com.zutubi.pulse.core.ObjectFactory;
 import com.zutubi.pulse.util.logging.Logger;
 import com.zutubi.pulse.validation.MessagesTextProvider;
 import com.zutubi.pulse.web.ActionSupport;
@@ -76,21 +75,9 @@ public class ConfigurationWizardAction extends ActionSupport
      * on a form. Without this (and the associated javascript), the first submit
      * button would always be the one used.
      */
-    private String submit;
-
-    private ObjectFactory objectFactory;
+    private String submitField;
 
     private ValidationManager validationManager;
-
-    /**
-     * Required resource.
-     *
-     * @param objectFactory instance
-     */
-    public void setObjectFactory(ObjectFactory objectFactory)
-    {
-        this.objectFactory = objectFactory;
-    }
 
     /**
      * Setter for the cancel field.
@@ -135,11 +122,11 @@ public class ConfigurationWizardAction extends ActionSupport
     /**
      * Setter for the submit field.
      *
-     * @param submit
+     * @param submitField
      */
-    public void setSubmit(String submit)
+    public void setSubmitField(String submitField)
     {
-        this.submit = submit;
+        this.submitField = submitField;
     }
 
     /**
@@ -155,9 +142,9 @@ public class ConfigurationWizardAction extends ActionSupport
 
     public boolean isCancelSelected()
     {
-        if (TextUtils.stringSet(submit))
+        if (TextUtils.stringSet(submitField))
         {
-            return submit.equals("cancel");
+            return submitField.equals("cancel");
         }
         else
         {
@@ -167,9 +154,9 @@ public class ConfigurationWizardAction extends ActionSupport
 
     public boolean isPreviousSelected()
     {
-        if (TextUtils.stringSet(submit))
+        if (TextUtils.stringSet(submitField))
         {
-            return submit.equals("previous");
+            return submitField.equals("previous");
         }
         else
         {
@@ -179,9 +166,9 @@ public class ConfigurationWizardAction extends ActionSupport
 
     public boolean isNextSelected()
     {
-        if (TextUtils.stringSet(submit))
+        if (TextUtils.stringSet(submitField))
         {
-            return submit.equals("next");
+            return submitField.equals("next");
         }
         else
         {
@@ -191,9 +178,9 @@ public class ConfigurationWizardAction extends ActionSupport
 
     public boolean isFinishSelected()
     {
-        if (TextUtils.stringSet(submit))
+        if (TextUtils.stringSet(submitField))
         {
-            return submit.equals("finish");
+            return submitField.equals("finish");
         }
         else
         {
@@ -219,6 +206,7 @@ public class ConfigurationWizardAction extends ActionSupport
         catch (TypeException e)
         {
             addActionError(e.getMessage());
+            LOG.error(e);
             return false;
         }
     }

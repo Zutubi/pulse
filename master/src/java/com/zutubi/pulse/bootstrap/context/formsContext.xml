@@ -13,10 +13,6 @@
         </property>
     </bean>
 
-    <bean id="objectRegistry" class="com.zutubi.pulse.form.persistence.DefaultObjectRegistry"/>
-
-    <bean id="objectStore" class="com.zutubi.pulse.form.persistence.stores.MemoryObjectStore"/>
-
     <bean id="annotationDecorator" class="com.zutubi.pulse.form.descriptor.annotation.AnnotationDecorator"/>
 
     <bean id="validationManager" class="com.zutubi.pulse.validation.HybridValidationManager">

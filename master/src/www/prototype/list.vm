@@ -6,45 +6,26 @@
 <div>
     #set($breadcrumbPath = "")
     #set($sep = "")
-    #foreach($pathElement in $action.configuration.parentPathElements)
+    #foreach($pathElement in $config.parentPathElements)
         #set($breadcrumbPath = "${breadcrumbPath}/${pathElement}")
         ${sep} <a href="configuration.action?path=${breadcrumbPath}">${pathElement}</a>
         #set($sep = ">")
     #end
-    ${sep} $!action.configuration.currentPath
+    ${sep} $!config.currentPath
 </div>
 
-<h2>list</h2>
+<h2>#i18n("path=$config.path" "key=label")</h2>
+<h4>list</h4>
+<p>
+    #i18n("path=$config.path" "key=introduction")
+</p>
 
-<p>
-    <ul>
-        <li>path: $!config.path</li>
-    </ul>
-    <ul>
-        <li>type symbolic name: $!config.typeSymbolicName</li>
-        <li>target symbolic name: $!config.targetSymbolicName</li>
-    </ul>
-</p>
-<p>
-    Current data size: $!action.configuration.record.size()
-</p>
-#if($action.configuration)
-<p>
-<table>
-#foreach($key in $action.configuration.record.keySet())
-    <tr>
-        <td> $key </td><td>&nbsp;</td><td> $action.configuration.record.get($key) </td>
-    </tr>
-#end
-</table>
-</p>
-#end
 
-#if( $action.configuration.extensions.size() > 0)
+#if( $config.extensions.size() > 0)
 <p>
     <h3>extensions to the base type</h3>
     <ul>
-    #foreach($prop in $action.configuration.extensions)
+    #foreach($prop in $config.extensions)
         <li>$prop</li>
     #end
     </ul>
@@ -52,14 +33,10 @@
 #end
 
 <p>
-    <h2>show list, empty or not.</h2>
+    #plist("path=$config.path")
 </p>
+
 <p>
-    #if ($action.configuration.record)
-        <h3>update</h3>
-    #else
-        <h3>create</h3>
-    #end
     #if( $config.extensions.size() > 0)
         #if($config.extensions.size() == 1)
             #pform("path=$config.path" "action=save.action?path=$config.path" "symbolicName=$config.extensions.get(0)")
@@ -71,13 +48,36 @@
 
 
 <p>
-    #plist("path=$config.path")
-</p>
-
-<p>
-    #if($action.configuration.pathElements.size() > 2)
-        <a href="configuration.action?path=${action.configuration.parentPath}">done</a>
+    #if($config.pathElements.size() > 2)
+        <a href="configuration.action?path=${config.parentPath}">done</a>
     #end
 </p>
+
+
+<h2>debugging</h2>
+<p>
+    <ul>
+        <li>path: $!config.path</li>
+    </ul>
+    <ul>
+        <li>type symbolic name: $!config.typeSymbolicName</li>
+        <li>target symbolic name: $!config.targetSymbolicName</li>
+    </ul>
+</p>
+<p>
+    Current data size: $!config.record.size()
+</p>
+#if($config)
+<p>
+<table>
+#foreach($key in $config.record.keySet())
+    <tr>
+        <td> $key </td><td>&nbsp;</td><td> $config.record.get($key) </td>
+    </tr>
+#end
+</table>
+</p>
+#end
+
 </body>
 </html>

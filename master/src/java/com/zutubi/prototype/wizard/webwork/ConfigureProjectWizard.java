@@ -5,6 +5,7 @@ import com.zutubi.prototype.FormDescriptorFactory;
 import com.zutubi.prototype.config.ConfigurationPersistenceManager;
 import com.zutubi.prototype.model.Field;
 import com.zutubi.prototype.model.Form;
+import com.zutubi.prototype.model.SubmitField;
 import com.zutubi.prototype.type.CompositeType;
 import com.zutubi.prototype.type.Type;
 import com.zutubi.prototype.type.TypeException;
@@ -20,7 +21,6 @@ import com.zutubi.pulse.model.Project;
 import com.zutubi.pulse.model.ProjectManager;
 
 import java.util.Arrays;
-import java.util.LinkedList;
 import java.util.List;
 
 /**
@@ -246,7 +246,8 @@ public class ConfigureProjectWizard implements Wizard
             Field hiddenStateField = new Field("state", "state", "hidden", getName());
             form.add(hiddenStateField);
 
-            form.setActions(Arrays.asList("next"));
+            form.add(new SubmitField("next").setTabindex(3));
+            form.add(new SubmitField("cancel").setTabindex(4));
 
             return form;
         }
@@ -291,19 +292,16 @@ public class ConfigureProjectWizard implements Wizard
             // where do we get the data from?
             Form form = formDescriptor.instantiate(data);
 
-            List<String> actions = new LinkedList<String>();
-            for (WizardTransition transition : getAvailableActions())
-            {
-                actions.add(transition.name().toLowerCase());
-            }
-
             Field state = new Field();
             state.addParameter("name", "state");
             state.addParameter("type", "hidden");
             state.addParameter("value", getName());
             form.add(state);
 
-            form.setActions(actions);
+            for (WizardTransition transition : getAvailableActions())
+            {
+                form.add(new SubmitField(transition.name().toLowerCase()));
+            }
             return form;
         }
 

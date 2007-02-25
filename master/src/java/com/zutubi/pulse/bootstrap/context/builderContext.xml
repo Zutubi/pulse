@@ -221,4 +221,6 @@
     <bean id="configurationRegistry" class="com.zutubi.prototype.config.ConfigurationRegistry" autowire="byName" init-method="init"/>
     <bean id="configurationPersistenceManager" class="com.zutubi.prototype.config.ConfigurationPersistenceManager" autowire="byName"/>
 
+    <bean id="formDescriptorFactory" class="com.zutubi.prototype.FormDescriptorFactory" autowire="byName"/>
+
 </beans>

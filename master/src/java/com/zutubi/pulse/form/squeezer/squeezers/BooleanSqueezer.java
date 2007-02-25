@@ -19,6 +19,18 @@ public class BooleanSqueezer implements TypeSqueezer
 
     public Object unsqueeze(String... str) throws SqueezeException
     {
-        return Boolean.parseBoolean(str[0]);
+        String value = str[0];
+        if (value != null)
+        {
+            if ("on".equalsIgnoreCase(value))
+            {
+                return Boolean.TRUE;
+            }
+            if ("yes".equalsIgnoreCase(value))
+            {
+                return Boolean.TRUE;
+            }
+        }
+        return Boolean.parseBoolean(value);
     }
 }

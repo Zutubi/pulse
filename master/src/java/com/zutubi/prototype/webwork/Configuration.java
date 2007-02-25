@@ -92,9 +92,9 @@ public class Configuration
 
         parentPath = configurationPersistenceManager.getParentPath(path);
 
-        type = (Type) configurationPersistenceManager.getType(path);
+        type = configurationPersistenceManager.getType(path);
 
-        typeSymbolicName = (type).getSymbolicName();
+        typeSymbolicName = type.getSymbolicName();
 
         targetType = type;
         if (type instanceof CollectionType)

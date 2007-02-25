@@ -1,26 +1,28 @@
 package com.zutubi.prototype.wizard.webwork;
 
+import com.zutubi.prototype.FormDescriptor;
+import com.zutubi.prototype.FormDescriptorFactory;
 import com.zutubi.prototype.config.ConfigurationPersistenceManager;
 import com.zutubi.prototype.model.Field;
 import com.zutubi.prototype.model.Form;
+import com.zutubi.prototype.model.SubmitField;
+import com.zutubi.prototype.type.CollectionType;
 import com.zutubi.prototype.type.CompositeType;
 import com.zutubi.prototype.type.Type;
 import com.zutubi.prototype.type.TypeException;
 import com.zutubi.prototype.type.TypeRegistry;
-import com.zutubi.prototype.type.CollectionType;
 import com.zutubi.prototype.wizard.Wizard;
 import com.zutubi.prototype.wizard.WizardState;
 import com.zutubi.prototype.wizard.WizardTransition;
 import static com.zutubi.prototype.wizard.WizardTransition.*;
-import com.zutubi.prototype.FormDescriptorFactory;
-import com.zutubi.prototype.FormDescriptor;
 import com.zutubi.pulse.core.PulseRuntimeException;
+import com.zutubi.pulse.util.CollectionUtils;
+import com.zutubi.pulse.util.Mapping;
 
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.LinkedList;
 
 /**
  * An implementation of the wizard interface that generates a simple 2 step wizard for types that have
@@ -219,7 +221,8 @@ public class ExtendedTypeWizard implements Wizard
             Field hiddenStateField = new Field("state", "state", "hidden", getName());
             form.add(hiddenStateField);
             
-            form.setActions(Arrays.asList("next"));
+            form.add(new SubmitField("next").setTabindex(2));
+            form.add(new SubmitField("cancel").setTabindex(3));
             return form;
         }
 
@@ -261,16 +264,20 @@ public class ExtendedTypeWizard implements Wizard
 
             FormDescriptorFactory formFactory = new FormDescriptorFactory();
             formFactory.setTypeRegistry(typeRegistry);
+
             FormDescriptor formDescriptor = formFactory.createDescriptor(stateType);
+
+            List<String> actions = CollectionUtils.map(getAvailableActions(), new Mapping<WizardTransition, String>()
+            {
+                public String map(WizardTransition o)
+                {
+                    return o.name().toLowerCase();
+                }
+            });
+            formDescriptor.setActions(actions);
 
             // where do we get the data from?
             Form form = formDescriptor.instantiate(data);
-
-            List<String> actions = new LinkedList<String>();
-            for (WizardTransition transition : getAvailableActions())
-            {
-                actions.add(transition.name().toLowerCase());
-            }
 
             Field state = new Field();
             state.addParameter("name", "state");
@@ -278,7 +285,6 @@ public class ExtendedTypeWizard implements Wizard
             state.addParameter("value", getName());
             form.add(state);
 
-            form.setActions(actions);
             return form;
         }
 
