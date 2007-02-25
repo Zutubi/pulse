@@ -44,11 +44,11 @@
             <interceptor name="ajax" class="com.zutubi.pulse.xwork.interceptor.AjaxInterceptor"/>
             <interceptor name="errorHanding" class="com.zutubi.pulse.xwork.interceptor.ErrorHandlingInterceptor"/>
             <interceptor name="hibernateSession" class="com.zutubi.pulse.xwork.interceptor.HibernateSessionInterceptor"/>
+            <interceptor name="readOnly" class="com.zutubi.pulse.xwork.interceptor.ReadOnlyInterceptor"/>
             <interceptor name="licensed" class="com.zutubi.pulse.xwork.interceptor.LicensedInterceptor"/>
 
-            <!-- Basic stack -->
-            <interceptor-stack name="defaultStack">
-                <interceptor-ref name="hibernateSession"/>
+            <!-- Primitive stack with no hibernate session -->
+            <interceptor-stack name="noSessionStack">
                 <interceptor-ref name="servlet-config"/>
                 <interceptor-ref name="prepare"/>
                 <interceptor-ref name="static-params"/>
@@ -59,6 +59,19 @@
                 <interceptor-ref name="errorHanding"/>
             </interceptor-stack>
 
+            <!-- Basic stack -->
+            <interceptor-stack name="defaultStack">
+                <interceptor-ref name="hibernateSession"/>
+                <interceptor-ref name="noSessionStack"/>
+            </interceptor-stack>
+
+            <!-- Basic stack for read only operations -->
+            <interceptor-stack name="defaultReadOnlyStack">
+                <interceptor-ref name="hibernateSession"/>
+                <interceptor-ref name="readOnly"/>
+                <interceptor-ref name="noSessionStack"/>
+            </interceptor-stack>
+
             <!-- Execute and wait stack.
                  Note: execAndWait should always be the *last* interceptor. -->
             <interceptor-stack name="executeAndWaitStack">
@@ -66,15 +79,8 @@
                 <interceptor-ref name="execAndWait"/>
             </interceptor-stack>
 
-            <!-- A complete stack with all the common interceptors in place.
-                 Generally, this stack should be the one you use, though it
-                 may process additional stuff you don't need, which could
-                 lead to some performance problems. Also, the ordering can be
-                 switched around (ex: if you wish to have your components
-                 before prepare() is called, you'd need to move the component
-                 interceptor up -->
-            <interceptor-stack name="completeStack">
-                <interceptor-ref name="hibernateSession"/>
+            <!-- Everything minus the hibernate session.  Not typically used for actions -->
+            <interceptor-stack name="completeNoSession">
                 <interceptor-ref name="prepare"/>
                 <interceptor-ref name="servlet-config"/>
                 <interceptor-ref name="chain"/>
@@ -92,6 +98,25 @@
                     <param name="excludeMethods">input,back,cancel</param>
                 </interceptor-ref>
                 <interceptor-ref name="errorHanding"/>
+            </interceptor-stack>
+
+            <!-- A complete stack with all the common interceptors in place.
+                 Generally, this stack should be the one you use, though it
+                 may process additional stuff you don't need, which could
+                 lead to some performance problems. Also, the ordering can be
+                 switched around (ex: if you wish to have your components
+                 before prepare() is called, you'd need to move the component
+                 interceptor up -->
+            <interceptor-stack name="completeStack">
+                <interceptor-ref name="hibernateSession"/>
+                <interceptor-ref name="completeNoSession"/>
+            </interceptor-stack>
+
+            <!-- The complete stack, for read-only actions -->
+            <interceptor-stack name="completeReadOnlyStack">
+                <interceptor-ref name="hibernateSession"/>
+                <interceptor-ref name="readOnly"/>
+                <interceptor-ref name="completeNoSession"/>
             </interceptor-stack>
 
             <interceptor-stack name="crudStack">
@@ -143,6 +168,12 @@
 
             <interceptor-stack name="ajaxStack">
                 <interceptor-ref name="completeStack"/>
+                <interceptor-ref name="ajax"/>
+                <interceptor-ref name="errorHanding"/>
+            </interceptor-stack>
+
+            <interceptor-stack name="ajaxReadOnlyStack">
+                <interceptor-ref name="completeReadOnlyStack"/>
                 <interceptor-ref name="ajax"/>
                 <interceptor-ref name="errorHanding"/>
             </interceptor-stack>

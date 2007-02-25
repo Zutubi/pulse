@@ -3,6 +3,8 @@
 <hibernate-mapping>
 
     <class name="com.zutubi.pulse.model.BuildSpecification" table="BUILD_SPECIFICATION" lazy="false">
+        <cache usage="read-write"/>
+        
         <id name="id" type="java.lang.Long" column="ID" unsaved-value="0">
             <generator class="hilo"/>
         </id>
@@ -25,13 +27,15 @@
                      column="ROOT_ID" cascade="all" lazy="false"/>
 
         <bag name="properties" cascade="all,delete-orphan" lazy="false">
+            <cache usage="read-write"/>
             <key column="SPECIFICATION_ID"/>
             <one-to-many class="com.zutubi.pulse.core.model.ResourceProperty"/>
         </bag>
     </class>
 
     <class name="com.zutubi.pulse.model.BuildSpecificationNode" table="BUILD_SPECIFICATION_NODE" lazy="false">
-
+        <cache usage="read-write"/>
+        
         <id name="id" type="java.lang.Long" column="ID" unsaved-value="0">
             <generator class="hilo"/>
         </id>
@@ -47,6 +51,7 @@
         </component>
 
         <bag name="resourceRequirements" cascade="all,delete-orphan" table="RESOURCE_REQUIREMENTS" lazy="false">
+            <cache usage="read-write"/>
             <key column="NODE_ID"/>
             <composite-element class="com.zutubi.pulse.model.ResourceRequirement">
                 <property name="resource" type="string" not-null="true"/>
@@ -55,11 +60,13 @@
         </bag>
 
         <bag name="postActions" cascade="all,delete-orphan" lazy="false">
+            <cache usage="read-write"/>
             <key column="SPECIFICATION_NODE_ID"/>
             <one-to-many class="com.zutubi.pulse.model.PostBuildAction"/>
         </bag>
 
         <list name="children" cascade="all,delete-orphan" lazy="false">
+            <cache usage="read-write"/>
             <key column="PARENT_ID"/>
             <index column="ORDINAL"/>
             <one-to-many class="com.zutubi.pulse.model.BuildSpecificationNode"/>
@@ -67,6 +74,8 @@
     </class>
 
     <class name="com.zutubi.pulse.core.model.PersistentName" table="PERSISTENT_NAME">
+        <cache usage="read-write"/>
+        
         <id name="id" type="java.lang.Long" column="ID" unsaved-value="0">
             <generator class="hilo"/>
         </id>
@@ -75,6 +84,7 @@
     </class>
 
     <class name="com.zutubi.pulse.model.AbstractBuildHostRequirements" table="BUILD_HOST_REQUIREMENTS" lazy="false">
+        <cache usage="read-write"/>
 
         <id name="id" type="java.lang.Long" column="ID" unsaved-value="0">
             <generator class="hilo"/>
@@ -92,6 +102,8 @@
     </class>
 
     <class name="com.zutubi.pulse.core.model.ResourceProperty" table="RESOURCE_PROPERTY">
+        <cache usage="read-write"/>
+        
         <id name="id" type="java.lang.Long" column="ID" unsaved-value="0">
             <generator class="hilo"/>
         </id>

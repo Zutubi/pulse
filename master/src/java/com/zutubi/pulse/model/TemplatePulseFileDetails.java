@@ -5,7 +5,6 @@ import com.zutubi.pulse.core.BuildException;
 import com.zutubi.pulse.core.model.Revision;
 import com.zutubi.pulse.personal.PatchArchive;
 import com.zutubi.pulse.util.FileSystemUtils;
-import com.zutubi.pulse.bootstrap.ComponentContext;
 import com.zutubi.pulse.util.logging.Logger;
 import org.apache.velocity.VelocityContext;
 import org.apache.velocity.app.VelocityEngine;
@@ -26,6 +25,16 @@ public abstract class TemplatePulseFileDetails extends PulseFileDetails
     private List<Capture> captures = new LinkedList<Capture>();
     private List<String> outputProcessors = new LinkedList<String>();
     private VelocityEngine velocityEngine;
+
+    protected void copyCommon(TemplatePulseFileDetails copy)
+    {
+        copy.captures = new LinkedList<Capture>();
+        for(Capture c: captures)
+        {
+            copy.captures.add(c.copy());
+        }
+        copy.outputProcessors = new LinkedList<String>(outputProcessors);
+    }
 
     public boolean isBuiltIn()
     {

@@ -19,6 +19,8 @@ public class ProjectHomeAction extends ProjectActionSupport
     private BuildResult currentBuild;
     private List<Changelist> latestChanges;
     private List<BuildResult> recentBuilds;
+    private BuildColumns summaryColumns;
+    private BuildColumns recentColumns;
 
     public long getId()
     {
@@ -109,14 +111,12 @@ public class ProjectHomeAction extends ProjectActionSupport
 
     public BuildColumns getSummaryColumns()
     {
-        User user = getLoggedInUser();
-        return new BuildColumns(user == null ? User.getDefaultProjectColumns() : user.getProjectSummaryColumns(), projectManager);
+        return summaryColumns;
     }
 
     public BuildColumns getRecentColumns()
     {
-        User user = getLoggedInUser();
-        return new BuildColumns(user == null ? User.getDefaultProjectColumns() : user.getProjectRecentColumns(), projectManager);
+        return recentColumns;
     }
 
     public String execute()
@@ -143,6 +143,10 @@ public class ProjectHomeAction extends ProjectActionSupport
             {
                 recentBuilds.remove(0);
             }
+
+            User user = getLoggedInUser();
+            summaryColumns = new BuildColumns(user == null ? User.getDefaultProjectColumns() : user.getProjectSummaryColumns(), projectManager);
+            recentColumns = new BuildColumns(user == null ? User.getDefaultProjectColumns() : user.getProjectRecentColumns(), projectManager);
         }
         else
         {

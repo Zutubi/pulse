@@ -17,6 +17,19 @@ public class XCodePulseFileDetails  extends TemplatePulseFileDetails
     private String action = null;
     private String settings = null;
 
+    public PulseFileDetails copy()
+    {
+        XCodePulseFileDetails copy = new XCodePulseFileDetails();
+        copy.workingDir = workingDir;
+        copy.config = config;
+        copy.project = project;
+        copy.target = target;
+        copy.action = action;
+        copy.settings = settings;
+        copyCommon(copy);
+        return copy;
+    }
+
     protected String getTemplateName()
     {
         return "xcode.template.vm";
@@ -48,11 +61,6 @@ public class XCodePulseFileDetails  extends TemplatePulseFileDetails
         {
             context.put("settings", settings);
         }
-    }
-
-    public PulseFileDetails copy()
-    {
-        return null;
     }
 
     public String getType()

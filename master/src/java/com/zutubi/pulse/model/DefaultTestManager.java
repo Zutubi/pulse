@@ -8,6 +8,7 @@ import com.zutubi.pulse.util.StringUtils;
 import com.zutubi.pulse.util.logging.Logger;
 import nu.xom.Attribute;
 import nu.xom.Element;
+import org.hibernate.SessionFactory;
 
 import java.io.File;
 import java.util.HashMap;
@@ -24,6 +25,7 @@ public class DefaultTestManager implements TestManager
     private TestSuitePersister persister = new TestSuitePersister();
     private TestCaseIndexDao testCaseIndexDao;
     private MasterConfigurationManager configurationManager;
+    private SessionFactory sessionFactory;
 
     public void index(BuildResult result)
     {
@@ -62,6 +64,11 @@ public class DefaultTestManager implements TestManager
         this.configurationManager = configurationManager;
     }
 
+    public void setSessionFactory(SessionFactory sessionFactory)
+    {
+        this.sessionFactory = sessionFactory;
+    }
+
     private class IndexingHandler implements TestHandler
     {
         private Stack<TestSuiteResult> suites = new Stack<TestSuiteResult>();
@@ -73,6 +80,7 @@ public class DefaultTestManager implements TestManager
         private long stageNameId;
         private String path;
         private Map<String, TestCaseIndex> allCases;
+        private int count = 0;
 
         public IndexingHandler(long projectId, long buildId, long buildNumber, long specNameId, long stageNameId)
         {
@@ -162,7 +170,10 @@ public class DefaultTestManager implements TestManager
             }
 
             caseIndex.recordExecution(caseResult.getStatus(), buildId, buildNumber);
-            testCaseIndexDao.save(caseIndex);
+            if((++count % 1000) == 0)
+            {
+                sessionFactory.getCurrentSession().flush();
+            }
         }
 
         private void markChanged()

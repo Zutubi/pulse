@@ -800,6 +800,38 @@ public class RemoteApi implements com.zutubi.pulse.events.EventListener
         }
     }
 
+    public Hashtable<String, Object> cloneProject(String token, String name, String cloneName, String cloneDescription) throws IllegalArgumentException, AuthenticationException
+    {
+        try
+        {
+            tokenManager.loginUser(token);
+
+            Project project = projectManager.getProject(name);
+            if (project == null)
+            {
+                throw new IllegalArgumentException(String.format("Unknown project name: '%s'", name));
+            }
+
+            if(projectManager.getProject(cloneName) != null)
+            {
+                throw new IllegalArgumentException(String.format("The name '%s' is already in use by another project. Please select a different name.", name));
+            }
+            
+            Project clone = projectManager.cloneProject(project, cloneName, cloneDescription);
+            Hashtable<String, Object> details = extractDetails(clone);
+            // add the scm and type details.
+            details.put("scm", clone.getScm().getType());
+            details.put("type", clone.getPulseFileDetails().getType());
+
+            return details;
+        }
+        finally
+        {
+            tokenManager.logoutUser();
+        }
+
+    }
+
     /**
      * Retrieve the scm details for the specified project.
      *

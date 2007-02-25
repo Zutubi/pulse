@@ -45,7 +45,7 @@ public abstract class HibernateEntityDao<T extends Entity> extends HibernateDaoS
 
     public List<T> findAll()
     {
-        return (List<T>) getHibernateTemplate().find("from " + persistentClass().getName());
+        return (List<T>) getHibernateTemplate().loadAll(persistentClass());
     }
 
     public void save(T entity)
@@ -158,7 +158,6 @@ public abstract class HibernateEntityDao<T extends Entity> extends HibernateDaoS
                     queryObject.setMaxResults(maxResults);
                 }
                 queryObject.setCacheable(cachable);
-
                 SessionFactoryUtils.applyTransactionTimeout(queryObject, getSessionFactory());
                 return queryObject.list();
             }

@@ -58,8 +58,7 @@ hibernate.dialect=org.hibernate.dialect.HSQLDialect
 #hibernate.dialect=org.hibernate.dialect.PostgreSQLDialect
 #hibernate.dialect=org.hibernate.dialect.MySQLDialect
 hibernate.show_sql=false
-hibernate.jdbc.batch_size=0
-hibernate.jdbc.use_scrollable_resultsets=false
+hibernate.query.use_query_cache=true
 
 #
 # Connection specific properties. Any custom jdbc connection properties can

@@ -103,4 +103,9 @@ public class HibernateProjectDao extends HibernateEntityDao<Project> implements 
     {
         return (Project) findUniqueByNamedQuery("findProjectByCleanupRule", "cleanupRule", rule);
     }
+
+    public List<Project> findAllProjectsCached()
+    {
+        return findByNamedQuery("findAllProjectsCached", 0, true);
+    }
 }

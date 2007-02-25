@@ -1,6 +1,6 @@
 #helpTag("Resource+Repository")
 #authorisationTags($principle)
-<content tag="selectedTab">agents</content>
+#agentTags($slave)
 <html>
 <head>
     <title>#wwtext("name=add.java.resource")</title>
@@ -10,11 +10,11 @@
     	{
     	    if ($agentId == -1)
     	    {
-    	        openFileDialog('$base/popups/fileDialog.action', 'resource.add.ant', 'dir', 'local:///', false, false, false);
+    	        openFileDialog('$base/popups/fileDialog.action', 'resource.add.java', 'dir', 'local:///', false, false, false);
     	    }
     	    else
     	    {
-    	        openFileDialog('$base/popups/fileDialog.action', 'resource.add.ant', 'dir', 'agent://$agentId/', false, false, false);
+    	        openFileDialog('$base/popups/fileDialog.action', 'resource.add.java', 'dir', 'agent://$agentId/', false, false, false);
     	    }
     	    return false;
     	}

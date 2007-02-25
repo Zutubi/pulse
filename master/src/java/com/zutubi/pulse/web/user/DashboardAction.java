@@ -27,6 +27,7 @@ public class DashboardAction extends ActionSupport
     private UserManager userManager;
 
     private boolean contactError = false;
+    private BuildColumns columns;
 
     public User getUser()
     {
@@ -50,7 +51,11 @@ public class DashboardAction extends ActionSupport
 
     public BuildColumns getColumns()
     {
-        return new BuildColumns(user.getMyProjectsColumns(), projectManager);
+        if(columns == null)
+        {
+            columns = new BuildColumns(user.getMyProjectsColumns(), projectManager);
+        }
+        return columns;
     }
     
     public List<BuildResult> getLatestBuilds(Project p)
@@ -90,7 +95,7 @@ public class DashboardAction extends ActionSupport
 
         if(user.getShowAllProjects())
         {
-            shownProjects = projectManager.getAllProjects();
+            shownProjects = projectManager.getAllProjectsCached();
         }
         else
         {
@@ -122,27 +127,11 @@ public class DashboardAction extends ActionSupport
         return SUCCESS;
     }
 
-    /**
-     * Allow the template access to a specific project instance.
-     *
-     * @param id uniquely identifies a project.
-     *
-     * @return the project associated with the id, or null if it does
-     * not exist.
-     */
     public Project getProject(long id)
     {
         return projectManager.getProject(id);
     }
 
-    /**
-     * Allow the template access to a specific build result instance.
-     *
-     * @param id uniquely identifies a project.
-     *
-     * @return the build result associated with the id, or null if it does
-     * not exist.
-     */
     public BuildResult getResult(long id)
     {
         return buildManager.getBuildResult(id);

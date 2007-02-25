@@ -1,6 +1,7 @@
 package com.zutubi.pulse.web.project;
 
-import com.zutubi.pulse.model.*;
+import com.zutubi.pulse.model.BuildHostRequirements;
+import com.zutubi.pulse.model.BuildSpecificationNode;
 import com.zutubi.pulse.xwork.interceptor.Cancelable;
 
 /**
@@ -64,6 +65,13 @@ public class EditBuildStageAction extends BuildStageActionSupport implements Can
 
     public String execute()
     {
+        BuildHostRequirements currentHostRequirements = node.getStage().getHostRequirements();
+        if(currentHostRequirements != null)
+        {
+            node.getStage().setHostRequirements(null);
+            projectManager.delete(currentHostRequirements);
+        }
+                
         node.setStage(stage);
         addFieldsToStage();
         getProjectManager().save(getProject());

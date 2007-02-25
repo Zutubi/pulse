@@ -31,6 +31,8 @@ public interface ProjectManager extends EntityManager<Project>
 
     List<Project> getAllProjects();
 
+    List<Project> getAllProjectsCached();
+
     List<Project> getProjectsWithNameLike(String s);
 
     int getProjectCount();
@@ -156,6 +158,7 @@ public interface ProjectManager extends EntityManager<Project>
     long getNextBuildNumber(Project project);
 
     List<ProjectGroup> getAllProjectGroups();
+    List<ProjectGroup> getAllProjectGroupsCached();
     ProjectGroup getProjectGroup(long id);
     ProjectGroup getProjectGroup(String name);
 
@@ -168,4 +171,6 @@ public interface ProjectManager extends EntityManager<Project>
     Project getProjectByCleanupRule(CleanupRule rule);
 
     BuildSpecification getBuildSpecification(long id);
+
+    void delete(BuildHostRequirements hostRequirements);
 }

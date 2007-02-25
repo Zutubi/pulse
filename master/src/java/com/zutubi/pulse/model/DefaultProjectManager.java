@@ -1,6 +1,7 @@
 package com.zutubi.pulse.model;
 
 import com.zutubi.pulse.bootstrap.ComponentContext;
+import com.zutubi.pulse.cache.ehcache.CustomAclEntryCache;
 import com.zutubi.pulse.core.BuildException;
 import com.zutubi.pulse.core.BuildRevision;
 import com.zutubi.pulse.core.PulseException;
@@ -49,6 +50,7 @@ public class DefaultProjectManager implements ProjectManager
 
     private LicenseManager licenseManager;
     private UserManager userManager;
+    private CustomAclEntryCache projectAclEntryCache;
 
     public void save(Project project)
     {
@@ -78,6 +80,11 @@ public class DefaultProjectManager implements ProjectManager
     public List<Project> getAllProjects()
     {
         return projectDao.findAll();
+    }
+
+    public List<Project> getAllProjectsCached()
+    {
+        return projectDao.findAllProjectsCached();
     }
 
     public List<Project> getProjectsWithNameLike(String name)
@@ -298,6 +305,7 @@ public class DefaultProjectManager implements ProjectManager
             }
 
             save(p);
+            projectAclEntryCache.removeEntriesFromCache(p);
         }
     }
 
@@ -308,6 +316,7 @@ public class DefaultProjectManager implements ProjectManager
         {
             p.removeAdmin(authority);
             save(p);
+            projectAclEntryCache.removeEntriesFromCache(p);
         }
     }
 
@@ -536,6 +545,11 @@ public class DefaultProjectManager implements ProjectManager
         return projectGroupDao.findAll();
     }
 
+    public List<ProjectGroup> getAllProjectGroupsCached()
+    {
+        return projectGroupDao.findAllCached();
+    }
+
     public ProjectGroup getProjectGroup(long id)
     {
         return projectGroupDao.findById(id);
@@ -568,6 +582,11 @@ public class DefaultProjectManager implements ProjectManager
         return buildSpecificationDao.findById(id);
     }
 
+    public void delete(BuildHostRequirements hostRequirements)
+    {
+        buildSpecificationDao.delete(hostRequirements);
+    }
+
     public void setEventManager(EventManager eventManager)
     {
         this.eventManager = eventManager;
@@ -596,5 +615,10 @@ public class DefaultProjectManager implements ProjectManager
     public void setTestCaseIndexDao(TestCaseIndexDao testCaseIndexDao)
     {
         this.testCaseIndexDao = testCaseIndexDao;
+    }
+
+    public void setProjectAclEntryCache(CustomAclEntryCache projectAclEntryCache)
+    {
+        this.projectAclEntryCache = projectAclEntryCache;
     }
 }

@@ -46,6 +46,7 @@ public class MakePulseFileDetails extends TemplatePulseFileDetails
     {
         MakePulseFileDetails copy = new MakePulseFileDetails(makefile, targets, arguments, workingDir);
         copy.environment = new TreeMap<String, String>(environment);
+        copyCommon(copy);
         return copy;
     }
 

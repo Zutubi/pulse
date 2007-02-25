@@ -69,13 +69,25 @@ public class ProjectXmlRpcAcceptanceTest extends BaseXmlRpcAcceptanceTest
         assertEquals(Boolean.TRUE, result);
     }
 
+    public void testCloneProject() throws IOException, XmlRpcException
+    {
+        // create a project with a specific name.
+        String name = createProject();
+
+        String newName = String.format("project-%s", RandomUtils.randomString(4));
+        String newDescription = "random desc";
+
+        Object result = xmlRpcClient.execute("RemoteApi.cloneProject", getVector(adminToken, name, newName, newDescription));
+        assertProject(result, newName, newDescription);
+    }
+
     public void testEditProject() throws IOException, XmlRpcException
     {
         // create a project with a specific name.
         String name = createProject();
 
         String newName = String.format("project-%s", RandomUtils.randomString(4));
-        
+
         Hashtable<String, Object> projectDetails = new Hashtable<String, Object>();
         projectDetails.put("name", newName);
 
@@ -89,6 +101,11 @@ public class ProjectXmlRpcAcceptanceTest extends BaseXmlRpcAcceptanceTest
         String projectName = createProject();
 
         Object result = xmlRpcClient.execute("RemoteApi.getProject", getVector(adminToken, projectName));
+        assertProject(result, projectName, PROJECT_DESCRIPTION);
+    }
+
+    private void assertProject(Object result, String projectName, String projectDescription)
+    {
         assertNotNull(result);
         assertTrue(result instanceof Hashtable);
         Hashtable<String, Object> details = (Hashtable<String, Object>) result;
@@ -96,7 +113,7 @@ public class ProjectXmlRpcAcceptanceTest extends BaseXmlRpcAcceptanceTest
         // check that the necessary entries exist.
         assertEquals(5, details.size());
         assertEquals(projectName, details.get("name"));
-        assertEquals(PROJECT_DESCRIPTION, details.get("description"));
+        assertEquals(projectDescription, details.get("description"));
         assertEquals(PROJECT_URL, details.get("url"));
         assertEquals("cvs", details.get("scm"));
         assertEquals("ant", details.get("type"));

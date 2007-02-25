@@ -81,6 +81,7 @@
                 <ref local="schemaUpgrade0102015002"/>
                 <ref local="schemaUpgrade0102015003"/>
                 <ref local="schemaUpgrade0102015004"/>
+                <ref local="danglingBuildHostRequirements"/>
             </list>
         </property>
         <property name="systemTasks">
@@ -559,5 +560,18 @@
                 <value>com/zutubi/pulse/upgrade/schema/build_0102015004/BuildResult.hbm.xml</value>
             </list>
         </property>
+    </bean>
+
+    <bean id="schemaUpgrade0102017001" class="com.zutubi.pulse.upgrade.tasks.UpdateBobFileDetailsPulseFileColumnSizeUpgradeTask" autowire="byName">
+        <property name="buildNumber" value="102017001"/>
+        <property name="mappings">
+            <list>
+                <value>com/zutubi/pulse/upgrade/schema/build_0102017001/Project.hbm.xml</value>
+            </list>
+        </property>
+    </bean>
+
+    <bean id="danglingBuildHostRequirements" class="com.zutubi.pulse.upgrade.tasks.DanglingBuildHostRequirementsUpgradeTask" autowire="byName">
+        <property name="buildNumber" value="102017002"/>        
     </bean>
 </beans>

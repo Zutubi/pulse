@@ -34,6 +34,15 @@ public class FileCapture extends Capture
         this.mimeType = mimeType;
     }
 
+    public FileCapture copy()
+    {
+        FileCapture copy = new FileCapture();
+        copyCommon(copy);
+        copy.file = file;
+        copy.mimeType = mimeType;
+        return copy;
+    }
+
     public String getFile()
     {
         return file;

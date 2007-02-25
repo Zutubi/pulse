@@ -31,6 +31,7 @@ public class HistoryAction extends ProjectActionSupport implements Preparable
     private List<String> stateFilters;
     private Map<Long, String> specs;
     private Long spec = 0L;
+    private BuildColumns columns;
 
     /**
      * The system configuration manager.
@@ -109,8 +110,7 @@ public class HistoryAction extends ProjectActionSupport implements Preparable
 
     public BuildColumns getColumns()
     {
-        User user = getLoggedInUser();
-        return new BuildColumns(user == null ? User.getDefaultProjectColumns() : user.getProjectHistoryColumns(), projectManager);
+        return columns;
     }
 
     public List<String> getPrepareParameterNames()
@@ -196,6 +196,9 @@ public class HistoryAction extends ProjectActionSupport implements Preparable
             addActionError("Start page '" + pagingSupport.getStartPage() + "' is past the end of the results");
             return ERROR;
         }
+
+        User user = getLoggedInUser();
+        columns = new BuildColumns(user == null ? User.getDefaultProjectColumns() : user.getProjectHistoryColumns(), projectManager);
 
         return SUCCESS;
     }

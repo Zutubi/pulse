@@ -25,8 +25,8 @@ public class ProjectActionSupport extends ActionSupport
 
     private static final long NONE_SPECIFIED = -1;
 
+    private User loggedInUser = null;
     protected long projectId = NONE_SPECIFIED;
-
     protected String projectName = null;
 
     public BuildManager getBuildManager()
@@ -164,13 +164,16 @@ public class ProjectActionSupport extends ActionSupport
 
     public User getLoggedInUser()
     {
-        Object principle = getPrinciple();
-        if(principle != null && principle instanceof String)
+        if (loggedInUser == null)
         {
-            return userManager.getUser((String)principle);
+            Object principle = getPrinciple();
+            if(principle != null && principle instanceof String)
+            {
+                loggedInUser = userManager.getUser((String)principle);
+            }
         }
 
-        return null;
+        return loggedInUser;
     }
 
     public void checkPermissions(BuildResult result)

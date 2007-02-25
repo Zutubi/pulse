@@ -49,6 +49,11 @@ public class MockProjectManager implements ProjectManager
         return new LinkedList<Project>(projects.values());
     }
 
+    public List<Project> getAllProjectsCached()
+    {
+        throw new RuntimeException("Method not implemented.");
+    }
+
     public List<Project> getProjectsWithNameLike(String s)
     {
         throw new RuntimeException("Method not implemented.");
@@ -160,6 +165,11 @@ public class MockProjectManager implements ProjectManager
         throw new RuntimeException("Method not implemented.");
     }
 
+    public List<ProjectGroup> getAllProjectGroupsCached()
+    {
+        throw new RuntimeException("Method not yet implemented.");
+    }
+
     public ProjectGroup getProjectGroup(long id)
     {
         throw new RuntimeException("Method not implemented.");
@@ -188,6 +198,11 @@ public class MockProjectManager implements ProjectManager
     public BuildSpecification getBuildSpecification(long id)
     {
         throw new RuntimeException("Method not implemented.");
+    }
+
+    public void delete(BuildHostRequirements hostRequirements)
+    {
+        throw new RuntimeException("Method not yet implemented.");
     }
 
     public void updateProjectDetails(Project project, String name, String description, String url)

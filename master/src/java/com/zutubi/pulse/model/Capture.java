@@ -29,6 +29,12 @@ public abstract class Capture extends Entity implements NamedEntity
         this.processors = new LinkedList<String>();
     }
 
+    protected void copyCommon(Capture copy)
+    {
+        copy.name = name;
+        copy.processors = new LinkedList<String>(processors);
+    }
+
     public String getName()
     {
         return name;
@@ -53,6 +59,8 @@ public abstract class Capture extends Entity implements NamedEntity
     {
         processors.add(name);
     }
+
+    public abstract Capture copy();
 
     public abstract String getType();
 

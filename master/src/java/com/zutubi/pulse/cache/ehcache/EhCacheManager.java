@@ -2,7 +2,6 @@ package com.zutubi.pulse.cache.ehcache;
 
 import net.sf.ehcache.CacheException;
 import net.sf.ehcache.CacheManager;
-import com.zutubi.pulse.cache.Cache;
 
 /**
  * <class comment/>
@@ -23,7 +22,7 @@ public class EhCacheManager implements com.zutubi.pulse.cache.CacheManager
         }
     }
 
-    public synchronized Cache getCache(String name)
+    public synchronized EhCache getCache(String name)
     {
         if (!cacheManager.cacheExists(name))
         {
