@@ -7,7 +7,7 @@ import java.util.LinkedList;
  *
  *
  */
-public class Table
+public class Table extends UIComponent
 {
     private List<Column> columns = new LinkedList<Column>();
 

@@ -6,6 +6,7 @@ import com.zutubi.prototype.type.Type;
 import com.zutubi.prototype.type.TypeRegistry;
 import com.zutubi.pulse.bootstrap.ComponentContext;
 import com.zutubi.pulse.velocity.AbstractDirective;
+import com.zutubi.pulse.util.logging.Logger;
 import freemarker.template.Configuration;
 import org.apache.velocity.context.InternalContextAdapter;
 import org.apache.velocity.exception.ParseErrorException;
@@ -22,6 +23,8 @@ import java.util.Map;
  */
 public abstract class PrototypeDirective extends AbstractDirective
 {
+    private static final Logger LOG = Logger.getLogger(PrototypeDirective.class);
+    
     protected TypeRegistry typeRegistry;
 
     /**
@@ -68,6 +71,7 @@ public abstract class PrototypeDirective extends AbstractDirective
         }
         catch (Exception e)
         {
+            LOG.warning(e);
             writer.write(renderError("Failed to render form. Unexpected "+e.getClass()+": " + e.getMessage()));
             return true;
         }

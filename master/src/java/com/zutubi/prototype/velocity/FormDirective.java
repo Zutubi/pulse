@@ -7,6 +7,7 @@ import com.zutubi.prototype.model.Form;
 import com.zutubi.prototype.type.Type;
 import com.zutubi.prototype.type.TypeException;
 import com.zutubi.pulse.i18n.Messages;
+import com.zutubi.pulse.util.logging.Logger;
 import freemarker.core.DelegateBuiltin;
 import freemarker.template.Template;
 import freemarker.template.TemplateException;
@@ -19,6 +20,8 @@ import java.util.Map;
 
 public class FormDirective extends PrototypeDirective
 {
+    private static final Logger LOG = Logger.getLogger(FormDirective.class);
+
     private String action;
 
     /**
@@ -87,6 +90,7 @@ public class FormDirective extends PrototypeDirective
         }
         catch (TemplateException e)
         {
+            LOG.warning(e);
             throw new ParseErrorException(e.getMessage());
         }
     }

@@ -2,12 +2,11 @@ package com.zutubi.prototype;
 
 import com.zutubi.prototype.annotation.AnnotationHandler;
 import com.zutubi.prototype.annotation.Handler;
-import com.zutubi.prototype.type.CompositeType;
-import com.zutubi.prototype.type.ListType;
 import com.zutubi.prototype.type.PrimitiveType;
 import com.zutubi.prototype.type.Type;
 import com.zutubi.prototype.type.TypeProperty;
 import com.zutubi.prototype.type.TypeRegistry;
+import com.zutubi.pulse.core.ObjectFactory;
 import com.zutubi.pulse.util.logging.Logger;
 
 import java.lang.annotation.Annotation;
@@ -23,7 +22,16 @@ import java.util.Map;
  */
 public class FormDescriptorFactory
 {
+    /**
+     * The object factory is required for the instantiation of objects that occurs within the form descriptor.
+     * To ensure that this always works, we default to a base implementation of the Object factory, which simply
+     * instantiated objects.  When deployed, this should be replaced by the auto wiring object factory.
+     */
+    private ObjectFactory objectFactory = new ObjectFactory();
+
     private static final Logger LOG = Logger.getLogger(FormDescriptorFactory.class);
+
+    // TODO: extract this field type mapping to make it extendable.
 
     private static final Map<Class, String> defaultFieldTypeMapping = new HashMap<Class, String>();
     static
@@ -53,14 +61,13 @@ public class FormDescriptorFactory
 
     public FormDescriptor createDescriptor(Type type)
     {
-        if (!(type instanceof CompositeType))
-        {
-            throw new IllegalArgumentException("Can not create a form for a non-composite type.");
-        }
-
         FormDescriptor descriptor = new FormDescriptor();
+
+        // The symbolic name uniquely identifies the type, and so will uniquely identify this form.
+        // (we are not planning to have multiple forms on a single page at this stage...) 
         descriptor.setId(type.getSymbolicName());
 
+        // Process the annotations at apply to the type / form.
         List<Annotation> annotations = type.getAnnotations();
         handleAnnotations(descriptor, annotations);
 
@@ -84,6 +91,7 @@ public class FormDescriptorFactory
             // other magical cases, then we can refactor this a bit.
             if (fd.getName().equals("password"))
             {
+                fd.setType("password");
                 fd.addParameter("type", "password");
             }
             else
@@ -96,36 +104,26 @@ public class FormDescriptorFactory
             fieldDescriptors.add(fd);
         }
 
-        for (FieldDescriptor fd : fieldDescriptors)
-        {
-            String propertyName = fd.getName();
-            if (type.getProperty(propertyName + "Options") != null)
-            {
-                Type optionsProperty = type.getProperty(propertyName + "Options").getType();
-                if (optionsProperty instanceof ListType)
-                {
-                    Type propertyType = type.getProperty(propertyName).getType();
-                    // ensure that the option type is the same as the field type.
-                    ListType listType = (ListType) optionsProperty;
-                    if (listType.getCollectionType().getClazz() == propertyType.getClazz())
-                    {
-                        fd.addParameter("type", "select");
-                    }
-                }
-            }
-        }
-
         return fieldDescriptors;
     }
 
+    /**
+     * This handle annotation method will serach through the annotaion hierarchy, looking for annotations that
+     * are themselves annotated by the Handler annotation.  When found, the referenced handler is run in the context
+     * of the annotation and the descriptor.
+     *
+     * Note: This method will process all of the annotations annotations as well.
+     *
+     * @param descriptor the target that will be modified by these annotations.
+     * @param annotations the annotations that need to be processed. 
+     */
     private void handleAnnotations(Descriptor descriptor, List<Annotation> annotations)
     {
-        // need to recurse over annotations, ignoring the java.lang annotations.
         for (Annotation annotation : annotations)
         {
             if (annotation.annotationType().getName().startsWith("java.lang"))
             {
-                // ignore standard ann10otations.
+                // ignore standard annotations.
                 continue;
             }
 
@@ -137,16 +135,20 @@ public class FormDescriptorFactory
                 Handler handlerAnnotation = annotation.annotationType().getAnnotation(Handler.class);
                 try
                 {
-                    AnnotationHandler handler = handlerAnnotation.value().newInstance();
+                    AnnotationHandler handler = objectFactory.buildBean(handlerAnnotation.value());
                     handler.process(annotation, descriptor);
                 }
                 catch (InstantiationException e)
                 {
-                    LOG.warning(e); // failed to instantiate the annotation handler.
+                    LOG.warning("Failed to instantiate annotation handler.", e); // failed to instantiate the annotation handler.
                 }
                 catch (IllegalAccessException e)
                 {
-                    LOG.warning(e); // failed to instantiate the annotation handler.
+                    LOG.warning("Failed to instantiate annotation handler.", e); // failed to instantiate the annotation handler.
+                }
+                catch (Exception e)
+                {
+                    LOG.warning("Unexpected exception processing the annotation handler.", e);
                 }
             }
         }
@@ -160,5 +162,10 @@ public class FormDescriptorFactory
     public void setTypeRegistry(TypeRegistry typeRegistry)
     {
         this.typeRegistry = typeRegistry;
+    }
+
+    public void setObjectFactory(ObjectFactory objectFactory)
+    {
+        this.objectFactory = objectFactory;
     }
 }

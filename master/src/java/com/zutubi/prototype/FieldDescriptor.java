@@ -13,23 +13,27 @@ import java.util.Map;
  */
 public class FieldDescriptor implements Descriptor
 {
-    private String name;
 
     private Map<String, Object> parameters = new HashMap<String, Object>();
 
     public String getName()
     {
-        return name;
+        return (String) parameters.get("name");
     }
 
     public void setName(String name)
     {
-        this.name = name;
+        parameters.put("name", name);
     }
 
     public void addParameter(String key, Object value)
     {
         parameters.put(key, value);
+    }
+
+    public void addAll(Map<String, Object> parameters)
+    {
+        parameters.putAll(parameters);
     }
 
     public Object getParameter(String key)
@@ -63,11 +67,6 @@ public class FieldDescriptor implements Descriptor
                 {
                     Map context = Ognl.createDefaultContext(instance);
                     field.setValue(Ognl.getValue(getName(), context, instance));
-
-                    if (getParameter("type").equals("select"))
-                    {
-                        field.addParameter("list", Ognl.getValue(getName() + "Options", context, instance));
-                    }
                 }
             }
         }
@@ -77,5 +76,15 @@ public class FieldDescriptor implements Descriptor
         }
 
         return field;
+    }
+
+    public void setType(String type)
+    {
+        parameters.put("type", type);
+    }
+
+    public String getType()
+    {
+        return (String) parameters.get("type");
     }
 }

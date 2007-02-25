@@ -1,5 +1,7 @@
 package com.zutubi.pulse.prototype.config.admin;
 
+import com.zutubi.prototype.annotation.Select;
+
 /**
  *
  *
@@ -9,6 +11,7 @@ public class LoggingConfiguration
     private String level;
     private boolean eventLoggingEnabled;
 
+    @Select(LoggingLevelProvider.class)
     public String getLevel()
     {
         return level;

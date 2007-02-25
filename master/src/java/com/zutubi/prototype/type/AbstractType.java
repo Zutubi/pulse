@@ -1,5 +1,8 @@
 package com.zutubi.prototype.type;
 
+import com.zutubi.pulse.util.CollectionUtils;
+import com.zutubi.pulse.util.Predicate;
+
 import java.lang.annotation.Annotation;
 import java.util.Collections;
 import java.util.LinkedList;
@@ -42,6 +45,28 @@ public abstract class AbstractType implements Type
     public List<Annotation> getAnnotations()
     {
         return Collections.unmodifiableList(annotations);
+    }
+
+    public List<Annotation> getAnnotations(final Class annotationType)
+    {
+        return CollectionUtils.filter(annotations, new Predicate<Annotation>()
+        {
+            public boolean satisfied(Annotation annotation)
+            {
+                return annotation.annotationType().equals(annotationType);
+            }
+        });
+    }
+
+    public Annotation getAnnotation(final Class annotationType)
+    {
+        return CollectionUtils.find(annotations, new Predicate<Annotation>()
+        {
+            public boolean satisfied(Annotation annotation)
+            {
+                return annotation.annotationType().equals(annotationType);
+            }
+        });
     }
 
     public void addAnnotation(Annotation annotation)

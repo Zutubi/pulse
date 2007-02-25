@@ -14,7 +14,7 @@ public class FieldAnnotationHandler implements AnnotationHandler
     public void process(Annotation annotation, Descriptor descriptor)
     {
         // apply annotations..
-        descriptor.getParameters().putAll(AnnotationUtils.collectPropertiesFromAnnotation(annotation));
+        descriptor.addAll(AnnotationUtils.collectPropertiesFromAnnotation(annotation));
 
     }
 }

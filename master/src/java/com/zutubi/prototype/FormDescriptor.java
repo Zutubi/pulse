@@ -63,6 +63,11 @@ public class FormDescriptor implements Descriptor
         parameters.put(key, value);
     }
 
+    public void addAll(Map<String, Object> parameters)
+    {
+        parameters.putAll(parameters);
+    }
+
     public Map<String, Object> getParameters()
     {
         return parameters;

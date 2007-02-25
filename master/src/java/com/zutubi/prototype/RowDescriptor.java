@@ -15,13 +15,6 @@ public class RowDescriptor
 {
     private List<ColumnDescriptor> columnDescriptors = new LinkedList<ColumnDescriptor>();
 
-    private int colspan = 1;
-
-    public void setColspan(int colspan)
-    {
-        this.colspan = colspan;
-    }
-
     public List<Row> instantiate(Object value)
     {
         Row row = new Row();

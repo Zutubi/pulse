@@ -15,7 +15,7 @@ public class ColumnDescriptor
 
     private int colspan = 1;
 
-    private ColumnFormatter formatter = new SimpleColumnFormatter();
+    private Formatter formatter = new SimpleColumnFormatter();
 
     private Map<String, Object> parameters = new HashMap<String, Object>();
 
@@ -29,7 +29,7 @@ public class ColumnDescriptor
         return parameters;
     }
 
-    public void setFormatter(ColumnFormatter formatter)
+    public void setFormatter(Formatter formatter)
     {
         this.formatter = formatter;
     }
@@ -38,7 +38,7 @@ public class ColumnDescriptor
     {
         Column c = new Column();
         c.setSpan(colspan);
-        c.setParameters(getParameters());
+        c.addAll(getParameters());
         c.setValue(formatter.format(value));
         return c;
     }

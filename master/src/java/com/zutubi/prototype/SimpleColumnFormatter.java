@@ -4,7 +4,7 @@ package com.zutubi.prototype;
  *
  *
  */
-public class SimpleColumnFormatter implements ColumnFormatter
+public class SimpleColumnFormatter implements Formatter
 {
     public String format(Object obj)
     {

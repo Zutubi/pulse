@@ -1,20 +1,42 @@
 package com.zutubi.pulse.prototype.config;
 
+import com.zutubi.validation.annotations.Required;
+
 /**
  *
  *
  */
-public class FileArtifactConfiguration
+public class FileArtifactConfiguration extends ArtifactConfiguration
 {
-    private String artifactPath;
+    /**
+     * Path of the file to capture, relative to the base directory.
+     */
+    @Required()
+    private String file;
 
-    public String getArtifactPath()
+    /**
+     * MIME type of the file, may be null in which case it will be guessed
+     * when the user downloads the artifact.
+     */
+    private String mimeType;
+
+    public String getFile()
     {
-        return artifactPath;
+        return file;
     }
 
-    public void setArtifactPath(String artifactPath)
+    public void setFile(String file)
     {
-        this.artifactPath = artifactPath;
+        this.file = file;
+    }
+
+    public String getMimeType()
+    {
+        return mimeType;
+    }
+
+    public void setMimeType(String mimeType)
+    {
+        this.mimeType = mimeType;
     }
 }

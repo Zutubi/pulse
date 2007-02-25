@@ -1,0 +1,26 @@
+package com.zutubi.prototype.annotation;
+
+import com.zutubi.prototype.Formatter;
+
+import java.lang.annotation.Target;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+
+/**
+ * The format annotation allows an implementation of the formatter to be associated with a property, type, or
+ * another annotation. 
+ *
+ */
+@Target({ElementType.TYPE, ElementType.FIELD, ElementType.METHOD, ElementType.ANNOTATION_TYPE})
+@Retention(RetentionPolicy.RUNTIME)
+public @interface Format
+{
+    /**
+     * The implementation of the Formatter interface, that will be applied to provide formatting
+     * funtionality to the annotated type.
+     *
+     * @return formatter class.
+     */
+    Class<? extends Formatter> value();
+}

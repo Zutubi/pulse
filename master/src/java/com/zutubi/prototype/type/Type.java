@@ -16,6 +16,10 @@ public interface Type
      */
     List<Annotation> getAnnotations();
 
+    List<Annotation> getAnnotations(Class annotationType);
+
+    Annotation getAnnotation(Class annotationType);
+
     /**
      * The underlying class represented by this type instance.
      *
