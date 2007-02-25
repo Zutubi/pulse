@@ -1,0 +1,377 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite errors="0" failures="0" name="com.zutubi.pulse.acceptance.AcceptanceTestSuite" tests="274" time="3066.284">
+  <properties>
+    <property name="java.vendor" value="Sun Microsystems Inc."/>
+    <property name="copyright.statement" value="/********************************************************************************  * Copyright (c) 2005-2007, Zutubi Pty Ltd.  ********************************************************************************/  "/>
+    <property name="package.name.slave" value="pulse-agent-1.2.17-dev"/>
+    <property name="ivy.configurations" value="*"/>
+    <property name="sun.management.compiler" value="HotSpot Client Compiler"/>
+    <property name="os.name" value="Linux"/>
+    <property name="sun.boot.class.path" value="/usr/local/java/jdk1.5.0_08/jre/lib/rt.jar:/usr/local/java/jdk1.5.0_08/jre/lib/i18n.jar:/usr/local/java/jdk1.5.0_08/jre/lib/sunrsasign.jar:/usr/local/java/jdk1.5.0_08/jre/lib/jsse.jar:/usr/local/java/jdk1.5.0_08/jre/lib/jce.jar:/usr/local/java/jdk1.5.0_08/jre/lib/charsets.jar:/usr/local/java/jdk1.5.0_08/jre/classes"/>
+    <property name="ivy.module" value="pulse-root"/>
+    <property name="java.vm.specification.vendor" value="Sun Microsystems Inc."/>
+    <property name="ant.home" value="/usr/local/java/ant"/>
+    <property name="java.runtime.version" value="1.5.0_08-b03"/>
+    <property name="ivy.lib.dir" value="/var/pulse/recipes/15368204/base/lib"/>
+    <property name="user.name" value="root"/>
+    <property name="ivy.revision" value="working@pal"/>
+    <property name="build.dir" value="master/build"/>
+    <property name="version.root.master" value="build/package/pulse-1.2.17-dev/versions/0102016002"/>
+    <property name="project.root.dir" value="."/>
+    <property name="user.language" value="en"/>
+    <property name="sun.boot.library.path" value="/usr/local/java/jdk1.5.0_08/jre/lib/i386"/>
+    <property name="ivy.deliver.ivy.pattern" value="/var/pulse/recipes/15368204/base/distrib/[type]s/[artifact]-[revision].[ext]"/>
+    <property name="ant.project.name" value="Pulse"/>
+    <property name="java.version" value="1.5.0_08"/>
+    <property name="user.timezone" value=""/>
+    <property name="ivy.resolved.configurations" value="master"/>
+    <property name="ivy.organisation" value="zutubi"/>
+    <property name="ivy.resolve.default.type.filter" value="*"/>
+    <property name="sun.arch.data.model" value="32"/>
+    <property name="ivy.retrieve.pattern" value="/var/pulse/recipes/15368204/base/lib/[artifact]-[revision].[ext]"/>
+    <property name="java.endorsed.dirs" value="/usr/local/java/jdk1.5.0_08/jre/lib/endorsed"/>
+    <property name="sun.cpu.isalist" value=""/>
+    <property name="sun.jnu.encoding" value="UTF-8"/>
+    <property name="file.encoding.pkg" value="sun.io"/>
+    <property name="file.separator" value="/"/>
+    <property name="java.specification.name" value="Java Platform API Specification"/>
+    <property name="java.class.version" value="49.0"/>
+    <property name="user.country" value="AU"/>
+    <property name="java.home" value="/usr/local/java/jdk1.5.0_08/jre"/>
+    <property name="java.vm.info" value="mixed mode, sharing"/>
+    <property name="ivy.build.artifacts.dir" value="/var/pulse/recipes/15368204/base/build/artifacts"/>
+    <property name="ant.file" value="/var/pulse/recipes/15368204/base/build.xml"/>
+    <property name="os.version" value="2.6.15-27-686"/>
+    <property name="pulse.port" value="8889"/>
+    <property name="ant.file.Pulse" value="/var/pulse/recipes/15368204/base/build.xml"/>
+    <property name="bootstrap" value="com/zutubi/pulse/bootstrap/bootstrapContext.xml"/>
+    <property name="pulse.release.date" value="07-February-2007"/>
+    <property name="path.separator" value=":"/>
+    <property name="package.root.master" value="build/package/pulse-1.2.17-dev"/>
+    <property name="java.vm.version" value="1.5.0_08-b03"/>
+    <property name="report.dir" value="build/reports/junit"/>
+    <property name="ant.library.dir" value="/usr/local/java/ant/lib"/>
+    <property name="java.awt.printerjob" value="sun.print.PSPrinterJob"/>
+    <property name="sun.io.unicode.encoding" value="UnicodeLittle"/>
+    <property name="ivy.status" value="integration"/>
+    <property name="package.name.master" value="pulse-1.2.17-dev"/>
+    <property name="user.home" value="/root"/>
+    <property name="ivy.report.output.pattern" value="[organisation]-[module]-[conf].html"/>
+    <property name="version.root.local" value="build/package/pulse-dev-1.2.17-dev/versions/0102016002"/>
+    <property name="java.specification.vendor" value="Sun Microsystems Inc."/>
+    <property name="package.root.local" value="build/package/pulse-dev-1.2.17-dev"/>
+    <property name="java.library.path" value="/usr/local/java/jdk1.5.0_08/jre/lib/i386/client:/usr/local/java/jdk1.5.0_08/jre/lib/i386:/usr/local/java/jdk1.5.0_08/jre/../lib/i386"/>
+    <property name="java.vendor.url" value="http://java.sun.com/"/>
+    <property name="java.vm.vendor" value="Sun Microsystems Inc."/>
+    <property name="java.runtime.name" value="Java(TM) 2 Runtime Environment, Standard Edition"/>
+    <property name="project.repository" value="./build/repository"/>
+    <property name="java.class.path" value="/var/pulse/recipes/15368204/base/master/build/classes:/var/pulse/recipes/15368204/base/master/build/test.classes:/var/pulse/recipes/15368204/base/master/build/accept.classes:/var/pulse/recipes/15368204/base/master/build/lib/acegi-security-1.0.0.jar:/var/pulse/recipes/15368204/base/master/build/lib/acegi-security-tiger-1.0.0.jar:/var/pulse/recipes/15368204/base/master/build/lib/activation-1.0.2.jar:/var/pulse/recipes/15368204/base/master/build/lib/antlr-2.7.6rc1.jar:/var/pulse/recipes/15368204/base/master/build/lib/aopalliance-1.0.jar:/var/pulse/recipes/15368204/base/master/build/lib/apache-ant-directoryscanner-1.6.5.jar:/var/pulse/recipes/15368204/base/master/build/lib/boot-1.2.jar:/var/pulse/recipes/15368204/base/master/build/lib/cglib-nodep-2.1.3.jar:/var/pulse/recipes/15368204/base/master/build/lib/commons-attributes-api-2.1.jar:/var/pulse/recipes/15368204/base/master/build/lib/commons-attributes-compiler-2.1.jar:/var/pulse/recipes/15368204/base/master/build/lib/commons-cli-1.0.jar:/var/pulse/recipes/15368204/base/master/build/lib/commons-codec-1.3.jar:/var/pulse/recipes/15368204/base/master/build/lib/commons-collections-3.1.jar:/var/pulse/recipes/15368204/base/master/build/lib/commons-dbcp-1.2.1.jar:/var/pulse/recipes/15368204/base/master/build/lib/commons-fileupload-1.0.jar:/var/pulse/recipes/15368204/base/master/build/lib/commons-httpclient-3.0.jar:/var/pulse/recipes/15368204/base/master/build/lib/commons-lang-2.1.jar:/var/pulse/recipes/15368204/base/master/build/lib/commons-logging-1.0.4.jar:/var/pulse/recipes/15368204/base/master/build/lib/commons-logging-api-1.0.4.jar:/var/pulse/recipes/15368204/base/master/build/lib/commons-pool-1.2.jar:/var/pulse/recipes/15368204/base/master/build/lib/commons-vfs-core-20061011.jar:/var/pulse/recipes/15368204/base/master/build/lib/commons-vfs-provider-local-20061011.jar:/var/pulse/recipes/15368204/base/master/build/lib/commons-vfs-provider-ram-20061011.jar:/var/pulse/recipes/15368204/base/master/build/lib/content-20060508.jar:/var/pulse/recipes/15368204/base/master/build/lib/core-20070222200913.jar:/var/pulse/recipes/15368204/base/master/build/lib/core-test-20070222200913.jar:/var/pulse/recipes/15368204/base/master/build/lib/displaytag-1.0.jar:/var/pulse/recipes/15368204/base/master/build/lib/dom4j-1.6.1.jar:/var/pulse/recipes/15368204/base/master/build/lib/dwr-1.1-beta-3.jar:/var/pulse/recipes/15368204/base/master/build/lib/ehcache-1.1.jar:/var/pulse/recipes/15368204/base/master/build/lib/freemarker-2.3.4.jar:/var/pulse/recipes/15368204/base/master/build/lib/hessian-3.0.13.jar:/var/pulse/recipes/15368204/base/master/build/lib/hibernate-3.1.1.jar:/var/pulse/recipes/15368204/base/master/build/lib/hsqldb-1.8.0.7.jar:/var/pulse/recipes/15368204/base/master/build/lib/hsqldbutil-1.8.0.7.jar:/var/pulse/recipes/15368204/base/master/build/lib/httpunit-20060509.jar:/var/pulse/recipes/15368204/base/master/build/lib/j2ssh-common-0.2.7.jar:/var/pulse/recipes/15368204/base/master/build/lib/j2ssh-core-0.2.7.jar:/var/pulse/recipes/15368204/base/master/build/lib/javasvn-1.0.6.jar:/var/pulse/recipes/15368204/base/master/build/lib/javasvn-ganymed-1.0.6.jar:/var/pulse/recipes/15368204/base/master/build/lib/javax.servlet-2.4.jar:/var/pulse/recipes/15368204/base/master/build/lib/jcommon-1.0.5.jar:/var/pulse/recipes/15368204/base/master/build/lib/jdom-1.0.jar:/var/pulse/recipes/15368204/base/master/build/lib/jfreechart-1.0.0-rc1.jar:/var/pulse/recipes/15368204/base/master/build/lib/jhighlight-1.0.jar:/var/pulse/recipes/15368204/base/master/build/lib/js-1.6R2.jar:/var/pulse/recipes/15368204/base/master/build/lib/json-1.0.jar:/var/pulse/recipes/15368204/base/master/build/lib/jta-1.0.1b.jar:/var/pulse/recipes/15368204/base/master/build/lib/junit-3.8.1.jar:/var/pulse/recipes/15368204/base/master/build/lib/jwebunit-1.2.jar:/var/pulse/recipes/15368204/base/master/build/lib/mail-1.3.3.jar:/var/pulse/recipes/15368204/base/master/build/lib/mockobjects-alt-jdk1.4-0.09.jar:/var/pulse/recipes/15368204/base/master/build/lib/mockobjects-alt-jdk1.4-j2ee1.3-0.09.jar:/var/pulse/recipes/15368204/base/master/build/lib/mockobjects-core-0.09.jar:/var/pulse/recipes/15368204/base/master/build/lib/mockobjects-jdk1.4-0.09.jar:/var/pulse/recipes/15368204/base/master/build/lib/mockobjects-jdk1.4-j2ee1.3-0.09.jar:/var/pulse/recipes/15368204/base/master/build/lib/nekohtml-0.8.1.jar:/var/pulse/recipes/15368204/base/master/build/lib/ognl-2.6.7.jar:/var/pulse/recipes/15368204/base/master/build/lib/org-netbeans-lib-cvsclient-5.5.jar:/var/pulse/recipes/15368204/base/master/build/lib/org.mortbay.jetty-5.1.6.jar:/var/pulse/recipes/15368204/base/master/build/lib/oscore-2.2.4.jar:/var/pulse/recipes/15368204/base/master/build/lib/portlet-api-1.0.jar:/var/pulse/recipes/15368204/base/master/build/lib/quartz-20060404.jar:/var/pulse/recipes/15368204/base/master/build/lib/rife-continuations-0.0.1.jar:/var/pulse/recipes/15368204/base/master/build/lib/rome-0.8.jar:/var/pulse/recipes/15368204/base/master/build/lib/server-core-20070222200923.jar:/var/pulse/recipes/15368204/base/master/build/lib/server-core-test-20070222200923.jar:/var/pulse/recipes/15368204/base/master/build/lib/sitemesh-2.2.1.jar:/var/pulse/recipes/15368204/base/master/build/lib/smack-2.2.1.jar:/var/pulse/recipes/15368204/base/master/build/lib/smackx-2.2.1.jar:/var/pulse/recipes/15368204/base/master/build/lib/spring-aop-2.0.jar:/var/pulse/recipes/15368204/base/master/build/lib/spring-beans-2.0.jar:/var/pulse/recipes/15368204/base/master/build/lib/spring-context-2.0.jar:/var/pulse/recipes/15368204/base/master/build/lib/spring-core-2.0.jar:/var/pulse/recipes/15368204/base/master/build/lib/spring-dao-2.0.jar:/var/pulse/recipes/15368204/base/master/build/lib/spring-hibernate3-2.0.jar:/var/pulse/recipes/15368204/base/master/build/lib/spring-jdbc-2.0.jar:/var/pulse/recipes/15368204/base/master/build/lib/spring-support-2.0.jar:/var/pulse/recipes/15368204/base/master/build/lib/spring-web-2.0.jar:/var/pulse/recipes/15368204/base/master/build/lib/velocity-1.3.1.jar:/var/pulse/recipes/15368204/base/master/build/lib/velocity-dep-1.3.1.jar:/var/pulse/recipes/15368204/base/master/build/lib/velocity-tools-view-1.1.jar:/var/pulse/recipes/15368204/base/master/build/lib/webwork-2.2.1.jar:/var/pulse/recipes/15368204/base/master/build/lib/ws-commons-util-1.0.jar:/var/pulse/recipes/15368204/base/master/build/lib/xercesImpl-2.6.2.jar:/var/pulse/recipes/15368204/base/master/build/lib/xmlrpc-2.0.1.jar:/var/pulse/recipes/15368204/base/master/build/lib/xom-20051027.jar:/var/pulse/recipes/15368204/base/master/build/lib/xstream-1.2.jar:/var/pulse/recipes/15368204/base/master/build/lib/xwork-1.1.1.jar:/usr/local/java/ant/lib/junit.jar:/usr/local/java/apache-ant-1.6.5/lib/ant-launcher.jar:/usr/local/java/ant/lib/ant.jar:/usr/local/java/ant/lib/ant-junit.jar"/>
+    <property name="ant.version" value="Apache Ant version 1.6.5 compiled on June 2 2005"/>
+    <property name="java.vm.specification.name" value="Java Virtual Machine Specification"/>
+    <property name="package.name.local" value="pulse-dev-1.2.17-dev"/>
+    <property name="java.vm.specification.version" value="1.0"/>
+    <property name="sun.cpu.endian" value="little"/>
+    <property name="sun.os.patch.level" value="unknown"/>
+    <property name="java.io.tmpdir" value="/tmp"/>
+    <property name="java.vendor.url.bug" value="http://java.sun.com/cgi-bin/bugreport.cgi"/>
+    <property name="ivy.deps.changed" value="true"/>
+    <property name="os.arch" value="i386"/>
+    <property name="pulse.build" value="0102016002"/>
+    <property name="java.awt.graphicsenv" value="sun.awt.X11GraphicsEnvironment"/>
+    <property name="ivy.project.dir" value="/var/pulse/recipes/15368204/base"/>
+    <property name="extension" value="tar.gz"/>
+    <property name="java.ext.dirs" value="/usr/local/java/jdk1.5.0_08/jre/lib/ext"/>
+    <property name="user.dir" value="/var/pulse/recipes/15368204/base"/>
+    <property name="ivy.publish.src.artifacts.pattern" value="/var/pulse/recipes/15368204/base/distrib/[type]s/[artifact]-[revision].[ext]"/>
+    <property name="line.separator" value=" "/>
+    <property name="java.vm.name" value="Java HotSpot(TM) Client VM"/>
+    <property name="ivy.distrib.dir" value="/var/pulse/recipes/15368204/base/distrib"/>
+    <property name="basedir" value="/var/pulse/recipes/15368204/base"/>
+    <property name="version.root.slave" value="build/package/pulse-agent-1.2.17-dev/versions/0102016002"/>
+    <property name="pulse.version" value="1.2.17-dev"/>
+    <property name="ant.java.version" value="1.5"/>
+    <property name="package.root.slave" value="build/package/pulse-agent-1.2.17-dev"/>
+    <property name="file.encoding" value="UTF-8"/>
+    <property name="ivy.conf.file" value="ivyconf.xml"/>
+    <property name="ivy.resolver.default.check.modified" value="false"/>
+    <property name="ivy.buildlist.ivyfilepath" value="ivy.xml"/>
+    <property name="java.specification.version" value="1.5"/>
+    <property name="ivy.dep.file" value="ivy.xml"/>
+  </properties>
+  <testcase classname="com.zutubi.pulse.acceptance.SetupAcceptanceTest" name="testSetupProcess" time="31.927"/>
+  <testcase classname="com.zutubi.pulse.acceptance.AdminXmlRpcAcceptanceTest" name="testCreateUser" time="0.136"/>
+  <testcase classname="com.zutubi.pulse.acceptance.AdminXmlRpcAcceptanceTest" name="testDeleteUser" time="0.098"/>
+  <testcase classname="com.zutubi.pulse.acceptance.AdminXmlRpcAcceptanceTest" name="testSetPassword" time="0.107"/>
+  <testcase classname="com.zutubi.pulse.acceptance.ProjectXmlRpcAcceptanceTest" name="testCreateProject" time="0.201"/>
+  <testcase classname="com.zutubi.pulse.acceptance.ProjectXmlRpcAcceptanceTest" name="testCreateExeProject" time="0.099"/>
+  <testcase classname="com.zutubi.pulse.acceptance.ProjectXmlRpcAcceptanceTest" name="testDeleteProject" time="0.248"/>
+  <testcase classname="com.zutubi.pulse.acceptance.ProjectXmlRpcAcceptanceTest" name="testEditProject" time="0.133"/>
+  <testcase classname="com.zutubi.pulse.acceptance.ProjectXmlRpcAcceptanceTest" name="testGetProject" time="0.105"/>
+  <testcase classname="com.zutubi.pulse.acceptance.ProjectXmlRpcAcceptanceTest" name="testGetProjectBuildSpecifications" time="0.094"/>
+  <testcase classname="com.zutubi.pulse.acceptance.ProjectXmlRpcAcceptanceTest" name="testGetScm" time="0.114"/>
+  <testcase classname="com.zutubi.pulse.acceptance.ProjectXmlRpcAcceptanceTest" name="testEditScm" time="0.279"/>
+  <testcase classname="com.zutubi.pulse.acceptance.LicenseAuthorisationAcceptanceTest" name="testAddProjectLinkOnlyAvailableWhenLicensed" time="7.849"/>
+  <testcase classname="com.zutubi.pulse.acceptance.LicenseAuthorisationAcceptanceTest" name="testCreateUserFormOnlyAvailableWhenLicensed" time="5.752"/>
+  <testcase classname="com.zutubi.pulse.acceptance.LicenseAuthorisationAcceptanceTest" name="testAddAgentLinkOnlyAvailableWhenLicensed" time="5.708"/>
+  <testcase classname="com.zutubi.pulse.acceptance.LicenseManagementAcceptanceTest" name="testUpdateLicense" time="3.045"/>
+  <testcase classname="com.zutubi.pulse.acceptance.LicenseManagementAcceptanceTest" name="testUpdateLicenseValidation" time="2.254"/>
+  <testcase classname="com.zutubi.pulse.acceptance.LicenseManagementAcceptanceTest" name="testCancelLicenseEdit" time="3.156"/>
+  <testcase classname="com.zutubi.pulse.acceptance.LicenseManagementAcceptanceTest" name="testExpiredLicense" time="2.114"/>
+  <testcase classname="com.zutubi.pulse.acceptance.LicenseManagementAcceptanceTest" name="testLicenseDetails" time="3.116"/>
+  <testcase classname="com.zutubi.pulse.acceptance.ProjectGroupAcceptanceTest" name="testAddGroup" time="12.319"/>
+  <testcase classname="com.zutubi.pulse.acceptance.ProjectGroupAcceptanceTest" name="testAddGroupValidation" time="3.088"/>
+  <testcase classname="com.zutubi.pulse.acceptance.ProjectGroupAcceptanceTest" name="testAddGroupDuplicate" time="5.0"/>
+  <testcase classname="com.zutubi.pulse.acceptance.ProjectGroupAcceptanceTest" name="testEditGroup" time="6.853"/>
+  <testcase classname="com.zutubi.pulse.acceptance.ProjectGroupAcceptanceTest" name="testEditGroupValidation" time="5.285"/>
+  <testcase classname="com.zutubi.pulse.acceptance.ProjectGroupAcceptanceTest" name="testEditGroupDuplicate" time="7.838"/>
+  <testcase classname="com.zutubi.pulse.acceptance.ProjectGroupAcceptanceTest" name="testDeleteGroup" time="7.993"/>
+  <testcase classname="com.zutubi.pulse.acceptance.ProjectAcceptanceTest" name="testEditScm" time="5.52"/>
+  <testcase classname="com.zutubi.pulse.acceptance.ProjectAcceptanceTest" name="testEditProjectBasics" time="7.234"/>
+  <testcase classname="com.zutubi.pulse.acceptance.ProjectAcceptanceTest" name="testEditBasicsValidationProjectNameUnique" time="5.455"/>
+  <testcase classname="com.zutubi.pulse.acceptance.ProjectAcceptanceTest" name="testEditScmPasswordValue" time="4.092"/>
+  <testcase classname="com.zutubi.pulse.acceptance.ProjectAcceptanceTest" name="testEditScmValidation" time="3.46"/>
+  <testcase classname="com.zutubi.pulse.acceptance.ProjectAcceptanceTest" name="testEditScmActiveStatus" time="4.837"/>
+  <testcase classname="com.zutubi.pulse.acceptance.ProjectAcceptanceTest" name="testAddCleanupPolicy" time="3.465"/>
+  <testcase classname="com.zutubi.pulse.acceptance.ProjectAcceptanceTest" name="testAddCleanupPolicyCancel" time="3.358"/>
+  <testcase classname="com.zutubi.pulse.acceptance.ProjectAcceptanceTest" name="testAddCleanupPolicyValidation" time="2.333"/>
+  <testcase classname="com.zutubi.pulse.acceptance.ProjectAcceptanceTest" name="testEditCleanupPolicyUpdate" time="3.915"/>
+  <testcase classname="com.zutubi.pulse.acceptance.ProjectAcceptanceTest" name="testEditCleanupPolicyCancel" time="3.35"/>
+  <testcase classname="com.zutubi.pulse.acceptance.ProjectAcceptanceTest" name="testEditCleanupPolicyValidation" time="2.275"/>
+  <testcase classname="com.zutubi.pulse.acceptance.ProjectAcceptanceTest" name="testDeleteCleanupPolicy" time="3.266"/>
+  <testcase classname="com.zutubi.pulse.acceptance.ProjectAcceptanceTest" name="testAddBuildSpec" time="3.974"/>
+  <testcase classname="com.zutubi.pulse.acceptance.ProjectAcceptanceTest" name="testAddBuildSpecValidation" time="2.352"/>
+  <testcase classname="com.zutubi.pulse.acceptance.ProjectAcceptanceTest" name="testAddBuildSpecDuplicate" time="2.782"/>
+  <testcase classname="com.zutubi.pulse.acceptance.ProjectAcceptanceTest" name="testEditBuildSpec" time="4.989"/>
+  <testcase classname="com.zutubi.pulse.acceptance.ProjectAcceptanceTest" name="testEditBuildSpecValidation" time="3.636"/>
+  <testcase classname="com.zutubi.pulse.acceptance.ProjectAcceptanceTest" name="testEditBuildSpecDuplicate" time="3.461"/>
+  <testcase classname="com.zutubi.pulse.acceptance.ProjectAcceptanceTest" name="testDeleteBuildSpec" time="6.532"/>
+  <testcase classname="com.zutubi.pulse.acceptance.ProjectAcceptanceTest" name="testAddBuildStage" time="4.602"/>
+  <testcase classname="com.zutubi.pulse.acceptance.ProjectAcceptanceTest" name="testAddBuildStageValidation" time="3.48"/>
+  <testcase classname="com.zutubi.pulse.acceptance.ProjectAcceptanceTest" name="testAddBuildStageDuplicate" time="3.525"/>
+  <testcase classname="com.zutubi.pulse.acceptance.ProjectAcceptanceTest" name="testEditBuildStage" time="4.608"/>
+  <testcase classname="com.zutubi.pulse.acceptance.ProjectAcceptanceTest" name="testEditBuildStageValidation" time="3.486"/>
+  <testcase classname="com.zutubi.pulse.acceptance.ProjectAcceptanceTest" name="testEditBuildStageDuplicate" time="4.616"/>
+  <testcase classname="com.zutubi.pulse.acceptance.ProjectAcceptanceTest" name="testDeleteBuildStage" time="2.563"/>
+  <testcase classname="com.zutubi.pulse.acceptance.ProjectAcceptanceTest" name="testAddBuildSpecProperty" time="3.595"/>
+  <testcase classname="com.zutubi.pulse.acceptance.ProjectAcceptanceTest" name="testAddBuildSpecPropertyValidation" time="2.531"/>
+  <testcase classname="com.zutubi.pulse.acceptance.ProjectAcceptanceTest" name="testAddBuildSpecPropertyDuplicate" time="3.625"/>
+  <testcase classname="com.zutubi.pulse.acceptance.ProjectAcceptanceTest" name="testEditBuildSpecProperty" time="4.715"/>
+  <testcase classname="com.zutubi.pulse.acceptance.ProjectAcceptanceTest" name="testEditBuildSpecPropertyValidation" time="4.148"/>
+  <testcase classname="com.zutubi.pulse.acceptance.ProjectAcceptanceTest" name="testEditBuildSpecPropertyDuplicate" time="4.789"/>
+  <testcase classname="com.zutubi.pulse.acceptance.ProjectAcceptanceTest" name="testDeleteBuildSpecProperty" time="4.593"/>
+  <testcase classname="com.zutubi.pulse.acceptance.ProjectAcceptanceTest" name="testAddBuildSpecResource" time="4.646"/>
+  <testcase classname="com.zutubi.pulse.acceptance.ProjectAcceptanceTest" name="testAddBuildSpecResourceValidation" time="3.434"/>
+  <testcase classname="com.zutubi.pulse.acceptance.ProjectAcceptanceTest" name="testEditBuildSpecResource" time="6.152"/>
+  <testcase classname="com.zutubi.pulse.acceptance.ProjectAcceptanceTest" name="testAddBuildStageResource" time="4.494"/>
+  <testcase classname="com.zutubi.pulse.acceptance.ProjectAcceptanceTest" name="testEditBuildStageResource" time="5.573"/>
+  <testcase classname="com.zutubi.pulse.acceptance.ProjectAcceptanceTest" name="testAddNewTrigger" time="3.551"/>
+  <testcase classname="com.zutubi.pulse.acceptance.ProjectAcceptanceTest" name="testDeleteTrigger" time="3.237"/>
+  <testcase classname="com.zutubi.pulse.acceptance.ProjectAcceptanceTest" name="testDisableEnableTrigger" time="4.885"/>
+  <testcase classname="com.zutubi.pulse.acceptance.ProjectAcceptanceTest" name="testCreateTriggerValidation" time="2.738"/>
+  <testcase classname="com.zutubi.pulse.acceptance.ProjectAcceptanceTest" name="testEditCronTrigger" time="6.531"/>
+  <testcase classname="com.zutubi.pulse.acceptance.ProjectAcceptanceTest" name="testEditCronTriggerCancel" time="6.496"/>
+  <testcase classname="com.zutubi.pulse.acceptance.ProjectAcceptanceTest" name="testEditCronTriggerValidation" time="5.332"/>
+  <testcase classname="com.zutubi.pulse.acceptance.ProjectAcceptanceTest" name="testEditEventTrigger" time="5.346"/>
+  <testcase classname="com.zutubi.pulse.acceptance.ProjectAcceptanceTest" name="testEditEventTriggerCancel" time="4.935"/>
+  <testcase classname="com.zutubi.pulse.acceptance.ProjectAcceptanceTest" name="testEditEventTriggerValidation" time="3.779"/>
+  <testcase classname="com.zutubi.pulse.acceptance.ProjectAcceptanceTest" name="testAddNewBuildCompletedTrigger" time="3.922"/>
+  <testcase classname="com.zutubi.pulse.acceptance.ProjectAcceptanceTest" name="testCloneProject" time="4.263"/>
+  <testcase classname="com.zutubi.pulse.acceptance.ProjectAcceptanceTest" name="testCloneSameName" time="2.668"/>
+  <testcase classname="com.zutubi.pulse.acceptance.ProjectAcceptanceTest" name="testCloneNoName" time="2.604"/>
+  <testcase classname="com.zutubi.pulse.acceptance.ProjectAcceptanceTest" name="testCloneProjectCreatesDistinctScm" time="20.556"/>
+  <testcase classname="com.zutubi.pulse.acceptance.ProjectAcceptanceTest" name="testScmFilterDefaultDisplay" time="2.134"/>
+  <testcase classname="com.zutubi.pulse.acceptance.ProjectAcceptanceTest" name="testScmFilterAddDeleteExclusion" time="2.504"/>
+  <testcase classname="com.zutubi.pulse.acceptance.ProjectAcceptanceTest" name="testScmFilterAddValidation" time="2.642"/>
+  <testcase classname="com.zutubi.pulse.acceptance.ProjectAcceptanceTest" name="testAddTagAction" time="3.79"/>
+  <testcase classname="com.zutubi.pulse.acceptance.ProjectAcceptanceTest" name="testAddTagSpecsAndStates" time="5.139"/>
+  <testcase classname="com.zutubi.pulse.acceptance.ProjectAcceptanceTest" name="testAddTagActionValidation" time="2.533"/>
+  <testcase classname="com.zutubi.pulse.acceptance.ProjectAcceptanceTest" name="testAddTagActionDuplicate" time="3.662"/>
+  <testcase classname="com.zutubi.pulse.acceptance.ProjectAcceptanceTest" name="testEditTagAction" time="4.871"/>
+  <testcase classname="com.zutubi.pulse.acceptance.ProjectAcceptanceTest" name="testEditTagActionValidation" time="4.345"/>
+  <testcase classname="com.zutubi.pulse.acceptance.ProjectAcceptanceTest" name="testEditTagActionDuplicate" time="5.128"/>
+  <testcase classname="com.zutubi.pulse.acceptance.ProjectAcceptanceTest" name="testAddExeAction" time="3.668"/>
+  <testcase classname="com.zutubi.pulse.acceptance.ProjectAcceptanceTest" name="testAddExeActionValidation" time="2.566"/>
+  <testcase classname="com.zutubi.pulse.acceptance.ProjectAcceptanceTest" name="testEditExeAction" time="4.954"/>
+  <testcase classname="com.zutubi.pulse.acceptance.ProjectAcceptanceTest" name="testEditExeActionValidation" time="3.805"/>
+  <testcase classname="com.zutubi.pulse.acceptance.ProjectAcceptanceTest" name="testEditExeActionSameName" time="5.211"/>
+  <testcase classname="com.zutubi.pulse.acceptance.ProjectAcceptanceTest" name="testDeletePostBuildAction" time="4.655"/>
+  <testcase classname="com.zutubi.pulse.acceptance.ProjectAcceptanceTest" name="testAddTagStageAction" time="3.755"/>
+  <testcase classname="com.zutubi.pulse.acceptance.ProjectAcceptanceTest" name="testAddTagStageStates" time="3.913"/>
+  <testcase classname="com.zutubi.pulse.acceptance.ProjectAcceptanceTest" name="testAddTagStageActionValidation" time="2.734"/>
+  <testcase classname="com.zutubi.pulse.acceptance.ProjectAcceptanceTest" name="testAddTagStageActionDuplicate" time="3.718"/>
+  <testcase classname="com.zutubi.pulse.acceptance.ProjectAcceptanceTest" name="testEditTagStageAction" time="5.341"/>
+  <testcase classname="com.zutubi.pulse.acceptance.ProjectAcceptanceTest" name="testEditTagStageActionValidation" time="4.035"/>
+  <testcase classname="com.zutubi.pulse.acceptance.ProjectAcceptanceTest" name="testEditTagStageActionDuplicate" time="5.093"/>
+  <testcase classname="com.zutubi.pulse.acceptance.ProjectAcceptanceTest" name="testAddExeStageAction" time="3.775"/>
+  <testcase classname="com.zutubi.pulse.acceptance.ProjectAcceptanceTest" name="testAddExeStageActionValidation" time="2.781"/>
+  <testcase classname="com.zutubi.pulse.acceptance.ProjectAcceptanceTest" name="testEditExeStageAction" time="5.426"/>
+  <testcase classname="com.zutubi.pulse.acceptance.ProjectAcceptanceTest" name="testEditExeStageActionValidation" time="3.91"/>
+  <testcase classname="com.zutubi.pulse.acceptance.ProjectAcceptanceTest" name="testDeletePostStageAction" time="4.621"/>
+  <testcase classname="com.zutubi.pulse.acceptance.ProjectAcceptanceTest" name="testAddNewCommitMessageTransformer" time="4.48"/>
+  <testcase classname="com.zutubi.pulse.acceptance.ProjectAcceptanceTest" name="testAddExistingCommitMessageTransformer" time="4.979"/>
+  <testcase classname="com.zutubi.pulse.acceptance.ProjectAcceptanceTest" name="testOnlyUnassignedExistingTransformersDisplayed" time="7.605"/>
+  <testcase classname="com.zutubi.pulse.acceptance.ProjectAcceptanceTest" name="testAddValidatedNameUniqueness" time="4.0"/>
+  <testcase classname="com.zutubi.pulse.acceptance.ProjectAcceptanceTest" name="testEditCommitMessageTransformer" time="5.153"/>
+  <testcase classname="com.zutubi.pulse.acceptance.ProjectAcceptanceTest" name="testRemoveCommitMessageTransformer" time="4.819"/>
+  <testcase classname="com.zutubi.pulse.acceptance.AnonymousAccessAcceptanceTest" name="testDisabledByDefault" time="1.693"/>
+  <testcase classname="com.zutubi.pulse.acceptance.AnonymousAccessAcceptanceTest" name="testEnableDisableAccess" time="25.868"/>
+  <testcase classname="com.zutubi.pulse.acceptance.GeneralConfigurationAcceptanceTest" name="testGeneralReset" time="2.833"/>
+  <testcase classname="com.zutubi.pulse.acceptance.GeneralConfigurationAcceptanceTest" name="testGeneralEdit" time="3.047"/>
+  <testcase classname="com.zutubi.pulse.acceptance.GeneralConfigurationAcceptanceTest" name="testGeneralCancel" time="2.91"/>
+  <testcase classname="com.zutubi.pulse.acceptance.GeneralConfigurationAcceptanceTest" name="testGeneralValidation" time="2.615"/>
+  <testcase classname="com.zutubi.pulse.acceptance.ProjectArtifactsAcceptanceTest" name="testArtifactsTableAppears" time="2.144"/>
+  <testcase classname="com.zutubi.pulse.acceptance.ProjectArtifactsAcceptanceTest" name="testEditOutputProcessors" time="4.0"/>
+  <testcase classname="com.zutubi.pulse.acceptance.ProjectArtifactsAcceptanceTest" name="testEditOutputProcessorsCancel" time="3.512"/>
+  <testcase classname="com.zutubi.pulse.acceptance.ProjectArtifactsAcceptanceTest" name="testAddArtifactValidation" time="2.315"/>
+  <testcase classname="com.zutubi.pulse.acceptance.ProjectArtifactsAcceptanceTest" name="testAddFileArtifact" time="4.803"/>
+  <testcase classname="com.zutubi.pulse.acceptance.ProjectArtifactsAcceptanceTest" name="testAddFileArtifactValidation" time="2.391"/>
+  <testcase classname="com.zutubi.pulse.acceptance.ProjectArtifactsAcceptanceTest" name="testEditFileArtifact" time="6.031"/>
+  <testcase classname="com.zutubi.pulse.acceptance.ProjectArtifactsAcceptanceTest" name="testEditFileArtifactValidation" time="4.892"/>
+  <testcase classname="com.zutubi.pulse.acceptance.ProjectArtifactsAcceptanceTest" name="testEditFileArtifactSameName" time="5.446"/>
+  <testcase classname="com.zutubi.pulse.acceptance.ProjectArtifactsAcceptanceTest" name="testEditFileArtifactCancel" time="5.963"/>
+  <testcase classname="com.zutubi.pulse.acceptance.ProjectArtifactsAcceptanceTest" name="testAddDirectoryArtifact" time="4.795"/>
+  <testcase classname="com.zutubi.pulse.acceptance.ProjectArtifactsAcceptanceTest" name="testEditDirectoryArtifact" time="6.053"/>
+  <testcase classname="com.zutubi.pulse.acceptance.ProjectArtifactsAcceptanceTest" name="testEditDirectoryArtifactSameName" time="5.62"/>
+  <testcase classname="com.zutubi.pulse.acceptance.ProjectArtifactsAcceptanceTest" name="testEditDirectoryArtifactCancel" time="5.958"/>
+  <testcase classname="com.zutubi.pulse.acceptance.ProjectArtifactsAcceptanceTest" name="testAddArtifactSameName" time="4.856"/>
+  <testcase classname="com.zutubi.pulse.acceptance.ProjectWizardAcceptanceTest" name="testCreateVersionedProject" time="79.191"/>
+  <testcase classname="com.zutubi.pulse.acceptance.ProjectWizardAcceptanceTest" name="testCreateCustomProject" time="80.188"/>
+  <testcase classname="com.zutubi.pulse.acceptance.ProjectWizardAcceptanceTest" name="testCreateMaven2Project" time="83.072"/>
+  <testcase classname="com.zutubi.pulse.acceptance.ProjectWizardAcceptanceTest" name="testCreateExecutableProject" time="84.095"/>
+  <testcase classname="com.zutubi.pulse.acceptance.ProjectWizardAcceptanceTest" name="testProjectNameUnique" time="84.838"/>
+  <testcase classname="com.zutubi.pulse.acceptance.RssAcceptanceTest" name="testProjectRssFeedGenerationSuccessful" time="46.113"/>
+  <testcase classname="com.zutubi.pulse.acceptance.RssAcceptanceTest" name="testAllProjectRssFeedGenerationSuccessful" time="3.829"/>
+  <testcase classname="com.zutubi.pulse.acceptance.SmtpConfigurationAcceptanceTest" name="testSmtpReset" time="2.887"/>
+  <testcase classname="com.zutubi.pulse.acceptance.SmtpConfigurationAcceptanceTest" name="testSmtpEdit" time="3.024"/>
+  <testcase classname="com.zutubi.pulse.acceptance.SmtpConfigurationAcceptanceTest" name="testSmtpCancel" time="3.082"/>
+  <testcase classname="com.zutubi.pulse.acceptance.ResourceAcceptanceTest" name="testAddResource" time="3.602"/>
+  <testcase classname="com.zutubi.pulse.acceptance.ResourceAcceptanceTest" name="testAddResourceValidation" time="2.197"/>
+  <testcase classname="com.zutubi.pulse.acceptance.ResourceAcceptanceTest" name="testAddResourceDuplicate" time="3.555"/>
+  <testcase classname="com.zutubi.pulse.acceptance.ResourceAcceptanceTest" name="testEditResource" time="4.42"/>
+  <testcase classname="com.zutubi.pulse.acceptance.ResourceAcceptanceTest" name="testEditResourceValidation" time="3.288"/>
+  <testcase classname="com.zutubi.pulse.acceptance.ResourceAcceptanceTest" name="testEditResourceDuplicate" time="4.644"/>
+  <testcase classname="com.zutubi.pulse.acceptance.ResourceAcceptanceTest" name="testDeleteResource" time="4.434"/>
+  <testcase classname="com.zutubi.pulse.acceptance.ResourceAcceptanceTest" name="testAddResourceProperty" time="4.294"/>
+  <testcase classname="com.zutubi.pulse.acceptance.ResourceAcceptanceTest" name="testAddVersionProperty" time="5.321"/>
+  <testcase classname="com.zutubi.pulse.acceptance.ResourceAcceptanceTest" name="testAddResourcePropertyValidation" time="3.5"/>
+  <testcase classname="com.zutubi.pulse.acceptance.ResourceAcceptanceTest" name="testAddResourcePropertyDuplicate" time="4.4"/>
+  <testcase classname="com.zutubi.pulse.acceptance.ResourceAcceptanceTest" name="testAddVersionPropertyDuplicate" time="5.52"/>
+  <testcase classname="com.zutubi.pulse.acceptance.ResourceAcceptanceTest" name="testEditResourceProperty" time="5.264"/>
+  <testcase classname="com.zutubi.pulse.acceptance.ResourceAcceptanceTest" name="testEditVersionProperty" time="6.815"/>
+  <testcase classname="com.zutubi.pulse.acceptance.ResourceAcceptanceTest" name="testEditResourcePropertyValidation" time="4.523"/>
+  <testcase classname="com.zutubi.pulse.acceptance.ResourceAcceptanceTest" name="testEditResourcePropertyDuplicate" time="5.433"/>
+  <testcase classname="com.zutubi.pulse.acceptance.ResourceAcceptanceTest" name="testEditVersionPropertyDuplicate" time="6.565"/>
+  <testcase classname="com.zutubi.pulse.acceptance.ResourceAcceptanceTest" name="testDeleteResourceProperty" time="5.268"/>
+  <testcase classname="com.zutubi.pulse.acceptance.ResourceAcceptanceTest" name="testDeleteVersionProperty" time="6.223"/>
+  <testcase classname="com.zutubi.pulse.acceptance.ResourceAcceptanceTest" name="testAddResourceVersion" time="4.382"/>
+  <testcase classname="com.zutubi.pulse.acceptance.ResourceAcceptanceTest" name="testAddResourceVersionValidation" time="3.449"/>
+  <testcase classname="com.zutubi.pulse.acceptance.ResourceAcceptanceTest" name="testAddResourceVersionDuplicate" time="4.442"/>
+  <testcase classname="com.zutubi.pulse.acceptance.ResourceAcceptanceTest" name="testEditResourceVersion" time="5.419"/>
+  <testcase classname="com.zutubi.pulse.acceptance.ResourceAcceptanceTest" name="testEditResourceVersionValidation" time="4.465"/>
+  <testcase classname="com.zutubi.pulse.acceptance.ResourceAcceptanceTest" name="testEditResourceVersionDuplicate" time="5.537"/>
+  <testcase classname="com.zutubi.pulse.acceptance.SlaveAcceptanceTest" name="testAddResource" time="4.148"/>
+  <testcase classname="com.zutubi.pulse.acceptance.SlaveAcceptanceTest" name="testDeleteResource" time="5.012"/>
+  <testcase classname="com.zutubi.pulse.acceptance.SlaveAcceptanceTest" name="testEditMasterLocation" time="2.927"/>
+  <testcase classname="com.zutubi.pulse.acceptance.SlaveAcceptanceTest" name="testEditMasterLocationValidation" time="2.032"/>
+  <testcase classname="com.zutubi.pulse.acceptance.SlaveAcceptanceTest" name="testMasterEnableDisable" time="3.772"/>
+  <testcase classname="com.zutubi.pulse.acceptance.SlaveAcceptanceTest" name="testAddSlave" time="2.96"/>
+  <testcase classname="com.zutubi.pulse.acceptance.SlaveAcceptanceTest" name="testAddSlaveValidation" time="1.938"/>
+  <testcase classname="com.zutubi.pulse.acceptance.SlaveAcceptanceTest" name="testAddSlaveDuplicate" time="3.07"/>
+  <testcase classname="com.zutubi.pulse.acceptance.SlaveAcceptanceTest" name="testEditSlave" time="12.529"/>
+  <testcase classname="com.zutubi.pulse.acceptance.SlaveAcceptanceTest" name="testEditSlaveValidation" time="3.071"/>
+  <testcase classname="com.zutubi.pulse.acceptance.SlaveAcceptanceTest" name="testEditSlaveDuplicate" time="4.172"/>
+  <testcase classname="com.zutubi.pulse.acceptance.SlaveAcceptanceTest" name="testDeleteSlave" time="4.236"/>
+  <testcase classname="com.zutubi.pulse.acceptance.SlaveAcceptanceTest" name="testCanDeleteAgentWithAssociatedResource" time="5.791"/>
+  <testcase classname="com.zutubi.pulse.acceptance.JabberConfigurationAcceptanceTest" name="testJabberEdit" time="4.227"/>
+  <testcase classname="com.zutubi.pulse.acceptance.JabberConfigurationAcceptanceTest" name="testJabberReset" time="5.828"/>
+  <testcase classname="com.zutubi.pulse.acceptance.JabberConfigurationAcceptanceTest" name="testJabberCancel" time="3.085"/>
+  <testcase classname="com.zutubi.pulse.acceptance.JabberConfigurationAcceptanceTest" name="testJabberValidate" time="2.118"/>
+  <testcase classname="com.zutubi.pulse.acceptance.LdapConfigurationAcceptanceTest" name="testEdit" time="3.536"/>
+  <testcase classname="com.zutubi.pulse.acceptance.LdapConfigurationAcceptanceTest" name="testLdapReset" time="4.676"/>
+  <testcase classname="com.zutubi.pulse.acceptance.LdapConfigurationAcceptanceTest" name="testLdapCancel" time="3.07"/>
+  <testcase classname="com.zutubi.pulse.acceptance.LdapConfigurationAcceptanceTest" name="testLdapValidate" time="2.3"/>
+  <testcase classname="com.zutubi.pulse.acceptance.CommitMessageTransformerAcceptanceTest" name="testAddNewTransformer" time="91.217"/>
+  <testcase classname="com.zutubi.pulse.acceptance.CommitMessageTransformerAcceptanceTest" name="testCancelAddingNewTransformer" time="4.891"/>
+  <testcase classname="com.zutubi.pulse.acceptance.CommitMessageTransformerAcceptanceTest" name="testAddNewTransformerValidation" time="4.68"/>
+  <testcase classname="com.zutubi.pulse.acceptance.CommitMessageTransformerAcceptanceTest" name="testEditExistingTransformer" time="7.014"/>
+  <testcase classname="com.zutubi.pulse.acceptance.CommitMessageTransformerAcceptanceTest" name="testDeleteExistingTransformer" time="6.165"/>
+  <testcase classname="com.zutubi.pulse.acceptance.CommitMessageTransformerAcceptanceTest" name="testAssignTransformerToProject" time="50.52"/>
+  <testcase classname="com.zutubi.pulse.acceptance.ChangeViewersAcceptanceTest" name="testNoChangeViewer" time="2.137"/>
+  <testcase classname="com.zutubi.pulse.acceptance.ChangeViewersAcceptanceTest" name="testAddCustomChangeViewer" time="3.589"/>
+  <testcase classname="com.zutubi.pulse.acceptance.ChangeViewersAcceptanceTest" name="testAddFisheyeChangeViewer" time="3.519"/>
+  <testcase classname="com.zutubi.pulse.acceptance.ChangeViewersAcceptanceTest" name="testAddFisheyeChangeViewerValidation" time="2.319"/>
+  <testcase classname="com.zutubi.pulse.acceptance.ChangeViewersAcceptanceTest" name="testAddTracChangeViewer" time="3.529"/>
+  <testcase classname="com.zutubi.pulse.acceptance.ChangeViewersAcceptanceTest" name="testAddTracChangeViewerValidation" time="2.351"/>
+  <testcase classname="com.zutubi.pulse.acceptance.ChangeViewersAcceptanceTest" name="testAddP4WebChangeViewer" time="4.109"/>
+  <testcase classname="com.zutubi.pulse.acceptance.ChangeViewersAcceptanceTest" name="testAddP4WebChangeViewerValidation" time="2.314"/>
+  <testcase classname="com.zutubi.pulse.acceptance.ChangeViewersAcceptanceTest" name="testAddViewVCChangeViewer" time="3.51"/>
+  <testcase classname="com.zutubi.pulse.acceptance.ChangeViewersAcceptanceTest" name="testAddViewVCChangeViewerValidation" time="2.324"/>
+  <testcase classname="com.zutubi.pulse.acceptance.UserAdministrationAcceptanceTest" name="testDeleteUser" time="4.041"/>
+  <testcase classname="com.zutubi.pulse.acceptance.UserAdministrationAcceptanceTest" name="testCreateStandardUser" time="6.313"/>
+  <testcase classname="com.zutubi.pulse.acceptance.UserAdministrationAcceptanceTest" name="testCreateUserValidation" time="2.331"/>
+  <testcase classname="com.zutubi.pulse.acceptance.UserAdministrationAcceptanceTest" name="testViewUser" time="3.098"/>
+  <testcase classname="com.zutubi.pulse.acceptance.UserAdministrationAcceptanceTest" name="testChangeUserPassword" time="5.861"/>
+  <testcase classname="com.zutubi.pulse.acceptance.UserAdministrationAcceptanceTest" name="testEditUser" time="4.221"/>
+  <testcase classname="com.zutubi.pulse.acceptance.UserAdministrationAcceptanceTest" name="testEditUserValidation" time="3.206"/>
+  <testcase classname="com.zutubi.pulse.acceptance.UserAdministrationAcceptanceTest" name="testEditUserDuplicate" time="4.264"/>
+  <testcase classname="com.zutubi.pulse.acceptance.UserAdministrationAcceptanceTest" name="testChangeUserPasswordValidation" time="3.443"/>
+  <testcase classname="com.zutubi.pulse.acceptance.UserPreferencesAcceptanceTest" name="testEditUser" time="19.917"/>
+  <testcase classname="com.zutubi.pulse.acceptance.UserPreferencesAcceptanceTest" name="testEditUserValidation" time="19.446"/>
+  <testcase classname="com.zutubi.pulse.acceptance.UserPreferencesAcceptanceTest" name="testUserPreferences" time="18.275"/>
+  <testcase classname="com.zutubi.pulse.acceptance.UserPreferencesAcceptanceTest" name="testAddEmailContactValidation" time="18.931"/>
+  <testcase classname="com.zutubi.pulse.acceptance.UserPreferencesAcceptanceTest" name="testCancelEmailContact" time="19.58"/>
+  <testcase classname="com.zutubi.pulse.acceptance.UserPreferencesAcceptanceTest" name="testCancelEditUser" time="19.51"/>
+  <testcase classname="com.zutubi.pulse.acceptance.UserPreferencesAcceptanceTest" name="testEditPassword" time="21.194"/>
+  <testcase classname="com.zutubi.pulse.acceptance.UserPreferencesAcceptanceTest" name="testEditPasswordValidation" time="19.399"/>
+  <testcase classname="com.zutubi.pulse.acceptance.UserPreferencesAcceptanceTest" name="testSetAndEditABlankPassword" time="35.706"/>
+  <testcase classname="com.zutubi.pulse.acceptance.UserPreferencesAcceptanceTest" name="testAddAlias" time="19.535"/>
+  <testcase classname="com.zutubi.pulse.acceptance.UserPreferencesAcceptanceTest" name="testAddAliasValidation" time="19.79"/>
+  <testcase classname="com.zutubi.pulse.acceptance.UserPreferencesAcceptanceTest" name="testAddAliasCancel" time="19.51"/>
+  <testcase classname="com.zutubi.pulse.acceptance.UserPreferencesAcceptanceTest" name="testDeleteAlias" time="21.144"/>
+  <testcase classname="com.zutubi.pulse.acceptance.UserPreferencesAcceptanceTest" name="testEditSettings" time="19.67"/>
+  <testcase classname="com.zutubi.pulse.acceptance.UserPreferencesAcceptanceTest" name="testEditSettingsCancel" time="19.476"/>
+  <testcase classname="com.zutubi.pulse.acceptance.UserPreferencesAcceptanceTest" name="testEditSettingsValidation" time="18.843"/>
+  <testcase classname="com.zutubi.pulse.acceptance.UserPreferencesAcceptanceTest" name="testSubscriptionFormValidation" time="18.53"/>
+  <testcase classname="com.zutubi.pulse.acceptance.UserPreferencesAcceptanceTest" name="testEditContactPoint" time="21.822"/>
+  <testcase classname="com.zutubi.pulse.acceptance.UserPreferencesAcceptanceTest" name="testAddJabberContactPoint" time="20.265"/>
+  <testcase classname="com.zutubi.pulse.acceptance.UserPreferencesAcceptanceTest" name="testAddJabberContactValidation" time="18.863"/>
+  <testcase classname="com.zutubi.pulse.acceptance.UserPreferencesAcceptanceTest" name="testAddJabberContactCancel" time="19.742"/>
+  <testcase classname="com.zutubi.pulse.acceptance.UserPreferencesAcceptanceTest" name="testEditJabberContact" time="20.614"/>
+  <testcase classname="com.zutubi.pulse.acceptance.UserPreferencesAcceptanceTest" name="testEditJabberContactValidation" time="19.833"/>
+  <testcase classname="com.zutubi.pulse.acceptance.UserPreferencesAcceptanceTest" name="testEditJabberContactCancel" time="20.712"/>
+  <testcase classname="com.zutubi.pulse.acceptance.UserPreferencesAcceptanceTest" name="testDeleteJabberContact" time="21.345"/>
+  <testcase classname="com.zutubi.pulse.acceptance.UserPreferencesAcceptanceTest" name="testCreateSubscriptionProject" time="21.782"/>
+  <testcase classname="com.zutubi.pulse.acceptance.UserPreferencesAcceptanceTest" name="testCreateSubscriptionAllProjects" time="21.555"/>
+  <testcase classname="com.zutubi.pulse.acceptance.UserPreferencesAcceptanceTest" name="testCreateSubscriptionPersonal" time="21.073"/>
+  <testcase classname="com.zutubi.pulse.acceptance.UserPreferencesAcceptanceTest" name="testEditSubscriptionProject" time="25.562"/>
+  <testcase classname="com.zutubi.pulse.acceptance.UserPreferencesAcceptanceTest" name="testEditSubscriptionPersonal" time="23.251"/>
+  <testcase classname="com.zutubi.pulse.acceptance.UserSecurityAcceptanceTest" name="testLoginLogout" time="4.969"/>
+  <testcase classname="com.zutubi.pulse.acceptance.UserSecurityAcceptanceTest" name="testLoginValidation" time="4.169"/>
+  <testcase classname="com.zutubi.pulse.acceptance.UserSecurityAcceptanceTest" name="testRememberMeCookieSet" time="2.519"/>
+  <testcase classname="com.zutubi.pulse.acceptance.UserSecurityAcceptanceTest" name="testRememberMeCookieNotSet" time="2.495"/>
+  <testcase classname="com.zutubi.pulse.acceptance.UserSecurityAcceptanceTest" name="testExplicitLogoutExpiresCookie" time="4.972"/>
+  <testcase classname="com.zutubi.pulse.acceptance.GroupAcceptanceTest" name="testAddGroup" time="159.175"/>
+  <testcase classname="com.zutubi.pulse.acceptance.GroupAcceptanceTest" name="testAddGroupValidation" time="5.153"/>
+  <testcase classname="com.zutubi.pulse.acceptance.GroupAcceptanceTest" name="testAddGroupDuplicate" time="7.911"/>
+  <testcase classname="com.zutubi.pulse.acceptance.GroupAcceptanceTest" name="testEditGroup" time="8.319"/>
+  <testcase classname="com.zutubi.pulse.acceptance.GroupAcceptanceTest" name="testEditGroupValidation" time="7.575"/>
+  <testcase classname="com.zutubi.pulse.acceptance.GroupAcceptanceTest" name="testEditGroupDuplicate" time="10.356"/>
+  <testcase classname="com.zutubi.pulse.acceptance.GroupAcceptanceTest" name="testAddGroupServerAdmin" time="6.148"/>
+  <testcase classname="com.zutubi.pulse.acceptance.GroupAcceptanceTest" name="testAddGroupPersonal" time="6.257"/>
+  <testcase classname="com.zutubi.pulse.acceptance.GroupAcceptanceTest" name="testAddGroupAllProjectAdmin" time="6.624"/>
+  <testcase classname="com.zutubi.pulse.acceptance.GroupAcceptanceTest" name="testAddGroupSomeProjectsAdmin" time="6.155"/>
+  <testcase classname="com.zutubi.pulse.acceptance.GroupAcceptanceTest" name="testEditGroupRemovePrivileges" time="8.568"/>
+  <testcase classname="com.zutubi.pulse.acceptance.GroupAcceptanceTest" name="testAddGroupMembers" time="7.773"/>
+  <testcase classname="com.zutubi.pulse.acceptance.GroupAcceptanceTest" name="testAddGroupMembersCurrentMembersNotShown" time="7.917"/>
+  <testcase classname="com.zutubi.pulse.acceptance.GroupAcceptanceTest" name="testRemoveGroupMember" time="8.284"/>
+  <testcase classname="com.zutubi.pulse.acceptance.GroupAcceptanceTest" name="testAdminUsersGetPrivileges" time="172.682"/>
+  <testcase classname="com.zutubi.pulse.acceptance.GroupAcceptanceTest" name="testRemoveAdminPrivileges" time="13.75"/>
+  <testcase classname="com.zutubi.pulse.acceptance.GroupAcceptanceTest" name="testProjectAdminsGetPrivileges" time="173.957"/>
+  <testcase classname="com.zutubi.pulse.acceptance.GroupAcceptanceTest" name="testRemoveProjectAdminPrivileges" time="63.557"/>
+  <testcase classname="com.zutubi.pulse.acceptance.GroupAcceptanceTest" name="testSpecificProjectAdminsGetPrivileges" time="165.558"/>
+  <testcase classname="com.zutubi.pulse.acceptance.GroupAcceptanceTest" name="testRemoveSpecificProjectAdminPrivileges" time="64.535"/>
+  <testcase classname="com.zutubi.pulse.acceptance.WebAppAcceptanceTest" name="testDirectoryListingIsNotAllowed" time="1.702"/>
+  <testcase classname="com.zutubi.pulse.acceptance.WebAppAcceptanceTest" name="test404DisplaysAllInformation" time="2.546"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

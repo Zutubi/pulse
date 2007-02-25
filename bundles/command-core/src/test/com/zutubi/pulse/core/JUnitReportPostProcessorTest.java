@@ -29,11 +29,10 @@ public class JUnitReportPostProcessorTest extends XMLReportPostProcessorTestBase
     {
         TestSuiteResult tests = runProcessor("simple");
 
-        assertEquals(3, tests.getSuites().size());
+        assertEquals(2, tests.getSuites().size());
         checkWarning(tests.getSuites().get(0), "com.zutubi.pulse.junit.EmptyTest", 91, "No tests found");
-        checkWarning(tests.getSuites().get(1), "com.zutubi.pulse.junit.NonConstructableTest", 100, "no public constructor");
 
-        TestSuiteResult suite = tests.getSuites().get(2);
+        TestSuiteResult suite = tests.getSuites().get(1);
         assertEquals("com.zutubi.pulse.junit.SimpleTest", suite.getName());
         assertEquals(90, suite.getDuration());
 
@@ -52,6 +51,13 @@ public class JUnitReportPostProcessorTest extends XMLReportPostProcessorTestBase
     {
         TestSuiteResult tests = runProcessor("single");
         assertSingleSuite(tests);
+    }
+
+    public void testSuite()
+    {
+        TestSuiteResult tests = runProcessor("suite");
+        assertEquals(274, tests.getTotal());
+        assertNotNull(tests.getSuite("com.zutubi.pulse.acceptance.AcceptanceTestSuite").getCase("com.zutubi.pulse.acceptance.LicenseAuthorisationAcceptanceTest.testAddProjectLinkOnlyAvailableWhenLicensed"));
     }
 
     public void testCustom()
