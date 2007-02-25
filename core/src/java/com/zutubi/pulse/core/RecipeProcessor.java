@@ -125,7 +125,7 @@ public class RecipeProcessor
 
             runningLock.lock();
             runningRecipe = 0;
-            runningCommand = null;
+            runningRecipeInstance = null;
             if (terminating)
             {
                 terminating = false;
