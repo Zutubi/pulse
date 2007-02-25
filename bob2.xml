@@ -41,7 +41,7 @@
                 <process processor="${junit.pp}"/>
             </dir-artifact>
             <dir-artifact name="packages" base="build">
-                <include pattern="pulse-*-${pulse.version}.*"/>
+                <include pattern="pulse-*${pulse.version}.*"/>
             </dir-artifact>
         </command>
     </recipe>
