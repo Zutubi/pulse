@@ -1,20 +1,23 @@
 package com.zutubi.pulse.vfs.agent;
 
+import com.caucho.hessian.client.HessianRuntimeException;
+import com.zutubi.pulse.filesystem.FileInfo;
+import com.zutubi.pulse.util.logging.Logger;
 import org.apache.commons.vfs.FileName;
-import org.apache.commons.vfs.FileType;
 import org.apache.commons.vfs.FileSystemException;
+import org.apache.commons.vfs.FileType;
 import org.apache.commons.vfs.provider.AbstractFileObject;
 import org.apache.commons.vfs.provider.UriParser;
 
 import java.io.InputStream;
-
-import com.zutubi.pulse.filesystem.FileInfo;
 
 /**
  * <class comment/>
  */
 public class AgentFileObject extends AbstractFileObject
 {
+    private static final Logger LOG = Logger.getLogger(AgentFileObject.class);
+
     private AgentFileSystem fs;
 
     public AgentFileObject(final FileName name, final AgentFileSystem fs)
@@ -41,11 +44,12 @@ public class AgentFileObject extends AbstractFileObject
     protected String[] doListChildren() throws Exception
     {
         String path = getName().getPath();
-        if (path.equals(FileName.ROOT_PATH))
+        if (fs.isWindows() && path.equals(FileName.ROOT_PATH))
         {
             return fs.getRoots();
         }
-        return UriParser.encode(getFileInfo().list());
+        FileInfo info = getFileInfo();
+        return UriParser.encode(info.list());
     }
 
     protected long doGetContentSize() throws Exception
@@ -61,12 +65,20 @@ public class AgentFileObject extends AbstractFileObject
     protected FileInfo getFileInfo() throws FileSystemException
     {
         String path = getName().getPath();
-        if (fs.isRoot(path))
+        try
         {
-            // need to munge it a little, must add the trailing slash if we want
-            // the correct file.
-            return fs.getProxy().getFileInfo(fs.getToken(), path + "/");
+            if (fs.isWindows() && fs.isRoot(path))
+            {
+                // need to munge it a little, must add the trailing slash if we want
+                // the correct file.
+                return fs.getProxy().getFileInfo(fs.getToken(), path + "/");
+            }
+            return fs.getProxy().getFileInfo(fs.getToken(), path);
         }
-        return fs.getProxy().getFileInfo(fs.getToken(), path);
+        catch (HessianRuntimeException e)
+        {
+            LOG.warning(e);
+            throw new FileSystemException(e);
+        }
     }
 }

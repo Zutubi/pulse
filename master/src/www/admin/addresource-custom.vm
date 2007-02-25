@@ -1,6 +1,6 @@
 #helpTag("Resource+Repository")
 #authorisationTags($principle)
-<content tag="selectedTab">agents</content>
+#agentTags($slave)
 <html>
 <head>
     <title>#wwtext("name=add.custom.resource")</title>

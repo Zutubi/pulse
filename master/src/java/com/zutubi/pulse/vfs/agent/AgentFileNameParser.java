@@ -1,12 +1,12 @@
 package com.zutubi.pulse.vfs.agent;
 
-import org.apache.commons.vfs.provider.AbstractFileNameParser;
-import org.apache.commons.vfs.provider.FileNameParser;
-import org.apache.commons.vfs.provider.VfsComponentContext;
-import org.apache.commons.vfs.provider.UriParser;
 import org.apache.commons.vfs.FileName;
 import org.apache.commons.vfs.FileSystemException;
 import org.apache.commons.vfs.FileType;
+import org.apache.commons.vfs.provider.AbstractFileNameParser;
+import org.apache.commons.vfs.provider.FileNameParser;
+import org.apache.commons.vfs.provider.UriParser;
+import org.apache.commons.vfs.provider.VfsComponentContext;
 
 /**
  * <class comment/>
@@ -57,7 +57,7 @@ public class AgentFileNameParser extends AbstractFileNameParser
             {
                 // Found the end of the user info
                 String address = name.substring(0, pos);
-                name.delete(0, pos + 1);
+                name.delete(0, pos);
                 return address;
             }
         }

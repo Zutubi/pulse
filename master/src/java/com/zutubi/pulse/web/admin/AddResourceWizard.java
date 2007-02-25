@@ -88,7 +88,7 @@ public class AddResourceWizard extends BaseWizard
         this.agentId = agentId;
     }
 
-    protected Slave getSlave()
+    public Slave getSlave()
     {
         return slaveManager.getSlave(agentId);
     }
