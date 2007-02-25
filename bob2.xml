@@ -30,7 +30,7 @@
     <recipe name="release">
         <executable name="prepare" exe="bash" args="prepare-release.sh ${pulse.version}"/>
         <command name="build">
-            <ant targets="package.master"/>
+            <ant targets="accept.master"/>
             <dir-artifact name="combined junit" base="build/reports/junit/html" fail-if-not-present="false"/>
             <dir-artifact name="core junit" base="core/build/reports/junit/html" fail-if-not-present="false"/>
             <dir-artifact name="server-core junit" base="server-core/build/reports/junit/html" fail-if-not-present="false"/>
@@ -47,7 +47,7 @@
     </recipe>
 
     <recipe name="dbtest">
-        <ant name="package" args="-Dskip.tests=true" targets="package.master"/>
+        <ant name="package" args="skip.tests=true" targets="package.master"/>
         <command name="build">
             <ant targets="accept.master.nodeps"/>
             <dir-artifact name="junit" base="build/reports/junit/html" fail-if-not-present="false"/>
