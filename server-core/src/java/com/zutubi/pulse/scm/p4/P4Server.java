@@ -6,6 +6,7 @@ import com.zutubi.pulse.scm.*;
 import static com.zutubi.pulse.scm.p4.P4Constants.*;
 import com.zutubi.pulse.util.FileSystemUtils;
 import com.zutubi.pulse.util.logging.Logger;
+import com.opensymphony.util.TextUtils;
 
 import java.io.File;
 import java.io.IOException;
@@ -402,7 +403,7 @@ public class P4Server extends CachingSCMServer
         this.client.setEnv(ENV_PORT, port);
         this.client.setEnv(ENV_USER, user);
 
-        if (password != null)
+        if (TextUtils.stringSet(password))
         {
             this.client.setEnv(ENV_PASSWORD, password);
         }
