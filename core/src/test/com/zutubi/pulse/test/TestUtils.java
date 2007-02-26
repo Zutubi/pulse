@@ -28,13 +28,13 @@ public class TestUtils
         File master = new File("master");
         if (master.isDirectory())
         {
-            return master.getParentFile();
+            return master.getAbsoluteFile().getParentFile();
         }
 
         master = new File("../master");
         if (master.isDirectory())
         {
-            return master.getParentFile();
+            return master.getAbsoluteFile().getParentFile();
         }
 
         // OK, maybe we can find indirectly via the classpath

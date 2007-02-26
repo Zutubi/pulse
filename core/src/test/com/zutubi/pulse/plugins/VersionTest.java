@@ -142,7 +142,7 @@ public class VersionTest extends PulseTestCase
     public void testToStringEmtpyQualifier()
     {
         Version v = new Version("1.2.3.");
-        assertEquals("1.2.3.", v.toString());
+        assertEquals("1.2.3", v.toString());
     }
     
     public void testToStringNoQualifier()

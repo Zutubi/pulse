@@ -295,7 +295,7 @@ public abstract class PulseTestCase extends TestCase
     protected File getTestDataFile(String module, String testName, String extension)
     {
         File root = getPulseRoot();
-        System.out.println("CalculatedRoot: " + root.getAbsolutePath());
+//        System.out.println("CalculatedRoot: " + root.getAbsolutePath());
         return new File(root, FileSystemUtils.composeFilename(module, "src", "test", getClass().getName().replace('.', File.separatorChar) + "." + testName + "." + extension));
     }
 
