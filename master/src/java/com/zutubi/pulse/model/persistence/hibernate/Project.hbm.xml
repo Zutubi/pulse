@@ -13,14 +13,13 @@
 
         <property name="name" column="NAME" type="string" length="255"/>
 
-        <property name="description" column="DESCRIPTION" type="string" length="4096"/>
+        <property name="description" column="DESCRIPTION" type="string" length="4095"/>
 
-        <property name="url" column="URL" type="string" length="512"/>
+        <property name="url" column="URL" type="string" length="511"/>
 
         <property name="stateName" column="STATE" type="string" length="31"/>
 
-        <many-to-one name="pulseFileDetails" class="com.zutubi.pulse.model.PulseFileDetails" column="BOB_FILE_DETAILS"
-                     lazy="false" cascade="all"/>
+        <many-to-one name="pulseFileDetails" class="com.zutubi.pulse.model.PulseFileDetails" column="BOB_FILE_DETAILS" lazy="false" cascade="all"/>
 
         <bag name="buildSpecifications" cascade="all,delete-orphan" lazy="false">
             <cache usage="read-write"/>
@@ -66,30 +65,30 @@
         <discriminator column="TYPE" type="string" length="63"/>
 
         <subclass name="com.zutubi.pulse.model.CustomChangeViewer" discriminator-value="CUSTOM" lazy="false">
-            <property name="changesetURL" type="string"/>
-            <property name="fileViewURL" type="string"/>
-            <property name="fileDownloadURL" type="string"/>
-            <property name="fileDiffURL" type="string"/>
+            <property name="changesetURL" type="string" length="511"/>
+            <property name="fileViewURL" type="string" length="511"/>
+            <property name="fileDownloadURL" type="string" length="511"/>
+            <property name="fileDiffURL" type="string" length="511"/>
         </subclass>
 
         <subclass name="com.zutubi.pulse.model.FisheyeChangeViewer" discriminator-value="FISHEYE" lazy="false">
-            <property name="baseURL" type="string"/>
-            <property name="projectPath" type="string"/>
+            <property name="baseURL" type="string" length="511"/>
+            <property name="projectPath" type="string" length="511"/>
         </subclass>
 
         <subclass name="com.zutubi.pulse.model.P4WebChangeViewer" discriminator-value="P4WEB" lazy="false">
-            <property name="baseURL" type="string"/>
-            <property name="projectPath" type="string"/>
+            <property name="baseURL" type="string" length="511"/>
+            <property name="projectPath" type="string" length="511"/>
         </subclass>
 
         <subclass name="com.zutubi.pulse.model.TracChangeViewer" discriminator-value="TRAC" lazy="false">
-            <property name="baseURL" type="string"/>
-            <property name="projectPath" type="string"/>
+            <property name="baseURL" type="string" length="511"/>
+            <property name="projectPath" type="string" length="511"/>
         </subclass>
 
         <subclass name="com.zutubi.pulse.model.ViewVCChangeViewer" discriminator-value="VIEWVC" lazy="false">
-            <property name="baseURL" type="string"/>
-            <property name="projectPath" type="string"/>
+            <property name="baseURL" type="string" length="511"/>
+            <property name="projectPath" type="string" length="511"/>
         </subclass>
     </class>
 
@@ -100,7 +99,7 @@
             <generator class="hilo"/>
         </id>
 
-        <property name="recipient" type="string"/>
+        <property name="recipient" type="string" length="511"/>
 
         <property name="mask" type="int"/>
 
@@ -117,7 +116,7 @@
         <discriminator column="SOURCE_TYPE" type="string" length="63"/>
 
         <subclass name="com.zutubi.pulse.model.CustomPulseFileDetails" discriminator-value="CUSTOM" lazy="false">
-            <property name="pulseFile" column="PULSE_FILE" type="string"/>
+            <property name="pulseFile" column="PULSE_FILE" type="text"/>
         </subclass>
 
         <subclass name="com.zutubi.pulse.model.VersionedPulseFileDetails" discriminator-value="VERSIONED" lazy="false">
@@ -145,8 +144,8 @@
                 <map name="environment" lazy="false" table="ANT_SOURCE_ENVIRONMENT" cascade="all">
                     <cache usage="read-write"/>
                     <key column="SOURCE_ID"/>
-                    <index column="NAME" type="string"/>
-                    <element type="string" column="VALUE"/>
+                    <index column="NAME" type="string" length="255"/>
+                    <element type="text" column="VALUE"/>
                 </map>
             </subclass>
 
@@ -158,40 +157,40 @@
                 <map name="environment" lazy="false" table="EXE_SOURCE_ENVIRONMENT" cascade="all">
                     <cache usage="read-write"/>
                     <key column="SOURCE_ID"/>
-                    <index column="NAME" type="string"/>
-                    <element type="string" column="VALUE"/>
+                    <index column="NAME" type="string" length="255"/>
+                    <element type="text" column="VALUE"/>
                 </map>
             </subclass>
 
             <subclass name="com.zutubi.pulse.model.MakePulseFileDetails" discriminator-value="MAKE" lazy="false">
                 <property name="makefile" column="MAKEFILE" type="string" length="255"/>
-                <property name="targets" column="TARGETS" type="string" length="255"/>
+                <property name="targets" column="TARGETS" type="string" length="1023"/>
                 <property name="arguments" column="ARGUMENTS" type="string" length="1023"/>
-                <property name="workingDir" column="WORKING_DIR" type="string" length="255"/>
+                <property name="workingDir" column="WORKING_DIR" type="string" length="1023"/>
                 <map name="environment" lazy="false" table="MAKE_SOURCE_ENVIRONMENT" cascade="all">
                     <cache usage="read-write"/>
                     <key column="SOURCE_ID"/>
-                    <index column="NAME" type="string"/>
-                    <element type="string" column="VALUE"/>
+                    <index column="NAME" type="string" length="255"/>
+                    <element type="text" column="VALUE"/>
                 </map>
             </subclass>
 
             <subclass name="com.zutubi.pulse.model.MavenPulseFileDetails" discriminator-value="MAVEN" lazy="false">
-                <property name="workingDir" column="BASE_DIR" type="string" length="255"/>
-                <property name="targets" column="TARGETS" type="string" length="255"/>
+                <property name="workingDir" column="BASE_DIR" type="string" length="1023"/>
+                <property name="targets" column="TARGETS" type="string" length="1023"/>
                 <property name="arguments" column="ARGUMENTS" type="string" length="1023"/>
             </subclass>
 
             <subclass name="com.zutubi.pulse.model.Maven2PulseFileDetails" discriminator-value="MAVEN2" lazy="false">
-                <property name="workingDir" column="BASE_DIR" type="string" length="255"/>
+                <property name="workingDir" column="BASE_DIR" type="string" length="1023"/>
                 <!-- Use a targets column so that it overlaps with other subtypes -->
-                <property name="goals" column="TARGETS" type="string" length="255"/>
+                <property name="goals" column="TARGETS" type="string" length="1023"/>
                 <property name="arguments" column="ARGUMENTS" type="string" length="1023"/>
             </subclass>
 
             <subclass name="com.zutubi.pulse.model.XCodePulseFileDetails" discriminator-value="XCODE" lazy="false">
-                <property name="workingDir" column="BASE_DIR" type="string" length="255"/>
-                <property name="target" column="TARGETS" type="string" length="255"/>
+                <property name="workingDir" column="BASE_DIR" type="string" length="1023"/>
+                <property name="target" column="TARGETS" type="string" length="1023"/>
                 <property name="project" column="PROJECT" type="string" length="1023"/>
                 <property name="config" column="CONFIG" type="string" length="1023"/>
                 <property name="action" column="BUILDACTION" type="string" length="1023"/>
@@ -210,24 +209,24 @@
 
         <discriminator column="TYPE" type="string" length="31"/>
 
-        <property name="name" type="string"/>
+        <property name="name" type="string" length="255"/>
 
         <bag name="processors" table="CAPTURE_PROCESSORS" lazy="false">
             <cache usage="read-write"/>
             <key column="CAPTURE_ID"/>
-            <element type="string" column="PROCESSOR" not-null="true"/>
+            <element type="string" column="PROCESSOR" not-null="true" length="255"/>
         </bag>
 
         <subclass name="com.zutubi.pulse.model.DirectoryCapture" discriminator-value="DIRECTORY" lazy="false">
-            <property name="base" type="string"/>
-            <property name="includes" type="string"/>
-            <property name="excludes" type="string"/>
-            <property name="mimeType" type="string"/>
+            <property name="base" type="string" length="4095"/>
+            <property name="includes" type="string" length="4095"/>
+            <property name="excludes" type="string" length="4095"/>
+            <property name="mimeType" type="string" length="4095"/>
         </subclass>
 
         <subclass name="com.zutubi.pulse.model.FileCapture" discriminator-value="FILE" lazy="false">
-            <property name="file" type="string"/>
-            <property name="mimeType" type="string"/>
+            <property name="file" type="string" length="4095"/>
+            <property name="mimeType" type="string" length="255"/>
         </subclass>
     </class>
 
@@ -238,9 +237,9 @@
             <generator class="hilo"/>
         </id>
 
-        <discriminator column="TYPE" type="string" length="31"/>
+        <discriminator column="TYPE" type="string" length="255"/>
 
-        <property name="name" type="string"/>
+        <property name="name" type="string" length="255"/>
 
         <bag name="specifications" table="POST_BUILD_ACTION_SPECIFICATIONS" lazy="false">
             <cache usage="read-write"/>
@@ -248,17 +247,17 @@
             <many-to-many class="com.zutubi.pulse.model.BuildSpecification" column="SPECIFICATION_ID"/>
         </bag>
 
-        <property name="statesString" type="string"/>
+        <property name="statesString" type="string" length="255"/>
 
         <property name="failOnError" type="boolean"/>
 
         <subclass name="com.zutubi.pulse.model.RunExecutablePostBuildAction" discriminator-value="EXECUTABLE" lazy="false">
-            <property name="command" type="string"/>
-            <property name="arguments" type="string" length="1023"/>
+            <property name="command" type="string" length="255"/>
+            <property name="arguments" type="text"/>
         </subclass>
 
         <subclass name="com.zutubi.pulse.model.TagPostBuildAction" discriminator-value="TAG" lazy="false">
-            <property name="tag" type="string"/>
+            <property name="tag" type="string" length="255"/>
             <property name="moveExisting" type="boolean"/>
         </subclass>
     </class>
@@ -272,11 +271,11 @@
 
         <property name="workDirOnly" type="boolean"/>
 
-        <property name="stateNames" type="string"/>
+        <property name="stateNames" type="string" length="255"/>
 
         <property name="limit" column="RULE_LIMIT" type="int"/>
 
-        <property name="unitName" type="string"/>
+        <property name="unitName" type="string" length="255"/>
     </class>
 
     <query name="findAllProjectsCached" cacheable="true"><![CDATA[

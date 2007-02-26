@@ -31,6 +31,8 @@ public class CvsWorkingCopy extends PersonalBuildSupport implements WorkingCopy
 
     private File workingDir;
     private ConfigSupport configSupport;
+    private String localWorkingRoot;
+    private String localWorkingModule;
 
     public CvsWorkingCopy(File path, Config config) throws PersonalBuildException
     {
@@ -41,7 +43,8 @@ public class CvsWorkingCopy extends PersonalBuildSupport implements WorkingCopy
         CVSRoot cvsRoot;
         try
         {
-            String localWorkingRoot = loadLocalWorkingRoot();
+            localWorkingRoot = loadLocalWorkingRoot();
+            localWorkingModule = loadLocalWorkingModule();
             if (localWorkingRoot == null)
             {
                 throw new IOException("Failed to retrieve the cvs.root from " + workingDir.getAbsolutePath() + "CVS/Root");
@@ -80,29 +83,20 @@ public class CvsWorkingCopy extends PersonalBuildSupport implements WorkingCopy
 
     public boolean matchesRepository(Properties repositoryDetails) throws SCMException
     {
-        try
+        CVSRoot localCvsRoot = CVSRoot.parse(localWorkingRoot);
+
+        String projectRoot = repositoryDetails.getProperty(CvsConstants.ROOT);
+        CVSRoot projectCvsRoot = CVSRoot.parse(projectRoot);
+
+        if (localCvsRoot.getCompatibilityLevel(projectCvsRoot) == -1)
         {
-            String localRoot = loadLocalWorkingRoot();
-            CVSRoot localCvsRoot = CVSRoot.parse(localRoot);
-
-            String projectRoot = repositoryDetails.getProperty(CvsConstants.ROOT);
-            CVSRoot projectCvsRoot = CVSRoot.parse(projectRoot);
-
-            if (localCvsRoot.getCompatibilityLevel(projectCvsRoot) == -1)
-            {
-                return false;
-            }
-
-            // now check that the modules match.
-            String localModule = loadLocalWorkingModule();
-            String projectModule = repositoryDetails.getProperty(CvsConstants.MODULE);
-
-            return localModule.equals(projectModule);
+            return false;
         }
-        catch (IOException e)
-        {
-            throw new SCMException(e);
-        }
+
+        // now check that the modules match.
+        String projectModule = repositoryDetails.getProperty(CvsConstants.MODULE);
+
+        return localWorkingModule.equals(projectModule);
     }
 
     private String loadLocalWorkingModule() throws IOException
@@ -268,6 +262,8 @@ public class CvsWorkingCopy extends PersonalBuildSupport implements WorkingCopy
             if (fileState != null)
             {
                 FileStatus fs = new FileStatus(path, fileState, localFile.isDirectory());
+                fs.setTargetPath(localWorkingModule + "/" + path);
+                
                 fs.setOutOfDate(recordOutOfDate && outOfDate);
                 if (fs.isInteresting())
                 {

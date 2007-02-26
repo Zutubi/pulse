@@ -24,13 +24,13 @@
 
         <property name="dataMap" column="DATA" type="serializable" length="16383"/>
 
-        <property name="triggerState" column="STATE" type="string" not-null="true"/>
+        <property name="triggerState" column="STATE" type="string" not-null="true" length="127"/>
 
         <subclass name="com.zutubi.pulse.scheduling.NoopTrigger" discriminator-value="NOOP" dynamic-update="false">
         </subclass>
 
         <subclass name="com.zutubi.pulse.scheduling.CronTrigger" discriminator-value="CRON" dynamic-update="false">
-            <property name="cron" column="CRON" type="string" not-null="false"/>
+            <property name="cron" column="CRON" type="string" not-null="false" length="255"/>
         </subclass>
 
         <subclass name="com.zutubi.pulse.scheduling.EventTrigger" discriminator-value="EVENT" dynamic-update="false">

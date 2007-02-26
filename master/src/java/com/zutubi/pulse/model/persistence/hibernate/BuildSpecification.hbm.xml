@@ -17,14 +17,13 @@
 
         <property name="timeout" column="TIMEOUT" type="int"/>
 
-        <property name="checkoutSchemeName" column="CHECKOUT_SCHEME" type="string" length="50"/>
+        <property name="checkoutSchemeName" column="CHECKOUT_SCHEME" type="string" length="255"/>
 
         <property name="forceClean" column="FORCE_CLEAN" type="boolean"/>
 
         <property name="prompt" column="PROMPT" type="boolean"/>
 
-        <many-to-one name="root" class="com.zutubi.pulse.model.BuildSpecificationNode"
-                     column="ROOT_ID" cascade="all" lazy="false"/>
+        <many-to-one name="root" class="com.zutubi.pulse.model.BuildSpecificationNode" column="ROOT_ID" cascade="all" lazy="false"/>
 
         <bag name="properties" cascade="all,delete-orphan" lazy="false">
             <cache usage="read-write"/>
@@ -54,8 +53,8 @@
             <cache usage="read-write"/>
             <key column="NODE_ID"/>
             <composite-element class="com.zutubi.pulse.model.ResourceRequirement">
-                <property name="resource" type="string" not-null="true"/>
-                <property name="version" type="string"/>
+                <property name="resource" type="string" not-null="true" length="255"/>
+                <property name="version" type="string" length="255"/>
             </composite-element>
         </bag>
 
@@ -80,7 +79,7 @@
             <generator class="hilo"/>
         </id>
 
-        <property name="name" type="string" column="NAME"/>
+        <property name="name" type="string" column="NAME" length="255"/>
     </class>
 
     <class name="com.zutubi.pulse.model.AbstractBuildHostRequirements" table="BUILD_HOST_REQUIREMENTS" lazy="false">

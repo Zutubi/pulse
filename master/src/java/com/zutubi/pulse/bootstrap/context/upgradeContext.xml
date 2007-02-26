@@ -82,6 +82,7 @@
                 <ref local="schemaUpgrade0102015003"/>
                 <ref local="schemaUpgrade0102015004"/>
                 <ref local="danglingBuildHostRequirements"/>
+                <ref local="schemaUpgrade0102017001"/> <!-- update bob_file_details.pulse_file column size. -->
             </list>
         </property>
         <property name="systemTasks">

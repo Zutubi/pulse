@@ -18,7 +18,7 @@
 
         <property name="enabled" column="ENABLED" type="boolean"/>
 
-        <property name="defaultAction" type="string" length="63"/>
+        <property name="defaultAction" type="string" length="255"/>
 
         <property name="refreshInterval" type="int"/>
 
@@ -26,7 +26,7 @@
             <cache usage="read-write"/>
             <key column="USER_ID"/>
             <index column="PROPERTY_KEY" type="string" length="255"/>
-            <element column="PROPERTY_VALUE" type="string" length="4000"/>
+            <element column="PROPERTY_VALUE" type="string" length="4095"/>
         </map>
 
         <idbag name="grantedAuthorities" table="USER_AUTHORITIES" cascade="all,delete-orphan" lazy="false">
@@ -35,7 +35,7 @@
                 <generator class="hilo"/>
             </collection-id>
             <key column="USER_ID"/>
-            <element type="string" column="AUTHORITY" not-null="true"/>
+            <element type="string" column="AUTHORITY" not-null="true" length="255"/>
         </idbag>
 
         <set name="groups" table="GROUP_USERS" lazy="false" inverse="true" cascade="none">
@@ -53,7 +53,7 @@
         <bag name="aliases" lazy="false" table="USER_ALIASES">
             <cache usage="read-write"/>
             <key column="USER_ID"/>
-            <element type="string" column="ALIAS" not-null="true"/>
+            <element type="string" column="ALIAS" not-null="true" length="255"/>
         </bag>
 
         <set name="shownProjects" table="USER_SHOWN_PROJECTS" lazy="true" cascade="save-update">
@@ -79,13 +79,12 @@
             <generator class="hilo"/>
         </id>
 
-        <discriminator column="TYPE" type="string"/>
+        <discriminator column="TYPE" type="string" length="255"/>
 
         <property name="name" column="NAME" type="string" not-null="false" length="255"/>
         <property name="uid" column="UID" type="string" not-null="false" length="255"/>
 
-        <property name="properties" column="PROPERTIES" type="com.zutubi.pulse.util.PropertiesType" not-null="false"
-                  length="4095"/>
+        <property name="properties" column="PROPERTIES" type="com.zutubi.pulse.util.PropertiesType" not-null="false" length="4095"/>
 
         <many-to-one name="user" column="USER_ID" class="com.zutubi.pulse.model.User" insert="true" lazy="false"/>
 
@@ -95,7 +94,7 @@
             <one-to-many class="com.zutubi.pulse.model.Subscription"/>
         </bag>
 
-        <property name="lastError" column="LAST_ERROR" type="string" not-null="false" length="1023"/>
+        <property name="lastError" column="LAST_ERROR" type="string" not-null="false" length="4095"/>
         
         <subclass name="com.zutubi.pulse.model.EmailContactPoint" discriminator-value="EMAIL">
 
@@ -114,7 +113,7 @@
             <generator class="hilo"/>
         </id>
 
-        <discriminator column="TYPE" type="string"/>
+        <discriminator column="TYPE" type="string" length="255"/>
 
         <many-to-one name="contactPoint" column="CONTACT_ID" class="com.zutubi.pulse.model.ContactPoint" insert="true" lazy="false"/>
 

@@ -8,11 +8,10 @@
             <generator class="hilo"/>
         </id>
 
-        <property name="serverUid" column="SERVER_UID" type="string"/>
+        <property name="serverUid" column="SERVER_UID" type="string" length="255"/>
 
         <!-- the local side of a one-one...  -->
-        <many-to-one name="revision" class="com.zutubi.pulse.core.model.Revision" column="REVISION_ID" cascade="all"
-                     unique="true"/>
+        <many-to-one name="revision" class="com.zutubi.pulse.core.model.Revision" column="REVISION_ID" cascade="all" unique="true"/>
 
         <list name="changes" cascade="all,delete-orphan" lazy="true">
             <key column="CHANGELIST_ID"/>
@@ -36,7 +35,7 @@
             <generator class="hilo"/>
         </id>
 
-        <property name="actionName" column="ACTION" type="string" length="63"/>
+        <property name="actionName" column="ACTION" type="string" length="255"/>
 
         <property name="filename" column="FILENAME" type="string" length="4095"/>
 

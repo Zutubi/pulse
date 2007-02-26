@@ -15,7 +15,7 @@
 
         <map name="properties" lazy="false" table="RESOURCE_VERSION_PROPERTIES">
             <key column="RESOURCE_VERSION_ID"/>
-            <index type="string" column="PROPERTY_NAME"/>
+            <index type="string" column="PROPERTY_NAME" length="255"/>
             <composite-element class="com.zutubi.pulse.core.model.ResourceProperty">
                 <property name="name" column="NAME" type="string" length="1023" not-null="true"/>
                 <property name="value" column="VALUE" type="string" length="1023"/>
@@ -30,7 +30,7 @@
         <map name="versions" lazy="false" table="RESOURCE_VERSIONS" cascade="all,delete-orphan">
             <cache usage="read-write"/>
             <key column="RESOURCE_ID"/>
-            <index type="string" column="VERSION_VALUE"/>
+            <index type="string" column="VERSION_VALUE" length="255"/>
             <one-to-many class="com.zutubi.pulse.core.model.ResourceVersion"/>
         </map>
     </class>
