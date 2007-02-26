@@ -100,7 +100,7 @@ public class WizardDirective extends AbstractDirective
             Messages messages = Messages.getInstance(state.getData().getClass());
 
             Map<String, Object> context = new HashMap<String, Object>();
-            Form form = state.getForm(state.getData());
+            Form form = state.getForm();
             form.setAction(action);
             
             context.put("form", form);

@@ -98,7 +98,7 @@ public class ConfigurationPersistenceManager
 
     protected Type getTypeByRecord(String fullPath)
     {
-        // a) locate the longest path segment with a record and an associated type.
+        // Locate the longest path segment with a record and an associated type.
         String path = fullPath;
         Type type = null;
         while (path != null)
@@ -120,17 +120,17 @@ public class ConfigurationPersistenceManager
             return null;
         }
 
+        // then evaluate the remaining path via each types properties.
         String remainingPath = fullPath.substring(path.length());
         StringTokenizer tokens = new StringTokenizer(remainingPath, "/", false);
         while (tokens.hasMoreTokens())
         {
-            TypeProperty property = ((CompositeType)type).getProperty(tokens.nextToken());
+            TypeProperty property = type.getProperty(tokens.nextToken());
             if (property != null)
             {
                 type = property.getType();
             }
         }
-
         return type;
     }
 
@@ -163,6 +163,8 @@ public class ConfigurationPersistenceManager
      * @param path
      *
      * @return object defined by the path.
+     *
+     * @throws TypeException if there is an type related error loading the instance at the specified path.
      */
     public Object getInstance(String path) throws TypeException
     {
@@ -178,6 +180,11 @@ public class ConfigurationPersistenceManager
             return type.instantiate(record);
         }
         return null;
+    }
+
+    public Record getRecord(String path)
+    {
+        return recordManager.load(path);
     }
 
     /**

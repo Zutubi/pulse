@@ -20,9 +20,7 @@ public interface WizardState
     /**
      * Generate the form to be displayed for this wizard state.
      * 
-     * @param data
-     * 
      * @return
      */
-    Form getForm(Object data);
+    Form getForm();
 }

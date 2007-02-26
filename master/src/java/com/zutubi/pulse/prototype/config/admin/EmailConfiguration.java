@@ -1,9 +1,12 @@
 package com.zutubi.pulse.prototype.config.admin;
 
+import com.zutubi.prototype.annotation.ConfigurationCheck;
+
 /**
  *
  *
  */
+@ConfigurationCheck(EmailConfigurationCheckHandler.class)
 public class EmailConfiguration
 {
     private String host;

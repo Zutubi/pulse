@@ -93,7 +93,7 @@ public class FormDescriptor implements Descriptor
     {
         Form form = new Form();
         form.setId(id);    
-
+        form.addAll(getParameters());
         List<String> fieldOrder = evaluateFieldOrder();
 
         int tabindex = 1;

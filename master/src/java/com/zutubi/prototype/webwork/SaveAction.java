@@ -2,13 +2,8 @@ package com.zutubi.prototype.webwork;
 
 import com.opensymphony.util.TextUtils;
 import com.opensymphony.xwork.ActionContext;
-import com.opensymphony.xwork.ValidationAware;
 import com.zutubi.prototype.config.ConfigurationCrudSupport;
 import com.zutubi.pulse.web.ActionSupport;
-import com.zutubi.pulse.validation.MessagesTextProvider;
-import com.zutubi.validation.ValidationContext;
-import com.zutubi.validation.DelegatingValidationContext;
-import com.zutubi.validation.XWorkValidationAdapter;
 
 /**
  *
@@ -18,7 +13,6 @@ public class SaveAction extends ActionSupport
 {
     private String symbolicName;
     private String path;
-    private Configuration configuration;
 
     public String getSymbolicName()
     {

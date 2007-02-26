@@ -11,6 +11,7 @@ import com.zutubi.prototype.type.Type;
 import com.zutubi.prototype.type.TypeException;
 import com.zutubi.prototype.type.TypeRegistry;
 import com.zutubi.prototype.type.record.MutableRecord;
+import com.zutubi.prototype.type.record.Record;
 import com.zutubi.prototype.type.record.RecordManager;
 import com.zutubi.prototype.wizard.Wizard;
 import com.zutubi.prototype.wizard.WizardState;
@@ -41,13 +42,35 @@ public class ConfigureProjectWizard implements Wizard
 
     private WizardState currentState;
 
+    private long parentId;
+    
+    private Record inheritedRecord;
+
     public void initialise()
     {
-        CompositeType scmType = (CompositeType) typeRegistry.getType("scmConfig");
-        CompositeType typeType = (CompositeType) typeRegistry.getType("typeConfig");
+        try
+        {
+            Record existingProject = configurationPersistenceManager.getRecord("project/" + parentId);
+            if (existingProject != null)
+            {
+                inheritedRecord = existingProject.clone();
+            }
 
-        selectState = new WizardStepOne(scmType.getExtensions(), typeType.getExtensions());
-        currentState = selectState;
+            CompositeType scmType = (CompositeType) typeRegistry.getType("scmConfig");
+            CompositeType typeType = (CompositeType) typeRegistry.getType("typeConfig");
+
+            selectState = new WizardStepOne(scmType.getExtensions(), typeType.getExtensions(), inheritedRecord);
+            currentState = selectState;
+        }
+        catch (CloneNotSupportedException e)
+        {
+            // never going to happen.
+        }
+    }
+
+    public void setParentId(long parentId)
+    {
+        this.parentId = parentId;
     }
 
     public WizardState getCurrentState()
@@ -193,8 +216,11 @@ public class ConfigureProjectWizard implements Wizard
         private List<String> scmOptions;
         private List<String> typeOptions;
 
-        public WizardStepOne(List<String> scmOptions, List<String> typeOptions)
+        private Record record;
+
+        public WizardStepOne(List<String> scmOptions, List<String> typeOptions, Record record)
         {
+            this.record = record;
             this.scmOptions = scmOptions;
             this.typeOptions = typeOptions;
         }
@@ -229,23 +255,35 @@ public class ConfigureProjectWizard implements Wizard
             this.type = type;
         }
 
-        public Form getForm(Object data)
+        public Form getForm()
         {
             Form form = new Form();
             form.setId(getClass().getName());
             Field scmSelectField = new Field("scm", "scm", "select", scm);
             scmSelectField.addParameter("list", scmOptions);
             scmSelectField.setTabindex(1);
-            form.add(scmSelectField);
+            
+            if (record.containsKey("scm"))
+            { 
+                scmSelectField.setValue(((Record)record.get("scm")).getSymbolicName());
+                scmSelectField.addParameter("disabled", true);
+            }
 
             Field typeSelectField = new Field("type", "type", "select", type);
             typeSelectField.addParameter("list", typeOptions);
             typeSelectField.setTabindex(2);
-            form.add(typeSelectField);
+            
+            if (record.containsKey("type"))
+            {
+                typeSelectField.setValue(((Record)record.get("type")).getSymbolicName());
+                typeSelectField.addParameter("disabled", true);
+            }
 
             Field hiddenStateField = new Field("state", "state", "hidden", getName());
             form.add(hiddenStateField);
 
+            form.add(scmSelectField);
+            form.add(typeSelectField);
             form.add(new SubmitField("next").setTabindex(3));
             form.add(new SubmitField("cancel").setTabindex(4));
 
@@ -283,14 +321,14 @@ public class ConfigureProjectWizard implements Wizard
             return configInstance;
         }
 
-        public Form getForm(Object data)
+        public Form getForm()
         {
             FormDescriptorFactory formFactory = new FormDescriptorFactory();
             formFactory.setTypeRegistry(typeRegistry);
             FormDescriptor formDescriptor = formFactory.createDescriptor(configType);
 
             // where do we get the data from?
-            Form form = formDescriptor.instantiate(data);
+            Form form = formDescriptor.instantiate(null);
 
             Field state = new Field();
             state.addParameter("name", "state");

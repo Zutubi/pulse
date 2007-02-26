@@ -208,7 +208,7 @@ public class ExtendedTypeWizard implements Wizard
             return getClass().getName();
         }
 
-        public Form getForm(Object data)
+        public Form getForm()
         {
             Form form = new Form();
             form.setId(getClass().getName());
@@ -258,7 +258,7 @@ public class ExtendedTypeWizard implements Wizard
             return dataObject;
         }
 
-        public Form getForm(Object data)
+        public Form getForm()
         {
             Type stateType = typeRegistry.getType(dataObject.getClass());
 
@@ -277,7 +277,7 @@ public class ExtendedTypeWizard implements Wizard
             formDescriptor.setActions(actions);
 
             // where do we get the data from?
-            Form form = formDescriptor.instantiate(data);
+            Form form = formDescriptor.instantiate(null);
 
             Field state = new Field();
             state.addParameter("name", "state");

@@ -2,11 +2,11 @@ package com.zutubi.prototype.velocity;
 
 import com.zutubi.prototype.FieldDescriptor;
 import com.zutubi.prototype.FormDescriptor;
-import com.zutubi.prototype.freemarker.GetTextMethod;
 import com.zutubi.prototype.model.Form;
+import com.zutubi.prototype.annotation.ConfigurationCheck;
+import com.zutubi.prototype.freemarker.GetTextMethod;
 import com.zutubi.prototype.type.Type;
 import com.zutubi.prototype.type.TypeException;
-import com.zutubi.prototype.type.record.Record;
 import com.zutubi.pulse.i18n.Messages;
 import com.zutubi.pulse.util.logging.Logger;
 import freemarker.core.DelegateBuiltin;
@@ -16,10 +16,17 @@ import org.apache.velocity.exception.ParseErrorException;
 
 import java.io.IOException;
 import java.io.StringWriter;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.List;
+import java.util.LinkedList;
 
-public class FormDirective extends PrototypeDirective
+/**
+ *
+ *
+ */
+public class CheckDirective extends PrototypeDirective
 {
     private static final Logger LOG = Logger.getLogger(FormDirective.class);
 
@@ -32,7 +39,7 @@ public class FormDirective extends PrototypeDirective
      */
     public String getName()
     {
-        return "pform";
+        return "checkform";
     }
 
     public int getType()
@@ -42,7 +49,7 @@ public class FormDirective extends PrototypeDirective
 
     /**
      * The generated forms action attribute.
-     * 
+     *
      * @param action attribute
      */
     public void setAction(String action)
@@ -52,7 +59,7 @@ public class FormDirective extends PrototypeDirective
 
     public String doRender(Type type) throws IOException, ParseErrorException, TypeException
     {
-        Record data = configurationPersistenceManager.getRecord(path);
+        Object data = configurationPersistenceManager.getInstance(path);
 
         FormDescriptor formDescriptor = formDescriptorFactory.createDescriptor(type.getSymbolicName());
 
@@ -65,11 +72,36 @@ public class FormDirective extends PrototypeDirective
         hiddenFieldDescriptor.addParameter("type", "hidden");
         formDescriptor.add(hiddenFieldDescriptor);
 
+        for (FieldDescriptor fd : formDescriptor.getFieldDescriptors())
+        {
+            fd.setType("hidden");
+        }
+
+        List<String> originalFieldNames = new LinkedList<String>();
+        for (FieldDescriptor fd : formDescriptor.getFieldDescriptors())
+        {
+            originalFieldNames.add(fd.getName());
+            fd.setName(fd.getName() + "_check");
+        }
+        formDescriptor.addParameter("originalFields", originalFieldNames);
+
         Map<String, Object> context = new HashMap<String, Object>();
 
-        Form form = formDescriptor.instantiate(data);
-        form.setAction(action);
+        // lookup and construct the configuration test form.
+        ConfigurationCheck annotation = (ConfigurationCheck) type.getAnnotation(ConfigurationCheck.class);
+        Class checkClass = annotation.value();
+        Type checkType = typeRegistry.getType(checkClass);
 
+        FormDescriptor checkFormDescriptor = formDescriptorFactory.createDescriptor(checkType);
+        for (FieldDescriptor fd : checkFormDescriptor.getFieldDescriptors())
+        {
+            formDescriptor.add(fd);
+        }
+        formDescriptor.setActions(Arrays.asList("check"));
+
+
+        Form form = formDescriptor.instantiate(null);
+        form.setAction(action);
         context.put("form", form);
 
         try
@@ -77,14 +109,14 @@ public class FormDirective extends PrototypeDirective
             // handle rendering of the freemarker template.
             StringWriter writer = new StringWriter();
 
-            Messages messages = Messages.getInstance(type.getClazz());
+            Messages messages = Messages.getInstance(checkType.getClazz());
 
             context.put("i18nText", new GetTextMethod(messages));
 
             // provide some syntactic sweetener by linking the i18n text method to the ?i18n builtin function.
             DelegateBuiltin.conditionalRegistration("i18n", "i18nText");
 
-            Template template = configuration.getTemplate("prototype/xhtml/form.ftl");
+            Template template = configuration.getTemplate("prototype/xhtml/test-form.ftl");
             template.process(context, writer);
 
             return writer.toString();

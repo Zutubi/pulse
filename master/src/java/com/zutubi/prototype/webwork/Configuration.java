@@ -8,8 +8,11 @@ import com.zutubi.prototype.type.ListType;
 import com.zutubi.prototype.type.MapType;
 import com.zutubi.prototype.type.PrimitiveType;
 import com.zutubi.prototype.type.Type;
+import com.zutubi.prototype.type.TypeRegistry;
+import com.zutubi.prototype.type.TypeException;
 import com.zutubi.prototype.type.record.RecordManager;
 import com.zutubi.prototype.type.record.Record;
+import com.zutubi.prototype.annotation.ConfigurationCheck;
 import com.zutubi.pulse.bootstrap.ComponentContext;
 import com.zutubi.pulse.util.StringUtils;
 
@@ -25,6 +28,8 @@ public class Configuration
 {
     private RecordManager recordManager;
     private ConfigurationPersistenceManager configurationPersistenceManager;
+
+    private TypeRegistry typeRegistry;
 
     private Record record;
     private Type type;
@@ -43,6 +48,9 @@ public class Configuration
     private List<String> listProperties = new LinkedList<String>();
     private List<String> mapProperties = new LinkedList<String>();
     private List<String> extensions = new LinkedList<String>();
+
+    private boolean configurationCheckAvailable = false;
+    private Type checkType;
 
     public Configuration(String path)
     {
@@ -124,6 +132,39 @@ public class Configuration
         {
             extensions.addAll(((CompositeType)targetType).getExtensions());
         }
+
+        // where should this happen? maybe it is something that the typeRegistry should be able to handle...
+        // via additional processors..? post processors? .. maybe split the processing into propertyProcessors and
+        // annotation processors ... or something similar..
+        ConfigurationCheck annotation = (ConfigurationCheck) targetType.getAnnotation(ConfigurationCheck.class);
+        if (annotation != null)
+        {
+            try
+            {
+                Class checkClass = annotation.value();
+                // ensure that a type is available
+                checkType = typeRegistry.getType(checkClass);
+                if (checkType == null)
+                {
+                    this.checkType = typeRegistry.register(checkClass);
+                }
+            }
+            catch (TypeException e)
+            {
+                e.printStackTrace();
+            }
+        }
+        configurationCheckAvailable = checkType != null;
+    }
+
+    public boolean isConfigurationCheckAvailable()
+    {
+        return configurationCheckAvailable;
+    }
+
+    public Type getCheckType()
+    {
+        return checkType;
     }
 
     public String getTypeSymbolicName()
@@ -209,5 +250,10 @@ public class Configuration
     public void setConfigurationPersistenceManager(ConfigurationPersistenceManager configurationPersistenceManager)
     {
         this.configurationPersistenceManager = configurationPersistenceManager;
+    }
+
+    public void setTypeRegistry(TypeRegistry typeRegistry)
+    {
+        this.typeRegistry = typeRegistry;
     }
 }

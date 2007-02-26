@@ -43,6 +43,13 @@
     <p>
         #pform("path=$config.path" "action=save.action?path=$config.path")
     </p>
+
+    #if ($config.configurationCheckAvailable)
+    <p>
+        Test configuration
+        #checkform("path=$config.path" "action=check.action?path=$config.path")
+    </p>
+    #end
 </p>
 #end
 

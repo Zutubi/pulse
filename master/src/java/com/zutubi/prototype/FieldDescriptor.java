@@ -23,32 +23,33 @@ public class FieldDescriptor implements Descriptor
 
     public void setName(String name)
     {
-        parameters.put("name", name);
+        this.parameters.put("name", name);
     }
 
     public void addParameter(String key, Object value)
     {
-        parameters.put(key, value);
+        this.parameters.put(key, value);
     }
 
     public void addAll(Map<String, Object> parameters)
     {
-        parameters.putAll(parameters);
+        this.parameters.putAll(parameters);
     }
 
     public Object getParameter(String key)
     {
-        return parameters.get(key);
+        return this.parameters.get(key);
     }
 
     public Map<String, Object> getParameters()
     {
-        return parameters;
+        return this.parameters;
     }
 
     public void setParameters(Map<String, Object> parameters)
     {
-        this.parameters = parameters;
+        this.parameters.clear();
+        this.parameters.putAll(parameters);
     }
 
     public Field instantiate(Object instance)

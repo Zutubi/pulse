@@ -8,6 +8,14 @@
 </p>
 
 <p>
+    TODO: <a href="clone.action?path=project/1">clone project 1</a>
+</p>
+
+<p>
+    <a href="wizard.action?path=project&parentId=1">create child of project 1</a>
+</p>
+
+<p>
     <a href="configuration.action?path=global">global configuration</a>
 </p>
 

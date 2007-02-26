@@ -50,6 +50,8 @@ public class Project extends Entity implements AclObjectIdentity, AclObjectIdent
 
     private List<ProjectAclEntry> aclEntries;
 
+    private Project parent;
+
     public Project()
     {
     }
@@ -139,6 +141,21 @@ public class Project extends Entity implements AclObjectIdentity, AclObjectIdent
         }
 
         return copy;
+    }
+
+    /**
+     * A reference to this projects parent.  Project parents are used to define the project template hierarchy.
+     *
+     * @return parent project.
+     */
+    public Project getParent()
+    {
+        return parent;
+    }
+
+    public void setParent(Project parent)
+    {
+        this.parent = parent;
     }
 
     public String getName()

@@ -1551,6 +1551,10 @@
             <result name="success" type="redirect">configuration.action?path=${configuration.parentPath}</result>
         </action>
 
+        <action name="check" class="com.zutubi.prototype.webwork.CheckAction">
+            <result name="success" type="redirect">configuration.action?path=${configuration.parentPath}</result>
+        </action>
+
     </package>
 
     <package name="ajax" namespace="/ajax" extends="webwork-default-package">
