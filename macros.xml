@@ -6,9 +6,9 @@
         <attribute name="conf" default="default"/>
         <attribute name="dest" default="lib"/>
         <sequential>
-            <ivy:resolve file="@{ivyfile}" conf="@{conf}"/>
+            <ivy:resolve useOrigin="true" file="@{ivyfile}" conf="@{conf}"/>
             <ivy:deliver deliverpattern="${project.repository}/[module]/ivy-[revision].xml"/>
-            <ivy:retrieve pattern="@{dest}/[artifact]-[revision].[ext]" validate="true" conf="@{conf}"/>
+            <ivy:retrieve pattern="@{dest}/[artifact]-[revision].[ext]" useOrigin="true" validate="true" conf="@{conf}"/>
         </sequential>
     </macrodef>
 

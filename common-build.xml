@@ -248,7 +248,7 @@
         <attribute name="conf"/>
         <sequential>
             <!-- lookup dependencies, loading them into the cache -->
-            <ivy:resolve conf="@{conf}"/>
+            <ivy:resolve conf="@{conf}" useOrigin="true"/>
             <!-- copy the dependencies into the local directory -->
             <ivy:retrieve validate="true" conf="@{conf}"/>
             <!-- deliver resolved ivy file so that it can be used by dependent modules. -->
