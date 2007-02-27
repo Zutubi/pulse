@@ -195,7 +195,9 @@ public class ConfigurationPersistenceManager
      *
      * @param obj instance to persisted.
      *
-     * @see #getType(String) 
+     * @see #getType(String)
+     *
+     * @throws TypeException 
      */
     public void setInstance(String path, Object obj) throws TypeException
     {
@@ -207,7 +209,7 @@ public class ConfigurationPersistenceManager
 
         // if we are storing an object in the location of an existing collection, add the object to the collection.
         Record existingRecord = recordManager.load(path);
-        Type definedType = (Type) getType(path);
+        Type definedType = getType(path);
         if (definedType instanceof CollectionType)
         {
             if (definedType instanceof ListType)

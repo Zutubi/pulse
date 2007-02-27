@@ -4,7 +4,7 @@ package com.zutubi.pulse.prototype.config;
  *
  *
  */
-public class DirectoryArtifactConfiguration extends ArtifactConfiguration
+public class DirectoryArtifactConfiguration extends BaseArtifactConfiguration
 {
     /**
      * Base directory, or null to default to base for the build.

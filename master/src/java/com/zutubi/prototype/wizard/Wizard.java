@@ -63,4 +63,8 @@ public interface Wizard
      * @return return the new state.
      */
     WizardState doRestart();
+
+    int getStateCount();
+
+    int getCurrentStateIndex();
 }

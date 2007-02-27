@@ -3,8 +3,10 @@ package com.zutubi.prototype.wizard.webwork;
 import com.opensymphony.util.TextUtils;
 import com.opensymphony.xwork.ActionContext;
 import com.opensymphony.xwork.ValidationAware;
-import com.zutubi.prototype.config.ConfigurationCrudSupport;
-import com.zutubi.prototype.type.TypeException;
+import com.zutubi.prototype.type.PrimitiveType;
+import com.zutubi.prototype.type.Type;
+import com.zutubi.prototype.type.TypeRegistry;
+import com.zutubi.prototype.type.record.Record;
 import com.zutubi.prototype.wizard.Wizard;
 import com.zutubi.prototype.wizard.WizardState;
 import com.zutubi.pulse.bootstrap.ComponentContext;
@@ -33,6 +35,8 @@ public class ConfigurationWizardAction extends ActionSupport
     private String path;
 
     private boolean wizardRequiresLazyInitialisation = false;
+
+    private TypeRegistry typeRegistry;
 
     /**
      * Setter for the configuration path.
@@ -130,7 +134,6 @@ public class ConfigurationWizardAction extends ActionSupport
     }
 
     /**
-     *
      * @return
      */
     public boolean isInitialised()
@@ -191,8 +194,34 @@ public class ConfigurationWizardAction extends ActionSupport
     private boolean validateState()
     {
         // popupate the state, extract the type details.
+/*
         try
         {
+*/
+        Record record = getState().getRecord();
+        Type type = typeRegistry.getType(record.getSymbolicName());
+        // apply the parameters to the record.
+
+        Map parameters = ActionContext.getContext().getParameters();
+        for (String propertyName : type.getPropertyNames(PrimitiveType.class))
+        {
+            String[] values = (String[]) parameters.get(propertyName);
+            if (values != null)
+            {
+                if (values.length > 1)
+                {
+                    record.put(propertyName, values);
+                }
+                else if (values.length == 1)
+                {
+                    record.put(propertyName, values[0]);
+                }
+            }
+        }
+
+        // run basic validation.
+
+/*
             Object instance = getState().getData();
 
             // copy the parameters to the state instance... maybe this should be done separately so that it is
@@ -200,7 +229,9 @@ public class ConfigurationWizardAction extends ActionSupport
             ConfigurationCrudSupport crud = new ConfigurationCrudSupport();
             crud.apply(ActionContext.getContext().getParameters(), instance);
             crud.validate(instance, this);
-
+*/
+        return true;
+/*
             return !hasErrors();
         }
         catch (TypeException e)
@@ -209,6 +240,7 @@ public class ConfigurationWizardAction extends ActionSupport
             LOG.error(e);
             return false;
         }
+*/
     }
 
     private boolean validateWizard()
@@ -252,12 +284,12 @@ public class ConfigurationWizardAction extends ActionSupport
         try
         {
             initWizardIfRequired();
-            
+
             if (isCancelSelected())
             {
                 return doCancel();
             }
-            else  if (isNextSelected())
+            else if (isNextSelected())
             {
                 return doNext();
             }
@@ -319,7 +351,7 @@ public class ConfigurationWizardAction extends ActionSupport
         catch (Exception e)
         {
             removeWizard();
-            throw (RuntimeException)e;
+            throw (RuntimeException) e;
         }
     }
 
@@ -348,7 +380,7 @@ public class ConfigurationWizardAction extends ActionSupport
         {
             // normalise the path by stripping leading and trailing '/' chars
             String sessionKey = normalizePath(this.path);
-            
+
             Map<String, Object> session = ActionContext.getContext().getSession();
             if (!session.containsKey(sessionKey))
             {
@@ -373,11 +405,11 @@ public class ConfigurationWizardAction extends ActionSupport
         }
         else
         {
-            wizardInstance = new ExtendedTypeWizard(path);
+            wizardInstance = new SingleTypeWizard(path);
         }
 
         ComponentContext.autowire(wizardInstance);
-        wizardRequiresLazyInitialisation = true;        
+        wizardRequiresLazyInitialisation = true;
         return wizardInstance;
     }
 
@@ -389,7 +421,7 @@ public class ConfigurationWizardAction extends ActionSupport
         }
         if (path.endsWith("/"))
         {
-            path = path.substring(0, path.length() -1);
+            path = path.substring(0, path.length() - 1);
         }
         return path;
     }
@@ -397,5 +429,10 @@ public class ConfigurationWizardAction extends ActionSupport
     public void setValidationManager(ValidationManager validationManager)
     {
         this.validationManager = validationManager;
+    }
+
+    public void setTypeRegistry(TypeRegistry typeRegistry)
+    {
+        this.typeRegistry = typeRegistry;
     }
 }

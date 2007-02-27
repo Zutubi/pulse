@@ -11,7 +11,7 @@ public class LoggingConfiguration
     private String level;
     private boolean eventLoggingEnabled;
 
-    @Select(LoggingLevelProvider.class)
+    @Select(optionProvider = LoggingLevelProvider.class)
     public String getLevel()
     {
         return level;

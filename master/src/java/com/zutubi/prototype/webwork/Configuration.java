@@ -15,6 +15,7 @@ import com.zutubi.prototype.type.record.Record;
 import com.zutubi.prototype.annotation.ConfigurationCheck;
 import com.zutubi.pulse.bootstrap.ComponentContext;
 import com.zutubi.pulse.util.StringUtils;
+import com.zutubi.pulse.prototype.config.ConfigurationExtension;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -111,10 +112,14 @@ public class Configuration
         }
 
         targetSymbolicName = targetType.getSymbolicName();
-        
-        for (String propertyName : targetType.getPropertyNames(PrimitiveType.class))
+
+        if (!ConfigurationExtension.class.isAssignableFrom(targetType.getClazz()))
         {
-            simpleProperties.add(propertyName);
+            // only show a simple properties form if it is not associated with an extension type.
+            for (String propertyName : targetType.getPropertyNames(PrimitiveType.class))
+            {
+                simpleProperties.add(propertyName);
+            }
         }
         for (String propertyName : targetType.getPropertyNames(CompositeType.class))
         {

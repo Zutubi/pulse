@@ -1,6 +1,5 @@
 package com.zutubi.prototype.annotation;
 
-import com.zutubi.prototype.OptionProvider;
 import com.zutubi.pulse.form.FieldType;
 
 import java.lang.annotation.ElementType;
@@ -16,12 +15,12 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 
 @Field(type = FieldType.SELECT)
-@Handler(SelectAnnotationHandler.class)
-public @interface Select
+@Handler(TypeSelectAnnotationHandler.class)
+public @interface TypeSelect
 {
-    Class<? extends OptionProvider> optionProvider();
+    Class configurationType();
 
-    public static final int DEFAULT_size = 1;
+    public static final int DEFAULT_size = 0;
 
     public int size() default DEFAULT_size;
 }

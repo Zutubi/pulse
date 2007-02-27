@@ -2,7 +2,10 @@ package com.zutubi.prototype.annotation;
 
 import com.zutubi.prototype.Descriptor;
 import com.zutubi.prototype.OptionProvider;
+import com.zutubi.prototype.type.TypeRegistry;
+import com.zutubi.prototype.type.Type;
 import com.zutubi.pulse.core.ObjectFactory;
+import com.zutubi.pulse.i18n.Messages;
 
 import java.lang.annotation.Annotation;
 
@@ -10,17 +13,22 @@ import java.lang.annotation.Annotation;
  *
  *
  */
-public class SelectAnnotationHandler implements AnnotationHandler
+public class SelectAnnotationHandler extends FieldAnnotationHandler
 {
     private ObjectFactory objectFactory;
 
     public void process(Annotation annotation, Descriptor descriptor)
     {
+        super.process(annotation, descriptor);
+        
         try
         {
-            Class optionProviderClass = ((Select)annotation).value();
+            Class optionProviderClass = ((Select)annotation).optionProvider();
             OptionProvider optionProvider = objectFactory.buildBean(optionProviderClass);
-            descriptor.addParameter("list", optionProvider.getOptions());
+
+            java.util.List<String> optionList = optionProvider.getOptions();
+            descriptor.addParameter("list", optionList);
+
         }
         catch (Exception e)
         {

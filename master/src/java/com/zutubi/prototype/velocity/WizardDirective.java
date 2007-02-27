@@ -1,18 +1,25 @@
 package com.zutubi.prototype.velocity;
 
-import com.opensymphony.xwork.ActionContext;
 import com.opensymphony.util.TextUtils;
-import com.zutubi.prototype.wizard.Wizard;
-import com.zutubi.prototype.wizard.WizardState;
-import com.zutubi.prototype.model.Form;
+import com.opensymphony.xwork.ActionContext;
+import com.zutubi.prototype.FieldDescriptor;
+import com.zutubi.prototype.FormDescriptor;
+import com.zutubi.prototype.FormDescriptorFactory;
 import com.zutubi.prototype.freemarker.GetTextMethod;
-import com.zutubi.pulse.i18n.Messages;
-import com.zutubi.pulse.velocity.AbstractDirective;
+import com.zutubi.prototype.model.Form;
+import com.zutubi.prototype.type.Type;
+import com.zutubi.prototype.wizard.WizardState;
+import com.zutubi.prototype.wizard.WizardTransition;
+import com.zutubi.prototype.wizard.Wizard;
 import com.zutubi.pulse.bootstrap.ComponentContext;
+import com.zutubi.pulse.i18n.Messages;
+import com.zutubi.pulse.util.CollectionUtils;
+import com.zutubi.pulse.util.Mapping;
+import com.zutubi.pulse.velocity.AbstractDirective;
 import freemarker.core.DelegateBuiltin;
+import freemarker.template.Configuration;
 import freemarker.template.Template;
 import freemarker.template.TemplateException;
-import freemarker.template.Configuration;
 import org.apache.velocity.context.InternalContextAdapter;
 import org.apache.velocity.exception.MethodInvocationException;
 import org.apache.velocity.exception.ParseErrorException;
@@ -23,6 +30,7 @@ import java.io.IOException;
 import java.io.StringWriter;
 import java.io.Writer;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -33,8 +41,11 @@ public class WizardDirective extends AbstractDirective
 {
     private String action;
     private String path;
-    
+
+    private FormDescriptorFactory formDescriptorFactory;
+
     private Configuration configuration;
+    private Wizard wizardInstance;
 
     public WizardDirective()
     {
@@ -57,7 +68,7 @@ public class WizardDirective extends AbstractDirective
         wireParams(params);
 
         String sessionKey = normalizePath(path);
-        Wizard wizardInstance = (Wizard) ActionContext.getContext().getSession().get(sessionKey);
+        wizardInstance = (Wizard) ActionContext.getContext().getSession().get(sessionKey);
         if (wizardInstance == null)
         {
             return false;
@@ -97,20 +108,37 @@ public class WizardDirective extends AbstractDirective
 
         try
         {
-            Messages messages = Messages.getInstance(state.getData().getClass());
+            Messages messages = Messages.getInstance(state.getType().getClazz());
+
+            Type type = state.getType();
+            
+            // generate the form.
+            FormDescriptor formDescriptor = formDescriptorFactory.createDescriptor(type.getSymbolicName());
+
+            // need to decorate the form a little bit to handle the fact that it is being rendered as a wizard.
+            decorate(formDescriptor);
 
             Map<String, Object> context = new HashMap<String, Object>();
-            Form form = state.getForm();
+
+            Form form = formDescriptor.instantiate(state.getRecord());
             form.setAction(action);
             
             context.put("form", form);
             context.put("i18nText", new GetTextMethod(messages));
             context.put("path", path);
 
+            
+            com.zutubi.prototype.model.Wizard wizard = new com.zutubi.prototype.model.Wizard();
+            wizard.setStepCount(wizardInstance.getStateCount());
+            wizard.setCurrentStep(wizardInstance.getCurrentStateIndex() + 1);
+            context.put("wizard", wizard);
+
             // provide some syntactic sweetener by linking the i18n text method to the ?i18n builtin function.
             DelegateBuiltin.conditionalRegistration("i18n", "i18nText");
 
-            Template template = configuration.getTemplate("prototype/xhtml/form.ftl");
+            // provide wizard specific rendering, that includes details about all of the steps, the current step
+            // index, and much much more.
+            Template template = configuration.getTemplate("prototype/xhtml/wizard.ftl");
             template.process(context, writer);
 
             return writer.toString();
@@ -119,6 +147,25 @@ public class WizardDirective extends AbstractDirective
         {
             throw new ParseErrorException(e.getMessage());
         }
+    }
+
+    private void decorate(FormDescriptor formDescriptor)
+    {
+        List<String> actions = CollectionUtils.map(wizardInstance.getAvailableActions(), new Mapping<WizardTransition, String>()
+        {
+            public String map(WizardTransition o)
+            {
+                return o.name().toLowerCase();
+            }
+        });
+        formDescriptor.setActions(actions);
+
+        FieldDescriptor hiddenStateField = new FieldDescriptor();
+        hiddenStateField.setType("hidden");
+        hiddenStateField.setName("state");
+        hiddenStateField.addParameter("value", wizardInstance.getCurrentState().getClass().toString());
+
+        formDescriptor.add(hiddenStateField);
     }
 
     public void setFreemarkerConfiguration(Configuration configuration)
@@ -134,5 +181,10 @@ public class WizardDirective extends AbstractDirective
     public void setPath(String path)
     {
         this.path = path;
+    }
+
+    public void setFormDescriptorFactory(FormDescriptorFactory formDescriptorFactory)
+    {
+        this.formDescriptorFactory = formDescriptorFactory;
     }
 }
