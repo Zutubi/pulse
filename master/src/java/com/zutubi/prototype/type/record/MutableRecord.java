@@ -92,6 +92,7 @@ public class MutableRecord implements Record
 
     public void clear()
     {
+        meta.clear();
         data.clear();
     }
 

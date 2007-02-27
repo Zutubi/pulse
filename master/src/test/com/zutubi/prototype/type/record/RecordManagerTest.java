@@ -26,18 +26,18 @@ public class RecordManagerTest extends TestCase
 
     public void testStore()
     {
-        recordManager.store("hello", new MutableRecord());
+        recordManager.insert("hello", new MutableRecord());
 
-        Record record = new MutableRecord();
+        MutableRecord record = new MutableRecord();
         record.put("key", "value");
-        recordManager.store("hello/world", record);
+        recordManager.insert("hello/world", record);
 
         Record hello = recordManager.load("hello");
         assertNotNull(hello.get("world"));
 
         try
         {
-            recordManager.store("hello/world/key", new MutableRecord());
+            recordManager.insert("hello/world/key", new MutableRecord());
             fail();
         }
         catch (IllegalArgumentException e)
@@ -50,7 +50,7 @@ public class RecordManagerTest extends TestCase
         MutableRecord record = new MutableRecord();
         record.putMeta("key", "value");
 
-        recordManager.store("hello/world", record);
+        recordManager.insert("hello/world", record);
         assertNull(recordManager.load("hello/moon"));
         assertNull(recordManager.load("hello/world/key"));
         assertNotNull(recordManager.load("hello/world"));
@@ -61,7 +61,7 @@ public class RecordManagerTest extends TestCase
         MutableRecord record = new MutableRecord();
         record.putMeta("key", "value");
 
-        recordManager.store("hello/world", record);
+        recordManager.insert("hello/world", record);
 
         assertNull(recordManager.delete("hello/moon"));
         assertNull(recordManager.delete("hello/world/key"));
@@ -71,9 +71,9 @@ public class RecordManagerTest extends TestCase
 
     public void testMetaProperties()
     {
-        Record record = new MutableRecord();
+        MutableRecord record = new MutableRecord();
         record.putMeta("key", "value");
-        recordManager.store("path/to/record", record);
+        recordManager.insert("path/to/record", record);
 
         Record loadedRecord = recordManager.load("path/to/record");
         assertEquals(record.getMeta("key"), loadedRecord.getMeta("key"));
@@ -84,7 +84,7 @@ public class RecordManagerTest extends TestCase
         MutableRecord record = new MutableRecord();
         record.putMeta("key", "value");
 
-        recordManager.store("another", record);
+        recordManager.insert("another", record);
 
         assertNotNull(recordManager.load("/another"));
         assertNotNull(recordManager.load("another"));
@@ -96,7 +96,7 @@ public class RecordManagerTest extends TestCase
         MutableRecord original = new MutableRecord();
         original.put("key", "value");
 
-        recordManager.store("sourcePath", original);
+        recordManager.insert("sourcePath", original);
         assertNull(recordManager.load("destinationPath"));
         recordManager.copy("sourcePath", "destinationPath");
 
@@ -106,7 +106,7 @@ public class RecordManagerTest extends TestCase
 
         // ensure that changing the original does not change the copy
         original.put("anotherKey", "anotherValue");
-        recordManager.store("sourcePath", original);
+        recordManager.insert("sourcePath", original);
 
         copy = recordManager.load("destinationPath");
         assertFalse(copy.containsKey("anotherKey"));
@@ -117,7 +117,7 @@ public class RecordManagerTest extends TestCase
         MutableRecord original = new MutableRecord();
         original.put("key", "value");
 
-        recordManager.store("path", original);
+        recordManager.insert("path", original);
 
         // update the external record.
         original.put("key", "changedValue");

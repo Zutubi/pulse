@@ -5,8 +5,9 @@ import com.zutubi.prototype.type.CollectionType;
 import com.zutubi.prototype.type.Type;
 import com.zutubi.prototype.type.TypeProperty;
 import com.zutubi.prototype.type.TypeRegistry;
-import com.zutubi.prototype.type.record.MutableRecord;
 import com.zutubi.prototype.type.record.Record;
+import com.zutubi.prototype.type.record.TemplateRecord;
+import com.zutubi.prototype.type.record.MutableRecord;
 import com.zutubi.prototype.wizard.WizardState;
 
 import java.util.HashMap;
@@ -15,88 +16,70 @@ import java.util.Map;
 
 /**
  * This wizard walks a user through the project configuration process. During project configuration,
- * a user needs to configure the projects type, scm and general details. 
- *
+ * a user needs to configure the projects type, scm and general details.
  */
 public class ConfigureProjectWizard extends AbstractTypeWizard
 {
     private ConfigurationPersistenceManager configurationPersistenceManager;
 
     private long parentId;
-    
+
     private Record record;
 
     public void initialise()
     {
-        try
+
+        // load template information.
+        TemplateRecord templateRecord = new TemplateRecord("owner", null, new MutableRecord());
+
+        // to create a project, we need to specify 3 sets of data.
+        // a) general info, in particular, the name, which must be unique.
+        // b) the scm type
+        // c) and the project type.
+
+        String[] paths = new String[]{"general", "scm", "type"};
+
+        // the path at which we are storing this data, the path that triggers this wizard, is project
+        String basePath = "project";
+
+        Map<String, Type> wizardTypes = new HashMap<String, Type>();
+
+        Type type = configurationPersistenceManager.getType(basePath);
+        if (type instanceof CollectionType)
         {
-            Record existingProject = configurationPersistenceManager.getRecord("project/" + parentId);
-            if (existingProject != null)
-            {
-                record = existingProject.clone();
-            }
-            else
-            {
-                record = new MutableRecord();
-            }
-
-            // to create a project, we need to specify 3 sets of data.
-            // a) general info, in particular, the name, which must be unique.
-            // b) the scm type
-            // c) and the project type.
-
-            String[] paths = new String[]{"general", "scm", "type"};
-
-            // the path at which we are storing this data, the path that triggers this wizard, is project
-            String basePath = "project";
-
-            Map<String, Type> wizardTypes = new HashMap<String, Type>();
-
-            Type type = configurationPersistenceManager.getType(basePath);
-            if (type instanceof CollectionType)
-            {
-                type = ((CollectionType)type).getCollectionType();
-            }
-            
-            // the types associated with the paths that require configuration are determined as follows:
-            for (String propertyPath : paths)
-            {
-                TypeProperty property = type.getProperty(propertyPath);
-                wizardTypes.put(propertyPath, property.getType());
-            }
-
-            // these wizard types now define the UI forms that we will be seeing.
-
-            // - general info represents one page, with some nice simple data.
-            // - scm represents two pages, one to select the scm, the next to configure it.
-            // - type represents two pages, one to select the type, the next to configure it.
-
-            // each one of these represents a single piece of data, even if they take more than one step.
-            // they contain small wizards themselves.
-
-            // So, now we want to initialise this wizard with the information that we have.
-
-            wizardStates = new LinkedList<WizardState>();
-            for (String propertyPath : paths)
-            {
-                Type propertyType = wizardTypes.get(propertyPath);
-
-                if (!record.containsKey(propertyPath))
-                {
-                    record.put(propertyPath, new MutableRecord());
-                }
-                Record stateRecord = (Record) record.get(propertyPath);
-                
-                // convert the type into wizard state(s).
-                addWizardStates(wizardStates, propertyType, stateRecord);
-            }
-
-            currentState = wizardStates.getFirst();
+            type = ((CollectionType) type).getCollectionType();
         }
-        catch (CloneNotSupportedException e)
+
+        // the types associated with the paths that require configuration are determined as follows:
+        for (String propertyPath : paths)
         {
-            // never going to happen.
+            TypeProperty property = type.getProperty(propertyPath);
+            wizardTypes.put(propertyPath, property.getType());
         }
+
+        // these wizard types now define the UI forms that we will be seeing.
+
+        // - general info represents one page, with some nice simple data.
+        // - scm represents two pages, one to select the scm, the next to configure it.
+        // - type represents two pages, one to select the type, the next to configure it.
+
+        // each one of these represents a single piece of data, even if they take more than one step.
+        // they contain small wizards themselves.
+
+        // So, now we want to initialise this wizard with the information that we have.
+
+        wizardStates = new LinkedList<WizardState>();
+        for (String propertyPath : paths)
+        {
+            Type propertyType = wizardTypes.get(propertyPath);
+
+            TemplateRecord stateTemplateRecord = (TemplateRecord) templateRecord.get(propertyPath);
+
+            // convert the type into wizard state(s).
+            addWizardStates(wizardStates, propertyType, stateTemplateRecord);
+        }
+
+        currentState = wizardStates.getFirst();
     }
 
     public void setParentId(long parentId)
@@ -120,7 +103,8 @@ public class ConfigureProjectWizard extends AbstractTypeWizard
     /**
      * Required resource.
      *
-     * @param configurationPersistenceManager instance
+     * @param configurationPersistenceManager
+     *         instance
      */
     public void setConfigurationPersistenceManager(ConfigurationPersistenceManager configurationPersistenceManager)
     {

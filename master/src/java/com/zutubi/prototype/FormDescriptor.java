@@ -3,6 +3,8 @@ package com.zutubi.prototype;
 import com.zutubi.prototype.model.Field;
 import com.zutubi.prototype.model.Form;
 import com.zutubi.prototype.model.SubmitField;
+import com.zutubi.prototype.type.record.Record;
+import com.zutubi.prototype.type.record.TemplateRecord;
 import com.zutubi.pulse.util.CollectionUtils;
 import com.zutubi.pulse.util.Predicate;
 
@@ -89,7 +91,7 @@ public class FormDescriptor implements Descriptor
         this.actions.addAll(actions);
     }
 
-    public Form instantiate(Object data)
+    public Form instantiate(Record record)
     {
         Form form = new Form();
         form.setId(id);    
@@ -100,7 +102,7 @@ public class FormDescriptor implements Descriptor
         for (String fieldName : fieldOrder)
         {
             FieldDescriptor fieldDescriptor = getFieldDescriptor(fieldName);
-            Field field = fieldDescriptor.instantiate(data);
+            Field field = fieldDescriptor.instantiate(record);
             field.setTabindex(tabindex++);
             form.add(field);
         }

@@ -47,6 +47,8 @@ public interface Record extends Map<String, Object>, Cloneable
      */
     String getMeta(String key);
 
+    Object get(Object key);
+
     /**
      * Create a clone of this record.
      *

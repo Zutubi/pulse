@@ -1,6 +1,7 @@
 package com.zutubi.prototype.type.record;
 
 import java.util.StringTokenizer;
+import java.util.Map;
 
 /**
  *
@@ -67,35 +68,53 @@ public class RecordManager
         return record != null;
     }
 
-    /**
-     * Store the provided record at the requested path. If a record already exists at this location,
-     * the two records are merged.
-     * 
-     * @param path identifying the path at which to store the record.
-     * @param newRecord the new record data to be stored.
-     */
-    public void store(String path, Record newRecord)
+    
+    public void insert(String path, MutableRecord newRecord)
+    {
+        String[] pathElements = PathUtils.getPathElements(path);
+        if(pathElements == null)
+        {
+            throw new IllegalArgumentException("Invalid path '" + path + "'");
+        }
+
+        Record parent = getRecord(PathUtils.getParentPathElements(pathElements));
+        parent.put(pathElements[pathElements.length - 1], newRecord);
+    }
+
+    private MutableRecord getRecord(String[] pathElements)
     {
         MutableRecord record = baseRecord;
-        StringTokenizer tokens = new StringTokenizer(path, PATH_SEPARATOR, false);
-        while (tokens.hasMoreTokens())
+        for(int i = 0; i < pathElements.length - 1; i++)
         {
-            String pathElement = tokens.nextToken();
-            // if a record in the path does not exist, create it. An empty record is fine. 
-            if (record.get(pathElement) == null)
+            String element = pathElements[i];
+            if(record.get(element) == null)
             {
-                record.put(pathElement, new MutableRecord());
+                record.put(element, new MutableRecord());
             }
-            Object obj = record.get(pathElement);
-            if (!(obj instanceof MutableRecord))
+            Object obj = record.get(element);
+            if(!(obj instanceof MutableRecord))
             {
-                // ok, problem. We have a non-record entry, meaning that we are inside
-                // a record that contains data.
-                throw new IllegalArgumentException("Invalid path.");
+                throw new IllegalArgumentException("Invalid path '" + PathUtils.getPath(pathElements) + "'");
             }
-            record = (MutableRecord) record.get(pathElement);
+            record = (MutableRecord) obj;
         }
-        record.putAll((MutableRecord)newRecord);
+
+        return record;
+    }
+
+    /**
+     * Updates the record at the requested path.  A record must exist at the
+     * given path.  To create new records, use #insert(String, MutableRecord).
+     *
+     * @see #insert(String, MutableRecord)
+     *
+     * @param path identifying the path of the existing record.
+     * @param values new primitive values to write to the record
+     */
+    public void store(String path, Map<String, String> values)
+    {
+        MutableRecord record = getRecord(PathUtils.getPathElements(path));
+        record.putAll(values);
     }
 
     /**
@@ -155,11 +174,11 @@ public class RecordManager
     {
         try
         {
-            Record record = load(sourcePath);
+            MutableRecord record = (MutableRecord) load(sourcePath);
             if (record != null)
             {
-                Record copy = (Record) record.clone();
-                store(destinationPath, copy);
+                MutableRecord copy = (MutableRecord) record.clone();
+                insert(destinationPath, copy);
             }
         }
         catch (CloneNotSupportedException e)

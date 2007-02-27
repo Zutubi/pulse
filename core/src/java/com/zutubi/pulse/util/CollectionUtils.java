@@ -45,6 +45,12 @@ public class CollectionUtils
         }
     }
 
+    public static String[] filterToArray(String[] in, Predicate<String> predicate)
+    {
+        List<String> result = filter(in, predicate);
+        return result.toArray(new String[result.size()]);
+    }
+
     public static <T, U> List<U> map(List<T> l, Mapping<T, U> m)
     {
         List<U> result = new LinkedList<U>();

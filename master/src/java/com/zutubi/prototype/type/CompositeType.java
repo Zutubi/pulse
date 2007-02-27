@@ -2,6 +2,7 @@ package com.zutubi.prototype.type;
 
 import com.zutubi.prototype.type.record.MutableRecord;
 import com.zutubi.prototype.type.record.Record;
+import com.zutubi.prototype.type.record.RecordManager;
 import com.zutubi.pulse.util.CollectionUtils;
 import com.zutubi.pulse.util.Mapping;
 
@@ -99,6 +100,11 @@ public class CompositeType extends AbstractType implements Traversable, Type
     public boolean hasProperty(String propertyName)
     {
         return properties.containsKey(propertyName);
+    }
+
+    public void setRecord(String path, Record record, RecordManager recordManager)
+    {
+        //recordManager.store(path, record);
     }
 
     public void addExtension(String symbolicName)

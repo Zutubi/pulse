@@ -1,5 +1,7 @@
 package com.zutubi.prototype;
 
+import com.zutubi.prototype.type.record.Record;
+
 import java.util.Map;
 
 /**
@@ -14,5 +16,5 @@ public interface Descriptor
 
     Map<String, Object> getParameters();
 
-    Object instantiate(Object obj);
+    Object instantiate(Record record);
 }

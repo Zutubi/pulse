@@ -3,6 +3,8 @@ package com.zutubi.prototype.type;
 import com.zutubi.pulse.form.squeezer.SqueezeException;
 import com.zutubi.pulse.form.squeezer.Squeezers;
 import com.zutubi.pulse.form.squeezer.TypeSqueezer;
+import com.zutubi.prototype.type.record.Record;
+import com.zutubi.prototype.type.record.RecordManager;
 
 import java.util.List;
 import java.util.Collections;
@@ -85,5 +87,10 @@ public class PrimitiveType extends AbstractType implements Type
     public List<TypeProperty> getProperties(Class<? extends Type> type)
     {
         return Collections.EMPTY_LIST;
+    }
+
+    public void setRecord(String path, Record record, RecordManager recordManager)
+    {
+        throw new RuntimeException("Method not implemented.");
     }
 }

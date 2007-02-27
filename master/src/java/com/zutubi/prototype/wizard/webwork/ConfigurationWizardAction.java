@@ -6,13 +6,16 @@ import com.opensymphony.xwork.ValidationAware;
 import com.zutubi.prototype.type.PrimitiveType;
 import com.zutubi.prototype.type.Type;
 import com.zutubi.prototype.type.TypeRegistry;
-import com.zutubi.prototype.type.record.Record;
+import com.zutubi.prototype.type.TypeProperty;
 import com.zutubi.prototype.wizard.Wizard;
 import com.zutubi.prototype.wizard.WizardState;
 import com.zutubi.pulse.bootstrap.ComponentContext;
 import com.zutubi.pulse.util.logging.Logger;
 import com.zutubi.pulse.validation.MessagesTextProvider;
 import com.zutubi.pulse.web.ActionSupport;
+import com.zutubi.pulse.form.squeezer.TypeSqueezer;
+import com.zutubi.pulse.form.squeezer.Squeezers;
+import com.zutubi.pulse.form.squeezer.SqueezeException;
 import com.zutubi.validation.DelegatingValidationContext;
 import com.zutubi.validation.ValidationContext;
 import com.zutubi.validation.ValidationException;
@@ -198,11 +201,29 @@ public class ConfigurationWizardAction extends ActionSupport
         try
         {
 */
-        Record record = getState().getRecord();
-        Type type = typeRegistry.getType(record.getSymbolicName());
+
+        try
+        {
+            Map parameters = ActionContext.getContext().getParameters();
+            Map<String, Object> data = getState().getRecord();
+
+            Type type = getState().getType();
+            for (TypeProperty property : type.getProperties(PrimitiveType.class))
+            {
+                TypeSqueezer squeezer = Squeezers.findSqueezer(property.getClazz());
+                data.put(property.getName(), squeezer.unsqueeze((String[])parameters.get(property.getName())));
+            }
+        }
+        catch (SqueezeException e)
+        {
+            e.printStackTrace();
+            return false;
+        }
+
+/*
+        Record record = getState().getTemplateRecord();
         // apply the parameters to the record.
 
-        Map parameters = ActionContext.getContext().getParameters();
         for (String propertyName : type.getPropertyNames(PrimitiveType.class))
         {
             String[] values = (String[]) parameters.get(propertyName);
@@ -218,6 +239,7 @@ public class ConfigurationWizardAction extends ActionSupport
                 }
             }
         }
+*/
 
         // run basic validation.
 

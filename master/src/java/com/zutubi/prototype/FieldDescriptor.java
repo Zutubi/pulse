@@ -1,6 +1,8 @@
 package com.zutubi.prototype;
 
 import com.zutubi.prototype.model.Field;
+import com.zutubi.prototype.type.record.Record;
+import com.zutubi.prototype.type.record.TemplateRecord;
 import ognl.Ognl;
 import ognl.OgnlException;
 
@@ -52,7 +54,7 @@ public class FieldDescriptor implements Descriptor
         this.parameters.putAll(parameters);
     }
 
-    public Field instantiate(Object instance)
+    public Field instantiate(Record instance)
     {
         Field field = new Field();
         field.setName(getName());

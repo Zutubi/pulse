@@ -47,8 +47,8 @@ public class ConfigurationCrudSupport
                 return false;
             }
 
-            configurationPersistenceManager.setInstance(path, instance);
-            return true;
+//            configurationPersistenceManager.setInstance(path, instance);
+            throw new RuntimeException("need to implement store.");
         }
         catch (Exception e)
         {

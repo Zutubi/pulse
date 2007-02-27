@@ -1,5 +1,8 @@
 package com.zutubi.prototype.type;
 
+import com.zutubi.prototype.type.record.Record;
+import com.zutubi.prototype.type.record.RecordManager;
+
 import java.lang.annotation.Annotation;
 import java.util.List;
 
@@ -102,4 +105,6 @@ public interface Type
      * @return
      */
     boolean hasProperty(String propertyName);
+
+    void setRecord(String path, Record record, RecordManager recordManager);
 }

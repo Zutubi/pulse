@@ -1,8 +1,7 @@
 package com.zutubi.prototype.wizard.webwork;
 
-import com.zutubi.prototype.type.CompositeType;
-import com.zutubi.prototype.type.Type;
-import com.zutubi.prototype.type.TypeRegistry;
+import com.zutubi.prototype.type.*;
+import com.zutubi.prototype.type.record.TemplateRecord;
 import com.zutubi.prototype.type.record.MutableRecord;
 import com.zutubi.prototype.type.record.Record;
 import com.zutubi.prototype.wizard.Wizard;
@@ -13,11 +12,12 @@ import com.zutubi.pulse.prototype.config.ConfigurationExtension;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
 
 /**
  * This wizard walks a user through the project configuration process. During project configuration,
  * a user needs to configure the projects type, scm and general details.
- *
  */
 public abstract class AbstractTypeWizard implements Wizard
 {
@@ -27,7 +27,7 @@ public abstract class AbstractTypeWizard implements Wizard
 
     protected LinkedList<WizardState> wizardStates;
 
-    protected void addWizardStates(LinkedList<WizardState> states, Type type, Record record)
+    protected void addWizardStates(LinkedList<WizardState> states, Type type, TemplateRecord record)
     {
         // this extension thing is a little awkward, makes sense in theory, but a little awkward in practice
         if (type instanceof CompositeType)
@@ -75,7 +75,7 @@ public abstract class AbstractTypeWizard implements Wizard
         {
             transitions.add(PREVIOUS);
         }
-        if (currentIndex < wizardStates.size() -1)
+        if (currentIndex < wizardStates.size() - 1)
         {
             transitions.add(NEXT);
         }
@@ -92,9 +92,9 @@ public abstract class AbstractTypeWizard implements Wizard
     {
         // only step forward if there is another state to step to.
         int currentIndex = wizardStates.indexOf(currentState);
-        if (currentIndex < wizardStates.size() -1)
+        if (currentIndex < wizardStates.size() - 1)
         {
-            currentState = wizardStates.get(currentIndex +1);
+            currentState = wizardStates.get(currentIndex + 1);
         }
         return currentState;
     }
@@ -154,17 +154,27 @@ public abstract class AbstractTypeWizard implements Wizard
         /**
          * The record stores the persistent data for this wizard state.
          */
-        private Record record;
+        private TemplateRecord templateRecord;
+
+        private MutableRecord record = new MutableRecord();
 
         /**
-         *
          * @param type
          * @param record
          */
-        public SingleStepWizardState(Type type, Record record)
+        public SingleStepWizardState(Type type, TemplateRecord record)
         {
             this.type = type;
-            this.record = record;
+            this.templateRecord = record;
+
+            // extract initial values from the template record.
+            if (record != null)
+            {
+                for (TypeProperty property : type.getProperties(PrimitiveType.class))
+                {
+                    this.record.put(property.getName(), record.get(property.getName()));
+                }
+            }
         }
 
         /**
@@ -183,9 +193,13 @@ public abstract class AbstractTypeWizard implements Wizard
          *
          * @return the state record.
          */
+        public TemplateRecord getTemplateRecord()
+        {
+            return templateRecord;
+        }
+
         public Record getRecord()
         {
-            record.setSymbolicName(type.getSymbolicName());
             return record;
         }
     }
@@ -194,8 +208,6 @@ public abstract class AbstractTypeWizard implements Wizard
      * Some types need a little more than just a single wizard state / form to present all of the
      * information.  In particular, types that define multiple extension points.  These types need two-step
      * wizards.
-     *
-     *
      */
     public static class TwoStepWizardState
     {
@@ -203,11 +215,12 @@ public abstract class AbstractTypeWizard implements Wizard
 
         private Type type;
 
-        private Record record;
+        private TemplateRecord record;
 
         private Record selectionRecord = new MutableRecord();
+        private Map<String, MutableRecord> typeRecordCache = new TreeMap<String, MutableRecord>();
 
-        public TwoStepWizardState(Type type, Record record)
+        public TwoStepWizardState(Type type, TemplateRecord record)
         {
             this.type = type;
             this.record = record;
@@ -246,32 +259,77 @@ public abstract class AbstractTypeWizard implements Wizard
 
         private class SelectWizardState implements WizardState
         {
-            public Record getRecord()
+
+            public SelectWizardState()
             {
-                selectionRecord.setSymbolicName(type.getSymbolicName());
-                return selectionRecord;
+                // initialise the data.
+                if (getTemplateRecord() != null)
+                {
+                    selectionRecord.put("option", getTemplateRecord().getSymbolicName());
+                }
+            }
+
+            public TemplateRecord getTemplateRecord()
+            {
+                return record;
             }
 
             public Type getType()
             {
                 return type;
             }
+
+            public Record getRecord()
+            {
+                return selectionRecord;
+            }
         }
 
         private class ConfigurationWizardState implements WizardState
         {
-            public Record getRecord()
+
+            public ConfigurationWizardState()
             {
-                String selectedSymbolicName = (String) selectionRecord.get("option");
-                record.setSymbolicName(selectedSymbolicName);
+                // initialise the states data using the template record if it exists.
+                if (record != null)
+                {
+                    MutableRecord data = new MutableRecord();
+                    Type type = getType();
+                    for (TypeProperty property : type.getProperties(PrimitiveType.class))
+                    {
+                        data.put(property.getName(), record.get(property.getName()));
+                    }
+                    data.setSymbolicName(type.getSymbolicName());
+                    typeRecordCache.put(type.getSymbolicName(), data);
+                }
+            }
+
+            public TemplateRecord getTemplateRecord()
+            {
                 return record;
             }
 
             public Type getType()
             {
-                // this selection record provides data from a ConfigurationExtension implementation.
-                String selectedSymbolicName = (String) selectionRecord.get("option");
+                String selectedSymbolicName = getSelectedSymbolicName();
                 return typeRegistry.getType(selectedSymbolicName);
+            }
+
+            public Record getRecord()
+            {
+                String selectedSymbolicName = getSelectedSymbolicName();
+                if (!typeRecordCache.containsKey(selectedSymbolicName))
+                {
+                    MutableRecord r = new MutableRecord();
+                    r.setSymbolicName(selectedSymbolicName);
+                    typeRecordCache.put(selectedSymbolicName, r);
+                }
+                return typeRecordCache.get(selectedSymbolicName);
+            }
+
+            private String getSelectedSymbolicName()
+            {
+                return (String) selectionRecord.get("option");
             }
         }
     }

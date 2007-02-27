@@ -99,6 +99,7 @@ public class ConfigurationPersistenceManagerTest extends TestCase
         assertEquals(SimpleObject.class, type.getClazz());
     }
 
+/*
     public void testListingSimpleCollectionFromRecord() throws TypeException
     {
         manager.register("simpleCollection", typeRegistry.register(SimpleCollectionObject.class));
@@ -115,6 +116,7 @@ public class ConfigurationPersistenceManagerTest extends TestCase
 
         assertEquals(2, manager.getListing("simpleCollection/simpleList").size());
     }
+*/
 
     public void testListingNestedCollectionObject() throws TypeException
     {
@@ -123,6 +125,7 @@ public class ConfigurationPersistenceManagerTest extends TestCase
         assertEquals(0, manager.getListing("nestedCollection/nestedList").size());
     }
 
+/*
     public void testLoadSimpleObject() throws TypeException
     {
         manager.register("simpleObject", typeRegistry.register("simpleObject", SimpleObject.class));
@@ -137,7 +140,9 @@ public class ConfigurationPersistenceManagerTest extends TestCase
         assertEquals("a", instance.getStrA());
         assertEquals("b", instance.getStrB());
     }
+*/
 
+/*
     public void testStoreSimpleObject() throws TypeException
     {
         manager.register("simpleObject", typeRegistry.register("simpleObject", SimpleObject.class));
@@ -152,7 +157,9 @@ public class ConfigurationPersistenceManagerTest extends TestCase
         assertEquals("A", record.get("strA"));
         assertEquals("B", record.get("strB"));
     }
+*/
 
+/*
     public void testStoreInCollection() throws TypeException
     {
         typeRegistry.register("simpleObject", SimpleObject.class);
@@ -170,6 +177,7 @@ public class ConfigurationPersistenceManagerTest extends TestCase
         assertEquals(2, manager.getListing("simpleCollection/simpleList").size());
 
     }
+*/
 
     public static class SimpleObject
     {

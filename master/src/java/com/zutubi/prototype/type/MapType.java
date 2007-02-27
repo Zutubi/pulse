@@ -2,6 +2,7 @@ package com.zutubi.prototype.type;
 
 import com.zutubi.prototype.type.record.MutableRecord;
 import com.zutubi.prototype.type.record.Record;
+import com.zutubi.prototype.type.record.RecordManager;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -100,5 +101,10 @@ public class MapType extends CollectionType
             record.put(key, objectType.unstantiate(obj));
         }
         return record;
+    }
+
+    public void setRecord(String path, Record record, RecordManager recordManager)
+    {
+        throw new RuntimeException("Method not implemented.");
     }
 }

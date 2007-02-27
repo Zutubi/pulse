@@ -2,6 +2,7 @@ package com.zutubi.prototype.type;
 
 import com.zutubi.prototype.type.record.MutableRecord;
 import com.zutubi.prototype.type.record.Record;
+import com.zutubi.prototype.type.record.RecordManager;
 
 import java.util.Collections;
 import java.util.Comparator;
@@ -113,5 +114,10 @@ public class ListType extends CollectionType
             record.put(String.valueOf(i), objectType.unstantiate(obj));
         }
         return record;
+    }
+
+    public void setRecord(String path, Record record, RecordManager recordManager)
+    {
+        throw new RuntimeException("Method not implemented.");
     }
 }

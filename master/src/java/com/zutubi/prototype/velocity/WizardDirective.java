@@ -120,13 +120,17 @@ public class WizardDirective extends AbstractDirective
 
             Map<String, Object> context = new HashMap<String, Object>();
 
+            // need to handle the template record here.
+            // a) we have a data map that contains posted information.
+            // b) we have a template record that contains default data.
+            // maybe the data map needs to be merged first, external to this
+
             Form form = formDescriptor.instantiate(state.getRecord());
             form.setAction(action);
             
             context.put("form", form);
             context.put("i18nText", new GetTextMethod(messages));
             context.put("path", path);
-
             
             com.zutubi.prototype.model.Wizard wizard = new com.zutubi.prototype.model.Wizard();
             wizard.setStepCount(wizardInstance.getStateCount());

@@ -6,6 +6,7 @@ import com.zutubi.prototype.type.CollectionType;
 import com.zutubi.prototype.type.record.Record;
 import com.zutubi.prototype.type.record.MutableRecord;
 import com.zutubi.prototype.type.record.RecordManager;
+import com.zutubi.prototype.type.record.TemplateRecord;
 import com.zutubi.prototype.wizard.WizardState;
 
 import java.util.LinkedList;
@@ -29,40 +30,23 @@ public class SingleTypeWizard extends AbstractTypeWizard
 
     public void initialise()
     {
-        try
+        Type type = configurationPersistenceManager.getType(path);
+        if (type instanceof CollectionType)
         {
-            Type type = configurationPersistenceManager.getType(path);
-            if (type instanceof CollectionType)
-            {
-                type = ((CollectionType)type).getCollectionType();
-            }
-
-            Record record;
-            Record existingRecord = configurationPersistenceManager.getRecord(path);
-            if (existingRecord != null)
-            {
-                record = existingRecord.clone();
-            }
-            else
-            {
-                record = new MutableRecord();
-                record.setSymbolicName(type.getSymbolicName());
-            }
-
-            wizardStates = new LinkedList<WizardState>();
-            addWizardStates(wizardStates, type, record);
-
-            currentState = wizardStates.getFirst();
+            type = ((CollectionType) type).getCollectionType();
         }
-        catch (CloneNotSupportedException e)
-        {
-            // not going to happen.
-        }
+
+        TemplateRecord templateRecord = new TemplateRecord("owner", null, new MutableRecord());
+
+        wizardStates = new LinkedList<WizardState>();
+        addWizardStates(wizardStates, type, templateRecord);
+
+        currentState = wizardStates.getFirst();
     }
 
     public void doFinish()
     {
-        recordManager.store(path, wizardStates.getLast().getRecord());
+//        recordManager.insert(path, wizardStates.getLast().getRecord());
     }
 
     public void setConfigurationPersistenceManager(ConfigurationPersistenceManager configurationPersistenceManager)

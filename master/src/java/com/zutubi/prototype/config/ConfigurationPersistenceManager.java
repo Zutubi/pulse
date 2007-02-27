@@ -193,12 +193,11 @@ public class ConfigurationPersistenceManager
      * @param path used to identify (and retrieve) the object in future. This path must be consistent with the
      * defined type structure.
      *
-     * @param obj instance to persisted.
-     *
      * @see #getType(String)
      *
      * @throws TypeException 
      */
+/*
     public void setInstance(String path, Object obj) throws TypeException
     {
         Type type = typeRegistry.getType(obj.getClass());
@@ -240,6 +239,13 @@ public class ConfigurationPersistenceManager
         MutableRecord record = (MutableRecord) type.unstantiate(obj);
         recordManager.store(path, record);
     }
+*/
+
+   public void setRecord(String path, Record record)
+   {
+       Type type = getType(path);
+       type.setRecord(path, record, recordManager);
+   }
 
     public String getKey(Object obj) throws TypeException
     {

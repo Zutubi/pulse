@@ -2,6 +2,9 @@ package com.zutubi.prototype.wizard;
 
 import com.zutubi.prototype.type.Type;
 import com.zutubi.prototype.type.record.Record;
+import com.zutubi.prototype.type.record.TemplateRecord;
+
+import java.util.Map;
 
 /**
  *
@@ -9,8 +12,10 @@ import com.zutubi.prototype.type.record.Record;
  */
 public interface WizardState
 {
-    Record getRecord();
+    TemplateRecord getTemplateRecord();
 
     Type getType();
+
+    Record getRecord();
 
 }
