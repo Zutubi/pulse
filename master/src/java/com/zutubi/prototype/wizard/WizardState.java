@@ -1,10 +1,8 @@
 package com.zutubi.prototype.wizard;
 
 import com.zutubi.prototype.type.Type;
-import com.zutubi.prototype.type.record.Record;
+import com.zutubi.prototype.type.record.MutableRecord;
 import com.zutubi.prototype.type.record.TemplateRecord;
-
-import java.util.Map;
 
 /**
  *
@@ -12,10 +10,23 @@ import java.util.Map;
  */
 public interface WizardState
 {
+    /**
+     * The template record associated with the data for this wizard state.
+     * 
+     * @return
+     */
     TemplateRecord getTemplateRecord();
 
+    /**
+     * The type of the data represented by this wizard state.
+     * @return
+     */
     Type getType();
 
-    Record getRecord();
+    /**
+     * The record containing the data within this wizard state.
+     * @return
+     */
+    MutableRecord getRecord();
 
 }

@@ -1,6 +1,7 @@
 package com.zutubi.prototype;
 
 import com.zutubi.prototype.model.Table;
+import com.zutubi.prototype.type.record.Record;
 
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -35,7 +36,7 @@ public class TableDescriptor implements Descriptor
         return parameters;
     }
 
-    public Table instantiate(Object obj)
+    public Table instantiate(Record obj)
     {
         Table table = new Table();
 

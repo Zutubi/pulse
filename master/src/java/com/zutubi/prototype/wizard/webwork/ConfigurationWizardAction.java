@@ -2,20 +2,17 @@ package com.zutubi.prototype.wizard.webwork;
 
 import com.opensymphony.util.TextUtils;
 import com.opensymphony.xwork.ActionContext;
-import com.opensymphony.xwork.ValidationAware;
-import com.zutubi.prototype.type.PrimitiveType;
 import com.zutubi.prototype.type.Type;
+import com.zutubi.prototype.type.TypeException;
 import com.zutubi.prototype.type.TypeRegistry;
-import com.zutubi.prototype.type.TypeProperty;
+import com.zutubi.prototype.type.record.MutableRecord;
+import com.zutubi.prototype.webwork.PrototypeUtils;
 import com.zutubi.prototype.wizard.Wizard;
 import com.zutubi.prototype.wizard.WizardState;
 import com.zutubi.pulse.bootstrap.ComponentContext;
 import com.zutubi.pulse.util.logging.Logger;
 import com.zutubi.pulse.validation.MessagesTextProvider;
 import com.zutubi.pulse.web.ActionSupport;
-import com.zutubi.pulse.form.squeezer.TypeSqueezer;
-import com.zutubi.pulse.form.squeezer.Squeezers;
-import com.zutubi.pulse.form.squeezer.SqueezeException;
 import com.zutubi.validation.DelegatingValidationContext;
 import com.zutubi.validation.ValidationContext;
 import com.zutubi.validation.ValidationException;
@@ -196,73 +193,31 @@ public class ConfigurationWizardAction extends ActionSupport
 
     private boolean validateState()
     {
-        // popupate the state, extract the type details.
-/*
         try
         {
-*/
-
-        try
-        {
-            Map parameters = ActionContext.getContext().getParameters();
-            Map<String, Object> data = getState().getRecord();
-
+            MutableRecord record = getState().getRecord();
             Type type = getState().getType();
-            for (TypeProperty property : type.getProperties(PrimitiveType.class))
+
+            Object instance = type.instantiate(record);
+
+            ValidationContext context = createValidationContext(instance);
+
+            try
             {
-                TypeSqueezer squeezer = Squeezers.findSqueezer(property.getClazz());
-                data.put(property.getName(), squeezer.unsqueeze((String[])parameters.get(property.getName())));
+                validationManager.validate(instance, context);
+                return !context.hasErrors();
+            }
+            catch (ValidationException e)
+            {
+                context.addActionError(e.getMessage());
+                return false;
             }
         }
-        catch (SqueezeException e)
+        catch (TypeException e)
         {
             e.printStackTrace();
             return false;
         }
-
-/*
-        Record record = getState().getTemplateRecord();
-        // apply the parameters to the record.
-
-        for (String propertyName : type.getPropertyNames(PrimitiveType.class))
-        {
-            String[] values = (String[]) parameters.get(propertyName);
-            if (values != null)
-            {
-                if (values.length > 1)
-                {
-                    record.put(propertyName, values);
-                }
-                else if (values.length == 1)
-                {
-                    record.put(propertyName, values[0]);
-                }
-            }
-        }
-*/
-
-        // run basic validation.
-
-/*
-            Object instance = getState().getData();
-
-            // copy the parameters to the state instance... maybe this should be done separately so that it is
-            // not a byproduct of the validation process
-            ConfigurationCrudSupport crud = new ConfigurationCrudSupport();
-            crud.apply(ActionContext.getContext().getParameters(), instance);
-            crud.validate(instance, this);
-*/
-        return true;
-/*
-            return !hasErrors();
-        }
-        catch (TypeException e)
-        {
-            addActionError(e.getMessage());
-            LOG.error(e);
-            return false;
-        }
-*/
     }
 
     private boolean validateWizard()
@@ -271,7 +226,7 @@ public class ConfigurationWizardAction extends ActionSupport
         {
             Object wizard = getWizardInstance();
 
-            ValidationContext validationContext = createValidationContext(wizard, this);
+            ValidationContext validationContext = createValidationContext(wizard);
 
             // validate the form input
             validationManager.validate(wizard, validationContext);
@@ -285,14 +240,22 @@ public class ConfigurationWizardAction extends ActionSupport
         }
     }
 
-    private ValidationContext createValidationContext(Object subject, ValidationAware action)
+    private ValidationContext createValidationContext(Object subject)
     {
         MessagesTextProvider textProvider = new MessagesTextProvider(subject);
-        return new DelegatingValidationContext(new XWorkValidationAdapter(action), textProvider);
+        return new DelegatingValidationContext(new XWorkValidationAdapter(this), textProvider);
     }
 
     public String execute()
     {
+        if (isInitialised())
+        {
+            MutableRecord post = PrototypeUtils.toRecord(getState().getType(), ActionContext.getContext().getParameters());
+
+            // apply the posted record details to the current states record.
+            getState().getRecord().update(post);
+        }
+
         // only validate when we are moving forwards in the wizard
         if (isNextSelected() || isFinishSelected())
         {

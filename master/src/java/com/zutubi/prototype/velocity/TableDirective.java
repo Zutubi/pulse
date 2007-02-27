@@ -6,6 +6,7 @@ import com.zutubi.prototype.freemarker.GetTextMethod;
 import com.zutubi.prototype.type.CollectionType;
 import com.zutubi.prototype.type.Type;
 import com.zutubi.prototype.type.TypeException;
+import com.zutubi.prototype.type.record.Record;
 import com.zutubi.pulse.i18n.Messages;
 import com.zutubi.pulse.util.logging.Logger;
 import freemarker.core.DelegateBuiltin;
@@ -22,9 +23,9 @@ import java.util.Map;
  *
  *
  */
-public class CollectionDirective extends PrototypeDirective
+public class TableDirective extends PrototypeDirective
 {
-    private static final Logger LOG = Logger.getLogger(CollectionDirective.class);
+    private static final Logger LOG = Logger.getLogger(TableDirective.class);
 
     public String getName()
     {
@@ -38,7 +39,7 @@ public class CollectionDirective extends PrototypeDirective
 
     public String doRender(Type collectionType) throws IOException, ParseErrorException, TypeException
     {
-        Object collection = configurationPersistenceManager.getInstance(path);
+        Record record = configurationPersistenceManager.getRecord(path);
 
         TableDescriptorFactory tableFactory = new TableDescriptorFactory();
         tableFactory.setTypeRegistry(typeRegistry);
@@ -54,7 +55,7 @@ public class CollectionDirective extends PrototypeDirective
             Messages messages = Messages.getInstance(type.getClazz());
 
             Map<String, Object> context = new HashMap<String, Object>();
-            context.put("table", tableDescriptor.instantiate(collection));
+            context.put("table", tableDescriptor.instantiate(record));
             context.put("i18nText", new GetTextMethod(messages));
             context.put("path", path);
 

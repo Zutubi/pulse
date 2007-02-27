@@ -25,9 +25,9 @@ public abstract class AbstractTypeWizard implements Wizard
 
     protected WizardState currentState;
 
-    protected LinkedList<WizardState> wizardStates;
+    protected LinkedList<WizardState> wizardStates = new LinkedList<WizardState>();
 
-    protected void addWizardStates(LinkedList<WizardState> states, Type type, TemplateRecord record)
+    protected void addWizardStates(List<WizardState> wizardStates, Type type, TemplateRecord templateRecord)
     {
         // this extension thing is a little awkward, makes sense in theory, but a little awkward in practice
         if (type instanceof CompositeType)
@@ -37,21 +37,21 @@ public abstract class AbstractTypeWizard implements Wizard
             {
                 if (ctype.getExtensions().size() > 1)
                 {
-                    TwoStepWizardState state = new TwoStepWizardState(type, record);
+                    TwoStepWizardState state = new TwoStepWizardState(type, templateRecord);
                     state.setTypeRegistry(typeRegistry);
-                    states.add(state.getFirstState());
-                    states.add(state.getSecondState());
+                    wizardStates.add(state.getFirstState());
+                    wizardStates.add(state.getSecondState());
                 }
                 else
                 {
-                    SingleStepWizardState singleStepState = new SingleStepWizardState(type, record);
-                    states.add(singleStepState);
+                    SingleStepWizardState singleStepState = new SingleStepWizardState(type, templateRecord);
+                    wizardStates.add(singleStepState);
                 }
             }
             else
             {
-                SingleStepWizardState singleStepState = new SingleStepWizardState(type, record);
-                states.add(singleStepState);
+                SingleStepWizardState singleStepState = new SingleStepWizardState(type, templateRecord);
+                wizardStates.add(singleStepState);
             }
         }
     }
@@ -198,7 +198,7 @@ public abstract class AbstractTypeWizard implements Wizard
             return templateRecord;
         }
 
-        public Record getRecord()
+        public MutableRecord getRecord()
         {
             return record;
         }
@@ -217,7 +217,8 @@ public abstract class AbstractTypeWizard implements Wizard
 
         private TemplateRecord record;
 
-        private Record selectionRecord = new MutableRecord();
+        private MutableRecord selectionRecord = new MutableRecord();
+
         private Map<String, MutableRecord> typeRecordCache = new TreeMap<String, MutableRecord>();
 
         public TwoStepWizardState(Type type, TemplateRecord record)
@@ -279,7 +280,7 @@ public abstract class AbstractTypeWizard implements Wizard
                 return type;
             }
 
-            public Record getRecord()
+            public MutableRecord getRecord()
             {
                 return selectionRecord;
             }
@@ -293,13 +294,7 @@ public abstract class AbstractTypeWizard implements Wizard
                 // initialise the states data using the template record if it exists.
                 if (record != null)
                 {
-                    MutableRecord data = new MutableRecord();
-                    Type type = getType();
-                    for (TypeProperty property : type.getProperties(PrimitiveType.class))
-                    {
-                        data.put(property.getName(), record.get(property.getName()));
-                    }
-                    data.setSymbolicName(type.getSymbolicName());
+                    MutableRecord data = record.flatten();
                     typeRecordCache.put(type.getSymbolicName(), data);
                 }
             }
@@ -315,7 +310,7 @@ public abstract class AbstractTypeWizard implements Wizard
                 return typeRegistry.getType(selectedSymbolicName);
             }
 
-            public Record getRecord()
+            public MutableRecord getRecord()
             {
                 String selectedSymbolicName = getSelectedSymbolicName();
                 if (!typeRecordCache.containsKey(selectedSymbolicName))
@@ -333,5 +328,4 @@ public abstract class AbstractTypeWizard implements Wizard
             }
         }
     }
-
 }

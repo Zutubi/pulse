@@ -1,12 +1,10 @@
 package com.zutubi.prototype;
 
+import com.zutubi.prototype.annotation.Format;
 import com.zutubi.prototype.type.CollectionType;
-import com.zutubi.prototype.type.ListType;
-import com.zutubi.prototype.type.MapType;
 import com.zutubi.prototype.type.Type;
 import com.zutubi.prototype.type.TypeException;
 import com.zutubi.prototype.type.TypeRegistry;
-import com.zutubi.prototype.annotation.Format;
 
 /**
  *
@@ -32,7 +30,7 @@ public class TableDescriptorFactory
         tableDescriptor.setName(type.getSymbolicName());
 
         // generate the header row.
-        RowDescriptor headerRow = new RowDescriptor();
+        RowDescriptor headerRow = new SingleRowDescriptor();
         headerRow.addDescriptor(new HeaderColumnDescriptor(type.getSymbolicName()));
         headerRow.addDescriptor(new HeaderColumnDescriptor("action", 2));
         tableDescriptor.addDescriptor(headerRow);
@@ -40,19 +38,7 @@ public class TableDescriptorFactory
         //TODO: check that the user has the necessary Auth to view / execute these actions.
 
         // generate data row.
-        RowDescriptor dataRow = null;
-        if (type instanceof MapType)
-        {
-            dataRow = new MapRowDescriptor();
-        }
-        else if (type instanceof ListType)
-        {
-            dataRow = new ListRowDescriptor();
-        }
-        else
-        {
-            throw new TypeException("Unsupported collection type: " + type.getClass());
-        }
+        RowDescriptor dataRow = new CollectionRowDescriptor();
 
         // take a look at any annotations defined for the base collection type.
         Formatter defaultFormatter = new SimpleColumnFormatter();
@@ -70,7 +56,7 @@ public class TableDescriptorFactory
             }
         }
 
-        ColumnDescriptor columnDescriptor = new ColumnDescriptor();
+        ColumnDescriptor columnDescriptor = new SummaryColumnDescriptor();
         columnDescriptor.setFormatter(new AnnotationFormatter(defaultFormatter));
 
         dataRow.addDescriptor(columnDescriptor);
@@ -78,7 +64,7 @@ public class TableDescriptorFactory
         dataRow.addDescriptor(new ActionColumnDescriptor("delete"));
         tableDescriptor.addDescriptor(dataRow);
 
-        RowDescriptor addRowDescriptor = new RowDescriptor();
+        RowDescriptor addRowDescriptor = new SingleRowDescriptor();
         addRowDescriptor.addDescriptor(new ActionColumnDescriptor("add", 3));
         tableDescriptor.addDescriptor(addRowDescriptor);
 

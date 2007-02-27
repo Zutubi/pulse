@@ -82,40 +82,6 @@ public class ListType extends CollectionType
         return new LinkedList<Object>();
     }
 
-    public Record unstantiate(Object data) throws TypeException
-    {
-        if (data == null)
-        {
-            return null;
-        }
-
-        List<Object> list = (List<Object>) data;
-
-        Record record = new MutableRecord();
-        record.setSymbolicName(getSymbolicName());
-
-        // write list order meta-data...
-
-        // write type data.
-        if (list.size() > 0)
-        {
-            Object first = list.get(0);
-            Type type = typeRegistry.getType(first.getClass());
-            if (type instanceof PrimitiveType)
-            {
-                record.putMeta("type", type.getSymbolicName());
-            }
-        }
-
-        for (int i = 0; i < list.size(); i++)
-        {
-            Object obj = list.get(i);
-            Type objectType = typeRegistry.getType(obj.getClass());
-            record.put(String.valueOf(i), objectType.unstantiate(obj));
-        }
-        return record;
-    }
-
     public void setRecord(String path, Record record, RecordManager recordManager)
     {
         throw new RuntimeException("Method not implemented.");

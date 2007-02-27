@@ -155,41 +155,6 @@ public class CompositeType extends AbstractType implements Traversable, Type
         }
     }
 
-    public Record unstantiate(Object instance) throws TypeConversionException
-    {
-        if (instance == null)
-        {
-            return null;
-        }
-
-        try
-        {
-            MutableRecord record = new MutableRecord();
-            record.setSymbolicName(getSymbolicName());
-            for (Map.Entry<String, TypeProperty> entry : properties.entrySet())
-            {
-                String name = entry.getKey();
-                Type type = entry.getValue().getType();
-
-                Method getter = properties.get(name).getGetter();
-                Object value = getter.invoke(instance);
-                if (value != null)
-                {
-                    Object propertyValue = type.unstantiate(value);
-                    if (propertyValue != null)
-                    {
-                        record.put(name, propertyValue);
-                    }
-                }
-            }
-            return record;
-        }
-        catch (Exception e)
-        {
-            throw new TypeConversionException(e);
-        }
-    }
-    
     public void populateInstance(Map<String, Object> source, Object target) throws TypeException
     {
         try

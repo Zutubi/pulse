@@ -71,38 +71,6 @@ public class MapType extends CollectionType
         return new HashMap<String, Object>();
     }
 
-    public Record unstantiate(Object data) throws TypeException
-    {
-        if (data == null)
-        {
-            return null;
-        }
-
-        Map<String, Object> map = (Map<String, Object>) data;
-
-        Record record = new MutableRecord();
-        record.setSymbolicName("mapType");
-
-        // write type data.
-        if (map.size() > 0)
-        {
-            Object first = map.values().iterator().next();
-            Type type = typeRegistry.getType(first.getClass());
-            if (type instanceof PrimitiveType)
-            {
-                record.putMeta("type", type.getSymbolicName());
-            }
-        }
-
-        for (String key: map.keySet())
-        {
-            Object obj = map.get(key);
-            Type objectType = typeRegistry.getType(obj.getClass());
-            record.put(key, objectType.unstantiate(obj));
-        }
-        return record;
-    }
-
     public void setRecord(String path, Record record, RecordManager recordManager)
     {
         throw new RuntimeException("Method not implemented.");

@@ -1,15 +1,11 @@
 package com.zutubi.prototype.wizard.webwork;
 
 import com.zutubi.prototype.config.ConfigurationPersistenceManager;
-import com.zutubi.prototype.type.Type;
 import com.zutubi.prototype.type.CollectionType;
-import com.zutubi.prototype.type.record.Record;
+import com.zutubi.prototype.type.Type;
 import com.zutubi.prototype.type.record.MutableRecord;
-import com.zutubi.prototype.type.record.RecordManager;
 import com.zutubi.prototype.type.record.TemplateRecord;
-import com.zutubi.prototype.wizard.WizardState;
-
-import java.util.LinkedList;
+import com.zutubi.pulse.util.logging.Logger;
 
 /**
  *
@@ -17,11 +13,13 @@ import java.util.LinkedList;
  */
 public class SingleTypeWizard extends AbstractTypeWizard
 {
+    private static final Logger LOG = Logger.getLogger(SingleTypeWizard.class);
+
     private ConfigurationPersistenceManager configurationPersistenceManager;
 
-    private RecordManager recordManager;
-
     private String path;
+
+    private static final TemplateRecord EMPTY_RECORD = new TemplateRecord("empty", null, new MutableRecord());
 
     public SingleTypeWizard(String path)
     {
@@ -36,9 +34,12 @@ public class SingleTypeWizard extends AbstractTypeWizard
             type = ((CollectionType) type).getCollectionType();
         }
 
-        TemplateRecord templateRecord = new TemplateRecord("owner", null, new MutableRecord());
+        LOG.warning("TODO: load template record for path: " + path + ", currently using empty template record.");
+        
+        // for now, use an empty template record.
+        TemplateRecord templateRecord = EMPTY_RECORD;
 
-        wizardStates = new LinkedList<WizardState>();
+        // the template record represents the existing data.
         addWizardStates(wizardStates, type, templateRecord);
 
         currentState = wizardStates.getFirst();
@@ -46,16 +47,11 @@ public class SingleTypeWizard extends AbstractTypeWizard
 
     public void doFinish()
     {
-//        recordManager.insert(path, wizardStates.getLast().getRecord());
+        LOG.warning("TODO: implement persistence of data.");
     }
 
     public void setConfigurationPersistenceManager(ConfigurationPersistenceManager configurationPersistenceManager)
     {
         this.configurationPersistenceManager = configurationPersistenceManager;
-    }
-
-    public void setRecordManager(RecordManager recordManager)
-    {
-        this.recordManager = recordManager;
     }
 }

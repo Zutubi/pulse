@@ -5,10 +5,11 @@ import com.zutubi.prototype.type.CollectionType;
 import com.zutubi.prototype.type.Type;
 import com.zutubi.prototype.type.TypeProperty;
 import com.zutubi.prototype.type.TypeRegistry;
+import com.zutubi.prototype.type.record.MutableRecord;
 import com.zutubi.prototype.type.record.Record;
 import com.zutubi.prototype.type.record.TemplateRecord;
-import com.zutubi.prototype.type.record.MutableRecord;
 import com.zutubi.prototype.wizard.WizardState;
+import com.zutubi.pulse.util.logging.Logger;
 
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -20,17 +21,22 @@ import java.util.Map;
  */
 public class ConfigureProjectWizard extends AbstractTypeWizard
 {
+    private static final Logger LOG = Logger.getLogger(ConfigureProjectWizard.class);
+
     private ConfigurationPersistenceManager configurationPersistenceManager;
 
     private long parentId;
 
     private Record record;
 
+    private static final TemplateRecord EMPTY_RECORD = new TemplateRecord("empty", null, new MutableRecord());
+
     public void initialise()
     {
-
         // load template information.
-        TemplateRecord templateRecord = new TemplateRecord("owner", null, new MutableRecord());
+        LOG.warning("TODO: load template record for project wizard, currently using empty template record.");
+
+        TemplateRecord templateRecord = EMPTY_RECORD;
 
         // to create a project, we need to specify 3 sets of data.
         // a) general info, in particular, the name, which must be unique.

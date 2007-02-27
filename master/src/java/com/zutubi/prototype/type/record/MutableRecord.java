@@ -135,4 +135,25 @@ public class MutableRecord implements Record
         }
         return clone;
     }
+
+    public void update(MutableRecord record)
+    {
+        Map<String, Object> newData = new HashMap<String, Object>();
+
+        for (Map.Entry<String, Object> entry : data.entrySet())
+        {
+            if (entry.getValue() instanceof Record)
+            {
+                newData.put(entry.getKey(), entry.getValue());
+            }
+        }
+
+        newData.putAll(record);
+        
+        data.clear();
+        data.putAll(newData);
+
+        meta.clear();
+        meta.putAll(record.meta);
+    }
 }

@@ -1,5 +1,8 @@
 package com.zutubi.prototype;
 
+import com.zutubi.prototype.model.Column;
+import com.zutubi.prototype.type.record.Record;
+
 /**
  *
  *
@@ -17,5 +20,13 @@ public class ActionColumnDescriptor extends ColumnDescriptor
         setColspan(colspan);
         getParameters().put("label", actionName);
         getParameters().put("type", "action");
+    }
+
+    public Column instantiate(Record value)
+    {
+        Column column = new Column();
+        column.addAll(getParameters());
+        return column;
+
     }
 }

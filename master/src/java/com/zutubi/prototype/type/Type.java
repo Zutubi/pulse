@@ -43,19 +43,6 @@ public interface Type
      */
     Object instantiate(Object record) throws TypeException;
 
-    Object instantiate() throws TypeConversionException;
-
-    /**
-     * Returns a version of the instance that have been converted for persistence purposes.
-     *
-     * @param instance
-     * 
-     * @return
-     *
-     * @throws TypeException
-     */
-    Object unstantiate(Object instance) throws TypeException;
-
     String getSymbolicName();
 
     /**

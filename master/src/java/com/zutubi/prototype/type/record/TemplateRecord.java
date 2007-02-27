@@ -1,13 +1,10 @@
 package com.zutubi.prototype.type.record;
 
+import com.zutubi.prototype.type.TypeRegistry;
+
+import java.util.Collection;
 import java.util.Map;
 import java.util.Set;
-import java.util.Collection;
-
-import com.zutubi.prototype.type.TypeRegistry;
-import com.zutubi.prototype.type.Type;
-import com.zutubi.prototype.type.TypeProperty;
-import com.zutubi.prototype.type.CollectionType;
 
 /**
  */
@@ -132,5 +129,17 @@ public class TemplateRecord implements Record
     {
         // TODO
         return null;
+    }
+
+    /**
+     * Would be nice to have a flattened view of the template information, since this is the view
+     * that will be commonly used when displaying forms. 
+     *
+     * @return a flattened record view of this template record.
+     */
+    public MutableRecord flatten()
+    {
+        // do not forget that this needs to set the template records symbolic details.
+        return new MutableRecord();
     }
 }

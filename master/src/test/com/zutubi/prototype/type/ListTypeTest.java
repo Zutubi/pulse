@@ -31,6 +31,7 @@ public class ListTypeTest extends TypeTestCase
         super.tearDown();
     }
 
+/*
     public void testSimpleList() throws TypeException
     {
         List<String> list = new LinkedList<String>();
@@ -59,6 +60,7 @@ public class ListTypeTest extends TypeTestCase
         assertTrue(newList.get(0) instanceof MockA);
         assertTrue(newList.get(1) instanceof MockB);
     }
+*/
 
     public static class MockA
     {

@@ -2,6 +2,7 @@ package com.zutubi.prototype;
 
 import com.zutubi.prototype.model.Row;
 import com.zutubi.prototype.model.Column;
+import com.zutubi.prototype.type.record.Record;
 
 import java.util.List;
 import java.util.LinkedList;
@@ -11,8 +12,9 @@ import java.util.Map;
  *
  *
  */
-public class MapRowDescriptor extends RowDescriptor
+public class MapRowDescriptor //extends RowDescriptor
 {
+/*
     public List<Row> instantiate(Object value)
     {
         List<Row> rows = new LinkedList<Row>();
@@ -52,5 +54,10 @@ public class MapRowDescriptor extends RowDescriptor
         rows.add(row);
         return rows;
     }
+*/
 
+    public List<Row> instantiate(Record record)
+    {
+        return null;
+    }
 }

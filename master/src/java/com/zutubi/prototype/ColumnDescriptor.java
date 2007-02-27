@@ -1,6 +1,7 @@
 package com.zutubi.prototype;
 
 import com.zutubi.prototype.model.Column;
+import com.zutubi.prototype.type.record.Record;
 
 import java.util.Map;
 import java.util.HashMap;
@@ -9,13 +10,13 @@ import java.util.HashMap;
  *
  *
  */
-public class ColumnDescriptor
+public abstract class ColumnDescriptor
 {
     private String name;
 
-    private int colspan = 1;
+    protected int colspan = 1;
 
-    private Formatter formatter = new SimpleColumnFormatter();
+    protected Formatter formatter = new SimpleColumnFormatter();
 
     private Map<String, Object> parameters = new HashMap<String, Object>();
 
@@ -34,14 +35,7 @@ public class ColumnDescriptor
         this.formatter = formatter;
     }
 
-    public Column instantiate(Object value)
-    {
-        Column c = new Column();
-        c.setSpan(colspan);
-        c.addAll(getParameters());
-        c.setValue(formatter.format(value));
-        return c;
-    }
+    public abstract Column instantiate(Record value);
 
     public String getName()
     {

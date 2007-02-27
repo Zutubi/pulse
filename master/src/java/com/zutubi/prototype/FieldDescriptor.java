@@ -2,9 +2,6 @@ package com.zutubi.prototype;
 
 import com.zutubi.prototype.model.Field;
 import com.zutubi.prototype.type.record.Record;
-import com.zutubi.prototype.type.record.TemplateRecord;
-import ognl.Ognl;
-import ognl.OgnlException;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -62,20 +59,12 @@ public class FieldDescriptor implements Descriptor
         field.setLabel(getName() + ".label");
         field.addAll(getParameters());
 
-        try
+        if (field.getValue() != null)
         {
-            if (!field.getParameters().containsKey("value"))
+            if (instance != null)
             {
-                if (instance != null)
-                {
-                    Map context = Ognl.createDefaultContext(instance);
-                    field.setValue(Ognl.getValue(getName(), context, instance));
-                }
+                field.setValue(instance.get(getName()));
             }
-        }
-        catch (OgnlException e)
-        {
-            field.setValue(e.getMessage());
         }
 
         return field;

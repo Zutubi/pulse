@@ -1,18 +1,17 @@
 package com.zutubi.prototype;
 
-import com.zutubi.prototype.model.Column;
 import com.zutubi.prototype.model.Row;
+import com.zutubi.prototype.type.record.Record;
 
-import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 
 /**
  *
  *
  */
-public class ListRowDescriptor extends RowDescriptor
+public class ListRowDescriptor //extends RowDescriptor
 {
+/*
     public List<Row> instantiate(Object value)
     {
         List<Row> rows = new LinkedList<Row>();
@@ -59,5 +58,11 @@ public class ListRowDescriptor extends RowDescriptor
         row.addCell(col);
         rows.add(row);
         return rows;
+    }
+*/
+
+    public List<Row> instantiate(Record record)
+    {
+        return null;
     }
 }
