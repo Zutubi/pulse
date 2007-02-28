@@ -136,8 +136,11 @@ public class CompositeType extends AbstractType implements ComplexType
 
                 TypeProperty property = entry.getValue();
                 Method setter = property.getSetter();
-                Type type = property.getType();
-                setter.invoke(instance, type.instantiate(record.get(name)));
+                if (setter != null)
+                {
+                    Type type = property.getType();
+                    setter.invoke(instance, type.instantiate(record.get(name)));
+                }
             }
 
             return instance;
