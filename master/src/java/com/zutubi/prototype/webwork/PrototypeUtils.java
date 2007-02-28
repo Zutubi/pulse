@@ -2,6 +2,7 @@ package com.zutubi.prototype.webwork;
 
 import com.zutubi.prototype.type.Type;
 import com.zutubi.prototype.type.TypeProperty;
+import com.zutubi.prototype.type.CompositeType;
 import com.zutubi.prototype.type.record.MutableRecord;
 import com.zutubi.prototype.type.record.Record;
 
@@ -25,7 +26,7 @@ public class PrototypeUtils
      * 
      * @return a record instance containing the parameter data that applies to the map.
      */
-    public static MutableRecord toRecord(Type type, Map<String, String[]> parameters)
+    public static MutableRecord toRecord(CompositeType type, Map<String, String[]> parameters)
     {
         MutableRecord record = new MutableRecord();
         record.setSymbolicName(type.getSymbolicName());

@@ -74,21 +74,6 @@ public class PrimitiveType extends AbstractType implements Type
         throw new RuntimeException("not yet implemented.");
     }
 
-    public List<TypeProperty> getProperties()
-    {
-        return Collections.EMPTY_LIST;
-    }
-
-    public TypeProperty getProperty(String name)
-    {
-        return null;
-    }
-
-    public List<TypeProperty> getProperties(Class<? extends Type> type)
-    {
-        return Collections.EMPTY_LIST;
-    }
-
     public void setRecord(String path, Record record, RecordManager recordManager)
     {
         throw new RuntimeException("Method not implemented.");

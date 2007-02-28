@@ -5,6 +5,7 @@ import com.zutubi.prototype.type.record.Record;
 import com.zutubi.prototype.type.TypeRegistry;
 import com.zutubi.prototype.type.Type;
 import com.zutubi.prototype.type.TypeException;
+import com.zutubi.prototype.type.CompositeType;
 
 /**
  *
@@ -18,7 +19,7 @@ public class SummaryColumnDescriptor extends ColumnDescriptor
     {
         try
         {
-            Type type = typeRegistry.getType(record.getSymbolicName());
+            CompositeType type = typeRegistry.getType(record.getSymbolicName());
             Object instance = type.instantiate(record);
 
             Column c = new Column();

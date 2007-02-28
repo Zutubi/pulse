@@ -1,6 +1,7 @@
 package com.zutubi.prototype.wizard;
 
 import com.zutubi.prototype.type.Type;
+import com.zutubi.prototype.type.CompositeType;
 import com.zutubi.prototype.type.record.MutableRecord;
 import com.zutubi.prototype.type.record.TemplateRecord;
 
@@ -21,7 +22,7 @@ public interface WizardState
      * The type of the data represented by this wizard state.
      * @return
      */
-    Type getType();
+    CompositeType getType();
 
     /**
      * The record containing the data within this wizard state.

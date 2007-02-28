@@ -14,16 +14,6 @@ public class TableDescriptorFactory
 {
     private TypeRegistry typeRegistry;
 
-    public TableDescriptor createDescriptor(String symbolicName) throws TypeException
-    {
-        Type type = typeRegistry.getType(symbolicName);
-        if (type instanceof CollectionType)
-        {
-            return createTableDescriptor((CollectionType) type);
-        }
-        return null;
-    }
-
     public TableDescriptor createTableDescriptor(CollectionType type) throws TypeException
     {
         TableDescriptor tableDescriptor = new TableDescriptor();

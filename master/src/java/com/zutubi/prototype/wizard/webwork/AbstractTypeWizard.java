@@ -27,32 +27,28 @@ public abstract class AbstractTypeWizard implements Wizard
 
     protected LinkedList<WizardState> wizardStates = new LinkedList<WizardState>();
 
-    protected void addWizardStates(List<WizardState> wizardStates, Type type, TemplateRecord templateRecord)
+    protected void addWizardStates(List<WizardState> wizardStates, CompositeType type, TemplateRecord templateRecord)
     {
         // this extension thing is a little awkward, makes sense in theory, but a little awkward in practice
-        if (type instanceof CompositeType)
+        if (ConfigurationExtension.class.isAssignableFrom(type.getClazz()))
         {
-            CompositeType ctype = (CompositeType) type;
-            if (ConfigurationExtension.class.isAssignableFrom(ctype.getClazz()))
+            if (type.getExtensions().size() > 1)
             {
-                if (ctype.getExtensions().size() > 1)
-                {
-                    TwoStepWizardState state = new TwoStepWizardState(type, templateRecord);
-                    state.setTypeRegistry(typeRegistry);
-                    wizardStates.add(state.getFirstState());
-                    wizardStates.add(state.getSecondState());
-                }
-                else
-                {
-                    SingleStepWizardState singleStepState = new SingleStepWizardState(type, templateRecord);
-                    wizardStates.add(singleStepState);
-                }
+                TwoStepWizardState state = new TwoStepWizardState(type, templateRecord);
+                state.setTypeRegistry(typeRegistry);
+                wizardStates.add(state.getFirstState());
+                wizardStates.add(state.getSecondState());
             }
             else
             {
                 SingleStepWizardState singleStepState = new SingleStepWizardState(type, templateRecord);
                 wizardStates.add(singleStepState);
             }
+        }
+        else
+        {
+            SingleStepWizardState singleStepState = new SingleStepWizardState(type, templateRecord);
+            wizardStates.add(singleStepState);
         }
     }
 
@@ -149,7 +145,7 @@ public abstract class AbstractTypeWizard implements Wizard
         /**
          * Every wizard state / form is represented by a type.
          */
-        private Type type;
+        private CompositeType type;
 
         /**
          * The record stores the persistent data for this wizard state.
@@ -162,7 +158,7 @@ public abstract class AbstractTypeWizard implements Wizard
          * @param type
          * @param record
          */
-        public SingleStepWizardState(Type type, TemplateRecord record)
+        public SingleStepWizardState(CompositeType type, TemplateRecord record)
         {
             this.type = type;
             this.templateRecord = record;
@@ -182,7 +178,7 @@ public abstract class AbstractTypeWizard implements Wizard
          *
          * @return the state type.
          */
-        public Type getType()
+        public CompositeType getType()
         {
             return type;
         }
@@ -213,7 +209,7 @@ public abstract class AbstractTypeWizard implements Wizard
     {
         private TypeRegistry typeRegistry;
 
-        private Type type;
+        private CompositeType type;
 
         private TemplateRecord record;
 
@@ -221,7 +217,7 @@ public abstract class AbstractTypeWizard implements Wizard
 
         private Map<String, MutableRecord> typeRecordCache = new TreeMap<String, MutableRecord>();
 
-        public TwoStepWizardState(Type type, TemplateRecord record)
+        public TwoStepWizardState(CompositeType type, TemplateRecord record)
         {
             this.type = type;
             this.record = record;
@@ -275,7 +271,7 @@ public abstract class AbstractTypeWizard implements Wizard
                 return record;
             }
 
-            public Type getType()
+            public CompositeType getType()
             {
                 return type;
             }
@@ -304,7 +300,7 @@ public abstract class AbstractTypeWizard implements Wizard
                 return record;
             }
 
-            public Type getType()
+            public CompositeType getType()
             {
                 String selectedSymbolicName = getSelectedSymbolicName();
                 return typeRegistry.getType(selectedSymbolicName);

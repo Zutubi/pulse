@@ -12,6 +12,7 @@ import com.zutubi.prototype.type.TypeRegistry;
 import com.zutubi.prototype.type.TypeException;
 import com.zutubi.prototype.type.record.RecordManager;
 import com.zutubi.prototype.type.record.Record;
+import com.zutubi.prototype.type.record.PathUtils;
 import com.zutubi.prototype.annotation.ConfigurationCheck;
 import com.zutubi.pulse.bootstrap.ComponentContext;
 import com.zutubi.pulse.util.StringUtils;
@@ -40,9 +41,9 @@ public class Configuration
     private String targetSymbolicName;
 
     private String path;
-    private List<String> pathElements;
+    private String[] pathElements;
     private String parentPath;
-    private List<String> parentPathElements;
+    private String[] parentPathElements;
     private String currentPath;
     private List<String> simpleProperties = new LinkedList<String>();
     private List<String> nestedProperties = new LinkedList<String>();
@@ -81,21 +82,15 @@ public class Configuration
     public void analyse()
     {
         // load the type defined by the path.
-        pathElements = new LinkedList<String>();
-        StringTokenizer tokens = new StringTokenizer(path, "/", false);
-        while (tokens.hasMoreTokens())
-        {
-            pathElements.add(tokens.nextToken());
-        }
-        if (pathElements.size() == 0)
+        pathElements = PathUtils.getPathElements(path);
+        if (pathElements.length == 0)
         {
             return;
         }
         
-        parentPathElements = pathElements.subList(0, pathElements.size() - 1);
-
-        parentPath = StringUtils.join("/", parentPathElements);
-        currentPath = StringUtils.join("", pathElements.subList(pathElements.size() - 1, pathElements.size()));
+        parentPathElements = PathUtils.getParentPathElements(pathElements);
+        parentPath = PathUtils.getPath(parentPathElements);
+        currentPath = pathElements[pathElements.length - 1];
 
         record = recordManager.load(path);
 
@@ -105,60 +100,58 @@ public class Configuration
 
         typeSymbolicName = type.getSymbolicName();
 
-        targetType = type;
-        if (type instanceof CollectionType)
-        {
-            targetType = ((CollectionType)type).getCollectionType();
-        }
-
+        targetType = configurationPersistenceManager.getTargetType(type);
         targetSymbolicName = targetType.getSymbolicName();
 
-        if (!ConfigurationExtension.class.isAssignableFrom(targetType.getClazz()))
-        {
-            // only show a simple properties form if it is not associated with an extension type.
-            for (String propertyName : targetType.getPropertyNames(PrimitiveType.class))
-            {
-                simpleProperties.add(propertyName);
-            }
-        }
-        for (String propertyName : targetType.getPropertyNames(CompositeType.class))
-        {
-            nestedProperties.add(propertyName);
-        }
-        for (String propertyName : targetType.getPropertyNames(ListType.class))
-        {
-            listProperties.add(propertyName);
-        }
-        for (String propertyName : targetType.getPropertyNames(MapType.class))
-        {
-            mapProperties.add(propertyName);
-        }
         if (targetType instanceof CompositeType)
         {
-            extensions.addAll(((CompositeType)targetType).getExtensions());
-        }
-
-        // where should this happen? maybe it is something that the typeRegistry should be able to handle...
-        // via additional processors..? post processors? .. maybe split the processing into propertyProcessors and
-        // annotation processors ... or something similar..
-        ConfigurationCheck annotation = (ConfigurationCheck) targetType.getAnnotation(ConfigurationCheck.class);
-        if (annotation != null)
-        {
-            try
+            CompositeType ctype = (CompositeType) targetType;
+            if (!ConfigurationExtension.class.isAssignableFrom(targetType.getClazz()))
             {
-                Class checkClass = annotation.value();
-                // ensure that a type is available
-                checkType = typeRegistry.getType(checkClass);
-                if (checkType == null)
+                // only show a simple properties form if it is not associated with an extension type.
+                for (String propertyName : ctype.getPropertyNames(PrimitiveType.class))
                 {
-                    this.checkType = typeRegistry.register(checkClass);
+                    simpleProperties.add(propertyName);
                 }
             }
-            catch (TypeException e)
+            for (String propertyName : ctype.getPropertyNames(CompositeType.class))
             {
-                e.printStackTrace();
+                nestedProperties.add(propertyName);
+            }
+            for (String propertyName : ctype.getPropertyNames(ListType.class))
+            {
+                listProperties.add(propertyName);
+            }
+            for (String propertyName : ctype.getPropertyNames(MapType.class))
+            {
+                mapProperties.add(propertyName);
+            }
+
+            extensions.addAll(((CompositeType)targetType).getExtensions());
+
+            // where should this happen? maybe it is something that the typeRegistry should be able to handle...
+            // via additional processors..? post processors? .. maybe split the processing into propertyProcessors and
+            // annotation processors ... or something similar..
+            ConfigurationCheck annotation = (ConfigurationCheck) targetType.getAnnotation(ConfigurationCheck.class);
+            if (annotation != null)
+            {
+                try
+                {
+                    Class checkClass = annotation.value();
+                    // ensure that a type is available
+                    checkType = typeRegistry.getType(checkClass);
+                    if (checkType == null)
+                    {
+                        this.checkType = typeRegistry.register(checkClass);
+                    }
+                }
+                catch (TypeException e)
+                {
+                    e.printStackTrace();
+                }
             }
         }
+
         configurationCheckAvailable = checkType != null;
     }
 
@@ -192,12 +185,12 @@ public class Configuration
         return currentPath;
     }
 
-    public List<String> getParentPathElements()
+    public String[] getParentPathElements()
     {
         return parentPathElements;
     }
 
-    public List<String> getPathElements()
+    public String[] getPathElements()
     {
         return pathElements;
     }

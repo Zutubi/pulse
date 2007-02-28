@@ -2,10 +2,7 @@ package com.zutubi.prototype;
 
 import com.zutubi.prototype.annotation.AnnotationHandler;
 import com.zutubi.prototype.annotation.Handler;
-import com.zutubi.prototype.type.PrimitiveType;
-import com.zutubi.prototype.type.Type;
-import com.zutubi.prototype.type.TypeProperty;
-import com.zutubi.prototype.type.TypeRegistry;
+import com.zutubi.prototype.type.*;
 import com.zutubi.pulse.core.ObjectFactory;
 import com.zutubi.pulse.util.logging.Logger;
 
@@ -49,17 +46,15 @@ public class FormDescriptorFactory
 
     public FormDescriptor createDescriptor(Class clazz)
     {
-        Type type = typeRegistry.getType(clazz);
-        return createDescriptor(type);
+        return createDescriptor(typeRegistry.getType(clazz));
     }
 
     public FormDescriptor createDescriptor(String symbolicName)
     {
-        Type type = typeRegistry.getType(symbolicName);
-        return createDescriptor(type);
+        return createDescriptor(typeRegistry.getType(symbolicName));
     }
 
-    public FormDescriptor createDescriptor(Type type)
+    public FormDescriptor createDescriptor(CompositeType type)
     {
         FormDescriptor descriptor = new FormDescriptor();
 
@@ -77,7 +72,7 @@ public class FormDescriptorFactory
         return descriptor;
     }
 
-    private List<FieldDescriptor> buildFieldDescriptors(Type type)
+    private List<FieldDescriptor> buildFieldDescriptors(CompositeType type)
     {
         List<FieldDescriptor> fieldDescriptors = new LinkedList<FieldDescriptor>();
 

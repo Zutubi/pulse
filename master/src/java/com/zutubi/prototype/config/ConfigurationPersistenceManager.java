@@ -46,7 +46,7 @@ public class ConfigurationPersistenceManager
 
     /**
      * Retrieve the type definition for the specified path.
-     * 
+     *
      * @param path
      *
      * @return the type definition, or null if none exists.
@@ -60,6 +60,45 @@ public class ConfigurationPersistenceManager
         }
 
         return type;
+    }
+
+    public <T extends Type> T getType(String path, Class<T> typeClass)
+    {
+        Type type = getType(path);
+        if(type == null)
+        {
+            throw new IllegalArgumentException("Invalid path '" + path + "': does not exist");
+        }
+
+        if(!typeClass.isInstance(type))
+        {
+            throw new IllegalArgumentException("Invalid path '" + path + "': references incompatible type (expected '" + typeClass.getName() + "', found '" + type.getClass().getName() + "')");
+        }
+
+        return (T)type;
+    }
+
+    public <T extends Type> T getTargetType(String path, Class<T> typeClass)
+    {
+        Type type = getTargetType(getType(path, Type.class));
+        if(!typeClass.isInstance(type))
+        {
+            throw new IllegalArgumentException("Invalid path '" + path + "': referenced collection contains incompatible type (expected '" + typeClass.getName() + "', found '" + type.getClass().getName() + "')");
+        }
+
+        return (T) type;
+    }
+
+    public Type getTargetType(Type type)
+    {
+        if(type instanceof CollectionType)
+        {
+            return ((CollectionType)type).getCollectionType();
+        }
+        else
+        {
+            return type;
+        }
     }
 
     protected Type getTypeByConfig(String path)
@@ -83,9 +122,9 @@ public class ConfigurationPersistenceManager
                 {
                     type = ((CollectionType)type).getCollectionType();
                 }
-                else
+                else if(type instanceof CompositeType)
                 {
-                    type = getProperty(type, pathElement);
+                    type = getProperty((CompositeType)type, pathElement);
                 }
                 if (type == null)
                 {
@@ -100,7 +139,7 @@ public class ConfigurationPersistenceManager
     {
         // Locate the longest path segment with a record and an associated type.
         String path = fullPath;
-        Type type = null;
+        CompositeType type = null;
         while (path != null)
         {
             Record record = recordManager.load(path);
@@ -126,9 +165,9 @@ public class ConfigurationPersistenceManager
         while (tokens.hasMoreTokens())
         {
             TypeProperty property = type.getProperty(tokens.nextToken());
-            if (property != null)
+            if (property != null && property.getType() instanceof CompositeType)
             {
-                type = property.getType();
+                type = (CompositeType) property.getType();
             }
         }
         return type;
@@ -144,14 +183,15 @@ public class ConfigurationPersistenceManager
             Record record = recordManager.load(path);
             if (record != null)
             {
-                list.addAll(record.keySet());            
+                list.addAll(record.keySet());
             }
         }
         else if (type instanceof CompositeType)
         {
-            list.addAll(type.getPropertyNames(CompositeType.class));
-            list.addAll(type.getPropertyNames(MapType.class));
-            list.addAll(type.getPropertyNames(ListType.class));
+            CompositeType compositeType = (CompositeType) type;
+            list.addAll(compositeType.getPropertyNames(CompositeType.class));
+            list.addAll(compositeType.getPropertyNames(MapType.class));
+            list.addAll(compositeType.getPropertyNames(ListType.class));
             return list;
         }
         return list;
@@ -174,7 +214,7 @@ public class ConfigurationPersistenceManager
             return null;
         }
 
-        Type type = getType(path);
+        CompositeType type = (CompositeType) typeRegistry.getType(record.getSymbolicName());
         if (type != null)
         {
             return type.instantiate(record);
@@ -195,7 +235,7 @@ public class ConfigurationPersistenceManager
      *
      * @see #getType(String)
      *
-     * @throws TypeException 
+     * @throws TypeException
      */
 /*
     public void setInstance(String path, Object obj) throws TypeException
@@ -266,7 +306,7 @@ public class ConfigurationPersistenceManager
 
     public TypeProperty getKeyProperty(Object obj)
     {
-        Type type = typeRegistry.getType(obj.getClass());
+        CompositeType type = (CompositeType) typeRegistry.getType(obj.getClass());
         for (TypeProperty property : type.getProperties(PrimitiveType.class))
         {
             if (property.getAnnotation(ID.class) != null)
@@ -286,7 +326,7 @@ public class ConfigurationPersistenceManager
         return null;
     }
 
-    private Type getProperty(Type type, String path)
+    private Type getProperty(CompositeType type, String path)
     {
         TypeProperty property = type.getProperty(path);
         if (property != null)

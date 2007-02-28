@@ -16,7 +16,7 @@ public class TypeConversionSupport
 
     public void applyToMap(Object instance, Map<String, Object> map) throws TypeException
     {
-        Type type = typeRegistry.getType(instance.getClass());
+        CompositeType type = typeRegistry.getType(instance.getClass());
         if (type == null)
         {
             type = typeRegistry.register(instance.getClass());
@@ -38,7 +38,7 @@ public class TypeConversionSupport
 
     public void applyMapTo(Map<String, Object> map, Object instance) throws TypeException
     {
-        Type type = typeRegistry.getType(instance.getClass());
+        CompositeType type = typeRegistry.getType(instance.getClass());
         if (type == null)
         {
             type = typeRegistry.register(instance.getClass());

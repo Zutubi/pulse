@@ -70,7 +70,7 @@
 </p>
 
 <p>
-    #if($action.configuration.pathElements.size() > 2)
+    #if($action.configuration.pathElements.length > 2)
         <a href="configuration.action?path=${action.configuration.parentPath}">done</a>
     #end
 </p>

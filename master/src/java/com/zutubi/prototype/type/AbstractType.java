@@ -83,35 +83,4 @@ public abstract class AbstractType implements Type
     {
         this.typeRegistry = typeRegistry;
     }
-
-
-    public List<TypeProperty> getProperties()
-    {
-        return Collections.EMPTY_LIST;
-    }
-
-    public TypeProperty getProperty(String name)
-    {
-        return null;
-    }
-
-    public List<TypeProperty> getProperties(Class<? extends Type> type)
-    {
-        return Collections.EMPTY_LIST;
-    }
-
-    public List<String> getPropertyNames()
-    {
-        return Collections.EMPTY_LIST;
-    }
-
-    public List<String> getPropertyNames(Class<? extends Type> type)
-    {
-        return Collections.EMPTY_LIST;
-    }
-
-    public boolean hasProperty(String propertyName)
-    {
-        return false;
-    }
 }

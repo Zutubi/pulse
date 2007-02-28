@@ -22,14 +22,15 @@ public class TypeRegistry
 {
     private static final Class[] BUILT_IN_TYPES = {Boolean.class, Boolean.TYPE, Byte.class, Byte.TYPE, Character.class, Character.TYPE, Double.class, Double.TYPE, Float.class, Float.TYPE, Integer.class, Integer.TYPE, Long.class, Long.TYPE, Short.class, Short.TYPE, String.class};
 
-    private Map<String, Type> symbolicNameMapping = new HashMap<String, Type>();
+    private Map<String, CompositeType> symbolicNameMapping = new HashMap<String, CompositeType>();
 
-    private Map<Class, Type> classMapping = new HashMap<Class, Type>();
+    private Map<Class, CompositeType> classMapping = new HashMap<Class, CompositeType>();
+    private Map<Class, PrimitiveType> primitiveMapping = new HashMap<Class, PrimitiveType>();
 
     public TypeRegistry()
     {
         // setup internal built-in types.
-        List<Type> builtInTypes = new LinkedList<Type>();
+        List<PrimitiveType> builtInTypes = new LinkedList<PrimitiveType>();
         builtInTypes.add(new PrimitiveType(Boolean.class, "Boolean"));
         builtInTypes.add(new PrimitiveType(Boolean.TYPE, "boolean"));
         builtInTypes.add(new PrimitiveType(Byte.class, "Byte"));
@@ -48,20 +49,19 @@ public class TypeRegistry
         builtInTypes.add(new PrimitiveType(Short.TYPE, "short"));
         builtInTypes.add(new PrimitiveType(String.class, "String"));
 
-        for (Type type : builtInTypes)
+        for (PrimitiveType type : builtInTypes)
         {
-            classMapping.put(type.getClazz(), type);
-            symbolicNameMapping.put(type.getSymbolicName(), type);
-            ((AbstractType) type).setTypeRegistry(this);
+            primitiveMapping.put(type.getClazz(), type);
+            type.setTypeRegistry(this);
         }
     }
 
-    public Type register(Class clazz) throws TypeException
+    public CompositeType register(Class clazz) throws TypeException
     {
         return register(null, clazz);
     }
 
-    public Type register(String symbolicName, Class clazz) throws TypeException
+    public CompositeType register(String symbolicName, Class clazz) throws TypeException
     {
         if (symbolicName != null && symbolicNameMapping.containsKey(symbolicName))
         {
@@ -69,23 +69,21 @@ public class TypeRegistry
                     "to a different type " + clazz.getName());
         }
 
-        Type type = classMapping.get(clazz);
+        CompositeType type = classMapping.get(clazz);
         if (type == null)
         {
-            CompositeType ctype = new CompositeType(clazz, symbolicName);
-            classMapping.put(clazz, ctype);
+            type = new CompositeType(clazz, symbolicName);
+            classMapping.put(clazz, type);
 
             try
             {
-                buildType(ctype);
+                buildType(type);
             }
             catch (RuntimeException e)
             {
                 classMapping.remove(clazz);
                 throw e;
             }
-            
-            type = ctype;
         }
 
         if (symbolicName != null)
@@ -96,7 +94,7 @@ public class TypeRegistry
         return type;
     }
 
-    public Type register(String symbolicName, Type type) throws TypeException
+    public CompositeType register(String symbolicName, CompositeType type) throws TypeException
     {
         if (symbolicNameMapping.containsKey(symbolicName))
         {
@@ -139,7 +137,11 @@ public class TypeRegistry
                 if (type instanceof Class)
                 {
                     Class clazz = (Class) type;
-                    if (classMapping.containsKey(clazz))
+                    if (primitiveMapping.containsKey(clazz))
+                    {
+                        property.setType(primitiveMapping.get(clazz));
+                    }
+                    else if (classMapping.containsKey(clazz))
                     {
                         property.setType(classMapping.get(clazz));
                     }
@@ -193,12 +195,12 @@ public class TypeRegistry
         }
     }
 
-    public Type getType(String symbolicName)
+    public CompositeType getType(String symbolicName)
     {
         return symbolicNameMapping.get(symbolicName);
     }
 
-    public Type getType(Class type)
+    public CompositeType getType(Class type)
     {
         return classMapping.get(type);
     }

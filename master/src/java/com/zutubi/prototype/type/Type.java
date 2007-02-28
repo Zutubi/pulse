@@ -45,53 +45,5 @@ public interface Type
 
     String getSymbolicName();
 
-    /**
-     * Get a list of this types properties.
-     * 
-     * @return
-     */
-    List<TypeProperty> getProperties();
-
-    /**
-     * Get a list of this types property names.
-     *
-     * @return
-     */
-    List<String> getPropertyNames();
-
-    /**
-     * Retrieve this types named property.
-     *
-     * @param name
-     *
-     * @return
-     */
-    TypeProperty getProperty(String name);
-
-    /**
-     * Retrieve a list of properties that are of the specified type.
-     *
-     * @param type
-     * 
-     * @return
-     */
-    List<TypeProperty> getProperties(Class<? extends Type> type);
-
-    /**
-     * Retrive a list of property names for all properties of the specified type.
-     *
-     * @param type
-     * 
-     * @return
-     */
-    List<String> getPropertyNames(Class<? extends Type> type);
-
-    /**
-     * Returns true if this type has a property with the specified name.
-     * @param propertyName
-     * @return
-     */
-    boolean hasProperty(String propertyName);
-
     void setRecord(String path, Record record, RecordManager recordManager);
 }

@@ -1,10 +1,7 @@
 package com.zutubi.prototype.wizard.webwork;
 
 import com.zutubi.prototype.config.ConfigurationPersistenceManager;
-import com.zutubi.prototype.type.CollectionType;
-import com.zutubi.prototype.type.Type;
-import com.zutubi.prototype.type.TypeProperty;
-import com.zutubi.prototype.type.TypeRegistry;
+import com.zutubi.prototype.type.*;
 import com.zutubi.prototype.type.record.MutableRecord;
 import com.zutubi.prototype.type.record.Record;
 import com.zutubi.prototype.type.record.TemplateRecord;
@@ -48,19 +45,15 @@ public class ConfigureProjectWizard extends AbstractTypeWizard
         // the path at which we are storing this data, the path that triggers this wizard, is project
         String basePath = "project";
 
-        Map<String, Type> wizardTypes = new HashMap<String, Type>();
+        Map<String, CompositeType> wizardTypes = new HashMap<String, CompositeType>();
 
-        Type type = configurationPersistenceManager.getType(basePath);
-        if (type instanceof CollectionType)
-        {
-            type = ((CollectionType) type).getCollectionType();
-        }
+        CompositeType type = configurationPersistenceManager.getTargetType(basePath, CompositeType.class);
 
         // the types associated with the paths that require configuration are determined as follows:
         for (String propertyPath : paths)
         {
             TypeProperty property = type.getProperty(propertyPath);
-            wizardTypes.put(propertyPath, property.getType());
+            wizardTypes.put(propertyPath, (CompositeType) property.getType());
         }
 
         // these wizard types now define the UI forms that we will be seeing.
@@ -77,7 +70,7 @@ public class ConfigureProjectWizard extends AbstractTypeWizard
         wizardStates = new LinkedList<WizardState>();
         for (String propertyPath : paths)
         {
-            Type propertyType = wizardTypes.get(propertyPath);
+            CompositeType propertyType = wizardTypes.get(propertyPath);
 
             TemplateRecord stateTemplateRecord = (TemplateRecord) templateRecord.get(propertyPath);
 

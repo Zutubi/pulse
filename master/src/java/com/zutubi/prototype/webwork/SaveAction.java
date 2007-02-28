@@ -5,6 +5,7 @@ import com.opensymphony.xwork.ActionContext;
 import com.zutubi.prototype.type.Type;
 import com.zutubi.prototype.type.TypeException;
 import com.zutubi.prototype.type.TypeRegistry;
+import com.zutubi.prototype.type.CompositeType;
 import com.zutubi.prototype.type.record.MutableRecord;
 import com.zutubi.prototype.type.record.Record;
 import com.zutubi.pulse.validation.MessagesTextProvider;
@@ -54,7 +55,7 @@ public class SaveAction extends ActionSupport
             return INPUT;
         }
 
-        Type type = typeRegistry.getType(symbolicName);
+        CompositeType type = typeRegistry.getType(symbolicName);
         if (type == null)
         {
             return ERROR;

@@ -1,8 +1,7 @@
 package com.zutubi.prototype.wizard.webwork;
 
 import com.zutubi.prototype.config.ConfigurationPersistenceManager;
-import com.zutubi.prototype.type.CollectionType;
-import com.zutubi.prototype.type.Type;
+import com.zutubi.prototype.type.CompositeType;
 import com.zutubi.prototype.type.record.MutableRecord;
 import com.zutubi.prototype.type.record.TemplateRecord;
 import com.zutubi.pulse.util.logging.Logger;
@@ -28,11 +27,7 @@ public class SingleTypeWizard extends AbstractTypeWizard
 
     public void initialise()
     {
-        Type type = configurationPersistenceManager.getType(path);
-        if (type instanceof CollectionType)
-        {
-            type = ((CollectionType) type).getCollectionType();
-        }
+        CompositeType type = configurationPersistenceManager.getTargetType(path, CompositeType.class);
 
         LOG.warning("TODO: load template record for path: " + path + ", currently using empty template record.");
         

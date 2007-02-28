@@ -94,7 +94,7 @@
 #end
 
 <p>
-    #if($config.pathElements.size() > 1)
+    #if($config.pathElements.length > 1)
         <a href="configuration.action?path=${config.parentPath}">done</a>
     #end
 </p>
