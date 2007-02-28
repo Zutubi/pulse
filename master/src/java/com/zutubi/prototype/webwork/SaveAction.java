@@ -2,19 +2,15 @@ package com.zutubi.prototype.webwork;
 
 import com.opensymphony.util.TextUtils;
 import com.opensymphony.xwork.ActionContext;
+import com.zutubi.prototype.config.ConfigurationPersistenceManager;
+import com.zutubi.prototype.type.CompositeType;
 import com.zutubi.prototype.type.Type;
 import com.zutubi.prototype.type.TypeException;
 import com.zutubi.prototype.type.TypeRegistry;
-import com.zutubi.prototype.type.CompositeType;
-import com.zutubi.prototype.type.record.MutableRecord;
 import com.zutubi.prototype.type.record.Record;
 import com.zutubi.pulse.validation.MessagesTextProvider;
 import com.zutubi.pulse.web.ActionSupport;
-import com.zutubi.validation.DelegatingValidationContext;
-import com.zutubi.validation.ValidationContext;
-import com.zutubi.validation.ValidationException;
-import com.zutubi.validation.ValidationManager;
-import com.zutubi.validation.XWorkValidationAdapter;
+import com.zutubi.validation.*;
 
 /**
  *
@@ -22,6 +18,7 @@ import com.zutubi.validation.XWorkValidationAdapter;
  */
 public class SaveAction extends ActionSupport
 {
+    private ConfigurationPersistenceManager configurationPersistenceManager;
     private TypeRegistry typeRegistry;
     private ValidationManager validationManager;
 
@@ -61,11 +58,13 @@ public class SaveAction extends ActionSupport
             return ERROR;
         }
 
-        MutableRecord record = PrototypeUtils.toRecord(type, ActionContext.getContext().getParameters());
-        if (validate(record))
+        Record record = PrototypeUtils.toRecord(type, ActionContext.getContext().getParameters());
+        if (!validate(record))
         {
             return INPUT;
         }
+
+        configurationPersistenceManager.updateRecord(path, record);
 
         return SUCCESS;
     }
@@ -111,5 +110,10 @@ public class SaveAction extends ActionSupport
     public void setValidationManager(ValidationManager validationManager)
     {
         this.validationManager = validationManager;
+    }
+
+    public void setConfigurationPersistenceManager(ConfigurationPersistenceManager configurationPersistenceManager)
+    {
+        this.configurationPersistenceManager = configurationPersistenceManager;
     }
 }

@@ -1,13 +1,7 @@
 package com.zutubi.prototype.config;
 
-import com.zutubi.prototype.type.CollectionType;
-import com.zutubi.prototype.type.CompositeType;
-import com.zutubi.prototype.type.Type;
-import com.zutubi.prototype.type.TypeException;
-import com.zutubi.prototype.type.TypeRegistry;
-import com.zutubi.prototype.type.record.MutableRecord;
+import com.zutubi.prototype.type.*;
 import com.zutubi.prototype.type.record.RecordManager;
-import com.zutubi.prototype.type.record.Record;
 import junit.framework.TestCase;
 
 import java.util.List;
@@ -41,7 +35,7 @@ public class ConfigurationPersistenceManagerTest extends TestCase
         recordManager = null;
         typeRegistry = null;
         manager = null;
-        
+
         super.tearDown();
     }
 
@@ -53,7 +47,7 @@ public class ConfigurationPersistenceManagerTest extends TestCase
 
         Type type = (Type) manager.getType("simple");
         assertEquals(SimpleObject.class, type.getClazz());
-        
+
         assertNull(manager.getType("unknown"));
     }
 
@@ -91,10 +85,10 @@ public class ConfigurationPersistenceManagerTest extends TestCase
         Type type = (Type) manager.getType("simpleCollection");
         assertEquals(SimpleCollectionObject.class, type.getClazz());
 
-        type = (Type)manager.getType("simpleCollection/simpleList");
+        type = (Type) manager.getType("simpleCollection/simpleList");
         assertTrue(type instanceof CollectionType);
 
-        type = ((CollectionType)type).getCollectionType();
+        type = ((CollectionType) type).getCollectionType();
         assertTrue(type instanceof CompositeType);
         assertEquals(SimpleObject.class, type.getClazz());
     }

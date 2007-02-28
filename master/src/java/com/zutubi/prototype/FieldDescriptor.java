@@ -59,7 +59,7 @@ public class FieldDescriptor implements Descriptor
         field.setLabel(getName() + ".label");
         field.addAll(getParameters());
 
-        if (field.getValue() != null)
+        if (field.getValue() == null)
         {
             if (instance != null)
             {

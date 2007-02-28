@@ -1,18 +1,17 @@
 package com.zutubi.prototype.type.record;
 
-import java.util.Map;
-import java.util.HashMap;
-import java.util.Set;
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * Simple record that holds key:value data, along with meta data.
- *
  */
 public class MutableRecord implements Record
 {
     private Map<String, String> meta = new HashMap<String, String>();
-    
+
     private Map<String, Object> data = new HashMap<String, Object>();
 
     public MutableRecord()
@@ -125,11 +124,11 @@ public class MutableRecord implements Record
             Object value = entry.getValue();
             if (value instanceof String)
             {
-                value = new String((String)value);
+                value = new String((String) value);
             }
-            else if (value instanceof MutableRecord)
+            else if (value instanceof Record)
             {
-                value = ((Record)value).clone();
+                value = ((Record) value).clone();
             }
             clone.put(key, value);
         }
@@ -149,7 +148,7 @@ public class MutableRecord implements Record
         }
 
         newData.putAll(record);
-        
+
         data.clear();
         data.putAll(newData);
 

@@ -1,11 +1,10 @@
 package com.zutubi.prototype;
 
 import com.zutubi.prototype.model.Column;
-import com.zutubi.prototype.type.record.Record;
-import com.zutubi.prototype.type.TypeRegistry;
-import com.zutubi.prototype.type.Type;
-import com.zutubi.prototype.type.TypeException;
 import com.zutubi.prototype.type.CompositeType;
+import com.zutubi.prototype.type.TypeException;
+import com.zutubi.prototype.type.TypeRegistry;
+import com.zutubi.prototype.type.record.Record;
 
 /**
  *
@@ -14,6 +13,11 @@ import com.zutubi.prototype.type.CompositeType;
 public class SummaryColumnDescriptor extends ColumnDescriptor
 {
     private TypeRegistry typeRegistry;
+
+    public SummaryColumnDescriptor(TypeRegistry typeRegistry)
+    {
+        this.typeRegistry = typeRegistry;
+    }
 
     public Column instantiate(Record record)
     {

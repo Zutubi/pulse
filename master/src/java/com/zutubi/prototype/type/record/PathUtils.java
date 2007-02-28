@@ -18,7 +18,7 @@ public class PathUtils
     public static String[] getPathElements(String path, boolean allowEmpty)
     {
         String[] elements = path.split(SEPARATOR);
-        if(!allowEmpty)
+        if (!allowEmpty)
         {
             elements = CollectionUtils.filterToArray(elements, new Predicate<String>()
             {
@@ -40,7 +40,7 @@ public class PathUtils
     private static String[] getParentPathElements(String path, boolean allowEmpty)
     {
         String[] elements = getPathElements(path, allowEmpty);
-        if(elements.length == 0)
+        if (elements.length == 0)
         {
             return null;
         }
@@ -57,7 +57,7 @@ public class PathUtils
         return parent;
     }
 
-    public static String getPath(String[] pathElements)
+    public static String getPath(String... pathElements)
     {
         return StringUtils.join(SEPARATOR, pathElements);
     }

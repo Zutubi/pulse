@@ -1,9 +1,11 @@
 package com.zutubi.prototype.wizard.webwork;
 
-import com.zutubi.prototype.type.*;
-import com.zutubi.prototype.type.record.TemplateRecord;
-import com.zutubi.prototype.type.record.MutableRecord;
+import com.zutubi.prototype.type.CompositeType;
+import com.zutubi.prototype.type.PrimitiveType;
+import com.zutubi.prototype.type.TypeProperty;
+import com.zutubi.prototype.type.TypeRegistry;
 import com.zutubi.prototype.type.record.Record;
+import com.zutubi.prototype.type.record.TemplateRecord;
 import com.zutubi.prototype.wizard.Wizard;
 import com.zutubi.prototype.wizard.WizardState;
 import com.zutubi.prototype.wizard.WizardTransition;
@@ -25,9 +27,11 @@ public abstract class AbstractTypeWizard implements Wizard
 
     protected WizardState currentState;
 
+    protected String successPath;
+
     protected LinkedList<WizardState> wizardStates = new LinkedList<WizardState>();
 
-    protected void addWizardStates(List<WizardState> wizardStates, CompositeType type, TemplateRecord templateRecord)
+    protected WizardState addWizardStates(List<WizardState> wizardStates, CompositeType type, TemplateRecord templateRecord)
     {
         // this extension thing is a little awkward, makes sense in theory, but a little awkward in practice
         if (ConfigurationExtension.class.isAssignableFrom(type.getClazz()))
@@ -50,11 +54,18 @@ public abstract class AbstractTypeWizard implements Wizard
             SingleStepWizardState singleStepState = new SingleStepWizardState(type, templateRecord);
             wizardStates.add(singleStepState);
         }
+
+        return wizardStates.get(wizardStates.size() - 1);
     }
 
     public WizardState getCurrentState()
     {
         return currentState;
+    }
+
+    public String getSuccessPath()
+    {
+        return successPath;
     }
 
     public List<WizardTransition> getAvailableActions()
@@ -147,12 +158,9 @@ public abstract class AbstractTypeWizard implements Wizard
          */
         private CompositeType type;
 
-        /**
-         * The record stores the persistent data for this wizard state.
-         */
         private TemplateRecord templateRecord;
 
-        private MutableRecord record = new MutableRecord();
+        private Record record = null;
 
         /**
          * @param type
@@ -162,6 +170,7 @@ public abstract class AbstractTypeWizard implements Wizard
         {
             this.type = type;
             this.templateRecord = record;
+            this.record = type.createNewRecord();
 
             // extract initial values from the template record.
             if (record != null)
@@ -183,18 +192,12 @@ public abstract class AbstractTypeWizard implements Wizard
             return type;
         }
 
-        /**
-         * The record of data for this state.  It is from the record that form fields are pre populated
-         * and data is recorded.
-         *
-         * @return the state record.
-         */
         public TemplateRecord getTemplateRecord()
         {
             return templateRecord;
         }
 
-        public MutableRecord getRecord()
+        public Record getRecord()
         {
             return record;
         }
@@ -213,14 +216,15 @@ public abstract class AbstractTypeWizard implements Wizard
 
         private TemplateRecord record;
 
-        private MutableRecord selectionRecord = new MutableRecord();
+        private Record selectionRecord;
 
-        private Map<String, MutableRecord> typeRecordCache = new TreeMap<String, MutableRecord>();
+        private Map<String, Record> typeRecordCache = new TreeMap<String, Record>();
 
         public TwoStepWizardState(CompositeType type, TemplateRecord record)
         {
             this.type = type;
             this.record = record;
+            this.selectionRecord = type.createNewRecord();
         }
 
         /**
@@ -276,7 +280,7 @@ public abstract class AbstractTypeWizard implements Wizard
                 return type;
             }
 
-            public MutableRecord getRecord()
+            public Record getRecord()
             {
                 return selectionRecord;
             }
@@ -290,7 +294,7 @@ public abstract class AbstractTypeWizard implements Wizard
                 // initialise the states data using the template record if it exists.
                 if (record != null)
                 {
-                    MutableRecord data = record.flatten();
+                    Record data = record.flatten();
                     typeRecordCache.put(type.getSymbolicName(), data);
                 }
             }
@@ -306,13 +310,13 @@ public abstract class AbstractTypeWizard implements Wizard
                 return typeRegistry.getType(selectedSymbolicName);
             }
 
-            public MutableRecord getRecord()
+            public Record getRecord()
             {
                 String selectedSymbolicName = getSelectedSymbolicName();
                 if (!typeRecordCache.containsKey(selectedSymbolicName))
                 {
-                    MutableRecord r = new MutableRecord();
-                    r.setSymbolicName(selectedSymbolicName);
+                    CompositeType selectedType = typeRegistry.getType(selectedSymbolicName);
+                    Record r = selectedType.createNewRecord();
                     typeRecordCache.put(selectedSymbolicName, r);
                 }
                 return typeRecordCache.get(selectedSymbolicName);

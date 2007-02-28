@@ -1,11 +1,7 @@
 package com.zutubi.prototype.type;
 
-import com.zutubi.prototype.type.record.MutableRecord;
 import com.zutubi.prototype.type.record.Record;
-import com.zutubi.prototype.type.record.RecordManager;
 
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -42,31 +38,21 @@ public class ListType extends CollectionType
             throw new TypeConversionException("Expected a map type, instead received " + data.getClass());
         }
 
-        Record record = (Record)data;
-        
-        // read list order meta-data
+        Record record = (Record) data;
 
-        List<String> keys = new LinkedList<String>(record.keySet());
-        Collections.sort(keys, new Comparator<String>()
-        {
-            public int compare(String o1, String o2)
-            {
-                return Integer.valueOf(o1).compareTo(Integer.valueOf(o2));
-            }
-        });
-
+        Iterable<String> keys = getOrder(record);
         Type defaultType = getCollectionType();
         if (defaultType == null && record.getMeta("type") != null)
         {
             defaultType = typeRegistry.getType(record.getMeta("type"));
         }
 
-        List<Object> instance = instantiate();
+        List<Object> instance = new LinkedList<Object>();
         for (String key : keys)
         {
             Object child = record.get(key);
             Type type = defaultType;
-            if (child instanceof MutableRecord)
+            if (child instanceof Record)
             {
                 Record childRecord = (Record) child;
                 type = typeRegistry.getType(childRecord.getSymbolicName());
@@ -75,15 +61,5 @@ public class ListType extends CollectionType
             instance.add(value);
         }
         return instance;
-    }
-
-    public List<Object> instantiate() throws TypeConversionException
-    {
-        return new LinkedList<Object>();
-    }
-
-    public void setRecord(String path, Record record, RecordManager recordManager)
-    {
-        throw new RuntimeException("Method not implemented.");
     }
 }

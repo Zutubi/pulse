@@ -1,11 +1,14 @@
 package com.zutubi.prototype.wizard.webwork;
 
 import com.zutubi.prototype.config.ConfigurationPersistenceManager;
-import com.zutubi.prototype.type.*;
+import com.zutubi.prototype.type.CompositeType;
+import com.zutubi.prototype.type.TypeProperty;
+import com.zutubi.prototype.type.TypeRegistry;
 import com.zutubi.prototype.type.record.MutableRecord;
 import com.zutubi.prototype.type.record.Record;
 import com.zutubi.prototype.type.record.TemplateRecord;
 import com.zutubi.prototype.wizard.WizardState;
+import com.zutubi.pulse.model.ProjectManager;
 import com.zutubi.pulse.util.logging.Logger;
 
 import java.util.HashMap;
@@ -20,13 +23,18 @@ public class ConfigureProjectWizard extends AbstractTypeWizard
 {
     private static final Logger LOG = Logger.getLogger(ConfigureProjectWizard.class);
 
+    private static final String[] PATHS = new String[]{"general", "scm", "type"};
+
     private ConfigurationPersistenceManager configurationPersistenceManager;
 
     private long parentId;
 
-    private Record record;
-
     private static final TemplateRecord EMPTY_RECORD = new TemplateRecord("empty", null, new MutableRecord());
+    private ProjectManager projectManager;
+
+    private Map<String, WizardState> recordStates = new HashMap<String, WizardState>();
+    private String path;
+    private CompositeType projectType;
 
     public void initialise()
     {
@@ -40,19 +48,17 @@ public class ConfigureProjectWizard extends AbstractTypeWizard
         // b) the scm type
         // c) and the project type.
 
-        String[] paths = new String[]{"general", "scm", "type"};
-
         // the path at which we are storing this data, the path that triggers this wizard, is project
         String basePath = "project";
 
         Map<String, CompositeType> wizardTypes = new HashMap<String, CompositeType>();
 
-        CompositeType type = configurationPersistenceManager.getTargetType(basePath, CompositeType.class);
+        projectType = configurationPersistenceManager.getTargetType(basePath, CompositeType.class);
 
         // the types associated with the paths that require configuration are determined as follows:
-        for (String propertyPath : paths)
+        for (String propertyPath : PATHS)
         {
-            TypeProperty property = type.getProperty(propertyPath);
+            TypeProperty property = projectType.getProperty(propertyPath);
             wizardTypes.put(propertyPath, (CompositeType) property.getType());
         }
 
@@ -66,16 +72,15 @@ public class ConfigureProjectWizard extends AbstractTypeWizard
         // they contain small wizards themselves.
 
         // So, now we want to initialise this wizard with the information that we have.
-
         wizardStates = new LinkedList<WizardState>();
-        for (String propertyPath : paths)
+        for (String propertyPath : PATHS)
         {
             CompositeType propertyType = wizardTypes.get(propertyPath);
 
             TemplateRecord stateTemplateRecord = (TemplateRecord) templateRecord.get(propertyPath);
 
             // convert the type into wizard state(s).
-            addWizardStates(wizardStates, propertyType, stateTemplateRecord);
+            recordStates.put(propertyPath, addWizardStates(wizardStates, propertyType, stateTemplateRecord));
         }
 
         currentState = wizardStates.getFirst();
@@ -94,9 +99,14 @@ public class ConfigureProjectWizard extends AbstractTypeWizard
         // we do not know the project id that will be used to reference this project.  Maybe we should leave that up to
         // the dude that understands the project/ scope and how it relates to the external world.  If that is the case,
         // then we just store this baby.
+        Record record = projectType.createNewRecord();
 
-        // persist("project", record);
+        for (Map.Entry<String, WizardState> entry : recordStates.entrySet())
+        {
+            record.put(entry.getKey(), entry.getValue().getRecord());
+        }
 
+        successPath = configurationPersistenceManager.insertRecord("project", record);
     }
 
     /**
@@ -118,5 +128,10 @@ public class ConfigureProjectWizard extends AbstractTypeWizard
     public void setTypeRegistry(TypeRegistry typeRegistry)
     {
         this.typeRegistry = typeRegistry;
+    }
+
+    public void setProjectManager(ProjectManager projectManager)
+    {
+        this.projectManager = projectManager;
     }
 }

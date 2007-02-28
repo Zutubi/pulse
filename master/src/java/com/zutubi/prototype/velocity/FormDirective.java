@@ -4,6 +4,7 @@ import com.zutubi.prototype.FieldDescriptor;
 import com.zutubi.prototype.FormDescriptor;
 import com.zutubi.prototype.freemarker.GetTextMethod;
 import com.zutubi.prototype.model.Form;
+import com.zutubi.prototype.type.CompositeType;
 import com.zutubi.prototype.type.Type;
 import com.zutubi.prototype.type.TypeException;
 import com.zutubi.prototype.type.record.Record;
@@ -42,7 +43,7 @@ public class FormDirective extends PrototypeDirective
 
     /**
      * The generated forms action attribute.
-     * 
+     *
      * @param action attribute
      */
     public void setAction(String action)
@@ -52,16 +53,17 @@ public class FormDirective extends PrototypeDirective
 
     public String doRender(Type type) throws IOException, ParseErrorException, TypeException
     {
+        CompositeType ctype = (CompositeType) type;
         Record data = configurationPersistenceManager.getRecord(path);
 
-        FormDescriptor formDescriptor = formDescriptorFactory.createDescriptor(type.getSymbolicName());
+        FormDescriptor formDescriptor = formDescriptorFactory.createDescriptor(ctype.getSymbolicName());
 
         // decorate the form to include the symbolic name as a hidden field. This is necessary for
         // configuration. This is probably not the best place for this, but until i think of a better location,
         // here it stays.
         FieldDescriptor hiddenFieldDescriptor = new FieldDescriptor();
         hiddenFieldDescriptor.setName("symbolicName");
-        hiddenFieldDescriptor.addParameter("value", type.getSymbolicName());
+        hiddenFieldDescriptor.addParameter("value", ctype.getSymbolicName());
         hiddenFieldDescriptor.addParameter("type", "hidden");
         formDescriptor.add(hiddenFieldDescriptor);
 
@@ -77,7 +79,7 @@ public class FormDirective extends PrototypeDirective
             // handle rendering of the freemarker template.
             StringWriter writer = new StringWriter();
 
-            Messages messages = Messages.getInstance(type.getClazz());
+            Messages messages = Messages.getInstance(ctype.getClazz());
 
             context.put("i18nText", new GetTextMethod(messages));
 

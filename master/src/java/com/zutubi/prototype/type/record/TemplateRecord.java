@@ -69,10 +69,10 @@ public class TemplateRecord implements Record
     {
         Object value = moi.get(key);
 
-        if(value instanceof Record)
+        if (value instanceof Record)
         {
             Object inherited = parent == null ? null : parent.get(key);
-            return new TemplateRecord(owner, (TemplateRecord)inherited, (Record)value);
+            return new TemplateRecord(owner, (TemplateRecord) inherited, (Record) value);
         }
 
         return value;
@@ -97,7 +97,7 @@ public class TemplateRecord implements Record
     {
         // I don't suppose we'll actually use this ...
         moi.clear();
-        if(parent != null)
+        if (parent != null)
         {
             parent.clear();
         }
@@ -131,15 +131,8 @@ public class TemplateRecord implements Record
         return null;
     }
 
-    /**
-     * Would be nice to have a flattened view of the template information, since this is the view
-     * that will be commonly used when displaying forms. 
-     *
-     * @return a flattened record view of this template record.
-     */
     public MutableRecord flatten()
     {
-        // do not forget that this needs to set the template records symbolic details.
         return new MutableRecord();
     }
 }

@@ -1,9 +1,7 @@
 package com.zutubi.prototype.webwork;
 
-import com.zutubi.prototype.type.Type;
-import com.zutubi.prototype.type.TypeProperty;
 import com.zutubi.prototype.type.CompositeType;
-import com.zutubi.prototype.type.record.MutableRecord;
+import com.zutubi.prototype.type.TypeProperty;
 import com.zutubi.prototype.type.record.Record;
 
 import java.util.List;
@@ -17,18 +15,17 @@ public class PrototypeUtils
 {
     /**
      * Convert the parameters from the HTTP post into a record, according to the type definition.
-     *
+     * <p/>
      * NOTE: This method does not do any real type conversion. Instead, it 'unwraps' data that has been
      * wrapped in String[]s'.
      *
-     * @param type instance that defines the data contained in the parameters map.
+     * @param type       instance that defines the data contained in the parameters map.
      * @param parameters map that contains the http parameters to be converted into a record.
-     * 
      * @return a record instance containing the parameter data that applies to the map.
      */
-    public static MutableRecord toRecord(CompositeType type, Map<String, String[]> parameters)
+    public static Record toRecord(CompositeType type, Map<String, String[]> parameters)
     {
-        MutableRecord record = new MutableRecord();
+        Record record = type.createNewRecord();
         record.setSymbolicName(type.getSymbolicName());
 
         for (TypeProperty property : type.getProperties())

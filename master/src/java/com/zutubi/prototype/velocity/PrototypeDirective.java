@@ -5,8 +5,8 @@ import com.zutubi.prototype.config.ConfigurationPersistenceManager;
 import com.zutubi.prototype.type.Type;
 import com.zutubi.prototype.type.TypeRegistry;
 import com.zutubi.pulse.bootstrap.ComponentContext;
-import com.zutubi.pulse.velocity.AbstractDirective;
 import com.zutubi.pulse.util.logging.Logger;
+import com.zutubi.pulse.velocity.AbstractDirective;
 import freemarker.template.Configuration;
 import org.apache.velocity.context.InternalContextAdapter;
 import org.apache.velocity.exception.ParseErrorException;
@@ -24,7 +24,7 @@ import java.util.Map;
 public abstract class PrototypeDirective extends AbstractDirective
 {
     private static final Logger LOG = Logger.getLogger(PrototypeDirective.class);
-    
+
     protected TypeRegistry typeRegistry;
 
     /**
@@ -61,7 +61,7 @@ public abstract class PrototypeDirective extends AbstractDirective
             Type type = configurationPersistenceManager.getType(path);
             if (type == null)
             {
-                writer.write(renderError("Failed to render form for path: "+path + ". Unknown type."));
+                writer.write(renderError("Failed to render form for path: " + path + ". Unknown type."));
                 return true;
             }
 
@@ -72,7 +72,7 @@ public abstract class PrototypeDirective extends AbstractDirective
         catch (Exception e)
         {
             LOG.warning(e);
-            writer.write(renderError("Failed to render form. Unexpected "+e.getClass()+": " + e.getMessage()));
+            writer.write(renderError("Failed to render form. Unexpected " + e.getClass() + ": " + e.getMessage()));
             return true;
         }
     }
@@ -98,7 +98,8 @@ public abstract class PrototypeDirective extends AbstractDirective
     /**
      * Required resource
      *
-     * @param configurationPersistenceManager instance
+     * @param configurationPersistenceManager
+     *         instance
      */
     public void setConfigurationPersistenceManager(ConfigurationPersistenceManager configurationPersistenceManager)
     {

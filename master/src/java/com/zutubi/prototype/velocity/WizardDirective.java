@@ -7,10 +7,10 @@ import com.zutubi.prototype.FormDescriptor;
 import com.zutubi.prototype.FormDescriptorFactory;
 import com.zutubi.prototype.freemarker.GetTextMethod;
 import com.zutubi.prototype.model.Form;
-import com.zutubi.prototype.type.Type;
+import com.zutubi.prototype.type.CompositeType;
+import com.zutubi.prototype.wizard.Wizard;
 import com.zutubi.prototype.wizard.WizardState;
 import com.zutubi.prototype.wizard.WizardTransition;
-import com.zutubi.prototype.wizard.Wizard;
 import com.zutubi.pulse.bootstrap.ComponentContext;
 import com.zutubi.pulse.i18n.Messages;
 import com.zutubi.pulse.util.CollectionUtils;
@@ -79,7 +79,7 @@ public class WizardDirective extends AbstractDirective
         {
             return false;
         }
-        
+
         writer.write(internalRender(currentState));
 
         return true;
@@ -95,7 +95,7 @@ public class WizardDirective extends AbstractDirective
             }
             if (path.endsWith("/"))
             {
-                path = path.substring(0, path.length() -1);
+                path = path.substring(0, path.length() - 1);
             }
         }
         return path;
@@ -110,8 +110,8 @@ public class WizardDirective extends AbstractDirective
         {
             Messages messages = Messages.getInstance(state.getType().getClazz());
 
-            Type type = state.getType();
-            
+            CompositeType type = state.getType();
+
             // generate the form.
             FormDescriptor formDescriptor = formDescriptorFactory.createDescriptor(type.getSymbolicName());
 
@@ -127,11 +127,11 @@ public class WizardDirective extends AbstractDirective
 
             Form form = formDescriptor.instantiate(state.getRecord());
             form.setAction(action);
-            
+
             context.put("form", form);
             context.put("i18nText", new GetTextMethod(messages));
             context.put("path", path);
-            
+
             com.zutubi.prototype.model.Wizard wizard = new com.zutubi.prototype.model.Wizard();
             wizard.setStepCount(wizardInstance.getStateCount());
             wizard.setCurrentStep(wizardInstance.getCurrentStateIndex() + 1);
@@ -167,7 +167,7 @@ public class WizardDirective extends AbstractDirective
         FieldDescriptor hiddenStateField = new FieldDescriptor();
         hiddenStateField.setType("hidden");
         hiddenStateField.setName("state");
-        hiddenStateField.addParameter("value", wizardInstance.getCurrentState().getClass().toString());
+        hiddenStateField.addParameter("value", wizardInstance.getCurrentStateIndex());
 
         formDescriptor.add(hiddenStateField);
     }

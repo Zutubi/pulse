@@ -1,8 +1,7 @@
 package com.zutubi.prototype.type;
 
-import com.zutubi.prototype.type.record.MutableRecord;
+import com.zutubi.prototype.annotation.ID;
 import com.zutubi.prototype.type.record.Record;
-import com.zutubi.prototype.type.record.RecordManager;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -40,7 +39,7 @@ public class MapType extends CollectionType
             throw new TypeConversionException("Expected a map type, instead received " + data.getClass());
         }
 
-        Record record = (Record)data;
+        Record record = (Record) data;
 
         Type defaultType = getCollectionType();
         if (defaultType == null && record.getMeta("type") != null)
@@ -66,13 +65,18 @@ public class MapType extends CollectionType
         return instance;
     }
 
-    public Map<String, Object> instantiate() throws TypeConversionException
+    public TypeProperty getKeyProperty(Object obj)
     {
-        return new HashMap<String, Object>();
-    }
-
-    public void setRecord(String path, Record record, RecordManager recordManager)
-    {
-        throw new RuntimeException("Method not implemented.");
+        // TODO: assumes a Map only holds composites, which is fair enough but
+        // would need to be enforced at registration time.
+        CompositeType type = (CompositeType) getCollectionType();
+        for (TypeProperty property : type.getProperties(PrimitiveType.class))
+        {
+            if (property.getAnnotation(ID.class) != null)
+            {
+                return property;
+            }
+        }
+        return null;
     }
 }

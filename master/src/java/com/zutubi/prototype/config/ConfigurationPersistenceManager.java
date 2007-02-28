@@ -1,24 +1,11 @@
 package com.zutubi.prototype.config;
 
-import com.zutubi.prototype.annotation.ID;
-import com.zutubi.prototype.type.CollectionType;
-import com.zutubi.prototype.type.CompositeType;
-import com.zutubi.prototype.type.ListType;
-import com.zutubi.prototype.type.MapType;
-import com.zutubi.prototype.type.PrimitiveType;
-import com.zutubi.prototype.type.Type;
-import com.zutubi.prototype.type.TypeException;
-import com.zutubi.prototype.type.TypeProperty;
-import com.zutubi.prototype.type.TypeRegistry;
-import com.zutubi.prototype.type.record.MutableRecord;
-import com.zutubi.prototype.type.record.RecordManager;
+import com.zutubi.prototype.type.*;
+import com.zutubi.prototype.type.record.PathUtils;
 import com.zutubi.prototype.type.record.Record;
+import com.zutubi.prototype.type.record.RecordManager;
 
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.StringTokenizer;
+import java.util.*;
 
 /**
  *
@@ -30,58 +17,123 @@ public class ConfigurationPersistenceManager
 
     private RecordManager recordManager;
 
-    private Map<String, Object> rootScopes = new HashMap<String, Object>();
+    private Map<String, ComplexType> rootScopes = new HashMap<String, ComplexType>();
 
     /**
      * Register the root scope definitions, from which all of the other definitions will be
      * derived.
      *
      * @param scope name of the scope
-     * @param obj type of the object.
+     * @param type  type of the object.
      */
-    public void register(String scope, Object obj)
+    public void register(String scope, ComplexType type)
     {
-        rootScopes.put(scope, obj);
+        rootScopes.put(scope, type);
+        recordManager.insert(scope, type.createNewRecord());
     }
 
     /**
      * Retrieve the type definition for the specified path.
      *
      * @param path
-     *
      * @return the type definition, or null if none exists.
      */
     public Type getType(String path)
     {
-        Type type = getTypeByRecord(path);
-        if (type == null)
+        String[] pathElements = PathUtils.getPathElements(path);
+        String[] parentElements = PathUtils.getParentPathElements(pathElements);
+        if (parentElements == null)
         {
-            type = getTypeByConfig(path);
+            throw new IllegalArgumentException("Invalid path '" + path + "': no parent");
         }
 
-        return type;
+        Record parentRecord = recordManager.load(PathUtils.getPath(parentElements));
+        if (parentRecord == null)
+        {
+            throw new IllegalArgumentException("Invalid path '" + path + "': parent does not exist");
+        }
+
+        String lastElement = pathElements[pathElements.length - 1];
+        String parentSymbolicName = parentRecord.getSymbolicName();
+        Object value = parentRecord.get(lastElement);
+
+        if (parentElements.length == 0)
+        {
+            // Parent is the base, special case this as the base is currently
+            // like a composite without a registered type :/.
+            ComplexType type = rootScopes.get(lastElement);
+            if (type == null)
+            {
+                throw new IllegalArgumentException("Invalid path '" + path + ": references non-existant root scope '" + lastElement + "'");
+            }
+
+            return type;
+        }
+        else if (parentSymbolicName == null)
+        {
+            // Parent is a collection, last segment of path must refer to an
+            // existing child composite record.
+            if (value == null)
+            {
+                throw new IllegalArgumentException("Invalid path '" + path + "': references unknown child '" + lastElement + "' of collection");
+            }
+            // TODO: validate that collections must not contain collections
+            return extractRecordType(value, path);
+        }
+        else
+        {
+            // Parent is a composite, see if the field exists.
+            CompositeType parentType = typeRegistry.getType(parentSymbolicName);
+            TypeProperty typeProperty = parentType.getProperty(lastElement);
+            if (typeProperty == null)
+            {
+                throw new IllegalArgumentException("Invalid path '" + path + ": references non-existant field '" + lastElement + "' of type '" + parentSymbolicName + "'");
+            }
+
+            Type type = typeProperty.getType();
+            if (value == null || type instanceof CollectionType)
+            {
+                return type;
+            }
+            else
+            {
+                // Return the type of the actual value.
+                return extractRecordType(value, path);
+            }
+        }
+    }
+
+    private CompositeType extractRecordType(Object value, String path)
+    {
+        if (!(value instanceof Record))
+        {
+            throw new IllegalArgumentException("Invalid path '" + path + "': does not reference a complex type");
+        }
+
+        Record record = (Record) value;
+        return typeRegistry.getType(record.getSymbolicName());
     }
 
     public <T extends Type> T getType(String path, Class<T> typeClass)
     {
         Type type = getType(path);
-        if(type == null)
+        if (type == null)
         {
             throw new IllegalArgumentException("Invalid path '" + path + "': does not exist");
         }
 
-        if(!typeClass.isInstance(type))
+        if (!typeClass.isInstance(type))
         {
             throw new IllegalArgumentException("Invalid path '" + path + "': references incompatible type (expected '" + typeClass.getName() + "', found '" + type.getClass().getName() + "')");
         }
 
-        return (T)type;
+        return (T) type;
     }
 
     public <T extends Type> T getTargetType(String path, Class<T> typeClass)
     {
         Type type = getTargetType(getType(path, Type.class));
-        if(!typeClass.isInstance(type))
+        if (!typeClass.isInstance(type))
         {
             throw new IllegalArgumentException("Invalid path '" + path + "': referenced collection contains incompatible type (expected '" + typeClass.getName() + "', found '" + type.getClass().getName() + "')");
         }
@@ -91,9 +143,9 @@ public class ConfigurationPersistenceManager
 
     public Type getTargetType(Type type)
     {
-        if(type instanceof CollectionType)
+        if (type instanceof CollectionType)
         {
-            return ((CollectionType)type).getCollectionType();
+            return ((CollectionType) type).getCollectionType();
         }
         else
         {
@@ -110,7 +162,7 @@ public class ConfigurationPersistenceManager
             String pathElement = tokens.nextToken();
             if (type == null)
             {
-                type = (Type) rootScopes.get(pathElement);
+                type = rootScopes.get(pathElement);
                 if (type == null)
                 {
                     return null;
@@ -120,11 +172,11 @@ public class ConfigurationPersistenceManager
             {
                 if (type instanceof CollectionType)
                 {
-                    type = ((CollectionType)type).getCollectionType();
+                    type = ((CollectionType) type).getCollectionType();
                 }
-                else if(type instanceof CompositeType)
+                else if (type instanceof CompositeType)
                 {
-                    type = getProperty((CompositeType)type, pathElement);
+                    type = getProperty((CompositeType) type, pathElement);
                 }
                 if (type == null)
                 {
@@ -201,9 +253,7 @@ public class ConfigurationPersistenceManager
      * Load the object at the specified path, or null if no object exists.
      *
      * @param path
-     *
      * @return object defined by the path.
-     *
      * @throws TypeException if there is an type related error loading the instance at the specified path.
      */
     public Object getInstance(String path) throws TypeException
@@ -214,7 +264,7 @@ public class ConfigurationPersistenceManager
             return null;
         }
 
-        CompositeType type = (CompositeType) typeRegistry.getType(record.getSymbolicName());
+        CompositeType type = typeRegistry.getType(record.getSymbolicName());
         if (type != null)
         {
             return type.instantiate(record);
@@ -227,94 +277,10 @@ public class ConfigurationPersistenceManager
         return recordManager.load(path);
     }
 
-    /**
-     * Store the object at the specified path.
-     *
-     * @param path used to identify (and retrieve) the object in future. This path must be consistent with the
-     * defined type structure.
-     *
-     * @see #getType(String)
-     *
-     * @throws TypeException
-     */
-/*
-    public void setInstance(String path, Object obj) throws TypeException
+    public String insertRecord(String path, Record record)
     {
-        Type type = typeRegistry.getType(obj.getClass());
-        if (type == null)
-        {
-            type = typeRegistry.register(obj.getClass());
-        }
-
-        // if we are storing an object in the location of an existing collection, add the object to the collection.
-        Record existingRecord = recordManager.load(path);
-        Type definedType = getType(path);
-        if (definedType instanceof CollectionType)
-        {
-            if (definedType instanceof ListType)
-            {
-                List<Object> list = (List<Object>) definedType.instantiate(existingRecord);
-                if (list == null)
-                {
-                    list = (List<Object>) definedType.instantiate();
-                }
-                list.add(obj);
-                obj = list;
-                type = definedType;
-            }
-            else if (definedType instanceof MapType)
-            {
-                Map<String, Object> map = (Map<String, Object>) definedType.instantiate(existingRecord);
-                if (map == null)
-                {
-                    map = (Map<String, Object>) definedType.instantiate();
-                }
-
-                map.put(getKey(obj), obj);
-                obj = map;
-                type = definedType;
-            }
-        }
-
-        MutableRecord record = (MutableRecord) type.unstantiate(obj);
-        recordManager.store(path, record);
-    }
-*/
-
-   public void setRecord(String path, Record record)
-   {
-       Type type = getType(path);
-       type.setRecord(path, record, recordManager);
-   }
-
-    public String getKey(Object obj) throws TypeException
-    {
-        try
-        {
-            TypeProperty keyProperty = getKeyProperty(obj);
-            if (keyProperty != null)
-            {
-                return keyProperty.getGetter().invoke(obj).toString();
-            }
-            return obj.toString();
-        }
-        catch (Exception e)
-        {
-            throw new TypeException(e);
-        }
-    }
-
-    public TypeProperty getKeyProperty(Object obj)
-    {
-        CompositeType type = (CompositeType) typeRegistry.getType(obj.getClass());
-        for (TypeProperty property : type.getProperties(PrimitiveType.class))
-        {
-            if (property.getAnnotation(ID.class) != null)
-            {
-                return property;
-            }
-        }
-        return null;
+        ComplexType type = getType(path, ComplexType.class);
+        return type.insert(path, record, recordManager);
     }
 
     public String getParentPath(String path)
@@ -344,5 +310,10 @@ public class ConfigurationPersistenceManager
     public void setRecordManager(RecordManager recordManager)
     {
         this.recordManager = recordManager;
+    }
+
+    public void updateRecord(String path, Record record)
+    {
+        recordManager.store(path, record);
     }
 }

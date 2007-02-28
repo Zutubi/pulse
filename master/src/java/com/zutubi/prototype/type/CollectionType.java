@@ -1,14 +1,22 @@
 package com.zutubi.prototype.type;
 
-import java.util.List;
-import java.util.Collections;
+import com.zutubi.prototype.annotation.Ordered;
+import com.zutubi.prototype.type.record.MutableRecord;
+import com.zutubi.prototype.type.record.PathUtils;
+import com.zutubi.prototype.type.record.Record;
+import com.zutubi.prototype.type.record.RecordManager;
+
+import java.util.Arrays;
+import java.util.Set;
 
 /**
  *
  *
  */
-public abstract class CollectionType extends AbstractType implements Type, Traversable
+public abstract class CollectionType extends AbstractType implements ComplexType
 {
+    private static final String LATEST_KEY_KEY = "latestKey";
+
     private Type collectionType;
 
     public CollectionType(Class type)
@@ -31,23 +39,62 @@ public abstract class CollectionType extends AbstractType implements Type, Trave
         this.collectionType = collectionType;
     }
 
-    public Type getType(List<String> path)
+    public Iterable<String> getOrder(Record record)
     {
-        if (path.size() == 0)
+        Set<String> keys = record.keySet();
+
+        if (getAnnotation(Ordered.class) != null)
         {
-            return this;
-        }
-        if (path.size() == 1)
-        {
-            return collectionType;
+            String order = record.getMeta("order");
+            if (order != null)
+            {
+                return convertOrder(order);
+            }
         }
 
-        if (collectionType instanceof Traversable)
+        // By default, just whatever order.
+        return keys;
+    }
+
+    private Iterable<String> convertOrder(String order)
+    {
+        // TODO: comma not safe in keys, could be bad.
+        return Arrays.asList(order.split(","));
+    }
+
+    public String insert(String path, Record newRecord, RecordManager recordManager)
+    {
+        Record collectionRecord = recordManager.load(path);
+        if (collectionRecord == null)
         {
-            Traversable ctype = (Traversable) collectionType;
-            return ctype.getType(path.subList(1, path.size()));
+            throw new IllegalArgumentException("Attempt to store into a non-existant list at path '" + path + "'");
         }
 
-        throw new IllegalArgumentException();
+        String newKey = getNextKey(path, collectionRecord, recordManager);
+        String newPath = PathUtils.getPath(path, newKey);
+        recordManager.insert(newPath, newRecord);
+        return newPath;
+    }
+
+    public Record createNewRecord()
+    {
+        return new MutableRecord();
+    }
+
+    protected String getNextKey(String path, Record record, RecordManager recordManager)
+    {
+        String latestKey = record.getMeta(LATEST_KEY_KEY);
+        if (latestKey == null)
+        {
+            latestKey = "1";
+        }
+        else
+        {
+            latestKey = Integer.toString(Integer.parseInt(latestKey) + 1);
+        }
+
+        record.putMeta(LATEST_KEY_KEY, latestKey);
+        recordManager.store(path, record);
+        return latestKey;
     }
 }

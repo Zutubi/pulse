@@ -1,26 +1,17 @@
 package com.zutubi.prototype.webwork;
 
 import com.opensymphony.util.TextUtils;
-import com.zutubi.prototype.config.ConfigurationPersistenceManager;
-import com.zutubi.prototype.type.CollectionType;
-import com.zutubi.prototype.type.CompositeType;
-import com.zutubi.prototype.type.ListType;
-import com.zutubi.prototype.type.MapType;
-import com.zutubi.prototype.type.PrimitiveType;
-import com.zutubi.prototype.type.Type;
-import com.zutubi.prototype.type.TypeRegistry;
-import com.zutubi.prototype.type.TypeException;
-import com.zutubi.prototype.type.record.RecordManager;
-import com.zutubi.prototype.type.record.Record;
-import com.zutubi.prototype.type.record.PathUtils;
 import com.zutubi.prototype.annotation.ConfigurationCheck;
+import com.zutubi.prototype.config.ConfigurationPersistenceManager;
+import com.zutubi.prototype.type.*;
+import com.zutubi.prototype.type.record.PathUtils;
+import com.zutubi.prototype.type.record.Record;
+import com.zutubi.prototype.type.record.RecordManager;
 import com.zutubi.pulse.bootstrap.ComponentContext;
-import com.zutubi.pulse.util.StringUtils;
 import com.zutubi.pulse.prototype.config.ConfigurationExtension;
 
 import java.util.LinkedList;
 import java.util.List;
-import java.util.StringTokenizer;
 
 /**
  *
@@ -35,7 +26,6 @@ public class Configuration
 
     private Record record;
     private Type type;
-    private String typeSymbolicName;
 
     private Type targetType;
     private String targetSymbolicName;
@@ -74,7 +64,7 @@ public class Configuration
         }
         if (path.endsWith("/"))
         {
-            path = path.substring(0, path.length() -1);
+            path = path.substring(0, path.length() - 1);
         }
         return path;
     }
@@ -87,7 +77,7 @@ public class Configuration
         {
             return;
         }
-        
+
         parentPathElements = PathUtils.getParentPathElements(pathElements);
         parentPath = PathUtils.getPath(parentPathElements);
         currentPath = pathElements[pathElements.length - 1];
@@ -97,15 +87,13 @@ public class Configuration
         parentPath = configurationPersistenceManager.getParentPath(path);
 
         type = configurationPersistenceManager.getType(path);
-
-        typeSymbolicName = type.getSymbolicName();
-
         targetType = configurationPersistenceManager.getTargetType(type);
-        targetSymbolicName = targetType.getSymbolicName();
 
         if (targetType instanceof CompositeType)
         {
             CompositeType ctype = (CompositeType) targetType;
+            targetSymbolicName = ctype.getSymbolicName();
+
             if (!ConfigurationExtension.class.isAssignableFrom(targetType.getClazz()))
             {
                 // only show a simple properties form if it is not associated with an extension type.
@@ -127,7 +115,7 @@ public class Configuration
                 mapProperties.add(propertyName);
             }
 
-            extensions.addAll(((CompositeType)targetType).getExtensions());
+            extensions.addAll(((CompositeType) targetType).getExtensions());
 
             // where should this happen? maybe it is something that the typeRegistry should be able to handle...
             // via additional processors..? post processors? .. maybe split the processing into propertyProcessors and
@@ -163,11 +151,6 @@ public class Configuration
     public Type getCheckType()
     {
         return checkType;
-    }
-
-    public String getTypeSymbolicName()
-    {
-        return typeSymbolicName;
     }
 
     public String getPath()

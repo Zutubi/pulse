@@ -7,17 +7,13 @@ import com.zutubi.pulse.util.CollectionUtils;
 import com.zutubi.pulse.util.Mapping;
 
 import java.lang.reflect.Method;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  *
  *
  */
-public class CompositeType extends AbstractType implements Traversable, Type
+public class CompositeType extends AbstractType implements ComplexType
 {
     private Map<Class, List<String>> propertiesByClass = new HashMap<Class, List<String>>();
 
@@ -57,14 +53,13 @@ public class CompositeType extends AbstractType implements Traversable, Type
     {
         return properties.get(propertyName);
     }
-    
+
     /**
      * Retrieve all of the property names of properties of a specific type.
      *
      * @param type being retrieved.
-     *
      * @return a list of property names, or an empty list if no properties of the requested type can
-     * be located.
+     *         be located.
      */
     public List<TypeProperty> getProperties(Class<? extends Type> type)
     {
@@ -102,11 +97,6 @@ public class CompositeType extends AbstractType implements Traversable, Type
         return properties.containsKey(propertyName);
     }
 
-    public void setRecord(String path, Record record, RecordManager recordManager)
-    {
-        //recordManager.store(path, record);
-    }
-
     public void addExtension(String symbolicName)
     {
         this.extensions.add(symbolicName);
@@ -124,89 +114,33 @@ public class CompositeType extends AbstractType implements Traversable, Type
 
     public Object instantiate(Object data) throws TypeException
     {
-        if (data == null)
-        {
-            return null;
-        }
-
-        if (!Map.class.isAssignableFrom(data.getClass()))
-        {
-            throw new TypeConversionException("Expected a map type, instead received " + data.getClass());
-        }
-
-        Map<String, Object> record = (Map<String, Object>)data;
-
-        Object instance = instantiate();
-
-        populateInstance(record, instance);
-
-        return instance;
-    }
-
-    public Object instantiate() throws TypeConversionException
-    {
         try
         {
-            return getClazz().newInstance();
-        }
-        catch (Exception e)
-        {
-            throw new TypeConversionException(e);
-        }
-    }
+            if (data == null)
+            {
+                return null;
+            }
 
-    public void populateInstance(Map<String, Object> source, Object target) throws TypeException
-    {
-        try
-        {
+            // TODO: the data parameter for this method should be a Record.
+            Record record = (Record) data;
+
+            Object instance = getClazz().newInstance();
+
             for (Map.Entry<String, TypeProperty> entry : properties.entrySet())
             {
                 String name = entry.getKey();
-                if (!source.containsKey(name))
+                if (!record.containsKey(name))
                 {
                     continue;
                 }
-                
+
                 TypeProperty property = entry.getValue();
                 Method setter = property.getSetter();
                 Type type = property.getType();
-                setter.invoke(target, type.instantiate(source.get(name)));
+                setter.invoke(instance, type.instantiate(record.get(name)));
             }
-        }
-        catch (Exception e)
-        {
-            throw new TypeException(e);
-        }
-    }
 
-    /**
-     * This method extracts the details from the instance and populates the map, based on this
-     * typs definition.
-     *
-     * @param source the instance from which the data is being extracted.
-     * @param target the map to which the data is being copied.
-     *
-     * @throws TypeConversionException if there is a problem converting the data into a form appropriate
-     * for the map.
-     */
-    public void populateMap(Object source, Map<String, Object> target) throws TypeConversionException
-    {
-        try
-        {
-            for (Map.Entry<String, TypeProperty> entry : properties.entrySet())
-            {
-                String name = entry.getKey();
-                Type type = entry.getValue().getType();
-                if (type instanceof PrimitiveType)
-                {
-                    Method getter = properties.get(name).getGetter();
-                    Object value = getter.invoke(source);
-                    if (value != null)
-                    {
-                        target.put(name, value);
-                    }
-                }
-            }
+            return instance;
         }
         catch (Exception e)
         {
@@ -214,27 +148,24 @@ public class CompositeType extends AbstractType implements Traversable, Type
         }
     }
 
-    public Type getType(List<String> path)
+    public String insert(String path, Record newRecord, RecordManager recordManager)
     {
-        if (path.size() == 0)
-        {
-            return this;
-        }
+        recordManager.insert(path, newRecord);
+        return path;
+    }
 
-        String propertyName = path.get(0);
-        Type type = getProperty(propertyName).getType();
-        if (type instanceof CompositeType)
+    public Record createNewRecord()
+    {
+        MutableRecord record = new MutableRecord();
+        for (String propertyName : getPropertyNames(MapType.class))
         {
-            CompositeType ctype = (CompositeType) type;
-            return ctype.getType(path.subList(1, path.size()));
+            record.put(propertyName, new MutableRecord());
         }
-
-        if (path.size() == 1)
+        for (String propertyName : getPropertyNames(ListType.class))
         {
-            return type;
+            record.put(propertyName, new MutableRecord());
         }
-        
-        // we have a non - composite type yet we are trying to navigate into it. No can do.
-        throw new IllegalArgumentException("Invalid path");
+        record.setSymbolicName(getSymbolicName());
+        return record;
     }
 }

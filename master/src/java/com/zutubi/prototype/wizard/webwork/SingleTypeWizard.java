@@ -4,6 +4,7 @@ import com.zutubi.prototype.config.ConfigurationPersistenceManager;
 import com.zutubi.prototype.type.CompositeType;
 import com.zutubi.prototype.type.record.MutableRecord;
 import com.zutubi.prototype.type.record.TemplateRecord;
+import com.zutubi.prototype.wizard.WizardState;
 import com.zutubi.pulse.util.logging.Logger;
 
 /**
@@ -19,6 +20,7 @@ public class SingleTypeWizard extends AbstractTypeWizard
     private String path;
 
     private static final TemplateRecord EMPTY_RECORD = new TemplateRecord("empty", null, new MutableRecord());
+    private WizardState recordState;
 
     public SingleTypeWizard(String path)
     {
@@ -30,19 +32,20 @@ public class SingleTypeWizard extends AbstractTypeWizard
         CompositeType type = configurationPersistenceManager.getTargetType(path, CompositeType.class);
 
         LOG.warning("TODO: load template record for path: " + path + ", currently using empty template record.");
-        
+
         // for now, use an empty template record.
         TemplateRecord templateRecord = EMPTY_RECORD;
 
         // the template record represents the existing data.
-        addWizardStates(wizardStates, type, templateRecord);
+        recordState = addWizardStates(wizardStates, type, templateRecord);
 
         currentState = wizardStates.getFirst();
     }
 
     public void doFinish()
     {
-        LOG.warning("TODO: implement persistence of data.");
+        configurationPersistenceManager.insertRecord(path, recordState.getRecord());
+        successPath = path;
     }
 
     public void setConfigurationPersistenceManager(ConfigurationPersistenceManager configurationPersistenceManager)

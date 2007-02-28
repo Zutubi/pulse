@@ -1,19 +1,10 @@
 package com.zutubi.prototype.config;
 
-import com.zutubi.prototype.type.CompositeType;
-import com.zutubi.prototype.type.ListType;
-import com.zutubi.prototype.type.MapType;
-import com.zutubi.prototype.type.TypeException;
-import com.zutubi.prototype.type.TypeProperty;
-import com.zutubi.prototype.type.TypeRegistry;
+import com.zutubi.prototype.type.*;
 import com.zutubi.pulse.model.Project;
+import com.zutubi.pulse.model.ProjectManager;
 import com.zutubi.pulse.prototype.config.*;
-import com.zutubi.pulse.prototype.config.admin.EmailConfiguration;
-import com.zutubi.pulse.prototype.config.admin.GeneralAdminConfiguration;
-import com.zutubi.pulse.prototype.config.admin.JabberConfiguration;
-import com.zutubi.pulse.prototype.config.admin.LDAPConfiguration;
-import com.zutubi.pulse.prototype.config.admin.LicenseConfiguration;
-import com.zutubi.pulse.prototype.config.admin.LoggingConfiguration;
+import com.zutubi.pulse.prototype.config.admin.*;
 
 import java.util.HashMap;
 
@@ -25,6 +16,7 @@ public class ConfigurationRegistry
 {
     private TypeRegistry typeRegistry;
     private ConfigurationPersistenceManager configurationPersistenceManager;
+    private ProjectManager projectManager;
 
     public void init() throws TypeException
     {
@@ -39,7 +31,7 @@ public class ConfigurationRegistry
         scmConfig.addExtension("cvsConfig");
         scmConfig.addExtension("perforceConfig");
 
-        CompositeType typeConfig = (CompositeType) typeRegistry.register("typeConfig", ProjectTypeConfiguration.class);
+        CompositeType typeConfig = typeRegistry.register("typeConfig", ProjectTypeConfiguration.class);
         typeRegistry.register("antConfig", AntTypeConfiguration.class);
         typeRegistry.register("mavenConfig", MavenTypeConfiguration.class);
 
@@ -53,7 +45,7 @@ public class ConfigurationRegistry
         typeRegistry.register("cleanupRuleConfig", CleanupRuleConfiguration.class);
 
         // commit message processors.
-        CompositeType commitConfig = (CompositeType) typeRegistry.register("commitConfig", CommitMessageConfiguration.class);
+        CompositeType commitConfig = typeRegistry.register("commitConfig", CommitMessageConfiguration.class);
         typeRegistry.register("jiraCommitConfig", JiraCommitMessageConfiguration.class);
         typeRegistry.register("customCommitConfig", CustomCommitMessageConfiguration.class);
 
@@ -61,14 +53,14 @@ public class ConfigurationRegistry
         commitConfig.addExtension("customCommitConfig");
 
         // change view configuration
-        CompositeType changeViewerConfig = (CompositeType) typeRegistry.register("changeViewerConfig", ChangeViewerConfiguration.class);
+        CompositeType changeViewerConfig = typeRegistry.register("changeViewerConfig", ChangeViewerConfiguration.class);
         typeRegistry.register("fisheyeChangeViewerConfig", FisheyeConfiguration.class);
         typeRegistry.register("customChangeViewerConfig", CustomChangeViewerConfiguration.class);
 
         changeViewerConfig.addExtension("fisheyeChangeViewerConfig");
         changeViewerConfig.addExtension("customChangeViewerConfig");
-        
-        CompositeType artifactConfig = (CompositeType) typeRegistry.register("artifactConfig", ArtifactConfiguration.class);
+
+        CompositeType artifactConfig = typeRegistry.register("artifactConfig", ArtifactConfiguration.class);
         typeRegistry.register("fileArtifactConfig", FileArtifactConfiguration.class);
         typeRegistry.register("directoryArtifactConfig", DirectoryArtifactConfiguration.class);
 
@@ -82,7 +74,7 @@ public class ConfigurationRegistry
         projectConfig.addProperty(new TypeProperty("general", typeRegistry.getType("generalConfig")));
         projectConfig.addProperty(new TypeProperty("cleanup", typeRegistry.getType("cleanupRuleConfig")));
         projectConfig.addProperty(new TypeProperty("changeViewer", typeRegistry.getType("changeViewerConfig")));
-        
+
         ListType artifacts = new ListType();
         artifacts.setTypeRegistry(typeRegistry);
         artifacts.setCollectionType(typeRegistry.getType("artifactConfig"));
@@ -94,7 +86,7 @@ public class ConfigurationRegistry
         projectConfig.addProperty(new TypeProperty("commit", commitTransformers));
 
         // define the root level scope.
-        MapType projectCollection = new MapType(HashMap.class);
+        ProjectMapType projectCollection = new ProjectMapType(HashMap.class, projectManager);
         projectCollection.setTypeRegistry(typeRegistry);
         projectCollection.setCollectionType(projectConfig);
 
@@ -129,5 +121,10 @@ public class ConfigurationRegistry
     public void setConfigurationPersistenceManager(ConfigurationPersistenceManager configurationPersistenceManager)
     {
         this.configurationPersistenceManager = configurationPersistenceManager;
+    }
+
+    public void setProjectManager(ProjectManager projectManager)
+    {
+        this.projectManager = projectManager;
     }
 }

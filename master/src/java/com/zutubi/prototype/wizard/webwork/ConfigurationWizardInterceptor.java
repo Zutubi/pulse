@@ -10,7 +10,7 @@ import java.util.Map;
 
 /**
  *
- * 
+ *
  */
 public class ConfigurationWizardInterceptor implements Interceptor
 {
@@ -61,11 +61,11 @@ public class ConfigurationWizardInterceptor implements Interceptor
             if (actionRequested)
             {
                 // ensure state is in sync.
-                if(wizardAction.isInitialised())
+                if (wizardAction.isInitialised())
                 {
                     String[] actualStates = (String[]) parameters.get("state");
                     String actualState = (actualStates.length > 0) ? actualStates[0] : null;
-                    String expectedState = wizardAction.getState().getClass().toString();
+                    String expectedState = Integer.toString(wizardAction.getWizardInstance().getCurrentStateIndex());
                     if (!expectedState.equals(actualState))
                     {
                         String previousExpected = null;
@@ -79,7 +79,7 @@ public class ConfigurationWizardInterceptor implements Interceptor
                                 break;
                             }
                             wizard.doPrevious();
-                            expectedState = wizard.getCurrentState().getClass().toString();
+                            expectedState = Integer.toString(wizard.getCurrentStateIndex());
                             previousExpected = expectedState;
                         }
                     }

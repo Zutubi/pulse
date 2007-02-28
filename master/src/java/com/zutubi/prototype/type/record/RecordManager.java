@@ -1,7 +1,6 @@
 package com.zutubi.prototype.type.record;
 
 import java.util.StringTokenizer;
-import java.util.Map;
 
 /**
  *
@@ -24,7 +23,6 @@ public class RecordManager
      * Load the record identified by the path.
      *
      * @param path uniquely identifying the record to be loaded.
-     *
      * @return the loaded record, or null if no record could be found.
      */
     public Record load(String path)
@@ -48,7 +46,6 @@ public class RecordManager
      * Returns true if a record exists at the specified path.
      *
      * @param path uniquely identifying a record.
-     *
      * @return true if a record exists, false otherwise.
      */
     public boolean containsRecord(String path)
@@ -68,11 +65,11 @@ public class RecordManager
         return record != null;
     }
 
-    
-    public void insert(String path, MutableRecord newRecord)
+
+    public void insert(String path, Record newRecord)
     {
         String[] pathElements = PathUtils.getPathElements(path);
-        if(pathElements == null)
+        if (pathElements == null)
         {
             throw new IllegalArgumentException("Invalid path '" + path + "'");
         }
@@ -84,15 +81,15 @@ public class RecordManager
     private MutableRecord getRecord(String[] pathElements)
     {
         MutableRecord record = baseRecord;
-        for(int i = 0; i < pathElements.length - 1; i++)
+        for (int i = 0; i < pathElements.length; i++)
         {
             String element = pathElements[i];
-            if(record.get(element) == null)
+            if (record.get(element) == null)
             {
                 record.put(element, new MutableRecord());
             }
             Object obj = record.get(element);
-            if(!(obj instanceof MutableRecord))
+            if (!(obj instanceof MutableRecord))
             {
                 throw new IllegalArgumentException("Invalid path '" + PathUtils.getPath(pathElements) + "'");
             }
@@ -102,33 +99,23 @@ public class RecordManager
         return record;
     }
 
-    /**
-     * Updates the record at the requested path.  A record must exist at the
-     * given path.  To create new records, use #insert(String, MutableRecord).
-     *
-     * @see #insert(String, MutableRecord)
-     *
-     * @param path identifying the path of the existing record.
-     * @param values new primitive values to write to the record
-     */
-    public void store(String path, Map<String, String> values)
+    public void store(String path, Record values)
     {
         MutableRecord record = getRecord(PathUtils.getPathElements(path));
-        record.putAll(values);
+        record.update((MutableRecord) values);
     }
 
     /**
      * Delete the record at the specified path.
      *
      * @param path identifying the record to be deleted.
-     *
      * @return an instance of the record just deleted, or null if no record exists at the specified path.
      */
     public Record delete(String path)
     {
         MutableRecord record = baseRecord;
         StringTokenizer tokens = new StringTokenizer(path, PATH_SEPARATOR, false);
-        
+
         String pathElement = null;
         while (tokens.hasMoreTokens())
         {
@@ -138,18 +125,18 @@ public class RecordManager
             // are are at the parent record with the key for the record we are interested in.
             if (!tokens.hasMoreTokens())
             {
-                break;                
+                break;
             }
             if (!record.containsKey(pathElement))
             {
                 return null;
             }
             Object obj = record.get(pathElement);
-            if (!(obj instanceof MutableRecord))
+            if (!(obj instanceof Record))
             {
                 return null;
             }
-            
+
             record = (MutableRecord) record.get(pathElement);
         }
 
@@ -166,7 +153,7 @@ public class RecordManager
 
     /**
      * Copy the record contents from the source path to the destination path
-     * 
+     *
      * @param sourcePath
      * @param destinationPath
      */

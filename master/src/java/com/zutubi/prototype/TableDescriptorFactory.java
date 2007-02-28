@@ -28,7 +28,7 @@ public class TableDescriptorFactory
         //TODO: check that the user has the necessary Auth to view / execute these actions.
 
         // generate data row.
-        RowDescriptor dataRow = new CollectionRowDescriptor();
+        RowDescriptor dataRow = new CollectionRowDescriptor(type);
 
         // take a look at any annotations defined for the base collection type.
         Formatter defaultFormatter = new SimpleColumnFormatter();
@@ -46,7 +46,7 @@ public class TableDescriptorFactory
             }
         }
 
-        ColumnDescriptor columnDescriptor = new SummaryColumnDescriptor();
+        ColumnDescriptor columnDescriptor = new SummaryColumnDescriptor(typeRegistry);
         columnDescriptor.setFormatter(new AnnotationFormatter(defaultFormatter));
 
         dataRow.addDescriptor(columnDescriptor);
