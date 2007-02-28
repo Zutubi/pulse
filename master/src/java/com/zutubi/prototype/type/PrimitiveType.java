@@ -44,22 +44,4 @@ public class PrimitiveType extends AbstractType implements Type
             throw new TypeConversionException(e);
         }
     }
-
-    public Object unstantiate(Object data) throws TypeException
-    {
-        if (data == null)
-        {
-            return null;
-        }
-
-        TypeSqueezer squeezer = Squeezers.findSqueezer(getClazz());
-        try
-        {
-            return squeezer.squeeze(data);
-        }
-        catch (SqueezeException e)
-        {
-            throw new TypeConversionException(e);
-        }
-    }
 }
