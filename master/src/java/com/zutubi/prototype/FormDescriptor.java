@@ -62,12 +62,12 @@ public class FormDescriptor implements Descriptor
 
     public void addParameter(String key, Object value)
     {
-        parameters.put(key, value);
+        this.parameters.put(key, value);
     }
 
     public void addAll(Map<String, Object> parameters)
     {
-        parameters.putAll(parameters);
+        this.parameters.putAll(parameters);
     }
 
     public Map<String, Object> getParameters()

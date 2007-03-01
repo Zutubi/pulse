@@ -52,21 +52,14 @@
 #end
 
 <p>
-    <h2>show map, empty or not.</h2>
+    <h2>show map</h2>
 </p>
 <p>
     #plist("path=$config.path")
 </p>
 
 <p>
-    <h2>show add new link.</h2>
-    #if( $config.extensions.size() > 0)
-        #if($config.extensions.size() == 1)
-            #pform("path=$config.path" "action=save.action?path=$config.path" "symbolicName=$config.extensions.get(0)")
-        #else
-            <a href="wizard.action?path=$config.path">add...</a>
-        #end
-    #end
+    <a href="wizard.action?path=$config.path">add...</a>
 </p>
 
 <p>

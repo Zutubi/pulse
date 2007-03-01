@@ -13,8 +13,6 @@ import com.zutubi.pulse.form.squeezer.TypeSqueezer;
 import com.zutubi.pulse.form.ui.components.Component;
 import com.zutubi.pulse.form.ui.components.Form;
 import com.zutubi.pulse.form.ui.renderers.FreemarkerTemplateRenderer;
-import com.zutubi.pulse.prototype.TemplateFormDecorator;
-import com.zutubi.pulse.prototype.TemplateRecord;
 import com.zutubi.pulse.wizard.Wizard;
 import freemarker.template.Configuration;
 import ognl.NoSuchPropertyException;
@@ -42,16 +40,6 @@ public class FormSupport
         FormDescriptor descriptor = descriptorFactory.createFormDescriptor(obj.getClass());
 
         return renderDescriptor(descriptor, obj);
-    }
-
-    public String renderForm(Class clazz, TemplateRecord record) throws Exception
-    {
-        FormDescriptor descriptor = descriptorFactory.createFormDescriptor(clazz);
-
-        TemplateFormDecorator decorator = new TemplateFormDecorator(record);
-        descriptor = decorator.decorate(descriptor);
-
-        return renderDescriptor(descriptor, record);
     }
 
     public String renderWizard(Wizard wizard, Object obj) throws Exception

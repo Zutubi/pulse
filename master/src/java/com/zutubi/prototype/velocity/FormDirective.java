@@ -2,6 +2,7 @@ package com.zutubi.prototype.velocity;
 
 import com.zutubi.prototype.FieldDescriptor;
 import com.zutubi.prototype.FormDescriptor;
+import com.zutubi.prototype.TemplateFormDecorator;
 import com.zutubi.prototype.freemarker.GetTextMethod;
 import com.zutubi.prototype.model.Form;
 import com.zutubi.prototype.type.CompositeType;
@@ -56,7 +57,10 @@ public class FormDirective extends PrototypeDirective
         CompositeType ctype = (CompositeType) type;
         Record data = configurationPersistenceManager.getRecord(path);
 
-        FormDescriptor formDescriptor = formDescriptorFactory.createDescriptor(ctype.getSymbolicName());
+        FormDescriptor formDescriptor = formDescriptorFactory.createDescriptor(ctype);
+
+        TemplateFormDecorator templateDecorator = new TemplateFormDecorator(null);
+        templateDecorator.decorate(formDescriptor);
 
         // decorate the form to include the symbolic name as a hidden field. This is necessary for
         // configuration. This is probably not the best place for this, but until i think of a better location,
