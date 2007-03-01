@@ -171,4 +171,9 @@ public class CompositeType extends AbstractType implements ComplexType
         record.setSymbolicName(getSymbolicName());
         return record;
     }
+
+    public boolean isTemplated()
+    {
+        return false;
+    }
 }

@@ -39,10 +39,13 @@ public class TemplateRecord implements Record
 
     public String getMeta(String key)
     {
-        // Should this be templated???
-        // Currently only holds the type.
-        // TODO
-        return null;
+        String value = moi.getMeta(key);
+        if (value == null)
+        {
+            value = parent == null ? null : parent.getMeta(key);
+        }
+
+        return value;
     }
 
     public int size()
@@ -67,15 +70,28 @@ public class TemplateRecord implements Record
 
     public Object get(Object key)
     {
+        // This is where magic happens.
         Object value = moi.get(key);
-
-        if (value instanceof Record)
+        if (value == null)
         {
-            Object inherited = parent == null ? null : parent.get(key);
-            return new TemplateRecord(owner, (TemplateRecord) inherited, (Record) value);
+            // We have nothing to add, delegate to parent
+            return getInherited((String) key);
         }
+        else if (value instanceof Record)
+        {
+            // Wrap in another template on the way out
+            return new TemplateRecord(owner, (TemplateRecord) getInherited((String) key), (Record) value);
+        }
+        else
+        {
+            // Primitive, we override the parent
+            return value;
+        }
+    }
 
-        return value;
+    private Object getInherited(String key)
+    {
+        return parent == null ? null : parent.get(key);
     }
 
     public Object put(String key, Object value)
@@ -134,5 +150,21 @@ public class TemplateRecord implements Record
     public MutableRecord flatten()
     {
         return new MutableRecord();
+    }
+
+    public String getOwner(String key)
+    {
+        if (moi.containsKey(key))
+        {
+            return owner;
+        }
+        else if (parent != null)
+        {
+            return parent.getOwner(key);
+        }
+        else
+        {
+            return null;
+        }
     }
 }

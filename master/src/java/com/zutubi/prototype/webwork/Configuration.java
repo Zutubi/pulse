@@ -51,23 +51,11 @@ public class Configuration
             throw new IllegalArgumentException("Path must be provided.");
         }
 
-        this.path = normalizePath(path);
+        this.path = PathUtils.normalizePath(path);
 
         ComponentContext.autowire(this);
     }
 
-    private String normalizePath(String path)
-    {
-        if (path.startsWith("/"))
-        {
-            path = path.substring(1);
-        }
-        if (path.endsWith("/"))
-        {
-            path = path.substring(0, path.length() - 1);
-        }
-        return path;
-    }
 
     public void analyse()
     {
@@ -82,9 +70,9 @@ public class Configuration
         parentPath = PathUtils.getPath(parentPathElements);
         currentPath = pathElements[pathElements.length - 1];
 
-        record = recordManager.load(path);
+        record = configurationPersistenceManager.getRecord(path);
 
-        parentPath = configurationPersistenceManager.getParentPath(path);
+        parentPath = PathUtils.getParentPath(path);
 
         type = configurationPersistenceManager.getType(path);
         targetType = configurationPersistenceManager.getTargetType(type);

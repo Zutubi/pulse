@@ -81,6 +81,11 @@ public abstract class CollectionType extends AbstractType implements ComplexType
         return new MutableRecord();
     }
 
+    public boolean isTemplated()
+    {
+        return false;
+    }
+
     protected String getNextKey(String path, Record record, RecordManager recordManager)
     {
         String latestKey = record.getMeta(LATEST_KEY_KEY);

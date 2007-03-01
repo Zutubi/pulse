@@ -4,8 +4,12 @@ import com.zutubi.prototype.type.*;
 import com.zutubi.prototype.type.record.PathUtils;
 import com.zutubi.prototype.type.record.Record;
 import com.zutubi.prototype.type.record.RecordManager;
+import com.zutubi.prototype.type.record.TemplateRecord;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
 
 /**
  *
@@ -153,78 +157,6 @@ public class ConfigurationPersistenceManager
         }
     }
 
-    protected Type getTypeByConfig(String path)
-    {
-        Type type = null;
-        StringTokenizer tokens = new StringTokenizer(path, "/", false);
-        while (tokens.hasMoreTokens())
-        {
-            String pathElement = tokens.nextToken();
-            if (type == null)
-            {
-                type = rootScopes.get(pathElement);
-                if (type == null)
-                {
-                    return null;
-                }
-            }
-            else
-            {
-                if (type instanceof CollectionType)
-                {
-                    type = ((CollectionType) type).getCollectionType();
-                }
-                else if (type instanceof CompositeType)
-                {
-                    type = getProperty((CompositeType) type, pathElement);
-                }
-                if (type == null)
-                {
-                    return null;
-                }
-            }
-        }
-        return type;
-    }
-
-    protected Type getTypeByRecord(String fullPath)
-    {
-        // Locate the longest path segment with a record and an associated type.
-        String path = fullPath;
-        CompositeType type = null;
-        while (path != null)
-        {
-            Record record = recordManager.load(path);
-            if (record != null)
-            {
-                type = typeRegistry.getType(record.getSymbolicName());
-                if (type != null)
-                {
-                    break;
-                }
-            }
-            path = getParentPath(path);
-        }
-
-        if (type == null)
-        {
-            return null;
-        }
-
-        // then evaluate the remaining path via each types properties.
-        String remainingPath = fullPath.substring(path.length());
-        StringTokenizer tokens = new StringTokenizer(remainingPath, "/", false);
-        while (tokens.hasMoreTokens())
-        {
-            TypeProperty property = type.getProperty(tokens.nextToken());
-            if (property != null && property.getType() instanceof CompositeType)
-            {
-                type = (CompositeType) property.getType();
-            }
-        }
-        return type;
-    }
-
     public List<String> getListing(String path)
     {
         LinkedList<String> list = new LinkedList<String>();
@@ -274,32 +206,39 @@ public class ConfigurationPersistenceManager
 
     public Record getRecord(String path)
     {
-        return recordManager.load(path);
+        Record record = recordManager.load(path);
+        if (record != null)
+        {
+            // We need to understand the root level can be templated.
+            String[] pathElements = PathUtils.getPathElements(path);
+            if (pathElements.length > 1)
+            {
+                ComplexType scopeType = rootScopes.get(pathElements[0]);
+                if (scopeType.isTemplated())
+                {
+                    // Need to load a chain of templates.
+                    String owner = pathElements[1];
+                    Record owningRecord = recordManager.load(PathUtils.getPath(pathElements[0], pathElements[1]));
+                    String parent = owningRecord.getMeta("parent");
+                    TemplateRecord parentRecord = null;
+                    if (parent != null)
+                    {
+                        pathElements[1] = parent;
+                        parentRecord = (TemplateRecord) getRecord(PathUtils.getPath(pathElements));
+                    }
+
+                    return new TemplateRecord(owner, parentRecord, record);
+                }
+            }
+        }
+
+        return record;
     }
 
     public String insertRecord(String path, Record record)
     {
         ComplexType type = getType(path, ComplexType.class);
         return type.insert(path, record, recordManager);
-    }
-
-    public String getParentPath(String path)
-    {
-        if (path.indexOf("/") != -1)
-        {
-            return path.substring(0, path.lastIndexOf("/"));
-        }
-        return null;
-    }
-
-    private Type getProperty(CompositeType type, String path)
-    {
-        TypeProperty property = type.getProperty(path);
-        if (property != null)
-        {
-            return property.getType();
-        }
-        return null;
     }
 
     public void setTypeRegistry(TypeRegistry typeRegistry)

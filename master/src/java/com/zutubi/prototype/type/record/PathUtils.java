@@ -57,6 +57,29 @@ public class PathUtils
         return parent;
     }
 
+    public static String getParentPath(String path)
+    {
+        int i = path.lastIndexOf(SEPARATOR);
+        if (i != -1)
+        {
+            return path.substring(0, i);
+        }
+        return null;
+    }
+
+    public static String normalizePath(String path)
+    {
+        if (path.startsWith(SEPARATOR))
+        {
+            path = path.substring(1);
+        }
+        if (path.endsWith(SEPARATOR))
+        {
+            path = path.substring(0, path.length() - 1);
+        }
+        return path;
+    }
+
     public static String getPath(String... pathElements)
     {
         return StringUtils.join(SEPARATOR, pathElements);

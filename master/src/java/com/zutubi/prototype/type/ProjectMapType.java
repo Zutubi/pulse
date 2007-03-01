@@ -17,6 +17,11 @@ public class ProjectMapType extends MapType
         this.projectManager = projectManager;
     }
 
+    public boolean isTemplated()
+    {
+        return true;
+    }
+
     protected String getNextKey(String path, Record record, RecordManager recordManager)
     {
         Project project = new Project((String) record.get("name"), (String) record.get("description"));
