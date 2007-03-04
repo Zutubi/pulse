@@ -1,15 +1,9 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <testsuites>
-  <testsuite errors="0" failures="1" id="0" name="VersionTest" package="com.zutubi.pulse" tests="2" time="0.18">
+  <testsuite errors="0" failures="0" id="0" name="VersionTest" package="com.zutubi.pulse" tests="2" time="0.18">
   
 
-      <testcase classname="com.zutubi.pulse.VersionTest" name="testDefaultVersion" time="0.05">
-    
-      <failure message="expected:&lt;@BUILD_NUMBER@&gt; but was:&lt;1010&gt;" type="junit.framework.ComparisonFailure">junit.framework.ComparisonFailure: expected:&lt;@BUILD_NUMBER@&gt; but was:&lt;1010&gt;
-	at com.zutubi.pulse.VersionTest.testDefaultVersion(VersionTest.java:40)
-</failure>
-
-      </testcase>
+      <testcase classname="com.zutubi.pulse.VersionTest" name="testDefaultVersion" time="0.05"></testcase>
 
       <testcase classname="com.zutubi.pulse.VersionTest" name="testReadWriteVersion" time="0.04"></testcase>
 
@@ -18,6 +12,7 @@
       <system-err></system-err>
 
   </testsuite>
+    
   <testsuite errors="0" failures="0" id="1" name="AntCommandTest" package="com.zutubi.pulse.core" tests="9" time="12.778">
   
 
@@ -416,321 +411,7 @@
 
       <testcase classname="com.zutubi.pulse.core.RegexPostProcessorTest" name="testJoinSeparated" time="0.01"></testcase>
 
-      <system-out><![CDATA[result = [first line, first line
-second line, second line
-xxx, xxx
-xxx abc, xxx abc
-abc xxx, abc xxx
-abc xxx abc]
-result = [first line
-second line, second line
-xxx, xxx
-xxx abc, xxx abc
-abc xxx, abc xxx
-abc xxx abc, abc xxx abc]
-result = [first line
-second line, first line
-second line
-xxx, second line
-xxx
-xxx abc, xxx
-xxx abc
-abc xxx, xxx abc
-abc xxx
-abc xxx abc, abc xxx
-abc xxx abc]
-result = [first line, first line
-second line, first line
-second line
-xxx, second line
-xxx
-xxx abc, xxx
-xxx abc
-abc xxx, xxx abc
-abc xxx
-abc xxx abc]
-result = [first line
-second line
-xxx, second line
-xxx
-xxx abc, xxx
-xxx abc
-abc xxx, xxx abc
-abc xxx
-abc xxx abc, abc xxx
-abc xxx abc, abc xxx abc]
-result = [first line
-second line
-xxx, first line
-second line
-xxx
-xxx abc, first line
-second line
-xxx
-xxx abc
-abc xxx, second line
-xxx
-xxx abc
-abc xxx
-abc xxx abc, xxx
-xxx abc
-abc xxx
-abc xxx abc, xxx abc
-abc xxx
-abc xxx abc]
-result = [first line, first line
-second line, first line
-second line
-xxx, first line
-second line
-xxx
-xxx abc, first line
-second line
-xxx
-xxx abc
-abc xxx, first line
-second line
-xxx
-xxx abc
-abc xxx
-abc xxx abc]
-result = [first line
-second line
-xxx
-xxx abc
-abc xxx
-abc xxx abc, second line
-xxx
-xxx abc
-abc xxx
-abc xxx abc, xxx
-xxx abc
-abc xxx
-abc xxx abc, xxx abc
-abc xxx
-abc xxx abc, abc xxx
-abc xxx abc, abc xxx abc]
-result = [first line
-second line
-xxx
-xxx abc
-abc xxx
-abc xxx abc, first line
-second line
-xxx
-xxx abc
-abc xxx
-abc xxx abc, first line
-second line
-xxx
-xxx abc
-abc xxx
-abc xxx abc, first line
-second line
-xxx
-xxx abc
-abc xxx
-abc xxx abc, first line
-second line
-xxx
-xxx abc
-abc xxx
-abc xxx abc, first line
-second line
-xxx
-xxx abc
-abc xxx
-abc xxx abc]
-result = [first line, first line
-second line, first line
-second line
-xxx, first line
-second line
-xxx
-xxx abc, first line
-second line
-xxx
-xxx abc
-abc xxx, first line
-second line
-xxx
-xxx abc
-abc xxx
-abc xxx abc]
-result = [first line
-second line
-xxx
-xxx abc
-abc xxx
-abc xxx abc, second line
-xxx
-xxx abc
-abc xxx
-abc xxx abc, xxx
-xxx abc
-abc xxx
-abc xxx abc, xxx abc
-abc xxx
-abc xxx abc, abc xxx
-abc xxx abc, abc xxx abc]
-result = [first line
-second line
-xxx
-xxx abc
-abc xxx
-abc xxx abc, first line
-second line
-xxx
-xxx abc
-abc xxx
-abc xxx abc, first line
-second line
-xxx
-xxx abc
-abc xxx
-abc xxx abc, first line
-second line
-xxx
-xxx abc
-abc xxx
-abc xxx abc, first line
-second line
-xxx
-xxx abc
-abc xxx
-abc xxx abc, first line
-second line
-xxx
-xxx abc
-abc xxx
-abc xxx abc]
-result = [first line, first line
-second line, first line
-second line
-xxx, first line
-second line
-xxx
-xxx abc, first line
-second line
-xxx
-xxx abc
-abc xxx, first line
-second line
-xxx
-xxx abc
-abc xxx
-abc xxx abc]
-result = [first line
-second line
-xxx
-xxx abc
-abc xxx
-abc xxx abc, second line
-xxx
-xxx abc
-abc xxx
-abc xxx abc, xxx
-xxx abc
-abc xxx
-abc xxx abc, xxx abc
-abc xxx
-abc xxx abc, abc xxx
-abc xxx abc, abc xxx abc]
-result = [first line
-second line
-xxx
-xxx abc
-abc xxx
-abc xxx abc, first line
-second line
-xxx
-xxx abc
-abc xxx
-abc xxx abc, first line
-second line
-xxx
-xxx abc
-abc xxx
-abc xxx abc, first line
-second line
-xxx
-xxx abc
-abc xxx
-abc xxx abc, first line
-second line
-xxx
-xxx abc
-abc xxx
-abc xxx abc, first line
-second line
-xxx
-xxx abc
-abc xxx
-abc xxx abc]
-result = [first line, first line
-second line, first line
-second line
-xxx, first line
-second line
-xxx
-xxx abc, first line
-second line
-xxx
-xxx abc
-abc xxx, first line
-second line
-xxx
-xxx abc
-abc xxx
-abc xxx abc]
-result = [first line
-second line
-xxx
-xxx abc
-abc xxx
-abc xxx abc, second line
-xxx
-xxx abc
-abc xxx
-abc xxx abc, xxx
-xxx abc
-abc xxx
-abc xxx abc, xxx abc
-abc xxx
-abc xxx abc, abc xxx
-abc xxx abc, abc xxx abc]
-result = [first line
-second line
-xxx
-xxx abc
-abc xxx
-abc xxx abc, first line
-second line
-xxx
-xxx abc
-abc xxx
-abc xxx abc, first line
-second line
-xxx
-xxx abc
-abc xxx
-abc xxx abc, first line
-second line
-xxx
-xxx abc
-abc xxx
-abc xxx abc, first line
-second line
-xxx
-xxx abc
-abc xxx
-abc xxx abc, first line
-second line
-xxx
-xxx abc
-abc xxx
-abc xxx abc]
-]]></system-out>
+      <system-out></system-out>
 
       <system-err></system-err>
 
@@ -868,28 +549,7 @@ abc xxx abc]
 
       <testcase classname="com.zutubi.pulse.util.CircularBufferTest" name="testAppendZero" time="0.0"></testcase>
 
-      <system-out><![CDATA[test0
-test0
-test1
-test2
-test3
-test1
-test2
-test3
-test4
-test3
-test4
-test5
-test6
-test4
-test5
-test6
-test7
-test5
-test6
-test7
-test8
-]]></system-out>
+      <system-out></system-out>
 
       <system-err></system-err>
 
@@ -937,18 +597,13 @@ test8
       <system-err></system-err>
 
   </testsuite>
-  <testsuite errors="0" failures="2" id="23" name="StringUtilsTest" package="com.zutubi.pulse.util" tests="21" time="0.13">
+  <testsuite errors="0" failures="0" id="23" name="StringUtilsTest" package="com.zutubi.pulse.util" tests="21" time="0.13">
   
       <testcase classname="com.zutubi.pulse.util.StringUtilsTest" name="testTrimStringShort" time="0.01"></testcase>
 
       <testcase classname="com.zutubi.pulse.util.StringUtilsTest" name="testTrimStringMuchLonger" time="0.0"></testcase>
 
       <testcase classname="com.zutubi.pulse.util.StringUtilsTest" name="testTrimStringExact" time="0.01">
-    
-      <failure message="expected:&lt;...3...&gt; but was:&lt;......&gt;" type="junit.framework.ComparisonFailure">junit.framework.ComparisonFailure: expected:&lt;...3...&gt; but was:&lt;......&gt;
-	at com.zutubi.pulse.util.StringUtilsTest.testTrimStringExact(StringUtilsTest.java:24)
-</failure>
-
       </testcase>
 
       <testcase classname="com.zutubi.pulse.util.StringUtilsTest" name="testTrimStringJustOver" time="0.0"></testcase>
@@ -960,11 +615,6 @@ test8
       <testcase classname="com.zutubi.pulse.util.StringUtilsTest" name="testTrimStringZeroLimit" time="0.0"></testcase>
 
       <testcase classname="com.zutubi.pulse.util.StringUtilsTest" name="testWrapShort" time="0.01">
-    
-      <failure message="expected:&lt;...4...&gt; but was:&lt;......&gt;" type="junit.framework.ComparisonFailure">junit.framework.ComparisonFailure: expected:&lt;...4...&gt; but was:&lt;......&gt;
-	at com.zutubi.pulse.util.StringUtilsTest.testWrapShort(StringUtilsTest.java:49)
-</failure>
-
       </testcase>
 
       <testcase classname="com.zutubi.pulse.util.StringUtilsTest" name="testWrapSimple" time="0.0"></testcase>

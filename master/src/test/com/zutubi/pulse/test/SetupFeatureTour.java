@@ -10,6 +10,7 @@ import com.zutubi.pulse.model.*;
 import com.zutubi.pulse.model.persistence.*;
 import com.zutubi.pulse.util.FileSystemUtils;
 import com.zutubi.pulse.util.IOUtils;
+import com.zutubi.pulse.util.Constants;
 import com.zutubi.pulse.util.logging.Logger;
 
 import java.io.File;
@@ -17,6 +18,7 @@ import java.io.IOException;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Random;
 
 /**
  */
@@ -43,6 +45,7 @@ public class SetupFeatureTour implements Runnable
     private CommandResult commands[];
     private long buildNumber = 0;
     private int commandIndex = 0;
+
 
     private String comments[] = {
             "Fixed tab indexes and text field sizes.",
@@ -93,32 +96,41 @@ public class SetupFeatureTour implements Runnable
 
             project = setupProject("ant", "Apache ant build tools");
             project.setUrl("http://ant.apache.org/");
-            successfulBuild();
-            successfulBuild();
+            BuildTimes buildTimes = new BuildTimes(System.currentTimeMillis(), 5);
+            successfulBuild(buildTimes);
+            successfulBuild(buildTimes);
 
             project = setupProject("make", "GNU variant of make.");
             project.setUrl("http://www.gnu.org/software/make/");
-            successfulBuild();
-            successfulBuild();
-            successfulBuild();
-            successfulBuild();
+            successfulBuild(buildTimes);
+            successfulBuild(buildTimes);
+            successfulBuild(buildTimes);
+            successfulBuild(buildTimes);
 
             project = setupProject("maven", "Apache maven build lord");
             project.setUrl("http://maven.apache.org/");
-            successfulBuild();
-            successfulBuild();
-            successfulBuild();
-            successfulBuild();
-            successfulBuild();
+            successfulBuild(buildTimes);
+            successfulBuild(buildTimes);
+            successfulBuild(buildTimes);
+            successfulBuild(buildTimes);
+            successfulBuild(buildTimes);
 
             project = setupProject("pulse", "The pulse automated build server");
             project.setUrl("http://zutubi.com/products/pulse/");
             addBuildStage("remote", slave);
-            for (int i = 0; i < 54; i++)
+            long startTime = System.currentTimeMillis() - 45 * Constants.DAY;
+            for (int i = 0; i < 350; i++)
             {
-                successfulBuild();
+                startTime = startTime + (RAND.nextInt(400) * Constants.MINUTE);
+                if (RAND.nextInt(100) > 10)
+                {
+                    successfulBuild(new BuildTimes(startTime, 7));
+                }
+                else
+                {
+                    testsFailedBuild(new BuildTimes(startTime, 7));
+                }
             }
-            testsFailedBuild();
 
             setupUsers(project);
             createLogMessages();
@@ -232,10 +244,12 @@ public class SetupFeatureTour implements Runnable
         Project project = new Project(name, description);
         project.setPulseFileDetails(new VersionedPulseFileDetails("pulse.xml"));
 
-        P4 scm = new P4();
-        scm.setPort(":1666");
-        scm.setUser("pulse");
-        scm.setClient("pulse");
+        Svn scm = new Svn();
+        scm.setUrl("svn://localhost/svnroot");
+        scm.setUsername("jsankey");
+        scm.setPassword("jsankey");
+        scm.setMonitor(false);
+        scm.setVerifyExternals(false);
         project.setScm(scm);
 
         BuildSpecification simpleSpec = new BuildSpecification("default");
@@ -244,7 +258,7 @@ public class SetupFeatureTour implements Runnable
         simpleSpec.getRoot().addChild(simpleNode);
         project.addBuildSpecification(simpleSpec);
         project.setDefaultSpecification(simpleSpec);
-        
+
         simpleSpec = new BuildSpecification("nightly");
         simpleSpec.setTimeout(120);
         simpleStage = new BuildStage("default", new MasterBuildHostRequirements(), "nightly-build");
@@ -268,7 +282,7 @@ public class SetupFeatureTour implements Runnable
         projectDao.save(project);
     }
 
-    private void addBuildResult()
+    private void addBuildResult(BuildTimes buildTimes)
     {
         BuildResult previous = build;
         BuildSpecification spec = project.getBuildSpecifications().get(0);
@@ -281,13 +295,14 @@ public class SetupFeatureTour implements Runnable
         int i = 0;
         recipes = new RecipeResult[spec.getRoot().getChildren().size()];
 
-        for(BuildSpecificationNode specNode: spec.getRoot().getChildren())
+        for (BuildSpecificationNode specNode : spec.getRoot().getChildren())
         {
             recipes[i] = new RecipeResult(null);
             buildResultDao.save(recipes[i]);
 
             File recipeDir = masterBuildPaths.getRecipeDir(build, recipes[i].getId());
             recipes[i].commence();
+            recipes[i].getStamps().setStartTime(buildTimes.getCommandStart(i));
             recipes[i].setAbsoluteOutputDir(configManager.getDataDirectory(), recipeDir);
             RecipeResultNode node = new RecipeResultNode(specNode.getStage().getPname(), recipes[i]);
             node.setHost(specNode.getStage().getHostRequirements().getSummary());
@@ -297,6 +312,7 @@ public class SetupFeatureTour implements Runnable
 
         File buildDir = masterBuildPaths.getBuildDir(build);
         build.commence();
+        build.getStamps().setStartTime(buildTimes.getBuildStart());
         build.setAbsoluteOutputDir(configManager.getDataDirectory(), buildDir);
         buildDir.mkdirs();
         try
@@ -311,8 +327,8 @@ public class SetupFeatureTour implements Runnable
         addChanges(previous);
 
         commandIndex = 0;
-        addCommandResult("bootstrap");
-        completeCommandResult();
+        addCommandResult("bootstrap", buildTimes);
+        completeCommandResult(buildTimes);
     }
 
     private void addChanges(BuildResult previous)
@@ -349,26 +365,29 @@ public class SetupFeatureTour implements Runnable
         };
     }
 
-    private void completeBuildResult()
+    private void completeBuildResult(BuildTimes buildTimes)
     {
-        for(RecipeResult recipe: recipes)
+        for (int i = 0; i < recipes.length; i++)
         {
+            RecipeResult recipe = recipes[i];
             recipe.complete();
+            recipe.getStamps().setEndTime(buildTimes.getCommandEnd(i));
         }
         build.complete();
+        build.getStamps().setEndTime(buildTimes.getBuildEnd());
         buildResultDao.save(build);
     }
 
-    private void addCommandResult(String name)
+    private void addCommandResult(String name, BuildTimes buildTimes)
     {
         int i = 0;
         commands = new CommandResult[recipes.length];
-        for(RecipeResult recipe: recipes)
+        for (RecipeResult recipe : recipes)
         {
             commands[i] = new CommandResult(name);
             File commandDir = new File(recipe.getAbsoluteOutputDir(configManager.getDataDirectory()), RecipeProcessor.getCommandDirName(commandIndex, commands[i]));
             File outputDir = new File(commandDir, "output");
-            commands[i].commence();
+            commands[i].getStamps().setStartTime(buildTimes.getCommandStart(i));
             commands[i].setAbsoluteOutputDir(configManager.getDataDirectory(), outputDir);
             i++;
         }
@@ -376,43 +395,45 @@ public class SetupFeatureTour implements Runnable
         commandIndex++;
     }
 
-    private void completeCommandResult()
+    private void completeCommandResult(BuildTimes buildTimes)
     {
         for (int i = 0; i < recipes.length; i++)
         {
             recipes[i].add(commands[i]);
             commands[i].complete();
+            commands[i].getStamps().setEndTime(buildTimes.getCommandEnd(i));
         }
     }
 
-    private void successfulBuild()
+    private void successfulBuild(BuildTimes buildTimes)
     {
-        addBuildResult();
-        addCommandResult("build");
-        completeCommandResult();
-        completeBuildResult();
+        addBuildResult(buildTimes);
+        addCommandResult("build", buildTimes);
+        addSuccessTestArtifact();
+        completeCommandResult(buildTimes);
+        completeBuildResult(buildTimes);
     }
 
-    private void testsFailedBuild()
+    private void testsFailedBuild(BuildTimes buildTimes)
     {
-        addBuildResult();
-        addCommandResult("build");
+        addBuildResult(buildTimes);
+        addCommandResult("build", buildTimes);
         addAntFailedArtifact();
         addFailedTestArtifact();
         addTestReportArtifact();
-        completeCommandResult();
+        completeCommandResult(buildTimes);
 
-        for(BuildSpecificationNode node: project.getBuildSpecifications().get(0).getRoot().getChildren())
+        for (BuildSpecificationNode node : project.getBuildSpecifications().get(0).getRoot().getChildren())
         {
             build.failure("Stage " + node.getStage().getName() + " failed.");
         }
 
-        completeBuildResult();
+        completeBuildResult(buildTimes);
 
         File f = getDataFile("base");
         try
         {
-            for (RecipeResult recipe: recipes)
+            for (RecipeResult recipe : recipes)
             {
                 FileSystemUtils.copy(new File(recipe.getAbsoluteOutputDir(configManager.getDataDirectory()), "base"), f);
             }
@@ -428,7 +449,7 @@ public class SetupFeatureTour implements Runnable
         AntPostProcessor pp = new AntPostProcessor();
         File dummy = getDataFile("ant-failed.txt");
 
-        for (CommandResult command: commands)
+        for (CommandResult command : commands)
         {
             try
             {
@@ -447,6 +468,17 @@ public class SetupFeatureTour implements Runnable
     private void addFailedTestArtifact()
     {
         File dummy = getDataFile("junit-failed.xml");
+        addTestArtifact(dummy);
+    }
+
+    private void addSuccessTestArtifact()
+    {
+        File dummy = getDataFile("junit-success.xml");
+        addTestArtifact(dummy);
+    }
+
+    private void addTestArtifact(File dummy)
+    {
         JUnitReportPostProcessor pp = new JUnitReportPostProcessor();
 
         for (int i = 0; i < commands.length; i++)
@@ -477,7 +509,7 @@ public class SetupFeatureTour implements Runnable
     {
         File dir = getDataFile("junit-report");
 
-        for (CommandResult command: commands)
+        for (CommandResult command : commands)
         {
             DirectoryArtifact da = new DirectoryArtifact();
             da.setName("JUnit HTML Report");
@@ -526,7 +558,7 @@ public class SetupFeatureTour implements Runnable
         Changelist list = new Changelist(":1666", rev);
         list.addProjectId(project.getId());
         list.addResultId(build.getId());
-        if(previous != null)
+        if (previous != null)
         {
             list.addProjectId(previous.getProject().getId());
             list.addResultId(previous.getId());
@@ -589,5 +621,61 @@ public class SetupFeatureTour implements Runnable
     public void setAgentManager(AgentManager agentManager)
     {
         this.agentManager = agentManager;
+    }
+
+    private static final Random RAND = new Random(System.currentTimeMillis());
+
+    /**
+     * The build times object is used to help create realistic build and command times for the sample
+     * data.
+     *
+     */
+    public static class BuildTimes
+    {
+        private long buildStart;
+
+        private long[] commandStart;
+        private long[] commandEnd;
+
+        public BuildTimes(long buildStart, int noOfCommands)
+        {
+            this.buildStart = buildStart;
+
+            commandStart = new long[noOfCommands];
+            commandEnd = new long[noOfCommands];
+
+            if (noOfCommands > 0)
+            {
+                commandStart[0] = 0;
+                commandEnd[0] = commandStart[0] + RAND.nextInt(10);
+            }
+
+            // generate the build times.
+            for (int i = 1; i < noOfCommands; i++)
+            {
+                commandStart[i] = commandEnd[i - 1];
+                commandEnd[i] = commandStart[i] + RAND.nextInt(10);
+            }
+        }
+
+        public long getCommandStart(int index)
+        {
+            return buildStart + Constants.MINUTE * commandStart[index];
+        }
+
+        public long getCommandEnd(int index)
+        {
+            return buildStart + Constants.MINUTE * commandEnd[index];
+        }
+
+        public long getBuildStart()
+        {
+            return buildStart;
+        }
+
+        public long getBuildEnd()
+        {
+            return getCommandEnd(commandEnd.length - 1);
+        }
     }
 }
