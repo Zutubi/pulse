@@ -118,19 +118,34 @@ public class SetupFeatureTour implements Runnable
             project = setupProject("pulse", "The pulse automated build server");
             project.setUrl("http://zutubi.com/products/pulse/");
             addBuildStage("remote", slave);
+
             long startTime = System.currentTimeMillis() - 45 * Constants.DAY;
-            for (int i = 0; i < 350; i++)
+            for (int j = 0; j < 45; j++)
             {
-                startTime = startTime + (RAND.nextInt(400) * Constants.MINUTE);
-                if (RAND.nextInt(100) > 10)
+                // we want somewhere between 5 - 15 builds per day.
+                int noBuilds = RAND.nextInt(10) + 5;
+
+                long buildStart = startTime;
+                for (int i = 0; i < noBuilds; i++)
                 {
-                    successfulBuild(new BuildTimes(startTime, 7));
+                    buildStart = buildStart + (RAND.nextInt(60) * Constants.MINUTE);
+                    int noCommands = RAND.nextInt(3) + 4;
+                    boolean successful = (RAND.nextInt(100) > 15);
+                    if (successful)
+                    {
+                        successfulBuild(new BuildTimes(buildStart, noCommands));
+                    }
+                    else
+                    {
+                        testsFailedBuild(new BuildTimes(buildStart, noCommands));
+                    }
                 }
-                else
-                {
-                    testsFailedBuild(new BuildTimes(startTime, 7));
-                }
+                // shift the start time forward by one day.
+                startTime = startTime + Constants.DAY;
             }
+
+            testsFailedBuild(new BuildTimes(startTime, 5));
+            successfulBuild(new BuildTimes(startTime + 2 * Constants.HOUR, 4));
 
             setupUsers(project);
             createLogMessages();
@@ -387,6 +402,7 @@ public class SetupFeatureTour implements Runnable
             commands[i] = new CommandResult(name);
             File commandDir = new File(recipe.getAbsoluteOutputDir(configManager.getDataDirectory()), RecipeProcessor.getCommandDirName(commandIndex, commands[i]));
             File outputDir = new File(commandDir, "output");
+            commands[i].commence();
             commands[i].getStamps().setStartTime(buildTimes.getCommandStart(i));
             commands[i].setAbsoluteOutputDir(configManager.getDataDirectory(), outputDir);
             i++;
