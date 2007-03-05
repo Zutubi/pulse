@@ -46,7 +46,6 @@ public class SetupFeatureTour implements Runnable
     private long buildNumber = 0;
     private int commandIndex = 0;
 
-
     private String comments[] = {
             "Fixed tab indexes and text field sizes.",
             "CIB-315: Build specification triggering links shown to unauthorised users.",
@@ -120,7 +119,7 @@ public class SetupFeatureTour implements Runnable
             addBuildStage("remote", slave);
 
             long startTime = System.currentTimeMillis() - 45 * Constants.DAY;
-            for (int j = 0; j < 45; j++)
+            for (int j = 0; j < 40; j++)
             {
                 // we want somewhere between 5 - 15 builds per day.
                 int noBuilds = RAND.nextInt(10) + 5;
@@ -339,27 +338,29 @@ public class SetupFeatureTour implements Runnable
             e.printStackTrace();
         }
 
-        addChanges(previous);
+        addChanges(previous, buildTimes);
 
         commandIndex = 0;
         addCommandResult("bootstrap", buildTimes);
         completeCommandResult(buildTimes);
     }
 
-    private void addChanges(BuildResult previous)
+    private void addChanges(BuildResult previous, BuildTimes buildTimes)
     {
         List<Changelist> changes = new LinkedList<Changelist>();
 
-        while (Math.random() > 0.20)
+        int changesRemaining = 3;
+        while (Math.random() > 0.20 && (changesRemaining > 0))
         {
             String author = Math.random() > 0.3 ? "jsankey" : "dostermeier"; // ;)
 
-            changes.add(createChange(previous, revision++, author, comments[changeIndex], (1000 - revision) * 600000, generateChangeFiles()));
+            changes.add(createChange(previous, revision++, author, comments[changeIndex], buildTimes.getBuildStart() - 1, generateChangeFiles()));
             changeIndex++;
             if (changeIndex >= comments.length)
             {
                 changeIndex = 0;
             }
+            changesRemaining--;
         }
 
         BuildScmDetails details = new BuildScmDetails(new NumericalRevision(400));
@@ -564,12 +565,12 @@ public class SetupFeatureTour implements Runnable
         return fileArtifact;
     }
 
-    private Changelist createChange(BuildResult previous, long revision, String author, String comment, long ago, String... files)
+    private Changelist createChange(BuildResult previous, long revision, String author, String comment, long time, String... files)
     {
         NumericalRevision rev = new NumericalRevision(revision);
         rev.setAuthor(author);
         rev.setComment(comment);
-        rev.setDate(new Date(System.currentTimeMillis() - ago));
+        rev.setDate(new Date(time));
 
         Changelist list = new Changelist(":1666", rev);
         list.addProjectId(project.getId());
