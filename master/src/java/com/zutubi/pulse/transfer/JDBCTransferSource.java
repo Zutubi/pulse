@@ -1,10 +1,10 @@
 package com.zutubi.pulse.transfer;
 
-import com.zutubi.pulse.upgrade.tasks.MutableConfiguration;
 import com.zutubi.pulse.util.JDBCUtils;
 import org.hibernate.engine.Mapping;
 import org.hibernate.mapping.Column;
 import org.hibernate.mapping.Table;
+import org.hibernate.cfg.Configuration;
 
 import javax.sql.DataSource;
 import java.sql.Connection;
@@ -24,14 +24,14 @@ public class JDBCTransferSource implements TransferSource
 {
     private DataSource dataSource;
 
-    private MutableConfiguration configuration;
+    private Configuration configuration;
 
     public void setDataSource(DataSource dataSource)
     {
         this.dataSource = dataSource;
     }
 
-    public void setConfiguration(MutableConfiguration configuration)
+    public void setConfiguration(Configuration configuration)
     {
         this.configuration = configuration;
     }
@@ -40,8 +40,9 @@ public class JDBCTransferSource implements TransferSource
     {
         try
         {
+            // ensure that the mappings are built.
             configuration.buildMappings();
-            Mapping mapping = configuration.getMapping();
+            Mapping mapping = new HibernateMapping(configuration);
 
             target.start();
 

@@ -1,9 +1,9 @@
 package com.zutubi.pulse.transfer;
 
-import com.zutubi.pulse.upgrade.tasks.MutableConfiguration;
 import com.zutubi.pulse.util.JDBCTypes;
 import nu.xom.Builder;
 import nu.xom.NodeFactory;
+import org.hibernate.cfg.Configuration;
 import org.hibernate.mapping.Table;
 import org.xml.sax.Attributes;
 
@@ -18,7 +18,7 @@ public class XMLTransferSource extends XMLTransferSupport implements TransferSou
 {
     private InputStream source;
 
-    private MutableConfiguration configuration;
+    private Configuration configuration;
 
     private Map<String, String> row;
 
@@ -99,7 +99,7 @@ public class XMLTransferSource extends XMLTransferSupport implements TransferSou
     {
         String columnName = atts.getValue("name");
         String columnType = atts.getValue("type");
-        
+
         columnNames.add(columnName);
         columnTypes.put(columnName, JDBCTypes.valueOf(columnType));
     }
@@ -136,7 +136,7 @@ public class XMLTransferSource extends XMLTransferSupport implements TransferSou
         return null;
     }
 
-    public void setConfiguration(MutableConfiguration configuration)
+    public void setConfiguration(Configuration configuration)
     {
         this.configuration = configuration;
     }

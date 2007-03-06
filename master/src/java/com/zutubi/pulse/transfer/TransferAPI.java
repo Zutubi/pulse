@@ -1,7 +1,6 @@
 package com.zutubi.pulse.transfer;
 
 import com.zutubi.pulse.Version;
-import com.zutubi.pulse.upgrade.tasks.MutableConfiguration;
 import com.zutubi.pulse.util.IOUtils;
 import com.zutubi.pulse.util.JDBCUtils;
 import org.hibernate.cfg.Configuration;
@@ -27,14 +26,14 @@ import java.util.List;
  */
 public class TransferAPI
 {
-    public void dump(MutableConfiguration configuration, DataSource dataSource, File outFile) throws TransferException
+    public void dump(Configuration config, DataSource dataSource, File outFile) throws TransferException
     {
         FileOutputStream outputStream = null;
         try
         {
             outputStream = new FileOutputStream(outFile);
 
-            dump(configuration, dataSource, outputStream);
+            dump(config, dataSource, outputStream);
 
         }
         catch (IOException e)
@@ -47,12 +46,12 @@ public class TransferAPI
         }
     }
 
-    public void dump(MutableConfiguration configuration, DataSource dataSource, OutputStream outputStream) throws TransferException
+    public void dump(Configuration config, DataSource dataSource, OutputStream outputStream) throws TransferException
     {
         XMLTransferTarget target = null;
         try
         {
-            if (!isSchemaMappingValid(configuration, dataSource))
+            if (!isSchemaMappingValid(config, dataSource))
             {
                 throw new JDBCTransferException("Schema export aborted due to schema / mapping mismatch");
             }
@@ -62,7 +61,7 @@ public class TransferAPI
             target.setVersion(Version.getVersion().getBuildNumber());
 
             JDBCTransferSource source = new JDBCTransferSource();
-            source.setConfiguration(configuration);
+            source.setConfiguration(config);
             source.setDataSource(dataSource);
 
             source.transferTo(target);
@@ -76,7 +75,7 @@ public class TransferAPI
         }
     }
 
-    public void restore(MutableConfiguration configuration, File inFile, DataSource dataSource) throws TransferException
+    public void restore(Configuration configuration, File inFile, DataSource dataSource) throws TransferException
     {
         FileInputStream inputStream = null;
         try
@@ -94,7 +93,7 @@ public class TransferAPI
         }
     }
 
-    public void restore(MutableConfiguration configuration, DataSource dataSource, InputStream inputStream) throws TransferException
+    public void restore(Configuration configuration, DataSource dataSource, InputStream inputStream) throws TransferException
     {
         // configure the import.
         JDBCTransferTarget target = null;
