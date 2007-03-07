@@ -18,11 +18,11 @@ public class RegexPattern
     private String expression;
     private String summary;
     private Pattern pattern;
-    private List<Exclusion> exclusions;
+    private List<ExpressionElement> exclusions;
 
     public RegexPattern()
     {
-        exclusions = new LinkedList<Exclusion>();
+        exclusions = new LinkedList<ExpressionElement>();
     }
 
     public RegexPattern(Feature.Level category, Pattern pattern)
@@ -30,7 +30,7 @@ public class RegexPattern
         this.category = category;
         this.pattern = pattern;
         this.expression = pattern.pattern();
-        exclusions = new LinkedList<Exclusion>();
+        exclusions = new LinkedList<ExpressionElement>();
     }
 
     public Feature.Level getCategory()
@@ -93,11 +93,16 @@ public class RegexPattern
         this.pattern = pattern;
     }
 
-    public Exclusion createExclude()
+    public ExpressionElement createExclude()
     {
-        Exclusion exclusion = new Exclusion();
+        ExpressionElement exclusion = new ExpressionElement();
         exclusions.add(exclusion);
         return exclusion;
+    }
+
+    List<ExpressionElement> getExclusions()
+    {
+        return exclusions;
     }
 
     public String match(String line)
@@ -107,7 +112,7 @@ public class RegexPattern
         Matcher matcher = pattern.matcher(line);
         if (matcher.find())
         {
-            for (Exclusion e : exclusions)
+            for (ExpressionElement e : exclusions)
             {
                 if (e.getPattern().matcher(line).find())
                 {
@@ -130,51 +135,11 @@ public class RegexPattern
 
     public void addExclusion(Pattern pattern)
     {
-        exclusions.add(new Exclusion(pattern));
+        exclusions.add(new ExpressionElement(pattern));
     }
 
-    public class Exclusion
+    public void addExclusion(ExpressionElement element)
     {
-        private String expression;
-        private Pattern pattern;
-
-        public Exclusion()
-        {
-
-        }
-
-        public Exclusion(Pattern pattern)
-        {
-            this.pattern = pattern;
-            expression = pattern.pattern();
-        }
-
-        public String getExpression()
-        {
-            return expression;
-        }
-
-        public void setPattern(Pattern pattern)
-        {
-            this.pattern = pattern;
-        }
-        
-        public void setExpression(String expression) throws FileLoadException
-        {
-            try
-            {
-                pattern = Pattern.compile(expression);
-                this.expression = expression;
-            }
-            catch (PatternSyntaxException e)
-            {
-                throw new FileLoadException(e);
-            }
-        }
-
-        public Pattern getPattern()
-        {
-            return pattern;
-        }
+        exclusions.add(element);
     }
 }

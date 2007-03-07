@@ -1,0 +1,15 @@
+[INFO] Scanning for projects...
+[INFO] ----------------------------------------------------------------------------
+[INFO] Building Maven Quick Start Archetype
+[INFO]    task-segment: [compile]
+[INFO] ----------------------------------------------------------------------------
+[INFO] [resources:resources]
+[INFO] Using default encoding to copy filtered resources.
+[INFO] [compiler:compile]
+Compiling 1 source file to base.dir/target/classes
+[WARNING] Removing: jar from forked lifecycle, to prevent recursive invocation.
+[WARNING] Another warning
+[INFO] ----------------------------------------------------------------------------
+[INFO] BUILD SUCCESSFUL
+[INFO] ----------------------------------------------------------------------------
+[INFO] ----------------------------------------------------------------------------

@@ -11,11 +11,10 @@ import java.util.regex.Pattern;
  */
 public class Maven2PostProcessor extends PostProcessorGroup
 {
-    private static final String[] warningRegexps = new String[]{
-            "^\\[WARNING\\]"
-    };
     private RegexPostProcessor failurePP;
     private RegexPostProcessor featurePP;
+    private RegexPattern warningPattern;
+    private RegexPattern errorPattern;
 
     public Maven2PostProcessor()
     {
@@ -44,10 +43,12 @@ public class Maven2PostProcessor extends PostProcessorGroup
         Pattern failurePattern = Pattern.compile("^\\[ERROR\\] BUILD (ERROR|FAILURE)");
 
         featurePP = new RegexPostProcessor();
-        RegexPattern errorRegex = new RegexPattern(Feature.Level.ERROR, Pattern.compile("^\\[ERROR\\]"));
-        errorRegex.addExclusion(failurePattern);
-        featurePP.addRegexPattern(errorRegex);
-        featurePP.addWarningRegexs(warningRegexps);
+        errorPattern = new RegexPattern(Feature.Level.ERROR, Pattern.compile("^\\[ERROR\\]"));
+        errorPattern.addExclusion(failurePattern);
+        featurePP.addRegexPattern(errorPattern);
+
+        warningPattern = new RegexPattern(Feature.Level.WARNING, Pattern.compile("^\\[WARNING\\]"));
+        featurePP.addRegexPattern(warningPattern);
 
         featurePP.setFailOnError(false);
         featurePP.setLeadingContext(1);
@@ -67,6 +68,30 @@ public class Maven2PostProcessor extends PostProcessorGroup
         failurePP.setLeadingContext(1);
         failurePP.setTrailingContext(6);
         add(failurePP);
+    }
+
+    public ExpressionElement createSuppressWarning(String expression)
+    {
+        ExpressionElement element = new ExpressionElement();
+        warningPattern.addExclusion(element);
+        return element;
+    }
+
+    public ExpressionElement createSuppressError(String expression)
+    {
+        ExpressionElement element = new ExpressionElement();
+        errorPattern.addExclusion(element);
+        return element;
+    }
+
+    public void addSuppressWarning(ExpressionElement element)
+    {
+        warningPattern.addExclusion(element);
+    }
+
+    public void addSuppressError(ExpressionElement element)
+    {
+        errorPattern.addExclusion(element);
     }
 
     public void setFailOnError(boolean fail)
@@ -91,5 +116,15 @@ public class Maven2PostProcessor extends PostProcessorGroup
     {
         featurePP.setTrailingContext(lines);
         failurePP.setTrailingContext(lines);
+    }
+
+    RegexPattern getWarningPattern()
+    {
+        return warningPattern;
+    }
+
+    RegexPattern getErrorPattern()
+    {
+        return errorPattern;
     }
 }
