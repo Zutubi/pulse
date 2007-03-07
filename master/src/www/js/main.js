@@ -111,7 +111,7 @@ function submitenter(field, evt, value)
 //   - extraArgs: optional extra arguments for param string (e.g. "&prefix=foo")
 function openBrowseWindow(contextPath, selectDir, elementId, extraArgs)
 {
-    var browseWindow = window.open(contextPath + "/popups/browseScm.action?selectDir=" + selectDir + "&elementId=" + elementId + extraArgs, "browse scm", 'status=yes,resizable=yes,top=100,left=100,width=600,height=600,scrollbars=yes');
+    var browseWindow = window.open(contextPath + "/popups/browseScm.action?selectDir=" + selectDir + "&elementId=" + elementId + extraArgs, "scm", 'status=yes,resizable=yes,top=100,left=100,width=600,height=600,scrollbars=yes');
     browseWindow.opener = self;
     browseWindow.focus();
 }
@@ -121,7 +121,7 @@ function openBrowseWindow(contextPath, selectDir, elementId, extraArgs)
 //   - versionId: ID of textbox to receive the resource version
 function openResourceBrowser(contextPath, resourceId, versionId)
 {
-    var browseWindow = window.open(contextPath + "/popups/browseResources.action?resourceId=" + resourceId + "&versionId=" + versionId, "resource browser", 'status=yes,resizable=yes,top=100,left=100,width=600,height=600,scrollbars=yes');
+    var browseWindow = window.open(contextPath + "/popups/browseResources.action?resourceId=" + resourceId + "&versionId=" + versionId, "resources", 'status=yes,resizable=yes,top=100,left=100,width=600,height=600,scrollbars=yes');
     browseWindow.opener = self;
     browseWindow.focus();
 }
@@ -132,7 +132,7 @@ function openFileDialog(path, formname, fieldname, root, showFiles, showHidden, 
                                    '&fieldname=' + fieldname + '&root=' + root +
                                    '&showFiles=' + showFiles + '&showHidden=' + showHidden +
                                    '&showToolbar=' + showToolbar,
-            'browse_popup', 'width=400, height=550, resizable=yes', false);
+            'files', 'width=400, height=550, resizable=yes', false);
     browseWindow.opener = self;
     browseWindow.focus();
 }
