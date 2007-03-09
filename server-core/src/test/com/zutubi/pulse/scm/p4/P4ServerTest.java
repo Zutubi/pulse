@@ -457,7 +457,6 @@ public class P4ServerTest extends PulseTestCase
     {
         String spec = SystemUtils.runCommand("p4", "-p", "6666", "client", "-o", "test-client");
         spec = spec.replaceAll("(\nOptions:.*)unlocked", "$1locked");
-        System.out.println("spec = " + spec);
         SystemUtils.runCommandWithInput(spec, "p4", "-p", "6666", "client", "-i");
 
         P4Client client = new P4Client();
