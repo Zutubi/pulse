@@ -16,6 +16,7 @@ public class ExecutableCommand implements Command, ScopeAware
 {
     public static final String ENV_NAME = "environment";
     private static final String ENV_PATH = "PATH";
+    private static final String SUPPRESSED_VALUE = "[value suppressed for security reasons]";
 
     private String name;
     private String exe;
@@ -28,6 +29,8 @@ public class ExecutableCommand implements Command, ScopeAware
     private Process child;
     private CancellableReader reader;
     private volatile boolean terminated = false;
+
+    private List<String> suppressedEnvironment = Arrays.asList(System.getProperty("pulse.suppressed.environment.variables", "P4PASSWD").split(" +"));
 
     public void execute(CommandContext context, CommandResult cmdResult)
     {
@@ -213,7 +216,16 @@ public class ExecutableCommand implements Command, ScopeAware
         Map<String, String> env = new TreeMap<String, String>(builder.environment());
         for (String key : env.keySet())
         {
-            buffer.append(key).append("=").append(env.get(key)).append(separator);
+            String value;
+            if(suppressedEnvironment.contains(key.toUpperCase()))
+            {
+                value = SUPPRESSED_VALUE;
+            }
+            else
+            {
+                value = env.get(key);
+            }
+            buffer.append(key).append("=").append(value).append(separator);
         }
 
         buffer.append(separator);
