@@ -2,10 +2,7 @@ package com.zutubi.pulse.util;
 
 import com.zutubi.pulse.util.logging.Logger;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.StringWriter;
+import java.io.*;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.LinkedList;
@@ -56,11 +53,26 @@ public class SystemUtils
         return findInPath(name, null);
     }
 
-    public static String runCommand(String... command) throws IOException
+    public static String runCommandWithInput(String input, String... command) throws IOException
     {
         Process process;
         process = Runtime.getRuntime().exec(command);
 
+        if(input != null)
+        {
+            OutputStream stdinStream = null;
+
+            try
+            {
+                stdinStream = process.getOutputStream();
+                stdinStream.write(input.getBytes("US-ASCII"));
+            }
+            finally
+            {
+                IOUtils.close(stdinStream);
+            }
+        }
+        
         InputStreamReader stdoutReader = new InputStreamReader(process.getInputStream());
         StringWriter stdoutWriter = new StringWriter();
         IOUtils.joinReaderToWriter(stdoutReader, stdoutWriter);
@@ -81,8 +93,14 @@ public class SystemUtils
         }
         else
         {
+            System.out.println(stdoutWriter.getBuffer().toString());
             throw new IOException(String.format("Command '%s' exited with code %d", command[0], exitCode));
         }
+    }
+
+    public static String runCommand(String... command) throws IOException
+    {
+        return runCommandWithInput(null, command);
     }
 
     /**
