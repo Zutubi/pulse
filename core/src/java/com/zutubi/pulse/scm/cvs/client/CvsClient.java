@@ -4,10 +4,14 @@ import com.opensymphony.util.TextUtils;
 import com.zutubi.pulse.core.model.CvsRevision;
 import com.zutubi.pulse.scm.SCMCheckoutEventHandler;
 import com.zutubi.pulse.scm.SCMException;
-import com.zutubi.pulse.scm.cvs.client.commands.*;
+import com.zutubi.pulse.scm.cvs.client.commands.CheckoutListener;
+import com.zutubi.pulse.scm.cvs.client.commands.LogListener;
+import com.zutubi.pulse.scm.cvs.client.commands.StatusListener;
+import com.zutubi.pulse.scm.cvs.client.commands.UpdateListener;
+import com.zutubi.pulse.scm.cvs.client.commands.VersionCommand;
 import com.zutubi.pulse.scm.cvs.client.util.CvsUtils;
-import com.zutubi.pulse.util.logging.Logger;
 import com.zutubi.pulse.util.Constants;
+import com.zutubi.pulse.util.logging.Logger;
 import org.netbeans.lib.cvsclient.CVSRoot;
 import org.netbeans.lib.cvsclient.Client;
 import org.netbeans.lib.cvsclient.admin.StandardAdminHandler;
@@ -24,8 +28,8 @@ import org.netbeans.lib.cvsclient.command.tag.RtagCommand;
 import org.netbeans.lib.cvsclient.command.update.UpdateCommand;
 import org.netbeans.lib.cvsclient.connection.AuthenticationException;
 import org.netbeans.lib.cvsclient.connection.Connection;
-import org.netbeans.lib.cvsclient.event.CVSListener;
 import org.netbeans.lib.cvsclient.event.CVSAdapter;
+import org.netbeans.lib.cvsclient.event.CVSListener;
 import org.netbeans.lib.cvsclient.event.MessageEvent;
 
 import java.io.File;
@@ -33,6 +37,8 @@ import java.lang.reflect.Field;
 import java.text.SimpleDateFormat;
 import java.util.List;
 import java.util.TimeZone;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.logging.Level;
 
 /**
@@ -107,6 +113,55 @@ public class CvsClient
             listener = new UpdateListener(handler);
         }
         update(workingDirectory, revision, listener);
+    }
+
+    public CvsRevision updateWorkingCopyForPersonalBuild(File workingDirectory, String module, CvsRevision revision, CVSListener listener) throws SCMException
+    {
+        // What we need is:
+        // a) to update the local working copy to the latest revision
+        // b) identify that latest revision
+        // so that when the local working copy is recreated on the server, it is accurate.
+
+        // To accurately identify the base revision of the working copy, we really need to have a date stamp.  We have
+        // two options for this:
+        // a) update -D <somedate>.  The problem with this is that it will apply a sticky date to the working copy,
+        //    which then requires a second update -A to remove.
+        // b) determine the latest revision on the server, and run a standard update, which will update the local copy
+        //    to the latest version on the server.  This option does not suffer from the sticky date issue, but is not
+        //    as strick on the date revision of the update.  In practice, this should be fine.  In theory, if a checkin
+        //    is made at the same time as the update, and part of that checkin is pulled into the update, then some problems
+        //    may occur. Tough.
+
+
+        // Get latest revision from the server.  This code is the same as the CvsServer.getLatestRevision.
+        String branch = revision.getBranch();
+
+        LogInformationAnalyser analyser = new LogInformationAnalyser();
+
+        Calendar cal = Calendar.getInstance();
+        cal.add(Calendar.DAY_OF_YEAR, -1);
+
+        CvsRevision latest = new CvsRevision("", branch, "", cal.getTime());
+
+        Date latestUpdate = analyser.latestUpdate(rlog(module, latest, null));
+        if (latestUpdate != null)
+        {
+            latest = new CvsRevision("", branch, "", latestUpdate);
+        }
+
+        UpdateCommand update = new UpdateCommand();
+
+        if (TextUtils.stringSet(revision.getBranch()))
+        {
+            update.setUpdateByRevision(revision.getBranch());
+        }
+
+        if (!executeCommand(update, workingDirectory, listener))
+        {
+            throw new SCMException("Failed to update the local working copy. Reason unknown.");
+        }
+
+        return latest;
     }
 
     public void update(File workingDirectory, CvsRevision revision, CVSListener listener) throws SCMException

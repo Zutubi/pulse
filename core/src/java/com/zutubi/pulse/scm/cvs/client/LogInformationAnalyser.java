@@ -37,6 +37,10 @@ public class LogInformationAnalyser
     private String uid;
     private CVSRoot root;
 
+    public LogInformationAnalyser()
+    {
+    }
+
     public LogInformationAnalyser(String uid, CVSRoot root)
     {
         this.uid = uid;

@@ -144,9 +144,7 @@ public class CvsWorkingCopy extends PersonalBuildSupport implements WorkingCopy
         
         UpdateHandler updateHandler = new UpdateHandler();
         
-        CvsRevision revision = new CvsRevision(null, branch, null, new Date());
-        client.update(workingDir, revision, updateHandler);
-        return revision;
+        return client.updateWorkingCopyForPersonalBuild(workingDir, localWorkingModule, new CvsRevision(null, branch, null, null), updateHandler);
     }
 
     private class UpdateHandler extends CVSAdapter
