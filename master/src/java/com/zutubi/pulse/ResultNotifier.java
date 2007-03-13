@@ -55,7 +55,7 @@ public class ResultNotifier implements EventListener
 
         buildResult.loadFailedTestResults(configurationManager.getDataDirectory(), getFailureLimit());
 
-        Set<String> notifiedContactPoints = new HashSet<String>();
+        Set<Long> notifiedContactPoints = new HashSet<Long>();
         Map<String, String> renderCache = new HashMap<String, String>();
 
         // Retrieve all of the subscriptions indicating an interest in the project
@@ -65,7 +65,7 @@ public class ResultNotifier implements EventListener
         {
             // filter out contact points that we have already notified.
             ContactPoint contactPoint = subscription.getContactPoint();
-            if (notifiedContactPoints.contains(contactPoint.getUid()))
+            if (notifiedContactPoints.contains(contactPoint.getId()))
             {
                 continue;
             }
@@ -79,7 +79,7 @@ public class ResultNotifier implements EventListener
             {
                 String templateName = subscription.getTemplate();
                 String rendered = renderResult(buildResult, templateName, renderCache);
-                notifiedContactPoints.add(contactPoint.getUid());
+                notifiedContactPoints.add(contactPoint.getId());
                 contactPoint.notify(buildResult, rendered, buildResultRenderer.getTemplateInfo(templateName, buildResult.isPersonal()).getMimeType());
                 
                 // Contact point may be modified: e.g. error may be set.
