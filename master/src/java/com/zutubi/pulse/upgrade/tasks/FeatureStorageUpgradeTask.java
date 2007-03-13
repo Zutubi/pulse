@@ -91,26 +91,29 @@ public class FeatureStorageUpgradeTask extends DatabaseUpgradeTask implements Co
 
     private void processCommandResult(Connection con, Long id, String name, String outputDir) throws SQLException, IOException
     {
-        OriginalFeaturePersister.CommandResult commandResult = new OriginalFeaturePersister.CommandResult(name);
-        ResultSet rs = null;
-        try
+        if (outputDir != null)
         {
-            selectArtifactByCommandId.setLong(1, id);
-            rs = selectArtifactByCommandId.executeQuery();
-            while (rs.next())
+            OriginalFeaturePersister.CommandResult commandResult = new OriginalFeaturePersister.CommandResult(name);
+            ResultSet rs = null;
+            try
             {
-                commandResult.addArtifact(processArtifact(con, rs.getLong("id"), rs.getString("name")));
+                selectArtifactByCommandId.setLong(1, id);
+                rs = selectArtifactByCommandId.executeQuery();
+                while (rs.next())
+                {
+                    commandResult.addArtifact(processArtifact(con, rs.getLong("id"), rs.getString("name")));
+                }
             }
-        }
-        finally
-        {
-            JDBCUtils.close(rs);
-        }
+            finally
+            {
+                JDBCUtils.close(rs);
+            }
 
-        File recipeDir = new File(configurationManager.getDataDirectory(), outputDir).getParentFile().getParentFile();
-        if (recipeDir.exists())
-        {
-            persister.writeFeatures(commandResult, recipeDir);
+            File recipeDir = new File(configurationManager.getDataDirectory(), outputDir).getParentFile().getParentFile();
+            if (recipeDir.exists())
+            {
+                persister.writeFeatures(commandResult, recipeDir);
+            }
         }
     }
 
