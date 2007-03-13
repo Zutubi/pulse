@@ -10,6 +10,7 @@ import com.zutubi.pulse.events.build.*;
 import com.zutubi.pulse.logging.CustomLogRecord;
 import com.zutubi.pulse.model.*;
 import com.zutubi.pulse.test.PulseTestCase;
+import com.zutubi.pulse.util.FileSystemUtils;
 
 import java.io.File;
 import java.util.*;
@@ -18,6 +19,8 @@ import java.util.*;
  */
 public class RecipeControllerTest extends PulseTestCase
 {
+    private File recipeDir;
+
     private MockRecipeResultCollector resultCollector;
     private MockRecipeQueue recipeQueue;
     private MockBuildManager buildManager;
@@ -35,6 +38,8 @@ public class RecipeControllerTest extends PulseTestCase
     protected void setUp() throws Exception
     {
         super.setUp();
+        recipeDir = FileSystemUtils.createTempDir(RecipeControllerTest.class.getName(), "");
+
         resultCollector = new MockRecipeResultCollector();
         recipeQueue = new MockRecipeQueue();
         buildManager = new MockBuildManager();
@@ -60,6 +65,7 @@ public class RecipeControllerTest extends PulseTestCase
 
     protected void tearDown() throws Exception
     {
+        FileSystemUtils.rmdir(recipeDir);
         super.tearDown();
     }
 
@@ -267,6 +273,11 @@ public class RecipeControllerTest extends PulseTestCase
         public void cleanup(BuildResult result, long recipeId, boolean incremental, BuildService buildService)
         {
             cleanedRecipes.put(recipeId, buildService);
+        }
+
+        public File getRecipeDir(BuildResult result, long recipeId)
+        {
+            return recipeDir;
         }
 
         public boolean hasPrepared(long recipeId)

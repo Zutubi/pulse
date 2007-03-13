@@ -133,6 +133,7 @@ public class TemporaryViewArtifactAction extends ProjectActionSupport
 
     public String execute()
     {
+        buildResult.loadFeatures(configurationManager.getDataDirectory());        
         File artifactFile = new File(commandResult.getAbsoluteOutputDir(configurationManager.getDataDirectory()), artifact.getPath());
         if(!artifactFile.isFile())
         {

@@ -247,6 +247,19 @@ public class RecipeResultNode extends Entity
         return worst;
     }
 
+    public void loadFeatures(File dataRoot)
+    {
+        if(result != null)
+        {
+            result.loadFeatures(dataRoot);
+        }
+
+        for(RecipeResultNode child: children)
+        {
+            child.loadFeatures(dataRoot);
+        }
+    }
+
     public void loadFailedTestResults(File dataRoot, int limit)
     {
         if(result != null)

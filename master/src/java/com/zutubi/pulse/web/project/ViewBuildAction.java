@@ -116,6 +116,8 @@ public class ViewBuildAction extends ProjectActionSupport
 
         checkPermissions(result);
 
+        result.loadFeatures(configurationManager.getDataDirectory());
+
         if(result.completed())
         {
             result.loadFailedTestResults(configurationManager.getDataDirectory(), getFailureLimit());

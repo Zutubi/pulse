@@ -4,6 +4,7 @@ import com.zutubi.pulse.bootstrap.ComponentContext;
 import com.zutubi.pulse.core.Bootstrapper;
 import com.zutubi.pulse.core.BuildException;
 import com.zutubi.pulse.core.model.CommandResult;
+import com.zutubi.pulse.core.model.FeaturePersister;
 import com.zutubi.pulse.core.model.RecipeResult;
 import com.zutubi.pulse.core.model.ResourceProperty;
 import com.zutubi.pulse.events.build.*;
@@ -11,6 +12,7 @@ import com.zutubi.pulse.model.*;
 import com.zutubi.pulse.services.ServiceTokenManager;
 import com.zutubi.pulse.util.logging.Logger;
 
+import java.io.IOException;
 import java.util.List;
 
 /**
@@ -196,6 +198,16 @@ public class RecipeController
     {
         CommandResult result = event.getResult();
         result.getStamps().setEndTime(System.currentTimeMillis());
+        FeaturePersister persister = new FeaturePersister();
+        try
+        {
+            persister.writeFeatures(result, collector.getRecipeDir(buildResult, recipeResult.getId()));
+        }
+        catch (IOException e)
+        {
+            LOG.severe("Unable to save features for command '" + result.getCommandName() + "': " + e.getMessage(), e);
+        }
+        
         recipeResult.update(result);
         buildManager.save(recipeResult);
         logger.log(event, result);

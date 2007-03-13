@@ -144,12 +144,12 @@ public class FileArtifactFileObject extends AbstractPulseFileObject implements A
 
     protected StoredArtifact getArtifact() throws FileSystemException
     {
-        return ((ArtifactProvider) getAncestor(ArtifactProvider.class)).getArtifact();
+        return getAncestor(ArtifactProvider.class).getArtifact();
     }
 
     protected String getArtifactPath() throws FileSystemException
     {
-        AbstractPulseFileObject fo = getAncestor(ArtifactProvider.class);
+        AbstractPulseFileObject fo = (AbstractPulseFileObject) getAncestor(ArtifactProvider.class);
         return fo.getName().getRelativeName(getName());
     }
 }

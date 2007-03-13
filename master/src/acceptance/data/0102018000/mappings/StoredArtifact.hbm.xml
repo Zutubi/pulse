@@ -29,6 +29,12 @@
         <property name="path" column="FILE" type="string" length="1023"/>
 
         <property name="type" column="TYPE" type="string" length="255"/>
+
+        <bag name="features" cascade="all,delete-orphan" lazy="true">
+            <key column="FILE_ARTIFACT_ID"/>
+            <one-to-many class="com.zutubi.pulse.core.model.Feature"/>
+        </bag>
+
     </class>
 
 </hibernate-mapping>

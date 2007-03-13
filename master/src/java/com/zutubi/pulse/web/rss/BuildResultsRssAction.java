@@ -4,6 +4,7 @@ import com.sun.syndication.feed.WireFeed;
 import com.sun.syndication.feed.module.content.ContentModule;
 import com.sun.syndication.feed.module.content.ContentModuleImpl;
 import com.sun.syndication.feed.synd.*;
+import com.zutubi.pulse.ResultNotifier;
 import com.zutubi.pulse.bootstrap.MasterConfigurationManager;
 import com.zutubi.pulse.cache.Cache;
 import com.zutubi.pulse.cache.CacheManager;
@@ -484,6 +485,8 @@ public class BuildResultsRssAction extends ProjectActionSupport
                 {
                     // create
                     BuildResult result = buildManager.getBuildResult(id);
+                    result.loadFeatures(configurationManager.getDataDirectory());
+                    result.loadFailedTestResults(configurationManager.getDataDirectory(), ResultNotifier.getFailureLimit());
                     SyndEntry entry = factory.createEntry(result);
 
                     // and add.

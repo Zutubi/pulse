@@ -55,6 +55,11 @@ public class UpgradeAcceptanceTest extends BaseAcceptanceTestCase
         importAndUpgradeTest("0102017001");
     }
 
+    public void testFeatureStorage() throws Exception
+    {
+        importAndUpgradeTest("0102018000");
+    }
+
     public void importAndUpgradeTest(String build) throws Exception
     {
         String db = System.getenv("PULSE_DB");

@@ -1,17 +1,12 @@
 package com.zutubi.pulse.web.project;
 
 import com.opensymphony.util.TextUtils;
-import com.zutubi.pulse.core.model.CommandResult;
-import com.zutubi.pulse.core.model.Feature;
-import com.zutubi.pulse.core.model.PlainFeature;
-import com.zutubi.pulse.core.model.StoredFileArtifact;
-import com.zutubi.pulse.model.BuildResult;
+import com.zutubi.pulse.bootstrap.MasterConfigurationManager;
+import com.zutubi.pulse.core.model.*;
 import com.zutubi.pulse.model.BuildManager;
+import com.zutubi.pulse.model.BuildResult;
 import com.zutubi.pulse.util.logging.Logger;
-import com.zutubi.pulse.vfs.pulse.AbstractPulseFileObject;
-import com.zutubi.pulse.vfs.pulse.BuildResultProvider;
-import com.zutubi.pulse.vfs.pulse.CommandResultProvider;
-import com.zutubi.pulse.vfs.pulse.FileArtifactProvider;
+import com.zutubi.pulse.vfs.pulse.*;
 import com.zutubi.pulse.web.vfs.VFSActionSupport;
 import org.apache.commons.vfs.FileObject;
 import org.apache.commons.vfs.FileSystemException;
@@ -27,16 +22,17 @@ public class ViewArtifactAction extends VFSActionSupport
 {
     private static final Logger LOG = Logger.getLogger(ViewArtifactAction.class);
 
+    private MasterConfigurationManager configurationManager;
     private BuildManager buildManager;
 
     private BuildResult buildResult;
     private CommandResult commandResult;
     private StoredFileArtifact artifact;
     private BufferedReader reader;
+
     private Map<Long, Feature.Level> lineLevels;
 
     private String path;
-
     /**
      * @deprecated
      */
@@ -127,8 +123,10 @@ public class ViewArtifactAction extends VFSActionSupport
 
         AbstractPulseFileObject pfo = (AbstractPulseFileObject) fo;
 
-        buildResult = ((BuildResultProvider)pfo.getAncestor(BuildResultProvider.class)).getBuildResult();
-        commandResult = ((CommandResultProvider)pfo.getAncestor(CommandResultProvider.class)).getCommandResult();
+        buildResult = pfo.getAncestor(BuildResultProvider.class).getBuildResult();
+        RecipeResult recipeResult = pfo.getAncestor(RecipeResultProvider.class).getRecipeResult();
+        commandResult = pfo.getAncestor(CommandResultProvider.class).getCommandResult();
+        commandResult.loadFeatures(recipeResult.getRecipeDir(configurationManager.getDataDirectory()));
         artifact = buildManager.getFileArtifact(((FileArtifactProvider)pfo).getFileArtifactId());
 
         File artifactFile = ((FileArtifactProvider)pfo).getFile();
@@ -156,6 +154,11 @@ public class ViewArtifactAction extends VFSActionSupport
     public void setBuildManager(BuildManager buildManager)
     {
         this.buildManager = buildManager;
+    }
+
+    public void setConfigurationManager(MasterConfigurationManager configurationManager)
+    {
+        this.configurationManager = configurationManager;
     }
 
     class ReaderIterator implements Iterator
