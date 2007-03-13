@@ -16,6 +16,11 @@ public class ManualTriggerBuildReason extends AbstractBuildReason
         this.username = username;
     }
 
+    public boolean isUser()
+    {
+        return true;
+    }
+
     public String getSummary()
     {
         return "manual trigger by " + username;

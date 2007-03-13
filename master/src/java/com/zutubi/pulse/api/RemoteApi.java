@@ -10,6 +10,7 @@ import com.zutubi.pulse.bootstrap.ComponentContext;
 import com.zutubi.pulse.committransformers.CommitMessageTransformerManager;
 import com.zutubi.pulse.core.model.PersistentName;
 import com.zutubi.pulse.core.model.ResultState;
+import com.zutubi.pulse.core.model.Revision;
 import com.zutubi.pulse.events.Event;
 import com.zutubi.pulse.events.EventManager;
 import com.zutubi.pulse.events.system.SystemStartedEvent;
@@ -20,6 +21,7 @@ import com.zutubi.pulse.license.LicenseException;
 import com.zutubi.pulse.license.LicenseHolder;
 import com.zutubi.pulse.model.*;
 import com.zutubi.pulse.scm.SCMConfiguration;
+import com.zutubi.pulse.scm.SCMException;
 import com.zutubi.pulse.util.OgnlUtils;
 import com.zutubi.pulse.util.TimeStamps;
 import com.zutubi.pulse.validation.PulseValidationContext;
@@ -373,12 +375,31 @@ public class RemoteApi implements com.zutubi.pulse.events.EventListener
 
     public boolean triggerBuild(String token, String projectName, String buildSpecification) throws AuthenticationException
     {
+        return triggerBuild(token, projectName, buildSpecification, null);
+    }
+
+    public boolean triggerBuild(String token, String projectName, String buildSpecification, String revision) throws AuthenticationException
+    {
         try
         {
             tokenManager.loginUser(token);
             Project project = internalGetProject(projectName);
             getBuildSpecification(project, buildSpecification);
-            projectManager.triggerBuild(project, buildSpecification, new RemoteTriggerBuildReason(), null, true);
+
+            Revision r = null;
+            if(TextUtils.stringSet(revision))
+            {
+                try
+                {
+                    r = project.getScm().createServer().getRevision(revision);
+                }
+                catch (SCMException e)
+                {
+                    throw new IllegalArgumentException("Unable to verify revision: " + e.getMessage());
+                }
+            }
+
+            projectManager.triggerBuild(project, buildSpecification, new RemoteTriggerBuildReason(), r, true);
             return true;
         }
         finally

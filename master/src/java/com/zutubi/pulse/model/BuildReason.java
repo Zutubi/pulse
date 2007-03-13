@@ -5,6 +5,8 @@ package com.zutubi.pulse.model;
  */
 public interface BuildReason extends Cloneable
 {
+    boolean isUser();
+
     String getSummary();
 
     Object clone() throws CloneNotSupportedException;

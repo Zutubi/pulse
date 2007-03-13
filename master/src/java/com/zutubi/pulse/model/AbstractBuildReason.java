@@ -8,6 +8,11 @@ import com.zutubi.pulse.core.model.Entity;
  */
 public abstract class AbstractBuildReason extends Entity implements BuildReason, Cloneable
 {
+    public boolean isUser()
+    {
+        return false;
+    }
+
     public Object clone() throws CloneNotSupportedException
     {
         return super.clone();

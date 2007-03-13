@@ -255,7 +255,7 @@ public class DefaultProjectManager implements ProjectManager
         try
         {
             String pulseFile = getPulseFile(project, revision, null);
-            eventManager.publish(new BuildRequestEvent(this, reason, project, specification, new BuildRevision(revision, pulseFile, reason instanceof ManualTriggerBuildReason)));
+            eventManager.publish(new BuildRequestEvent(this, reason, project, specification, new BuildRevision(revision, pulseFile, reason.isUser())));
         }
         catch (BuildException e)
         {
