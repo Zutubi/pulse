@@ -21,4 +21,8 @@ public interface DatabaseConsole extends Stoppable
     DatabaseConfig getConfig();
 
     double getDatabaseUsagePercent();
+
+    void postSchemaHook();
+
+    void postUpgradeHook(boolean changes);
 }

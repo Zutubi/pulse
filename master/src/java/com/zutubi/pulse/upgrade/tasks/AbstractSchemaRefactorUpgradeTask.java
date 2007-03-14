@@ -47,7 +47,7 @@ public abstract class AbstractSchemaRefactorUpgradeTask extends DatabaseUpgradeT
         doRefactor(context, con, refactor);
     }
 
-    protected abstract void doRefactor(UpgradeContext context, Connection con, SchemaRefactor refactor) throws SQLException;
+    protected abstract void doRefactor(UpgradeContext context, Connection con, SchemaRefactor refactor) throws SQLException, IOException;
 
     public void setDatabaseConsole(DatabaseConsole databaseConsole)
     {

@@ -10,10 +10,11 @@ import com.zutubi.pulse.model.UserManager;
 import com.zutubi.pulse.upgrade.UpgradeManager;
 import com.zutubi.pulse.util.IOUtils;
 
-import java.io.*;
+import java.io.File;
+import java.io.IOException;
+import java.sql.SQLException;
 import java.util.List;
 import java.util.Properties;
-import java.sql.SQLException;
 
 /**
  * <class-comment/>
@@ -50,6 +51,7 @@ public class DefaultSetupManager implements SetupManager
     private SetupState state = SetupState.STARTING;
 
     private boolean promptShown = false;
+    private DatabaseConsole databaseConsole;
 
     public SetupState getCurrentState()
     {
@@ -169,7 +171,7 @@ public class DefaultSetupManager implements SetupManager
         loadContexts(daoContexts);
 
         // create the database based on the hibernate configuration.
-        DatabaseConsole databaseConsole = (DatabaseConsole) ComponentContext.getBean("databaseConsole");
+        databaseConsole = (DatabaseConsole) ComponentContext.getBean("databaseConsole");
         if (!databaseConsole.schemaExists())
         {
             try
@@ -182,6 +184,7 @@ public class DefaultSetupManager implements SetupManager
             }
         }
 
+        databaseConsole.postSchemaHook();
         loadContexts(upgradeContexts);
 
         if (isUpgradeRequired())
@@ -193,11 +196,13 @@ public class DefaultSetupManager implements SetupManager
 
         updateVersionIfNecessary();
 
-        requestUpgradeComplete();
+        requestUpgradeComplete(false);
     }
 
-    public void requestUpgradeComplete()
+    public void requestUpgradeComplete(boolean changes)
     {
+        databaseConsole.postUpgradeHook(changes);
+
         state = SetupState.STARTING;
 
         // Remove the upgrade context from the ComponentContext stack / namespace.

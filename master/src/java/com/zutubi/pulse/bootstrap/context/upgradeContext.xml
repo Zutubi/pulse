@@ -579,7 +579,13 @@
     </bean>
 
     <bean id="featureStorage" class="com.zutubi.pulse.upgrade.tasks.FeatureStorageUpgradeTask" autowire="byName">
-        <property name="buildNumber" value="102018001"/>        
+        <property name="buildNumber" value="102018001"/>
+        <property name="mappings">
+            <list>
+                <value>com/zutubi/pulse/upgrade/schema/build_0102018001/Feature.hbm.xml</value>                    
+                <value>com/zutubi/pulse/upgrade/schema/build_0102018001/StoredArtifact.hbm.xml</value>
+            </list>
+        </property>
     </bean>
 
     <bean id="duplicateChangelist" class="com.zutubi.pulse.upgrade.tasks.DuplicateChangelistUpgradeTask" autowire="byName">
