@@ -278,19 +278,6 @@ public class ExecutableCommand implements Command, ScopeAware
         cmdResult.addArtifact(envArtifact);
     }
 
-    protected StoredFileArtifact getOutputFileArtifact(CommandResult result)
-    {
-        StoredArtifact outputArtifact = result.getArtifact(OUTPUT_ARTIFACT_NAME);
-        for (StoredFileArtifact file : outputArtifact.getChildren())
-        {
-            if (file.getPath().equals(OUTPUT_ARTIFACT_NAME + "/output.txt"))
-            {
-                return file;
-            }
-        }
-        return null;
-    }
-
     private List<String> constructCommand(File workingDir)
     {
         String binary = exe;

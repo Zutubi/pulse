@@ -34,6 +34,8 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 /**
  *
@@ -42,6 +44,8 @@ public class BuildController implements EventListener
 {
     private static final String TIMEOUT_TRIGGER_GROUP = "timeout";
     private static final Logger LOG = Logger.getLogger(BuildController.class);
+
+    private static final Lock CHANGE_LOCK = new ReentrantLock();
 
     private AbstractBuildRequestEvent request;
     private Project project;
@@ -88,7 +92,9 @@ public class BuildController implements EventListener
 
         // Fail early if things are not as expected.
         if (!buildResult.isPersistent())
+        {
             throw new RuntimeException("Build result must be a persistent instance.");
+        }
 
         MasterBuildPaths paths = new MasterBuildPaths(configurationManager);
         File buildDir = paths.getBuildDir(buildResult);
@@ -123,7 +129,7 @@ public class BuildController implements EventListener
     {
         BuildResult previousSuccessful = null;
         List<BuildResult> previousSuccess = buildManager.querySpecificationBuilds(project, specification.getPname(), new ResultState[] { ResultState.SUCCESS }, -1, -1, 0, 1, true, true);
-        if(previousSuccess.size() > 0)
+        if (previousSuccess.size() > 0)
         {
             previousSuccessful = previousSuccess.get(0);
         }
@@ -185,7 +191,7 @@ public class BuildController implements EventListener
             }
             else if (evt instanceof RecipeTimeoutEvent)
             {
-                handleRecipeTimeout((RecipeTimeoutEvent)evt);
+                handleRecipeTimeout((RecipeTimeoutEvent) evt);
             }
             else if (evt instanceof RecipeEvent)
             {
@@ -217,7 +223,7 @@ public class BuildController implements EventListener
         // progress, but the specification *might*.
         project = projectManager.getProject(project.getId());
         specification = project.getBuildSpecification(specification.getId());
-        if(specification == null)
+        if (specification == null)
         {
             throw new BuildException("Build specification deleted during build");
         }
@@ -232,7 +238,7 @@ public class BuildController implements EventListener
             throw new BuildException("Unable to create build directory '" + buildDir.getAbsolutePath() + "'");
         }
 
-        if(!buildManager.isSpaceAvailableForBuild())
+        if (!buildManager.isSpaceAvailableForBuild())
         {
             throw new BuildException("Insufficient database space to run build.  Consider adding more cleanup rules to remove old build information");
         }
@@ -243,7 +249,7 @@ public class BuildController implements EventListener
         if (checkoutOnly)
         {
             initialBootstrapper = new CheckoutBootstrapper(project.getName(), specification.getName(), project.getScm(), request.getRevision(), false);
-            if(request.isPersonal())
+            if (request.isPersonal())
             {
                 initialBootstrapper = createPersonalBuildBootstrapper(initialBootstrapper);
             }
@@ -283,7 +289,7 @@ public class BuildController implements EventListener
     private void handleBuildTerminationRequest(BuildTerminationRequestEvent event)
     {
         long id = event.getBuildId();
-        
+
         if (id == buildResult.getId() || id == -1)
         {
             // Tell every running recipe to stop, and mark the build terminating
@@ -291,13 +297,13 @@ public class BuildController implements EventListener
             buildResult.terminate(event.isTimeout());
             List<TreeNode<RecipeController>> completedNodes = new ArrayList<TreeNode<RecipeController>>(executingControllers.size());
 
-            if(executingControllers.size() > 0)
+            if (executingControllers.size() > 0)
             {
                 for (TreeNode<RecipeController> controllerNode : executingControllers)
                 {
                     RecipeController controller = controllerNode.getData();
                     controller.terminateRecipe(event.isTimeout());
-                    if(controller.isFinished())
+                    if (controller.isFinished())
                     {
                         completedNodes.add(controllerNode);
                     }
@@ -307,7 +313,7 @@ public class BuildController implements EventListener
                 executingControllers.removeAll(completedNodes);
             }
 
-            if(executingControllers.size() == 0)
+            if (executingControllers.size() == 0)
             {
                 completeBuild();
             }
@@ -320,21 +326,21 @@ public class BuildController implements EventListener
         for (TreeNode<RecipeController> controllerNode : executingControllers)
         {
             RecipeController controller = controllerNode.getData();
-            if(controller.getResult().getId() == event.getRecipeId())
+            if (controller.getResult().getId() == event.getRecipeId())
             {
                 found = controllerNode;
                 break;
             }
         }
 
-        if(found != null)
+        if (found != null)
         {
             RecipeController controller = found.getData();
             controller.terminateRecipe(true);
-            if(controller.isFinished())
+            if (controller.isFinished())
             {
                 executingControllers.remove(controller);
-                if(executingControllers.size() == 0)
+                if (executingControllers.size() == 0)
                 {
                     completeBuild();
                 }
@@ -382,7 +388,7 @@ public class BuildController implements EventListener
             {
                 pendingRecipes--;
 
-                if(pendingRecipes == 0)
+                if (pendingRecipes == 0)
                 {
                     handleLastCommenced();
                 }
@@ -392,7 +398,7 @@ public class BuildController implements EventListener
                     scheduleTimeout(e.getRecipeId());
                 }
             }
-            else if(e instanceof RecipeDispatchedEvent)
+            else if (e instanceof RecipeDispatchedEvent)
             {
                 if (!buildResult.commenced())
                 {
@@ -415,11 +421,11 @@ public class BuildController implements EventListener
                     LOG.warning("Unable to unschedule timeout trigger: " + ex.getMessage(), ex);
                 }
 
-                if(e instanceof RecipeCompletedEvent)
+                if (e instanceof RecipeCompletedEvent)
                 {
                     RecipeCompletedEvent completedEvent = (RecipeCompletedEvent) e;
                     String version = completedEvent.getBuildVersion();
-                    if(version != null)
+                    if (version != null)
                     {
                         buildResult.setVersion(version);
                         buildManager.save(buildResult);
@@ -437,13 +443,13 @@ public class BuildController implements EventListener
         // time, as there are no more queued recipes.
         long longestRemaining = 0;
 
-        for(RecipeController controller: tree)
+        for (RecipeController controller : tree)
         {
             TimeStamps stamps = controller.getResult().getStamps();
-            if(stamps.hasEstimatedEndTime())
+            if (stamps.hasEstimatedEndTime())
             {
                 long remaining = stamps.getEstimatedTimeRemaining();
-                if(remaining > longestRemaining)
+                if (remaining > longestRemaining)
                 {
                     longestRemaining = remaining;
                 }
@@ -452,7 +458,7 @@ public class BuildController implements EventListener
 
         TimeStamps buildStamps = buildResult.getStamps();
         long estimatedEnd = System.currentTimeMillis() + longestRemaining;
-        if(estimatedEnd > buildStamps.getStartTime())
+        if (estimatedEnd > buildStamps.getStartTime())
         {
             buildStamps.setEstimatedRunningTime(estimatedEnd - buildStamps.getStartTime());
         }
@@ -471,18 +477,18 @@ public class BuildController implements EventListener
         {
             FileSystemUtils.createFile(new File(buildResult.getAbsoluteOutputDir(configurationManager.getDataDirectory()), BuildResult.PULSE_FILE), request.getPulseFileSource());
         }
-        catch(IOException e)
+        catch (IOException e)
         {
             LOG.warning("Unable to save pulse file for build: " + e.getMessage(), e);
         }
 
-        if(!buildResult.isPersonal())
+        if (!buildResult.isPersonal())
         {
             getChanges(dispatchRequest.getRevision());
         }
-        
+
         buildResult.commence(dispatchRequest.getRevision().getTimestamp());
-        if(previousSuccessful != null)
+        if (previousSuccessful != null)
         {
             buildResult.getStamps().setEstimatedRunningTime(previousSuccessful.getStamps().getElapsed());
         }
@@ -524,19 +530,27 @@ public class BuildController implements EventListener
         // made first
         String uid = server.getUid();
 
-        for (Changelist change : scmChanges)
+        CHANGE_LOCK.lock();
+        try
         {
-            // Have we already got this revision?
-            Changelist alreadySaved = buildManager.getChangelistByRevision(uid, change.getRevision());
-            if(alreadySaved != null)
+            for (Changelist change : scmChanges)
             {
-                change = alreadySaved;
-            }
+                // Have we already got this revision?
+                Changelist alreadySaved = buildManager.getChangelistByRevision(uid, change.getRevision());
+                if (alreadySaved != null)
+                {
+                    change = alreadySaved;
+                }
 
-            change.addProjectId(buildResult.getProject().getId());
-            change.addResultId(buildResult.getId());
-            buildManager.save(change);
-            result.add(change);
+                change.addProjectId(buildResult.getProject().getId());
+                change.addResultId(buildResult.getId());
+                buildManager.save(change);
+                result.add(change);
+            }
+        }
+        finally
+        {
+            CHANGE_LOCK.unlock();
         }
 
         return result;
@@ -603,13 +617,13 @@ public class BuildController implements EventListener
 
         if (!request.isPersonal())
         {
-            if(specification.getForceClean())
+            if (specification.getForceClean())
             {
                 specification.setForceClean(false);
                 projectManager.save(specification);
             }
 
-            for(PostBuildAction action: buildResult.getProject().getPostBuildActions())
+            for (PostBuildAction action : buildResult.getProject().getPostBuildActions())
             {
                 ComponentContext.autowire(action);
                 action.execute(buildResult, null, buildProperties);
@@ -623,7 +637,7 @@ public class BuildController implements EventListener
         long start = System.currentTimeMillis();
         testManager.index(buildResult);
         long duration = System.currentTimeMillis() - start;
-        if(duration > 300000)
+        if (duration > 300000)
         {
             LOG.warning("Test case indexing for project %s specification %s took %f seconds", project.getName(), specification.getName(), duration / 1000.0);
         }
@@ -639,7 +653,7 @@ public class BuildController implements EventListener
 
     public Class[] getHandledEvents()
     {
-        return new Class[]{BuildCommencedEvent.class, RecipeEvent.class, BuildTerminationRequestEvent.class, RecipeTimeoutEvent.class };
+        return new Class[] { BuildCommencedEvent.class, RecipeEvent.class, BuildTerminationRequestEvent.class, RecipeTimeoutEvent.class };
     }
 
     public long getBuildId()

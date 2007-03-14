@@ -60,6 +60,11 @@ public class UpgradeAcceptanceTest extends BaseAcceptanceTestCase
         importAndUpgradeTest("0102018000");
     }
 
+    public void testDuplicateChangelists() throws Exception
+    {
+        importAndUpgradeTest("0102018001");
+    }
+
     public void importAndUpgradeTest(String build) throws Exception
     {
         String db = System.getenv("PULSE_DB");

@@ -5,11 +5,11 @@ import com.zutubi.pulse.model.Project;
 import com.zutubi.pulse.model.User;
 import com.zutubi.pulse.model.persistence.ChangelistDao;
 import com.zutubi.pulse.util.Constants;
-import com.zutubi.pulse.core.model.NumericalFileRevision;
-import com.zutubi.pulse.core.model.CvsFileRevision;
 
 import java.util.Date;
 import java.util.List;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * 
@@ -244,6 +244,50 @@ public class HibernateChangelistDaoTest extends MasterPersistenceTestCase
         assertEquals(l1, found.get(1));
     }
 
+    public void testRaceToSave() throws Exception
+    {
+        Lock lock = new ReentrantLock();
+        ChangelistNutter[] nutters = new ChangelistNutter[5];
+        Thread[] threads = new Thread[5];
+
+        for(int i = 0; i < nutters.length; i++)
+        {
+            nutters[i] = new ChangelistNutter(i, lock);
+        }
+
+        for(int i = 0; i < threads.length; i++)
+        {
+            threads[i] = new Thread(nutters[i]);
+        }
+
+        for (Thread thread : threads)
+        {
+            thread.start();
+        }
+
+        System.out.println("sleeping");
+        Thread.sleep(5000);
+        System.out.println("awake");
+
+        for (ChangelistNutter nutter : nutters)
+        {
+            nutter.done = true;
+        }
+
+        for (Thread thread1 : threads)
+        {
+            thread1.join();
+        }
+
+        for (ChangelistNutter nutter1 : nutters)
+        {
+            if (nutter1.e != null)
+            {
+                fail(nutter1.e.getMessage());
+            }
+        }
+    }
+
     private Changelist createChangelist(long project, long number, String login)
     {
         NumericalRevision revision = new NumericalRevision(number);
@@ -263,5 +307,53 @@ public class HibernateChangelistDaoTest extends MasterPersistenceTestCase
     private Changelist createChangelist(long number, String login)
     {
         return createChangelist(0, number, login);
+    }
+
+    private class ChangelistNutter implements Runnable
+    {
+        int n;
+        Exception e;
+        boolean done = false;
+        Lock lock;
+
+        public ChangelistNutter(int i, Lock lock)
+        {
+            this.n = i;
+            this.lock = lock;
+        }
+
+        public void run()
+        {
+            long i = 0;
+            try
+            {
+                System.out.println("nutter " + n + " starting");
+                while(!done)
+                {
+                    Changelist newList = new Changelist("scm", new NumericalRevision(i));
+                    lock.lock();
+                    try
+                    {
+                        Changelist list = changelistDao.findByRevision("scm", new NumericalRevision(i++));
+                        if(list == null)
+                        {
+                            changelistDao.save(newList);
+                        }
+                    }
+                    finally
+                    {
+                        lock.unlock();
+                    }
+                }
+
+                System.out.println("nutter " + n + " finishing, i = " + i);
+            }
+            catch(Exception e)
+            {
+                System.out.println("i = " + i);
+                e.printStackTrace();
+                this.e = e;
+            }
+        }
     }
 }

@@ -38,7 +38,7 @@ public class FeatureStorageUpgradeTask extends DatabaseUpgradeTask implements Co
 
     public boolean haltOnFailure()
     {
-        return false;
+        return true;
     }
 
     public void execute(UpgradeContext context, Connection con) throws IOException, SQLException
