@@ -49,7 +49,7 @@
             #set($result = $latestBuilds.get($index))
 
             #dynamicRightLinkCell($result.number "viewBuild.action?id=$result.id")
-            #classCell($result.buildSpecification)
+            #contentCell($result.buildSpecification)
             #statusCell($result true)
         </tr>
 #end
