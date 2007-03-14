@@ -33,6 +33,7 @@ public class XMLTransferSupport
             case Types.LONGVARCHAR:
             case Types.TIMESTAMP:
             case Types.DATE:
+            case Types.CLOB:
                 return obj.toString();
             case Types.NULL:
                 return null;
@@ -76,6 +77,7 @@ public class XMLTransferSupport
             case Types.VARCHAR:
             case Types.CHAR:
             case Types.LONGVARCHAR:
+            case Types.CLOB:
                 return str;
             case Types.BINARY :
             case Types.VARBINARY :

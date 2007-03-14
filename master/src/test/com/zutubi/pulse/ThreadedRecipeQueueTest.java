@@ -601,6 +601,20 @@ public class ThreadedRecipeQueueTest extends TestCase implements EventListener
         assertRecipeError(1001, "Recipe request timed out waiting for a capable agent to become available");
     }
 
+    public void testBreak()
+    {
+        for(int i = 0; i < 5; i++)
+        {
+            if(true)
+            {
+                if(true)
+                {
+                    break;
+                }
+            }
+            fail();
+        }
+    }
     //-----------------------------------------------------------------------
     // Helpers and mocks
     //-----------------------------------------------------------------------
