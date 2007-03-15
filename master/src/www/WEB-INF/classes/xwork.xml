@@ -197,12 +197,6 @@
             <result name="error" type="velocity">generic-error.vm</result>
         </action>
 
-        <action name="viewRecipe" class="com.zutubi.pulse.web.project.ViewRecipeAction">
-            <interceptor-ref name="completeReadOnlyStack"/>
-            <result name="success" type="velocity">view-recipe.vm</result>
-            <result name="error" type="velocity">generic-error.vm</result>
-        </action>
-
         <action name="tailRecipeLog" class="com.zutubi.pulse.web.project.TailRecipeLogAction">
             <interceptor-ref name="completeReadOnlyStack"/>
             <result name="success" type="velocity">tail-recipe-log.vm</result>

@@ -8,6 +8,7 @@ import com.zutubi.pulse.util.SystemUtils;
 
 import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.Field;
 import java.util.List;
 import java.net.URL;
 
@@ -309,6 +310,22 @@ public class ExecutableCommandTest extends ExecutableCommandTestBase
         boolean java15 = message.contains("Working directory 'nosuchworkdir' does not exist");
         boolean jaav16 = message.endsWith("The directory name is invalid");
         assertTrue(java15 || jaav16);
+    }
+
+    public void testProcessId() throws IOException, ClassNotFoundException, NoSuchFieldException, IllegalAccessException
+    {
+        if(SystemUtils.IS_WINDOWS)
+        {
+            ProcessBuilder processBuilder = new ProcessBuilder("cmd");
+            Process p = processBuilder.start();
+            ClassLoader loader = Thread.currentThread().getContextClassLoader();
+            Class clazz = loader.loadClass("java.lang.ProcessImpl");
+            assertNotNull(clazz);
+            Field handleField = clazz.getDeclaredField("handle");
+            handleField.setAccessible(true);
+            long handle = handleField.getLong(p);
+            System.out.println("handle = " + handle);
+        }
     }
 
     private CommandResult runCommand(ExecutableCommand command, long buildNumber)
