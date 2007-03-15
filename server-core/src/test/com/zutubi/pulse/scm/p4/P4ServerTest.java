@@ -17,6 +17,8 @@ import java.util.List;
  */
 public class P4ServerTest extends PulseTestCase
 {
+    private static final String TEST_CLIENT = "test-client";
+
     private P4Client client;
     private P4Server server;
     private File tmpDir;
@@ -61,13 +63,13 @@ public class P4ServerTest extends PulseTestCase
 
     public void testGetLocation()
     {
-        getServer("test-client");
+        getServer(TEST_CLIENT);
         assertEquals(server.getLocation(), "test-client@:6666");
     }
 
     public void testGetLatestRevision() throws SCMException
     {
-        getServer("test-client");
+        getServer(TEST_CLIENT);
         assertEquals(8, server.getLatestRevision().getRevisionNumber());
     }
 
@@ -127,7 +129,7 @@ public class P4ServerTest extends PulseTestCase
 
     public void testHasChangedSince() throws Exception
     {
-        getServer("test-client");
+        getServer(TEST_CLIENT);
         assertTrue(server.hasChangedSince(new NumericalRevision(6)));
     }
 
@@ -139,21 +141,21 @@ public class P4ServerTest extends PulseTestCase
 
     public void testHasChangeSinceExcluded() throws Exception
     {
-        getServer("test-client");
+        getServer(TEST_CLIENT);
         server.setExcludedPaths(Arrays.asList("//depot2/**"));
         assertFalse(server.hasChangedSince(new NumericalRevision(6)));
     }
 
     public void testHasChangeSinceSomeExcluded() throws Exception
     {
-        getServer("test-client");
+        getServer(TEST_CLIENT);
         server.setExcludedPaths(Arrays.asList("//depot2/**"));
         assertTrue(server.hasChangedSince(new NumericalRevision(3)));
     }
 
     public void testHasChangeNoneExcluded() throws Exception
     {
-        getServer("test-client");
+        getServer(TEST_CLIENT);
         server.setExcludedPaths(Arrays.asList("//depot1/**"));
         assertTrue(server.hasChangedSince(new NumericalRevision(6)));
     }
@@ -166,7 +168,7 @@ public class P4ServerTest extends PulseTestCase
         //  { uid: :6666, rev: 4, changes: [//depot/file2#2 - EDIT, //depot2/file2#2 - EDIT] },
         //  { uid: :6666, rev: 3, changes: [//depot2/file1#2 - EDIT, //depot2/file10#2 - DELETE] },
         //  { uid: :6666, rev: 2, changes: [//depot2/file1#1 - ADD, //depot2/file10#1 - ADD, //depot2/file2#1 - ADD, //depot2/file3#1 - ADD, //depot2/file4#1 - ADD, //depot2/file5#1 - ADD, //depot2/file6#1 - ADD, //depot2/file7#1 - ADD, //depot2/file8#1 - ADD, //depot2/file9#1 - ADD] }]
-        getServer("test-client");
+        getServer(TEST_CLIENT);
         List<Changelist> changes = server.getChanges(new NumericalRevision(1), new NumericalRevision(7), "");
         assertEquals(6, changes.size());
         Changelist list = changes.get(1);
@@ -193,7 +195,7 @@ public class P4ServerTest extends PulseTestCase
 
     public void testListNonExistent() throws SCMException
     {
-        getServer("test-client");
+        getServer(TEST_CLIENT);
         try
         {
             server.getListing("depot4");
@@ -207,7 +209,7 @@ public class P4ServerTest extends PulseTestCase
 
     public void testListRoot() throws SCMException
     {
-        getServer("test-client");
+        getServer(TEST_CLIENT);
         List<RemoteFile> files = server.getListing("");
         assertEquals(2, files.size());
         RemoteFile f = files.get(0);
@@ -222,7 +224,7 @@ public class P4ServerTest extends PulseTestCase
 
     public void testListPath() throws SCMException
     {
-        getServer("test-client");
+        getServer(TEST_CLIENT);
         List<RemoteFile> files = server.getListing("depot2");
         assertEquals(10, files.size());
 
@@ -284,11 +286,11 @@ public class P4ServerTest extends PulseTestCase
 
     public void testTag() throws SCMException
     {
-        getServer("test-client");
-        assertFalse(server.labelExists("test-client", "test-tag"));
+        getServer(TEST_CLIENT);
+        assertFalse(server.labelExists(TEST_CLIENT, "test-tag"));
         server.tag(new NumericalRevision(5), "test-tag", false);
-        assertTrue(server.labelExists("test-client", "test-tag"));
-        P4Client.P4Result result = client.runP4(null, "p4", "-c", "test-client", "sync", "-f", "-n", "@test-tag");
+        assertTrue(server.labelExists(TEST_CLIENT, "test-tag"));
+        P4Client.P4Result result = client.runP4(null, "p4", "-c", TEST_CLIENT, "sync", "-f", "-n", "@test-tag");
         assertTrue(result.stdout.toString().contains("//depot2/file9#1"));
     }
 
@@ -296,16 +298,16 @@ public class P4ServerTest extends PulseTestCase
     {
         testTag();
         server.tag(new NumericalRevision(7), "test-tag", true);
-        assertTrue(server.labelExists("test-client", "test-tag"));
-        P4Client.P4Result result = client.runP4(null, "p4", "-c", "test-client", "sync", "-f", "-n", "@test-tag");
+        assertTrue(server.labelExists(TEST_CLIENT, "test-tag"));
+        P4Client.P4Result result = client.runP4(null, "p4", "-c", TEST_CLIENT, "sync", "-f", "-n", "@test-tag");
         assertTrue(result.stdout.toString().contains("//depot2/file9#2"));
     }
 
     public void testUnmovableTag() throws SCMException
     {
-        getServer("test-client");
+        getServer(TEST_CLIENT);
         server.tag(new NumericalRevision(5), "test-tag", false);
-        assertTrue(server.labelExists("test-client", "test-tag"));
+        assertTrue(server.labelExists(TEST_CLIENT, "test-tag"));
         try
         {
             server.tag(new NumericalRevision(7), "test-tag", false);
@@ -319,15 +321,15 @@ public class P4ServerTest extends PulseTestCase
 
     public void testTagSameRevision() throws SCMException
     {
-        getServer("test-client");
+        getServer(TEST_CLIENT);
         server.tag(new NumericalRevision(5), "test-tag", false);
-        assertTrue(server.labelExists("test-client", "test-tag"));
+        assertTrue(server.labelExists(TEST_CLIENT, "test-tag"));
         server.tag(new NumericalRevision(5), "test-tag", true);
     }
 
     public void testGetRevisionsSince() throws SCMException
     {
-        getServer("test-client");
+        getServer(TEST_CLIENT);
         List<Revision> revisions = server.getRevisionsSince(new NumericalRevision(5));
         assertEquals(2, revisions.size());
         assertEquals("6", revisions.get(0).getRevisionString());
@@ -336,7 +338,7 @@ public class P4ServerTest extends PulseTestCase
 
     public void testGetRevisionsSinceLatest() throws SCMException
     {
-        getServer("test-client");
+        getServer(TEST_CLIENT);
         List<Revision> revisions = server.getRevisionsSince(new NumericalRevision(7));
         assertEquals(0, revisions.size());
     }
@@ -370,7 +372,7 @@ public class P4ServerTest extends PulseTestCase
 
     public void testMultiUpdates() throws SCMException, IOException
     {
-        getServer("test-client");
+        getServer(TEST_CLIENT);
 
         NumericalRevision coRevision = new NumericalRevision(1);
         server.checkout("my-id", workDir, coRevision, null);
@@ -384,7 +386,7 @@ public class P4ServerTest extends PulseTestCase
 
     public void testGetFileRevision() throws SCMException
     {
-        getServer("test-client");
+        getServer(TEST_CLIENT);
         FileRevision rev = server.getFileRevision("//depot2/file1", new NumericalRevision(5));
         assertTrue(rev instanceof NumericalFileRevision);
         assertEquals("2", rev.getRevisionString());
@@ -392,33 +394,33 @@ public class P4ServerTest extends PulseTestCase
 
     public void testGetFileRevisionUnknownPath() throws SCMException
     {
-        getServer("test-client");
+        getServer(TEST_CLIENT);
         assertNull(server.getFileRevision("//depot2/this/path/is/wrong", new NumericalRevision(5)));
     }
 
     public void testGetFileRevisionBeforeFileAdded() throws SCMException
     {
-        getServer("test-client");
+        getServer(TEST_CLIENT);
         assertNull(server.getFileRevision("//depot2/file1", new NumericalRevision(1)));
     }
 
     public void testGetFileRevisionAfterFileDeleted() throws SCMException
     {
-        getServer("test-client");
+        getServer(TEST_CLIENT);
         FileRevision fileRevision = server.getFileRevision("//depot2/file10", new NumericalRevision(4));
         assertNull(fileRevision);
     }
 
     public void testGetRevision() throws SCMException
     {
-        getServer("test-client");
+        getServer(TEST_CLIENT);
         NumericalRevision rev = server.getRevision("3");
         assertEquals(3, rev.getRevisionNumber());
     }
 
     public void testGetRevisionLatest() throws SCMException
     {
-        getServer("test-client");
+        getServer(TEST_CLIENT);
         NumericalRevision latest = server.getLatestRevision();
         NumericalRevision rev = server.getRevision(latest.getRevisionString());
         assertEquals(latest.getRevisionNumber(), rev.getRevisionNumber());
@@ -426,7 +428,7 @@ public class P4ServerTest extends PulseTestCase
 
     public void testGetRevisionPostLatest() throws SCMException
     {
-        getServer("test-client");
+        getServer(TEST_CLIENT);
         NumericalRevision latest = server.getLatestRevision();
         try
         {
@@ -441,7 +443,7 @@ public class P4ServerTest extends PulseTestCase
 
     public void testGetRevisionInvalid() throws SCMException
     {
-        getServer("test-client");
+        getServer(TEST_CLIENT);
         try
         {
             server.getRevision("bullet");
@@ -455,18 +457,54 @@ public class P4ServerTest extends PulseTestCase
 
     public void testLockedTemplate() throws SCMException, IOException
     {
-        String spec = SystemUtils.runCommand("p4", "-p", "6666", "client", "-o", "test-client");
+        String spec = SystemUtils.runCommand("p4", "-p", "6666", "client", "-o", TEST_CLIENT);
         spec = spec.replaceAll("(\nOptions:.*)unlocked", "$1locked");
         SystemUtils.runCommandWithInput(spec, "p4", "-p", "6666", "client", "-i");
 
-        P4Client client = new P4Client();
-        client.setEnv("P4PORT", ":6666");
-        client.setEnv("P4USER", "test-user");
-        client.createClient("test-client", "unlocked-client", tmpDir);
-        spec = SystemUtils.runCommand("p4", "-p", "6666", "client", "-o", "test-client");
+        P4Client client = getClient();
+        client.createClient(TEST_CLIENT, "unlocked-client", tmpDir);
+        spec = SystemUtils.runCommand("p4", "-p", "6666", "client", "-o", TEST_CLIENT);
         assertTrue(spec.contains(" locked"));
         spec = SystemUtils.runCommand("p4", "-p", "6666", "client", "-o", "unlocked-client");
         assertFalse(spec.contains(" locked"));
+    }
+
+    public void testDeletedChangelist() throws Exception
+    {
+        // CIB-1010
+        getServer(TEST_CLIENT);
+
+        NumericalRevision latest = server.getLatestRevision();
+
+        P4Client client = getClient();
+        client.setEnv(P4Constants.ENV_CLIENT, TEST_CLIENT);
+        client.runP4("Change: new\n" +
+                     "Client: test-client\n" +
+                     "User: test-user\n" +
+                     "Status: new\n" +
+                     "Description:\n" +
+                     "    Dead changelist",
+                     "p4", "change", "-i");
+        client.runP4(null, "p4", "change", "-d", Long.toString(latest.getRevisionNumber() + 1));
+
+        client.createClient(TEST_CLIENT, "edit-client", workDir);
+        client.setEnv(P4Constants.ENV_CLIENT, "edit-client");
+        client.runP4(null, "p4", "sync");
+        client.runP4(null, "p4", "edit", "//depot/file1");
+        client.submit("test edit");
+        client.setEnv(P4Constants.ENV_CLIENT, TEST_CLIENT);
+        client.runP4(null, "p4", "client", "-d", "edit-client");
+
+        server.setExcludedPaths(Arrays.asList("//depot/file2"));
+        assertTrue(server.hasChangedSince(latest));
+    }
+
+    private P4Client getClient()
+    {
+        P4Client client = new P4Client();
+        client.setEnv(P4Constants.ENV_PORT, ":6666");
+        client.setEnv(P4Constants.ENV_USER, "test-user");
+        return client;
     }
 
     private void getServer(String client)

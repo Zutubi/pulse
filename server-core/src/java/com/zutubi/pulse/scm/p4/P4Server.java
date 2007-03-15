@@ -209,7 +209,21 @@ public class P4Server extends CachingSCMServer
         //   ... <file>#<revision> <action>
         //   ... <file>#<revision> <action>
         //   ...
-        P4Client.P4Result result = client.runP4(null, P4_COMMAND, FLAG_CLIENT, clientName, COMMAND_DESCRIBE, FLAG_SHORT, Long.toString(number));
+        P4Client.P4Result result = client.runP4(false, null, P4_COMMAND, FLAG_CLIENT, clientName, COMMAND_DESCRIBE, FLAG_SHORT, Long.toString(number));
+        if(result.stderr.length() > 0)
+        {
+            if(result.stderr.indexOf("no such changelist") >= 0)
+            {
+                // OK, this change must have been deleted at some point
+                // (CIB-1010).
+                return null;
+            }
+            else
+            {
+                throw new SCMException("p4 process returned error '" + result.stderr.toString().trim() + "'");
+            }
+        }
+        
         String[] lines = client.splitLines(result);
 
         if (lines.length < 1)
