@@ -5,9 +5,12 @@ import com.zutubi.pulse.scm.SCMCancelledException;
 import com.zutubi.pulse.scm.SCMException;
 import static com.zutubi.pulse.scm.p4.P4Constants.*;
 import com.zutubi.pulse.util.IOUtils;
+import com.zutubi.pulse.util.StringUtils;
+import com.zutubi.pulse.util.logging.Logger;
 
 import java.io.*;
 import java.util.*;
+import java.util.logging.Level;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -15,6 +18,8 @@ import java.util.regex.Pattern;
  */
 public class P4Client
 {
+    private static final Logger LOG = Logger.getLogger(P4Client.class);
+
     private static final String ASCII_CHARSET = "US-ASCII";
 
     private Map<String, String> p4Env = new HashMap<String, String>();
@@ -98,6 +103,11 @@ public class P4Client
 
     public void runP4WithHandler(P4Handler handler, String input, String... commands) throws SCMException
     {
+        if(LOG.isLoggable(Level.FINE))
+        {
+            LOG.fine(StringUtils.join(" ", commands));
+        }
+        
         Process child;
 
         p4Builder.command(commands);

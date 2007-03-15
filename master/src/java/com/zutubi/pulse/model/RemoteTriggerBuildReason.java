@@ -5,6 +5,11 @@ package com.zutubi.pulse.model;
  */
 public class RemoteTriggerBuildReason extends AbstractBuildReason
 {
+    public boolean isUser()
+    {
+        return true;
+    }
+
     public String getSummary()
     {
         return "trigger via remote api";

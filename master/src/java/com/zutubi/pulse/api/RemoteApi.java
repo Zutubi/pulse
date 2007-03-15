@@ -8,8 +8,7 @@ import com.zutubi.pulse.agent.AgentManager;
 import com.zutubi.pulse.agent.SlaveAgent;
 import com.zutubi.pulse.bootstrap.ComponentContext;
 import com.zutubi.pulse.committransformers.CommitMessageTransformerManager;
-import com.zutubi.pulse.core.model.PersistentName;
-import com.zutubi.pulse.core.model.ResultState;
+import com.zutubi.pulse.core.model.*;
 import com.zutubi.pulse.events.Event;
 import com.zutubi.pulse.events.EventManager;
 import com.zutubi.pulse.events.system.SystemStartedEvent;
@@ -20,6 +19,7 @@ import com.zutubi.pulse.license.LicenseException;
 import com.zutubi.pulse.license.LicenseHolder;
 import com.zutubi.pulse.model.*;
 import com.zutubi.pulse.scm.SCMConfiguration;
+import com.zutubi.pulse.scm.SCMException;
 import com.zutubi.pulse.util.OgnlUtils;
 import com.zutubi.pulse.util.TimeStamps;
 import com.zutubi.pulse.validation.PulseValidationContext;
@@ -371,14 +371,102 @@ public class RemoteApi implements com.zutubi.pulse.events.EventListener
         return buildDetails;
     }
 
+    public Vector<Hashtable<String, Object>> getChangesInBuild(String token, String projectName, int id) throws AuthenticationException
+    {
+        tokenManager.verifyUser(token);
+        Project project = internalGetProject(projectName);
+        BuildResult build = buildManager.getByProjectAndNumber(project, id);
+        if (build == null)
+        {
+            throw new IllegalArgumentException("Unknown build '" + id + "' for project '" + projectName + "'");
+        }
+
+        List<Changelist> changelists = buildManager.getChangesForBuild(build);
+        Vector<Hashtable<String, Object>> result = new Vector<Hashtable<String, Object>>(changelists.size());
+        for(Changelist change: changelists)
+        {
+            result.add(convertChangelist(change));
+        }
+
+        return result;
+    }
+
+    private Hashtable<String, Object> convertChangelist(Changelist change)
+    {
+        Hashtable<String, Object> result = new Hashtable<String, Object>();
+        if(change.getRevision() != null && change.getRevision().getRevisionString() != null)
+        {
+            result.put("revision", change.getRevision().getRevisionString());
+        }
+        if(change.getUser() != null)
+        {
+            result.put("author", change.getUser());
+        }
+        if(change.getDate() != null)
+        {
+            result.put("date", change.getDate());
+        }
+        if(change.getComment() != null)
+        {
+            result.put("comment", change.getComment());
+        }
+
+        Vector<Hashtable<String, Object>> files = new Vector<Hashtable<String, Object>>(change.getChanges().size());
+        for(Change file: change.getChanges())
+        {
+            files.add(convertChange(file));
+        }
+        result.put("files", files);
+
+        return result;
+    }
+
+    private Hashtable<String, Object> convertChange(Change change)
+    {
+        Hashtable<String, Object> result = new Hashtable<String, Object>();
+        if(change.getFilename() != null)
+        {
+            result.put("file", change.getFilename());
+        }
+        if(change.getRevision() != null)
+        {
+            result.put("revision", change.getRevision().getRevisionString());
+        }
+        if(change.getAction() != null)
+        {
+            result.put("action", change.getAction().toString().toLowerCase());
+        }
+
+        return result;
+    }
+
     public boolean triggerBuild(String token, String projectName, String buildSpecification) throws AuthenticationException
+    {
+        return triggerBuild(token, projectName, buildSpecification, null);
+    }
+
+    public boolean triggerBuild(String token, String projectName, String buildSpecification, String revision) throws AuthenticationException
     {
         try
         {
             tokenManager.loginUser(token);
             Project project = internalGetProject(projectName);
             getBuildSpecification(project, buildSpecification);
-            projectManager.triggerBuild(project, buildSpecification, new RemoteTriggerBuildReason(), null, true);
+
+            Revision r = null;
+            if(TextUtils.stringSet(revision))
+            {
+                try
+                {
+                    r = project.getScm().createServer().getRevision(revision);
+                }
+                catch (SCMException e)
+                {
+                    throw new IllegalArgumentException("Unable to verify revision: " + e.getMessage());
+                }
+            }
+
+            projectManager.triggerBuild(project, buildSpecification, new RemoteTriggerBuildReason(), r, true);
             return true;
         }
         finally

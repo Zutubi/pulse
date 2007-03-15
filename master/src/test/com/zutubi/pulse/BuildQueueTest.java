@@ -112,6 +112,11 @@ public class BuildQueueTest extends PulseTestCase
 
     private class MockBuildReason implements BuildReason
     {
+        public boolean isUser()
+        {
+            return false;
+        }
+
         public String getSummary()
         {
             return "mock";

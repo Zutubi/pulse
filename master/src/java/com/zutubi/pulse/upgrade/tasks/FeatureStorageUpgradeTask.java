@@ -16,7 +16,7 @@ import java.sql.SQLException;
 /**
  * Upgrade task to move artifact features from the db to disk.
  */
-public class FeatureStorageUpgradeTask extends DatabaseUpgradeTask implements ConfigurationAware
+public class FeatureStorageUpgradeTask extends AbstractSchemaRefactorUpgradeTask implements ConfigurationAware
 {
     private MasterConfigurationManager configurationManager;
     private PreparedStatement selectCommandResults;
@@ -38,10 +38,10 @@ public class FeatureStorageUpgradeTask extends DatabaseUpgradeTask implements Co
 
     public boolean haltOnFailure()
     {
-        return false;
+        return true;
     }
 
-    public void execute(UpgradeContext context, Connection con) throws IOException, SQLException
+    protected void doRefactor(UpgradeContext context, Connection con, SchemaRefactor refactor) throws SQLException, IOException
     {
         persister = new OriginalFeaturePersister();
         try
@@ -53,6 +53,8 @@ public class FeatureStorageUpgradeTask extends DatabaseUpgradeTask implements Co
         {
             closePreparedStatements();
         }
+
+        refactor.dropColumn("FEATURE", "FILE_ARTIFACT_ID");
     }
 
     private void prepareStatements(Connection con) throws SQLException
@@ -91,26 +93,29 @@ public class FeatureStorageUpgradeTask extends DatabaseUpgradeTask implements Co
 
     private void processCommandResult(Connection con, Long id, String name, String outputDir) throws SQLException, IOException
     {
-        OriginalFeaturePersister.CommandResult commandResult = new OriginalFeaturePersister.CommandResult(name);
-        ResultSet rs = null;
-        try
+        if (outputDir != null)
         {
-            selectArtifactByCommandId.setLong(1, id);
-            rs = selectArtifactByCommandId.executeQuery();
-            while (rs.next())
+            OriginalFeaturePersister.CommandResult commandResult = new OriginalFeaturePersister.CommandResult(name);
+            ResultSet rs = null;
+            try
             {
-                commandResult.addArtifact(processArtifact(con, rs.getLong("id"), rs.getString("name")));
+                selectArtifactByCommandId.setLong(1, id);
+                rs = selectArtifactByCommandId.executeQuery();
+                while (rs.next())
+                {
+                    commandResult.addArtifact(processArtifact(con, rs.getLong("id"), rs.getString("name")));
+                }
             }
-        }
-        finally
-        {
-            JDBCUtils.close(rs);
-        }
+            finally
+            {
+                JDBCUtils.close(rs);
+            }
 
-        File recipeDir = new File(configurationManager.getDataDirectory(), outputDir).getParentFile().getParentFile();
-        if (recipeDir.exists())
-        {
-            persister.writeFeatures(commandResult, recipeDir);
+            File recipeDir = new File(configurationManager.getDataDirectory(), outputDir).getParentFile().getParentFile();
+            if (recipeDir.exists())
+            {
+                persister.writeFeatures(commandResult, recipeDir);
+            }
         }
     }
 

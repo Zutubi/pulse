@@ -17,7 +17,7 @@ public interface SetupManager
 
     void requestLicenseComplete();
 
-    void requestUpgradeComplete();
+    void requestUpgradeComplete(boolean changes);
 
     void requestSetupComplete();
 

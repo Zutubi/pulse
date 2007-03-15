@@ -6,8 +6,11 @@ import com.zutubi.pulse.core.ObjectFactory;
 import com.zutubi.pulse.events.EventManager;
 import com.zutubi.pulse.events.system.SystemStartedEvent;
 import com.zutubi.pulse.util.logging.Logger;
+import com.zutubi.pulse.util.IOUtils;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
 import java.util.logging.Level;
@@ -117,6 +120,8 @@ public class DefaultStartupManager implements StartupManager
             // i) run startup tasks
             runStartupTasks(startupTasks);
 
+            loadSystemProperties();
+            
             // record the start time
             startTime = System.currentTimeMillis();
 
@@ -129,6 +134,28 @@ public class DefaultStartupManager implements StartupManager
         catch (Exception e)
         {
             throw new StartupException(e);
+        }
+    }
+
+    private void loadSystemProperties()
+    {
+        File propFile = new File(configurationManager.getUserPaths().getUserConfigRoot(), "system.properties");
+        if(propFile.exists())
+        {
+            FileInputStream is = null;
+            try
+            {
+                is = new FileInputStream(propFile);
+                System.getProperties().load(is);
+            }
+            catch (IOException e)
+            {
+                LOG.warning("Unable to load system properties: " + e.getMessage(), e);
+            }
+            finally
+            {
+                IOUtils.close(is);
+            }
         }
     }
 

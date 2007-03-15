@@ -81,6 +81,14 @@ public class EmbeddedHSQLDBConsole implements DatabaseConsole
         return HSQLDBUtils.getDatabaseUsagePercent(dataSource);
     }
 
+    public void postSchemaHook()
+    {
+    }
+
+    public void postUpgradeHook(boolean changes)
+    {
+    }
+
     public void stop(boolean force)
     {
         try

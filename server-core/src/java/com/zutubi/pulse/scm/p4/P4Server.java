@@ -1,12 +1,12 @@
 package com.zutubi.pulse.scm.p4;
 
+import com.opensymphony.util.TextUtils;
 import com.zutubi.pulse.core.model.*;
 import com.zutubi.pulse.filesystem.remote.CachingRemoteFile;
 import com.zutubi.pulse.scm.*;
 import static com.zutubi.pulse.scm.p4.P4Constants.*;
 import com.zutubi.pulse.util.FileSystemUtils;
 import com.zutubi.pulse.util.logging.Logger;
-import com.opensymphony.util.TextUtils;
 
 import java.io.File;
 import java.io.IOException;
@@ -86,12 +86,13 @@ public class P4Server extends CachingSCMServer
 
     private String getClientName(String id)
     {
+        String clientPrefix = System.getProperty("pulse.p4.client.prefix", "pulse-");
         String clientName;
 
         if (id == null)
         {
             id = Long.toString((long) (Math.random() * 100000));
-            clientName = "pulse-temp-" + id;
+            clientName = clientPrefix + "temp-" + id;
         }
         else
         {
@@ -102,7 +103,7 @@ public class P4Server extends CachingSCMServer
             catch (UnsupportedEncodingException e)
             {
             }
-            clientName = "pulse-" + id;
+            clientName = clientPrefix + id;
         }
         return clientName;
     }
