@@ -19,6 +19,7 @@ import java.util.*;
 public class ExecutableCommand extends CommandSupport implements ScopeAware
 {
     private static final String ENV_PATH = "PATH";
+    private static final String SUPPRESSED_VALUE = "[value suppressed for security reasons]";
 
     /**
      * The name of the execution environment artifact.
@@ -44,6 +45,7 @@ public class ExecutableCommand extends CommandSupport implements ScopeAware
     private PrecapturedArtifact envArtifact;
 
     private List<ProcessArtifact> processes = new LinkedList<ProcessArtifact>();
+    private List<String> suppressedEnvironment = Arrays.asList(System.getProperty("pulse.suppressed.environment.variables", "P4PASSWD").split(" +"));
 
     /**
      * Required no arg constructor.
@@ -264,7 +266,16 @@ public class ExecutableCommand extends CommandSupport implements ScopeAware
         Map<String, String> env = new TreeMap<String, String>(builder.environment());
         for (String key : env.keySet())
         {
-            buffer.append(key).append("=").append(env.get(key)).append(separator);
+            String value;
+            if(suppressedEnvironment.contains(key.toUpperCase()))
+            {
+                value = SUPPRESSED_VALUE;
+            }
+            else
+            {
+                value = env.get(key);
+            }
+            buffer.append(key).append("=").append(value).append(separator);
         }
 
         buffer.append(separator);
