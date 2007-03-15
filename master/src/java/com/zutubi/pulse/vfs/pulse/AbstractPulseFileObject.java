@@ -1,19 +1,18 @@
 package com.zutubi.pulse.vfs.pulse;
 
+import com.zutubi.pulse.core.ObjectFactory;
+import com.zutubi.pulse.model.BuildManager;
+import com.zutubi.pulse.model.ProjectManager;
 import org.apache.commons.vfs.FileName;
 import org.apache.commons.vfs.FileSystemException;
 import org.apache.commons.vfs.FileType;
 import org.apache.commons.vfs.provider.AbstractFileObject;
 import org.apache.commons.vfs.provider.AbstractFileSystem;
 
-import java.util.List;
-import java.util.LinkedList;
 import java.io.File;
 import java.io.InputStream;
-
-import com.zutubi.pulse.core.ObjectFactory;
-import com.zutubi.pulse.model.BuildManager;
-import com.zutubi.pulse.model.ProjectManager;
+import java.util.LinkedList;
+import java.util.List;
 
 /**
  * The Pulse File Object is the base class for all the file objects handled by the Pulse File System.
@@ -108,11 +107,11 @@ public abstract class AbstractPulseFileObject extends AbstractFileObject
      *
      * @throws FileSystemException if there are any problems that prevent searching the hierarchy.
      */
-    public AbstractPulseFileObject getAncestor(Class type) throws FileSystemException
+    public <T> T getAncestor(Class<T> type) throws FileSystemException
     {
         if (type.isAssignableFrom(this.getClass()))
         {
-            return this;
+            return (T) this;
         }
         AbstractPulseFileObject parent = (AbstractPulseFileObject) getParent();
         if (parent != null)

@@ -275,6 +275,11 @@ public class BuildResult extends Result implements AclObjectIdentityAware, Itera
         }
     }
 
+    public void loadFeatures(File dataRoot)
+    {
+        root.loadFeatures(dataRoot);
+    }
+
     public void loadFailedTestResults(File dataRoot, int limitPerRecipe)
     {
         root.loadFailedTestResults(dataRoot, limitPerRecipe);

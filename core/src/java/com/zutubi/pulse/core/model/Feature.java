@@ -24,7 +24,7 @@ public class Feature extends Entity
                     {
                         return "error";
                     }
-                };
+                }
     }
 
     private Level level;

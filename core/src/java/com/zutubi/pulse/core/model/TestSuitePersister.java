@@ -1,11 +1,13 @@
 package com.zutubi.pulse.core.model;
 
 import com.zutubi.pulse.util.FileSystemUtils;
-import com.zutubi.pulse.util.IOUtils;
+import com.zutubi.pulse.util.XMLUtils;
 import com.zutubi.pulse.util.logging.Logger;
 import nu.xom.*;
 
-import java.io.*;
+import java.io.File;
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
 
@@ -46,24 +48,7 @@ public class TestSuitePersister
     private void writeCases(TestSuiteResult suite, File file) throws IOException
     {
         Document doc = suiteToDoc(suite);
-        writeDocument(file, doc);
-    }
-
-    private void writeDocument(File file, Document doc) throws IOException
-    {
-        BufferedOutputStream bos = null;
-        try
-        {
-            FileOutputStream fos = new FileOutputStream(file);
-            bos = new BufferedOutputStream(fos);
-
-            Serializer serializer = new Serializer(bos);
-            serializer.write(doc);
-        }
-        finally
-        {
-            IOUtils.close(bos);
-        }
+        XMLUtils.writeDocument(file, doc);
     }
 
     private Document suiteToDoc(TestSuiteResult suite)
@@ -128,7 +113,7 @@ public class TestSuitePersister
         if(handler.endSuite())
         {
             // Document has changed, need to save.
-            writeDocument(suiteFile, doc);
+            XMLUtils.writeDocument(suiteFile, doc);
         }
     }
 

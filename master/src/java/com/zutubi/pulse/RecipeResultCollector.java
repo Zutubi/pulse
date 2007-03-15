@@ -2,6 +2,8 @@ package com.zutubi.pulse;
 
 import com.zutubi.pulse.model.BuildResult;
 
+import java.io.File;
+
 /**
  */
 public interface RecipeResultCollector
@@ -12,4 +14,5 @@ public interface RecipeResultCollector
 
     void cleanup(BuildResult result, long recipeId, boolean incremental, BuildService buildService);
 
+    File getRecipeDir(BuildResult result, long recipeId);
 }

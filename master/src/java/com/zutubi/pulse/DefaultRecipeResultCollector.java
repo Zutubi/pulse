@@ -50,5 +50,10 @@ public class DefaultRecipeResultCollector implements RecipeResultCollector
         }
     }
 
+    public File getRecipeDir(BuildResult result, long recipeId)
+    {
+        return paths.getRecipeDir(result, recipeId);
+    }
+
 
 }

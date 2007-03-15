@@ -1,5 +1,8 @@
 package com.zutubi.pulse.core.model;
 
+import com.zutubi.pulse.util.logging.Logger;
+
+import java.io.File;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Properties;
@@ -10,6 +13,8 @@ import java.util.Properties;
  */
 public class CommandResult extends Result
 {
+    private static final Logger LOG = Logger.getLogger(CommandResult.class);
+    
     private String commandName;
     private Properties properties;
     private List<StoredArtifact> artifacts = new LinkedList<StoredArtifact>();
@@ -108,6 +113,22 @@ public class CommandResult extends Result
         {
             warningFeatureCount += artifact.getFeatures(Feature.Level.WARNING).size();
             errorFeatureCount += artifact.getFeatures(Feature.Level.ERROR).size();
+        }
+    }
+
+    public void loadFeatures(File recipeDir)
+    {
+        if(completed())
+        {
+            try
+            {
+                FeaturePersister persister = new FeaturePersister();
+                persister.readFeatures(this, recipeDir);
+            }
+            catch (Exception e)
+            {
+                LOG.severe("Unable to load features: " + e.getMessage(), e);
+            }
         }
     }
 }

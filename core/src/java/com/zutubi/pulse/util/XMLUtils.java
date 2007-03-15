@@ -1,11 +1,7 @@
 package com.zutubi.pulse.util;
 
 import nu.xom.*;
-
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.StringReader;
+import java.io.*;
 
 /**
  */
@@ -83,6 +79,23 @@ public class XMLUtils
         finally
         {
             IOUtils.close(in);
+        }
+    }
+
+    public static void writeDocument(File file, Document doc) throws IOException
+    {
+        BufferedOutputStream bos = null;
+        try
+        {
+            FileOutputStream fos = new FileOutputStream(file);
+            bos = new BufferedOutputStream(fos);
+
+            Serializer serializer = new Serializer(bos);
+            serializer.write(doc);
+        }
+        finally
+        {
+            IOUtils.close(bos);
         }
     }
 }

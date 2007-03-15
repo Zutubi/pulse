@@ -226,6 +226,11 @@ public class RecipeResult extends Result
         return null;
     }
 
+    public File getRecipeDir(File dataRoot)
+    {
+        return getAbsoluteOutputDir(dataRoot).getParentFile();
+    }
+
     public TestSuiteResult getFailedTestResults()
     {
         return failedTestResults;
@@ -234,6 +239,14 @@ public class RecipeResult extends Result
     public void setFailedTestResults(TestSuiteResult failedTestResults)
     {
         this.failedTestResults = failedTestResults;
+    }
+
+    public void loadFeatures(File dataRoot)
+    {
+        for(CommandResult command: results)
+        {
+            command.loadFeatures(getRecipeDir(dataRoot));
+        }
     }
 
     public void loadFailedTestResults(File dataRoot, int limit)
@@ -251,7 +264,7 @@ public class RecipeResult extends Result
             {
                 // There is other info to show, don't totally explode
                 // because we can't load the tests
-                LOG.severe("Unable to load test results", e);
+                LOG.severe("Unable to load test results: " + e.getMessage(), e);
             }
         }
     }

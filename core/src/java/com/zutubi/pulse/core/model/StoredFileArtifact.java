@@ -14,7 +14,7 @@ public class StoredFileArtifact extends Entity
 
     private String path;
     private String type;
-    private List<Feature> features;
+    private List<Feature> features = new LinkedList<Feature>();
 
     public StoredFileArtifact()
     {
@@ -30,7 +30,6 @@ public class StoredFileArtifact extends Entity
     {
         setPath(path);
         this.type = type;
-        features = new LinkedList<Feature>();
     }
 
     public String getPath()
