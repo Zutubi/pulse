@@ -47,7 +47,7 @@
     </recipe>
 
     <recipe name="dbtest">
-        <ant name="package" args="-D=skip.tests=true" targets="package.master"/>
+        <ant name="package" args="-Dskip.tests=true" targets="package.master"/>
         <command name="build">
             <ant targets="accept.master.nodeps"/>
             <dir-artifact name="junit" base="build/reports/junit/html" fail-if-not-present="false"/>
