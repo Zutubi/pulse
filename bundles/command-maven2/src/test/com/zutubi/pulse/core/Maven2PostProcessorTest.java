@@ -4,6 +4,7 @@ import com.zutubi.pulse.core.model.CommandResult;
 import com.zutubi.pulse.util.SystemUtils;
 
 import java.io.IOException;
+import java.util.regex.Pattern;
 
 /**
  * Tests for RegexPostProcessor.
@@ -29,6 +30,34 @@ public class Maven2PostProcessorTest extends PostProcessorTestBase
         CommandResult result = createAndProcessArtifact("success", pp);
         assertTrue(result.succeeded());
         assertEquals(0, artifact.getFeatures().size());
+    }
+
+    public void testWarnings() throws Exception
+    {
+        CommandResult result = createAndProcessArtifact("warnings", pp);
+        assertTrue(result.succeeded());
+        assertWarnings("Compiling 1 source file to base.dir/target/classes\n" +
+                       "[WARNING] Removing: jar from forked lifecycle, to prevent recursive invocation.\n" +
+                       "[WARNING] Another warning\n" +
+                       "[INFO] ----------------------------------------------------------------------------");
+    }
+
+    public void testSuppressAllWarnings() throws Exception
+    {
+        pp.addSuppressWarning(new ExpressionElement(Pattern.compile(".*")));
+        CommandResult result = createAndProcessArtifact("warnings", pp);
+        assertTrue(result.succeeded());
+        assertEquals(0, artifact.getFeatures().size());
+    }
+
+    public void testSuppressWarning() throws Exception
+    {
+        pp.addSuppressWarning(new ExpressionElement(Pattern.compile(".*jar from forked lifecycle.*")));
+        CommandResult result = createAndProcessArtifact("warnings", pp);
+        assertTrue(result.succeeded());
+        assertWarnings("[WARNING] Removing: jar from forked lifecycle, to prevent recursive invocation.\n" +
+                       "[WARNING] Another warning\n" +
+                       "[INFO] ----------------------------------------------------------------------------");
     }
 
     public void testNoPOM() throws Exception
@@ -111,6 +140,14 @@ public class Maven2PostProcessorTest extends PostProcessorTestBase
                 "[ERROR] VM #displayTree: error : too few arguments to macro. Wanted 2 got 0\n" +
                 "[ERROR] VM #menuItem: error : too few arguments to macro. Wanted 1 got 0\n" +
                 "[INFO] Generate \"Dependencies\" report.");
+        assertTrue(result.succeeded());
+    }
+
+    public void testSuppressError() throws Exception
+    {
+        pp.addSuppressError(new ExpressionElement(Pattern.compile(".*too few arguments.*")));
+        CommandResult result = createAndProcessArtifact("successfulerror", pp);
+        assertEquals(0, artifact.getFeatures().size());
         assertTrue(result.succeeded());
     }
 }

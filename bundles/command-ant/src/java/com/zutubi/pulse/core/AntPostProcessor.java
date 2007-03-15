@@ -39,7 +39,7 @@ public class AntPostProcessor extends RegexPostProcessor
         // javac task compiler messages
         pattern = createPattern();
         pattern.setPattern(Pattern.compile("\\[javac\\] .*:[0-9]+:"));
-        RegexPattern.Exclusion exclude = pattern.createExclude();
+        ExpressionElement exclude = pattern.createExclude();
         Pattern warningPattern = Pattern.compile("\\[javac\\] .*:[0-9]+: warning");
         exclude.setPattern(warningPattern);
         pattern.setCategory(Feature.Level.ERROR);

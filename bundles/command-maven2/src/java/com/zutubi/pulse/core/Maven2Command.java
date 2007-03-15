@@ -12,6 +12,7 @@ import java.io.File;
 public class Maven2Command extends ExecutableCommand
 {
     private String goals;
+    private Maven2PostProcessor pp = new Maven2PostProcessor("maven2.pp");
 
     private void checkExe()
     {
@@ -80,6 +81,25 @@ public class Maven2Command extends ExecutableCommand
     public void setGoals(String goals)
     {
         this.goals = goals;
+    }
+
+    public ExpressionElement createSuppressWarning()
+    {
+        ExpressionElement element = new ExpressionElement();
+        pp.addSuppressWarning(element);
+        return element;
+    }
+
+    public ExpressionElement createSuppressError()
+    {
+        ExpressionElement element = new ExpressionElement();
+        pp.addSuppressError(element);
+        return element;
+    }
+
+    public Maven2PostProcessor getPp()
+    {
+        return pp;
     }
 
     public void setScope(Scope scope)
