@@ -6,6 +6,7 @@ import com.zutubi.pulse.scm.SCMChangeAccumulator;
 import com.zutubi.pulse.scm.SCMException;
 import com.zutubi.pulse.test.PulseTestCase;
 import com.zutubi.pulse.util.FileSystemUtils;
+import com.zutubi.pulse.util.SystemUtils;
 
 import java.io.File;
 import java.io.IOException;
@@ -450,6 +451,22 @@ public class P4ServerTest extends PulseTestCase
         {
             assertEquals("Invalid revision 'bullet': must be a valid Perforce changelist number", e.getMessage());
         }
+    }
+
+    public void testLockedTemplate() throws SCMException, IOException
+    {
+        String spec = SystemUtils.runCommand("p4", "-p", "6666", "client", "-o", "test-client");
+        spec = spec.replaceAll("(\nOptions:.*)unlocked", "$1locked");
+        SystemUtils.runCommandWithInput(spec, "p4", "-p", "6666", "client", "-i");
+
+        P4Client client = new P4Client();
+        client.setEnv("P4PORT", ":6666");
+        client.setEnv("P4USER", "test-user");
+        client.createClient("test-client", "unlocked-client", tmpDir);
+        spec = SystemUtils.runCommand("p4", "-p", "6666", "client", "-o", "test-client");
+        assertTrue(spec.contains(" locked"));
+        spec = SystemUtils.runCommand("p4", "-p", "6666", "client", "-o", "unlocked-client");
+        assertFalse(spec.contains(" locked"));
     }
 
     private void getServer(String client)
