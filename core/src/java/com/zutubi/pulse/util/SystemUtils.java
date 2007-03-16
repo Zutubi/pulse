@@ -223,4 +223,17 @@ public class SystemUtils
     {
         return !IS_WINDOWS && findInPath(binary) != null;
     }
+
+    public static boolean getBooleanProperty(String key, boolean defaultValue)
+    {
+        String value = System.getProperty(key);
+        if(value == null)
+        {
+            return defaultValue;
+        }
+        else
+        {
+            return Boolean.valueOf(value);
+        }
+    }
 }

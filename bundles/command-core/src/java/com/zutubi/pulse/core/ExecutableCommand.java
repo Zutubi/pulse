@@ -1,10 +1,8 @@
 package com.zutubi.pulse.core;
 
 import com.zutubi.pulse.core.model.CommandResult;
-import com.zutubi.pulse.util.Constants;
-import com.zutubi.pulse.util.ForkOutputStream;
-import com.zutubi.pulse.util.IOUtils;
-import com.zutubi.pulse.util.SystemUtils;
+import com.zutubi.pulse.jni.ProcessControl;
+import com.zutubi.pulse.util.*;
 
 import java.io.*;
 import java.util.*;
@@ -608,7 +606,7 @@ public class ExecutableCommand extends CommandSupport implements ScopeAware
         terminated = true;
         if (child != null)
         {
-            child.destroy();
+            ProcessControl.destroyProcess(child);
         }
 
         if(reader != null)
