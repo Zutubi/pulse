@@ -211,4 +211,17 @@ public class SystemUtils
 
         return false;
     }
+
+    public static boolean getBooleanProperty(String key, boolean defaultValue)
+    {
+        String value = System.getProperty(key);
+        if(value == null)
+        {
+            return defaultValue;
+        }
+        else
+        {
+            return Boolean.valueOf(value);
+        }
+    }
 }

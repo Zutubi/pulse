@@ -3,6 +3,7 @@ package com.zutubi.pulse.core;
 import com.zutubi.pulse.core.model.CommandResult;
 import com.zutubi.pulse.core.model.StoredArtifact;
 import com.zutubi.pulse.core.model.StoredFileArtifact;
+import com.zutubi.pulse.jni.ProcessControl;
 import com.zutubi.pulse.util.*;
 
 import java.io.*;
@@ -532,7 +533,7 @@ public class ExecutableCommand implements Command, ScopeAware
         terminated = true;
         if (child != null)
         {
-            child.destroy();
+            ProcessControl.destroyProcess(child);
         }
 
         if(reader != null)
