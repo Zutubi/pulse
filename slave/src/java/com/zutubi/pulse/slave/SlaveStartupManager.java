@@ -8,12 +8,15 @@ import com.zutubi.pulse.config.ConfigSupport;
 import com.zutubi.pulse.config.FileConfig;
 import com.zutubi.pulse.core.ObjectFactory;
 import com.zutubi.pulse.core.Stoppable;
+import com.zutubi.pulse.util.IOUtils;
 import com.zutubi.pulse.util.logging.Logger;
 import org.mortbay.http.SocketListener;
 import org.mortbay.jetty.Server;
 import org.mortbay.jetty.servlet.WebApplicationContext;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -41,6 +44,7 @@ public class SlaveStartupManager implements Startup, Stoppable
         startupConfig.setProperty(SystemConfiguration.CONTEXT_PATH, config.getContextPath());
         startupConfig.setInteger(SystemConfiguration.WEBAPP_PORT, config.getServerPort());
 
+        loadSystemProperties();
         runStartupRunnables();
 
         jettyServer = new Server();
@@ -67,6 +71,28 @@ public class SlaveStartupManager implements Startup, Stoppable
     public long getUptime()
     {
         return System.currentTimeMillis() - startTime;
+    }
+
+    private void loadSystemProperties()
+    {
+        File propFile = new File(configurationManager.getUserPaths().getUserConfigRoot(), "system.properties");
+        if(propFile.exists())
+        {
+            FileInputStream is = null;
+            try
+            {
+                is = new FileInputStream(propFile);
+                System.getProperties().load(is);
+            }
+            catch (IOException e)
+            {
+                LOG.warning("Unable to load system properties: " + e.getMessage(), e);
+            }
+            finally
+            {
+                IOUtils.close(is);
+            }
+        }
     }
 
     private void runStartupRunnables()
