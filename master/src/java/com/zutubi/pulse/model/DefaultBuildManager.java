@@ -138,6 +138,11 @@ public class DefaultBuildManager implements BuildManager, EventListener
         return buildResultDao.getBuildCount(project, states, spec);
     }
 
+    public int getBuildCount(BuildSpecification spec, long after, long upTo)
+    {
+        return buildResultDao.getBuildCount(spec.getPname(), after, upTo);
+    }
+
     public void fillHistoryPage(HistoryPage page)
     {
         fillHistoryPage(page, new ResultState[]{ResultState.ERROR, ResultState.FAILURE, ResultState.SUCCESS}, null);

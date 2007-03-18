@@ -1,9 +1,11 @@
 package com.zutubi.pulse.web.user;
 
 import antlr.MismatchedTokenException;
+import antlr.NoViableAltException;
 import antlr.collections.AST;
 import com.opensymphony.xwork.TextProvider;
 import com.opensymphony.xwork.ValidationAware;
+import com.zutubi.pulse.condition.NotifyCondition;
 import com.zutubi.pulse.condition.NotifyConditionFactory;
 import com.zutubi.pulse.condition.antlr.NotifyConditionLexer;
 import com.zutubi.pulse.condition.antlr.NotifyConditionParser;
@@ -135,19 +137,24 @@ public class SubscriptionHelper
         return defaultTemplate;
     }
 
-    public void validateCondition(String condition, ValidationAware action)
+    public NotifyCondition validateCondition(String condition, ValidationAware action)
+    {
+        return validateCondition(condition, action, notifyConditionFactory);
+    }
+
+    public static NotifyCondition validateCondition(String condition, ValidationAware action, NotifyConditionFactory notifyConditionFactory)
     {
         try
         {
             NotifyConditionLexer lexer = new NotifyConditionLexer(new StringReader(condition));
             NotifyConditionParser parser = new NotifyConditionParser(lexer);
-            parser.orexpression();
+            parser.condition();
             AST t = parser.getAST();
             if(t != null)
             {
                 NotifyConditionTreeParser tree = new NotifyConditionTreeParser();
                 tree.setNotifyConditionFactory(notifyConditionFactory);
-                tree.cond(t);
+                return tree.cond(t);
             }
         }
         catch(MismatchedTokenException mte)
@@ -161,10 +168,22 @@ public class SubscriptionHelper
                 action.addFieldError("condition", mte.toString());
             }
         }
+        catch(NoViableAltException nvae)
+        {
+            if(nvae.token.getText() == null)
+            {
+                action.addFieldError("condition", "line " + nvae.getLine() + ":" + nvae.getColumn() + ": unexpected end of input");
+            }
+            else
+            {
+                action.addFieldError("condition", nvae.toString());
+            }
+        }
         catch (Exception e)
         {
             action.addFieldError("condition", e.toString());
         }
 
+        return null;
     }
 }

@@ -24,17 +24,20 @@ public NotifyConditionLexer(LexerSharedInputState state) {
 	caseSensitiveLiterals = true;
 	setCaseSensitive(true);
 	literals = new Hashtable();
-	literals.put(new ANTLRHashString("or", this), new Integer(5));
-	literals.put(new ANTLRHashString("state.change", this), new Integer(14));
-	literals.put(new ANTLRHashString("changed.by.me", this), new Integer(13));
-	literals.put(new ANTLRHashString("true", this), new Integer(7));
-	literals.put(new ANTLRHashString("and", this), new Integer(4));
-	literals.put(new ANTLRHashString("failure", this), new Integer(10));
-	literals.put(new ANTLRHashString("changed", this), new Integer(12));
-	literals.put(new ANTLRHashString("success", this), new Integer(9));
-	literals.put(new ANTLRHashString("false", this), new Integer(8));
+	literals.put(new ANTLRHashString("changed.by.me", this), new Integer(21));
+	literals.put(new ANTLRHashString("state.change", this), new Integer(22));
+	literals.put(new ANTLRHashString("true", this), new Integer(15));
+	literals.put(new ANTLRHashString("changed", this), new Integer(20));
+	literals.put(new ANTLRHashString("unsuccessful.count.days", this), new Integer(24));
+	literals.put(new ANTLRHashString("false", this), new Integer(16));
+	literals.put(new ANTLRHashString("success", this), new Integer(17));
 	literals.put(new ANTLRHashString("not", this), new Integer(6));
-	literals.put(new ANTLRHashString("error", this), new Integer(11));
+	literals.put(new ANTLRHashString("or", this), new Integer(5));
+	literals.put(new ANTLRHashString("and", this), new Integer(4));
+	literals.put(new ANTLRHashString("previous", this), new Integer(13));
+	literals.put(new ANTLRHashString("failure", this), new Integer(18));
+	literals.put(new ANTLRHashString("error", this), new Integer(19));
+	literals.put(new ANTLRHashString("unsuccessful.count.builds", this), new Integer(23));
 }
 
 public Token nextToken() throws TokenStreamException {
@@ -66,6 +69,26 @@ tryAgain:
 					theRetToken=_returnToken;
 					break;
 				}
+				case '0':  case '1':  case '2':  case '3':
+				case '4':  case '5':  case '6':  case '7':
+				case '8':  case '9':
+				{
+					mINTEGER(true);
+					theRetToken=_returnToken;
+					break;
+				}
+				case '=':
+				{
+					mEQUAL(true);
+					theRetToken=_returnToken;
+					break;
+				}
+				case '!':
+				{
+					mNOT_EQUAL(true);
+					theRetToken=_returnToken;
+					break;
+				}
 				case '(':
 				{
 					mLEFT_PAREN(true);
@@ -85,7 +108,23 @@ tryAgain:
 					break;
 				}
 				default:
-				{
+					if ((LA(1)=='<') && (LA(2)=='=')) {
+						mLESS_THAN_OR_EQUAL(true);
+						theRetToken=_returnToken;
+					}
+					else if ((LA(1)=='>') && (LA(2)=='=')) {
+						mGREATER_THAN_OR_EQUAL(true);
+						theRetToken=_returnToken;
+					}
+					else if ((LA(1)=='<') && (true)) {
+						mLESS_THAN(true);
+						theRetToken=_returnToken;
+					}
+					else if ((LA(1)=='>') && (true)) {
+						mGREATER_THAN(true);
+						theRetToken=_returnToken;
+					}
+				else {
 					if (LA(1)==EOF_CHAR) {uponEOF(); _returnToken = makeToken(Token.EOF_TYPE);}
 				else {throw new NoViableAltForCharException((char)LA(1), getFilename(), getLine(), getColumn());}
 				}
@@ -117,8 +156,8 @@ tryAgain:
 		int _saveIndex;
 		
 		{
-		int _cnt18=0;
-		_loop18:
+		int _cnt38=0;
+		_loop38:
 		do {
 			switch ( LA(1)) {
 			case 'a':  case 'b':  case 'c':  case 'd':
@@ -150,12 +189,116 @@ tryAgain:
 			}
 			default:
 			{
-				if ( _cnt18>=1 ) { break _loop18; } else {throw new NoViableAltForCharException((char)LA(1), getFilename(), getLine(), getColumn());}
+				if ( _cnt38>=1 ) { break _loop38; } else {throw new NoViableAltForCharException((char)LA(1), getFilename(), getLine(), getColumn());}
 			}
 			}
-			_cnt18++;
+			_cnt38++;
 		} while (true);
 		}
+		if ( _createToken && _token==null && _ttype!=Token.SKIP ) {
+			_token = makeToken(_ttype);
+			_token.setText(new String(text.getBuffer(), _begin, text.length()-_begin));
+		}
+		_returnToken = _token;
+	}
+	
+	public final void mINTEGER(boolean _createToken) throws RecognitionException, CharStreamException, TokenStreamException {
+		int _ttype; Token _token=null; int _begin=text.length();
+		_ttype = INTEGER;
+		int _saveIndex;
+		
+		{
+		int _cnt41=0;
+		_loop41:
+		do {
+			if (((LA(1) >= '0' && LA(1) <= '9'))) {
+				matchRange('0','9');
+			}
+			else {
+				if ( _cnt41>=1 ) { break _loop41; } else {throw new NoViableAltForCharException((char)LA(1), getFilename(), getLine(), getColumn());}
+			}
+			
+			_cnt41++;
+		} while (true);
+		}
+		if ( _createToken && _token==null && _ttype!=Token.SKIP ) {
+			_token = makeToken(_ttype);
+			_token.setText(new String(text.getBuffer(), _begin, text.length()-_begin));
+		}
+		_returnToken = _token;
+	}
+	
+	public final void mEQUAL(boolean _createToken) throws RecognitionException, CharStreamException, TokenStreamException {
+		int _ttype; Token _token=null; int _begin=text.length();
+		_ttype = EQUAL;
+		int _saveIndex;
+		
+		match("==");
+		if ( _createToken && _token==null && _ttype!=Token.SKIP ) {
+			_token = makeToken(_ttype);
+			_token.setText(new String(text.getBuffer(), _begin, text.length()-_begin));
+		}
+		_returnToken = _token;
+	}
+	
+	public final void mNOT_EQUAL(boolean _createToken) throws RecognitionException, CharStreamException, TokenStreamException {
+		int _ttype; Token _token=null; int _begin=text.length();
+		_ttype = NOT_EQUAL;
+		int _saveIndex;
+		
+		match("!=");
+		if ( _createToken && _token==null && _ttype!=Token.SKIP ) {
+			_token = makeToken(_ttype);
+			_token.setText(new String(text.getBuffer(), _begin, text.length()-_begin));
+		}
+		_returnToken = _token;
+	}
+	
+	public final void mLESS_THAN(boolean _createToken) throws RecognitionException, CharStreamException, TokenStreamException {
+		int _ttype; Token _token=null; int _begin=text.length();
+		_ttype = LESS_THAN;
+		int _saveIndex;
+		
+		match("<");
+		if ( _createToken && _token==null && _ttype!=Token.SKIP ) {
+			_token = makeToken(_ttype);
+			_token.setText(new String(text.getBuffer(), _begin, text.length()-_begin));
+		}
+		_returnToken = _token;
+	}
+	
+	public final void mLESS_THAN_OR_EQUAL(boolean _createToken) throws RecognitionException, CharStreamException, TokenStreamException {
+		int _ttype; Token _token=null; int _begin=text.length();
+		_ttype = LESS_THAN_OR_EQUAL;
+		int _saveIndex;
+		
+		match("<=");
+		if ( _createToken && _token==null && _ttype!=Token.SKIP ) {
+			_token = makeToken(_ttype);
+			_token.setText(new String(text.getBuffer(), _begin, text.length()-_begin));
+		}
+		_returnToken = _token;
+	}
+	
+	public final void mGREATER_THAN(boolean _createToken) throws RecognitionException, CharStreamException, TokenStreamException {
+		int _ttype; Token _token=null; int _begin=text.length();
+		_ttype = GREATER_THAN;
+		int _saveIndex;
+		
+		match(">");
+		if ( _createToken && _token==null && _ttype!=Token.SKIP ) {
+			_token = makeToken(_ttype);
+			_token.setText(new String(text.getBuffer(), _begin, text.length()-_begin));
+		}
+		_returnToken = _token;
+	}
+	
+	public final void mGREATER_THAN_OR_EQUAL(boolean _createToken) throws RecognitionException, CharStreamException, TokenStreamException {
+		int _ttype; Token _token=null; int _begin=text.length();
+		_ttype = GREATER_THAN_OR_EQUAL;
+		int _saveIndex;
+		
+		match(">=");
 		if ( _createToken && _token==null && _ttype!=Token.SKIP ) {
 			_token = makeToken(_ttype);
 			_token.setText(new String(text.getBuffer(), _begin, text.length()-_begin));

@@ -111,7 +111,7 @@ public class ProjectBuildSubscription extends Subscription
                 NotifyConditionLexer lexer = new NotifyConditionLexer(new StringReader(condition));
 
                 NotifyConditionParser parser = new NotifyConditionParser(lexer);
-                parser.orexpression();
+                parser.condition();
                 AST t = parser.getAST();
                 if(t == null)
                 {

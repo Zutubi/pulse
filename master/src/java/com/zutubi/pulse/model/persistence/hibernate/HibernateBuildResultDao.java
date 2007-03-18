@@ -233,6 +233,21 @@ public class HibernateBuildResultDao extends HibernateEntityDao<BuildResult> imp
         });
     }
 
+    public int getBuildCount(final PersistentName spec, final long after, final long upTo)
+    {
+        return (Integer) getHibernateTemplate().execute(new HibernateCallback()
+        {
+            public Object doInHibernate(Session session) throws HibernateException
+            {
+                Criteria criteria = getBuildResultCriteria(session, null, null, spec, false);
+                criteria.add(Expression.gt("number", after));
+                criteria.add(Expression.le("number", upTo));
+                criteria.setProjection(Projections.rowCount());
+                return criteria.uniqueResult();
+            }
+        });
+    }
+
     public List<PersistentName> findAllSpecifications(final Project project)
     {
         return (List<PersistentName>) getHibernateTemplate().execute(new HibernateCallback()
@@ -507,8 +522,11 @@ public class HibernateBuildResultDao extends HibernateEntityDao<BuildResult> imp
         {
             criteria.add(Expression.isNull("user"));
         }
-        
-        criteria.add(Expression.eq("project", project));
+
+        if (project != null)
+        {
+            criteria.add(Expression.eq("project", project));
+        }
 
         addStatesToCriteria(states, criteria);
 
