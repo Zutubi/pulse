@@ -725,3 +725,21 @@ A heading row to top a table.
         </th>
     </tr>
 [/#macro]
+
+<#---------------------------------------------------------------------------
+A row in a project summary notification table.
+---------------------------------------------------------------------------->
+[#macro summaryRow ch cc url="" colour=""]
+    <tr>
+        <th style="text-align: right; background: #fafae8; color: #124; border-right: solid 1px #124; padding: 4px">${ch}</th>
+    [#if colour?length &gt; 0]
+        <td style="padding: 4px; color: ${colour}">
+    [#else]
+        <td style="padding: 4px">
+    [/#if]
+            [#if url?length &gt; 0]<a href="${url}" style="font-weight: bold; color: #336; text-decoration: none; border-bottom: dotted 1px #336;">[/#if]
+                ${cc}
+            [#if url?length &gt; 0]</a>[/#if]
+        </td>
+    </tr>
+[/#macro]

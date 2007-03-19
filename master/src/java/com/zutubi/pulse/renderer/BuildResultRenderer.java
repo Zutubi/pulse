@@ -1,10 +1,10 @@
 package com.zutubi.pulse.renderer;
 
-import com.zutubi.pulse.core.model.Changelist;
 import com.zutubi.pulse.model.BuildResult;
 
 import java.io.Writer;
 import java.util.List;
+import java.util.Map;
 
 /**
  * A BuildResultRenderer converts a build model into a displayable form, based
@@ -14,7 +14,8 @@ import java.util.List;
  */
 public interface BuildResultRenderer
 {
-    public void render(String baseUrl, BuildResult result, List<Changelist> changelists, String templateName, Writer writer);
-    public List<TemplateInfo> getAvailableTemplates(boolean personal);
-    public TemplateInfo getTemplateInfo(String templateName, boolean personal);   
+    void render(BuildResult result, Map<String, Object> dataMap, String templateName, Writer writer);
+    boolean hasTemplate(String template, boolean personal);
+    List<TemplateInfo> getAvailableTemplates(boolean personal);
+    TemplateInfo getTemplateInfo(String templateName, boolean personal);
 }

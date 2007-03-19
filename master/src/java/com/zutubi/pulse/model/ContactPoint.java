@@ -125,12 +125,12 @@ public abstract class ContactPoint extends Entity implements NamedEntity
         this.subscriptions = subscriptions;
     }
 
-    public void notify(BuildResult result, String rendered, String mimeType)
+    public void notify(BuildResult result, String subject, String rendered, String mimeType)
     {
         lastError = null;
         try
         {
-            internalNotify(result, rendered, mimeType);
+            internalNotify(result, subject, rendered, mimeType);
         }
         catch(Exception e)
         {
@@ -144,6 +144,6 @@ public abstract class ContactPoint extends Entity implements NamedEntity
 
     public abstract String getDefaultTemplate();
 
-    protected abstract void internalNotify(BuildResult result, String rendered, String mimeType) throws Exception;
+    protected abstract void internalNotify(BuildResult result, String subj, String rendered, String mimeType) throws Exception;
 }
 

@@ -6,15 +6,14 @@ import com.zutubi.pulse.committransformers.LinkCommitMessageTransformer;
 import com.zutubi.pulse.core.model.*;
 import com.zutubi.pulse.model.*;
 import com.zutubi.pulse.test.PulseTestCase;
+import com.zutubi.pulse.util.Constants;
 import com.zutubi.pulse.util.IOUtils;
 import freemarker.template.Configuration;
 import freemarker.template.DefaultObjectWrapper;
 
 import java.io.*;
 import java.net.URISyntaxException;
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 
 /**
  */
@@ -166,6 +165,29 @@ public class FreemarkerBuildResultRendererTest extends PulseTestCase
     public void testPersonalHTMLEmail() throws Exception
     {
         personalBuildHelper("html-email");
+    }
+
+    public void testProjectOverviewSuccess() throws Exception
+    {
+        BuildResult result = createSuccessfulBuild();
+        createAndVerify("basic", "html-project-overview", "http://test.url:8080", result, new LinkedList<Changelist>());
+    }
+
+    public void testProjectOverviewFailureNoPreviousSuccess() throws Exception
+    {
+        BuildResult result = createSuccessfulBuild();
+        result.failure("i failed");
+        createAndVerify("failednosuccess", "html-project-overview", "http://test.url:8080", result, new LinkedList<Changelist>(), null, 0, 0);
+    }
+
+    public void testProjectOverviewFailurePreviousSuccess() throws Exception
+    {
+        BuildResult previous = new BuildResult(new TriggerBuildReason("scm trigger"), new Project("test project", "test description"), new BuildSpecification("test spec"), 90, false);
+        initialiseResult(previous);
+        previous.getStamps().setStartTime(System.currentTimeMillis() - Constants.DAY * 3);
+        BuildResult result = createSuccessfulBuild();
+        result.failure("i failed");
+        createAndVerify("failedsuccess", "html-project-overview", "http://test.url:8080", result, new LinkedList<Changelist>(), previous, 33, 10);
     }
 
     private void errorsHelper(String type) throws Exception
@@ -390,6 +412,13 @@ public class FreemarkerBuildResultRendererTest extends PulseTestCase
 
     protected void createAndVerify(String expectedName, String type, String baseUrl, BuildResult result, List<Changelist> changelists) throws IOException
     {
+        createAndVerify(expectedName, type, baseUrl, result, changelists, null, 0, 0);
+    }
+
+    protected void createAndVerify(String expectedName, String type, String baseUrl, BuildResult result, List<Changelist> changelists, BuildResult lastSuccess, int unsuccessfulBuilds, int unsuccessfulDays) throws IOException
+    {
+        Map<String, Object> dataMap = getDataMap(baseUrl, result, changelists, lastSuccess, unsuccessfulBuilds, unsuccessfulDays);
+
         String extension = "txt";
 
         // Just a hack that makes it easier to view expected output in a
@@ -397,6 +426,10 @@ public class FreemarkerBuildResultRendererTest extends PulseTestCase
         if (type.equals("html-email"))
         {
             extension = "html";
+        }
+        else if(type.equals("html-project-overview"))
+        {
+            extension = "overview.html";
         }
         else if(type.equals("simple-instant-message"))
         {
@@ -417,7 +450,7 @@ public class FreemarkerBuildResultRendererTest extends PulseTestCase
             {
                 outStream = new FileOutputStream(expected);
                 writer = new OutputStreamWriter(outStream);
-                renderer.render(baseUrl, result, changelists, type, writer);
+                renderer.render(result, dataMap, type, writer);
             }
             finally
             {
@@ -434,7 +467,7 @@ public class FreemarkerBuildResultRendererTest extends PulseTestCase
                 expectedStream = getInput(expectedName, extension);
 
                 StringWriter writer = new StringWriter();
-                renderer.render(baseUrl, result, changelists, type, writer);
+                renderer.render(result, dataMap, type, writer);
                 String got = replaceTimestamps(writer.getBuffer().toString());
                 String expected = replaceTimestamps(IOUtils.inputStreamToString(expectedStream));
                 assertEquals(expected, got);
@@ -444,6 +477,35 @@ public class FreemarkerBuildResultRendererTest extends PulseTestCase
                 IOUtils.close(expectedStream);
             }
         }
+    }
+
+    private Map<String, Object> getDataMap(String baseUrl, BuildResult result, List<Changelist> changelists)
+    {
+        return getDataMap(baseUrl, result, changelists, null, 0, 0);
+    }
+
+    private Map<String, Object> getDataMap(String baseUrl, BuildResult result, List<Changelist> changelists, BuildResult lastSuccess, int unsuccessfulBuilds, int unsuccessfulDays)
+    {
+
+        Map<String, Object> dataMap = new HashMap<String, Object>();
+        dataMap.put("renderer", renderer);
+        dataMap.put("baseUrl", baseUrl);
+        dataMap.put("project", result.getProject());
+        dataMap.put("status", result.succeeded() ? "healthy" : "broken");
+        dataMap.put("result", result);
+        dataMap.put("model", result);
+        dataMap.put("changelists", changelists);
+        dataMap.put("errorLevel", Feature.Level.ERROR);
+        dataMap.put("warningLevel", Feature.Level.WARNING);
+
+        if(lastSuccess != null)
+        {
+            dataMap.put("lastSuccess", lastSuccess);
+            dataMap.put("unsuccessfulBuilds", unsuccessfulBuilds);
+            dataMap.put("unsuccessfulDays", unsuccessfulDays);
+        }
+        
+        return dataMap;
     }
 
     private String replaceTimestamps(String str)

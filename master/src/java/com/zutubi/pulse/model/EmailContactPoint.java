@@ -56,7 +56,7 @@ public class EmailContactPoint extends ContactPoint
         return "html-email";
     }
 
-    public void internalNotify(BuildResult result, String rendered, String mimeType) throws Exception
+    public void internalNotify(BuildResult result, String subject, String rendered, String mimeType) throws Exception
     {
         MasterConfiguration config = lookupConfigManager().getAppConfig();
 
@@ -76,9 +76,6 @@ public class EmailContactPoint extends ContactPoint
         {
             prefix += " ";
         }
-
-        String prelude = result.isPersonal() ? "personal build " : (result.getProject().getName() + ": build ");
-        String subject = prefix + prelude + Long.toString(result.getNumber()) + ": " + result.getState().getPrettyString();
 
         try
         {

@@ -1,10 +1,9 @@
 package com.zutubi.pulse.renderer;
 
 import com.zutubi.pulse.bootstrap.SystemPaths;
-import com.zutubi.pulse.core.model.Changelist;
-import com.zutubi.pulse.core.model.Feature;
-import com.zutubi.pulse.model.BuildResult;
 import com.zutubi.pulse.committransformers.CommitMessageTransformerManager;
+import com.zutubi.pulse.core.model.Changelist;
+import com.zutubi.pulse.model.BuildResult;
 import com.zutubi.pulse.util.FileSystemUtils;
 import com.zutubi.pulse.util.StringUtils;
 import com.zutubi.pulse.util.logging.Logger;
@@ -13,7 +12,10 @@ import freemarker.template.Configuration;
 import freemarker.template.Template;
 
 import java.io.*;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Properties;
 
 /**
  */
@@ -25,18 +27,8 @@ public class FreemarkerBuildResultRenderer implements BuildResultRenderer
     private SystemPaths systemPaths;
     private CommitMessageTransformerManager commitMessageTransformerManager;
 
-    public void render(String baseUrl, BuildResult result, List<Changelist> changelists, String templateName, Writer writer)
+    public void render(BuildResult result, Map<String, Object> dataMap, String templateName, Writer writer)
     {
-        Map<String, Object> dataMap = new HashMap<String, Object>();
-
-        dataMap.put("renderer", this);
-        dataMap.put("baseUrl", baseUrl);
-        dataMap.put("result", result);
-        dataMap.put("changelists", changelists);
-        dataMap.put("model", result);
-        dataMap.put("errorLevel", Feature.Level.ERROR);
-        dataMap.put("warningLevel", Feature.Level.WARNING);
-
         try
         {
             Template template = freemarkerConfiguration.getTemplate(getTemplatePath(result.isPersonal()) + File.separatorChar + templateName + ".ftl");
@@ -47,6 +39,19 @@ public class FreemarkerBuildResultRenderer implements BuildResultRenderer
         {
             // TemplateExceptions also end up in the writer output
             LOG.warning("Unable to render build result: " + e.getMessage(), e);
+        }
+    }
+
+    public boolean hasTemplate(String templateName, boolean personal)
+    {
+        try
+        {
+            Template template = freemarkerConfiguration.getTemplate(getTemplatePath(personal) + File.separatorChar + templateName + ".ftl");
+            return template != null;
+        }
+        catch (IOException e)
+        {
+            return false;
         }
     }
 
@@ -69,7 +74,7 @@ public class FreemarkerBuildResultRenderer implements BuildResultRenderer
                 {
                     public boolean accept(File dir, String name)
                     {
-                        return name.endsWith(".ftl");
+                        return name.endsWith(".ftl") && !name.endsWith("-subject.ftl");
                     }
                 });
 

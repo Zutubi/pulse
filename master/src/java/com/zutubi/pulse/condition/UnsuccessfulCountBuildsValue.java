@@ -3,12 +3,19 @@ package com.zutubi.pulse.condition;
 import com.zutubi.pulse.model.*;
 
 /**
+ * Evaluates to the number of consecutive unsuccessful builds up to and
+ * including the given build.
  */
 public class UnsuccessfulCountBuildsValue implements NotifyIntegerValue
 {
     private BuildManager buildManager;
 
     public int getValue(BuildResult result, User user)
+    {
+        return getValueForBuild(result, buildManager);
+    }
+
+    public static int getValueForBuild(BuildResult result, BuildManager buildManager)
     {
         if (result != null && !result.succeeded())
         {
