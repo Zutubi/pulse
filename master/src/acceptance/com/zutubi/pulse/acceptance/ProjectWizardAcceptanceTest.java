@@ -87,7 +87,7 @@ public class ProjectWizardAcceptanceTest extends BaseAcceptanceTestCase
 
         CustomDetailsForm detailsForm = new CustomDetailsForm(tester);
         detailsForm.assertFormPresent();
-        detailsForm.nextFormElements("<?xml version=\"1.0\"?><project><property name=\"foo\" value=\"${base.dir\"/></project>");
+        detailsForm.nextFormElements("<?xml version=\"1.0\"?><project><property name=\"foo\" value=\"${base.dir}\"/></project>");
 
         // assert that all of the expected tables have the expected data.
         assertBasics(projectName, description, url);
