@@ -3,9 +3,9 @@ package com.zutubi.pulse.upgrade.tasks;
 import com.zutubi.pulse.util.JDBCUtils;
 
 import java.sql.Connection;
-import java.sql.SQLException;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 
 /**
  * <class-comment/>
@@ -43,7 +43,7 @@ public class HibernateUtils
         try
         {
             ps = con.prepareStatement("UPDATE hibernate_unique_key SET next_hi = ?");
-            JDBCUtils.setLong(ps, 1, nextHi + 1);
+            JDBCUtils.setLong(ps, 1, nextHi + 2);
             ps.executeUpdate();
         }
         finally
@@ -51,7 +51,7 @@ public class HibernateUtils
             JDBCUtils.close(ps);
         }
 
-        return getNextId(nextHi);
+        return getNextId(nextHi + 1);
     }
 
     private static long getNextId(long nextHi)
@@ -68,7 +68,7 @@ public class HibernateUtils
 
         try
         {
-            ps = con.prepareStatement("select NEXT_HI from HIBERNATE_UNIQUE_KEY");
+            ps = con.prepareStatement("select next_hi from hibernate_unique_key");
             rs = ps.executeQuery();
             rs.next();
             nextHi = rs.getLong(1);
