@@ -50,6 +50,18 @@ public enum Status
                     return false;
                 }
             },
+    INVALID_MASTER
+            {
+                public String getPrettyString()
+                {
+                    return "invalid master";
+                }
+
+                public boolean isOnline()
+                {
+                    return false;
+                }
+            },
     BUILDING
             {
                 public String getPrettyString()

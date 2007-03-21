@@ -59,15 +59,15 @@ public class DuplicateChangelistUpgradeTask extends DatabaseUpgradeTask
 
     private void prepareStatements(Connection con) throws SQLException
     {
-        selectChangelists = con.prepareStatement("SELECT changelist.id AS id, changelist.server_uid AS server_uid, revision.revisionstring AS revisionstring FROM changelist, revision WHERE changelist.revision_id = revision.id");
-        updateChangelistProjects = con.prepareStatement("UPDATE changelist_projects SET changelist_id = ? WHERE changelist_id = ?");
-        updateChangelistResults = con.prepareStatement("UPDATE changelist_results SET changelist_id = ? WHERE changelist_id = ?");
-        selectFileChangeByChangelistId = con.prepareStatement("SELECT revision_id FROM file_change where changelist_id = ?");
-        deleteFileRevisionById = con.prepareStatement("DELETE FROM file_revision WHERE id = ?");
-        deleteFileChangeByChangelistId = con.prepareStatement("DELETE FROM file_change WHERE changelist_id = ?");
-        deleteChangelistById = con.prepareStatement("DELETE FROM changelist WHERE id = ?");
-        selectRevisionByChangelistId = con.prepareStatement("SELECT revision_id FROM changelist WHERE id = ?");
-        deleteRevisionById = con.prepareStatement("DELETE FROM revision where id = ?");
+        selectChangelists = con.prepareStatement("SELECT CHANGELIST.ID AS ID, CHANGELIST.SERVER_UID AS SERVER_UID, REVISION.REVISIONSTRING AS REVISIONSTRING FROM CHANGELIST, REVISION WHERE CHANGELIST.REVISION_ID = REVISION.ID");
+        updateChangelistProjects = con.prepareStatement("UPDATE CHANGELIST_PROJECTS SET CHANGELIST_ID = ? WHERE CHANGELIST_ID = ?");
+        updateChangelistResults = con.prepareStatement("UPDATE CHANGELIST_RESULTS SET CHANGELIST_ID = ? WHERE CHANGELIST_ID = ?");
+        selectFileChangeByChangelistId = con.prepareStatement("SELECT REVISION_ID FROM FILE_CHANGE WHERE CHANGELIST_ID = ?");
+        deleteFileRevisionById = con.prepareStatement("DELETE FROM FILE_REVISION WHERE ID = ?");
+        deleteFileChangeByChangelistId = con.prepareStatement("DELETE FROM FILE_CHANGE WHERE CHANGELIST_ID = ?");
+        deleteChangelistById = con.prepareStatement("DELETE FROM CHANGELIST WHERE ID = ?");
+        selectRevisionByChangelistId = con.prepareStatement("SELECT REVISION_ID FROM CHANGELIST WHERE ID = ?");
+        deleteRevisionById = con.prepareStatement("DELETE FROM REVISION where ID = ?");
     }
 
     private void closePreparedStatements()
@@ -91,7 +91,7 @@ public class DuplicateChangelistUpgradeTask extends DatabaseUpgradeTask
             rs = selectChangelists.executeQuery();
             while (rs.next())
             {
-                processChangelist(con, JDBCUtils.getLong(rs, "id"), JDBCUtils.getString(rs, "server_uid"), JDBCUtils.getString(rs, "revisionstring"));
+                processChangelist(con, JDBCUtils.getLong(rs, "ID"), JDBCUtils.getString(rs, "SERVER_UID"), JDBCUtils.getString(rs, "REVISIONSTRING"));
             }
         }
         finally
@@ -141,7 +141,7 @@ public class DuplicateChangelistUpgradeTask extends DatabaseUpgradeTask
 
             while(rs.next())
             {
-                Long revisionId = rs.getLong("revision_id");
+                Long revisionId = rs.getLong("REVISION_ID");
                 deleteFileRevisionById.setLong(1, revisionId);
                 deleteFileRevisionById.executeUpdate();
             }
@@ -165,7 +165,7 @@ public class DuplicateChangelistUpgradeTask extends DatabaseUpgradeTask
 
             while(rs.next())
             {
-                Long revisionId = rs.getLong("revision_id");
+                Long revisionId = rs.getLong("REVISION_ID");
                 deleteRevisionById.setLong(1, revisionId);
                 deleteRevisionById.executeUpdate();
             }

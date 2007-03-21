@@ -1,0 +1,10 @@
+<?xml version="1.0"?>
+<project>
+    <property name="foo" value="bar"/>
+    <recipe name="test">
+        <command name="${foo}">
+            <sleep interval="0"/>
+            <artifact file="somefile.tgz" name="${foo}"/>
+        </command>
+    </recipe>
+</project>

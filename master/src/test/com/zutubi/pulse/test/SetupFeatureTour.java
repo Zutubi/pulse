@@ -234,7 +234,7 @@ public class SetupFeatureTour implements Runnable
         contactPoint.setName("zutubi mail");
         List<Project> projects = new LinkedList<Project>();
         projects.add(project);
-        ProjectBuildSubscription subscription = new ProjectBuildSubscription(contactPoint, "html-email", "true");
+        ProjectBuildSubscription subscription = new ProjectBuildSubscription(contactPoint, "html-email", new AllProjectBuildCondition());
         subscription.setProjects(projects);
         contactPoint.add(subscription);
         user.add(contactPoint);
@@ -244,9 +244,9 @@ public class SetupFeatureTour implements Runnable
         jabber.setUsername("jason@jabber");
         projects = new LinkedList<Project>();
         projects.add(project);
-        subscription = new ProjectBuildSubscription(jabber, "simple-instant-message", "true");
+        subscription = new ProjectBuildSubscription(jabber, "simple-instant-message", new AllProjectBuildCondition());
         subscription.setProjects(projects);
-        subscription.setCondition("all changed or failed");
+        subscription.setCondition(new SimpleProjectBuildCondition("changed"));
         jabber.add(subscription);
         user.add(jabber);
 

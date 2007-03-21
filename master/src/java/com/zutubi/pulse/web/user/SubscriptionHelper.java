@@ -16,6 +16,8 @@ import com.zutubi.pulse.renderer.TemplateInfo;
 
 import java.io.StringReader;
 import java.util.*;
+import java.util.regex.Pattern;
+import java.util.regex.Matcher;
 
 /**
  */
@@ -76,24 +78,46 @@ public class SubscriptionHelper
         return availableTemplates;
     }
 
-    public Map getConditions()
+    public Map<String, String> getConditions()
     {
         if (conditions == null)
         {
             conditions = new LinkedHashMap<String, String>();
-            conditions.put(NotifyConditionFactory.TRUE, textProvider.getText("condition.allbuilds"));
-            conditions.put("not " + NotifyConditionFactory.SUCCESS, textProvider.getText("condition.allfailed"));
+            conditions.put("not " + NotifyConditionFactory.SUCCESS, textProvider.getText("condition.unsuccessful"));
             conditions.put(NotifyConditionFactory.CHANGED, textProvider.getText("condition.allchanged"));
-            conditions.put(NotifyConditionFactory.CHANGED + " or not " + NotifyConditionFactory.SUCCESS,
-                    textProvider.getText("condition.allchangedorfailed"));
             conditions.put(NotifyConditionFactory.CHANGED_BY_ME, textProvider.getText("condition.changedbyme"));
-            conditions.put(NotifyConditionFactory.CHANGED_BY_ME + " and not " + NotifyConditionFactory.SUCCESS,
-                    textProvider.getText("condition.brokenbyme"));
-            conditions.put("not " + NotifyConditionFactory.SUCCESS + " or " + NotifyConditionFactory.STATE_CHANGE,
-                    textProvider.getText("condition.allfailedandfirstsuccess"));
             conditions.put(NotifyConditionFactory.STATE_CHANGE, textProvider.getText("condition.statechange"));
         }
         return conditions;
+    }
+
+    public Map<Pattern, String> getConditionToTypeMap()
+    {
+        Map<Pattern, String> conditionToType = new HashMap<Pattern, String>();
+        for(Object o: getConditions().keySet())
+        {
+            String condition = (String) o;
+            conditionToType.put(Pattern.compile(Pattern.quote(condition)), "selected");
+        }
+
+        conditionToType.put(Pattern.compile(NotifyConditionFactory.TRUE), "all");
+        conditionToType.put(Pattern.compile("unsuccessful.count.builds == ([0-9]+)"), "repeated");
+        conditionToType.put(Pattern.compile("unsuccessful.count.days >= ([0-9]+) and unsuccessful.count.days(previous) < \\1"), "repeated");
+        return conditionToType;
+    }
+
+    public String getConditionType(String condition)
+    {
+        for(Map.Entry<Pattern, String> entry: getConditionToTypeMap().entrySet())
+        {
+            Matcher matcher = entry.getKey().matcher(condition);
+            if(matcher.matches())
+            {
+                return entry.getValue();
+            }
+        }
+
+        return "advanced";
     }
 
     public Map<Long, String> getAllProjects()
@@ -137,9 +161,20 @@ public class SubscriptionHelper
         return defaultTemplate;
     }
 
-    public NotifyCondition validateCondition(String condition, ValidationAware action)
+    public void validateCondition(String type, List<String> simpleConditions, int repeatedX, String repeatedUnits, String expression, ValidationAware action)
     {
-        return validateCondition(condition, action, notifyConditionFactory);
+        if(type.equals("advanced"))
+        {
+            validateCondition(expression, action, notifyConditionFactory);
+        }
+        else if(type.equals("repeated"))
+        {
+            if(repeatedX <= 0)
+            {
+                action.addFieldError("repeatedX", "value must be a positive integer");
+            }
+        }
+
     }
 
     public static NotifyCondition validateCondition(String condition, ValidationAware action, NotifyConditionFactory notifyConditionFactory)
@@ -161,29 +196,49 @@ public class SubscriptionHelper
         {
             if(mte.token.getText() == null)
             {
-                action.addFieldError("condition", "line " + mte.getLine() + ":" + mte.getColumn() + ": end of input when expecting " + NotifyConditionParser._tokenNames[mte.expecting]);
+                action.addFieldError("expression", "line " + mte.getLine() + ":" + mte.getColumn() + ": end of input when expecting " + NotifyConditionParser._tokenNames[mte.expecting]);
             }
             else
             {
-                action.addFieldError("condition", mte.toString());
+                action.addFieldError("expression", mte.toString());
             }
         }
         catch(NoViableAltException nvae)
         {
             if(nvae.token.getText() == null)
             {
-                action.addFieldError("condition", "line " + nvae.getLine() + ":" + nvae.getColumn() + ": unexpected end of input");
+                action.addFieldError("expression", "line " + nvae.getLine() + ":" + nvae.getColumn() + ": unexpected end of input");
             }
             else
             {
-                action.addFieldError("condition", nvae.toString());
+                action.addFieldError("expression", nvae.toString());
             }
         }
         catch (Exception e)
         {
-            action.addFieldError("condition", e.toString());
+            action.addFieldError("expression", e.toString());
         }
 
         return null;
+    }
+
+    public ProjectBuildCondition createCondition(String type, List<String> simpleConditions, int repeatedX, String repeatedUnits, String expression)
+    {
+        if(type.equals("all"))
+        {
+           return new AllProjectBuildCondition();
+        }
+        else if(type.equals("simple"))
+        {
+            return new SimpleProjectBuildCondition(simpleConditions);
+        }
+        else if(type.equals("repeated"))
+        {
+            return new RepeatedFailuresProjectBuildCondition(repeatedX, repeatedUnits);
+        }
+        else
+        {
+            return new AdvancedProjectBuildCondition(expression);
+        }
     }
 }

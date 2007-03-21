@@ -29,7 +29,7 @@ public class HibernateUtils
 
         try
         {
-            ps = con.prepareStatement("select NEXT_HI from HIBERNATE_UNIQUE_KEY");
+            ps = con.prepareStatement("select next_hi from hibernate_unique_key");
             rs = ps.executeQuery();
             rs.next();
             nextHi = rs.getLong(1);
@@ -42,10 +42,8 @@ public class HibernateUtils
 
         try
         {
-            nextHi++;
-            ps = con.prepareStatement("UPDATE hibernate_unique_key SET next_hi = ? where next_hi = ?");
-            JDBCUtils.setLong(ps, 1, nextHi);
-            JDBCUtils.setLong(ps, 2, (nextHi - 1));
+            ps = con.prepareStatement("UPDATE hibernate_unique_key SET next_hi = ?");
+            JDBCUtils.setLong(ps, 1, nextHi + 1);
             ps.executeUpdate();
         }
         finally

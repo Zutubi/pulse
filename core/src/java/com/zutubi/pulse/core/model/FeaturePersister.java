@@ -95,8 +95,11 @@ public class FeaturePersister
     {
         File featuresFile = getFeaturesFile(result, recipeDir);
         Builder builder = new Builder();
-        Document doc = builder.build(featuresFile);
-        readArtifacts(doc.getRootElement(), result);
+        if (featuresFile.exists())
+        {
+            Document doc = builder.build(featuresFile);
+            readArtifacts(doc.getRootElement(), result);
+        }
     }
 
     private void readArtifacts(Element root, CommandResult result)

@@ -85,6 +85,8 @@
                 <ref local="danglingBuildHostRequirements"/>
                 <ref local="featureStorage"/>
                 <ref local="duplicateChangelist"/>
+                <ref local="schemaUpgrade0102019001"/>
+                <ref local="subscriptionCondition"/>
             </list>
         </property>
         <property name="systemTasks">
@@ -590,5 +592,18 @@
 
     <bean id="duplicateChangelist" class="com.zutubi.pulse.upgrade.tasks.DuplicateChangelistUpgradeTask" autowire="byName">
         <property name="buildNumber" value="102018002"/>        
+    </bean>
+
+    <bean id="schemaUpgrade0102019001" class="com.zutubi.pulse.upgrade.tasks.MigrateSchemaUpgradeTask" autowire="byName">
+        <property name="buildNumber" value="102019001"/>
+        <property name="mappings">
+            <list>
+                <value>com/zutubi/pulse/upgrade/schema/build_0102019001/User.hbm.xml</value>
+            </list>
+        </property>
+    </bean>
+
+    <bean id="subscriptionCondition" class="com.zutubi.pulse.upgrade.tasks.SubscriptionConditionUpgradeTask" autowire="byName">
+        <property name="buildNumber" value="102019002"/>        
     </bean>
 </beans>

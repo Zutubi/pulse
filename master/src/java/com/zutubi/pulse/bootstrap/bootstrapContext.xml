@@ -16,6 +16,7 @@
         <property name="startupRunnables">
             <list>
                 <value>com.zutubi.pulse.BuildAborter</value>
+                <value>com.zutubi.pulse.NextBuildNumberAdjuster</value>
             </list>
         </property>
         <property name="configurationManager">

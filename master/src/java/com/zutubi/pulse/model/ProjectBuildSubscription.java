@@ -22,10 +22,9 @@ public class ProjectBuildSubscription extends Subscription
     private static final Logger LOG = Logger.getLogger(ProjectBuildSubscription.class);
 
     /**
-     * Condition to be satisfied before notifying.  Not currently used for
-     * personal builds.
+     * Condition to be satisfied before notifying.
      */
-    private String condition;
+    private ProjectBuildCondition condition;
 
     /**
      * The projects to which this subscription is associated.  If empty,
@@ -58,13 +57,13 @@ public class ProjectBuildSubscription extends Subscription
      *                 subscription
      * @param condition the condition to satisfy before this subscription fires
      */
-    public ProjectBuildSubscription(ContactPoint contactPoint, String template, String condition)
+    public ProjectBuildSubscription(ContactPoint contactPoint, String template, ProjectBuildCondition condition)
     {
         super(contactPoint, template);
         this.condition = condition;
     }
 
-    public ProjectBuildSubscription(ContactPoint contactPoint, String template, List<Project> projects, String condition)
+    public ProjectBuildSubscription(ContactPoint contactPoint, String template, List<Project> projects, ProjectBuildCondition condition)
     {
         this(contactPoint, template, condition);
         this.projects = projects;
@@ -80,18 +79,12 @@ public class ProjectBuildSubscription extends Subscription
         this.projects = projects;
     }
 
-    /**
-     * Sets the given condition as that which must be satisfied before the
-     * contact point should be notified.
-     *
-     * @param condition the condition to set.
-     */
-    public void setCondition(String condition)
+    public void setCondition(ProjectBuildCondition condition)
     {
         this.condition = condition;
     }
 
-    public String getCondition()
+    public ProjectBuildCondition getCondition()
     {
         return this.condition;
     }
@@ -108,7 +101,7 @@ public class ProjectBuildSubscription extends Subscription
             // Need to parse our condition.
             try
             {
-                NotifyConditionLexer lexer = new NotifyConditionLexer(new StringReader(condition));
+                NotifyConditionLexer lexer = new NotifyConditionLexer(new StringReader(condition.getExpression()));
 
                 NotifyConditionParser parser = new NotifyConditionParser(lexer);
                 parser.condition();

@@ -148,6 +148,11 @@
            eternal="true"
            overflowToDisk="false"/>
 
+    <cache name="com.zutubi.pulse.model.ProjectBuildCondition"
+           maxElementsInMemory="1000"
+           eternal="true"
+           overflowToDisk="false"/>
+
     <cache name="com.zutubi.pulse.model.ProjectGroup"
            maxElementsInMemory="100"
            eternal="true"

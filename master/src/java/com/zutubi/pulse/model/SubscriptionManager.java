@@ -13,4 +13,6 @@ public interface SubscriptionManager extends EntityManager<Subscription>
     public List<Subscription> getSubscriptions(Project project);
 
     void deleteAllSubscriptions(Project project);
+
+    void delete(ProjectBuildCondition condition);
 }

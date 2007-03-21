@@ -326,7 +326,7 @@ public class DefaultAgentManager implements AgentManager, EventListener, Stoppab
                 if(build == masterBuildNumber)
                 {
                     String token = serviceTokenManager.getToken();
-                    status = agent.getSlaveService().getStatus(token);
+                    status = agent.getSlaveService().getStatus(token, "http://" + MasterAgent.constructMasterLocation(configurationManager.getAppConfig(), configurationManager.getSystemConfig()));
                 }
                 else
                 {

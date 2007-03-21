@@ -53,7 +53,7 @@ public class HibernateSubscriptionDaoTest extends MasterPersistenceTestCase
         Project project = new Project();
         List<Project> projects = new LinkedList<Project>();
         projects.add(project);
-        ProjectBuildSubscription subscription = new ProjectBuildSubscription(contactPoint, "html-email", projects, "true");
+        ProjectBuildSubscription subscription = new ProjectBuildSubscription(contactPoint, "html-email", projects, new AllProjectBuildCondition());
         save(contactPoint, project, subscription);
 
         List<Subscription> subscriptions = subDao.findByProject(project);
@@ -68,7 +68,7 @@ public class HibernateSubscriptionDaoTest extends MasterPersistenceTestCase
     {
         ContactPoint contactPoint = new EmailContactPoint();
         Project project = new Project();
-        ProjectBuildSubscription subscription = new ProjectBuildSubscription(contactPoint, "html-email", "true");
+        ProjectBuildSubscription subscription = new ProjectBuildSubscription(contactPoint, "html-email", new AllProjectBuildCondition());
         save(contactPoint, project, subscription);
 
         List<Subscription> subscriptions = subDao.findByNoProject();
@@ -85,10 +85,10 @@ public class HibernateSubscriptionDaoTest extends MasterPersistenceTestCase
         Project project = new Project();
         List<Project> projects = new LinkedList<Project>();
         projects.add(project);
-        ProjectBuildSubscription subWithProject = new ProjectBuildSubscription(contactPoint, "html-email", projects, "true");
+        ProjectBuildSubscription subWithProject = new ProjectBuildSubscription(contactPoint, "html-email", projects, new AllProjectBuildCondition());
         save(contactPoint, project, subWithProject);
 
-        ProjectBuildSubscription subWithoutProject = new ProjectBuildSubscription(contactPoint, "html-email", "true");
+        ProjectBuildSubscription subWithoutProject = new ProjectBuildSubscription(contactPoint, "html-email", new AllProjectBuildCondition());
         save(subWithoutProject);
         
         List<Subscription> subscriptions = subDao.findByNoProject();
@@ -105,7 +105,7 @@ public class HibernateSubscriptionDaoTest extends MasterPersistenceTestCase
         Project project = new Project();
         List<Project> projects = new LinkedList<Project>();
         projects.add(project);
-        ProjectBuildSubscription subscription = new ProjectBuildSubscription(contactPoint, "html-email", projects, "true");
+        ProjectBuildSubscription subscription = new ProjectBuildSubscription(contactPoint, "html-email", projects, new AllProjectBuildCondition());
         save(contactPoint, project, subscription);
 
         subDao.delete(subscription);
@@ -114,6 +114,59 @@ public class HibernateSubscriptionDaoTest extends MasterPersistenceTestCase
         assertNotNull(contactDao.findById(contactPoint.getId()));
         assertNotNull(projectDao.findById(project.getId()));
         assertNull(subDao.findById(subscription.getId()));
+    }
+
+    public void testAllCondition()
+    {
+        ContactPoint c = new EmailContactPoint();
+        contactDao.save(c);
+
+        Subscription subscription = new ProjectBuildSubscription(c, "template", new AllProjectBuildCondition());
+        save(subscription);
+
+        ProjectBuildSubscription other = (ProjectBuildSubscription) subDao.findById(subscription.getId());
+        assertTrue(other.getCondition() instanceof AllProjectBuildCondition);
+    }
+
+    public void testSimpleCondition()
+    {
+        ContactPoint c = new EmailContactPoint();
+        contactDao.save(c);
+
+        Subscription subscription = new ProjectBuildSubscription(c, "template", new SimpleProjectBuildCondition("changed"));
+        save(subscription);
+
+        ProjectBuildSubscription other = (ProjectBuildSubscription) subDao.findById(subscription.getId());
+        assertTrue(other.getCondition() instanceof SimpleProjectBuildCondition);
+        assertEquals("changed", other.getCondition().getExpression());
+    }
+
+    public void testRepeatedCondition()
+    {
+        ContactPoint c = new EmailContactPoint();
+        contactDao.save(c);
+
+        Subscription subscription = new ProjectBuildSubscription(c, "template", new RepeatedFailuresProjectBuildCondition(5, "builds"));
+        save(subscription);
+
+        ProjectBuildSubscription other = (ProjectBuildSubscription) subDao.findById(subscription.getId());
+        assertTrue(other.getCondition() instanceof RepeatedFailuresProjectBuildCondition);
+        RepeatedFailuresProjectBuildCondition repeated = (RepeatedFailuresProjectBuildCondition) other.getCondition();
+        assertEquals(5, repeated.getX());
+        assertEquals("builds", repeated.getUnits());
+    }
+
+    public void testAdvancedCondition()
+    {
+        ContactPoint c = new EmailContactPoint();
+        contactDao.save(c);
+
+        Subscription subscription = new ProjectBuildSubscription(c, "template", new AdvancedProjectBuildCondition("the monkeys!"));
+        save(subscription);
+
+        ProjectBuildSubscription other = (ProjectBuildSubscription) subDao.findById(subscription.getId());
+        assertTrue(other.getCondition() instanceof AdvancedProjectBuildCondition);
+        assertEquals("the monkeys!", other.getCondition().getExpression());
     }
 
     private void save(ContactPoint c, Project p, Subscription s)

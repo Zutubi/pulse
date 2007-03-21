@@ -331,6 +331,9 @@ th.form, th.heading, th.group, th.note, th.content, th.content-row, td.content, 
 
 th.form {
     padding: 5px;
+    background: #ffffdd;
+    border-bottom: solid 1px #eee;
+    border-top: solid 1px #eee;
 }
 
 td.content-centre {
@@ -452,6 +455,10 @@ span.action {
 td.right {
     text-align: right;
     vertical-align: top;
+}
+
+th.right {
+    text-align: right;
 }
 
     /*------------------------------

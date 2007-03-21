@@ -52,6 +52,11 @@ public class ResourceRequirementsPredicate implements TypeLoadPredicate
         return type instanceof ResourceReference;
     }
 
+    public boolean allowUnresolved(Object type, Element element)
+    {
+        return false;
+    }
+
     public List<ResourceReference> getReferences()
     {
         return references;

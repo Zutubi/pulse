@@ -4,6 +4,7 @@
 <html>
 <head>
     <title>#wwtext("name=subscription.create")</title>
+    #subscriptionScript("subscription.create.project")
 </head>
 <body>
     #dashboardTabs("preferences")
@@ -16,13 +17,9 @@
     #wwcform("action=subscriptionWizard.action" "id=subscription.create.project" "heading=%{getText('subscription.create.project')}" "method=post")
         #wwhidden("name=state")
         #wwhidden("name=submit")
-        #wwselect("name=projects" "label=%{getText('subscription.projects')}" "list=allProjects" "multiple=true" "tabindex=1")
-        #inlineHelp("subscription.projects.help")
-        #wwcombobox("name=condition" "list=conditions" "listKey=key" "listValue=value" "size=50" "label=%{getText('subscription.condition')}" "tabindex=2")
-        #inlineHelp("condition.help")
-        #wwselect("name=template" "label=%{getText('subscription.template')}" "list=availableTemplates" "tabindex=3")
 
-        #previousFinishCancel(4)
+        #subscriptionCommonFields()
+        #previousFinishCancel(8)
     #end
 
     </td><td class="columns">
@@ -33,5 +30,9 @@
 </table>
 
     #tabEnd()
+
+    <script type="text/javascript">
+        toggleConditions(getSelectedCondition());
+    </script>
 </body>
 </html>

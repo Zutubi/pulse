@@ -59,4 +59,9 @@ public class DefaultSubscriptionManager implements SubscriptionManager
             }
         }
     }
+
+    public void delete(ProjectBuildCondition condition)
+    {
+        subscriptionDao.delete(condition);
+    }
 }

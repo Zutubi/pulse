@@ -40,7 +40,7 @@ public class SubscriptionManagerTest extends PulseTestCase
     public void testDeleteByProjectLastProject()
     {
         ContactPoint contactPoint = new EmailContactPoint();
-        ProjectBuildSubscription subscription = new ProjectBuildSubscription(contactPoint, "html-email", "true");
+        ProjectBuildSubscription subscription = new ProjectBuildSubscription(contactPoint, "html-email", new AllProjectBuildCondition());
         Project project = addProject(11, subscription);
         subscriptionManager.save(subscription);
 
@@ -52,7 +52,7 @@ public class SubscriptionManagerTest extends PulseTestCase
     public void testDeleteByProjectMoreProjects()
     {
         ContactPoint contactPoint = new EmailContactPoint();
-        ProjectBuildSubscription subscription = new ProjectBuildSubscription(contactPoint, "html-email", "true");
+        ProjectBuildSubscription subscription = new ProjectBuildSubscription(contactPoint, "html-email", new AllProjectBuildCondition());
         Project project = addProject(11, subscription);
         addProject(12, subscription);
         subscriptionManager.save(subscription);
@@ -67,7 +67,7 @@ public class SubscriptionManagerTest extends PulseTestCase
     public void testDeleteByProjectNotIncluded()
     {
         ContactPoint contactPoint = new EmailContactPoint();
-        ProjectBuildSubscription subscription = new ProjectBuildSubscription(contactPoint, "html-email", "true");
+        ProjectBuildSubscription subscription = new ProjectBuildSubscription(contactPoint, "html-email", new AllProjectBuildCondition());
         addProject(11, subscription);
         subscriptionManager.save(subscription);
 
