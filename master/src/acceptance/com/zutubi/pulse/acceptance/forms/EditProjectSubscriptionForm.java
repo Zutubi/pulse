@@ -18,11 +18,11 @@ public class EditProjectSubscriptionForm extends BaseForm
 
     public String[] getFieldNames()
     {
-        return new String[] { "contactPointId", "projects", "condition", "template" };
+        return new String[] { "contactPointId", "projects", "conditionType", "selectedConditions", "repeatedX", "repeatedUnits", "expression", "template" };
     }
 
     public int[] getFieldTypes()
     {
-        return new int[] { SELECT, MULTI_SELECT, TEXTFIELD, SELECT };
+        return new int[] { SELECT, MULTI_SELECT, RADIOBOX, MULTI_CHECKBOX, TEXTFIELD, SELECT, TEXTFIELD, SELECT };
     }
 }

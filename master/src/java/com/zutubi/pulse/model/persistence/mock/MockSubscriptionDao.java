@@ -3,6 +3,7 @@ package com.zutubi.pulse.model.persistence.mock;
 import com.zutubi.pulse.model.Project;
 import com.zutubi.pulse.model.ProjectBuildSubscription;
 import com.zutubi.pulse.model.Subscription;
+import com.zutubi.pulse.model.ProjectBuildCondition;
 import com.zutubi.pulse.model.persistence.SubscriptionDao;
 
 import java.util.List;
@@ -32,5 +33,10 @@ public class MockSubscriptionDao extends MockEntityDao<Subscription> implements 
                 return o instanceof ProjectBuildSubscription && ((ProjectBuildSubscription) o).getProjects().size() == 0;
             }
         });
+    }
+
+    public void delete(ProjectBuildCondition condition)
+    {
+        throw new RuntimeException("Method not implemented.");
     }
 }

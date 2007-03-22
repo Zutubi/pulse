@@ -16,4 +16,9 @@ public class RecipeListingPredicate implements TypeLoadPredicate
     {
         return true;
     }
+
+    public boolean allowUnresolved(Object type, Element element)
+    {
+        return true;
+    }
 }

@@ -11,15 +11,19 @@ import com.zutubi.pulse.transfer.TransferAPI;
 import com.zutubi.pulse.upgrade.tasks.MutableConfiguration;
 import com.zutubi.pulse.util.FileSystemUtils;
 import com.zutubi.pulse.util.IOUtils;
+import com.zutubi.pulse.core.PulseRuntimeException;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
+import org.springframework.dao.DataAccessException;
 
 import java.io.*;
 import java.sql.SQLException;
 import java.util.Properties;
 import java.util.zip.ZipInputStream;
+import java.net.Socket;
+import java.net.InetSocketAddress;
 
 /**
  * <class-comment/>
@@ -65,9 +69,14 @@ public class UpgradeAcceptanceTest extends BaseAcceptanceTestCase
         importAndUpgradeTest("0102018001");
     }
 
+    public void testSubscriptionConditions() throws Exception
+    {
+        importAndUpgradeTest("0102019000");
+    }
+
     public void importAndUpgradeTest(String build) throws Exception
     {
-        String db = System.getenv("PULSE_DB");
+        String db = "postgresql";//System.getenv("PULSE_DB");
         if ("mysql".equals(db))
         {
             setupMySQL();
@@ -247,9 +256,37 @@ public class UpgradeAcceptanceTest extends BaseAcceptanceTestCase
         ShutdownCommand shutdown = new ShutdownCommand();
         shutdown.setExitJvm(false);
         assertEquals(0, shutdown.execute(getBootContext("shutdown", "-F", "true", "-p", "8990")));
-
+        waitForServerToExit(8990);
+        
         // allow time for the shutdown to complete.
         Thread.sleep(3000);
+    }
+
+    protected void waitForServerToExit(int port) throws IOException
+    {
+        int retries = 0;
+
+        while(retries++ < 30)
+        {
+            Socket sock = new Socket();
+            try
+            {
+                sock.connect(new InetSocketAddress(port));
+                sock.close();
+                try
+                {
+                    Thread.sleep(1000);
+                }
+                catch (InterruptedException e)
+                {
+                    // Empty
+                }
+            }
+            catch (IOException e)
+            {
+                break;
+            }
+        }
     }
 
     private BootContext getBootContext(String... args)

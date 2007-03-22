@@ -17,6 +17,11 @@ public class CustomProjectValidationPredicate implements TypeLoadPredicate
 
     public boolean resolveReferences(Object type, Element element)
     {
-        return false;
+        return true;
+    }
+
+    public boolean allowUnresolved(Object type, Element element)
+    {
+        return true;
     }
 }

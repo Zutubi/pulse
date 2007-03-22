@@ -13,10 +13,7 @@ import com.zutubi.pulse.logging.CustomLogRecord;
 import com.zutubi.pulse.logging.ServerMessagesHandler;
 import com.zutubi.pulse.resources.ResourceConstructor;
 import com.zutubi.pulse.resources.ResourceDiscoverer;
-import com.zutubi.pulse.services.InvalidTokenException;
-import com.zutubi.pulse.services.ServiceTokenManager;
-import com.zutubi.pulse.services.SlaveService;
-import com.zutubi.pulse.services.SlaveStatus;
+import com.zutubi.pulse.services.*;
 import com.zutubi.pulse.slave.command.CleanupRecipeCommand;
 import com.zutubi.pulse.slave.command.RecipeCommand;
 import com.zutubi.pulse.slave.command.UpdateCommand;
@@ -26,6 +23,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
+import java.net.MalformedURLException;
 
 /**
  */
@@ -40,6 +38,7 @@ public class SlaveServiceImpl implements SlaveService
     private StartupManager startupManager;
     private SlaveRecipeProcessor slaveRecipeProcessor;
     private ServerMessagesHandler serverMessagesHandler;
+    private MasterProxyFactory masterProxyFactory;
 
     //---( Status API )---
 
@@ -71,7 +70,7 @@ public class SlaveServiceImpl implements SlaveService
         return serverMessagesHandler.takeSnapshot();
     }
 
-    public SlaveStatus getStatus(String token)
+    public SlaveStatus getStatus(String token, String master)
     {
         try
         {
@@ -81,6 +80,17 @@ public class SlaveServiceImpl implements SlaveService
         {
             // Respond as status
             return new SlaveStatus(Status.TOKEN_MISMATCH);
+        }
+
+        // Pong the master (CIB-825)
+        try
+        {
+            pongMaster(master);
+        }
+        catch(Exception e)
+        {
+            LOG.severe(e);
+            return new SlaveStatus(Status.INVALID_MASTER, "Unable to contact master at location '" + master + "': " + e.getMessage());
         }
 
         // Synchronous request
@@ -93,6 +103,12 @@ public class SlaveServiceImpl implements SlaveService
         {
             return new SlaveStatus(Status.IDLE, 0);
         }
+    }
+
+    private void pongMaster(String master) throws MalformedURLException
+    {
+        MasterService service = masterProxyFactory.createProxy(master);
+        service.pong();
     }
 
     //---( Build API )---
@@ -248,5 +264,10 @@ public class SlaveServiceImpl implements SlaveService
     public void setSlaveQueue(SlaveQueue slaveQueue)
     {
         this.slaveQueue = slaveQueue;
+    }
+
+    public void setMasterProxyFactory(MasterProxyFactory masterProxyFactory)
+    {
+        this.masterProxyFactory = masterProxyFactory;
     }
 }

@@ -8,6 +8,7 @@
                 <value>com.zutubi.pulse.bootstrap.FreemarkerLoggingStartupTask</value>
                 <value>com.zutubi.pulse.bootstrap.ProcessSetupStartupTask</value>
                 <value>com.zutubi.pulse.BuildAborterStartupTask</value>
+                <value>com.zutubi.pulse.NextBuildNumberAdjusterStartupTask</value>
                 <value>com.zutubi.pulse.bootstrap.DeployMainWebappStartupTask</value>
             </list>
         </property>

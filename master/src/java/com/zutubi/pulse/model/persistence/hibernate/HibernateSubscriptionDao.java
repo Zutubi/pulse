@@ -2,6 +2,7 @@ package com.zutubi.pulse.model.persistence.hibernate;
 
 import com.zutubi.pulse.model.Project;
 import com.zutubi.pulse.model.Subscription;
+import com.zutubi.pulse.model.ProjectBuildCondition;
 import com.zutubi.pulse.model.persistence.SubscriptionDao;
 import org.hibernate.HibernateException;
 import org.hibernate.Query;
@@ -51,5 +52,10 @@ public class HibernateSubscriptionDao extends HibernateEntityDao<Subscription> i
                 return queryObject.list();
             }
         });
+    }
+
+    public void delete(ProjectBuildCondition condition)
+    {
+        getHibernateTemplate().delete(condition);
     }
 }

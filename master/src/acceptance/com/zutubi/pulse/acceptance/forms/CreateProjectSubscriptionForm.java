@@ -18,11 +18,11 @@ public class CreateProjectSubscriptionForm extends BaseForm
 
     public String[] getFieldNames()
     {
-        return new String[] { "projects", "condition", "template" };
+        return new String[] { "projects", "conditionType", "selectedConditions", "repeatedX", "repeatedUnits", "expression", "template" };
     }
 
     public int[] getFieldTypes()
     {
-        return new int[] { MULTI_SELECT, TEXTFIELD, SELECT };
+        return new int[] { MULTI_SELECT, RADIOBOX, MULTI_CHECKBOX, TEXTFIELD, SELECT, TEXTFIELD, SELECT };
     }
 }

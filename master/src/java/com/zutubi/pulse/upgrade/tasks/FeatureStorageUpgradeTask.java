@@ -59,11 +59,11 @@ public class FeatureStorageUpgradeTask extends AbstractSchemaRefactorUpgradeTask
 
     private void prepareStatements(Connection con) throws SQLException
     {
-        selectCommandResults = con.prepareStatement("SELECT id, command_name, outputDir FROM command_result", ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY);
-        selectArtifactByCommandId = con.prepareStatement("SELECT id, name FROM artifact where command_result_id = ?");
-        selectFileArtifactByArtifactId = con.prepareStatement("SELECT id, file FROM file_artifact where artifact_id = ?");
-        selectFeatureByFileArtifactId = con.prepareStatement("SELECT id, level, first_line, last_line, line, summary FROM feature WHERE file_artifact_id = ?");
-        deleteFeatureByFileArtifactId = con.prepareStatement("DELETE FROM feature WHERE file_artifact_id = ?");
+        selectCommandResults = con.prepareStatement("SELECT ID, COMMAND_NAME, outputDir FROM COMMAND_RESULT", ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY);
+        selectArtifactByCommandId = con.prepareStatement("SELECT ID, NAME FROM ARTIFACT WHERE COMMAND_RESULT_ID = ?");
+        selectFileArtifactByArtifactId = con.prepareStatement("SELECT ID, FILE FROM FILE_ARTIFACT WHERE ARTIFACT_ID = ?");
+        selectFeatureByFileArtifactId = con.prepareStatement("SELECT ID, LEVEL, FIRST_LINE, LAST_LINE, LINE, SUMMARY FROM FEATURE WHERE FILE_ARTIFACT_ID = ?");
+        deleteFeatureByFileArtifactId = con.prepareStatement("DELETE FROM FEATURE WHERE FILE_ARTIFACT_ID = ?");
     }
 
     private void closePreparedStatements()
@@ -82,7 +82,7 @@ public class FeatureStorageUpgradeTask extends AbstractSchemaRefactorUpgradeTask
             rs = selectCommandResults.executeQuery();
             while (rs.next())
             {
-                processCommandResult(con, JDBCUtils.getLong(rs, "id"), JDBCUtils.getString(rs, "command_name"), JDBCUtils.getString(rs, "outputDir"));
+                processCommandResult(con, JDBCUtils.getLong(rs, "ID"), JDBCUtils.getString(rs, "COMMAND_NAME"), JDBCUtils.getString(rs, "outputDir"));
             }
         }
         finally
@@ -103,7 +103,7 @@ public class FeatureStorageUpgradeTask extends AbstractSchemaRefactorUpgradeTask
                 rs = selectArtifactByCommandId.executeQuery();
                 while (rs.next())
                 {
-                    commandResult.addArtifact(processArtifact(con, rs.getLong("id"), rs.getString("name")));
+                    commandResult.addArtifact(processArtifact(con, rs.getLong("ID"), rs.getString("NAME")));
                 }
             }
             finally
@@ -129,7 +129,7 @@ public class FeatureStorageUpgradeTask extends AbstractSchemaRefactorUpgradeTask
             rs = selectFileArtifactByArtifactId.executeQuery();
             while (rs.next())
             {
-                storedArtifact.addFile(processFileArtifact(con, rs.getLong("id"), rs.getString("file")));
+                storedArtifact.addFile(processFileArtifact(con, rs.getLong("ID"), rs.getString("FILE")));
             }
         }
         finally
@@ -150,7 +150,7 @@ public class FeatureStorageUpgradeTask extends AbstractSchemaRefactorUpgradeTask
             rs = selectFeatureByFileArtifactId.executeQuery();
             while (rs.next())
             {
-                fileArtifact.addFeature(new OriginalFeaturePersister.PlainFeature(Feature.Level.valueOf(rs.getString("level")), rs.getString("summary"), rs.getLong("first_line"), rs.getLong("last_line"), rs.getLong("line")));
+                fileArtifact.addFeature(new OriginalFeaturePersister.PlainFeature(Feature.Level.valueOf(rs.getString("LEVEL")), rs.getString("SUMMARY"), rs.getLong("FIRST_LINE"), rs.getLong("LAST_LINE"), rs.getLong("LINE")));
             }
         }
         finally

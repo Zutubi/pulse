@@ -25,6 +25,8 @@ import java.util.Properties;
  */
 public class SvnWorkingCopy extends PersonalBuildSupport implements WorkingCopy
 {
+    public static final String PROPERTY_ALLOW_EXTERNALS = "svn.allow.externals";
+
     private File base;
     private SVNClientManager clientManager;
     private ConfigSupport configSupport;
@@ -342,7 +344,14 @@ public class SvnWorkingCopy extends PersonalBuildSupport implements WorkingCopy
         }
         else if (contentsStatus == SVNStatusType.STATUS_EXTERNAL)
         {
-            fileState = FileStatus.State.UNSUPPORTED;
+            if(configSupport.getBooleanProperty(PROPERTY_ALLOW_EXTERNALS, false))
+            {
+                fileState = FileStatus.State.IGNORED;
+            }
+            else
+            {
+                fileState = FileStatus.State.UNSUPPORTED;
+            }
         }
         else if (contentsStatus == SVNStatusType.STATUS_INCOMPLETE)
         {

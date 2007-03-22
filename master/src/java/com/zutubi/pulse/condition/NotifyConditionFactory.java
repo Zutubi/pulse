@@ -23,8 +23,8 @@ public class NotifyConditionFactory
     public static final String TRUE = "true";
 
     // Integer values
-    public static final String FAIL_COUNT_BUILDS = "unsuccessful.count.builds";
-    public static final String FAIL_COUNT_DAYS = "unsuccessful.count.days";
+    public static final String UNSUCCESSFUL_COUNT_BUILDS = "unsuccessful.count.builds";
+    public static final String UNSUCCESSFUL_COUNT_DAYS = "unsuccessful.count.days";
 
     private final static Map<String, Class> typeMap = new HashMap<String, Class>();
 
@@ -42,8 +42,8 @@ public class NotifyConditionFactory
         typeMap.put(STATE_CHANGE, StateChangeNotifyCondition.class);
         typeMap.put(TRUE, TrueNotifyCondition.class);
 
-        typeMap.put(FAIL_COUNT_BUILDS, UnsuccessfulCountBuildsValue.class);
-        typeMap.put(FAIL_COUNT_DAYS, UnsuccessfulCountDaysValue.class);
+        typeMap.put(UNSUCCESSFUL_COUNT_BUILDS, UnsuccessfulCountBuildsValue.class);
+        typeMap.put(UNSUCCESSFUL_COUNT_DAYS, UnsuccessfulCountDaysValue.class);
     }
 
     public List<String> getAvailableConditions()

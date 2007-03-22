@@ -22,7 +22,7 @@
       </div>
       <div id="south" style="border-top: none">
         <strong>:: pulse ($version_number #$build_number) ::</strong>
-        copyright &copy; 2005-2006 zutubi pty ltd
+        copyright &copy; 2005-2007 zutubi pty ltd
       </div>
     </body>
 </html>

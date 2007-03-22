@@ -10,10 +10,7 @@ import com.zutubi.pulse.web.wizard.BaseWizard;
 import com.zutubi.pulse.web.wizard.BaseWizardState;
 import com.zutubi.pulse.web.wizard.Wizard;
 
-import java.util.Collections;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * <class-comment/>
@@ -242,7 +239,12 @@ public class SubscriptionWizard extends BaseWizard
     public class ConfigureProject extends BaseWizardState implements Validateable
     {
         private SubscriptionHelper helper;
-        private String condition = NotifyConditionFactory.TRUE;
+        private String conditionType;
+        private List<String> selectedConditions = new LinkedList<String>();
+        private int repeatedX = 5;
+        private String repeatedUnits;
+        private String expression;
+        private ProjectBuildCondition condition = new AllProjectBuildCondition();
 
         public ConfigureProject(Wizard wizard, String stateName)
         {
@@ -269,12 +271,62 @@ public class SubscriptionWizard extends BaseWizard
             helper.setProjects(projects);
         }
 
-        public String getCondition()
+        public String getConditionType()
+        {
+            return conditionType;
+        }
+
+        public void setConditionType(String conditionType)
+        {
+            this.conditionType = conditionType;
+        }
+
+        public List<String> getSelectedConditions()
+        {
+            return selectedConditions;
+        }
+
+        public void setSelectedConditions(List<String> selectedConditions)
+        {
+            this.selectedConditions = selectedConditions;
+        }
+
+        public int getRepeatedX()
+        {
+            return repeatedX;
+        }
+
+        public void setRepeatedX(int repeatedX)
+        {
+            this.repeatedX = repeatedX;
+        }
+
+        public String getRepeatedUnits()
+        {
+            return repeatedUnits;
+        }
+
+        public void setRepeatedUnits(String repeatedUnits)
+        {
+            this.repeatedUnits = repeatedUnits;
+        }
+
+        public String getExpression()
+        {
+            return expression;
+        }
+
+        public void setExpression(String expression)
+        {
+            this.expression = expression;
+        }
+
+        public ProjectBuildCondition getCondition()
         {
             return condition;
         }
 
-        public void setCondition(String condition)
+        public void setCondition(ProjectBuildCondition condition)
         {
             this.condition = condition;
         }
@@ -284,7 +336,7 @@ public class SubscriptionWizard extends BaseWizard
             return helper.getAvailableTemplates();
         }
 
-        public Map getConditions()
+        public Map getSelectedOptions()
         {
             return helper.getConditions();
         }
@@ -298,6 +350,8 @@ public class SubscriptionWizard extends BaseWizard
         {
             Long contactId = selectState.getContactId();
             helper = new SubscriptionHelper(false, getUser(), getUser().getContactPoint(contactId), projectManager, notifyConditionFactory, getTextProvider(), buildResultRenderer);
+            conditionType = condition.getType();
+            expression = condition.getExpression();
         }
 
         public String getNextStateName()
@@ -307,7 +361,12 @@ public class SubscriptionWizard extends BaseWizard
 
         public void validate()
         {
-            helper.validateCondition(condition, this);
+            helper.validateCondition(conditionType, selectedConditions, repeatedX, repeatedUnits, expression, this);
+        }
+
+        public void execute()
+        {
+            condition = helper.createCondition(conditionType, selectedConditions, repeatedX, repeatedUnits, expression);
         }
     }
 }

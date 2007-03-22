@@ -541,7 +541,7 @@ public class UserPreferencesAcceptanceTest extends BaseAcceptanceTestCase
         projectForm.assertFormPresent();
         String projectId = tester.getDialog().getOptionValuesFor("projects")[0];
         String projectName = tester.getDialog().getOptionsFor("projects")[0];
-        projectForm.nextFormElements(projectId, "changed", "simple-instant-message");
+        projectForm.nextFormElements(projectId, "all", null, null, null, null, "simple-instant-message");
 
         assertSubscriptionsTable(projectName, contactName);
     }
@@ -560,9 +560,12 @@ public class UserPreferencesAcceptanceTest extends BaseAcceptanceTestCase
 
         CreateProjectSubscriptionForm projectForm = new CreateProjectSubscriptionForm(tester);
         projectForm.assertFormPresent();
-        projectForm.nextFormElements("", "changed", "simple-instant-message");
+        projectForm.nextFormElements("", "all", null, null, null, null, "simple-instant-message");
 
         assertSubscriptionsTable("[all projects]", contactName);
+        clickLinkWithText("edit", 3);
+        EditProjectSubscriptionForm edit = new EditProjectSubscriptionForm(tester);
+        edit.assertFormElements(contactId, "", "all", null, "5", "builds", "true", "simple-instant-message");
     }
 
     // @Requires a project.
@@ -593,17 +596,17 @@ public class UserPreferencesAcceptanceTest extends BaseAcceptanceTestCase
         clickLinkWithText("edit", 4);
         EditProjectSubscriptionForm form = new EditProjectSubscriptionForm(tester);
         form.assertFormPresent();
-        form.assertFormElements(null, null, "changed", "simple-instant-message");
+        form.assertFormElements(null, null, "all", null, "5", "builds", "true", "simple-instant-message");
 
         String projectId = tester.getDialog().getOptionValuesFor("projects")[1];
         String projectName = tester.getDialog().getOptionsFor("projects")[1];
         String contactId = tester.getDialog().getOptionValuesFor("contactPointId")[1];
         String contactName = tester.getDialog().getOptionsFor("contactPointId")[1];
-        form.saveFormElements(contactId, projectId, "true", "html-email");
+        form.saveFormElements(contactId, projectId, "repeated", null, "20", "days", null, "html-email");
 
         assertSubscriptionsTable(projectName, contactName);
         clickLinkWithText("edit", 4);
-        form.assertFormElements(contactId, projectId, "true", "html-email");
+        form.assertFormElements(contactId, projectId, "repeated", null, "20", "days", "unsuccessful.count.days(previous) < 20 and unsuccessful.count.days >= 20", "html-email");
     }
 
     public void testEditSubscriptionPersonal()

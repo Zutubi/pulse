@@ -23,49 +23,77 @@ public class MasterServiceImpl implements MasterService
     private SlaveManager slaveManager;
     private AgentManager agentManager;
 
+    public void pong()
+    {
+        // Empty: just to test coms.
+    }
+
     public void upgradeStatus(String token, UpgradeStatus upgradeStatus)
     {
-        getServiceTokenManager().validateToken(token);
-        agentManager.upgradeStatus(upgradeStatus);
+        if (validateToken(token))
+        {
+            agentManager.upgradeStatus(upgradeStatus);
+        }
     }
 
     public void handleEvent(String token, Event event) throws InvalidTokenException
     {
-        getServiceTokenManager().validateToken(token);
-        eventManager.publish(event);
+        if (validateToken(token))
+        {
+            eventManager.publish(event);
+        }
     }
 
     public Resource getResource(String token, long slaveId, String name) throws InvalidTokenException
     {
-        getServiceTokenManager().validateToken(token);
-
-        Slave slave = getSlaveManager().getSlave(slaveId);
-        PersistentResource persistent;
-        Resource resource = null;
-
-        if(slave != null)
+        if (validateToken(token))
         {
-            persistent = getResourceManager().findBySlaveAndName(slave, name);
-            if(persistent != null)
+            Slave slave = getSlaveManager().getSlave(slaveId);
+            PersistentResource persistent;
+            Resource resource = null;
+
+            if(slave != null)
             {
-                resource = persistent.asResource();
+                persistent = getResourceManager().findBySlaveAndName(slave, name);
+                if(persistent != null)
+                {
+                    resource = persistent.asResource();
+                }
             }
+
+            return resource;
         }
 
-        return resource;
+        return null;
     }
 
     public List<String> getResourceNames(String token, long slaveId) throws InvalidTokenException
     {
-        getServiceTokenManager().validateToken(token);
-
-        Slave slave = getSlaveManager().getSlave(slaveId);
-        if(slave != null)
+        if (validateToken(token))
         {
-            return getResourceManager().getSlaveRepository(slave).getResourceNames();
+            Slave slave = getSlaveManager().getSlave(slaveId);
+            if(slave != null)
+            {
+                return getResourceManager().getSlaveRepository(slave).getResourceNames();
+            }
         }
 
         return null;
+    }
+
+    private boolean validateToken(String token)
+    {
+        ServiceTokenManager tokenManager = getServiceTokenManager();
+        if (tokenManager != null)
+        {
+            tokenManager.validateToken(token);
+            return true;
+        }
+        else
+        {
+            // CIB-1019: agents can send messages during master startup
+            return false;
+        }
     }
 
     public void setEventManager(EventManager eventManager)

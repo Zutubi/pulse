@@ -38,7 +38,7 @@ public interface SlaveService
      */
     boolean updateVersion(String token, String build, String master, long id, String packageUrl, long packageSize);
 
-    SlaveStatus getStatus(String token);
+    SlaveStatus getStatus(String token, String master);
 
     /**
      * A request to build a recipe on the slave, if the slave is currently idle.
@@ -72,9 +72,7 @@ public interface SlaveService
 
     String[] listRoots(String token);
 
-    Resource createResource(ResourceConstructor constructor, String path)
-            ;
+    Resource createResource(ResourceConstructor constructor, String path);
 
-    boolean isResourceHome(ResourceConstructor constructor, String path)
-            ;
+    boolean isResourceHome(ResourceConstructor constructor, String path);
 }

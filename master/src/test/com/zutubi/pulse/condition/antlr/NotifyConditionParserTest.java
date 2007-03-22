@@ -379,7 +379,7 @@ public class NotifyConditionParserTest extends PulseTestCase
         NotifyCondition condition = SubscriptionHelper.validateCondition(expression, validate, factory);
         if(condition == null)
         {
-            throw new PulseRuntimeException((String) ((List)validate.getFieldErrors().get("condition")).get(0));
+            throw new PulseRuntimeException((String) ((List)validate.getFieldErrors().get("expression")).get(0));
         }
 
         return condition;

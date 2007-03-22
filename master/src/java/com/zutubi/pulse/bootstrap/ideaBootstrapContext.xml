@@ -17,6 +17,7 @@
         <property name="postStartupTasks">
             <list>
                 <value>com.zutubi.pulse.bootstrap.SystemStartedMessageStartupTask</value>
+                <value>com.zutubi.pulse.NextBuildNumberAdjusterStartupTask</value>
             </list>
         </property>
     </bean>

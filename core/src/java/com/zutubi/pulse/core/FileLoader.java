@@ -63,6 +63,11 @@ public class FileLoader
 
     public void load(InputStream input, Object root, Scope globalScope, ResourceRepository resourceRepository, TypeLoadPredicate predicate) throws PulseException
     {
+        if(predicate == null)
+        {
+            predicate = new DefaultTypeLoadPredicate();
+        }
+
         try
         {
             Builder builder = new Builder(new LocationAwareNodeFactory());
@@ -94,7 +99,7 @@ public class FileLoader
                 ((ScopeAware) root).setScope(globalScope);
             }
 
-            mapAttributesToProperties(rootElement, root, true, globalScope);
+            mapAttributesToProperties(rootElement, root, predicate, globalScope);
 
             for (int index = 0; index < rootElement.getChildCount(); index++)
             {
@@ -103,7 +108,7 @@ public class FileLoader
                 {
                     continue;
                 }
-                loadType((Element) node, root, true, globalScope, 1, resourceRepository, predicate);
+                loadType((Element) node, root, globalScope, 1, resourceRepository, predicate);
             }
         }
         finally
@@ -112,7 +117,7 @@ public class FileLoader
         }
     }
 
-    private void loadType(Element e, Object parent, boolean resolveReferences, Scope scope, int depth, ResourceRepository resourceRepository, TypeLoadPredicate predicate) throws PulseException
+    private void loadType(Element e, Object parent, Scope scope, int depth, ResourceRepository resourceRepository, TypeLoadPredicate predicate) throws PulseException
     {
         IntrospectionHelper parentHelper = IntrospectionHelper.getHelper(parent.getClass(), typeDefinitions);
         String name = e.getLocalName();
@@ -126,7 +131,7 @@ public class FileLoader
                 throw new FileLoadException(String.format("Maximum recursion depth %s exceeded", MAX_RECURSION_DEPTH));
             }
 
-            if(handleInternalElement(e, parent, resolveReferences, scope, parentHelper, depth, resourceRepository, predicate))
+            if(handleInternalElement(e, parent, scope, parentHelper, depth, resourceRepository, predicate))
             {
                 return;
             }
@@ -144,15 +149,10 @@ public class FileLoader
                 type = create(name);
             }
 
-            if(predicate != null)
-            {
-                resolveReferences = resolveReferences && predicate.resolveReferences(type, e);
-            }
-
             IntrospectionHelper typeHelper = IntrospectionHelper.getHelper(type.getClass(), typeDefinitions);
 
             // initialise attributes
-            mapAttributesToProperties(e, type, resolveReferences, scope);
+            mapAttributesToProperties(e, type, predicate, scope);
 
             // interface based initialisation.
             if (Reference.class.isAssignableFrom(type.getClass()))
@@ -164,7 +164,7 @@ public class FileLoader
                 }
             }
 
-            boolean loadType = predicate == null || predicate.loadType(type, e);
+            boolean loadType = predicate.loadType(type, e);
             if(loadType)
             {
                 scope = new Scope(scope);
@@ -185,7 +185,7 @@ public class FileLoader
                 }
 
                 // initialise sub-elements.
-                loadSubElements(e, type, resolveReferences, scope, typeHelper, depth, resourceRepository, predicate);
+                loadSubElements(e, type, scope, typeHelper, depth, resourceRepository, predicate);
             }
 
             // add to container.
@@ -246,7 +246,7 @@ public class FileLoader
         }
     }
 
-    private void loadSubElements(Element e, Object type, boolean resolveReferences, Scope scope, IntrospectionHelper typeHelper, int depth, ResourceRepository resourceRepository, TypeLoadPredicate predicate)
+    private void loadSubElements(Element e, Object type, Scope scope, IntrospectionHelper typeHelper, int depth, ResourceRepository resourceRepository, TypeLoadPredicate predicate)
             throws Exception
     {
         String text = null;
@@ -259,7 +259,7 @@ public class FileLoader
             {
                 Element element = (Element) node;
                 // process type.
-                loadType(element, type, resolveReferences, scope, depth + 1, resourceRepository, predicate);
+                loadType(element, type, scope, depth + 1, resourceRepository, predicate);
             }
             else if (node instanceof Text)
             {
@@ -276,7 +276,7 @@ public class FileLoader
 
         if (text != null && typeHelper.hasSetText())
         {
-            if (resolveReferences)
+            if (predicate.resolveReferences(type, e))
             {
                 text = VariableHelper.replaceVariables(text, scope);
             }
@@ -285,7 +285,7 @@ public class FileLoader
         }
     }
 
-    private boolean handleInternalElement(Element element, Object type, boolean resolveReferences, Scope scope, IntrospectionHelper typeHelper, int depth, ResourceRepository resourceRepository, TypeLoadPredicate predicate) throws Exception
+    private boolean handleInternalElement(Element element, Object type, Scope scope, IntrospectionHelper typeHelper, int depth, ResourceRepository resourceRepository, TypeLoadPredicate predicate) throws Exception
     {
         String localName = element.getLocalName();
         if(localName.equals("macro"))
@@ -336,7 +336,7 @@ public class FileLoader
 
                     try
                     {
-                        loadSubElements(lae, type, resolveReferences, scope, typeHelper, depth, resourceRepository, predicate);
+                        loadSubElements(lae, type, scope, typeHelper, depth, resourceRepository, predicate);
                     }
                     catch(Exception e)
                     {
@@ -360,7 +360,7 @@ public class FileLoader
         else if(localName.equals("scope"))
         {
             // Just load children in new scope and redirect to parent
-            loadSubElements(element, type, resolveReferences, new Scope(scope), typeHelper, depth, resourceRepository, predicate);
+            loadSubElements(element, type, new Scope(scope), typeHelper, depth, resourceRepository, predicate);
             return true;
         }
 
@@ -427,7 +427,7 @@ public class FileLoader
         return name;
     }
 
-    private void mapAttributesToProperties(Element source, Object target, boolean resolveReferences, Scope scope) throws FileLoadException
+    private void mapAttributesToProperties(Element source, Object target, TypeLoadPredicate predicate, Scope scope) throws FileLoadException
     {
         IntrospectionHelper helper = IntrospectionHelper.getHelper(target.getClass(), typeDefinitions);
 
@@ -438,7 +438,7 @@ public class FileLoader
             try
             {
                 String propertyName = convertLocalNameToPropertyName(a.getLocalName());
-                helper.set(propertyName, target, a.getValue(), resolveReferences, scope);
+                helper.set(propertyName, target, a.getValue(), predicate.resolveReferences(target, source), predicate.allowUnresolved(target, source), scope);
             }
             catch (InvocationTargetException e)
             {

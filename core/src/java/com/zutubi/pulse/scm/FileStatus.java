@@ -123,6 +123,11 @@ public class FileStatus
                 return true;
             }
 
+            public boolean isInteresting()
+            {
+                return true;
+            }
+
             public boolean requiresFile()
             {
                 return true;
@@ -131,6 +136,11 @@ public class FileStatus
         BRANCHED
         {
             public boolean isConsistent()
+            {
+                return true;
+            }
+
+            public boolean isInteresting()
             {
                 return true;
             }
@@ -147,6 +157,28 @@ public class FileStatus
                 return true;
             }
 
+            public boolean isInteresting()
+            {
+                return true;
+            }
+
+            public boolean requiresFile()
+            {
+                return false;
+            }
+        },
+        IGNORED
+        {
+            public boolean isConsistent()
+            {
+                return true;
+            }
+
+            public boolean isInteresting()
+            {
+                return false;
+            }
+
             public boolean requiresFile()
             {
                 return false;
@@ -159,6 +191,11 @@ public class FileStatus
                 return false;
             }
 
+            public boolean isInteresting()
+            {
+                return true;
+            }
+
             public boolean requiresFile()
             {
                 return false;
@@ -167,6 +204,11 @@ public class FileStatus
         MERGED
         {
             public boolean isConsistent()
+            {
+                return true;
+            }
+
+            public boolean isInteresting()
             {
                 return true;
             }
@@ -183,6 +225,11 @@ public class FileStatus
                 return false;
             }
 
+            public boolean isInteresting()
+            {
+                return true;
+            }
+
             public boolean requiresFile()
             {
                 return false;
@@ -191,6 +238,11 @@ public class FileStatus
         MODIFIED
         {
             public boolean isConsistent()
+            {
+                return true;
+            }
+
+            public boolean isInteresting()
             {
                 return true;
             }
@@ -207,6 +259,11 @@ public class FileStatus
                 return false;
             }
 
+            public boolean isInteresting()
+            {
+                return true;
+            }
+
             public boolean requiresFile()
             {
                 return false;
@@ -215,6 +272,11 @@ public class FileStatus
         REPLACED
         {
             public boolean isConsistent()
+            {
+                return true;
+            }
+
+            public boolean isInteresting()
             {
                 return true;
             }
@@ -231,6 +293,11 @@ public class FileStatus
                 return false;
             }
 
+            public boolean isInteresting()
+            {
+                return true;
+            }
+
             public boolean requiresFile()
             {
                 return false;
@@ -241,6 +308,11 @@ public class FileStatus
             public boolean isConsistent()
             {
                 return false;
+            }
+
+            public boolean isInteresting()
+            {
+                return true;
             }
 
             public boolean requiresFile()
@@ -255,6 +327,11 @@ public class FileStatus
                 return true;
             }
 
+            public boolean isInteresting()
+            {
+                return false;
+            }
+
             public boolean requiresFile()
             {
                 return false;
@@ -262,6 +339,7 @@ public class FileStatus
         };
 
         public abstract boolean isConsistent();
+        public abstract boolean isInteresting();
         public abstract boolean requiresFile();
     }
 
@@ -390,7 +468,7 @@ public class FileStatus
 
     public boolean isInteresting()
     {
-        return isOutOfDate() || state != State.UNCHANGED || properties.size() > 0;
+        return isOutOfDate() || state.isInteresting() || properties.size() > 0;
     }
 
     public void preApply(File base) throws IOException

@@ -2532,6 +2532,109 @@
     </script>
 #end
 
+##
+## Javascript for project subscription forms
+##
+#macro(subscriptionScript $formId)
+    <script type="text/javascript">
+        var conditionMap = { 'all'     : [],
+                             'simple'  : [ 'selectedConditions-1', 'selectedConditions-2', 'selectedConditions-3', 'selectedConditions-4' ],
+                             'repeated': [ '${formId}_repeatedX', '${formId}_repeatedUnits' ],
+                             'advanced': [ '${formId}_expression' ] };
+
+        function toggleConditions(name)
+        {
+            if(name)
+            {
+                for(key in conditionMap)
+                {
+                    var disable = key != name;
+                    var ids = conditionMap[key];
+                    for(i = 0; i < ids.length; i++)
+                    {
+                        getElement(ids[i]).disabled = disable;
+                    }
+                }
+            }
+        }
+
+        function getSelectedCondition()
+        {
+            for(key in conditionMap)
+            {
+                var r = getElement('conditionType' + key);
+                if(r.checked)
+                {
+                    return r.value;
+                }
+            }
+
+            return null;
+        }
+    </script>
+#end
+
+##
+## Outputs a subsection for the condition section of a project subcription form
+##
+#macro(conditionSection $name)
+    <tr>
+        <td class="field" colspan="2">
+            <input type="radio" name="conditionType" id="conditionType${name}" value="${name}" onclick="toggleConditions('$name');" #if($name == $conditionType) checked="checked" #end/>
+            <label for="conditionType${name}">#wwtext("name=subscription.condition.${name}")</label>
+        </td>
+    </tr>
+#end
+
+##
+## Common fields for the subscription forms
+##
+#macro(subscriptionCommonFields)
+    <tr><th class="form" colspan="2">#wwtext("name=subscription.projects")</th></tr>
+
+    #wwselect("name=projects" "label=%{getText('subscription.projects')}" "list=allProjects" "multiple=true" "tabindex=2")
+    #inlineHelp("subscription.projects.help")
+
+    <tr><th class="form" colspan="2">#wwtext("name=subscription.condition")</th></tr>
+
+    #conditionSection("all")
+    #conditionSection("simple")
+
+    #wwcheckboxlist("name=selectedConditions" "label=%{getText('conditions.builds.any.of')}" "multirow=true" "list=selectedOptions" "multiple=true" "tabindex=3")
+
+    #conditionSection("repeated")
+
+    #set($prefix = "")
+#if($fieldErrors.containsKey("repeatedX"))
+    #foreach($error in $fieldErrors.repeatedX)
+        <tr errorFor="subscription.create.project_repeatedX">
+            <th class="error-message" colspan="2">
+                <span class="errorMessage">$!webwork.htmlEncode($error)</span>
+            </th>
+        </tr>
+    #end
+
+    #set($prefix = "error-")
+#end
+    <tr>
+        <th class="${prefix}label">#wwtext("name=conditions.notify.after")</th>
+        <td class="${prefix}field">
+            #wwtextfield("theme=simple" "template=ctext" "name=repeatedX" "size=5" "onkeypress=return submitenter(this,event)" "tabindex=4")
+            #wwselect("theme=simple" "template=select" "name=repeatedUnits" "list={'builds', 'days'}" "tabindex=5")
+        </td>
+    </tr>
+    #inlineHelp("conditions.notify.after.help")
+
+    #conditionSection("advanced")
+
+    #wwtextfield("name=expression" "size=60" "label=%{getText('conditions.custom.expression')}" "tabindex=6")
+    #inlineHelp("conditions.custom.expression.help")
+
+    <tr><th class="form" colspan="2">#wwtext("name=subscription.template")</th></tr>
+
+    #wwselect("name=template" "label=%{getText('subscription.template')}" "list=availableTemplates" "tabindex=7")
+#end
+
 #macro(pluginStateImage $plugin)
     #if($plugin.disabled || $plugin.disabling)
         #set($image = "exclamation-bw.gif")

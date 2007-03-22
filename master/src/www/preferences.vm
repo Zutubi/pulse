@@ -85,7 +85,7 @@
 #foreach ($subscription in $subscriptions)
     #set($contact = $subscription.contactPoint)
     #set($projects = $subscription.projects)
-    #set($confirmMessage = $action.getText("subscription.delete.confirm", [$project.name]))
+    #set($confirmMessage = $action.getText("subscription.delete.confirm"))
                     <tr>
                         #dynamicCell($contact.name)
                         <td class="content">

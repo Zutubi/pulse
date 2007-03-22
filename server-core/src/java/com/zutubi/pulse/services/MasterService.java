@@ -9,6 +9,8 @@ import java.util.List;
  */
 public interface MasterService
 {
+    void pong();
+
     void upgradeStatus(String token, UpgradeStatus upgradeStatus);
 
     void handleEvent(String token, Event event) throws InvalidTokenException;

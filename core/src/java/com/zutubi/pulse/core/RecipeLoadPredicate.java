@@ -43,4 +43,9 @@ public class RecipeLoadPredicate implements TypeLoadPredicate
     {
         return true;
     }
+
+    public boolean allowUnresolved(Object type, Element element)
+    {
+        return false;
+    }
 }

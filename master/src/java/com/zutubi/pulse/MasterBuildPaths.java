@@ -54,11 +54,6 @@ public class MasterBuildPaths
         return new File(getProjectDir(project), "repo");
     }
 
-    public File getBuildsDir(Project project)
-    {
-        return new File(getProjectDir(project), "builds");
-    }
-
     public File getBuildsDir(long userId)
     {
         return new File(getUserDir(userId), "builds");
@@ -66,7 +61,12 @@ public class MasterBuildPaths
 
     public static String getBuildDirName(BuildResult result)
     {
-        return String.format("%08d", result.getNumber());
+        return getBuildDirName(result.getNumber());
+    }
+
+    public static String getBuildDirName(long number)
+    {
+        return String.format("%08d", number);
     }
 
     public File getBuildDir(BuildResult result)
