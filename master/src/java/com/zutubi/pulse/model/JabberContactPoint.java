@@ -23,9 +23,8 @@ public class JabberContactPoint extends ContactPoint
         return "simple-instant-message";
     }
 
-    public void internalNotify(BuildResult result, String rendered, String mimeType) throws Exception
+    public void internalNotify(BuildResult result, String subject, String rendered, String mimeType) throws Exception
     {
-        // TODO: oh dear, again
         ComponentContext.autowire(this);
 
         if (!jabberManager.isConfigured())

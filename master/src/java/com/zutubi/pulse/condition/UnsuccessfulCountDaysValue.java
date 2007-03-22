@@ -19,6 +19,11 @@ public class UnsuccessfulCountDaysValue implements NotifyIntegerValue
 
     public int getValue(BuildResult result, User user)
     {
+        return getValueForBuild(result, buildManager);
+    }
+
+    public static int getValueForBuild(BuildResult result, BuildManager buildManager)
+    {
         if(result != null && !result.succeeded())
         {
             Project project = result.getProject();

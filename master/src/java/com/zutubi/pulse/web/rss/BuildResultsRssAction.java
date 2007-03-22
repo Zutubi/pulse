@@ -107,10 +107,8 @@ public class BuildResultsRssAction extends ProjectActionSupport
     private String renderResult(BuildResult result)
     {
         StringWriter w = new StringWriter();
-        buildResultRenderer.render(configurationManager.getAppConfig().getBaseUrl(),
-                result,
-                getBuildManager().getChangesForBuild(result),
-                "html-email", w);
+        Map<String, Object> dataMap = ResultNotifier.getDataMap(result, configurationManager.getAppConfig().getBaseUrl(), buildManager, buildResultRenderer);
+        buildResultRenderer.render(result, dataMap, "html-email", w);
         return w.toString();
     }
 
