@@ -763,6 +763,66 @@ public class HibernateBuildResultDaoTest extends MasterPersistenceTestCase
         assertEquals("a2", result.getSpecName().getName());
     }
 
+    public void testGetBuildCountRange()
+    {
+        Project p1 = new Project("p1", "this is p1 speaking");
+        BuildSpecification s1 = new BuildSpecification("s1");
+        BuildSpecification s2 = new BuildSpecification("s2");
+        p1.addBuildSpecification(s1);
+        p1.addBuildSpecification(s2);
+        projectDao.save(p1);
+
+        buildResultDao.save(createCompletedBuild(p1, s1, 1));
+        buildResultDao.save(createCompletedBuild(p1, s2, 2));
+        buildResultDao.save(createCompletedBuild(p1, s1, 3));
+        buildResultDao.save(createCompletedBuild(p1, s1, 4));
+        buildResultDao.save(createCompletedBuild(p1, s2, 5));
+        
+        assertEquals(0, buildResultDao.getBuildCount(s1.getPname(), 1, 1));
+        assertEquals(1, buildResultDao.getBuildCount(s1.getPname(), 0, 1));
+        assertEquals(1, buildResultDao.getBuildCount(s1.getPname(), 0, 2));
+        assertEquals(2, buildResultDao.getBuildCount(s1.getPname(), 0, 3));
+        assertEquals(1, buildResultDao.getBuildCount(s1.getPname(), 1, 3));
+        assertEquals(2, buildResultDao.getBuildCount(s1.getPname(), 1, 4));
+        assertEquals(2, buildResultDao.getBuildCount(s1.getPname(), 1, 100));
+        assertEquals(3, buildResultDao.getBuildCount(s1.getPname(), 0, 100));
+    }
+
+    public void testQuerySpecificationBuilds()
+    {
+        Project p1 = new Project("p1", "this is p1 speaking");
+        BuildSpecification s1 = new BuildSpecification("s1");
+        BuildSpecification s2 = new BuildSpecification("s2");
+        p1.addBuildSpecification(s1);
+        p1.addBuildSpecification(s2);
+        projectDao.save(p1);
+
+        buildResultDao.save(createCompletedBuild(p1, s1, 1));
+        buildResultDao.save(createCompletedBuild(p1, s2, 2));
+        buildResultDao.save(createCompletedBuild(p1, s1, 3));
+        buildResultDao.save(createCompletedBuild(p1, s1, 4));
+        buildResultDao.save(createCompletedBuild(p1, s2, 5));
+
+        List<BuildResult> results = buildResultDao.querySpecificationBuilds(p1, s1.getPname(), null, 1, -1, 0, 1, false, false);
+        assertEquals(1, results.size());
+        assertEquals(1, results.get(0).getNumber());
+
+        results = buildResultDao.querySpecificationBuilds(p1, s1.getPname(), null, 2, -1, 0, 1, false, false);
+        assertEquals(1, results.size());
+        assertEquals(3, results.get(0).getNumber());
+
+        results = buildResultDao.querySpecificationBuilds(p1, s1.getPname(), null, 3, -1, 0, 1, false, false);
+        assertEquals(1, results.size());
+        assertEquals(3, results.get(0).getNumber());
+
+        results = buildResultDao.querySpecificationBuilds(p1, s1.getPname(), null, 4, -1, 0, 1, false, false);
+        assertEquals(1, results.size());
+        assertEquals(4, results.get(0).getNumber());
+
+        results = buildResultDao.querySpecificationBuilds(p1, s1.getPname(), null, 5, -1, 0, 1, false, false);
+        assertEquals(0, results.size());
+    }
+
     private BuildResult createCompletedBuild(Project project, long number)
     {
         BuildSpecification spec = makeSpec();

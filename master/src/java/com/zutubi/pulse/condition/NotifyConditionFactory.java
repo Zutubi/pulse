@@ -1,11 +1,7 @@
 package com.zutubi.pulse.condition;
 
-import com.zutubi.pulse.core.PulseRuntimeException;
 import com.zutubi.pulse.core.ObjectFactory;
-import com.zutubi.pulse.condition.NotifyCondition;
-import com.zutubi.pulse.condition.TrueNotifyCondition;
-import com.zutubi.pulse.condition.SuccessNotifyCondition;
-import com.zutubi.pulse.condition.StateChangeNotifyCondition;
+import com.zutubi.pulse.core.PulseRuntimeException;
 
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -13,7 +9,6 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * <class-comment/>
  */
 public class NotifyConditionFactory
 {
@@ -26,6 +21,10 @@ public class NotifyConditionFactory
     public static final String SUCCESS = "success";
     public static final String STATE_CHANGE = "state.change";
     public static final String TRUE = "true";
+
+    // Integer values
+    public static final String FAIL_COUNT_BUILDS = "unsuccessful.count.builds";
+    public static final String FAIL_COUNT_DAYS = "unsuccessful.count.days";
 
     private final static Map<String, Class> typeMap = new HashMap<String, Class>();
 
@@ -42,6 +41,9 @@ public class NotifyConditionFactory
         typeMap.put(SUCCESS, SuccessNotifyCondition.class);
         typeMap.put(STATE_CHANGE, StateChangeNotifyCondition.class);
         typeMap.put(TRUE, TrueNotifyCondition.class);
+
+        typeMap.put(FAIL_COUNT_BUILDS, UnsuccessfulCountBuildsValue.class);
+        typeMap.put(FAIL_COUNT_DAYS, UnsuccessfulCountDaysValue.class);
     }
 
     public List<String> getAvailableConditions()
@@ -49,9 +51,10 @@ public class NotifyConditionFactory
         return new LinkedList<String>(typeMap.keySet());
     }
 
-    public boolean isValid(String key)
+    public boolean isValid(String key, Class clazz)
     {
-        return typeMap.containsKey(key);
+        Class foundClass = typeMap.get(key);
+        return foundClass != null && clazz.isAssignableFrom(foundClass);
     }
 
     public void setObjectFactory(ObjectFactory objectFactory)
@@ -61,15 +64,25 @@ public class NotifyConditionFactory
 
     public NotifyCondition createCondition(String condition)
     {
-        if (!isValid(condition))
+        return create(condition, NotifyCondition.class);
+    }
+
+    public NotifyIntegerValue createIntegerValue(String value)
+    {
+        return create(value, NotifyIntegerValue.class);
+    }
+
+    private <T> T create(String token, Class<T> clazz)
+    {
+        if (!isValid(token, clazz))
         {
-            throw new IllegalArgumentException("invalid condition '" + condition + "' specified.");
+            throw new IllegalArgumentException("invalid token '" + token + "' specified.");
         }
-        Class definition = typeMap.get(condition);
+        Class definition = typeMap.get(token);
 
         try
         {
-            return objectFactory.buildBean(definition);
+            return (T)objectFactory.buildBean(definition);
         }
         catch (Exception e)
         {

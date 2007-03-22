@@ -24,6 +24,11 @@ public class ChangedByMeNotifyCondition implements NotifyCondition
 
     public boolean satisfied(BuildResult result, User user)
     {
+        if(result == null)
+        {
+            return false;
+        }
+
         // look for a change.
         List<Changelist> changelists = buildManager.getChangesForBuild(result);
         for (Changelist changelist : changelists)

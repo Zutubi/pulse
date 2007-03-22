@@ -47,6 +47,16 @@ public interface BuildManager
     public int getBuildCount(Project project, ResultState[] states, PersistentName spec);
 
     /**
+     * Counts the number of builds that have happened subsequent to the given
+     * build number for the given spec.
+     *
+     * @param spec  build specification to limit our search to
+     * @param after lower number for the count range, not inclusive
+     * @param upTo  upper number of the count range, inclusive
+     */
+    int getBuildCount(BuildSpecification spec, long after, long upTo);
+
+    /**
      * Fills out the list in the given history page based on the page offset.
      * Results in the initial state are NOT included.
      *

@@ -1,6 +1,5 @@
 package com.zutubi.pulse.condition;
 
-import com.zutubi.pulse.condition.NotifyCondition;
 import com.zutubi.pulse.model.BuildManager;
 import com.zutubi.pulse.model.BuildResult;
 import com.zutubi.pulse.model.User;
@@ -30,7 +29,11 @@ public class StateChangeNotifyCondition implements NotifyCondition
 
     public boolean satisfied(BuildResult result, User user)
     {
-        // retrieve the previous result. If it was a failure, then this condition is satisfied.
+        if(result == null)
+        {
+            return false;
+        }
+
         BuildResult previous = buildManager.getPreviousBuildResult(result);
         if(previous == null)
         {

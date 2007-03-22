@@ -133,6 +133,11 @@ public class MockBuildManager implements BuildManager
         throw new RuntimeException("Method not implemented.");
     }
 
+    public int getBuildCount(BuildSpecification spec, long after, long upTo)
+    {
+        throw new RuntimeException("Method not yet implemented.");
+    }
+
     public void fillHistoryPage(HistoryPage page)
     {
         throw new RuntimeException("Method not implemented.");

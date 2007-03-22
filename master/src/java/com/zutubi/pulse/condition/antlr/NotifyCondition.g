@@ -4,10 +4,7 @@ header {
 
 {
     import com.zutubi.pulse.bootstrap.ComponentContext;
-    import com.zutubi.pulse.condition.NotifyCondition;
-    import com.zutubi.pulse.condition.NotifyConditionFactory;
-    import com.zutubi.pulse.condition.CompoundNotifyCondition;
-    import com.zutubi.pulse.condition.NotNotifyCondition;
+    import com.zutubi.pulse.condition.*;
 }
 
 class NotifyConditionTreeParser extends TreeParser;
@@ -29,10 +26,48 @@ cond returns [NotifyCondition r]
     : #("and" a=cond b=cond) { r = new CompoundNotifyCondition(a, b, false); }
     | #("or" a=cond b=cond) { r = new CompoundNotifyCondition(a, b, true); }
     | #("not" a=cond) { r = new NotNotifyCondition(a); }
-    | c:condition { r = factory.createCondition(c.getText()); }
+    | r=comp
+    | r=prev
+    | c:boolsymbol { r = factory.createCondition(c.getText()); }
     ;
 
-condition
+comp returns [NotifyCondition r]
+{
+    NotifyIntegerValue x, y;
+    r = null;
+}
+    : #(EQUAL x=integer y=integer) { r = new ComparisonNotifyCondition(x, y, ComparisonNotifyCondition.Op.EQUAL); }
+    | #(NOT_EQUAL x=integer y=integer) { r = new ComparisonNotifyCondition(x, y, ComparisonNotifyCondition.Op.NOT_EQUAL); }
+    | #(LESS_THAN x=integer y=integer) { r = new ComparisonNotifyCondition(x, y, ComparisonNotifyCondition.Op.LESS_THAN); }
+    | #(LESS_THAN_OR_EQUAL x=integer y=integer) { r = new ComparisonNotifyCondition(x, y, ComparisonNotifyCondition.Op.LESS_THAN_OR_EQUAL); }
+    | #(GREATER_THAN x=integer y=integer) { r = new ComparisonNotifyCondition(x, y, ComparisonNotifyCondition.Op.GREATER_THAN); }
+    | #(GREATER_THAN_OR_EQUAL x=integer y=integer) { r = new ComparisonNotifyCondition(x, y, ComparisonNotifyCondition.Op.GREATER_THAN_OR_EQUAL); }
+    ;
+
+prev returns [NotifyCondition r]
+{
+    r = null;
+}
+    : #("previous" r=cond) { r = new PreviousNotifyCondition(r); }
+    ;
+
+integer returns [NotifyIntegerValue r]
+{
+    r = null;
+}
+    : i:INTEGER { r = new LiteralNotifyIntegerValue(Integer.parseInt(i.getText())); }
+    | r=previnteger
+    | j:intsymbol { r = factory.createIntegerValue(j.getText()); }
+    ;
+
+previnteger returns [NotifyIntegerValue r]
+{
+    r = null;
+}
+    : #("previous" r=integer) { r = new PreviousNotifyIntegerValue(r); }
+    ;
+    
+boolsymbol
     : "true"
     | "false"
     | "success"
@@ -43,12 +78,21 @@ condition
     | "state.change"
     ;
 
+intsymbol
+    : "unsuccessful.count.builds"
+    | "unsuccessful.count.days"
+    ;
+
 class NotifyConditionParser extends Parser;
 
 options {
         buildAST=true;
         defaultErrorHandler=false;
 }
+
+condition
+    : orexpression EOF
+    ;
 
 orexpression
     :   andexpression ("or"^ andexpression)*
@@ -59,15 +103,25 @@ andexpression
     ;
 
 notexpression
-    : ("not"^)? atom
+    : ("not"^)? boolexpression
     ;
 
-atom
-    : condition
+boolexpression
+    : boolsymbol (LEFT_PAREN! "previous"^ RIGHT_PAREN!)?
     | LEFT_PAREN! orexpression RIGHT_PAREN!
+    | compareexpression
     ;
 
-condition
+compareexpression
+    : integer (EQUAL^ | NOT_EQUAL^ | LESS_THAN^ | LESS_THAN_OR_EQUAL^ | GREATER_THAN^ | GREATER_THAN_OR_EQUAL^) integer
+    ;
+
+integer
+    : INTEGER
+    | intsymbol (LEFT_PAREN! "previous"^ RIGHT_PAREN!)?
+    ;
+
+boolsymbol
     : "true"
     | "false"
     | "success"
@@ -78,18 +132,38 @@ condition
     | "state.change"
     ;
 
+intsymbol
+    : "unsuccessful.count.builds"
+    | "unsuccessful.count.days"
+    ;
+    
 class NotifyConditionLexer extends Lexer;
 
 options {
-   k = 1;
+   k = 2;
 }
 
-// Words, which include our operators
+// Words, which include our boolean operators
 WORD
 options {
     paraphrase = "a word";
 }
     : ('a'..'z' | 'A'..'Z' | '.')+ ;
+
+// Integers, used in comparison expressions
+INTEGER
+options {
+    paraphrase = "an integer";
+}
+    : ('0'..'9')+ ;
+
+// Comparison operators
+EQUAL                : "==";
+NOT_EQUAL            : "!=";
+LESS_THAN            : "<";
+LESS_THAN_OR_EQUAL   : "<=";
+GREATER_THAN         : ">";
+GREATER_THAN_OR_EQUAL: ">=";
 
 // Grouping
 LEFT_PAREN

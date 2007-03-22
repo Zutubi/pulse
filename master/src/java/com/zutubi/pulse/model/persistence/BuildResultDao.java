@@ -49,6 +49,8 @@ public interface BuildResultDao extends EntityDao<BuildResult>
 
     int getBuildCount(Project project, ResultState[] states, Boolean hasWorkDir);
 
+    int getBuildCount(PersistentName spec, long after, long upTo);
+
     List<PersistentName> findAllSpecifications(Project project);
 
     List<PersistentName> findAllSpecificationsForProjects(Project[] projects);

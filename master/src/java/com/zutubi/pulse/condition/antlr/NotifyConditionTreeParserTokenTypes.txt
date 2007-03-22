@@ -3,15 +3,25 @@ NotifyConditionTreeParser    // output token vocab name
 LITERAL_and="and"=4
 LITERAL_or="or"=5
 LITERAL_not="not"=6
-LITERAL_true="true"=7
-LITERAL_false="false"=8
-LITERAL_success="success"=9
-LITERAL_failure="failure"=10
-LITERAL_error="error"=11
-LITERAL_changed="changed"=12
-"changed.by.me"=13
-"state.change"=14
-LEFT_PAREN("an opening parenthesis '('")=15
-RIGHT_PAREN("a closing parenthesis ')'")=16
-WORD("a word")=17
-WHITESPACE=18
+EQUAL=7
+NOT_EQUAL=8
+LESS_THAN=9
+LESS_THAN_OR_EQUAL=10
+GREATER_THAN=11
+GREATER_THAN_OR_EQUAL=12
+LITERAL_previous="previous"=13
+INTEGER("an integer")=14
+LITERAL_true="true"=15
+LITERAL_false="false"=16
+LITERAL_success="success"=17
+LITERAL_failure="failure"=18
+LITERAL_error="error"=19
+LITERAL_changed="changed"=20
+"changed.by.me"=21
+"state.change"=22
+"unsuccessful.count.builds"=23
+"unsuccessful.count.days"=24
+LEFT_PAREN("an opening parenthesis '('")=25
+RIGHT_PAREN("a closing parenthesis ')'")=26
+WORD("a word")=27
+WHITESPACE=28
