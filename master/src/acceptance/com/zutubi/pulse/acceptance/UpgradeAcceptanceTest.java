@@ -11,19 +11,17 @@ import com.zutubi.pulse.transfer.TransferAPI;
 import com.zutubi.pulse.upgrade.tasks.MutableConfiguration;
 import com.zutubi.pulse.util.FileSystemUtils;
 import com.zutubi.pulse.util.IOUtils;
-import com.zutubi.pulse.core.PulseRuntimeException;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
-import org.springframework.dao.DataAccessException;
 
 import java.io.*;
+import java.net.InetSocketAddress;
+import java.net.Socket;
 import java.sql.SQLException;
 import java.util.Properties;
 import java.util.zip.ZipInputStream;
-import java.net.Socket;
-import java.net.InetSocketAddress;
 
 /**
  * <class-comment/>
@@ -76,7 +74,7 @@ public class UpgradeAcceptanceTest extends BaseAcceptanceTestCase
 
     public void importAndUpgradeTest(String build) throws Exception
     {
-        String db = "postgresql";//System.getenv("PULSE_DB");
+        String db = System.getenv("PULSE_DB");
         if ("mysql".equals(db))
         {
             setupMySQL();
