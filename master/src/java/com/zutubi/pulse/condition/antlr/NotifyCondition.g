@@ -48,7 +48,7 @@ prev returns [NotifyCondition r]
 {
     r = null;
 }
-    : #("previous" r=cond) { r = new PreviousNotifyCondition(r); }
+    : #("previous" r=cond) { r = factory.build(PreviousNotifyCondition.class, new Class[]{ NotifyCondition.class }, new Object[]{ r }); }
     ;
 
 integer returns [NotifyIntegerValue r]
@@ -64,7 +64,7 @@ previnteger returns [NotifyIntegerValue r]
 {
     r = null;
 }
-    : #("previous" r=integer) { r = new PreviousNotifyIntegerValue(r); }
+    : #("previous" r=integer) { r = factory.build(PreviousNotifyIntegerValue.class, new Class[]{ NotifyIntegerValue.class }, new Object[]{ r }); }
     ;
     
 boolsymbol

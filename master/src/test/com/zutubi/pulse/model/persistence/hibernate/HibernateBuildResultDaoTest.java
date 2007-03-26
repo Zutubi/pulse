@@ -823,6 +823,52 @@ public class HibernateBuildResultDaoTest extends MasterPersistenceTestCase
         assertEquals(0, results.size());
     }
 
+    public void testQuerySpecificationBuildsSuccess()
+    {
+        Project p1 = new Project("p1", "this is p1 speaking");
+        BuildSpecification s1 = new BuildSpecification("s1");
+        BuildSpecification s2 = new BuildSpecification("s2");
+        p1.addBuildSpecification(s1);
+        p1.addBuildSpecification(s2);
+        projectDao.save(p1);
+
+        buildResultDao.save(createCompletedBuild(p1, s1, 1));
+        buildResultDao.save(createCompletedBuild(p1, s2, 2));
+        buildResultDao.save(createFailedBuild(p1, s1, 3));
+        buildResultDao.save(createCompletedBuild(p1, s1, 4));
+        buildResultDao.save(createCompletedBuild(p1, s2, 5));
+        buildResultDao.save(createFailedBuild(p1, s1, 6));
+        buildResultDao.save(createCompletedBuild(p1, s1, 7));
+
+        List<BuildResult> results = buildResultDao.querySpecificationBuilds(p1, s1.getPname(), new ResultState[]{ ResultState.SUCCESS }, -1, 1, 0, 1, true, false);
+        assertEquals(1, results.size());
+        assertEquals(1, results.get(0).getNumber());
+
+        results = buildResultDao.querySpecificationBuilds(p1, s1.getPname(), new ResultState[]{ ResultState.SUCCESS }, -1, 2, 0, 1, true, false);
+        assertEquals(1, results.size());
+        assertEquals(1, results.get(0).getNumber());
+
+        results = buildResultDao.querySpecificationBuilds(p1, s1.getPname(), new ResultState[]{ ResultState.SUCCESS }, -1, 3, 0, 1, true, false);
+        assertEquals(1, results.size());
+        assertEquals(1, results.get(0).getNumber());
+
+        results = buildResultDao.querySpecificationBuilds(p1, s1.getPname(), new ResultState[]{ ResultState.SUCCESS }, -1, 4, 0, 1, true, false);
+        assertEquals(1, results.size());
+        assertEquals(4, results.get(0).getNumber());
+
+        results = buildResultDao.querySpecificationBuilds(p1, s1.getPname(), new ResultState[]{ ResultState.SUCCESS }, -1, 5, 0, 1, true, false);
+        assertEquals(1, results.size());
+        assertEquals(4, results.get(0).getNumber());
+
+        results = buildResultDao.querySpecificationBuilds(p1, s1.getPname(), new ResultState[]{ ResultState.SUCCESS }, -1, 6, 0, 1, true, false);
+        assertEquals(1, results.size());
+        assertEquals(4, results.get(0).getNumber());
+
+        results = buildResultDao.querySpecificationBuilds(p1, s1.getPname(), new ResultState[]{ ResultState.SUCCESS }, -1, 7, 0, 1, true, false);
+        assertEquals(1, results.size());
+        assertEquals(7, results.get(0).getNumber());
+    }
+
     private BuildResult createCompletedBuild(Project project, long number)
     {
         BuildSpecification spec = makeSpec();
