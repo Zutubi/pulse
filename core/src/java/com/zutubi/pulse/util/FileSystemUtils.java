@@ -484,7 +484,7 @@ public class FileSystemUtils
                 addToZip(os, base, path);
             }
         }
-        else
+        else if(source.exists())
         {
             ZipEntry entry = new ZipEntry(sourcePath);
             entry.setTime(modifiedTime);
