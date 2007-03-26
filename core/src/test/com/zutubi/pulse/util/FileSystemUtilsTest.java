@@ -665,6 +665,22 @@ public class FileSystemUtilsTest extends PulseTestCase
         }
     }
 
+    public void testZipBrokenSymlink() throws IOException
+    {
+        if(FileSystemUtils.LN_AVAILABLE)
+        {
+            File dir = new File(tmpDir, "dir");
+            assertTrue(dir.mkdir());
+            File f = new File(dir, "f");
+            FileSystemUtils.createFile(f, "content");
+            File l = new File(dir, "l");
+            FileSystemUtils.createFile(f, "content");
+            FileSystemUtils.createSymlink(l, f);
+            assertTrue(f.delete());
+            FileSystemUtils.createZip(new File(tmpDir, "my.zip"), dir, dir);
+        }
+    }
+
     private void simpleEOLTest(byte[] eol, String out) throws IOException
     {
         File test = null;
