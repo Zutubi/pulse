@@ -256,7 +256,7 @@ public NotifyConditionTreeParser() {
 			_t = _retTree;
 			_t = __t13;
 			_t = _t.getNextSibling();
-			r = new PreviousNotifyCondition(r);
+			r = factory.build(PreviousNotifyCondition.class, new Class[]{ NotifyCondition.class }, new Object[]{ r });
 		}
 		catch (RecognitionException ex) {
 			reportError(ex);
@@ -409,7 +409,7 @@ public NotifyConditionTreeParser() {
 			_t = _retTree;
 			_t = __t16;
 			_t = _t.getNextSibling();
-			r = new PreviousNotifyIntegerValue(r);
+			r = factory.build(PreviousNotifyIntegerValue.class, new Class[]{ NotifyIntegerValue.class }, new Object[]{ r });
 		}
 		catch (RecognitionException ex) {
 			reportError(ex);

@@ -9,7 +9,9 @@ import com.zutubi.pulse.model.*;
 import com.zutubi.pulse.test.PulseTestCase;
 import com.zutubi.pulse.util.Constants;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 /**
  */
@@ -49,7 +51,7 @@ public class UnsuccessfulCountDaysValueTest extends PulseTestCase
     public void testNoPreviousSuccessFirstFailure()
     {
         BuildResult failure = createBuild(20);
-        setupCalls(null, failure);
+        setupCalls(20, null, failure);
         setBuildManager();
         assertEquals(0, value.getValue(failure, null));
     }
@@ -59,7 +61,7 @@ public class UnsuccessfulCountDaysValueTest extends PulseTestCase
         BuildResult firstFailure = createBuild(2);
         firstFailure.getStamps().setEndTime(System.currentTimeMillis() - Constants.DAY * 3 - 7200000);
         BuildResult failure = createBuild(20);
-        setupCalls(null, firstFailure);
+        setupCalls(20, null, firstFailure);
         setBuildManager();
         assertEquals(3, value.getValue(failure, null));
     }
@@ -69,7 +71,7 @@ public class UnsuccessfulCountDaysValueTest extends PulseTestCase
         BuildResult success = createBuild(3);
         success.setState(ResultState.SUCCESS);
         BuildResult failure = createBuild(20);
-        setupCalls(success, failure);
+        setupCalls(20, success, failure);
         setBuildManager();
         assertEquals(0, value.getValue(failure, null));
     }
@@ -80,7 +82,7 @@ public class UnsuccessfulCountDaysValueTest extends PulseTestCase
         success.setState(ResultState.SUCCESS);
         BuildResult firstFailure = createBuild(5);
         firstFailure.getStamps().setEndTime(System.currentTimeMillis() - Constants.DAY * 4);
-        setupCalls(success, firstFailure);
+        setupCalls(20, success, firstFailure);
         setBuildManager();
         assertEquals(4, value.getValue(createBuild(20), null));
     }
@@ -93,12 +95,13 @@ public class UnsuccessfulCountDaysValueTest extends PulseTestCase
         return buildResult;
     }
 
-    private void setupCalls(BuildResult lastSuccess, BuildResult... firstFailure)
+    private void setupCalls(long number, BuildResult lastSuccess, BuildResult... firstFailure)
     {
-        mockBuildManager.expectAndReturn("getLatestSuccessfulBuildResult", spec, lastSuccess);
-        // project, spec.getPname(), null, lastSuccess == null ? 1 : lastSuccess.getNumber() + 1, -1, 1, 1, false, false
-        long number = lastSuccess == null ? 1 : lastSuccess.getNumber() + 1;
-        mockBuildManager.expectAndReturn("querySpecificationBuilds", new FullConstraintMatcher(new Constraint[]{ C.eq(project), C.eq(spec.getPname()), C.IS_NULL, C.eq(number), C.eq(-1L), C.eq(0), C.eq(1), C.eq(false), C.eq(false) }), Arrays.asList(firstFailure));
+        List<BuildResult> lastSuccesses = new ArrayList<BuildResult>(1);
+        lastSuccesses.add(lastSuccess);
+        mockBuildManager.expectAndReturn("querySpecificationBuilds", new FullConstraintMatcher(new Constraint[]{ C.eq(project), C.eq(spec.getPname()), C.eq(new ResultState[]{ ResultState.SUCCESS }), C.eq(-1L), C.eq(number - 1), C.eq(0), C.eq(1), C.eq(true), C.eq(false) }), lastSuccesses);
+        long lastSuccessNumber = lastSuccess == null ? 1 : lastSuccess.getNumber() + 1;
+        mockBuildManager.expectAndReturn("querySpecificationBuilds", new FullConstraintMatcher(new Constraint[]{ C.eq(project), C.eq(spec.getPname()), C.IS_NULL, C.eq(lastSuccessNumber), C.eq(-1L), C.eq(0), C.eq(1), C.eq(false), C.eq(false) }), Arrays.asList(firstFailure));
     }
 
     private void setBuildManager()

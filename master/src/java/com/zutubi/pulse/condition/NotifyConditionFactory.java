@@ -89,4 +89,17 @@ public class NotifyConditionFactory
             throw new PulseRuntimeException(e);
         }
     }
+
+
+    public <T> T build(Class clazz, Class[] argTypes, Object[] args)
+    {
+        try
+        {
+            return (T)objectFactory.buildBean(clazz, argTypes, args);
+        }
+        catch (Exception e)
+        {
+            throw new PulseRuntimeException(e);
+        }
+    }
 }

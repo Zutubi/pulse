@@ -1,5 +1,6 @@
 package com.zutubi.pulse.condition;
 
+import com.zutubi.pulse.core.model.ResultState;
 import com.zutubi.pulse.model.*;
 import com.zutubi.pulse.util.Constants;
 
@@ -30,7 +31,8 @@ public class UnsuccessfulCountDaysValue implements NotifyIntegerValue
             BuildSpecification spec = project.getBuildSpecification(result.getSpecName().getName());
             if(spec != null)
             {
-                BuildResult lastSuccess = buildManager.getLatestSuccessfulBuildResult(spec);
+                List<BuildResult> lastSuccesses = buildManager.querySpecificationBuilds(project, spec.getPname(), new ResultState[]{ ResultState.SUCCESS }, -1, result.getNumber() - 1, 0, 1, true, false);
+                BuildResult lastSuccess = lastSuccesses.size() > 0 ? lastSuccesses.get(0) : null;
                 List<BuildResult> firstFailure = buildManager.querySpecificationBuilds(project, spec.getPname(), null, lastSuccess == null ? 1 : lastSuccess.getNumber() + 1, -1, 0, 1, false, false);
                 if(firstFailure.size() > 0)
                 {
