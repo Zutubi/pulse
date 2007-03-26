@@ -120,6 +120,9 @@ public class BuildController implements EventListener
         buildManager.save(buildResult);
         previousSuccessful = getPreviousSuccessfulBuild();
         buildProperties = specification.copyProperties();
+        buildProperties.add(new ResourceProperty("project", project.getName()));
+        buildProperties.add(new ResourceProperty("specification", specification.getName()));
+        
         configure(root, buildResult.getRoot(), specification, specification.getRoot());
 
         return tree;
@@ -151,11 +154,12 @@ public class BuildController implements EventListener
             recipeResult.setAbsoluteOutputDir(configurationManager.getDataDirectory(), recipeOutputDir);
 
             boolean incremental = !request.isPersonal() && specification.getCheckoutScheme() == BuildSpecification.CheckoutScheme.INCREMENTAL_UPDATE;
-            RecipeRequest recipeRequest = new RecipeRequest(project.getName(), specification.getName(), recipeResult.getId(), stage.getRecipe(), incremental, getResourceRequirements(specification, node), buildProperties);
+            List<ResourceProperty> recipeProperties = new LinkedList<ResourceProperty>(buildProperties);
+            RecipeRequest recipeRequest = new RecipeRequest(project.getName(), specification.getName(), recipeResult.getId(), stage.getRecipe(), incremental, getResourceRequirements(specification, node), recipeProperties);
             RecipeDispatchRequest dispatchRequest = new RecipeDispatchRequest(stage.getHostRequirements(), request.getRevision(), recipeRequest, buildResult);
             DefaultRecipeLogger logger = new DefaultRecipeLogger(new File(paths.getRecipeDir(buildResult, recipeResult.getId()), RecipeResult.RECIPE_LOG));
             RecipeResultNode previousRecipe = previousSuccessful == null ? null : previousSuccessful.findResultNode(stage.getPname());
-            RecipeController rc = new RecipeController(buildResult, node, childResultNode, dispatchRequest, buildProperties, request.isPersonal(), incremental, previousRecipe, logger, collector, queue, buildManager, serviceTokenManager);
+            RecipeController rc = new RecipeController(buildResult, node, childResultNode, dispatchRequest, recipeProperties, request.isPersonal(), incremental, previousRecipe, logger, collector, queue, buildManager, serviceTokenManager);
             TreeNode<RecipeController> child = new TreeNode<RecipeController>(rc);
             rcNode.add(child);
             pendingRecipes++;

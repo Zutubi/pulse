@@ -1,7 +1,7 @@
 package com.zutubi.pulse.core;
 
-import com.zutubi.pulse.model.ResourceRequirement;
 import com.zutubi.pulse.core.model.ResourceProperty;
+import com.zutubi.pulse.model.ResourceRequirement;
 
 import java.util.List;
 
@@ -155,5 +155,7 @@ public class RecipeRequest
     public void prepare(String agent)
     {
         bootstrapper.prepare(agent);
+        properties.add(new ResourceProperty("agent", agent));
+        properties.add(new ResourceProperty("recipe", recipeName == null ? "[default]" : recipeName));
     }
 }
