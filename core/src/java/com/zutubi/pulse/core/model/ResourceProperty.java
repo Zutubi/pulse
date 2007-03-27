@@ -16,6 +16,11 @@ public class ResourceProperty extends Entity implements NamedEntity
     {
     }
 
+    public ResourceProperty(String name, String value)
+    {
+        this(name, value, false, false, false);
+    }
+
     public ResourceProperty(String name, String value, boolean addToEnvironment, boolean addToPath, boolean resolveVariables)
     {
         this.name = name;
