@@ -9,7 +9,7 @@ import xmlrpclib
 
 
 WINDOWS = os.name == "nt"
-
+LINUX = sys.platform.startswith("linux")
 
 def getScript():
     if WINDOWS:
