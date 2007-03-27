@@ -6,6 +6,7 @@
         <property name="startupTasks">
             <list>
                 <value>com.zutubi.pulse.bootstrap.SlaveContextStartupTask</value>
+                <value>com.zutubi.pulse.bootstrap.SlaveSystemPropertiesStartupTask</value>
                 <value>com.zutubi.pulse.bootstrap.SlaveJettyStartupTask</value>
             </list>
         </property>

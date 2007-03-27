@@ -8,15 +8,14 @@ import com.zutubi.pulse.filesystem.remote.RemoteFile;
 import com.zutubi.pulse.scm.SCMException;
 import com.zutubi.pulse.test.PulseTestCase;
 import com.zutubi.pulse.util.FileSystemUtils;
+import com.zutubi.pulse.util.ZipUtils;
 import org.tmatesoft.svn.core.SVNURL;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
-import java.util.zip.ZipInputStream;
 
 /**
  * 
@@ -104,7 +103,7 @@ public class SVNServerTest extends PulseTestCase
         gotDir = new File(repoDir, "got");
         gotDir.mkdirs();
 
-        FileSystemUtils.extractZip(new ZipInputStream(new FileInputStream(dataFile)), repoDir);
+        ZipUtils.extractZip(dataFile, repoDir);
         serverProcess = Runtime.getRuntime().exec("svnserve --foreground -dr " + repoDir.getAbsolutePath());
 
         waitForServer(3690);
@@ -270,7 +269,7 @@ public class SVNServerTest extends PulseTestCase
     private void assertRevision(File dir, int revision) throws IOException
     {
         File dataFile = getTestDataFile("server-core", Integer.toString(revision), "zip");
-        FileSystemUtils.extractZip(new ZipInputStream(new FileInputStream(dataFile)), expectedDir);
+        ZipUtils.extractZip(dataFile, expectedDir);
         assertDirectoriesEqual(new File(new File(expectedDir, "test"), "trunk"), dir);
     }
 

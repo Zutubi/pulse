@@ -5,6 +5,7 @@ import com.zutubi.pulse.scm.FileStatus;
 import com.zutubi.pulse.scm.WorkingCopyStatus;
 import com.zutubi.pulse.test.PulseTestCase;
 import com.zutubi.pulse.util.FileSystemUtils;
+import com.zutubi.pulse.util.ZipUtils;
 
 import java.io.File;
 import java.io.IOException;
@@ -50,7 +51,7 @@ public class PatchArchiveTest extends PulseTestCase
         
         PatchArchive archive = new PatchArchive(wcs, archiveFile, null);
         assertTrue(archiveFile.exists());
-        FileSystemUtils.extractZip(archiveFile, extractDir);
+        ZipUtils.extractZip(archiveFile, extractDir);
         //System.out.println(IOUtils.fileToString(new File(extractDir, "meta.xml")));
 
         archive = new PatchArchive(archiveFile);

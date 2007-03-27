@@ -11,17 +11,20 @@ import com.zutubi.pulse.transfer.TransferAPI;
 import com.zutubi.pulse.upgrade.tasks.MutableConfiguration;
 import com.zutubi.pulse.util.FileSystemUtils;
 import com.zutubi.pulse.util.IOUtils;
+import com.zutubi.pulse.util.ZipUtils;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
 
-import java.io.*;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.FilenameFilter;
+import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.sql.SQLException;
 import java.util.Properties;
-import java.util.zip.ZipInputStream;
 
 /**
  * <class-comment/>
@@ -207,19 +210,8 @@ public class UpgradeAcceptanceTest extends BaseAcceptanceTestCase
         System.setProperty("bootstrap", "com/zutubi/pulse/bootstrap/ideaBootstrapContext.xml");
 
         // extract zip file.
-        InputStream is = null;
-        try
-        {
-            File data = new File(dataArea, "pulse-1.1.0-data.zip");
-            is = new FileInputStream(data);
-
-            assertNotNull(is);
-            FileSystemUtils.extractZip(new ZipInputStream(is), tmpDir);
-        }
-        finally
-        {
-            IOUtils.close(is);
-        }
+        File data = new File(dataArea, "pulse-1.1.0-data.zip");
+        ZipUtils.extractZip(data, tmpDir);
 
         runUpgrade("0101000000");
     }

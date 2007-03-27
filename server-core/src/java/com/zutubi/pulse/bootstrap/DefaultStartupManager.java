@@ -120,8 +120,6 @@ public class DefaultStartupManager implements StartupManager
             // i) run startup tasks
             runStartupTasks(startupTasks);
 
-            loadSystemProperties();
-            
             // record the start time
             startTime = System.currentTimeMillis();
 
@@ -134,28 +132,6 @@ public class DefaultStartupManager implements StartupManager
         catch (Exception e)
         {
             throw new StartupException(e);
-        }
-    }
-
-    private void loadSystemProperties()
-    {
-        File propFile = new File(configurationManager.getUserPaths().getUserConfigRoot(), "system.properties");
-        if(propFile.exists())
-        {
-            FileInputStream is = null;
-            try
-            {
-                is = new FileInputStream(propFile);
-                System.getProperties().load(is);
-            }
-            catch (IOException e)
-            {
-                LOG.warning("Unable to load system properties: " + e.getMessage(), e);
-            }
-            finally
-            {
-                IOUtils.close(is);
-            }
         }
     }
 

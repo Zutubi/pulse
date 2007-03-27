@@ -2,9 +2,10 @@ package com.zutubi.pulse.util;
 
 import com.zutubi.pulse.test.PulseTestCase;
 
-import java.io.*;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.Arrays;
-import java.util.zip.ZipInputStream;
 
 /**
  */
@@ -93,27 +94,6 @@ public class FileSystemUtilsTest extends PulseTestCase
                 temp.delete();
             }
         }
-    }
-
-    //@Required(tmpDir)
-    public void testExtractEmptyFile() throws Exception
-    {
-        extractTestZipToTmp();
-
-        // ensure that the expected directories exist.
-        assertTrue(new File(tmpDir, "dir").isDirectory());
-        assertTrue(new File(tmpDir, FileSystemUtils.composeFilename("dir", "subdirectory")).isDirectory());
-        assertTrue(new File(tmpDir, FileSystemUtils.composeFilename("dir", "subdirectory", "emptyfile")).isFile());
-    }
-
-    public void testExtractNonEmptyFiles() throws Exception
-    {
-        extractTestZipToTmp();
-
-        // ensure that the expected directories exist.
-        assertTrue(new File(tmpDir, FileSystemUtils.composeFilename("config")).isDirectory());
-        assertTrue(new File(tmpDir, FileSystemUtils.composeFilename("pulse.config.properties")).isFile());
-        assertTrue(new File(tmpDir, FileSystemUtils.composeFilename("config", "pulse.properties")).isFile());
     }
 
     public void testFilesMatchBothEmpty() throws IOException
@@ -665,22 +645,6 @@ public class FileSystemUtilsTest extends PulseTestCase
         }
     }
 
-    public void testZipBrokenSymlink() throws IOException
-    {
-        if(FileSystemUtils.LN_AVAILABLE)
-        {
-            File dir = new File(tmpDir, "dir");
-            assertTrue(dir.mkdir());
-            File f = new File(dir, "f");
-            FileSystemUtils.createFile(f, "content");
-            File l = new File(dir, "l");
-            FileSystemUtils.createFile(f, "content");
-            FileSystemUtils.createSymlink(l, f);
-            assertTrue(f.delete());
-            FileSystemUtils.createZip(new File(tmpDir, "my.zip"), dir, dir);
-        }
-    }
-
     private void simpleEOLTest(byte[] eol, String out) throws IOException
     {
         File test = null;
@@ -708,22 +672,6 @@ public class FileSystemUtilsTest extends PulseTestCase
         FileSystemUtils.createFile(f2, s2);
 
         assertEquals(expected, FileSystemUtils.filesMatch(f1, f2));
-    }
-
-    private void extractTestZipToTmp() throws IOException
-    {
-        InputStream is = null;
-        try
-        {
-            File dataFile = getTestDataFile("core", getName(), "zip");
-            is = new FileInputStream(dataFile);
-            assertNotNull(is);
-            FileSystemUtils.extractZip(new ZipInputStream(is), tmpDir);
-        }
-        finally
-        {
-            IOUtils.close(is);
-        }
     }
 
     interface Copier

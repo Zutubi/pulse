@@ -7,6 +7,7 @@ import com.zutubi.pulse.scm.SCMException;
 import com.zutubi.pulse.test.PulseTestCase;
 import com.zutubi.pulse.util.FileSystemUtils;
 import com.zutubi.pulse.util.SystemUtils;
+import com.zutubi.pulse.util.ZipUtils;
 
 import java.io.File;
 import java.io.IOException;
@@ -36,7 +37,7 @@ public class P4ServerTest extends PulseTestCase
         repoDir = new File(tmpDir, "repo");
 
         File repoZip = getTestDataFile("server-core", "repo", "zip");
-        FileSystemUtils.extractZip(repoZip, repoDir);
+        ZipUtils.extractZip(repoZip, repoDir);
 
         // Restore from checkpoint
         p4dProcess = Runtime.getRuntime().exec(new String[] { "p4d", "-r", repoDir.getAbsolutePath(), "-jr", "checkpoint.1"});

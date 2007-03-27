@@ -5,6 +5,7 @@ import com.zutubi.pulse.config.Config;
 import com.zutubi.pulse.config.FileConfig;
 import com.zutubi.pulse.util.FileSystemUtils;
 import com.zutubi.pulse.util.IOUtils;
+import com.zutubi.pulse.util.ZipUtils;
 import com.zutubi.pulse.util.logging.Logger;
 
 import javax.sql.DataSource;
@@ -133,7 +134,7 @@ public class Data implements MasterUserPaths
 
         FileSystemUtils.copy(new File(tmpBackup, CONFIG_FILE_NAME), getConfigFile());
 
-        FileSystemUtils.createZip(backup, tmpBackup, tmpBackup);
+        ZipUtils.createZip(backup, tmpBackup, null);
 
         FileSystemUtils.rmdir(tmpBackup);
         // - done.

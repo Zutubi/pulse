@@ -9,10 +9,6 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.zip.CRC32;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipInputStream;
-import java.util.zip.ZipOutputStream;
 
 /**
  * Miscellaneous utilities for manipulating the file system.
@@ -22,8 +18,6 @@ import java.util.zip.ZipOutputStream;
 public class FileSystemUtils
 {
     private static final Logger LOG = Logger.getLogger(FileSystemUtils.class);
-
-    public static final char ZIP_SEPARATOR = '/';
 
     // Unix-style file mode values
     
@@ -49,12 +43,14 @@ public class FileSystemUtils
     static final boolean CP_AVAILABLE;
     static final boolean LN_AVAILABLE;
     static final boolean STAT_AVAILABLE;
+    static final boolean ZIP_AVAILABLE;
 
     static
     {
         CP_AVAILABLE = SystemUtils.unixBinaryAvailable("cp");
         LN_AVAILABLE = SystemUtils.unixBinaryAvailable("ln");
         STAT_AVAILABLE = SystemUtils.unixBinaryAvailable("stat");
+        ZIP_AVAILABLE  = SystemUtils.unixBinaryAvailable("zip");
     }
 
     /**
@@ -220,8 +216,15 @@ public class FileSystemUtils
         return childPath.startsWith(parentPath);
     }
 
+    /**
+     * Returns true iff the given file is a relative symlink.
+     *
+     * @param file file to test
+     * @return true if the file is a symlink with a relative path
+     */
     public static boolean isSymlink(File file)
     {
+        // WARNING: only detects relative symnlinks
         if(!SystemUtils.IS_WINDOWS)
         {
             // Try testing the canonical path then.
@@ -404,265 +407,6 @@ public class FileSystemUtils
         }
 
         return false;
-    }
-
-    public static void createZip(File zipFile, File base, File source) throws IOException
-    {
-        if (!source.exists())
-        {
-            throw new FileNotFoundException("Source file '" + source.getAbsolutePath() + "' does not exist");
-        }
-
-        if (!isParentOf(base, source))
-        {
-            throw new IOException("Base '" + base.getAbsolutePath() + "' is not a parent of source '" + source.getAbsolutePath() + "'");
-        }
-
-        // ensure that the zip file exists.
-        if (!zipFile.exists())
-        {
-            if (!zipFile.getParentFile().isDirectory() && !zipFile.getParentFile().mkdirs())
-            {
-                throw new IOException(String.format("Failed to create the directory '%s'", zipFile.getParentFile().getAbsolutePath()));
-            }
-            if (!zipFile.createNewFile())
-            {
-                throw new IOException(String.format("Failed to create the zip file '%s'", zipFile.getAbsolutePath()));
-            }
-        }
-
-        ZipOutputStream os = null;
-
-        try
-        {
-            os = new ZipOutputStream(new FileOutputStream(zipFile));
-            String sourcePath = source.getAbsolutePath().substring(base.getAbsolutePath().length());
-            // The additional check for slashes is for systems that may accept something other than
-            // their canonical file separator (e.g. '/' is acceptable on Windows despite '\' being
-            // the canonical separator).
-            sourcePath = sourcePath.replace('\\', ZIP_SEPARATOR);
-            sourcePath = sourcePath.replace(File.separatorChar, ZIP_SEPARATOR);
-            if (sourcePath.startsWith("/"))
-            {
-                sourcePath = sourcePath.substring(1);
-            }
-            addToZip(os, base, sourcePath);
-        }
-        finally
-        {
-            IOUtils.close(os);
-        }
-    }
-
-    private static void addToZip(ZipOutputStream os, File base, String sourcePath) throws IOException
-    {
-        File source = new File(base, sourcePath);
-
-        if (!isParentOf(base, source) || isSymlink(source))
-        {
-            return;
-        }
-
-        long modifiedTime = source.lastModified();
-
-        if (source.isDirectory())
-        {
-            String dirPath = "";
-            if (!("".equals(sourcePath)))
-            {
-                dirPath = sourcePath + ZIP_SEPARATOR;
-                ZipEntry entry = new ZipEntry(dirPath);
-                entry.setTime(modifiedTime);
-                os.putNextEntry(entry);
-            }
-
-            String[] files = source.list();
-
-            for (String filename : files)
-            {
-                String path = dirPath + filename;
-                addToZip(os, base, path);
-            }
-        }
-        else if(source.exists())
-        {
-            ZipEntry entry = new ZipEntry(sourcePath);
-            entry.setTime(modifiedTime);
-            //entry.setExtra(Integer.toOctalString(getPermissions(source)).getBytes());
-            os.putNextEntry(entry);
-
-            FileInputStream is = null;
-
-            try
-            {
-                is = new FileInputStream(source);
-                IOUtils.joinStreams(is, os);
-            }
-            finally
-            {
-                IOUtils.close(is);
-            }
-        }
-    }
-
-    public static byte[] getZipModeBlock(int mode)
-    {
-        // extra field: (Variable)
-        //
-        //     ...
-        //     files, the following structure should be used for all
-        //     programs storing data in this field:
-        //
-        //     header1+data1 + header2+data2 . . .
-        //
-        //     Each header should consist of:
-        //
-        //       Header ID - 2 bytes
-        //       Data Size - 2 bytes
-        //
-        //     Note: all fields stored in Intel low-byte/high-byte order.
-        //
-        //     The Header ID field indicates the type of data that is in
-        //     the following data block.
-        // ...
-        //
-        // The Data Size field indicates the size of the following
-        // data block. Programs can use this value to skip to the
-        // next header block, passing over any data blocks that are
-        // not of interest.
-
-        // Value         Size            Description
-        // -----         ----            -----------
-        // (Unix3) 0x756e        Short           tag for this extra block type
-        //         TSize         Short           total data size for this block
-        //         CRC           Long            CRC-32 of the remaining data
-        //         Mode          Short           file permissions
-        //         SizDev        Long            symlink'd size OR major/minor dev num
-        //         UID           Short           user ID
-        //         GID           Short           group ID
-        //         (var.)        variable        symbolic link filename
-        byte[] data = new byte[18];
-
-        encodeZipShort(0x756E, data, 0);
-        encodeZipShort(14, data, 2);
-
-        // CRC fills this gap later
-
-        encodeZipShort(mode, data, 8);
-        Arrays.fill(data, 10, 18, (byte) 0);
-
-        CRC32 crc = new CRC32();
-        crc.update(data, 8, 10);
-        long checksum = crc.getValue();
-
-        encodeZipLong(checksum, data, 4);
-        return data;
-    }
-
-    public static void encodeZipShort(int value, byte[] block, int offset)
-    {
-        block[offset] = (byte) (value & 0xFF);
-        block[offset + 1] = (byte) ((value & 0xFF00) >> 8);
-    }
-
-    public static int decodeZipShort(byte[] block, int offset)
-    {
-        int value = (block[offset + 1] << 8) & 0xFF00;
-        value += (block[offset] & 0xFF);
-        return value;
-    }
-
-    public static void encodeZipLong(long value, byte[] block, int offset)
-    {
-        block[offset] = (byte) ((value & 0xFF));
-        block[offset + 1] = (byte) ((value & 0xFF00) >> 8);
-        block[offset + 2] = (byte) ((value & 0xFF0000) >> 16);
-        block[offset + 3] = (byte) ((value & 0xFF000000L) >> 24);
-    }
-
-    public static long decodeZipLong(byte[] block, int offset)
-    {
-        long value = (block[offset + 3] << 24) & 0xFF000000L;
-        value += (block[offset + 2] << 16) & 0xFF0000;
-        value += (block[offset + 1] << 8) & 0xFF00;
-        value += (block[offset] & 0xFF);
-        return value;
-    }
-
-    public static int getModeFromZipBlock(byte[] block)
-    {
-        // Currently assumes the block was made by us.
-        if (block.length == 18)
-        {
-            return decodeZipShort(block, 8);
-        }
-
-        return 0;
-    }
-
-    public static void extractZip(File zipFile, File dir) throws IOException
-    {
-        ZipInputStream zin = null;
-        try
-        {
-            zin = new ZipInputStream(new FileInputStream(zipFile));
-            extractZip(zin, dir);
-        }
-        finally
-        {
-            IOUtils.close(zin);
-        }
-    }
-
-    public static void extractZip(ZipInputStream zin, File dir) throws IOException
-    {
-        ZipEntry entry;
-        while ((entry = zin.getNextEntry()) != null)
-        {
-            File file = new File(dir, entry.getName());
-
-            if (entry.isDirectory())
-            {
-                file.mkdirs();
-            }
-            else
-            {
-                // ensure that the files parents already exist.
-                if (!file.getParentFile().isDirectory())
-                {
-                    file.getParentFile().mkdirs();
-                }
-                unzip(zin, file);
-//                String octalPermissions = new String(entry.getExtra());
-//                int permissions = Integer.parseInt(octalPermissions, 8);
-//                if (permissions != 0)
-//                {
-//                    setPermissions(file, permissions);
-//                }
-            }
-
-            file.setLastModified(entry.getTime());
-        }
-    }
-
-    private static void unzip(InputStream zin, File file) throws IOException
-    {
-        FileOutputStream out = null;
-
-        try
-        {
-            out = new FileOutputStream(file);
-            byte[] b = new byte[512];
-            int len;
-            while ((len = zin.read(b)) != -1)
-            {
-                out.write(b, 0, len);
-            }
-        }
-        finally
-        {
-            IOUtils.close(out);
-        }
     }
 
     /**
@@ -1123,7 +867,7 @@ public class FileSystemUtils
         // Use the Unix cp command because it:
         //   - preserves permissions; and
         //   - is likely to be faster when it matters (i.e. large copy)
-        String flags = "-p";
+        String flags = "-dp";
         if (src.length == 1)
         {
             // cp handles file->file and file->dir as expected.  Help is

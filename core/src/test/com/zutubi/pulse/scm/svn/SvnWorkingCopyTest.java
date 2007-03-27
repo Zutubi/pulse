@@ -7,6 +7,7 @@ import com.zutubi.pulse.scm.WorkingCopyStatus;
 import com.zutubi.pulse.test.PulseTestCase;
 import com.zutubi.pulse.util.FileSystemUtils;
 import com.zutubi.pulse.util.IOUtils;
+import com.zutubi.pulse.util.ZipUtils;
 import org.tmatesoft.svn.core.SVNCommitInfo;
 import org.tmatesoft.svn.core.SVNException;
 import org.tmatesoft.svn.core.SVNURL;
@@ -77,7 +78,7 @@ public class SvnWorkingCopyTest extends PulseTestCase
 
         // Restore from dump
         File repoZip = getTestDataFile("core", "repo", "zip");
-        FileSystemUtils.extractZip(repoZip, tempDir);
+        ZipUtils.extractZip(repoZip, tempDir);
 
         File dump = new File(tempDir, "SvnWorkingCopyTest.dump");
         svnProcess = Runtime.getRuntime().exec(new String[] { "svnadmin", "load", "-q", repoDir.getAbsolutePath() });
