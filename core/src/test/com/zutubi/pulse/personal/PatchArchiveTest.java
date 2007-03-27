@@ -52,7 +52,6 @@ public class PatchArchiveTest extends PulseTestCase
         PatchArchive archive = new PatchArchive(wcs, archiveFile, null);
         assertTrue(archiveFile.exists());
         ZipUtils.extractZip(archiveFile, extractDir);
-        //System.out.println(IOUtils.fileToString(new File(extractDir, "meta.xml")));
 
         archive = new PatchArchive(archiveFile);
         fs = archive.getStatus().getFileStatus(TEST_FILENAME);

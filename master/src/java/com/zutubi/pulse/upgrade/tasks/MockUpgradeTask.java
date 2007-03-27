@@ -14,6 +14,7 @@ public class MockUpgradeTask implements UpgradeTask
 {
     private int buildNumber;
     private boolean haltOnFailure;
+    private int executionCount;
 
     protected List<String> errors = new LinkedList<String>();
 
@@ -40,7 +41,7 @@ public class MockUpgradeTask implements UpgradeTask
 
     public void execute(UpgradeContext context) throws UpgradeException
     {
-
+        executionCount++;
     }
 
     public String getDescription()
@@ -66,5 +67,10 @@ public class MockUpgradeTask implements UpgradeTask
     public boolean haltOnFailure()
     {
         return haltOnFailure;
+    }
+
+    public int getExecutionCount()
+    {
+        return executionCount;
     }
 }

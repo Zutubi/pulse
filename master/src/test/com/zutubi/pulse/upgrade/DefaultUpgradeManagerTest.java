@@ -97,6 +97,7 @@ public class DefaultUpgradeManagerTest extends PulseTestCase
 
         upgradeManager.prepareUpgrade(tmpData);
         upgradeManager.executeUpgrade();
+        assertTrue(upgradeManager.getUpgradeMonitor().isStarted());
 
         UpgradeProgressMonitor monitor = upgradeManager.getUpgradeMonitor();
         assertTrue(monitor.isError());
@@ -117,6 +118,7 @@ public class DefaultUpgradeManagerTest extends PulseTestCase
 
         upgradeManager.prepareUpgrade(tmpData);
         upgradeManager.executeUpgrade();
+        assertTrue(upgradeManager.getUpgradeMonitor().isStarted());
 
         UpgradeProgressMonitor monitor = upgradeManager.getUpgradeMonitor();
         assertTrue(monitor.isError());
@@ -137,6 +139,7 @@ public class DefaultUpgradeManagerTest extends PulseTestCase
 
         upgradeManager.prepareUpgrade(tmpData);
         upgradeManager.executeUpgrade();
+        assertTrue(upgradeManager.getUpgradeMonitor().isStarted());
 
         UpgradeProgressMonitor monitor = upgradeManager.getUpgradeMonitor();
         assertTrue(monitor.isError());
@@ -155,6 +158,7 @@ public class DefaultUpgradeManagerTest extends PulseTestCase
 
         upgradeManager.prepareUpgrade(tmpData);
         upgradeManager.executeUpgrade();
+        assertTrue(upgradeManager.getUpgradeMonitor().isStarted());
 
         Version targetVersion = tmpData.getVersion();
 /*
@@ -163,6 +167,23 @@ public class DefaultUpgradeManagerTest extends PulseTestCase
         assertEquals("@VERSION@", targetVersion.getVersionNumber());
         assertEquals("@RELEASE_DATE@", targetVersion.getReleaseDate());
 */
+    }
+
+    public void testUpgradeMultipleExecuteUpgradeRequestsIgnored()
+    {
+        MockUpgradeTask upgradeTask = new MockUpgradeTask(20);
+        List<UpgradeTask> tasks = new LinkedList<UpgradeTask>();
+        tasks.add(upgradeTask);
+
+        upgradeManager.setTasks(tasks);
+
+        upgradeManager.prepareUpgrade(tmpData);
+        assertEquals(0, upgradeTask.getExecutionCount());
+        upgradeManager.executeUpgrade();
+        assertTrue(upgradeManager.getUpgradeMonitor().isStarted());
+        assertEquals(1, upgradeTask.getExecutionCount());
+        upgradeManager.executeUpgrade();
+        assertEquals(1, upgradeTask.getExecutionCount());
     }
 
     private class ErrorOnExecuteUpgradeTask extends MockUpgradeTask
@@ -179,6 +200,7 @@ public class DefaultUpgradeManagerTest extends PulseTestCase
 
         public void execute(UpgradeContext context) throws UpgradeException
         {
+            super.execute(context);
             errors.add("ErrorOnExecute");
         }
     }
@@ -192,6 +214,7 @@ public class DefaultUpgradeManagerTest extends PulseTestCase
 
         public void execute(UpgradeContext context) throws UpgradeException
         {
+            super.execute(context);
             throw new UpgradeException("ExceptionOnExecute");
         }
     }
