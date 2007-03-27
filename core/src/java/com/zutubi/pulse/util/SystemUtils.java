@@ -16,6 +16,7 @@ public class SystemUtils
     
     public static final boolean IS_WINDOWS = System.getProperty("os.name").toLowerCase().startsWith("win");
     public static final boolean IS_LINUX = System.getProperty("os.name").toLowerCase().startsWith("linux");
+    public static final boolean IS_MAC = System.getProperty("os.name").toLowerCase().startsWith("mac");
 
     public static final String LINE_SEPARATOR;
 

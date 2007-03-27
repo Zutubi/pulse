@@ -69,16 +69,16 @@ class Pulse:
         """Waits for this server to start listening.  If a connection
         can be made to the port before the specified timeout (in seconds) elapses,
         this function returns True.  Otherwise, False is returned."""
-        s = socket.socket()
         endTime = time.time() + timeout
         while time.time() < endTime:
             try:
-                s.connect(('localhost', self.port))
+                s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+                s.connect(('127.0.0.1', self.port))
                 s.close()
                 # Sleep a little longer just to be sure
                 time.sleep(3)
                 return True
-            except:
+            except Exception, e:
                 time.sleep(1)
         
         return False

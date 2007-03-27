@@ -272,7 +272,7 @@ public class FileSystemUtils
     {
         int result = -1;
 
-        if (SystemUtils.IS_WINDOWS)
+        if (SystemUtils.IS_WINDOWS || !STAT_AVAILABLE)
         {
             return -1;
         }
@@ -282,7 +282,17 @@ public class FileSystemUtils
         {
             try
             {
-                process = Runtime.getRuntime().exec(new String[] { "stat",  "-c",  "%a", file.getAbsolutePath()});
+                String[] command;
+                if(SystemUtils.IS_LINUX)
+                {
+                    command = new String[] { "stat",  "-c",  "%a", file.getAbsolutePath()};
+                }
+                else
+                {
+                    command = new String[] { "stat",  "-f",  "%Lp", file.getAbsolutePath()};
+                }
+                
+                process = Runtime.getRuntime().exec(command);
             }
             catch (IOException e)
             {
@@ -861,7 +871,12 @@ public class FileSystemUtils
         // Use the Unix cp command because it:
         //   - preserves permissions; and
         //   - is likely to be faster when it matters (i.e. large copy)
-        String flags = "-dp";
+        String flags = "-pR";
+        if(SystemUtils.IS_LINUX)
+        {
+            flags += "d";
+        }
+
         if (src.length == 1)
         {
             // cp handles file->file and file->dir as expected.  Help is
@@ -869,7 +884,6 @@ public class FileSystemUtils
             if(src[0].isDirectory())
             {
                 delete(dest);
-                flags += "r";
             }
         }
         else

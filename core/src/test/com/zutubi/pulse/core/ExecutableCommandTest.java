@@ -48,7 +48,7 @@ public class ExecutableCommandTest extends PulseTestCase
     public void testExecuteFailureExpected() throws Exception
     {
         ExecutableCommand command = new ExecutableCommand();
-        command.setExe("dir");
+        command.setExe(SystemUtils.IS_WINDOWS ? "dir" : "ls");
         command.setArgs("wtfisgoingon");
         CommandResult result = new CommandResult("failure");
         execute(command, result);

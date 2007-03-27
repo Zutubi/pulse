@@ -42,7 +42,14 @@ public class FileSystemUtilsTest extends PulseTestCase
         {
             int permissions = FileSystemUtils.getPermissions(new File("/bin/sh"));
             // It is a link, hence the full permissions
-            assertEquals(FileSystemUtils.PERMISSION_ALL_FULL, permissions);
+            if (SystemUtils.IS_LINUX)
+            {
+                assertEquals(FileSystemUtils.PERMISSION_ALL_FULL, permissions);
+            }
+            else
+            {
+                assertEquals(FileSystemUtils.PERMISSION_ALL_EXECUTE | FileSystemUtils.PERMISSION_ALL_READ, permissions);
+            }
         }
     }
 

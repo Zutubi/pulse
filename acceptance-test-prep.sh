@@ -31,7 +31,7 @@ mkdir $tmpDir
 extension="${package##*.}"
 if [[ $extension == "gz" ]]
 then
-    tar -xv -C $tmpDir -f "$package"
+    tar -zxv -C $tmpDir -f "$package"
     extension=tar.gz
 else
     unzip -d $tmpDir "$package"
