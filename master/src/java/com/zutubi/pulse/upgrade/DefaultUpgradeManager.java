@@ -233,8 +233,17 @@ public class DefaultUpgradeManager implements UpgradeManager
      * Start executing the upgrade.
      *
      */
-    public void executeUpgrade()
+    public synchronized void executeUpgrade()
     {
+        // CIB-1029: Refresh during upgrade causes tasks to be re-run
+        // The upgrade manager handles a one-shot process.  At no stage should executeUpgrade be allowed
+        // to proceed a second time.  Enforce this just in case the client gets it wrong.
+        if (monitor.isStarted())
+        {
+            LOG.warning("Attempted to execute an executing upgrade.  Request has been ignored.");
+            return;
+        }
+
         currentContext.setData(upgradeTarget);
 
         List<UpgradeTask> tasksToExecute = currentContext.getTasks();

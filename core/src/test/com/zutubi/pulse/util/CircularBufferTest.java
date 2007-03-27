@@ -137,7 +137,6 @@ public class CircularBufferTest extends PulseTestCase
                 d = count + n - 4;
             }
             assertEquals(String.format("test%d", d), s);
-            System.out.println(String.format("test%d", d));
             count++;
         }
 

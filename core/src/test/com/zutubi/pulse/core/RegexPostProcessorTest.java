@@ -346,7 +346,6 @@ public class RegexPostProcessorTest extends PulseTestCase
             result[i] = joined.toString();
         }
 
-        System.out.println("result = " + Arrays.asList(result));
         return result;
     }
 

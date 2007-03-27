@@ -349,7 +349,6 @@ public class ExecutableCommandTest extends PulseTestCase
             Field handleField = clazz.getDeclaredField("handle");
             handleField.setAccessible(true);
             long handle = handleField.getLong(p);
-            System.out.println("handle = " + handle);
         }
     }
 
