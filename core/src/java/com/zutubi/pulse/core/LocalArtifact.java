@@ -4,7 +4,6 @@ import com.zutubi.pulse.core.model.CommandResult;
 import com.zutubi.pulse.core.model.StoredArtifact;
 import com.zutubi.pulse.core.model.StoredFileArtifact;
 import com.zutubi.pulse.util.FileSystemUtils;
-import com.zutubi.pulse.util.IOUtils;
 import com.zutubi.validation.annotations.Name;
 import com.zutubi.validation.annotations.Required;
 
@@ -143,7 +142,7 @@ public abstract class LocalArtifact implements Artifact
         try
         {
             FileSystemUtils.createDirectory(parent);
-            IOUtils.copyFile(fromFile, toFile);
+            FileSystemUtils.copy(toFile, fromFile);
             StoredFileArtifact fileArtifact = new StoredFileArtifact(path, type);
             artifact.add(fileArtifact);
 

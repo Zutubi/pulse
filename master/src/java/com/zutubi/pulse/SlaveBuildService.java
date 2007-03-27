@@ -12,16 +12,15 @@ import com.zutubi.pulse.services.ServiceTokenManager;
 import com.zutubi.pulse.services.SlaveService;
 import com.zutubi.pulse.util.FileSystemUtils;
 import com.zutubi.pulse.util.IOUtils;
+import com.zutubi.pulse.util.ZipUtils;
 import com.zutubi.pulse.util.logging.Logger;
 import org.mortbay.util.UrlEncoded;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.URL;
 import java.net.URLConnection;
-import java.util.zip.ZipInputStream;
 
 /**
  */
@@ -81,8 +80,6 @@ public class SlaveBuildService implements BuildService
 
     private void collect(String project, String spec, long recipeId, boolean incremental, boolean output, File destination)
     {
-        ZipInputStream zis = null;
-        FileInputStream fis = null;
         FileOutputStream fos = null;
         File tempDir = null;
 
@@ -115,13 +112,7 @@ public class SlaveBuildService implements BuildService
             fos = null;
 
             // now unzip the file
-            fis = new FileInputStream(zipFile);
-            zis = new ZipInputStream(fis);
-            FileSystemUtils.extractZip(zis, tempDir);
-            IOUtils.close(fis);
-            fis = null;
-            IOUtils.close(zis);
-            zis = null;
+            ZipUtils.extractZip(zipFile, tempDir);
 
             zipFile.delete();
 
@@ -136,8 +127,6 @@ public class SlaveBuildService implements BuildService
         }
         finally
         {
-            IOUtils.close(zis);
-            IOUtils.close(fis);
             IOUtils.close(fos);
 
             if(tempDir != null)

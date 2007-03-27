@@ -7,12 +7,9 @@ import com.zutubi.pulse.events.EventManager;
 import com.zutubi.pulse.events.system.SystemStartedEvent;
 import com.zutubi.pulse.freemarker.CustomFreemarkerManager;
 import com.zutubi.pulse.security.AcegiSecurityManager;
-import com.zutubi.pulse.util.IOUtils;
 import com.zutubi.pulse.util.logging.Logger;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.logging.Level;
@@ -172,8 +169,6 @@ public class DefaultStartupManager implements StartupManager
 
     public void continueApplicationStartup()
     {
-        loadSystemProperties();
-
         WebManager webManager = (WebManager) ComponentContext.getBean("webManager");
 
         // handle the initialisation of the security manager, since this can not be done within the spring context file.
@@ -202,28 +197,6 @@ public class DefaultStartupManager implements StartupManager
         String str = "The server is now available on port %s at context path '%s' [base URL configured as: %s]";
         String msg = String.format(str, sysConfig.getServerPort(), sysConfig.getContextPath(), appConfig.getBaseUrl());
         System.err.println(msg);
-    }
-
-    private void loadSystemProperties()
-    {
-        File propFile = new File(configurationManager.getUserPaths().getUserConfigRoot(), "system.properties");
-        if(propFile.exists())
-        {
-            FileInputStream is = null;
-            try
-            {
-                is = new FileInputStream(propFile);
-                System.getProperties().load(is);
-            }
-            catch (IOException e)
-            {
-                LOG.warning("Unable to load system properties: " + e.getMessage(), e);
-            }
-            finally
-            {
-                IOUtils.close(is);
-            }
-        }
     }
 
     private void runStartupTasks()

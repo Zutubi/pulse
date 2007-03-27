@@ -1,18 +1,17 @@
 package com.zutubi.pulse.web.vfs;
 
-import org.apache.commons.vfs.FileSystemException;
+import com.opensymphony.util.TextUtils;
+import com.zutubi.pulse.bootstrap.MasterConfigurationManager;
+import com.zutubi.pulse.util.RandomUtils;
+import com.zutubi.pulse.util.TempFileInputStream;
+import com.zutubi.pulse.util.ZipUtils;
+import com.zutubi.pulse.vfs.pulse.AbstractPulseFileObject;
 import org.apache.commons.vfs.FileObject;
+import org.apache.commons.vfs.FileSystemException;
 
-import java.io.InputStream;
 import java.io.File;
 import java.io.IOException;
-
-import com.zutubi.pulse.util.RandomUtils;
-import com.zutubi.pulse.util.FileSystemUtils;
-import com.zutubi.pulse.util.TempFileInputStream;
-import com.zutubi.pulse.bootstrap.MasterConfigurationManager;
-import com.zutubi.pulse.vfs.pulse.AbstractPulseFileObject;
-import com.opensymphony.util.TextUtils;
+import java.io.InputStream;
 
 /**
  * <class comment/>
@@ -85,7 +84,7 @@ public class ZipAction extends VFSActionSupport
 
         try
         {
-            FileSystemUtils.createZip(temp, base.getParentFile(), base);
+            ZipUtils.createZip(temp, base.getParentFile(), base.getName());
             contentLength = temp.length();
             filename = base.getName() + ".zip";
             inputStream = new TempFileInputStream(temp);

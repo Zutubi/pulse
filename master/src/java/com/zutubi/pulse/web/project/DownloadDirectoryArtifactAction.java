@@ -3,9 +3,9 @@ package com.zutubi.pulse.web.project;
 import com.zutubi.pulse.bootstrap.MasterConfigurationManager;
 import com.zutubi.pulse.core.model.CommandResult;
 import com.zutubi.pulse.core.model.StoredArtifact;
-import com.zutubi.pulse.util.FileSystemUtils;
 import com.zutubi.pulse.util.RandomUtils;
 import com.zutubi.pulse.util.TempFileInputStream;
+import com.zutubi.pulse.util.ZipUtils;
 
 import java.io.File;
 import java.io.IOException;
@@ -88,7 +88,7 @@ public class DownloadDirectoryArtifactAction extends ProjectActionSupport
 
         try
         {
-            FileSystemUtils.createZip(temp, outputDir, artifactDir);
+            ZipUtils.createZip(temp, outputDir, artifact.getName());
             contentLength = temp.length();
             filename = artifact.getName() + ".zip";
             inputStream = new TempFileInputStream(temp);

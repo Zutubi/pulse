@@ -5,9 +5,9 @@ import com.zutubi.pulse.bootstrap.ComponentContext;
 import com.zutubi.pulse.bootstrap.ConfigurationManager;
 import com.zutubi.pulse.services.InvalidTokenException;
 import com.zutubi.pulse.services.ServiceTokenManager;
-import com.zutubi.pulse.util.FileSystemUtils;
 import com.zutubi.pulse.util.IOUtils;
 import com.zutubi.pulse.util.RandomUtils;
+import com.zutubi.pulse.util.ZipUtils;
 import com.zutubi.pulse.util.logging.Logger;
 
 import javax.servlet.http.HttpServlet;
@@ -66,7 +66,7 @@ public class DownloadResultsServlet extends HttpServlet
 
             try
             {
-                FileSystemUtils.createZip(zipFile, dir, dir);
+                ZipUtils.createZip(zipFile, dir, null);
 
                 response.setContentType("application/x-octet-stream");
                 response.setContentLength((int) zipFile.length());

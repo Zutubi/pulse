@@ -11,6 +11,7 @@ import com.zutubi.pulse.slave.MasterProxyFactory;
 import com.zutubi.pulse.util.FileSystemUtils;
 import com.zutubi.pulse.util.IOUtils;
 import com.zutubi.pulse.util.RandomUtils;
+import com.zutubi.pulse.util.ZipUtils;
 import com.zutubi.pulse.util.logging.Logger;
 
 import java.io.File;
@@ -142,7 +143,7 @@ public class UpdateCommand implements Runnable
             IOUtils.downloadFile(packageUrl, packageFile);
 
             sendMessage(masterService, UpgradeState.APPLYING);
-            FileSystemUtils.extractZip(packageFile, unpackDir);
+            ZipUtils.extractZip(packageFile, unpackDir);
 
             // There will be a single directory under unpackDir (e.g. pulse-agent-1.1.1)
             File[] children = unpackDir.listFiles();

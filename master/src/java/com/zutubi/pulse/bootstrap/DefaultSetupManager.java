@@ -9,8 +9,10 @@ import com.zutubi.pulse.license.LicenseHolder;
 import com.zutubi.pulse.model.UserManager;
 import com.zutubi.pulse.upgrade.UpgradeManager;
 import com.zutubi.pulse.util.IOUtils;
+import com.zutubi.pulse.util.logging.Logger;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.List;
@@ -21,6 +23,8 @@ import java.util.Properties;
  */
 public class DefaultSetupManager implements SetupManager
 {
+    private static final Logger LOG = Logger.getLogger(DefaultSetupManager.class);
+    
     private MasterConfigurationManager configurationManager;
     private StartupManager startupManager;
     private UserManager userManager;
@@ -149,6 +153,8 @@ public class DefaultSetupManager implements SetupManager
             configurationManager.getData().init(configurationManager.getSystemPaths());
         }
 
+        loadSystemProperties();
+
         state = SetupState.STARTING;
         if (isLicenseRequired())
         {
@@ -159,6 +165,28 @@ public class DefaultSetupManager implements SetupManager
             return;
         }
         requestLicenseComplete();
+    }
+
+    private void loadSystemProperties()
+    {
+        File propFile = new File(configurationManager.getUserPaths().getUserConfigRoot(), "system.properties");
+        if(propFile.exists())
+        {
+            FileInputStream is = null;
+            try
+            {
+                is = new FileInputStream(propFile);
+                System.getProperties().load(is);
+            }
+            catch (IOException e)
+            {
+                LOG.warning("Unable to load system properties: " + e.getMessage(), e);
+            }
+            finally
+            {
+                IOUtils.close(is);
+            }
+        }
     }
 
     public void requestLicenseComplete()

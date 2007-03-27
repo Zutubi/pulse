@@ -3,17 +3,15 @@ package com.zutubi.pulse;
 import com.zutubi.pulse.core.BootstrapperSupport;
 import com.zutubi.pulse.core.BuildException;
 import com.zutubi.pulse.core.CommandContext;
-import com.zutubi.pulse.util.FileSystemUtils;
 import com.zutubi.pulse.util.IOUtils;
+import com.zutubi.pulse.util.ZipUtils;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
-import java.util.zip.ZipInputStream;
 
 /**
  */
@@ -53,17 +51,7 @@ public class CopyBootstrapper extends BootstrapperSupport
                 IOUtils.close(zos);
             }
 
-            ZipInputStream zis = null;
-
-            try
-            {
-                zis = new ZipInputStream(new FileInputStream(zipName));
-                FileSystemUtils.extractZip(zis, context.getPaths().getBaseDir());
-            }
-            finally
-            {
-                IOUtils.close(zis);
-            }
+            ZipUtils.extractZip(zipName, context.getPaths().getBaseDir());
         }
         catch (MalformedURLException e)
         {
