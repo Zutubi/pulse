@@ -32,12 +32,12 @@ public class FisheyeChangeViewer extends BasePathChangeViewer
 
     public String getFileViewURL(String path, FileRevision revision)
     {
-        return StringUtils.join("/", true, true, getBaseURL(), "browse", getProjectPath(), path + "?r=" + revision.getRevisionString());
+        return StringUtils.join("/", true, true, getBaseURL(), "browse", getProjectPath(), StringUtils.urlEncodePath(path) + "?r=" + revision.getRevisionString());
     }
 
     public String getFileDownloadURL(String path, FileRevision revision)
     {
-        return StringUtils.join("/", true, true, getBaseURL(), "browse", "~raw,r=" + revision.getRevisionString(), getProjectPath(), path);
+        return StringUtils.join("/", true, true, getBaseURL(), "browse", "~raw,r=" + revision.getRevisionString(), getProjectPath(), StringUtils.urlEncodePath(path));
     }
 
     public String getFileDiffURL(String path, FileRevision revision)
@@ -48,7 +48,7 @@ public class FisheyeChangeViewer extends BasePathChangeViewer
             return null;
         }
 
-        return StringUtils.join("/", true, true, getBaseURL(), "browse", getProjectPath(), path + "?r1=" + previousRevision.getRevisionString() + "&r2=" + revision.getRevisionString());
+        return StringUtils.join("/", true, true, getBaseURL(), "browse", getProjectPath(), StringUtils.urlEncodePath(path) + "?r1=" + previousRevision.getRevisionString() + "&r2=" + revision.getRevisionString());
     }
 
     public ChangeViewer copy()

@@ -126,7 +126,7 @@ public class DefaultTestManager implements TestManager
 
                 if (i > 0)
                 {
-                    path += StringUtils.urlEncode(suite.getName());
+                    path += StringUtils.formUrlEncode(suite.getName());
                 }
 
                 i++;
@@ -135,7 +135,7 @@ public class DefaultTestManager implements TestManager
 
         private String getCasePath(String name)
         {
-            name = StringUtils.urlEncode(name);
+            name = StringUtils.formUrlEncode(name);
             if (TextUtils.stringSet(path))
             {
                 return path + "/" + name;

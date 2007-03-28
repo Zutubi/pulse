@@ -1,6 +1,8 @@
 package com.zutubi.pulse.util;
 
 import java.io.UnsupportedEncodingException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.LinkedList;
@@ -495,8 +497,16 @@ public class StringUtils
         return result.toString();
     }
 
-
-    public static String urlEncode(String s)
+    /**
+     * Encodes the given string in application/x-www-form-urlencoded format.
+     * Note that this is *not* the same as encoding the string to be part of
+     * a URL itself.
+     *
+     * @param s the string to encode
+     * @return application/x-www-form-urlencoded form of the string
+     * @see URLEncoder
+     */
+    public static String formUrlEncode(String s)
     {
         try
         {
@@ -505,6 +515,28 @@ public class StringUtils
         catch (UnsupportedEncodingException e)
         {
             return s;
+        }
+    }
+
+    /**
+     * Encodes the given string as a path to appear in a literal URL (as
+     * defined in RFC2396).
+     *
+     * @param path the path to encode
+     * @return encoded form of the path (% escaping for illegal octets)
+     */
+    public static String urlEncodePath(String path)
+    {
+        try
+        {
+            // We need to include a scheme and host because otherwise a
+            // double slash at the start of the path confuses URI.
+            URI uri = new URI("http", "0.0.0.0", path, null);
+            return uri.getRawPath();
+        }
+        catch (URISyntaxException e)
+        {
+            return path;
         }
     }
 }

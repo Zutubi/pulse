@@ -47,12 +47,12 @@ public class ViewVCChangeViewer extends BasePathChangeViewer
 
     public String getFileViewURL(String path, FileRevision revision)
     {
-        return StringUtils.join("/", true, true, getBaseURL(), getProjectPath(), path + "?rev=" + revision.getRevisionString() + "&view=markup");
+        return StringUtils.join("/", true, true, getBaseURL(), getProjectPath(), StringUtils.urlEncodePath(path) + "?rev=" + revision.getRevisionString() + "&view=markup");
     }
 
     public String getFileDownloadURL(String path, FileRevision revision)
     {
-        return StringUtils.join("/", true, true, getBaseURL(), "*checkout*", getProjectPath(), path + "?rev=" + revision.getRevisionString());
+        return StringUtils.join("/", true, true, getBaseURL(), "*checkout*", getProjectPath(), StringUtils.urlEncodePath(path) + "?rev=" + revision.getRevisionString());
     }
 
     public String getFileDiffURL(String path, FileRevision revision)
@@ -63,7 +63,7 @@ public class ViewVCChangeViewer extends BasePathChangeViewer
             return null;
         }
 
-        return StringUtils.join("/", true, true, getBaseURL(), getProjectPath(), path + "?r1=" + previous.getRevisionString() + "&r2=" + revision.getRevisionString());
+        return StringUtils.join("/", true, true, getBaseURL(), getProjectPath(), StringUtils.urlEncodePath(path) + "?r1=" + previous.getRevisionString() + "&r2=" + revision.getRevisionString());
     }
 
     public ChangeViewer copy()
