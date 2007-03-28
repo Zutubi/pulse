@@ -92,7 +92,7 @@ Exit:
 FunctionEnd
 
 Function EnsureJRE
-  nsExec::ExecToStack '"$INSTDIR\bin\findjvm"'
+  nsExec::ExecToStack '"$INSTDIR\bin\findjava"'
   Pop $0
   Pop $1
   StrCmp $0 "error" 0 CheckExit
@@ -105,7 +105,7 @@ Exit:
 FunctionEnd
 
 Function SetJavaHome
-  nsExec::ExecToStack '"$INSTDIR\bin\findjvm" -h'
+  nsExec::ExecToStack '"$INSTDIR\bin\findjava" -h'
   Pop $0
   Pop $1
   StrCmp $0 "error" 0 CheckExit
