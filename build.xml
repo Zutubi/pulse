@@ -147,6 +147,7 @@
         <copy file="installer/env.nsh" todir="${package.root.local}"/>
         <copy file="installer/pulse.ico" todir="${package.root.local}"/>
         <copy file="installer/dev.nsi.in" tofile="${package.root.local}/dev.nsi"/>
+        <copy file="installer/findjava.exe" todir="${package.root.local}/bin"/>
 
         <replace file="${package.root.local}/dev.nsi">
             <replacefilter token="__PACKAGE_NAME__" value="${package.name.local}"/>
@@ -262,6 +263,7 @@
         <copy file="installer/env.nsh" todir="${package.root.slave}"/>
         <copy file="installer/pulse.ico" todir="${package.root.slave}"/>
         <copy file="installer/pulse.nsi.in" tofile="${package.root.slave}/pulse.nsi"/>
+        <copy file="installer/findjava.exe" todir="${package.root.slave}/bin"/>
 
         <replace file="${package.root.slave}/pulse.nsi" replacefilterfile="slave/subst.properties">
             <replacefilter token="__PACKAGE_NAME__" value="${package.name.slave}"/>
@@ -394,6 +396,7 @@
         <copy file="installer/env.nsh" todir="${package.root.master}"/>
         <copy file="installer/pulse.ico" todir="${package.root.master}"/>
         <copy file="installer/pulse.nsi.in" tofile="${package.root.master}/pulse.nsi"/>
+        <copy file="installer/findjava.exe" todir="${package.root.master}/bin"/>
 
         <replace file="${package.root.master}/pulse.nsi" replacefilterfile="master/subst.properties">
             <replacefilter token="__PACKAGE_NAME__" value="${package.name.master}"/>
