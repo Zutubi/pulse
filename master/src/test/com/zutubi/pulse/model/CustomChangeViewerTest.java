@@ -30,15 +30,43 @@ public class CustomChangeViewerTest extends PulseTestCase
 
     public void testGetFileDownloadURL()
     {
-        viewer.setFileViewURL("http://hello${path}?r=${revision}&format=raw");
+        viewer.setFileDownloadURL("http://hello${path}?r=${revision}&format=raw");
         FileRevision rev = new NumericalFileRevision(10);
-        assertEquals("http://hello/my/path?r=10&format=raw", viewer.getFileViewURL("/my/path", rev));
+        assertEquals("http://hello/my/path?r=10&format=raw", viewer.getFileDownloadURL("/my/path", rev));
     }
 
     public void testGetFileDiffURL()
     {
-        viewer.setFileViewURL("http://hello${path}?r=${revision}&p=${previous.revision}");
+        viewer.setFileDiffURL("http://hello${path}?r=${revision}&p=${previous.revision}");
         FileRevision rev = new NumericalFileRevision(10);
-        assertEquals("http://hello/my/path?r=10&p=9", viewer.getFileViewURL("/my/path", rev));
+        assertEquals("http://hello/my/path?r=10&p=9", viewer.getFileDiffURL("/my/path", rev));
+    }
+
+    public void testGetFileViewURLSpecial()
+    {
+        viewer.setFileViewURL("http://hello${path}?r=${revision}");
+        FileRevision rev = new NumericalFileRevision(10);
+        assertEquals("http://hello/my/path+special%20chars?r=10", viewer.getFileViewURL("/my/path+special chars", rev));
+    }
+
+    public void testGetFileDownloadURLSpecial()
+    {
+        viewer.setFileDownloadURL("http://hello${path}?r=${revision}&format=raw");
+        FileRevision rev = new NumericalFileRevision(10);
+        assertEquals("http://hello/my/path+special%20chars?r=10&format=raw", viewer.getFileDownloadURL("/my/path+special chars", rev));
+    }
+
+    public void testGetFileDiffURLSpecial()
+    {
+        viewer.setFileDiffURL("http://hello${path}?r=${revision}&p=${previous.revision}");
+        FileRevision rev = new NumericalFileRevision(10);
+        assertEquals("http://hello/my/path+special%20chars?r=10&p=9", viewer.getFileDiffURL("/my/path+special chars", rev));
+    }
+
+    public void testFilePropertiesSpecial()
+    {
+        viewer.setFileDiffURL("${path} ${path.raw} ${path.form}");
+        FileRevision rev = new NumericalFileRevision(10);
+        assertEquals("/my/path+special%20chars /my/path+special chars %2Fmy%2Fpath%2Bspecial+chars", viewer.getFileDiffURL("/my/path+special chars", rev));
     }
 }

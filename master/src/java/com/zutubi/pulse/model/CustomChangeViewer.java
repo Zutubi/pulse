@@ -7,6 +7,7 @@ import com.zutubi.pulse.core.VariableHelper;
 import com.zutubi.pulse.core.model.FileRevision;
 import com.zutubi.pulse.core.model.Property;
 import com.zutubi.pulse.core.model.Revision;
+import com.zutubi.pulse.util.StringUtils;
 
 import java.text.SimpleDateFormat;
 import java.util.TimeZone;
@@ -22,6 +23,8 @@ public class CustomChangeViewer extends ChangeViewer
     private static final String PROPERTY_AUTHOR = "author";
     private static final String PROPERTY_BRANCH = "branch";
     private static final String PROPERTY_PATH = "path";
+    private static final String PROPERTY_PATH_RAW = "path.raw";
+    private static final String PROPERTY_PATH_FORM = "path.form";
     private static final String PROPERTY_TIMESTAMP_PULSE = "time.pulse";
     private static final String PROPERTY_TIMESTAMP_FISHEYE = "time.fisheye";
 
@@ -126,7 +129,7 @@ public class CustomChangeViewer extends ChangeViewer
 
     public String getFileDownloadURL(String path, FileRevision revision)
     {
-        return resolveFileURL(fileViewURL, path, revision);
+        return resolveFileURL(fileDownloadURL, path, revision);
     }
 
     public String getFileDiffURL(String path, FileRevision revision)
@@ -136,7 +139,7 @@ public class CustomChangeViewer extends ChangeViewer
             return null;
         }
 
-        return resolveFileURL(fileViewURL, path, revision);
+        return resolveFileURL(fileDiffURL, path, revision);
     }
 
     public ChangeViewer copy()
@@ -177,7 +180,9 @@ public class CustomChangeViewer extends ChangeViewer
         if(TextUtils.stringSet(url))
         {
             Scope scope = new Scope();
-            scope.add(new Property(PROPERTY_PATH, path));
+            scope.add(new Property(PROPERTY_PATH, StringUtils.urlEncodePath(path)));
+            scope.add(new Property(PROPERTY_PATH_RAW, path));
+            scope.add(new Property(PROPERTY_PATH_FORM, StringUtils.formUrlEncode(path)));
             scope.add(new Property(PROPERTY_REVISION, revision.getRevisionString()));
             FileRevision previous = revision.getPrevious();
             if(previous != null)

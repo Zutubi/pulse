@@ -2042,7 +2042,7 @@
             <td class="image">
                 <img src="$base/images/folder.gif"/>
             </td>
-            #dynamicLinkCell($entry.name "${url}path=$entry.path")
+            #dynamicLinkCell($entry.name "${url}path=$action.urlEncode($entry.path)")
             #contentCell($entry.mimeType)
     #elseif(!$dirAction)
             <td class="image">
@@ -2051,7 +2051,7 @@
         #if($fileAction)
             #dynamicCell($!webwork.htmlEncode($entry.name))
         #else
-            #dynamicLinkCell($entry.name "${url}path=$entry.path")
+            #dynamicLinkCell($entry.name "${url}path=$action.urlEncode($entry.path)")
         #end
             #contentCell($entry.mimeType)
     #end

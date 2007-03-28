@@ -37,4 +37,19 @@ public class TracChangeViewerTest extends PulseTestCase
     {
         assertEquals("http://trac.edgewall.org/changeset?new=trunk%2FINSTALL%403673&old=trunk%2FINSTALL%403672", viewer.getFileDiffURL("/trunk/INSTALL", new NumericalFileRevision(3673)));
     }
+
+    public void testGetFileViewURLSpecial()
+    {
+        assertEquals("http://trac.edgewall.org/browser/trunk/INSTALL+this%20please?rev=3673", viewer.getFileViewURL("/trunk/INSTALL+this please", new NumericalFileRevision(3673)));
+    }
+
+    public void testGetFileDownloadURLSpecial()
+    {
+        assertEquals("http://trac.edgewall.org/browser/trunk/INSTALL+this%20please?rev=3673&format=raw", viewer.getFileDownloadURL("/trunk/INSTALL+this please", new NumericalFileRevision(3673)));
+    }
+
+    public void testGetFileDiffURLSpecial()
+    {
+        assertEquals("http://trac.edgewall.org/changeset?new=trunk%2FINSTALL%2Bthis+please%403673&old=trunk%2FINSTALL%2Bthis+please%403672", viewer.getFileDiffURL("/trunk/INSTALL+this please", new NumericalFileRevision(3673)));
+    }
 }

@@ -34,7 +34,7 @@ public class TracChangeViewer extends BasePathChangeViewer
 
     public String getFileViewURL(String path, FileRevision revision)
     {
-        return StringUtils.join("/", true, true, getBaseURL(), "browser", path + "?rev=" + revision.getRevisionString());
+        return StringUtils.join("/", true, true, getBaseURL(), "browser", StringUtils.urlEncodePath(path) + "?rev=" + revision.getRevisionString());
     }
 
     public String getFileDownloadURL(String path, FileRevision revision)

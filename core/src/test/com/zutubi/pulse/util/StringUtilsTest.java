@@ -341,6 +341,26 @@ public class StringUtilsTest extends PulseTestCase
         assertEquals("a,b,c", StringUtils.join(",", true, true, "", "", "a", "", "b", "", "", "c", ""));
     }
 
+    public void testUrlEncodePath()
+    {
+        assertEquals("foo%20bar/baz+quux%3Fquuux", StringUtils.urlEncodePath("foo bar/baz+quux?quuux"));
+    }
+    
+    public void testUrlEncodePathAbsolute()
+    {
+        assertEquals("/absolute%20path", StringUtils.urlEncodePath("/absolute path"));
+    }
+
+    public void testUrlEncodePathDoubleSlash()
+    {
+        assertEquals("//absolute/path+here", StringUtils.urlEncodePath("//absolute/path+here"));
+    }
+
+    public void testUrlEncodePathDoubleSlashMiddle()
+    {
+        assertEquals("double//slash/in+the%20path", StringUtils.urlEncodePath("double//slash/in+the path"));
+    }
+
     private void splitHelper(String s, String... expected)
     {
         List<String> expectedParts = Arrays.asList(expected);
