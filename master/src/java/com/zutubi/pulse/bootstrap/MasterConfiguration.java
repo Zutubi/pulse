@@ -73,6 +73,7 @@ public interface MasterConfiguration extends LogConfiguration
     public static final String LDAP_BASE_DN = "ldap.base.dn";
     public static final String LDAP_MANAGER_DN = "ldap.manager.dn";
     public static final String LDAP_MANAGER_PASSWORD = "ldap.manager.password";
+    public static final String LDAP_USER_BASE = "ldap.user.base";
     public static final String LDAP_USER_FILTER = "ldap.user.filter";
     public static final String LDAP_GROUP_BASE_DN = "ldap.group.base.dn";
     public static final String LDAP_GROUP_SEARCH_SUBTREE = "ldap.group.search.subtree";
@@ -81,6 +82,7 @@ public interface MasterConfiguration extends LogConfiguration
     public static final String LDAP_AUTO_ADD = "ldap.auto.add";
     public static final String LDAP_EMAIL_ATTRIBUTE = "ldap.email.attribute";
     public static final String LDAP_ESCAPE_SPACES = "ldap.escape";
+    public static final String LDAP_FOLLOW_REFERRALS = "ldap.follow";
 
     String getAdminLogin();
 
@@ -178,6 +180,10 @@ public interface MasterConfiguration extends LogConfiguration
 
     void setLdapManagerPassword(String managerPassword);
 
+    String getLdapUserBase();
+
+    void setLdapUserBase(String userBase);
+
     String getLdapUserFilter();
 
     void setLdapUserFilter(String userFilter);
@@ -193,6 +199,10 @@ public interface MasterConfiguration extends LogConfiguration
     Boolean getLdapEscapeSpaces();
 
     void setLdapEscapeSpaces(Boolean escape);
+
+    boolean getLdapFollowReferrals();
+
+    void setLdapFollowReferrals(boolean follow);
 
     String getLdapGroupBaseDn();
 

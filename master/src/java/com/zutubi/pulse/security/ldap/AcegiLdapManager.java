@@ -53,10 +53,11 @@ public class AcegiLdapManager implements LdapManager
             String baseDn = appConfig.getLdapBaseDn();
             String managerDn = appConfig.getLdapManagerDn();
             String managerPassword = appConfig.getLdapManagerPassword();
+            boolean followReferrals = appConfig.getLdapFollowReferrals();
             boolean escapeSpaces = appConfig.getLdapEscapeSpaces();
 
-            contextFactory = createContextFactory(hostUrl, baseDn, managerDn, managerPassword, escapeSpaces);
-            authenticator = createAuthenticator(appConfig.getLdapUserFilter(), contextFactory);
+            contextFactory = createContextFactory(hostUrl, baseDn, managerDn, managerPassword, followReferrals, escapeSpaces);
+            authenticator = createAuthenticator(appConfig.getLdapUserBase(), appConfig.getLdapUserFilter(), contextFactory);
 
             try
             {
@@ -84,7 +85,7 @@ public class AcegiLdapManager implements LdapManager
         initialised = true;
     }
 
-    private DefaultInitialDirContextFactory createContextFactory(String hostUrl, String baseDn, String managerDn, String managerPassword, boolean escapeSpaces)
+    private DefaultInitialDirContextFactory createContextFactory(String hostUrl, String baseDn, String managerDn, String managerPassword, boolean followReferrals, boolean escapeSpaces)
     {
         if (escapeSpaces)
         {
@@ -110,12 +111,19 @@ public class AcegiLdapManager implements LdapManager
             }
         }
 
+        if(followReferrals)
+        {
+            Map<String, String> vars = new HashMap<String, String>();
+            vars.put("java.naming.referral", "follow");
+            result.setExtraEnvVars(vars);
+        }
+
         return result;
     }
 
-    private BindAuthenticator createAuthenticator(String userFilter, DefaultInitialDirContextFactory contextFactory)
+    private BindAuthenticator createAuthenticator(String userBase, String userFilter, DefaultInitialDirContextFactory contextFactory)
     {
-        FilterBasedLdapUserSearch search = new FilterBasedLdapUserSearch("", convertUserFilter(userFilter), contextFactory);
+        FilterBasedLdapUserSearch search = new FilterBasedLdapUserSearch(userBase, convertUserFilter(userFilter), contextFactory);
         search.setSearchSubtree(true);
 
         BindAuthenticator authenticator = new BindAuthenticator(contextFactory);
@@ -296,14 +304,16 @@ public class AcegiLdapManager implements LdapManager
         return enabled && initialised && autoAdd && LicenseHolder.hasAuthorization("canAddUser");
     }
 
-    public List<Group> testAuthenticate(String hostUrl, String baseDn, String managerDn, String managerPassword, String userFilter,
-                                         String groupDn, String groupFilter, String groupRoleAttribute, boolean groupSearchSubtree, boolean escapeSpaces,
-                                         String testLogin, String testPassword)
+    public List<Group> testAuthenticate(String hostUrl, String baseDn, String managerDn, String managerPassword,
+                                        String userBase, String userFilter,
+                                        String groupDn, String groupFilter, String groupRoleAttribute, boolean groupSearchSubtree,
+                                        boolean followReferrals, boolean escapeSpaces,
+                                        String testLogin, String testPassword)
     {
-        DefaultInitialDirContextFactory contextFactory = createContextFactory(hostUrl, baseDn, managerDn, managerPassword, escapeSpaces);
+        DefaultInitialDirContextFactory contextFactory = createContextFactory(hostUrl, baseDn, managerDn, managerPassword, followReferrals, escapeSpaces);
         contextFactory.newInitialDirContext();
 
-        BindAuthenticator authenticator = createAuthenticator(userFilter, contextFactory);
+        BindAuthenticator authenticator = createAuthenticator(userBase, userFilter, contextFactory);
         LdapUserDetails details = authenticator.authenticate(testLogin, testPassword);
 
         if(TextUtils.stringSet(groupDn))

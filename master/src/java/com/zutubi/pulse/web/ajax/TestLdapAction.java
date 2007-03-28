@@ -19,11 +19,13 @@ public class TestLdapAction extends ActionSupport
     private String baseDn;
     private String managerDn;
     private String managerPassword;
+    private String userBase;
     private String userFilter;
     private String groupDn;
     private String groupFilter;
     private String groupRoleAttribute;
     private boolean groupSearchSubtree;
+    private boolean followReferrals;
     private boolean escapeSpaces;
     private String login;
     private String password;
@@ -54,9 +56,19 @@ public class TestLdapAction extends ActionSupport
         this.managerPassword = managerPassword;
     }
 
+    public void setFollowReferrals(boolean followReferrals)
+    {
+        this.followReferrals = followReferrals;
+    }
+
     public void setEscapeSpaces(boolean escapeSpaces)
     {
         this.escapeSpaces = escapeSpaces;
+    }
+
+    public void setUserBase(String userBase)
+    {
+        this.userBase = userBase;
     }
 
     public void setUserFilter(String userFilter)
@@ -115,7 +127,7 @@ public class TestLdapAction extends ActionSupport
         {
             try
             {
-                groups = ldapManager.testAuthenticate(host, baseDn, managerDn, managerPassword, userFilter, groupDn, groupFilter, groupRoleAttribute, groupSearchSubtree, escapeSpaces, login, password);
+                groups = ldapManager.testAuthenticate(host, baseDn, managerDn, managerPassword, userBase, userFilter, groupDn, groupFilter, groupRoleAttribute, groupSearchSubtree, followReferrals, escapeSpaces, login, password);
             }
             catch(Exception e)
             {
