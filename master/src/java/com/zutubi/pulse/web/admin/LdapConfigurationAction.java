@@ -80,6 +80,7 @@ public class LdapConfigurationAction extends ActionSupport
         config.setLdapBaseDn("");
         config.setLdapManagerDn("");
         config.setLdapManagerPassword("");
+        config.setLdapUserBase("");
         config.setLdapUserFilter("");
         config.setLdapEmailAttribute("");
         config.setLdapAutoAdd(false);
@@ -87,6 +88,7 @@ public class LdapConfigurationAction extends ActionSupport
         config.setLdapGroupFilter("");
         config.setLdapGroupRoleAttribute("");
         config.setLdapGroupSearchSubtree(false);
+        config.setLdapFollowReferrals(false);
         config.setLdapEscapeSpaces(false);
         ldapManager.init();
     }
@@ -99,6 +101,7 @@ public class LdapConfigurationAction extends ActionSupport
         config.setLdapBaseDn(ldap.getBaseDn());
         config.setLdapManagerDn(ldap.getManagerDn());
         config.setLdapManagerPassword(ldap.getManagerPassword());
+        config.setLdapUserBase(ldap.getUserBase());
         config.setLdapUserFilter(ldap.getUserFilter());
         config.setLdapAutoAdd(ldap.getAutoAdd());
         config.setLdapEmailAttribute(ldap.getEmailAttribute());
@@ -106,6 +109,7 @@ public class LdapConfigurationAction extends ActionSupport
         config.setLdapGroupFilter(ldap.getGroupFilter());
         config.setLdapGroupRoleAttribute(ldap.getGroupRoleAttribute());
         config.setLdapGroupSearchSubtree(ldap.getGroupSearchSubtree());
+        config.setLdapFollowReferrals(ldap.getFollowReferrals());
         config.setLdapEscapeSpaces(ldap.getEscapeSpaces());
         ldapManager.init();
         if(ldap.getEnabled())
@@ -123,6 +127,7 @@ public class LdapConfigurationAction extends ActionSupport
         ldap.setBaseDn(config.getLdapBaseDn());
         ldap.setManagerDn(config.getLdapManagerDn());
         ldap.setManagerPassword(config.getLdapManagerPassword());
+        ldap.setUserBase(config.getLdapUserBase());
         ldap.setUserFilter(config.getLdapUserFilter());
         ldap.setAutoAdd(config.getLdapAutoAdd());
         ldap.setEmailAttribute(config.getLdapEmailAttribute());
@@ -130,6 +135,7 @@ public class LdapConfigurationAction extends ActionSupport
         ldap.setGroupFilter(config.getLdapGroupFilter());
         ldap.setGroupRoleAttribute(config.getLdapGroupRoleAttribute());
         ldap.setGroupSearchSubtree(config.getLdapGroupSearchSubtree());
+        ldap.setFollowReferrals(config.getLdapFollowReferrals());
         ldap.setEscapeSpaces(config.getLdapEscapeSpaces());
     }
 
@@ -158,6 +164,7 @@ public class LdapConfigurationAction extends ActionSupport
         private String baseDn;
         private String managerDn;
         private String managerPassword;
+        private String userBase;
         private String userFilter;
         private Boolean autoAdd = false;
         private String emailAttribute;
@@ -165,6 +172,7 @@ public class LdapConfigurationAction extends ActionSupport
         private String groupFilter;
         private String groupRoleAttribute;
         private Boolean groupSearchSubtree = false;
+        private Boolean followReferrals = false;
         private Boolean escapeSpaces = false;
 
         public Boolean getEnabled()
@@ -215,6 +223,16 @@ public class LdapConfigurationAction extends ActionSupport
         public void setManagerPassword(String managerPassword)
         {
             this.managerPassword = managerPassword;
+        }
+
+        public String getUserBase()
+        {
+            return userBase;
+        }
+
+        public void setUserBase(String userBase)
+        {
+            this.userBase = userBase;
         }
 
         public String getUserFilter()
@@ -285,6 +303,16 @@ public class LdapConfigurationAction extends ActionSupport
         public void setGroupSearchSubtree(Boolean groupSearchSubtree)
         {
             this.groupSearchSubtree = groupSearchSubtree;
+        }
+
+        public Boolean getFollowReferrals()
+        {
+            return followReferrals;
+        }
+
+        public void setFollowReferrals(Boolean followReferrals)
+        {
+            this.followReferrals = followReferrals;
         }
 
         public Boolean getEscapeSpaces()

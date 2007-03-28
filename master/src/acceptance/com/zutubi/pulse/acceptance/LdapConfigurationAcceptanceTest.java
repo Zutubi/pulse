@@ -36,7 +36,7 @@ public class LdapConfigurationAcceptanceTest extends BaseAcceptanceTestCase
         assertAndClick(Navigation.Administration.LINK_EDIT_LDAP);
         form.assertFormPresent();
 
-        form.saveFormElements("true", "ldap://dummy/", "dc=example,dc=com", "uid=admin", "password", "(uid={0})", "true", "mail", "ou=groups", "(member=${user.dn})", "cn", "true", "false");
+        form.saveFormElements("true", "ldap://dummy/", "dc=example,dc=com", "uid=admin", "password", "ou=users", "(uid={0})", "true", "mail", "ou=groups", "(member=${user.dn})", "cn", "true", "true", "false");
 
         // The ldap config throws up a wait page, run around it :)
         navigateToLdapConfiguration();
@@ -44,8 +44,8 @@ public class LdapConfigurationAcceptanceTest extends BaseAcceptanceTestCase
         assertLdapTable("ldap://dummy/", "dc=example,dc=com");
 
         assertAndClick(Navigation.Administration.LINK_EDIT_LDAP);
-        form.assertFormElements("true", "ldap://dummy/", "dc=example,dc=com", "uid=admin", "password", "(uid={0})", "true", "mail", "ou=groups", "(member=${user.dn})", "cn", "true", "false");
-        form.cancelFormElements("true", "ldap://dummy/", "dc=example,dc=com", "uid=admin", "password", "(uid={0})", "true", "mail", "ou=groups", "(member=${user.dn})", "cn", "true", "false");
+        form.assertFormElements("true", "ldap://dummy/", "dc=example,dc=com", "uid=admin", "password", "ou=users", "(uid={0})", "true", "mail", "ou=groups", "(member=${user.dn})", "cn", "true", "true", "false");
+        form.cancelFormElements("true", "ldap://dummy/", "dc=example,dc=com", "uid=admin", "password", "ou=users", "(uid={0})", "true", "mail", "ou=groups", "(member=${user.dn})", "cn", "true", "true", "false");
     }
 
     public void testLdapReset() throws Exception
@@ -64,7 +64,7 @@ public class LdapConfigurationAcceptanceTest extends BaseAcceptanceTestCase
         assertAndClick(Navigation.Administration.LINK_EDIT_LDAP);
         LdapConfigurationForm form = new LdapConfigurationForm(tester);
         form.assertFormPresent();
-        form.cancelFormElements("true", "oogie", "oogie", "oogie", "oogie", "boogie", "false", "boogie", "oogie", "oogie", "oogie", "false", "false");
+        form.cancelFormElements("true", "oogie", "oogie", "oogie", "oogie", "wookie", "boogie", "false", "boogie", "oogie", "oogie", "oogie", "false", "false", "false");
 
         assertTextNotPresent("oogie");
     }
@@ -76,7 +76,7 @@ public class LdapConfigurationAcceptanceTest extends BaseAcceptanceTestCase
         assertAndClick(Navigation.Administration.LINK_EDIT_LDAP);
         LdapConfigurationForm form = new LdapConfigurationForm(tester);
         form.assertFormPresent();
-        form.saveFormElements("true", "", "", "", "", "", "false", "", "", "", "", "false", "false");
+        form.saveFormElements("true", "", "", "", "", "", "", "false", "", "", "", "", "false", "false", "false");
         form.assertFormPresent();
         assertTextPresent("host is required");
         assertTextPresent("base dn is required");

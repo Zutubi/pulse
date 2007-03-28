@@ -18,15 +18,17 @@
             var baseDn = escape($F("ldap.config_ldap_baseDn"));
             var managerDn = escape($F("ldap.config_ldap_managerDn"));
             var managerPassword = escape($F("ldap.config_ldap_managerPassword"));
+            var userBase = escape($F("ldap.config_ldap_userBase"));
             var userFilter = escape($F("ldap.config_ldap_userFilter"));
             var groupDn = escape($F("ldap.config_ldap_groupBaseDn"));
             var groupFilter = escape($F("ldap.config_ldap_groupFilter"));
             var groupRoleAttribute = escape($F("ldap.config_ldap_groupRoleAttribute"));
             var groupSearchSubtree = escape($F("ldap.config_ldap_groupSearchSubtree"));
+            var followReferrals = escape($F("ldap.config_ldap_followReferrals"));
             var escapeSpaces = escape($F("ldap.config_ldap_escapeSpaces"));
             var login = escape($F("test.login"));
             var password = escape($F("test.password"));
-            var params = "host=" + host + "&baseDn=" + baseDn + "&managerDn=" + managerDn + "&managerPassword=" + managerPassword + "&userFilter=" + userFilter + "&groupDn=" + groupDn + "&groupFilter=" + groupFilter + "&groupRoleAttribute=" + groupRoleAttribute + "&groupSearchSubtree=" + groupSearchSubtree + "&escapeSpaces=" + escapeSpaces + "&login=" + login + "&password=" + password;
+            var params = "host=" + host + "&baseDn=" + baseDn + "&managerDn=" + managerDn + "&managerPassword=" + managerPassword + "&userBase=" + userBase + "&userFilter=" + userFilter + "&groupDn=" + groupDn + "&groupFilter=" + groupFilter + "&groupRoleAttribute=" + groupRoleAttribute + "&groupSearchSubtree=" + groupSearchSubtree + "&followReferrals=" + followReferrals + "&escapeSpaces=" + escapeSpaces + "&login=" + login + "&password=" + password;
 
             var updater = new Ajax.Updater({success: 'test-results'},
                                            "/ajax/testLdap.action",
@@ -59,24 +61,28 @@
     #inlineHelp("ldap.manager.dn.help")
     #wwpassword("name=ldap.managerPassword" "label=%{getText('ldap.manager.password')}" "showPassword=true" "tabindex=5")
     #inlineHelp("ldap.manager.password.help")
-    #wwtextfield("name=ldap.userFilter" "label=%{getText('ldap.user.filter')}" "size=60" "required=true" "tabindex=6")
+    #wwtextfield("name=ldap.userBase" "label=%{getText('ldap.user.base')}" "size=60" "tabindex=6")
+    #inlineHelp("ldap.user.base.help")
+    #wwtextfield("name=ldap.userFilter" "label=%{getText('ldap.user.filter')}" "size=60" "required=true" "tabindex=7")
     #inlineHelp("ldap.user.filter.help")
-    #wwcheckbox("name=ldap.autoAdd" "label=%{getText('ldap.auto.add')}" "tabindex=7")
+    #wwcheckbox("name=ldap.autoAdd" "label=%{getText('ldap.auto.add')}" "tabindex=8")
     #inlineHelp("ldap.auto.add.help")
-    #wwtextfield("name=ldap.emailAttribute" "label=%{getText('ldap.email.attribute')}" "tabindex=8")
+    #wwtextfield("name=ldap.emailAttribute" "label=%{getText('ldap.email.attribute')}" "tabindex=9")
     #inlineHelp("ldap.email.attribute.help")
-    #wwtextfield("name=ldap.groupBaseDn" "label=%{getText('ldap.group.base.dn')}" "size=60" "tabindex=9")
+    #wwtextfield("name=ldap.groupBaseDn" "label=%{getText('ldap.group.base.dn')}" "size=60" "tabindex=10")
     #inlineHelp("ldap.group.base.dn.help")
-    #wwtextfield("name=ldap.groupFilter" "label=%{getText('ldap.group.search.filter')}" "size=60" "tabindex=10")
+    #wwtextfield("name=ldap.groupFilter" "label=%{getText('ldap.group.search.filter')}" "size=60" "tabindex=11")
     #inlineHelp("ldap.group.search.filter.help")
-    #wwtextfield("name=ldap.groupRoleAttribute" "label=%{getText('ldap.group.role.attribute')}" "tabindex=11")
+    #wwtextfield("name=ldap.groupRoleAttribute" "label=%{getText('ldap.group.role.attribute')}" "tabindex=12")
     #inlineHelp("ldap.group.role.attribute.help")
-    #wwcheckbox("name=ldap.groupSearchSubtree" "label=%{getText('ldap.group.search.subtree')}" "tabindex=12")
+    #wwcheckbox("name=ldap.groupSearchSubtree" "label=%{getText('ldap.group.search.subtree')}" "tabindex=13")
     #inlineHelp("ldap.group.search.subtree.help")
-    #wwcheckbox("name=ldap.escapeSpaces" "label=%{getText('ldap.escape.spaces')}" "tabindex=13")
+    #wwcheckbox("name=ldap.followReferrals" "label=%{getText('ldap.follow.referrals')}" "tabindex=14")
+    #inlineHelp("ldap.follow.referrals.help")
+    #wwcheckbox("name=ldap.escapeSpaces" "label=%{getText('ldap.escape.spaces')}" "tabindex=15")
     #inlineHelp("ldap.escape.spaces.help")
 
-    #saveCancel(14)
+    #saveCancel(16)
 #end
 
             </td>
@@ -89,7 +95,7 @@
                             <label for="test.login" class="label">test login <span class="required">*</span></label>:
                         </th>
                         <td class="field">
-                            <input type="text" name="test login" id="test.login" tabindex="16"/>
+                            <input type="text" name="test login" id="test.login" tabindex="18"/>
                         </td>
                     </tr>
                     <tr>
@@ -97,7 +103,7 @@
                             <label for="test.password" class="label">test password <span class="required">*</span></label>:
                         </th>
                         <td class="field">
-                            <input type="password" name="test password" id="test.password" tabindex="17"/>
+                            <input type="password" name="test password" id="test.password" tabindex="19"/>
                         </td>
                     </tr>
                     <tr>

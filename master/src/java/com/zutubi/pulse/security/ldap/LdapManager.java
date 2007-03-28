@@ -22,8 +22,10 @@ public interface LdapManager
 
     String getStatusMessage();
 
-    List<Group> testAuthenticate(String hostUrl, String baseDn, String managerDn, String managerPassword, String userFilter,
-                                  String groupDn, String groupFilter, String groupRoleAttribute, boolean groupSearchSubtree, boolean escapeSpaces,
-                                  String testLogin, String testPassword);
+    List<Group> testAuthenticate(String hostUrl, String baseDn, String managerDn, String managerPassword,
+                                 String userBase, String userFilter,
+                                 String groupDn, String groupFilter, String groupRoleAttribute, boolean groupSearchSubtree,
+                                 boolean followReferrals, boolean escapeSpaces,
+                                 String testLogin, String testPassword);
 
 }

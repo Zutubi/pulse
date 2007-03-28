@@ -260,6 +260,16 @@ public class MasterConfigurationSupport extends ConfigSupport implements MasterC
         setProperty(LDAP_MANAGER_PASSWORD, managerPassword);
     }
 
+    public String getLdapUserBase()
+    {
+        return getProperty(LDAP_USER_BASE, "");
+    }
+
+    public void setLdapUserBase(String userBase)
+    {
+        setProperty(LDAP_USER_BASE, userBase);
+    }
+
     public String getLdapUserFilter()
     {
         return getProperty(LDAP_USER_FILTER);
@@ -308,6 +318,16 @@ public class MasterConfigurationSupport extends ConfigSupport implements MasterC
     public void setLdapEmailAttribute(String attribute)
     {
         setProperty(LDAP_EMAIL_ATTRIBUTE, attribute);
+    }
+
+    public boolean getLdapFollowReferrals()
+    {
+        return getBooleanProperty(LDAP_FOLLOW_REFERRALS, false);
+    }
+
+    public void setLdapFollowReferrals(boolean follow)
+    {
+        setBooleanProperty(LDAP_FOLLOW_REFERRALS, follow);
     }
 
     public Boolean getLdapEscapeSpaces()
