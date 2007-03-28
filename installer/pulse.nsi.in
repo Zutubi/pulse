@@ -1,3 +1,4 @@
+!define ALL_USERS
 !include env.nsh
 
 ;--------------------------------
@@ -103,6 +104,22 @@ CheckExit:
 Exit:
 FunctionEnd
 
+Function SetJavaHome
+  nsExec::ExecToStack '"$INSTDIR\bin\findjvm" -h'
+  Pop $0
+  Pop $1
+  StrCmp $0 "error" 0 CheckExit
+  MessageBox MB_OK "Unable to ensure JAVA_HOME is set.  Please ensure it is set before executing the Pulse service."
+  Goto Exit
+CheckExit:
+  StrCmp $0 "0" 0 Exit
+  DetailPrint "Setting JAVA_HOME to $1."
+  Push "JAVA_HOME"
+  Push $1
+  Call WriteEnvStr
+Exit:
+FunctionEnd
+
 Function StartService
   nsExec::Exec 'net start "__SERVICE_NAME__"'
 FunctionEnd
@@ -120,6 +137,7 @@ Section "Pulse" SecMain
   File /r /x pulse.nsi /x env.nsh *
 
   Call EnsureJre
+  Call SetJavaHome
   
   nsExec::Exec '"$INSTDIR\bin\wrapper-windows-x86-32.exe" -r "$INSTDIR\bin\wrapper.conf"'
   nsExec::ExecToStack '"$INSTDIR\bin\wrapper-windows-x86-32.exe" -i "$INSTDIR\bin\wrapper.conf"'
