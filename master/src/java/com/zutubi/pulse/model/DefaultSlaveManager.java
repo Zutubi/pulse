@@ -9,11 +9,7 @@ import com.zutubi.pulse.scheduling.Trigger;
 import com.zutubi.pulse.scheduling.tasks.PingSlaves;
 import com.zutubi.pulse.util.Constants;
 import com.zutubi.pulse.util.logging.Logger;
-import com.zutubi.pulse.agent.AgentManager;
-import com.zutubi.pulse.license.LicenseHolder;
-import com.zutubi.pulse.license.LicenseException;
 
-import java.util.LinkedList;
 import java.util.List;
 
 /**
@@ -80,26 +76,16 @@ public class DefaultSlaveManager implements SlaveManager
             List<BuildSpecification> buildSpecs = buildSpecificationDao.findBySlave(slave);
             for(BuildSpecification spec: buildSpecs)
             {
-                removeStages(spec.getRoot(), id);
-                if(spec.getRoot().getChildren().size() == 0)
-                {
-                    // Completely empty spec should be deleted
-                    projectManager.deleteBuildSpecification(projectManager.getProjectByBuildSpecification(spec), spec.getId());
-                }
-                else
-                {
-                    // Still stages remaining, save
-                    projectManager.save(spec);
-                }
+                removeStageReferences(spec.getRoot(), id);
+                projectManager.save(spec);
             }
 
             slaveDao.delete(slave);
         }
     }
 
-    private void removeStages(BuildSpecificationNode node, long id)
+    private void removeStageReferences(BuildSpecificationNode node, long id)
     {
-        List<BuildSpecificationNode> dead = new LinkedList<BuildSpecificationNode>();
         for(BuildSpecificationNode child: node.getChildren())
         {
             BuildStage stage = child.getStage();
@@ -110,15 +96,14 @@ public class DefaultSlaveManager implements SlaveManager
                 {
                     if(((SlaveBuildHostRequirements)hostRequirements).getSlave().getId() == id)
                     {
-                        dead.add(child);
+                        stage.setHostRequirements(new AnyCapableBuildHostRequirements());
+                        projectManager.delete(hostRequirements);
                     }
                 }
             }
 
-            removeStages(child, id);
+            removeStageReferences(child, id);
         }
-
-        node.getChildren().removeAll(dead);
     }
 
     public void delete(Slave slave)
