@@ -151,7 +151,7 @@ if __name__ == "__main__":
     serviceValues = [ False ]
     if len(sys.argv) > 3:
         if sys.argv[3] == "both":
-            if not WINDOWS:
+            if LINUX:
                 serviceValues = [ False, True ]
         elif sys.argv[3] == "service":
             serviceValues = [ True ]
