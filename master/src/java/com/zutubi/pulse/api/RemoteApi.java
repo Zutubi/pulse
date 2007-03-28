@@ -261,16 +261,24 @@ public class RemoteApi implements com.zutubi.pulse.events.EventListener
 
     public boolean deleteBuild(String token, String projectName, int id) throws AuthenticationException
     {
-        tokenManager.verifyUser(token);
-        Project project = internalGetProject(projectName);
-        BuildResult build = buildManager.getByProjectAndNumber(project, id);
-        if (build == null)
+        tokenManager.loginUser(token);
+        try
         {
-            return false;
-        }
+            Project project = internalGetProject(projectName);
+            projectManager.checkWrite(project);
+            BuildResult build = buildManager.getByProjectAndNumber(project, id);
+            if (build == null)
+            {
+                return false;
+            }
 
-        buildManager.delete(build);
-        return true;
+            buildManager.delete(build);
+            return true;
+        }
+        finally
+        {
+            tokenManager.logoutUser();   
+        }
     }
 
     public Vector<Hashtable<String, Object>> getLatestBuildsForProject(String token, String projectName, String buildSpecification, boolean completedOnly, int maxResults) throws AuthenticationException
