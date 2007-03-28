@@ -531,8 +531,13 @@ public class StringUtils
         {
             // We need to include a scheme and host because otherwise a
             // double slash at the start of the path confuses URI.
-            URI uri = new URI("http", "0.0.0.0", path, null);
-            return uri.getRawPath();
+            URI uri = new URI("http", "0.0.0.0", "/" + path, null);
+            String encoded = uri.getRawPath();
+            if(encoded.startsWith("/"))
+            {
+                encoded = encoded.substring(1);
+            }
+            return encoded;
         }
         catch (URISyntaxException e)
         {
