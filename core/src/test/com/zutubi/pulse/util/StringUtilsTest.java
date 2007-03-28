@@ -361,6 +361,11 @@ public class StringUtilsTest extends PulseTestCase
         assertEquals("double//slash/in+the%20path", StringUtils.urlEncodePath("double//slash/in+the path"));
     }
 
+    public void testUrlEncodePathEmpty()
+    {
+        assertEquals("", StringUtils.urlEncodePath(""));
+    }
+
     private void splitHelper(String s, String... expected)
     {
         List<String> expectedParts = Arrays.asList(expected);
