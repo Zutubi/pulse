@@ -278,7 +278,7 @@ public class FileLoader
         {
             if (predicate.resolveReferences(type, e))
             {
-                text = VariableHelper.replaceVariables(text, scope);
+                text = VariableHelper.replaceVariables(text, scope, predicate.allowUnresolved(type, e));
             }
             
             typeHelper.setText(type, text);
