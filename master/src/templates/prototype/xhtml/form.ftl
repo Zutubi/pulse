@@ -21,7 +21,7 @@
     </#list>
 
         <#-- submit field required by javascript submit support -->
-        <input type="hidden" name="submitField"/>
+        <input type="hidden" name="submitField"></input>
         
     <#include "submitgroup.ftl"/>
     <#list form.submitFields as submitField>

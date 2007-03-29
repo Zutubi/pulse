@@ -11,6 +11,12 @@ import java.net.MalformedURLException;
  */
 public class URLValidator extends FieldValidatorSupport
 {
+    public URLValidator()
+    {
+        setMessageKey("${fieldName}.invalid");
+        setDefaultMessageKey(".invalid");
+    }
+
     public void validate(Object obj) throws ValidationException
     {
         String fieldName = getFieldName();
@@ -23,7 +29,7 @@ public class URLValidator extends FieldValidatorSupport
 
         if (!(value.getClass().equals(String.class)) || !verifyUrl((String) value))
         {
-            validationContext.addFieldError(fieldName, (String) obj);
+            addFieldError(fieldName);
         }
     }
 

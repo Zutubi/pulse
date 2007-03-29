@@ -2,6 +2,7 @@ package com.zutubi.prototype.velocity;
 
 import com.opensymphony.util.TextUtils;
 import com.opensymphony.xwork.ActionContext;
+import com.opensymphony.xwork.util.OgnlValueStack;
 import com.zutubi.prototype.FieldDescriptor;
 import com.zutubi.prototype.FormDescriptor;
 import com.zutubi.prototype.FormDescriptorFactory;
@@ -108,9 +109,10 @@ public class WizardDirective extends AbstractDirective
 
         try
         {
-            Messages messages = Messages.getInstance(state.getType().getClazz());
-
             CompositeType type = state.getType();
+
+            Messages stateMessages = Messages.getInstance(state.getType().getClazz());
+            Messages wizardMessages = Messages.getInstance(wizardInstance.getClass());
 
             // generate the form.
             FormDescriptor formDescriptor = formDescriptorFactory.createDescriptor(type.getSymbolicName());
@@ -129,13 +131,17 @@ public class WizardDirective extends AbstractDirective
             form.setAction(action);
 
             context.put("form", form);
-            context.put("i18nText", new GetTextMethod(messages));
+            context.put("i18nText", new GetTextMethod(stateMessages, wizardMessages));
             context.put("path", path);
 
             com.zutubi.prototype.model.Wizard wizard = new com.zutubi.prototype.model.Wizard();
             wizard.setStepCount(wizardInstance.getStateCount());
             wizard.setCurrentStep(wizardInstance.getCurrentStateIndex() + 1);
             context.put("wizard", wizard);
+
+            // validation support:
+            OgnlValueStack stack = ActionContext.getContext().getValueStack();
+            context.put("fieldErrors", stack.findValue("fieldErrors"));
 
             // provide some syntactic sweetener by linking the i18n text method to the ?i18n builtin function.
             DelegateBuiltin.conditionalRegistration("i18n", "i18nText");

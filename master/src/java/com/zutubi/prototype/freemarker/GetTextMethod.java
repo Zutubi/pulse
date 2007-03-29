@@ -13,9 +13,9 @@ import com.opensymphony.util.TextUtils;
  */
 public class GetTextMethod implements TemplateMethodModel
 {
-    private Messages messages;
+    private Messages[] messages;
 
-    public GetTextMethod(Messages messages)
+    public GetTextMethod(Messages... messages)
     {
         this.messages = messages;
     }
@@ -27,7 +27,17 @@ public class GetTextMethod implements TemplateMethodModel
             throw new TemplateModelException("Wrong arguments");
         }
         String key = (String) args.get(0);
-        String value = messages.format(key);
+
+        String value = null;
+        for (Messages message : messages)
+        {
+            value = message.format(key);
+            if (TextUtils.stringSet(value))
+            {
+                break;
+            }
+        }
+        
         if (!TextUtils.stringSet(value))
         {
             value = key;

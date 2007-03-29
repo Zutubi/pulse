@@ -11,6 +11,8 @@ import com.zutubi.prototype.type.TypeException;
 import com.zutubi.prototype.type.record.Record;
 import com.zutubi.pulse.i18n.Messages;
 import com.zutubi.pulse.util.logging.Logger;
+import com.opensymphony.xwork.util.OgnlValueStack;
+import com.opensymphony.xwork.ActionContext;
 import freemarker.core.DelegateBuiltin;
 import freemarker.template.Template;
 import freemarker.template.TemplateException;
@@ -86,6 +88,10 @@ public class FormDirective extends PrototypeDirective
             Messages messages = Messages.getInstance(ctype.getClazz());
 
             context.put("i18nText", new GetTextMethod(messages));
+
+            // validation support:
+            OgnlValueStack stack = ActionContext.getContext().getValueStack();
+            context.put("fieldErrors", stack.findValue("fieldErrors"));
 
             // provide some syntactic sweetener by linking the i18n text method to the ?i18n builtin function.
             DelegateBuiltin.conditionalRegistration("i18n", "i18nText");

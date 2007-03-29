@@ -27,10 +27,13 @@ public class ConfigureProjectWizard extends AbstractTypeWizard
 
     private ConfigurationPersistenceManager configurationPersistenceManager;
 
+    // TODO: record id of parent project template.
     private long parentId;
 
-    private static final TemplateRecord EMPTY_RECORD = new TemplateRecord("empty", null, new MutableRecord());
+    // TODO: create actual project in the database.
     private ProjectManager projectManager;
+
+    private static final TemplateRecord EMPTY_RECORD = new TemplateRecord("empty", null, new MutableRecord());
 
     private Map<String, WizardState> recordStates = new HashMap<String, WizardState>();
     private String path;
@@ -39,7 +42,7 @@ public class ConfigureProjectWizard extends AbstractTypeWizard
     public void initialise()
     {
         // load template information.
-        LOG.warning("TODO: load template record for project wizard, currently using empty template record.");
+        LOG.warning("TODO: load template record for project wizard, currently using empty template record. Parent ID: " + parentId);
 
         TemplateRecord templateRecord = EMPTY_RECORD;
 
@@ -130,6 +133,11 @@ public class ConfigureProjectWizard extends AbstractTypeWizard
         this.typeRegistry = typeRegistry;
     }
 
+    /**
+     * Required resource
+     *
+     * @param projectManager instance
+     */
     public void setProjectManager(ProjectManager projectManager)
     {
         this.projectManager = projectManager;

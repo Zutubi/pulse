@@ -5,6 +5,7 @@ import com.zutubi.prototype.type.TypeRegistry;
 import java.util.Collection;
 import java.util.Map;
 import java.util.Set;
+import java.util.HashMap;
 
 /**
  */
@@ -138,7 +139,7 @@ public class TemplateRecord implements Record
     {
         // Actually, do we really need this annoying Map interface??
         // TODO
-        return null;
+        return new HashMap<String, Object>();
     }
 
     public Record clone() throws CloneNotSupportedException

@@ -15,7 +15,6 @@
 </div>
 
 <h2>#i18n("path=$config.path" "key=label")</h2>
-<h4>composite</h4>
 <p>
     #i18n("path=$config.path" "key=introduction")
 </p>
@@ -32,14 +31,7 @@
 #end
 
 #if( $config.simpleProperties.size() > 0)
-<p>
-    <h3>simple properties</h3>
-    <ul>
-    #foreach($prop in $config.simpleProperties)
-        <li>$prop : #i18n("path=$config.path" "key=${prop}.description")</li>
-    #end
-    </ul>
-
+    <!-- this configuration definition contains fields to be configured. -->
     <p>
         #pform("path=$config.path" "action=save.action?path=$config.path")
     </p>
@@ -50,41 +42,31 @@
         #checkform("path=$config.path" "action=check.action?path=$config.path")
     </p>
     #end
-</p>
 #end
 
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+<h3>nested properties</h3>
+<p>the following nested properties are also available:</p>
+<ul>
 #if( $config.listProperties.size() > 0)
-<p>
-    <h3>list properties</h3>
-    <ul>
     #foreach($prop in $config.listProperties)
-        <li><a href="configuration.action?path=${config.path}/${prop}">$prop</a> $!config.record.get($prop)</li>
+        <li><a href="configuration.action?path=${config.path}/${prop}">$prop</a> ($!config.record.size())</li>
     #end
-    </ul>
-</p>
 #end
 
 #if( $config.mapProperties.size() > 0)
-<p>
-    <h3>map properties</h3>
-    <ul>
     #foreach($prop in $config.mapProperties)
-        <li><a href="configuration.action?path=${config.path}/${prop}">$prop</a> $!config.record.get($prop)</li>
+        <li><a href="configuration.action?path=${config.path}/${prop}">$prop</a> ($!config.record.size())</li>
     #end
-    </ul>
-</p>
 #end
 
 #if( $config.nestedProperties.size() > 0)
-<p>
-    <h3>nested properties</h3>
-    <ul>
     #foreach($prop in $config.nestedProperties)
         <li><a href="configuration.action?path=${config.path}/${prop}">$prop</a>  #if($config.record.get($prop)) (edit) #else (not configured) #end</li>
     #end
-    </ul>
-</p>
 #end
+</ul>
 
 #if( $config.extensions.size() > 0)
 <p>
@@ -100,7 +82,9 @@
 </p>
 
 
-<h2>debugging</h2>
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+<h2>debugging: composite</h2>
 <p>
     <ul>
         <li>path: $!config.path</li>
@@ -109,9 +93,6 @@
         <li>type symbolic name: $!config.typeSymbolicName</li>
         <li>target symbolic name: $!config.targetSymbolicName</li>
     </ul>
-</p>
-<p>
-    Current data size: $!config.record.size()
 </p>
 #if($config.record)
 <p>

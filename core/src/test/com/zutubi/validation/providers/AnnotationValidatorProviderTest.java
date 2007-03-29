@@ -2,6 +2,10 @@ package com.zutubi.validation.providers;
 
 import junit.framework.TestCase;
 import com.zutubi.validation.Validator;
+import com.zutubi.validation.annotations.Required;
+import com.zutubi.validation.annotations.Email;
+import com.zutubi.validation.annotations.Name;
+import com.zutubi.validation.annotations.Regex;
 import com.zutubi.validation.mock.*;
 import com.zutubi.validation.validators.*;
 
@@ -108,4 +112,32 @@ public class AnnotationValidatorProviderTest extends TestCase
         assertTrue(validators.get(2) instanceof NameValidator);
         assertTrue(validators.get(3) instanceof RegexValidator);
     }
+
+    public void testConstraintDefinedOnField()
+    {
+        MockConstraintsDefinedOnField mock = new MockConstraintsDefinedOnField();
+        List<Validator> validators = provider.getValidators(mock);
+        assertEquals(4, validators.size());
+        assertTrue(validators.get(0) instanceof RequiredValidator);
+        assertTrue(validators.get(1) instanceof EmailValidator);
+        assertTrue(validators.get(2) instanceof NameValidator);
+        assertTrue(validators.get(3) instanceof RegexValidator);
+    }
+
+    public class MockConstraintsDefinedOnField
+    {
+        @Required @Email @Name @Regex(pattern = ".")
+        private String field;
+
+        public String getField()
+        {
+            return field;
+        }
+
+        public void setField(String field)
+        {
+            this.field = field;
+        }
+    }
+
 }

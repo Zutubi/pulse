@@ -12,7 +12,6 @@ import java.util.Map;
  */
 public class FieldDescriptor implements Descriptor
 {
-
     private Map<String, Object> parameters = new HashMap<String, Object>();
 
     public String getName()

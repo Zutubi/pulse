@@ -18,9 +18,21 @@ import java.util.HashMap;
  */
 public class CheckAction extends ActionSupport
 {
+    private String path;
+
     private ObjectFactory objectFactory;
 
     private TypeRegistry typeRegistry;
+
+    public void setPath(String path)
+    {
+        this.path = path;
+    }
+
+    public String getPath()
+    {
+        return path;
+    }
 
     public String execute() throws Exception
     {
@@ -50,6 +62,10 @@ public class CheckAction extends ActionSupport
 
         handler.test(instance);
 
+        // Propogate errors to the web ui in the same way as with default validation, using the validation context.
+        // In this way, the errors will appear on the form, where they are most appropriate. 
+
+        // We need to return the existing form values as well.
 
         return super.execute();
     }

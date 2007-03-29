@@ -1,6 +1,7 @@
 package com.zutubi.pulse.prototype.config;
 
 import com.zutubi.prototype.annotation.TypeSelect;
+import com.zutubi.validation.annotations.Required;
 
 /**
  *
@@ -8,6 +9,7 @@ import com.zutubi.prototype.annotation.TypeSelect;
  */
 public class ProjectTypeConfiguration implements ConfigurationExtension
 {
+    @Required()
     private String option;
 
     @TypeSelect(configurationType = ProjectTypeConfiguration.class, size = 5)

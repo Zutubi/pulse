@@ -21,7 +21,7 @@ public class ConfigurationRegistry
     public void init() throws TypeException
     {
         // scm configuration
-        CompositeType scmConfig = (CompositeType) typeRegistry.register("scmConfig", ScmConfiguration.class);
+        CompositeType scmConfig = typeRegistry.register("scmConfig", ScmConfiguration.class);
         typeRegistry.register("svnConfig", SvnConfiguration.class);
         typeRegistry.register("cvsConfig", CvsConfiguration.class);
         typeRegistry.register("perforceConfig", PerforceConfiguration.class);

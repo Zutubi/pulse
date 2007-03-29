@@ -2,6 +2,7 @@ package com.zutubi.prototype.velocity;
 
 import com.opensymphony.util.TextUtils;
 import com.zutubi.prototype.type.Type;
+import com.zutubi.prototype.type.CollectionType;
 import com.zutubi.pulse.i18n.Messages;
 import org.apache.velocity.context.InternalContextAdapter;
 import org.apache.velocity.exception.MethodInvocationException;
@@ -43,12 +44,18 @@ public class I18NDirective extends PrototypeDirective
 
     public String doRender(Type type) throws Exception
     {
-        Messages messages = Messages.getInstance(type.getClazz());
+        Class aClass = type.getClazz();
+        if (type instanceof CollectionType)
+        {
+            aClass = ((CollectionType)type).getCollectionType().getClazz();
+        }
+        
+        Messages messages = Messages.getInstance(aClass);
 
         String value = messages.format(this.key);
         if (!TextUtils.stringSet(value))
         {
-            value = key;
+            value = "unresolved: " + key + " (" + aClass + ")";
         }
 
         return value;

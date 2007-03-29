@@ -31,7 +31,7 @@
 <#if parameters.cssStyle?exists>
  style="${parameters.cssStyle?html}"<#rt/>
 </#if>
-/><#rt/>
+></input><#rt/>
 <label<#rt/>
 <#if parameters.name?exists>
  for="${parameters.name?html}${itemKey?html}"<#rt/>

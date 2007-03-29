@@ -6,9 +6,11 @@ import java.beans.IntrospectionException;
 import java.beans.PropertyDescriptor;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
+import java.lang.reflect.Field;
 import java.util.*;
 
 /**
+ * 
  */
 public class AnnotationUtils
 {
@@ -16,16 +18,33 @@ public class AnnotationUtils
     {
         List<Annotation> annotations = new LinkedList<Annotation>();
 
+        Class declaringClass = null;
+
         Method readMethod = property.getReadMethod();
         if (readMethod != null)
         {
             annotations.addAll(Arrays.asList(readMethod.getAnnotations()));
+            declaringClass = readMethod.getDeclaringClass();
         }
 
         Method writeMethod = property.getWriteMethod();
         if (writeMethod != null)
         {
             annotations.addAll(Arrays.asList(writeMethod.getAnnotations()));
+            declaringClass = writeMethod.getDeclaringClass();
+        }
+
+        if (declaringClass != null)
+        {
+            try
+            {
+                Field field = declaringClass.getDeclaredField(property.getName());
+                annotations.addAll(Arrays.asList(field.getAnnotations()));
+            }
+            catch (NoSuchFieldException e)
+            {
+                // noop.
+            }
         }
 
         return annotations;

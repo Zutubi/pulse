@@ -10,6 +10,8 @@ import com.zutubi.pulse.util.AnnotationUtils;
 
 import java.util.*;
 import java.lang.reflect.Method;
+import java.lang.reflect.Field;
+import java.lang.reflect.AnnotatedElement;
 import java.lang.annotation.Annotation;
 import java.beans.Introspector;
 import java.beans.IntrospectionException;
@@ -93,11 +95,22 @@ public class AnnotationValidatorProvider implements ValidatorProvider
                 if (read != null)
                 {
                     List<Annotation> constraints = new LinkedList<Annotation>();
-                    constraints.addAll(constraintsOnMethod(read));
+                    constraints.addAll(constraintsOn(read));
                     Method write = descriptor.getWriteMethod();
                     if (write != null)
                     {
-                        constraints.addAll(constraintsOnMethod(write));
+                        constraints.addAll(constraintsOn(write));
+                    }
+
+                    // analyse the field (if it exists).
+                    try
+                    {
+                        Field field = clazz.getDeclaredField(descriptor.getName());
+                        constraints.addAll(constraintsOn(field));
+                    }
+                    catch (NoSuchFieldException e)
+                    {
+                        
                     }
 
                     // convert constraints into validators.
@@ -112,14 +125,15 @@ public class AnnotationValidatorProvider implements ValidatorProvider
         return validators;
     }
 
-    private Collection<Annotation> constraintsOnMethod(Method method)
+    private Collection<Annotation> constraintsOn(AnnotatedElement element)
     {
-        if (method == null)
+        if (element == null)
         {
             return Collections.EMPTY_SET;
         }
+        
         List<Annotation> constraints = new LinkedList<Annotation>();
-        for (Annotation annotation : method.getAnnotations())
+        for (Annotation annotation : element.getAnnotations())
         {
             if (isConstraint(annotation))
             {

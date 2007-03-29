@@ -1,9 +1,12 @@
 package com.zutubi.pulse.prototype.config;
 
+import com.zutubi.prototype.annotation.ConfigurationCheck;
+
 /**
  *
  *
  */
+@ConfigurationCheck(CvsConfigurationCheckHandler.class)
 public class CvsConfiguration extends BaseScmConfiguration
 {
     private String root;

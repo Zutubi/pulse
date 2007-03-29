@@ -14,4 +14,4 @@
 <#if parameters.tabindex?exists>
  tabindex="${parameters.tabindex?html}"<#rt/>
 </#if>
-/>
+></input>

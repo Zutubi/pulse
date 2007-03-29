@@ -3,10 +3,15 @@ package com.zutubi.prototype.webwork;
 import com.opensymphony.util.TextUtils;
 import com.zutubi.prototype.annotation.ConfigurationCheck;
 import com.zutubi.prototype.config.ConfigurationPersistenceManager;
-import com.zutubi.prototype.type.*;
+import com.zutubi.prototype.type.CompositeType;
+import com.zutubi.prototype.type.ListType;
+import com.zutubi.prototype.type.MapType;
+import com.zutubi.prototype.type.PrimitiveType;
+import com.zutubi.prototype.type.Type;
+import com.zutubi.prototype.type.TypeException;
+import com.zutubi.prototype.type.TypeRegistry;
 import com.zutubi.prototype.type.record.PathUtils;
 import com.zutubi.prototype.type.record.Record;
-import com.zutubi.prototype.type.record.RecordManager;
 import com.zutubi.pulse.bootstrap.ComponentContext;
 import com.zutubi.pulse.prototype.config.ConfigurationExtension;
 
@@ -19,7 +24,6 @@ import java.util.List;
  */
 public class Configuration
 {
-    private RecordManager recordManager;
     private ConfigurationPersistenceManager configurationPersistenceManager;
 
     private TypeRegistry typeRegistry;
@@ -204,11 +208,6 @@ public class Configuration
     public List<String> getExtensions()
     {
         return extensions;
-    }
-
-    public void setRecordManager(RecordManager recordManager)
-    {
-        this.recordManager = recordManager;
     }
 
     public String getTargetSymbolicName()

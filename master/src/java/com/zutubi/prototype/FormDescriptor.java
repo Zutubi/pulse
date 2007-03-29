@@ -102,6 +102,13 @@ public class FormDescriptor implements Descriptor
         for (String fieldName : fieldOrder)
         {
             FieldDescriptor fieldDescriptor = getFieldDescriptor(fieldName);
+            if (fieldDescriptor == null)
+            {
+                // Ignore unknown fields. One awkward case where this happens is with the Check form.  Here, all of the
+                // fields have the _check postfix, so any fields defined in the fieldOrder annotation will fail.
+                continue;
+            }
+            
             Field field = fieldDescriptor.instantiate(record);
             field.setTabindex(tabindex++);
             form.add(field);

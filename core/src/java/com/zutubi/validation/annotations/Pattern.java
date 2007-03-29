@@ -12,7 +12,7 @@ import java.lang.annotation.RetentionPolicy;
  * <class comment/>
  */
 @Constraint(PatternValidator.class)
-@Target(ElementType.METHOD)
+@Target({ElementType.METHOD, ElementType.FIELD})
 @Retention(RetentionPolicy.RUNTIME)
 public @interface Pattern
 {

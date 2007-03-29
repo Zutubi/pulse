@@ -1,35 +1,40 @@
 <#--
 Only show message if errors are available. 
 -->
-<#--
 <#assign hasFieldErrors = fieldErrors?exists && fieldErrors[parameters.name]?exists/>
 <#if hasFieldErrors>
 <#list fieldErrors[parameters.name] as error>
 <tr errorFor="${parameters.id}">
-<#if parameters.labelposition?default("") == 'top'>
-   <td align="left" valign="top" colspan="2"><#rt/>
-<#else>
-   <td align="center" valign="top" colspan="2"><#rt/>
-</#if>
-       <span class="errorMessage">${error?html}</span><#t/>
-   </td><#lt/>
+    <th class="error-message" colspan="2"><#rt/>
+        ${error?i18n}<#t/>
+    </th><#lt/>
 </tr>
 </#list>
 </#if>
--->
 
 <tr>
-   <td align="right" valign="top"><#rt/>
+   <th align="right" valign="top" <#rt/> 
+<#if hasFieldErrors>
+ class="error-label"<#t/>
+<#else>
+ class="label"<#t/>
+</#if>
+><#rt/>
 <#if parameters.label?exists>
    <label <#t/>
 <#if parameters.id?exists>
  for="${parameters.id?html}" <#t/>
 </#if>
+<#if hasFieldErrors>
+ class="error-label"<#t/>
+<#else>
  class="label"<#t/>
+</#if>
 ><#t/>
+ ${parameters.label?i18n} <#t/>
 <#if parameters.required?default(false)>
        <span class="required">*</span><#t/>
 </#if>
- ${parameters.label?i18n}:</label><#t/>
+ :</label><#t/>
 </#if>
-   </td><#lt/>
+   </th><#lt/>

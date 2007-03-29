@@ -1,2 +1,2 @@
 <tr>
-    <td colspan="2">
+    <td class="submit" colspan="2">

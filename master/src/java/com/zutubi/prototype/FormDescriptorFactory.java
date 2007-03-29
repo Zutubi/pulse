@@ -5,6 +5,7 @@ import com.zutubi.prototype.annotation.Handler;
 import com.zutubi.prototype.type.*;
 import com.zutubi.pulse.core.ObjectFactory;
 import com.zutubi.pulse.util.logging.Logger;
+import com.zutubi.validation.annotations.Required;
 
 import java.lang.annotation.Annotation;
 import java.util.Arrays;
@@ -145,6 +146,10 @@ public class FormDescriptorFactory
                 {
                     LOG.warning("Unexpected exception processing the annotation handler.", e);
                 }
+            }
+            if (annotation instanceof Required)
+            {
+                descriptor.addParameter("required", true);
             }
         }
     }

@@ -1,14 +1,10 @@
 <html>
 <body>
 
-    <h2>blah wizard blah</h2>
+    <h2>wizard title...</h2>
     <p>
-        show the current form.
         #pwizard("path=$action.path" "action=wizard.action?path=$action.path")
     </p>
-<p>
-    path=$action.path
-</p>
 
 </body>
 </html>
