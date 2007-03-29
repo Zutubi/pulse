@@ -12,7 +12,7 @@ public class RecordManager
      * The base record is the 'anchor' point for all of the records held in memory. All searches for
      * records start from here.
      */
-    private MutableRecord baseRecord = new MutableRecord();
+    private MutableRecordImpl baseRecord = new MutableRecordImpl();
 
     /**
      * The path separator used for paths that identify records.
@@ -33,7 +33,7 @@ public class RecordManager
         {
             String pathElement = tokens.nextToken();
             Object data = record.get(pathElement);
-            if (data == null || !(data instanceof MutableRecord))
+            if (data == null || !(data instanceof MutableRecordImpl))
             {
                 return null;
             }
@@ -50,17 +50,17 @@ public class RecordManager
      */
     public boolean containsRecord(String path)
     {
-        MutableRecord record = baseRecord;
+        MutableRecordImpl record = baseRecord;
         StringTokenizer tokens = new StringTokenizer(path, PATH_SEPARATOR, false);
         while (tokens.hasMoreTokens())
         {
             String pathElement = tokens.nextToken();
             Object data = record.get(pathElement);
-            if (data == null || !(data instanceof MutableRecord))
+            if (data == null || !(data instanceof MutableRecordImpl))
             {
                 return false;
             }
-            record = (MutableRecord) record.get(pathElement);
+            record = (MutableRecordImpl) record.get(pathElement);
         }
         return record != null;
     }
@@ -78,22 +78,22 @@ public class RecordManager
         parent.put(pathElements[pathElements.length - 1], newRecord);
     }
 
-    private MutableRecord getRecord(String[] pathElements)
+    private MutableRecordImpl getRecord(String[] pathElements)
     {
-        MutableRecord record = baseRecord;
+        MutableRecordImpl record = baseRecord;
         for (int i = 0; i < pathElements.length; i++)
         {
             String element = pathElements[i];
             if (record.get(element) == null)
             {
-                record.put(element, new MutableRecord());
+                record.put(element, new MutableRecordImpl());
             }
             Object obj = record.get(element);
-            if (!(obj instanceof MutableRecord))
+            if (!(obj instanceof MutableRecordImpl))
             {
                 throw new IllegalArgumentException("Invalid path '" + PathUtils.getPath(pathElements) + "'");
             }
-            record = (MutableRecord) obj;
+            record = (MutableRecordImpl) obj;
         }
 
         return record;
@@ -101,8 +101,8 @@ public class RecordManager
 
     public void store(String path, Record values)
     {
-        MutableRecord record = getRecord(PathUtils.getPathElements(path));
-        record.update((MutableRecord) values);
+        MutableRecordImpl record = getRecord(PathUtils.getPathElements(path));
+        record.update((MutableRecordImpl) values);
     }
 
     /**
@@ -113,7 +113,7 @@ public class RecordManager
      */
     public Record delete(String path)
     {
-        MutableRecord record = baseRecord;
+        MutableRecordImpl record = baseRecord;
         StringTokenizer tokens = new StringTokenizer(path, PATH_SEPARATOR, false);
 
         String pathElement = null;
@@ -137,13 +137,13 @@ public class RecordManager
                 return null;
             }
 
-            record = (MutableRecord) record.get(pathElement);
+            record = (MutableRecordImpl) record.get(pathElement);
         }
 
         if (record.containsKey(pathElement))
         {
             Object obj = record.get(pathElement);
-            if (obj instanceof MutableRecord)
+            if (obj instanceof MutableRecordImpl)
             {
                 return (Record) record.remove(pathElement);
             }
@@ -161,10 +161,10 @@ public class RecordManager
     {
         try
         {
-            MutableRecord record = (MutableRecord) load(sourcePath);
+            MutableRecordImpl record = (MutableRecordImpl) load(sourcePath);
             if (record != null)
             {
-                MutableRecord copy = (MutableRecord) record.clone();
+                MutableRecordImpl copy = (MutableRecordImpl) record.clone();
                 insert(destinationPath, copy);
             }
         }

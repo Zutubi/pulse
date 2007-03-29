@@ -27,6 +27,7 @@
     <a href="wizard.action?path=$config.path">add...</a>
 </p>
 
+<!--
 <p>&nbsp;</p>
 <p>&nbsp;</p>
 <h2>debugging: map</h2>
@@ -71,6 +72,7 @@
         <a href="configuration.action?path=${action.configuration.parentPath}">done</a>
     #end
 </p>
+-->
 
 </body>
 </html>

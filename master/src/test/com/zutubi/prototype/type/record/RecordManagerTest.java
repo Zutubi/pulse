@@ -26,9 +26,9 @@ public class RecordManagerTest extends TestCase
 
     public void testStore()
     {
-        recordManager.insert("hello", new MutableRecord());
+        recordManager.insert("hello", new MutableRecordImpl());
 
-        MutableRecord record = new MutableRecord();
+        MutableRecordImpl record = new MutableRecordImpl();
         record.put("key", "value");
         recordManager.insert("hello/world", record);
 
@@ -37,7 +37,7 @@ public class RecordManagerTest extends TestCase
 
         try
         {
-            recordManager.insert("hello/world/key", new MutableRecord());
+            recordManager.insert("hello/world/key", new MutableRecordImpl());
             fail();
         }
         catch (IllegalArgumentException e)
@@ -47,7 +47,7 @@ public class RecordManagerTest extends TestCase
 
     public void testLoad()
     {
-        MutableRecord record = new MutableRecord();
+        MutableRecordImpl record = new MutableRecordImpl();
         record.putMeta("key", "value");
 
         recordManager.insert("hello/world", record);
@@ -58,7 +58,7 @@ public class RecordManagerTest extends TestCase
 
     public void testDelete()
     {
-        MutableRecord record = new MutableRecord();
+        MutableRecordImpl record = new MutableRecordImpl();
         record.putMeta("key", "value");
 
         recordManager.insert("hello/world", record);
@@ -71,7 +71,7 @@ public class RecordManagerTest extends TestCase
 
     public void testMetaProperties()
     {
-        MutableRecord record = new MutableRecord();
+        MutableRecordImpl record = new MutableRecordImpl();
         record.putMeta("key", "value");
         recordManager.insert("path/to/record", record);
 
@@ -81,7 +81,7 @@ public class RecordManagerTest extends TestCase
 
     public void testTrimmingPath()
     {
-        MutableRecord record = new MutableRecord();
+        MutableRecordImpl record = new MutableRecordImpl();
         record.putMeta("key", "value");
 
         recordManager.insert("another", record);
@@ -93,7 +93,7 @@ public class RecordManagerTest extends TestCase
 
     public void testCopy()
     {
-        MutableRecord original = new MutableRecord();
+        MutableRecordImpl original = new MutableRecordImpl();
         original.put("key", "value");
 
         recordManager.insert("sourcePath", original);
@@ -114,7 +114,7 @@ public class RecordManagerTest extends TestCase
 
     public void testCopyOnStore()
     {
-        MutableRecord original = new MutableRecord();
+        MutableRecordImpl original = new MutableRecordImpl();
         original.put("key", "value");
 
         recordManager.insert("path", original);

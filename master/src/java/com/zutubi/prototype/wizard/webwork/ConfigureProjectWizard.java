@@ -4,7 +4,7 @@ import com.zutubi.prototype.config.ConfigurationPersistenceManager;
 import com.zutubi.prototype.type.CompositeType;
 import com.zutubi.prototype.type.TypeProperty;
 import com.zutubi.prototype.type.TypeRegistry;
-import com.zutubi.prototype.type.record.MutableRecord;
+import com.zutubi.prototype.type.record.MutableRecordImpl;
 import com.zutubi.prototype.type.record.Record;
 import com.zutubi.prototype.type.record.TemplateRecord;
 import com.zutubi.prototype.wizard.WizardState;
@@ -33,7 +33,7 @@ public class ConfigureProjectWizard extends AbstractTypeWizard
     // TODO: create actual project in the database.
     private ProjectManager projectManager;
 
-    private static final TemplateRecord EMPTY_RECORD = new TemplateRecord("empty", null, new MutableRecord());
+    private static final TemplateRecord EMPTY_RECORD = new TemplateRecord("empty", null, new MutableRecordImpl());
 
     private Map<String, WizardState> recordStates = new HashMap<String, WizardState>();
     private String path;

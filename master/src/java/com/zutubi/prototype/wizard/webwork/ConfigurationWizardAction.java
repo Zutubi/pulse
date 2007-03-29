@@ -5,7 +5,7 @@ import com.opensymphony.xwork.ActionContext;
 import com.zutubi.prototype.type.Type;
 import com.zutubi.prototype.type.TypeException;
 import com.zutubi.prototype.type.TypeRegistry;
-import com.zutubi.prototype.type.record.MutableRecord;
+import com.zutubi.prototype.type.record.MutableRecordImpl;
 import com.zutubi.prototype.type.record.Record;
 import com.zutubi.prototype.webwork.PrototypeUtils;
 import com.zutubi.prototype.wizard.Wizard;
@@ -251,7 +251,7 @@ public class ConfigurationWizardAction extends ActionSupport
 
             // apply the posted record details to the current states record.
             // TODO: mmmm, mutable
-            ((MutableRecord) getState().getRecord()).update((MutableRecord) post);
+            ((MutableRecordImpl) getState().getRecord()).update((MutableRecordImpl) post);
         }
 
         // only validate when we are moving forwards in the wizard

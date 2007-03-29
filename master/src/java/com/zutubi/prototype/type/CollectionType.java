@@ -1,7 +1,7 @@
 package com.zutubi.prototype.type;
 
 import com.zutubi.prototype.annotation.Ordered;
-import com.zutubi.prototype.type.record.MutableRecord;
+import com.zutubi.prototype.type.record.MutableRecordImpl;
 import com.zutubi.prototype.type.record.PathUtils;
 import com.zutubi.prototype.type.record.Record;
 import com.zutubi.prototype.type.record.RecordManager;
@@ -78,7 +78,7 @@ public abstract class CollectionType extends AbstractType implements ComplexType
 
     public Record createNewRecord()
     {
-        return new MutableRecord();
+        return new MutableRecordImpl();
     }
 
     public boolean isTemplated()

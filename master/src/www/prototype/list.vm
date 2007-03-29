@@ -15,7 +15,6 @@
 </div>
 
 <h2>#i18n("path=$config.path" "key=label")</h2>
-<h4>list</h4>
 <p>
     #i18n("path=$config.path" "key=introduction")
 </p>
@@ -53,7 +52,7 @@
     #end
 </p>
 
-
+<!--
 <h2>debugging</h2>
 <p>
     <ul>
@@ -78,6 +77,6 @@
 </table>
 </p>
 #end
-
+-->
 </body>
 </html>

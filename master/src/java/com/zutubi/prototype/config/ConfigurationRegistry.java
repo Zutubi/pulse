@@ -68,7 +68,7 @@ public class ConfigurationRegistry
         artifactConfig.addExtension("directoryArtifactConfig");
 
         // generated dynamically as new components are registered.
-        CompositeType projectConfig = new CompositeType(ProjectConfiguration.class, "projectConfig");
+        CompositeType projectConfig = typeRegistry.register("projectConfig", ProjectConfiguration.class);
         projectConfig.addProperty(new TypeProperty("scm", typeRegistry.getType("scmConfig")));
         projectConfig.addProperty(new TypeProperty("type", typeRegistry.getType("typeConfig")));
         projectConfig.addProperty(new TypeProperty("general", typeRegistry.getType("generalConfig")));
@@ -89,8 +89,6 @@ public class ConfigurationRegistry
         ProjectMapType projectCollection = new ProjectMapType(HashMap.class, projectManager);
         projectCollection.setTypeRegistry(typeRegistry);
         projectCollection.setCollectionType(projectConfig);
-
-        typeRegistry.register("projectConfig", projectConfig);
 
         configurationPersistenceManager.register("project", projectCollection);
 

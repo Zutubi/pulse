@@ -8,13 +8,13 @@ import java.util.Set;
 /**
  * Simple record that holds key:value data, along with meta data.
  */
-public class MutableRecord implements Record
+public class MutableRecordImpl implements Record
 {
     private Map<String, String> meta = new HashMap<String, String>();
 
     private Map<String, Object> data = new HashMap<String, Object>();
 
-    public MutableRecord()
+    public MutableRecordImpl()
     {
     }
 
@@ -38,7 +38,7 @@ public class MutableRecord implements Record
         return meta.get(key);
     }
 
-    public void putAll(MutableRecord newRecord)
+    public void putAll(MutableRecordImpl newRecord)
     {
         meta.putAll(newRecord.meta);
         data.putAll(newRecord.data);
@@ -84,9 +84,10 @@ public class MutableRecord implements Record
         return data.remove(key);
     }
 
-    public void putAll(Map<? extends String, ? extends Object> t)
+    public void putAll(Record t)
     {
-        this.data.putAll(t);
+        // todo: fix.
+        this.data.putAll(((MutableRecordImpl)t).data);
     }
 
     public void clear()
@@ -100,16 +101,16 @@ public class MutableRecord implements Record
         return data.values();
     }
 
-    public Set<Entry<String, Object>> entrySet()
+    public Set<Map.Entry<String, Object>> entrySet()
     {
         return data.entrySet();
     }
 
-    public MutableRecord clone() throws CloneNotSupportedException
+    public MutableRecordImpl clone() throws CloneNotSupportedException
     {
         super.clone();
 
-        MutableRecord clone = new MutableRecord();
+        MutableRecordImpl clone = new MutableRecordImpl();
 
         for (Map.Entry<String, String> entry : meta.entrySet())
         {
@@ -135,7 +136,7 @@ public class MutableRecord implements Record
         return clone;
     }
 
-    public void update(MutableRecord record)
+    public void update(MutableRecordImpl record)
     {
         Map<String, Object> newData = new HashMap<String, Object>();
 
@@ -147,7 +148,7 @@ public class MutableRecord implements Record
             }
         }
 
-        newData.putAll(record);
+        newData.putAll(record.data);
 
         data.clear();
         data.putAll(newData);

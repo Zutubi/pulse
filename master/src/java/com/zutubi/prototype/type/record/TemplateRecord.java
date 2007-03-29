@@ -105,7 +105,7 @@ public class TemplateRecord implements Record
         return moi.remove(key);
     }
 
-    public void putAll(Map<? extends String, ? extends Object> t)
+    public void putAll(Record t)
     {
         moi.putAll(t);
     }
@@ -130,7 +130,7 @@ public class TemplateRecord implements Record
         return getMergedMap().values();
     }
 
-    public Set<Entry<String, Object>> entrySet()
+    public Set<Map.Entry<String, Object>> entrySet()
     {
         return getMergedMap().entrySet();
     }
@@ -148,9 +148,9 @@ public class TemplateRecord implements Record
         return null;
     }
 
-    public MutableRecord flatten()
+    public MutableRecordImpl flatten()
     {
-        return new MutableRecord();
+        return new MutableRecordImpl();
     }
 
     public String getOwner(String key)

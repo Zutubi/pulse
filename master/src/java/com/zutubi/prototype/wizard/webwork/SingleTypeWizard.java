@@ -2,7 +2,7 @@ package com.zutubi.prototype.wizard.webwork;
 
 import com.zutubi.prototype.config.ConfigurationPersistenceManager;
 import com.zutubi.prototype.type.CompositeType;
-import com.zutubi.prototype.type.record.MutableRecord;
+import com.zutubi.prototype.type.record.MutableRecordImpl;
 import com.zutubi.prototype.type.record.TemplateRecord;
 import com.zutubi.prototype.wizard.WizardState;
 import com.zutubi.pulse.util.logging.Logger;
@@ -19,7 +19,7 @@ public class SingleTypeWizard extends AbstractTypeWizard
 
     private String path;
 
-    private static final TemplateRecord EMPTY_RECORD = new TemplateRecord("empty", null, new MutableRecord());
+    private static final TemplateRecord EMPTY_RECORD = new TemplateRecord("empty", null, new MutableRecordImpl());
     private WizardState recordState;
 
     public SingleTypeWizard(String path)

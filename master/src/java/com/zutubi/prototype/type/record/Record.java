@@ -8,7 +8,7 @@ import java.util.Collection;
  * A record defines a simple map for storing data.  
  *
  */
-public interface Record extends Map<String, Object>, Cloneable
+public interface Record extends Cloneable
 {
     /**
      * Set the symbolic name for the data contained by this record.  The symbolic name defines the type of the
@@ -49,6 +49,18 @@ public interface Record extends Map<String, Object>, Cloneable
 
     Object get(Object key);
 
+    int size();
+
+    Object put(String key, Object value);
+
+    void putAll(Record other);
+
+    void clear();
+
+    Object remove(Object key);
+
+    boolean containsKey(Object key);
+
     /**
      * Create a clone of this record.
      *
@@ -57,4 +69,6 @@ public interface Record extends Map<String, Object>, Cloneable
      * @throws CloneNotSupportedException
      */
     Record clone() throws CloneNotSupportedException;
+
+    Set<String> keySet();
 }

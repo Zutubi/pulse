@@ -1,6 +1,6 @@
 package com.zutubi.prototype.type;
 
-import com.zutubi.prototype.type.record.MutableRecord;
+import com.zutubi.prototype.type.record.MutableRecordImpl;
 import com.zutubi.prototype.type.record.Record;
 import com.zutubi.prototype.type.record.RecordManager;
 import com.zutubi.pulse.util.CollectionUtils;
@@ -159,14 +159,14 @@ public class CompositeType extends AbstractType implements ComplexType
 
     public Record createNewRecord()
     {
-        MutableRecord record = new MutableRecord();
+        MutableRecordImpl record = new MutableRecordImpl();
         for (String propertyName : getPropertyNames(MapType.class))
         {
-            record.put(propertyName, new MutableRecord());
+            record.put(propertyName, new MutableRecordImpl());
         }
         for (String propertyName : getPropertyNames(ListType.class))
         {
-            record.put(propertyName, new MutableRecord());
+            record.put(propertyName, new MutableRecordImpl());
         }
         record.setSymbolicName(getSymbolicName());
         return record;
