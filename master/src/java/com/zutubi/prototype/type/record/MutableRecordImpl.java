@@ -114,20 +114,16 @@ public class MutableRecordImpl implements Record
 
         for (Map.Entry<String, String> entry : meta.entrySet())
         {
-            String key = new String(entry.getKey());
-            String value = new String(entry.getValue());
+            String key = entry.getKey();
+            String value = entry.getValue();
             clone.putMeta(key, value);
         }
 
         for (Map.Entry<String, Object> entry : data.entrySet())
         {
-            String key = new String(entry.getKey());
+            String key = entry.getKey();
             Object value = entry.getValue();
-            if (value instanceof String)
-            {
-                value = new String((String) value);
-            }
-            else if (value instanceof Record)
+            if (value instanceof Record)
             {
                 value = ((Record) value).clone();
             }

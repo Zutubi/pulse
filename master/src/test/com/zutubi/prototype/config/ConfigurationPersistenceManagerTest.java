@@ -1,15 +1,16 @@
 package com.zutubi.prototype.config;
 
-import com.zutubi.prototype.type.*;
+import com.zutubi.prototype.type.Type;
+import com.zutubi.prototype.type.TypeException;
+import com.zutubi.prototype.type.TypeRegistry;
 import com.zutubi.prototype.type.record.RecordManager;
+import com.zutubi.pulse.prototype.record.SymbolicName;
 import junit.framework.TestCase;
 
 import java.util.List;
 import java.util.Map;
 
 /**
- *
- *
  */
 public class ConfigurationPersistenceManagerTest extends TestCase
 {
@@ -27,7 +28,6 @@ public class ConfigurationPersistenceManagerTest extends TestCase
         manager = new ConfigurationPersistenceManager();
         manager.setTypeRegistry(typeRegistry);
         manager.setRecordManager(recordManager);
-
     }
 
     protected void tearDown() throws Exception
@@ -43,53 +43,8 @@ public class ConfigurationPersistenceManagerTest extends TestCase
     {
         manager.register("simple", typeRegistry.register(SimpleObject.class));
         assertEquals(0, manager.getListing("simple").size());
-        assertEquals(0, manager.getListing("unknown").size());
 
-        Type type = (Type) manager.getType("simple");
-        assertEquals(SimpleObject.class, type.getClazz());
-
-        assertNull(manager.getType("unknown"));
-    }
-
-    public void testListingNestedObject() throws TypeException
-    {
-        manager.register("nested", typeRegistry.register(NestedObject.class));
-        assertEquals(1, manager.getListing("nested").size());
-        assertEquals(1, manager.getListing("nested/nested").size());
-        assertEquals(0, manager.getListing("nested/unknown").size());
-
-        Type type = (Type) manager.getType("nested/nested");
-        assertEquals(NestedObject.class, type.getClazz());
-    }
-
-    public void testListingCompositeObject() throws TypeException
-    {
-        manager.register("composite", typeRegistry.register(CompositeObject.class));
-        assertEquals(4, manager.getListing("composite").size());
-        assertEquals(1, manager.getListing("composite/nested").size());
-        assertEquals(0, manager.getListing("composite/unknown").size());
-
-        Type type = (Type) manager.getType("composite");
-        assertEquals(CompositeObject.class, type.getClazz());
-
-        type = (Type) manager.getType("composite/nested");
-        assertEquals(NestedObject.class, type.getClazz());
-    }
-
-    public void testListingSimpleCollectionObject() throws TypeException
-    {
-        manager.register("simpleCollection", typeRegistry.register(SimpleCollectionObject.class));
-        assertEquals(1, manager.getListing("simpleCollection").size());
-        assertEquals(0, manager.getListing("simpleCollection/simpleList").size());
-
-        Type type = (Type) manager.getType("simpleCollection");
-        assertEquals(SimpleCollectionObject.class, type.getClazz());
-
-        type = (Type) manager.getType("simpleCollection/simpleList");
-        assertTrue(type instanceof CollectionType);
-
-        type = ((CollectionType) type).getCollectionType();
-        assertTrue(type instanceof CompositeType);
+        Type type = manager.getType("simple");
         assertEquals(SimpleObject.class, type.getClazz());
     }
 
@@ -173,6 +128,7 @@ public class ConfigurationPersistenceManagerTest extends TestCase
     }
 */
 
+    @SymbolicName("Simple")
     public static class SimpleObject
     {
         private String strA;
@@ -200,6 +156,7 @@ public class ConfigurationPersistenceManagerTest extends TestCase
         }
     }
 
+    @SymbolicName("Nested")
     public static class NestedObject
     {
         private NestedObject nested;
@@ -215,6 +172,7 @@ public class ConfigurationPersistenceManagerTest extends TestCase
         }
     }
 
+    @SymbolicName("Composite")
     public static class CompositeObject
     {
         private String strA;
@@ -286,6 +244,7 @@ public class ConfigurationPersistenceManagerTest extends TestCase
         }
     }
 
+    @SymbolicName("SimpleCollection")
     public static class SimpleCollectionObject
     {
         List<SimpleObject> simpleList;
@@ -301,6 +260,7 @@ public class ConfigurationPersistenceManagerTest extends TestCase
         }
     }
 
+    @SymbolicName("NestedCollection")
     public static class NestedCollectionObject
     {
         List<NestedObject> nestedList;

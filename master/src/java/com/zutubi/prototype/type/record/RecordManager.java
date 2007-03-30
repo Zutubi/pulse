@@ -75,7 +75,14 @@ public class RecordManager
         }
 
         Record parent = getRecord(PathUtils.getParentPathElements(pathElements));
-        parent.put(pathElements[pathElements.length - 1], newRecord);
+        try
+        {
+            parent.put(pathElements[pathElements.length - 1], newRecord.clone());
+        }
+        catch (CloneNotSupportedException e)
+        {
+            // Buh
+        }
     }
 
     private MutableRecordImpl getRecord(String[] pathElements)
