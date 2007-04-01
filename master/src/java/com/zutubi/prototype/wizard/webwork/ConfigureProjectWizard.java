@@ -4,8 +4,8 @@ import com.zutubi.prototype.config.ConfigurationPersistenceManager;
 import com.zutubi.prototype.type.CompositeType;
 import com.zutubi.prototype.type.TypeProperty;
 import com.zutubi.prototype.type.TypeRegistry;
+import com.zutubi.prototype.type.record.MutableRecord;
 import com.zutubi.prototype.type.record.MutableRecordImpl;
-import com.zutubi.prototype.type.record.Record;
 import com.zutubi.prototype.type.record.TemplateRecord;
 import com.zutubi.prototype.wizard.WizardState;
 import com.zutubi.pulse.model.ProjectManager;
@@ -102,7 +102,7 @@ public class ConfigureProjectWizard extends AbstractTypeWizard
         // we do not know the project id that will be used to reference this project.  Maybe we should leave that up to
         // the dude that understands the project/ scope and how it relates to the external world.  If that is the case,
         // then we just store this baby.
-        Record record = projectType.createNewRecord();
+        MutableRecord record = projectType.createNewRecord();
 
         for (Map.Entry<String, WizardState> entry : recordStates.entrySet())
         {

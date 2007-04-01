@@ -1,10 +1,7 @@
 package com.zutubi.prototype.type;
 
 import com.zutubi.prototype.annotation.Ordered;
-import com.zutubi.prototype.type.record.MutableRecordImpl;
-import com.zutubi.prototype.type.record.PathUtils;
-import com.zutubi.prototype.type.record.Record;
-import com.zutubi.prototype.type.record.RecordManager;
+import com.zutubi.prototype.type.record.*;
 
 import java.util.Arrays;
 import java.util.Set;
@@ -98,8 +95,9 @@ public abstract class CollectionType extends AbstractType implements ComplexType
             latestKey = Integer.toString(Integer.parseInt(latestKey) + 1);
         }
 
-        record.putMeta(LATEST_KEY_KEY, latestKey);
-        recordManager.store(path, record);
+        MutableRecord mutableRecord = record.createMutable();
+        mutableRecord.putMeta(LATEST_KEY_KEY, latestKey);
+        recordManager.store(path, mutableRecord);
         return latestKey;
     }
 }

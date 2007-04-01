@@ -6,6 +6,7 @@ import com.zutubi.prototype.type.TypeProperty;
 import com.zutubi.prototype.type.TypeRegistry;
 import com.zutubi.prototype.type.record.Record;
 import com.zutubi.prototype.type.record.TemplateRecord;
+import com.zutubi.prototype.type.record.MutableRecord;
 import com.zutubi.prototype.wizard.Wizard;
 import com.zutubi.prototype.wizard.WizardState;
 import com.zutubi.prototype.wizard.WizardTransition;
@@ -160,7 +161,7 @@ public abstract class AbstractTypeWizard implements Wizard
 
         private TemplateRecord templateRecord;
 
-        private Record record = null;
+        private MutableRecord record = null;
 
         /**
          * @param type
@@ -216,7 +217,7 @@ public abstract class AbstractTypeWizard implements Wizard
 
         private TemplateRecord record;
 
-        private Record selectionRecord;
+        private MutableRecord selectionRecord;
 
         private Map<String, Record> typeRecordCache = new TreeMap<String, Record>();
 

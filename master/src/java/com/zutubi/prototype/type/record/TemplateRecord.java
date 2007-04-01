@@ -23,19 +23,9 @@ public class TemplateRecord implements Record
         this.moi = moi;
     }
 
-    public void setSymbolicName(String name)
-    {
-        moi.setSymbolicName(name);
-    }
-
     public String getSymbolicName()
     {
         return moi.getSymbolicName();
-    }
-
-    public void putMeta(String key, String value)
-    {
-        moi.putMeta(key, value);
     }
 
     public String getMeta(String key)
@@ -81,7 +71,7 @@ public class TemplateRecord implements Record
         else if (value instanceof Record)
         {
             // Wrap in another template on the way out
-            return new TemplateRecord(owner, (TemplateRecord) getInherited((String) key), (Record) value);
+            return new TemplateRecord(owner, (TemplateRecord) getInherited((String) key), (MutableRecord) value);
         }
         else
         {
@@ -95,34 +85,14 @@ public class TemplateRecord implements Record
         return parent == null ? null : parent.get(key);
     }
 
-    public Object put(String key, Object value)
-    {
-        return moi.put(key, value);
-    }
-
-    public Object remove(Object key)
-    {
-        return moi.remove(key);
-    }
-
-    public void putAll(Record t)
-    {
-        moi.putAll(t);
-    }
-
-    public void clear()
-    {
-        // I don't suppose we'll actually use this ...
-        moi.clear();
-        if (parent != null)
-        {
-            parent.clear();
-        }
-    }
-
     public Set<String> keySet()
     {
         return getMergedMap().keySet();
+    }
+
+    public Set<String> metaKeySet()
+    {
+        return moi.metaKeySet();
     }
 
     public Collection<Object> values()
@@ -142,13 +112,7 @@ public class TemplateRecord implements Record
         return new HashMap<String, Object>();
     }
 
-    public Record clone() throws CloneNotSupportedException
-    {
-        // TODO
-        return null;
-    }
-
-    public MutableRecordImpl flatten()
+    public Record flatten()
     {
         return new MutableRecordImpl();
     }
@@ -167,5 +131,10 @@ public class TemplateRecord implements Record
         {
             return null;
         }
+    }
+
+    public MutableRecord createMutable()
+    {
+        throw new UnsupportedOperationException("Record is not mutable.");
     }
 }

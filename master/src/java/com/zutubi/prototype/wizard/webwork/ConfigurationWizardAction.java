@@ -297,8 +297,8 @@ public class ConfigurationWizardAction extends ActionSupport
     private String doFinish()
     {
         getWizardInstance().doFinish();
-        path = ((AbstractTypeWizard) getWizardInstance()).getSuccessPath();
         removeWizard();
+        path = ((AbstractTypeWizard) getWizardInstance()).getSuccessPath();
         return SUCCESS;
     }
 

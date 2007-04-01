@@ -3,6 +3,7 @@ package com.zutubi.prototype.type;
 import com.zutubi.prototype.type.record.MutableRecordImpl;
 import com.zutubi.prototype.type.record.Record;
 import com.zutubi.prototype.type.record.RecordManager;
+import com.zutubi.prototype.type.record.MutableRecord;
 import com.zutubi.pulse.util.CollectionUtils;
 import com.zutubi.pulse.util.Mapping;
 
@@ -157,7 +158,7 @@ public class CompositeType extends AbstractType implements ComplexType
         return path;
     }
 
-    public Record createNewRecord()
+    public MutableRecord createNewRecord()
     {
         MutableRecordImpl record = new MutableRecordImpl();
         for (String propertyName : getPropertyNames(MapType.class))

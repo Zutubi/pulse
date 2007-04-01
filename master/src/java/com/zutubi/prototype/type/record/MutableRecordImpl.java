@@ -1,6 +1,5 @@
 package com.zutubi.prototype.type.record;
 
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -8,24 +7,22 @@ import java.util.Set;
 /**
  * Simple record that holds key:value data, along with meta data.
  */
-public class MutableRecordImpl implements Record
+public class MutableRecordImpl implements MutableRecord
 {
     private Map<String, String> meta = new HashMap<String, String>();
 
     private Map<String, Object> data = new HashMap<String, Object>();
 
-    public MutableRecordImpl()
-    {
-    }
+    private static final String SYMBOLIC_NAME = "symbolicName";
 
     public void setSymbolicName(String name)
     {
-        meta.put("symbolicName", name);
+        meta.put(SYMBOLIC_NAME, name);
     }
 
     public String getSymbolicName()
     {
-        return meta.get("symbolicName");
+        return meta.get(SYMBOLIC_NAME);
     }
 
     public void putMeta(String key, String value)
@@ -36,12 +33,6 @@ public class MutableRecordImpl implements Record
     public String getMeta(String key)
     {
         return meta.get(key);
-    }
-
-    public void putAll(MutableRecordImpl newRecord)
-    {
-        meta.putAll(newRecord.meta);
-        data.putAll(newRecord.data);
     }
 
     public Object put(String key, Object value)
@@ -59,19 +50,14 @@ public class MutableRecordImpl implements Record
         return data.keySet();
     }
 
-    public boolean isEmpty()
+    public Set<String> metaKeySet()
     {
-        return data.isEmpty();
+        return meta.keySet();
     }
 
     public boolean containsKey(Object key)
     {
         return data.containsKey(key);
-    }
-
-    public boolean containsValue(Object value)
-    {
-        return data.containsValue(value);
     }
 
     public Object get(Object key)
@@ -84,32 +70,14 @@ public class MutableRecordImpl implements Record
         return data.remove(key);
     }
 
-    public void putAll(Record t)
-    {
-        // todo: fix.
-        this.data.putAll(((MutableRecordImpl)t).data);
-    }
-
     public void clear()
     {
         meta.clear();
         data.clear();
     }
 
-    public Collection<Object> values()
+    public MutableRecord createMutable()
     {
-        return data.values();
-    }
-
-    public Set<Map.Entry<String, Object>> entrySet()
-    {
-        return data.entrySet();
-    }
-
-    public MutableRecordImpl clone() throws CloneNotSupportedException
-    {
-        super.clone();
-
         MutableRecordImpl clone = new MutableRecordImpl();
 
         for (Map.Entry<String, String> entry : meta.entrySet())
@@ -125,17 +93,18 @@ public class MutableRecordImpl implements Record
             Object value = entry.getValue();
             if (value instanceof Record)
             {
-                value = ((Record) value).clone();
+                value = ((Record) value).createMutable();
             }
             clone.put(key, value);
         }
         return clone;
     }
 
-    public void update(MutableRecordImpl record)
+    public void update(Record record)
     {
         Map<String, Object> newData = new HashMap<String, Object>();
 
+        // take the existing records but not the existing primitives.
         for (Map.Entry<String, Object> entry : data.entrySet())
         {
             if (entry.getValue() instanceof Record)
@@ -144,12 +113,23 @@ public class MutableRecordImpl implements Record
             }
         }
 
-        newData.putAll(record.data);
+        // take the new data from the record.
+        for (String key : record.keySet())
+        {
+            newData.put(key, record.get(key));
+        }
 
         data.clear();
         data.putAll(newData);
 
+        // copy across all of the meta data.
+        Map<String, String> newMetaData = new HashMap<String, String>();
+        for (String key: record.metaKeySet())
+        {
+            newMetaData.put(key, record.getMeta(key));
+        }
+        
         meta.clear();
-        meta.putAll(record.meta);
+        meta.putAll(newMetaData);
     }
 }
