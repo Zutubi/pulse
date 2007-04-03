@@ -1533,7 +1533,7 @@
             <result name="success" type="redirect">configuration.action?path=${path}</result>
         </action>
 
-        <action name="configuration" class="com.zutubi.prototype.webwork.ConfigurationAction">
+        <action name="configuration" class="com.zutubi.prototype.webwork.PrototypeAction">
             <result name="composite" type="velocity">composite.vm</result>
             <result name="list" type="velocity">list.vm</result>
             <result name="map" type="velocity">map.vm</result>

@@ -102,7 +102,7 @@ public class RecordManager
     public void store(String path, Record values)
     {
         MutableRecord record = getRecord(PathUtils.getPathElements(path));
-        record.update((MutableRecord) values);
+        record.update(values);
     }
 
     /**

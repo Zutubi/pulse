@@ -26,6 +26,7 @@ public class ProjectMapType extends MapType
     {
         Project project = new Project((String) record.get("name"), (String) record.get("description"));
         projectManager.save(project);
+        projectManager.delete(project); // this is not the right place for this.. or is it?..
         return Long.toString(project.getId());
     }
 }

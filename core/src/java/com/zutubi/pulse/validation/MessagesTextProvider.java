@@ -15,6 +15,11 @@ public class MessagesTextProvider extends TextProviderSupport
         this.context = context;
     }
 
+    public MessagesTextProvider(Class context)
+    {
+        this.context = context;
+    }
+
     protected String lookupText(String key, Object... args)
     {
         return Messages.format(context, key, args);

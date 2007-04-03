@@ -207,31 +207,32 @@ public class ConfigurationPersistenceManager
     public Record getRecord(String path)
     {
         Record record = recordManager.load(path);
-        if (record != null)
+        if (record == null)
         {
-            // We need to understand the root level can be templated.
-            String[] pathElements = PathUtils.getPathElements(path);
-            if (pathElements.length > 1)
-            {
-                ComplexType scopeType = rootScopes.get(pathElements[0]);
-                if (scopeType.isTemplated())
-                {
-                    // Need to load a chain of templates.
-                    String owner = pathElements[1];
-                    Record owningRecord = recordManager.load(PathUtils.getPath(pathElements[0], pathElements[1]));
-                    String parent = owningRecord.getMeta("parent");
-                    TemplateRecord parentRecord = null;
-                    if (parent != null)
-                    {
-                        pathElements[1] = parent;
-                        parentRecord = (TemplateRecord) getRecord(PathUtils.getPath(pathElements));
-                    }
-
-                    return new TemplateRecord(owner, parentRecord, record);
-                }
-            }
+            return null;
         }
 
+        // We need to understand the root level can be templated.
+        String[] pathElements = PathUtils.getPathElements(path);
+        if (pathElements.length > 1)
+        {
+            ComplexType scopeType = rootScopes.get(pathElements[0]);
+            if (scopeType.isTemplated())
+            {
+                // Need to load a chain of templates.
+                String owner = pathElements[1];
+                Record owningRecord = recordManager.load(PathUtils.getPath(pathElements[0], pathElements[1]));
+                String parent = owningRecord.getMeta("parent");
+                TemplateRecord parentRecord = null;
+                if (parent != null)
+                {
+                    pathElements[1] = parent;
+                    parentRecord = (TemplateRecord) getRecord(PathUtils.getPath(pathElements));
+                }
+
+                return new TemplateRecord(owner, parentRecord, record);
+            }
+        }
         return record;
     }
 

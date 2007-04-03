@@ -8,12 +8,23 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 
 /**
+ * The ConfigurationCheck annotation allows for a ConfigurationCheckHandler to be associated
+ * with a configuration object.
  *
+ * Configuration checks are presented in the UI as a separate form that can be used to run
+ * a check on the target configuration.
  *
  */
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
 public @interface ConfigurationCheck
 {
+    /**
+     * The reference to a configuration check handler implementation. 
+     * 
+     * @return the type to be used to run the configuration check.
+     *
+     * @see ConfigurationCheckHandler
+     */
     Class<? extends ConfigurationCheckHandler> value();
 }

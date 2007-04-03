@@ -9,7 +9,8 @@ import java.lang.annotation.Target;
 
 
 /**
- * <class-comment/>
+ * The text annotation represents a simple form text field.
+ *
  */
 @Handler(FieldAnnotationHandler.class)
 @Target(ElementType.METHOD)
@@ -18,7 +19,15 @@ import java.lang.annotation.Target;
 @Field(type = FieldType.TEXT)
 public @interface Text
 {
+    /**
+     * The DEFAULT_size indicates that, by default, no size value will be rendered.
+     */
     public static final int DEFAULT_size = 0;
 
+    /**
+     * The size of the rendered text field.
+     * 
+     * @return number of columns to be displayed.
+     */
     public int size() default DEFAULT_size;
 }

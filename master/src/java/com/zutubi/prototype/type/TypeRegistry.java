@@ -1,5 +1,6 @@
 package com.zutubi.prototype.type;
 
+import com.zutubi.pulse.prototype.record.SymbolicName;
 import com.zutubi.pulse.util.AnnotationUtils;
 import com.zutubi.pulse.util.CollectionUtils;
 
@@ -58,15 +59,30 @@ public class TypeRegistry
 
     public CompositeType register(Class clazz) throws TypeException
     {
+        SymbolicName symbolicName = (SymbolicName) clazz.getAnnotation(SymbolicName.class);
+        if (symbolicName != null)
+        {
+            return register(symbolicName.value(), clazz);
+        }
+        // this is invalid, let the base register method handle the exception generation.
         return register(null, clazz);
     }
 
     public CompositeType register(String symbolicName, Class clazz) throws TypeException
     {
+        if (symbolicName == null)
+        {
+            throw new TypeException("Class " + clazz.getName() + " requires a symbolic name before it can be registered.  You can " +
+                    "add a symbolic name to the class by using the @SymbolicName annotation.");
+        }
         if (symbolicName != null && symbolicNameMapping.containsKey(symbolicName))
         {
-            throw new TypeException("Symbolic name " + symbolicName + " is already in use, can not be assigned " +
-                    "to a different type " + clazz.getName());
+            Class existingRegistration = symbolicNameMapping.get(symbolicName).getClazz();
+            if (existingRegistration != clazz)
+            {
+                throw new TypeException("Symbolic name " + symbolicName + " is already in use, can not be assigned " +
+                        "to a different type " + clazz.getName());
+            }
         }
 
         CompositeType type = classMapping.get(clazz);
@@ -120,7 +136,7 @@ public class TypeRegistry
             {
                 beanInfo = Introspector.getBeanInfo(typeClass, Object.class);
             }
-            
+
             for (PropertyDescriptor descriptor : beanInfo.getPropertyDescriptors())
             {
                 TypeProperty property = new TypeProperty();
@@ -178,6 +194,10 @@ public class TypeRegistry
                     if (classMapping.containsKey(valueClass))
                     {
                         collection.setCollectionType(classMapping.get(valueClass));
+                    }
+                    else if (primitiveMapping.containsKey(valueClass))
+                    {
+                        property.setType(primitiveMapping.get(valueClass));
                     }
                     else
                     {

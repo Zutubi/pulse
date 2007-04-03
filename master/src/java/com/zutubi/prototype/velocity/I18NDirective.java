@@ -1,11 +1,13 @@
 package com.zutubi.prototype.velocity;
 
 import com.opensymphony.util.TextUtils;
-import com.zutubi.prototype.type.Type;
+import com.opensymphony.xwork.ActionContext;
+import com.opensymphony.xwork.util.OgnlValueStack;
 import com.zutubi.prototype.type.CollectionType;
+import com.zutubi.prototype.type.Type;
 import com.zutubi.pulse.i18n.Messages;
+import com.zutubi.pulse.velocity.AbstractDirective;
 import org.apache.velocity.context.InternalContextAdapter;
-import org.apache.velocity.exception.MethodInvocationException;
 import org.apache.velocity.exception.ParseErrorException;
 import org.apache.velocity.exception.ResourceNotFoundException;
 import org.apache.velocity.runtime.parser.node.Node;
@@ -42,22 +44,41 @@ public class I18NDirective extends PrototypeDirective
         this.key = key;
     }
 
-    public String doRender(Type type) throws Exception
+    public boolean render(InternalContextAdapter context, Writer writer, Node node) throws IOException, ResourceNotFoundException, ParseErrorException
     {
-        Class aClass = type.getClazz();
-        if (type instanceof CollectionType)
-        {
-            aClass = ((CollectionType)type).getCollectionType().getClazz();
-        }
-        
-        Messages messages = Messages.getInstance(aClass);
+        // validation: key field is required.
 
-        String value = messages.format(this.key);
-        if (!TextUtils.stringSet(value))
+        try
         {
-            value = "unresolved: " + key + " (" + aClass + ")";
-        }
+            Map params = createPropertyMap(context, node);
+            wireParams(params);
 
-        return value;
+            Type type = lookupType();
+
+            Class clazz = type.getClazz();
+            if (type instanceof CollectionType)
+            {
+                clazz = ((CollectionType)type).getCollectionType().getClazz();
+            }
+
+            Messages messages = Messages.getInstance(clazz);
+
+            String value = messages.format(this.key);
+            if (!TextUtils.stringSet(value))
+            {
+                // only print unresolved when in debug mode...
+                value = "unresolved: " + key + " (" + clazz + ")";
+            }
+
+            writer.write(value);
+
+            return true;
+        }
+        catch (Exception e)
+        {
+            writer.write(renderError("Failed to render. Unexpected " + e.getClass() + ": " + e.getMessage()));
+            return true;
+        }
     }
+
 }

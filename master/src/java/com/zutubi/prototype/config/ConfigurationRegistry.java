@@ -1,10 +1,22 @@
 package com.zutubi.prototype.config;
 
-import com.zutubi.prototype.type.*;
-import com.zutubi.pulse.model.Project;
+import com.zutubi.prototype.type.CompositeType;
+import com.zutubi.prototype.type.ListType;
+import com.zutubi.prototype.type.MapType;
+import com.zutubi.prototype.type.ProjectMapType;
+import com.zutubi.prototype.type.TypeException;
+import com.zutubi.prototype.type.TypeProperty;
+import com.zutubi.prototype.type.TypeRegistry;
 import com.zutubi.pulse.model.ProjectManager;
 import com.zutubi.pulse.prototype.config.*;
-import com.zutubi.pulse.prototype.config.admin.*;
+import com.zutubi.pulse.prototype.config.admin.EmailConfiguration;
+import com.zutubi.pulse.prototype.config.admin.GeneralAdminConfiguration;
+import com.zutubi.pulse.prototype.config.admin.GlobalConfiguration;
+import com.zutubi.pulse.prototype.config.admin.JabberConfiguration;
+import com.zutubi.pulse.prototype.config.admin.LDAPConfiguration;
+import com.zutubi.pulse.prototype.config.admin.LicenseConfiguration;
+import com.zutubi.pulse.prototype.config.admin.LoggingConfiguration;
+import com.zutubi.pulse.prototype.config.admin.LicenseKeyConfiguration;
 
 import java.util.HashMap;
 
@@ -98,9 +110,9 @@ public class ConfigurationRegistry
         typeRegistry.register("emailConfig", EmailConfiguration.class);
         typeRegistry.register("ldapConfig", LDAPConfiguration.class);
         typeRegistry.register("jabberConfig", JabberConfiguration.class);
-        typeRegistry.register("licenseConfig", LicenseConfiguration.class);
+        typeRegistry.register("licenseConfig", LicenseKeyConfiguration.class);
 
-        CompositeType globalConfig = new CompositeType(Object.class, "globalConfig");
+        CompositeType globalConfig = typeRegistry.register("globalConfig", GlobalConfiguration.class);
         globalConfig.addProperty(new TypeProperty("general", typeRegistry.getType("generalAdminConfig")));
         globalConfig.addProperty(new TypeProperty("logging", typeRegistry.getType("loggingConfig")));
         globalConfig.addProperty(new TypeProperty("email", typeRegistry.getType("emailConfig")));

@@ -1,6 +1,8 @@
 package com.zutubi.pulse.prototype.config;
 
 import com.zutubi.prototype.annotation.Form;
+import com.zutubi.prototype.annotation.Wizard;
+import com.zutubi.prototype.wizard.webwork.ConfigureProjectWizard;
 import com.zutubi.validation.annotations.Required;
 import com.zutubi.validation.annotations.Name;
 import com.zutubi.validation.annotations.Url;
@@ -10,6 +12,7 @@ import com.zutubi.validation.annotations.Url;
  *
  */
 @Form(fieldOrder = {"name", "url", "description"})
+@Wizard(ConfigureProjectWizard.class)
 public class ProjectConfiguration
 {
     @Required() @Name()

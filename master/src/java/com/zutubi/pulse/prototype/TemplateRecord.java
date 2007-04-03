@@ -1,18 +1,11 @@
 package com.zutubi.pulse.prototype;
 
-import com.zutubi.pulse.prototype.record.Record;
-
-import java.util.Collection;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
 /**
  * <class comment/>
  */
-public class TemplateRecord implements Record
+public class TemplateRecord
 {
+/*
     private TemplateRecord parent;
     private String owner;
     private Record record;
@@ -228,4 +221,5 @@ public class TemplateRecord implements Record
     {
         throw new RuntimeException("Method not yet implemented.");
     }
+*/
 }

@@ -1,16 +1,18 @@
 package com.zutubi.prototype.webwork;
 
-import com.zutubi.pulse.web.ActionSupport;
-import com.zutubi.pulse.core.ObjectFactory;
-import com.zutubi.prototype.config.ConfigurationCrudSupport;
+import com.opensymphony.xwork.ActionContext;
+import com.zutubi.prototype.ConfigurationCheckHandler;
+import com.zutubi.prototype.annotation.ConfigurationCheck;
+import com.zutubi.prototype.type.CompositeType;
 import com.zutubi.prototype.type.Type;
 import com.zutubi.prototype.type.TypeRegistry;
-import com.zutubi.prototype.annotation.ConfigurationCheck;
-import com.zutubi.prototype.ConfigurationCheckHandler;
-import com.opensymphony.xwork.ActionContext;
+import com.zutubi.prototype.type.record.Record;
+import com.zutubi.pulse.bootstrap.ComponentContext;
+import com.zutubi.pulse.web.ActionSupport;
+import com.zutubi.validation.XWorkValidationAdapter;
 
-import java.util.Map;
 import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Process a configuration check request.
@@ -20,9 +22,16 @@ public class CheckAction extends ActionSupport
 {
     private String path;
 
-    private ObjectFactory objectFactory;
-
     private TypeRegistry typeRegistry;
+    
+    private PrototypeInteractionHandler interactionHandler;
+
+
+    public CheckAction()
+    {
+        interactionHandler = new PrototypeInteractionHandler();
+        ComponentContext.autowire(interactionHandler);
+    }
 
     public void setPath(String path)
     {
@@ -36,9 +45,9 @@ public class CheckAction extends ActionSupport
 
     public String execute() throws Exception
     {
-        Map<String, Object> parameters = ActionContext.getContext().getParameters();
+        Map<String, String[]> parameters = ActionContext.getContext().getParameters();
 
-        Map<String, Object> checkParameters = new HashMap<String, Object>();
+        Map<String, String[]> checkParameters = new HashMap<String, String[]>();
         for (String name : parameters.keySet())
         {
             if (name.endsWith("_check"))
@@ -47,32 +56,37 @@ public class CheckAction extends ActionSupport
             }
         }
 
-        String symbolicName = ((String[])checkParameters.get("symbolicName"))[0];
+        String symbolicName = checkParameters.get("symbolicName")[0];
         
         Type type = typeRegistry.getType(symbolicName);
-        Object instance = objectFactory.buildBean(type.getClazz());
 
+        Record record = PrototypeUtils.toRecord((CompositeType) type, checkParameters);
+        if (!interactionHandler.validate(record, new XWorkValidationAdapter(this)))
+        {
+            return SUCCESS;
+        }
 
-        ConfigurationCrudSupport crud = new ConfigurationCrudSupport();
-        crud.apply(checkParameters,  instance);
+        Object instance = type.instantiate(record);
 
         ConfigurationCheck annotation = (ConfigurationCheck) type.getAnnotation(ConfigurationCheck.class);
-        ConfigurationCheckHandler handler = objectFactory.buildBean(annotation.value());
-        crud.apply(parameters, handler);
+        type = typeRegistry.getType(annotation.value());
+        if (type == null)
+        {
+            type = typeRegistry.register(annotation.value());
+        }
 
+        record = PrototypeUtils.toRecord((CompositeType) type, parameters);
+        if (!interactionHandler.validate(record, new XWorkValidationAdapter(this)))
+        {
+            return SUCCESS;
+        }
+
+        ConfigurationCheckHandler handler = (ConfigurationCheckHandler) type.instantiate(record);
         handler.test(instance);
-
-        // Propogate errors to the web ui in the same way as with default validation, using the validation context.
-        // In this way, the errors will appear on the form, where they are most appropriate. 
 
         // We need to return the existing form values as well.
 
-        return super.execute();
-    }
-
-    public void setObjectFactory(ObjectFactory objectFactory)
-    {
-        this.objectFactory = objectFactory;
+        return SUCCESS;
     }
 
     public void setTypeRegistry(TypeRegistry typeRegistry)

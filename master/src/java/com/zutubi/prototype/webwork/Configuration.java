@@ -39,10 +39,9 @@ public class Configuration
     private String parentPath;
     private String[] parentPathElements;
     private String currentPath;
+
     private List<String> simpleProperties = new LinkedList<String>();
     private List<String> nestedProperties = new LinkedList<String>();
-    private List<String> listProperties = new LinkedList<String>();
-    private List<String> mapProperties = new LinkedList<String>();
     private List<String> extensions = new LinkedList<String>();
 
     private boolean configurationCheckAvailable = false;
@@ -94,17 +93,18 @@ public class Configuration
                     simpleProperties.add(propertyName);
                 }
             }
+
             for (String propertyName : ctype.getPropertyNames(CompositeType.class))
             {
                 nestedProperties.add(propertyName);
             }
             for (String propertyName : ctype.getPropertyNames(ListType.class))
             {
-                listProperties.add(propertyName);
+                nestedProperties.add(propertyName);
             }
             for (String propertyName : ctype.getPropertyNames(MapType.class))
             {
-                mapProperties.add(propertyName);
+                nestedProperties.add(propertyName);
             }
 
             extensions.addAll(((CompositeType) targetType).getExtensions());
@@ -193,16 +193,6 @@ public class Configuration
     public List<String> getNestedProperties()
     {
         return nestedProperties;
-    }
-
-    public List<String> getListProperties()
-    {
-        return listProperties;
-    }
-
-    public List<String> getMapProperties()
-    {
-        return mapProperties;
     }
 
     public List<String> getExtensions()

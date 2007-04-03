@@ -4,9 +4,8 @@ import com.zutubi.prototype.type.CompositeType;
 import com.zutubi.prototype.type.PrimitiveType;
 import com.zutubi.prototype.type.TypeProperty;
 import com.zutubi.prototype.type.TypeRegistry;
-import com.zutubi.prototype.type.record.Record;
-import com.zutubi.prototype.type.record.TemplateRecord;
 import com.zutubi.prototype.type.record.MutableRecord;
+import com.zutubi.prototype.type.record.TemplateRecord;
 import com.zutubi.prototype.wizard.Wizard;
 import com.zutubi.prototype.wizard.WizardState;
 import com.zutubi.prototype.wizard.WizardTransition;
@@ -198,7 +197,7 @@ public abstract class AbstractTypeWizard implements Wizard
             return templateRecord;
         }
 
-        public Record getRecord()
+        public MutableRecord getRecord()
         {
             return record;
         }
@@ -219,7 +218,7 @@ public abstract class AbstractTypeWizard implements Wizard
 
         private MutableRecord selectionRecord;
 
-        private Map<String, Record> typeRecordCache = new TreeMap<String, Record>();
+        private Map<String, MutableRecord> typeRecordCache = new TreeMap<String, MutableRecord>();
 
         public TwoStepWizardState(CompositeType type, TemplateRecord record)
         {
@@ -281,7 +280,7 @@ public abstract class AbstractTypeWizard implements Wizard
                 return type;
             }
 
-            public Record getRecord()
+            public MutableRecord getRecord()
             {
                 return selectionRecord;
             }
@@ -295,7 +294,7 @@ public abstract class AbstractTypeWizard implements Wizard
                 // initialise the states data using the template record if it exists.
                 if (record != null)
                 {
-                    Record data = record.flatten();
+                    MutableRecord data = record.flatten();
                     typeRecordCache.put(type.getSymbolicName(), data);
                 }
             }
@@ -311,13 +310,13 @@ public abstract class AbstractTypeWizard implements Wizard
                 return typeRegistry.getType(selectedSymbolicName);
             }
 
-            public Record getRecord()
+            public MutableRecord getRecord()
             {
                 String selectedSymbolicName = getSelectedSymbolicName();
                 if (!typeRecordCache.containsKey(selectedSymbolicName))
                 {
                     CompositeType selectedType = typeRegistry.getType(selectedSymbolicName);
-                    Record r = selectedType.createNewRecord();
+                    MutableRecord r = selectedType.createNewRecord();
                     typeRecordCache.put(selectedSymbolicName, r);
                 }
                 return typeRecordCache.get(selectedSymbolicName);

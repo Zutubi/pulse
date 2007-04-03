@@ -7,9 +7,10 @@ import com.zutubi.prototype.type.record.MutableRecord;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Collection;
 
 /**
- *
+ * Webwork environment specific prototype utility methods.
  *
  */
 public class PrototypeUtils
@@ -27,7 +28,6 @@ public class PrototypeUtils
     public static Record toRecord(CompositeType type, Map<String, String[]> parameters)
     {
         MutableRecord record = type.createNewRecord();
-        record.setSymbolicName(type.getSymbolicName());
 
         for (TypeProperty property : type.getProperties())
         {
@@ -40,13 +40,13 @@ public class PrototypeUtils
             }
 
             // this is a read only property.
-            if (property.getSetter() == null)
+            if (!property.isWritable())
             {
                 continue;
             }
 
             String[] parameterValue = parameters.get(propertyName);
-            if (List.class.isAssignableFrom(property.getClazz()))
+            if (Collection.class.isAssignableFrom(property.getClazz()))
             {
                 record.put(propertyName, parameterValue);
             }

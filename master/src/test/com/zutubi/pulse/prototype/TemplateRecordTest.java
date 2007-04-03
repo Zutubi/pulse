@@ -1,15 +1,12 @@
 package com.zutubi.pulse.prototype;
 
-import com.zutubi.pulse.prototype.record.SingleRecord;
 import com.zutubi.pulse.test.PulseTestCase;
-
-import java.util.Arrays;
-import java.util.Collections;
 
 /**
  */
 public class TemplateRecordTest extends PulseTestCase
 {
+/*
     private TemplateRecord grandparent;
     private TemplateRecord parent;
     private TemplateRecord child;
@@ -169,4 +166,5 @@ public class TemplateRecordTest extends PulseTestCase
     {
         assertEquals(Arrays.asList(expected), value);
     }
+*/
 }

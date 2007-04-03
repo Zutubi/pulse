@@ -26,25 +26,6 @@ public abstract class ValidatorSupport implements Validator, ShortCircuitableVal
         this.validationContext = validationContext;
     }
 
-    protected Object getFieldValue(String name, Object target) throws ValidationException
-    {
-        try
-        {
-            return BeanUtils.getProperty(name, target);
-        }
-        catch (PropertyNotFoundException e)
-        {
-            throw new ValidationException("Field '" + name + "' is not a property on object of type '" +
-                    target.getClass().getName() + "'");
-        }
-        catch (Exception e)
-        {
-            throw new ValidationException("Failed to retrieve the field '" + name +
-                    "' from an object of type '" + target.getClass().getName() +
-                    "'. Cause: " + e.getMessage(), e);
-        }
-    }
-
     public void setShortCircuit(boolean b)
     {
         shortCircuit = b;

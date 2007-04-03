@@ -2,6 +2,9 @@ package com.zutubi.validation.validators;
 
 import com.zutubi.validation.FieldValidator;
 import com.zutubi.validation.ValidationContext;
+import com.zutubi.validation.ValidationException;
+import com.zutubi.validation.bean.BeanUtils;
+import com.zutubi.validation.bean.PropertyNotFoundException;
 
 /**
  * <class-comment/>
@@ -25,6 +28,25 @@ public abstract class FieldValidatorSupport extends ValidatorSupport implements 
     public void setFieldName(String fieldName)
     {
         this.fieldName = fieldName;
+    }
+
+    protected Object getFieldValue(String name, Object target) throws ValidationException
+    {
+        try
+        {
+            return BeanUtils.getProperty(name, target);
+        }
+        catch (PropertyNotFoundException e)
+        {
+            throw new ValidationException("Field '" + name + "' is not a property on object of type '" +
+                    target.getClass().getName() + "'");
+        }
+        catch (Exception e)
+        {
+            throw new ValidationException("Failed to retrieve the field '" + name +
+                    "' from an object of type '" + target.getClass().getName() +
+                    "'. Cause: " + e.getMessage(), e);
+        }
     }
 
     protected Object[] getMessageArgs()

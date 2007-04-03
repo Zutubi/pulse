@@ -7,6 +7,7 @@ import com.zutubi.prototype.type.CompositeType;
 import com.zutubi.prototype.type.Type;
 import com.zutubi.prototype.type.TypeException;
 import com.zutubi.prototype.type.TypeRegistry;
+import com.zutubi.prototype.type.TypeConversionException;
 import com.zutubi.prototype.type.record.Record;
 import com.zutubi.pulse.validation.MessagesTextProvider;
 import com.zutubi.pulse.web.ActionSupport;
@@ -80,9 +81,21 @@ public class SaveAction extends ActionSupport
         try
         {
             Type type = typeRegistry.getType(record.getSymbolicName());
-            Object instance = type.instantiate(record);
-
-            ValidationContext context = createValidationContext(instance);
+            ValidationContext context = createValidationContext(type.getClazz());
+            
+            Object instance;
+            try
+            {
+                instance = type.instantiate(record);
+            }
+            catch (TypeConversionException e)
+            {
+                for (String field : e.getFieldErrors())
+                {
+                    context.addFieldError(field, e.getFieldError(field));
+                }
+                return false;
+            }
 
             try
             {

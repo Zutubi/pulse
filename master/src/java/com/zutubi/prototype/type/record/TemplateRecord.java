@@ -107,12 +107,22 @@ public class TemplateRecord implements Record
 
     private Map<String, Object> getMergedMap()
     {
-        // Actually, do we really need this annoying Map interface??
-        // TODO
-        return new HashMap<String, Object>();
+        Map<String, Object> mergedMap = new HashMap<String, Object>();
+
+        for (String key : moi.keySet())
+        {
+            mergedMap.put(key, moi.get(key));
+        }
+
+        if (parent != this && parent != null) // ensure that we do not recurse infinitely -> IDEA complaint.
+        {
+            mergedMap.putAll(parent.getMergedMap());
+        }
+        
+        return mergedMap;
     }
 
-    public Record flatten()
+    public MutableRecord flatten()
     {
         return new MutableRecordImpl();
     }

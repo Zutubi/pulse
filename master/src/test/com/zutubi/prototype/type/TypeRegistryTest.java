@@ -112,6 +112,18 @@ public class TypeRegistryTest extends TestCase
         }
     }
 
+    public void testRegistrationRequiresSymbolicName()
+    {
+        try
+        {
+            typeRegistry.register(InvalidObject.class);
+            fail();
+        }
+        catch (TypeException e)
+        {
+        }
+    }
+
     @SymbolicName("mockName")
     public static class Mock
     {
@@ -178,6 +190,7 @@ public class TypeRegistryTest extends TestCase
         }
     }
 
+    @SymbolicName("simpleObject")
     public static class SimpleObject
     {
         private String b;
@@ -193,12 +206,32 @@ public class TypeRegistryTest extends TestCase
         }
     }
 
+    /**
+     * No symbolic name makes this invalid.
+     */
+    public static class InvalidObject
+    {
+        private String c;
+
+        public String getC()
+        {
+            return c;
+        }
+
+        public void setC(String c)
+        {
+            this.c = c;
+        }
+    }
+
+    @SymbolicName("simpleInterface")
     public static interface SimpleInterface
     {
         String getA();
         void setA(String str);
     }
 
+    @SymbolicName("simpleInterfaceHolder")
     public static class SimpleInterfaceHolder
     {
         private SimpleInterface simpleInterface;

@@ -1,9 +1,12 @@
 package com.zutubi.pulse.prototype.config.admin;
 
+import com.zutubi.prototype.annotation.Form;
+
 /**
  *
  *
  */
+@Form(fieldOrder={"baseUrl", "baseHelpUrl", "recipeTimeout", "scmPollingInterval"})
 public class GeneralAdminConfiguration
 {
     private String baseUrl;

@@ -3,7 +3,7 @@
  name="${parameters.name?html}"<#rt/>
 </#if>
  value="true"<#rt/>
-<#if parameters.value?exists && parameters.value == true>
+<#if parameters.value?exists && parameters.value == "true">
  checked="checked"<#rt/>
 </#if>
 <#if parameters.disabled?default(false)>

@@ -35,7 +35,7 @@
 #if( $config.simpleProperties.size() > 0)
     <!-- this configuration definition contains fields to be configured. -->
     <p>
-        #pform("path=$config.path" "action=save.action?path=$config.path")
+        #pform("path=$config.path" "action=configuration.action?path=$config.path")
     </p>
 
     #if ($config.configurationCheckAvailable)
@@ -63,21 +63,9 @@
 <h3>nested properties</h3>
 <p>the following nested properties are also available:</p>
 <ul>
-#if( $config.listProperties.size() > 0)
-    #foreach($prop in $config.listProperties)
-        <li><a href="configuration.action?path=${config.path}/${prop}">$prop</a> ($!config.record.size())</li>
-    #end
-#end
-
-#if( $config.mapProperties.size() > 0)
-    #foreach($prop in $config.mapProperties)
-        <li><a href="configuration.action?path=${config.path}/${prop}">$prop</a> ($!config.record.size())</li>
-    #end
-#end
-
 #if( $config.nestedProperties.size() > 0)
     #foreach($prop in $config.nestedProperties)
-        <li><a href="configuration.action?path=${config.path}/${prop}">$prop</a>  #if($config.record.get($prop)) (edit) #else (not configured) #end</li>
+        <li><a href="configuration.action?path=${config.path}/${prop}">$prop</a>  #if($config.record.get($prop)) (configured) #else (not configured) #end</li>
     #end
 #end
 </ul>

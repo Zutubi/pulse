@@ -3,6 +3,7 @@ package com.zutubi.prototype.wizard;
 import com.zutubi.prototype.type.CompositeType;
 import com.zutubi.prototype.type.record.Record;
 import com.zutubi.prototype.type.record.TemplateRecord;
+import com.zutubi.prototype.type.record.MutableRecord;
 
 /**
  *
@@ -29,6 +30,6 @@ public interface WizardState
      *
      * @return
      */
-    Record getRecord();
+    MutableRecord getRecord();
 
 }

@@ -122,10 +122,11 @@ public class CompositeType extends AbstractType implements ComplexType
                 return null;
             }
 
-            // TODO: the data parameter for this method should be a Record.
             Record record = (Record) data;
 
             Object instance = getClazz().newInstance();
+
+            TypeConversionException exception = null;
 
             for (Map.Entry<String, TypeProperty> entry : properties.entrySet())
             {
@@ -140,11 +141,32 @@ public class CompositeType extends AbstractType implements ComplexType
                 if (setter != null)
                 {
                     Type type = property.getType();
-                    setter.invoke(instance, type.instantiate(record.get(name)));
+                    try
+                    {
+                        setter.invoke(instance, type.instantiate(record.get(name)));
+                    }
+                    catch (Exception e)
+                    {
+                        if (exception == null)
+                        {
+                            exception = new TypeConversionException();
+                        }
+                        exception.addFieldError(name, e.getMessage());
+                    }
                 }
             }
 
+            if (exception != null)
+            {
+                throw exception;
+            }
+
             return instance;
+        }
+        catch (TypeConversionException e)
+        {
+            // let the type conversion exception pass through.
+            throw e;
         }
         catch (Exception e)
         {

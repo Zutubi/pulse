@@ -2,11 +2,12 @@ package com.zutubi.prototype.wizard.webwork;
 
 import com.opensymphony.util.TextUtils;
 import com.opensymphony.xwork.ActionContext;
+import com.zutubi.prototype.config.ConfigurationPersistenceManager;
+import com.zutubi.prototype.type.CollectionType;
 import com.zutubi.prototype.type.Type;
 import com.zutubi.prototype.type.TypeException;
-import com.zutubi.prototype.type.TypeRegistry;
-import com.zutubi.prototype.type.record.MutableRecordImpl;
 import com.zutubi.prototype.type.record.Record;
+import com.zutubi.prototype.webwork.PrototypeInteractionHandler;
 import com.zutubi.prototype.webwork.PrototypeUtils;
 import com.zutubi.prototype.wizard.Wizard;
 import com.zutubi.prototype.wizard.WizardState;
@@ -14,7 +15,11 @@ import com.zutubi.pulse.bootstrap.ComponentContext;
 import com.zutubi.pulse.util.logging.Logger;
 import com.zutubi.pulse.validation.MessagesTextProvider;
 import com.zutubi.pulse.web.ActionSupport;
-import com.zutubi.validation.*;
+import com.zutubi.validation.DelegatingValidationContext;
+import com.zutubi.validation.ValidationContext;
+import com.zutubi.validation.ValidationException;
+import com.zutubi.validation.ValidationManager;
+import com.zutubi.validation.XWorkValidationAdapter;
 
 import java.util.Map;
 
@@ -33,7 +38,15 @@ public class ConfigurationWizardAction extends ActionSupport
 
     private boolean wizardRequiresLazyInitialisation = false;
 
-    private TypeRegistry typeRegistry;
+    private ConfigurationPersistenceManager configurationPersistenceManager;
+
+    private PrototypeInteractionHandler interactionHandler;
+
+    public ConfigurationWizardAction()
+    {
+        interactionHandler = new PrototypeInteractionHandler();
+        ComponentContext.autowire(interactionHandler);
+    }
 
     /**
      * Setter for the configuration path.
@@ -190,29 +203,15 @@ public class ConfigurationWizardAction extends ActionSupport
 
     private boolean validateState()
     {
+        Record record = getState().getRecord();
         try
         {
-            Record record = getState().getRecord();
-            Type type = getState().getType();
-
-            Object instance = type.instantiate(record);
-
-            ValidationContext context = createValidationContext(instance);
-
-            try
-            {
-                validationManager.validate(instance, context);
-                return !context.hasErrors();
-            }
-            catch (ValidationException e)
-            {
-                context.addActionError(e.getMessage());
-                return false;
-            }
+            return interactionHandler.validate(record, new XWorkValidationAdapter(this));
         }
         catch (TypeException e)
         {
             e.printStackTrace();
+            addActionError(e.getMessage());
             return false;
         }
     }
@@ -223,7 +222,7 @@ public class ConfigurationWizardAction extends ActionSupport
         {
             Object wizard = getWizardInstance();
 
-            ValidationContext validationContext = createValidationContext(wizard);
+            ValidationContext validationContext = createValidationContext(wizard.getClass());
 
             // validate the form input
             validationManager.validate(wizard, validationContext);
@@ -237,7 +236,7 @@ public class ConfigurationWizardAction extends ActionSupport
         }
     }
 
-    private ValidationContext createValidationContext(Object subject)
+    private ValidationContext createValidationContext(Class subject)
     {
         MessagesTextProvider textProvider = new MessagesTextProvider(subject);
         return new DelegatingValidationContext(new XWorkValidationAdapter(this), textProvider);
@@ -250,8 +249,7 @@ public class ConfigurationWizardAction extends ActionSupport
             Record post = PrototypeUtils.toRecord(getState().getType(), ActionContext.getContext().getParameters());
 
             // apply the posted record details to the current states record.
-            // TODO: mmmm, mutable
-            ((MutableRecordImpl) getState().getRecord()).update((MutableRecordImpl) post);
+            getState().getRecord().update(post);
         }
 
         // only validate when we are moving forwards in the wizard
@@ -297,8 +295,10 @@ public class ConfigurationWizardAction extends ActionSupport
     private String doFinish()
     {
         getWizardInstance().doFinish();
+        String newPath = ((AbstractTypeWizard) getWizardInstance()).getSuccessPath();
         removeWizard();
-        path = ((AbstractTypeWizard) getWizardInstance()).getSuccessPath();
+        path = newPath;
+
         return SUCCESS;
     }
 
@@ -346,7 +346,8 @@ public class ConfigurationWizardAction extends ActionSupport
 
     private void removeWizard()
     {
-        ActionContext.getContext().getSession().remove(path);
+        String sessionKey = normalizePath(this.path);
+        ActionContext.getContext().getSession().remove(sessionKey);
     }
 
     private void handleException(Exception e)
@@ -382,17 +383,33 @@ public class ConfigurationWizardAction extends ActionSupport
 
     protected Wizard doCreateWizard()
     {
-        Wizard wizardInstance;
-        if (path.equals("project"))
+        Wizard wizardInstance = null;
+
+        Type type = configurationPersistenceManager.getType(path);
+        if (type instanceof CollectionType)
         {
-            wizardInstance = new ConfigureProjectWizard();
-        }
-        else
-        {
-            wizardInstance = new SingleTypeWizard(path);
+            type = ((CollectionType) type).getCollectionType();
         }
 
-        ComponentContext.autowire(wizardInstance);
+        com.zutubi.prototype.annotation.Wizard annotation = (com.zutubi.prototype.annotation.Wizard) type.getAnnotation(com.zutubi.prototype.annotation.Wizard.class);
+        if (annotation != null)
+        {
+            try
+            {
+                wizardInstance = ComponentContext.createBean(annotation.value());
+            }
+            catch (Exception e)
+            {
+                e.printStackTrace();
+            }
+        }
+
+        if (wizardInstance == null)
+        {
+            wizardInstance = new SingleTypeWizard(path);
+            ComponentContext.autowire(wizardInstance);
+        }
+
         wizardRequiresLazyInitialisation = true;
         return wizardInstance;
     }
@@ -415,8 +432,8 @@ public class ConfigurationWizardAction extends ActionSupport
         this.validationManager = validationManager;
     }
 
-    public void setTypeRegistry(TypeRegistry typeRegistry)
+    public void setConfigurationPersistenceManager(ConfigurationPersistenceManager configurationPersistenceManager)
     {
-        this.typeRegistry = typeRegistry;
+        this.configurationPersistenceManager = configurationPersistenceManager;
     }
 }

@@ -5,6 +5,7 @@ import com.zutubi.prototype.type.CompositeType;
 import com.zutubi.prototype.type.Type;
 import com.zutubi.prototype.type.TypeRegistry;
 import com.zutubi.pulse.i18n.Messages;
+import com.zutubi.pulse.util.logging.Logger;
 
 import java.lang.annotation.Annotation;
 
@@ -14,6 +15,8 @@ import java.lang.annotation.Annotation;
  */
 public class TypeSelectAnnotationHandler extends FieldAnnotationHandler
 {
+    private static final Logger LOG = Logger.getLogger(TypeSelectAnnotationHandler.class);
+
     private TypeRegistry typeRegistry;
 
     public void process(Annotation annotation, Descriptor descriptor)
@@ -52,7 +55,7 @@ public class TypeSelectAnnotationHandler extends FieldAnnotationHandler
         }
         catch (Exception e)
         {
-            e.printStackTrace();
+            LOG.severe(e);
         }
     }
 

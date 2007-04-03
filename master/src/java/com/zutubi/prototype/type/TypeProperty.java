@@ -119,4 +119,13 @@ public class TypeProperty
     {
         return type.getClazz();
     }
+
+    public boolean isReadable()
+    {
+        return getter != null;
+    }
+    public boolean isWritable()
+    {
+        return setter != null;
+    }
 }
