@@ -20,6 +20,7 @@ public class ProjectFileObject extends AbstractPulseFileObject implements Projec
         nodesDefinitions.put("latest", LatestBuildFileObject.class);
         nodesDefinitions.put("successful", LatestSuccessfulBuildFileObject.class);
         nodesDefinitions.put("latestsuccessful", LatestSuccessfulBuildFileObject.class);
+        nodesDefinitions.put("scm", SCMRootFileObject.class);
         nodesDefinitions.put("specs", BuildSpecificationsFileObject.class);
     }
     private String displayName;

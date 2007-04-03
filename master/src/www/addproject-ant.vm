@@ -7,14 +7,14 @@
     <script type="text/javascript" src="$base/js/prototype.js"></script>
     <script type="text/javascript">
     <!--
-    	function openDirWindow()
-    	{
-    	    openBrowseWindow('$base', true, "ant.setup_details_workingDir", "");
-    	}
-
+        function openDirWindow()
+        {
+            openSCMSelectDialog("$base", false, "ant.setup", "details.workingDir", 0, "", "/scm");
+        }
+        
     	function openFileWindow()
     	{
-    	    openBrowseWindow('$base', false, "ant.setup_details_buildFile", "&prefix=" + $F("ant.setup_details_workingDir"));
+    	    openSCMSelectDialog("$base", true, "ant.setup", "details.buildFile", 0, "scm/" + $F("ant.setup_details_workingDir"), "/");
     	}
     -->
     </script>

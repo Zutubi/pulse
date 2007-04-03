@@ -1,7 +1,6 @@
 package com.zutubi.pulse.scm.svn;
 
 import com.zutubi.pulse.core.model.*;
-import com.zutubi.pulse.filesystem.remote.RemoteFile;
 import com.zutubi.pulse.scm.*;
 import com.zutubi.pulse.util.FileSystemUtils;
 import com.zutubi.pulse.util.IOUtils;
@@ -121,32 +120,6 @@ public class SVNServer implements SCMServer
         }
     }
 
-    /**
-     * Helper class for identifying the files added during a checkout.
-     */
-//    private class ChangeAccumulator implements ISVNWorkspaceListener
-//    {
-//        public List<Change> changes;
-//
-//        public ChangeAccumulator(List<Change> changes)
-//        {
-//            this.changes = changes;
-//        }
-//
-//        public void updated(String path, int contentsStatus, int propertiesStatus, long revision)
-//        {
-//            changes.add(new Change(path, Long.toString(revision), Change.Action.ADD));
-//        }
-//
-//        public void committed(String path, int kind)
-//        {
-//        }
-//
-//        public void modified(String path, int kind)
-//        {
-//        }
-//    }
-
     //=======================================================================
     // Construction
     //=======================================================================
@@ -154,7 +127,8 @@ public class SVNServer implements SCMServer
     /**
      * Creates a new SVNServer using the given location and default credentials.
      *
-     * @param url
+     * @param url the url of the SVN repository
+     * @throws com.zutubi.pulse.scm.SCMException on error
      */
     public SVNServer(String url) throws SCMException
     {
@@ -230,6 +204,11 @@ public class SVNServer implements SCMServer
     //=======================================================================
     // SCMServer interface
     //=======================================================================
+
+    public Set<SCMCapability> getCapabilities()
+    {
+        return new HashSet<SCMCapability>(Arrays.asList(SCMCapability.values()));
+    }
 
     public Map<String, String> getServerInfo() throws SCMException
     {
@@ -325,7 +304,7 @@ public class SVNServer implements SCMServer
         }
     }
 
-    public String checkout(Revision revision, String file) throws SCMException
+    public InputStream checkout(Revision revision, String file) throws SCMException
     {
         ByteArrayOutputStream os = new ByteArrayOutputStream(1024);
 
@@ -338,10 +317,10 @@ public class SVNServer implements SCMServer
             throw convertException(e);
         }
 
-        return os.toString();
+        return new ByteArrayInputStream(os.toByteArray());
     }
 
-    private boolean reportChanges(ChangeHandler handler, Revision from, Revision to, String... paths) throws SCMException
+    private boolean reportChanges(ChangeHandler handler, Revision from, Revision to) throws SCMException
     {
         if (to == null)
         {
@@ -355,7 +334,7 @@ public class SVNServer implements SCMServer
         {
             try
             {
-                if (log(repository, fromNumber, toNumber, handler, paths))
+                if (log(repository, fromNumber, toNumber, handler))
                 {
                     return true;
                 }
@@ -365,7 +344,7 @@ public class SVNServer implements SCMServer
                 {
                     SVNRepository repo = SVNRepositoryFactory.create(external.url);
                     repo.setAuthenticationManager(authenticationManager);
-                    if (log(repo, fromNumber, toNumber, handler, paths))
+                    if (log(repo, fromNumber, toNumber, handler))
                     {
                         return true;
                     }
@@ -381,12 +360,12 @@ public class SVNServer implements SCMServer
         return false;
     }
 
-    private boolean log(SVNRepository repository, long fromNumber, long toNumber, ChangeHandler handler, String... paths) throws SVNException, SCMException
+    private boolean log(SVNRepository repository, long fromNumber, long toNumber, ChangeHandler handler) throws SVNException, SCMException
     {
         List<SVNLogEntry> logs = new LinkedList<SVNLogEntry>();
         FilepathFilter filter = new ScmFilepathFilter(excludedPaths);
 
-        repository.log(paths, logs, fromNumber, toNumber, true, true);
+        repository.log(new String[]{""}, logs, fromNumber, toNumber, true, true);
         for (SVNLogEntry entry : logs)
         {
             NumericalRevision revision = new NumericalRevision(entry.getRevision());
@@ -495,16 +474,16 @@ public class SVNServer implements SCMServer
         }
     }
 
-    public List<Changelist> getChanges(Revision from, Revision to, String... paths) throws SCMException
+    public List<Changelist> getChanges(Revision from, Revision to) throws SCMException
     {
         ChangelistAccumulator accumulator = new ChangelistAccumulator();
-        reportChanges(accumulator, from, to, paths);
+        reportChanges(accumulator, from, to);
         return accumulator.getChangelists();
     }
 
     public List<Revision> getRevisionsSince(Revision from) throws SCMException
     {
-        List<Changelist> changes = getChanges(from, null, "");
+        List<Changelist> changes = getChanges(from, null);
         Collections.sort(changes, new Comparator<Changelist>()
         {
             public int compare(Changelist o1, Changelist o2)
@@ -528,7 +507,7 @@ public class SVNServer implements SCMServer
         if (latestRevision.getRevisionNumber() != ((NumericalRevision) since).getRevisionNumber())
         {
             ChangeDetector detector = new ChangeDetector();
-            reportChanges(detector, since, latestRevision, "");
+            reportChanges(detector, since, latestRevision);
             return detector.isChanged();
         }
         else
@@ -549,7 +528,7 @@ public class SVNServer implements SCMServer
         }
     }
 
-    public RemoteFile getFile(String path) throws SCMException
+    public SCMFile getFile(String path) throws SCMException
     {
         try
         {
@@ -561,7 +540,7 @@ public class SVNServer implements SCMServer
                 directory = true;
             }
 
-            return new RemoteFile(directory, null, path);
+            return new SCMFile(directory, path);
         }
         catch (SVNException e)
         {
@@ -569,7 +548,7 @@ public class SVNServer implements SCMServer
         }
     }
 
-    public List<RemoteFile> getListing(String path) throws SCMException
+    public List<SCMFile> getListing(String path) throws SCMException
     {
         LinkedList<SVNDirEntry> files = new LinkedList<SVNDirEntry>();
         try
@@ -581,7 +560,7 @@ public class SVNServer implements SCMServer
             throw convertException(e);
         }
 
-        List<RemoteFile> result = new LinkedList<RemoteFile>();
+        List<SCMFile> result = new LinkedList<SCMFile>();
         String pathPrefix = "";
         if (path.length() > 0)
         {
@@ -605,7 +584,7 @@ public class SVNServer implements SCMServer
                 continue;
             }
 
-            RemoteFile f = new RemoteFile(e.getName(), isDir, null, pathPrefix + e.getName());
+            SCMFile f = new SCMFile(e.getName(), isDir, pathPrefix + e.getName());
             result.add(f);
         }
 
@@ -645,11 +624,6 @@ public class SVNServer implements SCMServer
         {
             throw convertException(e);
         }
-    }
-
-    public boolean supportsUpdate()
-    {
-        return true;
     }
 
     boolean pathExists(Revision revision, SVNURL path) throws SVNException
@@ -698,12 +672,12 @@ public class SVNServer implements SCMServer
         }
     }
 
-    public Map<String, String> getConnectionProperties(String id, File dir) throws SCMException
+    public Map<String, String> getEnvironmentVariables(String id, File dir) throws SCMException
     {
         return Collections.EMPTY_MAP;
     }
 
-    public void writeConnectionDetails(File outputDir) throws SCMException, IOException
+    public void storeConnectionDetails(File outputDir) throws SCMException, IOException
     {
         Properties props = new Properties();
         props.put("location", getLocation());
@@ -723,12 +697,6 @@ public class SVNServer implements SCMServer
     public FileStatus.EOLStyle getEOLPolicy()
     {
         return FileStatus.EOLStyle.BINARY;
-    }
-
-    public FileRevision getFileRevision(String path, Revision repoRevision)
-    {
-        // Subversion does not distinguish between file and repo revisions
-        return new NumericalFileRevision(((NumericalRevision) repoRevision).getRevisionNumber());
     }
 
     public Revision getRevision(String revision) throws SCMException
@@ -763,7 +731,7 @@ public class SVNServer implements SCMServer
         {
             SVNServer server = new SVNServer("svn+ssh://jason@www.anyhews.net/usr/local/svn-repo/pulse/trunk", argv[0], argv[1]);
             //server.checkout(new File("/home/jsankey/svntest"), new SVNRevision(ISVNWorkspace.HEAD));
-            List<Changelist> cls = server.getChanges(new NumericalRevision(47), new NumericalRevision(-1), "");
+            List<Changelist> cls = server.getChanges(new NumericalRevision(47), new NumericalRevision(-1));
 
             for (Changelist l : cls)
             {

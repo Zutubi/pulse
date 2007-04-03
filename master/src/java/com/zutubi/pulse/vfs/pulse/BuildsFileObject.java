@@ -36,7 +36,7 @@ public class BuildsFileObject extends AbstractPulseFileObject
         long id = Long.parseLong(str);
 
         // else, is it a build number?
-        ProjectProvider provider = (ProjectProvider) getAncestor(ProjectProvider.class);
+        ProjectProvider provider = getAncestor(ProjectProvider.class);
         if (provider != null)
         {
             Project project = provider.getProject();

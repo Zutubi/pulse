@@ -34,15 +34,6 @@ public class RecordManagerTest extends TestCase
 
         Record hello = recordManager.load("hello");
         assertNotNull(hello.get("world"));
-
-        try
-        {
-            recordManager.insert("hello/world/key", new MutableRecordImpl());
-            fail();
-        }
-        catch (IllegalArgumentException e)
-        {
-        }
     }
 
     public void testLoad()

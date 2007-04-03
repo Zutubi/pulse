@@ -2,13 +2,14 @@ package com.zutubi.pulse.vfs.pulse;
 
 import com.zutubi.pulse.core.model.CommandResult;
 import com.zutubi.pulse.core.model.StoredArtifact;
+import com.zutubi.pulse.vfs.FileAction;
 import org.apache.commons.vfs.FileName;
 import org.apache.commons.vfs.FileSystemException;
 import org.apache.commons.vfs.FileType;
 import org.apache.commons.vfs.provider.AbstractFileSystem;
 
 import java.io.File;
-import java.util.LinkedList;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -117,20 +118,20 @@ public class ArtifactFileObject extends AbstractPulseFileObject implements Artif
         return getArtifact().getName();
     }
 
-    public List<String> getActions()
+    public List<FileAction> getActions()
     {
-        List<String> actions = new LinkedList<String>();
+        List<FileAction> actions = new ArrayList<FileAction>(3);
         if(isLinkArtifact)
         {
-            actions.add("link");
+            actions.add(new FileAction("link", getUrlPath()));
         }
         else if (getArtifactBase().isDirectory())
         {
             if (isHtmlArtifact)
             {
-                actions.add("download");
+                actions.add(new FileAction("download", getUrlPath()));
             }
-            actions.add("archive");
+            actions.add(new FileAction("archive", "/zip.action?path=" + getName().getURI()));
         }
         return actions;
     }

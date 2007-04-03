@@ -5,10 +5,10 @@ import com.opensymphony.webwork.ServletActionContext;
 import com.opensymphony.webwork.dispatcher.WebWorkResultSupport;
 import com.opensymphony.xwork.ActionInvocation;
 import com.opensymphony.xwork.util.OgnlValueStack;
-import com.zutubi.pulse.util.IOUtils;
-import com.zutubi.pulse.util.logging.Logger;
 import com.zutubi.pulse.bootstrap.ComponentContext;
 import com.zutubi.pulse.bootstrap.MasterConfigurationManager;
+import com.zutubi.pulse.util.IOUtils;
+import com.zutubi.pulse.util.logging.Logger;
 import org.json.JSONException;
 import org.json.JSONWriter;
 import org.w3c.dom.Document;
@@ -25,8 +25,8 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import java.io.*;
 import java.util.Collection;
-import java.util.List;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -43,6 +43,7 @@ public class JsonResult extends WebWorkResultSupport
         HttpServletResponse response = ServletActionContext.getResponse();
         OgnlValueStack stack = ai.getStack();
 
+        
         Writer writer = new OutputStreamWriter(response.getOutputStream(), response.getCharacterEncoding());
         JSONWriter jw = new JSONWriter(writer);
 

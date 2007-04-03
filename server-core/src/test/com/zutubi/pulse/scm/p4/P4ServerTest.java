@@ -1,11 +1,12 @@
 package com.zutubi.pulse.scm.p4;
 
 import com.zutubi.pulse.core.model.*;
-import com.zutubi.pulse.filesystem.remote.RemoteFile;
 import com.zutubi.pulse.scm.SCMChangeAccumulator;
 import com.zutubi.pulse.scm.SCMException;
+import com.zutubi.pulse.scm.SCMFile;
 import com.zutubi.pulse.test.PulseTestCase;
 import com.zutubi.pulse.util.FileSystemUtils;
+import com.zutubi.pulse.util.IOUtils;
 import com.zutubi.pulse.util.SystemUtils;
 import com.zutubi.pulse.util.ZipUtils;
 
@@ -114,17 +115,17 @@ public class P4ServerTest extends PulseTestCase
         checkDirectory("checkoutRevision");
     }
 
-    public void testCheckoutFile() throws SCMException
+    public void testCheckoutFile() throws SCMException, IOException
     {
         getServer("depot-client");
-        String content = server.checkout(null, FileSystemUtils.composeFilename("depot", "file2"));
+        String content = IOUtils.inputStreamToString(server.checkout(null, FileSystemUtils.composeFilename("depot", "file2")));
         assertEquals("content of file2: edited at the same time as file2 in depot2.\n", content);
     }
 
-    public void testCheckoutFileRevision() throws SCMException
+    public void testCheckoutFileRevision() throws SCMException, IOException
     {
         getServer("depot-client");
-        String content = server.checkout(new NumericalRevision(2), FileSystemUtils.composeFilename("depot", "file2"));
+        String content = IOUtils.inputStreamToString(server.checkout(new NumericalRevision(2), FileSystemUtils.composeFilename("depot", "file2")));
         assertEquals("content of file2\n", content);
     }
 
@@ -170,7 +171,7 @@ public class P4ServerTest extends PulseTestCase
         //  { uid: :6666, rev: 3, changes: [//depot2/file1#2 - EDIT, //depot2/file10#2 - DELETE] },
         //  { uid: :6666, rev: 2, changes: [//depot2/file1#1 - ADD, //depot2/file10#1 - ADD, //depot2/file2#1 - ADD, //depot2/file3#1 - ADD, //depot2/file4#1 - ADD, //depot2/file5#1 - ADD, //depot2/file6#1 - ADD, //depot2/file7#1 - ADD, //depot2/file8#1 - ADD, //depot2/file9#1 - ADD] }]
         getServer(TEST_CLIENT);
-        List<Changelist> changes = server.getChanges(new NumericalRevision(1), new NumericalRevision(7), "");
+        List<Changelist> changes = server.getChanges(new NumericalRevision(1), new NumericalRevision(7));
         assertEquals(6, changes.size());
         Changelist list = changes.get(1);
         assertEquals("Delete and edit files in depot2.", list.getComment());
@@ -189,7 +190,7 @@ public class P4ServerTest extends PulseTestCase
     public void testGetChangesRestrictedToView() throws Exception
     {
         getServer("depot-client");
-        List<Changelist> changes = server.getChanges(new NumericalRevision(1), new NumericalRevision(7), "");
+        List<Changelist> changes = server.getChanges(new NumericalRevision(1), new NumericalRevision(7));
         assertEquals(1, changes.size());
         assertEquals(4, ((NumericalRevision) changes.get(0).getRevision()).getRevisionNumber());
     }
@@ -211,9 +212,9 @@ public class P4ServerTest extends PulseTestCase
     public void testListRoot() throws SCMException
     {
         getServer(TEST_CLIENT);
-        List<RemoteFile> files = server.getListing("");
+        List<SCMFile> files = server.getListing("");
         assertEquals(2, files.size());
-        RemoteFile f = files.get(0);
+        SCMFile f = files.get(0);
         assertEquals("depot", f.getName());
         assertTrue(f.isDirectory());
 
@@ -226,10 +227,10 @@ public class P4ServerTest extends PulseTestCase
     public void testListPath() throws SCMException
     {
         getServer(TEST_CLIENT);
-        List<RemoteFile> files = server.getListing("depot2");
+        List<SCMFile> files = server.getListing("depot2");
         assertEquals(10, files.size());
 
-        RemoteFile f;
+        SCMFile f;
         for (int i = 0; i < 9; i++)
         {
             f = files.get(i);
@@ -248,41 +249,41 @@ public class P4ServerTest extends PulseTestCase
     public void testListComplexClient() throws SCMException
     {
         getServer("complex-client");
-        List<RemoteFile> files = server.getListing("");
+        List<SCMFile> files = server.getListing("");
         assertEquals(1, files.size());
-        RemoteFile remoteFile = files.get(0);
-        assertEquals("src", remoteFile.getName());
-        assertTrue(remoteFile.isDirectory());
+        SCMFile scmFile = files.get(0);
+        assertEquals("src", scmFile.getName());
+        assertTrue(scmFile.isDirectory());
     }
 
     public void testListComplexSrc() throws SCMException
     {
         getServer("complex-client");
-        List<RemoteFile> files = server.getListing("src");
+        List<SCMFile> files = server.getListing("src");
         assertEquals(2, files.size());
 
-        RemoteFile remoteFile = files.get(0);
-        assertEquals("host", remoteFile.getName());
-        assertTrue(remoteFile.isDirectory());
+        SCMFile scmFile = files.get(0);
+        assertEquals("host", scmFile.getName());
+        assertTrue(scmFile.isDirectory());
 
-        remoteFile = files.get(1);
-        assertEquals("libraries", remoteFile.getName());
-        assertTrue(remoteFile.isDirectory());
+        scmFile = files.get(1);
+        assertEquals("libraries", scmFile.getName());
+        assertTrue(scmFile.isDirectory());
     }
 
     public void testListComplexSnuth() throws SCMException
     {
         getServer("complex-client");
-        List<RemoteFile> files = server.getListing("src/libraries/snuth");
+        List<SCMFile> files = server.getListing("src/libraries/snuth");
         assertEquals(2, files.size());
 
-        RemoteFile remoteFile = files.get(0);
-        assertEquals("Makefile", remoteFile.getName());
-        assertFalse(remoteFile.isDirectory());
+        SCMFile scmFile = files.get(0);
+        assertEquals("Makefile", scmFile.getName());
+        assertFalse(scmFile.isDirectory());
 
-        remoteFile = files.get(1);
-        assertEquals("source.c", remoteFile.getName());
-        assertFalse(remoteFile.isDirectory());
+        scmFile = files.get(1);
+        assertEquals("source.c", scmFile.getName());
+        assertFalse(scmFile.isDirectory());
     }
 
     public void testTag() throws SCMException

@@ -1,18 +1,17 @@
 package com.zutubi.pulse.web.vfs;
 
-import org.apache.commons.vfs.FileObject;
-import org.apache.commons.vfs.FileType;
-import org.apache.commons.vfs.FileSystemException;
-import org.apache.commons.vfs.FileName;
-
-import java.io.File;
-import java.util.List;
-import java.util.Collections;
-
+import com.zutubi.pulse.util.logging.Logger;
+import com.zutubi.pulse.vfs.FileAction;
 import com.zutubi.pulse.vfs.pulse.AbstractPulseFileObject;
 import com.zutubi.pulse.vfs.pulse.AddressableFileObject;
 import com.zutubi.pulse.vfs.pulse.FileTypeConstants;
-import com.zutubi.pulse.util.logging.Logger;
+import org.apache.commons.vfs.FileObject;
+import org.apache.commons.vfs.FileSystemException;
+import org.apache.commons.vfs.FileType;
+
+import java.io.File;
+import java.util.Collections;
+import java.util.List;
 
 /**
  * <class comment/>
@@ -140,7 +139,8 @@ public class FileObjectWrapper
         return File.separator;
     }
 
-    public List<String> getActions()
+    @SuppressWarnings({"unchecked"})
+    public List<FileAction> getActions()
     {
         if (fo instanceof AbstractPulseFileObject)
         {

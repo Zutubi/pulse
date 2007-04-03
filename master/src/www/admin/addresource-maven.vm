@@ -8,14 +8,7 @@
     <!--
     	function openBrowseFileDialog()
     	{
-    	    if ($agentId == -1)
-    	    {
-    	        openFileDialog('$base/popups/fileDialog.action', 'resource.add.maven', 'dir', 'local:///', false, false, false);
-    	    }
-    	    else
-    	    {
-    	        openFileDialog('$base/popups/fileDialog.action', 'resource.add.maven', 'dir', 'agent://$agentId/', false, false, false);
-    	    }
+    	    openResourceDialog('$base', $agentId, 'resource.add.maven', 'dir');
     	    return false;
     	}
     -->

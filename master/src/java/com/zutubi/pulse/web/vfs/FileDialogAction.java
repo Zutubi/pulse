@@ -20,6 +20,11 @@ public class FileDialogAction extends VFSActionSupport
     private String root;
 
     /**
+     * The prefix is stripped when the value is eventually selected.
+     */
+    private String prefix;
+
+    /**
      * The initial path defines what directory path should be opened
      */
     private String initialPath;
@@ -53,6 +58,16 @@ public class FileDialogAction extends VFSActionSupport
     public void setRoot(String root)
     {
         this.root = root;
+    }
+
+    public String getPrefix()
+    {
+        return prefix;
+    }
+
+    public void setPrefix(String prefix)
+    {
+        this.prefix = prefix;
     }
 
     public String getInitialPath()

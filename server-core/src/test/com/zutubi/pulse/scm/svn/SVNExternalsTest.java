@@ -162,7 +162,7 @@ public class SVNExternalsTest extends PulseTestCase
     public void testGetChangesOnExternal() throws Exception
     {
         server.addExternalPath(".");
-        List<Changelist> changes = server.getChanges(new NumericalRevision(5), new NumericalRevision(6), "");
+        List<Changelist> changes = server.getChanges(new NumericalRevision(5), new NumericalRevision(6));
         assertEquals(1, changes.size());
         assertChange(changes.get(0), "6", "/ext1/trunk/file1");
     }
@@ -170,7 +170,7 @@ public class SVNExternalsTest extends PulseTestCase
     public void testGetChangesOnExternalAndBundle() throws Exception
     {
         server.addExternalPath(".");
-        List<Changelist> changes = server.getChanges(new NumericalRevision(4), new NumericalRevision(6), "");
+        List<Changelist> changes = server.getChanges(new NumericalRevision(4), new NumericalRevision(6));
         assertEquals(2, changes.size());
         assertChange(changes.get(0), "5", "/bundle/trunk/file1");
         assertChange(changes.get(1), "6", "/ext1/trunk/file1");
@@ -179,14 +179,14 @@ public class SVNExternalsTest extends PulseTestCase
     public void testGetChangesOnMetaExternals() throws Exception
     {
         server.addExternalPath(".");
-        List<Changelist> changes = server.getChanges(new NumericalRevision(6), new NumericalRevision(7), "");
+        List<Changelist> changes = server.getChanges(new NumericalRevision(6), new NumericalRevision(7));
         assertEquals(0, changes.size());
     }
 
     public void testGetChangesOnAll() throws Exception
     {
         server.addExternalPath(".");
-        List<Changelist> changes = server.getChanges(new NumericalRevision(7), new NumericalRevision(8), "");
+        List<Changelist> changes = server.getChanges(new NumericalRevision(7), new NumericalRevision(8));
         assertEquals(1, changes.size());
         assertChange(changes.get(0), "8", "/bundle/trunk/file2", "/ext1/trunk/file2", "/meta/trunk/file2", "/ext2/trunk/file2");
     }
@@ -268,7 +268,7 @@ public class SVNExternalsTest extends PulseTestCase
     {
         SVNServer server = new SVNServer("http://svn.nuxeo.org/nuxeo/bundles/ECM-trunk");
         server.addExternalPath(".");
-        List<Changelist> changelists = server.getChanges(new NumericalRevision(6600), new NumericalRevision(6603), "");
+        List<Changelist> changelists = server.getChanges(new NumericalRevision(6600), new NumericalRevision(6603));
         for(Changelist list: changelists)
         {
             System.out.println(list.getRevision().getRevisionString() + ": " + list.getComment());

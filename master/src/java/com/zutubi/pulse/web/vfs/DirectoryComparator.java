@@ -1,16 +1,13 @@
 package com.zutubi.pulse.web.vfs;
 
-import com.zutubi.pulse.util.FileSystemUtils;
 import com.zutubi.pulse.util.logging.Logger;
-import com.zutubi.pulse.vfs.pulse.AbstractPulseFileObject;
-
-import java.io.File;
-import java.util.Comparator;
-import java.text.Collator;
-
+import com.zutubi.pulse.vfs.pulse.PluginFileObject;
 import org.apache.commons.vfs.FileObject;
-import org.apache.commons.vfs.FileType;
 import org.apache.commons.vfs.FileSystemException;
+import org.apache.commons.vfs.FileType;
+
+import java.text.Collator;
+import java.util.Comparator;
 
 /**
  * <class-comment/>
@@ -41,9 +38,9 @@ public class DirectoryComparator implements Comparator<FileObject>
             }
 
             // then sort alphabetically
-            if(o1 instanceof AbstractPulseFileObject)
+            if(o1 instanceof PluginFileObject)
             {
-                return c.compare(((AbstractPulseFileObject)o1).getDisplayName(), ((AbstractPulseFileObject)o2).getDisplayName());
+                return c.compare(((PluginFileObject)o1).getDisplayName(), ((PluginFileObject)o2).getDisplayName());
             }
 
             return c.compare(o1.getName().getPath(), o2.getName().getPath());

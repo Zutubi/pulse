@@ -2,15 +2,13 @@ package com.zutubi.pulse.scm.p4;
 
 import com.opensymphony.util.TextUtils;
 import com.zutubi.pulse.core.model.*;
-import com.zutubi.pulse.filesystem.remote.CachingRemoteFile;
+import com.zutubi.pulse.filesystem.remote.CachingSCMFile;
 import com.zutubi.pulse.scm.*;
 import static com.zutubi.pulse.scm.p4.P4Constants.*;
 import com.zutubi.pulse.util.FileSystemUtils;
 import com.zutubi.pulse.util.logging.Logger;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.UnsupportedEncodingException;
+import java.io.*;
 import java.net.URLEncoder;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -139,9 +137,9 @@ public class P4Server extends CachingSCMServer
     public void populate(SCMFileCache.CacheItem item) throws SCMException
     {
         item.cachedRevision = getLatestRevision();
-        item.cachedListing = new TreeMap<String, CachingRemoteFile>();
+        item.cachedListing = new TreeMap<String, CachingSCMFile>();
 
-        CachingRemoteFile rootFile = new CachingRemoteFile("", true, null, "");
+        CachingSCMFile rootFile = new CachingSCMFile("", true, null, "");
         item.cachedListing.put("", rootFile);
 
         String clientName = updateClient(null, null);
@@ -426,6 +424,11 @@ public class P4Server extends CachingSCMServer
         this.client.setEnv(ENV_CLIENT, client);
     }
 
+    public Set<SCMCapability> getCapabilities()
+    {
+        return new HashSet<SCMCapability>(Arrays.asList(SCMCapability.values()));
+    }
+
     public Map<String, String> getServerInfo() throws SCMException
     {
         return client.getServerInfo(templateClient);
@@ -454,7 +457,7 @@ public class P4Server extends CachingSCMServer
         return sync(id, toDirectory, revision, handler, true);
     }
 
-    public String checkout(Revision revision, String file) throws SCMException
+    public InputStream checkout(Revision revision, String file) throws SCMException
     {
         String clientName = updateClient(null, null);
 
@@ -469,7 +472,7 @@ public class P4Server extends CachingSCMServer
             }
 
             P4Client.P4Result result = client.runP4(null, P4_COMMAND, FLAG_CLIENT, clientName, "print", "-q", fileArgument);
-            return result.stdout.toString();
+            return new ByteArrayInputStream(result.stdout.toString().getBytes("US-ASCII"));
         }
         catch (SCMException e)
         {
@@ -483,13 +486,18 @@ public class P4Server extends CachingSCMServer
                 throw e;
             }
         }
+        catch (UnsupportedEncodingException e)
+        {
+            // Programmer error
+            throw new SCMException(e);
+        }
         finally
         {
             deleteClient(clientName);
         }
     }
 
-    public List<Changelist> getChanges(Revision from, Revision to, String... paths) throws SCMException
+    public List<Changelist> getChanges(Revision from, Revision to) throws SCMException
     {
         List<Changelist> result = new LinkedList<Changelist>();
         getRevisions(from, to, result);
@@ -595,11 +603,6 @@ public class P4Server extends CachingSCMServer
         sync(id, workDir, rev, handler, false);
     }
 
-    public boolean supportsUpdate()
-    {
-        return true;
-    }
-
     public void tag(Revision revision, String name, boolean moveExisting) throws SCMException
     {
         String clientName = updateClient(null, null);
@@ -622,14 +625,14 @@ public class P4Server extends CachingSCMServer
         }
     }
 
-    public Map<String, String> getConnectionProperties(String id, File dir) throws SCMException
+    public Map<String, String> getEnvironmentVariables(String id, File dir) throws SCMException
     {
         Map<String, String> result = client.getEnv();
         result.put("P4CLIENT", getClientName(id));
         return result;
     }
 
-    public void writeConnectionDetails(File outputDir) throws SCMException, IOException
+    public void storeConnectionDetails(File outputDir) throws SCMException, IOException
     {
         P4Client.P4Result result = client.runP4(null, P4_COMMAND, FLAG_CLIENT, templateClient, COMMAND_INFO);
         FileSystemUtils.createFile(new File(outputDir, "server-info.txt"), result.stdout.toString());
@@ -803,7 +806,7 @@ public class P4Server extends CachingSCMServer
         try
         {
             server.checkout(new NumericalRevision(2), "file");
-            List<Changelist> cls = server.getChanges(new NumericalRevision(2), new NumericalRevision(6), "");
+            List<Changelist> cls = server.getChanges(new NumericalRevision(2), new NumericalRevision(6));
 
             for (Changelist l : cls)
             {

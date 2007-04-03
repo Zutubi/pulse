@@ -48,10 +48,21 @@
                 var tree = YAHOO.widget.TreeView.getTree('browseTree');
                 if (tree.selected)
                 {
-                    var path = tree.selected.getPath();
+                    var path = tree.selected.getIdPath();
                     if ('$separator' == '/' && path.charAt(0) != '/')
                     {
                         path = '/' + path;
+                    }
+                    if('$prefix' && path.indexOf('$prefix') == 0)
+                    {
+                        // Make path relative to the prefix.  We may need to
+                        // strip a leading separator after we remove the
+                        // prefix.
+                        path = path.substring('$prefix'.length);
+                        if(path.length > 0 && path[0] == '$separator')
+                        {
+                            path = path.substring(1);
+                        }
                     }
                     setFormValue(path);
                 }
@@ -233,10 +244,10 @@
 
                 // generate id path.
                 var p = "";
-                if (node.getPath)
+                if (node.getIdPath)
                 {
                     // not available for Yahoo.widget.RootNodes
-                    p = node.getPath();
+                    p = node.getIdPath();
                 }
 
                 var ajax = new Ajax.Request(

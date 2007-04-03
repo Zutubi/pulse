@@ -8,14 +8,7 @@
     <!--
     	function openBrowseFileDialog()
     	{
-    	    if ($agentId == -1)
-    	    {
-    	        openFileDialog('$base/popups/fileDialog.action', 'resource.add.ant', 'dir', 'local:///', false, false, false);
-    	    }
-    	    else
-    	    {
-    	        openFileDialog('$base/popups/fileDialog.action', 'resource.add.ant', 'dir', 'agent://$agentId/', false, false, false);
-    	    }
+    	    openResourceDialog('$base', $agentId, 'resource.add.ant', 'dir');
     	    return false;
     	}
     -->

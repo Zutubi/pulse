@@ -528,7 +528,7 @@ public class BuildController implements EventListener
     private List<Changelist> getChangeSince(SCMServer server, Revision previousRevision, Revision revision) throws SCMException
     {
         List<Changelist> result = new LinkedList<Changelist>();
-        List<Changelist> scmChanges = server.getChanges(previousRevision, revision, "");
+        List<Changelist> scmChanges = server.getChanges(previousRevision, revision);
 
         // Get the uid after the changes as Svn requires a connection to be
         // made first

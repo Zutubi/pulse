@@ -469,21 +469,14 @@ YAHOO.extend(ZUTUBI.widget.FileNode, YAHOO.widget.TextNode, {
 
     getActionLink: function(action)
     {
-        if(action == "link")
+        var url = action.url;
+        if(url.length > 0 && url[0] == '/')
         {
-            return this.data.url;
+            return this.tree.base + url;
         }
-        else if (action == "download" || action == "html")
+        else
         {
-            return this.tree.base + this.data.url;
-        }
-        else if (action == "decorate")
-        {
-            return this.tree.base+"/viewArtifact.action?path=" + this.tree.fsRoot + this.getIdPath();
-        }
-        else if (action == "archive")
-        {
-            return this.tree.base+"/zip.action?path=" + this.tree.fsRoot + this.getIdPath();
+            return url;
         }
     },
 
@@ -558,7 +551,7 @@ YAHOO.extend(ZUTUBI.widget.FileNode, YAHOO.widget.TextNode, {
         {
             sb[sb.length] = '<td>';
             sb[sb.length] = '<a href="' +self.getActionLink(action)+ '">';
-            sb[sb.length] = '<div class="'+action+'">';
+            sb[sb.length] = '<div class="'+action.type+'">';
             sb[sb.length] = '&nbsp;';
             sb[sb.length] = '</div>';
             sb[sb.length] = '</a>';
@@ -614,7 +607,7 @@ YAHOO.extend(ZUTUBI.widget.PulseTreeView, ZUTUBI.widget.TreeView, {
     ls: function(node, onCompleteCallback, showFiles, showHidden, depth, prefix)
     {
         this.hideActionErrors();
-            
+
         // generate id path.
         var p = "";
         if (node.tree.getIdPath)
@@ -666,7 +659,7 @@ YAHOO.extend(ZUTUBI.widget.PulseTreeView, ZUTUBI.widget.TreeView, {
                 };
 
                 var parentNode = self.getNodeByPath(baseNode, obj.relativeParentPath);
-                if(parentNode != baseNode)
+                if(parentNode && parentNode != baseNode)
                 {
                     parentNode.expanded = true;
                     parentNode.dynamicLoadComplete = true;

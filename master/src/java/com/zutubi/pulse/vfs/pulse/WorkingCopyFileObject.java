@@ -1,6 +1,7 @@
 package com.zutubi.pulse.vfs.pulse;
 
 import com.zutubi.pulse.model.Project;
+import com.zutubi.pulse.vfs.FileAction;
 import org.apache.commons.vfs.FileName;
 import org.apache.commons.vfs.FileSystemException;
 import org.apache.commons.vfs.FileType;
@@ -44,12 +45,12 @@ public class WorkingCopyFileObject extends AbstractPulseFileObject implements Ad
         return FileType.FILE;
     }
 
-    public List<String> getActions()
+    public List<FileAction> getActions()
     {
         if (base.isFile())
         {
-            List<String> actions = new LinkedList<String>();
-            actions.add("download");
+            List<FileAction> actions = new LinkedList<FileAction>();
+            actions.add(new FileAction("download", getUrlPath()));
             return actions;
         }
         return super.getActions();
@@ -90,13 +91,13 @@ public class WorkingCopyFileObject extends AbstractPulseFileObject implements Ad
 
     private long getBuildId() throws FileSystemException
     {
-        BuildResultProvider provider = (BuildResultProvider) getAncestor(BuildResultProvider.class);
+        BuildResultProvider provider = getAncestor(BuildResultProvider.class);
         return provider.getBuildResultId();
     }
 
     private long getRecipeId() throws FileSystemException
     {
-        RecipeResultProvider provider = (RecipeResultProvider) getAncestor(RecipeResultProvider.class);
+        RecipeResultProvider provider = getAncestor(RecipeResultProvider.class);
         return provider.getRecipeResultId();
     }
 
@@ -110,7 +111,7 @@ public class WorkingCopyFileObject extends AbstractPulseFileObject implements Ad
     {
         try
         {
-            ProjectProvider node = (ProjectProvider) getAncestor(ProjectProvider.class);
+            ProjectProvider node = getAncestor(ProjectProvider.class);
             Project project = node.getProject();
             projectManager.checkWrite(project);
             return true;

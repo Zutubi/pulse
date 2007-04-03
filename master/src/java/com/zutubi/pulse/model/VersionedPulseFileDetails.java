@@ -3,10 +3,11 @@ package com.zutubi.pulse.model;
 import com.zutubi.pulse.core.BuildException;
 import com.zutubi.pulse.core.model.Revision;
 import com.zutubi.pulse.personal.PatchArchive;
-import com.zutubi.pulse.scm.SCMException;
 import com.zutubi.pulse.util.FileSystemUtils;
+import com.zutubi.pulse.util.IOUtils;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.Properties;
 
 /**
@@ -59,9 +60,10 @@ public class VersionedPulseFileDetails extends PulseFileDetails
 
             try
             {
-                return scm.createServer().checkout(revision, pulseFileName);
+                InputStream is = scm.createServer().checkout(revision, pulseFileName);
+                return IOUtils.inputStreamToString(is);
             }
-            catch (SCMException e)
+            catch (Exception e)
             {
                 throw new BuildException("Unable to retrieve pulse file from SCM: " + e.getMessage());
             }

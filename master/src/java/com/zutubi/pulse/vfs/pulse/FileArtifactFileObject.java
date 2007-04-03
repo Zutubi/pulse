@@ -3,6 +3,7 @@ package com.zutubi.pulse.vfs.pulse;
 import com.zutubi.pulse.core.model.StoredArtifact;
 import com.zutubi.pulse.core.model.StoredFileArtifact;
 import com.zutubi.pulse.util.logging.Logger;
+import com.zutubi.pulse.vfs.FileAction;
 import org.apache.commons.vfs.FileName;
 import org.apache.commons.vfs.FileSystemException;
 import org.apache.commons.vfs.FileType;
@@ -113,16 +114,16 @@ public class FileArtifactFileObject extends AbstractPulseFileObject implements A
         }
     }
 
-    public List<String> getActions()
+    public List<FileAction> getActions()
     {
-        List<String> actions = new LinkedList<String>();
+        List<FileAction> actions = new LinkedList<FileAction>();
         if (base.isFile())
         {
-            actions.add("download");
+            actions.add(new FileAction("download", getUrlPath()));
         }
         if (canDecorate())
         {
-            actions.add("decorate");
+            actions.add(new FileAction("decorate", "/viewArtifact.action?path=" + getName().getURI()));
         }
         return actions;
     }

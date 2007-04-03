@@ -7,10 +7,10 @@
     <script type="text/javascript" src="$base/js/prototype.js"></script>
     <script type="text/javascript">
     <!--
-    	function openDirWindow()
-    	{
-    	    openBrowseWindow('$base', true, "editExecutableDetails_details_workingDir", "&id=$project.id");
-    	}
+        function openDirWindow()
+        {
+            openSCMSelectDialog("$base", false, "editExecutableDetails", "details.workingDir", $project.id, "", "/scm");
+        }
     -->
     </script>
 </head>

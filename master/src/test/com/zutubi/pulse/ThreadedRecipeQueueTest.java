@@ -13,7 +13,6 @@ import com.zutubi.pulse.events.EventListener;
 import com.zutubi.pulse.events.build.RecipeCompletedEvent;
 import com.zutubi.pulse.events.build.RecipeDispatchedEvent;
 import com.zutubi.pulse.events.build.RecipeErrorEvent;
-import com.zutubi.pulse.filesystem.remote.RemoteFile;
 import com.zutubi.pulse.model.*;
 import com.zutubi.pulse.personal.PatchArchive;
 import com.zutubi.pulse.scm.*;
@@ -23,12 +22,12 @@ import junit.framework.TestCase;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.*;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
 
 /**
- * <class-comment/>
  */
 public class ThreadedRecipeQueueTest extends TestCase implements EventListener
 {
@@ -784,6 +783,11 @@ public class ThreadedRecipeQueueTest extends TestCase implements EventListener
             this.throwError = throwError;
         }
 
+        public Set<SCMCapability> getCapabilities()
+        {
+            return new HashSet<SCMCapability>(Arrays.asList(SCMCapability.values()));            
+        }
+
         public Map<String, String> getServerInfo() throws SCMException
         {
             throw new RuntimeException("Method not implemented.");
@@ -809,12 +813,12 @@ public class ThreadedRecipeQueueTest extends TestCase implements EventListener
             throw new RuntimeException("Method not implemented.");
         }
 
-        public String checkout(Revision revision, String file) throws SCMException
+        public InputStream checkout(Revision revision, String file) throws SCMException
         {
             throw new RuntimeException("Method not implemented.");
         }
 
-        public List<Changelist> getChanges(Revision from, Revision to, String ...paths) throws SCMException
+        public List<Changelist> getChanges(Revision from, Revision to) throws SCMException
         {
             throw new RuntimeException("Method not implemented.");
         }
@@ -841,12 +845,12 @@ public class ThreadedRecipeQueueTest extends TestCase implements EventListener
             }
         }
 
-        public RemoteFile getFile(String path) throws SCMException
+        public SCMFile getFile(String path) throws SCMException
         {
             throw new RuntimeException("Method not implemented.");
         }
 
-        public List<RemoteFile> getListing(String path) throws SCMException
+        public List<SCMFile> getListing(String path) throws SCMException
         {
             throw new RuntimeException("Method not implemented.");
         }
@@ -856,22 +860,17 @@ public class ThreadedRecipeQueueTest extends TestCase implements EventListener
             throw new RuntimeException("Method not implemented.");
         }
 
-        public boolean supportsUpdate()
-        {
-            throw new RuntimeException("Method not implemented.");
-        }
-
         public void tag(Revision revision, String name, boolean moveExisting) throws SCMException
         {
             throw new RuntimeException("Method not implemented");
         }
 
-        public Map<String, String> getConnectionProperties(String id, File dir) throws SCMException
+        public Map<String, String> getEnvironmentVariables(String id, File dir) throws SCMException
         {
             throw new RuntimeException("Method not yet implemented.");
         }
 
-        public void writeConnectionDetails(File outputDir) throws SCMException, IOException
+        public void storeConnectionDetails(File outputDir) throws SCMException, IOException
         {
             throw new RuntimeException("Method not implemented.");
         }
@@ -879,11 +878,6 @@ public class ThreadedRecipeQueueTest extends TestCase implements EventListener
         public FileStatus.EOLStyle getEOLPolicy() throws SCMException
         {
             return FileStatus.EOLStyle.BINARY;
-        }
-
-        public FileRevision getFileRevision(String path, Revision repoRevision)
-        {
-            throw new RuntimeException("Method not implemented.");
         }
 
         public Revision getRevision(String revision) throws SCMException

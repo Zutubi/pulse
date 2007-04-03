@@ -4,10 +4,11 @@ import com.zutubi.pulse.core.model.Change;
 import com.zutubi.pulse.core.model.Changelist;
 import com.zutubi.pulse.core.model.NumericalRevision;
 import com.zutubi.pulse.core.model.Revision;
-import com.zutubi.pulse.filesystem.remote.RemoteFile;
 import com.zutubi.pulse.scm.SCMException;
+import com.zutubi.pulse.scm.SCMFile;
 import com.zutubi.pulse.test.PulseTestCase;
 import com.zutubi.pulse.util.FileSystemUtils;
+import com.zutubi.pulse.util.IOUtils;
 import com.zutubi.pulse.util.ZipUtils;
 import org.tmatesoft.svn.core.SVNURL;
 
@@ -27,7 +28,6 @@ public class SVNServerTest extends PulseTestCase
     private File tmpDir;
     private File gotDir;
     private File expectedDir;
-    private File repoDir;
     private Process serverProcess;
     private static final String TAG_PATH = "svn://localhost/test/tags/test-tag";
 
@@ -94,7 +94,7 @@ public class SVNServerTest extends PulseTestCase
         super.setUp();
         File dataFile = getTestDataFile("server-core", "data", "zip");
         tmpDir = FileSystemUtils.createTempDir(getClass().getName(), "");
-        repoDir = new File(tmpDir, "repo");
+        File repoDir = new File(tmpDir, "repo");
         repoDir.mkdirs();
 
         expectedDir = new File(repoDir, "expected");
@@ -127,7 +127,7 @@ public class SVNServerTest extends PulseTestCase
 
     public void testList() throws SCMException
     {
-        List<RemoteFile> files = server.getListing("afolder");
+        List<SCMFile> files = server.getListing("afolder");
         assertEquals(2, files.size());
         assertEquals("f1", files.get(0).getName());
         assertEquals("f2", files.get(1).getName());
@@ -146,46 +146,46 @@ public class SVNServerTest extends PulseTestCase
         }
     }
 
-    public void testTag() throws SCMException
+    public void testTag() throws SCMException, IOException
     {
         server.tag(new NumericalRevision(1), TAG_PATH, false);
 
         SVNServer confirmServer = new SVNServer(TAG_PATH, "jsankey", "password");
-        List<RemoteFile> files = getSortedListing(confirmServer);
+        List<SCMFile> files = getSortedListing(confirmServer);
 
         assertEquals(3, files.size());
         assertEquals("afolder", files.get(0).getName());
         assertEquals("bfolder", files.get(1).getName());
         assertEquals("foo", files.get(2).getName());
 
-        String foo = confirmServer.checkout(null, "foo");
+        String foo = IOUtils.inputStreamToString(confirmServer.checkout(null, "foo"));
         assertEquals("", foo);
     }
 
-    public void testMoveTag() throws SCMException
+    public void testMoveTag() throws SCMException, IOException
     {
         server.tag(new NumericalRevision(1), TAG_PATH, false);
         server.tag(new NumericalRevision(8), TAG_PATH, true);
         assertTaggedRev8();
     }
 
-    public void testMoveTagNonExistant() throws SCMException
+    public void testMoveTagNonExistant() throws SCMException, IOException
     {
         server.tag(new NumericalRevision(8), TAG_PATH, true);
         assertTaggedRev8();
     }
 
-    private void assertTaggedRev8() throws SCMException
+    private void assertTaggedRev8() throws SCMException, IOException
     {
         SVNServer confirmServer = new SVNServer(TAG_PATH, "jsankey", "password");
-        List<RemoteFile> files = getSortedListing(confirmServer);
+        List<SCMFile> files = getSortedListing(confirmServer);
 
         assertEquals(3, files.size());
         assertEquals("afolder", files.get(0).getName());
         assertEquals("bfolder", files.get(1).getName());
         assertEquals("foo", files.get(2).getName());
 
-        String foo = confirmServer.checkout(null, "foo");
+        String foo = IOUtils.inputStreamToString(confirmServer.checkout(null, "foo"));
         assertEquals("hello\n", foo);
     }
 
@@ -205,7 +205,7 @@ public class SVNServerTest extends PulseTestCase
 
     public void testChangesSince() throws SCMException
     {
-        List<Changelist> changes = server.getChanges(new NumericalRevision(2), null, "");
+        List<Changelist> changes = server.getChanges(new NumericalRevision(2), null);
         assertEquals(2, changes.size());
         Changelist changelist = changes.get(0);
         assertEquals("3", changelist.getRevision().getRevisionString());
@@ -273,13 +273,13 @@ public class SVNServerTest extends PulseTestCase
         assertDirectoriesEqual(new File(new File(expectedDir, "test"), "trunk"), dir);
     }
 
-    private List<RemoteFile> getSortedListing(SVNServer confirmServer)
+    private List<SCMFile> getSortedListing(SVNServer confirmServer)
             throws SCMException
     {
-        List<RemoteFile> files = confirmServer.getListing("");
-        Collections.sort(files, new Comparator<RemoteFile>()
+        List<SCMFile> files = confirmServer.getListing("");
+        Collections.sort(files, new Comparator<SCMFile>()
         {
-            public int compare(RemoteFile o1, RemoteFile o2)
+            public int compare(SCMFile o1, SCMFile o2)
             {
                 return o1.getName().compareTo(o2.getName());
             }

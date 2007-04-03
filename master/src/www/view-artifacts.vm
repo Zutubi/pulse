@@ -8,30 +8,31 @@
     <link rel="stylesheet" type="text/css" href="$base/css/treeview/tree.css"/>
     <script type="text/javascript" src="$base/js/prototype.js"></script>
     <script type="text/javascript" src="$base/js/zutubi.js"></script>
-    <script type="text/javascript" src="$base/js/yahoo/yahoo.js"></script>
-    <script type="text/javascript" src="$base/js/yahoo/event.js"></script>
     <script type="text/javascript" src="$base/js/yahoo/treeview.js"></script>
     <script type="text/javascript" src="$base/js/widget/treeview.js"></script>
     <script type="text/javascript">
-
-        window.onload = initialize;
-
-        function initialize()
+        SetupTree = function()
         {
-            var tree = new ZUTUBI.widget.PulseTreeView('browseTree');
-            tree.setSeparator('$separator');
-            tree.setFSRoot('pulse:///projects/$project.id/builds/$result.id/artifacts/');
-            tree.setBase('$base');
+            return {
+                init: function()
+                {
+                    var tree = new ZUTUBI.widget.PulseTreeView('browseTree');
+                    tree.setSeparator('$separator');
+                    tree.setFSRoot('pulse:///projects/$project.id/builds/$result.id/artifacts/');
+                    tree.setBase('$base');
 
-            // load the root nodes for the file system, then draw the tree.
-            Element.show($('loading'));
-            tree.ls(tree.getRoot(), function()
-            {
-                Element.hide($('loading'));
-                tree.draw();
-            }, true, false, 3);
-        }
+                    // load the root nodes for the file system, then draw the tree.
+                    Element.show($('loading'));
+                    tree.ls(tree.getRoot(), function()
+                    {
+                        Element.hide($('loading'));
+                        tree.draw();
+                    }, true, false, 3);
+                }
+            }
+        }();
 
+        YAHOO.ext.EventManager.onDocumentReady(SetupTree.init, SetupTree, true);
     </script>
 </head>
 <body>

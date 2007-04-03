@@ -3,8 +3,8 @@ package com.zutubi.pulse.scm.cvs;
 import com.zutubi.pulse.core.model.Changelist;
 import com.zutubi.pulse.core.model.CvsRevision;
 import com.zutubi.pulse.core.model.Revision;
-import com.zutubi.pulse.filesystem.remote.RemoteFile;
 import com.zutubi.pulse.scm.SCMException;
+import com.zutubi.pulse.scm.SCMFile;
 import com.zutubi.pulse.test.PulseTestCase;
 import com.zutubi.pulse.util.FileSystemUtils;
 import org.netbeans.lib.cvsclient.util.Logger;
@@ -53,7 +53,7 @@ public class CvsServerTest extends PulseTestCase
     public void testListRoot() throws SCMException
     {
         CvsServer cvsServer = new CvsServer(cvsRoot, "unit-test", null, null);
-        List<RemoteFile> files = cvsServer.getListing("");
+        List<SCMFile> files = cvsServer.getListing("");
         assertEquals(1, files.size());
         assertEquals("unit-test", files.get(0).getPath());
         assertTrue(files.get(0).isDirectory());
@@ -62,7 +62,7 @@ public class CvsServerTest extends PulseTestCase
     public void testListing() throws SCMException
     {
         CvsServer cvsServer = new CvsServer(cvsRoot, "unit-test", null, null);
-        List<RemoteFile> files = cvsServer.getListing("unit-test/CvsWorkerTest/testRlog");
+        List<SCMFile> files = cvsServer.getListing("unit-test/CvsWorkerTest/testRlog");
         assertEquals(4, files.size());
 
         String [] expectedNames = new String[]{"file1.txt", "Attic", "dir1", "dir2"};
@@ -74,7 +74,7 @@ public class CvsServerTest extends PulseTestCase
         }
     }
 
-    /**
+    /*
      * Retrieve the changes between two revisions.
      */
     public void testGetChangesBetween() throws ParseException, SCMException
@@ -82,12 +82,12 @@ public class CvsServerTest extends PulseTestCase
         CvsServer cvsServer = new CvsServer(cvsRoot, "unit-test/CvsServerTest/testGetChangesBetweenSingleRevision", null, null);
         CvsRevision from = new CvsRevision("", "", "", SERVER_DATE.parse("2006-05-08 11:07:00 GMT"));
         CvsRevision to = new CvsRevision("", "", "", SERVER_DATE.parse("2006-05-08 11:08:00 GMT"));
-        List<Changelist> changes = cvsServer.getChanges(from, to, "");
+        List<Changelist> changes = cvsServer.getChanges(from, to);
         assertNotNull(changes);
         assertEquals(1, changes.size());
     }
 
-    /**
+    /*
      * When requesting the changes between a revision and itself, nothing
      * should be returned.
      */
@@ -95,12 +95,12 @@ public class CvsServerTest extends PulseTestCase
     {
         CvsServer cvsServer = new CvsServer(cvsRoot, "unit-test/CvsServerTest/testGetChangesBetweenSingleRevision", null, null);
         CvsRevision from = new CvsRevision("daniel", "", "", SERVER_DATE.parse("2006-05-08 11:07:15 GMT"));
-        List<Changelist> changes = cvsServer.getChanges(from, from, "");
+        List<Changelist> changes = cvsServer.getChanges(from, from);
         assertNotNull(changes);
         assertEquals(0, changes.size());
     }
 
-    /**
+    /*
      * Verify that the upper bound is included, and the lower bound is not.
      */
     public void testGetChangesBetweenTwoRevisions() throws ParseException, SCMException
@@ -191,7 +191,6 @@ public class CvsServerTest extends PulseTestCase
     {
         CvsServer cvsServer = new CvsServer(cvsRoot, "unit-test/CvsServerTest/testGetChangesBetweenSingleRevision", null, null);
         CvsRevision from = new CvsRevision("", "", "", SERVER_DATE.parse("2006-05-08 11:07:00 GMT"));
-        CvsRevision to = new CvsRevision("", "", "", SERVER_DATE.parse("2006-05-08 11:08:00 GMT"));
         List<Revision> revisions = cvsServer.getRevisionsSince(from);
         assertNotNull(revisions);
         assertEquals(1, revisions.size());

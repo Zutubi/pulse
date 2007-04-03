@@ -7,14 +7,14 @@
     <script type="text/javascript" src="$base/js/prototype.js"></script>
     <script type="text/javascript">
     <!--
-    	function openDirWindow()
-    	{
-    	    openBrowseWindow('$base', true, "editAntDetails_details_workingDir", "&id=$project.id");
-    	}
+        function openDirWindow()
+        {
+            openSCMSelectDialog("$base", false, "editAntDetails", "details.workingDir", $project.id, "", "/scm");
+        }
 
     	function openFileWindow()
     	{
-    	    openBrowseWindow('$base', false, "editAntDetails_details_buildFile", "&id=$project.id&prefix=" + $F("editAntDetails_details_workingDir"));
+    	    openSCMSelectDialog("$base", true, "editAntDetails", "details.buildFile", $project.id, "/scm/" + $F("editAntDetails_details_workingDir"), "/");
     	}
     -->
     </script>

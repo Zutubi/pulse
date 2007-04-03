@@ -39,7 +39,14 @@ Create an object of the following format:
                 <pair key="file">name</pair>
                 <pair key="type">type</pair>
                 <pair key="container">container</pair>
-                <pair key="actions"><array ref="actions"/></pair>
+                <pair key="actions">
+                    <array ref="actions">
+                        <object>
+                            <pair key="type">type</pair>
+                            <pair key="url">url</pair>
+                        </object>
+                    </array>
+                </pair>
                 <pair key="url">url</pair>
                 <pair key="relativeParentPath">relativeParentPath</pair>
             </object>

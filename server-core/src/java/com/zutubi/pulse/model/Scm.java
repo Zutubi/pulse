@@ -1,6 +1,7 @@
 package com.zutubi.pulse.model;
 
 import com.zutubi.pulse.core.model.Entity;
+import com.zutubi.pulse.scm.SCMCapability;
 import com.zutubi.pulse.scm.SCMException;
 import com.zutubi.pulse.scm.SCMServer;
 import com.zutubi.pulse.util.logging.Logger;
@@ -34,7 +35,7 @@ public abstract class Scm extends Entity implements Cloneable
     {
         try
         {
-            return createServer().supportsUpdate();
+            return createServer().getCapabilities().contains(SCMCapability.UPDATE);
         }
         catch (SCMException e)
         {

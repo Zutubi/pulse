@@ -9,7 +9,7 @@
     <!--
     	function openFileWindow()
     	{
-    	    openBrowseWindow('$base', false, "versioned.setup_details_pulseFileName", "");
+    	    openSCMSelectDialog("$base", true, "versioned.setup", "details.pulseFileName", 0, "scm/", "/");
     	}
     -->
     </script>

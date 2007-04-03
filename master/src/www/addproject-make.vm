@@ -7,14 +7,14 @@
     <script type="text/javascript" src="$base/js/prototype.js"></script>
     <script type="text/javascript">
     <!--
-    	function openDirWindow()
-    	{
-    	    openBrowseWindow('$base', true, "make.setup_details_workingDir", "");
-    	}
+        function openDirWindow()
+        {
+            openSCMSelectDialog("$base", false, "make.setup", "details.workingDir", 0, "", "/scm");
+        }
 
     	function openFileWindow()
     	{
-    	    openBrowseWindow('$base', false, "make.setup_details_makefile", "&prefix=" + $F("make.setup_details_workingDir"));
+    	    openSCMSelectDialog("$base", true, "make.setup", "details.makefile", 0, "scm/" + $F("make.setup_details_workingDir"), "/");
     	}
     -->
     </script>

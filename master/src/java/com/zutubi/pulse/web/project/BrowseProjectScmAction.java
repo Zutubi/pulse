@@ -1,8 +1,6 @@
 package com.zutubi.pulse.web.project;
 
-import com.zutubi.pulse.filesystem.remote.RemoteScmFileSystem;
 import com.zutubi.pulse.model.Project;
-import org.acegisecurity.acl.AclManager;
 
 /**
  */
@@ -51,7 +49,7 @@ public class BrowseProjectScmAction extends AbstractBrowseDirAction
         try
         {
             location = project.getScm().createServer().getLocation();
-            return super.execute(new RemoteScmFileSystem(project.getScm()));
+            return getPath().length() > 0 ? "file" : SUCCESS;
         }
         catch (Exception e)
         {

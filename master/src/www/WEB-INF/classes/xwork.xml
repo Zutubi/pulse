@@ -279,11 +279,15 @@
 
         <action name="browseProjectScm" class="com.zutubi.pulse.web.project.BrowseProjectScmAction">
             <interceptor-ref name="completeReadOnlyStack"/>
-            <result name="dir" type="velocity">browse-project-scm-dir.vm</result>
-            <result name="file" type="stream">
+            <result name="success" type="velocity">browse-project-scm-dir.vm</result>
+        </action>
+
+        <action name="downloadSCMFile" class="com.zutubi.pulse.web.project.DownloadSCMFileAction">
+            <interceptor-ref name="completeReadOnlyStack"/>
+            <result name="success" type="stream">
                 <param name="contentType">${contentType}</param>
+                <param name="contentDisposition">filename="${filename}"</param>
             </result>
-            <result name="error" type="velocity">generic-error.vm</result>
         </action>
 
         <action name="index!default" class="com.zutubi.pulse.web.ActionSupport">
@@ -1670,7 +1674,7 @@
         </action>
 
         <action name="disablePlugin" class="com.zutubi.pulse.web.admin.plugins.DisablePluginAction">
-            <result name="success" type="velocity">empty.vm</result>
+            <result name="success" type="httpheader">200</result>
         </action>
     </package>
 
@@ -1679,11 +1683,6 @@
 
         <action name="viewScmInfo" class="com.zutubi.pulse.web.project.ViewScmInfoAction">
             <result name="success" type="velocity">view-scm-info.vm</result>
-            <result name="error" type="velocity">/generic-error.vm</result>
-        </action>
-
-        <action name="browseScm" class="com.zutubi.pulse.web.project.BrowseScmAction">
-            <result name="dir" type="velocity">browse-scm-dir.vm</result>
             <result name="error" type="velocity">/generic-error.vm</result>
         </action>
 

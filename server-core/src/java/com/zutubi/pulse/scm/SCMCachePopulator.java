@@ -6,7 +6,7 @@ import com.zutubi.pulse.core.model.Revision;
  */
 public interface SCMCachePopulator
 {
-    String getUniqueLocation();
+    String getUniqueLocation() throws SCMException;
 
     boolean requiresRefresh(Revision revision) throws SCMException;
 

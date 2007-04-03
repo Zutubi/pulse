@@ -3,6 +3,7 @@ package com.zutubi.pulse.vfs.pulse;
 import com.zutubi.pulse.core.ObjectFactory;
 import com.zutubi.pulse.model.BuildManager;
 import com.zutubi.pulse.model.ProjectManager;
+import com.zutubi.pulse.vfs.FileAction;
 import org.apache.commons.vfs.FileName;
 import org.apache.commons.vfs.FileSystemException;
 import org.apache.commons.vfs.FileType;
@@ -11,7 +12,7 @@ import org.apache.commons.vfs.provider.AbstractFileSystem;
 
 import java.io.File;
 import java.io.InputStream;
-import java.util.LinkedList;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -72,9 +73,10 @@ public abstract class AbstractPulseFileObject extends AbstractFileObject
      *
      * @return a list of action names.
      */
-    public List<String> getActions()
+    @SuppressWarnings({"unchecked"})
+    public List<FileAction> getActions()
     {
-        return new LinkedList<String>();
+        return Collections.EMPTY_LIST;
     }
 
     /**

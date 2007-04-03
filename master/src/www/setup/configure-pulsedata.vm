@@ -6,7 +6,7 @@
     <!--
     	function openBrowseFileDialog()
     	{
-    	    openFileDialog('$base/popups/fileDialog.action', 'setup.data', 'data', 'local:///', false, false, true);
+    	    openFileDialog('$base/popups/fileDialog.action', 'setup.data', 'data', 'local:///', '', false, false, true);
     	    return false;
     	}
     -->

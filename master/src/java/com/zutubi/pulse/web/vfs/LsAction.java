@@ -145,7 +145,7 @@ public class LsAction extends VFSActionSupport
 
         if (children != null)
         {
-            Collections.sort(Arrays.asList(children), new DirectoryComparator());
+            Arrays.sort(children, new DirectoryComparator());
         }
 
         if (children != null)

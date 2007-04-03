@@ -126,16 +126,63 @@ function openResourceBrowser(contextPath, resourceId, versionId)
     browseWindow.focus();
 }
 
-function openFileDialog(path, formname, fieldname, root, showFiles, showHidden, showToolbar)
+function openFileDialog(path, formname, fieldname, root, prefix, showFiles, showHidden, showToolbar)
 {
     var browseWindow = window.open(path + '?formname=' + formname +
                                    '&fieldname=' + fieldname + '&root=' + root +
-                                   '&showFiles=' + showFiles + '&showHidden=' + showHidden +
-                                   '&showToolbar=' + showToolbar,
+                                   '&prefix=' + prefix + '&showFiles=' + showFiles +
+                                   '&showHidden=' + showHidden + '&showToolbar=' + showToolbar,
             'files', 'width=400, height=550, resizable=yes', false);
     browseWindow.opener = self;
     browseWindow.focus();
 }
+
+function openResourceDialog(base, agent, formname, fieldname)
+{
+    var root;
+
+    if (agent == -1)
+    {
+        root = 'local:///';
+    }
+    else
+    {
+        root = 'agent://$agentId/';
+    }
+
+    openFileDialog(base + '/popups/fileDialog.action', formname, fieldname, root, '', false, false, false);
+}
+
+function openSCMSelectDialog(base, showFiles, formName, fieldName, projectId, path, prefix)
+{
+    if(path)
+    {
+        var pieces = path.split("/");
+
+        // Reassemble, removing empty pieces
+        path = "";
+        for(var i = 0; i < pieces.length; i++)
+        {
+            if(pieces[i])
+            {
+                if(path)
+                {
+                    path += "/";
+                }
+
+                path += pieces[i];
+            }
+        }
+
+        if(path)
+        {
+            path += "/";
+        }
+    }
+
+    openFileDialog(base + '/popups/fileDialog.action', formName, fieldName, 'pulse:///projects/' + projectId + '/scm/' + path, prefix, showFiles, false, false);
+}
+
 
 // @deprecated. Use the Prototype function Element.toggle instead.
 function toggleElementDisplay(element)

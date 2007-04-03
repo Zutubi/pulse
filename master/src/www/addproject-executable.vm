@@ -9,7 +9,7 @@
     <!--
     	function openDirWindow()
     	{
-    	    openBrowseWindow('$base', true, "executable.setup_details_workingDir", "");
+            openSCMSelectDialog("$base", false, "executable.setup", "details.workingDir", 0, "", "/scm");
     	}
     -->
     </script>

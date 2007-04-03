@@ -1,7 +1,7 @@
 package com.zutubi.pulse.scm;
 
 import com.zutubi.pulse.core.model.Revision;
-import com.zutubi.pulse.filesystem.remote.CachingRemoteFile;
+import com.zutubi.pulse.filesystem.remote.CachingSCMFile;
 import com.zutubi.pulse.scm.cvs.CvsServer;
 
 import java.util.Map;
@@ -35,7 +35,7 @@ public class SCMFileCache
         return INSTANCE;
     }
 
-    public Map<String, CachingRemoteFile> lookup(SCMCachePopulator populator) throws SCMException
+    public Map<String, CachingSCMFile> lookup(SCMCachePopulator populator) throws SCMException
     {
         CacheItem item;
 
@@ -73,7 +73,7 @@ public class SCMFileCache
 
     public class CacheItem
     {
-        public Map<String, CachingRemoteFile> cachedListing;
+        public Map<String, CachingSCMFile> cachedListing;
         public Revision cachedRevision;
     }
 }

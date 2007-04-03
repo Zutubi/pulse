@@ -1,34 +1,33 @@
-package com.zutubi.pulse.filesystem.remote;
-
-import com.zutubi.pulse.filesystem.File;
+package com.zutubi.pulse.scm;
 
 /**
- * <class-comment/>
+ * Represents a file or directory stored in an SCM.
  */
-public class RemoteFile implements File, Comparable
+public class SCMFile implements Comparable
 {
+    private static final String SEPARATOR = "/";
+    
     private String name;
     private String path;
     private boolean isDir;
-    private RemoteFile parent;
+    private SCMFile parent;
     private String type = "text/plain";
 
-    public RemoteFile(String name, boolean isDirectory, RemoteFile parent, String path)
+    public SCMFile(String name, boolean isDirectory, String path)
     {
         this.name = name;
         this.isDir = isDirectory;
-        this.parent = parent;
 
-        if (path.endsWith("/"))
+        if (path.endsWith(SEPARATOR))
         {
             path = path.substring(0, path.length() - 1);
         }
         this.path = path;
     }
 
-    public RemoteFile(boolean isDirectory, RemoteFile parent, String path)
+    public SCMFile(boolean isDirectory, String path)
     {
-        this(null, isDirectory, parent, path);
+        this(null, isDirectory, path);
 
         int index = path.lastIndexOf('/');
         if (index == -1)
@@ -45,6 +44,18 @@ public class RemoteFile implements File, Comparable
         }
     }
 
+    public SCMFile(String name, boolean isDirectory, SCMFile parent, String path)
+    {
+        this(name, isDirectory, path);
+        this.parent = parent;
+    }
+
+    public SCMFile(boolean isDirectory, SCMFile parent, String path)
+    {
+        this(isDirectory, path);
+        this.parent = parent;
+    }
+
     public boolean isDirectory()
     {
         return isDir;
@@ -55,19 +66,19 @@ public class RemoteFile implements File, Comparable
         return !isDirectory();
     }
 
-    public File getParentFile()
+    public SCMFile getParentFile()
     {
         if (parent == null)
         {
-            if (path.contains("/"))
+            if (path.contains(SEPARATOR))
             {
-                parent = new RemoteFile(true, null, getParentPath(path));
+                parent = new SCMFile(true, getParentPath(path));
             }
             else
             {
                 if (path.length() > 0)
                 {
-                    parent = new RemoteFile(true, null, "");
+                    parent = new SCMFile(true, "");
                 }
             }
         }
@@ -114,12 +125,12 @@ public class RemoteFile implements File, Comparable
 
     public int compareTo(Object o)
     {
-        RemoteFile other = (RemoteFile) o;
+        SCMFile other = (SCMFile) o;
         return name.compareTo(other.name);
     }
 
     public String toString()
     {
-        return name + (isDir ? "/" : "");
+        return name + (isDir ? SEPARATOR : "");
     }
 }

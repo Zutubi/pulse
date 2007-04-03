@@ -1,11 +1,15 @@
 package com.zutubi.pulse.scm.cvs;
 
 import com.opensymphony.util.TextUtils;
-import com.zutubi.pulse.core.model.*;
-import com.zutubi.pulse.filesystem.remote.CachingRemoteFile;
+import com.zutubi.pulse.core.model.Change;
+import com.zutubi.pulse.core.model.Changelist;
+import com.zutubi.pulse.core.model.CvsRevision;
+import com.zutubi.pulse.core.model.Revision;
+import com.zutubi.pulse.filesystem.remote.CachingSCMFile;
 import com.zutubi.pulse.scm.*;
 import com.zutubi.pulse.scm.cvs.client.CvsClient;
 import com.zutubi.pulse.scm.cvs.client.LogInformationAnalyser;
+import com.zutubi.pulse.util.CleanupInputStream;
 import com.zutubi.pulse.util.Constants;
 import com.zutubi.pulse.util.FileSystemUtils;
 import com.zutubi.pulse.util.IOUtils;
@@ -13,9 +17,7 @@ import com.zutubi.pulse.util.logging.Logger;
 import org.netbeans.lib.cvsclient.CVSRoot;
 import org.netbeans.lib.cvsclient.command.log.LogInformation;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
+import java.io.*;
 import java.util.*;
 
 /**
@@ -68,6 +70,11 @@ public class CvsServer extends CachingSCMServer
     public void setExcludedPaths(List<String> excluded)
     {
         this.excludedPaths = excluded;
+    }
+
+    public Set<SCMCapability> getCapabilities()
+    {
+        return new HashSet<SCMCapability>(Arrays.asList(SCMCapability.values()));
     }
 
     /**
@@ -177,28 +184,18 @@ public class CvsServer extends CachingSCMServer
         client.update(workingDirectory, (CvsRevision) rev, handler);
     }
 
-    /**
-     * Returns true since this scm implementation supports the update command.
-     *
-     * @return true.
-     */
-    public boolean supportsUpdate()
-    {
-        return true;
-    }
-
     public void tag(Revision revision, String name, boolean moveExisting) throws SCMException
     {
         assertRevisionArgValid(revision);
         client.tag(module, (CvsRevision) revision, name, moveExisting);
     }
 
-    public Map<String, String> getConnectionProperties(String id, File dir) throws SCMException
+    public Map<String, String> getEnvironmentVariables(String id, File dir) throws SCMException
     {
         return Collections.EMPTY_MAP;
     }
 
-    public void writeConnectionDetails(File outputDir) throws SCMException, IOException
+    public void storeConnectionDetails(File outputDir) throws SCMException, IOException
     {
         Properties props = new Properties();
         props.put("root", root);
@@ -225,11 +222,6 @@ public class CvsServer extends CachingSCMServer
         return FileStatus.EOLStyle.BINARY;
     }
 
-    public FileRevision getFileRevision(String path, Revision repoRevision)
-    {
-        return null;
-    }
-
     public CvsRevision getRevision(String revision) throws SCMException
     {
         CvsRevision cvsRevision = new CvsRevision(revision);
@@ -250,7 +242,7 @@ public class CvsServer extends CachingSCMServer
         return revision;
     }
 
-    public String checkout(Revision revision, String file) throws SCMException
+    public InputStream checkout(Revision revision, String file) throws SCMException
     {
         if (!TextUtils.stringSet(file))
         {
@@ -262,20 +254,31 @@ public class CvsServer extends CachingSCMServer
             revision = CvsRevision.HEAD;
         }
 
-        File tmpDir = null;
+        final File tmpDir[] = new File[1];
         try
         {
-            tmpDir = createTemporaryDirectory();
+            tmpDir[0] = createTemporaryDirectory();
 
-            client.checkout(tmpDir, file, (CvsRevision)revision, null);
+            client.checkout(tmpDir[0], file, (CvsRevision)revision, null);
 
             // read checked out file.
-            File checkedOutFile = new File(tmpDir, file);
+            File checkedOutFile = new File(tmpDir[0], file);
             if (!checkedOutFile.exists())
             {
                 throw new SCMException("Unable to checkout file '" + file + "' from cvs[" + getRoot() + "].");
             }
-            return IOUtils.fileToString(checkedOutFile);
+
+            FileInputStream fis = new FileInputStream(checkedOutFile);
+            return new CleanupInputStream(fis, new CleanupInputStream.CleanupCallback()
+            {
+                public void execute()
+                {
+                    if (!FileSystemUtils.rmdir(tmpDir[0]))
+                    {
+                        LOG.severe("failed to remove temporary directory " + tmpDir[0]);
+                    }
+                }
+            });
         }
         catch (IOException e)
         {
@@ -284,26 +287,14 @@ public class CvsServer extends CachingSCMServer
         }
         finally
         {
-            if (!FileSystemUtils.rmdir(tmpDir))
+            if (tmpDir[0] != null && !FileSystemUtils.rmdir(tmpDir[0]))
             {
-                LOG.severe("failed to remove temporary directory " + tmpDir);
+                LOG.severe("failed to remove temporary directory " + tmpDir[0]);
             }
         }
     }
 
-    /**
-     * Retreive the list of changes between the two specified revisions.
-     *
-     * @param from
-     * @param to
-     *
-     * @param paths are ignored.
-     *
-     * @return a list of changelist instances.
-     *
-     * @throws SCMException
-     */
-    public List<Changelist> getChanges(Revision from, Revision to, String ...paths) throws SCMException
+    public List<Changelist> getChanges(Revision from, Revision to) throws SCMException
     {
         // assert that the branch for both revisions is the same. We do not support retrieving
         // differences across multiple branches/revisions. For practical reasons, we do not need to...
@@ -332,7 +323,7 @@ public class CvsServer extends CachingSCMServer
 
     public List<Revision> getRevisionsSince(Revision from) throws SCMException
     {
-        List<Changelist> changes = getChanges(from, null, "");
+        List<Changelist> changes = getChanges(from, null);
         Collections.sort(changes, new Comparator<Changelist>()
         {
             public int compare(Changelist o1, Changelist o2)
@@ -440,13 +431,13 @@ public class CvsServer extends CachingSCMServer
     public void populate(SCMFileCache.CacheItem item) throws SCMException
     {
         item.cachedRevision = getLatestRevision();
-        item.cachedListing = new TreeMap<String, CachingRemoteFile>();
+        item.cachedListing = new TreeMap<String, CachingSCMFile>();
 
         List<LogInformation> logs = client.rlog(module, null, null, true);
 
         CVSRoot root = CVSRoot.parse(getRoot());
 
-        CachingRemoteFile rootFile = new CachingRemoteFile("", true, null, "");
+        CachingSCMFile rootFile = new CachingSCMFile("", true, null, "");
         item.cachedListing.put("", rootFile);
 
         for (LogInformation log : logs)

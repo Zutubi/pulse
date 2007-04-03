@@ -1,8 +1,7 @@
 package com.zutubi.pulse.scm;
 
 import com.zutubi.pulse.core.model.Revision;
-import com.zutubi.pulse.filesystem.remote.CachingRemoteFile;
-import com.zutubi.pulse.filesystem.remote.RemoteFile;
+import com.zutubi.pulse.filesystem.remote.CachingSCMFile;
 
 import java.util.List;
 import java.util.Map;
@@ -12,7 +11,7 @@ import java.util.StringTokenizer;
  */
 public abstract class CachingSCMServer implements SCMServer, SCMCachePopulator
 {
-    public String getUniqueLocation()
+    public String getUniqueLocation() throws SCMException
     {
         return getLocation();
     }
@@ -22,9 +21,9 @@ public abstract class CachingSCMServer implements SCMServer, SCMCachePopulator
         return hasChangedSince(revision);
     }
 
-    public RemoteFile getFile(String path) throws SCMException
+    public SCMFile getFile(String path) throws SCMException
     {
-        Map<String, CachingRemoteFile> cachedListing = SCMFileCache.getInstance().lookup(this);
+        Map<String, CachingSCMFile> cachedListing = SCMFileCache.getInstance().lookup(this);
         if (cachedListing.containsKey(path))
         {
             return cachedListing.get(path);
@@ -35,9 +34,9 @@ public abstract class CachingSCMServer implements SCMServer, SCMCachePopulator
         }
     }
 
-    public List<RemoteFile> getListing(String path) throws SCMException
+    public List<SCMFile> getListing(String path) throws SCMException
     {
-        Map<String, CachingRemoteFile> cachedListing = SCMFileCache.getInstance().lookup(this);
+        Map<String, CachingSCMFile> cachedListing = SCMFileCache.getInstance().lookup(this);
         if (cachedListing.containsKey(path))
         {
             return cachedListing.get(path).list();
@@ -48,11 +47,11 @@ public abstract class CachingSCMServer implements SCMServer, SCMCachePopulator
         }
     }
 
-    protected void addToCache(String filename, CachingRemoteFile rootFile, SCMFileCache.CacheItem item)
+    protected void addToCache(String filename, CachingSCMFile rootFile, SCMFileCache.CacheItem item)
     {
         StringTokenizer tokens = new StringTokenizer(filename, "/", false);
         String path = "";
-        CachingRemoteFile parent = rootFile;
+        CachingSCMFile parent = rootFile;
         while (tokens.hasMoreTokens())
         {
             String name = tokens.nextToken();
@@ -65,7 +64,7 @@ public abstract class CachingSCMServer implements SCMServer, SCMCachePopulator
 
             if (!item.cachedListing.containsKey(path))
             {
-                CachingRemoteFile f = new CachingRemoteFile(name, tokens.hasMoreTokens(), parent, path);
+                CachingSCMFile f = new CachingSCMFile(name, tokens.hasMoreTokens(), parent, path);
                 if (parent != null)
                 {
                     parent.addChild(f);
