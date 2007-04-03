@@ -196,10 +196,17 @@ public class DefaultScheduler implements Scheduler, EventListener
         for(Trigger trigger: projectTriggers)
         {
             SchedulerStrategy impl = getStrategy(trigger);
-            impl.unschedule(trigger);
+            boolean active = trigger.isActive();
+            if (active)
+            {
+                impl.unschedule(trigger);
+            }
             trigger.setGroup(name);
             triggerDao.save(trigger);
-            impl.schedule(trigger);
+            if (active)
+            {
+                impl.schedule(trigger);
+            }
         }
     }
 
