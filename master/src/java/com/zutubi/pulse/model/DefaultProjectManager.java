@@ -24,6 +24,7 @@ import com.zutubi.pulse.scm.SCMException;
 import com.zutubi.pulse.util.logging.Logger;
 import org.acegisecurity.annotation.Secured;
 
+import java.util.LinkedList;
 import java.util.List;
 
 /**
@@ -367,6 +368,28 @@ public class DefaultProjectManager implements ProjectManager
                     }
                 }
             }
+        }
+
+        List<PostBuildAction> actions = project.getPostBuildActions();
+        List<PostBuildAction> dead = new LinkedList<PostBuildAction>();
+        for(PostBuildAction action: actions)
+        {
+            List<BuildSpecification> actionSpecs = action.getSpecifications();
+            if(actionSpecs != null && actionSpecs.contains(spec))
+            {
+                if(actionSpecs.size() == 1)
+                {
+                    // The only spec: we should remove this action.
+                    dead.add(action);
+                }
+
+                actionSpecs.remove(spec);
+            }
+        }
+
+        for(PostBuildAction action: dead)
+        {
+            project.removePostBuildAction(action.getId());
         }
 
         project.remove(spec);
