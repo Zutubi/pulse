@@ -208,6 +208,8 @@ public class ExecutableCommand extends CommandSupport implements ScopeAware
         if (envArtifact != null)
         {
             artifacts.add(envArtifact);
+
+            ProcessControl.destroyProcess(child);
         }
         if (outputArtifact != null)
         {
@@ -607,6 +609,7 @@ public class ExecutableCommand extends CommandSupport implements ScopeAware
         if (child != null)
         {
             ProcessControl.destroyProcess(child);
+            child = null;
         }
 
         if(reader != null)

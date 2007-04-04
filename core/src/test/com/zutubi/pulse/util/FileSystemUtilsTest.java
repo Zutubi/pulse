@@ -211,7 +211,7 @@ public class FileSystemUtilsTest extends PulseTestCase
                 f = File.createTempFile(FileSystemUtils.class.getName(), ".txt");
 
                 long startTime = System.currentTimeMillis();
-                for (int i = 0; i < 100; i++)
+                for (int i = 0; i < 10000; i++)
                 {
                    FileSystemUtils.getPermissions(f);
                 }
@@ -572,6 +572,18 @@ public class FileSystemUtilsTest extends PulseTestCase
             FileSystemUtils.setPermissions(from, 777);
             FileSystemUtils.unixCopy(to, from);
             assertEquals(777, FileSystemUtils.getPermissions(to));
+        }
+    }
+
+    public void testCopyManyFiles() throws Exception
+    {
+        File from = new File(tmpDir, "from");
+        File to = new File(tmpDir, "to");
+
+        FileSystemUtils.createFile(from, "test");
+        for(int i = 0; i < 2500; i++)
+        {
+            FileSystemUtils.copy(to, from);
         }
     }
 

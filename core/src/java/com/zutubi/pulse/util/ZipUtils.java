@@ -1,5 +1,6 @@
 package com.zutubi.pulse.util;
 
+import com.zutubi.pulse.jni.ProcessControl;
 import com.zutubi.pulse.util.logging.Logger;
 
 import java.io.*;
@@ -127,6 +128,10 @@ public class ZipUtils
         catch (InterruptedException e)
         {
             throw new IOException("Interrupted waiting for external archiving process");
+        }
+        finally
+        {
+            ProcessControl.destroyProcess(child);
         }
     }
 

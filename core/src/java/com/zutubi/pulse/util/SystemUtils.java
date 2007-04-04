@@ -1,5 +1,6 @@
 package com.zutubi.pulse.util;
 
+import com.zutubi.pulse.jni.ProcessControl;
 import com.zutubi.pulse.util.logging.Logger;
 
 import java.io.*;
@@ -13,7 +14,7 @@ import java.util.List;
 public class SystemUtils
 {
     private static final Logger LOG = Logger.getLogger(SystemUtils.class);
-    
+
     public static final boolean IS_WINDOWS = System.getProperty("os.name").toLowerCase().startsWith("win");
     public static final boolean IS_LINUX = System.getProperty("os.name").toLowerCase().startsWith("linux");
     public static final boolean IS_MAC = System.getProperty("os.name").toLowerCase().startsWith("mac");
@@ -21,16 +22,16 @@ public class SystemUtils
     public static final String LINE_SEPARATOR;
 
     public static final byte[] LINE_SEPARATOR_BYTES;
-    public static final byte[] CR_BYTES   = new byte [] { '\r' };
-    public static final byte[] CRLF_BYTES = new byte [] { '\r', '\n' };
-    public static final byte[] LF_BYTES   = new byte [] { '\n' };
+    public static final byte[] CR_BYTES = new byte[]{'\r'};
+    public static final byte[] CRLF_BYTES = new byte[]{'\r', '\n'};
+    public static final byte[] LF_BYTES = new byte[]{'\n'};
 
     static
     {
         String sep = System.getProperty("line.separator");
-        if(sep == null)
+        if (sep == null)
         {
-            if(IS_WINDOWS)
+            if (IS_WINDOWS)
             {
                 sep = "\r\n";
             }
@@ -56,46 +57,51 @@ public class SystemUtils
 
     public static String runCommandWithInput(String input, String... command) throws IOException
     {
-        Process process;
-        process = Runtime.getRuntime().exec(command);
+        Process process = Runtime.getRuntime().exec(command);
 
-        if(input != null)
-        {
-            OutputStream stdinStream = null;
-
-            try
-            {
-                stdinStream = process.getOutputStream();
-                stdinStream.write(input.getBytes("US-ASCII"));
-            }
-            finally
-            {
-                IOUtils.close(stdinStream);
-            }
-        }
-        
-        InputStreamReader stdoutReader = new InputStreamReader(process.getInputStream());
-        StringWriter stdoutWriter = new StringWriter();
-        IOUtils.joinReaderToWriter(stdoutReader, stdoutWriter);
-
-        int exitCode = 0;
         try
         {
-            exitCode = process.waitFor();
-        }
-        catch (InterruptedException e)
-        {
-            LOG.warning(e);
-        }
+            if (input != null)
+            {
+                OutputStream stdinStream = null;
 
-        if (exitCode == 0)
-        {
-            return stdoutWriter.getBuffer().toString();
+                try
+                {
+                    stdinStream = process.getOutputStream();
+                    stdinStream.write(input.getBytes("US-ASCII"));
+                }
+                finally
+                {
+                    IOUtils.close(stdinStream);
+                }
+            }
+
+            InputStreamReader stdoutReader = new InputStreamReader(process.getInputStream());
+            StringWriter stdoutWriter = new StringWriter();
+            IOUtils.joinReaderToWriter(stdoutReader, stdoutWriter);
+
+            int exitCode = 0;
+            try
+            {
+                exitCode = process.waitFor();
+            }
+            catch (InterruptedException e)
+            {
+                LOG.warning(e);
+            }
+
+            if (exitCode == 0)
+            {
+                return stdoutWriter.getBuffer().toString();
+            }
+            else
+            {
+                throw new IOException(String.format("Command '%s' exited with code %d", command[0], exitCode));
+            }
         }
-        else
+        finally
         {
-            System.out.println(stdoutWriter.getBuffer().toString());
-            throw new IOException(String.format("Command '%s' exited with code %d", command[0], exitCode));
+            ProcessControl.destroyProcess(process);
         }
     }
 
@@ -111,7 +117,7 @@ public class SystemUtils
      * extra paths or a directory in the PATH.  On windows, files are
      * expected to have one of the extensions in PATHEXT.
      *
-     * @param name the name of the executable to look for
+     * @param name       the name of the executable to look for
      * @param extraPaths a set of extra paths to check, in order, BEFORE
      *                   checking the system PATH
      * @return the file in the path, or null if not found
@@ -119,7 +125,7 @@ public class SystemUtils
     public static File findInPath(String name, Collection<String> extraPaths)
     {
         List<String> allPaths = new LinkedList<String>();
-        if(extraPaths != null)
+        if (extraPaths != null)
         {
             allPaths.addAll(extraPaths);
         }
@@ -165,29 +171,29 @@ public class SystemUtils
         // otherwise use a sensible default list.
         String[] extensions;
         String pathext = System.getenv("PATHEXT");
-        if(pathext == null)
+        if (pathext == null)
         {
-            extensions = new String[] { ".COM", ".EXE", ".BAT", ".CMD", ".VBS", ".VBE", ".JS", ".JSE", ".WSF", ".WSH" };
+            extensions = new String[]{".COM", ".EXE", ".BAT", ".CMD", ".VBS", ".VBE", ".JS", ".JSE", ".WSF", ".WSH"};
         }
         else
         {
             extensions = pathext.split(";");
-            for(int i = 0; i < extensions.length; i++)
+            for (int i = 0; i < extensions.length; i++)
             {
                 extensions[i] = extensions[i].toUpperCase();
             }
         }
 
-        for (String p: paths)
+        for (String p : paths)
         {
             File dir = new File(p);
-            if(dir.isDirectory())
+            if (dir.isDirectory())
             {
                 String[] list = dir.list();
-                for(String filename: list)
+                for (String filename : list)
                 {
                     File candidate = new File(dir, filename);
-                    if(candidate.isFile() && filenameMatches(name, filename, extensions))
+                    if (candidate.isFile() && filenameMatches(name, filename, extensions))
                     {
                         return candidate;
                     }
@@ -202,9 +208,9 @@ public class SystemUtils
     {
         filename = filename.toUpperCase();
 
-        for(String extension: extensions)
+        for (String extension : extensions)
         {
-            if(filename.equals(name + extension))
+            if (filename.equals(name + extension))
             {
                 return true;
             }
@@ -228,7 +234,7 @@ public class SystemUtils
     public static boolean getBooleanProperty(String key, boolean defaultValue)
     {
         String value = System.getProperty(key);
-        if(value == null)
+        if (value == null)
         {
             return defaultValue;
         }

@@ -85,23 +85,24 @@ public class ProcessControl
     {
         init();
 
-        if (nativeAvailable)
+        if (p != null)
         {
-            try
+            if (nativeAvailable)
             {
-                long handle = handleField.getLong(p);
-                if (destroy(handle))
+                try
                 {
-                    return;
+                    long handle = handleField.getLong(p);
+                    destroy(handle);
+                }
+                catch (IllegalAccessException e)
+                {
+                    // Fall through
                 }
             }
-            catch (IllegalAccessException e)
-            {
-                // Fall through
-            }
-        }
 
-        p.destroy();
+            // Always called, so that any additional cleanup is done.
+            p.destroy();
+        }
     }
 
     private static native boolean destroy(long handle);

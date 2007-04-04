@@ -1,6 +1,7 @@
 package com.zutubi.pulse.util;
 
 import com.opensymphony.util.TextUtils;
+import com.zutubi.pulse.jni.ProcessControl;
 import com.zutubi.pulse.util.logging.Logger;
 
 import java.io.*;
@@ -322,10 +323,7 @@ public class FileSystemUtils
         }
         finally
         {
-            if (process != null)
-            {
-                process.destroy();
-            }
+            ProcessControl.destroyProcess(process);
         }
 
         return result;
@@ -404,15 +402,20 @@ public class FileSystemUtils
     {
         if(!SystemUtils.IS_WINDOWS)
         {
+            Process p = null;
             try
             {
-                Process p = Runtime.getRuntime().exec(new String[] { "chmod", arg, file.getAbsolutePath()});
+                p = Runtime.getRuntime().exec(new String[] { "chmod", arg, file.getAbsolutePath()});
                 int exitCode = p.waitFor();
                 return exitCode == 0;
             }
             catch (Exception e)
             {
                 // Oh well, we tried
+            }
+            finally
+            {
+                ProcessControl.destroyProcess(p);    
             }
         }
 
@@ -634,13 +637,19 @@ public class FileSystemUtils
         String type = URLConnection.guessContentTypeFromName(file.getName());
         if (type == null)
         {
+            FileInputStream fis = null;
             try
             {
-                type = URLConnection.guessContentTypeFromStream(new FileInputStream(file));
+                fis = new FileInputStream(file);
+                type = URLConnection.guessContentTypeFromStream(fis);
             }
             catch (IOException e)
             {
                 // Oh well
+            }
+            finally
+            {
+                IOUtils.close(fis);
             }
 
             if (type == null)
@@ -925,6 +934,10 @@ public class FileSystemUtils
             IOException ioe = new IOException("Interrupted while executing '"+StringUtils.join(" ", args)+"'");
             ioe.initCause(e);
             throw ioe;
+        }
+        finally
+        {
+            ProcessControl.destroyProcess(child);
         }
     }
 
