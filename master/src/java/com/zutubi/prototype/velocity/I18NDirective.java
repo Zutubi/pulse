@@ -1,12 +1,11 @@
 package com.zutubi.prototype.velocity;
 
 import com.opensymphony.util.TextUtils;
-import com.opensymphony.xwork.ActionContext;
-import com.opensymphony.xwork.util.OgnlValueStack;
+import com.zutubi.prototype.config.ConfigurationPersistenceManager;
 import com.zutubi.prototype.type.CollectionType;
 import com.zutubi.prototype.type.Type;
 import com.zutubi.pulse.i18n.Messages;
-import com.zutubi.pulse.velocity.AbstractDirective;
+import com.zutubi.pulse.bootstrap.ComponentContext;
 import org.apache.velocity.context.InternalContextAdapter;
 import org.apache.velocity.exception.ParseErrorException;
 import org.apache.velocity.exception.ResourceNotFoundException;
@@ -22,26 +21,58 @@ import java.util.Map;
  */
 public class I18NDirective extends PrototypeDirective
 {
+    /**
+     * The I18N message key.  This field is required.
+     */
     private String key;
 
+    /**
+     * This field is optional.
+     */
+    private String path;
+
+    private ConfigurationPersistenceManager configurationPersistenceManager;
+
+    public I18NDirective()
+    {
+        ComponentContext.autowire(this);
+    }
+
+    /**
+     * @see org.apache.velocity.runtime.directive.Directive#getName() 
+     */
     public String getName()
     {
         return "i18n";
     }
 
+    /**
+     * @see org.apache.velocity.runtime.directive.Directive#getType() 
+     * @see org.apache.velocity.runtime.directive.DirectiveConstants#LINE 
+     */
     public int getType()
     {
         return LINE;
     }
 
     /**
-     * The of the I18N string being retrieved.
+     * Setter for the <code>key</code> property.
      *
      * @param key
      */
     public void setKey(String key)
     {
         this.key = key;
+    }
+
+    /**
+     * Setter for the <code>path</code> property.
+     *
+     * @param path
+     */
+    public void setPath(String path)
+    {
+        this.path = path;
     }
 
     public boolean render(InternalContextAdapter context, Writer writer, Node node) throws IOException, ResourceNotFoundException, ParseErrorException
@@ -53,13 +84,7 @@ public class I18NDirective extends PrototypeDirective
             Map params = createPropertyMap(context, node);
             wireParams(params);
 
-            Type type = lookupType();
-
-            Class clazz = type.getClazz();
-            if (type instanceof CollectionType)
-            {
-                clazz = ((CollectionType)type).getCollectionType().getClazz();
-            }
+            Class clazz = getContext();
 
             Messages messages = Messages.getInstance(clazz);
 
@@ -81,4 +106,35 @@ public class I18NDirective extends PrototypeDirective
         }
     }
 
+    /**
+     * Get the class that defines the I18N context for this directive.  
+     *
+     * @return the i18n context.
+     */
+    private Class getContext()
+    {
+        Type type = null;
+        if (TextUtils.stringSet(path)) // if a the path is specified, us it to attempt to look up. 
+        {
+            type = configurationPersistenceManager.getType(path);
+        }
+
+        if (type == null)
+        {
+            type = lookupType();
+        }
+
+        Class clazz = type.getClazz();
+        if (type instanceof CollectionType)
+        {
+            clazz = ((CollectionType)type).getCollectionType().getClazz();
+        }
+
+        return clazz;
+    }
+
+    public void setConfigurationPersistenceManager(ConfigurationPersistenceManager configurationPersistenceManager)
+    {
+        this.configurationPersistenceManager = configurationPersistenceManager;
+    }
 }

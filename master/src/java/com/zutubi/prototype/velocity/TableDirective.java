@@ -64,7 +64,7 @@ public class TableDirective extends PrototypeDirective
             
             try
             {
-                Template template = configuration.getTemplate("prototype/table.ftl");
+                Template template = configuration.getTemplate("prototype/xhtml/table.ftl");
                 template.process(context, writer);
             }
             catch (TemplateException e)

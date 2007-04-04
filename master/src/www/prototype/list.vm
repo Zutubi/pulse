@@ -19,18 +19,6 @@
     #i18n("path=$config.path" "key=introduction")
 </p>
 
-
-#if( $config.extensions.size() > 0)
-<p>
-    <h3>extensions to the base type</h3>
-    <ul>
-    #foreach($prop in $config.extensions)
-        <li>$prop</li>
-    #end
-    </ul>
-</p>
-#end
-
 <p>
     #plist("path=$config.path")
 </p>

@@ -3,7 +3,7 @@
 
 #set($config = $action.configuration)
 
-<div>
+<div style="font-style:italic;">
     #set($breadcrumbPath = "")
     #set($sep = "")
     #foreach($pathElement in $config.parentPathElements)
@@ -14,23 +14,11 @@
     ${sep} $!config.currentPath
 </div>
 
-<h2>#i18n("path=$config.path" "key=label")</h2>
+<h2>#i18n("key=label")</h2>
 <p>
-    #i18n("path=$config.path" "key=introduction")
+    #i18n("key=introduction")
 </p>
 
-<p>&nbsp;</p>
-
-#if( $config.extensions.size() > 0)
-<p>
-    <h3>extensions to the base type</h3>
-    <ul>
-    #foreach($prop in $config.extensions)
-        <li>$prop</li>
-    #end
-    </ul>
-</p>
-#end
 
 #if( $config.simpleProperties.size() > 0)
     <!-- this configuration definition contains fields to be configured. -->
@@ -59,16 +47,16 @@
     #end
 </p>
 
+#if( $config.nestedProperties.size() > 0)
 <p>&nbsp;</p>
 <h3>nested properties</h3>
 <p>the following nested properties are also available:</p>
 <ul>
-#if( $config.nestedProperties.size() > 0)
     #foreach($prop in $config.nestedProperties)
-        <li><a href="configuration.action?path=${config.path}/${prop}">$prop</a>  #if($config.record.get($prop)) (configured) #else (not configured) #end</li>
+        <li>#i18n("path=$config.path/$prop" "key=label") <a href="configuration.action?path=${config.path}/${prop}">(view)</a>  </li>
     #end
-#end
 </ul>
+#end
 
 <!--
 <p>&nbsp;</p>

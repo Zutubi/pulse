@@ -2,11 +2,13 @@ package com.zutubi.pulse.prototype.config.admin;
 
 import com.zutubi.prototype.ConfigurationCheckHandler;
 import com.zutubi.prototype.annotation.TextArea;
+import com.zutubi.pulse.prototype.record.SymbolicName;
 
 /**
  *
  *
  */
+@SymbolicName("internal.emailConfigurationCheckHandler")
 public class EmailConfigurationCheckHandler implements ConfigurationCheckHandler<EmailConfiguration>
 {
     private String emailAddress;
