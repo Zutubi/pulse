@@ -7,16 +7,16 @@ public class XCodePostProcessor extends PostProcessorGroup
 {
     private String[] errorRegexs = new String[]
     {
-            ".*[\\d]+: error:.*",
-            ".*Assertion failure.*",
-            ".*No such file or directory.*",
-            ".*Undefined symbols.*",
-            ".*Uncaught exception:.*"
+            "[\\d]+: error:",
+            "Assertion failure",
+            "No such file or directory",
+            "Undefined symbols",
+            "Uncaught exception:"
     };
 
     private String[] warningRegexs = new String[]
     {
-            ".*warning:.*"
+            "warning:"
     };
 
     public XCodePostProcessor()
