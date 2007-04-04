@@ -430,11 +430,23 @@ public class ZipTest extends PulseTestCase
     public void testExtractNonEmptyFiles() throws Exception
     {
         extractTestZipToTmp();
+        assertNonEmptyFiles(tmpDir);
+    }
 
+    public void testExtractToNonExistentDir() throws Exception
+    {
+        File dir = new File(tmpDir, "nonexistent");
+        assertFalse(dir.isDirectory());
+        extractTestZipToDir(dir, "testExtractNonEmptyFiles");
+        assertNonEmptyFiles(dir);
+    }
+
+    private void assertNonEmptyFiles(File dir)
+    {
         // ensure that the expected directories exist.
-        assertTrue(new File(tmpDir, FileSystemUtils.composeFilename("config")).isDirectory());
-        assertTrue(new File(tmpDir, FileSystemUtils.composeFilename("pulse.config.properties")).isFile());
-        assertTrue(new File(tmpDir, FileSystemUtils.composeFilename("config", "pulse.properties")).isFile());
+        assertTrue(new File(dir, FileSystemUtils.composeFilename("config")).isDirectory());
+        assertTrue(new File(dir, FileSystemUtils.composeFilename("pulse.config.properties")).isFile());
+        assertTrue(new File(dir, FileSystemUtils.composeFilename("config", "pulse.properties")).isFile());
     }
 
     public void testZipBrokenSymlink() throws IOException
@@ -623,13 +635,16 @@ public class ZipTest extends PulseTestCase
 
     private void extractTestZipToTmp() throws IOException
     {
+        extractTestZipToDir(tmpDir, getName());
+    }
+
+    private void extractTestZipToDir(File tmpDir, String name) throws IOException
+    {
         InputStream is = null;
         try
         {
-            File dataFile = getTestDataFile("core", getName(), "zip");
-            is = new FileInputStream(dataFile);
-            assertNotNull(is);
-            ZipUtils.extractZip(new ZipInputStream(is), tmpDir);
+            File dataFile = getTestDataFile("core", name, "zip");
+            ZipUtils.extractZip(dataFile, tmpDir);
         }
         finally
         {
