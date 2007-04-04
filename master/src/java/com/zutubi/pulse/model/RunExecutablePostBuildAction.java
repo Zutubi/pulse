@@ -6,6 +6,7 @@ import com.zutubi.pulse.core.FileLoadException;
 import com.zutubi.pulse.core.Scope;
 import com.zutubi.pulse.core.VariableHelper;
 import com.zutubi.pulse.core.model.*;
+import com.zutubi.pulse.jni.ProcessControl;
 import com.zutubi.pulse.util.IOUtils;
 
 import java.util.LinkedList;
@@ -33,6 +34,7 @@ public class RunExecutablePostBuildAction extends PostBuildAction
 
     protected void internalExecute(BuildResult build, RecipeResultNode recipe, List<ResourceProperty> properties)
     {
+        Process child = null;
         try
         {
             List<String> commandLine = new LinkedList<String>();
@@ -40,7 +42,7 @@ public class RunExecutablePostBuildAction extends PostBuildAction
             addArguments(commandLine, build, recipe, properties);
 
             ProcessBuilder builder = new ProcessBuilder(commandLine);
-            Process child = builder.start();
+            child = builder.start();
             IOUtils.joinStreams(child.getInputStream(), System.out);
             int code = child.waitFor();
             if(code != 0)
@@ -51,6 +53,10 @@ public class RunExecutablePostBuildAction extends PostBuildAction
         catch (Exception e)
         {
             addError(e.getMessage());
+        }
+        finally
+        {
+            ProcessControl.destroyProcess(child);
         }
     }
 
