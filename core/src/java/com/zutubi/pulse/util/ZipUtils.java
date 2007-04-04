@@ -414,6 +414,14 @@ public class ZipUtils
             return;
         }
 
+        if(!dir.isDirectory())
+        {
+            if (!dir.mkdirs())
+            {
+                throw new IOException("Unable to create destination directory '" + dir.getAbsolutePath() + "'");
+            }
+        }
+
         if(useExternalUnzip())
         {
             extractZipExternal(zipFile, dir);
