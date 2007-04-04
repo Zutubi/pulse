@@ -142,7 +142,7 @@ public class AgentUpdaterTest extends PulseTestCase implements EventListener
     public void testRebootWrongBuild() throws Exception
     {
         createUpdater(true, 2, 6);
-        updater.setPingInterval(5000);
+        updater.setPingInterval(6000);
         updater.start();
         start();
         download();
