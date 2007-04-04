@@ -147,7 +147,7 @@
         </subant>
     </target>
 
-    <!-- prepare for new build -->
+    <!-- perform the actual build -->
     <target name="build" depends="init, module-pre-build, common-build, module-post-build"/>
 
     <target name="module-pre-build"/>
@@ -181,7 +181,7 @@
 
     </target>
 
-    <!-- prepare for new build -->
+    <!-- run tests -->
     <target name="test" depends="init, module-pre-test, common-test, module-post-test"/>
 
     <target name="module-pre-test"/>
