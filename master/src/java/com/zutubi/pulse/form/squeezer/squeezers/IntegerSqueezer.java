@@ -20,9 +20,16 @@ public class IntegerSqueezer implements TypeSqueezer
 
     public Object unsqueeze(String... str) throws SqueezeException
     {
-        if (TextUtils.stringSet(str[0]))
+        try
         {
-            return Integer.parseInt(str[0]);
+            if (TextUtils.stringSet(str[0]))
+            {
+                return Integer.parseInt(str[0]);
+            }
+        }
+        catch (NumberFormatException e)
+        {
+            throw new SqueezeException(e.getMessage());
         }
         return null;
     }

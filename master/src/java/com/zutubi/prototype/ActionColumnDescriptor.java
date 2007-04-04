@@ -26,6 +26,7 @@ public class ActionColumnDescriptor extends ColumnDescriptor
     {
         Column column = new Column();
         column.addAll(getParameters());
+        column.setSpan(colspan);
         return column;
 
     }

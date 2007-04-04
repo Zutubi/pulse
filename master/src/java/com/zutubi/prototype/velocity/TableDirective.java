@@ -28,6 +28,13 @@ public class TableDirective extends PrototypeDirective
     private static final Logger LOG = Logger.getLogger(TableDirective.class);
     private Configuration configuration;
 
+    private String action;
+
+    public void setAction(String action)
+    {
+        this.action = action;
+    }
+
     public String getName()
     {
         return "plist";
@@ -61,6 +68,7 @@ public class TableDirective extends PrototypeDirective
             Map<String, Object> context = initialiseContext(type.getClazz());
             context.put("table", tableDescriptor.instantiate(record));
             context.put("path", lookupPath());
+            context.put("action", action);
             
             try
             {

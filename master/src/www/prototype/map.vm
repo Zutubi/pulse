@@ -20,13 +20,15 @@
 </p>
 
 <p>
-    #plist("path=$config.path")
+    #plist("path=$config.path" "action=wizard.action?path=$config.path")
 </p>
 
+<!--
 <p>
     <a href="wizard.action?path=$config.path">add...</a>
 </p>
 
+-->
 <!--
 <p>&nbsp;</p>
 <p>&nbsp;</p>

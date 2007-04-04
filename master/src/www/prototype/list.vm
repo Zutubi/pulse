@@ -20,19 +20,8 @@
 </p>
 
 <p>
-    #plist("path=$config.path")
+    #plist("path=$config.path" "action=wizard.action?path=$config.path")
 </p>
-
-<p>
-    #if( $config.extensions.size() > 0)
-        #if($config.extensions.size() == 1)
-            #pform("path=$config.path" "action=save.action?path=$config.path" "symbolicName=$config.extensions.get(0)")
-        #else
-            <a href="wizard.action?path=$config.path">add...</a>
-        #end
-    #end
-</p>
-
 
 <p>
     #if($config.pathElements.length > 2)

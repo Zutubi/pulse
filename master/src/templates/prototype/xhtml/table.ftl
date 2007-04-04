@@ -5,20 +5,22 @@
             <#list row.cells as cell>
                 <#if cell.parameters.type?exists>
                     <#if cell.parameters.type == "header">
-                        <th colspan="${cell.span}"><#if cell.value?exists>${cell.value?i18n}</#if></th>
+                        <th class="content" colspan="${cell.span}"><#if cell.value?exists>${cell.value?i18n}</#if></th>
                     <#elseif cell.parameters.type == "action">
-                        <td colspan="${cell.span}">
+                        <td  class="content" colspan="${cell.span}">
                         <#if cell.parameters.label == "edit">
                             &nbsp;<a href="configuration.action?path=${path}/${cell.parameters.key}">${cell.parameters.label?i18n}</a>
                         <#elseif cell.parameters.label == "delete">
                             &nbsp;<a href="reset.action?submit=delete&path=${path}/${cell.parameters.key}">${cell.parameters.label?i18n}</a>
+                        <#elseif cell.parameters.label == "add">
+                            &nbsp;<a href="${action}">${cell.parameters.label?i18n}</a>
                         <#else>
                             &nbsp;${cell.parameters.label?i18n}
                         </#if>
                         </td>
                     </#if>
                 <#else>
-                    <td colspan="${cell.span}"><#if cell.value?exists>${cell.value}</#if></td>
+                    <td class="content" colspan="${cell.span}"><#if cell.value?exists>${cell.value}</#if></td>
                 </#if>
             </#list>
         </tr>

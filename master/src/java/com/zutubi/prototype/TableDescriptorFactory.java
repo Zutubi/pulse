@@ -5,6 +5,7 @@ import com.zutubi.prototype.type.CollectionType;
 import com.zutubi.prototype.type.Type;
 import com.zutubi.prototype.type.TypeException;
 import com.zutubi.prototype.type.TypeRegistry;
+import com.zutubi.prototype.type.CompositeType;
 
 /**
  *
@@ -21,7 +22,7 @@ public class TableDescriptorFactory
 
         // generate the header row.
         RowDescriptor headerRow = new SingleRowDescriptor();
-        headerRow.addDescriptor(new HeaderColumnDescriptor(type.getSymbolicName()));
+        headerRow.addDescriptor(new HeaderColumnDescriptor(((CompositeType)type.getCollectionType()).getSymbolicName()));
         headerRow.addDescriptor(new HeaderColumnDescriptor("action", 2));
         tableDescriptor.addDescriptor(headerRow);
 

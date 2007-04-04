@@ -1,7 +1,8 @@
 <#assign hint>${parameters.name}.hint</#assign>
-<#if hint?i18n?exists && hint != hint?i18n>
+<#assign inlinehelp>${hint?i18n}</#assign>
+<#if inlinehelp?exists && hint != inlinehelp>
 <tr>
     <td>&nbsp;</td>
-    <td class="inline-help">${hint?i18n}</td>
+    <td class="inline-help">${inlinehelp}</td>
 </tr>
 </#if>
