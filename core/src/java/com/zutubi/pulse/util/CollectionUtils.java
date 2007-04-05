@@ -1,8 +1,5 @@
 package com.zutubi.pulse.util;
 
-import com.zutubi.pulse.plugins.PluginImpl;
-import com.zutubi.pulse.plugins.Plugin;
-
 import java.util.*;
 
 /**
@@ -11,12 +8,10 @@ public class CollectionUtils
 {
     public static <T> List<T> filter(List<T> l, Predicate<T> p)
     {
-        List<T> result = new LinkedList<T>();
-        filter(l, p, result);
-        return result;
+        return filter(l, p, (List<T>) new LinkedList<T>());
     }
 
-    public static <T> void filter(Collection<T> in, Predicate<T> p, Collection<T> out)
+    public static <T, U extends Collection<T>> U filter(Collection<T> in, Predicate<T> p, U out)
     {
         for(T t: in)
         {
@@ -25,6 +20,8 @@ public class CollectionUtils
                 out.add(t);
             }
         }
+
+        return out;
     }
 
     public static <T> List<T> filter(T[] l, Predicate<T> p)

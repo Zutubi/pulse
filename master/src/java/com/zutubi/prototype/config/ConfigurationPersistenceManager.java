@@ -33,7 +33,10 @@ public class ConfigurationPersistenceManager
     public void register(String scope, ComplexType type)
     {
         rootScopes.put(scope, type);
-        recordManager.insert(scope, type.createNewRecord());
+        if(!recordManager.containsRecord(scope))
+        {
+            recordManager.insert(scope, type.createNewRecord());
+        }
     }
 
     /**

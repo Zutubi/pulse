@@ -35,6 +35,9 @@ public class Data implements MasterUserPaths
 {
     private static final Logger LOG = Logger.getLogger(Data.class);
 
+    public static final String CONFIG_FILE_NAME = "pulse.config.properties";
+    private static final String LICENSE_KEY = "license.key";
+
     private final File pulseData;
 
     private Version dataVersion;
@@ -43,13 +46,11 @@ public class Data implements MasterUserPaths
     private File userRoot;
     private File databaseRoot;
     private File userTemplateRoot;
+    private File recordRoot;
 
     private File backupRoot;
 
-    public static final String CONFIG_FILE_NAME = "pulse.config.properties";
-
     private Config config = null;
-    private static final String LICENSE_KEY = "license.key";
 
     public Data(File dataDir)
     {
@@ -334,6 +335,15 @@ public class Data implements MasterUserPaths
             userTemplateRoot = new File(getUserConfigRoot(), "templates");
         }
         return userTemplateRoot;
+    }
+
+    public File getRecordRoot()
+    {
+        if(recordRoot == null)
+        {
+            recordRoot = new File(getData(), "records");
+        }
+        return recordRoot;
     }
 
     private Config getConfig()

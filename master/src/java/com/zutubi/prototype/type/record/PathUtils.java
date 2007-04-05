@@ -67,6 +67,16 @@ public class PathUtils
         return null;
     }
 
+    public static String getBasePath(String path)
+    {
+        int i = path.lastIndexOf(SEPARATOR);
+        if (i != -1 && i < path.length())
+        {
+            return path.substring(i + 1);
+        }
+        return null;
+    }
+
     public static String normalizePath(String path)
     {
         if (path.startsWith(SEPARATOR))

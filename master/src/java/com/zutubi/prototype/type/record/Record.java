@@ -1,8 +1,6 @@
 package com.zutubi.prototype.type.record;
 
-import java.util.Map;
 import java.util.Set;
-import java.util.Collection;
 
 /**
  * A record defines a simple map for storing data.  
@@ -30,11 +28,11 @@ public interface Record extends Cloneable
      */
     String getMeta(String key);
 
-    Object get(Object key);
+    Object get(String key);
 
     int size();
 
-    boolean containsKey(Object key);
+    boolean containsKey(String key);
 
     /**
      * Create a clone of this record.

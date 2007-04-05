@@ -1,6 +1,7 @@
 package com.zutubi.pulse.util;
 
 import nu.xom.*;
+
 import java.io.*;
 
 /**
@@ -35,6 +36,11 @@ public class XMLUtils
 
     public static String getText(Element element)
     {
+        return getText(element, null);
+    }
+
+    public static String getText(Element element, String defaultValue)
+    {
         if (element.getChildCount() > 0)
         {
             Node child = element.getChild(0);
@@ -44,7 +50,7 @@ public class XMLUtils
             }
         }
 
-        return null;
+        return defaultValue;
     }
 
     public static String getRequiredAttribute(Element e, String attribute) throws ParsingException
@@ -82,7 +88,26 @@ public class XMLUtils
         }
     }
 
+    public static Document readDocument(File file) throws IOException, ParsingException
+    {
+        FileInputStream is = null;
+        try
+        {
+            is = new FileInputStream(file);
+            return streamToDoc(is);
+        }
+        finally
+        {
+            IOUtils.close(is);
+        }
+    }
+
     public static void writeDocument(File file, Document doc) throws IOException
+    {
+        writeDocument(file, doc, false);
+    }
+
+    public static void writeDocument(File file, Document doc, boolean prettyPrint) throws IOException
     {
         BufferedOutputStream bos = null;
         try
@@ -91,6 +116,10 @@ public class XMLUtils
             bos = new BufferedOutputStream(fos);
 
             Serializer serializer = new Serializer(bos);
+            if(prettyPrint)
+            {
+                serializer.setIndent(4);
+            }
             serializer.write(doc);
         }
         finally

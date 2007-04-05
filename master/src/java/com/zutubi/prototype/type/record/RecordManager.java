@@ -1,6 +1,6 @@
 package com.zutubi.prototype.type.record;
 
-import java.util.StringTokenizer;
+import com.zutubi.pulse.bootstrap.MasterConfigurationManager;
 
 /**
  *
@@ -13,11 +13,14 @@ public class RecordManager
      * records start from here.
      */
     private MutableRecord baseRecord = new MutableRecordImpl();
+    private MasterConfigurationManager configurationManager;
+    private RecordSerialiser recordSerialiser;
 
-    /**
-     * The path separator used for paths that identify records.
-     */
-    private static final String PATH_SEPARATOR = "/";
+    public void init()
+    {
+        recordSerialiser = new DefaultRecordSerialiser(configurationManager.getUserPaths().getRecordRoot());
+        baseRecord = recordSerialiser.deserialise("");
+    }
 
     /**
      * Load the record identified by the path.
@@ -28,10 +31,8 @@ public class RecordManager
     public Record load(String path)
     {
         Record record = baseRecord;
-        StringTokenizer tokens = new StringTokenizer(path, PATH_SEPARATOR, false);
-        while (tokens.hasMoreTokens())
+        for(String pathElement: PathUtils.getPathElements(path))
         {
-            String pathElement = tokens.nextToken();
             Object data = record.get(pathElement);
             if (data == null || !(data instanceof MutableRecordImpl))
             {
@@ -51,10 +52,8 @@ public class RecordManager
     public boolean containsRecord(String path)
     {
         MutableRecord record = baseRecord;
-        StringTokenizer tokens = new StringTokenizer(path, PATH_SEPARATOR, false);
-        while (tokens.hasMoreTokens())
+        for(String pathElement: PathUtils.getPathElements(path))
         {
-            String pathElement = tokens.nextToken();
             Object data = record.get(pathElement);
             if (data == null || !(data instanceof MutableRecordImpl))
             {
@@ -75,15 +74,17 @@ public class RecordManager
         }
 
         MutableRecord parent = getRecord(PathUtils.getParentPathElements(pathElements));
+
+        // Save first before hooking up in memory
+        recordSerialiser.serialise(path, (MutableRecord) newRecord, true);
         parent.put(pathElements[pathElements.length - 1], newRecord.createMutable());
     }
 
     private MutableRecord getRecord(String[] pathElements)
     {
         MutableRecord record = baseRecord;
-        for (int i = 0; i < pathElements.length; i++)
+        for (String element : pathElements)
         {
-            String element = pathElements[i];
             if (record.get(element) == null)
             {
                 record.put(element, new MutableRecordImpl());
@@ -103,6 +104,7 @@ public class RecordManager
     {
         MutableRecord record = getRecord(PathUtils.getPathElements(path));
         record.update(values);
+        recordSerialiser.serialise(path, record, false);
     }
 
     /**
@@ -114,19 +116,8 @@ public class RecordManager
     public Record delete(String path)
     {
         MutableRecord record = baseRecord;
-        StringTokenizer tokens = new StringTokenizer(path, PATH_SEPARATOR, false);
-
-        String pathElement = null;
-        while (tokens.hasMoreTokens())
+        for(String pathElement: PathUtils.getParentPathElements(path))
         {
-            pathElement = tokens.nextToken();
-
-            // search for the record until we have no more tokens. At this point, we
-            // are are at the parent record with the key for the record we are interested in.
-            if (!tokens.hasMoreTokens())
-            {
-                break;
-            }
             if (!record.containsKey(pathElement))
             {
                 return null;
@@ -140,12 +131,14 @@ public class RecordManager
             record = (MutableRecordImpl) record.get(pathElement);
         }
 
-        if (record.containsKey(pathElement))
+        String basePath = PathUtils.getBasePath(path);
+        if (record.containsKey(basePath))
         {
-            Object obj = record.get(pathElement);
+            recordSerialiser.delete(path);
+            Object obj = record.get(basePath);
             if (obj instanceof MutableRecordImpl)
             {
-                return (Record) record.remove(pathElement);
+                return (Record) record.remove(basePath);
             }
         }
         return null;
@@ -154,16 +147,21 @@ public class RecordManager
     /**
      * Copy the record contents from the source path to the destination path
      *
-     * @param sourcePath
-     * @param destinationPath
+     * @param sourcePath      path to copy from
+     * @param destinationPath path to copy to
      */
     public void copy(String sourcePath, String destinationPath)
     {
         MutableRecord record = (MutableRecord) load(sourcePath);
         if (record != null)
         {
-            MutableRecord copy = (MutableRecord) record.createMutable();
+            MutableRecord copy = record.createMutable();
             insert(destinationPath, copy);
         }
+    }
+
+    public void setConfigurationManager(MasterConfigurationManager configurationManager)
+    {
+        this.configurationManager = configurationManager;
     }
 }

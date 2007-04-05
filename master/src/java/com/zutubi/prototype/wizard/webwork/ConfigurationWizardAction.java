@@ -6,6 +6,7 @@ import com.zutubi.prototype.config.ConfigurationPersistenceManager;
 import com.zutubi.prototype.type.CollectionType;
 import com.zutubi.prototype.type.Type;
 import com.zutubi.prototype.type.TypeException;
+import com.zutubi.prototype.type.record.PathUtils;
 import com.zutubi.prototype.type.record.Record;
 import com.zutubi.prototype.webwork.PrototypeInteractionHandler;
 import com.zutubi.prototype.webwork.PrototypeUtils;
@@ -15,11 +16,7 @@ import com.zutubi.pulse.bootstrap.ComponentContext;
 import com.zutubi.pulse.util.logging.Logger;
 import com.zutubi.pulse.validation.MessagesTextProvider;
 import com.zutubi.pulse.web.ActionSupport;
-import com.zutubi.validation.DelegatingValidationContext;
-import com.zutubi.validation.ValidationContext;
-import com.zutubi.validation.ValidationException;
-import com.zutubi.validation.ValidationManager;
-import com.zutubi.validation.XWorkValidationAdapter;
+import com.zutubi.validation.*;
 
 import java.util.Map;
 
@@ -346,7 +343,7 @@ public class ConfigurationWizardAction extends ActionSupport
 
     private void removeWizard()
     {
-        String sessionKey = normalizePath(this.path);
+        String sessionKey = PathUtils.normalizePath(this.path);
         ActionContext.getContext().getSession().remove(sessionKey);
     }
 
@@ -364,7 +361,7 @@ public class ConfigurationWizardAction extends ActionSupport
         try
         {
             // normalise the path by stripping leading and trailing '/' chars
-            String sessionKey = normalizePath(this.path);
+            String sessionKey = PathUtils.normalizePath(this.path);
 
             Map<String, Object> session = ActionContext.getContext().getSession();
             if (!session.containsKey(sessionKey))
@@ -412,19 +409,6 @@ public class ConfigurationWizardAction extends ActionSupport
 
         wizardRequiresLazyInitialisation = true;
         return wizardInstance;
-    }
-
-    private String normalizePath(String path)
-    {
-        if (path.startsWith("/"))
-        {
-            path = path.substring(1);
-        }
-        if (path.endsWith("/"))
-        {
-            path = path.substring(0, path.length() - 1);
-        }
-        return path;
     }
 
     public void setValidationManager(ValidationManager validationManager)

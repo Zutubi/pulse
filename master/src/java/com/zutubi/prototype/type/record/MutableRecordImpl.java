@@ -1,6 +1,10 @@
 package com.zutubi.prototype.type.record;
 
+import com.zutubi.pulse.util.CollectionUtils;
+import com.zutubi.pulse.util.Predicate;
+
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
@@ -55,17 +59,17 @@ public class MutableRecordImpl implements MutableRecord
         return meta.keySet();
     }
 
-    public boolean containsKey(Object key)
+    public boolean containsKey(String key)
     {
         return data.containsKey(key);
     }
 
-    public Object get(Object key)
+    public Object get(String key)
     {
         return data.get(key);
     }
 
-    public Object remove(Object key)
+    public Object remove(String key)
     {
         return data.remove(key);
     }
@@ -131,5 +135,49 @@ public class MutableRecordImpl implements MutableRecord
         
         meta.clear();
         meta.putAll(newMetaData);
+    }
+
+    public Set<String> simpleKeySet()
+    {
+        return CollectionUtils.filter(keySet(), new Predicate<String>()
+        {
+            public boolean satisfied(String s)
+            {
+                return get(s) instanceof String;
+            }
+        }, new HashSet<String>(data.size()));
+    }
+
+    public boolean equals(Object o)
+    {
+        if (this == o)
+        {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass())
+        {
+            return false;
+        }
+
+        MutableRecordImpl that = (MutableRecordImpl) o;
+
+        if (data != null ? !data.equals(that.data) : that.data != null)
+        {
+            return false;
+        }
+        if (meta != null ? !meta.equals(that.meta) : that.meta != null)
+        {
+            return false;
+        }
+
+        return true;
+    }
+
+    public int hashCode()
+    {
+        int result;
+        result = (meta != null ? meta.hashCode() : 0);
+        result = 31 * result + (data != null ? data.hashCode() : 0);
+        return result;
     }
 }

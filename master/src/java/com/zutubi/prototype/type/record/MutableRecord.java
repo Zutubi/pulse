@@ -1,8 +1,9 @@
 package com.zutubi.prototype.type.record;
 
+import java.util.Set;
+
 /**
- *
- * 
+ * A record that supports writing to properties.
  */
 public interface MutableRecord extends Record
 {
@@ -28,7 +29,9 @@ public interface MutableRecord extends Record
 
     void clear();
 
-    Object remove(Object key);
+    Object remove(String key);
 
     void update(Record record);
+
+    Set<String> simpleKeySet();
 }

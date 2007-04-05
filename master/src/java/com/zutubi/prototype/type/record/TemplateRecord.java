@@ -3,9 +3,9 @@ package com.zutubi.prototype.type.record;
 import com.zutubi.prototype.type.TypeRegistry;
 
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
-import java.util.HashMap;
 
 /**
  */
@@ -49,17 +49,17 @@ public class TemplateRecord implements Record
         return keySet().isEmpty();
     }
 
-    public boolean containsKey(Object key)
+    public boolean containsKey(String key)
     {
         return moi.containsKey(key) || parent != null && parent.containsKey(key);
     }
 
-    public boolean containsValue(Object value)
+    public boolean containsValue(String value)
     {
         return values().contains(value);
     }
 
-    public Object get(Object key)
+    public Object get(String key)
     {
         // This is where magic happens.
         Object value = moi.get(key);
