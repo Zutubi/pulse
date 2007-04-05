@@ -164,4 +164,9 @@ public class RecordManager
     {
         this.configurationManager = configurationManager;
     }
+
+    public void setRecordSerialiser(RecordSerialiser recordSerialiser)
+    {
+        this.recordSerialiser = recordSerialiser;
+    }
 }

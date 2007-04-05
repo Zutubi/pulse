@@ -15,6 +15,7 @@ public class RecordManagerTest extends TestCase
         super.setUp();
 
         recordManager = new RecordManager();
+        recordManager.setRecordSerialiser(new MockRecordSerialiser());        
     }
 
     protected void tearDown() throws Exception

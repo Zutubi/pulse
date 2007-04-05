@@ -3,6 +3,7 @@ package com.zutubi.prototype.config;
 import com.zutubi.prototype.type.Type;
 import com.zutubi.prototype.type.TypeException;
 import com.zutubi.prototype.type.TypeRegistry;
+import com.zutubi.prototype.type.record.MockRecordSerialiser;
 import com.zutubi.prototype.type.record.RecordManager;
 import com.zutubi.pulse.prototype.record.SymbolicName;
 import junit.framework.TestCase;
@@ -24,7 +25,7 @@ public class ConfigurationPersistenceManagerTest extends TestCase
 
         typeRegistry = new TypeRegistry();
         recordManager = new RecordManager();
-
+        recordManager.setRecordSerialiser(new MockRecordSerialiser());
         manager = new ConfigurationPersistenceManager();
         manager.setTypeRegistry(typeRegistry);
         manager.setRecordManager(recordManager);
