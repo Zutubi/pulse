@@ -7,6 +7,9 @@ import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 
+@Target(ElementType.TYPE)
+@Retention(RetentionPolicy.RUNTIME)
+
 /**
  * The ConfigurationCheck annotation allows for a ConfigurationCheckHandler to be associated
  * with a configuration object.
@@ -15,8 +18,6 @@ import java.lang.annotation.RetentionPolicy;
  * a check on the target configuration.
  *
  */
-@Target(ElementType.TYPE)
-@Retention(RetentionPolicy.RUNTIME)
 public @interface ConfigurationCheck
 {
     /**

@@ -5,10 +5,8 @@ import com.zutubi.prototype.ConfigurationCheckHandler;
 import com.zutubi.prototype.annotation.ConfigurationCheck;
 import com.zutubi.prototype.type.CompositeType;
 import com.zutubi.prototype.type.Type;
-import com.zutubi.prototype.type.TypeRegistry;
 import com.zutubi.prototype.type.record.Record;
 import com.zutubi.pulse.bootstrap.ComponentContext;
-import com.zutubi.pulse.web.ActionSupport;
 import com.zutubi.validation.XWorkValidationAdapter;
 
 import java.util.HashMap;
@@ -18,14 +16,11 @@ import java.util.Map;
  * Process a configuration check request.
  *
  */
-public class CheckAction extends ActionSupport
+public class CheckAction extends PrototypeSupport
 {
-    private String path;
-
-    private TypeRegistry typeRegistry;
-    
     private PrototypeInteractionHandler interactionHandler;
 
+    private Record checkRecord;
 
     public CheckAction()
     {
@@ -33,64 +28,67 @@ public class CheckAction extends ActionSupport
         ComponentContext.autowire(interactionHandler);
     }
 
-    public void setPath(String path)
+    public Record getCheckRecord()
     {
-        this.path = path;
-    }
-
-    public String getPath()
-    {
-        return path;
+        return checkRecord;
     }
 
     public String execute() throws Exception
     {
+        if (!isCheckSelected())
+        {
+            return ERROR;
+        }
+
+        // first, gather all of the parameters (both those being checked and those used by the checking) so that
+        // we have something to display back to the user.
+
         Map<String, String[]> parameters = ActionContext.getContext().getParameters();
 
-        Map<String, String[]> checkParameters = new HashMap<String, String[]>();
+        // The form being processed:
+        Map<String, String[]> formParameters = new HashMap<String, String[]>();
         for (String name : parameters.keySet())
         {
             if (name.endsWith("_check"))
             {
-                checkParameters.put(name.substring(0, name.length() - 6), parameters.get(name));
+                formParameters.put(name.substring(0, name.length() - 6), parameters.get(name));
             }
         }
 
-        String symbolicName = checkParameters.get("symbolicName")[0];
-        
+        String symbolicName = formParameters.get("symbolicName")[0];
         Type type = typeRegistry.getType(symbolicName);
+        record = PrototypeUtils.toRecord((CompositeType) type, formParameters);
 
-        Record record = PrototypeUtils.toRecord((CompositeType) type, checkParameters);
-        if (!interactionHandler.validate(record, new XWorkValidationAdapter(this)))
+        // Now lets create the record for the secondary form, used to generate the check processor. 
+        ConfigurationCheck annotation = (ConfigurationCheck) type.getAnnotation(ConfigurationCheck.class);
+        Type checkType = typeRegistry.getType(annotation.value());
+        if (checkType == null)
         {
-            return SUCCESS;
+            checkType = typeRegistry.register(annotation.value());
+        }
+        checkRecord = PrototypeUtils.toRecord((CompositeType) checkType, parameters);
+
+        // validate the check form first.
+        if (!interactionHandler.validate(checkRecord, new XWorkValidationAdapter(this)))
+        {
+            return doRender();
         }
 
+        // validate the primary form.
+        if (!interactionHandler.validate(record, new XWorkValidationAdapter(this)))
+        {
+            return doRender();
+        }
+
+        // Instantiate the primary configuration object.
         Object instance = type.instantiate(record);
 
-        ConfigurationCheck annotation = (ConfigurationCheck) type.getAnnotation(ConfigurationCheck.class);
-        type = typeRegistry.getType(annotation.value());
-        if (type == null)
-        {
-            type = typeRegistry.register(annotation.value());
-        }
-
-        record = PrototypeUtils.toRecord((CompositeType) type, parameters);
-        if (!interactionHandler.validate(record, new XWorkValidationAdapter(this)))
-        {
-            return SUCCESS;
-        }
-
-        ConfigurationCheckHandler handler = (ConfigurationCheckHandler) type.instantiate(record);
+        // Instantiate and execute the check handler.
+        ConfigurationCheckHandler handler = (ConfigurationCheckHandler) checkType.instantiate(checkRecord);
         handler.test(instance);
 
         // We need to return the existing form values as well.
 
-        return SUCCESS;
-    }
-
-    public void setTypeRegistry(TypeRegistry typeRegistry)
-    {
-        this.typeRegistry = typeRegistry;
+        return doRender();
     }
 }

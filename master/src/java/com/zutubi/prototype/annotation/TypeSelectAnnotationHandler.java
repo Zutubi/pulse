@@ -4,10 +4,11 @@ import com.zutubi.prototype.Descriptor;
 import com.zutubi.prototype.type.CompositeType;
 import com.zutubi.prototype.type.Type;
 import com.zutubi.prototype.type.TypeRegistry;
-import com.zutubi.pulse.i18n.Messages;
 import com.zutubi.pulse.util.logging.Logger;
 
 import java.lang.annotation.Annotation;
+import java.util.Collections;
+import java.util.List;
 
 /**
  *
@@ -25,17 +26,19 @@ public class TypeSelectAnnotationHandler extends FieldAnnotationHandler
 
         try
         {
+            List<String> optionList = Collections.EMPTY_LIST;
+
             Type type = typeRegistry.getType(((TypeSelect)annotation).configurationType());
-            if (type == null)
+            if (type != null)
             {
-                return;
+                optionList = ((CompositeType)type).getExtensions();
             }
-            
-            java.util.List<String> optionList = ((CompositeType)type).getExtensions();
+
             descriptor.addParameter("list", optionList);
 
+/*
             // It would be nice ot have some information about each of these options. This is
-            // possible when the options represent types and we are in a wizard.
+            // possible when the options represent types.
             for (String option: optionList)
             {
                 String extraInformation = "No extra information avaiable";
@@ -51,14 +54,19 @@ public class TypeSelectAnnotationHandler extends FieldAnnotationHandler
                 }
                 descriptor.addParameter(option + ".introduction", extraInformation);
             }
-
+*/
         }
         catch (Exception e)
         {
-            LOG.severe(e);
+            LOG.warning(e);
         }
     }
 
+    /**
+     * Required resource.
+     *
+     * @param typeRegistry instance
+     */
     public void setTypeRegistry(TypeRegistry typeRegistry)
     {
         this.typeRegistry = typeRegistry;

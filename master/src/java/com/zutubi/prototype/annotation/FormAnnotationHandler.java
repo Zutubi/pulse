@@ -13,7 +13,7 @@ public class FormAnnotationHandler implements AnnotationHandler
 {
     public void process(Annotation annotation, Descriptor descriptor)
     {
-        // apply annotations..
+        // Collect all of the annotations fields in a map and add them to the descriptor.
         descriptor.addAll(AnnotationUtils.collectPropertiesFromAnnotation(annotation));
     }
 }

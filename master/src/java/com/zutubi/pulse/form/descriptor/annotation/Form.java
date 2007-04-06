@@ -6,7 +6,7 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 
 /**
- * <class-comment/>
+ * @deprecated
  */
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)

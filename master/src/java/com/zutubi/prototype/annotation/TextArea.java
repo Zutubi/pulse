@@ -7,15 +7,19 @@ import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 
-/**
- * The TextArea annotation is used to mark a field / property as being rendered using a text field.  
- *
- * 
- */
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ElementType.METHOD, ElementType.FIELD})
+
+// Annotation handler reference that is used to process 'this' annotation.
 @Handler(FieldAnnotationHandler.class)
+
+// This annotation is a form field of type TEXTAREA.
 @Field(type = FieldType.TEXTAREA)
+
+/**
+ * The TextArea annotation is used to mark a property as being rendered using a text field.
+ *
+ */
 public @interface TextArea
 {
     /**

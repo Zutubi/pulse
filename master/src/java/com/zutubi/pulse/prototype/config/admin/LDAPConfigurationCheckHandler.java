@@ -11,10 +11,11 @@ import com.zutubi.pulse.prototype.record.SymbolicName;
 @SymbolicName("internal.ldapConfigutionCheckHandler")
 public class LDAPConfigurationCheckHandler implements ConfigurationCheckHandler<LDAPConfiguration>
 {
+    @Required
     private String login;
+    
     private String password;
 
-    @Required()
     public String getLogin()
     {
         return login;
@@ -37,6 +38,6 @@ public class LDAPConfigurationCheckHandler implements ConfigurationCheckHandler<
 
     public void test(LDAPConfiguration configuration)
     {
-
+        System.out.println(configuration.getBaseDn());
     }
 }

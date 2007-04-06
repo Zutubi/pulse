@@ -8,8 +8,9 @@ import java.lang.annotation.Target;
 /**
  * Marks a collection-typed property as ordered: i.e. the user can edit the
  * ordering of items in the collection.
+ * 
  */
-@Target({ElementType.METHOD, ElementType.ANNOTATION_TYPE})
+@Target({ElementType.METHOD, ElementType.FIELD})
 @Retention(RetentionPolicy.RUNTIME)
 public @interface Ordered
 {

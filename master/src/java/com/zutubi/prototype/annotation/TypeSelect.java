@@ -7,16 +7,21 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
+@Target({ElementType.METHOD, ElementType.FIELD})
+@Retention(RetentionPolicy.RUNTIME)
+
+// Annotation handler reference that is used to process 'this' annotation.
+@Handler(TypeSelectAnnotationHandler.class)
+
+// This annotation is a form field of type SELECT.
+@Field(type = FieldType.SELECT)
+
 /**
  * The TypeSelect annotation generates a form select widget using the defined extensions
  * of the configurationType as the source for the select options.
  *
  * @see @com.zutubi.prototype.annotation.Select()
  */
-@Target(ElementType.METHOD)
-@Retention(RetentionPolicy.RUNTIME)
-@Field(type = FieldType.SELECT)
-@Handler(TypeSelectAnnotationHandler.class)
 public @interface TypeSelect
 {
     /**

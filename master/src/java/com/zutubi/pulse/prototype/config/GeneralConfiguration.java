@@ -3,8 +3,8 @@ package com.zutubi.pulse.prototype.config;
 import com.zutubi.prototype.annotation.Form;
 import com.zutubi.pulse.prototype.record.SymbolicName;
 import com.zutubi.validation.annotations.Required;
-import com.zutubi.validation.annotations.Url;
 import com.zutubi.validation.annotations.Name;
+import com.zutubi.validation.annotations.Url;
 
 /**
  *
@@ -14,12 +14,12 @@ import com.zutubi.validation.annotations.Name;
 @SymbolicName("internal.GeneralConfiguration")
 public class GeneralConfiguration
 {
-    @Required() @Name()
+    @Required @Name
     private String name;
 
     private String description;
 
-    @Url()
+    @Url
     private String url;
 
     public String getName()

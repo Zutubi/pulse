@@ -23,7 +23,7 @@
 #if( $config.simpleProperties.size() > 0)
     <!-- this configuration definition contains fields to be configured. -->
     <p>
-        #pform("path=$config.path" "action=configuration.action?path=$config.path")
+        #pform("path=$config.path" "action=save.action?path=$config.path")
     </p>
 
     #if ($config.configurationCheckAvailable)

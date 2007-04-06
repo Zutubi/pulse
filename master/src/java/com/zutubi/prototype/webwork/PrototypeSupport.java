@@ -1,52 +1,36 @@
 package com.zutubi.prototype.webwork;
 
 import com.opensymphony.util.TextUtils;
-import com.opensymphony.xwork.ActionContext;
 import com.zutubi.prototype.type.CompositeType;
 import com.zutubi.prototype.type.ListType;
 import com.zutubi.prototype.type.MapType;
 import com.zutubi.prototype.type.Type;
-import com.zutubi.prototype.type.TypeException;
 import com.zutubi.prototype.type.TypeRegistry;
 import com.zutubi.prototype.type.record.Record;
-import com.zutubi.prototype.webwork.Configuration;
-import com.zutubi.prototype.webwork.PrototypeUtils;
-import com.zutubi.pulse.bootstrap.ComponentContext;
 import com.zutubi.pulse.web.ActionSupport;
-import com.zutubi.validation.XWorkValidationAdapter;
 
 /**
  *
  *
  */
-public class PrototypeAction extends ActionSupport
+public class PrototypeSupport extends ActionSupport
 {
-    private String path;
-    private String symbolicName;
-    
-    private Configuration configuration;
+    protected String path;
 
-    private Record record;
+    protected Configuration configuration;
+
+    protected TypeRegistry typeRegistry;
+
+    protected Record record;
+    
     private Type type;
 
-    private String cancel;
+    private String previous;
+    private String next;
+    private String finish;
     private String save;
+    private String check;
     private String submitField;
-
-    private PrototypeInteractionHandler interactionHandler;
-    private TypeRegistry typeRegistry;
-
-
-    public PrototypeAction()
-    {
-        interactionHandler = new PrototypeInteractionHandler();
-        ComponentContext.autowire(interactionHandler);
-    }
-
-    public void setCancel(String cancel)
-    {
-        this.cancel = cancel;
-    }
 
     public boolean isCancelSelected()
     {
@@ -77,14 +61,77 @@ public class PrototypeAction extends ActionSupport
         }
     }
 
+    public void setCheck(String check)
+    {
+        this.check= check;
+    }
+
+    public boolean isCheckSelected()
+    {
+        if (TextUtils.stringSet(submitField))
+        {
+            return submitField.equals("check");
+        }
+        else
+        {
+            return TextUtils.stringSet(check);
+        }
+    }
+
+    public void setPrevious(String previous)
+    {
+        this.previous= previous;
+    }
+
+    public boolean isPreviousSelected()
+    {
+        if (TextUtils.stringSet(submitField))
+        {
+            return submitField.equals("previous");
+        }
+        else
+        {
+            return TextUtils.stringSet(previous);
+        }
+    }
+
+    public void setNext(String next)
+    {
+        this.next = next;
+    }
+
+    public boolean isNextSelected()
+    {
+        if (TextUtils.stringSet(submitField))
+        {
+            return submitField.equals("next");
+        }
+        else
+        {
+            return TextUtils.stringSet(next);
+        }
+    }
+
+    public void setFinish(String finish)
+    {
+        this.finish = finish;
+    }
+
+    public boolean isFinishSelected()
+    {
+        if (TextUtils.stringSet(submitField))
+        {
+            return submitField.equals("finish");
+        }
+        else
+        {
+            return TextUtils.stringSet(finish);
+        }
+    }
+
     public void setSubmitField(String submitField)
     {
         this.submitField = submitField;
-    }
-
-    public void setSymbolicName(String symbolicName)
-    {
-        this.symbolicName = symbolicName;
     }
 
     public String getPath()
@@ -97,6 +144,11 @@ public class PrototypeAction extends ActionSupport
         this.path = path;
     }
 
+    public Type getType()
+    {
+        return type;
+    }
+
     public Configuration getConfiguration()
     {
         return configuration;
@@ -105,48 +157,6 @@ public class PrototypeAction extends ActionSupport
     public Record getRecord()
     {
         return record;
-    }
-
-    public Type getType()
-    {
-        return type;
-    }
-
-    public String execute() throws Exception
-    {
-        if (isSaveSelected())
-        {
-            doSave();
-        }
-        return doRender();
-    }
-
-    private void doSave() throws TypeException
-    {
-        if (!TextUtils.stringSet(symbolicName))
-        {
-            return;
-        }
-
-        CompositeType type = typeRegistry.getType(symbolicName);
-        if (type == null)
-        {
-            return;
-        }
-
-        record = PrototypeUtils.toRecord(type, ActionContext.getContext().getParameters());
-
-        if (!validate(record))
-        {
-            return;
-        }
-
-        interactionHandler.save(path, record);
-    }
-
-    public boolean validate(Record record) throws TypeException
-    {
-        return interactionHandler.validate(record, new XWorkValidationAdapter(this));
     }
 
     public String doRender() throws Exception
@@ -183,4 +193,5 @@ public class PrototypeAction extends ActionSupport
     {
         this.typeRegistry = typeRegistry;
     }
+
 }

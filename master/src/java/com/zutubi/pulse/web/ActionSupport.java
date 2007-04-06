@@ -44,7 +44,7 @@ public class ActionSupport extends com.opensymphony.xwork.ActionSupport implemen
      */
     private transient final TextProvider textProvider = new TextProviderSupport(getClass(), this);
 
-    private String cancel;
+    protected String cancel;
     protected ProjectManager projectManager;
     protected String changeUrl;
     protected CommitMessageTransformerManager commitMessageTransformerManager;

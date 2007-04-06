@@ -1,9 +1,5 @@
 package com.zutubi.prototype.webwork;
 
-import com.zutubi.prototype.type.CompositeType;
-import com.zutubi.prototype.type.ListType;
-import com.zutubi.prototype.type.MapType;
-import com.zutubi.prototype.type.Type;
 import com.zutubi.pulse.web.ActionSupport;
 
 /**
@@ -12,9 +8,12 @@ import com.zutubi.pulse.web.ActionSupport;
  */
 public class ConfigurationAction extends ActionSupport
 {
-    /**
+/*
+    */
+/**
      * The path identifying the configuration presented by this action.
      */
+/*
     private String path;
 
     private Configuration configuration;
@@ -56,4 +55,5 @@ public class ConfigurationAction extends ActionSupport
 
         return SUCCESS;
     }
+*/
 }

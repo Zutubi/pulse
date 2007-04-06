@@ -8,7 +8,10 @@ import com.zutubi.prototype.model.Form;
 import com.zutubi.prototype.type.CompositeType;
 import com.zutubi.prototype.type.Type;
 import com.zutubi.prototype.type.TypeRegistry;
+import com.zutubi.prototype.type.record.Record;
 import com.zutubi.pulse.util.logging.Logger;
+import com.opensymphony.xwork.util.OgnlValueStack;
+import com.opensymphony.xwork.ActionContext;
 import freemarker.template.Configuration;
 import freemarker.template.Template;
 import freemarker.template.TemplateException;
@@ -116,7 +119,10 @@ public class CheckDirective extends PrototypeDirective
 
             Map<String, Object> context = initialiseContext(checkType.getClazz());
 
-            Form form = formDescriptor.instantiate(null);
+            OgnlValueStack stack = ActionContext.getContext().getValueStack();
+            Record data = (Record) stack.findValue("checkRecord");
+
+            Form form = formDescriptor.instantiate(data);
             form.setAction(action);
             context.put("form", form);
 
