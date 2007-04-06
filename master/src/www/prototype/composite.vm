@@ -15,7 +15,7 @@
 </div>
 
 <h2>#i18n("key=label")</h2>
-<p>
+<p style="color:gray">
     #i18n("key=introduction")
 </p>
 
@@ -33,19 +33,6 @@
     </p>
     #end
 #end
-
-#if( $config.extensions.size() > 0)
-<p>
-    <h3>extension</h3>
-    <a href="wizard.action?path=$config.path">create...</a>
-</p>
-#end
-
-<p>
-    #if($config.pathElements.length > 1)
-        <a href="configuration.action?path=${config.parentPath}">done</a>
-    #end
-</p>
 
 #if( $config.nestedProperties.size() > 0)
 <p>&nbsp;</p>

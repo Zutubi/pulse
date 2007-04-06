@@ -1,17 +1,27 @@
 package com.zutubi.pulse.prototype.config.admin;
 
 import com.zutubi.prototype.annotation.ConfigurationCheck;
+import com.zutubi.prototype.annotation.Form;
+import com.zutubi.pulse.jabber.JabberManager;
+import com.zutubi.validation.annotations.Required;
 
 /**
  *
  *
  */
+@Form(fieldOrder = {"username", "password", "server", "port"})
 @ConfigurationCheck(JabberConfigurationCheckHandler.class)
 public class JabberConfiguration
 {
+    @Required
+    private int port = JabberManager.DEFAULT_PORT;
+    
+    @Required
     private String server;
-    private int port;
-    private String username;
+
+    @Required private String username;
+    private String password;
+    
     private boolean ssl;
 
     public String getServer()
@@ -42,6 +52,16 @@ public class JabberConfiguration
     public void setUsername(String username)
     {
         this.username = username;
+    }
+
+    public String getPassword()
+    {
+        return password;
+    }
+
+    public void setPassword(String password)
+    {
+        this.password = password;
     }
 
     public boolean isSsl()

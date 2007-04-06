@@ -20,17 +20,18 @@ public class IntegerSqueezer implements TypeSqueezer
 
     public Object unsqueeze(String... str) throws SqueezeException
     {
+        String s = str[0];
+        if (!TextUtils.stringSet(s))
+        {
+            return null;
+        }
         try
         {
-            if (TextUtils.stringSet(str[0]))
-            {
-                return Integer.parseInt(str[0]);
-            }
+            return Integer.parseInt(s);
         }
         catch (NumberFormatException e)
         {
-            throw new SqueezeException(e.getMessage());
+            throw new SqueezeException(String.format("'%s' is not a valid integer", s));
         }
-        return null;
     }
 }

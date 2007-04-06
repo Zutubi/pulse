@@ -41,7 +41,7 @@ public class PrimitiveType extends AbstractType implements Type
         }
         catch (SqueezeException e)
         {
-            throw new TypeConversionException(e);
+            throw new TypeConversionException(e.getMessage());
         }
     }
 }
