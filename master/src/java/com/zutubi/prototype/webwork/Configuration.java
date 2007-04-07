@@ -3,13 +3,7 @@ package com.zutubi.prototype.webwork;
 import com.opensymphony.util.TextUtils;
 import com.zutubi.prototype.annotation.ConfigurationCheck;
 import com.zutubi.prototype.config.ConfigurationPersistenceManager;
-import com.zutubi.prototype.type.CompositeType;
-import com.zutubi.prototype.type.ListType;
-import com.zutubi.prototype.type.MapType;
-import com.zutubi.prototype.type.PrimitiveType;
-import com.zutubi.prototype.type.Type;
-import com.zutubi.prototype.type.TypeException;
-import com.zutubi.prototype.type.TypeRegistry;
+import com.zutubi.prototype.type.*;
 import com.zutubi.prototype.type.record.PathUtils;
 import com.zutubi.prototype.type.record.Record;
 import com.zutubi.pulse.bootstrap.ComponentContext;
@@ -89,6 +83,10 @@ public class Configuration
             {
                 // only show a simple properties form if it is not associated with an extension type.
                 for (String propertyName : ctype.getPropertyNames(PrimitiveType.class))
+                {
+                    simpleProperties.add(propertyName);
+                }
+                for (String propertyName : ctype.getPropertyNames(ReferenceType.class))
                 {
                     simpleProperties.add(propertyName);
                 }

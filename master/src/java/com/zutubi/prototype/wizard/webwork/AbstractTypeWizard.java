@@ -1,9 +1,6 @@
 package com.zutubi.prototype.wizard.webwork;
 
-import com.zutubi.prototype.type.CompositeType;
-import com.zutubi.prototype.type.PrimitiveType;
-import com.zutubi.prototype.type.TypeProperty;
-import com.zutubi.prototype.type.TypeRegistry;
+import com.zutubi.prototype.type.*;
 import com.zutubi.prototype.type.record.MutableRecord;
 import com.zutubi.prototype.type.record.TemplateRecord;
 import com.zutubi.prototype.wizard.Wizard;
@@ -36,7 +33,7 @@ public abstract class AbstractTypeWizard implements Wizard
         // this extension thing is a little awkward, makes sense in theory, but a little awkward in practice
         if (ConfigurationExtension.class.isAssignableFrom(type.getClazz()))
         {
-            if (type.getExtensions().size() > 1)
+            if (type.getExtensions().size() > 0)
             {
                 TwoStepWizardState state = new TwoStepWizardState(type, templateRecord);
                 state.setTypeRegistry(typeRegistry);
@@ -175,7 +172,7 @@ public abstract class AbstractTypeWizard implements Wizard
             // extract initial values from the template record.
             if (record != null)
             {
-                for (TypeProperty property : type.getProperties(PrimitiveType.class))
+                for (TypeProperty property : type.getProperties(SimpleType.class))
                 {
                     this.record.put(property.getName(), record.get(property.getName()));
                 }

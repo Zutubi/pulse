@@ -9,6 +9,7 @@ import com.zutubi.prototype.FormDescriptorFactory;
 import com.zutubi.prototype.freemarker.GetTextMethod;
 import com.zutubi.prototype.model.Form;
 import com.zutubi.prototype.type.CompositeType;
+import com.zutubi.prototype.type.record.PathUtils;
 import com.zutubi.prototype.wizard.Wizard;
 import com.zutubi.prototype.wizard.WizardState;
 import com.zutubi.prototype.wizard.WizardTransition;
@@ -68,7 +69,7 @@ public class WizardDirective extends AbstractDirective
         Map params = createPropertyMap(context, node);
         wireParams(params);
 
-        String sessionKey = normalizePath(path);
+        String sessionKey = PathUtils.normalizePath(path);
         wizardInstance = (Wizard) ActionContext.getContext().getSession().get(sessionKey);
         if (wizardInstance == null)
         {
@@ -86,22 +87,6 @@ public class WizardDirective extends AbstractDirective
         return true;
     }
 
-    private String normalizePath(String path)
-    {
-        if (TextUtils.stringSet(path))
-        {
-            if (path.startsWith("/"))
-            {
-                path = path.substring(1);
-            }
-            if (path.endsWith("/"))
-            {
-                path = path.substring(0, path.length() - 1);
-            }
-        }
-        return path;
-    }
-
     private String internalRender(WizardState state) throws IOException, ParseErrorException
     {
         // handle rendering of the freemarker template.
@@ -115,7 +100,7 @@ public class WizardDirective extends AbstractDirective
             Messages wizardMessages = Messages.getInstance(wizardInstance.getClass());
 
             // generate the form.
-            FormDescriptor formDescriptor = formDescriptorFactory.createDescriptor(type.getSymbolicName());
+            FormDescriptor formDescriptor = formDescriptorFactory.createDescriptor(path, type.getSymbolicName());
 
             // need to decorate the form a little bit to handle the fact that it is being rendered as a wizard.
             decorate(formDescriptor);

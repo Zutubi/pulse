@@ -5,23 +5,30 @@ import com.zutubi.prototype.type.record.PathUtils;
 import com.zutubi.prototype.type.record.Record;
 import com.zutubi.prototype.type.record.RecordManager;
 import com.zutubi.prototype.type.record.TemplateRecord;
+import com.zutubi.pulse.util.logging.Logger;
 
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  *
  *
  */
+@SuppressWarnings({"unchecked"})
 public class ConfigurationPersistenceManager
 {
+    private static final Logger LOG = Logger.getLogger(ConfigurationPersistenceManager.class);
+    
     private TypeRegistry typeRegistry;
 
     private RecordManager recordManager;
 
     private Map<String, ComplexType> rootScopes = new HashMap<String, ComplexType>();
+    /**
+     * An index mapping from composite types to all paths where records of that
+     * type (or a subtype) may reside.  Paths will include wildcards to navigate
+     * collection members.
+     */
+    private Map<CompositeType, List<String>> compositeTypePathIndex = new HashMap<CompositeType, List<String>>();
 
     /**
      * Register the root scope definitions, from which all of the other definitions will be
@@ -37,12 +44,118 @@ public class ConfigurationPersistenceManager
         {
             recordManager.insert(scope, type.createNewRecord());
         }
+
+        if(type instanceof CompositeType)
+        {
+            updateIndex(scope, (CompositeType) type);
+        }
+        else if(type instanceof CollectionType)
+        {
+            updateIndex(scope, (CollectionType) type);
+        }
+    }
+
+    private void updateIndex(String path, CompositeType type)
+    {
+        // Add an entry at the current path, and analyse properties
+        addToIndex(type, path);
+        for(TypeProperty property: type.getProperties(CompositeType.class))
+        {
+            String childPath = PathUtils.getPath(path, property.getName());
+            updateIndex(childPath, (CompositeType) property.getType());
+        }
+        for(TypeProperty property: type.getProperties(CollectionType.class))
+        {
+            String childPath = PathUtils.getPath(path, property.getName());
+            updateIndex(childPath, (CollectionType) property.getType());
+        }
+    }
+
+    private void updateIndex(String path, CollectionType type)
+    {
+        // If the collection itself holds a complex type, add a wildcard
+        // to the path and traverse down.
+        Type targetType = type.getCollectionType();
+        if(targetType instanceof CompositeType)
+        {
+            updateIndex(PathUtils.getPath(path, PathUtils.WILDCARD_ANY_ELEMENT), (CompositeType) targetType);
+        }
+    }
+
+    private void addToIndex(CompositeType composite, String path)
+    {
+        getConfigurationPaths(composite).add(path);
+    }
+
+    List<String> getConfigurationPaths(CompositeType type)
+    {
+        List<String> l = compositeTypePathIndex.get(type);
+        if(l == null)
+        {
+            l = new ArrayList<String>();
+            compositeTypePathIndex.put(type, l);
+        }
+        return l;
+    }
+
+    public Map<String, Record> getReferencableRecords(CompositeType type, String referencingPath)
+    {
+        HashMap<String, Record> records = new HashMap<String, Record>();
+        for(String path: getOwningPaths(type, getClosestOwningScope(type, referencingPath)))
+        {
+            recordManager.loadAll(path, records);
+        }
+
+        return records;
+    }
+
+    String getClosestOwningScope(CompositeType type, String path)
+    {
+        List<String> paths = compositeTypePathIndex.get(type);
+        if(paths != null)
+        {
+            // Find the closest by starting at our path and working up the
+            // ancestry until one hits.
+            path = PathUtils.normalizePath(path);
+            while(path != null)
+            {
+                for(String candidate: paths)
+                {
+                    if(PathUtils.prefixMatches(candidate, path))
+                    {
+                        return PathUtils.getParentPath(path);
+                    }
+                }
+
+                path = PathUtils.getParentPath(path);
+            }
+        }
+
+        return null;
+    }
+
+    List<String> getOwningPaths(CompositeType type, String prefix)
+    {
+        List<String> paths = compositeTypePathIndex.get(type);
+        List<String> result = new LinkedList<String>();
+        if(prefix != null && paths != null)
+        {
+            for(String owningPath: paths)
+            {
+                if(PathUtils.prefixMatches(owningPath, prefix))
+                {
+                    result.add(PathUtils.getPath(prefix, PathUtils.stripMatchingPrefix(owningPath, prefix)));
+                }
+            }
+        }
+
+        return result;
     }
 
     /**
      * Retrieve the type definition for the specified path.
      *
-     * @param path
+     * @param path the path to retrieve the type of
      * @return the type definition, or null if none exists.
      */
     public Type getType(String path)
@@ -187,7 +300,7 @@ public class ConfigurationPersistenceManager
     /**
      * Load the object at the specified path, or null if no object exists.
      *
-     * @param path
+     * @param path path of the instance to retrieve
      * @return object defined by the path.
      * @throws TypeException if there is an type related error loading the instance at the specified path.
      */

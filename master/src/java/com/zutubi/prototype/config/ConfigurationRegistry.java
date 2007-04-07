@@ -87,6 +87,15 @@ public class ConfigurationRegistry
         projectConfig.addProperty(new TypeProperty("cleanup", typeRegistry.getType("cleanupRuleConfig")));
         projectConfig.addProperty(new TypeProperty("changeViewer", typeRegistry.getType("changeViewerConfig")));
 
+        // Triggers
+        CompositeType triggerConfig = typeRegistry.register("triggerConfig", TriggerConfiguration.class);
+        typeRegistry.register("buildCompletedConfig", BuildCompletedTriggerConfiguration.class);
+        triggerConfig.addExtension("buildCompletedConfig");
+        MapType triggers = new MapType();
+        triggers.setTypeRegistry(typeRegistry);
+        triggers.setCollectionType(typeRegistry.getType("triggerConfig"));
+        projectConfig.addProperty(new TypeProperty("trigger", triggers));
+        
         ListType artifacts = new ListType();
         artifacts.setTypeRegistry(typeRegistry);
         artifacts.setCollectionType(typeRegistry.getType("artifactConfig"));

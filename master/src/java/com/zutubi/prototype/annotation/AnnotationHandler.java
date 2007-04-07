@@ -10,5 +10,5 @@ import java.lang.annotation.Annotation;
  */
 public interface AnnotationHandler
 {
-    void process(Annotation annotation, Descriptor descriptor);
+    void process(Annotation annotation, Descriptor descriptor) throws Exception;
 }

@@ -2,6 +2,8 @@ package com.zutubi.prototype.type.record;
 
 import com.zutubi.pulse.bootstrap.MasterConfigurationManager;
 
+import java.util.*;
+
 /**
  *
  *
@@ -41,6 +43,28 @@ public class RecordManager
             record = (Record) record.get(pathElement);
         }
         return record;
+    }
+
+    public void loadAll(String path, Map<String, Record> records)
+    {
+        loadAll(baseRecord, PathUtils.getPathElements(path), 0, "", records);
+    }
+
+    private void loadAll(Record record, String[] elements, int pathIndex, String resolvedPath, Map<String, Record> records)
+    {
+        if(pathIndex == elements.length)
+        {
+            records.put(resolvedPath, record);
+            return;
+        }
+
+        for(String key: record.keySet())
+        {
+            if(PathUtils.matches(elements[pathIndex], key))
+            {
+                loadAll((Record) record.get(key), elements, pathIndex + 1, PathUtils.getPath(resolvedPath, key), records);
+            }
+        }
     }
 
     /**

@@ -8,7 +8,7 @@ import com.zutubi.pulse.form.squeezer.TypeSqueezer;
  *
  *
  */
-public class PrimitiveType extends AbstractType implements Type
+public class PrimitiveType extends SimpleType implements Type
 {
     public PrimitiveType(Class type)
     {

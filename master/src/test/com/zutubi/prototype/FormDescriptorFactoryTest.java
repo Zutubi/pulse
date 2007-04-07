@@ -39,7 +39,7 @@ public class FormDescriptorFactoryTest extends TestCase
     public void testPasswordField() throws TypeException
     {
         typeRegistry.register("mock", MockPassword.class);
-        FormDescriptor formDescriptor = descriptorFactory.createDescriptor("mock");
+        FormDescriptor formDescriptor = descriptorFactory.createDescriptor("path", "mock");
 
         List<FieldDescriptor> fieldDescriptors = formDescriptor.getFieldDescriptors();
         assertEquals(1, fieldDescriptors.size());
@@ -49,7 +49,7 @@ public class FormDescriptorFactoryTest extends TestCase
     public void testTextField() throws TypeException
     {
         typeRegistry.register("mock", MockText.class);
-        FormDescriptor formDescriptor = descriptorFactory.createDescriptor("mock");
+        FormDescriptor formDescriptor = descriptorFactory.createDescriptor("path", "mock");
 
         List<FieldDescriptor> fieldDescriptors = formDescriptor.getFieldDescriptors();
         assertEquals(1, fieldDescriptors.size());

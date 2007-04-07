@@ -20,48 +20,41 @@ public class TypeSelectAnnotationHandler extends FieldAnnotationHandler
 
     private TypeRegistry typeRegistry;
 
-    public void process(Annotation annotation, Descriptor descriptor)
+    public void process(Annotation annotation, Descriptor descriptor) throws Exception
     {
         super.process(annotation, descriptor);
 
-        try
+        List<String> optionList = Collections.EMPTY_LIST;
+
+        Type type = typeRegistry.getType(((TypeSelect)annotation).configurationType());
+        if (type != null)
         {
-            List<String> optionList = Collections.EMPTY_LIST;
+            optionList = ((CompositeType)type).getExtensions();
+        }
 
-            Type type = typeRegistry.getType(((TypeSelect)annotation).configurationType());
-            if (type != null)
-            {
-                optionList = ((CompositeType)type).getExtensions();
-            }
-
-            descriptor.addParameter("list", optionList);
+        descriptor.addParameter("list", optionList);
 
 /*
-            // It would be nice ot have some information about each of these options. This is
-            // possible when the options represent types.
-            for (String option: optionList)
-            {
-                String extraInformation = "No extra information avaiable";
-                Type optionType = typeRegistry.getType(option);
-                if (optionType != null)
-                {
-                    Messages messages = Messages.getInstance(optionType.getClazz());
-                    String message = messages.format("introduction");
-                    if (message != null)
-                    {
-                        extraInformation = message;
-                    }
-                }
-                descriptor.addParameter(option + ".introduction", extraInformation);
-            }
-*/
-        }
-        catch (Exception e)
+        // It would be nice ot have some information about each of these options. This is
+        // possible when the options represent types.
+        for (String option: optionList)
         {
-            LOG.warning(e);
+            String extraInformation = "No extra information avaiable";
+            Type optionType = typeRegistry.getType(option);
+            if (optionType != null)
+            {
+                Messages messages = Messages.getInstance(optionType.getClazz());
+                String message = messages.format("introduction");
+                if (message != null)
+                {
+                    extraInformation = message;
+                }
+            }
+            descriptor.addParameter(option + ".introduction", extraInformation);
         }
+*/
     }
-
+    
     /**
      * Required resource.
      *

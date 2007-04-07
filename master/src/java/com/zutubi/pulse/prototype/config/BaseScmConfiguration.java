@@ -3,8 +3,6 @@ package com.zutubi.pulse.prototype.config;
 import java.util.List;
 
 /**
- *
- *
  */
 public class BaseScmConfiguration
 {

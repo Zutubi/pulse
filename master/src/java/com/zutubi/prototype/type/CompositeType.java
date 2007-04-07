@@ -12,7 +12,6 @@ import java.util.*;
 
 /**
  *
- *
  */
 public class CompositeType extends AbstractType implements ComplexType
 {
@@ -64,17 +63,18 @@ public class CompositeType extends AbstractType implements ComplexType
      */
     public List<TypeProperty> getProperties(Class<? extends Type> type)
     {
-        List<String> list = propertiesByClass.get(type);
-        if (list != null)
+        List<TypeProperty> result = new LinkedList<TypeProperty>();
+        for(Map.Entry<Class, List<String>> entry: propertiesByClass.entrySet())
         {
-            List<TypeProperty> properties = new LinkedList<TypeProperty>();
-            for (String propertyName : list)
+            if(type.isAssignableFrom(entry.getKey()))
             {
-                properties.add(getProperty(propertyName));
+                for(String property: entry.getValue())
+                {
+                    result.add(getProperty(property));
+                }
             }
-            return properties;
         }
-        return Collections.EMPTY_LIST;
+        return result;
     }
 
     public List<String> getPropertyNames(Class<? extends Type> type)
@@ -202,5 +202,25 @@ public class CompositeType extends AbstractType implements ComplexType
     public boolean isTemplated()
     {
         return false;
+    }
+
+    public boolean equals(Object o)
+    {
+        if (this == o)
+        {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass())
+        {
+            return false;
+        }
+
+        CompositeType that = (CompositeType) o;
+        return getSymbolicName().equals(that.getSymbolicName());
+    }
+
+    public int hashCode()
+    {
+        return getSymbolicName().hashCode();
     }
 }

@@ -1,15 +1,12 @@
 package com.zutubi.prototype.config;
 
-import com.zutubi.prototype.type.Type;
-import com.zutubi.prototype.type.TypeException;
-import com.zutubi.prototype.type.TypeRegistry;
+import com.zutubi.prototype.type.*;
 import com.zutubi.prototype.type.record.MockRecordSerialiser;
 import com.zutubi.prototype.type.record.RecordManager;
-import com.zutubi.pulse.prototype.record.SymbolicName;
+import com.zutubi.prototype.config.types.*;
 import junit.framework.TestCase;
 
-import java.util.List;
-import java.util.Map;
+import java.util.Arrays;
 
 /**
  */
@@ -49,231 +46,60 @@ public class ConfigurationPersistenceManagerTest extends TestCase
         assertEquals(SimpleObject.class, type.getClazz());
     }
 
-/*
-    public void testListingSimpleCollectionFromRecord() throws TypeException
+    public void testListingCollectionObject() throws TypeException
     {
         manager.register("simpleCollection", typeRegistry.register(SimpleCollectionObject.class));
+        assertEquals(1, manager.getListing("simpleCollection").size());
         assertEquals(0, manager.getListing("simpleCollection/simpleList").size());
-
-        // now lets add some records.
-        Record listData = new MutableRecord();
-        listData.put("1", "a");
-        listData.put("2", "b");
-
-        MutableRecord scoRecord = new MutableRecord();
-        scoRecord.put("simpleList", listData);
-        recordManager.store("simpleCollection", scoRecord);
-
-        assertEquals(2, manager.getListing("simpleCollection/simpleList").size());
     }
-*/
 
-    public void testListingNestedCollectionObject() throws TypeException
+    public void testIndexSimple() throws TypeException
     {
-        manager.register("nestedCollection", typeRegistry.register(NestedCollectionObject.class));
-        assertEquals(1, manager.getListing("nestedCollection").size());
-        assertEquals(0, manager.getListing("nestedCollection/nestedList").size());
+        CompositeType type = typeRegistry.register(SimpleObject.class);
+        manager.register("simple", type);
+        assertEquals(Arrays.asList("simple"), manager.getConfigurationPaths(type));
     }
 
-/*
-    public void testLoadSimpleObject() throws TypeException
+    public void testIndexComposite() throws TypeException
     {
-        manager.register("simpleObject", typeRegistry.register("simpleObject", SimpleObject.class));
-
-        Record simpleObject = new MutableRecord();
-        simpleObject.setSymbolicName("simpleObject");
-        simpleObject.put("strA", "a");
-        simpleObject.put("strB", "b");
-        recordManager.store("simpleObject", simpleObject);
-
-        SimpleObject instance = (SimpleObject) manager.getInstance("simpleObject");
-        assertEquals("a", instance.getStrA());
-        assertEquals("b", instance.getStrB());
+        CompositeType type = typeRegistry.register(CompositeObject.class);
+        manager.register("composite", type);
+        assertEquals(Arrays.asList("composite"), manager.getConfigurationPaths(type));
+        assertEquals(Arrays.asList("composite/simple"), manager.getConfigurationPaths(typeRegistry.getType("Simple")));
     }
-*/
 
-/*
-    public void testStoreSimpleObject() throws TypeException
+    public void testIndexSimpleCollection() throws TypeException
     {
-        manager.register("simpleObject", typeRegistry.register("simpleObject", SimpleObject.class));
-
-        SimpleObject instance = new SimpleObject();
-        instance.setStrA("A");
-        instance.setStrB("B");
-
-        manager.setInstance("simpleObject", instance);
-
-        Record record = recordManager.load("simpleObject");
-        assertEquals("A", record.get("strA"));
-        assertEquals("B", record.get("strB"));
+        CompositeType type = typeRegistry.register(SimpleCollectionObject.class);
+        manager.register("collection", type);
+        assertEquals(Arrays.asList("collection"), manager.getConfigurationPaths(type));
+        assertEquals(Arrays.asList("collection/simpleList/*"), manager.getConfigurationPaths(typeRegistry.getType("Simple")));
     }
-*/
 
-/*
-    public void testStoreInCollection() throws TypeException
+    public void testIndexCompositeCollection() throws TypeException
     {
-        typeRegistry.register("simpleObject", SimpleObject.class);
-        manager.register("simpleCollection", typeRegistry.register(SimpleCollectionObject.class));
-        assertEquals(0, manager.getListing("simpleCollection/simpleList").size());
-
-        SimpleObject instance = new SimpleObject();
-        instance.setStrA("string a");
-        instance.setStrB("string b");
-
-        manager.setInstance("simpleCollection/simpleList", instance);
-        assertEquals(1, manager.getListing("simpleCollection/simpleList").size());
-
-        manager.setInstance("simpleCollection/simpleList", instance);
-        assertEquals(2, manager.getListing("simpleCollection/simpleList").size());
-
+        CompositeType type = typeRegistry.register(CompositeCollectionObject.class);
+        manager.register("collection", type);
+        assertEquals(Arrays.asList("collection"), manager.getConfigurationPaths(type));
+        assertEquals(Arrays.asList("collection/composites/*"), manager.getConfigurationPaths(typeRegistry.getType("Composite")));
+        assertEquals(Arrays.asList("collection/composites/*/simple"), manager.getConfigurationPaths(typeRegistry.getType("Simple")));
     }
-*/
 
-    @SymbolicName("Simple")
-    public static class SimpleObject
+    public void testIndexTopLevelCollection() throws TypeException
     {
-        private String strA;
-
-        private String strB;
-
-        public String getStrA()
-        {
-            return strA;
-        }
-
-        public void setStrA(String strA)
-        {
-            this.strA = strA;
-        }
-
-        public String getStrB()
-        {
-            return strB;
-        }
-
-        public void setStrB(String strB)
-        {
-            this.strB = strB;
-        }
+        CompositeType simple = typeRegistry.register(SimpleObject.class);
+        TopLevelMapType top = new TopLevelMapType();
+        top.setCollectionType(simple);
+        manager.register("top", top);
+        assertEquals(Arrays.asList("top/*"), manager.getConfigurationPaths(simple));
     }
 
-    @SymbolicName("Nested")
-    public static class NestedObject
+    public void testIndexCircular() throws TypeException
     {
-        private NestedObject nested;
-
-        public NestedObject getNested()
-        {
-            return nested;
-        }
-
-        public void setNested(NestedObject nested)
-        {
-            this.nested = nested;
-        }
+        // TODO FIXME make nested work
+//        CompositeType type = typeRegistry.register(CircularObject.class);
+//        manager.register("nested", type);
+//        assertEquals(Arrays.asList("nested", "nested/nested"), manager.getConfigurationPaths(type));
     }
 
-    @SymbolicName("Composite")
-    public static class CompositeObject
-    {
-        private String strA;
-        private String strB;
-        private NestedObject nested;
-        private CompositeObject composite;
-
-        private List<String> list;
-        private Map<String, String> map;
-
-        public String getStrA()
-        {
-            return strA;
-        }
-
-        public void setStrA(String strA)
-        {
-            this.strA = strA;
-        }
-
-        public String getStrB()
-        {
-            return strB;
-        }
-
-        public void setStrB(String strB)
-        {
-            this.strB = strB;
-        }
-
-        public NestedObject getNested()
-        {
-            return nested;
-        }
-
-        public void setNested(NestedObject nested)
-        {
-            this.nested = nested;
-        }
-
-        public CompositeObject getComposite()
-        {
-            return composite;
-        }
-
-        public void setComposite(CompositeObject composite)
-        {
-            this.composite = composite;
-        }
-
-        public List<String> getList()
-        {
-            return list;
-        }
-
-        public void setList(List<String> list)
-        {
-            this.list = list;
-        }
-
-        public Map<String, String> getMap()
-        {
-            return map;
-        }
-
-        public void setMap(Map<String, String> map)
-        {
-            this.map = map;
-        }
-    }
-
-    @SymbolicName("SimpleCollection")
-    public static class SimpleCollectionObject
-    {
-        List<SimpleObject> simpleList;
-
-        public List<SimpleObject> getSimpleList()
-        {
-            return simpleList;
-        }
-
-        public void setSimpleList(List<SimpleObject> simpleList)
-        {
-            this.simpleList = simpleList;
-        }
-    }
-
-    @SymbolicName("NestedCollection")
-    public static class NestedCollectionObject
-    {
-        List<NestedObject> nestedList;
-
-        public List<NestedObject> getNestedList()
-        {
-            return nestedList;
-        }
-
-        public void setNestedList(List<NestedObject> nestedList)
-        {
-            this.nestedList = nestedList;
-        }
-    }
 }

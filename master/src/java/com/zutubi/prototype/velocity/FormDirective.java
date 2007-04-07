@@ -70,7 +70,7 @@ public class FormDirective extends PrototypeDirective
             CompositeType ctype = (CompositeType) type;
             Record data = lookupRecord();
 
-            FormDescriptor formDescriptor = formDescriptorFactory.createDescriptor(ctype);
+            FormDescriptor formDescriptor = formDescriptorFactory.createDescriptor(lookupPath(), ctype);
 
             TemplateFormDecorator templateDecorator = new TemplateFormDecorator(null);
             templateDecorator.decorate(formDescriptor);

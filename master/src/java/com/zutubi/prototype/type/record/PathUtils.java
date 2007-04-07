@@ -9,6 +9,7 @@ import com.zutubi.pulse.util.StringUtils;
 public class PathUtils
 {
     private static final String SEPARATOR = "/";
+    public static final String WILDCARD_ANY_ELEMENT = "*";
 
     public static String[] getPathElements(String path)
     {
@@ -92,6 +93,51 @@ public class PathUtils
 
     public static String getPath(String... pathElements)
     {
-        return StringUtils.join(SEPARATOR, pathElements);
+        return StringUtils.join(SEPARATOR, true, true, pathElements);
+    }
+
+    public static boolean prefixMatches(String candidate, String prefix)
+    {
+        String[] candidateParts = getPathElements(candidate);
+        String[] prefixParts = getPathElements(prefix);
+
+        if(candidateParts.length < prefixParts.length)
+        {
+            return false;
+        }
+        
+        for(int i = 0; i < prefixParts.length; i++)
+        {
+            if(!matches(candidateParts[i], prefixParts[i]))
+            {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    public static String stripMatchingPrefix(String path, String prefix)
+    {
+        String[] parts = getPathElements(path);
+        String[] prefixParts = getPathElements(prefix);
+
+        int i;
+        for(i = 0; i < prefixParts.length; i++)
+        {
+            if(i >= parts.length || !matches(parts[i], prefixParts[i]))
+            {
+                break;
+            }
+        }
+
+        String[] newParts = new String[parts.length - i];
+        System.arraycopy(parts, i, newParts, 0, newParts.length);
+        return getPath(newParts);
+    }
+
+    public static boolean matches(String pattern, String element)
+    {
+        return pattern.equals(WILDCARD_ANY_ELEMENT) || pattern.equals(element);
     }
 }

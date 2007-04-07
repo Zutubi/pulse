@@ -79,7 +79,8 @@ public class CheckDirective extends PrototypeDirective
 
             CompositeType ctype = (CompositeType) type;
 
-            FormDescriptor formDescriptor = formDescriptorFactory.createDescriptor(ctype.getSymbolicName());
+            String path = lookupPath();
+            FormDescriptor formDescriptor = formDescriptorFactory.createDescriptor(path, ctype.getSymbolicName());
 
             // decorate the form to include the symbolic name as a hidden field. This is necessary for
             // configuration. This is probably not the best place for this, but until i think of a better location,
@@ -110,7 +111,7 @@ public class CheckDirective extends PrototypeDirective
             Class checkClass = annotation.value();
             CompositeType checkType = typeRegistry.getType(checkClass);
 
-            FormDescriptor checkFormDescriptor = formDescriptorFactory.createDescriptor(checkType);
+            FormDescriptor checkFormDescriptor = formDescriptorFactory.createDescriptor(path, checkType);
             for (FieldDescriptor fd : checkFormDescriptor.getFieldDescriptors())
             {
                 formDescriptor.add(fd);

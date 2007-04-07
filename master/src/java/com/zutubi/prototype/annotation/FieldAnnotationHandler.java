@@ -11,7 +11,7 @@ import java.lang.annotation.Annotation;
  */
 public class FieldAnnotationHandler implements AnnotationHandler
 {
-    public void process(Annotation annotation, Descriptor descriptor)
+    public void process(Annotation annotation, Descriptor descriptor) throws Exception
     {
         // Collect all of the annotations fields in a map and add them to the descriptor.
         descriptor.addAll(AnnotationUtils.collectPropertiesFromAnnotation(annotation));

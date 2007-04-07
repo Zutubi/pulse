@@ -3,6 +3,8 @@ package com.zutubi.prototype.type;
 import com.zutubi.pulse.prototype.record.SymbolicName;
 import com.zutubi.pulse.util.AnnotationUtils;
 import com.zutubi.pulse.util.CollectionUtils;
+import com.zutubi.prototype.annotation.Reference;
+import com.zutubi.prototype.config.ConfigurationPersistenceManager;
 
 import java.beans.BeanInfo;
 import java.beans.IntrospectionException;
@@ -27,6 +29,8 @@ public class TypeRegistry
 
     private Map<Class, CompositeType> classMapping = new HashMap<Class, CompositeType>();
     private Map<Class, PrimitiveType> primitiveMapping = new HashMap<Class, PrimitiveType>();
+
+    private ConfigurationPersistenceManager configurationPersistenceManager;
 
     public TypeRegistry()
     {
@@ -127,7 +131,7 @@ public class TypeRegistry
             Class typeClass = prototype.getClazz();
             prototype.setAnnotations(Arrays.asList(typeClass.getAnnotations()));
 
-            BeanInfo beanInfo = null;
+            BeanInfo beanInfo;
             if (typeClass.isInterface() || typeClass == Object.class)
             {
                 beanInfo = Introspector.getBeanInfo(typeClass);
@@ -157,53 +161,73 @@ public class TypeRegistry
                     {
                         property.setType(primitiveMapping.get(clazz));
                     }
-                    else if (classMapping.containsKey(clazz))
-                    {
-                        property.setType(classMapping.get(clazz));
-                    }
                     else
                     {
-                        property.setType(register(clazz));
+                        CompositeType compositeType = classMapping.get(clazz);
+                        if(compositeType == null)
+                        {
+                            compositeType = register(clazz);
+                        }
+
+                        if(property.getAnnotation(Reference.class) != null)
+                        {
+                            ReferenceType referenceType = new ReferenceType(compositeType, configurationPersistenceManager);
+                            referenceType.setTypeRegistry(this);
+                            property.setType(referenceType);
+                        }
+                        else
+                        {
+                            property.setType(compositeType);
+                        }
                     }
                 }
-                else if (type instanceof ParameterizedType)
+                else
                 {
-                    // have we seen this class yet?
-                    ParameterizedType parameterizedType = (ParameterizedType) type;
-                    Class clazz = (Class) parameterizedType.getRawType();
+                    if (type instanceof ParameterizedType)
+                    {
+                        // have we seen this class yet?
+                        ParameterizedType parameterizedType = (ParameterizedType) type;
+                        Class clazz = (Class) parameterizedType.getRawType();
 
-                    Class valueClass = null;
-                    CollectionType collection = null;
-                    if (List.class.isAssignableFrom(clazz))
-                    {
-                        valueClass = (Class) parameterizedType.getActualTypeArguments()[0];
-                        collection = new ListType();
-                    }
-                    else if (Map.class.isAssignableFrom(clazz))
-                    {
-                        valueClass = (Class) parameterizedType.getActualTypeArguments()[1];
-                        collection = new MapType();
-                    }
+                        Class valueClass = null;
+                        CollectionType collection = null;
+                        if (List.class.isAssignableFrom(clazz))
+                        {
+                            valueClass = (Class) parameterizedType.getActualTypeArguments()[0];
+                            collection = new ListType();
+                        }
+                        else
+                        {
+                            if (Map.class.isAssignableFrom(clazz))
+                            {
+                                valueClass = (Class) parameterizedType.getActualTypeArguments()[1];
+                                collection = new MapType();
+                            }
+                        }
 
-                    if (collection == null)
-                    {
-                        continue;
-                    }
+                        if (collection == null)
+                        {
+                            continue;
+                        }
 
-                    collection.setTypeRegistry(this);
-                    if (classMapping.containsKey(valueClass))
-                    {
-                        collection.setCollectionType(classMapping.get(valueClass));
+                        collection.setTypeRegistry(this);
+                        if (classMapping.containsKey(valueClass))
+                        {
+                            collection.setCollectionType(classMapping.get(valueClass));
+                        }
+                        else
+                        {
+                            if (primitiveMapping.containsKey(valueClass))
+                            {
+                                property.setType(primitiveMapping.get(valueClass));
+                            }
+                            else
+                            {
+                                collection.setCollectionType(register(valueClass));
+                            }
+                        }
+                        property.setType(collection);
                     }
-                    else if (primitiveMapping.containsKey(valueClass))
-                    {
-                        property.setType(primitiveMapping.get(valueClass));
-                    }
-                    else
-                    {
-                        collection.setCollectionType(register(valueClass));
-                    }
-                    property.setType(collection);
                 }
                 prototype.addProperty(property);
             }
@@ -230,4 +254,8 @@ public class TypeRegistry
         return CollectionUtils.containsIdentity(BUILT_IN_TYPES, type) || type.isEnum();
     }
 
+    public void setConfigurationPersistenceManager(ConfigurationPersistenceManager configurationPersistenceManager)
+    {
+        this.configurationPersistenceManager = configurationPersistenceManager;
+    }
 }

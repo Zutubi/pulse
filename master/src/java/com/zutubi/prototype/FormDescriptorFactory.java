@@ -45,17 +45,17 @@ public class FormDescriptorFactory
 
     private TypeRegistry typeRegistry;
 
-    public FormDescriptor createDescriptor(Class clazz)
+    public FormDescriptor createDescriptor(String path, Class clazz)
     {
-        return createDescriptor(typeRegistry.getType(clazz));
+        return createDescriptor(path, typeRegistry.getType(clazz));
     }
 
-    public FormDescriptor createDescriptor(String symbolicName)
+    public FormDescriptor createDescriptor(String path, String symbolicName)
     {
-        return createDescriptor(typeRegistry.getType(symbolicName));
+        return createDescriptor(path, typeRegistry.getType(symbolicName));
     }
 
-    public FormDescriptor createDescriptor(CompositeType type)
+    public FormDescriptor createDescriptor(String path, CompositeType type)
     {
         FormDescriptor descriptor = new FormDescriptor();
 
@@ -67,13 +67,13 @@ public class FormDescriptorFactory
         List<Annotation> annotations = type.getAnnotations();
         handleAnnotations(descriptor, annotations);
 
-        descriptor.setFieldDescriptors(buildFieldDescriptors(type));
+        descriptor.setFieldDescriptors(buildFieldDescriptors(path, type));
         descriptor.setActions(Arrays.asList("save", "cancel"));
 
         return descriptor;
     }
 
-    private List<FieldDescriptor> buildFieldDescriptors(CompositeType type)
+    private List<FieldDescriptor> buildFieldDescriptors(String path, CompositeType type)
     {
         List<FieldDescriptor> fieldDescriptors = new LinkedList<FieldDescriptor>();
 
@@ -81,6 +81,8 @@ public class FormDescriptorFactory
         {
             Type propertyType = property.getType();
             FieldDescriptor fd = new FieldDescriptor();
+            fd.setPath(path);
+            fd.setProperty(property);
             fd.setName(property.getName());
 
             // some little bit of magic, take a guess at any property called password. If we come up with any
@@ -100,6 +102,19 @@ public class FormDescriptorFactory
             fieldDescriptors.add(fd);
         }
 
+        for (TypeProperty property : type.getProperties(ReferenceType.class))
+        {
+            FieldDescriptor fd = new FieldDescriptor();
+            fd.setPath(path);
+            fd.setProperty(property);
+            fd.setType("select");
+            fd.setName(property.getName());
+
+            handleAnnotations(fd, property.getAnnotations());
+
+            fieldDescriptors.add(fd);
+        }
+
         return fieldDescriptors;
     }
 
@@ -108,7 +123,7 @@ public class FormDescriptorFactory
      * are themselves annotated by the Handler annotation.  When found, the referenced handler is run in the context
      * of the annotation and the descriptor.
      *
-     * Note: This method will process all of the annotations annotations as well.
+     * Note: This method will process all of the annotation's annotations as well.
      *
      * @param descriptor the target that will be modified by these annotations.
      * @param annotations the annotations that need to be processed. 

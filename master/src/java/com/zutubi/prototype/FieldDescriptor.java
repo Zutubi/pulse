@@ -2,6 +2,7 @@ package com.zutubi.prototype;
 
 import com.zutubi.prototype.model.Field;
 import com.zutubi.prototype.type.record.Record;
+import com.zutubi.prototype.type.TypeProperty;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -12,16 +13,41 @@ import java.util.Map;
  */
 public class FieldDescriptor implements Descriptor
 {
+    private static final String KEY_PATH = "path";
+    private static final String KEY_PROPERTY = "property";
+    private static final String KEY_NAME = "name";
+    private static final String KEY_TYPE = "type";
+
     private Map<String, Object> parameters = new HashMap<String, Object>();
+
+    public String getPath()
+    {
+        return (String) parameters.get(KEY_PATH);
+    }
+
+    public void setPath(String path)
+    {
+        this.parameters.put(KEY_PATH, path);
+    }
+
+    public TypeProperty getProperty()
+    {
+        return (TypeProperty) parameters.get(KEY_PROPERTY);
+    }
+
+    public void setProperty(TypeProperty property)
+    {
+        this.parameters.put(KEY_PROPERTY, property);
+    }
 
     public String getName()
     {
-        return (String) parameters.get("name");
+        return (String) parameters.get(KEY_NAME);
     }
 
     public void setName(String name)
     {
-        this.parameters.put("name", name);
+        this.parameters.put(KEY_NAME, name);
     }
 
     public void addParameter(String key, Object value)
@@ -71,11 +97,11 @@ public class FieldDescriptor implements Descriptor
 
     public void setType(String type)
     {
-        parameters.put("type", type);
+        parameters.put(KEY_TYPE, type);
     }
 
     public String getType()
     {
-        return (String) parameters.get("type");
+        return (String) parameters.get(KEY_TYPE);
     }
 }

@@ -8,6 +8,8 @@ import com.zutubi.validation.annotations.Required;
 import com.zutubi.validation.annotations.Name;
 import com.zutubi.validation.annotations.Url;
 
+import java.util.Map;
+
 /**
  *
  *
