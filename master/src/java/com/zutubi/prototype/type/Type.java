@@ -20,6 +20,8 @@ public interface Type
 
     Annotation getAnnotation(Class annotationType);
 
+    Type getTargetType();
+
     /**
      * The underlying class represented by this type instance.
      *

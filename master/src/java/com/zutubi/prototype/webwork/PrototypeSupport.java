@@ -1,11 +1,7 @@
 package com.zutubi.prototype.webwork;
 
 import com.opensymphony.util.TextUtils;
-import com.zutubi.prototype.type.CompositeType;
-import com.zutubi.prototype.type.ListType;
-import com.zutubi.prototype.type.MapType;
-import com.zutubi.prototype.type.Type;
-import com.zutubi.prototype.type.TypeRegistry;
+import com.zutubi.prototype.type.*;
 import com.zutubi.prototype.type.record.Record;
 import com.zutubi.pulse.web.ActionSupport;
 
@@ -63,7 +59,7 @@ public class PrototypeSupport extends ActionSupport
 
     public void setCheck(String check)
     {
-        this.check= check;
+        this.check = check;
     }
 
     public boolean isCheckSelected()

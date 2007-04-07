@@ -1,21 +1,17 @@
 package com.zutubi.prototype.type;
 
+import com.zutubi.prototype.annotation.Reference;
+import com.zutubi.prototype.config.ConfigurationPersistenceManager;
 import com.zutubi.pulse.prototype.record.SymbolicName;
 import com.zutubi.pulse.util.AnnotationUtils;
 import com.zutubi.pulse.util.CollectionUtils;
-import com.zutubi.prototype.annotation.Reference;
-import com.zutubi.prototype.config.ConfigurationPersistenceManager;
 
 import java.beans.BeanInfo;
 import java.beans.IntrospectionException;
 import java.beans.Introspector;
 import java.beans.PropertyDescriptor;
 import java.lang.reflect.ParameterizedType;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  *
@@ -28,7 +24,7 @@ public class TypeRegistry
     private Map<String, CompositeType> symbolicNameMapping = new HashMap<String, CompositeType>();
 
     private Map<Class, CompositeType> classMapping = new HashMap<Class, CompositeType>();
-    private Map<Class, PrimitiveType> primitiveMapping = new HashMap<Class, PrimitiveType>();
+    private Map<Class, SimpleType> primitiveMapping = new HashMap<Class, SimpleType>();
 
     private ConfigurationPersistenceManager configurationPersistenceManager;
 
@@ -157,9 +153,10 @@ public class TypeRegistry
                 if (type instanceof Class)
                 {
                     Class clazz = (Class) type;
-                    if (primitiveMapping.containsKey(clazz))
+                    SimpleType simpleType = getSimpleType(clazz);
+                    if (simpleType != null)
                     {
-                        property.setType(primitiveMapping.get(clazz));
+                        property.setType(simpleType);
                     }
                     else
                     {
@@ -169,16 +166,7 @@ public class TypeRegistry
                             compositeType = register(clazz);
                         }
 
-                        if(property.getAnnotation(Reference.class) != null)
-                        {
-                            ReferenceType referenceType = new ReferenceType(compositeType, configurationPersistenceManager);
-                            referenceType.setTypeRegistry(this);
-                            property.setType(referenceType);
-                        }
-                        else
-                        {
-                            property.setType(compositeType);
-                        }
+                        property.setType(checkReferenceType(property, compositeType));
                     }
                 }
                 else
@@ -213,17 +201,19 @@ public class TypeRegistry
                         collection.setTypeRegistry(this);
                         if (classMapping.containsKey(valueClass))
                         {
-                            collection.setCollectionType(classMapping.get(valueClass));
+                            collection.setCollectionType(checkReferenceType(property, classMapping.get(valueClass)));
                         }
                         else
                         {
-                            if (primitiveMapping.containsKey(valueClass))
+                            SimpleType simpleType = getSimpleType(valueClass);
+                            if (simpleType != null)
                             {
-                                property.setType(primitiveMapping.get(valueClass));
+                                collection.setCollectionType(simpleType);
                             }
                             else
                             {
-                                collection.setCollectionType(register(valueClass));
+                                CompositeType compositeType = register(valueClass);
+                                collection.setCollectionType(checkReferenceType(property, compositeType));
                             }
                         }
                         property.setType(collection);
@@ -237,6 +227,35 @@ public class TypeRegistry
         {
             throw new TypeException(e);
         }
+    }
+
+    private Type checkReferenceType(TypeProperty property, CompositeType compositeType)
+    {
+        if(property.getAnnotation(Reference.class) != null)
+        {
+            ReferenceType referenceType = new ReferenceType(compositeType, configurationPersistenceManager);
+            referenceType.setTypeRegistry(this);
+            return referenceType;
+        }
+        else
+        {
+            return compositeType;
+        }
+    }
+
+    private SimpleType getSimpleType(Class clazz)
+    {
+        SimpleType type = primitiveMapping.get(clazz);
+        if(type == null)
+        {
+            if(clazz.isEnum())
+            {
+                type = new EnumType(clazz);
+                primitiveMapping.put(clazz, type);
+            }
+        }
+
+        return type;
     }
 
     public CompositeType getType(String symbolicName)

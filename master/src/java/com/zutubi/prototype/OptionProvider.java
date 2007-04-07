@@ -2,7 +2,6 @@ package com.zutubi.prototype;
 
 import com.zutubi.prototype.type.TypeProperty;
 
-import java.util.Map;
 import java.util.Collection;
 
 /**
@@ -19,7 +18,9 @@ public interface OptionProvider
      * @param path     the concrete path of the property that we are
      *                 providing options for
      * @param property type information for the property we are providing
-     *                 options for
+     *                 options for.  Note that the property type may be a
+     *                 collection: options should be based on the target
+     *                 type of the property's type.
      * @return a collection of the available options
      */
     Collection getOptions(String path, TypeProperty property);

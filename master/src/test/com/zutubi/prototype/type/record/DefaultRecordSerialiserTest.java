@@ -131,6 +131,20 @@ public class DefaultRecordSerialiserTest extends PulseTestCase
         assertRoundTrip("test", record, true);
     }
 
+    public void testArray() throws IOException
+    {
+        MutableRecord record = new MutableRecordImpl();
+        String[] array = new String[]{"test", "array", "here"};
+        record.put("array", array);
+        MutableRecord other = roundTrip("argh", record, false);
+        String[] otherArray = (String[]) other.get("array");
+        assertEquals(array.length, otherArray.length);
+        for(int i = 0; i < array.length; i++)
+        {
+            assertEquals(array[i], otherArray[i]);
+        }
+    }
+
     private MutableRecord createSimple()
     {
         MutableRecord simple = new MutableRecordImpl();
@@ -149,8 +163,7 @@ public class DefaultRecordSerialiserTest extends PulseTestCase
 
     private MutableRecord assertRoundTrip(String path, MutableRecord record, boolean deep) throws IOException
     {
-        serialiser.serialise(path, record, deep);
-        MutableRecord other = serialiser.deserialise(path);
+        MutableRecord other = roundTrip(path, record, deep);
 
         if(deep)
         {
@@ -174,6 +187,13 @@ public class DefaultRecordSerialiserTest extends PulseTestCase
             }
         }
 
+        return other;
+    }
+
+    private MutableRecord roundTrip(String path, MutableRecord record, boolean deep)
+    {
+        serialiser.serialise(path, record, deep);
+        MutableRecord other = serialiser.deserialise(path);
         return other;
     }
 

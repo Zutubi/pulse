@@ -143,7 +143,7 @@ public class MutableRecordImpl implements MutableRecord
         {
             public boolean satisfied(String s)
             {
-                return get(s) instanceof String;
+                return !(get(s) instanceof Record);
             }
         }, new HashSet<String>(data.size()));
     }

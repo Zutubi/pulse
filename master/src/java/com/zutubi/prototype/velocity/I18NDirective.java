@@ -4,8 +4,9 @@ import com.opensymphony.util.TextUtils;
 import com.zutubi.prototype.config.ConfigurationPersistenceManager;
 import com.zutubi.prototype.type.CollectionType;
 import com.zutubi.prototype.type.Type;
-import com.zutubi.pulse.i18n.Messages;
 import com.zutubi.pulse.bootstrap.ComponentContext;
+import com.zutubi.pulse.i18n.Messages;
+import com.zutubi.pulse.util.logging.Logger;
 import org.apache.velocity.context.InternalContextAdapter;
 import org.apache.velocity.exception.ParseErrorException;
 import org.apache.velocity.exception.ResourceNotFoundException;
@@ -21,6 +22,8 @@ import java.util.Map;
  */
 public class I18NDirective extends PrototypeDirective
 {
+    private static final Logger LOG = Logger.getLogger(I18NDirective.class);
+
     /**
      * The I18N message key.  This field is required.
      */
@@ -102,6 +105,7 @@ public class I18NDirective extends PrototypeDirective
         catch (Exception e)
         {
             writer.write(renderError("Failed to render. Unexpected " + e.getClass() + ": " + e.getMessage()));
+            LOG.severe(e);
             return true;
         }
     }

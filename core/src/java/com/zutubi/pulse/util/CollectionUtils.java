@@ -89,6 +89,17 @@ public class CollectionUtils
         return out;
     }
 
+    public static <T, U> U[] mapToArray(T[] in, Mapping<T, U> m, U[] out)
+    {
+        int i = 0;
+        for(T t: in)
+        {
+            out[i++] = m.map(t);
+        }
+
+        return out;
+    }
+
     public static <K, T, U> Map<K, U> map(Map<K, T> in, Mapping<T, U> m)
     {
         Map<K, U> result = new HashMap<K,U>(in.size());

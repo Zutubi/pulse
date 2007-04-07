@@ -56,7 +56,7 @@ public class ConfigureProjectWizard extends AbstractTypeWizard
 
         Map<String, CompositeType> wizardTypes = new HashMap<String, CompositeType>();
 
-        projectType = configurationPersistenceManager.getTargetType(basePath, CompositeType.class);
+        projectType = (CompositeType) configurationPersistenceManager.getType(basePath).getTargetType();
 
         // the types associated with the paths that require configuration are determined as follows:
         for (String propertyPath : PATHS)

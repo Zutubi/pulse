@@ -69,6 +69,11 @@ public abstract class AbstractType implements Type
         });
     }
 
+    public Type getTargetType()
+    {
+        return this;
+    }
+
     public void addAnnotation(Annotation annotation)
     {
         this.annotations.add(annotation);

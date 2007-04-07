@@ -8,6 +8,11 @@ public enum ResultState
 {
     INITIAL
             {
+                public boolean isCompleted()
+                {
+                    return false;
+                }
+
                 public String getString()
                 {
                     return "pending";
@@ -20,6 +25,11 @@ public enum ResultState
             },
     IN_PROGRESS
             {
+                public boolean isCompleted()
+                {
+                    return false;
+                }
+
                 public String getString()
                 {
                     return "inprogress";
@@ -32,6 +42,11 @@ public enum ResultState
             },
     TERMINATING
             {
+                public boolean isCompleted()
+                {
+                    return false;
+                }
+
                 public String getString()
                 {
                     return "terminating";
@@ -44,6 +59,11 @@ public enum ResultState
             },
     SUCCESS
             {
+                public boolean isCompleted()
+                {
+                    return true;
+                }
+
                 public String getString()
                 {
                     return "success";
@@ -56,6 +76,11 @@ public enum ResultState
             },
     FAILURE
             {
+                public boolean isCompleted()
+                {
+                    return true;
+                }
+
                 public String getString()
                 {
                     return "failure";
@@ -68,6 +93,11 @@ public enum ResultState
             },
     ERROR
             {
+                public boolean isCompleted()
+                {
+                    return true;
+                }
+
                 public String getString()
                 {
                     return "error";
@@ -79,11 +109,47 @@ public enum ResultState
                 }
             };
 
+    public abstract boolean isCompleted();
     public abstract String getPrettyString();
-
     public abstract String getString();
 
+
     public static final String SEPARATOR = ",";
+    private static final ResultState[] COMPLETED_STATES;
+    private static final ResultState[] INCOMPLETE_STATES;
+    static
+    {
+        int complete = 0;
+        int incomplete = 0;
+        for(ResultState state: values())
+        {
+            if(state.isCompleted())
+            {
+                complete++;
+            }
+            else
+            {
+                incomplete++;
+            }
+        }
+
+        COMPLETED_STATES = new ResultState[complete];
+        INCOMPLETE_STATES = new ResultState[incomplete];
+
+        complete = 0;
+        incomplete = 0;
+        for(ResultState state: values())
+        {
+            if(state.isCompleted())
+            {
+                COMPLETED_STATES[complete++] = state;
+            }
+            else
+            {
+                INCOMPLETE_STATES[incomplete++] = state;
+            }
+        }
+    }
 
     public static List<String> getNames(List<ResultState> states)
     {
@@ -170,7 +236,7 @@ public enum ResultState
 
     public static ResultState[] getCompletedStates()
     {
-        return new ResultState[] { SUCCESS, FAILURE, ERROR };
+        return COMPLETED_STATES;
     }
 
     public static Map<String, String> getCompletedStatesMap()
@@ -196,6 +262,11 @@ public enum ResultState
         return result;
     }
 
+    public static ResultState[] getIncompleteStates()
+    {
+        return INCOMPLETE_STATES;
+    }
+
     public static ResultState getWorseState(ResultState s1, ResultState s2)
     {
         if(s1 == ERROR || s2 == ERROR)
@@ -210,10 +281,5 @@ public enum ResultState
         {
             return SUCCESS;
         }
-    }
-
-    public static ResultState[] getIncompleteStates()
-    {
-        return new ResultState[] { INITIAL, IN_PROGRESS, TERMINATING };
     }
 }

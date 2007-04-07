@@ -2,12 +2,11 @@ package com.zutubi.prototype.webwork;
 
 import com.zutubi.prototype.type.CompositeType;
 import com.zutubi.prototype.type.TypeProperty;
-import com.zutubi.prototype.type.record.Record;
 import com.zutubi.prototype.type.record.MutableRecord;
+import com.zutubi.prototype.type.record.Record;
 
-import java.util.List;
-import java.util.Map;
 import java.util.Collection;
+import java.util.Map;
 
 /**
  * Webwork environment specific prototype utility methods.

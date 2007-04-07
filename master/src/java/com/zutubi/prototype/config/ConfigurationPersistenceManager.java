@@ -250,29 +250,6 @@ public class ConfigurationPersistenceManager
         return (T) type;
     }
 
-    public <T extends Type> T getTargetType(String path, Class<T> typeClass)
-    {
-        Type type = getTargetType(getType(path, Type.class));
-        if (!typeClass.isInstance(type))
-        {
-            throw new IllegalArgumentException("Invalid path '" + path + "': referenced collection contains incompatible type (expected '" + typeClass.getName() + "', found '" + type.getClass().getName() + "')");
-        }
-
-        return (T) type;
-    }
-
-    public Type getTargetType(Type type)
-    {
-        if (type instanceof CollectionType)
-        {
-            return ((CollectionType) type).getCollectionType();
-        }
-        else
-        {
-            return type;
-        }
-    }
-
     public List<String> getListing(String path)
     {
         LinkedList<String> list = new LinkedList<String>();

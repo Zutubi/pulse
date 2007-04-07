@@ -26,6 +26,11 @@ public abstract class CollectionType extends AbstractType implements ComplexType
         super(type, symbolicName);
     }
 
+    public Type getTargetType()
+    {
+        return collectionType;
+    }
+
     public Type getCollectionType()
     {
         return collectionType;

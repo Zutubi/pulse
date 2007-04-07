@@ -72,7 +72,7 @@ public class Configuration
         parentPath = PathUtils.getParentPath(path);
 
         type = configurationPersistenceManager.getType(path);
-        targetType = configurationPersistenceManager.getTargetType(type);
+        targetType = type.getTargetType();
 
         if (targetType instanceof CompositeType)
         {
@@ -96,13 +96,12 @@ public class Configuration
             {
                 nestedProperties.add(propertyName);
             }
-            for (String propertyName : ctype.getPropertyNames(ListType.class))
+            for (TypeProperty property: ctype.getProperties(CollectionType.class))
             {
-                nestedProperties.add(propertyName);
-            }
-            for (String propertyName : ctype.getPropertyNames(MapType.class))
-            {
-                nestedProperties.add(propertyName);
+                if(!(((CollectionType)property.getType()).getCollectionType() instanceof SimpleType))
+                {
+                    nestedProperties.add(property.getName());
+                }
             }
 
             extensions.addAll(((CompositeType) targetType).getExtensions());

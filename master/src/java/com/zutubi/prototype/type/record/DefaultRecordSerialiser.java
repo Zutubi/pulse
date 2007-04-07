@@ -1,6 +1,8 @@
 package com.zutubi.prototype.type.record;
 
+import com.zutubi.pulse.util.CollectionUtils;
 import com.zutubi.pulse.util.FileSystemUtils;
+import com.zutubi.pulse.util.Mapping;
 import com.zutubi.pulse.util.XMLUtils;
 import com.zutubi.pulse.util.logging.Logger;
 import nu.xom.*;
@@ -22,7 +24,9 @@ public class DefaultRecordSerialiser implements RecordSerialiser
     private File baseDirectory;
     private static final String ELEMENT_RECORD = "record";
     private static final String ELEMENT_META = "meta";
-    private static final String ELEMENT_DATA = "data";
+    private static final String ELEMENT_VALUE = "value";
+    private static final String ELEMENT_ARRAY = "array";
+    private static final String ELEMENT_ITEM = "item";
     private static final String ATTRIBUTE_NAME = "name";
 
     public DefaultRecordSerialiser(File baseDirectory)
@@ -100,7 +104,15 @@ public class DefaultRecordSerialiser implements RecordSerialiser
 
         for (String key : record.simpleKeySet())
         {
-            root.appendChild(createElement(ELEMENT_DATA, key, (String) record.get(key)));
+            Object value = record.get(key);
+            if(value instanceof String)
+            {
+                root.appendChild(createElement(ELEMENT_VALUE, key, (String) value));
+            }
+            else
+            {
+                root.appendChild(createElement(ELEMENT_ARRAY, key, (String[])value));
+            }
         }
 
         return doc;
@@ -108,9 +120,30 @@ public class DefaultRecordSerialiser implements RecordSerialiser
 
     private Element createElement(String elementName, String key, String value)
     {
+        return createElement(elementName, key, new Text(value));
+    }
+
+    private Element createElement(String elementName, String key, String[] values)
+    {
+        return createElement(elementName, key, CollectionUtils.mapToArray(values, new Mapping<String, Element>()
+        {
+            public Element map(String s)
+            {
+                Element e = new Element(ELEMENT_ITEM);
+                e.appendChild(new Text(s));
+                return e;
+            }
+        }, new Element[values.length]));
+    }
+
+    private Element createElement(String elementName, String key, Node... children)
+    {
         Element element = new Element(elementName);
         element.addAttribute(new Attribute(ATTRIBUTE_NAME, key));
-        element.appendChild(new Text(value));
+        for(Node child: children)
+        {
+            element.appendChild(child);
+        }
         return element;
     }
 
@@ -168,21 +201,40 @@ public class DefaultRecordSerialiser implements RecordSerialiser
 
         processChildren(recordFile, root.getChildElements(ELEMENT_META), new ElementHandler()
         {
-            public void handle(String key, String value)
+            public void handle(String key, Element child)
             {
-                record.putMeta(key, value);
+                record.putMeta(key, XMLUtils.getText(child, ""));
             }
         });
 
-        processChildren(recordFile, root.getChildElements(ELEMENT_DATA), new ElementHandler()
+        processChildren(recordFile, root.getChildElements(ELEMENT_VALUE), new ElementHandler()
         {
-            public void handle(String key, String value)
+            public void handle(String key, Element child)
             {
-                record.put(key, value);
+                record.put(key, XMLUtils.getText(child, ""));
+            }
+        });
+
+        processChildren(recordFile, root.getChildElements(ELEMENT_ARRAY), new ElementHandler()
+        {
+            public void handle(String key, Element child)
+            {
+                record.put(key, getItems(child));
             }
         });
 
         return record;
+    }
+
+    private String[] getItems(Element element)
+    {
+        Elements items = element.getChildElements(ELEMENT_ITEM);
+        String[] result = new String[items.size()];
+        for(int i = 0; i < items.size(); i++)
+        {
+            result[i] = XMLUtils.getText(items.get(i), "");
+        }
+        return result;
     }
 
     private void processChildren(File recordFile, Elements children, ElementHandler handler)
@@ -196,13 +248,13 @@ public class DefaultRecordSerialiser implements RecordSerialiser
                 LOG.warning("Ignoring '" + child.getLocalName() + "' with no '" + ATTRIBUTE_NAME + "' attribute in file '" + recordFile.getAbsolutePath() + "'");
             }
 
-            handler.handle(key, XMLUtils.getText(child, ""));
+            handler.handle(key, child);
         }
     }
 
     private interface ElementHandler
     {
-        void handle(String key, String value);
+        void handle(String key, Element child);
     }
 
     private class SubrecordDirFileFilter implements FileFilter

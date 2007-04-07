@@ -1,8 +1,8 @@
 package com.zutubi.prototype;
 
 import com.zutubi.prototype.model.Field;
-import com.zutubi.prototype.type.record.Record;
 import com.zutubi.prototype.type.TypeProperty;
+import com.zutubi.prototype.type.record.Record;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -58,6 +58,11 @@ public class FieldDescriptor implements Descriptor
     public void addAll(Map<String, Object> parameters)
     {
         this.parameters.putAll(parameters);
+    }
+
+    public boolean hasParameter(String key)
+    {
+        return parameters.containsKey(key);
     }
 
     public Object getParameter(String key)

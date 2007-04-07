@@ -10,6 +10,7 @@ import com.zutubi.prototype.config.ConfigurationPersistenceManager;
 public class ReferenceType extends SimpleType implements Type
 {
     private CompositeType referencedType;
+    private boolean multiple;
     private ConfigurationPersistenceManager configurationPersistenceManager;
 
     public ReferenceType(CompositeType referencedType, ConfigurationPersistenceManager configurationPersistenceManager)
@@ -28,5 +29,10 @@ public class ReferenceType extends SimpleType implements Type
     {
         String path = (String) data;
         return configurationPersistenceManager.getInstance(path);
+    }
+
+    public boolean isMultiple()
+    {
+        return multiple;
     }
 }

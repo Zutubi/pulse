@@ -1,22 +1,29 @@
 package com.zutubi.pulse.prototype.config;
 
-import com.zutubi.pulse.form.descriptor.annotation.Summary;
 import com.zutubi.prototype.annotation.Form;
-import com.zutubi.prototype.annotation.ConfigurationCheck;
 import com.zutubi.prototype.annotation.Reference;
+import com.zutubi.prototype.annotation.Select;
+import com.zutubi.pulse.core.model.ResultState;
+import com.zutubi.pulse.prototype.CompletedResultStateOptionProvider;
+
+import java.util.List;
 
 /**
  */
-@Form(fieldOrder = { "name", "project"})
+@Form(fieldOrder = { "name", "project", "states"})
 public class BuildCompletedTriggerConfiguration extends BaseTriggerConfiguration
 {
+    @Reference
     private ProjectConfiguration project;
+    @Reference
+    private List<ProjectConfiguration> projects;
+    @Select(optionProvider = CompletedResultStateOptionProvider.class)
+    private List<ResultState> states;
 
     public BuildCompletedTriggerConfiguration()
     {
     }
 
-    @Reference(optionProvider = DefaultReferenceOptionProvider.class)
     public ProjectConfiguration getProject()
     {
         return project;
@@ -25,5 +32,25 @@ public class BuildCompletedTriggerConfiguration extends BaseTriggerConfiguration
     public void setProject(ProjectConfiguration project)
     {
         this.project = project;
+    }
+
+    public List<ProjectConfiguration> getProjects()
+    {
+        return projects;
+    }
+
+    public void setProjects(List<ProjectConfiguration> projects)
+    {
+        this.projects = projects;
+    }
+
+    public List<ResultState> getStates()
+    {
+        return states;
+    }
+
+    public void setStates(List<ResultState> states)
+    {
+        this.states = states;
     }
 }

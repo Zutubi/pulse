@@ -29,7 +29,7 @@ public class SingleTypeWizard extends AbstractTypeWizard
 
     public void initialise()
     {
-        CompositeType type = configurationPersistenceManager.getTargetType(path, CompositeType.class);
+        CompositeType type = (CompositeType) configurationPersistenceManager.getType(path).getTargetType();
 
         LOG.warning("TODO: load template record for path: " + path + ", currently using empty template record.");
 

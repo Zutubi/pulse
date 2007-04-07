@@ -1,13 +1,13 @@
 package com.zutubi.prototype.config;
 
-import junit.framework.TestCase;
-import com.zutubi.prototype.type.TypeRegistry;
-import com.zutubi.prototype.type.CompositeType;
-import com.zutubi.prototype.type.record.RecordManager;
-import com.zutubi.prototype.type.record.MockRecordSerialiser;
-import com.zutubi.prototype.config.types.SimpleObject;
 import com.zutubi.prototype.config.types.CompositeObject;
 import com.zutubi.prototype.config.types.GrandParentObject;
+import com.zutubi.prototype.config.types.SimpleObject;
+import com.zutubi.prototype.type.CompositeType;
+import com.zutubi.prototype.type.TypeRegistry;
+import com.zutubi.prototype.type.record.MockRecordSerialiser;
+import com.zutubi.prototype.type.record.RecordManager;
+import junit.framework.TestCase;
 
 /**
  */
@@ -33,5 +33,10 @@ public class ReferencableRecordsTest extends TestCase
         simpleType = typeRegistry.register(SimpleObject.class);
         compositeType = typeRegistry.register(CompositeObject.class);
         grandparentType = typeRegistry.register(GrandParentObject.class);
+    }
+
+    public void testSomething()
+    {
+        // TODO FIXME
     }
 }

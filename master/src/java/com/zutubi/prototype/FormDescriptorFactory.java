@@ -3,16 +3,14 @@ package com.zutubi.prototype;
 import com.zutubi.prototype.annotation.AnnotationHandler;
 import com.zutubi.prototype.annotation.Handler;
 import com.zutubi.prototype.type.*;
+import com.zutubi.prototype.type.record.PathUtils;
 import com.zutubi.pulse.core.ObjectFactory;
+import com.zutubi.pulse.prototype.config.EnumOptionProvider;
 import com.zutubi.pulse.util.logging.Logger;
 import com.zutubi.validation.annotations.Required;
 
 import java.lang.annotation.Annotation;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  *
@@ -77,45 +75,92 @@ public class FormDescriptorFactory
     {
         List<FieldDescriptor> fieldDescriptors = new LinkedList<FieldDescriptor>();
 
-        for (TypeProperty property : type.getProperties(PrimitiveType.class))
+        for (TypeProperty property : type.getProperties(SimpleType.class))
         {
-            Type propertyType = property.getType();
-            FieldDescriptor fd = new FieldDescriptor();
-            fd.setPath(path);
-            fd.setProperty(property);
-            fd.setName(property.getName());
+            SimpleType propertyType = (SimpleType) property.getType();
+            FieldDescriptor fd = createField(path, property);
 
-            // some little bit of magic, take a guess at any property called password. If we come up with any
-            // other magical cases, then we can refactor this a bit.
-            if (fd.getName().equals("password"))
+            if(propertyType instanceof PrimitiveType)
             {
-                fd.setType("password");
-                fd.addParameter("type", "password");
+                // some little bit of magic, take a guess at any property called password. If we come up with any
+                // other magical cases, then we can refactor this a bit.
+                if (fd.getName().equals("password"))
+                {
+                    fd.setType("password");
+                }
+                else
+                {
+                    fd.setType(defaultFieldTypeMapping.get(propertyType.getClazz()));
+                }
             }
             else
             {
-                fd.addParameter("type", defaultFieldTypeMapping.get(propertyType.getClazz()));
+                // References and enums default to lists
+                fd.setType("select");
             }
 
-            handleAnnotations(fd, property.getAnnotations());
-
+            addFieldParameters(path, property, fd);
             fieldDescriptors.add(fd);
         }
 
-        for (TypeProperty property : type.getProperties(ReferenceType.class))
+        for(TypeProperty property: type.getProperties(CollectionType.class))
         {
-            FieldDescriptor fd = new FieldDescriptor();
-            fd.setPath(path);
-            fd.setProperty(property);
-            fd.setType("select");
-            fd.setName(property.getName());
-
-            handleAnnotations(fd, property.getAnnotations());
-
-            fieldDescriptors.add(fd);
+            CollectionType propertyType = (CollectionType) property.getType();
+            Type targetType = propertyType.getCollectionType();
+            if(targetType instanceof EnumType || targetType instanceof ReferenceType)
+            {
+                FieldDescriptor fd = createField(path, property);
+                fd.setType("select");
+                fd.addParameter("multiple", true);
+                addFieldParameters(path, property, fd);
+                fieldDescriptors.add(fd);
+            }
         }
 
         return fieldDescriptors;
+    }
+
+    private void addFieldParameters(String path, TypeProperty property, FieldDescriptor fd)
+    {
+        handleAnnotations(fd, property.getAnnotations());
+        if("select".equals(fd.getType()) && !fd.hasParameter("list"))
+        {
+            addDefaultOptions(path, property, fd);
+        }
+    }
+
+    private FieldDescriptor createField(String path, TypeProperty property)
+    {
+        FieldDescriptor fd = new FieldDescriptor();
+        fd.setPath(PathUtils.getPath(path, property.getName()));
+        fd.setProperty(property);
+        fd.setName(property.getName());
+        return fd;
+    }
+
+    private void addDefaultOptions(String path, TypeProperty typeProperty, FieldDescriptor fd)
+    {
+        // TODO FIXME this dups code in the OptionAnnotationHandler
+        // TODO FIXME i have not fixed now because this class itself seems to
+        // TODO FIXME a prime candidate for refactoring when we understand
+        // TODO FIXME things better
+        if(typeProperty.getType().getTargetType() instanceof EnumType)
+        {
+            OptionProvider optionProvider = new EnumOptionProvider();
+            fd.addParameter("list", optionProvider.getOptions(path, typeProperty));
+            if (optionProvider.getOptionKey() != null)
+            {
+                fd.addParameter("listKey", optionProvider.getOptionKey());
+            }
+            if (optionProvider.getOptionValue() != null)
+            {
+                fd.addParameter("listValue", optionProvider.getOptionValue());
+            }
+        }
+        else
+        {
+            fd.addParameter("list", Collections.EMPTY_LIST);
+        }
     }
 
     /**

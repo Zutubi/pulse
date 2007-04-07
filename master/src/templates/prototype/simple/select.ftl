@@ -34,7 +34,7 @@
         <#assign itemValue = item/>
     </#if>
     <option value="${itemKey?html}"<#rt/>
-        <#if parameters.value?exists && parameters.value == itemKey>
+        <#if parameters.value?exists && (parameters.value?is_sequence && parameters.value?seq_contains(itemKey) || !parameters.value?is_sequence && parameters.value == itemKey)>
  selected="selected"<#rt/>
         </#if>
     >${itemValue?html}</option><#lt/>

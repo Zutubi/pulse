@@ -33,33 +33,45 @@ public class ListType extends CollectionType
             return null;
         }
 
-        if (!(data instanceof Record))
+        if (data instanceof Record)
         {
-            throw new TypeConversionException("Expected a map type, instead received " + data.getClass());
-        }
+            Record record = (Record) data;
 
-        Record record = (Record) data;
-
-        Iterable<String> keys = getOrder(record);
-        Type defaultType = getCollectionType();
-        if (defaultType == null && record.getMeta("type") != null)
-        {
-            defaultType = typeRegistry.getType(record.getMeta("type"));
-        }
-
-        List<Object> instance = new LinkedList<Object>();
-        for (String key : keys)
-        {
-            Object child = record.get(key);
-            Type type = defaultType;
-            if (child instanceof Record)
+            Iterable<String> keys = getOrder(record);
+            Type defaultType = getCollectionType();
+            if (defaultType == null && record.getMeta("type") != null)
             {
-                Record childRecord = (Record) child;
-                type = typeRegistry.getType(childRecord.getSymbolicName());
+                defaultType = typeRegistry.getType(record.getMeta("type"));
             }
-            Object value = type.instantiate(child);
-            instance.add(value);
+
+            List<Object> instance = new LinkedList<Object>();
+            for (String key : keys)
+            {
+                Object child = record.get(key);
+                Type type = defaultType;
+                if (child instanceof Record)
+                {
+                    Record childRecord = (Record) child;
+                    type = typeRegistry.getType(childRecord.getSymbolicName());
+                }
+                Object value = type.instantiate(child);
+                instance.add(value);
+            }
+            
+            return instance;
         }
-        return instance;
+        else if(data instanceof String[])
+        {
+            List<Object> instance = new LinkedList<Object>();
+            for(String s: (String[])data)
+            {
+                instance.add(s);
+            }
+            return instance;
+        }
+        else
+        {
+            throw new TypeConversionException("Expected a record or string array, instead received " + data.getClass());
+        }
     }
 }
