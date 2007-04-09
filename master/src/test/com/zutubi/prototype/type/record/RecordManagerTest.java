@@ -25,7 +25,7 @@ public class RecordManagerTest extends TestCase
         super.tearDown();
     }
 
-    public void testStore()
+    public void testInsert()
     {
         recordManager.insert("hello", new MutableRecordImpl());
 
@@ -42,6 +42,7 @@ public class RecordManagerTest extends TestCase
         MutableRecordImpl record = new MutableRecordImpl();
         record.putMeta("key", "value");
 
+        recordManager.insert("hello", new MutableRecordImpl());
         recordManager.insert("hello/world", record);
         assertNull(recordManager.load("hello/moon"));
         assertNull(recordManager.load("hello/world/key"));
@@ -53,6 +54,7 @@ public class RecordManagerTest extends TestCase
         MutableRecordImpl record = new MutableRecordImpl();
         record.putMeta("key", "value");
 
+        recordManager.insert("hello", new MutableRecordImpl());
         recordManager.insert("hello/world", record);
 
         assertNull(recordManager.delete("hello/moon"));
@@ -65,9 +67,9 @@ public class RecordManagerTest extends TestCase
     {
         MutableRecordImpl record = new MutableRecordImpl();
         record.putMeta("key", "value");
-        recordManager.insert("path/to/record", record);
+        recordManager.insert("path", record);
 
-        Record loadedRecord = recordManager.load("path/to/record");
+        Record loadedRecord = recordManager.load("path");
         assertEquals(record.getMeta("key"), loadedRecord.getMeta("key"));
     }
 
@@ -104,7 +106,7 @@ public class RecordManagerTest extends TestCase
         assertFalse(copy.containsKey("anotherKey"));
     }
 
-    public void testCopyOnStore()
+    public void testCopyOnInsert()
     {
         MutableRecordImpl original = new MutableRecordImpl();
         original.put("key", "value");

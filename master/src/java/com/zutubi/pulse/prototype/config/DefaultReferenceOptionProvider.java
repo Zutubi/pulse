@@ -26,7 +26,7 @@ public class DefaultReferenceOptionProvider extends MapOptionProvider
 
         for(Map.Entry<String, Record> entry: referencable.entrySet())
         {
-            // TODO FIXME get name properly
+            // FIXME get name properly
             options.put(entry.getKey(), (String) entry.getValue().get("name"));
         }
         

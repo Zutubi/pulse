@@ -143,7 +143,7 @@ public class TemplateRecord implements Record
         }
     }
 
-    public MutableRecord createMutable()
+    public MutableRecord copy(boolean deep)
     {
         throw new UnsupportedOperationException("Record is not mutable.");
     }

@@ -1,9 +1,12 @@
 package com.zutubi.prototype.config;
 
-import com.zutubi.prototype.type.*;
+import com.zutubi.prototype.config.types.*;
+import com.zutubi.prototype.type.CompositeType;
+import com.zutubi.prototype.type.Type;
+import com.zutubi.prototype.type.TypeException;
+import com.zutubi.prototype.type.TypeRegistry;
 import com.zutubi.prototype.type.record.MockRecordSerialiser;
 import com.zutubi.prototype.type.record.RecordManager;
-import com.zutubi.prototype.config.types.*;
 import junit.framework.TestCase;
 
 import java.util.Arrays;
@@ -96,7 +99,7 @@ public class ConfigurationPersistenceManagerTest extends TestCase
 
     public void testIndexCircular() throws TypeException
     {
-        // TODO FIXME make nested work
+        // FIXME make nested work
 //        CompositeType type = typeRegistry.register(CircularObject.class);
 //        manager.register("nested", type);
 //        assertEquals(Arrays.asList("nested", "nested/nested"), manager.getConfigurationPaths(type));

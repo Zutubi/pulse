@@ -2,11 +2,13 @@ package com.zutubi.prototype.type.record;
 
 import com.zutubi.pulse.bootstrap.MasterConfigurationManager;
 
-import java.util.*;
+import java.util.Map;
 
 /**
- *
- *
+ * Manages a tree of records used to store arbitrary data.  All records are
+ * cached in memory and backed by permanent storage.  This manager supports
+ * basic CRUD operations, and manages the cache: including ensuring
+ * consistency for loaded records.
  */
 public class RecordManager
 {
@@ -30,10 +32,16 @@ public class RecordManager
      * @param path uniquely identifying the record to be loaded.
      * @return the loaded record, or null if no record could be found.
      */
-    public Record load(String path)
+    public synchronized Record load(String path)
+    {
+        String[] elements = PathUtils.getPathElements(path);
+        return load(elements);
+    }
+
+    private Record load(String[] elements)
     {
         Record record = baseRecord;
-        for(String pathElement: PathUtils.getPathElements(path))
+        for(String pathElement: elements)
         {
             Object data = record.get(pathElement);
             if (data == null || !(data instanceof MutableRecordImpl))
@@ -45,7 +53,16 @@ public class RecordManager
         return record;
     }
 
-    public void loadAll(String path, Map<String, Record> records)
+    /**
+     * Loads all records whose paths match the given path.  The path may
+     * include wildcards.
+     *
+     * @param path    search path to use, may include wildcards
+     * @param records filled with a mapping from path to record for all
+     *                records that are stored at a path matching the search
+     *                path
+     */
+    public synchronized void loadAll(String path, Map<String, Record> records)
     {
         loadAll(baseRecord, PathUtils.getPathElements(path), 0, "", records);
     }
@@ -73,23 +90,20 @@ public class RecordManager
      * @param path uniquely identifying a record.
      * @return true if a record exists, false otherwise.
      */
-    public boolean containsRecord(String path)
+    public synchronized boolean containsRecord(String path)
     {
-        MutableRecord record = baseRecord;
-        for(String pathElement: PathUtils.getPathElements(path))
-        {
-            Object data = record.get(pathElement);
-            if (data == null || !(data instanceof MutableRecordImpl))
-            {
-                return false;
-            }
-            record = (MutableRecordImpl) record.get(pathElement);
-        }
-        return record != null;
+        return getRecord(PathUtils.getPathElements(path)) != null;
     }
 
-
-    public void insert(String path, Record newRecord)
+    /**
+     * Inserts a new record at the given path.  No record should exist at
+     * that path, but the parent must exist.
+     *
+     * @param path      path to store the new record at
+     * @param newRecord the record value to store
+     * @return the newly-inserted record
+     */
+    public synchronized Record insert(String path, Record newRecord)
     {
         String[] pathElements = PathUtils.getPathElements(path);
         if (pathElements == null)
@@ -98,10 +112,16 @@ public class RecordManager
         }
 
         MutableRecord parent = getRecord(PathUtils.getParentPathElements(pathElements));
+        if(parent == null)
+        {
+            throw new IllegalArgumentException("No parent record for path '" + path + "'");
+        }
 
         // Save first before hooking up in memory
-        recordSerialiser.serialise(path, (MutableRecord) newRecord, true);
-        parent.put(pathElements[pathElements.length - 1], newRecord.createMutable());
+        MutableRecord record = newRecord.copy(true);
+        recordSerialiser.serialise(path, record, true);
+        parent.put(pathElements[pathElements.length - 1], record);
+        return record;
     }
 
     private MutableRecord getRecord(String[] pathElements)
@@ -109,79 +129,134 @@ public class RecordManager
         MutableRecord record = baseRecord;
         for (String element : pathElements)
         {
-            if (record.get(element) == null)
-            {
-                record.put(element, new MutableRecordImpl());
-            }
-            Object obj = record.get(element);
-            if (!(obj instanceof MutableRecordImpl))
-            {
-                throw new IllegalArgumentException("Invalid path '" + PathUtils.getPath(pathElements) + "'");
-            }
-            record = (MutableRecordImpl) obj;
+            record = getChildRecord(record, element);
         }
 
         return record;
     }
 
-    public void store(String path, Record values)
+    private MutableRecord getChildRecord(MutableRecord record, String element)
     {
-        MutableRecord record = getRecord(PathUtils.getPathElements(path));
-        record.update(values);
+        Object obj = record.get(element);
+        if (obj == null || !(obj instanceof MutableRecordImpl))
+        {
+            return null;
+        }
+        return (MutableRecordImpl) obj;
+    }
+
+    /**
+     * Updates the record at the given path with the new values.  Only simple
+     * values are updated: child records are unaffected.
+     *
+     * @param path   path of the record to update: a record must exist at
+     *               this path
+     * @param values a record holding new simple values to apply
+     * @return the new record created by the update
+     */
+    public synchronized Record update(String path, Record values)
+    {
+        if(path.length() == 0)
+        {
+            throw new IllegalArgumentException("Cannot store into an empty path");
+        }
+        
+        String[] parentElements = PathUtils.getParentPathElements(path);
+        String baseName = PathUtils.getBaseName(path);
+
+        MutableRecord parentRecord = getRecord(parentElements);
+        if(parentRecord == null)
+        {
+            throw new IllegalArgumentException("No parent record for path '" + path + "'" );
+        }
+
+        MutableRecord record = getChildRecord(parentRecord, baseName);
+        if (record == null)
+        {
+            throw new IllegalArgumentException("No record at path '" + path + "'");
+        }
+
+        // Create a new record to store the updates, and use it to replace
+        // the cached record.  The cached record is cut loose and will be
+        // collected when no longer in use.
+        MutableRecord copy = record.copy(false);
+        copy.update(values);
+        parentRecord.put(baseName, copy);
         recordSerialiser.serialise(path, record, false);
+        return copy;
+    }
+
+    /**
+     * Stores the given record at the given path.  If a record exists at the
+     * path, it is updated.  If not, a new record is inserted.  In the latter
+     * case the parent record must exist.
+     *
+     * @param path   path to store the record at
+     * @param record record values to store
+     * @return the newly-stored record
+     */
+    public synchronized Record insertOrUpdate(String path, Record record)
+    {
+        if(containsRecord(path))
+        {
+            return update(path, record);
+        }
+        else
+        {
+            return insert(path, record);
+        }
     }
 
     /**
      * Delete the record at the specified path.
      *
-     * @param path identifying the record to be deleted.
-     * @return an instance of the record just deleted, or null if no record exists at the specified path.
+     * @param path identifying the record to be deleted
+     * @return an instance of the record just deleted, or null if no record
+     *         exists at the specified path.
      */
-    public Record delete(String path)
+    public synchronized Record delete(String path)
     {
-        MutableRecord record = baseRecord;
-        for(String pathElement: PathUtils.getParentPathElements(path))
+        if(path.length() == 0)
         {
-            if (!record.containsKey(pathElement))
-            {
-                return null;
-            }
-            Object obj = record.get(pathElement);
-            if (!(obj instanceof Record))
-            {
-                return null;
-            }
-
-            record = (MutableRecordImpl) record.get(pathElement);
+            throw new IllegalArgumentException("Cannot delete the base record");
         }
 
-        String basePath = PathUtils.getBasePath(path);
-        if (record.containsKey(basePath))
+        MutableRecord parentRecord = getRecord(PathUtils.getParentPathElements(path));
+        if (parentRecord == null)
         {
+            throw new IllegalArgumentException("No parent record for path '" + path + "'");
+        }
+
+        String baseName = PathUtils.getBaseName(path);
+        Object value = parentRecord.get(baseName);
+        if(value != null && value instanceof Record)
+        {
+            Record result = (Record) parentRecord.remove(baseName);
             recordSerialiser.delete(path);
-            Object obj = record.get(basePath);
-            if (obj instanceof MutableRecordImpl)
-            {
-                return (Record) record.remove(basePath);
-            }
+            return result;
         }
         return null;
     }
 
     /**
-     * Copy the record contents from the source path to the destination path
+     * Copy the record contents from the source path to the destination path.
      *
      * @param sourcePath      path to copy from
      * @param destinationPath path to copy to
+     * @return the new record, or null if the source path does not refer to
+     *         an existing record
      */
-    public void copy(String sourcePath, String destinationPath)
+    public synchronized Record copy(String sourcePath, String destinationPath)
     {
         MutableRecord record = (MutableRecord) load(sourcePath);
         if (record != null)
         {
-            MutableRecord copy = record.createMutable();
+            MutableRecord copy = record.copy(true);
             insert(destinationPath, copy);
+            return copy;
         }
+
+        return null;
     }
 
     public void setConfigurationManager(MasterConfigurationManager configurationManager)

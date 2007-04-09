@@ -60,7 +60,7 @@ public abstract class CollectionType extends AbstractType implements ComplexType
 
     private Iterable<String> convertOrder(String order)
     {
-        // TODO: comma not safe in keys, could be bad.
+        // FIXME comma not safe in keys, could be bad.
         return Arrays.asList(order.split(","));
     }
 
@@ -100,9 +100,9 @@ public abstract class CollectionType extends AbstractType implements ComplexType
             latestKey = Integer.toString(Integer.parseInt(latestKey) + 1);
         }
 
-        MutableRecord mutableRecord = record.createMutable();
+        MutableRecord mutableRecord = record.copy(false);
         mutableRecord.putMeta(LATEST_KEY_KEY, latestKey);
-        recordManager.store(path, mutableRecord);
+        recordManager.update(path, mutableRecord);
         return latestKey;
     }
 }

@@ -245,7 +245,7 @@ public class ConfigurationWizardAction extends ActionSupport
         {
             Record post = PrototypeUtils.toRecord(getState().getType(), ActionContext.getContext().getParameters());
 
-            // apply the posted record details to the current states record.
+            // apply the posted record details to the current state's record.
             getState().getRecord().update(post);
         }
 

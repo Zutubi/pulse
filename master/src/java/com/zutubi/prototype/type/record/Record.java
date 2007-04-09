@@ -6,7 +6,7 @@ import java.util.Set;
  * A record defines a simple map for storing data.  
  *
  */
-public interface Record extends Cloneable
+public interface Record
 {
 
     /**
@@ -35,11 +35,12 @@ public interface Record extends Cloneable
     boolean containsKey(String key);
 
     /**
-     * Create a clone of this record.
+     * Create a copy of this record.
      *
-     * @return a deep value copy of this record.
+     * @param deep if true, the copy is deep: child records are also copied
+     * @return a value copy of this record
      */
-    MutableRecord createMutable();
+    MutableRecord copy(boolean deep);
 
     Set<String> keySet();
 

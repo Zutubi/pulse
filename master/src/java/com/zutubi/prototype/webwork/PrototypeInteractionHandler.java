@@ -8,11 +8,7 @@ import com.zutubi.prototype.type.TypeRegistry;
 import com.zutubi.prototype.type.record.Record;
 import com.zutubi.prototype.type.record.RecordManager;
 import com.zutubi.pulse.validation.MessagesTextProvider;
-import com.zutubi.validation.DelegatingValidationContext;
-import com.zutubi.validation.ValidationAware;
-import com.zutubi.validation.ValidationContext;
-import com.zutubi.validation.ValidationException;
-import com.zutubi.validation.ValidationManager;
+import com.zutubi.validation.*;
 
 /**
  *
@@ -69,7 +65,7 @@ public class PrototypeInteractionHandler
 
     public void save(String path, Record record)
     {
-        configurationPersistenceManager.updateRecord(path, record);
+        configurationPersistenceManager.saveRecord(path, record);
     }
 
     public void delete(String path)

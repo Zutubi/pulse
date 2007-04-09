@@ -68,14 +68,14 @@ public class PathUtils
         return null;
     }
 
-    public static String getBasePath(String path)
+    public static String getBaseName(String path)
     {
         int i = path.lastIndexOf(SEPARATOR);
-        if (i != -1 && i < path.length())
+        if (i != -1)
         {
             return path.substring(i + 1);
         }
-        return null;
+        return path;
     }
 
     public static String normalizePath(String path)

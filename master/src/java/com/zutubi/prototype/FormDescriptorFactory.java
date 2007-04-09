@@ -140,10 +140,10 @@ public class FormDescriptorFactory
 
     private void addDefaultOptions(String path, TypeProperty typeProperty, FieldDescriptor fd)
     {
-        // TODO FIXME this dups code in the OptionAnnotationHandler
-        // TODO FIXME i have not fixed now because this class itself seems to
-        // TODO FIXME a prime candidate for refactoring when we understand
-        // TODO FIXME things better
+        // FIXME this dups code in the OptionAnnotationHandler
+        // FIXME i have not fixed now because this class itself seems to
+        // FIXME a prime candidate for refactoring when we understand
+        // FIXME things better
         if(typeProperty.getType().getTargetType() instanceof EnumType)
         {
             OptionProvider optionProvider = new EnumOptionProvider();

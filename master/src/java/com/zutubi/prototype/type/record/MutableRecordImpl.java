@@ -80,7 +80,7 @@ public class MutableRecordImpl implements MutableRecord
         data.clear();
     }
 
-    public MutableRecord createMutable()
+    public MutableRecord copy(boolean deep)
     {
         MutableRecordImpl clone = new MutableRecordImpl();
 
@@ -95,9 +95,9 @@ public class MutableRecordImpl implements MutableRecord
         {
             String key = entry.getKey();
             Object value = entry.getValue();
-            if (value instanceof Record)
+            if (deep && value instanceof Record)
             {
-                value = ((Record) value).createMutable();
+                value = ((Record) value).copy(deep);
             }
             clone.put(key, value);
         }

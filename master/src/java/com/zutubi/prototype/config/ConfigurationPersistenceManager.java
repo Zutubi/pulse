@@ -345,8 +345,8 @@ public class ConfigurationPersistenceManager
         this.recordManager = recordManager;
     }
 
-    public void updateRecord(String path, Record record)
+    public void saveRecord(String path, Record record)
     {
-        recordManager.store(path, record);
+        recordManager.insertOrUpdate(path, record);
     }
 }
