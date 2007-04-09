@@ -14,14 +14,6 @@ public class SaveAction extends PrototypeSupport
 {
     private String symbolicName;
 
-    private PrototypeInteractionHandler interactionHandler;
-
-    public SaveAction()
-    {
-        interactionHandler = new PrototypeInteractionHandler();
-        ComponentContext.autowire(interactionHandler);
-    }
-
     public String getSymbolicName()
     {
         return symbolicName;
@@ -56,12 +48,12 @@ public class SaveAction extends PrototypeSupport
 
         record = PrototypeUtils.toRecord(type, ActionContext.getContext().getParameters());
 
-        if (!interactionHandler.validate(record, new XWorkValidationAdapter(this)))
+        if (!configurationPersistenceManager.validate(record, new XWorkValidationAdapter(this)))
         {
             return doRender();
         }
 
-        interactionHandler.save(path, record);
+        configurationPersistenceManager.saveRecord(path, record);
 
         return doRender();
     }

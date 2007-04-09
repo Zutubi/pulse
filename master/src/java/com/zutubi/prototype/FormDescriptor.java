@@ -91,7 +91,7 @@ public class FormDescriptor implements Descriptor
         this.actions.addAll(actions);
     }
 
-    public Form instantiate(Record record)
+    public Form instantiate(String path, Record record)
     {
         Form form = new Form();
         form.setId(id);    
@@ -109,7 +109,7 @@ public class FormDescriptor implements Descriptor
                 continue;
             }
             
-            Field field = fieldDescriptor.instantiate(record);
+            Field field = fieldDescriptor.instantiate(path, record);
             field.setTabindex(tabindex++);
             form.add(field);
         }

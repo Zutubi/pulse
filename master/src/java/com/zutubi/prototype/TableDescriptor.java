@@ -36,13 +36,13 @@ public class TableDescriptor implements Descriptor
         return parameters;
     }
 
-    public Table instantiate(Record obj)
+    public Table instantiate(String path, Record obj)
     {
         Table table = new Table();
 
         for (RowDescriptor rowDescriptor : rowDescriptors)
         {
-            table.addRows(rowDescriptor.instantiate(obj));
+            table.addRows(rowDescriptor.instantiate(path, obj));
         }
 
         return table;

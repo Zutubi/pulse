@@ -1,9 +1,7 @@
 package com.zutubi.prototype.type;
 
-import com.zutubi.prototype.type.record.MutableRecordImpl;
-import com.zutubi.prototype.type.record.Record;
-import com.zutubi.prototype.type.record.RecordManager;
-import com.zutubi.prototype.type.record.MutableRecord;
+import com.zutubi.prototype.type.record.*;
+import com.zutubi.prototype.config.ConfigurationPersistenceManager;
 import com.zutubi.pulse.util.CollectionUtils;
 import com.zutubi.pulse.util.Mapping;
 
@@ -15,20 +13,16 @@ import java.util.*;
  */
 public class CompositeType extends AbstractType implements ComplexType
 {
+    private List<String> extensions = new LinkedList<String>();
+    private Map<String, TypeProperty> properties = new HashMap<String, TypeProperty>();
     private Map<Class, List<String>> propertiesByClass = new HashMap<Class, List<String>>();
 
-    private List<String> extensions = new LinkedList<String>();
+    private ConfigurationPersistenceManager configurationPersistenceManager;
 
-    private Map<String, TypeProperty> properties = new HashMap<String, TypeProperty>();
-
-    public CompositeType(Class type)
-    {
-        super(type);
-    }
-
-    public CompositeType(Class type, String symbolicName)
+    public CompositeType(Class type, String symbolicName, ConfigurationPersistenceManager configurationPersistenceManager)
     {
         super(type, symbolicName);
+        this.configurationPersistenceManager = configurationPersistenceManager;
     }
 
     public void addProperty(TypeProperty property)
@@ -64,11 +58,11 @@ public class CompositeType extends AbstractType implements ComplexType
     public List<TypeProperty> getProperties(Class<? extends Type> type)
     {
         List<TypeProperty> result = new LinkedList<TypeProperty>();
-        for(Map.Entry<Class, List<String>> entry: propertiesByClass.entrySet())
+        for (Map.Entry<Class, List<String>> entry : propertiesByClass.entrySet())
         {
-            if(type.isAssignableFrom(entry.getKey()))
+            if (type.isAssignableFrom(entry.getKey()))
             {
-                for(String property: entry.getValue())
+                for (String property : entry.getValue())
                 {
                     result.add(getProperty(property));
                 }
@@ -113,70 +107,125 @@ public class CompositeType extends AbstractType implements ComplexType
         this.extensions = extensions;
     }
 
-    public Object instantiate(Object data) throws TypeException
+    public Object instantiate(String path, Object data) throws TypeException
     {
-        try
+        Object instance = path == null ? null : configurationPersistenceManager.getInstance(path);
+        if (instance == null && data != null)
         {
-            if (data == null)
+            try
             {
-                return null;
-            }
+                Record record = (Record) data;
 
-            Record record = (Record) data;
-
-            Object instance = getClazz().newInstance();
-
-            TypeConversionException exception = null;
-
-            for (Map.Entry<String, TypeProperty> entry : properties.entrySet())
-            {
-                String name = entry.getKey();
-                if (!record.containsKey(name))
+                instance = getClazz().newInstance();
+                if (path != null)
                 {
-                    continue;
+                    configurationPersistenceManager.putInstance(path, instance);
                 }
 
-                TypeProperty property = entry.getValue();
-                Method setter = property.getSetter();
-                if (setter != null)
+                TypeConversionException exception = null;
+
+                for (Map.Entry<String, TypeProperty> entry : properties.entrySet())
                 {
+                    String name = entry.getKey();
+                    if (!record.containsKey(name))
+                    {
+                        continue;
+                    }
+
+                    TypeProperty property = entry.getValue();
+
+                    // Instantiate even if there is no setter so the instance
+                    // is both checked for validity and cached.
                     Type type = property.getType();
-                    try
+                    Object value = type.instantiate(path == null ? null : PathUtils.getPath(path, name), record.get(name));
+                    Method setter = property.getSetter();
+                    if (setter != null)
                     {
-                        Object value = type.instantiate(record.get(name));
-                        if (value != null || !(type instanceof PrimitiveType))
+                        try
                         {
-                            setter.invoke(instance, value);
+                            if (value != null || !(type instanceof PrimitiveType))
+                            {
+                                setter.invoke(instance, value);
+                            }
                         }
-                    }
-                    catch (Exception e)
-                    {
-                        if (exception == null)
+                        catch (Exception e)
                         {
-                            exception = new TypeConversionException();
+                            if (exception == null)
+                            {
+                                exception = new TypeConversionException();
+                            }
+                            exception.addFieldError(name, e.getMessage());
                         }
-                        exception.addFieldError(name, e.getMessage());
                     }
                 }
-            }
 
-            if (exception != null)
+                if (exception != null)
+                {
+                    throw exception;
+                }
+
+            }
+            catch (TypeConversionException e)
             {
-                throw exception;
+                // let the type conversion exception pass through.
+                throw e;
             }
-
-            return instance;
+            catch (Exception e)
+            {
+                throw new TypeConversionException(e);
+            }
         }
-        catch (TypeConversionException e)
-        {
-            // let the type conversion exception pass through.
-            throw e;
-        }
-        catch (Exception e)
-        {
-            throw new TypeConversionException(e);
-        }
+        
+        return instance;
     }
+
+//    public void resolveReferences(Object data, Object instance) throws TypeException
+//    {
+//        if (!(data instanceof Record))
+//        {
+//            throw new TypeException("Expected record, got: " + data.getClass().getName());
+//        }
+//
+//        // Check each of our properties:
+//        //   - if it is an reference, resolve it
+//        //   - if it is a complex type, recurisvely tell it to resolve
+//        Record record = (Record) data;
+//        if (instance != null)
+//        {
+//            for (TypeProperty referenceProperty : getProperties(ReferenceType.class))
+//            {
+//                Object path = record.get(referenceProperty.getName());
+//                if (path != null)
+//                {
+//                    ReferenceType type = (ReferenceType) referenceProperty.getType();
+//                    Object resolved = type.instantiate(path);
+//                    try
+//                    {
+//                        referenceProperty.getSetter().invoke(instance, resolved);
+//                    }
+//                    catch (Exception e)
+//                    {
+//                        throw new TypeException("Unable to set property '" + referenceProperty.getName() + "': " + e.getMessage(), e);
+//                    }
+//                }
+//            }
+//
+//            for (TypeProperty complexProperty : getProperties(ComplexType.class))
+//            {
+//                ComplexType complex = (ComplexType) complexProperty.getType();
+//                Object nestedInstance;
+//                try
+//                {
+//                    nestedInstance = complexProperty.getGetter().invoke(instance);
+//                }
+//                catch (Exception e)
+//                {
+//                    throw new TypeException("Unable to get property '" + complexProperty.getName() + ": " + e.getMessage(), e);
+//                }
+//                complex.resolveReferences(record.get(complexProperty.getName()), nestedInstance);
+//            }
+//        }
+//    }
 
     public String insert(String path, Record newRecord, RecordManager recordManager)
     {

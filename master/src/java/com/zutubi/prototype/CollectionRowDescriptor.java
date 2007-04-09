@@ -4,6 +4,7 @@ import com.zutubi.prototype.model.Column;
 import com.zutubi.prototype.model.Row;
 import com.zutubi.prototype.type.CollectionType;
 import com.zutubi.prototype.type.record.Record;
+import com.zutubi.prototype.type.record.PathUtils;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -21,7 +22,7 @@ public class CollectionRowDescriptor extends RowDescriptor
         this.type = type;
     }
 
-    public List<Row> instantiate(Record record)
+    public List<Row> instantiate(String path, Record record)
     {
         List<Row> rows = new LinkedList<Row>();
 
@@ -39,7 +40,7 @@ public class CollectionRowDescriptor extends RowDescriptor
             row.setIndex(rowIndex);
             for (ColumnDescriptor c : getColumnDescriptors())
             {
-                Column column = c.instantiate(entry);
+                Column column = c.instantiate(PathUtils.getPath(path, key), entry);
                 column.addParameter("key", key);
                 row.addCell(column);
             }

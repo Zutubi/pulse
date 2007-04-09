@@ -16,5 +16,5 @@ public interface Descriptor
 
     Map<String, Object> getParameters();
 
-    Object instantiate(Record record);
+    Object instantiate(String path, Record record);
 }

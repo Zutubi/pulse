@@ -6,7 +6,6 @@ import com.zutubi.prototype.annotation.ConfigurationCheck;
 import com.zutubi.prototype.type.CompositeType;
 import com.zutubi.prototype.type.Type;
 import com.zutubi.prototype.type.record.Record;
-import com.zutubi.pulse.bootstrap.ComponentContext;
 import com.zutubi.validation.XWorkValidationAdapter;
 
 import java.util.HashMap;
@@ -18,15 +17,7 @@ import java.util.Map;
  */
 public class CheckAction extends PrototypeSupport
 {
-    private PrototypeInteractionHandler interactionHandler;
-
     private Record checkRecord;
-
-    public CheckAction()
-    {
-        interactionHandler = new PrototypeInteractionHandler();
-        ComponentContext.autowire(interactionHandler);
-    }
 
     public Record getCheckRecord()
     {
@@ -69,22 +60,22 @@ public class CheckAction extends PrototypeSupport
         checkRecord = PrototypeUtils.toRecord((CompositeType) checkType, parameters);
 
         // validate the check form first.
-        if (!interactionHandler.validate(checkRecord, new XWorkValidationAdapter(this)))
+        if (!configurationPersistenceManager.validate(checkRecord, new XWorkValidationAdapter(this)))
         {
             return doRender();
         }
 
         // validate the primary form.
-        if (!interactionHandler.validate(record, new XWorkValidationAdapter(this)))
+        if (!configurationPersistenceManager.validate(record, new XWorkValidationAdapter(this)))
         {
             return doRender();
         }
 
         // Instantiate the primary configuration object.
-        Object instance = type.instantiate(record);
+        Object instance = type.instantiate(null, record);
 
         // Instantiate and execute the check handler.
-        ConfigurationCheckHandler handler = (ConfigurationCheckHandler) checkType.instantiate(checkRecord);
+        ConfigurationCheckHandler handler = (ConfigurationCheckHandler) checkType.instantiate(null, checkRecord);
         handler.test(instance);
 
         // We need to return the existing form values as well.

@@ -112,7 +112,7 @@ public class WizardDirective extends AbstractDirective
             // b) we have a template record that contains default data.
             // maybe the data map needs to be merged first, external to this
 
-            Form form = formDescriptor.instantiate(state.getRecord());
+            Form form = formDescriptor.instantiate(path, state.getRecord());
             form.setAction(action);
 
             context.put("form", form);

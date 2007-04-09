@@ -30,13 +30,13 @@ public interface Type
     Class getClazz();
 
     /**
-     * Returns an instance of the object defined by this type, using the record to populate the details.
+     * Returns an instance of the object defined by this type, using the data to populate the details.
      * <p/>
-     * The type of the record will vary between types.
+     * The type of the data will vary between types.
      *
-     * @param record
+     * @param data
      * @return
      * @throws TypeException
      */
-    Object instantiate(Object record) throws TypeException;
+    Object instantiate(String path, Object data) throws TypeException;
 }

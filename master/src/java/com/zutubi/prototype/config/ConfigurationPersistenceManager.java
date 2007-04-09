@@ -1,19 +1,13 @@
 package com.zutubi.prototype.config;
 
-import com.zutubi.prototype.type.CollectionType;
-import com.zutubi.prototype.type.ComplexType;
-import com.zutubi.prototype.type.CompositeType;
-import com.zutubi.prototype.type.ListType;
-import com.zutubi.prototype.type.MapType;
-import com.zutubi.prototype.type.Type;
-import com.zutubi.prototype.type.TypeException;
-import com.zutubi.prototype.type.TypeProperty;
-import com.zutubi.prototype.type.TypeRegistry;
+import com.zutubi.prototype.type.*;
 import com.zutubi.prototype.type.record.PathUtils;
 import com.zutubi.prototype.type.record.Record;
 import com.zutubi.prototype.type.record.RecordManager;
 import com.zutubi.prototype.type.record.TemplateRecord;
 import com.zutubi.pulse.util.logging.Logger;
+import com.zutubi.pulse.validation.MessagesTextProvider;
+import com.zutubi.validation.*;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -33,15 +27,22 @@ public class ConfigurationPersistenceManager
     private TypeRegistry typeRegistry;
 
     private RecordManager recordManager;
+    private ValidationManager validationManager;
 
-    private Map<String, ComplexType> rootScopes = new HashMap<String, ComplexType>();
+    private Map<String, ScopeInfo> rootScopes = new HashMap<String, ScopeInfo>();
     /**
      * An index mapping from composite types to all paths where records of that
      * type (or a subtype) may reside.  Paths will include wildcards to navigate
      * collection members.
      */
     private Map<CompositeType, List<String>> compositeTypePathIndex = new HashMap<CompositeType, List<String>>();
+    private Map<String, Object> instances = new HashMap<String, Object>();
 
+    public void init()
+    {
+        refreshInstances();
+    }
+    
     /**
      * Register the root scope definitions, from which all of the other definitions will be
      * derived.
@@ -51,7 +52,7 @@ public class ConfigurationPersistenceManager
      */
     public void register(String scope, ComplexType type)
     {
-        rootScopes.put(scope, type);
+        rootScopes.put(scope, new ScopeInfo(scope, type));
         if(!recordManager.containsRecord(scope))
         {
             recordManager.insert(scope, type.createNewRecord());
@@ -113,6 +114,8 @@ public class ConfigurationPersistenceManager
     public Map<String, Record> getReferencableRecords(CompositeType type, String referencingPath)
     {
         HashMap<String, Record> records = new HashMap<String, Record>();
+        // FIXME does not account for templating, and may need to be more
+        // FIXME general.  review when we have more config objects...
         for(String path: getOwningPaths(type, getClosestOwningScope(type, referencingPath)))
         {
             recordManager.loadAll(path, records);
@@ -193,13 +196,13 @@ public class ConfigurationPersistenceManager
         {
             // Parent is the base, special case this as the base is currently
             // like a composite without a registered type :/.
-            ComplexType type = rootScopes.get(lastElement);
-            if (type == null)
+            ScopeInfo info = rootScopes.get(lastElement);
+            if (info == null)
             {
                 throw new IllegalArgumentException("Invalid path '" + path + ": references non-existant root scope '" + lastElement + "'");
             }
 
-            return type;
+            return info.getType();
         }
         else if (parentSymbolicName == null)
         {
@@ -286,27 +289,50 @@ public class ConfigurationPersistenceManager
         return list;
     }
 
+    private void refreshInstances()
+    {
+        instances.clear();
+        for(ScopeInfo scope: rootScopes.values())
+        {
+            String path = scope.getScopeName();
+            if(scope.isCollection())
+            {
+                path = PathUtils.getPath(path, PathUtils.WILDCARD_ANY_ELEMENT);
+            }
+
+            Type targetType = scope.getTargetType();
+            Map<String, Record> records = new HashMap<String, Record>();
+            getAllRecords(path, records);
+            for(Map.Entry<String, Record> entry: records.entrySet())
+            {
+                try
+                {
+                    targetType.instantiate(entry.getKey(), entry.getValue());
+                }
+                catch (TypeException e)
+                {
+                    // FIXME how should we present this? i think we need to
+                    // FIXME store and allow the UI to show such problems
+                    LOG.severe("Unable to instantiate '" + path + "': " + e.getMessage(), e);
+                }
+            }
+        }
+    }
+
     /**
      * Load the object at the specified path, or null if no object exists.
      *
      * @param path path of the instance to retrieve
      * @return object defined by the path.
-     * @throws TypeException if there is an type related error loading the instance at the specified path.
      */
-    public Object getInstance(String path) throws TypeException
+    public Object getInstance(String path)
     {
-        Record record = recordManager.load(path);
-        if (record == null)
-        {
-            return null;
-        }
+        return instances.get(path);
+    }
 
-        CompositeType type = typeRegistry.getType(record.getSymbolicName());
-        if (type != null)
-        {
-            return type.instantiate(record);
-        }
-        return null;
+    public void putInstance(String path, Object instance)
+    {
+        instances.put(path, instance);
     }
 
     public Record getRecord(String path)
@@ -316,15 +342,30 @@ public class ConfigurationPersistenceManager
         {
             return null;
         }
+        return templatiseRecord(path, record);
+    }
 
+    private void getAllRecords(String path, Map<String, Record> records)
+    {
+        recordManager.loadAll(path, records);
+        for(Map.Entry<String, Record> entry: records.entrySet())
+        {
+            entry.setValue(templatiseRecord(entry.getKey(), entry.getValue()));
+        }
+    }
+
+    private Record templatiseRecord(String path, Record record)
+    {
         // We need to understand the root level can be templated.
         String[] pathElements = PathUtils.getPathElements(path);
         if (pathElements.length > 1)
         {
-            ComplexType scopeType = rootScopes.get(pathElements[0]);
-            if (scopeType.isTemplated())
+            ScopeInfo scopeInfo = rootScopes.get(pathElements[0]);
+            if (scopeInfo.isTemplated())
             {
                 // Need to load a chain of templates.
+                // FIXME this does not appear to handle the case where the
+                // FIXME parent has no configuration but the grandparent does
                 String owner = pathElements[1];
                 Record owningRecord = recordManager.load(PathUtils.getPath(pathElements[0], pathElements[1]));
                 String parent = owningRecord.getMeta("parent");
@@ -338,13 +379,69 @@ public class ConfigurationPersistenceManager
                 return new TemplateRecord(owner, parentRecord, record);
             }
         }
+
         return record;
     }
 
     public String insertRecord(String path, Record record)
     {
         ComplexType type = getType(path, ComplexType.class);
-        return type.insert(path, record, recordManager);
+        String result = type.insert(path, record, recordManager);
+        refreshInstances();
+        return result;
+    }
+
+    public boolean validate(Record subject, ValidationAware validationCallback) throws TypeException
+    {
+        // The type we validating against.
+        Type type = typeRegistry.getType(subject.getSymbolicName());
+
+        // Construct the validation context, wrapping it around the validation callback to that the
+        // client is notified of validation errors.
+        MessagesTextProvider textProvider = new MessagesTextProvider(type.getClazz());
+        ValidationContext context = new DelegatingValidationContext(validationCallback, textProvider);
+
+        // Create an instance of the object represented by the record.  It is during the instantiation that
+        // type conversion errors are detected.
+        Object instance;
+        try
+        {
+            instance = type.instantiate(null, subject);
+        }
+        catch (TypeConversionException e)
+        {
+            for (String field : e.getFieldErrors())
+            {
+                context.addFieldError(field, e.getFieldError(field));
+            }
+            return false;
+        }
+
+        // Process the instance via the validation manager.
+        try
+        {
+            validationManager.validate(instance, context);
+            return !context.hasErrors();
+        }
+        catch (ValidationException e)
+        {
+            context.addActionError(e.getMessage());
+            return false;
+        }
+    }
+
+    public void saveRecord(String path, Record record)
+    {
+        // FIXME Review whether we should allow this insert without
+        // FIXME consulting the type (as in insertRecord)
+        recordManager.insertOrUpdate(path, record);
+        refreshInstances();
+    }
+
+    public void delete(String path)
+    {
+        recordManager.delete(path);
+        refreshInstances();
     }
 
     public void setTypeRegistry(TypeRegistry typeRegistry)
@@ -357,8 +454,49 @@ public class ConfigurationPersistenceManager
         this.recordManager = recordManager;
     }
 
-    public void saveRecord(String path, Record record)
+    public void setValidationManager(ValidationManager validationManager)
     {
-        recordManager.insertOrUpdate(path, record);
+        this.validationManager = validationManager;
+    }
+
+
+    /**
+     * Holds information about a root scope.
+     */
+    private class ScopeInfo
+    {
+        private String scopeName;
+        private ComplexType type;
+
+        public ScopeInfo(String scopeName, ComplexType type)
+        {
+            this.scopeName = scopeName;
+            this.type = type;
+        }
+
+        public String getScopeName()
+        {
+            return scopeName;
+        }
+
+        public ComplexType getType()
+        {
+            return type;
+        }
+
+        public Type getTargetType()
+        {
+            return type.getTargetType();
+        }
+
+        public boolean isCollection()
+        {
+            return type instanceof CollectionType;
+        }
+
+        public boolean isTemplated()
+        {
+            return type.isTemplated();
+        }
     }
 }

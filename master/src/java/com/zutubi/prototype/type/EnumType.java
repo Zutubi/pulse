@@ -17,7 +17,7 @@ public class EnumType extends SimpleType
         return (Class<? extends Enum>) super.getClazz();
     }
 
-    public Object instantiate(Object record) throws TypeException
+    public Object instantiate(String path, Object record) throws TypeException
     {
         return Enum.valueOf(getClazz(), (String) record);
     }

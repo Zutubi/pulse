@@ -2,6 +2,8 @@ package com.zutubi.prototype.type;
 
 import com.zutubi.prototype.annotation.ID;
 import com.zutubi.prototype.type.record.Record;
+import com.zutubi.prototype.type.record.PathUtils;
+import com.zutubi.prototype.config.ConfigurationPersistenceManager;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -12,54 +14,50 @@ import java.util.Map;
  */
 public class MapType extends CollectionType
 {
-    public MapType()
+    private ConfigurationPersistenceManager configurationPersistenceManager;
+
+    public MapType(ConfigurationPersistenceManager configurationPersistenceManager)
     {
-        this(HashMap.class);
+        super(HashMap.class);
+        this.configurationPersistenceManager = configurationPersistenceManager;
     }
 
-    public MapType(Class type)
+    public Map instantiate(String path, Object data) throws TypeException
     {
-        super(type);
-    }
-
-    public MapType(Class type, String symbolicName)
-    {
-        super(type, symbolicName);
-    }
-
-    public Map instantiate(Object data) throws TypeException
-    {
-        if (data == null)
+        Map instance = (Map) (path == null ? null : configurationPersistenceManager.getInstance(path));
+        if (instance == null && data != null)
         {
-            return null;
-        }
-
-        if (!Map.class.isAssignableFrom(data.getClass()))
-        {
-            throw new TypeConversionException("Expected a map type, instead received " + data.getClass());
-        }
-
-        Record record = (Record) data;
-
-        Type defaultType = getCollectionType();
-        if (defaultType == null && record.getMeta("type") != null)
-        {
-            defaultType = typeRegistry.getType(record.getMeta("type"));
-        }
-
-        Map<String, Object> instance = new HashMap<String, Object>();
-        for (String key : record.keySet())
-        {
-            Object child = record.get(key);
-            Type type = defaultType;
-            if (child instanceof Record)
+            if (!(data instanceof Record))
             {
-                Record childRecord = (Record) child;
-                type = typeRegistry.getType(childRecord.getSymbolicName());
+                throw new TypeConversionException("Expected a record, instead received " + data.getClass());
             }
 
-            Object value = type.instantiate(child);
-            instance.put(key, value);
+            Record record = (Record) data;
+
+            Type defaultType = getCollectionType();
+            instance = new HashMap<String, Object>();
+            if (path != null)
+            {
+                configurationPersistenceManager.putInstance(path, instance);
+            }
+
+            for (String key : record.keySet())
+            {
+                Object child = record.get(key);
+                Type type = defaultType;
+                if (child instanceof Record)
+                {
+                    Record childRecord = (Record) child;
+                    type = typeRegistry.getType(childRecord.getSymbolicName());
+                    if(type == null)
+                    {
+                        throw new TypeException("Reference to unrecorgnised type '" + childRecord.getSymbolicName() + "'");
+                    }
+                }
+
+                Object value = type.instantiate(path == null ? null : PathUtils.getPath(path, key), child);
+                instance.put(key, value);
+            }
         }
 
         return instance;

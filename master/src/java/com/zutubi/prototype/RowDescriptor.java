@@ -37,5 +37,5 @@ public abstract class RowDescriptor
         return rows;
     }
 
-    public abstract List<Row> instantiate(Record record);
+    public abstract List<Row> instantiate(String path, Record record);
 }

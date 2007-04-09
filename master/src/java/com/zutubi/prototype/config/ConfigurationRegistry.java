@@ -86,23 +86,23 @@ public class ConfigurationRegistry
         CompositeType triggerConfig = typeRegistry.register("triggerConfig", TriggerConfiguration.class);
         typeRegistry.register("buildCompletedConfig", BuildCompletedTriggerConfiguration.class);
         triggerConfig.addExtension("buildCompletedConfig");
-        MapType triggers = new MapType();
+        MapType triggers = new MapType(configurationPersistenceManager);
         triggers.setTypeRegistry(typeRegistry);
         triggers.setCollectionType(typeRegistry.getType("triggerConfig"));
         projectConfig.addProperty(new TypeProperty("trigger", triggers));
         
-        ListType artifacts = new ListType();
+        ListType artifacts = new ListType(configurationPersistenceManager);
         artifacts.setTypeRegistry(typeRegistry);
         artifacts.setCollectionType(typeRegistry.getType("artifactConfig"));
         projectConfig.addProperty(new TypeProperty("artifact", artifacts));
 
-        MapType commitTransformers = new MapType();
+        MapType commitTransformers = new MapType(configurationPersistenceManager);
         commitTransformers.setTypeRegistry(typeRegistry);
         commitTransformers.setCollectionType(typeRegistry.getType("commitConfig"));
         projectConfig.addProperty(new TypeProperty("commit", commitTransformers));
 
         // define the root level scope.
-        ProjectMapType projectCollection = new ProjectMapType(HashMap.class, projectManager);
+        ProjectMapType projectCollection = new ProjectMapType(configurationPersistenceManager, projectManager);
         projectCollection.setTypeRegistry(typeRegistry);
         projectCollection.setCollectionType(projectConfig);
 
@@ -125,6 +125,9 @@ public class ConfigurationRegistry
         globalConfig.addProperty(new TypeProperty("license", typeRegistry.getType("licenseConfig")));
 
         configurationPersistenceManager.register("global", globalConfig);
+
+        // FIXME work out init order: plugins need to get in before this...
+        configurationPersistenceManager.init();
     }
 
     public void setTypeRegistry(TypeRegistry typeRegistry)

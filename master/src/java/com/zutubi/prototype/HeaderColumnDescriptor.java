@@ -24,7 +24,7 @@ public class HeaderColumnDescriptor extends ColumnDescriptor
         this.colspan = colspan;
     }
 
-    public Column instantiate(Record value)
+    public Column instantiate(String path, Record value)
     {
         Column column = new Column();
         column.addParameter("type", "header");

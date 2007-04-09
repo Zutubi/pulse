@@ -24,7 +24,7 @@ public class PrimitiveType extends SimpleType implements Type
         }
     }
 
-    public Object instantiate(Object data) throws TypeException
+    public Object instantiate(String path, Object data) throws TypeException
     {
         TypeSqueezer squeezer = Squeezers.findSqueezer(getClazz());
         try

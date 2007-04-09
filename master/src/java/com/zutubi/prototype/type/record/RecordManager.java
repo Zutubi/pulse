@@ -9,6 +9,10 @@ import java.util.Map;
  * cached in memory and backed by permanent storage.  This manager supports
  * basic CRUD operations, and manages the cache: including ensuring
  * consistency for loaded records.
+ *
+ * This class should not usually be accessed directly.  Rather, the
+ * {@link com.zutubi.prototype.config.ConfigurationPersistenceManager} should
+ * be used.
  */
 public class RecordManager
 {

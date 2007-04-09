@@ -123,7 +123,7 @@ public class CheckDirective extends PrototypeDirective
             OgnlValueStack stack = ActionContext.getContext().getValueStack();
             Record data = (Record) stack.findValue("checkRecord");
 
-            Form form = formDescriptor.instantiate(data);
+            Form form = formDescriptor.instantiate(path, data);
             form.setAction(action);
             context.put("form", form);
 

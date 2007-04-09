@@ -7,7 +7,11 @@
     #set($breadcrumbPath = "")
     #set($sep = "")
     #foreach($pathElement in $config.parentPathElements)
-        #set($breadcrumbPath = "${breadcrumbPath}/${pathElement}")
+        #if($breadcrumbPath.length() > 0)
+            #set($breadcrumbPath = "${breadcrumbPath}/${pathElement}")
+        #else
+            #set($breadcrumbPath = "${pathElement}")
+        #end
         ${sep} <a href="configuration.action?path=${breadcrumbPath}">${pathElement}</a>
         #set($sep = ">")
     #end

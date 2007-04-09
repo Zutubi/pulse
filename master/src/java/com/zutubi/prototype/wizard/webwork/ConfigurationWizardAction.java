@@ -8,7 +8,6 @@ import com.zutubi.prototype.type.Type;
 import com.zutubi.prototype.type.TypeException;
 import com.zutubi.prototype.type.record.PathUtils;
 import com.zutubi.prototype.type.record.Record;
-import com.zutubi.prototype.webwork.PrototypeInteractionHandler;
 import com.zutubi.prototype.webwork.PrototypeUtils;
 import com.zutubi.prototype.wizard.Wizard;
 import com.zutubi.prototype.wizard.WizardState;
@@ -36,14 +35,6 @@ public class ConfigurationWizardAction extends ActionSupport
     private boolean wizardRequiresLazyInitialisation = false;
 
     private ConfigurationPersistenceManager configurationPersistenceManager;
-
-    private PrototypeInteractionHandler interactionHandler;
-
-    public ConfigurationWizardAction()
-    {
-        interactionHandler = new PrototypeInteractionHandler();
-        ComponentContext.autowire(interactionHandler);
-    }
 
     /**
      * Setter for the configuration path.
@@ -203,7 +194,7 @@ public class ConfigurationWizardAction extends ActionSupport
         Record record = getState().getRecord();
         try
         {
-            return interactionHandler.validate(record, new XWorkValidationAdapter(this));
+            return configurationPersistenceManager.validate(record, new XWorkValidationAdapter(this));
         }
         catch (TypeException e)
         {

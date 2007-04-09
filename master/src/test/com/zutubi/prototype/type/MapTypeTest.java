@@ -1,10 +1,5 @@
 package com.zutubi.prototype.type;
 
-import com.zutubi.prototype.type.record.Record;
-
-import java.util.Map;
-import java.util.HashMap;
-
 /**
  *
  *
@@ -17,7 +12,7 @@ public class MapTypeTest extends  TypeTestCase
     {
         super.setUp();
 
-        mapType = new MapType();
+        mapType = new MapType(configurationPersistenceManager);
         mapType.setTypeRegistry(typeRegistry);
 
         typeRegistry.register("mockA", MockA.class);

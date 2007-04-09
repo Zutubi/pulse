@@ -6,6 +6,7 @@ import com.zutubi.prototype.type.CompositeType;
 import com.zutubi.prototype.type.Type;
 import com.zutubi.prototype.type.TypeRegistry;
 import com.zutubi.prototype.type.record.Record;
+import com.zutubi.prototype.config.ConfigurationPersistenceManager;
 import com.zutubi.pulse.web.ActionSupport;
 
 /**
@@ -19,6 +20,7 @@ public class PrototypeSupport extends ActionSupport
     protected Configuration configuration;
 
     protected TypeRegistry typeRegistry;
+    protected ConfigurationPersistenceManager configurationPersistenceManager;
 
     protected Record record;
     
@@ -189,4 +191,8 @@ public class PrototypeSupport extends ActionSupport
         this.typeRegistry = typeRegistry;
     }
 
+    public void setConfigurationPersistenceManager(ConfigurationPersistenceManager configurationPersistenceManager)
+    {
+        this.configurationPersistenceManager = configurationPersistenceManager;
+    }
 }

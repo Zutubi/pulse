@@ -88,7 +88,7 @@ public class TypeRegistry
         CompositeType type = classMapping.get(clazz);
         if (type == null)
         {
-            type = new CompositeType(clazz, symbolicName);
+            type = new CompositeType(clazz, symbolicName, configurationPersistenceManager);
             classMapping.put(clazz, type);
 
             try
@@ -182,14 +182,14 @@ public class TypeRegistry
                         if (List.class.isAssignableFrom(clazz))
                         {
                             valueClass = (Class) parameterizedType.getActualTypeArguments()[0];
-                            collection = new ListType();
+                            collection = new ListType(configurationPersistenceManager);
                         }
                         else
                         {
                             if (Map.class.isAssignableFrom(clazz))
                             {
                                 valueClass = (Class) parameterizedType.getActualTypeArguments()[1];
-                                collection = new MapType();
+                                collection = new MapType(configurationPersistenceManager);
                             }
                         }
 

@@ -5,6 +5,7 @@ import com.zutubi.prototype.type.CompositeType;
 import com.zutubi.prototype.type.TypeException;
 import com.zutubi.prototype.type.TypeRegistry;
 import com.zutubi.prototype.type.record.Record;
+import com.zutubi.prototype.config.ConfigurationPersistenceManager;
 
 /**
  *
@@ -12,36 +13,25 @@ import com.zutubi.prototype.type.record.Record;
  */
 public class SummaryColumnDescriptor extends ColumnDescriptor
 {
-    private TypeRegistry typeRegistry;
+    private ConfigurationPersistenceManager configurationPersistenceManager;
 
-    public SummaryColumnDescriptor(TypeRegistry typeRegistry)
+    public SummaryColumnDescriptor(ConfigurationPersistenceManager configurationPersistenceManager)
     {
-        this.typeRegistry = typeRegistry;
+        this.configurationPersistenceManager = configurationPersistenceManager;
     }
 
-    public Column instantiate(Record record)
+    public Column instantiate(String path, Record record)
     {
-        try
+        Object instance = configurationPersistenceManager.getInstance(path);
+        if(instance == null)
         {
-            CompositeType type = typeRegistry.getType(record.getSymbolicName());
-            Object instance = type.instantiate(record);
-
-            Column c = new Column();
-            c.setSpan(colspan);
-            c.addAll(getParameters());
-            c.setValue(formatter.format(instance));
-            return c;
-
-        }
-        catch (TypeException e)
-        {
-            e.printStackTrace();
             return null;
         }
-    }
 
-    public void setTypeRegistry(TypeRegistry typeRegistry)
-    {
-        this.typeRegistry = typeRegistry;
+        Column c = new Column();
+        c.setSpan(colspan);
+        c.addAll(getParameters());
+        c.setValue(formatter.format(instance));
+        return c;
     }
 }

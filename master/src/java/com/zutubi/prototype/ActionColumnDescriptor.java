@@ -22,7 +22,7 @@ public class ActionColumnDescriptor extends ColumnDescriptor
         getParameters().put("type", "action");
     }
 
-    public Column instantiate(Record value)
+    public Column instantiate(String path, Record value)
     {
         Column column = new Column();
         column.addAll(getParameters());

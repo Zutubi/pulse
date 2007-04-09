@@ -35,7 +35,7 @@ public abstract class ColumnDescriptor
         this.formatter = formatter;
     }
 
-    public abstract Column instantiate(Record value);
+    public abstract Column instantiate(String path, Record value);
 
     public String getName()
     {

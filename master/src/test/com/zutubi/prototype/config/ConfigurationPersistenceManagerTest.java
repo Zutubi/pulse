@@ -91,7 +91,7 @@ public class ConfigurationPersistenceManagerTest extends TestCase
     public void testIndexTopLevelCollection() throws TypeException
     {
         CompositeType simple = typeRegistry.register(SimpleObject.class);
-        TopLevelMapType top = new TopLevelMapType();
+        TopLevelMapType top = new TopLevelMapType(manager);
         top.setCollectionType(simple);
         manager.register("top", top);
         assertEquals(Arrays.asList("top/*"), manager.getConfigurationPaths(simple));

@@ -66,12 +66,12 @@ public class TemplateRecord implements Record
         if (value == null)
         {
             // We have nothing to add, delegate to parent
-            return getInherited((String) key);
+            return getInherited(key);
         }
         else if (value instanceof Record)
         {
             // Wrap in another template on the way out
-            return new TemplateRecord(owner, (TemplateRecord) getInherited((String) key), (MutableRecord) value);
+            return new TemplateRecord(owner, (TemplateRecord) getInherited(key), (MutableRecord) value);
         }
         else
         {

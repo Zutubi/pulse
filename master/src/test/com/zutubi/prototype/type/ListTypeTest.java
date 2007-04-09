@@ -1,10 +1,5 @@
 package com.zutubi.prototype.type;
 
-import com.zutubi.prototype.type.record.Record;
-
-import java.util.LinkedList;
-import java.util.List;
-
 /**
  *
  *
@@ -20,7 +15,7 @@ public class ListTypeTest extends TypeTestCase
         typeRegistry.register("mockA", MockA.class);
         typeRegistry.register("mockB", MockB.class);
         
-        listType = new ListType();
+        listType = new ListType(configurationPersistenceManager);
         listType.setTypeRegistry(typeRegistry);
     }
 

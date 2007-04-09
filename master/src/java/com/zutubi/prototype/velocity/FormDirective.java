@@ -86,7 +86,7 @@ public class FormDirective extends PrototypeDirective
             // Create the context object used to define the freemarker rendering context
             Map<String, Object> context = initialiseContext(type.getClazz());
 
-            Form form = formDescriptor.instantiate(data);
+            Form form = formDescriptor.instantiate(lookupPath(), data);
             form.setAction(action);
             context.put("form", form);
 

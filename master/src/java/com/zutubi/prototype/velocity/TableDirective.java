@@ -66,8 +66,9 @@ public class TableDirective extends PrototypeDirective
             // handle rendering of the freemarker template.
 
             Map<String, Object> context = initialiseContext(type.getClazz());
-            context.put("table", tableDescriptor.instantiate(record));
-            context.put("path", lookupPath());
+            String path = lookupPath();
+            context.put("table", tableDescriptor.instantiate(path, record));
+            context.put("path", path);
             context.put("action", action);
             
             try

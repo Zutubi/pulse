@@ -1,6 +1,8 @@
 package com.zutubi.prototype.type;
 
 import com.zutubi.prototype.type.record.Record;
+import com.zutubi.prototype.type.record.PathUtils;
+import com.zutubi.prototype.config.ConfigurationPersistenceManager;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -11,67 +13,74 @@ import java.util.List;
  */
 public class ListType extends CollectionType
 {
-    public ListType()
+    private ConfigurationPersistenceManager configurationPersistenceManager;
+
+    public ListType(ConfigurationPersistenceManager configurationPersistenceManager)
     {
-        this(LinkedList.class);
+        super(LinkedList.class);
+        this.configurationPersistenceManager = configurationPersistenceManager;
     }
 
-    public ListType(Class type)
+    public List<Object> instantiate(String path, Object data) throws TypeException
     {
-        super(type);
-    }
-
-    public ListType(Class type, String symbolicName)
-    {
-        super(type, symbolicName);
-    }
-
-    public List<Object> instantiate(Object data) throws TypeException
-    {
-        if (data == null)
+        List<Object> instance = (List<Object>) (path == null ? null : configurationPersistenceManager.getInstance(path));
+        if (instance == null && data != null)
         {
-            return null;
-        }
-
-        if (data instanceof Record)
-        {
-            Record record = (Record) data;
-
-            Iterable<String> keys = getOrder(record);
-            Type defaultType = getCollectionType();
-            if (defaultType == null && record.getMeta("type") != null)
+            if (data instanceof Record)
             {
-                defaultType = typeRegistry.getType(record.getMeta("type"));
-            }
+                Record record = (Record) data;
 
-            List<Object> instance = new LinkedList<Object>();
-            for (String key : keys)
-            {
-                Object child = record.get(key);
-                Type type = defaultType;
-                if (child instanceof Record)
+                instance = create(path);
+
+                Iterable<String> keys = getOrder(record);
+                Type defaultType = getCollectionType();
+                for (String key : keys)
                 {
-                    Record childRecord = (Record) child;
-                    type = typeRegistry.getType(childRecord.getSymbolicName());
+                    Object child = record.get(key);
+                    Type type = defaultType;
+                    if (child instanceof Record)
+                    {
+                        Record childRecord = (Record) child;
+                        String symbolicName = childRecord.getSymbolicName();
+                        type = typeRegistry.getType(symbolicName);
+                        if(type == null)
+                        {
+                            throw new TypeException("Reference to unknown type '" + symbolicName + "'");
+                        }
+                    }
+                    Object value = type.instantiate(path == null ? null : PathUtils.getPath(path, key), child);
+                    instance.add(value);
                 }
-                Object value = type.instantiate(child);
-                instance.add(value);
+
+                return instance;
             }
-            
-            return instance;
-        }
-        else if(data instanceof String[])
-        {
-            List<Object> instance = new LinkedList<Object>();
-            for(String s: (String[])data)
+            else if(data instanceof String[])
             {
-                instance.add(s);
+                instance = create(path);
+                Type type = getCollectionType();
+                for(String s: (String[])data)
+                {
+                    instance.add(type.instantiate(path == null ? null : PathUtils.getPath(path, s), s));
+                }
+                return instance;
             }
-            return instance;
+            else
+            {
+                throw new TypeConversionException("Expected a record or string array, instead received " + data.getClass());
+            }
         }
-        else
+
+        return instance;
+    }
+
+    private List<Object> create(String path)
+    {
+        List<Object> instance;
+        instance = new LinkedList<Object>();
+        if (path != null)
         {
-            throw new TypeConversionException("Expected a record or string array, instead received " + data.getClass());
+            configurationPersistenceManager.putInstance(path, instance);
         }
+        return instance;
     }
 }

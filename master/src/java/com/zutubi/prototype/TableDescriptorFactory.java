@@ -6,6 +6,7 @@ import com.zutubi.prototype.type.Type;
 import com.zutubi.prototype.type.TypeException;
 import com.zutubi.prototype.type.TypeRegistry;
 import com.zutubi.prototype.type.CompositeType;
+import com.zutubi.prototype.config.ConfigurationPersistenceManager;
 
 /**
  *
@@ -13,7 +14,7 @@ import com.zutubi.prototype.type.CompositeType;
  */
 public class TableDescriptorFactory
 {
-    private TypeRegistry typeRegistry;
+    private ConfigurationPersistenceManager configurationPersistenceManager;
 
     public TableDescriptor createTableDescriptor(CollectionType type) throws TypeException
     {
@@ -47,7 +48,7 @@ public class TableDescriptorFactory
             }
         }
 
-        ColumnDescriptor columnDescriptor = new SummaryColumnDescriptor(typeRegistry);
+        ColumnDescriptor columnDescriptor = new SummaryColumnDescriptor(configurationPersistenceManager);
         columnDescriptor.setFormatter(new AnnotationFormatter(defaultFormatter));
 
         dataRow.addDescriptor(columnDescriptor);
@@ -62,8 +63,8 @@ public class TableDescriptorFactory
         return tableDescriptor;
     }
 
-    public void setTypeRegistry(TypeRegistry typeRegistry)
+    public void setConfigurationPersistenceManager(ConfigurationPersistenceManager configurationPersistenceManager)
     {
-        this.typeRegistry = typeRegistry;
+        this.configurationPersistenceManager = configurationPersistenceManager;
     }
 }

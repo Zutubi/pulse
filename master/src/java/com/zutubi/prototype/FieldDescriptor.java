@@ -81,7 +81,7 @@ public class FieldDescriptor implements Descriptor
         this.parameters.putAll(parameters);
     }
 
-    public Field instantiate(Record instance)
+    public Field instantiate(String path, Record instance)
     {
         Field field = new Field();
         field.setName(getName());
