@@ -1541,11 +1541,17 @@
         <action name="save" class="com.zutubi.prototype.webwork.SaveAction">
             <result name="composite" type="velocity">composite.vm</result>
             <result name="map" type="velocity">map.vm</result>
+            <result name="cancel" type="redirect">configuration.action?path=${path}</result>
         </action>
 
         <action name="check" class="com.zutubi.prototype.webwork.CheckAction">
             <result name="composite" type="velocity">composite.vm</result>
             <result name="map" type="velocity">map.vm</result>
+        </action>
+
+        <action name="delete" class="com.zutubi.prototype.webwork.DeleteAction">
+            <result name="success" type="redirect">configuration.action?path=${path}</result>
+            <result name="cancel" type="redirect">configuration.action?path=${path}</result>
         </action>
 
     </package>

@@ -1,12 +1,12 @@
 package com.zutubi.prototype.webwork;
 
 import com.opensymphony.util.TextUtils;
+import com.zutubi.prototype.config.ConfigurationPersistenceManager;
 import com.zutubi.prototype.type.CollectionType;
 import com.zutubi.prototype.type.CompositeType;
 import com.zutubi.prototype.type.Type;
 import com.zutubi.prototype.type.TypeRegistry;
 import com.zutubi.prototype.type.record.Record;
-import com.zutubi.prototype.config.ConfigurationPersistenceManager;
 import com.zutubi.pulse.web.ActionSupport;
 
 /**
@@ -31,6 +31,7 @@ public class PrototypeSupport extends ActionSupport
     private String finish;
     private String save;
     private String check;
+    private String delete;
     private String submitField;
 
     public boolean isCancelSelected()
@@ -76,6 +77,23 @@ public class PrototypeSupport extends ActionSupport
         else
         {
             return TextUtils.stringSet(check);
+        }
+    }
+
+    public void setDelete(String delete)
+    {
+        this.delete = delete;
+    }
+
+    public boolean isDeleteSelected()
+    {
+        if (TextUtils.stringSet(submitField))
+        {
+            return submitField.equals("delete");
+        }
+        else
+        {
+            return TextUtils.stringSet(delete);
         }
     }
 

@@ -23,63 +23,9 @@
     #i18n("key=introduction")
 </div>
 
-
 <p>
     #plist("path=$config.path" "action=wizard.action?path=$config.path")
 </p>
-
-<!--
-<p>
-    <a href="wizard.action?path=$config.path">add...</a>
-</p>
-
--->
-<!--
-<p>&nbsp;</p>
-<p>&nbsp;</p>
-<h2>debugging: map</h2>
-<p>
-    <ul>
-        <li>path: $!config.path</li>
-    </ul>
-    <ul>
-        <li>type symbolic name: $!config.typeSymbolicName</li>
-        <li>target symbolic name: $!config.targetSymbolicName</li>
-    </ul>
-</p>
-<p>
-    Current data size: $!config.record.size()
-</p>
-
-#if($config.record)
-<p>
-<table>
-#foreach($key in $config.record.keySet())
-    <tr>
-        <td> $key </td><td>&nbsp;</td><td> $config.record.get($key) </td>
-    </tr>
-#end
-</table>
-</p>
-#end
-
-#if( $config.extensions.size() > 0)
-<p>
-    <h2>extensions to the base type</h2>
-    <ul>
-    #foreach($prop in $config.extensions)
-        <li>$prop</li>
-    #end
-    </ul>
-</p>
-#end
-
-<p>
-    #if($action.configuration.pathElements.length > 2)
-        <a href="configuration.action?path=${action.configuration.parentPath}">done</a>
-    #end
-</p>
--->
 
 </body>
 </html>
