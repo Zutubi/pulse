@@ -25,7 +25,7 @@ public class CollectionRowDescriptor extends RowDescriptor
     {
         List<Row> rows = new LinkedList<Row>();
 
-        if (record == null)
+        if (record == null || record.size() == 0)
         {
             return addEmptyRow(rows);
         }

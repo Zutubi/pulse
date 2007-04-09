@@ -14,9 +14,8 @@ import com.zutubi.pulse.prototype.config.admin.GeneralAdminConfiguration;
 import com.zutubi.pulse.prototype.config.admin.GlobalConfiguration;
 import com.zutubi.pulse.prototype.config.admin.JabberConfiguration;
 import com.zutubi.pulse.prototype.config.admin.LDAPConfiguration;
-import com.zutubi.pulse.prototype.config.admin.LicenseConfiguration;
-import com.zutubi.pulse.prototype.config.admin.LoggingConfiguration;
 import com.zutubi.pulse.prototype.config.admin.LicenseKeyConfiguration;
+import com.zutubi.pulse.prototype.config.admin.LoggingConfiguration;
 
 import java.util.HashMap;
 
@@ -50,9 +49,6 @@ public class ConfigurationRegistry
         typeConfig.addExtension("antConfig");
         typeConfig.addExtension("mavenConfig");
 
-        // general project configuration
-        typeRegistry.register("generalConfig", GeneralConfiguration.class);
-
         // cleanup rule configuration
         typeRegistry.register("cleanupRuleConfig", CleanupRuleConfiguration.class);
 
@@ -83,7 +79,6 @@ public class ConfigurationRegistry
         CompositeType projectConfig = typeRegistry.register("projectConfig", ProjectConfiguration.class);
         projectConfig.addProperty(new TypeProperty("scm", typeRegistry.getType("scmConfig")));
         projectConfig.addProperty(new TypeProperty("type", typeRegistry.getType("typeConfig")));
-        projectConfig.addProperty(new TypeProperty("general", typeRegistry.getType("generalConfig")));
         projectConfig.addProperty(new TypeProperty("cleanup", typeRegistry.getType("cleanupRuleConfig")));
         projectConfig.addProperty(new TypeProperty("changeViewer", typeRegistry.getType("changeViewerConfig")));
 

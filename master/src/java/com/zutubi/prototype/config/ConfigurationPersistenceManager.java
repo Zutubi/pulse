@@ -1,13 +1,25 @@
 package com.zutubi.prototype.config;
 
-import com.zutubi.prototype.type.*;
+import com.zutubi.prototype.type.CollectionType;
+import com.zutubi.prototype.type.ComplexType;
+import com.zutubi.prototype.type.CompositeType;
+import com.zutubi.prototype.type.ListType;
+import com.zutubi.prototype.type.MapType;
+import com.zutubi.prototype.type.Type;
+import com.zutubi.prototype.type.TypeException;
+import com.zutubi.prototype.type.TypeProperty;
+import com.zutubi.prototype.type.TypeRegistry;
 import com.zutubi.prototype.type.record.PathUtils;
 import com.zutubi.prototype.type.record.Record;
 import com.zutubi.prototype.type.record.RecordManager;
 import com.zutubi.prototype.type.record.TemplateRecord;
 import com.zutubi.pulse.util.logging.Logger;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
 
 /**
  *

@@ -1,7 +1,10 @@
 package com.zutubi.prototype.webwork;
 
 import com.opensymphony.util.TextUtils;
-import com.zutubi.prototype.type.*;
+import com.zutubi.prototype.type.CollectionType;
+import com.zutubi.prototype.type.CompositeType;
+import com.zutubi.prototype.type.Type;
+import com.zutubi.prototype.type.TypeRegistry;
 import com.zutubi.prototype.type.record.Record;
 import com.zutubi.pulse.web.ActionSupport;
 
@@ -172,11 +175,7 @@ public class PrototypeSupport extends ActionSupport
         {
             return "composite";
         }
-        if (type instanceof ListType)
-        {
-            return "list";
-        }
-        if (type instanceof MapType)
+        if (type instanceof CollectionType)
         {
             return "map";
         }

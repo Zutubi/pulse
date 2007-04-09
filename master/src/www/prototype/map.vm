@@ -14,10 +14,11 @@
     ${sep} $!action.configuration.currentPath
 </div>
 
-<h2>#i18n("path=$config.path" "key=label")</h2>
-<p>
-    #i18n("path=$config.path" "key=introduction")
-</p>
+<h2>#i18n("key=label")</h2>
+<div style="color:gray">
+    #i18n("key=introduction")
+</div>
+
 
 <p>
     #plist("path=$config.path" "action=wizard.action?path=$config.path")

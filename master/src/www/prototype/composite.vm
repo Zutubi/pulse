@@ -15,9 +15,9 @@
 </div>
 
 <h2>#i18n("key=label")</h2>
-<p style="color:gray">
+<div style="color:gray">
     #i18n("key=introduction")
-</p>
+</div>
 
 
 #if( $config.simpleProperties.size() > 0)
