@@ -19,7 +19,6 @@
     #i18n("key=introduction")
 </div>
 
-
 #if( $config.simpleProperties.size() > 0)
     <!-- this configuration definition contains fields to be configured. -->
     <p>
@@ -36,43 +35,14 @@
 
 #if( $config.nestedProperties.size() > 0)
 <p>&nbsp;</p>
-<h3>nested properties</h3>
-<p>the following nested properties are also available:</p>
+<h4>nested configurations</h4>
+<p>the following nested configurations are also available:</p>
 <ul>
     #foreach($prop in $config.nestedProperties)
         <li>#i18n("path=$config.path/$prop" "key=label") <a href="configuration.action?path=${config.path}/${prop}">(view)</a>  </li>
     #end
 </ul>
 #end
-
-<!--
-<p>&nbsp;</p>
-<p>&nbsp;</p>
-<h2>debugging: composite</h2>
-<p>
-    <ul>
-        <li>path: $!config.path</li>
-    </ul>
-    <ul>
-        <li>type symbolic name: $!config.typeSymbolicName</li>
-        <li>target symbolic name: $!config.targetSymbolicName</li>
-    </ul>
-</p>
-#if($config.record)
-<p>
-<table>
-#foreach($key in $config.record.keySet())
-    <tr>
-        <td> $key </td><td>&nbsp;</td><td> $config.record.get($key) </td>
-    </tr>
-#end
-</table>
-</p>
-<p>
-    <a href="reset.action?path=$config.path">reset</a>
-</p>
-#end
--->
 
 </body>
 </html>

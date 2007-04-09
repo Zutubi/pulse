@@ -6,7 +6,6 @@ import com.zutubi.prototype.type.record.MutableRecord;
 import com.zutubi.prototype.type.record.MutableRecordImpl;
 import com.zutubi.prototype.type.record.TemplateRecord;
 import com.zutubi.prototype.wizard.WizardState;
-import com.zutubi.pulse.model.ProjectManager;
 import com.zutubi.pulse.util.logging.Logger;
 
 import java.util.LinkedList;
@@ -21,12 +20,6 @@ public class ConfigureProjectWizard extends AbstractTypeWizard
 
     private ConfigurationPersistenceManager configurationPersistenceManager;
 
-    // TODO: record id of parent project template.
-    private long parentId;
-
-    // TODO: create actual project in the database.
-    private ProjectManager projectManager;
-
     private static final TemplateRecord EMPTY_RECORD = new TemplateRecord("empty", null, new MutableRecordImpl());
 
     private CompositeType projectType;
@@ -34,11 +27,12 @@ public class ConfigureProjectWizard extends AbstractTypeWizard
     public void initialise()
     {
         // load template information.
-        LOG.warning("TODO: load template record for project wizard, currently using empty template record. Parent ID: " + parentId);
+//        LOG.warning("TODO: load template record for project wizard, currently using empty template record. Parent ID: " + parentId);
 
         TemplateRecord templateRecord = EMPTY_RECORD;
 
-        projectType = configurationPersistenceManager.getType("project", CompositeType.class);
+        projectType = (CompositeType) configurationPersistenceManager.getType("project").getTargetType();
+        
         CompositeType scmType = (CompositeType) projectType.getProperty("scm").getType();
         CompositeType typeType = (CompositeType) projectType.getProperty("type").getType();
 
@@ -48,11 +42,6 @@ public class ConfigureProjectWizard extends AbstractTypeWizard
         addWizardStates(wizardStates, typeType, (TemplateRecord) templateRecord.get("type"));
 
         currentState = wizardStates.getFirst();
-    }
-
-    public void setParentId(long parentId)
-    {
-        this.parentId = parentId;
     }
 
     public void doFinish()
@@ -74,15 +63,5 @@ public class ConfigureProjectWizard extends AbstractTypeWizard
     public void setConfigurationPersistenceManager(ConfigurationPersistenceManager configurationPersistenceManager)
     {
         this.configurationPersistenceManager = configurationPersistenceManager;
-    }
-
-    /**
-     * Required resource
-     *
-     * @param projectManager instance
-     */
-    public void setProjectManager(ProjectManager projectManager)
-    {
-        this.projectManager = projectManager;
     }
 }
