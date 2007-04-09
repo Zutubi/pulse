@@ -1,16 +1,26 @@
 package com.zutubi.pulse.prototype.config;
 
 import com.zutubi.prototype.annotation.ConfigurationCheck;
+import com.zutubi.prototype.annotation.Form;
+import com.zutubi.prototype.annotation.Password;
+import com.zutubi.prototype.annotation.Text;
+import com.zutubi.validation.annotations.Required;
+import com.zutubi.pulse.validation.annotation.CvsRoot;
 
 /**
  *
  *
  */
 @ConfigurationCheck(CvsConfigurationCheckHandler.class)
+@Form(fieldOrder = {"root", "password", "module", "branch"})
 public class CvsConfiguration extends BaseScmConfiguration
 {
+    @Required @CvsRoot @Text(size = 50)
     private String root;
+
     private String module;
+    
+    @Password
     private String password;
     private String branch;
     private Integer quietPeriod;

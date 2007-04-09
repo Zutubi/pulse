@@ -198,7 +198,6 @@ public class ConfigurationWizardAction extends ActionSupport
         }
         catch (TypeException e)
         {
-            e.printStackTrace();
             addActionError(e.getMessage());
             return false;
         }
@@ -232,26 +231,26 @@ public class ConfigurationWizardAction extends ActionSupport
 
     public String execute()
     {
-        if (isInitialised())
-        {
-            Record post = PrototypeUtils.toRecord(getState().getType(), ActionContext.getContext().getParameters());
-
-            // apply the posted record details to the current state's record.
-            getState().getRecord().update(post);
-        }
-
-        // only validate when we are moving forwards in the wizard
-        if (isNextSelected() || isFinishSelected())
-        {
-            if (!validateState() || !validateWizard())
-            {
-                // if there is a validation failure, then we stay where we are.
-                return "step";
-            }
-        }
-
         try
         {
+            if (isInitialised())
+            {
+                Record post = PrototypeUtils.toRecord(getState().getType(), ActionContext.getContext().getParameters());
+
+                // apply the posted record details to the current state's record.
+                getState().getRecord().update(post);
+            }
+
+            // only validate when we are moving forwards in the wizard
+            if (isNextSelected() || isFinishSelected())
+            {
+                if (!validateState() || !validateWizard())
+                {
+                    // if there is a validation failure, then we stay where we are.
+                    return "step";
+                }
+            }
+            
             initWizardIfRequired();
 
             if (isCancelSelected())

@@ -26,8 +26,7 @@ public class ConfigureProjectWizard extends AbstractTypeWizard
 
     public void initialise()
     {
-        // load template information.
-//        LOG.warning("TODO: load template record for project wizard, currently using empty template record. Parent ID: " + parentId);
+        //todo: load template information.
 
         TemplateRecord templateRecord = EMPTY_RECORD;
 
@@ -48,8 +47,8 @@ public class ConfigureProjectWizard extends AbstractTypeWizard
     {
         MutableRecord record = projectType.createNewRecord();
         record.update(wizardStates.get(0).getRecord());
-        record.put("scm", wizardStates.get(1).getRecord());
-        record.put("type", wizardStates.get(2).getRecord());
+        record.put("scm", wizardStates.get(2).getRecord());
+        record.put("type", wizardStates.get(4).getRecord());
 
         successPath = configurationPersistenceManager.insertRecord("project", record);
     }

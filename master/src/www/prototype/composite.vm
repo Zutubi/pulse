@@ -43,7 +43,7 @@
 <p>the following nested configurations are also available:</p>
 <ul>
     #foreach($prop in $config.nestedProperties)
-        <li>#i18n("path=$config.path/$prop" "key=label") <a href="configuration.action?path=${config.path}/${prop}">(view)</a>  </li>
+        <li>#i18n("path=$config.path/$prop" "key=label") <a href="configuration.action?path=${config.path}/${prop}">(view - ${prop})</a>  </li>
     #end
 </ul>
 #end
