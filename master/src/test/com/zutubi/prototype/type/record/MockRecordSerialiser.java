@@ -4,7 +4,7 @@ package com.zutubi.prototype.type.record;
  */
 public class MockRecordSerialiser implements RecordSerialiser
 {
-    public void serialise(String path, MutableRecord record, boolean deep) throws RecordSerialiseException
+    public void serialise(String path, Record record, boolean deep) throws RecordSerialiseException
     {
     }
 

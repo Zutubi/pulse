@@ -147,4 +147,9 @@ public class TemplateRecord implements Record
     {
         throw new UnsupportedOperationException("Record is not mutable.");
     }
+
+    public Set<String> simpleKeySet()
+    {
+        return getMergedMap().keySet();
+    }
 }
