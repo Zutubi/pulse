@@ -4,7 +4,7 @@ package com.zutubi.pulse.prototype.config;
  *
  *
  */
-public class FisheyeConfiguration
+public class FisheyeConfiguration extends ChangeViewerConfiguration
 {
     private String baseurl;
     private String repository;

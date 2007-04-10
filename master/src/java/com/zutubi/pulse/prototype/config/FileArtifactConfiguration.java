@@ -6,7 +6,7 @@ import com.zutubi.validation.annotations.Required;
  *
  *
  */
-public class FileArtifactConfiguration extends BaseArtifactConfiguration
+public class FileArtifactConfiguration extends ArtifactConfiguration
 {
     /**
      * Path of the file to capture, relative to the base directory.

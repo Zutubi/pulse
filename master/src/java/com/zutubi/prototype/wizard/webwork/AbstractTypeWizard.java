@@ -1,13 +1,21 @@
 package com.zutubi.prototype.wizard.webwork;
 
-import com.zutubi.prototype.type.*;
+import com.zutubi.prototype.FieldDescriptor;
+import com.zutubi.prototype.FormDescriptor;
+import com.zutubi.prototype.FormDescriptorFactory;
+import com.zutubi.prototype.type.CompositeType;
+import com.zutubi.prototype.type.SimpleType;
+import com.zutubi.prototype.type.TypeProperty;
+import com.zutubi.prototype.type.TypeRegistry;
 import com.zutubi.prototype.type.record.MutableRecord;
+import com.zutubi.prototype.type.record.Record;
 import com.zutubi.prototype.type.record.TemplateRecord;
+import com.zutubi.prototype.webwork.PrototypeUtils;
 import com.zutubi.prototype.wizard.Wizard;
 import com.zutubi.prototype.wizard.WizardState;
 import com.zutubi.prototype.wizard.WizardTransition;
 import static com.zutubi.prototype.wizard.WizardTransition.*;
-import com.zutubi.pulse.prototype.config.ConfigurationExtension;
+import com.zutubi.pulse.i18n.Messages;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -30,26 +38,25 @@ public abstract class AbstractTypeWizard implements Wizard
 
     protected WizardState addWizardStates(List<WizardState> wizardStates, CompositeType type, TemplateRecord templateRecord)
     {
-        // this extension thing is a little awkward, makes sense in theory, but a little awkward in practice
-        if (ConfigurationExtension.class.isAssignableFrom(type.getClazz()))
+        int extensionCount = type.getExtensions().size();
+        if(extensionCount < 2)
         {
-            if (type.getExtensions().size() > 0)
+            // No point showing the first state, just check if we are
+            // configuring a type itself or a type with only one extension.
+            if(extensionCount == 1)
             {
-                TwoStepWizardState state = new TwoStepWizardState(type, templateRecord);
-                state.setTypeRegistry(typeRegistry);
-                wizardStates.add(state.getFirstState());
-                wizardStates.add(state.getSecondState());
+                type = typeRegistry.getType(type.getExtensions().get(0));
             }
-            else
-            {
-                SingleStepWizardState singleStepState = new SingleStepWizardState(type, templateRecord);
-                wizardStates.add(singleStepState);
-            }
+
+            SingleStepWizardState singleStepState = new SingleStepWizardState(type, templateRecord);
+            wizardStates.add(singleStepState);
         }
         else
         {
-            SingleStepWizardState singleStepState = new SingleStepWizardState(type, templateRecord);
-            wizardStates.add(singleStepState);
+            TwoStepWizardState state = new TwoStepWizardState(type, templateRecord);
+            state.setTypeRegistry(typeRegistry);
+            wizardStates.add(state.getFirstState());
+            wizardStates.add(state.getSecondState());
         }
 
         return wizardStates.get(wizardStates.size() - 1);
@@ -144,11 +151,34 @@ public abstract class AbstractTypeWizard implements Wizard
         this.typeRegistry = typeRegistry;
     }
 
+    public abstract static class TypeWizardState implements WizardState
+    {
+        public void updateRecord(Map parameters)
+        {
+            Record post = PrototypeUtils.toRecord(getType(), parameters);
+
+            // apply the posted record details to the current state's record.
+            getRecord().update(post);
+        }
+
+        public Messages getMessages()
+        {
+            return Messages.getInstance(getType().getClazz());
+        }
+
+        public FormDescriptor createFormDescriptor(FormDescriptorFactory formDescriptorFactory, String path)
+        {
+            return formDescriptorFactory.createDescriptor(path, getType().getSymbolicName());
+        }
+
+        public abstract CompositeType getType();
+    }
+
     /**
      *
      *
      */
-    public static class SingleStepWizardState implements WizardState
+    public static class SingleStepWizardState extends TypeWizardState
     {
         /**
          * Every wizard state / form is represented by a type.
@@ -281,11 +311,37 @@ public abstract class AbstractTypeWizard implements Wizard
             {
                 return selectionRecord;
             }
+
+            public void updateRecord(Map parameters)
+            {
+                String[] value = (String[]) parameters.get("option");
+                if(value != null)
+                {
+                    selectionRecord.put("option", value[0]);
+                }
+            }
+
+            public Messages getMessages()
+            {
+                return Messages.getInstance(type.getClazz());
+            }
+
+            public FormDescriptor createFormDescriptor(FormDescriptorFactory formDescriptorFactory, String path)
+            {
+                FormDescriptor descriptor = new FormDescriptor();
+                descriptor.setId("select.state");
+
+                FieldDescriptor select = new FieldDescriptor();
+                select.setName("option");
+                select.setType("select");
+                select.addParameter("list", type.getExtensions());
+                descriptor.add(select);
+                return descriptor;
+            }
         }
 
-        private class ConfigurationWizardState implements WizardState
+        private class ConfigurationWizardState extends TypeWizardState
         {
-
             public ConfigurationWizardState()
             {
                 // initialise the states data using the template record if it exists.

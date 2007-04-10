@@ -13,8 +13,6 @@ public abstract class FieldValidatorSupport extends ValidatorSupport implements 
 {
     private String fieldName;
 
-    private ValidationContext context;
-
     private String defaultMessage;
 
     private String messageKey;

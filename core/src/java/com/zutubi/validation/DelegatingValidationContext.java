@@ -23,7 +23,7 @@ public class DelegatingValidationContext implements ValidationContext
     public DelegatingValidationContext(Object obj)
     {
         validationAware = makeValidationAware(obj);
-        textProvider = makeTextPovider(obj);
+        textProvider = makeTextProvider(obj);
     }
 
     protected DelegatingValidationContext()
@@ -31,7 +31,7 @@ public class DelegatingValidationContext implements ValidationContext
 
     }
 
-    public TextProvider makeTextPovider(Object obj)
+    public TextProvider makeTextProvider(Object obj)
     {
         if (obj instanceof TextProvider)
         {

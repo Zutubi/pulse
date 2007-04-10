@@ -94,13 +94,11 @@ public class WizardDirective extends AbstractDirective
 
         try
         {
-            CompositeType type = state.getType();
-
-            Messages stateMessages = Messages.getInstance(state.getType().getClazz());
+            Messages stateMessages = state.getMessages();
             Messages wizardMessages = Messages.getInstance(wizardInstance.getClass());
 
             // generate the form.
-            FormDescriptor formDescriptor = formDescriptorFactory.createDescriptor(path, type.getSymbolicName());
+            FormDescriptor formDescriptor = state.createFormDescriptor(formDescriptorFactory, path);
 
             // need to decorate the form a little bit to handle the fact that it is being rendered as a wizard.
             decorate(formDescriptor);

@@ -4,7 +4,7 @@ package com.zutubi.pulse.prototype.config;
  *
  *
  */
-public class CustomChangeViewerConfiguration
+public class CustomChangeViewerConfiguration extends ChangeViewerConfiguration
 {
     private String changelist;
     private String fileview;

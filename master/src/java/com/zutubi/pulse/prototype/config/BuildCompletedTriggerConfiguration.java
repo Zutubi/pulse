@@ -11,7 +11,7 @@ import java.util.List;
 /**
  */
 @Form(fieldOrder = { "name", "project", "states"})
-public class BuildCompletedTriggerConfiguration extends BaseTriggerConfiguration
+public class BuildCompletedTriggerConfiguration extends TriggerConfiguration
 {
     @Reference
     private ProjectConfiguration project;

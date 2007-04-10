@@ -6,6 +6,7 @@ import com.zutubi.prototype.annotation.ConfigurationCheck;
 import com.zutubi.prototype.type.CompositeType;
 import com.zutubi.prototype.type.Type;
 import com.zutubi.prototype.type.record.Record;
+import com.zutubi.prototype.type.record.PathUtils;
 import com.zutubi.validation.XWorkValidationAdapter;
 
 import java.util.HashMap;
@@ -60,13 +61,13 @@ public class CheckAction extends PrototypeSupport
         checkRecord = PrototypeUtils.toRecord((CompositeType) checkType, parameters);
 
         // validate the check form first.
-        if (!configurationPersistenceManager.validate(checkRecord, new XWorkValidationAdapter(this)))
+        if (!configurationPersistenceManager.validate(null, null, checkRecord, new XWorkValidationAdapter(this)))
         {
             return doRender();
         }
 
         // validate the primary form.
-        if (!configurationPersistenceManager.validate(record, new XWorkValidationAdapter(this)))
+        if (!configurationPersistenceManager.validate(PathUtils.getParentPath(path), PathUtils.getBaseName(path), record, new XWorkValidationAdapter(this)))
         {
             return doRender();
         }

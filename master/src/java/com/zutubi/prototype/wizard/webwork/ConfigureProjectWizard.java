@@ -7,8 +7,12 @@ import com.zutubi.prototype.type.record.MutableRecordImpl;
 import com.zutubi.prototype.type.record.TemplateRecord;
 import com.zutubi.prototype.wizard.WizardState;
 import com.zutubi.pulse.util.logging.Logger;
+import com.zutubi.pulse.model.Project;
+import com.zutubi.pulse.model.ProjectManager;
 
 import java.util.LinkedList;
+
+import org.apache.velocity.runtime.configuration.Configuration;
 
 /**
  * This wizard walks a user through the project configuration process. During project configuration,
@@ -23,6 +27,7 @@ public class ConfigureProjectWizard extends AbstractTypeWizard
     private static final TemplateRecord EMPTY_RECORD = new TemplateRecord("empty", null, new MutableRecordImpl());
 
     private CompositeType projectType;
+    private ProjectManager projectManager;
 
     public void initialise()
     {
@@ -50,6 +55,10 @@ public class ConfigureProjectWizard extends AbstractTypeWizard
         record.put("scm", wizardStates.get(2).getRecord());
         record.put("type", wizardStates.get(4).getRecord());
 
+        Project project = new Project();
+        projectManager.save(project);
+        record.putMeta("entity", Long.toString(project.getId()));
+
         successPath = configurationPersistenceManager.insertRecord("project", record);
     }
 
@@ -62,5 +71,10 @@ public class ConfigureProjectWizard extends AbstractTypeWizard
     public void setConfigurationPersistenceManager(ConfigurationPersistenceManager configurationPersistenceManager)
     {
         this.configurationPersistenceManager = configurationPersistenceManager;
+    }
+
+    public void setProjectManager(ProjectManager projectManager)
+    {
+        this.projectManager = projectManager;
     }
 }

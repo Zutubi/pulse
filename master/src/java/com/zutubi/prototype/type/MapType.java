@@ -3,6 +3,8 @@ package com.zutubi.prototype.type;
 import com.zutubi.prototype.annotation.ID;
 import com.zutubi.prototype.type.record.Record;
 import com.zutubi.prototype.type.record.PathUtils;
+import com.zutubi.prototype.type.record.RecordManager;
+import com.zutubi.prototype.type.record.MutableRecord;
 import com.zutubi.prototype.config.ConfigurationPersistenceManager;
 
 import java.util.HashMap;
@@ -15,6 +17,7 @@ import java.util.Map;
 public class MapType extends CollectionType
 {
     private ConfigurationPersistenceManager configurationPersistenceManager;
+    private static final String LATEST_KEY_KEY = "latestKey";
 
     public MapType(ConfigurationPersistenceManager configurationPersistenceManager)
     {
@@ -63,10 +66,8 @@ public class MapType extends CollectionType
         return instance;
     }
 
-    public TypeProperty getKeyProperty(Object obj)
+    public TypeProperty getKeyProperty()
     {
-        // TODO: assumes a Map only holds composites, which is fair enough but
-        // would need to be enforced at registration time.
         CompositeType type = (CompositeType) getCollectionType();
         for (TypeProperty property : type.getProperties(PrimitiveType.class))
         {
@@ -76,5 +77,26 @@ public class MapType extends CollectionType
             }
         }
         return null;
+    }
+
+    public void setCollectionType(Type collectionType) throws TypeException
+    {
+        super.setCollectionType(collectionType);
+
+        if(!(collectionType instanceof CompositeType))
+        {
+            throw new TypeException("Maps may only contain composite types");
+        }
+
+        if(getKeyProperty() == null)
+        {
+            throw new TypeException("Types stored in maps must have an @ID property");
+        }
+    }
+
+    protected String getItemKey(String path, Record collectionRecord, Record itemRecord, RecordManager recordManager)
+    {
+        TypeProperty keyProperty = getKeyProperty();
+        return (String) itemRecord.get(keyProperty.getName());
     }
 }

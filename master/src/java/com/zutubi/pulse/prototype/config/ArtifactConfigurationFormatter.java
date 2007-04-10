@@ -6,13 +6,13 @@ import com.zutubi.prototype.Formatter;
  *
  *
  */
-public class ArtifactConfigurationFormatter implements Formatter<BaseArtifactConfiguration>
+public class ArtifactConfigurationFormatter implements Formatter<ArtifactConfiguration>
 {
     public ArtifactConfigurationFormatter()
     {
     }
 
-    public String format(BaseArtifactConfiguration obj)
+    public String format(ArtifactConfiguration obj)
     {
         return obj.getName();
     }

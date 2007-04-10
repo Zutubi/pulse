@@ -4,7 +4,7 @@ package com.zutubi.pulse.prototype.config;
  *
  *
  */
-public class PerforceConfiguration
+public class PerforceConfiguration extends ScmConfiguration
 {
     private String port;
     private String user;

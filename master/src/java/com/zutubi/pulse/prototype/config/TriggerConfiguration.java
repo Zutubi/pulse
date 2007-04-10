@@ -2,23 +2,22 @@ package com.zutubi.pulse.prototype.config;
 
 import com.zutubi.validation.annotations.Required;
 import com.zutubi.prototype.annotation.TypeSelect;
+import com.zutubi.prototype.annotation.ID;
 
 /**
  */
-public class TriggerConfiguration implements ConfigurationExtension
+public class TriggerConfiguration
 {
-    // should the option list be coming from this class??
-    @Required()
-    private String option;
+    @ID
+    private String name;
 
-    @TypeSelect(configurationType = TriggerConfiguration.class)
-    public String getOption()
+    public String getName()
     {
-        return option;
+        return name;
     }
 
-    public void setOption(String option)
+    public void setName(String name)
     {
-        this.option = option;
+        this.name = name;
     }
 }

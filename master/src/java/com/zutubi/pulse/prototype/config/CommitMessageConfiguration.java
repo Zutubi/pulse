@@ -2,6 +2,7 @@ package com.zutubi.pulse.prototype.config;
 
 import com.zutubi.prototype.annotation.TypeSelect;
 import com.zutubi.prototype.annotation.Wizard;
+import com.zutubi.prototype.annotation.ID;
 import com.zutubi.prototype.wizard.webwork.ConfigureProjectWizard;
 import com.zutubi.pulse.prototype.record.SymbolicName;
 
@@ -11,18 +12,18 @@ import com.zutubi.pulse.prototype.record.SymbolicName;
  */
 @SymbolicName("commitConfig")
 @Wizard(CommitMessageConfigurationWizard.class)
-public class CommitMessageConfiguration implements ConfigurationExtension
+public class CommitMessageConfiguration
 {
-    private String option;
+    @ID
+    private String name;
 
-    @TypeSelect(configurationType = CommitMessageConfiguration.class, size = 5)
-    public String getOption()
+    public String getName()
     {
-        return option;
+        return name;
     }
 
-    public void setOption(String option)
+    public void setName(String name)
     {
-        this.option = option;
+        this.name = name;
     }
 }

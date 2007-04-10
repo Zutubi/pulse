@@ -291,26 +291,16 @@ public class ConfigurationPersistenceManager
         for(ScopeInfo scope: rootScopes.values())
         {
             String path = scope.getScopeName();
-            if(scope.isCollection())
+            Type type = scope.getType();
+            try
             {
-                path = PathUtils.getPath(path, PathUtils.WILDCARD_ANY_ELEMENT);
+                type.instantiate(path, recordManager.load(path));
             }
-
-            Type targetType = scope.getTargetType();
-            Map<String, Record> records = new HashMap<String, Record>();
-            getAllRecords(path, records);
-            for(Map.Entry<String, Record> entry: records.entrySet())
+            catch (TypeException e)
             {
-                try
-                {
-                    targetType.instantiate(entry.getKey(), entry.getValue());
-                }
-                catch (TypeException e)
-                {
-                    // FIXME how should we present this? i think we need to
-                    // FIXME store and allow the UI to show such problems
-                    LOG.severe("Unable to instantiate '" + path + "': " + e.getMessage(), e);
-                }
+                // FIXME how should we present this? i think we need to
+                // FIXME store and allow the UI to show such problems
+                LOG.severe("Unable to instantiate '" + path + "': " + e.getMessage(), e);
             }
         }
     }
@@ -410,7 +400,7 @@ public class ConfigurationPersistenceManager
         return result;
     }
 
-    public boolean validate(Record subject, ValidationAware validationCallback) throws TypeException
+    public boolean validate(String parentPath, String baseName, Record subject, ValidationAware validationCallback) throws TypeException
     {
         // The type we validating against.
         Type type = typeRegistry.getType(subject.getSymbolicName());
@@ -418,7 +408,7 @@ public class ConfigurationPersistenceManager
         // Construct the validation context, wrapping it around the validation callback to that the
         // client is notified of validation errors.
         MessagesTextProvider textProvider = new MessagesTextProvider(type.getClazz());
-        ValidationContext context = new DelegatingValidationContext(validationCallback, textProvider);
+        ValidationContext context = new ConfigurationValidationContext(validationCallback, textProvider, getInstance(parentPath), baseName);
 
         // Create an instance of the object represented by the record.  It is during the instantiation that
         // type conversion errors are detected.

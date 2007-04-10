@@ -4,6 +4,11 @@ import com.zutubi.prototype.type.CompositeType;
 import com.zutubi.prototype.type.record.Record;
 import com.zutubi.prototype.type.record.TemplateRecord;
 import com.zutubi.prototype.type.record.MutableRecord;
+import com.zutubi.prototype.FormDescriptor;
+import com.zutubi.prototype.FormDescriptorFactory;
+import com.zutubi.pulse.i18n.Messages;
+
+import java.util.Map;
 
 /**
  *
@@ -19,17 +24,15 @@ public interface WizardState
     TemplateRecord getTemplateRecord();
 
     /**
-     * The type of the data represented by this wizard state.
-     *
-     * @return
-     */
-    CompositeType getType();
-
-    /**
      * The record containing the data within this wizard state.
      *
      * @return
      */
     MutableRecord getRecord();
 
+    void updateRecord(Map parameters);
+
+    Messages getMessages();
+
+    FormDescriptor createFormDescriptor(FormDescriptorFactory formDescriptorFactory, String path);
 }

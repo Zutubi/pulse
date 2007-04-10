@@ -27,7 +27,6 @@ public class ConfigurationRegistry
 {
     private TypeRegistry typeRegistry;
     private ConfigurationPersistenceManager configurationPersistenceManager;
-    private ProjectManager projectManager;
 
     public void init() throws TypeException
     {
@@ -102,7 +101,7 @@ public class ConfigurationRegistry
         projectConfig.addProperty(new TypeProperty("commit", commitTransformers));
 
         // define the root level scope.
-        ProjectMapType projectCollection = new ProjectMapType(configurationPersistenceManager, projectManager);
+        ProjectMapType projectCollection = new ProjectMapType(configurationPersistenceManager);
         projectCollection.setTypeRegistry(typeRegistry);
         projectCollection.setCollectionType(projectConfig);
 
@@ -138,10 +137,5 @@ public class ConfigurationRegistry
     public void setConfigurationPersistenceManager(ConfigurationPersistenceManager configurationPersistenceManager)
     {
         this.configurationPersistenceManager = configurationPersistenceManager;
-    }
-
-    public void setProjectManager(ProjectManager projectManager)
-    {
-        this.projectManager = projectManager;
     }
 }

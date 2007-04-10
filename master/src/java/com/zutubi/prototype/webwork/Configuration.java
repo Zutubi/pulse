@@ -7,7 +7,6 @@ import com.zutubi.prototype.type.*;
 import com.zutubi.prototype.type.record.PathUtils;
 import com.zutubi.prototype.type.record.Record;
 import com.zutubi.pulse.bootstrap.ComponentContext;
-import com.zutubi.pulse.prototype.config.ConfigurationExtension;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -79,8 +78,9 @@ public class Configuration
             CompositeType ctype = (CompositeType) targetType;
             targetSymbolicName = ctype.getSymbolicName();
 
-            if (!ConfigurationExtension.class.isAssignableFrom(targetType.getClazz()))
-            {
+            // FIXME if necessary
+//            if (!ConfigurationExtension.class.isAssignableFrom(targetType.getClazz()))
+//            {
                 // only show a simple properties form if it is not associated with an extension type.
                 for (String propertyName : ctype.getPropertyNames(PrimitiveType.class))
                 {
@@ -90,7 +90,7 @@ public class Configuration
                 {
                     simpleProperties.add(propertyName);
                 }
-            }
+//            }
 
             for (String propertyName : ctype.getPropertyNames(CompositeType.class))
             {

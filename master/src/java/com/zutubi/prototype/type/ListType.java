@@ -2,6 +2,8 @@ package com.zutubi.prototype.type;
 
 import com.zutubi.prototype.type.record.Record;
 import com.zutubi.prototype.type.record.PathUtils;
+import com.zutubi.prototype.type.record.RecordManager;
+import com.zutubi.prototype.type.record.MutableRecord;
 import com.zutubi.prototype.config.ConfigurationPersistenceManager;
 
 import java.util.LinkedList;
@@ -14,6 +16,7 @@ import java.util.List;
 public class ListType extends CollectionType
 {
     private ConfigurationPersistenceManager configurationPersistenceManager;
+    private static final String LATEST_KEY_KEY = "latestKey";
 
     public ListType(ConfigurationPersistenceManager configurationPersistenceManager)
     {
@@ -82,5 +85,23 @@ public class ListType extends CollectionType
             configurationPersistenceManager.putInstance(path, instance);
         }
         return instance;
+    }
+
+    protected String getItemKey(String path, Record collectionRecord, Record itemRecord, RecordManager recordManager)
+    {
+        String latestKey = collectionRecord.getMeta(LATEST_KEY_KEY);
+        if (latestKey == null)
+        {
+            latestKey = "1";
+        }
+        else
+        {
+            latestKey = Integer.toString(Integer.parseInt(latestKey) + 1);
+        }
+
+        MutableRecord mutableRecord = collectionRecord.copy(false);
+        mutableRecord.putMeta(LATEST_KEY_KEY, latestKey);
+        recordManager.update(path, mutableRecord);
+        return latestKey;
     }
 }

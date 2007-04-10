@@ -3,24 +3,23 @@ package com.zutubi.pulse.prototype.config;
 import com.zutubi.prototype.annotation.TypeSelect;
 import com.zutubi.validation.annotations.Required;
 
+import java.util.List;
+
 /**
  *
  *
  */
-public class ScmConfiguration implements ConfigurationExtension
+public class ScmConfiguration
 {
-    // should the option list be coming from this class??
-    @Required()
-    private String option;
+    private List<String> filterPaths;
 
-    @TypeSelect(configurationType = ScmConfiguration.class, size = 5)
-    public String getOption()
+    public List<String> getFilterPaths()
     {
-        return option;
+        return filterPaths;
     }
 
-    public void setOption(String option)
+    public void setFilterPaths(List<String> filterPaths)
     {
-        this.option = option;
-    }
+        this.filterPaths = filterPaths;
+    }    
 }

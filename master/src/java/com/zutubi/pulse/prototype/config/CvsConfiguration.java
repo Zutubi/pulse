@@ -13,7 +13,7 @@ import com.zutubi.pulse.validation.annotation.CvsRoot;
  */
 @ConfigurationCheck(CvsConfigurationCheckHandler.class)
 @Form(fieldOrder = {"root", "password", "module", "branch"})
-public class CvsConfiguration extends BaseScmConfiguration
+public class CvsConfiguration extends ScmConfiguration
 {
     @Required @CvsRoot @Text(size = 50)
     private String root;

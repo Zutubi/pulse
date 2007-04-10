@@ -1,23 +1,9 @@
 package com.zutubi.pulse.prototype.config;
 
-import com.zutubi.prototype.annotation.TypeSelect;
-
 /**
  *
  *
  */
-public class ChangeViewerConfiguration implements ConfigurationExtension
+public class ChangeViewerConfiguration
 {
-    private String option;
-
-    @TypeSelect(configurationType = ChangeViewerConfiguration.class, size = 5)
-    public String getOption()
-    {
-        return option;
-    }
-
-    public void setOption(String option)
-    {
-        this.option = option;
-    }
 }

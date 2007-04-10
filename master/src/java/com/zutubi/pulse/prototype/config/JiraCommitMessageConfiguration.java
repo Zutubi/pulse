@@ -6,23 +6,10 @@ import com.zutubi.prototype.annotation.ID;
  *
  *
  */
-public class JiraCommitMessageConfiguration
+public class JiraCommitMessageConfiguration extends CommitMessageConfiguration
 {
-    private String name;
-
     private String url;
     private String regex;
-
-    @ID()
-    public String getName()
-    {
-        return name;
-    }
-
-    public void setName(String name)
-    {
-        this.name = name;
-    }
 
     public String getUrl()
     {

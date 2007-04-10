@@ -12,8 +12,6 @@ import java.util.Set;
  */
 public abstract class CollectionType extends AbstractType implements ComplexType
 {
-    private static final String LATEST_KEY_KEY = "latestKey";
-
     private Type collectionType;
 
     public CollectionType(Class type)
@@ -36,7 +34,7 @@ public abstract class CollectionType extends AbstractType implements ComplexType
         return collectionType;
     }
 
-    public void setCollectionType(Type collectionType)
+    public void setCollectionType(Type collectionType) throws TypeException
     {
         this.collectionType = collectionType;
     }
@@ -72,7 +70,7 @@ public abstract class CollectionType extends AbstractType implements ComplexType
             throw new IllegalArgumentException("Attempt to store into a non-existant list at path '" + path + "'");
         }
 
-        String newKey = getNextKey(path, collectionRecord, recordManager);
+        String newKey = getItemKey(path, collectionRecord, newRecord, recordManager);
         String newPath = PathUtils.getPath(path, newKey);
         recordManager.insert(newPath, newRecord);
         return newPath;
@@ -88,21 +86,5 @@ public abstract class CollectionType extends AbstractType implements ComplexType
         return false;
     }
 
-    protected String getNextKey(String path, Record record, RecordManager recordManager)
-    {
-        String latestKey = record.getMeta(LATEST_KEY_KEY);
-        if (latestKey == null)
-        {
-            latestKey = "1";
-        }
-        else
-        {
-            latestKey = Integer.toString(Integer.parseInt(latestKey) + 1);
-        }
-
-        MutableRecord mutableRecord = record.copy(false);
-        mutableRecord.putMeta(LATEST_KEY_KEY, latestKey);
-        recordManager.update(path, mutableRecord);
-        return latestKey;
-    }
+    protected abstract String getItemKey(String path, Record collectionRecord, Record itemRecord, RecordManager recordManager);
 }

@@ -3,6 +3,7 @@ package com.zutubi.prototype.webwork;
 import com.opensymphony.util.TextUtils;
 import com.opensymphony.xwork.ActionContext;
 import com.zutubi.prototype.type.CompositeType;
+import com.zutubi.prototype.type.record.PathUtils;
 import com.zutubi.pulse.bootstrap.ComponentContext;
 import com.zutubi.validation.XWorkValidationAdapter;
 
@@ -48,7 +49,7 @@ public class SaveAction extends PrototypeSupport
 
         record = PrototypeUtils.toRecord(type, ActionContext.getContext().getParameters());
 
-        if (!configurationPersistenceManager.validate(record, new XWorkValidationAdapter(this)))
+        if (!configurationPersistenceManager.validate(PathUtils.getParentPath(path), PathUtils.getBaseName(path), record, new XWorkValidationAdapter(this)))
         {
             return doRender();
         }

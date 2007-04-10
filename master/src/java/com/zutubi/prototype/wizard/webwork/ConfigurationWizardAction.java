@@ -194,7 +194,7 @@ public class ConfigurationWizardAction extends ActionSupport
         Record record = getState().getRecord();
         try
         {
-            return configurationPersistenceManager.validate(record, new XWorkValidationAdapter(this));
+            return configurationPersistenceManager.validate(path, null, record, new XWorkValidationAdapter(this));
         }
         catch (TypeException e)
         {
@@ -235,10 +235,7 @@ public class ConfigurationWizardAction extends ActionSupport
         {
             if (isInitialised())
             {
-                Record post = PrototypeUtils.toRecord(getState().getType(), ActionContext.getContext().getParameters());
-
-                // apply the posted record details to the current state's record.
-                getState().getRecord().update(post);
+                getState().updateRecord(ActionContext.getContext().getParameters());
             }
 
             // only validate when we are moving forwards in the wizard

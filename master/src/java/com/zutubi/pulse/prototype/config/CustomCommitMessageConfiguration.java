@@ -1,26 +1,12 @@
 package com.zutubi.pulse.prototype.config;
 
-import com.zutubi.prototype.annotation.ID;
-
 /**
  *
  *
  */
-public class CustomCommitMessageConfiguration
+public class CustomCommitMessageConfiguration extends CommitMessageConfiguration
 {
-    private String name;
     private String regex;
-
-    @ID()
-    public String getName()
-    {
-        return name;
-    }
-
-    public void setName(String name)
-    {
-        this.name = name;
-    }
 
     public String getRegex()
     {
