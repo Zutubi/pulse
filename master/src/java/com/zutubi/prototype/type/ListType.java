@@ -61,9 +61,10 @@ public class ListType extends CollectionType
             {
                 instance = create(path);
                 Type type = getCollectionType();
-                for(String s: (String[])data)
+                String[] references = (String[]) data;
+                for (String reference : references)
                 {
-                    instance.add(type.instantiate(path == null ? null : PathUtils.getPath(path, s), s));
+                    instance.add(type.instantiate(path, reference));
                 }
                 return instance;
             }
@@ -103,5 +104,12 @@ public class ListType extends CollectionType
         mutableRecord.putMeta(LATEST_KEY_KEY, latestKey);
         recordManager.update(path, mutableRecord);
         return latestKey;
+    }
+
+    public String save(String path, String baseName, Record record, RecordManager recordManager)
+    {
+        String newPath = PathUtils.getPath(path, baseName);
+        recordManager.update(newPath, record);
+        return newPath;
     }
 }

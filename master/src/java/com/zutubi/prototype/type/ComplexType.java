@@ -11,6 +11,8 @@ public interface ComplexType extends Type
 
     String insert(String path, Record newRecord, RecordManager recordManager);
 
+    String save(String path, String baseName, Record record, RecordManager recordManager);
+
     Record createNewRecord();
 
     boolean isTemplated();

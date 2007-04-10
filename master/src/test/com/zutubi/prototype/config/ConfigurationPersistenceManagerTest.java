@@ -68,7 +68,7 @@ public class ConfigurationPersistenceManagerTest extends TestCase
         CompositeType type = typeRegistry.register(CompositeObject.class);
         manager.register("composite", type);
         assertEquals(Arrays.asList("composite"), manager.getConfigurationPaths(type));
-        assertEquals(Arrays.asList("composite/simple"), manager.getConfigurationPaths(typeRegistry.getType("Simple")));
+        assertEquals(Arrays.asList("composite/simple", "composite/map/*"), manager.getConfigurationPaths(typeRegistry.getType("Simple")));
     }
 
     public void testIndexSimpleCollection() throws TypeException
@@ -85,7 +85,7 @@ public class ConfigurationPersistenceManagerTest extends TestCase
         manager.register("collection", type);
         assertEquals(Arrays.asList("collection"), manager.getConfigurationPaths(type));
         assertEquals(Arrays.asList("collection/composites/*"), manager.getConfigurationPaths(typeRegistry.getType("Composite")));
-        assertEquals(Arrays.asList("collection/composites/*/simple"), manager.getConfigurationPaths(typeRegistry.getType("Simple")));
+        assertEquals(Arrays.asList("collection/composites/*/simple", "collection/composites/*/map/*"), manager.getConfigurationPaths(typeRegistry.getType("Simple")));
     }
 
     public void testIndexTopLevelCollection() throws TypeException

@@ -70,44 +70,51 @@ public class TypeRegistry
 
     public CompositeType register(String symbolicName, Class clazz) throws TypeException
     {
-        if (symbolicName == null)
+        try
         {
-            throw new TypeException("Class " + clazz.getName() + " requires a symbolic name before it can be registered.  You can " +
-                    "add a symbolic name to the class by using the @SymbolicName annotation.");
-        }
-        if (symbolicName != null && symbolicNameMapping.containsKey(symbolicName))
-        {
-            Class existingRegistration = symbolicNameMapping.get(symbolicName).getClazz();
-            if (existingRegistration != clazz)
+            if (symbolicName == null)
             {
-                throw new TypeException("Symbolic name " + symbolicName + " is already in use, can not be assigned " +
-                        "to a different type " + clazz.getName());
+                throw new TypeException("Class " + clazz.getName() + " requires a symbolic name before it can be registered.  You can " +
+                        "add a symbolic name to the class by using the @SymbolicName annotation.");
             }
-        }
-
-        CompositeType type = classMapping.get(clazz);
-        if (type == null)
-        {
-            type = new CompositeType(clazz, symbolicName, configurationPersistenceManager);
-            classMapping.put(clazz, type);
-
-            try
+            if (symbolicName != null && symbolicNameMapping.containsKey(symbolicName))
             {
-                buildType(type);
+                Class existingRegistration = symbolicNameMapping.get(symbolicName).getClazz();
+                if (existingRegistration != clazz)
+                {
+                    throw new TypeException("Symbolic name " + symbolicName + " is already in use, can not be assigned " +
+                            "to a different type " + clazz.getName());
+                }
             }
-            catch (RuntimeException e)
+
+            CompositeType type = classMapping.get(clazz);
+            if (type == null)
             {
-                classMapping.remove(clazz);
-                throw e;
+                type = new CompositeType(clazz, symbolicName, configurationPersistenceManager);
+                classMapping.put(clazz, type);
+
+                try
+                {
+                    buildType(type);
+                }
+                catch (RuntimeException e)
+                {
+                    classMapping.remove(clazz);
+                    throw e;
+                }
             }
-        }
 
-        if (symbolicName != null)
+            if (symbolicName != null)
+            {
+                symbolicNameMapping.put(symbolicName, type);
+            }
+
+            return type;
+        }
+        catch (TypeException e)
         {
-            symbolicNameMapping.put(symbolicName, type);
+            throw new TypeException("Registering class '" + clazz.getName() + "': " + e.getMessage(), e);
         }
-
-        return type;
     }
 
     public CompositeType register(String symbolicName, CompositeType type) throws TypeException
@@ -161,7 +168,7 @@ public class TypeRegistry
                     else
                     {
                         CompositeType compositeType = classMapping.get(clazz);
-                        if(compositeType == null)
+                        if (compositeType == null)
                         {
                             compositeType = register(clazz);
                         }
@@ -231,7 +238,7 @@ public class TypeRegistry
 
     private Type checkReferenceType(TypeProperty property, CompositeType compositeType)
     {
-        if(property.getAnnotation(Reference.class) != null)
+        if (property.getAnnotation(Reference.class) != null)
         {
             ReferenceType referenceType = new ReferenceType(compositeType, configurationPersistenceManager);
             referenceType.setTypeRegistry(this);
@@ -246,9 +253,9 @@ public class TypeRegistry
     private SimpleType getSimpleType(Class clazz)
     {
         SimpleType type = primitiveMapping.get(clazz);
-        if(type == null)
+        if (type == null)
         {
-            if(clazz.isEnum())
+            if (clazz.isEnum())
             {
                 type = new EnumType(clazz);
                 primitiveMapping.put(clazz, type);

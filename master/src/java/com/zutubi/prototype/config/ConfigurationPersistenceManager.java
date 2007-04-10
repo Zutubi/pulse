@@ -1,11 +1,10 @@
 package com.zutubi.prototype.config;
 
 import com.zutubi.prototype.type.*;
-import com.zutubi.prototype.type.record.PathUtils;
-import com.zutubi.prototype.type.record.Record;
-import com.zutubi.prototype.type.record.RecordManager;
-import com.zutubi.prototype.type.record.TemplateRecord;
+import com.zutubi.prototype.type.record.*;
 import com.zutubi.pulse.util.logging.Logger;
+import com.zutubi.pulse.util.CollectionUtils;
+import com.zutubi.pulse.util.Mapping;
 import com.zutubi.pulse.validation.MessagesTextProvider;
 import com.zutubi.validation.*;
 
@@ -19,7 +18,7 @@ import java.util.*;
 public class ConfigurationPersistenceManager
 {
     private static final Logger LOG = Logger.getLogger(ConfigurationPersistenceManager.class);
-    
+
     private TypeRegistry typeRegistry;
 
     private RecordManager recordManager;
@@ -33,12 +32,13 @@ public class ConfigurationPersistenceManager
      */
     private Map<CompositeType, List<String>> compositeTypePathIndex = new HashMap<CompositeType, List<String>>();
     private Map<String, Object> instances = new HashMap<String, Object>();
+    private Map<String, List<String>> references = new HashMap<String, List<String>>();
 
     public void init()
     {
         refreshInstances();
     }
-    
+
     /**
      * Register the root scope definitions, from which all of the other definitions will be
      * derived.
@@ -49,18 +49,21 @@ public class ConfigurationPersistenceManager
     public void register(String scope, ComplexType type)
     {
         rootScopes.put(scope, new ScopeInfo(scope, type));
-        if(!recordManager.containsRecord(scope))
+        if (!recordManager.containsRecord(scope))
         {
             recordManager.insert(scope, type.createNewRecord());
         }
 
-        if(type instanceof CompositeType)
+        if (type instanceof CompositeType)
         {
             updateIndex(scope, (CompositeType) type);
         }
-        else if(type instanceof CollectionType)
+        else
         {
-            updateIndex(scope, (CollectionType) type);
+            if (type instanceof CollectionType)
+            {
+                updateIndex(scope, (CollectionType) type);
+            }
         }
     }
 
@@ -68,12 +71,12 @@ public class ConfigurationPersistenceManager
     {
         // Add an entry at the current path, and analyse properties
         addToIndex(type, path);
-        for(TypeProperty property: type.getProperties(CompositeType.class))
+        for (TypeProperty property : type.getProperties(CompositeType.class))
         {
             String childPath = PathUtils.getPath(path, property.getName());
             updateIndex(childPath, (CompositeType) property.getType());
         }
-        for(TypeProperty property: type.getProperties(CollectionType.class))
+        for (TypeProperty property : type.getProperties(CollectionType.class))
         {
             String childPath = PathUtils.getPath(path, property.getName());
             updateIndex(childPath, (CollectionType) property.getType());
@@ -85,7 +88,7 @@ public class ConfigurationPersistenceManager
         // If the collection itself holds a complex type, add a wildcard
         // to the path and traverse down.
         Type targetType = type.getCollectionType();
-        if(targetType instanceof CompositeType)
+        if (targetType instanceof CompositeType)
         {
             updateIndex(PathUtils.getPath(path, PathUtils.WILDCARD_ANY_ELEMENT), (CompositeType) targetType);
         }
@@ -99,7 +102,7 @@ public class ConfigurationPersistenceManager
     List<String> getConfigurationPaths(CompositeType type)
     {
         List<String> l = compositeTypePathIndex.get(type);
-        if(l == null)
+        if (l == null)
         {
             l = new ArrayList<String>();
             compositeTypePathIndex.put(type, l);
@@ -112,7 +115,7 @@ public class ConfigurationPersistenceManager
         HashMap<String, Record> records = new HashMap<String, Record>();
         // FIXME does not account for templating, and may need to be more
         // FIXME general.  review when we have more config objects...
-        for(String path: getOwningPaths(type, getClosestOwningScope(type, referencingPath)))
+        for (String path : getOwningPaths(type, getClosestOwningScope(type, referencingPath)))
         {
             recordManager.loadAll(path, records);
         }
@@ -123,16 +126,16 @@ public class ConfigurationPersistenceManager
     String getClosestOwningScope(CompositeType type, String path)
     {
         List<String> paths = compositeTypePathIndex.get(type);
-        if(paths != null)
+        if (paths != null)
         {
             // Find the closest by starting at our path and working up the
             // ancestry until one hits.
             path = PathUtils.normalizePath(path);
-            while(path != null)
+            while (path != null)
             {
-                for(String candidate: paths)
+                for (String candidate : paths)
                 {
-                    if(PathUtils.prefixMatches(candidate, path))
+                    if (PathUtils.prefixMatches(candidate, path))
                     {
                         return PathUtils.getParentPath(path);
                     }
@@ -149,11 +152,11 @@ public class ConfigurationPersistenceManager
     {
         List<String> paths = compositeTypePathIndex.get(type);
         List<String> result = new LinkedList<String>();
-        if(prefix != null && paths != null)
+        if (prefix != null && paths != null)
         {
-            for(String owningPath: paths)
+            for (String owningPath : paths)
             {
-                if(PathUtils.prefixMatches(owningPath, prefix))
+                if (PathUtils.prefixMatches(owningPath, prefix))
                 {
                     result.add(PathUtils.getPath(prefix, PathUtils.stripMatchingPrefix(owningPath, prefix)));
                 }
@@ -200,36 +203,39 @@ public class ConfigurationPersistenceManager
 
             return info.getType();
         }
-        else if (parentSymbolicName == null)
-        {
-            // Parent is a collection, last segment of path must refer to an
-            // existing child composite record.
-            if (value == null)
-            {
-                throw new IllegalArgumentException("Invalid path '" + path + "': references unknown child '" + lastElement + "' of collection");
-            }
-            // TODO: validate that collections must not contain collections
-            return extractRecordType(value, path);
-        }
         else
         {
-            // Parent is a composite, see if the field exists.
-            CompositeType parentType = typeRegistry.getType(parentSymbolicName);
-            TypeProperty typeProperty = parentType.getProperty(lastElement);
-            if (typeProperty == null)
+            if (parentSymbolicName == null)
             {
-                throw new IllegalArgumentException("Invalid path '" + path + ": references non-existant field '" + lastElement + "' of type '" + parentSymbolicName + "'");
-            }
-
-            Type type = typeProperty.getType();
-            if (value == null || type instanceof CollectionType)
-            {
-                return type;
+                // Parent is a collection, last segment of path must refer to an
+                // existing child composite record.
+                if (value == null)
+                {
+                    throw new IllegalArgumentException("Invalid path '" + path + "': references unknown child '" + lastElement + "' of collection");
+                }
+                // TODO: validate that collections must not contain collections
+                return extractRecordType(value, path);
             }
             else
             {
-                // Return the type of the actual value.
-                return extractRecordType(value, path);
+                // Parent is a composite, see if the field exists.
+                CompositeType parentType = typeRegistry.getType(parentSymbolicName);
+                TypeProperty typeProperty = parentType.getProperty(lastElement);
+                if (typeProperty == null)
+                {
+                    throw new IllegalArgumentException("Invalid path '" + path + ": references non-existant field '" + lastElement + "' of type '" + parentSymbolicName + "'");
+                }
+
+                Type type = typeProperty.getType();
+                if (value == null || type instanceof CollectionType)
+                {
+                    return type;
+                }
+                else
+                {
+                    // Return the type of the actual value.
+                    return extractRecordType(value, path);
+                }
             }
         }
     }
@@ -274,13 +280,16 @@ public class ConfigurationPersistenceManager
                 list.addAll(record.keySet());
             }
         }
-        else if (type instanceof CompositeType)
+        else
         {
-            CompositeType compositeType = (CompositeType) type;
-            list.addAll(compositeType.getPropertyNames(CompositeType.class));
-            list.addAll(compositeType.getPropertyNames(MapType.class));
-            list.addAll(compositeType.getPropertyNames(ListType.class));
-            return list;
+            if (type instanceof CompositeType)
+            {
+                CompositeType compositeType = (CompositeType) type;
+                list.addAll(compositeType.getPropertyNames(CompositeType.class));
+                list.addAll(compositeType.getPropertyNames(MapType.class));
+                list.addAll(compositeType.getPropertyNames(ListType.class));
+                return list;
+            }
         }
         return list;
     }
@@ -288,7 +297,9 @@ public class ConfigurationPersistenceManager
     private void refreshInstances()
     {
         instances.clear();
-        for(ScopeInfo scope: rootScopes.values())
+        references.clear();
+
+        for (ScopeInfo scope : rootScopes.values())
         {
             String path = scope.getScopeName();
             Type type = scope.getType();
@@ -318,17 +329,18 @@ public class ConfigurationPersistenceManager
 
     public Object resolveReference(String fromPath, String toPath) throws TypeException
     {
+        indexReference(fromPath, toPath);
         Object instance = getInstance(toPath);
-        if(instance == null)
+        if (instance == null)
         {
             Record record = getRecord(toPath);
-            if(record == null)
+            if (record == null)
             {
                 throw new TypeException("Broken reference from '" + fromPath + "' to '" + toPath + "'");
             }
-            
+
             Type type = typeRegistry.getType(record.getSymbolicName());
-            if(type == null)
+            if (type == null)
             {
                 throw new TypeException("Reference to unrecognised type '" + record.getSymbolicName() + "'");
             }
@@ -337,6 +349,18 @@ public class ConfigurationPersistenceManager
         }
 
         return instance;
+    }
+
+    private void indexReference(String fromPath, String toPath)
+    {
+        List<String> index = references.get(toPath);
+        if (index == null)
+        {
+            index = new LinkedList<String>();
+            references.put(toPath, index);
+        }
+
+        index.add(fromPath);
     }
 
     public void putInstance(String path, Object instance)
@@ -357,7 +381,7 @@ public class ConfigurationPersistenceManager
     private void getAllRecords(String path, Map<String, Record> records)
     {
         recordManager.loadAll(path, records);
-        for(Map.Entry<String, Record> entry: records.entrySet())
+        for (Map.Entry<String, Record> entry : records.entrySet())
         {
             entry.setValue(templatiseRecord(entry.getKey(), entry.getValue()));
         }
@@ -439,16 +463,73 @@ public class ConfigurationPersistenceManager
         }
     }
 
-    public void saveRecord(String path, Record record)
+    public String saveRecord(String parentPath, String baseName, Record record)
     {
-        // FIXME Review whether we should allow this insert without
-        // FIXME consulting the type (as in insertRecord)
-        recordManager.insertOrUpdate(path, record);
+        Record parentRecord = recordManager.load(parentPath);
+        if (parentRecord == null)
+        {
+            throw new IllegalArgumentException("Invalid parent path '" + parentPath + "'");
+        }
+
+        ComplexType parentType = (ComplexType) getType(parentPath);
+        String newPath = parentType.save(parentPath, baseName, record, recordManager);
         refreshInstances();
+        return newPath;
+    }
+
+    public void renameReferences(final String oldPath, final String newPath)
+    {
+        List<String> index = references.get(oldPath);
+        if (index != null)
+        {
+            for (String referencingPath : index)
+            {
+                String parentPath = PathUtils.getParentPath(referencingPath);
+                String baseName = PathUtils.getBaseName(referencingPath);
+
+                Record parentRecord = recordManager.load(parentPath);
+                if (parentRecord != null)
+                {
+                    Object currentValue = parentRecord.get(baseName);
+                    if (currentValue != null)
+                    {
+                        MutableRecord newRecord = parentRecord.copy(false);
+                        Object newValue = currentValue;
+
+                        if (currentValue instanceof String)
+                        {
+                            newValue = newPath;
+                        }
+                        else if (currentValue instanceof String[])
+                        {
+                            String[] refs = (String[]) currentValue;
+                            newValue = CollectionUtils.mapToArray(refs, new Mapping<String, String>()
+                            {
+                                public String map(String s)
+                                {
+                                    if (s.equals(oldPath))
+                                    {
+                                        return newPath;
+                                    }
+                                    else
+                                    {
+                                        return s;
+                                    }
+                                }
+                            }, new String[refs.length]);
+                        }
+
+                        newRecord.put(baseName, newValue);
+                        recordManager.update(parentPath, newRecord);
+                    }
+                }
+            }
+        }
     }
 
     public void delete(String path)
     {
+        // FIXME handle references to this path
         recordManager.delete(path);
         refreshInstances();
     }

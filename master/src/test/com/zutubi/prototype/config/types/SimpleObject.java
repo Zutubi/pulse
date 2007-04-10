@@ -1,12 +1,14 @@
 package com.zutubi.prototype.config.types;
 
 import com.zutubi.pulse.prototype.record.SymbolicName;
+import com.zutubi.prototype.annotation.ID;
 
 /**
  */
 @SymbolicName("Simple")
 public class SimpleObject
 {
+    @ID
     private String strA;
 
     private String strB;

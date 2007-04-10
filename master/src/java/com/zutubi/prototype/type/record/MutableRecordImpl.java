@@ -117,10 +117,14 @@ public class MutableRecordImpl implements MutableRecord
             }
         }
 
-        // take the new data from the record.
+        // take the new primitive data from the record.
         for (String key : record.keySet())
         {
-            newData.put(key, record.get(key));
+            Object value = record.get(key);
+            if(!(value instanceof Record))
+            {
+                newData.put(key, value);
+            }
         }
 
         data.clear();

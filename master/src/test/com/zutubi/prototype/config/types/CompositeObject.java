@@ -2,6 +2,7 @@ package com.zutubi.prototype.config.types;
 
 import com.zutubi.pulse.prototype.record.SymbolicName;
 import com.zutubi.prototype.config.types.SimpleObject;
+import com.zutubi.prototype.annotation.ID;
 
 import java.util.List;
 import java.util.Map;
@@ -11,12 +12,13 @@ import java.util.Map;
 @SymbolicName("Composite")
 public class CompositeObject
 {
+    @ID
     private String strA;
     private String strB;
     private SimpleObject simple;
 
     private List<String> list;
-    private Map<String, String> map;
+    private Map<String, SimpleObject> map;
 
     public String getStrA()
     {
@@ -58,12 +60,12 @@ public class CompositeObject
         this.list = list;
     }
 
-    public Map<String, String> getMap()
+    public Map<String, SimpleObject> getMap()
     {
         return map;
     }
 
-    public void setMap(Map<String, String> map)
+    public void setMap(Map<String, SimpleObject> map)
     {
         this.map = map;
     }

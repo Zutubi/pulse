@@ -186,7 +186,7 @@ public class RecordManager
         MutableRecord copy = record.copy(false);
         copy.update(values);
         parentRecord.put(baseName, copy);
-        recordSerialiser.serialise(path, record, false);
+        recordSerialiser.serialise(path, copy, false);
         return copy;
     }
 

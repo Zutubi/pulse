@@ -1,11 +1,11 @@
 package com.zutubi.prototype.type;
 
 import com.zutubi.prototype.annotation.ID;
-import com.zutubi.prototype.type.record.Record;
+import com.zutubi.prototype.config.ConfigurationPersistenceManager;
 import com.zutubi.prototype.type.record.PathUtils;
+import com.zutubi.prototype.type.record.Record;
 import com.zutubi.prototype.type.record.RecordManager;
 import com.zutubi.prototype.type.record.MutableRecord;
-import com.zutubi.prototype.config.ConfigurationPersistenceManager;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -17,7 +17,7 @@ import java.util.Map;
 public class MapType extends CollectionType
 {
     private ConfigurationPersistenceManager configurationPersistenceManager;
-    private static final String LATEST_KEY_KEY = "latestKey";
+    private String keyProperty;
 
     public MapType(ConfigurationPersistenceManager configurationPersistenceManager)
     {
@@ -59,24 +59,12 @@ public class MapType extends CollectionType
                 }
 
                 Object value = type.instantiate(path == null ? null : PathUtils.getPath(path, key), child);
+                //noinspection unchecked
                 instance.put(key, value);
             }
         }
 
         return instance;
-    }
-
-    public TypeProperty getKeyProperty()
-    {
-        CompositeType type = (CompositeType) getCollectionType();
-        for (TypeProperty property : type.getProperties(PrimitiveType.class))
-        {
-            if (property.getAnnotation(ID.class) != null)
-            {
-                return property;
-            }
-        }
-        return null;
     }
 
     public void setCollectionType(Type collectionType) throws TypeException
@@ -88,15 +76,54 @@ public class MapType extends CollectionType
             throw new TypeException("Maps may only contain composite types");
         }
 
-        if(getKeyProperty() == null)
+        CompositeType compositeType = (CompositeType) collectionType;
+        for (TypeProperty property : compositeType.getProperties(PrimitiveType.class))
         {
-            throw new TypeException("Types stored in maps must have an @ID property");
+            if (property.getAnnotation(ID.class) != null)
+            {
+                keyProperty = property.getName();
+                break;
+            }
         }
+
+        // FIXME: barfs on cycles
+//        if(keyProperty == null)
+//        {
+//            throw new TypeException("Types stored in maps must have an @ID property");
+//        }
     }
 
     protected String getItemKey(String path, Record collectionRecord, Record itemRecord, RecordManager recordManager)
     {
-        TypeProperty keyProperty = getKeyProperty();
-        return (String) itemRecord.get(keyProperty.getName());
+        return (String) itemRecord.get(keyProperty);
+    }
+
+    public String save(String path, String baseName, Record record, RecordManager recordManager)
+    {
+        // Check for renames
+        String newName = (String) record.get(keyProperty);
+        if(baseName != null && !baseName.equals(newName))
+        {
+            // We need to update our own record and tell the CPM to update
+            // references.
+            String oldPath = PathUtils.getPath(path, baseName);
+            String newPath = PathUtils.getPath(path, newName);
+
+            // Rename references first, as the below changes to the record
+            // will invalidate the reference index.
+            configurationPersistenceManager.renameReferences(oldPath, newPath);
+
+            recordManager.copy(oldPath, newPath);
+            recordManager.delete(oldPath);
+            recordManager.update(newPath, record);
+            return newPath;
+        }
+        else
+        {
+            // Regular update.
+            String newPath = PathUtils.getPath(path, baseName);
+            recordManager.update(newPath, record);
+            return newPath;
+        }
     }
 }

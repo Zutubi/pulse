@@ -7,6 +7,7 @@ import java.util.Map;
 
 import com.zutubi.validation.annotations.Required;
 import com.zutubi.pulse.prototype.record.SymbolicName;
+import com.zutubi.prototype.annotation.ID;
 
 /**
  *
@@ -127,6 +128,7 @@ public class TypeRegistryTest extends TestCase
     @SymbolicName("mockName")
     public static class Mock
     {
+        @ID
         private String name;
 
         private List<String> names;
@@ -137,7 +139,6 @@ public class TypeRegistryTest extends TestCase
 
         private Map<String, Mock> mocks;
 
-        @Required()
         public String getName()
         {
             return name;

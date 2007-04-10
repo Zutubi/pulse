@@ -233,6 +233,14 @@ public class CompositeType extends AbstractType implements ComplexType
         return path;
     }
 
+    public String save(String path, String baseName, Record record, RecordManager recordManager)
+    {
+        // Nothing special to do, let the record manager figure it out.
+        String newPath = PathUtils.getPath(path, baseName);
+        recordManager.insertOrUpdate(newPath, record);
+        return newPath;
+    }
+
     public MutableRecord createNewRecord()
     {
         MutableRecordImpl record = new MutableRecordImpl();

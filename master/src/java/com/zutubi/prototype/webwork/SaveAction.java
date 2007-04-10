@@ -49,12 +49,14 @@ public class SaveAction extends PrototypeSupport
 
         record = PrototypeUtils.toRecord(type, ActionContext.getContext().getParameters());
 
-        if (!configurationPersistenceManager.validate(PathUtils.getParentPath(path), PathUtils.getBaseName(path), record, new XWorkValidationAdapter(this)))
+        String parentPath = PathUtils.getParentPath(path);
+        String baseName = PathUtils.getBaseName(path);
+        if (!configurationPersistenceManager.validate(parentPath, baseName, record, new XWorkValidationAdapter(this)))
         {
             return doRender();
         }
 
-        configurationPersistenceManager.saveRecord(path, record);
+        path = configurationPersistenceManager.saveRecord(parentPath, baseName, record);
 
         return doRender();
     }
