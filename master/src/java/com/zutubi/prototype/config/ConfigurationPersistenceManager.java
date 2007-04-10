@@ -9,11 +9,7 @@ import com.zutubi.pulse.util.logging.Logger;
 import com.zutubi.pulse.validation.MessagesTextProvider;
 import com.zutubi.validation.*;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  *
@@ -328,6 +324,29 @@ public class ConfigurationPersistenceManager
     public Object getInstance(String path)
     {
         return instances.get(path);
+    }
+
+    public Object resolveReference(String fromPath, String toPath) throws TypeException
+    {
+        Object instance = getInstance(toPath);
+        if(instance == null)
+        {
+            Record record = getRecord(toPath);
+            if(record == null)
+            {
+                throw new TypeException("Broken reference from '" + fromPath + "' to '" + toPath + "'");
+            }
+            
+            Type type = typeRegistry.getType(record.getSymbolicName());
+            if(type == null)
+            {
+                throw new TypeException("Reference to unrecognised type '" + record.getSymbolicName() + "'");
+            }
+
+            instance = type.instantiate(toPath, record);
+        }
+
+        return instance;
     }
 
     public void putInstance(String path, Object instance)
