@@ -97,7 +97,7 @@ public class MutableRecordImpl implements MutableRecord
             Object value = entry.getValue();
             if (deep && value instanceof Record)
             {
-                value = ((Record) value).copy(deep);
+                value = ((Record) value).copy(true);
             }
             clone.put(key, value);
         }

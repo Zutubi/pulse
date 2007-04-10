@@ -38,7 +38,7 @@ public class DefaultRecordSerialiser implements RecordSerialiser
         }
     }
 
-    public void serialise(String path, MutableRecord record, boolean deep)
+    public void serialise(String path, Record record, boolean deep)
     {
         File storageDir = new File(baseDirectory, path);
         if (!storageDir.isDirectory())
@@ -91,7 +91,7 @@ public class DefaultRecordSerialiser implements RecordSerialiser
         return new File(dir, "record.xml");
     }
 
-    private Document recordToDocument(MutableRecord record)
+    private Document recordToDocument(Record record)
     {
         Element root = new Element(ELEMENT_RECORD);
         Document doc = new Document(root);

@@ -32,6 +32,4 @@ public interface MutableRecord extends Record
     Object remove(String key);
 
     void update(Record record);
-
-    Set<String> simpleKeySet();
 }
