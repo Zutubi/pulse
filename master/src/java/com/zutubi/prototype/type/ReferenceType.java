@@ -27,6 +27,14 @@ public class ReferenceType extends SimpleType implements Type
     public Object instantiate(String path, Object data) throws TypeException
     {
         String referencePath = (String) data;
-        return configurationPersistenceManager.resolveReference(path, referencePath);
+        if(referencePath.length() > 0)
+        {
+            return configurationPersistenceManager.resolveReference(path, referencePath);
+        }
+        else
+        {
+            // Empty string == null reference.
+            return null;
+        }
     }
 }

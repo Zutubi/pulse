@@ -5,7 +5,6 @@ import com.zutubi.prototype.config.ConfigurationPersistenceManager;
 import com.zutubi.prototype.type.record.PathUtils;
 import com.zutubi.prototype.type.record.Record;
 import com.zutubi.prototype.type.record.RecordManager;
-import com.zutubi.prototype.type.record.MutableRecord;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -54,7 +53,7 @@ public class MapType extends CollectionType
                     type = typeRegistry.getType(childRecord.getSymbolicName());
                     if(type == null)
                     {
-                        throw new TypeException("Reference to unrecorgnised type '" + childRecord.getSymbolicName() + "'");
+                        throw new TypeException("Reference to unrecognised type '" + childRecord.getSymbolicName() + "'");
                     }
                 }
 

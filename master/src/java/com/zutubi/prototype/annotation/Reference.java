@@ -1,6 +1,8 @@
 package com.zutubi.prototype.annotation;
 
 import com.zutubi.prototype.OptionProvider;
+import com.zutubi.prototype.config.DefaultReferenceCleanupTaskProvider;
+import com.zutubi.prototype.config.ReferenceCleanupTaskProvider;
 import com.zutubi.pulse.form.FieldType;
 import com.zutubi.pulse.prototype.config.DefaultReferenceOptionProvider;
 
@@ -21,4 +23,5 @@ import java.lang.annotation.Target;
 public @interface Reference
 {
     Class<? extends OptionProvider> optionProvider() default DefaultReferenceOptionProvider.class;
+    Class<? extends ReferenceCleanupTaskProvider> cleanupTaskProvider() default DefaultReferenceCleanupTaskProvider.class;
 }

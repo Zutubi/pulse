@@ -1,12 +1,17 @@
 package com.zutubi.prototype.config;
 
+import com.zutubi.prototype.annotation.Reference;
 import com.zutubi.prototype.type.*;
 import com.zutubi.prototype.type.record.*;
-import com.zutubi.pulse.util.logging.Logger;
+import com.zutubi.pulse.core.ObjectFactory;
 import com.zutubi.pulse.util.CollectionUtils;
 import com.zutubi.pulse.util.Mapping;
+import com.zutubi.pulse.util.logging.Logger;
 import com.zutubi.pulse.validation.MessagesTextProvider;
-import com.zutubi.validation.*;
+import com.zutubi.validation.ValidationAware;
+import com.zutubi.validation.ValidationContext;
+import com.zutubi.validation.ValidationException;
+import com.zutubi.validation.ValidationManager;
 
 import java.util.*;
 
@@ -23,6 +28,7 @@ public class ConfigurationPersistenceManager
 
     private RecordManager recordManager;
     private ValidationManager validationManager;
+    private ObjectFactory objectFactory;
 
     private Map<String, ScopeInfo> rootScopes = new HashMap<String, ScopeInfo>();
     /**
@@ -527,10 +533,60 @@ public class ConfigurationPersistenceManager
         }
     }
 
+    public ReferenceCleanupTask getCleanupTasks(String path)
+    {
+        DeleteReferenceCleanupTask result = new DeleteReferenceCleanupTask(path, recordManager);
+        List<String> index = references.get(path);
+        if(index != null)
+        {
+            for(String referencingPath: index)
+            {
+                ReferenceCleanupTaskProvider provider = getCleanupTaskProvider(referencingPath);
+                if (provider != null)
+                {
+                    ReferenceCleanupTask task = provider.getAction(path, referencingPath);
+                    if(task != null)
+                    {
+                        result.addCascaded(task);
+                    }
+                }
+            }
+        }
+
+        return result;
+    }
+
+    private ReferenceCleanupTaskProvider getCleanupTaskProvider(String referencingPath)
+    {
+        String parentPath = PathUtils.getParentPath(referencingPath);
+        String baseName = PathUtils.getBaseName(referencingPath);
+
+        CompositeType parentType = (CompositeType) getType(parentPath);
+        TypeProperty property = parentType.getProperty(baseName);
+        Reference ref = property.getAnnotation(Reference.class);
+        Class<? extends ReferenceCleanupTaskProvider> providerClass = ref.cleanupTaskProvider();
+        try
+        {
+            return objectFactory.buildBean(providerClass);
+        }
+        catch (Exception e)
+        {
+            LOG.severe("Unable to instantiate reference cleanup task provider of class '" + ref.cleanupTaskProvider().getName() + "': " + e.getMessage(), e);
+            try
+            {
+                return objectFactory.buildBean(DefaultReferenceCleanupTaskProvider.class);
+            }
+            catch (Exception omg)
+            {
+                LOG.severe("Unable to instantiate default reference cleanup task provider: " + e.getMessage(), e);
+                return null;
+            }
+        }
+    }
+
     public void delete(String path)
     {
-        // FIXME handle references to this path
-        recordManager.delete(path);
+        getCleanupTasks(path).execute();
         refreshInstances();
     }
 
@@ -547,6 +603,11 @@ public class ConfigurationPersistenceManager
     public void setValidationManager(ValidationManager validationManager)
     {
         this.validationManager = validationManager;
+    }
+
+    public void setObjectFactory(ObjectFactory objectFactory)
+    {
+        this.objectFactory = objectFactory;
     }
 
 

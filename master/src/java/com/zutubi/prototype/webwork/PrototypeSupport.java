@@ -31,6 +31,7 @@ public class PrototypeSupport extends ActionSupport
     private String finish;
     private String save;
     private String check;
+    private String confirm;
     private String delete;
     private String submitField;
 
@@ -80,6 +81,23 @@ public class PrototypeSupport extends ActionSupport
         }
     }
 
+    public void setConfirm(String confirm)
+    {
+        this.confirm = confirm;
+    }
+
+    public boolean isConfirmSelected()
+    {
+        if (TextUtils.stringSet(submitField))
+        {
+            return submitField.equals("confirm");
+        }
+        else
+        {
+            return TextUtils.stringSet(confirm);
+        }
+    }
+
     public void setDelete(String delete)
     {
         this.delete = delete;
@@ -99,7 +117,7 @@ public class PrototypeSupport extends ActionSupport
 
     public void setPrevious(String previous)
     {
-        this.previous= previous;
+        this.previous = previous;
     }
 
     public boolean isPreviousSelected()
