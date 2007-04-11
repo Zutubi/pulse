@@ -5,8 +5,16 @@ import com.zutubi.prototype.config.ConfigurationPersistenceManager;
 import com.zutubi.prototype.type.record.PathUtils;
 import com.zutubi.prototype.type.record.Record;
 import com.zutubi.prototype.type.record.RecordManager;
+import com.zutubi.pulse.util.AnnotationUtils;
+import com.zutubi.pulse.util.logging.Logger;
 
+import java.beans.BeanInfo;
+import java.beans.IntrospectionException;
+import java.beans.Introspector;
+import java.beans.PropertyDescriptor;
+import java.lang.annotation.Annotation;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -15,6 +23,8 @@ import java.util.Map;
  */
 public class MapType extends CollectionType
 {
+    private static final Logger LOG = Logger.getLogger(MapType.class);
+
     private ConfigurationPersistenceManager configurationPersistenceManager;
     private String keyProperty;
 
@@ -76,20 +86,41 @@ public class MapType extends CollectionType
         }
 
         CompositeType compositeType = (CompositeType) collectionType;
-        for (TypeProperty property : compositeType.getProperties(PrimitiveType.class))
+
+        // Unfortunately we cannot use the type registry information as we
+        // are part way through registration and cyclical type structures
+        // mean that the ID property may not yet have been found.
+        Class clazz = compositeType.getClazz();
+        try
         {
-            if (property.getAnnotation(ID.class) != null)
+            BeanInfo beanInfo = Introspector.getBeanInfo(clazz);
+            for(PropertyDescriptor descriptor: beanInfo.getPropertyDescriptors())
             {
-                keyProperty = property.getName();
-                break;
+                List<Annotation> annotations = AnnotationUtils.annotationsFromProperty(descriptor);
+                for(Annotation a: annotations)
+                {
+                    if(a.annotationType() == ID.class)
+                    {
+                        keyProperty = descriptor.getName();
+                        break;
+                    }
+                }
+
+                if(keyProperty != null)
+                {
+                    break;
+                }
             }
         }
+        catch (IntrospectionException e)
+        {
+            LOG.severe(e);
+        }
 
-        // FIXME: barfs on cycles
-//        if(keyProperty == null)
-//        {
-//            throw new TypeException("Types stored in maps must have an @ID property");
-//        }
+        if(keyProperty == null)
+        {
+            throw new TypeException("Types stored in maps must have an @ID property");
+        }
     }
 
     protected String getItemKey(String path, Record collectionRecord, Record itemRecord, RecordManager recordManager)
