@@ -90,7 +90,7 @@ public class SetupWizard extends AbstractTypeWizard
 
             // make sure that we encode the password after we have a persistent user,
             // since the users id is required. This is a little awkward...
-            userManager.setPassword(admin, admin.getPassword());
+            userManager.setPassword(admin, adminConfig.getPassword());
             userManager.save(admin);
 
             // create an administrators group (for convenience)
