@@ -185,7 +185,7 @@ public class AcegiLdapManager implements LdapManager
         {
             try
             {
-                LdapUserDetails details = authenticator.authenticate(username, password);
+                LdapUserDetails details = ldapAuthenticate(authenticator, username, password);
                 String name = getStringAttribute(details, "cn", username);
                 if (name == null)
                 {
@@ -214,6 +214,15 @@ public class AcegiLdapManager implements LdapManager
         }
 
         return null;
+    }
+
+    private LdapUserDetails ldapAuthenticate(BindAuthenticator authenticator, String username, String password)
+    {
+        if(!TextUtils.stringSet(password))
+        {
+            throw new BadCredentialsException("LDAP users cannot have an empty password");
+        }
+        return authenticator.authenticate(username, password);
     }
 
     public void addLdapRoles(AcegiUser user)
@@ -314,7 +323,7 @@ public class AcegiLdapManager implements LdapManager
         contextFactory.newInitialDirContext();
 
         BindAuthenticator authenticator = createAuthenticator(userBase, userFilter, contextFactory);
-        LdapUserDetails details = authenticator.authenticate(testLogin, testPassword);
+        LdapUserDetails details = ldapAuthenticate(authenticator, testLogin, testPassword);
 
         if(TextUtils.stringSet(groupDn))
         {
