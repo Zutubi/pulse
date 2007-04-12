@@ -21,6 +21,7 @@ public class PulseFileLoader extends FileLoader
     PulseFileLoader()
     {
 
+        register("register", Register.class);
     }
 
     public List<ResourceRequirement> loadRequiredResources(String pulseFile, String recipe) throws PulseException
