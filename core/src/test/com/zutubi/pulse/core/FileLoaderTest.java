@@ -97,17 +97,6 @@ public class FileLoaderTest extends FileLoaderTestBase
         assertNotNull(pf.getRecipe("default"));
     }
 
-    public void testScope() throws Exception
-    {
-        PulseFile pf = new PulseFile();
-        loader.load(getInput("testScope"), pf);
-
-        Recipe recipe = pf.getRecipe("r1");
-        assertNotNull(recipe);
-        assertNotNull(recipe.getCommand("scope1"));
-        assertNotNull(recipe.getCommand("scope2"));
-    }
-
     public void testScopeTopLevel() throws Exception
     {
         PulseFile pf = new PulseFile();
