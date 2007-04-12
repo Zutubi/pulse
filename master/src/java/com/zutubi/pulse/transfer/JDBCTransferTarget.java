@@ -145,7 +145,7 @@ public class JDBCTransferTarget implements TransferTarget
             Table table = (Table) tableMappings.next();
             if (JDBCUtils.tableExists(connection, table.getName()))
             {
-                throw new TransferException("Unable to create the new database schema. The table '"+table.getName()+"' " +
+                throw new JDBCTransferException("Unable to create the new database schema. The table '"+table.getName()+"' " +
                         "already exists. Please ensure that you are importing into a blank database.");
             }
         }
