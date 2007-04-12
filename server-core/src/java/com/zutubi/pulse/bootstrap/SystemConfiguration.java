@@ -39,6 +39,8 @@ public interface SystemConfiguration
      */
     String getContextPath();
 
+    String getContextPathNormalised();
+
     void setDataPath(String path);
 
     String getDataPath();

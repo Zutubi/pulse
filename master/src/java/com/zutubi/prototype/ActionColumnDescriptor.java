@@ -3,9 +3,9 @@ package com.zutubi.prototype;
 import com.zutubi.prototype.model.Column;
 import com.zutubi.prototype.type.record.Record;
 
+import java.util.Map;
+
 /**
- *
- *
  */
 public class ActionColumnDescriptor extends ColumnDescriptor
 {
@@ -18,7 +18,7 @@ public class ActionColumnDescriptor extends ColumnDescriptor
     {
         setName("actions");
         setColspan(colspan);
-        getParameters().put("label", actionName);
+        getParameters().put("value", actionName);
         getParameters().put("type", "action");
     }
 
@@ -28,6 +28,5 @@ public class ActionColumnDescriptor extends ColumnDescriptor
         column.addAll(getParameters());
         column.setSpan(colspan);
         return column;
-
     }
 }

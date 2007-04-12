@@ -96,6 +96,22 @@ public class PathUtils
         return StringUtils.join(SEPARATOR, true, true, pathElements);
     }
 
+    public static String getPath(int beginIndex, String... pathElements)
+    {
+        if(beginIndex == 0)
+        {
+            return getPath(pathElements);
+        }
+        else if(beginIndex >= pathElements.length)
+        {
+            return "";
+        }
+
+        String [] newElements = new String[pathElements.length - beginIndex];
+        System.arraycopy(pathElements, beginIndex, newElements, 0, newElements.length);
+        return getPath(newElements);
+    }
+
     public static boolean prefixMatches(String candidate, String prefix)
     {
         String[] candidateParts = getPathElements(candidate);

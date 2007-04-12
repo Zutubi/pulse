@@ -2,11 +2,10 @@
 <body>
 
 <h1>Test index</h1>
-
 <ul>
-    <li><a href="configuration.action?path=global">global</a></li>
-    <li><a href="configuration.action?path=project">project</a></li>
-    <li><a href="wizard.action?path=project">new project wizard</a></li>
+    <li><a href="#url("action=display" "path=global")">global</a></li>
+    <li><a href="#url("action=display" "path=project")">project</a></li>
+    <li><a href="#url("action=wizard" "path=project")">new project wizard</a></li>
 </ul>
 
 </body>

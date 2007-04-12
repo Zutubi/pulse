@@ -1,7 +1,7 @@
 #macro(showTask $cleanupTask $indent)
     <tr>
         <td class="content">
-            $indent <a href="configuration.action?path=$cleanupTask.affectedPath">$!webwork.htmlEncode($cleanupTask.affectedPath)</a>
+            $indent <a href="#url("action=display" "path=$cleanupTask.affectedPath")">$!webwork.htmlEncode($cleanupTask.affectedPath)</a>
         </td>
         <td class="content">
             $cleanupTask.getSummary($textProvider)
@@ -17,20 +17,7 @@
 
 #set($config = $action.configuration)
 
-<div>
-    #set($breadcrumbPath = "")
-    #set($sep = "")
-    #foreach($pathElement in $config.parentPathElements)
-        #if($breadcrumbPath.length() > 0)
-            #set($breadcrumbPath = "${breadcrumbPath}/${pathElement}")
-        #else
-            #set($breadcrumbPath = "${pathElement}")
-        #end
-        ${sep} <a href="configuration.action?path=${breadcrumbPath}">${pathElement}</a>
-        #set($sep = ">")
-    #end
-    ${sep} $!action.configuration.currentPath
-</div>
+#parse("prototype/breadcrumbs.vm")
 
 <h2>#wwtext("name=confirm.delete")</h2>
 
@@ -38,7 +25,7 @@
     #wwtext("name=confirm.delete.blurb")
 </p>
 
-<form id="confirm.form" method="post" action="delete.action">
+<form id="confirm.form" method="post" action="#url("action=delete")">
     <input type="hidden" name="path" value="$path"></input>
     <table class="form">
         <tr>

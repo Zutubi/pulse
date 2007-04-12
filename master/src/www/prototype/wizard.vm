@@ -3,7 +3,7 @@
 
     <h2>wizard title...</h2>
     <p>
-        #pwizard("path=$action.path" "action=wizard.action?path=$action.path")
+        #pwizard("path=$action.path")
     </p>
 
 </body>

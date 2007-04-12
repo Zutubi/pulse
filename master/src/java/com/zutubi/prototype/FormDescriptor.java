@@ -4,7 +4,7 @@ import com.zutubi.prototype.model.Field;
 import com.zutubi.prototype.model.Form;
 import com.zutubi.prototype.model.SubmitField;
 import com.zutubi.prototype.type.record.Record;
-import com.zutubi.prototype.type.record.TemplateRecord;
+import com.zutubi.prototype.webwork.PrototypeUtils;
 import com.zutubi.pulse.util.CollectionUtils;
 import com.zutubi.pulse.util.Predicate;
 
@@ -21,17 +21,22 @@ import java.util.Collections;
  */
 public class FormDescriptor implements Descriptor
 {
-    private List<FieldDescriptor> fieldDescriptors = new LinkedList<FieldDescriptor>();
+    private static final String DEFAULT_ACTION = "save";
 
     private String id;
-
-    private Map<String, Object> parameters = new HashMap<String, Object>();
-
+    private String action = DEFAULT_ACTION;
+    private List<FieldDescriptor> fieldDescriptors = new LinkedList<FieldDescriptor>();
     private List<String> actions = new LinkedList<String>();
+    private Map<String, Object> parameters = new HashMap<String, Object>();
 
     public void setId(String id)
     {
         this.id = id;
+    }
+
+    public void setAction(String action)
+    {
+        this.action = action;
     }
 
     public void add(FieldDescriptor descriptor)
@@ -94,7 +99,8 @@ public class FormDescriptor implements Descriptor
     public Form instantiate(String path, Record record)
     {
         Form form = new Form();
-        form.setId(id);    
+        form.setId(id);
+        form.setAction(PrototypeUtils.getConfigURL(action, path, null));
         form.addAll(getParameters());
         List<String> fieldOrder = evaluateFieldOrder();
 

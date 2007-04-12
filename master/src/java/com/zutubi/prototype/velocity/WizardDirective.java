@@ -41,7 +41,6 @@ import java.util.Map;
  */
 public class WizardDirective extends AbstractDirective
 {
-    private String action;
     private String path;
     private boolean decorate = true;
 
@@ -100,6 +99,7 @@ public class WizardDirective extends AbstractDirective
 
             // generate the form.
             FormDescriptor formDescriptor = state.createFormDescriptor(formDescriptorFactory, path);
+            formDescriptor.setAction("wizard");
 
             // need to decorate the form a little bit to handle the fact that it is being rendered as a wizard.
             decorate(formDescriptor);
@@ -112,7 +112,6 @@ public class WizardDirective extends AbstractDirective
             // maybe the data map needs to be merged first, external to this
 
             Form form = formDescriptor.instantiate(path, state.getRecord());
-            form.setAction(action);
 
             context.put("form", form);
             context.put("i18nText", new GetTextMethod(stateMessages, wizardMessages));
@@ -170,7 +169,6 @@ public class WizardDirective extends AbstractDirective
 
     public void setAction(String action)
     {
-        this.action = action;
     }
 
     public void setPath(String path)

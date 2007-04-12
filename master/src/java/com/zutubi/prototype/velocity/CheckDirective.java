@@ -81,7 +81,8 @@ public class CheckDirective extends PrototypeDirective
 
             String path = lookupPath();
             FormDescriptor formDescriptor = formDescriptorFactory.createDescriptor(path, ctype.getSymbolicName());
-
+            formDescriptor.setAction("check");
+            
             // decorate the form to include the symbolic name as a hidden field. This is necessary for
             // configuration. This is probably not the best place for this, but until i think of a better location,
             // here it stays.
@@ -124,7 +125,6 @@ public class CheckDirective extends PrototypeDirective
             Record data = (Record) stack.findValue("checkRecord");
 
             Form form = formDescriptor.instantiate(path, data);
-            form.setAction(action);
             context.put("form", form);
 
             try

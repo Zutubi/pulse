@@ -1,5 +1,7 @@
 package com.zutubi.prototype.model;
 
+import com.zutubi.prototype.webwork.PrototypeUtils;
+
 import java.util.List;
 import java.util.LinkedList;
 import java.util.Collections;

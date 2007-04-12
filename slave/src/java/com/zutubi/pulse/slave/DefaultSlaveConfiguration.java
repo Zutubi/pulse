@@ -88,6 +88,21 @@ public class DefaultSlaveConfiguration implements SlaveConfiguration, SystemConf
         return config.getProperty(CONTEXT_PATH, "/");
     }
 
+    public String getContextPathNormalised()
+    {
+        // TODO share with master.  more of this whole class, preferrably
+        String contextPath = getContextPath();
+        if(!contextPath.startsWith("/"))
+        {
+            contextPath = "/" + contextPath;
+        }
+        if(contextPath.endsWith("/"))
+        {
+            contextPath = contextPath.substring(0, contextPath.length() - 1);
+        }
+        return contextPath;
+    }
+
     public void setDataPath(String path)
     {
         config.setProperty(PULSE_DATA, path);

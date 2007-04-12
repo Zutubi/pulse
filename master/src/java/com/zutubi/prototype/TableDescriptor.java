@@ -15,10 +15,7 @@ import java.util.Map;
 public class TableDescriptor implements Descriptor
 {
     private String name;
-
     private Map<String, Object> parameters = new HashMap<String, Object>();
-
-    private List<ColumnDescriptor> columnDescriptors = new LinkedList<ColumnDescriptor>();
     private List<RowDescriptor> rowDescriptors = new LinkedList<RowDescriptor>();
 
     public void addParameter(String key, Object value)
@@ -56,16 +53,6 @@ public class TableDescriptor implements Descriptor
     public void setName(String name)
     {
         this.name = name;
-    }
-
-    public void addDescriptor(ColumnDescriptor columnDescriptor)
-    {
-        columnDescriptors.add(columnDescriptor);
-    }
-
-    public List<ColumnDescriptor> getColumnDescriptors()
-    {
-        return columnDescriptors;
     }
 
     public void addDescriptor(RowDescriptor rowDescriptor)

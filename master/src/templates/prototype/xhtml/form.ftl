@@ -1,6 +1,6 @@
 <#-- render form -->
 <#if form?exists>
-<form id="${form.id}" method="post" action="${form.action}">
+<form id="${form.id}" method="post" action="${base}/${form.action}">
 
     <table class="form">
     <#list form.fields as field>

@@ -34,6 +34,7 @@ public class FreemarkerConfigurationFactoryBean implements FactoryBean
                     FREEMARKER_CONFIGURATION.setTemplateLoader(getMultiLoader());
                     FREEMARKER_CONFIGURATION.setObjectWrapper(new DefaultObjectWrapper());
                     FREEMARKER_CONFIGURATION.addAutoInclude("macro.ftl");
+                    FREEMARKER_CONFIGURATION.setSharedVariable("base", getConfigurationManager().getSystemConfig().getContextPathNormalised());
                 }
             }
         }
@@ -42,7 +43,7 @@ public class FreemarkerConfigurationFactoryBean implements FactoryBean
 
     private TemplateLoader getMultiLoader()
     {
-        MasterConfigurationManager manager = (MasterConfigurationManager) ComponentContext.getBean("configurationManager");
+        MasterConfigurationManager manager = getConfigurationManager();
 
         List<File> templateRoots = manager.getSystemPaths().getTemplateRoots();
         File userTemplateRoot = manager.getUserPaths().getUserTemplateRoot();
@@ -66,6 +67,11 @@ public class FreemarkerConfigurationFactoryBean implements FactoryBean
         }
 
         return new MultiTemplateLoader(loaders);
+    }
+
+    private MasterConfigurationManager getConfigurationManager()
+    {
+        return (MasterConfigurationManager) ComponentContext.getBean("configurationManager");
     }
 
     public Class getObjectType()

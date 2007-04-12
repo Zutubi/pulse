@@ -52,12 +52,12 @@ public class TableDescriptorFactory
         columnDescriptor.setFormatter(new AnnotationFormatter(defaultFormatter));
 
         dataRow.addDescriptor(columnDescriptor);
-        dataRow.addDescriptor(new ActionColumnDescriptor("edit"));
-        dataRow.addDescriptor(new ActionColumnDescriptor("delete"));
+        dataRow.addDescriptor(new EditColumnDescriptor());
+        dataRow.addDescriptor(new DeleteColumnDescriptor());
         tableDescriptor.addDescriptor(dataRow);
 
         RowDescriptor addRowDescriptor = new SingleRowDescriptor();
-        addRowDescriptor.addDescriptor(new ActionColumnDescriptor("add", 3));
+        addRowDescriptor.addDescriptor(new AddColumnDescriptor(3));
         tableDescriptor.addDescriptor(addRowDescriptor);
 
         return tableDescriptor;

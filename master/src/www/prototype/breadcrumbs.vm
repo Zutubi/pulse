@@ -1,0 +1,14 @@
+<div>
+#set($breadcrumbPath = "")
+#set($sep = "")
+#foreach($pathElement in $config.parentPathElements)
+    #if($breadcrumbPath.length() > 0)
+        #set($breadcrumbPath = "${breadcrumbPath}/${pathElement}")
+    #else
+        #set($breadcrumbPath = "${pathElement}")
+    #end
+    ${sep} <a href="#url("action=display" "path=${breadcrumbPath}")">${pathElement}</a>
+    #set($sep = ">")
+#end
+    ${sep} $!action.configuration.currentPath
+</div>

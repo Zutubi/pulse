@@ -41,6 +41,24 @@ public class SystemConfigurationSupport extends ConfigSupport implements SystemC
         return getProperty(CONTEXT_PATH, "/");
     }
 
+    /**
+     * @return the web app context path in a normalised form suitable for
+     *         appending further path elements like: contextPath + "/" + path
+     */
+    public String getContextPathNormalised()
+    {
+        String contextPath = getContextPath();
+        if(!contextPath.startsWith("/"))
+        {
+            contextPath = "/" + contextPath;
+        }
+        if(contextPath.endsWith("/"))
+        {
+            contextPath = contextPath.substring(0, contextPath.length() - 1);
+        }
+        return contextPath;
+    }
+
     public void setDataPath(String path)
     {
         setProperty(PULSE_DATA, path);

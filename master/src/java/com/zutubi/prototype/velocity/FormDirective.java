@@ -29,7 +29,6 @@ public class FormDirective extends PrototypeDirective
 {
     private static final Logger LOG = Logger.getLogger(FormDirective.class);
 
-    private String action;
     private FormDescriptorFactory formDescriptorFactory;
     private Configuration configuration;
 
@@ -46,16 +45,6 @@ public class FormDirective extends PrototypeDirective
     public int getType()
     {
         return LINE;
-    }
-
-    /**
-     * The generated forms action attribute.
-     *
-     * @param action attribute
-     */
-    public void setAction(String action)
-    {
-        this.action = action;
     }
 
     public boolean render(InternalContextAdapter contextAdapter, Writer writer, Node node) throws IOException, ResourceNotFoundException, ParseErrorException
@@ -87,7 +76,6 @@ public class FormDirective extends PrototypeDirective
             Map<String, Object> context = initialiseContext(type.getClazz());
 
             Form form = formDescriptor.instantiate(lookupPath(), data);
-            form.setAction(action);
             context.put("form", form);
 
             try

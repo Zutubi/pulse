@@ -3,20 +3,7 @@
 
 #set($config = $action.configuration)
 
-<div>
-    #set($breadcrumbPath = "")
-    #set($sep = "")
-    #foreach($pathElement in $config.parentPathElements)
-        #if($breadcrumbPath.length() > 0)
-            #set($breadcrumbPath = "${breadcrumbPath}/${pathElement}")
-        #else
-            #set($breadcrumbPath = "${pathElement}")
-        #end
-        ${sep} <a href="configuration.action?path=${breadcrumbPath}">${pathElement}</a>
-        #set($sep = ">")
-    #end
-    ${sep} $!action.configuration.currentPath
-</div>
+#parse("prototype/breadcrumbs.vm")
 
 <h2>#i18n("key=label")</h2>
 <div style="color:gray">

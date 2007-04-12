@@ -4,6 +4,8 @@ import com.zutubi.prototype.type.CompositeType;
 import com.zutubi.prototype.type.TypeProperty;
 import com.zutubi.prototype.type.record.MutableRecord;
 import com.zutubi.prototype.type.record.Record;
+import com.zutubi.prototype.type.record.PathUtils;
+import com.zutubi.pulse.util.StringUtils;
 
 import java.util.Collection;
 import java.util.Map;
@@ -14,6 +16,21 @@ import java.util.Map;
  */
 public class PrototypeUtils
 {
+    public static String getConfigURL(String action, String path, String params)
+    {
+        String result = StringUtils.join("/", true, true, ConfigurationActionMapper.NAMESPACE, action);
+        if(path != null)
+        {
+            result = StringUtils.join("/", true, true, result, path);
+        }
+        result = PathUtils.normalizePath(result);
+        if(params != null)
+        {
+            result = result + "?" + params;
+        }
+        return result;
+    }
+
     /**
      * Convert the parameters from the HTTP post into a record, according to the type definition.
      * <p/>
