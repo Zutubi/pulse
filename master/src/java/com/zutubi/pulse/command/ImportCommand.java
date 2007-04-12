@@ -1,5 +1,7 @@
 package com.zutubi.pulse.command;
 
+import com.zutubi.pulse.transfer.TransferAPI;
+import com.zutubi.pulse.transfer.TransferException;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.ParseException;
@@ -9,9 +11,6 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
-
-import com.zutubi.pulse.transfer.TransferAPI;
-import com.zutubi.pulse.transfer.JDBCTransferException;
 
 /**
  */
@@ -42,7 +41,7 @@ public class ImportCommand extends DataCommand
         {
             transferAPI.restore(configuration, inFile, dataSource);
         }
-        catch (JDBCTransferException e)
+        catch (TransferException e)
         {
             System.err.println("Error importing data from database located at "+ databaseConfig.getUrl() +".  Trace below:");
             e.printStackTrace(System.err);
