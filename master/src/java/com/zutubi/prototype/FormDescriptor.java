@@ -100,7 +100,7 @@ public class FormDescriptor implements Descriptor
     {
         Form form = new Form();
         form.setId(id);
-        form.setAction(PrototypeUtils.getConfigURL(action, path, null));
+        form.setAction(PrototypeUtils.getConfigURL(path, action, null));
         form.addAll(getParameters());
         List<String> fieldOrder = evaluateFieldOrder();
 

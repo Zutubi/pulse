@@ -3,7 +3,7 @@
 
 #set($config = $action.configuration)
 
-#parse("prototype/breadcrumbs.vm")
+#parse("config/breadcrumbs.vm")
 
 <h2>#i18n("key=label")</h2>
 <div style="color:gray">

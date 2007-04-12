@@ -1376,7 +1376,7 @@
 
     </package>
 
-    <package name="prototype" namespace="/prototype" extends="webwork-default-package">
+    <package name="config" namespace="/config" extends="webwork-default-package">
         <default-interceptor-ref name="completeStack"/>
 
         <action name="index" class="com.zutubi.pulse.web.ActionSupport">
@@ -1387,8 +1387,8 @@
             <interceptor-ref name="prototypeWizardStack"/>
             <result name="step" type="velocity">wizard.vm</result>
             <result name="input" type="velocity">wizard.vm</result>
-            <result name="cancel" type="redirect">display/${path}/</result>
-            <result name="success" type="redirect">display/${path}/</result>
+            <result name="cancel" type="redirect">${path}/</result>
+            <result name="success" type="redirect">${path}/</result>
         </action>
 
         <action name="display" class="com.zutubi.prototype.webwork.DisplayAction">
@@ -1399,7 +1399,7 @@
         <action name="save" class="com.zutubi.prototype.webwork.SaveAction">
             <result name="composite" type="velocity">composite.vm</result>
             <result name="map" type="velocity">map.vm</result>
-            <result name="cancel" type="redirect">display/${path}/</result>
+            <result name="cancel" type="redirect">${path}/</result>
         </action>
 
         <action name="check" class="com.zutubi.prototype.webwork.CheckAction">
@@ -1409,8 +1409,8 @@
 
         <action name="delete" class="com.zutubi.prototype.webwork.DeleteAction">
             <result name="confirm" type="velocity">confirm.vm</result>
-            <result name="success" type="redirect">display/${path}</result>
-            <result name="cancel" type="redirect">display/${path}</result>
+            <result name="success" type="redirect">${path}</result>
+            <result name="cancel" type="redirect">${path}</result>
         </action>
 
     </package>

@@ -209,7 +209,7 @@
 
     <servlet-mapping>
         <servlet-name>webwork</servlet-name>
-        <url-pattern>/prototype/*</url-pattern>
+        <url-pattern>/config/*</url-pattern>
     </servlet-mapping>
 
     <servlet-mapping>

@@ -66,7 +66,7 @@ public class URLDirective extends PrototypeDirective
             Map params = createPropertyMap(context, node);
             wireParams(params);
 
-            writer.write(StringUtils.join("/", true, true, configurationManager.getSystemConfig().getContextPath(), PrototypeUtils.getConfigURL(action, path, null)));
+            writer.write(StringUtils.join("/", true, true, configurationManager.getSystemConfig().getContextPath(), PrototypeUtils.getConfigURL(path, action, null)));
 
             return true;
         }

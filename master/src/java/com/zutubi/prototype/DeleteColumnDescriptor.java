@@ -24,7 +24,7 @@ public class DeleteColumnDescriptor extends ActionColumnDescriptor
     public Column instantiate(String path, Record value)
     {
         Column column = super.instantiate(path, value);
-        column.setLink(PrototypeUtils.getConfigURL("delete", path, "submitField=confirm"));
+        column.setLink(PrototypeUtils.getConfigURL(path, "delete", "confirm"));
         return column;
     }
 }

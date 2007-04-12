@@ -24,7 +24,7 @@ public class EditColumnDescriptor extends ActionColumnDescriptor
     public Column instantiate(String path, Record value)
     {
         Column column = super.instantiate(path, value);
-        column.setLink(PrototypeUtils.getConfigURL("display", path, null));
+        column.setLink(PrototypeUtils.getConfigURL(path, "display", null));
         return column;
     }
 }

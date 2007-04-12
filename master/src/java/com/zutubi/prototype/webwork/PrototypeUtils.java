@@ -16,18 +16,25 @@ import java.util.Map;
  */
 public class PrototypeUtils
 {
-    public static String getConfigURL(String action, String path, String params)
+    public static String getConfigURL(String path, String action, String submitField)
     {
-        String result = StringUtils.join("/", true, true, ConfigurationActionMapper.NAMESPACE, action);
+        String result = ConfigurationActionMapper.NAMESPACE;
         if(path != null)
         {
             result = StringUtils.join("/", true, true, result, path);
         }
         result = PathUtils.normalizePath(result);
-        if(params != null)
+
+        if(action != null && !action.equals("display") || submitField != null)
         {
-            result = result + "?" + params;
+            result = result + "?" + action;
         }
+
+        if(submitField != null)
+        {
+            result = result + "=" + submitField;
+        }
+        
         return result;
     }
 
