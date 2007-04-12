@@ -73,12 +73,12 @@ public class LatestBuildFileObject extends AbstractPulseFileObject implements Ad
     {
         try
         {
-            ProjectProvider provider = (ProjectProvider) getAncestor(ProjectProvider.class);
+            ProjectProvider provider = getAncestor(ProjectProvider.class);
             if (provider != null)
             {
                 Project project = provider.getProject();
 
-                BuildSpecificationProvider buildSpecProvider = (BuildSpecificationProvider) getAncestor(BuildSpecificationProvider.class);
+                BuildSpecificationProvider buildSpecProvider = getAncestor(BuildSpecificationProvider.class);
                 if (buildSpecProvider != null)
                 {
                     return buildManager.getLatestBuildResult(buildSpecProvider.getBuildSpecification());

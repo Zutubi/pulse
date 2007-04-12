@@ -29,14 +29,20 @@ public class BuildFileObject extends AbstractPulseFileObject implements BuildRes
                     new Object[]{fileName, pfs}
             );
         }
-        if (name.equals("artifacts"))
+        else if (name.equals("artifacts"))
         {
             return objectFactory.buildBean(ArtifactsContextFileObject.class,
                     new Class[]{FileName.class, AbstractFileSystem.class},
                     new Object[]{fileName, pfs}
             );
         }
-        return null;
+        else
+        {
+            return objectFactory.buildBean(NamedStageFileObject.class,
+                    new Class[]{FileName.class, String.class, AbstractFileSystem.class},
+                    new Object[]{fileName, name, pfs}
+            );
+        }
     }
 
     protected FileType doGetType() throws Exception
