@@ -1,8 +1,8 @@
 package com.zutubi.prototype.type;
 
-import com.zutubi.pulse.form.squeezer.SqueezeException;
-import com.zutubi.pulse.form.squeezer.Squeezers;
-import com.zutubi.pulse.form.squeezer.TypeSqueezer;
+import com.zutubi.pulse.prototype.squeezer.SqueezeException;
+import com.zutubi.pulse.prototype.squeezer.Squeezers;
+import com.zutubi.pulse.prototype.squeezer.TypeSqueezer;
 
 /**
  *

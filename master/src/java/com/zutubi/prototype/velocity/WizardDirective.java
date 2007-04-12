@@ -43,6 +43,7 @@ public class WizardDirective extends AbstractDirective
 {
     private String action;
     private String path;
+    private boolean decorate = true;
 
     private FormDescriptorFactory formDescriptorFactory;
 
@@ -116,6 +117,7 @@ public class WizardDirective extends AbstractDirective
             context.put("form", form);
             context.put("i18nText", new GetTextMethod(stateMessages, wizardMessages));
             context.put("path", path);
+            context.put("decorate", decorate);
 
             com.zutubi.prototype.model.Wizard wizard = new com.zutubi.prototype.model.Wizard();
             wizard.setStepCount(wizardInstance.getStateCount());
@@ -174,6 +176,11 @@ public class WizardDirective extends AbstractDirective
     public void setPath(String path)
     {
         this.path = path;
+    }
+
+    public void setDecorate(boolean decorate)
+    {
+        this.decorate = decorate;
     }
 
     public void setFormDescriptorFactory(FormDescriptorFactory formDescriptorFactory)

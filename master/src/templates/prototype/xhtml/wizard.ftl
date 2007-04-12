@@ -3,6 +3,7 @@
 <link rel="stylesheet" type="text/css" href="/css/prototype.css" media="screen"/>
 
 <#-- TODO: review the css classes used here. -->
+<#if decorate == true>
 <table>
     <tr>
         <td valign="top" class="wizardsteps">
@@ -24,4 +25,7 @@
         </td>
     </tr>
 </table>
+<#else>
+    <#include "form.ftl"/>
+</#if>
 

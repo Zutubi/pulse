@@ -15,7 +15,7 @@ public class ServerSettingsForm extends BaseForm
 
     public String getFormName()
     {
-        return "server.settings";
+        return "com.zutubi.pulse.prototype.config.setup.ServerSettingsConfiguration";
     }
 
     public String[] getFieldNames()

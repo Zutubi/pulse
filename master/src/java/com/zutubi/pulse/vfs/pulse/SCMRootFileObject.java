@@ -1,14 +1,10 @@
 package com.zutubi.pulse.vfs.pulse;
 
-import com.opensymphony.xwork.ActionContext;
 import com.zutubi.pulse.model.Scm;
-import com.zutubi.pulse.web.project.AddProjectWizard;
 import org.apache.commons.vfs.FileName;
 import org.apache.commons.vfs.FileSystemException;
 import org.apache.commons.vfs.FileType;
 import org.apache.commons.vfs.provider.AbstractFileSystem;
-
-import java.util.Map;
 
 /**
  * Used to browse a Pulse project's SCM.  This file object represents the
@@ -43,6 +39,7 @@ public class SCMRootFileObject extends AbstractPulseFileObject implements SCMPro
         ProjectProvider projectProvider = getAncestor(ProjectProvider.class);
         if(projectProvider.getProjectId() == 0)
         {
+/*
             // Assume project setup
             Map session = ActionContext.getContext().getSession();
             if (!session.containsKey(AddProjectWizard.class.getName()))
@@ -52,6 +49,8 @@ public class SCMRootFileObject extends AbstractPulseFileObject implements SCMPro
 
             AddProjectWizard wizard = (AddProjectWizard) session.get(AddProjectWizard.class.getName());
             return wizard.getScm();            
+*/
+            return null;
         }
         else
         {

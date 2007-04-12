@@ -15,11 +15,11 @@ public class CreateAdminForm extends BaseForm
 
     public String getFormName()
     {
-        return "admin.create";
+        return "com.zutubi.pulse.prototype.config.setup.AdminUserConfiguration";
     }
 
     public String[] getFieldNames()
     {
-        return new String[]{"admin.login", "admin.name", "admin.password", "confirm"};
+        return new String[]{"login", "name", "password", "confirm"};
     }
 }

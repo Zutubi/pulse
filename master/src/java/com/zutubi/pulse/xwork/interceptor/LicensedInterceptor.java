@@ -8,7 +8,6 @@ import com.opensymphony.xwork.util.LocalizedTextUtil;
 import com.zutubi.pulse.license.LicenseAnnotationAttributes;
 import com.zutubi.pulse.license.LicenseException;
 import com.zutubi.pulse.license.LicenseHolder;
-import com.zutubi.pulse.web.wizard.WizardAction;
 
 import java.lang.reflect.Method;
 import java.util.Collection;
@@ -36,10 +35,12 @@ public class LicensedInterceptor implements Interceptor
         Object target = invocation.getAction();
 
         // if the target is a WizardAction, then use the WizardClass instead.
+/*
         if (target instanceof WizardAction)
         {
             target = ((WizardAction)target).getWizard();
         }
+*/
 
         LicenseAnnotationAttributes attributes = new LicenseAnnotationAttributes();
         // check the class level attributes.

@@ -1,7 +1,7 @@
 package com.zutubi.prototype.annotation;
 
 import com.zutubi.prototype.OptionProvider;
-import com.zutubi.pulse.form.FieldType;
+import com.zutubi.pulse.prototype.FieldType;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

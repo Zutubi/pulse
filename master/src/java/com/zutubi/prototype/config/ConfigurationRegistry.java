@@ -16,8 +16,7 @@ import com.zutubi.pulse.prototype.config.admin.JabberConfiguration;
 import com.zutubi.pulse.prototype.config.admin.LDAPConfiguration;
 import com.zutubi.pulse.prototype.config.admin.LicenseKeyConfiguration;
 import com.zutubi.pulse.prototype.config.admin.LoggingConfiguration;
-
-import java.util.HashMap;
+import com.zutubi.pulse.prototype.config.setup.SetupConfiguration;
 
 /**
  *
@@ -30,6 +29,9 @@ public class ConfigurationRegistry
 
     public void init() throws TypeException
     {
+        CompositeType setupConfig = typeRegistry.register(SetupConfiguration.class);
+        configurationPersistenceManager.register("setup", setupConfig);
+
         // scm configuration
         CompositeType scmConfig = typeRegistry.register("scmConfig", ScmConfiguration.class);
         typeRegistry.register("svnConfig", SvnConfiguration.class);

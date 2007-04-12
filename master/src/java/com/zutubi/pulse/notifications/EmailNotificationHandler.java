@@ -1,9 +1,9 @@
 package com.zutubi.pulse.notifications;
 
-import com.zutubi.pulse.form.descriptor.annotation.Form;
-import com.zutubi.pulse.form.descriptor.annotation.Text;
 import com.zutubi.validation.annotations.Email;
 import com.zutubi.validation.annotations.Required;
+import com.zutubi.prototype.annotation.Text;
+import com.zutubi.prototype.annotation.Form;
 
 /**
  * <class-comment/>

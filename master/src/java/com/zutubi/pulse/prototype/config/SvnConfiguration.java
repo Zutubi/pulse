@@ -1,12 +1,10 @@
 package com.zutubi.pulse.prototype.config;
 
-import com.zutubi.pulse.form.descriptor.annotation.Summary;
 import com.zutubi.prototype.annotation.Form;
 import com.zutubi.prototype.annotation.ConfigurationCheck;
 
 /**
  */
-@Summary(fields = {"name", "url"})
 @Form(fieldOrder = { "url", "username", "password", "keyfile", "keyfilePassphrase"})
 @ConfigurationCheck(SvnConfigurationCheckHandler.class)
 public class SvnConfiguration extends ScmConfiguration

@@ -17,6 +17,7 @@
         </property>
         <property name="setupContexts">
             <list>
+                <value>classpath:/com/zutubi/pulse/bootstrap/context/formsContext.xml</value>
                 <value>classpath:/com/zutubi/pulse/bootstrap/context/userContext.xml</value>
             </list>
         </property>
@@ -25,7 +26,6 @@
                 <value>classpath:/com/zutubi/pulse/bootstrap/context/schedulingContext.xml</value>
                 <value>classpath:/com/zutubi/pulse/bootstrap/context/builderContext.xml</value>
                 <value>classpath:/com/zutubi/pulse/bootstrap/context/securityContext.xml</value>
-                <value>classpath:/com/zutubi/pulse/bootstrap/context/formsContext.xml</value>
             </list>
         </property>
         <property name="postStartupContexts">

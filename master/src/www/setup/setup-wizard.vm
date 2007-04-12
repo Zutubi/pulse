@@ -1,0 +1,10 @@
+<html>
+<body>
+
+    <h2>:: setup pulse server ::</h2>
+    <p>
+        #pwizard("path=$action.path" "action=setupWizard.action?path=$action.path" "decorate=false")
+    </p>
+
+</body>
+</html>

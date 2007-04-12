@@ -38,8 +38,6 @@
 
             <interceptor name="prepare" class="com.zutubi.pulse.xwork.interceptor.PrepareInterceptor"/>
             <interceptor name="cancel" class="com.zutubi.pulse.xwork.interceptor.CancelWorkflowInterceptor"/>
-            <interceptor name="wizard" class="com.zutubi.pulse.web.wizard.WizardInterceptor"/>
-            <interceptor name="wiz" class="com.zutubi.pulse.web.wizard.auto.WizardInterceptor"/>
             <interceptor name="prototypeWizard" class="com.zutubi.prototype.wizard.webwork.ConfigurationWizardInterceptor"/>
             <interceptor name="ajax" class="com.zutubi.pulse.xwork.interceptor.AjaxInterceptor"/>
             <interceptor name="errorHanding" class="com.zutubi.pulse.xwork.interceptor.ErrorHandlingInterceptor"/>
@@ -140,28 +138,6 @@
                 <interceptor-ref name="errorHanding"/>
             </interceptor-stack>
 
-            <interceptor-stack name="wizardStack">
-                <interceptor-ref name="hibernateSession"/>
-                <interceptor-ref name="prepare"/>
-                <interceptor-ref name="servlet-config"/>
-                <interceptor-ref name="chain"/>
-                <interceptor-ref name="model-driven"/>
-                <interceptor-ref name="fileUpload"/>
-                <interceptor-ref name="static-params"/>
-                <interceptor-ref name="wizard"/>
-                <interceptor-ref name="params"/>
-                <interceptor-ref name="licensed"/>
-                <interceptor-ref name="cancel"/>
-                <interceptor-ref name="conversionError"/>
-                <interceptor-ref name="validation">
-                    <param name="excludeMethods">input,back,cancel</param>
-                </interceptor-ref>
-                <interceptor-ref name="workflow">
-                    <param name="excludeMethods">input,back,cancel</param>
-                </interceptor-ref>
-                <interceptor-ref name="errorHanding"/>
-            </interceptor-stack>
-
             <interceptor-stack name="paramsStack">
                 <interceptor-ref name="params"/>
             </interceptor-stack>
@@ -175,28 +151,6 @@
             <interceptor-stack name="ajaxReadOnlyStack">
                 <interceptor-ref name="completeReadOnlyStack"/>
                 <interceptor-ref name="ajax"/>
-                <interceptor-ref name="errorHanding"/>
-            </interceptor-stack>
-
-            <interceptor-stack name="wizStack">
-                <interceptor-ref name="hibernateSession"/>
-                <interceptor-ref name="prepare"/>
-                <interceptor-ref name="servlet-config"/>
-                <interceptor-ref name="chain"/>
-                <interceptor-ref name="model-driven"/>
-                <interceptor-ref name="fileUpload"/>
-                <interceptor-ref name="static-params"/>
-                <interceptor-ref name="wiz"/>
-                <interceptor-ref name="params"/>
-                <interceptor-ref name="licensed"/>
-                <interceptor-ref name="cancel"/>
-                <interceptor-ref name="conversionError"/>
-                <interceptor-ref name="validation">
-                    <param name="excludeMethods">input,back,cancel</param>
-                </interceptor-ref>
-                <interceptor-ref name="workflow">
-                    <param name="excludeMethods">input,back,cancel</param>
-                </interceptor-ref>
                 <interceptor-ref name="errorHanding"/>
             </interceptor-stack>
 

@@ -3,7 +3,7 @@ package com.zutubi.prototype.annotation;
 import com.zutubi.prototype.OptionProvider;
 import com.zutubi.prototype.config.DefaultReferenceCleanupTaskProvider;
 import com.zutubi.prototype.config.ReferenceCleanupTaskProvider;
-import com.zutubi.pulse.form.FieldType;
+import com.zutubi.pulse.prototype.FieldType;
 import com.zutubi.pulse.prototype.config.DefaultReferenceOptionProvider;
 
 import java.lang.annotation.ElementType;

@@ -1,7 +1,6 @@
 package com.zutubi.pulse.notifications;
 
 import com.zutubi.validation.annotations.Required;
-import com.zutubi.pulse.form.descriptor.annotation.Text;
 
 /**
  * <class-comment/>
@@ -9,10 +8,7 @@ import com.zutubi.pulse.form.descriptor.annotation.Text;
 public interface NotificationHandler
 {
     @Required
-    @Text(size= 60)
-    String getName()
-            ;
+    String getName() ;
 
-    void setName(String name)
-            ;
+    void setName(String name) ;
 }

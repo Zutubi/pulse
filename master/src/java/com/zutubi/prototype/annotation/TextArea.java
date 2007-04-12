@@ -1,6 +1,6 @@
 package com.zutubi.prototype.annotation;
 
-import com.zutubi.pulse.form.FieldType;
+import com.zutubi.pulse.prototype.FieldType;
 
 import java.lang.annotation.Target;
 import java.lang.annotation.ElementType;

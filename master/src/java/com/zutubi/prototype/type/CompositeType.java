@@ -1,18 +1,32 @@
 package com.zutubi.prototype.type;
 
-import com.zutubi.prototype.type.record.*;
 import com.zutubi.prototype.config.ConfigurationPersistenceManager;
+import com.zutubi.prototype.type.record.MutableRecord;
+import com.zutubi.prototype.type.record.MutableRecordImpl;
+import com.zutubi.prototype.type.record.PathUtils;
+import com.zutubi.prototype.type.record.Record;
+import com.zutubi.prototype.type.record.RecordManager;
+import com.zutubi.pulse.prototype.squeezer.SqueezeException;
+import com.zutubi.pulse.prototype.squeezer.Squeezers;
+import com.zutubi.pulse.prototype.squeezer.TypeSqueezer;
 import com.zutubi.pulse.util.CollectionUtils;
 import com.zutubi.pulse.util.Mapping;
+import com.zutubi.pulse.util.logging.Logger;
 
 import java.lang.reflect.Method;
-import java.util.*;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
 
 /**
  *
  */
 public class CompositeType extends AbstractType implements ComplexType
 {
+    private static final Logger LOG = Logger.getLogger(CompositeType.class);
+
     private List<String> extensions = new LinkedList<String>();
     private Map<String, TypeProperty> properties = new HashMap<String, TypeProperty>();
     private Map<Class, List<String>> propertiesByClass = new HashMap<Class, List<String>>();
@@ -253,6 +267,30 @@ public class CompositeType extends AbstractType implements ComplexType
             record.put(propertyName, new MutableRecordImpl());
         }
         record.setSymbolicName(getSymbolicName());
+
+        // setup the default values, instantiate the configuration object and
+        // extract the default values.
+        try
+        {
+            Object defaultInstance = getClazz().newInstance();
+            for (TypeProperty property : getProperties(SimpleType.class))
+            {
+                try
+                {
+                    TypeSqueezer squeeser = Squeezers.findSqueezer(property.getClazz());
+                    record.put(property.getName(), squeeser.squeeze(property.getGetter().invoke(defaultInstance)));
+                }
+                catch (SqueezeException e)
+                {
+                    LOG.warning(e);
+                }
+            }
+        }
+        catch (Exception e)
+        {
+            LOG.warning(e);
+        }
+
         return record;
     }
 

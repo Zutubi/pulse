@@ -5,20 +5,30 @@ package com.zutubi.pulse.wizard;
  */
 public enum WizardTransition
 {
-    /**
+/*
+    */
+/**
      *
      */
+/*
     NEXT,
-    /**
+    */
+/**
      *
      */
+/*
     PREVIOUS,
-    /**
+    */
+/**
      *
      */
+/*
     FINISH,
-    /**
+    */
+/**
      * 
      */
+/*
     CANCEL
+*/
 }

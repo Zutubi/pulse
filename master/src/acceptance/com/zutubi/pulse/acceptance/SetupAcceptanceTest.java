@@ -78,25 +78,25 @@ public class SetupAcceptanceTest extends BaseAcceptanceTestCase
 
         // local host is required, and while we are at it, verify that all of the other form fields
         // are correctly returned to the user when there is a validation failure.
-        settingsForm.nextFormElements("", "some.smtp.host.com", "false", "from@some.host.com", "username", "password", "prefix", "false", null);
+        settingsForm.finishFormElements("", "some.smtp.host.com", "false", "from@some.host.com", "username", "password", "prefix", "false", null);
         settingsForm.assertFormElements("", "some.smtp.host.com", "false", "from@some.host.com", "username", "password", "prefix", "false", "25");
         assertTextPresent("required");
 
         // if smtp host is set, then smtp from is also required.
-        settingsForm.nextFormElements("localhost:8080", "some.smtp.host.com", "false", "", "", "", "", "false", null);
+        settingsForm.finishFormElements("localhost:8080", "some.smtp.host.com", "false", "", "", "", "", "false", null);
         settingsForm.assertFormElements("localhost:8080", "some.smtp.host.com", "false", "", "", "", "", "false", "25");
         assertTextPresent("required");
 
         // ensure that the base url setting is a valid url.
-        settingsForm.nextFormElements("localhost:8080", "false", "", "", "", "", "", "false", null);
+        settingsForm.finishFormElements("localhost:8080", "false", "", "", "", "", "", "false", null);
         settingsForm.assertFormElements("localhost:8080", "false", "", "", "", "", "", "false", "25");
         assertTextPresent("valid");
 
         // check that the from address is correctly validated.
-        settingsForm.nextFormElements("http://localhost:8080", "false", "", "invalid at email dot com", "", "", "", "false", null);
-        assertTextPresent("whitespace");
+        settingsForm.finishFormElements("http://localhost:8080", "false", "", "invalid at email dot com", "", "", "", "false", null);
+        assertTextPresent("invalid");
 
-        settingsForm.nextFormElements("http://localhost:8080", "some.smtp.host.com", "true", "Setup <from@localhost.com>", "username", "password", "prefix", "true", "123");
+        settingsForm.finishFormElements("http://localhost:8080", "some.smtp.host.com", "true", "Setup <from@localhost.com>", "username", "password", "prefix", "true", "123");
     }
 
     private void checkLicenseDetails()
@@ -137,22 +137,22 @@ public class SetupAcceptanceTest extends BaseAcceptanceTestCase
 
         // check validation on the form.
         createAdminForm.nextFormElements("", "A. D. Ministrator", "admin", "admin");
-        createAdminForm.assertFormElements("", "A. D. Ministrator", "", "");
+        createAdminForm.assertFormElements("", "A. D. Ministrator", "admin", "admin");
         assertTextPresent("required");
 
         // - no name
         createAdminForm.nextFormElements("admin", "", "admin", "admin");
-        createAdminForm.assertFormElements("admin", "", "", "");
+        createAdminForm.assertFormElements("admin", "", "admin", "admin");
         assertTextPresent("required");
 
         // - no password
         createAdminForm.nextFormElements("admin", "A. D. Ministrator", "", "admin");
-        createAdminForm.assertFormElements("admin", "A. D. Ministrator", "", "");
+        createAdminForm.assertFormElements("admin", "A. D. Ministrator", "", "admin");
         assertTextPresent("required");
 
         // - password and confirmation do not match
         createAdminForm.nextFormElements("admin", "A. D. Ministrator", "admin", "something other then pass");
-        createAdminForm.assertFormElements("admin", "A. D. Ministrator", "", "");
+        createAdminForm.assertFormElements("admin", "A. D. Ministrator", "admin", "something other then pass");
 
         // now create the administrator.
         createAdminForm.nextFormElements("admin", "A. D. Ministrator", "admin", "admin");
