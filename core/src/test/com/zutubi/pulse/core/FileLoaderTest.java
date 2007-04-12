@@ -92,6 +92,13 @@ public class FileLoaderTest extends FileLoaderTestBase
         assertEquals("b", recipe.getDependencies().get(0).getVersion());
     }
 
+    public void testRegister() throws Exception
+    {
+        PulseFile pf = new PulseFile();
+        loader.load(getInput("testRegister"), pf);
+        assertNotNull(pf.getRecipe("default"));
+    }
+
     public void testScope() throws Exception
     {
         PulseFile pf = new PulseFile();

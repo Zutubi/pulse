@@ -179,6 +179,11 @@ public class FileLoader
                     ((ResourceAware) type).setResourceRepository(resourceRepository);
                 }
 
+                if (FileLoaderAware.class.isAssignableFrom(type.getClass()))
+                {
+                    ((FileLoaderAware)type).setFileLoader(this);
+                }
+
                 if (InitComponent.class.isAssignableFrom(type.getClass()))
                 {
                     ((InitComponent) type).initBeforeChildren();
@@ -207,7 +212,6 @@ public class FileLoader
 
                 // Apply declarative validation
                 validate(type);
-//                CommandValidationManager.validate(type, name);
             }
         }
         catch (InvocationTargetException ex)

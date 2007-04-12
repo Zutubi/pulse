@@ -39,6 +39,7 @@ public class PulseFileLoader extends FileLoader
         register("make", MakeCommand.class);
         register("xcodebuild", XCodeCommand.class);
         register("resource", ResourceReference.class);
+        register("register", Register.class);
     }
 
     public List<ResourceRequirement> loadRequiredResources(String pulseFile, String recipe) throws PulseException
