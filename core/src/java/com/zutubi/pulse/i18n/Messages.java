@@ -72,11 +72,6 @@ public class Messages
         return new Messages(getContext(context));
     }
 
-    public static Messages getInstance(Class clazz)
-    {
-        return new Messages(new ClassContext(clazz));
-    }
-
     public String format(String key)
     {
         return Messages.format(context, key);

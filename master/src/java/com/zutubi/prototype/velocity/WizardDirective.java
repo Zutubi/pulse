@@ -1,6 +1,5 @@
 package com.zutubi.prototype.velocity;
 
-import com.opensymphony.util.TextUtils;
 import com.opensymphony.xwork.ActionContext;
 import com.opensymphony.xwork.util.OgnlValueStack;
 import com.zutubi.prototype.FieldDescriptor;
@@ -8,7 +7,6 @@ import com.zutubi.prototype.FormDescriptor;
 import com.zutubi.prototype.FormDescriptorFactory;
 import com.zutubi.prototype.freemarker.GetTextMethod;
 import com.zutubi.prototype.model.Form;
-import com.zutubi.prototype.type.CompositeType;
 import com.zutubi.prototype.type.record.PathUtils;
 import com.zutubi.prototype.wizard.Wizard;
 import com.zutubi.prototype.wizard.WizardState;

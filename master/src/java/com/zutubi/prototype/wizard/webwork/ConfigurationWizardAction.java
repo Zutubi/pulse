@@ -8,14 +8,18 @@ import com.zutubi.prototype.type.Type;
 import com.zutubi.prototype.type.TypeException;
 import com.zutubi.prototype.type.record.PathUtils;
 import com.zutubi.prototype.type.record.Record;
-import com.zutubi.prototype.webwork.PrototypeUtils;
 import com.zutubi.prototype.wizard.Wizard;
 import com.zutubi.prototype.wizard.WizardState;
 import com.zutubi.pulse.bootstrap.ComponentContext;
+import com.zutubi.pulse.i18n.Messages;
 import com.zutubi.pulse.util.logging.Logger;
 import com.zutubi.pulse.validation.MessagesTextProvider;
 import com.zutubi.pulse.web.ActionSupport;
-import com.zutubi.validation.*;
+import com.zutubi.validation.DelegatingValidationContext;
+import com.zutubi.validation.ValidationContext;
+import com.zutubi.validation.ValidationException;
+import com.zutubi.validation.ValidationManager;
+import com.zutubi.validation.XWorkValidationAdapter;
 
 import java.util.Map;
 
@@ -227,6 +231,11 @@ public class ConfigurationWizardAction extends ActionSupport
     {
         MessagesTextProvider textProvider = new MessagesTextProvider(subject);
         return new DelegatingValidationContext(new XWorkValidationAdapter(this), textProvider);
+    }
+
+    public Messages getMessages()
+    {
+        return Messages.getInstance(getWizardInstance().getClass());
     }
 
     public String execute()

@@ -11,7 +11,6 @@ Only show message if errors are available.
 </tr>
 </#list>
 </#if>
-
 <tr>
    <th align="right" valign="top" <#rt/> 
 <#if hasFieldErrors>
@@ -34,6 +33,8 @@ Only show message if errors are available.
  ${parameters.label?i18n} <#t/>
 <#if parameters.required?default(false)>
        <span class="required">*</span><#t/>
+<#elseif parameters.constrained?default(false)>
+       <span class="constrained">*</span><#t/>
 </#if>
  :</label><#t/>
 </#if>

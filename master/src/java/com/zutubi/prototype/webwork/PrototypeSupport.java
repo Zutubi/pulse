@@ -8,12 +8,14 @@ import com.zutubi.prototype.type.Type;
 import com.zutubi.prototype.type.TypeRegistry;
 import com.zutubi.prototype.type.record.Record;
 import com.zutubi.pulse.web.ActionSupport;
+import com.zutubi.pulse.i18n.MessagesProvider;
+import com.zutubi.pulse.i18n.Messages;
 
 /**
  *
  *
  */
-public class PrototypeSupport extends ActionSupport
+public class PrototypeSupport extends ActionSupport implements MessagesProvider
 {
     protected String path;
 
@@ -220,6 +222,11 @@ public class PrototypeSupport extends ActionSupport
 
         // unknown type.
         return ERROR;
+    }
+
+    public Messages getMessages()
+    {
+        return Messages.getInstance(type.getTargetType().getClazz());
     }
 
     public void setTypeRegistry(TypeRegistry typeRegistry)

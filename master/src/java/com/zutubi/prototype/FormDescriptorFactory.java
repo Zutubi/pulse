@@ -2,15 +2,30 @@ package com.zutubi.prototype;
 
 import com.zutubi.prototype.annotation.AnnotationHandler;
 import com.zutubi.prototype.annotation.Handler;
-import com.zutubi.prototype.type.*;
+import com.zutubi.prototype.type.CollectionType;
+import com.zutubi.prototype.type.CompositeType;
+import com.zutubi.prototype.type.EnumType;
+import com.zutubi.prototype.type.PrimitiveType;
+import com.zutubi.prototype.type.ReferenceType;
+import com.zutubi.prototype.type.SimpleType;
+import com.zutubi.prototype.type.Type;
+import com.zutubi.prototype.type.TypeProperty;
+import com.zutubi.prototype.type.TypeRegistry;
 import com.zutubi.prototype.type.record.PathUtils;
 import com.zutubi.pulse.core.ObjectFactory;
 import com.zutubi.pulse.prototype.config.EnumOptionProvider;
 import com.zutubi.pulse.util.logging.Logger;
-import com.zutubi.validation.annotations.Required;
+import com.zutubi.validation.Validator;
+import com.zutubi.validation.validators.RequiredValidator;
+import com.zutubi.validation.annotations.Constraint;
 
 import java.lang.annotation.Annotation;
-import java.util.*;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
 
 /**
  *
@@ -207,9 +222,16 @@ public class FormDescriptorFactory
                     LOG.warning("Unexpected exception processing the annotation handler.", e);
                 }
             }
-            if (annotation instanceof Required)
+            // This needs to be handled by a handler somehow - remembering that the annotations themselves
+            // are not part of the form package.  ...
+            if (annotation instanceof Constraint)
             {
-                descriptor.addParameter("required", true);
+                descriptor.addParameter("constrained", true);
+                List<Class<? extends Validator>> constraints = Arrays.asList(((Constraint)annotation).value());
+                if (constraints.contains(RequiredValidator.class))
+                {
+                    descriptor.addParameter("required", true);
+                }
             }
         }
     }

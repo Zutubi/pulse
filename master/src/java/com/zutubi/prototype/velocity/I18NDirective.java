@@ -1,9 +1,8 @@
 package com.zutubi.prototype.velocity;
 
 import com.opensymphony.util.TextUtils;
-import com.zutubi.prototype.config.ConfigurationPersistenceManager;
-import com.zutubi.prototype.type.CollectionType;
-import com.zutubi.prototype.type.Type;
+import com.opensymphony.xwork.ActionContext;
+import com.opensymphony.xwork.util.OgnlValueStack;
 import com.zutubi.pulse.bootstrap.ComponentContext;
 import com.zutubi.pulse.i18n.Messages;
 import com.zutubi.pulse.util.logging.Logger;
@@ -28,13 +27,6 @@ public class I18NDirective extends PrototypeDirective
      * The I18N message key.  This field is required.
      */
     private String key;
-
-    /**
-     * This field is optional.
-     */
-    private String path;
-
-    private ConfigurationPersistenceManager configurationPersistenceManager;
 
     public I18NDirective()
     {
@@ -61,21 +53,11 @@ public class I18NDirective extends PrototypeDirective
     /**
      * Setter for the <code>key</code> property.
      *
-     * @param key
+     * @param key 
      */
     public void setKey(String key)
     {
         this.key = key;
-    }
-
-    /**
-     * Setter for the <code>path</code> property.
-     *
-     * @param path
-     */
-    public void setPath(String path)
-    {
-        this.path = path;
     }
 
     public boolean render(InternalContextAdapter context, Writer writer, Node node) throws IOException, ResourceNotFoundException, ParseErrorException
@@ -87,15 +69,14 @@ public class I18NDirective extends PrototypeDirective
             Map params = createPropertyMap(context, node);
             wireParams(params);
 
-            Class clazz = getContext();
-
-            Messages messages = Messages.getInstance(clazz);
+            Messages messages = getMessages();
 
             String value = messages.format(this.key);
             if (!TextUtils.stringSet(value))
             {
-                // only print unresolved when in debug mode...
-                value = "unresolved: " + key + " (" + clazz + ")";
+                // only print unresolved when in debug mode..., would be nice to also know where the
+                // messages are coming from, the context.
+                value = "unresolved: " + key;
             }
 
             writer.write(value);
@@ -110,35 +91,9 @@ public class I18NDirective extends PrototypeDirective
         }
     }
 
-    /**
-     * Get the class that defines the I18N context for this directive.  
-     *
-     * @return the i18n context.
-     */
-    private Class getContext()
+    private Messages getMessages()
     {
-        Type type = null;
-        if (TextUtils.stringSet(path)) // if a the path is specified, us it to attempt to look up. 
-        {
-            type = configurationPersistenceManager.getType(path);
-        }
-
-        if (type == null)
-        {
-            type = lookupType();
-        }
-
-        Class clazz = type.getClazz();
-        if (type instanceof CollectionType)
-        {
-            clazz = ((CollectionType)type).getCollectionType().getClazz();
-        }
-
-        return clazz;
-    }
-
-    public void setConfigurationPersistenceManager(ConfigurationPersistenceManager configurationPersistenceManager)
-    {
-        this.configurationPersistenceManager = configurationPersistenceManager;
+        OgnlValueStack stack = ActionContext.getContext().getValueStack();
+        return (Messages) stack.findValue("messages");
     }
 }
