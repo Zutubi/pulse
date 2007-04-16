@@ -6,11 +6,11 @@ import com.zutubi.prototype.config.ConfigurationPersistenceManager;
 /**
  * Base for events raised when configuration changes occur.
  */
-public class ConfigurationEvent extends Event
+public class ConfigurationEvent extends Event<ConfigurationPersistenceManager>
 {
     private String path;
 
-    public ConfigurationEvent(Object source, String path)
+    public ConfigurationEvent(ConfigurationPersistenceManager source, String path)
     {
         super(source);
         this.path = path;

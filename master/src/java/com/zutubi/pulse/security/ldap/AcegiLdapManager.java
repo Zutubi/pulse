@@ -46,7 +46,7 @@ public class AcegiLdapManager implements LdapManager, ConfigurationEventListener
         initialised = false;
         statusMessage = null;
 
-        configurationProvider.registerEventListener(this, LDAPConfiguration.class);
+        configurationProvider.registerEventListener(this, false, LDAPConfiguration.class);
         LDAPConfiguration ldapConfiguration = configurationProvider.get(LDAPConfiguration.class);
         enabled = ldapConfiguration != null && ldapConfiguration.isEnabled();
 

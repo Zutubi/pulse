@@ -3,7 +3,6 @@ package com.zutubi.prototype.config.events;
 import com.zutubi.prototype.config.ConfigurationPersistenceManager;
 
 /**
- * @see com.zutubi.prototype.config.ConfigurationListener#postSave(String, Object, String, Object)
  */
 public class PostSaveEvent extends ConfigurationEvent
 {
@@ -12,7 +11,7 @@ public class PostSaveEvent extends ConfigurationEvent
     private String newPath;
     private Object newInstance;
 
-    public PostSaveEvent(Object source, String path, Object oldInstance, String newPath, Object newInstance)
+    public PostSaveEvent(ConfigurationPersistenceManager source, String path, Object oldInstance, String newPath, Object newInstance)
     {
         super(source, path);
         this.path = path;

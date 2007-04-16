@@ -18,16 +18,18 @@ public class DefaultConfigurationProvider implements ConfigurationProvider
 {
     private ConfigurationPersistenceManager configurationPersistenceManager;
     private EventManager eventManager;
-    private MultiplexingListener muxListener;
+    private MultiplexingListener syncMux;
+    private MultiplexingListener asyncMux;
     private TypeRegistry typeRegistry;
 
     public void init()
     {
-        muxListener = new MultiplexingListener(ConfigurationEvent.class);
-        AsynchronousDelegatingListener asych = new AsynchronousDelegatingListener(muxListener);
-        eventManager.register(asych);
+        syncMux = new MultiplexingListener(ConfigurationEvent.class);
+        eventManager.register(syncMux);
 
-        configurationPersistenceManager.registerListener("", new EventPublishingConfigurationListener(eventManager));
+        asyncMux = new MultiplexingListener(ConfigurationEvent.class);
+        AsynchronousDelegatingListener asych = new AsynchronousDelegatingListener(asyncMux);
+        eventManager.register(asych);
     }
 
     public <T> T get(String path, Class<T> clazz)
@@ -51,22 +53,7 @@ public class DefaultConfigurationProvider implements ConfigurationProvider
         return configurationPersistenceManager.getAllInstances(clazz);
     }
 
-    public void registerListener(Class clazz, ConfigurationListener listener)
-    {
-        configurationPersistenceManager.registerListener(clazz, listener);
-    }
-
-    public void registerListener(String path, ConfigurationListener listener)
-    {
-        configurationPersistenceManager.registerListener(path, listener);
-    }
-
-    public void unregisterListener(ConfigurationListener listener)
-    {
-        configurationPersistenceManager.unregisterListener(listener);
-    }
-
-    public void registerEventListener(ConfigurationEventListener listener, Class clazz)
+    public void registerEventListener(ConfigurationEventListener listener, boolean synchronous, Class clazz)
     {
         CompositeType type = typeRegistry.getType(clazz);
         if(type == null)
@@ -75,19 +62,31 @@ public class DefaultConfigurationProvider implements ConfigurationProvider
         }
 
         List<String> paths = configurationPersistenceManager.getConfigurationPaths(type);
-        FilteringListener filter = new FilteringListener(new PathPredicate(paths.toArray(new String[paths.size()])), new Listener(listener));
-        muxListener.addDelegate(filter);
+        registerEventListener(listener, synchronous, paths.toArray(new String[paths.size()]));
     }
 
-    public void registerEventListener(ConfigurationEventListener listener, String... paths)
+    public void registerEventListener(ConfigurationEventListener listener, boolean synchronous, String... paths)
     {
         FilteringListener filter = new FilteringListener(new PathPredicate(paths), new Listener(listener));
-        muxListener.addDelegate(filter);
+        if (synchronous)
+        {
+            syncMux.addDelegate(filter);
+        }
+        else
+        {
+            asyncMux.addDelegate(filter);
+        }
     }
 
     public void unregisterEventListener(final ConfigurationEventListener listener)
     {
-        muxListener.removeDelegate(new Predicate<EventListener>()
+        unregister(listener, syncMux);
+        unregister(listener, asyncMux);
+    }
+
+    private void unregister(final ConfigurationEventListener listener, MultiplexingListener mux)
+    {
+        mux.removeDelegate(new Predicate<EventListener>()
         {
             public boolean satisfied(EventListener eventListener)
             {
