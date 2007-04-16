@@ -5,34 +5,41 @@ import com.zutubi.validation.annotations.Url;
 import com.zutubi.prototype.annotation.Password;
 import com.zutubi.prototype.annotation.Form;
 import com.zutubi.prototype.annotation.ConfigurationCheck;
+import com.zutubi.pulse.prototype.record.SymbolicName;
 
 /**
- *
- *
+ * Configuration for LDAP auth integration.
  */
+@SymbolicName("ldapConfig")
 @Form(fieldOrder={"enabled", "ldapUrl", "baseDn", "managerDn", "managerPassword",
-        "userFilter", "autoAddUsers", "emailAttribute", "groupRootDn", "groupSearchFilter",
-        "groupNameAttribute", "searchGroupSubtree", "escapeSpaceCharacters"})
+        "userBaseDn", "userFilter", "autoAddUsers", "emailAttribute", "groupBaseDn", "groupSearchFilter",
+        "groupRoleAttribute", "searchGroupSubtree", "followReferrals", "escapeSpaceCharacters"})
 @ConfigurationCheck(LDAPConfigurationCheckHandler.class)
 public class LDAPConfiguration
 {
     private boolean enabled;
+    @Required
     private String ldapUrl;
+    @Required
     private String baseDn;
 
     private String managerDn;
+    @Password
     private String managerPassword;
 
+    private String userBaseDn;
+    @Required
     private String userFilter;
     private boolean autoAddUsers;
-
     private String emailAttribute;
 
-    private String groupRootDn;
+    private String groupBaseDn;
     private String groupSearchFilter;
-    private String groupNameAttribute;
+    private String groupRoleAttribute;
     private boolean searchGroupSubtree;
+
     private boolean escapeSpaceCharacters;
+    private boolean followReferrals;
 
     public boolean isEnabled()
     {
@@ -44,8 +51,6 @@ public class LDAPConfiguration
         this.enabled = enabled;
     }
 
-    @Required()
-    @Url()
     public String getLdapUrl()
     {
         return ldapUrl;
@@ -56,7 +61,6 @@ public class LDAPConfiguration
         this.ldapUrl = ldapUrl;
     }
 
-    @Required()
     public String getBaseDn()
     {
         return baseDn;
@@ -77,7 +81,6 @@ public class LDAPConfiguration
         this.managerDn = managerDn;
     }
 
-    @Password()
     public String getManagerPassword()
     {
         return managerPassword;
@@ -88,7 +91,16 @@ public class LDAPConfiguration
         this.managerPassword = managerPassword;
     }
 
-    @Required()
+    public String getUserBaseDn()
+    {
+        return userBaseDn;
+    }
+
+    public void setUserBaseDn(String userBaseDn)
+    {
+        this.userBaseDn = userBaseDn;
+    }
+
     public String getUserFilter()
     {
         return userFilter;
@@ -99,7 +111,7 @@ public class LDAPConfiguration
         this.userFilter = userFilter;
     }
 
-    public boolean isAutoAddUsers()
+    public boolean getAutoAddUsers()
     {
         return autoAddUsers;
     }
@@ -119,14 +131,14 @@ public class LDAPConfiguration
         this.emailAttribute = emailAttribute;
     }
 
-    public String getGroupRootDn()
+    public String getGroupBaseDn()
     {
-        return groupRootDn;
+        return groupBaseDn;
     }
 
-    public void setGroupRootDn(String groupRootDn)
+    public void setGroupBaseDn(String groupBaseDn)
     {
-        this.groupRootDn = groupRootDn;
+        this.groupBaseDn = groupBaseDn;
     }
 
     public String getGroupSearchFilter()
@@ -139,17 +151,17 @@ public class LDAPConfiguration
         this.groupSearchFilter = groupSearchFilter;
     }
 
-    public String getGroupNameAttribute()
+    public String getGroupRoleAttribute()
     {
-        return groupNameAttribute;
+        return groupRoleAttribute;
     }
 
-    public void setGroupNameAttribute(String groupNameAttribute)
+    public void setGroupRoleAttribute(String groupRoleAttribute)
     {
-        this.groupNameAttribute = groupNameAttribute;
+        this.groupRoleAttribute = groupRoleAttribute;
     }
 
-    public boolean isSearchGroupSubtree()
+    public boolean getSearchGroupSubtree()
     {
         return searchGroupSubtree;
     }
@@ -159,7 +171,17 @@ public class LDAPConfiguration
         this.searchGroupSubtree = searchGroupSubtree;
     }
 
-    public boolean isEscapeSpaceCharacters()
+    public boolean getFollowReferrals()
+    {
+        return followReferrals;
+    }
+
+    public void setFollowReferrals(boolean followReferrals)
+    {
+        this.followReferrals = followReferrals;
+    }
+
+    public boolean getEscapeSpaceCharacters()
     {
         return escapeSpaceCharacters;
     }

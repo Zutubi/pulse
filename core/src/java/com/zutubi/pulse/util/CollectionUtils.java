@@ -156,4 +156,30 @@ public class CollectionUtils
             }
         };
     }
+
+    public static <T> boolean equals(T[] a1, T[] a2)
+    {
+        if(a1.length == a2.length)
+        {
+            for(int i = 0; i < a1.length; i++)
+            {
+                if(a1[i] == null)
+                {
+                    if(a2[i] != null)
+                    {
+                        return false;
+                    }
+                }
+                else
+                {
+                    if(!a1[i].equals(a2[i]))
+                    {
+                        return false;
+                    }
+                }
+            }
+        }
+
+        return true;
+    }
 }

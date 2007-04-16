@@ -1,11 +1,13 @@
 package com.zutubi.pulse.prototype.config.admin;
 
 import com.zutubi.prototype.annotation.Form;
+import com.zutubi.pulse.prototype.record.SymbolicName;
 
 /**
  *
  *
  */
+@SymbolicName("generalConfig")
 @Form(fieldOrder={"baseUrl", "baseHelpUrl", "recipeTimeout", "scmPollingInterval"})
 public class GeneralAdminConfiguration
 {

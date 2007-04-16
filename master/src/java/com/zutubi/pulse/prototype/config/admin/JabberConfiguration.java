@@ -3,12 +3,14 @@ package com.zutubi.pulse.prototype.config.admin;
 import com.zutubi.prototype.annotation.ConfigurationCheck;
 import com.zutubi.prototype.annotation.Form;
 import com.zutubi.pulse.jabber.JabberManager;
+import com.zutubi.pulse.prototype.record.SymbolicName;
 import com.zutubi.validation.annotations.Required;
 
 /**
  *
  *
  */
+@SymbolicName("jabberConfig")
 @Form(fieldOrder = {"username", "password", "server", "port"})
 @ConfigurationCheck(JabberConfigurationCheckHandler.class)
 public class JabberConfiguration

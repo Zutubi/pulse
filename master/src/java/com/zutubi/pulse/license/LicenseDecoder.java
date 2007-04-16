@@ -1,6 +1,7 @@
 package com.zutubi.pulse.license;
 
 import com.opensymphony.util.TextUtils;
+import com.zutubi.pulse.util.StringUtils;
 import org.apache.commons.codec.binary.Base64;
 
 import java.io.IOException;
@@ -174,4 +175,21 @@ public class LicenseDecoder
         }
     }
 
+    public static void main(String[] argv)
+    {
+        LicenseDecoder decoder = new LicenseDecoder();
+        try
+        {
+            String licenseString = StringUtils.join("", argv);
+            License license = decoder.decode(licenseString.getBytes());
+            System.out.println("license.getType() = " + license.getType());
+            System.out.println("license.getHolder() = " + license.getHolder());
+            System.out.println("license.getSupportedAgents() = " + license.getSupportedAgents());
+            System.out.println("license.getExpiryDate() = " + license.getExpiryDate());
+        }
+        catch (LicenseException e)
+        {
+            e.printStackTrace();
+        }
+    }
 }

@@ -109,26 +109,16 @@ public class ConfigurationRegistry
 
         configurationPersistenceManager.register("project", projectCollection);
 
-        // setup the global configuration options.
-        typeRegistry.register("generalAdminConfig", GeneralAdminConfiguration.class);
-        typeRegistry.register("loggingConfig", LoggingConfiguration.class);
-        typeRegistry.register("emailConfig", EmailConfiguration.class);
-        typeRegistry.register("ldapConfig", LDAPConfiguration.class);
-        typeRegistry.register("jabberConfig", JabberConfiguration.class);
-        typeRegistry.register("licenseConfig", LicenseKeyConfiguration.class);
-
         CompositeType globalConfig = typeRegistry.register("globalConfig", GlobalConfiguration.class);
-        globalConfig.addProperty(new TypeProperty("general", typeRegistry.getType("generalAdminConfig")));
-        globalConfig.addProperty(new TypeProperty("logging", typeRegistry.getType("loggingConfig")));
-        globalConfig.addProperty(new TypeProperty("email", typeRegistry.getType("emailConfig")));
-        globalConfig.addProperty(new TypeProperty("ldap", typeRegistry.getType("ldapConfig")));
-        globalConfig.addProperty(new TypeProperty("jabber", typeRegistry.getType("jabberConfig")));
-        globalConfig.addProperty(new TypeProperty("license", typeRegistry.getType("licenseConfig")));
-
-        configurationPersistenceManager.register("global", globalConfig);
+        configurationPersistenceManager.register(GlobalConfiguration.SCOPE_NAME, globalConfig);
 
         // FIXME work out init order: plugins need to get in before this...
         configurationPersistenceManager.init();
+    }
+
+    public GlobalConfiguration getGlobalConfiguration()
+    {
+        return configurationPersistenceManager.getInstance(GlobalConfiguration.SCOPE_NAME, GlobalConfiguration.class);
     }
 
     public void setTypeRegistry(TypeRegistry typeRegistry)

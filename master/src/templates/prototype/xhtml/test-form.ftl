@@ -2,7 +2,7 @@
 <#if form?exists>
 <#-- This form requires javascript to behave correctly. Only display it if javascript is enabled. -->
 <div id="${form.id}_div" style="display:none">
-    <form id="${form.id}" method="post" action="${form.action}">
+    <form id="${form.id}" method="post" action="${base}/${form.action}">
 
         <#-- render the test form. -->
         <table class="form">

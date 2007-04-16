@@ -26,8 +26,8 @@ The beans defined within the security subsystem need not be accessed by other co
     </bean>
 
     <bean id="ldapManager" class="com.zutubi.pulse.security.ldap.AcegiLdapManager" init-method="init">
-        <property name="configurationManager">
-            <ref bean="configurationManager"/>
+        <property name="configurationProvider">
+            <ref bean="configurationProvider"/>
         </property>
         <property name="userManager">
             <ref bean="userManager"/>

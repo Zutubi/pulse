@@ -11,6 +11,7 @@ import java.beans.IntrospectionException;
 import java.beans.Introspector;
 import java.beans.PropertyDescriptor;
 import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Method;
 import java.util.*;
 
 /**
@@ -146,16 +147,23 @@ public class TypeRegistry
 
             for (PropertyDescriptor descriptor : beanInfo.getPropertyDescriptors())
             {
+                Method readMethod = descriptor.getReadMethod();
+                if(readMethod == null)
+                {
+                    // We only hook up readable properties
+                    continue;
+                }
+
                 TypeProperty property = new TypeProperty();
                 property.setName(descriptor.getName());
-                property.setGetter(descriptor.getReadMethod());
+                property.setGetter(readMethod);
                 property.setSetter(descriptor.getWriteMethod());
 
                 // extract annotations for this property, from the getter, setter
                 property.setAnnotations(AnnotationUtils.annotationsFromProperty(descriptor));
 
                 // analyse the java type
-                java.lang.reflect.Type type = descriptor.getReadMethod().getGenericReturnType();
+                java.lang.reflect.Type type = readMethod.getGenericReturnType();
 
                 if (type instanceof Class)
                 {

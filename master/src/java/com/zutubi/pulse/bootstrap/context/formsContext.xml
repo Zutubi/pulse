@@ -43,6 +43,7 @@
     <bean id="typeRegistry" class="com.zutubi.prototype.type.TypeRegistry" autowire="byName"/>
     <bean id="configurationRegistry" class="com.zutubi.prototype.config.ConfigurationRegistry" autowire="byName" init-method="init"/>
     <bean id="configurationPersistenceManager" class="com.zutubi.prototype.config.ConfigurationPersistenceManager" autowire="byName"/>
+    <bean id="configurationProvider" class="com.zutubi.prototype.config.DefaultConfigurationProvider" autowire="byName" init-method="init"/>
 
     <bean id="formDescriptorFactory" class="com.zutubi.prototype.FormDescriptorFactory" autowire="byName"/>
 

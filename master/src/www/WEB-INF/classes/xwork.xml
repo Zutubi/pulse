@@ -1181,30 +1181,6 @@
             <result name="success" type="redirect">/admin/refreshJabber.action</result>
         </action>
 
-        <action name="ldap" class="com.zutubi.pulse.web.admin.LdapConfigurationAction">
-            <interceptor-ref name="defaultStack"/>
-            <result name="error" type="velocity">configure-ldapconfig.vm</result>
-            <result name="success" type="redirect">/admin/serverSettings.action</result>
-        </action>
-
-        <action name="editLdap" class="com.zutubi.pulse.web.admin.LdapConfigurationAction">
-            <interceptor-ref name="crudStack"/>
-            <result name="input" type="velocity">configure-ldapconfig.vm</result>
-            <result name="error" type="velocity">configure-ldapconfig.vm</result>
-            <result name="cancel" type="redirect">/admin/serverSettings.action</result>
-            <result name="success" type="redirect">/admin/serverSettings.action</result>
-        </action>
-
-        <action name="saveLdap" class="com.zutubi.pulse.web.admin.LdapConfigurationAction">
-            <interceptor-ref name="crudStack"/>
-            <interceptor-ref name="execAndWait"/>
-            <result name="wait" type="velocity">configure-ldapconfig-wait.vm</result>
-            <result name="input" type="velocity">configure-ldapconfig.vm</result>
-            <result name="error" type="redirect">/admin/serverSettings.action</result>
-            <result name="cancel" type="redirect">/admin/serverSettings.action</result>
-            <result name="success" type="redirect">/admin/serverSettings.action</result>
-        </action>
-
         <action name="general" class="com.zutubi.pulse.web.admin.GeneralConfigurationAction">
             <interceptor-ref name="defaultStack"/>
             <result name="error" type="velocity">configure-generalconfig.vm</result>
@@ -1485,10 +1461,6 @@
 
         <action name="testJabber" class="com.zutubi.pulse.web.ajax.TestJabberAction">
             <result name="success" type="velocity">test-settings.vm</result>
-        </action>
-
-        <action name="testLdap" class="com.zutubi.pulse.web.ajax.TestLdapAction">
-            <result name="success" type="velocity">test-ldap-settings.vm</result>
         </action>
 
         <action name="ls" class="com.zutubi.pulse.web.vfs.LsAction">

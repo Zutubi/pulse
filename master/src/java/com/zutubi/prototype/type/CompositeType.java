@@ -277,8 +277,8 @@ public class CompositeType extends AbstractType implements ComplexType
             {
                 try
                 {
-                    TypeSqueezer squeeser = Squeezers.findSqueezer(property.getClazz());
-                    record.put(property.getName(), squeeser.squeeze(property.getGetter().invoke(defaultInstance)));
+                    TypeSqueezer squeezer = Squeezers.findSqueezer(property.getClazz());
+                    record.put(property.getName(), squeezer.squeeze(property.getGetter().invoke(defaultInstance)));
                 }
                 catch (SqueezeException e)
                 {

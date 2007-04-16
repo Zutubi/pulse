@@ -37,9 +37,10 @@ public class ConfigurationPersistenceManager
      * collection members.
      */
     private Map<CompositeType, List<String>> compositeTypePathIndex = new HashMap<CompositeType, List<String>>();
-    private Map<String, Object> instances = new HashMap<String, Object>();
+    private InstanceCache instances = new InstanceCache();
     private Map<String, List<String>> references = new HashMap<String, List<String>>();
-
+    private Map<String, List<ConfigurationListener>> listenerMap = new HashMap<String, List<ConfigurationListener>>();
+    
     public void init()
     {
         refreshInstances();
@@ -102,10 +103,10 @@ public class ConfigurationPersistenceManager
 
     private void addToIndex(CompositeType composite, String path)
     {
-        getConfigurationPaths(composite).add(path);
+        ensureConfigurationPaths(composite).add(path);
     }
 
-    List<String> getConfigurationPaths(CompositeType type)
+    private List<String> ensureConfigurationPaths(CompositeType type)
     {
         List<String> l = compositeTypePathIndex.get(type);
         if (l == null)
@@ -300,6 +301,11 @@ public class ConfigurationPersistenceManager
         return list;
     }
 
+    public List<String> getConfigurationPaths(CompositeType type)
+    {
+        return compositeTypePathIndex.get(type);
+    }
+
     private void refreshInstances()
     {
         instances.clear();
@@ -333,6 +339,43 @@ public class ConfigurationPersistenceManager
         return instances.get(path);
     }
 
+    public <T> T getInstance(String path, Class<T> clazz)
+    {
+        Object instance = getInstance(path);
+        if(instance == null)
+        {
+            return null;
+        }
+
+        if(!clazz.isAssignableFrom(instance.getClass()))
+        {
+            throw new IllegalArgumentException("Path '" + path + "' does not reference an instance of type '" + clazz.getName() + "'");
+        }
+
+        return (T)instance;
+    }
+
+    public <T> Collection<T> getAllInstances(Class<T> clazz)
+    {
+        CompositeType type = typeRegistry.getType(clazz);
+        if(type == null)
+        {
+            return Collections.EMPTY_LIST;
+        }
+
+        List<T> result = new LinkedList<T>();
+        List<String> paths = compositeTypePathIndex.get(type);
+        if (paths != null)
+        {
+            for(String path: paths)
+            {
+                instances.getAll(path, result);
+            }
+        }
+
+        return result;
+    }
+
     public Object resolveReference(String fromPath, String toPath) throws TypeException
     {
         indexReference(fromPath, toPath);
@@ -340,7 +383,7 @@ public class ConfigurationPersistenceManager
         if (instance == null)
         {
             Record record = getRecord(toPath);
-            if (record == null)
+            if (record == null || record.getSymbolicName() == null)
             {
                 throw new TypeException("Broken reference from '" + fromPath + "' to '" + toPath + "'");
             }
@@ -422,11 +465,29 @@ public class ConfigurationPersistenceManager
         return record;
     }
 
-    public String insertRecord(String path, Record record)
+    public String insertRecord(final String path, Record record)
     {
         ComplexType type = getType(path, ComplexType.class);
-        String result = type.insert(path, record, recordManager);
+
+        foreachListener(path, new ListenerHandler()
+        {
+            public void handle(ConfigurationListener listener)
+            {
+                listener.preInsert(path);
+            }
+        });
+
+        final String result = type.insert(path, record, recordManager);
         refreshInstances();
+
+        foreachListener(path, new ListenerHandler()
+        {
+            public void handle(ConfigurationListener listener)
+            {
+                listener.postInsert(path, result, instances.get(result));
+            }
+        });
+        
         return result;
     }
 
@@ -478,8 +539,28 @@ public class ConfigurationPersistenceManager
         }
 
         ComplexType parentType = (ComplexType) getType(parentPath);
-        String newPath = parentType.save(parentPath, baseName, record, recordManager);
+
+        final String path = PathUtils.getPath(parentPath, baseName);
+        final Object oldInstance = instances.get(path);
+        foreachListener(path, new ListenerHandler()
+        {
+            public void handle(ConfigurationListener listener)
+            {
+                listener.preSave(path, oldInstance);
+            }
+        });
+        
+        final String newPath = parentType.save(parentPath, baseName, record, recordManager);
         refreshInstances();
+
+        foreachListener(path, new ListenerHandler()
+        {
+            public void handle(ConfigurationListener listener)
+            {
+                listener.postSave(path, oldInstance, newPath, instances.get(newPath));
+            }
+        });
+        
         return newPath;
     }
 
@@ -584,10 +665,87 @@ public class ConfigurationPersistenceManager
         }
     }
 
-    public void delete(String path)
+    public void delete(final String path)
     {
+        final Object oldInstance = instances.get(path);
+        foreachListener(path, new ListenerHandler()
+        {
+            public void handle(ConfigurationListener listener)
+            {
+                listener.preDelete(path, oldInstance);
+            }
+        });
+
         getCleanupTasks(path).execute();
         refreshInstances();
+
+        foreachListener(path, new ListenerHandler()
+        {
+            public void handle(ConfigurationListener listener)
+            {
+                listener.postDelete(path, oldInstance);
+            }
+        });
+    }
+
+    public void registerListener(Class clazz, ConfigurationListener listener)
+    {
+        CompositeType type = typeRegistry.getType(clazz);
+        if(type != null)
+        {
+            List<String> paths = compositeTypePathIndex.get(type);
+            if (paths != null)
+            {
+                for(String path: paths)
+                {
+                    registerListener(path, listener);
+                }
+            }
+        }
+    }
+
+    public void registerListener(String path, ConfigurationListener listener)
+    {
+        List<ConfigurationListener> listeners = listenerMap.get(path);
+        if(listeners == null)
+        {
+            listeners = new LinkedList<ConfigurationListener>();
+            listenerMap.put(path, listeners);
+        }
+
+        if(!listeners.contains(listener))
+        {
+            listeners.add(listener);
+        }
+    }
+    
+    public void unregisterListener(ConfigurationListener listener)
+    {
+        for(List<ConfigurationListener> listeners: listenerMap.values())
+        {
+            listeners.remove(listener);
+        }
+    }
+
+    private void foreachListener(String path, ListenerHandler handler)
+    {
+        Set<ConfigurationListener> notified = new HashSet<ConfigurationListener>();
+
+        for(Map.Entry<String, List<ConfigurationListener>> entry: listenerMap.entrySet())
+        {
+            String pattern = entry.getKey();
+            if(pattern.length() == 0 || PathUtils.matches(pattern, path))
+            {
+                for(ConfigurationListener listener: entry.getValue())
+                {
+                    if(!notified.contains(listener))
+                    {
+                        handler.handle(listener);
+                        notified.add(listener);
+                    }
+                }
+            }
+        }
     }
 
     public void setTypeRegistry(TypeRegistry typeRegistry)
@@ -609,7 +767,6 @@ public class ConfigurationPersistenceManager
     {
         this.objectFactory = objectFactory;
     }
-
 
     /**
      * Holds information about a root scope.
@@ -649,5 +806,10 @@ public class ConfigurationPersistenceManager
         {
             return type.isTemplated();
         }
+    }
+
+    private interface ListenerHandler
+    {
+        void handle(ConfigurationListener listener);
     }
 }

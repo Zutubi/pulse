@@ -1,10 +1,13 @@
 package com.zutubi.pulse.security.ldap;
 
 import com.opensymphony.util.TextUtils;
-import com.zutubi.pulse.bootstrap.MasterConfiguration;
-import com.zutubi.pulse.bootstrap.MasterConfigurationManager;
+import com.zutubi.prototype.config.ConfigurationEventListener;
+import com.zutubi.prototype.config.ConfigurationProvider;
+import com.zutubi.prototype.config.events.ConfigurationEvent;
+import com.zutubi.prototype.config.events.PostSaveEvent;
 import com.zutubi.pulse.license.LicenseHolder;
 import com.zutubi.pulse.model.*;
+import com.zutubi.pulse.prototype.config.admin.LDAPConfiguration;
 import com.zutubi.pulse.util.logging.Logger;
 import org.acegisecurity.BadCredentialsException;
 import org.acegisecurity.GrantedAuthority;
@@ -20,14 +23,14 @@ import java.util.*;
 
 /**
  */
-public class AcegiLdapManager implements LdapManager
+public class AcegiLdapManager implements LdapManager, ConfigurationEventListener
 {
     private static final Logger LOG = Logger.getLogger(AcegiLdapManager.class);
 
     private static final String EMAIL_CONTACT_NAME = "LDAP email";
 
     private boolean initialised = false;
-    private MasterConfigurationManager configurationManager;
+    private ConfigurationProvider configurationProvider;
     private boolean enabled = false;
     private DefaultInitialDirContextFactory contextFactory;
     private BindAuthenticator authenticator;
@@ -38,26 +41,29 @@ public class AcegiLdapManager implements LdapManager
     private UserManager userManager;
     private Map<String, LdapUserDetails> detailsMap = new HashMap<String, LdapUserDetails>();
 
-    public void init()
+    public synchronized void init()
     {
         initialised = false;
         statusMessage = null;
-        MasterConfiguration appConfig = configurationManager.getAppConfig();
-        enabled = appConfig.getLdapEnabled();
-        autoAdd = appConfig.getLdapAutoAdd();
-        emailAttribute = appConfig.getLdapEmailAttribute();
+
+        configurationProvider.registerEventListener(this, LDAPConfiguration.class);
+        LDAPConfiguration ldapConfiguration = configurationProvider.get(LDAPConfiguration.class);
+        enabled = ldapConfiguration != null && ldapConfiguration.isEnabled();
 
         if (enabled)
         {
-            String hostUrl = appConfig.getLdapHostUrl();
-            String baseDn = appConfig.getLdapBaseDn();
-            String managerDn = appConfig.getLdapManagerDn();
-            String managerPassword = appConfig.getLdapManagerPassword();
-            boolean followReferrals = appConfig.getLdapFollowReferrals();
-            boolean escapeSpaces = appConfig.getLdapEscapeSpaces();
+            autoAdd = ldapConfiguration.getAutoAddUsers();
+            emailAttribute = ldapConfiguration.getEmailAttribute();
+
+            String hostUrl = ldapConfiguration.getLdapUrl();
+            String baseDn = ldapConfiguration.getBaseDn();
+            String managerDn = ldapConfiguration.getManagerDn();
+            String managerPassword = ldapConfiguration.getManagerPassword();
+            boolean followReferrals = ldapConfiguration.getFollowReferrals();
+            boolean escapeSpaces = ldapConfiguration.getEscapeSpaceCharacters();
 
             contextFactory = createContextFactory(hostUrl, baseDn, managerDn, managerPassword, followReferrals, escapeSpaces);
-            authenticator = createAuthenticator(appConfig.getLdapUserBase(), appConfig.getLdapUserFilter(), contextFactory);
+            authenticator = createAuthenticator(ldapConfiguration.getUserBaseDn(), ldapConfiguration.getUserFilter(), contextFactory);
 
             try
             {
@@ -70,9 +76,9 @@ public class AcegiLdapManager implements LdapManager
                 return;
             }
 
-            if (TextUtils.stringSet(appConfig.getLdapGroupBaseDn()))
+            if (TextUtils.stringSet(ldapConfiguration.getGroupBaseDn()))
             {
-                populator = createPopulator(appConfig.getLdapGroupBaseDn(), appConfig.getLdapGroupFilter(), appConfig.getLdapGroupRoleAttribute(), appConfig.getLdapGroupSearchSubtree(), escapeSpaces, contextFactory);
+                populator = createPopulator(ldapConfiguration.getGroupBaseDn(), ldapConfiguration.getGroupSearchFilter(), ldapConfiguration.getGroupRoleAttribute(), ldapConfiguration.getSearchGroupSubtree(), escapeSpaces, contextFactory);
             }
         }
         else
@@ -165,7 +171,7 @@ public class AcegiLdapManager implements LdapManager
         return groupFilter.replace("${user.dn}", "{0}").replace("${login}", "{1}");
     }
 
-    public void connect()
+    public synchronized void connect()
     {
         statusMessage = null;
         try
@@ -179,7 +185,7 @@ public class AcegiLdapManager implements LdapManager
         }
     }
 
-    public User authenticate(String username, String password)
+    public synchronized User authenticate(String username, String password)
     {
         if (enabled && initialised)
         {
@@ -225,7 +231,7 @@ public class AcegiLdapManager implements LdapManager
         return authenticator.authenticate(username, password);
     }
 
-    public void addLdapRoles(AcegiUser user)
+    public synchronized void addLdapRoles(AcegiUser user)
     {
         if (populator != null)
         {
@@ -308,7 +314,7 @@ public class AcegiLdapManager implements LdapManager
         return null;
     }
 
-    public boolean canAutoAdd()
+    public synchronized boolean canAutoAdd()
     {
         return enabled && initialised && autoAdd && LicenseHolder.hasAuthorization("canAddUser");
     }
@@ -341,18 +347,26 @@ public class AcegiLdapManager implements LdapManager
         return dn.replaceAll(" ", "\\\\20");
     }
 
-    public void setConfigurationManager(MasterConfigurationManager configurationManager)
-    {
-        this.configurationManager = configurationManager;
-    }
-
     public String getStatusMessage()
     {
         return statusMessage;
     }
 
+    public synchronized void handleEvent(ConfigurationEvent event)
+    {
+        if(event instanceof PostSaveEvent)
+        {
+            init();
+        }
+    }
+
     public void setUserManager(UserManager userManager)
     {
         this.userManager = userManager;
+    }
+
+    public void setConfigurationProvider(ConfigurationProvider configurationProvider)
+    {
+        this.configurationProvider = configurationProvider;
     }
 }

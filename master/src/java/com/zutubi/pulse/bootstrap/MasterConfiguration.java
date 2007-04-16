@@ -68,22 +68,6 @@ public interface MasterConfiguration extends LogConfiguration
 
     //--- ( ldap integration )---
 
-    public static final String LDAP_ENABLED = "ldap.enabled";
-    public static final String LDAP_HOST_URL = "ldap.host";
-    public static final String LDAP_BASE_DN = "ldap.base.dn";
-    public static final String LDAP_MANAGER_DN = "ldap.manager.dn";
-    public static final String LDAP_MANAGER_PASSWORD = "ldap.manager.password";
-    public static final String LDAP_USER_BASE = "ldap.user.base";
-    public static final String LDAP_USER_FILTER = "ldap.user.filter";
-    public static final String LDAP_GROUP_BASE_DN = "ldap.group.base.dn";
-    public static final String LDAP_GROUP_SEARCH_SUBTREE = "ldap.group.search.subtree";
-    public static final String LDAP_GROUP_FILTER = "ldap.group.filter";
-    public static final String LDAP_GROUP_ROLE_ATTRIBUTE = "ldap.group.role.attribute";
-    public static final String LDAP_AUTO_ADD = "ldap.auto.add";
-    public static final String LDAP_EMAIL_ATTRIBUTE = "ldap.email.attribute";
-    public static final String LDAP_ESCAPE_SPACES = "ldap.escape";
-    public static final String LDAP_FOLLOW_REFERRALS = "ldap.follow";
-
     String getAdminLogin();
 
     void setAdminLogin(String login);
@@ -159,66 +143,6 @@ public interface MasterConfiguration extends LogConfiguration
     Boolean getAnonymousSignupEnabled();
 
     void setAnonymousSignupEnabled(Boolean signupEnabled);
-
-    Boolean getLdapEnabled();
-
-    void setLdapEnabled(Boolean enabled);
-
-    String getLdapHostUrl();
-
-    void setLdapHostUrl(String hostUrl);
-
-    String getLdapBaseDn();
-
-    void setLdapBaseDn(String baseDn);
-
-    String getLdapManagerDn();
-
-    void setLdapManagerDn(String managerDn);
-
-    String getLdapManagerPassword();
-
-    void setLdapManagerPassword(String managerPassword);
-
-    String getLdapUserBase();
-
-    void setLdapUserBase(String userBase);
-
-    String getLdapUserFilter();
-
-    void setLdapUserFilter(String userFilter);
-
-    Boolean getLdapAutoAdd();
-
-    void setLdapAutoAdd(Boolean autoAdd);
-
-    String getLdapEmailAttribute();
-
-    void setLdapEmailAttribute(String attribute);
-
-    Boolean getLdapEscapeSpaces();
-
-    void setLdapEscapeSpaces(Boolean escape);
-
-    boolean getLdapFollowReferrals();
-
-    void setLdapFollowReferrals(boolean follow);
-
-    String getLdapGroupBaseDn();
-
-    void setLdapGroupBaseDn(String dn);
-
-    boolean getLdapGroupSearchSubtree();
-
-    void setLdapGroupSearchSubtree(boolean search);
-
-    String getLdapGroupFilter();
-
-    void setLdapGroupFilter(String groupFilter);
-
-    String getLdapGroupRoleAttribute();
-
-    void setLdapGroupRoleAttribute(String attribute);
 
     Integer getScmPollingInterval();
 
