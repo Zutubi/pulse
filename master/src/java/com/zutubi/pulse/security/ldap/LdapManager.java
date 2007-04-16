@@ -3,6 +3,7 @@ package com.zutubi.pulse.security.ldap;
 import com.zutubi.pulse.model.AcegiUser;
 import com.zutubi.pulse.model.Group;
 import com.zutubi.pulse.model.User;
+import com.zutubi.pulse.prototype.config.admin.LDAPConfiguration;
 
 import java.util.List;
 
@@ -22,10 +23,6 @@ public interface LdapManager
 
     String getStatusMessage();
 
-    List<Group> testAuthenticate(String hostUrl, String baseDn, String managerDn, String managerPassword,
-                                 String userBase, String userFilter,
-                                 String groupDn, String groupFilter, String groupRoleAttribute, boolean groupSearchSubtree,
-                                 boolean followReferrals, boolean escapeSpaces,
-                                 String testLogin, String testPassword);
+    List<Group> testAuthenticate(LDAPConfiguration configuration, String testLogin, String testPassword);
 
 }

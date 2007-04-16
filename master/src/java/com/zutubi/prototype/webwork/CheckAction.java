@@ -8,6 +8,7 @@ import com.zutubi.prototype.type.Type;
 import com.zutubi.prototype.type.record.Record;
 import com.zutubi.prototype.type.record.PathUtils;
 import com.zutubi.validation.XWorkValidationAdapter;
+import com.zutubi.pulse.bootstrap.ComponentContext;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -77,6 +78,7 @@ public class CheckAction extends PrototypeSupport
 
         // Instantiate and execute the check handler.
         ConfigurationCheckHandler handler = (ConfigurationCheckHandler) checkType.instantiate(null, checkRecord);
+        ComponentContext.autowire(handler);
         handler.test(instance);
 
         // We need to return the existing form values as well.

@@ -319,21 +319,17 @@ public class AcegiLdapManager implements LdapManager, ConfigurationEventListener
         return enabled && initialised && autoAdd && LicenseHolder.hasAuthorization("canAddUser");
     }
 
-    public List<Group> testAuthenticate(String hostUrl, String baseDn, String managerDn, String managerPassword,
-                                        String userBase, String userFilter,
-                                        String groupDn, String groupFilter, String groupRoleAttribute, boolean groupSearchSubtree,
-                                        boolean followReferrals, boolean escapeSpaces,
-                                        String testLogin, String testPassword)
+    public List<Group> testAuthenticate(LDAPConfiguration configuration, String testLogin, String testPassword)
     {
-        DefaultInitialDirContextFactory contextFactory = createContextFactory(hostUrl, baseDn, managerDn, managerPassword, followReferrals, escapeSpaces);
+        DefaultInitialDirContextFactory contextFactory = createContextFactory(configuration.getLdapUrl(), configuration.getBaseDn(), configuration.getManagerDn(), configuration.getManagerPassword(), configuration.getFollowReferrals(), configuration.getEscapeSpaceCharacters());
         contextFactory.newInitialDirContext();
 
-        BindAuthenticator authenticator = createAuthenticator(userBase, userFilter, contextFactory);
+        BindAuthenticator authenticator = createAuthenticator(configuration.getUserBaseDn(), configuration.getUserFilter(), contextFactory);
         LdapUserDetails details = ldapAuthenticate(authenticator, testLogin, testPassword);
 
-        if(TextUtils.stringSet(groupDn))
+        if(TextUtils.stringSet(configuration.getGroupBaseDn()))
         {
-            DefaultLdapAuthoritiesPopulator populator = createPopulator(groupDn, groupFilter, groupRoleAttribute, groupSearchSubtree, escapeSpaces, contextFactory);
+            DefaultLdapAuthoritiesPopulator populator = createPopulator(configuration.getGroupBaseDn(), configuration.getGroupSearchFilter(), configuration.getGroupRoleAttribute(), configuration.getSearchGroupSubtree(), configuration.getEscapeSpaceCharacters(), contextFactory);
             return getLdapGroups(details, populator);
         }
         else

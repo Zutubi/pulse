@@ -3,6 +3,8 @@ package com.zutubi.pulse.prototype.config.admin;
 import com.zutubi.validation.annotations.Required;
 import com.zutubi.prototype.ConfigurationCheckHandler;
 import com.zutubi.pulse.prototype.record.SymbolicName;
+import com.zutubi.pulse.security.ldap.AcegiLdapManager;
+import com.zutubi.pulse.security.ldap.LdapManager;
 
 /**
  *
@@ -13,8 +15,9 @@ public class LDAPConfigurationCheckHandler implements ConfigurationCheckHandler<
 {
     @Required
     private String login;
-    
     private String password;
+
+    private LdapManager ldapManager;
 
     public String getLogin()
     {
@@ -38,6 +41,11 @@ public class LDAPConfigurationCheckHandler implements ConfigurationCheckHandler<
 
     public void test(LDAPConfiguration configuration)
     {
-        System.out.println(configuration.getBaseDn());
+        ldapManager.testAuthenticate(configuration, login, password);
+    }
+
+    public void setLdapManager(LdapManager ldapManager)
+    {
+        this.ldapManager = ldapManager;
     }
 }

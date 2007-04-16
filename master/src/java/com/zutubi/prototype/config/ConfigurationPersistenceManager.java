@@ -489,7 +489,7 @@ public class ConfigurationPersistenceManager
         // Construct the validation context, wrapping it around the validation callback to that the
         // client is notified of validation errors.
         MessagesTextProvider textProvider = new MessagesTextProvider(type.getClazz());
-        ValidationContext context = new ConfigurationValidationContext(validationCallback, textProvider, getInstance(parentPath), baseName);
+        ValidationContext context = new ConfigurationValidationContext(validationCallback, textProvider, parentPath == null ? null : getInstance(parentPath), baseName);
 
         // Create an instance of the object represented by the record.  It is during the instantiation that
         // type conversion errors are detected.
