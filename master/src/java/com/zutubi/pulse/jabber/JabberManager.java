@@ -1,11 +1,14 @@
 package com.zutubi.pulse.jabber;
 
 import com.opensymphony.util.TextUtils;
-import com.zutubi.pulse.bootstrap.MasterConfiguration;
-import com.zutubi.pulse.bootstrap.MasterConfigurationManager;
+import com.zutubi.prototype.config.ConfigurationEventListener;
+import com.zutubi.prototype.config.ConfigurationProvider;
+import com.zutubi.prototype.config.events.ConfigurationEvent;
+import com.zutubi.prototype.config.events.PostSaveEvent;
 import com.zutubi.pulse.core.Stoppable;
-import com.zutubi.pulse.util.logging.Logger;
+import com.zutubi.pulse.prototype.config.admin.JabberConfiguration;
 import com.zutubi.pulse.util.Constants;
+import com.zutubi.pulse.util.logging.Logger;
 import org.jivesoftware.smack.*;
 import org.jivesoftware.smack.filter.MessageTypeFilter;
 import org.jivesoftware.smack.packet.Message;
@@ -14,14 +17,14 @@ import org.jivesoftware.smack.packet.XMPPError;
 
 /**
  */
-public class JabberManager implements Stoppable, PacketListener
+public class JabberManager implements Stoppable, PacketListener, ConfigurationEventListener
 {
     public static final int DEFAULT_PORT = 5222;
 
     private static final Logger LOG = Logger.getLogger(JabberManager.class);
 
     private XMPPConnection connection = null;
-    private MasterConfigurationManager configurationManager;
+    private ConfigurationProvider configurationProvider;
 
     /**
      * Holds the status from when we last tried to connect.  Will be null
@@ -32,15 +35,21 @@ public class JabberManager implements Stoppable, PacketListener
 
     public synchronized void init()
     {
+        configurationProvider.registerEventListener(this, false, JabberConfiguration.class);
+        JabberConfiguration config = configurationProvider.get(JabberConfiguration.class);
+        init(config);
+    }
+
+    private void init(JabberConfiguration config)
+    {
         statusMessage = null;
-        MasterConfiguration appConfig = configurationManager.getAppConfig();
-        if (isConfigured())
+        if (config != null && TextUtils.stringSet(config.getServer()))
         {
             LOG.info("Initialising Jabber");
             Roster.setDefaultSubscriptionMode(Roster.SUBSCRIPTION_ACCEPT_ALL);
             try
             {
-                openConnection(appConfig);
+                openConnection(config);
             }
             catch (Exception e)
             {
@@ -49,7 +58,7 @@ public class JabberManager implements Stoppable, PacketListener
                 try
                 {
                     stop(true);
-                    openConnection(appConfig);
+                    openConnection(config);
                 }
                 catch(Exception nesty)
                 {
@@ -66,37 +75,39 @@ public class JabberManager implements Stoppable, PacketListener
 
     public boolean isConfigured()
     {
-        return TextUtils.stringSet(configurationManager.getAppConfig().getJabberHost());
+        JabberConfiguration config = configurationProvider.get(JabberConfiguration.class);
+        return config != null && TextUtils.stringSet(config.getServer());
     }
 
-    private void openConnection(MasterConfiguration appConfig) throws XMPPException
+    private void openConnection(JabberConfiguration config) throws XMPPException
     {
-        connection = openConnection(appConfig.getJabberHost(), appConfig.getJabberPort(), appConfig.getJabberUsername(), appConfig.getJabberPassword(), appConfig.getJabberForceSSL());
+        connection = getConnection(config);
+        lastFailureTime = -1;
         connection.addPacketListener(this, new MessageTypeFilter(Message.Type.ERROR));
     }
 
-    private XMPPConnection openConnection(String host, int port, String username, String password, boolean forceSSL) throws XMPPException
+    private XMPPConnection getConnection(JabberConfiguration config) throws XMPPException
     {
-        XMPPConnection connection = null;
+        XMPPConnection connection;
 
-        if (host.endsWith("google.com"))
+        if (config.getServer().endsWith("google.com"))
         {
             connection = new GoogleTalkConnection();
         }
-        else if(forceSSL)
+        else if(config.isSsl())
         {
-            connection = new SSLXMPPConnection(host, port);
+            connection = new SSLXMPPConnection(config.getServer(), config.getPort());
         }
         else
         {
-            connection = new XMPPConnection(host, port);
+            connection = new XMPPConnection(config.getServer(), config.getPort());
         }
 
-        connection.login(username, password);
+        connection.login(config.getUsername(), config.getPassword());
         return connection;
     }
 
-    public void testConnection(String host, int port, String username, String password, boolean forceSSL) throws XMPPException
+    public void testConnection(JabberConfiguration config) throws XMPPException
     {
         XMPPConnection connection = null;
 
@@ -104,12 +115,12 @@ public class JabberManager implements Stoppable, PacketListener
         {
             try
             {
-                connection = openConnection(host, port, username, password, forceSSL);
+                connection = getConnection(config);
             }
             catch (XMPPException e)
             {
                 // Second try to workaround SSL negotiation issues
-                connection = openConnection(host, port, username, password, forceSSL);
+                connection = getConnection(config);
             }
         }
         finally
@@ -186,19 +197,22 @@ public class JabberManager implements Stoppable, PacketListener
         }
     }
 
-    public void refresh()
-    {
-        stop(true);
-        init();
-    }
-
     public String getStatusMessage()
     {
         return statusMessage;
     }
 
-    public void setConfigurationManager(MasterConfigurationManager configurationManager)
+    public void setConfigurationProvider(ConfigurationProvider configurationProvider)
     {
-        this.configurationManager = configurationManager;
+        this.configurationProvider = configurationProvider;
+    }
+
+    public void handleEvent(ConfigurationEvent event)
+    {
+        if(event instanceof PostSaveEvent)
+        {
+            stop(true);
+            init((JabberConfiguration) ((PostSaveEvent)event).getNewInstance());
+        }
     }
 }

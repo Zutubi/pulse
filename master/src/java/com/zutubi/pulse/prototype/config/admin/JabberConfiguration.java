@@ -11,19 +11,17 @@ import com.zutubi.validation.annotations.Required;
  *
  */
 @SymbolicName("jabberConfig")
-@Form(fieldOrder = {"username", "password", "server", "port"})
+@Form(fieldOrder = {"server", "port", "username", "password", "ssl"})
 @ConfigurationCheck(JabberConfigurationCheckHandler.class)
 public class JabberConfiguration
 {
     @Required
-    private int port = JabberManager.DEFAULT_PORT;
-    
-    @Required
     private String server;
-
-    @Required private String username;
+    @Required
+    private int port = JabberManager.DEFAULT_PORT;
+    @Required
+    private String username;
     private String password;
-    
     private boolean ssl;
 
     public String getServer()

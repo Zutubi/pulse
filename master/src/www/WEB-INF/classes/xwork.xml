@@ -1137,36 +1137,6 @@
             <result name="error" type="velocity">/generic-error.vm</result>
         </action>
 
-        <action name="jabber" class="com.zutubi.pulse.web.admin.JabberConfigurationAction">
-            <interceptor-ref name="defaultStack"/>
-            <result name="error" type="velocity">configure-jabberconfig.vm</result>
-            <result name="success" type="redirect">/admin/serverSettings.action</result>
-        </action>
-
-        <action name="refreshJabber" class="com.zutubi.pulse.web.admin.JabberConfigurationAction" method="doRefresh">
-            <interceptor-ref name="defaultStack"/>
-            <interceptor-ref name="execAndWait"/>
-            <result name="wait" type="velocity">configure-jabberconfig-wait.vm</result>
-            <result name="error" type="redirect">/admin/serverSettings.action</result>
-            <result name="success" type="redirect">/admin/serverSettings.action</result>
-        </action>
-
-        <action name="editJabber" class="com.zutubi.pulse.web.admin.JabberConfigurationAction">
-            <interceptor-ref name="crudStack"/>
-            <result name="input" type="velocity">configure-jabberconfig.vm</result>
-            <result name="error" type="velocity">configure-jabberconfig.vm</result>
-            <result name="cancel" type="redirect">/admin/serverSettings.action</result>
-            <result name="success" type="redirect">/admin/serverSettings.action</result>
-        </action>
-
-        <action name="saveJabber" class="com.zutubi.pulse.web.admin.JabberConfigurationAction">
-            <interceptor-ref name="crudStack"/>
-            <result name="input" type="velocity">configure-jabberconfig.vm</result>
-            <result name="error" type="redirect">/admin/serverSettings.action</result>
-            <result name="cancel" type="redirect">/admin/serverSettings.action</result>
-            <result name="success" type="redirect">/admin/refreshJabber.action</result>
-        </action>
-
         <action name="general" class="com.zutubi.pulse.web.admin.GeneralConfigurationAction">
             <interceptor-ref name="defaultStack"/>
             <result name="error" type="velocity">configure-generalconfig.vm</result>
@@ -1438,10 +1408,6 @@
         </action>
 
         <action name="testSvn" class="com.zutubi.pulse.web.ajax.TestSvnAction">
-            <result name="success" type="velocity">test-settings.vm</result>
-        </action>
-
-        <action name="testJabber" class="com.zutubi.pulse.web.ajax.TestJabberAction">
             <result name="success" type="velocity">test-settings.vm</result>
         </action>
 
