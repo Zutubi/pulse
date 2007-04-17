@@ -98,7 +98,8 @@ public class Configuration
             }
             for (TypeProperty property: ctype.getProperties(CollectionType.class))
             {
-                if(!(((CollectionType)property.getType()).getCollectionType() instanceof SimpleType))
+                final CollectionType propertyType = (CollectionType) property.getType();
+                if(!(propertyType.getCollectionType() instanceof SimpleType))
                 {
                     nestedProperties.add(property.getName());
                 }
@@ -119,7 +120,7 @@ public class Configuration
                     checkType = typeRegistry.getType(checkClass);
                     if (checkType == null)
                     {
-                        this.checkType = typeRegistry.register(checkClass);
+                        checkType = typeRegistry.register(checkClass);
                     }
                 }
                 catch (TypeException e)

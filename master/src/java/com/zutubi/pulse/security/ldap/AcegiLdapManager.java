@@ -43,11 +43,17 @@ public class AcegiLdapManager implements LdapManager, ConfigurationEventListener
 
     public synchronized void init()
     {
+        configurationProvider.registerEventListener(this, false, LDAPConfiguration.class);
+        LDAPConfiguration ldapConfiguration = configurationProvider.get(LDAPConfiguration.class);
+
+        init(ldapConfiguration);
+    }
+
+    private void init(LDAPConfiguration ldapConfiguration)
+    {
         initialised = false;
         statusMessage = null;
 
-        configurationProvider.registerEventListener(this, false, LDAPConfiguration.class);
-        LDAPConfiguration ldapConfiguration = configurationProvider.get(LDAPConfiguration.class);
         enabled = ldapConfiguration != null && ldapConfiguration.isEnabled();
 
         if (enabled)
@@ -352,7 +358,7 @@ public class AcegiLdapManager implements LdapManager, ConfigurationEventListener
     {
         if(event instanceof PostSaveEvent)
         {
-            init();
+            init((LDAPConfiguration) ((PostSaveEvent)event).getNewInstance());
         }
     }
 
