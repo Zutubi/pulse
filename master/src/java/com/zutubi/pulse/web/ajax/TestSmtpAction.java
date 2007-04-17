@@ -72,17 +72,17 @@ public class TestSmtpAction extends ActionSupport
     {
         if(!TextUtils.stringSet(host))
         {
-            addActionError(getText("smtp.host.required"));
+//            addActionError(getText("smtp.host.required"));
         }
 
         if(!TextUtils.stringSet(from))
         {
-            addActionError(getText("smtp.from.required"));
+//            addActionError(getText("smtp.from.required"));
         }
 
         if(!TextUtils.stringSet(to))
         {
-            addActionError(getText("smtp.to.required"));
+//            addActionError(getText("smtp.to.required"));
         }
 
         if (!hasErrors())
@@ -93,7 +93,6 @@ public class TestSmtpAction extends ActionSupport
                 {
                     port = -1;
                 }
-                EmailContactPoint.sendMail(to, prefix + " Test Email", "text/plain", "Welcome to Zutubi Pulse!", host, port, ssl, username, password, from);
             }
             catch(Exception e)
             {

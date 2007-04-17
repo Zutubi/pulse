@@ -1,9 +1,9 @@
 package com.zutubi.pulse.model;
 
 import com.opensymphony.util.TextUtils;
+import com.zutubi.prototype.config.ConfigurationProvider;
 import com.zutubi.pulse.bootstrap.ComponentContext;
-import com.zutubi.pulse.bootstrap.MasterConfiguration;
-import com.zutubi.pulse.bootstrap.MasterConfigurationManager;
+import com.zutubi.pulse.prototype.config.admin.EmailConfiguration;
 import com.zutubi.pulse.util.logging.Logger;
 import com.zutubi.validation.annotations.Email;
 import com.zutubi.validation.annotations.Required;
@@ -58,28 +58,17 @@ public class EmailContactPoint extends ContactPoint
 
     public void internalNotify(BuildResult result, String subject, String rendered, String mimeType) throws Exception
     {
-        MasterConfiguration config = lookupConfigManager().getAppConfig();
+        EmailConfiguration config = lookupConfigProvider().get(EmailConfiguration.class);
 
-        if (!TextUtils.stringSet(config.getSmtpHost()))
+        if (!TextUtils.stringSet(config.getHost()))
         {
             LOG.severe(NO_SMTP_HOST_ERROR);
             throw new NotificationException(NO_SMTP_HOST_ERROR);
         }
 
-        String prefix = config.getSmtpPrefix();
-
-        if (prefix == null)
-        {
-            prefix = "";
-        }
-        else if (prefix.length() > 0)
-        {
-            prefix += " ";
-        }
-
         try
         {
-            sendMail(getEmail(), prefix + subject, mimeType, rendered, config.getSmtpHost(), config.getSmtpPort(), config.getSmtpSSL(), config.getSmtpUsername(), config.getSmtpPassword(), config.getSmtpFrom());
+            sendMail(getEmail(), config, subject, mimeType, rendered);
         }
         catch (Exception e)
         {
@@ -88,41 +77,47 @@ public class EmailContactPoint extends ContactPoint
         }
     }
 
-    private MasterConfigurationManager lookupConfigManager()
+    private ConfigurationProvider lookupConfigProvider()
     {
-        return (MasterConfigurationManager) ComponentContext.getBean("configurationManager");
+        return (ConfigurationProvider) ComponentContext.getBean("configurationProvider");
     }
 
-    public static void sendMail(String email, String subject, String mimeType, String body, String host, int port, boolean ssl, final String username, final String password, String from) throws Exception
+    public static void sendMail(String address, final EmailConfiguration config, String subject, String mimeType, String message) throws MessagingException
     {
-        Properties properties = (Properties) System.getProperties().clone();
-        if(ssl)
+        String prefix = config.getSubjectPrefix();
+        if (TextUtils.stringSet(prefix))
         {
-            properties.put(SMTPS_HOST_PROPERTY, host);
+            subject = prefix + " " + subject;
+        }
+
+        Properties properties = (Properties) System.getProperties().clone();
+        if(config.getSsl())
+        {
+            properties.put(SMTPS_HOST_PROPERTY, config.getHost());
         }
         else
         {
-            properties.put(SMTP_HOST_PROPERTY, host);
+            properties.put(SMTP_HOST_PROPERTY, config.getHost());
         }
 
-        if(port > 0)
+        if(config.isCustomPort())
         {
-            if(ssl)
+            if(config.getSsl())
             {
-                properties.put(SMTPS_PORT_PROPERTY, Integer.toString(port));
+                properties.put(SMTPS_PORT_PROPERTY, Integer.toString(config.getPort()));
             }
             else
             {
-                properties.put(SMTP_PORT_PROPERTY, Integer.toString(port));
+                properties.put(SMTP_PORT_PROPERTY, Integer.toString(config.getPort()));
             }
         }
 
 //        properties.put("mail.smtp.starttls.enable","true");
 
         Authenticator authenticator = null;
-        if (TextUtils.stringSet(username))
+        if (TextUtils.stringSet(config.getUsername()))
         {
-            if(ssl)
+            if(config.getSsl())
             {
                 properties.put(SMTPS_AUTH_PROPERTY, "true");
             }
@@ -130,12 +125,12 @@ public class EmailContactPoint extends ContactPoint
             {
                 properties.put(SMTP_AUTH_PROPERTY, "true");
             }
-            
+
             authenticator = new Authenticator()
             {
                 protected PasswordAuthentication getPasswordAuthentication()
                 {
-                    return new PasswordAuthentication(username, password);
+                    return new PasswordAuthentication(config.getUsername(), config.getPassword());
                 }
             };
         }
@@ -144,19 +139,19 @@ public class EmailContactPoint extends ContactPoint
 
         Message msg = new MimeMessage(session);
 
-        if (from != null)
+        if (TextUtils.stringSet(config.getFrom()))
         {
-            msg.setFrom(new InternetAddress(from));
+            msg.setFrom(new InternetAddress(config.getFrom()));
         }
 
-        InternetAddress toAddress = new InternetAddress(email);
+        InternetAddress toAddress = new InternetAddress(address);
         msg.setRecipient(Message.RecipientType.TO, toAddress);
         msg.setSubject(subject);
-        msg.setContent(body, mimeType);
+        msg.setContent(message, mimeType);
         msg.setHeader("X-Mailer", "Zutubi-Pulse");
         msg.setSentDate(new Date());
 
-        Transport transport = session.getTransport(ssl ? "smtps" : "smtp");
+        Transport transport = session.getTransport(config.getSsl() ? "smtps" : "smtp");
         try
         {
             transport.connect();

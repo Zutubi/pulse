@@ -3,20 +3,20 @@ package com.zutubi.pulse.prototype.config.admin;
 import com.zutubi.prototype.ConfigurationCheckHandler;
 import com.zutubi.prototype.annotation.TextArea;
 import com.zutubi.pulse.prototype.record.SymbolicName;
+import com.zutubi.pulse.model.EmailContactPoint;
+
+import javax.mail.MessagingException;
 
 /**
- *
- *
  */
 @SymbolicName("internal.emailConfigurationCheckHandler")
 public class EmailConfigurationCheckHandler implements ConfigurationCheckHandler<EmailConfiguration>
 {
     private String emailAddress;
-    private String message;
 
-    public void test(EmailConfiguration configuration)
+    public void test(EmailConfiguration configuration) throws Exception
     {
-        // send a test email to check the email server configuration.
+        EmailContactPoint.sendMail(emailAddress, configuration, "Test Email", "text/plain", "Welcome to Zutubi Pulse!");
     }
 
     public String getEmailAddress()
@@ -27,16 +27,5 @@ public class EmailConfigurationCheckHandler implements ConfigurationCheckHandler
     public void setEmailAddress(String emailAddress)
     {
         this.emailAddress = emailAddress;
-    }
-
-    @TextArea()
-    public String getMessage()
-    {
-        return message;
-    }
-
-    public void setMessage(String message)
-    {
-        this.message = message;
     }
 }

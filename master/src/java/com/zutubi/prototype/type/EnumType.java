@@ -21,4 +21,9 @@ public class EnumType extends SimpleType
     {
         return Enum.valueOf(getClazz(), (String) record);
     }
+
+    public Object unstantiate(Object instance) throws TypeException
+    {
+        return instance.toString();
+    }
 }

@@ -2,9 +2,7 @@ package com.zutubi.prototype.type;
 
 import com.zutubi.prototype.annotation.ID;
 import com.zutubi.prototype.config.ConfigurationPersistenceManager;
-import com.zutubi.prototype.type.record.PathUtils;
-import com.zutubi.prototype.type.record.Record;
-import com.zutubi.prototype.type.record.RecordManager;
+import com.zutubi.prototype.type.record.*;
 import com.zutubi.pulse.util.AnnotationUtils;
 import com.zutubi.pulse.util.logging.Logger;
 
@@ -74,6 +72,24 @@ public class MapType extends CollectionType
         }
 
         return instance;
+    }
+
+    public Object unstantiate(Object instance) throws TypeException
+    {
+        if(!(instance instanceof Map))
+        {
+            throw new TypeException("Expecting map, got '" + instance.getClass().getName() + "'");
+        }
+
+        MutableRecord result = createNewRecord();
+        Map<String, Object> map = (Map<String, Object>) instance;
+        Type collectionType = getCollectionType();
+        for(Map.Entry<String, Object> entry: map.entrySet())
+        {
+            result.put(entry.getKey(), collectionType.unstantiate(entry.getValue()));
+        }
+
+        return result;
     }
 
     public void setCollectionType(Type collectionType) throws TypeException

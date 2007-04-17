@@ -76,7 +76,7 @@ public abstract class CollectionType extends AbstractType implements ComplexType
         return newPath;
     }
 
-    public Record createNewRecord()
+    public MutableRecord createNewRecord()
     {
         return new MutableRecordImpl();
     }

@@ -44,4 +44,17 @@ public class PrimitiveType extends SimpleType implements Type
             throw new TypeConversionException(e.getMessage());
         }
     }
+
+    public Object unstantiate(Object instance) throws TypeException
+    {
+        TypeSqueezer squeezer = Squeezers.findSqueezer(getClazz());
+        try
+        {
+            return squeezer.squeeze(instance);
+        }
+        catch (SqueezeException e)
+        {
+            throw new TypeException(e);
+        }
+    }
 }

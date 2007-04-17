@@ -120,56 +120,6 @@ public class MasterConfigurationSupport extends ConfigSupport implements MasterC
         setProperty(HELP_URL, helpUrl);
     }
 
-    public String getSmtpHost()
-    {
-        return getProperty(SMTP_HOST);
-    }
-
-    public void setSmtpHost(String host)
-    {
-        setProperty(SMTP_HOST, host);
-    }
-
-    public int getSmtpPort()
-    {
-        return getInteger(SMTP_PORT, -1);
-    }
-
-    public void setSmtpPort(int port)
-    {
-        setInteger(SMTP_PORT, port);
-    }
-
-    public boolean getSmtpSSL()
-    {
-        return getBooleanProperty(SMTP_SSL, false);
-    }
-
-    public void setSmtpSSL(boolean ssl)
-    {
-        setBooleanProperty(SMTP_SSL, ssl);
-    }
-
-    public String getSmtpFrom()
-    {
-        return getProperty(SMTP_FROM);
-    }
-
-    public void setSmtpFrom(String from)
-    {
-        setProperty(SMTP_FROM, from);
-    }
-
-    public String getSmtpPassword()
-    {
-        return getProperty(SMTP_PASSWORD);
-    }
-
-    public void setSmtpPassword(String password)
-    {
-        setProperty(SMTP_PASSWORD, password);
-    }
-
     public Boolean getJabberForceSSL()
     {
         return getBooleanProperty(JABBER_FORCE_SSL, Boolean.FALSE);
@@ -208,26 +158,6 @@ public class MasterConfigurationSupport extends ConfigSupport implements MasterC
     public void setAnonymousSignupEnabled(Boolean signupEnabled)
     {
         setBooleanProperty(ANONYMOUS_SIGNUP_ENABLED, signupEnabled);
-    }
-
-    public String getSmtpPrefix()
-    {
-        return getProperty(SMTP_PREFIX);
-    }
-
-    public void setSmtpPrefix(String prefix)
-    {
-        setProperty(SMTP_PREFIX, prefix);
-    }
-
-    public String getSmtpUsername()
-    {
-        return getProperty(SMTP_USERNAME);
-    }
-
-    public void setSmtpUsername(String username)
-    {
-        setProperty(SMTP_USERNAME, username);
     }
 
     public String getJabberHost()

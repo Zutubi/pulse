@@ -24,22 +24,6 @@ public interface MasterConfiguration extends LogConfiguration
     public static final String UNSATISFIABLE_RECIPE_TIMEOUT = "unsatisfiable.recipe.timeout";
     public static final long UNSATISFIABLE_RECIPE_TIMEOUT_DEFAULT = 15;
 
-    //---( mail configuration )---
-
-    public static final String SMTP_HOST = "mail.smtp.host";
-
-    public static final String SMTP_SSL = "mail.smtp.ssl";
-
-    public static final String SMTP_PORT = "mail.smtp.port";
-
-    public static final String SMTP_FROM = "mail.smtp.from";
-
-    public static final String SMTP_PREFIX = "mail.smtp.prefix";
-
-    public static final String SMTP_USERNAME = "mail.smtp.username";
-
-    public static final String SMTP_PASSWORD = "mail.smtp.password";
-
     //---( jabber configuration )---
 
     public static final String JABBER_HOST = "jabber.host";
@@ -83,34 +67,6 @@ public interface MasterConfiguration extends LogConfiguration
     String getHelpUrl();
 
     void setHelpUrl(String helpUrl);
-
-    String getSmtpHost();
-
-    void setSmtpHost(String host);
-
-    int getSmtpPort();
-
-    void setSmtpPort(int port);
-
-    boolean getSmtpSSL();
-
-    void setSmtpSSL(boolean ssl);
-
-    String getSmtpFrom();
-
-    void setSmtpFrom(String from);
-
-    String getSmtpPrefix();
-
-    void setSmtpPrefix(String prefix);
-
-    String getSmtpUsername();
-
-    void setSmtpUsername(String username);
-
-    String getSmtpPassword();
-
-    void setSmtpPassword(String password);
 
     String getJabberHost();
 

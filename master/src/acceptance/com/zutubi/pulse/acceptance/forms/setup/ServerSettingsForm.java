@@ -20,7 +20,7 @@ public class ServerSettingsForm extends BaseForm
 
     public String[] getFieldNames()
     {
-        return new String[]{"baseUrl", "smtpHost", "smtpSSL", "fromAddress", "username", "password", "prefix", "smtpCustomPort", "smtpPort"};
+        return new String[]{"baseUrl", "host", "ssl", "from", "username", "password", "subjectPrefix", "customPort", "port"};
     }
 
     public int[] getFieldTypes()

@@ -37,4 +37,10 @@ public class ReferenceType extends SimpleType implements Type
             return null;
         }
     }
+
+    public Object unstantiate(Object instance) throws TypeException
+    {
+        // FIXME
+        throw new TypeException("Unstantiate not yet supported for references");
+    }
 }

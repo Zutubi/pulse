@@ -19,23 +19,21 @@ import com.zutubi.validation.validators.EmailValidator;
  */
 @SymbolicName("internal.serverSettingsConfig")
 @ConfigurationCheck(ServerSettingsConfigurationCheckHandler.class)
-@Form(fieldOrder = {"baseUrl", "smtpHost", "smtpSSL", "fromAddress", "username", "password", "prefix", "smtpCustomPort", "smtpPort"})
+@Form(fieldOrder = {"baseUrl", "host", "ssl", "from", "username", "password", "subjectPrefix", "customPort", "port"})
 public class ServerSettingsConfiguration implements Validateable
 {
     @Url @Required
     private String baseUrl;
-    
-    @Email @Required
-    private String fromAddress;
-    private String smtpHost;
-    private boolean smtpSSL;
-    private boolean smtpCustomPort;
-    private int smtpPort = 25;
+    @Email
+    private String host;
+    private boolean ssl;
+    private String from;
+    private boolean customPort;
+    private int port = 25;
     private String username;
-    
     @Password
     private String password;
-    private String prefix;
+    private String subjectPrefix;
 
 /*
     public void initialise()
@@ -55,24 +53,24 @@ public class ServerSettingsConfiguration implements Validateable
         this.baseUrl = baseUrl;
     }
 
-    public String getFromAddress()
+    public String getFrom()
     {
-        return fromAddress;
+        return from;
     }
 
-    public void setFromAddress(String fromAddress)
+    public void setFrom(String from)
     {
-        this.fromAddress = fromAddress;
+        this.from = from;
     }
 
-    public String getSmtpHost()
+    public String getHost()
     {
-        return smtpHost;
+        return host;
     }
 
-    public void setSmtpHost(String smtpHost)
+    public void setHost(String host)
     {
-        this.smtpHost = smtpHost;
+        this.host = host;
     }
 
     public String getUsername()
@@ -95,70 +93,70 @@ public class ServerSettingsConfiguration implements Validateable
         this.password = password;
     }
 
-    public boolean getSmtpSSL()
+    public boolean getSsl()
     {
-        return smtpSSL;
+        return ssl;
     }
 
-    public void setSmtpSSL(boolean smtpSSL)
+    public void setSsl(boolean ssl)
     {
-        this.smtpSSL = smtpSSL;
+        this.ssl = ssl;
     }
 
-    public boolean getSmtpCustomPort()
+    public boolean getCustomPort()
     {
-        return smtpCustomPort;
+        return customPort;
     }
 
-    public void setSmtpCustomPort(boolean smtpCustomPort)
+    public void setCustomPort(boolean customPort)
     {
-        this.smtpCustomPort = smtpCustomPort;
+        this.customPort = customPort;
     }
 
-    public int getSmtpPort()
+    public int getPort()
     {
-        return smtpPort;
+        return port;
     }
 
-    public void setSmtpPort(int smtpPort)
+    public void setPort(int port)
     {
-        this.smtpPort = smtpPort;
+        this.port = port;
     }
 
     public void validate(ValidationContext context)
     {
-        if (TextUtils.stringSet(smtpHost))
+        if (TextUtils.stringSet(host))
         {
-            if (!TextUtils.stringSet(fromAddress))
+            if (!TextUtils.stringSet(from))
             {
-                context.addFieldError("fromAddress", "from address is required when smtp host is provided");
+                context.addFieldError("from", "from address is required when smtp host is provided");
             }
         }
 
         // If the from address is specified, then ensure that a valid value is set.
-        if (TextUtils.stringSet(fromAddress))
+        if (TextUtils.stringSet(from))
         {
             EmailValidator validator = new EmailValidator();
             validator.setValidationContext(context);
-            validator.setFieldName("fromAddress");
+            validator.setFieldName("from");
             try
             {
                 validator.validate(this);
             }
             catch (ValidationException e)
             {
-                context.addFieldError("fromAddress", e.getMessage());
+                context.addFieldError("from", e.getMessage());
             }
         }
     }
 
-    public String getPrefix()
+    public String getSubjectPrefix()
     {
-        return prefix;
+        return subjectPrefix;
     }
 
-    public void setPrefix(String prefix)
+    public void setSubjectPrefix(String subjectPrefix)
     {
-        this.prefix = prefix;
+        this.subjectPrefix = subjectPrefix;
     }
 }

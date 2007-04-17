@@ -1137,20 +1137,6 @@
             <result name="error" type="velocity">/generic-error.vm</result>
         </action>
 
-        <action name="smtp" class="com.zutubi.pulse.web.admin.SmtpConfigurationAction">
-            <interceptor-ref name="defaultStack"/>
-            <result name="error" type="velocity">configure-smtpconfig.vm</result>
-            <result name="success" type="redirect">/admin/serverSettings.action</result>
-        </action>
-
-        <action name="editSmtp" class="com.zutubi.pulse.web.admin.SmtpConfigurationAction">
-            <interceptor-ref name="crudStack"/>
-            <result name="input" type="velocity">configure-smtpconfig.vm</result>
-            <result name="error" type="velocity">configure-smtpconfig.vm</result>
-            <result name="cancel" type="redirect">/admin/serverSettings.action</result>
-            <result name="success" type="redirect">/admin/serverSettings.action</result>
-        </action>
-
         <action name="jabber" class="com.zutubi.pulse.web.admin.JabberConfigurationAction">
             <interceptor-ref name="defaultStack"/>
             <result name="error" type="velocity">configure-jabberconfig.vm</result>

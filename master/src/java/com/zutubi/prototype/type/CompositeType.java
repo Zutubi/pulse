@@ -1,11 +1,7 @@
 package com.zutubi.prototype.type;
 
 import com.zutubi.prototype.config.ConfigurationPersistenceManager;
-import com.zutubi.prototype.type.record.MutableRecord;
-import com.zutubi.prototype.type.record.MutableRecordImpl;
-import com.zutubi.prototype.type.record.PathUtils;
-import com.zutubi.prototype.type.record.Record;
-import com.zutubi.prototype.type.record.RecordManager;
+import com.zutubi.prototype.type.record.*;
 import com.zutubi.pulse.prototype.squeezer.SqueezeException;
 import com.zutubi.pulse.prototype.squeezer.Squeezers;
 import com.zutubi.pulse.prototype.squeezer.TypeSqueezer;
@@ -14,11 +10,8 @@ import com.zutubi.pulse.util.Mapping;
 import com.zutubi.pulse.util.logging.Logger;
 
 import java.lang.reflect.Method;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import java.lang.reflect.InvocationTargetException;
+import java.util.*;
 
 /**
  *
@@ -189,57 +182,32 @@ public class CompositeType extends AbstractType implements ComplexType
                 throw new TypeConversionException(e);
             }
         }
-        
+
         return instance;
     }
 
-//    public void resolveReferences(Object data, Object instance) throws TypeException
-//    {
-//        if (!(data instanceof Record))
-//        {
-//            throw new TypeException("Expected record, got: " + data.getClass().getName());
-//        }
-//
-//        // Check each of our properties:
-//        //   - if it is an reference, resolve it
-//        //   - if it is a complex type, recurisvely tell it to resolve
-//        Record record = (Record) data;
-//        if (instance != null)
-//        {
-//            for (TypeProperty referenceProperty : getProperties(ReferenceType.class))
-//            {
-//                Object path = record.get(referenceProperty.getName());
-//                if (path != null)
-//                {
-//                    ReferenceType type = (ReferenceType) referenceProperty.getType();
-//                    Object resolved = type.instantiate(path);
-//                    try
-//                    {
-//                        referenceProperty.getSetter().invoke(instance, resolved);
-//                    }
-//                    catch (Exception e)
-//                    {
-//                        throw new TypeException("Unable to set property '" + referenceProperty.getName() + "': " + e.getMessage(), e);
-//                    }
-//                }
-//            }
-//
-//            for (TypeProperty complexProperty : getProperties(ComplexType.class))
-//            {
-//                ComplexType complex = (ComplexType) complexProperty.getType();
-//                Object nestedInstance;
-//                try
-//                {
-//                    nestedInstance = complexProperty.getGetter().invoke(instance);
-//                }
-//                catch (Exception e)
-//                {
-//                    throw new TypeException("Unable to get property '" + complexProperty.getName() + ": " + e.getMessage(), e);
-//                }
-//                complex.resolveReferences(record.get(complexProperty.getName()), nestedInstance);
-//            }
-//        }
-//    }
+    public Object unstantiate(Object instance) throws TypeException
+    {
+        MutableRecord result = createNewRecord(false);
+        for(TypeProperty property: getProperties())
+        {
+            final Method getter = property.getGetter();
+            if(getter != null)
+            {
+                try
+                {
+                    Object value = getter.invoke(instance);
+                    result.put(property.getName(), property.getType().unstantiate(value));
+                }
+                catch (Exception e)
+                {
+                    throw new TypeException("Unable to invoke getter for property '" + property.getName() + "': " + e.getMessage(), e);
+                }
+            }
+        }
+        
+        return result;
+    }
 
     public String insert(String path, Record newRecord, RecordManager recordManager)
     {
@@ -257,6 +225,11 @@ public class CompositeType extends AbstractType implements ComplexType
 
     public MutableRecord createNewRecord()
     {
+        return createNewRecord(true);
+    }
+
+    private MutableRecord createNewRecord(boolean initialise)
+    {
         MutableRecordImpl record = new MutableRecordImpl();
         for (String propertyName : getPropertyNames(MapType.class))
         {
@@ -268,27 +241,30 @@ public class CompositeType extends AbstractType implements ComplexType
         }
         record.setSymbolicName(getSymbolicName());
 
-        // setup the default values, instantiate the configuration object and
-        // extract the default values.
-        try
+        if (initialise)
         {
-            Object defaultInstance = getClazz().newInstance();
-            for (TypeProperty property : getProperties(SimpleType.class))
+            // setup the default values, instantiate the configuration object and
+            // extract the default values.
+            try
             {
-                try
+                Object defaultInstance = getClazz().newInstance();
+                for (TypeProperty property : getProperties(SimpleType.class))
                 {
-                    TypeSqueezer squeezer = Squeezers.findSqueezer(property.getClazz());
-                    record.put(property.getName(), squeezer.squeeze(property.getGetter().invoke(defaultInstance)));
-                }
-                catch (SqueezeException e)
-                {
-                    LOG.warning(e);
+                    try
+                    {
+                        TypeSqueezer squeezer = Squeezers.findSqueezer(property.getClazz());
+                        record.put(property.getName(), squeezer.squeeze(property.getGetter().invoke(defaultInstance)));
+                    }
+                    catch (SqueezeException e)
+                    {
+                        LOG.warning(e);
+                    }
                 }
             }
-        }
-        catch (Exception e)
-        {
-            LOG.warning(e);
+            catch (Exception e)
+            {
+                LOG.warning(e);
+            }
         }
 
         return record;

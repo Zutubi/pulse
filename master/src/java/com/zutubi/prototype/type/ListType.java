@@ -77,6 +77,41 @@ public class ListType extends CollectionType
         return instance;
     }
 
+    public Object unstantiate(Object instance) throws TypeException
+    {
+        if(!(instance instanceof List))
+        {
+            throw new TypeException("Expecting list, got '" + instance.getClass().getName() + "'");
+        }
+
+        List list = (List) instance;
+        Type collectionType = getCollectionType();
+        if(collectionType instanceof SimpleType)
+        {
+            // Make it a String array
+            String[] result = new String[list.size()];
+            int i = 0;
+            for(Object o: list)
+            {
+                result[i++] = (String) collectionType.unstantiate(o);
+            }
+
+            return result;
+        }
+        else
+        {
+            // A sub-record.  We have no sensible way to define an ordering...
+            MutableRecord result = createNewRecord();
+            int i = 0;
+            for(Object o: list)
+            {
+                result.put(Integer.toString(i++), collectionType.unstantiate(o));
+            }
+
+            return result;
+        }
+    }
+
     private List<Object> create(String path)
     {
         List<Object> instance;

@@ -39,4 +39,6 @@ public interface Type
      * @throws TypeException
      */
     Object instantiate(String path, Object data) throws TypeException;
+
+    Object unstantiate(Object instance) throws TypeException;
 }

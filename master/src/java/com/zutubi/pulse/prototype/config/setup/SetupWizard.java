@@ -3,7 +3,10 @@ package com.zutubi.pulse.prototype.config.setup;
 import com.zutubi.prototype.config.ConfigurationPersistenceManager;
 import com.zutubi.prototype.type.CompositeType;
 import com.zutubi.prototype.type.TypeException;
+import com.zutubi.prototype.type.Type;
+import com.zutubi.prototype.type.TypeProperty;
 import com.zutubi.prototype.type.record.MutableRecord;
+import com.zutubi.prototype.type.record.PathUtils;
 import com.zutubi.prototype.wizard.WizardState;
 import com.zutubi.prototype.wizard.WizardTransition;
 import com.zutubi.prototype.wizard.webwork.AbstractTypeWizard;
@@ -18,6 +21,8 @@ import com.zutubi.pulse.model.User;
 import com.zutubi.pulse.model.UserManager;
 import com.zutubi.pulse.security.AcegiUtils;
 import com.zutubi.pulse.web.DefaultAction;
+import com.zutubi.pulse.prototype.config.admin.EmailConfiguration;
+import com.zutubi.pulse.prototype.config.admin.GlobalConfiguration;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -69,7 +74,8 @@ public class SetupWizard extends AbstractTypeWizard
         try
         {
             AdminUserConfiguration adminConfig = (AdminUserConfiguration) adminConfigType.instantiate(null, wizardStates.get(0).getRecord());
-            ServerSettingsConfiguration serverConfig = (ServerSettingsConfiguration) serverConfigType.instantiate(null, wizardStates.get(1).getRecord());
+            MutableRecord serverConfigRecord = wizardStates.get(1).getRecord();
+            ServerSettingsConfiguration serverConfig = (ServerSettingsConfiguration) serverConfigType.instantiate(null, serverConfigRecord);
 
             MasterConfiguration config = configurationManager.getAppConfig();
 
@@ -112,17 +118,8 @@ public class SetupWizard extends AbstractTypeWizard
 
             // apply the settings
             config.setBaseUrl(serverConfig.getBaseUrl());
-            config.setSmtpFrom(serverConfig.getFromAddress());
-            config.setSmtpHost(serverConfig.getSmtpHost());
-            config.setSmtpSSL(serverConfig.getSmtpSSL());
-            if(serverConfig.getSmtpCustomPort())
-            {
-                config.setSmtpPort(serverConfig.getSmtpPort());
-            }
-            config.setSmtpSSL(serverConfig.getSmtpSSL());
-            config.setSmtpUsername(serverConfig.getUsername());
-            config.setSmtpPassword(serverConfig.getPassword());
-            config.setSmtpPrefix(serverConfig.getPrefix());
+
+            extractAndSave(EmailConfiguration.class, serverConfigRecord);
 
             // login as the admin user.  safe to directly create AcegiUser as
             // we know the user has no external authorities
@@ -154,6 +151,27 @@ public class SetupWizard extends AbstractTypeWizard
             e.printStackTrace();
         }
 
+    }
+
+    private void extractAndSave(Class clazz, MutableRecord wizardRecord)
+    {
+        CompositeType type = typeRegistry.getType(clazz);
+
+        MutableRecord record = type.createNewRecord();
+        for(TypeProperty property: type.getProperties())
+        {
+            String name = property.getName();
+            Object value = wizardRecord.get(name);
+            if(value != null)
+            {
+                record.put(name, value);
+            }
+        }
+
+        List<String> paths = configurationPersistenceManager.getConfigurationPaths(type);
+        assert(paths.size() == 1);
+        String path = paths.get(0);
+        configurationPersistenceManager.saveRecord(PathUtils.getParentPath(path), PathUtils.getBaseName(path), record);
     }
 
     /**

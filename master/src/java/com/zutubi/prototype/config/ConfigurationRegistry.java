@@ -1,21 +1,8 @@
 package com.zutubi.prototype.config;
 
-import com.zutubi.prototype.type.CompositeType;
-import com.zutubi.prototype.type.ListType;
-import com.zutubi.prototype.type.MapType;
-import com.zutubi.prototype.type.ProjectMapType;
-import com.zutubi.prototype.type.TypeException;
-import com.zutubi.prototype.type.TypeProperty;
-import com.zutubi.prototype.type.TypeRegistry;
-import com.zutubi.pulse.model.ProjectManager;
+import com.zutubi.prototype.type.*;
 import com.zutubi.pulse.prototype.config.*;
-import com.zutubi.pulse.prototype.config.admin.EmailConfiguration;
-import com.zutubi.pulse.prototype.config.admin.GeneralAdminConfiguration;
 import com.zutubi.pulse.prototype.config.admin.GlobalConfiguration;
-import com.zutubi.pulse.prototype.config.admin.JabberConfiguration;
-import com.zutubi.pulse.prototype.config.admin.LDAPConfiguration;
-import com.zutubi.pulse.prototype.config.admin.LicenseKeyConfiguration;
-import com.zutubi.pulse.prototype.config.admin.LoggingConfiguration;
 import com.zutubi.pulse.prototype.config.setup.SetupConfiguration;
 
 /**

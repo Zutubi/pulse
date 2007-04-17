@@ -20,6 +20,7 @@ public class RootFileObject extends AbstractPulseFileObject
         // setup the default root node definitions.
         nodesDefinitions.put("artifacts", ArtifactsFileObject.class);
         nodesDefinitions.put("builds", BuildsFileObject.class);
+        nodesDefinitions.put("config", ConfigFileObject.class);
         nodesDefinitions.put("plugins", PluginsFileObject.class);
         nodesDefinitions.put("projects", ProjectsFileObject.class);
     }

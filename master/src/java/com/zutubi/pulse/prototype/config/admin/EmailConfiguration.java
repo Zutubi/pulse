@@ -1,20 +1,37 @@
 package com.zutubi.pulse.prototype.config.admin;
 
 import com.zutubi.prototype.annotation.ConfigurationCheck;
+import com.zutubi.prototype.annotation.Password;
+import com.zutubi.prototype.annotation.Form;
 import com.zutubi.pulse.prototype.record.SymbolicName;
+import com.zutubi.validation.annotations.Required;
+import com.zutubi.validation.annotations.Email;
+import com.zutubi.validation.annotations.Numeric;
+import com.zutubi.validation.Validateable;
+import com.zutubi.validation.ValidationContext;
+import com.opensymphony.util.TextUtils;
 
 /**
  *
  *
  */
 @SymbolicName("emailConfig")
+@Form(fieldOrder = { "host", "ssl", "from", "username", "password", "subjectPrefix", "customPort", "port"})
 @ConfigurationCheck(EmailConfigurationCheckHandler.class)
 public class EmailConfiguration
 {
+    @Required
     private String host;
-    private String username;
-    private String subjectPrefix;
+    private boolean ssl = false;
+    @Required @Email
     private String from;
+    private String username;
+    @Password
+    private String password;
+    private String subjectPrefix;
+    private boolean customPort;
+    @Numeric(min = 1)
+    private int port;
 
     public String getHost()
     {
@@ -24,6 +41,26 @@ public class EmailConfiguration
     public void setHost(String host)
     {
         this.host = host;
+    }
+
+    public boolean getSsl()
+    {
+        return ssl;
+    }
+
+    public void setSsl(boolean ssl)
+    {
+        this.ssl = ssl;
+    }
+
+    public String getFrom()
+    {
+        return from;
+    }
+
+    public void setFrom(String from)
+    {
+        this.from = from;
     }
 
     public String getUsername()
@@ -36,6 +73,16 @@ public class EmailConfiguration
         this.username = username;
     }
 
+    public String getPassword()
+    {
+        return password;
+    }
+
+    public void setPassword(String password)
+    {
+        this.password = password;
+    }
+
     public String getSubjectPrefix()
     {
         return subjectPrefix;
@@ -46,13 +93,30 @@ public class EmailConfiguration
         this.subjectPrefix = subjectPrefix;
     }
 
-    public String getFrom()
+    public boolean isCustomPort()
     {
-        return from;
+        return customPort;
     }
 
-    public void setFrom(String from)
+    public void setCustomPort(boolean customPort)
     {
-        this.from = from;
+        this.customPort = customPort;
+    }
+
+    public int getPort()
+    {
+        if(customPort)
+        {
+            return port;
+        }
+        else
+        {
+            return ssl ? 465 : 25;
+        }
+    }
+
+    public void setPort(int port)
+    {
+        this.port = port;
     }
 }
