@@ -354,7 +354,7 @@ public class AcegiLdapManager implements LdapManager, ConfigurationEventListener
         return statusMessage;
     }
 
-    public synchronized void handleEvent(ConfigurationEvent event)
+    public synchronized void handleConfigurationEvent(ConfigurationEvent event)
     {
         if(event instanceof PostSaveEvent)
         {

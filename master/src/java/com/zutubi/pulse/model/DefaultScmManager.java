@@ -17,6 +17,8 @@ import com.zutubi.pulse.util.Constants;
 import com.zutubi.pulse.util.Pair;
 import com.zutubi.pulse.util.logging.Logger;
 import com.zutubi.pulse.ShutdownManager;
+import com.zutubi.pulse.prototype.config.admin.GeneralAdminConfiguration;
+import com.zutubi.prototype.config.ConfigurationProvider;
 
 import java.util.HashMap;
 import java.util.List;
@@ -43,7 +45,7 @@ public class DefaultScmManager implements ScmManager, Stoppable
     private static final String MONITOR_GROUP = "scm";
     private static final long POLLING_FREQUENCY = Constants.MINUTE;
 
-    private MasterConfigurationManager configManager;
+    private ConfigurationProvider configurationProvider;
 
     private final Map<Long, Pair<Long, Revision>> waiting = new HashMap<Long, Pair<Long, Revision>>();
     private final Map<Long, Revision> latestRevisions = new HashMap<Long, Revision>();
@@ -61,11 +63,6 @@ public class DefaultScmManager implements ScmManager, Stoppable
     public void setScheduler(Scheduler scheduler)
     {
         this.scheduler = scheduler;
-    }
-
-    public void setConfigurationManager(MasterConfigurationManager configManager)
-    {
-        this.configManager = configManager;
     }
 
     public void init()
@@ -302,12 +299,7 @@ public class DefaultScmManager implements ScmManager, Stoppable
 
     public int getDefaultPollingInterval()
     {
-        return configManager.getAppConfig().getScmPollingInterval();
-    }
-
-    public void setDefaultPollingInterval(int interval)
-    {
-        configManager.getAppConfig().setScmPollingInterval(interval);
+        return configurationProvider.get(GeneralAdminConfiguration.class).getScmPollingInterval();
     }
 
     /**
@@ -328,5 +320,10 @@ public class DefaultScmManager implements ScmManager, Stoppable
     public void setShutdownManager(ShutdownManager shutdownManager)
     {
         this.shutdownManager = shutdownManager;
+    }
+
+    public void setConfigurationProvider(ConfigurationProvider configurationProvider)
+    {
+        this.configurationProvider = configurationProvider;
     }
 }

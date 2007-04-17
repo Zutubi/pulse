@@ -2,7 +2,6 @@ package com.zutubi.pulse;
 
 import com.zutubi.pulse.agent.Agent;
 import com.zutubi.pulse.agent.AgentManager;
-import com.zutubi.pulse.bootstrap.MasterConfigurationManager;
 import com.zutubi.pulse.core.BuildException;
 import com.zutubi.pulse.core.BuildRevision;
 import com.zutubi.pulse.core.RecipeRequest;
@@ -19,6 +18,11 @@ import com.zutubi.pulse.scm.SCMChangeEvent;
 import com.zutubi.pulse.scm.SCMException;
 import com.zutubi.pulse.util.Constants;
 import com.zutubi.pulse.util.logging.Logger;
+import com.zutubi.pulse.prototype.config.admin.GeneralAdminConfiguration;
+import com.zutubi.prototype.config.ConfigurationProvider;
+import com.zutubi.prototype.config.ConfigurationEventListener;
+import com.zutubi.prototype.config.events.ConfigurationEvent;
+import com.zutubi.prototype.config.events.PostSaveEvent;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -31,9 +35,8 @@ import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.ReentrantLock;
 
 /**
- * <class-comment/>
  */
-public class ThreadedRecipeQueue implements Runnable, RecipeQueue, EventListener, Stoppable
+public class ThreadedRecipeQueue implements Runnable, RecipeQueue, EventListener, Stoppable, ConfigurationEventListener
 {
     private static final Logger LOG = Logger.getLogger(ThreadedRecipeQueue.class);
 
@@ -130,8 +133,6 @@ public class ThreadedRecipeQueue implements Runnable, RecipeQueue, EventListener
 
     /**
      * Enqueue a new recipe dispatch request.
-     *
-     * @param dispatchRequest
      */
     public void enqueue(RecipeDispatchRequest dispatchRequest)
     {
@@ -718,14 +719,33 @@ public class ThreadedRecipeQueue implements Runnable, RecipeQueue, EventListener
         return new Class[]{RecipeCompletedEvent.class, RecipeErrorEvent.class, SCMChangeEvent.class, AgentEvent.class};
     }
 
+    public void handleConfigurationEvent(ConfigurationEvent event)
+    {
+        if(event instanceof PostSaveEvent)
+        {
+            updateTimeout((GeneralAdminConfiguration) ((PostSaveEvent)event).getNewInstance());
+        }
+    }
+
+    private void updateTimeout(GeneralAdminConfiguration adminConfiguration)
+    {
+        long timeout = adminConfiguration.getRecipeTimeout();
+        if(timeout > 0)
+        {
+            timeout *= Constants.MINUTE;
+        }
+
+        this.unsatisfiableTimeout = timeout;
+    }
+
+    public void setUnsatisfiableTimeout(int timeout)
+    {
+        this.unsatisfiableTimeout = timeout;
+    }
+
     public void setSleepInterval(int sleepInterval)
     {
         this.sleepInterval = sleepInterval;
-    }
-
-    public void setUnsatisfiableTimeout(long unsatisfiableTimeout)
-    {
-        this.unsatisfiableTimeout = unsatisfiableTimeout;
     }
 
     public void setEventManager(EventManager eventManager)
@@ -738,14 +758,11 @@ public class ThreadedRecipeQueue implements Runnable, RecipeQueue, EventListener
         this.agentManager = agentManager;
     }
 
-    public void setConfigurationManager(MasterConfigurationManager configurationManager)
+    public void setConfigurationProvider(ConfigurationProvider configurationProvider)
     {
-        long timeout = configurationManager.getAppConfig().getUnsatisfiableRecipeTimeout();
-        if(timeout > 0)
-        {
-            timeout *= Constants.MINUTE;
-        }
+        GeneralAdminConfiguration adminConfiguration = configurationProvider.get(GeneralAdminConfiguration.class);
+        updateTimeout(adminConfiguration);
 
-        this.unsatisfiableTimeout = timeout;
+        configurationProvider.registerEventListener(this, false, GeneralAdminConfiguration.class);
     }
 }

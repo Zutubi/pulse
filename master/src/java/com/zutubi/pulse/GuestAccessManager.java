@@ -1,17 +1,21 @@
 package com.zutubi.pulse;
 
-import com.zutubi.pulse.bootstrap.MasterConfigurationManager;
+import com.zutubi.prototype.config.ConfigurationEventListener;
+import com.zutubi.prototype.config.ConfigurationProvider;
+import com.zutubi.prototype.config.events.ConfigurationEvent;
+import com.zutubi.prototype.config.events.PostSaveEvent;
 import com.zutubi.pulse.model.GrantedAuthority;
+import com.zutubi.pulse.prototype.config.admin.GeneralAdminConfiguration;
 import org.acegisecurity.GrantedAuthorityImpl;
 import org.acegisecurity.providers.anonymous.AnonymousProcessingFilter;
 import org.acegisecurity.userdetails.memory.UserAttribute;
 
 /**
  */
-public class GuestAccessManager
+public class GuestAccessManager implements ConfigurationEventListener
 {
     private AnonymousProcessingFilter anonymousProcessingFilter;
-    private MasterConfigurationManager configurationManager;
+    private ConfigurationProvider configurationProvider;
 
     public void init()
     {
@@ -20,7 +24,7 @@ public class GuestAccessManager
 
         newAttribute.setPassword(userAttribute.getPassword());
         newAttribute.addAuthority(new GrantedAuthorityImpl(GrantedAuthority.ANONYMOUS));
-        if(configurationManager.getAppConfig().getAnonymousAccessEnabled())
+        if(configurationProvider.get(GeneralAdminConfiguration.class).isAnonymousAccessEnabled())
         {
             newAttribute.addAuthority(new GrantedAuthorityImpl(GrantedAuthority.GUEST));
         }
@@ -28,13 +32,22 @@ public class GuestAccessManager
         anonymousProcessingFilter.setUserAttribute(newAttribute);
     }
 
+    public void handleConfigurationEvent(ConfigurationEvent event)
+    {
+        if(event instanceof PostSaveEvent)
+        {
+            init();
+        }
+    }
+
     public void setAnonymousProcessingFilter(AnonymousProcessingFilter anonymousProcessingFilter)
     {
         this.anonymousProcessingFilter = anonymousProcessingFilter;
     }
 
-    public void setConfigurationManager(MasterConfigurationManager configurationManager)
+    public void setConfigurationProvider(ConfigurationProvider configurationProvider)
     {
-        this.configurationManager = configurationManager;
+        this.configurationProvider = configurationProvider;
+        configurationProvider.registerEventListener(this, false, GeneralAdminConfiguration.class);
     }
 }

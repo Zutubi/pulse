@@ -2,23 +2,24 @@ package com.zutubi.pulse.prototype.config.admin;
 
 import com.zutubi.prototype.annotation.Form;
 import com.zutubi.pulse.prototype.record.SymbolicName;
+import com.opensymphony.util.TextUtils;
 
 /**
  *
  *
  */
 @SymbolicName("generalConfig")
-@Form(fieldOrder={"baseUrl", "baseHelpUrl", "recipeTimeout", "scmPollingInterval"})
+@Form(fieldOrder={"baseUrl", "baseHelpUrl", "rssEnabled", "anonymousAccessEnabled", "anonymousSignupEnabled", "scmPollingInterval", "recipeTimeoutEnabled", "recipeTimeout" })
 public class GeneralAdminConfiguration
 {
     private String baseUrl;
-    private String baseHelpUrl;
-    private boolean rssEnabled;
-    private boolean anonymousAccessEnabled;
-    private boolean anonymousSignupEnabled;
-    private int scmPollingInterval;
-    private boolean recipeTimeoutEnabled;
-    private int recipeTimeout;
+    private String baseHelpUrl = "http://confluence.zutubi.com/display/pulse0200";
+    private boolean rssEnabled = true;
+    private boolean anonymousAccessEnabled = false;
+    private boolean anonymousSignupEnabled = false;
+    private int scmPollingInterval = 5;
+    private boolean recipeTimeoutEnabled = true;
+    private int recipeTimeout = 15;
 
     public String getBaseUrl()
     {
@@ -27,6 +28,11 @@ public class GeneralAdminConfiguration
 
     public void setBaseUrl(String baseUrl)
     {
+        // munge the url a little. We assume that there is no trailing '/' when using this property.
+        if (TextUtils.stringSet(baseUrl) && baseUrl.endsWith("/"))
+        {
+            baseUrl = baseUrl.substring(0, baseUrl.length() - 1);
+        }
         this.baseUrl = baseUrl;
     }
 

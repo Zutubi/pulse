@@ -12,6 +12,8 @@ import com.zutubi.pulse.events.build.BuildCompletedEvent;
 import com.zutubi.pulse.model.*;
 import com.zutubi.pulse.renderer.BuildResultRenderer;
 import com.zutubi.pulse.util.logging.Logger;
+import com.zutubi.pulse.prototype.config.admin.GeneralAdminConfiguration;
+import com.zutubi.prototype.config.ConfigurationProvider;
 
 import java.io.StringWriter;
 import java.util.*;
@@ -29,6 +31,7 @@ public class ResultNotifier implements EventListener
     private SubscriptionManager subscriptionManager;
     private UserManager userManager;
     private MasterConfigurationManager configurationManager;
+    private ConfigurationProvider configurationProvider;
     private BuildResultRenderer buildResultRenderer;
     private BuildManager buildManager;
 
@@ -60,7 +63,7 @@ public class ResultNotifier implements EventListener
 
         Set<Long> notifiedContactPoints = new HashSet<Long>();
         Map<String, RenderedResult> renderCache = new HashMap<String, RenderedResult>();
-        Map<String, Object> dataMap = getDataMap(buildResult, configurationManager.getAppConfig().getBaseUrl(), buildManager, buildResultRenderer);
+        Map<String, Object> dataMap = getDataMap(buildResult, configurationProvider.get(GeneralAdminConfiguration.class).getBaseUrl(), buildManager, buildResultRenderer);
 
         // Retrieve all of the subscriptions indicating an interest in the project
         // associated with the build result.
@@ -131,7 +134,7 @@ public class ResultNotifier implements EventListener
             buildResultRenderer.render(result, dataMap, template, w);
             String content = w.toString();
 
-            String subject = null;
+            String subject;
             String subjectTemplate = template + "-subject";
             if(buildResultRenderer.hasTemplate(subjectTemplate, result.isPersonal()))
             {
@@ -190,6 +193,11 @@ public class ResultNotifier implements EventListener
     public void setBuildManager(BuildManager buildManager)
     {
         this.buildManager = buildManager;
+    }
+
+    public void setConfigurationProvider(ConfigurationProvider configurationProvider)
+    {
+        this.configurationProvider = configurationProvider;
     }
 
     private class RenderedResult

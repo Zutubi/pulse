@@ -11,13 +11,14 @@
                 <value>com.zutubi.pulse.bootstrap.FreemarkerLoggingStartupTask</value>
                 <value>com.zutubi.pulse.bootstrap.ProcessSetupStartupTask</value>
                 <value>com.zutubi.pulse.BuildAborterStartupTask</value>
+                <value>com.zutubi.pulse.NextBuildNumberAdjusterStartupTask</value>
                 <value>com.zutubi.pulse.bootstrap.DeployMainWebappStartupTask</value>
             </list>
         </property>
         <property name="postStartupTasks">
             <list>
+                <value>com.zutubi.pulse.bootstrap.InitialiseExtensionsStartupTask</value>
                 <value>com.zutubi.pulse.bootstrap.SystemStartedMessageStartupTask</value>
-                <value>com.zutubi.pulse.NextBuildNumberAdjusterStartupTask</value>
             </list>
         </property>
     </bean>

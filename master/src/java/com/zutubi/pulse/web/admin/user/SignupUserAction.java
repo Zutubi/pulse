@@ -2,15 +2,18 @@ package com.zutubi.pulse.web.admin.user;
 
 import com.zutubi.pulse.model.AcegiUser;
 import com.zutubi.pulse.security.AcegiUtils;
+import com.zutubi.pulse.prototype.config.admin.GeneralAdminConfiguration;
+import com.zutubi.prototype.config.ConfigurationProvider;
 
 /**
- * <class comment/>
  */
 public class SignupUserAction extends CreateUserAction
 {
+    private ConfigurationProvider configurationProvider;
+
     public String execute() throws Exception
     {
-        if (!getConfigurationManager().getAppConfig().getAnonymousSignupEnabled())
+        if (!configurationProvider.get(GeneralAdminConfiguration.class).isAnonymousSignupEnabled())
         {
             return "disabled";
         }
@@ -21,5 +24,10 @@ public class SignupUserAction extends CreateUserAction
         AcegiUtils.loginAs(new AcegiUser(newUser));
 
         return SUCCESS;
+    }
+
+    public void setConfigurationProvider(ConfigurationProvider configurationProvider)
+    {
+        this.configurationProvider = configurationProvider;
     }
 }

@@ -11,5 +11,5 @@ import com.zutubi.prototype.config.events.ConfigurationEvent;
  */
 public interface ConfigurationEventListener
 {
-    public void handleEvent(ConfigurationEvent event);
+    public void handleConfigurationEvent(ConfigurationEvent event);
 }

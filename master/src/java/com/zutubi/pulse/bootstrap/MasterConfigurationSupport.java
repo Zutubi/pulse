@@ -50,41 +50,27 @@ public class MasterConfigurationSupport extends ConfigSupport implements MasterC
         setProperty(ADMIN_LOGIN, login);
     }
 
-    public String getBaseUrl()
-    {
-        return getProperty(BASE_URL);
-    }
-
-    public void setBaseUrl(String host)
-    {
-        // munge the url a little. We assume that there is no trailing '/' when using this property.
-        if (TextUtils.stringSet(host) && host.endsWith("/"))
-        {
-            host = host.substring(0, host.length() - 1);
-        }
-        setProperty(BASE_URL, host);
-    }
-
     public String getAgentHost()
     {
         String host = getProperty(AGENT_HOST);
         if(host == null)
         {
+            // FIXME
             // Base it on the base URL
-            String base = getBaseUrl();
-            if(base != null)
-            {
-                // Pull out just the host part
-                try
-                {
-                    URL url = new URL(getBaseUrl());
-                    host = url.getHost();
-                }
-                catch (MalformedURLException e)
-                {
-                    // Nice try
-                }
-            }
+//            String base = getBaseUrl();
+//            if(base != null)
+//            {
+//                // Pull out just the host part
+//                try
+//                {
+//                    URL url = new URL(getBaseUrl());
+//                    host = url.getHost();
+//                }
+//                catch (MalformedURLException e)
+//                {
+//                    // Nice try
+//                }
+//            }
 
             if(host == null)
             {
@@ -108,66 +94,6 @@ public class MasterConfigurationSupport extends ConfigSupport implements MasterC
     public void setAgentHost(String url)
     {
         setProperty(AGENT_HOST, url);
-    }
-
-    public String getHelpUrl()
-    {
-        return getProperty(HELP_URL, "http://confluence.zutubi.com/display/pulse0102");
-    }
-
-    public void setHelpUrl(String helpUrl)
-    {
-        setProperty(HELP_URL, helpUrl);
-    }
-
-    public Boolean getRssEnabled()
-    {
-        return getBooleanProperty(RSS_ENABLED, Boolean.TRUE);
-    }
-
-    public void setRssEnabled(Boolean rssEnabled)
-    {
-        setBooleanProperty(RSS_ENABLED, rssEnabled);
-    }
-
-    public Boolean getAnonymousAccessEnabled()
-    {
-        return getBooleanProperty(ANONYMOUS_ACCESS_ENABLED, Boolean.FALSE);
-    }
-
-    public void setAnonymousAccessEnabled(Boolean anonEnabled)
-    {
-        setBooleanProperty(ANONYMOUS_ACCESS_ENABLED, anonEnabled);
-    }
-
-    public Boolean getAnonymousSignupEnabled()
-    {
-        return getBooleanProperty(ANONYMOUS_SIGNUP_ENABLED, Boolean.FALSE);
-    }
-
-    public void setAnonymousSignupEnabled(Boolean signupEnabled)
-    {
-        setBooleanProperty(ANONYMOUS_SIGNUP_ENABLED, signupEnabled);
-    }
-
-    public Integer getScmPollingInterval()
-    {
-        return getInteger(SCM_POLLING_INTERVAL, Integer.valueOf(5));
-    }
-
-    public void setScmPollingInterval(Integer interval)
-    {
-        setInteger(SCM_POLLING_INTERVAL, interval);
-    }
-
-    public long getUnsatisfiableRecipeTimeout()
-    {
-        return getLong(UNSATISFIABLE_RECIPE_TIMEOUT, UNSATISFIABLE_RECIPE_TIMEOUT_DEFAULT);
-    }
-
-    public void setUnsatisfiableRecipeTimeout(Long timeout)
-    {
-        setLong(UNSATISFIABLE_RECIPE_TIMEOUT, timeout);
     }
 
     public boolean isMasterEnabled()

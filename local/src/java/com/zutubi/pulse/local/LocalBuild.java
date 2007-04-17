@@ -80,6 +80,9 @@ public class LocalBuild
 
             DevBootstrapManager.bootstrapAndLoadContexts("com/zutubi/pulse/local/bootstrap/context/applicationContext.xml");
 
+            PluginManager pluginManager = ComponentContext.getBean("pluginManager");
+            pluginManager.initialiseExtensions();
+            
             LocalBuild b = ComponentContext.getBean("localBuild");
             File baseDir = new File(System.getProperty("user.dir"));
             b.runBuild(baseDir, pulseFile, recipe, resourcesFile, outputDir);

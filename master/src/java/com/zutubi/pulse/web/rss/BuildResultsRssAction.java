@@ -5,6 +5,7 @@ import com.sun.syndication.feed.module.content.ContentModule;
 import com.sun.syndication.feed.module.content.ContentModuleImpl;
 import com.sun.syndication.feed.synd.*;
 import com.zutubi.pulse.ResultNotifier;
+import com.zutubi.pulse.prototype.config.admin.GeneralAdminConfiguration;
 import com.zutubi.pulse.bootstrap.MasterConfigurationManager;
 import com.zutubi.pulse.cache.Cache;
 import com.zutubi.pulse.cache.CacheManager;
@@ -18,6 +19,7 @@ import com.zutubi.pulse.search.Queries;
 import com.zutubi.pulse.search.SearchQuery;
 import com.zutubi.pulse.web.project.ProjectActionSupport;
 import com.zutubi.pulse.xwork.results.JITFeed;
+import com.zutubi.prototype.config.ConfigurationProvider;
 import org.hibernate.criterion.Expression;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Projections;
@@ -26,7 +28,6 @@ import java.io.StringWriter;
 import java.util.*;
 
 /**
- * <class-comment/>
  */
 public class BuildResultsRssAction extends ProjectActionSupport
 {
@@ -34,6 +35,7 @@ public class BuildResultsRssAction extends ProjectActionSupport
 
     private BuildResultRenderer buildResultRenderer;
     private MasterConfigurationManager configurationManager;
+    private ConfigurationProvider configurationProvider;
 
     private Queries queries;
 
@@ -60,7 +62,7 @@ public class BuildResultsRssAction extends ProjectActionSupport
     public String execute()
     {
         // check that rss is enabled.
-        if (!configurationManager.getAppConfig().getRssEnabled())
+        if (!configurationProvider.get(GeneralAdminConfiguration.class).isRssEnabled())
         {
             addActionError("rss feed is disabled");
             return "disabled";
@@ -107,9 +109,14 @@ public class BuildResultsRssAction extends ProjectActionSupport
     private String renderResult(BuildResult result)
     {
         StringWriter w = new StringWriter();
-        Map<String, Object> dataMap = ResultNotifier.getDataMap(result, configurationManager.getAppConfig().getBaseUrl(), buildManager, buildResultRenderer);
+        Map<String, Object> dataMap = ResultNotifier.getDataMap(result, getBaseUrl(), buildManager, buildResultRenderer);
         buildResultRenderer.render(result, dataMap, "html-email", w);
         return w.toString();
+    }
+
+    private String getBaseUrl()
+    {
+        return configurationProvider.get(GeneralAdminConfiguration.class).getBaseUrl();
     }
 
     public void setConfigurationManager(MasterConfigurationManager configurationManager)
@@ -130,6 +137,11 @@ public class BuildResultsRssAction extends ProjectActionSupport
     public void setCacheManager(CacheManager cacheManager)
     {
         this.cacheManager = cacheManager;
+    }
+
+    public void setConfigurationProvider(ConfigurationProvider configurationProvider)
+    {
+        this.configurationProvider = configurationProvider;
     }
 
     private interface RssFeedTemplate
@@ -174,7 +186,7 @@ public class BuildResultsRssAction extends ProjectActionSupport
 
         public String getLink()
         {
-            return configurationManager.getAppConfig().getBaseUrl() + "/viewProjects.action";
+            return getBaseUrl() + "/viewProjects.action";
         }
 
         public String getEntryTitle(BuildResult result)
@@ -188,7 +200,7 @@ public class BuildResultsRssAction extends ProjectActionSupport
 
         public String getEntryLink(BuildResult result)
         {
-            return configurationManager.getAppConfig().getBaseUrl() + "/viewBuild.action?id=" + result.getId();
+            return getBaseUrl() + "/viewBuild.action?id=" + result.getId();
         }
 
         public String getUID()
@@ -240,7 +252,7 @@ public class BuildResultsRssAction extends ProjectActionSupport
 
         public String getLink()
         {
-            return configurationManager.getAppConfig().getBaseUrl() + "/viewProjects.action";
+            return getBaseUrl() + "/viewProjects.action";
         }
 
         public String getEntryTitle(BuildResult result)
@@ -254,7 +266,7 @@ public class BuildResultsRssAction extends ProjectActionSupport
 
         public String getEntryLink(BuildResult result)
         {
-            return configurationManager.getAppConfig().getBaseUrl() + "/viewBuild.action?id=" + result.getId();
+            return getBaseUrl() + "/viewBuild.action?id=" + result.getId();
         }
 
         public String getUID()
@@ -296,7 +308,7 @@ public class BuildResultsRssAction extends ProjectActionSupport
 
         public String getLink()
         {
-            return configurationManager.getAppConfig().getBaseUrl() + "/currentBuild.action?id=" + project.getId();
+            return getBaseUrl() + "/currentBuild.action?id=" + project.getId();
         }
 
         public String getEntryTitle(BuildResult result)
@@ -306,7 +318,7 @@ public class BuildResultsRssAction extends ProjectActionSupport
 
         public String getEntryLink(BuildResult result)
         {
-            return configurationManager.getAppConfig().getBaseUrl() + "/viewBuild.action?id=" + result.getId();
+            return getBaseUrl() + "/viewBuild.action?id=" + result.getId();
         }
 
         public String getUID()
@@ -352,7 +364,7 @@ public class BuildResultsRssAction extends ProjectActionSupport
 
         public String getLink()
         {
-            return configurationManager.getAppConfig().getBaseUrl() + "/dashboard.action";
+            return getBaseUrl() + "/dashboard.action";
         }
 
         public String getEntryTitle(BuildResult result)
@@ -366,7 +378,7 @@ public class BuildResultsRssAction extends ProjectActionSupport
 
         public String getEntryLink(BuildResult result)
         {
-            return configurationManager.getAppConfig().getBaseUrl() + "/viewBuild.action?id=" + result.getId();
+            return getBaseUrl() + "/viewBuild.action?id=" + result.getId();
         }
 
         public String getUID()
@@ -454,6 +466,7 @@ public class BuildResultsRssAction extends ProjectActionSupport
         }
     }
 
+    @SuppressWarnings({"unchecked"})
     private List<SyndEntry> fetch(String key, List<Long> ids, SyndFeedEntryFactory factory)
     {
         Cache cache = cacheManager.getCache("BuildResultsRss");

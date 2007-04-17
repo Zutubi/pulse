@@ -11,8 +11,6 @@ import java.lang.annotation.Target;
 @Target({ElementType.METHOD, ElementType.FIELD})
 
 /**
- *
- *
  */
 @Constraint(URLValidator.class)
 public @interface Url

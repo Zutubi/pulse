@@ -11,6 +11,9 @@ import java.util.List;
  */
 public interface PluginManager
 {
+    void initialiseExtensions();
+    void registerExtensionManager(ExtensionManager extensionManager);
+
     IExtensionRegistry getExtenstionRegistry();
     IExtensionTracker getExtenstionTracker();
 

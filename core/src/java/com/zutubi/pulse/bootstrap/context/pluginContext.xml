@@ -1,9 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
 
-<beans>
-
-    <bean id="pluginManager" class="com.zutubi.pulse.plugins.DefaultPluginManager" init-method="init" destroy-method="destroy" autowire="byName"/>
-    <bean id="commandExtensionManager" class="com.zutubi.pulse.core.plugins.CommandExtensionManager" init-method="init" autowire="byName"/>
-
+<beans default-autowire="byName">
+    <bean id="pluginManager" class="com.zutubi.pulse.plugins.DefaultPluginManager" init-method="init" destroy-method="destroy"/>
+    <bean id="commandExtensionManager" class="com.zutubi.pulse.core.plugins.CommandExtensionManager" init-method="init"/>
 </beans>

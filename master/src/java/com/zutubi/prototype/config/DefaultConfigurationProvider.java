@@ -121,7 +121,7 @@ public class DefaultConfigurationProvider implements ConfigurationProvider
 
         public void handleEvent(Event evt)
         {
-            delegate.handleEvent((ConfigurationEvent)evt);
+            delegate.handleConfigurationEvent((ConfigurationEvent)evt);
         }
 
         public Class[] getHandledEvents()

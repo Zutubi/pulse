@@ -3,6 +3,7 @@ package com.zutubi.pulse.core.plugins;
 import com.zutubi.pulse.core.PulseFileLoaderFactory;
 import com.zutubi.pulse.plugins.Plugin;
 import com.zutubi.pulse.plugins.PluginManager;
+import com.zutubi.pulse.plugins.ExtensionManager;
 import com.zutubi.pulse.util.logging.Logger;
 import org.eclipse.core.internal.registry.osgi.OSGIUtils;
 import org.eclipse.core.runtime.IConfigurationElement;
@@ -18,7 +19,7 @@ import org.osgi.framework.Bundle;
 
 /**
  */
-public class CommandExtensionManager implements IExtensionChangeHandler
+public class CommandExtensionManager implements IExtensionChangeHandler, ExtensionManager
 {
     private static final Logger LOG = Logger.getLogger(CommandExtensionManager.class);
 
@@ -26,6 +27,11 @@ public class CommandExtensionManager implements IExtensionChangeHandler
     private PulseFileLoaderFactory fileLoaderFactory;
 
     public void init()
+    {
+        pluginManager.registerExtensionManager(this);
+    }
+
+    public void initialiseExtensions()
     {
         IExtensionRegistry registry = pluginManager.getExtenstionRegistry();
         IExtensionTracker tracker = pluginManager.getExtenstionTracker();

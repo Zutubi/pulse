@@ -3,7 +3,6 @@ package com.zutubi.pulse.prototype.config.setup;
 import com.zutubi.prototype.config.ConfigurationPersistenceManager;
 import com.zutubi.prototype.type.CompositeType;
 import com.zutubi.prototype.type.TypeException;
-import com.zutubi.prototype.type.Type;
 import com.zutubi.prototype.type.TypeProperty;
 import com.zutubi.prototype.type.record.MutableRecord;
 import com.zutubi.prototype.type.record.PathUtils;
@@ -14,22 +13,16 @@ import com.zutubi.pulse.bootstrap.MasterConfiguration;
 import com.zutubi.pulse.bootstrap.MasterConfigurationManager;
 import com.zutubi.pulse.bootstrap.SetupManager;
 import com.zutubi.pulse.bootstrap.SystemConfigurationSupport;
-import com.zutubi.pulse.model.AcegiUser;
-import com.zutubi.pulse.model.GrantedAuthority;
-import com.zutubi.pulse.model.Group;
-import com.zutubi.pulse.model.User;
-import com.zutubi.pulse.model.UserManager;
-import com.zutubi.pulse.security.AcegiUtils;
-import com.zutubi.pulse.web.DefaultAction;
+import com.zutubi.pulse.model.*;
 import com.zutubi.pulse.prototype.config.admin.EmailConfiguration;
 import com.zutubi.pulse.prototype.config.admin.GlobalConfiguration;
+import com.zutubi.pulse.security.AcegiUtils;
+import com.zutubi.pulse.web.DefaultAction;
 
 import java.util.LinkedList;
 import java.util.List;
 
 /**
- *
- *
  */
 public class SetupWizard extends AbstractTypeWizard
 {
@@ -42,12 +35,12 @@ public class SetupWizard extends AbstractTypeWizard
     private SetupManager setupManager;
 
     private CompositeType adminConfigType;
-    private CompositeType serverConfigType;
+    private static final String GENERAL_CONFIG_PROPERTY = "generalConfig";
 
     public void initialise()
     {
         adminConfigType = (CompositeType) configurationPersistenceManager.getType("setup/admin");
-        serverConfigType = (CompositeType) configurationPersistenceManager.getType("setup/server");
+        CompositeType serverConfigType = (CompositeType) configurationPersistenceManager.getType("setup/server");
 
         wizardStates = new LinkedList<WizardState>();
         addWizardStates(wizardStates, adminConfigType, null);
@@ -75,8 +68,6 @@ public class SetupWizard extends AbstractTypeWizard
         {
             AdminUserConfiguration adminConfig = (AdminUserConfiguration) adminConfigType.instantiate(null, wizardStates.get(0).getRecord());
             MutableRecord serverConfigRecord = wizardStates.get(1).getRecord();
-            ServerSettingsConfiguration serverConfig = (ServerSettingsConfiguration) serverConfigType.instantiate(null, serverConfigRecord);
-
             MasterConfiguration config = configurationManager.getAppConfig();
 
             // create the admin user.
@@ -117,7 +108,10 @@ public class SetupWizard extends AbstractTypeWizard
             userManager.addGroup(developersGroup);
 
             // apply the settings
-            config.setBaseUrl(serverConfig.getBaseUrl());
+            CompositeType generalType = typeRegistry.getType(GENERAL_CONFIG_PROPERTY);
+            MutableRecord record = generalType.createNewRecord();
+            record.put("baseUrl", serverConfigRecord.get("baseUrl"));
+            configurationPersistenceManager.saveRecord(GlobalConfiguration.SCOPE_NAME, GENERAL_CONFIG_PROPERTY, record);
 
             extractAndSave(EmailConfiguration.class, serverConfigRecord);
 
@@ -174,42 +168,21 @@ public class SetupWizard extends AbstractTypeWizard
         configurationPersistenceManager.saveRecord(PathUtils.getParentPath(path), PathUtils.getBaseName(path), record);
     }
 
-    /**
-     * Required resource.
-     *
-     * @param configurationPersistenceManager
-     *         instance
-     */
     public void setConfigurationPersistenceManager(ConfigurationPersistenceManager configurationPersistenceManager)
     {
         this.configurationPersistenceManager = configurationPersistenceManager;
     }
 
-    /**
-     * Required resource.
-     *
-     * @param userManager
-     */
     public void setUserManager(UserManager userManager)
     {
         this.userManager = userManager;
     }
 
-    /**
-     * Required resource.
-     *
-     * @param configurationManager
-     */
     public void setConfigurationManager(MasterConfigurationManager configurationManager)
     {
         this.configurationManager = configurationManager;
     }
 
-    /**
-     * Required resource.
-     *
-     * @param setupManager
-     */
     public void setSetupManager(SetupManager setupManager)
     {
         this.setupManager = setupManager;

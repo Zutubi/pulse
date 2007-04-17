@@ -57,6 +57,11 @@ public class ComponentContext
         context = newContext;
     }
 
+    public static boolean containsBean(String name)
+    {
+        return getContext() != null && getContext().containsBean(name);
+    }
+
     public static <U> U getBean(String name)
     {
         if (getContext() != null)

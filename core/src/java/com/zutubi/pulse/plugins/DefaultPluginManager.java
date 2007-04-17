@@ -2,6 +2,7 @@ package com.zutubi.pulse.plugins;
 
 import com.zutubi.pulse.util.*;
 import com.zutubi.pulse.util.logging.Logger;
+import com.zutubi.pulse.bootstrap.ComponentContext;
 import nu.xom.*;
 import org.eclipse.core.internal.registry.osgi.OSGIUtils;
 import org.eclipse.core.runtime.IExtension;
@@ -46,6 +47,7 @@ public class DefaultPluginManager implements PluginManager
 
     private IExtensionTracker extensionTracker;
     private List<PluginImpl> plugins;
+    private List<ExtensionManager> extensionManagers = new LinkedList<ExtensionManager>();
 
     public DefaultPluginManager()
     {
@@ -109,6 +111,16 @@ public class DefaultPluginManager implements PluginManager
         catch (Exception e)
         {
             LOG.severe("Unable to start plugin manager: " + e.getMessage(), e);
+        }
+    }
+
+    public void initialiseExtensions()
+    {
+        for(ExtensionManager extensionManager: extensionManagers)
+        {
+            // FIXME
+            ComponentContext.autowire(extensionManager);
+            extensionManager.initialiseExtensions();
         }
     }
 
@@ -549,6 +561,11 @@ public class DefaultPluginManager implements PluginManager
         }
 
         packageAdmin.resolveBundles(bundles);
+    }
+
+    public void registerExtensionManager(ExtensionManager extensionManager)
+    {
+        extensionManagers.add(extensionManager);
     }
 
     public IExtensionRegistry getExtenstionRegistry()

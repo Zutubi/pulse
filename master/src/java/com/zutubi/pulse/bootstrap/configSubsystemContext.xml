@@ -3,6 +3,12 @@
 <beans>
 
     <bean id="setupManager" class="com.zutubi.pulse.bootstrap.DefaultSetupManager" autowire="byName">
+        <property name="configContexts">
+            <list>
+                <value>classpath:/com/zutubi/pulse/bootstrap/context/pluginContext.xml</value>
+                <value>classpath:/com/zutubi/pulse/bootstrap/context/configContext.xml</value>
+            </list>
+        </property>
         <property name="daoContexts">
             <list>
                 <value>classpath:/com/zutubi/pulse/bootstrap/context/databaseContext.xml</value>
@@ -30,7 +36,6 @@
         </property>
         <property name="postStartupContexts">
             <list>
-                <value>classpath:/com/zutubi/pulse/bootstrap/context/pluginContext.xml</value>
             </list>
         </property>
     </bean>

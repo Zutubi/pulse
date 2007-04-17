@@ -20,36 +20,11 @@
     <bean id="notificationSchemeManager" class="com.zutubi.pulse.notifications.DefaultNotificationSchemeManager" init-method="init"/>
 -->
 
-    <bean id="validationManager" class="com.zutubi.pulse.validation.HybridValidationManager">
-        <property name="validationManager">
-            <ref local="zutubiValidationManager"/>
-        </property>
-    </bean>
-
-    <bean id="zutubiValidationManager" class="com.zutubi.validation.DefaultValidationManager">
-        <property name="providers">
-            <list>
-                <ref local="annotationValidatorProvider"/>
-                <ref local="reflectionValidatorProvider"/>
-            </list>
-        </property>
-    </bean>
-
-    <bean id="annotationValidatorProvider" class="com.zutubi.validation.providers.AnnotationValidatorProvider"/>
-    <bean id="reflectionValidatorProvider" class="com.zutubi.validation.providers.ReflectionValidatorProvider"/>
-    
-    <!-- prototype components. -->
-    <bean id="recordManager" class="com.zutubi.prototype.type.record.RecordManager" autowire="byName" init-method="init"/>
-    <bean id="typeRegistry" class="com.zutubi.prototype.type.TypeRegistry" autowire="byName"/>
-    <bean id="configurationRegistry" class="com.zutubi.prototype.config.ConfigurationRegistry" autowire="byName" init-method="init"/>
-    <bean id="configurationPersistenceManager" class="com.zutubi.prototype.config.ConfigurationPersistenceManager" autowire="byName"/>
-    <bean id="configurationProvider" class="com.zutubi.prototype.config.DefaultConfigurationProvider" autowire="byName" init-method="init"/>
-
     <bean id="formDescriptorFactory" class="com.zutubi.prototype.FormDescriptorFactory" autowire="byName"/>
 
     <bean id="freemarkerConfiguration" class="com.zutubi.pulse.bootstrap.freemarker.FreemarkerConfigurationFactoryBean" autowire="byName"/>
 
     <!-- can this be moved into the webserverContext? it does not seem appropriate here... -->
     <bean id="xworkObjectFactory" class="com.opensymphony.xwork.spring.SpringObjectFactory" init-method="initObjectFactory"/>
-
 </beans>
+        

@@ -231,13 +231,10 @@ public class CompositeType extends AbstractType implements ComplexType
     private MutableRecord createNewRecord(boolean initialise)
     {
         MutableRecordImpl record = new MutableRecordImpl();
-        for (String propertyName : getPropertyNames(MapType.class))
+        for(TypeProperty property: getProperties(ComplexType.class))
         {
-            record.put(propertyName, new MutableRecordImpl());
-        }
-        for (String propertyName : getPropertyNames(ListType.class))
-        {
-            record.put(propertyName, new MutableRecordImpl());
+            ComplexType type = (ComplexType) property.getType();
+            record.put(property.getName(), type.createNewRecord());
         }
         record.setSymbolicName(getSymbolicName());
 

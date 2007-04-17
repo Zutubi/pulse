@@ -54,11 +54,6 @@ public class ServerSettingsAction extends ActionSupport
         return commitMessageTransformers;
     }
 
-    public boolean isRecipeTimeoutEnabled()
-    {
-        return config.getUnsatisfiableRecipeTimeout() >= 0;
-    }
-
     public int getSupportedContactPoints()
     {
         return LicenseHolder.getLicense().getSupportedContactPoints();

@@ -10,6 +10,11 @@ import com.zutubi.pulse.model.UserManager;
 import com.zutubi.pulse.upgrade.UpgradeManager;
 import com.zutubi.pulse.util.IOUtils;
 import com.zutubi.pulse.util.logging.Logger;
+import com.zutubi.prototype.type.TypeRegistry;
+import com.zutubi.prototype.type.record.RecordManager;
+import com.zutubi.prototype.config.ConfigurationRegistry;
+import com.zutubi.prototype.config.ConfigurationPersistenceManager;
+import com.zutubi.prototype.config.ConfigurationProvider;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -31,25 +36,33 @@ public class DefaultSetupManager implements SetupManager
     private UpgradeManager upgradeManager;
 
     /**
-     * Contexts for Stage A: the database.
+     * Contexts for Stage A: the config subsystem.
+     */
+    private List<String> configContexts = new LinkedList<String>();
+
+    /**
+     * Contexts for Stage B: the database.
      */
     private List<String> daoContexts = new LinkedList<String>();
 
     /**
-     * Contexts for Stage B: the upgrade system.
+     * Contexts for Stage C: the upgrade system.
      */
     private List<String> upgradeContexts = new LinkedList<String>();
 
     /**
-     * Contexts for Stage C: setup / configuration.
+     * Contexts for Stage D: setup / configuration.
      */
     private List<String> setupContexts = new LinkedList<String>();
 
     /**
-     * Contexts for Stage D: application startup.
+     * Contexts for Stage E: application startup.
      */
     private List<String> startupContexts = new LinkedList<String>();
 
+    /**
+     * Contexts for Stage F: post-startup.
+     */
     private List<String> postStartupContexts = new LinkedList<String>();
 
     private SetupState state = SetupState.STARTING;
@@ -70,15 +83,9 @@ public class DefaultSetupManager implements SetupManager
         {
             // let the user know that they should continue / complete the setup process via the Web UI.
             SystemConfigurationSupport systemConfig = (SystemConfigurationSupport) configurationManager.getSystemConfig();
-
-            //TODO: I18N this message - note, this also only works if the user is installing on the local
-            //TODO: machine. We need to provide a better (widely applicable) URL.
-
-            String baseUrl = configurationManager.getAppConfig().getBaseUrl();
-            if (!TextUtils.stringSet(baseUrl))
-            {
-                baseUrl = systemConfig.getHostUrl();
-            }
+            // FIXME showing the base url is tricky as this can be called
+            // FIXME very early
+            String baseUrl = systemConfig.getHostUrl();
             System.err.println("Now go to " + baseUrl + " and follow the prompts.");
             promptShown = true;
         }
@@ -159,16 +166,33 @@ public class DefaultSetupManager implements SetupManager
 
         loadSystemProperties();
 
+        initialiseConfigurationSystem();
+
         state = SetupState.STARTING;
         if (isLicenseRequired())
         {
-            //TODO: we need to provide some feedback to the user about what / why there current license
+            //TODO: we need to provide some feedback to the user about what / why their current license
             //TODO: if one exists is not sufficient.
             state = SetupState.LICENSE;
             showPrompt();
             return;
         }
         requestLicenseComplete();
+    }
+
+    private void initialiseConfigurationSystem()
+    {
+        loadContexts(configContexts);
+
+        RecordManager recordManager = ComponentContext.getBean("recordManager");
+        ConfigurationRegistry configurationRegistry = ComponentContext.getBean("configurationRegistry");
+        ConfigurationPersistenceManager configurationPersistenceManager = ComponentContext.getBean("configurationPersistenceManager");
+        ConfigurationProvider configurationProvider = ComponentContext.getBean("configurationProvider");
+
+        recordManager.init();
+        configurationRegistry.init();
+        configurationPersistenceManager.init();
+        configurationProvider.init();
     }
 
     private void loadSystemProperties()
@@ -309,34 +333,24 @@ public class DefaultSetupManager implements SetupManager
         }
     }
 
-    /**
-     * Required resource.
-     *
-     * @param userManager
-     */
     public void setUserManager(UserManager userManager)
     {
         this.userManager = userManager;
     }
 
-    /**
-     * Required resource.
-     *
-     * @param upgradeManager
-     */
     public void setUpgradeManager(UpgradeManager upgradeManager)
     {
         this.upgradeManager = upgradeManager;
     }
 
-    /**
-     * Required resources.
-     *
-     * @param configurationManager
-     */
     public void setConfigurationManager(MasterConfigurationManager configurationManager)
     {
         this.configurationManager = configurationManager;
+    }
+
+    public void setConfigContexts(List<String> configContexts)
+    {
+        this.configContexts = configContexts;
     }
 
     public void setDaoContexts(List<String> daoContexts)
@@ -363,5 +377,4 @@ public class DefaultSetupManager implements SetupManager
     {
         this.upgradeContexts = upgradeContexts;
     }
-
 }
