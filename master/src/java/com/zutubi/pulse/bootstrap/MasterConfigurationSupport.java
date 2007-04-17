@@ -120,16 +120,6 @@ public class MasterConfigurationSupport extends ConfigSupport implements MasterC
         setProperty(HELP_URL, helpUrl);
     }
 
-    public Boolean getJabberForceSSL()
-    {
-        return getBooleanProperty(JABBER_FORCE_SSL, Boolean.FALSE);
-    }
-
-    public void setJabberForceSSL(Boolean forceSSL)
-    {
-        setBooleanProperty(JABBER_FORCE_SSL, forceSSL);
-    }
-
     public Boolean getRssEnabled()
     {
         return getBooleanProperty(RSS_ENABLED, Boolean.TRUE);
@@ -158,46 +148,6 @@ public class MasterConfigurationSupport extends ConfigSupport implements MasterC
     public void setAnonymousSignupEnabled(Boolean signupEnabled)
     {
         setBooleanProperty(ANONYMOUS_SIGNUP_ENABLED, signupEnabled);
-    }
-
-    public String getJabberHost()
-    {
-        return getProperty(JABBER_HOST);
-    }
-
-    public void setJabberHost(String host)
-    {
-        setProperty(JABBER_HOST, host);
-    }
-
-    public int getJabberPort()
-    {
-        return getInteger(JABBER_PORT, JABBER_PORT_DEFAULT);
-    }
-
-    public void setJabberPort(int port)
-    {
-        setInteger(JABBER_PORT, port);
-    }
-
-    public String getJabberUsername()
-    {
-        return getProperty(JABBER_USERNAME);
-    }
-
-    public void setJabberUsername(String username)
-    {
-        setProperty(JABBER_USERNAME, username);
-    }
-
-    public String getJabberPassword()
-    {
-        return getProperty(JABBER_PASSWORD);
-    }
-
-    public void setJabberPassword(String password)
-    {
-        setProperty(JABBER_PASSWORD, password);
     }
 
     public Integer getScmPollingInterval()

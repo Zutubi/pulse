@@ -24,19 +24,6 @@ public interface MasterConfiguration extends LogConfiguration
     public static final String UNSATISFIABLE_RECIPE_TIMEOUT = "unsatisfiable.recipe.timeout";
     public static final long UNSATISFIABLE_RECIPE_TIMEOUT_DEFAULT = 15;
 
-    //---( jabber configuration )---
-
-    public static final String JABBER_HOST = "jabber.host";
-
-    public static final String JABBER_PORT = "jabber.port";
-    public static final int JABBER_PORT_DEFAULT = 5222;
-
-    public static final String JABBER_USERNAME = "jabber.username";
-
-    public static final String JABBER_PASSWORD = "jabber.password";
-
-    public static final String JABBER_FORCE_SSL = "jabber.force.ssl";
-
     //---( rss configuration )---
 
     public static final String RSS_ENABLED = "rss.enabled";
@@ -67,26 +54,6 @@ public interface MasterConfiguration extends LogConfiguration
     String getHelpUrl();
 
     void setHelpUrl(String helpUrl);
-
-    String getJabberHost();
-
-    void setJabberHost(String host);
-
-    int getJabberPort();
-
-    void setJabberPort(int port);
-
-    String getJabberUsername();
-
-    void setJabberUsername(String username);
-
-    String getJabberPassword();
-
-    void setJabberPassword(String password);
-
-    Boolean getJabberForceSSL();
-
-    void setJabberForceSSL(Boolean forceSSL);
 
     Boolean getRssEnabled();
 
