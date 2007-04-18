@@ -625,7 +625,7 @@ public class P4Server extends CachingSCMServer
         }
     }
 
-    public Map<String, String> getEnvironmentVariables(String id, File dir) throws SCMException
+    public Map<String, String> getProperties(String id, File dir) throws SCMException
     {
         Map<String, String> result = client.getEnv();
         result.put("P4CLIENT", getClientName(id));

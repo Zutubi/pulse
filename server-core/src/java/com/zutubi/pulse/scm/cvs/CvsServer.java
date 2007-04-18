@@ -190,9 +190,16 @@ public class CvsServer extends CachingSCMServer
         client.tag(module, (CvsRevision) revision, name, moveExisting);
     }
 
-    public Map<String, String> getEnvironmentVariables(String id, File dir) throws SCMException
+    public Map<String, String> getProperties(String id, File dir) throws SCMException
     {
-        return Collections.EMPTY_MAP;
+        Map<String, String> result = new HashMap<String, String>();
+        result.put("cvs.root", root);
+        if (branch != null)
+        {
+            result.put("cvs.branch", branch);
+        }
+        result.put("cvs.module", module);
+        return result;
     }
 
     public void storeConnectionDetails(File outputDir) throws SCMException, IOException

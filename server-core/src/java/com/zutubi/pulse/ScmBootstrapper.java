@@ -91,7 +91,7 @@ public abstract class ScmBootstrapper implements Bootstrapper, SCMCheckoutEventH
             try
             {
                 server.storeConnectionDetails(outDir);
-                for(Map.Entry<String, String> entry: server.getEnvironmentVariables(getId(), workDir).entrySet())
+                for(Map.Entry<String, String> entry: server.getProperties(getId(), workDir).entrySet())
                 {
                     context.getGlobalScope().add(new ResourceProperty(entry.getKey(), entry.getValue(), true, false, false));
                 }

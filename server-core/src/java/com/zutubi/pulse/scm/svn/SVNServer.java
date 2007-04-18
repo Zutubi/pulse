@@ -672,7 +672,7 @@ public class SVNServer implements SCMServer
         }
     }
 
-    public Map<String, String> getEnvironmentVariables(String id, File dir) throws SCMException
+    public Map<String, String> getProperties(String id, File dir) throws SCMException
     {
         return Collections.EMPTY_MAP;
     }

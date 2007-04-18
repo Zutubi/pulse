@@ -80,7 +80,7 @@ public interface SCMServer
      * @return properties to introduce into the build environment
      * @throws SCMException on error
      */
-    Map<String, String> getEnvironmentVariables(String id, File dir) throws SCMException;
+    Map<String, String> getProperties(String id, File dir) throws SCMException;
 
     /**
      * Stores details about the connection to the server to the given

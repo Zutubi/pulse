@@ -865,7 +865,7 @@ public class ThreadedRecipeQueueTest extends TestCase implements EventListener
             throw new RuntimeException("Method not implemented");
         }
 
-        public Map<String, String> getEnvironmentVariables(String id, File dir) throws SCMException
+        public Map<String, String> getProperties(String id, File dir) throws SCMException
         {
             throw new RuntimeException("Method not yet implemented.");
         }
