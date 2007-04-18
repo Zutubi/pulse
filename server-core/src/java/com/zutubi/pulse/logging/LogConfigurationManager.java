@@ -39,9 +39,8 @@ public class LogConfigurationManager
         // load default configuration.
         logManager.configure(new File(configDir, "logging.properties"));
 
-        // load the default level configuration.
-        updateConfiguration(logConfig.getLoggingLevel());
-
+        applyConfig();
+        
         final Logger evtLogger = Loggers.getEventLogger();
         eventManager.register(new AllEventListener()
         {
@@ -60,21 +59,26 @@ public class LogConfigurationManager
         });
     }
 
-    public boolean isEventLoggingEnabled()
+    public void applyConfig()
     {
-        Logger evtLogger = Loggers.getEventLogger();
-        Handler[] handlers = evtLogger.getDelegate().getHandlers();
-        for (Handler h : handlers)
-        {
-            if (h.getLevel() != Level.OFF)
-            {
-                return true;
-            }
-        }
-        return false;
+        updateConfiguration(logConfig.getLoggingLevel());
+        setEventLoggingEnabled(logConfig.isEventLoggingEnabled());
     }
 
-    public void setEventLoggingEnabled(boolean b)
+    private void updateConfiguration(String config)
+    {
+        // load requested file.
+        File configFile = new File(logConfigDir, "logging." + config + ".properties");
+        if (!configFile.isFile() || !configFile.canRead())
+        {
+            return;
+        }
+
+        logManager.resetLevels();
+        logManager.configure(configFile);
+    }
+
+    private void setEventLoggingEnabled(boolean b)
     {
         Logger evtLogger = Loggers.getEventLogger();
         Handler[] handlers = evtLogger.getDelegate().getHandlers();
@@ -104,33 +108,12 @@ public class LogConfigurationManager
         return configs;
     }
 
-    // what we need is the configuration directory - can we get this directly out of sping?
-    // if so, that would be sweet. no need to tie in the ConfigurationManager interface.
-
-    public void updateConfiguration(String config)
-    {
-        // load requested file.
-        File configFile = new File(logConfigDir, "logging." + config + ".properties");
-        if (!configFile.isFile() || !configFile.canRead())
-        {
-            return;
-        }
-
-        logManager.resetLevels();
-        logManager.configure(configFile);
-    }
-
     public void setSystemPaths(SystemPaths paths)
     {
         configDir = paths.getConfigRoot();
         logConfigDir = new File(configDir, "logging");
     }
 
-    /**
-     * Required resource.
-     *
-     * @param config
-     */
     public void setLogConfiguration(LogConfiguration config)
     {
         this.logConfig = config;

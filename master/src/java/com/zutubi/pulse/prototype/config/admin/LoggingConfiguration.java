@@ -4,14 +4,12 @@ import com.zutubi.prototype.annotation.Select;
 import com.zutubi.pulse.prototype.record.SymbolicName;
 
 /**
- *
- *
  */
 @SymbolicName("loggingConfig")
 public class LoggingConfiguration
 {
-    private String level;
-    private boolean eventLoggingEnabled;
+    private String level = "default";
+    private boolean eventLoggingEnabled = false;
 
     @Select(optionProvider = LoggingLevelProvider.class)
     public String getLevel()

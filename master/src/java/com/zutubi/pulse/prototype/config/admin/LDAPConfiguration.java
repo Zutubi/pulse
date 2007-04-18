@@ -1,11 +1,10 @@
 package com.zutubi.pulse.prototype.config.admin;
 
-import com.zutubi.validation.annotations.Required;
-import com.zutubi.validation.annotations.Url;
-import com.zutubi.prototype.annotation.Password;
-import com.zutubi.prototype.annotation.Form;
 import com.zutubi.prototype.annotation.ConfigurationCheck;
+import com.zutubi.prototype.annotation.Form;
+import com.zutubi.prototype.annotation.Password;
 import com.zutubi.pulse.prototype.record.SymbolicName;
+import com.zutubi.validation.annotations.Required;
 
 /**
  * Configuration for LDAP auth integration.

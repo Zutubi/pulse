@@ -11,33 +11,12 @@ import java.net.URL;
 import java.net.UnknownHostException;
 
 /**
- * <class-comment/>
  */
 public class MasterConfigurationSupport extends ConfigSupport implements MasterConfiguration
 {
     public MasterConfigurationSupport(Config... config)
     {
         super(new CompositeConfig(config));
-    }
-
-    public boolean isEventLoggingEnabled()
-    {
-        return getBooleanProperty(LOG_EVENTS, false);
-    }
-
-    public void setEventLoggingEnabled(boolean b)
-    {
-        setBooleanProperty(LOG_EVENTS, b);
-    }
-
-    public String getLoggingLevel()
-    {
-        return getProperty(LOGGING_CONFIG, "default");
-    }
-
-    public void setLoggingLevel(String logConfig)
-    {
-        setProperty(LOGGING_CONFIG, logConfig);
     }
 
     public String getAdminLogin()

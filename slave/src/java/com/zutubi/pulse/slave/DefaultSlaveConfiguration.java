@@ -10,7 +10,6 @@ import com.zutubi.pulse.config.Config;
 import com.zutubi.pulse.config.ConfigSupport;
 import com.zutubi.pulse.config.FileConfig;
 import com.zutubi.pulse.util.FileSystemUtils;
-import com.zutubi.pulse.util.logging.Logger;
 
 import java.io.File;
 
@@ -18,10 +17,10 @@ import java.io.File;
  */
 public class DefaultSlaveConfiguration implements SlaveConfiguration, SystemConfiguration
 {
-    private static final Logger LOG = Logger.getLogger(DefaultSlaveConfiguration.class);
-
     private static final String PROPERTIES_FILE = "pulse-agent.properties";
     private static final String CONFIG_DIR = ".pulse-agent";
+    private static final String LOGGING_CONFIG = "log.config";
+    private static final String LOG_EVENTS = "log.events";
 
     private EnvConfig envConfig;
     private ConfigSupport config;
@@ -114,18 +113,8 @@ public class DefaultSlaveConfiguration implements SlaveConfiguration, SystemConf
         return config.getProperty(PULSE_DATA, defaultData);
     }
 
-    public void setLoggingLevel(String c)
-    {
-        config.setProperty(LOGGING_CONFIG, c);
-    }
-
     public boolean isEventLoggingEnabled()
     {
         return config.getBooleanProperty(LOG_EVENTS, false);
-    }
-
-    public void setEventLoggingEnabled(boolean b)
-    {
-        config.setBooleanProperty(LOG_EVENTS, b);
     }
 }

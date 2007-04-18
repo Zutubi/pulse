@@ -6,7 +6,6 @@ import com.zutubi.prototype.config.ConfigurationPersistenceManager;
  */
 public class PostSaveEvent extends ConfigurationEvent
 {
-    private String path;
     private Object oldInstance;
     private String newPath;
     private Object newInstance;
@@ -14,15 +13,9 @@ public class PostSaveEvent extends ConfigurationEvent
     public PostSaveEvent(ConfigurationPersistenceManager source, String path, Object oldInstance, String newPath, Object newInstance)
     {
         super(source, path);
-        this.path = path;
         this.oldInstance = oldInstance;
         this.newPath = newPath;
         this.newInstance = newInstance;
-    }
-
-    public String getPath()
-    {
-        return path;
     }
 
     public Object getOldInstance()
@@ -38,5 +31,10 @@ public class PostSaveEvent extends ConfigurationEvent
     public Object getNewInstance()
     {
         return newInstance;
+    }
+
+    public String toString()
+    {
+        return "Post Save Event: " + getPath();
     }
 }

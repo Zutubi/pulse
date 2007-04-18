@@ -6,16 +6,13 @@ import com.zutubi.prototype.config.ConfigurationPersistenceManager;
  */
 public class PreInsertEvent extends ConfigurationEvent
 {
-    private String path;
-
     public PreInsertEvent(ConfigurationPersistenceManager source, String path)
     {
         super(source, path);
-        this.path = path;
     }
 
-    public String getPath()
+    public String toString()
     {
-        return path;
+        return "Pre Insert Event: " + getPath();
     }
 }

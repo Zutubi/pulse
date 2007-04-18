@@ -1137,21 +1137,6 @@
             <result name="error" type="velocity">/generic-error.vm</result>
         </action>
 
-        <action name="logConfig" class="com.zutubi.pulse.web.admin.LogConfigurationAction">
-            <interceptor-ref name="defaultStack"/>
-            <result name="error" type="velocity">configure-logconfig.vm</result>
-            <result name="cancel" type="redirect">/admin/serverSettings.action</result>
-            <result name="success" type="redirect">/admin/serverSettings.action</result>
-        </action>
-
-        <action name="editLogConfig" class="com.zutubi.pulse.web.admin.LogConfigurationAction">
-            <interceptor-ref name="crudStack"/>
-            <result name="input" type="velocity">configure-logconfig.vm</result>
-            <result name="error" type="velocity">configure-logconfig.vm</result>
-            <result name="cancel" type="redirect">/admin/serverSettings.action</result>
-            <result name="success" type="redirect">/admin/serverSettings.action</result>
-        </action>
-
         <action name="createResource" class="com.zutubi.pulse.web.admin.CreateResourceAction">
             <result name="input" type="velocity">create-resource.vm</result>
             <result name="cancel" type="redirect">/viewResources.action?agentId=${agentId}</result>

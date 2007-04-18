@@ -6,7 +6,7 @@ import com.zutubi.pulse.logging.LogConfiguration;
  * 
  *
  */
-public interface MasterConfiguration extends LogConfiguration
+public interface MasterConfiguration
 {
     //---( server configuration )---
     public static final String ADMIN_LOGIN = "admin.login";

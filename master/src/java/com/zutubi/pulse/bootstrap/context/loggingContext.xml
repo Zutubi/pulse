@@ -39,14 +39,7 @@ This context requires:
         </property>
     </bean>
 
-    <bean id="logConfiguration" class="org.springframework.beans.factory.config.PropertyPathFactoryBean">
-        <property name="targetBeanName">
-            <value>configurationManager</value>
-        </property>
-        <property name="propertyPath">
-            <value>appConfig</value>
-        </property>
-    </bean>
+    <bean id="logConfiguration" class="com.zutubi.pulse.bootstrap.MasterLogConfiguration" autowire="byName"/>
 
     <bean id="systemPaths" class="org.springframework.beans.factory.config.PropertyPathFactoryBean">
         <property name="targetBeanName">

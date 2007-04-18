@@ -2,19 +2,19 @@ package com.zutubi.pulse.bootstrap;
 
 import com.opensymphony.util.TextUtils;
 import com.opensymphony.xwork.spring.SpringObjectFactory;
+import com.zutubi.prototype.config.ConfigurationPersistenceManager;
+import com.zutubi.prototype.config.ConfigurationProvider;
+import com.zutubi.prototype.config.ConfigurationRegistry;
+import com.zutubi.prototype.type.record.RecordManager;
 import com.zutubi.pulse.Version;
 import com.zutubi.pulse.bootstrap.conf.EnvConfig;
 import com.zutubi.pulse.config.PropertiesWriter;
 import com.zutubi.pulse.license.LicenseHolder;
+import com.zutubi.pulse.logging.LogConfigurationManager;
 import com.zutubi.pulse.model.UserManager;
 import com.zutubi.pulse.upgrade.UpgradeManager;
 import com.zutubi.pulse.util.IOUtils;
 import com.zutubi.pulse.util.logging.Logger;
-import com.zutubi.prototype.type.TypeRegistry;
-import com.zutubi.prototype.type.record.RecordManager;
-import com.zutubi.prototype.config.ConfigurationRegistry;
-import com.zutubi.prototype.config.ConfigurationPersistenceManager;
-import com.zutubi.prototype.config.ConfigurationProvider;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -193,6 +193,9 @@ public class DefaultSetupManager implements SetupManager
         configurationRegistry.init();
         configurationPersistenceManager.init();
         configurationProvider.init();
+
+        LogConfigurationManager logConfigurationManager = ComponentContext.getBean("logConfigurationManager");
+        logConfigurationManager.applyConfig();
     }
 
     private void loadSystemProperties()

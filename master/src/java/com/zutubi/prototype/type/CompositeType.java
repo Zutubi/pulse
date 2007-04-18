@@ -10,7 +10,6 @@ import com.zutubi.pulse.util.Mapping;
 import com.zutubi.pulse.util.logging.Logger;
 
 import java.lang.reflect.Method;
-import java.lang.reflect.InvocationTargetException;
 import java.util.*;
 
 /**
@@ -230,11 +229,22 @@ public class CompositeType extends AbstractType implements ComplexType
 
     private MutableRecord createNewRecord(boolean initialise)
     {
+        if(extensions.size() > 0)
+        {
+            // Can only be created when the extension type is specified,
+            // there is no default initialisation.
+            return null;
+        }
+
         MutableRecordImpl record = new MutableRecordImpl();
         for(TypeProperty property: getProperties(ComplexType.class))
         {
             ComplexType type = (ComplexType) property.getType();
-            record.put(property.getName(), type.createNewRecord());
+            Record childRecord = type.createNewRecord();
+            if (childRecord != null)
+            {
+                record.put(property.getName(), childRecord);
+            }
         }
         record.setSymbolicName(getSymbolicName());
 
