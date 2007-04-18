@@ -86,7 +86,7 @@ public class FeaturePersister
             element.addAttribute(new Attribute(ATTRIBUTE_FIRST_LINE, Long.toString(pf.getFirstLine())));
             element.addAttribute(new Attribute(ATTRIBUTE_LAST_LINE, Long.toString(pf.getLastLine())));
             element.addAttribute(new Attribute(ATTRIBUTE_LINE, Long.toString(pf.getLineNumber())));
-            element.appendChild(new Text(pf.getSummary()));
+            element.appendChild(new Text(XMLUtils.removeIllegalCharacters(pf.getSummary())));
             parent.appendChild(element);
         }
     }
