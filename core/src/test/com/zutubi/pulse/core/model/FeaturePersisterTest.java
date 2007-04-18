@@ -2,6 +2,7 @@ package com.zutubi.pulse.core.model;
 
 import com.zutubi.pulse.test.PulseTestCase;
 import com.zutubi.pulse.util.FileSystemUtils;
+import com.zutubi.pulse.util.XMLUtils;
 import nu.xom.ParsingException;
 
 import java.io.File;
@@ -47,6 +48,12 @@ public class FeaturePersisterTest extends PulseTestCase
     public void testComplexSummary() throws Exception
     {
         CommandResult result = getResultWithFeatures(new PlainFeature(Feature.Level.WARNING, "this is a summary that\nhas multiple lines & special\n<characters> in /> it <", 1, 10, 3));
+        roundTrip(result);
+    }
+
+    public void testControlCharacterINSummary() throws Exception
+    {
+        CommandResult result = getResultWithFeatures(new PlainFeature(Feature.Level.ERROR, "summary\u0000here", 10));
         roundTrip(result);
     }
 
@@ -110,7 +117,7 @@ public class FeaturePersisterTest extends PulseTestCase
                 for(Feature f: fa.getFeatures())
                 {
                     PlainFeature pf = (PlainFeature) f;
-                    description.append("    ").append(pf.getLevel()).append(':').append(pf.getFirstLine()).append(':').append(pf.getLastLine()).append(':').append(pf.getLineNumber()).append(':').append(pf.getSummary()).append('\n');
+                    description.append("    ").append(pf.getLevel()).append(':').append(pf.getFirstLine()).append(':').append(pf.getLastLine()).append(':').append(pf.getLineNumber()).append(':').append(XMLUtils.removeIllegalCharacters(pf.getSummary())).append('\n');
                 }
             }
         }
