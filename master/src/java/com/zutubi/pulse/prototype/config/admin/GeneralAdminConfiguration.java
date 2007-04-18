@@ -1,18 +1,19 @@
 package com.zutubi.pulse.prototype.config.admin;
 
+import com.opensymphony.util.TextUtils;
 import com.zutubi.prototype.annotation.Form;
 import com.zutubi.pulse.prototype.record.SymbolicName;
-import com.opensymphony.util.TextUtils;
 
 /**
  *
  *
  */
 @SymbolicName("generalConfig")
-@Form(fieldOrder={"baseUrl", "baseHelpUrl", "rssEnabled", "anonymousAccessEnabled", "anonymousSignupEnabled", "scmPollingInterval", "recipeTimeoutEnabled", "recipeTimeout" })
+@Form(fieldOrder={"baseUrl", "masterHost", "baseHelpUrl", "rssEnabled", "anonymousAccessEnabled", "anonymousSignupEnabled", "scmPollingInterval", "recipeTimeoutEnabled", "recipeTimeout" })
 public class GeneralAdminConfiguration
 {
     private String baseUrl;
+    private String masterHost;
     private String baseHelpUrl = "http://confluence.zutubi.com/display/pulse0200";
     private boolean rssEnabled = true;
     private boolean anonymousAccessEnabled = false;
@@ -34,6 +35,16 @@ public class GeneralAdminConfiguration
             baseUrl = baseUrl.substring(0, baseUrl.length() - 1);
         }
         this.baseUrl = baseUrl;
+    }
+
+    public String getMasterHost()
+    {
+        return masterHost;
+    }
+
+    public void setMasterHost(String masterHost)
+    {
+        this.masterHost = masterHost;
     }
 
     public String getBaseHelpUrl()

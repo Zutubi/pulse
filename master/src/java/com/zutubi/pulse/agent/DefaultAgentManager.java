@@ -1,5 +1,6 @@
 package com.zutubi.pulse.agent;
 
+import com.zutubi.prototype.config.ConfigurationProvider;
 import com.zutubi.pulse.*;
 import com.zutubi.pulse.bootstrap.MasterConfigurationManager;
 import com.zutubi.pulse.bootstrap.StartupManager;
@@ -16,6 +17,7 @@ import com.zutubi.pulse.model.NamedEntityComparator;
 import com.zutubi.pulse.model.ResourceManager;
 import com.zutubi.pulse.model.Slave;
 import com.zutubi.pulse.model.SlaveManager;
+import com.zutubi.pulse.prototype.config.admin.GeneralAdminConfiguration;
 import com.zutubi.pulse.services.ServiceTokenManager;
 import com.zutubi.pulse.services.SlaveService;
 import com.zutubi.pulse.services.SlaveStatus;
@@ -44,6 +46,7 @@ public class DefaultAgentManager implements AgentManager, EventListener, Stoppab
     private SlaveManager slaveManager;
     private MasterRecipeProcessor masterRecipeProcessor;
     private MasterConfigurationManager configurationManager;
+    private ConfigurationProvider configurationProvider;
     private ResourceManager resourceManager;
     private EventManager eventManager;
     private SlaveProxyFactory slaveProxyFactory;
@@ -62,8 +65,8 @@ public class DefaultAgentManager implements AgentManager, EventListener, Stoppab
 
     public void init()
     {
-        MasterBuildService masterService = new MasterBuildService(masterRecipeProcessor, configurationManager, resourceManager);
-        masterAgent = new MasterAgent(masterService, configurationManager, startupManager, serverMessagesHandler);
+        MasterBuildService masterService = new MasterBuildService(masterRecipeProcessor, configurationProvider, configurationManager, resourceManager);
+        masterAgent = new MasterAgent(masterService, configurationProvider, configurationManager, startupManager, serverMessagesHandler);
 
         refreshSlaveAgents();
 
@@ -95,7 +98,7 @@ public class DefaultAgentManager implements AgentManager, EventListener, Stoppab
         try
         {
             SlaveService service = slaveProxyFactory.createProxy(slave);
-            SlaveBuildService buildService = new SlaveBuildService(service, serviceTokenManager, slave, configurationManager, resourceManager);
+            SlaveBuildService buildService = new SlaveBuildService(service, serviceTokenManager, slave, configurationProvider, configurationManager, resourceManager);
 
             if(slave.getEnableState() == Slave.EnableState.UPGRADING)
             {
@@ -234,7 +237,7 @@ public class DefaultAgentManager implements AgentManager, EventListener, Stoppab
         slave.setEnableState(Slave.EnableState.UPGRADING);
         slaveManager.save(slave);
 
-        String masterUrl = "http://" + MasterAgent.constructMasterLocation(configurationManager.getAppConfig(), configurationManager.getSystemConfig());
+        String masterUrl = "http://" + MasterAgent.constructMasterLocation(configurationProvider.get(GeneralAdminConfiguration.class), configurationManager.getSystemConfig());
         AgentUpdater updater = new AgentUpdater(agent, serviceTokenManager.getToken(), masterUrl, eventManager, configurationManager.getSystemPaths());
         updatersLock.lock();
 
@@ -307,6 +310,11 @@ public class DefaultAgentManager implements AgentManager, EventListener, Stoppab
         return new Class[] { SlaveUpgradeCompleteEvent.class };
     }
 
+    public void setConfigurationProvider(ConfigurationProvider configurationProvider)
+    {
+        this.configurationProvider = configurationProvider;
+    }
+
     private class Pinger implements Callable<SlaveStatus>
     {
         private SlaveAgent agent;
@@ -326,7 +334,7 @@ public class DefaultAgentManager implements AgentManager, EventListener, Stoppab
                 if(build == masterBuildNumber)
                 {
                     String token = serviceTokenManager.getToken();
-                    status = agent.getSlaveService().getStatus(token, "http://" + MasterAgent.constructMasterLocation(configurationManager.getAppConfig(), configurationManager.getSystemConfig()));
+                    status = agent.getSlaveService().getStatus(token, "http://" + MasterAgent.constructMasterLocation(configurationProvider.get(GeneralAdminConfiguration.class), configurationManager.getSystemConfig()));
                 }
                 else
                 {

@@ -1,5 +1,6 @@
 package com.zutubi.pulse.agent;
 
+import com.zutubi.prototype.config.ConfigurationProvider;
 import com.zutubi.pulse.BuildService;
 import com.zutubi.pulse.MasterBuildService;
 import com.zutubi.pulse.SystemInfo;
@@ -9,6 +10,7 @@ import com.zutubi.pulse.bootstrap.StartupManager;
 import com.zutubi.pulse.bootstrap.SystemConfiguration;
 import com.zutubi.pulse.logging.CustomLogRecord;
 import com.zutubi.pulse.logging.ServerMessagesHandler;
+import com.zutubi.pulse.prototype.config.admin.GeneralAdminConfiguration;
 
 import java.util.List;
 
@@ -17,13 +19,15 @@ import java.util.List;
 public class MasterAgent implements Agent
 {
     private MasterBuildService service;
+    private ConfigurationProvider configurationProvider;
     private MasterConfigurationManager configurationManager;
     private StartupManager startupManager;
     private ServerMessagesHandler serverMessagesHandler;
 
-    public MasterAgent(MasterBuildService service, MasterConfigurationManager configurationManager, StartupManager startupManager, ServerMessagesHandler serverMessagesHandler)
+    public MasterAgent(MasterBuildService service, ConfigurationProvider configurationProvider, MasterConfigurationManager configurationManager, StartupManager startupManager, ServerMessagesHandler serverMessagesHandler)
     {
         this.service = service;
+        this.configurationProvider = configurationProvider;
         this.configurationManager = configurationManager;
         this.startupManager = startupManager;
         this.serverMessagesHandler = serverMessagesHandler;
@@ -93,7 +97,7 @@ public class MasterAgent implements Agent
     public String getLocation()
     {
         SystemConfiguration systemConfig = configurationManager.getSystemConfig();
-        return constructMasterLocation(configurationManager.getAppConfig(), systemConfig);
+        return constructMasterLocation(configurationProvider.get(GeneralAdminConfiguration.class), systemConfig);
     }
 
     public boolean isSlave()
@@ -106,9 +110,9 @@ public class MasterAgent implements Agent
         return "master";
     }
 
-    public static String constructMasterLocation(MasterConfiguration appConfig, SystemConfiguration systemConfig)
+    public static String constructMasterLocation(GeneralAdminConfiguration generalConfig, SystemConfiguration systemConfig)
     {
-        String url = appConfig.getAgentHost() + ":" + systemConfig.getServerPort() + systemConfig.getContextPath();
+        String url = generalConfig.getMasterHost() + ":" + systemConfig.getServerPort() + systemConfig.getContextPath();
         if(url.endsWith("/"))
         {
             url = url.substring(0, url.length() - 1);

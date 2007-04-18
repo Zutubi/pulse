@@ -1,41 +1,40 @@
 package com.zutubi.pulse;
 
+import com.zutubi.prototype.config.ConfigurationProvider;
 import com.zutubi.pulse.agent.MasterAgent;
-import com.zutubi.pulse.bootstrap.MasterConfiguration;
 import com.zutubi.pulse.bootstrap.MasterConfigurationManager;
 import com.zutubi.pulse.bootstrap.SystemConfiguration;
 import com.zutubi.pulse.core.BuildException;
 import com.zutubi.pulse.core.RecipeRequest;
 import com.zutubi.pulse.model.ResourceManager;
+import com.zutubi.pulse.prototype.config.admin.GeneralAdminConfiguration;
 import com.zutubi.pulse.util.FileSystemUtils;
-import com.zutubi.pulse.util.logging.Logger;
 
 import java.io.File;
 import java.io.IOException;
 
 /**
- * <class-comment/>
  */
 public class MasterBuildService implements BuildService
 {
-    private static final Logger LOG = Logger.getLogger(MasterBuildService.class);
-
     private MasterRecipeProcessor masterRecipeProcessor;
+    private ConfigurationProvider configurationProvider;
     private MasterConfigurationManager configurationManager;
     private ResourceManager resourceManager;
 
-    public MasterBuildService(MasterRecipeProcessor masterRecipeProcessor, MasterConfigurationManager configurationManager, ResourceManager resourceManager)
+    public MasterBuildService(MasterRecipeProcessor masterRecipeProcessor, ConfigurationProvider configurationProvider, MasterConfigurationManager configurationManager, ResourceManager resourceManager)
     {
         this.masterRecipeProcessor = masterRecipeProcessor;
+        this.configurationProvider = configurationProvider;
         this.configurationManager = configurationManager;
         this.resourceManager = resourceManager;
     }
 
     public String getUrl()
     {
-        MasterConfiguration appConfig = configurationManager.getAppConfig();
+        GeneralAdminConfiguration generalConfig = configurationProvider.get(GeneralAdminConfiguration.class);
         SystemConfiguration systemConfig = configurationManager.getSystemConfig();
-        return MasterAgent.constructMasterLocation(appConfig, systemConfig);
+        return MasterAgent.constructMasterLocation(generalConfig, systemConfig);
     }
 
     public boolean hasResource(String resource, String version)

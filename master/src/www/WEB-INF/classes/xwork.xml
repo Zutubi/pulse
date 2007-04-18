@@ -1218,13 +1218,6 @@
             <result name="success" type="redirect">/viewAgents.action</result>
         </action>
 
-        <action name="editMasterAgent" class="com.zutubi.pulse.web.agents.EditMasterAgentAction">
-            <result name="error" type="velocity">/edit-master-agent.vm</result>
-            <result name="input" type="velocity">/edit-master-agent.vm</result>
-            <result name="cancel" type="redirect">/viewAgents.action</result>
-            <result name="success" type="redirect">/viewAgents.action</result>
-        </action>
-
         <action name="enableAgent" class="com.zutubi.pulse.web.agents.EnableAgentAction">
             <result name="success" type="redirect">/viewAgents.action</result>
         </action>

@@ -1,13 +1,14 @@
 package com.zutubi.pulse;
 
+import com.zutubi.prototype.config.ConfigurationProvider;
 import com.zutubi.pulse.agent.MasterAgent;
-import com.zutubi.pulse.bootstrap.MasterConfiguration;
 import com.zutubi.pulse.bootstrap.MasterConfigurationManager;
 import com.zutubi.pulse.bootstrap.SystemConfiguration;
 import com.zutubi.pulse.core.BuildException;
 import com.zutubi.pulse.core.RecipeRequest;
 import com.zutubi.pulse.model.ResourceManager;
 import com.zutubi.pulse.model.Slave;
+import com.zutubi.pulse.prototype.config.admin.GeneralAdminConfiguration;
 import com.zutubi.pulse.services.ServiceTokenManager;
 import com.zutubi.pulse.services.SlaveService;
 import com.zutubi.pulse.util.FileSystemUtils;
@@ -30,15 +31,17 @@ public class SlaveBuildService implements BuildService
 
     private SlaveService service;
     private Slave slave;
+    private ConfigurationProvider configurationProvider;
     private MasterConfigurationManager configurationManager;
     private ResourceManager resourceManager;
     private ServiceTokenManager serviceTokenManager;
 
-    public SlaveBuildService(SlaveService service, ServiceTokenManager serviceTokenManager, Slave slave, MasterConfigurationManager configurationManager, ResourceManager resourceManager)
+    public SlaveBuildService(SlaveService service, ServiceTokenManager serviceTokenManager, Slave slave, ConfigurationProvider configurationProvider, MasterConfigurationManager configurationManager, ResourceManager resourceManager)
     {
         this.service = service;
         this.serviceTokenManager = serviceTokenManager;
         this.slave = slave;
+        this.configurationProvider = configurationProvider;
         this.configurationManager = configurationManager;
         this.resourceManager = resourceManager;
     }
@@ -55,9 +58,9 @@ public class SlaveBuildService implements BuildService
 
     public boolean build(RecipeRequest request, BuildContext context)
     {
-        MasterConfiguration appConfig = configurationManager.getAppConfig();
+        GeneralAdminConfiguration generalConfig = configurationProvider.get(GeneralAdminConfiguration.class);
         SystemConfiguration systemConfig = configurationManager.getSystemConfig();
-        String masterUrl = "http://" + MasterAgent.constructMasterLocation(appConfig, systemConfig);
+        String masterUrl = "http://" + MasterAgent.constructMasterLocation(generalConfig, systemConfig);
 
         try
         {

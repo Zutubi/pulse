@@ -19,6 +19,10 @@ import com.zutubi.pulse.prototype.config.admin.GlobalConfiguration;
 import com.zutubi.pulse.security.AcegiUtils;
 import com.zutubi.pulse.web.DefaultAction;
 
+import java.net.InetAddress;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.net.UnknownHostException;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -110,9 +114,12 @@ public class SetupWizard extends AbstractTypeWizard
             // apply the settings
             CompositeType generalType = typeRegistry.getType(GENERAL_CONFIG_PROPERTY);
             MutableRecord record = generalType.createNewRecord();
-            record.put("baseUrl", serverConfigRecord.get("baseUrl"));
+            String baseUrl = (String) serverConfigRecord.get("baseUrl");
+            record.put("baseUrl", baseUrl);
+            record.put("masterHost", getMasterHost(baseUrl));
             configurationPersistenceManager.saveRecord(GlobalConfiguration.SCOPE_NAME, GENERAL_CONFIG_PROPERTY, record);
 
+            // Now copy over the email properties
             extractAndSave(EmailConfiguration.class, serverConfigRecord);
 
             // login as the admin user.  safe to directly create AcegiUser as
@@ -145,6 +152,41 @@ public class SetupWizard extends AbstractTypeWizard
             e.printStackTrace();
         }
 
+    }
+
+    private String getMasterHost(String baseUrl)
+    {
+        String masterHost = null;
+        if(baseUrl != null)
+        {
+            // Pull out just the host part
+            try
+            {
+                URL url = new URL(baseUrl);
+                masterHost = url.getHost();
+            }
+            catch (MalformedURLException e)
+            {
+                // Nice try
+            }
+        }
+
+        if(masterHost == null)
+        {
+            // So much for that plan...let's try and get the host name
+            try
+            {
+                InetAddress address = InetAddress.getLocalHost();
+                masterHost = address.getCanonicalHostName();
+            }
+            catch (UnknownHostException e)
+            {
+                // Oh well, we tried
+                masterHost = "localhost";
+            }
+        }
+
+        return masterHost;
     }
 
     private void extractAndSave(Class clazz, MutableRecord wizardRecord)
