@@ -195,7 +195,14 @@ public class CvsServer extends CachingSCMServer
 
     public Map<String, String> getConnectionProperties(String id, File dir) throws SCMException
     {
-        return Collections.EMPTY_MAP;
+        Map<String, String> result = new HashMap<String, String>();
+        result.put("cvs.root", root);
+        if (branch != null)
+        {
+            result.put("cvs.branch", branch);
+        }
+        result.put("cvs.module", module);
+        return result;
     }
 
     public void writeConnectionDetails(File outputDir) throws SCMException, IOException
