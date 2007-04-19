@@ -1,7 +1,7 @@
 package com.zutubi.pulse.vfs;
 
 import com.zutubi.pulse.SlaveProxyFactory;
-import com.zutubi.pulse.core.ObjectFactory;
+import com.zutubi.util.bean.ObjectFactory;
 import com.zutubi.pulse.model.SlaveManager;
 import com.zutubi.pulse.services.ServiceTokenManager;
 import com.zutubi.util.logging.Logger;

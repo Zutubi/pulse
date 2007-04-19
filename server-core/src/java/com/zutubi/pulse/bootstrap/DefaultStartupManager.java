@@ -2,7 +2,7 @@ package com.zutubi.pulse.bootstrap;
 
 import com.zutubi.pulse.config.ConfigSupport;
 import com.zutubi.pulse.config.FileConfig;
-import com.zutubi.pulse.core.ObjectFactory;
+import com.zutubi.util.bean.ObjectFactory;
 import com.zutubi.pulse.events.EventManager;
 import com.zutubi.pulse.events.system.SystemStartedEvent;
 import com.zutubi.util.logging.Logger;
@@ -51,7 +51,7 @@ public class DefaultStartupManager implements StartupManager
     /**
      * Required resource.
      *
-     * @param configurationManager
+     * @param configurationManager instance
      */
     public void setConfigurationManager(ConfigurationManager configurationManager)
     {
@@ -61,7 +61,7 @@ public class DefaultStartupManager implements StartupManager
     /**
      * Required resource.
      *
-     * @param objectFactory
+     * @param objectFactory instance
      */
     public void setObjectFactory(ObjectFactory objectFactory)
     {

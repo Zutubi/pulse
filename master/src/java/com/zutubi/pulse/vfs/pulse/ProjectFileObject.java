@@ -14,7 +14,7 @@ import java.util.Set;
  */
 public class ProjectFileObject extends AbstractPulseFileObject implements ProjectProvider, AddressableFileObject
 {
-    private static final Map<String, Class> nodesDefinitions = new HashMap<String, Class>();
+    private static final Map<String, Class<? extends AbstractPulseFileObject>> nodesDefinitions = new HashMap<String, Class<? extends AbstractPulseFileObject>>();
     {
         nodesDefinitions.put("builds", BuildsFileObject.class);
         nodesDefinitions.put("latest", LatestBuildFileObject.class);
@@ -38,7 +38,7 @@ public class ProjectFileObject extends AbstractPulseFileObject implements Projec
         String name = fileName.getBaseName();
         if (nodesDefinitions.containsKey(name))
         {
-            Class clazz = nodesDefinitions.get(name);
+            Class<? extends AbstractPulseFileObject> clazz = nodesDefinitions.get(name);
             return objectFactory.buildBean(clazz,
                     new Class[]{FileName.class, AbstractFileSystem.class},
                     new Object[]{fileName, pfs}

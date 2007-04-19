@@ -3,6 +3,7 @@ package com.zutubi.pulse.core;
 import com.zutubi.pulse.core.model.Resource;
 import com.zutubi.pulse.core.model.ResourceProperty;
 import com.zutubi.pulse.core.model.ResourceVersion;
+import com.zutubi.util.bean.DefaultObjectFactory;
 
 import java.io.InputStream;
 
@@ -27,7 +28,7 @@ public class ResourceFileLoader
     private static FileLoader createLoader()
     {
         FileLoader loader = new FileLoader();
-        loader.setObjectFactory(new ObjectFactory());
+        loader.setObjectFactory(new DefaultObjectFactory());
         loader.register("resource", Resource.class);
         loader.register("version", ResourceVersion.class);
         loader.register("property", ResourceProperty.class);

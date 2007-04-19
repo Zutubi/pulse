@@ -5,6 +5,7 @@ import com.opensymphony.xwork.ValidationAware;
 import com.zutubi.pulse.core.*;
 import com.zutubi.pulse.model.CustomProjectValidationPredicate;
 import com.zutubi.util.StringUtils;
+import com.zutubi.util.bean.DefaultObjectFactory;
 
 import java.io.ByteArrayInputStream;
 
@@ -48,7 +49,7 @@ public class CustomDetailsHelper
         try
         {
             PulseFileLoader loader = fileLoaderFactory.createLoader();
-            loader.setObjectFactory(new ObjectFactory());
+            loader.setObjectFactory(new DefaultObjectFactory());
             
             loader.load(new ByteArrayInputStream(pulseFile.getBytes()), new PulseFile(), new Scope(), resourceRepository, new CustomProjectValidationPredicate());
         }

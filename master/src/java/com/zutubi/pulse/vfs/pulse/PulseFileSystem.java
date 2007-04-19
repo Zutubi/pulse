@@ -2,7 +2,7 @@ package com.zutubi.pulse.vfs.pulse;
 
 import com.zutubi.pulse.MasterBuildPaths;
 import com.zutubi.pulse.bootstrap.MasterConfigurationManager;
-import com.zutubi.pulse.core.ObjectFactory;
+import com.zutubi.util.bean.ObjectFactory;
 import com.zutubi.pulse.model.BuildManager;
 import com.zutubi.pulse.model.BuildResult;
 import org.apache.commons.vfs.FileName;

@@ -32,7 +32,7 @@ public class SpringAutowireSupport implements ApplicationContextAware
      * contains a parent or a factory that is, then set the autoWiringFactory
      * appropriately.
      *
-     * @param context
+     * @param context application context
      */
     private void findAutoWiringBeanFactory(ApplicationContext context)
     {
@@ -57,7 +57,9 @@ public class SpringAutowireSupport implements ApplicationContextAware
     /**
      * Autowire an existing object based on the current application context.
      *
-     * @param bean
+     * @param bean instance
+     *
+     * @return autowired bean instance.
      */
     public Object autoWireBean(Object bean)
     {
@@ -70,14 +72,14 @@ public class SpringAutowireSupport implements ApplicationContextAware
         return bean;
     }
 
-    public Object createWiredBean(Class beanClass) throws Exception
+    public <U> U createWiredBean(Class<U> beanClass) throws Exception
     {
         if (autoWiringFactory == null)
         {
             throw new UnsupportedOperationException("Unable to create beans at this stage.");
         }
 
-        Object bean = autoWiringFactory.autowire(beanClass, autowireStrategy, false);
+        U bean = (U) autoWiringFactory.autowire(beanClass, autowireStrategy, false);
 
         if (bean instanceof ApplicationContextAware)
         {
@@ -96,7 +98,12 @@ public class SpringAutowireSupport implements ApplicationContextAware
     /**
      * Sets the autowiring strategy
      *
-     * @param autowireStrategy
+     * @param autowireStrategy identifier
+     *
+     * @see AutowireCapableBeanFactory#AUTOWIRE_AUTODETECT
+     * @see AutowireCapableBeanFactory#AUTOWIRE_BY_NAME
+     * @see AutowireCapableBeanFactory#AUTOWIRE_BY_TYPE
+     * @see AutowireCapableBeanFactory#AUTOWIRE_CONSTRUCTOR
      */
     public void setAutowireStrategy(int autowireStrategy)
     {

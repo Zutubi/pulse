@@ -1,6 +1,6 @@
 package com.zutubi.pulse.scheduling;
 
-import com.zutubi.pulse.core.ObjectFactory;
+import com.zutubi.util.bean.DefaultObjectFactory;
 import com.zutubi.pulse.model.persistence.mock.MockTriggerDao;
 import com.zutubi.pulse.test.PulseTestCase;
 
@@ -31,7 +31,7 @@ public class DefaultTriggerHandlerTest extends PulseTestCase
         super.setUp();
 
         handler = new DefaultTriggerHandler();
-        handler.setObjectFactory(new ObjectFactory());
+        handler.setObjectFactory(new DefaultObjectFactory());
         triggerDao = new MockTriggerDao();
         handler.setTriggerDao(triggerDao);
 

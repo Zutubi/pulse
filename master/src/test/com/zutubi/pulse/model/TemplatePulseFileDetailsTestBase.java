@@ -5,6 +5,7 @@ import com.zutubi.pulse.core.model.Property;
 import com.zutubi.pulse.test.PulseTestCase;
 import com.zutubi.pulse.util.FileSystemUtils;
 import com.zutubi.util.IOUtils;
+import com.zutubi.util.bean.DefaultObjectFactory;
 import org.apache.velocity.app.VelocityEngine;
 
 import java.io.File;
@@ -65,7 +66,7 @@ public abstract class TemplatePulseFileDetailsTestBase extends PulseTestCase
 
         // Ensure syntactic correctness
         PulseFileLoaderFactory fileLoaderFactory = new PulseFileLoaderFactory();
-        fileLoaderFactory.setObjectFactory(new ObjectFactory());
+        fileLoaderFactory.setObjectFactory(new DefaultObjectFactory());
         PulseFileLoader loader = fileLoaderFactory.createLoader();
 
         Scope scope = new Scope();

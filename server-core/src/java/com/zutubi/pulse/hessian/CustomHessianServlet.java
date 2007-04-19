@@ -5,7 +5,7 @@ import com.caucho.hessian.io.HessianOutput;
 import com.caucho.hessian.io.SerializerFactory;
 import com.caucho.hessian.server.HessianSkeleton;
 import com.zutubi.pulse.bootstrap.ComponentContext;
-import com.zutubi.pulse.core.ObjectFactory;
+import com.zutubi.util.bean.ObjectFactory;
 import com.zutubi.pulse.spring.SpringObjectFactory;
 
 import javax.servlet.*;

@@ -12,7 +12,8 @@ import com.zutubi.prototype.type.Type;
 import com.zutubi.prototype.type.TypeProperty;
 import com.zutubi.prototype.type.TypeRegistry;
 import com.zutubi.prototype.type.record.PathUtils;
-import com.zutubi.pulse.core.ObjectFactory;
+import com.zutubi.util.bean.ObjectFactory;
+import com.zutubi.util.bean.DefaultObjectFactory;
 import com.zutubi.pulse.prototype.config.EnumOptionProvider;
 import com.zutubi.util.logging.Logger;
 import com.zutubi.validation.Validator;
@@ -38,7 +39,7 @@ public class FormDescriptorFactory
      * To ensure that this always works, we default to a base implementation of the Object factory, which simply
      * instantiated objects.  When deployed, this should be replaced by the auto wiring object factory.
      */
-    private ObjectFactory objectFactory = new ObjectFactory();
+    private ObjectFactory objectFactory = new DefaultObjectFactory();
 
     private static final Logger LOG = Logger.getLogger(FormDescriptorFactory.class);
 

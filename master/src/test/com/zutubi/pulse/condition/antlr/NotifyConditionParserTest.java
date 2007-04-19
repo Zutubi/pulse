@@ -4,7 +4,7 @@ import antlr.MismatchedTokenException;
 import antlr.collections.AST;
 import com.opensymphony.xwork.ValidationAwareSupport;
 import com.zutubi.pulse.condition.*;
-import com.zutubi.pulse.core.ObjectFactory;
+import com.zutubi.util.bean.DefaultObjectFactory;
 import com.zutubi.pulse.core.PulseRuntimeException;
 import com.zutubi.pulse.test.PulseTestCase;
 import com.zutubi.pulse.web.user.SubscriptionHelper;
@@ -374,7 +374,7 @@ public class NotifyConditionParserTest extends PulseTestCase
     private NotifyCondition parseExpression(String expression)
     {
         NotifyConditionFactory factory = new NotifyConditionFactory();
-        factory.setObjectFactory(new ObjectFactory());
+        factory.setObjectFactory(new DefaultObjectFactory());
         ValidationAwareSupport validate = new ValidationAwareSupport();
         NotifyCondition condition = SubscriptionHelper.validateCondition(expression, validate, factory);
         if(condition == null)

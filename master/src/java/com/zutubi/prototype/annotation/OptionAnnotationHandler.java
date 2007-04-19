@@ -1,6 +1,6 @@
 package com.zutubi.prototype.annotation;
 
-import com.zutubi.pulse.core.ObjectFactory;
+import com.zutubi.util.bean.ObjectFactory;
 import com.zutubi.prototype.Descriptor;
 import com.zutubi.prototype.OptionProvider;
 import com.zutubi.prototype.FieldDescriptor;

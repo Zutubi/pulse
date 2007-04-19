@@ -1,6 +1,6 @@
 package com.zutubi.pulse.logging;
 
-import com.zutubi.pulse.core.ObjectFactory;
+import com.zutubi.util.bean.ObjectFactory;
 
 import java.util.Properties;
 import java.util.logging.Level;

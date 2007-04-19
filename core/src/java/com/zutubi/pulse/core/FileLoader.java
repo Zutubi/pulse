@@ -2,6 +2,7 @@ package com.zutubi.pulse.core;
 
 import com.zutubi.pulse.core.validation.CommandValidationException;
 import com.zutubi.util.IOUtils;
+import com.zutubi.util.bean.ObjectFactory;
 import com.zutubi.validation.i18n.MessagesTextProvider;
 import com.zutubi.pulse.validation.PulseValidationContext;
 import com.zutubi.pulse.validation.PulseValidationManager;
@@ -44,7 +45,7 @@ public class FileLoader
     /**
      * The object factory will be used to instantiate new instances of types.
      *
-     * @param factory
+     * @param factory instance
      */
     public void setObjectFactory(ObjectFactory factory)
     {

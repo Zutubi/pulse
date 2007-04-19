@@ -1,6 +1,7 @@
 package com.zutubi.pulse.core;
 
 import com.zutubi.pulse.core.model.Property;
+import com.zutubi.util.bean.ObjectFactory;
 
 import java.util.Map;
 import java.util.HashMap;

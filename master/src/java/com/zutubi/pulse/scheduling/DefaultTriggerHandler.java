@@ -1,6 +1,6 @@
 package com.zutubi.pulse.scheduling;
 
-import com.zutubi.pulse.core.ObjectFactory;
+import com.zutubi.util.bean.ObjectFactory;
 import com.zutubi.util.logging.Logger;
 import com.zutubi.pulse.model.persistence.TriggerDao;
 

@@ -1,6 +1,6 @@
 package com.zutubi.pulse.scheduling;
 
-import com.zutubi.pulse.core.ObjectFactory;
+import com.zutubi.util.bean.ObjectFactory;
 import com.zutubi.pulse.events.Event;
 import com.zutubi.pulse.events.EventListener;
 import com.zutubi.pulse.events.EventManager;
@@ -108,7 +108,7 @@ public class EventSchedulerStrategy implements SchedulerStrategy
 
     public boolean dependsOnProject(Trigger trigger, long projectId)
     {
-        Class filterClass = ((EventTrigger)trigger).getFilterClass();
+        Class<? extends EventTriggerFilter> filterClass = ((EventTrigger)trigger).getFilterClass();
         if(filterClass != null)
         {
             try

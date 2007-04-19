@@ -1,6 +1,6 @@
 package com.zutubi.pulse.scheduling;
 
-import com.zutubi.pulse.core.ObjectFactory;
+import com.zutubi.util.bean.DefaultObjectFactory;
 import com.zutubi.pulse.events.DefaultEventManager;
 import com.zutubi.pulse.events.Event;
 import com.zutubi.pulse.events.EventManager;
@@ -25,7 +25,7 @@ public class EventSchedulerStrategyTest extends SchedulerStrategyTestBase
         scheduler = new EventSchedulerStrategy();
         eventManager = new DefaultEventManager();
         ((EventSchedulerStrategy)scheduler).setEventManager(eventManager);
-        ((EventSchedulerStrategy)scheduler).setObjectFactory(new ObjectFactory());
+        ((EventSchedulerStrategy)scheduler).setObjectFactory(new DefaultObjectFactory());
         scheduler.setTriggerHandler(triggerHandler);
     }
 

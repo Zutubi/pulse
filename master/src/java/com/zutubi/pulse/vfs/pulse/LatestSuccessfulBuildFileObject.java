@@ -16,7 +16,7 @@ import java.util.Map;
  */
 public class LatestSuccessfulBuildFileObject extends AbstractPulseFileObject implements AddressableFileObject, BuildResultProvider
 {
-    private static final Map<String, Class> nodesDefinitions = new HashMap<String, Class>();
+    private static final Map<String, Class<? extends AbstractPulseFileObject>> nodesDefinitions = new HashMap<String, Class<? extends AbstractPulseFileObject>>();
     {
         // setup the default root node definitions.
         nodesDefinitions.put("artifacts", NamedArtifactsFileObject.class);
@@ -34,7 +34,7 @@ public class LatestSuccessfulBuildFileObject extends AbstractPulseFileObject imp
         String name = fileName.getBaseName();
         if (nodesDefinitions.containsKey(name))
         {
-            Class clazz = nodesDefinitions.get(name);
+            Class<? extends AbstractPulseFileObject> clazz = nodesDefinitions.get(name);
             return objectFactory.buildBean(clazz,
                     new Class[]{FileName.class, AbstractFileSystem.class},
                     new Object[]{fileName, pfs}
@@ -71,12 +71,12 @@ public class LatestSuccessfulBuildFileObject extends AbstractPulseFileObject imp
     {
         try
         {
-            ProjectProvider provider = (ProjectProvider) getAncestor(ProjectProvider.class);
+            ProjectProvider provider = getAncestor(ProjectProvider.class);
             if (provider != null)
             {
                 Project project = provider.getProject();
 
-                BuildSpecificationProvider buildSpecProvider = (BuildSpecificationProvider) getAncestor(BuildSpecificationProvider.class);
+                BuildSpecificationProvider buildSpecProvider = getAncestor(BuildSpecificationProvider.class);
                 if (buildSpecProvider != null)
                 {
                     return buildManager.getLatestSuccessfulBuildResult(buildSpecProvider.getBuildSpecification());

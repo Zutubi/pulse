@@ -1,6 +1,7 @@
 package com.zutubi.pulse.bootstrap.quartz;
 
-import com.zutubi.pulse.core.ObjectFactory;
+import com.zutubi.util.bean.DefaultObjectFactory;
+import com.zutubi.util.bean.ObjectFactory;
 import com.zutubi.util.logging.Logger;
 import org.quartz.Job;
 import org.quartz.JobDetail;
@@ -39,7 +40,7 @@ public class SpringJobFactory implements JobFactory
     public Job newJob(TriggerFiredBundle bundle) throws SchedulerException
     {
         JobDetail jobDetail = bundle.getJobDetail();
-        Class jobClass = jobDetail.getJobClass();
+        Class<Job> jobClass = jobDetail.getJobClass();
 
         try
         {

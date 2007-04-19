@@ -154,7 +154,7 @@ public class AnnotationValidatorProvider implements ValidatorProvider
         for (Annotation annotation : constraints)
         {
             Constraint constraint = annotation.annotationType().getAnnotation(Constraint.class);
-            for (Class validatorClass : constraint.value())
+            for (Class<? extends Validator> validatorClass : constraint.value())
             {
                 try
                 {

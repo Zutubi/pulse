@@ -4,7 +4,7 @@ import com.zutubi.prototype.annotation.Reference;
 import com.zutubi.prototype.config.events.*;
 import com.zutubi.prototype.type.*;
 import com.zutubi.prototype.type.record.*;
-import com.zutubi.pulse.core.ObjectFactory;
+import com.zutubi.util.bean.ObjectFactory;
 import com.zutubi.pulse.events.EventManager;
 import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.Mapping;

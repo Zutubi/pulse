@@ -1,6 +1,8 @@
 package com.zutubi.pulse.core;
 
 import com.zutubi.pulse.test.PulseTestCase;
+import com.zutubi.util.bean.DefaultObjectFactory;
+import com.zutubi.util.bean.ObjectFactory;
 
 /**
  * Helper base class for file loader tests.
@@ -13,7 +15,7 @@ public abstract class FileLoaderTestBase extends PulseTestCase
     {
         super.setUp();
 
-        ObjectFactory objectFactory = new ObjectFactory();
+        ObjectFactory objectFactory = new DefaultObjectFactory();
         PulseFileLoaderFactory fileLoaderFactory = new PulseFileLoaderFactory();
         fileLoaderFactory.setObjectFactory(objectFactory);
 

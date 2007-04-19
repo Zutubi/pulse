@@ -11,6 +11,8 @@ import com.zutubi.pulse.events.build.*;
 import com.zutubi.pulse.test.PulseTestCase;
 import com.zutubi.pulse.util.FileSystemUtils;
 import com.zutubi.util.IOUtils;
+import com.zutubi.util.bean.DefaultObjectFactory;
+import com.zutubi.util.bean.ObjectFactory;
 
 import java.io.File;
 import java.io.IOException;
@@ -49,7 +51,7 @@ public class RecipeProcessorTest extends PulseTestCase implements EventListener
         eventManager.register(this);
 
         // just a little bit of wiring tomfoolary to inject the event manager into the recipe.
-        ObjectFactory factory = new ObjectFactory()
+        ObjectFactory factory = new DefaultObjectFactory()
         {
             public Object buildBean(Class clazz) throws Exception
             {

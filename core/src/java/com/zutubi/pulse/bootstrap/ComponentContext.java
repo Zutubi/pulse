@@ -84,7 +84,7 @@ public class ComponentContext
         support.autoWireBean(bean);
     }
 
-    public static <U> U createBean(Class beanClass) throws Exception
+    public static <U> U createBean(Class<U> beanClass) throws Exception
     {
         SpringAutowireSupport support = new SpringAutowireSupport();
         support.setApplicationContext(context);

@@ -1,6 +1,6 @@
 package com.zutubi.pulse.condition;
 
-import com.zutubi.pulse.core.ObjectFactory;
+import com.zutubi.util.bean.ObjectFactory;
 import com.zutubi.pulse.core.PulseRuntimeException;
 
 import java.util.HashMap;
@@ -82,7 +82,7 @@ public class NotifyConditionFactory
 
         try
         {
-            return (T)objectFactory.buildBean(definition);
+            return (T) objectFactory.buildBean(definition);
         }
         catch (Exception e)
         {
@@ -91,11 +91,11 @@ public class NotifyConditionFactory
     }
 
 
-    public <T> T build(Class clazz, Class[] argTypes, Object[] args)
+    public <T> T build(Class<T> clazz, Class[] argTypes, Object[] args)
     {
         try
         {
-            return (T)objectFactory.buildBean(clazz, argTypes, args);
+            return objectFactory.buildBean(clazz, argTypes, args);
         }
         catch (Exception e)
         {

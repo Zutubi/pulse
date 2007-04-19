@@ -1,6 +1,6 @@
 package com.zutubi.pulse.vfs.pulse;
 
-import com.zutubi.pulse.core.ObjectFactory;
+import com.zutubi.util.bean.ObjectFactory;
 import org.apache.commons.vfs.*;
 import org.apache.commons.vfs.provider.AbstractOriginatingFileProvider;
 
