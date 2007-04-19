@@ -1,14 +1,10 @@
 package com.zutubi.pulse.vfs.pulse;
 
-import com.zutubi.pulse.plugins.Plugin;
-import com.zutubi.pulse.util.CollectionUtils;
-import com.zutubi.pulse.util.Mapping;
-import com.zutubi.pulse.filesystem.FileSystemException;
 import com.zutubi.prototype.config.ConfigurationPersistenceManager;
-import com.zutubi.prototype.type.record.PathUtils;
-import com.zutubi.prototype.type.Type;
 import com.zutubi.prototype.type.ComplexType;
-import com.zutubi.prototype.type.CollectionType;
+import com.zutubi.prototype.type.Type;
+import com.zutubi.prototype.type.record.PathUtils;
+import com.zutubi.pulse.filesystem.FileSystemException;
 import org.apache.commons.vfs.FileName;
 import org.apache.commons.vfs.FileType;
 import org.apache.commons.vfs.provider.AbstractFileSystem;
@@ -59,7 +55,7 @@ public class ConfigFileObject extends AbstractPulseFileObject
 
     protected FileType doGetType() throws Exception
     {
-        if(configurationPersistenceManager.getListing(path).size() > 0)
+        if(type == null || configurationPersistenceManager.getListing(path).size() > 0)
         {
             return FileType.FOLDER;
         }

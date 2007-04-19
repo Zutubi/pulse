@@ -279,25 +279,33 @@ public class ConfigurationPersistenceManager
     public List<String> getListing(String path)
     {
         LinkedList<String> list = new LinkedList<String>();
-        Type type = getType(path);
-        if (type instanceof CollectionType)
+        if(path.length() == 0)
         {
-            // load the record
-            Record record = recordManager.load(path);
-            if (record != null)
-            {
-                list.addAll(record.keySet());
-            }
+            // Root listing
+            list.addAll(rootScopes.keySet());
         }
         else
         {
-            if (type instanceof CompositeType)
+            Type type = getType(path);
+            if (type instanceof CollectionType)
             {
-                CompositeType compositeType = (CompositeType) type;
-                list.addAll(compositeType.getPropertyNames(CompositeType.class));
-                list.addAll(compositeType.getPropertyNames(MapType.class));
-                list.addAll(compositeType.getPropertyNames(ListType.class));
-                return list;
+                // load the record
+                Record record = recordManager.load(path);
+                if (record != null)
+                {
+                    list.addAll(record.keySet());
+                }
+            }
+            else
+            {
+                if (type instanceof CompositeType)
+                {
+                    CompositeType compositeType = (CompositeType) type;
+                    list.addAll(compositeType.getPropertyNames(CompositeType.class));
+                    list.addAll(compositeType.getPropertyNames(MapType.class));
+                    list.addAll(compositeType.getPropertyNames(ListType.class));
+                    return list;
+                }
             }
         }
         return list;
