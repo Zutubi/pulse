@@ -7,9 +7,9 @@ import com.zutubi.pulse.model.Scm;
 import com.zutubi.pulse.scm.SCMCancelledException;
 import com.zutubi.pulse.scm.SCMCheckoutEventHandler;
 import com.zutubi.pulse.scm.SCMServer;
-import com.zutubi.pulse.util.ForkOutputStream;
-import com.zutubi.pulse.util.IOUtils;
-import com.zutubi.pulse.util.logging.Logger;
+import com.zutubi.util.ForkOutputStream;
+import com.zutubi.util.IOUtils;
+import com.zutubi.util.logging.Logger;
 
 import java.io.*;
 import java.util.Map;

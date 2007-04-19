@@ -1,6 +1,6 @@
 package com.zutubi.pulse.logging;
 
-import com.zutubi.pulse.util.Constants;
+import com.zutubi.util.Constants;
 
 import java.text.MessageFormat;
 import java.util.Date;

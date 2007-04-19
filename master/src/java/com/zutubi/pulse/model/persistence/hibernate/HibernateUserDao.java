@@ -5,7 +5,7 @@ import com.zutubi.pulse.model.Project;
 import com.zutubi.pulse.model.ProjectGroup;
 import com.zutubi.pulse.model.User;
 import com.zutubi.pulse.model.persistence.UserDao;
-import com.zutubi.pulse.util.logging.Logger;
+import com.zutubi.util.logging.Logger;
 import org.hibernate.Hibernate;
 import org.hibernate.HibernateException;
 import org.hibernate.Query;

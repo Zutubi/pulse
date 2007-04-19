@@ -4,9 +4,9 @@ import com.zutubi.pulse.core.model.NumericalRevision;
 import com.zutubi.pulse.scm.SCMCancelledException;
 import com.zutubi.pulse.scm.SCMException;
 import static com.zutubi.pulse.scm.p4.P4Constants.*;
-import com.zutubi.pulse.util.IOUtils;
-import com.zutubi.pulse.util.StringUtils;
-import com.zutubi.pulse.util.logging.Logger;
+import com.zutubi.util.IOUtils;
+import com.zutubi.util.StringUtils;
+import com.zutubi.util.logging.Logger;
 
 import java.io.*;
 import java.util.*;

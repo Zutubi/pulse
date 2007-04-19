@@ -4,7 +4,7 @@ import com.zutubi.pulse.BuildContext;
 import com.zutubi.pulse.core.model.CommandResult;
 import com.zutubi.pulse.core.model.Feature;
 import com.zutubi.pulse.util.FileSystemUtils;
-import com.zutubi.pulse.util.IOUtils;
+import com.zutubi.util.IOUtils;
 
 import java.io.*;
 import java.net.URL;

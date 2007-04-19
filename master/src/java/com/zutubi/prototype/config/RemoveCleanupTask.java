@@ -4,8 +4,8 @@ import com.zutubi.prototype.type.record.MutableRecord;
 import com.zutubi.prototype.type.record.PathUtils;
 import com.zutubi.prototype.type.record.Record;
 import com.zutubi.prototype.type.record.RecordManager;
-import com.zutubi.pulse.util.CollectionUtils;
-import com.zutubi.pulse.util.Predicate;
+import com.zutubi.util.CollectionUtils;
+import com.zutubi.util.Predicate;
 import com.zutubi.validation.i18n.TextProvider;
 
 /**

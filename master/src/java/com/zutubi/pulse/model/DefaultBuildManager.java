@@ -17,9 +17,9 @@ import com.zutubi.pulse.scheduling.SchedulingException;
 import com.zutubi.pulse.scheduling.SimpleTrigger;
 import com.zutubi.pulse.scheduling.Trigger;
 import com.zutubi.pulse.scheduling.tasks.CleanupBuilds;
-import com.zutubi.pulse.util.Constants;
+import com.zutubi.util.Constants;
 import com.zutubi.pulse.util.FileSystemUtils;
-import com.zutubi.pulse.util.logging.Logger;
+import com.zutubi.util.logging.Logger;
 
 import java.io.File;
 import java.util.HashMap;

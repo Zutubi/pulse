@@ -1,6 +1,6 @@
 package com.zutubi.pulse.logging;
 
-import com.zutubi.pulse.util.ClassLoaderUtils;
+import com.zutubi.util.ClassLoaderUtils;
 
 import java.util.Properties;
 import java.util.List;

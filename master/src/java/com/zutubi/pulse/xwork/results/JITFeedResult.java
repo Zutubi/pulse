@@ -7,7 +7,7 @@ import com.opensymphony.xwork.util.OgnlValueStack;
 import com.opensymphony.util.TextUtils;
 import com.sun.syndication.feed.WireFeed;
 import com.sun.syndication.io.WireFeedOutput;
-import com.zutubi.pulse.util.Constants;
+import com.zutubi.util.Constants;
 
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpServletRequest;

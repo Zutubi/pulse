@@ -1,7 +1,7 @@
 package com.zutubi.pulse.model;
 
 import com.zutubi.pulse.core.model.Entity;
-import com.zutubi.pulse.util.logging.Logger;
+import com.zutubi.util.logging.Logger;
 
 /**
  * A subscription is a mapping from a project event to a contact point.  When

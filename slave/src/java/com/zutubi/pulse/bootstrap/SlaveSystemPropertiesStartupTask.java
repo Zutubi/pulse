@@ -1,8 +1,7 @@
 package com.zutubi.pulse.bootstrap;
 
-import com.zutubi.pulse.jetty.JettyManager;
-import com.zutubi.pulse.util.IOUtils;
-import com.zutubi.pulse.util.logging.Logger;
+import com.zutubi.util.IOUtils;
+import com.zutubi.util.logging.Logger;
 
 import java.io.File;
 import java.io.FileInputStream;

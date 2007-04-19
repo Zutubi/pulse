@@ -1,7 +1,7 @@
 package com.zutubi.pulse.slave;
 
 import com.zutubi.pulse.core.Stoppable;
-import com.zutubi.pulse.util.logging.Logger;
+import com.zutubi.util.logging.Logger;
 
 import java.util.LinkedList;
 import java.util.List;

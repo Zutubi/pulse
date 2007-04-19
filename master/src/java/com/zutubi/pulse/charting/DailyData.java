@@ -1,7 +1,7 @@
 package com.zutubi.pulse.charting;
 
 import com.zutubi.pulse.core.model.ResultState;
-import com.zutubi.pulse.util.Constants;
+import com.zutubi.util.Constants;
 
 /**
  */

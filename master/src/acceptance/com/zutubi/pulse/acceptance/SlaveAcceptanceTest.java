@@ -4,7 +4,7 @@ import com.zutubi.pulse.acceptance.forms.MasterAgentForm;
 import com.zutubi.pulse.acceptance.forms.ResourceForm;
 import com.zutubi.pulse.acceptance.forms.SlaveForm;
 import com.zutubi.pulse.acceptance.forms.AddResourceWizard;
-import com.zutubi.pulse.util.RandomUtils;
+import com.zutubi.util.RandomUtils;
 
 /**
  * <class-comment/>

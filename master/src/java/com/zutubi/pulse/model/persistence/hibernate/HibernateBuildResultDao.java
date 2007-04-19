@@ -3,7 +3,7 @@ package com.zutubi.pulse.model.persistence.hibernate;
 import com.zutubi.pulse.core.model.*;
 import com.zutubi.pulse.model.*;
 import com.zutubi.pulse.model.persistence.BuildResultDao;
-import com.zutubi.pulse.util.logging.Logger;
+import com.zutubi.util.logging.Logger;
 import org.hibernate.*;
 import org.hibernate.criterion.Expression;
 import org.hibernate.criterion.Order;

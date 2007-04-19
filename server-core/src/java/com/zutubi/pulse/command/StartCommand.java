@@ -4,7 +4,7 @@ import com.opensymphony.util.TextUtils;
 import com.zutubi.pulse.bootstrap.SystemBootstrapManager;
 import com.zutubi.pulse.bootstrap.SystemConfiguration;
 import com.zutubi.pulse.bootstrap.conf.EnvConfig;
-import com.zutubi.pulse.util.logging.Logger;
+import com.zutubi.util.logging.Logger;
 import org.apache.commons.cli.*;
 
 import java.util.Arrays;

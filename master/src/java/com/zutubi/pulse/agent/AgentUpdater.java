@@ -8,7 +8,7 @@ import com.zutubi.pulse.services.SlaveService;
 import com.zutubi.pulse.services.UpgradeState;
 import com.zutubi.pulse.services.UpgradeStatus;
 import com.zutubi.pulse.servlet.DownloadPackageServlet;
-import com.zutubi.pulse.util.logging.Logger;
+import com.zutubi.util.logging.Logger;
 
 import java.io.File;
 import java.util.concurrent.ExecutorService;

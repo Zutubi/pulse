@@ -1,6 +1,5 @@
 package com.zutubi.pulse.model;
 
-import com.zutubi.pulse.bootstrap.MasterConfigurationManager;
 import com.zutubi.pulse.core.model.Revision;
 import com.zutubi.pulse.core.Stoppable;
 import com.zutubi.pulse.events.EventManager;
@@ -13,9 +12,9 @@ import com.zutubi.pulse.scm.MonitorScms;
 import com.zutubi.pulse.scm.SCMChangeEvent;
 import com.zutubi.pulse.scm.SCMException;
 import com.zutubi.pulse.scm.SCMServer;
-import com.zutubi.pulse.util.Constants;
+import com.zutubi.util.Constants;
 import com.zutubi.pulse.util.Pair;
-import com.zutubi.pulse.util.logging.Logger;
+import com.zutubi.util.logging.Logger;
 import com.zutubi.pulse.ShutdownManager;
 import com.zutubi.pulse.prototype.config.admin.GeneralAdminConfiguration;
 import com.zutubi.prototype.config.ConfigurationProvider;

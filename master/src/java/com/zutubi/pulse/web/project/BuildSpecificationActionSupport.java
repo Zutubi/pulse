@@ -4,7 +4,7 @@ import com.opensymphony.util.TextUtils;
 import com.zutubi.pulse.bootstrap.ComponentContext;
 import com.zutubi.pulse.core.*;
 import com.zutubi.pulse.model.*;
-import com.zutubi.pulse.util.logging.Logger;
+import com.zutubi.util.logging.Logger;
 
 import java.io.ByteArrayInputStream;
 import java.util.LinkedHashMap;

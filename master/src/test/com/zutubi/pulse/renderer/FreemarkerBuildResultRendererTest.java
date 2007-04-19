@@ -6,8 +6,8 @@ import com.zutubi.pulse.committransformers.LinkCommitMessageTransformer;
 import com.zutubi.pulse.core.model.*;
 import com.zutubi.pulse.model.*;
 import com.zutubi.pulse.test.PulseTestCase;
-import com.zutubi.pulse.util.Constants;
-import com.zutubi.pulse.util.IOUtils;
+import com.zutubi.util.Constants;
+import com.zutubi.util.IOUtils;
 import freemarker.template.Configuration;
 import freemarker.template.DefaultObjectWrapper;
 

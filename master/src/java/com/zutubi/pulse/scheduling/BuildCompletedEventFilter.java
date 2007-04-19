@@ -3,9 +3,7 @@ package com.zutubi.pulse.scheduling;
 import com.zutubi.pulse.core.model.ResultState;
 import com.zutubi.pulse.events.Event;
 import com.zutubi.pulse.events.build.BuildCompletedEvent;
-import com.zutubi.pulse.util.logging.Logger;
-
-import java.io.Serializable;
+import com.zutubi.util.logging.Logger;
 
 /**
  * A filter that will only allow triggers for builds that complete in

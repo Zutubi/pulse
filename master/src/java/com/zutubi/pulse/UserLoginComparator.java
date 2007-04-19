@@ -1,7 +1,7 @@
 package com.zutubi.pulse;
 
 import com.zutubi.pulse.model.User;
-import com.zutubi.pulse.util.Sort;
+import com.zutubi.util.Sort;
 
 import java.util.Comparator;
 

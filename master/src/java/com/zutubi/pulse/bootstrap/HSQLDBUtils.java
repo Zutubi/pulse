@@ -1,8 +1,8 @@
 package com.zutubi.pulse.bootstrap;
 
-import com.zutubi.pulse.util.IOUtils;
+import com.zutubi.util.IOUtils;
 import com.zutubi.pulse.util.JDBCUtils;
-import com.zutubi.pulse.util.logging.Logger;
+import com.zutubi.util.logging.Logger;
 
 import javax.sql.DataSource;
 import java.io.File;

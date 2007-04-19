@@ -1,8 +1,9 @@
 package com.zutubi.pulse.plugins;
 
 import com.zutubi.pulse.util.*;
-import com.zutubi.pulse.util.logging.Logger;
+import com.zutubi.util.logging.Logger;
 import com.zutubi.pulse.bootstrap.ComponentContext;
+import com.zutubi.util.*;
 import nu.xom.*;
 import org.eclipse.core.internal.registry.osgi.OSGIUtils;
 import org.eclipse.core.runtime.IExtension;

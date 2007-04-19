@@ -1,7 +1,7 @@
 package com.zutubi.prototype.type.record;
 
-import com.zutubi.pulse.util.CollectionUtils;
-import com.zutubi.pulse.util.Predicate;
+import com.zutubi.util.CollectionUtils;
+import com.zutubi.util.Predicate;
 
 import java.util.HashMap;
 import java.util.HashSet;

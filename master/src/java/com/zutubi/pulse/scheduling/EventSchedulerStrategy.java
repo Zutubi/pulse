@@ -4,7 +4,7 @@ import com.zutubi.pulse.core.ObjectFactory;
 import com.zutubi.pulse.events.Event;
 import com.zutubi.pulse.events.EventListener;
 import com.zutubi.pulse.events.EventManager;
-import com.zutubi.pulse.util.logging.Logger;
+import com.zutubi.util.logging.Logger;
 
 import java.util.HashMap;
 import java.util.Map;

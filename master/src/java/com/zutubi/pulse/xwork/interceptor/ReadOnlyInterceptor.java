@@ -2,7 +2,7 @@ package com.zutubi.pulse.xwork.interceptor;
 
 import com.opensymphony.xwork.ActionInvocation;
 import com.opensymphony.xwork.interceptor.Interceptor;
-import com.zutubi.pulse.util.logging.Logger;
+import com.zutubi.util.logging.Logger;
 import org.hibernate.FlushMode;
 import org.hibernate.SessionFactory;
 import org.springframework.transaction.PlatformTransactionManager;

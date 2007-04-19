@@ -4,7 +4,7 @@ import com.zutubi.pulse.core.BuildException;
 import com.zutubi.pulse.core.model.CommandResult;
 import com.zutubi.pulse.core.model.RecipeResult;
 import com.zutubi.pulse.events.build.*;
-import com.zutubi.pulse.util.IOUtils;
+import com.zutubi.util.IOUtils;
 
 import java.io.File;
 import java.io.FileNotFoundException;

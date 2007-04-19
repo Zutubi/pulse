@@ -7,7 +7,7 @@ import com.zutubi.pulse.model.BuildColumns;
 import com.zutubi.pulse.model.BuildResult;
 import com.zutubi.pulse.model.Project;
 import com.zutubi.pulse.model.User;
-import com.zutubi.pulse.util.logging.Logger;
+import com.zutubi.util.logging.Logger;
 
 import java.util.List;
 import java.util.Stack;

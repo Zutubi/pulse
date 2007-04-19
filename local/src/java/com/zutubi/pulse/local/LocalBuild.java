@@ -1,17 +1,13 @@
 package com.zutubi.pulse.local;
 
 import com.zutubi.pulse.resources.ResourceDiscoverer;
-import com.zutubi.pulse.BuildContext;
 import com.zutubi.pulse.dev.bootstrap.DevBootstrapManager;
 import com.zutubi.pulse.bootstrap.ComponentContext;
 import com.zutubi.pulse.plugins.PluginManager;
-import com.zutubi.pulse.plugins.DefaultPluginManager;
 import com.zutubi.pulse.core.*;
-import com.zutubi.pulse.core.plugins.CommandExtensionManager;
 import com.zutubi.pulse.core.model.Resource;
-import com.zutubi.pulse.events.DefaultEventManager;
 import com.zutubi.pulse.events.EventManager;
-import com.zutubi.pulse.util.IOUtils;
+import com.zutubi.util.IOUtils;
 import org.apache.commons.cli.*;
 
 import java.io.*;

@@ -1,6 +1,6 @@
 package com.zutubi.pulse.core;
 
-import com.zutubi.pulse.util.StringUtils;
+import com.zutubi.util.StringUtils;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;

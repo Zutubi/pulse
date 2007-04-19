@@ -5,7 +5,7 @@ import com.zutubi.prototype.type.TypeProperty;
 import com.zutubi.prototype.type.record.MutableRecord;
 import com.zutubi.prototype.type.record.Record;
 import com.zutubi.prototype.type.record.PathUtils;
-import com.zutubi.pulse.util.StringUtils;
+import com.zutubi.util.StringUtils;
 
 import java.util.Collection;
 import java.util.Map;

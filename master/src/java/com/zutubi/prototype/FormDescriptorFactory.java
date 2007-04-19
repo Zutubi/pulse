@@ -14,7 +14,7 @@ import com.zutubi.prototype.type.TypeRegistry;
 import com.zutubi.prototype.type.record.PathUtils;
 import com.zutubi.pulse.core.ObjectFactory;
 import com.zutubi.pulse.prototype.config.EnumOptionProvider;
-import com.zutubi.pulse.util.logging.Logger;
+import com.zutubi.util.logging.Logger;
 import com.zutubi.validation.Validator;
 import com.zutubi.validation.validators.RequiredValidator;
 import com.zutubi.validation.annotations.Constraint;

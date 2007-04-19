@@ -1,6 +1,6 @@
 package com.zutubi.pulse.logging;
 
-import com.zutubi.pulse.util.logging.Logger;
+import com.zutubi.util.logging.Logger;
 import com.opensymphony.webwork.dispatcher.VelocityResult;
 import com.opensymphony.webwork.dispatcher.DispatcherUtils;
 

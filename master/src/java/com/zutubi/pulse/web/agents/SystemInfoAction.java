@@ -2,7 +2,7 @@ package com.zutubi.pulse.web.agents;
 
 import com.zutubi.pulse.SystemInfo;
 import com.zutubi.pulse.agent.Agent;
-import com.zutubi.pulse.util.logging.Logger;
+import com.zutubi.util.logging.Logger;
 
 /**
  *

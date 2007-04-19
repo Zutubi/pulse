@@ -6,7 +6,7 @@ import com.zutubi.pulse.scm.SCMException;
 import com.zutubi.pulse.scm.WorkingCopyStatus;
 import com.zutubi.pulse.test.PulseTestCase;
 import com.zutubi.pulse.util.FileSystemUtils;
-import com.zutubi.pulse.util.IOUtils;
+import com.zutubi.util.IOUtils;
 import com.zutubi.pulse.util.ZipUtils;
 import org.tmatesoft.svn.core.SVNCommitInfo;
 import org.tmatesoft.svn.core.SVNException;

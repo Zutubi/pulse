@@ -3,7 +3,7 @@ package com.zutubi.pulse.bootstrap;
 import com.zutubi.pulse.upgrade.tasks.MutableConfiguration;
 import com.zutubi.pulse.upgrade.tasks.SchemaRefactor;
 import com.zutubi.pulse.util.JDBCUtils;
-import com.zutubi.pulse.util.logging.Logger;
+import com.zutubi.util.logging.Logger;
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;

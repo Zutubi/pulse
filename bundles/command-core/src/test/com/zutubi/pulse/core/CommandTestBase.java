@@ -9,7 +9,7 @@ import com.zutubi.pulse.events.EventManager;
 import com.zutubi.pulse.events.build.*;
 import com.zutubi.pulse.test.PulseTestCase;
 import com.zutubi.pulse.util.FileSystemUtils;
-import com.zutubi.pulse.util.IOUtils;
+import com.zutubi.util.IOUtils;
 
 import java.io.*;
 import java.util.concurrent.LinkedBlockingQueue;

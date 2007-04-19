@@ -5,7 +5,7 @@
 
 package com.zutubi.pulse.scm.cvs.client.util;
 
-import com.zutubi.pulse.util.logging.Logger;
+import com.zutubi.util.logging.Logger;
 import java.io.IOException;
 import org.netbeans.lib.cvsclient.connection.Connection;
 

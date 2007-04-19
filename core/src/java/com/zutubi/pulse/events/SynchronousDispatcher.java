@@ -1,6 +1,6 @@
 package com.zutubi.pulse.events;
 
-import com.zutubi.pulse.util.logging.Logger;
+import com.zutubi.util.logging.Logger;
 
 import java.util.List;
 

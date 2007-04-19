@@ -2,7 +2,7 @@ package com.zutubi.pulse.core;
 
 import com.zutubi.pulse.model.CustomProjectValidationPredicate;
 import com.zutubi.pulse.model.ResourceRequirement;
-import com.zutubi.pulse.util.IOUtils;
+import com.zutubi.util.IOUtils;
 
 import java.util.List;
 

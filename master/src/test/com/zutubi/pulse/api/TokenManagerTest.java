@@ -11,7 +11,7 @@ import com.zutubi.pulse.model.persistence.mock.MockGroupDao;
 import com.zutubi.pulse.model.persistence.mock.MockUserDao;
 import com.zutubi.pulse.security.ldap.AcegiLdapManager;
 import com.zutubi.pulse.test.PulseTestCase;
-import com.zutubi.pulse.util.Constants;
+import com.zutubi.util.Constants;
 import org.acegisecurity.Authentication;
 import org.acegisecurity.AuthenticationManager;
 import org.acegisecurity.BadCredentialsException;

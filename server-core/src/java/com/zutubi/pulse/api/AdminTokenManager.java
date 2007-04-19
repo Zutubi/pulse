@@ -1,8 +1,8 @@
 package com.zutubi.pulse.api;
 
-import com.zutubi.pulse.util.RandomUtils;
+import com.zutubi.util.RandomUtils;
 import com.zutubi.pulse.util.FileSystemUtils;
-import com.zutubi.pulse.util.logging.Logger;
+import com.zutubi.util.logging.Logger;
 
 import java.io.File;
 import java.io.IOException;

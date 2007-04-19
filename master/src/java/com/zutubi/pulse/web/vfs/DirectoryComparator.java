@@ -1,6 +1,6 @@
 package com.zutubi.pulse.web.vfs;
 
-import com.zutubi.pulse.util.logging.Logger;
+import com.zutubi.util.logging.Logger;
 import com.zutubi.pulse.vfs.pulse.PluginFileObject;
 import org.apache.commons.vfs.FileObject;
 import org.apache.commons.vfs.FileSystemException;

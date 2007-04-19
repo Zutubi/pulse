@@ -1,6 +1,7 @@
 package com.zutubi.pulse.util;
 
 import com.zutubi.pulse.test.PulseTestCase;
+import com.zutubi.pulse.util.SystemUtils;
 
 import java.io.File;
 import java.io.IOException;

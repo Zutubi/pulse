@@ -4,7 +4,7 @@ import freemarker.template.*;
 
 import java.util.List;
 
-import com.zutubi.pulse.i18n.Messages;
+import com.zutubi.i18n.Messages;
 import com.opensymphony.util.TextUtils;
 
 /**

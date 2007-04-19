@@ -4,7 +4,7 @@ import com.meterware.httpunit.TableCell;
 import com.meterware.httpunit.WebTable;
 import com.zutubi.pulse.acceptance.forms.AddGroupMembersForm;
 import com.zutubi.pulse.acceptance.forms.GroupForm;
-import com.zutubi.pulse.util.RandomUtils;
+import com.zutubi.util.RandomUtils;
 import net.sourceforge.jwebunit.ExpectedRow;
 import net.sourceforge.jwebunit.ExpectedTable;
 

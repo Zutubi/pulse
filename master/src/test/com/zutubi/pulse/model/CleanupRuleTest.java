@@ -6,7 +6,7 @@ import com.zutubi.pulse.model.persistence.BuildResultDao;
 import com.zutubi.pulse.model.persistence.BuildSpecificationDao;
 import com.zutubi.pulse.model.persistence.ProjectDao;
 import com.zutubi.pulse.model.persistence.hibernate.MasterPersistenceTestCase;
-import com.zutubi.pulse.util.Constants;
+import com.zutubi.util.Constants;
 
 import java.util.Arrays;
 import java.util.List;

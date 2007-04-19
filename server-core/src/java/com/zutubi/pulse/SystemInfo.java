@@ -3,7 +3,7 @@ package com.zutubi.pulse;
 import com.zutubi.pulse.bootstrap.ConfigurationManager;
 import com.zutubi.pulse.bootstrap.StartupManager;
 import com.zutubi.pulse.bootstrap.conf.EnvConfig;
-import com.zutubi.pulse.util.Constants;
+import com.zutubi.util.Constants;
 
 import java.text.DateFormat;
 import java.text.MessageFormat;

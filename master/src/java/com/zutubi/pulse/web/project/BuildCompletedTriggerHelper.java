@@ -8,7 +8,7 @@ import com.zutubi.pulse.model.Project;
 import com.zutubi.pulse.model.ProjectManager;
 import com.zutubi.pulse.scheduling.BuildCompletedEventFilter;
 import com.zutubi.pulse.scheduling.Trigger;
-import com.zutubi.pulse.util.Sort;
+import com.zutubi.util.Sort;
 
 import java.io.Serializable;
 import java.util.*;

@@ -7,7 +7,7 @@ import com.zutubi.pulse.config.Config;
 import com.zutubi.pulse.config.FileConfig;
 import com.zutubi.pulse.events.EventManager;
 import com.zutubi.pulse.events.DataDirectoryChangedEvent;
-import com.zutubi.pulse.util.IOUtils;
+import com.zutubi.util.IOUtils;
 
 import java.io.File;
 import java.io.IOException;

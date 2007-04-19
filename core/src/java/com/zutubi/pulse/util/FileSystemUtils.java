@@ -2,7 +2,10 @@ package com.zutubi.pulse.util;
 
 import com.opensymphony.util.TextUtils;
 import com.zutubi.pulse.jni.ProcessControl;
-import com.zutubi.pulse.util.logging.Logger;
+import com.zutubi.util.logging.Logger;
+import com.zutubi.pulse.util.SystemUtils;
+import com.zutubi.util.IOUtils;
+import com.zutubi.util.StringUtils;
 
 import java.io.*;
 import java.net.URLConnection;
@@ -924,7 +927,7 @@ public class FileSystemUtils
             if (exit != 0)
             {
                 // Attempt to copy ourselves.
-                LOG.warning("Copy using '"+StringUtils.join(" ", args)+"' failed, trying internal copy");
+                LOG.warning("Copy using '"+ StringUtils.join(" ", args)+"' failed, trying internal copy");
                 rmdir(dest);
                 javaCopy(dest, src);
             }

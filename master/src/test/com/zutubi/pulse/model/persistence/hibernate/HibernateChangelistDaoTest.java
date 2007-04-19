@@ -4,7 +4,7 @@ import com.zutubi.pulse.core.model.*;
 import com.zutubi.pulse.model.Project;
 import com.zutubi.pulse.model.User;
 import com.zutubi.pulse.model.persistence.ChangelistDao;
-import com.zutubi.pulse.util.Constants;
+import com.zutubi.util.Constants;
 
 import java.util.Date;
 import java.util.List;

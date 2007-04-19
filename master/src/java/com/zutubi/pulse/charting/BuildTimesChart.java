@@ -1,6 +1,6 @@
 package com.zutubi.pulse.charting;
 
-import com.zutubi.pulse.i18n.Messages;
+import com.zutubi.i18n.Messages;
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.axis.DateAxis;
 import org.jfree.chart.axis.NumberAxis;

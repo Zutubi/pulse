@@ -3,7 +3,7 @@ package com.zutubi.pulse.core;
 import com.opensymphony.util.TextUtils;
 import com.zutubi.pulse.core.model.CommandResult;
 import com.zutubi.pulse.core.model.StoredArtifact;
-import com.zutubi.pulse.util.StringUtils;
+import com.zutubi.util.StringUtils;
 
 import java.util.List;
 

@@ -2,7 +2,7 @@ package com.zutubi.pulse.security;
 
 import com.zutubi.pulse.jetty.JettyManager;
 import com.zutubi.pulse.spring.web.context.FilterToBeanProxy;
-import com.zutubi.pulse.util.logging.Logger;
+import com.zutubi.util.logging.Logger;
 import org.acegisecurity.providers.ProviderManager;
 import org.acegisecurity.util.FilterChainProxy;
 import org.mortbay.jetty.servlet.Dispatcher;

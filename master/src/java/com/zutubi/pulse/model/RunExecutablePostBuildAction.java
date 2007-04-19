@@ -7,7 +7,7 @@ import com.zutubi.pulse.core.Scope;
 import com.zutubi.pulse.core.VariableHelper;
 import com.zutubi.pulse.core.model.*;
 import com.zutubi.pulse.jni.ProcessControl;
-import com.zutubi.pulse.util.IOUtils;
+import com.zutubi.util.IOUtils;
 
 import java.util.LinkedList;
 import java.util.List;

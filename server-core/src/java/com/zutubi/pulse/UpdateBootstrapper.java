@@ -5,7 +5,7 @@ import com.zutubi.pulse.core.BuildRevision;
 import com.zutubi.pulse.model.Scm;
 import com.zutubi.pulse.scm.SCMException;
 import com.zutubi.pulse.scm.SCMServer;
-import com.zutubi.pulse.util.logging.Logger;
+import com.zutubi.util.logging.Logger;
 
 import java.io.File;
 

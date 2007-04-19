@@ -9,7 +9,7 @@ import com.zutubi.pulse.model.ManualTriggerBuildReason;
 import com.zutubi.pulse.model.NamedEntityComparator;
 import com.zutubi.pulse.model.Project;
 import com.zutubi.pulse.scm.SCMException;
-import com.zutubi.pulse.util.logging.Logger;
+import com.zutubi.util.logging.Logger;
 
 import java.util.ArrayList;
 import java.util.Collections;

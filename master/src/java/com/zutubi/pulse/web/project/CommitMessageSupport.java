@@ -3,7 +3,7 @@ package com.zutubi.pulse.web.project;
 import com.zutubi.pulse.committransformers.CommitMessageBuilder;
 import com.zutubi.pulse.model.CommitMessageTransformer;
 import com.zutubi.pulse.core.model.Changelist;
-import com.zutubi.pulse.util.logging.Logger;
+import com.zutubi.util.logging.Logger;
 
 import java.util.List;
 

@@ -6,7 +6,7 @@ import com.zutubi.pulse.scm.SCMException;
 import com.zutubi.pulse.scm.SCMServer;
 import com.zutubi.pulse.scm.svn.SVNServer;
 import com.zutubi.pulse.scm.svn.SvnConstants;
-import com.zutubi.pulse.util.StringUtils;
+import com.zutubi.util.StringUtils;
 
 import java.util.Map;
 import java.util.TreeMap;

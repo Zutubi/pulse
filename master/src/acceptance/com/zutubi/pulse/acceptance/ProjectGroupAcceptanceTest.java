@@ -3,7 +3,7 @@ package com.zutubi.pulse.acceptance;
 import com.meterware.httpunit.TableCell;
 import com.meterware.httpunit.WebTable;
 import com.zutubi.pulse.acceptance.forms.ProjectGroupForm;
-import com.zutubi.pulse.util.RandomUtils;
+import com.zutubi.util.RandomUtils;
 
 /**
  */

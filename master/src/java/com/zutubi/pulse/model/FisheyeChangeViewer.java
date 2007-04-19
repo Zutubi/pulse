@@ -3,7 +3,7 @@ package com.zutubi.pulse.model;
 import com.zutubi.pulse.core.model.CvsRevision;
 import com.zutubi.pulse.core.model.FileRevision;
 import com.zutubi.pulse.core.model.Revision;
-import com.zutubi.pulse.util.StringUtils;
+import com.zutubi.util.StringUtils;
 
 /**
  * A ChangeViewer for linking to a Fisheye instance.

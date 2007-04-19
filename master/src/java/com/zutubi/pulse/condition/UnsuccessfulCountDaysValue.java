@@ -2,7 +2,7 @@ package com.zutubi.pulse.condition;
 
 import com.zutubi.pulse.core.model.ResultState;
 import com.zutubi.pulse.model.*;
-import com.zutubi.pulse.util.Constants;
+import com.zutubi.util.Constants;
 
 import java.util.List;
 

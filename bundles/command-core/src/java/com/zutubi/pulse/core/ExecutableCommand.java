@@ -2,7 +2,10 @@ package com.zutubi.pulse.core;
 
 import com.zutubi.pulse.core.model.CommandResult;
 import com.zutubi.pulse.jni.ProcessControl;
-import com.zutubi.pulse.util.*;
+import com.zutubi.util.ForkOutputStream;
+import com.zutubi.util.Constants;
+import com.zutubi.util.IOUtils;
+import com.zutubi.pulse.util.SystemUtils;
 
 import java.io.*;
 import java.util.*;

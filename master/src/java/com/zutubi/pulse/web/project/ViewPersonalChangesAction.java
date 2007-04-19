@@ -5,7 +5,7 @@ import com.zutubi.pulse.bootstrap.MasterConfigurationManager;
 import com.zutubi.pulse.core.PulseException;
 import com.zutubi.pulse.model.BuildResult;
 import com.zutubi.pulse.personal.PatchArchive;
-import com.zutubi.pulse.util.logging.Logger;
+import com.zutubi.util.logging.Logger;
 
 import java.io.File;
 

@@ -1,6 +1,6 @@
 package com.zutubi.pulse.scm.cvs.client;
 
-import com.zutubi.pulse.util.logging.Logger;
+import com.zutubi.util.logging.Logger;
 
 import java.io.OutputStream;
 import java.io.IOException;

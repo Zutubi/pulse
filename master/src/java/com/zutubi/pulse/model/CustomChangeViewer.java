@@ -7,7 +7,7 @@ import com.zutubi.pulse.core.VariableHelper;
 import com.zutubi.pulse.core.model.FileRevision;
 import com.zutubi.pulse.core.model.Property;
 import com.zutubi.pulse.core.model.Revision;
-import com.zutubi.pulse.util.StringUtils;
+import com.zutubi.util.StringUtils;
 
 import java.text.SimpleDateFormat;
 import java.util.TimeZone;

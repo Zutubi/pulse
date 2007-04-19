@@ -5,7 +5,7 @@ import com.sun.syndication.io.FeedException;
 import com.sun.syndication.io.SyndFeedInput;
 import com.sun.syndication.io.XmlReader;
 import com.zutubi.pulse.acceptance.forms.GeneralConfigurationForm;
-import com.zutubi.pulse.util.RandomUtils;
+import com.zutubi.util.RandomUtils;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;

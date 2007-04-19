@@ -2,7 +2,7 @@ package com.zutubi.pulse.acceptance;
 
 import com.zutubi.pulse.acceptance.forms.BaseForm;
 import com.zutubi.pulse.acceptance.forms.ConfigureDashboardForm;
-import com.zutubi.pulse.util.RandomUtils;
+import com.zutubi.util.RandomUtils;
 
 /**
  */

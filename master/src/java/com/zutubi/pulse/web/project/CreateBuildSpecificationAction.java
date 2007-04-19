@@ -1,14 +1,8 @@
 package com.zutubi.pulse.web.project;
 
 import com.zutubi.pulse.model.*;
-import com.zutubi.pulse.bootstrap.ComponentContext;
 import com.zutubi.pulse.core.*;
-import com.zutubi.pulse.util.logging.Logger;
 import com.opensymphony.util.TextUtils;
-
-import java.util.List;
-import java.util.LinkedList;
-import java.io.ByteArrayInputStream;
 
 /**
  */

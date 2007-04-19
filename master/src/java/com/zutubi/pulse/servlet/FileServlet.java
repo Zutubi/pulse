@@ -2,8 +2,8 @@ package com.zutubi.pulse.servlet;
 
 import com.opensymphony.util.TextUtils;
 import com.zutubi.pulse.bootstrap.ComponentContext;
-import com.zutubi.pulse.util.IOUtils;
-import com.zutubi.pulse.util.logging.Logger;
+import com.zutubi.util.IOUtils;
+import com.zutubi.util.logging.Logger;
 import com.zutubi.pulse.vfs.pulse.AbstractPulseFileObject;
 import org.apache.commons.vfs.*;
 

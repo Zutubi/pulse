@@ -1,7 +1,7 @@
 package com.zutubi.pulse.model;
 
 import com.zutubi.pulse.core.model.Entity;
-import com.zutubi.pulse.util.StringUtils;
+import com.zutubi.util.StringUtils;
 import com.zutubi.pulse.web.DefaultAction;
 
 import java.util.*;

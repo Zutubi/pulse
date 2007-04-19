@@ -4,7 +4,7 @@ import com.opensymphony.webwork.ServletActionContext;
 import com.opensymphony.xwork.Action;
 import com.opensymphony.xwork.ActionInvocation;
 import com.opensymphony.xwork.interceptor.Interceptor;
-import com.zutubi.pulse.util.logging.Logger;
+import com.zutubi.util.logging.Logger;
 import com.zutubi.pulse.web.ActionSupport;
 import com.zutubi.pulse.web.LookupErrorException;
 import org.acegisecurity.AccessDeniedException;

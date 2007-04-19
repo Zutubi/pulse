@@ -2,7 +2,7 @@ package com.zutubi.pulse.model;
 
 import com.zutubi.pulse.bootstrap.ComponentContext;
 import com.zutubi.pulse.jabber.JabberManager;
-import com.zutubi.pulse.util.logging.Logger;
+import com.zutubi.util.logging.Logger;
 import com.zutubi.validation.annotations.Required;
 import org.jivesoftware.smack.Chat;
 import org.jivesoftware.smack.XMPPConnection;

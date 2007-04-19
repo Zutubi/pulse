@@ -1,7 +1,7 @@
 package com.zutubi.prototype.velocity;
 
 import com.zutubi.pulse.velocity.AbstractDirective;
-import com.zutubi.pulse.i18n.Messages;
+import com.zutubi.i18n.Messages;
 import com.zutubi.pulse.bootstrap.ComponentContext;
 import com.zutubi.prototype.type.Type;
 import com.zutubi.prototype.type.record.Record;

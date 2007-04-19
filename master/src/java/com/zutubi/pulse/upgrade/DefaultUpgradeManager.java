@@ -3,7 +3,7 @@ package com.zutubi.pulse.upgrade;
 import com.zutubi.pulse.Version;
 import com.zutubi.pulse.bootstrap.Data;
 import com.zutubi.pulse.bootstrap.MasterConfigurationManager;
-import com.zutubi.pulse.util.logging.Logger;
+import com.zutubi.util.logging.Logger;
 
 import java.util.Arrays;
 import java.util.Collections;

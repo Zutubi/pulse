@@ -3,7 +3,7 @@ package com.zutubi.pulse.bootstrap;
 import com.zutubi.pulse.upgrade.tasks.MutableConfiguration;
 import com.zutubi.pulse.upgrade.tasks.SchemaRefactor;
 import com.zutubi.pulse.util.JDBCUtils;
-import com.zutubi.pulse.util.logging.Logger;
+import com.zutubi.util.logging.Logger;
 
 import javax.sql.DataSource;
 import java.sql.SQLException;

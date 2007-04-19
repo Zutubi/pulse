@@ -1,6 +1,6 @@
 package com.zutubi.pulse.logging;
 
-import com.zutubi.pulse.util.IOUtils;
+import com.zutubi.util.IOUtils;
 
 import java.util.*;
 import java.util.logging.Handler;

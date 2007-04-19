@@ -4,7 +4,7 @@ import com.zutubi.pulse.bootstrap.SystemPaths;
 import com.zutubi.pulse.events.AllEventListener;
 import com.zutubi.pulse.events.Event;
 import com.zutubi.pulse.events.EventManager;
-import com.zutubi.pulse.util.logging.Logger;
+import com.zutubi.util.logging.Logger;
 
 import java.io.File;
 import java.io.FilenameFilter;

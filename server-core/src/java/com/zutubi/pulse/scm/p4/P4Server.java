@@ -6,7 +6,7 @@ import com.zutubi.pulse.filesystem.remote.CachingSCMFile;
 import com.zutubi.pulse.scm.*;
 import static com.zutubi.pulse.scm.p4.P4Constants.*;
 import com.zutubi.pulse.util.FileSystemUtils;
-import com.zutubi.pulse.util.logging.Logger;
+import com.zutubi.util.logging.Logger;
 
 import java.io.*;
 import java.net.URLEncoder;

@@ -1,7 +1,7 @@
 package com.zutubi.prototype.annotation;
 
 import com.zutubi.prototype.Descriptor;
-import com.zutubi.pulse.util.AnnotationUtils;
+import com.zutubi.util.AnnotationUtils;
 
 import java.lang.annotation.Annotation;
 

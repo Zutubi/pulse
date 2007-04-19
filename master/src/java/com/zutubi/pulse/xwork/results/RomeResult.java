@@ -9,7 +9,7 @@ import com.sun.syndication.feed.WireFeed;
 import com.sun.syndication.feed.synd.SyndEntry;
 import com.sun.syndication.feed.synd.SyndFeed;
 import com.sun.syndication.io.WireFeedOutput;
-import com.zutubi.pulse.util.Constants;
+import com.zutubi.util.Constants;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;

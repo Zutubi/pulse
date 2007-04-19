@@ -4,7 +4,7 @@ import com.opensymphony.util.TextUtils;
 import com.zutubi.prototype.config.ConfigurationProvider;
 import com.zutubi.pulse.bootstrap.ComponentContext;
 import com.zutubi.pulse.prototype.config.admin.EmailConfiguration;
-import com.zutubi.pulse.util.logging.Logger;
+import com.zutubi.util.logging.Logger;
 import com.zutubi.validation.annotations.Email;
 import com.zutubi.validation.annotations.Required;
 

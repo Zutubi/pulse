@@ -4,7 +4,7 @@ import com.uwyn.jhighlight.renderer.XmlXhtmlRenderer;
 import com.zutubi.pulse.bootstrap.MasterConfigurationManager;
 import com.zutubi.pulse.model.BuildResult;
 import com.zutubi.pulse.model.Project;
-import com.zutubi.pulse.util.IOUtils;
+import com.zutubi.util.IOUtils;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;

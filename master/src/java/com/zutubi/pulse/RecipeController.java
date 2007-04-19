@@ -10,7 +10,7 @@ import com.zutubi.pulse.core.model.ResourceProperty;
 import com.zutubi.pulse.events.build.*;
 import com.zutubi.pulse.model.*;
 import com.zutubi.pulse.services.ServiceTokenManager;
-import com.zutubi.pulse.util.logging.Logger;
+import com.zutubi.util.logging.Logger;
 
 import java.io.IOException;
 import java.util.List;

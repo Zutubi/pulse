@@ -1,7 +1,7 @@
 package com.zutubi.pulse.license;
 
-import com.zutubi.pulse.util.Constants;
-import com.zutubi.pulse.util.ObjectUtils;
+import com.zutubi.util.Constants;
+import com.zutubi.util.ObjectUtils;
 
 import java.util.Date;
 import java.util.Calendar;

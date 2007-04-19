@@ -1,6 +1,6 @@
 package com.zutubi.pulse.logging;
 
-import com.zutubi.pulse.util.CircularBuffer;
+import com.zutubi.util.CircularBuffer;
 
 import java.util.Iterator;
 import java.util.List;

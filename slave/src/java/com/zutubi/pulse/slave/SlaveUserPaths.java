@@ -1,7 +1,7 @@
 package com.zutubi.pulse.slave;
 
 import com.zutubi.pulse.bootstrap.UserPaths;
-import com.zutubi.pulse.util.logging.Logger;
+import com.zutubi.util.logging.Logger;
 
 import java.io.File;
 

@@ -1,6 +1,6 @@
 package com.zutubi.pulse.core;
 
-import com.zutubi.pulse.util.IOUtils;
+import com.zutubi.util.IOUtils;
 import nu.xom.*;
 
 import java.io.File;

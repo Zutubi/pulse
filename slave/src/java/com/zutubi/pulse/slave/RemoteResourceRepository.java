@@ -5,8 +5,7 @@ import com.zutubi.pulse.core.BuildException;
 import com.zutubi.pulse.core.model.Resource;
 import com.zutubi.pulse.services.MasterService;
 import com.zutubi.pulse.services.ServiceTokenManager;
-import com.zutubi.pulse.util.logging.Logger;
-import com.caucho.hessian.client.HessianRuntimeException;
+import com.zutubi.util.logging.Logger;
 
 import java.util.List;
 

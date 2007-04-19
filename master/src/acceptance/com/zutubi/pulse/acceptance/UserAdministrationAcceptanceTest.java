@@ -3,7 +3,7 @@ package com.zutubi.pulse.acceptance;
 import com.zutubi.pulse.acceptance.forms.AdminEditUserForm;
 import com.zutubi.pulse.acceptance.forms.CreateUserForm;
 import com.zutubi.pulse.acceptance.forms.admin.EditPasswordForm;
-import com.zutubi.pulse.util.RandomUtils;
+import com.zutubi.util.RandomUtils;
 
 /**
  * <class-comment/>

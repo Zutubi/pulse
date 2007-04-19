@@ -8,7 +8,7 @@ import com.zutubi.pulse.scm.SCMException;
 import com.zutubi.pulse.scm.SCMFile;
 import com.zutubi.pulse.test.PulseTestCase;
 import com.zutubi.pulse.util.FileSystemUtils;
-import com.zutubi.pulse.util.IOUtils;
+import com.zutubi.util.IOUtils;
 import com.zutubi.pulse.util.ZipUtils;
 import org.tmatesoft.svn.core.SVNURL;
 

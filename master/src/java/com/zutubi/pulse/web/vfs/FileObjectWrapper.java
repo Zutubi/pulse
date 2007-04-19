@@ -1,6 +1,6 @@
 package com.zutubi.pulse.web.vfs;
 
-import com.zutubi.pulse.util.logging.Logger;
+import com.zutubi.util.logging.Logger;
 import com.zutubi.pulse.vfs.FileAction;
 import com.zutubi.pulse.vfs.pulse.AbstractPulseFileObject;
 import com.zutubi.pulse.vfs.pulse.AddressableFileObject;

@@ -1,6 +1,6 @@
 package com.zutubi.pulse.model;
 
-import com.zutubi.pulse.util.Sort;
+import com.zutubi.util.Sort;
 
 import java.util.Comparator;
 

@@ -9,7 +9,7 @@ import java.util.Map;
 import java.util.HashMap;
 import java.io.IOException;
 
-import com.zutubi.pulse.util.RandomUtils;
+import com.zutubi.util.RandomUtils;
 
 /**
  * <class comment/>

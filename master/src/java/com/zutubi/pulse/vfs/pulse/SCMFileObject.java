@@ -2,12 +2,12 @@ package com.zutubi.pulse.vfs.pulse;
 
 import com.zutubi.pulse.scm.SCMException;
 import com.zutubi.pulse.scm.SCMFile;
-import com.zutubi.pulse.util.CollectionUtils;
-import com.zutubi.pulse.util.Mapping;
-import com.zutubi.pulse.util.Predicate;
-import com.zutubi.pulse.util.StringUtils;
-import com.zutubi.pulse.util.logging.Logger;
+import com.zutubi.util.Mapping;
+import com.zutubi.util.StringUtils;
+import com.zutubi.util.logging.Logger;
 import com.zutubi.pulse.vfs.FileAction;
+import com.zutubi.util.CollectionUtils;
+import com.zutubi.util.*;
 import org.apache.commons.vfs.FileName;
 import org.apache.commons.vfs.FileSystemException;
 import org.apache.commons.vfs.FileType;

@@ -1,6 +1,6 @@
 package com.zutubi.pulse.core.model;
 
-import com.zutubi.pulse.util.logging.Logger;
+import com.zutubi.util.logging.Logger;
 
 import java.io.File;
 import java.util.LinkedList;

@@ -4,7 +4,7 @@ import com.zutubi.prototype.config.events.ConfigurationEvent;
 import com.zutubi.prototype.type.CompositeType;
 import com.zutubi.prototype.type.TypeRegistry;
 import com.zutubi.pulse.events.*;
-import com.zutubi.pulse.util.Predicate;
+import com.zutubi.util.Predicate;
 
 import java.util.Collection;
 import java.util.List;

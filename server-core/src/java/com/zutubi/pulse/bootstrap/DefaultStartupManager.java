@@ -5,12 +5,9 @@ import com.zutubi.pulse.config.FileConfig;
 import com.zutubi.pulse.core.ObjectFactory;
 import com.zutubi.pulse.events.EventManager;
 import com.zutubi.pulse.events.system.SystemStartedEvent;
-import com.zutubi.pulse.util.logging.Logger;
-import com.zutubi.pulse.util.IOUtils;
+import com.zutubi.util.logging.Logger;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
 import java.util.logging.Level;

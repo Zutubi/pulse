@@ -3,8 +3,8 @@ package com.zutubi.prototype.type;
 import com.zutubi.prototype.annotation.ID;
 import com.zutubi.prototype.config.ConfigurationPersistenceManager;
 import com.zutubi.prototype.type.record.*;
-import com.zutubi.pulse.util.AnnotationUtils;
-import com.zutubi.pulse.util.logging.Logger;
+import com.zutubi.util.AnnotationUtils;
+import com.zutubi.util.logging.Logger;
 
 import java.beans.BeanInfo;
 import java.beans.IntrospectionException;

@@ -8,7 +8,7 @@ import com.zutubi.prototype.config.events.PostSaveEvent;
 import com.zutubi.pulse.license.LicenseHolder;
 import com.zutubi.pulse.model.*;
 import com.zutubi.pulse.prototype.config.admin.LDAPConfiguration;
-import com.zutubi.pulse.util.logging.Logger;
+import com.zutubi.util.logging.Logger;
 import org.acegisecurity.BadCredentialsException;
 import org.acegisecurity.GrantedAuthority;
 import org.acegisecurity.ldap.DefaultInitialDirContextFactory;

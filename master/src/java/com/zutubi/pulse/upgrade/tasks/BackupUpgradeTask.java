@@ -5,7 +5,7 @@ import com.zutubi.pulse.upgrade.ConfigurationAware;
 import com.zutubi.pulse.upgrade.UpgradeContext;
 import com.zutubi.pulse.upgrade.UpgradeException;
 import com.zutubi.pulse.upgrade.UpgradeTask;
-import com.zutubi.pulse.util.logging.Logger;
+import com.zutubi.util.logging.Logger;
 
 import java.io.IOException;
 import java.util.LinkedList;

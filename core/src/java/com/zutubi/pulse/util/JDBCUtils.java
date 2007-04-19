@@ -1,6 +1,6 @@
 package com.zutubi.pulse.util;
 
-import com.zutubi.pulse.util.logging.Logger;
+import com.zutubi.util.logging.Logger;
 
 import javax.sql.DataSource;
 import java.io.BufferedReader;

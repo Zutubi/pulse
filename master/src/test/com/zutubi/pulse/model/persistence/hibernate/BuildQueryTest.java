@@ -8,8 +8,8 @@ import com.zutubi.pulse.model.Project;
 import com.zutubi.pulse.model.UnknownBuildReason;
 import com.zutubi.pulse.model.persistence.BuildResultDao;
 import com.zutubi.pulse.model.persistence.ProjectDao;
-import com.zutubi.pulse.util.CollectionUtils;
-import com.zutubi.pulse.util.Predicate;
+import com.zutubi.util.CollectionUtils;
+import com.zutubi.util.Predicate;
 
 import java.util.*;
 

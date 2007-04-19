@@ -2,7 +2,7 @@ package com.zutubi.pulse.web.project;
 
 import com.opensymphony.util.TextUtils;
 import com.zutubi.pulse.model.Svn;
-import com.zutubi.pulse.util.StringUtils;
+import com.zutubi.util.StringUtils;
 
 /**
  */

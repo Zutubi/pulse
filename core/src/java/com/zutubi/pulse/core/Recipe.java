@@ -4,7 +4,7 @@ import com.zutubi.pulse.core.model.CommandResult;
 import com.zutubi.pulse.events.EventManager;
 import com.zutubi.pulse.events.build.CommandCommencedEvent;
 import com.zutubi.pulse.events.build.CommandCompletedEvent;
-import com.zutubi.pulse.util.logging.Logger;
+import com.zutubi.util.logging.Logger;
 
 import java.io.File;
 import java.util.Collections;

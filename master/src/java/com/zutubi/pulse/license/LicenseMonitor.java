@@ -2,7 +2,7 @@ package com.zutubi.pulse.license;
 
 import com.zutubi.pulse.events.EventManager;
 import com.zutubi.pulse.scheduling.*;
-import com.zutubi.pulse.util.logging.Logger;
+import com.zutubi.util.logging.Logger;
 
 /**
  * This task is used to periodically check the systems license and generate a

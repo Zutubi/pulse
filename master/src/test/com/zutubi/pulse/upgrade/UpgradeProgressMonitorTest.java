@@ -2,7 +2,7 @@ package com.zutubi.pulse.upgrade;
 
 import com.zutubi.pulse.test.PulseTestCase;
 import com.zutubi.pulse.upgrade.tasks.MockUpgradeTask;
-import com.zutubi.pulse.util.ObjectUtils;
+import com.zutubi.util.ObjectUtils;
 
 /**
  * <class-comment/>

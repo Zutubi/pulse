@@ -1,7 +1,7 @@
 package com.zutubi.pulse.acceptance;
 
 import com.zutubi.pulse.acceptance.forms.*;
-import com.zutubi.pulse.util.RandomUtils;
+import com.zutubi.util.RandomUtils;
 import net.sourceforge.jwebunit.ExpectedRow;
 import net.sourceforge.jwebunit.ExpectedTable;
 

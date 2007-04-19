@@ -5,7 +5,7 @@ import com.zutubi.pulse.license.LicenseType;
 import com.zutubi.pulse.license.License;
 import com.zutubi.pulse.license.LicenseException;
 import com.zutubi.pulse.test.LicenseHelper;
-import com.zutubi.pulse.util.RandomUtils;
+import com.zutubi.util.RandomUtils;
 
 /**
  * <class-comment/>

@@ -1,7 +1,7 @@
 package com.zutubi.prototype;
 
 import com.zutubi.prototype.type.TypeProperty;
-import com.zutubi.pulse.util.Sort;
+import com.zutubi.util.Sort;
 
 import java.util.*;
 

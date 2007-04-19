@@ -2,12 +2,10 @@ package com.zutubi.pulse.web.admin.plugins;
 
 import com.opensymphony.webwork.ServletActionContext;
 import com.opensymphony.webwork.dispatcher.multipart.MultiPartRequestWrapper;
-import com.zutubi.pulse.plugins.PluginException;
-import com.zutubi.pulse.util.logging.Logger;
+import com.zutubi.util.logging.Logger;
 
 import java.io.File;
 import java.util.Collection;
-import java.net.MalformedURLException;
 
 /**
  * An action to install a plugin from an uploaded file.

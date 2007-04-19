@@ -4,7 +4,7 @@ import com.zutubi.prototype.Descriptor;
 import com.zutubi.prototype.type.CompositeType;
 import com.zutubi.prototype.type.Type;
 import com.zutubi.prototype.type.TypeRegistry;
-import com.zutubi.pulse.util.logging.Logger;
+import com.zutubi.util.logging.Logger;
 
 import java.lang.annotation.Annotation;
 import java.util.Collections;

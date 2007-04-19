@@ -1,6 +1,6 @@
 package com.zutubi.pulse.velocity;
 
-import com.zutubi.pulse.util.logging.Logger;
+import com.zutubi.util.logging.Logger;
 import com.zutubi.pulse.bootstrap.ComponentContext;
 import org.acegisecurity.taglibs.authz.AuthorizeTag;
 import org.apache.velocity.context.InternalContextAdapter;

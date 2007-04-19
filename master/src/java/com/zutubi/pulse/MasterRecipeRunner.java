@@ -5,7 +5,7 @@ import com.zutubi.pulse.core.*;
 import com.zutubi.pulse.events.EventManager;
 import com.zutubi.pulse.events.build.RecipeErrorEvent;
 import com.zutubi.pulse.repository.MasterFileRepository;
-import com.zutubi.pulse.util.logging.Logger;
+import com.zutubi.util.logging.Logger;
 
 /**
  *

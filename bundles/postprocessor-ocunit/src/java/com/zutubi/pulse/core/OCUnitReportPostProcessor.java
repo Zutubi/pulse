@@ -3,8 +3,8 @@ package com.zutubi.pulse.core;
 import com.zutubi.pulse.core.model.CommandResult;
 import com.zutubi.pulse.core.model.TestCaseResult;
 import com.zutubi.pulse.core.model.TestSuiteResult;
-import com.zutubi.pulse.util.IOUtils;
-import com.zutubi.pulse.util.logging.Logger;
+import com.zutubi.util.IOUtils;
+import com.zutubi.util.logging.Logger;
 
 import java.io.BufferedReader;
 import java.io.File;

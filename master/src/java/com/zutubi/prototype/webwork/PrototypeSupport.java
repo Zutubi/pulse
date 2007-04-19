@@ -8,8 +8,8 @@ import com.zutubi.prototype.type.Type;
 import com.zutubi.prototype.type.TypeRegistry;
 import com.zutubi.prototype.type.record.Record;
 import com.zutubi.pulse.web.ActionSupport;
-import com.zutubi.pulse.i18n.MessagesProvider;
-import com.zutubi.pulse.i18n.Messages;
+import com.zutubi.i18n.MessagesProvider;
+import com.zutubi.i18n.Messages;
 
 /**
  *

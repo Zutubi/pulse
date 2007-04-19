@@ -1,7 +1,7 @@
 package com.zutubi.pulse.bootstrap.quartz;
 
 import com.zutubi.pulse.core.ObjectFactory;
-import com.zutubi.pulse.util.logging.Logger;
+import com.zutubi.util.logging.Logger;
 import org.quartz.Job;
 import org.quartz.JobDetail;
 import org.quartz.Scheduler;

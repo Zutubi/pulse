@@ -4,6 +4,7 @@ import com.zutubi.validation.DelegatingValidationContext;
 import com.zutubi.validation.ValidationAware;
 import com.zutubi.validation.ValidationAwareSupport;
 import com.zutubi.validation.i18n.TextProvider;
+import com.zutubi.validation.i18n.MessagesTextProvider;
 
 /**
  * <class-comment/>

@@ -2,7 +2,7 @@ package com.zutubi.pulse.acceptance;
 
 import com.zutubi.pulse.acceptance.forms.GeneralConfigurationForm;
 import com.zutubi.pulse.acceptance.forms.SignupForm;
-import com.zutubi.pulse.util.RandomUtils;
+import com.zutubi.util.RandomUtils;
 
 /**
  * This acceptance test case covers the various aspects of an annonymous user using the signup functionality

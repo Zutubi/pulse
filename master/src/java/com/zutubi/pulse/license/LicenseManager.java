@@ -6,7 +6,7 @@ import com.zutubi.pulse.events.EventListener;
 import com.zutubi.pulse.events.EventManager;
 import com.zutubi.pulse.license.authorisation.Authorisation;
 import com.zutubi.pulse.license.authorisation.CanRunPulseAuthorisation;
-import com.zutubi.pulse.util.logging.Logger;
+import com.zutubi.util.logging.Logger;
 import com.zutubi.pulse.Version;
 
 import java.util.Arrays;

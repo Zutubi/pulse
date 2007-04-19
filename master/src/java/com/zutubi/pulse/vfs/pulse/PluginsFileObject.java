@@ -5,13 +5,11 @@ import org.apache.commons.vfs.FileType;
 import org.apache.commons.vfs.provider.AbstractFileSystem;
 import com.zutubi.pulse.plugins.PluginManager;
 import com.zutubi.pulse.plugins.Plugin;
-import com.zutubi.pulse.util.CollectionUtils;
-import com.zutubi.pulse.util.Mapping;
-import com.zutubi.pulse.util.Sort;
+import com.zutubi.util.CollectionUtils;
+import com.zutubi.util.Mapping;
 import com.zutubi.pulse.core.PulseRuntimeException;
 
 import java.util.List;
-import java.util.Arrays;
 
 /**
  * A file to represent all installed plugins.  Viewing gives a summary of all

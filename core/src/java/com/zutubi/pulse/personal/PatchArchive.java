@@ -10,8 +10,8 @@ import com.zutubi.pulse.core.model.Revision;
 import com.zutubi.pulse.scm.FileStatus;
 import com.zutubi.pulse.scm.WorkingCopyStatus;
 import com.zutubi.pulse.util.FileSystemUtils;
-import com.zutubi.pulse.util.IOUtils;
-import com.zutubi.pulse.util.NullOutputStream;
+import com.zutubi.util.IOUtils;
+import com.zutubi.util.NullOutputStream;
 import com.zutubi.pulse.xstream.FileStatusConverter;
 
 import java.io.File;

@@ -2,7 +2,7 @@ package com.zutubi.pulse.acceptance;
 
 import com.meterware.httpunit.*;
 import com.zutubi.pulse.acceptance.forms.*;
-import com.zutubi.pulse.util.Constants;
+import com.zutubi.util.Constants;
 import junit.framework.Assert;
 import org.apache.xmlrpc.XmlRpcClient;
 import org.xml.sax.SAXException;

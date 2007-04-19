@@ -3,7 +3,7 @@ package com.zutubi.pulse.model;
 import com.zutubi.pulse.core.model.Entity;
 import com.zutubi.pulse.core.model.ResourceProperty;
 import com.zutubi.pulse.core.model.ResultState;
-import com.zutubi.pulse.util.logging.Logger;
+import com.zutubi.util.logging.Logger;
 
 import java.util.LinkedList;
 import java.util.List;

@@ -5,9 +5,9 @@ import com.zutubi.prototype.type.record.*;
 import com.zutubi.pulse.prototype.squeezer.SqueezeException;
 import com.zutubi.pulse.prototype.squeezer.Squeezers;
 import com.zutubi.pulse.prototype.squeezer.TypeSqueezer;
-import com.zutubi.pulse.util.CollectionUtils;
-import com.zutubi.pulse.util.Mapping;
-import com.zutubi.pulse.util.logging.Logger;
+import com.zutubi.util.CollectionUtils;
+import com.zutubi.util.Mapping;
+import com.zutubi.util.logging.Logger;
 
 import java.lang.reflect.Method;
 import java.util.*;

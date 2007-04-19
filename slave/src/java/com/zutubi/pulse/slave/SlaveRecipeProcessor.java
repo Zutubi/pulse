@@ -11,7 +11,7 @@ import com.zutubi.pulse.events.build.RecipeErrorEvent;
 import com.zutubi.pulse.repository.SlaveFileRepository;
 import com.zutubi.pulse.services.MasterService;
 import com.zutubi.pulse.services.ServiceTokenManager;
-import com.zutubi.pulse.util.logging.Logger;
+import com.zutubi.util.logging.Logger;
 
 import java.net.MalformedURLException;
 

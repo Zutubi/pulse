@@ -2,8 +2,8 @@ package com.zutubi.pulse.web.vfs;
 
 import com.opensymphony.util.TextUtils;
 import com.zutubi.pulse.bootstrap.MasterConfigurationManager;
-import com.zutubi.pulse.util.RandomUtils;
-import com.zutubi.pulse.util.TempFileInputStream;
+import com.zutubi.util.RandomUtils;
+import com.zutubi.util.TempFileInputStream;
 import com.zutubi.pulse.util.ZipUtils;
 import com.zutubi.pulse.vfs.pulse.AbstractPulseFileObject;
 import org.apache.commons.vfs.FileObject;

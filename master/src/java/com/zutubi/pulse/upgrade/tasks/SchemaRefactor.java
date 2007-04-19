@@ -1,7 +1,7 @@
 package com.zutubi.pulse.upgrade.tasks;
 
 import com.zutubi.pulse.util.JDBCUtils;
-import com.zutubi.pulse.util.logging.Logger;
+import com.zutubi.util.logging.Logger;
 import org.hibernate.cfg.Environment;
 import org.hibernate.connection.ConnectionProvider;
 import org.hibernate.connection.ConnectionProviderFactory;

@@ -2,7 +2,7 @@ package com.zutubi.pulse.model.persistence.hibernate;
 
 import com.zutubi.pulse.model.*;
 import com.zutubi.pulse.model.persistence.BuildSpecificationDao;
-import com.zutubi.pulse.util.Predicate;
+import com.zutubi.util.Predicate;
 
 import java.util.LinkedList;
 import java.util.List;

@@ -11,7 +11,7 @@ import com.zutubi.pulse.events.EventManager;
 import com.zutubi.pulse.events.build.BuildCompletedEvent;
 import com.zutubi.pulse.model.*;
 import com.zutubi.pulse.renderer.BuildResultRenderer;
-import com.zutubi.pulse.util.logging.Logger;
+import com.zutubi.util.logging.Logger;
 import com.zutubi.pulse.prototype.config.admin.GeneralAdminConfiguration;
 import com.zutubi.prototype.config.ConfigurationProvider;
 

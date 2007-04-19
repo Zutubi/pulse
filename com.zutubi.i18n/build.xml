@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns:ivy="antlib:fr.jayasoft.ivy.ant" name="i18n module" basedir=".">
+    <import file="../common-build.xml"/>
+
+    <target name="module-pre-init">
+        <property name="module" value="com.zutubi.i18n"/>
+        <dirname property="project.root.dir" file="../build.xml"/>
+        <property file="${project.root.dir}/build.properties"/>
+    </target>
+</project>

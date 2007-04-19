@@ -1,10 +1,10 @@
 package com.zutubi.prototype.type.record;
 
-import com.zutubi.pulse.util.CollectionUtils;
+import com.zutubi.util.CollectionUtils;
 import com.zutubi.pulse.util.FileSystemUtils;
-import com.zutubi.pulse.util.Mapping;
+import com.zutubi.util.Mapping;
 import com.zutubi.pulse.util.XMLUtils;
-import com.zutubi.pulse.util.logging.Logger;
+import com.zutubi.util.logging.Logger;
 import nu.xom.*;
 
 import java.io.File;

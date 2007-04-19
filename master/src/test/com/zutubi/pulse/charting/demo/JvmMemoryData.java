@@ -1,7 +1,7 @@
 package com.zutubi.pulse.charting.demo;
 
-import com.zutubi.pulse.util.CircularBuffer;
-import com.zutubi.pulse.util.Constants;
+import com.zutubi.util.CircularBuffer;
+import com.zutubi.util.Constants;
 import org.jfree.data.category.CategoryDataset;
 import org.jfree.data.category.DefaultCategoryDataset;
 import org.jfree.data.xy.XYDataset;

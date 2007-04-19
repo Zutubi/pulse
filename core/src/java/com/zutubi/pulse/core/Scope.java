@@ -2,8 +2,8 @@ package com.zutubi.pulse.core;
 
 import com.zutubi.pulse.core.model.Property;
 import com.zutubi.pulse.core.model.ResourceProperty;
-import com.zutubi.pulse.util.Sort;
-import com.zutubi.pulse.util.logging.Logger;
+import com.zutubi.util.Sort;
+import com.zutubi.util.logging.Logger;
 
 import java.io.File;
 import java.util.*;

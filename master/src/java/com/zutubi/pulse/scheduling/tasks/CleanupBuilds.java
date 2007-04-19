@@ -3,7 +3,7 @@ package com.zutubi.pulse.scheduling.tasks;
 import com.zutubi.pulse.model.BuildManager;
 import com.zutubi.pulse.scheduling.Task;
 import com.zutubi.pulse.scheduling.TaskExecutionContext;
-import com.zutubi.pulse.util.logging.Logger;
+import com.zutubi.util.logging.Logger;
 
 /**
  * <class-comment/>

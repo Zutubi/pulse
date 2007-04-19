@@ -1,7 +1,7 @@
 package com.zutubi.pulse.license;
 
 import com.zutubi.pulse.test.PulseTestCase;
-import com.zutubi.pulse.util.Sort;
+import com.zutubi.util.Sort;
 
 import java.lang.reflect.Method;
 import java.util.Arrays;

@@ -1,7 +1,7 @@
 package com.zutubi.pulse.core.model;
 
 import com.zutubi.pulse.util.XMLUtils;
-import com.zutubi.pulse.util.logging.Logger;
+import com.zutubi.util.logging.Logger;
 import nu.xom.*;
 
 import java.io.File;

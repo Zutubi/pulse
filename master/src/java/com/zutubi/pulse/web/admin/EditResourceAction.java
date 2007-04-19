@@ -1,7 +1,7 @@
 package com.zutubi.pulse.web.admin;
 
 import com.opensymphony.util.TextUtils;
-import com.zutubi.pulse.util.Sort;
+import com.zutubi.util.Sort;
 
 import java.util.ArrayList;
 import java.util.Collections;

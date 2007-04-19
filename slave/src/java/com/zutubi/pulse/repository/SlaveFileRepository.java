@@ -2,14 +2,11 @@ package com.zutubi.pulse.repository;
 
 import com.zutubi.pulse.core.PulseException;
 import com.zutubi.pulse.services.ServiceTokenManager;
-import com.zutubi.pulse.util.IOUtils;
+import com.zutubi.util.IOUtils;
 
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.net.URL;
-import java.net.URLConnection;
 
 /**
  */

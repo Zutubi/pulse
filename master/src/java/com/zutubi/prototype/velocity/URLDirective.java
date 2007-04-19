@@ -1,7 +1,7 @@
 package com.zutubi.prototype.velocity;
 
-import com.zutubi.pulse.util.logging.Logger;
-import com.zutubi.pulse.util.StringUtils;
+import com.zutubi.util.logging.Logger;
+import com.zutubi.util.StringUtils;
 import com.zutubi.pulse.bootstrap.MasterConfigurationManager;
 import com.zutubi.prototype.webwork.PrototypeUtils;
 import org.apache.velocity.context.InternalContextAdapter;

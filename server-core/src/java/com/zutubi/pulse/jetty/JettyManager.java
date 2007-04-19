@@ -2,7 +2,7 @@ package com.zutubi.pulse.jetty;
 
 import com.zutubi.pulse.bootstrap.ConfigurationManager;
 import com.zutubi.pulse.core.Stoppable;
-import com.zutubi.pulse.util.logging.Logger;
+import com.zutubi.util.logging.Logger;
 import org.mortbay.jetty.Server;
 import org.mortbay.jetty.servlet.WebApplicationContext;
 import org.mortbay.jetty.servlet.WebApplicationHandler;

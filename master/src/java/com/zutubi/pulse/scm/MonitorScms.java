@@ -3,8 +3,8 @@ package com.zutubi.pulse.scm;
 import com.zutubi.pulse.model.ScmManager;
 import com.zutubi.pulse.scheduling.Task;
 import com.zutubi.pulse.scheduling.TaskExecutionContext;
-import com.zutubi.pulse.util.logging.Logger;
-import com.zutubi.pulse.util.Constants;
+import com.zutubi.util.logging.Logger;
+import com.zutubi.util.Constants;
 
 /**
  * <class-comment/>

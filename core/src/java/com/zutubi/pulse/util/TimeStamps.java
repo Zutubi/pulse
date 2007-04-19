@@ -1,5 +1,7 @@
 package com.zutubi.pulse.util;
 
+import com.zutubi.util.Constants;
+
 import java.text.DateFormat;
 import java.util.Date;
 import java.util.Locale;

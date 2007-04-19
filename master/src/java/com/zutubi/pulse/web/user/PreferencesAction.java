@@ -4,7 +4,7 @@ import com.zutubi.pulse.license.License;
 import com.zutubi.pulse.license.LicenseHolder;
 import com.zutubi.pulse.model.*;
 import com.zutubi.pulse.security.AcegiUtils;
-import com.zutubi.pulse.util.Sort;
+import com.zutubi.util.Sort;
 
 import java.util.*;
 

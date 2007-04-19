@@ -6,7 +6,7 @@ import com.zutubi.pulse.core.model.RecipeResult;
 import com.zutubi.pulse.model.BuildResult;
 import com.zutubi.pulse.model.RecipeResultNode;
 import com.zutubi.pulse.model.User;
-import com.zutubi.pulse.util.CircularBuffer;
+import com.zutubi.util.CircularBuffer;
 
 import java.io.File;
 import java.io.IOException;

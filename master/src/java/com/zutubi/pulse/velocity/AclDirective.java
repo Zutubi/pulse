@@ -1,6 +1,6 @@
 package com.zutubi.pulse.velocity;
 
-import com.zutubi.pulse.util.logging.Logger;
+import com.zutubi.util.logging.Logger;
 import com.zutubi.pulse.bootstrap.ComponentContext;
 import com.opensymphony.xwork.util.OgnlValueStack;
 import com.opensymphony.xwork.ActionContext;

@@ -21,7 +21,7 @@ import com.zutubi.pulse.scheduling.*;
 import com.zutubi.pulse.scheduling.tasks.BuildProjectTask;
 import com.zutubi.pulse.scm.SCMChangeEvent;
 import com.zutubi.pulse.scm.SCMException;
-import com.zutubi.pulse.util.logging.Logger;
+import com.zutubi.util.logging.Logger;
 import org.acegisecurity.annotation.Secured;
 
 import java.util.LinkedList;

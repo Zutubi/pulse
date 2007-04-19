@@ -18,7 +18,7 @@ import com.zutubi.pulse.license.LicenseUpdateEvent;
 import com.zutubi.pulse.model.*;
 import com.zutubi.pulse.scheduling.quartz.TimeoutRecipeJob;
 import com.zutubi.pulse.services.ServiceTokenManager;
-import com.zutubi.pulse.util.logging.Logger;
+import com.zutubi.util.logging.Logger;
 import org.quartz.JobDetail;
 import org.quartz.Scheduler;
 import org.quartz.SchedulerException;

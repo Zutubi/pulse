@@ -2,7 +2,7 @@ package com.zutubi.pulse.jni;
 
 import com.zutubi.pulse.command.PulseCtl;
 import com.zutubi.pulse.util.SystemUtils;
-import com.zutubi.pulse.util.logging.Logger;
+import com.zutubi.util.logging.Logger;
 
 import java.io.File;
 import java.lang.reflect.Field;

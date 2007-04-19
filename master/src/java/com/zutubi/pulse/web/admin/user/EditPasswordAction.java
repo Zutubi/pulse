@@ -1,8 +1,8 @@
 package com.zutubi.pulse.web.admin.user;
 
 import com.zutubi.pulse.model.User;
-import com.zutubi.pulse.util.RandomUtils;
-import com.zutubi.pulse.util.StringUtils;
+import com.zutubi.util.RandomUtils;
+import com.zutubi.util.StringUtils;
 import com.zutubi.pulse.web.user.UserActionSupport;
 
 /**

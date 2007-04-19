@@ -1,7 +1,7 @@
 package com.zutubi.pulse.transfer;
 
 import com.zutubi.pulse.util.JDBCUtils;
-import com.zutubi.pulse.util.logging.Logger;
+import com.zutubi.util.logging.Logger;
 import org.hibernate.cfg.Configuration;
 import org.hibernate.dialect.Dialect;
 import org.hibernate.mapping.Column;

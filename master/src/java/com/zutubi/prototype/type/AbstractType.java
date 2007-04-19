@@ -1,7 +1,7 @@
 package com.zutubi.prototype.type;
 
-import com.zutubi.pulse.util.CollectionUtils;
-import com.zutubi.pulse.util.Predicate;
+import com.zutubi.util.CollectionUtils;
+import com.zutubi.util.Predicate;
 
 import java.lang.annotation.Annotation;
 import java.util.Collections;

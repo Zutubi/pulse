@@ -9,11 +9,11 @@ import com.zutubi.pulse.filesystem.remote.CachingSCMFile;
 import com.zutubi.pulse.scm.*;
 import com.zutubi.pulse.scm.cvs.client.CvsClient;
 import com.zutubi.pulse.scm.cvs.client.LogInformationAnalyser;
-import com.zutubi.pulse.util.CleanupInputStream;
-import com.zutubi.pulse.util.Constants;
+import com.zutubi.util.CleanupInputStream;
+import com.zutubi.util.Constants;
 import com.zutubi.pulse.util.FileSystemUtils;
-import com.zutubi.pulse.util.IOUtils;
-import com.zutubi.pulse.util.logging.Logger;
+import com.zutubi.util.IOUtils;
+import com.zutubi.util.logging.Logger;
 import org.netbeans.lib.cvsclient.CVSRoot;
 import org.netbeans.lib.cvsclient.command.log.LogInformation;
 

@@ -1,7 +1,7 @@
 package com.zutubi.pulse.model;
 
 import com.zutubi.pulse.core.model.Entity;
-import com.zutubi.pulse.util.Predicate;
+import com.zutubi.util.Predicate;
 
 import java.util.Iterator;
 import java.util.LinkedList;

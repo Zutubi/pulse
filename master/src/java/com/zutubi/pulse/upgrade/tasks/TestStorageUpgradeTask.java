@@ -3,7 +3,7 @@ package com.zutubi.pulse.upgrade.tasks;
 import com.zutubi.pulse.upgrade.UpgradeContext;
 import com.zutubi.pulse.upgrade.ConfigurationAware;
 import com.zutubi.pulse.util.JDBCUtils;
-import com.zutubi.pulse.util.logging.Logger;
+import com.zutubi.util.logging.Logger;
 import com.zutubi.pulse.core.model.*;
 import com.zutubi.pulse.bootstrap.MasterConfigurationManager;
 

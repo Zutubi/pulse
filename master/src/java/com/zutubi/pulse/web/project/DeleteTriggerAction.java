@@ -2,7 +2,7 @@ package com.zutubi.pulse.web.project;
 
 import com.zutubi.pulse.scheduling.Trigger;
 import com.zutubi.pulse.scheduling.SchedulingException;
-import com.zutubi.pulse.util.logging.Logger;
+import com.zutubi.util.logging.Logger;
 
 /**
  *

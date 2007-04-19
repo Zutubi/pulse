@@ -1,7 +1,7 @@
 package com.zutubi.prototype;
 
 import com.zutubi.prototype.annotation.Format;
-import com.zutubi.pulse.util.logging.Logger;
+import com.zutubi.util.logging.Logger;
 
 /**
  *

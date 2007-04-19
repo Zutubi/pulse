@@ -1,7 +1,7 @@
 package com.zutubi.pulse.web.ajax;
 
 import com.opensymphony.util.TextUtils;
-import com.zutubi.pulse.util.StringUtils;
+import com.zutubi.util.StringUtils;
 import com.zutubi.pulse.web.ActionSupport;
 import org.apache.xmlrpc.XmlRpcClient;
 

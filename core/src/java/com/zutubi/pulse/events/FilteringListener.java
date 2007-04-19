@@ -1,6 +1,6 @@
 package com.zutubi.pulse.events;
 
-import com.zutubi.pulse.util.Predicate;
+import com.zutubi.util.Predicate;
 
 /**
  * A listener that filters events before passing them on to a delegate,

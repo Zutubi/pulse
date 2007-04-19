@@ -5,10 +5,10 @@ import com.zutubi.pulse.bootstrap.ComponentContext;
 import com.zutubi.pulse.bootstrap.ConfigurationManager;
 import com.zutubi.pulse.services.InvalidTokenException;
 import com.zutubi.pulse.services.ServiceTokenManager;
-import com.zutubi.pulse.util.IOUtils;
-import com.zutubi.pulse.util.RandomUtils;
+import com.zutubi.util.IOUtils;
+import com.zutubi.util.RandomUtils;
 import com.zutubi.pulse.util.ZipUtils;
-import com.zutubi.pulse.util.logging.Logger;
+import com.zutubi.util.logging.Logger;
 
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;

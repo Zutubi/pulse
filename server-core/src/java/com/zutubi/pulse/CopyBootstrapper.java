@@ -3,7 +3,7 @@ package com.zutubi.pulse;
 import com.zutubi.pulse.core.BootstrapperSupport;
 import com.zutubi.pulse.core.BuildException;
 import com.zutubi.pulse.core.CommandContext;
-import com.zutubi.pulse.util.IOUtils;
+import com.zutubi.util.IOUtils;
 import com.zutubi.pulse.util.ZipUtils;
 
 import java.io.File;

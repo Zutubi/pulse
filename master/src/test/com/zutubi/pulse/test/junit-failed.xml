@@ -4913,33 +4913,33 @@ abc xxx abc]
 
       </properties>
 
-      <testcase classname="com.zutubi.pulse.util.CircularBufferTest" name="testIterateEmpty" time="0.02"></testcase>
+      <testcase classname="com.zutubi.util.CircularBufferTest" name="testIterateEmpty" time="0.02"></testcase>
 
-      <testcase classname="com.zutubi.pulse.util.CircularBufferTest" name="testAppend" time="0.011"></testcase>
+      <testcase classname="com.zutubi.util.CircularBufferTest" name="testAppend" time="0.011"></testcase>
 
-      <testcase classname="com.zutubi.pulse.util.CircularBufferTest" name="testIterate" time="0.0"></testcase>
+      <testcase classname="com.zutubi.util.CircularBufferTest" name="testIterate" time="0.0"></testcase>
 
-      <testcase classname="com.zutubi.pulse.util.CircularBufferTest" name="testFull" time="0.0"></testcase>
+      <testcase classname="com.zutubi.util.CircularBufferTest" name="testFull" time="0.0"></testcase>
 
-      <testcase classname="com.zutubi.pulse.util.CircularBufferTest" name="testIterateFull" time="0.0"></testcase>
+      <testcase classname="com.zutubi.util.CircularBufferTest" name="testIterateFull" time="0.0"></testcase>
 
-      <testcase classname="com.zutubi.pulse.util.CircularBufferTest" name="testWrap" time="0.0"></testcase>
+      <testcase classname="com.zutubi.util.CircularBufferTest" name="testWrap" time="0.0"></testcase>
 
-      <testcase classname="com.zutubi.pulse.util.CircularBufferTest" name="testIterateWrap" time="0.01"></testcase>
+      <testcase classname="com.zutubi.util.CircularBufferTest" name="testIterateWrap" time="0.01"></testcase>
 
-      <testcase classname="com.zutubi.pulse.util.CircularBufferTest" name="testWrapMultiple" time="0.0"></testcase>
+      <testcase classname="com.zutubi.util.CircularBufferTest" name="testWrapMultiple" time="0.0"></testcase>
 
-      <testcase classname="com.zutubi.pulse.util.CircularBufferTest" name="testIterateWrapMultiple" time="0.0"></testcase>
+      <testcase classname="com.zutubi.util.CircularBufferTest" name="testIterateWrapMultiple" time="0.0"></testcase>
 
-      <testcase classname="com.zutubi.pulse.util.CircularBufferTest" name="testFillTwice" time="0.0"></testcase>
+      <testcase classname="com.zutubi.util.CircularBufferTest" name="testFillTwice" time="0.0"></testcase>
 
-      <testcase classname="com.zutubi.pulse.util.CircularBufferTest" name="testIterateFillTwice" time="0.01"></testcase>
+      <testcase classname="com.zutubi.util.CircularBufferTest" name="testIterateFillTwice" time="0.01"></testcase>
 
-      <testcase classname="com.zutubi.pulse.util.CircularBufferTest" name="testWrapTwice" time="0.0"></testcase>
+      <testcase classname="com.zutubi.util.CircularBufferTest" name="testWrapTwice" time="0.0"></testcase>
 
-      <testcase classname="com.zutubi.pulse.util.CircularBufferTest" name="testIterateWrapTwice" time="0.0"></testcase>
+      <testcase classname="com.zutubi.util.CircularBufferTest" name="testIterateWrapTwice" time="0.0"></testcase>
 
-      <testcase classname="com.zutubi.pulse.util.CircularBufferTest" name="testAppendZero" time="0.0"></testcase>
+      <testcase classname="com.zutubi.util.CircularBufferTest" name="testAppendZero" time="0.0"></testcase>
 
       <system-out><![CDATA[test0
 test0
@@ -5828,59 +5828,59 @@ test8
 
       </properties>
 
-      <testcase classname="com.zutubi.pulse.util.StringUtilsTest" name="testTrimStringShort" time="0.01"></testcase>
+      <testcase classname="com.zutubi.util.StringUtilsTest" name="testTrimStringShort" time="0.01"></testcase>
 
-      <testcase classname="com.zutubi.pulse.util.StringUtilsTest" name="testTrimStringMuchLonger" time="0.0"></testcase>
+      <testcase classname="com.zutubi.util.StringUtilsTest" name="testTrimStringMuchLonger" time="0.0"></testcase>
 
-      <testcase classname="com.zutubi.pulse.util.StringUtilsTest" name="testTrimStringExact" time="0.01">
+      <testcase classname="com.zutubi.util.StringUtilsTest" name="testTrimStringExact" time="0.01">
     
       <failure message="expected:&lt;...3...&gt; but was:&lt;......&gt;" type="junit.framework.ComparisonFailure">junit.framework.ComparisonFailure: expected:&lt;...3...&gt; but was:&lt;......&gt;
-	at com.zutubi.pulse.util.StringUtilsTest.testTrimStringExact(StringUtilsTest.java:24)
-</failure>
+	at com.zutubi.util.StringUtilsTest.testTrimStringExact(StringUtilsTest.java:24)
+      </failure>
 
       </testcase>
 
-      <testcase classname="com.zutubi.pulse.util.StringUtilsTest" name="testTrimStringJustOver" time="0.0"></testcase>
+      <testcase classname="com.zutubi.util.StringUtilsTest" name="testTrimStringJustOver" time="0.0"></testcase>
 
-      <testcase classname="com.zutubi.pulse.util.StringUtilsTest" name="testTrimStringShortLimit" time="0.0"></testcase>
+      <testcase classname="com.zutubi.util.StringUtilsTest" name="testTrimStringShortLimit" time="0.0"></testcase>
 
-      <testcase classname="com.zutubi.pulse.util.StringUtilsTest" name="testTrimStringDotsLimit" time="0.0"></testcase>
+      <testcase classname="com.zutubi.util.StringUtilsTest" name="testTrimStringDotsLimit" time="0.0"></testcase>
 
-      <testcase classname="com.zutubi.pulse.util.StringUtilsTest" name="testTrimStringZeroLimit" time="0.0"></testcase>
+      <testcase classname="com.zutubi.util.StringUtilsTest" name="testTrimStringZeroLimit" time="0.0"></testcase>
 
-      <testcase classname="com.zutubi.pulse.util.StringUtilsTest" name="testWrapShort" time="0.01">
+      <testcase classname="com.zutubi.util.StringUtilsTest" name="testWrapShort" time="0.01">
     
       <failure message="expected:&lt;...4...&gt; but was:&lt;......&gt;" type="junit.framework.ComparisonFailure">junit.framework.ComparisonFailure: expected:&lt;...4...&gt; but was:&lt;......&gt;
-	at com.zutubi.pulse.util.StringUtilsTest.testWrapShort(StringUtilsTest.java:49)
-</failure>
+	at com.zutubi.util.StringUtilsTest.testWrapShort(StringUtilsTest.java:49)
+      </failure>
 
       </testcase>
 
-      <testcase classname="com.zutubi.pulse.util.StringUtilsTest" name="testWrapSimple" time="0.0"></testcase>
+      <testcase classname="com.zutubi.util.StringUtilsTest" name="testWrapSimple" time="0.0"></testcase>
 
-      <testcase classname="com.zutubi.pulse.util.StringUtilsTest" name="testWrapEarlierSpace" time="0.0"></testcase>
+      <testcase classname="com.zutubi.util.StringUtilsTest" name="testWrapEarlierSpace" time="0.0"></testcase>
 
-      <testcase classname="com.zutubi.pulse.util.StringUtilsTest" name="testWrapMultiline" time="0.0"></testcase>
+      <testcase classname="com.zutubi.util.StringUtilsTest" name="testWrapMultiline" time="0.0"></testcase>
 
-      <testcase classname="com.zutubi.pulse.util.StringUtilsTest" name="testWrapNoSpace" time="0.0"></testcase>
+      <testcase classname="com.zutubi.util.StringUtilsTest" name="testWrapNoSpace" time="0.0"></testcase>
 
-      <testcase classname="com.zutubi.pulse.util.StringUtilsTest" name="testWrapPrefix" time="0.0"></testcase>
+      <testcase classname="com.zutubi.util.StringUtilsTest" name="testWrapPrefix" time="0.0"></testcase>
 
-      <testcase classname="com.zutubi.pulse.util.StringUtilsTest" name="testWrapSomeText" time="0.0"></testcase>
+      <testcase classname="com.zutubi.util.StringUtilsTest" name="testWrapSomeText" time="0.0"></testcase>
 
-      <testcase classname="com.zutubi.pulse.util.StringUtilsTest" name="testInvalidPrefix" time="0.0"></testcase>
+      <testcase classname="com.zutubi.util.StringUtilsTest" name="testInvalidPrefix" time="0.0"></testcase>
 
-      <testcase classname="com.zutubi.pulse.util.StringUtilsTest" name="testGetLineLinefeed" time="0.01"></testcase>
+      <testcase classname="com.zutubi.util.StringUtilsTest" name="testGetLineLinefeed" time="0.01"></testcase>
 
-      <testcase classname="com.zutubi.pulse.util.StringUtilsTest" name="testGetLineCarriageReturn" time="0.0"></testcase>
+      <testcase classname="com.zutubi.util.StringUtilsTest" name="testGetLineCarriageReturn" time="0.0"></testcase>
 
-      <testcase classname="com.zutubi.pulse.util.StringUtilsTest" name="testGetLineCarriageReturnLinefeed" time="0.0"></testcase>
+      <testcase classname="com.zutubi.util.StringUtilsTest" name="testGetLineCarriageReturnLinefeed" time="0.0"></testcase>
 
-      <testcase classname="com.zutubi.pulse.util.StringUtilsTest" name="testGetLineMixed" time="0.0"></testcase>
+      <testcase classname="com.zutubi.util.StringUtilsTest" name="testGetLineMixed" time="0.0"></testcase>
 
-      <testcase classname="com.zutubi.pulse.util.StringUtilsTest" name="testGetLineEmpty" time="0.0"></testcase>
+      <testcase classname="com.zutubi.util.StringUtilsTest" name="testGetLineEmpty" time="0.0"></testcase>
 
-      <testcase classname="com.zutubi.pulse.util.StringUtilsTest" name="testGetLinePastEnd" time="0.0"></testcase>
+      <testcase classname="com.zutubi.util.StringUtilsTest" name="testGetLinePastEnd" time="0.0"></testcase>
 
       <system-out></system-out>
 

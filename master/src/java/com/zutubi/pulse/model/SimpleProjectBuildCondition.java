@@ -1,6 +1,6 @@
 package com.zutubi.pulse.model;
 
-import com.zutubi.pulse.util.StringUtils;
+import com.zutubi.util.StringUtils;
 
 import java.util.List;
 import java.util.Arrays;

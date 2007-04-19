@@ -1,7 +1,7 @@
 package com.zutubi.pulse.local;
 
 import com.zutubi.pulse.core.model.*;
-import com.zutubi.pulse.util.ForkOutputStream;
+import com.zutubi.util.ForkOutputStream;
 import com.zutubi.pulse.util.TimeStamps;
 import com.zutubi.pulse.events.Event;
 import com.zutubi.pulse.events.EventListener;

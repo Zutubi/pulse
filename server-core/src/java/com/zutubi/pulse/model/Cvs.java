@@ -7,7 +7,7 @@ import com.zutubi.pulse.scm.SCMConfiguration;
 import com.zutubi.pulse.scm.SCMException;
 import com.zutubi.pulse.scm.SCMServer;
 import com.zutubi.pulse.scm.cvs.CvsServer;
-import com.zutubi.pulse.util.Constants;
+import com.zutubi.util.Constants;
 
 import java.io.File;
 import java.util.Map;

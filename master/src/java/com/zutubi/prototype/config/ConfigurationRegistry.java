@@ -4,7 +4,7 @@ import com.zutubi.prototype.type.*;
 import com.zutubi.pulse.prototype.config.*;
 import com.zutubi.pulse.prototype.config.admin.GlobalConfiguration;
 import com.zutubi.pulse.prototype.config.setup.SetupConfiguration;
-import com.zutubi.pulse.util.logging.Logger;
+import com.zutubi.util.logging.Logger;
 
 /**
  * Registers the Pulse built-in configuration types.

@@ -2,13 +2,9 @@ package com.zutubi.pulse.vfs;
 
 import com.zutubi.pulse.SlaveProxyFactory;
 import com.zutubi.pulse.core.ObjectFactory;
-import com.zutubi.pulse.bootstrap.MasterConfigurationManager;
-import com.zutubi.pulse.model.BuildManager;
-import com.zutubi.pulse.model.ProjectManager;
 import com.zutubi.pulse.model.SlaveManager;
-import com.zutubi.pulse.search.Queries;
 import com.zutubi.pulse.services.ServiceTokenManager;
-import com.zutubi.pulse.util.logging.Logger;
+import com.zutubi.util.logging.Logger;
 import com.zutubi.pulse.vfs.agent.AgentFileProvider;
 import com.zutubi.pulse.vfs.local.DefaultLocalFileProvider;
 import com.zutubi.pulse.vfs.pulse.PulseFileProvider;

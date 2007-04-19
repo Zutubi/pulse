@@ -1,7 +1,7 @@
 package com.zutubi.pulse.test;
 
 import com.zutubi.pulse.license.*;
-import com.zutubi.pulse.util.StringUtils;
+import com.zutubi.util.StringUtils;
 
 import java.util.Date;
 import java.util.Calendar;

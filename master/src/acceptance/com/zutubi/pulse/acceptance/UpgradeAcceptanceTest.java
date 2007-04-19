@@ -10,7 +10,7 @@ import com.zutubi.pulse.test.TestUtils;
 import com.zutubi.pulse.transfer.TransferAPI;
 import com.zutubi.pulse.upgrade.tasks.MutableConfiguration;
 import com.zutubi.pulse.util.FileSystemUtils;
-import com.zutubi.pulse.util.IOUtils;
+import com.zutubi.util.IOUtils;
 import com.zutubi.pulse.util.ZipUtils;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;

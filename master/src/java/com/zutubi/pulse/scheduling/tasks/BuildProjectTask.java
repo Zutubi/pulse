@@ -7,7 +7,7 @@ import com.zutubi.pulse.model.BuildSpecification;
 import com.zutubi.pulse.scheduling.Task;
 import com.zutubi.pulse.scheduling.TaskExecutionContext;
 import com.zutubi.pulse.scheduling.Trigger;
-import com.zutubi.pulse.util.logging.Logger;
+import com.zutubi.util.logging.Logger;
 
 import java.io.Serializable;
 import java.util.Map;

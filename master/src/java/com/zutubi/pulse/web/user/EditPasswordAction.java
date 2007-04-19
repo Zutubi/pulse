@@ -1,7 +1,7 @@
 package com.zutubi.pulse.web.user;
 
 import com.zutubi.pulse.model.User;
-import com.zutubi.pulse.util.StringUtils;
+import com.zutubi.util.StringUtils;
 import org.acegisecurity.providers.encoding.PasswordEncoder;
 
 /**

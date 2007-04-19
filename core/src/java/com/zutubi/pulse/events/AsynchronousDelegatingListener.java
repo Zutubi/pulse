@@ -1,7 +1,7 @@
 package com.zutubi.pulse.events;
 
 import com.zutubi.pulse.core.Stoppable;
-import com.zutubi.pulse.util.logging.Logger;
+import com.zutubi.util.logging.Logger;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;

@@ -13,8 +13,8 @@ import com.zutubi.pulse.license.LicenseHolder;
 import com.zutubi.pulse.logging.LogConfigurationManager;
 import com.zutubi.pulse.model.UserManager;
 import com.zutubi.pulse.upgrade.UpgradeManager;
-import com.zutubi.pulse.util.IOUtils;
-import com.zutubi.pulse.util.logging.Logger;
+import com.zutubi.util.IOUtils;
+import com.zutubi.util.logging.Logger;
 
 import java.io.File;
 import java.io.FileInputStream;

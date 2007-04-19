@@ -4,7 +4,7 @@ import com.zutubi.pulse.core.model.Resource;
 import com.zutubi.pulse.core.model.ResourceVersion;
 import com.zutubi.pulse.model.PersistentResource;
 import com.zutubi.pulse.model.ResourceManager;
-import com.zutubi.pulse.util.Sort;
+import com.zutubi.util.Sort;
 
 import java.util.Collections;
 import java.util.Comparator;

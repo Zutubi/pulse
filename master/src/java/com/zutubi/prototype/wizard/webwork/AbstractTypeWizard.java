@@ -15,7 +15,7 @@ import com.zutubi.prototype.wizard.Wizard;
 import com.zutubi.prototype.wizard.WizardState;
 import com.zutubi.prototype.wizard.WizardTransition;
 import static com.zutubi.prototype.wizard.WizardTransition.*;
-import com.zutubi.pulse.i18n.Messages;
+import com.zutubi.i18n.Messages;
 
 import java.util.LinkedList;
 import java.util.List;

@@ -7,8 +7,8 @@ import com.zutubi.pulse.scheduling.SchedulingException;
 import com.zutubi.pulse.scheduling.SimpleTrigger;
 import com.zutubi.pulse.scheduling.Trigger;
 import com.zutubi.pulse.scheduling.tasks.PingSlaves;
-import com.zutubi.pulse.util.Constants;
-import com.zutubi.pulse.util.logging.Logger;
+import com.zutubi.util.Constants;
+import com.zutubi.util.logging.Logger;
 
 import java.util.List;
 

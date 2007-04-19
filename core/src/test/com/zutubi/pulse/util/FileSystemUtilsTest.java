@@ -1,6 +1,8 @@
 package com.zutubi.pulse.util;
 
 import com.zutubi.pulse.test.PulseTestCase;
+import com.zutubi.util.IOUtils;
+import com.zutubi.pulse.util.SystemUtils;
 
 import java.io.File;
 import java.io.FileOutputStream;

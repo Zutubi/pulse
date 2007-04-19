@@ -1,7 +1,7 @@
 package com.zutubi.prototype.config;
 
 import com.zutubi.pulse.events.Event;
-import com.zutubi.pulse.util.Predicate;
+import com.zutubi.util.Predicate;
 import com.zutubi.prototype.config.events.ConfigurationEvent;
 import com.zutubi.prototype.type.record.PathUtils;
 

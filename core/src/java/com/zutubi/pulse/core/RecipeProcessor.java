@@ -8,8 +8,8 @@ import com.zutubi.pulse.events.build.RecipeCommencedEvent;
 import com.zutubi.pulse.events.build.RecipeCompletedEvent;
 import com.zutubi.pulse.model.ResourceRequirement;
 import com.zutubi.pulse.util.FileSystemUtils;
-import com.zutubi.pulse.util.IOUtils;
-import com.zutubi.pulse.util.logging.Logger;
+import com.zutubi.util.IOUtils;
+import com.zutubi.util.logging.Logger;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;

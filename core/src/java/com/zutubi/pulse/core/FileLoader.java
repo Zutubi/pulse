@@ -1,8 +1,8 @@
 package com.zutubi.pulse.core;
 
 import com.zutubi.pulse.core.validation.CommandValidationException;
-import com.zutubi.pulse.util.IOUtils;
-import com.zutubi.pulse.validation.MessagesTextProvider;
+import com.zutubi.util.IOUtils;
+import com.zutubi.validation.i18n.MessagesTextProvider;
 import com.zutubi.pulse.validation.PulseValidationContext;
 import com.zutubi.pulse.validation.PulseValidationManager;
 import com.zutubi.validation.ValidationContext;

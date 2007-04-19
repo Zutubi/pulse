@@ -6,13 +6,11 @@ import com.zutubi.prototype.type.record.MutableRecord;
 import com.zutubi.prototype.type.record.MutableRecordImpl;
 import com.zutubi.prototype.type.record.TemplateRecord;
 import com.zutubi.prototype.wizard.WizardState;
-import com.zutubi.pulse.util.logging.Logger;
+import com.zutubi.util.logging.Logger;
 import com.zutubi.pulse.model.Project;
 import com.zutubi.pulse.model.ProjectManager;
 
 import java.util.LinkedList;
-
-import org.apache.velocity.runtime.configuration.Configuration;
 
 /**
  * This wizard walks a user through the project configuration process. During project configuration,

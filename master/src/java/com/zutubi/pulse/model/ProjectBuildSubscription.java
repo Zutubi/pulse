@@ -8,7 +8,7 @@ import com.zutubi.pulse.condition.TrueNotifyCondition;
 import com.zutubi.pulse.condition.antlr.NotifyConditionLexer;
 import com.zutubi.pulse.condition.antlr.NotifyConditionParser;
 import com.zutubi.pulse.condition.antlr.NotifyConditionTreeParser;
-import com.zutubi.pulse.util.logging.Logger;
+import com.zutubi.util.logging.Logger;
 
 import java.io.StringReader;
 import java.util.LinkedList;

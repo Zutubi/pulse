@@ -1,12 +1,10 @@
 package com.zutubi.prototype.wizard;
 
-import com.zutubi.prototype.type.CompositeType;
-import com.zutubi.prototype.type.record.Record;
 import com.zutubi.prototype.type.record.TemplateRecord;
 import com.zutubi.prototype.type.record.MutableRecord;
 import com.zutubi.prototype.FormDescriptor;
 import com.zutubi.prototype.FormDescriptorFactory;
-import com.zutubi.pulse.i18n.Messages;
+import com.zutubi.i18n.Messages;
 
 import java.util.Map;
 

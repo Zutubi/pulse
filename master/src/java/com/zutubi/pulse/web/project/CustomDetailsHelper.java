@@ -4,7 +4,7 @@ import com.opensymphony.util.TextUtils;
 import com.opensymphony.xwork.ValidationAware;
 import com.zutubi.pulse.core.*;
 import com.zutubi.pulse.model.CustomProjectValidationPredicate;
-import com.zutubi.pulse.util.StringUtils;
+import com.zutubi.util.StringUtils;
 
 import java.io.ByteArrayInputStream;
 
