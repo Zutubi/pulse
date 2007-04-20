@@ -191,18 +191,20 @@
       <div class="clear"></div>
       </div>
 
-     <div id="content" class="ylayout-inactive-content"></div>
-     
+      <div id="content" class="ylayout-inactive-content"></div>
+
       <div id="center">
           $body
           #if($license.expired)
             <div id="statusmessage">#wwtext("name=license.expiry.notice")</div>
           #end
       </div>
+        
       <div id="south">
          <b>::</b> <a href="http://zutubi.com/products/pulse/">pulse</a> ($version_number #$build_number) <b>::</b>
          copyright &copy; 2005-2007 <a href="http://zutubi.com/">zutubi pty ltd</a> <b>::</b>
          <a href="http://jira.zutubi.com/">report bug/request feature</a>
       </div>
+        
     </body>
 </html>

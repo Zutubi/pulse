@@ -1,7 +1,5 @@
 package com.zutubi.prototype.type.record;
 
-import java.util.Set;
-
 /**
  * A record that supports writing to properties.
  */

@@ -32,6 +32,12 @@ public abstract class PrototypeDirective extends AbstractDirective
         return (Type) stack.findValue("type");
     }
 
+    protected Messages lookupMessages()
+    {
+        OgnlValueStack stack = ActionContext.getContext().getValueStack();
+        return (Messages) stack.findValue("messages");
+    }
+
     protected Record lookupRecord()
     {
         OgnlValueStack stack = ActionContext.getContext().getValueStack();

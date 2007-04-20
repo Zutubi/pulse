@@ -2,6 +2,9 @@ package com.zutubi.prototype.type.record;
 
 import junit.framework.TestCase;
 
+import java.util.Map;
+import java.util.HashMap;
+
 /**
  *
  *
@@ -118,5 +121,104 @@ public class RecordManagerTest extends TestCase
 
         Record storedRecord = recordManager.load("path");
         assertEquals("value", storedRecord.get("key"));
+    }
+
+    public void testContainsRecord()
+    {
+        assertFalse(recordManager.containsRecord("a"));
+        recordManager.insert("a", new MutableRecordImpl());
+        assertTrue(recordManager.containsRecord("a"));
+    }
+
+    public void testLoadAll()
+    {
+        // setup test data.
+        recordManager.insert("a", new MutableRecordImpl());
+        recordManager.insert("a/b", new MutableRecordImpl());
+        recordManager.insert("a/b/c", new MutableRecordImpl());
+
+        assertLoadedRecordCount("a", 1);
+        assertLoadedRecordCount("a/b", 1);
+        assertLoadedRecordCount("a/b/c", 1);
+        assertLoadedRecordCount("a/b/c/d", 0);
+
+        assertLoadedRecordCount("a/*/c", 1);
+        assertLoadedRecordCount("*/*/*", 1);
+
+        recordManager.insert("a/b/d", new MutableRecordImpl());
+        assertLoadedRecordCount("a/b/*", 2);
+    }
+
+    public void testLoadAllHandlesNullInput()
+    {
+        try
+        {
+            recordManager.loadAll(null, new HashMap<String, Record>());
+            fail();
+        }
+        catch (IllegalArgumentException e)
+        {
+            // noop.
+        }
+    }
+
+    private void assertLoadedRecordCount(String path, int count)
+    {
+        Map<String, Record> records = new HashMap<String, Record>();
+        recordManager.loadAll(path, records);
+        assertEquals(count, records.size());
+    }
+
+    public void testLoadAllEmptyPath()
+    {
+        try
+        {
+            recordManager.loadAll("", new HashMap<String, Record>());
+            fail();
+        }
+        catch (IllegalArgumentException e)
+        {
+            // noop.
+        }
+    }
+
+    public void testLoadEmptyPath()
+    {
+        try
+        {
+            recordManager.load("");
+            fail();
+        }
+        catch (IllegalArgumentException e)
+        {
+            // noop.
+        }
+    }
+
+    public void testLoadHandlesNullInput()
+    {
+        try
+        {
+            recordManager.load(null);
+            fail();
+        }
+        catch (IllegalArgumentException e)
+        {
+            // noop.
+        }
+    }
+
+    public void testInsertAtEmptyString()
+    {
+        try
+        {
+            recordManager.insert("", new MutableRecordImpl());
+            fail();
+        }
+        catch (IllegalArgumentException e)
+        {
+            // noop.
+        }
+
     }
 }

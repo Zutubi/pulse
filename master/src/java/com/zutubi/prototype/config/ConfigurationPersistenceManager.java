@@ -438,15 +438,6 @@ public class ConfigurationPersistenceManager
         return templatiseRecord(path, record);
     }
 
-    private void getAllRecords(String path, Map<String, Record> records)
-    {
-        recordManager.loadAll(path, records);
-        for (Map.Entry<String, Record> entry : records.entrySet())
-        {
-            entry.setValue(templatiseRecord(entry.getKey(), entry.getValue()));
-        }
-    }
-
     private Record templatiseRecord(String path, Record record)
     {
         // We need to understand the root level can be templated.

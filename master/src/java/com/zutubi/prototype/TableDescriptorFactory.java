@@ -32,7 +32,7 @@ public class TableDescriptorFactory
         RowDescriptor dataRow = new CollectionRowDescriptor(type);
 
         // take a look at any annotations defined for the base collection type.
-        Formatter defaultFormatter = new SimpleColumnFormatter();
+        Formatter<Object> defaultFormatter = new SimpleColumnFormatter();
         CompositeType baseType = (CompositeType) type.getCollectionType();
         Format format = (Format) baseType.getAnnotation(Format.class);
         if (format != null)

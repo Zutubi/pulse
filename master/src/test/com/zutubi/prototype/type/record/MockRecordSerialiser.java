@@ -10,7 +10,7 @@ public class MockRecordSerialiser implements RecordSerialiser
 
     public MutableRecord deserialise(String path) throws RecordSerialiseException
     {
-        throw new RuntimeException("Method not yet implemented.");
+        return new MutableRecordImpl();
     }
 
     public void delete(String path) throws RecordSerialiseException

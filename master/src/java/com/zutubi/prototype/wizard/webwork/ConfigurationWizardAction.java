@@ -358,8 +358,8 @@ public class ConfigurationWizardAction extends ActionSupport
         {
             try
             {
-                Class clazz = ClassLoaderUtils.loadAssociatedClass(type.getClazz(), annotation.value());
-                wizardInstance = (Wizard) ComponentContext.createBean(clazz);
+                Class<? extends Wizard> clazz = ClassLoaderUtils.loadAssociatedClass(type.getClazz(), annotation.value());
+                wizardInstance = ComponentContext.createBean(clazz);
             }
             catch (Exception e)
             {

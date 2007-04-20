@@ -22,7 +22,10 @@ public class DefaultRecordSerialiserTest extends PulseTestCase
 
     protected void tearDown() throws Exception
     {
-        FileSystemUtils.rmdir(tmpDir);
+        if (!FileSystemUtils.rmdir(tmpDir))
+        {
+            throw new RuntimeException("Failed to clean up " + tmpDir.getAbsolutePath());
+        }
     }
 
     public void testSimple() throws IOException
@@ -193,39 +196,6 @@ public class DefaultRecordSerialiserTest extends PulseTestCase
     private MutableRecord roundTrip(String path, MutableRecord record, boolean deep)
     {
         serialiser.serialise(path, record, deep);
-        MutableRecord other = serialiser.deserialise(path);
-        return other;
+        return serialiser.deserialise(path);
     }
-
-//    @SymbolicName("simple")
-//    private class Simple
-//    {
-//        private String property;
-//
-//        public String getProperty()
-//        {
-//            return property;
-//        }
-//
-//        public void setProperty(String property)
-//        {
-//            this.property = property;
-//        }
-//    }
-//
-//    @SymbolicName("nested")
-//    private class Nested
-//    {
-//        private Simple child;
-//
-//        public Simple getChild()
-//        {
-//            return child;
-//        }
-//
-//        public void setChild(Simple child)
-//        {
-//            this.child = child;
-//        }
-//    }
 }

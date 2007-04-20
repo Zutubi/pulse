@@ -11,14 +11,14 @@ import java.util.Enumeration;
  */
 public class ClassLoaderUtils
 {
-    public static Class loadAssociatedClass(Class annotatedClass, String className) throws ClassNotFoundException
+    public static <V> Class<V> loadAssociatedClass(Class annotatedClass, String className) throws ClassNotFoundException
     {
         if(!className.contains("."))
         {
             className = annotatedClass.getPackage().getName() + "." + className;
         }
 
-        return annotatedClass.getClassLoader().loadClass(className);
+        return (Class<V>) annotatedClass.getClassLoader().loadClass(className);
     }
 
     /**

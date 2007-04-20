@@ -12,9 +12,9 @@ public class AnnotationFormatter implements Formatter
 {
     private static final Logger LOG  = Logger.getLogger(AnnotationFormatter.class);
 
-    private Formatter defaultFormatter = null;
+    private Formatter<Object> defaultFormatter = null;
 
-    public AnnotationFormatter(Formatter defaultFormatter)
+    public AnnotationFormatter(Formatter<Object> defaultFormatter)
     {
         this.defaultFormatter = defaultFormatter;
     }
@@ -32,8 +32,8 @@ public class AnnotationFormatter implements Formatter
                 return applyDefaultFormatting(obj);
             }
             
-            Class formatterClass = ClassLoaderUtils.loadAssociatedClass(obj.getClass(), formatAnnotation.value());
-            Formatter formatter = (Formatter) formatterClass.newInstance();
+            Class<? extends Formatter> formatterClass = ClassLoaderUtils.loadAssociatedClass(obj.getClass(), formatAnnotation.value());
+            Formatter formatter = formatterClass.newInstance();
             return formatter.format(obj);
         }
         catch (Exception e)

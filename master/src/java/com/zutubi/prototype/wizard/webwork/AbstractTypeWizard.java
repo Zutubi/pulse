@@ -169,7 +169,7 @@ public abstract class AbstractTypeWizard implements Wizard
 
         public FormDescriptor createFormDescriptor(FormDescriptorFactory formDescriptorFactory, String path)
         {
-            return formDescriptorFactory.createDescriptor(path, getType().getSymbolicName());
+            return formDescriptorFactory.createDescriptor(path, getType());
         }
 
         public abstract CompositeType getType();

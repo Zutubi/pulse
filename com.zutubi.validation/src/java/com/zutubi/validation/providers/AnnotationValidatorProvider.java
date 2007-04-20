@@ -27,12 +27,10 @@ public class AnnotationValidatorProvider implements ValidatorProvider
     // happy autowiring context.
     private ObjectFactory objectFactory = new DefaultObjectFactory();
 
-/*
     public void setObjectFactory(ObjectFactory objectFactory)
     {
         this.objectFactory = objectFactory;
     }
-*/
 
     public List<Validator> getValidators(Object obj)
     {
@@ -111,7 +109,7 @@ public class AnnotationValidatorProvider implements ValidatorProvider
                     }
                     catch (NoSuchFieldException e)
                     {
-                        
+                        // noop
                     }
 
                     // convert constraints into validators.
@@ -159,8 +157,8 @@ public class AnnotationValidatorProvider implements ValidatorProvider
             {
                 try
                 {
-                    Class validatorClass = ClassLoaderUtils.loadAssociatedClass(clazz, validatorClassName);
-                    Validator validator = (Validator) objectFactory.buildBean(validatorClass);
+                    Class<? extends Validator> validatorClass = ClassLoaderUtils.loadAssociatedClass(clazz, validatorClassName);
+                    Validator validator = objectFactory.buildBean(validatorClass);
                     AnnotationUtils.setPropertiesFromAnnotation(annotation, validator);
                     if (validator instanceof FieldValidator)
                     {

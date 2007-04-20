@@ -1,7 +1,5 @@
 package com.zutubi.prototype.type.record;
 
-import com.zutubi.pulse.bootstrap.MasterConfigurationManager;
-
 import java.util.Map;
 
 /**
@@ -21,6 +19,7 @@ public class RecordManager
      * records start from here.
      */
     private MutableRecord baseRecord = new MutableRecordImpl();
+    
     private RecordSerialiser recordSerialiser;
 
     public void init()
@@ -36,6 +35,8 @@ public class RecordManager
      */
     public synchronized Record load(String path)
     {
+        checkPath(path);
+        
         String[] elements = PathUtils.getPathElements(path);
         return load(elements);
     }
@@ -46,11 +47,11 @@ public class RecordManager
         for(String pathElement: elements)
         {
             Object data = record.get(pathElement);
-            if (data == null || !(data instanceof MutableRecordImpl))
+            if (data == null || !(data instanceof Record))
             {
                 return null;
             }
-            record = (Record) record.get(pathElement);
+            record = (Record) data;
         }
         return record;
     }
@@ -66,6 +67,8 @@ public class RecordManager
      */
     public synchronized void loadAll(String path, Map<String, Record> records)
     {
+        checkPath(path);
+        
         loadAll(baseRecord, PathUtils.getPathElements(path), 0, "", records);
     }
 
@@ -94,6 +97,8 @@ public class RecordManager
      */
     public synchronized boolean containsRecord(String path)
     {
+        checkPath(path);
+        
         return getRecord(PathUtils.getPathElements(path)) != null;
     }
 
@@ -107,6 +112,8 @@ public class RecordManager
      */
     public synchronized Record insert(String path, Record newRecord)
     {
+        checkPath(path);
+
         String[] pathElements = PathUtils.getPathElements(path);
         if (pathElements == null)
         {
@@ -124,6 +131,14 @@ public class RecordManager
         recordSerialiser.serialise(path, record, true);
         parent.put(pathElements[pathElements.length - 1], record);
         return record;
+    }
+
+    private void checkPath(String path)
+    {
+        if (path == null || path.equals(""))
+        {
+            throw new IllegalArgumentException("Invalid path '" + path + "'");
+        }
     }
 
     private MutableRecord getRecord(String[] pathElements)
@@ -158,10 +173,7 @@ public class RecordManager
      */
     public synchronized Record update(String path, Record values)
     {
-        if(path.length() == 0)
-        {
-            throw new IllegalArgumentException("Cannot store into an empty path");
-        }
+        checkPath(path);
         
         String[] parentElements = PathUtils.getParentPathElements(path);
         String baseName = PathUtils.getBaseName(path);
@@ -218,10 +230,7 @@ public class RecordManager
      */
     public synchronized Record delete(String path)
     {
-        if(path.length() == 0)
-        {
-            throw new IllegalArgumentException("Cannot delete the base record");
-        }
+        checkPath(path);
 
         MutableRecord parentRecord = getRecord(PathUtils.getParentPathElements(path));
         if (parentRecord == null)

@@ -1,7 +1,5 @@
 package com.zutubi.i18n;
 
-import com.zutubi.i18n.Messages;
-
 /**
  *
  *
