@@ -21,12 +21,10 @@ public class RecordManager
      * records start from here.
      */
     private MutableRecord baseRecord = new MutableRecordImpl();
-    private MasterConfigurationManager configurationManager;
     private RecordSerialiser recordSerialiser;
 
     public void init()
     {
-        recordSerialiser = new DefaultRecordSerialiser(configurationManager.getUserPaths().getRecordRoot());
         baseRecord = recordSerialiser.deserialise("");
     }
 
@@ -261,11 +259,6 @@ public class RecordManager
         }
 
         return null;
-    }
-
-    public void setConfigurationManager(MasterConfigurationManager configurationManager)
-    {
-        this.configurationManager = configurationManager;
     }
 
     public void setRecordSerialiser(RecordSerialiser recordSerialiser)

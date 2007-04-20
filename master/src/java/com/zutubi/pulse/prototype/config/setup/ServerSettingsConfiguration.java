@@ -18,7 +18,7 @@ import com.zutubi.validation.validators.EmailValidator;
  *
  */
 @SymbolicName("internal.serverSettingsConfig")
-@ConfigurationCheck(ServerSettingsConfigurationCheckHandler.class)
+@ConfigurationCheck("ServerSettingsConfigurationCheckHandler")
 @Form(fieldOrder = {"baseUrl", "host", "ssl", "from", "username", "password", "subjectPrefix", "customPort", "port"})
 public class ServerSettingsConfiguration implements Validateable
 {

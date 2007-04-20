@@ -2,7 +2,6 @@ package com.zutubi.prototype.webwork;
 
 import com.opensymphony.xwork.ActionContext;
 import com.zutubi.prototype.ConfigurationCheckHandler;
-import com.zutubi.prototype.annotation.ConfigurationCheck;
 import com.zutubi.prototype.type.CompositeType;
 import com.zutubi.prototype.type.Type;
 import com.zutubi.prototype.type.record.Record;
@@ -53,13 +52,8 @@ public class CheckAction extends PrototypeSupport
         record = PrototypeUtils.toRecord((CompositeType) type, formParameters);
 
         // Now lets create the record for the secondary form, used to generate the check processor. 
-        ConfigurationCheck annotation = (ConfigurationCheck) type.getAnnotation(ConfigurationCheck.class);
-        Type checkType = typeRegistry.getType(annotation.value());
-        if (checkType == null)
-        {
-            checkType = typeRegistry.register(annotation.value());
-        }
-        checkRecord = PrototypeUtils.toRecord((CompositeType) checkType, parameters);
+        CompositeType checkType = configurationRegistry.getConfigurationCheckType((CompositeType) type);
+        checkRecord = PrototypeUtils.toRecord(checkType, parameters);
 
         // validate the check form first.
         if (!configurationPersistenceManager.validate(null, null, checkRecord, new XWorkValidationAdapter(this)))

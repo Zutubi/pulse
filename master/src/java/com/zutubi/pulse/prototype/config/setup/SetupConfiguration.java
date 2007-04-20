@@ -8,7 +8,7 @@ import com.zutubi.prototype.annotation.Wizard;
  *
  */
 @SymbolicName("internal.setupConfig")
-@Wizard(SetupWizard.class)
+@Wizard("SetupWizard")
 public class SetupConfiguration
 {
     private AdminUserConfiguration admin;

@@ -1,6 +1,6 @@
 package com.zutubi.prototype.annotation;
 
-import com.zutubi.pulse.prototype.FieldType;
+import com.zutubi.prototype.annotation.FieldType;
 
 import java.lang.annotation.Target;
 import java.lang.annotation.ElementType;
@@ -9,9 +9,6 @@ import java.lang.annotation.RetentionPolicy;
 
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ElementType.METHOD, ElementType.FIELD})
-
-// Annotation handler reference that is used to process 'this' annotation.
-@Handler(FieldAnnotationHandler.class)
 
 // This annotation is a form field of type TEXTAREA.
 @Field(type = FieldType.TEXTAREA)

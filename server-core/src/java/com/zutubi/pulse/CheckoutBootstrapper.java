@@ -4,7 +4,7 @@ import com.zutubi.pulse.core.BuildException;
 import com.zutubi.pulse.core.BuildRevision;
 import com.zutubi.pulse.model.Scm;
 import com.zutubi.pulse.scm.SCMException;
-import com.zutubi.pulse.scm.SCMServer;
+import com.zutubi.pulse.scm.SCMClient;
 import com.zutubi.util.logging.Logger;
 
 import java.io.File;
@@ -24,7 +24,7 @@ public class CheckoutBootstrapper extends ScmBootstrapper
         this.persist = persist;
     }
 
-    public SCMServer bootstrap(File workDir)
+    public SCMClient bootstrap(File workDir)
     {
         try
         {
@@ -34,9 +34,9 @@ public class CheckoutBootstrapper extends ScmBootstrapper
                 id = getId();
             }
 
-            SCMServer server = scm.createServer();
-            server.checkout(id, workDir, revision.getRevision(), this);
-            return server;
+            SCMClient client = scm.createServer();
+            client.checkout(id, workDir, revision.getRevision(), this);
+            return client;
         }
         catch (SCMException e)
         {

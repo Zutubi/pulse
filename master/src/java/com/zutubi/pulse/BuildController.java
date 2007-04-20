@@ -16,7 +16,7 @@ import com.zutubi.pulse.model.*;
 import com.zutubi.pulse.scheduling.quartz.TimeoutRecipeJob;
 import com.zutubi.pulse.scm.FileStatus;
 import com.zutubi.pulse.scm.SCMException;
-import com.zutubi.pulse.scm.SCMServer;
+import com.zutubi.pulse.scm.SCMClient;
 import com.zutubi.pulse.services.ServiceTokenManager;
 import com.zutubi.util.Constants;
 import com.zutubi.pulse.util.FileSystemUtils;
@@ -514,8 +514,8 @@ public class BuildController implements EventListener
             {
                 try
                 {
-                    SCMServer server = scm.createServer();
-                    getChangeSince(server, previousRevision, revision);
+                    SCMClient client = scm.createServer();
+                    getChangeSince(client, previousRevision, revision);
                 }
                 catch (SCMException e)
                 {
@@ -525,14 +525,14 @@ public class BuildController implements EventListener
         }
     }
 
-    private List<Changelist> getChangeSince(SCMServer server, Revision previousRevision, Revision revision) throws SCMException
+    private List<Changelist> getChangeSince(SCMClient client, Revision previousRevision, Revision revision) throws SCMException
     {
         List<Changelist> result = new LinkedList<Changelist>();
-        List<Changelist> scmChanges = server.getChanges(previousRevision, revision);
+        List<Changelist> scmChanges = client.getChanges(previousRevision, revision);
 
         // Get the uid after the changes as Svn requires a connection to be
         // made first
-        String uid = server.getUid();
+        String uid = client.getUid();
 
         CHANGE_LOCK.lock();
         try

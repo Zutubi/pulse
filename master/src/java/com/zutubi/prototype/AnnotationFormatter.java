@@ -2,6 +2,7 @@ package com.zutubi.prototype;
 
 import com.zutubi.prototype.annotation.Format;
 import com.zutubi.util.logging.Logger;
+import com.zutubi.util.ClassLoaderUtils;
 
 /**
  *
@@ -20,6 +21,9 @@ public class AnnotationFormatter implements Formatter
 
     public String format(Object obj)
     {
+        // FIXME This is particularly inefficient: loading all this gear
+        // FIXME every row of the table, and every page reload.  We should
+        // FIXME look up once and cache somehow.
         try
         {
             Format formatAnnotation = obj.getClass().getAnnotation(Format.class);
@@ -28,7 +32,8 @@ public class AnnotationFormatter implements Formatter
                 return applyDefaultFormatting(obj);
             }
             
-            Formatter formatter = formatAnnotation.value().newInstance();
+            Class formatterClass = ClassLoaderUtils.loadAssociatedClass(obj.getClass(), formatAnnotation.value());
+            Formatter formatter = (Formatter) formatterClass.newInstance();
             return formatter.format(obj);
         }
         catch (Exception e)

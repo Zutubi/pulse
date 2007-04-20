@@ -27,5 +27,5 @@ public @interface ConfigurationCheck
      *
      * @see ConfigurationCheckHandler
      */
-    Class<? extends ConfigurationCheckHandler> value();
+    String value();
 }

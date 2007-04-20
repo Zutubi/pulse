@@ -11,7 +11,7 @@ import com.zutubi.pulse.scheduling.Trigger;
 import com.zutubi.pulse.scm.MonitorScms;
 import com.zutubi.pulse.scm.SCMChangeEvent;
 import com.zutubi.pulse.scm.SCMException;
-import com.zutubi.pulse.scm.SCMServer;
+import com.zutubi.pulse.scm.SCMClient;
 import com.zutubi.util.Constants;
 import com.zutubi.pulse.util.Pair;
 import com.zutubi.util.logging.Logger;
@@ -163,10 +163,10 @@ public class DefaultScmManager implements ScmManager, Stoppable
             save(scm);
 
             // when was the last time that we checked? if never, get the latest revision.
-            SCMServer server = scm.createServer();
+            SCMClient client = scm.createServer();
             if (!latestRevisions.containsKey(scm.getId()))
             {
-                latestRevisions.put(scm.getId(), server.getLatestRevision());
+                latestRevisions.put(scm.getId(), client.getLatestRevision());
                 return;
             }
 
@@ -175,7 +175,7 @@ public class DefaultScmManager implements ScmManager, Stoppable
             // slightly paranoid, but we can not rely on the scm implementations to behave as expected.
             if (previous == null)
             {
-                latestRevisions.put(scm.getId(), server.getLatestRevision());
+                latestRevisions.put(scm.getId(), client.getLatestRevision());
                 return;
             }
 
@@ -190,7 +190,7 @@ public class DefaultScmManager implements ScmManager, Stoppable
                     if (quietTime < System.currentTimeMillis())
                     {
                         Revision lastChange = waiting.get(scm.getId()).second;
-                        Revision latest = getLatestRevisionSince(lastChange, server);
+                        Revision latest = getLatestRevisionSince(lastChange, client);
                         if (latest != null)
                         {
                             // there has been a commit during the 'quiet period', lets reset the timer.
@@ -206,7 +206,7 @@ public class DefaultScmManager implements ScmManager, Stoppable
                 }
                 else
                 {
-                    Revision latest = getLatestRevisionSince(previous, server);
+                    Revision latest = getLatestRevisionSince(previous, client);
                     if (latest != null)
                     {
                         if (cvs.getQuietPeriod() != 0)
@@ -222,7 +222,7 @@ public class DefaultScmManager implements ScmManager, Stoppable
             }
             else
             {
-                Revision latest = getLatestRevisionSince(previous, server);
+                Revision latest = getLatestRevisionSince(previous, client);
                 if (latest != null)
                 {
                     sendScmChangeEvent(scm, latest, previous);
@@ -239,9 +239,9 @@ public class DefaultScmManager implements ScmManager, Stoppable
         }
     }
 
-    private Revision getLatestRevisionSince(Revision revision, SCMServer server) throws SCMException
+    private Revision getLatestRevisionSince(Revision revision, SCMClient client) throws SCMException
     {
-        List<Revision> revisions = server.getRevisionsSince(revision);
+        List<Revision> revisions = client.getRevisionsSince(revision);
         if (revisions.size() > 0)
         {
             // get the latest revision.

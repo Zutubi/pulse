@@ -1,9 +1,11 @@
-package com.zutubi.prototype.annotation;
+package com.zutubi.prototype.handler;
 
 import com.zutubi.util.bean.ObjectFactory;
+import com.zutubi.util.ClassLoaderUtils;
 import com.zutubi.prototype.Descriptor;
 import com.zutubi.prototype.OptionProvider;
 import com.zutubi.prototype.FieldDescriptor;
+import com.zutubi.prototype.type.CompositeType;
 
 import java.lang.annotation.Annotation;
 import java.util.Collection;
@@ -18,13 +20,14 @@ public abstract class OptionAnnotationHandler extends FieldAnnotationHandler
      */
     private ObjectFactory objectFactory;
 
-    public void process(Annotation annotation, Descriptor descriptor) throws Exception
+    public void process(CompositeType annotatedType, Annotation annotation, Descriptor descriptor) throws Exception
     {
         // do everything that the standard field annotation handler does,
-        super.process(annotation, descriptor);
+        super.process(annotatedType, annotation, descriptor);
 
         //  and then a little bit extra.
-        OptionProvider optionProvider = objectFactory.buildBean(getOptionProviderClass(annotation));
+        String className = getOptionProviderClass(annotation);
+        OptionProvider optionProvider = (OptionProvider) objectFactory.buildBean(ClassLoaderUtils.loadAssociatedClass(annotatedType.getClazz(), className));
 
         FieldDescriptor field = (FieldDescriptor) descriptor;
         Collection optionList = optionProvider.getOptions(field.getPath(), field.getProperty());
@@ -39,7 +42,7 @@ public abstract class OptionAnnotationHandler extends FieldAnnotationHandler
         }
     }
 
-    protected abstract Class<? extends OptionProvider> getOptionProviderClass(Annotation annotation);
+    protected abstract String getOptionProviderClass(Annotation annotation);
 
     /**
      * Required resource.

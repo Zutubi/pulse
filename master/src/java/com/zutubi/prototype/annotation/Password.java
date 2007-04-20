@@ -1,6 +1,6 @@
 package com.zutubi.prototype.annotation;
 
-import com.zutubi.pulse.prototype.FieldType;
+import com.zutubi.prototype.annotation.FieldType;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -9,9 +9,6 @@ import java.lang.annotation.Target;
 
 @Target({ElementType.METHOD, ElementType.FIELD})
 @Retention(RetentionPolicy.RUNTIME)
-
-// Annotation handler reference that is used to process 'this' annotation.
-@Handler(FieldAnnotationHandler.class)
 
 // This annotation is a form field of type PASSWORD.
 @Field(type = FieldType.PASSWORD)

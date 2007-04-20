@@ -12,7 +12,7 @@ import com.zutubi.validation.annotations.Required;
  */
 @SymbolicName("jabberConfig")
 @Form(fieldOrder = {"server", "port", "username", "password", "ssl"})
-@ConfigurationCheck(JabberConfigurationCheckHandler.class)
+@ConfigurationCheck("JabberConfigurationCheckHandler")
 public class JabberConfiguration
 {
     @Required

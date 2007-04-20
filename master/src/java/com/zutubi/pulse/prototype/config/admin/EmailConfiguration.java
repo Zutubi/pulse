@@ -17,7 +17,7 @@ import com.opensymphony.util.TextUtils;
  */
 @SymbolicName("emailConfig")
 @Form(fieldOrder = { "host", "ssl", "from", "username", "password", "subjectPrefix", "customPort", "port"})
-@ConfigurationCheck(EmailConfigurationCheckHandler.class)
+@ConfigurationCheck("EmailConfigurationCheckHandler")
 public class EmailConfiguration
 {
     @Required

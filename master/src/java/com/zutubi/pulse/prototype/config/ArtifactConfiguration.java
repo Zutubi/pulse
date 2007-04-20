@@ -1,14 +1,13 @@
 package com.zutubi.pulse.prototype.config;
 
 import com.zutubi.prototype.annotation.Format;
-import com.zutubi.prototype.annotation.TypeSelect;
 import com.zutubi.validation.annotations.Name;
 
 /**
  *
  *
  */
-@Format(ArtifactConfigurationFormatter.class)
+@Format("ArtifactConfigurationFormatter")
 public class ArtifactConfiguration
 {
     @Name

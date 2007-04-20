@@ -1,9 +1,7 @@
-package com.zutubi.prototype.annotation;
+package com.zutubi.prototype.handler;
 
-import com.zutubi.prototype.Descriptor;
-import com.zutubi.prototype.FieldDescriptor;
 import com.zutubi.prototype.OptionProvider;
-import com.zutubi.prototype.type.ReferenceType;
+import com.zutubi.prototype.annotation.Reference;
 
 import java.lang.annotation.Annotation;
 
@@ -13,7 +11,7 @@ import java.lang.annotation.Annotation;
  */
 public class ReferenceAnnotationHandler extends OptionAnnotationHandler
 {
-    protected Class<? extends OptionProvider> getOptionProviderClass(Annotation annotation)
+    protected String getOptionProviderClass(Annotation annotation)
     {
         return ((Reference)annotation).optionProvider();
     }

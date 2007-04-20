@@ -2,11 +2,10 @@ package com.zutubi.prototype;
 
 import com.zutubi.prototype.annotation.Format;
 import com.zutubi.prototype.type.CollectionType;
-import com.zutubi.prototype.type.Type;
 import com.zutubi.prototype.type.TypeException;
-import com.zutubi.prototype.type.TypeRegistry;
 import com.zutubi.prototype.type.CompositeType;
 import com.zutubi.prototype.config.ConfigurationPersistenceManager;
+import com.zutubi.util.ClassLoaderUtils;
 
 /**
  *
@@ -34,13 +33,16 @@ public class TableDescriptorFactory
 
         // take a look at any annotations defined for the base collection type.
         Formatter defaultFormatter = new SimpleColumnFormatter();
-        Type baseType = type.getCollectionType();
+        CompositeType baseType = (CompositeType) type.getCollectionType();
         Format format = (Format) baseType.getAnnotation(Format.class);
         if (format != null)
         {
             try
             {
-                defaultFormatter = format.value().newInstance();
+                // FIXME inefficient, just like formatting in the annotation
+                // FIXME formatter itself.
+                Class formatterClass = ClassLoaderUtils.loadAssociatedClass(baseType.getClazz(), format.value());
+                defaultFormatter = (Formatter) formatterClass.newInstance();
             }
             catch (Exception e)
             {

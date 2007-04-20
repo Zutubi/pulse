@@ -20,7 +20,7 @@ public @interface Format
      * The implementation of the Formatter interface, that will be applied to provide formatting
      * funtionality to the annotated type.
      *
-     * @return formatter class.
+     * @return the formatter class name.
      */
-    Class<? extends Formatter> value();
+    String value();
 }

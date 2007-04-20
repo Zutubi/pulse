@@ -4,7 +4,7 @@ import com.zutubi.pulse.core.BuildException;
 import com.zutubi.pulse.core.BuildRevision;
 import com.zutubi.pulse.model.Scm;
 import com.zutubi.pulse.scm.SCMException;
-import com.zutubi.pulse.scm.SCMServer;
+import com.zutubi.pulse.scm.SCMClient;
 import com.zutubi.util.logging.Logger;
 
 import java.io.File;
@@ -20,13 +20,13 @@ public class UpdateBootstrapper extends ScmBootstrapper
         super(project, spec, scm, revision);
     }
 
-    SCMServer bootstrap(File workDir)
+    SCMClient bootstrap(File workDir)
     {
         try
         {
-            SCMServer server = scm.createServer();
-            server.update(getId(), workDir, revision.getRevision(), this);
-            return server;
+            SCMClient client = scm.createServer();
+            client.update(getId(), workDir, revision.getRevision(), this);
+            return client;
         }
         catch (SCMException e)
         {

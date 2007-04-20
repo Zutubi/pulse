@@ -13,7 +13,7 @@ import java.util.Set;
 /**
  * An interface for interaction with SCM servers.
  */
-public interface SCMServer
+public interface SCMClient
 {
     /**
      * Returns the functionality that this implementation supports, as a set

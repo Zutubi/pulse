@@ -1,7 +1,5 @@
 package com.zutubi.validation.annotations;
 
-import com.zutubi.validation.validators.EmailValidator;
-
 import java.lang.annotation.Target;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -10,7 +8,7 @@ import java.lang.annotation.RetentionPolicy;
 /**
  * <class-comment/>
  */
-@Constraint(EmailValidator.class)
+@Constraint("com.zutubi.validation.validators.EmailValidator")
 @Target({ElementType.METHOD, ElementType.FIELD})
 @Retention(RetentionPolicy.RUNTIME)
 public @interface Email

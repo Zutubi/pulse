@@ -6,7 +6,7 @@ import com.zutubi.pulse.core.VariableHelper;
 import com.zutubi.pulse.core.model.Property;
 import com.zutubi.pulse.core.model.ResourceProperty;
 import com.zutubi.pulse.core.model.ResultState;
-import com.zutubi.pulse.scm.SCMServer;
+import com.zutubi.pulse.scm.SCMClient;
 
 import java.util.List;
 
@@ -35,8 +35,8 @@ public class TagPostBuildAction extends PostBuildAction
         try
         {
             String tagName = substituteVariables(tag, result, recipe, properties);
-            SCMServer server = result.getProject().getScm().createServer();
-            server.tag(result.getScmDetails().getRevision(), tagName, moveExisting);
+            SCMClient client = result.getProject().getScm().createServer();
+            client.tag(result.getScmDetails().getRevision(), tagName, moveExisting);
         }
         catch (Exception e)
         {

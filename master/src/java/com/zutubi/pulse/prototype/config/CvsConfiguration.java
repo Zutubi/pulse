@@ -11,7 +11,7 @@ import com.zutubi.pulse.validation.annotation.CvsRoot;
  *
  *
  */
-@ConfigurationCheck(CvsConfigurationCheckHandler.class)
+@ConfigurationCheck("CvsConfigurationCheckHandler")
 @Form(fieldOrder = {"root", "password", "module", "branch"})
 public class CvsConfiguration extends ScmConfiguration
 {

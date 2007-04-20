@@ -16,7 +16,7 @@ import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class P4Server extends CachingSCMServer
+public class P4Server extends CachingSCMClient
 {
     private static final Logger LOG = Logger.getLogger(P4Server.class);
 

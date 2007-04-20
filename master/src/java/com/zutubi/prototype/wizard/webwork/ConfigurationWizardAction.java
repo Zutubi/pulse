@@ -2,6 +2,7 @@ package com.zutubi.prototype.wizard.webwork;
 
 import com.opensymphony.util.TextUtils;
 import com.opensymphony.xwork.ActionContext;
+import com.zutubi.i18n.Messages;
 import com.zutubi.prototype.config.ConfigurationPersistenceManager;
 import com.zutubi.prototype.type.CollectionType;
 import com.zutubi.prototype.type.Type;
@@ -11,15 +12,11 @@ import com.zutubi.prototype.type.record.Record;
 import com.zutubi.prototype.wizard.Wizard;
 import com.zutubi.prototype.wizard.WizardState;
 import com.zutubi.pulse.bootstrap.ComponentContext;
-import com.zutubi.i18n.Messages;
-import com.zutubi.validation.i18n.MessagesTextProvider;
-import com.zutubi.util.logging.Logger;
 import com.zutubi.pulse.web.ActionSupport;
-import com.zutubi.validation.DelegatingValidationContext;
-import com.zutubi.validation.ValidationContext;
-import com.zutubi.validation.ValidationException;
-import com.zutubi.validation.ValidationManager;
-import com.zutubi.validation.XWorkValidationAdapter;
+import com.zutubi.util.ClassLoaderUtils;
+import com.zutubi.util.logging.Logger;
+import com.zutubi.validation.*;
+import com.zutubi.validation.i18n.MessagesTextProvider;
 
 import java.util.Map;
 
@@ -85,59 +82,31 @@ public class ConfigurationWizardAction extends ActionSupport
 
     private ValidationManager validationManager;
 
-    /**
-     * Setter for the cancel field.
-     *
-     * @param cancel
-     */
     public void setCancel(String cancel)
     {
         this.cancel = cancel;
     }
 
-    /**
-     * Setter for the next field.
-     *
-     * @param next
-     */
     public void setNext(String next)
     {
         this.next = next;
     }
 
-    /**
-     * Setter for the previous field.
-     *
-     * @param previous
-     */
     public void setPrevious(String previous)
     {
         this.previous = previous;
     }
 
-    /**
-     * Setter for the finish field.
-     *
-     * @param finish
-     */
     public void setFinish(String finish)
     {
         this.finish = finish;
     }
 
-    /**
-     * Setter for the submit field.
-     *
-     * @param submitField
-     */
     public void setSubmitField(String submitField)
     {
         this.submitField = submitField;
     }
 
-    /**
-     * @return
-     */
     public boolean isInitialised()
     {
         // ensure that the wizard instance is available / instantiated.
@@ -389,7 +358,8 @@ public class ConfigurationWizardAction extends ActionSupport
         {
             try
             {
-                wizardInstance = ComponentContext.createBean(annotation.value());
+                Class clazz = ClassLoaderUtils.loadAssociatedClass(type.getClazz(), annotation.value());
+                wizardInstance = (Wizard) ComponentContext.createBean(clazz);
             }
             catch (Exception e)
             {

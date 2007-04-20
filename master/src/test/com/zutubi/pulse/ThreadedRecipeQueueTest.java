@@ -749,9 +749,9 @@ public class ThreadedRecipeQueueTest extends TestCase implements EventListener
             this.throwError = throwError;
         }
 
-        public SCMServer createServer() throws SCMException
+        public SCMClient createServer() throws SCMException
         {
-            return new MockScmServer(throwError);
+            return new MockScmClient(throwError);
         }
 
         public String getType()
@@ -765,15 +765,15 @@ public class ThreadedRecipeQueueTest extends TestCase implements EventListener
         }
     }
 
-    class MockScmServer implements SCMServer
+    class MockScmClient implements SCMClient
     {
         private boolean throwError = false;
 
-        public MockScmServer()
+        public MockScmClient()
         {
         }
 
-        public MockScmServer(boolean throwError)
+        public MockScmClient(boolean throwError)
         {
             this.throwError = throwError;
         }

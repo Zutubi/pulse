@@ -3,7 +3,7 @@ package com.zutubi.pulse.model;
 import com.zutubi.pulse.core.model.Entity;
 import com.zutubi.pulse.scm.SCMCapability;
 import com.zutubi.pulse.scm.SCMException;
-import com.zutubi.pulse.scm.SCMServer;
+import com.zutubi.pulse.scm.SCMClient;
 import com.zutubi.util.logging.Logger;
 
 import java.util.*;
@@ -27,7 +27,7 @@ public abstract class Scm extends Entity implements Cloneable
     private Integer pollingInterval;
     private Long lastPollTime;
 
-    public abstract SCMServer createServer() throws SCMException;
+    public abstract SCMClient createServer() throws SCMException;
     public abstract String getType();
     public abstract Map<String, String> getRepositoryProperties();
 

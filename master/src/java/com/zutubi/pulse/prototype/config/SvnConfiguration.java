@@ -6,7 +6,7 @@ import com.zutubi.prototype.annotation.ConfigurationCheck;
 /**
  */
 @Form(fieldOrder = { "url", "username", "password", "keyfile", "keyfilePassphrase"})
-@ConfigurationCheck(SvnConfigurationCheckHandler.class)
+@ConfigurationCheck("SvnConfigurationCheckHandler")
 public class SvnConfiguration extends ScmConfiguration
 {
     private String url;

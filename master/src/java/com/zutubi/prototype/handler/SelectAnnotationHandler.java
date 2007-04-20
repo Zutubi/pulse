@@ -1,6 +1,7 @@
-package com.zutubi.prototype.annotation;
+package com.zutubi.prototype.handler;
 
 import com.zutubi.prototype.OptionProvider;
+import com.zutubi.prototype.annotation.Select;
 
 import java.lang.annotation.Annotation;
 
@@ -9,7 +10,7 @@ import java.lang.annotation.Annotation;
  */
 public class SelectAnnotationHandler extends OptionAnnotationHandler
 {
-    protected Class<? extends OptionProvider> getOptionProviderClass(Annotation annotation)
+    protected String getOptionProviderClass(Annotation annotation)
     {
         return ((Select)annotation).optionProvider();
     }

@@ -1,8 +1,8 @@
 package com.zutubi.prototype.webwork;
 
 import com.opensymphony.util.TextUtils;
-import com.zutubi.prototype.annotation.ConfigurationCheck;
 import com.zutubi.prototype.config.ConfigurationPersistenceManager;
+import com.zutubi.prototype.config.ConfigurationRegistry;
 import com.zutubi.prototype.type.*;
 import com.zutubi.prototype.type.record.PathUtils;
 import com.zutubi.prototype.type.record.Record;
@@ -20,6 +20,7 @@ public class Configuration
     private ConfigurationPersistenceManager configurationPersistenceManager;
 
     private TypeRegistry typeRegistry;
+    private ConfigurationRegistry configurationRegistry;
 
     private Record record;
     private Type type;
@@ -38,7 +39,6 @@ public class Configuration
     private List<String> extensions = new LinkedList<String>();
 
     private boolean configurationCheckAvailable = false;
-    private Type checkType;
 
     public Configuration(String path)
     {
@@ -107,40 +107,13 @@ public class Configuration
 
             extensions.addAll(((CompositeType) targetType).getExtensions());
 
-            // where should this happen? maybe it is something that the typeRegistry should be able to handle...
-            // via additional processors..? post processors? .. maybe split the processing into propertyProcessors and
-            // annotation processors ... or something similar..
-            ConfigurationCheck annotation = (ConfigurationCheck) targetType.getAnnotation(ConfigurationCheck.class);
-            if (annotation != null)
-            {
-                try
-                {
-                    Class checkClass = annotation.value();
-                    // ensure that a type is available
-                    checkType = typeRegistry.getType(checkClass);
-                    if (checkType == null)
-                    {
-                        checkType = typeRegistry.register(checkClass);
-                    }
-                }
-                catch (TypeException e)
-                {
-                    e.printStackTrace();
-                }
-            }
+            configurationCheckAvailable = configurationRegistry.getConfigurationCheckType(ctype) != null;
         }
-
-        configurationCheckAvailable = checkType != null;
     }
 
     public boolean isConfigurationCheckAvailable()
     {
         return configurationCheckAvailable;
-    }
-
-    public Type getCheckType()
-    {
-        return checkType;
     }
 
     public String getPath()
@@ -211,5 +184,10 @@ public class Configuration
     public void setTypeRegistry(TypeRegistry typeRegistry)
     {
         this.typeRegistry = typeRegistry;
+    }
+
+    public void setConfigurationRegistry(ConfigurationRegistry configurationRegistry)
+    {
+        this.configurationRegistry = configurationRegistry;
     }
 }

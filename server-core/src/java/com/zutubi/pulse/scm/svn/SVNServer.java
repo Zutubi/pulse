@@ -22,9 +22,9 @@ import java.util.*;
  *
  * @author jsankey
  */
-public class SVNServer implements SCMServer
+public class SVNServer implements SCMClient
 {
-    private static final Logger LOG = Logger.getLogger(SCMServer.class);
+    private static final Logger LOG = Logger.getLogger(SCMClient.class);
     private static final int CHECKOUT_RETRIES = 1;
 
     /**

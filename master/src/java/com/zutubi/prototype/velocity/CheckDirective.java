@@ -1,17 +1,17 @@
 package com.zutubi.prototype.velocity;
 
+import com.opensymphony.xwork.ActionContext;
+import com.opensymphony.xwork.util.OgnlValueStack;
 import com.zutubi.prototype.FieldDescriptor;
 import com.zutubi.prototype.FormDescriptor;
 import com.zutubi.prototype.FormDescriptorFactory;
-import com.zutubi.prototype.annotation.ConfigurationCheck;
+import com.zutubi.prototype.config.ConfigurationRegistry;
 import com.zutubi.prototype.model.Form;
 import com.zutubi.prototype.type.CompositeType;
 import com.zutubi.prototype.type.Type;
 import com.zutubi.prototype.type.TypeRegistry;
 import com.zutubi.prototype.type.record.Record;
 import com.zutubi.util.logging.Logger;
-import com.opensymphony.xwork.util.OgnlValueStack;
-import com.opensymphony.xwork.ActionContext;
 import freemarker.template.Configuration;
 import freemarker.template.Template;
 import freemarker.template.TemplateException;
@@ -40,7 +40,7 @@ public class CheckDirective extends PrototypeDirective
     private FormDescriptorFactory formDescriptorFactory;
 
     private TypeRegistry typeRegistry;
-
+    private ConfigurationRegistry configurationRegistry;
     private Configuration configuration;
 
     /**
@@ -108,9 +108,7 @@ public class CheckDirective extends PrototypeDirective
             formDescriptor.addParameter("originalFields", originalFieldNames);
 
             // lookup and construct the configuration test form.
-            ConfigurationCheck annotation = (ConfigurationCheck) ctype.getAnnotation(ConfigurationCheck.class);
-            Class checkClass = annotation.value();
-            CompositeType checkType = typeRegistry.getType(checkClass);
+            CompositeType checkType = configurationRegistry.getConfigurationCheckType(ctype);
 
             FormDescriptor checkFormDescriptor = formDescriptorFactory.createDescriptor(path, checkType);
             for (FieldDescriptor fd : checkFormDescriptor.getFieldDescriptors())
@@ -166,5 +164,10 @@ public class CheckDirective extends PrototypeDirective
     public void setFreemarkerConfiguration(Configuration configuration)
     {
         this.configuration = configuration;
+    }
+
+    public void setConfigurationRegistry(ConfigurationRegistry configurationRegistry)
+    {
+        this.configurationRegistry = configurationRegistry;
     }
 }

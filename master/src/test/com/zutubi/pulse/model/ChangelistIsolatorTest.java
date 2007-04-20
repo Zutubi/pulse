@@ -5,7 +5,7 @@ import com.mockobjects.dynamic.Mock;
 import com.zutubi.pulse.core.model.NumericalRevision;
 import com.zutubi.pulse.core.model.Revision;
 import com.zutubi.pulse.scm.SCMException;
-import com.zutubi.pulse.scm.SCMServer;
+import com.zutubi.pulse.scm.SCMClient;
 import com.zutubi.pulse.test.PulseTestCase;
 
 import java.util.Arrays;
@@ -21,7 +21,7 @@ public class ChangelistIsolatorTest extends PulseTestCase
     private Mock mockBuildManager;
     private BuildManager buildManager;
     private Mock mockScm;
-    private SCMServer scmServer;
+    private SCMClient scmClient;
     private Project project;
     private BuildSpecification buildSpecification;
 
@@ -30,7 +30,7 @@ public class ChangelistIsolatorTest extends PulseTestCase
         super.setUp();
 
         mockBuildManager = new Mock(BuildManager.class);
-        mockScm = new Mock(SCMServer.class);
+        mockScm = new Mock(SCMClient.class);
 
         buildSpecification = new BuildSpecification("default");
         buildSpecification.setIsolateChangelists(true);
@@ -38,9 +38,9 @@ public class ChangelistIsolatorTest extends PulseTestCase
         project = new Project("myproject", "mydesc", new CustomPulseFileDetails());
         project.setScm(new Scm()
         {
-            public SCMServer createServer() throws SCMException
+            public SCMClient createServer() throws SCMException
             {
-                return scmServer;
+                return scmClient;
             }
 
             public String getType()
@@ -172,7 +172,7 @@ public class ChangelistIsolatorTest extends PulseTestCase
     private void setupIsolator()
     {
         buildManager = (BuildManager) mockBuildManager.proxy();
-        scmServer = (SCMServer) mockScm.proxy();
+        scmClient = (SCMClient) mockScm.proxy();
         isolator = new ChangelistIsolator(buildManager);
     }
 

@@ -3,7 +3,7 @@ package com.zutubi.pulse.model;
 import com.opensymphony.util.TextUtils;
 import com.zutubi.pulse.scm.SCMConfiguration;
 import com.zutubi.pulse.scm.SCMException;
-import com.zutubi.pulse.scm.SCMServer;
+import com.zutubi.pulse.scm.SCMClient;
 import com.zutubi.pulse.scm.svn.SVNServer;
 import com.zutubi.pulse.scm.svn.SvnConstants;
 import com.zutubi.util.StringUtils;
@@ -18,7 +18,7 @@ import java.util.TreeMap;
 public class Svn extends Scm
 {
     @Override
-    public SCMServer createServer() throws SCMException
+    public SCMClient createServer() throws SCMException
     {
         SVNServer server;
         if (!TextUtils.stringSet(getKeyfile()))

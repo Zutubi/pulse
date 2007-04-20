@@ -4,7 +4,6 @@ import com.zutubi.prototype.annotation.Form;
 import com.zutubi.prototype.annotation.Reference;
 import com.zutubi.prototype.annotation.Select;
 import com.zutubi.pulse.core.model.ResultState;
-import com.zutubi.pulse.prototype.CompletedResultStateOptionProvider;
 import com.zutubi.validation.annotations.Required;
 
 import java.util.List;
@@ -18,7 +17,7 @@ public class BuildCompletedTriggerConfiguration extends TriggerConfiguration
     private ProjectConfiguration project;
     @Reference
     private List<ProjectConfiguration> projects;
-    @Select(optionProvider = CompletedResultStateOptionProvider.class)
+    @Select(optionProvider = "com.zutubi.pulse.prototype.CompletedResultStateOptionProvider")
     private List<ResultState> states;
 
     public BuildCompletedTriggerConfiguration()

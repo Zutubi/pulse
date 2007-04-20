@@ -10,6 +10,7 @@ import com.zutubi.prototype.type.TypeRegistry;
 import com.zutubi.prototype.type.record.MutableRecord;
 import com.zutubi.prototype.type.record.Record;
 import com.zutubi.prototype.type.record.TemplateRecord;
+import com.zutubi.prototype.type.record.MutableRecordImpl;
 import com.zutubi.prototype.webwork.PrototypeUtils;
 import com.zutubi.prototype.wizard.Wizard;
 import com.zutubi.prototype.wizard.WizardState;
@@ -251,7 +252,8 @@ public abstract class AbstractTypeWizard implements Wizard
         {
             this.type = type;
             this.record = record;
-            this.selectionRecord = type.createNewRecord();
+            this.selectionRecord = new MutableRecordImpl();
+            selectionRecord.setSymbolicName(type.getSymbolicName());
         }
 
         /**

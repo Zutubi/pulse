@@ -1,9 +1,7 @@
 package com.zutubi.pulse.prototype.config;
 
-import com.zutubi.prototype.annotation.TypeSelect;
-import com.zutubi.prototype.annotation.Wizard;
 import com.zutubi.prototype.annotation.ID;
-import com.zutubi.prototype.wizard.webwork.ConfigureProjectWizard;
+import com.zutubi.prototype.annotation.Wizard;
 import com.zutubi.pulse.prototype.record.SymbolicName;
 
 /**
@@ -11,7 +9,7 @@ import com.zutubi.pulse.prototype.record.SymbolicName;
  *
  */
 @SymbolicName("commitConfig")
-@Wizard(CommitMessageConfigurationWizard.class)
+@Wizard("CommitMessageConfigurationWizard")
 public class CommitMessageConfiguration
 {
     @ID

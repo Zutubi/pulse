@@ -6,7 +6,7 @@ import com.zutubi.pulse.core.model.ResourceProperty;
 import com.zutubi.pulse.model.Scm;
 import com.zutubi.pulse.scm.SCMCancelledException;
 import com.zutubi.pulse.scm.SCMCheckoutEventHandler;
-import com.zutubi.pulse.scm.SCMServer;
+import com.zutubi.pulse.scm.SCMClient;
 import com.zutubi.util.ForkOutputStream;
 import com.zutubi.util.IOUtils;
 import com.zutubi.util.logging.Logger;
@@ -60,7 +60,7 @@ public abstract class ScmBootstrapper implements Bootstrapper, SCMCheckoutEventH
 
         OutputStream out = null;
         FileOutputStream fout = null;
-        SCMServer server = null;
+        SCMClient client = null;
 
         try
         {
@@ -75,7 +75,7 @@ public abstract class ScmBootstrapper implements Bootstrapper, SCMCheckoutEventH
             }
 
             outputWriter = new PrintWriter(out);
-            server = bootstrap(workDir);
+            client = bootstrap(workDir);
         }
         catch (IOException e)
         {
@@ -86,12 +86,12 @@ public abstract class ScmBootstrapper implements Bootstrapper, SCMCheckoutEventH
             IOUtils.close(outputWriter);
         }
 
-        if (server != null)
+        if (client != null)
         {
             try
             {
-                server.storeConnectionDetails(outDir);
-                for(Map.Entry<String, String> entry: server.getProperties(getId(), workDir).entrySet())
+                client.storeConnectionDetails(outDir);
+                for(Map.Entry<String, String> entry: client.getProperties(getId(), workDir).entrySet())
                 {
                     context.getGlobalScope().add(new ResourceProperty(entry.getKey(), entry.getValue(), true, false, false));
                 }
@@ -137,5 +137,5 @@ public abstract class ScmBootstrapper implements Bootstrapper, SCMCheckoutEventH
         terminated = true;
     }
 
-    abstract SCMServer bootstrap(File workDir);
+    abstract SCMClient bootstrap(File workDir);
 }

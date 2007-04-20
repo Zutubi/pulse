@@ -1,7 +1,6 @@
 package com.zutubi.prototype;
 
-import com.zutubi.prototype.annotation.AnnotationHandler;
-import com.zutubi.prototype.annotation.Handler;
+import com.zutubi.prototype.annotation.*;
 import com.zutubi.prototype.type.CollectionType;
 import com.zutubi.prototype.type.CompositeType;
 import com.zutubi.prototype.type.EnumType;
@@ -12,12 +11,11 @@ import com.zutubi.prototype.type.Type;
 import com.zutubi.prototype.type.TypeProperty;
 import com.zutubi.prototype.type.TypeRegistry;
 import com.zutubi.prototype.type.record.PathUtils;
+import com.zutubi.prototype.handler.*;
 import com.zutubi.util.bean.ObjectFactory;
 import com.zutubi.util.bean.DefaultObjectFactory;
 import com.zutubi.pulse.prototype.config.EnumOptionProvider;
 import com.zutubi.util.logging.Logger;
-import com.zutubi.validation.Validator;
-import com.zutubi.validation.validators.RequiredValidator;
 import com.zutubi.validation.annotations.Constraint;
 
 import java.lang.annotation.Annotation;
@@ -43,8 +41,7 @@ public class FormDescriptorFactory
 
     private static final Logger LOG = Logger.getLogger(FormDescriptorFactory.class);
 
-    // TODO: extract this field type mapping to make it extendable.
-
+    // FIXME: extract these mappings to make them extendable.
     private static final Map<Class, String> defaultFieldTypeMapping = new HashMap<Class, String>();
     static
     {
@@ -55,6 +52,15 @@ public class FormDescriptorFactory
         defaultFieldTypeMapping.put(Integer.TYPE, "text");
         defaultFieldTypeMapping.put(Long.class, "text");
         defaultFieldTypeMapping.put(Long.TYPE, "text");
+    }
+    private static final Map<Class, Class<? extends AnnotationHandler>> defaultHandlerMapping = new HashMap<Class, Class<? extends AnnotationHandler>>();
+    static
+    {
+        defaultHandlerMapping.put(Field.class, FieldAnnotationHandler.class);
+        defaultHandlerMapping.put(Form.class, FormAnnotationHandler.class);
+        defaultHandlerMapping.put(Reference.class, ReferenceAnnotationHandler.class);
+        defaultHandlerMapping.put(Select.class, SelectAnnotationHandler.class);
+        // password, text, textarea, typeselect
     }
 
     private TypeRegistry typeRegistry;
@@ -79,7 +85,7 @@ public class FormDescriptorFactory
 
         // Process the annotations at apply to the type / form.
         List<Annotation> annotations = type.getAnnotations();
-        handleAnnotations(descriptor, annotations);
+        handleAnnotations(type, descriptor, annotations);
 
         descriptor.setFieldDescriptors(buildFieldDescriptors(path, type));
         descriptor.setActions(Arrays.asList("save", "cancel"));
@@ -115,7 +121,7 @@ public class FormDescriptorFactory
                 fd.setType("select");
             }
 
-            addFieldParameters(path, property, fd);
+            addFieldParameters(type, path, property, fd);
             fieldDescriptors.add(fd);
         }
 
@@ -128,7 +134,7 @@ public class FormDescriptorFactory
                 FieldDescriptor fd = createField(path, property);
                 fd.setType("select");
                 fd.addParameter("multiple", true);
-                addFieldParameters(path, property, fd);
+                addFieldParameters(type, path, property, fd);
                 fieldDescriptors.add(fd);
             }
         }
@@ -136,9 +142,9 @@ public class FormDescriptorFactory
         return fieldDescriptors;
     }
 
-    private void addFieldParameters(String path, TypeProperty property, FieldDescriptor fd)
+    private void addFieldParameters(CompositeType type, String path, TypeProperty property, FieldDescriptor fd)
     {
-        handleAnnotations(fd, property.getAnnotations());
+        handleAnnotations(type, fd, property.getAnnotations());
         if("select".equals(fd.getType()) && !fd.hasParameter("list"))
         {
             addDefaultOptions(path, property, fd);
@@ -180,16 +186,18 @@ public class FormDescriptorFactory
     }
 
     /**
-     * This handle annotation method will serach through the annotaion hierarchy, looking for annotations that
-     * are themselves annotated by the Handler annotation.  When found, the referenced handler is run in the context
-     * of the annotation and the descriptor.
+     * This handle annotation method will serach through the annotaion
+     * hierarchy, looking for annotations that have a handler mapped to them.
+     * When found, the handler is run in the context of the annotation and
+     * the descriptor.
      *
      * Note: This method will process all of the annotation's annotations as well.
      *
+     * @param type       the composite type that has been annotated (or meta-annotated)
      * @param descriptor the target that will be modified by these annotations.
-     * @param annotations the annotations that need to be processed. 
+     * @param annotations the annotations that need to be processed.
      */
-    private void handleAnnotations(Descriptor descriptor, List<Annotation> annotations)
+    private void handleAnnotations(CompositeType type, Descriptor descriptor, List<Annotation> annotations)
     {
         for (Annotation annotation : annotations)
         {
@@ -200,15 +208,15 @@ public class FormDescriptorFactory
             }
 
             // recurse up the annotation hierarchy.
-            handleAnnotations(descriptor, Arrays.asList(annotation.annotationType().getAnnotations()));
+            handleAnnotations(type, descriptor, Arrays.asList(annotation.annotationType().getAnnotations()));
 
-            if (annotation.annotationType().isAnnotationPresent(Handler.class))
+            Class<? extends AnnotationHandler> handlerClass = defaultHandlerMapping.get(annotation.annotationType());
+            if (handlerClass != null)
             {
-                Handler handlerAnnotation = annotation.annotationType().getAnnotation(Handler.class);
                 try
                 {
-                    AnnotationHandler handler = objectFactory.buildBean(handlerAnnotation.value());
-                    handler.process(annotation, descriptor);
+                    AnnotationHandler handler = objectFactory.buildBean(handlerClass);
+                    handler.process(type, annotation, descriptor);
                 }
                 catch (InstantiationException e)
                 {
@@ -228,8 +236,8 @@ public class FormDescriptorFactory
             if (annotation instanceof Constraint)
             {
                 descriptor.addParameter("constrained", true);
-                List<Class<? extends Validator>> constraints = Arrays.asList(((Constraint)annotation).value());
-                if (constraints.contains(RequiredValidator.class))
+                List<String> constraints = Arrays.asList(((Constraint)annotation).value());
+                if (constraints.contains("com.zutubi.validation.validators.RequiredValidator"))
                 {
                     descriptor.addParameter("required", true);
                 }

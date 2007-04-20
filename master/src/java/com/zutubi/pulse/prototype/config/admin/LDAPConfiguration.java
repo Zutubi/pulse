@@ -13,7 +13,7 @@ import com.zutubi.validation.annotations.Required;
 @Form(fieldOrder={"enabled", "ldapUrl", "baseDn", "managerDn", "managerPassword",
         "userBaseDn", "userFilter", "autoAddUsers", "emailAttribute", "groupBaseDn", "groupSearchFilter",
         "groupRoleAttribute", "searchGroupSubtree", "followReferrals", "escapeSpaceCharacters"})
-@ConfigurationCheck(LDAPConfigurationCheckHandler.class)
+@ConfigurationCheck("LDAPConfigurationCheckHandler")
 public class LDAPConfiguration
 {
     private boolean enabled;

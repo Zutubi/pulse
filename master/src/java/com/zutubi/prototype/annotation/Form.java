@@ -9,8 +9,6 @@ import java.lang.annotation.RetentionPolicy;
 @Retention(RetentionPolicy.RUNTIME)
 
 // Annotation handler reference that is used to process 'this' annotation.
-@Handler(FormAnnotationHandler.class)
-
 /**
  * The form annotation allows for some level of customisation of the rendering of the form
  * that is generated for the annotated object.

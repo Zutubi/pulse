@@ -1,11 +1,9 @@
 package com.zutubi.validation.annotations;
 
-import com.zutubi.validation.validators.NumericValidator;
-
 /**
  * <class-comment/>
  */
-@Constraint(NumericValidator.class)
+@Constraint("com.zutubi.validation.validators.NumericValidator")
 public @interface Max
 {
     @ConstraintProperty("max")

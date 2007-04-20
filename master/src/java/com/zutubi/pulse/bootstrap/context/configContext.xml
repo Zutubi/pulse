@@ -21,6 +21,21 @@
     <bean id="reflectionValidatorProvider" class="com.zutubi.validation.providers.ReflectionValidatorProvider"/>
 
     <!-- Record system -->
+    <bean id="recordRoot" class="org.springframework.beans.factory.config.PropertyPathFactoryBean">
+        <property name="targetBeanName">
+            <value>configurationManager</value>
+        </property>
+        <property name="propertyPath">
+            <value>userPaths.recordRoot</value>
+        </property>
+    </bean>
+
+    <bean id="recordSerialiser" class="com.zutubi.prototype.type.record.DefaultRecordSerialiser">
+        <constructor-arg index="0">
+            <ref local="recordRoot"/>
+        </constructor-arg>
+    </bean>
+    
     <bean id="recordManager" class="com.zutubi.prototype.type.record.RecordManager" autowire="byName"/>
     <bean id="typeRegistry" class="com.zutubi.prototype.type.TypeRegistry" autowire="byName"/>
     <bean id="configurationRegistry" class="com.zutubi.prototype.config.ConfigurationRegistry" autowire="byName"/>

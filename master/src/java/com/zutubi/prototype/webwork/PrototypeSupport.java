@@ -2,6 +2,7 @@ package com.zutubi.prototype.webwork;
 
 import com.opensymphony.util.TextUtils;
 import com.zutubi.prototype.config.ConfigurationPersistenceManager;
+import com.zutubi.prototype.config.ConfigurationRegistry;
 import com.zutubi.prototype.type.CollectionType;
 import com.zutubi.prototype.type.CompositeType;
 import com.zutubi.prototype.type.Type;
@@ -22,6 +23,7 @@ public class PrototypeSupport extends ActionSupport implements MessagesProvider
     protected Configuration configuration;
 
     protected TypeRegistry typeRegistry;
+    protected ConfigurationRegistry configurationRegistry;
     protected ConfigurationPersistenceManager configurationPersistenceManager;
 
     protected Record record;
@@ -232,6 +234,11 @@ public class PrototypeSupport extends ActionSupport implements MessagesProvider
     public void setTypeRegistry(TypeRegistry typeRegistry)
     {
         this.typeRegistry = typeRegistry;
+    }
+
+    public void setConfigurationRegistry(ConfigurationRegistry configurationRegistry)
+    {
+        this.configurationRegistry = configurationRegistry;
     }
 
     public void setConfigurationPersistenceManager(ConfigurationPersistenceManager configurationPersistenceManager)

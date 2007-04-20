@@ -4,16 +4,17 @@ import com.zutubi.prototype.annotation.Reference;
 import com.zutubi.prototype.config.events.*;
 import com.zutubi.prototype.type.*;
 import com.zutubi.prototype.type.record.*;
-import com.zutubi.util.bean.ObjectFactory;
 import com.zutubi.pulse.events.EventManager;
+import com.zutubi.util.ClassLoaderUtils;
 import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.Mapping;
+import com.zutubi.util.bean.ObjectFactory;
 import com.zutubi.util.logging.Logger;
-import com.zutubi.validation.i18n.MessagesTextProvider;
 import com.zutubi.validation.ValidationAware;
 import com.zutubi.validation.ValidationContext;
 import com.zutubi.validation.ValidationException;
 import com.zutubi.validation.ValidationManager;
+import com.zutubi.validation.i18n.MessagesTextProvider;
 
 import java.util.*;
 
@@ -631,14 +632,14 @@ public class ConfigurationPersistenceManager
         CompositeType parentType = (CompositeType) getType(parentPath);
         TypeProperty property = parentType.getProperty(baseName);
         Reference ref = property.getAnnotation(Reference.class);
-        Class<? extends ReferenceCleanupTaskProvider> providerClass = ref.cleanupTaskProvider();
         try
         {
+            Class<? extends ReferenceCleanupTaskProvider> providerClass = ClassLoaderUtils.loadAssociatedClass(parentType.getClazz(), ref.cleanupTaskProvider());
             return objectFactory.buildBean(providerClass);
         }
         catch (Exception e)
         {
-            LOG.severe("Unable to instantiate reference cleanup task provider of class '" + ref.cleanupTaskProvider().getName() + "': " + e.getMessage(), e);
+            LOG.severe("Unable to instantiate reference cleanup task provider of class '" + ref.cleanupTaskProvider() + "': " + e.getMessage(), e);
             try
             {
                 return objectFactory.buildBean(DefaultReferenceCleanupTaskProvider.class);

@@ -1,7 +1,7 @@
 package com.zutubi.pulse.model;
 
 import com.zutubi.pulse.scm.SCMException;
-import com.zutubi.pulse.scm.SCMServer;
+import com.zutubi.pulse.scm.SCMClient;
 import com.zutubi.pulse.test.PulseTestCase;
 
 import java.util.Arrays;
@@ -59,7 +59,7 @@ public class ScmTest extends PulseTestCase
 
     private class MockScm extends Scm
     {
-        public SCMServer createServer() throws SCMException
+        public SCMClient createServer() throws SCMException
         {
             return null;
         }

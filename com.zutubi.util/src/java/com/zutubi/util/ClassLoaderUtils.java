@@ -11,6 +11,16 @@ import java.util.Enumeration;
  */
 public class ClassLoaderUtils
 {
+    public static Class loadAssociatedClass(Class annotatedClass, String className) throws ClassNotFoundException
+    {
+        if(!className.contains("."))
+        {
+            className = annotatedClass.getPackage().getName() + "." + className;
+        }
+
+        return annotatedClass.getClassLoader().loadClass(className);
+    }
+
     /**
      * Load a class with a given name.
      * <p>

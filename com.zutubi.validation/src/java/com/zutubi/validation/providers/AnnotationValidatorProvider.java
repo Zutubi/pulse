@@ -7,6 +7,7 @@ import com.zutubi.validation.annotations.Constraint;
 import com.zutubi.util.bean.ObjectFactory;
 import com.zutubi.util.bean.DefaultObjectFactory;
 import com.zutubi.util.AnnotationUtils;
+import com.zutubi.util.ClassLoaderUtils;
 
 import java.util.*;
 import java.lang.reflect.Method;
@@ -114,7 +115,7 @@ public class AnnotationValidatorProvider implements ValidatorProvider
                     }
 
                     // convert constraints into validators.
-                    validators.addAll(validatorsFromConstraints(constraints, descriptor));
+                    validators.addAll(validatorsFromConstraints(clazz, constraints, descriptor));
                 }
             }
         }
@@ -148,17 +149,18 @@ public class AnnotationValidatorProvider implements ValidatorProvider
         return annotation.annotationType().getAnnotation(Constraint.class) != null;
     }
 
-    private List<Validator> validatorsFromConstraints(List<Annotation> constraints, PropertyDescriptor descriptor)
+    private List<Validator> validatorsFromConstraints(Class clazz, List<Annotation> constraints, PropertyDescriptor descriptor)
     {
         List<Validator> validators = new LinkedList<Validator>();
         for (Annotation annotation : constraints)
         {
             Constraint constraint = annotation.annotationType().getAnnotation(Constraint.class);
-            for (Class<? extends Validator> validatorClass : constraint.value())
+            for (String validatorClassName : constraint.value())
             {
                 try
                 {
-                    Validator validator = objectFactory.buildBean(validatorClass);
+                    Class validatorClass = ClassLoaderUtils.loadAssociatedClass(clazz, validatorClassName);
+                    Validator validator = (Validator) objectFactory.buildBean(validatorClass);
                     AnnotationUtils.setPropertiesFromAnnotation(annotation, validator);
                     if (validator instanceof FieldValidator)
                     {

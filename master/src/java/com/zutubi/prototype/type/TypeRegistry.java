@@ -60,16 +60,26 @@ public class TypeRegistry
 
     public CompositeType register(Class clazz) throws TypeException
     {
+        return register(clazz, null);
+    }
+
+    public CompositeType register(Class clazz, TypeHandler handler) throws TypeException
+    {
         SymbolicName symbolicName = (SymbolicName) clazz.getAnnotation(SymbolicName.class);
         if (symbolicName != null)
         {
-            return register(symbolicName.value(), clazz);
+            return register(symbolicName.value(), clazz, handler);
         }
         // this is invalid, let the base register method handle the exception generation.
-        return register(null, clazz);
+        return register(null, clazz, handler);
     }
 
     public CompositeType register(String symbolicName, Class clazz) throws TypeException
+    {
+        return register(symbolicName,  clazz, null);
+    }
+
+    public CompositeType register(String symbolicName, Class clazz, TypeHandler handler) throws TypeException
     {
         try
         {
@@ -96,7 +106,11 @@ public class TypeRegistry
 
                 try
                 {
-                    buildType(type);
+                    buildType(type, handler);
+                    if(handler != null)
+                    {
+                        handler.handle(type);
+                    }
                 }
                 catch (RuntimeException e)
                 {
@@ -128,7 +142,7 @@ public class TypeRegistry
         return type;
     }
 
-    private CompositeType buildType(CompositeType prototype) throws TypeException
+    private CompositeType buildType(CompositeType prototype, TypeHandler handler) throws TypeException
     {
         try
         {
@@ -178,7 +192,7 @@ public class TypeRegistry
                         CompositeType compositeType = classMapping.get(clazz);
                         if (compositeType == null)
                         {
-                            compositeType = register(clazz);
+                            compositeType = register(clazz, handler);
                         }
 
                         property.setType(checkReferenceType(property, compositeType));
@@ -227,7 +241,7 @@ public class TypeRegistry
                             }
                             else
                             {
-                                CompositeType compositeType = register(valueClass);
+                                CompositeType compositeType = register(valueClass, handler);
                                 collection.setCollectionType(checkReferenceType(property, compositeType));
                             }
                         }

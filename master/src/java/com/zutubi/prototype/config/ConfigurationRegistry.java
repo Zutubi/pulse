@@ -1,10 +1,15 @@
 package com.zutubi.prototype.config;
 
+import com.zutubi.prototype.ConfigurationCheckHandler;
+import com.zutubi.prototype.annotation.ConfigurationCheck;
 import com.zutubi.prototype.type.*;
 import com.zutubi.pulse.prototype.config.*;
 import com.zutubi.pulse.prototype.config.admin.GlobalConfiguration;
 import com.zutubi.pulse.prototype.config.setup.SetupConfiguration;
 import com.zutubi.util.logging.Logger;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Registers the Pulse built-in configuration types.
@@ -12,71 +17,72 @@ import com.zutubi.util.logging.Logger;
 public class ConfigurationRegistry
 {
     private static final Logger LOG = Logger.getLogger(ConfigurationRegistry.class);
-    
+
     private TypeRegistry typeRegistry;
     private ConfigurationPersistenceManager configurationPersistenceManager;
+    private Map<CompositeType, CompositeType> checkTypeMapping = new HashMap<CompositeType, CompositeType>();
 
     public void init()
     {
         try
         {
-            CompositeType setupConfig = typeRegistry.register(SetupConfiguration.class);
+            CompositeType setupConfig = registerConfigurationType(SetupConfiguration.class);
             configurationPersistenceManager.register("setup", setupConfig);
 
             // scm configuration
-            CompositeType scmConfig = typeRegistry.register("scmConfig", ScmConfiguration.class);
-            typeRegistry.register("svnConfig", SvnConfiguration.class);
-            typeRegistry.register("cvsConfig", CvsConfiguration.class);
-            typeRegistry.register("perforceConfig", PerforceConfiguration.class);
+            CompositeType scmConfig = registerConfigurationType("scmConfig", ScmConfiguration.class);
+            registerConfigurationType("svnConfig", SvnConfiguration.class);
+            registerConfigurationType("cvsConfig", CvsConfiguration.class);
+            registerConfigurationType("perforceConfig", PerforceConfiguration.class);
 
             // sort out the extensions.
             scmConfig.addExtension("svnConfig");
             scmConfig.addExtension("cvsConfig");
             scmConfig.addExtension("perforceConfig");
 
-            CompositeType typeConfig = typeRegistry.register("typeConfig", ProjectTypeConfiguration.class);
-            typeRegistry.register("antConfig", AntTypeConfiguration.class);
-            typeRegistry.register("mavenConfig", MavenTypeConfiguration.class);
+            CompositeType typeConfig = registerConfigurationType("typeConfig", ProjectTypeConfiguration.class);
+            registerConfigurationType("antConfig", AntTypeConfiguration.class);
+            registerConfigurationType("mavenConfig", MavenTypeConfiguration.class);
 
             typeConfig.addExtension("antConfig");
             typeConfig.addExtension("mavenConfig");
 
             // cleanup rule configuration
-            typeRegistry.register("cleanupRuleConfig", CleanupRuleConfiguration.class);
+            registerConfigurationType("cleanupRuleConfig", CleanupRuleConfiguration.class);
 
             // commit message processors.
-            CompositeType commitConfig = typeRegistry.register("commitConfig", CommitMessageConfiguration.class);
-            typeRegistry.register("jiraCommitConfig", JiraCommitMessageConfiguration.class);
-            typeRegistry.register("customCommitConfig", CustomCommitMessageConfiguration.class);
+            CompositeType commitConfig = registerConfigurationType("commitConfig", CommitMessageConfiguration.class);
+            registerConfigurationType("jiraCommitConfig", JiraCommitMessageConfiguration.class);
+            registerConfigurationType("customCommitConfig", CustomCommitMessageConfiguration.class);
 
             commitConfig.addExtension("jiraCommitConfig");
             commitConfig.addExtension("customCommitConfig");
 
             // change view configuration
-            CompositeType changeViewerConfig = typeRegistry.register("changeViewerConfig", ChangeViewerConfiguration.class);
-            typeRegistry.register("fisheyeChangeViewerConfig", FisheyeConfiguration.class);
-            typeRegistry.register("customChangeViewerConfig", CustomChangeViewerConfiguration.class);
+            CompositeType changeViewerConfig = registerConfigurationType("changeViewerConfig", ChangeViewerConfiguration.class);
+            registerConfigurationType("fisheyeChangeViewerConfig", FisheyeConfiguration.class);
+            registerConfigurationType("customChangeViewerConfig", CustomChangeViewerConfiguration.class);
 
             changeViewerConfig.addExtension("fisheyeChangeViewerConfig");
             changeViewerConfig.addExtension("customChangeViewerConfig");
 
-            CompositeType artifactConfig = typeRegistry.register("artifactConfig", ArtifactConfiguration.class);
-            typeRegistry.register("fileArtifactConfig", FileArtifactConfiguration.class);
-            typeRegistry.register("directoryArtifactConfig", DirectoryArtifactConfiguration.class);
+            CompositeType artifactConfig = registerConfigurationType("artifactConfig", ArtifactConfiguration.class);
+            registerConfigurationType("fileArtifactConfig", FileArtifactConfiguration.class);
+            registerConfigurationType("directoryArtifactConfig", DirectoryArtifactConfiguration.class);
 
             artifactConfig.addExtension("fileArtifactConfig");
             artifactConfig.addExtension("directoryArtifactConfig");
 
             // generated dynamically as new components are registered.
-            CompositeType projectConfig = typeRegistry.register("projectConfig", ProjectConfiguration.class);
+            CompositeType projectConfig = registerConfigurationType("projectConfig", ProjectConfiguration.class);
             projectConfig.addProperty(new TypeProperty("scm", typeRegistry.getType("scmConfig")));
             projectConfig.addProperty(new TypeProperty("type", typeRegistry.getType("typeConfig")));
             projectConfig.addProperty(new TypeProperty("cleanup", typeRegistry.getType("cleanupRuleConfig")));
             projectConfig.addProperty(new TypeProperty("changeViewer", typeRegistry.getType("changeViewerConfig")));
 
             // Triggers
-            CompositeType triggerConfig = typeRegistry.register("triggerConfig", TriggerConfiguration.class);
-            typeRegistry.register("buildCompletedConfig", BuildCompletedTriggerConfiguration.class);
+            CompositeType triggerConfig = registerConfigurationType("triggerConfig", TriggerConfiguration.class);
+            registerConfigurationType("buildCompletedConfig", BuildCompletedTriggerConfiguration.class);
             triggerConfig.addExtension("buildCompletedConfig");
             MapType triggers = new MapType(configurationPersistenceManager);
             triggers.setTypeRegistry(typeRegistry);
@@ -100,13 +106,77 @@ public class ConfigurationRegistry
 
             configurationPersistenceManager.register("project", projectCollection);
 
-            CompositeType globalConfig = typeRegistry.register("globalConfig", GlobalConfiguration.class);
+            CompositeType globalConfig = registerConfigurationType("globalConfig", GlobalConfiguration.class);
             configurationPersistenceManager.register(GlobalConfiguration.SCOPE_NAME, globalConfig);
         }
         catch (TypeException e)
         {
             LOG.severe(e);
         }
+    }
+
+    public CompositeType registerConfigurationType(Class clazz) throws TypeException
+    {
+        return registerConfigurationType(null, clazz);
+    }
+
+    public CompositeType registerConfigurationType(String name, Class clazz) throws TypeException
+    {
+        CompositeType type;
+
+        // Type callback that looks for ConfigurationCheck annotations
+        TypeHandler handler = new TypeHandler()
+        {
+            public void handle(CompositeType type) throws TypeException
+            {
+                ConfigurationCheck annotation = (ConfigurationCheck) type.getAnnotation(ConfigurationCheck.class);
+                if (annotation != null)
+                {
+                    String checkClassName = annotation.value();
+                    if (!checkClassName.contains("."))
+                    {
+                        checkClassName = type.getClazz().getPackage().getName() + "." + checkClassName;
+                    }
+
+                    Class checkClass;
+                    try
+                    {
+                        checkClass = type.getClazz().getClassLoader().loadClass(checkClassName);
+                    }
+                    catch (ClassNotFoundException e)
+                    {
+                        throw new TypeException("Registering check type for class '" + type.getClazz().getName() + "': " + e.getMessage(), e);
+                    }
+
+                    if(!ConfigurationCheckHandler.class.isAssignableFrom(checkClass))
+                    {
+                        throw new TypeException("Check type '" + checkClassName + "' does not implement ConfigurationCheckHandler");
+                    }
+
+                    CompositeType checkType = typeRegistry.register(checkClass);
+
+                    // FIXME should verify that everything in the check type would land in one form
+                    
+                    checkTypeMapping.put(type, checkType);
+                }
+            }
+        };
+
+        if (name == null)
+        {
+            type = typeRegistry.register(clazz, handler);
+        }
+        else
+        {
+            type = typeRegistry.register(name, clazz, handler);
+        }
+
+        return type;
+    }
+
+    public CompositeType getConfigurationCheckType(CompositeType type)
+    {
+        return checkTypeMapping.get(type);
     }
 
     public GlobalConfiguration getGlobalConfiguration()

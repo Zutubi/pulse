@@ -1,7 +1,7 @@
 package com.zutubi.prototype.annotation;
 
 import com.zutubi.prototype.OptionProvider;
-import com.zutubi.pulse.prototype.FieldType;
+import com.zutubi.prototype.annotation.FieldType;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -10,9 +10,6 @@ import java.lang.annotation.Target;
 
 @Target({ElementType.METHOD, ElementType.FIELD})
 @Retention(RetentionPolicy.RUNTIME)
-
-// Annotation handler reference that is used to process 'this' annotation.
-@Handler(SelectAnnotationHandler.class)
 
 // This annotation is a form field of type SELECT.
 @Field(type = FieldType.SELECT)
@@ -25,7 +22,7 @@ import java.lang.annotation.Target;
  */
 public @interface Select
 {
-    Class<? extends OptionProvider> optionProvider();
+    String optionProvider();
 
     /**
      * The DEFAULT_size indicates that, by default, no size value will be rendered.  For convenience, the
