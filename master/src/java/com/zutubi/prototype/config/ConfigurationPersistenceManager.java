@@ -191,15 +191,7 @@ public class ConfigurationPersistenceManager
             throw new IllegalArgumentException("Invalid path '" + path + "': no parent");
         }
 
-        Record parentRecord = recordManager.load(PathUtils.getPath(parentElements));
-        if (parentRecord == null)
-        {
-            throw new IllegalArgumentException("Invalid path '" + path + "': parent does not exist");
-        }
-
         String lastElement = pathElements[pathElements.length - 1];
-        String parentSymbolicName = parentRecord.getSymbolicName();
-        Object value = parentRecord.get(lastElement);
 
         if (parentElements.length == 0)
         {
@@ -215,6 +207,15 @@ public class ConfigurationPersistenceManager
         }
         else
         {
+            Record parentRecord = recordManager.load(PathUtils.getPath(parentElements));
+            if (parentRecord == null)
+            {
+                throw new IllegalArgumentException("Invalid path '" + path + "': parent does not exist");
+            }
+
+            String parentSymbolicName = parentRecord.getSymbolicName();
+            Object value = parentRecord.get(lastElement);
+
             if (parentSymbolicName == null)
             {
                 // Parent is a collection, last segment of path must refer to an
