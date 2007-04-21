@@ -1,6 +1,6 @@
 package com.zutubi.prototype.config.types;
 
-import com.zutubi.config.annotations.annotation.ID;
+import com.zutubi.config.annotations.ID;
 import com.zutubi.pulse.prototype.record.SymbolicName;
 
 /**

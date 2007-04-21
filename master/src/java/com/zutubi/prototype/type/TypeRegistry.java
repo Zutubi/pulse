@@ -1,6 +1,6 @@
 package com.zutubi.prototype.type;
 
-import com.zutubi.config.annotations.annotation.Reference;
+import com.zutubi.config.annotations.Reference;
 import com.zutubi.prototype.config.ConfigurationPersistenceManager;
 import com.zutubi.pulse.prototype.record.SymbolicName;
 import com.zutubi.util.AnnotationUtils;

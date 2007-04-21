@@ -3,7 +3,7 @@ package com.zutubi.prototype;
 /**
  * The Formatter interface.
  *
- * @see com.zutubi.config.annotations.annotation.Format
+ * @see com.zutubi.config.annotations.Format
  */
 public interface Formatter<T>
 {

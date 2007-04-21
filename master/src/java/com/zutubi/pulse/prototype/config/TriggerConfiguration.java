@@ -1,6 +1,6 @@
 package com.zutubi.pulse.prototype.config;
 
-import com.zutubi.config.annotations.annotation.ID;
+import com.zutubi.config.annotations.ID;
 
 /**
  */

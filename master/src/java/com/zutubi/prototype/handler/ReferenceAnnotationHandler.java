@@ -1,6 +1,6 @@
 package com.zutubi.prototype.handler;
 
-import com.zutubi.config.annotations.annotation.Reference;
+import com.zutubi.config.annotations.Reference;
 
 import java.lang.annotation.Annotation;
 

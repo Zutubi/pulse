@@ -1,6 +1,6 @@
 package com.zutubi.pulse.prototype.config.admin;
 
-import com.zutubi.config.annotations.annotation.TextArea;
+import com.zutubi.config.annotations.TextArea;
 import com.zutubi.validation.annotations.Required;
 
 /**

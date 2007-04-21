@@ -1,6 +1,6 @@
 package com.zutubi.prototype;
 
-import com.zutubi.config.annotations.annotation.Format;
+import com.zutubi.config.annotations.Format;
 import com.zutubi.prototype.config.ConfigurationPersistenceManager;
 import com.zutubi.prototype.type.CollectionType;
 import com.zutubi.prototype.type.CompositeType;

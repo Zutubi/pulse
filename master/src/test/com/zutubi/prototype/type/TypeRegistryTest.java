@@ -1,6 +1,6 @@
 package com.zutubi.prototype.type;
 
-import com.zutubi.config.annotations.annotation.ID;
+import com.zutubi.config.annotations.ID;
 import com.zutubi.pulse.prototype.record.SymbolicName;
 import com.zutubi.validation.annotations.Required;
 import junit.framework.TestCase;

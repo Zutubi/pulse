@@ -1,4 +1,4 @@
-package com.zutubi.config.annotations.annotation;
+package com.zutubi.config.annotations;
 
 import com.zutubi.prototype.ConfigurationCheckHandler;
 

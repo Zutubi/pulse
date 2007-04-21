@@ -1,8 +1,8 @@
 package com.zutubi.pulse.prototype.config;
 
-import com.zutubi.config.annotations.annotation.Form;
-import com.zutubi.config.annotations.annotation.Reference;
-import com.zutubi.config.annotations.annotation.Select;
+import com.zutubi.config.annotations.Form;
+import com.zutubi.config.annotations.Reference;
+import com.zutubi.config.annotations.Select;
 import com.zutubi.pulse.core.model.ResultState;
 import com.zutubi.validation.annotations.Required;
 
@@ -13,7 +13,8 @@ import java.util.List;
 @Form(fieldOrder = { "name", "project", "states"})
 public class BuildCompletedTriggerConfiguration extends TriggerConfiguration
 {
-    @Reference @Required
+    @Reference
+    @Required
     private ProjectConfiguration project;
     @Reference
     private List<ProjectConfiguration> projects;

@@ -1,6 +1,6 @@
 package com.zutubi.prototype.type;
 
-import com.zutubi.config.annotations.annotation.Ordered;
+import com.zutubi.config.annotations.Ordered;
 import com.zutubi.prototype.type.record.*;
 
 import java.util.Arrays;

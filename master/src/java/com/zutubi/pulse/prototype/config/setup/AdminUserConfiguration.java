@@ -1,7 +1,7 @@
 package com.zutubi.pulse.prototype.config.setup;
 
-import com.zutubi.config.annotations.annotation.Form;
-import com.zutubi.config.annotations.annotation.Password;
+import com.zutubi.config.annotations.Form;
+import com.zutubi.config.annotations.Password;
 import com.zutubi.pulse.prototype.record.SymbolicName;
 import com.zutubi.validation.Validateable;
 import com.zutubi.validation.ValidationContext;

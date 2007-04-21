@@ -1,9 +1,9 @@
 package com.zutubi.prototype;
 
-import com.zutubi.config.annotations.annotation.Field;
-import com.zutubi.config.annotations.annotation.Form;
-import com.zutubi.config.annotations.annotation.Reference;
-import com.zutubi.config.annotations.annotation.Select;
+import com.zutubi.config.annotations.Field;
+import com.zutubi.config.annotations.Form;
+import com.zutubi.config.annotations.Reference;
+import com.zutubi.config.annotations.Select;
 import com.zutubi.prototype.handler.*;
 import com.zutubi.prototype.type.*;
 import com.zutubi.prototype.type.record.PathUtils;

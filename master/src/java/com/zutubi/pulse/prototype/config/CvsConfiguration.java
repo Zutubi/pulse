@@ -1,9 +1,9 @@
 package com.zutubi.pulse.prototype.config;
 
-import com.zutubi.config.annotations.annotation.ConfigurationCheck;
-import com.zutubi.config.annotations.annotation.Form;
-import com.zutubi.config.annotations.annotation.Password;
-import com.zutubi.config.annotations.annotation.Text;
+import com.zutubi.config.annotations.ConfigurationCheck;
+import com.zutubi.config.annotations.Form;
+import com.zutubi.config.annotations.Password;
+import com.zutubi.config.annotations.Text;
 import com.zutubi.pulse.validation.annotation.CvsRoot;
 import com.zutubi.validation.annotations.Required;
 
