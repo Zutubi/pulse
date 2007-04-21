@@ -3,7 +3,6 @@
     <import file="../common-build.xml"/>
 
     <target name="module-pre-init">
-        <property name="module" value="com.zutubi.util"/>
         <dirname property="project.root.dir" file="../build.xml"/>
         <property file="${project.root.dir}/build.properties"/>
     </target>
