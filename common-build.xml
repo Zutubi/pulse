@@ -9,6 +9,13 @@
     <target name="module-post-init"/>
 
     <target name="common-init">
+        <dirname property="current.dir" file="ivy.xml"/>
+
+        <property file="${project.root.dir}/ivy.properties"/>
+        <ivy:configure file="${project.root.dir}/ivyconf.xml"/>
+
+        <ivy:info file="ivy.xml"/>
+        <property name="module" value="${ivy.module}"/>
 
         <echo message="-----------------------------------"/>
         <echo message="    Component: ${module}"/>
@@ -28,11 +35,6 @@
         <property name="report.dir" value="${build.dir}/reports"/>
 
         <property name="project.repository" value="${project.root.dir}/build/repository"/>
-
-        <dirname property="current.dir" file="ivy.xml"/>
-
-        <property file="${project.root.dir}/ivy.properties"/>
-        <ivy:configure file="${project.root.dir}/ivyconf.xml"/>
 
         <!-- library paths. -->
         <fileset id="module.libs" dir="${module.root.dir}/build/lib">

@@ -21,6 +21,7 @@
     <dependencies>
         <dependency org="zutubi" name="com.zutubi.util" rev="latest.integration" conf="*->@"/>
         <dependency org="zutubi" name="com.zutubi.i18n" rev="latest.integration" conf="*->@"/>
+        <dependency org="zutubi" name="com.zutubi.validation.annotations" rev="latest.integration" conf="*->@"/>
         
         <dependency org="junit" name="junit" rev="3.8.1" conf="build->default"/>
         <dependency org="opensymphony" name="xwork" rev="1.1.1" conf="build,release->minimal"/>

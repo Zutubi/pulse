@@ -1,7 +1,5 @@
 package com.zutubi.validation.annotations;
 
-import com.zutubi.validation.Validator;
-
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
