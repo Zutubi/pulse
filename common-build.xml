@@ -34,6 +34,20 @@
         <property name="accept.classes.dir" value="${build.dir}/accept.classes"/>
         <property name="report.dir" value="${build.dir}/reports"/>
 
+        <condition property="no.tests">
+            <and>
+                <not>
+                    <available file="${test.dir}"/>
+                </not>
+                <not>
+                    <available file="${accept.dir}"/>
+                </not>
+            </and>
+        </condition>
+        <condition property="skip.tests">
+            <isset property="no.tests"/>
+        </condition>
+
         <property name="project.repository" value="${project.root.dir}/build/repository"/>
 
         <!-- library paths. -->
@@ -75,14 +89,13 @@
     </target>
 
     <!-- prepare for new build -->
-    <target name="prepare" depends="init, module-pre-prepare, common-prepare, module-post-prepare"/>
+    <target name="prepare" depends="init, module-pre-prepare, common-prepare, test-prepare, module-post-prepare"/>
 
     <target name="module-pre-prepare"/>
 
     <target name="module-post-prepare"/>
 
     <target name="common-prepare" depends="init">
-
         <echo message="-----------------------------------"/>
         <echo message="    Component: prepare ${module}"/>
         <echo message="-----------------------------------"/>
@@ -90,23 +103,25 @@
         <!-- create necessary directories -->
         <mkdir dir="${build.dir}"/>
         <mkdir dir="${classes.dir}"/>
-        <mkdir dir="${test.classes.dir}"/>
-        <mkdir dir="${accept.classes.dir}"/>
         <mkdir dir="${module.root.dir}/build/lib"/>
         <mkdir dir="${report.dir}"/>
-        <mkdir dir="${report.dir}/junit"/>
-        <mkdir dir="${report.dir}/junit/xml"/>
-        <mkdir dir="${report.dir}/junit/html"/>
 
         <mkdir dir="${process.src.dir}"/>
 
         <!-- resolve dependencies -->
         <resolve conf="build"/>
+    </target>
 
+    <target name="test-prepare" depends="common-prepare" unless="no.tests">
+        <mkdir dir="${test.classes.dir}"/>
+        <mkdir dir="${accept.classes.dir}"/>
+        <mkdir dir="${report.dir}/junit"/>
+        <mkdir dir="${report.dir}/junit/xml"/>
+        <mkdir dir="${report.dir}/junit/html"/>
     </target>
 
     <!-- execute the build -->
-    <target name="build" depends="init, module-pre-build, common-build, module-post-build"/>
+    <target name="build" depends="init, module-pre-build, common-build, test-build, module-post-build"/>
 
     <!-- a pre build hook that can be overriden in the modules build.xml -->
     <target name="module-pre-build"/>
@@ -131,6 +146,19 @@
             </fileset>
         </copy>
 
+        <copy todir="${process.src.dir}" overwrite="true">
+            <fileset dir="${src.dir}">
+                <include name="**/*.java"/>
+            </fileset>
+        </copy>
+
+        <!-- process copyright. -->
+        <copyright src="${process.src.dir}" value="${copyright.statement}">
+            <include name="**/*.java"/>
+        </copyright>
+    </target>
+
+    <target name="test-build" depends="common-build" unless="no.tests">
         <javac srcdir="${test.dir}" destdir="${test.classes.dir}" debug="true">
             <classpath refid="lib.path"/>
             <classpath location="${classes.dir}"/>
@@ -153,21 +181,17 @@
                 <patternset refid="resources"/>
             </fileset>
         </copy>
-
+        
         <copy todir="${process.src.dir}" overwrite="true">
-            <fileset dir="${src.dir}">
-                <include name="**/*.java"/>
-            </fileset>
             <fileset dir="${test.dir}">
                 <include name="**/*.java"/>
             </fileset>
         </copy>
-
+        
         <!-- process copyright. -->
         <copyright src="${process.src.dir}" value="${copyright.statement}">
             <include name="**/*.java"/>
         </copyright>
-
     </target>
 
     <target name="test" depends="init, module-pre-test, common-test, module-post-test" unless="skip.tests"/>
@@ -209,11 +233,11 @@
             </fileset>
             <report format="frames" todir="${report.dir}/junit/html"/>
         </junitreport>
-        <!--<fail message="One or more tests failed.  See the reports (${report.dir}) for details." if="test.failed"/>        -->
+        <fail message="One or more tests failed.  See the reports (${report.dir}) for details." if="test.failed"/>
     </target>
 
     <!-- package artifacts -->
-    <target name="package" depends="init, module-pre-package, common-package, module-post-package"/>
+    <target name="package" depends="init, module-pre-package, common-package, test-package, module-post-package"/>
 
     <target name="module-pre-package"/>
 
@@ -229,6 +253,9 @@
             <!-- contains license encoding details. -->
             <patternset refid="release.excludes"/>
         </jar>
+    </target>
+
+    <target name="test-package" depends="common-package" unless="no.tests">
         <jar file="${module.root.dir}/build/${module}-test.jar" basedir="${test.classes.dir}">
             <!-- contains license encoding details. -->
             <patternset refid="release.excludes"/>
@@ -260,6 +287,4 @@
 
     <!-- the command that rules them all. -->
     <target name="build.module" depends="clean, prepare, build, test, package, publish"/>
-
-
 </project>

@@ -15,7 +15,6 @@
 
     <publications>
         <artifact name="com.zutubi.validation.annotations" type="jar" conf="release, build"/>
-        <artifact name="com.zutubi.validation.annotations-test" type="jar" conf="build"/>
     </publications>
 
     <dependencies>
