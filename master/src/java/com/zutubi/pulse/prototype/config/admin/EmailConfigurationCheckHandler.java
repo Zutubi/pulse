@@ -1,11 +1,8 @@
 package com.zutubi.pulse.prototype.config.admin;
 
 import com.zutubi.prototype.ConfigurationCheckHandler;
-import com.zutubi.prototype.annotation.TextArea;
-import com.zutubi.pulse.prototype.record.SymbolicName;
 import com.zutubi.pulse.model.EmailContactPoint;
-
-import javax.mail.MessagingException;
+import com.zutubi.pulse.prototype.record.SymbolicName;
 
 /**
  */

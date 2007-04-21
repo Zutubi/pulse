@@ -1,8 +1,8 @@
 package com.zutubi.prototype;
 
-import com.zutubi.prototype.annotation.Format;
-import com.zutubi.util.logging.Logger;
+import com.zutubi.config.annotations.annotation.Format;
 import com.zutubi.util.ClassLoaderUtils;
+import com.zutubi.util.logging.Logger;
 
 /**
  *

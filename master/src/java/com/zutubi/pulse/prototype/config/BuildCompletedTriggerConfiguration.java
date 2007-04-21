@@ -1,8 +1,8 @@
 package com.zutubi.pulse.prototype.config;
 
-import com.zutubi.prototype.annotation.Form;
-import com.zutubi.prototype.annotation.Reference;
-import com.zutubi.prototype.annotation.Select;
+import com.zutubi.config.annotations.annotation.Form;
+import com.zutubi.config.annotations.annotation.Reference;
+import com.zutubi.config.annotations.annotation.Select;
 import com.zutubi.pulse.core.model.ResultState;
 import com.zutubi.validation.annotations.Required;
 

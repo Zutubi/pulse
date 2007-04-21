@@ -1,15 +1,12 @@
 package com.zutubi.pulse.prototype.config.admin;
 
-import com.zutubi.prototype.annotation.ConfigurationCheck;
-import com.zutubi.prototype.annotation.Password;
-import com.zutubi.prototype.annotation.Form;
+import com.zutubi.config.annotations.annotation.ConfigurationCheck;
+import com.zutubi.config.annotations.annotation.Form;
+import com.zutubi.config.annotations.annotation.Password;
 import com.zutubi.pulse.prototype.record.SymbolicName;
-import com.zutubi.validation.annotations.Required;
 import com.zutubi.validation.annotations.Email;
 import com.zutubi.validation.annotations.Numeric;
-import com.zutubi.validation.Validateable;
-import com.zutubi.validation.ValidationContext;
-import com.opensymphony.util.TextUtils;
+import com.zutubi.validation.annotations.Required;
 
 /**
  *

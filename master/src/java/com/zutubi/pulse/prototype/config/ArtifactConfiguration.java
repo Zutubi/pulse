@@ -1,6 +1,6 @@
 package com.zutubi.pulse.prototype.config;
 
-import com.zutubi.prototype.annotation.Format;
+import com.zutubi.config.annotations.annotation.Format;
 import com.zutubi.validation.annotations.Name;
 
 /**

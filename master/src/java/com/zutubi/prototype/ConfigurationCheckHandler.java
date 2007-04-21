@@ -14,7 +14,7 @@ package com.zutubi.prototype;
  * The configuration check handler is presented to the UI as a form, and so it has all of the standard
  * form processing support available to it.
  *
- * @see com.zutubi.prototype.annotation.ConfigurationCheck
+ * @see com.zutubi.config.annotations.annotation.ConfigurationCheck
  */
 public interface ConfigurationCheckHandler<T>
 {

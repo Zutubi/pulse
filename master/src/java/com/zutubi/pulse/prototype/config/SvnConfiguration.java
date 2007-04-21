@@ -1,7 +1,7 @@
 package com.zutubi.pulse.prototype.config;
 
-import com.zutubi.prototype.annotation.Form;
-import com.zutubi.prototype.annotation.ConfigurationCheck;
+import com.zutubi.config.annotations.annotation.ConfigurationCheck;
+import com.zutubi.config.annotations.annotation.Form;
 
 /**
  */

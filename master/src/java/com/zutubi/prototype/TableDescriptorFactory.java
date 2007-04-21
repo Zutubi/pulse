@@ -1,10 +1,10 @@
 package com.zutubi.prototype;
 
-import com.zutubi.prototype.annotation.Format;
-import com.zutubi.prototype.type.CollectionType;
-import com.zutubi.prototype.type.TypeException;
-import com.zutubi.prototype.type.CompositeType;
+import com.zutubi.config.annotations.annotation.Format;
 import com.zutubi.prototype.config.ConfigurationPersistenceManager;
+import com.zutubi.prototype.type.CollectionType;
+import com.zutubi.prototype.type.CompositeType;
+import com.zutubi.prototype.type.TypeException;
 import com.zutubi.util.ClassLoaderUtils;
 
 /**

@@ -1,6 +1,6 @@
 package com.zutubi.prototype.type;
 
-import com.zutubi.prototype.annotation.Reference;
+import com.zutubi.config.annotations.annotation.Reference;
 import com.zutubi.prototype.config.ConfigurationPersistenceManager;
 import com.zutubi.pulse.prototype.record.SymbolicName;
 import com.zutubi.util.AnnotationUtils;
@@ -10,8 +10,8 @@ import java.beans.BeanInfo;
 import java.beans.IntrospectionException;
 import java.beans.Introspector;
 import java.beans.PropertyDescriptor;
-import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Method;
+import java.lang.reflect.ParameterizedType;
 import java.util.*;
 
 /**

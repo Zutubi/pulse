@@ -1,4 +1,4 @@
-package com.zutubi.prototype.annotation;
+package com.zutubi.config.annotations.annotation;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

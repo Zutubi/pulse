@@ -1,8 +1,8 @@
 package com.zutubi.pulse.prototype.config.admin;
 
-import com.zutubi.prototype.annotation.ConfigurationCheck;
-import com.zutubi.prototype.annotation.Form;
-import com.zutubi.prototype.annotation.Password;
+import com.zutubi.config.annotations.annotation.ConfigurationCheck;
+import com.zutubi.config.annotations.annotation.Form;
+import com.zutubi.config.annotations.annotation.Password;
 import com.zutubi.pulse.prototype.record.SymbolicName;
 import com.zutubi.validation.annotations.Required;
 

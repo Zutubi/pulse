@@ -1,6 +1,6 @@
 package com.zutubi.prototype.config;
 
-import com.zutubi.prototype.annotation.Reference;
+import com.zutubi.config.annotations.annotation.Reference;
 import com.zutubi.prototype.config.events.*;
 import com.zutubi.prototype.type.*;
 import com.zutubi.prototype.type.record.*;

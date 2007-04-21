@@ -1,7 +1,6 @@
 package com.zutubi.pulse.prototype.config.admin;
 
-import com.zutubi.prototype.annotation.TextArea;
-import com.zutubi.pulse.prototype.record.SymbolicName;
+import com.zutubi.config.annotations.annotation.TextArea;
 import com.zutubi.validation.annotations.Required;
 
 /**

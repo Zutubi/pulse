@@ -353,7 +353,7 @@ public class ConfigurationWizardAction extends ActionSupport
             type = ((CollectionType) type).getCollectionType();
         }
 
-        com.zutubi.prototype.annotation.Wizard annotation = (com.zutubi.prototype.annotation.Wizard) type.getAnnotation(com.zutubi.prototype.annotation.Wizard.class);
+        com.zutubi.config.annotations.annotation.Wizard annotation = (com.zutubi.config.annotations.annotation.Wizard) type.getAnnotation(com.zutubi.config.annotations.annotation.Wizard.class);
         if (annotation != null)
         {
             try

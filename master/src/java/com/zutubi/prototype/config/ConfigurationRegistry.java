@@ -1,7 +1,7 @@
 package com.zutubi.prototype.config;
 
+import com.zutubi.config.annotations.annotation.ConfigurationCheck;
 import com.zutubi.prototype.ConfigurationCheckHandler;
-import com.zutubi.prototype.annotation.ConfigurationCheck;
 import com.zutubi.prototype.type.*;
 import com.zutubi.pulse.prototype.config.*;
 import com.zutubi.pulse.prototype.config.admin.GlobalConfiguration;

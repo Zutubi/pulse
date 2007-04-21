@@ -1,13 +1,12 @@
 package com.zutubi.prototype.type;
 
+import com.zutubi.config.annotations.annotation.ID;
+import com.zutubi.pulse.prototype.record.SymbolicName;
+import com.zutubi.validation.annotations.Required;
 import junit.framework.TestCase;
 
 import java.util.List;
 import java.util.Map;
-
-import com.zutubi.validation.annotations.Required;
-import com.zutubi.pulse.prototype.record.SymbolicName;
-import com.zutubi.prototype.annotation.ID;
 
 /**
  *

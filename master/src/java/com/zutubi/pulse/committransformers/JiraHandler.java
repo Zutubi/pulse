@@ -1,8 +1,8 @@
 package com.zutubi.pulse.committransformers;
 
+import com.zutubi.config.annotations.annotation.Form;
+import com.zutubi.config.annotations.annotation.Text;
 import com.zutubi.validation.annotations.Required;
-import com.zutubi.prototype.annotation.Form;
-import com.zutubi.prototype.annotation.Text;
 
 /**
  * <class comment/>

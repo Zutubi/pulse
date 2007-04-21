@@ -1,8 +1,11 @@
 package com.zutubi.prototype.type;
 
-import com.zutubi.prototype.annotation.ID;
+import com.zutubi.config.annotations.annotation.ID;
 import com.zutubi.prototype.config.ConfigurationPersistenceManager;
-import com.zutubi.prototype.type.record.*;
+import com.zutubi.prototype.type.record.MutableRecord;
+import com.zutubi.prototype.type.record.PathUtils;
+import com.zutubi.prototype.type.record.Record;
+import com.zutubi.prototype.type.record.RecordManager;
 import com.zutubi.util.AnnotationUtils;
 import com.zutubi.util.logging.Logger;
 

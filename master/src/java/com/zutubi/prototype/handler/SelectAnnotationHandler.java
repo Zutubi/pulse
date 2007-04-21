@@ -1,7 +1,6 @@
 package com.zutubi.prototype.handler;
 
-import com.zutubi.prototype.OptionProvider;
-import com.zutubi.prototype.annotation.Select;
+import com.zutubi.config.annotations.annotation.Select;
 
 import java.lang.annotation.Annotation;
 
