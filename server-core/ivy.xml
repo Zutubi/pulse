@@ -23,11 +23,8 @@
     </publications>
 
     <dependencies>
-
-        <dependency org="zutubi" name="pulse-core" rev="latest.integration" conf="external->external"/>
-        <dependency org="zutubi" name="pulse-core" rev="latest.integration" conf="release->release"/>
-        <dependency org="zutubi" name="pulse-core" rev="latest.integration" conf="build->build"/>
-        <dependency org="zutubi" name="pulse-core" rev="latest.integration" conf="bundles->bundles"/>
+        <dependency org="zutubi" name="pulse-core" rev="latest.integration" conf="*->@"/>
+        <dependency org="zutubi" name="com.zutubi.config.annotations" rev="latest.integration" conf="*->@"/>
 
         <dependency org="apache" name="commons-collections" rev="3.1" conf="external,build,release->default"/>
         <dependency org="apache" name="commons-cli" rev="1.0" conf="external,build,release->default"/>
@@ -44,7 +41,6 @@
         <dependency org="mockobjects" name="mockobjects-jdk1.4-j2ee1.3" rev="0.09" conf="external,build->default"/>
         <dependency org="mockobjects" name="mockobjects-alt-jdk1.4" rev="0.09" conf="external,build->default"/>
         <dependency org="mockobjects" name="mockobjects-alt-jdk1.4-j2ee1.3" rev="0.09" conf="external,build->default"/>
-
     </dependencies>
 
 
