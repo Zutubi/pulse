@@ -6,6 +6,7 @@ import com.zutubi.pulse.core.Bootstrapper;
 import com.zutubi.pulse.core.BuildException;
 import com.zutubi.pulse.core.BuildRevision;
 import com.zutubi.pulse.core.RecipeRequest;
+import com.zutubi.pulse.core.config.ResourceProperty;
 import com.zutubi.pulse.core.model.*;
 import com.zutubi.pulse.events.AsynchronousDelegatingListener;
 import com.zutubi.pulse.events.Event;
@@ -13,15 +14,17 @@ import com.zutubi.pulse.events.EventListener;
 import com.zutubi.pulse.events.EventManager;
 import com.zutubi.pulse.events.build.*;
 import com.zutubi.pulse.model.*;
+import com.zutubi.pulse.prototype.config.ProjectConfiguration;
 import com.zutubi.pulse.scheduling.quartz.TimeoutRecipeJob;
 import com.zutubi.pulse.scm.FileStatus;
 import com.zutubi.pulse.scm.SCMException;
-import com.zutubi.pulse.scm.SCMClient;
+import com.zutubi.pulse.scm.ScmClient;
+import com.zutubi.pulse.servercore.config.ScmConfiguration;
 import com.zutubi.pulse.services.ServiceTokenManager;
-import com.zutubi.util.Constants;
 import com.zutubi.pulse.util.FileSystemUtils;
 import com.zutubi.pulse.util.TimeStamps;
 import com.zutubi.pulse.util.TreeNode;
+import com.zutubi.util.Constants;
 import com.zutubi.util.logging.Logger;
 import org.quartz.Scheduler;
 import org.quartz.SchedulerException;
@@ -49,6 +52,7 @@ public class BuildController implements EventListener
 
     private AbstractBuildRequestEvent request;
     private Project project;
+    private ProjectConfiguration projectConfig;
     private BuildSpecification specification;
     private EventManager eventManager;
     private ProjectManager projectManager;
@@ -71,7 +75,9 @@ public class BuildController implements EventListener
     public BuildController(AbstractBuildRequestEvent event, BuildSpecification specification, EventManager eventManager, ProjectManager projectManager, UserManager userManager, BuildManager buildManager, TestManager testManager, RecipeQueue queue, RecipeResultCollector collector, Scheduler quartScheduler, MasterConfigurationManager configManager, ServiceTokenManager serviceTokenManager)
     {
         this.request = event;
-        this.project = event.getProject();
+        this.projectConfig = event.getProjectConfig();
+        // FIXME: a race here ... nicer to have the project id in the config??
+        this.project = projectManager.getProject(projectConfig.getName());
         this.specification = specification;
         this.eventManager = eventManager;
         this.projectManager = projectManager;
@@ -156,10 +162,10 @@ public class BuildController implements EventListener
             boolean incremental = !request.isPersonal() && specification.getCheckoutScheme() == BuildSpecification.CheckoutScheme.INCREMENTAL_UPDATE;
             List<ResourceProperty> recipeProperties = new LinkedList<ResourceProperty>(buildProperties);
             RecipeRequest recipeRequest = new RecipeRequest(project.getName(), specification.getName(), recipeResult.getId(), stage.getRecipe(), incremental, getResourceRequirements(specification, node), recipeProperties);
-            RecipeDispatchRequest dispatchRequest = new RecipeDispatchRequest(stage.getHostRequirements(), request.getRevision(), recipeRequest, buildResult);
+            RecipeDispatchRequest dispatchRequest = new RecipeDispatchRequest(stage.getHostRequirements(), request.getRevision(), recipeRequest, projectConfig, buildResult);
             DefaultRecipeLogger logger = new DefaultRecipeLogger(new File(paths.getRecipeDir(buildResult, recipeResult.getId()), RecipeResult.RECIPE_LOG));
             RecipeResultNode previousRecipe = previousSuccessful == null ? null : previousSuccessful.findResultNode(stage.getPname());
-            RecipeController rc = new RecipeController(buildResult, node, childResultNode, dispatchRequest, recipeProperties, request.isPersonal(), incremental, previousRecipe, logger, collector, queue, buildManager, serviceTokenManager);
+            RecipeController rc = new RecipeController(projectConfig, buildResult, node, childResultNode, dispatchRequest, recipeProperties, request.isPersonal(), incremental, previousRecipe, logger, collector, queue, buildManager, serviceTokenManager);
             TreeNode<RecipeController> child = new TreeNode<RecipeController>(rc);
             rcNode.add(child);
             pendingRecipes++;
@@ -252,7 +258,7 @@ public class BuildController implements EventListener
         boolean checkoutOnly = request.isPersonal() || specification.getCheckoutScheme() == BuildSpecification.CheckoutScheme.CLEAN_CHECKOUT;
         if (checkoutOnly)
         {
-            initialBootstrapper = new CheckoutBootstrapper(project.getName(), specification.getName(), project.getScm(), request.getRevision(), false);
+            initialBootstrapper = new CheckoutBootstrapper(project.getName(), specification.getName(), projectConfig.getScm(), request.getRevision(), false);
             if (request.isPersonal())
             {
                 initialBootstrapper = createPersonalBuildBootstrapper(initialBootstrapper);
@@ -260,7 +266,7 @@ public class BuildController implements EventListener
         }
         else
         {
-            initialBootstrapper = new ProjectRepoBootstrapper(project.getName(), specification.getName(), project.getScm(), request.getRevision(), specification.getForceClean());
+            initialBootstrapper = new ProjectRepoBootstrapper(project.getName(), specification.getName(), projectConfig.getScm(), request.getRevision(), specification.getForceClean());
         }
 
         tree.prepare(buildResult);
@@ -275,7 +281,7 @@ public class BuildController implements EventListener
         PersonalBuildRequestEvent pbr = ((PersonalBuildRequestEvent) request);
         try
         {
-            FileStatus.EOLStyle localEOL = project.getScm().createServer().getEOLPolicy();
+            FileStatus.EOLStyle localEOL = projectConfig.getScm().createClient().getEOLPolicy();
             initialBootstrapper = new PatchBootstrapper(initialBootstrapper, pbr.getUser().getId(), pbr.getNumber(), localEOL);
         }
         catch (SCMException e)
@@ -343,7 +349,7 @@ public class BuildController implements EventListener
             controller.terminateRecipe(true);
             if (controller.isFinished())
             {
-                executingControllers.remove(controller);
+                executingControllers.remove(found);
                 if (executingControllers.size() == 0)
                 {
                     completeBuild();
@@ -471,6 +477,8 @@ public class BuildController implements EventListener
     /**
      * Called when the first recipe for this build is dispatched.  It is at
      * this point that the build is said to have commenced.
+     * 
+     * @param controller the controller for the recipe that has been dispatched
      */
     private void handleFirstDispatch(RecipeController controller)
     {
@@ -507,14 +515,14 @@ public class BuildController implements EventListener
 
         if (!buildResult.isUserRevision())
         {
-            Scm scm = project.getScm();
+            ScmConfiguration scm = projectConfig.getScm();
             Revision previousRevision = buildManager.getPreviousRevision(project, specification.getPname());
 
             if (previousRevision != null)
             {
                 try
                 {
-                    SCMClient client = scm.createServer();
+                    ScmClient client = scm.createClient();
                     getChangeSince(client, previousRevision, revision);
                 }
                 catch (SCMException e)
@@ -525,7 +533,7 @@ public class BuildController implements EventListener
         }
     }
 
-    private List<Changelist> getChangeSince(SCMClient client, Revision previousRevision, Revision revision) throws SCMException
+    private List<Changelist> getChangeSince(ScmClient client, Revision previousRevision, Revision revision) throws SCMException
     {
         List<Changelist> result = new LinkedList<Changelist>();
         List<Changelist> scmChanges = client.getChanges(previousRevision, revision);
@@ -630,7 +638,7 @@ public class BuildController implements EventListener
             for (PostBuildAction action : buildResult.getProject().getPostBuildActions())
             {
                 ComponentContext.autowire(action);
-                action.execute(buildResult, null, buildProperties);
+                action.execute(projectConfig, buildResult, null, buildProperties);
             }
         }
 

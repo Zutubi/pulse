@@ -5,9 +5,11 @@ import com.zutubi.pulse.core.model.Revision;
 import com.zutubi.pulse.license.LicenseException;
 import com.zutubi.pulse.personal.PatchArchive;
 import com.zutubi.pulse.scheduling.SchedulingException;
+import com.zutubi.pulse.prototype.config.ProjectConfiguration;
 import org.acegisecurity.annotation.Secured;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * 
@@ -15,6 +17,11 @@ import java.util.List;
  */
 public interface ProjectManager extends EntityManager<Project>
 {
+    Map<String, ProjectConfiguration> getAllProjectConfigs();
+    ProjectConfiguration getProjectConfig(String name);
+    ProjectConfiguration getProjectConfig(long id);
+    void saveProjectConfig(ProjectConfiguration config);
+
     /**
      * Looks up the project of the given name.
      *
@@ -29,7 +36,7 @@ public interface ProjectManager extends EntityManager<Project>
 
     Project getProjectByBuildSpecification(BuildSpecification buildSpecification);
 
-    List<Project> getAllProjects();
+    List<Project> getNameToConfig();
 
     List<Project> getAllProjectsCached();
 
@@ -173,4 +180,5 @@ public interface ProjectManager extends EntityManager<Project>
     BuildSpecification getBuildSpecification(long id);
 
     void delete(BuildHostRequirements hostRequirements);
+
 }

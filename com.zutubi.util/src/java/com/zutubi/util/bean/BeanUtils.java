@@ -1,4 +1,4 @@
-package com.zutubi.util;
+package com.zutubi.util.bean;
 
 import com.zutubi.util.bean.BeanException;
 import com.zutubi.util.bean.BeanPropertyException;

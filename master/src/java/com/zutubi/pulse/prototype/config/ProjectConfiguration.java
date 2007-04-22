@@ -2,6 +2,10 @@ package com.zutubi.pulse.prototype.config;
 
 import com.zutubi.config.annotations.*;
 import com.zutubi.validation.annotations.Url;
+import com.zutubi.pulse.core.config.ResourceProperty;
+import com.zutubi.pulse.servercore.config.ScmConfiguration;
+
+import java.util.Map;
 
 /**
  *
@@ -12,14 +16,26 @@ import com.zutubi.validation.annotations.Url;
 @Format("ProjectConfigurationFormatter")
 public class ProjectConfiguration
 {
+    @Internal
+    private long projectId;
     @ID
     private String name;
-
     @Url
     private String url;
-
     @TextArea
     private String description;
+    private ScmConfiguration scm;
+    private Map<String, ResourceProperty> properties;
+
+    public long getProjectId()
+    {
+        return projectId;
+    }
+
+    public void setProjectId(long projectId)
+    {
+        this.projectId = projectId;
+    }
 
     public String getName()
     {
@@ -49,5 +65,30 @@ public class ProjectConfiguration
     public void setDescription(String description)
     {
         this.description = description;
+    }
+
+    public ScmConfiguration getScm()
+    {
+        return scm;
+    }
+
+    public void setScm(ScmConfiguration scm)
+    {
+        this.scm = scm;
+    }
+
+    public Map<String, ResourceProperty> getProperties()
+    {
+        return properties;
+    }
+
+    public void setProperties(Map<String, ResourceProperty> properties)
+    {
+        this.properties = properties;
+    }
+
+    public ResourceProperty getProperty(String name)
+    {
+        return properties.get(name);
     }
 }

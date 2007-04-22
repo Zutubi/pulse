@@ -164,10 +164,9 @@ public class ConfigurationWizardAction extends ActionSupport
 
     private boolean validateState()
     {
-        Record record = getState().getRecord();
         try
         {
-            return configurationPersistenceManager.validate(path, null, record, new XWorkValidationAdapter(this));
+            return getState().validate(path, new XWorkValidationAdapter(this));
         }
         catch (TypeException e)
         {

@@ -3,6 +3,7 @@ package com.zutubi.pulse.model;
 import com.zutubi.pulse.core.model.PersistentName;
 import com.zutubi.pulse.core.model.Revision;
 import com.zutubi.pulse.scm.SCMException;
+import com.zutubi.pulse.prototype.config.ProjectConfiguration;
 
 import java.util.Arrays;
 import java.util.List;
@@ -21,10 +22,10 @@ public class ChangelistIsolator
         this.buildManager = buildManager;
     }
 
-    public synchronized List<Revision> getRevisionsToRequest(Project project, BuildSpecification specification, boolean force) throws SCMException
+    public synchronized List<Revision> getRevisionsToRequest(ProjectConfiguration projectConfig, Project project, BuildSpecification specification, boolean force) throws SCMException
     {
         List<Revision> result;
-        Revision latestBuiltRevision = null;
+        Revision latestBuiltRevision;
 
         if (latestRequestedRevisions.containsKey(specification.getId()))
         {
@@ -46,13 +47,13 @@ public class ChangelistIsolator
         {
             // The spec has never been built or even requested.  Just build
             // the latest (we need to start somewhere!).
-            result = Arrays.asList(project.getScm().createServer().getLatestRevision());
+            result = Arrays.asList(projectConfig.getScm().createClient().getLatestRevision());
         }
         else
         {
             // We now have the last requested revision, return every revision
             // since then.
-            result = project.getScm().createServer().getRevisionsSince(latestBuiltRevision);
+            result = projectConfig.getScm().createClient().getRevisionsSince(latestBuiltRevision);
         }
 
         if (result.size() > 0)
@@ -64,6 +65,7 @@ public class ChangelistIsolator
         {
             // Force a build of the latest revision anyway
             // We need to copy the revision as they are unique in the BUILD_SCM table!
+            assert latestBuiltRevision != null;
             result = Arrays.asList(latestBuiltRevision.copy());
         }
 

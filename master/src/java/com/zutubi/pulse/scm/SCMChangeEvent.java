@@ -3,27 +3,23 @@ package com.zutubi.pulse.scm;
 import com.zutubi.pulse.events.Event;
 import com.zutubi.pulse.core.model.Revision;
 import com.zutubi.pulse.model.Scm;
+import com.zutubi.pulse.prototype.config.ProjectConfiguration;
 
 /**
  * This event indicates that a change has been detected in an SCM.
  */
-public class SCMChangeEvent extends Event<Scm>
+public class SCMChangeEvent extends Event<ProjectConfiguration>
 {
     private Revision newRevision;
     private Revision previousRevision;
 
-    public SCMChangeEvent(Scm source, Revision newRevision, Revision previousRevision)
+    public SCMChangeEvent(ProjectConfiguration source, Revision newRevision, Revision previousRevision)
     {
         super(source);
         this.newRevision = newRevision;
         this.previousRevision = previousRevision;
     }
 
-    public Scm getScm()
-    {
-        return getSource();
-    }
-    
     public Revision getNewRevision()
     {
         return newRevision;
@@ -37,9 +33,9 @@ public class SCMChangeEvent extends Event<Scm>
     public String toString()
     {
         StringBuffer buff = new StringBuffer("SCM Change Event");
-        if (getScm() != null)
+        if (getSource() != null)
         {
-            buff.append(": ").append(getScm().getId());
+            buff.append(": ").append(getSource().getName());
         }
         buff.append(": ").append(getPreviousRevision()).append(" -> ").append(getNewRevision());
         return buff.toString();

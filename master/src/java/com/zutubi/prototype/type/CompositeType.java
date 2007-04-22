@@ -8,6 +8,7 @@ import com.zutubi.pulse.prototype.squeezer.TypeSqueezer;
 import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.Mapping;
 import com.zutubi.util.logging.Logger;
+import com.zutubi.config.annotations.Internal;
 
 import java.lang.reflect.Method;
 import java.util.*;
@@ -20,6 +21,7 @@ public class CompositeType extends AbstractType implements ComplexType
     private static final Logger LOG = Logger.getLogger(CompositeType.class);
 
     private List<String> extensions = new LinkedList<String>();
+    private Map<String, TypeProperty> internalProperties = new HashMap<String, TypeProperty>();
     private Map<String, TypeProperty> properties = new HashMap<String, TypeProperty>();
     private Map<Class, List<String>> propertiesByClass = new HashMap<Class, List<String>>();
 
@@ -33,15 +35,21 @@ public class CompositeType extends AbstractType implements ComplexType
 
     public void addProperty(TypeProperty property)
     {
-        this.properties.put(property.getName(), property);
-        Class typeClass = property.getType().getClass();
-        if (!propertiesByClass.containsKey(typeClass))
+        if (property.getAnnotation(Internal.class) == null)
         {
-            propertiesByClass.put(typeClass, new LinkedList<String>());
+            properties.put(property.getName(), property);
+            Class typeClass = property.getType().getClass();
+            if (!propertiesByClass.containsKey(typeClass))
+            {
+                propertiesByClass.put(typeClass, new LinkedList<String>());
+            }
+            List<String> props = propertiesByClass.get(typeClass);
+            props.add(property.getName());
         }
-        List<String> props = propertiesByClass.get(typeClass);
-        props.add(property.getName());
-
+        else
+        {
+            internalProperties.put(property.getName(), property);
+        }
     }
 
     public List<TypeProperty> getProperties()
@@ -122,6 +130,13 @@ public class CompositeType extends AbstractType implements ComplexType
             {
                 Record record = (Record) data;
 
+                // Check if it is actually a derived type.
+                if(!getSymbolicName().equals(record.getSymbolicName()))
+                {
+                    CompositeType type = typeRegistry.getType(record.getSymbolicName());
+                    return type.instantiate(path, data);
+                }
+
                 instance = getClazz().newInstance();
                 if (path != null)
                 {
@@ -132,44 +147,17 @@ public class CompositeType extends AbstractType implements ComplexType
 
                 for (Map.Entry<String, TypeProperty> entry : properties.entrySet())
                 {
-                    String name = entry.getKey();
-                    if (!record.containsKey(name))
-                    {
-                        continue;
-                    }
-
-                    TypeProperty property = entry.getValue();
-
-                    // Instantiate even if there is no setter so the instance
-                    // is both checked for validity and cached.
-                    Type type = property.getType();
-                    Object value = type.instantiate(path == null ? null : PathUtils.getPath(path, name), record.get(name));
-                    Method setter = property.getSetter();
-                    if (setter != null)
-                    {
-                        try
-                        {
-                            if (value != null || !(type instanceof PrimitiveType))
-                            {
-                                setter.invoke(instance, value);
-                            }
-                        }
-                        catch (Exception e)
-                        {
-                            if (exception == null)
-                            {
-                                exception = new TypeConversionException();
-                            }
-                            exception.addFieldError(name, e.getMessage());
-                        }
-                    }
+                    exception = instantiateProperty(entry, path, record, instance, exception);
+                }
+                for (Map.Entry<String, TypeProperty> entry : internalProperties.entrySet())
+                {
+                    exception = instantiateProperty(entry, path, record, instance, exception);
                 }
 
                 if (exception != null)
                 {
                     throw exception;
                 }
-
             }
             catch (TypeConversionException e)
             {
@@ -178,34 +166,79 @@ public class CompositeType extends AbstractType implements ComplexType
             }
             catch (Exception e)
             {
-                throw new TypeConversionException(e);
+                throw new TypeConversionException("Instantiating type '" + getSymbolicName() + "': " + e.getMessage(), e);
             }
         }
 
         return instance;
     }
 
-    public Object unstantiate(Object instance) throws TypeException
+    private TypeConversionException instantiateProperty(Map.Entry<String, TypeProperty> entry, String path, Record record, Object instance, TypeConversionException exception) throws TypeException
     {
-        MutableRecord result = createNewRecord(false);
-        for(TypeProperty property: getProperties())
+        String name = entry.getKey();
+        if (!record.containsKey(name))
         {
-            final Method getter = property.getGetter();
-            if(getter != null)
+            return exception;
+        }
+
+        TypeProperty property = entry.getValue();
+
+        // Instantiate even if there is no setter so the instance
+        // is both checked for validity and cached.
+        Type type = property.getType();
+        Object value = type.instantiate(path == null ? null : PathUtils.getPath(path, name), record.get(name));
+        Method setter = property.getSetter();
+        if (setter != null)
+        {
+            try
             {
-                try
+                if (value != null || !(type instanceof PrimitiveType))
                 {
-                    Object value = getter.invoke(instance);
-                    result.put(property.getName(), property.getType().unstantiate(value));
-                }
-                catch (Exception e)
-                {
-                    throw new TypeException("Unable to invoke getter for property '" + property.getName() + "': " + e.getMessage(), e);
+                    setter.invoke(instance, value);
                 }
             }
+            catch (Exception e)
+            {
+                if (exception == null)
+                {
+                    exception = new TypeConversionException();
+                }
+                exception.addFieldError(name, e.getMessage());
+            }
         }
-        
+        return exception;
+    }
+
+    public Record unstantiate(Object instance) throws TypeException
+    {
+        MutableRecord result = createNewRecord(false);
+        for (TypeProperty property : properties.values())
+        {
+            unstantiateProperty(property, instance, result);
+        }
+        for (TypeProperty property : internalProperties.values())
+        {
+            unstantiateProperty(property, instance, result);
+        }
+
         return result;
+    }
+
+    private void unstantiateProperty(TypeProperty property, Object instance, MutableRecord result) throws TypeException
+    {
+        final Method getter = property.getGetter();
+        if (getter != null)
+        {
+            try
+            {
+                Object value = getter.invoke(instance);
+                result.put(property.getName(), property.getType().unstantiate(value));
+            }
+            catch (Exception e)
+            {
+                throw new TypeException("Unable to invoke getter for property '" + property.getName() + "': " + e.getMessage(), e);
+            }
+        }
     }
 
     public String insert(String path, Record newRecord, RecordManager recordManager)
@@ -229,7 +262,7 @@ public class CompositeType extends AbstractType implements ComplexType
 
     private MutableRecord createNewRecord(boolean initialise)
     {
-        if(extensions.size() > 0)
+        if (extensions.size() > 0)
         {
             // Can only be created when the extension type is specified,
             // there is no default initialisation.
@@ -237,7 +270,7 @@ public class CompositeType extends AbstractType implements ComplexType
         }
 
         MutableRecordImpl record = new MutableRecordImpl();
-        for(TypeProperty property: getProperties(ComplexType.class))
+        for (TypeProperty property : getProperties(ComplexType.class))
         {
             ComplexType type = (ComplexType) property.getType();
             Record childRecord = type.createNewRecord();

@@ -1,9 +1,6 @@
 package com.zutubi.prototype;
 
-import com.zutubi.config.annotations.Field;
-import com.zutubi.config.annotations.Form;
-import com.zutubi.config.annotations.Reference;
-import com.zutubi.config.annotations.Select;
+import com.zutubi.config.annotations.*;
 import com.zutubi.prototype.handler.*;
 import com.zutubi.prototype.type.*;
 import com.zutubi.prototype.type.record.PathUtils;
@@ -48,9 +45,11 @@ public class FormDescriptorFactory
     {
         defaultHandlerMapping.put(Field.class, FieldAnnotationHandler.class);
         defaultHandlerMapping.put(Form.class, FormAnnotationHandler.class);
+        defaultHandlerMapping.put(Password.class, FieldAnnotationHandler.class);
         defaultHandlerMapping.put(Reference.class, ReferenceAnnotationHandler.class);
         defaultHandlerMapping.put(Select.class, SelectAnnotationHandler.class);
-        // password, text, textarea, typeselect
+        defaultHandlerMapping.put(Text.class, FieldAnnotationHandler.class);
+        defaultHandlerMapping.put(TextArea.class, FieldAnnotationHandler.class);
     }
 
     private TypeRegistry typeRegistry;

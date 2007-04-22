@@ -75,7 +75,7 @@
                         #contentRowHeading("actions")
                         <td class="content">
         #if(!$project.pulseFileDetails.type.equals("custom"))
-                            <a href="convertToCustomProject!input.action?id=$project.id">
+                            <a href="convertToCustomProject!input.action?projectName=$action.urlEncode($project.name)">
                                 #wwtext("name=convert.to.custom")
                             </a>
                             ::

@@ -4,6 +4,8 @@ import com.zutubi.pulse.core.BuildException;
 import com.zutubi.pulse.core.model.Revision;
 import com.zutubi.pulse.personal.PatchArchive;
 import com.zutubi.pulse.util.FileSystemUtils;
+import com.zutubi.pulse.prototype.config.ProjectConfiguration;
+import com.zutubi.pulse.servercore.config.ScmConfiguration;
 import com.zutubi.util.IOUtils;
 
 import java.io.IOException;
@@ -51,16 +53,16 @@ public class VersionedPulseFileDetails extends PulseFileDetails
         return result;
     }
 
-    public String getPulseFile(long id, Project project, Revision revision, PatchArchive patch)
+    public String getPulseFile(long id, ProjectConfiguration projectConfig, Project project, Revision revision, PatchArchive patch)
     {
         String normalisedPath = FileSystemUtils.normaliseSeparators(pulseFileName);
         if (patch == null || !patch.containsPath(normalisedPath))
         {
-            Scm scm = project.getScm();
+            ScmConfiguration scm = projectConfig.getScm();
 
             try
             {
-                InputStream is = scm.createServer().checkout(revision, pulseFileName);
+                InputStream is = scm.createClient().checkout(revision, pulseFileName);
                 return IOUtils.inputStreamToString(is);
             }
             catch (Exception e)

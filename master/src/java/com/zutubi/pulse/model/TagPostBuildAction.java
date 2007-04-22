@@ -3,10 +3,11 @@ package com.zutubi.pulse.model;
 import com.zutubi.pulse.core.FileLoadException;
 import com.zutubi.pulse.core.Scope;
 import com.zutubi.pulse.core.VariableHelper;
+import com.zutubi.pulse.core.config.ResourceProperty;
 import com.zutubi.pulse.core.model.Property;
-import com.zutubi.pulse.core.model.ResourceProperty;
 import com.zutubi.pulse.core.model.ResultState;
-import com.zutubi.pulse.scm.SCMClient;
+import com.zutubi.pulse.scm.ScmClient;
+import com.zutubi.pulse.prototype.config.ProjectConfiguration;
 
 import java.util.List;
 
@@ -30,12 +31,12 @@ public class TagPostBuildAction extends PostBuildAction
         this.moveExisting = moveExisting;
     }
 
-    protected void internalExecute(BuildResult result, RecipeResultNode recipe, List<ResourceProperty> properties)
+    protected void internalExecute(ProjectConfiguration projectConfig, BuildResult result, RecipeResultNode recipe, List<ResourceProperty> properties)
     {
         try
         {
             String tagName = substituteVariables(tag, result, recipe, properties);
-            SCMClient client = result.getProject().getScm().createServer();
+            ScmClient client = projectConfig.getScm().createClient();
             client.tag(result.getScmDetails().getRevision(), tagName, moveExisting);
         }
         catch (Exception e)

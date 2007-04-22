@@ -70,7 +70,7 @@ public class SCMFileObject extends AbstractPulseFileObject
         {
             try
             {
-                scmChildren = getAncestor(SCMProvider.class).getScm().createServer().getListing(scmFile.getPath());
+                scmChildren = getAncestor(SCMProvider.class).getScm().createClient().getListing(scmFile.getPath());
             }
             catch (SCMException e)
             {
@@ -109,7 +109,7 @@ public class SCMFileObject extends AbstractPulseFileObject
         {
             try
             {
-                return getAncestor(SCMProvider.class).getScm().createServer().getLocation();
+                return getAncestor(SCMProvider.class).getScm().createClient().getLocation();
             }
             catch (Exception e)
             {

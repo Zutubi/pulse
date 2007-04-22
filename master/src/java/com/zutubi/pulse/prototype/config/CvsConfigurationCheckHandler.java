@@ -1,7 +1,7 @@
 package com.zutubi.pulse.prototype.config;
 
 import com.zutubi.prototype.ConfigurationCheckHandler;
-import com.zutubi.pulse.prototype.record.SymbolicName;
+import com.zutubi.config.annotations.SymbolicName;
 
 /**
  *

@@ -1,8 +1,10 @@
 package com.zutubi.pulse.vfs.pulse;
 
 import com.zutubi.pulse.model.Project;
+import com.zutubi.pulse.prototype.config.ProjectConfiguration;
 import org.apache.commons.vfs.FileName;
 import org.apache.commons.vfs.FileType;
+import org.apache.commons.vfs.FileSystemException;
 import org.apache.commons.vfs.provider.AbstractFileSystem;
 
 import java.util.HashMap;
@@ -67,6 +69,11 @@ public class ProjectFileObject extends AbstractPulseFileObject implements Projec
     public String getDisplayName()
     {
         return displayName;
+    }
+
+    public ProjectConfiguration getProjectConfig() throws FileSystemException
+    {
+        return projectManager.getProjectConfig(projectId);
     }
 
     public Project getProject()

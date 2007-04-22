@@ -1,9 +1,6 @@
 package com.zutubi.prototype.config.types;
 
-import com.zutubi.pulse.prototype.record.SymbolicName;
-
-import java.util.List;
-import java.util.Map;
+import com.zutubi.config.annotations.SymbolicName;
 
 /**
  */

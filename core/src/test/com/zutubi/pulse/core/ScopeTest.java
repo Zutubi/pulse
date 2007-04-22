@@ -1,7 +1,7 @@
 package com.zutubi.pulse.core;
 
 import com.zutubi.pulse.core.model.Property;
-import com.zutubi.pulse.core.model.ResourceProperty;
+import com.zutubi.pulse.core.config.ResourceProperty;
 import com.zutubi.pulse.test.PulseTestCase;
 import com.zutubi.pulse.util.FileSystemUtils;
 

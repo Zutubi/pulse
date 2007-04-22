@@ -23,7 +23,8 @@
     </publications>
 
     <dependencies>
-        <dependency org="zutubi" name="com.zutubi.validation" rev="latest.integration" conf="build,release->@"/>
+        <dependency org="zutubi" name="com.zutubi.validation" rev="latest.integration" conf="*->@"/>
+        <dependency org="zutubi" name="com.zutubi.config.annotations" rev="latest.integration" conf="*->@"/>
 
         <dependency org="zutubi" name="boot" rev="1.2" conf="external,build,release->default"/>
 

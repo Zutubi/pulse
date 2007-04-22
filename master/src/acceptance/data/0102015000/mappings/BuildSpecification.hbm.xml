@@ -26,7 +26,7 @@
 
         <bag name="properties" cascade="all,delete-orphan" lazy="false">
             <key column="SPECIFICATION_ID"/>
-            <one-to-many class="com.zutubi.pulse.core.model.ResourceProperty"/>
+            <one-to-many class="com.zutubi.pulse.core.config.ResourceProperty"/>
         </bag>
     </class>
 
@@ -91,7 +91,7 @@
         </subclass>
     </class>
 
-    <class name="com.zutubi.pulse.core.model.ResourceProperty" table="RESOURCE_PROPERTY">
+    <class name="com.zutubi.pulse.core.config.ResourceProperty" table="RESOURCE_PROPERTY">
         <id name="id" type="java.lang.Long" column="ID" unsaved-value="0">
             <generator class="hilo"/>
         </id>

@@ -2,6 +2,7 @@ package com.zutubi.pulse.model;
 
 import com.zutubi.pulse.core.model.Revision;
 import com.zutubi.pulse.personal.PatchArchive;
+import com.zutubi.pulse.prototype.config.ProjectConfiguration;
 import org.acegisecurity.annotation.Secured;
 
 import java.util.LinkedList;
@@ -15,6 +16,26 @@ public class MockProjectManager implements ProjectManager
 {
     private Map<Long, Project> projects = new TreeMap<Long, Project>();
     private long nextId = 1;
+
+    public Map<String, ProjectConfiguration> getAllProjectConfigs()
+    {
+        throw new RuntimeException("Method not yet implemented.");
+    }
+
+    public ProjectConfiguration getProjectConfig(String name)
+    {
+        throw new RuntimeException("Method not yet implemented.");
+    }
+
+    public ProjectConfiguration getProjectConfig(long id)
+    {
+        throw new RuntimeException("Method not yet implemented.");
+    }
+
+    public void saveProjectConfig(ProjectConfiguration config)
+    {
+        throw new RuntimeException("Method not yet implemented.");
+    }
 
     public Project getProject(String name)
     {
@@ -44,7 +65,7 @@ public class MockProjectManager implements ProjectManager
         throw new RuntimeException("Method not implemented.");
     }
 
-    public List<Project> getAllProjects()
+    public List<Project> getNameToConfig()
     {
         return new LinkedList<Project>(projects.values());
     }

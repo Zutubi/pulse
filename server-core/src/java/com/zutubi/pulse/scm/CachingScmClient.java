@@ -9,7 +9,7 @@ import java.util.StringTokenizer;
 
 /**
  */
-public abstract class CachingSCMClient implements SCMClient, SCMCachePopulator
+public abstract class CachingScmClient implements ScmClient, SCMCachePopulator
 {
     public String getUniqueLocation() throws SCMException
     {

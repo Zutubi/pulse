@@ -8,7 +8,6 @@ public class BrowseProjectScmAction extends AbstractBrowseDirAction
 {
     private long id;
     private Project project;
-    private String location;
 
     public long getId()
     {
@@ -23,11 +22,6 @@ public class BrowseProjectScmAction extends AbstractBrowseDirAction
     public Project getProject()
     {
         return project;
-    }
-
-    public String getLocation()
-    {
-        return location;
     }
 
     public boolean getShowSizes()
@@ -48,7 +42,6 @@ public class BrowseProjectScmAction extends AbstractBrowseDirAction
 
         try
         {
-            location = project.getScm().createServer().getLocation();
             return getPath().length() > 0 ? "file" : SUCCESS;
         }
         catch (Exception e)

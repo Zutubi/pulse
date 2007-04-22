@@ -5,8 +5,11 @@ import com.mockobjects.dynamic.Mock;
 import com.zutubi.pulse.core.model.NumericalRevision;
 import com.zutubi.pulse.core.model.Revision;
 import com.zutubi.pulse.scm.SCMException;
-import com.zutubi.pulse.scm.SCMClient;
+import com.zutubi.pulse.scm.ScmClient;
 import com.zutubi.pulse.test.PulseTestCase;
+import com.zutubi.pulse.prototype.config.ProjectConfiguration;
+import com.zutubi.pulse.servercore.config.ScmConfiguration;
+import com.zutubi.config.annotations.Transient;
 
 import java.util.Arrays;
 import java.util.LinkedList;
@@ -21,8 +24,9 @@ public class ChangelistIsolatorTest extends PulseTestCase
     private Mock mockBuildManager;
     private BuildManager buildManager;
     private Mock mockScm;
-    private SCMClient scmClient;
+    private ScmClient scmClient;
     private Project project;
+    private ProjectConfiguration projectConfig;
     private BuildSpecification buildSpecification;
 
     protected void setUp() throws Exception
@@ -30,30 +34,26 @@ public class ChangelistIsolatorTest extends PulseTestCase
         super.setUp();
 
         mockBuildManager = new Mock(BuildManager.class);
-        mockScm = new Mock(SCMClient.class);
+        mockScm = new Mock(ScmClient.class);
 
         buildSpecification = new BuildSpecification("default");
         buildSpecification.setIsolateChangelists(true);
 
         project = new Project("myproject", "mydesc", new CustomPulseFileDetails());
-        project.setScm(new Scm()
+        projectConfig = new ProjectConfiguration();
+        projectConfig.setScm(new ScmConfiguration()
         {
-            public SCMClient createServer() throws SCMException
-            {
-                return scmClient;
-            }
-
+            @Transient
             public String getType()
             {
                 return "mock";
             }
 
-            public Map<String, String> getRepositoryProperties()
+            public ScmClient createClient() throws SCMException
             {
-                throw new RuntimeException("Method not implemented.");
+                return scmClient;
             }
         });
-
     }
 
     public void testNeverBuilt() throws SCMException
@@ -124,7 +124,7 @@ public class ChangelistIsolatorTest extends PulseTestCase
         returnRevisions(10);
         setupIsolator();
 
-        List<Revision> gotRevisions = isolator.getRevisionsToRequest(project, buildSpecification, true);
+        List<Revision> gotRevisions = isolator.getRevisionsToRequest(projectConfig, project, buildSpecification, true);
         assertEquals(1, gotRevisions.size());
         Revision got = gotRevisions.get(0);
         assertEquals(rev.getRevisionString(), got.getRevisionString());
@@ -146,7 +146,7 @@ public class ChangelistIsolatorTest extends PulseTestCase
     private void returnNullDetails()
     {
         BuildResult result = new BuildResult();
-        mockBuildManager.expectAndReturn("queryBuilds", C.ANY_ARGS, Arrays.asList(new BuildResult[] { result }));
+        mockBuildManager.expectAndReturn("queryBuilds", C.ANY_ARGS, Arrays.asList(result));
     }
 
     private Revision returnBuild(long revision)
@@ -154,7 +154,7 @@ public class ChangelistIsolatorTest extends PulseTestCase
         BuildResult result = new BuildResult();
         NumericalRevision rev = new NumericalRevision(revision);
         result.setScmDetails(new BuildScmDetails(rev));
-        mockBuildManager.expectAndReturn("queryBuilds", C.ANY_ARGS, Arrays.asList(new BuildResult[]{ result }));
+        mockBuildManager.expectAndReturn("queryBuilds", C.ANY_ARGS, Arrays.asList(result));
         return rev;
     }
 
@@ -172,13 +172,13 @@ public class ChangelistIsolatorTest extends PulseTestCase
     private void setupIsolator()
     {
         buildManager = (BuildManager) mockBuildManager.proxy();
-        scmClient = (SCMClient) mockScm.proxy();
+        scmClient = (ScmClient) mockScm.proxy();
         isolator = new ChangelistIsolator(buildManager);
     }
 
     private void expectRevisions(boolean force, long... revisions) throws SCMException
     {
-        List<Revision> gotRevisions = isolator.getRevisionsToRequest(project, buildSpecification, force);
+        List<Revision> gotRevisions = isolator.getRevisionsToRequest(projectConfig, project, buildSpecification, force);
         assertEquals(revisions.length, gotRevisions.size());
         for(int i = 0; i < revisions.length; i++)
         {

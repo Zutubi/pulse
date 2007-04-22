@@ -6,6 +6,8 @@ import com.zutubi.pulse.core.model.FileRevision;
 import com.zutubi.pulse.model.*;
 import com.zutubi.pulse.model.persistence.ChangelistDao;
 import com.zutubi.pulse.web.ActionSupport;
+import com.zutubi.pulse.prototype.config.ProjectConfiguration;
+import com.zutubi.pulse.servercore.config.ScmConfiguration;
 
 import java.util.Collections;
 import java.util.Comparator;
@@ -33,7 +35,7 @@ public class ViewChangelistAction extends ActionSupport
 
     private boolean changeViewerInitialised;
     private ChangeViewer changeViewer;
-    private Scm scm;
+    private ScmConfiguration scm;
 
     private String fileViewUrl;
     private String fileDownloadUrl;
@@ -99,17 +101,22 @@ public class ViewChangelistAction extends ActionSupport
             if(p != null)
             {
                 changeViewer = p.getChangeViewer();
-                scm = p.getScm();
+                ProjectConfiguration projectConfig = projectManager.getProjectConfig(p.getId());
+                if (projectConfig != null)
+                {
+                    scm = projectConfig.getScm();
+                }
             }
             else
             {
                 for(long id: changelist.getProjectIds())
                 {
                     p = projectManager.getProject(id);
-                    if(p != null && p.getChangeViewer() != null)
+                    ProjectConfiguration projectConfig = projectManager.getProjectConfig(id);
+                    if(p != null && projectConfig != null && p.getChangeViewer() != null)
                     {
                         changeViewer = p.getChangeViewer();
-                        scm = p.getScm();
+                        scm = projectConfig.getScm();
                         break;
                     }
                 }

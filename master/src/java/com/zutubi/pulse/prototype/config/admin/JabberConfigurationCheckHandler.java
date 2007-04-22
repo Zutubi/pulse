@@ -1,9 +1,8 @@
 package com.zutubi.pulse.prototype.config.admin;
 
 import com.zutubi.prototype.ConfigurationCheckHandler;
-import com.zutubi.pulse.prototype.record.SymbolicName;
+import com.zutubi.config.annotations.SymbolicName;
 import com.zutubi.pulse.jabber.JabberManager;
-import org.tmatesoft.svn.core.internal.io.svn.SVNRepositoryImpl;
 import org.jivesoftware.smack.XMPPException;
 
 /**

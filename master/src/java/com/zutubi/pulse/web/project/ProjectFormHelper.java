@@ -24,6 +24,6 @@ public class ProjectFormHelper extends NamedEntityFormHelper<Project>
 
     protected List<Project> getAll()
     {
-        return projectManager.getAllProjects();
+        return projectManager.getNameToConfig();
     }
 }

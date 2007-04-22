@@ -3,7 +3,7 @@ package com.zutubi.pulse.prototype.config.admin;
 import com.zutubi.config.annotations.ConfigurationCheck;
 import com.zutubi.config.annotations.Form;
 import com.zutubi.config.annotations.Password;
-import com.zutubi.pulse.prototype.record.SymbolicName;
+import com.zutubi.config.annotations.SymbolicName;
 import com.zutubi.validation.annotations.Email;
 import com.zutubi.validation.annotations.Numeric;
 import com.zutubi.validation.annotations.Required;

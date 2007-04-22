@@ -225,7 +225,7 @@ public class DefaultBuildManager implements BuildManager, EventListener
     public void cleanupBuilds()
     {
         // Lookup project cleanup info, query for old builds, cleanup where necessary
-        List<Project> projects = projectManager.getAllProjects();
+        List<Project> projects = projectManager.getNameToConfig();
         for (Project project : projects)
         {
             cleanupBuilds(project);

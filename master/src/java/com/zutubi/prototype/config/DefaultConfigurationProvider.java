@@ -53,6 +53,11 @@ public class DefaultConfigurationProvider implements ConfigurationProvider
         return configurationPersistenceManager.getAllInstances(clazz);
     }
 
+    public void save(String parentPath, String baseName, Object instance)
+    {
+        configurationPersistenceManager.save(parentPath, baseName, instance);
+    }
+
     public void registerEventListener(ConfigurationEventListener listener, boolean synchronous, Class clazz)
     {
         CompositeType type = typeRegistry.getType(clazz);

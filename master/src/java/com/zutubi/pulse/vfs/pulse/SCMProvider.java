@@ -1,6 +1,7 @@
 package com.zutubi.pulse.vfs.pulse;
 
 import com.zutubi.pulse.model.Scm;
+import com.zutubi.pulse.servercore.config.ScmConfiguration;
 import org.apache.commons.vfs.FileSystemException;
 
 /**
@@ -8,5 +9,5 @@ import org.apache.commons.vfs.FileSystemException;
  */
 public interface SCMProvider
 {
-    Scm getScm() throws FileSystemException;
+    ScmConfiguration getScm() throws FileSystemException;
 }

@@ -1,5 +1,10 @@
 package com.zutubi.pulse.prototype.config;
 
+import com.zutubi.pulse.scm.ScmClient;
+import com.zutubi.pulse.scm.SCMException;
+import com.zutubi.pulse.servercore.config.ScmConfiguration;
+import com.zutubi.config.annotations.Transient;
+
 /**
  *
  *
@@ -49,5 +54,16 @@ public class PerforceConfiguration extends ScmConfiguration
     public void setSpec(String spec)
     {
         this.spec = spec;
+    }
+
+    public String getType()
+    {
+        return "p4";
+    }
+
+    public ScmClient createClient() throws SCMException
+    {
+        // FIXME
+        throw new RuntimeException("Method not yet implemented.");
     }
 }

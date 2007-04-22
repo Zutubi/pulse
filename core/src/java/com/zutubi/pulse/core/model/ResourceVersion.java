@@ -1,6 +1,7 @@
 package com.zutubi.pulse.core.model;
 
 import com.zutubi.pulse.core.FileLoadException;
+import com.zutubi.pulse.core.config.ResourceProperty;
 
 import java.util.Map;
 import java.util.TreeMap;

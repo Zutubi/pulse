@@ -204,7 +204,7 @@ public class DefaultUserManager implements UserManager
         Set<Project> projects = new HashSet<Project>();
         if(user.getShowAllProjects())
         {
-            projects.addAll(projectManager.getAllProjects());
+            projects.addAll(projectManager.getNameToConfig());
         }
         else
         {

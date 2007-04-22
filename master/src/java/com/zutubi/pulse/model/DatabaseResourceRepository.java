@@ -4,13 +4,11 @@ import com.zutubi.pulse.core.ResourceRepository;
 import com.zutubi.pulse.core.ConfigurableResourceRepository;
 import com.zutubi.pulse.core.FileLoadException;
 import com.zutubi.pulse.core.model.Resource;
-import com.zutubi.pulse.core.model.ResourceProperty;
 import com.zutubi.pulse.core.model.ResourceVersion;
 import com.zutubi.pulse.model.persistence.ResourceDao;
 
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 
 /**
  */

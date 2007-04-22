@@ -13,6 +13,16 @@ import java.util.List;
  */
 public class Project extends Entity implements AclObjectIdentity, AclObjectIdentityAware, NamedEntity
 {
+    public Long getLastPollTime()
+    {
+        return lastPollTime;
+    }
+
+    public void setLastPollTime(Long lastPollTime)
+    {
+        this.lastPollTime = lastPollTime;
+    }
+
     public enum State
     {
         /**
@@ -44,6 +54,7 @@ public class Project extends Entity implements AclObjectIdentity, AclObjectIdent
     private ChangeViewer changeViewer;
     private State state = State.IDLE;
     private long nextBuildNumber = 1;
+    private Long lastPollTime;
 
     private List<BuildSpecification> buildSpecifications;
     private BuildSpecification defaultSpecification;
@@ -186,16 +197,6 @@ public class Project extends Entity implements AclObjectIdentity, AclObjectIdent
     public void setUrl(String url)
     {
         this.url = url;
-    }
-
-    public Scm getScm()
-    {
-        return scm;
-    }
-
-    public void setScm(Scm scm)
-    {
-        this.scm = scm;
     }
 
     public ChangeViewer getChangeViewer()

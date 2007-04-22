@@ -6,7 +6,7 @@ import java.util.*;
  */
 public class CollectionUtils
 {
-    public static <T> List<T> filter(List<T> l, Predicate<T> p)
+    public static <T> List<T> filter(Collection<T> l, Predicate<T> p)
     {
         return filter(l, p, (List<T>) new LinkedList<T>());
     }

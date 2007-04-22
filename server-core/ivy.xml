@@ -24,7 +24,6 @@
 
     <dependencies>
         <dependency org="zutubi" name="pulse-core" rev="latest.integration" conf="*->@"/>
-        <dependency org="zutubi" name="com.zutubi.config.annotations" rev="latest.integration" conf="*->@"/>
 
         <dependency org="apache" name="commons-collections" rev="3.1" conf="external,build,release->default"/>
         <dependency org="apache" name="commons-cli" rev="1.0" conf="external,build,release->default"/>

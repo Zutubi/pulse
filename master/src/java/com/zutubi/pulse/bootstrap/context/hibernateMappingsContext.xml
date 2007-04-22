@@ -24,7 +24,6 @@ This context exports:
                 <value>com/zutubi/pulse/model/persistence/hibernate/ProjectGroup.hbm.xml</value>
                 <value>com/zutubi/pulse/model/persistence/hibernate/Resource.hbm.xml</value>
                 <value>com/zutubi/pulse/model/persistence/hibernate/Revision.hbm.xml</value>
-                <value>com/zutubi/pulse/model/persistence/hibernate/Scm.hbm.xml</value>
                 <value>com/zutubi/pulse/model/persistence/hibernate/Slave.hbm.xml</value>
                 <value>com/zutubi/pulse/model/persistence/hibernate/StoredArtifact.hbm.xml</value>
                 <value>com/zutubi/pulse/model/persistence/hibernate/TestCaseIndex.hbm.xml</value>

@@ -2,7 +2,7 @@ package com.zutubi.pulse.web.project;
 
 import com.zutubi.pulse.bootstrap.MasterConfigurationManager;
 import com.zutubi.pulse.core.Scope;
-import com.zutubi.pulse.core.model.ResourceProperty;
+import com.zutubi.pulse.core.config.ResourceProperty;
 import com.zutubi.pulse.core.model.ResultState;
 import com.zutubi.pulse.model.*;
 

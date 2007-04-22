@@ -2,7 +2,7 @@ package com.zutubi.pulse.web.admin;
 
 import com.opensymphony.util.TextUtils;
 import com.zutubi.pulse.core.FileLoadException;
-import com.zutubi.pulse.core.model.ResourceProperty;
+import com.zutubi.pulse.core.config.ResourceProperty;
 
 /**
  */

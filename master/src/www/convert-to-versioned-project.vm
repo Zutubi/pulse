@@ -15,7 +15,7 @@
 
     <tr>
         <th class="label">#wwtext("name=pulse.file"): </th>
-        <td class="field"><a href="downloadProjectBuildFile.action?id=$id">#wwtext("name=download")</a></td>
+        <td class="field"><a href="downloadProjectBuildFile.action?projectName=$action.urlEncode($project.name)">#wwtext("name=download")</a></td>
     </tr>
     #inlineHelp("pulse.file.download.help")
     #wwtextfield("name=details.pulseFileName" "label=%{getText('pulse.filename')}" "required=true" "size=40" "tabindex=1")

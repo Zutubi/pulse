@@ -2,8 +2,8 @@ package com.zutubi.pulse.prototype.config.admin;
 
 import com.zutubi.config.annotations.ConfigurationCheck;
 import com.zutubi.config.annotations.Form;
+import com.zutubi.config.annotations.SymbolicName;
 import com.zutubi.pulse.jabber.JabberManager;
-import com.zutubi.pulse.prototype.record.SymbolicName;
 import com.zutubi.validation.annotations.Required;
 
 /**

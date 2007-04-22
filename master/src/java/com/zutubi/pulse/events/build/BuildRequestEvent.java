@@ -3,6 +3,7 @@ package com.zutubi.pulse.events.build;
 import com.zutubi.pulse.core.BuildRevision;
 import com.zutubi.pulse.core.model.Entity;
 import com.zutubi.pulse.model.*;
+import com.zutubi.pulse.prototype.config.ProjectConfiguration;
 
 /**
  */
@@ -10,9 +11,9 @@ public class BuildRequestEvent extends AbstractBuildRequestEvent
 {
     private BuildReason reason;
 
-    public BuildRequestEvent(Object source, BuildReason reason, Project project, BuildSpecification specification, BuildRevision revision)
+    public BuildRequestEvent(Object source, BuildReason reason, ProjectConfiguration projectConfig, Project project, BuildSpecification specification, BuildRevision revision)
     {
-        super(source, revision, project, specification);
+        super(source, revision, projectConfig, project, specification);
         this.reason = reason;
     }
 

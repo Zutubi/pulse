@@ -2,7 +2,7 @@ package com.zutubi.pulse.prototype.config.admin;
 
 import com.zutubi.prototype.ConfigurationCheckHandler;
 import com.zutubi.pulse.model.EmailContactPoint;
-import com.zutubi.pulse.prototype.record.SymbolicName;
+import com.zutubi.config.annotations.SymbolicName;
 
 /**
  */

@@ -1,5 +1,9 @@
 package com.zutubi.pulse;
 
+import com.zutubi.prototype.config.ConfigurationEventListener;
+import com.zutubi.prototype.config.ConfigurationProvider;
+import com.zutubi.prototype.config.events.ConfigurationEvent;
+import com.zutubi.prototype.config.events.PostSaveEvent;
 import com.zutubi.pulse.agent.Agent;
 import com.zutubi.pulse.agent.AgentManager;
 import com.zutubi.pulse.core.BuildException;
@@ -13,16 +17,13 @@ import com.zutubi.pulse.events.build.RecipeDispatchedEvent;
 import com.zutubi.pulse.events.build.RecipeErrorEvent;
 import com.zutubi.pulse.events.build.RecipeEvent;
 import com.zutubi.pulse.model.Project;
-import com.zutubi.pulse.model.Scm;
+import com.zutubi.pulse.prototype.config.ProjectConfiguration;
+import com.zutubi.pulse.prototype.config.admin.GeneralAdminConfiguration;
 import com.zutubi.pulse.scm.SCMChangeEvent;
 import com.zutubi.pulse.scm.SCMException;
+import com.zutubi.pulse.servercore.config.ScmConfiguration;
 import com.zutubi.util.Constants;
 import com.zutubi.util.logging.Logger;
-import com.zutubi.pulse.prototype.config.admin.GeneralAdminConfiguration;
-import com.zutubi.prototype.config.ConfigurationProvider;
-import com.zutubi.prototype.config.ConfigurationEventListener;
-import com.zutubi.prototype.config.events.ConfigurationEvent;
-import com.zutubi.prototype.config.events.PostSaveEvent;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -198,9 +199,9 @@ public class ThreadedRecipeQueue implements Runnable, RecipeQueue, EventListener
         if (!buildRevision.isInitialised())
         {
             // Let's initialise it
-            Project project = dispatchRequest.getBuild().getProject();
-            Scm scm = project.getScm();
-            Revision revision = scm.createServer().getLatestRevision();
+            ProjectConfiguration projectConfig = dispatchRequest.getProjectConfig();
+            ScmConfiguration scm = projectConfig.getScm();
+            Revision revision = scm.createClient().getLatestRevision();
 
             // May throw a BuildException
             updateRevision(dispatchRequest, revision);
@@ -210,7 +211,7 @@ public class ThreadedRecipeQueue implements Runnable, RecipeQueue, EventListener
     private void updateRevision(RecipeDispatchRequest dispatchRequest, Revision revision) throws BuildException
     {
         Project project = dispatchRequest.getBuild().getProject();
-        String pulseFile = project.getPulseFileDetails().getPulseFile(dispatchRequest.getRequest().getId(), project, revision, null);
+        String pulseFile = project.getPulseFileDetails().getPulseFile(dispatchRequest.getRequest().getId(), dispatchRequest.getProjectConfig(), project, revision, null);
         dispatchRequest.getRevision().update(revision, pulseFile);
     }
 
@@ -640,11 +641,10 @@ public class ThreadedRecipeQueue implements Runnable, RecipeQueue, EventListener
     private void handleScmChange(SCMChangeEvent event)
     {
         List<RecipeDispatchRequest> rejects = null;
-        Scm changedScm = event.getScm();
         lock.lock();
         try
         {
-            List<RecipeDispatchRequest> unfulfillable = checkQueueForChanges(changedScm, event, queuedDispatches);
+            List<RecipeDispatchRequest> unfulfillable = checkQueueForChanges(event.getSource(), event, queuedDispatches);
             if(unsatisfiableTimeout == 0)
             {
                 queuedDispatches.removeAll(unfulfillable);
@@ -686,14 +686,14 @@ public class ThreadedRecipeQueue implements Runnable, RecipeQueue, EventListener
         }
     }
 
-    private List<RecipeDispatchRequest> checkQueueForChanges(Scm changedScm, SCMChangeEvent event, List<RecipeDispatchRequest> requests)
+    private List<RecipeDispatchRequest> checkQueueForChanges(ProjectConfiguration changedProject, SCMChangeEvent event, List<RecipeDispatchRequest> requests)
     {
         List<RecipeDispatchRequest> unfulfillable = new LinkedList<RecipeDispatchRequest>();
 
         for (RecipeDispatchRequest request : requests)
         {
-            Scm requestScm = request.getBuild().getProject().getScm();
-            if (!request.getRevision().isFixed() && requestScm.getId() == changedScm.getId())
+            ProjectConfiguration requestProject = request.getProjectConfig();
+            if (!request.getRevision().isFixed() && requestProject.getProjectId() == changedProject.getProjectId())
             {
                 try
                 {

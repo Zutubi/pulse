@@ -21,17 +21,21 @@ import com.zutubi.pulse.scheduling.*;
 import com.zutubi.pulse.scheduling.tasks.BuildProjectTask;
 import com.zutubi.pulse.scm.SCMChangeEvent;
 import com.zutubi.pulse.scm.SCMException;
+import com.zutubi.pulse.prototype.config.ProjectConfiguration;
 import com.zutubi.util.logging.Logger;
+import com.zutubi.prototype.config.ConfigurationProvider;
+import com.zutubi.prototype.config.ConfigurationEventListener;
+import com.zutubi.prototype.config.events.ConfigurationEvent;
+import com.zutubi.prototype.type.record.PathUtils;
 import org.acegisecurity.annotation.Secured;
 
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 
 /**
  * 
  *
  */
-public class DefaultProjectManager implements ProjectManager
+public class DefaultProjectManager implements ProjectManager, ConfigurationEventListener
 {
     public static final int DEFAULT_WORK_DIR_BUILDS = 10;
 
@@ -53,9 +57,58 @@ public class DefaultProjectManager implements ProjectManager
     private UserManager userManager;
     private CustomAclEntryCache projectAclEntryCache;
 
+    private ConfigurationProvider configurationProvider;
+
+    private Map<String, ProjectConfiguration> nameToConfig;
+    private Map<Long, ProjectConfiguration> idToConfig;
+
+    public void initialise()
+    {
+        changelistIsolator = new ChangelistIsolator(buildManager);
+
+        // register the canAddProject authorisation with the license manager.
+        AddProjectAuthorisation addProjectAuthorisation = new AddProjectAuthorisation();
+        addProjectAuthorisation.setProjectManager(this);
+        licenseManager.addAuthorisation(addProjectAuthorisation);
+
+        configurationProvider.registerEventListener(this, true, "project", PathUtils.getPath("project", PathUtils.WILDCARD_ANY_ELEMENT));
+        updateProjects();
+    }
+
+    @SuppressWarnings({"unchecked"})
+    private void updateProjects()
+    {
+        nameToConfig = configurationProvider.get("project", Map.class);
+        idToConfig = new HashMap<Long, ProjectConfiguration>(nameToConfig.size());
+        for(ProjectConfiguration config: nameToConfig.values())
+        {
+            idToConfig.put(config.getProjectId(), config);
+        }
+    }
+
     public void save(Project project)
     {
         projectDao.save(project);
+    }
+
+    public Map<String, ProjectConfiguration> getAllProjectConfigs()
+    {
+        return Collections.unmodifiableMap(nameToConfig);
+    }
+
+    public ProjectConfiguration getProjectConfig(String name)
+    {
+        return nameToConfig.get(name);
+    }
+
+    public ProjectConfiguration getProjectConfig(long id)
+    {
+        return idToConfig.get(id);
+    }
+
+    public void saveProjectConfig(ProjectConfiguration config)
+    {
+        configurationProvider.save("project", config.getName(), config);
     }
 
     public Project getProject(String name)
@@ -78,7 +131,7 @@ public class DefaultProjectManager implements ProjectManager
         return projectDao.findByBuildSpecification(buildSpecification);
     }
 
-    public List<Project> getAllProjects()
+    public List<Project> getNameToConfig()
     {
         return projectDao.findAll();
     }
@@ -197,6 +250,13 @@ public class DefaultProjectManager implements ProjectManager
             return;
         }
 
+        ProjectConfiguration projectConfig = getProjectConfig(project.getId());
+        if(projectConfig == null)
+        {
+            // Unlikely, but it may have been deleted
+            return;
+        }
+        
         if(revision == null)
         {
             if(spec.getIsolateChangelists())
@@ -205,10 +265,10 @@ public class DefaultProjectManager implements ProjectManager
                 // outstanding revisions and if so create requests for each one.
                 try
                 {
-                    List<Revision> revisions = changelistIsolator.getRevisionsToRequest(project, spec, force);
+                    List<Revision> revisions = changelistIsolator.getRevisionsToRequest(projectConfig, project, spec, force);
                     for(Revision r: revisions)
                     {
-                        requestBuildOfRevision(reason, project, spec, r);
+                        requestBuildOfRevision(reason, projectConfig, project, spec, r);
                     }
                 }
                 catch (SCMException e)
@@ -218,23 +278,29 @@ public class DefaultProjectManager implements ProjectManager
             }
             else
             {
-                eventManager.publish(new BuildRequestEvent(this, reason, project, spec, new BuildRevision()));
+                eventManager.publish(new BuildRequestEvent(this, reason, projectConfig, project, spec, new BuildRevision()));
             }
         }
         else
         {
             // Just raise one request.
-            requestBuildOfRevision(reason, project, spec, revision);
+            requestBuildOfRevision(reason, projectConfig, project, spec, revision);
         }
     }
 
     public void triggerBuild(long number, Project project, BuildSpecification specification, User user, PatchArchive archive) throws PulseException
     {
+        ProjectConfiguration projectConfig = getProjectConfig(project.getId());
+        if(projectConfig == null)
+        {
+            return;
+        }
+
         Revision revision = archive.getStatus().getRevision();
         try
         {
-            String pulseFile = getPulseFile(project, revision, archive);
-            eventManager.publish(new PersonalBuildRequestEvent(this, number, new BuildRevision(revision, pulseFile, false), user, archive, project, specification));
+            String pulseFile = getPulseFile(projectConfig, project, revision, archive);
+            eventManager.publish(new PersonalBuildRequestEvent(this, number, new BuildRevision(revision, pulseFile, false), user, archive, projectConfig, project, specification));
         }
         catch (BuildException e)
         {
@@ -251,12 +317,12 @@ public class DefaultProjectManager implements ProjectManager
         return number;
     }
 
-    private void requestBuildOfRevision(BuildReason reason, Project project, BuildSpecification specification, Revision revision)
+    private void requestBuildOfRevision(BuildReason reason, ProjectConfiguration projectConfig, Project project, BuildSpecification specification, Revision revision)
     {
         try
         {
-            String pulseFile = getPulseFile(project, revision, null);
-            eventManager.publish(new BuildRequestEvent(this, reason, project, specification, new BuildRevision(revision, pulseFile, reason.isUser())));
+            String pulseFile = getPulseFile(projectConfig, project, revision, null);
+            eventManager.publish(new BuildRequestEvent(this, reason, projectConfig, project, specification, new BuildRevision(revision, pulseFile, reason.isUser())));
         }
         catch (BuildException e)
         {
@@ -264,11 +330,11 @@ public class DefaultProjectManager implements ProjectManager
         }
     }
 
-    private String getPulseFile(Project project, Revision revision, PatchArchive patch) throws BuildException
+    private String getPulseFile(ProjectConfiguration projectConfig, Project project, Revision revision, PatchArchive patch) throws BuildException
     {
         PulseFileDetails pulseFileDetails = project.getPulseFileDetails();
         ComponentContext.autowire(pulseFileDetails);
-        return pulseFileDetails.getPulseFile(0, project, revision, patch);
+        return pulseFileDetails.getPulseFile(0, projectConfig, project, revision, patch);
     }
 
     public void updateProjectDetails(Project project, String name, String description, String url) throws SchedulingException
@@ -293,7 +359,7 @@ public class DefaultProjectManager implements ProjectManager
 
     public void updateProjectAdmins(String authority, List<Long> restrictToProjects)
     {
-        List<Project> projects = getAllProjects();
+        List<Project> projects = getNameToConfig();
         for(Project p: projects)
         {
             if(restrictToProjects == null || restrictToProjects.contains(p.getId()))
@@ -319,16 +385,6 @@ public class DefaultProjectManager implements ProjectManager
             save(p);
             projectAclEntryCache.removeEntriesFromCache(p);
         }
-    }
-
-    public void initialise()
-    {
-        changelistIsolator = new ChangelistIsolator(buildManager);
-
-        // register the canAddProject authorisation with the license manager.
-        AddProjectAuthorisation addProjectAuthorisation = new AddProjectAuthorisation();
-        addProjectAuthorisation.setProjectManager(this);
-        licenseManager.addAuthorisation(addProjectAuthorisation);
     }
 
     public void deleteBuildSpecification(Project project, long specId)
@@ -513,51 +569,26 @@ public class DefaultProjectManager implements ProjectManager
         projectDao = dao;
     }
 
-    /**
-     * Required resource.
-     *
-     * @param buildSpecificationDao
-     */
     public void setBuildSpecificationDao(BuildSpecificationDao buildSpecificationDao)
     {
         this.buildSpecificationDao = buildSpecificationDao;
     }
 
-    /**
-     * Required resource.
-     *
-     * @param triggerDao
-     */
     public void setTriggerDao(TriggerDao triggerDao)
     {
         this.triggerDao = triggerDao;
     }
 
-    /**
-     * Required resource.
-     *
-     * @param scheduler
-     */
     public void setScheduler(Scheduler scheduler)
     {
         this.scheduler = scheduler;
     }
 
-    /**
-     * Required resource.
-     *
-     * @param buildManager
-     */
     public void setBuildManager(BuildManager buildManager)
     {
         this.buildManager = buildManager;
     }
 
-    /**
-     * Required resource.
-     * 
-     * @param subscriptionManager
-     */
     public void setSubscriptionManager(SubscriptionManager subscriptionManager)
     {
         this.subscriptionManager = subscriptionManager;
@@ -610,6 +641,11 @@ public class DefaultProjectManager implements ProjectManager
         buildSpecificationDao.delete(hostRequirements);
     }
 
+    public void handleConfigurationEvent(ConfigurationEvent event)
+    {
+        updateProjects();
+    }
+
     public void setEventManager(EventManager eventManager)
     {
         this.eventManager = eventManager;
@@ -643,5 +679,10 @@ public class DefaultProjectManager implements ProjectManager
     public void setProjectAclEntryCache(CustomAclEntryCache projectAclEntryCache)
     {
         this.projectAclEntryCache = projectAclEntryCache;
+    }
+
+    public void setConfigurationProvider(ConfigurationProvider configurationProvider)
+    {
+        this.configurationProvider = configurationProvider;
     }
 }

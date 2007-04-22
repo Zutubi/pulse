@@ -1,4 +1,4 @@
-package com.zutubi.pulse.prototype.record;
+package com.zutubi.config.annotations;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

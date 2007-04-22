@@ -2,8 +2,10 @@ package com.zutubi.pulse.vfs.pulse;
 
 import com.zutubi.pulse.model.BuildResult;
 import com.zutubi.pulse.model.Project;
+import com.zutubi.pulse.prototype.config.ProjectConfiguration;
 import org.apache.commons.vfs.FileName;
 import org.apache.commons.vfs.FileType;
+import org.apache.commons.vfs.FileSystemException;
 import org.apache.commons.vfs.provider.AbstractFileSystem;
 
 /**
@@ -75,6 +77,11 @@ public class BuildFileObject extends AbstractPulseFileObject implements BuildRes
     public long getBuildResultId()
     {
         return buildId;
+    }
+
+    public ProjectConfiguration getProjectConfig() throws FileSystemException
+    {
+        return projectManager.getProjectConfig(getProject().getName());
     }
 
     public Project getProject()

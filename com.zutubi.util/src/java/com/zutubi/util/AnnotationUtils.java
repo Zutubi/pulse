@@ -1,9 +1,11 @@
 package com.zutubi.util;
 
-import com.zutubi.util.BeanUtils;
+import com.zutubi.util.bean.BeanUtils;
 
 import java.beans.IntrospectionException;
 import java.beans.PropertyDescriptor;
+import java.beans.Introspector;
+import java.beans.BeanInfo;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.lang.reflect.Field;
@@ -14,7 +16,7 @@ import java.util.*;
  */
 public class AnnotationUtils
 {
-    public static List<Annotation> annotationsFromProperty(PropertyDescriptor property) throws IntrospectionException
+    public static List<Annotation> annotationsFromProperty(final PropertyDescriptor property) throws IntrospectionException
     {
         List<Annotation> annotations = new LinkedList<Annotation>();
 
@@ -45,9 +47,37 @@ public class AnnotationUtils
             {
                 // noop.
             }
+
+            Class superClass = declaringClass.getSuperclass();
+            if(superClass != null && superClass != Object.class)
+            {
+                processSuper(superClass, property, annotations);
+            }
+
+            for(Class superInterface: declaringClass.getInterfaces())
+            {
+                processSuper(superInterface, property, annotations);
+            }
         }
 
         return annotations;
+    }
+
+    private static void processSuper(Class superClass, final PropertyDescriptor property, List<Annotation> annotations) throws IntrospectionException
+    {
+        BeanInfo superInfo = Introspector.getBeanInfo(superClass);
+        PropertyDescriptor superDescriptor = CollectionUtils.find(superInfo.getPropertyDescriptors(), new Predicate<PropertyDescriptor>()
+        {
+            public boolean satisfied(PropertyDescriptor superProperty)
+            {
+                return superProperty.getName().equals(property.getName());
+            }
+        });
+
+        if(superDescriptor != null)
+        {
+            annotations.addAll(annotationsFromProperty(superDescriptor));
+        }
     }
 
     /**

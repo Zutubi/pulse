@@ -40,7 +40,7 @@ public abstract class TemplatePulseFileDetailsTestBase extends PulseTestCase
 
     protected void createAndVerify(String expectedName) throws Exception
     {
-        String got = getDetails().getPulseFile(0, null, null, null);
+        String got = getDetails().getPulseFile(0, null, null, null, null);
         File file = new File(getPulseRoot(), FileSystemUtils.composeFilename("master", "src", "test", "com", "zutubi", "pulse", "model", getClass().getSimpleName() + "." + expectedName + ".xml"));
 
         if(generateMode)

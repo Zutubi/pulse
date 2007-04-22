@@ -1,5 +1,7 @@
 package com.zutubi.pulse.model;
 
+import com.zutubi.pulse.servercore.config.ScmConfiguration;
+
 /**
  * A type of change viewer that can be configured using a base URL and a
  * project path.
@@ -35,7 +37,7 @@ public abstract class BasePathChangeViewer extends ChangeViewer
         this.projectPath = projectPath;
     }
 
-    public boolean hasCapability(Scm scm, Capability capability)
+    public boolean hasCapability(ScmConfiguration scm, Capability capability)
     {
         return true;
     }

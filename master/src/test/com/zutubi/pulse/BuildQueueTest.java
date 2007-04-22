@@ -107,7 +107,7 @@ public class BuildQueueTest extends PulseTestCase
         BuildSpecification specification = new BuildSpecification();
         specification.setId(specId * 100);
         specification.setPname(specName);
-        return new BuildRequestEvent(this, new MockBuildReason(), project, specification, new BuildRevision());
+        return new BuildRequestEvent(this, new MockBuildReason(), null, project, specification, new BuildRevision());
     }
 
     private class MockBuildReason implements BuildReason

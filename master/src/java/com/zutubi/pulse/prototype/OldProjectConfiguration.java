@@ -1,6 +1,6 @@
 package com.zutubi.pulse.prototype;
 
-import com.zutubi.pulse.core.model.ResourceProperty;
+import com.zutubi.pulse.core.config.ResourceProperty;
 import com.zutubi.pulse.model.*;
 
 import java.util.LinkedList;
@@ -10,7 +10,7 @@ import java.util.Map;
 /**
  * The top-level model for all project configuration data.
  */
-public class ProjectConfiguration
+public class OldProjectConfiguration
 {
     public static final int TIMEOUT_NEVER = 0;
 

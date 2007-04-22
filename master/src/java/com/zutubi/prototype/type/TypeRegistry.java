@@ -1,8 +1,9 @@
 package com.zutubi.prototype.type;
 
 import com.zutubi.config.annotations.Reference;
+import com.zutubi.config.annotations.SymbolicName;
+import com.zutubi.config.annotations.Transient;
 import com.zutubi.prototype.config.ConfigurationPersistenceManager;
-import com.zutubi.pulse.prototype.record.SymbolicName;
 import com.zutubi.util.AnnotationUtils;
 import com.zutubi.util.CollectionUtils;
 
@@ -63,6 +64,7 @@ public class TypeRegistry
         return register(clazz, null);
     }
 
+    @SuppressWarnings({"unchecked"})
     public CompositeType register(Class clazz, TypeHandler handler) throws TypeException
     {
         SymbolicName symbolicName = (SymbolicName) clazz.getAnnotation(SymbolicName.class);
@@ -102,6 +104,7 @@ public class TypeRegistry
             if (type == null)
             {
                 type = new CompositeType(clazz, symbolicName, configurationPersistenceManager);
+                type.setTypeRegistry(this);
                 classMapping.put(clazz, type);
 
                 try
@@ -176,6 +179,11 @@ public class TypeRegistry
                 // extract annotations for this property, from the getter, setter
                 property.setAnnotations(AnnotationUtils.annotationsFromProperty(descriptor));
 
+                if(property.getAnnotation(Transient.class) != null)
+                {
+                    continue;
+                }
+                
                 // analyse the java type
                 java.lang.reflect.Type type = readMethod.getGenericReturnType();
 
@@ -272,6 +280,7 @@ public class TypeRegistry
         }
     }
 
+    @SuppressWarnings({"unchecked"})
     private SimpleType getSimpleType(Class clazz)
     {
         SimpleType type = primitiveMapping.get(clazz);

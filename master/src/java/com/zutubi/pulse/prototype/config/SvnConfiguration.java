@@ -2,6 +2,10 @@ package com.zutubi.pulse.prototype.config;
 
 import com.zutubi.config.annotations.ConfigurationCheck;
 import com.zutubi.config.annotations.Form;
+import com.zutubi.config.annotations.Transient;
+import com.zutubi.pulse.scm.ScmClient;
+import com.zutubi.pulse.scm.SCMException;
+import com.zutubi.pulse.servercore.config.ScmConfiguration;
 
 /**
  */
@@ -78,5 +82,16 @@ public class SvnConfiguration extends ScmConfiguration
     public void setKeyfilePassphrase(String keyfilePassphrase)
     {
         this.keyfilePassphrase = keyfilePassphrase;
+    }
+
+    public String getType()
+    {
+        return "svn";
+    }
+
+    public ScmClient createClient() throws SCMException
+    {
+        // FIXME
+        throw new RuntimeException("Method not yet implemented.");
     }
 }

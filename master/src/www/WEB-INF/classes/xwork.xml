@@ -350,69 +350,6 @@
             <result name="input" type="redirect">viewProjects.action</result>
         </action>
 
-        <action name="editScm" class="com.zutubi.pulse.web.project.EditScmAction">
-            <result name="svn" type="chain">editSvn!input</result>
-            <result name="cvs" type="chain">editCvs!input</result>
-            <result name="p4" type="chain">editP4!input</result>
-            <result name="error" type="velocity">generic-error.vm</result>
-        </action>
-
-        <!-- Alias is required as WW can't chain to a non-execute method :| -->
-        <action name="editSvn!input" class="com.zutubi.pulse.web.project.EditSvnAction" method="doInput">
-            <interceptor-ref name="crudStack"/>
-            <result name="input" type="velocity">edit-scm-svn.vm</result>
-        </action>
-
-        <action name="editSvn" class="com.zutubi.pulse.web.project.EditSvnAction">
-            <interceptor-ref name="crudStack"/>
-            <result name="input" type="velocity">edit-scm-svn.vm</result>
-            <result name="cancel" type="redirect">/configureProject.action?id=${projectId}</result>
-            <result name="success" type="redirect">/configureProject.action?id=${projectId}</result>
-        </action>
-
-        <!-- Alias is required as WW can't chain to a non-execute method :| -->
-        <action name="editCvs!input" class="com.zutubi.pulse.web.project.EditCvsAction" method="doInput">
-            <interceptor-ref name="crudStack"/>
-            <result name="input" type="velocity">edit-scm-cvs.vm</result>
-        </action>
-
-        <action name="editCvs" class="com.zutubi.pulse.web.project.EditCvsAction">
-            <interceptor-ref name="crudStack"/>
-            <result name="input" type="velocity">edit-scm-cvs.vm</result>
-            <result name="cancel" type="redirect">/configureProject.action?id=${projectId}</result>
-            <result name="success" type="redirect">/configureProject.action?id=${projectId}</result>
-        </action>
-
-        <!-- Alias is required as WW can't chain to a non-execute method :| -->
-        <action name="editP4!input" class="com.zutubi.pulse.web.project.EditP4Action" method="doInput">
-            <interceptor-ref name="crudStack"/>
-            <result name="input" type="velocity">edit-scm-p4.vm</result>
-        </action>
-
-        <action name="editP4" class="com.zutubi.pulse.web.project.EditP4Action">
-            <interceptor-ref name="crudStack"/>
-            <result name="input" type="velocity">edit-scm-p4.vm</result>
-            <result name="cancel" type="redirect">/configureProject.action?id=${projectId}</result>
-            <result name="success" type="redirect">/configureProject.action?id=${projectId}</result>
-        </action>
-
-        <action name="filterScm" class="com.zutubi.pulse.web.project.ManageScmFiltersAction">
-            <result name="success" type="velocity">edit-scm-filters.vm</result>
-            <result name="error" type="velocity">generic-error.vm</result>
-        </action>
-
-        <action name="addExcludedPath" class="com.zutubi.pulse.web.project.ManageScmFiltersAction" method="doAdd">
-            <result name="input" type="velocity">edit-scm-filters.vm</result>
-            <result name="success" type="velocity">edit-scm-filters.vm</result>
-            <result name="error" type="velocity">generic-error.vm</result>
-        </action>
-
-        <action name="deleteExcludedPath" class="com.zutubi.pulse.web.project.ManageScmFiltersAction" method="doDelete">
-            <result name="input" type="velocity">edit-scm-filters.vm</result>
-            <result name="success" type="velocity">edit-scm-filters.vm</result>
-            <result name="error" type="velocity">generic-error.vm</result>
-        </action>
-
         <action name="editPulseFileDetails" class="com.zutubi.pulse.web.project.EditPulseFileDetailsAction">
             <result name="custom" type="chain">editCustomDetails!input</result>
             <result name="versioned" type="chain">editVersionedDetails!input</result>
@@ -763,14 +700,6 @@
             <result name="success" type="redirect">/viewBuildSpecification.action?id=${specId}&amp;projectId=${projectId}</result>
         </action>
 
-        <action name="editBuildSpecification" class="com.zutubi.pulse.web.project.EditBuildSpecificationAction">
-            <interceptor-ref name="crudStack"/>
-            <result name="input" type="velocity">edit-build-specification.vm</result>
-            <result name="error" type="velocity">/generic-error.vm</result>
-            <result name="cancel" type="redirect">/viewBuildSpecification.action?id=${id}&amp;projectId=${projectId}</result>
-            <result name="success" type="redirect">/viewBuildSpecification.action?id=${id}&amp;projectId=${projectId}</result>
-        </action>
-
         <action name="setDefaultBuildSpecification" class="com.zutubi.pulse.web.project.SetDefaultBuildSpecificationAction">
             <result name="success" type="redirect">/configureProject.action?id=${projectId}</result>
             <result name="error" type="velocity">generic-error.vm</result>
@@ -786,18 +715,6 @@
             <result name="cancel" type="redirect">/viewBuildSpecification.action?id=${specId}&amp;projectId=${projectId}</result>
             <result name="error" type="velocity">/generic-error.vm</result>
             <result name="success" type="redirect">/viewBuildSpecification.action?id=${specId}&amp;projectId=${projectId}&amp;selectedNode=${id}</result>
-        </action>
-
-        <action name="editBuildSpecificationProperty" class="com.zutubi.pulse.web.project.EditPropertyAction">
-            <result name="input" type="velocity">edit-specification-property.vm</result>
-            <result name="cancel" type="redirect">/viewBuildSpecification.action?id=${specId}&amp;projectId=${projectId}</result>
-            <result name="error" type="velocity">/generic-error.vm</result>
-            <result name="success" type="redirect">/viewBuildSpecification.action?id=${specId}&amp;projectId=${projectId}&amp;selectedNode=${id}</result>
-        </action>
-
-        <action name="deleteBuildSpecificationProperty" class="com.zutubi.pulse.web.project.DeletePropertyAction">
-            <result name="error" type="velocity">/generic-error.vm</result>
-            <result name="success" type="redirect">/viewBuildSpecification.action?id=${specId}&amp;projectId=${projectId}</result>
         </action>
 
         <action name="createBuildStage" class="com.zutubi.pulse.web.project.CreateBuildStageAction">

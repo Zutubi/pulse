@@ -3,10 +3,8 @@ package com.zutubi.prototype.wizard.webwork;
 import com.zutubi.prototype.FieldDescriptor;
 import com.zutubi.prototype.FormDescriptor;
 import com.zutubi.prototype.FormDescriptorFactory;
-import com.zutubi.prototype.type.CompositeType;
-import com.zutubi.prototype.type.SimpleType;
-import com.zutubi.prototype.type.TypeProperty;
-import com.zutubi.prototype.type.TypeRegistry;
+import com.zutubi.prototype.config.ConfigurationPersistenceManager;
+import com.zutubi.prototype.type.*;
 import com.zutubi.prototype.type.record.MutableRecord;
 import com.zutubi.prototype.type.record.Record;
 import com.zutubi.prototype.type.record.TemplateRecord;
@@ -17,6 +15,7 @@ import com.zutubi.prototype.wizard.WizardState;
 import com.zutubi.prototype.wizard.WizardTransition;
 import static com.zutubi.prototype.wizard.WizardTransition.*;
 import com.zutubi.i18n.Messages;
+import com.zutubi.validation.XWorkValidationAdapter;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -30,6 +29,7 @@ import java.util.TreeMap;
 public abstract class AbstractTypeWizard implements Wizard
 {
     protected TypeRegistry typeRegistry;
+    protected ConfigurationPersistenceManager configurationPersistenceManager;
 
     protected WizardState currentState;
 
@@ -152,8 +152,9 @@ public abstract class AbstractTypeWizard implements Wizard
         this.typeRegistry = typeRegistry;
     }
 
-    public abstract static class TypeWizardState implements WizardState
+    public abstract class TypeWizardState implements WizardState
     {
+        @SuppressWarnings({"unchecked"})
         public void updateRecord(Map parameters)
         {
             Record post = PrototypeUtils.toRecord(getType(), parameters);
@@ -172,6 +173,11 @@ public abstract class AbstractTypeWizard implements Wizard
             return formDescriptorFactory.createDescriptor(path, getType());
         }
 
+        public boolean validate(String path, XWorkValidationAdapter validationCallback) throws TypeException
+        {
+            return configurationPersistenceManager.validate(path, null, currentState.getRecord(), validationCallback);
+        }
+
         public abstract CompositeType getType();
     }
 
@@ -179,7 +185,7 @@ public abstract class AbstractTypeWizard implements Wizard
      *
      *
      */
-    public static class SingleStepWizardState extends TypeWizardState
+    public class SingleStepWizardState extends TypeWizardState
     {
         /**
          * Every wizard state / form is represented by a type.
@@ -190,10 +196,6 @@ public abstract class AbstractTypeWizard implements Wizard
 
         private MutableRecord record = null;
 
-        /**
-         * @param type
-         * @param record
-         */
         public SingleStepWizardState(CompositeType type, TemplateRecord record)
         {
             this.type = type;
@@ -236,7 +238,7 @@ public abstract class AbstractTypeWizard implements Wizard
      * information.  In particular, types that define multiple extension points.  These types need two-step
      * wizards.
      */
-    public static class TwoStepWizardState
+    public class TwoStepWizardState
     {
         private TypeRegistry typeRegistry;
 
@@ -259,7 +261,7 @@ public abstract class AbstractTypeWizard implements Wizard
         /**
          * The first state will be a select field.
          *
-         * @return
+         * @return the first wizard state
          */
         public WizardState getFirstState()
         {
@@ -339,6 +341,11 @@ public abstract class AbstractTypeWizard implements Wizard
                 select.addParameter("list", type.getExtensions());
                 descriptor.add(select);
                 return descriptor;
+            }
+
+            public boolean validate(String path, XWorkValidationAdapter validationCallback) throws TypeException
+            {
+                return true;
             }
         }
 

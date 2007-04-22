@@ -23,7 +23,7 @@ import java.util.*;
 /**
  * The Cvs Server provides all interactions with a cvs repository.
  */
-public class CvsServer extends CachingSCMClient
+public class CvsServer extends CachingScmClient
 {
     private File tmpSpace;
 
@@ -101,7 +101,7 @@ public class CvsServer extends CachingSCMClient
     /**
      * Returns the unique identifier for this scm server. For CVS servers, this is the cvs root.
      *
-     * @see com.zutubi.pulse.scm.SCMClient#getUid()
+     * @see com.zutubi.pulse.scm.ScmClient#getUid()
      */
     public String getUid()
     {

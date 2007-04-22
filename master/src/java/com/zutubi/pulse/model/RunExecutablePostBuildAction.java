@@ -1,10 +1,12 @@
 package com.zutubi.pulse.model;
 
 import com.zutubi.pulse.MasterBuildPaths;
+import com.zutubi.pulse.prototype.config.ProjectConfiguration;
 import com.zutubi.pulse.bootstrap.MasterConfigurationManager;
 import com.zutubi.pulse.core.FileLoadException;
 import com.zutubi.pulse.core.Scope;
 import com.zutubi.pulse.core.VariableHelper;
+import com.zutubi.pulse.core.config.ResourceProperty;
 import com.zutubi.pulse.core.model.*;
 import com.zutubi.pulse.jni.ProcessControl;
 import com.zutubi.util.IOUtils;
@@ -32,7 +34,7 @@ public class RunExecutablePostBuildAction extends PostBuildAction
         this.arguments = arguments;
     }
 
-    protected void internalExecute(BuildResult build, RecipeResultNode recipe, List<ResourceProperty> properties)
+    protected void internalExecute(ProjectConfiguration projectConfig, BuildResult build, RecipeResultNode recipe, List<ResourceProperty> properties)
     {
         Process child = null;
         try

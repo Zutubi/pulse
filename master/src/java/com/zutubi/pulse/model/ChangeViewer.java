@@ -3,6 +3,7 @@ package com.zutubi.pulse.model;
 import com.zutubi.pulse.core.model.Revision;
 import com.zutubi.pulse.core.model.Entity;
 import com.zutubi.pulse.core.model.FileRevision;
+import com.zutubi.pulse.servercore.config.ScmConfiguration;
 
 /**
  * Represents an external SCM change viewing application, such as Fisheye or
@@ -18,7 +19,7 @@ public abstract class ChangeViewer extends Entity
         VIEW_FILE_DIFF,
     }
 
-    public abstract boolean hasCapability(Scm scm, Capability capability);
+    public abstract boolean hasCapability(ScmConfiguration scm, Capability capability);
 
     public abstract String getDetails();
 

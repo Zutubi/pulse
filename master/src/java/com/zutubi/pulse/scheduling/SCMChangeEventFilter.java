@@ -4,6 +4,7 @@ import com.zutubi.pulse.events.Event;
 import com.zutubi.pulse.scm.SCMChangeEvent;
 import com.zutubi.pulse.model.ProjectManager;
 import com.zutubi.pulse.model.Project;
+import com.zutubi.pulse.prototype.config.ProjectConfiguration;
 
 /**
  * A filter to ensure a trigger only fires for the SCM of the matching
@@ -17,7 +18,7 @@ public class SCMChangeEventFilter implements EventTriggerFilter
     {
         SCMChangeEvent changeEvent = (SCMChangeEvent) event;
         Project project = projectManager.getProject(trigger.getProject());
-        return project != null && changeEvent.getScm().getId() == project.getScm().getId();
+        return project != null && project.getName().equals(changeEvent.getSource().getName());
     }
 
     public boolean dependsOnProject(Trigger trigger, long projectId)

@@ -1,6 +1,6 @@
 package com.zutubi.pulse.vfs.pulse;
 
-import com.zutubi.pulse.model.Scm;
+import com.zutubi.pulse.servercore.config.ScmConfiguration;
 import org.apache.commons.vfs.FileName;
 import org.apache.commons.vfs.FileSystemException;
 import org.apache.commons.vfs.FileType;
@@ -34,11 +34,12 @@ public class SCMRootFileObject extends AbstractPulseFileObject implements SCMPro
         return new String[]{"scm"};
     }
 
-    public Scm getScm() throws FileSystemException
+    public ScmConfiguration getScm() throws FileSystemException
     {
         ProjectProvider projectProvider = getAncestor(ProjectProvider.class);
         if(projectProvider.getProjectId() == 0)
         {
+            // FIXME
 /*
             // Assume project setup
             Map session = ActionContext.getContext().getSession();
@@ -54,7 +55,7 @@ public class SCMRootFileObject extends AbstractPulseFileObject implements SCMPro
         }
         else
         {
-            return projectProvider.getProject().getScm();
+            return projectProvider.getProjectConfig().getScm();
         }
     }
 }

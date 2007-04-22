@@ -2,10 +2,9 @@ package com.zutubi.pulse.util;
 
 import com.opensymphony.util.TextUtils;
 import com.zutubi.pulse.jni.ProcessControl;
-import com.zutubi.util.logging.Logger;
-import com.zutubi.pulse.util.SystemUtils;
 import com.zutubi.util.IOUtils;
 import com.zutubi.util.StringUtils;
+import com.zutubi.util.logging.Logger;
 
 import java.io.*;
 import java.net.URLConnection;
@@ -822,9 +821,9 @@ public class FileSystemUtils
      *   File(s) -> Dir: copies files into existing dest dir, overwrites
      *                   existing dest, creates dest if necessary
      * 
-     * @param dest
-     * @param src
-     * @throws IOException
+     * @param dest destination to copy file(s) to
+     * @param src  source files to be copied
+     * @throws IOException on any error
      */
     public static void copy(File dest, File... src) throws IOException
     {

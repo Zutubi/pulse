@@ -1,6 +1,6 @@
 package com.zutubi.validation.validators;
 
-import com.zutubi.util.BeanUtils;
+import com.zutubi.util.bean.BeanUtils;
 import com.zutubi.util.bean.PropertyNotFoundException;
 import com.zutubi.validation.FieldValidator;
 import com.zutubi.validation.ValidationException;

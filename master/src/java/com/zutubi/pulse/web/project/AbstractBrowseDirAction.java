@@ -15,7 +15,7 @@ import java.util.List;
 /**
  * Helper base class for actions for browsing file systems.
  */
-public abstract class AbstractBrowseDirAction extends ProjectActionSupport
+public abstract class AbstractBrowseDirAction extends ProjectActionBase
 {
     private String path = "";
     private List<DirectoryEntry> entries;

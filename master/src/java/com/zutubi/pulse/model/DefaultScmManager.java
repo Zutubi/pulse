@@ -3,7 +3,6 @@ package com.zutubi.pulse.model;
 import com.zutubi.pulse.core.model.Revision;
 import com.zutubi.pulse.core.Stoppable;
 import com.zutubi.pulse.events.EventManager;
-import com.zutubi.pulse.model.persistence.ScmDao;
 import com.zutubi.pulse.scheduling.Scheduler;
 import com.zutubi.pulse.scheduling.SchedulingException;
 import com.zutubi.pulse.scheduling.SimpleTrigger;
@@ -11,12 +10,16 @@ import com.zutubi.pulse.scheduling.Trigger;
 import com.zutubi.pulse.scm.MonitorScms;
 import com.zutubi.pulse.scm.SCMChangeEvent;
 import com.zutubi.pulse.scm.SCMException;
-import com.zutubi.pulse.scm.SCMClient;
+import com.zutubi.pulse.scm.ScmClient;
 import com.zutubi.util.Constants;
+import com.zutubi.util.CollectionUtils;
+import com.zutubi.util.Predicate;
 import com.zutubi.pulse.util.Pair;
 import com.zutubi.util.logging.Logger;
 import com.zutubi.pulse.ShutdownManager;
+import com.zutubi.pulse.servercore.config.ScmConfiguration;
 import com.zutubi.pulse.prototype.config.admin.GeneralAdminConfiguration;
+import com.zutubi.pulse.prototype.config.ProjectConfiguration;
 import com.zutubi.prototype.config.ConfigurationProvider;
 
 import java.util.HashMap;
@@ -34,8 +37,7 @@ public class DefaultScmManager implements ScmManager, Stoppable
 {
     private static final Logger LOG = Logger.getLogger(DefaultScmManager.class);
 
-    private ScmDao scmDao = null;
-
+    private ProjectManager projectManager;
     private EventManager eventManager;
     private ShutdownManager shutdownManager;
 
@@ -54,10 +56,6 @@ public class DefaultScmManager implements ScmManager, Stoppable
     private static final int DEFAULT_POLL_THREAD_COUNT = 10;
     private static final String PROPERTY_POLLING_THREAD_COUNT = "scm.polling.thread.count";
 
-    public void setScmDao(ScmDao scmDao)
-    {
-        this.scmDao = scmDao;
-    }
 
     public void setScheduler(Scheduler scheduler)
     {
@@ -112,21 +110,27 @@ public class DefaultScmManager implements ScmManager, Stoppable
         shutdown();
     }
 
-    public List<Scm> getActiveScms()
+    private List<ProjectConfiguration> getActiveProjects()
     {
-        return scmDao.findAllActive();
+        return CollectionUtils.filter(projectManager.getAllProjectConfigs().values(), new Predicate<ProjectConfiguration>()
+        {
+            public boolean satisfied(ProjectConfiguration configuration)
+            {
+                return configuration.getScm().getMonitor();
+            }
+        });
     }
 
     public void pollActiveScms()
     {
-        for (final Scm scm : getActiveScms())
+        for (final ProjectConfiguration projectConfiguration: getActiveProjects())
         {
             executor.execute(new Runnable()
             {
                 public void run()
                 {
                     long start = System.currentTimeMillis();
-                    process(scm);
+                    process(projectConfiguration);
                     long end = System.currentTimeMillis();
                     LOG.debug("Scm polling took " + ((end - start)/Constants.SECOND) + " seconds.");
                 }
@@ -147,60 +151,62 @@ public class DefaultScmManager implements ScmManager, Stoppable
         }
     }
 
-    private void process(Scm scm)
+    private void process(ProjectConfiguration projectConfig)
     {
+        ScmConfiguration scm = projectConfig.getScm();
+        Project project = projectManager.getProject(projectConfig.getProjectId());
+
         try
         {
             long now = System.currentTimeMillis();
-            if (!checkPollingInterval(scm, now))
+            if (!checkPollingInterval(project, scm, now))
             {
                 // do not poll the scm just yet.
                 return;
             }
 
             // set the poll time.
-            scm.setLastPollTime(now);
-            save(scm);
+            project.setLastPollTime(now);
+            projectManager.save(project);
 
             // when was the last time that we checked? if never, get the latest revision.
-            SCMClient client = scm.createServer();
-            if (!latestRevisions.containsKey(scm.getId()))
+            ScmClient client = scm.createClient();
+            if (!latestRevisions.containsKey(project.getId()))
             {
-                latestRevisions.put(scm.getId(), client.getLatestRevision());
+                latestRevisions.put(project.getId(), client.getLatestRevision());
                 return;
             }
 
-            Revision previous = latestRevisions.get(scm.getId());
+            Revision previous = latestRevisions.get(project.getId());
             
             // slightly paranoid, but we can not rely on the scm implementations to behave as expected.
             if (previous == null)
             {
-                latestRevisions.put(scm.getId(), client.getLatestRevision());
+                latestRevisions.put(project.getId(), client.getLatestRevision());
                 return;
             }
 
             // We need to move this CVS specific code into the cvs implementation specific code.
-            if (scm instanceof Cvs)
+            if (scm.isQuietPeriodEnabled())
             {
-                Cvs cvs = (Cvs) scm;
                 // are we waiting
-                if (waiting.containsKey(scm.getId()))
+                if (waiting.containsKey(project.getId()))
                 {
-                    long quietTime = waiting.get(scm.getId()).first;
+                    long quietTime = waiting.get(project.getId()).first;
                     if (quietTime < System.currentTimeMillis())
                     {
-                        Revision lastChange = waiting.get(scm.getId()).second;
+                        Revision lastChange = waiting.get(project.getId()).second;
                         Revision latest = getLatestRevisionSince(lastChange, client);
                         if (latest != null)
                         {
                             // there has been a commit during the 'quiet period', lets reset the timer.
-                            waiting.put(scm.getId(), new Pair<Long, Revision>(System.currentTimeMillis() + cvs.getQuietPeriod(), latest));
+                            waiting.put(project.getId(), new Pair<Long, Revision>(System.currentTimeMillis() + scm.getQuietPeriod() * Constants.MINUTE, latest));
                         }
                         else
                         {
                             // there have been no commits during the 'quiet period', trigger a change.
-                            sendScmChangeEvent(scm, lastChange, previous);
-                            waiting.remove(scm.getId());
+                            sendScmChangeEvent(projectConfig, lastChange, previous);
+                            waiting.remove(project.getId());
                         }
                     }
                 }
@@ -209,13 +215,13 @@ public class DefaultScmManager implements ScmManager, Stoppable
                     Revision latest = getLatestRevisionSince(previous, client);
                     if (latest != null)
                     {
-                        if (cvs.getQuietPeriod() != 0)
+                        if (scm.getQuietPeriod() != 0)
                         {
-                            waiting.put(scm.getId(), new Pair<Long, Revision>(System.currentTimeMillis() + cvs.getQuietPeriod(), latest));
+                            waiting.put(project.getId(), new Pair<Long, Revision>(System.currentTimeMillis() + scm.getQuietPeriod() * Constants.MINUTE, latest));
                         }
                         else
                         {
-                            sendScmChangeEvent(scm, latest, previous);
+                            sendScmChangeEvent(projectConfig, latest, previous);
                         }
                     }
                 }
@@ -225,7 +231,7 @@ public class DefaultScmManager implements ScmManager, Stoppable
                 Revision latest = getLatestRevisionSince(previous, client);
                 if (latest != null)
                 {
-                    sendScmChangeEvent(scm, latest, previous);
+                    sendScmChangeEvent(projectConfig, latest, previous);
                 }
             }
         }
@@ -239,7 +245,7 @@ public class DefaultScmManager implements ScmManager, Stoppable
         }
     }
 
-    private Revision getLatestRevisionSince(Revision revision, SCMClient client) throws SCMException
+    private Revision getLatestRevisionSince(Revision revision, ScmClient client) throws SCMException
     {
         List<Revision> revisions = client.getRevisionsSince(revision);
         if (revisions.size() > 0)
@@ -250,26 +256,26 @@ public class DefaultScmManager implements ScmManager, Stoppable
         return null;
     }
 
-    private void sendScmChangeEvent(Scm scm, Revision latest, Revision previous)
+    private void sendScmChangeEvent(ProjectConfiguration projectConfig, Revision latest, Revision previous)
     {
-        LOG.finer("publishing scm change event for " + scm + " revision " + latest);
-        eventManager.publish(new SCMChangeEvent(scm, latest, previous));
-        latestRevisions.put(scm.getId(), latest);
+        LOG.finer("publishing scm change event for " + projectConfig.getName() + " revision " + latest);
+        eventManager.publish(new SCMChangeEvent(projectConfig, latest, previous));
+        latestRevisions.put(projectConfig.getProjectId(), latest);
     }
 
-    private boolean checkPollingInterval(Scm scm, long now)
+    private boolean checkPollingInterval(Project project, ScmConfiguration scm, long now)
     {
         // A) is it time to poll this scm server?
-        if (scm.getLastPollTime() != null)
+        if (project.getLastPollTime() != null)
         {
             // poll interval.
             int pollingInterval = getDefaultPollingInterval();
-            if (scm.getPollingInterval() != null)
+            if (scm.isCustomPollingInterval())
             {
                 pollingInterval = scm.getPollingInterval();
             }
 
-            long lastPollTime = scm.getLastPollTime();
+            long lastPollTime = project.getLastPollTime();
             long nextPollTime = lastPollTime + Constants.MINUTE * pollingInterval;
 
             if (now < nextPollTime)
@@ -278,22 +284,6 @@ public class DefaultScmManager implements ScmManager, Stoppable
             }
         }
         return true;
-    }
-
-
-    public void save(Scm entity)
-    {
-        scmDao.save(entity);
-    }
-
-    public void delete(Scm entity)
-    {
-        scmDao.delete(entity);
-    }
-
-    public Scm getScm(long id)
-    {
-        return scmDao.findById(id);
     }
 
     public int getDefaultPollingInterval()
@@ -324,5 +314,10 @@ public class DefaultScmManager implements ScmManager, Stoppable
     public void setConfigurationProvider(ConfigurationProvider configurationProvider)
     {
         this.configurationProvider = configurationProvider;
+    }
+
+    public void setProjectManager(ProjectManager projectManager)
+    {
+        this.projectManager = projectManager;
     }
 }

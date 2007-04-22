@@ -3,6 +3,7 @@ package com.zutubi.pulse.model;
 import com.zutubi.pulse.core.model.CvsRevision;
 import com.zutubi.pulse.core.model.FileRevision;
 import com.zutubi.pulse.core.model.Revision;
+import com.zutubi.pulse.servercore.config.ScmConfiguration;
 import com.zutubi.util.StringUtils;
 
 /**
@@ -20,7 +21,7 @@ public class ViewVCChangeViewer extends BasePathChangeViewer
         super(baseURL, projectPath);
     }
 
-    public boolean hasCapability(Scm scm, Capability capability)
+    public boolean hasCapability(ScmConfiguration scm, Capability capability)
     {
         if(capability.equals(Capability.VIEW_CHANGESET) && scm.getType().equals("cvs"))
         {

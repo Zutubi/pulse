@@ -1,12 +1,12 @@
 package com.zutubi.pulse;
 
 import com.zutubi.pulse.core.*;
+import com.zutubi.pulse.core.config.ResourceProperty;
 import com.zutubi.pulse.core.model.Change;
-import com.zutubi.pulse.core.model.ResourceProperty;
-import com.zutubi.pulse.model.Scm;
 import com.zutubi.pulse.scm.SCMCancelledException;
 import com.zutubi.pulse.scm.SCMCheckoutEventHandler;
-import com.zutubi.pulse.scm.SCMClient;
+import com.zutubi.pulse.scm.ScmClient;
+import com.zutubi.pulse.servercore.config.ScmConfiguration;
 import com.zutubi.util.ForkOutputStream;
 import com.zutubi.util.IOUtils;
 import com.zutubi.util.logging.Logger;
@@ -24,12 +24,12 @@ public abstract class ScmBootstrapper implements Bootstrapper, SCMCheckoutEventH
     protected String agent;
     protected String project;
     protected String spec;
-    protected Scm scm;
+    protected ScmConfiguration scm;
     protected BuildRevision revision;
     protected boolean terminated = false;
     protected transient PrintWriter outputWriter;
 
-    public ScmBootstrapper(String project, String spec, Scm scm, BuildRevision revision)
+    public ScmBootstrapper(String project, String spec, ScmConfiguration scm, BuildRevision revision)
     {
         this.project = project;
         this.spec = spec;
@@ -44,23 +44,13 @@ public abstract class ScmBootstrapper implements Bootstrapper, SCMCheckoutEventH
 
     public void bootstrap(CommandContext context)
     {
-        File workDir;
-
-        if (scm.getPath() != null)
-        {
-            workDir = new File(context.getPaths().getBaseDir(), scm.getPath());
-        }
-        else
-        {
-            workDir = context.getPaths().getBaseDir();
-        }
-
+        File workDir = context.getPaths().getBaseDir();
         File outDir = new File(context.getOutputDir(), BootstrapCommand.OUTPUT_NAME);
         outDir.mkdirs();
 
-        OutputStream out = null;
-        FileOutputStream fout = null;
-        SCMClient client = null;
+        OutputStream out;
+        FileOutputStream fout;
+        ScmClient client = null;
 
         try
         {
@@ -137,5 +127,5 @@ public abstract class ScmBootstrapper implements Bootstrapper, SCMCheckoutEventH
         terminated = true;
     }
 
-    abstract SCMClient bootstrap(File workDir);
+    abstract ScmClient bootstrap(File workDir);
 }

@@ -2,6 +2,7 @@ package com.zutubi.pulse.model;
 
 import com.zutubi.pulse.core.model.Revision;
 import com.zutubi.pulse.personal.PatchArchive;
+import com.zutubi.pulse.prototype.config.ProjectConfiguration;
 
 import java.util.Properties;
 
@@ -41,7 +42,7 @@ public class CustomPulseFileDetails extends PulseFileDetails
         return new Properties();
     }
 
-    public String getPulseFile(long id, Project project, Revision revision, PatchArchive patch)
+    public String getPulseFile(long id, ProjectConfiguration projectConfig, Project project, Revision revision, PatchArchive patch)
     {
         return getPulseFile();
     }

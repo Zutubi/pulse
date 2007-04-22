@@ -1,6 +1,6 @@
 package com.zutubi.pulse.web.admin;
 
-import com.zutubi.pulse.core.model.ResourceProperty;
+import com.zutubi.pulse.core.config.ResourceProperty;
 
 /**
  * <class-comment/>

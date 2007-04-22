@@ -29,17 +29,6 @@ public class ConfigurationRegistry
             CompositeType setupConfig = registerConfigurationType(SetupConfiguration.class);
             configurationPersistenceManager.register("setup", setupConfig);
 
-            // scm configuration
-            CompositeType scmConfig = registerConfigurationType("scmConfig", ScmConfiguration.class);
-            registerConfigurationType("svnConfig", SvnConfiguration.class);
-            registerConfigurationType("cvsConfig", CvsConfiguration.class);
-            registerConfigurationType("perforceConfig", PerforceConfiguration.class);
-
-            // sort out the extensions.
-            scmConfig.addExtension("svnConfig");
-            scmConfig.addExtension("cvsConfig");
-            scmConfig.addExtension("perforceConfig");
-
             CompositeType typeConfig = registerConfigurationType("typeConfig", ProjectTypeConfiguration.class);
             registerConfigurationType("antConfig", AntTypeConfiguration.class);
             registerConfigurationType("mavenConfig", MavenTypeConfiguration.class);
@@ -79,6 +68,17 @@ public class ConfigurationRegistry
             projectConfig.addProperty(new TypeProperty("type", typeRegistry.getType("typeConfig")));
             projectConfig.addProperty(new TypeProperty("cleanup", typeRegistry.getType("cleanupRuleConfig")));
             projectConfig.addProperty(new TypeProperty("changeViewer", typeRegistry.getType("changeViewerConfig")));
+
+            // scm configuration
+            CompositeType scmConfig = typeRegistry.getType("scmConfig");
+            registerConfigurationType("svnConfig", SvnConfiguration.class);
+            registerConfigurationType("cvsConfig", CvsConfiguration.class);
+            registerConfigurationType("perforceConfig", PerforceConfiguration.class);
+
+            // sort out the extensions.
+            scmConfig.addExtension("svnConfig");
+            scmConfig.addExtension("cvsConfig");
+            scmConfig.addExtension("perforceConfig");
 
             // Triggers
             CompositeType triggerConfig = registerConfigurationType("triggerConfig", TriggerConfiguration.class);

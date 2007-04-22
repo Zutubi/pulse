@@ -2,6 +2,7 @@ package com.zutubi.pulse.core;
 
 import com.zutubi.pulse.BuildContext;
 import com.zutubi.pulse.core.model.*;
+import com.zutubi.pulse.core.config.ResourceProperty;
 import com.zutubi.pulse.util.FileSystemUtils;
 import com.zutubi.util.IOUtils;
 import com.zutubi.pulse.util.SystemUtils;

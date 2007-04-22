@@ -2,8 +2,7 @@ package com.zutubi.pulse.prototype.config.admin;
 
 import com.zutubi.validation.annotations.Required;
 import com.zutubi.prototype.ConfigurationCheckHandler;
-import com.zutubi.pulse.prototype.record.SymbolicName;
-import com.zutubi.pulse.security.ldap.AcegiLdapManager;
+import com.zutubi.config.annotations.SymbolicName;
 import com.zutubi.pulse.security.ldap.LdapManager;
 
 /**

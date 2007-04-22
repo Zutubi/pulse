@@ -1,10 +1,10 @@
 package com.zutubi.pulse.prototype.config;
 
-import com.zutubi.config.annotations.ConfigurationCheck;
-import com.zutubi.config.annotations.Form;
-import com.zutubi.config.annotations.Password;
-import com.zutubi.config.annotations.Text;
+import com.zutubi.config.annotations.*;
 import com.zutubi.pulse.validation.annotation.CvsRoot;
+import com.zutubi.pulse.scm.ScmClient;
+import com.zutubi.pulse.scm.SCMException;
+import com.zutubi.pulse.servercore.config.ScmConfiguration;
 import com.zutubi.validation.annotations.Required;
 
 /**
@@ -23,7 +23,6 @@ public class CvsConfiguration extends ScmConfiguration
     @Password
     private String password;
     private String branch;
-    private Integer quietPeriod;
 
     public String getRoot()
     {
@@ -65,13 +64,14 @@ public class CvsConfiguration extends ScmConfiguration
         this.module = module;
     }
 
-    public Integer getQuietPeriod()
+    public String getType()
     {
-        return quietPeriod;
+        return "cvs";
     }
 
-    public void setQuietPeriod(Integer quietPeriod)
+    public ScmClient createClient() throws SCMException
     {
-        this.quietPeriod = quietPeriod;
+        // FIXME
+        throw new RuntimeException("Method not yet implemented.");
     }
 }

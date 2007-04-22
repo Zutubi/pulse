@@ -7,26 +7,15 @@ import com.zutubi.pulse.model.CustomPulseFileDetails;
 import com.zutubi.pulse.model.Project;
 import com.zutubi.pulse.model.PulseFileDetails;
 import com.zutubi.pulse.util.XMLUtils;
+import com.zutubi.pulse.prototype.config.ProjectConfiguration;
 
 /**
  */
-public class ConvertToCustomProjectAction extends ProjectActionSupport
+public class ConvertToCustomProjectAction extends ProjectActionBase
 {
-    private long id;
     private CustomPulseFileDetails details = new CustomPulseFileDetails();
     private CustomDetailsHelper detailsHelper;
-    private Project project;
     private ResourceRepository resourceRepository;
-
-    public long getId()
-    {
-        return id;
-    }
-
-    public void setId(long id)
-    {
-        this.id = id;
-    }
 
     public CustomPulseFileDetails getDetails()
     {
@@ -38,22 +27,13 @@ public class ConvertToCustomProjectAction extends ProjectActionSupport
         return detailsHelper;
     }
 
-    public Project getProject()
-    {
-        return project;
-    }
-
     public String doInput()
     {
-        project = lookupProject(id);
-        if(hasErrors())
-        {
-            return ERROR;
-        }
-
+        Project project = getProject();
+        ProjectConfiguration projectConfig = getProjectConfig();
         PulseFileDetails pulseFileDetails = project.getPulseFileDetails();
         ComponentContext.autowire(pulseFileDetails);
-        String pulseFile = pulseFileDetails.getPulseFile(0, project, null, null);
+        String pulseFile = pulseFileDetails.getPulseFile(0, projectConfig, project, null, null);
         details.setPulseFile(XMLUtils.prettyPrint(pulseFile));
 
         return INPUT;
@@ -61,17 +41,12 @@ public class ConvertToCustomProjectAction extends ProjectActionSupport
 
     public void validate()
     {
-        project = lookupProject(id);
-        if(hasErrors())
-        {
-            return;
-        }
-
         detailsHelper.validate(this, details.getPulseFile(), resourceRepository);
     }
 
     public String execute()
     {
+        Project project = getProject();
         project.setPulseFileDetails(details);
         getProjectManager().save(project);
 

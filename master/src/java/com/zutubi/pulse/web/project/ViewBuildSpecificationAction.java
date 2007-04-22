@@ -1,10 +1,9 @@
 package com.zutubi.pulse.web.project;
 
 import com.zutubi.pulse.model.BuildSpecification;
-import com.zutubi.pulse.model.Project;
 import com.zutubi.pulse.model.NamedEntityComparator;
-import com.zutubi.pulse.model.persistence.BuildSpecificationDao;
-import com.zutubi.pulse.core.model.ResourceProperty;
+import com.zutubi.pulse.core.config.ResourceProperty;
+import com.zutubi.pulse.core.config.NamedConfigurationComparator;
 
 import java.util.List;
 import java.util.ArrayList;
@@ -17,7 +16,6 @@ public class ViewBuildSpecificationAction extends ProjectActionSupport
     private BuildSpecification specification;
     private long id;
     private long selectedNode;
-    private List<ResourceProperty> properties;
 
     public BuildSpecification getSpecification()
     {
@@ -54,11 +52,6 @@ public class ViewBuildSpecificationAction extends ProjectActionSupport
         return selectedNode != 0L && selectedNode != specification.getRoot().getId();
     }
 
-    public List<ResourceProperty> getProperties()
-    {
-        return properties;
-    }
-
     public String execute()
     {
         lookupProject(projectId);
@@ -73,9 +66,6 @@ public class ViewBuildSpecificationAction extends ProjectActionSupport
             addActionError("Unknown build specification [" + id + "]");
             return ERROR;
         }
-
-        properties = new ArrayList<ResourceProperty>(specification.getProperties());
-        Collections.sort(properties, new NamedEntityComparator());
 
         return SUCCESS;
     }

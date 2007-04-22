@@ -5,7 +5,7 @@ import com.zutubi.pulse.bootstrap.ComponentContext;
 import com.zutubi.pulse.bootstrap.ConfigurationManager;
 import com.zutubi.pulse.scm.SCMConfiguration;
 import com.zutubi.pulse.scm.SCMException;
-import com.zutubi.pulse.scm.SCMClient;
+import com.zutubi.pulse.scm.ScmClient;
 import com.zutubi.pulse.scm.cvs.CvsServer;
 import com.zutubi.util.Constants;
 
@@ -42,7 +42,7 @@ public class Cvs extends Scm
 
     private static final String BRANCH = "cvs.branch";
 
-    public SCMClient createServer() throws SCMException
+    public ScmClient createServer() throws SCMException
     {
         // use a manual autowire here since this object itself is not wired, and so
         // does not have access to the object factory.

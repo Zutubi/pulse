@@ -2,7 +2,7 @@ package com.zutubi.pulse.model;
 
 import com.zutubi.pulse.core.model.Entity;
 import com.zutubi.pulse.core.model.PersistentName;
-import com.zutubi.pulse.core.model.ResourceProperty;
+import com.zutubi.pulse.core.config.ResourceProperty;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -218,19 +218,6 @@ public class BuildSpecification extends Entity implements NamedEntity
         this.properties = properties;
     }
 
-    public ResourceProperty getProperty(long id)
-    {
-        for(ResourceProperty p: properties)
-        {
-            if(p.getId() == id)
-            {
-                return p;
-            }
-        }
-
-        return null;
-    }
-
     public ResourceProperty getProperty(String name)
     {
         for(ResourceProperty p: properties)
@@ -247,19 +234,6 @@ public class BuildSpecification extends Entity implements NamedEntity
     public boolean hasProperty(String name)
     {
         return getProperty(name) != null;
-    }
-
-    public void removeProperty(long id)
-    {
-        Iterator<ResourceProperty> it = properties.iterator();
-        while(it.hasNext())
-        {
-            if(it.next().getId() == id)
-            {
-                it.remove();
-                return;
-            }
-        }
     }
 
     public void addProperty(ResourceProperty property)

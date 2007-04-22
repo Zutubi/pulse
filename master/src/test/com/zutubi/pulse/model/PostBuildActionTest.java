@@ -1,9 +1,10 @@
 package com.zutubi.pulse.model;
 
 import com.zutubi.pulse.core.model.Feature;
-import com.zutubi.pulse.core.model.ResourceProperty;
+import com.zutubi.pulse.core.config.ResourceProperty;
 import com.zutubi.pulse.core.model.ResultState;
 import com.zutubi.pulse.test.PulseTestCase;
+import com.zutubi.pulse.prototype.config.ProjectConfiguration;
 
 import java.util.Arrays;
 import java.util.LinkedList;
@@ -25,7 +26,7 @@ public class PostBuildActionTest extends PulseTestCase
     public void testRestrictedToSpec()
     {
         BuildSpecification spec = new BuildSpecification("test");
-        action.setSpecifications(Arrays.asList(new BuildSpecification[] { spec }));
+        action.setSpecifications(Arrays.asList(spec));
         testResult("diff");
         assertFalse(executed);
         testResult("test");
@@ -34,7 +35,7 @@ public class PostBuildActionTest extends PulseTestCase
 
     public void testRestrictedToState()
     {
-        action.setStates(Arrays.asList(new ResultState[] {ResultState.FAILURE}));
+        action.setStates(Arrays.asList(ResultState.FAILURE));
         testResult(ResultState.ERROR);
         assertFalse(executed);
         testResult(ResultState.FAILURE);
@@ -60,7 +61,7 @@ public class PostBuildActionTest extends PulseTestCase
     private BuildResult testResult(String spec)
     {
         BuildResult result = new BuildResult(new UnknownBuildReason(), null, new BuildSpecification(spec), 1, false);
-        action.execute(result, null, new LinkedList<ResourceProperty>());
+        action.execute(null, result, null, new LinkedList<ResourceProperty>());
         return result;
     }
 
@@ -68,7 +69,7 @@ public class PostBuildActionTest extends PulseTestCase
     {
         BuildResult result = new BuildResult(new UnknownBuildReason(), null, new BuildSpecification("foo"), 1, false);
         result.setState(state);
-        action.execute(result, null, new LinkedList<ResourceProperty>());
+        action.execute(null, result, null, new LinkedList<ResourceProperty>());
         return result;
     }
 
@@ -81,7 +82,7 @@ public class PostBuildActionTest extends PulseTestCase
             setName("mock");
         }
 
-        protected void internalExecute(BuildResult result, RecipeResultNode recipe, List<ResourceProperty> properties)
+        protected void internalExecute(ProjectConfiguration projectConfig, BuildResult result, RecipeResultNode recipe, List<ResourceProperty> properties)
         {
             executed = true;
             if(error != null)

@@ -4,6 +4,7 @@ import com.zutubi.pulse.core.BuildRevision;
 import com.zutubi.pulse.core.model.Entity;
 import com.zutubi.pulse.model.*;
 import com.zutubi.pulse.personal.PatchArchive;
+import com.zutubi.pulse.prototype.config.ProjectConfiguration;
 
 /**
  */
@@ -13,9 +14,9 @@ public class PersonalBuildRequestEvent extends AbstractBuildRequestEvent
     private User user;
     private PatchArchive patch;
 
-    public PersonalBuildRequestEvent(Object source, long number, BuildRevision revision, User user, PatchArchive patch, Project project, BuildSpecification specification)
+    public PersonalBuildRequestEvent(Object source, long number, BuildRevision revision, User user, PatchArchive patch, ProjectConfiguration projectConfig, Project project, BuildSpecification specification)
     {
-        super(source, revision, project, specification);
+        super(source, revision, projectConfig, project, specification);
         this.number = number;
         this.user = user;
         this.patch = patch;

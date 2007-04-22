@@ -53,50 +53,51 @@ public class BuildSpecificationActionSupport extends ProjectActionSupport
     protected void populateRecipes()
     {
         recipes.add("");
-        final List<String> pulseFileRecipes = new LinkedList<String>();
-        final Semaphore doneSemaphore = new Semaphore(0);
-
-        Thread populator = new Thread(new Runnable()
-        {
-            public void run()
-            {
-                PulseFileLoader fileLoader = fileLoaderFactory.createLoader();
-
-                try
-                {
-                    PulseFileDetails details = getProject().getPulseFileDetails();
-                    ComponentContext.autowire(details);
-                    String pulseFile = details.getPulseFile(0, project, null, null);
-
-                    PulseFile file = new PulseFile();
-                    fileLoader.load(new ByteArrayInputStream(pulseFile.getBytes()), file, null, resourceRepository, new RecipeListingPredicate());
-                    for(Recipe r: file.getRecipes())
-                    {
-                        pulseFileRecipes.add(r.getName());
-                    }
-                }
-                catch(Exception e)
-                {
-                    // Ignore...we just don't show recipes
-                    LOG.warning("Unable to load pulse file for project '" + project.getName() + "': " + e.getClass().getSimpleName() + ": " + e.getMessage());
-                }
-
-                doneSemaphore.release();
-            }
-        });
-        populator.run();
-
-        try
-        {
-            if(doneSemaphore.tryAcquire(10, TimeUnit.SECONDS))
-            {
-                recipes.addAll(pulseFileRecipes);
-            }
-        }
-        catch (InterruptedException e)
-        {
-            LOG.warning(e);
-        }
+        // FIXME this will be an option provider elsewhere
+//        final List<String> pulseFileRecipes = new LinkedList<String>();
+//        final Semaphore doneSemaphore = new Semaphore(0);
+//
+//        Thread populator = new Thread(new Runnable()
+//        {
+//            public void run()
+//            {
+//                PulseFileLoader fileLoader = fileLoaderFactory.createLoader();
+//
+//                try
+//                {
+//                    PulseFileDetails details = getProject().getPulseFileDetails();
+//                    ComponentContext.autowire(details);
+//                    String pulseFile = details.getPulseFile(0, project, null, null);
+//
+//                    PulseFile file = new PulseFile();
+//                    fileLoader.load(new ByteArrayInputStream(pulseFile.getBytes()), file, null, resourceRepository, new RecipeListingPredicate());
+//                    for(Recipe r: file.getRecipes())
+//                    {
+//                        pulseFileRecipes.add(r.getName());
+//                    }
+//                }
+//                catch(Exception e)
+//                {
+//                    // Ignore...we just don't show recipes
+//                    LOG.warning("Unable to load pulse file for project '" + project.getName() + "': " + e.getClass().getSimpleName() + ": " + e.getMessage());
+//                }
+//
+//                doneSemaphore.release();
+//            }
+//        });
+//        populator.run();
+//
+//        try
+//        {
+//            if(doneSemaphore.tryAcquire(10, TimeUnit.SECONDS))
+//            {
+//                recipes.addAll(pulseFileRecipes);
+//            }
+//        }
+//        catch (InterruptedException e)
+//        {
+//            LOG.warning(e);
+//        }
     }
 
     public BuildStage getStage()

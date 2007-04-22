@@ -1,7 +1,6 @@
 package com.zutubi.pulse.web.project;
 
-import com.zutubi.pulse.model.Project;
-import com.zutubi.pulse.model.Scm;
+import com.zutubi.pulse.servercore.config.ScmConfiguration;
 
 import java.util.Map;
 
@@ -30,17 +29,10 @@ public class ViewScmInfoAction extends AbstractBrowseDirAction
 
     public String execute()
     {
-        Project project = lookupProject(id);
-        if (project == null)
-        {
-            addActionError("Unknown project [" + project + "]");
-            return ERROR;
-        }
-
         try
         {
-            Scm scm = project.getScm();
-            info = scm.createServer().getServerInfo();
+            ScmConfiguration scm = getProjectConfig().getScm();
+            info = scm.createClient().getServerInfo();
 
             return SUCCESS;
         }

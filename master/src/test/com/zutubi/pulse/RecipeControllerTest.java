@@ -5,12 +5,14 @@ import com.zutubi.pulse.agent.Status;
 import com.zutubi.pulse.core.Bootstrapper;
 import com.zutubi.pulse.core.BuildRevision;
 import com.zutubi.pulse.core.RecipeRequest;
+import com.zutubi.pulse.core.config.ResourceProperty;
 import com.zutubi.pulse.core.model.*;
 import com.zutubi.pulse.events.build.*;
 import com.zutubi.pulse.logging.CustomLogRecord;
 import com.zutubi.pulse.model.*;
 import com.zutubi.pulse.test.PulseTestCase;
 import com.zutubi.pulse.util.FileSystemUtils;
+import com.zutubi.pulse.prototype.config.SvnConfiguration;
 
 import java.io.File;
 import java.util.*;
@@ -21,46 +23,41 @@ public class RecipeControllerTest extends PulseTestCase
 {
     private File recipeDir;
 
-    private MockRecipeResultCollector resultCollector;
     private MockRecipeQueue recipeQueue;
     private MockBuildManager buildManager;
     private MockBuildService buildService;
 
     private RecipeResult rootResult;
     private RecipeResultNode rootNode;
-    private RecipeResult childResult;
-    private RecipeResultNode childNode;
     private RecipeDispatchRequest dispatchRequest;
-    private RecipeRequest recipeRequest;
     private RecipeController recipeController;
-    private RecipeLogger logger;
 
     protected void setUp() throws Exception
     {
         super.setUp();
         recipeDir = FileSystemUtils.createTempDir(RecipeControllerTest.class.getName(), "");
 
-        resultCollector = new MockRecipeResultCollector();
+        MockRecipeResultCollector resultCollector = new MockRecipeResultCollector();
         recipeQueue = new MockRecipeQueue();
         buildManager = new MockBuildManager();
         buildService = new MockBuildService();
-        logger = new MockRecipeLogger();
+        RecipeLogger logger = new MockRecipeLogger();
 
         rootResult = new RecipeResult("root recipe");
         rootResult.setId(100);
         rootNode = new RecipeResultNode(new PersistentName("root stage"), rootResult);
         rootNode.setId(101);
-        childResult = new RecipeResult("child recipe");
+        RecipeResult childResult = new RecipeResult("child recipe");
         childResult.setId(102);
-        childNode = new RecipeResultNode(new PersistentName("child stage"), childResult);
+        RecipeResultNode childNode = new RecipeResultNode(new PersistentName("child stage"), childResult);
         childNode.setId(103);
         rootNode.addChild(childNode);
 
-        recipeRequest = new RecipeRequest("project", "spec", rootResult.getId(), rootResult.getRecipeName(), false);
+        RecipeRequest recipeRequest = new RecipeRequest("project", "spec", rootResult.getId(), rootResult.getRecipeName(), false);
         BuildResult build = new BuildResult();
         BuildSpecificationNode specificationNode = new BuildSpecificationNode();
-        dispatchRequest = new RecipeDispatchRequest(new MasterBuildHostRequirements(), new BuildRevision(), recipeRequest, null);
-        recipeController = new RecipeController(build, specificationNode, rootNode, dispatchRequest, new LinkedList<ResourceProperty>(), false, false, null, logger, resultCollector, recipeQueue, buildManager, null);
+        dispatchRequest = new RecipeDispatchRequest(new MasterBuildHostRequirements(), new BuildRevision(), recipeRequest, null, null);
+        recipeController = new RecipeController(null, build, specificationNode, rootNode, dispatchRequest, new LinkedList<ResourceProperty>(), false, false, null, logger, resultCollector, recipeQueue, buildManager, null);
     }
 
     protected void tearDown() throws Exception
@@ -77,7 +74,7 @@ public class RecipeControllerTest extends PulseTestCase
     public void testDispatchRequest()
     {
         // Initialising should cause a dispatch request, and should initialise the bootstrapper
-        Bootstrapper bootstrapper = new CheckoutBootstrapper("project", "spec", new Svn(), new BuildRevision(), false);
+        Bootstrapper bootstrapper = new CheckoutBootstrapper("project", "spec", new SvnConfiguration(), new BuildRevision(), false);
         recipeController.initialise(bootstrapper);
         assertTrue(recipeQueue.hasDispatched(rootResult.getId()));
         RecipeDispatchRequest dispatched = recipeQueue.getRequest(rootResult.getId());

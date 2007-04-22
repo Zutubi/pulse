@@ -7,6 +7,7 @@ import com.zutubi.pulse.core.VariableHelper;
 import com.zutubi.pulse.core.model.FileRevision;
 import com.zutubi.pulse.core.model.Property;
 import com.zutubi.pulse.core.model.Revision;
+import com.zutubi.pulse.servercore.config.ScmConfiguration;
 import com.zutubi.util.StringUtils;
 
 import java.text.SimpleDateFormat;
@@ -95,7 +96,7 @@ public class CustomChangeViewer extends ChangeViewer
         this.fileDiffURL = fileDiffURL;
     }
 
-    public boolean hasCapability(Scm scm, Capability capability)
+    public boolean hasCapability(ScmConfiguration scm, Capability capability)
     {
         switch(capability)
         {

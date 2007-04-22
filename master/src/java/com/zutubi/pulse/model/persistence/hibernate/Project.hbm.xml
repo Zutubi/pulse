@@ -41,8 +41,6 @@
             <one-to-many class="com.zutubi.pulse.model.CleanupRule"/>
         </bag>
 
-        <many-to-one name="scm" class="com.zutubi.pulse.model.Scm" column="SCM" cascade="all" lazy="false"/>
-
         <many-to-one name="changeViewer" class="com.zutubi.pulse.model.ChangeViewer" column="CHANGE_VIEWER" cascade="all" lazy="false"/>
 
         <bag name="aclEntries" inverse="true" cascade="all,delete-orphan" lazy="false">
@@ -290,16 +288,6 @@
     <query name="findByName" cacheable="true"><![CDATA[
         from Project project
         where project.name = :name
-    ]]></query>
-
-    <query name="findByScm"><![CDATA[
-        from Project project
-        where project.scm = :scm
-    ]]></query>
-
-    <query name="findByScmId"><![CDATA[
-        from Project project
-        where project.scm.id = :scmId
     ]]></query>
 
     <query name="findProjectByBuildSpecification" cacheable="true"><![CDATA[

@@ -7,6 +7,7 @@ import com.zutubi.pulse.agent.Status;
 import com.zutubi.pulse.core.BuildException;
 import com.zutubi.pulse.core.BuildRevision;
 import com.zutubi.pulse.core.RecipeRequest;
+import com.zutubi.pulse.core.config.ResourceProperty;
 import com.zutubi.pulse.core.model.*;
 import com.zutubi.pulse.events.*;
 import com.zutubi.pulse.events.EventListener;
@@ -18,6 +19,8 @@ import com.zutubi.pulse.personal.PatchArchive;
 import com.zutubi.pulse.scm.*;
 import com.zutubi.pulse.services.SlaveStatus;
 import com.zutubi.pulse.services.UpgradeStatus;
+import com.zutubi.pulse.servercore.config.ScmConfiguration;
+import com.zutubi.pulse.prototype.config.ProjectConfiguration;
 import junit.framework.TestCase;
 
 import java.io.File;
@@ -410,8 +413,10 @@ public class ThreadedRecipeQueueTest extends TestCase implements EventListener
     public void testErrorDeterminingRevision() throws Exception
     {
         MockScm scm = new MockScm(true);
+        ProjectConfiguration projectConfig = new ProjectConfiguration();
+        projectConfig.setScm(scm);
         queue.online(createAvailableAgent(0));
-        queue.enqueue(createDispatchRequest(0, 1000, scm));
+        queue.enqueue(createDispatchRequest(0, 1000, projectConfig));
 
         assertTrue(errorSemaphore.tryAcquire(30, TimeUnit.SECONDS));
         assertRecipeError(1000, "Unable to determine revision to build: test");
@@ -432,15 +437,15 @@ public class ThreadedRecipeQueueTest extends TestCase implements EventListener
 
     public void testChangeWhileQueued() throws Exception
     {
-        MockScm scm = new MockScm();
-        queue.enqueue(createDispatchRequest(0, 1000, scm));
-        queue.enqueue(createDispatchRequest(0, 1001, scm));
+        ProjectConfiguration projectConfig = createProjectConfig();
+        queue.enqueue(createDispatchRequest(0, 1000, projectConfig));
+        queue.enqueue(createDispatchRequest(0, 1001, projectConfig));
 
         queue.online(createAvailableAgent(0));
         assertTrue(semaphore.tryAcquire(30, TimeUnit.SECONDS));
         assertTrue(dispatchedSemaphore.tryAcquire(30, TimeUnit.SECONDS));
 
-        queue.handleEvent(new SCMChangeEvent(scm, new NumericalRevision(98), new NumericalRevision(1)));
+        queue.handleEvent(new SCMChangeEvent(projectConfig, new NumericalRevision(98), new NumericalRevision(1)));
         sendRecipeCompleted(1000);
         assertTrue(semaphore.tryAcquire(30, TimeUnit.SECONDS));
         assertTrue(dispatchedSemaphore.tryAcquire(30, TimeUnit.SECONDS));
@@ -450,16 +455,15 @@ public class ThreadedRecipeQueueTest extends TestCase implements EventListener
 
     public void testChangeOtherScmWhileQueued() throws Exception
     {
-        MockScm scm = new MockScm();
-        scm.setId(12);
-        queue.enqueue(createDispatchRequest(0, 1000, scm));
-        queue.enqueue(createDispatchRequest(0, 1001, scm));
+        ProjectConfiguration projectConfig = createProjectConfig(12);
+        queue.enqueue(createDispatchRequest(0, 1000, projectConfig));
+        queue.enqueue(createDispatchRequest(0, 1001, projectConfig));
 
         queue.online(createAvailableAgent(0));
         assertTrue(semaphore.tryAcquire(30, TimeUnit.SECONDS));
         assertTrue(dispatchedSemaphore.tryAcquire(30, TimeUnit.SECONDS));
 
-        queue.handleEvent(new SCMChangeEvent(new MockScm(), new NumericalRevision(98), new NumericalRevision(1)));
+        queue.handleEvent(new SCMChangeEvent(createProjectConfig(), new NumericalRevision(98), new NumericalRevision(1)));
         sendRecipeCompleted(1000);
         assertTrue(semaphore.tryAcquire(30, TimeUnit.SECONDS));
         assertTrue(dispatchedSemaphore.tryAcquire(30, TimeUnit.SECONDS));
@@ -467,12 +471,26 @@ public class ThreadedRecipeQueueTest extends TestCase implements EventListener
         assertEquals(getPulseFileForRevision(1), dispatchedEvent.getRequest().getPulseFileSource());
     }
 
+    private ProjectConfiguration createProjectConfig()
+    {
+        return createProjectConfig(0);
+    }
+
+    private ProjectConfiguration createProjectConfig(int projectId)
+    {
+        MockScm scm = new MockScm();
+        ProjectConfiguration projectConfig = new ProjectConfiguration();
+        projectConfig.setScm(scm);
+        projectConfig.setProjectId(projectId);
+        return projectConfig;
+    }
+
     public void testChangeButFixed() throws Exception
     {
         queue.online(createAvailableAgent(0));
 
-        MockScm scm = new MockScm();
-        queue.enqueue(createDispatchRequest(0, 1000, scm));
+        ProjectConfiguration projectConfig = createProjectConfig();
+        queue.enqueue(createDispatchRequest(0, 1000, projectConfig));
         assertTrue(semaphore.tryAcquire(30, TimeUnit.SECONDS));
         assertTrue(dispatchedSemaphore.tryAcquire(30, TimeUnit.SECONDS));
 
@@ -481,7 +499,7 @@ public class ThreadedRecipeQueueTest extends TestCase implements EventListener
         request.getRevision().apply(request.getRequest());
         queue.enqueue(request);
 
-        queue.handleEvent(new SCMChangeEvent(scm, new NumericalRevision(98), new NumericalRevision(1)));
+        queue.handleEvent(new SCMChangeEvent(projectConfig, new NumericalRevision(98), new NumericalRevision(1)));
         sendRecipeCompleted(1000);
         assertTrue(semaphore.tryAcquire(30, TimeUnit.SECONDS));
         assertTrue(dispatchedSemaphore.tryAcquire(30, TimeUnit.SECONDS));
@@ -491,10 +509,9 @@ public class ThreadedRecipeQueueTest extends TestCase implements EventListener
 
     public void testChangeMakesUnfulfillable() throws Exception
     {
-        MockScm scm = new MockScm();
-        scm.setId(12);
-        queue.enqueue(createDispatchRequest(0, 1000, scm));
-        queue.enqueue(createDispatchRequest(0, 1001, scm));
+        ProjectConfiguration projectConfig = createProjectConfig(12);
+        queue.enqueue(createDispatchRequest(0, 1000, projectConfig));
+        queue.enqueue(createDispatchRequest(0, 1001, projectConfig));
 
         queue.setUnsatisfiableTimeout(0);
         Agent agent = createAvailableAgent(0);
@@ -503,7 +520,7 @@ public class ThreadedRecipeQueueTest extends TestCase implements EventListener
 
 
         // Negative revision will be rejected by mock
-        queue.handleEvent(new SCMChangeEvent(scm, new NumericalRevision(-1), new NumericalRevision(1)));
+        queue.handleEvent(new SCMChangeEvent(projectConfig, new NumericalRevision(-1), new NumericalRevision(1)));
         assertTrue(errorSemaphore.tryAcquire(30, TimeUnit.SECONDS));
         assertRecipeError(1001, "No online agent is capable of executing the build stage");
     }
@@ -512,14 +529,14 @@ public class ThreadedRecipeQueueTest extends TestCase implements EventListener
     {
         queue.online(createAvailableAgent(0));
 
-        MockScm scm = new MockScm();
-        queue.enqueue(createDispatchRequest(0, 1000, scm));
+        ProjectConfiguration projectConfig = createProjectConfig();
+        queue.enqueue(createDispatchRequest(0, 1000, projectConfig));
         assertTrue(semaphore.tryAcquire(30, TimeUnit.SECONDS));
         assertTrue(dispatchedSemaphore.tryAcquire(30, TimeUnit.SECONDS));
 
-        queue.enqueue(createDispatchRequest(0, 1001, scm));
+        queue.enqueue(createDispatchRequest(0, 1001, projectConfig));
 
-        queue.handleEvent(new SCMChangeEvent(scm, new NumericalRevision(0), new NumericalRevision(1)));
+        queue.handleEvent(new SCMChangeEvent(projectConfig, new NumericalRevision(0), new NumericalRevision(1)));
         sendRecipeCompleted(1000);
         assertTrue(semaphore.tryAcquire(30, TimeUnit.SECONDS));
         assertTrue(dispatchedSemaphore.tryAcquire(30, TimeUnit.SECONDS));
@@ -583,10 +600,9 @@ public class ThreadedRecipeQueueTest extends TestCase implements EventListener
 
     public void testChangeMakesTimeout() throws Exception
     {
-        MockScm scm = new MockScm();
-        scm.setId(12);
-        queue.enqueue(createDispatchRequest(0, 1000, scm));
-        queue.enqueue(createDispatchRequest(0, 1001, scm));
+        ProjectConfiguration projectConfig = createProjectConfig(12);
+        queue.enqueue(createDispatchRequest(0, 1000, projectConfig));
+        queue.enqueue(createDispatchRequest(0, 1001, projectConfig));
 
         queue.setSleepInterval(1);
         queue.setUnsatisfiableTimeout(1);
@@ -595,25 +611,11 @@ public class ThreadedRecipeQueueTest extends TestCase implements EventListener
         assertTrue(semaphore.tryAcquire(30, TimeUnit.SECONDS));
 
         // Negative revision will be rejected by mock
-        queue.handleEvent(new SCMChangeEvent(scm, new NumericalRevision(-1), new NumericalRevision(1)));
+        queue.handleEvent(new SCMChangeEvent(projectConfig, new NumericalRevision(-1), new NumericalRevision(1)));
         assertTrue(errorSemaphore.tryAcquire(30, TimeUnit.SECONDS));
         assertRecipeError(1001, "Recipe request timed out waiting for a capable agent to become available");
     }
 
-    public void testBreak()
-    {
-        for(int i = 0; i < 5; i++)
-        {
-            if(true)
-            {
-                if(true)
-                {
-                    break;
-                }
-            }
-            fail();
-        }
-    }
     //-----------------------------------------------------------------------
     // Helpers and mocks
     //-----------------------------------------------------------------------
@@ -691,18 +693,17 @@ public class ThreadedRecipeQueueTest extends TestCase implements EventListener
 
     private RecipeDispatchRequest createDispatchRequest(int type, long id)
     {
-        return createDispatchRequest(type, id, new MockScm());
+        return createDispatchRequest(type, id, createProjectConfig());
     }
 
-    private RecipeDispatchRequest createDispatchRequest(int type, long id, Scm scm)
+    private RecipeDispatchRequest createDispatchRequest(int type, long id, ProjectConfiguration projectConfig)
     {
         Project project = new Project("test", "test description", new MockPulseFileDetails());
-        project.setScm(scm);
         BuildResult result = new BuildResult(new UnknownBuildReason(), project, new BuildSpecification("spec"), 100, false);
         BuildHostRequirements requirements = new MockBuildHostRequirements(type);
         RecipeRequest request = new RecipeRequest("project", "spec", id, null, null, null, false, null, new LinkedList<ResourceProperty>());
         request.setBootstrapper(new ChainBootstrapper());
-        return new RecipeDispatchRequest(requirements, new BuildRevision(), request, result);
+        return new RecipeDispatchRequest(requirements, new BuildRevision(), request, projectConfig, result);
     }
 
     private RecipeDispatchRequest createDispatchRequest(int type)
@@ -730,13 +731,12 @@ public class ThreadedRecipeQueueTest extends TestCase implements EventListener
         return new Class[]{RecipeErrorEvent.class, RecipeDispatchedEvent.class};
     }
 
-    class MockScm extends Scm
+    class MockScm extends ScmConfiguration
     {
         private boolean throwError = false;
 
         public MockScm()
         {
-            setId(98765);
         }
 
         public MockScm(boolean throwError)
@@ -749,7 +749,7 @@ public class ThreadedRecipeQueueTest extends TestCase implements EventListener
             this.throwError = throwError;
         }
 
-        public SCMClient createServer() throws SCMException
+        public ScmClient createClient() throws SCMException
         {
             return new MockScmClient(throwError);
         }
@@ -758,14 +758,9 @@ public class ThreadedRecipeQueueTest extends TestCase implements EventListener
         {
             return "mock";
         }
-
-        public Map<String, String> getRepositoryProperties()
-        {
-            throw new RuntimeException("Method not implemented.");
-        }
     }
 
-    class MockScmClient implements SCMClient
+    class MockScmClient implements ScmClient
     {
         private boolean throwError = false;
 
@@ -909,7 +904,7 @@ public class ThreadedRecipeQueueTest extends TestCase implements EventListener
             throw new RuntimeException("Method not implemented.");
         }
 
-        public String getPulseFile(long id, Project project, Revision revision, PatchArchive patch)
+        public String getPulseFile(long id, ProjectConfiguration projectConfig, Project project, Revision revision, PatchArchive patch)
         {
             long number = ((NumericalRevision) revision).getRevisionNumber();
             if(number == 0)

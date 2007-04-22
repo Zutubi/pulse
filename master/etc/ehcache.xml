@@ -298,7 +298,7 @@
            eternal="true"
            overflowToDisk="false"/>
 
-    <cache name="com.zutubi.pulse.core.model.ResourceProperty"
+    <cache name="com.zutubi.pulse.core.config.ResourceProperty"
            maxElementsInMemory="5000"
            eternal="true"
            overflowToDisk="false"/>

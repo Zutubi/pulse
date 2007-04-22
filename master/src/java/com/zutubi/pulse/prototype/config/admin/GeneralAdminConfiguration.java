@@ -2,7 +2,7 @@ package com.zutubi.pulse.prototype.config.admin;
 
 import com.opensymphony.util.TextUtils;
 import com.zutubi.config.annotations.Form;
-import com.zutubi.pulse.prototype.record.SymbolicName;
+import com.zutubi.config.annotations.SymbolicName;
 
 /**
  *

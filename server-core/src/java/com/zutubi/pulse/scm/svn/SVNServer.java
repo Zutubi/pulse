@@ -22,10 +22,9 @@ import java.util.*;
  *
  * @author jsankey
  */
-public class SVNServer implements SCMClient
+public class SVNServer implements ScmClient
 {
-    private static final Logger LOG = Logger.getLogger(SCMClient.class);
-    private static final int CHECKOUT_RETRIES = 1;
+    private static final Logger LOG = Logger.getLogger(ScmClient.class);
 
     /**
      * A list of paths within the main repository for which we will check the
@@ -672,6 +671,7 @@ public class SVNServer implements SCMClient
         }
     }
 
+    @SuppressWarnings({"unchecked"})
     public Map<String, String> getProperties(String id, File dir) throws SCMException
     {
         return Collections.EMPTY_MAP;

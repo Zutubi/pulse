@@ -6,12 +6,8 @@ import java.util.List;
  *
  * 
  */
-public interface ScmManager extends EntityManager<Scm>
+public interface ScmManager
 {
-    Scm getScm(long id);
-
-    List<Scm> getActiveScms();
-
     void pollActiveScms();
 
     /**

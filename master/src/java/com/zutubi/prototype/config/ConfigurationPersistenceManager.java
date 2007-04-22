@@ -521,6 +521,27 @@ public class ConfigurationPersistenceManager
         }
     }
 
+    public void save(String parentPath, String baseName, Object instance)
+    {
+        CompositeType type = typeRegistry.getType(instance.getClass());
+        if(type == null)
+        {
+            throw new IllegalArgumentException("Attempt to save instance of an unknown class '" + instance.getClass().getName() + "'");
+        }
+
+        Record record = null;
+        try
+        {
+            record = type.unstantiate(instance);
+        }
+        catch (TypeException e)
+        {
+            throw new ConfigRuntimeException(e);
+        }
+        
+        saveRecord(parentPath, baseName, record);
+    }
+
     public String saveRecord(String parentPath, String baseName, Record record)
     {
         Record parentRecord = recordManager.load(parentPath);

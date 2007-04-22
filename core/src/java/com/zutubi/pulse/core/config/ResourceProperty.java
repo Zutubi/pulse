@@ -1,12 +1,13 @@
-package com.zutubi.pulse.core.model;
+package com.zutubi.pulse.core.config;
 
-import com.zutubi.pulse.model.NamedEntity;
+import com.zutubi.config.annotations.SymbolicName;
 
 /**
  */
-public class ResourceProperty extends Entity implements NamedEntity
+@SymbolicName("internal.resourceProperty")
+public class ResourceProperty extends AbstractNamedConfiguration
 {
-    private String name;
+    private long id;
     private String value;
     private boolean addToEnvironment = false;
     private boolean addToPath = false;
@@ -23,7 +24,7 @@ public class ResourceProperty extends Entity implements NamedEntity
 
     public ResourceProperty(String name, String value, boolean addToEnvironment, boolean addToPath, boolean resolveVariables)
     {
-        this.name = name;
+        super(name);
         this.value = value;
         this.addToEnvironment = addToEnvironment;
         this.addToPath = addToPath;
@@ -32,17 +33,18 @@ public class ResourceProperty extends Entity implements NamedEntity
 
     public ResourceProperty copy()
     {
-        return new ResourceProperty(name, value, addToEnvironment, addToPath, resolveVariables);
+        return new ResourceProperty(getName(), value, addToEnvironment, addToPath, resolveVariables);
     }
 
-    public String getName()
+    // FIXME this id is to temporarily appease hibernate
+    public long getId()
     {
-        return name;
+        return id;
     }
 
-    public void setName(String name)
+    public void setId(long id)
     {
-        this.name = name;
+        this.id = id;
     }
 
     public String getValue()

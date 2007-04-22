@@ -5,6 +5,7 @@ import com.zutubi.pulse.core.BuildException;
 import com.zutubi.pulse.core.model.Revision;
 import com.zutubi.pulse.personal.PatchArchive;
 import com.zutubi.pulse.util.FileSystemUtils;
+import com.zutubi.pulse.prototype.config.ProjectConfiguration;
 import com.zutubi.util.logging.Logger;
 import org.apache.velocity.VelocityContext;
 import org.apache.velocity.app.VelocityEngine;
@@ -41,7 +42,7 @@ public abstract class TemplatePulseFileDetails extends PulseFileDetails
         return true;
     }
 
-    public String getPulseFile(long id, Project project, Revision revision, PatchArchive patch)
+    public String getPulseFile(long id, ProjectConfiguration projectConfig, Project project, Revision revision, PatchArchive patch)
     {
         try
         {

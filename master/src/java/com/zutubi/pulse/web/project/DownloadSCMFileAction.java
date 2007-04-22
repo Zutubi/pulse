@@ -1,6 +1,6 @@
 package com.zutubi.pulse.web.project;
 
-import com.zutubi.pulse.model.Project;
+import com.zutubi.pulse.prototype.config.ProjectConfiguration;
 import com.zutubi.pulse.scm.SCMException;
 
 import java.io.InputStream;
@@ -9,7 +9,8 @@ import java.net.URLConnection;
 /**
  * An action to stream a file from an SCM server to the client.
  */
-public class DownloadSCMFileAction extends ProjectActionSupport
+// FIXME: is this used? if so, the params will have changed...
+public class DownloadSCMFileAction extends ProjectActionBase
 {
     private String path;
     private InputStream inputStream;
@@ -39,13 +40,8 @@ public class DownloadSCMFileAction extends ProjectActionSupport
     {
         try
         {
-            Project project = lookupProject(projectId);
-            if (project == null)
-            {
-                return ERROR;
-            }
-
-            inputStream = project.getScm().createServer().checkout(null, path);
+            ProjectConfiguration projectConfig = getProjectConfig();
+            inputStream = projectConfig.getScm().createClient().checkout(null, path);
             contentType = URLConnection.guessContentTypeFromName(path);
             return SUCCESS;
         }

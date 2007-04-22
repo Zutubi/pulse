@@ -25,7 +25,7 @@ public class BuildCompletedTriggerHelper
         filterProjects = new TreeMap<Long, String>();
         filterSpecifications = new LinkedHashMap<Long, List<String>>();
 
-        List<Project> projects = projectManager.getAllProjects();
+        List<Project> projects = projectManager.getNameToConfig();
         Collections.sort(projects, new NamedEntityComparator());
         for(Project p: projects)
         {

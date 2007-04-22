@@ -2,9 +2,9 @@ package com.zutubi.pulse;
 
 import com.zutubi.pulse.core.BuildException;
 import com.zutubi.pulse.core.BuildRevision;
-import com.zutubi.pulse.model.Scm;
 import com.zutubi.pulse.scm.SCMException;
-import com.zutubi.pulse.scm.SCMClient;
+import com.zutubi.pulse.scm.ScmClient;
+import com.zutubi.pulse.servercore.config.ScmConfiguration;
 import com.zutubi.util.logging.Logger;
 
 import java.io.File;
@@ -18,13 +18,13 @@ public class CheckoutBootstrapper extends ScmBootstrapper
 
     private boolean persist;
 
-    public CheckoutBootstrapper(String project, String spec, Scm scm, BuildRevision revision, boolean persist)
+    public CheckoutBootstrapper(String project, String spec, ScmConfiguration scm, BuildRevision revision, boolean persist)
     {
         super(project, spec, scm, revision);
         this.persist = persist;
     }
 
-    public SCMClient bootstrap(File workDir)
+    public ScmClient bootstrap(File workDir)
     {
         try
         {
@@ -34,7 +34,7 @@ public class CheckoutBootstrapper extends ScmBootstrapper
                 id = getId();
             }
 
-            SCMClient client = scm.createServer();
+            ScmClient client = scm.createClient();
             client.checkout(id, workDir, revision.getRevision(), this);
             return client;
         }

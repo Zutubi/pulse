@@ -3,13 +3,14 @@ package com.zutubi.pulse;
 import com.zutubi.pulse.bootstrap.ComponentContext;
 import com.zutubi.pulse.core.Bootstrapper;
 import com.zutubi.pulse.core.BuildException;
+import com.zutubi.pulse.core.config.ResourceProperty;
 import com.zutubi.pulse.core.model.CommandResult;
 import com.zutubi.pulse.core.model.FeaturePersister;
 import com.zutubi.pulse.core.model.RecipeResult;
-import com.zutubi.pulse.core.model.ResourceProperty;
 import com.zutubi.pulse.events.build.*;
 import com.zutubi.pulse.model.*;
 import com.zutubi.pulse.services.ServiceTokenManager;
+import com.zutubi.pulse.prototype.config.ProjectConfiguration;
 import com.zutubi.util.logging.Logger;
 
 import java.io.IOException;
@@ -22,6 +23,7 @@ public class RecipeController
 {
     private static final Logger LOG = Logger.getLogger(RecipeController.class);
 
+    private ProjectConfiguration projectConfig;
     private BuildResult buildResult;
     private BuildSpecificationNode specNode;
     private RecipeResultNode recipeResultNode;
@@ -40,8 +42,9 @@ public class RecipeController
     private RecipeQueue queue;
     private BuildService buildService;
 
-    public RecipeController(BuildResult buildResult, BuildSpecificationNode specNode, RecipeResultNode recipeResultNode, RecipeDispatchRequest dispatchRequest, List<ResourceProperty> buildProperties, boolean personal, boolean incremental, RecipeResultNode previousSuccessful, RecipeLogger logger, RecipeResultCollector collector, RecipeQueue queue, BuildManager manager, ServiceTokenManager serviceTokenManager)
+    public RecipeController(ProjectConfiguration projectConfig, BuildResult buildResult, BuildSpecificationNode specNode, RecipeResultNode recipeResultNode, RecipeDispatchRequest dispatchRequest, List<ResourceProperty> buildProperties, boolean personal, boolean incremental, RecipeResultNode previousSuccessful, RecipeLogger logger, RecipeResultCollector collector, RecipeQueue queue, BuildManager manager, ServiceTokenManager serviceTokenManager)
     {
+        this.projectConfig = projectConfig;
         this.buildResult = buildResult;
         this.specNode = specNode;
         this.recipeResultNode = recipeResultNode;
@@ -239,7 +242,7 @@ public class RecipeController
             for(PostBuildAction action: specNode.getPostActions())
             {
                 ComponentContext.autowire(action);
-                action.execute(buildResult, recipeResultNode, buildProperties);
+                action.execute(projectConfig, buildResult, recipeResultNode, buildProperties);
             }
         }
 

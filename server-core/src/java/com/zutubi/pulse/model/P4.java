@@ -2,7 +2,7 @@ package com.zutubi.pulse.model;
 
 import com.zutubi.pulse.scm.SCMConfiguration;
 import com.zutubi.pulse.scm.SCMException;
-import com.zutubi.pulse.scm.SCMClient;
+import com.zutubi.pulse.scm.ScmClient;
 import static com.zutubi.pulse.scm.p4.P4Constants.*;
 import com.zutubi.pulse.scm.p4.P4Server;
 
@@ -16,7 +16,7 @@ import java.util.TreeMap;
 public class P4 extends Scm
 {
     @Override
-    public SCMClient createServer() throws SCMException
+    public ScmClient createServer() throws SCMException
     {
         P4Server server = new P4Server(getPort(), getUser(), getPassword(), getClient());
         server.setExcludedPaths(getFilteredPaths());
