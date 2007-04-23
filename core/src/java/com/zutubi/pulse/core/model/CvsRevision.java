@@ -1,6 +1,6 @@
 package com.zutubi.pulse.core.model;
 
-import com.zutubi.pulse.scm.SCMException;
+import com.zutubi.pulse.scm.ScmException;
 
 import java.text.DateFormat;
 import java.text.ParseException;
@@ -34,7 +34,7 @@ public class CvsRevision extends Revision
         setRevisionString(generateRevisionString());
     }
 
-    public CvsRevision(String revisionString) throws SCMException
+    public CvsRevision(String revisionString) throws ScmException
     {
         String[] parts = revisionString.split(":");
         if (parts.length == 1)
@@ -69,13 +69,13 @@ public class CvsRevision extends Revision
         }
         else
         {
-            throw new SCMException("Invalid CVS revision '" + revisionString + "' (must be a date, or <author>:<branch>:<date>)");
+            throw new ScmException("Invalid CVS revision '" + revisionString + "' (must be a date, or <author>:<branch>:<date>)");
         }
 
         setRevisionString(generateRevisionString());
     }
 
-    private void setDate(String s, String revisionString, DateFormat dateFormat) throws SCMException
+    private void setDate(String s, String revisionString, DateFormat dateFormat) throws ScmException
     {
         try
         {
@@ -83,7 +83,7 @@ public class CvsRevision extends Revision
         }
         catch (ParseException e)
         {
-            throw new SCMException("Invalid CVS revision '" + revisionString + "': date is invalid: " + e.getMessage());
+            throw new ScmException("Invalid CVS revision '" + revisionString + "': date is invalid: " + e.getMessage());
         }
     }
 

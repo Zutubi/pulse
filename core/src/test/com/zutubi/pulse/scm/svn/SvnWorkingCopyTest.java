@@ -2,12 +2,12 @@ package com.zutubi.pulse.scm.svn;
 
 import com.zutubi.pulse.config.PropertiesConfig;
 import com.zutubi.pulse.scm.FileStatus;
-import com.zutubi.pulse.scm.SCMException;
+import com.zutubi.pulse.scm.ScmException;
 import com.zutubi.pulse.scm.WorkingCopyStatus;
 import com.zutubi.pulse.test.PulseTestCase;
 import com.zutubi.pulse.util.FileSystemUtils;
-import com.zutubi.util.IOUtils;
 import com.zutubi.pulse.util.ZipUtils;
+import com.zutubi.util.IOUtils;
 import org.tmatesoft.svn.core.SVNCommitInfo;
 import org.tmatesoft.svn.core.SVNException;
 import org.tmatesoft.svn.core.SVNURL;
@@ -96,7 +96,7 @@ public class SvnWorkingCopyTest extends PulseTestCase
         createWC();
     }
 
-    private void createWC() throws SCMException, SVNException
+    private void createWC() throws ScmException, SVNException
     {
         base = new File(tempDir, "base");
         base.mkdir();
@@ -134,21 +134,21 @@ public class SvnWorkingCopyTest extends PulseTestCase
         wc = null;
     }
 
-    public void testMatchesRepositoryMatches() throws SCMException
+    public void testMatchesRepositoryMatches() throws ScmException
     {
         Properties p = new Properties();
         p.put(SvnConstants.PROPERTY_URL, "svn://localhost/test/trunk");
         assertTrue(wc.matchesRepository(p));
     }
 
-    public void testMatchesRepositoryDoesntMatch() throws SCMException
+    public void testMatchesRepositoryDoesntMatch() throws ScmException
     {
         Properties p = new Properties();
         p.put(SvnConstants.PROPERTY_URL, "svn://localhost/test/branches/1.0.x");
         assertFalse(wc.matchesRepository(p));
     }
 
-    public void testMatchesRepositoryEmbeddedUser() throws SCMException
+    public void testMatchesRepositoryEmbeddedUser() throws ScmException
     {
         Properties p = new Properties();
         p.put(SvnConstants.PROPERTY_URL, "svn://goober@localhost/test/trunk");
@@ -195,7 +195,7 @@ public class SvnWorkingCopyTest extends PulseTestCase
         getStatusEditedText(false);
     }
 
-    private void getStatusEditedText(boolean remote) throws IOException, SCMException
+    private void getStatusEditedText(boolean remote) throws IOException, ScmException
     {
         File test = new File(base, "textfile1");
         FileSystemUtils.createFile(test, "hello");
@@ -213,7 +213,7 @@ public class SvnWorkingCopyTest extends PulseTestCase
         getStatusEditedNewlyText(false);
     }
 
-    private void getStatusEditedNewlyText(boolean remote)  throws IOException, SVNException, SCMException
+    private void getStatusEditedNewlyText(boolean remote)  throws IOException, SVNException, ScmException
     {
         File test = edit("file1");
         client.doSetProperty(test, SvnConstants.SVN_PROPERTY_EOL_STYLE, "native", true, false, null);
@@ -232,7 +232,7 @@ public class SvnWorkingCopyTest extends PulseTestCase
         getStatusEditedLF(false);
     }
 
-    private void getStatusEditedLF(boolean remote)  throws IOException, SCMException
+    private void getStatusEditedLF(boolean remote)  throws IOException, ScmException
     {
         File test = new File(base, "unixfile1");
         FileSystemUtils.createFile(test, "hello");
@@ -250,7 +250,7 @@ public class SvnWorkingCopyTest extends PulseTestCase
         getStatusEditedAddRandomProperty(false);
     }
 
-    private void getStatusEditedAddRandomProperty(boolean remote) throws IOException, SVNException, SCMException
+    private void getStatusEditedAddRandomProperty(boolean remote) throws IOException, SVNException, ScmException
     {
         File test = edit("file1");
         client.doSetProperty(test, "random", "value", true, false, null);
@@ -268,7 +268,7 @@ public class SvnWorkingCopyTest extends PulseTestCase
         getStatusEditedAddedExecutableProperty(false);
     }
 
-    private void getStatusEditedAddedExecutableProperty(boolean remote) throws IOException, SVNException, SCMException
+    private void getStatusEditedAddedExecutableProperty(boolean remote) throws IOException, SVNException, ScmException
     {
         File test = edit("file1");
         client.doSetProperty(test, SvnConstants.SVN_PROPERTY_EXECUTABLE, "yay", true, false, null);
@@ -286,7 +286,7 @@ public class SvnWorkingCopyTest extends PulseTestCase
         getStatusEditedRemovedExecutableProperty(false);
     }
 
-    private void getStatusEditedRemovedExecutableProperty(boolean remote) throws IOException, SVNException, SCMException
+    private void getStatusEditedRemovedExecutableProperty(boolean remote) throws IOException, SVNException, ScmException
     {
         File test = new File(base, "bin1");
         FileSystemUtils.createFile(test, "hello");
@@ -305,7 +305,7 @@ public class SvnWorkingCopyTest extends PulseTestCase
         getStatusAdded(false);
     }
 
-    private void getStatusAdded(boolean remote) throws IOException, SVNException, SCMException
+    private void getStatusAdded(boolean remote) throws IOException, SVNException, ScmException
     {
         File test = new File(base, "newfile");
         FileSystemUtils.createFile(test, "hello");
@@ -325,7 +325,7 @@ public class SvnWorkingCopyTest extends PulseTestCase
         getStatusAddedText(false);
     }
 
-    private void getStatusAddedText(boolean remote) throws IOException, SVNException, SCMException
+    private void getStatusAddedText(boolean remote) throws IOException, SVNException, ScmException
     {
         File test = new File(base, "newfile");
         FileSystemUtils.createFile(test, "hello");
@@ -522,7 +522,7 @@ public class SvnWorkingCopyTest extends PulseTestCase
         getStatusDeleted(false);
     }
 
-    private void getStatusDeleted(boolean remote) throws SVNException, SCMException
+    private void getStatusDeleted(boolean remote) throws SVNException, ScmException
     {
         delete("file1");
         WorkingCopyStatus wcs = assertSimpleStatus("file1", FileStatus.State.DELETED, false, remote);
@@ -751,12 +751,12 @@ public class SvnWorkingCopyTest extends PulseTestCase
         clientManager.getDiffClient().doMerge(branchUrl, SVNRevision.create(change - 1), branchUrl, SVNRevision.create(change), base, true, false, true, false);
     }
 
-    private WorkingCopyStatus assertSimpleStatus(String path, FileStatus.State state, boolean ood) throws SCMException
+    private WorkingCopyStatus assertSimpleStatus(String path, FileStatus.State state, boolean ood) throws ScmException
     {
         return assertSimpleStatus(path, state, ood, true);
     }
 
-    private WorkingCopyStatus assertSimpleStatus(String path, FileStatus.State state, boolean ood, boolean remote) throws SCMException
+    private WorkingCopyStatus assertSimpleStatus(String path, FileStatus.State state, boolean ood, boolean remote) throws ScmException
     {
         WorkingCopyStatus wcs;
         if(remote)

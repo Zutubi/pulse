@@ -103,13 +103,13 @@ public class SvnWorkingCopy extends PersonalBuildSupport implements WorkingCopy
         return password;
     }
 
-    public boolean matchesRepository(Properties repositoryDetails) throws SCMException
+    public boolean matchesRepository(Properties repositoryDetails) throws ScmException
     {
         // We just check that the URL matches
         String url = repositoryDetails.getProperty(SvnConstants.PROPERTY_URL);
         if (url == null)
         {
-            throw new SCMException("Subversion repository details not returned by Pulse server");
+            throw new ScmException("Subversion repository details not returned by Pulse server");
         }
 
         SVNURL serverURL;
@@ -151,14 +151,14 @@ public class SvnWorkingCopy extends PersonalBuildSupport implements WorkingCopy
         }
     }
 
-    public WorkingCopyStatus getStatus() throws SCMException
+    public WorkingCopyStatus getStatus() throws ScmException
     {
         return getStatus(true, base);
     }
 
-    public WorkingCopyStatus getLocalStatus(String... spec) throws SCMException
+    public WorkingCopyStatus getLocalStatus(String... spec) throws ScmException
     {
-        File[] files = SCMUtils.specToFiles(base, spec);
+        File[] files = ScmUtils.specToFiles(base, spec);
         if (files == null)
         {
             return getStatus(false, base);
@@ -169,7 +169,7 @@ public class SvnWorkingCopy extends PersonalBuildSupport implements WorkingCopy
         }
     }
 
-    private WorkingCopyStatus getStatus(boolean remote, File... files) throws SCMException
+    private WorkingCopyStatus getStatus(boolean remote, File... files) throws ScmException
     {
         if (remote)
         {
@@ -276,7 +276,7 @@ public class SvnWorkingCopy extends PersonalBuildSupport implements WorkingCopy
         }
     }
 
-    public Revision update() throws SCMException
+    public Revision update() throws ScmException
     {
         initAuthenticationManager();
 
@@ -294,9 +294,9 @@ public class SvnWorkingCopy extends PersonalBuildSupport implements WorkingCopy
         }
     }
 
-    private SCMException convertException(SVNException e)
+    private ScmException convertException(SVNException e)
     {
-        return new SCMException(e.getMessage(), e);
+        return new ScmException(e.getMessage(), e);
     }
 
     private FileStatus convertStatus(SVNStatus svnStatus, List<String> propertyChangedPaths)

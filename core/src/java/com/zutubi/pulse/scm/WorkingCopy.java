@@ -9,9 +9,9 @@ import java.util.Properties;
  */
 public interface WorkingCopy extends PersonalBuildWorker
 {
-    boolean matchesRepository(Properties repositoryDetails) throws SCMException;
+    boolean matchesRepository(Properties repositoryDetails) throws ScmException;
 
-    WorkingCopyStatus getLocalStatus(String... spec) throws SCMException;
+    WorkingCopyStatus getLocalStatus(String... spec) throws ScmException;
 
-    Revision update() throws SCMException;
+    Revision update() throws ScmException;
 }

@@ -50,7 +50,6 @@ public class Project extends Entity implements AclObjectIdentity, AclObjectIdent
     private PulseFileDetails pulseFileDetails;
     private List<PostBuildAction> postBuildActions = new LinkedList<PostBuildAction>();
     private List<CleanupRule> cleanupRules = new LinkedList<CleanupRule>();
-    private Scm scm;
     private ChangeViewer changeViewer;
     private State state = State.IDLE;
     private long nextBuildNumber = 1;
@@ -100,7 +99,6 @@ public class Project extends Entity implements AclObjectIdentity, AclObjectIdent
             copy.cleanupRules.add(rule.copy());
         }
 
-        copy.scm = scm.copy();
         if(changeViewer != null)
         {
             copy.changeViewer = changeViewer.copy();

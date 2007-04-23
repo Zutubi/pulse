@@ -1,19 +1,21 @@
 package com.zutubi.pulse.scm.cvs.client.commands;
 
 import com.zutubi.pulse.core.model.Change;
-import com.zutubi.pulse.scm.SCMCheckoutEventHandler;
-import org.netbeans.lib.cvsclient.event.*;
+import com.zutubi.pulse.scm.ScmCheckoutEventHandler;
 import org.netbeans.lib.cvsclient.command.DefaultFileInfoContainer;
 import org.netbeans.lib.cvsclient.command.FileInfoContainer;
+import org.netbeans.lib.cvsclient.event.CVSAdapter;
+import org.netbeans.lib.cvsclient.event.FileInfoEvent;
+import org.netbeans.lib.cvsclient.event.FileRemovedEvent;
 
 /**
  * <class comment/>
  */
 public class UpdateListener extends CVSAdapter
 {
-    private final SCMCheckoutEventHandler handler;
+    private final ScmCheckoutEventHandler handler;
 
-    public UpdateListener(SCMCheckoutEventHandler handler)
+    public UpdateListener(ScmCheckoutEventHandler handler)
     {
         if (handler == null)
         {

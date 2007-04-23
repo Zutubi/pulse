@@ -5,11 +5,10 @@
 
 package com.zutubi.pulse.scm.cvs.client.commands;
 
-import com.zutubi.pulse.scm.SCMException;
+import com.zutubi.pulse.scm.ScmException;
+import org.netbeans.lib.cvsclient.command.Builder;
 
 import java.util.*;
-
-import org.netbeans.lib.cvsclient.command.Builder;
 
 // Referenced classes of package com.zutubi.pulse.scm.cvs.client.commands:
 //            HistoryInfo
@@ -29,7 +28,7 @@ public class HistoryBuilder implements Builder
                 HistoryInfo info = parse(line);
                 infos.add(info);
             }
-            catch (SCMException e)
+            catch (ScmException e)
             {
                 e.printStackTrace();
             }
@@ -49,7 +48,7 @@ public class HistoryBuilder implements Builder
     }
 
     private HistoryInfo parse(String data)
-            throws SCMException
+            throws ScmException
     {
         HistoryInfo info = new HistoryInfo();
         StringTokenizer tokenizer = new StringTokenizer(data, " ", false);
@@ -61,7 +60,7 @@ public class HistoryBuilder implements Builder
 
         if (tokens.size() < 8)
         {
-            throw new SCMException("Unable to extract history info from data: " + data);
+            throw new ScmException("Unable to extract history info from data: " + data);
         }
 
         info.code = (tokens.get(0));

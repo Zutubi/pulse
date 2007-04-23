@@ -1,14 +1,10 @@
 package com.zutubi.pulse.scm.cvs.client.commands;
 
 import com.zutubi.pulse.core.model.Change;
-import com.zutubi.pulse.scm.SCMException;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.StringTokenizer;
-import java.util.List;
-import java.util.ArrayList;
 
 /**
  * The HistoryInfo object represents a single line from the history output.

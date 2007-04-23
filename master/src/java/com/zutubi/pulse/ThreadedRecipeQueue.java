@@ -19,8 +19,8 @@ import com.zutubi.pulse.events.build.RecipeEvent;
 import com.zutubi.pulse.model.Project;
 import com.zutubi.pulse.prototype.config.ProjectConfiguration;
 import com.zutubi.pulse.prototype.config.admin.GeneralAdminConfiguration;
-import com.zutubi.pulse.scm.SCMChangeEvent;
-import com.zutubi.pulse.scm.SCMException;
+import com.zutubi.pulse.scm.ScmChangeEvent;
+import com.zutubi.pulse.scm.ScmException;
 import com.zutubi.pulse.servercore.config.ScmConfiguration;
 import com.zutubi.util.Constants;
 import com.zutubi.util.logging.Logger;
@@ -193,7 +193,7 @@ public class ThreadedRecipeQueue implements Runnable, RecipeQueue, EventListener
         lockCondition.signal();
     }
 
-    private void determineRevision(RecipeDispatchRequest dispatchRequest) throws BuildException, SCMException
+    private void determineRevision(RecipeDispatchRequest dispatchRequest) throws BuildException, ScmException
     {
         BuildRevision buildRevision = dispatchRequest.getRevision();
         if (!buildRevision.isInitialised())
@@ -581,9 +581,9 @@ public class ThreadedRecipeQueue implements Runnable, RecipeQueue, EventListener
         {
             handleSlaveEvent((AgentEvent) evt);
         }
-        else if (evt instanceof SCMChangeEvent)
+        else if (evt instanceof ScmChangeEvent)
         {
-            handleScmChange((SCMChangeEvent) evt);
+            handleScmChange((ScmChangeEvent) evt);
         }
     }
 
@@ -638,7 +638,7 @@ public class ThreadedRecipeQueue implements Runnable, RecipeQueue, EventListener
         }
     }
 
-    private void handleScmChange(SCMChangeEvent event)
+    private void handleScmChange(ScmChangeEvent event)
     {
         List<RecipeDispatchRequest> rejects = null;
         lock.lock();
@@ -686,7 +686,7 @@ public class ThreadedRecipeQueue implements Runnable, RecipeQueue, EventListener
         }
     }
 
-    private List<RecipeDispatchRequest> checkQueueForChanges(ProjectConfiguration changedProject, SCMChangeEvent event, List<RecipeDispatchRequest> requests)
+    private List<RecipeDispatchRequest> checkQueueForChanges(ProjectConfiguration changedProject, ScmChangeEvent event, List<RecipeDispatchRequest> requests)
     {
         List<RecipeDispatchRequest> unfulfillable = new LinkedList<RecipeDispatchRequest>();
 
@@ -716,7 +716,7 @@ public class ThreadedRecipeQueue implements Runnable, RecipeQueue, EventListener
 
     public Class[] getHandledEvents()
     {
-        return new Class[]{RecipeCompletedEvent.class, RecipeErrorEvent.class, SCMChangeEvent.class, AgentEvent.class};
+        return new Class[]{RecipeCompletedEvent.class, RecipeErrorEvent.class, ScmChangeEvent.class, AgentEvent.class};
     }
 
     public void handleConfigurationEvent(ConfigurationEvent event)

@@ -1,5 +1,9 @@
 package com.zutubi.pulse.model;
 
+import com.zutubi.prototype.config.ConfigurationEventListener;
+import com.zutubi.prototype.config.ConfigurationProvider;
+import com.zutubi.prototype.config.events.ConfigurationEvent;
+import com.zutubi.prototype.type.record.PathUtils;
 import com.zutubi.pulse.bootstrap.ComponentContext;
 import com.zutubi.pulse.cache.ehcache.CustomAclEntryCache;
 import com.zutubi.pulse.core.BuildException;
@@ -17,16 +21,12 @@ import com.zutubi.pulse.license.LicenseManager;
 import com.zutubi.pulse.license.authorisation.AddProjectAuthorisation;
 import com.zutubi.pulse.model.persistence.*;
 import com.zutubi.pulse.personal.PatchArchive;
+import com.zutubi.pulse.prototype.config.ProjectConfiguration;
 import com.zutubi.pulse.scheduling.*;
 import com.zutubi.pulse.scheduling.tasks.BuildProjectTask;
-import com.zutubi.pulse.scm.SCMChangeEvent;
-import com.zutubi.pulse.scm.SCMException;
-import com.zutubi.pulse.prototype.config.ProjectConfiguration;
+import com.zutubi.pulse.scm.ScmChangeEvent;
+import com.zutubi.pulse.scm.ScmException;
 import com.zutubi.util.logging.Logger;
-import com.zutubi.prototype.config.ConfigurationProvider;
-import com.zutubi.prototype.config.ConfigurationEventListener;
-import com.zutubi.prototype.config.events.ConfigurationEvent;
-import com.zutubi.prototype.type.record.PathUtils;
 import org.acegisecurity.annotation.Secured;
 
 import java.util.*;
@@ -119,11 +119,6 @@ public class DefaultProjectManager implements ProjectManager, ConfigurationEvent
     public Project getProject(long id)
     {
         return projectDao.findById(id);
-    }
-
-    public Project getProjectByScm(long scmId)
-    {
-        return projectDao.findByScmId(scmId);
     }
 
     public Project getProjectByBuildSpecification(BuildSpecification buildSpecification)
@@ -271,7 +266,7 @@ public class DefaultProjectManager implements ProjectManager, ConfigurationEvent
                         requestBuildOfRevision(reason, projectConfig, project, spec, r);
                     }
                 }
-                catch (SCMException e)
+                catch (ScmException e)
                 {
                     LOG.error("Unable to determine revisions to build for project '" + project.getName() + "', specification '" + specification + "': " + e.getMessage(), e);
                 }
@@ -547,7 +542,7 @@ public class DefaultProjectManager implements ProjectManager, ConfigurationEvent
         // schedule the event trigger - unique to this project.
         try
         {
-            EventTrigger trigger = new EventTrigger(SCMChangeEvent.class, "scm trigger", project.getName(), SCMChangeEventFilter.class);
+            EventTrigger trigger = new EventTrigger(ScmChangeEvent.class, "scm trigger", project.getName(), ScmChangeEventFilter.class);
             trigger.setProject(project.getId());
             trigger.setTaskClass(BuildProjectTask.class);
             trigger.getDataMap().put(BuildProjectTask.PARAM_SPEC, buildSpec.getId());

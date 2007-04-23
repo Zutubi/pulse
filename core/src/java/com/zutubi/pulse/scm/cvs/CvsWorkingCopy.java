@@ -8,7 +8,7 @@ import com.zutubi.pulse.core.model.Revision;
 import com.zutubi.pulse.personal.PersonalBuildException;
 import com.zutubi.pulse.personal.PersonalBuildSupport;
 import com.zutubi.pulse.scm.*;
-import com.zutubi.pulse.scm.cvs.client.CvsClient;
+import com.zutubi.pulse.scm.cvs.client.CvsCore;
 import com.zutubi.util.IOUtils;
 import org.netbeans.lib.cvsclient.CVSRoot;
 import org.netbeans.lib.cvsclient.command.DefaultFileInfoContainer;
@@ -27,7 +27,7 @@ import java.util.Properties;
  */
 public class CvsWorkingCopy extends PersonalBuildSupport implements WorkingCopy
 {
-    private CvsClient client;
+    private CvsCore core;
 
     private File workingDir;
     private ConfigSupport configSupport;
@@ -37,7 +37,7 @@ public class CvsWorkingCopy extends PersonalBuildSupport implements WorkingCopy
     public CvsWorkingCopy(File path, Config config) throws PersonalBuildException
     {
         this.workingDir = path;
-        this.client = new CvsClient();
+        this.core = new CvsCore();
         this.configSupport = new ConfigSupport(config);
 
         CVSRoot cvsRoot;
@@ -69,19 +69,19 @@ public class CvsWorkingCopy extends PersonalBuildSupport implements WorkingCopy
                     "local working copies cvs.root. Cause: " + e.getClass() + ": " + e.getMessage());
         }
         
-        client.setRoot(cvsRoot);
+        core.setRoot(cvsRoot);
 
         // is the password specified?
         if (!TextUtils.stringSet(cvsRoot.getPassword()))
         {
             if (configSupport.hasProperty(CvsConstants.PASS))
             {
-                client.setPassword(configSupport.getProperty(CvsConstants.PASS));
+                core.setPassword(configSupport.getProperty(CvsConstants.PASS));
             }
         }
     }
 
-    public boolean matchesRepository(Properties repositoryDetails) throws SCMException
+    public boolean matchesRepository(Properties repositoryDetails) throws ScmException
     {
         CVSRoot localCvsRoot = CVSRoot.parse(localWorkingRoot);
 
@@ -111,28 +111,28 @@ public class CvsWorkingCopy extends PersonalBuildSupport implements WorkingCopy
         return IOUtils.fileToString(rootFile).trim();
     }
 
-    public WorkingCopyStatus getStatus() throws SCMException
+    public WorkingCopyStatus getStatus() throws ScmException
     {
         WorkingCopyStatus status = new WorkingCopyStatus(workingDir);
         StatusHandler statusHandler = new StatusHandler(status);
 
-        client.status(workingDir, null, statusHandler);
+        core.status(workingDir, null, statusHandler);
 
         return status;
     }
 
-    public WorkingCopyStatus getLocalStatus(String... spec) throws SCMException
+    public WorkingCopyStatus getLocalStatus(String... spec) throws ScmException
     {
-        File[] files = SCMUtils.specToFiles(workingDir, spec);
+        File[] files = ScmUtils.specToFiles(workingDir, spec);
         WorkingCopyStatus status = new WorkingCopyStatus(workingDir);
         StatusHandler statusHandler = new StatusHandler(status, false);
 
-        client.status(workingDir, files, statusHandler);
+        core.status(workingDir, files, statusHandler);
 
         return status;
     }
 
-    public Revision update() throws SCMException
+    public Revision update() throws ScmException
     {
         // updating to the latest repository version for the current configurations branch (or head).
         String branch = configSupport.getProperty(CvsConstants.BRANCH);
@@ -145,7 +145,7 @@ public class CvsWorkingCopy extends PersonalBuildSupport implements WorkingCopy
         UpdateHandler updateHandler = new UpdateHandler();
         
         CvsRevision revision = new CvsRevision(null, branch, null, new Date());
-        client.update(workingDir, revision, updateHandler);
+        core.update(workingDir, revision, updateHandler);
         return revision;
     }
 

@@ -1,10 +1,9 @@
 package com.zutubi.pulse.servercore.config;
 
 import com.zutubi.config.annotations.SymbolicName;
-import com.zutubi.config.annotations.Internal;
 import com.zutubi.config.annotations.Transient;
-import com.zutubi.pulse.scm.ScmClient;
-import com.zutubi.pulse.scm.SCMException;
+import com.zutubi.pulse.scm.ScmException;
+import com.zutubi.pulse.servercore.scm.ScmClient;
 import com.zutubi.validation.annotations.Numeric;
 
 import java.util.List;
@@ -12,7 +11,7 @@ import java.util.List;
 /**
  *
  */
-@SymbolicName("scmConfig")
+@SymbolicName("internal.scmConfig")
 public abstract class ScmConfiguration
 {
     private boolean monitor;
@@ -93,5 +92,5 @@ public abstract class ScmConfiguration
 
     @Transient
     public abstract String getType();
-    public abstract ScmClient createClient() throws SCMException;
+    public abstract ScmClient createClient() throws ScmException;
 }

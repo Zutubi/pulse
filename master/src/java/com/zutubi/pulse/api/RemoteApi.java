@@ -1,38 +1,5 @@
 package com.zutubi.pulse.api;
 
-import com.opensymphony.util.TextUtils;
-import com.zutubi.pulse.ShutdownManager;
-import com.zutubi.pulse.Version;
-import com.zutubi.pulse.prototype.squeezer.TypeSqueezer;
-import com.zutubi.pulse.prototype.squeezer.Squeezers;
-import com.zutubi.pulse.prototype.squeezer.SqueezeException;
-import com.zutubi.pulse.prototype.config.ProjectConfiguration;
-import com.zutubi.pulse.agent.Agent;
-import com.zutubi.pulse.agent.AgentManager;
-import com.zutubi.pulse.agent.SlaveAgent;
-import com.zutubi.pulse.bootstrap.ComponentContext;
-import com.zutubi.pulse.committransformers.CommitMessageTransformerManager;
-import com.zutubi.pulse.core.model.*;
-import com.zutubi.pulse.events.Event;
-import com.zutubi.pulse.events.EventManager;
-import com.zutubi.pulse.events.system.SystemStartedEvent;
-import com.zutubi.pulse.license.LicenseException;
-import com.zutubi.pulse.license.LicenseHolder;
-import com.zutubi.pulse.model.*;
-import com.zutubi.pulse.scm.SCMConfiguration;
-import com.zutubi.pulse.scm.SCMException;
-import com.zutubi.pulse.util.OgnlUtils;
-import com.zutubi.pulse.util.TimeStamps;
-import com.zutubi.pulse.validation.PulseValidationContext;
-import com.zutubi.validation.ValidationContext;
-import com.zutubi.validation.ValidationException;
-import com.zutubi.validation.ValidationManager;
-import ognl.Ognl;
-import ognl.OgnlException;
-import org.acegisecurity.AuthenticationManager;
-
-import java.util.*;
-
 /**
  * Implements a simple API for remote monitoring and control.
  */

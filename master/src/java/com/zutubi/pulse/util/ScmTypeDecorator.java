@@ -1,6 +1,6 @@
 package com.zutubi.pulse.util;
 
-import com.zutubi.pulse.model.Svn;
+import com.zutubi.pulse.servercore.config.SvnConfiguration;
 import org.displaytag.decorator.TableDecorator;
 
 /**
@@ -13,7 +13,7 @@ public class ScmTypeDecorator extends TableDecorator
     {
         Object current = getCurrentRowObject();
         
-        if(current instanceof Svn)
+        if(current instanceof SvnConfiguration)
         {
             return "subversion";
         }

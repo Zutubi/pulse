@@ -2,9 +2,9 @@ package com.zutubi.pulse;
 
 import com.zutubi.pulse.core.BuildException;
 import com.zutubi.pulse.core.BuildRevision;
-import com.zutubi.pulse.scm.SCMException;
-import com.zutubi.pulse.scm.ScmClient;
+import com.zutubi.pulse.scm.ScmException;
 import com.zutubi.pulse.servercore.config.ScmConfiguration;
+import com.zutubi.pulse.servercore.scm.ScmClient;
 import com.zutubi.util.logging.Logger;
 
 import java.io.File;
@@ -28,7 +28,7 @@ public class UpdateBootstrapper extends ScmBootstrapper
             client.update(getId(), workDir, revision.getRevision(), this);
             return client;
         }
-        catch (SCMException e)
+        catch (ScmException e)
         {
             LOG.severe(e);
             throw new BuildException("Error checking out from SCM: " + e.getMessage(), e);

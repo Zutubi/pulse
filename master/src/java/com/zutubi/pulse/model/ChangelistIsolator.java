@@ -2,8 +2,8 @@ package com.zutubi.pulse.model;
 
 import com.zutubi.pulse.core.model.PersistentName;
 import com.zutubi.pulse.core.model.Revision;
-import com.zutubi.pulse.scm.SCMException;
 import com.zutubi.pulse.prototype.config.ProjectConfiguration;
+import com.zutubi.pulse.scm.ScmException;
 
 import java.util.Arrays;
 import java.util.List;
@@ -22,7 +22,7 @@ public class ChangelistIsolator
         this.buildManager = buildManager;
     }
 
-    public synchronized List<Revision> getRevisionsToRequest(ProjectConfiguration projectConfig, Project project, BuildSpecification specification, boolean force) throws SCMException
+    public synchronized List<Revision> getRevisionsToRequest(ProjectConfiguration projectConfig, Project project, BuildSpecification specification, boolean force) throws ScmException
     {
         List<Revision> result;
         Revision latestBuiltRevision;

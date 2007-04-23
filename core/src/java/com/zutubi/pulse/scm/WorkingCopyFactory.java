@@ -1,10 +1,10 @@
 package com.zutubi.pulse.scm;
 
 import com.zutubi.pulse.config.Config;
-import com.zutubi.pulse.scm.p4.P4WorkingCopy;
-import com.zutubi.pulse.scm.svn.SvnWorkingCopy;
-import com.zutubi.pulse.scm.cvs.CvsWorkingCopy;
 import com.zutubi.pulse.personal.PersonalBuildException;
+import com.zutubi.pulse.scm.cvs.CvsWorkingCopy;
+import com.zutubi.pulse.scm.p4.PerforceWorkingCopy;
+import com.zutubi.pulse.scm.svn.SvnWorkingCopy;
 
 import java.io.File;
 import java.lang.reflect.Constructor;
@@ -21,9 +21,9 @@ public class WorkingCopyFactory
     {
         try
         {
-            registerType(SCMConfiguration.TYPE_SUBVERSION, SvnWorkingCopy.class);
-            registerType(SCMConfiguration.TYPE_PERFORCE, P4WorkingCopy.class);
-            registerType(SCMConfiguration.TYPE_CVS, CvsWorkingCopy.class);
+            registerType(ScmConfiguration.TYPE_SUBVERSION, SvnWorkingCopy.class);
+            registerType(ScmConfiguration.TYPE_PERFORCE, PerforceWorkingCopy.class);
+            registerType(ScmConfiguration.TYPE_CVS, CvsWorkingCopy.class);
         }
         catch (NoSuchMethodException e)
         {

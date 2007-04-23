@@ -6,6 +6,9 @@ import com.zutubi.prototype.type.*;
 import com.zutubi.pulse.prototype.config.*;
 import com.zutubi.pulse.prototype.config.admin.GlobalConfiguration;
 import com.zutubi.pulse.prototype.config.setup.SetupConfiguration;
+import com.zutubi.pulse.servercore.config.CvsConfiguration;
+import com.zutubi.pulse.servercore.config.PerforceConfiguration;
+import com.zutubi.pulse.servercore.config.SvnConfiguration;
 import com.zutubi.util.logging.Logger;
 
 import java.util.HashMap;

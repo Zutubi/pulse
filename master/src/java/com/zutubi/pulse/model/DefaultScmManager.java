@@ -1,26 +1,26 @@
 package com.zutubi.pulse.model;
 
-import com.zutubi.pulse.core.model.Revision;
+import com.zutubi.prototype.config.ConfigurationProvider;
+import com.zutubi.pulse.ShutdownManager;
 import com.zutubi.pulse.core.Stoppable;
+import com.zutubi.pulse.core.model.Revision;
 import com.zutubi.pulse.events.EventManager;
+import com.zutubi.pulse.prototype.config.ProjectConfiguration;
+import com.zutubi.pulse.prototype.config.admin.GeneralAdminConfiguration;
 import com.zutubi.pulse.scheduling.Scheduler;
 import com.zutubi.pulse.scheduling.SchedulingException;
 import com.zutubi.pulse.scheduling.SimpleTrigger;
 import com.zutubi.pulse.scheduling.Trigger;
 import com.zutubi.pulse.scm.MonitorScms;
-import com.zutubi.pulse.scm.SCMChangeEvent;
-import com.zutubi.pulse.scm.SCMException;
-import com.zutubi.pulse.scm.ScmClient;
-import com.zutubi.util.Constants;
-import com.zutubi.util.CollectionUtils;
-import com.zutubi.util.Predicate;
-import com.zutubi.pulse.util.Pair;
-import com.zutubi.util.logging.Logger;
-import com.zutubi.pulse.ShutdownManager;
+import com.zutubi.pulse.scm.ScmChangeEvent;
+import com.zutubi.pulse.scm.ScmException;
 import com.zutubi.pulse.servercore.config.ScmConfiguration;
-import com.zutubi.pulse.prototype.config.admin.GeneralAdminConfiguration;
-import com.zutubi.pulse.prototype.config.ProjectConfiguration;
-import com.zutubi.prototype.config.ConfigurationProvider;
+import com.zutubi.pulse.servercore.scm.ScmClient;
+import com.zutubi.pulse.util.Pair;
+import com.zutubi.util.CollectionUtils;
+import com.zutubi.util.Constants;
+import com.zutubi.util.Predicate;
+import com.zutubi.util.logging.Logger;
 
 import java.util.HashMap;
 import java.util.List;
@@ -235,7 +235,7 @@ public class DefaultScmManager implements ScmManager, Stoppable
                 }
             }
         }
-        catch (SCMException e)
+        catch (ScmException e)
         {
             // there has been a problem communicating with one of the scms. Log the
             // warning and move on.
@@ -245,7 +245,7 @@ public class DefaultScmManager implements ScmManager, Stoppable
         }
     }
 
-    private Revision getLatestRevisionSince(Revision revision, ScmClient client) throws SCMException
+    private Revision getLatestRevisionSince(Revision revision, ScmClient client) throws ScmException
     {
         List<Revision> revisions = client.getRevisionsSince(revision);
         if (revisions.size() > 0)
@@ -259,7 +259,7 @@ public class DefaultScmManager implements ScmManager, Stoppable
     private void sendScmChangeEvent(ProjectConfiguration projectConfig, Revision latest, Revision previous)
     {
         LOG.finer("publishing scm change event for " + projectConfig.getName() + " revision " + latest);
-        eventManager.publish(new SCMChangeEvent(projectConfig, latest, previous));
+        eventManager.publish(new ScmChangeEvent(projectConfig, latest, previous));
         latestRevisions.put(projectConfig.getProjectId(), latest);
     }
 

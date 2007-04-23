@@ -1280,18 +1280,6 @@
             <result name="error" type="velocity">/generic-error.vm</result>
         </action>
 
-        <action name="testCVS" class="com.zutubi.pulse.web.ajax.TestCVSAction">
-            <result name="success" type="velocity">test-settings.vm</result>
-        </action>
-
-        <action name="testP4" class="com.zutubi.pulse.web.ajax.TestP4Action">
-            <result name="success" type="velocity">test-settings.vm</result>
-        </action>
-
-        <action name="testSvn" class="com.zutubi.pulse.web.ajax.TestSvnAction">
-            <result name="success" type="velocity">test-settings.vm</result>
-        </action>
-
         <action name="ls" class="com.zutubi.pulse.web.vfs.LsAction">
             <result name="success" type="json">ls.xml</result>
             <result name="error" type="json">error.xml</result>

@@ -17,9 +17,9 @@ import com.zutubi.pulse.model.*;
 import com.zutubi.pulse.prototype.config.ProjectConfiguration;
 import com.zutubi.pulse.scheduling.quartz.TimeoutRecipeJob;
 import com.zutubi.pulse.scm.FileStatus;
-import com.zutubi.pulse.scm.SCMException;
-import com.zutubi.pulse.scm.ScmClient;
+import com.zutubi.pulse.scm.ScmException;
 import com.zutubi.pulse.servercore.config.ScmConfiguration;
+import com.zutubi.pulse.servercore.scm.ScmClient;
 import com.zutubi.pulse.services.ServiceTokenManager;
 import com.zutubi.pulse.util.FileSystemUtils;
 import com.zutubi.pulse.util.TimeStamps;
@@ -284,7 +284,7 @@ public class BuildController implements EventListener
             FileStatus.EOLStyle localEOL = projectConfig.getScm().createClient().getEOLPolicy();
             initialBootstrapper = new PatchBootstrapper(initialBootstrapper, pbr.getUser().getId(), pbr.getNumber(), localEOL);
         }
-        catch (SCMException e)
+        catch (ScmException e)
         {
             throw new BuildException("Unable to determine SCM end-of-line policy: " + e.getMessage(), e);
         }
@@ -525,7 +525,7 @@ public class BuildController implements EventListener
                     ScmClient client = scm.createClient();
                     getChangeSince(client, previousRevision, revision);
                 }
-                catch (SCMException e)
+                catch (ScmException e)
                 {
                     LOG.warning("Unable to retrieve changelist details from SCM server: " + e.getMessage(), e);
                 }
@@ -533,7 +533,7 @@ public class BuildController implements EventListener
         }
     }
 
-    private List<Changelist> getChangeSince(ScmClient client, Revision previousRevision, Revision revision) throws SCMException
+    private List<Changelist> getChangeSince(ScmClient client, Revision previousRevision, Revision revision) throws ScmException
     {
         List<Changelist> result = new LinkedList<Changelist>();
         List<Changelist> scmChanges = client.getChanges(previousRevision, revision);

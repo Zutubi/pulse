@@ -6,7 +6,7 @@ import com.zutubi.pulse.core.config.NamedConfigurationComparator;
 import com.zutubi.pulse.core.config.ResourceProperty;
 import com.zutubi.pulse.core.model.Revision;
 import com.zutubi.pulse.model.ManualTriggerBuildReason;
-import com.zutubi.pulse.scm.SCMException;
+import com.zutubi.pulse.scm.ScmException;
 import com.zutubi.util.logging.Logger;
 
 import java.util.ArrayList;
@@ -59,7 +59,7 @@ public class EditBuildPropertiesAction extends ProjectActionBase
             {
                 r = getProjectConfig().getScm().createClient().getRevision(revision);
             }
-            catch (SCMException e)
+            catch (ScmException e)
             {
                 addFieldError("revision", "Unable to verify revision: " + e.getMessage());
                 LOG.severe(e);

@@ -8,7 +8,10 @@ import com.zutubi.pulse.core.BuildException;
 import com.zutubi.pulse.core.BuildRevision;
 import com.zutubi.pulse.core.RecipeRequest;
 import com.zutubi.pulse.core.config.ResourceProperty;
-import com.zutubi.pulse.core.model.*;
+import com.zutubi.pulse.core.model.Changelist;
+import com.zutubi.pulse.core.model.NumericalRevision;
+import com.zutubi.pulse.core.model.RecipeResult;
+import com.zutubi.pulse.core.model.Revision;
 import com.zutubi.pulse.events.*;
 import com.zutubi.pulse.events.EventListener;
 import com.zutubi.pulse.events.build.RecipeCompletedEvent;
@@ -16,11 +19,17 @@ import com.zutubi.pulse.events.build.RecipeDispatchedEvent;
 import com.zutubi.pulse.events.build.RecipeErrorEvent;
 import com.zutubi.pulse.model.*;
 import com.zutubi.pulse.personal.PatchArchive;
-import com.zutubi.pulse.scm.*;
+import com.zutubi.pulse.prototype.config.ProjectConfiguration;
+import com.zutubi.pulse.scm.FileStatus;
+import com.zutubi.pulse.scm.ScmChangeEvent;
+import com.zutubi.pulse.scm.ScmCheckoutEventHandler;
+import com.zutubi.pulse.scm.ScmException;
+import com.zutubi.pulse.servercore.config.ScmConfiguration;
+import com.zutubi.pulse.servercore.scm.ScmCapability;
+import com.zutubi.pulse.servercore.scm.ScmClient;
+import com.zutubi.pulse.servercore.scm.ScmFile;
 import com.zutubi.pulse.services.SlaveStatus;
 import com.zutubi.pulse.services.UpgradeStatus;
-import com.zutubi.pulse.servercore.config.ScmConfiguration;
-import com.zutubi.pulse.prototype.config.ProjectConfiguration;
 import junit.framework.TestCase;
 
 import java.io.File;
@@ -445,7 +454,7 @@ public class ThreadedRecipeQueueTest extends TestCase implements EventListener
         assertTrue(semaphore.tryAcquire(30, TimeUnit.SECONDS));
         assertTrue(dispatchedSemaphore.tryAcquire(30, TimeUnit.SECONDS));
 
-        queue.handleEvent(new SCMChangeEvent(projectConfig, new NumericalRevision(98), new NumericalRevision(1)));
+        queue.handleEvent(new ScmChangeEvent(projectConfig, new NumericalRevision(98), new NumericalRevision(1)));
         sendRecipeCompleted(1000);
         assertTrue(semaphore.tryAcquire(30, TimeUnit.SECONDS));
         assertTrue(dispatchedSemaphore.tryAcquire(30, TimeUnit.SECONDS));
@@ -463,7 +472,7 @@ public class ThreadedRecipeQueueTest extends TestCase implements EventListener
         assertTrue(semaphore.tryAcquire(30, TimeUnit.SECONDS));
         assertTrue(dispatchedSemaphore.tryAcquire(30, TimeUnit.SECONDS));
 
-        queue.handleEvent(new SCMChangeEvent(createProjectConfig(), new NumericalRevision(98), new NumericalRevision(1)));
+        queue.handleEvent(new ScmChangeEvent(createProjectConfig(), new NumericalRevision(98), new NumericalRevision(1)));
         sendRecipeCompleted(1000);
         assertTrue(semaphore.tryAcquire(30, TimeUnit.SECONDS));
         assertTrue(dispatchedSemaphore.tryAcquire(30, TimeUnit.SECONDS));
@@ -499,7 +508,7 @@ public class ThreadedRecipeQueueTest extends TestCase implements EventListener
         request.getRevision().apply(request.getRequest());
         queue.enqueue(request);
 
-        queue.handleEvent(new SCMChangeEvent(projectConfig, new NumericalRevision(98), new NumericalRevision(1)));
+        queue.handleEvent(new ScmChangeEvent(projectConfig, new NumericalRevision(98), new NumericalRevision(1)));
         sendRecipeCompleted(1000);
         assertTrue(semaphore.tryAcquire(30, TimeUnit.SECONDS));
         assertTrue(dispatchedSemaphore.tryAcquire(30, TimeUnit.SECONDS));
@@ -520,7 +529,7 @@ public class ThreadedRecipeQueueTest extends TestCase implements EventListener
 
 
         // Negative revision will be rejected by mock
-        queue.handleEvent(new SCMChangeEvent(projectConfig, new NumericalRevision(-1), new NumericalRevision(1)));
+        queue.handleEvent(new ScmChangeEvent(projectConfig, new NumericalRevision(-1), new NumericalRevision(1)));
         assertTrue(errorSemaphore.tryAcquire(30, TimeUnit.SECONDS));
         assertRecipeError(1001, "No online agent is capable of executing the build stage");
     }
@@ -536,7 +545,7 @@ public class ThreadedRecipeQueueTest extends TestCase implements EventListener
 
         queue.enqueue(createDispatchRequest(0, 1001, projectConfig));
 
-        queue.handleEvent(new SCMChangeEvent(projectConfig, new NumericalRevision(0), new NumericalRevision(1)));
+        queue.handleEvent(new ScmChangeEvent(projectConfig, new NumericalRevision(0), new NumericalRevision(1)));
         sendRecipeCompleted(1000);
         assertTrue(semaphore.tryAcquire(30, TimeUnit.SECONDS));
         assertTrue(dispatchedSemaphore.tryAcquire(30, TimeUnit.SECONDS));
@@ -611,7 +620,7 @@ public class ThreadedRecipeQueueTest extends TestCase implements EventListener
         assertTrue(semaphore.tryAcquire(30, TimeUnit.SECONDS));
 
         // Negative revision will be rejected by mock
-        queue.handleEvent(new SCMChangeEvent(projectConfig, new NumericalRevision(-1), new NumericalRevision(1)));
+        queue.handleEvent(new ScmChangeEvent(projectConfig, new NumericalRevision(-1), new NumericalRevision(1)));
         assertTrue(errorSemaphore.tryAcquire(30, TimeUnit.SECONDS));
         assertRecipeError(1001, "Recipe request timed out waiting for a capable agent to become available");
     }
@@ -749,7 +758,7 @@ public class ThreadedRecipeQueueTest extends TestCase implements EventListener
             this.throwError = throwError;
         }
 
-        public ScmClient createClient() throws SCMException
+        public ScmClient createClient() throws ScmException
         {
             return new MockScmClient(throwError);
         }
@@ -778,17 +787,17 @@ public class ThreadedRecipeQueueTest extends TestCase implements EventListener
             this.throwError = throwError;
         }
 
-        public Set<SCMCapability> getCapabilities()
+        public Set<ScmCapability> getCapabilities()
         {
-            return new HashSet<SCMCapability>(Arrays.asList(SCMCapability.values()));            
+            return new HashSet<ScmCapability>(Arrays.asList(ScmCapability.values()));
         }
 
-        public Map<String, String> getServerInfo() throws SCMException
+        public Map<String, String> getServerInfo() throws ScmException
         {
             throw new RuntimeException("Method not implemented.");
         }
 
-        public String getUid() throws SCMException
+        public String getUid() throws ScmException
         {
             throw new RuntimeException("Method not implemented.");
         }
@@ -798,41 +807,41 @@ public class ThreadedRecipeQueueTest extends TestCase implements EventListener
             throw new RuntimeException("Method not implemented.");
         }
 
-        public void testConnection() throws SCMException
+        public void testConnection() throws ScmException
         {
             throw new RuntimeException("Method not implemented.");
         }
 
-        public Revision checkout(String id, File toDirectory, Revision revision, SCMCheckoutEventHandler handler) throws SCMException
+        public Revision checkout(String id, File toDirectory, Revision revision, ScmCheckoutEventHandler handler) throws ScmException
         {
             throw new RuntimeException("Method not implemented.");
         }
 
-        public InputStream checkout(Revision revision, String file) throws SCMException
+        public InputStream checkout(Revision revision, String file) throws ScmException
         {
             throw new RuntimeException("Method not implemented.");
         }
 
-        public List<Changelist> getChanges(Revision from, Revision to) throws SCMException
+        public List<Changelist> getChanges(Revision from, Revision to) throws ScmException
         {
             throw new RuntimeException("Method not implemented.");
         }
 
-        public List<Revision> getRevisionsSince(Revision from) throws SCMException
+        public List<Revision> getRevisionsSince(Revision from) throws ScmException
         {
             throw new RuntimeException("Method not implemented.");
         }
 
-        public boolean hasChangedSince(Revision since) throws SCMException
+        public boolean hasChangedSince(Revision since) throws ScmException
         {
             throw new RuntimeException("Method not implemented.");
         }
 
-        public Revision getLatestRevision() throws SCMException
+        public Revision getLatestRevision() throws ScmException
         {
             if(throwError)
             {
-                throw new SCMException("test");
+                throw new ScmException("test");
             }
             else
             {
@@ -840,42 +849,42 @@ public class ThreadedRecipeQueueTest extends TestCase implements EventListener
             }
         }
 
-        public SCMFile getFile(String path) throws SCMException
+        public ScmFile getFile(String path) throws ScmException
         {
             throw new RuntimeException("Method not implemented.");
         }
 
-        public List<SCMFile> getListing(String path) throws SCMException
+        public List<ScmFile> getListing(String path) throws ScmException
         {
             throw new RuntimeException("Method not implemented.");
         }
 
-        public void update(String id, File workDir, Revision rev, SCMCheckoutEventHandler handler) throws SCMException
+        public void update(String id, File workDir, Revision rev, ScmCheckoutEventHandler handler) throws ScmException
         {
             throw new RuntimeException("Method not implemented.");
         }
 
-        public void tag(Revision revision, String name, boolean moveExisting) throws SCMException
+        public void tag(Revision revision, String name, boolean moveExisting) throws ScmException
         {
             throw new RuntimeException("Method not implemented");
         }
 
-        public Map<String, String> getProperties(String id, File dir) throws SCMException
+        public Map<String, String> getProperties(String id, File dir) throws ScmException
         {
             throw new RuntimeException("Method not yet implemented.");
         }
 
-        public void storeConnectionDetails(File outputDir) throws SCMException, IOException
+        public void storeConnectionDetails(File outputDir) throws ScmException, IOException
         {
             throw new RuntimeException("Method not implemented.");
         }
 
-        public FileStatus.EOLStyle getEOLPolicy() throws SCMException
+        public FileStatus.EOLStyle getEOLPolicy() throws ScmException
         {
             return FileStatus.EOLStyle.BINARY;
         }
 
-        public Revision getRevision(String revision) throws SCMException
+        public Revision getRevision(String revision) throws ScmException
         {
             throw new RuntimeException("Method not yet implemented.");
         }

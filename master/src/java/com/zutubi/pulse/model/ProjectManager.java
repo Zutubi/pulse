@@ -4,8 +4,8 @@ import com.zutubi.pulse.core.PulseException;
 import com.zutubi.pulse.core.model.Revision;
 import com.zutubi.pulse.license.LicenseException;
 import com.zutubi.pulse.personal.PatchArchive;
-import com.zutubi.pulse.scheduling.SchedulingException;
 import com.zutubi.pulse.prototype.config.ProjectConfiguration;
+import com.zutubi.pulse.scheduling.SchedulingException;
 import org.acegisecurity.annotation.Secured;
 
 import java.util.List;
@@ -31,8 +31,6 @@ public interface ProjectManager extends EntityManager<Project>
     Project getProject(String name);
 
     Project getProject(long id);
-
-    Project getProjectByScm(long scmId);
 
     Project getProjectByBuildSpecification(BuildSpecification buildSpecification);
 
@@ -93,6 +91,7 @@ public interface ProjectManager extends EntityManager<Project>
      *
      * @param project the project to copy
      * @param name    the name of the new project
+     * @param description the new project's description
      * @return the new project
      */
     @Secured({"ROLE_ADMINISTRATOR"})
@@ -106,6 +105,8 @@ public interface ProjectManager extends EntityManager<Project>
      * @param name        the new name for the project
      * @param description the new description for the project
      * @param url         the new url for the project
+     * @throws com.zutubi.pulse.scheduling.SchedulingException if there is an
+     *         error updating triggers
      */
     @Secured({"ACL_PROJECT_WRITE"})
     void updateProjectDetails(Project project, String name, String description, String url) throws SchedulingException;

@@ -1,6 +1,6 @@
 package com.zutubi.pulse.xmlrpc;
 
-import com.zutubi.pulse.scm.SCMConfiguration;
+import com.zutubi.pulse.scm.ScmConfiguration;
 import org.apache.xmlrpc.XmlRpcClient;
 
 import java.net.MalformedURLException;
@@ -56,7 +56,7 @@ public class PulseXmlRpcClient
         }
     }
 
-    public SCMConfiguration preparePersonalBuild(String token, String projectName, String buildSpecification)
+    public ScmConfiguration preparePersonalBuild(String token, String projectName, String buildSpecification)
     {
         if(buildSpecification == null)
         {
@@ -65,11 +65,11 @@ public class PulseXmlRpcClient
 
         Hashtable<String, String> result = (Hashtable<String, String>) execute("RemoteApi.preparePersonalBuild", token, projectName, buildSpecification);
 
-        SCMConfiguration config = new SCMConfiguration(result.get(SCMConfiguration.PROPERTY_TYPE));
+        ScmConfiguration config = new ScmConfiguration(result.get(ScmConfiguration.PROPERTY_TYPE));
         for(Map.Entry<String, String> entry: result.entrySet())
         {
             String key = entry.getKey();
-            if(!key.equals(SCMConfiguration.PROPERTY_TYPE))
+            if(!key.equals(ScmConfiguration.PROPERTY_TYPE))
             {
                 config.addProperty(key, entry.getValue());
             }

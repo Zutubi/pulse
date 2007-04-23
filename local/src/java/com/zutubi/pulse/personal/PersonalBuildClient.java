@@ -3,9 +3,9 @@ package com.zutubi.pulse.personal;
 import com.zutubi.pulse.Version;
 import com.zutubi.pulse.core.model.Revision;
 import com.zutubi.pulse.scm.*;
-import com.zutubi.util.IOUtils;
 import com.zutubi.pulse.xmlrpc.PulseXmlRpcClient;
 import com.zutubi.pulse.xmlrpc.PulseXmlRpcException;
+import com.zutubi.util.IOUtils;
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.HttpStatus;
 import org.apache.commons.httpclient.UsernamePasswordCredentials;
@@ -174,7 +174,7 @@ public class PersonalBuildClient extends PersonalBuildSupport
         try
         {
             debug("Checking configuration and obtaining project SCM details...");
-            SCMConfiguration scmConfiguration = rpc.preparePersonalBuild(token, config.getProject(), config.getSpecification());
+            ScmConfiguration scmConfiguration = rpc.preparePersonalBuild(token, config.getProject(), config.getSpecification());
             debug("Configuration accepted.");
             String scmType = scmConfiguration.getType();
             debug("SCM type: " + scmType);
@@ -237,7 +237,7 @@ public class PersonalBuildClient extends PersonalBuildSupport
             }
             status("Update complete.");
         }
-        catch (SCMException e)
+        catch (ScmException e)
         {
             throw new PersonalBuildException("Unable to update working copy: " + e.getMessage(), e);
         }
@@ -289,7 +289,7 @@ public class PersonalBuildClient extends PersonalBuildSupport
         {
             status = wc.getLocalStatus(spec);
         }
-        catch (SCMException e)
+        catch (ScmException e)
         {
             throw new PersonalBuildException("Unable to get working copy status: " + e.getMessage(), e);
         }

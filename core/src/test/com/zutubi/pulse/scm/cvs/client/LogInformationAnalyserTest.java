@@ -1,16 +1,20 @@
 package com.zutubi.pulse.scm.cvs.client;
 
-import com.zutubi.pulse.core.model.*;
-import com.zutubi.pulse.scm.SCMException;
+import com.zutubi.pulse.core.model.Change;
+import com.zutubi.pulse.core.model.Changelist;
+import com.zutubi.pulse.core.model.CvsRevision;
+import com.zutubi.pulse.core.model.Revision;
+import com.zutubi.pulse.scm.ScmException;
 import com.zutubi.pulse.test.PulseTestCase;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.*;
 import org.netbeans.lib.cvsclient.CVSRoot;
 import org.netbeans.lib.cvsclient.command.CommandException;
 import org.netbeans.lib.cvsclient.command.log.LogInformation;
 import org.netbeans.lib.cvsclient.connection.AuthenticationException;
 import org.netbeans.lib.cvsclient.util.Logger;
+
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.*;
 
 /**
  *
@@ -29,7 +33,7 @@ public class LogInformationAnalyserTest extends PulseTestCase
         SERVER_DATE.setTimeZone(TimeZone.getTimeZone("GMT"));
     }
 
-    private CvsClient cvs;
+    private CvsCore cvs;
     private LogInformationAnalyser analyser;
 
     public LogInformationAnalyserTest()
@@ -42,7 +46,7 @@ public class LogInformationAnalyserTest extends PulseTestCase
         Logger.setLogging("system");
 
         String cvsRoot = ":ext:cvstester:cvs@192.168.1.99:/cvsroot";
-        cvs = new CvsClient();
+        cvs = new CvsCore();
         cvs.setRoot(CVSRoot.parse(cvsRoot));
         analyser = new LogInformationAnalyser("test", CVSRoot.parse(cvsRoot));
     }
@@ -264,7 +268,7 @@ public class LogInformationAnalyserTest extends PulseTestCase
         assertCvsRevision(changelist.getRevision(), "daniel", "BRANCH", "file1.txt modified on BRANCH by author a\n");
     }
 
-    public void testAddToBranchDoesNotAppearOnHead() throws SCMException, ParseException
+    public void testAddToBranchDoesNotAppearOnHead() throws ScmException, ParseException
     {
         // In testChangesWithBranch, file1 and file2 are added to head. We then branch, add file3
         // to the branch and edit file1.
@@ -289,7 +293,7 @@ public class LogInformationAnalyserTest extends PulseTestCase
         assertEquals(0, changes.size());
     }
 
-    public void testChangesOnHeadAndBranch() throws SCMException, ParseException, CommandException, AuthenticationException
+    public void testChangesOnHeadAndBranch() throws ScmException, ParseException, CommandException, AuthenticationException
     {
         String module = "unit-test/CvsWorkerTest/testChangesOnHeadAndBranch";
 

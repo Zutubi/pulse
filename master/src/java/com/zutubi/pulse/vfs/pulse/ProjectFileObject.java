@@ -3,8 +3,8 @@ package com.zutubi.pulse.vfs.pulse;
 import com.zutubi.pulse.model.Project;
 import com.zutubi.pulse.prototype.config.ProjectConfiguration;
 import org.apache.commons.vfs.FileName;
-import org.apache.commons.vfs.FileType;
 import org.apache.commons.vfs.FileSystemException;
+import org.apache.commons.vfs.FileType;
 import org.apache.commons.vfs.provider.AbstractFileSystem;
 
 import java.util.HashMap;
@@ -22,7 +22,7 @@ public class ProjectFileObject extends AbstractPulseFileObject implements Projec
         nodesDefinitions.put("latest", LatestBuildFileObject.class);
         nodesDefinitions.put("successful", LatestSuccessfulBuildFileObject.class);
         nodesDefinitions.put("latestsuccessful", LatestSuccessfulBuildFileObject.class);
-        nodesDefinitions.put("scm", SCMRootFileObject.class);
+        nodesDefinitions.put("scm", ScmRootFileObject.class);
         nodesDefinitions.put("specs", BuildSpecificationsFileObject.class);
     }
     private String displayName;

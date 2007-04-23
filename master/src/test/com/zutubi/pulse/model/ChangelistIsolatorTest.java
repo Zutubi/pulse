@@ -2,19 +2,18 @@ package com.zutubi.pulse.model;
 
 import com.mockobjects.dynamic.C;
 import com.mockobjects.dynamic.Mock;
+import com.zutubi.config.annotations.Transient;
 import com.zutubi.pulse.core.model.NumericalRevision;
 import com.zutubi.pulse.core.model.Revision;
-import com.zutubi.pulse.scm.SCMException;
-import com.zutubi.pulse.scm.ScmClient;
-import com.zutubi.pulse.test.PulseTestCase;
 import com.zutubi.pulse.prototype.config.ProjectConfiguration;
+import com.zutubi.pulse.scm.ScmException;
 import com.zutubi.pulse.servercore.config.ScmConfiguration;
-import com.zutubi.config.annotations.Transient;
+import com.zutubi.pulse.servercore.scm.ScmClient;
+import com.zutubi.pulse.test.PulseTestCase;
 
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 
 /**
  */
@@ -49,14 +48,14 @@ public class ChangelistIsolatorTest extends PulseTestCase
                 return "mock";
             }
 
-            public ScmClient createClient() throws SCMException
+            public ScmClient createClient() throws ScmException
             {
                 return scmClient;
             }
         });
     }
 
-    public void testNeverBuilt() throws SCMException
+    public void testNeverBuilt() throws ScmException
     {
         returnNoMoreBuilds();
         returnLatestBuild(10);
@@ -64,7 +63,7 @@ public class ChangelistIsolatorTest extends PulseTestCase
         expectRevisions(true, 10);
     }
 
-    public void testPreviouslyBuilt() throws SCMException
+    public void testPreviouslyBuilt() throws ScmException
     {
         returnBuild(55);
         returnRevisions(55, 56, 57);
@@ -72,7 +71,7 @@ public class ChangelistIsolatorTest extends PulseTestCase
         expectRevisions(true, 56, 57);
     }
 
-    public void testNoNewRevisions() throws SCMException
+    public void testNoNewRevisions() throws ScmException
     {
         returnBuild(55);
         returnRevisions(55);
@@ -80,7 +79,7 @@ public class ChangelistIsolatorTest extends PulseTestCase
         expectRevisions(false);
     }
 
-    public void testNoNewRevisionsForced() throws SCMException
+    public void testNoNewRevisionsForced() throws ScmException
     {
         returnBuild(55);
         returnRevisions(55);
@@ -88,7 +87,7 @@ public class ChangelistIsolatorTest extends PulseTestCase
         expectRevisions(true, 55);
     }
 
-    public void testRemembersPreviousRevision() throws SCMException
+    public void testRemembersPreviousRevision() throws ScmException
     {
         returnBuild(101);
         returnRevisions(101, 102, 103, 104);
@@ -98,7 +97,7 @@ public class ChangelistIsolatorTest extends PulseTestCase
         expectRevisions(true, 105);
     }
 
-    public void testNullRevision() throws SCMException
+    public void testNullRevision() throws ScmException
     {
         returnNullDetails();
         returnNoMoreBuilds();
@@ -107,7 +106,7 @@ public class ChangelistIsolatorTest extends PulseTestCase
         expectRevisions(true, 22);
     }
 
-    public void testSearchesBeyondNullRevision() throws SCMException
+    public void testSearchesBeyondNullRevision() throws ScmException
     {
         returnNullDetails();
         returnNullDetails();
@@ -118,7 +117,7 @@ public class ChangelistIsolatorTest extends PulseTestCase
         expectRevisions(true, 10, 11, 13);
     }
 
-    public void testReturnsDifferentRevisionObject() throws SCMException
+    public void testReturnsDifferentRevisionObject() throws ScmException
     {
         Revision rev = returnBuild(10);
         returnRevisions(10);
@@ -176,7 +175,7 @@ public class ChangelistIsolatorTest extends PulseTestCase
         isolator = new ChangelistIsolator(buildManager);
     }
 
-    private void expectRevisions(boolean force, long... revisions) throws SCMException
+    private void expectRevisions(boolean force, long... revisions) throws ScmException
     {
         List<Revision> gotRevisions = isolator.getRevisionsToRequest(projectConfig, project, buildSpecification, force);
         assertEquals(revisions.length, gotRevisions.size());

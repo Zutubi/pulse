@@ -1,7 +1,7 @@
 package com.zutubi.pulse.web.project;
 
 import com.zutubi.pulse.prototype.config.ProjectConfiguration;
-import com.zutubi.pulse.scm.SCMException;
+import com.zutubi.pulse.scm.ScmException;
 
 import java.io.InputStream;
 import java.net.URLConnection;
@@ -45,7 +45,7 @@ public class DownloadSCMFileAction extends ProjectActionBase
             contentType = URLConnection.guessContentTypeFromName(path);
             return SUCCESS;
         }
-        catch (SCMException e)
+        catch (ScmException e)
         {
             addActionError(e.getMessage());
             return ERROR;

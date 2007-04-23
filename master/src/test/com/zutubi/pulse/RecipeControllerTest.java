@@ -10,9 +10,9 @@ import com.zutubi.pulse.core.model.*;
 import com.zutubi.pulse.events.build.*;
 import com.zutubi.pulse.logging.CustomLogRecord;
 import com.zutubi.pulse.model.*;
+import com.zutubi.pulse.servercore.config.SvnConfiguration;
 import com.zutubi.pulse.test.PulseTestCase;
 import com.zutubi.pulse.util.FileSystemUtils;
-import com.zutubi.pulse.prototype.config.SvnConfiguration;
 
 import java.io.File;
 import java.util.*;

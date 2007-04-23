@@ -26,7 +26,7 @@ public class CvsAcceptanceTest extends TestCase
     }
 
     private LogInformationAnalyser analyser;
-    private CvsClient cvs;
+    private CvsCore cvs;
 
     protected void setUp() throws Exception
     {
@@ -36,7 +36,7 @@ public class CvsAcceptanceTest extends TestCase
 
         String cvsRoot = ":ext:cvstester:cvs@192.168.1.99:/cvsroot";
 
-        cvs = new CvsClient();
+        cvs = new CvsCore();
         cvs.setRoot(CVSRoot.parse(cvsRoot));
 
         analyser = new LogInformationAnalyser("test", CVSRoot.parse(cvsRoot));

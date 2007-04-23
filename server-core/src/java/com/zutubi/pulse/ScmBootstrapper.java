@@ -3,10 +3,10 @@ package com.zutubi.pulse;
 import com.zutubi.pulse.core.*;
 import com.zutubi.pulse.core.config.ResourceProperty;
 import com.zutubi.pulse.core.model.Change;
-import com.zutubi.pulse.scm.SCMCancelledException;
-import com.zutubi.pulse.scm.SCMCheckoutEventHandler;
-import com.zutubi.pulse.scm.ScmClient;
+import com.zutubi.pulse.scm.ScmCancelledException;
+import com.zutubi.pulse.scm.ScmCheckoutEventHandler;
 import com.zutubi.pulse.servercore.config.ScmConfiguration;
+import com.zutubi.pulse.servercore.scm.ScmClient;
 import com.zutubi.util.ForkOutputStream;
 import com.zutubi.util.IOUtils;
 import com.zutubi.util.logging.Logger;
@@ -17,7 +17,7 @@ import java.util.Map;
 /**
  * A bootstrapper that populates the working directory by checking out from one SCM.
  */
-public abstract class ScmBootstrapper implements Bootstrapper, SCMCheckoutEventHandler
+public abstract class ScmBootstrapper implements Bootstrapper, ScmCheckoutEventHandler
 {
     private static final Logger LOG = Logger.getLogger(ScmBootstrapper.class);
 
@@ -114,11 +114,11 @@ public abstract class ScmBootstrapper implements Bootstrapper, SCMCheckoutEventH
         outputWriter.println(change.getFilename() + revision + " - " + change.getAction().toString());
     }
 
-    public void checkCancelled() throws SCMCancelledException
+    public void checkCancelled() throws ScmCancelledException
     {
         if (terminated)
         {
-            throw new SCMCancelledException("Operation cancelled");
+            throw new ScmCancelledException("Operation cancelled");
         }
     }
 
