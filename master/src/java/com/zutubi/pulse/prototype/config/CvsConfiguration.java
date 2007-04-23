@@ -1,10 +1,13 @@
 package com.zutubi.pulse.prototype.config;
 
-import com.zutubi.config.annotations.*;
-import com.zutubi.pulse.validation.annotation.CvsRoot;
-import com.zutubi.pulse.scm.ScmClient;
+import com.zutubi.config.annotations.ConfigurationCheck;
+import com.zutubi.config.annotations.Form;
+import com.zutubi.config.annotations.Password;
+import com.zutubi.config.annotations.Text;
 import com.zutubi.pulse.scm.SCMException;
+import com.zutubi.pulse.scm.ScmClient;
 import com.zutubi.pulse.servercore.config.ScmConfiguration;
+import com.zutubi.pulse.validation.annotation.CvsRoot;
 import com.zutubi.validation.annotations.Required;
 
 /**
@@ -12,7 +15,7 @@ import com.zutubi.validation.annotations.Required;
  *
  */
 @ConfigurationCheck("CvsConfigurationCheckHandler")
-@Form(fieldOrder = {"root", "password", "module", "branch"})
+@Form(fieldOrder = {"root", "password", "module", "branch", "monitor", "customPollingInterval", "pollingInterval", "quietPeriodEnabled", "quietPeriod"})
 public class CvsConfiguration extends ScmConfiguration
 {
     @Required @CvsRoot @Text(size = 50)

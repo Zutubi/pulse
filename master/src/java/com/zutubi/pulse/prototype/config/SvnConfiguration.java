@@ -2,26 +2,31 @@ package com.zutubi.pulse.prototype.config;
 
 import com.zutubi.config.annotations.ConfigurationCheck;
 import com.zutubi.config.annotations.Form;
-import com.zutubi.config.annotations.Transient;
-import com.zutubi.pulse.scm.ScmClient;
+import com.zutubi.config.annotations.Text;
 import com.zutubi.pulse.scm.SCMException;
+import com.zutubi.pulse.scm.ScmClient;
 import com.zutubi.pulse.servercore.config.ScmConfiguration;
+import com.zutubi.validation.annotations.Required;
 
 /**
  */
-@Form(fieldOrder = { "url", "username", "password", "keyfile", "keyfilePassphrase"})
+@Form(fieldOrder = { "url", "username", "password", "keyfile", "keyfilePassphrase", "externalMonitorPaths", "verifyExternals", "monitor", "customPollingInterval", "pollingInterval", "quietPeriodEnabled", "quietPeriod" })
 @ConfigurationCheck("SvnConfigurationCheckHandler")
 public class SvnConfiguration extends ScmConfiguration
 {
+    @Required
+    @Text(size = 80)
     private String url;
-
     private String username;
-
     private String password;
-
+    @Text(size = 80)
     private String keyfile;
-    
     private String keyfilePassphrase;
+
+    // FIXME: add a validator that splits this field
+    @Text(size = 80)
+    private String externalMonitorPaths;
+    private boolean verifyExternals;
 
     public SvnConfiguration()
     {
@@ -93,5 +98,25 @@ public class SvnConfiguration extends ScmConfiguration
     {
         // FIXME
         throw new RuntimeException("Method not yet implemented.");
+    }
+
+    public String getExternalMonitorPaths()
+    {
+        return externalMonitorPaths;
+    }
+
+    public void setExternalMonitorPaths(String externalMonitorPaths)
+    {
+        this.externalMonitorPaths = externalMonitorPaths;
+    }
+
+    public boolean getVerifyExternals()
+    {
+        return verifyExternals;
+    }
+
+    public void setVerifyExternals(boolean verifyExternals)
+    {
+        this.verifyExternals = verifyExternals;
     }
 }

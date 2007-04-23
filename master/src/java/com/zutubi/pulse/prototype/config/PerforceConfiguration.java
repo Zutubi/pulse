@@ -1,14 +1,15 @@
 package com.zutubi.pulse.prototype.config;
 
-import com.zutubi.pulse.scm.ScmClient;
+import com.zutubi.config.annotations.Form;
 import com.zutubi.pulse.scm.SCMException;
+import com.zutubi.pulse.scm.ScmClient;
 import com.zutubi.pulse.servercore.config.ScmConfiguration;
-import com.zutubi.config.annotations.Transient;
 
 /**
  *
  *
  */
+@Form(fieldOrder = { "port", "user", "password", "spec", "monitor", "customPollingInterval", "pollingInterval", "quietPeriodEnabled", "quietPeriod" })
 public class PerforceConfiguration extends ScmConfiguration
 {
     private String port;
