@@ -1,11 +1,11 @@
 package com.zutubi.prototype.handler;
 
-import com.zutubi.util.bean.ObjectFactory;
-import com.zutubi.util.ClassLoaderUtils;
 import com.zutubi.prototype.Descriptor;
 import com.zutubi.prototype.OptionProvider;
-import com.zutubi.prototype.FieldDescriptor;
+import com.zutubi.prototype.model.SelectFieldDescriptor;
 import com.zutubi.prototype.type.CompositeType;
+import com.zutubi.util.ClassLoaderUtils;
+import com.zutubi.util.bean.ObjectFactory;
 
 import java.lang.annotation.Annotation;
 import java.util.Collection;
@@ -29,16 +29,16 @@ public abstract class OptionAnnotationHandler extends FieldAnnotationHandler
         String className = getOptionProviderClass(annotation);
         OptionProvider optionProvider = (OptionProvider) objectFactory.buildBean(ClassLoaderUtils.loadAssociatedClass(annotatedType.getClazz(), className));
 
-        FieldDescriptor field = (FieldDescriptor) descriptor;
+        SelectFieldDescriptor field = (SelectFieldDescriptor) descriptor;
         Collection optionList = optionProvider.getOptions(field.getPath(), field.getProperty());
-        descriptor.addParameter("list", optionList);
+        field.setList(optionList);
         if (optionProvider.getOptionKey() != null)
         {
-            descriptor.addParameter("listKey", optionProvider.getOptionKey());
+            field.setListKey(optionProvider.getOptionKey());
         }
         if (optionProvider.getOptionValue() != null)
         {
-            descriptor.addParameter("listValue", optionProvider.getOptionValue());
+            field.setListValue(optionProvider.getOptionValue());
         }
     }
 

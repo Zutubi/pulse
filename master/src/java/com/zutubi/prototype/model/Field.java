@@ -6,18 +6,6 @@ package com.zutubi.prototype.model;
  */
 public class Field extends UIComponent
 {
-    public Field()
-    {
-    }
-    
-    public Field(String name, String label, String type, Object value)
-    {
-        setName(name);
-        setLabel(label);
-        setType(type);
-        setValue(value);
-    }
-
     public int getTabindex()
     {
         return (Integer)parameters.get("tabindex");

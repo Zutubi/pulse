@@ -7,6 +7,7 @@ import com.zutubi.prototype.FormDescriptor;
 import com.zutubi.prototype.FormDescriptorFactory;
 import com.zutubi.prototype.config.ConfigurationRegistry;
 import com.zutubi.prototype.model.Form;
+import com.zutubi.prototype.model.HiddenFieldDescriptor;
 import com.zutubi.prototype.type.CompositeType;
 import com.zutubi.prototype.type.Type;
 import com.zutubi.prototype.type.TypeRegistry;
@@ -86,10 +87,9 @@ public class CheckDirective extends PrototypeDirective
             // decorate the form to include the symbolic name as a hidden field. This is necessary for
             // configuration. This is probably not the best place for this, but until i think of a better location,
             // here it stays.
-            FieldDescriptor hiddenFieldDescriptor = new FieldDescriptor();
+            HiddenFieldDescriptor hiddenFieldDescriptor = new HiddenFieldDescriptor();
             hiddenFieldDescriptor.setName("symbolicName");
-            hiddenFieldDescriptor.addParameter("value", ctype.getSymbolicName());
-            hiddenFieldDescriptor.addParameter("type", "hidden");
+            hiddenFieldDescriptor.setValue(ctype.getSymbolicName());
             formDescriptor.add(hiddenFieldDescriptor);
 
             for (FieldDescriptor fd : formDescriptor.getFieldDescriptors())

@@ -30,8 +30,6 @@ import java.util.List;
  */
 public class SetupWizard extends AbstractTypeWizard
 {
-    private ConfigurationPersistenceManager configurationPersistenceManager;
-
     private UserManager userManager;
 
     private MasterConfigurationManager configurationManager;
@@ -208,11 +206,6 @@ public class SetupWizard extends AbstractTypeWizard
         assert(paths.size() == 1);
         String path = paths.get(0);
         configurationPersistenceManager.saveRecord(PathUtils.getParentPath(path), PathUtils.getBaseName(path), record);
-    }
-
-    public void setConfigurationPersistenceManager(ConfigurationPersistenceManager configurationPersistenceManager)
-    {
-        this.configurationPersistenceManager = configurationPersistenceManager;
     }
 
     public void setUserManager(UserManager userManager)

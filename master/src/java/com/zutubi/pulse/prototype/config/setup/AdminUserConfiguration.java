@@ -21,10 +21,10 @@ public class AdminUserConfiguration implements Validateable
     @Required
     private String name;
     
-    @Password
+    @Password(showPassword = true)
     private String password;
     
-    @Password
+    @Password(showPassword = true)
     private String confirm;
 
     public String getLogin()

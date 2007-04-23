@@ -15,8 +15,6 @@ public class SingleTypeWizard extends AbstractTypeWizard
 {
     private static final Logger LOG = Logger.getLogger(SingleTypeWizard.class);
 
-    private ConfigurationPersistenceManager configurationPersistenceManager;
-
     private String path;
 
     private static final TemplateRecord EMPTY_RECORD = new TemplateRecord("empty", null, new MutableRecordImpl());
@@ -46,10 +44,5 @@ public class SingleTypeWizard extends AbstractTypeWizard
     {
         configurationPersistenceManager.insertRecord(path, recordState.getRecord());
         successPath = path;
-    }
-
-    public void setConfigurationPersistenceManager(ConfigurationPersistenceManager configurationPersistenceManager)
-    {
-        this.configurationPersistenceManager = configurationPersistenceManager;
     }
 }

@@ -1,20 +1,24 @@
 package com.zutubi.prototype.wizard.webwork;
 
-import com.zutubi.prototype.FieldDescriptor;
+import com.zutubi.i18n.Messages;
 import com.zutubi.prototype.FormDescriptor;
 import com.zutubi.prototype.FormDescriptorFactory;
 import com.zutubi.prototype.config.ConfigurationPersistenceManager;
-import com.zutubi.prototype.type.*;
+import com.zutubi.prototype.model.SelectFieldDescriptor;
+import com.zutubi.prototype.type.CompositeType;
+import com.zutubi.prototype.type.SimpleType;
+import com.zutubi.prototype.type.TypeException;
+import com.zutubi.prototype.type.TypeProperty;
+import com.zutubi.prototype.type.TypeRegistry;
 import com.zutubi.prototype.type.record.MutableRecord;
+import com.zutubi.prototype.type.record.MutableRecordImpl;
 import com.zutubi.prototype.type.record.Record;
 import com.zutubi.prototype.type.record.TemplateRecord;
-import com.zutubi.prototype.type.record.MutableRecordImpl;
 import com.zutubi.prototype.webwork.PrototypeUtils;
 import com.zutubi.prototype.wizard.Wizard;
 import com.zutubi.prototype.wizard.WizardState;
 import com.zutubi.prototype.wizard.WizardTransition;
 import static com.zutubi.prototype.wizard.WizardTransition.*;
-import com.zutubi.i18n.Messages;
 import com.zutubi.validation.XWorkValidationAdapter;
 
 import java.util.LinkedList;
@@ -335,10 +339,10 @@ public abstract class AbstractTypeWizard implements Wizard
                 FormDescriptor descriptor = new FormDescriptor();
                 descriptor.setId("select.state");
 
-                FieldDescriptor select = new FieldDescriptor();
+                SelectFieldDescriptor select = new SelectFieldDescriptor();
                 select.setName("option");
                 select.setType("select");
-                select.addParameter("list", type.getExtensions());
+                select.setList(type.getExtensions());
                 descriptor.add(select);
                 return descriptor;
             }
@@ -389,5 +393,10 @@ public abstract class AbstractTypeWizard implements Wizard
                 return (String) selectionRecord.get("option");
             }
         }
+    }
+
+    public void setConfigurationPersistenceManager(ConfigurationPersistenceManager configurationPersistenceManager)
+    {
+        this.configurationPersistenceManager = configurationPersistenceManager;
     }
 }

@@ -7,6 +7,7 @@ import com.zutubi.prototype.FormDescriptor;
 import com.zutubi.prototype.FormDescriptorFactory;
 import com.zutubi.prototype.freemarker.GetTextMethod;
 import com.zutubi.prototype.model.Form;
+import com.zutubi.prototype.model.HiddenFieldDescriptor;
 import com.zutubi.prototype.type.record.PathUtils;
 import com.zutubi.prototype.wizard.Wizard;
 import com.zutubi.prototype.wizard.WizardState;
@@ -152,10 +153,9 @@ public class WizardDirective extends AbstractDirective
         });
         formDescriptor.setActions(actions);
 
-        FieldDescriptor hiddenStateField = new FieldDescriptor();
-        hiddenStateField.setType("hidden");
+        HiddenFieldDescriptor hiddenStateField = new HiddenFieldDescriptor();
         hiddenStateField.setName("state");
-        hiddenStateField.addParameter("value", wizardInstance.getCurrentStateIndex());
+        hiddenStateField.setValue(wizardInstance.getCurrentStateIndex());
 
         formDescriptor.add(hiddenStateField);
     }

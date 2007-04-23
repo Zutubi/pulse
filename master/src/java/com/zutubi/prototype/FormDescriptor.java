@@ -2,18 +2,18 @@ package com.zutubi.prototype;
 
 import com.zutubi.prototype.model.Field;
 import com.zutubi.prototype.model.Form;
-import com.zutubi.prototype.model.SubmitField;
+import com.zutubi.prototype.model.SubmitFieldDescriptor;
 import com.zutubi.prototype.type.record.Record;
 import com.zutubi.prototype.webwork.PrototypeUtils;
 import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.Predicate;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Collections;
 
 /**
  *
@@ -28,6 +28,8 @@ public class FormDescriptor implements Descriptor
     private List<FieldDescriptor> fieldDescriptors = new LinkedList<FieldDescriptor>();
     private List<String> actions = new LinkedList<String>();
     private Map<String, Object> parameters = new HashMap<String, Object>();
+
+//    private String[] fieldOrder;
 
     public void setId(String id)
     {
@@ -123,7 +125,11 @@ public class FormDescriptor implements Descriptor
         // add the submit fields.
         for (String action : actions)
         {
-            form.add(new SubmitField(action).setTabindex(tabindex++));
+            SubmitFieldDescriptor submitDescriptor = new SubmitFieldDescriptor();
+            submitDescriptor.setName(action);
+            Field submit = submitDescriptor.instantiate(path, record);
+            submit.setTabindex(tabindex++);
+            form.add(submit);
         }
 
         return form;

@@ -62,17 +62,6 @@ public class ConfigureProjectWizard extends AbstractTypeWizard
         successPath = configurationPersistenceManager.insertRecord("project", record);
     }
 
-    /**
-     * Required resource.
-     *
-     * @param configurationPersistenceManager
-     *         instance
-     */
-    public void setConfigurationPersistenceManager(ConfigurationPersistenceManager configurationPersistenceManager)
-    {
-        this.configurationPersistenceManager = configurationPersistenceManager;
-    }
-
     public void setProjectManager(ProjectManager projectManager)
     {
         this.projectManager = projectManager;

@@ -13,42 +13,15 @@ import java.util.Map;
  */
 public class FieldDescriptor implements Descriptor
 {
-    private static final String KEY_PATH = "path";
-    private static final String KEY_PROPERTY = "property";
-    private static final String KEY_NAME = "name";
-    private static final String KEY_TYPE = "type";
-
     private Map<String, Object> parameters = new HashMap<String, Object>();
 
-    public String getPath()
-    {
-        return (String) parameters.get(KEY_PATH);
-    }
-
-    public void setPath(String path)
-    {
-        this.parameters.put(KEY_PATH, path);
-    }
-
-    public TypeProperty getProperty()
-    {
-        return (TypeProperty) parameters.get(KEY_PROPERTY);
-    }
-
-    public void setProperty(TypeProperty property)
-    {
-        this.parameters.put(KEY_PROPERTY, property);
-    }
-
-    public String getName()
-    {
-        return (String) parameters.get(KEY_NAME);
-    }
-
-    public void setName(String name)
-    {
-        this.parameters.put(KEY_NAME, name);
-    }
+    private Object value;
+    private String path;
+    private TypeProperty property;
+    private String name;
+    private String type;
+    private boolean required;
+    private boolean constrained;
 
     public void addParameter(String key, Object value)
     {
@@ -84,29 +57,97 @@ public class FieldDescriptor implements Descriptor
     public Field instantiate(String path, Record instance)
     {
         Field field = new Field();
+        field.setType(getType());
         field.setName(getName());
         field.setId(getName());
         field.setLabel(getName() + ".label");
+        
+        field.addParameter("path", getPath());
+        field.addParameter("required", isRequired());
+        field.addParameter("constrained", isConstrained());
+        field.addParameter("property", getProperty());
         field.addAll(getParameters());
 
-        if (field.getValue() == null)
+        // if we do not have a value set, then take the value from the instance.
+        if (value != null)
         {
-            if (instance != null)
-            {
-                field.setValue(instance.get(getName()));
-            }
+            field.setValue(value);
+        }
+        else if (instance != null)
+        {
+            field.setValue(instance.get(getName()));
         }
 
         return field;
     }
 
-    public void setType(String type)
+    public Object getValue()
     {
-        parameters.put(KEY_TYPE, type);
+        return value;
+    }
+
+    public void setValue(Object value)
+    {
+        this.value = value;
+    }
+
+    public String getPath()
+    {
+        return path;
+    }
+
+    public void setPath(String path)
+    {
+        this.path = path;
+    }
+
+    public TypeProperty getProperty()
+    {
+        return property;
+    }
+
+    public void setProperty(TypeProperty property)
+    {
+        this.property = property;
+    }
+
+    public String getName()
+    {
+        return name;
+    }
+
+    public void setName(String name)
+    {
+        this.name = name;
     }
 
     public String getType()
     {
-        return (String) parameters.get(KEY_TYPE);
+        return type;
+    }
+
+    public void setType(String type)
+    {
+        this.type = type;
+    }
+
+    public boolean isRequired()
+    {
+        return required;
+    }
+
+    public void setRequired(boolean required)
+    {
+        this.required = required;
+    }
+
+    public boolean isConstrained()
+    {
+        return constrained;
+    }
+
+    public void setConstrained(boolean constrained)
+    {
+        this.constrained = constrained;
     }
 }
