@@ -20,14 +20,14 @@ public abstract class ScmConfiguration
      * Number of minutes between polls of this SCM.
      */
     @Numeric(min = 1)
-    private int pollingInterval;
+    private int pollingInterval = 1;
     private boolean quietPeriodEnabled;
     /**
      * Quiet period, i.e. idle time to wait for between checkins before
      * raising a change event, measured in minutes.
      */
     @Numeric(min = 1)
-    private int quietPeriod;
+    private int quietPeriod = 1;
     private List<String> filterPaths;
 
     public boolean getMonitor()

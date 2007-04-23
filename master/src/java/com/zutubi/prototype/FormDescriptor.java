@@ -10,16 +10,14 @@ import com.zutubi.util.Predicate;
 
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 
 /**
  *
  *
  */
-public class FormDescriptor implements Descriptor
+public class FormDescriptor extends AbstractDescriptor
 {
     private static final String DEFAULT_ACTION = "save";
 
@@ -27,7 +25,6 @@ public class FormDescriptor implements Descriptor
     private String action = DEFAULT_ACTION;
     private List<FieldDescriptor> fieldDescriptors = new LinkedList<FieldDescriptor>();
     private List<String> actions = new LinkedList<String>();
-    private Map<String, Object> parameters = new HashMap<String, Object>();
 
 //    private String[] fieldOrder;
 
@@ -65,26 +62,6 @@ public class FormDescriptor implements Descriptor
     public void setFieldDescriptors(List<FieldDescriptor> fieldDescriptors)
     {
         this.fieldDescriptors = fieldDescriptors;
-    }
-
-    public void addParameter(String key, Object value)
-    {
-        this.parameters.put(key, value);
-    }
-
-    public void addAll(Map<String, Object> parameters)
-    {
-        this.parameters.putAll(parameters);
-    }
-
-    public Map<String, Object> getParameters()
-    {
-        return parameters;
-    }
-
-    public void setParameters(Map<String, Object> parameters)
-    {
-        this.parameters = parameters;
     }
 
     public List<String> getActions()

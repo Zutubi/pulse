@@ -2,21 +2,20 @@ package com.zutubi.prototype.velocity;
 
 import com.opensymphony.xwork.ActionContext;
 import com.opensymphony.xwork.util.OgnlValueStack;
-import com.zutubi.prototype.FieldDescriptor;
+import com.zutubi.i18n.Messages;
 import com.zutubi.prototype.FormDescriptor;
 import com.zutubi.prototype.FormDescriptorFactory;
+import com.zutubi.prototype.WizardDescriptor;
 import com.zutubi.prototype.freemarker.GetTextMethod;
-import com.zutubi.prototype.model.Form;
 import com.zutubi.prototype.model.HiddenFieldDescriptor;
 import com.zutubi.prototype.type.record.PathUtils;
 import com.zutubi.prototype.wizard.Wizard;
 import com.zutubi.prototype.wizard.WizardState;
 import com.zutubi.prototype.wizard.WizardTransition;
 import com.zutubi.pulse.bootstrap.ComponentContext;
-import com.zutubi.i18n.Messages;
+import com.zutubi.pulse.velocity.AbstractDirective;
 import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.Mapping;
-import com.zutubi.pulse.velocity.AbstractDirective;
 import freemarker.core.DelegateBuiltin;
 import freemarker.template.Configuration;
 import freemarker.template.Template;
@@ -96,31 +95,15 @@ public class WizardDirective extends AbstractDirective
             Messages stateMessages = state.getMessages();
             Messages wizardMessages = Messages.getInstance(wizardInstance.getClass());
 
-            // generate the form.
-            FormDescriptor formDescriptor = state.createFormDescriptor(formDescriptorFactory, path);
-            formDescriptor.setAction("wizard");
-
-            // need to decorate the form a little bit to handle the fact that it is being rendered as a wizard.
-            decorate(formDescriptor);
+            WizardDescriptor wizardDescriptor = new WizardDescriptor(wizardInstance);
+            wizardDescriptor.setFormDescriptorFactory(formDescriptorFactory);
+            wizardDescriptor.setDecorate(decorate);
 
             Map<String, Object> context = new HashMap<String, Object>();
 
-            // need to handle the template record here.
-            // a) we have a data map that contains posted information.
-            // b) we have a template record that contains default data.
-            // maybe the data map needs to be merged first, external to this
-
-            Form form = formDescriptor.instantiate(path, state.getRecord());
-
-            context.put("form", form);
             context.put("i18nText", new GetTextMethod(stateMessages, wizardMessages));
-            context.put("path", path);
-            context.put("decorate", decorate);
 
-            com.zutubi.prototype.model.Wizard wizard = new com.zutubi.prototype.model.Wizard();
-            wizard.setStepCount(wizardInstance.getStateCount());
-            wizard.setCurrentStep(wizardInstance.getCurrentStateIndex() + 1);
-            context.put("wizard", wizard);
+            context.put("wizard", wizardDescriptor.instantiate(path, state.getRecord()));
 
             // validation support:
             OgnlValueStack stack = ActionContext.getContext().getValueStack();

@@ -3,7 +3,7 @@
 <link rel="stylesheet" type="text/css" href="/css/prototype.css" media="screen"/>
 
 <#-- TODO: review the css classes used here. -->
-<#if decorate == true>
+<#if wizard.decorate == true>
 <table>
     <tr>
         <td valign="top" class="wizardsteps">
@@ -21,11 +21,13 @@
         </td>
         <td valign="top">
             <p>${xdescr?i18n}</p>
+            <#assign form = wizard.form/>
             <#include "form.ftl"/>
         </td>
     </tr>
 </table>
 <#else>
+    <#assign form = wizard.form/>
     <#include "form.ftl"/>
 </#if>
 

@@ -4,17 +4,12 @@ import com.zutubi.prototype.model.Field;
 import com.zutubi.prototype.type.TypeProperty;
 import com.zutubi.prototype.type.record.Record;
 
-import java.util.HashMap;
-import java.util.Map;
-
 /**
  *
  *
  */
-public class FieldDescriptor implements Descriptor
+public class FieldDescriptor extends AbstractDescriptor
 {
-    private Map<String, Object> parameters = new HashMap<String, Object>();
-
     private Object value;
     private String path;
     private TypeProperty property;
@@ -22,37 +17,6 @@ public class FieldDescriptor implements Descriptor
     private String type;
     private boolean required;
     private boolean constrained;
-
-    public void addParameter(String key, Object value)
-    {
-        this.parameters.put(key, value);
-    }
-
-    public void addAll(Map<String, Object> parameters)
-    {
-        this.parameters.putAll(parameters);
-    }
-
-    public boolean hasParameter(String key)
-    {
-        return parameters.containsKey(key);
-    }
-
-    public Object getParameter(String key)
-    {
-        return this.parameters.get(key);
-    }
-
-    public Map<String, Object> getParameters()
-    {
-        return this.parameters;
-    }
-
-    public void setParameters(Map<String, Object> parameters)
-    {
-        this.parameters.clear();
-        this.parameters.putAll(parameters);
-    }
 
     public Field instantiate(String path, Record instance)
     {

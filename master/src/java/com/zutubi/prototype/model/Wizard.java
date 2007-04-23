@@ -9,7 +9,9 @@ public class Wizard
     private int stepCount;
     private int currentStep;
 
-    
+    private boolean decorate;
+
+    private Form form;
 
     public int getStepCount()
     {
@@ -29,5 +31,25 @@ public class Wizard
     public void setCurrentStep(int currentStep)
     {
         this.currentStep = currentStep;
+    }
+
+    public boolean isDecorate()
+    {
+        return decorate;
+    }
+
+    public void setDecorate(boolean decorate)
+    {
+        this.decorate = decorate;
+    }
+
+    public Form getForm()
+    {
+        return form;
+    }
+
+    public void setForm(Form form)
+    {
+        this.form = form;
     }
 }

@@ -3,35 +3,17 @@ package com.zutubi.prototype;
 import com.zutubi.prototype.model.Table;
 import com.zutubi.prototype.type.record.Record;
 
-import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 
 /**
  *
  *
  */
-public class TableDescriptor implements Descriptor
+public class TableDescriptor extends AbstractDescriptor
 {
     private String name;
-    private Map<String, Object> parameters = new HashMap<String, Object>();
     private List<RowDescriptor> rowDescriptors = new LinkedList<RowDescriptor>();
-
-    public void addParameter(String key, Object value)
-    {
-        parameters.put(key, value);
-    }
-
-    public void addAll(Map<String, Object> parameters)
-    {
-        parameters.putAll(parameters);
-    }
-
-    public Map<String, Object> getParameters()
-    {
-        return parameters;
-    }
 
     public Table instantiate(String path, Record obj)
     {
