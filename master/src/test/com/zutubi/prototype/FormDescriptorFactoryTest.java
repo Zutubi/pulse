@@ -2,13 +2,9 @@ package com.zutubi.prototype;
 
 import com.zutubi.prototype.type.TypeException;
 import com.zutubi.prototype.type.TypeRegistry;
-import com.zutubi.prototype.model.Form;
-import com.zutubi.prototype.model.Field;
 import junit.framework.TestCase;
 
 import java.util.List;
-import java.util.Arrays;
-import java.util.Map;
 
 /**
  *
@@ -43,7 +39,7 @@ public class FormDescriptorFactoryTest extends TestCase
 
         List<FieldDescriptor> fieldDescriptors = formDescriptor.getFieldDescriptors();
         assertEquals(1, fieldDescriptors.size());
-        assertEquals("password", fieldDescriptors.get(0).getParameter("type"));
+        assertEquals("password", fieldDescriptors.get(0).getType());
     }
 
     public void testTextField() throws TypeException
@@ -53,7 +49,7 @@ public class FormDescriptorFactoryTest extends TestCase
 
         List<FieldDescriptor> fieldDescriptors = formDescriptor.getFieldDescriptors();
         assertEquals(1, fieldDescriptors.size());
-        assertEquals("text", fieldDescriptors.get(0).getParameter("type"));
+        assertEquals("text", fieldDescriptors.get(0).getType());
     }
 
     private class MockText
