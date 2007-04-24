@@ -1,11 +1,7 @@
 package com.zutubi.prototype;
 
-import com.zutubi.config.annotations.*;
+import com.zutubi.config.annotations.Handler;
 import com.zutubi.prototype.handler.AnnotationHandler;
-import com.zutubi.prototype.handler.FieldAnnotationHandler;
-import com.zutubi.prototype.handler.FormAnnotationHandler;
-import com.zutubi.prototype.handler.ReferenceAnnotationHandler;
-import com.zutubi.prototype.handler.SelectAnnotationHandler;
 import com.zutubi.prototype.model.SelectFieldDescriptor;
 import com.zutubi.prototype.type.CollectionType;
 import com.zutubi.prototype.type.CompositeType;
@@ -59,6 +55,7 @@ public class FormDescriptorFactory
         defaultFieldTypeMapping.put(Long.class, "text");
         defaultFieldTypeMapping.put(Long.TYPE, "text");
     }
+/*
     private static final Map<Class, Class<? extends AnnotationHandler>> defaultHandlerMapping = new HashMap<Class, Class<? extends AnnotationHandler>>();
     static
     {
@@ -72,6 +69,7 @@ public class FormDescriptorFactory
         defaultHandlerMapping.put(TextArea.class, FieldAnnotationHandler.class);
         // typeselect
     }
+*/
 
     private TypeRegistry typeRegistry;
 
@@ -224,12 +222,12 @@ public class FormDescriptorFactory
             // recurse up the annotation hierarchy.
             handleAnnotations(type, descriptor, Arrays.asList(annotation.annotationType().getAnnotations()));
 
-            Class<? extends AnnotationHandler> handlerClass = defaultHandlerMapping.get(annotation.annotationType());
-            if (handlerClass != null)
+            Handler handlerAnnotation = annotation.annotationType().getAnnotation(Handler.class);
+            if (handlerAnnotation != null)
             {
                 try
                 {
-                    AnnotationHandler handler = objectFactory.buildBean(handlerClass);
+                    AnnotationHandler handler = objectFactory.buildBean(handlerAnnotation.className());
                     handler.process(type, annotation, descriptor);
                 }
                 catch (InstantiationException e)

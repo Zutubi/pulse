@@ -9,6 +9,7 @@ import com.zutubi.pulse.prototype.config.setup.SetupConfiguration;
 import com.zutubi.pulse.servercore.config.CvsConfiguration;
 import com.zutubi.pulse.servercore.config.PerforceConfiguration;
 import com.zutubi.pulse.servercore.config.SvnConfiguration;
+import com.zutubi.pulse.servercore.config.ScmConfiguration;
 import com.zutubi.util.logging.Logger;
 
 import java.util.HashMap;
@@ -67,13 +68,13 @@ public class ConfigurationRegistry
 
             // generated dynamically as new components are registered.
             CompositeType projectConfig = registerConfigurationType("projectConfig", ProjectConfiguration.class);
-            projectConfig.addProperty(new TypeProperty("scm", typeRegistry.getType("scmConfig")));
+            projectConfig.addProperty(new TypeProperty("scm", typeRegistry.getType(ScmConfiguration.class)));
             projectConfig.addProperty(new TypeProperty("type", typeRegistry.getType("typeConfig")));
             projectConfig.addProperty(new TypeProperty("cleanup", typeRegistry.getType("cleanupRuleConfig")));
             projectConfig.addProperty(new TypeProperty("changeViewer", typeRegistry.getType("changeViewerConfig")));
 
             // scm configuration
-            CompositeType scmConfig = typeRegistry.getType("scmConfig");
+            CompositeType scmConfig = typeRegistry.getType(ScmConfiguration.class);
             registerConfigurationType("svnConfig", SvnConfiguration.class);
             registerConfigurationType("cvsConfig", CvsConfiguration.class);
             registerConfigurationType("perforceConfig", PerforceConfiguration.class);

@@ -17,6 +17,7 @@ import java.lang.annotation.Target;
  * The contents of the select field are provided by the configured OptionProvider implementation.
  * 
  */
+@Handler(className = DefaultAnnotationHandlers.SELECT)
 public @interface Select
 {
     String optionProvider();

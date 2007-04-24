@@ -13,6 +13,7 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 
 @Field(type = FieldType.SELECT)
+@Handler(className = DefaultAnnotationHandlers.REFERENCE)
 public @interface Reference
 {
     String optionProvider() default "com.zutubi.prototype.config.DefaultReferenceOptionProvider";

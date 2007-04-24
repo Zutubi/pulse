@@ -14,6 +14,7 @@ import java.lang.annotation.Target;
  * making it explicit.
  *  
  */
+@Handler(className = DefaultAnnotationHandlers.FIELD)
 public @interface Field
 {
     /**

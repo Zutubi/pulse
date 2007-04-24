@@ -15,6 +15,7 @@ import java.lang.annotation.Target;
  * The TextArea annotation is used to mark a property as being rendered using a text field.
  *
  */
+@Handler(className = DefaultAnnotationHandlers.FIELD)
 public @interface TextArea
 {
     /**

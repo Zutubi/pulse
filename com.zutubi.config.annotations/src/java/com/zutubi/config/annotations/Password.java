@@ -15,6 +15,7 @@ import java.lang.annotation.Target;
  * The password annotation allows you to mark a property for display as a simple form password field.
  * 
  */
+@Handler(className = DefaultAnnotationHandlers.FIELD)
 public @interface Password
 {
     /**
