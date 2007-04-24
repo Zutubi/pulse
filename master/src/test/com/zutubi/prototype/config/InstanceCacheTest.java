@@ -1,6 +1,8 @@
 package com.zutubi.prototype.config;
 
 import com.zutubi.pulse.test.PulseTestCase;
+import com.zutubi.pulse.core.config.Configuration;
+import com.zutubi.pulse.core.config.AbstractConfiguration;
 
 import java.util.List;
 import java.util.LinkedList;
@@ -33,7 +35,7 @@ public class InstanceCacheTest extends PulseTestCase
 
     public void testGetEmptyPath()
     {
-        cache.put("anything", new Object());
+        cache.put("anything", new TestConfiguration());
         assertNull(cache.get(""));
     }
 
@@ -44,29 +46,29 @@ public class InstanceCacheTest extends PulseTestCase
 
     public void testPutEmptyPath()
     {
-        Object o = new Object();
+        TestConfiguration o = new TestConfiguration();
         cache.put("", o);
         assertEquals(o, cache.get(""));
     }
 
     public void testPutSimple()
     {
-        Object o = new Object();
+        TestConfiguration o = new TestConfiguration();
         cache.put("simple", o);
         assertEquals(o, cache.get("simple"));
     }
 
     public void testPutMultipleNoParent()
     {
-        Object o = new Object();
+        TestConfiguration o = new TestConfiguration();
         cache.put("multi/part/path", o);
         assertEquals(o, cache.get("multi/part/path"));
     }
 
     public void testPutMultipleParent()
     {
-        Object p = new Object();
-        Object c = new Object();
+        TestConfiguration p = new TestConfiguration();
+        TestConfiguration c = new TestConfiguration();
         cache.put("multi", p);
         cache.put("multi/part", c);
         assertEquals(p, cache.get("multi"));
@@ -89,11 +91,11 @@ public class InstanceCacheTest extends PulseTestCase
 
     public void testGetAllOneMatch()
     {
-        Object o = new Object();
-        cache.put("foo", new Object());
-        cache.put("foo/bar", new Object());
+        TestConfiguration o = new TestConfiguration();
+        cache.put("foo", new TestConfiguration());
+        cache.put("foo/bar", new TestConfiguration());
         cache.put("foo/baz", o);
-        cache.put("foo/quux", new Object());
+        cache.put("foo/quux", new TestConfiguration());
         
         List all = new LinkedList();
         cache.getAll("foo/baz", all);
@@ -103,10 +105,10 @@ public class InstanceCacheTest extends PulseTestCase
 
     public void testGetAllMultiMatch()
     {
-        Object bar = new Object();
-        Object baz = new Object();
-        Object quux = new Object();
-        cache.put("foo", new Object());
+        TestConfiguration bar = new TestConfiguration();
+        TestConfiguration baz = new TestConfiguration();
+        TestConfiguration quux = new TestConfiguration();
+        cache.put("foo", new TestConfiguration());
         cache.put("foo/bar", bar);
         cache.put("foo/baz", baz);
         cache.put("foo/quux", quux);
@@ -117,5 +119,10 @@ public class InstanceCacheTest extends PulseTestCase
         assertTrue(all.contains(bar));
         assertTrue(all.contains(baz));
         assertTrue(all.contains(quux));
+    }
+
+    private static class TestConfiguration extends AbstractConfiguration
+    {
+        // Empty
     }
 }

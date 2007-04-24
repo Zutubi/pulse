@@ -7,7 +7,7 @@ import com.zutubi.pulse.agent.Status;
 import com.zutubi.pulse.bootstrap.ComponentContext;
 import com.zutubi.pulse.bootstrap.StartupManager;
 import com.zutubi.pulse.core.RecipeRequest;
-import com.zutubi.pulse.core.model.Resource;
+import com.zutubi.pulse.core.config.Resource;
 import com.zutubi.pulse.filesystem.FileInfo;
 import com.zutubi.pulse.logging.CustomLogRecord;
 import com.zutubi.pulse.logging.ServerMessagesHandler;

@@ -1,8 +1,8 @@
 package com.zutubi.pulse.core;
 
-import com.zutubi.pulse.core.model.Resource;
+import com.zutubi.pulse.core.config.Resource;
 import com.zutubi.pulse.core.config.ResourceProperty;
-import com.zutubi.pulse.core.model.ResourceVersion;
+import com.zutubi.pulse.core.config.ResourceVersion;
 import com.zutubi.pulse.test.PulseTestCase;
 
 import java.util.List;

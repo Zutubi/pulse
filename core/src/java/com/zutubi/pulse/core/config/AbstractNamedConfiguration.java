@@ -1,13 +1,10 @@
 package com.zutubi.pulse.core.config;
 
-import com.zutubi.config.annotations.ID;
-
 /**
  * Abstract base to be extended by named configuration objects.
  */
-public abstract class AbstractNamedConfiguration implements NamedConfiguration
+public abstract class AbstractNamedConfiguration extends AbstractConfiguration implements NamedConfiguration
 {
-    @ID
     private String name;
 
     public AbstractNamedConfiguration()

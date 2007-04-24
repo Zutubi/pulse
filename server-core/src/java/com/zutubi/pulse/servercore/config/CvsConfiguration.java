@@ -18,8 +18,8 @@ import java.io.File;
  *
  *
  */
-@ConfigurationCheck("CvsConfigurationCheckHandler")
 @Form(fieldOrder = {"root", "password", "module", "branch", "monitor", "customPollingInterval", "pollingInterval", "quietPeriodEnabled", "quietPeriod"})
+@ConfigurationCheck("com.zutubi.pulse.prototype.config.CvsConfigurationCheckHandler")
 public class CvsConfiguration extends ScmConfiguration
 {
     @Required @CvsRoot

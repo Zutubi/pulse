@@ -7,7 +7,7 @@ import com.zutubi.pulse.model.ResourceManager;
 import com.zutubi.pulse.model.SlaveManager;
 import com.zutubi.pulse.model.Slave;
 import com.zutubi.pulse.model.PersistentResource;
-import com.zutubi.pulse.core.model.Resource;
+import com.zutubi.pulse.core.config.Resource;
 import com.zutubi.pulse.bootstrap.ComponentContext;
 import com.zutubi.pulse.agent.AgentManager;
 

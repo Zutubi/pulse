@@ -1,10 +1,12 @@
 package com.zutubi.pulse.prototype.config;
 
+import com.zutubi.pulse.core.config.AbstractConfiguration;
+
 /**
  *
  *
  */
-public class MavenTypeConfiguration
+public class MavenTypeConfiguration extends AbstractConfiguration
 {
     private String target;
 

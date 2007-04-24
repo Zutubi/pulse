@@ -1,18 +1,16 @@
 package com.zutubi.pulse.model;
 
-import com.zutubi.pulse.core.model.Resource;
+import com.zutubi.pulse.core.config.Resource;
 
 import java.util.List;
 
 /**
  */
-public interface ResourceManager extends EntityManager<PersistentResource>
+public interface ResourceManager
 {
-    PersistentResource findById(long id);
-    List<PersistentResource> findBySlave(Slave slave);
     PersistentResource findBySlaveAndName(Slave slave, String name);
 
-    DatabaseResourceRepository getMasterRepository();
+    ConfigurationResourceRepository getMasterRepository();
     DatabaseResourceRepository getSlaveRepository(Slave slave);
 
     void addDiscoveredResources(Slave slave, List<Resource> resources);

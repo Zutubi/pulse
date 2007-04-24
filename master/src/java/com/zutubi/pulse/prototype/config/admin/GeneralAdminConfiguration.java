@@ -3,6 +3,7 @@ package com.zutubi.pulse.prototype.config.admin;
 import com.opensymphony.util.TextUtils;
 import com.zutubi.config.annotations.Form;
 import com.zutubi.config.annotations.SymbolicName;
+import com.zutubi.pulse.core.config.AbstractConfiguration;
 
 /**
  *
@@ -10,7 +11,7 @@ import com.zutubi.config.annotations.SymbolicName;
  */
 @SymbolicName("generalConfig")
 @Form(fieldOrder={"baseUrl", "masterHost", "baseHelpUrl", "rssEnabled", "anonymousAccessEnabled", "anonymousSignupEnabled", "scmPollingInterval", "recipeTimeoutEnabled", "recipeTimeout" })
-public class GeneralAdminConfiguration
+public class GeneralAdminConfiguration extends AbstractConfiguration
 {
     private String baseUrl;
     private String masterHost;

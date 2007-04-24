@@ -1,17 +1,19 @@
-package com.zutubi.pulse.core.model;
+package com.zutubi.pulse.core.config;
 
-import com.zutubi.pulse.model.NamedEntity;
 import com.zutubi.pulse.core.config.ResourceProperty;
+import com.zutubi.pulse.core.config.ResourceVersion;
+import com.zutubi.config.annotations.SymbolicName;
 
 import java.util.Map;
 import java.util.TreeMap;
 
 /**
- * <class-comment/>
+ * A resource is something that is required by a build.  It may be an
+ * external tool, a certain operating system, or some virtual concept.
  */
-public class Resource extends Entity implements NamedEntity
+@SymbolicName("internal.resource")
+public class Resource extends AbstractNamedConfiguration
 {
-    private String name;
     private Map<String, ResourceProperty> properties = new TreeMap<String, ResourceProperty>();
     private String defaultVersion;
     private Map<String, ResourceVersion> versions = new TreeMap<String, ResourceVersion>();
@@ -23,17 +25,7 @@ public class Resource extends Entity implements NamedEntity
 
     public Resource(String name)
     {
-        this.name = name;
-    }
-
-    public String getName()
-    {
-        return name;
-    }
-
-    public void setName(String name)
-    {
-        this.name = name;
+        setName(name);
     }
 
     public boolean hasVersion(String value)
@@ -44,19 +36,6 @@ public class Resource extends Entity implements NamedEntity
     public ResourceVersion getVersion(String id)
     {
         return versions.get(id);
-    }
-
-    public ResourceVersion getVersion(long id)
-    {
-        for(ResourceVersion v: versions.values())
-        {
-            if(v.getId() == id)
-            {
-                return v;
-            }
-        }
-
-        return null;
     }
 
     public String getDefaultVersion()

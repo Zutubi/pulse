@@ -1,10 +1,12 @@
 package com.zutubi.pulse.prototype.config;
 
+import com.zutubi.pulse.core.config.AbstractConfiguration;
+
 /**
  *
  *
  */
-public class AntTypeConfiguration
+public class AntTypeConfiguration extends AbstractConfiguration
 {
     private String work;
     private String file;

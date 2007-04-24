@@ -4,6 +4,7 @@ import com.zutubi.config.annotations.SymbolicName;
 import com.zutubi.config.annotations.Transient;
 import com.zutubi.pulse.scm.ScmException;
 import com.zutubi.pulse.servercore.scm.ScmClient;
+import com.zutubi.pulse.core.config.AbstractConfiguration;
 import com.zutubi.validation.annotations.Numeric;
 
 import java.util.List;
@@ -12,7 +13,7 @@ import java.util.List;
  *
  */
 @SymbolicName("internal.scmConfig")
-public abstract class ScmConfiguration
+public abstract class ScmConfiguration extends AbstractConfiguration
 {
     private boolean monitor;
     private boolean customPollingInterval;

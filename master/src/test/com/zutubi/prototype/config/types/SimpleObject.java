@@ -2,11 +2,12 @@ package com.zutubi.prototype.config.types;
 
 import com.zutubi.config.annotations.ID;
 import com.zutubi.config.annotations.SymbolicName;
+import com.zutubi.pulse.core.config.AbstractConfiguration;
 
 /**
  */
 @SymbolicName("Simple")
-public class SimpleObject
+public class SimpleObject extends AbstractConfiguration
 {
     @ID
     private String strA;

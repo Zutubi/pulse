@@ -2,6 +2,7 @@ package com.zutubi.pulse.prototype.config.setup;
 
 import com.zutubi.config.annotations.Wizard;
 import com.zutubi.config.annotations.SymbolicName;
+import com.zutubi.pulse.core.config.AbstractConfiguration;
 
 /**
  *
@@ -9,7 +10,7 @@ import com.zutubi.config.annotations.SymbolicName;
  */
 @SymbolicName("internal.setupConfig")
 @Wizard("SetupWizard")
-public class SetupConfiguration
+public class SetupConfiguration extends AbstractConfiguration
 {
     private AdminUserConfiguration admin;
     private ServerSettingsConfiguration server;

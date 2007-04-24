@@ -1,5 +1,7 @@
 package com.zutubi.prototype.type.record;
 
+import com.zutubi.util.logging.Logger;
+
 import java.util.Map;
 
 /**
@@ -14,17 +16,89 @@ import java.util.Map;
  */
 public class RecordManager
 {
+    private static final Logger LOG = Logger.getLogger(RecordManager.class);
+
+    private static final String NEXT_ID_KEY = "nextId";
+    private static final long UNDEFINED = 0;
+    private static final long DEFAULT_ID_BLOCK_SIZE = 1024;
+
     /**
      * The base record is the 'anchor' point for all of the records held in memory. All searches for
      * records start from here.
      */
-    private MutableRecord baseRecord = new MutableRecordImpl();
-    
+    private MutableRecord baseRecord;
+    private long nextId = UNDEFINED;
+    private long idBlockSize = DEFAULT_ID_BLOCK_SIZE;
     private RecordSerialiser recordSerialiser;
 
     public void init()
     {
         baseRecord = recordSerialiser.deserialise("");
+        String idString = baseRecord.getMeta(NEXT_ID_KEY);
+        if(idString != null)
+        {
+            try
+            {
+                nextId = Long.parseLong(idString);
+                if(nextId % idBlockSize != 0)
+                {
+                    moveNextIdToBoundary();
+                }
+            }
+            catch (NumberFormatException e)
+            {
+                LOG.warning("Illegal next id value '" + idString + "'");
+                // Dealt with below.
+            }
+        }
+
+        if(nextId == UNDEFINED)
+        {
+            initialiseNextId();
+        }
+    }
+
+    private void initialiseNextId()
+    {
+        nextId = getHighestId(baseRecord, "") + 1;
+        moveNextIdToBoundary();
+    }
+
+    private void moveNextIdToBoundary()
+    {
+        long id = ((nextId / idBlockSize) + 1) * idBlockSize;
+        baseRecord.putMeta(NEXT_ID_KEY, Long.toString(id));
+        recordSerialiser.serialise("", baseRecord, false);
+    }
+
+    private long getHighestId(Record record, String path)
+    {
+        long highest = record.getID();
+        for(String key: record.keySet())
+        {
+            Object value = record.get(key);
+            if(value instanceof Record)
+            {
+                long childId = getHighestId((Record)value, PathUtils.getPath(path, key));
+                if(childId > highest)
+                {
+                    highest = childId;
+                }
+            }
+        }
+
+        return highest;
+    }
+
+    long allocateId()
+    {
+        if(nextId % idBlockSize == 0)
+        {
+            baseRecord.putMeta(NEXT_ID_KEY, Long.toString(nextId + idBlockSize));
+            recordSerialiser.serialise("", baseRecord, false);
+        }
+
+        return nextId++;
     }
 
     /**
@@ -128,6 +202,7 @@ public class RecordManager
 
         // Save first before hooking up in memory
         MutableRecord record = newRecord.copy(true);
+        record.setId(allocateId());
         recordSerialiser.serialise(path, record, true);
         parent.put(pathElements[pathElements.length - 1], record);
         return record;
@@ -268,6 +343,11 @@ public class RecordManager
         }
 
         return null;
+    }
+
+    public void setIdBlockSize(long idBlockSize)
+    {
+        this.idBlockSize = idBlockSize;
     }
 
     public void setRecordSerialiser(RecordSerialiser recordSerialiser)

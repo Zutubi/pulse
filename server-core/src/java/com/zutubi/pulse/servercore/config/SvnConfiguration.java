@@ -13,7 +13,7 @@ import com.zutubi.validation.annotations.Required;
 /**
  */
 @Form(fieldOrder = { "url", "username", "password", "keyfile", "keyfilePassphrase", "externalMonitorPaths", "verifyExternals", "monitor", "customPollingInterval", "pollingInterval", "quietPeriodEnabled", "quietPeriod" })
-@ConfigurationCheck("SvnConfigurationCheckHandler")
+@ConfigurationCheck("com.zutubi.pulse.prototype.config.SvnConfigurationCheckHandler")
 public class SvnConfiguration extends ScmConfiguration
 {
     @Required

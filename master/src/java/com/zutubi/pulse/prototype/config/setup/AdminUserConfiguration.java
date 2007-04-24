@@ -6,6 +6,7 @@ import com.zutubi.config.annotations.SymbolicName;
 import com.zutubi.validation.Validateable;
 import com.zutubi.validation.ValidationContext;
 import com.zutubi.validation.annotations.Required;
+import com.zutubi.pulse.core.config.AbstractConfiguration;
 
 /**
  *
@@ -13,7 +14,7 @@ import com.zutubi.validation.annotations.Required;
  */
 @SymbolicName("internal.adminUserConfig")
 @Form(fieldOrder = {"login", "name", "password", "confirm"})
-public class AdminUserConfiguration implements Validateable
+public class AdminUserConfiguration extends AbstractConfiguration implements Validateable
 {
     @Required
     private String login;

@@ -11,7 +11,7 @@ import java.util.Set;
 /**
  * Simple record that holds key:value data, along with meta data.
  */
-public class MutableRecordImpl implements MutableRecord
+public class MutableRecordImpl extends AbstractMutableRecord
 {
     private Map<String, String> meta = new HashMap<String, String>();
 

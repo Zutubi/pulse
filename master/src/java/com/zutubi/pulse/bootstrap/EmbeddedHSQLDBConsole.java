@@ -34,7 +34,7 @@ public class EmbeddedHSQLDBConsole implements DatabaseConsole
 
     public boolean schemaExists()
     {
-        return JDBCUtils.tableExists(dataSource, "RESOURCE");
+        return JDBCUtils.tableExists(dataSource, "PROJECT");
     }
 
     public void createSchema() throws SQLException

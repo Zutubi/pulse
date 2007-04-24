@@ -26,6 +26,7 @@ public class ConfigurationPersistenceManagerTest extends TestCase
         typeRegistry = new TypeRegistry();
         recordManager = new RecordManager();
         recordManager.setRecordSerialiser(new MockRecordSerialiser());
+        recordManager.init();
         manager = new ConfigurationPersistenceManager();
         manager.setTypeRegistry(typeRegistry);
         manager.setRecordManager(recordManager);

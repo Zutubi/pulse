@@ -1,6 +1,6 @@
 package com.zutubi.pulse.web.project;
 
-import com.zutubi.pulse.core.model.ResourceVersion;
+import com.zutubi.pulse.core.config.ResourceVersion;
 import com.zutubi.pulse.model.PersistentResource;
 import com.zutubi.pulse.model.ResourceManager;
 import com.zutubi.pulse.model.Slave;

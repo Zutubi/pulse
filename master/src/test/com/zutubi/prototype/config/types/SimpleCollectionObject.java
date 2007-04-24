@@ -2,13 +2,14 @@ package com.zutubi.prototype.config.types;
 
 import com.zutubi.config.annotations.SymbolicName;
 import com.zutubi.prototype.config.types.SimpleObject;
+import com.zutubi.pulse.core.config.AbstractConfiguration;
 
 import java.util.List;
 
 /**
  */
 @SymbolicName("SimpleCollection")
-public class SimpleCollectionObject
+public class SimpleCollectionObject extends AbstractConfiguration
 {
     List<SimpleObject> simpleList;
 

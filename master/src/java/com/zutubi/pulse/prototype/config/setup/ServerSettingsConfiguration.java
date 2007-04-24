@@ -12,6 +12,7 @@ import com.zutubi.validation.annotations.Email;
 import com.zutubi.validation.annotations.Required;
 import com.zutubi.validation.annotations.Url;
 import com.zutubi.validation.validators.EmailValidator;
+import com.zutubi.pulse.core.config.AbstractConfiguration;
 
 /**
  *
@@ -20,7 +21,7 @@ import com.zutubi.validation.validators.EmailValidator;
 @SymbolicName("internal.serverSettingsConfig")
 @ConfigurationCheck("ServerSettingsConfigurationCheckHandler")
 @Form(fieldOrder = {"baseUrl", "host", "ssl", "from", "username", "password", "subjectPrefix", "customPort", "port"})
-public class ServerSettingsConfiguration implements Validateable
+public class ServerSettingsConfiguration extends AbstractConfiguration implements Validateable
 {
     @Url @Required
     private String baseUrl;

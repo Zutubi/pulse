@@ -5,6 +5,7 @@ import com.zutubi.prototype.config.events.*;
 import com.zutubi.prototype.type.*;
 import com.zutubi.prototype.type.record.*;
 import com.zutubi.pulse.events.EventManager;
+import com.zutubi.pulse.core.config.Configuration;
 import com.zutubi.util.ClassLoaderUtils;
 import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.Mapping;
@@ -53,11 +54,12 @@ public class ConfigurationPersistenceManager
      * Register the root scope definitions, from which all of the other definitions will be
      * derived.
      *
-     * @param scope name of the scope
-     * @param type  type of the object.
+     * @param scope      name of the scope
+     * @param type       type of the object stored in this scope
      */
     public void register(String scope, ComplexType type)
     {
+        validateConfiguration(type);
         rootScopes.put(scope, new ScopeInfo(scope, type));
         if (!recordManager.containsRecord(scope))
         {
@@ -73,6 +75,31 @@ public class ConfigurationPersistenceManager
             if (type instanceof CollectionType)
             {
                 updateIndex(scope, (CollectionType) type);
+            }
+        }
+    }
+
+    private void validateConfiguration(ComplexType type)
+    {
+        if(type instanceof CollectionType)
+        {
+            Type targetType = type.getTargetType();
+            if (targetType instanceof ComplexType)
+            {
+                validateConfiguration((ComplexType) targetType);
+            }
+        }
+        else
+        {
+            CompositeType compositeType = (CompositeType) type;
+            if(!Configuration.class.isAssignableFrom(compositeType.getClazz()))
+            {
+                throw new IllegalArgumentException("Attempt to register persistent configuration of type '" + compositeType.getClazz() + "': which does not implement Configuration");
+            }
+
+            for(TypeProperty property: compositeType.getProperties(ComplexType.class))
+            {
+                validateConfiguration((ComplexType) property.getType());
             }
         }
     }
@@ -367,6 +394,13 @@ public class ConfigurationPersistenceManager
         return (T)instance;
     }
 
+    public <T> Collection<T> getAllInstances(String path, Class<T> clazz)
+    {
+        List<T> result = new LinkedList<T>();
+        instances.getAll(path, result);
+        return result;
+    }
+
     public <T> Collection<T> getAllInstances(Class<T> clazz)
     {
         CompositeType type = typeRegistry.getType(clazz);
@@ -468,6 +502,25 @@ public class ConfigurationPersistenceManager
         return record;
     }
 
+    public String insert(String parentPath, Object instance)
+    {
+        CompositeType type = typeRegistry.getType(instance.getClass());
+        if(type == null)
+        {
+            throw new IllegalArgumentException("Attempt to insert object of unregistered class '" + instance.getClass().getName() + "'");
+        }
+
+        try
+        {
+            Record record = type.unstantiate(instance);
+            return insertRecord(parentPath, record);
+        }
+        catch (TypeException e)
+        {
+            throw new ConfigRuntimeException(e);
+        }
+    }
+
     public String insertRecord(final String path, Record record)
     {
         ComplexType type = getType(path, ComplexType.class);
@@ -529,7 +582,7 @@ public class ConfigurationPersistenceManager
             throw new IllegalArgumentException("Attempt to save instance of an unknown class '" + instance.getClass().getName() + "'");
         }
 
-        Record record = null;
+        Record record;
         try
         {
             record = type.unstantiate(instance);

@@ -4,6 +4,9 @@ import junit.framework.TestCase;
 
 import java.util.Map;
 import java.util.HashMap;
+import java.io.File;
+
+import com.zutubi.pulse.util.FileSystemUtils;
 
 /**
  *
@@ -11,20 +14,26 @@ import java.util.HashMap;
  */
 public class RecordManagerTest extends TestCase
 {
+    private static final long ID_BLOCK_SIZE = 32;
+    private File tempDir;
     private RecordManager recordManager;
 
     protected void setUp() throws Exception
     {
         super.setUp();
 
-        recordManager = new RecordManager();
-        recordManager.setRecordSerialiser(new MockRecordSerialiser());        
+        tempDir = FileSystemUtils.createTempDir(getName(), "");
+        newRecordManager(ID_BLOCK_SIZE);
     }
 
     protected void tearDown() throws Exception
     {
         recordManager = null;
-
+        if(!FileSystemUtils.rmdir(tempDir))
+        {
+            throw new RuntimeException("Unable to remove '" + tempDir + "' because your OS is not brown enough");
+        }
+        
         super.tearDown();
     }
 
@@ -219,6 +228,64 @@ public class RecordManagerTest extends TestCase
         {
             // noop.
         }
+    }
 
+    public void testInsertCreatesId()
+    {
+        Record record = new MutableRecordImpl();
+        recordManager.insert("testpath", record);
+        record = recordManager.load("testpath");
+        assertEquals(1, record.getID());
+    }
+
+    public void testInsertCreatesUniqueIds()
+    {
+        recordManager.insert("r1", new MutableRecordImpl());
+        recordManager.insert("r2", new MutableRecordImpl());
+        long id1 = recordManager.load("r1").getID();
+        long id2 = recordManager.load("r2").getID();
+        assertNotSame(id1, id2);
+    }
+
+    public void testIdsAreUniqueAcrossRuns()
+    {
+        long id = recordManager.allocateId();
+        for(int i = 0; i < ID_BLOCK_SIZE * 2 + 5; i++)
+        {
+            newRecordManager(ID_BLOCK_SIZE);
+            for(int j = 0; j < i; j++)
+            {
+                long nextId = recordManager.allocateId();
+                assertNextId(nextId, id);
+                id = nextId;
+            }
+        }
+    }
+
+    public void testIncreasingIdBoundary()
+    {
+        long id = recordManager.allocateId();
+        newRecordManager(ID_BLOCK_SIZE + 10);
+        assertNextId(recordManager.allocateId(), id);
+    }
+
+    public void testDecreasingIdBoundary()
+    {
+        long id = recordManager.allocateId();
+        newRecordManager(ID_BLOCK_SIZE - 1);
+        assertNextId(recordManager.allocateId(), id);
+    }
+
+    private void assertNextId(long nextId, long id)
+    {
+        assertTrue("Next id '" + nextId + "' not higher than last '" + id + "'", nextId > id);
+    }
+
+    private void newRecordManager(long idBlockSize)
+    {
+        recordManager = new RecordManager();
+        recordManager.setIdBlockSize(idBlockSize);
+        recordManager.setRecordSerialiser(new DefaultRecordSerialiser(tempDir));
+        recordManager.init();
     }
 }

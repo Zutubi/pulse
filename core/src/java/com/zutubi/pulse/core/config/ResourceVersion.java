@@ -1,16 +1,19 @@
-package com.zutubi.pulse.core.model;
+package com.zutubi.pulse.core.config;
 
 import com.zutubi.pulse.core.FileLoadException;
 import com.zutubi.pulse.core.config.ResourceProperty;
+import com.zutubi.config.annotations.SymbolicName;
+import com.zutubi.config.annotations.ID;
 
 import java.util.Map;
 import java.util.TreeMap;
 
 /**
- * <class-comment/>
  */
-public class ResourceVersion extends Entity
+@SymbolicName("internal.resourceVersion")
+public class ResourceVersion
 {
+    @ID
     private String value;
     private Map<String, ResourceProperty> properties = new TreeMap<String, ResourceProperty>();
 
@@ -39,7 +42,7 @@ public class ResourceVersion extends Entity
         return properties;
     }
 
-    private void setProperties(Map<String, ResourceProperty> properties)
+    public void setProperties(Map<String, ResourceProperty> properties)
     {
         this.properties = properties;
     }

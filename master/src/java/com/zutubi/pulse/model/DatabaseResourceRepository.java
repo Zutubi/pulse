@@ -3,8 +3,8 @@ package com.zutubi.pulse.model;
 import com.zutubi.pulse.core.ResourceRepository;
 import com.zutubi.pulse.core.ConfigurableResourceRepository;
 import com.zutubi.pulse.core.FileLoadException;
-import com.zutubi.pulse.core.model.Resource;
-import com.zutubi.pulse.core.model.ResourceVersion;
+import com.zutubi.pulse.core.config.Resource;
+import com.zutubi.pulse.core.config.ResourceVersion;
 import com.zutubi.pulse.model.persistence.ResourceDao;
 
 import java.util.LinkedList;
@@ -95,7 +95,7 @@ public class DatabaseResourceRepository implements ConfigurableResourceRepositor
         PersistentResource existingResource = resourceDao.findBySlaveAndName(slave, resource.getName());
         if (existingResource == null)
         {
-            resourceDao.save(new PersistentResource(resource, slave));
+//            resourceDao.save(new PersistentResource(resource, slave));
             return;
         }
 
@@ -146,6 +146,6 @@ public class DatabaseResourceRepository implements ConfigurableResourceRepositor
                 }
             }
         }
-        resourceDao.save(existingResource);
+//        resourceDao.save(existingResource);
     }
 }

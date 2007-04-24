@@ -2,6 +2,7 @@ package com.zutubi.prototype.config.types;
 
 import com.zutubi.config.annotations.ID;
 import com.zutubi.config.annotations.SymbolicName;
+import com.zutubi.pulse.core.config.AbstractConfiguration;
 
 import java.util.List;
 import java.util.Map;
@@ -9,7 +10,7 @@ import java.util.Map;
 /**
  */
 @SymbolicName("Composite")
-public class CompositeObject
+public class CompositeObject extends AbstractConfiguration
 {
     @ID
     private String strA;

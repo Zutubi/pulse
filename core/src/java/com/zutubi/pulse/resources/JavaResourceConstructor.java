@@ -2,8 +2,8 @@ package com.zutubi.pulse.resources;
 
 import com.zutubi.pulse.core.FileLoadException;
 import com.zutubi.pulse.core.config.ResourceProperty;
-import com.zutubi.pulse.core.model.Resource;
-import com.zutubi.pulse.core.model.ResourceVersion;
+import com.zutubi.pulse.core.config.Resource;
+import com.zutubi.pulse.core.config.ResourceVersion;
 import com.zutubi.pulse.util.SystemUtils;
 
 import java.io.File;

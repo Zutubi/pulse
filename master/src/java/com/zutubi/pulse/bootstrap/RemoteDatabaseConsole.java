@@ -35,7 +35,7 @@ public class RemoteDatabaseConsole implements DatabaseConsole, ApplicationContex
 
     public boolean schemaExists()
     {
-        return JDBCUtils.tableExists(dataSource, "RESOURCE");
+        return JDBCUtils.tableExists(dataSource, "PROJECT");
     }
 
     public void createSchema() throws SQLException

@@ -1,8 +1,8 @@
 package com.zutubi.pulse.core;
 
 import com.opensymphony.util.TextUtils;
-import com.zutubi.pulse.core.model.Resource;
-import com.zutubi.pulse.core.model.ResourceVersion;
+import com.zutubi.pulse.core.config.Resource;
+import com.zutubi.pulse.core.config.ResourceVersion;
 
 /**
  * A resource references adds the named resource to the current scope.

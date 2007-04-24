@@ -9,7 +9,7 @@ import java.util.Set;
 
 /**
  */
-public class TemplateRecord implements Record
+public class TemplateRecord extends AbstractRecord
 {
     private TypeRegistry registry;
     private TemplateRecord parent;

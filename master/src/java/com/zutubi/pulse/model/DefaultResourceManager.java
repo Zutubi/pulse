@@ -1,8 +1,9 @@
 package com.zutubi.pulse.model;
 
 import com.zutubi.pulse.core.ConfigurableResourceRepository;
-import com.zutubi.pulse.core.model.Resource;
-import com.zutubi.pulse.core.model.ResourceVersion;
+import com.zutubi.pulse.core.ResourceRepository;
+import com.zutubi.pulse.core.config.Resource;
+import com.zutubi.pulse.core.config.ResourceVersion;
 import com.zutubi.pulse.model.persistence.BuildSpecificationNodeDao;
 import com.zutubi.pulse.model.persistence.ResourceDao;
 import com.zutubi.pulse.resources.ResourceDiscoverer;
@@ -31,7 +32,6 @@ public class DefaultResourceManager implements ResourceManager
 
     public void save(PersistentResource entity)
     {
-        resourceDao.save(entity);
     }
 
     public void delete(PersistentResource entity)
@@ -43,12 +43,11 @@ public class DefaultResourceManager implements ResourceManager
             slave.getResources().remove(entity);
         }
         // now that we have removed the associations, we can delete the entity.
-        resourceDao.delete(entity);
     }
 
     public PersistentResource findById(long id)
     {
-        return resourceDao.findById(id);
+        return null;
     }
 
     public PersistentResource findBySlaveAndName(Slave slave, String name)
@@ -56,9 +55,9 @@ public class DefaultResourceManager implements ResourceManager
         return resourceDao.findBySlaveAndName(slave, name);
     }
 
-    public DatabaseResourceRepository getMasterRepository()
+    public ConfigurationResourceRepository getMasterRepository()
     {
-        return masterResourceRepository;
+        return null;
     }
 
     public DatabaseResourceRepository getSlaveRepository(Slave slave)
@@ -74,14 +73,14 @@ public class DefaultResourceManager implements ResourceManager
     public void addDiscoveredResources(Slave slave, List<Resource> resources)
     {
         ConfigurableResourceRepository repository = getRepository(slave);
-
-        for(Resource r: resources)
-        {
-            if(!repository.hasResource(r.getName()))
-            {
-                repository.addResource(r);
-            }
-        }
+        // FIXME
+//        for(Resource r: resources)
+//        {
+//            if(!repository.hasResource(r.getName()))
+//            {
+//                repository.addResource(r);
+//            }
+//        }
     }
 
     public List<PersistentResource> findAll()
@@ -91,6 +90,7 @@ public class DefaultResourceManager implements ResourceManager
 
     public void editResource(PersistentResource resource, String newName, String defaultVersion)
     {
+        // FIXME remember to catch config events to do this
         List<BuildSpecificationNode> nodes = buildSpecificationNodeDao.findByResourceRequirement(resource.getName());
         for(BuildSpecificationNode node: nodes)
         {
@@ -107,11 +107,11 @@ public class DefaultResourceManager implements ResourceManager
 
         resource.setName(newName);
         resource.setDefaultVersion(defaultVersion);
-        resourceDao.save(resource);
     }
 
     public void renameResourceVersion(PersistentResource resource, String value, String newValue)
     {
+        // FIXME remember to catch config events to do this
         List<BuildSpecificationNode> nodes = buildSpecificationNodeDao.findByResourceRequirement(resource.getName());
         for(BuildSpecificationNode node: nodes)
         {
@@ -130,7 +130,6 @@ public class DefaultResourceManager implements ResourceManager
         resource.deleteVersion(version);
         version.setValue(newValue);
         resource.add(version);
-        resourceDao.save(resource);
     }
 
     public void addResource(Slave slave, Resource resource)
@@ -139,10 +138,6 @@ public class DefaultResourceManager implements ResourceManager
         repository.addResource(resource, true);
     }
 
-    public List<PersistentResource> findBySlave(Slave slave)
-    {
-        return resourceDao.findAllBySlave(slave);
-    }
 
     public ConfigurableResourceRepository getRepository(Slave slave)
     {

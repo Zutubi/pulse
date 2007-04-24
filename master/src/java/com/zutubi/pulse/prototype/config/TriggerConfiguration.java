@@ -1,21 +1,9 @@
 package com.zutubi.pulse.prototype.config;
 
-import com.zutubi.config.annotations.ID;
+import com.zutubi.pulse.core.config.AbstractNamedConfiguration;
 
 /**
  */
-public class TriggerConfiguration
+public class TriggerConfiguration extends AbstractNamedConfiguration
 {
-    @ID
-    private String name;
-
-    public String getName()
-    {
-        return name;
-    }
-
-    public void setName(String name)
-    {
-        this.name = name;
-    }
 }

@@ -292,46 +292,6 @@ This context requires:
         </property>
     </bean>
 
-    <bean id="resourceDaoTarget" class="com.zutubi.pulse.model.persistence.hibernate.HibernateResourceDao">
-        <property name="sessionFactory">
-            <ref bean="sessionFactory"/>
-        </property>
-    </bean>
-    <bean id="resourceDao" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
-        <property name="transactionManager">
-            <ref bean="transactionManager"/>
-        </property>
-        <property name="target">
-            <ref bean="resourceDaoTarget"/>
-        </property>
-        <property name="transactionAttributes">
-            <props>
-                <prop key="*">PROPAGATION_REQUIRED</prop>
-            </props>
-        </property>
-    </bean>
-
-
-    <bean id="resourceVersionDaoTarget" class="com.zutubi.pulse.model.persistence.hibernate.HibernateResourceVersionDao">
-        <property name="sessionFactory">
-            <ref bean="sessionFactory"/>
-        </property>
-    </bean>
-    <bean id="resourceVersionDao" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
-        <property name="transactionManager">
-            <ref bean="transactionManager"/>
-        </property>
-        <property name="target">
-            <ref bean="resourceVersionDaoTarget"/>
-        </property>
-        <property name="transactionAttributes">
-            <props>
-                <prop key="*">PROPAGATION_REQUIRED</prop>
-            </props>
-        </property>
-    </bean>
-
-
     <bean id="testCaseIndexDaoTarget" class="com.zutubi.pulse.model.persistence.hibernate.HibernateTestCaseIndexDao">
         <property name="sessionFactory">
             <ref bean="sessionFactory"/>

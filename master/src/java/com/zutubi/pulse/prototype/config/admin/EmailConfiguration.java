@@ -7,6 +7,7 @@ import com.zutubi.config.annotations.SymbolicName;
 import com.zutubi.validation.annotations.Email;
 import com.zutubi.validation.annotations.Numeric;
 import com.zutubi.validation.annotations.Required;
+import com.zutubi.pulse.core.config.AbstractConfiguration;
 
 /**
  *
@@ -15,7 +16,7 @@ import com.zutubi.validation.annotations.Required;
 @SymbolicName("emailConfig")
 @Form(fieldOrder = { "host", "ssl", "from", "username", "password", "subjectPrefix", "customPort", "port"})
 @ConfigurationCheck("EmailConfigurationCheckHandler")
-public class EmailConfiguration
+public class EmailConfiguration extends AbstractConfiguration
 {
     @Required
     private String host;

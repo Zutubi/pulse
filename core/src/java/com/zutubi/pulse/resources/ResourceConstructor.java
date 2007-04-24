@@ -1,6 +1,6 @@
 package com.zutubi.pulse.resources;
 
-import com.zutubi.pulse.core.model.Resource;
+import com.zutubi.pulse.core.config.Resource;
 
 import java.io.File;
 import java.io.IOException;

@@ -1,20 +1,11 @@
 package com.zutubi.pulse.prototype.config;
 
+import com.zutubi.pulse.core.config.AbstractNamedConfiguration;
+
 /**
  *
  *
  */
-public class CleanupRuleConfiguration
+public class CleanupRuleConfiguration  extends AbstractNamedConfiguration
 {
-    private String name;
-
-    public String getName()
-    {
-        return name;
-    }
-
-    public void setName(String name)
-    {
-        this.name = name;
-    }
 }

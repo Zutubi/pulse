@@ -5,6 +5,7 @@ import com.zutubi.config.annotations.Form;
 import com.zutubi.config.annotations.Password;
 import com.zutubi.config.annotations.SymbolicName;
 import com.zutubi.validation.annotations.Required;
+import com.zutubi.pulse.core.config.AbstractConfiguration;
 
 /**
  * Configuration for LDAP auth integration.
@@ -14,7 +15,7 @@ import com.zutubi.validation.annotations.Required;
         "userBaseDn", "userFilter", "autoAddUsers", "emailAttribute", "groupBaseDn", "groupSearchFilter",
         "groupRoleAttribute", "searchGroupSubtree", "followReferrals", "escapeSpaceCharacters"})
 @ConfigurationCheck("LDAPConfigurationCheckHandler")
-public class LDAPConfiguration
+public class LDAPConfiguration extends AbstractConfiguration
 {
     private boolean enabled;
     @Required

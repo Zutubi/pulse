@@ -11,7 +11,7 @@ import com.zutubi.pulse.servercore.scm.p4.PerforceClient;
  *
  */
 @Form(fieldOrder = { "port", "user", "password", "spec", "monitor", "customPollingInterval", "pollingInterval", "quietPeriodEnabled", "quietPeriod" })
-@ConfigurationCheck("PerforceConfigurationCheckHandler")
+@ConfigurationCheck("com.zutubi.pulse.prototype.config.PerforceConfigurationCheckHandler")
 public class PerforceConfiguration extends ScmConfiguration
 {
     private String port;

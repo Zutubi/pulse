@@ -2,13 +2,14 @@ package com.zutubi.prototype.config.types;
 
 import com.zutubi.config.annotations.SymbolicName;
 import com.zutubi.prototype.config.types.CompositeObject;
+import com.zutubi.pulse.core.config.AbstractConfiguration;
 
 import java.util.Map;
 
 /**
  */
 @SymbolicName("CompositeCollection")
-public class CompositeCollectionObject
+public class CompositeCollectionObject extends AbstractConfiguration
 {
     private Map<String, CompositeObject> composites;
 

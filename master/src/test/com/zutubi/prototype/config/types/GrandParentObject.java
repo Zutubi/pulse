@@ -1,11 +1,12 @@
 package com.zutubi.prototype.config.types;
 
 import com.zutubi.config.annotations.SymbolicName;
+import com.zutubi.pulse.core.config.AbstractConfiguration;
 
 /**
  */
 @SymbolicName("GrandParent")
-public class GrandParentObject
+public class GrandParentObject extends AbstractConfiguration
 {
     private String strA;
     private SimpleObject simple;

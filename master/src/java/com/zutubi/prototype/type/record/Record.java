@@ -78,4 +78,10 @@ public interface Record
     Set<String> metaKeySet();
 
     Set<String> simpleKeySet();
+
+    /**
+     * @return the unique id for this record, or 0 if this record has never
+     *         been saved.
+     */
+    long getID();
 }

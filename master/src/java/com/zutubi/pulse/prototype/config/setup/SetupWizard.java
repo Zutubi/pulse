@@ -1,6 +1,5 @@
 package com.zutubi.pulse.prototype.config.setup;
 
-import com.zutubi.prototype.config.ConfigurationPersistenceManager;
 import com.zutubi.prototype.type.CompositeType;
 import com.zutubi.prototype.type.TypeException;
 import com.zutubi.prototype.type.TypeProperty;
@@ -41,8 +40,8 @@ public class SetupWizard extends AbstractTypeWizard
 
     public void initialise()
     {
-        adminConfigType = (CompositeType) configurationPersistenceManager.getType("setup/admin");
-        CompositeType serverConfigType = (CompositeType) configurationPersistenceManager.getType("setup/server");
+        adminConfigType = typeRegistry.getType(AdminUserConfiguration.class);
+        CompositeType serverConfigType = typeRegistry.getType(ServerSettingsConfiguration.class);
 
         wizardStates = new LinkedList<WizardState>();
         addWizardStates(wizardStates, adminConfigType, null);

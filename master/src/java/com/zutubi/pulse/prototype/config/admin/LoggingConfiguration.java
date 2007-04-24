@@ -2,11 +2,12 @@ package com.zutubi.pulse.prototype.config.admin;
 
 import com.zutubi.config.annotations.Select;
 import com.zutubi.config.annotations.SymbolicName;
+import com.zutubi.pulse.core.config.AbstractConfiguration;
 
 /**
  */
 @SymbolicName("loggingConfig")
-public class LoggingConfiguration
+public class LoggingConfiguration extends AbstractConfiguration
 {
     private String level = "default";
     private boolean eventLoggingEnabled = false;

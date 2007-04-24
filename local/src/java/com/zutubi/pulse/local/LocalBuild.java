@@ -5,7 +5,7 @@ import com.zutubi.pulse.dev.bootstrap.DevBootstrapManager;
 import com.zutubi.pulse.bootstrap.ComponentContext;
 import com.zutubi.pulse.plugins.PluginManager;
 import com.zutubi.pulse.core.*;
-import com.zutubi.pulse.core.model.Resource;
+import com.zutubi.pulse.core.config.Resource;
 import com.zutubi.pulse.events.EventManager;
 import com.zutubi.util.IOUtils;
 import org.apache.commons.cli.*;

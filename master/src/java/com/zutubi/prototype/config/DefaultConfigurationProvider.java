@@ -4,6 +4,7 @@ import com.zutubi.prototype.config.events.ConfigurationEvent;
 import com.zutubi.prototype.type.CompositeType;
 import com.zutubi.prototype.type.TypeRegistry;
 import com.zutubi.pulse.events.*;
+import com.zutubi.pulse.core.config.Configuration;
 import com.zutubi.util.Predicate;
 
 import java.util.Collection;
@@ -48,14 +49,29 @@ public class DefaultConfigurationProvider implements ConfigurationProvider
         return null;
     }
 
+    public <T> Collection<T> getAll(String path, Class<T> clazz)
+    {
+        return configurationPersistenceManager.getAllInstances(path, clazz);
+    }
+
     public <T> Collection<T> getAll(Class<T> clazz)
     {
         return configurationPersistenceManager.getAllInstances(clazz);
     }
 
+    public String insert(String parentPath, Object instance)
+    {
+        return configurationPersistenceManager.insert(parentPath, instance);
+    }
+
     public void save(String parentPath, String baseName, Object instance)
     {
         configurationPersistenceManager.save(parentPath, baseName, instance);
+    }
+
+    public void delete(String path)
+    {
+        configurationPersistenceManager.delete(path);
     }
 
     public void registerEventListener(ConfigurationEventListener listener, boolean synchronous, Class clazz)

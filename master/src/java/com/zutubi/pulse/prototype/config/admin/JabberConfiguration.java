@@ -4,6 +4,7 @@ import com.zutubi.config.annotations.ConfigurationCheck;
 import com.zutubi.config.annotations.Form;
 import com.zutubi.config.annotations.SymbolicName;
 import com.zutubi.pulse.jabber.JabberManager;
+import com.zutubi.pulse.core.config.AbstractConfiguration;
 import com.zutubi.validation.annotations.Required;
 
 /**
@@ -13,7 +14,7 @@ import com.zutubi.validation.annotations.Required;
 @SymbolicName("jabberConfig")
 @Form(fieldOrder = {"server", "port", "username", "password", "ssl"})
 @ConfigurationCheck("JabberConfigurationCheckHandler")
-public class JabberConfiguration
+public class JabberConfiguration extends AbstractConfiguration
 {
     @Required
     private String server;

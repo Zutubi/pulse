@@ -2,25 +2,13 @@ package com.zutubi.pulse.prototype.config;
 
 import com.zutubi.config.annotations.Format;
 import com.zutubi.validation.annotations.Name;
+import com.zutubi.pulse.core.config.AbstractNamedConfiguration;
 
 /**
  *
  *
  */
 @Format("ArtifactConfigurationFormatter")
-public class ArtifactConfiguration
+public class ArtifactConfiguration extends AbstractNamedConfiguration
 {
-    @Name
-    private String name;
-
-
-    public String getName()
-    {
-        return name;
-    }
-
-    public void setName(String name)
-    {
-        this.name = name;
-    }
 }

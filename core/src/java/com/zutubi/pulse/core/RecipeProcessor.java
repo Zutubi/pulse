@@ -3,6 +3,8 @@ package com.zutubi.pulse.core;
 import com.opensymphony.util.TextUtils;
 import com.zutubi.pulse.BuildContext;
 import com.zutubi.pulse.core.model.*;
+import com.zutubi.pulse.core.config.Resource;
+import com.zutubi.pulse.core.config.ResourceVersion;
 import com.zutubi.pulse.events.EventManager;
 import com.zutubi.pulse.events.build.RecipeCommencedEvent;
 import com.zutubi.pulse.events.build.RecipeCompletedEvent;
