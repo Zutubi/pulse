@@ -206,7 +206,7 @@ public class SvnClient implements ScmClient
     }
 
     //=======================================================================
-    // SCMServer interface
+    // ScmClient interface
     //=======================================================================
 
     public Set<ScmCapability> getCapabilities()
@@ -723,39 +723,6 @@ public class SvnClient implements ScmClient
         catch (SVNException e)
         {
             throw convertException(e);
-        }
-    }
-
-    //=======================================================================
-    // Testing use only
-    //=======================================================================
-
-    public static void main(String argv[])
-    {
-        try
-        {
-            SvnClient server = new SvnClient("svn+ssh://jason@www.anyhews.net/usr/local/svn-repo/pulse/trunk", argv[0], argv[1]);
-            //server.checkout(new File("/home/jsankey/svntest"), new SVNRevision(ISVNWorkspace.HEAD));
-            List<Changelist> cls = server.getChanges(new NumericalRevision(47), new NumericalRevision(-1));
-
-            for (Changelist l : cls)
-            {
-                System.out.println("Changelist:");
-                System.out.println("  Revision: " + l.getRevision());
-                System.out.println("  Date    : " + l.getDate());
-                System.out.println("  User    : " + l.getUser());
-                System.out.println("  Comment : " + l.getComment());
-                System.out.println("  Files   : " + l.getRevision());
-
-                for (Change c : l.getChanges())
-                {
-                    System.out.println("    " + c.getFilename() + "#" + c.getRevision() + " - " + c.getAction());
-                }
-            }
-        }
-        catch (ScmException e)
-        {
-            e.printStackTrace();
         }
     }
 
