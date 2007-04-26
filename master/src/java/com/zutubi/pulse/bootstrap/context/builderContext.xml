@@ -132,11 +132,6 @@
 
     <bean id="masterRecipeProcessor" class="com.zutubi.pulse.MasterRecipeProcessor" autowire="byName"/>
 
-<!--
-    <bean id="freemarkerConfiguration" class="com.zutubi.pulse.bootstrap.freemarker.FreemarkerConfigurationFactoryBean"
-          autowire="byName"/>
--->
-
     <bean id="buildResultRenderer" class="com.zutubi.pulse.renderer.FreemarkerBuildResultRenderer" autowire="byName"/>
 
     <bean id="userConfigRoot" class="org.springframework.beans.factory.config.PropertyPathFactoryBean">
@@ -217,5 +212,7 @@
         <property name="objectFactory"><ref bean="objectFactory"/></property>
     </bean>
 
+
+    <bean id="cleanupManager" class="com.zutubi.pulse.cleanup.CleanupManager" autowire="byName" init-method="init"/>
 
 </beans>

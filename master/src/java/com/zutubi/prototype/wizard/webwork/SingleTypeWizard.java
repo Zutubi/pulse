@@ -1,6 +1,5 @@
 package com.zutubi.prototype.wizard.webwork;
 
-import com.zutubi.prototype.config.ConfigurationPersistenceManager;
 import com.zutubi.prototype.type.CompositeType;
 import com.zutubi.prototype.type.record.MutableRecordImpl;
 import com.zutubi.prototype.type.record.TemplateRecord;

@@ -2,15 +2,22 @@ package com.zutubi.prototype.config;
 
 import com.zutubi.config.annotations.ConfigurationCheck;
 import com.zutubi.prototype.ConfigurationCheckHandler;
-import com.zutubi.prototype.type.*;
+import com.zutubi.prototype.type.CompositeType;
+import com.zutubi.prototype.type.ListType;
+import com.zutubi.prototype.type.MapType;
+import com.zutubi.prototype.type.ProjectMapType;
+import com.zutubi.prototype.type.TypeException;
+import com.zutubi.prototype.type.TypeHandler;
+import com.zutubi.prototype.type.TypeProperty;
+import com.zutubi.prototype.type.TypeRegistry;
 import com.zutubi.pulse.prototype.config.*;
 import com.zutubi.pulse.prototype.config.admin.GlobalConfiguration;
 import com.zutubi.pulse.prototype.config.setup.SetupConfiguration;
 import com.zutubi.pulse.servercore.config.CvsConfiguration;
 import com.zutubi.pulse.servercore.config.PerforceConfiguration;
-import com.zutubi.pulse.servercore.config.SvnConfiguration;
 import com.zutubi.pulse.servercore.config.ScmConfiguration;
-import com.zutubi.pulse.core.config.Configuration;
+import com.zutubi.pulse.servercore.config.SvnConfiguration;
+import com.zutubi.pulse.cleanup.config.CleanupConfiguration;
 import com.zutubi.util.logging.Logger;
 
 import java.util.HashMap;
@@ -41,11 +48,8 @@ public class ConfigurationRegistry
             typeConfig.addExtension("antConfig");
             typeConfig.addExtension("mavenConfig");
 
-            // cleanup rule configuration
-            registerConfigurationType("cleanupRuleConfig", CleanupRuleConfiguration.class);
-
             // commit message processors.
-            CompositeType commitConfig = registerConfigurationType("commitConfig", CommitMessageConfiguration.class);
+            CompositeType commitConfig = registerConfigurationType(CommitMessageConfiguration.class);
             registerConfigurationType("jiraCommitConfig", JiraCommitMessageConfiguration.class);
             registerConfigurationType("customCommitConfig", CustomCommitMessageConfiguration.class);
 
@@ -70,7 +74,6 @@ public class ConfigurationRegistry
             // generated dynamically as new components are registered.
             CompositeType projectConfig = registerConfigurationType("projectConfig", ProjectConfiguration.class);
             projectConfig.addProperty(new TypeProperty("type", typeRegistry.getType("typeConfig")));
-            projectConfig.addProperty(new TypeProperty("cleanup", typeRegistry.getType("cleanupRuleConfig")));
             projectConfig.addProperty(new TypeProperty("changeViewer", typeRegistry.getType("changeViewerConfig")));
 
             // scm configuration
@@ -102,6 +105,13 @@ public class ConfigurationRegistry
             commitTransformers.setTypeRegistry(typeRegistry);
             commitTransformers.setCollectionType(typeRegistry.getType("commitConfig"));
             projectConfig.addProperty(new TypeProperty("commit", commitTransformers));
+
+            // cleanup rule configuration
+            CompositeType cleanupType = registerConfigurationType(CleanupConfiguration.class);
+            MapType cleanupRules = new MapType(configurationPersistenceManager);
+            cleanupRules.setTypeRegistry(typeRegistry);
+            cleanupRules.setCollectionType(cleanupType);
+            projectConfig.addProperty(new TypeProperty("cleanup", cleanupRules));
 
             // define the root level scope.
             ProjectMapType projectCollection = new ProjectMapType(configurationPersistenceManager);

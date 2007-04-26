@@ -3,21 +3,18 @@ package com.zutubi.pulse.model;
 import com.zutubi.pulse.MasterBuildPaths;
 import com.zutubi.pulse.bootstrap.DatabaseConsole;
 import com.zutubi.pulse.bootstrap.MasterConfigurationManager;
-import com.zutubi.pulse.core.model.*;
-import com.zutubi.pulse.events.Event;
-import com.zutubi.pulse.events.EventListener;
-import com.zutubi.pulse.events.EventManager;
-import com.zutubi.pulse.events.build.BuildCompletedEvent;
+import com.zutubi.pulse.core.model.Changelist;
+import com.zutubi.pulse.core.model.CommandResult;
+import com.zutubi.pulse.core.model.PersistentName;
+import com.zutubi.pulse.core.model.RecipeResult;
+import com.zutubi.pulse.core.model.ResultState;
+import com.zutubi.pulse.core.model.Revision;
+import com.zutubi.pulse.core.model.StoredArtifact;
+import com.zutubi.pulse.core.model.StoredFileArtifact;
 import com.zutubi.pulse.model.persistence.ArtifactDao;
 import com.zutubi.pulse.model.persistence.BuildResultDao;
 import com.zutubi.pulse.model.persistence.ChangelistDao;
 import com.zutubi.pulse.model.persistence.FileArtifactDao;
-import com.zutubi.pulse.scheduling.Scheduler;
-import com.zutubi.pulse.scheduling.SchedulingException;
-import com.zutubi.pulse.scheduling.SimpleTrigger;
-import com.zutubi.pulse.scheduling.Trigger;
-import com.zutubi.pulse.scheduling.tasks.CleanupBuilds;
-import com.zutubi.util.Constants;
 import com.zutubi.pulse.util.FileSystemUtils;
 import com.zutubi.util.logging.Logger;
 
@@ -30,7 +27,7 @@ import java.util.Map;
  *
  *
  */
-public class DefaultBuildManager implements BuildManager, EventListener
+public class DefaultBuildManager implements BuildManager
 {
     private static final Logger LOG = Logger.getLogger(DefaultBuildManager.class);
 
@@ -39,43 +36,14 @@ public class DefaultBuildManager implements BuildManager, EventListener
     private FileArtifactDao fileArtifactDao;
     private ChangelistDao changelistDao;
     private ProjectManager projectManager;
-    private Scheduler scheduler;
     private MasterConfigurationManager configurationManager;
-    private EventManager eventManager;
-    private TestManager testManager;
 
     private DatabaseConsole databaseConsole;
-
-    private static final String CLEANUP_NAME = "cleanup";
-    private static final String CLEANUP_GROUP = "services";
-    private static final long CLEANUP_FREQUENCY = Constants.HOUR;
 
     private static final Map<Project, Object> runningCleanups = new HashMap<Project, Object>();
 
     public void init()
     {
-        eventManager.register(this);
-
-        // register a schedule for cleaning up old build results.
-        // check if the trigger exists. if not, create and schedule.
-        Trigger trigger = scheduler.getTrigger(CLEANUP_NAME, CLEANUP_GROUP);
-        if (trigger != null)
-        {
-            return;
-        }
-
-        // initialise the trigger.
-        trigger = new SimpleTrigger(CLEANUP_NAME, CLEANUP_GROUP, CLEANUP_FREQUENCY);
-        trigger.setTaskClass(CleanupBuilds.class);
-
-        try
-        {
-            scheduler.schedule(trigger);
-        }
-        catch (SchedulingException e)
-        {
-            LOG.severe(e);
-        }
     }
 
     public void setBuildResultDao(BuildResultDao dao)
@@ -611,30 +579,6 @@ public class DefaultBuildManager implements BuildManager, EventListener
         }
     }
 
-    public void handleEvent(Event evt)
-    {
-        BuildCompletedEvent completedEvent = (BuildCompletedEvent) evt;
-        BuildResult result = completedEvent.getResult();
-        if(result.isPersonal())
-        {
-            cleanupBuilds(result.getUser());
-        }
-        else
-        {
-            cleanupBuilds(result.getProject());
-        }
-    }
-
-    public Class[] getHandledEvents()
-    {
-        return new Class[]{BuildCompletedEvent.class};
-    }
-
-    public void setScheduler(Scheduler scheduler)
-    {
-        this.scheduler = scheduler;
-    }
-
     public void setProjectManager(ProjectManager projectManager)
     {
         this.projectManager = projectManager;
@@ -653,16 +597,6 @@ public class DefaultBuildManager implements BuildManager, EventListener
     public void setConfigurationManager(MasterConfigurationManager configurationManager)
     {
         this.configurationManager = configurationManager;
-    }
-
-    public void setEventManager(EventManager eventManager)
-    {
-        this.eventManager = eventManager;
-    }
-
-    public void setTestManager(TestManager testManager)
-    {
-        this.testManager = testManager;
     }
 
     public void setDatabaseConsole(DatabaseConsole databaseConsole)

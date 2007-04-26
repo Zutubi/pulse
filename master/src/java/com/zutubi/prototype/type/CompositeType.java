@@ -1,17 +1,22 @@
 package com.zutubi.prototype.type;
 
+import com.zutubi.config.annotations.Internal;
 import com.zutubi.prototype.config.ConfigurationPersistenceManager;
-import com.zutubi.prototype.type.record.*;
-import com.zutubi.pulse.prototype.squeezer.SqueezeException;
-import com.zutubi.pulse.prototype.squeezer.Squeezers;
-import com.zutubi.pulse.prototype.squeezer.TypeSqueezer;
+import com.zutubi.prototype.type.record.MutableRecord;
+import com.zutubi.prototype.type.record.MutableRecordImpl;
+import com.zutubi.prototype.type.record.PathUtils;
+import com.zutubi.prototype.type.record.Record;
+import com.zutubi.prototype.type.record.RecordManager;
 import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.Mapping;
 import com.zutubi.util.logging.Logger;
-import com.zutubi.config.annotations.Internal;
 
 import java.lang.reflect.Method;
-import java.util.*;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
 
 /**
  *
@@ -288,16 +293,12 @@ public class CompositeType extends AbstractType implements ComplexType
             try
             {
                 Object defaultInstance = getClazz().newInstance();
-                for (TypeProperty property : getProperties(SimpleType.class))
+                for (TypeProperty property : getProperties())
                 {
-                    try
+                    Object defaultValue = property.getGetter().invoke(defaultInstance);
+                    if (defaultValue != null)
                     {
-                        TypeSqueezer squeezer = Squeezers.findSqueezer(property.getClazz());
-                        record.put(property.getName(), squeezer.squeeze(property.getGetter().invoke(defaultInstance)));
-                    }
-                    catch (SqueezeException e)
-                    {
-                        LOG.warning(e);
+                        record.put(property.getName(), property.getType().unstantiate(defaultValue));
                     }
                 }
             }
