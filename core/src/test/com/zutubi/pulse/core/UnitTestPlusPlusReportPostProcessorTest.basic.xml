@@ -1,0 +1,12 @@
+<?xml version="1.0"?>
+<unittest-results tests="5" failedtests="2" failures="2" time="0.109">
+    <test suite="SuiteOne" name="TestOne" time="0"/>
+    <test suite="SuiteOne" name="TestTwo" time="0.001">
+        <failure message="utpp.cpp(14) : false"/>
+    </test>
+    <test suite="SuiteOne" name="TestThrow" time="0.107">
+        <failure message="utpp.cpp(17) : Unhandled exception: Crash!"/>
+    </test>
+    <test suite="SuiteTwo" name="TestOne" time="0"/>
+    <test suite="DefaultSuite" name="SuiteLess" time="0"/>
+</unittest-results>
