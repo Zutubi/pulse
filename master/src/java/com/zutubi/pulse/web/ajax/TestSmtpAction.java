@@ -5,6 +5,8 @@ import com.zutubi.pulse.model.EmailContactPoint;
 import com.zutubi.pulse.web.ActionSupport;
 import com.zutubi.pulse.util.logging.Logger;
 
+import java.util.Arrays;
+
 /**
  * An ajax request to test SMTP settings and send a fragment of HTML
  * with results.
@@ -93,7 +95,7 @@ public class TestSmtpAction extends ActionSupport
                 {
                     port = -1;
                 }
-                EmailContactPoint.sendMail(to, prefix + " Test Email", "text/plain", "Welcome to Zutubi Pulse!", host, port, ssl, username, password, from);
+                EmailContactPoint.sendMail(Arrays.asList(to), prefix + " Test Email", "text/plain", "Welcome to Zutubi Pulse!", host, port, ssl, username, password, from);
             }
             catch(Exception e)
             {

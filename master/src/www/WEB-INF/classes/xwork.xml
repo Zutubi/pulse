@@ -718,6 +718,7 @@
             <interceptor-ref name="wizardStack"/>
             <param name="wizardClass">com.zutubi.pulse.web.project.AddPostBuildActionWizard</param>
             <result name="select" type="velocity">select-post-build-action.vm</result>
+            <result name="email" type="velocity">configure-email-action.vm</result>
             <result name="exe" type="velocity">configure-exe-action.vm</result>
             <result name="tag" type="velocity">configure-tag-action.vm</result>
             <result name="success" type="redirect">/configureProject.action?id=${wizard.projectId}</result>
@@ -744,8 +745,22 @@
 
         <action name="editPostBuildAction" class="com.zutubi.pulse.web.project.EditPostBuildActionAction">
             <result name="run executable" type="chain">editExeAction!input</result>
+            <result name="email committers" type="chain">editEmailAction!input</result>
             <result name="apply tag" type="chain">editTagAction!input</result>
             <result name="error" type="velocity">generic-error.vm</result>
+        </action>
+
+        <!-- Alias is required as WW can't chain to a non-execute method :| -->
+        <action name="editEmailAction!input" class="com.zutubi.pulse.web.project.EditEmailActionAction" method="input">
+            <interceptor-ref name="crudStack"/>
+            <result name="input" type="velocity">edit-action-email.vm</result>
+        </action>
+
+        <action name="editEmailAction" class="com.zutubi.pulse.web.project.EditEmailActionAction">
+            <interceptor-ref name="crudStack"/>
+            <result name="input" type="velocity">edit-action-email.vm</result>
+            <result name="cancel" type="redirect">/configureProject.action?id=${projectId}</result>
+            <result name="success" type="redirect">/configureProject.action?id=${projectId}</result>
         </action>
 
         <!-- Alias is required as WW can't chain to a non-execute method :| -->

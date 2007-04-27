@@ -13,6 +13,8 @@ import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 import java.util.Date;
 import java.util.Properties;
+import java.util.List;
+import java.util.Arrays;
 
 /**
  *
@@ -79,7 +81,7 @@ public class EmailContactPoint extends ContactPoint
 
         try
         {
-            sendMail(getEmail(), prefix + subject, mimeType, rendered, config.getSmtpHost(), config.getSmtpPort(), config.getSmtpSSL(), config.getSmtpUsername(), config.getSmtpPassword(), config.getSmtpFrom());
+            sendMail(Arrays.asList(getEmail()), prefix + subject, mimeType, rendered, config.getSmtpHost(), config.getSmtpPort(), config.getSmtpSSL(), config.getSmtpUsername(), config.getSmtpPassword(), config.getSmtpFrom());
         }
         catch (Exception e)
         {
@@ -93,7 +95,7 @@ public class EmailContactPoint extends ContactPoint
         return (MasterConfigurationManager) ComponentContext.getBean("configurationManager");
     }
 
-    public static void sendMail(String email, String subject, String mimeType, String body, String host, int port, boolean ssl, final String username, final String password, String from) throws Exception
+    public static void sendMail(List<String> emails, String subject, String mimeType, String body, String host, int port, boolean ssl, final String username, final String password, String from) throws Exception
     {
         Properties properties = (Properties) System.getProperties().clone();
         if(ssl)
@@ -149,8 +151,12 @@ public class EmailContactPoint extends ContactPoint
             msg.setFrom(new InternetAddress(from));
         }
 
-        InternetAddress toAddress = new InternetAddress(email);
-        msg.setRecipient(Message.RecipientType.TO, toAddress);
+        for(String email: emails)
+        {
+            InternetAddress toAddress = new InternetAddress(email);
+            msg.addRecipient(Message.RecipientType.TO, toAddress);
+        }
+
         msg.setSubject(subject);
         msg.setContent(body, mimeType);
         msg.setHeader("X-Mailer", "Zutubi-Pulse");

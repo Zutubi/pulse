@@ -1,0 +1,29 @@
+#helpTag("Project+Email+Committers+Post+Build+Actions")
+#authorisationTags($principle)
+#projectTags($wizard.project)
+<html>
+<head>
+    <title>#wwtext("name=add.post.build.action")</title>
+</head>
+<body>
+    #projectTabs("configuration")
+
+    #parse("/template/includes/actionerrors.vm")
+
+#wwcform("action=addPostBuildAction.action" "id=post.build.action.email" "heading=%{getText('post.build.action.email.step')}" "method=post")
+    #wwhidden("name=state")
+    #wwhidden("name=submit")
+
+    #wwtextfield("name=emailDomain" "label=%{getText('post.build.action.email.domain')}" "required=true" "tabindex=1" "onkeypress=return submitenter(this,event)")
+    #inlineHelp("post.build.action.email.domain.help")
+    #wwselect("name=template" "label=%{getText('post.build.action.email.template')}" "list=availableTemplates" "tabindex=2")
+    #wwcheckbox("name=ignorePulseUsers" "label=%{getText('post.build.action.email.ignore.pulse.users')}" "tabindex=3")
+    #inlineHelp("post.build.action.email.ignore.pulse.users.help")
+
+    #previousFinishCancel(4)
+#end
+</table>
+
+    #tabEnd()
+</body>
+</html>

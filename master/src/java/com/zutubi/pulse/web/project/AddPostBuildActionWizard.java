@@ -10,6 +10,8 @@ import com.zutubi.pulse.model.*;
 import com.zutubi.pulse.web.wizard.BaseWizard;
 import com.zutubi.pulse.web.wizard.BaseWizardState;
 import com.zutubi.pulse.web.wizard.Wizard;
+import com.zutubi.pulse.renderer.TemplateInfo;
+import com.zutubi.pulse.renderer.BuildResultRenderer;
 
 import java.util.*;
 
@@ -18,6 +20,7 @@ import java.util.*;
  */
 public class AddPostBuildActionWizard extends BaseWizard
 {
+    private static final String EMAIL_STATE = "email";
     private static final String EXE_STATE = "exe";
     private static final String TAG_STATE = "tag";
 
@@ -28,20 +31,24 @@ public class AddPostBuildActionWizard extends BaseWizard
     private ProjectManager projectManager;
     private BuildManager buildManager;
     private MasterConfigurationManager configurationManager;
+    private BuildResultRenderer buildResultRenderer;
 
     private SelectActionType selectState;
-    private ConfigureTag configTag;
+    private ConfigureEmail configEmail;
     private ConfigureExe configExe;
+    private ConfigureTag configTag;
 
     public AddPostBuildActionWizard()
     {
         selectState = new SelectActionType(this, "select");
-        configTag = new ConfigureTag(this, TAG_STATE);
+        configEmail = new ConfigureEmail(this, EMAIL_STATE);
         configExe = new ConfigureExe(this, EXE_STATE);
+        configTag = new ConfigureTag(this, TAG_STATE);
 
         addInitialState(selectState);
-        addState(configTag);
+        addState(configEmail);
         addState(configExe);
+        addState(configTag);
     }
 
     public long getProjectId()
@@ -107,6 +114,16 @@ public class AddPostBuildActionWizard extends BaseWizard
                     configTag.getTagName(),
                     configTag.getMoveExisting());
         }
+        else if (EMAIL_STATE.equals(selectState.getType()))
+        {
+            action = new EmailCommittersPostBuildAction(selectState.getName(),
+                    project.lookupBuildSpecifications(selectState.getSpecIds()),
+                    ResultState.getStatesList(selectState.getStateNames()),
+                    selectState.getFailOnError(),
+                    configEmail.getEmailDomain(),
+                    configEmail.getTemplate(),
+                    configEmail.getIgnorePulseUsers());
+        }
         else if (EXE_STATE.equals(selectState.getType()))
         {
             action = new RunExecutablePostBuildAction(selectState.getName(),
@@ -154,6 +171,11 @@ public class AddPostBuildActionWizard extends BaseWizard
     public void setConfigurationManager(MasterConfigurationManager configurationManager)
     {
         this.configurationManager = configurationManager;
+    }
+
+    public void setBuildResultRenderer(BuildResultRenderer buildResultRenderer)
+    {
+        this.buildResultRenderer = buildResultRenderer;
     }
 
     public class SelectActionType extends BaseWizardState implements Validateable
@@ -310,6 +332,7 @@ public class AddPostBuildActionWizard extends BaseWizard
             {
                 types = new LinkedHashMap<String, String>();
                 types.put(TAG_STATE, "apply tag");
+                types.put(EMAIL_STATE, "email committers");
                 types.put(EXE_STATE, "run executable");
             }
 
@@ -322,6 +345,73 @@ public class AddPostBuildActionWizard extends BaseWizard
                 return type;
             }
             return super.getStateName();
+        }
+    }
+
+    public class ConfigureEmail extends BaseWizardState
+    {
+        private String emailDomain;
+        private String template;
+        private boolean ignorePulseUsers = false;
+        private Map<String, String> availableTemplates;
+
+        public ConfigureEmail(Wizard wizard, String stateName)
+        {
+            super(wizard, stateName);
+        }
+
+        public void initialise()
+        {
+            super.initialise();
+            availableTemplates = new TreeMap<String, String>();
+
+            List<TemplateInfo> templates = buildResultRenderer.getAvailableTemplates(false);
+            for(TemplateInfo info: templates)
+            {
+                availableTemplates.put(info.getTemplate(), info.getDisplay());
+            }
+            
+            template = "html-email";
+        }
+
+        public String getEmailDomain()
+        {
+            return emailDomain;
+        }
+
+        public void setEmailDomain(String emailDomain)
+        {
+            this.emailDomain = emailDomain;
+        }
+
+        public String getTemplate()
+        {
+            return template;
+        }
+
+        public void setTemplate(String template)
+        {
+            this.template = template;
+        }
+
+        public Map<String, String> getAvailableTemplates()
+        {
+            return availableTemplates;
+        }
+
+        public boolean getIgnorePulseUsers()
+        {
+            return ignorePulseUsers;
+        }
+
+        public void setIgnorePulseUsers(boolean ignorePulseUsers)
+        {
+            this.ignorePulseUsers = ignorePulseUsers;
+        }
+
+        public String getNextStateName()
+        {
+            return "success";
         }
     }
 

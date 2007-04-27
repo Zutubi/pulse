@@ -82,7 +82,7 @@ public class ResultNotifier implements EventListener
             if (subscription.conditionSatisfied(buildResult))
             {
                 String templateName = subscription.getTemplate();
-                RenderedResult rendered = renderResult(buildResult, dataMap, templateName, renderCache);
+                RenderedResult rendered = renderResult(buildResult, dataMap, buildResultRenderer, templateName, renderCache);
                 notifiedContactPoints.add(contactPoint.getId());
                 contactPoint.notify(buildResult, rendered.subject, rendered.content, buildResultRenderer.getTemplateInfo(templateName, buildResult.isPersonal()).getMimeType());
                 
@@ -122,16 +122,22 @@ public class ResultNotifier implements EventListener
         return dataMap;
     }
 
-    private RenderedResult renderResult(BuildResult result, Map<String, Object> dataMap, String template, Map<String, RenderedResult> cache)
+    public static RenderedResult renderResult(BuildResult result, String baseUrl, BuildManager buildManager, BuildResultRenderer buildResultRenderer, String template)
     {
-        RenderedResult rendered = cache.get(template);
+        Map<String, Object> dataMap = getDataMap(result, baseUrl, buildManager, buildResultRenderer);
+        return renderResult(result, dataMap, buildResultRenderer, template, null);
+    }
+    
+    private static RenderedResult renderResult(BuildResult result, Map<String, Object> dataMap, BuildResultRenderer buildResultRenderer, String template, Map<String, RenderedResult> cache)
+    {
+        RenderedResult rendered = cache == null ? null : cache.get(template);
         if(rendered == null)
         {
             StringWriter w = new StringWriter();
             buildResultRenderer.render(result, dataMap, template, w);
             String content = w.toString();
 
-            String subject = null;
+            String subject;
             String subjectTemplate = template + "-subject";
             if(buildResultRenderer.hasTemplate(subjectTemplate, result.isPersonal()))
             {
@@ -145,13 +151,16 @@ public class ResultNotifier implements EventListener
             }
 
             rendered = new RenderedResult(subject, content);
-            cache.put(template, rendered);
+            if (cache != null)
+            {
+                cache.put(template, rendered);
+            }
         }
 
         return rendered;
     }
 
-    private String getDefaultSubject(BuildResult result)
+    private static String getDefaultSubject(BuildResult result)
     {
         String prelude = result.isPersonal() ? "personal build " : (result.getProject().getName() + ": build ");
         return prelude + Long.toString(result.getNumber()) + ": " + result.getState().getPrettyString();
@@ -192,7 +201,7 @@ public class ResultNotifier implements EventListener
         this.buildManager = buildManager;
     }
 
-    private class RenderedResult
+    public static class RenderedResult
     {
         String subject;
         String content;
@@ -201,6 +210,16 @@ public class ResultNotifier implements EventListener
         {
             this.subject = subject;
             this.content = content;
+        }
+
+        public String getSubject()
+        {
+            return subject;
+        }
+
+        public String getContent()
+        {
+            return content;
         }
     }
 }
