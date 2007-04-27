@@ -1,0 +1,19 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD//EN" "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd" >
+<hibernate-mapping>
+    <class name="com.zutubi.pulse.model.PostBuildAction" table="POST_BUILD_ACTION">
+        <cache usage="read-write"/>
+
+        <id name="id" type="java.lang.Long" column="ID" unsaved-value="0">
+            <generator class="hilo"/>
+        </id>
+
+        <discriminator column="TYPE" type="string" length="255"/>
+
+        <subclass name="com.zutubi.pulse.model.EmailCommittersPostBuildAction" discriminator-value="EMAIL" lazy="false">
+            <property name="emailDomain" column="EMAIL_DOMAIN" type="string" length="255"/>
+            <property name="template" column="TEMPLATE" type="string" length="63"/>
+            <property name="ignorePulseUsers" column="IGNORE_PULSE_USERS" type="boolean"/>
+        </subclass>
+    </class>
+</hibernate-mapping>

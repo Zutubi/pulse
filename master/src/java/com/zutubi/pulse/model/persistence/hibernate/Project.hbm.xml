@@ -250,9 +250,9 @@
         <property name="failOnError" type="boolean"/>
 
         <subclass name="com.zutubi.pulse.model.EmailCommittersPostBuildAction" discriminator-value="EMAIL" lazy="false">
-            <property name="emailDomain" type="string" length="255"/>
-            <property name="template" type="string" length="63"/>
-            <property name="ignorePulseUsers" type="boolean"/>
+            <property name="emailDomain" column="EMAIL_DOMAIN" type="string" length="255"/>
+            <property name="template" column="TEMPLATE" type="string" length="63"/>
+            <property name="ignorePulseUsers" column="IGNORE_PULSE_USERS" type="boolean"/>
         </subclass>
 
         <subclass name="com.zutubi.pulse.model.RunExecutablePostBuildAction" discriminator-value="EXECUTABLE" lazy="false">
