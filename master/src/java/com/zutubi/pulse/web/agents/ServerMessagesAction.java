@@ -1,6 +1,6 @@
 package com.zutubi.pulse.web.agents;
 
-import com.caucho.hessian.client.HessianRuntimeException;
+import com.zutubi.pulse.agent.Agent;
 import com.zutubi.pulse.logging.CustomLogRecord;
 import com.zutubi.pulse.web.PagingSupport;
 
@@ -32,13 +32,12 @@ public class ServerMessagesAction extends ServerMessagesActionSupport
 
     public String execute() throws Exception
     {
-        lookupSlave();
-
-        if(getAgent().isOnline())
+        Agent agent = getAgent();
+        if(agent.isOnline())
         {
             try
             {
-                records = getAgent().getRecentMessages();
+                records = agent.getService().getRecentMessages();
                 Collections.reverse(records);
                 pagingSupport.setTotalItems(records.size());
                 records = records.subList(pagingSupport.getStartOffset(), pagingSupport.getEndOffset());

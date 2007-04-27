@@ -12,6 +12,7 @@ import com.zutubi.prototype.type.TypeHandler;
 import com.zutubi.prototype.type.TypeRegistry;
 import com.zutubi.pulse.prototype.config.*;
 import com.zutubi.pulse.prototype.config.admin.GlobalConfiguration;
+import com.zutubi.pulse.prototype.config.agent.AgentConfiguration;
 import com.zutubi.pulse.prototype.config.setup.SetupConfiguration;
 import com.zutubi.pulse.servercore.config.CvsConfiguration;
 import com.zutubi.pulse.servercore.config.PerforceConfiguration;
@@ -112,6 +113,11 @@ public class ConfigurationRegistry
 
             configurationPersistenceManager.register("project", projectCollection);
 
+            MapType agentCollection = new MapType(configurationPersistenceManager);
+            agentCollection.setTypeRegistry(typeRegistry);
+            agentCollection.setCollectionType(registerConfigurationType(AgentConfiguration.class));
+            configurationPersistenceManager.register("agent", agentCollection);
+            
             CompositeType globalConfig = registerConfigurationType("globalConfig", GlobalConfiguration.class);
             configurationPersistenceManager.register(GlobalConfiguration.SCOPE_NAME, globalConfig);
         }

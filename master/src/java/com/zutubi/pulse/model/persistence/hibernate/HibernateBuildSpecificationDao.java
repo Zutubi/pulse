@@ -17,7 +17,7 @@ public class HibernateBuildSpecificationDao extends HibernateEntityDao<BuildSpec
         return BuildSpecification.class;
     }
 
-    public List<BuildSpecification> findBySlave(final Slave slave)
+    public List<BuildSpecification> findBySlave(final AgentState agentState)
     {
         List<BuildSpecification> all = findAll();
         List<BuildSpecification> referringToSlave = new LinkedList<BuildSpecification>();
@@ -35,7 +35,7 @@ public class HibernateBuildSpecificationDao extends HibernateEntityDao<BuildSpec
                         BuildHostRequirements hostRequirements = stage.getHostRequirements();
                         if(hostRequirements instanceof SlaveBuildHostRequirements)
                         {
-                            return ((SlaveBuildHostRequirements)hostRequirements).getSlave().getId() == slave.getId();
+                            return ((SlaveBuildHostRequirements)hostRequirements).getSlave().getId() == agentState.getId();
                         }
                     }
 

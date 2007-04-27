@@ -40,7 +40,7 @@ public class RecipeController
     private boolean finished = false;
 
     private RecipeQueue queue;
-    private BuildService buildService;
+    private AgentService agentService;
 
     public RecipeController(ProjectConfiguration projectConfig, BuildResult buildResult, BuildSpecificationNode specNode, RecipeResultNode recipeResultNode, RecipeDispatchRequest dispatchRequest, List<ResourceProperty> buildProperties, boolean personal, boolean incremental, RecipeResultNode previousSuccessful, RecipeLogger logger, RecipeResultCollector collector, RecipeQueue queue, BuildManager manager, ServiceTokenManager serviceTokenManager)
     {
@@ -144,8 +144,8 @@ public class RecipeController
     private void handleRecipeDispatch(RecipeDispatchedEvent event)
     {
         logger.log(event);
-        buildService = event.getAgent().getBuildService();
-        recipeResultNode.setHost(buildService.getHostName());
+        agentService = event.getAgent().getService();
+        recipeResultNode.setHost(agentService.getHostName());
         buildManager.save(recipeResultNode);
     }
 
@@ -165,7 +165,7 @@ public class RecipeController
         {
             // This terminate must have come in before the recipe commenced.
             // Now we know who to tell to stop processing the recipe!
-            buildService.terminateRecipe(recipeResult.getId());
+            agentService.terminateRecipe(recipeResult.getId());
         }
         buildManager.save(recipeResult);
         logger.log(event, recipeResult);
@@ -261,7 +261,7 @@ public class RecipeController
         try
         {
             logger.collecting(recipeResult, collectWorkingCopy);
-            collector.collect(buildResult, recipeResult.getId(), collectWorkingCopy, incremental, buildService);
+            collector.collect(buildResult, recipeResult.getId(), collectWorkingCopy, incremental, agentService);
         }
         catch (BuildException e)
         {
@@ -281,7 +281,7 @@ public class RecipeController
     {
         try
         {
-            collector.cleanup(buildResult, recipeResult.getId(), incremental, buildService);
+            collector.cleanup(buildResult, recipeResult.getId(), incremental, agentService);
         }
         catch (Exception e)
         {
@@ -292,7 +292,7 @@ public class RecipeController
     public Bootstrapper getChildBootstrapper()
     {
         // use the service details to configure the copy bootstrapper.
-        String url = buildService.getUrl();
+        String url = agentService.getUrl();
         return new CopyBootstrapper(url, serviceTokenManager.getToken(), recipeResult.getId());
     }
 
@@ -327,7 +327,7 @@ public class RecipeController
             // recipe.  We *must* have received the commenced event before we
             // can do this.
             recipeResult.terminate(timeout);
-            buildService.terminateRecipe(recipeResult.getId());
+            agentService.terminateRecipe(recipeResult.getId());
         }
         else
         {

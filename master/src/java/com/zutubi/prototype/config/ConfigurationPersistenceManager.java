@@ -162,17 +162,17 @@ public class ConfigurationPersistenceManager
 
     String getClosestOwningScope(CompositeType type, String path)
     {
-        List<String> paths = compositeTypePathIndex.get(type);
-        if (paths != null)
+        List<String> patterns = compositeTypePathIndex.get(type);
+        if (patterns != null)
         {
             // Find the closest by starting at our path and working up the
             // ancestry until one hits.
             path = PathUtils.normalizePath(path);
             while (path != null)
             {
-                for (String candidate : paths)
+                for (String candidatePattern : patterns)
                 {
-                    if (PathUtils.prefixMatches(candidate, path))
+                    if (PathUtils.prefixMatches(candidatePattern, path))
                     {
                         return PathUtils.getParentPath(path);
                     }

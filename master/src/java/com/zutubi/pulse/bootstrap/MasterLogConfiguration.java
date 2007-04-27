@@ -53,7 +53,7 @@ public class MasterLogConfiguration implements LogConfiguration, ConfigurationEv
             configurationProvider = ComponentContext.getBean(CONFIGURATION_PROVIDER_NAME);
             if(configurationProvider != null)
             {
-                configurationProvider.registerEventListener(this, false, LoggingConfiguration.class);
+                configurationProvider.registerEventListener(this, false, false, LoggingConfiguration.class);
             }
         }
         return configurationProvider;

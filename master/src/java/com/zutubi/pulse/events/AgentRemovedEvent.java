@@ -1,12 +1,12 @@
 package com.zutubi.pulse.events;
 
-import com.zutubi.pulse.agent.SlaveAgent;
+import com.zutubi.pulse.agent.Agent;
 
 /**
  */
-public class SlaveAgentRemovedEvent extends SlaveAgentEvent
+public class AgentRemovedEvent extends AgentEvent
 {
-    public SlaveAgentRemovedEvent(Object source, SlaveAgent agent)
+    public AgentRemovedEvent(Object source, Agent agent)
     {
         super(source, agent);
     }
@@ -16,7 +16,7 @@ public class SlaveAgentRemovedEvent extends SlaveAgentEvent
         StringBuffer buff = new StringBuffer("Agent Removed Event");
         if (getAgent() != null)
         {
-            buff.append(": ").append(getAgent().getName());
+            buff.append(": ").append(getAgent().getAgentConfig().getName());
         }
         return buff.toString();
     }

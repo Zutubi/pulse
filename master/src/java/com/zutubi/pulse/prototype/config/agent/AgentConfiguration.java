@@ -1,17 +1,22 @@
 package com.zutubi.pulse.prototype.config.agent;
 
 import com.zutubi.config.annotations.SymbolicName;
-import com.zutubi.validation.annotations.Numeric;
+import com.zutubi.config.annotations.Internal;
+import com.zutubi.config.annotations.Form;
+import com.zutubi.pulse.core.config.AbstractNamedConfiguration;
 import com.zutubi.pulse.core.config.Resource;
-import com.zutubi.pulse.core.config.AbstractConfiguration;
+import com.zutubi.validation.annotations.Numeric;
 
 import java.util.Map;
 
 /**
  */
+@Form(fieldOrder = {"name", "remote", "host", "port"})
 @SymbolicName("internal.agentConfig")
-public class AgentConfiguration extends AbstractConfiguration
+public class AgentConfiguration extends AbstractNamedConfiguration
 {
+    @Internal
+    private long agentId;
     private boolean remote = true;
     private String host;
     @Numeric(min = 1)
@@ -46,5 +51,25 @@ public class AgentConfiguration extends AbstractConfiguration
     public void setPort(int port)
     {
         this.port = port;
+    }
+
+    public long getAgentId()
+    {
+        return agentId;
+    }
+
+    public void setAgentId(long agentId)
+    {
+        this.agentId = agentId;
+    }
+
+    public Map<String, Resource> getResources()
+    {
+        return resources;
+    }
+
+    public void setResources(Map<String, Resource> resources)
+    {
+        this.resources = resources;
     }
 }

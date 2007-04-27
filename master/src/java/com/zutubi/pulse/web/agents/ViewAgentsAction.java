@@ -2,10 +2,10 @@ package com.zutubi.pulse.web.agents;
 
 import com.zutubi.pulse.agent.Agent;
 import com.zutubi.pulse.agent.AgentManager;
-import com.zutubi.pulse.agent.SlaveAgent;
+import com.zutubi.pulse.agent.DefaultAgent;
 import com.zutubi.pulse.bootstrap.MasterConfigurationManager;
 import com.zutubi.pulse.web.ActionSupport;
-import com.zutubi.pulse.model.Slave;
+import com.zutubi.pulse.model.AgentState;
 
 import java.util.List;
 
@@ -29,14 +29,14 @@ public class ViewAgentsAction extends ActionSupport
         return configurationManager.getSystemConfig().getServerPort();
     }
 
-    public boolean upgrading(SlaveAgent agent)
+    public boolean upgrading(DefaultAgent agent)
     {
-        return agent.getSlave().getEnableState() == Slave.EnableState.UPGRADING;
+        return agent.getAgentState().getEnableState() == AgentState.EnableState.UPGRADING;
     }
 
-    public boolean failedUpgrade(SlaveAgent agent)
+    public boolean failedUpgrade(DefaultAgent agent)
     {
-        return agent.getSlave().getEnableState() == Slave.EnableState.FAILED_UPGRADE;
+        return agent.getAgentState().getEnableState() == AgentState.EnableState.FAILED_UPGRADE;
     }
 
     public String execute() throws Exception

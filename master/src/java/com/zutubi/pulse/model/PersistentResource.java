@@ -12,7 +12,7 @@ public class PersistentResource extends Resource
     /**
      * The slave that owns this resource, or null if it is owned by the master.
      */
-    private Slave slave;
+    private AgentState agentState;
 
     public PersistentResource()
     {
@@ -23,13 +23,13 @@ public class PersistentResource extends Resource
         super(name);
     }
 
-    public PersistentResource(String name, Slave slave)
+    public PersistentResource(String name, AgentState agentState)
     {
         super(name);
-        this.slave = slave;
+        this.agentState = agentState;
     }
 
-    public PersistentResource(Resource resource, Slave slave)
+    public PersistentResource(Resource resource, AgentState agentState)
     {
         // Shallow copy: we take ownership
         this.setName(resource.getName());
@@ -37,7 +37,7 @@ public class PersistentResource extends Resource
         this.setDefaultVersion(resource.getDefaultVersion());
         this.setVersions(resource.getVersions());
 
-        this.slave = slave;
+        this.agentState = agentState;
     }
 
     public Resource asResource()
@@ -70,14 +70,14 @@ public class PersistentResource extends Resource
         return resource;
     }
 
-    public Slave getSlave()
+    public AgentState getSlave()
     {
-        return slave;
+        return agentState;
     }
 
-    public void setSlave(Slave slave)
+    public void setSlave(AgentState agentState)
     {
-        this.slave = slave;
+        this.agentState = agentState;
     }
 
 }

@@ -1,6 +1,5 @@
 package com.zutubi.pulse.events;
 
-import com.zutubi.pulse.agent.SlaveAgent;
 import com.zutubi.pulse.agent.Status;
 import com.zutubi.pulse.agent.Agent;
 
@@ -26,7 +25,7 @@ public class AgentStatusEvent extends AgentEvent
         StringBuffer buff = new StringBuffer("Agent Status Event");
         if (getAgent() != null)
         {
-            buff.append(": ").append(getAgent().getName()).append(", ").append(oldStatus);
+            buff.append(": ").append(getAgent().getAgentConfig().getName()).append(", ").append(oldStatus);
         }
         return buff.toString();
     }    

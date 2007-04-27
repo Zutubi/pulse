@@ -311,17 +311,17 @@ This context requires:
         </property>
     </bean>
 
-    <bean id="slaveDaoTarget" class="com.zutubi.pulse.model.persistence.hibernate.HibernateSlaveDao">
+    <bean id="agentStateDaoTarget" class="com.zutubi.pulse.model.persistence.hibernate.HibernateAgentStateDao">
         <property name="sessionFactory">
             <ref bean="sessionFactory"/>
         </property>
     </bean>
-    <bean id="slaveDao" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
+    <bean id="agentStateDao" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
         <property name="transactionManager">
             <ref bean="transactionManager"/>
         </property>
         <property name="target">
-            <ref bean="slaveDaoTarget"/>
+            <ref bean="agentStateDaoTarget"/>
         </property>
         <property name="transactionAttributes">
             <props>

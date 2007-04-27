@@ -12,22 +12,22 @@ public class RecipeCommand implements Runnable
      * The URL of the master that made the request.
      */
     private String master;
-    private long slaveId;
+    private long handle;
     private RecipeRequest request;
     private SlaveRecipeProcessor recipeProcessor;
     private BuildContext context;
 
-    public RecipeCommand(String master, long slaveId, RecipeRequest request, BuildContext context)
+    public RecipeCommand(String master, long handle, RecipeRequest request, BuildContext context)
     {
         this.master = master;
-        this.slaveId = slaveId;
+        this.handle = handle;
         this.request = request;
         this.context = context;
     }
 
     public void run()
     {
-        recipeProcessor.processRecipe(master, slaveId, request, context);
+        recipeProcessor.processRecipe(master, handle, request, context);
     }
 
     public void setSlaveRecipeProcessor(SlaveRecipeProcessor recipeProcessor)

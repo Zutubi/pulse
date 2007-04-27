@@ -28,19 +28,19 @@ public class UpdateCommand implements Runnable
     private String build;
     private String master;
     private String token;
-    private long slaveId;
+    private long handle;
     private String url;
     private long packageSize;
     private ConfigurationManager configurationManager;
     private MasterProxyFactory masterProxyFactory;
     private ShutdownManager shutdownManager;
 
-    public UpdateCommand(String build, String master, String token, long slaveId, String url, long packageSize)
+    public UpdateCommand(String build, String master, String token, long handle, String url, long packageSize)
     {
         this.build = build;
         this.master = master;
         this.token = token;
-        this.slaveId = slaveId;
+        this.handle = handle;
         this.url = url;
         this.packageSize = packageSize;
     }
@@ -120,7 +120,7 @@ public class UpdateCommand implements Runnable
     {
         try
         {
-            masterService.upgradeStatus(token, new UpgradeStatus(slaveId, state, progress, message));
+            masterService.upgradeStatus(token, new UpgradeStatus(handle, state, progress, message));
         }
         catch (Exception e)
         {

@@ -18,71 +18,71 @@ public class RecordManager
 {
     private static final Logger LOG = Logger.getLogger(RecordManager.class);
 
-    private static final String NEXT_ID_KEY = "nextId";
+    private static final String NEXT_HANDLE_KEY = "nextHandle";
     private static final long UNDEFINED = 0;
-    private static final long DEFAULT_ID_BLOCK_SIZE = 1024;
+    private static final long DEFAULT_HANDLE_BLOCK_SIZE = 1024;
 
     /**
      * The base record is the 'anchor' point for all of the records held in memory. All searches for
      * records start from here.
      */
     private MutableRecord baseRecord;
-    private long nextId = UNDEFINED;
-    private long idBlockSize = DEFAULT_ID_BLOCK_SIZE;
+    private long nextHandle = UNDEFINED;
+    private long handleBlockSize = DEFAULT_HANDLE_BLOCK_SIZE;
     private RecordSerialiser recordSerialiser;
 
     public void init()
     {
         baseRecord = recordSerialiser.deserialise("");
-        String idString = baseRecord.getMeta(NEXT_ID_KEY);
-        if(idString != null)
+        String handleString = baseRecord.getMeta(NEXT_HANDLE_KEY);
+        if(handleString != null)
         {
             try
             {
-                nextId = Long.parseLong(idString);
-                if(nextId % idBlockSize != 0)
+                nextHandle = Long.parseLong(handleString);
+                if(nextHandle % handleBlockSize != 0)
                 {
-                    moveNextIdToBoundary();
+                    moveNextHandleToBoundary();
                 }
             }
             catch (NumberFormatException e)
             {
-                LOG.warning("Illegal next id value '" + idString + "'");
+                LOG.warning("Illegal next handle value '" + handleString + "'");
                 // Dealt with below.
             }
         }
 
-        if(nextId == UNDEFINED)
+        if(nextHandle == UNDEFINED)
         {
-            initialiseNextId();
+            initialiseNextHandle();
         }
     }
 
-    private void initialiseNextId()
+    private void initialiseNextHandle()
     {
-        nextId = getHighestId(baseRecord, "") + 1;
-        moveNextIdToBoundary();
+        nextHandle = getHighestHandle(baseRecord, "") + 1;
+        moveNextHandleToBoundary();
     }
 
-    private void moveNextIdToBoundary()
+    private void moveNextHandleToBoundary()
     {
-        long id = ((nextId / idBlockSize) + 1) * idBlockSize;
-        baseRecord.putMeta(NEXT_ID_KEY, Long.toString(id));
+        long handle = ((nextHandle / handleBlockSize) + 1) * handleBlockSize;
+        baseRecord.putMeta(NEXT_HANDLE_KEY, Long.toString(handle));
         recordSerialiser.serialise("", baseRecord, false);
     }
 
-    private long getHighestId(Record record, String path)
+    private long getHighestHandle(Record record, String path)
     {
-        long highest = record.getID();
+        long highest = record.getHandle();
         for(String key: record.keySet())
         {
             Object value = record.get(key);
             if(value instanceof Record)
             {
-                long childId = getHighestId((Record)value, PathUtils.getPath(path, key));
-                if(childId > highest)
+                long childHandle = getHighestHandle((Record)value, PathUtils.getPath(path, key));
+                if(childHandle > highest)
                 {
-                    highest = childId;
+                    highest = childHandle;
                 }
             }
         }
@@ -90,15 +90,15 @@ public class RecordManager
         return highest;
     }
 
-    long allocateId()
+    long allocateHandle()
     {
-        if(nextId % idBlockSize == 0)
+        if(nextHandle % handleBlockSize == 0)
         {
-            baseRecord.putMeta(NEXT_ID_KEY, Long.toString(nextId + idBlockSize));
+            baseRecord.putMeta(NEXT_HANDLE_KEY, Long.toString(nextHandle + handleBlockSize));
             recordSerialiser.serialise("", baseRecord, false);
         }
 
-        return nextId++;
+        return nextHandle++;
     }
 
     /**
@@ -156,7 +156,7 @@ public class RecordManager
 
         for(String key: record.keySet())
         {
-            if(PathUtils.matches(elements[pathIndex], key))
+            if(PathUtils.elementMatches(elements[pathIndex], key))
             {
                 loadAll((Record) record.get(key), elements, pathIndex + 1, PathUtils.getPath(resolvedPath, key), records);
             }
@@ -202,7 +202,7 @@ public class RecordManager
 
         // Save first before hooking up in memory
         MutableRecord record = newRecord.copy(true);
-        record.setId(allocateId());
+        record.setHandle(allocateHandle());
         recordSerialiser.serialise(path, record, true);
         parent.put(pathElements[pathElements.length - 1], record);
         return record;
@@ -345,9 +345,9 @@ public class RecordManager
         return null;
     }
 
-    public void setIdBlockSize(long idBlockSize)
+    public void setHandleBlockSize(long handleBlockSize)
     {
-        this.idBlockSize = idBlockSize;
+        this.handleBlockSize = handleBlockSize;
     }
 
     public void setRecordSerialiser(RecordSerialiser recordSerialiser)

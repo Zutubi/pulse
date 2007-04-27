@@ -1,7 +1,7 @@
 package com.zutubi.pulse.model;
 
-import com.zutubi.pulse.BuildService;
-import com.zutubi.pulse.MasterBuildService;
+import com.zutubi.pulse.AgentService;
+import com.zutubi.pulse.MasterAgentService;
 import com.zutubi.pulse.RecipeDispatchRequest;
 
 /**
@@ -13,9 +13,9 @@ public class MasterBuildHostRequirements extends AbstractBuildHostRequirements
         return new MasterBuildHostRequirements();
     }
 
-    public boolean fulfilledBy(RecipeDispatchRequest request, BuildService service)
+    public boolean fulfilledBy(RecipeDispatchRequest request, AgentService service)
     {
-        return service instanceof MasterBuildService;
+        return service instanceof MasterAgentService;
     }
 
     public String getSummary()

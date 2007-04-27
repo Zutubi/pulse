@@ -1,9 +1,7 @@
 package com.zutubi.pulse.model;
 
-import com.zutubi.prototype.config.ConfigurationEventListener;
+import com.zutubi.prototype.config.CollectionListener;
 import com.zutubi.prototype.config.ConfigurationProvider;
-import com.zutubi.prototype.config.events.ConfigurationEvent;
-import com.zutubi.prototype.type.record.PathUtils;
 import com.zutubi.pulse.bootstrap.ComponentContext;
 import com.zutubi.pulse.cache.ehcache.CustomAclEntryCache;
 import com.zutubi.pulse.core.BuildException;
@@ -35,7 +33,7 @@ import java.util.*;
  * 
  *
  */
-public class DefaultProjectManager implements ProjectManager, ConfigurationEventListener
+public class DefaultProjectManager implements ProjectManager
 {
     public static final int DEFAULT_WORK_DIR_BUILDS = 10;
 
@@ -59,8 +57,8 @@ public class DefaultProjectManager implements ProjectManager, ConfigurationEvent
 
     private ConfigurationProvider configurationProvider;
 
-    private Map<String, ProjectConfiguration> nameToConfig;
-    private Map<Long, ProjectConfiguration> idToConfig;
+    private Map<String, ProjectConfiguration> nameToConfig = new HashMap<String, ProjectConfiguration>();
+    private Map<Long, ProjectConfiguration> idToConfig = new HashMap<Long, ProjectConfiguration>();
 
     public void initialise()
     {
@@ -71,19 +69,49 @@ public class DefaultProjectManager implements ProjectManager, ConfigurationEvent
         addProjectAuthorisation.setProjectManager(this);
         licenseManager.addAuthorisation(addProjectAuthorisation);
 
-        configurationProvider.registerEventListener(this, true, "project", PathUtils.getPath("project", PathUtils.WILDCARD_ANY_ELEMENT));
+        CollectionListener<ProjectConfiguration> listener = new CollectionListener<ProjectConfiguration>("project", ProjectConfiguration.class, true)
+        {
+            protected void instanceInserted(ProjectConfiguration instance)
+            {
+                registerProjectConfig(instance);
+            }
+
+            protected void instanceDeleted(ProjectConfiguration instance)
+            {
+                nameToConfig.remove(instance.getName());
+                idToConfig.remove(instance.getProjectId());
+            }
+
+            protected void instanceChanged(ProjectConfiguration instance)
+            {
+                // Tricky: the name may have changed.
+                ProjectConfiguration old = idToConfig.remove(instance.getProjectId());
+                if(old != null)
+                {
+                    nameToConfig.remove(old.getName());
+                }
+
+                registerProjectConfig(instance);
+            }
+        };
+
+        listener.register(configurationProvider);
         updateProjects();
     }
 
     @SuppressWarnings({"unchecked"})
     private void updateProjects()
     {
-        nameToConfig = configurationProvider.get("project", Map.class);
-        idToConfig = new HashMap<Long, ProjectConfiguration>(nameToConfig.size());
-        for(ProjectConfiguration config: nameToConfig.values())
+        for(ProjectConfiguration config: configurationProvider.getAll(ProjectConfiguration.class))
         {
-            idToConfig.put(config.getProjectId(), config);
+            registerProjectConfig(config);
         }
+    }
+
+    private void registerProjectConfig(ProjectConfiguration projectConfig)
+    {
+        nameToConfig.put(projectConfig.getName(), projectConfig);
+        idToConfig.put(projectConfig.getProjectId(), projectConfig);
     }
 
     public void save(Project project)
@@ -631,11 +659,6 @@ public class DefaultProjectManager implements ProjectManager, ConfigurationEvent
     public void delete(BuildHostRequirements hostRequirements)
     {
         buildSpecificationDao.delete(hostRequirements);
-    }
-
-    public void handleConfigurationEvent(ConfigurationEvent event)
-    {
-        updateProjects();
     }
 
     public void setEventManager(EventManager eventManager)

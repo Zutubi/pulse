@@ -3,6 +3,7 @@ package com.zutubi.prototype.config;
 import com.zutubi.prototype.config.events.ConfigurationEvent;
 import com.zutubi.prototype.type.CompositeType;
 import com.zutubi.prototype.type.TypeRegistry;
+import com.zutubi.prototype.type.record.PathUtils;
 import com.zutubi.pulse.events.*;
 import com.zutubi.pulse.core.config.Configuration;
 import com.zutubi.util.Predicate;
@@ -59,6 +60,23 @@ public class DefaultConfigurationProvider implements ConfigurationProvider
         return configurationPersistenceManager.getAllInstances(clazz);
     }
 
+    @SuppressWarnings({"unchecked"})
+    public <T> T getAncestorOfType(Configuration c, Class<T> clazz)
+    {
+        String path = c.getConfigurationPath();
+        CompositeType type = typeRegistry.getType(clazz);
+        if (type != null)
+        {
+            String ancestorPath = configurationPersistenceManager.getClosestOwningScope(type, path);
+            if(ancestorPath != null)
+            {
+                return (T) configurationPersistenceManager.getInstance(ancestorPath);
+            }
+        }
+
+        return null;
+    }
+
     public String insert(String parentPath, Object instance)
     {
         return configurationPersistenceManager.insert(parentPath, instance);
@@ -74,7 +92,7 @@ public class DefaultConfigurationProvider implements ConfigurationProvider
         configurationPersistenceManager.delete(path);
     }
 
-    public void registerEventListener(ConfigurationEventListener listener, boolean synchronous, Class clazz)
+    public void registerEventListener(ConfigurationEventListener listener, boolean synchronous, boolean includeChildPaths, Class clazz)
     {
         CompositeType type = typeRegistry.getType(clazz);
         if(type == null)
@@ -83,12 +101,12 @@ public class DefaultConfigurationProvider implements ConfigurationProvider
         }
 
         List<String> paths = configurationPersistenceManager.getConfigurationPaths(type);
-        registerEventListener(listener, synchronous, paths.toArray(new String[paths.size()]));
+        registerEventListener(listener, synchronous, includeChildPaths, paths.toArray(new String[paths.size()]));
     }
 
-    public void registerEventListener(ConfigurationEventListener listener, boolean synchronous, String... paths)
+    public void registerEventListener(ConfigurationEventListener listener, boolean synchronous, boolean includeChildPaths, String... paths)
     {
-        FilteringListener filter = new FilteringListener(new PathPredicate(paths), new Listener(listener));
+        FilteringListener filter = new FilteringListener(new PathPredicate(includeChildPaths, paths), new Listener(listener));
         if (synchronous)
         {
             syncMux.addDelegate(filter);

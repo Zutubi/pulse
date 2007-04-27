@@ -1,7 +1,7 @@
 package com.zutubi.pulse.vfs.agent;
 
 import com.zutubi.pulse.SlaveProxyFactory;
-import com.zutubi.pulse.model.SlaveManager;
+import com.zutubi.pulse.agent.AgentManager;
 import com.zutubi.pulse.services.ServiceTokenManager;
 import org.apache.commons.vfs.*;
 import org.apache.commons.vfs.provider.AbstractOriginatingFileProvider;
@@ -15,7 +15,7 @@ import java.util.Collections;
  */
 public class AgentFileProvider extends AbstractOriginatingFileProvider
 {
-    private SlaveManager slaveManager;
+    private AgentManager agentManager;
     private SlaveProxyFactory proxyFactory;
     private ServiceTokenManager serviceTokenManager;
 
@@ -36,7 +36,7 @@ public class AgentFileProvider extends AbstractOriginatingFileProvider
     {
         AgentFileSystem fileSystem = new AgentFileSystem(rootName, null, options);
         fileSystem.setProxyFactory(proxyFactory);
-        fileSystem.setSlaveManager(slaveManager);
+        fileSystem.setAgentManager(agentManager);
         fileSystem.setServiceTokenManager(serviceTokenManager);
         return fileSystem;
     }
@@ -46,9 +46,9 @@ public class AgentFileProvider extends AbstractOriginatingFileProvider
         return CAPABILITIES;
     }
 
-    public void setSlaveManager(SlaveManager slaveManager)
+    public void setAgentManager(AgentManager agentManager)
     {
-        this.slaveManager = slaveManager;
+        this.agentManager = agentManager;
     }
 
     public void setSlaveProxyFactory(SlaveProxyFactory proxyFactory)

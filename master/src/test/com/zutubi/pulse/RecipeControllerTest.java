@@ -6,6 +6,7 @@ import com.zutubi.pulse.core.Bootstrapper;
 import com.zutubi.pulse.core.BuildRevision;
 import com.zutubi.pulse.core.RecipeRequest;
 import com.zutubi.pulse.core.config.ResourceProperty;
+import com.zutubi.pulse.core.config.Resource;
 import com.zutubi.pulse.core.model.*;
 import com.zutubi.pulse.events.build.*;
 import com.zutubi.pulse.logging.CustomLogRecord;
@@ -13,6 +14,9 @@ import com.zutubi.pulse.model.*;
 import com.zutubi.pulse.servercore.config.SvnConfiguration;
 import com.zutubi.pulse.test.PulseTestCase;
 import com.zutubi.pulse.util.FileSystemUtils;
+import com.zutubi.pulse.services.SlaveStatus;
+import com.zutubi.pulse.services.UpgradeState;
+import com.zutubi.pulse.prototype.config.agent.AgentConfiguration;
 
 import java.io.File;
 import java.util.*;
@@ -25,7 +29,7 @@ public class RecipeControllerTest extends PulseTestCase
 
     private MockRecipeQueue recipeQueue;
     private MockBuildManager buildManager;
-    private MockBuildService buildService;
+    private MockAgentService buildService;
 
     private RecipeResult rootResult;
     private RecipeResultNode rootNode;
@@ -40,7 +44,7 @@ public class RecipeControllerTest extends PulseTestCase
         MockRecipeResultCollector resultCollector = new MockRecipeResultCollector();
         recipeQueue = new MockRecipeQueue();
         buildManager = new MockBuildManager();
-        buildService = new MockBuildService();
+        buildService = new MockAgentService();
         RecipeLogger logger = new MockRecipeLogger();
 
         rootResult = new RecipeResult("root recipe");
@@ -254,22 +258,22 @@ public class RecipeControllerTest extends PulseTestCase
     class MockRecipeResultCollector implements RecipeResultCollector
     {
         private Set<Long> preparedRecipes = new TreeSet<Long>();
-        private Map<Long, BuildService> collectedRecipes = new TreeMap<Long, BuildService>();
-        private Map<Long, BuildService> cleanedRecipes = new TreeMap<Long, BuildService>();
+        private Map<Long, AgentService> collectedRecipes = new TreeMap<Long, AgentService>();
+        private Map<Long, AgentService> cleanedRecipes = new TreeMap<Long, AgentService>();
 
         public void prepare(BuildResult result, long recipeId)
         {
             preparedRecipes.add(recipeId);
         }
 
-        public void collect(BuildResult result, long recipeId, boolean collectWorkingCopy, boolean incremental, BuildService buildService)
+        public void collect(BuildResult result, long recipeId, boolean collectWorkingCopy, boolean incremental, AgentService agentService)
         {
-            collectedRecipes.put(recipeId, buildService);
+            collectedRecipes.put(recipeId, agentService);
         }
 
-        public void cleanup(BuildResult result, long recipeId, boolean incremental, BuildService buildService)
+        public void cleanup(BuildResult result, long recipeId, boolean incremental, AgentService agentService)
         {
-            cleanedRecipes.put(recipeId, buildService);
+            cleanedRecipes.put(recipeId, agentService);
         }
 
         public File getRecipeDir(BuildResult result, long recipeId)
@@ -340,9 +344,9 @@ public class RecipeControllerTest extends PulseTestCase
 
     class MockAgent implements Agent
     {
-        private BuildService service;
+        private AgentService service;
 
-        public MockAgent(BuildService service)
+        public MockAgent(AgentService service)
         {
             this.service = service;
         }
@@ -352,24 +356,34 @@ public class RecipeControllerTest extends PulseTestCase
             return 0;
         }
 
-        public BuildService getBuildService()
+        public AgentService getService()
         {
             return service;
-        }
-
-        public SystemInfo getSystemInfo()
-        {
-            throw new RuntimeException("Method not implemented.");
-        }
-
-        public List<CustomLogRecord> getRecentMessages()
-        {
-            throw new RuntimeException("Method not implemented.");
         }
 
         public boolean isOnline()
         {
             return true;
+        }
+
+        public boolean isEnabled()
+        {
+            throw new RuntimeException("Method not yet implemented.");
+        }
+
+        public boolean isUpgrading()
+        {
+            throw new RuntimeException("Method not yet implemented.");
+        }
+
+        public boolean isFailedUpgrade()
+        {
+            throw new RuntimeException("Method not yet implemented.");
+        }
+
+        public boolean isAvailable()
+        {
+            throw new RuntimeException("Method not yet implemented.");
         }
 
         public Status getStatus()
@@ -382,9 +396,29 @@ public class RecipeControllerTest extends PulseTestCase
             return "mock";
         }
 
-        public boolean isSlave()
+        public void updateStatus(SlaveStatus status)
         {
-            return true;
+            throw new RuntimeException("Method not yet implemented.");
+        }
+
+        public void setStatus(Status status)
+        {
+            throw new RuntimeException("Method not yet implemented.");
+        }
+
+        public void upgradeStatus(UpgradeState state, int progress, String message)
+        {
+            throw new RuntimeException("Method not yet implemented.");
+        }
+
+        public AgentConfiguration getAgentConfig()
+        {
+            throw new RuntimeException("Method not yet implemented.");
+        }
+
+        public AgentState getAgentState()
+        {
+            throw new RuntimeException("Method not yet implemented.");
         }
 
         public String getName()
@@ -393,8 +427,38 @@ public class RecipeControllerTest extends PulseTestCase
         }
     }
 
-    class MockBuildService implements BuildService
+    class MockAgentService implements AgentService
     {
+        public int ping()
+        {
+            throw new RuntimeException("Method not yet implemented.");
+        }
+
+        public SlaveStatus getStatus(String masterLocation)
+        {
+            throw new RuntimeException("Method not yet implemented.");
+        }
+
+        public boolean updateVersion(String masterBuild, String masterUrl, long handle, String packageUrl, long packageSize)
+        {
+            throw new RuntimeException("Method not yet implemented.");
+        }
+
+        public List<Resource> discoverResources()
+        {
+            throw new RuntimeException("Method not yet implemented.");
+        }
+
+        public SystemInfo getSystemInfo()
+        {
+            throw new RuntimeException("Method not yet implemented.");
+        }
+
+        public List<CustomLogRecord> getRecentMessages()
+        {
+            throw new RuntimeException("Method not yet implemented.");
+        }
+
         public boolean hasResource(String resource, String version)
         {
             throw new RuntimeException("Method not implemented.");

@@ -14,19 +14,19 @@ import java.util.List;
  */
 public class DatabaseResourceRepository implements ConfigurableResourceRepository
 {
-    private Slave slave;
+    private AgentState agentState;
     private ResourceRepository parent;
     private ResourceDao resourceDao;
 
     public DatabaseResourceRepository(ResourceDao resourceDao)
     {
-        slave = null;
+        agentState = null;
         this.resourceDao = resourceDao;
     }
 
-    public DatabaseResourceRepository(Slave slave, ResourceDao resourceDao)
+    public DatabaseResourceRepository(AgentState agentState, ResourceDao resourceDao)
     {
-        this.slave = slave;
+        this.agentState = agentState;
         this.resourceDao = resourceDao;
     }
 
@@ -49,7 +49,7 @@ public class DatabaseResourceRepository implements ConfigurableResourceRepositor
         }
         else
         {
-            return resourceDao.findBySlaveAndName(slave, name);
+            return resourceDao.findBySlaveAndName(agentState, name);
         }
     }
 
@@ -67,7 +67,7 @@ public class DatabaseResourceRepository implements ConfigurableResourceRepositor
             names = new LinkedList<String>();
         }
 
-        for (PersistentResource resource : resourceDao.findAllBySlave(slave))
+        for (PersistentResource resource : resourceDao.findAllBySlave(agentState))
         {
             if (!names.contains(resource.getName()))
             {
@@ -92,7 +92,7 @@ public class DatabaseResourceRepository implements ConfigurableResourceRepositor
     {
         // merge this new resource with existing resources.  The overwrite refers to properties that already exist.
 
-        PersistentResource existingResource = resourceDao.findBySlaveAndName(slave, resource.getName());
+        PersistentResource existingResource = resourceDao.findBySlaveAndName(agentState, resource.getName());
         if (existingResource == null)
         {
 //            resourceDao.save(new PersistentResource(resource, slave));

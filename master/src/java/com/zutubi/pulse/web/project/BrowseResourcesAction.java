@@ -1,9 +1,8 @@
 package com.zutubi.pulse.web.project;
 
 import com.zutubi.pulse.core.config.ResourceVersion;
-import com.zutubi.pulse.model.PersistentResource;
+import com.zutubi.pulse.core.config.Resource;
 import com.zutubi.pulse.model.ResourceManager;
-import com.zutubi.pulse.model.Slave;
 import com.zutubi.pulse.web.ActionSupport;
 
 import java.util.*;
@@ -48,9 +47,10 @@ public class BrowseResourcesAction extends ActionSupport
 
     public String execute() throws Exception
     {
-        List<PersistentResource> resources = resourceManager.findAll();
-        for(PersistentResource resource: resources)
+        Map<String, Resource> resources = resourceManager.findAll();
+        for(Map.Entry<String, Resource> entry: resources.entrySet())
         {
+            Resource resource = entry.getValue();
             Map<String, Set<String>> versions = allResources.get(resource.getName());
 
             if(versions == null)
@@ -59,23 +59,23 @@ public class BrowseResourcesAction extends ActionSupport
                 allResources.put(resource.getName(), versions);
             }
 
-            mergeVersions(resource, versions);
+            mergeVersions(entry.getKey(), resource, versions);
         }
 
         return SUCCESS;
     }
 
-    private void mergeVersions(PersistentResource resource, Map<String,Set<String>> versions)
+    private void mergeVersions(String agent, Resource resource, Map<String, Set<String>> versions)
     {
-        mergeVersion("", versions, resource);
+        mergeVersion(agent, "", versions, resource);
 
         for(ResourceVersion version: resource.getVersions().values())
         {
-            mergeVersion(version.getValue(), versions, resource);
+            mergeVersion(agent, version.getValue(), versions, resource);
         }
     }
 
-    private void mergeVersion(String version, Map<String, Set<String>> versions, PersistentResource resource)
+    private void mergeVersion(String agent, String version, Map<String, Set<String>> versions, Resource resource)
     {
         Set<String> agents = versions.get(version);
         if(agents == null)
@@ -83,20 +83,7 @@ public class BrowseResourcesAction extends ActionSupport
             agents = new TreeSet<String>();
             versions.put(version, agents);
         }
-        agents.add(getAgentName(resource));
-    }
-
-    private String getAgentName(PersistentResource resource)
-    {
-        Slave slave = resource.getSlave();
-        if(slave == null)
-        {
-            return "master";
-        }
-        else
-        {
-            return slave.getName();
-        }
+        agents.add(agent);
     }
 
     public void setResourceManager(ResourceManager resourceManager)

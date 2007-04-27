@@ -3,6 +3,8 @@ package com.zutubi.pulse.core.config;
 import com.zutubi.pulse.core.config.ResourceProperty;
 import com.zutubi.pulse.core.config.ResourceVersion;
 import com.zutubi.config.annotations.SymbolicName;
+import com.zutubi.config.annotations.Transient;
+import com.zutubi.config.annotations.Form;
 
 import java.util.Map;
 import java.util.TreeMap;
@@ -11,6 +13,7 @@ import java.util.TreeMap;
  * A resource is something that is required by a build.  It may be an
  * external tool, a certain operating system, or some virtual concept.
  */
+@Form(fieldOrder = { "name", "defaultVersion" })
 @SymbolicName("internal.resource")
 public class Resource extends AbstractNamedConfiguration
 {
@@ -104,6 +107,7 @@ public class Resource extends AbstractNamedConfiguration
         versions.put(v.getValue(), v);
     }
 
+    @Transient
     public int getTotalPropertyCount()
     {
         int count = properties.size();
@@ -115,6 +119,7 @@ public class Resource extends AbstractNamedConfiguration
         return count;
     }
 
+    @Transient
     public int getEmptyVersionCount()
     {
         int count = 0;

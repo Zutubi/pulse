@@ -1,14 +1,14 @@
 package com.zutubi.pulse.events;
 
-import com.zutubi.pulse.agent.SlaveAgent;
+import com.zutubi.pulse.agent.Agent;
 
 /**
  */
-public class SlaveUpgradeCompleteEvent extends SlaveAgentEvent
+public class AgentUpgradeCompleteEvent extends AgentEvent
 {
     private boolean successful;
 
-    public SlaveUpgradeCompleteEvent(Object source, SlaveAgent agent, boolean successful)
+    public AgentUpgradeCompleteEvent(Object source, Agent agent, boolean successful)
     {
         super(source, agent);
         this.successful = successful;

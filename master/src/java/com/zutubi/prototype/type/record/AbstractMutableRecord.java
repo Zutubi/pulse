@@ -5,8 +5,8 @@ package com.zutubi.prototype.type.record;
  */
 public abstract class AbstractMutableRecord extends AbstractRecord implements MutableRecord
 {
-    public void setId(long id)
+    public void setHandle(long id)
     {
-        putMeta(ID_KEY, Long.toString(id));
+        putMeta(HANDLE_KEY, Long.toString(id));
     }    
 }

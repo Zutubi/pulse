@@ -112,19 +112,40 @@ public class PathUtils
         return getPath(newElements);
     }
 
-    public static boolean prefixMatches(String candidate, String prefix)
+    public static boolean pathMatches(String pattern, String path)
     {
-        String[] candidateParts = getPathElements(candidate);
-        String[] prefixParts = getPathElements(prefix);
+        String[] patternParts = getPathElements(pattern);
+        String[] pathParts = getPathElements(path);
 
-        if(candidateParts.length < prefixParts.length)
+        if(patternParts.length != pathParts.length)
         {
             return false;
         }
-        
+
+        for(int i = 0; i < pathParts.length; i++)
+        {
+            if(!elementMatches(patternParts[i], pathParts[i]))
+            {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    public static boolean prefixMatches(String pattern, String prefix)
+    {
+        String[] patternParts = getPathElements(pattern);
+        String[] prefixParts = getPathElements(prefix);
+
+        if(patternParts.length < prefixParts.length)
+        {
+            return false;
+        }
+
         for(int i = 0; i < prefixParts.length; i++)
         {
-            if(!matches(candidateParts[i], prefixParts[i]))
+            if(!elementMatches(patternParts[i], prefixParts[i]))
             {
                 return false;
             }
@@ -141,7 +162,7 @@ public class PathUtils
         int i;
         for(i = 0; i < prefixParts.length; i++)
         {
-            if(i >= parts.length || !matches(parts[i], prefixParts[i]))
+            if(i >= parts.length || !elementMatches(parts[i], prefixParts[i]))
             {
                 break;
             }
@@ -152,7 +173,7 @@ public class PathUtils
         return getPath(newParts);
     }
 
-    public static boolean matches(String pattern, String element)
+    public static boolean elementMatches(String pattern, String element)
     {
         return pattern.equals(WILDCARD_ANY_ELEMENT) || pattern.equals(element);
     }

@@ -69,11 +69,11 @@
         </property>
     </bean>
 
-    <bean id="slaveManagerTarget" class="com.zutubi.pulse.model.DefaultSlaveManager" autowire="byName"
+    <bean id="agentStateManagerTarget" class="com.zutubi.pulse.model.DefaultAgentStateManager" autowire="byName"
           init-method="init"/>
-    <bean id="slaveManager" class="org.springframework.aop.framework.ProxyFactoryBean">
+    <bean id="agentStateManager" class="org.springframework.aop.framework.ProxyFactoryBean">
         <property name="target">
-            <ref bean="slaveManagerTarget"/>
+            <ref bean="agentStateManagerTarget"/>
         </property>
         <property name="interceptorNames">
             <list>
@@ -206,7 +206,7 @@
 
     <!-- re create the file system manager now that the slave details are available. -->
     <bean id="fileSystemManager" class="com.zutubi.pulse.vfs.VfsManagerFactoryBean" destroy-method="shutdown">
-        <property name="slaveManager"><ref local="slaveManager"/></property>
+        <property name="agentManager"><ref local="agentManager"/></property>
         <property name="slaveProxyFactory"><ref local="slaveProxyFactory"/></property>
         <property name="serviceTokenManager"><ref local="serviceTokenManager"/></property>
         <property name="objectFactory"><ref bean="objectFactory"/></property>

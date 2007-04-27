@@ -1,13 +1,25 @@
 package com.zutubi.pulse;
 
 import com.zutubi.pulse.core.RecipeRequest;
+import com.zutubi.pulse.core.config.Resource;
+import com.zutubi.pulse.logging.CustomLogRecord;
+import com.zutubi.pulse.services.SlaveStatus;
 
 import java.io.File;
+import java.util.List;
 
 /**
  */
-public interface BuildService extends RemoteService
+public interface AgentService extends RemoteService
 {
+    int ping();
+    SlaveStatus getStatus(String masterLocation);    
+    boolean updateVersion(String masterBuild, String masterUrl, long handle, String packageUrl, long packageSize);
+
+    List<Resource> discoverResources();
+    SystemInfo getSystemInfo();
+    List<CustomLogRecord> getRecentMessages();
+
     /**
      * Returns true iff the service has the given version of the given
      * resource.
@@ -43,9 +55,6 @@ public interface BuildService extends RemoteService
      * @param recipeId the recipe to terminate
      */
     void terminateRecipe(long recipeId);
-
-    // get available resources..... so that we can check to see if the
-    // build host requirements are fullfilled.
 
     String getHostName();
 

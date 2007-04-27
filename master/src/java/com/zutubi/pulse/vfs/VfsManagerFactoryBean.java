@@ -1,13 +1,12 @@
 package com.zutubi.pulse.vfs;
 
 import com.zutubi.pulse.SlaveProxyFactory;
-import com.zutubi.util.bean.ObjectFactory;
-import com.zutubi.pulse.model.SlaveManager;
+import com.zutubi.pulse.agent.AgentManager;
 import com.zutubi.pulse.services.ServiceTokenManager;
-import com.zutubi.util.logging.Logger;
 import com.zutubi.pulse.vfs.agent.AgentFileProvider;
 import com.zutubi.pulse.vfs.local.DefaultLocalFileProvider;
 import com.zutubi.pulse.vfs.pulse.PulseFileProvider;
+import com.zutubi.util.bean.ObjectFactory;
 import org.apache.commons.vfs.FileSystemManager;
 import org.apache.commons.vfs.impl.DefaultFileSystemManager;
 import org.apache.commons.vfs.provider.ram.RamFileProvider;
@@ -18,11 +17,9 @@ import org.springframework.beans.factory.FactoryBean;
  */
 public class VfsManagerFactoryBean implements FactoryBean
 {
-    private static final Logger LOG = Logger.getLogger(VfsManagerFactoryBean.class);
-
     private ObjectFactory objectFactory;
 
-    private SlaveManager slaveManager;
+    private AgentManager agentManager;
     private SlaveProxyFactory proxyFactory;
     private ServiceTokenManager serviceTokenManager;
 
@@ -41,7 +38,7 @@ public class VfsManagerFactoryBean implements FactoryBean
                     instance.addProvider("ram", new RamFileProvider());
 
                     AgentFileProvider agentFileProviderfileProvider = new AgentFileProvider();
-                    agentFileProviderfileProvider.setSlaveManager(slaveManager);
+                    agentFileProviderfileProvider.setAgentManager(agentManager);
                     agentFileProviderfileProvider.setSlaveProxyFactory(proxyFactory);
                     agentFileProviderfileProvider.setServiceTokenManager(serviceTokenManager);
                     instance.addProvider("agent", agentFileProviderfileProvider);
@@ -80,9 +77,9 @@ public class VfsManagerFactoryBean implements FactoryBean
         this.proxyFactory = proxyFactory;
     }
 
-    public void setSlaveManager(SlaveManager slaveManager)
+    public void setAgentManager(AgentManager agentManager)
     {
-        this.slaveManager = slaveManager;
+        this.agentManager = agentManager;
     }
 
     public void setServiceTokenManager(ServiceTokenManager serviceTokenManager)

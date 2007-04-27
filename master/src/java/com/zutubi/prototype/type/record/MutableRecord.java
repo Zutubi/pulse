@@ -31,5 +31,5 @@ public interface MutableRecord extends Record
 
     void update(Record record);
 
-    void setId(long id);
+    void setHandle(long handle);
 }

@@ -4,22 +4,22 @@ package com.zutubi.pulse.services;
  */
 public class UpgradeStatus
 {
-    private long slaveId;
+    private long handle;
     private UpgradeState state;
     private int progress;
     private String message;
 
-    public UpgradeStatus(long slaveId, UpgradeState state, int progress, String message)
+    public UpgradeStatus(long handle, UpgradeState state, int progress, String message)
     {
-        this.slaveId = slaveId;
+        this.handle = handle;
         this.state = state;
         this.progress = progress;
         this.message = message;
     }
 
-    public long getSlaveId()
+    public long getHandle()
     {
-        return slaveId;
+        return handle;
     }
 
     public UpgradeState getState()

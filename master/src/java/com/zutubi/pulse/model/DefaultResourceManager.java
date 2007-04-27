@@ -1,12 +1,17 @@
 package com.zutubi.pulse.model;
 
+import com.zutubi.prototype.config.ConfigurationEventListener;
+import com.zutubi.prototype.config.ConfigurationProvider;
+import com.zutubi.prototype.config.CollectionListener;
+import com.zutubi.prototype.config.events.ConfigurationEvent;
+import com.zutubi.prototype.config.events.PostInsertEvent;
+import com.zutubi.prototype.config.events.PostSaveEvent;
+import com.zutubi.prototype.config.events.PreDeleteEvent;
 import com.zutubi.pulse.core.ConfigurableResourceRepository;
 import com.zutubi.pulse.core.ResourceRepository;
 import com.zutubi.pulse.core.config.Resource;
 import com.zutubi.pulse.core.config.ResourceVersion;
-import com.zutubi.pulse.model.persistence.BuildSpecificationNodeDao;
-import com.zutubi.pulse.model.persistence.ResourceDao;
-import com.zutubi.pulse.resources.ResourceDiscoverer;
+import com.zutubi.pulse.prototype.config.agent.AgentConfiguration;
 
 import java.util.List;
 import java.util.Map;
@@ -14,96 +19,75 @@ import java.util.TreeMap;
 
 /**
  */
-public class DefaultResourceManager implements ResourceManager
+public class DefaultResourceManager implements ResourceManager, ConfigurationEventListener
 {
-    private ResourceDao resourceDao;
-    private BuildSpecificationNodeDao buildSpecificationNodeDao;
-    private DatabaseResourceRepository masterResourceRepository;
-    private Map<Long, DatabaseResourceRepository> slaveRepositories = new TreeMap<Long, DatabaseResourceRepository>();
+    private Map<Long, ConfigurationResourceRepository> agentRepositories = new TreeMap<Long, ConfigurationResourceRepository>();
+
+    private ConfigurationProvider configurationProvider;
 
     public void init()
     {
-        masterResourceRepository = new DatabaseResourceRepository(resourceDao);
-
-        ResourceDiscoverer discoverer = new ResourceDiscoverer();
-        List<Resource> resources = discoverer.discover();
-        addDiscoveredResources(null, resources);
-    }
-
-    public void save(PersistentResource entity)
-    {
-    }
-
-    public void delete(PersistentResource entity)
-    {
-        // if the resource is associated with a slave, remove it manually.
-        Slave slave = entity.getSlave();
-        if (slave != null)
+        CollectionListener<AgentConfiguration> listener = new CollectionListener<AgentConfiguration>("agent", AgentConfiguration.class, true)
         {
-            slave.getResources().remove(entity);
-        }
-        // now that we have removed the associations, we can delete the entity.
+            protected void instanceInserted(AgentConfiguration instance)
+            {
+                agentRepositories.put(instance.getHandle(), new ConfigurationResourceRepository(instance, configurationProvider));
+            }
+
+            protected void instanceDeleted(AgentConfiguration instance)
+            {
+                agentRepositories.remove(instance.getHandle());
+            }
+
+            protected void instanceChanged(AgentConfiguration instance)
+            {
+                instanceDeleted(instance);
+                instanceInserted(instance);
+            }
+        };
+
+        listener.register(configurationProvider);
     }
 
-    public PersistentResource findById(long id)
+    public ResourceRepository getAgentRepository(long handle)
     {
-        return null;
+        return agentRepositories.get(handle);
     }
 
-    public PersistentResource findBySlaveAndName(Slave slave, String name)
+    public void addDiscoveredResources(long handle, List<Resource> resources)
     {
-        return resourceDao.findBySlaveAndName(slave, name);
-    }
-
-    public ConfigurationResourceRepository getMasterRepository()
-    {
-        return null;
-    }
-
-    public DatabaseResourceRepository getSlaveRepository(Slave slave)
-    {
-        if(!slaveRepositories.containsKey(slave.getId()))
+        ConfigurableResourceRepository repository = agentRepositories.get(handle);
+        for(Resource r: resources)
         {
-            slaveRepositories.put(slave.getId(), new DatabaseResourceRepository(slave, resourceDao));
+            if(!repository.hasResource(r.getName()))
+            {
+                repository.addResource(r);
+            }
         }
-
-        return slaveRepositories.get(slave.getId());
     }
 
-    public void addDiscoveredResources(Slave slave, List<Resource> resources)
+    public Map<String, Resource> findAll()
     {
-        ConfigurableResourceRepository repository = getRepository(slave);
         // FIXME
-//        for(Resource r: resources)
-//        {
-//            if(!repository.hasResource(r.getName()))
-//            {
-//                repository.addResource(r);
-//            }
-//        }
-    }
-
-    public List<PersistentResource> findAll()
-    {
-        return resourceDao.findAll();
+        return null;
     }
 
     public void editResource(PersistentResource resource, String newName, String defaultVersion)
     {
         // FIXME remember to catch config events to do this
-        List<BuildSpecificationNode> nodes = buildSpecificationNodeDao.findByResourceRequirement(resource.getName());
-        for(BuildSpecificationNode node: nodes)
-        {
-            for(ResourceRequirement r: node.getResourceRequirements())
-            {
-                if(r.getResource().equals(resource.getName()))
-                {
-                    r.setResource(newName);
-                }
-            }
-
-            buildSpecificationNodeDao.save(node);
-        }
+//        List<BuildSpecificationNode> nodes = buildSpecificationNodeDao.findByResourceRequirement(resource.getName());
+//        for(BuildSpecificationNode node: nodes)
+//        {
+//            for(ResourceRequirement r: node.getResourceRequirements())
+//            {
+//                if(r.getResource().equals(resource.getName()))
+//                {
+//                    r.setResource(newName);
+//                }
+//            }
+//
+//            buildSpecificationNodeDao.save(node);
+//        }
 
         resource.setName(newName);
         resource.setDefaultVersion(defaultVersion);
@@ -112,19 +96,19 @@ public class DefaultResourceManager implements ResourceManager
     public void renameResourceVersion(PersistentResource resource, String value, String newValue)
     {
         // FIXME remember to catch config events to do this
-        List<BuildSpecificationNode> nodes = buildSpecificationNodeDao.findByResourceRequirement(resource.getName());
-        for(BuildSpecificationNode node: nodes)
-        {
-            for(ResourceRequirement r: node.getResourceRequirements())
-            {
-                if(r.getResource().equals(resource.getName()) && value.equals(r.getVersion()))
-                {
-                    r.setVersion(newValue);
-                }
-            }
-
-            buildSpecificationNodeDao.save(node);
-        }
+//        List<BuildSpecificationNode> nodes = buildSpecificationNodeDao.findByResourceRequirement(resource.getName());
+//        for(BuildSpecificationNode node: nodes)
+//        {
+//            for(ResourceRequirement r: node.getResourceRequirements())
+//            {
+//                if(r.getResource().equals(resource.getName()) && value.equals(r.getVersion()))
+//                {
+//                    r.setVersion(newValue);
+//                }
+//            }
+//
+//            buildSpecificationNodeDao.save(node);
+//        }
 
         ResourceVersion version = resource.getVersion(value);
         resource.deleteVersion(version);
@@ -132,32 +116,27 @@ public class DefaultResourceManager implements ResourceManager
         resource.add(version);
     }
 
-    public void addResource(Slave slave, Resource resource)
+    public void handleConfigurationEvent(ConfigurationEvent event)
     {
-        ConfigurableResourceRepository repository = getRepository(slave);
-        repository.addResource(resource, true);
-    }
-
-
-    public ConfigurableResourceRepository getRepository(Slave slave)
-    {
-        if(slave == null)
+        if(event instanceof PostInsertEvent)
         {
-            return getMasterRepository();
+            PostInsertEvent pie = (PostInsertEvent) event;
+            AgentConfiguration agentConfig = (AgentConfiguration) pie.getNewInstance();
+            agentRepositories.put(agentConfig.getHandle(), new ConfigurationResourceRepository((AgentConfiguration) pie.getNewInstance(), configurationProvider));
         }
-        else
+        else if(event instanceof PreDeleteEvent)
         {
-            return getSlaveRepository(slave);
+            PreDeleteEvent pde = (PreDeleteEvent) event;
+            agentRepositories.remove(((AgentConfiguration) pde.getInstance()).getHandle());
+        }
+        else if(event instanceof PostSaveEvent)
+        {
+            
         }
     }
 
-    public void setResourceDao(ResourceDao resourceDao)
+    public void setConfigurationProvider(ConfigurationProvider configurationProvider)
     {
-        this.resourceDao = resourceDao;
-    }
-
-    public void setBuildSpecificationNodeDao(BuildSpecificationNodeDao buildSpecificationNodeDao)
-    {
-        this.buildSpecificationNodeDao = buildSpecificationNodeDao;
+        this.configurationProvider = configurationProvider;
     }
 }

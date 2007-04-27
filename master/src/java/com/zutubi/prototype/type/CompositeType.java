@@ -10,6 +10,7 @@ import com.zutubi.prototype.type.record.RecordManager;
 import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.Mapping;
 import com.zutubi.util.logging.Logger;
+import com.zutubi.pulse.core.config.Configuration;
 
 import java.util.Collections;
 import java.util.HashMap;
@@ -127,7 +128,7 @@ public class CompositeType extends AbstractType implements ComplexType
 
     public Object instantiate(String path, Object data) throws TypeException
     {
-        Object instance = path == null ? null : configurationPersistenceManager.getInstance(path);
+        Configuration instance =  path == null ? null : (Configuration)configurationPersistenceManager.getInstance(path);
         if (instance == null && data != null)
         {
             try
@@ -141,10 +142,12 @@ public class CompositeType extends AbstractType implements ComplexType
                     return type.instantiate(path, data);
                 }
 
-                instance = getClazz().newInstance();
+                instance = (Configuration) getClazz().newInstance();
                 if (path != null)
                 {
                     configurationPersistenceManager.putInstance(path, instance);
+                    instance.setConfigurationPath(path);
+                    instance.setHandle(record.getHandle());
                 }
 
                 TypeConversionException exception = null;

@@ -6,8 +6,7 @@ import com.zutubi.pulse.core.ConfigurableResourceRepository;
 import com.zutubi.pulse.core.FileLoadException;
 import com.zutubi.pulse.core.config.Resource;
 import com.zutubi.pulse.core.config.ResourceVersion;
-import com.zutubi.util.CollectionUtils;
-import com.zutubi.util.Mapping;
+import com.zutubi.pulse.prototype.config.agent.AgentConfiguration;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -17,12 +16,12 @@ import java.util.List;
  */
 public class ConfigurationResourceRepository implements ConfigurableResourceRepository
 {
-    private String path;
+    private AgentConfiguration agentConfig;
     private ConfigurationProvider configurationProvider;
 
-    public ConfigurationResourceRepository(String path, ConfigurationProvider configurationProvider)
+    public ConfigurationResourceRepository(AgentConfiguration agentConfig, ConfigurationProvider configurationProvider)
     {
-        this.path = path;
+        this.agentConfig = agentConfig;
         this.configurationProvider = configurationProvider;
     }
 
@@ -39,21 +38,12 @@ public class ConfigurationResourceRepository implements ConfigurableResourceRepo
 
     public Resource getResource(String name)
     {
-        return configurationProvider.get(PathUtils.getPath(path, name), Resource.class);
+        return agentConfig.getResources().get(name);
     }
 
     public List<String> getResourceNames()
     {
-        List<String> names = new LinkedList<String>();
-        CollectionUtils.map(configurationProvider.getAll(path, Resource.class), new Mapping<Resource, String>()
-        {
-            public String map(Resource resource)
-            {
-                return resource.getName();
-            }
-        }, names);
-        
-        return names;
+        return new LinkedList<String>(agentConfig.getResources().keySet());
     }
 
     public void addResource(Resource resource)
@@ -67,14 +57,14 @@ public class ConfigurationResourceRepository implements ConfigurableResourceRepo
         Resource existingResource = getResource(resource.getName());
         if (existingResource == null)
         {
-            configurationProvider.insert(path, resource);
+            configurationProvider.insert(getResourcesPath(), resource);
         }
         else
         {
             // FIXME: do we have a better way to programmatically update an
             // FIXME: existing instance?
             // Remove the existing instance before we play with it.
-            configurationProvider.delete(PathUtils.getPath(path, resource.getName()));
+            configurationProvider.delete(resource.getConfigurationPath());
 
             // we have an existing resource, so merge the details.
             for (String propertyName: resource.getProperties().keySet())
@@ -124,7 +114,12 @@ public class ConfigurationResourceRepository implements ConfigurableResourceRepo
                 }
             }
 
-            configurationProvider.insert(path, existingResource);
+            configurationProvider.insert(getResourcesPath(), existingResource);
         }
+    }
+
+    private String getResourcesPath()
+    {
+        return PathUtils.getPath(agentConfig.getConfigurationPath(), "resources");
     }
 }

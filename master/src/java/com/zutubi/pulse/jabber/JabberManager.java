@@ -35,7 +35,7 @@ public class JabberManager implements Stoppable, PacketListener, ConfigurationEv
 
     public synchronized void init()
     {
-        configurationProvider.registerEventListener(this, false, JabberConfiguration.class);
+        configurationProvider.registerEventListener(this, false, false, JabberConfiguration.class);
         JabberConfiguration config = configurationProvider.get(JabberConfiguration.class);
         init(config);
     }

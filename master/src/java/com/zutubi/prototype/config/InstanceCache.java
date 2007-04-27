@@ -55,7 +55,7 @@ class InstanceCache
         {
             for(Map.Entry<String, Entry> child: children.entrySet())
             {
-                if(PathUtils.matches(pattern, child.getKey()))
+                if(PathUtils.elementMatches(pattern, child.getKey()))
                 {
                     getAll(child.getValue(), elements, index + 1, result);
                 }

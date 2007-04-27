@@ -24,12 +24,6 @@
         <property name="prompt" column="PROMPT" type="boolean"/>
 
         <many-to-one name="root" class="com.zutubi.pulse.model.BuildSpecificationNode" column="ROOT_ID" cascade="all" lazy="false"/>
-
-        <bag name="properties" cascade="all,delete-orphan" lazy="false">
-            <cache usage="read-write"/>
-            <key column="SPECIFICATION_ID"/>
-            <one-to-many class="com.zutubi.pulse.core.config.ResourceProperty"/>
-        </bag>
     </class>
 
     <class name="com.zutubi.pulse.model.BuildSpecificationNode" table="BUILD_SPECIFICATION_NODE" lazy="false">
@@ -96,21 +90,7 @@
         <subclass name="com.zutubi.pulse.model.MasterBuildHostRequirements" discriminator-value="MASTER"/>
 
         <subclass name="com.zutubi.pulse.model.SlaveBuildHostRequirements" discriminator-value="SLAVE">
-            <many-to-one name="slave" class="com.zutubi.pulse.model.Slave" cascade="none"/>
+            <many-to-one name="slave" class="com.zutubi.pulse.model.AgentState" cascade="none"/>
         </subclass>
-    </class>
-
-    <class name="com.zutubi.pulse.core.config.ResourceProperty" table="RESOURCE_PROPERTY">
-        <cache usage="read-write"/>
-        
-        <id name="id" type="java.lang.Long" column="ID" unsaved-value="0">
-            <generator class="hilo"/>
-        </id>
-
-        <property name="name" column="NAME" type="string" length="1023" not-null="true"/>
-        <property name="value" column="VALUE" type="string" length="1023" not-null="true"/>
-        <property name="addToEnvironment" column="ADD_TO_ENVIRONMENT" type="boolean"/>
-        <property name="addToPath" column="ADD_TO_PATH" type="boolean"/>
-        <property name="resolveVariables" column="RESOLVE_VARIABLES" type="boolean"/>
     </class>
 </hibernate-mapping>

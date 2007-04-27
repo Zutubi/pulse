@@ -8,6 +8,10 @@ import com.zutubi.config.annotations.Transient;
 public interface Configuration
 {
     @Transient
-    long getID();
-    void setID(long id);
+    long getHandle();
+    void setHandle(long handle);
+
+    @Transient
+    String getConfigurationPath();
+    void setConfigurationPath(String configurationPath);
 }

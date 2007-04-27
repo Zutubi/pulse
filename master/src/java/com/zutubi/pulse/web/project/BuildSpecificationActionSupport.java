@@ -1,18 +1,14 @@
 package com.zutubi.pulse.web.project;
 
 import com.opensymphony.util.TextUtils;
-import com.zutubi.pulse.bootstrap.ComponentContext;
 import com.zutubi.pulse.core.*;
 import com.zutubi.pulse.model.*;
 import com.zutubi.util.logging.Logger;
 
-import java.io.ByteArrayInputStream;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.Semaphore;
-import java.util.concurrent.TimeUnit;
 
 /**
  */
@@ -23,7 +19,7 @@ public class BuildSpecificationActionSupport extends ProjectActionSupport
     protected List<String> recipes;
     protected ResourceRepository resourceRepository;
     protected Project project;
-    private SlaveManager slaveManager;
+    private AgentStateManager agentStateManager;
     private PulseFileLoaderFactory fileLoaderFactory;
 
     private Map<Long, String> buildHosts;
@@ -119,16 +115,16 @@ public class BuildSpecificationActionSupport extends ProjectActionSupport
     {
         if(buildHosts == null)
         {
-            List<Slave> slaves = slaveManager.getAll();
+            List<AgentState> agentStates = agentStateManager.getAll();
 
             buildHosts = new LinkedHashMap<Long, String>();
             buildHosts.put(0L, "[any]");
             buildHosts.put(1L, "master");
 
-            for (Slave slave : slaves)
-            {
-                buildHosts.put(slave.getId(), slave.getName());
-            }
+//            for (AgentState agentState : agentStates)
+//            {
+//                buildHosts.put(agentState.getId(), agentState.getName());
+//            }
         }
 
         return buildHosts;
@@ -146,7 +142,7 @@ public class BuildSpecificationActionSupport extends ProjectActionSupport
 
     protected void lookupAgent()
     {
-        if (buildHost != 0 && buildHost != 1 && slaveManager.getSlave(buildHost) == null)
+        if (buildHost != 0 && buildHost != 1 && agentStateManager.getAgentState(buildHost) == null)
         {
             addActionError("Unknown agent [" + buildHost + "]");
         }
@@ -166,8 +162,8 @@ public class BuildSpecificationActionSupport extends ProjectActionSupport
         }
         else
         {
-            Slave slave = slaveManager.getSlave(buildHost);
-            stage.setHostRequirements(new SlaveBuildHostRequirements(slave));
+            AgentState agentState = agentStateManager.getAgentState(buildHost);
+            stage.setHostRequirements(new SlaveBuildHostRequirements(agentState));
         }
 
         if(!TextUtils.stringSet(stage.getRecipe()))
@@ -176,9 +172,9 @@ public class BuildSpecificationActionSupport extends ProjectActionSupport
         }
     }
 
-    public void setSlaveManager(SlaveManager slaveManager)
+    public void setSlaveManager(AgentStateManager agentStateManager)
     {
-        this.slaveManager = slaveManager;
+        this.agentStateManager = agentStateManager;
     }
 
     public void setFileLoaderFactory(PulseFileLoaderFactory fileLoaderFactory)

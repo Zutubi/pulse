@@ -17,7 +17,7 @@ public class PingSlaves implements Task
     public void execute(TaskExecutionContext context)
     {
         LOG.info("pinging slaves.");
-        agentManager.pingSlaves();
+        agentManager.pingAgents();
     }
 
     public void setAgentManager(AgentManager agentManager)

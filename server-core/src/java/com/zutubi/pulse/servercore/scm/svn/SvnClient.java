@@ -24,8 +24,6 @@ import java.util.*;
 
 /**
  * A connection to a subversion server.
- *
- * @author jsankey
  */
 public class SvnClient implements ScmClient
 {

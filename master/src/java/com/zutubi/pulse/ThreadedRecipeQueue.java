@@ -269,10 +269,11 @@ public class ThreadedRecipeQueue implements Runnable, RecipeQueue, EventListener
         lock.lock();
         try
         {
-            if(!onlineAgents.containsKey(agent.getId()))
+            long handle = agent.getAgentConfig().getHandle();
+            if(!onlineAgents.containsKey(handle))
             {
-                onlineAgents.put(agent.getId(), agent);
-                availableAgents.put(agent.getId(), agent);
+                onlineAgents.put(handle, agent);
+                availableAgents.put(handle, agent);
                 resetTimeouts(agent);
                 lockCondition.signal();
             }
@@ -287,7 +288,7 @@ public class ThreadedRecipeQueue implements Runnable, RecipeQueue, EventListener
     {
         for(RecipeDispatchRequest request: queuedDispatches)
         {
-            if(request.hasTimeout() && request.getHostRequirements().fulfilledBy(request, agent.getBuildService()))
+            if(request.hasTimeout() && request.getHostRequirements().fulfilledBy(request, agent.getService()))
             {
                 request.clearTimeout();
             }
@@ -302,7 +303,7 @@ public class ThreadedRecipeQueue implements Runnable, RecipeQueue, EventListener
         lock.lock();
         try
         {
-            onlineAgents.remove(agent.getId());
+            onlineAgents.remove(agent.getAgentConfig().getHandle());
 
             if(unsatisfiableTimeout == 0)
             {
@@ -316,7 +317,7 @@ public class ThreadedRecipeQueue implements Runnable, RecipeQueue, EventListener
             long deadRecipe = 0;
             for (Map.Entry<Long, Agent> entry : executingAgents.entrySet())
             {
-                if (entry.getValue().getId() == agent.getId())
+                if (entry.getValue().getAgentConfig().getHandle() == agent.getAgentConfig().getHandle())
                 {
                     // Agent dropped off while we were executing.
                     deadRecipe = entry.getKey();
@@ -331,7 +332,7 @@ public class ThreadedRecipeQueue implements Runnable, RecipeQueue, EventListener
                 error = new RecipeErrorEvent(this, deadRecipe, "Connection to agent lost during recipe execution");
             }
 
-            availableAgents.remove(agent.getId());
+            availableAgents.remove(agent.getAgentConfig().getHandle());
             lockCondition.signal();
         }
         finally
@@ -385,7 +386,7 @@ public class ThreadedRecipeQueue implements Runnable, RecipeQueue, EventListener
     {
         for (Agent a : onlineAgents.values())
         {
-            if (request.getHostRequirements().fulfilledBy(request, a.getBuildService()))
+            if (request.getHostRequirements().fulfilledBy(request, a.getService()))
             {
                 return true;
             }
@@ -431,7 +432,7 @@ public class ThreadedRecipeQueue implements Runnable, RecipeQueue, EventListener
                     {
                         for (Agent agent : availableAgents.values())
                         {
-                            BuildService service = agent.getBuildService();
+                            AgentService service = agent.getService();
 
                             // can the request be sent to this service?
                             if (request.getHostRequirements().fulfilledBy(request, service) && !unavailableAgents.contains(agent))
@@ -449,7 +450,7 @@ public class ThreadedRecipeQueue implements Runnable, RecipeQueue, EventListener
 
                 for (Agent a : unavailableAgents)
                 {
-                    availableAgents.remove(a.getId());
+                    availableAgents.remove(a.getAgentConfig().getHandle());
                 }
 
                 try
@@ -486,7 +487,7 @@ public class ThreadedRecipeQueue implements Runnable, RecipeQueue, EventListener
         // We can no longer update the revision once we have dispatched a
         // request: it is fixed here if not already.
         buildRevision.apply(recipeRequest);
-        recipeRequest.prepare(agent.getName());
+        recipeRequest.prepare(agent.getAgentConfig().getName());
 
         // TODO: this code cannot handle an agent rejecting the build
         // (the handling was backed outdue to CIB-553 and the fact that
@@ -502,7 +503,7 @@ public class ThreadedRecipeQueue implements Runnable, RecipeQueue, EventListener
             context.setBuildRevision(buildRevision.getRevision().getRevisionString());
             context.setBuildTimestamp(buildRevision.getTimestamp());
             
-            agent.getBuildService().build(recipeRequest, context);
+            agent.getService().build(recipeRequest, context);
             unavailableAgents.add(agent);
             executingAgents.put(recipeRequest.getId(), agent);
         }
@@ -600,9 +601,10 @@ public class ThreadedRecipeQueue implements Runnable, RecipeQueue, EventListener
             if (agent != null)
             {
                 executingAgents.remove(event.getRecipeId());
-                if(onlineAgents.containsKey(agent.getId()))
+                long handle = agent.getAgentConfig().getHandle();
+                if(onlineAgents.containsKey(handle))
                 {
-                    availableAgents.put(agent.getId(), agent);
+                    availableAgents.put(handle, agent);
                     lockCondition.signal();
                 }
             }
@@ -619,7 +621,7 @@ public class ThreadedRecipeQueue implements Runnable, RecipeQueue, EventListener
         {
             handleAgentStatus((AgentStatusEvent) event);
         }
-        else if (event instanceof SlaveAgentRemovedEvent)
+        else if (event instanceof AgentRemovedEvent)
         {
             offline(event.getAgent());
         }
@@ -763,6 +765,6 @@ public class ThreadedRecipeQueue implements Runnable, RecipeQueue, EventListener
         GeneralAdminConfiguration adminConfiguration = configurationProvider.get(GeneralAdminConfiguration.class);
         updateTimeout(adminConfiguration);
 
-        configurationProvider.registerEventListener(this, false, GeneralAdminConfiguration.class);
+        configurationProvider.registerEventListener(this, false, false, GeneralAdminConfiguration.class);
     }
 }

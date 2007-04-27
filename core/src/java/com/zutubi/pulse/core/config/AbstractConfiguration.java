@@ -5,15 +5,26 @@ package com.zutubi.pulse.core.config;
  */
 public abstract class AbstractConfiguration implements Configuration
 {
-    private long id;
+    private long handle;
+    private String configurationPath;
 
-    public long getID()
+    public long getHandle()
     {
-        return id;
+        return handle;
     }
 
-    public void setID(long id)
+    public void setHandle(long handle)
     {
-        this.id = id;
+        this.handle = handle;
+    }
+
+    public String getConfigurationPath()
+    {
+        return configurationPath;
+    }
+
+    public void setConfigurationPath(String configurationPath)
+    {
+        this.configurationPath = configurationPath;
     }
 }

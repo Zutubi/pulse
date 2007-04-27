@@ -31,12 +31,12 @@ public interface SlaveService
      * @param token secure token for inter-agent communication
      * @param build the build number to update to
      * @param master url of the master requesting the update
-     * @param id the slave's id, for when it calls us back
+     * @param handle the agents's handle, for when it calls us back
      * @param packageUrl URL from which a zip containing the given build can
      *                   be obtained
      * @return true if the agent wishes to proceed with the update
      */
-    boolean updateVersion(String token, String build, String master, long id, String packageUrl, long packageSize);
+    boolean updateVersion(String token, String build, String master, long handle, String packageUrl, long packageSize);
 
     SlaveStatus getStatus(String token, String master);
 
@@ -45,14 +45,14 @@ public interface SlaveService
      *
      * @param token   secure token for inter-agent communication
      * @param master  location of the master for return messages
-     * @param slaveId id of the slave, used in returned messages
+     * @param handle  handle of the agent, used in returned messages
      * @param request details of the recipe to build
      * @return true if the request was accepted, false of the slave was busy
      *
      * @throws InvalidTokenException if the given token does not match the
      * slave's
      */
-    boolean build(String token, String master, long slaveId, RecipeRequest request, BuildContext context) throws InvalidTokenException;
+    boolean build(String token, String master, long handle, RecipeRequest request, BuildContext context) throws InvalidTokenException;
 
     void cleanupRecipe(String token, String project, String spec, long recipeId, boolean incremental) throws InvalidTokenException;
 

@@ -10,9 +10,9 @@ public interface RecipeResultCollector
 {
     void prepare(BuildResult result, long recipeId);
 
-    void collect(BuildResult result, long recipeId, boolean collectWorkingCopy, boolean incremental, BuildService buildService);
+    void collect(BuildResult result, long recipeId, boolean collectWorkingCopy, boolean incremental, AgentService agentService);
 
-    void cleanup(BuildResult result, long recipeId, boolean incremental, BuildService buildService);
+    void cleanup(BuildResult result, long recipeId, boolean incremental, AgentService agentService);
 
     File getRecipeDir(BuildResult result, long recipeId);
 }

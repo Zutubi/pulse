@@ -1,8 +1,8 @@
 package com.zutubi.pulse;
 
 import com.zutubi.pulse.hessian.CustomHessianProxyFactory;
-import com.zutubi.pulse.model.Slave;
 import com.zutubi.pulse.services.SlaveService;
+import com.zutubi.pulse.prototype.config.agent.AgentConfiguration;
 
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -13,9 +13,9 @@ public class SlaveProxyFactory
 {
     private CustomHessianProxyFactory hessianProxyFactory;
 
-    public SlaveService createProxy(Slave slave) throws MalformedURLException
+    public SlaveService createProxy(AgentConfiguration agentConfig) throws MalformedURLException
     {
-        URL url = new URL("http", slave.getHost(), slave.getPort(), "/hessian");
+        URL url = new URL("http", agentConfig.getHost(), agentConfig.getPort(), "/hessian");
         return (SlaveService) hessianProxyFactory.create(SlaveService.class, url.toString());
     }
 

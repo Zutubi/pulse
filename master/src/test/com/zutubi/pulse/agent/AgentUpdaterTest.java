@@ -2,14 +2,13 @@ package com.zutubi.pulse.agent;
 
 import com.mockobjects.dynamic.C;
 import com.mockobjects.dynamic.Mock;
-import com.zutubi.pulse.BuildService;
+import com.zutubi.pulse.AgentService;
 import com.zutubi.pulse.Version;
 import com.zutubi.pulse.bootstrap.DefaultSystemPaths;
 import com.zutubi.pulse.bootstrap.SystemPaths;
 import com.zutubi.pulse.events.*;
-import com.zutubi.pulse.model.Slave;
-import com.zutubi.pulse.services.ServiceTokenManager;
-import com.zutubi.pulse.services.SlaveService;
+import com.zutubi.pulse.model.AgentState;
+import com.zutubi.pulse.prototype.config.agent.AgentConfiguration;
 import com.zutubi.pulse.services.UpgradeState;
 import com.zutubi.pulse.services.UpgradeStatus;
 import com.zutubi.pulse.servlet.DownloadPackageServlet;
@@ -29,13 +28,14 @@ public class AgentUpdaterTest extends PulseTestCase implements EventListener
 
     private File tempDir;
     private SystemPaths systemPaths;
-    private Slave slave;
-    private SlaveAgent agent;
+    private AgentConfiguration agentConfig;
+    private AgentState agentState;
+    private DefaultAgent agent;
     private EventManager eventManager;
     private Mock mockService;
     private AgentUpdater updater;
     private Semaphore agentSemaphore;
-    private SlaveUpgradeCompleteEvent event;
+    private AgentUpgradeCompleteEvent event;
     private Semaphore eventSemaphore;
 
     protected void setUp() throws Exception
@@ -50,12 +50,16 @@ public class AgentUpdaterTest extends PulseTestCase implements EventListener
         File packageFile = DownloadPackageServlet.getAgentZip(systemPaths);
         FileSystemUtils.createFile(packageFile, "dummy");
 
-        slave = new Slave("test", "host");
-        slave.setId(111);
+        agentConfig = new AgentConfiguration();
+        agentConfig.setHandle(111);
+        agentConfig.setName("test");
+        agentConfig.setHost("host");
+        agentState = new AgentState();
+        agentState.setId(222);
         eventManager = new DefaultEventManager();
         eventManager.register(this);
 
-        mockService = new Mock(SlaveService.class);
+        mockService = new Mock(AgentService.class);
         agentSemaphore = new Semaphore(0);
         eventSemaphore = new Semaphore(0);
     }
@@ -90,7 +94,7 @@ public class AgentUpdaterTest extends PulseTestCase implements EventListener
     {
         createUpdater(true, 0);
         updater.start();
-        updater.upgradeStatus(new UpgradeStatus(slave.getId(), UpgradeState.ERROR, -1, "Exploded"));
+        updater.upgradeStatus(new UpgradeStatus(agentState.getId(), UpgradeState.ERROR, -1, "Exploded"));
         assertStatus(UpgradeState.ERROR, -1, "Exploded");
         assertCompleted(false);
     }
@@ -101,7 +105,7 @@ public class AgentUpdaterTest extends PulseTestCase implements EventListener
         updater.start();
         start();
         download();
-        updater.upgradeStatus(new UpgradeStatus(slave.getId(), UpgradeState.ERROR, -1, "Download failed"));
+        updater.upgradeStatus(new UpgradeStatus(agentState.getId(), UpgradeState.ERROR, -1, "Download failed"));
         assertStatus(UpgradeState.ERROR, -1, "Download failed");
         assertCompleted(false);
     }
@@ -176,7 +180,7 @@ public class AgentUpdaterTest extends PulseTestCase implements EventListener
             }
         }
 
-        agent = new MockSlaveAgent(slave, (SlaveService) mockService.proxy(), null, null);
+        agent = new MockAgent(agentConfig, agentState, (AgentService) mockService.proxy());
         updater = new AgentUpdater(agent, TEST_TOKEN, TEST_URL, eventManager, systemPaths);
         updater.setStatusTimeout(5);
         updater.setRebootTimeout(5);
@@ -185,25 +189,25 @@ public class AgentUpdaterTest extends PulseTestCase implements EventListener
 
     private void start() throws Exception
     {
-        updater.upgradeStatus(new UpgradeStatus(slave.getId(), UpgradeState.STARTED, -1, null));
+        updater.upgradeStatus(new UpgradeStatus(agentState.getId(), UpgradeState.STARTED, -1, null));
         assertStatus(UpgradeState.STARTED, -1, null);
     }
 
     private void download() throws Exception
     {
-        updater.upgradeStatus(new UpgradeStatus(slave.getId(), UpgradeState.DOWNLOADING, -1, null));
+        updater.upgradeStatus(new UpgradeStatus(agentState.getId(), UpgradeState.DOWNLOADING, -1, null));
         assertStatus(UpgradeState.DOWNLOADING, -1, null);
     }
 
     private void apply() throws Exception
     {
-        updater.upgradeStatus(new UpgradeStatus(slave.getId(), UpgradeState.APPLYING, -1, null));
+        updater.upgradeStatus(new UpgradeStatus(agentState.getId(), UpgradeState.APPLYING, -1, null));
         assertStatus(UpgradeState.APPLYING, -1, null);
     }
 
     private void reboot() throws Exception
     {
-        updater.upgradeStatus(new UpgradeStatus(slave.getId(), UpgradeState.REBOOTING, -1, null));
+        updater.upgradeStatus(new UpgradeStatus(agentState.getId(), UpgradeState.REBOOTING, -1, null));
         assertStatus(UpgradeState.REBOOTING, -1, null);
     }
 
@@ -224,20 +228,20 @@ public class AgentUpdaterTest extends PulseTestCase implements EventListener
 
     public void handleEvent(Event evt)
     {
-        event = (SlaveUpgradeCompleteEvent) evt;
+        event = (AgentUpgradeCompleteEvent) evt;
         eventSemaphore.release();
     }
 
     public Class[] getHandledEvents()
     {
-        return new Class[] { SlaveUpgradeCompleteEvent.class };
+        return new Class[] { AgentUpgradeCompleteEvent.class };
     }
 
-    private class MockSlaveAgent extends SlaveAgent
+    private class MockAgent extends DefaultAgent
     {
-        public MockSlaveAgent(Slave slave, SlaveService slaveService, ServiceTokenManager serviceTokenManager, BuildService buildService)
+        public MockAgent(AgentConfiguration agentConfig, AgentState agentState, AgentService agentService)
         {
-            super(slave, slaveService, serviceTokenManager, buildService);
+            super(agentConfig, agentState, agentService);
         }
 
         public void upgradeStatus(UpgradeState state, int progress, String message)

@@ -15,6 +15,6 @@ public interface MasterService
 
     void handleEvent(String token, Event event) throws InvalidTokenException;
 
-    Resource getResource(String token, long slaveId, String name) throws InvalidTokenException;
-    List<String> getResourceNames(String token, long slaveId) throws InvalidTokenException;
+    Resource getResource(String token, long handle, String name) throws InvalidTokenException;
+    List<String> getResourceNames(String token, long handle) throws InvalidTokenException;
 }

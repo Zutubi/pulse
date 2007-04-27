@@ -676,11 +676,6 @@
             <result name="success" type="velocity">view-quartz.vm</result>
         </action>
 
-        <action name="createSlave!default" class="com.zutubi.pulse.web.agents.AddAgentAction" method="doDefault">
-            <interceptor-ref name="defaultStack"/>
-            <result name="success" type="velocity">create-slave.vm</result>
-        </action>
-
         <action name="createBuildSpecification" class="com.zutubi.pulse.web.project.CreateBuildSpecificationAction">
             <result name="input" type="velocity">create-build-specification.vm</result>
             <result name="cancel" type="redirect">/configureProject.action?id=${projectId}</result>
@@ -1030,35 +1025,12 @@
             <result name="cancel" type="redirect">/admin/serverSettings.action</result>
         </action>
 
-        <action name="addAgent" class="com.zutubi.pulse.web.agents.AddAgentAction">
-            <result name="input" type="velocity">/add-agent.vm</result>
-            <result name="cancel" type="redirect">/viewAgents.action</result>
-            <result name="error" type="velocity">/generic-error.vm</result>
-            <result name="success" type="redirect">/viewAgents.action</result>
-        </action>
-
-        <action name="editAgent" class="com.zutubi.pulse.web.agents.EditAgentAction">
-            <result name="error" type="velocity">/edit-agent.vm</result>
-            <result name="input" type="velocity">/edit-agent.vm</result>
-            <result name="cancel" type="redirect">/viewAgents.action</result>
-            <result name="success" type="redirect">/viewAgents.action</result>
-        </action>
-
         <action name="enableAgent" class="com.zutubi.pulse.web.agents.EnableAgentAction">
-            <result name="success" type="redirect">/viewAgents.action</result>
-        </action>
-
-        <action name="enableMaster" class="com.zutubi.pulse.web.agents.EnableMasterAction">
             <result name="success" type="redirect">/viewAgents.action</result>
         </action>
 
         <action name="pingAgent" class="com.zutubi.pulse.web.agents.PingAgentAction">
             <result name="success" type="redirect">/viewAgents.action</result>
-        </action>
-
-        <action name="deleteAgent" class="com.zutubi.pulse.web.agents.DeleteAgentAction">
-            <result name="success" type="redirect">/viewAgents.action</result>
-            <result name="error" type="velocity">/generic-error.vm</result>
         </action>
 
         <action name="deleteCommitMessageLink" class="com.zutubi.pulse.web.admin.DeleteCommitMessageTransformerAction">

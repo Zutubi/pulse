@@ -5,12 +5,12 @@ package com.zutubi.prototype.type.record;
  */
 public abstract class AbstractRecord implements Record
 {
-    protected static final String ID_KEY = "id";
+    protected static final String HANDLE_KEY = "handle";
     protected static final long UNDEFINED = 0;
 
-    public long getID()
+    public long getHandle()
     {
-        String idString = getMeta(ID_KEY);
+        String idString = getMeta(HANDLE_KEY);
         if (idString != null)
         {
             try

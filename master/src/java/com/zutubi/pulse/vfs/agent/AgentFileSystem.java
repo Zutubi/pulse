@@ -3,8 +3,8 @@ package com.zutubi.pulse.vfs.agent;
 import com.caucho.hessian.client.HessianRuntimeException;
 import com.zutubi.pulse.SlaveProxyFactory;
 import com.zutubi.pulse.SystemInfo;
-import com.zutubi.pulse.model.Slave;
-import com.zutubi.pulse.model.SlaveManager;
+import com.zutubi.pulse.agent.Agent;
+import com.zutubi.pulse.agent.AgentManager;
 import com.zutubi.pulse.services.ServiceTokenManager;
 import com.zutubi.pulse.services.SlaveService;
 import com.zutubi.util.logging.Logger;
@@ -26,7 +26,7 @@ public class AgentFileSystem extends AbstractFileSystem
 {
     private static final Logger LOG = Logger.getLogger(AgentFileSystem.class);
 
-    private SlaveManager slaveManager;
+    private AgentManager agentManager;
     private SlaveProxyFactory proxyFactory;
     private ServiceTokenManager serviceTokenManager;
 
@@ -116,8 +116,8 @@ public class AgentFileSystem extends AbstractFileSystem
     {
         try
         {
-            Slave slave = slaveManager.getSlave(Long.valueOf(agent));
-            return proxyFactory.createProxy(slave);
+            Agent agent = agentManager.getAgent(Long.valueOf(this.agent));
+            return proxyFactory.createProxy(agent.getAgentConfig());
         }
         catch (MalformedURLException e)
         {
@@ -136,11 +136,6 @@ public class AgentFileSystem extends AbstractFileSystem
         return osName != null && osName.toLowerCase().startsWith("win");
     }
 
-    public void setSlaveManager(SlaveManager slaveManager)
-    {
-        this.slaveManager = slaveManager;
-    }
-
     public void setProxyFactory(SlaveProxyFactory proxyFactory)
     {
         this.proxyFactory = proxyFactory;
@@ -149,5 +144,10 @@ public class AgentFileSystem extends AbstractFileSystem
     public void setServiceTokenManager(ServiceTokenManager serviceTokenManager)
     {
         this.serviceTokenManager = serviceTokenManager;
+    }
+
+    public void setAgentManager(AgentManager agentManager)
+    {
+        this.agentManager = agentManager;
     }
 }

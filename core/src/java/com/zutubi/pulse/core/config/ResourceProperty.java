@@ -1,13 +1,14 @@
 package com.zutubi.pulse.core.config;
 
 import com.zutubi.config.annotations.SymbolicName;
+import com.zutubi.config.annotations.Form;
 
 /**
  */
+@Form(fieldOrder = { "name", "value", "addToEnvironment", "addToPath", "resolveVariables" })
 @SymbolicName("internal.resourceProperty")
 public class ResourceProperty extends AbstractNamedConfiguration
 {
-    private long id;
     private String value;
     private boolean addToEnvironment = false;
     private boolean addToPath = false;
@@ -34,17 +35,6 @@ public class ResourceProperty extends AbstractNamedConfiguration
     public ResourceProperty copy()
     {
         return new ResourceProperty(getName(), value, addToEnvironment, addToPath, resolveVariables);
-    }
-
-    // FIXME this id is to temporarily appease hibernate
-    public long getId()
-    {
-        return id;
-    }
-
-    public void setId(long id)
-    {
-        this.id = id;
     }
 
     public String getValue()

@@ -48,6 +48,6 @@ public class GuestAccessManager implements ConfigurationEventListener
     public void setConfigurationProvider(ConfigurationProvider configurationProvider)
     {
         this.configurationProvider = configurationProvider;
-        configurationProvider.registerEventListener(this, false, GeneralAdminConfiguration.class);
+        configurationProvider.registerEventListener(this, false, false, GeneralAdminConfiguration.class);
     }
 }

@@ -18,14 +18,12 @@ public class SystemInfoAction extends AgentActionSupport
      */
     public String execute()
     {
-        lookupSlave();
         Agent agent = getAgent();
-
         if(agent.isOnline())
         {
             try
             {
-                info = agent.getSystemInfo();
+                info = agent.getService().getSystemInfo();
             }
             catch(RuntimeException e)
             {

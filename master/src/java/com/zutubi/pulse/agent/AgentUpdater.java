@@ -1,10 +1,10 @@
 package com.zutubi.pulse.agent;
 
 import com.zutubi.pulse.Version;
+import com.zutubi.pulse.AgentService;
 import com.zutubi.pulse.bootstrap.SystemPaths;
 import com.zutubi.pulse.events.EventManager;
-import com.zutubi.pulse.events.SlaveUpgradeCompleteEvent;
-import com.zutubi.pulse.services.SlaveService;
+import com.zutubi.pulse.events.AgentUpgradeCompleteEvent;
 import com.zutubi.pulse.services.UpgradeState;
 import com.zutubi.pulse.services.UpgradeStatus;
 import com.zutubi.pulse.servlet.DownloadPackageServlet;
@@ -25,7 +25,7 @@ public class AgentUpdater implements Runnable
 {
     private static final Logger LOG = Logger.getLogger(AgentUpdater.class);
     
-    private SlaveAgent agent;
+    private Agent agent;
     private String token;
     private String masterUrl;
     private EventManager eventManager;
@@ -47,7 +47,7 @@ public class AgentUpdater implements Runnable
      */
     private long pingInterval = 5000;
 
-    public AgentUpdater(SlaveAgent agent, String token, String masterUrl, EventManager eventManager, SystemPaths systemPaths)
+    public AgentUpdater(Agent agent, String token, String masterUrl, EventManager eventManager, SystemPaths systemPaths)
     {
         this.agent = agent;
         this.token = token;
@@ -63,14 +63,14 @@ public class AgentUpdater implements Runnable
 
     public void run()
     {
-        SlaveService slaveService = agent.getSlaveService();
+        AgentService agentService = agent.getService();
         File packageFile = DownloadPackageServlet.getAgentZip(systemPaths);
         String packageUrl = DownloadPackageServlet.getPackagesUrl(masterUrl) + "/" + packageFile.getName();
         String masterBuild = Version.getVersion().getBuildNumber();
 
         try
         {
-            boolean accepted = slaveService.updateVersion(token, masterBuild, masterUrl, agent.getSlave().getId(), packageUrl, packageFile.length());
+            boolean accepted = agentService.updateVersion(masterBuild, masterUrl, agent.getAgentState().getId(), packageUrl, packageFile.length());
 
             if(!accepted)
             {
@@ -110,7 +110,7 @@ public class AgentUpdater implements Runnable
             {
                 try
                 {
-                    int build = slaveService.ping();
+                    int build = agentService.ping();
                     if(build == expectedBuild)
                     {
                         // We did it!
@@ -139,7 +139,7 @@ public class AgentUpdater implements Runnable
 
     private void completed(boolean succeeded)
     {
-        eventManager.publish(new SlaveUpgradeCompleteEvent(this, agent, succeeded));
+        eventManager.publish(new AgentUpgradeCompleteEvent(this, agent, succeeded));
     }
 
     public void stop(boolean force)

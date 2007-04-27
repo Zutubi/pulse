@@ -55,13 +55,13 @@ public class SlaveRecipeProcessor
         return null;
     }
 
-    public void processRecipe(String master, long slaveId, RecipeRequest request, BuildContext context)
+    public void processRecipe(String master, long handle, RecipeRequest request, BuildContext context)
     {
         MasterService masterProxy = getMasterProxy(master);
         if(masterProxy != null)
         {
             EventListener listener = registerMasterListener(master, masterProxy, request.getId());
-            ResourceRepository repo = new RemoteResourceRepository(slaveId, masterProxy, serviceTokenManager);
+            ResourceRepository repo = new RemoteResourceRepository(handle, masterProxy, serviceTokenManager);
             ServerRecipePaths processorPaths = new ServerRecipePaths(request.getProject(), request.getSpec(), request.getId(), configurationManager.getUserPaths().getData(), request.isIncremental());
 
             context.setFileRepository(new SlaveFileRepository(processorPaths.getRecipeRoot(), master, serviceTokenManager));

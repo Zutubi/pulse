@@ -1,50 +1,103 @@
 package com.zutubi.pulse;
 
 import com.zutubi.prototype.config.ConfigurationProvider;
-import com.zutubi.pulse.agent.MasterAgent;
 import com.zutubi.pulse.bootstrap.MasterConfigurationManager;
+import com.zutubi.pulse.bootstrap.StartupManager;
 import com.zutubi.pulse.bootstrap.SystemConfiguration;
 import com.zutubi.pulse.core.BuildException;
 import com.zutubi.pulse.core.RecipeRequest;
+import com.zutubi.pulse.core.config.Resource;
+import com.zutubi.pulse.logging.CustomLogRecord;
+import com.zutubi.pulse.logging.ServerMessagesHandler;
 import com.zutubi.pulse.model.ResourceManager;
 import com.zutubi.pulse.prototype.config.admin.GeneralAdminConfiguration;
+import com.zutubi.pulse.prototype.config.agent.AgentConfiguration;
 import com.zutubi.pulse.util.FileSystemUtils;
+import com.zutubi.pulse.resources.ResourceDiscoverer;
+import com.zutubi.pulse.services.SlaveStatus;
+import com.zutubi.pulse.agent.Status;
+import com.zutubi.util.logging.Logger;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.List;
 
 /**
  */
-public class MasterBuildService implements BuildService
+public class MasterAgentService implements AgentService
 {
+    private static final Logger LOG = Logger.getLogger(MasterAgentService.class);
+    
+    private AgentConfiguration agentConfig;
+
     private MasterRecipeProcessor masterRecipeProcessor;
     private ConfigurationProvider configurationProvider;
     private MasterConfigurationManager configurationManager;
     private ResourceManager resourceManager;
+    private StartupManager startupManager;
+    private ServerMessagesHandler serverMessagesHandler;
 
-    public MasterBuildService(MasterRecipeProcessor masterRecipeProcessor, ConfigurationProvider configurationProvider, MasterConfigurationManager configurationManager, ResourceManager resourceManager)
+
+    public MasterAgentService(AgentConfiguration agentConfig)
     {
-        this.masterRecipeProcessor = masterRecipeProcessor;
-        this.configurationProvider = configurationProvider;
-        this.configurationManager = configurationManager;
-        this.resourceManager = resourceManager;
+        this.agentConfig = agentConfig;
     }
 
     public String getUrl()
     {
         GeneralAdminConfiguration generalConfig = configurationProvider.get(GeneralAdminConfiguration.class);
         SystemConfiguration systemConfig = configurationManager.getSystemConfig();
-        return MasterAgent.constructMasterLocation(generalConfig, systemConfig);
+        return constructMasterLocation(generalConfig, systemConfig);
+    }
+
+    public int ping()
+    {
+        return Version.getVersion().getBuildNumberAsInt();
+    }
+
+    public SlaveStatus getStatus(String masterLocation)
+    {
+        long recipeId = masterRecipeProcessor.getBuildingRecipe();
+        if(recipeId == 0)
+        {
+            return new SlaveStatus(Status.IDLE);
+        }
+        else
+        {
+            return new SlaveStatus(Status.BUILDING, recipeId);
+        }
+    }
+
+    public boolean updateVersion(String masterBuild, String masterUrl, long handle, String packageUrl, long packageSize)
+    {
+        LOG.warning("Illegal request to update version of master agent.");
+        return true;
+    }
+
+    public List<Resource> discoverResources()
+    {
+        ResourceDiscoverer discoverer = new ResourceDiscoverer();
+        return discoverer.discover();
+    }
+
+    public SystemInfo getSystemInfo()
+    {
+        return SystemInfo.getSystemInfo(configurationManager, startupManager);
+    }
+
+    public List<CustomLogRecord> getRecentMessages()
+    {
+        return serverMessagesHandler.takeSnapshot();
     }
 
     public boolean hasResource(String resource, String version)
     {
-        return resourceManager.getMasterRepository().hasResource(resource, version);
+        return resourceManager.getAgentRepository(agentConfig.getHandle()).hasResource(resource, version);
     }
 
     public boolean build(RecipeRequest request, BuildContext context)
     {
-        masterRecipeProcessor.processRecipe(request, context);
+        masterRecipeProcessor.processRecipe(request, context, resourceManager.getAgentRepository(agentConfig.getHandle()));
         return true;
     }
 
@@ -109,6 +162,29 @@ public class MasterBuildService implements BuildService
         return "master";
     }
 
+    @Override
+    public boolean equals(Object obj)
+    {
+        if(obj instanceof MasterAgentService)
+        {
+            MasterAgentService other = (MasterAgentService) obj;
+            return other.agentConfig.getHandle() == agentConfig.getHandle();
+        }
+
+        return false;
+    }
+
+    public static String constructMasterLocation(GeneralAdminConfiguration generalConfig, SystemConfiguration systemConfig)
+    {
+        String url = generalConfig.getMasterHost() + ":" + systemConfig.getServerPort() + systemConfig.getContextPath();
+        if(url.endsWith("/"))
+        {
+            url = url.substring(0, url.length() - 1);
+        }
+
+        return url;
+    }
+
     public void setMasterRecipeProcessor(MasterRecipeProcessor masterRecipeProcessor)
     {
         this.masterRecipeProcessor = masterRecipeProcessor;
@@ -119,14 +195,23 @@ public class MasterBuildService implements BuildService
         this.configurationManager = configurationManager;
     }
 
-    @Override
-    public boolean equals(Object obj)
-    {
-        return obj instanceof MasterBuildService;
-    }
-
     public void setResourceManager(ResourceManager resourceManager)
     {
         this.resourceManager = resourceManager;
+    }
+
+    public void setConfigurationProvider(ConfigurationProvider configurationProvider)
+    {
+        this.configurationProvider = configurationProvider;
+    }
+
+    public void setStartupManager(StartupManager startupManager)
+    {
+        this.startupManager = startupManager;
+    }
+
+    public void setServerMessagesHandler(ServerMessagesHandler serverMessagesHandler)
+    {
+        this.serverMessagesHandler = serverMessagesHandler;
     }
 }

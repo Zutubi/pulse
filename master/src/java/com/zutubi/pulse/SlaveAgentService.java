@@ -1,19 +1,21 @@
 package com.zutubi.pulse;
 
 import com.zutubi.prototype.config.ConfigurationProvider;
-import com.zutubi.pulse.agent.MasterAgent;
 import com.zutubi.pulse.bootstrap.MasterConfigurationManager;
 import com.zutubi.pulse.bootstrap.SystemConfiguration;
 import com.zutubi.pulse.core.BuildException;
 import com.zutubi.pulse.core.RecipeRequest;
+import com.zutubi.pulse.core.config.Resource;
 import com.zutubi.pulse.model.ResourceManager;
-import com.zutubi.pulse.model.Slave;
 import com.zutubi.pulse.prototype.config.admin.GeneralAdminConfiguration;
+import com.zutubi.pulse.prototype.config.agent.AgentConfiguration;
 import com.zutubi.pulse.services.ServiceTokenManager;
 import com.zutubi.pulse.services.SlaveService;
+import com.zutubi.pulse.services.SlaveStatus;
 import com.zutubi.pulse.util.FileSystemUtils;
-import com.zutubi.util.IOUtils;
 import com.zutubi.pulse.util.ZipUtils;
+import com.zutubi.pulse.logging.CustomLogRecord;
+import com.zutubi.util.IOUtils;
 import com.zutubi.util.logging.Logger;
 import org.mortbay.util.UrlEncoded;
 
@@ -22,53 +24,80 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.URL;
 import java.net.URLConnection;
+import java.util.List;
 
 /**
  */
-public class SlaveBuildService implements BuildService
+public class SlaveAgentService implements AgentService
 {
-    private static final Logger LOG = Logger.getLogger(SlaveBuildService.class);
+    private static final Logger LOG = Logger.getLogger(SlaveAgentService.class);
 
     private SlaveService service;
-    private Slave slave;
+    private AgentConfiguration agentConfig;
     private ConfigurationProvider configurationProvider;
     private MasterConfigurationManager configurationManager;
     private ResourceManager resourceManager;
     private ServiceTokenManager serviceTokenManager;
 
-    public SlaveBuildService(SlaveService service, ServiceTokenManager serviceTokenManager, Slave slave, ConfigurationProvider configurationProvider, MasterConfigurationManager configurationManager, ResourceManager resourceManager)
+    public SlaveAgentService(SlaveService service, AgentConfiguration agentConfig)
     {
         this.service = service;
-        this.serviceTokenManager = serviceTokenManager;
-        this.slave = slave;
-        this.configurationProvider = configurationProvider;
-        this.configurationManager = configurationManager;
-        this.resourceManager = resourceManager;
+        this.agentConfig = agentConfig;
     }
 
     public String getUrl()
     {
-        return slave.getHost() + ":" + slave.getPort();
+        return agentConfig.getHost() + ":" + agentConfig.getPort();
+    }
+
+    public int ping()
+    {
+        return service.ping();
+    }
+
+    public SlaveStatus getStatus(String masterLocation)
+    {
+        return service.getStatus(serviceTokenManager.getToken(), masterLocation);
+    }
+
+    public boolean updateVersion(String masterBuild, String masterUrl, long handle, String packageUrl, long packageSize)
+    {
+        return service.updateVersion(serviceTokenManager.getToken(), masterBuild, masterUrl, handle, packageUrl, packageSize);
+    }
+
+    public List<Resource> discoverResources()
+    {
+        return service.discoverResources(serviceTokenManager.getToken());
+    }
+
+    public SystemInfo getSystemInfo()
+    {
+        return service.getSystemInfo(serviceTokenManager.getToken());
+    }
+
+    public List<CustomLogRecord> getRecentMessages()
+    {
+        return service.getRecentMessages(serviceTokenManager.getToken());
     }
 
     public boolean hasResource(String resource, String version)
     {
-        return resourceManager.getSlaveRepository(slave).hasResource(resource, version);
+        return resourceManager.getAgentRepository(agentConfig.getHandle()).hasResource(resource, version);
     }
 
     public boolean build(RecipeRequest request, BuildContext context)
     {
         GeneralAdminConfiguration generalConfig = configurationProvider.get(GeneralAdminConfiguration.class);
         SystemConfiguration systemConfig = configurationManager.getSystemConfig();
-        String masterUrl = "http://" + MasterAgent.constructMasterLocation(generalConfig, systemConfig);
+        String masterUrl = "http://" + MasterAgentService.constructMasterLocation(generalConfig, systemConfig);
 
         try
         {
-            return service.build(serviceTokenManager.getToken(), masterUrl, slave.getId(), request, context);
+            return service.build(serviceTokenManager.getToken(), masterUrl, agentConfig.getHandle(), request, context);
         }
         catch (RuntimeException e)
         {
-            throw convertException("Unable to dispatch recipe request '" + request.getId() + "' to slave '" + slave.getName() + "'", e);
+            throw convertException("Unable to dispatch recipe request '" + request.getId() + "' to slave '" + agentConfig.getName() + "'", e);
         }
     }
 
@@ -98,7 +127,7 @@ public class SlaveBuildService implements BuildService
                 throw new BuildException("Unable to create temporary directory '" + tempDir.getAbsolutePath() + "'");
             }
 
-            URL resultUrl = new URL("http", slave.getHost(), slave.getPort(), "/download?token=" + serviceTokenManager.getToken() + "&project=" + UrlEncoded.encodeString(project) + "&spec=" + UrlEncoded.encodeString(spec) + "&incremental=" + incremental + "&output=" + output + "&recipe=" + recipeId);
+            URL resultUrl = new URL("http", agentConfig.getHost(), agentConfig.getPort(), "/download?token=" + serviceTokenManager.getToken() + "&project=" + UrlEncoded.encodeString(project) + "&spec=" + UrlEncoded.encodeString(spec) + "&incremental=" + incremental + "&output=" + output + "&recipe=" + recipeId);
             URLConnection urlConnection = resultUrl.openConnection();
 
             // originally the zip stream was unzipped as read from the
@@ -126,7 +155,7 @@ public class SlaveBuildService implements BuildService
         }
         catch (IOException e)
         {
-            throw new BuildException("Error downloading results from agent '" + slave.getName() + ": " + e.getMessage(), e);
+            throw new BuildException("Error downloading results from agent '" + agentConfig.getName() + ": " + e.getMessage(), e);
         }
         finally
         {
@@ -147,7 +176,7 @@ public class SlaveBuildService implements BuildService
         }
         catch (Exception e)
         {
-            LOG.warning("Failed to cleanup recipe '" + recipeId + "' on slave '" + slave.getName() + "'", e);
+            LOG.warning("Failed to cleanup recipe '" + recipeId + "' on slave '" + agentConfig.getName() + "'", e);
         }
     }
 
@@ -165,12 +194,12 @@ public class SlaveBuildService implements BuildService
 
     public String getHostName()
     {
-        return slave.getName();
+        return agentConfig.getName();
     }
 
-    public Slave getSlave()
+    public AgentConfiguration getAgentConfig()
     {
-        return slave;
+        return agentConfig;
     }
 
     private BuildException convertException(String context, RuntimeException e)
@@ -181,13 +210,18 @@ public class SlaveBuildService implements BuildService
     @Override
     public boolean equals(Object obj)
     {
-        if (obj instanceof SlaveBuildService)
+        if (obj instanceof SlaveAgentService)
         {
-            SlaveBuildService other = (SlaveBuildService) obj;
-            return other.getSlave().equals(slave);
+            SlaveAgentService other = (SlaveAgentService) obj;
+            return other.getAgentConfig().getHandle() == agentConfig.getHandle();
         }
 
         return false;
+    }
+
+    public void setConfigurationProvider(ConfigurationProvider configurationProvider)
+    {
+        this.configurationProvider = configurationProvider;
     }
 
     public void setConfigurationManager(MasterConfigurationManager configurationManager)
@@ -198,5 +232,10 @@ public class SlaveBuildService implements BuildService
     public void setResourceManager(ResourceManager resourceManager)
     {
         this.resourceManager = resourceManager;
+    }
+
+    public void setServiceTokenManager(ServiceTokenManager serviceTokenManager)
+    {
+        this.serviceTokenManager = serviceTokenManager;
     }
 }

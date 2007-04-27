@@ -1,15 +1,16 @@
 package com.zutubi.pulse;
 
+import com.zutubi.pulse.agent.AgentManager;
+import com.zutubi.pulse.bootstrap.ComponentContext;
+import com.zutubi.pulse.core.ResourceRepository;
+import com.zutubi.pulse.core.config.Resource;
 import com.zutubi.pulse.events.Event;
 import com.zutubi.pulse.events.EventManager;
-import com.zutubi.pulse.services.*;
 import com.zutubi.pulse.model.ResourceManager;
-import com.zutubi.pulse.model.SlaveManager;
-import com.zutubi.pulse.model.Slave;
-import com.zutubi.pulse.model.PersistentResource;
-import com.zutubi.pulse.core.config.Resource;
-import com.zutubi.pulse.bootstrap.ComponentContext;
-import com.zutubi.pulse.agent.AgentManager;
+import com.zutubi.pulse.services.InvalidTokenException;
+import com.zutubi.pulse.services.MasterService;
+import com.zutubi.pulse.services.ServiceTokenManager;
+import com.zutubi.pulse.services.UpgradeStatus;
 
 import java.util.List;
 
@@ -20,7 +21,6 @@ public class MasterServiceImpl implements MasterService
     private ServiceTokenManager serviceTokenManager;
     private EventManager eventManager;
     private ResourceManager resourceManager;
-    private SlaveManager slaveManager;
     private AgentManager agentManager;
 
     public void pong()
@@ -48,20 +48,11 @@ public class MasterServiceImpl implements MasterService
     {
         if (validateToken(token))
         {
-            Slave slave = getSlaveManager().getSlave(slaveId);
-            PersistentResource persistent;
-            Resource resource = null;
-
-            if(slave != null)
+            ResourceRepository repository = getResourceManager().getAgentRepository(slaveId);
+            if (repository != null)
             {
-                persistent = getResourceManager().findBySlaveAndName(slave, name);
-                if(persistent != null)
-                {
-                    resource = persistent.asResource();
-                }
+                return repository.getResource(name);
             }
-
-            return resource;
         }
 
         return null;
@@ -71,10 +62,10 @@ public class MasterServiceImpl implements MasterService
     {
         if (validateToken(token))
         {
-            Slave slave = getSlaveManager().getSlave(slaveId);
-            if(slave != null)
+            ResourceRepository repository = getResourceManager().getAgentRepository(slaveId);
+            if (repository != null)
             {
-                return getResourceManager().getSlaveRepository(slave).getResourceNames();
+                return repository.getResourceNames();
             }
         }
 
@@ -106,28 +97,14 @@ public class MasterServiceImpl implements MasterService
         this.resourceManager = resourceManager;
     }
 
-    public void setSlaveManager(SlaveManager slaveManager)
-    {
-        this.slaveManager = slaveManager;
-    }
-
     public void setServiceTokenManager(ServiceTokenManager serviceTokenManager)
     {
         this.serviceTokenManager = serviceTokenManager;
     }
 
-    private SlaveManager getSlaveManager()
-    {
-        if(slaveManager == null)
-        {
-            ComponentContext.autowire(this);
-        }
-        return slaveManager;
-    }
-
     private ResourceManager getResourceManager()
     {
-        if(slaveManager == null)
+        if(resourceManager == null)
         {
             ComponentContext.autowire(this);
         }

@@ -1,7 +1,7 @@
 package com.zutubi.pulse.model;
 
 import com.zutubi.pulse.model.persistence.BuildSpecificationDao;
-import com.zutubi.pulse.model.persistence.SlaveDao;
+import com.zutubi.pulse.model.persistence.AgentStateDao;
 import com.zutubi.pulse.scheduling.Scheduler;
 import com.zutubi.pulse.scheduling.SchedulingException;
 import com.zutubi.pulse.scheduling.SimpleTrigger;
@@ -13,13 +13,12 @@ import com.zutubi.util.logging.Logger;
 import java.util.List;
 
 /**
- * <class-comment/>
  */
-public class DefaultSlaveManager implements SlaveManager
+public class DefaultAgentStateManager implements AgentStateManager
 {
-    private static final Logger LOG = Logger.getLogger(DefaultSlaveManager.class);
+    private static final Logger LOG = Logger.getLogger(DefaultAgentStateManager.class);
 
-    private SlaveDao slaveDao;
+    private AgentStateDao agentStateDao;
     private BuildSpecificationDao buildSpecificationDao;
     private Scheduler scheduler;
     private ProjectManager projectManager;
@@ -52,35 +51,30 @@ public class DefaultSlaveManager implements SlaveManager
         }
     }
 
-    public Slave getSlave(String name)
+    public List<AgentState> getAll()
     {
-        return slaveDao.findByName(name);
+        return agentStateDao.findAll();
     }
 
-    public List<Slave> getAll()
+    public AgentState getAgentState(long id)
     {
-        return slaveDao.findAll();
-    }
-
-    public Slave getSlave(long id)
-    {
-        return slaveDao.findById(id);
+        return agentStateDao.findById(id);
     }
 
     public void delete(long id)
     {
-        Slave slave = slaveDao.findById(id);
-        if (slave != null)
+        AgentState agentState = agentStateDao.findById(id);
+        if (agentState != null)
         {
             // Remove all build stages that require this slave explicitly
-            List<BuildSpecification> buildSpecs = buildSpecificationDao.findBySlave(slave);
+            List<BuildSpecification> buildSpecs = buildSpecificationDao.findBySlave(agentState);
             for(BuildSpecification spec: buildSpecs)
             {
                 removeStageReferences(spec.getRoot(), id);
                 projectManager.save(spec);
             }
 
-            slaveDao.delete(slave);
+            agentStateDao.delete(agentState);
         }
     }
 
@@ -106,19 +100,19 @@ public class DefaultSlaveManager implements SlaveManager
         }
     }
 
-    public void delete(Slave slave)
+    public void delete(AgentState agentState)
     {
-        slaveDao.delete(slave);
+        agentStateDao.delete(agentState);
     }
 
-    public void save(Slave slave)
+    public void save(AgentState agentState)
     {
-        slaveDao.save(slave);
+        agentStateDao.save(agentState);
     }
 
-    public void setSlaveDao(SlaveDao slaveDao)
+    public void setSlaveDao(AgentStateDao agentStateDao)
     {
-        this.slaveDao = slaveDao;
+        this.agentStateDao = agentStateDao;
     }
 
     public void setScheduler(Scheduler scheduler)

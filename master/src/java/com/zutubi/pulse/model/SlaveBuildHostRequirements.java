@@ -1,37 +1,37 @@
 package com.zutubi.pulse.model;
 
-import com.zutubi.pulse.BuildService;
-import com.zutubi.pulse.SlaveBuildService;
+import com.zutubi.pulse.AgentService;
+import com.zutubi.pulse.SlaveAgentService;
 import com.zutubi.pulse.RecipeDispatchRequest;
 
 /**
  */
 public class SlaveBuildHostRequirements extends AbstractBuildHostRequirements
 {
-    private Slave slave;
+    private AgentState agentState;
 
     public SlaveBuildHostRequirements()
     {
 
     }
 
-    public SlaveBuildHostRequirements(Slave slave)
+    public SlaveBuildHostRequirements(AgentState agentState)
     {
-        this.slave = slave;
+        this.agentState = agentState;
     }
 
     public SlaveBuildHostRequirements copy()
     {
         // Don't deep copy the slave reference!
-        return new SlaveBuildHostRequirements(slave);
+        return new SlaveBuildHostRequirements(agentState);
     }
 
-    public boolean fulfilledBy(RecipeDispatchRequest request, BuildService service)
+    public boolean fulfilledBy(RecipeDispatchRequest request, AgentService service)
     {
-        if (service instanceof SlaveBuildService)
+        if (service instanceof SlaveAgentService)
         {
-            SlaveBuildService slaveService = (SlaveBuildService) service;
-            return slaveService.getSlave().getId() == slave.getId();
+            SlaveAgentService slaveService = (SlaveAgentService) service;
+            return slaveService.getAgentConfig().getAgentId() == agentState.getId();
         }
 
         return false;
@@ -39,16 +39,18 @@ public class SlaveBuildHostRequirements extends AbstractBuildHostRequirements
 
     public String getSummary()
     {
-        return slave.getName();
+        // FIXME this will be easily fixed when host requirements are part of
+        // FIXME the config subsystem
+        return "foo";//agentState.getName();
     }
 
-    public Slave getSlave()
+    public AgentState getSlave()
     {
-        return slave;
+        return agentState;
     }
 
-    private void setSlave(Slave slave)
+    private void setSlave(AgentState agentState)
     {
-        this.slave = slave;
+        this.agentState = agentState;
     }
 }

@@ -14,7 +14,7 @@ import com.zutubi.pulse.util.FileSystemUtils;
  */
 public class RecordManagerTest extends TestCase
 {
-    private static final long ID_BLOCK_SIZE = 32;
+    private static final long HANDLE_BLOCK_SIZE = 32;
     private File tempDir;
     private RecordManager recordManager;
 
@@ -23,7 +23,7 @@ public class RecordManagerTest extends TestCase
         super.setUp();
 
         tempDir = FileSystemUtils.createTempDir(getName(), "");
-        newRecordManager(ID_BLOCK_SIZE);
+        newRecordManager(HANDLE_BLOCK_SIZE);
     }
 
     protected void tearDown() throws Exception
@@ -230,61 +230,61 @@ public class RecordManagerTest extends TestCase
         }
     }
 
-    public void testInsertCreatesId()
+    public void testInsertCreatesHandle()
     {
         Record record = new MutableRecordImpl();
         recordManager.insert("testpath", record);
         record = recordManager.load("testpath");
-        assertEquals(1, record.getID());
+        assertEquals(1, record.getHandle());
     }
 
-    public void testInsertCreatesUniqueIds()
+    public void testInsertCreatesUniqueHandles()
     {
         recordManager.insert("r1", new MutableRecordImpl());
         recordManager.insert("r2", new MutableRecordImpl());
-        long id1 = recordManager.load("r1").getID();
-        long id2 = recordManager.load("r2").getID();
-        assertNotSame(id1, id2);
+        long h1 = recordManager.load("r1").getHandle();
+        long h2 = recordManager.load("r2").getHandle();
+        assertNotSame(h1, h2);
     }
 
-    public void testIdsAreUniqueAcrossRuns()
+    public void testHandlesAreUniqueAcrossRuns()
     {
-        long id = recordManager.allocateId();
-        for(int i = 0; i < ID_BLOCK_SIZE * 2 + 5; i++)
+        long handle = recordManager.allocateHandle();
+        for(int i = 0; i < HANDLE_BLOCK_SIZE * 2 + 5; i++)
         {
-            newRecordManager(ID_BLOCK_SIZE);
+            newRecordManager(HANDLE_BLOCK_SIZE);
             for(int j = 0; j < i; j++)
             {
-                long nextId = recordManager.allocateId();
-                assertNextId(nextId, id);
-                id = nextId;
+                long nextHandle = recordManager.allocateHandle();
+                assertNextHandle(nextHandle, handle);
+                handle = nextHandle;
             }
         }
     }
 
     public void testIncreasingIdBoundary()
     {
-        long id = recordManager.allocateId();
-        newRecordManager(ID_BLOCK_SIZE + 10);
-        assertNextId(recordManager.allocateId(), id);
+        long handle = recordManager.allocateHandle();
+        newRecordManager(HANDLE_BLOCK_SIZE + 10);
+        assertNextHandle(recordManager.allocateHandle(), handle);
     }
 
     public void testDecreasingIdBoundary()
     {
-        long id = recordManager.allocateId();
-        newRecordManager(ID_BLOCK_SIZE - 1);
-        assertNextId(recordManager.allocateId(), id);
+        long handle = recordManager.allocateHandle();
+        newRecordManager(HANDLE_BLOCK_SIZE - 1);
+        assertNextHandle(recordManager.allocateHandle(), handle);
     }
 
-    private void assertNextId(long nextId, long id)
+    private void assertNextHandle(long nextHandle, long handle)
     {
-        assertTrue("Next id '" + nextId + "' not higher than last '" + id + "'", nextId > id);
+        assertTrue("Next handle '" + nextHandle + "' not higher than last '" + handle + "'", nextHandle > handle);
     }
 
-    private void newRecordManager(long idBlockSize)
+    private void newRecordManager(long handleBlockSize)
     {
         recordManager = new RecordManager();
-        recordManager.setIdBlockSize(idBlockSize);
+        recordManager.setHandleBlockSize(handleBlockSize);
         recordManager.setRecordSerialiser(new DefaultRecordSerialiser(tempDir));
         recordManager.init();
     }

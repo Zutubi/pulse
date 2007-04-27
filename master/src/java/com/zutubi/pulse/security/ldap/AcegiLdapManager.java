@@ -43,7 +43,7 @@ public class AcegiLdapManager implements LdapManager, ConfigurationEventListener
 
     public synchronized void init()
     {
-        configurationProvider.registerEventListener(this, false, LDAPConfiguration.class);
+        configurationProvider.registerEventListener(this, false, false, LDAPConfiguration.class);
         LDAPConfiguration ldapConfiguration = configurationProvider.get(LDAPConfiguration.class);
 
         init(ldapConfiguration);

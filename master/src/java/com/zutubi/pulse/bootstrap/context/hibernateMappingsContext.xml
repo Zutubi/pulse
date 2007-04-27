@@ -23,7 +23,7 @@ This context exports:
                 <value>com/zutubi/pulse/model/persistence/hibernate/Project.hbm.xml</value>
                 <value>com/zutubi/pulse/model/persistence/hibernate/ProjectGroup.hbm.xml</value>
                 <value>com/zutubi/pulse/model/persistence/hibernate/Revision.hbm.xml</value>
-                <value>com/zutubi/pulse/model/persistence/hibernate/Slave.hbm.xml</value>
+                <value>com/zutubi/pulse/model/persistence/hibernate/AgentState.hbm.xml</value>
                 <value>com/zutubi/pulse/model/persistence/hibernate/StoredArtifact.hbm.xml</value>
                 <value>com/zutubi/pulse/model/persistence/hibernate/TestCaseIndex.hbm.xml</value>
                 <value>com/zutubi/pulse/model/persistence/hibernate/Trigger.hbm.xml</value>

@@ -11,10 +11,12 @@ import com.zutubi.prototype.type.record.PathUtils;
  */
 public class PathPredicate implements Predicate<Event>
 {
+    private boolean includeChildPaths;
     private String[] patterns;
 
-    public PathPredicate(String... patterns)
+    public PathPredicate(boolean includeChildPaths, String... patterns)
     {
+        this.includeChildPaths = includeChildPaths;
         this.patterns = patterns;
     }
 
@@ -25,9 +27,19 @@ public class PathPredicate implements Predicate<Event>
             final String path = ((ConfigurationEvent) event).getPath();
             for(String pattern: patterns)
             {
-                if(PathUtils.matches(pattern, path))
+                if(includeChildPaths)
                 {
-                    return true;
+                    if(PathUtils.prefixMatches(pattern, path))
+                    {
+                        return true;
+                    }
+                }
+                else
+                {
+                    if(PathUtils.pathMatches(pattern, path))
+                    {
+                        return true;
+                    }
                 }
             }
         }

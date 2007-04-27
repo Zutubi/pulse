@@ -1,6 +1,6 @@
 package com.zutubi.pulse.model;
 
-import com.zutubi.pulse.BuildService;
+import com.zutubi.pulse.AgentService;
 import com.zutubi.pulse.RecipeDispatchRequest;
 import com.zutubi.pulse.bootstrap.ComponentContext;
 import com.zutubi.pulse.core.PulseException;
@@ -28,7 +28,7 @@ public class AnyCapableBuildHostRequirements extends AbstractBuildHostRequiremen
         return new AnyCapableBuildHostRequirements();
     }
 
-    public boolean fulfilledBy(RecipeDispatchRequest request, BuildService service)
+    public boolean fulfilledBy(RecipeDispatchRequest request, AgentService service)
     {
         List<ResourceRequirement> requirements = request.getRequest().getResourceRequirements();
         for(ResourceRequirement requirement: requirements)

@@ -27,9 +27,9 @@ public class DefaultRecipeResultCollector implements RecipeResultCollector
         }
     }
 
-    public void collect(BuildResult result, long recipeId, boolean collectWorkingCopy, boolean incremental, BuildService buildService)
+    public void collect(BuildResult result, long recipeId, boolean collectWorkingCopy, boolean incremental, AgentService agentService)
     {
-        if (buildService != null)
+        if (agentService != null)
         {
             File outputDest = paths.getOutputDir(result, recipeId);
             File workDest = null;
@@ -38,15 +38,15 @@ public class DefaultRecipeResultCollector implements RecipeResultCollector
                 workDest = paths.getBaseDir(result, recipeId);
             }
 
-            buildService.collectResults(result.getProject().getName(), result.getBuildSpecification(), recipeId, incremental, outputDest, workDest);
+            agentService.collectResults(result.getProject().getName(), result.getBuildSpecification(), recipeId, incremental, outputDest, workDest);
         }
     }
 
-    public void cleanup(BuildResult result, long recipeId, boolean incremental, BuildService buildService)
+    public void cleanup(BuildResult result, long recipeId, boolean incremental, AgentService agentService)
     {
-        if (buildService != null)
+        if (agentService != null)
         {
-            buildService.cleanup(result.getProject().getName(), result.getBuildSpecification(), recipeId, incremental);
+            agentService.cleanup(result.getProject().getName(), result.getBuildSpecification(), recipeId, incremental);
         }
     }
 

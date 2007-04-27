@@ -1,24 +1,18 @@
 package com.zutubi.pulse.model;
 
 import com.zutubi.pulse.core.config.Resource;
+import com.zutubi.pulse.core.ResourceRepository;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  */
 public interface ResourceManager
 {
-    PersistentResource findBySlaveAndName(Slave slave, String name);
+    ResourceRepository getAgentRepository(long handle);
 
-    ConfigurationResourceRepository getMasterRepository();
-    DatabaseResourceRepository getSlaveRepository(Slave slave);
+    void addDiscoveredResources(long handle, List<Resource> resources);
 
-    void addDiscoveredResources(Slave slave, List<Resource> resources);
-
-    List<PersistentResource> findAll();
-
-    void editResource(PersistentResource resource, String newName, String defaultVersion);
-    void renameResourceVersion(PersistentResource resource, String value, String newValue);
-
-    void addResource(Slave slave, Resource resource);
+    Map<String, Resource> findAll();
 }

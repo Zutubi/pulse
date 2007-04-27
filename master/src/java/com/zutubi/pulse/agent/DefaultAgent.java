@@ -1,31 +1,23 @@
 package com.zutubi.pulse.agent;
 
-import com.zutubi.pulse.BuildService;
-import com.zutubi.pulse.SystemInfo;
-import com.zutubi.pulse.Version;
-import com.zutubi.pulse.logging.CustomLogRecord;
-import com.zutubi.pulse.model.Slave;
-import com.zutubi.pulse.services.ServiceTokenManager;
-import com.zutubi.pulse.services.SlaveService;
+import com.zutubi.pulse.AgentService;
+import com.zutubi.pulse.model.AgentState;
+import com.zutubi.pulse.prototype.config.agent.AgentConfiguration;
 import com.zutubi.pulse.services.SlaveStatus;
 import com.zutubi.pulse.services.UpgradeState;
 
 import java.text.DateFormat;
 import java.util.Date;
-import java.util.List;
 
 /**
  */
-public class SlaveAgent implements Agent
+public class DefaultAgent implements Agent
 {
-    private final int masterBuildNumber = Version.getVersion().getBuildNumberAsInt();
-
-    private Slave slave;
+    private AgentConfiguration agentConfig;
+    private AgentState agentState;
     private Status status;
     private long lastPingTime = 0;
-    private SlaveService slaveService;
-    private ServiceTokenManager serviceTokenManager;
-    private BuildService buildService;
+    private AgentService agentService;
     private String pingError = null;
     /**
      * The upgrade state is only used when the slave enable state is UPGRADING.
@@ -34,15 +26,14 @@ public class SlaveAgent implements Agent
     private int upgradeProgress = -1;
     private String upgradeMessage = null;
 
-    public SlaveAgent(Slave slave, SlaveService slaveService, ServiceTokenManager serviceTokenManager, BuildService buildService)
+    public DefaultAgent(AgentConfiguration agentConfig, AgentState agentState, AgentService agentService)
     {
-        this.slave = slave;
-        this.slaveService = slaveService;
-        this.serviceTokenManager = serviceTokenManager;
-        this.buildService = buildService;
+        this.agentConfig = agentConfig;
+        this.agentState = agentState;
+        this.agentService = agentService;
 
         // Restore transient state based on persistent state
-        switch(slave.getEnableState())
+        switch(agentState.getEnableState())
         {
             case ENABLED:
                 status = Status.OFFLINE;
@@ -58,39 +49,14 @@ public class SlaveAgent implements Agent
         }
     }
 
-    public long getId()
+    public AgentService getService()
     {
-        return slave.getId();
+        return agentService;
     }
 
-    public BuildService getBuildService()
+    public AgentState getAgentState()
     {
-        return buildService;
-    }
-
-    public SystemInfo getSystemInfo()
-    {
-        return slaveService.getSystemInfo(serviceTokenManager.getToken());
-    }
-
-    public List<CustomLogRecord> getRecentMessages()
-    {
-        return slaveService.getRecentMessages(serviceTokenManager.getToken());
-    }
-
-    public String getName()
-    {
-        return slave.getName();
-    }
-
-    public Slave getSlave()
-    {
-        return slave;
-    }
-
-    public SlaveService getSlaveService()
-    {
-        return slaveService;
+        return agentState;
     }
 
     public Status getStatus()
@@ -100,17 +66,24 @@ public class SlaveAgent implements Agent
 
     public String getLocation()
     {
-        return slave.getHost() + ":" + slave.getPort();
-    }
-
-    public boolean isSlave()
-    {
-        return true;
+        if(agentConfig.isRemote())
+        {
+            return agentConfig.getHost() + ":" + agentConfig.getPort();
+        }
+        else
+        {
+            return "[local]";
+        }
     }
 
     public void setStatus(Status status)
     {
         this.status = status;
+    }
+
+    public AgentConfiguration getAgentConfig()
+    {
+        return agentConfig;
     }
 
     public long getLastPingTime()
@@ -140,11 +113,6 @@ public class SlaveAgent implements Agent
         return (System.currentTimeMillis() - lastPingTime) / 1000;
     }
 
-    private void setLastPingTime(long time)
-    {
-        lastPingTime = time;
-    }
-
     public String getPingError()
     {
         return pingError;
@@ -157,17 +125,17 @@ public class SlaveAgent implements Agent
 
     public boolean isEnabled()
     {
-        return slave.isEnabled();
+        return agentState.isEnabled();
     }
 
     public boolean isUpgrading()
     {
-        return slave.getEnableState() == Slave.EnableState.UPGRADING;
+        return agentState.getEnableState() == AgentState.EnableState.UPGRADING;
     }
 
     public boolean isFailedUpgrade()
     {
-        return slave.getEnableState() == Slave.EnableState.FAILED_UPGRADE;
+        return agentState.getEnableState() == AgentState.EnableState.FAILED_UPGRADE;
     }
 
     public boolean isAvailable()

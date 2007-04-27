@@ -15,13 +15,13 @@ public class RemoteResourceRepository implements ResourceRepository
 {
     private static final Logger LOG = Logger.getLogger(RemoteResourceRepository.class);
 
-    private long slaveId;
+    private long handle;
     private MasterService masterProxy;
     private ServiceTokenManager serviceTokenManager;
 
-    public RemoteResourceRepository(long slaveId, MasterService masterProxy, ServiceTokenManager serviceTokenManager)
+    public RemoteResourceRepository(long handle, MasterService masterProxy, ServiceTokenManager serviceTokenManager)
     {
-        this.slaveId = slaveId;
+        this.handle = handle;
         this.masterProxy = masterProxy;
         this.serviceTokenManager = serviceTokenManager;
     }
@@ -41,7 +41,7 @@ public class RemoteResourceRepository implements ResourceRepository
     {
         try
         {
-            return masterProxy.getResource(serviceTokenManager.getToken(), slaveId, name);
+            return masterProxy.getResource(serviceTokenManager.getToken(), handle, name);
         }
         catch (RuntimeException e)
         {
@@ -52,6 +52,6 @@ public class RemoteResourceRepository implements ResourceRepository
 
     public List<String> getResourceNames()
     {
-        return masterProxy.getResourceNames(serviceTokenManager.getToken(), slaveId);
+        return masterProxy.getResourceNames(serviceTokenManager.getToken(), handle);
     }
 }

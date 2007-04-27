@@ -3,9 +3,9 @@ package com.zutubi.pulse;
 import com.zutubi.pulse.bootstrap.MasterConfigurationManager;
 import com.zutubi.pulse.core.RecipeProcessor;
 import com.zutubi.pulse.core.RecipeRequest;
+import com.zutubi.pulse.core.ResourceRepository;
 import com.zutubi.pulse.core.Stoppable;
 import com.zutubi.pulse.events.EventManager;
-import com.zutubi.pulse.model.ResourceManager;
 import com.zutubi.util.logging.Logger;
 
 import java.util.concurrent.ExecutorService;
@@ -21,16 +21,15 @@ public class MasterRecipeProcessor implements Stoppable
     private RecipeProcessor recipeProcessor;
     private MasterConfigurationManager configurationManager;
     private EventManager eventManager;
-    private ResourceManager resourceManager;
 
     public MasterRecipeProcessor()
     {
         executor = Executors.newSingleThreadExecutor();
     }
 
-    public void processRecipe(RecipeRequest request, BuildContext context)
+    public void processRecipe(RecipeRequest request, BuildContext context, ResourceRepository agentRepository)
     {
-        executor.execute(new MasterRecipeRunner(request, recipeProcessor, eventManager, configurationManager, resourceManager.getMasterRepository(), context));
+        executor.execute(new MasterRecipeRunner(request, recipeProcessor, eventManager, configurationManager, agentRepository, context));
     }
 
     public void setRecipeProcessor(RecipeProcessor recipeProcessor)
@@ -67,24 +66,8 @@ public class MasterRecipeProcessor implements Stoppable
         return recipeProcessor.getBuildingRecipe(); 
     }
 
-    /**
-     * Required resource
-     *
-     * @param resourceManager
-     */
-    public void setResourceManager(ResourceManager resourceManager)
-    {
-        this.resourceManager = resourceManager;
-    }
-
-    /**
-     * Required resource.
-     *
-     * @param eventManager
-     */
     public void setEventManager(EventManager eventManager)
     {
         this.eventManager = eventManager;
     }
-
 }

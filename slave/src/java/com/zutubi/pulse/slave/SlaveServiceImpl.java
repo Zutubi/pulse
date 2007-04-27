@@ -47,12 +47,12 @@ public class SlaveServiceImpl implements SlaveService
         return Version.getVersion().getBuildNumberAsInt();
     }
 
-    public boolean updateVersion(String token, String build, String master, long id, String packageUrl, long packageSize)
+    public boolean updateVersion(String token, String build, String master, long handle, String packageUrl, long packageSize)
     {
         serviceTokenManager.validateToken(token);
 
         // Currently we always accept the request
-        UpdateCommand command = new UpdateCommand(build, master, token, id, packageUrl, packageSize);
+        UpdateCommand command = new UpdateCommand(build, master, token, handle, packageUrl, packageSize);
         ComponentContext.autowire(command);
         threadPool.execute(command);
         return true;
@@ -113,11 +113,11 @@ public class SlaveServiceImpl implements SlaveService
 
     //---( Build API )---
 
-    public boolean build(String token, String master, long slaveId, RecipeRequest request, BuildContext context) throws InvalidTokenException
+    public boolean build(String token, String master, long handle, RecipeRequest request, BuildContext context) throws InvalidTokenException
     {
         serviceTokenManager.validateToken(token);
 
-        RecipeCommand command = new RecipeCommand(master, slaveId, request, context);
+        RecipeCommand command = new RecipeCommand(master, handle, request, context);
         ComponentContext.autowire(command);
         ErrorHandlingRunnable runnable = new ErrorHandlingRunnable(master, serviceTokenManager, request.getId(), command);
         ComponentContext.autowire(runnable);

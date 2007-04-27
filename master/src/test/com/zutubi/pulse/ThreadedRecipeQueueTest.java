@@ -2,11 +2,12 @@ package com.zutubi.pulse;
 
 import com.zutubi.pulse.agent.Agent;
 import com.zutubi.pulse.agent.AgentManager;
-import com.zutubi.pulse.agent.SlaveAgent;
+import com.zutubi.pulse.agent.DefaultAgent;
 import com.zutubi.pulse.agent.Status;
 import com.zutubi.pulse.core.BuildException;
 import com.zutubi.pulse.core.BuildRevision;
 import com.zutubi.pulse.core.RecipeRequest;
+import com.zutubi.pulse.core.config.Resource;
 import com.zutubi.pulse.core.config.ResourceProperty;
 import com.zutubi.pulse.core.model.Changelist;
 import com.zutubi.pulse.core.model.NumericalRevision;
@@ -17,9 +18,11 @@ import com.zutubi.pulse.events.EventListener;
 import com.zutubi.pulse.events.build.RecipeCompletedEvent;
 import com.zutubi.pulse.events.build.RecipeDispatchedEvent;
 import com.zutubi.pulse.events.build.RecipeErrorEvent;
+import com.zutubi.pulse.logging.CustomLogRecord;
 import com.zutubi.pulse.model.*;
 import com.zutubi.pulse.personal.PatchArchive;
 import com.zutubi.pulse.prototype.config.ProjectConfiguration;
+import com.zutubi.pulse.prototype.config.agent.AgentConfiguration;
 import com.zutubi.pulse.scm.FileStatus;
 import com.zutubi.pulse.scm.ScmChangeEvent;
 import com.zutubi.pulse.scm.ScmCheckoutEventHandler;
@@ -50,9 +53,9 @@ public class ThreadedRecipeQueueTest extends TestCase implements EventListener
     private Semaphore errorSemaphore;
     private Semaphore dispatchedSemaphore;
     private ThreadedRecipeQueueTest.MockAgentManager agentManager;
-    private Slave slave1000;
-    private Slave slave2000;
-    private Slave slave3000;
+    private AgentConfiguration slave1000;
+    private AgentConfiguration slave2000;
+    private AgentConfiguration slave3000;
     private List<RecipeErrorEvent> recipeErrors;
     private DefaultEventManager eventManager;
     private RecipeDispatchedEvent dispatchedEvent;
@@ -74,12 +77,12 @@ public class ThreadedRecipeQueueTest extends TestCase implements EventListener
         eventManager.register(this);
 
         agentManager = new MockAgentManager();
-        slave1000 = createSlave(1000);
-        agentManager.addSlave(slave1000);
-        slave2000 = createSlave(2000);
-        agentManager.addSlave(slave2000);
-        slave3000 = createSlave(3000);
-        agentManager.addSlave(slave3000);
+        slave1000 = createAgentConfig(1000);
+        agentManager.addAgent(slave1000);
+        slave2000 = createAgentConfig(2000);
+        agentManager.addAgent(slave2000);
+        slave3000 = createAgentConfig(3000);
+        agentManager.addAgent(slave3000);
 
         queue = new ThreadedRecipeQueue();
         queue.setEventManager(eventManager);
@@ -402,7 +405,7 @@ public class ThreadedRecipeQueueTest extends TestCase implements EventListener
     {
         Agent agent = createAvailableAgent(0);
         queue.online(agent);
-        MockBuildService service = (MockBuildService) agent.getBuildService();
+        MockAgentService service = (MockAgentService) agent.getService();
 
         service.setThrowError(true);
         queue.enqueue(createDispatchRequest(0));
@@ -659,18 +662,11 @@ public class ThreadedRecipeQueueTest extends TestCase implements EventListener
         }
     }
 
-    private void sendOnlineEvent(Slave slave)
+    private void sendOfflineEvent(AgentConfiguration agentConfig)
     {
-        SlaveAgent a = (SlaveAgent) agentManager.getAgent(slave);
-        AgentStatusEvent event = new AgentStatusEvent(this, Status.OFFLINE, a);
-        queue.handleEvent(event);
-    }
-
-    private void sendOfflineEvent(Slave slave)
-    {
-        SlaveAgent a = (SlaveAgent) agentManager.getAgent(slave);
+        Agent a = agentManager.getAgent(agentConfig.getHandle());
         a.updateStatus(new SlaveStatus(Status.OFFLINE, "oops"));
-        SlaveAgentRemovedEvent event = new SlaveAgentRemovedEvent(this, a);
+        AgentRemovedEvent event = new AgentRemovedEvent(this, a);
         queue.handleEvent(event);
     }
 
@@ -686,16 +682,18 @@ public class ThreadedRecipeQueueTest extends TestCase implements EventListener
         queue.handleEvent(new RecipeErrorEvent(this, id, "test"));
     }
 
-    private Slave createSlave(long id)
+    private AgentConfiguration createAgentConfig(long handle)
     {
-        Slave result = new Slave("name" + id, "host" + id);
-        result.setId(id);
+        AgentConfiguration result = new AgentConfiguration();
+        result.setHandle(handle);
+        result.setName("name" + handle);
+        result.setHost("host" + handle);
         return result;
     }
 
     private Agent createAvailableAgent(long type)
     {
-        SlaveAgent slaveAgent = new SlaveAgent(createSlave(type), null, null, new MockBuildService(type));
+        DefaultAgent slaveAgent = new DefaultAgent(createAgentConfig(type), new AgentState(), new MockAgentService(type));
         slaveAgent.updateStatus(new SlaveStatus(Status.IDLE, 0));
         return slaveAgent;
     }
@@ -939,24 +937,17 @@ public class ThreadedRecipeQueueTest extends TestCase implements EventListener
             return new LinkedList<Agent>(onlineAgents.values());
         }
 
-        public Agent getAgent(Slave slave)
+        public Agent getAgent(long handle)
         {
-            if(slave == null)
-            {
-                return onlineAgents.get(0L);
-            }
-            else
-            {
-                return onlineAgents.get(slave.getId());
-            }
+            return onlineAgents.get(handle);
         }
 
-        public void pingSlave(Slave slave)
+        public void pingAgent(long handle)
         {
             throw new RuntimeException("Method not implemented.");
         }
 
-        public void pingSlaves()
+        public void pingAgents()
         {
             throw new RuntimeException("Method not implemented.");
         }
@@ -966,27 +957,7 @@ public class ThreadedRecipeQueueTest extends TestCase implements EventListener
             throw new RuntimeException("Method not implemented.");
         }
 
-        public void slaveAdded(long id)
-        {
-            throw new RuntimeException("Method not implemented.");
-        }
-
-        public void slaveChanged(long id)
-        {
-            throw new RuntimeException("Method not implemented.");
-        }
-
-        public void slaveDeleted(long id)
-        {
-            throw new RuntimeException("Method not implemented.");
-        }
-
         public void upgradeStatus(UpgradeStatus upgradeStatus)
-        {
-            throw new RuntimeException("Method not implemented.");
-        }
-
-        public boolean agentExists(String name)
         {
             throw new RuntimeException("Method not implemented.");
         }
@@ -996,48 +967,68 @@ public class ThreadedRecipeQueueTest extends TestCase implements EventListener
             throw new RuntimeException("Method not implemented.");
         }
 
-        public void enableMasterAgent()
+        public void addAgent(AgentConfiguration agentConfig)
         {
-            throw new RuntimeException("Method not implemented.");
-        }
-
-        public void disableMasterAgent()
-        {
-            throw new RuntimeException("Method not implemented.");
-        }
-
-        public void addSlave(Slave slave)
-        {
-            SlaveAgent agent = new SlaveAgent(slave, null, null, new MockBuildService(slave.getId()));
+            DefaultAgent agent = new DefaultAgent(agentConfig, new AgentState(), new MockAgentService(agentConfig.getHandle()));
             agent.updateStatus(new SlaveStatus(Status.IDLE, 0));
-            onlineAgents.put(slave.getId(), agent);
+            onlineAgents.put(agentConfig.getHandle(), agent);
         }
 
-        public void enableSlave(Slave slave)
+        public void enableAgent(long handle)
         {
             throw new RuntimeException("Method not yet implemented.");
         }
 
-        public void disableSlave(Slave slave)
+        public void disableAgent(long handle)
         {
             throw new RuntimeException("Method not yet implemented.");
         }
 
-        public void setSlaveState(Slave slave, Slave.EnableState state)
+        public void setAgentState(long handle, AgentState.EnableState state)
         {
             throw new RuntimeException("Method not yet implemented.");
         }
     }
 
-    class MockBuildService implements BuildService
+    class MockAgentService implements AgentService
     {
         private long type;
         private boolean acceptBuild = true;
         private boolean throwError = false;
 
-        public MockBuildService(long type)
+        public MockAgentService(long type)
         {
             this.type = type;
+        }
+
+        public int ping()
+        {
+            throw new RuntimeException("Method not yet implemented.");
+        }
+
+        public SlaveStatus getStatus(String masterLocation)
+        {
+            throw new RuntimeException("Method not yet implemented.");
+        }
+
+        public boolean updateVersion(String masterBuild, String masterUrl, long handle, String packageUrl, long packageSize)
+        {
+            throw new RuntimeException("Method not yet implemented.");
+        }
+
+        public List<Resource> discoverResources()
+        {
+            throw new RuntimeException("Method not yet implemented.");
+        }
+
+        public SystemInfo getSystemInfo()
+        {
+            throw new RuntimeException("Method not yet implemented.");
+        }
+
+        public List<CustomLogRecord> getRecentMessages()
+        {
+            throw new RuntimeException("Method not yet implemented.");
         }
 
         public boolean hasResource(String resource, String version)
@@ -1108,9 +1099,9 @@ public class ThreadedRecipeQueueTest extends TestCase implements EventListener
             return new MockBuildHostRequirements(type);
         }
 
-        public boolean fulfilledBy(RecipeDispatchRequest request, BuildService service)
+        public boolean fulfilledBy(RecipeDispatchRequest request, AgentService service)
         {
-            return (((MockBuildService) service).getType() == type) &&
+            return (((MockAgentService) service).getType() == type) &&
                     (((NumericalRevision)request.getRevision().getRevision()).getRevisionNumber() >= 0);
         }
 
