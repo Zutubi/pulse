@@ -44,34 +44,6 @@ public class HibernateProjectDaoTest extends MasterPersistenceTestCase
         assertPropertyEquals(project, otherProject);
     }
 
-    public void testLoadSaveCleanupRule()
-    {
-        cleanupRuleHelper(new CleanupRule(true, new ResultState[] { ResultState.ERROR, ResultState.FAILURE }, 5, CleanupRule.CleanupUnit.BUILDS));
-    }
-
-    public void testLoadSaveCleanupRuleNoStates()
-    {
-        cleanupRuleHelper(new CleanupRule(true, null, 5, CleanupRule.CleanupUnit.BUILDS));
-    }
-
-    public void testLoadSaveCleanupRuleDays()
-    {
-        cleanupRuleHelper(new CleanupRule(false, new ResultState[] { ResultState.SUCCESS }, 11, CleanupRule.CleanupUnit.DAYS));
-    }
-
-    private void cleanupRuleHelper(CleanupRule rule)
-    {
-        Project project = new Project("yay", "test");
-        project.addCleanupRule(rule);
-
-        projectDao.save(project);
-        commitAndRefreshTransaction();
-
-        Project otherProject = projectDao.findById(project.getId());
-        CleanupRule otherRule = otherProject.getCleanupRule(rule.getId());
-        assertEquals(rule, otherRule);
-    }
-
     public void testLoadSaveVersionedPulseFileSource()
     {
         VersionedPulseFileDetails details = new VersionedPulseFileDetails("hello");
@@ -223,23 +195,6 @@ public class HibernateProjectDaoTest extends MasterPersistenceTestCase
 
         // assert that we get the right project back.
         Project found = projectDao.findByBuildSpecification(spec1);
-        assertNotNull(found);
-        assertEquals(p1.getId(), found.getId());
-    }
-
-    public void testFindByCleanupRule()
-    {
-        Project p1 = new Project("p1", "This is a test project");
-        Project p2 = new Project("p2", "This is a test project");
-        CleanupRule r1 = new CleanupRule(true, null, 5, CleanupRule.CleanupUnit.BUILDS);
-        CleanupRule r2 = new CleanupRule(true, null, 5, CleanupRule.CleanupUnit.BUILDS);
-        p1.addCleanupRule(r1);
-        p2.addCleanupRule(r2);
-        projectDao.save(p1);
-        projectDao.save(p2);
-        commitAndRefreshTransaction();
-
-        Project found = projectDao.findByCleanupRule(r1);
         assertNotNull(found);
         assertEquals(p1.getId(), found.getId());
     }

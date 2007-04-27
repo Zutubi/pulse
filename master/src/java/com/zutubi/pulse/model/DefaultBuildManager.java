@@ -19,9 +19,7 @@ import com.zutubi.pulse.util.FileSystemUtils;
 import com.zutubi.util.logging.Logger;
 
 import java.io.File;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 /**
  *
@@ -39,8 +37,6 @@ public class DefaultBuildManager implements BuildManager
     private MasterConfigurationManager configurationManager;
 
     private DatabaseConsole databaseConsole;
-
-    private static final Map<Project, Object> runningCleanups = new HashMap<Project, Object>();
 
     public void init()
     {
@@ -190,25 +186,6 @@ public class DefaultBuildManager implements BuildManager
         return buildResultDao.querySpecificationBuilds(project, spec, states, lowestNumber, highestNumber, first, max, mostRecentFirst, initialise);
     }
 
-    public void cleanupBuilds()
-    {
-        // Lookup project cleanup info, query for old builds, cleanup where necessary
-        List<Project> projects = projectManager.getNameToConfig();
-        for (Project project : projects)
-        {
-            cleanupBuilds(project);
-        }
-
-        // Now check the database is not too close to full
-        if (databaseConsole.isEmbedded())
-        {
-            if(databaseConsole.getDatabaseUsagePercent() > 95.0)
-            {
-                LOG.warning("The internal database is close to reaching its size limit.  Consider adding more cleanup rules to remove old build information.");
-            }
-        }
-    }
-
     public Revision getPreviousRevision(Project project, PersistentName specification)
     {
         Revision previousRevision = null;
@@ -354,18 +331,6 @@ public class DefaultBuildManager implements BuildManager
         return buildResultDao.findPreviousBuildResult(result);
     }
 
-    /**
-     * Returns true if a cleanup is being run for the specified project, false otherwise.
-     *
-     * @param project being queried.
-     *
-     * @return true iff a cleanup is in progress.
-     */
-    public boolean isCleanupInProgress(Project project)
-    {
-        return runningCleanups.containsKey(project);
-    }
-
     public CommandResult getCommandResultByArtifact(long artifactId)
     {
         return buildResultDao.findCommandResultByArtifact(artifactId);
@@ -434,76 +399,6 @@ public class DefaultBuildManager implements BuildManager
         return buildResultDao.findLatestSuccessful();
     }
 
-    /**
-     * Execute the configured cleanup rules for the specified project.
-     *
-     * @param project   the project to be cleaned up.
-     */
-    public void cleanupBuilds(Project project)
-    {
-        try
-        {
-            runningCleanups.put(project, null);
-
-            List<CleanupRule> rules = project.getCleanupRules();
-
-            for (CleanupRule rule : rules)
-            {
-                cleanupBuilds(rule, project);
-            }
-        }
-        finally
-        {
-            runningCleanups.remove(project);
-        }
-    }
-
-    public void cleanupBuilds(CleanupRule rule)
-    {
-        // locate the project associated with the cleanup rule.
-        Project project = projectManager.getProjectByCleanupRule(rule);
-        try
-        {
-            runningCleanups.put(project, null);
-            cleanupBuilds(rule, project);
-        }
-        finally
-        {
-            runningCleanups.remove(project);
-        }
-    }
-
-    public void cleanupBuilds(User user)
-    {
-        int count = buildResultDao.getCompletedResultCount(user);
-        int max = user.getMyBuildsCount();
-        if(count > max)
-        {
-            List<BuildResult> results = buildResultDao.getOldestCompletedBuilds(user, count - max);
-            for(BuildResult result: results)
-            {
-                cleanupResult(result);
-            }
-        }
-    }
-
-    private synchronized void cleanupBuilds(CleanupRule rule, Project project)
-    {
-        List<BuildResult> oldBuilds = rule.getMatchingResults(project, buildResultDao);
-
-        for (BuildResult build : oldBuilds)
-        {
-            if (rule.getWorkDirOnly())
-            {
-                cleanupWork(build);
-            }
-            else
-            {
-                cleanupResult(build);
-            }
-        }
-    }
-
     public boolean canCancel(BuildResult build, User user)
     {
         if(build.isPersonal())
@@ -524,7 +419,7 @@ public class DefaultBuildManager implements BuildManager
         }
     }
 
-    private void cleanupResult(BuildResult build)
+    public void cleanupResult(BuildResult build)
     {
         MasterBuildPaths paths = new MasterBuildPaths(configurationManager);
         File buildDir = paths.getBuildDir(build);
@@ -557,7 +452,7 @@ public class DefaultBuildManager implements BuildManager
         buildResultDao.delete(build);
     }
 
-    private void cleanupWork(BuildResult build)
+    public void cleanupWork(BuildResult build)
     {
         build.setHasWorkDir(false);
         buildResultDao.save(build);

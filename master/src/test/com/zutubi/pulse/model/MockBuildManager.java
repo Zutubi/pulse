@@ -313,28 +313,7 @@ public class MockBuildManager implements BuildManager
         return true;
     }
 
-    public void cleanupBuilds(User user)
-    {
-        throw new RuntimeException("Method not implemented.");
-    }
-
     public boolean canCancel(BuildResult build, User user)
-    {
-        throw new RuntimeException("Method not implemented.");
-    }
-
-
-    public void cleanupBuilds(Project project)
-    {
-        throw new RuntimeException("Method not implemented.");
-    }
-
-    public void cleanupBuilds(CleanupRule rule)
-    {
-        throw new RuntimeException("Method not implemented.");
-    }
-
-    public boolean isCleanupInProgress(Project project)
     {
         throw new RuntimeException("Method not implemented.");
     }
@@ -345,6 +324,16 @@ public class MockBuildManager implements BuildManager
     }
 
     public CommandResult getCommandResult(long id, String commandName)
+    {
+        throw new RuntimeException("Method not implemented.");
+    }
+
+    public void cleanupResult(BuildResult build)
+    {
+        throw new RuntimeException("Method not implemented.");
+    }
+
+    public void cleanupWork(BuildResult build)
     {
         throw new RuntimeException("Method not implemented.");
     }

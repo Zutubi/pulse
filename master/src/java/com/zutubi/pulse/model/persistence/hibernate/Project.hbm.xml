@@ -35,12 +35,6 @@
             <one-to-many class="com.zutubi.pulse.model.PostBuildAction"/>
         </bag>
 
-        <bag name="cleanupRules" cascade="all,delete-orphan" lazy="false">
-            <cache usage="read-write"/>
-            <key column="PROJECT_ID"/>
-            <one-to-many class="com.zutubi.pulse.model.CleanupRule"/>
-        </bag>
-
         <many-to-one name="changeViewer" class="com.zutubi.pulse.model.ChangeViewer" column="CHANGE_VIEWER" cascade="all" lazy="false"/>
 
         <bag name="aclEntries" inverse="true" cascade="all,delete-orphan" lazy="false">
@@ -260,22 +254,6 @@
         </subclass>
     </class>
 
-    <class name="com.zutubi.pulse.model.CleanupRule" table="CLEANUP_RULE" lazy="false">
-        <cache usage="read-write"/>
-
-        <id name="id" type="java.lang.Long" column="ID" unsaved-value="0">
-            <generator class="hilo"/>
-        </id>
-
-        <property name="workDirOnly" type="boolean"/>
-
-        <property name="stateNames" type="string" length="255"/>
-
-        <property name="limit" column="RULE_LIMIT" type="int"/>
-
-        <property name="unitName" type="string" length="255"/>
-    </class>
-
     <query name="findAllProjectsCached" cacheable="true"><![CDATA[
         from Project project
     ]]></query>
@@ -295,17 +273,11 @@
         where :buildSpecification in elements(project.buildSpecifications)
     ]]></query>
 
-    <query name="findProjectByCleanupRule"><![CDATA[
-        from Project project
-        where :cleanupRule in elements(project.cleanupRules)
-    ]]></query>
-
     <query name="findByAcl"><![CDATA[
         select project
         from Project project
         join project.aclEntries acl
         where acl.recipient = :recipient
     ]]></query>
-
 
 </hibernate-mapping>

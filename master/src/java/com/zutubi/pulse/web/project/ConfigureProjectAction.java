@@ -1,6 +1,12 @@
 package com.zutubi.pulse.web.project;
 
-import com.zutubi.pulse.model.*;
+import com.zutubi.pulse.cleanup.CleanupManager;
+import com.zutubi.pulse.model.BuildSpecification;
+import com.zutubi.pulse.model.CommitMessageTransformer;
+import com.zutubi.pulse.model.Project;
+import com.zutubi.pulse.model.ProjectAclEntry;
+import com.zutubi.pulse.model.User;
+import com.zutubi.pulse.model.UserManager;
 import com.zutubi.pulse.scheduling.Trigger;
 import com.zutubi.pulse.scheduling.tasks.BuildProjectTask;
 
@@ -15,7 +21,7 @@ public class ConfigureProjectAction extends ProjectActionSupport
     private Project project;
     private List<Trigger> triggers;
     private UserManager userManager;
-
+    private CleanupManager cleanupManager;
     private boolean cleanupInProgress = false;
 
     private List<CommitMessageTransformer> transformers;
@@ -120,7 +126,7 @@ public class ConfigureProjectAction extends ProjectActionSupport
 
         transformers = commitMessageTransformerManager.getByProject(project);
 
-        cleanupInProgress = buildManager.isCleanupInProgress(project);
+        cleanupInProgress = cleanupManager.isCleanupInProgress(project);
 
         return SUCCESS;
     }
@@ -128,5 +134,10 @@ public class ConfigureProjectAction extends ProjectActionSupport
     public void setUserManager(UserManager userManager)
     {
         this.userManager = userManager;
+    }
+
+    public void setCleanupManager(CleanupManager cleanupManager)
+    {
+        this.cleanupManager = cleanupManager;
     }
 }

@@ -1,8 +1,11 @@
 package com.zutubi.pulse.web.project;
 
+import com.zutubi.pulse.cleanup.CleanupManager;
+import com.zutubi.pulse.cleanup.config.CleanupConfiguration;
 import com.zutubi.pulse.model.Project;
-import com.zutubi.pulse.model.CleanupRule;
+import com.zutubi.pulse.prototype.config.ProjectConfiguration;
 
+import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -17,6 +20,8 @@ public class TriggerCleanupRuleAction extends ProjectActionSupport
 {
     private long id;
 
+    private CleanupManager cleanupManager;
+
     public long getId()
     {
         return id;
@@ -29,14 +34,20 @@ public class TriggerCleanupRuleAction extends ProjectActionSupport
 
     public String execute() throws Exception
     {
-        Project project = getProjectManager().getProject(projectId);
+        final Project project = getProjectManager().getProject(projectId);
         if(project == null)
         {
             addActionError("Unknown project [" + projectId + "]");
             return ERROR;
         }
 
-        final CleanupRule rule = project.getCleanupRule(id);
+//        final CleanupRule rule = project.getCleanupRule(id);
+        ProjectConfiguration projectConfig = projectManager.getProjectConfig(project.getId());
+
+        // Fixme: need to locate the requested configuration. How is it identified? name? id certainly
+        // does not work here.
+        Map cleanupConfigurations = (Map) projectConfig.getExtensions().get("cleanup");
+        final CleanupConfiguration cleanupConfiguration = (CleanupConfiguration) cleanupConfigurations.get(id);
 
         // run this in the background since it will take some time.
         ExecutorService executor = Executors.newSingleThreadExecutor();
@@ -44,10 +55,15 @@ public class TriggerCleanupRuleAction extends ProjectActionSupport
         {
             public void run()
             {
-                buildManager.cleanupBuilds(rule);
+                cleanupManager.cleanupBuilds(project, cleanupConfiguration);
             }
         });
 
         return SUCCESS;
+    }
+
+    public void setCleanupManager(CleanupManager cleanupManager)
+    {
+        this.cleanupManager = cleanupManager;
     }
 }

@@ -108,8 +108,6 @@ public interface BuildManager
      */
     BuildResult getPreviousBuildResult(BuildResult result);
 
-    void cleanupBuilds();
-
     Revision getPreviousRevision(Project project, PersistentName specification);
 
     /**
@@ -143,14 +141,6 @@ public interface BuildManager
 
     boolean canCancel(BuildResult build, User user);
 
-    void cleanupBuilds(User user);
-
-    void cleanupBuilds(Project project);
-
-    void cleanupBuilds(CleanupRule rule);
-
-    boolean isCleanupInProgress(Project project);
-
     CommandResult getCommandResultByArtifact(long artifactId);
 
     CommandResult getCommandResult(long id, String commandName);
@@ -163,4 +153,8 @@ public interface BuildManager
 
     // debugging hack: need to work out a better way
     void executeInTransaction(Runnable r);
+
+    void cleanupResult(BuildResult build);
+
+    void cleanupWork(BuildResult build);
 }

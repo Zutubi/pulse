@@ -3,12 +3,12 @@ package com.zutubi.prototype.config;
 import com.zutubi.config.annotations.ConfigurationCheck;
 import com.zutubi.prototype.ConfigurationCheckHandler;
 import com.zutubi.prototype.type.CompositeType;
+import com.zutubi.prototype.type.ExtensionTypeProperty;
 import com.zutubi.prototype.type.ListType;
 import com.zutubi.prototype.type.MapType;
 import com.zutubi.prototype.type.ProjectMapType;
 import com.zutubi.prototype.type.TypeException;
 import com.zutubi.prototype.type.TypeHandler;
-import com.zutubi.prototype.type.TypeProperty;
 import com.zutubi.prototype.type.TypeRegistry;
 import com.zutubi.pulse.prototype.config.*;
 import com.zutubi.pulse.prototype.config.admin.GlobalConfiguration;
@@ -17,7 +17,6 @@ import com.zutubi.pulse.servercore.config.CvsConfiguration;
 import com.zutubi.pulse.servercore.config.PerforceConfiguration;
 import com.zutubi.pulse.servercore.config.ScmConfiguration;
 import com.zutubi.pulse.servercore.config.SvnConfiguration;
-import com.zutubi.pulse.cleanup.config.CleanupConfiguration;
 import com.zutubi.util.logging.Logger;
 
 import java.util.HashMap;
@@ -73,8 +72,8 @@ public class ConfigurationRegistry
 
             // generated dynamically as new components are registered.
             CompositeType projectConfig = registerConfigurationType("projectConfig", ProjectConfiguration.class);
-            projectConfig.addProperty(new TypeProperty("type", typeRegistry.getType("typeConfig")));
-            projectConfig.addProperty(new TypeProperty("changeViewer", typeRegistry.getType("changeViewerConfig")));
+            projectConfig.addProperty(new ExtensionTypeProperty("type", typeRegistry.getType("typeConfig")));
+            projectConfig.addProperty(new ExtensionTypeProperty("changeViewer", typeRegistry.getType("changeViewerConfig")));
 
             // scm configuration
             CompositeType scmConfig = typeRegistry.getType(ScmConfiguration.class);
@@ -94,24 +93,17 @@ public class ConfigurationRegistry
             MapType triggers = new MapType(configurationPersistenceManager);
             triggers.setTypeRegistry(typeRegistry);
             triggers.setCollectionType(typeRegistry.getType("triggerConfig"));
-            projectConfig.addProperty(new TypeProperty("trigger", triggers));
+            projectConfig.addProperty(new ExtensionTypeProperty("trigger", triggers));
 
             ListType artifacts = new ListType(configurationPersistenceManager);
             artifacts.setTypeRegistry(typeRegistry);
             artifacts.setCollectionType(typeRegistry.getType("artifactConfig"));
-            projectConfig.addProperty(new TypeProperty("artifact", artifacts));
+            projectConfig.addProperty(new ExtensionTypeProperty("artifact", artifacts));
 
             MapType commitTransformers = new MapType(configurationPersistenceManager);
             commitTransformers.setTypeRegistry(typeRegistry);
             commitTransformers.setCollectionType(typeRegistry.getType("commitConfig"));
-            projectConfig.addProperty(new TypeProperty("commit", commitTransformers));
-
-            // cleanup rule configuration
-            CompositeType cleanupType = registerConfigurationType(CleanupConfiguration.class);
-            MapType cleanupRules = new MapType(configurationPersistenceManager);
-            cleanupRules.setTypeRegistry(typeRegistry);
-            cleanupRules.setCollectionType(cleanupType);
-            projectConfig.addProperty(new TypeProperty("cleanup", cleanupRules));
+            projectConfig.addProperty(new ExtensionTypeProperty("commit", commitTransformers));
 
             // define the root level scope.
             ProjectMapType projectCollection = new ProjectMapType(configurationPersistenceManager);
@@ -127,6 +119,21 @@ public class ConfigurationRegistry
         {
             LOG.severe(e);
         }
+    }
+
+    public void registerProjectMapExtension(String name, Class clazz) throws TypeException
+    {
+        // create the map type.
+        MapType cleanupRules = new MapType(configurationPersistenceManager);
+        cleanupRules.setTypeRegistry(typeRegistry);
+
+        // register the new type.
+        CompositeType cleanupType = registerConfigurationType(clazz);
+        cleanupRules.setCollectionType(cleanupType);
+
+        // register the new type with the project as an extension point.
+        CompositeType projectConfig = typeRegistry.getType(ProjectConfiguration.class);
+        projectConfig.addProperty(new ExtensionTypeProperty(name, cleanupRules));
     }
 
     public CompositeType registerConfigurationType(Class clazz) throws TypeException

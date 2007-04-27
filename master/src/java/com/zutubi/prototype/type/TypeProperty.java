@@ -4,32 +4,37 @@ import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.Predicate;
 
 import java.lang.annotation.Annotation;
-import java.lang.reflect.Method;
-import java.util.List;
 import java.util.LinkedList;
+import java.util.List;
 
 /**
  *
  *
  */
-public class TypeProperty
+public abstract class TypeProperty
 {
+    /**
+     * Annotations associated with this property.
+     */
     private List<Annotation> annotations = new LinkedList<Annotation>();
 
+    /**
+     * The name of this property.
+     */
     private String name;
-    private Method getter;
-    private Method setter;
+
+    /**
+     * The type of this property.
+     */
     private Type type;
 
     public TypeProperty()
     {
     }
 
-    public TypeProperty(String name, Method getter, Method setter)
+    public TypeProperty(String name)
     {
         this.name = name;
-        this.getter = getter;
-        this.setter = setter;
     }
 
     public TypeProperty(String name, Type type)
@@ -85,25 +90,6 @@ public class TypeProperty
         this.name = name;
     }
 
-    public Method getGetter()
-    {
-        return getter;
-    }
-
-    protected void setGetter(Method getter)
-    {
-        this.getter = getter;
-    }
-
-    public Method getSetter()
-    {
-        return setter;
-    }
-
-    protected void setSetter(Method setter)
-    {
-        this.setter = setter;
-    }
 
     public Type getType()
     {
@@ -120,12 +106,11 @@ public class TypeProperty
         return type.getClazz();
     }
 
-    public boolean isReadable()
-    {
-        return getter != null;
-    }
-    public boolean isWritable()
-    {
-        return setter != null;
-    }
+    public abstract Object getValue(Object instance) throws Exception;
+    
+    public abstract void setValue(Object instance, Object value) throws Exception;
+
+    public abstract boolean isReadable();
+    
+    public abstract boolean isWriteable();
 }

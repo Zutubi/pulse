@@ -211,11 +211,6 @@ public class MockProjectManager implements ProjectManager
         throw new RuntimeException("Method not implemented.");
     }
 
-    public Project getProjectByCleanupRule(CleanupRule rule)
-    {
-        throw new RuntimeException("Method not implemented.");
-    }
-
     public BuildSpecification getBuildSpecification(long id)
     {
         throw new RuntimeException("Method not implemented.");

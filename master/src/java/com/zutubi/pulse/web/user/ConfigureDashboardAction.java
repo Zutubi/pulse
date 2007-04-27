@@ -1,6 +1,6 @@
 package com.zutubi.pulse.web.user;
 
-import com.zutubi.pulse.model.BuildManager;
+import com.zutubi.pulse.cleanup.CleanupManager;
 import com.zutubi.pulse.model.User;
 import com.zutubi.pulse.security.AcegiUtils;
 import com.zutubi.pulse.web.project.ProjectFormHelper;
@@ -22,7 +22,7 @@ public class ConfigureDashboardAction extends UserActionSupport
     private List<Long> shownGroups;
     private boolean showMyChanges = false;
     private boolean showProjectChanges = false;
-    private BuildManager buildManager;
+    private CleanupManager cleanupManager;
     private ProjectFormHelper projectHelper;
     private ProjectGroupFormHelper groupHelper;
 
@@ -147,7 +147,7 @@ public class ConfigureDashboardAction extends UserActionSupport
 
         User user = getUser();
 
-        buildManager.cleanupBuilds(user);
+        cleanupManager.cleanupBuilds(user);
 
         user.setDashboardBuildCount(buildCount);
 
@@ -171,11 +171,6 @@ public class ConfigureDashboardAction extends UserActionSupport
         return SUCCESS;
     }
 
-    public void setBuildManager(BuildManager buildManager)
-    {
-        this.buildManager = buildManager;
-    }
-
     public ProjectFormHelper getProjectHelper()
     {
         if (projectHelper == null)
@@ -192,5 +187,10 @@ public class ConfigureDashboardAction extends UserActionSupport
             groupHelper = new ProjectGroupFormHelper(projectManager);
         }
         return groupHelper;
+    }
+
+    public void setCleanupManager(CleanupManager cleanupManager)
+    {
+        this.cleanupManager = cleanupManager;
     }
 }

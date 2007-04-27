@@ -45,7 +45,7 @@ public class OldProjectConfiguration
     private ChangeViewer changeViewer;
     private Map<String, CommitMessageTransformer> commitMessageTransformers;
     private Map<String, PostBuildAction> postBuildActions;
-    private Map<String, CleanupRule> cleanupRules;
+//    private Map<String, CleanupRule> cleanupRules;
 
     // Build stages
 

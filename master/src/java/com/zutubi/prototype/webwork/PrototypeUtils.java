@@ -63,7 +63,7 @@ public class PrototypeUtils
             }
 
             // this is a read only property.
-            if (!property.isWritable())
+            if (!property.isWriteable())
             {
                 continue;
             }

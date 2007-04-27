@@ -11,7 +11,6 @@ import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.Mapping;
 import com.zutubi.util.logging.Logger;
 
-import java.lang.reflect.Method;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -136,7 +135,7 @@ public class CompositeType extends AbstractType implements ComplexType
                 Record record = (Record) data;
 
                 // Check if it is actually a derived type.
-                if(!getSymbolicName().equals(record.getSymbolicName()))
+                if (!getSymbolicName().equals(record.getSymbolicName()))
                 {
                     CompositeType type = typeRegistry.getType(record.getSymbolicName());
                     return type.instantiate(path, data);
@@ -192,24 +191,17 @@ public class CompositeType extends AbstractType implements ComplexType
         // is both checked for validity and cached.
         Type type = property.getType();
         Object value = type.instantiate(path == null ? null : PathUtils.getPath(path, name), record.get(name));
-        Method setter = property.getSetter();
-        if (setter != null)
+        try
         {
-            try
+            property.setValue(instance, value);
+        }
+        catch (Exception e)
+        {
+            if (exception == null)
             {
-                if (value != null || !(type instanceof PrimitiveType))
-                {
-                    setter.invoke(instance, value);
-                }
+                exception = new TypeConversionException();
             }
-            catch (Exception e)
-            {
-                if (exception == null)
-                {
-                    exception = new TypeConversionException();
-                }
-                exception.addFieldError(name, e.getMessage());
-            }
+            exception.addFieldError(name, e.getMessage());
         }
         return exception;
     }
@@ -231,18 +223,17 @@ public class CompositeType extends AbstractType implements ComplexType
 
     private void unstantiateProperty(TypeProperty property, Object instance, MutableRecord result) throws TypeException
     {
-        final Method getter = property.getGetter();
-        if (getter != null)
+        try
         {
-            try
+            Object value = property.getValue(instance);
+            if (value != null)
             {
-                Object value = getter.invoke(instance);
                 result.put(property.getName(), property.getType().unstantiate(value));
             }
-            catch (Exception e)
-            {
-                throw new TypeException("Unable to invoke getter for property '" + property.getName() + "': " + e.getMessage(), e);
-            }
+        }
+        catch (Exception e)
+        {
+            throw new TypeException("Unable to invoke getter for property '" + property.getName() + "': " + e.getMessage(), e);
         }
     }
 
@@ -295,7 +286,7 @@ public class CompositeType extends AbstractType implements ComplexType
                 Object defaultInstance = getClazz().newInstance();
                 for (TypeProperty property : getProperties())
                 {
-                    Object defaultValue = property.getGetter().invoke(defaultInstance);
+                    Object defaultValue = property.getValue(defaultInstance);
                     if (defaultValue != null)
                     {
                         record.put(property.getName(), property.getType().unstantiate(defaultValue));

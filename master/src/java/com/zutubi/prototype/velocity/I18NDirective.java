@@ -122,8 +122,9 @@ public class I18NDirective extends PrototypeDirective
         if (ctype.hasProperty(property))
         {
             type = ctype.getProperty(property).getType();
+            type = type.getTargetType();
         }
-        
+
         return Messages.getInstance(type.getClazz());
     }
 }

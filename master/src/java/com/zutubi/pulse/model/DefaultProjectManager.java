@@ -528,7 +528,9 @@ public class DefaultProjectManager implements ProjectManager, ConfigurationEvent
         BuildSpecification buildSpec = new BuildSpecification("default");
         project.addBuildSpecification(buildSpec);
         project.setDefaultSpecification(buildSpec);
-        project.addCleanupRule(new CleanupRule(true, null, DEFAULT_WORK_DIR_BUILDS, CleanupRule.CleanupUnit.BUILDS));
+// Fixme: this functionality is not present with the new plugin configuration system.  There is no concept of a
+//        default inclusion by an external plugin to the project.        
+//        project.addCleanupRule(new CleanupRule(true, null, DEFAULT_WORK_DIR_BUILDS, CleanupRule.CleanupUnit.BUILDS));
 
         projectDao.save(project);
 
@@ -619,11 +621,6 @@ public class DefaultProjectManager implements ProjectManager, ConfigurationEvent
     {
         userManager.removeReferencesToProjectGroup(projectGroup);
         projectGroupDao.delete(projectGroup);
-    }
-
-    public Project getProjectByCleanupRule(CleanupRule rule)
-    {
-        return projectDao.findByCleanupRule(rule);
     }
 
     public BuildSpecification getBuildSpecification(long id)

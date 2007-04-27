@@ -171,7 +171,7 @@ public class TypeRegistry
                     continue;
                 }
 
-                TypeProperty property = new TypeProperty();
+                DefinedTypeProperty property = new DefinedTypeProperty();
                 property.setName(descriptor.getName());
                 property.setGetter(readMethod);
                 property.setSetter(descriptor.getWriteMethod());

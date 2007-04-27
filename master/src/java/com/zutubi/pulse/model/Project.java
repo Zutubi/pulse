@@ -49,7 +49,6 @@ public class Project extends Entity implements AclObjectIdentity, AclObjectIdent
     private String url;
     private PulseFileDetails pulseFileDetails;
     private List<PostBuildAction> postBuildActions = new LinkedList<PostBuildAction>();
-    private List<CleanupRule> cleanupRules = new LinkedList<CleanupRule>();
     private ChangeViewer changeViewer;
     private State state = State.IDLE;
     private long nextBuildNumber = 1;
@@ -93,11 +92,6 @@ public class Project extends Entity implements AclObjectIdentity, AclObjectIdent
         copy.description = description;
         copy.url = url;
         copy.pulseFileDetails = pulseFileDetails.copy();
-        copy.cleanupRules = new LinkedList<CleanupRule>();
-        for(CleanupRule rule: cleanupRules)
-        {
-            copy.cleanupRules.add(rule.copy());
-        }
 
         if(changeViewer != null)
         {
@@ -363,43 +357,6 @@ public class Project extends Entity implements AclObjectIdentity, AclObjectIdent
         }
 
         return null;
-    }
-
-    public List<CleanupRule> getCleanupRules()
-    {
-        return cleanupRules;
-    }
-
-    private void setCleanupRules(List<CleanupRule> cleanupRules)
-    {
-        this.cleanupRules = cleanupRules;
-    }
-
-    public void addCleanupRule(CleanupRule rule)
-    {
-        cleanupRules.add(rule);
-    }
-
-    public CleanupRule getCleanupRule(long id)
-    {
-        for (CleanupRule rule : cleanupRules)
-        {
-            if (rule.getId() == id)
-            {
-                return rule;
-            }
-        }
-
-        return null;
-    }
-
-    public void removeCleanupRule(long id)
-    {
-        CleanupRule deadRuleWalking = getCleanupRule(id);
-        if (deadRuleWalking != null)
-        {
-            cleanupRules.remove(deadRuleWalking);
-        }
     }
 
     public State getState()

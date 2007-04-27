@@ -750,25 +750,6 @@
             <result name="error" type="velocity">generic-error.vm</result>
         </action>
 
-        <action name="addCleanupRule" class="com.zutubi.pulse.web.project.AddCleanupRuleAction">
-            <result name="input" type="velocity">add-cleanup-rule.vm</result>
-            <result name="cancel" type="redirect">/configureProject.action?id=${projectId}</result>
-            <result name="error" type="velocity">generic-error.vm</result>
-            <result name="success" type="redirect">/configureProject.action?id=${projectId}</result>
-        </action>
-
-        <action name="editCleanupRule" class="com.zutubi.pulse.web.project.EditCleanupRuleAction">
-            <result name="input" type="velocity">edit-cleanup-rule.vm</result>
-            <result name="cancel" type="redirect">/configureProject.action?id=${projectId}</result>
-            <result name="error" type="velocity">generic-error.vm</result>
-            <result name="success" type="redirect">/configureProject.action?id=${projectId}</result>
-        </action>
-
-        <action name="deleteCleanupRule" class="com.zutubi.pulse.web.project.DeleteCleanupRuleAction">
-            <result name="error" type="velocity">generic-error.vm</result>
-            <result name="success" type="redirect">/configureProject.action?id=${projectId}</result>
-        </action>
-
         <action name="triggerCleanupRule" class="com.zutubi.pulse.web.project.TriggerCleanupRuleAction">
             <result name="error" type="velocity">generic-error.vm</result>
             <result name="success" type="redirect">/configureProject.action?id=${projectId}</result>
