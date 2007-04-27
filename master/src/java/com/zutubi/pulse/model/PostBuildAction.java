@@ -2,6 +2,7 @@ package com.zutubi.pulse.model;
 
 import com.zutubi.pulse.core.model.Entity;
 import com.zutubi.pulse.core.model.ResourceProperty;
+import com.zutubi.pulse.core.model.Result;
 import com.zutubi.pulse.core.model.ResultState;
 import com.zutubi.pulse.util.logging.Logger;
 
@@ -46,7 +47,7 @@ public abstract class PostBuildAction extends Entity
     {
         errors = new LinkedList<String>();
 
-        if(resultMatches(build))
+        if(resultMatches(build, recipe))
         {
             internalExecute(build, recipe, properties);
             for(String error: errors)
@@ -70,8 +71,13 @@ public abstract class PostBuildAction extends Entity
         }
     }
 
-    private boolean resultMatches(BuildResult result)
+    private boolean resultMatches(BuildResult result, RecipeResultNode recipe)
     {
+        if (recipe != null)
+        {
+            // no spec to check when we are tied to a stage.
+            return stateMatches(recipe.getResult());
+        }
         return specMatches(result) && stateMatches(result);
     }
 
@@ -93,7 +99,7 @@ public abstract class PostBuildAction extends Entity
         return false;
     }
 
-    private boolean stateMatches(BuildResult result)
+    private boolean stateMatches(Result result)
     {
         if(states == null || states.size() == 0)
         {
