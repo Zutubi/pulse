@@ -44,15 +44,15 @@
 
     #parse("/template/includes/actionerrors.vm")
 
-    <span class="action">
+    <p style="text-align: right; margin-bottom: 0">
         <a href="triggerBuild.action?id=$specification.id&amp;projectId=$project.id"><img alt="trigger" src="$base/images/lightning.gif"/> #wwtext("name=buildspec.trigger")</a>
 #if($specification.forceClean)
         [ #wwtext("name=buildspec.forced.clean") ]
 #else
         [ <a href="forceCleanBuild.action?id=$specification.id&amp;projectId=$project.id">#wwtext("name=buildspec.force.clean")</a> ]
 #end
-    </span>
-    <h2 class="section">#wwtext("name=buildspec") $!webwork.htmlEncode($specification.name)</h2>
+    </p>
+    <h2 style="margin-top: 0" class="section">#wwtext("name=buildspec") $!webwork.htmlEncode($specification.name)</h2>
 
     <table class="columns">
         <tr>
