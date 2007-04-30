@@ -1,11 +1,9 @@
 package com.zutubi.prototype.config;
 
-import com.zutubi.pulse.core.config.Configuration;
-import com.zutubi.prototype.config.events.ConfigurationEvent;
-import com.zutubi.prototype.config.events.PostInsertEvent;
-import com.zutubi.prototype.config.events.PreDeleteEvent;
-import com.zutubi.prototype.config.events.PostSaveEvent;
+import com.zutubi.prototype.config.events.*;
+import com.zutubi.prototype.type.record.MutableRecord;
 import com.zutubi.prototype.type.record.PathUtils;
+import com.zutubi.pulse.core.config.Configuration;
 
 /**
  */
@@ -30,7 +28,11 @@ public abstract class CollectionListener<T extends Configuration>
         {
             public void handleConfigurationEvent(ConfigurationEvent event)
             {
-                if(event instanceof PostInsertEvent)
+                if(event instanceof PreInsertEvent)
+                {
+                    preInsert(((PreInsertEvent)event).getRecord());
+                }
+                else if(event instanceof PostInsertEvent)
                 {
                     Object instance = ((PostInsertEvent)event).getNewInstance();
                     if(configurationClass.isInstance(instance))
@@ -76,6 +78,7 @@ public abstract class CollectionListener<T extends Configuration>
         }, synchronous, true, path);
     }
 
+    protected abstract void preInsert(MutableRecord record);
     protected abstract void instanceInserted(T instance);
     protected abstract void instanceDeleted(T instance);
     protected abstract void instanceChanged(T instance);

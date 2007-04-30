@@ -2,6 +2,7 @@ package com.zutubi.pulse.model;
 
 import com.zutubi.prototype.config.CollectionListener;
 import com.zutubi.prototype.config.ConfigurationProvider;
+import com.zutubi.prototype.type.record.MutableRecord;
 import com.zutubi.pulse.bootstrap.ComponentContext;
 import com.zutubi.pulse.cache.ehcache.CustomAclEntryCache;
 import com.zutubi.pulse.core.BuildException;
@@ -71,6 +72,16 @@ public class DefaultProjectManager implements ProjectManager
 
         CollectionListener<ProjectConfiguration> listener = new CollectionListener<ProjectConfiguration>("project", ProjectConfiguration.class, true)
         {
+            protected void preInsert(MutableRecord record)
+            {
+                // FIXME: Pulse file details temporary for testing
+                AntPulseFileDetails pulseFileDetails = new AntPulseFileDetails();
+                pulseFileDetails.setBuildFile("build.xml");
+                Project project = new Project((String) record.get("name"), (String) record.get("description"), pulseFileDetails);
+                save(project);
+                record.put("projectId", Long.toString(project.getId()));
+            }
+
             protected void instanceInserted(ProjectConfiguration instance)
             {
                 registerProjectConfig(instance);

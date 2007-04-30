@@ -4,8 +4,8 @@ import com.zutubi.config.annotations.Reference;
 import com.zutubi.prototype.config.events.*;
 import com.zutubi.prototype.type.*;
 import com.zutubi.prototype.type.record.*;
-import com.zutubi.pulse.events.EventManager;
 import com.zutubi.pulse.core.config.Configuration;
+import com.zutubi.pulse.events.EventManager;
 import com.zutubi.util.ClassLoaderUtils;
 import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.Mapping;
@@ -525,7 +525,7 @@ public class ConfigurationPersistenceManager
     {
         ComplexType type = getType(path, ComplexType.class);
 
-        eventManager.publish(new PreInsertEvent(this, path));
+        eventManager.publish(new PreInsertEvent(this, path, (MutableRecord) record));
 
         final String result = type.insert(path, record, recordManager);
         refreshInstances();

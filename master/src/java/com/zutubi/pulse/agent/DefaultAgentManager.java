@@ -2,13 +2,13 @@ package com.zutubi.pulse.agent;
 
 import com.zutubi.prototype.config.CollectionListener;
 import com.zutubi.prototype.config.ConfigurationProvider;
+import com.zutubi.prototype.type.record.MutableRecord;
 import com.zutubi.pulse.*;
 import com.zutubi.pulse.bootstrap.MasterConfigurationManager;
 import com.zutubi.pulse.core.Stoppable;
 import com.zutubi.pulse.core.config.Resource;
 import com.zutubi.pulse.events.*;
 import com.zutubi.pulse.events.EventListener;
-import com.zutubi.pulse.license.LicenseException;
 import com.zutubi.pulse.license.LicenseHolder;
 import com.zutubi.pulse.license.LicenseManager;
 import com.zutubi.pulse.license.authorisation.AddAgentAuthorisation;
@@ -63,17 +63,18 @@ public class DefaultAgentManager implements AgentManager, EventListener, Stoppab
     {
         CollectionListener<AgentConfiguration> listener = new CollectionListener<AgentConfiguration>("agent", AgentConfiguration.class, true)
         {
+            protected void preInsert(MutableRecord record)
+            {
+                LicenseHolder.ensureAuthorization(AddAgentAuthorisation.AUTH);
+
+                AgentState state = new AgentState();
+                agentStateManager.save(state);
+                record.put("agentStateId", Long.toString(state.getId()));
+            }
+
             protected void instanceInserted(AgentConfiguration instance)
             {
-                try
-                {
-                    addAgent(instance);
-                }
-                catch (LicenseException e)
-                {
-                    // FIXME
-                    e.printStackTrace();
-                }
+                agentAdded(instance);
             }
 
             protected void instanceDeleted(AgentConfiguration instance)
@@ -119,7 +120,7 @@ public class DefaultAgentManager implements AgentManager, EventListener, Stoppab
         try
         {
             AgentService agentService = createAgentService(agentConfig);
-            AgentState agentState = agentStateManager.getAgentState(agentConfig.getAgentId());
+            AgentState agentState = agentStateManager.getAgentState(agentConfig.getAgentStateId());
             if(agentState.getEnableState() == AgentState.EnableState.UPGRADING)
             {
                 // Something went wrong: lost contact with slave (or master
@@ -179,15 +180,6 @@ public class DefaultAgentManager implements AgentManager, EventListener, Stoppab
     public int getAgentCount()
     {
         return agents.size();
-    }
-
-    public void addAgent(AgentConfiguration agentConfig) throws LicenseException
-    {
-        LicenseHolder.ensureAuthorization(AddAgentAuthorisation.AUTH);
-        
-        AgentState state = new AgentState();
-        agentStateManager.save(state);
-        agentAdded(agentConfig);
     }
 
     public void enableAgent(long handle)
@@ -413,7 +405,7 @@ public class DefaultAgentManager implements AgentManager, EventListener, Stoppab
 
     public void agentAdded(AgentConfiguration agentConfig)
     {
-        AgentState agentState = agentStateManager.getAgentState(agentConfig.getAgentId());
+        AgentState agentState = agentStateManager.getAgentState(agentConfig.getAgentStateId());
         if(agentState != null)
         {
             lock.lock();
@@ -432,7 +424,7 @@ public class DefaultAgentManager implements AgentManager, EventListener, Stoppab
 
     public void agentChanged(AgentConfiguration agentConfig)
     {
-        AgentState agentState = agentStateManager.getAgentState(agentConfig.getAgentId());
+        AgentState agentState = agentStateManager.getAgentState(agentConfig.getAgentStateId());
         if(agentState != null)
         {
             lock.lock();
@@ -510,7 +502,7 @@ public class DefaultAgentManager implements AgentManager, EventListener, Stoppab
         return null;
     }
 
-    public void setSlaveManager(AgentStateManager agentStateManager)
+    public void setAgentStateManager(AgentStateManager agentStateManager)
     {
         this.agentStateManager = agentStateManager;
     }

@@ -1,8 +1,8 @@
 package com.zutubi.pulse.prototype.config.agent;
 
-import com.zutubi.config.annotations.SymbolicName;
-import com.zutubi.config.annotations.Internal;
 import com.zutubi.config.annotations.Form;
+import com.zutubi.config.annotations.Internal;
+import com.zutubi.config.annotations.SymbolicName;
 import com.zutubi.pulse.core.config.AbstractNamedConfiguration;
 import com.zutubi.pulse.core.config.Resource;
 import com.zutubi.validation.annotations.Numeric;
@@ -16,7 +16,7 @@ import java.util.Map;
 public class AgentConfiguration extends AbstractNamedConfiguration
 {
     @Internal
-    private long agentId;
+    private long agentStateId;
     private boolean remote = true;
     private String host;
     @Numeric(min = 1)
@@ -53,14 +53,14 @@ public class AgentConfiguration extends AbstractNamedConfiguration
         this.port = port;
     }
 
-    public long getAgentId()
+    public long getAgentStateId()
     {
-        return agentId;
+        return agentStateId;
     }
 
-    public void setAgentId(long agentId)
+    public void setAgentStateId(long agentStateId)
     {
-        this.agentId = agentId;
+        this.agentStateId = agentStateId;
     }
 
     public Map<String, Resource> getResources()

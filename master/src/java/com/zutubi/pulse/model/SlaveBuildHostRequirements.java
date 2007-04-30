@@ -1,8 +1,8 @@
 package com.zutubi.pulse.model;
 
 import com.zutubi.pulse.AgentService;
-import com.zutubi.pulse.SlaveAgentService;
 import com.zutubi.pulse.RecipeDispatchRequest;
+import com.zutubi.pulse.SlaveAgentService;
 
 /**
  */
@@ -31,7 +31,7 @@ public class SlaveBuildHostRequirements extends AbstractBuildHostRequirements
         if (service instanceof SlaveAgentService)
         {
             SlaveAgentService slaveService = (SlaveAgentService) service;
-            return slaveService.getAgentConfig().getAgentId() == agentState.getId();
+            return slaveService.getAgentConfig().getAgentStateId() == agentState.getId();
         }
 
         return false;

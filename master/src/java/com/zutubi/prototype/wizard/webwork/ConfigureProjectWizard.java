@@ -1,15 +1,12 @@
 package com.zutubi.prototype.wizard.webwork;
 
-import com.zutubi.prototype.config.ConfigurationPersistenceManager;
 import com.zutubi.prototype.type.CompositeType;
 import com.zutubi.prototype.type.record.MutableRecord;
 import com.zutubi.prototype.type.record.MutableRecordImpl;
 import com.zutubi.prototype.type.record.TemplateRecord;
 import com.zutubi.prototype.wizard.WizardState;
-import com.zutubi.util.logging.Logger;
-import com.zutubi.pulse.model.Project;
 import com.zutubi.pulse.model.ProjectManager;
-import com.zutubi.pulse.model.AntPulseFileDetails;
+import com.zutubi.util.logging.Logger;
 
 import java.util.LinkedList;
 
@@ -52,12 +49,6 @@ public class ConfigureProjectWizard extends AbstractTypeWizard
         record.put("scm", wizardStates.get(2).getRecord());
         record.put("type", wizardStates.get(4).getRecord());
 
-        // FIXME: Pulse file details temporary for testing
-        AntPulseFileDetails pulseFileDetails = new AntPulseFileDetails();
-        pulseFileDetails.setBuildFile("build.xml");
-        Project project = new Project((String) record.get("name"), (String) record.get("description"), pulseFileDetails);
-        projectManager.save(project);
-        record.put("projectId", Long.toString(project.getId()));
 
         successPath = configurationPersistenceManager.insertRecord("project", record);
     }

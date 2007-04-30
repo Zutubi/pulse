@@ -1,7 +1,7 @@
 package com.zutubi.pulse.model;
 
-import com.zutubi.pulse.model.persistence.BuildSpecificationDao;
 import com.zutubi.pulse.model.persistence.AgentStateDao;
+import com.zutubi.pulse.model.persistence.BuildSpecificationDao;
 import com.zutubi.pulse.scheduling.Scheduler;
 import com.zutubi.pulse.scheduling.SchedulingException;
 import com.zutubi.pulse.scheduling.SimpleTrigger;
@@ -110,7 +110,7 @@ public class DefaultAgentStateManager implements AgentStateManager
         agentStateDao.save(agentState);
     }
 
-    public void setSlaveDao(AgentStateDao agentStateDao)
+    public void setAgentStateDao(AgentStateDao agentStateDao)
     {
         this.agentStateDao = agentStateDao;
     }
