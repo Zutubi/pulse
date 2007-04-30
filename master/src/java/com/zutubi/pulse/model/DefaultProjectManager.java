@@ -77,7 +77,8 @@ public class DefaultProjectManager implements ProjectManager
                 // FIXME: Pulse file details temporary for testing
                 AntPulseFileDetails pulseFileDetails = new AntPulseFileDetails();
                 pulseFileDetails.setBuildFile("build.xml");
-                Project project = new Project((String) record.get("name"), (String) record.get("description"), pulseFileDetails);
+                Project project = new Project((String) record.get("name"), (String) record.get("description"));
+                project.setPulseFileDetails(pulseFileDetails);
                 save(project);
                 record.put("projectId", Long.toString(project.getId()));
             }
