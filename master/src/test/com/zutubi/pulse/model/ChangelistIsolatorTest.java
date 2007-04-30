@@ -38,7 +38,7 @@ public class ChangelistIsolatorTest extends PulseTestCase
         buildSpecification = new BuildSpecification("default");
         buildSpecification.setIsolateChangelists(true);
 
-        project = new Project("myproject", "mydesc", new CustomPulseFileDetails());
+        project = new Project();
         projectConfig = new ProjectConfiguration();
         projectConfig.setScm(new ScmConfiguration()
         {

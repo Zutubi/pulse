@@ -21,7 +21,6 @@ public class ConfigureProjectWizard extends AbstractTypeWizard
     private static final TemplateRecord EMPTY_RECORD = new TemplateRecord("empty", null, new MutableRecordImpl());
 
     private CompositeType projectType;
-    private ProjectManager projectManager;
 
     public void initialise()
     {
@@ -49,12 +48,6 @@ public class ConfigureProjectWizard extends AbstractTypeWizard
         record.put("scm", wizardStates.get(2).getRecord());
         record.put("type", wizardStates.get(4).getRecord());
 
-
         successPath = configurationPersistenceManager.insertRecord("project", record);
-    }
-
-    public void setProjectManager(ProjectManager projectManager)
-    {
-        this.projectManager = projectManager;
     }
 }

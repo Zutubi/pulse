@@ -9,8 +9,6 @@
             <generator class="hilo"/>
         </id>
 
-        <property name="parent" column="PARENT" type="com.zutubi.pulse.model.Project"/>
-
         <property name="name" column="NAME" type="string" length="255"/>
 
         <property name="description" column="DESCRIPTION" type="string" length="4095"/>
@@ -44,7 +42,8 @@
         </bag>
 
         <property name="nextBuildNumber" column="NEXT_BUILD_NUMBER" type="long"/>
-        
+        <property name="lastPollTime" column="LAST_POLL_TIME" type="long"/>
+
     </class>
 
     <class name="com.zutubi.pulse.model.ChangeViewer" table="CHANGE_VIEWER" lazy="false">
@@ -256,11 +255,6 @@
 
     <query name="findAllProjectsCached" cacheable="true"><![CDATA[
         from Project project
-    ]]></query>
-
-    <query name="findByLikeName"><![CDATA[
-        from Project project
-        where project.name like :name
     ]]></query>
 
     <query name="findByName" cacheable="true"><![CDATA[

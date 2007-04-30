@@ -30,7 +30,7 @@ public class HibernateProjectGroupDaoTest extends MasterPersistenceTestCase
 
     public void testLoadSave()
     {
-        Project project = new Project("test-project", "This is a test project");
+        Project project = new Project();
         projectDao.save(project);
 
         ProjectGroup group = new ProjectGroup("my group");
@@ -62,7 +62,7 @@ public class HibernateProjectGroupDaoTest extends MasterPersistenceTestCase
 
     public void testFindByProject()
     {
-        Project project = new Project("test-project", "This is a test project");
+        Project project = new Project();
         projectDao.save(project);
 
         ProjectGroup g1 = new ProjectGroup("g1");

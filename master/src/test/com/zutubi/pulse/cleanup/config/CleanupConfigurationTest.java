@@ -38,8 +38,8 @@ public class CleanupConfigurationTest extends MasterPersistenceTestCase
         buildResultDao = (BuildResultDao) ComponentContext.getBean("buildResultDao");
         buildSpecificationDao = (BuildSpecificationDao) ComponentContext.getBean("buildSpecificationDao");
 
-        p1 = new Project("p1", "desc");
-        p2 = new Project("p2", "desc");
+        p1 = new Project();
+        p2 = new Project();
         projectDao.save(p1);
         projectDao.save(p2);
 

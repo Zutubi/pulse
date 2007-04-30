@@ -37,13 +37,13 @@ public class BuildAborterTest extends PulseTestCase
 
     public void testNoBuilds()
     {
-        projectManager.create(new Project("hello", "test project"));
+        projectManager.create(new Project());
         aborter.execute();
     }
 
     public void testCompletedBuild()
     {
-        Project project = new Project("test", "project");
+        Project project = new Project();
         BuildResult result = new BuildResult(new TriggerBuildReason("scm trigger"), project, new BuildSpecification("foo"), 1, false);
         result.commence(10);
         result.complete();
@@ -58,7 +58,7 @@ public class BuildAborterTest extends PulseTestCase
 
     public void testIncompleteBuild()
     {
-        Project project = new Project("test", "project");
+        Project project = new Project();
         BuildResult result = new BuildResult(new TriggerBuildReason("scm trigger"), project, new BuildSpecification("foo"), 1, false);
         result.commence(10);
 
@@ -74,7 +74,7 @@ public class BuildAborterTest extends PulseTestCase
 
     public void testCompletePersonalBuild()
     {
-        Project project = new Project("test", "project");
+        Project project = new Project();
         User user = new User("u", "u");
         BuildResult result = new BuildResult(user, project, new BuildSpecification("foo"), 1);
         result.commence(10);
@@ -94,7 +94,7 @@ public class BuildAborterTest extends PulseTestCase
 
     public void testIncompletePersonalBuild()
     {
-        Project project = new Project("test", "project");
+        Project project = new Project();
         User user = new User("u", "u");
         BuildResult result = new BuildResult(user, project, new BuildSpecification("foo"), 1);
         result.commence(10);

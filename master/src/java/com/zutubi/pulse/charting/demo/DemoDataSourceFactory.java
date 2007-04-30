@@ -3,7 +3,6 @@ package com.zutubi.pulse.charting.demo;
 import com.zutubi.pulse.charting.BuildResultsDataSource;
 import com.zutubi.pulse.charting.DemoBuildResultDataSource;
 import com.zutubi.pulse.core.model.ResultState;
-import com.zutubi.pulse.model.BuildReason;
 import com.zutubi.pulse.model.BuildResult;
 
 import java.util.Calendar;
@@ -46,7 +45,7 @@ public class DemoDataSourceFactory
 
     private static BuildResult createBuildResult(long id, boolean successful, long started, long finished)
     {
-        BuildResult result = new BuildResult((BuildReason)null, null, null, id, false);
+        BuildResult result = new BuildResult(null, null, null, id, false);
         result.setId(id);
         if (successful)
         {

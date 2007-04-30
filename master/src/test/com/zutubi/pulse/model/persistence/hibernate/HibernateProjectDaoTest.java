@@ -1,13 +1,18 @@
 package com.zutubi.pulse.model.persistence.hibernate;
 
 import com.zutubi.pulse.core.model.ResultState;
-import com.zutubi.pulse.model.*;
+import com.zutubi.pulse.model.AntPulseFileDetails;
+import com.zutubi.pulse.model.BuildSpecification;
+import com.zutubi.pulse.model.DirectoryCapture;
+import com.zutubi.pulse.model.FileCapture;
+import com.zutubi.pulse.model.Project;
+import com.zutubi.pulse.model.RunExecutablePostBuildAction;
+import com.zutubi.pulse.model.TagPostBuildAction;
 import com.zutubi.pulse.model.persistence.BuildSpecificationDao;
 import com.zutubi.pulse.model.persistence.ProjectDao;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.TreeMap;
 
 /**
  * 
@@ -34,7 +39,9 @@ public class HibernateProjectDaoTest extends MasterPersistenceTestCase
 
     public void testLoadSave()
     {
-        Project project = new Project("test-project", "This is a test project");
+        Project project = new Project();
+        project.setLastPollTime((long)33442);
+        project.pause();
 
         projectDao.save(project);
 
@@ -42,60 +49,6 @@ public class HibernateProjectDaoTest extends MasterPersistenceTestCase
 
         Project otherProject = projectDao.findById(project.getId());
         assertPropertyEquals(project, otherProject);
-    }
-
-    public void testLoadSaveVersionedPulseFileSource()
-    {
-        VersionedPulseFileDetails details = new VersionedPulseFileDetails("hello");
-
-        projectDao.save(details);
-        commitAndRefreshTransaction();
-
-        VersionedPulseFileDetails otherDetails = projectDao.findVersionedPulseFileDetails(details.getId());
-        assertPropertyEquals(details, otherDetails);
-    }
-
-    public void testLoadSaveAntPulseFileDetails()
-    {
-        TreeMap<String, String> environment = new TreeMap<String, String>();
-        environment.put("PATH", "/bin");
-
-        AntPulseFileDetails details = new AntPulseFileDetails("build.xml", "build test", "arg1", "workdir", environment);
-        details.setEnvironment(environment);
-
-        projectDao.save(details);
-        commitAndRefreshTransaction();
-
-        AntPulseFileDetails otherDetails = projectDao.findAntPulseFileSource(details.getId());
-        assertEquals(details.getBuildFile(), otherDetails.getBuildFile());
-        assertEquals(details.getTargets(), otherDetails.getTargets());
-        assertEquals(details.getArguments(), otherDetails.getArguments());
-        assertEquals(details.getWorkingDir(), otherDetails.getWorkingDir());
-        for (String key : environment.keySet())
-        {
-            assertEquals(environment.get(key), otherDetails.getEnvironment().get(key));
-        }
-    }
-
-    public void testLoadSaveMakePulseFileDetails()
-    {
-        TreeMap<String, String> environment = new TreeMap<String, String>();
-        environment.put("PATH", "/bin");
-
-        MakePulseFileDetails details = new MakePulseFileDetails("Makefile", "build test", "arg1", "workdir");
-        details.setEnvironment(environment);
-        projectDao.save(details);
-        commitAndRefreshTransaction();
-
-        MakePulseFileDetails otherDetails = projectDao.findMakePulseFileSource(details.getId());
-        assertEquals(details.getMakefile(), otherDetails.getMakefile());
-        assertEquals(details.getTargets(), otherDetails.getTargets());
-        assertEquals(details.getArguments(), otherDetails.getArguments());
-        assertEquals(details.getWorkingDir(), otherDetails.getWorkingDir());
-        for (String key : environment.keySet())
-        {
-            assertEquals(environment.get(key), otherDetails.getEnvironment().get(key));
-        }
     }
 
     public void testLoadSaveFileCapture()
@@ -162,20 +115,9 @@ public class HibernateProjectDaoTest extends MasterPersistenceTestCase
         assertPropertyEquals(action, otherAction);
     }
 
-    public void testFindByLikeName()
-    {
-        Project projectA = new Project("nameA", "description");
-        Project projectB = new Project("nameB", "description");
-        projectDao.save(projectA);
-        projectDao.save(projectB);
-        commitAndRefreshTransaction();
-        assertEquals(2, projectDao.findByLikeName("%name%").size());
-        assertEquals(1, projectDao.findByLikeName("%A%").size());
-    }
-
     public void testFindByName()
     {
-        Project projectA = new Project("nameA", "description");
+        Project projectA = new Project("nameA");
         projectDao.save(projectA);
         commitAndRefreshTransaction();
         assertNotNull(projectDao.findByName("nameA"));
@@ -183,8 +125,8 @@ public class HibernateProjectDaoTest extends MasterPersistenceTestCase
 
     public void testFindByBuildSpecification()
     {
-        Project p1 = new Project("p1", "This is a test project");
-        Project p2 = new Project("p2", "This is a test project");
+        Project p1 = new Project();
+        Project p2 = new Project();
         BuildSpecification spec1 = new BuildSpecification();
         BuildSpecification spec2 = new BuildSpecification();
         p1.addBuildSpecification(spec1);
@@ -215,7 +157,7 @@ public class HibernateProjectDaoTest extends MasterPersistenceTestCase
 
     private Project addAdminProject(String name, String... authorities)
     {
-        Project p = new Project(name, "test");
+        Project p = new Project(name);
         for(String a: authorities)
         {
             p.addAdmin(a);

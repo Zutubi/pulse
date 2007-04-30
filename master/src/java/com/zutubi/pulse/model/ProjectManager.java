@@ -38,8 +38,6 @@ public interface ProjectManager extends EntityManager<Project>
 
     List<Project> getAllProjectsCached();
 
-    List<Project> getProjectsWithNameLike(String s);
-
     int getProjectCount();
 
     void save(BuildSpecification specification);

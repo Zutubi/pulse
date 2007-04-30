@@ -24,11 +24,6 @@ public class HibernateProjectDao extends HibernateEntityDao<Project> implements 
         return (Project) findUniqueByNamedQuery("findByName", "name", name, true);
     }
 
-    public List<Project> findByLikeName(final String name)
-    {
-        return findByNamedQuery("findByLikeName", "name", name);
-    }
-
     public Project findByBuildSpecification(BuildSpecification buildSpecification)
     {
         return (Project) findUniqueByNamedQuery("findProjectByBuildSpecification", "buildSpecification", buildSpecification);

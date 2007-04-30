@@ -73,8 +73,8 @@ public class ConfigurationRegistry
 
             // generated dynamically as new components are registered.
             CompositeType projectConfig = registerConfigurationType("projectConfig", ProjectConfiguration.class);
-            projectConfig.addProperty(new ExtensionTypeProperty("type", typeRegistry.getType("typeConfig")));
-            projectConfig.addProperty(new ExtensionTypeProperty("changeViewer", typeRegistry.getType("changeViewerConfig")));
+            projectConfig.addProperty(new ExtensionTypeProperty("type", typeConfig));
+            projectConfig.addProperty(new ExtensionTypeProperty("changeViewer", changeViewerConfig));
 
             // scm configuration
             CompositeType scmConfig = typeRegistry.getType(ScmConfiguration.class);

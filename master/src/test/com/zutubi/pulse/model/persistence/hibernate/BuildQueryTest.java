@@ -39,14 +39,14 @@ public class BuildQueryTest extends MasterPersistenceTestCase
 
     private void createProjects()
     {
-        p1 = new Project("p1", "p1 description");
+        p1 = new Project();
         default1 = new BuildSpecification("default");
         overnight1 = new BuildSpecification("overnight");
         p1.addBuildSpecification(default1);
         p1.addBuildSpecification(overnight1);
         projectDao.save(p1);
 
-        p2 = new Project("p2", "p2 description");
+        p2 = new Project();
         default2 = new BuildSpecification("default");
         overnight2 = new BuildSpecification("overnight");
         borken2 = new BuildSpecification("borken");

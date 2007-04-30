@@ -175,11 +175,6 @@ public class DefaultProjectManager implements ProjectManager
         return projectDao.findAllProjectsCached();
     }
 
-    public List<Project> getProjectsWithNameLike(String name)
-    {
-        return projectDao.findByLikeName(name);
-    }
-
     public int getProjectCount()
     {
         return projectDao.count();

@@ -21,6 +21,9 @@ public class HibernateBuildResultDaoTest extends MasterPersistenceTestCase
     private ChangelistDao changelistDao;
     private UserDao userDao;
 
+    private Project projectA;
+    private Project projectB;
+
     public void setUp() throws Exception
     {
         super.setUp();
@@ -38,6 +41,9 @@ public class HibernateBuildResultDaoTest extends MasterPersistenceTestCase
         buildResultDao = null;
         changelistDao = null;
         userDao = null;
+
+        projectA = null;
+        projectB = null;
 
         try
         {
@@ -469,7 +475,7 @@ public class HibernateBuildResultDaoTest extends MasterPersistenceTestCase
 
     public void testDeleteBuildRetainChangelist()
     {
-        Project p = new Project("p", "test");
+        Project p = new Project();
         projectDao.save(p);
 
         BuildResult result = createCompletedBuild(p, 1);
@@ -492,7 +498,7 @@ public class HibernateBuildResultDaoTest extends MasterPersistenceTestCase
 
     public void testFindByUser()
     {
-        Project p = new Project("p", "test");
+        Project p = new Project();
         projectDao.save(p);
 
         User u1 = new User("u1", "u1");
@@ -529,7 +535,7 @@ public class HibernateBuildResultDaoTest extends MasterPersistenceTestCase
 
     public void testFindByUserAndNumber()
     {
-        Project p = new Project("p", "test");
+        Project p = new Project();
         projectDao.save(p);
 
         User u1 = new User("u1", "u1");
@@ -566,7 +572,7 @@ public class HibernateBuildResultDaoTest extends MasterPersistenceTestCase
 
     public void testGetLatestByUser()
     {
-        Project p = new Project("p", "test");
+        Project p = new Project();
         projectDao.save(p);
 
         User u1 = new User("u1", "u1");
@@ -595,7 +601,7 @@ public class HibernateBuildResultDaoTest extends MasterPersistenceTestCase
 
     public void testGetLatestByUserStates()
     {
-        Project p = new Project("p", "test");
+        Project p = new Project();
         projectDao.save(p);
 
         User u1 = new User("u1", "u1");
@@ -616,7 +622,7 @@ public class HibernateBuildResultDaoTest extends MasterPersistenceTestCase
 
     public void testGetCompletedPersonalBuildCount()
     {
-        Project p = new Project("p", "test");
+        Project p = new Project();
         projectDao.save(p);
 
         User u1 = new User("u1", "u1");
@@ -641,7 +647,7 @@ public class HibernateBuildResultDaoTest extends MasterPersistenceTestCase
 
     public void testGetOldestCompletedPersonalBuilds()
     {
-        Project p = new Project("p", "test");
+        Project p = new Project();
         projectDao.save(p);
 
         User u1 = new User("u1", "u1");
@@ -680,12 +686,12 @@ public class HibernateBuildResultDaoTest extends MasterPersistenceTestCase
 
     private void createFindLatestSuccessfulTestData()
     {
-        Project projectA = new Project("a", "");
+        projectA = new Project();
         projectA.addBuildSpecification(new BuildSpecification("a1"));
         projectA.addBuildSpecification(new BuildSpecification("a2"));
         projectDao.save(projectA);
 
-        Project projectB = new Project("b", "");
+        projectB = new Project();
         projectB.addBuildSpecification(new BuildSpecification("b1"));
         projectB.addBuildSpecification(new BuildSpecification("b2"));
         projectDao.save(projectB);
@@ -723,12 +729,10 @@ public class HibernateBuildResultDaoTest extends MasterPersistenceTestCase
     {
         createFindLatestSuccessfulTestData();
 
-        Project projectA = projectDao.findByName("a");
         BuildResult result = buildResultDao.findLatestSuccessfulByProject(projectA);
         assertEquals(4, result.getNumber());
         assertEquals("a2", result.getSpecName().getName());
 
-        Project projectB = projectDao.findByName("b");
         result = buildResultDao.findLatestSuccessfulByProject(projectB);
         assertEquals(4, result.getNumber());
         assertEquals("b2", result.getSpecName().getName());
@@ -765,7 +769,7 @@ public class HibernateBuildResultDaoTest extends MasterPersistenceTestCase
 
     public void testGetBuildCountRange()
     {
-        Project p1 = new Project("p1", "this is p1 speaking");
+        Project p1 = new Project();
         BuildSpecification s1 = new BuildSpecification("s1");
         BuildSpecification s2 = new BuildSpecification("s2");
         p1.addBuildSpecification(s1);
@@ -790,7 +794,7 @@ public class HibernateBuildResultDaoTest extends MasterPersistenceTestCase
 
     public void testQuerySpecificationBuilds()
     {
-        Project p1 = new Project("p1", "this is p1 speaking");
+        Project p1 = new Project();
         BuildSpecification s1 = new BuildSpecification("s1");
         BuildSpecification s2 = new BuildSpecification("s2");
         p1.addBuildSpecification(s1);
@@ -825,7 +829,7 @@ public class HibernateBuildResultDaoTest extends MasterPersistenceTestCase
 
     public void testQuerySpecificationBuildsSuccess()
     {
-        Project p1 = new Project("p1", "this is p1 speaking");
+        Project p1 = new Project();
         BuildSpecification s1 = new BuildSpecification("s1");
         BuildSpecification s2 = new BuildSpecification("s2");
         p1.addBuildSpecification(s1);

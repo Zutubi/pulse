@@ -23,7 +23,7 @@ public class UnsuccessfulCountBuildsValueTest extends PulseTestCase
     protected void setUp() throws Exception
     {
         mockBuildManager = new Mock(BuildManager.class);
-        project = new Project("test", "test");
+        project = new Project();
         project.setId(12);
         spec = new BuildSpecification("hooray");
         spec.setId(1234);

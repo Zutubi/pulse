@@ -282,16 +282,6 @@
             <result name="success" type="velocity">index.vm</result>
         </action>
 
-        <action name="findProjects!default" class="com.zutubi.pulse.web.ActionSupport">
-            <interceptor-ref name="defaultStack"/>
-            <result name="success" type="velocity">find-project.vm</result>
-        </action>
-
-        <action name="findProjects" class="com.zutubi.pulse.web.project.FindProjectsAction">
-            <result name="input" type="velocity">find-project.vm</result>
-            <result name="success" type="velocity">find-project.vm</result>
-        </action>
-
         <action name="cloneProject" class="com.zutubi.pulse.web.project.CloneProjectAction">
             <result name="input" type="velocity">clone-project.vm</result>
             <result name="success" type="redirect">/configureProject.action?id=${cloneId}</result>

@@ -21,8 +21,8 @@ public class BuildQueueTest extends PulseTestCase
     {
         super.setUp();
 
-        p1 = new Project("p1", "test project 1");
-        p2 = new Project("p2", "test project 2");
+        p1 = new Project();
+        p2 = new Project();
     }
 
     public void testSimpleQueue()

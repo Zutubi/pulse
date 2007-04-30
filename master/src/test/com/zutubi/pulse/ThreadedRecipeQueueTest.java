@@ -705,7 +705,8 @@ public class ThreadedRecipeQueueTest extends TestCase implements EventListener
 
     private RecipeDispatchRequest createDispatchRequest(int type, long id, ProjectConfiguration projectConfig)
     {
-        Project project = new Project("test", "test description", new MockPulseFileDetails());
+        Project project = new Project();
+        project.setPulseFileDetails(new MockPulseFileDetails());
         BuildResult result = new BuildResult(new UnknownBuildReason(), project, new BuildSpecification("spec"), 100, false);
         BuildHostRequirements requirements = new MockBuildHostRequirements(type);
         RecipeRequest request = new RecipeRequest("project", "spec", id, null, null, null, false, null, new LinkedList<ResourceProperty>());

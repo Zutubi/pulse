@@ -101,8 +101,8 @@ public class HibernateUserDaoTest extends MasterPersistenceTestCase
     public void testProjects()
     {
         Set<Project> projects = new HashSet<Project>();
-        Project p1 = new Project("1", "project 1");
-        Project p2 = new Project("2", "project 2");
+        Project p1 = new Project();
+        Project p2 = new Project();
         projectDao.save(p1);
         projectDao.save(p2);
         projects.add(p1);
@@ -176,8 +176,8 @@ public class HibernateUserDaoTest extends MasterPersistenceTestCase
     public void testFindByShownProject()
     {
         Set<Project> projects = new HashSet<Project>();
-        Project p1 = new Project("1", "project 1");
-        Project p2 = new Project("2", "project 2");
+        Project p1 = new Project();
+        Project p2 = new Project();
         projectDao.save(p1);
         projectDao.save(p2);
         projects.add(p1);

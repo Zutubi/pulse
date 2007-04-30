@@ -25,7 +25,7 @@ public class UnsuccessfulCountDaysValueTest extends PulseTestCase
     protected void setUp() throws Exception
     {
         mockBuildManager = new Mock(BuildManager.class);
-        project = new Project("test", "test");
+        project = new Project();
         project.setId(99);
         spec = new BuildSpecification("hooray");
         spec.setId(1234);

@@ -13,16 +13,6 @@ import java.util.List;
  */
 public class Project extends Entity implements AclObjectIdentity, AclObjectIdentityAware, NamedEntity
 {
-    public Long getLastPollTime()
-    {
-        return lastPollTime;
-    }
-
-    public void setLastPollTime(Long lastPollTime)
-    {
-        this.lastPollTime = lastPollTime;
-    }
-
     public enum State
     {
         /**
@@ -44,37 +34,133 @@ public class Project extends Entity implements AclObjectIdentity, AclObjectIdent
         PAUSING
     }
 
+    private State state = State.IDLE;
+    private long nextBuildNumber = 1;
+    private Long lastPollTime;
+
+    // Not sure where the ACLs belong, in the database or in the configuration
+    private List<ProjectAclEntry> aclEntries;
+
+    // the following fields are being transfered to the configuration system and will be
+    // removed shortly.
     private String name;
     private String description;
     private String url;
     private PulseFileDetails pulseFileDetails;
     private List<PostBuildAction> postBuildActions = new LinkedList<PostBuildAction>();
     private ChangeViewer changeViewer;
-    private State state = State.IDLE;
-    private long nextBuildNumber = 1;
-    private Long lastPollTime;
-
     private List<BuildSpecification> buildSpecifications;
     private BuildSpecification defaultSpecification;
-
-    private List<ProjectAclEntry> aclEntries;
-
-    private Project parent;
 
     public Project()
     {
     }
 
-    public Project(String name, String description)
+    public Long getLastPollTime()
     {
-        this(name, description, new VersionedPulseFileDetails("pulse.xml"));
+        return lastPollTime;
     }
 
-    public Project(String name, String description, PulseFileDetails pulseFileDetails)
+    public void setLastPollTime(Long lastPollTime)
+    {
+        this.lastPollTime = lastPollTime;
+    }
+
+    public State getState()
+    {
+        return state;
+    }
+
+    /**
+     * used by hibernate.
+     */
+    private String getStateName()
+    {
+        return state.toString();
+    }
+
+    /**
+     * used by hibernate.
+     */
+    private void setStateName(String stateName)
+    {
+        state = State.valueOf(stateName);
+    }
+
+    public synchronized boolean isPaused()
+    {
+        return state == State.PAUSED || state == State.PAUSING;
+    }
+
+    public synchronized void buildCommenced()
+    {
+        state = State.BUILDING;
+    }
+
+    public synchronized void buildCompleted()
+    {
+        if (state == State.PAUSING)
+        {
+            state = State.PAUSED;
+        }
+        else
+        {
+            state = State.IDLE;
+        }
+    }
+
+    public synchronized void pause()
+    {
+        switch (state)
+        {
+            case BUILDING:
+                state = State.PAUSING;
+                break;
+            case IDLE:
+                state = State.PAUSED;
+                break;
+        }
+    }
+
+    public synchronized void resume()
+    {
+        switch (state)
+        {
+            case PAUSED:
+                state = State.IDLE;
+                break;
+            case PAUSING:
+                state = State.BUILDING;
+                break;
+        }
+    }
+
+    public long getNextBuildNumber()
+    {
+        return nextBuildNumber;
+    }
+
+    public void setNextBuildNumber(long nextBuildNumber)
+    {
+        this.nextBuildNumber = nextBuildNumber;
+    }
+
+    /**
+     * @deprecated
+     */
+    public Project(String name, String description)
     {
         this.name = name;
         this.description = description;
-        this.pulseFileDetails = pulseFileDetails;
+        this.pulseFileDetails = new VersionedPulseFileDetails("pulse.xml");
+    }
+
+    /**
+     * @deprecated
+     */
+    public Project(String name)
+    {
+        this(name, null);
     }
 
     /**
@@ -144,21 +230,6 @@ public class Project extends Entity implements AclObjectIdentity, AclObjectIdent
         }
 
         return copy;
-    }
-
-    /**
-     * A reference to this projects parent.  Project parents are used to define the project template hierarchy.
-     *
-     * @return parent project.
-     */
-    public Project getParent()
-    {
-        return parent;
-    }
-
-    public void setParent(Project parent)
-    {
-        this.parent = parent;
     }
 
     public String getName()
@@ -359,68 +430,6 @@ public class Project extends Entity implements AclObjectIdentity, AclObjectIdent
         return null;
     }
 
-    public State getState()
-    {
-        return state;
-    }
-
-    private String getStateName()
-    {
-        return state.toString();
-    }
-
-    private void setStateName(String stateName)
-    {
-        state = State.valueOf(stateName);
-    }
-
-    public synchronized boolean isPaused()
-    {
-        return state == State.PAUSED || state == State.PAUSING;
-    }
-
-    public synchronized void buildCommenced()
-    {
-        state = State.BUILDING;
-    }
-
-    public synchronized void buildCompleted()
-    {
-        if (state == State.PAUSING)
-        {
-            state = State.PAUSED;
-        }
-        else
-        {
-            state = State.IDLE;
-        }
-    }
-
-    public synchronized void pause()
-    {
-        switch (state)
-        {
-            case BUILDING:
-                state = State.PAUSING;
-                break;
-            case IDLE:
-                state = State.PAUSED;
-                break;
-        }
-    }
-
-    public synchronized void resume()
-    {
-        switch (state)
-        {
-            case PAUSED:
-                state = State.IDLE;
-                break;
-            case PAUSING:
-                state = State.BUILDING;
-                break;
-        }
-    }
 
     public AclObjectIdentity getAclObjectIdentity()
     {
@@ -480,13 +489,4 @@ public class Project extends Entity implements AclObjectIdentity, AclObjectIdent
         }
     }
 
-    public long getNextBuildNumber()
-    {
-        return nextBuildNumber;
-    }
-
-    public void setNextBuildNumber(long nextBuildNumber)
-    {
-        this.nextBuildNumber = nextBuildNumber;
-    }
 }

@@ -12,8 +12,6 @@ public interface ProjectDao extends EntityDao<Project>
 {
     Project findByName(String name);
 
-    List<Project> findByLikeName(String name);
-
     Project findByBuildSpecification(BuildSpecification buildSpecification);
 
     void save(VersionedPulseFileDetails details);

@@ -90,4 +90,6 @@ public class ProjectConfiguration extends AbstractNamedConfiguration implements 
     {
         return extensions;
     }
+
+    
 }
