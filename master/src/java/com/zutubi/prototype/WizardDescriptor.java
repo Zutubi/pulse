@@ -1,7 +1,7 @@
 package com.zutubi.prototype;
 
-import com.zutubi.prototype.model.Wizard;
 import com.zutubi.prototype.model.HiddenFieldDescriptor;
+import com.zutubi.prototype.model.Wizard;
 import com.zutubi.prototype.type.record.Record;
 import com.zutubi.prototype.wizard.WizardState;
 import com.zutubi.prototype.wizard.WizardTransition;

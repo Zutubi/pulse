@@ -1,8 +1,10 @@
 package com.zutubi.prototype;
 
 import com.zutubi.config.annotations.Handler;
+import com.zutubi.config.annotations.FieldType;
 import com.zutubi.prototype.handler.AnnotationHandler;
-import com.zutubi.prototype.model.SelectFieldDescriptor;
+import com.zutubi.prototype.handler.OptionAnnotationHandler;
+import com.zutubi.prototype.model.*;
 import com.zutubi.prototype.type.CollectionType;
 import com.zutubi.prototype.type.CompositeType;
 import com.zutubi.prototype.type.EnumType;
@@ -13,20 +15,17 @@ import com.zutubi.prototype.type.Type;
 import com.zutubi.prototype.type.TypeProperty;
 import com.zutubi.prototype.type.TypeRegistry;
 import com.zutubi.prototype.type.record.PathUtils;
+import com.zutubi.prototype.config.ConfigurationPersistenceManager;
 import com.zutubi.pulse.prototype.config.EnumOptionProvider;
 import com.zutubi.util.bean.DefaultObjectFactory;
 import com.zutubi.util.bean.ObjectFactory;
 import com.zutubi.util.logging.Logger;
+import com.zutubi.util.AnnotationUtils;
 import com.zutubi.validation.annotations.Constraint;
 import com.zutubi.validation.validators.RequiredValidator;
 
 import java.lang.annotation.Annotation;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  *
@@ -55,22 +54,8 @@ public class FormDescriptorFactory
         defaultFieldTypeMapping.put(Long.class, "text");
         defaultFieldTypeMapping.put(Long.TYPE, "text");
     }
-/*
-    private static final Map<Class, Class<? extends AnnotationHandler>> defaultHandlerMapping = new HashMap<Class, Class<? extends AnnotationHandler>>();
-    static
-    {
-        defaultHandlerMapping.put(Field.class, FieldAnnotationHandler.class);
-        defaultHandlerMapping.put(Form.class, FormAnnotationHandler.class);
-        defaultHandlerMapping.put(Password.class, FieldAnnotationHandler.class);
-        defaultHandlerMapping.put(Reference.class, ReferenceAnnotationHandler.class);
-        defaultHandlerMapping.put(Select.class, SelectAnnotationHandler.class);
-        defaultHandlerMapping.put(Password.class, FieldAnnotationHandler.class);
-        defaultHandlerMapping.put(Text.class, FieldAnnotationHandler.class);
-        defaultHandlerMapping.put(TextArea.class, FieldAnnotationHandler.class);
-        // typeselect
-    }
-*/
 
+    private ConfigurationPersistenceManager configurationPersistenceManager;
     private TypeRegistry typeRegistry;
 
     public FormDescriptor createDescriptor(String path, Class clazz)
@@ -122,7 +107,6 @@ public class FormDescriptorFactory
                 fd.setPath(PathUtils.getPath(path, property.getName()));
                 fd.setProperty(property);
                 fd.setName(property.getName());
-                fd.setType("select");
                 fd.setMultiple(true);
                 addFieldParameters(type, path, property, fd);
                 fieldDescriptors.add(fd);
@@ -135,36 +119,43 @@ public class FormDescriptorFactory
     private void addFieldParameters(CompositeType type, String path, TypeProperty property, FieldDescriptor fd)
     {
         handleAnnotations(type, fd, property.getAnnotations());
-        if("select".equals(fd.getType()) && !fd.hasParameter("list"))
+        if(fd instanceof SelectFieldDescriptor)
         {
-            addDefaultOptions(path, property, (SelectFieldDescriptor)fd);
+            SelectFieldDescriptor select = (SelectFieldDescriptor) fd;
+            if (select.getList() == null)
+            {
+                addDefaultOptions(path, property, select);
+            }
         }
     }
 
     private FieldDescriptor createField(String path, TypeProperty property)
     {
-        SimpleType propertyType = (SimpleType) property.getType();
-        String fieldType = "select";
-        if(propertyType instanceof PrimitiveType)
+        String fieldType = FieldType.TEXT;
+        com.zutubi.config.annotations.Field field = AnnotationUtils.findAnnotation(property.getAnnotations(), com.zutubi.config.annotations.Field.class);
+        if(field != null)
         {
-            // some little bit of magic, take a guess at any property called password. If we come up with any
-            // other magical cases, then we can refactor this a bit.
-            if (property.getName().equals("password"))
+            fieldType = field.type();
+        }
+        else
+        {
+            SimpleType propertyType = (SimpleType) property.getType();
+            if(propertyType instanceof PrimitiveType)
             {
-                fieldType = "password";
-            }
-            else
-            {
-                fieldType = defaultFieldTypeMapping.get(propertyType.getClazz());
+                // some little bit of magic, take a guess at any property called password. If we come up with any
+                // other magical cases, then we can refactor this a bit.
+                if (property.getName().equals("password"))
+                {
+                    fieldType = "password";
+                }
+                else
+                {
+                    fieldType = defaultFieldTypeMapping.get(propertyType.getClazz());
+                }
             }
         }
 
-        FieldDescriptor fd = new FieldDescriptor();
-        if (fieldType.equals("select"))
-        {
-            fd = new SelectFieldDescriptor();            
-        }
-
+        FieldDescriptor fd = createFieldOfType(fieldType);
         fd.setType(fieldType);
         fd.setPath(PathUtils.getPath(path, property.getName()));
         fd.setProperty(property);
@@ -172,24 +163,36 @@ public class FormDescriptorFactory
         return fd;
     }
 
+    private FieldDescriptor createFieldOfType(String type)
+    {
+        // FIXME: incomplete
+        if(type.equals(FieldType.CHECKBOX))
+        {
+            return new CheckboxFieldDescriptor();
+        }
+        else if(type.equals(FieldType.HIDDEN))
+        {
+            return new HiddenFieldDescriptor();
+        }
+        else if(type.equals(FieldType.PASSWORD))
+        {
+            return new PasswordFieldDescriptor();
+        }
+        else if(type.equals(FieldType.SELECT))
+        {
+            return new SelectFieldDescriptor();
+        }
+        else
+        {
+            return new TextFieldDescriptor();
+        }
+    }
+
     private void addDefaultOptions(String path, TypeProperty typeProperty, SelectFieldDescriptor fd)
     {
-        // FIXME this dups code in the OptionAnnotationHandler
-        // FIXME i have not fixed now because this class itself seems to
-        // FIXME a prime candidate for refactoring when we understand
-        // FIXME things better
         if(typeProperty.getType().getTargetType() instanceof EnumType)
         {
-            OptionProvider optionProvider = new EnumOptionProvider();
-            fd.setList(optionProvider.getOptions(path, typeProperty));
-            if (optionProvider.getOptionKey() != null)
-            {
-                fd.setListKey(optionProvider.getOptionKey());
-            }
-            if (optionProvider.getOptionValue() != null)
-            {
-                fd.setListValue(optionProvider.getOptionValue());
-            }
+            OptionAnnotationHandler.process(configurationPersistenceManager, new EnumOptionProvider(), path, fd);
         }
         else
         {
@@ -213,16 +216,17 @@ public class FormDescriptorFactory
     {
         for (Annotation annotation : annotations)
         {
-            if (annotation.annotationType().getName().startsWith("java.lang"))
+            Class<? extends Annotation> annotationType = annotation.annotationType();
+            if (annotationType.getName().startsWith("java.lang"))
             {
                 // ignore standard annotations.
                 continue;
             }
 
             // recurse up the annotation hierarchy.
-            handleAnnotations(type, descriptor, Arrays.asList(annotation.annotationType().getAnnotations()));
-
-            Handler handlerAnnotation = annotation.annotationType().getAnnotation(Handler.class);
+            handleAnnotations(type, descriptor, Arrays.asList(annotationType.getAnnotations()));
+            
+            Handler handlerAnnotation = annotationType.getAnnotation(Handler.class);
             if (handlerAnnotation != null)
             {
                 try
@@ -258,11 +262,6 @@ public class FormDescriptorFactory
         }
     }
 
-    /**
-     * Required resource
-     *
-     * @param typeRegistry instance.
-     */
     public void setTypeRegistry(TypeRegistry typeRegistry)
     {
         this.typeRegistry = typeRegistry;
@@ -271,5 +270,10 @@ public class FormDescriptorFactory
     public void setObjectFactory(ObjectFactory objectFactory)
     {
         this.objectFactory = objectFactory;
+    }
+
+    public void setConfigurationPersistenceManager(ConfigurationPersistenceManager configurationPersistenceManager)
+    {
+        this.configurationPersistenceManager = configurationPersistenceManager;
     }
 }

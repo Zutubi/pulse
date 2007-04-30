@@ -161,6 +161,47 @@ public class AnnotationUtils
         return properties;
     }
 
+    public static <T extends Annotation> T findAnnotation(PropertyDescriptor property, Class<T> clazz) throws IntrospectionException
+    {
+        List<Annotation> from = annotationsFromProperty(property);
+        return findAnnotation(from, clazz);
+    }
+
+    @SuppressWarnings({"unchecked"})
+    public static <T extends Annotation> T findAnnotation(List<Annotation> from, Class<T> clazz)
+    {
+        Set<Class<? extends Annotation>> seenTypes = new HashSet<Class<? extends Annotation>>();
+        CollectionUtils.map(from, new Mapping<Annotation, Class<? extends Annotation>>()
+        {
+            public Class<? extends Annotation> map(Annotation annotation)
+            {
+                return annotation.annotationType();
+            }
+        }, seenTypes);
+
+        Queue<Annotation> toProcess = new LinkedList<Annotation>(from);
+        while(!toProcess.isEmpty())
+        {
+            Annotation a = toProcess.remove();
+            if(clazz.isInstance(a))
+            {
+                return (T) a;
+            }
+
+            Class<? extends Annotation> type = a.annotationType();
+            seenTypes.add(type);
+            for(Annotation meta: type.getAnnotations())
+            {
+                if(!seenTypes.contains(meta.annotationType()))
+                {
+                    toProcess.offer(meta);
+                }
+            }
+        }
+
+        return null;
+    }
+
     private static final Set<String> internalMethods = new HashSet<String>();
     static
     {

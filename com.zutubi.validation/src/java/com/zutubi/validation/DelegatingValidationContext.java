@@ -5,6 +5,7 @@ import com.zutubi.validation.i18n.*;
 import java.util.List;
 import java.util.Map;
 import java.util.Collection;
+import java.util.Set;
 
 /**
  * <class-comment/>
@@ -98,9 +99,20 @@ public class DelegatingValidationContext implements ValidationContext
         return validationAware.hasFieldError(field);
     }
 
+    @SuppressWarnings({"unchecked"})
     public Map getFieldErrors()
     {
         return validationAware.getFieldErrors();
+    }
+
+    public void addIgnoredField(String field)
+    {
+        validationAware.addIgnoredField(field);
+    }
+
+    public void addIgnoredFields(Set<String> fields)
+    {
+        validationAware.addIgnoredFields(fields);
     }
 
     public void addActionMessage(String message)

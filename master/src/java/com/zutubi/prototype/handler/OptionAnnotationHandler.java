@@ -2,8 +2,10 @@ package com.zutubi.prototype.handler;
 
 import com.zutubi.prototype.Descriptor;
 import com.zutubi.prototype.OptionProvider;
+import com.zutubi.prototype.config.ConfigurationPersistenceManager;
 import com.zutubi.prototype.model.SelectFieldDescriptor;
 import com.zutubi.prototype.type.CompositeType;
+import com.zutubi.prototype.type.record.PathUtils;
 import com.zutubi.util.ClassLoaderUtils;
 import com.zutubi.util.bean.ObjectFactory;
 
@@ -15,6 +17,7 @@ import java.util.Collection;
  */
 public abstract class OptionAnnotationHandler extends FieldAnnotationHandler
 {
+    private ConfigurationPersistenceManager configurationPersistenceManager;
     /**
      * Object factory provides access to object instantiation services.
      */
@@ -30,7 +33,14 @@ public abstract class OptionAnnotationHandler extends FieldAnnotationHandler
         OptionProvider optionProvider = (OptionProvider) objectFactory.buildBean(ClassLoaderUtils.loadAssociatedClass(annotatedType.getClazz(), className));
 
         SelectFieldDescriptor field = (SelectFieldDescriptor) descriptor;
-        Collection optionList = optionProvider.getOptions(field.getPath(), field.getProperty());
+        String fieldPath = field.getPath();
+        process(configurationPersistenceManager, optionProvider, fieldPath, field);
+    }
+
+    public static void process(ConfigurationPersistenceManager configurationPersistenceManager, OptionProvider optionProvider, String fieldPath, SelectFieldDescriptor field)
+    {
+        String instancePath = PathUtils.getParentPath(fieldPath);
+        Collection optionList = optionProvider.getOptions(configurationPersistenceManager.getInstance(instancePath), fieldPath, field.getProperty());
         field.setList(optionList);
         if (optionProvider.getOptionKey() != null)
         {
@@ -52,5 +62,10 @@ public abstract class OptionAnnotationHandler extends FieldAnnotationHandler
     public void setObjectFactory(ObjectFactory objectFactory)
     {
         this.objectFactory = objectFactory;
+    }
+
+    public void setConfigurationPersistenceManager(ConfigurationPersistenceManager configurationPersistenceManager)
+    {
+        this.configurationPersistenceManager = configurationPersistenceManager;
     }
 }

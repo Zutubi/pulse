@@ -1,15 +1,12 @@
 package com.zutubi.prototype.wizard.webwork;
 
 import com.zutubi.i18n.Messages;
+import com.zutubi.prototype.FieldDescriptor;
 import com.zutubi.prototype.FormDescriptor;
 import com.zutubi.prototype.FormDescriptorFactory;
 import com.zutubi.prototype.config.ConfigurationPersistenceManager;
 import com.zutubi.prototype.model.SelectFieldDescriptor;
-import com.zutubi.prototype.type.CompositeType;
-import com.zutubi.prototype.type.SimpleType;
-import com.zutubi.prototype.type.TypeException;
-import com.zutubi.prototype.type.TypeProperty;
-import com.zutubi.prototype.type.TypeRegistry;
+import com.zutubi.prototype.type.*;
 import com.zutubi.prototype.type.record.MutableRecord;
 import com.zutubi.prototype.type.record.MutableRecordImpl;
 import com.zutubi.prototype.type.record.Record;
@@ -19,12 +16,9 @@ import com.zutubi.prototype.wizard.Wizard;
 import com.zutubi.prototype.wizard.WizardState;
 import com.zutubi.prototype.wizard.WizardTransition;
 import static com.zutubi.prototype.wizard.WizardTransition.*;
-import com.zutubi.validation.XWorkValidationAdapter;
+import com.zutubi.validation.ValidationAware;
 
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.TreeMap;
+import java.util.*;
 
 /**
  * This wizard walks a user through the project configuration process. During project configuration,
@@ -158,6 +152,8 @@ public abstract class AbstractTypeWizard implements Wizard
 
     public abstract class TypeWizardState implements WizardState
     {
+        private Set<String> ignoredFields = new HashSet<String>();
+        
         @SuppressWarnings({"unchecked"})
         public void updateRecord(Map parameters)
         {
@@ -174,11 +170,25 @@ public abstract class AbstractTypeWizard implements Wizard
 
         public FormDescriptor createFormDescriptor(FormDescriptorFactory formDescriptorFactory, String path)
         {
-            return formDescriptorFactory.createDescriptor(path, getType());
+            CompositeType type = getType();
+            FormDescriptor descriptor = formDescriptorFactory.createDescriptor(path, type);
+            Iterator<FieldDescriptor> fieldIt = descriptor.getFieldDescriptors().iterator();
+            while(fieldIt.hasNext())
+            {
+                TypeProperty property = type.getProperty(fieldIt.next().getName());
+                if(property != null && property.getAnnotation(com.zutubi.config.annotations.Wizard.Ignore.class) != null)
+                {
+                    ignoredFields.add(property.getName());
+                    fieldIt.remove();
+                }
+            }
+            
+            return descriptor;
         }
 
-        public boolean validate(String path, XWorkValidationAdapter validationCallback) throws TypeException
+        public boolean validate(String path, ValidationAware validationCallback) throws TypeException
         {
+            validationCallback.addIgnoredFields(ignoredFields);
             return configurationPersistenceManager.validate(path, null, currentState.getRecord(), validationCallback);
         }
 
@@ -347,7 +357,7 @@ public abstract class AbstractTypeWizard implements Wizard
                 return descriptor;
             }
 
-            public boolean validate(String path, XWorkValidationAdapter validationCallback) throws TypeException
+            public boolean validate(String path, ValidationAware validationCallback) throws TypeException
             {
                 return true;
             }

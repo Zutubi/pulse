@@ -3,12 +3,17 @@ package com.zutubi.validation;
 import java.util.List;
 import java.util.Map;
 import java.util.Collection;
+import java.util.Set;
 
 /**
  * <class-comment/>
  */
 public interface ValidationAware
 {
+    void addIgnoredField(String field);
+
+    void addIgnoredFields(Set<String> fields);
+
     void addActionMessage(String message);
 
     void addActionError(String error);

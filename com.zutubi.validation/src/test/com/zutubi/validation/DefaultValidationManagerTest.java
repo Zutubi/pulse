@@ -49,6 +49,15 @@ public class DefaultValidationManagerTest extends TestCase
         assertEquals("animal.head.required", fieldErrors.get(0));
     }
 
+    public void testIgnoredField() throws ValidationException
+    {
+        MockAnimal animal = new MockAnimal();
+        validationContext.addIgnoredField("head");
+        validationManager.validate(animal, validationContext);
+        assertFalse(validationContext.hasErrors());
+        assertFalse(validationContext.hasFieldErrors());
+    }
+
     public void testMockWallet() throws ValidationException
     {
         MockWallet wallet = new MockWallet();

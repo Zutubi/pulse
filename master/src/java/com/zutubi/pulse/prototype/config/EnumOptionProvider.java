@@ -14,7 +14,7 @@ import java.util.Map;
  */
 public class EnumOptionProvider extends MapOptionProvider
 {
-    public Map<String,String> getMap(String path, TypeProperty property)
+    public Map<String,String> getMap(Object instance, String path, TypeProperty property)
     {
         EnumType enumType = (EnumType) property.getType().getTargetType();
         Class<? extends Enum> enumClass = enumType.getClazz();

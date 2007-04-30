@@ -4,6 +4,9 @@ import com.zutubi.validation.DelegatingValidationContext;
 import com.zutubi.validation.ValidationAware;
 import com.zutubi.validation.i18n.TextProvider;
 
+import java.util.Set;
+import java.util.HashSet;
+
 /**
  * A specialised validation context that carries extra information specific
  * to the Pulse configuration system.

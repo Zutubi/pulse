@@ -14,4 +14,8 @@ import java.lang.annotation.Target;
 public @interface Wizard
 {
     String value();
+
+    @Target(ElementType.METHOD)
+    @Retention(RetentionPolicy.RUNTIME)
+    public @interface Ignore {}
 }

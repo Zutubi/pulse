@@ -15,6 +15,11 @@ public class SelectFieldDescriptor extends FieldDescriptor
         setType("select");
     }
 
+    public Collection getList()
+    {
+        return (Collection) getParameter("list");
+    }
+
     public void setList(Collection list)
     {
         addParameter("list", list);

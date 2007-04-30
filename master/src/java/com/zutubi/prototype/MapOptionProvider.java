@@ -12,9 +12,9 @@ import java.util.*;
  */
 public abstract class MapOptionProvider implements OptionProvider
 {
-    public List<Map.Entry<String, String>> getOptions(String path, TypeProperty property)
+    public List<Map.Entry<String, String>> getOptions(Object instance, String path, TypeProperty property)
     {
-        Map<String, String> optionMap = getMap(path, property);
+        Map<String, String> optionMap = getMap(instance, path, property);
         List<Map.Entry<String, String>> options = new ArrayList<Map.Entry<String, String>>(optionMap.entrySet());
         sort(options);
         return options;
@@ -33,7 +33,7 @@ public abstract class MapOptionProvider implements OptionProvider
         });
     }
 
-    protected abstract Map<String, String> getMap(String path, TypeProperty property);
+    protected abstract Map<String, String> getMap(Object instance, String path, TypeProperty property);
 
     public String getOptionKey()
     {

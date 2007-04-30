@@ -17,7 +17,7 @@ public class DefaultReferenceOptionProvider extends MapOptionProvider
 {
     private ConfigurationPersistenceManager configurationPersistenceManager;
 
-    public Map<String,String> getMap(String path, TypeProperty property)
+    public Map<String,String> getMap(Object instance, String path, TypeProperty property)
     {
         // We need to find all objects of a given type in a given scope...
         ReferenceType referenceType = (ReferenceType) property.getType().getTargetType();

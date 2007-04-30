@@ -7,6 +7,7 @@ import com.zutubi.prototype.FormDescriptor;
 import com.zutubi.prototype.FormDescriptorFactory;
 import com.zutubi.i18n.Messages;
 import com.zutubi.validation.XWorkValidationAdapter;
+import com.zutubi.validation.ValidationAware;
 
 import java.util.Map;
 
@@ -36,5 +37,5 @@ public interface WizardState
 
     FormDescriptor createFormDescriptor(FormDescriptorFactory formDescriptorFactory, String path);
 
-    boolean validate(String path, XWorkValidationAdapter validationCallback) throws TypeException;
+    boolean validate(String path, ValidationAware validationCallback) throws TypeException;
 }

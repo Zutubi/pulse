@@ -2,9 +2,7 @@ package com.zutubi.validation;
 
 import com.opensymphony.xwork.*;
 
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * <class-comment/>
@@ -12,12 +10,23 @@ import java.util.Map;
 public class XWorkValidationAdapter implements ValidationAware
 {
     private com.opensymphony.xwork.ValidationAware delegate;
+    private Set<String> ignoredFields = new HashSet<String>();
 
     public XWorkValidationAdapter(com.opensymphony.xwork.ValidationAware delegate)
     {
         this.delegate = delegate;
     }
 
+    public void addIgnoredField(String field)
+    {
+        ignoredFields.add(field);
+    }
+
+    public void addIgnoredFields(Set<String> ignoredFields)
+    {
+        this.ignoredFields.addAll(ignoredFields);
+    }
+    
     public void addActionMessage(String message)
     {
         delegate.addActionMessage(message);
@@ -30,7 +39,10 @@ public class XWorkValidationAdapter implements ValidationAware
 
     public void addFieldError(String field, String error)
     {
-        delegate.addFieldError(field, error);
+        if (!ignoredFields.contains(field))
+        {
+            delegate.addFieldError(field, error);
+        }
     }
 
     public Collection<String> getActionMessages()

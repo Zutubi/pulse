@@ -1,10 +1,6 @@
 package com.zutubi.pulse.core.config;
 
-import com.zutubi.pulse.core.config.ResourceProperty;
-import com.zutubi.pulse.core.config.ResourceVersion;
-import com.zutubi.config.annotations.SymbolicName;
-import com.zutubi.config.annotations.Transient;
-import com.zutubi.config.annotations.Form;
+import com.zutubi.config.annotations.*;
 
 import java.util.Map;
 import java.util.TreeMap;
@@ -18,6 +14,7 @@ import java.util.TreeMap;
 public class Resource extends AbstractNamedConfiguration
 {
     private Map<String, ResourceProperty> properties = new TreeMap<String, ResourceProperty>();
+    @Select(optionProvider = "com.zutubi.pulse.prototype.config.agent.ResourceVersionOptionProvider")
     private String defaultVersion;
     private Map<String, ResourceVersion> versions = new TreeMap<String, ResourceVersion>();
 
@@ -41,6 +38,7 @@ public class Resource extends AbstractNamedConfiguration
         return versions.get(id);
     }
 
+    @Wizard.Ignore
     public String getDefaultVersion()
     {
         return defaultVersion;
