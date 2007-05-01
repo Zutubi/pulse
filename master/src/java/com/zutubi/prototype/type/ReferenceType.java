@@ -1,6 +1,7 @@
 package com.zutubi.prototype.type;
 
 import com.zutubi.prototype.config.ConfigurationPersistenceManager;
+import com.zutubi.pulse.core.config.Configuration;
 
 /**
  * A type that represents a reference to some composite type.  The reference
@@ -40,7 +41,6 @@ public class ReferenceType extends SimpleType implements Type
 
     public Object unstantiate(Object instance) throws TypeException
     {
-        // FIXME
-        throw new TypeException("Unstantiate not yet supported for references");
+        return ((Configuration)instance).getConfigurationPath();
     }
 }
