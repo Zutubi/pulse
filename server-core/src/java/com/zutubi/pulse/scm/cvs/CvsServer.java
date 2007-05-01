@@ -174,7 +174,19 @@ public class CvsServer extends CachingSCMServer
     public void update(String id, File workingDirectory, Revision rev, SCMCheckoutEventHandler handler) throws SCMException
     {
         assertRevisionArgValid(rev);
-        client.update(workingDirectory, (CvsRevision) rev, handler);
+
+        // CIB-833: temporary work around for correctly handling update requests.
+        File updatePath = new File(workingDirectory, module);
+        if (updatePath.isDirectory())
+        {
+            // we assume that we are dealing with a standard module.
+            client.update(updatePath, (CvsRevision) rev, handler);
+        }
+        else
+        {
+            // we have no way of dealing with alias modules yet, so revert to old behaviour.
+            client.update(workingDirectory, (CvsRevision) rev, handler);
+        }
     }
 
     /**
