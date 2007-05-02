@@ -39,28 +39,34 @@ public class CommandOutputStream extends OutputStream implements Runnable
 
     public synchronized void write(int b)
     {
-        buffer[offset++] = (byte) b;
-        checkBuffer();
+        if (buffer != null)
+        {
+            buffer[offset++] = (byte) b;
+            checkBuffer();
+        }
     }
 
     public synchronized void write(byte b[], int off, int len)
     {
-        if (offset + len <= MINIMUM_SIZE)
+        if (buffer != null)
         {
-            // It fits in the buffer, chuck it there
-            System.arraycopy(b, off, buffer, offset, len);
-            offset += len;
-            checkBuffer();
-        }
-        else
-        {
-            // We have more data than we need.  Assemble into a buffer and
-            // send.
-            byte[] sendBuffer = new byte[offset + len];
-            System.arraycopy(buffer, 0, sendBuffer, 0, offset);
-            System.arraycopy(b, off, sendBuffer, offset, len);
+            if (offset + len <= MINIMUM_SIZE)
+            {
+                // It fits in the buffer, chuck it there
+                System.arraycopy(b, off, buffer, offset, len);
+                offset += len;
+                checkBuffer();
+            }
+            else
+            {
+                // We have more data than we need.  Assemble into a buffer and
+                // send.
+                byte[] sendBuffer = new byte[offset + len];
+                System.arraycopy(buffer, 0, sendBuffer, 0, offset);
+                System.arraycopy(b, off, sendBuffer, offset, len);
 
-            sendEvent(sendBuffer);
+                sendEvent(sendBuffer);
+            }
         }
     }
 
