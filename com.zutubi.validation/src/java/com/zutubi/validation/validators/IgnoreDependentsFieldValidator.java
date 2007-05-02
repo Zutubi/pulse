@@ -36,9 +36,17 @@ public class IgnoreDependentsFieldValidator extends FieldValidatorSupport
 
         if(!equal)
         {
-            for(String dependentField: dependentFields)
+            if(dependentFields.length > 0)
             {
-                getValidationContext().addIgnoredField(dependentField);
+                for(String dependentField: dependentFields)
+                {
+                    getValidationContext().addIgnoredField(dependentField);
+                }
+            }
+            else
+            {
+                // Turn off field validation altogether
+                getValidationContext().ignoreAllFields();
             }
         }
     }

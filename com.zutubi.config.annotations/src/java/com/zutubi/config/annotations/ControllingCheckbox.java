@@ -10,7 +10,8 @@ import java.lang.annotation.RetentionPolicy;
 /**
  * A checkbox field that controls dependent fields.  When the checkbox is in
  * a certain state, dependent fields will be disabled and ignored during
- * validation.
+ * validation.  If no dependent fields are specified, the checkbox controls
+ * all other fields in the form.
  */
 @Target({ElementType.METHOD, ElementType.FIELD})
 @Retention(RetentionPolicy.RUNTIME)

@@ -115,6 +115,11 @@ public class DelegatingValidationContext implements ValidationContext
         validationAware.addIgnoredFields(fields);
     }
 
+    public void ignoreAllFields()
+    {
+        validationAware.ignoreAllFields();
+    }
+
     public void addActionMessage(String message)
     {
         validationAware.addActionMessage(message);

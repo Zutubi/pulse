@@ -1,9 +1,6 @@
 package com.zutubi.pulse.prototype.config.admin;
 
-import com.zutubi.config.annotations.ConfigurationCheck;
-import com.zutubi.config.annotations.Form;
-import com.zutubi.config.annotations.Password;
-import com.zutubi.config.annotations.SymbolicName;
+import com.zutubi.config.annotations.*;
 import com.zutubi.validation.annotations.Required;
 import com.zutubi.pulse.core.config.AbstractConfiguration;
 
@@ -11,12 +8,13 @@ import com.zutubi.pulse.core.config.AbstractConfiguration;
  * Configuration for LDAP auth integration.
  */
 @SymbolicName("ldapConfig")
-@Form(fieldOrder={"enabled", "ldapUrl", "baseDn", "managerDn", "managerPassword",
+@Form(fieldOrder = {"enabled", "ldapUrl", "baseDn", "managerDn", "managerPassword",
         "userBaseDn", "userFilter", "autoAddUsers", "emailAttribute", "groupBaseDn", "groupSearchFilter",
         "groupRoleAttribute", "searchGroupSubtree", "followReferrals", "escapeSpaceCharacters"})
 @ConfigurationCheck("LDAPConfigurationCheckHandler")
 public class LDAPConfiguration extends AbstractConfiguration
 {
+    @ControllingCheckbox
     private boolean enabled;
     @Required
     private String ldapUrl;

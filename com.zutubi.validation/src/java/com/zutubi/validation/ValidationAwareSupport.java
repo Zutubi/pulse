@@ -11,6 +11,7 @@ public class ValidationAwareSupport implements ValidationAware
     private Collection<String> actionErrors;
     private Collection<String> actionMessages;
     private Map<String, List<String>> fieldErrors;
+    private boolean ignoreAllFields = false;
 
     public void addIgnoredField(String field)
     {
@@ -24,6 +25,12 @@ public class ValidationAwareSupport implements ValidationAware
         {
             addIgnoredField(field);
         }
+    }
+
+    public void ignoreAllFields()
+    {
+        fieldErrors = null;
+        ignoreAllFields = true;
     }
 
     private Set<String> getIgnoredFields()
@@ -47,7 +54,7 @@ public class ValidationAwareSupport implements ValidationAware
 
     public void addFieldError(String field, String error)
     {
-        if (!getIgnoredFields().contains(field))
+        if (!ignoreAllFields && !getIgnoredFields().contains(field))
         {
             Map<String, List<String>> errors = internalGetFieldErrors();
             if (!errors.containsKey(field))

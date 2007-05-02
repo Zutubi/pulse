@@ -4,6 +4,7 @@ import com.zutubi.config.annotations.*;
 import com.zutubi.pulse.core.config.AbstractNamedConfiguration;
 import com.zutubi.pulse.core.config.Resource;
 import com.zutubi.validation.annotations.Numeric;
+import com.zutubi.validation.annotations.Required;
 
 import java.util.Map;
 
@@ -15,11 +16,12 @@ public class AgentConfiguration extends AbstractNamedConfiguration
 {
     @Internal
     private long agentStateId;
-    @ControllingCheckbox(invert = true, dependentFields = {"host", "port"})
+    @ControllingCheckbox(dependentFields = {"host", "port"})
     private boolean remote = true;
+    @Required
     private String host;
     @Numeric(min = 1)
-    private int port;
+    private int port = 8090;
     private Map<String, Resource> resources;
 
     public boolean isRemote()

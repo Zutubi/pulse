@@ -1,15 +1,15 @@
 package com.zutubi.validation;
 
-import com.opensymphony.xwork.*;
-
 import java.util.*;
 
 /**
- * <class-comment/>
+ * Adapts from Zutubi validation aware to xwork equivalent.
  */
+@SuppressWarnings({"unchecked"})
 public class XWorkValidationAdapter implements ValidationAware
 {
     private com.opensymphony.xwork.ValidationAware delegate;
+    private boolean ignoreAllFields = false;
     private Set<String> ignoredFields = new HashSet<String>();
 
     public XWorkValidationAdapter(com.opensymphony.xwork.ValidationAware delegate)
@@ -32,7 +32,13 @@ public class XWorkValidationAdapter implements ValidationAware
             addIgnoredField(field);
         }
     }
-    
+
+    public void ignoreAllFields()
+    {
+        ignoreAllFields = true;
+        delegate.setFieldErrors(new HashMap());
+    }
+
     public void addActionMessage(String message)
     {
         delegate.addActionMessage(message);
@@ -45,7 +51,7 @@ public class XWorkValidationAdapter implements ValidationAware
 
     public void addFieldError(String field, String error)
     {
-        if (!ignoredFields.contains(field))
+        if (!ignoreAllFields && !ignoredFields.contains(field))
         {
             delegate.addFieldError(field, error);
         }

@@ -14,6 +14,8 @@ public interface ValidationAware
 
     void addIgnoredFields(Set<String> fields);
 
+    void ignoreAllFields();
+    
     void addActionMessage(String message);
 
     void addActionError(String error);
