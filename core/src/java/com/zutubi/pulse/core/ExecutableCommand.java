@@ -124,7 +124,7 @@ public class ExecutableCommand implements Command, ScopeAware
             boolean readerComplete = reader.waitFor(10);
             while(!terminated && !readerComplete)
             {
-                reader.waitFor(10);
+                readerComplete = reader.waitFor(10);
             }
 
             if(readerComplete)
