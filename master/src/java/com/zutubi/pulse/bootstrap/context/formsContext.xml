@@ -20,7 +20,7 @@
     <bean id="notificationSchemeManager" class="com.zutubi.pulse.notifications.DefaultNotificationSchemeManager" init-method="init"/>
 -->
 
-    <bean id="formDescriptorFactory" class="com.zutubi.prototype.FormDescriptorFactory" autowire="byName"/>
+    <bean id="formDescriptorFactory" class="com.zutubi.prototype.FormDescriptorFactory" autowire="byName" init-method="init"/>
 
     <bean id="freemarkerConfiguration" class="com.zutubi.pulse.bootstrap.freemarker.FreemarkerConfigurationFactoryBean" autowire="byName"/>
 

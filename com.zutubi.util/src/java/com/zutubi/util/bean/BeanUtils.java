@@ -15,8 +15,6 @@ import java.lang.reflect.Method;
  */
 public class BeanUtils
 {
-    private static final Object[] NO_ARGS = new Object[0];
-
     public static void setProperty(String propertyName, Object propertyValue, Object target) throws BeanException
     {
         try
@@ -53,7 +51,7 @@ public class BeanUtils
             {
                 throw new BeanPropertyException();
             }
-            return readMethod.invoke(target, NO_ARGS);
+            return readMethod.invoke(target);
         }
         catch (BeanException e)
         {

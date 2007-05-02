@@ -1,7 +1,5 @@
 <input type="checkbox"<#rt/>
-<#if parameters.name?exists>
  name="${parameters.name?html}"<#rt/>
-</#if>
  value="true"<#rt/>
 <#if parameters.value?exists && parameters.value == "true">
  checked="checked"<#rt/>
@@ -24,4 +22,8 @@
 <#if parameters.cssStyle?exists>
  style="${parameters.cssStyle?html}"<#rt/>
 </#if>
+></input>
+<input type="hidden"<#rt/>
+ name="${parameters.name?html}.default"<#rt/>
+ value="false"<#rt/>
 ></input>

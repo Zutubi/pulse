@@ -39,7 +39,7 @@
             }
         }();
 
-        YAHOO.ext.EventManager.onDocumentReady(SetupTree.init, SetupTree, true);
+        Ext.onReady(SetupTree.init, SetupTree, true);
     </script>
 #end
 </head>

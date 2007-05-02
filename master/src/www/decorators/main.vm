@@ -51,14 +51,16 @@
 		<title>:: pulse :: #if ($title) $title #end</title>
         <link rel="shortcut icon" href="$base/favicon.ico"/>
         <link rel="icon" type="image/png" href="$base/favicon.png"/>
-        <link rel="stylesheet" type="text/css" href="/css/yui-ext.css"/>
+        <link rel="stylesheet" type="text/css" href="/css/ext-all.css"/>
         <link rel="stylesheet" type="text/css" href="$base/css/main.css" media="screen"/>
 		<link rel="stylesheet" type="text/css" href="$base/css/form.css" media="screen"/>
 #if ($rssEnabled && $projectId && $projectId != "0")
         <link rel="alternate" type="application/rss+xml" title="RSS" href="$base/rss.action?projectId=$projectId"/>
 #end
         <script type="text/javascript" src="/js/yahoo/utilities.js"></script>
-        <script type="text/javascript" src="/js/yui-ext.js"></script>
+        <script type="text/javascript" src="/js/yui-utilities.js"></script>
+        <script type="text/javascript" src="/js/ext-yui-adapter.js"></script>
+        <script type="text/javascript" src="/js/ext-all.js"></script>
         <script type="text/javascript" src="$base/js/main.js"></script>
         <script type="text/javascript">
             var layout;
@@ -68,14 +70,14 @@
                 return {
                     init : function(){
                         // If there is a tab bar, drop it in to the north div.
-                        var tabbar = getEl('tabbar');
+                        var tabbar = Ext.get('tabbar');
                         if(tabbar)
                         {
-                            var north = getEl('north');
+                            var north = Ext.get('north');
                             north.appendChild(tabbar);
                         }
 
-                        layout = new YAHOO.ext.BorderLayout(document.body, {
+                        layout = new Ext.BorderLayout(document.body, {
                             hideOnLayout: true,
                             north: {
                                 split: false,
@@ -92,7 +94,7 @@
                             }
                         });
 
-                        nestedLayout = new YAHOO.ext.BorderLayout('content', {
+                        nestedLayout = new Ext.BorderLayout('content', {
                             hideOnLayout: true,
                             center: {
                                 autoScroll: true
@@ -100,19 +102,19 @@
                         });
 
                         nestedLayout.beginUpdate();
-                        nestedLayout.add('center', new YAHOO.ext.ContentPanel('center', {title: 'Close Me', closable: false}));
+                        nestedLayout.add('center', new Ext.ContentPanel('center', {title: 'Close Me', closable: false}));
                         nestedLayout.endUpdate();
 
                         layout.beginUpdate();
-                        layout.add('north', new YAHOO.ext.ContentPanel('north', 'North'));
-                        layout.add('south', new YAHOO.ext.ContentPanel('south', 'South'));
-                        layout.add('center', new YAHOO.ext.NestedLayoutPanel(nestedLayout));
+                        layout.add('north', new Ext.ContentPanel('north', 'North'));
+                        layout.add('south', new Ext.ContentPanel('south', 'South'));
+                        layout.add('center', new Ext.NestedLayoutPanel(nestedLayout));
                         layout.endUpdate();
                     }
                 }
             }();
 
-            YAHOO.ext.EventManager.onDocumentReady(PageLayout.init, PageLayout, true);
+            Ext.onReady(PageLayout.init, PageLayout, true);
             window.nestedLayout = nestedLayout;
         </script>
 

@@ -26,14 +26,14 @@
                         });
 
                         nestedLayout.beginUpdate();
-                        nestedLayout.add('north', new YAHOO.ext.ContentPanel('innernorth', {title: 'Inner North'}));
-                        nestedLayout.add('west', new YAHOO.ext.ContentPanel('project-tree', {title: 'Projects'}));
-                        nestedLayout.add('west', new YAHOO.ext.ContentPanel('config-tree', {title: 'Configuration'}));
+                        nestedLayout.add('north', new Ext.ContentPanel('innernorth', {title: 'Inner North'}));
+                        nestedLayout.add('west', new Ext.ContentPanel('project-tree', {title: 'Projects'}));
+                        nestedLayout.add('west', new Ext.ContentPanel('config-tree', {title: 'Configuration'}));
                         nestedLayout.endUpdate();
                    }
              }
         }();
-        YAHOO.ext.EventManager.onDocumentReady(Layout.init, Layout, true);
+        Ext.onReady(Layout.init, Layout, true);
 	</script>
     <link href="$base/css/prototype.css" rel="stylesheet" type="text/css" media="screen"/>
 </head>

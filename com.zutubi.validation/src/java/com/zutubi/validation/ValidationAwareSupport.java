@@ -14,12 +14,16 @@ public class ValidationAwareSupport implements ValidationAware
 
     public void addIgnoredField(String field)
     {
+        internalGetFieldErrors().remove(field);
         getIgnoredFields().add(field);
     }
 
     public void addIgnoredFields(Set<String> fields)
     {
-        getIgnoredFields().addAll(fields);
+        for(String field: fields)
+        {
+            addIgnoredField(field);
+        }
     }
 
     private Set<String> getIgnoredFields()

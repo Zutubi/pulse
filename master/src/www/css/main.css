@@ -144,7 +144,7 @@ pre{
     Footer
     */
 
-.ylayout-panel , .ylayout-nested-layout .ylayout-panel {
+.x-layout-panel, .x-layout-nested-layout .x-layout-panel {
     border: 0 none;
 }
 

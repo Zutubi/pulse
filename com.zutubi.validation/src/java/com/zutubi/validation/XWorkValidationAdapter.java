@@ -19,12 +19,18 @@ public class XWorkValidationAdapter implements ValidationAware
 
     public void addIgnoredField(String field)
     {
+        Map errors = delegate.getFieldErrors();
+        errors.remove(field);
+        delegate.setFieldErrors(errors);
         ignoredFields.add(field);
     }
 
     public void addIgnoredFields(Set<String> ignoredFields)
     {
-        this.ignoredFields.addAll(ignoredFields);
+        for(String field: ignoredFields)
+        {
+            addIgnoredField(field);
+        }
     }
     
     public void addActionMessage(String message)

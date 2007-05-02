@@ -55,9 +55,28 @@ public class FormDescriptorFactory
         defaultFieldTypeMapping.put(Long.TYPE, "text");
     }
 
+    private Map<String, Class<? extends FieldDescriptor>> fieldDescriptorTypes = new HashMap<String, Class<? extends FieldDescriptor>>();
     private ConfigurationPersistenceManager configurationPersistenceManager;
     private TypeRegistry typeRegistry;
 
+    
+    public void init()
+    {
+        // FIXME: incomplete
+        registerFieldType(FieldType.CHECKBOX, CheckboxFieldDescriptor.class);
+        registerFieldType(FieldType.CONTROLLING_CHECKBOX, ControllingCheckboxFieldDescriptor.class);
+        registerFieldType(FieldType.HIDDEN, HiddenFieldDescriptor.class);
+        registerFieldType(FieldType.PASSWORD, PasswordFieldDescriptor.class);
+        registerFieldType(FieldType.SELECT, SelectFieldDescriptor.class);
+        registerFieldType(FieldType.TEXT, TextFieldDescriptor.class);
+        registerFieldType(FieldType.TEXTAREA, TextAreaFieldDescriptor.class);
+    }
+
+    public void registerFieldType(String type, Class<? extends FieldDescriptor> clazz)
+    {
+        fieldDescriptorTypes.put(type, clazz);
+    }
+    
     public FormDescriptor createDescriptor(String path, Class clazz)
     {
         return createDescriptor(path, typeRegistry.getType(clazz));
@@ -165,26 +184,22 @@ public class FormDescriptorFactory
 
     private FieldDescriptor createFieldOfType(String type)
     {
-        // FIXME: incomplete
-        if(type.equals(FieldType.CHECKBOX))
+        Class<? extends FieldDescriptor> clazz = fieldDescriptorTypes.get(type);
+        if(clazz == null)
         {
-            return new CheckboxFieldDescriptor();
-        }
-        else if(type.equals(FieldType.HIDDEN))
-        {
-            return new HiddenFieldDescriptor();
-        }
-        else if(type.equals(FieldType.PASSWORD))
-        {
-            return new PasswordFieldDescriptor();
-        }
-        else if(type.equals(FieldType.SELECT))
-        {
-            return new SelectFieldDescriptor();
+            return new FieldDescriptor();
         }
         else
         {
-            return new TextFieldDescriptor();
+            try
+            {
+                return clazz.newInstance();
+            }
+            catch (Exception e)
+            {
+                LOG.severe(e);
+                return new FieldDescriptor();
+            }
         }
     }
 

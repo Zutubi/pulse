@@ -124,6 +124,7 @@ public class AnnotationValidatorProvider implements ValidatorProvider
         return validators;
     }
 
+    @SuppressWarnings({"unchecked"})
     private Collection<Annotation> constraintsOn(AnnotatedElement element)
     {
         if (element == null)

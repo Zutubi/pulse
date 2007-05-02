@@ -43,8 +43,8 @@
                         });
 
                         nestedLayout.beginUpdate();
-                        nestedLayout.add('north', new YAHOO.ext.ContentPanel('innernorth', {title: 'inner north'}));
-                        nestedLayout.add('west', new YAHOO.ext.ContentPanel('plugin-tree', {title: 'plugins'}));
+                        nestedLayout.add('north', new Ext.ContentPanel('innernorth', {title: 'inner north'}));
+                        nestedLayout.add('west', new Ext.ContentPanel('plugin-tree', {title: 'plugins'}));
                         nestedLayout.endUpdate();
 
                         this.createTree();
@@ -125,7 +125,7 @@
                    }
              }
         }();
-        YAHOO.ext.EventManager.onDocumentReady(Layout.init, Layout, true);
+        Ext.onReady(Layout.init, Layout, true);
 
         function pluginAction(id, action)
         {

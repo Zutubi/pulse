@@ -57,6 +57,8 @@ public interface FieldType
 
     static final String TEXTAREA = "textarea";
 
+    static final String CONTROLLING_CHECKBOX = "controlling-checkbox";
+
     static final String CHECKBOX = "checkbox";
 
     static final String SELECT = "select";

@@ -56,12 +56,6 @@ public class PrototypeUtils
         {
             String propertyName = property.getName();
 
-            // no data is available for this particular property.
-            if (!parameters.containsKey(propertyName))
-            {
-                continue;
-            }
-
             // this is a read only property.
             if (!property.isWriteable())
             {
@@ -69,6 +63,15 @@ public class PrototypeUtils
             }
 
             String[] parameterValue = parameters.get(propertyName);
+            if(parameterValue == null)
+            {
+                parameterValue = parameters.get(propertyName + ".default");
+                if(parameterValue == null)
+                {
+                    continue;
+                }
+            }
+            
             if (Collection.class.isAssignableFrom(property.getClazz()))
             {
                 record.put(propertyName, parameterValue);

@@ -1,8 +1,6 @@
 package com.zutubi.pulse.prototype.config.agent;
 
-import com.zutubi.config.annotations.Form;
-import com.zutubi.config.annotations.Internal;
-import com.zutubi.config.annotations.SymbolicName;
+import com.zutubi.config.annotations.*;
 import com.zutubi.pulse.core.config.AbstractNamedConfiguration;
 import com.zutubi.pulse.core.config.Resource;
 import com.zutubi.validation.annotations.Numeric;
@@ -17,6 +15,7 @@ public class AgentConfiguration extends AbstractNamedConfiguration
 {
     @Internal
     private long agentStateId;
+    @ControllingCheckbox(invert = true, dependentFields = {"host", "port"})
     private boolean remote = true;
     private String host;
     @Numeric(min = 1)
