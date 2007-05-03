@@ -238,6 +238,15 @@ public class RecordManagerTest extends TestCase
         assertEquals(1, record.getHandle());
     }
 
+    public void testInsertNestedCreatesHandles()
+    {
+        MutableRecord record = new MutableRecordImpl();
+        record.put("nested", new MutableRecordImpl());
+        recordManager.insert("testpath", record);
+        Record nested = recordManager.load("testpath/nested");
+        assertEquals(2, nested.getHandle());
+    }
+
     public void testInsertCreatesUniqueHandles()
     {
         recordManager.insert("r1", new MutableRecordImpl());
@@ -262,14 +271,14 @@ public class RecordManagerTest extends TestCase
         }
     }
 
-    public void testIncreasingIdBoundary()
+    public void testIncreasingHandleBoundary()
     {
         long handle = recordManager.allocateHandle();
         newRecordManager(HANDLE_BLOCK_SIZE + 10);
         assertNextHandle(recordManager.allocateHandle(), handle);
     }
 
-    public void testDecreasingIdBoundary()
+    public void testDecreasingHandleBoundary()
     {
         long handle = recordManager.allocateHandle();
         newRecordManager(HANDLE_BLOCK_SIZE - 1);
@@ -279,6 +288,63 @@ public class RecordManagerTest extends TestCase
     private void assertNextHandle(long nextHandle, long handle)
     {
         assertTrue("Next handle '" + nextHandle + "' not higher than last '" + handle + "'", nextHandle > handle);
+    }
+
+    public void testMove()
+    {
+        MutableRecord record = new MutableRecordImpl();
+        record.put("prop", "value");
+        recordManager.insert("testpath", record);
+        Record moved = recordManager.move("testpath", "newpath");
+
+        // Check returned record has expected property
+        assertEquals("value", moved.get("prop"));
+
+        // Check we can load from move destination
+        moved = recordManager.load("newpath");
+        assertEquals("value", moved.get("prop"));
+
+        // Check nothing at source
+        assertNull(recordManager.load("testpath"));
+    }
+
+    public void testMovePreservesHandle()
+    {
+        Record record = new MutableRecordImpl();
+        record = recordManager.insert("testpath", record);
+        long handle = record.getHandle();
+        assertTrue(handle > 0);
+
+        record = recordManager.move("testpath", "newpath");
+        assertEquals(handle, record.getHandle());
+
+        record = recordManager.load("newpath");
+        assertEquals(handle, record.getHandle());
+    }
+
+    public void testMoveIsDeep()
+    {
+        MutableRecord record = new MutableRecordImpl();
+        MutableRecord nested = new MutableRecordImpl();
+        record.put("prop", "val");
+        record.put("nested", nested);
+        nested.put("prop", "nestedval");
+
+        Record inserted = recordManager.insert("testpath", record);
+        Record insertedNest = (Record) inserted.get("nested");
+        assertTrue(insertedNest.getHandle() > 0);
+        
+        Record moved = recordManager.move("testpath", "newpath");
+        assertEquals("val", moved.get("prop"));
+        Record movedNest = (Record) moved.get("nested");
+        assertEquals(insertedNest.getHandle(), movedNest.getHandle());
+        assertEquals("nestedval", movedNest.get("prop"));
+
+        Record loadedNest = recordManager.load("newpath/nested");
+        assertEquals(insertedNest.getHandle(), loadedNest.getHandle());
+        assertEquals("nestedval", loadedNest.get("prop"));
+
+        assertNull(recordManager.load("testpath/nested"));
     }
 
     private void newRecordManager(long handleBlockSize)

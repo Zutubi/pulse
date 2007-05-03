@@ -162,8 +162,7 @@ public class MapType extends CollectionType
             // will invalidate the reference index.
             configurationPersistenceManager.renameReferences(oldPath, newPath);
 
-            recordManager.copy(oldPath, newPath);
-            recordManager.delete(oldPath);
+            recordManager.move(oldPath, newPath);
             recordManager.update(newPath, record);
             return newPath;
         }

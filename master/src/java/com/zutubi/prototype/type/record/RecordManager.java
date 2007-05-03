@@ -186,6 +186,26 @@ public class RecordManager
      */
     public synchronized Record insert(String path, Record newRecord)
     {
+        MutableRecord record = newRecord.copy(true);
+        allocateHandles(record);
+
+        return store(path, record);
+    }
+
+    private void allocateHandles(MutableRecord record)
+    {
+        record.setHandle(allocateHandle());
+        for(Object child: record.values())
+        {
+            if(child instanceof MutableRecord)
+            {
+                allocateHandles((MutableRecord) child);
+            }
+        }
+    }
+
+    private Record store(String path, MutableRecord record)
+    {
         checkPath(path);
 
         String[] pathElements = PathUtils.getPathElements(path);
@@ -201,8 +221,6 @@ public class RecordManager
         }
 
         // Save first before hooking up in memory
-        MutableRecord record = newRecord.copy(true);
-        record.setHandle(allocateHandle());
         recordSerialiser.serialise(path, record, true);
         parent.put(pathElements[pathElements.length - 1], record);
         return record;
@@ -326,6 +344,7 @@ public class RecordManager
 
     /**
      * Copy the record contents from the source path to the destination path.
+     * A new record with a new handle is created at the destination.
      *
      * @param sourcePath      path to copy from
      * @param destinationPath path to copy to
@@ -343,6 +362,25 @@ public class RecordManager
         }
 
         return null;
+    }
+
+    /**
+     * Move the record at the given source to the given destination.  The
+     * record handle is maintained.
+     *
+     * @param sourcePath      path to move from
+     * @param destinationPath path to move to
+     * @return the moved record, or null if the source path does not refer to
+     *         an existing record
+     */
+    public synchronized Record move(String sourcePath, String destinationPath)
+    {
+        Record record = delete(sourcePath);
+        if (record != null)
+        {
+            record = store(destinationPath, (MutableRecord) record);
+        }
+        return record;
     }
 
     public void setHandleBlockSize(long handleBlockSize)

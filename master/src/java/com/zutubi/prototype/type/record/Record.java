@@ -1,6 +1,7 @@
 package com.zutubi.prototype.type.record;
 
 import java.util.Set;
+import java.util.Collection;
 
 /**
  * A record defines a simple map for storing data.  
@@ -78,6 +79,8 @@ public interface Record
     Set<String> metaKeySet();
 
     Set<String> simpleKeySet();
+
+    Collection<Object> values();
 
     /**
      * @return the unique handle for this record, or 0 if this record has never

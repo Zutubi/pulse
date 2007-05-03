@@ -3,10 +3,7 @@ package com.zutubi.prototype.type.record;
 import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.Predicate;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Simple record that holds key:value data, along with meta data.
@@ -152,6 +149,11 @@ public class MutableRecordImpl extends AbstractMutableRecord
         }, new HashSet<String>(data.size()));
     }
 
+    public Collection<Object> values()
+    {
+        return data.values();
+    }
+
     public boolean equals(Object o)
     {
         if (this == o)
@@ -169,12 +171,8 @@ public class MutableRecordImpl extends AbstractMutableRecord
         {
             return false;
         }
-        if (meta != null ? !meta.equals(that.meta) : that.meta != null)
-        {
-            return false;
-        }
 
-        return true;
+        return !(meta != null ? !meta.equals(that.meta) : that.meta != null);
     }
 
     public int hashCode()
