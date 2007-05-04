@@ -18,7 +18,6 @@ public abstract class PostBuildAction extends Entity
     private static final Logger LOG = Logger.getLogger(PostBuildAction.class);
 
     private String name;
-    private List<BuildSpecification> specifications = new LinkedList<BuildSpecification>();
     private List<ResultState> states = new LinkedList<ResultState>();
     private boolean failOnError = false;
     private List<String> errors;
@@ -27,10 +26,9 @@ public abstract class PostBuildAction extends Entity
     {
     }
 
-    protected PostBuildAction(String name, List<BuildSpecification> specifications, List<ResultState> states, boolean failOnError)
+    protected PostBuildAction(String name, List<ResultState> states, boolean failOnError)
     {
         this.name = name;
-        this.specifications = specifications;
         this.states = states;
         this.failOnError = failOnError;
     }
@@ -38,7 +36,6 @@ public abstract class PostBuildAction extends Entity
     protected void copyCommon(PostBuildAction copy)
     {
         copy.name = name;
-        copy.specifications = new LinkedList<BuildSpecification>(specifications);
         copy.states = new LinkedList<ResultState>(states);
         copy.failOnError = failOnError;
     }
@@ -73,25 +70,7 @@ public abstract class PostBuildAction extends Entity
 
     private boolean resultMatches(BuildResult result)
     {
-        return specMatches(result) && stateMatches(result);
-    }
-
-    private boolean specMatches(BuildResult result)
-    {
-        if(specifications == null || specifications.size() == 0)
-        {
-            return true;
-        }
-
-        for(BuildSpecification spec: specifications)
-        {
-            if(spec.getName().equals(result.getBuildSpecification()))
-            {
-                return true;
-            }
-        }
-
-        return false;
+        return stateMatches(result);
     }
 
     private boolean stateMatches(BuildResult result)
@@ -120,27 +99,6 @@ public abstract class PostBuildAction extends Entity
     public void setName(String name)
     {
         this.name = name;
-    }
-
-    public List<BuildSpecification> getSpecifications()
-    {
-        return specifications;
-    }
-
-    public void setSpecifications(List<BuildSpecification> specifications)
-    {
-        this.specifications = specifications;
-    }
-
-    public List<Long> getBuildSpecificationIds()
-    {
-        List<Long> ids = new LinkedList<Long>();
-        for(BuildSpecification spec: specifications)
-        {
-            ids.add(spec.getId());
-        }
-
-        return ids;
     }
 
     public List<ResultState> getStates()

@@ -18,7 +18,6 @@ import java.util.List;
 public class UnsuccessfulCountDaysValueTest extends PulseTestCase
 {
     private Mock mockBuildManager;
-    private BuildSpecification spec;
     private UnsuccessfulCountDaysValue value;
     private Project project;
 
@@ -27,10 +26,6 @@ public class UnsuccessfulCountDaysValueTest extends PulseTestCase
         mockBuildManager = new Mock(BuildManager.class);
         project = new Project();
         project.setId(99);
-        spec = new BuildSpecification("hooray");
-        spec.setId(1234);
-        spec.getPname().setId(2);
-        project.addBuildSpecification(spec);
         value = new UnsuccessfulCountDaysValue();
     }
 
@@ -89,7 +84,7 @@ public class UnsuccessfulCountDaysValueTest extends PulseTestCase
 
     private BuildResult createBuild(long number)
     {
-        BuildResult buildResult = new BuildResult(new ManualTriggerBuildReason("w00t"), project, spec, number, false);
+        BuildResult buildResult = new BuildResult(new ManualTriggerBuildReason("w00t"), project, number, false);
         buildResult.complete(System.currentTimeMillis());
         buildResult.setState(ResultState.FAILURE);
         return buildResult;
@@ -99,9 +94,9 @@ public class UnsuccessfulCountDaysValueTest extends PulseTestCase
     {
         List<BuildResult> lastSuccesses = new ArrayList<BuildResult>(1);
         lastSuccesses.add(lastSuccess);
-        mockBuildManager.expectAndReturn("querySpecificationBuilds", new FullConstraintMatcher(new Constraint[]{ C.eq(project), C.eq(spec.getPname()), C.eq(new ResultState[]{ ResultState.SUCCESS }), C.eq(-1L), C.eq(number - 1), C.eq(0), C.eq(1), C.eq(true), C.eq(false) }), lastSuccesses);
+        mockBuildManager.expectAndReturn("queryBuilds", new FullConstraintMatcher(new Constraint[]{ C.eq(project), C.eq(new ResultState[]{ ResultState.SUCCESS }), C.eq(-1L), C.eq(number - 1), C.eq(0), C.eq(1), C.eq(true), C.eq(false) }), lastSuccesses);
         long lastSuccessNumber = lastSuccess == null ? 1 : lastSuccess.getNumber() + 1;
-        mockBuildManager.expectAndReturn("querySpecificationBuilds", new FullConstraintMatcher(new Constraint[]{ C.eq(project), C.eq(spec.getPname()), C.IS_NULL, C.eq(lastSuccessNumber), C.eq(-1L), C.eq(0), C.eq(1), C.eq(false), C.eq(false) }), Arrays.asList(firstFailure));
+        mockBuildManager.expectAndReturn("queryBuilds", new FullConstraintMatcher(new Constraint[]{ C.eq(project), C.IS_NULL, C.eq(lastSuccessNumber), C.eq(-1L), C.eq(0), C.eq(1), C.eq(false), C.eq(false) }), Arrays.asList(firstFailure));
     }
 
     private void setBuildManager()

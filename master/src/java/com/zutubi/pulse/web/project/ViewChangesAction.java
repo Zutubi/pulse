@@ -136,7 +136,7 @@ public class ViewChangesAction extends ProjectActionSupport
                 addActionError("Invalid build range");
             }
 
-            if(sinceResult != null && result != null && !sinceResult.getBuildSpecification().equals(result.getBuildSpecification()))
+            if(sinceResult != null && result != null && !sinceResult.getProject().equals(result.getProject()))
             {
                 addActionError("Builds must be of the same specification");
             }
@@ -153,7 +153,7 @@ public class ViewChangesAction extends ProjectActionSupport
         int offset = 0;
         while(true)
         {
-            List<BuildResult> previousResults = getBuildManager().querySpecificationBuilds(project, result.getSpecName(), states, -1, toBuild - 1, offset, 1, true, false);
+            List<BuildResult> previousResults = getBuildManager().queryBuilds(project, states, -1, toBuild - 1, offset, 1, true, false);
             if(previousResults.size() > 0)
             {
                 BuildResult buildResult = previousResults.get(0);
@@ -180,7 +180,7 @@ public class ViewChangesAction extends ProjectActionSupport
         // Get changes for all results after since, up to and including to.
         if (sinceBuild != 0)
         {
-            List<BuildResult> resultRange = getBuildManager().querySpecificationBuilds(project, result.getSpecName(), ResultState.getCompletedStates(), sinceBuild + 1, toBuild - 1, 0, -1, true, false);
+            List<BuildResult> resultRange = getBuildManager().queryBuilds(project, ResultState.getCompletedStates(), sinceBuild + 1, toBuild - 1, 0, -1, true, false);
             for(BuildResult r: resultRange)
             {
                 changelists.addAll(getBuildManager().getChangesForBuild(r));

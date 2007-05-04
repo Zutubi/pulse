@@ -19,17 +19,8 @@ public class PostBuildActionTest extends PulseTestCase
 
     public void testNoRestrictions()
     {
-        testResult("test");
-        assertTrue(executed);
-    }
-
-    public void testRestrictedToSpec()
-    {
-        BuildSpecification spec = new BuildSpecification("test");
-        action.setSpecifications(Arrays.asList(spec));
-        testResult("diff");
-        assertFalse(executed);
-        testResult("test");
+        BuildResult result = new BuildResult(new UnknownBuildReason(), null, 1, false);
+        action.execute(null, result, null, new LinkedList<ResourceProperty>());
         assertTrue(executed);
     }
 
@@ -58,16 +49,9 @@ public class PostBuildActionTest extends PulseTestCase
         assertEquals("Executing post build action 'mock': test error", result.getFeatures(Feature.Level.ERROR).get(0).getSummary());
     }
 
-    private BuildResult testResult(String spec)
-    {
-        BuildResult result = new BuildResult(new UnknownBuildReason(), null, new BuildSpecification(spec), 1, false);
-        action.execute(null, result, null, new LinkedList<ResourceProperty>());
-        return result;
-    }
-
     private BuildResult testResult(ResultState state)
     {
-        BuildResult result = new BuildResult(new UnknownBuildReason(), null, new BuildSpecification("foo"), 1, false);
+        BuildResult result = new BuildResult(new UnknownBuildReason(), null, 1, false);
         result.setState(state);
         action.execute(null, result, null, new LinkedList<ResourceProperty>());
         return result;

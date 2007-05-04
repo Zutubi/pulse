@@ -88,11 +88,6 @@ public class EditBuildCompletedTriggerAction extends AbstractEditTriggerAction
         return helper.getFilterProjects();
     }
 
-    public Map<Long, List<String>> getFilterSpecifications()
-    {
-        return helper.getFilterSpecifications();
-    }
-
     public Map<String, String> getStateMap()
     {
         return helper.getStateMap();

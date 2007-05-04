@@ -14,9 +14,9 @@ public class PersonalBuildRequestEvent extends AbstractBuildRequestEvent
     private User user;
     private PatchArchive patch;
 
-    public PersonalBuildRequestEvent(Object source, long number, BuildRevision revision, User user, PatchArchive patch, ProjectConfiguration projectConfig, Project project, BuildSpecification specification)
+    public PersonalBuildRequestEvent(Object source, long number, BuildRevision revision, User user, PatchArchive patch, ProjectConfiguration projectConfig, Project project)
     {
-        super(source, revision, projectConfig, project, specification);
+        super(source, revision, projectConfig, project);
         this.number = number;
         this.user = user;
         this.patch = patch;
@@ -34,7 +34,7 @@ public class PersonalBuildRequestEvent extends AbstractBuildRequestEvent
 
     public BuildResult createResult(ProjectManager projectManager, UserManager userManager)
     {
-        return new BuildResult(user, getProject(), getSpecification(), number);
+        return new BuildResult(user, getProject(), number);
     }
 
     public PatchArchive getPatch()

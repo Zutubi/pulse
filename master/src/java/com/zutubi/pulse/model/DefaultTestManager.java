@@ -36,17 +36,17 @@ public class DefaultTestManager implements TestManager
                 File testDir = new File(node.getResult().getAbsoluteOutputDir(configurationManager.getDataDirectory()), RecipeResult.TEST_DIR);
                 if (testDir.isDirectory())
                 {
-                    indexTestsForStage(result, result.getSpecName().getId(), node.getStageName().getId(), testDir);
+                    indexTestsForStage(result, result.getProject().getId(), node.getStageHandle(), testDir);
                 }
             }
         }
     }
 
-    private void indexTestsForStage(BuildResult result, long specNameId, long stageNameId, File testDir)
+    private void indexTestsForStage(BuildResult result, long projectId, long stageNameId, File testDir)
     {
         try
         {
-            persister.read(new IndexingHandler(result.getProject().getId(), result.getId(), result.getNumber(), specNameId, stageNameId), null, testDir, true, false);
+            persister.read(new IndexingHandler(result.getProject().getId(), result.getId(), result.getNumber(), projectId, stageNameId), null, testDir, true, false);
         }
         catch (Exception e)
         {

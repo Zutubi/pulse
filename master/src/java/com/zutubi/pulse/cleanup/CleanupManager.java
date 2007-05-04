@@ -97,7 +97,7 @@ public class CleanupManager
     public void cleanupBuilds()
     {
         // Lookup project cleanup info, query for old builds, cleanup where necessary
-        List<Project> projects = projectManager.getNameToConfig();
+        List<Project> projects = projectManager.getProjects();
         for (Project project : projects)
         {
             cleanupBuilds(project);
@@ -130,11 +130,15 @@ public class CleanupManager
             ProjectConfiguration projectConfig = projectManager.getProjectConfig(project.getId());
             Map<String, CleanupConfiguration> cleanupConfigs = (Map<String, CleanupConfiguration>) projectConfig.getExtensions().get("cleanup");
 
-            List<CleanupConfiguration> rules = new LinkedList<CleanupConfiguration>(cleanupConfigs.values());
-
-            for (CleanupConfiguration rule : rules)
+            if (cleanupConfigs != null)
             {
-                cleanupBuilds(rule, project);
+                // if cleanup rules are specified.  Maybe we should always have at least an empty map?
+                List<CleanupConfiguration> rules = new LinkedList<CleanupConfiguration>(cleanupConfigs.values());
+
+                for (CleanupConfiguration rule : rules)
+                {
+                    cleanupBuilds(rule, project);
+                }
             }
         }
         finally

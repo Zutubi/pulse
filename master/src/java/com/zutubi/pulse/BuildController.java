@@ -7,13 +7,20 @@ import com.zutubi.pulse.core.BuildException;
 import com.zutubi.pulse.core.BuildRevision;
 import com.zutubi.pulse.core.RecipeRequest;
 import com.zutubi.pulse.core.config.ResourceProperty;
-import com.zutubi.pulse.core.model.*;
+import com.zutubi.pulse.core.model.Changelist;
+import com.zutubi.pulse.core.model.Feature;
+import com.zutubi.pulse.core.model.RecipeResult;
+import com.zutubi.pulse.core.model.ResultState;
+import com.zutubi.pulse.core.model.Revision;
 import com.zutubi.pulse.events.AsynchronousDelegatingListener;
 import com.zutubi.pulse.events.Event;
 import com.zutubi.pulse.events.EventListener;
 import com.zutubi.pulse.events.EventManager;
 import com.zutubi.pulse.events.build.*;
 import com.zutubi.pulse.model.*;
+import com.zutubi.pulse.model.BuildSpecification.CheckoutScheme;
+import com.zutubi.pulse.prototype.config.BuildOptionsConfiguration;
+import com.zutubi.pulse.prototype.config.BuildStageConfiguration;
 import com.zutubi.pulse.prototype.config.ProjectConfiguration;
 import com.zutubi.pulse.scheduling.quartz.TimeoutRecipeJob;
 import com.zutubi.pulse.scm.FileStatus;
@@ -45,15 +52,16 @@ import java.util.concurrent.locks.ReentrantLock;
  */
 public class BuildController implements EventListener
 {
-    private static final String TIMEOUT_TRIGGER_GROUP = "timeout";
     private static final Logger LOG = Logger.getLogger(BuildController.class);
+    
+    private static final String TIMEOUT_TRIGGER_GROUP = "timeout";
 
     private static final Lock CHANGE_LOCK = new ReentrantLock();
 
     private AbstractBuildRequestEvent request;
     private Project project;
     private ProjectConfiguration projectConfig;
-    private BuildSpecification specification;
+
     private EventManager eventManager;
     private ProjectManager projectManager;
     private UserManager userManager;
@@ -72,24 +80,16 @@ public class BuildController implements EventListener
     private BuildResult previousSuccessful;
     private List<ResourceProperty> buildProperties;
 
-    public BuildController(AbstractBuildRequestEvent event, BuildSpecification specification, EventManager eventManager, ProjectManager projectManager, UserManager userManager, BuildManager buildManager, TestManager testManager, RecipeQueue queue, RecipeResultCollector collector, Scheduler quartScheduler, MasterConfigurationManager configManager, ServiceTokenManager serviceTokenManager)
+    public BuildController(AbstractBuildRequestEvent event)
     {
         this.request = event;
-        this.projectConfig = event.getProjectConfig();
-        // FIXME: a race here ... nicer to have the project id in the config??
-        this.project = projectManager.getProject(projectConfig.getName());
-        this.specification = specification;
-        this.eventManager = eventManager;
-        this.projectManager = projectManager;
-        this.userManager = userManager;
-        this.buildManager = buildManager;
-        this.testManager = testManager;
-        this.queue = queue;
-        this.collector = collector;
-        this.quartzScheduler = quartScheduler;
+    }
+
+    public void init()
+    {
+        this.projectConfig = request.getProjectConfig();
+        this.project = projectManager.getProject(projectConfig.getProjectId());
         this.asyncListener = new AsynchronousDelegatingListener(this);
-        this.configurationManager = configManager;
-        this.serviceTokenManager = serviceTokenManager;
     }
 
     public void run()
@@ -125,11 +125,10 @@ public class BuildController implements EventListener
         buildResult = request.createResult(projectManager, userManager);
         buildManager.save(buildResult);
         previousSuccessful = getPreviousSuccessfulBuild();
-        buildProperties = specification.copyProperties();
-        buildProperties.add(new ResourceProperty("project", project.getName()));
-        buildProperties.add(new ResourceProperty("specification", specification.getName()));
+        buildProperties = new LinkedList<ResourceProperty>(projectConfig.getProperties().values());
+        buildProperties.add(new ResourceProperty("project", projectConfig.getName()));
         
-        configure(root, buildResult.getRoot(), specification, specification.getRoot());
+        configure(root, buildResult.getRoot());
 
         return tree;
     }
@@ -137,7 +136,7 @@ public class BuildController implements EventListener
     private BuildResult getPreviousSuccessfulBuild()
     {
         BuildResult previousSuccessful = null;
-        List<BuildResult> previousSuccess = buildManager.querySpecificationBuilds(project, specification.getPname(), new ResultState[] { ResultState.SUCCESS }, -1, -1, 0, 1, true, true);
+        List<BuildResult> previousSuccess = buildManager.queryBuilds(project, new ResultState[] { ResultState.SUCCESS }, -1, -1, 0, 1, true, true);
         if (previousSuccess.size() > 0)
         {
             previousSuccessful = previousSuccess.get(0);
@@ -145,13 +144,12 @@ public class BuildController implements EventListener
         return previousSuccessful;
     }
 
-    private void configure(TreeNode<RecipeController> rcNode, RecipeResultNode resultNode, BuildSpecification specification, BuildSpecificationNode specNode)
+    private void configure(TreeNode<RecipeController> rcNode, RecipeResultNode resultNode)
     {
-        for (BuildSpecificationNode node : specNode.getChildren())
+        for (BuildStageConfiguration stage : projectConfig.getStages().values())
         {
-            BuildStage stage = node.getStage();
             RecipeResult recipeResult = new RecipeResult(stage.getRecipe());
-            RecipeResultNode childResultNode = new RecipeResultNode(stage.getPname(), recipeResult);
+            RecipeResultNode childResultNode = new RecipeResultNode(stage.getName(), stage.getHandle(), recipeResult);
             resultNode.addChild(childResultNode);
             buildManager.save(resultNode);
 
@@ -159,25 +157,33 @@ public class BuildController implements EventListener
             File recipeOutputDir = paths.getOutputDir(buildResult, recipeResult.getId());
             recipeResult.setAbsoluteOutputDir(configurationManager.getDataDirectory(), recipeOutputDir);
 
-            boolean incremental = !request.isPersonal() && specification.getCheckoutScheme() == BuildSpecification.CheckoutScheme.INCREMENTAL_UPDATE;
+            // FIXME: lookup the checkout scheme from the projectConfig.scm when available.
+            CheckoutScheme checkoutScheme = CheckoutScheme.CLEAN_CHECKOUT;
+            
+            boolean incremental = !request.isPersonal() && checkoutScheme == CheckoutScheme.INCREMENTAL_UPDATE;
             List<ResourceProperty> recipeProperties = new LinkedList<ResourceProperty>(buildProperties);
-            RecipeRequest recipeRequest = new RecipeRequest(project.getName(), specification.getName(), recipeResult.getId(), stage.getRecipe(), incremental, getResourceRequirements(specification, node), recipeProperties);
+            RecipeRequest recipeRequest = new RecipeRequest(projectConfig.getName(), recipeResult.getId(), stage.getRecipe(), incremental, getResourceRequirements(stage), recipeProperties);
             RecipeDispatchRequest dispatchRequest = new RecipeDispatchRequest(stage.getHostRequirements(), request.getRevision(), recipeRequest, projectConfig, buildResult);
             DefaultRecipeLogger logger = new DefaultRecipeLogger(new File(paths.getRecipeDir(buildResult, recipeResult.getId()), RecipeResult.RECIPE_LOG));
-            RecipeResultNode previousRecipe = previousSuccessful == null ? null : previousSuccessful.findResultNode(stage.getPname());
-            RecipeController rc = new RecipeController(projectConfig, buildResult, node, childResultNode, dispatchRequest, recipeProperties, request.isPersonal(), incremental, previousRecipe, logger, collector, queue, buildManager, serviceTokenManager);
+            RecipeResultNode previousRecipe = previousSuccessful == null ? null : previousSuccessful.findResultNodeByHandle(stage.getHandle());
+            RecipeController rc = new RecipeController(projectConfig, buildResult, childResultNode, dispatchRequest, recipeProperties, request.isPersonal(), incremental, previousRecipe, logger, collector);
+            //queue, buildManager, serviceTokenManager
+            rc.setRecipeQueue(queue);
+            rc.setBuildManager(buildManager);
+            rc.setServiceTokenManager(serviceTokenManager);
+            
             TreeNode<RecipeController> child = new TreeNode<RecipeController>(rc);
             rcNode.add(child);
             pendingRecipes++;
-            configure(child, childResultNode, specification, node);
         }
     }
 
-    private List<ResourceRequirement> getResourceRequirements(BuildSpecification specification, BuildSpecificationNode node)
+    private List<ResourceRequirement> getResourceRequirements(BuildStageConfiguration node)
     {
+        // get the list of resource requirements for the project AND the particular stage we are running.
         List<ResourceRequirement> requirements = new LinkedList<ResourceRequirement>();
-        requirements.addAll(specification.getRoot().getResourceRequirements());
-        requirements.addAll(node.getResourceRequirements());
+        requirements.addAll(projectConfig.getRequirements());
+        requirements.addAll(node.getRequirements());
         return requirements;
     }
 
@@ -228,16 +234,6 @@ public class BuildController implements EventListener
 
     private void handleBuildCommenced()
     {
-        // Reload any persistent instances we use, as we are crossing a
-        // thread boundary.  The project can't be deleted while a build is in
-        // progress, but the specification *might*.
-        project = projectManager.getProject(project.getId());
-        specification = project.getBuildSpecification(specification.getId());
-        if (specification == null)
-        {
-            throw new BuildException("Build specification deleted during build");
-        }
-
         // It is important that this directory is created *after* the build
         // result is commenced and saved to the database, so that the
         // database knows of the possibility of some other persistent
@@ -253,12 +249,15 @@ public class BuildController implements EventListener
             throw new BuildException("Insufficient database space to run build.  Consider adding more cleanup rules to remove old build information");
         }
 
+        // FIXME: lookup the checkout scheme from the projectConfig.scm when available.
+        CheckoutScheme checkoutScheme = CheckoutScheme.CLEAN_CHECKOUT;
+
         // check project configuration to determine which bootstrap configuration should be used.
         Bootstrapper initialBootstrapper;
-        boolean checkoutOnly = request.isPersonal() || specification.getCheckoutScheme() == BuildSpecification.CheckoutScheme.CLEAN_CHECKOUT;
+        boolean checkoutOnly = request.isPersonal() || checkoutScheme == CheckoutScheme.CLEAN_CHECKOUT;
         if (checkoutOnly)
         {
-            initialBootstrapper = new CheckoutBootstrapper(project.getName(), specification.getName(), projectConfig.getScm(), request.getRevision(), false);
+            initialBootstrapper = new CheckoutBootstrapper(projectConfig.getName(), projectConfig.getScm(), request.getRevision(), false);
             if (request.isPersonal())
             {
                 initialBootstrapper = createPersonalBuildBootstrapper(initialBootstrapper);
@@ -266,7 +265,7 @@ public class BuildController implements EventListener
         }
         else
         {
-            initialBootstrapper = new ProjectRepoBootstrapper(project.getName(), specification.getName(), projectConfig.getScm(), request.getRevision(), specification.getForceClean());
+            initialBootstrapper = new ProjectRepoBootstrapper(projectConfig.getName(), projectConfig.getScm(), request.getRevision(), project.isForceClean());
         }
 
         tree.prepare(buildResult);
@@ -403,7 +402,7 @@ public class BuildController implements EventListener
                     handleLastCommenced();
                 }
 
-                if (specification.getTimeout() != BuildSpecification.TIMEOUT_NEVER)
+                if (projectConfig.getOptions().getTimeout() != BuildOptionsConfiguration.TIMEOUT_NEVER)
                 {
                     scheduleTimeout(e.getRecipeId());
                 }
@@ -516,7 +515,8 @@ public class BuildController implements EventListener
         if (!buildResult.isUserRevision())
         {
             ScmConfiguration scm = projectConfig.getScm();
-            Revision previousRevision = buildManager.getPreviousRevision(project, specification.getPname());
+            // FIXME: locate previous revision for this project
+            Revision previousRevision = buildManager.getPreviousRevision(project);
 
             if (previousRevision != null)
             {
@@ -571,7 +571,7 @@ public class BuildController implements EventListener
     private void scheduleTimeout(long recipeId)
     {
         String name = getTriggerName(recipeId);
-        Date time = new Date(System.currentTimeMillis() + specification.getTimeout() * Constants.MINUTE);
+        Date time = new Date(System.currentTimeMillis() + projectConfig.getOptions().getTimeout() * Constants.MINUTE);
 
         Trigger timeoutTrigger = new SimpleTrigger(name, TIMEOUT_TRIGGER_GROUP, time);
         timeoutTrigger.setJobName(FatController.TIMEOUT_JOB_NAME);
@@ -595,7 +595,7 @@ public class BuildController implements EventListener
 
         if (controller.isFinished())
         {
-            controller.collect(buildResult, specification.getRetainWorkingCopy());
+            controller.collect(buildResult, projectConfig.getOptions().getRetainWorkingCopy());
             executingControllers.remove(node);
 
             RecipeResult result = controller.getResult();
@@ -624,15 +624,15 @@ public class BuildController implements EventListener
     private void completeBuild()
     {
         buildResult.abortUnfinishedRecipes();
-        buildResult.setHasWorkDir(specification.getRetainWorkingCopy());
+        buildResult.setHasWorkDir(projectConfig.getOptions().getRetainWorkingCopy());
         buildResult.complete();
 
         if (!request.isPersonal())
         {
-            if (specification.getForceClean())
+            if (project.isForceClean())
             {
-                specification.setForceClean(false);
-                projectManager.save(specification);
+                project.setForceClean(false);
+                projectManager.save(project);
             }
 
             for (PostBuildAction action : buildResult.getProject().getPostBuildActions())
@@ -651,7 +651,7 @@ public class BuildController implements EventListener
         long duration = System.currentTimeMillis() - start;
         if (duration > 300000)
         {
-            LOG.warning("Test case indexing for project %s specification %s took %f seconds", project.getName(), specification.getName(), duration / 1000.0);
+            LOG.warning("Test case indexing for project %s took %f seconds", projectConfig.getName(), duration / 1000.0);
         }
 
         buildManager.save(buildResult);
@@ -676,5 +676,50 @@ public class BuildController implements EventListener
     public void setConfigurationManager(MasterConfigurationManager configurationManager)
     {
         this.configurationManager = configurationManager;
+    }
+
+    public void setEventManager(EventManager eventManager)
+    {
+        this.eventManager = eventManager;
+    }
+
+    public void setProjectManager(ProjectManager projectManager)
+    {
+        this.projectManager = projectManager;
+    }
+
+    public void setUserManager(UserManager userManager)
+    {
+        this.userManager = userManager;
+    }
+
+    public void setBuildManager(BuildManager buildManager)
+    {
+        this.buildManager = buildManager;
+    }
+
+    public void setTestManager(TestManager testManager)
+    {
+        this.testManager = testManager;
+    }
+
+    public void setQueue(RecipeQueue queue)
+    {
+        this.queue = queue;
+    }
+
+    public void setCollector(RecipeResultCollector collector)
+    {
+        this.collector = collector;
+    }
+
+    public void setQuartzScheduler(Scheduler quartzScheduler)
+    {
+        this.quartzScheduler = quartzScheduler;
+    }
+
+    public void setServiceTokenManager(ServiceTokenManager serviceTokenManager)
+    {
+        this.serviceTokenManager = serviceTokenManager;
     }
 }

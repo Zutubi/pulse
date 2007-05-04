@@ -113,13 +113,13 @@ public class CleanupConfiguration extends AbstractNamedConfiguration
             if(total > retain)
             {
                 // Clean out the difference
-                return dao.queryBuilds(new Project[] { project }, allowedStates, null, 0, 0, hasWorkDir, 0, total - retain, false);
+                return dao.queryBuilds(new Project[] { project }, allowedStates, 0, 0, hasWorkDir, 0, total - retain, false);
             }
         }
         else
         {
             long startTime = System.currentTimeMillis() - retain * Constants.DAY;
-            return dao.queryBuilds(new Project[] { project }, allowedStates, null, 0, startTime, hasWorkDir, -1, -1, false);
+            return dao.queryBuilds(new Project[] { project }, allowedStates, 0, startTime, hasWorkDir, -1, -1, false);
         }
 
         return new LinkedList<BuildResult>();

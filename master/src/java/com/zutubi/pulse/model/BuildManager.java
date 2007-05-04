@@ -38,23 +38,22 @@ public interface BuildManager
 
     BuildResult getLatestBuildResult();
     
-    List<BuildResult> queryBuilds(Project[] projects, ResultState[] states, PersistentName[] specs, long earliestStartTime, long latestStartTime, Boolean hasWorkDir, int first, int max, boolean mostRecentFirst);
+    List<BuildResult> queryBuilds(Project[] projects, ResultState[] states, long earliestStartTime, long latestStartTime, Boolean hasWorkDir, int first, int max, boolean mostRecentFirst);
 
-    List<BuildResult> querySpecificationBuilds(Project project, PersistentName spec, ResultState[] states, long lowestNumber, long highestNumber, int first, int max, boolean mostRecentFirst, boolean initialise);
+    List<BuildResult> queryBuilds(Project project, ResultState[] states, long lowestNumber, long highestNumber, int first, int max, boolean mostRecentFirst, boolean initialise);
 
     List<BuildResult> getLatestBuildResultsForProject(Project project, int max);
 
-    public int getBuildCount(Project project, ResultState[] states, PersistentName spec);
+    public int getBuildCount(Project project, ResultState[] states);
 
     /**
      * Counts the number of builds that have happened subsequent to the given
      * build number for the given spec.
      *
-     * @param spec  build specification to limit our search to
      * @param after lower number for the count range, not inclusive
      * @param upTo  upper number of the count range, inclusive
      */
-    int getBuildCount(BuildSpecification spec, long after, long upTo);
+    int getBuildCount(Project project, long after, long upTo);
 
     /**
      * Fills out the list in the given history page based on the page offset.
@@ -70,26 +69,14 @@ public interface BuildManager
      *
      * @param page   the page to fill in
      * @param states if not null, restrict to results in one of these states
-     * @param spec   if no null, restrict to results of the given spec
      */
-    void fillHistoryPage(HistoryPage page, ResultState[] states, PersistentName spec);
+    void fillHistoryPage(HistoryPage page, ResultState[] states);
 
-    /**
-     * @param project the project to search for
-     * @return all build specification names referred to by build results of
-     *         the given project
-     */
-    List<PersistentName> getBuildSpecifications(Project project);
+    List<BuildResult> getLatestCompletedBuildResults(Project project, int max);
 
-    List<BuildResult> getLatestCompletedBuildResults(Project project, PersistentName spec, int max);
-
-    List<BuildResult> getLatestCompletedBuildResults(Project project, PersistentName spec, int first, int max);
+    List<BuildResult> getLatestCompletedBuildResults(Project project, int first, int max);
 
     BuildResult getLatestBuildResult(Project project);
-
-    BuildResult getLatestBuildResult(BuildSpecification spec);
-
-    BuildResult getLatestSuccessfulBuildResult(BuildSpecification specification);
 
     BuildResult getLatestSuccessfulBuildResult(Project project);
 
@@ -108,7 +95,7 @@ public interface BuildManager
      */
     BuildResult getPreviousBuildResult(BuildResult result);
 
-    Revision getPreviousRevision(Project project, PersistentName specification);
+    Revision getPreviousRevision(Project project);
 
     /**
      * Returns the most recent changelists submitted by the given user.

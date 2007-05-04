@@ -4,6 +4,7 @@ import com.zutubi.prototype.config.ConfigurationProvider;
 import com.zutubi.pulse.bootstrap.MasterConfigurationManager;
 import com.zutubi.pulse.bootstrap.StartupManager;
 import com.zutubi.pulse.bootstrap.SystemConfiguration;
+import com.zutubi.pulse.bootstrap.ComponentContext;
 import com.zutubi.pulse.core.BuildException;
 import com.zutubi.pulse.core.RecipeRequest;
 import com.zutubi.pulse.core.config.Resource;
@@ -27,7 +28,7 @@ import java.util.List;
 public class MasterAgentService implements AgentService
 {
     private static final Logger LOG = Logger.getLogger(MasterAgentService.class);
-    
+
     private AgentConfiguration agentConfig;
 
     private MasterRecipeProcessor masterRecipeProcessor;
@@ -57,8 +58,8 @@ public class MasterAgentService implements AgentService
 
     public SlaveStatus getStatus(String masterLocation)
     {
-        long recipeId = masterRecipeProcessor.getBuildingRecipe();
-        if(recipeId == 0)
+        long recipeId = getMasterRecipeProcessor().getBuildingRecipe();
+        if (recipeId == 0)
         {
             return new SlaveStatus(Status.IDLE);
         }
@@ -92,23 +93,23 @@ public class MasterAgentService implements AgentService
 
     public boolean hasResource(String resource, String version)
     {
-        return resourceManager.getAgentRepository(agentConfig.getHandle()).hasResource(resource, version);
+        return getResourceManager().getAgentRepository(agentConfig.getHandle()).hasResource(resource, version);
     }
 
     public boolean build(RecipeRequest request, BuildContext context)
     {
-        masterRecipeProcessor.processRecipe(request, context, resourceManager.getAgentRepository(agentConfig.getHandle()));
+        getMasterRecipeProcessor().processRecipe(request, context, getResourceManager().getAgentRepository(agentConfig.getHandle()));
         return true;
     }
 
     public long getBuildingRecipe()
     {
-        return masterRecipeProcessor.getBuildingRecipe();
+        return getMasterRecipeProcessor().getBuildingRecipe();
     }
 
-    public void collectResults(String project, String spec, long recipeId, boolean incremental, File outputDest, File workDest)
+    public void collectResults(String project, long recipeId, boolean incremental, File outputDest, File workDest)
     {
-        ServerRecipePaths recipePaths = new ServerRecipePaths(project, spec, recipeId, configurationManager.getUserPaths().getData(), incremental);
+        ServerRecipePaths recipePaths = new ServerRecipePaths(project, recipeId, configurationManager.getUserPaths().getData(), incremental);
         File outputDir = recipePaths.getOutputDir();
 
         if (!FileSystemUtils.rename(outputDir, outputDest, true))
@@ -119,13 +120,13 @@ public class MasterAgentService implements AgentService
         if (workDest != null)
         {
             File workDir = recipePaths.getBaseDir();
-            if(incremental)
+            if (incremental)
             {
                 try
                 {
                     FileSystemUtils.copy(workDest, workDir);
                 }
-                catch(IOException e)
+                catch (IOException e)
                 {
                     throw new BuildException("Unable to snapshot work directory '" + workDir.getAbsolutePath() + "' to '" + workDest.getAbsolutePath() + "': " + e.getMessage());
                 }
@@ -140,10 +141,10 @@ public class MasterAgentService implements AgentService
         }
     }
 
-    public void cleanup(String project, String spec, long recipeId, boolean incremental)
+    public void cleanup(String project, long recipeId, boolean incremental)
     {
         // We rename the output dir, so no need to remove it.
-        ServerRecipePaths recipePaths = new ServerRecipePaths(project, spec, recipeId, configurationManager.getUserPaths().getData(), incremental);
+        ServerRecipePaths recipePaths = new ServerRecipePaths(project, recipeId, configurationManager.getUserPaths().getData(), incremental);
         File recipeRoot = recipePaths.getRecipeRoot();
 
         if (!FileSystemUtils.rmdir(recipeRoot))
@@ -154,7 +155,7 @@ public class MasterAgentService implements AgentService
 
     public void terminateRecipe(long recipeId)
     {
-        masterRecipeProcessor.terminateRecipe(recipeId);
+        getMasterRecipeProcessor().terminateRecipe(recipeId);
     }
 
     public String getHostName()
@@ -165,7 +166,7 @@ public class MasterAgentService implements AgentService
     @Override
     public boolean equals(Object obj)
     {
-        if(obj instanceof MasterAgentService)
+        if (obj instanceof MasterAgentService)
         {
             MasterAgentService other = (MasterAgentService) obj;
             return other.agentConfig.getHandle() == agentConfig.getHandle();
@@ -177,12 +178,21 @@ public class MasterAgentService implements AgentService
     public static String constructMasterLocation(GeneralAdminConfiguration generalConfig, SystemConfiguration systemConfig)
     {
         String url = generalConfig.getMasterHost() + ":" + systemConfig.getServerPort() + systemConfig.getContextPath();
-        if(url.endsWith("/"))
+        if (url.endsWith("/"))
         {
             url = url.substring(0, url.length() - 1);
         }
 
         return url;
+    }
+
+    private MasterRecipeProcessor getMasterRecipeProcessor()
+    {
+        if (masterRecipeProcessor == null)
+        {
+            masterRecipeProcessor = ComponentContext.getBean("masterRecipeProcessor");
+        }
+        return masterRecipeProcessor;
     }
 
     public void setMasterRecipeProcessor(MasterRecipeProcessor masterRecipeProcessor)
@@ -195,6 +205,15 @@ public class MasterAgentService implements AgentService
         this.configurationManager = configurationManager;
     }
 
+    public ResourceManager getResourceManager()
+    {
+        if (resourceManager == null)
+        {
+            resourceManager = ComponentContext.getBean("resourceManager");
+        }
+        return resourceManager;
+    }
+    
     public void setResourceManager(ResourceManager resourceManager)
     {
         this.resourceManager = resourceManager;

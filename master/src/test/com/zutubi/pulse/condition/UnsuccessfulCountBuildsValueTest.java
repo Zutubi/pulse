@@ -16,7 +16,6 @@ import java.util.List;
 public class UnsuccessfulCountBuildsValueTest extends PulseTestCase
 {
     private Mock mockBuildManager;
-    private BuildSpecification spec;
     private UnsuccessfulCountBuildsValue value;
     private Project project;
 
@@ -25,10 +24,6 @@ public class UnsuccessfulCountBuildsValueTest extends PulseTestCase
         mockBuildManager = new Mock(BuildManager.class);
         project = new Project();
         project.setId(12);
-        spec = new BuildSpecification("hooray");
-        spec.setId(1234);
-        spec.getPname().setId(44444);
-        project.addBuildSpecification(spec);
         value = new UnsuccessfulCountBuildsValue();
     }
 
@@ -63,7 +58,7 @@ public class UnsuccessfulCountBuildsValueTest extends PulseTestCase
 
     private BuildResult createBuild(long number)
     {
-        BuildResult buildResult = new BuildResult(new ManualTriggerBuildReason("w00t"), project, spec, number, false);
+        BuildResult buildResult = new BuildResult(new ManualTriggerBuildReason("w00t"), project, number, false);
         buildResult.setState(ResultState.FAILURE);
         return buildResult;
     }
@@ -72,8 +67,8 @@ public class UnsuccessfulCountBuildsValueTest extends PulseTestCase
     {
         List<BuildResult> lastSuccesses = new ArrayList<BuildResult>(1);
         lastSuccesses.add(lastSuccess);
-        mockBuildManager.expectAndReturn("querySpecificationBuilds", new FullConstraintMatcher(new Constraint[]{ C.eq(project), C.eq(spec.getPname()), C.eq(new ResultState[]{ ResultState.SUCCESS }), C.eq(-1L), C.eq(buildNumber - 1), C.eq(0), C.eq(1), C.eq(true), C.eq(false) }), lastSuccesses);
-        mockBuildManager.expectAndReturn("getBuildCount", C.args(C.eq(spec), C.eq(sinceBuildNumber), C.eq(buildNumber)), unsuccessfulCount);
+        mockBuildManager.expectAndReturn("queryBuilds", new FullConstraintMatcher(new Constraint[]{ C.eq(project), C.eq(new ResultState[]{ ResultState.SUCCESS }), C.eq(-1L), C.eq(buildNumber - 1), C.eq(0), C.eq(1), C.eq(true), C.eq(false) }), lastSuccesses);
+        mockBuildManager.expectAndReturn("getBuildCount", C.args(C.eq(project), C.eq(sinceBuildNumber), C.eq(buildNumber)), unsuccessfulCount);
     }
 
     private void setBuildManager()

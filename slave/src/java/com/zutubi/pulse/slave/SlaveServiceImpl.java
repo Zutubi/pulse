@@ -125,11 +125,11 @@ public class SlaveServiceImpl implements SlaveService
         return slaveQueue.enqueueExclusive(runnable);
     }
 
-    public void cleanupRecipe(String token, String project, String spec, long recipeId, boolean incremental) throws InvalidTokenException
+    public void cleanupRecipe(String token, String project, long recipeId, boolean incremental) throws InvalidTokenException
     {
         serviceTokenManager.validateToken(token);
 
-        CleanupRecipeCommand command = new CleanupRecipeCommand(project, spec, recipeId, incremental);
+        CleanupRecipeCommand command = new CleanupRecipeCommand(project, recipeId, incremental);
         ComponentContext.autowire(command);
         threadPool.execute(command);
     }

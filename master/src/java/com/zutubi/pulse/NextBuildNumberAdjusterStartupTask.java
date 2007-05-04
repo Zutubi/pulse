@@ -22,7 +22,7 @@ public class NextBuildNumberAdjusterStartupTask implements StartupTask
     public void execute()
     {
         MasterBuildPaths paths = new MasterBuildPaths(configurationManager);
-        List<Project> projects = projectManager.getNameToConfig();
+        List<Project> projects = projectManager.getProjects();
 
         for (Project project : projects)
         {

@@ -112,7 +112,7 @@ public class DefaultScmManager implements ScmManager, Stoppable
 
     private List<ProjectConfiguration> getActiveProjects()
     {
-        return CollectionUtils.filter(projectManager.getAllProjectConfigs().values(), new Predicate<ProjectConfiguration>()
+        return CollectionUtils.filter(projectManager.getAllProjectConfigs(), new Predicate<ProjectConfiguration>()
         {
             public boolean satisfied(ProjectConfiguration configuration)
             {

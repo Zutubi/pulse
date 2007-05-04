@@ -1,6 +1,6 @@
 package com.zutubi.pulse.vfs.pulse;
 
-import com.zutubi.pulse.model.Project;
+import com.zutubi.pulse.prototype.config.ProjectConfiguration;
 import org.apache.commons.vfs.FileName;
 import org.apache.commons.vfs.FileType;
 import org.apache.commons.vfs.provider.AbstractFileSystem;
@@ -45,10 +45,10 @@ public class ProjectsFileObject extends AbstractPulseFileObject implements Addre
         }
         catch (NumberFormatException e)
         {
-            Project project = projectManager.getProject(str);
+            ProjectConfiguration project = projectManager.getProjectConfig(str);
             if (project != null)
             {
-                return project.getId();
+                return project.getProjectId();
             }
         }
         return -1;

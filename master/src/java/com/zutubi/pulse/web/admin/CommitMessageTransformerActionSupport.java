@@ -30,7 +30,7 @@ public class CommitMessageTransformerActionSupport extends ActionSupport
     {
         if(allProjects == null)
         {
-            List<Project> projects = projectManager.getNameToConfig();
+            List<Project> projects = projectManager.getProjects();
             Collections.sort(projects, new NamedEntityComparator());
             allProjects = new LinkedHashMap<Long, String>();
             for(Project p: projects)

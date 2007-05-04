@@ -63,7 +63,7 @@ public class GroupBasicsActionSupport extends GroupActionSupport
         if(allProjects == null)
         {
             allProjects = new LinkedHashMap<Long, String>();
-            List<Project> all = getProjectManager().getNameToConfig();
+            List<Project> all = getProjectManager().getProjects();
             Collections.sort(all, new NamedEntityComparator());
             for(Project p: all)
             {

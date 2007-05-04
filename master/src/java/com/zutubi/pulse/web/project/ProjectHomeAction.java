@@ -11,7 +11,6 @@ import java.util.List;
 public class ProjectHomeAction extends ProjectActionSupport
 {
     private long id;
-    private String projectName;
     private Project project;
     private int totalBuilds;
     private int successfulBuilds;
@@ -125,17 +124,13 @@ public class ProjectHomeAction extends ProjectActionSupport
         {
             project = getProjectManager().getProject(id);
         }
-        else
-        {
-            project = getProjectManager().getProject(projectName);
-        }
 
         if (project != null)
         {
             BuildManager buildManager = getBuildManager();
-            totalBuilds = buildManager.getBuildCount(project, new ResultState[]{ResultState.SUCCESS, ResultState.ERROR, ResultState.FAILURE}, null);
-            successfulBuilds = buildManager.getBuildCount(project, new ResultState[]{ResultState.SUCCESS}, null);
-            failedBuilds = buildManager.getBuildCount(project, new ResultState[]{ResultState.FAILURE}, null);
+            totalBuilds = buildManager.getBuildCount(project, new ResultState[]{ResultState.SUCCESS, ResultState.ERROR, ResultState.FAILURE});
+            successfulBuilds = buildManager.getBuildCount(project, new ResultState[]{ResultState.SUCCESS});
+            failedBuilds = buildManager.getBuildCount(project, new ResultState[]{ResultState.FAILURE});
             currentBuild = buildManager.getLatestBuildResult(project);
             latestChanges = getBuildManager().getLatestChangesForProject(project, 10);
             recentBuilds = buildManager.getLatestBuildResultsForProject(project, 11);
@@ -150,15 +145,10 @@ public class ProjectHomeAction extends ProjectActionSupport
         }
         else
         {
-            addActionError("Unknown project [" + id + "] " + projectName);
+            addActionError("Unknown project [" + id + "] ");
             return ERROR;
         }
 
         return SUCCESS;
-    }
-
-    public void setProjectName(String projectName)
-    {
-        this.projectName = projectName;
     }
 }

@@ -131,50 +131,6 @@ This context requires:
         </property>
     </bean>
 
-
-    <bean id="buildSpecificationDaoTarget"
-          class="com.zutubi.pulse.model.persistence.hibernate.HibernateBuildSpecificationDao">
-        <property name="sessionFactory">
-            <ref bean="sessionFactory"/>
-        </property>
-    </bean>
-    <bean id="buildSpecificationDao" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
-        <property name="transactionManager">
-            <ref bean="transactionManager"/>
-        </property>
-        <property name="target">
-            <ref bean="buildSpecificationDaoTarget"/>
-        </property>
-        <property name="transactionAttributes">
-            <props>
-                <prop key="*">PROPAGATION_REQUIRED</prop>
-            </props>
-        </property>
-    </bean>
-
-
-    <bean id="buildSpecificationNodeDaoTarget"
-          class="com.zutubi.pulse.model.persistence.hibernate.HibernateBuildSpecificationNodeDao">
-        <property name="sessionFactory">
-            <ref bean="sessionFactory"/>
-        </property>
-    </bean>
-    <bean id="buildSpecificationNodeDao"
-          class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
-        <property name="transactionManager">
-            <ref bean="transactionManager"/>
-        </property>
-        <property name="target">
-            <ref bean="buildSpecificationNodeDaoTarget"/>
-        </property>
-        <property name="transactionAttributes">
-            <props>
-                <prop key="*">PROPAGATION_REQUIRED</prop>
-            </props>
-        </property>
-    </bean>
-
-
     <bean id="changelistDaoTarget" class="com.zutubi.pulse.model.persistence.hibernate.HibernateChangelistDao">
         <property name="sessionFactory">
             <ref bean="sessionFactory"/>

@@ -97,40 +97,35 @@ public class DefaultBuildManager implements BuildManager
         return buildResultDao.findLatestByProject(project, max);
     }
 
-    public int getBuildCount(Project project, ResultState[] states, PersistentName spec)
+    public int getBuildCount(Project project, ResultState[] states)
     {
-        return buildResultDao.getBuildCount(project, states, spec);
+        return buildResultDao.getBuildCount(project, states);
     }
 
-    public int getBuildCount(BuildSpecification spec, long after, long upTo)
+    public int getBuildCount(Project project, long after, long upTo)
     {
-        return buildResultDao.getBuildCount(spec.getPname(), after, upTo);
+        return buildResultDao.getBuildCount(project, after, upTo);
     }
 
     public void fillHistoryPage(HistoryPage page)
     {
-        fillHistoryPage(page, new ResultState[]{ResultState.ERROR, ResultState.FAILURE, ResultState.SUCCESS}, null);
+        fillHistoryPage(page, new ResultState[]{ResultState.ERROR, ResultState.FAILURE, ResultState.SUCCESS});
     }
 
-    public List<PersistentName> getBuildSpecifications(Project project)
+    public void fillHistoryPage(HistoryPage page, ResultState[] states)
     {
-        return buildResultDao.findAllSpecifications(project);
+        page.setTotalBuilds(buildResultDao.getBuildCount(page.getProject(), states));
+        page.setResults(buildResultDao.findLatestByProject(page.getProject(), states, page.getFirst(), page.getMax()));
     }
 
-    public void fillHistoryPage(HistoryPage page, ResultState[] states, PersistentName spec)
+    public List<BuildResult> getLatestCompletedBuildResults(Project project, int max)
     {
-        page.setTotalBuilds(buildResultDao.getBuildCount(page.getProject(), states, spec));
-        page.setResults(buildResultDao.findLatestByProject(page.getProject(), states, spec, page.getFirst(), page.getMax()));
+        return getLatestCompletedBuildResults(project, 0, max);
     }
 
-    public List<BuildResult> getLatestCompletedBuildResults(Project project, PersistentName spec, int max)
+    public List<BuildResult> getLatestCompletedBuildResults(Project project, int first, int max)
     {
-        return getLatestCompletedBuildResults(project, spec, 0, max);
-    }
-
-    public List<BuildResult> getLatestCompletedBuildResults(Project project, PersistentName spec, int first, int max)
-    {
-        return buildResultDao.findLatestCompleted(project, spec, first, max);        
+        return buildResultDao.findLatestCompleted(project, first, max);
     }
 
     public BuildResult getByProjectAndNumber(final Project project, final long number)
@@ -176,24 +171,24 @@ public class DefaultBuildManager implements BuildManager
         }
     }
 
-    public List<BuildResult> queryBuilds(Project[] projects, ResultState[] states, PersistentName[] specs, long earliestStartTime, long latestStartTime, Boolean hasWorkDir, int first, int max, boolean mostRecentFirst)
+    public List<BuildResult> queryBuilds(Project[] projects, ResultState[] states, long earliestStartTime, long latestStartTime, Boolean hasWorkDir, int first, int max, boolean mostRecentFirst)
     {
-        return buildResultDao.queryBuilds(projects, states, specs, earliestStartTime, latestStartTime, hasWorkDir, first, max, mostRecentFirst);
+        return buildResultDao.queryBuilds(projects, states, earliestStartTime, latestStartTime, hasWorkDir, first, max, mostRecentFirst);
     }
 
-    public List<BuildResult> querySpecificationBuilds(Project project, PersistentName spec, ResultState[] states, long lowestNumber, long highestNumber, int first, int max, boolean mostRecentFirst, boolean initialise)
+    public List<BuildResult> queryBuilds(Project project, ResultState[] states, long lowestNumber, long highestNumber, int first, int max, boolean mostRecentFirst, boolean initialise)
     {
-        return buildResultDao.querySpecificationBuilds(project, spec, states, lowestNumber, highestNumber, first, max, mostRecentFirst, initialise);
+        return buildResultDao.queryBuilds(project, states, lowestNumber, highestNumber, first, max, mostRecentFirst, initialise);
     }
 
-    public Revision getPreviousRevision(Project project, PersistentName specification)
+    public Revision getPreviousRevision(Project project)
     {
         Revision previousRevision = null;
         int offset = 0;
 
         while(true)
         {
-            List<BuildResult> previousBuildResults = getLatestCompletedBuildResults(project, specification, offset, 1);
+            List<BuildResult> previousBuildResults = getLatestCompletedBuildResults(project, offset, 1);
 
             if (previousBuildResults.size() == 1)
             {
@@ -289,7 +284,7 @@ public class DefaultBuildManager implements BuildManager
 
     public void abortUnfinishedBuilds(Project project, String message)
     {
-        List<BuildResult> incompleteBuilds = queryBuilds(new Project[]{ project}, ResultState.getIncompleteStates(), null, -1, -1, null, -1, -1, true);
+        List<BuildResult> incompleteBuilds = queryBuilds(new Project[]{ project}, ResultState.getIncompleteStates(), -1, -1, null, -1, -1, true);
         for(BuildResult r: incompleteBuilds)
         {
             abortBuild(r, message);
@@ -364,11 +359,6 @@ public class DefaultBuildManager implements BuildManager
         runnable.run();
     }
 
-    public BuildResult getLatestBuildResult(BuildSpecification spec)
-    {
-        return buildResultDao.findLatestByBuildSpec(spec);
-    }
-
     public BuildResult getLatestBuildResult(Project project)
     {
         List<BuildResult> results = getLatestBuildResultsForProject(project, 1);
@@ -382,11 +372,6 @@ public class DefaultBuildManager implements BuildManager
     public BuildResult getLatestBuildResult()
     {
         return buildResultDao.findLatest();
-    }
-
-    public BuildResult getLatestSuccessfulBuildResult(BuildSpecification specification)
-    {
-        return buildResultDao.findLatestSuccessfulBySpecification(specification);
     }
 
     public BuildResult getLatestSuccessfulBuildResult(Project project)

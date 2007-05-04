@@ -16,11 +16,6 @@ public class BuildStageResourceActionSupport extends BuildStageActionSupport
 
     protected void lookupNode()
     {
-        node = getSpecification().getNode(getId());
-        if(node == null)
-        {
-            node = getSpecification().getRoot();
-        }
     }
 
     protected void addFieldsToResource()

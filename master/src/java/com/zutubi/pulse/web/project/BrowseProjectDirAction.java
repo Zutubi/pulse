@@ -1,9 +1,9 @@
 package com.zutubi.pulse.web.project;
 
 import com.zutubi.pulse.model.BuildResult;
-import com.zutubi.pulse.model.BuildSpecification;
 import com.zutubi.pulse.model.Project;
-import com.zutubi.pulse.model.BuildSpecification;
+import com.zutubi.pulse.prototype.config.BuildOptionsConfiguration;
+import com.zutubi.pulse.prototype.config.ProjectConfiguration;
 
 import java.io.File;
 
@@ -14,7 +14,8 @@ public class BrowseProjectDirAction extends ProjectActionSupport
     private long buildId;
     private BuildResult buildResult;
     private String separator;
-    private BuildSpecification buildSpecification;
+    // FIXME: rename me to something else, make sure the template is also updated.
+    private BuildOptionsConfiguration buildSpecification;
 
     public long getBuildId()
     {
@@ -31,7 +32,7 @@ public class BrowseProjectDirAction extends ProjectActionSupport
         return buildResult;
     }
 
-    public BuildSpecification getBuildSpecification()
+    public BuildOptionsConfiguration getBuildSpecification()
     {
         return buildSpecification;
     }
@@ -68,9 +69,9 @@ public class BrowseProjectDirAction extends ProjectActionSupport
         separator = File.separator.replace("\\", "\\\\");
 
         // provide some useful feedback on why the working directory is not available.
-
+        ProjectConfiguration projectConfig = getProjectManager().getProjectConfig(projectId);
         // a) the working copy is not being retained.
-        buildSpecification = getProject().getBuildSpecification(buildResult.getBuildSpecification());
+        buildSpecification = projectConfig.getOptions();
         // b) else, the working directory has been cleaned up by a the projects "cleanup rules" or
         //    it has been manually deleted or the working directory capture has failed.
 

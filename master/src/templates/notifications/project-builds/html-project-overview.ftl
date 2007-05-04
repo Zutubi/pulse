@@ -5,8 +5,7 @@
 </head>
 <body>
     <table cellspacing="0">
-        [@summaryRow ch="Project" cc=project.name?html url=projectLink(result)/]
-        [@summaryRow ch="Build Specification" cc=result.specName.name?html/]
+        [@summaryRow ch="Project" cc=project.name?html url=projectLink(result)/]        
 [#if status == "healthy"]
     [#assign colour="#383"/]
 [#else]

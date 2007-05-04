@@ -5,11 +5,10 @@ import com.zutubi.pulse.core.model.Revision;
 import com.zutubi.pulse.license.LicenseException;
 import com.zutubi.pulse.personal.PatchArchive;
 import com.zutubi.pulse.prototype.config.ProjectConfiguration;
-import com.zutubi.pulse.scheduling.SchedulingException;
 import org.acegisecurity.annotation.Secured;
 
+import java.util.Collection;
 import java.util.List;
-import java.util.Map;
 
 /**
  * 
@@ -17,9 +16,12 @@ import java.util.Map;
  */
 public interface ProjectManager extends EntityManager<Project>
 {
-    Map<String, ProjectConfiguration> getAllProjectConfigs();
+    Collection<ProjectConfiguration> getAllProjectConfigs();
+
     ProjectConfiguration getProjectConfig(String name);
+
     ProjectConfiguration getProjectConfig(long id);
+
     void saveProjectConfig(ProjectConfiguration config);
 
     /**
@@ -32,31 +34,11 @@ public interface ProjectManager extends EntityManager<Project>
 
     Project getProject(long id);
 
-    Project getProjectByBuildSpecification(BuildSpecification buildSpecification);
-
-    List<Project> getNameToConfig();
+    List<Project> getProjects();
 
     List<Project> getAllProjectsCached();
 
     int getProjectCount();
-
-    void save(BuildSpecification specification);
-
-    @Secured({"ACL_PROJECT_WRITE"})
-    void setDefaultBuildSpecification(Project project, long specId);
-
-    /**
-     * Deletes a build specification *and* all triggers that refer to it.
-     *
-     * @param project   the project to delete the specification from
-     * @param specId    the identifier of the specification to delete
-     * @throws com.zutubi.pulse.core.PulseRuntimeException
-     *          if there is no
-     *          specification with the given identifier, or an error occurs
-     *          while deleting it
-     */
-    @Secured({"ACL_PROJECT_WRITE"})
-    void deleteBuildSpecification(Project project, long specId);
 
     @Secured({"ACL_PROJECT_WRITE"})
     void deleteArtifact(Project project, long id);
@@ -82,32 +64,6 @@ public interface ProjectManager extends EntityManager<Project>
 
     @Secured({"ACL_PROJECT_WRITE"})
     void checkWrite(Project project);
-
-    /**
-     * Creates and saves a project that is a replica of the given project,
-     * but with the given name.
-     *
-     * @param project the project to copy
-     * @param name    the name of the new project
-     * @param description the new project's description
-     * @return the new project
-     */
-    @Secured({"ROLE_ADMINISTRATOR"})
-    Project cloneProject(Project project, String name, String description);
-
-    /**
-     * Updates the basic details of a project to the given values, adjusting
-     * other persistent entities where necessary (e.g. trigger groups).
-     *
-     * @param project     the project to be updated
-     * @param name        the new name for the project
-     * @param description the new description for the project
-     * @param url         the new url for the project
-     * @throws com.zutubi.pulse.scheduling.SchedulingException if there is an
-     *         error updating triggers
-     */
-    @Secured({"ACL_PROJECT_WRITE"})
-    void updateProjectDetails(Project project, String name, String description, String url) throws SchedulingException;
 
     /**
      * Returns a list of all projects that allow administration by the given
@@ -149,7 +105,6 @@ public interface ProjectManager extends EntityManager<Project>
      * specification is marked for changelist isolation.
      *
      * @param project       the project to trigger a build of
-     * @param specification name of the specification to build
      * @param reason        the reason the build was triggered
      * @param revision      the revision to build, or null if the revision is
      *                      not fixed (in which case changelist isolation may
@@ -157,11 +112,13 @@ public interface ProjectManager extends EntityManager<Project>
      * @param force         if true, force a build to occur even if the
      *                      latest has been built
      */
-    void triggerBuild(Project project, String specification, BuildReason reason, Revision revision, boolean force);
+    void triggerBuild(Project project, BuildReason reason, Revision revision, boolean force);
 
-    void triggerBuild(long number, Project project, BuildSpecification specification, User user, PatchArchive archive) throws PulseException;
+    void triggerBuild(long number, Project project, User user, PatchArchive archive) throws PulseException;
 
     long getNextBuildNumber(Project project);
+
+    void delete(BuildHostRequirements hostRequirements);
 
     List<ProjectGroup> getAllProjectGroups();
     List<ProjectGroup> getAllProjectGroupsCached();
@@ -173,9 +130,4 @@ public interface ProjectManager extends EntityManager<Project>
 
     @Secured({"ROLE_ADMINISTRATOR"})
     void delete(ProjectGroup projectGroup);
-
-    BuildSpecification getBuildSpecification(long id);
-
-    void delete(BuildHostRequirements hostRequirements);
-
 }

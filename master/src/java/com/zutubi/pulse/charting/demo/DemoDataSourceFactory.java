@@ -45,7 +45,7 @@ public class DemoDataSourceFactory
 
     private static BuildResult createBuildResult(long id, boolean successful, long started, long finished)
     {
-        BuildResult result = new BuildResult(null, null, null, id, false);
+        BuildResult result = new BuildResult(null, null, id, false);
         result.setId(id);
         if (successful)
         {

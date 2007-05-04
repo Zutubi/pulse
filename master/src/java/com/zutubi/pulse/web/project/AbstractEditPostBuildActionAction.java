@@ -1,10 +1,13 @@
 package com.zutubi.pulse.web.project;
 
 import com.zutubi.pulse.core.model.ResultState;
-import com.zutubi.pulse.model.*;
+import com.zutubi.pulse.model.PostBuildAction;
+import com.zutubi.pulse.model.Project;
 import com.zutubi.pulse.xwork.interceptor.Preparable;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
 
 /**
  *
@@ -21,10 +24,9 @@ public abstract class AbstractEditPostBuildActionAction extends ProjectActionSup
     private List<Long> specIds;
     private List<String> stateNames;
 
-    private Map<Long, String> specs;
     private Map<String, String> states;
 
-    private static final List<String> ID_PARAMS = Arrays.asList("id", "projectId", "specId", "nodeId");
+    private static final List<String> ID_PARAMS = Arrays.asList("id", "projectId", "nodeId");
 
     public long getId()
     {
@@ -106,22 +108,6 @@ public abstract class AbstractEditPostBuildActionAction extends ProjectActionSup
         return specId > 0;
     }
 
-    public Map<Long, String> getSpecs()
-    {
-        if(specs == null)
-        {
-            specs = new LinkedHashMap<Long, String>();
-            List<BuildSpecification> buildSpecifications = project.getBuildSpecifications();
-            Collections.sort(buildSpecifications, new NamedEntityComparator());
-            for (BuildSpecification spec : buildSpecifications)
-            {
-                specs.put(spec.getId(), spec.getName());
-            }
-        }
-
-        return specs;
-    }
-
     public Map<String, String> getStates()
     {
         if(states == null)
@@ -143,7 +129,6 @@ public abstract class AbstractEditPostBuildActionAction extends ProjectActionSup
         if (project == null)
         {
             addActionError("Unknown project [" + projectId + "]");
-            return;
         }
     }
 
@@ -156,7 +141,6 @@ public abstract class AbstractEditPostBuildActionAction extends ProjectActionSup
 
         newName = getPostBuildAction().getName();
         failOnError = getPostBuildAction().getFailOnError();
-        specIds = getPostBuildAction().getBuildSpecificationIds();
         stateNames = ResultState.getNames(getPostBuildAction().getStates());
         return INPUT;
     }
@@ -168,38 +152,10 @@ public abstract class AbstractEditPostBuildActionAction extends ProjectActionSup
             return;
         }
 
-        PostBuildAction a;
-        if(isStage())
+        PostBuildAction a = getProject().getPostBuildAction(newName);
+        if(a != null && a.getId() != getPostBuildAction().getId())
         {
-            BuildSpecification spec = project.getBuildSpecification(specId);
-            if(spec == null)
-            {
-                addActionError("Unknown build specification [" + specId + "]");
-                return;
-            }
-
-            BuildSpecificationNode node = spec.getNode(nodeId);
-            if(node == null)
-            {
-                addActionError("Unknown build stage [" + nodeId + "]");
-                return;
-            }
-
-            a = node.getPostAction(newName);
-
-            if(a != null && a.getId() != getPostBuildAction().getId())
-            {
-                addFieldError("newName", "This stage already has a post stage action with name '" + newName + "'");
-            }
-        }
-        else
-        {
-            a = getProject().getPostBuildAction(newName);
-
-            if(a != null && a.getId() != getPostBuildAction().getId())
-            {
-                addFieldError("newName", "This project already has a post build action with name '" + newName + "'");
-            }
+            addFieldError("newName", "This project already has a post build action with name '" + newName + "'");
         }
     }
 
@@ -212,7 +168,6 @@ public abstract class AbstractEditPostBuildActionAction extends ProjectActionSup
 
         PostBuildAction action = getPostBuildAction();
         action.setName(newName);
-        action.setSpecifications(project.lookupBuildSpecifications(specIds));
         action.setStates(ResultState.getStatesList(stateNames));
         action.setFailOnError(failOnError);
         getProjectManager().save(project);
@@ -221,31 +176,7 @@ public abstract class AbstractEditPostBuildActionAction extends ProjectActionSup
 
     protected PostBuildAction lookupAction()
     {
-        PostBuildAction a;
-
-        if(isStage())
-        {
-            BuildSpecification spec = project.getBuildSpecification(getSpecId());
-            if(spec == null)
-            {
-                addActionError("Unknown build specification [" + getSpecId() + "]");
-                return null;
-            }
-
-            BuildSpecificationNode node = spec.getNode(getNodeId());
-            if(node == null)
-            {
-                addActionError("Unknown build stage [" + getNodeId() + "]");
-                return null;
-            }
-
-            a = node.getPostAction(getId());
-        }
-        else
-        {
-            a = project.getPostBuildAction(getId());
-        }
-
+        PostBuildAction a = project.getPostBuildAction(getId());
         if (a == null)
         {
             addActionError("Unknown post build action [" + getId() + "]");

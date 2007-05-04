@@ -21,7 +21,7 @@ public class BuildResult extends Result implements AclObjectIdentityAware, Itera
      * If not null, this build is a personal build for the given user.
      */
     private User user;
-    private PersistentName specName;
+
     private long number;
     /**
      * If true, this build was triggered by a user at a fixed revision.
@@ -42,7 +42,7 @@ public class BuildResult extends Result implements AclObjectIdentityAware, Itera
 
     }
 
-    public BuildResult(BuildReason reason, Project project, BuildSpecification spec, long number, boolean userRevision)
+    public BuildResult(BuildReason reason, Project project, long number, boolean userRevision)
     {
         // Clone the build reason to ensure that each build result has its own build reason. 
         try
@@ -56,17 +56,16 @@ public class BuildResult extends Result implements AclObjectIdentityAware, Itera
 
         this.project = project;
         this.user = null;
-        this.specName = spec.getPname();
         this.number = number;
         this.userRevision = userRevision;
         state = ResultState.INITIAL;
-        root = new RecipeResultNode(null, null);
+        root = new RecipeResultNode(null, 0, null);
         hasWorkDir = true;
     }
 
-    public BuildResult(User user, Project project, BuildSpecification spec, long number)
+    public BuildResult(User user, Project project, long number)
     {
-        this(new PersonalBuildReason(user.getLogin()), project, spec, number, false);
+        this(new PersonalBuildReason(user.getLogin()), project, number, false);
         this.user = user;
     }
 
@@ -98,21 +97,6 @@ public class BuildResult extends Result implements AclObjectIdentityAware, Itera
     private void setUser(User user)
     {
         this.user = user;
-    }
-
-    public String getBuildSpecification()
-    {
-        return specName.getName();
-    }
-
-    public PersistentName getSpecName()
-    {
-        return specName;
-    }
-
-    private void setSpecName(PersistentName specName)
-    {
-        this.specName = specName;
     }
 
     public long getNumber()
@@ -226,9 +210,9 @@ public class BuildResult extends Result implements AclObjectIdentityAware, Itera
         return root.findNode(id);
     }
 
-    public RecipeResultNode findResultNode(PersistentName stage)
+    public RecipeResultNode findResultNodeByHandle(long handle)
     {
-        return root.findNode(stage);
+        return root.findNodeByHandle(handle);
     }
 
     public StoredArtifact findArtifact(String artifactName)

@@ -37,6 +37,7 @@ public class Project extends Entity implements AclObjectIdentity, AclObjectIdent
     private State state = State.IDLE;
     private long nextBuildNumber = 1;
     private Long lastPollTime;
+    private boolean forceClean = false;
 
     // Not sure where the ACLs belong, in the database or in the configuration
     private List<ProjectAclEntry> aclEntries;
@@ -49,8 +50,6 @@ public class Project extends Entity implements AclObjectIdentity, AclObjectIdent
     private PulseFileDetails pulseFileDetails;
     private List<PostBuildAction> postBuildActions = new LinkedList<PostBuildAction>();
     private ChangeViewer changeViewer;
-    private List<BuildSpecification> buildSpecifications;
-    private BuildSpecification defaultSpecification;
 
     public Project()
     {
@@ -69,6 +68,16 @@ public class Project extends Entity implements AclObjectIdentity, AclObjectIdent
     public State getState()
     {
         return state;
+    }
+
+    public boolean isForceClean()
+    {
+        return forceClean;
+    }
+
+    public void setForceClean(boolean forceClean)
+    {
+        this.forceClean = forceClean;
     }
 
     /**
@@ -184,18 +193,6 @@ public class Project extends Entity implements AclObjectIdentity, AclObjectIdent
             copy.changeViewer = changeViewer.copy();
         }
 
-        copy.buildSpecifications = new LinkedList<BuildSpecification>();
-        for(BuildSpecification spec: buildSpecifications)
-        {
-            BuildSpecification specCopy = spec.copy();
-            copy.buildSpecifications.add(specCopy);
-
-            if(spec.equals(defaultSpecification))
-            {
-                copy.defaultSpecification = specCopy;
-            }
-        }
-
         copy.postBuildActions = new LinkedList<PostBuildAction>();
         for(PostBuildAction action: postBuildActions)
         {
@@ -205,6 +202,7 @@ public class Project extends Entity implements AclObjectIdentity, AclObjectIdent
         // Fix the build specification references. The copied post build actions currently reference the original
         // projects specifications. Since the specifications have themselves been copied, we need to reference the
         // new copies.
+/*
         for(PostBuildAction action: copy.postBuildActions)
         {
             List<BuildSpecification> copiedSpecs = new LinkedList<BuildSpecification>();
@@ -222,6 +220,7 @@ public class Project extends Entity implements AclObjectIdentity, AclObjectIdent
             }
             action.setSpecifications(copiedSpecs);
         }
+*/
 
         copy.aclEntries = new LinkedList<ProjectAclEntry>();
         for(ProjectAclEntry acl: getAclEntries())
@@ -270,95 +269,6 @@ public class Project extends Entity implements AclObjectIdentity, AclObjectIdent
     public void setChangeViewer(ChangeViewer changeViewer)
     {
         this.changeViewer = changeViewer;
-    }
-
-    public List<BuildSpecification> getBuildSpecifications()
-    {
-        if (buildSpecifications == null)
-        {
-            buildSpecifications = new LinkedList<BuildSpecification>();
-        }
-
-        return buildSpecifications;
-    }
-
-    public void addBuildSpecification(BuildSpecification specification)
-    {
-        getBuildSpecifications().add(specification);
-    }
-
-    private void setBuildSpecifications(List<BuildSpecification> buildSpecifications)
-    {
-        this.buildSpecifications = buildSpecifications;
-    }
-
-    public BuildSpecification getBuildSpecification(long id)
-    {
-        for(BuildSpecification s: buildSpecifications)
-        {
-            if(s.getId() == id)
-            {
-                return s;
-            }
-        }
-
-        return null;
-    }
-
-    public BuildSpecification getBuildSpecification(String name)
-    {
-        for (BuildSpecification spec : buildSpecifications)
-        {
-            if (spec.getName().compareToIgnoreCase(name) == 0)
-            {
-                return spec;
-            }
-        }
-        return null;
-    }
-
-    public boolean remove(BuildSpecification buildSpecification)
-    {
-        return buildSpecifications.remove(buildSpecification);
-    }
-
-    public BuildSpecification getDefaultSpecification()
-    {
-        return defaultSpecification;
-    }
-
-    public void setDefaultSpecification(BuildSpecification defaultSpecification)
-    {
-        this.defaultSpecification = defaultSpecification;
-    }
-
-    public List<Long> getBuildSpecificationIds()
-    {
-        List<Long> ids = new LinkedList<Long>();
-        for(BuildSpecification spec: buildSpecifications)
-        {
-            ids.add(spec.getId());
-        }
-
-        return ids;
-    }
-
-    public List<BuildSpecification> lookupBuildSpecifications(List<Long> ids)
-    {
-        List<BuildSpecification> result = new LinkedList<BuildSpecification>();
-        if (ids != null)
-        {
-            for(Long id: ids)
-            {
-                BuildSpecification buildSpecification = getBuildSpecification(id);
-                if(buildSpecification != null)
-                {
-                    result.add(buildSpecification);
-                }
-            }
-        }
-
-        return result;
     }
 
     public PulseFileDetails getPulseFileDetails()

@@ -18,9 +18,9 @@ public class CheckoutBootstrapper extends ScmBootstrapper
 
     private boolean persist;
 
-    public CheckoutBootstrapper(String project, String spec, ScmConfiguration scm, BuildRevision revision, boolean persist)
+    public CheckoutBootstrapper(String project, ScmConfiguration scm, BuildRevision revision, boolean persist)
     {
-        super(project, spec, scm, revision);
+        super(project, scm, revision);
         this.persist = persist;
     }
 

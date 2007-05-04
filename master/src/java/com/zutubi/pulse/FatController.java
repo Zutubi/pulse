@@ -209,7 +209,6 @@ public class FatController implements EventListener, Stoppable
         }
     }
 
-
     private void handleBuildRequest(AbstractBuildRequestEvent event)
     {
         // if we are disabled, we ignore incoming build requests.
@@ -233,7 +232,6 @@ public class FatController implements EventListener, Stoppable
     private void startBuild(AbstractBuildRequestEvent event)
     {
         final Project project = event.getProject();
-        BuildSpecification buildSpec = event.getSpecification();
 
         lock.lock();
         try
@@ -244,9 +242,22 @@ public class FatController implements EventListener, Stoppable
                 {
                     projectManager.buildCommenced(project.getId());
                 }
-                
+
+                // FIXME: move the controller creation into the spring context so that we do not need to
+                // do this manual wiring.
                 RecipeResultCollector collector = new DefaultRecipeResultCollector(configManager);
-                BuildController controller = new BuildController(event, buildSpec, eventManager, projectManager, userManager, buildManager, testManager, recipeQueue, collector, quartzScheduler, configManager, serviceTokenManager);
+                BuildController controller = new BuildController(event);
+                controller.setBuildManager(buildManager);
+                controller.setCollector(collector);
+                controller.setEventManager(eventManager);
+                controller.setProjectManager(projectManager);
+                controller.setQuartzScheduler(quartzScheduler);
+                controller.setQueue(recipeQueue);
+                controller.setServiceTokenManager(serviceTokenManager);
+                controller.setTestManager(testManager);
+                controller.setUserManager(userManager);
+                controller.setConfigurationManager(configManager);
+                controller.init();
                 controller.run();
                 runningBuilds.add(controller);
             }

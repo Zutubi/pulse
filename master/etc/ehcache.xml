@@ -253,16 +253,6 @@
            eternal="true"
            overflowToDisk="false"/>
 
-    <cache name="com.zutubi.pulse.model.BuildSpecification"
-           maxElementsInMemory="2000"
-           eternal="true"
-           overflowToDisk="false"/>
-
-    <cache name="com.zutubi.pulse.model.BuildSpecification.properties"
-           maxElementsInMemory="2000"
-           eternal="true"
-           overflowToDisk="false"/>
-
     <cache name="com.zutubi.pulse.model.BuildSpecificationNode"
            maxElementsInMemory="5000"
            eternal="true"

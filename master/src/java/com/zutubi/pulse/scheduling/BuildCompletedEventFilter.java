@@ -21,7 +21,7 @@ public class BuildCompletedEventFilter implements EventTriggerFilter
     public boolean accept(Trigger trigger, Event event)
     {
         BuildCompletedEvent bce = (BuildCompletedEvent) event;
-        return !bce.getResult().isPersonal() && checkProject(trigger, bce) && checkSpec(trigger, bce) && checkState(trigger, bce);
+        return !bce.getResult().isPersonal() && checkProject(trigger, bce) && checkState(trigger, bce);
     }
 
     public boolean dependsOnProject(Trigger trigger, long projectId)
@@ -34,12 +34,6 @@ public class BuildCompletedEventFilter implements EventTriggerFilter
     {
         Long projectId = (Long) trigger.getDataMap().get(PARAM_PROJECT);
         return projectId == null || projectId == event.getResult().getProject().getId();
-    }
-
-    private boolean checkSpec(Trigger trigger, BuildCompletedEvent event)
-    {
-        String spec = (String) trigger.getDataMap().get(PARAM_SPECIFICATION);
-        return spec == null || spec.equals(event.getResult().getBuildSpecification());
     }
 
     private boolean checkState(Trigger trigger, BuildCompletedEvent event)

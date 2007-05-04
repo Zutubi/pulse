@@ -1,16 +1,24 @@
 package com.zutubi.pulse;
 
-import com.zutubi.pulse.bootstrap.ComponentContext;
 import com.zutubi.pulse.core.Bootstrapper;
 import com.zutubi.pulse.core.BuildException;
 import com.zutubi.pulse.core.config.ResourceProperty;
 import com.zutubi.pulse.core.model.CommandResult;
 import com.zutubi.pulse.core.model.FeaturePersister;
 import com.zutubi.pulse.core.model.RecipeResult;
-import com.zutubi.pulse.events.build.*;
-import com.zutubi.pulse.model.*;
-import com.zutubi.pulse.services.ServiceTokenManager;
+import com.zutubi.pulse.events.build.CommandCommencedEvent;
+import com.zutubi.pulse.events.build.CommandCompletedEvent;
+import com.zutubi.pulse.events.build.CommandOutputEvent;
+import com.zutubi.pulse.events.build.RecipeCommencedEvent;
+import com.zutubi.pulse.events.build.RecipeCompletedEvent;
+import com.zutubi.pulse.events.build.RecipeDispatchedEvent;
+import com.zutubi.pulse.events.build.RecipeErrorEvent;
+import com.zutubi.pulse.events.build.RecipeEvent;
+import com.zutubi.pulse.model.BuildManager;
+import com.zutubi.pulse.model.BuildResult;
+import com.zutubi.pulse.model.RecipeResultNode;
 import com.zutubi.pulse.prototype.config.ProjectConfiguration;
+import com.zutubi.pulse.services.ServiceTokenManager;
 import com.zutubi.util.logging.Logger;
 
 import java.io.IOException;
@@ -25,7 +33,6 @@ public class RecipeController
 
     private ProjectConfiguration projectConfig;
     private BuildResult buildResult;
-    private BuildSpecificationNode specNode;
     private RecipeResultNode recipeResultNode;
     private RecipeResult recipeResult;
     private RecipeDispatchRequest dispatchRequest;
@@ -42,11 +49,10 @@ public class RecipeController
     private RecipeQueue queue;
     private AgentService agentService;
 
-    public RecipeController(ProjectConfiguration projectConfig, BuildResult buildResult, BuildSpecificationNode specNode, RecipeResultNode recipeResultNode, RecipeDispatchRequest dispatchRequest, List<ResourceProperty> buildProperties, boolean personal, boolean incremental, RecipeResultNode previousSuccessful, RecipeLogger logger, RecipeResultCollector collector, RecipeQueue queue, BuildManager manager, ServiceTokenManager serviceTokenManager)
+    public RecipeController(ProjectConfiguration projectConfig, BuildResult buildResult, RecipeResultNode recipeResultNode, RecipeDispatchRequest dispatchRequest, List<ResourceProperty> buildProperties, boolean personal, boolean incremental, RecipeResultNode previousSuccessful, RecipeLogger logger, RecipeResultCollector collector)
     {
         this.projectConfig = projectConfig;
         this.buildResult = buildResult;
-        this.specNode = specNode;
         this.recipeResultNode = recipeResultNode;
         this.recipeResult = recipeResultNode.getResult();
         this.dispatchRequest = dispatchRequest;
@@ -56,9 +62,6 @@ public class RecipeController
         this.previousSuccessful = previousSuccessful;
         this.logger = logger;
         this.collector = collector;
-        this.queue = queue;
-        this.buildManager = manager;
-        this.serviceTokenManager = serviceTokenManager;
     }
 
     public void prepare(BuildResult buildResult)
@@ -239,11 +242,14 @@ public class RecipeController
 
         if (!personal)
         {
+            // FIXME: re-enable post build actions via the configuration objects.
+/*
             for(PostBuildAction action: specNode.getPostActions())
             {
                 ComponentContext.autowire(action);
                 action.execute(projectConfig, buildResult, recipeResultNode, buildProperties);
             }
+*/
         }
 
         buildManager.save(recipeResult);
@@ -351,5 +357,21 @@ public class RecipeController
     public RecipeResult getResult()
     {
         return recipeResult;
+    }
+
+
+    public void setBuildManager(BuildManager buildManager)
+    {
+        this.buildManager = buildManager;
+    }
+
+    public void setServiceTokenManager(ServiceTokenManager serviceTokenManager)
+    {
+        this.serviceTokenManager = serviceTokenManager;
+    }
+
+    public void setRecipeQueue(RecipeQueue queue)
+    {
+        this.queue = queue;
     }
 }

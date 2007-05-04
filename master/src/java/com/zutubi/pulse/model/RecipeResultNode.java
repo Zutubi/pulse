@@ -10,7 +10,8 @@ import java.util.List;
  */
 public class RecipeResultNode extends Entity
 {
-    private PersistentName stageName;
+    private long stageHandle;
+    private String stageName;
     private String host;
     private RecipeResult result;
     private List<RecipeResultNode> children;
@@ -19,26 +20,43 @@ public class RecipeResultNode extends Entity
     {
     }
 
-    public RecipeResultNode(PersistentName stageName, RecipeResult result)
+    public RecipeResultNode(String stageName, long stageHandle, RecipeResult result)
     {
         this.stageName = stageName;
+        this.stageHandle = stageHandle;
         this.result = result;
         children = new LinkedList<RecipeResultNode>();
     }
 
-    public String getStage()
-    {
-        return stageName.getName();
-    }
-
-    public PersistentName getStageName()
+    public String getStageName()
     {
         return stageName;
     }
 
-    private void setStageName(PersistentName stageName)
+    /**
+     * Used by hibernate
+     */
+    private void setStageName(String stageName)
     {
         this.stageName = stageName;
+    }
+
+    /**
+     * WARNING: This stage configuration id may or MAY NOT exist.
+     *  
+     * @return
+     */
+    public long getStageHandle()
+    {
+        return stageHandle;
+    }
+
+    /**
+     * Used by hibernate
+     */
+    private void setStageHandle(long stageHandle)
+    {
+        this.stageHandle = stageHandle;
     }
 
     public String getHost()
@@ -195,16 +213,16 @@ public class RecipeResultNode extends Entity
         return null;
     }
 
-    public RecipeResultNode findNode(PersistentName stageName)
+    public RecipeResultNode findNodeByHandle(long handle)
     {
-        if(stageName.equals(this.stageName))
+        if(handle == getStageHandle())
         {
             return this;
         }
 
         for(RecipeResultNode child: children)
         {
-            RecipeResultNode found = child.findNode(stageName);
+            RecipeResultNode found = child.findNodeByHandle(handle);
             if(found != null)
             {
                 return found;
@@ -216,7 +234,7 @@ public class RecipeResultNode extends Entity
 
     public RecipeResultNode findNode(String stageName)
     {
-        if(this.stageName != null && stageName.equals(this.stageName.getName()))
+        if(this.stageName != null && stageName.equals(this.stageName))
         {
             return this;
         }

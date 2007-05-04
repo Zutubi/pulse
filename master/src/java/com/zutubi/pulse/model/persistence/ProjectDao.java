@@ -12,8 +12,6 @@ public interface ProjectDao extends EntityDao<Project>
 {
     Project findByName(String name);
 
-    Project findByBuildSpecification(BuildSpecification buildSpecification);
-
     void save(VersionedPulseFileDetails details);
 
     VersionedPulseFileDetails findVersionedPulseFileDetails(long id);
@@ -37,4 +35,6 @@ public interface ProjectDao extends EntityDao<Project>
     List<Project> findByAdminAuthority(String authority);
 
     List<Project> findAllProjectsCached();
+
+    void delete(BuildHostRequirements hostRequirements);
 }

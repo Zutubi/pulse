@@ -1,45 +1,33 @@
 package com.zutubi.pulse.web.project;
 
-import com.opensymphony.util.TextUtils;
 import com.zutubi.pulse.core.model.ResultState;
-import com.zutubi.pulse.model.BuildSpecification;
 import com.zutubi.pulse.model.NamedEntityComparator;
 import com.zutubi.pulse.model.Project;
 import com.zutubi.pulse.model.ProjectManager;
 import com.zutubi.pulse.scheduling.BuildCompletedEventFilter;
 import com.zutubi.pulse.scheduling.Trigger;
-import com.zutubi.util.Sort;
 
 import java.io.Serializable;
-import java.util.*;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
 
 /**
  */
 public class BuildCompletedTriggerHelper
 {
     private Map<Long, String> filterProjects;
-    private Map<Long, List<String>> filterSpecifications;
 
     public void initialise(ProjectManager projectManager)
     {
         filterProjects = new TreeMap<Long, String>();
-        filterSpecifications = new LinkedHashMap<Long, List<String>>();
 
-        List<Project> projects = projectManager.getNameToConfig();
+        List<Project> projects = projectManager.getProjects();
         Collections.sort(projects, new NamedEntityComparator());
         for(Project p: projects)
         {
             filterProjects.put(p.getId(), p.getName());
-
-            List<String> specs = new LinkedList<String>();
-            for(BuildSpecification spec: p.getBuildSpecifications())
-            {
-                specs.add(spec.getName());
-            }
-
-            Collections.sort(specs, new Sort.StringComparator());
-            specs.add(0, "");
-            filterSpecifications.put(p.getId(), specs);
         }
     }
 
@@ -47,11 +35,6 @@ public class BuildCompletedTriggerHelper
     {
         Map<Serializable, Serializable> dataMap = trigger.getDataMap();
         dataMap.put(BuildCompletedEventFilter.PARAM_PROJECT, filterProject);
-
-        if(TextUtils.stringSet(filterSpecification))
-        {
-            dataMap.put(BuildCompletedEventFilter.PARAM_SPECIFICATION, filterSpecification);
-        }
 
         if(filterStateNames != null && filterStateNames.size() > 0)
         {
@@ -62,11 +45,6 @@ public class BuildCompletedTriggerHelper
     public Map<Long, String> getFilterProjects()
     {
         return filterProjects;
-    }
-
-    public Map<Long, List<String>> getFilterSpecifications()
-    {
-        return filterSpecifications;
     }
 
     public Map<String, String> getStateMap()

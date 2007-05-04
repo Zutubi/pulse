@@ -17,15 +17,9 @@
 
         <property name="stateName" column="STATE" type="string" length="31"/>
 
+        <property name="forceClean" column="FORCE_CLEAN" type="boolean"/>
+
         <many-to-one name="pulseFileDetails" class="com.zutubi.pulse.model.PulseFileDetails" column="BOB_FILE_DETAILS" lazy="false" cascade="all"/>
-
-        <bag name="buildSpecifications" cascade="all,delete-orphan" lazy="false">
-            <cache usage="read-write"/>
-            <key column="PROJECT_ID"/>
-            <one-to-many class="com.zutubi.pulse.model.BuildSpecification"/>
-        </bag>
-
-        <many-to-one name="defaultSpecification" class="com.zutubi.pulse.model.BuildSpecification" column="DEFAULT_SPECIFICATION" lazy="false" cascade="none"/>
 
         <bag name="postBuildActions" cascade="all,delete-orphan" lazy="false">
             <cache usage="read-write"/>
@@ -232,12 +226,6 @@
 
         <property name="name" type="string" length="255"/>
 
-        <bag name="specifications" table="POST_BUILD_ACTION_SPECIFICATIONS" lazy="false">
-            <cache usage="read-write"/>
-            <key column="ACTION_ID"/>
-            <many-to-many class="com.zutubi.pulse.model.BuildSpecification" column="SPECIFICATION_ID"/>
-        </bag>
-
         <property name="statesString" type="string" length="255"/>
 
         <property name="failOnError" type="boolean"/>
@@ -260,11 +248,6 @@
     <query name="findByName" cacheable="true"><![CDATA[
         from Project project
         where project.name = :name
-    ]]></query>
-
-    <query name="findProjectByBuildSpecification" cacheable="true"><![CDATA[
-        from Project project
-        where :buildSpecification in elements(project.buildSpecifications)
     ]]></query>
 
     <query name="findByAcl"><![CDATA[

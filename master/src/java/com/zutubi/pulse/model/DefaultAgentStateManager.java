@@ -1,7 +1,6 @@
 package com.zutubi.pulse.model;
 
 import com.zutubi.pulse.model.persistence.AgentStateDao;
-import com.zutubi.pulse.model.persistence.BuildSpecificationDao;
 import com.zutubi.pulse.scheduling.Scheduler;
 import com.zutubi.pulse.scheduling.SchedulingException;
 import com.zutubi.pulse.scheduling.SimpleTrigger;
@@ -19,7 +18,6 @@ public class DefaultAgentStateManager implements AgentStateManager
     private static final Logger LOG = Logger.getLogger(DefaultAgentStateManager.class);
 
     private AgentStateDao agentStateDao;
-    private BuildSpecificationDao buildSpecificationDao;
     private Scheduler scheduler;
     private ProjectManager projectManager;
 
@@ -67,12 +65,15 @@ public class DefaultAgentStateManager implements AgentStateManager
         if (agentState != null)
         {
             // Remove all build stages that require this slave explicitly
+            // FIXME: build specifications no longer hold the stages. this needs to be updated accordingly.
+/*
             List<BuildSpecification> buildSpecs = buildSpecificationDao.findBySlave(agentState);
             for(BuildSpecification spec: buildSpecs)
             {
                 removeStageReferences(spec.getRoot(), id);
                 projectManager.save(spec);
             }
+*/
 
             agentStateDao.delete(agentState);
         }
@@ -118,11 +119,6 @@ public class DefaultAgentStateManager implements AgentStateManager
     public void setScheduler(Scheduler scheduler)
     {
         this.scheduler = scheduler;
-    }
-
-    public void setBuildSpecificationDao(BuildSpecificationDao buildSpecificationDao)
-    {
-        this.buildSpecificationDao = buildSpecificationDao;
     }
 
     public void setProjectManager(ProjectManager projectManager)

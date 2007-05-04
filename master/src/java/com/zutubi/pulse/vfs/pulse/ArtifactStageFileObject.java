@@ -78,7 +78,7 @@ public class ArtifactStageFileObject extends AbstractPulseFileObject implements 
     public String getDisplayName()
     {
         RecipeResultNode node = buildManager.getResultNodeByResultId(recipeId);
-        return String.format(STAGE_FORMAT, node.getStage(), node.getResult().getRecipeNameSafe(), node.getHostSafe());
+        return String.format(STAGE_FORMAT, node.getStageName(), node.getResult().getRecipeNameSafe(), node.getHostSafe());
     }
 
     public RecipeResult getRecipeResult()

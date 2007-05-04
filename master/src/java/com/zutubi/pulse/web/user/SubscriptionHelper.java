@@ -125,7 +125,7 @@ public class SubscriptionHelper
         if(allProjects == null)
         {
             allProjects = new LinkedHashMap<Long, String>();
-            List<Project> all = projectManager.getNameToConfig();
+            List<Project> all = projectManager.getProjects();
             Collections.sort(all, new NamedEntityComparator());
             for(Project p: all)
             {

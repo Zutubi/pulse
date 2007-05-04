@@ -101,16 +101,16 @@ public class SlaveAgentService implements AgentService
         }
     }
 
-    public void collectResults(String project, String spec, long recipeId, boolean incremental, File outputDest, File workDest)
+    public void collectResults(String project, long recipeId, boolean incremental, File outputDest, File workDest)
     {
-        collect(project, spec, recipeId, incremental, true, outputDest);
+        collect(project, recipeId, incremental, true, outputDest);
         if (workDest != null)
         {
-            collect(project, spec, recipeId, incremental, false, workDest);
+            collect(project, recipeId, incremental, false, workDest);
         }
     }
 
-    private void collect(String project, String spec, long recipeId, boolean incremental, boolean output, File destination)
+    private void collect(String project, long recipeId, boolean incremental, boolean output, File destination)
     {
         FileOutputStream fos = null;
         File tempDir = null;
@@ -127,7 +127,7 @@ public class SlaveAgentService implements AgentService
                 throw new BuildException("Unable to create temporary directory '" + tempDir.getAbsolutePath() + "'");
             }
 
-            URL resultUrl = new URL("http", agentConfig.getHost(), agentConfig.getPort(), "/download?token=" + serviceTokenManager.getToken() + "&project=" + UrlEncoded.encodeString(project) + "&spec=" + UrlEncoded.encodeString(spec) + "&incremental=" + incremental + "&output=" + output + "&recipe=" + recipeId);
+            URL resultUrl = new URL("http", agentConfig.getHost(), agentConfig.getPort(), "/download?token=" + serviceTokenManager.getToken() + "&project=" + UrlEncoded.encodeString(project) + "&incremental=" + incremental + "&output=" + output + "&recipe=" + recipeId);
             URLConnection urlConnection = resultUrl.openConnection();
 
             // originally the zip stream was unzipped as read from the
@@ -168,11 +168,11 @@ public class SlaveAgentService implements AgentService
         }
     }
 
-    public void cleanup(String project, String spec, long recipeId, boolean incremental)
+    public void cleanup(String project, long recipeId, boolean incremental)
     {
         try
         {
-            service.cleanupRecipe(serviceTokenManager.getToken(), project, spec, recipeId, incremental);
+            service.cleanupRecipe(serviceTokenManager.getToken(), project, recipeId, incremental);
         }
         catch (Exception e)
         {

@@ -1,6 +1,5 @@
 package com.zutubi.pulse.web.project;
 
-import com.zutubi.pulse.model.BuildSpecification;
 import com.zutubi.pulse.model.Project;
 import com.zutubi.pulse.scheduling.Scheduler;
 import com.zutubi.pulse.scheduling.SchedulingException;
@@ -8,7 +7,9 @@ import com.zutubi.pulse.scheduling.Trigger;
 import com.zutubi.pulse.scheduling.tasks.BuildProjectTask;
 import com.zutubi.pulse.xwork.interceptor.Preparable;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
 
 /**
  *
@@ -65,6 +66,7 @@ public abstract class AbstractEditTriggerAction extends ProjectActionSupport imp
             return;
         }
 
+/*
         specifications = new LinkedHashMap<Long, String>();
         for (BuildSpecification spec : project.getBuildSpecifications())
         {
@@ -73,6 +75,7 @@ public abstract class AbstractEditTriggerAction extends ProjectActionSupport imp
 
         Trigger trigger = getTrigger();
         specification = (Long) trigger.getDataMap().get(BuildProjectTask.PARAM_SPEC);
+*/
     }
 
     public String doInput()

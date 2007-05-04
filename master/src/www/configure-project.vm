@@ -151,9 +151,6 @@
         #else
                         <td class="content">
                             #wwtext("name=buildspec.not.default")
-            #acl("domainObject=project" "hasPermission=4,1")
-                            [<a href="setDefaultBuildSpecification.action?projectId=$project.id&amp;id=$buildSpec.id">#wwtext("name=buildspec.make.default")</a>]
-            #end
                         </td>
         #end
         #acl("domainObject=project" "hasPermission=4,1")

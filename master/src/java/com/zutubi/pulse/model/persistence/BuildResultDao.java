@@ -19,17 +19,17 @@ public interface BuildResultDao extends EntityDao<BuildResult>
 
     void save(CommandResult result);
 
-    List<BuildResult> queryBuilds(Project[] projects, ResultState[] states, PersistentName[] specs, long earliestStartTime, long latestStartTime, Boolean hasWorkDir, int first, int max, boolean mostRecentFirst);
+    List<BuildResult> queryBuilds(Project[] projects, ResultState[] states, long earliestStartTime, long latestStartTime, Boolean hasWorkDir, int first, int max, boolean mostRecentFirst);
 
     List<BuildResult> findLatestByProject(Project project, int max);
 
-    List<BuildResult> findSinceByProject(Project project, PersistentName spec, Date since);
+    List<BuildResult> findSinceByProject(Project project, Date since);
 
     List<BuildResult> findLatestByProject(Project project, int first, int max);
 
-    List<BuildResult> findLatestByProject(Project project, ResultState[] states, PersistentName spec, int first, int max);
+    List<BuildResult> findLatestByProject(Project project, ResultState[] states, int first, int max);
 
-    List<BuildResult> findLatestCompleted(Project project, PersistentName spec, int first, int max);
+    List<BuildResult> findLatestCompleted(Project project, int first, int max);
 
     BuildResult findPreviousBuildResult(BuildResult result);
 
@@ -45,17 +45,13 @@ public interface BuildResultDao extends EntityDao<BuildResult>
 
     RecipeResult findRecipeResult(long id);
 
-    int getBuildCount(Project project, ResultState[] states, PersistentName spec);
+    int getBuildCount(Project project, ResultState[] states);
 
     int getBuildCount(Project project, ResultState[] states, Boolean hasWorkDir);
 
-    int getBuildCount(PersistentName spec, long after, long upTo);
+    int getBuildCount(Project project, long after, long upTo);
 
-    List<PersistentName> findAllSpecifications(Project project);
-
-    List<PersistentName> findAllSpecificationsForProjects(Project[] projects);
-
-    List<BuildResult> querySpecificationBuilds(Project project, PersistentName spec, ResultState[] states, long lowestNumber, long highestNumber, int first, int max, boolean mostRecentFirst, boolean initialise);
+    List<BuildResult> queryBuilds(Project project, ResultState[] states, long lowestNumber, long highestNumber, int first, int max, boolean mostRecentFirst, boolean initialise);
 
     List<BuildResult> findByUser(User user);
 
@@ -70,10 +66,6 @@ public interface BuildResultDao extends EntityDao<BuildResult>
     BuildResult findLatest();
 
     CommandResult findCommandResultByArtifact(long artifactId);
-
-    BuildResult findLatestByBuildSpec(BuildSpecification spec);
-
-    BuildResult findLatestSuccessfulBySpecification(BuildSpecification spec);
 
     BuildResult findLatestSuccessfulByProject(Project project);
 

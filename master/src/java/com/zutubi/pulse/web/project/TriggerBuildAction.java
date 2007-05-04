@@ -1,8 +1,8 @@
 package com.zutubi.pulse.web.project;
 
-import com.zutubi.pulse.model.BuildSpecification;
 import com.zutubi.pulse.model.ManualTriggerBuildReason;
 import com.zutubi.pulse.model.Project;
+import com.zutubi.pulse.prototype.config.ProjectConfiguration;
 
 public class TriggerBuildAction extends ProjectActionSupport
 {
@@ -34,28 +34,14 @@ public class TriggerBuildAction extends ProjectActionSupport
 
         getProjectManager().checkWrite(project);
 
-        BuildSpecification spec;
-        if(id > 0)
-        {
-            spec = project.getBuildSpecification(id);
-        }
-        else
-        {
-            spec = project.getDefaultSpecification();
-        }
+        ProjectConfiguration projectConfig = getProjectManager().getProjectConfig(projectId);
 
-        if (spec == null)
-        {
-            addActionError("Request to build unknown build specification id '" + id + "' for project '" + project.getName() + "'");
-            return ERROR;
-        }
-
-        if(spec.getPrompt())
+        if(projectConfig.getOptions().getPrompt())
         {
             return "prompt";
         }
         
-        getProjectManager().triggerBuild(project, spec.getName(), new ManualTriggerBuildReason((String)getPrinciple()), null, true);
+        getProjectManager().triggerBuild(project, new ManualTriggerBuildReason((String)getPrinciple()), null, true);
 
         try
         {

@@ -24,11 +24,6 @@ public class HibernateProjectDao extends HibernateEntityDao<Project> implements 
         return (Project) findUniqueByNamedQuery("findByName", "name", name, true);
     }
 
-    public Project findByBuildSpecification(BuildSpecification buildSpecification)
-    {
-        return (Project) findUniqueByNamedQuery("findProjectByBuildSpecification", "buildSpecification", buildSpecification);
-    }
-
     public void save(VersionedPulseFileDetails details)
     {
         getHibernateTemplate().saveOrUpdate(details);
@@ -87,5 +82,10 @@ public class HibernateProjectDao extends HibernateEntityDao<Project> implements 
     public List<Project> findAllProjectsCached()
     {
         return findByNamedQuery("findAllProjectsCached", 0, true);
+    }
+
+    public void delete(BuildHostRequirements hostRequirements)
+    {
+        getHibernateTemplate().delete(hostRequirements);
     }
 }

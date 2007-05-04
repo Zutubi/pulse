@@ -8,7 +8,6 @@ import com.zutubi.pulse.cache.ehcache.CustomAclEntryCache;
 import com.zutubi.pulse.core.BuildException;
 import com.zutubi.pulse.core.BuildRevision;
 import com.zutubi.pulse.core.PulseException;
-import com.zutubi.pulse.core.PulseRuntimeException;
 import com.zutubi.pulse.core.model.Revision;
 import com.zutubi.pulse.core.model.TestCaseIndex;
 import com.zutubi.pulse.events.EventManager;
@@ -18,17 +17,26 @@ import com.zutubi.pulse.license.LicenseException;
 import com.zutubi.pulse.license.LicenseHolder;
 import com.zutubi.pulse.license.LicenseManager;
 import com.zutubi.pulse.license.authorisation.AddProjectAuthorisation;
-import com.zutubi.pulse.model.persistence.*;
+import com.zutubi.pulse.model.persistence.ProjectDao;
+import com.zutubi.pulse.model.persistence.ProjectGroupDao;
+import com.zutubi.pulse.model.persistence.TestCaseIndexDao;
 import com.zutubi.pulse.personal.PatchArchive;
 import com.zutubi.pulse.prototype.config.ProjectConfiguration;
-import com.zutubi.pulse.scheduling.*;
+import com.zutubi.pulse.scheduling.EventTrigger;
+import com.zutubi.pulse.scheduling.Scheduler;
+import com.zutubi.pulse.scheduling.SchedulingException;
+import com.zutubi.pulse.scheduling.ScmChangeEventFilter;
 import com.zutubi.pulse.scheduling.tasks.BuildProjectTask;
 import com.zutubi.pulse.scm.ScmChangeEvent;
 import com.zutubi.pulse.scm.ScmException;
 import com.zutubi.util.logging.Logger;
 import org.acegisecurity.annotation.Secured;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * 
@@ -42,9 +50,6 @@ public class DefaultProjectManager implements ProjectManager
 
     private ProjectDao projectDao;
     private ProjectGroupDao projectGroupDao;
-    private BuildSpecificationDao buildSpecificationDao;
-    private BuildSpecificationNodeDao buildSpecificationNodeDao;
-    private TriggerDao triggerDao;
     private TestCaseIndexDao testCaseIndexDao;
     private Scheduler scheduler;
     private BuildManager buildManager;
@@ -77,7 +82,11 @@ public class DefaultProjectManager implements ProjectManager
                 // FIXME: Pulse file details temporary for testing
                 AntPulseFileDetails pulseFileDetails = new AntPulseFileDetails();
                 pulseFileDetails.setBuildFile("build.xml");
-                Project project = new Project((String) record.get("name"), (String) record.get("description"));
+                Project project = new Project();
+                // FIXME: setting the name and description here is temporary. All names and descriptions should be
+                // retrieved from the projectConfig.
+                project.setName((String) record.get("name"));
+                project.setDescription((String) record.get("description"));
                 project.setPulseFileDetails(pulseFileDetails);
                 save(project);
                 record.put("projectId", Long.toString(project.getId()));
@@ -131,9 +140,9 @@ public class DefaultProjectManager implements ProjectManager
         projectDao.save(project);
     }
 
-    public Map<String, ProjectConfiguration> getAllProjectConfigs()
+    public Collection<ProjectConfiguration> getAllProjectConfigs()
     {
-        return Collections.unmodifiableMap(nameToConfig);
+        return Collections.unmodifiableCollection(nameToConfig.values());
     }
 
     public ProjectConfiguration getProjectConfig(String name)
@@ -161,12 +170,7 @@ public class DefaultProjectManager implements ProjectManager
         return projectDao.findById(id);
     }
 
-    public Project getProjectByBuildSpecification(BuildSpecification buildSpecification)
-    {
-        return projectDao.findByBuildSpecification(buildSpecification);
-    }
-
-    public List<Project> getNameToConfig()
+    public List<Project> getProjects()
     {
         return projectDao.findAll();
     }
@@ -179,22 +183,6 @@ public class DefaultProjectManager implements ProjectManager
     public int getProjectCount()
     {
         return projectDao.count();
-    }
-
-    public void save(BuildSpecification specification)
-    {
-        buildSpecificationDao.save(specification);
-    }
-
-    public void setDefaultBuildSpecification(Project project, long specId)
-    {
-        BuildSpecification spec = project.getBuildSpecification(specId);
-        if(spec == null)
-        {
-            throw new IllegalArgumentException("Unknown build specificaiton [" + specId + "]");
-        }
-
-        project.setDefaultSpecification(spec);
     }
 
     private void deleteProject(Project entity)
@@ -249,37 +237,8 @@ public class DefaultProjectManager implements ProjectManager
     {
     }
 
-    public Project cloneProject(Project project, String name, String description)
+    public void triggerBuild(Project project, BuildReason reason, Revision revision, boolean force)
     {
-        Project copy = project.copy(name, description);
-        projectDao.save(copy);
-
-        List<Trigger> triggers = scheduler.getTriggers(project.getId());
-        for(Trigger t: triggers)
-        {
-            Trigger triggerCopy = t.copy(project, copy);
-            try
-            {
-                scheduler.schedule(triggerCopy);
-            }
-            catch (SchedulingException e)
-            {
-                LOG.severe("Unable to schedule trigger: " + e);
-            }
-        }
-
-        return copy;
-    }
-
-    public void triggerBuild(Project project, String specification, BuildReason reason, Revision revision, boolean force)
-    {
-        BuildSpecification spec = project.getBuildSpecification(specification);
-        if(spec == null)
-        {
-            LOG.warning("Request to build unknown specification '" + specification + "' of project '" + project.getName() + "'");
-            return;
-        }
-
         ProjectConfiguration projectConfig = getProjectConfig(project.getId());
         if(projectConfig == null)
         {
@@ -289,36 +248,36 @@ public class DefaultProjectManager implements ProjectManager
         
         if(revision == null)
         {
-            if(spec.getIsolateChangelists())
+            if(projectConfig.getOptions().getIsolateChangelists())
             {
                 // In this case we need to check if there are multiple
                 // outstanding revisions and if so create requests for each one.
                 try
                 {
-                    List<Revision> revisions = changelistIsolator.getRevisionsToRequest(projectConfig, project, spec, force);
+                    List<Revision> revisions = changelistIsolator.getRevisionsToRequest(projectConfig, project, force);
                     for(Revision r: revisions)
                     {
-                        requestBuildOfRevision(reason, projectConfig, project, spec, r);
+                        requestBuildOfRevision(reason, projectConfig, project, r);
                     }
                 }
                 catch (ScmException e)
                 {
-                    LOG.error("Unable to determine revisions to build for project '" + project.getName() + "', specification '" + specification + "': " + e.getMessage(), e);
+                    LOG.error("Unable to determine revisions to build for project '" + project.getName() + "': " + e.getMessage(), e);
                 }
             }
             else
             {
-                eventManager.publish(new BuildRequestEvent(this, reason, projectConfig, project, spec, new BuildRevision()));
+                eventManager.publish(new BuildRequestEvent(this, reason, projectConfig, project, new BuildRevision()));
             }
         }
         else
         {
             // Just raise one request.
-            requestBuildOfRevision(reason, projectConfig, project, spec, revision);
+            requestBuildOfRevision(reason, projectConfig, project, revision);
         }
     }
 
-    public void triggerBuild(long number, Project project, BuildSpecification specification, User user, PatchArchive archive) throws PulseException
+    public void triggerBuild(long number, Project project, User user, PatchArchive archive) throws PulseException
     {
         ProjectConfiguration projectConfig = getProjectConfig(project.getId());
         if(projectConfig == null)
@@ -330,7 +289,7 @@ public class DefaultProjectManager implements ProjectManager
         try
         {
             String pulseFile = getPulseFile(projectConfig, project, revision, archive);
-            eventManager.publish(new PersonalBuildRequestEvent(this, number, new BuildRevision(revision, pulseFile, false), user, archive, projectConfig, project, specification));
+            eventManager.publish(new PersonalBuildRequestEvent(this, number, new BuildRevision(revision, pulseFile, false), user, archive, projectConfig, project));
         }
         catch (BuildException e)
         {
@@ -347,12 +306,12 @@ public class DefaultProjectManager implements ProjectManager
         return number;
     }
 
-    private void requestBuildOfRevision(BuildReason reason, ProjectConfiguration projectConfig, Project project, BuildSpecification specification, Revision revision)
+    private void requestBuildOfRevision(BuildReason reason, ProjectConfiguration projectConfig, Project project, Revision revision)
     {
         try
         {
             String pulseFile = getPulseFile(projectConfig, project, revision, null);
-            eventManager.publish(new BuildRequestEvent(this, reason, projectConfig, project, specification, new BuildRevision(revision, pulseFile, reason.isUser())));
+            eventManager.publish(new BuildRequestEvent(this, reason, projectConfig, project, new BuildRevision(revision, pulseFile, reason.isUser())));
         }
         catch (BuildException e)
         {
@@ -367,21 +326,6 @@ public class DefaultProjectManager implements ProjectManager
         return pulseFileDetails.getPulseFile(0, projectConfig, project, revision, patch);
     }
 
-    public void updateProjectDetails(Project project, String name, String description, String url) throws SchedulingException
-    {
-        project = getProject(project.getId());
-        if(!project.getName().equals(name))
-        {
-            // Name has changed, triggers must be updated
-            scheduler.renameProjectTriggers(project.getId(), name);
-        }
-
-        project.setName(name);
-        project.setDescription(description);
-        project.setUrl(url);
-        projectDao.save(project);
-    }
-
     public List<Project> getProjectsWithAdmin(String authority)
     {
         return projectDao.findByAdminAuthority(authority);
@@ -389,7 +333,7 @@ public class DefaultProjectManager implements ProjectManager
 
     public void updateProjectAdmins(String authority, List<Long> restrictToProjects)
     {
-        List<Project> projects = getNameToConfig();
+        List<Project> projects = getProjects();
         for(Project p: projects)
         {
             if(restrictToProjects == null || restrictToProjects.contains(p.getId()))
@@ -417,6 +361,9 @@ public class DefaultProjectManager implements ProjectManager
         }
     }
 
+/*
+    // FIXME: Need to apply this logic to the new configuration, the trigger stuff in particular will
+    // need to be checked.
     public void deleteBuildSpecification(Project project, long specId)
     {
         project = projectDao.findById(project.getId());
@@ -481,6 +428,7 @@ public class DefaultProjectManager implements ProjectManager
         project.remove(spec);
         buildSpecificationDao.delete(spec);
     }
+*/
 
     @Secured({"ACL_PROJECT_WRITE"})
     public void deleteArtifact(Project project, long id)
@@ -560,9 +508,6 @@ public class DefaultProjectManager implements ProjectManager
 
         // setup the project defaults.
 
-        BuildSpecification buildSpec = new BuildSpecification("default");
-        project.addBuildSpecification(buildSpec);
-        project.setDefaultSpecification(buildSpec);
 // Fixme: this functionality is not present with the new plugin configuration system.  There is no concept of a
 //        default inclusion by an external plugin to the project.        
 //        project.addCleanupRule(new CleanupRule(true, null, DEFAULT_WORK_DIR_BUILDS, CleanupRule.CleanupUnit.BUILDS));
@@ -570,11 +515,13 @@ public class DefaultProjectManager implements ProjectManager
         projectDao.save(project);
 
         // create a simple build specification that executes the default recipe.
+/*
         BuildSpecificationNode parent = buildSpecificationNodeDao.findById(buildSpec.getRoot().getId());
         BuildStage stage = new BuildStage("default", new AnyCapableBuildHostRequirements(), null);
         BuildSpecificationNode node = new BuildSpecificationNode(stage);
         parent.addChild(node);
         buildSpecificationNodeDao.save(parent);
+*/
 
         // schedule the event trigger - unique to this project.
         try
@@ -582,7 +529,6 @@ public class DefaultProjectManager implements ProjectManager
             EventTrigger trigger = new EventTrigger(ScmChangeEvent.class, "scm trigger", project.getName(), ScmChangeEventFilter.class);
             trigger.setProject(project.getId());
             trigger.setTaskClass(BuildProjectTask.class);
-            trigger.getDataMap().put(BuildProjectTask.PARAM_SPEC, buildSpec.getId());
 
             scheduler.schedule(trigger);
         }
@@ -599,16 +545,6 @@ public class DefaultProjectManager implements ProjectManager
     public void setProjectDao(ProjectDao dao)
     {
         projectDao = dao;
-    }
-
-    public void setBuildSpecificationDao(BuildSpecificationDao buildSpecificationDao)
-    {
-        this.buildSpecificationDao = buildSpecificationDao;
-    }
-
-    public void setTriggerDao(TriggerDao triggerDao)
-    {
-        this.triggerDao = triggerDao;
     }
 
     public void setScheduler(Scheduler scheduler)
@@ -658,14 +594,9 @@ public class DefaultProjectManager implements ProjectManager
         projectGroupDao.delete(projectGroup);
     }
 
-    public BuildSpecification getBuildSpecification(long id)
-    {
-        return buildSpecificationDao.findById(id);
-    }
-
     public void delete(BuildHostRequirements hostRequirements)
     {
-        buildSpecificationDao.delete(hostRequirements);
+        projectDao.delete(hostRequirements);
     }
 
     public void setEventManager(EventManager eventManager)
@@ -686,11 +617,6 @@ public class DefaultProjectManager implements ProjectManager
     public void setProjectGroupDao(ProjectGroupDao projectGroupDao)
     {
         this.projectGroupDao = projectGroupDao;
-    }
-
-    public void setBuildSpecificationNodeDao(BuildSpecificationNodeDao buildSpecificationNodeDao)
-    {
-        this.buildSpecificationNodeDao = buildSpecificationNodeDao;
     }
 
     public void setTestCaseIndexDao(TestCaseIndexDao testCaseIndexDao)

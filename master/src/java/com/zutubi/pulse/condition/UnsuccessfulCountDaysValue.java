@@ -28,17 +28,13 @@ public class UnsuccessfulCountDaysValue implements NotifyIntegerValue
         if(result != null && !result.succeeded())
         {
             Project project = result.getProject();
-            BuildSpecification spec = project.getBuildSpecification(result.getSpecName().getName());
-            if(spec != null)
+            List<BuildResult> lastSuccesses = buildManager.queryBuilds(project, new ResultState[]{ ResultState.SUCCESS }, -1, result.getNumber() - 1, 0, 1, true, false);
+            BuildResult lastSuccess = lastSuccesses.size() > 0 ? lastSuccesses.get(0) : null;
+            List<BuildResult> firstFailure = buildManager.queryBuilds(project, null, lastSuccess == null ? 1 : lastSuccess.getNumber() + 1, -1, 0, 1, false, false);
+            if(firstFailure.size() > 0)
             {
-                List<BuildResult> lastSuccesses = buildManager.querySpecificationBuilds(project, spec.getPname(), new ResultState[]{ ResultState.SUCCESS }, -1, result.getNumber() - 1, 0, 1, true, false);
-                BuildResult lastSuccess = lastSuccesses.size() > 0 ? lastSuccesses.get(0) : null;
-                List<BuildResult> firstFailure = buildManager.querySpecificationBuilds(project, spec.getPname(), null, lastSuccess == null ? 1 : lastSuccess.getNumber() + 1, -1, 0, 1, false, false);
-                if(firstFailure.size() > 0)
-                {
-                    long failingSince = firstFailure.get(0).getStamps().getEndTime();
-                    return (int) ((result.getStamps().getEndTime() - failingSince) / Constants.DAY);
-                }
+                long failingSince = firstFailure.get(0).getStamps().getEndTime();
+                return (int) ((result.getStamps().getEndTime() - failingSince) / Constants.DAY);
             }
         }
 

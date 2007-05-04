@@ -24,9 +24,9 @@ public class TagPostBuildAction extends PostBuildAction
     {
     }
 
-    public TagPostBuildAction(String name, List<BuildSpecification> specifications, List<ResultState> states, boolean failOnError, String tag, boolean moveExisting)
+    public TagPostBuildAction(String name, List<ResultState> states, boolean failOnError, String tag, boolean moveExisting)
     {
-        super(name, specifications, states, failOnError);
+        super(name, states, failOnError);
         this.tag = tag;
         this.moveExisting = moveExisting;
     }
@@ -67,7 +67,6 @@ public class TagPostBuildAction extends PostBuildAction
 
         scope.add(new Property("project", build.getProject().getName()));
         scope.add(new Property("number", Long.toString(build.getNumber())));
-        scope.add(new Property("specification", build.getBuildSpecification()));
 
         // Build or stage
         if(recipe == null)

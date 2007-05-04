@@ -15,9 +15,9 @@ public class UpdateBootstrapper extends ScmBootstrapper
 {
     private static final Logger LOG = Logger.getLogger(UpdateBootstrapper.class);
 
-    public UpdateBootstrapper(String project, String spec, ScmConfiguration scm, BuildRevision revision)
+    public UpdateBootstrapper(String project, ScmConfiguration scm, BuildRevision revision)
     {
-        super(project, spec, scm, revision);
+        super(project, scm, revision);
     }
 
     ScmClient bootstrap(File workDir)

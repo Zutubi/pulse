@@ -282,25 +282,10 @@
             <result name="success" type="velocity">index.vm</result>
         </action>
 
-        <action name="cloneProject" class="com.zutubi.pulse.web.project.CloneProjectAction">
-            <result name="input" type="velocity">clone-project.vm</result>
-            <result name="success" type="redirect">/configureProject.action?id=${cloneId}</result>
-            <result name="cancel" type="redirect">/currentBuild.action?id=${id}</result>
-            <result name="error" type="velocity">generic-error.vm</result>
-        </action>
-
         <action name="deleteProject" class="com.zutubi.pulse.web.project.DeleteProjectAction">
             <result name="input" type="velocity">confirm-project-delete.vm</result>
             <result name="success" type="redirect">/viewProjects.action</result>
             <result name="cancel" type="redirect">/currentBuild.action?id=${id}</result>
-            <result name="error" type="velocity">generic-error.vm</result>
-        </action>
-
-        <action name="editProject" class="com.zutubi.pulse.web.project.EditProjectAction">
-            <interceptor-ref name="crudStack"/>
-            <result name="input" type="velocity">edit-project.vm</result>
-            <result name="cancel" type="redirect">/configureProject.action?id=${id}</result>
-            <result name="success" type="redirect">/configureProject.action?id=${id}</result>
             <result name="error" type="velocity">generic-error.vm</result>
         </action>
 
@@ -581,20 +566,6 @@
             <result name="success" type="velocity">view-triggers.vm</result>
         </action>
 
-        <action name="deletePostBuildAction" class="com.zutubi.pulse.web.project.DeletePostBuildAction">
-            <result name="success" type="redirect">/configureProject.action?id=${projectId}</result>
-        </action>
-
-        <action name="deletePostStageAction" class="com.zutubi.pulse.web.project.DeletePostBuildAction">
-            <result name="success" type="redirect">/viewBuildSpecification.action?id=${specId}&amp;projectId=${projectId}&amp;selectedNode=${nodeId}</result>
-        </action>
-
-        <action name="editPostBuildAction" class="com.zutubi.pulse.web.project.EditPostBuildActionAction">
-            <result name="run executable" type="chain">editExeAction!input</result>
-            <result name="apply tag" type="chain">editTagAction!input</result>
-            <result name="error" type="velocity">generic-error.vm</result>
-        </action>
-
         <!-- Alias is required as WW can't chain to a non-execute method :| -->
         <action name="editExeAction!input" class="com.zutubi.pulse.web.project.EditExeActionAction" method="input">
             <interceptor-ref name="crudStack"/>
@@ -619,12 +590,6 @@
             <result name="input" type="velocity">edit-action-tag.vm</result>
             <result name="cancel" type="redirect">/configureProject.action?id=${projectId}</result>
             <result name="success" type="redirect">/configureProject.action?id=${projectId}</result>
-        </action>
-
-        <action name="editPostStageAction" class="com.zutubi.pulse.web.project.EditPostBuildActionAction">
-            <result name="run executable" type="chain">editExeStageAction!input</result>
-            <result name="apply tag" type="chain">editTagStageAction!input</result>
-            <result name="error" type="velocity">generic-error.vm</result>
         </action>
 
         <!-- Alias is required as WW can't chain to a non-execute method :| -->
@@ -664,75 +629,6 @@
 
         <action name="quartzSystemInfo" class="com.zutubi.pulse.web.console.QuartzAdminAction">
             <result name="success" type="velocity">view-quartz.vm</result>
-        </action>
-
-        <action name="createBuildSpecification" class="com.zutubi.pulse.web.project.CreateBuildSpecificationAction">
-            <result name="input" type="velocity">create-build-specification.vm</result>
-            <result name="cancel" type="redirect">/configureProject.action?id=${projectId}</result>
-            <result name="error" type="velocity">create-build-specification.vm</result>
-            <result name="success" type="redirect">/viewBuildSpecification.action?id=${specId}&amp;projectId=${projectId}</result>
-        </action>
-
-        <action name="setDefaultBuildSpecification" class="com.zutubi.pulse.web.project.SetDefaultBuildSpecificationAction">
-            <result name="success" type="redirect">/configureProject.action?id=${projectId}</result>
-            <result name="error" type="velocity">generic-error.vm</result>
-        </action>
-
-        <action name="deleteBuildSpecification" class="com.zutubi.pulse.web.project.DeleteBuildSpecificationAction">
-            <result name="success" type="redirect">/configureProject.action?id=${projectId}</result>
-            <result name="error" type="velocity">generic-error.vm</result>
-        </action>
-
-        <action name="createBuildSpecificationProperty" class="com.zutubi.pulse.web.project.CreatePropertyAction">
-            <result name="input" type="velocity">create-specification-property.vm</result>
-            <result name="cancel" type="redirect">/viewBuildSpecification.action?id=${specId}&amp;projectId=${projectId}</result>
-            <result name="error" type="velocity">/generic-error.vm</result>
-            <result name="success" type="redirect">/viewBuildSpecification.action?id=${specId}&amp;projectId=${projectId}&amp;selectedNode=${id}</result>
-        </action>
-
-        <action name="createBuildStage" class="com.zutubi.pulse.web.project.CreateBuildStageAction">
-            <result name="input" type="velocity">create-build-stage.vm</result>
-            <result name="cancel" type="redirect">/viewBuildSpecification.action?id=${specId}&amp;projectId=${projectId}</result>
-            <result name="error" type="velocity">/generic-error.vm</result>
-            <result name="success" type="redirect">/viewBuildSpecification.action?id=${specId}&amp;projectId=${projectId}&amp;selectedNode=${id}</result>
-        </action>
-
-        <action name="editBuildStage" class="com.zutubi.pulse.web.project.EditBuildStageAction">
-            <result name="input" type="velocity">edit-build-stage.vm</result>
-            <result name="cancel" type="redirect">/viewBuildSpecification.action?id=${specId}&amp;projectId=${projectId}&amp;selectedNode=${id}</result>
-            <result name="error" type="velocity">/generic-error.vm</result>
-            <result name="success" type="redirect">/viewBuildSpecification.action?id=${specId}&amp;projectId=${projectId}&amp;selectedNode=${id}</result>
-        </action>
-
-        <action name="deleteBuildStage" class="com.zutubi.pulse.web.project.DeleteBuildStageAction">
-            <result name="error" type="velocity">/generic-error.vm</result>
-            <result name="input" type="velocity">view-build-specification.vm</result>
-            <result name="success" type="redirect">/viewBuildSpecification.action?id=${specId}&amp;projectId=${projectId}</result>
-        </action>
-
-        <action name="addBuildStageResource" class="com.zutubi.pulse.web.project.AddBuildStageResourceAction">
-            <result name="input" type="velocity">/add-build-stage-resource.vm</result>
-            <result name="cancel" type="redirect">/viewBuildSpecification.action?id=${specId}&amp;projectId=${projectId}&amp;selectedNode=${id}</result>
-            <result name="error" type="velocity">/generic-error.vm</result>
-            <result name="success" type="redirect">/viewBuildSpecification.action?id=${specId}&amp;projectId=${projectId}&amp;selectedNode=${id}</result>
-        </action>
-
-        <action name="editBuildStageResource" class="com.zutubi.pulse.web.project.EditBuildStageResourceAction">
-            <result name="input" type="velocity">/edit-build-stage-resource.vm</result>
-            <result name="cancel" type="redirect">/viewBuildSpecification.action?id=${specId}&amp;projectId=${projectId}&amp;selectedNode=${id}</result>
-            <result name="error" type="velocity">/generic-error.vm</result>
-            <result name="success" type="redirect">/viewBuildSpecification.action?id=${specId}&amp;projectId=${projectId}&amp;selectedNode=${id}</result>
-        </action>
-
-        <action name="deleteBuildStageResource" class="com.zutubi.pulse.web.project.DeleteBuildStageResourceAction">
-            <result name="error" type="velocity">/generic-error.vm</result>
-            <result name="success" type="redirect">/viewBuildSpecification.action?id=${specId}&amp;projectId=${projectId}&amp;selectedNode=${id}</result>
-        </action>
-
-        <action name="viewBuildSpecification" class="com.zutubi.pulse.web.project.ViewBuildSpecificationAction">
-            <interceptor-ref name="completeReadOnlyStack"/>
-            <result name="success" type="velocity">view-build-specification.vm</result>
-            <result name="error" type="velocity">generic-error.vm</result>
         </action>
 
         <action name="triggerCleanupRule" class="com.zutubi.pulse.web.project.TriggerCleanupRuleAction">

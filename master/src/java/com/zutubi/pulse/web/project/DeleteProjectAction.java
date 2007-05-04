@@ -61,7 +61,7 @@ public class DeleteProjectAction extends ProjectActionSupport
             return ERROR;
         }
 
-        totalBuilds = getBuildManager().getBuildCount(project, null, null);
+        totalBuilds = getBuildManager().getBuildCount(project, null);
         return INPUT;
     }
 

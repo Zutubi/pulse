@@ -6,6 +6,8 @@ import com.zutubi.pulse.committransformers.LinkCommitMessageTransformer;
 import com.zutubi.pulse.core.model.*;
 import com.zutubi.pulse.model.*;
 import com.zutubi.pulse.test.PulseTestCase;
+import com.zutubi.pulse.util.FileSystemUtils;
+import com.zutubi.pulse.util.SystemUtils;
 import com.zutubi.util.Constants;
 import com.zutubi.util.IOUtils;
 import freemarker.template.Configuration;
@@ -182,7 +184,7 @@ public class FreemarkerBuildResultRendererTest extends PulseTestCase
 
     public void testProjectOverviewFailurePreviousSuccess() throws Exception
     {
-        BuildResult previous = new BuildResult(new TriggerBuildReason("scm trigger"), new Project("test project", "test description"), new BuildSpecification("test spec"), 90, false);
+        BuildResult previous = new BuildResult(new TriggerBuildReason("scm trigger"), new Project("test project", "test description"), 90, false);
         initialiseResult(previous);
         previous.getStamps().setStartTime(System.currentTimeMillis() - Constants.DAY * 3);
         BuildResult result = createSuccessfulBuild();
@@ -294,7 +296,7 @@ public class FreemarkerBuildResultRendererTest extends PulseTestCase
     private void personalBuildHelper(String type) throws Exception
     {
         User user = new User("jason", "Jason Sankey");
-        BuildResult result = new BuildResult(user, new Project("my project", "project description"), new BuildSpecification("nightly"), 12);
+        BuildResult result = new BuildResult(user, new Project("my project", "project description"), 12);
         initialiseResult(result);
 
         result.failure("test failed tests");
@@ -367,7 +369,10 @@ public class FreemarkerBuildResultRendererTest extends PulseTestCase
 
     private BuildResult createSuccessfulBuild()
     {
-        BuildResult result = new BuildResult(new TriggerBuildReason("scm trigger"), new Project("test project", "test description"), new BuildSpecification("test spec"), 101, false);
+        Project project = new Project();
+        project.setName("test project");
+        project.setDescription("test description");
+        BuildResult result = new BuildResult(new TriggerBuildReason("scm trigger"), project, 101, false);
         initialiseResult(result);
         return result;
     }
@@ -381,19 +386,19 @@ public class FreemarkerBuildResultRendererTest extends PulseTestCase
         RecipeResult recipeResult = new RecipeResult("first recipe");
         recipeResult.commence();
         recipeResult.complete();
-        RecipeResultNode node = new RecipeResultNode(new PersistentName("first stage"), recipeResult);
+        RecipeResultNode node = new RecipeResultNode("first stage", 1, recipeResult);
         result.getRoot().addChild(node);
 
         recipeResult = new RecipeResult("second recipe");
         recipeResult.commence();
         recipeResult.complete();
-        node = new RecipeResultNode(new PersistentName("second stage"), recipeResult);
+        node = new RecipeResultNode("second stage", 2, recipeResult);
         result.getRoot().addChild(node);
 
         recipeResult = new RecipeResult("nested recipe");
         recipeResult.commence();
         recipeResult.complete();
-        node = new RecipeResultNode(new PersistentName("nested stage"), recipeResult);
+        node = new RecipeResultNode("nested stage", 3, recipeResult);
         result.getRoot().getChildren().get(0).addChild(node);
 
         result.complete();
@@ -468,8 +473,9 @@ public class FreemarkerBuildResultRendererTest extends PulseTestCase
 
                 StringWriter writer = new StringWriter();
                 renderer.render(result, dataMap, type, writer);
-                String got = replaceTimestamps(writer.getBuffer().toString());
-                String expected = replaceTimestamps(IOUtils.inputStreamToString(expectedStream));
+                String got = normaliseLineSeparators(replaceTimestamps(writer.getBuffer().toString()));
+                String expected = normaliseLineSeparators(replaceTimestamps(IOUtils.inputStreamToString(expectedStream)));
+                
                 assertEquals(expected, got);
             }
             finally
@@ -510,6 +516,11 @@ public class FreemarkerBuildResultRendererTest extends PulseTestCase
 
     private String replaceTimestamps(String str)
     {
-        return str.replaceAll("\n.*ago<", "@@@@").replaceAll("\n[0-9]+ ms", "@@@@");
+        return str.replaceAll("\n.*ago<", "\n@@@@").replaceAll("\n[0-9]+ ms", "\n@@@@");
+    }
+
+    private String normaliseLineSeparators(String str)
+    {
+        return str.replaceAll(SystemUtils.LINE_SEPARATOR, "\n");
     }
 }

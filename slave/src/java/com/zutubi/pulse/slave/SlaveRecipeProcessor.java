@@ -62,7 +62,7 @@ public class SlaveRecipeProcessor
         {
             EventListener listener = registerMasterListener(master, masterProxy, request.getId());
             ResourceRepository repo = new RemoteResourceRepository(handle, masterProxy, serviceTokenManager);
-            ServerRecipePaths processorPaths = new ServerRecipePaths(request.getProject(), request.getSpec(), request.getId(), configurationManager.getUserPaths().getData(), request.isIncremental());
+            ServerRecipePaths processorPaths = new ServerRecipePaths(request.getProject(), request.getId(), configurationManager.getUserPaths().getData(), request.isIncremental());
 
             context.setFileRepository(new SlaveFileRepository(processorPaths.getRecipeRoot(), master, serviceTokenManager));
             Bootstrapper requestBootstrapper = request.getBootstrapper();

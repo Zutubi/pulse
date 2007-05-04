@@ -122,9 +122,9 @@ results as a flat list but with context.
 [#macro recipeNodeMessages node level context=""]
     [#if node.hasMessages(level)]
         [#if context?length &gt; 0]
-            [#local nestedContext = "${context} :: stage ${node.stage} :: ${node.result.recipeNameSafe}@${node.hostSafe}"]
+            [#local nestedContext = "${context} :: stage ${node.stageName} :: ${node.result.recipeNameSafe}@${node.hostSafe}"]
         [#else]
-            [#local nestedContext = "stage ${node.stage} :: ${node.result.recipeNameSafe}@${node.hostSafe}"]
+            [#local nestedContext = "stage ${node.stageName} :: ${node.result.recipeNameSafe}@${node.hostSafe}"]
         [/#if]
         [@recipeResultMessages result=node.result level=level context=nestedContext/]
         [#list node.children as child]
@@ -152,7 +152,7 @@ Outputs a list of build stage results for the given build.
 ---------------------------------------------------------------------------->
 [#macro buildStages result]
     [#list result.root.children as child]
-  * ${child.stage} :: ${child.result.recipeNameSafe}@${child.hostSafe} :: ${child.result.state.prettyString}
+  * ${child.stageName} :: ${child.result.recipeNameSafe}@${child.hostSafe} :: ${child.result.state.prettyString}
     [/#list]
 [/#macro]
 
@@ -237,9 +237,9 @@ tests as a flat plain text list.
 ---------------------------------------------------------------------------->
 [#macro recipeNodeTestSummary node context=""]
     [#if context?length &gt; 0]
-        [#local nestedContext = "${context} :: ${node.stage} :: ${node.result.recipeNameSafe}@${node.hostSafe}"]
+        [#local nestedContext = "${context} :: ${node.stageName} :: ${node.result.recipeNameSafe}@${node.hostSafe}"]
     [#else]
-        [#local nestedContext = "${node.stage} :: ${node.result.recipeNameSafe}@${node.hostSafe}"]
+        [#local nestedContext = "${node.stageName} :: ${node.result.recipeNameSafe}@${node.hostSafe}"]
     [/#if]
     [#if node.result?exists]
         [@recipeTestSummary result=node.result context=nestedContext/]
@@ -404,7 +404,6 @@ Shows a summary table for a build.
         <tr>
             [@contentHeader cc="id"/]
             [@contentHeader cc="status"/]
-            [@contentHeader cc="spec"/]
             [@contentHeader cc="reason"/]
             [@contentHeader cc="tests"/]
             [@contentHeader cc="elapsed"/]
@@ -414,7 +413,6 @@ Shows a summary table for a build.
             [#assign class = result.state.string]
             [@classCell cc=result.number?c/]
             [@classCell cc=result.stateName?lower_case/]
-            [@classCell cc=result.buildSpecification/]
             [@classCell cc=result.reason.summary/]
             [@linkCell cc=result.testSummary url="${testsLink(result)}" class=class/]
             [@classCell cc=result.stamps.prettyElapsed/]
@@ -442,7 +440,7 @@ Shows a summary for each stage in a build.
     [#list result.root.children as child]
         <tr>
             [#assign class = child.result.state.string]
-            [@classCell cc=child.stage/]
+            [@classCell cc=child.stageName/]
             [@classCell cc=child.result.recipeNameSafe/]
             [@classCell cc=child.hostSafe/]
             [@classCell cc=child.result.stateName?lower_case/]
@@ -560,7 +558,7 @@ results as a HTML nested list.
 ---------------------------------------------------------------------------->
 [#macro recipeNodeMessagesHTML result node level]
     [#if node.hasMessages(level)]
-<li class="header">stage ${node.stage?html} :: ${node.result.recipeNameSafe?html}@${node.hostSafe?html}
+<li class="header">stage ${node.stageName?html} :: ${node.result.recipeNameSafe?html}@${node.hostSafe?html}
     <ul>
         [@recipeResultMessagesHTML result=result recipe=node.result level=level/]
         [#list node.children as child]
@@ -637,7 +635,7 @@ Outputs failing test cases for the given recipe node.
             [#local summary = node.result.testSummary/]
                 <tr><td>
                     [@openTable/]
-                        [@headingRow heading="stage ${node.stage} :: broken tests (total: ${summary.total}, errors: ${summary.errors}, failures: ${summary.failures})" span=3/]
+                        [@headingRow heading="stage ${node.stageName} :: broken tests (total: ${summary.total}, errors: ${summary.errors}, failures: ${summary.failures})" span=3/]
             [#local excess = node.result.excessFailureCount/]
             [#if excess &gt; 0]
                         <tr><th colspan="3" style="background-color: #ffffc0">This recipe has ${excess} further test failures, see the full test report for details.</th></tr>

@@ -2,6 +2,7 @@
 <!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD//EN" "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd" >
 <hibernate-mapping>
 
+<!--
     <class name="com.zutubi.pulse.model.BuildSpecification" table="BUILD_SPECIFICATION" lazy="false">
         <cache usage="read-write"/>
         
@@ -93,4 +94,5 @@
             <many-to-one name="slave" class="com.zutubi.pulse.model.AgentState" cascade="none"/>
         </subclass>
     </class>
+-->
 </hibernate-mapping>

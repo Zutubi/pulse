@@ -75,16 +75,7 @@ public class LatestSuccessfulBuildFileObject extends AbstractPulseFileObject imp
             if (provider != null)
             {
                 Project project = provider.getProject();
-
-                BuildSpecificationProvider buildSpecProvider = getAncestor(BuildSpecificationProvider.class);
-                if (buildSpecProvider != null)
-                {
-                    return buildManager.getLatestSuccessfulBuildResult(buildSpecProvider.getBuildSpecification());
-                }
-                else
-                {
-                    return buildManager.getLatestSuccessfulBuildResult(project);
-                }
+                return buildManager.getLatestSuccessfulBuildResult(project);
             }
             else
             {

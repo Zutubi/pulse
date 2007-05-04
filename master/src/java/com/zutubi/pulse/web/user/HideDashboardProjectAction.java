@@ -39,7 +39,7 @@ public class HideDashboardProjectAction extends UserActionSupport
             if(user.getShowAllProjects())
             {
                 user.setShowAllProjects(false);
-                user.getShownProjects().addAll(projectManager.getNameToConfig());
+                user.getShownProjects().addAll(projectManager.getProjects());
             }
 
             user.getShownProjects().remove(p);

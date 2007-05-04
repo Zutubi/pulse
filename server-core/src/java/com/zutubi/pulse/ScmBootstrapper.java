@@ -23,16 +23,14 @@ public abstract class ScmBootstrapper implements Bootstrapper, ScmCheckoutEventH
 
     protected String agent;
     protected String project;
-    protected String spec;
     protected ScmConfiguration scm;
     protected BuildRevision revision;
     protected boolean terminated = false;
     protected transient PrintWriter outputWriter;
 
-    public ScmBootstrapper(String project, String spec, ScmConfiguration scm, BuildRevision revision)
+    public ScmBootstrapper(String project, ScmConfiguration scm, BuildRevision revision)
     {
         this.project = project;
-        this.spec = spec;
         this.scm = scm;
         this.revision = revision;
     }
@@ -95,7 +93,7 @@ public abstract class ScmBootstrapper implements Bootstrapper, ScmCheckoutEventH
 
     protected String getId()
     {
-        return project + "-" + spec + "-" + agent;
+        return project + "-" + agent;
     }
 
     public void status(String message)

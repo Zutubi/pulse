@@ -37,7 +37,7 @@ public class MasterRecipeRunner implements Runnable
 
         context.setFileRepository(new MasterFileRepository(configurationManager));
         request.setBootstrapper(new ChainBootstrapper(new ServerBootstrapper(), requestBootstrapper));
-        ServerRecipePaths recipePaths = new ServerRecipePaths(request.getProject(), request.getSpec(), request.getId(), configurationManager.getUserPaths().getData(), request.isIncremental());
+        ServerRecipePaths recipePaths = new ServerRecipePaths(request.getProject(), request.getId(), configurationManager.getUserPaths().getData(), request.isIncremental());
 
         try
         {

@@ -1,9 +1,13 @@
 package com.zutubi.pulse.model;
 
+import com.zutubi.config.annotations.SymbolicName;
+import com.zutubi.pulse.core.config.AbstractConfiguration;
+
 /**
  * Identifies a required resource for a build stage.
  */
-public class ResourceRequirement
+@SymbolicName("internal.resourceRequirementConfig")
+public class ResourceRequirement extends AbstractConfiguration
 {
     private String resource;
     private String version;

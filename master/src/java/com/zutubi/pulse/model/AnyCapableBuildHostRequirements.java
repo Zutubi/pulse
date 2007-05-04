@@ -39,6 +39,12 @@ public class AnyCapableBuildHostRequirements extends AbstractBuildHostRequiremen
             }
         }
 
+        if (fileLoaderFactory == null)
+        {
+            // FIXME: timing problems with wiring this instance..
+            ComponentContext.autowire(this);
+        }
+
         PulseFileLoader fileLoader = fileLoaderFactory.createLoader();
         try
         {

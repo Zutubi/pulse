@@ -16,17 +16,15 @@ import java.io.IOException;
 public class ProjectRepoBootstrapper implements Bootstrapper
 {
     private final String projectName;
-    private final String specName;
     private final ScmConfiguration scm;
     private BuildRevision revision;
     private String agent;
     private boolean forceClean;
     private ScmBootstrapper childBootstrapper;
 
-    public ProjectRepoBootstrapper(String projectName, String specName, ScmConfiguration scm, BuildRevision revision, boolean forceClean)
+    public ProjectRepoBootstrapper(String projectName, ScmConfiguration scm, BuildRevision revision, boolean forceClean)
     {
         this.projectName = projectName;
-        this.specName = specName;
         this.scm = scm;
         this.revision = revision;
         this.forceClean = forceClean;
@@ -117,11 +115,11 @@ public class ProjectRepoBootstrapper implements Bootstrapper
         // else we can update.
         if (localDir.list().length == 0)
         {
-            return new CheckoutBootstrapper(projectName, specName, scm, revision, true);
+            return new CheckoutBootstrapper(projectName, scm, revision, true);
         }
         else
         {
-            return new UpdateBootstrapper(projectName, specName, scm, revision);
+            return new UpdateBootstrapper(projectName, scm, revision);
         }
     }
 }

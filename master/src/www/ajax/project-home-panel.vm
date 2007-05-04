@@ -127,9 +127,7 @@
                 <tr>
                     <th class="content-row" rowspan="2">#wwtext("name=actions")</th>
                     <td class="content">
-                        <a href="cloneProject!input.action?id=$project.id">
-                            <img src="$base/images/page_copy.gif"/> #wwtext("name=project.clone")
-                        </a>
+                        <img src="$base/images/page_copy.gif"/> #wwtext("name=project.clone")
                     </td>
                 </tr>
                 <tr>

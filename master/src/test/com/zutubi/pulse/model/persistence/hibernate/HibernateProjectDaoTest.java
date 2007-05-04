@@ -2,13 +2,11 @@ package com.zutubi.pulse.model.persistence.hibernate;
 
 import com.zutubi.pulse.core.model.ResultState;
 import com.zutubi.pulse.model.AntPulseFileDetails;
-import com.zutubi.pulse.model.BuildSpecification;
 import com.zutubi.pulse.model.DirectoryCapture;
 import com.zutubi.pulse.model.FileCapture;
 import com.zutubi.pulse.model.Project;
 import com.zutubi.pulse.model.RunExecutablePostBuildAction;
 import com.zutubi.pulse.model.TagPostBuildAction;
-import com.zutubi.pulse.model.persistence.BuildSpecificationDao;
 import com.zutubi.pulse.model.persistence.ProjectDao;
 
 import java.util.Arrays;
@@ -21,19 +19,16 @@ import java.util.List;
 public class HibernateProjectDaoTest extends MasterPersistenceTestCase
 {
     private ProjectDao projectDao;
-    private BuildSpecificationDao buildSpecificationDao;
 
     public void setUp() throws Exception
     {
         super.setUp();
         projectDao = (ProjectDao) context.getBean("projectDao");
-        buildSpecificationDao = (BuildSpecificationDao) context.getBean("buildSpecificationDao");
     }
 
     public void tearDown() throws Exception
     {
         projectDao = null;
-        buildSpecificationDao = null;
         super.tearDown();
     }
 
@@ -83,11 +78,7 @@ public class HibernateProjectDaoTest extends MasterPersistenceTestCase
 
     public void testLoadSaveTagAction()
     {
-        BuildSpecification spec = new BuildSpecification("test");
-        buildSpecificationDao.save(spec);
-
         TagPostBuildAction action = new TagPostBuildAction();
-        action.setSpecifications(Arrays.asList(spec));
         action.setStates(Arrays.asList(ResultState.SUCCESS));
         action.setTag("tag-name");
         action.setMoveExisting(true);
@@ -100,11 +91,7 @@ public class HibernateProjectDaoTest extends MasterPersistenceTestCase
 
     public void testLoadSaveExecutableAction()
     {
-        BuildSpecification spec = new BuildSpecification("test");
-        buildSpecificationDao.save(spec);
-
         RunExecutablePostBuildAction action = new RunExecutablePostBuildAction();
-        action.setSpecifications(Arrays.asList(spec));
         action.setStates(Arrays.asList(ResultState.SUCCESS));
         action.setCommand("command");
         action.setArguments("args");
@@ -121,24 +108,6 @@ public class HibernateProjectDaoTest extends MasterPersistenceTestCase
         projectDao.save(projectA);
         commitAndRefreshTransaction();
         assertNotNull(projectDao.findByName("nameA"));
-    }
-
-    public void testFindByBuildSpecification()
-    {
-        Project p1 = new Project();
-        Project p2 = new Project();
-        BuildSpecification spec1 = new BuildSpecification();
-        BuildSpecification spec2 = new BuildSpecification();
-        p1.addBuildSpecification(spec1);
-        p2.addBuildSpecification(spec2);
-        projectDao.save(p1);
-        projectDao.save(p2);
-        commitAndRefreshTransaction();
-
-        // assert that we get the right project back.
-        Project found = projectDao.findByBuildSpecification(spec1);
-        assertNotNull(found);
-        assertEquals(p1.getId(), found.getId());
     }
 
     public void testFindByAdminAuthority()

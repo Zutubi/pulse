@@ -1,8 +1,14 @@
 package com.zutubi.pulse.web.project;
 
 import com.opensymphony.util.TextUtils;
-import com.zutubi.pulse.core.*;
-import com.zutubi.pulse.model.*;
+import com.zutubi.pulse.core.ResourceRepository;
+import com.zutubi.pulse.model.AgentState;
+import com.zutubi.pulse.model.AgentStateManager;
+import com.zutubi.pulse.model.AnyCapableBuildHostRequirements;
+import com.zutubi.pulse.model.BuildStage;
+import com.zutubi.pulse.model.MasterBuildHostRequirements;
+import com.zutubi.pulse.model.Project;
+import com.zutubi.pulse.model.SlaveBuildHostRequirements;
 import com.zutubi.util.logging.Logger;
 
 import java.util.LinkedHashMap;
@@ -20,7 +26,6 @@ public class BuildSpecificationActionSupport extends ProjectActionSupport
     protected ResourceRepository resourceRepository;
     protected Project project;
     private AgentStateManager agentStateManager;
-    private PulseFileLoaderFactory fileLoaderFactory;
 
     private Map<Long, String> buildHosts;
     protected String name;
@@ -175,10 +180,5 @@ public class BuildSpecificationActionSupport extends ProjectActionSupport
     public void setSlaveManager(AgentStateManager agentStateManager)
     {
         this.agentStateManager = agentStateManager;
-    }
-
-    public void setFileLoaderFactory(PulseFileLoaderFactory fileLoaderFactory)
-    {
-        this.fileLoaderFactory = fileLoaderFactory;
     }
 }

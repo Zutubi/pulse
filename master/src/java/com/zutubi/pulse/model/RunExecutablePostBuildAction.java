@@ -27,9 +27,9 @@ public class RunExecutablePostBuildAction extends PostBuildAction
     {
     }
 
-    public RunExecutablePostBuildAction(String name, List<BuildSpecification> specifications, List<ResultState> states, boolean failOnError, String command, String arguments)
+    public RunExecutablePostBuildAction(String name, List<ResultState> states, boolean failOnError, String command, String arguments)
     {
-        super(name, specifications, states, failOnError);
+        super(name, states, failOnError);
         this.command = command;
         this.arguments = arguments;
     }
@@ -99,7 +99,6 @@ public class RunExecutablePostBuildAction extends PostBuildAction
             scope.add(new Property("revision", buildScmDetails.getRevision().getRevisionString()));
         }
         
-        scope.add(new Property("specification", result.getBuildSpecification()));
         scope.add(new Property("build.dir", paths.getBuildDir(result).getAbsolutePath()));
 
         if(recipe == null)
@@ -142,7 +141,7 @@ public class RunExecutablePostBuildAction extends PostBuildAction
 
     private static void addStageProperties(BuildResult result, RecipeResultNode node, Scope scope, MasterBuildPaths paths, MasterConfigurationManager configurationManager, boolean includeName)
     {
-        String name = node.getStage();
+        String name = node.getStageName();
         String prefix = "stage.";
 
         if(includeName)
@@ -167,7 +166,7 @@ public class RunExecutablePostBuildAction extends PostBuildAction
 
     private static void addCommandProperties(RecipeResultNode node, CommandResult commandResult, Scope scope, MasterConfigurationManager configurationManager, boolean includeName)
     {
-        String stageName = node.getStage();
+        String stageName = node.getStageName();
         String commandName = commandResult.getCommandName();
         String prefix = "";
 

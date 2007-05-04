@@ -51,7 +51,7 @@ public class EditExeActionAction extends AbstractEditPostBuildActionAction
 
         action = (RunExecutablePostBuildAction) a;
 
-        List<BuildResult> lastBuild = buildManager.queryBuilds(new Project[] { getProject() }, new ResultState[] { ResultState.SUCCESS }, null, -1, -1, null, 0, 1, true);
+        List<BuildResult> lastBuild = buildManager.queryBuilds(new Project[] { getProject() }, new ResultState[] { ResultState.SUCCESS }, -1, -1, null, 0, 1, true);
         if(!lastBuild.isEmpty())
         {
             BuildResult result = lastBuild.get(0);

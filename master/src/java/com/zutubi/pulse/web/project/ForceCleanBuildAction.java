@@ -1,6 +1,5 @@
 package com.zutubi.pulse.web.project;
 
-import com.zutubi.pulse.model.BuildSpecification;
 import com.zutubi.pulse.model.Project;
 
 public class ForceCleanBuildAction extends ProjectActionSupport
@@ -33,15 +32,8 @@ public class ForceCleanBuildAction extends ProjectActionSupport
 
         getProjectManager().checkWrite(project);
 
-        BuildSpecification spec = project.getBuildSpecification(id);
-        if (spec == null)
-        {
-            addActionError("Unknown build specification [" + id + "]");
-            return ERROR;
-        }
-
-        spec.setForceClean(true);
-        getProjectManager().save(spec);
+        project.setForceClean(true);
+        getProjectManager().save(project);
 
         return SUCCESS;
     }

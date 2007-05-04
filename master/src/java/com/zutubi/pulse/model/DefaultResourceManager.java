@@ -62,11 +62,14 @@ public class DefaultResourceManager implements ResourceManager, ConfigurationEve
     public void addDiscoveredResources(long handle, List<Resource> resources)
     {
         ConfigurableResourceRepository repository = agentRepositories.get(handle);
-        for(Resource r: resources)
+        if (repository != null)
         {
-            if(!repository.hasResource(r.getName()))
+            for(Resource r: resources)
             {
-                repository.addResource(r);
+                if(!repository.hasResource(r.getName()))
+                {
+                    repository.addResource(r);
+                }
             }
         }
     }

@@ -1,11 +1,10 @@
 package com.zutubi.pulse.model;
 
+import com.zutubi.pulse.core.config.ResourceProperty;
 import com.zutubi.pulse.core.model.Entity;
 import com.zutubi.pulse.core.model.PersistentName;
-import com.zutubi.pulse.core.config.ResourceProperty;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 

@@ -1,12 +1,14 @@
 package com.zutubi.pulse.web;
 
-import com.opensymphony.util.TextUtils;
 import com.opensymphony.webwork.ServletActionContext;
 import com.opensymphony.webwork.dispatcher.multipart.MultiPartRequestWrapper;
 import com.opensymphony.xwork.ActionContext;
 import com.zutubi.pulse.MasterBuildPaths;
 import com.zutubi.pulse.bootstrap.MasterConfigurationManager;
-import com.zutubi.pulse.model.*;
+import com.zutubi.pulse.model.GrantedAuthority;
+import com.zutubi.pulse.model.Project;
+import com.zutubi.pulse.model.User;
+import com.zutubi.pulse.model.UserManager;
 import com.zutubi.pulse.personal.PatchArchive;
 import com.zutubi.util.IOUtils;
 import com.zutubi.util.logging.Logger;
@@ -22,7 +24,6 @@ public class PersonalBuildAction extends ActionSupport
     private static final Logger LOG = Logger.getLogger(PersonalBuildAction.class);
 
     private String project;
-    private String specification;
     private String version;
     private long number;
     private String errorMessage;
@@ -32,11 +33,6 @@ public class PersonalBuildAction extends ActionSupport
     public void setProject(String project)
     {
         this.project = project;
-    }
-
-    public void setSpecification(String specification)
-    {
-        this.specification = specification;
     }
 
     public void setVersion(String version)
@@ -111,22 +107,6 @@ public class PersonalBuildAction extends ActionSupport
             return ERROR;
         }
 
-        BuildSpecification spec;
-        if(TextUtils.stringSet(specification))
-        {
-            spec = p.getBuildSpecification(specification);
-        }
-        else
-        {
-            spec = p.getDefaultSpecification();
-        }
-        
-        if(spec == null)
-        {
-            errorMessage = "Unknown build specification '" + specification + "'";
-            return ERROR;
-        }
-
         number = userManager.getNextBuildNumber(user);
         MasterBuildPaths paths = new MasterBuildPaths(configurationManager);
         File patchDir = paths.getUserPatchDir(user.getId());
@@ -148,7 +128,7 @@ public class PersonalBuildAction extends ActionSupport
             uploadedPatch.delete();
             
             archive = new PatchArchive(patchFile);
-            projectManager.triggerBuild(number, p, spec, user, archive);
+            projectManager.triggerBuild(number, p, user, archive);
         }
         catch (Exception e)
         {

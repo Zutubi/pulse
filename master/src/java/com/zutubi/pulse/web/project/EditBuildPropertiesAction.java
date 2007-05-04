@@ -67,7 +67,7 @@ public class EditBuildPropertiesAction extends ProjectActionBase
             }
         }
         
-        projectManager.triggerBuild(getProject(), null, new ManualTriggerBuildReason((String)getPrinciple()), r, true);
+        projectManager.triggerBuild(getProject(), new ManualTriggerBuildReason((String)getPrinciple()), r, true);
 
         try
         {

@@ -10,7 +10,6 @@ import com.zutubi.pulse.test.PulseTestCase;
 public class BuildCompletedEventFilterTest extends PulseTestCase
 {
     private static final long PROJECT = 10L;
-    private static final String SPEC = "test spec";
 
     private BuildCompletedEventFilter filter;
 
@@ -66,49 +65,34 @@ public class BuildCompletedEventFilterTest extends PulseTestCase
 
     public void testMissingProjectParam()
     {
-        assertTrue(filter.accept(createTrigger(null, SPEC, "SUCCESS"), createEvent(ResultState.SUCCESS)));
+        assertTrue(filter.accept(createTrigger(null, "SUCCESS"), createEvent(ResultState.SUCCESS)));
     }
 
     public void testDifferentProject()
     {
-        assertFalse(filter.accept(createTrigger(PROJECT + 1, SPEC, "SUCCESS"), createEvent(ResultState.SUCCESS)));
-    }
-
-    public void testMissingSpecParam()
-    {
-        assertTrue(filter.accept(createTrigger(PROJECT, null, "SUCCESS"), createEvent(ResultState.SUCCESS)));
-    }
-
-    public void testDifferentSpec()
-    {
-        assertFalse(filter.accept(createTrigger(PROJECT, "another spec", "SUCCESS"), createEvent(ResultState.SUCCESS)));
+        assertFalse(filter.accept(createTrigger(PROJECT + 1, "SUCCESS"), createEvent(ResultState.SUCCESS)));
     }
 
     public void testPersonalBuild()
     {
         Project project = new Project();
         project.setId(PROJECT);
-        BuildResult result = new BuildResult(new User(), project, new BuildSpecification(SPEC), 1);
+        BuildResult result = new BuildResult(new User(), project, 1);
         result.setState(ResultState.SUCCESS);
         assertFalse(filter.accept(createTrigger("SUCCESS"), new BuildCompletedEvent(this, result)));
     }
 
     private MockTrigger createTrigger(String s)
     {
-        return createTrigger(PROJECT, SPEC, s);
+        return createTrigger(PROJECT, s);
     }
 
-    private MockTrigger createTrigger(Long id, String spec, String states)
+    private MockTrigger createTrigger(Long id, String states)
     {
         MockTrigger t = new MockTrigger();
         if(id != null)
         {
             t.getDataMap().put(BuildCompletedEventFilter.PARAM_PROJECT, id);
-        }
-
-        if(spec != null)
-        {
-            t.getDataMap().put(BuildCompletedEventFilter.PARAM_SPECIFICATION, spec);
         }
 
         if(states != null)
@@ -128,7 +112,7 @@ public class BuildCompletedEventFilterTest extends PulseTestCase
     {
         Project project = new Project();
         project.setId(id);
-        BuildResult result = new BuildResult(new UnknownBuildReason(), project, new BuildSpecification(SPEC), 1, false);
+        BuildResult result = new BuildResult(new UnknownBuildReason(), project, 1, false);
         result.setState(state);
         return new BuildCompletedEvent(this, result);
     }

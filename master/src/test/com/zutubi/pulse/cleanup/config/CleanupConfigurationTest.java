@@ -3,11 +3,9 @@ package com.zutubi.pulse.cleanup.config;
 import com.zutubi.pulse.bootstrap.ComponentContext;
 import com.zutubi.pulse.core.model.ResultState;
 import com.zutubi.pulse.model.BuildResult;
-import com.zutubi.pulse.model.BuildSpecification;
 import com.zutubi.pulse.model.Project;
 import com.zutubi.pulse.model.TriggerBuildReason;
 import com.zutubi.pulse.model.persistence.BuildResultDao;
-import com.zutubi.pulse.model.persistence.BuildSpecificationDao;
 import com.zutubi.pulse.model.persistence.ProjectDao;
 import com.zutubi.pulse.model.persistence.hibernate.MasterPersistenceTestCase;
 import com.zutubi.pulse.test.PulseTestCase;
@@ -22,7 +20,6 @@ public class CleanupConfigurationTest extends MasterPersistenceTestCase
 {
     private ProjectDao projectDao;
     private BuildResultDao buildResultDao;
-    private BuildSpecificationDao buildSpecificationDao;
     private Project p1;
     private Project p2;
     private BuildResult b1;
@@ -36,7 +33,6 @@ public class CleanupConfigurationTest extends MasterPersistenceTestCase
         super.setUp();
         projectDao = (ProjectDao) ComponentContext.getBean("projectDao");
         buildResultDao = (BuildResultDao) ComponentContext.getBean("buildResultDao");
-        buildSpecificationDao = (BuildSpecificationDao) ComponentContext.getBean("buildSpecificationDao");
 
         p1 = new Project();
         p2 = new Project();
@@ -46,7 +42,7 @@ public class CleanupConfigurationTest extends MasterPersistenceTestCase
         createBuild(p2, 1, System.currentTimeMillis() - Constants.DAY * 5, ResultState.SUCCESS, false);
         b1 = createBuild(p1, 1, System.currentTimeMillis() - Constants.DAY * 5, ResultState.SUCCESS, false);
         b2 = createBuild(p1, 2, System.currentTimeMillis() - Constants.DAY * 4, ResultState.ERROR, false);
-        b3 = createBuild(p1, "otherspec", 3, System.currentTimeMillis() - Constants.DAY * 3, ResultState.SUCCESS, true);
+        b3 = createBuild(p1, 3, System.currentTimeMillis() - Constants.DAY * 3, ResultState.SUCCESS, true);
         b4 = createBuild(p1, 4, System.currentTimeMillis() - Constants.DAY * 2, ResultState.SUCCESS, true);
         b5 = createBuild(p1, 5, System.currentTimeMillis() - Constants.DAY * 1, ResultState.FAILURE, true);
         // Create a build that has started but is not in progress yet: -1 timestamp
@@ -57,7 +53,6 @@ public class CleanupConfigurationTest extends MasterPersistenceTestCase
     {
         projectDao = null;
         buildResultDao = null;
-        buildSpecificationDao = null;
         p1 = null;
         p2 = null;
         b1 = null;
@@ -112,14 +107,7 @@ public class CleanupConfigurationTest extends MasterPersistenceTestCase
 
     private BuildResult createBuild(Project project, long number, long startTime, ResultState state, boolean hasWorkDir)
     {
-        return createBuild(project,  "default", number, startTime, state, hasWorkDir);
-    }
-
-    private BuildResult createBuild(Project project, String spec, long number, long startTime, ResultState state, boolean hasWorkDir)
-    {
-        BuildSpecification specification = new BuildSpecification(spec);
-        buildSpecificationDao.save(specification);
-        BuildResult result = new BuildResult(new TriggerBuildReason("scm trigger"), project, specification, number, false);
+        BuildResult result = new BuildResult(new TriggerBuildReason("scm trigger"), project, number, false);
         if(startTime >= 0)
         {
             result.commence(startTime);

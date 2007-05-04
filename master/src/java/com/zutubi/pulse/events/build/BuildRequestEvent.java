@@ -11,9 +11,9 @@ public class BuildRequestEvent extends AbstractBuildRequestEvent
 {
     private BuildReason reason;
 
-    public BuildRequestEvent(Object source, BuildReason reason, ProjectConfiguration projectConfig, Project project, BuildSpecification specification, BuildRevision revision)
+    public BuildRequestEvent(Object source, BuildReason reason, ProjectConfiguration projectConfig, Project project, BuildRevision revision)
     {
-        super(source, revision, projectConfig, project, specification);
+        super(source, revision, projectConfig, project);
         this.reason = reason;
     }
 
@@ -34,7 +34,7 @@ public class BuildRequestEvent extends AbstractBuildRequestEvent
 
     public BuildResult createResult(ProjectManager projectManager, UserManager userManager)
     {
-        return new BuildResult(reason, getProject(), getSpecification(), projectManager.getNextBuildNumber(getProject()), getRevision().isUser());
+        return new BuildResult(reason, getProject(), projectManager.getNextBuildNumber(getProject()), getRevision().isUser());
     }
 
     public String toString()

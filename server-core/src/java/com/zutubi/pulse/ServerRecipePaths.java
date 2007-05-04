@@ -20,13 +20,11 @@ public class ServerRecipePaths implements RecipePaths
     private long id;
     private File dataDir;
     private String project;
-    private String spec;
     private boolean incremental;
 
-    public ServerRecipePaths(String project, String spec, long id, File dataDir, boolean incremental)
+    public ServerRecipePaths(String project, long id, File dataDir, boolean incremental)
     {
         this.project = project;
-        this.spec = spec;
         this.id = id;
         this.dataDir = dataDir;
         this.incremental = incremental;
@@ -44,7 +42,7 @@ public class ServerRecipePaths implements RecipePaths
 
     public File getPersistentWorkDir()
     {
-        return new File(dataDir, FileSystemUtils.composeFilename("work", encode(project), encode(spec)));
+        return new File(dataDir, FileSystemUtils.composeFilename("work", encode(project)));
     }
 
     private String encode(String s)

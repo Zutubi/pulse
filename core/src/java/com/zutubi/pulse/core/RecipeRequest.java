@@ -13,7 +13,6 @@ import java.util.List;
 public class RecipeRequest
 {
     private String project;
-    private String spec;
     private boolean incremental;
     /**
      * The unique identifier for the execution of this recipe.
@@ -42,30 +41,29 @@ public class RecipeRequest
      */
     private List<ResourceProperty> properties;
 
-    public RecipeRequest(String project, String spec, long id, String recipeName, boolean incremental)
+    public RecipeRequest(String project, long id, String recipeName, boolean incremental)
     {
-        this(project, spec, id, recipeName, incremental, null, null);
+        this(project, id, recipeName, incremental, null, null);
     }
 
-    public RecipeRequest(String project, String spec, long id, String recipeName, boolean incremental, List<ResourceRequirement> resourceRequirements, List<ResourceProperty> properties)
+    public RecipeRequest(String project, long id, String recipeName, boolean incremental, List<ResourceRequirement> resourceRequirements, List<ResourceProperty> properties)
     {
-        this(project, spec, id, null, null, recipeName, incremental, resourceRequirements, properties);
+        this(project, id, null, null, recipeName, incremental, resourceRequirements, properties);
     }
 
     public RecipeRequest(long id, Bootstrapper bootstrapper, String pulseFileSource, String recipeName)
     {
-        this(null, null, id, bootstrapper, pulseFileSource, recipeName, false, null, null);
+        this(null, id, bootstrapper, pulseFileSource, recipeName, false, null, null);
     }
 
-    public RecipeRequest(String project, String spec, long id, Bootstrapper bootstrapper, String pulseFileSource, String recipeName, boolean incremental)
+    public RecipeRequest(String project, long id, Bootstrapper bootstrapper, String pulseFileSource, String recipeName, boolean incremental)
     {
-        this(project, spec, id, bootstrapper, pulseFileSource, recipeName, incremental, null, null);
+        this(project, id, bootstrapper, pulseFileSource, recipeName, incremental, null, null);
     }
 
-    public RecipeRequest(String project, String spec, long id, Bootstrapper bootstrapper, String pulseFileSource, String recipeName, boolean incremental, List<ResourceRequirement> resourceRequirements, List<ResourceProperty> properties)
+    public RecipeRequest(String project, long id, Bootstrapper bootstrapper, String pulseFileSource, String recipeName, boolean incremental, List<ResourceRequirement> resourceRequirements, List<ResourceProperty> properties)
     {
         this.project = project;
-        this.spec = spec;
         this.id = id;
         this.bootstrapper = bootstrapper;
         this.pulseFileSource = pulseFileSource;
@@ -78,11 +76,6 @@ public class RecipeRequest
     public String getProject()
     {
         return project;
-    }
-
-    public String getSpec()
-    {
-        return spec;
     }
 
     public boolean isIncremental()

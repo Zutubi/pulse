@@ -14,16 +14,14 @@ public abstract class AbstractBuildRequestEvent extends Event
     private BuildRevision revision;
     private ProjectConfiguration projectConfig;
     private Project project;
-    private BuildSpecification specification;
     private long queued;
 
-    public AbstractBuildRequestEvent(Object source, BuildRevision revision, ProjectConfiguration projectConfig, Project project, BuildSpecification specification)
+    public AbstractBuildRequestEvent(Object source, BuildRevision revision, ProjectConfiguration projectConfig, Project project)
     {
         super(source);
         this.revision = revision;
         this.projectConfig = projectConfig;
         this.project = project;
-        this.specification = specification;
 
         this.queued = System.currentTimeMillis();
     }
@@ -45,11 +43,6 @@ public abstract class AbstractBuildRequestEvent extends Event
     public ProjectConfiguration getProjectConfig()
     {
         return projectConfig;
-    }
-
-    public BuildSpecification getSpecification()
-    {
-        return specification;
     }
 
     public long getQueued()

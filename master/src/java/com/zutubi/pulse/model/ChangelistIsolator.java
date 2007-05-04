@@ -1,6 +1,5 @@
 package com.zutubi.pulse.model;
 
-import com.zutubi.pulse.core.model.PersistentName;
 import com.zutubi.pulse.core.model.Revision;
 import com.zutubi.pulse.prototype.config.ProjectConfiguration;
 import com.zutubi.pulse.scm.ScmException;
@@ -22,24 +21,24 @@ public class ChangelistIsolator
         this.buildManager = buildManager;
     }
 
-    public synchronized List<Revision> getRevisionsToRequest(ProjectConfiguration projectConfig, Project project, BuildSpecification specification, boolean force) throws ScmException
+    public synchronized List<Revision> getRevisionsToRequest(ProjectConfiguration projectConfig, Project project, boolean force) throws ScmException
     {
         List<Revision> result;
         Revision latestBuiltRevision;
 
-        if (latestRequestedRevisions.containsKey(specification.getId()))
+        if (latestRequestedRevisions.containsKey(project.getId()))
         {
-            latestBuiltRevision = latestRequestedRevisions.get(specification.getId());
+            latestBuiltRevision = latestRequestedRevisions.get(project.getId());
         }
         else
         {
             // We have not yet seen a request for this build specification.
             // Find out what the last revision built of this specification
             // was (if any).
-            latestBuiltRevision = getLatestBuiltRevision(project, specification);
+            latestBuiltRevision = getLatestBuiltRevision(project);
             if (latestBuiltRevision != null)
             {
-                latestRequestedRevisions.put(specification.getId(), latestBuiltRevision);
+                latestRequestedRevisions.put(project.getId(), latestBuiltRevision);
             }
         }
 
@@ -59,7 +58,7 @@ public class ChangelistIsolator
         if (result.size() > 0)
         {
             // Remember the new latest
-            latestRequestedRevisions.put(specification.getId(), result.get(result.size() - 1));
+            latestRequestedRevisions.put(project.getId(), result.get(result.size() - 1));
         }
         else if (force)
         {
@@ -72,11 +71,11 @@ public class ChangelistIsolator
         return result;
     }
 
-    private Revision getLatestBuiltRevision(Project project, BuildSpecification specification)
+    private Revision getLatestBuiltRevision(Project project)
     {
         for (int first = 0; /* forever */; first++)
         {
-            List<BuildResult> latest = buildManager.queryBuilds(new Project[]{project}, null, new PersistentName[]{specification.getPname()}, -1, -1, null, first, 1, true);
+            List<BuildResult> latest = buildManager.queryBuilds(new Project[]{project}, null, -1, -1, null, first, 1, true);
             if (latest.size() > 0)
             {
                 BuildScmDetails scmDetails = latest.get(0).getScmDetails();

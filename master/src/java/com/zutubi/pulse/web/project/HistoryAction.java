@@ -29,7 +29,6 @@ public class HistoryAction extends ProjectActionSupport implements Preparable
     private Map<String, ResultState[]> nameToStates;
     private String stateFilter = STATE_ANY;
     private List<String> stateFilters;
-    private Map<Long, String> specs;
     private Long spec = 0L;
     private BuildColumns columns;
 
@@ -93,11 +92,6 @@ public class HistoryAction extends ProjectActionSupport implements Preparable
         this.stateFilter = stateFilter;
     }
 
-    public Map<Long, String> getSpecs()
-    {
-        return specs;
-    }
-
     public Long getSpec()
     {
         return spec;
@@ -144,15 +138,6 @@ public class HistoryAction extends ProjectActionSupport implements Preparable
             return ERROR;
         }
 
-        Map<Long, PersistentName> specNames = new HashMap<Long, PersistentName>();
-        specs = new LinkedHashMap<Long, String>();
-        specs.put(0L, "");
-        for(PersistentName pname: getBuildManager().getBuildSpecifications(project))
-        {
-            specs.put(pname.getId(), pname.getName());
-            specNames.put(pname.getId(), pname);
-        }
-
         if (pagingSupport.getStartPage() < 0)
         {
             addActionError("Invalid start page '" + pagingSupport.getStartPage() + "'");
@@ -175,17 +160,7 @@ public class HistoryAction extends ProjectActionSupport implements Preparable
                 return ERROR;
             }
 
-            PersistentName specName;
-            if (spec == null || spec == 0L)
-            {
-                specName = null;
-            }
-            else
-            {
-                specName = specNames.get(spec);
-            }
-
-            getBuildManager().fillHistoryPage(page, states, specName);
+            getBuildManager().fillHistoryPage(page, states);
         }
 
         history = page.getResults();

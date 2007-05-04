@@ -38,7 +38,7 @@ public class DefaultRecipeResultCollector implements RecipeResultCollector
                 workDest = paths.getBaseDir(result, recipeId);
             }
 
-            agentService.collectResults(result.getProject().getName(), result.getBuildSpecification(), recipeId, incremental, outputDest, workDest);
+            agentService.collectResults(result.getProject().getName(), recipeId, incremental, outputDest, workDest);
         }
     }
 
@@ -46,7 +46,7 @@ public class DefaultRecipeResultCollector implements RecipeResultCollector
     {
         if (agentService != null)
         {
-            agentService.cleanup(result.getProject().getName(), result.getBuildSpecification(), recipeId, incremental);
+            agentService.cleanup(result.getProject().getName(), recipeId, incremental);
         }
     }
 

@@ -1,14 +1,17 @@
 package com.zutubi.pulse.web.project;
 
-import com.zutubi.pulse.charting.*;
-import com.zutubi.pulse.model.BuildSpecification;
-import com.zutubi.pulse.model.NamedEntityComparator;
+import com.zutubi.pulse.charting.BuildResultsChart;
+import com.zutubi.pulse.charting.BuildTimesChart;
+import com.zutubi.pulse.charting.ChartUtils;
+import com.zutubi.pulse.charting.DBBuildResultsDataSource;
+import com.zutubi.pulse.charting.TestCountChart;
+import com.zutubi.pulse.charting.TimeBasedChartData;
 import com.zutubi.pulse.model.Project;
-import com.zutubi.pulse.model.ProjectManager;
 import com.zutubi.pulse.model.persistence.BuildResultDao;
 import com.zutubi.pulse.web.ActionSupport;
 
-import java.util.*;
+import java.util.Map;
+import java.util.TreeMap;
 
 /**
  * <class comment/>
@@ -20,8 +23,6 @@ public class ViewReportsAction extends ActionSupport
 
     private long id;
     private Project project;
-    private long specId = 0;
-    private Map<Long, String> buildSpecifications;
 
     private Map buildResultsChart;
     private Map testCountChart;
@@ -72,32 +73,6 @@ public class ViewReportsAction extends ActionSupport
         return timeframes;
     }
 
-    public long getSpecId()
-    {
-        return specId;
-    }
-
-    public void setSpecId(long specId)
-    {
-        this.specId = specId;
-    }
-
-    public Map<Long, String> getBuildSpecifications()
-    {
-        if(buildSpecifications == null)
-        {
-            buildSpecifications = new LinkedHashMap<Long, String>();
-            List<BuildSpecification> specs = project.getBuildSpecifications();
-            Collections.sort(specs, new NamedEntityComparator());
-            for(BuildSpecification s: specs)
-            {
-                buildSpecifications.put(s.getId(), s.getName());
-            }
-        }
-
-        return buildSpecifications;
-    }
-
     public String execute() throws Exception
     {
         project = projectManager.getProject(id);
@@ -107,21 +82,8 @@ public class ViewReportsAction extends ActionSupport
             return ERROR;
         }
         
-        BuildSpecification spec = null;
-        if(specId > 0)
-        {
-            spec = project.getBuildSpecification(specId);
-        }
-
-        if(spec == null)
-        {
-            spec = project.getBuildSpecifications().get(0);
-            specId = spec.getId();
-        }
-
         DBBuildResultsDataSource dataSource = new DBBuildResultsDataSource();
         dataSource.setProject(project);
-        dataSource.setSpec(spec);
         dataSource.setBuildResultDao(buildResultDao);
 
         TimeBasedChartData chartData = new TimeBasedChartData();

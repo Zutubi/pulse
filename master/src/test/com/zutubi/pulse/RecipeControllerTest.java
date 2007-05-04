@@ -49,19 +49,20 @@ public class RecipeControllerTest extends PulseTestCase
 
         rootResult = new RecipeResult("root recipe");
         rootResult.setId(100);
-        rootNode = new RecipeResultNode(new PersistentName("root stage"), rootResult);
+        rootNode = new RecipeResultNode("root stage", 1, rootResult);
         rootNode.setId(101);
         RecipeResult childResult = new RecipeResult("child recipe");
         childResult.setId(102);
-        RecipeResultNode childNode = new RecipeResultNode(new PersistentName("child stage"), childResult);
+        RecipeResultNode childNode = new RecipeResultNode("child stage", 2, childResult);
         childNode.setId(103);
         rootNode.addChild(childNode);
 
-        RecipeRequest recipeRequest = new RecipeRequest("project", "spec", rootResult.getId(), rootResult.getRecipeName(), false);
+        RecipeRequest recipeRequest = new RecipeRequest("project", rootResult.getId(), rootResult.getRecipeName(), false);
         BuildResult build = new BuildResult();
-        BuildSpecificationNode specificationNode = new BuildSpecificationNode();
         dispatchRequest = new RecipeDispatchRequest(new MasterBuildHostRequirements(), new BuildRevision(), recipeRequest, null, null);
-        recipeController = new RecipeController(null, build, specificationNode, rootNode, dispatchRequest, new LinkedList<ResourceProperty>(), false, false, null, logger, resultCollector, recipeQueue, buildManager, null);
+        recipeController = new RecipeController(null, build, rootNode, dispatchRequest, new LinkedList<ResourceProperty>(), false, false, null, logger, resultCollector);
+        recipeController.setRecipeQueue(recipeQueue);
+        recipeController.setBuildManager(buildManager);
     }
 
     protected void tearDown() throws Exception
@@ -78,7 +79,7 @@ public class RecipeControllerTest extends PulseTestCase
     public void testDispatchRequest()
     {
         // Initialising should cause a dispatch request, and should initialise the bootstrapper
-        Bootstrapper bootstrapper = new CheckoutBootstrapper("project", "spec", new SvnConfiguration(), new BuildRevision(), false);
+        Bootstrapper bootstrapper = new CheckoutBootstrapper("project", new SvnConfiguration(), new BuildRevision(), false);
         recipeController.initialise(bootstrapper);
         assertTrue(recipeQueue.hasDispatched(rootResult.getId()));
         RecipeDispatchRequest dispatched = recipeQueue.getRequest(rootResult.getId());
@@ -93,7 +94,7 @@ public class RecipeControllerTest extends PulseTestCase
 
         // After dispatching, the controller should handle a dispatched event
         // by recording the build service on the result node.
-        RecipeDispatchedEvent event = new RecipeDispatchedEvent(this, new RecipeRequest("project", "spec", rootResult.getId(), "test", false), new MockAgent(buildService));
+        RecipeDispatchedEvent event = new RecipeDispatchedEvent(this, new RecipeRequest("project", rootResult.getId(), "test", false), new MockAgent(buildService));
         assertTrue(recipeController.handleRecipeEvent(event));
         assertEquals(buildService.getHostName(), rootNode.getHost());
 
@@ -469,12 +470,12 @@ public class RecipeControllerTest extends PulseTestCase
             throw new RuntimeException("Method not implemented.");
         }
 
-        public void collectResults(String project, String spec, long recipeId, boolean incremental, File outputDest, File workDest)
+        public void collectResults(String project, long recipeId, boolean incremental, File outputDest, File workDest)
         {
             throw new RuntimeException("Method not implemented.");
         }
 
-        public void cleanup(String project, String spec, long recipeId, boolean incremental)
+        public void cleanup(String project, long recipeId, boolean incremental)
         {
             throw new RuntimeException("Method not implemented.");
         }
