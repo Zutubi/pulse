@@ -40,7 +40,7 @@ public class Maven2PostProcessor extends PostProcessorGroup
         // also need to exclude it from the more generic [ERROR] pattern
         // that is still used to pick up error features.
 
-        Pattern failurePattern = Pattern.compile("^\\[ERROR\\] BUILD (ERROR|FAILURE)");
+        Pattern failurePattern = Pattern.compile("^\\[ERROR\\] (BUILD|FATAL) (ERROR|FAILURE)");
 
         featurePP = new RegexPostProcessor();
         errorPattern = new RegexPattern(Feature.Level.ERROR, Pattern.compile("^\\[ERROR\\]"));
