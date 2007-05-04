@@ -25,6 +25,8 @@ import java.io.File;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.LinkedBlockingQueue;
 
 /**
  *
@@ -42,9 +44,10 @@ public class DefaultBuildManager implements BuildManager, EventListener
     private Scheduler scheduler;
     private MasterConfigurationManager configurationManager;
     private EventManager eventManager;
-    private TestManager testManager;
 
     private DatabaseConsole databaseConsole;
+
+    private BlockingQueue<CleanupRequest> cleanupQueue = new LinkedBlockingQueue<CleanupRequest>();
 
     private static final String CLEANUP_NAME = "cleanup";
     private static final String CLEANUP_GROUP = "services";
@@ -59,23 +62,47 @@ public class DefaultBuildManager implements BuildManager, EventListener
         // register a schedule for cleaning up old build results.
         // check if the trigger exists. if not, create and schedule.
         Trigger trigger = scheduler.getTrigger(CLEANUP_NAME, CLEANUP_GROUP);
-        if (trigger != null)
+        if (trigger == null)
         {
-            return;
+            // initialise the trigger.
+            trigger = new SimpleTrigger(CLEANUP_NAME, CLEANUP_GROUP, CLEANUP_FREQUENCY);
+            trigger.setTaskClass(CleanupBuilds.class);
+
+            try
+            {
+                scheduler.schedule(trigger);
+            }
+            catch (SchedulingException e)
+            {
+                LOG.severe(e);
+            }
         }
 
-        // initialise the trigger.
-        trigger = new SimpleTrigger(CLEANUP_NAME, CLEANUP_GROUP, CLEANUP_FREQUENCY);
-        trigger.setTaskClass(CleanupBuilds.class);
+        Thread cleanupThread = new Thread(new Runnable()
+        {
+            @SuppressWarnings({"InfiniteLoopStatement"})
+            public void run()
+            {
+                while(true)
+                {
+                    try
+                    {
+                        CleanupRequest request = cleanupQueue.take();
+                        if(request.dir.exists() && !FileSystemUtils.rmdir(request.dir))
+                        {
+                            LOG.warning("Unable to remove directory '" + request.dir.getAbsolutePath() + "'");
+                        }
+                    }
+                    catch (InterruptedException e)
+                    {
+                        LOG.warning(e);
+                    }
+                }
+            }
+        }, "Build Cleanup Service");
 
-        try
-        {
-            scheduler.schedule(trigger);
-        }
-        catch (SchedulingException e)
-        {
-            LOG.severe(e);
-        }
+        cleanupThread.setDaemon(true);
+        cleanupThread.start();
     }
 
     public void setBuildResultDao(BuildResultDao dao)
@@ -300,17 +327,14 @@ public class DefaultBuildManager implements BuildManager, EventListener
 
         MasterBuildPaths paths = new MasterBuildPaths(configurationManager);
         File projectDir = paths.getProjectDir(project);
-        if (!FileSystemUtils.rmdir(projectDir))
-        {
-            LOG.warning("Unable to remove project directory '" + projectDir.getAbsolutePath() + "'");
-        }
+        scheduleCleanup(projectDir);
 
         do
         {
             results = buildResultDao.findOldestByProject(project, null, 100, true);
             for (BuildResult r : results)
             {
-                cleanupResult(r);
+                cleanupResult(r, false);
             }
         }
         while (results.size() > 0);
@@ -320,15 +344,12 @@ public class DefaultBuildManager implements BuildManager, EventListener
     {
         MasterBuildPaths paths = new MasterBuildPaths(configurationManager);
         File userDir = paths.getUserDir(user.getId());
-        if (!FileSystemUtils.rmdir(userDir))
-        {
-            LOG.warning("Unable to remove user directory '" + userDir.getAbsolutePath() + "'");
-        }
+        scheduleCleanup(userDir);
 
         List<BuildResult> results = buildResultDao.findByUser(user);
         for (BuildResult r : results)
         {
-            cleanupResult(r);
+            cleanupResult(r, false);
         }
     }
 
@@ -339,7 +360,7 @@ public class DefaultBuildManager implements BuildManager, EventListener
 
     public void delete(BuildResult result)
     {
-        cleanupResult(result);
+        cleanupResult(result, true);
     }
 
     public void abortUnfinishedBuilds(Project project, String message)
@@ -514,7 +535,7 @@ public class DefaultBuildManager implements BuildManager, EventListener
             List<BuildResult> results = buildResultDao.getOldestCompletedBuilds(user, count - max);
             for(BuildResult result: results)
             {
-                cleanupResult(result);
+                cleanupResult(result, true);
             }
         }
     }
@@ -531,7 +552,7 @@ public class DefaultBuildManager implements BuildManager, EventListener
             }
             else
             {
-                cleanupResult(build);
+                cleanupResult(build, true);
             }
         }
     }
@@ -556,14 +577,13 @@ public class DefaultBuildManager implements BuildManager, EventListener
         }
     }
 
-    private void cleanupResult(BuildResult build)
+    private void cleanupResult(BuildResult build, boolean rmdir)
     {
         MasterBuildPaths paths = new MasterBuildPaths(configurationManager);
         File buildDir = paths.getBuildDir(build);
-        if (buildDir.exists() && !FileSystemUtils.rmdir(buildDir))
+        if (rmdir && buildDir.exists())
         {
-            LOG.warning("Unable to clean up build directory '" + buildDir.getAbsolutePath() + "'");
-            return;
+            scheduleCleanup(buildDir);
         }
 
         if(build.isPersonal())
@@ -602,12 +622,25 @@ public class DefaultBuildManager implements BuildManager, EventListener
         for (RecipeResultNode node : nodes)
         {
             File workDir = paths.getBaseDir(build, node.getResult().getId());
-            if (!FileSystemUtils.rmdir(workDir))
+            if (workDir.exists())
             {
-                LOG.warning("Unable to clean up build directory '" + workDir.getAbsolutePath() + "'");
+                scheduleCleanup(workDir);
             }
-
             cleanupWorkForNodes(paths, build, node.getChildren());
+        }
+    }
+
+    private void scheduleCleanup(File dir)
+    {
+        File dead = new File(dir + ".dead");
+        dir.renameTo(dead);
+        try
+        {
+            cleanupQueue.put(new CleanupRequest(dead));
+        }
+        catch (InterruptedException e)
+        {
+            LOG.warning(e);
         }
     }
 
@@ -660,13 +693,18 @@ public class DefaultBuildManager implements BuildManager, EventListener
         this.eventManager = eventManager;
     }
 
-    public void setTestManager(TestManager testManager)
-    {
-        this.testManager = testManager;
-    }
-
     public void setDatabaseConsole(DatabaseConsole databaseConsole)
     {
         this.databaseConsole = databaseConsole;
+    }
+
+    private class CleanupRequest
+    {
+        private File dir;
+
+        public CleanupRequest(File dir)
+        {
+            this.dir = dir;
+        }
     }
 }
