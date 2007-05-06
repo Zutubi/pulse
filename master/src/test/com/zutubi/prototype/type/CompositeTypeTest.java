@@ -1,6 +1,8 @@
 package com.zutubi.prototype.type;
 
-import java.util.List;
+import com.zutubi.prototype.type.record.Record;
+import com.zutubi.prototype.type.record.MutableRecord;
+import com.zutubi.config.annotations.SymbolicName;
 
 /**
  *
@@ -13,8 +15,7 @@ public class CompositeTypeTest extends TypeTestCase
         super.setUp();
 
         typeRegistry.register("basicTypes", BasicTypes.class);
-        typeRegistry.register("nestedType", NestedType.class);
-        typeRegistry.register("typeWithList", TypeWithList.class);
+        typeRegistry.register(ObjectTypeA.class);
     }
 
     protected void tearDown() throws Exception
@@ -22,7 +23,6 @@ public class CompositeTypeTest extends TypeTestCase
         super.tearDown();
     }
 
-/*
     public void testBasicTypesConversion() throws TypeException
     {
         BasicTypes instance = new BasicTypes();
@@ -47,55 +47,69 @@ public class CompositeTypeTest extends TypeTestCase
         Type compositeType = typeRegistry.getType("basicTypes");
 
         Record record = (Record) compositeType.unstantiate(instance);
-        Object newInstance = compositeType.instantiate(record);
+        Object newInstance = compositeType.instantiate(null, record);
         assertTrue(newInstance instanceof BasicTypes);
         assertEquals(newInstance, instance);
     }
 
-    public void testCompositeWithNestedComposites() throws TypeException
+    public void testWithNestedComplextType() throws TypeException
     {
-        Type compositeType = typeRegistry.getType("nestedType");
-        NestedType instance = new NestedType("a", new NestedType("b", new NestedType("c")));
+        Type compositeType = typeRegistry.getType("typeA");
+        
+        ObjectTypeA instance = new ObjectTypeA();
+        ObjectTypeB objectTypeB = new ObjectTypeB();
+        objectTypeB.setA("b");
+        instance.setA(objectTypeB);
 
         Record record = (Record) compositeType.unstantiate(instance);
-        Object newInstance = compositeType.instantiate(record);
+        Object newInstance = compositeType.instantiate(null, record);
 
         assertEquals(newInstance, instance);
     }
 
-    public void testCompositeWithList() throws TypeException
+    public void testCreateNewRecordInitialisedDefaultFields()
     {
-        Type compositeType = typeRegistry.getType("typeWithList");
-        TypeWithList instance = new TypeWithList(Arrays.asList(new NestedType("a"), new NestedType("b")));
+        CompositeType compositeType = typeRegistry.getType("typeA");
+        MutableRecord record = compositeType.createNewRecord();
+        assertNotNull(record);
 
-        Record record = (Record) compositeType.unstantiate(instance);
-        Object newInstance = compositeType.instantiate(record);
+        // field a contains an instance of typeB.
+        assertNotNull(record.get("a"));
 
-        assertEquals(newInstance, instance);
+        // field b is null.
+        assertNull(record.get("b"));
+
+        // typeB has field a initialised to 'value'
+        Record b = (Record) record.get("a");
+        assertEquals("value", b.get("a"));
     }
-*/
 
-    public static class TypeWithList
+
+    @SymbolicName("typeA")
+    public static class ObjectTypeA
     {
-        private List<NestedType> list;
+        private ObjectTypeB a = new ObjectTypeB();
 
-        public TypeWithList()
+        private ObjectTypeB b = null;
+
+        public ObjectTypeB getA()
         {
+            return a;
         }
 
-        public TypeWithList(List<NestedType> list)
+        public void setA(ObjectTypeB a)
         {
-            this.list = list;
+            this.a = a;
         }
 
-        public List<NestedType> getList()
+        public ObjectTypeB getB()
         {
-            return list;
+            return b;
         }
 
-        public void setList(List<NestedType> list)
+        public void setB(ObjectTypeB b)
         {
-            this.list = list;
+            this.b = b;
         }
 
         public boolean equals(Object o)
@@ -103,38 +117,23 @@ public class CompositeTypeTest extends TypeTestCase
             if (this == o) return true;
             if (o == null || getClass() != o.getClass()) return false;
 
-            TypeWithList that = (TypeWithList) o;
+            ObjectTypeA that = (ObjectTypeA) o;
 
-            if (list != null ? !list.equals(that.list) : that.list != null) return false;
+            if (a != null ? !a.equals(that.a) : that.a != null) return false;
 
             return true;
         }
 
         public int hashCode()
         {
-            return (list != null ? list.hashCode() : 0);
+            return (a != null ? a.hashCode() : 0);
         }
     }
 
-    public static class NestedType
+    @SymbolicName("typeB")
+    public static class ObjectTypeB
     {
-        private String a;
-        private NestedType b;
-
-        public NestedType()
-        {
-        }
-
-        public NestedType(String a)
-        {
-            this.a = a;
-        }
-
-        public NestedType(String a, NestedType b)
-        {
-            this.a = a;
-            this.b = b;
-        }
+        private String a = "value";
 
         public String getA()
         {
@@ -146,35 +145,21 @@ public class CompositeTypeTest extends TypeTestCase
             this.a = a;
         }
 
-        public NestedType getB()
-        {
-            return b;
-        }
-
-        public void setB(NestedType b)
-        {
-            this.b = b;
-        }
-
         public boolean equals(Object o)
         {
             if (this == o) return true;
             if (o == null || getClass() != o.getClass()) return false;
 
-            NestedType that = (NestedType) o;
+            ObjectTypeB that = (ObjectTypeB) o;
 
             if (a != null ? !a.equals(that.a) : that.a != null) return false;
-            if (b != null ? !b.equals(that.b) : that.b != null) return false;
 
             return true;
         }
 
         public int hashCode()
         {
-            int result;
-            result = (a != null ? a.hashCode() : 0);
-            result = 31 * result + (b != null ? b.hashCode() : 0);
-            return result;
+            return (a != null ? a.hashCode() : 0);
         }
     }
 

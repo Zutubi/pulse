@@ -48,10 +48,10 @@ public class MasterLogConfiguration implements LogConfiguration, ConfigurationEv
 
     private ConfigurationProvider getConfigurationProvider()
     {
-        if(configurationProvider == null && ComponentContext.containsBean(CONFIGURATION_PROVIDER_NAME))
+        if (configurationProvider == null && ComponentContext.containsBean(CONFIGURATION_PROVIDER_NAME))
         {
             configurationProvider = ComponentContext.getBean(CONFIGURATION_PROVIDER_NAME);
-            if(configurationProvider != null)
+            if (configurationProvider != null)
             {
                 configurationProvider.registerEventListener(this, false, false, LoggingConfiguration.class);
             }
@@ -61,7 +61,7 @@ public class MasterLogConfiguration implements LogConfiguration, ConfigurationEv
 
     public void handleConfigurationEvent(ConfigurationEvent event)
     {
-        if(event instanceof PostSaveEvent)
+        if (event instanceof PostSaveEvent)
         {
             logConfigurationManager.applyConfig();
         }

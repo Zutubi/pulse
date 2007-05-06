@@ -12,12 +12,12 @@ public class GlobalConfiguration extends AbstractConfiguration
 {
     public static final String SCOPE_NAME = "global";
 
-    private GeneralAdminConfiguration generalConfig;
-    private LoggingConfiguration loggingConfig;
-    private EmailConfiguration emailConfig;
-    private LDAPConfiguration ldapConfig;
-    private JabberConfiguration jabberConfig;
-    private LicenseConfiguration licenseConfig;
+    private GeneralAdminConfiguration generalConfig = new GeneralAdminConfiguration();
+    private LoggingConfiguration loggingConfig = new LoggingConfiguration();
+    private EmailConfiguration emailConfig = new EmailConfiguration();
+    private LDAPConfiguration ldapConfig = new LDAPConfiguration();
+    private JabberConfiguration jabberConfig = new JabberConfiguration();
+    private LicenseConfiguration licenseConfig = new LicenseConfiguration();
 
     private ConfigurationPersistenceManager configurationPersistenceManager;
 

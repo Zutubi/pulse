@@ -25,9 +25,18 @@ public class CompositeType extends AbstractType implements ComplexType
 {
     private static final Logger LOG = Logger.getLogger(CompositeType.class);
 
+    /**
+     * The list of symbolic names of types that 'extend' this type. 
+     */
     private List<String> extensions = new LinkedList<String>();
+
+    /**
+     * Those properties that are marked with the @Internal annotation.
+     */
     private Map<String, TypeProperty> internalProperties = new HashMap<String, TypeProperty>();
+
     private Map<String, TypeProperty> properties = new HashMap<String, TypeProperty>();
+    
     private Map<Class, List<String>> propertiesByClass = new HashMap<Class, List<String>>();
 
     private ConfigurationPersistenceManager configurationPersistenceManager;
@@ -128,7 +137,7 @@ public class CompositeType extends AbstractType implements ComplexType
 
     public Object instantiate(String path, Object data) throws TypeException
     {
-        Configuration instance =  path == null ? null : (Configuration)configurationPersistenceManager.getInstance(path);
+        Object instance =  path == null ? null : configurationPersistenceManager.getInstance(path);
         if (instance == null && data != null)
         {
             try
@@ -142,12 +151,17 @@ public class CompositeType extends AbstractType implements ComplexType
                     return type.instantiate(path, data);
                 }
 
-                instance = (Configuration) getClazz().newInstance();
+                instance = getClazz().newInstance();
                 if (path != null)
                 {
+                    // paths are associated with configuration objects only.
                     configurationPersistenceManager.putInstance(path, instance);
-                    instance.setConfigurationPath(path);
-                    instance.setHandle(record.getHandle());
+                    if (instance instanceof Configuration)
+                    {
+                        Configuration config = (Configuration) instance;
+                        config.setConfigurationPath(path);
+                        config.setHandle(record.getHandle());
+                    }
                 }
 
                 TypeConversionException exception = null;
@@ -211,7 +225,7 @@ public class CompositeType extends AbstractType implements ComplexType
 
     public Record unstantiate(Object instance) throws TypeException
     {
-        MutableRecord result = createNewRecord(false);
+        MutableRecord result = newRecord();
         for (TypeProperty property : properties.values())
         {
             unstantiateProperty(property, instance, result);
@@ -256,10 +270,19 @@ public class CompositeType extends AbstractType implements ComplexType
 
     public MutableRecord createNewRecord()
     {
-        return createNewRecord(true);
+        try
+        {
+            Object defaultInstance = getClazz().newInstance();
+            return (MutableRecord) unstantiate(defaultInstance);
+        }
+        catch (Exception e)
+        {
+            LOG.warning(e);
+            return null;
+        }
     }
 
-    private MutableRecord createNewRecord(boolean initialise)
+    private MutableRecord newRecord()
     {
         if (extensions.size() > 0)
         {
@@ -269,40 +292,25 @@ public class CompositeType extends AbstractType implements ComplexType
         }
 
         MutableRecordImpl record = new MutableRecordImpl();
-        for (TypeProperty property : getProperties(ComplexType.class))
+
+        // a) initialise all collection properties to empty collections.
+        //    leave other items blank so that they match the actual values in the objects.
+        for (TypeProperty property : getProperties(CollectionType.class))
         {
-            ComplexType type = (ComplexType) property.getType();
-            Record childRecord = type.createNewRecord();
-            if (childRecord != null)
-            {
-                record.put(property.getName(), childRecord);
-            }
+            CollectionType type = (CollectionType) property.getType();
+            record.put(property.getName(), type.createNewRecord());
         }
+
+        // b) set the symbolic name of the record.
         record.setSymbolicName(getSymbolicName());
 
-        if (initialise)
-        {
-            // setup the default values, instantiate the configuration object and
-            // extract the default values.
-            try
-            {
-                Object defaultInstance = getClazz().newInstance();
-                for (TypeProperty property : getProperties())
-                {
-                    Object defaultValue = property.getValue(defaultInstance);
-                    if (defaultValue != null)
-                    {
-                        record.put(property.getName(), property.getType().unstantiate(defaultValue));
-                    }
-                }
-            }
-            catch (Exception e)
-            {
-                LOG.warning(e);
-            }
-        }
-
         return record;
+    }
+
+    public Record unstantiateMe(Object instance)
+    {
+        
+        return null;
     }
 
     public boolean isTemplated()

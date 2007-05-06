@@ -28,9 +28,4 @@ public class TypeTestCase extends TestCase
         configurationPersistenceManager = null;
         super.tearDown();
     }
-
-    public void test()
-    {
-        // 
-    }
 }

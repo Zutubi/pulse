@@ -1,7 +1,11 @@
 package com.zutubi.pulse.cleanup;
 
+import com.zutubi.prototype.config.CollectionListener;
+import com.zutubi.prototype.config.ConfigurationProvider;
 import com.zutubi.prototype.config.ConfigurationRegistry;
 import com.zutubi.prototype.type.TypeException;
+import com.zutubi.prototype.type.record.MutableRecord;
+import com.zutubi.prototype.type.record.PathUtils;
 import com.zutubi.pulse.cleanup.config.CleanupConfiguration;
 import com.zutubi.pulse.cleanup.config.CleanupWhat;
 import com.zutubi.pulse.events.Event;
@@ -42,6 +46,7 @@ public class CleanupManager
     private BuildManager buildManager;
 
     private ConfigurationRegistry configurationRegistry;
+    private ConfigurationProvider configurationProvider;
 
     private ProjectManager projectManager;
 
@@ -92,6 +97,29 @@ public class CleanupManager
         {
             LOG.severe(e);
         }
+
+        CollectionListener<ProjectConfiguration> listener = new CollectionListener<ProjectConfiguration>("project", ProjectConfiguration.class, true)
+        {
+            protected void preInsert(MutableRecord record)
+            {
+            }
+
+            protected void instanceInserted(ProjectConfiguration instance)
+            {
+                CleanupConfiguration cleanupConfiguration = new CleanupConfiguration();
+                cleanupConfiguration.setName("default");
+                configurationProvider.insert(PathUtils.getPath(instance.getConfigurationPath(), "cleanup"), cleanupConfiguration);
+            }
+
+            protected void instanceDeleted(ProjectConfiguration instance)
+            {
+            }
+
+            protected void instanceChanged(ProjectConfiguration instance)
+            {
+            }
+        };
+        listener.register(configurationProvider);
     }
 
     public void cleanupBuilds()
@@ -196,6 +224,10 @@ public class CleanupManager
         this.buildResultDao = buildResultDao;
     }
 
+    public void setConfigurationProvider(ConfigurationProvider configurationProvider)
+    {
+        this.configurationProvider = configurationProvider;
+    }
 
     /**
      * Listen for build completed events, triggering each completed builds projects

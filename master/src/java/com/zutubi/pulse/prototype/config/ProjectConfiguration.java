@@ -39,6 +39,17 @@ public class ProjectConfiguration extends AbstractNamedConfiguration implements 
     @Transient
     private Map<String, Object> extensions = new HashMap<String, Object>();
 
+    public ProjectConfiguration()
+    {
+        // setup defaults
+        options = new BuildOptionsConfiguration();
+
+        BuildStageConfiguration defaultStage = new BuildStageConfiguration();
+        defaultStage.setName("default");
+        stages = new HashMap<String, BuildStageConfiguration>();
+        stages.put("default", defaultStage);
+    }
+
     public long getProjectId()
     {
         return projectId;

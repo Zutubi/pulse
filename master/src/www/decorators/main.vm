@@ -51,7 +51,7 @@
 		<title>:: pulse :: #if ($title) $title #end</title>
         <link rel="shortcut icon" href="$base/favicon.ico"/>
         <link rel="icon" type="image/png" href="$base/favicon.png"/>
-        <link rel="stylesheet" type="text/css" href="/css/ext-all.css"/>
+        <!--<link rel="stylesheet" type="text/css" href="/css/ext-all.css"/>-->
         <link rel="stylesheet" type="text/css" href="$base/css/main.css" media="screen"/>
 		<link rel="stylesheet" type="text/css" href="$base/css/form.css" media="screen"/>
 #if ($rssEnabled && $projectId && $projectId != "0")
@@ -59,8 +59,10 @@
 #end
         <script type="text/javascript" src="/js/yahoo/utilities.js"></script>
         <script type="text/javascript" src="/js/yui-utilities.js"></script>
+<!--
         <script type="text/javascript" src="/js/ext-yui-adapter.js"></script>
         <script type="text/javascript" src="/js/ext-all.js"></script>
+-->
         <script type="text/javascript" src="$base/js/main.js"></script>
         <script type="text/javascript">
             var layout;

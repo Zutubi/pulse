@@ -22,8 +22,6 @@ public @interface ConfigurationCheck
      * The reference to a configuration check handler implementation. 
      * 
      * @return the type to be used to run the configuration check.
-     *
-     * @see ConfigurationCheckHandler
      */
     String value();
 }
