@@ -62,7 +62,7 @@ public class P4ServerTest extends PulseTestCase
         super.tearDown();
     }
 
-    public void testGetLocation()
+    public void testGetLocation() throws SCMException
     {
         getServer(TEST_CLIENT);
         assertEquals(server.getLocation(), "test-client@:6666");
@@ -508,7 +508,7 @@ public class P4ServerTest extends PulseTestCase
         return client;
     }
 
-    private void getServer(String client)
+    private void getServer(String client) throws SCMException
     {
         server = new P4Server(":6666", "test-user", "", client);
         this.client.setEnv(P4Constants.ENV_PORT, ":6666");

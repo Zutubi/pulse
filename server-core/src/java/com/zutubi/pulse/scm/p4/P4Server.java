@@ -6,6 +6,8 @@ import com.zutubi.pulse.filesystem.remote.CachingRemoteFile;
 import com.zutubi.pulse.scm.*;
 import static com.zutubi.pulse.scm.p4.P4Constants.*;
 import com.zutubi.pulse.util.FileSystemUtils;
+import com.zutubi.pulse.util.StringUtils;
+import com.zutubi.pulse.util.SystemUtils;
 import com.zutubi.pulse.util.logging.Logger;
 
 import java.io.File;
@@ -24,6 +26,7 @@ public class P4Server extends CachingSCMServer
 
     private P4Client client;
     private String templateClient;
+    private String resolvedClient;
     private File clientRoot;
     private String port;
     private Pattern syncPattern;
@@ -34,18 +37,47 @@ public class P4Server extends CachingSCMServer
         this.excludedPaths = filteredPaths;
     }
 
+    private String resolveClient() throws SCMException
+    {
+        if (resolvedClient == null)
+        {
+            if (templateClient.startsWith("!"))
+            {
+                String commandLine = templateClient.substring(1);
+                List<String> command = StringUtils.split(commandLine);
+
+                try
+                {
+                    resolvedClient = SystemUtils.runCommand(command.toArray(new String[command.size()])).trim();
+                    return resolvedClient;
+                }
+                catch (IOException e)
+                {
+                    LOG.severe(e);
+                    throw new SCMException("Error running template client generation command: " + e.getMessage(), e);
+                }
+            }
+            else
+            {
+                resolvedClient = templateClient;
+            }
+        }
+        
+        return resolvedClient;
+    }
+
     private void createClient(String clientName, File toDirectory) throws SCMException
     {
-        client.createClient(templateClient, clientName, toDirectory);
+        client.createClient(resolveClient(), clientName, toDirectory);
     }
 
     private boolean clientExists(String clientName) throws SCMException
     {
         P4Client.P4Result result = client.runP4(null, P4_COMMAND, COMMAND_CLIENTS);
-        String [] lines = client.splitLines(result);
+        String[] lines = client.splitLines(result);
         for (String line : lines)
         {
-            String [] parts = line.split(" ");
+            String[] parts = line.split(" ");
             if (parts.length > 1 && parts[1].equals(clientName))
             {
                 return true;
@@ -117,7 +149,7 @@ public class P4Server extends CachingSCMServer
     {
         boolean cleanup = false;
 
-        if(clientName == null)
+        if (clientName == null)
         {
             clientName = updateClient(null, null);
             cleanup = true;
@@ -129,7 +161,7 @@ public class P4Server extends CachingSCMServer
         }
         finally
         {
-            if(cleanup)
+            if (cleanup)
             {
                 deleteClient(clientName);
             }
@@ -150,17 +182,17 @@ public class P4Server extends CachingSCMServer
         {
             P4Client.P4Result result = client.runP4(null, P4_COMMAND, FLAG_CLIENT, clientName, COMMAND_SYNC, FLAG_FORCE, FLAG_PREVIEW);
             Matcher matcher = syncPattern.matcher(result.stdout);
-            while(matcher.find())
+            while (matcher.find())
             {
                 String localFile = matcher.group(4);
-                if(localFile.startsWith(clientRoot.getAbsolutePath()))
+                if (localFile.startsWith(clientRoot.getAbsolutePath()))
                 {
                     localFile = localFile.substring(clientRoot.getAbsolutePath().length());
                 }
 
                 // Separators must be normalised
                 localFile = localFile.replace('\\', '/');
-                if(localFile.startsWith("/"))
+                if (localFile.startsWith("/"))
                 {
                     localFile = localFile.substring(1);
                 }
@@ -210,9 +242,9 @@ public class P4Server extends CachingSCMServer
         //   ... <file>#<revision> <action>
         //   ...
         P4Client.P4Result result = client.runP4(false, null, P4_COMMAND, FLAG_CLIENT, clientName, COMMAND_DESCRIBE, FLAG_SHORT, Long.toString(number));
-        if(result.stderr.length() > 0)
+        if (result.stderr.length() > 0)
         {
-            if(result.stderr.indexOf("no such changelist") >= 0)
+            if (result.stderr.indexOf("no such changelist") >= 0)
             {
                 // OK, this change must have been deleted at some point
                 // (CIB-1010).
@@ -223,7 +255,7 @@ public class P4Server extends CachingSCMServer
                 throw new SCMException("p4 process returned error '" + result.stderr.toString().trim() + "'");
             }
         }
-        
+
         String[] lines = client.splitLines(result);
 
         if (lines.length < 1)
@@ -358,7 +390,7 @@ public class P4Server extends CachingSCMServer
             long number = ((NumericalRevision) revision).getRevisionNumber();
             P4CheckoutHandler p4Handler = new P4CheckoutHandler(force, handler);
 
-            if(force)
+            if (force)
             {
                 client.runP4WithHandler(p4Handler, null, P4_COMMAND, FLAG_CLIENT, clientName, COMMAND_SYNC, FLAG_FORCE, "@" + Long.toString(number));
             }
@@ -403,7 +435,7 @@ public class P4Server extends CachingSCMServer
         return result;
     }
 
-    public P4Server(String port, String user, String password, String client)
+    public P4Server(String port, String user, String password, String client) throws SCMException
     {
         this.client = new P4Client();
         templateClient = client;
@@ -423,12 +455,12 @@ public class P4Server extends CachingSCMServer
             this.client.setEnv(ENV_PASSWORD, password);
         }
 
-        this.client.setEnv(ENV_CLIENT, client);
+        this.client.setEnv(ENV_CLIENT, resolveClient());
     }
 
     public Map<String, String> getServerInfo() throws SCMException
     {
-        return client.getServerInfo(templateClient);
+        return client.getServerInfo(resolveClient());
     }
 
     public String getUid()
@@ -443,9 +475,10 @@ public class P4Server extends CachingSCMServer
 
     public void testConnection() throws SCMException
     {
-        if(!clientExists(templateClient))
+        String client = resolveClient();
+        if (!clientExists(client))
         {
-            throw new SCMException("Client '" + templateClient + "' does not exist");
+            throw new SCMException("Client '" + client + "' does not exist");
         }
     }
 
@@ -507,7 +540,7 @@ public class P4Server extends CachingSCMServer
 
         String clientName = updateClient(null, null);
 
-        if(to == null)
+        if (to == null)
         {
             to = getLatestRevision(clientName);
         }
@@ -527,7 +560,7 @@ public class P4Server extends CachingSCMServer
                     NumericalRevision revision = new NumericalRevision(Long.parseLong(matcher.group(1)));
                     result.add(0, revision);
 
-                    if(changes != null)
+                    if (changes != null)
                     {
                         Changelist list = getChangelist(clientName, revision.getRevisionNumber());
 
@@ -555,9 +588,9 @@ public class P4Server extends CachingSCMServer
             String root = new File(clientRoot.getAbsolutePath(), VALUE_ALL_FILES).getAbsolutePath();
             long latestRevision = client.getLatestRevisionForFiles(clientName, root).getRevisionNumber();
             long sinceRevision = ((NumericalRevision) since).getRevisionNumber();
-            if(latestRevision > sinceRevision)
+            if (latestRevision > sinceRevision)
             {
-                if(excludedPaths != null && excludedPaths.size() > 0)
+                if (excludedPaths != null && excludedPaths.size() > 0)
                 {
                     // We have to find a change that includes a non-excluded
                     // path.
@@ -579,9 +612,9 @@ public class P4Server extends CachingSCMServer
 
     private boolean nonExcludedChange(String clientName, long sinceRevision, long latestRevision) throws SCMException
     {
-        for(long revision = sinceRevision + 1; revision <= latestRevision; revision++)
+        for (long revision = sinceRevision + 1; revision <= latestRevision; revision++)
         {
-            if(getChangelist(clientName, revision) != null)
+            if (getChangelist(clientName, revision) != null)
             {
                 return true;
             }
@@ -605,11 +638,11 @@ public class P4Server extends CachingSCMServer
         String clientName = updateClient(null, null);
         try
         {
-            if(!labelExists(clientName, name))
+            if (!labelExists(clientName, name))
             {
                 createLabel(clientName, name);
             }
-            else if(!moveExisting)
+            else if (!moveExisting)
             {
                 throw new SCMException("Cannot create label '" + name + "': label already exists");
             }
@@ -631,10 +664,10 @@ public class P4Server extends CachingSCMServer
 
     public void writeConnectionDetails(File outputDir) throws SCMException, IOException
     {
-        P4Client.P4Result result = client.runP4(null, P4_COMMAND, FLAG_CLIENT, templateClient, COMMAND_INFO);
+        P4Client.P4Result result = client.runP4(null, P4_COMMAND, FLAG_CLIENT, resolveClient(), COMMAND_INFO);
         FileSystemUtils.createFile(new File(outputDir, "server-info.txt"), result.stdout.toString());
 
-        result = client.runP4(null, P4_COMMAND, FLAG_CLIENT, templateClient, COMMAND_CLIENT, FLAG_OUTPUT);
+        result = client.runP4(null, P4_COMMAND, FLAG_CLIENT, resolveClient(), COMMAND_CLIENT, FLAG_OUTPUT);
         FileSystemUtils.createFile(new File(outputDir, "template-client.txt"), result.stdout.toString());
     }
 
@@ -646,24 +679,24 @@ public class P4Server extends CachingSCMServer
         {
             public void handleStdout(String line) throws SCMException
             {
-                if(line.startsWith("LineEnd:"))
+                if (line.startsWith("LineEnd:"))
                 {
                     String ending = line.substring(8).trim();
-                    if(ending.equals("local"))
+                    if (ending.equals("local"))
                     {
-                       eol[0] = FileStatus.EOLStyle.NATIVE;
+                        eol[0] = FileStatus.EOLStyle.NATIVE;
                     }
-                    else if(ending.equals("unix") || ending.equals("share"))
+                    else if (ending.equals("unix") || ending.equals("share"))
                     {
-                       eol[0] = FileStatus.EOLStyle.LINEFEED;
+                        eol[0] = FileStatus.EOLStyle.LINEFEED;
                     }
-                    else if(ending.equals("mac"))
+                    else if (ending.equals("mac"))
                     {
-                       eol[0] = FileStatus.EOLStyle.CARRIAGE_RETURN;
+                        eol[0] = FileStatus.EOLStyle.CARRIAGE_RETURN;
                     }
-                    else if(ending.equals("win"))
+                    else if (ending.equals("win"))
                     {
-                       eol[0] = FileStatus.EOLStyle.CARRIAGE_RETURN_LINEFEED;
+                        eol[0] = FileStatus.EOLStyle.CARRIAGE_RETURN_LINEFEED;
                     }
                 }
             }
@@ -671,7 +704,7 @@ public class P4Server extends CachingSCMServer
             public void checkCancelled() throws SCMCancelledException
             {
             }
-        }, null, P4_COMMAND, FLAG_CLIENT, templateClient, COMMAND_CLIENT, FLAG_OUTPUT);
+        }, null, P4_COMMAND, FLAG_CLIENT, resolveClient(), COMMAND_CLIENT, FLAG_OUTPUT);
 
         return eol[0];
     }
@@ -708,11 +741,11 @@ public class P4Server extends CachingSCMServer
         try
         {
             File f = new File(clientRoot.getAbsoluteFile(), path);
-            P4Client.P4Result result = client.runP4(false, null, P4_COMMAND, FLAG_CLIENT, clientName, COMMAND_FSTAT,  f.getAbsolutePath() + "@" + repoRevision.getRevisionString());
-            if(result.stderr.length() > 0)
+            P4Client.P4Result result = client.runP4(false, null, P4_COMMAND, FLAG_CLIENT, clientName, COMMAND_FSTAT, f.getAbsolutePath() + "@" + repoRevision.getRevisionString());
+            if (result.stderr.length() > 0)
             {
                 String error = result.stderr.toString();
-                if(error.contains("no file(s) at that changelist number") || error.contains("no such file(s)"))
+                if (error.contains("no file(s) at that changelist number") || error.contains("no such file(s)"))
                 {
                     return null;
                 }
@@ -721,17 +754,17 @@ public class P4Server extends CachingSCMServer
                     throw new SCMException("Error running p4 fstat: " + result.stderr);
                 }
             }
-            else if(result.stdout.toString().contains("... headAction delete"))
+            else if (result.stdout.toString().contains("... headAction delete"))
             {
                 return null;
             }
             else
             {
                 Pattern revPattern = Pattern.compile("... headRev ([0-9]+)");
-                for(String line: client.splitLines(result))
+                for (String line : client.splitLines(result))
                 {
                     Matcher m = revPattern.matcher(line);
-                    if(m.matches())
+                    if (m.matches())
                     {
                         long number = Long.parseLong(m.group(1));
                         return new NumericalFileRevision(number);
@@ -781,7 +814,7 @@ public class P4Server extends CachingSCMServer
         Matcher matcher = splitter.matcher(p4Result.stdout);
         while (matcher.find())
         {
-            if(matcher.group(1).equals(name))
+            if (matcher.group(1).equals(name))
             {
                 return true;
             }
@@ -798,10 +831,9 @@ public class P4Server extends CachingSCMServer
 
     public static void main(String argv[])
     {
-        P4Server server = new P4Server("localhost:1666", "jsankey", "", "pulse-demo");
-
         try
         {
+            P4Server server = new P4Server("localhost:1666", "jsankey", "", "pulse-demo");
             server.checkout(new NumericalRevision(2), "file");
             List<Changelist> cls = server.getChanges(new NumericalRevision(2), new NumericalRevision(6), "");
 
