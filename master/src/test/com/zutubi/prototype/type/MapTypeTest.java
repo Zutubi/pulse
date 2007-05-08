@@ -26,6 +26,11 @@ public class MapTypeTest extends  TypeTestCase
         super.tearDown();
     }
 
+    public void test()
+    {
+        // noop.
+    }
+
 /*
     public void testPrimitiveMap() throws TypeException
     {

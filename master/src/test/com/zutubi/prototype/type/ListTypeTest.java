@@ -26,6 +26,10 @@ public class ListTypeTest extends TypeTestCase
         super.tearDown();
     }
 
+    public void test()
+    {
+        // noop.
+    }
 /*
     public void testSimpleList() throws TypeException
     {
