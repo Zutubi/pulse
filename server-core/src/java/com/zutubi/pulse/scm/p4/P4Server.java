@@ -655,10 +655,14 @@ public class P4Server extends CachingSCMServer
         }
     }
 
-    public Map<String, String> getConnectionProperties(String id, File dir) throws SCMException
+    public List<ResourceProperty> getConnectionProperties(String id, File dir) throws SCMException
     {
-        Map<String, String> result = client.getEnv();
-        result.put("P4CLIENT", getClientName(id));
+        List<ResourceProperty> result = new LinkedList<ResourceProperty>();
+        for(Map.Entry<String, String> entry: client.getEnv().entrySet())
+        {
+            result.add(new ResourceProperty(entry.getKey(), entry.getValue(), true, false, false));
+        }
+        result.add(new ResourceProperty("P4CLIENT", getClientName(id), true, false, false));
         return result;
     }
 

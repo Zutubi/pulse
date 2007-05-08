@@ -2,7 +2,6 @@ package com.zutubi.pulse;
 
 import com.zutubi.pulse.core.*;
 import com.zutubi.pulse.core.model.Change;
-import com.zutubi.pulse.core.model.ResourceProperty;
 import com.zutubi.pulse.model.Scm;
 import com.zutubi.pulse.scm.SCMCancelledException;
 import com.zutubi.pulse.scm.SCMCheckoutEventHandler;
@@ -12,7 +11,6 @@ import com.zutubi.pulse.util.IOUtils;
 import com.zutubi.pulse.util.logging.Logger;
 
 import java.io.*;
-import java.util.Map;
 
 /**
  * A bootstrapper that populates the working directory by checking out from one SCM.
@@ -91,10 +89,7 @@ public abstract class ScmBootstrapper implements Bootstrapper, SCMCheckoutEventH
             try
             {
                 server.writeConnectionDetails(outDir);
-                for(Map.Entry<String, String> entry: server.getConnectionProperties(getId(), workDir).entrySet())
-                {
-                    context.getGlobalScope().add(new ResourceProperty(entry.getKey(), entry.getValue(), true, false, false));
-                }
+                context.getGlobalScope().add(server.getConnectionProperties(getId(), workDir));
             }
             catch (Exception e)
             {

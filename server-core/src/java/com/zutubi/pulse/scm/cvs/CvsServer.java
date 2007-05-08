@@ -205,15 +205,15 @@ public class CvsServer extends CachingSCMServer
         client.tag(module, (CvsRevision) revision, name, moveExisting);
     }
 
-    public Map<String, String> getConnectionProperties(String id, File dir) throws SCMException
+    public List<ResourceProperty> getConnectionProperties(String id, File dir) throws SCMException
     {
-        Map<String, String> result = new HashMap<String, String>();
-        result.put("cvs.root", root);
+        List<ResourceProperty> result = new LinkedList<ResourceProperty>();
+        result.add(new ResourceProperty("cvs.root", root));
         if (branch != null)
         {
-            result.put("cvs.branch", branch);
+            result.add(new ResourceProperty("cvs.branch", branch));
         }
-        result.put("cvs.module", module);
+        result.add(new ResourceProperty("cvs.module", module));
         return result;
     }
 

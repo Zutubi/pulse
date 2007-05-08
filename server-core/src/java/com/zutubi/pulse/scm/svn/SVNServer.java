@@ -40,6 +40,7 @@ public class SVNServer implements SCMServer
     private SVNRepository repository;
     private ISVNAuthenticationManager authenticationManager;
     private String uid;
+    private String url;
 
     //=======================================================================
     // Implementation
@@ -109,6 +110,8 @@ public class SVNServer implements SCMServer
         // Initialise SVN library
         DAVRepositoryFactory.setup();
         SVNRepositoryFactoryImpl.setup();
+
+        this.url = url;
 
         try
         {
@@ -698,9 +701,11 @@ public class SVNServer implements SCMServer
         }
     }
 
-    public Map<String, String> getConnectionProperties(String id, File dir) throws SCMException
+    public List<ResourceProperty> getConnectionProperties(String id, File dir) throws SCMException
     {
-        return Collections.EMPTY_MAP;
+        List<ResourceProperty> properties = new LinkedList<ResourceProperty>();
+        properties.add(new ResourceProperty("svn.url", url));
+        return properties;
     }
 
     public void writeConnectionDetails(File outputDir) throws SCMException, IOException

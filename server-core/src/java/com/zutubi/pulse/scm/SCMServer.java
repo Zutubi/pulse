@@ -2,6 +2,7 @@ package com.zutubi.pulse.scm;
 
 import com.zutubi.pulse.core.model.Changelist;
 import com.zutubi.pulse.core.model.FileRevision;
+import com.zutubi.pulse.core.model.ResourceProperty;
 import com.zutubi.pulse.core.model.Revision;
 import com.zutubi.pulse.filesystem.remote.RemoteFile;
 
@@ -167,7 +168,7 @@ public interface SCMServer
      */
     void tag(Revision revision, String name, boolean moveExisting) throws SCMException;
 
-    Map<String, String> getConnectionProperties(String id, File dir) throws SCMException;
+    List<ResourceProperty> getConnectionProperties(String id, File dir) throws SCMException;
     void writeConnectionDetails(File outputDir) throws SCMException, IOException;
 
     /**
