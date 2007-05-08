@@ -2,10 +2,13 @@ package com.zutubi.pulse.web.admin.user;
 
 import com.zutubi.pulse.model.GrantedAuthority;
 import com.zutubi.pulse.model.Group;
-import com.zutubi.pulse.model.NamedEntityComparator;
-import com.zutubi.pulse.model.Project;
+import com.zutubi.pulse.prototype.config.ProjectConfiguration;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  */
@@ -62,12 +65,12 @@ public class GroupBasicsActionSupport extends GroupActionSupport
     {
         if(allProjects == null)
         {
+            // FIXME: sort the map.
             allProjects = new LinkedHashMap<Long, String>();
-            List<Project> all = getProjectManager().getProjects();
-            Collections.sort(all, new NamedEntityComparator());
-            for(Project p: all)
+            Collection<ProjectConfiguration> all = projectManager.getAllProjectConfigs();
+            for(ProjectConfiguration p: all)
             {
-                allProjects.put(p.getId(), p.getName());
+                allProjects.put(p.getHandle(), p.getName());
             }
         }
         return allProjects;

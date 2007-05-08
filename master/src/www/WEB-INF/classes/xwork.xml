@@ -524,12 +524,6 @@
             <result name="input" type="velocity">generic-error.vm</result>
         </action>
 
-        <action name="editArtifact" class="com.zutubi.pulse.web.project.EditArtifactAction">
-            <result name="directory" type="chain">editDirectoryArtifact!input</result>
-            <result name="file" type="chain">editFileArtifact!input</result>
-            <result name="error" type="velocity">generic-error.vm</result>
-        </action>
-
         <!-- Alias is required as WW can't chain to a non-execute method :| -->
         <action name="editDirectoryArtifact!input" class="com.zutubi.pulse.web.project.EditDirectoryArtifactAction"
                 method="doInput">

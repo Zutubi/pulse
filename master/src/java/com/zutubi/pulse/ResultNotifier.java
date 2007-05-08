@@ -13,6 +13,7 @@ import com.zutubi.pulse.model.*;
 import com.zutubi.pulse.renderer.BuildResultRenderer;
 import com.zutubi.util.logging.Logger;
 import com.zutubi.pulse.prototype.config.admin.GeneralAdminConfiguration;
+import com.zutubi.pulse.prototype.config.ProjectConfiguration;
 import com.zutubi.prototype.config.ConfigurationProvider;
 
 import java.io.StringWriter;
@@ -34,6 +35,7 @@ public class ResultNotifier implements EventListener
     private ConfigurationProvider configurationProvider;
     private BuildResultRenderer buildResultRenderer;
     private BuildManager buildManager;
+    private ProjectManager projectManager;
 
     public static int getFailureLimit()
     {
@@ -156,7 +158,8 @@ public class ResultNotifier implements EventListener
 
     private String getDefaultSubject(BuildResult result)
     {
-        String prelude = result.isPersonal() ? "personal build " : (result.getProject().getName() + ": build ");
+        ProjectConfiguration config = projectManager.getProjectConfig(result.getProject().getId());
+        String prelude = result.isPersonal() ? "personal build " : (config.getName() + ": build ");
         return prelude + Long.toString(result.getNumber()) + ": " + result.getState().getPrettyString();
     }
 
@@ -198,6 +201,11 @@ public class ResultNotifier implements EventListener
     public void setConfigurationProvider(ConfigurationProvider configurationProvider)
     {
         this.configurationProvider = configurationProvider;
+    }
+
+    public void setProjectManager(ProjectManager projectManager)
+    {
+        this.projectManager = projectManager;
     }
 
     private class RenderedResult

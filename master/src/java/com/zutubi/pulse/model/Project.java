@@ -45,8 +45,6 @@ public class Project extends Entity implements AclObjectIdentity, AclObjectIdent
     // the following fields are being transfered to the configuration system and will be
     // removed shortly.
     private String name;
-    private String description;
-    private String url;
     private PulseFileDetails pulseFileDetails;
     private List<PostBuildAction> postBuildActions = new LinkedList<PostBuildAction>();
     private ChangeViewer changeViewer;
@@ -160,7 +158,6 @@ public class Project extends Entity implements AclObjectIdentity, AclObjectIdent
     public Project(String name, String description)
     {
         this.name = name;
-        this.description = description;
         this.pulseFileDetails = new VersionedPulseFileDetails("pulse.xml");
     }
 
@@ -184,20 +181,6 @@ public class Project extends Entity implements AclObjectIdentity, AclObjectIdent
     {
         Project copy = new Project();
         copy.name = name;
-        copy.description = description;
-        copy.url = url;
-        copy.pulseFileDetails = pulseFileDetails.copy();
-
-        if(changeViewer != null)
-        {
-            copy.changeViewer = changeViewer.copy();
-        }
-
-        copy.postBuildActions = new LinkedList<PostBuildAction>();
-        for(PostBuildAction action: postBuildActions)
-        {
-            copy.postBuildActions.add(action.copy());
-        }
 
         // Fix the build specification references. The copied post build actions currently reference the original
         // projects specifications. Since the specifications have themselves been copied, we need to reference the
@@ -239,26 +222,6 @@ public class Project extends Entity implements AclObjectIdentity, AclObjectIdent
     public void setName(String name)
     {
         this.name = name;
-    }
-
-    public String getDescription()
-    {
-        return description;
-    }
-
-    public void setDescription(String description)
-    {
-        this.description = description;
-    }
-
-    public String getUrl()
-    {
-        return url;
-    }
-
-    public void setUrl(String url)
-    {
-        this.url = url;
     }
 
     public ChangeViewer getChangeViewer()

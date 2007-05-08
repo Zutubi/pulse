@@ -40,15 +40,7 @@ public class MockProjectManager implements ProjectManager
 
     public Project getProject(String name)
     {
-        for (Project project : projects.values())
-        {
-            if (project.getName().equals(name))
-            {
-                return project;
-            }
-        }
-
-        return null;
+        throw new RuntimeException("Method not yet implemented.");
     }
 
     public Project getProject(long id)

@@ -41,12 +41,6 @@ public class DeleteArtifactAction extends ActionSupport
             addActionError("Unknown project [" + projectId + "]");
             return;
         }
-
-        PulseFileDetails details = project.getPulseFileDetails();
-        if(!TemplatePulseFileDetails.class.isAssignableFrom(details.getClass()))
-        {
-            addActionError("Invalid operation for project");
-        }
     }
 
     public String execute()

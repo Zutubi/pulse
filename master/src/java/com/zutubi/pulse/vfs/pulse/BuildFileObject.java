@@ -81,7 +81,7 @@ public class BuildFileObject extends AbstractPulseFileObject implements BuildRes
 
     public ProjectConfiguration getProjectConfig() throws FileSystemException
     {
-        return projectManager.getProjectConfig(getProject().getName());
+        return projectManager.getProjectConfig(getProject().getId());
     }
 
     public Project getProject()

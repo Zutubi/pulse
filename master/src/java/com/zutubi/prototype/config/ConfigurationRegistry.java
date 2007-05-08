@@ -11,6 +11,14 @@ import com.zutubi.prototype.type.TypeException;
 import com.zutubi.prototype.type.TypeHandler;
 import com.zutubi.prototype.type.TypeRegistry;
 import com.zutubi.pulse.prototype.config.*;
+import com.zutubi.pulse.prototype.config.types.MavenTypeConfiguration;
+import com.zutubi.pulse.prototype.config.types.AntTypeConfiguration;
+import com.zutubi.pulse.prototype.config.types.Maven2TypeConfiguration;
+import com.zutubi.pulse.prototype.config.types.ExecutableTypeConfiguration;
+import com.zutubi.pulse.prototype.config.types.MakeTypeConfiguration;
+import com.zutubi.pulse.prototype.config.types.XCodeTypeConfiguration;
+import com.zutubi.pulse.prototype.config.types.CustomTypeConfiguration;
+import com.zutubi.pulse.prototype.config.types.VersionedTypeConfiguration;
 import com.zutubi.pulse.prototype.config.admin.GlobalConfiguration;
 import com.zutubi.pulse.prototype.config.agent.AgentConfiguration;
 import com.zutubi.pulse.prototype.config.setup.SetupConfiguration;
@@ -42,11 +50,23 @@ public class ConfigurationRegistry
             configurationPersistenceManager.register("setup", setupConfig);
 
             CompositeType typeConfig = registerConfigurationType("typeConfig", ProjectTypeConfiguration.class);
-            registerConfigurationType("antConfig", AntTypeConfiguration.class);
-            registerConfigurationType("mavenConfig", MavenTypeConfiguration.class);
+            registerConfigurationType("internal.antTypeConfig", AntTypeConfiguration.class);
+            registerConfigurationType("internal.customTypeConfig", CustomTypeConfiguration.class);
+            registerConfigurationType("internal.executableTypeConfig", ExecutableTypeConfiguration.class);
+            registerConfigurationType("internal.mavenTypeConfig", MavenTypeConfiguration.class);
+            registerConfigurationType("internal.maven2TypeConfig", Maven2TypeConfiguration.class);
+            registerConfigurationType("internal.makeTypeConfig", MakeTypeConfiguration.class);
+            registerConfigurationType("internal.versionedTypeConfig", VersionedTypeConfiguration.class);
+            registerConfigurationType("internal.xcodeTypeConfig", XCodeTypeConfiguration.class);
 
-            typeConfig.addExtension("antConfig");
-            typeConfig.addExtension("mavenConfig");
+            typeConfig.addExtension("internal.antTypeConfig");
+            typeConfig.addExtension("internal.customTypeConfig");
+            typeConfig.addExtension("internal.executableTypeConfig");
+            typeConfig.addExtension("internal.mavenTypeConfig");
+            typeConfig.addExtension("internal.maven2TypeConfig");
+            typeConfig.addExtension("internal.makeTypeConfig");
+            typeConfig.addExtension("internal.versionedTypeConfig");
+            typeConfig.addExtension("internal.xcodeTypeConfig");
 
             // commit message processors.
             CompositeType commitConfig = registerConfigurationType(CommitMessageConfiguration.class);

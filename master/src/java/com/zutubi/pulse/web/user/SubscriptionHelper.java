@@ -11,19 +11,25 @@ import com.zutubi.pulse.condition.antlr.NotifyConditionLexer;
 import com.zutubi.pulse.condition.antlr.NotifyConditionParser;
 import com.zutubi.pulse.condition.antlr.NotifyConditionTreeParser;
 import com.zutubi.pulse.model.*;
+import com.zutubi.pulse.prototype.config.ProjectConfiguration;
 import com.zutubi.pulse.renderer.BuildResultRenderer;
 import com.zutubi.pulse.renderer.TemplateInfo;
 
 import java.io.StringReader;
-import java.util.*;
-import java.util.regex.Pattern;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
 import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  */
 public class SubscriptionHelper
 {
-    private User user;
     private ContactPoint contactPoint;
     private String template;
     private Map<String, String> availableTemplates;
@@ -36,9 +42,8 @@ public class SubscriptionHelper
     private TextProvider textProvider;
 
 
-    public SubscriptionHelper(boolean personal, User user, ContactPoint contactPoint, ProjectManager projectManager, NotifyConditionFactory notifyConditionFactory, TextProvider textProvider, BuildResultRenderer buildResultRenderer)
+    public SubscriptionHelper(boolean personal, ContactPoint contactPoint, ProjectManager projectManager, NotifyConditionFactory notifyConditionFactory, TextProvider textProvider, BuildResultRenderer buildResultRenderer)
     {
-        this.user = user;
         this.contactPoint = contactPoint;
         this.projectManager = projectManager;
         this.notifyConditionFactory = notifyConditionFactory;
@@ -124,12 +129,12 @@ public class SubscriptionHelper
     {
         if(allProjects == null)
         {
+            // FIXME: sort the map.
             allProjects = new LinkedHashMap<Long, String>();
-            List<Project> all = projectManager.getProjects();
-            Collections.sort(all, new NamedEntityComparator());
-            for(Project p: all)
+            Collection<ProjectConfiguration> all = projectManager.getAllProjectConfigs();
+            for(ProjectConfiguration p: all)
             {
-                allProjects.put(p.getId(), p.getName());
+                allProjects.put(p.getHandle(), p.getName());
             }
         }
         return allProjects;

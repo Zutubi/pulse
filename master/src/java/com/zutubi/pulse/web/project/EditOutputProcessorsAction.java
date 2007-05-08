@@ -1,13 +1,11 @@
 package com.zutubi.pulse.web.project;
 
-import com.zutubi.pulse.model.*;
 import com.zutubi.pulse.PostProcessorManager;
-import com.opensymphony.util.TextUtils;
+import com.zutubi.pulse.model.Project;
+import com.zutubi.pulse.model.TemplatePulseFileDetails;
 
 import java.util.List;
 import java.util.Map;
-import java.util.HashMap;
-import java.util.LinkedList;
 
 /**
  */
@@ -71,11 +69,6 @@ public class EditOutputProcessorsAction extends ProjectActionSupport
         {
             addActionError("Unknown project [" + projectId + "]");
             return;
-        }
-
-        if(!project.getPulseFileDetails().isBuiltIn())
-        {
-            addActionError("Invalid operation for project");
         }
     }
 

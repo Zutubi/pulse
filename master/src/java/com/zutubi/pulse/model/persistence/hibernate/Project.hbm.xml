@@ -11,10 +11,6 @@
 
         <property name="name" column="NAME" type="string" length="255"/>
 
-        <property name="description" column="DESCRIPTION" type="string" length="4095"/>
-
-        <property name="url" column="URL" type="string" length="511"/>
-
         <property name="stateName" column="STATE" type="string" length="31"/>
 
         <property name="forceClean" column="FORCE_CLEAN" type="boolean"/>

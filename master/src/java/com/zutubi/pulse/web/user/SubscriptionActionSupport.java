@@ -108,7 +108,7 @@ public abstract class SubscriptionActionSupport extends UserActionSupport
 
     protected void createHelper()
     {
-        helper = new SubscriptionHelper(personal, user, contactPoint, projectManager, notifyConditionFactory, this, buildResultRenderer);
+        helper = new SubscriptionHelper(personal, contactPoint, projectManager, notifyConditionFactory, this, buildResultRenderer);
     }
 
     protected boolean lookupUser()

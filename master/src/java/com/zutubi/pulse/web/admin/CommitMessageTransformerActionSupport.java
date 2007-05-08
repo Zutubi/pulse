@@ -1,11 +1,14 @@
 package com.zutubi.pulse.web.admin;
 
 import com.zutubi.pulse.committransformers.CommitMessageTransformerManager;
-import com.zutubi.pulse.model.NamedEntityComparator;
-import com.zutubi.pulse.model.Project;
+import com.zutubi.pulse.prototype.config.ProjectConfiguration;
 import com.zutubi.pulse.web.ActionSupport;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.LinkedHashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
 
 /**
  */
@@ -30,12 +33,12 @@ public class CommitMessageTransformerActionSupport extends ActionSupport
     {
         if(allProjects == null)
         {
-            List<Project> projects = projectManager.getProjects();
-            Collections.sort(projects, new NamedEntityComparator());
+            // FIXME: sort the map.
             allProjects = new LinkedHashMap<Long, String>();
-            for(Project p: projects)
+            Collection<ProjectConfiguration> all = projectManager.getAllProjectConfigs();
+            for(ProjectConfiguration p: all)
             {
-                allProjects.put(p.getId(), p.getName());
+                allProjects.put(p.getHandle(), p.getName());
             }
         }
         return allProjects;

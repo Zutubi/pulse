@@ -1,11 +1,13 @@
-package com.zutubi.pulse.prototype.config;
+package com.zutubi.pulse.prototype.config.types;
 
 import com.zutubi.pulse.core.config.AbstractConfiguration;
+import com.zutubi.config.annotations.SymbolicName;
 
 /**
  *
  *
  */
+@SymbolicName("internal.antTypeConfig")
 public class AntTypeConfiguration extends AbstractConfiguration
 {
     private String work;

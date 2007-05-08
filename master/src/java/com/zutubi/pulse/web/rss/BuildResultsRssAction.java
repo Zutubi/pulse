@@ -144,6 +144,11 @@ public class BuildResultsRssAction extends ProjectActionSupport
         this.configurationProvider = configurationProvider;
     }
 
+    public String getProjectName(Project project)
+    {
+        return projectManager.getProjectConfig(project.getId()).getName();
+    }
+
     private interface RssFeedTemplate
     {
         SearchQuery<Long> getQuery();
@@ -192,7 +197,7 @@ public class BuildResultsRssAction extends ProjectActionSupport
         public String getEntryTitle(BuildResult result)
         {
             return String.format("Project %s build %s %s",
-                    result.getProject().getName(),
+                    getProjectName(result.getProject()),
                     result.getNumber(),
                     (result.succeeded() ? "succeeded" : "failed")
             );
@@ -258,7 +263,7 @@ public class BuildResultsRssAction extends ProjectActionSupport
         public String getEntryTitle(BuildResult result)
         {
             return String.format("Project %s build %s %s",
-                    result.getProject().getName(),
+                    getProjectName(result.getProject()),
                     result.getNumber(),
                     (result.succeeded() ? "succeeded" : "failed")
             );
@@ -298,12 +303,12 @@ public class BuildResultsRssAction extends ProjectActionSupport
 
         public String getTitle()
         {
-            return "Pulse build results for " + project.getName();
+            return "Pulse build results for " + getProjectName(project);
         }
 
         public String getDescription()
         {
-            return "This feed contains the latest pulse build results for the " + project.getName() + " project.";
+            return "This feed contains the latest pulse build results for the " + getProjectName(project) + " project.";
         }
 
         public String getLink()
@@ -370,7 +375,7 @@ public class BuildResultsRssAction extends ProjectActionSupport
         public String getEntryTitle(BuildResult result)
         {
             return String.format("Project %s build %s %s",
-                    result.getProject().getName(),
+                    getProjectName(result.getProject()),
                     result.getNumber(),
                     (result.succeeded() ? "succeeded" : "failed")
             );

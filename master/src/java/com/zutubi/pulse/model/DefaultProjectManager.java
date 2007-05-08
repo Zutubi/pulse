@@ -22,12 +22,8 @@ import com.zutubi.pulse.model.persistence.ProjectGroupDao;
 import com.zutubi.pulse.model.persistence.TestCaseIndexDao;
 import com.zutubi.pulse.personal.PatchArchive;
 import com.zutubi.pulse.prototype.config.ProjectConfiguration;
-import com.zutubi.pulse.scheduling.EventTrigger;
 import com.zutubi.pulse.scheduling.Scheduler;
 import com.zutubi.pulse.scheduling.SchedulingException;
-import com.zutubi.pulse.scheduling.ScmChangeEventFilter;
-import com.zutubi.pulse.scheduling.tasks.BuildProjectTask;
-import com.zutubi.pulse.scm.ScmChangeEvent;
 import com.zutubi.pulse.scm.ScmException;
 import com.zutubi.util.logging.Logger;
 import org.acegisecurity.annotation.Secured;
@@ -79,15 +75,7 @@ public class DefaultProjectManager implements ProjectManager
         {
             protected void preInsert(MutableRecord record)
             {
-                // FIXME: Pulse file details temporary for testing
-                AntPulseFileDetails pulseFileDetails = new AntPulseFileDetails();
-                pulseFileDetails.setBuildFile("build.xml");
                 Project project = new Project();
-                // FIXME: setting the name and description here is temporary. All names and descriptions should be
-                // retrieved from the projectConfig.
-                project.setName((String) record.get("name"));
-                project.setDescription((String) record.get("description"));
-                project.setPulseFileDetails(pulseFileDetails);
                 save(project);
                 record.put("projectId", Long.toString(project.getId()));
             }
@@ -193,7 +181,7 @@ public class DefaultProjectManager implements ProjectManager
         }
         catch (SchedulingException e)
         {
-            LOG.warning("Unable to unschedule triggers for project '" + entity.getName() + "'", e);
+            LOG.warning("Unable to unschedule triggers for project '" + entity.getId() + "'", e);
         }
         
         buildManager.deleteAllBuilds(entity);
@@ -262,7 +250,7 @@ public class DefaultProjectManager implements ProjectManager
                 }
                 catch (ScmException e)
                 {
-                    LOG.error("Unable to determine revisions to build for project '" + project.getName() + "': " + e.getMessage(), e);
+                    LOG.error("Unable to determine revisions to build for project '" + projectConfig.getName() + "': " + e.getMessage(), e);
                 }
             }
             else
@@ -315,7 +303,7 @@ public class DefaultProjectManager implements ProjectManager
         }
         catch (BuildException e)
         {
-            LOG.severe("Unable to obtain pulse file for project '" + project.getName() + "', revision '" + revision.getRevisionString() + "': " + e.getMessage(), e);
+            LOG.severe("Unable to obtain pulse file for project '" + projectConfig.getName() + "', revision '" + revision.getRevisionString() + "': " + e.getMessage(), e);
         }
     }
 
@@ -524,6 +512,8 @@ public class DefaultProjectManager implements ProjectManager
 */
 
         // schedule the event trigger - unique to this project.
+/*
+        FIXME: need to convert triggers to config system.
         try
         {
             EventTrigger trigger = new EventTrigger(ScmChangeEvent.class, "scm trigger", project.getName(), ScmChangeEventFilter.class);
@@ -536,6 +526,7 @@ public class DefaultProjectManager implements ProjectManager
         {
             e.printStackTrace();
         }
+*/
 
         projectDao.save(project);
 

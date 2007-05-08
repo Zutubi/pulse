@@ -4,18 +4,34 @@ import com.mockobjects.dynamic.Mock;
 import com.zutubi.pulse.committransformers.CommitMessageTransformerManager;
 import com.zutubi.pulse.committransformers.LinkCommitMessageTransformer;
 import com.zutubi.pulse.core.model.*;
-import com.zutubi.pulse.model.*;
+import com.zutubi.pulse.model.BuildResult;
+import com.zutubi.pulse.model.BuildScmDetails;
+import com.zutubi.pulse.model.CommitMessageTransformer;
+import com.zutubi.pulse.model.Project;
+import com.zutubi.pulse.model.RecipeResultNode;
+import com.zutubi.pulse.model.TriggerBuildReason;
+import com.zutubi.pulse.model.User;
 import com.zutubi.pulse.test.PulseTestCase;
-import com.zutubi.pulse.util.FileSystemUtils;
 import com.zutubi.pulse.util.SystemUtils;
 import com.zutubi.util.Constants;
 import com.zutubi.util.IOUtils;
 import freemarker.template.Configuration;
 import freemarker.template.DefaultObjectWrapper;
 
-import java.io.*;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
+import java.io.StringWriter;
+import java.io.Writer;
 import java.net.URISyntaxException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
 
 /**
  */
@@ -371,7 +387,6 @@ public class FreemarkerBuildResultRendererTest extends PulseTestCase
     {
         Project project = new Project();
         project.setName("test project");
-        project.setDescription("test description");
         BuildResult result = new BuildResult(new TriggerBuildReason("scm trigger"), project, 101, false);
         initialiseResult(result);
         return result;

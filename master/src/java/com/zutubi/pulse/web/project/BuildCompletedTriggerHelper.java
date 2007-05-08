@@ -6,12 +6,14 @@ import com.zutubi.pulse.model.Project;
 import com.zutubi.pulse.model.ProjectManager;
 import com.zutubi.pulse.scheduling.BuildCompletedEventFilter;
 import com.zutubi.pulse.scheduling.Trigger;
+import com.zutubi.pulse.prototype.config.ProjectConfiguration;
 
 import java.io.Serializable;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
+import java.util.Collection;
 
 /**
  */
@@ -21,13 +23,12 @@ public class BuildCompletedTriggerHelper
 
     public void initialise(ProjectManager projectManager)
     {
+        // FIXME: sort the map.
         filterProjects = new TreeMap<Long, String>();
-
-        List<Project> projects = projectManager.getProjects();
-        Collections.sort(projects, new NamedEntityComparator());
-        for(Project p: projects)
+        Collection<ProjectConfiguration> all = projectManager.getAllProjectConfigs();
+        for(ProjectConfiguration p: all)
         {
-            filterProjects.put(p.getId(), p.getName());
+            filterProjects.put(p.getHandle(), p.getName());
         }
     }
 

@@ -3,6 +3,7 @@ package com.zutubi.pulse;
 import com.zutubi.pulse.bootstrap.MasterConfigurationManager;
 import com.zutubi.pulse.core.BuildException;
 import com.zutubi.pulse.model.BuildResult;
+import com.zutubi.pulse.prototype.config.ProjectConfiguration;
 
 import java.io.File;
 
@@ -11,6 +12,7 @@ import java.io.File;
 public class DefaultRecipeResultCollector implements RecipeResultCollector
 {
     private MasterBuildPaths paths;
+    private ProjectConfiguration projectConfig;
 
     public DefaultRecipeResultCollector(MasterConfigurationManager configManager)
     {
@@ -38,7 +40,7 @@ public class DefaultRecipeResultCollector implements RecipeResultCollector
                 workDest = paths.getBaseDir(result, recipeId);
             }
 
-            agentService.collectResults(result.getProject().getName(), recipeId, incremental, outputDest, workDest);
+            agentService.collectResults(projectConfig.getName(), recipeId, incremental, outputDest, workDest);
         }
     }
 
@@ -46,7 +48,7 @@ public class DefaultRecipeResultCollector implements RecipeResultCollector
     {
         if (agentService != null)
         {
-            agentService.cleanup(result.getProject().getName(), recipeId, incremental);
+            agentService.cleanup(projectConfig.getName(), recipeId, incremental);
         }
     }
 
@@ -55,5 +57,8 @@ public class DefaultRecipeResultCollector implements RecipeResultCollector
         return paths.getRecipeDir(result, recipeId);
     }
 
-
+    public void setProjectConfig(ProjectConfiguration projectConfig)
+    {
+        this.projectConfig = projectConfig;
+    }
 }

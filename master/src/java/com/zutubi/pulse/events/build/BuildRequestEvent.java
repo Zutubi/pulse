@@ -42,7 +42,7 @@ public class BuildRequestEvent extends AbstractBuildRequestEvent
         StringBuffer buff = new StringBuffer("Build Request Event");
         if (getProject() != null)
         {
-            buff.append(": ").append(getProject().getName());
+            buff.append(": ").append(getProjectConfig().getName());
         }
         if (getReason() != null)
         {

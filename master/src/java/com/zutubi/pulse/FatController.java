@@ -245,7 +245,8 @@ public class FatController implements EventListener, Stoppable
 
                 // FIXME: move the controller creation into the spring context so that we do not need to
                 // do this manual wiring.
-                RecipeResultCollector collector = new DefaultRecipeResultCollector(configManager);
+                DefaultRecipeResultCollector collector = new DefaultRecipeResultCollector(configManager);
+                collector.setProjectConfig(event.getProjectConfig());
                 BuildController controller = new BuildController(event);
                 controller.setBuildManager(buildManager);
                 controller.setCollector(collector);
