@@ -14,6 +14,8 @@ import org.acegisecurity.providers.ldap.authenticator.BindAuthenticator;
 import org.acegisecurity.providers.ldap.populator.DefaultLdapAuthoritiesPopulator;
 import org.acegisecurity.userdetails.ldap.LdapUserDetails;
 
+import javax.mail.internet.AddressException;
+import javax.mail.internet.InternetAddress;
 import javax.naming.NamingException;
 import javax.naming.directory.Attribute;
 import java.util.*;
@@ -192,7 +194,11 @@ public class AcegiLdapManager implements LdapManager
                     name = username;
                 }
 
-                User user = new User(username, name);
+                User user = userManager.getUser(username);
+                if(user == null)
+                {
+                    user = new User(username, name);
+                }
 
                 if (TextUtils.stringSet(emailAttribute))
                 {
@@ -275,9 +281,21 @@ public class AcegiLdapManager implements LdapManager
             String email = getStringAttribute(details, emailAttribute, user.getLogin());
             if (email != null)
             {
-                EmailContactPoint point = new EmailContactPoint(email);
-                point.setName(EMAIL_CONTACT_NAME);
-                user.add(point);
+                try
+                {
+                    new InternetAddress(email);
+                    EmailContactPoint point = new EmailContactPoint(email);
+                    point.setName(EMAIL_CONTACT_NAME);
+                    user.add(point);
+                    if (user.isPersistent())
+                    {
+                        userManager.save(user);
+                    }
+                }
+                catch (AddressException e)
+                {
+                    LOG.warning("Ignoring invalid email address '" + email + "' for user '" + user.getLogin() + "'");
+                }
             }
         }
     }
@@ -302,7 +320,7 @@ public class AcegiLdapManager implements LdapManager
         }
         else
         {
-            LOG.debug("User '" + username + "' has no common name (cn) attribute");
+            LOG.debug("User '" + username + "' has no '" + attribute + "' attribute");
         }
 
         return null;
