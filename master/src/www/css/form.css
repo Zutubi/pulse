@@ -35,6 +35,13 @@ td.inline-help {
     font-size: 80%;
 }
 
+span.inline-help {
+    display: block;
+    font-style: italic;
+    font-size: 90%;
+    padding: 3px;
+}
+
 td.submit {
     border-top: 1px solid #bbb;
     text-align: center;

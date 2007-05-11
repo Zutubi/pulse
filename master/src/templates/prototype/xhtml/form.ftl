@@ -78,5 +78,8 @@
         return form;
     }();
 </script>
-
-<div id="${form.id}" style="width: 350px"></div>
+<#--
+A table is used as there is no good way to have a div collapse to the
+width of its contents.  Floating it works, but hurts other things.
+-->
+<table><tr><td id="${form.id}"><td></tr></table>
