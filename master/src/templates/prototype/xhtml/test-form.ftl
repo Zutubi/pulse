@@ -44,7 +44,7 @@
     <#list form.fields as field>
         <#assign parameters=field.parameters>
         <#if field.type == 'text' || field.type == 'password' || field.type == 'checkbox'>
-            Ext.get('${field.name}').on('keypress', function(event){ return handleKeypress(event); });
+            Ext.get('${field.id}').on('keypress', function(event){ return handleKeypress(event); });
         </#if>
     </#list>
         });
