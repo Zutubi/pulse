@@ -1,26 +1,46 @@
 <#include "/prototype/xhtml/checkbox.ftl" />
-<script type="text/javascript">
-    function setEnabledState_${parameters.id}(checkbox)
+function setEnabledState_${parameters.id}(checkbox)
+{
+    if(!form.rendered)
     {
-        var disabled = <#if !parameters.invert>!</#if>checkbox.checked;
+        return;
+    }
+    
+    var enabled = <#if parameters.invert>!</#if>checkbox.getValue();
 
 <#if parameters.dependentFields?exists && parameters.dependentFields?size &gt; 0>
+    if(enabled)
+    {
     <#list parameters.dependentFields as dependent>
-        Ext.get("${dependent}").dom.disabled = disabled;
+        form.findField('${dependent}').enable();
     </#list>
+    }
+    else
+    {
+    <#list parameters.dependentFields as dependent>
+        form.findField('${dependent}').disable();
+    </#list>
+    }
 <#else>
-        var fields = checkbox.form.elements;
-        for(var i = 0; i < fields.length; i++)
+    form.items.each(function(field)
+    {
+        var type = field.getEl().dom.type;
+        if(field.getId() != checkbox.getId() && type && type != "hidden" && type != "submit")
         {
-            var field = fields[i];
-            if(field.id != checkbox.id && field.type && field.type != "hidden" && field.type != "submit")
+            if(enabled)
             {
-                fields[i].disabled = disabled;
+                field.enable();
+            }
+            else
+            {
+                field.clearInvalid();
+                field.disable();
             }
         }
+    });
 </#if>
-    }
+}
 
-    Ext.get("${parameters.id}").on("click", function(event) { setEnabledState_${parameters.id}(event.getTarget()); });
-    Ext.onReady(function() { setEnabledState_${parameters.id}(Ext.get("${parameters.id}").dom) });
-</script>
+var checkbox = form.findField("${parameters.name}");
+checkbox.on("check", function(checkbox, checked) { setEnabledState_${parameters.id}(checkbox); });
+form.on("render", function() { setEnabledState_${parameters.id}(checkbox) });

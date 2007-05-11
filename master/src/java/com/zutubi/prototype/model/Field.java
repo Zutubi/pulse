@@ -17,20 +17,14 @@ public class Field extends UIComponent
         return this;
     }
 
-    public Field setName(String name)
-    {
-        parameters.put("name", name);
-        return this;
-    }
-
     public String getName()
     {
         return (String) parameters.get("name");
     }
 
-    public Field setType(String type)
+    public Field setName(String name)
     {
-        parameters.put("type", type);
+        parameters.put("name", name);
         return this;
     }
 
@@ -39,9 +33,9 @@ public class Field extends UIComponent
         return (String) parameters.get("type");
     }
 
-    public Field setLabel(String label)
+    public Field setType(String type)
     {
-        parameters.put("label", label);
+        parameters.put("type", type);
         return this;
     }
 
@@ -50,9 +44,9 @@ public class Field extends UIComponent
         return (String)parameters.get("label");
     }
 
-    public Field setValue(Object value)
+    public Field setLabel(String label)
     {
-        parameters.put("value", value);
+        parameters.put("label", label);
         return this;
     }
 
@@ -61,14 +55,20 @@ public class Field extends UIComponent
         return parameters.get("value");
     }
 
-    public Field setId(String id)
+    public Field setValue(Object value)
     {
-        parameters.put("id", id);
+        parameters.put("value", value);
         return this;
     }
 
     public String getId()
     {
         return (String) parameters.get("id");
+    }
+
+    public Field setId(String id)
+    {
+        parameters.put("id", id);
+        return this;
     }
 }

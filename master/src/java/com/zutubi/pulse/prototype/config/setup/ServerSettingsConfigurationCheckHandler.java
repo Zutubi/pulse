@@ -1,14 +1,14 @@
 package com.zutubi.pulse.prototype.config.setup;
 
-import com.zutubi.prototype.ConfigurationCheckHandler;
 import com.zutubi.config.annotations.SymbolicName;
+import com.zutubi.prototype.ConfigurationCheckHandlerSupport;
 
 /**
  *
  *
  */
 @SymbolicName("internal.serverSettingsConfigurationCheckHandler")
-public class ServerSettingsConfigurationCheckHandler implements ConfigurationCheckHandler
+public class ServerSettingsConfigurationCheckHandler extends ConfigurationCheckHandlerSupport
 {
     private String testAddress;
 

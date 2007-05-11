@@ -11,20 +11,23 @@ public class EditColumnDescriptor extends ActionColumnDescriptor
 {
     private static final String ACTION = "edit";
 
-    public EditColumnDescriptor()
+    public EditColumnDescriptor(boolean ajax)
     {
-        super(ACTION);
-    }
-
-    public EditColumnDescriptor(int colspan)
-    {
-        super(ACTION, colspan);
+        super(ACTION, ajax);
     }
 
     public Column instantiate(String path, Record value)
     {
         Column column = super.instantiate(path, value);
-        column.setLink(PrototypeUtils.getConfigURL(path, "display", null));
+        if (isAjax())
+        {
+            column.setOnclick("selectPath");
+        }
+        else
+        {
+            column.setLink(PrototypeUtils.getConfigURL(path, "display", null));
+        }
+
         return column;
     }
 }

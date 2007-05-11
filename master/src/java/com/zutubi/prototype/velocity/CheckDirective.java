@@ -2,15 +2,12 @@ package com.zutubi.prototype.velocity;
 
 import com.opensymphony.xwork.ActionContext;
 import com.opensymphony.xwork.util.OgnlValueStack;
-import com.zutubi.prototype.FieldDescriptor;
 import com.zutubi.prototype.FormDescriptor;
 import com.zutubi.prototype.FormDescriptorFactory;
 import com.zutubi.prototype.config.ConfigurationRegistry;
 import com.zutubi.prototype.model.Form;
-import com.zutubi.prototype.model.HiddenFieldDescriptor;
 import com.zutubi.prototype.type.CompositeType;
 import com.zutubi.prototype.type.Type;
-import com.zutubi.prototype.type.TypeRegistry;
 import com.zutubi.prototype.type.record.Record;
 import com.zutubi.util.logging.Logger;
 import freemarker.template.Configuration;
@@ -24,8 +21,6 @@ import org.apache.velocity.runtime.parser.node.Node;
 import java.io.IOException;
 import java.io.Writer;
 import java.util.Arrays;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -36,11 +31,12 @@ public class CheckDirective extends PrototypeDirective
 {
     private static final Logger LOG = Logger.getLogger(CheckDirective.class);
 
-    private String action;
+    private String action = "check";
+    private String mainFormName = "form";
+    private String checkFormName = "check";
 
     private FormDescriptorFactory formDescriptorFactory;
 
-    private TypeRegistry typeRegistry;
     private ConfigurationRegistry configurationRegistry;
     private Configuration configuration;
 
@@ -69,6 +65,16 @@ public class CheckDirective extends PrototypeDirective
         this.action = action;
     }
 
+    public void setMainFormName(String mainFormName)
+    {
+        this.mainFormName = mainFormName;
+    }
+
+    public void setCheckFormName(String checkFormName)
+    {
+        this.checkFormName = checkFormName;
+    }
+
     public boolean render(InternalContextAdapter contextAdapter, Writer writer, Node node) throws IOException, ResourceNotFoundException, ParseErrorException
     {
         try
@@ -79,51 +85,22 @@ public class CheckDirective extends PrototypeDirective
             Type type = lookupType();
 
             CompositeType ctype = (CompositeType) type;
-
             String path = lookupPath();
-            FormDescriptor formDescriptor = formDescriptorFactory.createDescriptor(path, ctype.getSymbolicName());
-            formDescriptor.setAction("check");
-            
-            // decorate the form to include the symbolic name as a hidden field. This is necessary for
-            // configuration. This is probably not the best place for this, but until i think of a better location,
-            // here it stays.
-            HiddenFieldDescriptor hiddenFieldDescriptor = new HiddenFieldDescriptor();
-            hiddenFieldDescriptor.setName("symbolicName");
-            hiddenFieldDescriptor.setValue(ctype.getSymbolicName());
-            formDescriptor.add(hiddenFieldDescriptor);
-
-            for (FieldDescriptor fd : formDescriptor.getFieldDescriptors())
-            {
-                fd.setType("hidden");
-            }
-
-            List<String> originalFieldNames = new LinkedList<String>();
-            for (FieldDescriptor fd : formDescriptor.getFieldDescriptors())
-            {
-                // problem: by changing the field names, any annotations (fieldOrder in particular) that references
-                // fields by name will fail.
-                originalFieldNames.add(fd.getName());
-                fd.setName(fd.getName() + "_check");
-            }
-            formDescriptor.addParameter("originalFields", originalFieldNames);
-
-            // lookup and construct the configuration test form.
             CompositeType checkType = configurationRegistry.getConfigurationCheckType(ctype);
 
-            FormDescriptor checkFormDescriptor = formDescriptorFactory.createDescriptor(path, checkType);
-            for (FieldDescriptor fd : checkFormDescriptor.getFieldDescriptors())
-            {
-                formDescriptor.add(fd);
-            }
+            FormDescriptor formDescriptor = formDescriptorFactory.createDescriptor(path, checkType, "check");
+            formDescriptor.setName(checkFormName);
+            formDescriptor.setAction(action);
             formDescriptor.setActions(Arrays.asList("check"));
+            formDescriptor.setAjax(true);
 
             Map<String, Object> context = initialiseContext(checkType.getClazz());
-
             OgnlValueStack stack = ActionContext.getContext().getValueStack();
             Record data = (Record) stack.findValue("checkRecord");
 
             Form form = formDescriptor.instantiate(path, data);
             context.put("form", form);
+            context.put("mainFormName", mainFormName);
 
             try
             {
@@ -151,16 +128,6 @@ public class CheckDirective extends PrototypeDirective
         this.formDescriptorFactory = formDescriptorFactory;
     }
 
-    public void setTypeRegistry(TypeRegistry typeRegistry)
-    {
-        this.typeRegistry = typeRegistry;
-    }
-
-    /**
-     * Required resource
-     *
-     * @param configuration instance
-     */
     public void setFreemarkerConfiguration(Configuration configuration)
     {
         this.configuration = configuration;

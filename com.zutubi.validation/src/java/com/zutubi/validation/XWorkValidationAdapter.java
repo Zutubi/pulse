@@ -9,6 +9,7 @@ import java.util.*;
 public class XWorkValidationAdapter implements ValidationAware
 {
     private com.opensymphony.xwork.ValidationAware delegate;
+    private String fieldSuffix = "";
     private boolean ignoreAllFields = false;
     private Set<String> ignoredFields = new HashSet<String>();
 
@@ -17,10 +18,16 @@ public class XWorkValidationAdapter implements ValidationAware
         this.delegate = delegate;
     }
 
+    public XWorkValidationAdapter(com.opensymphony.xwork.ValidationAware delegate, String fieldSuffix)
+    {
+        this.delegate = delegate;
+        this.fieldSuffix = fieldSuffix;
+    }
+
     public void addIgnoredField(String field)
     {
         Map errors = delegate.getFieldErrors();
-        errors.remove(field);
+        errors.remove(field + fieldSuffix);
         delegate.setFieldErrors(errors);
         ignoredFields.add(field);
     }
@@ -53,7 +60,7 @@ public class XWorkValidationAdapter implements ValidationAware
     {
         if (!ignoreAllFields && !ignoredFields.contains(field))
         {
-            delegate.addFieldError(field, error);
+            delegate.addFieldError(field + fieldSuffix, error);
         }
     }
 

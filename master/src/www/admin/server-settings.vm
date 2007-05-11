@@ -4,130 +4,146 @@
 <html>
 <head>
     <title>#wwtext("name=administration")</title>
+    <script type="text/javascript" src="$base/js/zutubi.js"></script>
+	<script type="text/javascript">
+        var tree;
+        
+        var onSelect = function(sm, node)
+        {
+            if(node)
+            {
+                Ext.get('detail-pane').load({url: '$base/aconfig' + tree.loader.getNodePath(node), scripts:true});
+            }
+        }
+
+        var handleConfigurationResponse = function(result)
+        {
+            if(result.success)
+            {
+                if(result.newPanel)
+                {
+                    Ext.get('detail-pane').update(result.newPanel, true);
+                }
+                else
+                {
+                    tree.invalidatePaths(result.invalidatedPaths, function()
+                    {
+                        if(result.newPath)
+                        {
+                            selectPath(result.newPath);
+                        }
+                    });
+                }
+            }
+        }
+
+        var getAjaxCallback = function(maskedElement)
+        {
+            return {
+                success: function(response) { handleConfigurationResponse(Ext.decode(response.responseText)); },
+                failure: function(response) { if(maskedElement) { maskedElement.unmask() } }
+            }
+        }
+
+        var runAjaxRequest = function(url)
+        {
+            var pane = Ext.get('detail-pane');
+            pane.mask('Please wait...');
+            Ext.lib.Ajax.request('get', url, getAjaxCallback(pane));
+        }
+
+        var selectPath = function(path)
+        {
+            tree.getSelectionModel().clearSelections();
+            tree.selectPath(tree.getRootNode().getPath() + '/' + path);
+        }
+
+        var addToPath = function(path)
+        {
+            runAjaxRequest('$base/aconfig/' + path + '?wizard');
+        }
+
+        var deletePath = function(path)
+        {
+            runAjaxRequest('$base/aconfig/' + path + '?delete=confirm');
+        }
+
+        var Layout = function()
+        {
+            var centerRegion;
+#if($path)
+            var path = '$path';
+#else
+            var path = '';
+#end
+
+            return {
+                init : function()
+                {
+                    centerRegion = nestedLayout.getRegion('center');
+                    var centerPanel = centerRegion.getPanel(0);
+                    centerPanel.setTitle('');
+                    centerPanel.getEl().setStyle('margin', '0');
+                    centerRegion.titleEl.show();
+
+                    nestedLayout.addRegion('north', {
+                        split: false,
+                        titlebar: false
+                    });
+
+                    nestedLayout.addRegion('west', {
+                        split:true,
+                        initialSize: 300,
+                        titlebar: true,
+                        collapsible: true,
+                        animate: true,
+                        tabPosition: 'top',
+                        autoScroll: true
+                    });
+
+                    var loader = new ZUTUBI.ConfigTreeLoader('$base');
+                    loader.on('loadexception', function(loader, node, response) {  console.dir(response); });
+
+                    tree = new ZUTUBI.ConfigTree('config-tree', {
+                        animate: false,
+                        loader: loader,
+                        rootVisible: false,
+                        title: 'config'
+                    });
+
+                    var root = new Ext.tree.AsyncTreeNode({
+                        id: 'x',
+                        text: 'settings',
+                        allowDrag: false,
+                        allowDrop: false
+                    });
+                    
+                    tree.setRootNode(root);
+                    tree.getSelectionModel().on('selectionchange', onSelect);
+
+                    nestedLayout.beginUpdate();
+                    nestedLayout.add('north', new Ext.ContentPanel('innernorth', {title: 'inner north'}));
+                    nestedLayout.add('west', new Ext.ContentPanel('config-tree', {}));
+                    nestedLayout.endUpdate();
+
+                    tree.render();
+                    root.expand();
+                }
+            }
+        }();
+        
+        Ext.onReady(Layout.init, Layout, true);
+	</script>
 </head>
 <body>
     #adminTabs("settings")
 
-    #parse("/template/includes/actionerrors.vm")
+    <div id="innernorth" style="padding: 4px; padding-bottom: 12px; border-bottom: 1px solid #ccc">
+    </div>
 
-    <table class="columns" width="90%">
-        <tr>
-            <td class="columns" width="40%">
-                <table id="general.config" class="fill-content">
-                    #adminHeadingRow("general.config" "$base/admin/editGeneral!input.action" "general.edit" "$base/admin/general!reset.action" "general.reset")
-                    #dynamicRow("general.base.url" $config.baseUrl)
-                    #dynamicRow("general.help.url" $config.helpUrl)
-                    #enabledDisabledRow("general.rss.enabled" $config.rssEnabled)
-                    #enabledDisabledRow("general.anonymous" $config.anonymousAccessEnabled)
-                    #enabledDisabledRow("general.signup" $config.anonymousSignupEnabled)
-                    #dynamicRow("scm.polling.interval" $config.scmPollingInterval)
-                    #if($recipeTimeoutEnabled)
-                        #set($timeoutValue = $action.getText('recipe.queue.timeout.value', [$config.unsatisfiableRecipeTimeout]))
-                    #else
-                        #set($timeoutValue = $action.getText('recipe.queue.timeout.never'))
-                    #end
-                    #dynamicRow("recipe.queue.timeout" $timeoutValue)
-                </table>
+    <div id="config-tree">
+    </div>
 
-                <!-- commit message transformers -->
-                
-                <table id="commit.message.transformers" class="fill-content">
-                    #headingRow("global.commit.message.transformers" 5)
-                    <tr>
-                        #contentHeading("commit.message.transformer.name" 1)
-                        #contentHeading("commit.message.transformer.type" 1)
-                        #contentHeading("commit.message.transformer.projects" 1)
-                        #contentHeading("actions" 2)
-                    </tr>
-#if($commitMessageTransformers.size() > 0)
-    #foreach($transformer in $commitMessageTransformers)
-        #set($confirmMessage = $action.getText("commit.message.transformer.confirm.delete", [$transformer.name]))
-                    <tr>
-                        #dynamicCell($transformer.name)
-                        #dynamicCell($transformer.type)
-                        <td class="content">
-                            <a id="projects_$!webwork.htmlEncode($transformer.name)" href="editCommitMessageProjects!input.action?id=$transformer.id">$action.getText("commit.message.transformers.count", [$transformer.projects.size()])</a>
-                        </td>
-                        #editCell("editCommitMessage.action?id=$transformer.id" "edit_$!webwork.htmlEncode($transformer.name)")
-                        #deleteCell("delete_$!webwork.htmlEncode($transformer.name)" "deleteCommitMessageLink.action?id=$transformer.id" $confirmMessage)
-                    </tr>
-    #end
-#else
-                    #contentRow("global.commit.message.transformers.none" 5)
-#end
-                    #addRow("add.commit.message.transformer" 5 "addTransformer.action" "commit.message.transformer.add")
-                </table>
-
-                <table id="logging.config" class="fill-content">
-                    #adminHeadingRow("logging.config" "$base/admin/editLogConfig!input.action" "logging.edit" "$base/admin/logConfig!reset.action" "logging.reset")
-                    #dynamicRow("logging.level" $config.loggingLevel)
-                    #dynamicRow("logging.events.enabled" $config.eventLoggingEnabled)
-                </table>
-
-                <table class="fill-content" id="license.info">
-                    #restrictedHeadingRow("license.info" 2 "ROLE_ADMINISTRATOR" "edit" "$base/admin/editLicense!input.action" "pencil.gif" "license.edit")
-                    <tr>
-                        #contentRowHeading("license.name.field")
-                        #contentCell("license.type.$license.type")
-                    </tr>
-                    #dynamicRow("license.holder.field" $license.holder)
-                    #dynamicRow("license.expiry.field" $expiryDate)
-
-                    #foreach($res in $restrictions)
-                        #if($res.supported == -1)
-                            #set($t = "$unrestricted")
-                        #else
-                            #set($t = "$res.inUse of $res.supported")
-                        #end
-                        #dynamicRow("license.restriction.$res.entity" $t)
-                    #end
-                    #if($action.supportedContactPoints == -1)
-                        #set($t = "$unrestricted")
-                    #else
-                        #set($t = "$action.supportedContactPoints")
-                    #end
-                    #dynamicRow("license.restriction.contact" $t)
-
-                </table>
-            </td>
-            <td class="columns" width="40%">
-                <table id="smtp.config" class="fill-content">
-                    #adminHeadingRow("smtp.config" "$base/admin/editSmtp!input.action" "smtp.edit" "$base/admin/smtp!reset.action" "smtp.reset")
-                    #dynamicRow("smtp.host" $config.smtpHost)
-                    #dynamicRow("smtp.prefix" $config.smtpPrefix)
-                    #dynamicRow("smtp.from" $config.smtpFrom)
-                    #dynamicRow("smtp.username" $config.smtpUsername)
-                    <!-- Probably best we don't show the password -->
-                </table>
-
-                <table id="jabber.config" class="fill-content">
-                    #adminHeadingRow("jabber.config" "$base/admin/editJabber!input.action" "jabber.edit" "$base/admin/jabber!reset.action" "jabber.reset")
-#if($jabberStatus)
-                    <tr>
-                        <th class="note" colspan="2">$!webwork.htmlEncode($jabberStatus)</th>
-                    </tr>
-#end
-                    #dynamicRow("jabber.host" $config.jabberHost)
-                    #dynamicRow("jabber.port" $config.jabberPort)
-                    #dynamicRow("jabber.username" $config.jabberUsername)
-                    <!-- Probably best we don't show the password -->
-                    #dynamicRow("jabber.force.ssl" $config.jabberForceSSL.toString().toLowerCase())
-                </table>
-
-                <table id="ldap.config" class="fill-content">
-                    #adminHeadingRow("ldap.config" "$base/admin/editLdap!input.action" "ldap.edit" "$base/admin/ldap!reset.action" "ldap.reset")
-#if($ldapStatus)
-                    <tr>
-                        <th class="note" colspan="2">$!webwork.htmlEncode($ldapStatus)</th>
-                    </tr>
-#end
-                    #dynamicRow("ldap.enabled" $config.ldapEnabled)
-                    #dynamicRow("ldap.host.url" $config.ldapHostUrl)
-                    #dynamicRow("ldap.base.dn" $config.ldapBaseDn)
-                </table>
-            </td>
-        </tr>
-    </table>
-
+    <div id="detail-pane" style="padding: 4px; min-height: 100%"></div>
 </body>
 </html>

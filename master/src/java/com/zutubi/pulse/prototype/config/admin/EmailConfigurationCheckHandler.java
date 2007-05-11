@@ -1,14 +1,16 @@
 package com.zutubi.pulse.prototype.config.admin;
 
-import com.zutubi.prototype.ConfigurationCheckHandler;
-import com.zutubi.pulse.model.EmailContactPoint;
 import com.zutubi.config.annotations.SymbolicName;
+import com.zutubi.prototype.ConfigurationCheckHandlerSupport;
+import com.zutubi.pulse.model.EmailContactPoint;
+import com.zutubi.validation.annotations.Required;
 
 /**
  */
 @SymbolicName("internal.emailConfigurationCheckHandler")
-public class EmailConfigurationCheckHandler implements ConfigurationCheckHandler<EmailConfiguration>
+public class EmailConfigurationCheckHandler extends ConfigurationCheckHandlerSupport<EmailConfiguration>
 {
+    @Required
     private String emailAddress;
 
     public void test(EmailConfiguration configuration) throws Exception

@@ -1,0 +1,1 @@
+<img src='${base}/images/accept.gif'/> configuration ok

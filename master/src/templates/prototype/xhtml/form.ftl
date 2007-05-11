@@ -1,42 +1,52 @@
 <#-- render form -->
-<#if form?exists>
-<form id="${form.id}" method="post" action="${base}/${form.action}">
+<script type="text/javascript">
+    Ext.QuickTips.init();    
+    Ext.form.Field.prototype.msgTarget = 'side';
+    
+    var ${form.name} = function()
+    {
+        var form = new Ext.form.Form({
+            method: 'post',
+            labelAlign: 'right',
+            labelWidth: 150,
+            waitMsgTarget: true
+        });
 
-    <table class="form">
-    <#list form.fields as field>
-        <#assign parameters=field.parameters>
-        <#include "${parameters.type}.ftl"/>
-    </#list>
-
-        <#-- submit field required by javascript submit support -->
-        <input type="hidden" name="submitField"></input>
-        
-    <#include "submitgroup.ftl"/>
-    <#list form.submitFields as submitField>
-        <#assign parameters=submitField.parameters>
-        <#include "submit.ftl"/>
-    </#list>
-    <#include "submitgroup-end.ftl"/>
-
-    </table>
-</form>
-
-    <#-- TODO: use jscript to wire up the event handlers for supporting inline form validation -->
-
-    <script language="javascript">
-        function submitenter(evt, value)
+        function submitForm(value)
         {
-            // provide backward compatibility. The value may not be specified, in which case default to 'next'.
-            if (!value)
+            Ext.get('submitField').dom.value = value;
+    <#if form.ajax>
+            form.submit({
+                clientValidation: value != 'cancel',
+                waitMsg: 'Submitting...'
+            });
+    <#else>
+            if(value == 'cancel' || form.isValid())
             {
-                value = "next"; // the default value.
+                form.el.dom.submit();
             }
+    </#if>
+        }
 
-            if (evt.getKey() == Ext.EventObject.RETURN)
+        var defaultSubmit = function() {};
+
+        <#list form.submitFields as submitField>
+            <#if submitField.parameters.default?exists>
+                defaultSubmit = function()
+                {
+                    submitForm('${submitField.value}');
+                }
+            </#if>
+
+            form.addButton('${submitField.value}', function() { submitForm('${submitField.value}'); });
+        </#list>
+
+        function handleKeypress(evt)
+        {
+            if (evt.getKey() == evt.RETURN)
             {
-                var field = evt.getTarget();
-                field.form.submitField.value = value;
-                field.form.submit();
+                defaultSubmit();
+                evt.preventDefault();
                 return false;
             }
             else
@@ -45,23 +55,28 @@
             }
         }
 
-        <#-- use jscript to wire up the event handlers for handling the on 'enter' form submission -->
-        <#assign defaultsubmit='save'>
-        <#list form.submitFields as submitField>
-            <#if submitField.name == 'next'>
-                <#assign defaultsubmit='next'>
-            <#elseif submitField.name == 'finish' && defaultsubmit != 'next'>
-                <#assign defaultsubmit='finish'>
-            </#if>
-        </#list>
-        <#list form.fields as field>
-            <#if field.type != 'hidden' && field.type != 'select'>
-            Ext.get('${field.name}').on('keypress', function(event){ return submitenter(event, '${defaultsubmit}');});
-            </#if>
-        </#list>
+        form.on('render', function()
+        {
+            var errorMessage;
 
-        <#-- focus on the first form element. -->
-        Ext.onReady(function(){ Ext.get('${form.fields[0].name}').focus() });
-    </script>
+    <#list form.fields as field>
+        <#assign parameters=field.parameters>
+        <#if fieldErrors?exists && fieldErrors[parameters.name]?exists>
+            errorMessage = '<#list fieldErrors[parameters.name] as error>${error?i18n?js_string}<br/></#list>';
+            form.findField('${parameters.id}').markInvalid(errorMessage);
+        </#if>
+        <#if field.type == 'text' || field.type == 'password' || field.type == 'checkbox'>
+            Ext.get('${field.name}').on('keypress', function(event){ return handleKeypress(event);});
+        </#if>
+    </#list>
 
-</#if>
+            Ext.get('${form.fields[0].name}').focus()
+        });
+
+        <#include "/prototype/xhtml/form-fields.ftl"/>
+
+        return form;
+    }();
+</script>
+
+<div id="${form.id}" style="width: 350px"></div>

@@ -1,0 +1,32 @@
+#set($config = $action.configuration)
+<h2>#i18n("key=label")</h2>
+<div style="color:gray">
+    #i18n("key=introduction")
+</div>
+
+#if( $config.simpleProperties.size() > 0)
+    <!-- this configuration definition contains fields to be configured. -->
+    <p>
+        #pform("path=$config.path" "formName=mainform" "ajax=true")
+    </p>
+
+    <script type="text/javascript">
+        mainform.on('actioncomplete', function(form, action)
+        {
+            handleConfigurationResponse(action.result);
+        });
+    </script>
+
+    #parse("/aconfig/check.vm")
+#end
+
+#if( $config.nestedProperties.size() > 0)
+<p>&nbsp;</p>
+<h4>nested configurations</h4>
+<p>the following nested configurations are also available:</p>
+<ul>
+    #foreach($prop in $config.nestedProperties)
+        <li>#i18n("property=$prop" "key=label") <a href="#" onclick="selectPath('${config.path}/${prop}'); return false;">(view)</a>  </li>
+    #end
+</ul>
+#end

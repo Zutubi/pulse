@@ -972,13 +972,8 @@
 
         <action name="save" class="com.zutubi.prototype.webwork.SaveAction">
             <result name="composite" type="velocity">composite.vm</result>
-            <result name="map" type="velocity">map.vm</result>
+            <result name="input" type="velocity">composite.vm</result>
             <result name="cancel" type="redirect">${path}/</result>
-        </action>
-
-        <action name="check" class="com.zutubi.prototype.webwork.CheckAction">
-            <result name="composite" type="velocity">composite.vm</result>
-            <result name="map" type="velocity">map.vm</result>
         </action>
 
         <action name="delete" class="com.zutubi.prototype.webwork.DeleteAction">
@@ -1059,6 +1054,44 @@
         <action name="customiseBuildColumns" class="com.zutubi.pulse.web.user.CustomiseBuildColumnsAction">
             <interceptor-ref name="ajaxStack"/>
             <result name="success" type="httpheader">200</result>
+        </action>
+    </package>
+
+    <package name="configAjax" namespace="/aconfig" extends="default">
+        <default-interceptor-ref name="ajaxStack"/>
+
+        <action name="display" class="com.zutubi.prototype.webwork.DisplayAction">
+            <result name="composite" type="velocity">composite.vm</result>
+            <result name="map" type="velocity">map.vm</result>
+        </action>
+
+        <action name="wizard" class="com.zutubi.prototype.wizard.webwork.ConfigurationWizardAction">
+            <interceptor-ref name="ajaxPrototypeWizardStack"/>
+            <result name="step" type="flexjson">configurationPanel</result>
+            <result name="input" type="flexjson">configurationErrors</result>
+            <result name="cancel" type="flexjson">configurationResponse</result>
+            <result name="success" type="flexjson">configurationResponse</result>
+        </action>
+
+        <action name="save" class="com.zutubi.prototype.webwork.SaveAction">
+            <result name="composite" type="flexjson">configurationResponse</result>
+            <result name="input" type="flexjson">configurationErrors</result>
+        </action>
+
+        <action name="delete" class="com.zutubi.prototype.webwork.DeleteAction">
+            <result name="confirm" type="flexjson">newPanel</result>
+            <result name="success" type="flexjson">configurationResponse</result>
+            <result name="cancel" type="flexjson">configurationResponse</result>
+        </action>
+
+        <action name="ls" class="com.zutubi.prototype.webwork.LsAction">
+            <result name="success" type="flexjson">listing</result>
+            <result name="error" type="json">error.xml</result>
+        </action>
+
+        <action name="check" class="com.zutubi.prototype.webwork.CheckAction">
+            <result name="input" type="flexjson">configurationErrors</result>
+            <result name="success" type="flexjson">checkResponse</result>
         </action>
     </package>
 

@@ -1,10 +1,8 @@
 package com.zutubi.prototype.model;
 
-import com.zutubi.prototype.webwork.PrototypeUtils;
-
-import java.util.List;
-import java.util.LinkedList;
 import java.util.Collections;
+import java.util.LinkedList;
+import java.util.List;
 
 /**
  *
@@ -12,6 +10,11 @@ import java.util.Collections;
  */
 public class Form extends UIComponent
 {
+    private static final String PARAMETER_NAME = "name";
+    private static final String PARAMETER_ID = "id";
+    private static final String PARAMETER_ACTION = "action";
+    private static final String PARAMETER_AJAX = "ajax";
+
     /**
      * Ordered list of fields that make up this form.
      */
@@ -26,24 +29,44 @@ public class Form extends UIComponent
     {
     }
 
+    public String getName()
+    {
+        return (String) parameters.get(PARAMETER_NAME);
+    }
+
+    public void setName(String name)
+    {
+        parameters.put(PARAMETER_NAME, name);
+    }
+
     public String getId()
     {
-        return (String) parameters.get("id");
+        return (String) parameters.get(PARAMETER_ID);
     }
 
     public void setId(String id)
     {
-        parameters.put("id", id);
+        parameters.put(PARAMETER_ID, id);
     }
 
     public String getAction()
     {
-        return (String) parameters.get("action");
+        return (String) parameters.get(PARAMETER_ACTION);
     }
 
     public void setAction(String action)
     {
-        parameters.put("action", action);
+        parameters.put(PARAMETER_ACTION, action);
+    }
+
+    public boolean getAjax()
+    {
+        return (Boolean) parameters.get(PARAMETER_AJAX);
+    }
+
+    public void setAjax(boolean ajax)
+    {
+        parameters.put(PARAMETER_AJAX, ajax);
     }
 
     public void add(Field field)

@@ -2,21 +2,13 @@ package com.zutubi.prototype.type;
 
 import com.zutubi.config.annotations.Internal;
 import com.zutubi.prototype.config.ConfigurationPersistenceManager;
-import com.zutubi.prototype.type.record.MutableRecord;
-import com.zutubi.prototype.type.record.MutableRecordImpl;
-import com.zutubi.prototype.type.record.PathUtils;
-import com.zutubi.prototype.type.record.Record;
-import com.zutubi.prototype.type.record.RecordManager;
+import com.zutubi.prototype.type.record.*;
+import com.zutubi.pulse.core.config.Configuration;
 import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.Mapping;
 import com.zutubi.util.logging.Logger;
-import com.zutubi.pulse.core.config.Configuration;
 
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  *
@@ -207,9 +199,9 @@ public class CompositeType extends AbstractType implements ComplexType
         // Instantiate even if there is no setter so the instance
         // is both checked for validity and cached.
         Type type = property.getType();
-        Object value = type.instantiate(path == null ? null : PathUtils.getPath(path, name), record.get(name));
         try
         {
+            Object value = type.instantiate(path == null ? null : PathUtils.getPath(path, name), record.get(name));
             property.setValue(instance, value);
         }
         catch (Exception e)

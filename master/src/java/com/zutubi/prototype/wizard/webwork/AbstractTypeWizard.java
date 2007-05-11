@@ -168,10 +168,10 @@ public abstract class AbstractTypeWizard implements Wizard
             return Messages.getInstance(getType().getClazz());
         }
 
-        public FormDescriptor createFormDescriptor(FormDescriptorFactory formDescriptorFactory, String path)
+        public FormDescriptor createFormDescriptor(FormDescriptorFactory formDescriptorFactory, String path, String name)
         {
             CompositeType type = getType();
-            FormDescriptor descriptor = formDescriptorFactory.createDescriptor(path, type);
+            FormDescriptor descriptor = formDescriptorFactory.createDescriptor(path, type, name);
             Iterator<FieldDescriptor> fieldIt = descriptor.getFieldDescriptors().iterator();
             while(fieldIt.hasNext())
             {
@@ -344,9 +344,10 @@ public abstract class AbstractTypeWizard implements Wizard
                 return Messages.getInstance(type.getClazz());
             }
 
-            public FormDescriptor createFormDescriptor(FormDescriptorFactory formDescriptorFactory, String path)
+            public FormDescriptor createFormDescriptor(FormDescriptorFactory formDescriptorFactory, String path, String name)
             {
                 FormDescriptor descriptor = new FormDescriptor();
+                descriptor.setName(name);
                 descriptor.setId("select.state");
 
                 SelectFieldDescriptor select = new SelectFieldDescriptor();

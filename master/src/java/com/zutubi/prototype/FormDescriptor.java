@@ -21,12 +21,19 @@ public class FormDescriptor extends AbstractDescriptor
 {
     private static final String DEFAULT_ACTION = "save";
 
+    private String name;
     private String id;
     private String action = DEFAULT_ACTION;
     private List<FieldDescriptor> fieldDescriptors = new LinkedList<FieldDescriptor>();
     private List<String> actions = new LinkedList<String>();
+    private boolean ajax = false;
 
 //    private String[] fieldOrder;
+
+    public void setName(String name)
+    {
+        this.name = name;
+    }
 
     public void setId(String id)
     {
@@ -78,8 +85,10 @@ public class FormDescriptor extends AbstractDescriptor
     public Form instantiate(String path, Record record)
     {
         Form form = new Form();
+        form.setName(name);
         form.setId(id);
-        form.setAction(PrototypeUtils.getConfigURL(path, action, null));
+        form.setAction(PrototypeUtils.getConfigURL(path, action, null, ajax));
+        form.setAjax(ajax);
         form.addAll(getParameters());
         List<String> fieldOrder = evaluateFieldOrder();
 
@@ -99,10 +108,12 @@ public class FormDescriptor extends AbstractDescriptor
             form.add(field);
         }
 
+        String defaultAction = getDefaultAction();
+
         // add the submit fields.
         for (String action : actions)
         {
-            SubmitFieldDescriptor submitDescriptor = new SubmitFieldDescriptor();
+            SubmitFieldDescriptor submitDescriptor = new SubmitFieldDescriptor(action.equals(defaultAction));
             submitDescriptor.setName(action);
             Field submit = submitDescriptor.instantiate(path, record);
             submit.setTabindex(tabindex++);
@@ -110,6 +121,28 @@ public class FormDescriptor extends AbstractDescriptor
         }
 
         return form;
+    }
+
+    private String getDefaultAction()
+    {
+        String defaultAction = "save";
+        for(String action: actions)
+        {
+            if(action.equals("next"))
+            {
+                defaultAction = "next";
+            }
+            else if(action.equals("finish"))
+            {
+                // When next and finish are present, prefer next
+                if(!defaultAction.equals("next"))
+                {
+                    defaultAction = "finish";
+                }
+            }
+        }
+
+        return defaultAction;
     }
 
     protected List<String> evaluateFieldOrder()
@@ -138,4 +171,8 @@ public class FormDescriptor extends AbstractDescriptor
         return ordered;
     }
 
+    public void setAjax(boolean ajax)
+    {
+        this.ajax = ajax;
+    }
 }

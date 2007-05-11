@@ -18,6 +18,7 @@ public class WizardDescriptor extends AbstractDescriptor
 {
     private com.zutubi.prototype.wizard.Wizard wizardInstance;
 
+    private boolean ajax;
     private boolean decorate;
 
     private FormDescriptorFactory formDescriptorFactory;
@@ -35,9 +36,10 @@ public class WizardDescriptor extends AbstractDescriptor
         // create the form wizard for the wizard.
         WizardState state = wizardInstance.getCurrentState();
 
-        FormDescriptor formDescriptor = state.createFormDescriptor(formDescriptorFactory, path);
+        FormDescriptor formDescriptor = state.createFormDescriptor(formDescriptorFactory, path, "wizardForm");
         formDescriptor.setAction("wizard");
-
+        formDescriptor.setAjax(ajax);
+        
         // decorate the form so that it fits into the wizard.
         decorate(formDescriptor);
 
@@ -66,6 +68,11 @@ public class WizardDescriptor extends AbstractDescriptor
         hidden.setValue(wizardInstance.getCurrentStateIndex());
 
         descriptor.add(hidden);
+    }
+
+    public void setAjax(boolean ajax)
+    {
+        this.ajax = ajax;
     }
 
     public void setDecorate(boolean decorate)

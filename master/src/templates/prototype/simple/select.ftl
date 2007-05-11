@@ -1,42 +1,39 @@
-<select<#rt/>
- name="${parameters.name?default("")?html}"<#rt/>
-<#if parameters.size?exists>
- size="${parameters.size?html}"<#rt/>
-</#if>
-<#if parameters.disabled?default(false)>
- disabled="disabled"<#rt/>
-</#if>
-<#if parameters.tabindex?exists>
- tabindex="${parameters.tabindex?html}"<#rt/>
-</#if>
-<#if parameters.id?exists>
- id="${parameters.id?html}"<#rt/>
-</#if>
-<#if parameters.multiple?exists>
- multiple="multiple"<#rt/>
-</#if>
->
-<#if parameters.headerKey?exists && parameters.headerValue?exists>
-    <option value="${parameters.headerKey?html}">${parameters.headerValue?html}</option>
-</#if>
-<#if parameters.emptyOption?default(false)>
-    <option value=""></option>
-</#if>
-<#list parameters.list as item>
-    <#if parameters.listKey?exists>
-        <#assign itemKey = item[parameters.listKey]/>
-    <#else>
-        <#assign itemKey = item/>
-    </#if>
-    <#if parameters.listValue?exists>
-        <#assign itemValue = item[parameters.listValue]/>
-    <#else>
-        <#assign itemValue = item/>
-    </#if>
-    <option value="${itemKey?html}"<#rt/>
-        <#if parameters.value?exists && (parameters.value?is_sequence && parameters.value?seq_contains(itemKey) || !parameters.value?is_sequence && parameters.value == itemKey)>
- selected="selected"<#rt/>
+(function()
+{
+    var data = [];
+    var value = [];
+
+    <#list parameters.list as item>
+        <#if parameters.listKey?exists>
+            <#assign itemKey = item[parameters.listKey]/>
+        <#else>
+            <#assign itemKey = item/>
         </#if>
-    >${itemValue?html}</option><#lt/>
-</#list>
-</select>
+        <#if parameters.listValue?exists>
+            <#assign itemValue = item[parameters.listValue]/>
+        <#else>
+            <#assign itemValue = item/>
+        </#if>
+
+    data.push(['${itemKey?js_string}', '${itemValue?js_string}']);
+
+        <#if parameters.value?exists && (parameters.value?is_sequence && parameters.value?seq_contains(itemKey) || !parameters.value?is_sequence && parameters.value == itemKey)>
+    value.push('${itemKey?js_string}');
+        </#if>
+    </#list>
+
+    var store = new Ext.data.SimpleStore({
+        fields: ['value', 'text'],
+        data: data
+    });
+
+    fieldConfig.store = store;
+    fieldConfig.value = value;
+<#if parameters.multiple?exists>
+    fieldConfig.multiple = true;
+</#if>
+<#if parameters.size?exists>
+    fieldConfig.size = ${parameters.size};
+</#if>
+    form.add(new ZUTUBI.Select(fieldConfig));
+}());

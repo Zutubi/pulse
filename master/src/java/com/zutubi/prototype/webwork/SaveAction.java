@@ -4,7 +4,6 @@ import com.opensymphony.util.TextUtils;
 import com.opensymphony.xwork.ActionContext;
 import com.zutubi.prototype.type.CompositeType;
 import com.zutubi.prototype.type.record.PathUtils;
-import com.zutubi.pulse.bootstrap.ComponentContext;
 import com.zutubi.validation.XWorkValidationAdapter;
 
 /**
@@ -31,6 +30,11 @@ public class SaveAction extends PrototypeSupport
         {
             return doSave();
         }
+        else if(isCancelSelected())
+        {
+            response = new ConfigurationResponse(path);
+        }
+        
         return doRender();
     }
 
@@ -53,10 +57,18 @@ public class SaveAction extends PrototypeSupport
         String baseName = PathUtils.getBaseName(path);
         if (!configurationPersistenceManager.validate(parentPath, baseName, record, new XWorkValidationAdapter(this)))
         {
-            return doRender();
+            prepare();
+            return INPUT;
         }
 
-        path = configurationPersistenceManager.saveRecord(parentPath, baseName, record);
+        String newPath = configurationPersistenceManager.saveRecord(parentPath, baseName, record);
+        response = new ConfigurationResponse(newPath);
+        if(!newPath.equals(path))
+        {
+            response.addInvalidatedPath(parentPath);
+        }
+
+        path = newPath;
 
         return doRender();
     }

@@ -1,16 +1,16 @@
 package com.zutubi.pulse.prototype.config.admin;
 
-import com.zutubi.validation.annotations.Required;
-import com.zutubi.prototype.ConfigurationCheckHandler;
 import com.zutubi.config.annotations.SymbolicName;
+import com.zutubi.prototype.ConfigurationCheckHandlerSupport;
 import com.zutubi.pulse.security.ldap.LdapManager;
+import com.zutubi.validation.annotations.Required;
 
 /**
  *
  *
  */
 @SymbolicName("internal.ldapConfigutionCheckHandler")
-public class LDAPConfigurationCheckHandler implements ConfigurationCheckHandler<LDAPConfiguration>
+public class LDAPConfigurationCheckHandler extends ConfigurationCheckHandlerSupport<LDAPConfiguration>
 {
     @Required
     private String login;

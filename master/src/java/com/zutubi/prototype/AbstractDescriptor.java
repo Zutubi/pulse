@@ -1,7 +1,7 @@
 package com.zutubi.prototype;
 
-import java.util.Map;
 import java.util.HashMap;
+import java.util.Map;
 
 /**
  *
@@ -34,5 +34,15 @@ public abstract class AbstractDescriptor implements Descriptor
     public Object getParameter(String key)
     {
         return this.parameters.get(key);
+    }
+
+    public Object getParameter(String key, Object defaultValue)
+    {
+        Object value = parameters.get(key);
+        if(value == null)
+        {
+            value = defaultValue;
+        }
+        return value;
     }
 }

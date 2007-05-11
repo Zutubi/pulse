@@ -1,0 +1,1 @@
+<img src='${base}/images/exclamation.gif'/> <#if exception.message?exists>${exception.message}<#else>${exception.class}</#if>

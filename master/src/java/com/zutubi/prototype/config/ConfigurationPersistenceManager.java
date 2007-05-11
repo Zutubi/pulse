@@ -54,8 +54,8 @@ public class ConfigurationPersistenceManager
      * Register the root scope definitions, from which all of the other definitions will be
      * derived.
      *
-     * @param scope      name of the scope
-     * @param type       type of the object stored in this scope
+     * @param scope name of the scope
+     * @param type  type of the object stored in this scope
      */
     public void register(String scope, ComplexType type)
     {
@@ -81,7 +81,7 @@ public class ConfigurationPersistenceManager
 
     private void validateConfiguration(ComplexType type)
     {
-        if(type instanceof CollectionType)
+        if (type instanceof CollectionType)
         {
             Type targetType = type.getTargetType();
             if (targetType instanceof ComplexType)
@@ -92,12 +92,12 @@ public class ConfigurationPersistenceManager
         else
         {
             CompositeType compositeType = (CompositeType) type;
-            if(!Configuration.class.isAssignableFrom(compositeType.getClazz()))
+            if (!Configuration.class.isAssignableFrom(compositeType.getClazz()))
             {
                 throw new IllegalArgumentException("Attempt to register persistent configuration of type '" + compositeType.getClazz() + "': which does not implement Configuration");
             }
 
-            for(TypeProperty property: compositeType.getProperties(ComplexType.class))
+            for (TypeProperty property : compositeType.getProperties(ComplexType.class))
             {
                 validateConfiguration((ComplexType) property.getType());
             }
@@ -308,7 +308,7 @@ public class ConfigurationPersistenceManager
     public List<String> getListing(String path)
     {
         LinkedList<String> list = new LinkedList<String>();
-        if(path.length() == 0)
+        if (path.length() == 0)
         {
             // Root listing
             list.addAll(rootScopes.keySet());
@@ -325,16 +325,13 @@ public class ConfigurationPersistenceManager
                     list.addAll(record.keySet());
                 }
             }
-            else
+            else if (type instanceof CompositeType)
             {
-                if (type instanceof CompositeType)
-                {
-                    CompositeType compositeType = (CompositeType) type;
-                    list.addAll(compositeType.getPropertyNames(CompositeType.class));
-                    list.addAll(compositeType.getPropertyNames(MapType.class));
-                    list.addAll(compositeType.getPropertyNames(ListType.class));
-                    return list;
-                }
+                CompositeType compositeType = (CompositeType) type;
+                list.addAll(compositeType.getPropertyNames(CompositeType.class));
+                list.addAll(compositeType.getPropertyNames(MapType.class));
+                list.addAll(compositeType.getPropertyNames(ListType.class));
+                return list;
             }
         }
         return list;
@@ -381,17 +378,17 @@ public class ConfigurationPersistenceManager
     public <T> T getInstance(String path, Class<T> clazz)
     {
         Object instance = getInstance(path);
-        if(instance == null)
+        if (instance == null)
         {
             return null;
         }
 
-        if(!clazz.isAssignableFrom(instance.getClass()))
+        if (!clazz.isAssignableFrom(instance.getClass()))
         {
             throw new IllegalArgumentException("Path '" + path + "' does not reference an instance of type '" + clazz.getName() + "'");
         }
 
-        return (T)instance;
+        return (T) instance;
     }
 
     public <T> Collection<T> getAllInstances(String path, Class<T> clazz)
@@ -404,7 +401,7 @@ public class ConfigurationPersistenceManager
     public <T> Collection<T> getAllInstances(Class<T> clazz)
     {
         CompositeType type = typeRegistry.getType(clazz);
-        if(type == null)
+        if (type == null)
         {
             return Collections.EMPTY_LIST;
         }
@@ -413,7 +410,7 @@ public class ConfigurationPersistenceManager
         List<String> paths = compositeTypePathIndex.get(type);
         if (paths != null)
         {
-            for(String path: paths)
+            for (String path : paths)
             {
                 instances.getAll(path, result);
             }
@@ -505,7 +502,7 @@ public class ConfigurationPersistenceManager
     public String insert(String parentPath, Object instance)
     {
         CompositeType type = typeRegistry.getType(instance.getClass());
-        if(type == null)
+        if (type == null)
         {
             throw new IllegalArgumentException("Attempt to insert object of unregistered class '" + instance.getClass().getName() + "'");
         }
@@ -577,7 +574,7 @@ public class ConfigurationPersistenceManager
     public void save(String parentPath, String baseName, Object instance)
     {
         CompositeType type = typeRegistry.getType(instance.getClass());
-        if(type == null)
+        if (type == null)
         {
             throw new IllegalArgumentException("Attempt to save instance of an unknown class '" + instance.getClass().getName() + "'");
         }
@@ -591,7 +588,7 @@ public class ConfigurationPersistenceManager
         {
             throw new ConfigRuntimeException(e);
         }
-        
+
         saveRecord(parentPath, baseName, record);
     }
 
@@ -671,15 +668,15 @@ public class ConfigurationPersistenceManager
     {
         DeleteReferenceCleanupTask result = new DeleteReferenceCleanupTask(path, recordManager);
         List<String> index = references.get(path);
-        if(index != null)
+        if (index != null)
         {
-            for(String referencingPath: index)
+            for (String referencingPath : index)
             {
                 ReferenceCleanupTaskProvider provider = getCleanupTaskProvider(referencingPath);
                 if (provider != null)
                 {
                     ReferenceCleanupTask task = provider.getAction(path, referencingPath);
-                    if(task != null)
+                    if (task != null)
                     {
                         result.addCascaded(task);
                     }

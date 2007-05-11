@@ -8,17 +8,16 @@ import com.zutubi.prototype.type.CollectionType;
 import com.zutubi.prototype.type.Type;
 import com.zutubi.prototype.type.TypeException;
 import com.zutubi.prototype.type.record.PathUtils;
+import com.zutubi.prototype.webwork.ConfigurationErrors;
+import com.zutubi.prototype.webwork.ConfigurationPanel;
+import com.zutubi.prototype.webwork.ConfigurationResponse;
 import com.zutubi.prototype.wizard.Wizard;
 import com.zutubi.prototype.wizard.WizardState;
 import com.zutubi.pulse.bootstrap.ComponentContext;
 import com.zutubi.pulse.web.ActionSupport;
 import com.zutubi.util.ClassLoaderUtils;
 import com.zutubi.util.logging.Logger;
-import com.zutubi.validation.DelegatingValidationContext;
-import com.zutubi.validation.ValidationContext;
-import com.zutubi.validation.ValidationException;
-import com.zutubi.validation.ValidationManager;
-import com.zutubi.validation.XWorkValidationAdapter;
+import com.zutubi.validation.*;
 import com.zutubi.validation.i18n.MessagesTextProvider;
 
 import java.util.Map;
@@ -31,10 +30,15 @@ public class ConfigurationWizardAction extends ActionSupport
 {
     private static final Logger LOG = Logger.getLogger(ConfigurationWizardAction.class);
 
+    private static final String TEMPLATE = "aconfig/wizard.vm";
+
     /**
      * The path to the configuration type that defines this wizard.
      */
     private String path;
+    private ConfigurationPanel configurationPanel;
+    private ConfigurationResponse configurationResponse;
+    private ConfigurationErrors configurationErrors;
 
     private boolean wizardRequiresLazyInitialisation = false;
 
@@ -53,6 +57,21 @@ public class ConfigurationWizardAction extends ActionSupport
     public String getPath()
     {
         return path;
+    }
+
+    public ConfigurationPanel getConfigurationPanel()
+    {
+        return configurationPanel;
+    }
+
+    public ConfigurationResponse getConfigurationResponse()
+    {
+        return configurationResponse;
+    }
+
+    public ConfigurationErrors getConfigurationErrors()
+    {
+        return configurationErrors;
     }
 
     /**
@@ -224,7 +243,8 @@ public class ConfigurationWizardAction extends ActionSupport
                 if (!validateState() || !validateWizard())
                 {
                     // if there is a validation failure, then we stay where we are.
-                    return "step";
+                    configurationErrors = new ConfigurationErrors(this);
+                    return INPUT;
                 }
             }
             
@@ -247,6 +267,7 @@ public class ConfigurationWizardAction extends ActionSupport
                 return doFinish();
             }
 
+            configurationPanel = new ConfigurationPanel(TEMPLATE);
             return "step";
         }
         catch (Exception e)
@@ -260,6 +281,12 @@ public class ConfigurationWizardAction extends ActionSupport
     {
         getWizardInstance().doFinish();
         String newPath = ((AbstractTypeWizard) getWizardInstance()).getSuccessPath();
+        configurationResponse = new ConfigurationResponse(newPath);
+        if(!newPath.equals(path))
+        {
+            // Then we added a child, invalidating path
+            configurationResponse.addInvalidatedPath(path);
+        }
         removeWizard();
         path = newPath;
 
@@ -269,12 +296,14 @@ public class ConfigurationWizardAction extends ActionSupport
     private String doPrevious()
     {
         getWizardInstance().doPrevious();
+        configurationPanel = new ConfigurationPanel(TEMPLATE);
         return "step";
     }
 
     private String doNext()
     {
         getWizardInstance().doNext();
+        configurationPanel = new ConfigurationPanel(TEMPLATE);
         return "step";
     }
 
@@ -282,6 +311,7 @@ public class ConfigurationWizardAction extends ActionSupport
     {
         getWizardInstance().doCancel();
         removeWizard();
+        configurationResponse = new ConfigurationResponse(path);
         return "cancel";
     }
 

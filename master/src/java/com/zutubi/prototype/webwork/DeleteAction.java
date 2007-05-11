@@ -12,33 +12,51 @@ import com.zutubi.validation.i18n.TextProvider;
 public class DeleteAction extends PrototypeSupport
 {
     private ReferenceCleanupTask task;
+    private String parentPath;
+    private ConfigurationPanel newPanel;
 
     public ReferenceCleanupTask getTask()
     {
         return task;
     }
 
+    public String getParentPath()
+    {
+        return parentPath;
+    }
+
+    public ConfigurationPanel getNewPanel()
+    {
+        return newPanel;
+    }
+
     public TextProvider getTextProvider()
     {
         return new DefaultTextProvider();
     }
-    
+
     public String execute() throws Exception
     {
+        parentPath = PathUtils.getParentPath(path);
+
         if(isConfirmSelected())
         {
             task = configurationPersistenceManager.getCleanupTasks(getPath());
+            newPanel = new ConfigurationPanel("aconfig/confirm.vm");
             return "confirm";
         }
         else if (isDeleteSelected())
         {
             configurationPersistenceManager.delete(path);
-            path = PathUtils.getParentPath(path);
+            response = new ConfigurationResponse(PathUtils.getParentPath(path));
+            response.addInvalidatedPath(response.getNewPath());
+            path = response.getNewPath();
             return SUCCESS;
         }
         else if(isCancelSelected())
         {
-            path = PathUtils.getParentPath(path);
+            response = new ConfigurationResponse(PathUtils.getParentPath(path));
+            path = response.getNewPath();
             return "cancel";
         }
         

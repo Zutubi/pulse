@@ -1,6 +1,7 @@
 package com.zutubi.pulse.vfs.pulse;
 
 import com.zutubi.prototype.config.ConfigurationPersistenceManager;
+import com.zutubi.prototype.type.CollectionType;
 import com.zutubi.prototype.type.ComplexType;
 import com.zutubi.prototype.type.Type;
 import com.zutubi.prototype.type.record.PathUtils;
@@ -55,7 +56,7 @@ public class ConfigFileObject extends AbstractPulseFileObject
 
     protected FileType doGetType() throws Exception
     {
-        if(type == null || configurationPersistenceManager.getListing(path).size() > 0)
+        if(type == null || configurationPersistenceManager.getListing(path).size() > 0 || configurationPersistenceManager.getType(path) instanceof CollectionType)
         {
             return FileType.FOLDER;
         }

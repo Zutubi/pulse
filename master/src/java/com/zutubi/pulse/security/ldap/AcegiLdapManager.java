@@ -314,7 +314,7 @@ public class AcegiLdapManager implements LdapManager, ConfigurationEventListener
         }
         else
         {
-            LOG.debug("User '" + username + "' has no common name (cn) attribute");
+            LOG.debug("User '" + username + "' has no '" + attribute + "' attribute");
         }
 
         return null;

@@ -3,8 +3,8 @@ package com.zutubi.prototype.webwork;
 import com.zutubi.prototype.type.CompositeType;
 import com.zutubi.prototype.type.TypeProperty;
 import com.zutubi.prototype.type.record.MutableRecord;
-import com.zutubi.prototype.type.record.Record;
 import com.zutubi.prototype.type.record.PathUtils;
+import com.zutubi.prototype.type.record.Record;
 import com.zutubi.util.StringUtils;
 
 import java.util.Collection;
@@ -18,11 +18,27 @@ public class PrototypeUtils
 {
     public static String getConfigURL(String path, String action, String submitField)
     {
-        String result = ConfigurationActionMapper.NAMESPACE;
+        return getConfigURL(path, action, submitField, false);
+    }
+
+    public static String getConfigURL(String path, String action, String submitField, boolean ajax)
+    {
+        String result;
+
+        if (ajax)
+        {
+            result = ConfigurationActionMapper.AJAX_CONFIG_NAMESPACE;
+        }
+        else
+        {
+            result = ConfigurationActionMapper.CONFIG_NAMESPACE;
+        }
+
         if(path != null)
         {
             result = StringUtils.join("/", true, true, result, path);
         }
+
         result = PathUtils.normalizePath(result);
 
         if(action != null && !action.equals("display") || submitField != null)
@@ -34,7 +50,7 @@ public class PrototypeUtils
         {
             result = result + "=" + submitField;
         }
-        
+
         return result;
     }
 
@@ -71,7 +87,7 @@ public class PrototypeUtils
                     continue;
                 }
             }
-            
+
             if (Collection.class.isAssignableFrom(property.getClazz()))
             {
                 record.put(propertyName, parameterValue);

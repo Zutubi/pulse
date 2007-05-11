@@ -1,9 +1,9 @@
 package com.zutubi.pulse.web.vfs;
 
 import com.opensymphony.util.TextUtils;
-import com.zutubi.util.logging.Logger;
 import com.zutubi.pulse.vfs.CompoundFileFilter;
 import com.zutubi.pulse.vfs.FilePrefixFilter;
+import com.zutubi.util.logging.Logger;
 import org.apache.commons.vfs.*;
 
 import java.util.*;
@@ -28,7 +28,7 @@ public class LsAction extends VFSActionSupport
 
     private String path;
 
-    private List listing = null;
+    private List<FileObjectWrapper> listing = null;
 
     /**
      * @deprecated just use the path instead.
@@ -181,35 +181,6 @@ public class LsAction extends VFSActionSupport
             FileTypeFilter filter = new FileTypeFilter();
             filter.acceptedTypes.addAll(types);
             return filter;
-        }
-    }
-
-    /**
-     * A simple holder for the path:listing data pair
-     */
-    private static class ListingPair
-    {
-        private String path;
-        private List<String> listing;
-
-        public String getPath()
-        {
-            return path;
-        }
-
-        public void setPath(String path)
-        {
-            this.path = path;
-        }
-
-        public List<String> getListing()
-        {
-            return listing;
-        }
-
-        public void setListing(List<String> listing)
-        {
-            this.listing = listing;
         }
     }
 }

@@ -7,6 +7,7 @@ package com.zutubi.prototype.model;
 public class Column extends UIComponent
 {
     private static final String PARAM_LINK = "link";
+    private static final String PARAM_ONCLICK = "onclick";
 
     public Column()
     {
@@ -51,5 +52,15 @@ public class Column extends UIComponent
     public void setLink(String link)
     {
         parameters.put(PARAM_LINK, link);
+    }
+
+    public String getOnclick()
+    {
+        return (String) parameters.get(PARAM_ONCLICK);
+    }
+
+    public void setOnclick(String onclick)
+    {
+        parameters.put(PARAM_ONCLICK, onclick);
     }
 }

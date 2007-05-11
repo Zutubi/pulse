@@ -1,26 +1,18 @@
 package com.zutubi.prototype;
 
-import com.zutubi.config.annotations.Handler;
 import com.zutubi.config.annotations.FieldType;
+import com.zutubi.config.annotations.Handler;
+import com.zutubi.prototype.config.ConfigurationPersistenceManager;
 import com.zutubi.prototype.handler.AnnotationHandler;
 import com.zutubi.prototype.handler.OptionAnnotationHandler;
 import com.zutubi.prototype.model.*;
-import com.zutubi.prototype.type.CollectionType;
-import com.zutubi.prototype.type.CompositeType;
-import com.zutubi.prototype.type.EnumType;
-import com.zutubi.prototype.type.PrimitiveType;
-import com.zutubi.prototype.type.ReferenceType;
-import com.zutubi.prototype.type.SimpleType;
-import com.zutubi.prototype.type.Type;
-import com.zutubi.prototype.type.TypeProperty;
-import com.zutubi.prototype.type.TypeRegistry;
+import com.zutubi.prototype.type.*;
 import com.zutubi.prototype.type.record.PathUtils;
-import com.zutubi.prototype.config.ConfigurationPersistenceManager;
 import com.zutubi.pulse.prototype.config.EnumOptionProvider;
+import com.zutubi.util.AnnotationUtils;
 import com.zutubi.util.bean.DefaultObjectFactory;
 import com.zutubi.util.bean.ObjectFactory;
 import com.zutubi.util.logging.Logger;
-import com.zutubi.util.AnnotationUtils;
 import com.zutubi.validation.annotations.Constraint;
 import com.zutubi.validation.validators.RequiredValidator;
 
@@ -79,20 +71,21 @@ public class FormDescriptorFactory
     
     public FormDescriptor createDescriptor(String path, Class clazz)
     {
-        return createDescriptor(path, typeRegistry.getType(clazz));
+        return createDescriptor(path, typeRegistry.getType(clazz), "form");
     }
 
     public FormDescriptor createDescriptor(String path, String symbolicName)
     {
-        return createDescriptor(path, typeRegistry.getType(symbolicName));
+        return createDescriptor(path, typeRegistry.getType(symbolicName), "form");
     }
 
-    public FormDescriptor createDescriptor(String path, CompositeType type)
+    public FormDescriptor createDescriptor(String path, CompositeType type, String name)
     {
         FormDescriptor descriptor = new FormDescriptor();
+        descriptor.setName(name);
 
         // The symbolic name uniquely identifies the type, and so will uniquely identify this form.
-        // (we are not planning to have multiple forms on a single page at this stage...) 
+        // (we are not planning to have multiple forms on a single page at this stage...)
         descriptor.setId(type.getClazz().getName());
 
         // Process the annotations at apply to the type / form.

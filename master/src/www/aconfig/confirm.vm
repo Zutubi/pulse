@@ -1,0 +1,35 @@
+#macro(showTask $cleanupTask $indent)
+    <tr>
+        <td class="content">
+            $indent <a href="#url("action=display" "path=$cleanupTask.affectedPath")">$!webwork.htmlEncode($cleanupTask.affectedPath)</a>
+        </td>
+        <td class="content">
+            $cleanupTask.getSummary($textProvider)
+        </td>
+    </tr>
+    #foreach($childTask in $cleanupTask.cascaded)
+        #showTask($childTask "&nbsp;&nbsp;&nbsp;&nbsp;$indent")
+    #end
+#end
+
+<h2>#wwtext("name=confirm.delete")</h2>
+<p>
+    #wwtext("name=confirm.delete.blurb")
+</p>
+
+<table class="form">
+    <tr>
+        <th class="content">#wwtext("name=affected.path")</th>
+        <th class="content">#wwtext("name=action")</th>
+    </tr>
+    #showTask($task "")
+    <tr>
+        <td class="submit" colspan="2">
+            <a href="#" onclick="runAjaxRequest('$base/aconfig/$path?delete=delete'); return false;"/>delete</a>
+            <a href="#" onclick="selectPath('$parentPath'); return false;"/>cancel</a>
+        </td>
+    </tr>
+</table>
+
+</body>
+</html>

@@ -1,8 +1,9 @@
-<#include "/prototype/xhtml/controlheader-core.ftl" />
-    <td <#rt/>
-<#if hasFieldErrors>
-        class="error-field"<#t/>
-<#else>
-        class="field"<#t/>
+<#if parameters.label?exists>
+    fieldConfig.fieldLabel = '${parameters.label?i18n}';
 </#if>
-    ><#t/>
+<#if parameters.id?exists>
+    fieldConfig.id = '${parameters.id?html}';
+</#if>
+<#if parameters.required?default(false)>
+    fieldConfig.allowBlank = false;
+</#if>

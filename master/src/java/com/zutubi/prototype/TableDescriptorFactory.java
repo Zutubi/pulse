@@ -15,7 +15,7 @@ public class TableDescriptorFactory
 {
     private ConfigurationPersistenceManager configurationPersistenceManager;
 
-    public TableDescriptor createTableDescriptor(CollectionType type) throws TypeException
+    public TableDescriptor createTableDescriptor(CollectionType type, boolean ajax) throws TypeException
     {
         TableDescriptor tableDescriptor = new TableDescriptor();
         tableDescriptor.setName(type.getSymbolicName());
@@ -54,12 +54,12 @@ public class TableDescriptorFactory
         columnDescriptor.setFormatter(new AnnotationFormatter(defaultFormatter));
 
         dataRow.addDescriptor(columnDescriptor);
-        dataRow.addDescriptor(new EditColumnDescriptor());
-        dataRow.addDescriptor(new DeleteColumnDescriptor());
+        dataRow.addDescriptor(new EditColumnDescriptor(ajax));
+        dataRow.addDescriptor(new DeleteColumnDescriptor(ajax));
         tableDescriptor.addDescriptor(dataRow);
 
         RowDescriptor addRowDescriptor = new SingleRowDescriptor();
-        addRowDescriptor.addDescriptor(new AddColumnDescriptor(3));
+        addRowDescriptor.addDescriptor(new AddColumnDescriptor(3, ajax));
         tableDescriptor.addDescriptor(addRowDescriptor);
 
         return tableDescriptor;

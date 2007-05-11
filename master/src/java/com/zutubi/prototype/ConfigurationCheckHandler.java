@@ -1,5 +1,7 @@
 package com.zutubi.prototype;
 
+import com.zutubi.config.annotations.Transient;
+
 /**
  * Configuration check handlers allow testing of a configuration as a distinct user action.
  *
@@ -18,5 +20,11 @@ package com.zutubi.prototype;
  */
 public interface ConfigurationCheckHandler<T>
 {
+    @Transient
+    String getSuccessTemplate();
+
+    @Transient
+    String getFailureTemplate();
+
     void test(T configuration) throws Exception;
 }

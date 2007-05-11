@@ -1,6 +1,8 @@
 package com.zutubi.prototype.webwork;
 
 import com.opensymphony.util.TextUtils;
+import com.zutubi.i18n.Messages;
+import com.zutubi.i18n.MessagesProvider;
 import com.zutubi.prototype.config.ConfigurationPersistenceManager;
 import com.zutubi.prototype.config.ConfigurationRegistry;
 import com.zutubi.prototype.type.CollectionType;
@@ -9,8 +11,6 @@ import com.zutubi.prototype.type.Type;
 import com.zutubi.prototype.type.TypeRegistry;
 import com.zutubi.prototype.type.record.Record;
 import com.zutubi.pulse.web.ActionSupport;
-import com.zutubi.i18n.MessagesProvider;
-import com.zutubi.i18n.Messages;
 
 /**
  *
@@ -19,7 +19,7 @@ import com.zutubi.i18n.Messages;
 public class PrototypeSupport extends ActionSupport implements MessagesProvider
 {
     protected String path;
-
+    protected ConfigurationResponse response;
     protected Configuration configuration;
 
     protected TypeRegistry typeRegistry;
@@ -34,7 +34,6 @@ public class PrototypeSupport extends ActionSupport implements MessagesProvider
     private String next;
     private String finish;
     private String save;
-    private String check;
     private String confirm;
     private String delete;
     private String submitField;
@@ -65,23 +64,6 @@ public class PrototypeSupport extends ActionSupport implements MessagesProvider
         else
         {
             return TextUtils.stringSet(save);
-        }
-    }
-
-    public void setCheck(String check)
-    {
-        this.check = check;
-    }
-
-    public boolean isCheckSelected()
-    {
-        if (TextUtils.stringSet(submitField))
-        {
-            return submitField.equals("check");
-        }
-        else
-        {
-            return TextUtils.stringSet(check);
         }
     }
 
@@ -185,6 +167,16 @@ public class PrototypeSupport extends ActionSupport implements MessagesProvider
         this.path = path;
     }
 
+    public ConfigurationResponse getConfigurationResponse()
+    {
+        return response;
+    }
+
+    public ConfigurationErrors getConfigurationErrors()
+    {
+        return new ConfigurationErrors(this);
+    }
+
     public Type getType()
     {
         return type;
@@ -200,7 +192,7 @@ public class PrototypeSupport extends ActionSupport implements MessagesProvider
         return record;
     }
 
-    public String doRender() throws Exception
+    protected void prepare()
     {
         // default handling - render the page.
         configuration = new Configuration(path);
@@ -213,6 +205,12 @@ public class PrototypeSupport extends ActionSupport implements MessagesProvider
 
         // TODO: collapse into a single result vm that handles the various types.
         type = configuration.getType();
+    }
+
+    public String doRender() throws Exception
+    {
+        prepare();
+
         if (type instanceof CompositeType)
         {
             return "composite";

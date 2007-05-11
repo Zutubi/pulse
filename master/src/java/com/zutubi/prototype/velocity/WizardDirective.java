@@ -40,6 +40,7 @@ import java.util.Map;
 public class WizardDirective extends AbstractDirective
 {
     private String path;
+    private boolean ajax = false;
     private boolean decorate = true;
 
     private FormDescriptorFactory formDescriptorFactory;
@@ -98,6 +99,7 @@ public class WizardDirective extends AbstractDirective
             WizardDescriptor wizardDescriptor = new WizardDescriptor(wizardInstance);
             wizardDescriptor.setFormDescriptorFactory(formDescriptorFactory);
             wizardDescriptor.setDecorate(decorate);
+            wizardDescriptor.setAjax(ajax);
 
             Map<String, Object> context = new HashMap<String, Object>();
 
@@ -155,6 +157,11 @@ public class WizardDirective extends AbstractDirective
     public void setPath(String path)
     {
         this.path = path;
+    }
+
+    public void setAjax(boolean ajax)
+    {
+        this.ajax = ajax;
     }
 
     public void setDecorate(boolean decorate)

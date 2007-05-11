@@ -1,61 +1,59 @@
-<#-- render form -->
 <#if form?exists>
-<#-- This form requires javascript to behave correctly. Only display it if javascript is enabled. -->
-<div id="${form.id}_div" style="display:none">
-    <form id="${form.id}" method="post" action="${base}/${form.action}">
+<script type="text/javascript" src="${base}/js/zutubi.js"></script>
+<script type="text/javascript">
+    var ${form.name} = function()
+    {
+        var form = new ZUTUBI.CheckForm(${mainFormName}, {
+            method: 'post',
+            labelAlign: 'right',
+            labelWidth: 150,
+            waitMsgTarget: true
+        });
 
-        <#-- render the test form. -->
-        <table class="form">
-        <#list form.fields as field>
-            <#assign parameters=field.parameters>
-            <#if parameters.type == "select">
-                <#include "select.ftl"/>
-            <#elseif parameters.type == "hidden">
-                <#include "hidden.ftl"/>
-            <#elseif parameters.type == "password">
-                <#include "password.ftl"/>
-            <#elseif parameters.type == "textarea">
-                <#include "textarea.ftl"/>
-            <#elseif parameters.type == "checkbox">
-                <#include "checkbox.ftl"/>
-            <#else>
-                <#include "text.ftl"/>
-            </#if>
-        </#list>
-
-        <#-- submit field required by javascript submit support -->
-        <input type="hidden" name="submitField"/>
-
-        <#-- render the forms submit buttons -->
-        <#include "submitgroup.ftl"/>
-        <#list form.submitFields as submitField>
-            <#assign parameters=submitField.parameters>
-            <#include "submit.ftl"/>
-        </#list>
-        <#include "submitgroup-end.ftl"/>
-
-        </table>
-    </form>
-
-    <#-- TODO: use jscript to wire up the event handlers for supporting inline form validation -->
-
-    <script type="text/javascript" src="/js/prototype.js"></script>
-    <script language="javascript">
-    
-        <#-- only show the test form if javascript is enabled, since it will not work without it. -->
-        $('${form.id}_div').style.display = '';
-
-        <#-- loops through the form fields, transfering the form values into the hidden fields. -->
-        Event.observe($('${form.id}_div'), 'submit', function(event){ return submitcheck(event); });
-
-        function submitcheck(evt)
+        function submitForm()
         {
-        <#list form.parameters.originalFields as fieldName>
-            $('${fieldName}_check').value = $F('${fieldName}');
-        </#list>
-            $('${form.id}').submit();
-            return false;
+            if(form.isValid())
+            {
+                form.submit({
+                    clientValidation: true,
+                    waitMsg: 'Testing...'
+                });
+            }
         }
-    </script>
-</div>
+
+        <#list form.submitFields as submitField>
+            form.addButton('${submitField.value}', function() { submitForm(); });
+        </#list>
+
+        function handleKeypress(evt)
+        {
+            if (evt.getKey() == evt.RETURN)
+            {
+                submitForm();
+                evt.preventDefault();
+                return false;
+            }
+            else
+            {
+                return true;
+            }
+        }
+
+        form.on('render', function()
+        {
+    <#list form.fields as field>
+        <#assign parameters=field.parameters>
+        <#if field.type == 'text' || field.type == 'password' || field.type == 'checkbox'>
+            Ext.get('${field.name}').on('keypress', function(event){ return handleKeypress(event); });
+        </#if>
+    </#list>
+        });
+
+        <#include "/prototype/xhtml/form-fields.ftl"/>
+
+        return form;
+    }();
+</script>
+
+<div id="${form.id}" style="width: 350px"></div>
 </#if>

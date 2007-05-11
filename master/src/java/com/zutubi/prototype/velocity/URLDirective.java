@@ -1,16 +1,16 @@
 package com.zutubi.prototype.velocity;
 
-import com.zutubi.util.logging.Logger;
-import com.zutubi.util.StringUtils;
-import com.zutubi.pulse.bootstrap.MasterConfigurationManager;
 import com.zutubi.prototype.webwork.PrototypeUtils;
+import com.zutubi.pulse.bootstrap.MasterConfigurationManager;
+import com.zutubi.util.StringUtils;
+import com.zutubi.util.logging.Logger;
 import org.apache.velocity.context.InternalContextAdapter;
-import org.apache.velocity.runtime.parser.node.Node;
-import org.apache.velocity.exception.ResourceNotFoundException;
 import org.apache.velocity.exception.ParseErrorException;
+import org.apache.velocity.exception.ResourceNotFoundException;
+import org.apache.velocity.runtime.parser.node.Node;
 
-import java.io.Writer;
 import java.io.IOException;
+import java.io.Writer;
 import java.util.Map;
 
 /**
@@ -29,6 +29,11 @@ public class URLDirective extends PrototypeDirective
      * The path to pass to the action.  This field is optional.
      */
     private String path;
+
+    /**
+     * Set to true for the AJAX form of the URL.
+     */
+    private boolean ajax = false;
 
     private MasterConfigurationManager configurationManager;
 
@@ -59,6 +64,11 @@ public class URLDirective extends PrototypeDirective
         this.path = path;
     }
 
+    public void setAjax(boolean ajax)
+    {
+        this.ajax = ajax;
+    }
+
     public boolean render(InternalContextAdapter context, Writer writer, Node node) throws IOException, ResourceNotFoundException, ParseErrorException
     {
         try
@@ -66,7 +76,7 @@ public class URLDirective extends PrototypeDirective
             Map params = createPropertyMap(context, node);
             wireParams(params);
 
-            writer.write(StringUtils.join("/", true, true, configurationManager.getSystemConfig().getContextPath(), PrototypeUtils.getConfigURL(path, action, null)));
+            writer.write(StringUtils.join("/", true, true, configurationManager.getSystemConfig().getContextPath(), PrototypeUtils.getConfigURL(path, action, null, ajax)));
 
             return true;
         }

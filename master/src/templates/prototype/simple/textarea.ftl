@@ -1,34 +1,17 @@
-<textarea<#rt/>
- name="${parameters.name?default("")?html}"<#rt/>
+(function()
+{
+    var autoCreate = { tag: 'textarea', autocomplete: 'off' };
+    
 <#if parameters.cols?exists>
- cols="${parameters.cols?default("")?html}"<#rt/>
+    autoCreate.cols: ${parameters.cols};
 </#if>
 <#if parameters.rows?exists>
- rows="${parameters.rows?default("")?html}"<#rt/>
+    autoCreate.rows: ${parameters.rows};
 </#if>
 <#if parameters.wrap?exists>
- wrap="${parameters.wrap?html}"<#rt/>
+    autoCreate.wrap: '${parameters.wrap}';
 </#if>
-<#if parameters.disabled?default(false)>
- disabled="disabled"<#rt/>
-</#if>
-<#if parameters.readonly?exists>
- readonly="readonly"<#rt/>
-</#if>
-<#if parameters.tabindex?exists>
- tabindex="${parameters.tabindex?html}"<#rt/>
-</#if>
-<#if parameters.id?exists>
- id="${parameters.id?html}"<#rt/>
-</#if>
-<#if parameters.cssClass?exists>
- class="${parameters.cssClass?html}"<#rt/>
-</#if>
-<#if parameters.cssStyle?exists>
- style="${parameters.cssStyle?html}"<#rt/>
-</#if>
-><#rt/>
-<#if parameters.value?exists>
-${parameters.value?html}<#t/>
-</#if>
-</textarea>
+
+    fieldConfig.autoCreate = autoCreate;
+    form.add(new Ext.form.TextField(fieldConfig));
+})();

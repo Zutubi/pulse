@@ -1,0 +1,10 @@
+#set($config = $action.configuration)
+
+<h2>#i18n("key=label")</h2>
+<div style="color:gray">
+    #i18n("key=introduction")
+</div>
+
+<p>
+    #plist("path=$config.path" "action=wizard.action?path=$config.path" "ajax=true")
+</p>

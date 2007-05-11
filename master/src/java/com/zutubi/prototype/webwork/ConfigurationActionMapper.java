@@ -1,67 +1,67 @@
 package com.zutubi.prototype.webwork;
 
+import com.opensymphony.util.TextUtils;
 import com.opensymphony.webwork.dispatcher.mapper.ActionMapper;
 import com.opensymphony.webwork.dispatcher.mapper.ActionMapping;
 import com.opensymphony.webwork.dispatcher.mapper.DefaultActionMapper;
-import com.opensymphony.util.TextUtils;
 import com.zutubi.prototype.type.record.PathUtils;
 
 import javax.servlet.http.HttpServletRequest;
-import java.util.Map;
 import java.util.HashMap;
+import java.util.Map;
 
 /**
  */
 public class ConfigurationActionMapper implements ActionMapper
 {
-    static final String NAMESPACE = "/config";
-    
+    static final String CONFIG_NAMESPACE = "/config";
+    static final String AJAX_CONFIG_NAMESPACE = "/aconfig";
+
     private DefaultActionMapper delegate = new DefaultActionMapper();
 
     public ActionMapping getMapping(HttpServletRequest request)
     {
-        if (NAMESPACE.equals(request.getServletPath()))
+        String servletPath = request.getServletPath();
+        if (CONFIG_NAMESPACE.equals(servletPath) || AJAX_CONFIG_NAMESPACE.equals(servletPath))
         {
             String path = request.getPathInfo();
             if (path != null)
             {
                 String[] elements = PathUtils.getPathElements(path);
-                if(elements.length > 0)
-                {
-                    String action = "display";
-                    String submitField = "";
-                    String query = request.getQueryString();
-                    if(TextUtils.stringSet(query))
-                    {
-                        int index = query.indexOf('=');
-                        if(index > 0)
-                        {
-                            action = query.substring(0, index);
-                            submitField = query.substring(index + 1);
-                        }
-                        else
-                        {
-                            action = query;
-                        }
-                    }
+                String[] actionSubmit = getActionSubmit(request, elements.length > 0 ? "display" : "index");
 
-                    Map<String, String> params = new HashMap<String, String>();
-                    params.put("submitField", submitField);
-                    path = PathUtils.normalizePath(path);
-                    if(TextUtils.stringSet(path))
-                    {
-                        params.put("path", path);
-                    }
-                    return new ActionMapping(action, NAMESPACE, null, params);
-                }
-                else
+                Map<String, String> params = new HashMap<String, String>();
+                params.put("submitField", actionSubmit[1]);
+                path = PathUtils.normalizePath(path);
+                if (TextUtils.stringSet(path))
                 {
-                    return new ActionMapping("index", NAMESPACE, null, null);
+                    params.put("path", path);
                 }
+                return new ActionMapping(actionSubmit[0], servletPath, null, params);
             }
         }
 
         return delegate.getMapping(request);
+    }
+
+    private String[] getActionSubmit(HttpServletRequest request, String defaultAction)
+    {
+        String[] actionSubmit = new String[]{defaultAction, ""};
+        String query = request.getQueryString();
+        if (TextUtils.stringSet(query))
+        {
+            int index = query.indexOf('=');
+            if (index > 0)
+            {
+                actionSubmit[0] = query.substring(0, index);
+                actionSubmit[1] = query.substring(index + 1);
+            }
+            else
+            {
+                actionSubmit[0] = query;
+            }
+        }
+        return actionSubmit;
     }
 
     public String getUriFromActionMapping(ActionMapping mapping)

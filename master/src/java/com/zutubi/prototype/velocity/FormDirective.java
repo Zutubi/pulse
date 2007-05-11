@@ -1,6 +1,5 @@
 package com.zutubi.prototype.velocity;
 
-import com.zutubi.prototype.FieldDescriptor;
 import com.zutubi.prototype.FormDescriptor;
 import com.zutubi.prototype.FormDescriptorFactory;
 import com.zutubi.prototype.TemplateFormDecorator;
@@ -32,6 +31,8 @@ public class FormDirective extends PrototypeDirective
 
     private FormDescriptorFactory formDescriptorFactory;
     private Configuration configuration;
+    private String formName = "form";
+    private boolean ajax = false;
 
     /**
      * The name of this velocity directive.
@@ -48,6 +49,16 @@ public class FormDirective extends PrototypeDirective
         return LINE;
     }
 
+    public void setFormName(String formName)
+    {
+        this.formName = formName;
+    }
+
+    public void setAjax(boolean ajax)
+    {
+        this.ajax = ajax;
+    }
+
     public boolean render(InternalContextAdapter contextAdapter, Writer writer, Node node) throws IOException, ResourceNotFoundException, ParseErrorException
     {
         try
@@ -60,8 +71,9 @@ public class FormDirective extends PrototypeDirective
             CompositeType ctype = (CompositeType) type;
             Record data = lookupRecord();
 
-            FormDescriptor formDescriptor = formDescriptorFactory.createDescriptor(lookupPath(), ctype);
-
+            FormDescriptor formDescriptor = formDescriptorFactory.createDescriptor(lookupPath(), ctype, formName);
+            formDescriptor.setAjax(ajax);
+            
             TemplateFormDecorator templateDecorator = new TemplateFormDecorator(null);
             templateDecorator.decorate(formDescriptor);
 
@@ -100,21 +112,11 @@ public class FormDirective extends PrototypeDirective
         }
     }
 
-    /**
-     * Required resource
-     *
-     * @param configuration instance
-     */
     public void setFreemarkerConfiguration(Configuration configuration)
     {
         this.configuration = configuration;
     }
 
-    /**
-     * Required resource.
-     *
-     * @param formDescriptorFactory instance
-     */
     public void setFormDescriptorFactory(FormDescriptorFactory formDescriptorFactory)
     {
         this.formDescriptorFactory = formDescriptorFactory;

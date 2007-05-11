@@ -29,10 +29,16 @@ public class TableDirective extends PrototypeDirective
     private Configuration configuration;
 
     private String action;
+    private boolean ajax = false;
 
     public void setAction(String action)
     {
         this.action = action;
+    }
+
+    public void setAjax(boolean ajax)
+    {
+        this.ajax = ajax;
     }
 
     public String getName()
@@ -59,7 +65,7 @@ public class TableDirective extends PrototypeDirective
             TableDescriptorFactory tableFactory = new TableDescriptorFactory();
             ComponentContext.autowire(tableFactory);
 
-            TableDescriptor tableDescriptor = tableFactory.createTableDescriptor((CollectionType)collectionType);
+            TableDescriptor tableDescriptor = tableFactory.createTableDescriptor((CollectionType)collectionType, ajax);
 
             Type type = ((CollectionType)collectionType).getCollectionType();
 

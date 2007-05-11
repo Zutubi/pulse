@@ -13,15 +13,10 @@
 #if( $config.simpleProperties.size() > 0)
     <!-- this configuration definition contains fields to be configured. -->
     <p>
-        #pform("path=$config.path")
+        #pform("path=$config.path" "formName=mainform")
     </p>
 
-    #if ($config.configurationCheckAvailable)
-    <p>
-        Test configuration
-        #checkform("path=$config.path" "action=check.action?path=$config.path")
-    </p>
-    #end
+    #parse("/aconfig/check.vm")
 #end
 
 #if( $config.nestedProperties.size() > 0)

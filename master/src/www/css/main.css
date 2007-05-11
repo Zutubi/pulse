@@ -144,10 +144,6 @@ pre{
     Footer
     */
 
-.x-layout-panel, .x-layout-nested-layout .x-layout-panel {
-    border: 0 none;
-}
-
 #south {
     border-top: solid 1px #c0c0c0;
     color: #c0c0c0;
@@ -809,3 +805,28 @@ table.detail td li
     padding-top: 2px;
     padding-bottom: 2px;    
 }
+
+/*
+ * For Ext.
+ */
+.x-layout-panel, .x-layout-nested-layout .x-layout-panel {
+    border: 0 none;
+}
+
+.x-tree ul {
+    margin: 0;
+    padding: 0;    
+}
+
+.x-tree-node a
+{
+    border-bottom: none;
+    font-weight: normal;
+}
+/*
+.x-item-disabled
+{
+    background: none;
+    border: none;
+}
+*/

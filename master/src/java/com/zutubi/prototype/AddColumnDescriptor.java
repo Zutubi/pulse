@@ -11,20 +11,27 @@ public class AddColumnDescriptor extends ActionColumnDescriptor
 {
     private static final String ACTION = "add";
 
-    public AddColumnDescriptor()
+    public AddColumnDescriptor(boolean ajax)
     {
-        super(ACTION);
+        super(ACTION, ajax);
     }
 
-    public AddColumnDescriptor(int colspan)
+    public AddColumnDescriptor(int colspan, boolean ajax)
     {
-        super(ACTION, colspan);
+        super(ACTION, colspan,ajax);
     }
 
     public Column instantiate(String path, Record value)
     {
         Column column = super.instantiate(path, value);
-        column.setLink(PrototypeUtils.getConfigURL(path, "wizard", null));
+        if (isAjax())
+        {
+            column.setOnclick("addToPath");
+        }
+        else
+        {
+            column.setLink(PrototypeUtils.getConfigURL(path, "wizard", null, isAjax()));
+        }
         return column;
     }
 }

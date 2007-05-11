@@ -4,10 +4,10 @@ import com.opensymphony.xwork.ActionContext;
 import com.zutubi.prototype.ConfigurationCheckHandler;
 import com.zutubi.prototype.type.CompositeType;
 import com.zutubi.prototype.type.Type;
-import com.zutubi.prototype.type.record.Record;
 import com.zutubi.prototype.type.record.PathUtils;
-import com.zutubi.validation.XWorkValidationAdapter;
+import com.zutubi.prototype.type.record.Record;
 import com.zutubi.pulse.bootstrap.ComponentContext;
+import com.zutubi.validation.XWorkValidationAdapter;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -19,19 +19,27 @@ import java.util.Map;
 public class CheckAction extends PrototypeSupport
 {
     private Record checkRecord;
+    private ConfigurationErrors configurationErrors = new ConfigurationErrors(this);
+    private CheckResponse checkResponse;
+    private freemarker.template.Configuration freemarkerConfiguration;
 
     public Record getCheckRecord()
     {
         return checkRecord;
     }
 
+    public ConfigurationErrors getConfigurationErrors()
+    {
+        return configurationErrors;
+    }
+
+    public CheckResponse getCheckResponse()
+    {
+        return checkResponse;
+    }
+
     public String execute() throws Exception
     {
-        if (!isCheckSelected())
-        {
-            return ERROR;
-        }
-
         // first, gather all of the parameters (both those being checked and those used by the checking) so that
         // we have something to display back to the user.
 
@@ -56,15 +64,21 @@ public class CheckAction extends PrototypeSupport
         checkRecord = PrototypeUtils.toRecord(checkType, parameters);
 
         // validate the check form first.
+        boolean valid = true;
         if (!configurationPersistenceManager.validate(null, null, checkRecord, new XWorkValidationAdapter(this)))
         {
-            return doRender();
+            valid = false;
         }
 
         // validate the primary form.
-        if (!configurationPersistenceManager.validate(PathUtils.getParentPath(path), PathUtils.getBaseName(path), record, new XWorkValidationAdapter(this)))
+        if (!configurationPersistenceManager.validate(PathUtils.getParentPath(path), PathUtils.getBaseName(path), record, new XWorkValidationAdapter(this, "_check")))
         {
-            return doRender();
+            valid = false;
+        }
+
+        if (!valid)
+        {
+            return INPUT;
         }
 
         // Instantiate the primary configuration object.
@@ -73,10 +87,22 @@ public class CheckAction extends PrototypeSupport
         // Instantiate and execute the check handler.
         ConfigurationCheckHandler handler = (ConfigurationCheckHandler) checkType.instantiate(null, checkRecord);
         ComponentContext.autowire(handler);
-        handler.test(instance);
+        Exception exception = null;
+        try
+        {
+            handler.test(instance);
+        }
+        catch (Exception e)
+        {
+            exception = e;
+        }
+        
+        checkResponse = new CheckResponse(instance, handler, exception, freemarkerConfiguration);
+        return SUCCESS;
+    }
 
-        // We need to return the existing form values as well.
-
-        return doRender();
+    public void setFreemarkerConfiguration(freemarker.template.Configuration freemarkerConfiguration)
+    {
+        this.freemarkerConfiguration = freemarkerConfiguration;
     }
 }

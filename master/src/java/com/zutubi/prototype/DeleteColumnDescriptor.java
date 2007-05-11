@@ -11,20 +11,22 @@ public class DeleteColumnDescriptor extends ActionColumnDescriptor
 {
     private static final String ACTION = "delete";
 
-    public DeleteColumnDescriptor()
+    public DeleteColumnDescriptor(boolean ajax)
     {
-        super(ACTION);
-    }
-
-    public DeleteColumnDescriptor(int colspan)
-    {
-        super(ACTION, colspan);
+        super(ACTION, ajax);
     }
 
     public Column instantiate(String path, Record value)
     {
         Column column = super.instantiate(path, value);
-        column.setLink(PrototypeUtils.getConfigURL(path, "delete", "confirm"));
+        if (isAjax())
+        {
+            column.setOnclick("deletePath");
+        }
+        else
+        {
+            column.setLink(PrototypeUtils.getConfigURL(path, "delete", "confirm"));
+        }
         return column;
     }
 }
