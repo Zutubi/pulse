@@ -23,7 +23,7 @@ public class FieldDescriptor extends AbstractDescriptor
         Field field = new Field();
         field.setType(getType());
         field.setName(getName());
-        field.setId(getName());
+        field.setId("zfid." + getName());
         field.setLabel(getName() + ".label");
         
         field.addParameter("path", getPath());

@@ -66,11 +66,11 @@
             form.findField('${parameters.id}').markInvalid(errorMessage);
         </#if>
         <#if field.type == 'text' || field.type == 'password' || field.type == 'checkbox'>
-            Ext.get('${field.name}').on('keypress', function(event){ return handleKeypress(event);});
+            Ext.get('${field.id}').on('keypress', function(event){ return handleKeypress(event);});
         </#if>
     </#list>
 
-            Ext.get('${form.fields[0].name}').focus()
+            Ext.get('${form.fields[0].id}').focus()
         });
 
         <#include "/prototype/xhtml/form-fields.ftl"/>

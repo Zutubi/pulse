@@ -282,7 +282,7 @@ public class ConfigurationWizardAction extends ActionSupport
         getWizardInstance().doFinish();
         String newPath = ((AbstractTypeWizard) getWizardInstance()).getSuccessPath();
         configurationResponse = new ConfigurationResponse(newPath);
-        if(!newPath.equals(path))
+        if(!path.equals(newPath))
         {
             // Then we added a child, invalidating path
             configurationResponse.addInvalidatedPath(path);
