@@ -353,6 +353,7 @@ public class ConfigurationWizardAction extends ActionSupport
         removeWizard();
     }
 
+    @SuppressWarnings({"unchecked"})
     public Wizard getWizardInstance()
     {
         try

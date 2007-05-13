@@ -29,14 +29,13 @@ import java.util.List;
  */
 public class SetupWizard extends AbstractTypeWizard
 {
-    private UserManager userManager;
-
-    private MasterConfigurationManager configurationManager;
-
-    private SetupManager setupManager;
+    private static final String GENERAL_CONFIG_PROPERTY = "generalConfig";
 
     private CompositeType adminConfigType;
-    private static final String GENERAL_CONFIG_PROPERTY = "generalConfig";
+    
+    private UserManager userManager;
+    private MasterConfigurationManager configurationManager;
+    private SetupManager setupManager;
 
     public void initialise()
     {

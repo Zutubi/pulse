@@ -50,18 +50,24 @@ public class ConfigurationPersistenceManager
         refreshInstances();
     }
 
+    public void register(String scope, ComplexType type)
+    {
+        register(scope, type, true);
+    }
+
     /**
      * Register the root scope definitions, from which all of the other definitions will be
      * derived.
      *
-     * @param scope name of the scope
-     * @param type  type of the object stored in this scope
+     * @param scope      name of the scope
+     * @param type       type of the object stored in this scope
+     * @param persistent if true, records under this scope will be persisted
      */
-    public void register(String scope, ComplexType type)
+    public void register(String scope, ComplexType type, boolean persistent)
     {
         validateConfiguration(type);
-        rootScopes.put(scope, new ScopeInfo(scope, type));
-        if (!recordManager.containsRecord(scope))
+        rootScopes.put(scope, new ScopeInfo(scope, type, persistent));
+        if (persistent && !recordManager.containsRecord(scope))
         {
             recordManager.insert(scope, type.createNewRecord());
         }
@@ -520,6 +526,8 @@ public class ConfigurationPersistenceManager
 
     public String insertRecord(final String path, Record record)
     {
+        checkPersistent(path);
+
         ComplexType type = getType(path, ComplexType.class);
 
         eventManager.publish(new PreInsertEvent(this, path, (MutableRecord) record));
@@ -530,6 +538,27 @@ public class ConfigurationPersistenceManager
         eventManager.publish(new PostInsertEvent(this, path, result, instances.get(result)));
 
         return result;
+    }
+
+    private void checkPersistent(String path)
+    {
+        String[] parts = PathUtils.getPathElements(path);
+        if(parts.length > 0)
+        {
+            ScopeInfo rootScope = rootScopes.get(parts[0]);
+            if(rootScope == null)
+            {
+                throw new IllegalArgumentException("Invalid path '" + path + "': references non-existant root scope '" + parts[0] + "'");
+            }
+            else if(!rootScope.isPersistent())
+            {
+                throw new IllegalArgumentException("Attempt to write to non-persistent path '" + path + "'");
+            }
+        }
+        else
+        {
+            throw new IllegalArgumentException("Invalid path: path is empty");
+        }
     }
 
     public boolean validate(String parentPath, String baseName, Record subject, ValidationAware validationCallback) throws TypeException
@@ -594,6 +623,8 @@ public class ConfigurationPersistenceManager
 
     public String saveRecord(String parentPath, String baseName, Record record)
     {
+        checkPersistent(parentPath);
+                
         Record parentRecord = recordManager.load(parentPath);
         if (parentRecord == null)
         {
@@ -717,6 +748,8 @@ public class ConfigurationPersistenceManager
 
     public void delete(final String path)
     {
+        checkPersistent(path);
+
         Object oldInstance = instances.get(path);
         eventManager.publish(new PreDeleteEvent(this, path, oldInstance));
 
@@ -758,11 +791,13 @@ public class ConfigurationPersistenceManager
     {
         private String scopeName;
         private ComplexType type;
+        private boolean persistent;
 
-        public ScopeInfo(String scopeName, ComplexType type)
+        public ScopeInfo(String scopeName, ComplexType type, boolean persistent)
         {
             this.scopeName = scopeName;
             this.type = type;
+            this.persistent = persistent;
         }
 
         public String getScopeName()
@@ -773,6 +808,11 @@ public class ConfigurationPersistenceManager
         public ComplexType getType()
         {
             return type;
+        }
+
+        public boolean isPersistent()
+        {
+            return persistent;
         }
 
         public Type getTargetType()

@@ -38,6 +38,7 @@ public class SaveAction extends PrototypeSupport
         return doRender();
     }
 
+    @SuppressWarnings({"unchecked"})
     private String doSave() throws Exception
     {
         if (!TextUtils.stringSet(symbolicName))

@@ -2,26 +2,12 @@ package com.zutubi.prototype.config;
 
 import com.zutubi.config.annotations.ConfigurationCheck;
 import com.zutubi.prototype.ConfigurationCheckHandler;
-import com.zutubi.prototype.type.CompositeType;
-import com.zutubi.prototype.type.ExtensionTypeProperty;
-import com.zutubi.prototype.type.ListType;
-import com.zutubi.prototype.type.MapType;
-import com.zutubi.prototype.type.ProjectMapType;
-import com.zutubi.prototype.type.TypeException;
-import com.zutubi.prototype.type.TypeHandler;
-import com.zutubi.prototype.type.TypeRegistry;
+import com.zutubi.prototype.type.*;
 import com.zutubi.pulse.prototype.config.*;
-import com.zutubi.pulse.prototype.config.types.MavenTypeConfiguration;
-import com.zutubi.pulse.prototype.config.types.AntTypeConfiguration;
-import com.zutubi.pulse.prototype.config.types.Maven2TypeConfiguration;
-import com.zutubi.pulse.prototype.config.types.ExecutableTypeConfiguration;
-import com.zutubi.pulse.prototype.config.types.MakeTypeConfiguration;
-import com.zutubi.pulse.prototype.config.types.XCodeTypeConfiguration;
-import com.zutubi.pulse.prototype.config.types.CustomTypeConfiguration;
-import com.zutubi.pulse.prototype.config.types.VersionedTypeConfiguration;
 import com.zutubi.pulse.prototype.config.admin.GlobalConfiguration;
 import com.zutubi.pulse.prototype.config.agent.AgentConfiguration;
 import com.zutubi.pulse.prototype.config.setup.SetupConfiguration;
+import com.zutubi.pulse.prototype.config.types.*;
 import com.zutubi.pulse.servercore.config.CvsConfiguration;
 import com.zutubi.pulse.servercore.config.PerforceConfiguration;
 import com.zutubi.pulse.servercore.config.ScmConfiguration;
@@ -47,7 +33,7 @@ public class ConfigurationRegistry
         try
         {
             CompositeType setupConfig = registerConfigurationType(SetupConfiguration.class);
-            configurationPersistenceManager.register("setup", setupConfig);
+            configurationPersistenceManager.register("setup", setupConfig, false);
 
             CompositeType typeConfig = registerConfigurationType("typeConfig", ProjectTypeConfiguration.class);
             registerConfigurationType("internal.antTypeConfig", AntTypeConfiguration.class);
