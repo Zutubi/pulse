@@ -5,6 +5,7 @@ import com.zutubi.pulse.core.model.TestCaseResult;
 import com.zutubi.pulse.core.model.TestSuiteResult;
 import com.zutubi.util.IOUtils;
 import com.zutubi.util.logging.Logger;
+import com.opensymphony.util.TextUtils;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -225,7 +226,11 @@ public class RegexTestPostProcessor extends TestReportPostProcessor
 
     public void setText(String txt)
     {
-        regex = txt;
+        // first lets check to see if there is a valid regex here.
+        if (TextUtils.stringSet(txt) && TextUtils.stringSet(txt.trim()))
+        {
+            regex = txt;
+        }
     }
 
     public void setAutoFail(boolean autoFail)
