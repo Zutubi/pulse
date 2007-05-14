@@ -1,7 +1,8 @@
 package com.zutubi.prototype.type;
 
-import junit.framework.TestCase;
 import com.zutubi.prototype.config.ConfigurationPersistenceManager;
+import com.zutubi.prototype.type.record.RecordManager;
+import junit.framework.TestCase;
 
 /**
  *
@@ -9,6 +10,7 @@ import com.zutubi.prototype.config.ConfigurationPersistenceManager;
  */
 public class TypeTestCase extends TestCase
 {
+    protected RecordManager recordManager;
     protected ConfigurationPersistenceManager configurationPersistenceManager;
     protected TypeRegistry typeRegistry;
 

@@ -5,8 +5,13 @@
 		<title>:: pulse :: #if ($title) $title #end</title>
         <link rel="shortcut icon" href="$base/favicon.ico">
         <link rel="icon" type="image/png" href="$base/favicon.png">
+        <link rel="stylesheet" type="text/css" href="/css/ext-all.css"/>
 		<link href="$base/css/main.css" rel="stylesheet" type="text/css" media="screen"/>
 		<link href="$base/css/form.css" rel="stylesheet" type="text/css" media="screen"/>
+        <script type="text/javascript" src="/js/yahoo/utilities.js"></script>
+        <script type="text/javascript" src="/js/yui-utilities.js"></script>
+        <script type="text/javascript" src="/js/ext-yui-adapter.js"></script>
+        <script type="text/javascript" src="/js/ext-all.js"></script>
         <script type="text/javascript" src="$base/js/main.js"></script>
 		$head
 	</head>

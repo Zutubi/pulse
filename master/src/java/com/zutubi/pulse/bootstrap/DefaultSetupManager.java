@@ -15,6 +15,10 @@ import com.zutubi.pulse.model.UserManager;
 import com.zutubi.pulse.upgrade.UpgradeManager;
 import com.zutubi.util.IOUtils;
 import com.zutubi.util.logging.Logger;
+import freemarker.cache.FileTemplateLoader;
+import freemarker.cache.MultiTemplateLoader;
+import freemarker.cache.TemplateLoader;
+import freemarker.template.Configuration;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -106,6 +110,8 @@ public class DefaultSetupManager implements SetupManager
             System.err.println("WARNING: " + e.getMessage());
         }
 
+        initialiseConfigurationSystem();
+
         if (isDataRequired())
         {
             // request data input.
@@ -153,6 +159,17 @@ public class DefaultSetupManager implements SetupManager
         }
     }
 
+    private void initialiseConfigurationSystem()
+    {
+        loadContexts(configContexts);
+
+        ConfigurationRegistry configurationRegistry = ComponentContext.getBean("configurationRegistry");
+        configurationRegistry.initSetup();
+
+        LogConfigurationManager logConfigurationManager = ComponentContext.getBean("logConfigurationManager");
+        logConfigurationManager.applyConfig();
+    }
+
     public void requestDataComplete()
     {
         // If this is the first time this directory is being used as a data directory, then we need
@@ -165,8 +182,7 @@ public class DefaultSetupManager implements SetupManager
         }
 
         loadSystemProperties();
-
-        initialiseConfigurationSystem();
+        linkUserTemplates();
 
         state = SetupState.STARTING;
         if (isLicenseRequired())
@@ -178,24 +194,6 @@ public class DefaultSetupManager implements SetupManager
             return;
         }
         requestLicenseComplete();
-    }
-
-    private void initialiseConfigurationSystem()
-    {
-        loadContexts(configContexts);
-
-        RecordManager recordManager = ComponentContext.getBean("recordManager");
-        ConfigurationRegistry configurationRegistry = ComponentContext.getBean("configurationRegistry");
-        ConfigurationPersistenceManager configurationPersistenceManager = ComponentContext.getBean("configurationPersistenceManager");
-        ConfigurationProvider configurationProvider = ComponentContext.getBean("configurationProvider");
-
-        recordManager.init();
-        configurationRegistry.init();
-        configurationPersistenceManager.init();
-        configurationProvider.init();
-
-        LogConfigurationManager logConfigurationManager = ComponentContext.getBean("logConfigurationManager");
-        logConfigurationManager.applyConfig();
     }
 
     private void loadSystemProperties()
@@ -220,6 +218,25 @@ public class DefaultSetupManager implements SetupManager
         }
     }
 
+    private void linkUserTemplates()
+    {
+        File userTemplateRoot = configurationManager.getUserPaths().getUserTemplateRoot();
+        if(userTemplateRoot.isDirectory())
+        {
+            Configuration freemarkerConfiguration = ComponentContext.getBean("freemarkerConfiguration");
+            TemplateLoader existingLoader = freemarkerConfiguration.getTemplateLoader();
+            try
+            {
+                TemplateLoader userLoader = new FileTemplateLoader(userTemplateRoot);
+                freemarkerConfiguration.setTemplateLoader(new MultiTemplateLoader(new TemplateLoader[]{userLoader, existingLoader}));
+            }
+            catch (IOException e)
+            {
+                LOG.warning(e);
+            }
+        }
+    }
+
     public void requestLicenseComplete()
     {
         state = SetupState.STARTING;
@@ -228,6 +245,8 @@ public class DefaultSetupManager implements SetupManager
 
         // load db contexts...
         loadContexts(daoContexts);
+
+        initialiseConfigurationPersistence();
 
         // create the database based on the hibernate configuration.
         databaseConsole = (DatabaseConsole) ComponentContext.getBean("databaseConsole");
@@ -256,6 +275,20 @@ public class DefaultSetupManager implements SetupManager
         updateVersionIfNecessary();
 
         requestUpgradeComplete(false);
+    }
+
+    private void initialiseConfigurationPersistence()
+    {
+        RecordManager recordManager = ComponentContext.getBean("recordManager");
+        ConfigurationPersistenceManager configurationPersistenceManager = ComponentContext.getBean("configurationPersistenceManager");
+        ConfigurationRegistry configurationRegistry = ComponentContext.getBean("configurationRegistry");
+        ConfigurationProvider configurationProvider = ComponentContext.getBean("configurationProvider");
+
+        recordManager.init();
+        configurationPersistenceManager.setRecordManager(recordManager);
+        configurationRegistry.init();
+        configurationPersistenceManager.init();
+        configurationProvider.init();
     }
 
     public void requestUpgradeComplete(boolean changes)

@@ -4,12 +4,16 @@ import com.zutubi.prototype.model.Field;
 import com.zutubi.prototype.type.TypeProperty;
 import com.zutubi.prototype.type.record.Record;
 
+import java.util.LinkedList;
+import java.util.List;
+
 /**
  *
  *
  */
 public class FieldDescriptor extends AbstractDescriptor
 {
+    private FormDescriptor form;
     private Object value;
     private String path;
     private TypeProperty property;
@@ -17,6 +21,7 @@ public class FieldDescriptor extends AbstractDescriptor
     private String type;
     private boolean required;
     private boolean constrained;
+    private List<String> scripts = new LinkedList<String>();
 
     public Field instantiate(String path, Record instance)
     {
@@ -30,6 +35,7 @@ public class FieldDescriptor extends AbstractDescriptor
         field.addParameter("required", isRequired());
         field.addParameter("constrained", isConstrained());
         field.addParameter("property", getProperty());
+        field.addParameter("scripts", getScripts());
         field.addAll(getParameters());
 
         // if we do not have a value set, then take the value from the instance.
@@ -43,6 +49,16 @@ public class FieldDescriptor extends AbstractDescriptor
         }
 
         return field;
+    }
+
+    public FormDescriptor getForm()
+    {
+        return form;
+    }
+
+    public void setForm(FormDescriptor form)
+    {
+        this.form = form;
     }
 
     public Object getValue()
@@ -113,5 +129,15 @@ public class FieldDescriptor extends AbstractDescriptor
     public void setConstrained(boolean constrained)
     {
         this.constrained = constrained;
+    }
+
+    public void addScript(String template)
+    {
+        scripts.add(template);
+    }
+
+    public List<String> getScripts()
+    {
+        return scripts;
     }
 }

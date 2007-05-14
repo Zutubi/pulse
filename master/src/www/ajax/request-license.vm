@@ -1,0 +1,19 @@
+<h2 class="content">:: #i18n("key=license.request.evaluation") ::</h2>
+
+#pform("formName=requestForm" "path=$path" "action=ajax/requestLicense.action" "ajax=true")
+
+<script type="text/javascript">
+    requestForm.on('actioncomplete', function(requestForm, action)
+    {
+        form.findField('license').setValue(action.result.detail);
+        var status = Ext.get('requestForm.status');
+        status.setStyle('padding', '5px');
+        status.setStyle('text-align', 'center');
+        status.update('<img src="$base/images/accept.gif"/> #i18n("key=license.obtained")');
+    });
+
+    requestForm.on('actionfailed', function(form, action)
+    {
+        Ext.get('requestForm.status').update('<ul class="error"><li class="error">' + action.result.detail + '</li></ul>');
+    });
+</script>

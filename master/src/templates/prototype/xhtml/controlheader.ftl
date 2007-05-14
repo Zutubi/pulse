@@ -7,6 +7,3 @@
 <#if parameters.name?exists>
     fieldConfig.name = '${parameters.name?js_string}';
 </#if>
-<#if parameters.required?default(false)>
-    fieldConfig.allowBlank = false;
-</#if>

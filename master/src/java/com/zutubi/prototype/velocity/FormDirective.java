@@ -1,5 +1,6 @@
 package com.zutubi.prototype.velocity;
 
+import com.opensymphony.util.TextUtils;
 import com.zutubi.prototype.FormDescriptor;
 import com.zutubi.prototype.FormDescriptorFactory;
 import com.zutubi.prototype.TemplateFormDecorator;
@@ -8,7 +9,12 @@ import com.zutubi.prototype.model.HiddenFieldDescriptor;
 import com.zutubi.prototype.type.CompositeType;
 import com.zutubi.prototype.type.Type;
 import com.zutubi.prototype.type.record.Record;
+import com.zutubi.pulse.bootstrap.MasterConfigurationManager;
+import com.zutubi.pulse.bootstrap.freemarker.FreemarkerConfigurationFactoryBean;
 import com.zutubi.util.logging.Logger;
+import freemarker.cache.ClassTemplateLoader;
+import freemarker.cache.MultiTemplateLoader;
+import freemarker.cache.TemplateLoader;
 import freemarker.template.Configuration;
 import freemarker.template.Template;
 import freemarker.template.TemplateException;
@@ -30,9 +36,10 @@ public class FormDirective extends PrototypeDirective
     private static final Logger LOG = Logger.getLogger(FormDirective.class);
 
     private FormDescriptorFactory formDescriptorFactory;
-    private Configuration configuration;
+    private String action;
     private String formName = "form";
     private boolean ajax = false;
+    private MasterConfigurationManager configurationManager;
 
     /**
      * The name of this velocity directive.
@@ -47,6 +54,11 @@ public class FormDirective extends PrototypeDirective
     public int getType()
     {
         return LINE;
+    }
+
+    public void setAction(String action)
+    {
+        this.action = action;
     }
 
     public void setFormName(String formName)
@@ -88,11 +100,23 @@ public class FormDirective extends PrototypeDirective
             Map<String, Object> context = initialiseContext(type.getClazz());
 
             Form form = formDescriptor.instantiate(lookupPath(), data);
+            if(TextUtils.stringSet(action))
+            {
+                form.setAction(action);
+            }
+            
             context.put("form", form);
 
+            // Get our own configuration so that we can mess with the
+            // tenplate loader
+            Configuration configuration = FreemarkerConfigurationFactoryBean.createConfiguration(configurationManager);
+            TemplateLoader currentLoader = configuration.getTemplateLoader();
+            TemplateLoader classLoader = new ClassTemplateLoader(ctype.getClazz(), "");
+            MultiTemplateLoader loader = new MultiTemplateLoader(new TemplateLoader[]{ classLoader, currentLoader });
+            configuration.setTemplateLoader(loader);
+            
             try
             {
-
                 Template template = configuration.getTemplate("prototype/xhtml/form.ftl");
                 template.process(context, writer);
             }
@@ -112,14 +136,14 @@ public class FormDirective extends PrototypeDirective
         }
     }
 
-    public void setFreemarkerConfiguration(Configuration configuration)
-    {
-        this.configuration = configuration;
-    }
-
     public void setFormDescriptorFactory(FormDescriptorFactory formDescriptorFactory)
     {
         this.formDescriptorFactory = formDescriptorFactory;
+    }
+
+    public void setConfigurationManager(MasterConfigurationManager configurationManager)
+    {
+        this.configurationManager = configurationManager;
     }
 }
 

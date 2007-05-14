@@ -3,13 +3,16 @@
     var autoCreate = { tag: 'textarea', autocomplete: 'off' };
     
 <#if parameters.cols?exists>
-    autoCreate.cols: ${parameters.cols};
+    fieldConfig.width = ${parameters.cols} * 7;
 </#if>
 <#if parameters.rows?exists>
-    autoCreate.rows: ${parameters.rows};
+    autoCreate.rows = ${parameters.rows};
 </#if>
 <#if parameters.wrap?exists>
-    autoCreate.wrap: '${parameters.wrap}';
+    autoCreate.wrap = '${parameters.wrap}';
+</#if>
+<#if parameters.value?exists>
+    fieldConfig.value = '${parameters.value?js_string}';
 </#if>
 
     fieldConfig.autoCreate = autoCreate;

@@ -1,0 +1,14 @@
+#helpTag("Project+Build+Specifications")
+#authorisationTags($principle)
+#projectTags($project)
+<html>
+<head>
+    <title>#wwtext("name=build.properties.specify")</title>
+</head>
+<body>
+    #projectTabs("configuration")
+
+    $formSource
+
+</body>
+</html>

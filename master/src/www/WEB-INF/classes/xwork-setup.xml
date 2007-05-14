@@ -105,8 +105,9 @@
             <result name="error" type="json">error.xml</result>
         </action>
 
-        <action name="requestEvaluation" class="com.zutubi.pulse.web.ajax.RequestEvaluationAction">
-            <result name="success" type="json">license.xml</result>
+        <action name="requestLicense" class="com.zutubi.pulse.web.ajax.RequestLicenseAction">
+            <result name="input" type="velocity">request-license.vm</result>
+            <result name="success" type="flexjson">result</result>
         </action>
     </package>
 

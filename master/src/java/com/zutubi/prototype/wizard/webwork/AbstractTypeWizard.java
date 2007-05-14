@@ -6,7 +6,10 @@ import com.zutubi.prototype.FormDescriptor;
 import com.zutubi.prototype.FormDescriptorFactory;
 import com.zutubi.prototype.config.ConfigurationPersistenceManager;
 import com.zutubi.prototype.model.SelectFieldDescriptor;
-import com.zutubi.prototype.type.*;
+import com.zutubi.prototype.type.CompositeType;
+import com.zutubi.prototype.type.SimpleType;
+import com.zutubi.prototype.type.TypeProperty;
+import com.zutubi.prototype.type.TypeRegistry;
 import com.zutubi.prototype.type.record.MutableRecord;
 import com.zutubi.prototype.type.record.MutableRecordImpl;
 import com.zutubi.prototype.type.record.Record;
@@ -186,10 +189,10 @@ public abstract class AbstractTypeWizard implements Wizard
             return descriptor;
         }
 
-        public boolean validate(String path, ValidationAware validationCallback) throws TypeException
+        public boolean validate(String path, ValidationAware validationCallback)
         {
             validationCallback.addIgnoredFields(ignoredFields);
-            return configurationPersistenceManager.validate(path, null, currentState.getRecord(), validationCallback);
+            return configurationPersistenceManager.validate(path, null, currentState.getRecord(), validationCallback) != null;
         }
 
         public abstract CompositeType getType();
@@ -358,7 +361,7 @@ public abstract class AbstractTypeWizard implements Wizard
                 return descriptor;
             }
 
-            public boolean validate(String path, ValidationAware validationCallback) throws TypeException
+            public boolean validate(String path, ValidationAware validationCallback)
             {
                 return true;
             }

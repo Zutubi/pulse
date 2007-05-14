@@ -1,19 +1,19 @@
 package com.zutubi.prototype.velocity;
 
-import com.zutubi.pulse.velocity.AbstractDirective;
+import com.opensymphony.util.TextUtils;
+import com.opensymphony.xwork.ActionContext;
+import com.opensymphony.xwork.util.OgnlValueStack;
 import com.zutubi.i18n.Messages;
-import com.zutubi.pulse.bootstrap.ComponentContext;
+import com.zutubi.prototype.freemarker.GetTextMethod;
 import com.zutubi.prototype.type.Type;
 import com.zutubi.prototype.type.record.Record;
-import com.zutubi.prototype.freemarker.GetTextMethod;
-import com.opensymphony.xwork.util.OgnlValueStack;
-import com.opensymphony.xwork.ActionContext;
+import com.zutubi.pulse.bootstrap.ComponentContext;
+import com.zutubi.pulse.velocity.AbstractDirective;
+import freemarker.core.DelegateBuiltin;
 
 import java.io.IOException;
-import java.util.Map;
 import java.util.HashMap;
-
-import freemarker.core.DelegateBuiltin;
+import java.util.Map;
 
 /**
  *
@@ -21,33 +21,47 @@ import freemarker.core.DelegateBuiltin;
  */
 public abstract class PrototypeDirective extends AbstractDirective
 {
+    private String property;
+
     public PrototypeDirective()
     {
         ComponentContext.autowire(this);
     }
 
+    public void setProperty(String property)
+    {
+        this.property = property;
+    }
+
     protected Type lookupType()
     {
-        OgnlValueStack stack = ActionContext.getContext().getValueStack();
-        return (Type) stack.findValue("type");
+        return (Type) lookup("type");
     }
 
     protected Messages lookupMessages()
     {
-        OgnlValueStack stack = ActionContext.getContext().getValueStack();
-        return (Messages) stack.findValue("messages");
+        return (Messages) lookup("messages");
     }
 
     protected Record lookupRecord()
     {
-        OgnlValueStack stack = ActionContext.getContext().getValueStack();
-        return (Record) stack.findValue("record");
+        return (Record) lookup("record");
     }
 
     protected String lookupPath()
     {
+        return (String) lookup("path");
+    }
+
+    protected Object lookup(String key)
+    {
         OgnlValueStack stack = ActionContext.getContext().getValueStack();
-        return (String) stack.findValue("path");
+        if(TextUtils.stringSet(property))
+        {
+            key = property + "." + key;
+        }
+        
+        return stack.findValue(key);
     }
 
     protected String renderError(String errorMessage) throws IOException
@@ -55,7 +69,7 @@ public abstract class PrototypeDirective extends AbstractDirective
         return "<span id=\"error\">" + errorMessage + "</span>";
     }
 
-    protected Map<String, Object> initialiseContext(Class clazz)
+    public static Map<String, Object> initialiseContext(Class clazz)
     {
         Map<String, Object> context = new HashMap<String, Object>();
         Messages messages = Messages.getInstance(clazz);

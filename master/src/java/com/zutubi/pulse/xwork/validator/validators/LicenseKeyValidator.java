@@ -10,6 +10,8 @@ import com.zutubi.pulse.license.LicenseException;
  */
 public class LicenseKeyValidator extends FieldValidatorSupport
 {
+    // FIXME is this used?  there is validation elsewhere, and this may be
+    // FIXME incomplete?
     public void validate(Object object) throws ValidationException
     {
         Object obj = getFieldValue(getFieldName(), object);

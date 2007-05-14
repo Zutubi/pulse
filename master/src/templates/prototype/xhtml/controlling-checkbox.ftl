@@ -43,7 +43,7 @@
     </#if>
     }
 
-    var checkbox = form.findField("${parameters.id}");
-    checkbox.on("check", function(checkbox, checked) { setEnabledState(checkbox); });
-    form.on("render", function() { setEnabledState(checkbox) });
+    var checkbox = form.findField('${parameters.id}');
+    checkbox.on('check', function(checkbox, checked) { setEnabledState(checkbox); });
+    form.on('render', function() { setEnabledState(checkbox) });
 }());

@@ -25,4 +25,6 @@ public @interface Form
      * in the form.
      */
     String[] fieldOrder();
+
+    String[] actions() default { "save", "cancel" };
 }

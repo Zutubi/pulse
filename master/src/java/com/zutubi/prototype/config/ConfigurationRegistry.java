@@ -6,6 +6,8 @@ import com.zutubi.prototype.type.*;
 import com.zutubi.pulse.prototype.config.*;
 import com.zutubi.pulse.prototype.config.admin.GlobalConfiguration;
 import com.zutubi.pulse.prototype.config.agent.AgentConfiguration;
+import com.zutubi.pulse.prototype.config.misc.LoginConfiguration;
+import com.zutubi.pulse.prototype.config.misc.TransientConfiguration;
 import com.zutubi.pulse.prototype.config.setup.SetupConfiguration;
 import com.zutubi.pulse.prototype.config.types.*;
 import com.zutubi.pulse.servercore.config.CvsConfiguration;
@@ -24,17 +26,36 @@ public class ConfigurationRegistry
 {
     private static final Logger LOG = Logger.getLogger(ConfigurationRegistry.class);
 
-    private TypeRegistry typeRegistry;
-    private ConfigurationPersistenceManager configurationPersistenceManager;
+    private static final String TRANSIENT_SCOPE = "transient";
+
+    private CompositeType transientConfig;
     private Map<CompositeType, CompositeType> checkTypeMapping = new HashMap<CompositeType, CompositeType>();
 
-    public void init()
+    private TypeRegistry typeRegistry;
+    private ConfigurationPersistenceManager configurationPersistenceManager;
+
+    public void initSetup()
     {
         try
         {
             CompositeType setupConfig = registerConfigurationType(SetupConfiguration.class);
             configurationPersistenceManager.register("setup", setupConfig, false);
+        }
+        catch (TypeException e)
+        {
+            LOG.severe(e);
+        }
+    }
 
+    public void init()
+    {
+        try
+        {
+            transientConfig = registerConfigurationType(TransientConfiguration.class);
+            configurationPersistenceManager.register(TRANSIENT_SCOPE, transientConfig, false);
+
+            registerTransientConfiguration("login", LoginConfiguration.class);
+            
             CompositeType typeConfig = registerConfigurationType("typeConfig", ProjectTypeConfiguration.class);
             registerConfigurationType("internal.antTypeConfig", AntTypeConfiguration.class);
             registerConfigurationType("internal.customTypeConfig", CustomTypeConfiguration.class);
@@ -133,19 +154,25 @@ public class ConfigurationRegistry
         }
     }
 
+    public void registerTransientConfiguration(String propertyName, Class clazz) throws TypeException
+    {
+        CompositeType type = registerConfigurationType(clazz);
+        transientConfig.addProperty(new ExtensionTypeProperty(propertyName, type));
+    }
+
     public void registerProjectMapExtension(String name, Class clazz) throws TypeException
     {
         // create the map type.
-        MapType cleanupRules = new MapType(configurationPersistenceManager);
-        cleanupRules.setTypeRegistry(typeRegistry);
+        MapType mapType = new MapType(configurationPersistenceManager);
+        mapType.setTypeRegistry(typeRegistry);
 
         // register the new type.
-        CompositeType cleanupType = registerConfigurationType(clazz);
-        cleanupRules.setCollectionType(cleanupType);
+        CompositeType type = registerConfigurationType(clazz);
+        mapType.setCollectionType(type);
 
         // register the new type with the project as an extension point.
         CompositeType projectConfig = typeRegistry.getType(ProjectConfiguration.class);
-        projectConfig.addProperty(new ExtensionTypeProperty(name, cleanupRules));
+        projectConfig.addProperty(new ExtensionTypeProperty(name, mapType));
     }
 
     public CompositeType registerConfigurationType(Class clazz) throws TypeException

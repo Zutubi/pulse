@@ -1,40 +1,26 @@
 <html>
 <head>
-    <title>#wwtext("name=data.setup")</title>
-    <script type="text/javascript" src="$base/js/main.js"></script>
-    <script type="text/javascript">
-    <!--
-    	function openBrowseFileDialog()
-    	{
-    	    openFileDialog('$base/popups/fileDialog.action', 'setup.data', 'data', 'local:///', '', false, false, true);
-    	    return false;
-    	}
-    -->
-    </script>
+    <title>#i18n("key=data.setup")</title>
 </head>
 
 <body>
-    <h1>:: #wwtext("name=data.setup") ::</h1>
-<p>&nbsp;</p>
-    #parse("/template/includes/actionerrors.vm")
+    <h1>:: #i18n("key=data.setup") ::</h1>
 
-#wwcform("action=setupData.action" "heading=%{getText('data.setup')}" "name=setup.data" "method=post")
-    #wwtextfield("name=data" "required=true" "label=%{getText('data.field')}" "size=60" "tabindex=1"  "after= <a href='#' onclick='return openBrowseFileDialog();'>browse</a>"  "onkeypress=return submitenter(this,event);")
-    #inlineHelp("data.help")
-    #next(2)
-#end
-<p>
-    <img alt="info" src="$base/images/information.gif"/> $action.getText("data.using.config", [$pulseConfigPath])
-</p>
+    <p>&nbsp;</p>
+
+    #pform("path=$path" "action=setup/setupData.action")
+
+    <p>
+        <img alt="info" src="$base/images/information.gif"/> $action.getText("data.using.config", [$pulseConfigPath])
+    </p>
 #if(!$pulseConfigExists)
-<p>
-    <img alt="error" src="$base/images/exclamation.gif"/> #wwtext("name=data.config.missing")
-</p>
+    <p>
+        <img alt="error" src="$base/images/exclamation.gif"/> #i18n("key=data.config.missing")
+    </p>
 #end
-<div style="text-align:left;width:70%">
-    #wwtext("name=data.directory.what.is.it")
-    #wwtext("name=data.directory.where.should.it.go")
-</div>
-
+    <div style="text-align:left;width:70%">
+        #i18n("key=data.directory.what.is.it")
+        #i18n("key=data.directory.where.should.it.go")
+    </div>
 </body>
 </html>

@@ -11,6 +11,7 @@
         </property>
         <property name="daoContexts">
             <list>
+                <value>classpath:/com/zutubi/pulse/bootstrap/context/recordContext.xml</value>
                 <value>classpath:/com/zutubi/pulse/bootstrap/context/databaseContext.xml</value>
                 <value>classpath:/com/zutubi/pulse/bootstrap/context/hibernateContext.xml</value>
                 <value>classpath:/com/zutubi/pulse/bootstrap/context/cacheContext.xml</value>
@@ -23,7 +24,6 @@
         </property>
         <property name="setupContexts">
             <list>
-                <value>classpath:/com/zutubi/pulse/bootstrap/context/formsContext.xml</value>
                 <value>classpath:/com/zutubi/pulse/bootstrap/context/userContext.xml</value>
             </list>
         </property>

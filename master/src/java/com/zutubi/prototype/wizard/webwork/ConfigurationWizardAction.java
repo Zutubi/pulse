@@ -6,7 +6,6 @@ import com.zutubi.i18n.Messages;
 import com.zutubi.prototype.config.ConfigurationPersistenceManager;
 import com.zutubi.prototype.type.CollectionType;
 import com.zutubi.prototype.type.Type;
-import com.zutubi.prototype.type.TypeException;
 import com.zutubi.prototype.type.record.PathUtils;
 import com.zutubi.prototype.webwork.ConfigurationErrors;
 import com.zutubi.prototype.webwork.ConfigurationPanel;
@@ -186,15 +185,7 @@ public class ConfigurationWizardAction extends ActionSupport
 
     private boolean validateState()
     {
-        try
-        {
-            return getState().validate(path, new XWorkValidationAdapter(this));
-        }
-        catch (TypeException e)
-        {
-            addActionError(e.getMessage());
-            return false;
-        }
+        return getState().validate(path, new XWorkValidationAdapter(this));
     }
 
     private boolean validateWizard()

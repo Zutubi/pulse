@@ -28,11 +28,7 @@ import com.zutubi.pulse.scm.ScmException;
 import com.zutubi.util.logging.Logger;
 import org.acegisecurity.annotation.Secured;
 
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * 
@@ -150,7 +146,13 @@ public class DefaultProjectManager implements ProjectManager
 
     public Project getProject(String name)
     {
-        return projectDao.findByName(name);
+        ProjectConfiguration config = nameToConfig.get(name);
+        if(config == null)
+        {
+            return null;
+        }
+        
+        return projectDao.findById(config.getProjectId());
     }
 
     public Project getProject(long id)

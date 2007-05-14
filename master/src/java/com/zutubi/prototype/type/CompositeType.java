@@ -217,7 +217,18 @@ public class CompositeType extends AbstractType implements ComplexType
 
     public Record unstantiate(Object instance) throws TypeException
     {
-        MutableRecord result = newRecord();
+        MutableRecord result;
+
+        if(extensions.size() > 0)
+        {
+            CompositeType actualType = typeRegistry.getType(instance.getClass());
+            return actualType.unstantiate(instance);
+        }
+        else
+        {
+            result = newRecord();
+        }
+
         for (TypeProperty property : properties.values())
         {
             unstantiateProperty(property, instance, result);

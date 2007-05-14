@@ -102,7 +102,7 @@ public class FormDescriptor extends AbstractDescriptor
                 // fields have the _check postfix, so any fields defined in the fieldOrder annotation will fail.
                 continue;
             }
-            
+
             Field field = fieldDescriptor.instantiate(path, record);
             field.setTabindex(tabindex++);
             form.add(field);
@@ -125,7 +125,7 @@ public class FormDescriptor extends AbstractDescriptor
 
     private String getDefaultAction()
     {
-        String defaultAction = "save";
+        String defaultAction = actions.size() > 0 ? actions.get(0) : "save";
         for(String action: actions)
         {
             if(action.equals("next"))

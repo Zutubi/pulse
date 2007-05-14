@@ -20,26 +20,13 @@
     <bean id="annotationValidatorProvider" class="com.zutubi.validation.providers.AnnotationValidatorProvider"/>
     <bean id="reflectionValidatorProvider" class="com.zutubi.validation.providers.ReflectionValidatorProvider"/>
 
-    <!-- Record system -->
-    <bean id="recordRoot" class="org.springframework.beans.factory.config.PropertyPathFactoryBean">
-        <property name="targetBeanName">
-            <value>configurationManager</value>
-        </property>
-        <property name="propertyPath">
-            <value>userPaths.recordRoot</value>
-        </property>
-    </bean>
-
-    <bean id="recordSerialiser" class="com.zutubi.prototype.type.record.DefaultRecordSerialiser">
-        <constructor-arg index="0">
-            <ref local="recordRoot"/>
-        </constructor-arg>
-    </bean>
-    
-    <bean id="recordManager" class="com.zutubi.prototype.type.record.RecordManager" autowire="byName"/>
+    <!-- Config system -->
     <bean id="typeRegistry" class="com.zutubi.prototype.type.TypeRegistry" autowire="byName"/>
     <bean id="configurationRegistry" class="com.zutubi.prototype.config.ConfigurationRegistry" autowire="byName"/>
     <bean id="configurationPersistenceManager" class="com.zutubi.prototype.config.ConfigurationPersistenceManager" autowire="byName"/>
-    <bean id="configurationProvider" class="com.zutubi.prototype.config.DefaultConfigurationProvider" autowire="byName"/>
+
+    <bean id="formDescriptorFactory" class="com.zutubi.prototype.FormDescriptorFactory" autowire="byName" init-method="init"/>
+    <bean id="freemarkerConfiguration" class="com.zutubi.pulse.bootstrap.freemarker.FreemarkerConfigurationFactoryBean" autowire="byName"/>
+    <bean id="xworkObjectFactory" class="com.opensymphony.xwork.spring.SpringObjectFactory" init-method="initObjectFactory"/>
 </beans>
         

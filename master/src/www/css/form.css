@@ -1,3 +1,13 @@
+table.eform {
+    margin-top: 8px;
+    margin-bottom: 16px;
+}
+
+a.browse {
+    margin-left: 4px;
+}
+
+
 table.form {
     border: 1px solid #bbb;
     margin-bottom: 16px;

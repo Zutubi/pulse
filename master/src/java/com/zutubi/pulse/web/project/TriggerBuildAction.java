@@ -7,6 +7,7 @@ import com.zutubi.pulse.prototype.config.ProjectConfiguration;
 public class TriggerBuildAction extends ProjectActionSupport
 {
     private long id = -1;
+    private String projectName;
 
     public long getId()
     {
@@ -16,6 +17,11 @@ public class TriggerBuildAction extends ProjectActionSupport
     public void setId(long id)
     {
         this.id = id;
+    }
+
+    public String getProjectName()
+    {
+        return projectName;
     }
 
     public void validate()
@@ -38,6 +44,7 @@ public class TriggerBuildAction extends ProjectActionSupport
 
         if(projectConfig.getOptions().getPrompt())
         {
+            projectName = projectConfig.getName();
             return "prompt";
         }
         

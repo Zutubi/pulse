@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
+<beans default-autowire="byName">
+    <bean id="recordRoot" class="org.springframework.beans.factory.config.PropertyPathFactoryBean">
+        <property name="targetBeanName">
+            <value>configurationManager</value>
+        </property>
+        <property name="propertyPath">
+            <value>userPaths.recordRoot</value>
+        </property>
+    </bean>
+
+    <bean id="recordSerialiser" class="com.zutubi.prototype.type.record.DefaultRecordSerialiser">
+        <constructor-arg index="0">
+            <ref local="recordRoot"/>
+        </constructor-arg>
+    </bean>
+    
+    <bean id="recordManager" class="com.zutubi.prototype.type.record.RecordManager" autowire="byName"/>
+    
+    <bean id="configurationProvider" class="com.zutubi.prototype.config.DefaultConfigurationProvider" autowire="byName"/>
+</beans>
+        

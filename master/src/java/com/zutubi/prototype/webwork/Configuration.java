@@ -19,7 +19,6 @@ public class Configuration
 {
     private ConfigurationPersistenceManager configurationPersistenceManager;
 
-    private TypeRegistry typeRegistry;
     private ConfigurationRegistry configurationRegistry;
 
     private Record record;
@@ -66,7 +65,10 @@ public class Configuration
         parentPath = PathUtils.getPath(parentPathElements);
         currentPath = pathElements[pathElements.length - 1];
 
-        record = configurationPersistenceManager.getRecord(path);
+        if (configurationPersistenceManager.isPersistent(path))
+        {
+            record = configurationPersistenceManager.getRecord(path);
+        }
 
         parentPath = PathUtils.getParentPath(path);
 
@@ -179,11 +181,6 @@ public class Configuration
     public void setConfigurationPersistenceManager(ConfigurationPersistenceManager configurationPersistenceManager)
     {
         this.configurationPersistenceManager = configurationPersistenceManager;
-    }
-
-    public void setTypeRegistry(TypeRegistry typeRegistry)
-    {
-        this.typeRegistry = typeRegistry;
     }
 
     public void setConfigurationRegistry(ConfigurationRegistry configurationRegistry)

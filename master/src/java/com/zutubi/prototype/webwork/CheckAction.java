@@ -38,6 +38,7 @@ public class CheckAction extends PrototypeSupport
         return checkResponse;
     }
 
+    @SuppressWarnings({"unchecked"})
     public String execute() throws Exception
     {
         // first, gather all of the parameters (both those being checked and those used by the checking) so that
@@ -65,13 +66,13 @@ public class CheckAction extends PrototypeSupport
 
         // validate the check form first.
         boolean valid = true;
-        if (!configurationPersistenceManager.validate(null, null, checkRecord, new XWorkValidationAdapter(this)))
+        if (configurationPersistenceManager.validate(null, null, checkRecord, new XWorkValidationAdapter(this)) == null)
         {
             valid = false;
         }
 
         // validate the primary form.
-        if (!configurationPersistenceManager.validate(PathUtils.getParentPath(path), PathUtils.getBaseName(path), record, new XWorkValidationAdapter(this, "_check")))
+        if (configurationPersistenceManager.validate(PathUtils.getParentPath(path), PathUtils.getBaseName(path), record, new XWorkValidationAdapter(this, "_check")) == null)
         {
             valid = false;
         }

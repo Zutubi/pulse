@@ -1,33 +1,27 @@
 package com.zutubi.pulse.web.setup;
 
 import com.opensymphony.util.TextUtils;
+import com.zutubi.prototype.webwork.TransientAction;
 import com.zutubi.pulse.bootstrap.MasterConfigurationManager;
 import com.zutubi.pulse.bootstrap.SetupManager;
 import com.zutubi.pulse.bootstrap.conf.EnvConfig;
+import com.zutubi.pulse.prototype.config.setup.SetupDataConfiguration;
 import com.zutubi.pulse.util.FileSystemUtils;
 
 import java.io.File;
-import java.io.IOException;
 
 /**
- * <class-comment/>
  */
-public class SetupDataAction extends SetupActionSupport
+public class SetupDataAction extends TransientAction<SetupDataConfiguration>
 {
     private MasterConfigurationManager configurationManager;
     private SetupManager setupManager;
 
-    private String data;
     private File pulseConfig;
 
-    public String getData()
+    public SetupDataAction()
     {
-        return data;
-    }
-
-    public void setData(String data)
-    {
-        this.data = data;
+        super("setup/data");
     }
 
     public String getPulseConfigPath()
@@ -38,47 +32,6 @@ public class SetupDataAction extends SetupActionSupport
     public boolean getPulseConfigExists()
     {
         return getPulseConfig().isFile();
-    }
-
-    public void validate()
-    {
-        // if we already have validation errors, then do not continue.
-        if (hasErrors())
-        {
-            return;
-        }
-
-        // attempt to create the data directory. If this fails, we need to ask the
-        // user for another directory.
-        File data = new File(this.data);
-        if (!data.exists() && !data.mkdirs())
-        {
-            addFieldError("data", "Failed to create the specified data directory.");
-        }
-
-        // ensure that we have write access to the data directory.
-        checkDirectoryIsWritable(data);
-    }
-
-    private void checkDirectoryIsWritable(File data)
-    {
-        File tmpFile = null;
-        try
-        {
-            tmpFile = File.createTempFile("test", "tmp", data);
-        }
-        catch (IOException e)
-        {
-            addFieldError("data", "Failed to write to the selected data directory. Please ensure that pulse has " +
-                    "permission to write to the specified data directory.");
-        }
-        finally
-        {
-            if (tmpFile != null && tmpFile.isFile())
-            {
-                tmpFile.delete();
-            }
-        }
     }
 
     public File getPulseConfig()
@@ -98,50 +51,39 @@ public class SetupDataAction extends SetupActionSupport
         return pulseConfig;
     }
 
-    public String doInput() throws Exception
+    protected SetupDataConfiguration initialise() throws Exception
     {
-        // set the default.
+        String data;
+        SetupDataConfiguration config = new SetupDataConfiguration();
         String userHome = System.getProperty("user.home");
         if (TextUtils.stringSet(userHome))
         {
             String userConfig = configurationManager.getEnvConfig().getDefaultPulseConfigDir(MasterConfigurationManager.CONFIG_DIR);
-            this.data = FileSystemUtils.composeFilename(userConfig, "data");
+            data = FileSystemUtils.composeFilename(userConfig, "data");
         }
         else
         {
-            this.data = "data";
+            data = "data";
         }
 
         // make the path the shortest possible.
-        this.data = new File(this.data).getCanonicalPath();
-
-        return INPUT;
+        config.setData(new File(data).getCanonicalPath());
+        return config;
     }
 
-    public String execute() throws Exception
+    protected String complete(SetupDataConfiguration instance) throws Exception
     {
-        File home = new File(this.data);
+        File home = new File(instance.getData());
         configurationManager.setPulseData(home);
         setupManager.requestDataComplete();
-
         return SUCCESS;
     }
 
-    /**
-     * Required resource.
-     *
-     * @param configurationManager
-     */
     public void setConfigurationManager(MasterConfigurationManager configurationManager)
     {
         this.configurationManager = configurationManager;
     }
 
-    /**
-     * Required resource.
-     *
-     * @param setupManager
-     */
     public void setSetupManager(SetupManager setupManager)
     {
         this.setupManager = setupManager;

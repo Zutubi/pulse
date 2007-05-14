@@ -56,7 +56,7 @@ public class SaveAction extends PrototypeSupport
 
         String parentPath = PathUtils.getParentPath(path);
         String baseName = PathUtils.getBaseName(path);
-        if (!configurationPersistenceManager.validate(parentPath, baseName, record, new XWorkValidationAdapter(this)))
+        if (configurationPersistenceManager.validate(parentPath, baseName, record, new XWorkValidationAdapter(this)) == null)
         {
             prepare();
             return INPUT;

@@ -22,7 +22,7 @@ Ext.onReady(function()
         Ext.DomHelper.append(form.el, config);
     }
 
-    Ext.get(form.el).on('keypress', function(e) { if (e.getKey() == e.RETURN) { e.preventDefault(); } });
+    //Ext.get(form.el).on('keypress', function(e) { if (e.getKey() == e.RETURN) { e.preventDefault(); } });
     form.rendered = true;
     form.fireEvent('render', form);
 });

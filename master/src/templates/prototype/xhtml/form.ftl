@@ -57,6 +57,8 @@
 
         form.on('render', function()
         {
+            form.el.dom.name = '${form.name}';
+
             var errorMessage;
 
     <#list form.fields as field>
@@ -69,8 +71,6 @@
             Ext.get('${field.id}').on('keypress', function(event){ return handleKeypress(event);});
         </#if>
     </#list>
-
-            Ext.get('${form.fields[0].id}').focus()
         });
 
         <#include "/prototype/xhtml/form-fields.ftl"/>
@@ -82,4 +82,4 @@
 A table is used as there is no good way to have a div collapse to the
 width of its contents.  Floating it works, but hurts other things.
 -->
-<table><tr><td id="${form.id}"><td></tr></table>
+<table class="eform"><tr><td id="${form.name}.status"></td></tr><tr><td id="${form.id}"><td></tr></table>

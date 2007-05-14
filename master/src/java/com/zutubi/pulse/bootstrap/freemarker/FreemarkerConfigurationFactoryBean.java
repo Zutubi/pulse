@@ -8,6 +8,7 @@ import freemarker.cache.MultiTemplateLoader;
 import freemarker.cache.TemplateLoader;
 import freemarker.template.Configuration;
 import freemarker.template.DefaultObjectWrapper;
+import freemarker.template.TemplateModelException;
 import org.springframework.beans.factory.FactoryBean;
 
 import java.io.File;
@@ -30,28 +31,26 @@ public class FreemarkerConfigurationFactoryBean implements FactoryBean
             {
                 if (FREEMARKER_CONFIGURATION == null)
                 {
-                    FREEMARKER_CONFIGURATION = new Configuration();
-                    FREEMARKER_CONFIGURATION.setTemplateLoader(getMultiLoader());
-                    FREEMARKER_CONFIGURATION.setObjectWrapper(new DefaultObjectWrapper());
-                    FREEMARKER_CONFIGURATION.addAutoInclude("macro.ftl");
-                    FREEMARKER_CONFIGURATION.setSharedVariable("base", getConfigurationManager().getSystemConfig().getContextPathNormalised());
+                    FREEMARKER_CONFIGURATION = createConfiguration(getConfigurationManager());
                 }
             }
         }
         return FREEMARKER_CONFIGURATION;
     }
 
-    private TemplateLoader getMultiLoader()
+    public static Configuration createConfiguration(MasterConfigurationManager configurationManager) throws TemplateModelException
     {
-        MasterConfigurationManager manager = getConfigurationManager();
+        Configuration configuration = new Configuration();
+        configuration.setTemplateLoader(getMultiLoader(configurationManager));
+        configuration.setObjectWrapper(new DefaultObjectWrapper());
+        configuration.addAutoInclude("macro.ftl");
+        configuration.setSharedVariable("base", configurationManager.getSystemConfig().getContextPathNormalised());
+        return configuration;
+    }
 
-        List<File> templateRoots = manager.getSystemPaths().getTemplateRoots();
-        File userTemplateRoot = manager.getUserPaths().getUserTemplateRoot();
-        if(userTemplateRoot.isDirectory())
-        {
-            templateRoots.add(0, userTemplateRoot);
-        }
-
+    private static TemplateLoader getMultiLoader(MasterConfigurationManager configurationManager)
+    {
+        List<File> templateRoots = configurationManager.getSystemPaths().getTemplateRoots();
         FileTemplateLoader loaders[] = new FileTemplateLoader[templateRoots.size()];
 
         for (int i = 0; i < loaders.length; i++)

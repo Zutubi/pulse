@@ -2,13 +2,21 @@ package com.zutubi.pulse.web.project;
 
 import com.opensymphony.util.TextUtils;
 import com.opensymphony.xwork.ActionContext;
+import com.zutubi.prototype.model.Field;
+import com.zutubi.prototype.model.Form;
+import com.zutubi.prototype.velocity.PrototypeDirective;
 import com.zutubi.pulse.core.config.NamedConfigurationComparator;
 import com.zutubi.pulse.core.config.ResourceProperty;
 import com.zutubi.pulse.core.model.Revision;
 import com.zutubi.pulse.model.ManualTriggerBuildReason;
 import com.zutubi.pulse.scm.ScmException;
 import com.zutubi.util.logging.Logger;
+import freemarker.template.Configuration;
+import freemarker.template.Template;
+import freemarker.template.TemplateException;
 
+import java.io.IOException;
+import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -20,8 +28,15 @@ public class EditBuildPropertiesAction extends ProjectActionBase
 
     private static final String PROPERTY_PREFIX = "property.";
 
+    private String formSource;
     private String revision;
     private List<ResourceProperty> properties;
+    private Configuration freemarkerConfiguration;
+
+    public String getFormSource()
+    {
+        return formSource;
+    }
 
     public List<ResourceProperty> getProperties()
     {
@@ -38,18 +53,83 @@ public class EditBuildPropertiesAction extends ProjectActionBase
         this.revision = revision;
     }
 
-    public String doInput() throws Exception
+    private void renderForm() throws IOException, TemplateException
     {
         properties = new ArrayList<ResourceProperty>(getProjectConfig().getProperties().values());
         Collections.sort(properties, new NamedConfigurationComparator());
+
+        Form form = new Form();
+        form.setAjax(false);
+        form.setName("form");
+        form.setId("edit.build.properties");
+        form.setAction("editBuildProperties.action");
+
+        Field field = new Field();
+        field.setType("hidden");
+        field.setId("zfid.projectName");
+        field.setName("projectName");
+        field.setValue(getProjectName());
+        form.add(field);
+
+        field = new Field();
+        field.setType("text");
+        field.setId("zfid.revision");
+        field.setName("revision");
+        field.setLabel("revision");
+        field.setValue(revision);
+        form.add(field);
+
+        for(ResourceProperty property: properties)
+        {
+            field = new Field();
+            field.setType("text");
+            field.setId("zfid." + PROPERTY_PREFIX + property.getName());
+            field.setName(PROPERTY_PREFIX + property.getName());
+            field.setLabel(property.getName());
+            field.setValue(property.getValue());
+            form.add(field);
+        }
+
+        addSubmit(form, "trigger");
+        addSubmit(form, "cancel");
+
+        Map<String, Object> context = PrototypeDirective.initialiseContext(getClass());
+        context.put("form", form);
+        context.put("actionErrors", getActionErrors());
+        context.put("fieldErrors", getFieldErrors());
+
+        StringWriter writer = new StringWriter();
+        Template template = freemarkerConfiguration.getTemplate("prototype/xhtml/form.ftl");
+        template.process(context, writer);
+
+        formSource = writer.toString();
+    }
+
+    private void addSubmit(Form form, String name)
+    {
+        Field field;
+        field = new Field();
+        field.setType("submit");
+        field.setName(name);
+        field.setValue(name);
+        form.add(field);
+    }
+
+    public String doInput() throws Exception
+    {
+        renderForm();
         return INPUT;
     }
 
-    public String execute()
+    public String execute() throws IOException, TemplateException
     {
         getProjectManager().checkWrite(getProject());
 
         mapProperties();
+        // FIXME the values here do not seem to persist, but we are saving
+        // FIXME something accurate...also saving at this granularity is very
+        // FIXME heavy handed
+
         projectManager.saveProjectConfig(getProjectConfig());
 
         Revision r = null;
@@ -63,6 +143,7 @@ public class EditBuildPropertiesAction extends ProjectActionBase
             {
                 addFieldError("revision", "Unable to verify revision: " + e.getMessage());
                 LOG.severe(e);
+                renderForm();
                 return INPUT;
             }
         }
@@ -106,5 +187,10 @@ public class EditBuildPropertiesAction extends ProjectActionBase
                 }
             }
         }
+    }
+
+    public void setFreemarkerConfiguration(Configuration freemarkerConfiguration)
+    {
+        this.freemarkerConfiguration = freemarkerConfiguration;
     }
 }

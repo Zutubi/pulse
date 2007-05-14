@@ -67,9 +67,17 @@ public class ConfigurationPersistenceManager
     {
         validateConfiguration(type);
         rootScopes.put(scope, new ScopeInfo(scope, type, persistent));
-        if (persistent && !recordManager.containsRecord(scope))
+        if (persistent)
         {
-            recordManager.insert(scope, type.createNewRecord());
+            if(recordManager == null)
+            {
+                throw new IllegalArgumentException("Attempt to register persistent scope '" + scope + "' before persistence system is initialised");
+            }
+
+            if(!recordManager.containsRecord(scope))
+            {
+                recordManager.insert(scope, type.createNewRecord());
+            }
         }
 
         if (type instanceof CompositeType)
@@ -224,62 +232,96 @@ public class ConfigurationPersistenceManager
             throw new IllegalArgumentException("Invalid path '" + path + "': no parent");
         }
 
-        String lastElement = pathElements[pathElements.length - 1];
+        ScopeInfo info = rootScopes.get(pathElements[0]);
+        if (info == null)
+        {
+            throw new IllegalArgumentException("Invalid path '" + path + ": references non-existant root scope '" + pathElements[0] + "'");
+        }
 
         if (parentElements.length == 0)
         {
             // Parent is the base, special case this as the base is currently
             // like a composite without a registered type :/.
-            ScopeInfo info = rootScopes.get(lastElement);
-            if (info == null)
-            {
-                throw new IllegalArgumentException("Invalid path '" + path + ": references non-existant root scope '" + lastElement + "'");
-            }
-
             return info.getType();
         }
         else
         {
-            Record parentRecord = recordManager.load(PathUtils.getPath(parentElements));
-            if (parentRecord == null)
+            String lastElement = pathElements[pathElements.length - 1];
+            if(info.isPersistent())
             {
-                throw new IllegalArgumentException("Invalid path '" + path + "': parent does not exist");
-            }
-
-            String parentSymbolicName = parentRecord.getSymbolicName();
-            Object value = parentRecord.get(lastElement);
-
-            if (parentSymbolicName == null)
-            {
-                // Parent is a collection, last segment of path must refer to an
-                // existing child composite record.
-                if (value == null)
-                {
-                    throw new IllegalArgumentException("Invalid path '" + path + "': references unknown child '" + lastElement + "' of collection");
-                }
-                // TODO: validate that collections must not contain collections
-                return extractRecordType(value, path);
+                return lookupPersistentType(path, parentElements, lastElement);
             }
             else
             {
-                // Parent is a composite, see if the field exists.
-                CompositeType parentType = typeRegistry.getType(parentSymbolicName);
-                TypeProperty typeProperty = parentType.getProperty(lastElement);
-                if (typeProperty == null)
-                {
-                    throw new IllegalArgumentException("Invalid path '" + path + ": references non-existant field '" + lastElement + "' of type '" + parentSymbolicName + "'");
-                }
+                return lookupTransientType(path, pathElements, info);
+            }
+        }
+    }
 
-                Type type = typeProperty.getType();
-                if (value == null || type instanceof CollectionType)
-                {
-                    return type;
-                }
-                else
-                {
-                    // Return the type of the actual value.
-                    return extractRecordType(value, path);
-                }
+    private CompositeType lookupTransientType(String path, String[] pathElements, ScopeInfo info)
+    {
+        CompositeType type = (CompositeType) info.getType();
+        for(int i = 1; i < pathElements.length; i++)
+        {
+            TypeProperty property = type.getProperty(pathElements[i]);
+            if(property == null)
+            {
+                throw new IllegalArgumentException("Invalid path '" + path + "': references non-existant property '" + pathElements[i] + "' of class '" + type.getClazz().getName() + "'");
+            }
+
+            Type propertyType = property.getType();
+            if(!(propertyType instanceof CompositeType))
+            {
+                throw new IllegalArgumentException("Invalid path '" + path + "': references non-composite property '" + pathElements[i] + "' of class '" + type.getClazz().getName() + "'");
+            }
+
+            type = (CompositeType) propertyType;
+        }
+
+        return type;
+    }
+
+    private Type lookupPersistentType(String path, String[] parentElements, String lastElement)
+    {
+        Record parentRecord = recordManager.load(PathUtils.getPath(parentElements));
+        if (parentRecord == null)
+        {
+            throw new IllegalArgumentException("Invalid path '" + path + "': parent does not exist");
+        }
+
+        String parentSymbolicName = parentRecord.getSymbolicName();
+        Object value = parentRecord.get(lastElement);
+
+        if (parentSymbolicName == null)
+        {
+            // Parent is a collection, last segment of path must refer to an
+            // existing child composite record.
+            if (value == null)
+            {
+                throw new IllegalArgumentException("Invalid path '" + path + "': references unknown child '" + lastElement + "' of collection");
+            }
+            // TODO: validate that collections must not contain collections
+            return extractRecordType(value, path);
+        }
+        else
+        {
+            // Parent is a composite, see if the field exists.
+            CompositeType parentType = typeRegistry.getType(parentSymbolicName);
+            TypeProperty typeProperty = parentType.getProperty(lastElement);
+            if (typeProperty == null)
+            {
+                throw new IllegalArgumentException("Invalid path '" + path + ": references non-existant field '" + lastElement + "' of type '" + parentSymbolicName + "'");
+            }
+
+            Type type = typeProperty.getType();
+            if (value == null || type instanceof CollectionType)
+            {
+                return type;
+            }
+            else
+            {
+                // Return the type of the actual value.
+                return extractRecordType(value, path);
             }
         }
     }
@@ -317,7 +359,13 @@ public class ConfigurationPersistenceManager
         if (path.length() == 0)
         {
             // Root listing
-            list.addAll(rootScopes.keySet());
+            for(ScopeInfo info: rootScopes.values())
+            {
+                if(info.isPersistent())
+                {
+                    list.add(info.getScopeName());
+                }
+            }
         }
         else
         {
@@ -468,6 +516,8 @@ public class ConfigurationPersistenceManager
 
     public Record getRecord(String path)
     {
+        checkPersistent(path);
+
         Record record = recordManager.load(path);
         if (record == null)
         {
@@ -478,6 +528,8 @@ public class ConfigurationPersistenceManager
 
     private Record templatiseRecord(String path, Record record)
     {
+        checkPersistent(path);
+
         // We need to understand the root level can be templated.
         String[] pathElements = PathUtils.getPathElements(path);
         if (pathElements.length > 1)
@@ -540,7 +592,7 @@ public class ConfigurationPersistenceManager
         return result;
     }
 
-    private void checkPersistent(String path)
+    public boolean isPersistent(String path)
     {
         String[] parts = PathUtils.getPathElements(path);
         if(parts.length > 0)
@@ -550,10 +602,8 @@ public class ConfigurationPersistenceManager
             {
                 throw new IllegalArgumentException("Invalid path '" + path + "': references non-existant root scope '" + parts[0] + "'");
             }
-            else if(!rootScope.isPersistent())
-            {
-                throw new IllegalArgumentException("Attempt to write to non-persistent path '" + path + "'");
-            }
+
+            return rootScope.isPersistent();
         }
         else
         {
@@ -561,7 +611,15 @@ public class ConfigurationPersistenceManager
         }
     }
 
-    public boolean validate(String parentPath, String baseName, Record subject, ValidationAware validationCallback) throws TypeException
+    private void checkPersistent(String path)
+    {
+        if(!isPersistent(path))
+        {
+            throw new IllegalArgumentException("Attempt to manage records for non-persistent path '" + path + "'");
+        }
+    }
+
+    public Object validate(String parentPath, String baseName, Record subject, ValidationAware validationCallback)
     {
         // The type we validating against.
         Type type = typeRegistry.getType(subject.getSymbolicName());
@@ -584,19 +642,31 @@ public class ConfigurationPersistenceManager
             {
                 context.addFieldError(field, e.getFieldError(field));
             }
-            return false;
+            return null;
+        }
+        catch(TypeException e)
+        {
+            context.addActionError(e.getMessage());
+            return null;
         }
 
         // Process the instance via the validation manager.
         try
         {
             validationManager.validate(instance, context);
-            return !context.hasErrors();
+            if(context.hasErrors())
+            {
+                return null;
+            }
+            else
+            {
+                return instance;
+            }
         }
         catch (ValidationException e)
         {
             context.addActionError(e.getMessage());
-            return false;
+            return null;
         }
     }
 
