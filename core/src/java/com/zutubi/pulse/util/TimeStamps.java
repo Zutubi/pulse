@@ -200,9 +200,19 @@ public class TimeStamps implements Serializable
         return getPrettyDate(queueTime, locale);
     }
 
+    public String getPrettyStartDate()
+    {
+        return getPrettyStartDate(Locale.getDefault());
+    }
+
     public String getPrettyStartDate(Locale locale)
     {
         return getPrettyDate(startTime, locale);
+    }
+
+    public String getPrettyEndDate()
+    {
+        return getPrettyEndDate(Locale.getDefault());
     }
 
     public String getPrettyEndDate(Locale locale)
