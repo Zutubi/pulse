@@ -498,6 +498,7 @@ public class ThreadedRecipeQueue implements Runnable, RecipeQueue, EventListener
             context.setBuildNumber(request.getBuild().getNumber());
             context.setBuildRevision(buildRevision.getRevision().getRevisionString());
             context.setBuildTimestamp(buildRevision.getTimestamp());
+            context.setProjectName(recipeRequest.getProject());
             
             agent.getBuildService().build(recipeRequest, context);
             unavailableAgents.add(agent);

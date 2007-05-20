@@ -190,6 +190,22 @@ public class LicenseEncoder implements LicenseKeyFactory
         }
     }
 
+    private static class NewEvaluationLicense
+    {
+        public static void main(String[] args)
+        {
+            String projectName = "insert name here";
+
+            // code, name, expiry
+            SimpleDateFormat expiryFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+            Calendar oneMonthFromToday = Calendar.getInstance();
+            oneMonthFromToday.add(Calendar.MONTH, 1);
+
+            // code, name, expiry
+            LicenseEncoder.main(new String[]{LicenseType.EVALUATION.toString(), projectName, expiryFormat.format(oneMonthFromToday.getTime())});
+        }
+    }
+
     private static class NewOpenSourceLicense
     {
         public static void main(String[] args)
