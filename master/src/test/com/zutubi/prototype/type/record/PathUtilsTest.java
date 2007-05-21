@@ -8,39 +8,44 @@ public class PathUtilsTest extends TestCase
 {
     public void testPrefixMatchesSimpleMatch()
     {
-        assertTrue(PathUtils.prefixMatches("simple", "simple"));
+        assertTrue(PathUtils.prefixMatchesPathPattern("simple", "simple"));
     }
 
     public void testPrefixMatchesSimpleMismatch()
     {
-        assertFalse(PathUtils.prefixMatches("simple", "notsimple"));
+        assertFalse(PathUtils.prefixMatchesPathPattern("simple", "notsimple"));
     }
 
     public void testPrefixMatchesMultipleMatch()
     {
-        assertTrue(PathUtils.prefixMatches("simple/stuff", "simple"));
-        assertTrue(PathUtils.prefixMatches("simple/stuff", "simple/stuff"));
+        assertTrue(PathUtils.prefixMatchesPathPattern("simple/stuff", "simple"));
+        assertTrue(PathUtils.prefixMatchesPathPattern("simple/stuff", "simple/stuff"));
     }
 
     public void testPrefixMatchesMultipleMismatch()
     {
-        assertFalse(PathUtils.prefixMatches("simple/stuff", "stuff"));
+        assertFalse(PathUtils.prefixMatchesPathPattern("simple/stuff", "stuff"));
     }
 
     public void testPrefixMatchesWildcardMatch()
     {
-        assertTrue(PathUtils.prefixMatches("*/stuff", "some"));
-        assertTrue(PathUtils.prefixMatches("*/stuff", "some/stuff"));
+        assertTrue(PathUtils.prefixMatchesPathPattern("*/stuff", "some"));
+        assertTrue(PathUtils.prefixMatchesPathPattern("*/stuff", "some/stuff"));
     }
 
     public void testPrefixMatchesWildcardMismatch()
     {
-        assertFalse(PathUtils.prefixMatches("*/stuff", "some/thingelse"));
+        assertFalse(PathUtils.prefixMatchesPathPattern("*/stuff", "some/thingelse"));
     }
 
     public void testPrefixMatchesLongerPrefix()
     {
-        assertFalse(PathUtils.prefixMatches("simple", "simple/simple/simple"));
-        assertFalse(PathUtils.prefixMatches("simple", "complex/complex/complex"));
+        assertFalse(PathUtils.prefixMatchesPathPattern("simple", "simple/simple/simple"));
+        assertFalse(PathUtils.prefixMatchesPathPattern("simple", "complex/complex/complex"));
+    }
+
+    public void testPrefixMatchesWildcardChildren()
+    {
+
     }
 }

@@ -29,7 +29,7 @@ public class PathPredicate implements Predicate<Event>
             {
                 if(includeChildPaths)
                 {
-                    if(PathUtils.prefixMatches(pattern, path))
+                    if(PathUtils.prefixPatternMatchesPath(pattern, path))
                     {
                         return true;
                     }

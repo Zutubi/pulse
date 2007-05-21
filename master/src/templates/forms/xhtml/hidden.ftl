@@ -1,1 +1,0 @@
-<#include "/forms/simple/hidden.ftl" />

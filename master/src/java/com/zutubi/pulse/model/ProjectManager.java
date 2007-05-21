@@ -24,12 +24,6 @@ public interface ProjectManager extends EntityManager<Project>
 
     void saveProjectConfig(ProjectConfiguration config);
 
-    /**
-     * Looks up the project of the given name.
-     *
-     * @param name the name of the project to find
-     * @return the relevant project, or null if not found
-     */
     Project getProject(String name);
 
     Project getProject(long id);
@@ -40,8 +34,10 @@ public interface ProjectManager extends EntityManager<Project>
 
     int getProjectCount();
 
+/*
     @Secured({"ACL_PROJECT_WRITE"})
     void deleteArtifact(Project project, long id);
+*/
 
     void buildCommenced(long projectId);
 
@@ -112,7 +108,7 @@ public interface ProjectManager extends EntityManager<Project>
      * @param force         if true, force a build to occur even if the
      *                      latest has been built
      */
-    void triggerBuild(Project project, BuildReason reason, Revision revision, boolean force);
+    void triggerBuild(ProjectConfiguration project, BuildReason reason, Revision revision, boolean force);
 
     void triggerBuild(long number, Project project, User user, PatchArchive archive) throws PulseException;
 

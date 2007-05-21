@@ -1,7 +1,6 @@
 package com.zutubi.pulse.web.project;
 
 import com.zutubi.pulse.model.ProjectGroup;
-import com.zutubi.pulse.model.ProjectManager;
 import com.zutubi.pulse.web.ActionSupport;
 import com.zutubi.pulse.xwork.interceptor.Preparable;
 
@@ -77,7 +76,7 @@ public class ProjectGroupAction extends ActionSupport implements Preparable
         if(group != null)
         {
             name = group.getName();
-            projects = getHelper().convertToIds(group.getProjects());
+//            projects = getHelper().convertToIds(group.getProjects());
         }
 
         return INPUT;
@@ -100,7 +99,7 @@ public class ProjectGroupAction extends ActionSupport implements Preparable
     public String execute() throws Exception
     {
         group.setName(name);
-        getHelper().convertFromIds(projects, group.getProjects());
+//        getHelper().convertFromIds(projects, group.getProjects());
         projectManager.save(group);
         return SUCCESS;
     }

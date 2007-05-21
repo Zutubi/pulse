@@ -1,5 +1,7 @@
 package com.zutubi.i18n.context;
 
+import java.io.InputStream;
+
 /**
  * <class-comment/>
  */
@@ -36,6 +38,11 @@ public class ClassContext implements Context
     public Class getContext()
     {
         return context;
+    }
+
+    public InputStream getResourceAsStream(String name)
+    {
+        return context.getResourceAsStream(name);
     }
 
     public boolean equals(Object other)

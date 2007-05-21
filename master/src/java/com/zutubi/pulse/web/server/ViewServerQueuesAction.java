@@ -60,8 +60,8 @@ public class ViewServerQueuesAction extends ActionSupport
         buildQueue = new LinkedList<AbstractBuildRequestEvent>();
         executingBuilds = new LinkedList<BuildResult>();
 
-        Map<Entity, List<AbstractBuildRequestEvent>> builds = fatController.snapshotBuildQueue();
-        for(Entity entity: builds.keySet())
+        Map<Object, List<AbstractBuildRequestEvent>> builds = fatController.snapshotBuildQueue();
+        for(Object entity: builds.keySet())
         {
             List<AbstractBuildRequestEvent> events = builds.get(entity);
             if(events.size() > 0)

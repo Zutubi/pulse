@@ -16,6 +16,7 @@ import com.zutubi.util.logging.Logger;
 import com.zutubi.pulse.web.project.CommitMessageSupport;
 import com.zutubi.pulse.xwork.TextProviderSupport;
 import com.zutubi.pulse.xwork.interceptor.Cancelable;
+import com.zutubi.pulse.prototype.config.ProjectConfiguration;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
@@ -200,9 +201,14 @@ public class ActionSupport extends com.opensymphony.xwork.ActionSupport implemen
     {
         try
         {
-            if(revision != null && project != null && project.getChangeViewer() != null)
+            ProjectConfiguration projectConfig = null;
+            if (project != null)
             {
-                changeUrl = project.getChangeViewer().getChangesetURL(revision);
+                projectConfig = projectManager.getProjectConfig(project.getId());
+            }
+            if(revision != null && projectConfig != null && projectConfig.getChangeViewer() != null)
+            {
+                changeUrl = projectConfig.getChangeViewer().getChangesetURL(revision);
                 return;
             }
         }
@@ -231,7 +237,7 @@ public class ActionSupport extends com.opensymphony.xwork.ActionSupport implemen
                 {
                     for(long id: changelist.getProjectIds())
                     {
-                        Project p = getProjectManager().getProject(id);
+                        ProjectConfiguration p = getProjectManager().getProjectConfig(id);
                         if(p != null && p.getChangeViewer() != null)
                         {
                             String url = p.getChangeViewer().getChangesetURL(revision);

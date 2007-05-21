@@ -9,21 +9,9 @@
             <generator class="hilo"/>
         </id>
 
-        <property name="name" column="NAME" type="string" length="255"/>
-
         <property name="stateName" column="STATE" type="string" length="31"/>
 
         <property name="forceClean" column="FORCE_CLEAN" type="boolean"/>
-
-        <many-to-one name="pulseFileDetails" class="com.zutubi.pulse.model.PulseFileDetails" column="BOB_FILE_DETAILS" lazy="false" cascade="all"/>
-
-        <bag name="postBuildActions" cascade="all,delete-orphan" lazy="false">
-            <cache usage="read-write"/>
-            <key column="PROJECT_ID"/>
-            <one-to-many class="com.zutubi.pulse.model.PostBuildAction"/>
-        </bag>
-
-        <many-to-one name="changeViewer" class="com.zutubi.pulse.model.ChangeViewer" column="CHANGE_VIEWER" cascade="all" lazy="false"/>
 
         <bag name="aclEntries" inverse="true" cascade="all,delete-orphan" lazy="false">
             <cache usage="read-write"/>
@@ -34,43 +22,6 @@
         <property name="nextBuildNumber" column="NEXT_BUILD_NUMBER" type="long"/>
         <property name="lastPollTime" column="LAST_POLL_TIME" type="long"/>
 
-    </class>
-
-    <class name="com.zutubi.pulse.model.ChangeViewer" table="CHANGE_VIEWER" lazy="false">
-        <cache usage="read-write"/>
-
-        <id name="id" type="java.lang.Long" column="ID" unsaved-value="0">
-            <generator class="hilo"/>
-        </id>
-
-        <discriminator column="TYPE" type="string" length="63"/>
-
-        <subclass name="com.zutubi.pulse.model.CustomChangeViewer" discriminator-value="CUSTOM" lazy="false">
-            <property name="changesetURL" type="string" length="511"/>
-            <property name="fileViewURL" type="string" length="511"/>
-            <property name="fileDownloadURL" type="string" length="511"/>
-            <property name="fileDiffURL" type="string" length="511"/>
-        </subclass>
-
-        <subclass name="com.zutubi.pulse.model.FisheyeChangeViewer" discriminator-value="FISHEYE" lazy="false">
-            <property name="baseURL" type="string" length="511"/>
-            <property name="projectPath" type="string" length="511"/>
-        </subclass>
-
-        <subclass name="com.zutubi.pulse.model.P4WebChangeViewer" discriminator-value="P4WEB" lazy="false">
-            <property name="baseURL" type="string" length="511"/>
-            <property name="projectPath" type="string" length="511"/>
-        </subclass>
-
-        <subclass name="com.zutubi.pulse.model.TracChangeViewer" discriminator-value="TRAC" lazy="false">
-            <property name="baseURL" type="string" length="511"/>
-            <property name="projectPath" type="string" length="511"/>
-        </subclass>
-
-        <subclass name="com.zutubi.pulse.model.ViewVCChangeViewer" discriminator-value="VIEWVC" lazy="false">
-            <property name="baseURL" type="string" length="511"/>
-            <property name="projectPath" type="string" length="511"/>
-        </subclass>
     </class>
 
     <class name="com.zutubi.pulse.model.ProjectAclEntry" table="PROJECT_ACL_ENTRY" lazy="false">
@@ -211,39 +162,8 @@
         </subclass>
     </class>
 
-    <class name="com.zutubi.pulse.model.PostBuildAction" table="POST_BUILD_ACTION">
-        <cache usage="read-write"/>
-
-        <id name="id" type="java.lang.Long" column="ID" unsaved-value="0">
-            <generator class="hilo"/>
-        </id>
-
-        <discriminator column="TYPE" type="string" length="255"/>
-
-        <property name="name" type="string" length="255"/>
-
-        <property name="statesString" type="string" length="255"/>
-
-        <property name="failOnError" type="boolean"/>
-
-        <subclass name="com.zutubi.pulse.model.RunExecutablePostBuildAction" discriminator-value="EXECUTABLE" lazy="false">
-            <property name="command" type="string" length="255"/>
-            <property name="arguments" type="text"/>
-        </subclass>
-
-        <subclass name="com.zutubi.pulse.model.TagPostBuildAction" discriminator-value="TAG" lazy="false">
-            <property name="tag" type="string" length="255"/>
-            <property name="moveExisting" type="boolean"/>
-        </subclass>
-    </class>
-
     <query name="findAllProjectsCached" cacheable="true"><![CDATA[
         from Project project
-    ]]></query>
-
-    <query name="findByName" cacheable="true"><![CDATA[
-        from Project project
-        where project.name = :name
     ]]></query>
 
     <query name="findByAcl"><![CDATA[

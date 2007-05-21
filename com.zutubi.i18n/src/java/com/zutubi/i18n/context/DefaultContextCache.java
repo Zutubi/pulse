@@ -1,15 +1,15 @@
 package com.zutubi.i18n.context;
 
-import com.zutubi.i18n.context.Context;
-import com.zutubi.i18n.context.ContextCache;
-
-import java.util.*;
-import java.util.concurrent.locks.ReentrantReadWriteLock;
-
 import sun.misc.SoftCache;
 
+import java.util.List;
+import java.util.Locale;
+import java.util.ResourceBundle;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
+
 /**
- * <class-comment/>
+ * The default implementation of the context cache interface.
+ * 
  */
 public class DefaultContextCache implements ContextCache
 {
@@ -32,7 +32,7 @@ public class DefaultContextCache implements ContextCache
      *
      * @param context context with the scope of the bundle
      * @param locale  locale for the bundle
-     * @param bundle  bundle to add
+     * @param bundles  bundle to add
      */
     public void addToCache(Context context, Locale locale, List<ResourceBundle> bundles)
     {

@@ -76,6 +76,26 @@ public abstract class CollectionListener<T extends Configuration>
                 }
             }
         }, synchronous, true, path);
+
+/*
+        FIXME: need to fix this so that instanceChange callbacks are generated when nested paths of
+               the configured path are changed / added / deleted.
+        configurationProvider.registerEventListener(new ConfigurationEventListener()
+        {
+            public void handleConfigurationEvent(ConfigurationEvent event)
+            {
+                if(event instanceof PostInsertEvent)
+                {
+                    Configuration instance = (Configuration) ((PostInsertEvent)event).getNewInstance();
+                    T t = configurationProvider.getAncestorOfType(instance, configurationClass);
+                    if(t != null)
+                    {
+                        instanceChanged(t);
+                    }
+                }
+            }
+        }, synchronous, true, PathUtils.getPath(path, PathUtils.WILDCARD_ANY_ELEMENT));
+*/
     }
 
     protected abstract void preInsert(MutableRecord record);

@@ -6,6 +6,10 @@ import com.zutubi.pulse.core.config.ResourceProperty;
 import com.zutubi.pulse.core.config.AbstractNamedConfiguration;
 import com.zutubi.pulse.servercore.config.ScmConfiguration;
 import com.zutubi.pulse.model.ResourceRequirement;
+import com.zutubi.pulse.model.NamedEntity;
+import com.zutubi.pulse.prototype.config.types.TypeConfiguration;
+import com.zutubi.pulse.prototype.config.changeviewer.ChangeViewerConfiguration;
+import com.zutubi.pulse.prototype.config.actions.PostBuildActionConfiguration;
 import com.zutubi.prototype.type.Extendable;
 
 import java.util.Map;
@@ -17,9 +21,9 @@ import java.util.List;
  *
  */
 @Form(fieldOrder = {"name", "url", "description"})
-@Wizard("com.zutubi.prototype.wizard.webwork.ConfigureProjectWizard")
+@Wizard("ProjectConfigurationWizard")
 @Format("ProjectConfigurationFormatter")
-public class ProjectConfiguration extends AbstractNamedConfiguration implements Extendable
+public class ProjectConfiguration extends AbstractNamedConfiguration implements Extendable, NamedEntity
 {
     @Internal
     private long projectId;
@@ -27,7 +31,11 @@ public class ProjectConfiguration extends AbstractNamedConfiguration implements 
     private String url;
     @TextArea
     private String description;
+
     private ScmConfiguration scm;
+
+    private TypeConfiguration type;
+    
     private Map<String, ResourceProperty> properties;
 
     private BuildOptionsConfiguration options;
@@ -38,6 +46,11 @@ public class ProjectConfiguration extends AbstractNamedConfiguration implements 
 
     @Transient
     private Map<String, Object> extensions = new HashMap<String, Object>();
+
+    @Transient // sort this out later.
+    private List<PostBuildActionConfiguration> postBuildActions;
+
+    private ChangeViewerConfiguration changeViewer;
 
     public ProjectConfiguration()
     {
@@ -51,6 +64,12 @@ public class ProjectConfiguration extends AbstractNamedConfiguration implements 
     }
 
     public long getProjectId()
+    {
+        return projectId;
+    }
+
+    @Internal
+    public long getId()
     {
         return projectId;
     }
@@ -143,5 +162,35 @@ public class ProjectConfiguration extends AbstractNamedConfiguration implements 
     public void setRequirements(List<ResourceRequirement> requirements)
     {
         this.requirements = requirements;
+    }
+
+    public TypeConfiguration getType()
+    {
+        return type;
+    }
+
+    public void setType(TypeConfiguration type)
+    {
+        this.type = type;
+    }
+
+    public List<PostBuildActionConfiguration> getPostBuildActions()
+    {
+        return postBuildActions;
+    }
+
+    public void setPostBuildActions(List<PostBuildActionConfiguration> postBuildActions)
+    {
+        this.postBuildActions = postBuildActions;
+    }
+
+    public ChangeViewerConfiguration getChangeViewer()
+    {
+        return changeViewer;
+    }
+
+    public void setChangeViewer(ChangeViewerConfiguration changeViewer)
+    {
+        this.changeViewer = changeViewer;
     }
 }

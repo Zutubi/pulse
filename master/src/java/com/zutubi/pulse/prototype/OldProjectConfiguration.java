@@ -2,6 +2,7 @@ package com.zutubi.pulse.prototype;
 
 import com.zutubi.pulse.core.config.ResourceProperty;
 import com.zutubi.pulse.model.*;
+import com.zutubi.pulse.prototype.config.changeviewer.ChangeViewerConfiguration;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -39,10 +40,11 @@ public class OldProjectConfiguration
 
     // Configuration
 
-    private PulseFileDetails pulseFileDetails;
+//    private PulseFileDetails pulseFileDetails;
+    
     // Will change...
 
-    private ChangeViewer changeViewer;
+    private ChangeViewerConfiguration changeViewer;
     private Map<String, CommitMessageTransformer> commitMessageTransformers;
     private Map<String, PostBuildAction> postBuildActions;
 //    private Map<String, CleanupRule> cleanupRules;

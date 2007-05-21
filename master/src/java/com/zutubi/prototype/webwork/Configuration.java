@@ -10,6 +10,9 @@ import com.zutubi.pulse.bootstrap.ComponentContext;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Collections;
+import java.util.Comparator;
+import java.text.Collator;
 
 /**
  *
@@ -106,6 +109,17 @@ public class Configuration
                     nestedProperties.add(property.getName());
                 }
             }
+
+            // sort the nested properties.... this is a ui thing.
+            final Collator collator = Collator.getInstance();
+            Collections.sort(nestedProperties, new Comparator<String>()
+            {
+                public int compare(String o1, String o2)
+                {
+                    return collator.compare(o1, o2);
+                }
+            });
+
 
             extensions.addAll(((CompositeType) targetType).getExtensions());
 

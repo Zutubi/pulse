@@ -1,14 +1,15 @@
 package com.zutubi.pulse.prototype.config.types;
 
-import com.zutubi.pulse.core.config.AbstractConfiguration;
 import com.zutubi.config.annotations.SymbolicName;
+import com.opensymphony.util.TextUtils;
+import org.apache.velocity.VelocityContext;
 
 /**
  *
  *
  */
 @SymbolicName("internal.xcodeTypeConfig")
-public class XCodeTypeConfiguration extends AbstractConfiguration
+public class XCodeTypeConfiguration extends TemplateTypeConfiguration
 {
     private String workingDir = null;
     private String config = null;
@@ -75,5 +76,38 @@ public class XCodeTypeConfiguration extends AbstractConfiguration
     public void setSettings(String settings)
     {
         this.settings = settings;
+    }
+
+    protected String getTemplateName()
+    {
+        return "xcode.template.vm";
+    }
+
+    protected void setupContext(VelocityContext context)
+    {
+        if (TextUtils.stringSet(workingDir))
+        {
+            context.put("workingDir", workingDir);
+        }
+        if (TextUtils.stringSet(config))
+        {
+            context.put("config", config);
+        }
+        if (TextUtils.stringSet(project))
+        {
+            context.put("project", project);
+        }
+        if (TextUtils.stringSet(target))
+        {
+            context.put("target", target);
+        }
+        if (TextUtils.stringSet(action))
+        {
+            context.put("action", action);
+        }
+        if (TextUtils.stringSet(settings))
+        {
+            context.put("settings", settings);
+        }
     }
 }

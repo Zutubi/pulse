@@ -2,13 +2,15 @@ package com.zutubi.pulse.web.project;
 
 import com.zutubi.pulse.model.Project;
 import com.zutubi.pulse.model.ProjectManager;
+import com.zutubi.pulse.prototype.config.ProjectConfiguration;
 
 import java.util.List;
+import java.util.LinkedList;
 
 /**
  * Utilities for forms that deal with projects.
  */
-public class ProjectFormHelper extends NamedEntityFormHelper<Project>
+public class ProjectFormHelper extends NamedEntityFormHelper<ProjectConfiguration>
 {
     private ProjectManager projectManager;
 
@@ -17,13 +19,13 @@ public class ProjectFormHelper extends NamedEntityFormHelper<Project>
         this.projectManager = projectManager;
     }
 
-    protected Project get(long id)
+    protected ProjectConfiguration get(long id)
     {
-        return projectManager.getProject(id);
+        return projectManager.getProjectConfig(id);
     }
 
-    protected List<Project> getAll()
+    protected List<ProjectConfiguration> getAll()
     {
-        return projectManager.getProjects();
+        return new LinkedList<ProjectConfiguration>(projectManager.getAllProjectConfigs());
     }
 }

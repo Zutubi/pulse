@@ -4,6 +4,8 @@ import com.zutubi.config.annotations.Reference;
 import com.zutubi.prototype.config.events.*;
 import com.zutubi.prototype.type.*;
 import com.zutubi.prototype.type.record.*;
+import com.zutubi.prototype.i18n.Messages;
+import com.zutubi.prototype.i18n.TypeContext;
 import com.zutubi.pulse.core.config.Configuration;
 import com.zutubi.pulse.events.EventManager;
 import com.zutubi.util.ClassLoaderUtils;
@@ -186,7 +188,7 @@ public class ConfigurationPersistenceManager
             {
                 for (String candidatePattern : patterns)
                 {
-                    if (PathUtils.prefixMatches(candidatePattern, path))
+                    if (PathUtils.prefixMatchesPathPattern(candidatePattern, path))
                     {
                         return PathUtils.getParentPath(path);
                     }
@@ -207,7 +209,7 @@ public class ConfigurationPersistenceManager
         {
             for (String owningPath : paths)
             {
-                if (PathUtils.prefixMatches(owningPath, prefix))
+                if (PathUtils.prefixMatchesPathPattern(owningPath, prefix))
                 {
                     result.add(PathUtils.getPath(prefix, PathUtils.stripMatchingPrefix(owningPath, prefix)));
                 }
@@ -382,9 +384,26 @@ public class ConfigurationPersistenceManager
             else if (type instanceof CompositeType)
             {
                 CompositeType compositeType = (CompositeType) type;
+
+                // FIXME: this listing should be the I18N names, not the property names. However,
+                //        the listing in the UI needs to be modified to support separate display
+                //        names and paths. IE, the display name will be the I18N string, and the
+                //        path will be the properties actual name.
+
+/*
+                // for each compositeType, we want the types label.
+                for (Type propertyType : compositeType.getPropertyTypes(CompositeType.class))
+                {
+                    Messages typeMessages = Messages.getInstance(new TypeContext(propertyType));
+                    list.add(typeMessages.format("label"));
+                }
+*/
                 list.addAll(compositeType.getPropertyNames(CompositeType.class));
+
+                // for each collectionType, we want the target types label, with the 's' suffix?
                 list.addAll(compositeType.getPropertyNames(MapType.class));
                 list.addAll(compositeType.getPropertyNames(ListType.class));
+
                 return list;
             }
         }

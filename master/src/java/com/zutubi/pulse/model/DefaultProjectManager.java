@@ -22,6 +22,7 @@ import com.zutubi.pulse.model.persistence.ProjectGroupDao;
 import com.zutubi.pulse.model.persistence.TestCaseIndexDao;
 import com.zutubi.pulse.personal.PatchArchive;
 import com.zutubi.pulse.prototype.config.ProjectConfiguration;
+import com.zutubi.pulse.prototype.config.types.TypeConfiguration;
 import com.zutubi.pulse.scheduling.Scheduler;
 import com.zutubi.pulse.scheduling.SchedulingException;
 import com.zutubi.pulse.scm.ScmException;
@@ -102,6 +103,23 @@ public class DefaultProjectManager implements ProjectManager
 
         listener.register(configurationProvider);
         updateProjects();
+
+        // create default project if it is required.
+        ensureDefaultProjectDefined();
+    }
+
+    private void ensureDefaultProjectDefined()
+    {
+        if (configurationProvider.getAll(ProjectConfiguration.class).size() > 0)
+        {
+            return;
+        }
+
+/*
+        ProjectConfiguration defaultConfig = new ProjectConfiguration();
+        defaultConfig.setName("default project template");
+        configurationProvider.insert("project", defaultConfig);
+*/
     }
 
     @SuppressWarnings({"unchecked"})
@@ -151,7 +169,6 @@ public class DefaultProjectManager implements ProjectManager
         {
             return null;
         }
-        
         return projectDao.findById(config.getProjectId());
     }
 
@@ -227,15 +244,10 @@ public class DefaultProjectManager implements ProjectManager
     {
     }
 
-    public void triggerBuild(Project project, BuildReason reason, Revision revision, boolean force)
+    public void triggerBuild(ProjectConfiguration projectConfig, BuildReason reason, Revision revision, boolean force)
     {
-        ProjectConfiguration projectConfig = getProjectConfig(project.getId());
-        if(projectConfig == null)
-        {
-            // Unlikely, but it may have been deleted
-            return;
-        }
-        
+        Project project = getProject(projectConfig.getProjectId());
+
         if(revision == null)
         {
             if(projectConfig.getOptions().getIsolateChangelists())
@@ -278,8 +290,8 @@ public class DefaultProjectManager implements ProjectManager
         Revision revision = archive.getStatus().getRevision();
         try
         {
-            String pulseFile = getPulseFile(projectConfig, project, revision, archive);
-            eventManager.publish(new PersonalBuildRequestEvent(this, number, new BuildRevision(revision, pulseFile, false), user, archive, projectConfig, project));
+            String pulseFile = getPulseFile(projectConfig, revision, archive);
+            eventManager.publish(new PersonalBuildRequestEvent(this, number, new BuildRevision(revision, pulseFile, false), user, archive, projectConfig));
         }
         catch (BuildException e)
         {
@@ -300,7 +312,7 @@ public class DefaultProjectManager implements ProjectManager
     {
         try
         {
-            String pulseFile = getPulseFile(projectConfig, project, revision, null);
+            String pulseFile = getPulseFile(projectConfig, revision, null);
             eventManager.publish(new BuildRequestEvent(this, reason, projectConfig, project, new BuildRevision(revision, pulseFile, reason.isUser())));
         }
         catch (BuildException e)
@@ -309,11 +321,11 @@ public class DefaultProjectManager implements ProjectManager
         }
     }
 
-    private String getPulseFile(ProjectConfiguration projectConfig, Project project, Revision revision, PatchArchive patch) throws BuildException
+    private String getPulseFile(ProjectConfiguration projectConfig, Revision revision, PatchArchive patch) throws BuildException
     {
-        PulseFileDetails pulseFileDetails = project.getPulseFileDetails();
-        ComponentContext.autowire(pulseFileDetails);
-        return pulseFileDetails.getPulseFile(0, projectConfig, project, revision, patch);
+        TypeConfiguration type = projectConfig.getType();
+        ComponentContext.autowire(type);
+        return type.getPulseFile(0, projectConfig, revision, patch);
     }
 
     public List<Project> getProjectsWithAdmin(String authority)
@@ -420,6 +432,7 @@ public class DefaultProjectManager implements ProjectManager
     }
 */
 
+/*
     @Secured({"ACL_PROJECT_WRITE"})
     public void deleteArtifact(Project project, long id)
     {
@@ -444,6 +457,7 @@ public class DefaultProjectManager implements ProjectManager
             }
         }
     }
+*/
 
     public void buildCommenced(long projectId)
     {

@@ -31,6 +31,10 @@ public class GetTextMethod implements TemplateMethodModel
         String value = null;
         for (Messages message : messages)
         {
+            if (message == null)
+            {
+                continue;
+            }
             value = message.format(key);
             if (TextUtils.stringSet(value))
             {

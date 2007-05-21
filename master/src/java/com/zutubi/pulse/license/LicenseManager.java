@@ -1,13 +1,22 @@
 package com.zutubi.pulse.license;
 
+import com.zutubi.prototype.config.ConfigurationEventListener;
+import com.zutubi.prototype.config.PathPredicate;
+import com.zutubi.prototype.config.ConfigurationProvider;
+import com.zutubi.prototype.config.events.ConfigurationEvent;
+import com.zutubi.prototype.config.events.PostSaveEvent;
+import com.zutubi.prototype.type.record.PathUtils;
+import com.zutubi.pulse.Version;
+import com.zutubi.pulse.bootstrap.ComponentContext;
 import com.zutubi.pulse.events.DataDirectoryChangedEvent;
 import com.zutubi.pulse.events.Event;
 import com.zutubi.pulse.events.EventListener;
 import com.zutubi.pulse.events.EventManager;
+import com.zutubi.pulse.events.FilteringListener;
 import com.zutubi.pulse.license.authorisation.Authorisation;
 import com.zutubi.pulse.license.authorisation.CanRunPulseAuthorisation;
+import com.zutubi.pulse.prototype.config.admin.LicenseConfiguration;
 import com.zutubi.util.logging.Logger;
-import com.zutubi.pulse.Version;
 
 import java.util.Arrays;
 import java.util.LinkedList;
@@ -15,9 +24,8 @@ import java.util.List;
 
 /**
  * The License manager handles all things license related.
- *
  */
-public class LicenseManager
+public class LicenseManager implements ConfigurationEventListener
 {
     private static final Logger LOG = Logger.getLogger(LicenseManager.class);
 
@@ -34,7 +42,6 @@ public class LicenseManager
      * Update the installed license key
      *
      * @param newKey the new license key string
-     *
      * @throws LicenseException if the specified license can not be installed.
      */
     public void installLicense(String newKey) throws LicenseException
@@ -74,7 +81,60 @@ public class LicenseManager
                 return new Class[]{DataDirectoryChangedEvent.class};
             }
         });
-        
+
+        //FIXME: it would be nice not to have to 'go behind the back' of the configuration system like this
+        //       because the system is not yet avialable.  Also, the real solution is probably to support
+        //       storage of data externally from the configuration system, so that we dont have the data in two locations.
+        FilteringListener filter = new FilteringListener(new PathPredicate(true, "/global/*"), new EventListener()
+        {
+            // we need this state check to prevent the listeners updating of the license from triggering
+            // this listener over and over.
+            private boolean updatingLicense = false;
+
+            public void handleEvent(Event evt)
+            {
+                if (evt instanceof PostSaveEvent)
+                {
+                    PostSaveEvent psEvt = (PostSaveEvent) evt;
+                    if (psEvt.getNewInstance() instanceof LicenseConfiguration)
+                    {
+                        if (updatingLicense)
+                        {
+                            return;
+                        }
+                        try
+                        {
+                            updatingLicense = true;
+                            LicenseConfiguration config = (LicenseConfiguration) psEvt.getNewInstance();
+                            installLicense(config.getKey());
+
+                            License license = LicenseHolder.getLicense();
+                            config.setName(license.getHolder());
+                            config.setType(license.getType().toString());
+
+                            // now we also need to save the change.
+                            ConfigurationProvider provider = ComponentContext.getBean("configurationProvider");
+                            String parentPath = PathUtils.getParentPath(config.getConfigurationPath());
+                            String baseName = PathUtils.getBaseName(config.getConfigurationPath());
+                            provider.save(parentPath, baseName, config);
+                        }
+                        finally
+                        {
+                            updatingLicense = false;
+                        }
+                    }
+                }
+            }
+
+            public Class[] getHandledEvents()
+            {
+                return new Class[]{ConfigurationEvent.class};
+            }
+        });
+        eventManager.register(filter);
+
+        // also, on system started, we need to sync the existing license details with those of the configuration system. 
+
         refresh();
     }
 
@@ -116,7 +176,6 @@ public class LicenseManager
      * Check whether or not the currently installed license is able to run the specified version of pulse.
      *
      * @param version to check
-     * 
      * @return true if the installed license can run the specified version, false otherwise.
      */
     public boolean canRun(Version version)
@@ -140,6 +199,18 @@ public class LicenseManager
     {
         this.authorisations.add(auth);
         refreshAuthorisations();
+    }
+
+    public void handleConfigurationEvent(ConfigurationEvent event)
+    {
+        if (event instanceof PostSaveEvent)
+        {
+            LicenseConfiguration config = (LicenseConfiguration) ((PostSaveEvent) event).getNewInstance();
+            installLicense(config.getKey());
+
+            License license = LicenseHolder.getLicense();
+            config.setName(license.getHolder());
+        }
     }
 
     /**

@@ -1,24 +1,34 @@
 package com.zutubi.pulse.prototype.config.types;
 
 import com.zutubi.config.annotations.SymbolicName;
-import com.zutubi.pulse.core.config.AbstractConfiguration;
+import com.zutubi.config.annotations.TextArea;
+import com.zutubi.pulse.prototype.config.ProjectConfiguration;
+import com.zutubi.pulse.model.Project;
+import com.zutubi.pulse.core.model.Revision;
+import com.zutubi.pulse.personal.PatchArchive;
 
 /**
  *
  *
  */
 @SymbolicName("internal.customTypeConfig")
-public class CustomTypeConfiguration extends AbstractConfiguration
+public class CustomTypeConfiguration extends TypeConfiguration
 {
-    private String pulseFile;
+    @TextArea
+    private String pulseFileString;
 
-    public String getPulseFile()
+    public String getPulseFile(long id, ProjectConfiguration projectConfig, Revision revision, PatchArchive patch)
     {
-        return pulseFile;
+        return pulseFileString;
     }
 
-    public void setPulseFile(String pulseFile)
+    public String getPulseFileString()
     {
-        this.pulseFile = pulseFile;
+        return pulseFileString;
+    }
+
+    public void setPulseFileString(String pulseFileString)
+    {
+        this.pulseFileString = pulseFileString;
     }
 }

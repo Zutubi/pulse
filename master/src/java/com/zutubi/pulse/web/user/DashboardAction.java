@@ -102,7 +102,7 @@ public class DashboardAction extends ActionSupport
             shownProjects = new ArrayList<Project>(user.getShownProjects());
         }
         
-        Collections.sort(shownProjects, new NamedEntityComparator());
+//        Collections.sort(shownProjects, new NamedEntityComparator());
 
         shownGroups = new ArrayList<ProjectGroup>(user.getShownGroups());
         Collections.sort(shownGroups, new NamedEntityComparator());

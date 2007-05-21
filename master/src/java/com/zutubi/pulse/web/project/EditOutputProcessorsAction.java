@@ -54,11 +54,13 @@ public class EditOutputProcessorsAction extends ProjectActionSupport
     public String doInput()
     {
         project = getProjectManager().getProject(projectId);
+/*
         if(project != null && project.getPulseFileDetails().isBuiltIn())
         {
             TemplatePulseFileDetails details = (TemplatePulseFileDetails) project.getPulseFileDetails();
             processors = details.getOutputProcessors();
         }
+*/
         return INPUT;
     }
 
@@ -74,6 +76,7 @@ public class EditOutputProcessorsAction extends ProjectActionSupport
 
     public String execute()
     {
+/*
         TemplatePulseFileDetails details = (TemplatePulseFileDetails) project.getPulseFileDetails();
         List<String> procs = details.getOutputProcessors();
         procs.clear();
@@ -81,6 +84,7 @@ public class EditOutputProcessorsAction extends ProjectActionSupport
         {
             procs.addAll(processors);
         }
+*/
 
         getProjectManager().save(project);
         return SUCCESS;

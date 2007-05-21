@@ -62,11 +62,12 @@ public class RecipeProcessor
         eventManager.publish(new RecipeCommencedEvent(this, recipeResult.getId(), recipeResult.getRecipeName(), recipeResult.getStartTime()));
 
         CommandOutputStream outputStream = null;
+        Scope globalScope = new Scope();
         try
         {
             long recipeStartTime = recipeResult.getStartTime();
 
-            RecipeContext recipeContext = createRecipeContext(paths, testResults, null, recipeStartTime, context, request.getId());
+            RecipeContext recipeContext = createRecipeContext(paths, testResults, globalScope, recipeStartTime, context, request.getId());
             if(capture)
             {
                 outputStream = new CommandOutputStream(eventManager, runningRecipe, true);

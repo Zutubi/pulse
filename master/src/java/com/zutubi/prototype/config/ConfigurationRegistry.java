@@ -2,8 +2,28 @@ package com.zutubi.prototype.config;
 
 import com.zutubi.config.annotations.ConfigurationCheck;
 import com.zutubi.prototype.ConfigurationCheckHandler;
-import com.zutubi.prototype.type.*;
-import com.zutubi.pulse.prototype.config.*;
+import com.zutubi.prototype.type.CompositeType;
+import com.zutubi.prototype.type.ExtensionTypeProperty;
+import com.zutubi.prototype.type.MapType;
+import com.zutubi.prototype.type.ProjectMapType;
+import com.zutubi.prototype.type.TypeException;
+import com.zutubi.prototype.type.TypeHandler;
+import com.zutubi.prototype.type.TypeRegistry;
+import com.zutubi.prototype.type.ListType;
+import com.zutubi.pulse.prototype.config.triggers.BuildCompletedTriggerConfiguration;
+import com.zutubi.pulse.prototype.config.triggers.TriggerConfiguration;
+import com.zutubi.pulse.prototype.config.triggers.CronBuildTriggerConfiguration;
+import com.zutubi.pulse.prototype.config.triggers.ScmBuildTriggerConfiguration;
+import com.zutubi.pulse.prototype.config.CommitMessageConfiguration;
+import com.zutubi.pulse.prototype.config.CustomCommitMessageConfiguration;
+import com.zutubi.pulse.prototype.config.JiraCommitMessageConfiguration;
+import com.zutubi.pulse.prototype.config.ProjectConfiguration;
+import com.zutubi.pulse.prototype.config.changeviewer.FisheyeConfiguration;
+import com.zutubi.pulse.prototype.config.changeviewer.ChangeViewerConfiguration;
+import com.zutubi.pulse.prototype.config.changeviewer.CustomChangeViewerConfiguration;
+import com.zutubi.pulse.prototype.config.changeviewer.P4WebChangeViewer;
+import com.zutubi.pulse.prototype.config.changeviewer.TracChangeViewer;
+import com.zutubi.pulse.prototype.config.changeviewer.ViewVCChangeViewer;
 import com.zutubi.pulse.prototype.config.admin.GlobalConfiguration;
 import com.zutubi.pulse.prototype.config.agent.AgentConfiguration;
 import com.zutubi.pulse.prototype.config.misc.LoginConfiguration;
@@ -55,8 +75,8 @@ public class ConfigurationRegistry
             configurationPersistenceManager.register(TRANSIENT_SCOPE, transientConfig, false);
 
             registerTransientConfiguration("login", LoginConfiguration.class);
-            
-            CompositeType typeConfig = registerConfigurationType("typeConfig", ProjectTypeConfiguration.class);
+
+            CompositeType typeConfig = registerConfigurationType("internal.typeConfig", TypeConfiguration.class);
             registerConfigurationType("internal.antTypeConfig", AntTypeConfiguration.class);
             registerConfigurationType("internal.customTypeConfig", CustomTypeConfiguration.class);
             registerConfigurationType("internal.executableTypeConfig", ExecutableTypeConfiguration.class);
@@ -75,33 +95,22 @@ public class ConfigurationRegistry
             typeConfig.addExtension("internal.versionedTypeConfig");
             typeConfig.addExtension("internal.xcodeTypeConfig");
 
-            // commit message processors.
-            CompositeType commitConfig = registerConfigurationType(CommitMessageConfiguration.class);
-            registerConfigurationType("jiraCommitConfig", JiraCommitMessageConfiguration.class);
-            registerConfigurationType("customCommitConfig", CustomCommitMessageConfiguration.class);
-
-            commitConfig.addExtension("jiraCommitConfig");
-            commitConfig.addExtension("customCommitConfig");
-
-            // change view configuration
+            // change viewer configuration
             CompositeType changeViewerConfig = registerConfigurationType("changeViewerConfig", ChangeViewerConfiguration.class);
             registerConfigurationType("fisheyeChangeViewerConfig", FisheyeConfiguration.class);
             registerConfigurationType("customChangeViewerConfig", CustomChangeViewerConfiguration.class);
+            registerConfigurationType("p4WebChangeViewerConfig", P4WebChangeViewer.class);
+            registerConfigurationType("tracChangeViewerConfig", TracChangeViewer.class);
+            registerConfigurationType("viewVCChangeViewerConfig", ViewVCChangeViewer.class);
 
             changeViewerConfig.addExtension("fisheyeChangeViewerConfig");
             changeViewerConfig.addExtension("customChangeViewerConfig");
-
-            CompositeType artifactConfig = registerConfigurationType("artifactConfig", ArtifactConfiguration.class);
-            registerConfigurationType("fileArtifactConfig", FileArtifactConfiguration.class);
-            registerConfigurationType("directoryArtifactConfig", DirectoryArtifactConfiguration.class);
-
-            artifactConfig.addExtension("fileArtifactConfig");
-            artifactConfig.addExtension("directoryArtifactConfig");
+            changeViewerConfig.addExtension("p4WebChangeViewerConfig");
+            changeViewerConfig.addExtension("tracChangeViewerConfig");
+            changeViewerConfig.addExtension("viewVCChangeViewerConfig");
 
             // generated dynamically as new components are registered.
             CompositeType projectConfig = registerConfigurationType("projectConfig", ProjectConfiguration.class);
-            projectConfig.addProperty(new ExtensionTypeProperty("type", typeConfig));
-            projectConfig.addProperty(new ExtensionTypeProperty("changeViewer", changeViewerConfig));
 
             // scm configuration
             CompositeType scmConfig = typeRegistry.getType(ScmConfiguration.class);
@@ -117,16 +126,38 @@ public class ConfigurationRegistry
             // Triggers
             CompositeType triggerConfig = registerConfigurationType("triggerConfig", TriggerConfiguration.class);
             registerConfigurationType("buildCompletedConfig", BuildCompletedTriggerConfiguration.class);
+            registerConfigurationType("cronTriggerConfig", CronBuildTriggerConfiguration.class);
+            registerConfigurationType("scmTriggerConfig", ScmBuildTriggerConfiguration.class);
+
             triggerConfig.addExtension("buildCompletedConfig");
+            triggerConfig.addExtension("cronTriggerConfig");
+            triggerConfig.addExtension("scmTriggerConfig");
+            
             MapType triggers = new MapType(configurationPersistenceManager);
             triggers.setTypeRegistry(typeRegistry);
             triggers.setCollectionType(typeRegistry.getType("triggerConfig"));
             projectConfig.addProperty(new ExtensionTypeProperty("trigger", triggers));
 
+            // Artifacts.
+            CompositeType artifactConfig = registerConfigurationType("artifactConfig", ArtifactConfiguration.class);
+            registerConfigurationType("fileArtifactConfig", FileArtifactConfiguration.class);
+            registerConfigurationType("directoryArtifactConfig", DirectoryArtifactConfiguration.class);
+
+            artifactConfig.addExtension("fileArtifactConfig");
+            artifactConfig.addExtension("directoryArtifactConfig");
+
             ListType artifacts = new ListType(configurationPersistenceManager);
             artifacts.setTypeRegistry(typeRegistry);
             artifacts.setCollectionType(typeRegistry.getType("artifactConfig"));
             projectConfig.addProperty(new ExtensionTypeProperty("artifact", artifacts));
+
+            // commit message processors.
+            CompositeType commitConfig = registerConfigurationType(CommitMessageConfiguration.class);
+            registerConfigurationType("jiraCommitConfig", JiraCommitMessageConfiguration.class);
+            registerConfigurationType("customCommitConfig", CustomCommitMessageConfiguration.class);
+
+            commitConfig.addExtension("jiraCommitConfig");
+            commitConfig.addExtension("customCommitConfig");
 
             MapType commitTransformers = new MapType(configurationPersistenceManager);
             commitTransformers.setTypeRegistry(typeRegistry);
@@ -144,7 +175,7 @@ public class ConfigurationRegistry
             agentCollection.setTypeRegistry(typeRegistry);
             agentCollection.setCollectionType(registerConfigurationType(AgentConfiguration.class));
             configurationPersistenceManager.register("agent", agentCollection);
-            
+
             CompositeType globalConfig = registerConfigurationType("globalConfig", GlobalConfiguration.class);
             configurationPersistenceManager.register(GlobalConfiguration.SCOPE_NAME, globalConfig);
         }

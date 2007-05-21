@@ -115,10 +115,12 @@ public abstract class AbstractEditArtifactAction extends ProjectActionSupport im
             return;
         }
 
+/*
         if(!project.getPulseFileDetails().isBuiltIn())
         {
             addActionError("Invalid operation for project");
         }
+*/
     }
 
     public void validate()
@@ -129,12 +131,14 @@ public abstract class AbstractEditArtifactAction extends ProjectActionSupport im
             return;
         }
 
+/*
         TemplatePulseFileDetails details = (TemplatePulseFileDetails) project.getPulseFileDetails();
         Capture sameName = details.getCapture(name);
         if(sameName != null && sameName.getId() != capture.getId())
         {
             addFieldError("name", "the name " + name + " is already being used");
         }
+*/
     }
 
     public void prepare() throws Exception
@@ -145,12 +149,14 @@ public abstract class AbstractEditArtifactAction extends ProjectActionSupport im
             return;
         }
 
+/*
         capture = ((TemplatePulseFileDetails)project.getPulseFileDetails()).getCapture(id);
         if(capture == null)
         {
             addActionError("Unknown artifact [" + id + "]");
             return;
         }
+*/
 
         if(!verifyCapture(capture))
         {

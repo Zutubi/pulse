@@ -11,7 +11,7 @@ import java.util.List;
  * 
  *
  */
-public class Project extends Entity implements AclObjectIdentity, AclObjectIdentityAware, NamedEntity
+public class Project extends Entity implements AclObjectIdentity, AclObjectIdentityAware
 {
     public enum State
     {
@@ -41,13 +41,6 @@ public class Project extends Entity implements AclObjectIdentity, AclObjectIdent
 
     // Not sure where the ACLs belong, in the database or in the configuration
     private List<ProjectAclEntry> aclEntries;
-
-    // the following fields are being transfered to the configuration system and will be
-    // removed shortly.
-    private String name;
-    private PulseFileDetails pulseFileDetails;
-    private List<PostBuildAction> postBuildActions = new LinkedList<PostBuildAction>();
-    private ChangeViewer changeViewer;
 
     public Project()
     {
@@ -151,158 +144,6 @@ public class Project extends Entity implements AclObjectIdentity, AclObjectIdent
     {
         this.nextBuildNumber = nextBuildNumber;
     }
-
-    /**
-     * @deprecated
-     */
-    public Project(String name, String description)
-    {
-        this.name = name;
-        this.pulseFileDetails = new VersionedPulseFileDetails("pulse.xml");
-    }
-
-    /**
-     * @deprecated
-     */
-    public Project(String name)
-    {
-        this(name, null);
-    }
-
-    /**
-     * Returns a new project that is an exact replica of this project, but
-     * with a different name and description.
-     *
-     * @param name        the name of the new project
-     * @param description the description of the new project
-     * @return a copy of this project with the given name
-     */
-    public Project copy(String name, String description)
-    {
-        Project copy = new Project();
-        copy.name = name;
-
-        // Fix the build specification references. The copied post build actions currently reference the original
-        // projects specifications. Since the specifications have themselves been copied, we need to reference the
-        // new copies.
-/*
-        for(PostBuildAction action: copy.postBuildActions)
-        {
-            List<BuildSpecification> copiedSpecs = new LinkedList<BuildSpecification>();
-            for (BuildSpecification originalSpec : action.getSpecifications())
-            {
-                // find the copied spec that matches the original.
-                for (BuildSpecification copiedSpec : copy.buildSpecifications)
-                {
-                    if (copiedSpec.getName().equals(originalSpec.getName()))
-                    {
-                        copiedSpecs.add(copiedSpec);
-                        break;
-                    }
-                }
-            }
-            action.setSpecifications(copiedSpecs);
-        }
-*/
-
-        copy.aclEntries = new LinkedList<ProjectAclEntry>();
-        for(ProjectAclEntry acl: getAclEntries())
-        {
-            copy.aclEntries.add(acl.copy(copy));
-        }
-
-        return copy;
-    }
-
-    public String getName()
-    {
-        return name;
-    }
-
-    public void setName(String name)
-    {
-        this.name = name;
-    }
-
-    public ChangeViewer getChangeViewer()
-    {
-        return changeViewer;
-    }
-
-    public void setChangeViewer(ChangeViewer changeViewer)
-    {
-        this.changeViewer = changeViewer;
-    }
-
-    public PulseFileDetails getPulseFileDetails()
-    {
-        return pulseFileDetails;
-    }
-
-    public void setPulseFileDetails(PulseFileDetails pulseFileDetails)
-    {
-        this.pulseFileDetails = pulseFileDetails;
-    }
-
-    public List<PostBuildAction> getPostBuildActions()
-    {
-        return postBuildActions;
-    }
-
-    private void setPostBuildActions(List<PostBuildAction> postBuildActions)
-    {
-        this.postBuildActions = postBuildActions;
-    }
-
-    public void addPostBuildAction(PostBuildAction action)
-    {
-        postBuildActions.add(action);
-    }
-
-    public void removePostBuildAction(long id)
-    {
-        PostBuildAction deadActionWalking = null;
-        for(PostBuildAction action: postBuildActions)
-        {
-            if(action.getId() == id)
-            {
-                deadActionWalking = action;
-                break;
-            }
-        }
-
-        if(deadActionWalking != null)
-        {
-            postBuildActions.remove(deadActionWalking);
-        }
-    }
-
-    public PostBuildAction getPostBuildAction(String name)
-    {
-        for(PostBuildAction p: postBuildActions)
-        {
-            if(p.getName().equals(name))
-            {
-                return p;
-            }
-        }
-
-        return null;
-    }
-
-    public PostBuildAction getPostBuildAction(long id)
-    {
-        for(PostBuildAction a: postBuildActions)
-        {
-            if(a.getId() == id)
-            {
-                return a;
-            }
-        }
-
-        return null;
-    }
-
 
     public AclObjectIdentity getAclObjectIdentity()
     {

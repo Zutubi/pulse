@@ -19,7 +19,6 @@ import java.util.List;
  *
  *
  */
-@Wizard("CleanupConfigurationWizard")
 @SymbolicName("cleanupRuleConfig")
 @Format("CleanupConfigurationFormatter")
 @Form(fieldOrder = {"name", "what", "retain", "unit"})

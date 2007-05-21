@@ -59,7 +59,7 @@ public class ViewProjectsAction extends ProjectActionSupport
             projects.removeAll(g.getProjects());
         }
         
-        Collections.sort(projects, new NamedEntityComparator());
+//        Collections.sort(projects, new NamedEntityComparator());
 
         User user = getLoggedInUser();
         buildColumns = new BuildColumns(user == null ? User.getDefaultAllProjectsColumns() : user.getAllProjectsColumns(), projectManager);

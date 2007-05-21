@@ -1,8 +1,8 @@
 package com.zutubi.pulse.scheduling;
 
 import com.zutubi.pulse.events.Event;
-import com.zutubi.pulse.model.Project;
 import com.zutubi.pulse.model.ProjectManager;
+import com.zutubi.pulse.prototype.config.ProjectConfiguration;
 import com.zutubi.pulse.scm.ScmChangeEvent;
 
 /**
@@ -16,7 +16,7 @@ public class ScmChangeEventFilter implements EventTriggerFilter
     public boolean accept(Trigger trigger, Event event)
     {
         ScmChangeEvent changeEvent = (ScmChangeEvent) event;
-        Project project = projectManager.getProject(trigger.getProject());
+        ProjectConfiguration project = projectManager.getProjectConfig(trigger.getProject());
         return project != null && project.getName().equals(changeEvent.getSource().getName());
     }
 

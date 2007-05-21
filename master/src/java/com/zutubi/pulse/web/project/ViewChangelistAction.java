@@ -3,14 +3,16 @@ package com.zutubi.pulse.web.project;
 import com.zutubi.pulse.core.model.Change;
 import com.zutubi.pulse.core.model.Changelist;
 import com.zutubi.pulse.core.model.FileRevision;
-import com.zutubi.pulse.model.*;
+import com.zutubi.pulse.model.BuildManager;
+import com.zutubi.pulse.model.BuildResult;
+import com.zutubi.pulse.prototype.config.changeviewer.ChangeViewerConfiguration;
+import com.zutubi.pulse.model.ChangelistUtils;
+import com.zutubi.pulse.model.Project;
 import com.zutubi.pulse.model.persistence.ChangelistDao;
-import com.zutubi.pulse.web.ActionSupport;
 import com.zutubi.pulse.prototype.config.ProjectConfiguration;
 import com.zutubi.pulse.servercore.config.ScmConfiguration;
+import com.zutubi.pulse.web.ActionSupport;
 
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 
 /**
@@ -34,7 +36,7 @@ public class ViewChangelistAction extends ActionSupport
     private List<BuildResult> buildResults;
 
     private boolean changeViewerInitialised;
-    private ChangeViewer changeViewer;
+    private ChangeViewerConfiguration changeViewer;
     private ScmConfiguration scm;
 
     private String fileViewUrl;
@@ -86,7 +88,7 @@ public class ViewChangelistAction extends ActionSupport
         return changelist;
     }
 
-    public ChangeViewer getChangeViewer()
+    public ChangeViewerConfiguration getChangeViewer()
     {
         if(!changeViewerInitialised)
         {
@@ -100,12 +102,9 @@ public class ViewChangelistAction extends ActionSupport
 
             if(p != null)
             {
-                changeViewer = p.getChangeViewer();
                 ProjectConfiguration projectConfig = projectManager.getProjectConfig(p.getId());
-                if (projectConfig != null)
-                {
-                    scm = projectConfig.getScm();
-                }
+                changeViewer = projectConfig.getChangeViewer();
+                scm = projectConfig.getScm();
             }
             else
             {
@@ -113,9 +112,9 @@ public class ViewChangelistAction extends ActionSupport
                 {
                     p = projectManager.getProject(id);
                     ProjectConfiguration projectConfig = projectManager.getProjectConfig(id);
-                    if(p != null && projectConfig != null && p.getChangeViewer() != null)
+                    if(p != null && projectConfig != null && projectConfig.getChangeViewer() != null)
                     {
-                        changeViewer = p.getChangeViewer();
+                        changeViewer = projectConfig.getChangeViewer();
                         scm = projectConfig.getScm();
                         break;
                     }
@@ -133,8 +132,8 @@ public class ViewChangelistAction extends ActionSupport
     
     public String getChangeUrl()
     {
-        ChangeViewer changeViewer = getChangeViewer();
-        if(changeViewer != null && changeViewer.hasCapability(scm, ChangeViewer.Capability.VIEW_CHANGESET))
+        ChangeViewerConfiguration changeViewer = getChangeViewer();
+        if(changeViewer != null && changeViewer.hasCapability(scm, ChangeViewerConfiguration.Capability.VIEW_CHANGESET))
         {
             return changeViewer.getChangesetURL(changelist.getRevision());
         }
@@ -166,8 +165,8 @@ public class ViewChangelistAction extends ActionSupport
 
     public void updateFileViewUrl(Change change)
     {
-        ChangeViewer changeViewer = getChangeViewer();
-        if(changeViewer != null && changeViewer.hasCapability(scm, ChangeViewer.Capability.VIEW_FILE))
+        ChangeViewerConfiguration changeViewer = getChangeViewer();
+        if(changeViewer != null && changeViewer.hasCapability(scm, ChangeViewerConfiguration.Capability.VIEW_FILE))
         {
             fileViewUrl = changeViewer.getFileViewURL(change.getFilename(), change.getRevision());
         }
@@ -179,8 +178,8 @@ public class ViewChangelistAction extends ActionSupport
 
     public void updateFileDownloadUrl(Change change)
     {
-        ChangeViewer changeViewer = getChangeViewer();
-        if(changeViewer != null && changeViewer.hasCapability(scm, ChangeViewer.Capability.DOWNLOAD_FILE))
+        ChangeViewerConfiguration changeViewer = getChangeViewer();
+        if(changeViewer != null && changeViewer.hasCapability(scm, ChangeViewerConfiguration.Capability.DOWNLOAD_FILE))
         {
             fileDownloadUrl = changeViewer.getFileDownloadURL(change.getFilename(), change.getRevision());
         }
@@ -197,8 +196,8 @@ public class ViewChangelistAction extends ActionSupport
             FileRevision previous = change.getRevision().getPrevious();
             if(previous != null)
             {
-                ChangeViewer changeViewer = getChangeViewer();
-                if(changeViewer != null && changeViewer.hasCapability(scm, ChangeViewer.Capability.VIEW_FILE_DIFF))
+                ChangeViewerConfiguration changeViewer = getChangeViewer();
+                if(changeViewer != null && changeViewer.hasCapability(scm, ChangeViewerConfiguration.Capability.VIEW_FILE_DIFF))
                 {
                     fileDiffUrl = changeViewer.getFileDiffURL(change.getFilename(), change.getRevision());
                     return;
@@ -251,6 +250,7 @@ public class ViewChangelistAction extends ActionSupport
         }
 
         buildResults = ChangelistUtils.getBuilds(buildManager, changelist);
+/*
         Collections.sort(buildResults, new Comparator<BuildResult>()
         {
             public int compare(BuildResult b1, BuildResult b2)
@@ -265,6 +265,7 @@ public class ViewChangelistAction extends ActionSupport
                 return result;
             }
         });
+*/
         return SUCCESS;
     }
 

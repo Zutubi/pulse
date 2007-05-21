@@ -26,9 +26,9 @@ public class ChangelistIsolator
         List<Revision> result;
         Revision latestBuiltRevision;
 
-        if (latestRequestedRevisions.containsKey(project.getId()))
+        if (latestRequestedRevisions.containsKey(projectConfig.getHandle()))
         {
-            latestBuiltRevision = latestRequestedRevisions.get(project.getId());
+            latestBuiltRevision = latestRequestedRevisions.get(projectConfig.getHandle());
         }
         else
         {
@@ -38,7 +38,7 @@ public class ChangelistIsolator
             latestBuiltRevision = getLatestBuiltRevision(project);
             if (latestBuiltRevision != null)
             {
-                latestRequestedRevisions.put(project.getId(), latestBuiltRevision);
+                latestRequestedRevisions.put(projectConfig.getHandle(), latestBuiltRevision);
             }
         }
 
@@ -58,7 +58,7 @@ public class ChangelistIsolator
         if (result.size() > 0)
         {
             // Remember the new latest
-            latestRequestedRevisions.put(project.getId(), result.get(result.size() - 1));
+            latestRequestedRevisions.put(projectConfig.getHandle(), result.get(result.size() - 1));
         }
         else if (force)
         {

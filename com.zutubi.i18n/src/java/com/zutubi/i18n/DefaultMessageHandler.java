@@ -15,7 +15,7 @@ public class DefaultMessageHandler implements MessageHandler
 {
     private Formatter formatter = new Formatter();
 
-    private BundleManager bundleManager;
+    protected BundleManager bundleManager;
 
     public DefaultMessageHandler(BundleManager bundleManager)
     {

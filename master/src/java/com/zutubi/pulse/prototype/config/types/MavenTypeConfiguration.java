@@ -1,14 +1,15 @@
 package com.zutubi.pulse.prototype.config.types;
 
-import com.zutubi.pulse.core.config.AbstractConfiguration;
 import com.zutubi.config.annotations.SymbolicName;
+import com.opensymphony.util.TextUtils;
+import org.apache.velocity.VelocityContext;
 
 /**
  *
  *
  */
 @SymbolicName("internal.mavenTypeConfig")
-public class MavenTypeConfiguration extends AbstractConfiguration
+public class MavenTypeConfiguration extends TemplateTypeConfiguration
 {
     private String targets;
 
@@ -44,5 +45,26 @@ public class MavenTypeConfiguration extends AbstractConfiguration
     public void setArguments(String arguments)
     {
         this.arguments = arguments;
+    }
+
+    protected String getTemplateName()
+    {
+        return "maven.template.vm";
+    }
+
+    protected void setupContext(VelocityContext context)
+    {
+        if (TextUtils.stringSet(targets))
+        {
+            context.put("targets", targets);
+        }
+        if (TextUtils.stringSet(workingDir))
+        {
+            context.put("workingDir", workingDir.trim());
+        }
+        if (TextUtils.stringSet(arguments))
+        {
+            context.put("arguments", arguments);
+        }
     }
 }

@@ -11,7 +11,7 @@ import com.zutubi.validation.annotations.Required;
  *
  *
  */
-@SymbolicName("jabberConfig")
+@SymbolicName("internal.jabberConfig")
 @Form(fieldOrder = {"server", "port", "username", "password", "ssl"})
 @ConfigurationCheck("JabberConfigurationCheckHandler")
 public class JabberConfiguration extends AbstractConfiguration

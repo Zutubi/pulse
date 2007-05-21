@@ -3,9 +3,9 @@ package com.zutubi.pulse.web.project;
 import com.zutubi.pulse.bootstrap.ComponentContext;
 import com.zutubi.pulse.core.BuildException;
 import com.zutubi.pulse.model.Project;
-import com.zutubi.pulse.model.PulseFileDetails;
-import com.zutubi.pulse.util.XMLUtils;
 import com.zutubi.pulse.prototype.config.ProjectConfiguration;
+import com.zutubi.pulse.prototype.config.types.TypeConfiguration;
+import com.zutubi.pulse.util.XMLUtils;
 import org.hsqldb.lib.StringInputStream;
 
 import java.io.InputStream;
@@ -35,14 +35,12 @@ public class DownloadProjectBuildFileAction extends ProjectActionBase
 
     public String execute() throws Exception
     {
-        Project project = getProject();
         ProjectConfiguration projectConfig = getProjectConfig();
-
         try
         {
-            PulseFileDetails pulseFileDetails = project.getPulseFileDetails();
-            ComponentContext.autowire(pulseFileDetails);
-            String pulseFile = XMLUtils.prettyPrint(pulseFileDetails.getPulseFile(0, projectConfig, project, null, null));
+            TypeConfiguration typeConfiguration = projectConfig.getType();
+            ComponentContext.autowire(typeConfiguration);
+            String pulseFile = XMLUtils.prettyPrint(typeConfiguration.getPulseFile(0, projectConfig, null, null));
             inputStream = new StringInputStream(pulseFile);
             contentLength = pulseFile.length();
         }

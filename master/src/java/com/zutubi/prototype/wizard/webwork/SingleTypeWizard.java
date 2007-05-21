@@ -1,6 +1,7 @@
 package com.zutubi.prototype.wizard.webwork;
 
 import com.zutubi.prototype.type.CompositeType;
+import com.zutubi.prototype.type.Type;
 import com.zutubi.prototype.type.record.MutableRecordImpl;
 import com.zutubi.prototype.type.record.TemplateRecord;
 import com.zutubi.prototype.wizard.WizardState;
@@ -18,6 +19,8 @@ public class SingleTypeWizard extends AbstractTypeWizard
 
     private static final TemplateRecord EMPTY_RECORD = new TemplateRecord("empty", null, new MutableRecordImpl());
     private WizardState recordState;
+    
+    private CompositeType type;
 
     public SingleTypeWizard(String path)
     {
@@ -26,7 +29,7 @@ public class SingleTypeWizard extends AbstractTypeWizard
 
     public void initialise()
     {
-        CompositeType type = (CompositeType) configurationPersistenceManager.getType(path).getTargetType();
+        type = (CompositeType) configurationPersistenceManager.getType(path).getTargetType();
 
         LOG.warning("TODO: load template record for path: " + path + ", currently using empty template record.");
 
@@ -42,5 +45,10 @@ public class SingleTypeWizard extends AbstractTypeWizard
     public void doFinish()
     {
         successPath = configurationPersistenceManager.insertRecord(path, recordState.getRecord());
+    }
+
+    public Type getType()
+    {
+        return type;
     }
 }

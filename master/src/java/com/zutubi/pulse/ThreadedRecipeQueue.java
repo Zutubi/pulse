@@ -11,14 +11,19 @@ import com.zutubi.pulse.core.BuildRevision;
 import com.zutubi.pulse.core.RecipeRequest;
 import com.zutubi.pulse.core.Stoppable;
 import com.zutubi.pulse.core.model.Revision;
-import com.zutubi.pulse.events.*;
+import com.zutubi.pulse.events.AgentEvent;
+import com.zutubi.pulse.events.AgentRemovedEvent;
+import com.zutubi.pulse.events.AgentStatusEvent;
+import com.zutubi.pulse.events.Event;
+import com.zutubi.pulse.events.EventListener;
+import com.zutubi.pulse.events.EventManager;
 import com.zutubi.pulse.events.build.RecipeCompletedEvent;
 import com.zutubi.pulse.events.build.RecipeDispatchedEvent;
 import com.zutubi.pulse.events.build.RecipeErrorEvent;
 import com.zutubi.pulse.events.build.RecipeEvent;
-import com.zutubi.pulse.model.Project;
 import com.zutubi.pulse.prototype.config.ProjectConfiguration;
 import com.zutubi.pulse.prototype.config.admin.GeneralAdminConfiguration;
+import com.zutubi.pulse.prototype.config.types.TypeConfiguration;
 import com.zutubi.pulse.scm.ScmChangeEvent;
 import com.zutubi.pulse.scm.ScmException;
 import com.zutubi.pulse.servercore.config.ScmConfiguration;
@@ -210,8 +215,8 @@ public class ThreadedRecipeQueue implements Runnable, RecipeQueue, EventListener
 
     private void updateRevision(RecipeDispatchRequest dispatchRequest, Revision revision) throws BuildException
     {
-        Project project = dispatchRequest.getBuild().getProject();
-        String pulseFile = project.getPulseFileDetails().getPulseFile(dispatchRequest.getRequest().getId(), dispatchRequest.getProjectConfig(), project, revision, null);
+        TypeConfiguration type = dispatchRequest.getProjectConfig().getType();
+        String pulseFile = type.getPulseFile(dispatchRequest.getRequest().getId(), dispatchRequest.getProjectConfig(), revision, null);
         dispatchRequest.getRevision().update(revision, pulseFile);
     }
 

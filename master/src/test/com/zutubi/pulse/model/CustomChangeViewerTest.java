@@ -5,6 +5,7 @@ import com.zutubi.pulse.core.model.FileRevision;
 import com.zutubi.pulse.core.model.NumericalFileRevision;
 import com.zutubi.pulse.core.model.Revision;
 import com.zutubi.pulse.test.PulseTestCase;
+import com.zutubi.pulse.prototype.config.changeviewer.CustomChangeViewerConfiguration;
 
 import java.util.Date;
 
@@ -12,7 +13,7 @@ import java.util.Date;
  */
 public class CustomChangeViewerTest extends PulseTestCase
 {
-    private CustomChangeViewer viewer = new CustomChangeViewer();
+    private CustomChangeViewerConfiguration viewer = new CustomChangeViewerConfiguration();
 
     public void testGetChangesetURL()
     {

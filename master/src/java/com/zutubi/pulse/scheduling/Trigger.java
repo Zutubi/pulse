@@ -103,8 +103,10 @@ public abstract class Trigger extends Entity implements NamedEntity
     protected void copyCommon(Trigger copy, Project oldProject, Project newProject)
     {
         copy.setProject(newProject.getId());
+/*
         copy.name = name.replace(oldProject.getName(), newProject.getName());
         copy.group = group.replace(oldProject.getName(), newProject.getName());
+*/
         copy.dataMap = new TreeMap<Serializable, Serializable>();
         for(Map.Entry<Serializable, Serializable> entry: dataMap.entrySet())
         {

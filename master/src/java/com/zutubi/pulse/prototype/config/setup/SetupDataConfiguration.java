@@ -21,7 +21,7 @@ import java.io.IOException;
 public class SetupDataConfiguration extends AbstractConfiguration implements Validateable
 {
     @Required
-    @Text(size = 200)
+    @Text(size = 400)
     @BrowseLink(template = "SetupDataConfiguration")
     private String data;
 

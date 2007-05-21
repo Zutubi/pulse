@@ -3,6 +3,7 @@ package com.zutubi.pulse.prototype.config.admin;
 import com.opensymphony.util.TextUtils;
 import com.zutubi.config.annotations.Form;
 import com.zutubi.config.annotations.SymbolicName;
+import com.zutubi.config.annotations.ControllingCheckbox;
 import com.zutubi.pulse.core.config.AbstractConfiguration;
 
 /**
@@ -20,6 +21,8 @@ public class GeneralAdminConfiguration extends AbstractConfiguration
     private boolean anonymousAccessEnabled = false;
     private boolean anonymousSignupEnabled = false;
     private int scmPollingInterval = 5;
+    
+    @ControllingCheckbox(dependentFields = {"recipeTimeout"})
     private boolean recipeTimeoutEnabled = true;
     private int recipeTimeout = 15;
 

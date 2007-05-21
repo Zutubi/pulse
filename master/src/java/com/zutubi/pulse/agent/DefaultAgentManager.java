@@ -3,12 +3,20 @@ package com.zutubi.pulse.agent;
 import com.zutubi.prototype.config.CollectionListener;
 import com.zutubi.prototype.config.ConfigurationProvider;
 import com.zutubi.prototype.type.record.MutableRecord;
-import com.zutubi.pulse.*;
+import com.zutubi.pulse.AgentService;
+import com.zutubi.pulse.MasterAgentService;
+import com.zutubi.pulse.SlaveAgentService;
+import com.zutubi.pulse.SlaveProxyFactory;
+import com.zutubi.pulse.Version;
 import com.zutubi.pulse.bootstrap.MasterConfigurationManager;
 import com.zutubi.pulse.core.Stoppable;
 import com.zutubi.pulse.core.config.Resource;
-import com.zutubi.pulse.events.*;
+import com.zutubi.pulse.events.AgentRemovedEvent;
+import com.zutubi.pulse.events.AgentStatusEvent;
+import com.zutubi.pulse.events.AgentUpgradeCompleteEvent;
+import com.zutubi.pulse.events.Event;
 import com.zutubi.pulse.events.EventListener;
+import com.zutubi.pulse.events.EventManager;
 import com.zutubi.pulse.license.LicenseHolder;
 import com.zutubi.pulse.license.LicenseManager;
 import com.zutubi.pulse.license.authorisation.AddAgentAuthorisation;
@@ -26,8 +34,20 @@ import com.zutubi.util.bean.ObjectFactory;
 import com.zutubi.util.logging.Logger;
 
 import java.net.ConnectException;
-import java.util.*;
-import java.util.concurrent.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.FutureTask;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 import java.util.concurrent.locks.ReentrantLock;
 
 /**
@@ -96,6 +116,21 @@ public class DefaultAgentManager implements AgentManager, EventListener, Stoppab
         AddAgentAuthorisation addAgentAuthorisation = new AddAgentAuthorisation();
         addAgentAuthorisation.setAgentManager(this);
         licenseManager.addAuthorisation(addAgentAuthorisation);
+
+        // ensure that we create the default master agent.
+        if (agents.size() == 0)
+        {
+            AgentConfiguration masterAgent = new AgentConfiguration();
+            masterAgent.setName("master agent");
+/*
+            //FIXME: do we need to specify these details? and if so, how to we ensure that they stay up to date.
+            SystemConfiguration systemConfiguration = configurationManager.getSystemConfig();
+            masterAgent.setHost(systemConfiguration.getBindAddress());
+            masterAgent.setPort(systemConfiguration.getServerPort());
+*/
+            masterAgent.setRemote(false);
+            configurationProvider.insert("agent", masterAgent);
+        }
     }
 
     private void refreshAgents()

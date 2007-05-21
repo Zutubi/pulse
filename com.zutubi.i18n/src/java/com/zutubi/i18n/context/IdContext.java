@@ -1,5 +1,7 @@
 package com.zutubi.i18n.context;
 
+import java.io.InputStream;
+
 /**
  * <class-comment/>
  */
@@ -36,6 +38,11 @@ public class IdContext implements Context
         }
 
         return true;
+    }
+
+    public InputStream getResourceAsStream(String name)
+    {
+        return getClass().getResourceAsStream(name);
     }
 
     public int hashCode()

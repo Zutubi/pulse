@@ -6,6 +6,7 @@ import com.zutubi.pulse.model.TriggerBuildReason;
 import com.zutubi.pulse.scheduling.Task;
 import com.zutubi.pulse.scheduling.TaskExecutionContext;
 import com.zutubi.pulse.scheduling.Trigger;
+import com.zutubi.pulse.prototype.config.ProjectConfiguration;
 import com.zutubi.util.logging.Logger;
 
 import java.io.Serializable;
@@ -30,7 +31,7 @@ public class BuildProjectTask implements Task
         long projectId = trigger.getProject();
         boolean force = dataMap.containsKey(PARAM_FORCE);
 
-        Project project = projectManager.getProject(projectId);
+        ProjectConfiguration project = projectManager.getProjectConfig(projectId);
         if (project != null)
         {
             // generate build request.

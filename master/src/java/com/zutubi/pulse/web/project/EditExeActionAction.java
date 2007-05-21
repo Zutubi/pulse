@@ -63,7 +63,7 @@ public class EditExeActionAction extends AbstractEditPostBuildActionAction
                 node = stages.get(0);
             }
             
-            exampleScope = RunExecutablePostBuildAction.getScope(result, node, new LinkedList<ResourceProperty>(), configurationManager);
+//            exampleScope = RunExecutablePostBuildAction.getScope(result, node, new LinkedList<ResourceProperty>(), configurationManager);
         }
     }
 

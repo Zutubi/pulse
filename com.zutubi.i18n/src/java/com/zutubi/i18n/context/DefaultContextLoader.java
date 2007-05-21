@@ -10,6 +10,6 @@ public class DefaultContextLoader implements ContextLoader
     public InputStream loadResource(Context context, String resourceName)
     {
         // load from the current class loader.
-        return getClass().getResourceAsStream("/" + resourceName);
+        return context.getResourceAsStream("/" + resourceName);
     }
 }

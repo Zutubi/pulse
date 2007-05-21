@@ -23,7 +23,7 @@ import java.io.File;
 public class CvsConfiguration extends ScmConfiguration
 {
     @Required @CvsRoot
-    @Text(size = 50)
+    @Text
     private String root;
 
     private String module;

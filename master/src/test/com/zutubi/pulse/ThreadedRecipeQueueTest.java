@@ -22,6 +22,7 @@ import com.zutubi.pulse.logging.CustomLogRecord;
 import com.zutubi.pulse.model.*;
 import com.zutubi.pulse.personal.PatchArchive;
 import com.zutubi.pulse.prototype.config.ProjectConfiguration;
+import com.zutubi.pulse.prototype.config.types.CustomTypeConfiguration;
 import com.zutubi.pulse.prototype.config.agent.AgentConfiguration;
 import com.zutubi.pulse.scm.FileStatus;
 import com.zutubi.pulse.scm.ScmChangeEvent;
@@ -494,6 +495,7 @@ public class ThreadedRecipeQueueTest extends TestCase implements EventListener
         ProjectConfiguration projectConfig = new ProjectConfiguration();
         projectConfig.setScm(scm);
         projectConfig.setProjectId(projectId);
+        projectConfig.setType(new CustomTypeConfiguration());
         return projectConfig;
     }
 
@@ -706,7 +708,7 @@ public class ThreadedRecipeQueueTest extends TestCase implements EventListener
     private RecipeDispatchRequest createDispatchRequest(int type, long id, ProjectConfiguration projectConfig)
     {
         Project project = new Project();
-        project.setPulseFileDetails(new MockPulseFileDetails());
+//        project.setPulseFileDetails(new MockPulseFileDetails());
         BuildResult result = new BuildResult(new UnknownBuildReason(), project, 100, false);
         BuildHostRequirements requirements = new MockBuildHostRequirements(type);
         RecipeRequest request = new RecipeRequest("project", id, null, null, null, false, null, new LinkedList<ResourceProperty>());

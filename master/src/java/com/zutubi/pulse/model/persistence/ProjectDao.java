@@ -10,8 +10,6 @@ import java.util.List;
  */
 public interface ProjectDao extends EntityDao<Project>
 {
-    Project findByName(String name);
-
     void save(VersionedPulseFileDetails details);
 
     VersionedPulseFileDetails findVersionedPulseFileDetails(long id);

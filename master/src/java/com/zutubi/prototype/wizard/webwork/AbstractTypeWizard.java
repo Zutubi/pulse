@@ -10,6 +10,7 @@ import com.zutubi.prototype.type.CompositeType;
 import com.zutubi.prototype.type.SimpleType;
 import com.zutubi.prototype.type.TypeProperty;
 import com.zutubi.prototype.type.TypeRegistry;
+import com.zutubi.prototype.type.Type;
 import com.zutubi.prototype.type.record.MutableRecord;
 import com.zutubi.prototype.type.record.MutableRecordImpl;
 import com.zutubi.prototype.type.record.Record;
@@ -18,27 +19,28 @@ import com.zutubi.prototype.webwork.PrototypeUtils;
 import com.zutubi.prototype.wizard.Wizard;
 import com.zutubi.prototype.wizard.WizardState;
 import com.zutubi.prototype.wizard.WizardTransition;
+import com.zutubi.prototype.wizard.TypeWizardState;
 import static com.zutubi.prototype.wizard.WizardTransition.*;
 import com.zutubi.validation.ValidationAware;
 
 import java.util.*;
 
 /**
- * This wizard walks a user through the project configuration process. During project configuration,
- * a user needs to configure the projects type, scm and general details.
+ *
+ * 
  */
 public abstract class AbstractTypeWizard implements Wizard
 {
     protected TypeRegistry typeRegistry;
     protected ConfigurationPersistenceManager configurationPersistenceManager;
 
-    protected WizardState currentState;
+    protected TypeWizardState currentState;
 
     protected String successPath;
 
-    protected LinkedList<WizardState> wizardStates = new LinkedList<WizardState>();
+    protected LinkedList<TypeWizardState> wizardStates = new LinkedList<TypeWizardState>();
 
-    protected WizardState addWizardStates(List<WizardState> wizardStates, CompositeType type, TemplateRecord templateRecord)
+    protected TypeWizardState addWizardStates(List<TypeWizardState> wizardStates, CompositeType type, TemplateRecord templateRecord)
     {
         int extensionCount = type.getExtensions().size();
         if(extensionCount < 2)
@@ -64,7 +66,7 @@ public abstract class AbstractTypeWizard implements Wizard
         return wizardStates.get(wizardStates.size() - 1);
     }
 
-    public WizardState getCurrentState()
+    public TypeWizardState getCurrentState()
     {
         return currentState;
     }
@@ -143,6 +145,8 @@ public abstract class AbstractTypeWizard implements Wizard
         return wizardStates.indexOf(currentState);
     }
 
+    public abstract Type getType();
+
     /**
      * Required resource.
      *
@@ -153,7 +157,17 @@ public abstract class AbstractTypeWizard implements Wizard
         this.typeRegistry = typeRegistry;
     }
 
-    public abstract class TypeWizardState implements WizardState
+    /**
+     * Required resource.
+     * 
+     * @param configurationPersistenceManager
+     */
+    public void setConfigurationPersistenceManager(ConfigurationPersistenceManager configurationPersistenceManager)
+    {
+        this.configurationPersistenceManager = configurationPersistenceManager;
+    }
+
+    public abstract class AbstractTypeWizardState implements TypeWizardState
     {
         private Set<String> ignoredFields = new HashSet<String>();
         
@@ -194,15 +208,13 @@ public abstract class AbstractTypeWizard implements Wizard
             validationCallback.addIgnoredFields(ignoredFields);
             return configurationPersistenceManager.validate(path, null, currentState.getRecord(), validationCallback) != null;
         }
-
-        public abstract CompositeType getType();
     }
 
     /**
      *
      *
      */
-    public class SingleStepWizardState extends TypeWizardState
+    public class SingleStepWizardState extends AbstractTypeWizardState
     {
         /**
          * Every wizard state / form is represented by a type.
@@ -280,7 +292,7 @@ public abstract class AbstractTypeWizard implements Wizard
          *
          * @return the first wizard state
          */
-        public WizardState getFirstState()
+        public TypeWizardState getFirstState()
         {
             // should be rendering the base type, or maybe rendering a custom type that this wizard state understands.
             // Question: how to pass the properties up to the renderer.
@@ -289,7 +301,7 @@ public abstract class AbstractTypeWizard implements Wizard
             return new SelectWizardState();
         }
 
-        public WizardState getSecondState()
+        public TypeWizardState getSecondState()
         {
             // should be rendering the selected type.
 
@@ -306,15 +318,16 @@ public abstract class AbstractTypeWizard implements Wizard
             this.typeRegistry = typeRegistry;
         }
 
-        private class SelectWizardState implements WizardState
+        public class SelectWizardState implements TypeWizardState
         {
+            private static final String SELECT_FIELD_NAME = "option";
 
             public SelectWizardState()
             {
                 // initialise the data.
                 if (getTemplateRecord() != null)
                 {
-                    selectionRecord.put("option", getTemplateRecord().getSymbolicName());
+                    selectionRecord.put(SELECT_FIELD_NAME, getTemplateRecord().getSymbolicName());
                 }
             }
 
@@ -335,10 +348,10 @@ public abstract class AbstractTypeWizard implements Wizard
 
             public void updateRecord(Map parameters)
             {
-                String[] value = (String[]) parameters.get("option");
+                String[] value = (String[]) parameters.get(SELECT_FIELD_NAME);
                 if(value != null)
                 {
-                    selectionRecord.put("option", value[0]);
+                    selectionRecord.put(SELECT_FIELD_NAME, value[0]);
                 }
             }
 
@@ -367,7 +380,7 @@ public abstract class AbstractTypeWizard implements Wizard
             }
         }
 
-        private class ConfigurationWizardState extends TypeWizardState
+        private class ConfigurationWizardState extends AbstractTypeWizardState
         {
             public ConfigurationWizardState()
             {
@@ -409,8 +422,4 @@ public abstract class AbstractTypeWizard implements Wizard
         }
     }
 
-    public void setConfigurationPersistenceManager(ConfigurationPersistenceManager configurationPersistenceManager)
-    {
-        this.configurationPersistenceManager = configurationPersistenceManager;
-    }
 }

@@ -41,7 +41,7 @@ public class RunExecutablePostBuildAction extends PostBuildAction
         {
             List<String> commandLine = new LinkedList<String>();
             commandLine.add(command);
-            addArguments(commandLine, build, recipe, properties);
+            addArguments(projectConfig, commandLine, build, recipe, properties);
 
             ProcessBuilder builder = new ProcessBuilder(commandLine);
             child = builder.start();
@@ -77,20 +77,20 @@ public class RunExecutablePostBuildAction extends PostBuildAction
         return copy;
     }
 
-    private void addArguments(List<String> commandLine, BuildResult build, RecipeResultNode recipe, List<ResourceProperty> properties) throws FileLoadException
+    private void addArguments(ProjectConfiguration projectConfig, List<String> commandLine, BuildResult build, RecipeResultNode recipe, List<ResourceProperty> properties) throws FileLoadException
     {
-        Scope scope = getScope(build, recipe, properties, configurationManager);
+        Scope scope = getScope(projectConfig, build, recipe, properties, configurationManager);
         commandLine.addAll(VariableHelper.splitAndReplaceVariables(arguments, scope, true));
     }
 
-    public static Scope getScope(BuildResult result, RecipeResultNode recipe, List<ResourceProperty> properties, MasterConfigurationManager configurationManager)
+    public static Scope getScope(ProjectConfiguration projectConfig, BuildResult result, RecipeResultNode recipe, List<ResourceProperty> properties, MasterConfigurationManager configurationManager)
     {
         MasterBuildPaths paths = new MasterBuildPaths(configurationManager);
 
         Scope scope = new Scope();
         scope.add(properties);
         
-        scope.add(new Property("project", result.getProject().getName()));
+        scope.add(new Property("project", projectConfig.getName()));
         scope.add(new Property("number", Long.toString(result.getNumber())));
 
         BuildScmDetails buildScmDetails = result.getScmDetails();

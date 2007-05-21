@@ -2,6 +2,7 @@ package com.zutubi.pulse.servercore.config;
 
 import com.zutubi.config.annotations.SymbolicName;
 import com.zutubi.config.annotations.Transient;
+import com.zutubi.config.annotations.ControllingCheckbox;
 import com.zutubi.pulse.scm.ScmException;
 import com.zutubi.pulse.servercore.scm.ScmClient;
 import com.zutubi.pulse.core.config.AbstractConfiguration;
@@ -16,12 +17,16 @@ import java.util.List;
 public abstract class ScmConfiguration extends AbstractConfiguration
 {
     private boolean monitor;
+    
+    @ControllingCheckbox(dependentFields = {"pollingInterval"})
     private boolean customPollingInterval;
     /**
      * Number of minutes between polls of this SCM.
      */
     @Numeric(min = 1)
     private int pollingInterval = 1;
+    
+    @ControllingCheckbox(dependentFields = {"quietPeriod"})
     private boolean quietPeriodEnabled;
     /**
      * Quiet period, i.e. idle time to wait for between checkins before

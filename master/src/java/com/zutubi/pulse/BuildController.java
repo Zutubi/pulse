@@ -22,6 +22,7 @@ import com.zutubi.pulse.model.BuildSpecification.CheckoutScheme;
 import com.zutubi.pulse.prototype.config.BuildOptionsConfiguration;
 import com.zutubi.pulse.prototype.config.BuildStageConfiguration;
 import com.zutubi.pulse.prototype.config.ProjectConfiguration;
+import com.zutubi.pulse.prototype.config.actions.PostBuildActionConfiguration;
 import com.zutubi.pulse.scheduling.quartz.TimeoutRecipeJob;
 import com.zutubi.pulse.scm.FileStatus;
 import com.zutubi.pulse.scm.ScmException;
@@ -635,10 +636,11 @@ public class BuildController implements EventListener
                 projectManager.save(project);
             }
 
-            for (PostBuildAction action : buildResult.getProject().getPostBuildActions())
+            for (PostBuildActionConfiguration action : projectConfig.getPostBuildActions())
             {
                 ComponentContext.autowire(action);
-                action.execute(projectConfig, buildResult, null, buildProperties);
+//                action.execute(projectConfig, buildResult, null, buildProperties);
+                action.execute();
             }
         }
 

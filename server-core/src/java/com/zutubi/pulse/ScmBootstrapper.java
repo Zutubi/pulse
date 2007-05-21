@@ -47,7 +47,7 @@ public abstract class ScmBootstrapper implements Bootstrapper, ScmCheckoutEventH
         outDir.mkdirs();
 
         OutputStream out;
-        FileOutputStream fout;
+        FileOutputStream fout = null;
         ScmClient client = null;
 
         try
@@ -71,7 +71,10 @@ public abstract class ScmBootstrapper implements Bootstrapper, ScmCheckoutEventH
         }
         finally
         {
-            IOUtils.close(outputWriter);
+            // close the file output stream, but not the contexts output stream. That
+            // will still be used further on in the build, it is not ours to close.
+            outputWriter.flush();
+            IOUtils.close(fout);
         }
 
         if (client != null)

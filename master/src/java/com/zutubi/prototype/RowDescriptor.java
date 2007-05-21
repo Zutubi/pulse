@@ -1,12 +1,11 @@
 package com.zutubi.prototype;
 
-import com.zutubi.prototype.model.Row;
 import com.zutubi.prototype.model.Column;
+import com.zutubi.prototype.model.Row;
 import com.zutubi.prototype.type.record.Record;
 
-import java.util.List;
 import java.util.LinkedList;
-import java.util.Arrays;
+import java.util.List;
 
 /**
  *

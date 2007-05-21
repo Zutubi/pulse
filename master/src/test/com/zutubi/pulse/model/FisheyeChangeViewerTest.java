@@ -3,6 +3,7 @@ package com.zutubi.pulse.model;
 import com.zutubi.pulse.core.model.NumericalFileRevision;
 import com.zutubi.pulse.core.model.NumericalRevision;
 import com.zutubi.pulse.test.PulseTestCase;
+import com.zutubi.pulse.prototype.config.changeviewer.FisheyeConfiguration;
 
 /**
  */
@@ -11,11 +12,11 @@ public class FisheyeChangeViewerTest extends PulseTestCase
     private static final String BASE = "http://fisheye.cinnamonbob.com";
     private static final String PATH = "Zutubi";
 
-    private FisheyeChangeViewer viewer;
+    private FisheyeConfiguration viewer;
 
     protected void setUp() throws Exception
     {
-        viewer = new FisheyeChangeViewer(BASE, PATH);
+        viewer = new FisheyeConfiguration(BASE, PATH);
     }
 
     public void testGetChangesetURL()

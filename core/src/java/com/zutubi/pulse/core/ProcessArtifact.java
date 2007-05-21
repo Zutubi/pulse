@@ -7,7 +7,7 @@ import com.zutubi.validation.ValidationContext;
 /**
  * A reference to a post-processor.
  */
-class ProcessArtifact implements Validateable
+public class ProcessArtifact implements Validateable
 {
     private PostProcessor processor;
 

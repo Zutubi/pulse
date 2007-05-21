@@ -14,7 +14,8 @@ import java.util.TreeMap;
 public class Resource extends AbstractNamedConfiguration
 {
     private Map<String, ResourceProperty> properties = new TreeMap<String, ResourceProperty>();
-    @Select(optionProvider = "com.zutubi.pulse.prototype.config.agent.ResourceVersionOptionProvider")
+ 
+    @Select(optionProvider = "ResourceVersionOptionProvider")
     private String defaultVersion;
     private Map<String, ResourceVersion> versions = new TreeMap<String, ResourceVersion>();
 

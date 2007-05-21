@@ -33,7 +33,8 @@ public class ProjectActionBase extends ActionSupport
     {
         if(project == null)
         {
-            project = projectManager.getProject(projectName);
+            ProjectConfiguration config = getProjectConfig();
+            project = projectManager.getProject(config.getProjectId());
             if(project == null)
             {
                 throw new LookupErrorException("Unknown project '" + projectName + "'");

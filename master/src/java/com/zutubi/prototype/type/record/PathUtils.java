@@ -133,7 +133,7 @@ public class PathUtils
         return true;
     }
 
-    public static boolean prefixMatches(String pattern, String prefix)
+    public static boolean prefixMatchesPathPattern(String pattern, String prefix)
     {
         String[] patternParts = getPathElements(pattern);
         String[] prefixParts = getPathElements(prefix);
@@ -151,6 +151,26 @@ public class PathUtils
             }
         }
 
+        return true;
+    }
+
+    public static boolean prefixPatternMatchesPath(String prefixPattern, String path)
+    {
+        String[] pathParts = getPathElements(path);
+        String[] patternParts = getPathElements(prefixPattern);
+
+        if(pathParts.length < patternParts.length)
+        {
+            return false;
+        }
+
+        for(int i = 0; i < patternParts.length; i++)
+        {
+            if(!elementMatches(patternParts[i], pathParts[i]))
+            {
+                return false;
+            }
+        }
         return true;
     }
 

@@ -35,7 +35,7 @@ public class TagPostBuildAction extends PostBuildAction
     {
         try
         {
-            String tagName = substituteVariables(tag, result, recipe, properties);
+            String tagName = substituteVariables(tag, result, recipe, properties, projectConfig);
             ScmClient client = projectConfig.getScm().createClient();
             client.tag(result.getScmDetails().getRevision(), tagName, moveExisting);
         }
@@ -60,12 +60,12 @@ public class TagPostBuildAction extends PostBuildAction
         return copy;
     }
 
-    private String substituteVariables(String tag, BuildResult build, RecipeResultNode recipe, List<ResourceProperty> properties) throws FileLoadException
+    private String substituteVariables(String tag, BuildResult build, RecipeResultNode recipe, List<ResourceProperty> properties, ProjectConfiguration projectConfig) throws FileLoadException
     {
         Scope scope = new Scope();
         scope.add(properties);
 
-        scope.add(new Property("project", build.getProject().getName()));
+        scope.add(new Property("project", projectConfig.getName()));
         scope.add(new Property("number", Long.toString(build.getNumber())));
 
         // Build or stage

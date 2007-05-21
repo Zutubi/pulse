@@ -5,6 +5,7 @@ import com.zutubi.prototype.OptionProvider;
 import com.zutubi.prototype.config.ConfigurationPersistenceManager;
 import com.zutubi.prototype.model.SelectFieldDescriptor;
 import com.zutubi.prototype.type.CompositeType;
+import com.zutubi.prototype.type.TypeProperty;
 import com.zutubi.prototype.type.record.PathUtils;
 import com.zutubi.util.ClassLoaderUtils;
 import com.zutubi.util.bean.ObjectFactory;
@@ -40,7 +41,15 @@ public abstract class OptionAnnotationHandler extends FieldAnnotationHandler
     public static void process(ConfigurationPersistenceManager configurationPersistenceManager, OptionProvider optionProvider, String fieldPath, SelectFieldDescriptor field)
     {
         String instancePath = PathUtils.getParentPath(fieldPath);
-        Collection optionList = optionProvider.getOptions(configurationPersistenceManager.getInstance(instancePath), fieldPath, field.getProperty());
+        Object instance = configurationPersistenceManager.getInstance(instancePath);
+        TypeProperty fieldTypeProperty = field.getProperty();
+
+        // FIXME: not sure what the correct behaviour here should be? see comment.
+        // there are occasions, particularly with wizards, where we are rendering a configuration object at
+        // a path that represents a collection of that type.  In that situation, if the option provider is expecting
+        // the type that it is defined on, then things will go amiss.  How should we deal with this? pass a null?
+
+        Collection optionList = optionProvider.getOptions(instance, fieldPath, fieldTypeProperty);
         field.setList(optionList);
         if (optionProvider.getOptionKey() != null)
         {

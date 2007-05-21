@@ -154,7 +154,7 @@ public class MockProjectManager implements ProjectManager
         throw new RuntimeException("Method not implemented.");
     }
 
-    public void triggerBuild(Project project, BuildReason reason, Revision revision, boolean force)
+    public void triggerBuild(ProjectConfiguration project, BuildReason reason, Revision revision, boolean force)
     {
         throw new RuntimeException("Method not implemented.");
     }

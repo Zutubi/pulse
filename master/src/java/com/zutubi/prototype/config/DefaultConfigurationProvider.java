@@ -3,9 +3,13 @@ package com.zutubi.prototype.config;
 import com.zutubi.prototype.config.events.ConfigurationEvent;
 import com.zutubi.prototype.type.CompositeType;
 import com.zutubi.prototype.type.TypeRegistry;
-import com.zutubi.prototype.type.record.PathUtils;
-import com.zutubi.pulse.events.*;
 import com.zutubi.pulse.core.config.Configuration;
+import com.zutubi.pulse.events.AsynchronousDelegatingListener;
+import com.zutubi.pulse.events.Event;
+import com.zutubi.pulse.events.EventListener;
+import com.zutubi.pulse.events.EventManager;
+import com.zutubi.pulse.events.FilteringListener;
+import com.zutubi.pulse.events.MultiplexingListener;
 import com.zutubi.util.Predicate;
 
 import java.util.Collection;

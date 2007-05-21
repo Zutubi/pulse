@@ -16,6 +16,6 @@ import java.lang.annotation.Target;
 @Handler(className = DefaultAnnotationHandlers.REFERENCE)
 public @interface Reference
 {
-    String optionProvider() default "com.zutubi.prototype.config.DefaultReferenceOptionProvider";
+    String optionProvider() default "com.zutubi.pulse.prototype.config.DefaultReferenceOptionProvider";
     String cleanupTaskProvider() default "com.zutubi.prototype.config.DefaultReferenceCleanupTaskProvider";
 }

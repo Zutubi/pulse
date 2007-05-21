@@ -6,12 +6,14 @@ import com.zutubi.i18n.Messages;
 import com.zutubi.prototype.FormDescriptor;
 import com.zutubi.prototype.FormDescriptorFactory;
 import com.zutubi.prototype.WizardDescriptor;
+import com.zutubi.prototype.i18n.WizardContextResolver;
+import com.zutubi.prototype.i18n.WizardContext;
 import com.zutubi.prototype.freemarker.GetTextMethod;
 import com.zutubi.prototype.model.HiddenFieldDescriptor;
 import com.zutubi.prototype.type.record.PathUtils;
-import com.zutubi.prototype.wizard.Wizard;
-import com.zutubi.prototype.wizard.WizardState;
+import com.zutubi.prototype.wizard.TypeWizardState;
 import com.zutubi.prototype.wizard.WizardTransition;
+import com.zutubi.prototype.wizard.webwork.AbstractTypeWizard;
 import com.zutubi.pulse.bootstrap.ComponentContext;
 import com.zutubi.pulse.velocity.AbstractDirective;
 import com.zutubi.util.CollectionUtils;
@@ -39,6 +41,8 @@ import java.util.Map;
  */
 public class WizardDirective extends AbstractDirective
 {
+    private static boolean registrationRequired = true;
+
     private String path;
     private boolean ajax = false;
     private boolean decorate = true;
@@ -46,10 +50,11 @@ public class WizardDirective extends AbstractDirective
     private FormDescriptorFactory formDescriptorFactory;
 
     private Configuration configuration;
-    private Wizard wizardInstance;
+    private AbstractTypeWizard wizardInstance;
 
     public WizardDirective()
     {
+        registerContextResolverIfRequired();
         ComponentContext.autowire(this);
     }
 
@@ -69,13 +74,13 @@ public class WizardDirective extends AbstractDirective
         wireParams(params);
 
         String sessionKey = PathUtils.normalizePath(path);
-        wizardInstance = (Wizard) ActionContext.getContext().getSession().get(sessionKey);
+        wizardInstance = (AbstractTypeWizard) ActionContext.getContext().getSession().get(sessionKey);
         if (wizardInstance == null)
         {
             return false;
         }
 
-        WizardState currentState = wizardInstance.getCurrentState();
+        TypeWizardState currentState = wizardInstance.getCurrentState();
         if (currentState == null)
         {
             return false;
@@ -86,16 +91,13 @@ public class WizardDirective extends AbstractDirective
         return true;
     }
 
-    private String internalRender(WizardState state) throws IOException, ParseErrorException
+    private String internalRender(TypeWizardState state) throws IOException, ParseErrorException
     {
         // handle rendering of the freemarker template.
         StringWriter writer = new StringWriter();
 
         try
         {
-            Messages stateMessages = state.getMessages();
-            Messages wizardMessages = Messages.getInstance(wizardInstance.getClass());
-
             WizardDescriptor wizardDescriptor = new WizardDescriptor(wizardInstance);
             wizardDescriptor.setFormDescriptorFactory(formDescriptorFactory);
             wizardDescriptor.setDecorate(decorate);
@@ -103,8 +105,9 @@ public class WizardDirective extends AbstractDirective
 
             Map<String, Object> context = new HashMap<String, Object>();
 
-            context.put("i18nText", new GetTextMethod(stateMessages, wizardMessages));
+            Messages messages = Messages.getInstance(new WizardContext(wizardInstance));
 
+            context.put("i18nText", new GetTextMethod(messages));
             context.put("wizard", wizardDescriptor.instantiate(path, state.getRecord()));
 
             // validation support:
@@ -172,5 +175,14 @@ public class WizardDirective extends AbstractDirective
     public void setFormDescriptorFactory(FormDescriptorFactory formDescriptorFactory)
     {
         this.formDescriptorFactory = formDescriptorFactory;
+    }
+
+    private static void registerContextResolverIfRequired()
+    {
+        if (registrationRequired)
+        {
+            Messages.addResolver(new WizardContextResolver());
+            registrationRequired = false;
+        }
     }
 }

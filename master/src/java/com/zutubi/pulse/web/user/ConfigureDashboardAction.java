@@ -23,7 +23,6 @@ public class ConfigureDashboardAction extends UserActionSupport
     private boolean showMyChanges = false;
     private boolean showProjectChanges = false;
     private CleanupManager cleanupManager;
-    private ProjectFormHelper projectHelper;
     private ProjectGroupFormHelper groupHelper;
 
     public int getBuildCount()
@@ -126,7 +125,7 @@ public class ConfigureDashboardAction extends UserActionSupport
         buildCount = user.getDashboardBuildCount();
 
         showAllProjects = user.getShowAllProjects();
-        projects = getProjectHelper().convertToIds(user.getShownProjects());
+//        projects = getProjectHelper().convertToIds(user.getShownProjects());
         shownGroups = getGroupHelper().convertToIds(user.getShownGroups());
 
         showMyChanges = user.getShowMyChanges();
@@ -158,7 +157,7 @@ public class ConfigureDashboardAction extends UserActionSupport
         }
         else
         {
-            getProjectHelper().convertFromIds(projects, user.getShownProjects());
+//            getProjectHelper().convertFromIds(projects, user.getShownProjects());
         }
 
         getGroupHelper().convertFromIds(shownGroups, user.getShownGroups());
@@ -173,11 +172,7 @@ public class ConfigureDashboardAction extends UserActionSupport
 
     public ProjectFormHelper getProjectHelper()
     {
-        if (projectHelper == null)
-        {
-            projectHelper = new ProjectFormHelper(projectManager);
-        }
-        return projectHelper;
+        throw new RuntimeException("project is no longer a named entity.");
     }
 
     public ProjectGroupFormHelper getGroupHelper()

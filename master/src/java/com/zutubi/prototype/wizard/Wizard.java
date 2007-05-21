@@ -64,7 +64,18 @@ public interface Wizard
      */
     WizardState doRestart();
 
+    /**
+     * A count of the number of states defined in this wizard. Note, this currently assumes that the wizard
+     * does not branch.
+     *
+     * @return
+     */
     int getStateCount();
 
+    /**
+     * Get the index of the current state. The index starts at 0, and ends at #getStateCount() - 1
+     * 
+     * @return
+     */
     int getCurrentStateIndex();
 }

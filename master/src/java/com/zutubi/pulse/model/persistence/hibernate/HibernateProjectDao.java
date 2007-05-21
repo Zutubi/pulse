@@ -19,11 +19,6 @@ public class HibernateProjectDao extends HibernateEntityDao<Project> implements 
         return Project.class;
     }
 
-    public Project findByName(final String name)
-    {
-        return (Project) findUniqueByNamedQuery("findByName", "name", name, true);
-    }
-
     public void save(VersionedPulseFileDetails details)
     {
         getHibernateTemplate().saveOrUpdate(details);

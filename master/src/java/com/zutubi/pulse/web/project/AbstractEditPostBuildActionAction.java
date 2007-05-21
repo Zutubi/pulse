@@ -152,11 +152,13 @@ public abstract class AbstractEditPostBuildActionAction extends ProjectActionSup
             return;
         }
 
+/*
         PostBuildAction a = getProject().getPostBuildAction(newName);
         if(a != null && a.getId() != getPostBuildAction().getId())
         {
             addFieldError("newName", "This project already has a post build action with name '" + newName + "'");
         }
+*/
     }
 
     public String execute()
@@ -176,6 +178,7 @@ public abstract class AbstractEditPostBuildActionAction extends ProjectActionSup
 
     protected PostBuildAction lookupAction()
     {
+/*
         PostBuildAction a = project.getPostBuildAction(getId());
         if (a == null)
         {
@@ -183,6 +186,8 @@ public abstract class AbstractEditPostBuildActionAction extends ProjectActionSup
         }
 
         return a;
+*/
+        return null;
     }
 
     public abstract PostBuildAction getPostBuildAction();

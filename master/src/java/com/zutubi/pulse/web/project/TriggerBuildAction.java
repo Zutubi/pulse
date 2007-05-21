@@ -48,7 +48,7 @@ public class TriggerBuildAction extends ProjectActionSupport
             return "prompt";
         }
         
-        getProjectManager().triggerBuild(project, new ManualTriggerBuildReason((String)getPrinciple()), null, true);
+        getProjectManager().triggerBuild(projectConfig, new ManualTriggerBuildReason((String)getPrinciple()), null, true);
 
         try
         {

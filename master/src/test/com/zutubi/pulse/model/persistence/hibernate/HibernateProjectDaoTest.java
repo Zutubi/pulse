@@ -102,20 +102,11 @@ public class HibernateProjectDaoTest extends MasterPersistenceTestCase
         assertPropertyEquals(action, otherAction);
     }
 
-    public void testFindByName()
-    {
-        Project projectA = new Project("nameA");
-        projectDao.save(projectA);
-        commitAndRefreshTransaction();
-        assertNotNull(projectDao.findByName("nameA"));
-    }
-
     public void testFindByAdminAuthority()
     {
-        Project a = addAdminProject("justA1");
-        addAdminProject("justA1", "A1");
-        addAdminProject("justA2", "A2");
-        Project d = addAdminProject("bothA1A2", "A1", "A2");
+        Project a = addAdminProject("A1");
+        addAdminProject("A2");
+        Project d = addAdminProject("A1", "A2");
 
         commitAndRefreshTransaction();
         List<Project> projects = projectDao.findByAdminAuthority("A1");
@@ -124,9 +115,9 @@ public class HibernateProjectDaoTest extends MasterPersistenceTestCase
         assertEquals(d, projects.get(1));
     }
 
-    private Project addAdminProject(String name, String... authorities)
+    private Project addAdminProject(String... authorities)
     {
-        Project p = new Project(name);
+        Project p = new Project();
         for(String a: authorities)
         {
             p.addAdmin(a);

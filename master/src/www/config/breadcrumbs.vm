@@ -12,3 +12,4 @@
 #end
     ${sep} $!action.configuration.currentPath
 </div>
+<div>&nbsp;</div>

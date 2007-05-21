@@ -4,6 +4,7 @@ import com.zutubi.config.annotations.ConfigurationCheck;
 import com.zutubi.config.annotations.Form;
 import com.zutubi.config.annotations.Password;
 import com.zutubi.config.annotations.SymbolicName;
+import com.zutubi.config.annotations.ControllingCheckbox;
 import com.zutubi.validation.annotations.Email;
 import com.zutubi.validation.annotations.Numeric;
 import com.zutubi.validation.annotations.Required;
@@ -27,7 +28,10 @@ public class EmailConfiguration extends AbstractConfiguration
     @Password
     private String password;
     private String subjectPrefix;
+
+    @ControllingCheckbox(dependentFields = {"port"})
     private boolean customPort;
+    
     @Numeric(min = 1)
     private int port;
 

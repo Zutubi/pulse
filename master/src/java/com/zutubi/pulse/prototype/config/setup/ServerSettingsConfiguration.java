@@ -25,9 +25,9 @@ public class ServerSettingsConfiguration extends AbstractConfiguration implement
 {
     @Url @Required
     private String baseUrl;
-    @Email
     private String host;
     private boolean ssl;
+    @Email
     private String from;
     private boolean customPort;
     private int port = 25;

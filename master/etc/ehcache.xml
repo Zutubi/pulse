@@ -198,11 +198,6 @@
            eternal="true"
            overflowToDisk="false"/>
 
-    <cache name="com.zutubi.pulse.model.ChangeViewer"
-           maxElementsInMemory="500"
-           eternal="true"
-           overflowToDisk="false"/>
-
     <cache name="com.zutubi.pulse.model.PulseFileDetails"
            maxElementsInMemory="500"
            eternal="true"

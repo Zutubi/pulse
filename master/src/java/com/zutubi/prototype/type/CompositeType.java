@@ -102,6 +102,17 @@ public class CompositeType extends AbstractType implements ComplexType
         });
     }
 
+    public List<Type> getPropertyTypes(Class<? extends Type> type)
+    {
+        return CollectionUtils.map(getProperties(type), new Mapping<TypeProperty, Type>()
+        {
+            public Type map(TypeProperty property)
+            {
+                return property.getType();
+            }
+        });
+    }
+
     public List<String> getPropertyNames()
     {
         return Collections.unmodifiableList(new LinkedList<String>(properties.keySet()));

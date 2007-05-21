@@ -217,7 +217,8 @@ public class FatController implements EventListener, Stoppable
             return;
         }
 
-        if (!event.isPersonal() && event.getProject().isPaused())
+        Project project = projectManager.getProject(event.getProjectConfig().getProjectId());
+        if (!event.isPersonal() && project.isPaused())
         {
             // Ignore build requests while project is paused
             return;
@@ -231,7 +232,7 @@ public class FatController implements EventListener, Stoppable
 
     private void startBuild(AbstractBuildRequestEvent event)
     {
-        final Project project = event.getProject();
+        final Project project = projectManager.getProject(event.getProjectConfig().getProjectId());
 
         lock.lock();
         try
@@ -330,7 +331,7 @@ public class FatController implements EventListener, Stoppable
      * @return a mapping of owners to queued build request events. These events will be
      * the order that these events will be handled.
      */
-    public Map<Entity, List<AbstractBuildRequestEvent>> snapshotBuildQueue()
+    public Map<Object, List<AbstractBuildRequestEvent>> snapshotBuildQueue()
     {
         lock.lock();
         try

@@ -362,7 +362,7 @@ public class ConfigurationWizardAction extends ActionSupport
         }
         catch (Exception e)
         {
-            e.printStackTrace();
+            LOG.warning(e);
             return null;
         }
     }
@@ -377,6 +377,10 @@ public class ConfigurationWizardAction extends ActionSupport
             type = ((CollectionType) type).getCollectionType();
         }
 
+        // can create wizards using a number of conventions.
+        // a) <configurationClass>Wizard
+        // b) defined by the Wizard annotation.
+
         com.zutubi.config.annotations.Wizard annotation = (com.zutubi.config.annotations.Wizard) type.getAnnotation(com.zutubi.config.annotations.Wizard.class);
         if (annotation != null)
         {
@@ -387,6 +391,7 @@ public class ConfigurationWizardAction extends ActionSupport
             }
             catch (Exception e)
             {
+                LOG.warning(e);
                 e.printStackTrace();
             }
         }

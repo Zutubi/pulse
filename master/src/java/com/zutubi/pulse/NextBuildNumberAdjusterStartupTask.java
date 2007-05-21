@@ -30,7 +30,7 @@ public class NextBuildNumberAdjusterStartupTask implements StartupTask
             File candidateDir = getCandidateDir(paths, project, nextNumber);
             while(candidateDir.exists())
             {
-                LOG.warning("Build directory '" + candidateDir.getAbsolutePath() + "' already exists.  Skipping build number '" + nextNumber + "' for project '" + project.getName() + "'");
+                LOG.warning("Build directory '" + candidateDir.getAbsolutePath() + "' already exists.  Skipping build number '" + nextNumber + "' for project '" + project.getId() + "'");
                 // Increments and saves the new number.
                 projectManager.getNextBuildNumber(project);
                 candidateDir = getCandidateDir(paths, project, ++nextNumber);

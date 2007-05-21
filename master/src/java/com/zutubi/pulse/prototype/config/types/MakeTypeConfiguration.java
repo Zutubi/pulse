@@ -1,17 +1,15 @@
 package com.zutubi.pulse.prototype.config.types;
 
-import com.zutubi.pulse.core.config.AbstractConfiguration;
 import com.zutubi.config.annotations.SymbolicName;
-
-import java.util.Map;
-import java.util.TreeMap;
+import com.opensymphony.util.TextUtils;
+import org.apache.velocity.VelocityContext;
 
 /**
  *
  *
  */
 @SymbolicName("internal.makeTypeConfig")
-public class MakeTypeConfiguration extends AbstractConfiguration
+public class MakeTypeConfiguration extends TemplateTypeConfiguration
 {
     private String makefile;
 
@@ -83,4 +81,34 @@ public class MakeTypeConfiguration extends AbstractConfiguration
         this.environment = environment;
     }
 */
+
+    protected String getTemplateName()
+    {
+        return "make.template.vm";
+    }
+
+    protected void setupContext(VelocityContext context)
+    {
+        if (TextUtils.stringSet(makefile))
+        {
+            context.put("makefile", makefile);
+        }
+
+        if (TextUtils.stringSet(targets))
+        {
+            context.put("targets", targets);
+        }
+
+        if (TextUtils.stringSet(arguments))
+        {
+            context.put("arguments", arguments);
+        }
+
+        if (TextUtils.stringSet(workingDir))
+        {
+            context.put("workingDir", workingDir);
+        }
+
+//        context.put("environment", environment);
+    }
 }

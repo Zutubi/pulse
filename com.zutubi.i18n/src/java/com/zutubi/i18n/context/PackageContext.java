@@ -1,5 +1,7 @@
 package com.zutubi.i18n.context;
 
+import java.io.InputStream;
+
 /**
  * <class-comment/>
  */
@@ -15,6 +17,11 @@ public class PackageContext implements Context
     public PackageContext(Object obj)
     {
         packageName = getPackageName(obj);
+    }
+
+    public InputStream getResourceAsStream(String name)
+    {
+        return getClass().getResourceAsStream(name);
     }
 
     private String getPackageName(Object context)

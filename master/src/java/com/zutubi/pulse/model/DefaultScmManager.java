@@ -116,7 +116,12 @@ public class DefaultScmManager implements ScmManager, Stoppable
         {
             public boolean satisfied(ProjectConfiguration configuration)
             {
-                return configuration.getScm().getMonitor();
+                ScmConfiguration scm = configuration.getScm();
+                if (scm != null)
+                {
+                    return configuration.getScm().getMonitor();
+                }
+                return false;
             }
         });
     }

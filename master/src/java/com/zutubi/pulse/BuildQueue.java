@@ -20,11 +20,11 @@ public class BuildQueue
      * queued requests for the entity.  The entity is either a project or a
      * user (for personal builds).
      */
-    private Map<Entity, List<AbstractBuildRequestEvent>> requests;
+    private Map<Object, List<AbstractBuildRequestEvent>> requests;
 
     public BuildQueue()
     {
-        this.requests = new HashMap<Entity, List<AbstractBuildRequestEvent>>();
+        this.requests = new HashMap<Object, List<AbstractBuildRequestEvent>>();
     }
 
     /**
@@ -36,10 +36,10 @@ public class BuildQueue
      */
     public boolean buildRequested(AbstractBuildRequestEvent event)
     {
-        Entity entity = event.getOwner();
-        checkEntity(entity);
+        Object owner = event.getOwner();
+        checkOwner(owner);
 
-        List<AbstractBuildRequestEvent> entityRequests = requests.get(entity);
+        List<AbstractBuildRequestEvent> entityRequests = requests.get(owner);
         synchronized(entityRequests)
         {
             if (entityRequests.size() > 0)
@@ -55,11 +55,11 @@ public class BuildQueue
         }
     }
 
-    private void checkEntity(Entity entity)
+    private void checkOwner(Object owner)
     {
-        if (!requests.containsKey(entity))
+        if (!requests.containsKey(owner))
         {
-            requests.put(entity, new LinkedList<AbstractBuildRequestEvent>());
+            requests.put(owner, new LinkedList<AbstractBuildRequestEvent>());
         }
     }
 
@@ -73,7 +73,7 @@ public class BuildQueue
             // recipe is dispatched (CIB-701).
             for (AbstractBuildRequestEvent e : entityRequests)
             {
-                if (!e.getRevision().isFixed() && e.getProject().equals(event.getProject()))
+                if (!e.getRevision().isFixed() && e.getProjectConfig().getHandle() == event.getProjectConfig().getHandle())
                 {
                     // Existing floater, no need to remember this request.
                     return;
@@ -92,7 +92,7 @@ public class BuildQueue
      * @param owner owner of the completed build
      * @return the next request for the project, or null if there is none
      */
-    public AbstractBuildRequestEvent buildCompleted(Entity owner)
+    public AbstractBuildRequestEvent buildCompleted(Object owner)
     {
         List<AbstractBuildRequestEvent> entityRequests = requests.get(owner);
         assert(entityRequests.size() > 0);
@@ -112,10 +112,10 @@ public class BuildQueue
         }
     }
 
-    public Map<Entity, List<AbstractBuildRequestEvent>> takeSnapshot()
+    public Map<Object, List<AbstractBuildRequestEvent>> takeSnapshot()
     {
-        Map<Entity, List<AbstractBuildRequestEvent>> queue = new HashMap<Entity, List<AbstractBuildRequestEvent>>();
-        for (Map.Entry<Entity, List<AbstractBuildRequestEvent>> entry : requests.entrySet())
+        Map<Object, List<AbstractBuildRequestEvent>> queue = new HashMap<Object, List<AbstractBuildRequestEvent>>();
+        for (Map.Entry<Object, List<AbstractBuildRequestEvent>> entry : requests.entrySet())
         {
             List<AbstractBuildRequestEvent> events = new LinkedList<AbstractBuildRequestEvent>(entry.getValue());
             queue.put(entry.getKey(), events);
@@ -127,7 +127,7 @@ public class BuildQueue
     public boolean cancelBuild(long id)
     {
         // Locate build request and remove it.  If it does not exist, return false.
-        for (Map.Entry<Entity, List<AbstractBuildRequestEvent>> entry : requests.entrySet())
+        for (Map.Entry<Object, List<AbstractBuildRequestEvent>> entry : requests.entrySet())
         {
             List<AbstractBuildRequestEvent> events = entry.getValue();
             synchronized(events)

@@ -10,16 +10,18 @@ import com.zutubi.pulse.prototype.config.ProjectConfiguration;
 public class BuildRequestEvent extends AbstractBuildRequestEvent
 {
     private BuildReason reason;
+    private Project project;
 
     public BuildRequestEvent(Object source, BuildReason reason, ProjectConfiguration projectConfig, Project project, BuildRevision revision)
     {
-        super(source, revision, projectConfig, project);
+        super(source, revision, projectConfig);
         this.reason = reason;
+        this.project = project;
     }
 
     public Entity getOwner()
     {
-        return getProject();
+        return project;
     }
 
     public boolean isPersonal()
@@ -34,18 +36,21 @@ public class BuildRequestEvent extends AbstractBuildRequestEvent
 
     public BuildResult createResult(ProjectManager projectManager, UserManager userManager)
     {
-        return new BuildResult(reason, getProject(), projectManager.getNextBuildNumber(getProject()), getRevision().isUser());
+        Project project = projectManager.getProject(getProjectConfig().getProjectId());
+        return new BuildResult(reason, project, projectManager.getNextBuildNumber(project), getRevision().isUser());
     }
 
     public String toString()
     {
         StringBuffer buff = new StringBuffer("Build Request Event");
-        if (getProject() != null)
+        if (getProjectConfig() != null)
         {
+            // should never be null, but then again, toString must never fail either.
             buff.append(": ").append(getProjectConfig().getName());
         }
         if (getReason() != null)
         {
+            // should never be null, but then again, toString must never fail either.
             buff.append(": ").append(getReason().getSummary());
         }
         return buff.toString();

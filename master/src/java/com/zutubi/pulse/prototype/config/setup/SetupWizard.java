@@ -3,10 +3,12 @@ package com.zutubi.pulse.prototype.config.setup;
 import com.zutubi.prototype.type.CompositeType;
 import com.zutubi.prototype.type.TypeException;
 import com.zutubi.prototype.type.TypeProperty;
+import com.zutubi.prototype.type.Type;
 import com.zutubi.prototype.type.record.MutableRecord;
 import com.zutubi.prototype.type.record.PathUtils;
 import com.zutubi.prototype.wizard.WizardState;
 import com.zutubi.prototype.wizard.WizardTransition;
+import com.zutubi.prototype.wizard.TypeWizardState;
 import com.zutubi.prototype.wizard.webwork.AbstractTypeWizard;
 import com.zutubi.pulse.bootstrap.MasterConfiguration;
 import com.zutubi.pulse.bootstrap.MasterConfigurationManager;
@@ -42,7 +44,7 @@ public class SetupWizard extends AbstractTypeWizard
         adminConfigType = typeRegistry.getType(AdminUserConfiguration.class);
         CompositeType serverConfigType = typeRegistry.getType(ServerSettingsConfiguration.class);
 
-        wizardStates = new LinkedList<WizardState>();
+        wizardStates = new LinkedList<TypeWizardState>();
         addWizardStates(wizardStates, adminConfigType, null);
         addWizardStates(wizardStates, serverConfigType, null);
 
@@ -60,6 +62,11 @@ public class SetupWizard extends AbstractTypeWizard
         List<WizardTransition> transitions = super.getAvailableActions();
         transitions.remove(WizardTransition.CANCEL);
         return transitions;        
+    }
+
+    public Type getType()
+    {
+        return adminConfigType;
     }
 
     public void doFinish()

@@ -34,6 +34,19 @@ public class Messages
         return handler;
     }
 
+    /**
+     * Add a custom resolver to the I18N bundle manager.
+     * 
+     * @param resolver
+     */
+    public static void addResolver(ContextResolver resolver)
+    {
+        // ensure that the handler is initialised.
+        DefaultMessageHandler handler = (DefaultMessageHandler)getHandler();
+        DefaultBundleManager bundleManager = (DefaultBundleManager) handler.bundleManager;
+        bundleManager.addResolver(resolver);
+    }
+
     public static String format(Object context, String key)
     {
         return getHandler().format(getContext(context), key);

@@ -4,6 +4,7 @@ import com.zutubi.pulse.events.EventManager;
 import com.zutubi.pulse.events.build.CommandOutputEvent;
 
 import java.io.OutputStream;
+import java.io.IOException;
 
 /**
  *
@@ -50,8 +51,12 @@ public class CommandOutputStream extends OutputStream implements Runnable
         checkBuffer();
     }
 
-    public synchronized void write(byte b[], int off, int len)
+    public synchronized void write(byte b[], int off, int len) throws IOException
     {
+        if (buffer == null)
+        {
+            throw new IOException("Attempting to write to closed OutputStream.");
+        }
         if (offset + len <= MINIMUM_SIZE)
         {
             // It fits in the buffer, chuck it there
