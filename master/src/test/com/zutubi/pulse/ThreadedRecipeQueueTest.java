@@ -495,7 +495,20 @@ public class ThreadedRecipeQueueTest extends TestCase implements EventListener
         ProjectConfiguration projectConfig = new ProjectConfiguration();
         projectConfig.setScm(scm);
         projectConfig.setProjectId(projectId);
-        projectConfig.setType(new CustomTypeConfiguration());
+        CustomTypeConfiguration type = new CustomTypeConfiguration()
+        {
+            public String getPulseFile(long id, ProjectConfiguration projectConfig, Revision revision, PatchArchive patch)
+            {
+                long number = ((NumericalRevision) revision).getRevisionNumber();
+                if (number == 0)
+                {
+                    throw new BuildException("test");
+                }
+                return getPulseFileForRevision(number);
+            }
+        };
+
+        projectConfig.setType(type);
         return projectConfig;
     }
 
@@ -708,7 +721,6 @@ public class ThreadedRecipeQueueTest extends TestCase implements EventListener
     private RecipeDispatchRequest createDispatchRequest(int type, long id, ProjectConfiguration projectConfig)
     {
         Project project = new Project();
-//        project.setPulseFileDetails(new MockPulseFileDetails());
         BuildResult result = new BuildResult(new UnknownBuildReason(), project, 100, false);
         BuildHostRequirements requirements = new MockBuildHostRequirements(type);
         RecipeRequest request = new RecipeRequest("project", id, null, null, null, false, null, new LinkedList<ResourceProperty>());
@@ -723,7 +735,6 @@ public class ThreadedRecipeQueueTest extends TestCase implements EventListener
 
     public void handleEvent(Event evt)
     {
-        System.out.println("evt = " + evt.toString());
         if(evt instanceof RecipeErrorEvent)
         {
             recipeErrors.add((RecipeErrorEvent) evt);
@@ -888,41 +899,6 @@ public class ThreadedRecipeQueueTest extends TestCase implements EventListener
         public Revision getRevision(String revision) throws ScmException
         {
             throw new RuntimeException("Method not yet implemented.");
-        }
-    }
-
-
-    class MockPulseFileDetails extends PulseFileDetails
-    {
-        public PulseFileDetails copy()
-        {
-            throw new RuntimeException("Method not implemented.");
-        }
-
-        public boolean isBuiltIn()
-        {
-            throw new RuntimeException("Method not implemented.");
-        }
-
-        public String getType()
-        {
-            throw new RuntimeException("Method not implemented.");
-        }
-
-        public Properties getProperties()
-        {
-            throw new RuntimeException("Method not implemented.");
-        }
-
-        public String getPulseFile(long id, ProjectConfiguration projectConfig, Project project, Revision revision, PatchArchive patch)
-        {
-            long number = ((NumericalRevision) revision).getRevisionNumber();
-            if(number == 0)
-            {
-                throw new BuildException("test");
-            }
-
-            return getPulseFileForRevision(number);
         }
     }
 

@@ -76,32 +76,6 @@ public class HibernateProjectDaoTest extends MasterPersistenceTestCase
         assertPropertyEquals(capture, otherDetails.getCaptures().get(0));
     }
 
-    public void testLoadSaveTagAction()
-    {
-        TagPostBuildAction action = new TagPostBuildAction();
-        action.setStates(Arrays.asList(ResultState.SUCCESS));
-        action.setTag("tag-name");
-        action.setMoveExisting(true);
-        projectDao.save(action);
-        commitAndRefreshTransaction();
-
-        TagPostBuildAction otherAction = projectDao.findTagPostBuildAction(action.getId());
-        assertPropertyEquals(action, otherAction);
-    }
-
-    public void testLoadSaveExecutableAction()
-    {
-        RunExecutablePostBuildAction action = new RunExecutablePostBuildAction();
-        action.setStates(Arrays.asList(ResultState.SUCCESS));
-        action.setCommand("command");
-        action.setArguments("args");
-        projectDao.save(action);
-        commitAndRefreshTransaction();
-
-        RunExecutablePostBuildAction otherAction = projectDao.findRunExecutablePostBuildAction(action.getId());
-        assertPropertyEquals(action, otherAction);
-    }
-
     public void testFindByAdminAuthority()
     {
         Project a = addAdminProject("A1");
