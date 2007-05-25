@@ -12,8 +12,8 @@ import com.zutubi.pulse.prototype.config.ProjectConfiguration;
 public abstract class AbstractBuildRequestEvent extends Event
 {
     private BuildRevision revision;
-    private ProjectConfiguration projectConfig;
     private long queued;
+    protected ProjectConfiguration projectConfig;
 
     public AbstractBuildRequestEvent(Object source, BuildRevision revision, ProjectConfiguration projectConfig)
     {
@@ -24,7 +24,7 @@ public abstract class AbstractBuildRequestEvent extends Event
         this.queued = System.currentTimeMillis();
     }
 
-    public abstract Entity getOwner();
+    public abstract Object getOwner();
     public abstract boolean isPersonal();
     public abstract BuildResult createResult(ProjectManager projectManager, UserManager userManager);
 

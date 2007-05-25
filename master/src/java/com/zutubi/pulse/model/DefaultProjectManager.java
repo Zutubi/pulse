@@ -269,7 +269,7 @@ public class DefaultProjectManager implements ProjectManager
             }
             else
             {
-                eventManager.publish(new BuildRequestEvent(this, reason, projectConfig, project, new BuildRevision()));
+                eventManager.publish(new BuildRequestEvent(this, reason, projectConfig, new BuildRevision()));
             }
         }
         else
@@ -313,7 +313,7 @@ public class DefaultProjectManager implements ProjectManager
         try
         {
             String pulseFile = getPulseFile(projectConfig, revision, null);
-            eventManager.publish(new BuildRequestEvent(this, reason, projectConfig, project, new BuildRevision(revision, pulseFile, reason.isUser())));
+            eventManager.publish(new BuildRequestEvent(this, reason, projectConfig, new BuildRevision(revision, pulseFile, reason.isUser())));
         }
         catch (BuildException e)
         {

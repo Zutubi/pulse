@@ -3,12 +3,21 @@ package com.zutubi.pulse.web.server;
 import com.zutubi.pulse.FatController;
 import com.zutubi.pulse.RecipeDispatchRequest;
 import com.zutubi.pulse.RecipeQueue;
-import com.zutubi.pulse.core.model.Entity;
 import com.zutubi.pulse.events.build.AbstractBuildRequestEvent;
-import com.zutubi.pulse.model.*;
+import com.zutubi.pulse.model.BuildManager;
+import com.zutubi.pulse.model.BuildResult;
+import com.zutubi.pulse.model.Project;
+import com.zutubi.pulse.model.ProjectManager;
+import com.zutubi.pulse.model.User;
+import com.zutubi.pulse.model.UserManager;
+import com.zutubi.pulse.prototype.config.ProjectConfiguration;
 import com.zutubi.pulse.web.ActionSupport;
 
-import java.util.*;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
 
 /**
  */
@@ -20,6 +29,7 @@ public class ViewServerQueuesAction extends ActionSupport
     private FatController fatController;
     private RecipeQueue recipeQueue;
     private BuildManager buildManager;
+    private ProjectManager projectManager;
     private UserManager userManager;
 
     public List<AbstractBuildRequestEvent> getBuildQueue()
@@ -74,7 +84,9 @@ public class ViewServerQueuesAction extends ActionSupport
                 }
                 else
                 {
-                    result = buildManager.getLatestBuildResult((Project) active.getOwner());
+                    ProjectConfiguration projectConfig = (ProjectConfiguration) active.getOwner();
+                    Project project = projectManager.getProject(projectConfig.getId());
+                    result = buildManager.getLatestBuildResult(project);
                 }
 
                 if(result != null && !result.completed())
@@ -126,5 +138,10 @@ public class ViewServerQueuesAction extends ActionSupport
     public void setUserManager(UserManager userManager)
     {
         this.userManager = userManager;
+    }
+
+    public void setProjectManager(ProjectManager projectManager)
+    {
+        this.projectManager = projectManager;
     }
 }
