@@ -615,40 +615,52 @@ public class BuildController implements EventListener
 
     private void completeBuild()
     {
-        buildResult.abortUnfinishedRecipes();
-        buildResult.setHasWorkDir(specification.getRetainWorkingCopy());
-        buildResult.complete();
-
-        if (!request.isPersonal())
+        // FIXME: If there is an SQL problem while saving the build result, the build becomes stuck and the server
+        // needs to be restarted to clear it up.  To prevent the need for server restarts, we catch and log the exception
+        // and continue.  This leaves the build result in an incorrect state, but will allow builds to continue. The
+        // builds will be cleaned up next time the server restarts.  THIS IS ONLY A TEMPORARY FIX UNTIL WE WORK OUT
+        // WHAT IS CAUSING THE SQL PROBLEMS (DEADLOCKS, STALE SESSIONS) IN THE FIRST PLACE.
+        // Unfortunately, if we can not write to the db, then we are a little stuffed.
+        try
         {
-            if (specification.getForceClean())
+            buildResult.abortUnfinishedRecipes();
+            buildResult.setHasWorkDir(specification.getRetainWorkingCopy());
+            buildResult.complete();
+
+            if (!request.isPersonal())
             {
-                specification.setForceClean(false);
-                projectManager.save(specification);
+                if (specification.getForceClean())
+                {
+                    specification.setForceClean(false);
+                    projectManager.save(specification);
+                }
+
+                for (PostBuildAction action : buildResult.getProject().getPostBuildActions())
+                {
+                    ComponentContext.autowire(action);
+                    action.execute(buildResult, null, buildProperties);
+                }
             }
 
-            for (PostBuildAction action : buildResult.getProject().getPostBuildActions())
+            // calculate the feature counts at the end of the build so that the result hierarchy does not need to
+            // be traversed when this information is required.
+            buildResult.calculateFeatureCounts();
+
+            long start = System.currentTimeMillis();
+            testManager.index(buildResult);
+            long duration = System.currentTimeMillis() - start;
+            if (duration > 300000)
             {
-                ComponentContext.autowire(action);
-                action.execute(buildResult, null, buildProperties);
+                LOG.warning("Test case indexing for project %s specification %s took %f seconds", project.getName(), specification.getName(), duration / 1000.0);
             }
+
+            buildManager.save(buildResult);
+            tree.cleanup(buildResult);
         }
-
-        // calculate the feature counts at the end of the build so that the result hierarchy does not need to
-        // be traversed when this information is required.
-        buildResult.calculateFeatureCounts();
-
-        long start = System.currentTimeMillis();
-        testManager.index(buildResult);
-        long duration = System.currentTimeMillis() - start;
-        if (duration > 300000)
+        catch (Exception e)
         {
-            LOG.warning("Test case indexing for project %s specification %s took %f seconds", project.getName(), specification.getName(), duration / 1000.0);
+            LOG.severe("Failed to persist the completed build result. Reason: " + e.getMessage(), e);
         }
-
-        buildManager.save(buildResult);
-
-        tree.cleanup(buildResult);
 
         eventManager.unregister(asyncListener);
         eventManager.publish(new BuildCompletedEvent(this, buildResult));
