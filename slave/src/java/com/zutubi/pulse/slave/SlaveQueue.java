@@ -36,7 +36,7 @@ public class SlaveQueue implements Runnable, Stoppable
             throw new IllegalStateException("The queue is already running.");
         }
 
-        LOG.debug("start();");
+        LOG.info("Starting slave recipe queue.");
         executorService = Executors.newSingleThreadExecutor();
         executorService.execute(this);
     }
@@ -53,7 +53,7 @@ public class SlaveQueue implements Runnable, Stoppable
             throw new IllegalStateException("The queue is already stopping.");
         }
 
-        LOG.debug("stop();");
+        LOG.info("Stopping slave recipe queue.");
         recipesLock.lock();
         try
         {
@@ -97,6 +97,7 @@ public class SlaveQueue implements Runnable, Stoppable
                     break;
                 }
 
+                LOG.info("Execute recipe.");
                 executor.execute(recipes.remove(0));
             }
             finally
@@ -124,6 +125,7 @@ public class SlaveQueue implements Runnable, Stoppable
         recipesLock.lock();
         try
         {
+            LOG.info("Enqueue recipe.");
             recipes.add(recipe);
             recipesCondition.signal();
         }

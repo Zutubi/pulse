@@ -42,6 +42,7 @@ public class LogConfigurationManager
         // load the default level configuration.
         updateConfiguration(logConfig.getLoggingLevel());
 
+        // publish all events that pass through the event manager to the event logger
         final Logger evtLogger = Loggers.getEventLogger();
         eventManager.register(new AllEventListener()
         {
@@ -54,7 +55,7 @@ public class LogConfigurationManager
                 catch (Throwable t)
                 {
                     // noop.
-                    evtLogger.info(evt.getClass().getName());
+                    evtLogger.info("Failed to log event. Reason: " + t.getMessage(), t);
                 }
             }
         });
@@ -129,7 +130,7 @@ public class LogConfigurationManager
     /**
      * Required resource.
      *
-     * @param config
+     * @param config instance
      */
     public void setLogConfiguration(LogConfiguration config)
     {

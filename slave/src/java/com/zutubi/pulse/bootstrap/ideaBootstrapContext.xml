@@ -28,6 +28,12 @@
                 <property name="configRootString">
                     <value>slave/etc</value>
                 </property>
+                <property name="logRootString">
+                    <value>slave/system/logs</value>
+                </property>
+                <property name="tmpRootString">
+                    <value>slave/system/tmp</value>
+                </property>
             </bean>
         </property>
     </bean>

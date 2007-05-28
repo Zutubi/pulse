@@ -19,6 +19,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.logging.Level;
 
 /**
  */
@@ -35,6 +36,8 @@ public class SlaveStartupManager implements Startup, Stoppable
 
     public void init() throws StartupException
     {
+        LOG.debug("Initialising startup manager.");
+
         ComponentContext.addClassPathContextDefinitions(systemContexts.toArray(new String[systemContexts.size()]));
 
         SystemConfiguration config = configurationManager.getSystemConfig();
@@ -46,6 +49,14 @@ public class SlaveStartupManager implements Startup, Stoppable
 
         loadSystemProperties();
         runStartupRunnables();
+
+        Thread.setDefaultUncaughtExceptionHandler(new Thread.UncaughtExceptionHandler()
+        {
+            public void uncaughtException(Thread t, Throwable e)
+            {
+                java.util.logging.Logger.getLogger("").log(Level.SEVERE, "Uncaught exception: " + e.getMessage(), e);
+            }
+        });
 
         jettyServer = new Server();
         int port = config.getServerPort();
@@ -60,11 +71,14 @@ public class SlaveStartupManager implements Startup, Stoppable
             context.setDefaultsDescriptor(null);
             jettyServer.start();
             startTime = System.currentTimeMillis();
+
+            LOG.info("Agent startup complete.");
+            
             System.out.println("The agent is now listening on port: " + port);
         }
         catch (Exception e)
         {
-            e.printStackTrace();
+            LOG.severe(e);
         }
     }
 
@@ -135,11 +149,12 @@ public class SlaveStartupManager implements Startup, Stoppable
     {
         try
         {
+            LOG.info("Agent shutdown requested.");
             jettyServer.stop(true);
         }
         catch (InterruptedException e)
         {
-            // Ignore.
+            LOG.warning("Exception generated while attempting to shutdown agent. Reason " + e.getMessage(), e);
         }
     }
 }

@@ -1,6 +1,5 @@
 package com.zutubi.pulse.slave;
 
-import com.caucho.hessian.client.HessianRuntimeException;
 import com.zutubi.pulse.core.BuildException;
 import com.zutubi.pulse.events.build.RecipeErrorEvent;
 import com.zutubi.pulse.services.MasterService;
@@ -37,8 +36,8 @@ public class ErrorHandlingRunnable implements Runnable
         }
         catch (BuildException e)
         {
+            LOG.warning(e);
             sendError(e);
-
         }
         catch (Exception e)
         {
