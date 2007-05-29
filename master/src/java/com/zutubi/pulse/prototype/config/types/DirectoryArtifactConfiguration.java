@@ -1,9 +1,12 @@
 package com.zutubi.pulse.prototype.config.types;
 
+import com.zutubi.config.annotations.Form;
+
 /**
  *
  *
  */
+@Form(fieldOrder = {"name", "base", "mimeType", "includes", "excludes"})
 public class DirectoryArtifactConfiguration extends ArtifactConfiguration
 {
     /**

@@ -25,7 +25,7 @@ public class EnumOptionProvider extends MapOptionProvider
         {
             if (includeOption(e))
             {
-                options.put(e.toString(), getPrettyName(e));
+                options.put(e.toString(), e.toString());// FIXME: ui components incorrectly handle the getPrettyName(e));
             }
         }
         

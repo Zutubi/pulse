@@ -19,17 +19,17 @@
 
 #parse("config/breadcrumbs.vm")
 
-<h2>#wwtext("name=confirm.delete")</h2>
+<h2>#i18n("key=confirm.delete")</h2>
 
 <p>
-    #wwtext("name=confirm.delete.blurb")
+    #i18n("key=confirm.delete.blurb")
 </p>
 
-<form id="confirm.form" method="post" action="#url("action=delete" "path=$path")">
+<form id="confirm.form" method="post" action='#url("action=delete" "path=$path")'>
     <table class="form">
         <tr>
-            <th class="content">#wwtext("name=affected.path")</th>
-            <th class="content">#wwtext("name=action")</th>
+            <th class="content">#i18n("key=affected.path")</th>
+            <th class="content">#i18n("key=action.label")</th>
         </tr>
         #showTask($task "")
         <tr>

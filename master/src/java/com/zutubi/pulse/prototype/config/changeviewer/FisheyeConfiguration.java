@@ -4,10 +4,13 @@ import com.zutubi.pulse.core.model.CvsRevision;
 import com.zutubi.pulse.core.model.FileRevision;
 import com.zutubi.pulse.core.model.Revision;
 import com.zutubi.util.StringUtils;
+import com.zutubi.config.annotations.Transient;
+import com.zutubi.config.annotations.Form;
 
 /**
  * A ChangeViewer for linking to a Fisheye instance.
  */
+@Form(fieldOrder = {"name", "baseUrl", "projectPath"})
 public class FisheyeConfiguration extends BasePathChangeViewer
 {
     public FisheyeConfiguration()

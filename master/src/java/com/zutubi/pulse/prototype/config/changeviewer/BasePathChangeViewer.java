@@ -1,6 +1,7 @@
 package com.zutubi.pulse.prototype.config.changeviewer;
 
 import com.zutubi.pulse.servercore.config.ScmConfiguration;
+import com.zutubi.config.annotations.Form;
 
 /**
  * A type of change viewer that can be configured using a base URL and a

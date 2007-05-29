@@ -26,25 +26,21 @@ public class FormattingWrapper
     public Object get(String name) throws Exception
     {
         // type class level formatting
-        Format typeFormatter = (Format) type.getAnnotation(Format.class);
-        if (typeFormatter != null)
+        try
         {
-            try
+            String formatterName = type.getClazz().getName() + "Formatter";
+            Class formatter = ClassLoaderUtils.loadAssociatedClass(type.getClazz(), formatterName);
+            Object formatterInstance = formatter.newInstance();
+            String methodName = "get" + name.substring(0, 1).toUpperCase() + name.substring(1);
+            Method getter = formatter.getMethod(methodName, instance.getClass());
+            if (getter != null)
             {
-                Class formatter = ClassLoaderUtils.loadAssociatedClass(type.getClazz(), typeFormatter.value());
-                Object formatterInstance = formatter.newInstance();
-                String methodName = "get" + name.substring(0, 1).toUpperCase() + name.substring(1);
-                Method getter = formatter.getMethod(methodName, instance.getClass());
-                if (getter != null)
-                {
-                    return getter.invoke(formatterInstance, instance);
-                }
+                return getter.invoke(formatterInstance, instance);
             }
-            catch (Exception e)
-            {
+        }
+        catch (Exception e)
+        {
 //                e.printStackTrace();
-            }
-
         }
 
         // column level formatting

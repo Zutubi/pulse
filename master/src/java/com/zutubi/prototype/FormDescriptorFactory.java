@@ -153,6 +153,10 @@ public class FormDescriptorFactory
                     fieldType = defaultFieldTypeMapping.get(propertyType.getClazz());
                 }
             }
+            else if (propertyType instanceof EnumType)
+            {
+                fieldType = "select";
+            }
         }
 
         FieldDescriptor fd = createFieldOfType(fieldType);

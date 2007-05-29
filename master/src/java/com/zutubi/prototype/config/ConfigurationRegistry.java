@@ -150,10 +150,10 @@ public class ConfigurationRegistry
             artifactConfig.addExtension("fileArtifactConfig");
             artifactConfig.addExtension("directoryArtifactConfig");
 
-            ListType artifacts = new ListType(configurationPersistenceManager);
-            artifacts.setTypeRegistry(typeRegistry);
-            artifacts.setCollectionType(typeRegistry.getType("artifactConfig"));
-            projectConfig.addProperty(new ExtensionTypeProperty("artifact", artifacts));
+//            ListType artifacts = new ListType(configurationPersistenceManager);
+//            artifacts.setTypeRegistry(typeRegistry);
+//            artifacts.setCollectionType(typeRegistry.getType("artifactConfig"));
+//            projectConfig.addProperty(new ExtensionTypeProperty("artifact", artifacts));
 
             // commit message processors.
             CompositeType commitConfig = registerConfigurationType(CommitMessageConfiguration.class);

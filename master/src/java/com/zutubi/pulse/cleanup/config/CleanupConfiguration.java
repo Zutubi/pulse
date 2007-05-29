@@ -20,7 +20,6 @@ import java.util.List;
  */
 @SymbolicName("cleanupRuleConfig")
 @Form(fieldOrder = {"name", "what", "retain", "unit"})
-@Format("CleanupConfigurationFormatter") // look this up by name / convension?
 public class CleanupConfiguration extends AbstractNamedConfiguration
 {
     private CleanupWhat what;

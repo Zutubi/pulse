@@ -1,11 +1,13 @@
 package com.zutubi.pulse.prototype.config.types;
 
 import com.zutubi.validation.annotations.Required;
+import com.zutubi.config.annotations.Form;
 
 /**
  *
  *
  */
+@Form(fieldOrder = {"name", "file", "mimeType"})
 public class FileArtifactConfiguration extends ArtifactConfiguration
 {
     /**

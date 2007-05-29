@@ -2,7 +2,7 @@ package com.zutubi.prototype.webwork;
 
 import com.zutubi.prototype.config.ReferenceCleanupTask;
 import com.zutubi.prototype.type.record.PathUtils;
-import com.zutubi.validation.i18n.DefaultTextProvider;
+import com.zutubi.validation.i18n.MessagesTextProvider;
 import com.zutubi.validation.i18n.TextProvider;
 
 /**
@@ -14,6 +14,8 @@ public class DeleteAction extends PrototypeSupport
     private ReferenceCleanupTask task;
     private String parentPath;
     private ConfigurationPanel newPanel;
+
+    private TextProvider textProvider;
 
     public ReferenceCleanupTask getTask()
     {
@@ -32,12 +34,15 @@ public class DeleteAction extends PrototypeSupport
 
     public TextProvider getTextProvider()
     {
-        return new DefaultTextProvider();
+        return textProvider;
     }
 
     public String execute() throws Exception
     {
         parentPath = PathUtils.getParentPath(path);
+
+        type = configurationPersistenceManager.getType(path);
+        textProvider = new MessagesTextProvider(type.getClazz());
 
         if(isConfirmSelected())
         {

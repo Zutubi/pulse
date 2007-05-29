@@ -28,7 +28,7 @@ public class PrototypeSupport extends ActionSupport implements MessagesProvider
 
     protected Record record;
     
-    private Type type;
+    protected Type type;
 
     private String previous;
     private String next;
