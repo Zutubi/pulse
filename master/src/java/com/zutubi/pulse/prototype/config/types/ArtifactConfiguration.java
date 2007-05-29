@@ -12,7 +12,6 @@ import java.util.List;
  *
  */
 @SymbolicName("internal.artifactConfig")
-@Format("ArtifactConfigurationFormatter")
 public class ArtifactConfiguration extends AbstractNamedConfiguration
 {
     List<String> postprocessors = new LinkedList<String>();

@@ -51,7 +51,7 @@ public class TableDescriptorFactory
         }
 
         ColumnDescriptor columnDescriptor = new SummaryColumnDescriptor(configurationPersistenceManager);
-        columnDescriptor.setFormatter(new AnnotationFormatter(defaultFormatter));
+        columnDescriptor.setFormatter(defaultFormatter);
 
         dataRow.addDescriptor(columnDescriptor);
         dataRow.addDescriptor(new EditColumnDescriptor(ajax));

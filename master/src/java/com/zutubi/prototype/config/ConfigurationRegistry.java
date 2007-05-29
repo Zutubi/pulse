@@ -4,32 +4,36 @@ import com.zutubi.config.annotations.ConfigurationCheck;
 import com.zutubi.prototype.ConfigurationCheckHandler;
 import com.zutubi.prototype.type.CompositeType;
 import com.zutubi.prototype.type.ExtensionTypeProperty;
+import com.zutubi.prototype.type.ListType;
 import com.zutubi.prototype.type.MapType;
 import com.zutubi.prototype.type.ProjectMapType;
 import com.zutubi.prototype.type.TypeException;
 import com.zutubi.prototype.type.TypeHandler;
 import com.zutubi.prototype.type.TypeRegistry;
-import com.zutubi.prototype.type.ListType;
-import com.zutubi.pulse.prototype.config.triggers.BuildCompletedTriggerConfiguration;
-import com.zutubi.pulse.prototype.config.triggers.TriggerConfiguration;
-import com.zutubi.pulse.prototype.config.triggers.CronBuildTriggerConfiguration;
-import com.zutubi.pulse.prototype.config.triggers.ScmBuildTriggerConfiguration;
 import com.zutubi.pulse.prototype.config.CommitMessageConfiguration;
 import com.zutubi.pulse.prototype.config.CustomCommitMessageConfiguration;
 import com.zutubi.pulse.prototype.config.JiraCommitMessageConfiguration;
 import com.zutubi.pulse.prototype.config.ProjectConfiguration;
-import com.zutubi.pulse.prototype.config.changeviewer.FisheyeConfiguration;
+import com.zutubi.pulse.prototype.config.admin.GlobalConfiguration;
+import com.zutubi.pulse.prototype.config.agent.AgentConfiguration;
 import com.zutubi.pulse.prototype.config.changeviewer.ChangeViewerConfiguration;
 import com.zutubi.pulse.prototype.config.changeviewer.CustomChangeViewerConfiguration;
+import com.zutubi.pulse.prototype.config.changeviewer.FisheyeConfiguration;
 import com.zutubi.pulse.prototype.config.changeviewer.P4WebChangeViewer;
 import com.zutubi.pulse.prototype.config.changeviewer.TracChangeViewer;
 import com.zutubi.pulse.prototype.config.changeviewer.ViewVCChangeViewer;
-import com.zutubi.pulse.prototype.config.admin.GlobalConfiguration;
-import com.zutubi.pulse.prototype.config.agent.AgentConfiguration;
 import com.zutubi.pulse.prototype.config.misc.LoginConfiguration;
 import com.zutubi.pulse.prototype.config.misc.TransientConfiguration;
 import com.zutubi.pulse.prototype.config.setup.SetupConfiguration;
+import com.zutubi.pulse.prototype.config.triggers.BuildCompletedTriggerConfiguration;
+import com.zutubi.pulse.prototype.config.triggers.CronBuildTriggerConfiguration;
+import com.zutubi.pulse.prototype.config.triggers.ScmBuildTriggerConfiguration;
+import com.zutubi.pulse.prototype.config.triggers.TriggerConfiguration;
 import com.zutubi.pulse.prototype.config.types.*;
+import com.zutubi.pulse.prototype.config.user.UserConfiguration;
+import com.zutubi.pulse.prototype.config.user.contacts.ContactConfiguration;
+import com.zutubi.pulse.prototype.config.user.contacts.EmailContactConfiguration;
+import com.zutubi.pulse.prototype.config.user.contacts.JabberContactConfiguration;
 import com.zutubi.pulse.servercore.config.CvsConfiguration;
 import com.zutubi.pulse.servercore.config.PerforceConfiguration;
 import com.zutubi.pulse.servercore.config.ScmConfiguration;
@@ -178,6 +182,26 @@ public class ConfigurationRegistry
 
             CompositeType globalConfig = registerConfigurationType("globalConfig", GlobalConfiguration.class);
             configurationPersistenceManager.register(GlobalConfiguration.SCOPE_NAME, globalConfig);
+
+            
+            // user configuration.
+
+            MapType userCollection = new MapType(configurationPersistenceManager);
+            userCollection.setTypeRegistry(typeRegistry);
+            userCollection.setCollectionType(registerConfigurationType(UserConfiguration.class));
+
+            configurationPersistenceManager.register("user", userCollection);
+
+            // contacts configuration
+            CompositeType contactConfig = typeRegistry.getType(ContactConfiguration.class);
+            registerConfigurationType("emailContactConfig", EmailContactConfiguration.class);
+            registerConfigurationType("jabberContactConfig", JabberContactConfiguration.class);
+
+            // sort out the extensions.
+            contactConfig.addExtension("emailContactConfig");
+            contactConfig.addExtension("jabberContactConfig");
+
+
         }
         catch (TypeException e)
         {

@@ -2,21 +2,19 @@ package com.zutubi.pulse.prototype.config;
 
 import com.zutubi.config.annotations.SymbolicName;
 import com.zutubi.config.annotations.Transient;
-import com.zutubi.config.annotations.Format;
 import com.zutubi.pulse.core.config.AbstractNamedConfiguration;
 import com.zutubi.pulse.core.config.ResourceProperty;
+import com.zutubi.pulse.model.AnyCapableBuildHostRequirements;
 import com.zutubi.pulse.model.BuildHostRequirements;
 import com.zutubi.pulse.model.ResourceRequirement;
-import com.zutubi.pulse.model.AnyCapableBuildHostRequirements;
 
-import java.util.Map;
 import java.util.List;
+import java.util.Map;
 
 /**
  *
  *
  */
-@Format("BuildStageConfigurationFormatter")
 @SymbolicName("internal.stageConfig")
 public class BuildStageConfiguration extends AbstractNamedConfiguration
 {

@@ -9,19 +9,7 @@ import java.util.LinkedList;
  */
 public class Table extends UIComponent
 {
-    private List<Column> columns = new LinkedList<Column>();
-
     private List<Row> rows = new LinkedList<Row>();
-
-    public void addColumn(Column column)
-    {
-        columns.add(column);
-    }
-
-    public List<Column> getColumns()
-    {
-        return columns;
-    }
 
     public void addRow(Row row)
     {
@@ -36,10 +24,5 @@ public class Table extends UIComponent
     public List<Row> getRows()
     {
         return rows;
-    }
-
-    public int getColspan()
-    {
-        return columns.size();
     }
 }

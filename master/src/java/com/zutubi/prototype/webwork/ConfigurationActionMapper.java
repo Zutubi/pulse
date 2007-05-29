@@ -9,6 +9,8 @@ import com.zutubi.prototype.type.record.PathUtils;
 import javax.servlet.http.HttpServletRequest;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
+import java.util.HashSet;
 
 /**
  */
@@ -16,6 +18,16 @@ public class ConfigurationActionMapper implements ActionMapper
 {
     static final String CONFIG_NAMESPACE = "/config";
     static final String AJAX_CONFIG_NAMESPACE = "/aconfig";
+
+    static final Set<String> builtinActions = new HashSet<String>();
+    static
+    {
+        builtinActions.add("display");
+        builtinActions.add("index");
+        builtinActions.add("save");
+        builtinActions.add("delete");
+        builtinActions.add("wizard");
+    }
 
     private DefaultActionMapper delegate = new DefaultActionMapper();
 
@@ -37,7 +49,13 @@ public class ConfigurationActionMapper implements ActionMapper
                 {
                     params.put("path", path);
                 }
-                return new ActionMapping(actionSubmit[0], servletPath, null, params);
+                String requestedAction = actionSubmit[0];
+                if (builtinActions.contains(requestedAction))
+                {
+                    return new ActionMapping(requestedAction, servletPath, null, params);
+                }
+                params.put("action", requestedAction);
+                return new ActionMapping("generic", servletPath, null, params);
             }
         }
 

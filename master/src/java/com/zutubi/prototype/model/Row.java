@@ -16,6 +16,19 @@ public class Row extends UIComponent
         cells.add(column);
     }
 
+    public void addCells(List<Column> columns)
+    {
+        cells.addAll(columns);
+    }
+    
+    public void addCells(Column... columns)
+    {
+        for (Column column : columns)
+        {
+            cells.add(column);
+        }
+    }
+
     public List<Column> getCells()
     {
         return cells;

@@ -22,7 +22,6 @@ import java.util.List;
  */
 @Form(fieldOrder = {"name", "url", "description"})
 @Wizard("ProjectConfigurationWizard")
-@Format("ProjectConfigurationFormatter")
 public class ProjectConfiguration extends AbstractNamedConfiguration implements Extendable, NamedEntity
 {
     @Internal
