@@ -1,10 +1,9 @@
 package com.zutubi.pulse.cleanup.config;
 
 import com.zutubi.config.annotations.Form;
-import com.zutubi.config.annotations.Format;
 import com.zutubi.config.annotations.Select;
 import com.zutubi.config.annotations.SymbolicName;
-import com.zutubi.config.annotations.Wizard;
+import com.zutubi.config.annotations.Format;
 import com.zutubi.pulse.core.config.AbstractNamedConfiguration;
 import com.zutubi.pulse.core.model.ResultState;
 import com.zutubi.pulse.model.BuildResult;
@@ -20,13 +19,14 @@ import java.util.List;
  *
  */
 @SymbolicName("cleanupRuleConfig")
-@Format("CleanupConfigurationFormatter")
 @Form(fieldOrder = {"name", "what", "retain", "unit"})
+@Format("CleanupConfigurationFormatter") // look this up by name / convension?
 public class CleanupConfiguration extends AbstractNamedConfiguration
 {
     private CleanupWhat what;
 
     @Select(optionProvider = "com.zutubi.pulse.prototype.CompletedResultStateOptionProvider")
+    @Format("CleanupStateColumnFormatter")
     private List<ResultState> states;
 
     private int retain;

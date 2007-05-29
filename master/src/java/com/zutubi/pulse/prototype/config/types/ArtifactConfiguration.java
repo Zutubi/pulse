@@ -1,6 +1,5 @@
 package com.zutubi.pulse.prototype.config.types;
 
-import com.zutubi.config.annotations.Format;
 import com.zutubi.config.annotations.SymbolicName;
 import com.zutubi.pulse.core.config.AbstractNamedConfiguration;
 

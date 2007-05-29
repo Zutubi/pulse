@@ -32,7 +32,7 @@
 </#list>
 <#else>
     <tr>
-        <td class="content" colspan="${tablewidth}">${no.data.available?i18n}</td>
+        <td class="content" colspan="${tablewidth}">${"no.data.available"?i18n}</td>
     </tr>
 </#if>
     <tr>

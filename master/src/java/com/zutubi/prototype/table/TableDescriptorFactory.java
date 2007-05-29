@@ -33,11 +33,13 @@ public class TableDescriptorFactory
                 TableDefinition def = (TableDefinition) info;
                 for (String columnName : def.getColumns())
                 {
+/*
                     TypeProperty property = type.getProperty(columnName);
                     if (property == null)
                     {
                         continue;
                     }
+*/
 
                     ColumnDescriptor cd = new ColumnDescriptor();
                     cd.setName(columnName);

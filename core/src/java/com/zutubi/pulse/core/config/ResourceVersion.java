@@ -1,11 +1,9 @@
 package com.zutubi.pulse.core.config;
 
-import com.zutubi.pulse.core.FileLoadException;
-import com.zutubi.pulse.core.config.ResourceProperty;
-import com.zutubi.config.annotations.SymbolicName;
-import com.zutubi.config.annotations.ID;
 import com.zutubi.config.annotations.Form;
-import com.zutubi.config.annotations.Format;
+import com.zutubi.config.annotations.ID;
+import com.zutubi.config.annotations.SymbolicName;
+import com.zutubi.pulse.core.FileLoadException;
 
 import java.util.Map;
 import java.util.TreeMap;
@@ -14,7 +12,6 @@ import java.util.TreeMap;
  */
 @Form(fieldOrder = {"value"})
 @SymbolicName("internal.resourceVersion")
-@Format("ResourceVersionFormatter")
 public class ResourceVersion extends AbstractConfiguration
 {
     @ID

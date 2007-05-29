@@ -20,6 +20,8 @@ import java.io.IOException;
 import java.io.Writer;
 import java.util.Collection;
 import java.util.Map;
+import java.util.List;
+import java.util.LinkedList;
 
 /**
  *
@@ -115,6 +117,8 @@ public class TabDirective extends PrototypeDirective
     {
         Collection data;
         Object collection = configurationPersistenceManager.getInstance(path);
+        Type type = configurationPersistenceManager.getType(path).getTargetType();
+        
         if (collection instanceof Map)
         {
             Map map = (Map) collection;
@@ -124,7 +128,17 @@ public class TabDirective extends PrototypeDirective
         {
             data = (Collection) collection;
         }
-        return data;
+
+        // wrap the collection
+        List<Object> wrappedData = new LinkedList<Object>();
+        if (data != null)
+        {
+            for (Object instance : data)
+            {
+                wrappedData.add(new FormattingWrapper(instance, (CompositeType) type));
+            }
+        }
+        return wrappedData;
     }
 
     public void setFreemarkerConfiguration(Configuration configuration)

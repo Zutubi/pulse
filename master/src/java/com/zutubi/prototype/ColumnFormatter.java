@@ -5,7 +5,7 @@ package com.zutubi.prototype;
  *
  * @see com.zutubi.config.annotations.Format
  */
-public interface Formatter<T>
+public interface ColumnFormatter
 {
     /**
      * This method takes a object of type T, and returns a formatted string representation
@@ -15,5 +15,5 @@ public interface Formatter<T>
      *
      * @return formatted string representation of the parameter.
      */
-    String format(T obj);
+    String format(Object obj);
 }

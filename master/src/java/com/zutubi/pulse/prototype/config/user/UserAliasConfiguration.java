@@ -1,18 +1,13 @@
 package com.zutubi.pulse.prototype.config.user;
 
-import com.zutubi.pulse.core.config.AbstractConfiguration;
 import com.zutubi.config.annotations.SymbolicName;
-import com.zutubi.config.annotations.Format;
-
-import java.util.List;
-import java.util.LinkedList;
+import com.zutubi.pulse.core.config.AbstractConfiguration;
 
 /**
  *
  *
  */
 @SymbolicName("internal.userAliasConfig")
-@Format("UserAliasConfigurationFormatter")
 public class UserAliasConfiguration extends AbstractConfiguration
 {
     private String alias;
