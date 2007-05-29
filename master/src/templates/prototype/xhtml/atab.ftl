@@ -21,21 +21,21 @@
 <#list table.actions as action>
 <#assign actionlabel>${action}.label</#assign>
 <#if action == "edit">
-            <td class="content"><a href="/config/${item.configurationPath}">${"edit.label"?i18n}</a></td>
+            <td class="content"><a onclick="selectPath('${item.configurationPath}'); return false;">${"edit.label"?i18n}</a></td>
 <#elseif action == "delete">
-            <td class="content"><a href="/config/${item.configurationPath}?${action}=confirm">${"delete.label"?i18n}</a>  </td>
+            <td class="content"><a onclick="deletePath('${item.configurationPath}'); return false;">${"delete.label"?i18n}</a>  </td>
 <#else>
-            <td class="content"><a href="/config/${item.configurationPath}?${action}">${actionlabel?i18n}</a>  </td>
+            <td class="content"><a onclick="actionPath('${item.configurationPath}'); return false;">${actionlabel?i18n}</a>  </td>
 </#if>
 </#list>
         </tr>
 </#list>
 <#else>
     <tr>
-        <td class="content" colspan="${tablewidth}">${no.data.available?i18n}</td>
+        <td class="content" colspan="${tablewidth}">${"no.data.available.label"?i18n}</td>
     </tr>
 </#if>
     <tr>
-        <td class="content" colspan="${tablewidth}"><a href="/config/${path}?wizard">${"add.label"?i18n}</a></td>
+        <td class="content" colspan="${tablewidth}"><a onclick="addToPath('${path}'); return false;">${"add.label"?i18n}</a></td>
     </tr>
 </table>

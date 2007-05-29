@@ -1078,6 +1078,12 @@
             <result name="input" type="flexjson">configurationErrors</result>
             <result name="success" type="flexjson">checkResponse</result>
         </action>
+
+        <action name="generic" class="com.zutubi.prototype.webwork.GenericAction">
+            <result name="composite" type="velocity">composite.vm</result>
+            <result name="map" type="velocity">map.vm</result>
+        </action>
+
     </package>
 
     <package name="adminAjax" namespace="/ajax/admin" extends="admin">

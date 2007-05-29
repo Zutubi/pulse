@@ -41,6 +41,7 @@
 #end
 
 #if( $config.simpleProperties.size() > 0)
+        
 #end
 
 #if( $config.nestedProperties.size() > 0)

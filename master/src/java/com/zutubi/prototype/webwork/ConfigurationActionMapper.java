@@ -27,6 +27,7 @@ public class ConfigurationActionMapper implements ActionMapper
         builtinActions.add("save");
         builtinActions.add("delete");
         builtinActions.add("wizard");
+        builtinActions.add("ls");
     }
 
     private DefaultActionMapper delegate = new DefaultActionMapper();

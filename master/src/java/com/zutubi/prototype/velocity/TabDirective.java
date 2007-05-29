@@ -33,6 +33,7 @@ public class TabDirective extends PrototypeDirective
     private Configuration configuration;
 
     private String action;
+
     private boolean ajax = false;
 
     public void setAction(String action)
@@ -83,9 +84,15 @@ public class TabDirective extends PrototypeDirective
             context.put("data", data);
             context.put("action", action);
 
+            String templateName = "tab.ftl";
+            if (ajax)
+            {
+                templateName = "atab.ftl";
+            }
+
             try
             {
-                Template template = configuration.getTemplate("prototype/xhtml/tab.ftl");
+                Template template = configuration.getTemplate("prototype/xhtml/" + templateName);
                 template.process(context, writer);
             }
             catch (TemplateException e)

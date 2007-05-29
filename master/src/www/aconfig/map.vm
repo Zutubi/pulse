@@ -6,5 +6,5 @@
 </div>
 
 <p>
-    #plist("path=$config.path" "action=wizard.action?path=$config.path" "ajax=true")
+    #tab("path=$config.path" "action=wizard.action?path=$config.path" "ajax=true")
 </p>
