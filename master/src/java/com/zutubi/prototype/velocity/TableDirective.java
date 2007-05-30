@@ -3,10 +3,12 @@ package com.zutubi.prototype.velocity;
 import com.zutubi.prototype.config.ConfigurationPersistenceManager;
 import com.zutubi.prototype.table.TableDescriptor;
 import com.zutubi.prototype.table.TableDescriptorFactory;
+import com.zutubi.prototype.table.FormattingWrapper;
 import com.zutubi.prototype.type.CollectionType;
 import com.zutubi.prototype.type.CompositeType;
 import com.zutubi.prototype.type.Type;
 import com.zutubi.pulse.bootstrap.ComponentContext;
+import com.zutubi.pulse.bootstrap.freemarker.FreemarkerConfigurationFactoryBean;
 import com.zutubi.util.logging.Logger;
 import freemarker.template.Configuration;
 import freemarker.template.Template;
@@ -19,28 +21,29 @@ import org.apache.velocity.runtime.parser.node.Node;
 import java.io.IOException;
 import java.io.Writer;
 import java.util.Collection;
-import java.util.Map;
-import java.util.List;
 import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
 
 /**
  *
  *
  */
-public class TabDirective extends PrototypeDirective
+public class TableDirective extends PrototypeDirective
 {
     private ConfigurationPersistenceManager configurationPersistenceManager;
 
-    private static final Logger LOG = Logger.getLogger(TabDirective.class);
-    private Configuration configuration;
+    private static final Logger LOG = Logger.getLogger(TableDirective.class);
 
-    private String action;
+    private Configuration configuration;
 
     private boolean ajax = false;
 
-    public void setAction(String action)
+    private String path;
+
+    public TableDirective()
     {
-        this.action = action;
+        ComponentContext.autowire(this);
     }
 
     public void setAjax(boolean ajax)
@@ -48,9 +51,14 @@ public class TabDirective extends PrototypeDirective
         this.ajax = ajax;
     }
 
+    public void setPath(String path)
+    {
+        this.path = path;
+    }
+
     public String getName()
     {
-        return "tab";
+        return "table";
     }
 
     public int getType()
@@ -65,31 +73,29 @@ public class TabDirective extends PrototypeDirective
             Map params = createPropertyMap(contextAdapter, node);
             wireParams(params);
 
-            Type collectionType = lookupType();
-
-            String path = lookupPath();
-
+            Type collectionType = configurationPersistenceManager.getType(path);
+            
+            // lookup the data.
             Collection data = getTableData(path);
 
+            // generate the table descriptor based on the type of the results.
             TableDescriptorFactory tableFactory = new TableDescriptorFactory();
             ComponentContext.autowire(tableFactory);
 
             TableDescriptor tableDescriptor = tableFactory.create((CompositeType) collectionType.getTargetType());
 
             Type type = ((CollectionType)collectionType).getCollectionType();
-
+            
             // handle rendering of the freemarker template.
-
             Map<String, Object> context = initialiseContext(type.getClazz());
             context.put("table", tableDescriptor);
             context.put("path", path);
             context.put("data", data);
-            context.put("action", action);
 
-            String templateName = "tab.ftl";
+            String templateName = "table.ftl";
             if (ajax)
             {
-                templateName = "atab.ftl";
+                templateName = "atable.ftl";
             }
 
             try

@@ -6,5 +6,5 @@
 </div>
 
 <p>
-    #tab("path=$config.path" "action=wizard.action?path=$config.path" "ajax=true")
+    #table("path=$config.path" "ajax=true")
 </p>

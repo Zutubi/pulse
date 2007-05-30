@@ -1,7 +1,7 @@
 <table>
 <#assign tablewidth = table.columns?size + table.actions?size/>
     <tr>
-        <th class="content" colspan="${tablewidth}">${"table.header.label"?i18n}</th>
+        <th class="heading" colspan="${tablewidth}">${"table.header.label"?i18n}</th>
     </tr>
     <tr>
 <#list table.columns as column>
@@ -21,11 +21,11 @@
 <#list table.actions as action>
 <#assign actionlabel>${action}.label</#assign>
 <#if action == "edit">
-            <td class="content"><a href="/config/${item.configurationPath}">${"edit.label"?i18n}</a></td>
+            <td class="content"><a href="${base}/config/${item.configurationPath}">${"edit.label"?i18n}</a></td>
 <#elseif action == "delete">
-            <td class="content"><a href="/config/${item.configurationPath}?${action}=confirm">${"delete.label"?i18n}</a>  </td>
+            <td class="content"><a href="${base}/config/${item.configurationPath}?${action}=confirm">${"delete.label"?i18n}</a>  </td>
 <#else>
-            <td class="content"><a href="/config/${item.configurationPath}?${action}">${actionlabel?i18n}</a>  </td>
+            <td class="content"><a href="${base}/config/${item.configurationPath}?${action}">${actionlabel?i18n}</a>  </td>
 </#if>
 </#list>
         </tr>
@@ -36,6 +36,6 @@
     </tr>
 </#if>
     <tr>
-        <td class="content" colspan="${tablewidth}"><a href="/config/${path}?wizard">${"add.label"?i18n}</a></td>
+        <td class="content" colspan="${tablewidth}"><a href="${base}/config/${path}?wizard">${"add.label"?i18n}</a></td>
     </tr>
 </table>

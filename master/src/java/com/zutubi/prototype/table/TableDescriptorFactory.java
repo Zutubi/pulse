@@ -2,7 +2,6 @@ package com.zutubi.prototype.table;
 
 import com.zutubi.prototype.type.CompositeType;
 import com.zutubi.prototype.type.PrimitiveType;
-import com.zutubi.prototype.type.TypeProperty;
 import com.zutubi.util.logging.Logger;
 
 import java.lang.reflect.Method;
@@ -21,8 +20,8 @@ public class TableDescriptorFactory
         TableDescriptor td = new TableDescriptor();
 
         // default actions.
-        td.add("edit");
-        td.add("delete");
+        td.addAction("edit");
+        td.addAction("delete");
 
 
         Object info = getInfo(type);
@@ -41,9 +40,8 @@ public class TableDescriptorFactory
                     }
 */
 
-                    ColumnDescriptor cd = new ColumnDescriptor();
-                    cd.setName(columnName);
-                    td.add(cd);
+                    ColumnDescriptor cd = new ColumnDescriptor(columnName);
+                    td.addColumn(cd);
                 }
             }
             if (info instanceof ActionDefinition)
@@ -72,7 +70,7 @@ public class TableDescriptorFactory
                         continue;
                     }
                     // ok, we have an action here.
-                    td.add(m.getName().substring(2));
+                    td.addAction(m.getName().substring(2));
                 }
             }
         }
@@ -83,9 +81,8 @@ public class TableDescriptorFactory
             // render properties as columns.
             for (String primitivePropertyName : type.getPropertyNames(PrimitiveType.class))
             {
-                ColumnDescriptor cd = new ColumnDescriptor();
-                cd.setName(primitivePropertyName);
-                td.add(cd);
+                ColumnDescriptor cd = new ColumnDescriptor(primitivePropertyName);
+                td.addColumn(cd);
             }
         }
 

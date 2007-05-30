@@ -11,7 +11,7 @@
 </div>
 
 <p>
-    #tab("path=$config.path" "action=wizard.action?path=$config.path")
+    #table("path=$config.path")
 </p>
 
 </body>
