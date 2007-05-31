@@ -13,7 +13,7 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface Wizard
 {
-    String value();
+//    String value();
 
     @Target(ElementType.METHOD)
     @Retention(RetentionPolicy.RUNTIME)

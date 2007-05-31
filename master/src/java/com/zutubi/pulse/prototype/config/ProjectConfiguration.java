@@ -21,7 +21,7 @@ import java.util.Map;
  *
  */
 @Form(fieldOrder = {"name", "url", "description"})
-@Wizard("ProjectConfigurationWizard")
+@Table(columns = {"name"})
 public class ProjectConfiguration extends AbstractNamedConfiguration implements Extendable, NamedEntity
 {
     @Internal

@@ -29,7 +29,7 @@ import java.util.List;
 
 /**
  */
-public class SetupWizard extends AbstractTypeWizard
+public class SetupConfigurationWizard extends AbstractTypeWizard
 {
     private static final String GENERAL_CONFIG_PROPERTY = "generalConfig";
 

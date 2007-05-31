@@ -2,7 +2,9 @@ package com.zutubi.prototype.table;
 
 import com.zutubi.prototype.type.CompositeType;
 import com.zutubi.prototype.type.PrimitiveType;
+import com.zutubi.prototype.ConventionSupport;
 import com.zutubi.util.logging.Logger;
+import com.zutubi.config.annotations.Table;
 
 import java.lang.reflect.Method;
 
@@ -23,55 +25,40 @@ public class TableDescriptorFactory
         td.addAction("edit");
         td.addAction("delete");
 
-
-        Object info = getInfo(type);
-        if (info != null)
+        Class handler = ConventionSupport.getActions(type);
+        if (handler != null)
         {
-            if (info instanceof TableDefinition)
+            for (Method m : handler.getMethods())
             {
-                TableDefinition def = (TableDefinition) info;
-                for (String columnName : def.getColumns())
+                if (!m.getName().startsWith("do"))
                 {
-/*
-                    TypeProperty property = type.getProperty(columnName);
-                    if (property == null)
-                    {
-                        continue;
-                    }
-*/
-
-                    ColumnDescriptor cd = new ColumnDescriptor(columnName);
-                    td.addColumn(cd);
+                    continue;
                 }
+                if (m.getReturnType() != Void.TYPE)
+                {
+                    continue;
+                }
+                if (m.getParameterTypes().length != 1)
+                {
+                    continue;
+                }
+                Class param = m.getParameterTypes()[0];
+                if (param != type.getClazz())
+                {
+                    continue;
+                }
+                // ok, we have an action here.
+                td.addAction(m.getName().substring(2));
             }
-            if (info instanceof ActionDefinition)
-            {
-                ActionDefinition def = (ActionDefinition) info;
-                // inspect and extract the doXXX action defs.
+        }
 
-                Class handler = def.getActionHandler();
-                for (Method m : handler.getMethods())
-                {
-                    if (!m.getName().startsWith("do"))
-                    {
-                        continue;
-                    }
-                    if (m.getReturnType() != Void.TYPE)
-                    {
-                        continue;
-                    }
-                    if (m.getParameterTypes().length != 1)
-                    {
-                        continue;
-                    }
-                    Class param = m.getParameterTypes()[0];
-                    if (param != type.getClazz())
-                    {
-                        continue;
-                    }
-                    // ok, we have an action here.
-                    td.addAction(m.getName().substring(2));
-                }
+        Table tableAnnotation = (Table) type.getAnnotation(Table.class);
+        if (tableAnnotation != null)
+        {
+            for (String columnName : tableAnnotation.columns())
+            {
+                ColumnDescriptor cd = new ColumnDescriptor(columnName);
+                td.addColumn(cd);
             }
         }
 
@@ -87,21 +74,5 @@ public class TableDescriptorFactory
         }
 
         return td;
-    }
-
-    private Object getInfo(CompositeType type)
-    {
-        Class clazz = type.getClazz();
-        try
-        {
-            String infoClassName = clazz.getCanonicalName() + "Info";
-            Class infoClazz = clazz.getClassLoader().loadClass(infoClassName);
-            return infoClazz.newInstance();
-        }
-        catch (Exception e)
-        {
-            LOG.debug(e);
-        }
-        return null;
     }
 }

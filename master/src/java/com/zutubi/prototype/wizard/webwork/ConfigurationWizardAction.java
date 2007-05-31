@@ -5,6 +5,7 @@ import com.opensymphony.xwork.ActionContext;
 import com.zutubi.i18n.Messages;
 import com.zutubi.prototype.config.ConfigurationPersistenceManager;
 import com.zutubi.prototype.type.CollectionType;
+import com.zutubi.prototype.type.CompositeType;
 import com.zutubi.prototype.type.Type;
 import com.zutubi.prototype.type.record.PathUtils;
 import com.zutubi.prototype.webwork.ConfigurationErrors;
@@ -12,11 +13,15 @@ import com.zutubi.prototype.webwork.ConfigurationPanel;
 import com.zutubi.prototype.webwork.ConfigurationResponse;
 import com.zutubi.prototype.wizard.Wizard;
 import com.zutubi.prototype.wizard.WizardState;
+import com.zutubi.prototype.ConventionSupport;
 import com.zutubi.pulse.bootstrap.ComponentContext;
 import com.zutubi.pulse.web.ActionSupport;
-import com.zutubi.util.ClassLoaderUtils;
 import com.zutubi.util.logging.Logger;
-import com.zutubi.validation.*;
+import com.zutubi.validation.DelegatingValidationContext;
+import com.zutubi.validation.ValidationContext;
+import com.zutubi.validation.ValidationException;
+import com.zutubi.validation.ValidationManager;
+import com.zutubi.validation.XWorkValidationAdapter;
 import com.zutubi.validation.i18n.MessagesTextProvider;
 
 import java.util.Map;
@@ -381,13 +386,12 @@ public class ConfigurationWizardAction extends ActionSupport
         // a) <configurationClass>Wizard
         // b) defined by the Wizard annotation.
 
-        com.zutubi.config.annotations.Wizard annotation = (com.zutubi.config.annotations.Wizard) type.getAnnotation(com.zutubi.config.annotations.Wizard.class);
-        if (annotation != null)
+        Class wizardClass = ConventionSupport.getWizard(type);
+        if (wizardClass != null)
         {
             try
             {
-                Class<? extends Wizard> clazz = ClassLoaderUtils.loadAssociatedClass(type.getClazz(), annotation.value());
-                wizardInstance = ComponentContext.createBean(clazz);
+                wizardInstance = (Wizard) ComponentContext.createBean(wizardClass);
             }
             catch (Exception e)
             {

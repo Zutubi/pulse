@@ -7,7 +7,7 @@ import com.zutubi.pulse.model.ProjectManager;
  *
  *
  */
-public class ProjectConfigurationActionHandler
+public class ProjectConfigurationActions
 {
     private ProjectManager projectManager;
 

@@ -1,9 +1,9 @@
 package com.zutubi.prototype.webwork;
 
+import com.zutubi.prototype.ConventionSupport;
 import com.zutubi.prototype.type.CompositeType;
-import com.zutubi.prototype.table.ActionDefinition;
-import com.zutubi.util.logging.Logger;
 import com.zutubi.pulse.bootstrap.ComponentContext;
+import com.zutubi.util.logging.Logger;
 
 import java.lang.reflect.Method;
 
@@ -30,9 +30,7 @@ public class GenericAction extends PrototypeSupport
         CompositeType type = (CompositeType) configurationPersistenceManager.getType(path);
 
         // need the action handler.
-        Object info = getInfo(type);
-
-        Class handlerClass = ((ActionDefinition) info).getActionHandler();
+        Class handlerClass = ConventionSupport.getActions(type);
         Object actionHandler = handlerClass.newInstance();
 
         ComponentContext.autowire(actionHandler);

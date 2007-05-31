@@ -14,7 +14,7 @@ public class ProjectConfigurationFormatter
     {
         String base = configurationManager.getSystemConfig().getContextPathNormalised();
 
-        return "<a href=\""+ base + "/" + config.getConfigurationPath()+"\">" + config.getName() + "</a>";
+        return "<a href=\""+ base + "/config/" + config.getConfigurationPath()+"\">" + config.getName() + "</a>";
     }
 
     public void setConfigurationManager(MasterConfigurationManager configurationManager)

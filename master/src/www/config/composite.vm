@@ -10,7 +10,6 @@
     #i18n("key=introduction")
 </div>
 
-
 #if( $config.record )
     #if( $config.simpleProperties.size() > 0)
         <!-- this configuration definition contains fields to be configured. -->
