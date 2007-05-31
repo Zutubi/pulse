@@ -1,20 +1,20 @@
 package com.zutubi.pulse.prototype.config;
 
 import com.zutubi.config.annotations.*;
-import com.zutubi.validation.annotations.Url;
-import com.zutubi.pulse.core.config.ResourceProperty;
-import com.zutubi.pulse.core.config.AbstractNamedConfiguration;
-import com.zutubi.pulse.servercore.config.ScmConfiguration;
-import com.zutubi.pulse.model.ResourceRequirement;
-import com.zutubi.pulse.model.NamedEntity;
-import com.zutubi.pulse.prototype.config.types.TypeConfiguration;
-import com.zutubi.pulse.prototype.config.changeviewer.ChangeViewerConfiguration;
-import com.zutubi.pulse.prototype.config.actions.PostBuildActionConfiguration;
 import com.zutubi.prototype.type.Extendable;
+import com.zutubi.pulse.core.config.AbstractNamedConfiguration;
+import com.zutubi.pulse.core.config.ResourceProperty;
+import com.zutubi.pulse.model.NamedEntity;
+import com.zutubi.pulse.model.ResourceRequirement;
+import com.zutubi.pulse.prototype.config.actions.PostBuildActionConfiguration;
+import com.zutubi.pulse.prototype.config.changeviewer.ChangeViewerConfiguration;
+import com.zutubi.pulse.prototype.config.types.TypeConfiguration;
+import com.zutubi.pulse.servercore.config.ScmConfiguration;
+import com.zutubi.validation.annotations.Url;
 
-import java.util.Map;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  *
@@ -46,7 +46,7 @@ public class ProjectConfiguration extends AbstractNamedConfiguration implements 
     @Transient
     private Map<String, Object> extensions = new HashMap<String, Object>();
 
-    @Transient // sort this out later.
+    @Transient // FIXME sort this out later.
     private List<PostBuildActionConfiguration> postBuildActions;
 
     private ChangeViewerConfiguration changeViewer;
