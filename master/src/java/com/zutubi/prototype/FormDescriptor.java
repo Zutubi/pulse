@@ -92,7 +92,6 @@ public class FormDescriptor extends AbstractDescriptor
         form.addAll(getParameters());
         List<String> fieldOrder = evaluateFieldOrder();
 
-        int tabindex = 1;
         for (String fieldName : fieldOrder)
         {
             FieldDescriptor fieldDescriptor = getFieldDescriptor(fieldName);
@@ -104,7 +103,6 @@ public class FormDescriptor extends AbstractDescriptor
             }
 
             Field field = fieldDescriptor.instantiate(path, record);
-            field.setTabindex(tabindex++);
             form.add(field);
         }
 
@@ -116,7 +114,6 @@ public class FormDescriptor extends AbstractDescriptor
             SubmitFieldDescriptor submitDescriptor = new SubmitFieldDescriptor(action.equals(defaultAction));
             submitDescriptor.setName(action);
             Field submit = submitDescriptor.instantiate(path, record);
-            submit.setTabindex(tabindex++);
             form.add(submit);
         }
 

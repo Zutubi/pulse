@@ -11,5 +11,6 @@ public class CheckboxFieldDescriptor extends FieldDescriptor
     public CheckboxFieldDescriptor()
     {
         setType("checkbox");
+        setSubmitOnEnter(true);
     }
 }

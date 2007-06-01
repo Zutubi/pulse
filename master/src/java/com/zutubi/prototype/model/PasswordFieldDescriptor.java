@@ -11,5 +11,6 @@ public class PasswordFieldDescriptor extends FieldDescriptor
     public PasswordFieldDescriptor()
     {
         setType("password");
+        setSubmitOnEnter(true);
     }
 }

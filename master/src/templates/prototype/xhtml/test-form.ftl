@@ -25,29 +25,7 @@
             form.addButton('${submitField.value}', function() { submitForm(); });
         </#list>
 
-        function handleKeypress(evt)
-        {
-            if (evt.getKey() == evt.RETURN)
-            {
-                submitForm();
-                evt.preventDefault();
-                return false;
-            }
-            else
-            {
-                return true;
-            }
-        }
-
-        form.on('render', function()
-        {
-    <#list form.fields as field>
-        <#assign parameters=field.parameters>
-        <#if field.type == 'text' || field.type == 'password' || field.type == 'checkbox'>
-            Ext.get('${field.id}').on('keypress', function(event){ return handleKeypress(event); });
-        </#if>
-    </#list>
-        });
+        var defaultSubmit = submitForm;
 
         <#include "/prototype/xhtml/form-fields.ftl"/>
 

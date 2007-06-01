@@ -41,37 +41,7 @@
             form.addButton('${submitField.value}', function() { submitForm('${submitField.value}'); });
         </#list>
 
-        function handleKeypress(evt)
-        {
-            if (evt.getKey() == evt.RETURN)
-            {
-                defaultSubmit();
-                evt.preventDefault();
-                return false;
-            }
-            else
-            {
-                return true;
-            }
-        }
-
-        form.on('render', function()
-        {
-            form.el.dom.name = '${form.name}';
-
-            var errorMessage;
-
-    <#list form.fields as field>
-        <#assign parameters=field.parameters>
-        <#if fieldErrors?exists && fieldErrors[parameters.name]?exists>
-            errorMessage = '<#list fieldErrors[parameters.name] as error>${error?i18n?js_string}<br/></#list>';
-            form.findField('${parameters.id}').markInvalid(errorMessage);
-        </#if>
-        <#if field.type == 'text' || field.type == 'password' || field.type == 'checkbox'>
-            Ext.get('${field.id}').on('keypress', function(event){ return handleKeypress(event);});
-        </#if>
-    </#list>
-        });
+        form.on('render', function() { form.items.first().focus(); });
 
         <#include "/prototype/xhtml/form-fields.ftl"/>
 

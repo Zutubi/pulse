@@ -1,7 +1,7 @@
 package com.zutubi.prototype.model;
 
-import com.zutubi.prototype.FieldDescriptor;
 import com.zutubi.config.annotations.FieldType;
+import com.zutubi.prototype.FieldDescriptor;
 
 /**
  * Describes a controlling checkbox: i.e. a checkbox whose checked state
@@ -12,6 +12,7 @@ public class ControllingCheckboxFieldDescriptor extends FieldDescriptor
     public ControllingCheckboxFieldDescriptor()
     {
         setType(FieldType.CONTROLLING_CHECKBOX);
+        setSubmitOnEnter(true);
     }
 
     public void setInvert(boolean invert)
