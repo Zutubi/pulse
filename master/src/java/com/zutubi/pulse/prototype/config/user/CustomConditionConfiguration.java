@@ -9,4 +9,6 @@ import com.zutubi.config.annotations.SymbolicName;
 @SymbolicName("internal.customConditionConfig")
 public class CustomConditionConfiguration extends SubscriptionConditionConfiguration
 {
+    //TODO: add custom validation for this expression
+    private String expression;
 }
