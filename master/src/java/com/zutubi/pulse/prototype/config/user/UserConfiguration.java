@@ -2,9 +2,12 @@ package com.zutubi.pulse.prototype.config.user;
 
 import com.zutubi.prototype.type.Extendable;
 import com.zutubi.pulse.core.config.AbstractNamedConfiguration;
+import com.zutubi.pulse.core.config.AbstractConfiguration;
 import com.zutubi.pulse.prototype.config.user.contacts.ContactConfiguration;
 import com.zutubi.config.annotations.Transient;
 import com.zutubi.config.annotations.SymbolicName;
+import com.zutubi.config.annotations.Form;
+import com.zutubi.config.annotations.ID;
 
 import java.util.Map;
 import java.util.HashMap;
@@ -16,12 +19,14 @@ import java.util.LinkedList;
  *
  */
 @SymbolicName("internal.userConfig")
-public class UserConfiguration extends AbstractNamedConfiguration implements Extendable
+@Form(fieldOrder = {"login", "name"})
+public class UserConfiguration extends AbstractConfiguration implements Extendable
 {
     @Transient
     private Map<String, Object> extensions;
 
-    private String login; // internal.
+    @ID
+    private String login;
 
     private String name;
 

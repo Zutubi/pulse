@@ -14,21 +14,21 @@
     </tr>
 <#if data?exists && data?size &gt; 0>
 <#list data as item>
-        <tr>
+    <tr>
 <#list table.columns as column>
-            <td class="content"><#if item[column.name]?exists>${item[column.name]?string}</#if></td>
+        <td class="content"><#if item[column.name]?exists>${item[column.name]?string}</#if></td>
 </#list>
 <#list table.actions as action>
 <#assign actionlabel>${action}.label</#assign>
 <#if action == "edit">
-            <td class="content"><a href="${base}/config/${item.configurationPath}">${"edit.label"?i18n}</a></td>
+        <td class="content"><a href="${base}/config/${item.configurationPath}">${"edit.label"?i18n}</a></td>
 <#elseif action == "delete">
-            <td class="content"><a href="${base}/config/${item.configurationPath}?${action}=confirm">${"delete.label"?i18n}</a>  </td>
+        <td class="content"><a href="${base}/config/${item.configurationPath}?${action}=confirm">${"delete.label"?i18n}</a>  </td>
 <#else>
-            <td class="content"><a href="${base}/config/${item.configurationPath}?${action}">${actionlabel?i18n}</a>  </td>
+        <td class="content"><a href="${base}/config/${item.configurationPath}?${action}">${actionlabel?i18n}</a>  </td>
 </#if>
 </#list>
-        </tr>
+    </tr>
 </#list>
 <#else>
     <tr>

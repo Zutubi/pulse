@@ -4,7 +4,6 @@ import com.zutubi.config.annotations.ConfigurationCheck;
 import com.zutubi.prototype.ConfigurationCheckHandler;
 import com.zutubi.prototype.type.CompositeType;
 import com.zutubi.prototype.type.ExtensionTypeProperty;
-import com.zutubi.prototype.type.ListType;
 import com.zutubi.prototype.type.MapType;
 import com.zutubi.prototype.type.ProjectMapType;
 import com.zutubi.prototype.type.TypeException;
@@ -30,6 +29,11 @@ import com.zutubi.pulse.prototype.config.triggers.CronBuildTriggerConfiguration;
 import com.zutubi.pulse.prototype.config.triggers.ScmBuildTriggerConfiguration;
 import com.zutubi.pulse.prototype.config.triggers.TriggerConfiguration;
 import com.zutubi.pulse.prototype.config.types.*;
+import com.zutubi.pulse.prototype.config.user.AllBuildsConditionConfiguration;
+import com.zutubi.pulse.prototype.config.user.CustomConditionConfiguration;
+import com.zutubi.pulse.prototype.config.user.SelectedBuildsConditionConfiguration;
+import com.zutubi.pulse.prototype.config.user.SubscriptionConditionConfiguration;
+import com.zutubi.pulse.prototype.config.user.UnsuccessfulConditionConfiguration;
 import com.zutubi.pulse.prototype.config.user.UserConfiguration;
 import com.zutubi.pulse.prototype.config.user.contacts.ContactConfiguration;
 import com.zutubi.pulse.prototype.config.user.contacts.EmailContactConfiguration;
@@ -201,6 +205,18 @@ public class ConfigurationRegistry
             contactConfig.addExtension("emailContactConfig");
             contactConfig.addExtension("jabberContactConfig");
 
+
+            // user subscription conditions
+            CompositeType userSubscriptionConfig = typeRegistry.getType(SubscriptionConditionConfiguration.class);
+            registerConfigurationType("internal.allBuildsConditionConfig", AllBuildsConditionConfiguration.class);
+            registerConfigurationType("internal.selectedBuildsConditionConfig", SelectedBuildsConditionConfiguration.class);
+            registerConfigurationType("internal.customConditionConfig", CustomConditionConfiguration.class);
+            registerConfigurationType("internal.unsuccessfulConditionConfig", UnsuccessfulConditionConfiguration.class);
+
+            userSubscriptionConfig.addExtension("internal.allBuildsConditionConfig");
+            userSubscriptionConfig.addExtension("internal.selectedBuildsConditionConfig");
+            userSubscriptionConfig.addExtension("internal.customConditionConfig");
+            userSubscriptionConfig.addExtension("internal.unsuccessfulConditionConfig");
 
         }
         catch (TypeException e)

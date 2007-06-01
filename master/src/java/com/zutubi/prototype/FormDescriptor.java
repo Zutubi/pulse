@@ -126,20 +126,13 @@ public class FormDescriptor extends AbstractDescriptor
     private String getDefaultAction()
     {
         String defaultAction = actions.size() > 0 ? actions.get(0) : "save";
-        for(String action: actions)
+        if (actions.contains("next"))
         {
-            if(action.equals("next"))
-            {
-                defaultAction = "next";
-            }
-            else if(action.equals("finish"))
-            {
-                // When next and finish are present, prefer next
-                if(!defaultAction.equals("next"))
-                {
-                    defaultAction = "finish";
-                }
-            }
+            defaultAction = "next";
+        }
+        else if (actions.contains("finish"))
+        {
+            defaultAction = "finish";
         }
 
         return defaultAction;

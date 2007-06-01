@@ -1,13 +1,72 @@
 package com.zutubi.pulse.prototype.config.user;
 
-import com.zutubi.pulse.core.config.AbstractConfiguration;
+import com.zutubi.config.annotations.Reference;
+import com.zutubi.config.annotations.Select;
 import com.zutubi.config.annotations.SymbolicName;
+import com.zutubi.config.annotations.Table;
+import com.zutubi.pulse.core.config.AbstractNamedConfiguration;
+import com.zutubi.pulse.prototype.config.ProjectConfiguration;
+import com.zutubi.pulse.prototype.config.user.contacts.ContactConfiguration;
+
+import java.util.List;
 
 /**
  *
  *
  */
 @SymbolicName("internal.userSubscriptionConfig")
-public class SubscriptionConfiguration extends AbstractConfiguration
+@Table(columns = {"name"})
+public class SubscriptionConfiguration extends AbstractNamedConfiguration
 {
+    // contact point reference.
+    @Reference
+    private ContactConfiguration contact;
+
+    @Reference(optionProvider = "com.zutubi.pulse.prototype.config.ProjectReferenceOptionProvider")
+    private List<ProjectConfiguration> projects;
+
+    private SubscriptionConditionConfiguration condition;
+
+    @Select(optionProvider = "SubscriptionTemplateOptionProvider")
+    private String template;
+
+    public ContactConfiguration getContact()
+    {
+        return contact;
+    }
+
+    public void setContact(ContactConfiguration contact)
+    {
+        this.contact = contact;
+    }
+
+    public List<ProjectConfiguration> getProjects()
+    {
+        return projects;
+    }
+
+    public void setProjects(List<ProjectConfiguration> projects)
+    {
+        this.projects = projects;
+    }
+
+    public SubscriptionConditionConfiguration getCondition()
+    {
+        return condition;
+    }
+
+    public void setCondition(SubscriptionConditionConfiguration condition)
+    {
+        this.condition = condition;
+    }
+
+    public String getTemplate()
+    {
+        return template;
+    }
+
+    public void setTemplate(String template)
+    {
+        this.template = template;
+    }
 }
