@@ -3,9 +3,9 @@ package com.zutubi.prototype.wizard.webwork;
 import com.opensymphony.util.TextUtils;
 import com.opensymphony.xwork.ActionContext;
 import com.zutubi.i18n.Messages;
+import com.zutubi.prototype.ConventionSupport;
 import com.zutubi.prototype.config.ConfigurationPersistenceManager;
 import com.zutubi.prototype.type.CollectionType;
-import com.zutubi.prototype.type.CompositeType;
 import com.zutubi.prototype.type.Type;
 import com.zutubi.prototype.type.record.PathUtils;
 import com.zutubi.prototype.webwork.ConfigurationErrors;
@@ -13,7 +13,6 @@ import com.zutubi.prototype.webwork.ConfigurationPanel;
 import com.zutubi.prototype.webwork.ConfigurationResponse;
 import com.zutubi.prototype.wizard.Wizard;
 import com.zutubi.prototype.wizard.WizardState;
-import com.zutubi.prototype.ConventionSupport;
 import com.zutubi.pulse.bootstrap.ComponentContext;
 import com.zutubi.pulse.web.ActionSupport;
 import com.zutubi.util.logging.Logger;
@@ -374,7 +373,7 @@ public class ConfigurationWizardAction extends ActionSupport
 
     protected Wizard doCreateWizard()
     {
-        Wizard wizardInstance = null;
+        AbstractTypeWizard wizardInstance = null;
 
         Type type = configurationPersistenceManager.getType(path);
         if (type instanceof CollectionType)
@@ -391,7 +390,7 @@ public class ConfigurationWizardAction extends ActionSupport
         {
             try
             {
-                wizardInstance = (Wizard) ComponentContext.createBean(wizardClass);
+                wizardInstance = (AbstractTypeWizard) ComponentContext.createBean(wizardClass);
             }
             catch (Exception e)
             {
@@ -402,9 +401,11 @@ public class ConfigurationWizardAction extends ActionSupport
 
         if (wizardInstance == null)
         {
-            wizardInstance = new SingleTypeWizard(path);
+            wizardInstance = new SingleTypeWizard();
             ComponentContext.autowire(wizardInstance);
         }
+        
+        wizardInstance.setPath(path);
 
         wizardRequiresLazyInitialisation = true;
         return wizardInstance;

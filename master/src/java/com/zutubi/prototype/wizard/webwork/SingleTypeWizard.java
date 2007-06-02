@@ -15,17 +15,10 @@ public class SingleTypeWizard extends AbstractTypeWizard
 {
     private static final Logger LOG = Logger.getLogger(SingleTypeWizard.class);
 
-    private String path;
-
     private static final TemplateRecord EMPTY_RECORD = new TemplateRecord("empty", null, new MutableRecordImpl());
     private WizardState recordState;
     
     private CompositeType type;
-
-    public SingleTypeWizard(String path)
-    {
-        this.path = path;
-    }
 
     public void initialise()
     {

@@ -40,6 +40,8 @@ public abstract class AbstractTypeWizard implements Wizard
 
     protected LinkedList<TypeWizardState> wizardStates = new LinkedList<TypeWizardState>();
 
+    protected String path;
+
     protected TypeWizardState addWizardStates(List<TypeWizardState> wizardStates, CompositeType type, TemplateRecord templateRecord)
     {
         int extensionCount = type.getExtensions().size();
@@ -74,6 +76,11 @@ public abstract class AbstractTypeWizard implements Wizard
     public String getSuccessPath()
     {
         return successPath;
+    }
+
+    public void setPath(String path)
+    {
+        this.path = path;
     }
 
     public List<WizardTransition> getAvailableActions()

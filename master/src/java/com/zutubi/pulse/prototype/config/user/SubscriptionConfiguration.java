@@ -4,6 +4,7 @@ import com.zutubi.config.annotations.Reference;
 import com.zutubi.config.annotations.Select;
 import com.zutubi.config.annotations.SymbolicName;
 import com.zutubi.config.annotations.Table;
+import com.zutubi.config.annotations.Form;
 import com.zutubi.pulse.core.config.AbstractNamedConfiguration;
 import com.zutubi.pulse.prototype.config.ProjectConfiguration;
 import com.zutubi.pulse.prototype.config.user.contacts.ContactConfiguration;
@@ -16,6 +17,7 @@ import java.util.List;
  */
 @SymbolicName("internal.userSubscriptionConfig")
 @Table(columns = {"name"})
+@Form(fieldOrder = {"name", "projects", "contact", "template"})
 public class SubscriptionConfiguration extends AbstractNamedConfiguration
 {
     // contact point reference.
