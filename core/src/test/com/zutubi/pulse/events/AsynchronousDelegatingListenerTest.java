@@ -2,11 +2,17 @@ package com.zutubi.pulse.events;
 
 import com.zutubi.pulse.test.PulseTestCase;
 
+import java.util.concurrent.Semaphore;
+import java.util.concurrent.TimeUnit;
+
 /**
  * <class-comment/>
  */
 public class AsynchronousDelegatingListenerTest extends PulseTestCase
 {
+    private Semaphore eventSemaphore = new Semaphore(0);
+    private Semaphore doneSemaphore = new Semaphore(0);
+
     public AsynchronousDelegatingListenerTest()
     {
     }
@@ -28,30 +34,34 @@ public class AsynchronousDelegatingListenerTest extends PulseTestCase
 
     public void testEventsExecutedOnSeparateThread() throws InterruptedException
     {
-        CountHandleListener delegate = new CountHandleListener();
+        WatiListener delegate = new WatiListener();
         AsynchronousDelegatingListener l = new AsynchronousDelegatingListener(delegate);
 
         l.handleEvent(new Event<Object>(this));
-        l.handleEvent(new Event<Object>(this));
-        l.handleEvent(new Event<Object>(this));
-        // by asserting that the handled count is not equal to the number of
-        // events that have been 'handled' we can verify that the events are
-        // being handled on a separate thread.
-        assertTrue(delegate.getHandledCount() != 3);
+        // the listener thread is now waiting for the semaphore to release.
+        // we can only release it if it is indeed in a separate thread.
+        eventSemaphore.release();
+
+        assertTrue(doneSemaphore.tryAcquire(10, TimeUnit.SECONDS));
+        assertTrue(delegate.acquired);
     }
 
-    private class CountHandleListener implements EventListener
+    private class WatiListener implements EventListener
     {
-        private int count;
+        private boolean acquired;
 
         public void handleEvent(Event evt)
         {
-            count++;
-        }
+            try
+            {
+                acquired = eventSemaphore.tryAcquire(10, TimeUnit.SECONDS);
+            }
+            catch (InterruptedException e)
+            {
+                e.printStackTrace();
+            }
 
-        public int getHandledCount()
-        {
-            return count;
+            doneSemaphore.release();
         }
 
         public Class[] getHandledEvents()
