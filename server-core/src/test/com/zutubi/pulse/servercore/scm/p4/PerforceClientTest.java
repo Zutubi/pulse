@@ -26,7 +26,6 @@ public class PerforceClientTest extends PulseTestCase
     private PerforceCore core;
     private PerforceClient client;
     private File tmpDir;
-    private File repoDir;
     private File workDir;
     private Process p4dProcess;
     private boolean generateMode = false;
@@ -37,7 +36,7 @@ public class PerforceClientTest extends PulseTestCase
         core = new PerforceCore();
 
         tmpDir = FileSystemUtils.createTempDir(getClass().getName(), "");
-        repoDir = new File(tmpDir, "repo");
+        File repoDir = new File(tmpDir, "repo");
 
         File repoZip = getTestDataFile("server-core", "repo", "zip");
         ZipUtils.extractZip(repoZip, repoDir);
@@ -65,7 +64,7 @@ public class PerforceClientTest extends PulseTestCase
         super.tearDown();
     }
 
-    public void testGetLocation()
+    public void testGetLocation() throws ScmException
     {
         getServer(TEST_CLIENT);
         assertEquals(client.getLocation(), "test-client@:6666");
@@ -511,7 +510,7 @@ public class PerforceClientTest extends PulseTestCase
         return core;
     }
 
-    private void getServer(String client)
+    private void getServer(String client) throws ScmException
     {
         this.client = new PerforceClient(":6666", "test-user", "", client);
         this.core.setEnv(PerforceConstants.ENV_PORT, ":6666");
@@ -535,7 +534,7 @@ public class PerforceClientTest extends PulseTestCase
 
     private File getDataRoot()
     {
-        return new File(getPulseRoot(), FileSystemUtils.composeFilename("server-core", "src", "test", "com", "zutubi", "pulse", "scm", "p4", "data"));
+        return new File(getPulseRoot(), FileSystemUtils.composeFilename("server-core", "src", "test", "com", "zutubi", "pulse", "servercore", "scm", "p4", "data"));
     }
 
     private List<Change> checkoutChanges(String id, File dir, NumericalRevision revision, long expectedRevision) throws ScmException

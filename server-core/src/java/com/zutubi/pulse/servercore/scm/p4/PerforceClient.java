@@ -15,6 +15,8 @@ import com.zutubi.pulse.servercore.scm.ScmCapability;
 import com.zutubi.pulse.servercore.scm.ScmFileCache;
 import com.zutubi.pulse.servercore.scm.ScmFilepathFilter;
 import com.zutubi.pulse.util.FileSystemUtils;
+import com.zutubi.pulse.util.SystemUtils;
+import com.zutubi.util.StringUtils;
 import com.zutubi.util.logging.Logger;
 
 import java.io.*;
@@ -31,6 +33,7 @@ public class PerforceClient extends CachingScmClient
 
     private PerforceCore core;
     private String templateClient;
+    private String resolvedClient;
     private File clientRoot;
     private String port;
     private Pattern syncPattern;
@@ -41,9 +44,38 @@ public class PerforceClient extends CachingScmClient
         this.excludedPaths = filteredPaths;
     }
 
+    private String resolveClient() throws ScmException
+    {
+        if (resolvedClient == null)
+        {
+            if (templateClient.startsWith("!"))
+            {
+                String commandLine = templateClient.substring(1);
+                List<String> command = StringUtils.split(commandLine);
+
+                try
+                {
+                    resolvedClient = SystemUtils.runCommand(command.toArray(new String[command.size()])).trim();
+                    return resolvedClient;
+                }
+                catch (IOException e)
+                {
+                    LOG.severe(e);
+                    throw new ScmException("Error running template client generation command: " + e.getMessage(), e);
+                }
+            }
+            else
+            {
+                resolvedClient = templateClient;
+            }
+        }
+        
+        return resolvedClient;
+    }
+
     private void createClient(String clientName, File toDirectory) throws ScmException
     {
-        core.createClient(templateClient, clientName, toDirectory);
+        core.createClient(resolveClient(), clientName, toDirectory);
     }
 
     private boolean clientExists(String clientName) throws ScmException
@@ -52,7 +84,7 @@ public class PerforceClient extends CachingScmClient
         String [] lines = core.splitLines(result);
         for (String line : lines)
         {
-            String [] parts = line.split(" ");
+            String[] parts = line.split(" ");
             if (parts.length > 1 && parts[1].equals(clientName))
             {
                 return true;
@@ -109,6 +141,7 @@ public class PerforceClient extends CachingScmClient
             }
             catch (UnsupportedEncodingException e)
             {
+                // Use raw ID
             }
             clientName = clientPrefix + id;
         }
@@ -124,7 +157,7 @@ public class PerforceClient extends CachingScmClient
     {
         boolean cleanup = false;
 
-        if(clientName == null)
+        if (clientName == null)
         {
             clientName = updateClient(null, null);
             cleanup = true;
@@ -136,7 +169,7 @@ public class PerforceClient extends CachingScmClient
         }
         finally
         {
-            if(cleanup)
+            if (cleanup)
             {
                 deleteClient(clientName);
             }
@@ -157,17 +190,17 @@ public class PerforceClient extends CachingScmClient
         {
             PerforceCore.P4Result result = core.runP4(null, P4_COMMAND, FLAG_CLIENT, clientName, COMMAND_SYNC, FLAG_FORCE, FLAG_PREVIEW);
             Matcher matcher = syncPattern.matcher(result.stdout);
-            while(matcher.find())
+            while (matcher.find())
             {
                 String localFile = matcher.group(4);
-                if(localFile.startsWith(clientRoot.getAbsolutePath()))
+                if (localFile.startsWith(clientRoot.getAbsolutePath()))
                 {
                     localFile = localFile.substring(clientRoot.getAbsolutePath().length());
                 }
 
                 // Separators must be normalised
                 localFile = localFile.replace('\\', '/');
-                if(localFile.startsWith("/"))
+                if (localFile.startsWith("/"))
                 {
                     localFile = localFile.substring(1);
                 }
@@ -217,9 +250,9 @@ public class PerforceClient extends CachingScmClient
         //   ... <file>#<revision> <action>
         //   ...
         PerforceCore.P4Result result = core.runP4(false, null, P4_COMMAND, FLAG_CLIENT, clientName, COMMAND_DESCRIBE, FLAG_SHORT, Long.toString(number));
-        if(result.stderr.length() > 0)
+        if (result.stderr.length() > 0)
         {
-            if(result.stderr.indexOf("no such changelist") >= 0)
+            if (result.stderr.indexOf("no such changelist") >= 0)
             {
                 // OK, this change must have been deleted at some point
                 // (CIB-1010).
@@ -230,7 +263,7 @@ public class PerforceClient extends CachingScmClient
                 throw new ScmException("p4 process returned error '" + result.stderr.toString().trim() + "'");
             }
         }
-        
+
         String[] lines = core.splitLines(result);
 
         if (lines.length < 1)
@@ -365,7 +398,7 @@ public class PerforceClient extends CachingScmClient
             long number = ((NumericalRevision) revision).getRevisionNumber();
             PerforceCheckoutHandler perforceHandler = new PerforceCheckoutHandler(force, handler);
 
-            if(force)
+            if (force)
             {
                 core.runP4WithHandler(perforceHandler, null, P4_COMMAND, FLAG_CLIENT, clientName, COMMAND_SYNC, FLAG_FORCE, "@" + Long.toString(number));
             }
@@ -410,7 +443,7 @@ public class PerforceClient extends CachingScmClient
         return result;
     }
 
-    public PerforceClient(String port, String user, String password, String client)
+    public PerforceClient(String port, String user, String password, String client) throws ScmException
     {
         this.core = new PerforceCore();
         templateClient = client;
@@ -430,7 +463,7 @@ public class PerforceClient extends CachingScmClient
             this.core.setEnv(ENV_PASSWORD, password);
         }
 
-        this.core.setEnv(ENV_CLIENT, client);
+        this.core.setEnv(ENV_CLIENT, resolveClient());
     }
 
     public Set<ScmCapability> getCapabilities()
@@ -440,7 +473,7 @@ public class PerforceClient extends CachingScmClient
 
     public Map<String, String> getServerInfo() throws ScmException
     {
-        return core.getServerInfo(templateClient);
+        return core.getServerInfo(resolveClient());
     }
 
     public String getUid()
@@ -455,9 +488,10 @@ public class PerforceClient extends CachingScmClient
 
     public void testConnection() throws ScmException
     {
-        if(!clientExists(templateClient))
+        String client = resolveClient();
+        if (!clientExists(client))
         {
-            throw new ScmException("Client '" + templateClient + "' does not exist");
+            throw new ScmException("Client '" + client + "' does not exist");
         }
     }
 
@@ -524,7 +558,7 @@ public class PerforceClient extends CachingScmClient
 
         String clientName = updateClient(null, null);
 
-        if(to == null)
+        if (to == null)
         {
             to = getLatestRevision(clientName);
         }
@@ -544,7 +578,7 @@ public class PerforceClient extends CachingScmClient
                     NumericalRevision revision = new NumericalRevision(Long.parseLong(matcher.group(1)));
                     result.add(0, revision);
 
-                    if(changes != null)
+                    if (changes != null)
                     {
                         Changelist list = getChangelist(clientName, revision.getRevisionNumber());
 
@@ -572,9 +606,9 @@ public class PerforceClient extends CachingScmClient
             String root = new File(clientRoot.getAbsolutePath(), VALUE_ALL_FILES).getAbsolutePath();
             long latestRevision = core.getLatestRevisionForFiles(clientName, root).getRevisionNumber();
             long sinceRevision = ((NumericalRevision) since).getRevisionNumber();
-            if(latestRevision > sinceRevision)
+            if (latestRevision > sinceRevision)
             {
-                if(excludedPaths != null && excludedPaths.size() > 0)
+                if (excludedPaths != null && excludedPaths.size() > 0)
                 {
                     // We have to find a change that includes a non-excluded
                     // path.
@@ -596,9 +630,9 @@ public class PerforceClient extends CachingScmClient
 
     private boolean nonExcludedChange(String clientName, long sinceRevision, long latestRevision) throws ScmException
     {
-        for(long revision = sinceRevision + 1; revision <= latestRevision; revision++)
+        for (long revision = sinceRevision + 1; revision <= latestRevision; revision++)
         {
-            if(getChangelist(clientName, revision) != null)
+            if (getChangelist(clientName, revision) != null)
             {
                 return true;
             }
@@ -617,11 +651,11 @@ public class PerforceClient extends CachingScmClient
         String clientName = updateClient(null, null);
         try
         {
-            if(!labelExists(clientName, name))
+            if (!labelExists(clientName, name))
             {
                 createLabel(clientName, name);
             }
-            else if(!moveExisting)
+            else if (!moveExisting)
             {
                 throw new ScmException("Cannot create label '" + name + "': label already exists");
             }
@@ -643,10 +677,10 @@ public class PerforceClient extends CachingScmClient
 
     public void storeConnectionDetails(File outputDir) throws ScmException, IOException
     {
-        PerforceCore.P4Result result = core.runP4(null, P4_COMMAND, FLAG_CLIENT, templateClient, COMMAND_INFO);
+        PerforceCore.P4Result result = core.runP4(null, P4_COMMAND, FLAG_CLIENT, resolveClient(), COMMAND_INFO);
         FileSystemUtils.createFile(new File(outputDir, "server-info.txt"), result.stdout.toString());
 
-        result = core.runP4(null, P4_COMMAND, FLAG_CLIENT, templateClient, COMMAND_CLIENT, FLAG_OUTPUT);
+        result = core.runP4(null, P4_COMMAND, FLAG_CLIENT, resolveClient(), COMMAND_CLIENT, FLAG_OUTPUT);
         FileSystemUtils.createFile(new File(outputDir, "template-client.txt"), result.stdout.toString());
     }
 
@@ -658,24 +692,24 @@ public class PerforceClient extends CachingScmClient
         {
             public void handleStdout(String line) throws ScmException
             {
-                if(line.startsWith("LineEnd:"))
+                if (line.startsWith("LineEnd:"))
                 {
                     String ending = line.substring(8).trim();
-                    if(ending.equals("local"))
+                    if (ending.equals("local"))
                     {
-                       eol[0] = FileStatus.EOLStyle.NATIVE;
+                        eol[0] = FileStatus.EOLStyle.NATIVE;
                     }
-                    else if(ending.equals("unix") || ending.equals("share"))
+                    else if (ending.equals("unix") || ending.equals("share"))
                     {
-                       eol[0] = FileStatus.EOLStyle.LINEFEED;
+                        eol[0] = FileStatus.EOLStyle.LINEFEED;
                     }
-                    else if(ending.equals("mac"))
+                    else if (ending.equals("mac"))
                     {
-                       eol[0] = FileStatus.EOLStyle.CARRIAGE_RETURN;
+                        eol[0] = FileStatus.EOLStyle.CARRIAGE_RETURN;
                     }
-                    else if(ending.equals("win"))
+                    else if (ending.equals("win"))
                     {
-                       eol[0] = FileStatus.EOLStyle.CARRIAGE_RETURN_LINEFEED;
+                        eol[0] = FileStatus.EOLStyle.CARRIAGE_RETURN_LINEFEED;
                     }
                 }
             }
@@ -683,7 +717,7 @@ public class PerforceClient extends CachingScmClient
             public void checkCancelled() throws ScmCancelledException
             {
             }
-        }, null, P4_COMMAND, FLAG_CLIENT, templateClient, COMMAND_CLIENT, FLAG_OUTPUT);
+        }, null, P4_COMMAND, FLAG_CLIENT, resolveClient(), COMMAND_CLIENT, FLAG_OUTPUT);
 
         return eol[0];
     }
@@ -721,10 +755,10 @@ public class PerforceClient extends CachingScmClient
         {
             File f = new File(clientRoot.getAbsoluteFile(), path);
             PerforceCore.P4Result result = core.runP4(false, null, P4_COMMAND, FLAG_CLIENT, clientName, COMMAND_FSTAT,  f.getAbsolutePath() + "@" + repoRevision.getRevisionString());
-            if(result.stderr.length() > 0)
+            if (result.stderr.length() > 0)
             {
                 String error = result.stderr.toString();
-                if(error.contains("no file(s) at that changelist number") || error.contains("no such file(s)"))
+                if (error.contains("no file(s) at that changelist number") || error.contains("no such file(s)"))
                 {
                     return null;
                 }
@@ -733,17 +767,17 @@ public class PerforceClient extends CachingScmClient
                     throw new ScmException("Error running p4 fstat: " + result.stderr);
                 }
             }
-            else if(result.stdout.toString().contains("... headAction delete"))
+            else if (result.stdout.toString().contains("... headAction delete"))
             {
                 return null;
             }
             else
             {
                 Pattern revPattern = Pattern.compile("... headRev ([0-9]+)");
-                for(String line: core.splitLines(result))
+                for (String line: core.splitLines(result))
                 {
                     Matcher m = revPattern.matcher(line);
-                    if(m.matches())
+                    if (m.matches())
                     {
                         long number = Long.parseLong(m.group(1));
                         return new NumericalFileRevision(number);
@@ -793,7 +827,7 @@ public class PerforceClient extends CachingScmClient
         Matcher matcher = splitter.matcher(p4Result.stdout);
         while (matcher.find())
         {
-            if(matcher.group(1).equals(name))
+            if (matcher.group(1).equals(name))
             {
                 return true;
             }
@@ -810,10 +844,9 @@ public class PerforceClient extends CachingScmClient
 
     public static void main(String argv[])
     {
-        PerforceClient client = new PerforceClient("localhost:1666", "jsankey", "", "pulse-demo");
-
         try
         {
+            PerforceClient client = new PerforceClient("localhost:1666", "jsankey", "", "pulse-demo");
             client.checkout(new NumericalRevision(2), "file");
             List<Changelist> cls = client.getChanges(new NumericalRevision(2), new NumericalRevision(6));
 
