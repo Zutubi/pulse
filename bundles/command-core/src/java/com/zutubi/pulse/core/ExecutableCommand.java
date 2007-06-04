@@ -2,10 +2,10 @@ package com.zutubi.pulse.core;
 
 import com.zutubi.pulse.core.model.CommandResult;
 import com.zutubi.pulse.jni.ProcessControl;
-import com.zutubi.util.ForkOutputStream;
-import com.zutubi.util.Constants;
-import com.zutubi.util.IOUtils;
 import com.zutubi.pulse.util.SystemUtils;
+import com.zutubi.util.Constants;
+import com.zutubi.util.ForkOutputStream;
+import com.zutubi.util.IOUtils;
 
 import java.io.*;
 import java.util.*;
@@ -145,7 +145,7 @@ public class ExecutableCommand extends CommandSupport implements ScopeAware
             boolean readerComplete = reader.waitFor(10);
             while(!terminated && !readerComplete)
             {
-                reader.waitFor(10);
+                readerComplete = reader.waitFor(10);
             }
 
             if(readerComplete)
@@ -377,7 +377,7 @@ public class ExecutableCommand extends CommandSupport implements ScopeAware
      *   a) if it is absolute, this is the working directory.
      *   b) if it is relative, then it is taken as the directory relative to the base directory.
      *
-     * @param paths
+     * @param paths paths for the recipe we are executing in
      *
      * @return working directory for the command.
      */
@@ -454,7 +454,7 @@ public class ExecutableCommand extends CommandSupport implements ScopeAware
      * Is the specified name an acceptable name for adding to the child processes environment.
      * If it is already in the environment (env. prefix), then we return false.
      *
-     * @param name
+     * @param name variable name to check
      *
      * @return return false if the name contains the 'env.' prefix, or contains an unsupported
      * character
@@ -476,7 +476,7 @@ public class ExecutableCommand extends CommandSupport implements ScopeAware
         return "PULSE_" + name;
     }
 
-    /**
+    /*
      * Take the specified key, and find a case insensitive match in the maps key set. Return this match,
      * or null if no match is found.
      *
