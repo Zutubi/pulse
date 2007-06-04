@@ -95,8 +95,28 @@ public class Maven2PostProcessorTest extends PostProcessorTestBase
                 "[INFO] Compilation failure\n" +
                 "\n" +
                 "base.dir/src/main/java/com/zutubi/maven2/test/App.java:[12,4] ';' expected\n" +
+                "\n");
+
+        if(SystemUtils.IS_WINDOWS)
+        {
+            assertTrue(result.failed());
+        }
+        else
+        {
+            assertTrue(result.succeeded());
+        }
+    }
+
+    public void testFatalError() throws Exception
+    {
+        CommandResult result = createAndProcessArtifact("fatalerror", pp);
+        assertErrors("[INFO] ------------------------------------------------------------------------\n" +
+                "[ERROR] FATAL ERROR\n" +
+                "[INFO] ------------------------------------------------------------------------\n" +
+                "[INFO] Error building POM (may not be this project's POM).\n" +
                 "\n" +
-                "");
+                "\n" +
+                "Project ID: unknown\n");
 
         if(SystemUtils.IS_WINDOWS)
         {

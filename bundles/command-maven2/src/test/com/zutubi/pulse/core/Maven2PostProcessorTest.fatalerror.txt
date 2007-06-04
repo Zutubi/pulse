@@ -1,0 +1,47 @@
+[INFO] Scanning for projects...
+[INFO] ------------------------------------------------------------------------
+[ERROR] FATAL ERROR
+[INFO] ------------------------------------------------------------------------
+[INFO] Error building POM (may not be this project's POM).
+
+
+Project ID: unknown
+
+Reason: Could not find the model file 'E:\pulse\data\work\PaSS+Nightly\default\Standardization\PASSV2\Source\DailyBuild\pom.xml'.
+
+
+[INFO] ------------------------------------------------------------------------
+[INFO] Trace
+org.apache.maven.reactor.MavenExecutionException: Could not find the model file 'E:\pulse\data\work\PaSS+Nightly\default\Standardization\PASSV2\Source\DailyBuild\pom.xml'.
+at org.apache.maven.DefaultMaven.getProjects(DefaultMaven.java:365)
+at org.apache.maven.DefaultMaven.doExecute(DefaultMaven.java:278)
+at org.apache.maven.DefaultMaven.execute(DefaultMaven.java:115)
+at org.apache.maven.cli.MavenCli.main(MavenCli.java:256)
+at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:39)
+at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:25)
+at java.lang.reflect.Method.invoke(Method.java:585)
+at org.codehaus.classworlds.Launcher.launchEnhanced(Launcher.java:315)
+at org.codehaus.classworlds.Launcher.launch(Launcher.java:255)
+at org.codehaus.classworlds.Launcher.mainWithExitCode(Launcher.java:430)
+at org.codehaus.classworlds.Launcher.main(Launcher.java:375)
+Caused by: org.apache.maven.project.ProjectBuildingException: Could not find the model file 'E:\pulse\data\work\PaSS+Nightly\default\Standardization\PASSV2\Source\DailyBuild\pom.xml'.
+at org.apache.maven.project.DefaultMavenProjectBuilder.readModel(DefaultMavenProjectBuilder.java:1274)
+at org.apache.maven.project.DefaultMavenProjectBuilder.buildFromSourceFileInternal(DefaultMavenProjectBuilder.java:414)
+at org.apache.maven.project.DefaultMavenProjectBuilder.build(DefaultMavenProjectBuilder.java:192)
+at org.apache.maven.DefaultMaven.getProject(DefaultMaven.java:515)
+at org.apache.maven.DefaultMaven.collectProjects(DefaultMaven.java:447)
+at org.apache.maven.DefaultMaven.collectProjects(DefaultMaven.java:491)
+at org.apache.maven.DefaultMaven.getProjects(DefaultMaven.java:351)
+... 11 more
+Caused by: java.io.FileNotFoundException: E:\pulse\data\work\PaSS+Nightly\default\Standardization\PASSV2\Source\DailyBuild\pom.xml (The system cannot find the path specified)
+at java.io.FileInputStream.open(Native Method)
+at java.io.FileInputStream.<init>(FileInputStream.java:106)
+at java.io.FileReader.<init>(FileReader.java:55)
+at org.apache.maven.project.DefaultMavenProjectBuilder.readModel(DefaultMavenProjectBuilder.java:1269)
+... 17 more
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time: 1 second
+[INFO] Finished at: Thu May 03 16:58:42 PDT 2007
+[INFO] Final Memory: 3M/254M
+[INFO] ------------------------------------------------------------------------
