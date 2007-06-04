@@ -1,6 +1,7 @@
 package com.zutubi.pulse.servercore.scm.p4;
 
 import com.opensymphony.util.TextUtils;
+import com.zutubi.pulse.core.config.ResourceProperty;
 import com.zutubi.pulse.core.model.*;
 import com.zutubi.pulse.filesystem.remote.CachingScmFile;
 import com.zutubi.pulse.scm.FileStatus;
@@ -69,7 +70,7 @@ public class PerforceClient extends CachingScmClient
                 resolvedClient = templateClient;
             }
         }
-        
+
         return resolvedClient;
     }
 
@@ -81,7 +82,7 @@ public class PerforceClient extends CachingScmClient
     private boolean clientExists(String clientName) throws ScmException
     {
         PerforceCore.P4Result result = core.runP4(null, P4_COMMAND, COMMAND_CLIENTS);
-        String [] lines = core.splitLines(result);
+        String[] lines = core.splitLines(result);
         for (String line : lines)
         {
             String[] parts = line.split(" ");
@@ -668,10 +669,14 @@ public class PerforceClient extends CachingScmClient
         }
     }
 
-    public Map<String, String> getProperties(String id, File dir) throws ScmException
+    public List<ResourceProperty> getProperties(String id, File dir) throws ScmException
     {
-        Map<String, String> result = core.getEnv();
-        result.put("P4CLIENT", getClientName(id));
+        List<ResourceProperty> result = new LinkedList<ResourceProperty>();
+        for (Map.Entry<String, String> entry : core.getEnv().entrySet())
+        {
+            result.add(new ResourceProperty(entry.getKey(), entry.getValue(), true, false, false));
+        }
+        result.add(new ResourceProperty("P4CLIENT", getClientName(id), true, false, false));
         return result;
     }
 
@@ -754,7 +759,7 @@ public class PerforceClient extends CachingScmClient
         try
         {
             File f = new File(clientRoot.getAbsoluteFile(), path);
-            PerforceCore.P4Result result = core.runP4(false, null, P4_COMMAND, FLAG_CLIENT, clientName, COMMAND_FSTAT,  f.getAbsolutePath() + "@" + repoRevision.getRevisionString());
+            PerforceCore.P4Result result = core.runP4(false, null, P4_COMMAND, FLAG_CLIENT, clientName, COMMAND_FSTAT, f.getAbsolutePath() + "@" + repoRevision.getRevisionString());
             if (result.stderr.length() > 0)
             {
                 String error = result.stderr.toString();
@@ -774,7 +779,7 @@ public class PerforceClient extends CachingScmClient
             else
             {
                 Pattern revPattern = Pattern.compile("... headRev ([0-9]+)");
-                for (String line: core.splitLines(result))
+                for (String line : core.splitLines(result))
                 {
                     Matcher m = revPattern.matcher(line);
                     if (m.matches())

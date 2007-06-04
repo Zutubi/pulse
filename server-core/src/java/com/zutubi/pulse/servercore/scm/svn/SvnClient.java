@@ -1,5 +1,6 @@
 package com.zutubi.pulse.servercore.scm.svn;
 
+import com.zutubi.pulse.core.config.ResourceProperty;
 import com.zutubi.pulse.core.model.*;
 import com.zutubi.pulse.scm.FileStatus;
 import com.zutubi.pulse.scm.ScmCancelledException;
@@ -41,6 +42,8 @@ public class SvnClient implements ScmClient
     private SVNRepository repository;
     private ISVNAuthenticationManager authenticationManager;
     private String uid;
+
+    private String url;
 
     //=======================================================================
     // Implementation
@@ -110,6 +113,8 @@ public class SvnClient implements ScmClient
         // Initialise SVN library
         DAVRepositoryFactory.setup();
         SVNRepositoryFactoryImpl.setup();
+
+        this.url = url;
 
         try
         {
@@ -675,9 +680,11 @@ public class SvnClient implements ScmClient
     }
 
     @SuppressWarnings({"unchecked"})
-    public Map<String, String> getProperties(String id, File dir) throws ScmException
+    public List<ResourceProperty> getProperties(String id, File dir) throws ScmException
     {
-        return Collections.EMPTY_MAP;
+        List<ResourceProperty> properties = new LinkedList<ResourceProperty>();
+        properties.add(new ResourceProperty("svn.url", url));
+ 	    return properties;
     }
 
     public void storeConnectionDetails(File outputDir) throws ScmException, IOException

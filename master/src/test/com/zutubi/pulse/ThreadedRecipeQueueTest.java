@@ -13,7 +13,9 @@ import com.zutubi.pulse.core.model.Changelist;
 import com.zutubi.pulse.core.model.NumericalRevision;
 import com.zutubi.pulse.core.model.RecipeResult;
 import com.zutubi.pulse.core.model.Revision;
-import com.zutubi.pulse.events.*;
+import com.zutubi.pulse.events.AgentRemovedEvent;
+import com.zutubi.pulse.events.DefaultEventManager;
+import com.zutubi.pulse.events.Event;
 import com.zutubi.pulse.events.EventListener;
 import com.zutubi.pulse.events.build.RecipeCompletedEvent;
 import com.zutubi.pulse.events.build.RecipeDispatchedEvent;
@@ -22,8 +24,8 @@ import com.zutubi.pulse.logging.CustomLogRecord;
 import com.zutubi.pulse.model.*;
 import com.zutubi.pulse.personal.PatchArchive;
 import com.zutubi.pulse.prototype.config.ProjectConfiguration;
-import com.zutubi.pulse.prototype.config.types.CustomTypeConfiguration;
 import com.zutubi.pulse.prototype.config.agent.AgentConfiguration;
+import com.zutubi.pulse.prototype.config.types.CustomTypeConfiguration;
 import com.zutubi.pulse.scm.FileStatus;
 import com.zutubi.pulse.scm.ScmChangeEvent;
 import com.zutubi.pulse.scm.ScmCheckoutEventHandler;
@@ -881,7 +883,7 @@ public class ThreadedRecipeQueueTest extends TestCase implements EventListener
             throw new RuntimeException("Method not implemented");
         }
 
-        public Map<String, String> getProperties(String id, File dir) throws ScmException
+        public List<ResourceProperty> getProperties(String id, File dir) throws ScmException
         {
             throw new RuntimeException("Method not yet implemented.");
         }

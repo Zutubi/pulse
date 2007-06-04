@@ -1,5 +1,6 @@
 package com.zutubi.pulse.servercore.scm;
 
+import com.zutubi.pulse.core.config.ResourceProperty;
 import com.zutubi.pulse.core.model.Changelist;
 import com.zutubi.pulse.core.model.Revision;
 import com.zutubi.pulse.scm.FileStatus;
@@ -83,7 +84,7 @@ public interface ScmClient
      * @return properties to introduce into the build environment
      * @throws ScmException on error
      */
-    Map<String, String> getProperties(String id, File dir) throws ScmException;
+    List<ResourceProperty> getProperties(String id, File dir) throws ScmException;
 
     /**
      * Stores details about the connection to the server to the given

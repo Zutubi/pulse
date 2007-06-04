@@ -1,6 +1,7 @@
 package com.zutubi.pulse.servercore.scm.cvs;
 
 import com.opensymphony.util.TextUtils;
+import com.zutubi.pulse.core.config.ResourceProperty;
 import com.zutubi.pulse.core.model.Change;
 import com.zutubi.pulse.core.model.Changelist;
 import com.zutubi.pulse.core.model.CvsRevision;
@@ -193,15 +194,15 @@ public class CvsClient extends CachingScmClient
         core.tag(module, (CvsRevision) revision, name, moveExisting);
     }
 
-    public Map<String, String> getProperties(String id, File dir) throws ScmException
+    public List<ResourceProperty> getProperties(String id, File dir) throws ScmException
     {
-        Map<String, String> result = new HashMap<String, String>();
-        result.put("cvs.root", root);
+        List<ResourceProperty> result = new ArrayList<ResourceProperty>(3);
+        result.add(new ResourceProperty("cvs.root", root));
         if (branch != null)
         {
-            result.put("cvs.branch", branch);
+            result.add(new ResourceProperty("cvs.branch", branch));
         }
-        result.put("cvs.module", module);
+        result.add(new ResourceProperty("cvs.module", module));
         return result;
     }
 
