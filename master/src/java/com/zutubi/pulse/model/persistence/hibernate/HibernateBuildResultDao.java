@@ -12,6 +12,7 @@ import org.springframework.orm.hibernate3.HibernateCallback;
 import org.springframework.orm.hibernate3.SessionFactoryUtils;
 
 import java.sql.SQLException;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
@@ -421,23 +422,43 @@ public class HibernateBuildResultDao extends HibernateEntityDao<BuildResult> imp
         });
     }
 
-    public List<BuildResult> getOldestCompletedBuilds(final User user, final int max)
+    public List<BuildResult> getOldestCompletedBuilds(final User user, final int limit)
     {
-        return (List<BuildResult>) getHibernateTemplate().execute(new HibernateCallback()
+        int count = getCompletedResultCount(user);
+        if(count > limit)
         {
-            public Object doInHibernate(Session session) throws HibernateException
+            final int max = count - limit;
+            
+            return (List<BuildResult>) getHibernateTemplate().execute(new HibernateCallback()
             {
-                Query queryObject = session.createQuery("from BuildResult model where model.user = :user and model.stateName in (:stateNames) order by model.number asc");
-                queryObject.setEntity("user", user);
-                queryObject.setParameterList("stateNames", ResultState.getCompletedStateNames());
-                if(max > 0)
+                public Object doInHibernate(Session session) throws HibernateException
                 {
-                    queryObject.setMaxResults(max);
+                    Query queryObject = session.createQuery("from BuildResult model where model.user = :user and model.stateName in (:stateNames) order by model.number asc");
+                    queryObject.setEntity("user", user);
+                    queryObject.setParameterList("stateNames", ResultState.getCompletedStateNames());
+                    if(max > 0)
+                    {
+                        queryObject.setMaxResults(max);
+                    }
+                    SessionFactoryUtils.applyTransactionTimeout(queryObject, getSessionFactory());
+                    return queryObject.list();
                 }
-                SessionFactoryUtils.applyTransactionTimeout(queryObject, getSessionFactory());
-                return queryObject.list();
-            }
-        });
+            });
+        }
+
+        return Collections.EMPTY_LIST;
+    }
+
+    public List<BuildResult> getOldestBuilds(Project project, ResultState[] states, Boolean hasWorkDir, int limit)
+    {
+        int total = getBuildCount(project, states, hasWorkDir);
+        if(total > limit)
+        {
+            // Clean out the difference
+            return queryBuilds(new Project[] { project }, states, null, 0, 0, hasWorkDir, 0, total - limit, false);
+        }
+
+        return Collections.EMPTY_LIST;
     }
 
     public RecipeResultNode findResultNodeByResultId(long id)

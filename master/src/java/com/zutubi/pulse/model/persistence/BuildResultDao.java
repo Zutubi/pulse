@@ -63,7 +63,9 @@ public interface BuildResultDao extends EntityDao<BuildResult>
 
     int getCompletedResultCount(User user);
 
-    List<BuildResult> getOldestCompletedBuilds(User user, int max);
+    List<BuildResult> getOldestCompletedBuilds(User user, int limit);
+
+    List<BuildResult> getOldestBuilds(Project project, ResultState[] states, Boolean hasWorkDir, int limit);
 
     RecipeResultNode findResultNodeByResultId(long id);
 

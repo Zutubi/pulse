@@ -13,9 +13,10 @@ import com.zutubi.pulse.scheduling.tasks.CleanupBuilds;
 import com.zutubi.pulse.util.Constants;
 import com.zutubi.pulse.util.logging.Logger;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 /**
  *
@@ -23,6 +24,11 @@ import java.util.Map;
  */
 public class CleanupManager
 {
+    private static final String CLEANUP_NAME = "cleanup";
+    private static final String CLEANUP_GROUP = "services";
+
+    private static final long CLEANUP_FREQUENCY = Constants.HOUR;
+
     private static final Logger LOG = Logger.getLogger(CleanupManager.class);
 
     private final EventListener eventListener = new CleanupCallback();
@@ -31,15 +37,11 @@ public class CleanupManager
     private Scheduler scheduler;
     private BuildManager buildManager;
     private ProjectManager projectManager;
-
-    private static final Map<Project, Object> runningCleanups = new HashMap<Project, Object>();
-
-    private static final String CLEANUP_NAME = "cleanup";
-    private static final String CLEANUP_GROUP = "services";
-
-    private static final long CLEANUP_FREQUENCY = Constants.HOUR;
-
     private BuildResultDao buildResultDao;
+
+    private LinkedBlockingQueue<CleanupRequest> queue = new LinkedBlockingQueue<CleanupRequest>();
+    private Lock executingRequestLock = new ReentrantLock();
+    private CleanupRequest executingRequest = null;
 
     /**
      * Initialise the cleanup manager, registering event listeners and scheduling callbacks.
@@ -51,23 +53,61 @@ public class CleanupManager
 
         // register for scheduled callbacks.
         Trigger trigger = scheduler.getTrigger(CLEANUP_NAME, CLEANUP_GROUP);
-        if (trigger != null)
+        if (trigger == null)
         {
-            return;
+            // initialise the trigger.
+            trigger = new SimpleTrigger(CLEANUP_NAME, CLEANUP_GROUP, CLEANUP_FREQUENCY);
+            trigger.setTaskClass(CleanupBuilds.class);
+
+            try
+            {
+                scheduler.schedule(trigger);
+            }
+            catch (SchedulingException e)
+            {
+                LOG.severe(e);
+            }
         }
 
-        // initialise the trigger.
-        trigger = new SimpleTrigger(CLEANUP_NAME, CLEANUP_GROUP, CLEANUP_FREQUENCY);
-        trigger.setTaskClass(CleanupBuilds.class);
+        Thread cleanupThread = new Thread(new Runnable()
+        {
+            @SuppressWarnings({"InfiniteLoopStatement"})
+            public void run()
+            {
+                while(true)
+                {
+                    try
+                    {
+                        CleanupRequest request = queue.take();
 
-        try
-        {
-            scheduler.schedule(trigger);
-        }
-        catch (SchedulingException e)
-        {
-            LOG.severe(e);
-        }
+                        executingRequestLock.lock();
+                        executingRequest = request;
+                        executingRequestLock.unlock();
+
+                        try
+                        {
+                            request.cleanup();
+                        }
+                        catch(Exception e)
+                        {
+                            LOG.severe(e);
+                        }
+                        finally
+                        {
+                            executingRequestLock.lock();
+                            executingRequest = null;
+                            executingRequestLock.unlock();
+                        }
+                    }
+                    catch (InterruptedException e)
+                    {
+                        LOG.warning(e);
+                    }
+                }
+            }
+        }, "Build Cleanup Service");
+        cleanupThread.setDaemon(true);
+        cleanupThread.start();
     }
 
     public void cleanupBuilds()
@@ -89,7 +129,25 @@ public class CleanupManager
      */
     public boolean isCleanupInProgress(Project project)
     {
-        return runningCleanups.containsKey(project);
+        // We get a weakly-consistent iterator: safe even if there are
+        // concurrent modifications.
+        for(CleanupRequest request: queue)
+        {
+            if(request.isForProject(project))
+            {
+                return true;
+            }
+        }
+
+        executingRequestLock.lock();
+        try
+        {
+            return executingRequest != null && executingRequest.isForProject(project);
+        }
+        finally
+        {
+            executingRequestLock.unlock();
+        }
     }
 
     /**
@@ -97,53 +155,36 @@ public class CleanupManager
      *
      * @param project   the project to be cleaned up.
      */
-    public void cleanupBuilds(Project project)
+    private void cleanupBuilds(Project project)
     {
-        try
+        List<CleanupRule> rules = project.getCleanupRules();
+        for (CleanupRule rule : rules)
         {
-            runningCleanups.put(project, null);
-
-            List<CleanupRule> rules = project.getCleanupRules();
-
-            for (CleanupRule rule : rules)
-            {
-                cleanupBuilds(project, rule);
-            }
-        }
-        finally
-        {
-            runningCleanups.remove(project);
+            cleanupBuilds(project, rule);
         }
      }
 
     public void cleanupBuilds(Project project, CleanupRule rule)
     {
-        List<BuildResult> oldBuilds = rule.getMatchingResults(project, buildResultDao);
+        ProjectCleanupRequest request = new ProjectCleanupRequest(project, rule);
 
-        for (BuildResult build : oldBuilds)
+        // Slight race may lead to duplicates in the queue, but that does not
+        // really matter.
+        if (!queue.contains(request))
         {
-            if (rule.getWorkDirOnly())
-            {
-                buildManager.cleanupWork(build);
-            }
-            else
-            {
-                buildManager.cleanupResult(build, true);
-            }
+            queue.add(request);
         }
     }
 
     public void cleanupBuilds(User user)
     {
-        int count = buildResultDao.getCompletedResultCount(user);
-        int max = user.getMyBuildsCount();
-        if(count > max)
+        PersonalCleanupRequest request = new PersonalCleanupRequest(user);
+
+        // Slight race may lead to duplicates in the queue, but that does not
+        // really matter.
+        if (!queue.contains(request))
         {
-            List<BuildResult> results = buildResultDao.getOldestCompletedBuilds(user, count - max);
-            for(BuildResult result: results)
-            {
-                buildManager.cleanupResult(result, true);
-            }
+            queue.add(request);
         }
     }
 
@@ -152,10 +193,29 @@ public class CleanupManager
         this.buildResultDao = buildResultDao;
     }
 
+    public void setEventManager(EventManager eventManager)
+    {
+        this.eventManager = eventManager;
+    }
+
+    public void setBuildManager(BuildManager buildManager)
+    {
+        this.buildManager = buildManager;
+    }
+
+    public void setScheduler(Scheduler scheduler)
+    {
+        this.scheduler = scheduler;
+    }
+
+    public void setProjectManager(ProjectManager projectManager)
+    {
+        this.projectManager = projectManager;
+    }
+
     /**
      * Listen for build completed events, triggering each completed builds projects
      * cleanup routines.
-     *
      */
     private class CleanupCallback implements EventListener
     {
@@ -180,23 +240,126 @@ public class CleanupManager
         }
     }
 
-    public void setEventManager(EventManager eventManager)
+    /**
+     * Simple interface for request to perform a cleanup.
+     */
+    private interface CleanupRequest
     {
-        this.eventManager = eventManager;
+        void cleanup();
+        boolean isForProject(Project p);
     }
 
-    public void setBuildManager(BuildManager buildManager)
+    /**
+     * A request to execute a single cleanup rule for a project.
+     */
+    private class ProjectCleanupRequest implements CleanupRequest
     {
-        this.buildManager = buildManager;
+        private Project project;
+        private CleanupRule rule;
+
+        public ProjectCleanupRequest(Project project, CleanupRule rule)
+        {
+            this.project = project;
+            this.rule = rule;
+        }
+
+        public void cleanup()
+        {
+            List<BuildResult> oldBuilds = rule.getMatchingResults(project, buildResultDao);
+
+            for (BuildResult build : oldBuilds)
+            {
+                if (rule.getWorkDirOnly())
+                {
+                    buildManager.cleanupWork(build);
+                }
+                else
+                {
+                    buildManager.cleanupResult(build, true);
+                }
+            }
+        }
+
+        public boolean isForProject(Project p)
+        {
+            return p.equals(project);
+        }
+
+        public boolean equals(Object o)
+        {
+            if (this == o)
+            {
+                return true;
+            }
+
+            if (o == null || getClass() != o.getClass())
+            {
+                return false;
+            }
+
+            ProjectCleanupRequest that = (ProjectCleanupRequest) o;
+            if (!project.equals(that.project))
+            {
+                return false;
+            }
+
+            return rule.equals(that.rule);
+        }
+
+        public int hashCode()
+        {
+            int result;
+            result = project.hashCode();
+            result = 31 * result + rule.hashCode();
+            return result;
+        }
     }
 
-    public void setScheduler(Scheduler scheduler)
+    /**
+     * A request to cleanup personal builds for some user.
+     */
+    private class PersonalCleanupRequest implements CleanupRequest
     {
-        this.scheduler = scheduler;
-    }
+        private User user;
 
-    public void setProjectManager(ProjectManager projectManager)
-    {
-        this.projectManager = projectManager;
+        public PersonalCleanupRequest(User user)
+        {
+            this.user = user;
+        }
+
+        public void cleanup()
+        {
+            List<BuildResult> results = buildResultDao.getOldestCompletedBuilds(user, user.getMyBuildsCount());
+            for(BuildResult result: results)
+            {
+                buildManager.cleanupResult(result, true);
+            }
+        }
+
+        public boolean isForProject(Project p)
+        {
+            return false;
+        }
+
+        public boolean equals(Object o)
+        {
+            if (this == o)
+            {
+                return true;
+            }
+
+            if (o == null || getClass() != o.getClass())
+            {
+                return false;
+            }
+
+            PersonalCleanupRequest that = (PersonalCleanupRequest) o;
+            return user.equals(that.user);
+        }
+
+        public int hashCode()
+        {
+            return user.hashCode();
+        }
     }
 }
