@@ -152,7 +152,7 @@ public class CommandResult extends Result
 
         commandName = other.commandName;
 
-        properties.clear();
+        getProperties().clear();
         properties.putAll(other.getProperties());
 
         artifacts.clear();
