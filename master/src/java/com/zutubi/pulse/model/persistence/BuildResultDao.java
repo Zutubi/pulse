@@ -4,7 +4,10 @@ import com.zutubi.pulse.core.model.CommandResult;
 import com.zutubi.pulse.core.model.PersistentName;
 import com.zutubi.pulse.core.model.RecipeResult;
 import com.zutubi.pulse.core.model.ResultState;
-import com.zutubi.pulse.model.*;
+import com.zutubi.pulse.model.BuildResult;
+import com.zutubi.pulse.model.Project;
+import com.zutubi.pulse.model.RecipeResultNode;
+import com.zutubi.pulse.model.User;
 
 import java.util.Date;
 import java.util.List;
@@ -59,7 +62,9 @@ public interface BuildResultDao extends EntityDao<BuildResult>
 
     int getCompletedResultCount(User user);
 
-    List<BuildResult> getOldestCompletedBuilds(User user, int max);
+    List<BuildResult> getOldestCompletedBuilds(User user, int limit);
+
+    List<BuildResult> getOldestBuilds(Project project, ResultState[] states, Boolean hasWorkDir, int limit);
 
     RecipeResultNode findResultNodeByResultId(long id);
 

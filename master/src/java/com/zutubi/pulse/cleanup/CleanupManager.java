@@ -22,10 +22,12 @@ import com.zutubi.pulse.scheduling.Trigger;
 import com.zutubi.util.Constants;
 import com.zutubi.util.logging.Logger;
 
-import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 /**
  *
@@ -33,6 +35,11 @@ import java.util.Map;
  */
 public class CleanupManager
 {
+    private static final String CLEANUP_NAME = "cleanup";
+    private static final String CLEANUP_GROUP = "services";
+
+    private static final long CLEANUP_FREQUENCY = Constants.HOUR;
+
     private static final Logger LOG = Logger.getLogger(CleanupManager.class);
 
     private final EventListener eventListener = new CleanupCallback();
@@ -45,15 +52,11 @@ public class CleanupManager
     private ConfigurationProvider configurationProvider;
 
     private ProjectManager projectManager;
-
-    private static final Map<Project, Object> runningCleanups = new HashMap<Project, Object>();
-
-    private static final String CLEANUP_NAME = "cleanup";
-    private static final String CLEANUP_GROUP = "services";
-    
-    private static final long CLEANUP_FREQUENCY = Constants.HOUR;
-
     private BuildResultDao buildResultDao;
+
+    private LinkedBlockingQueue<CleanupRequest> queue = new LinkedBlockingQueue<CleanupRequest>();
+ 	private Lock executingRequestLock = new ReentrantLock();
+ 	private CleanupRequest executingRequest = null;
 
     /**
      * Initialise the cleanup manager, registering event listeners and scheduling callbacks.
@@ -76,22 +79,20 @@ public class CleanupManager
         
         // register for scheduled callbacks.
         Trigger trigger = scheduler.getTrigger(CLEANUP_NAME, CLEANUP_GROUP);
-        if (trigger != null)
+        if (trigger == null)
         {
-            return;
-        }
+            // initialise the trigger.
+            trigger = new SimpleTrigger(CLEANUP_NAME, CLEANUP_GROUP, CLEANUP_FREQUENCY);
+            trigger.setTaskClass(CleanupBuilds.class);
 
-        // initialise the trigger.
-        trigger = new SimpleTrigger(CLEANUP_NAME, CLEANUP_GROUP, CLEANUP_FREQUENCY);
-        trigger.setTaskClass(CleanupBuilds.class);
-
-        try
-        {
-            scheduler.schedule(trigger);
-        }
-        catch (SchedulingException e)
-        {
-            LOG.severe(e);
+            try
+            {
+                scheduler.schedule(trigger);
+            }
+            catch (SchedulingException e)
+            {
+                LOG.severe(e);
+            }
         }
 
         CollectionListener<ProjectConfiguration> listener = new CollectionListener<ProjectConfiguration>("project", ProjectConfiguration.class, true)
@@ -116,6 +117,46 @@ public class CleanupManager
             }
         };
         listener.register(configurationProvider);
+
+        Thread cleanupThread = new Thread(new Runnable()
+        {
+            @SuppressWarnings({"InfiniteLoopStatement"})
+            public void run()
+            {
+                while(true)
+                {
+                    try
+                    {
+                        CleanupRequest request = queue.take();
+
+                        executingRequestLock.lock();
+                        executingRequest = request;
+                        executingRequestLock.unlock();
+
+                        try
+                        {
+                            request.cleanup();
+                        }
+                        catch(Exception e)
+                        {
+                            LOG.severe(e);
+                        }
+                        finally
+                        {
+                            executingRequestLock.lock();
+                            executingRequest = null;
+                            executingRequestLock.unlock();
+                        }
+                    }
+                    catch (InterruptedException e)
+                    {
+                        LOG.warning(e);
+                    }
+                }
+            }
+        }, "Build Cleanup Service");
+        cleanupThread.setDaemon(true);
+        cleanupThread.start();
     }
 
     public void cleanupBuilds()
@@ -137,7 +178,25 @@ public class CleanupManager
      */
     public boolean isCleanupInProgress(Project project)
     {
-        return runningCleanups.containsKey(project);
+        // We get a weakly-consistent iterator: safe even if there are
+        // concurrent modifications.
+        for(CleanupRequest request: queue)
+        {
+            if(request.isForProject(project))
+            {
+                return true;
+            }
+        }
+
+        executingRequestLock.lock();
+        try
+        {
+            return executingRequest != null && executingRequest.isForProject(project);
+        }
+        finally
+        {
+            executingRequestLock.unlock();
+        }
     }
 
     /**
@@ -145,73 +204,45 @@ public class CleanupManager
      *
      * @param project   the project to be cleaned up.
      */
-    public void cleanupBuilds(Project project)
+    @SuppressWarnings({"unchecked"})
+    private void cleanupBuilds(Project project)
     {
-        try
+        ProjectConfiguration projectConfig = projectManager.getProjectConfig(project.getId());
+        Map<String, CleanupConfiguration> cleanupConfigs = (Map<String, CleanupConfiguration>) projectConfig.getExtensions().get("cleanup");
+
+        if (cleanupConfigs != null)
         {
-            runningCleanups.put(project, null);
+            // if cleanup rules are specified.  Maybe we should always have at least an empty map?
+            List<CleanupConfiguration> rules = new LinkedList<CleanupConfiguration>(cleanupConfigs.values());
 
-            ProjectConfiguration projectConfig = projectManager.getProjectConfig(project.getId());
-            Map<String, CleanupConfiguration> cleanupConfigs = (Map<String, CleanupConfiguration>) projectConfig.getExtensions().get("cleanup");
-
-            if (cleanupConfigs != null)
+            for (CleanupConfiguration rule : rules)
             {
-                // if cleanup rules are specified.  Maybe we should always have at least an empty map?
-                List<CleanupConfiguration> rules = new LinkedList<CleanupConfiguration>(cleanupConfigs.values());
-
-                for (CleanupConfiguration rule : rules)
-                {
-                    cleanupBuilds(rule, project);
-                }
+                cleanupBuilds(project, rule);
             }
-        }
-        finally
-        {
-            runningCleanups.remove(project);
         }
     }
 
     public void cleanupBuilds(Project project, CleanupConfiguration rule)
     {
-        try
+        ProjectCleanupRequest request = new ProjectCleanupRequest(project, rule);
+
+        // Slight race may lead to duplicates in the queue, but that does not
+        // really matter.
+        if (!queue.contains(request))
         {
-            runningCleanups.put(project, null);
-            cleanupBuilds(rule, project);
-        }
-        finally
-        {
-            runningCleanups.remove(project);
+            queue.add(request);
         }
     }
 
     public void cleanupBuilds(User user)
     {
-        int count = buildResultDao.getCompletedResultCount(user);
-        int max = user.getMyBuildsCount();
-        if(count > max)
-        {
-            List<BuildResult> results = buildResultDao.getOldestCompletedBuilds(user, count - max);
-            for(BuildResult result: results)
-            {
-                buildManager.cleanupResult(result, true);
-            }
-        }
-    }
+        PersonalCleanupRequest request = new PersonalCleanupRequest(user);
 
-    private synchronized void cleanupBuilds(CleanupConfiguration rule, Project project)
-    {
-        List<BuildResult> oldBuilds = rule.getMatchingResults(project, buildResultDao);
-
-        for (BuildResult build : oldBuilds)
+        // Slight race may lead to duplicates in the queue, but that does not
+        // really matter.
+        if (!queue.contains(request))
         {
-            if (rule.getWhat() == CleanupWhat.WORKING_DIRECTORIES_ONLY)
-            {
-                buildManager.cleanupWork(build);
-            }
-            else
-            {
-                buildManager.cleanupResult(build, true);
-            }
+            queue.add(request);
         }
     }
 
@@ -223,34 +254,6 @@ public class CleanupManager
     public void setConfigurationProvider(ConfigurationProvider configurationProvider)
     {
         this.configurationProvider = configurationProvider;
-    }
-
-    /**
-     * Listen for build completed events, triggering each completed builds projects
-     * cleanup routines.
-     * 
-     */
-    private class CleanupCallback implements EventListener
-    {
-        public void handleEvent(Event evt)
-        {
-            BuildCompletedEvent completedEvent = (BuildCompletedEvent) evt;
-            BuildResult result = completedEvent.getResult();
-
-            if(result.isPersonal())
-            {
-                cleanupBuilds(result.getUser());
-            }
-            else
-            {
-                cleanupBuilds(result.getProject());
-            }
-        }
-
-        public Class[] getHandledEvents()
-        {
-            return new Class[]{BuildCompletedEvent.class};
-        }
     }
 
     public void setEventManager(EventManager eventManager)
@@ -276,5 +279,156 @@ public class CleanupManager
     public void setConfigurationRegistry(ConfigurationRegistry configurationRegistry)
     {
         this.configurationRegistry = configurationRegistry;
+    }
+
+    /**
+     * Listen for build completed events, triggering each completed builds projects
+     * cleanup routines.
+     *
+     */
+    private class CleanupCallback implements EventListener
+    {
+        public void handleEvent(Event evt)
+        {
+            BuildCompletedEvent completedEvent = (BuildCompletedEvent) evt;
+            BuildResult result = completedEvent.getResult();
+
+            if(result.isPersonal())
+            {
+                cleanupBuilds(result.getUser());
+            }
+            else
+            {
+                cleanupBuilds(result.getProject());
+            }
+        }
+
+        public Class[] getHandledEvents()
+        {
+            return new Class[]{BuildCompletedEvent.class};
+        }
+    }
+
+    /**
+     * Simple interface for request to perform a cleanup.
+     */
+    private interface CleanupRequest
+    {
+        void cleanup();
+        boolean isForProject(Project p);
+    }
+
+    /**
+     * A request to execute a single cleanup rule for a project.
+     */
+    private class ProjectCleanupRequest implements CleanupRequest
+    {
+        private Project project;
+        private CleanupConfiguration rule;
+
+        public ProjectCleanupRequest(Project project, CleanupConfiguration rule)
+        {
+            this.project = project;
+            this.rule = rule;
+        }
+
+        public void cleanup()
+        {
+            List<BuildResult> oldBuilds = rule.getMatchingResults(project, buildResultDao);
+
+            for (BuildResult build : oldBuilds)
+            {
+                if (rule.getWhat() == CleanupWhat.WORKING_DIRECTORIES_ONLY)
+                {
+                    buildManager.cleanupWork(build);
+                }
+                else
+                {
+                    buildManager.cleanupResult(build, true);
+                }
+            }
+        }
+
+        public boolean isForProject(Project p)
+        {
+            return p.equals(project);
+        }
+
+        public boolean equals(Object o)
+        {
+            if (this == o)
+            {
+                return true;
+            }
+
+            if (o == null || getClass() != o.getClass())
+            {
+                return false;
+            }
+
+            ProjectCleanupRequest that = (ProjectCleanupRequest) o;
+            if (!project.equals(that.project))
+            {
+                return false;
+            }
+
+            return rule.equals(that.rule);
+        }
+
+        public int hashCode()
+        {
+            int result;
+            result = project.hashCode();
+            result = 31 * result + rule.hashCode();
+            return result;
+        }
+    }
+
+    /**
+     * A request to cleanup personal builds for some user.
+     */
+    private class PersonalCleanupRequest implements CleanupRequest
+    {
+        private User user;
+
+        public PersonalCleanupRequest(User user)
+        {
+            this.user = user;
+        }
+
+        public void cleanup()
+        {
+            List<BuildResult> results = buildResultDao.getOldestCompletedBuilds(user, user.getMyBuildsCount());
+            for(BuildResult result: results)
+            {
+                buildManager.cleanupResult(result, true);
+            }
+        }
+
+        public boolean isForProject(Project p)
+        {
+            return false;
+        }
+
+        public boolean equals(Object o)
+        {
+            if (this == o)
+            {
+                return true;
+            }
+
+            if (o == null || getClass() != o.getClass())
+            {
+                return false;
+            }
+
+            PersonalCleanupRequest that = (PersonalCleanupRequest) o;
+            return user.equals(that.user);
+        }
+
+        public int hashCode()
+        {
+            return user.hashCode();
+        }
     }
 }
