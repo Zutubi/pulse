@@ -100,7 +100,6 @@ public abstract class AbstractEditTriggerAction extends ProjectActionSupport imp
             Scheduler scheduler = getScheduler();
 
             Trigger trigger = getTrigger();
-            trigger.getDataMap().put(BuildProjectTask.PARAM_SPEC, specification);
             scheduler.update(trigger);
 
             return SUCCESS;

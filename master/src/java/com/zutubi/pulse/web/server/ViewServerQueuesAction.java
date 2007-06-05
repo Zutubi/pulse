@@ -10,7 +10,7 @@ import com.zutubi.pulse.model.Project;
 import com.zutubi.pulse.model.ProjectManager;
 import com.zutubi.pulse.model.User;
 import com.zutubi.pulse.model.UserManager;
-import com.zutubi.pulse.prototype.config.ProjectConfiguration;
+import com.zutubi.pulse.prototype.config.project.ProjectConfiguration;
 import com.zutubi.pulse.web.ActionSupport;
 
 import java.util.Collections;

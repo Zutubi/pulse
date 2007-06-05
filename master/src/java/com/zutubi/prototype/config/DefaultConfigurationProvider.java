@@ -67,18 +67,7 @@ public class DefaultConfigurationProvider implements ConfigurationProvider
     @SuppressWarnings({"unchecked"})
     public <T> T getAncestorOfType(Configuration c, Class<T> clazz)
     {
-        String path = c.getConfigurationPath();
-        CompositeType type = typeRegistry.getType(clazz);
-        if (type != null)
-        {
-            String ancestorPath = configurationPersistenceManager.getClosestOwningScope(type, path);
-            if(ancestorPath != null)
-            {
-                return (T) configurationPersistenceManager.getInstance(ancestorPath);
-            }
-        }
-
-        return null;
+        return configurationPersistenceManager.getAncestorOfType(c, clazz);
     }
 
     public String insert(String parentPath, Object instance)
@@ -111,6 +100,19 @@ public class DefaultConfigurationProvider implements ConfigurationProvider
     public void registerEventListener(ConfigurationEventListener listener, boolean synchronous, boolean includeChildPaths, String... paths)
     {
         FilteringListener filter = new FilteringListener(new PathPredicate(includeChildPaths, paths), new Listener(listener));
+        if (synchronous)
+        {
+            syncMux.addDelegate(filter);
+        }
+        else
+        {
+            asyncMux.addDelegate(filter);
+        }
+    }
+
+    public void registerEventListener(ConfigurationEventListener listener, boolean synchronous, Class clazz)
+    {
+        FilteringListener filter = new FilteringListener(new ClassPredicate(clazz), new Listener(listener));
         if (synchronous)
         {
             syncMux.addDelegate(filter);

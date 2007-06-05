@@ -13,7 +13,7 @@ import com.zutubi.pulse.model.*;
 import com.zutubi.pulse.renderer.BuildResultRenderer;
 import com.zutubi.util.logging.Logger;
 import com.zutubi.pulse.prototype.config.admin.GeneralAdminConfiguration;
-import com.zutubi.pulse.prototype.config.ProjectConfiguration;
+import com.zutubi.pulse.prototype.config.project.ProjectConfiguration;
 import com.zutubi.prototype.config.ConfigurationProvider;
 
 import java.io.StringWriter;

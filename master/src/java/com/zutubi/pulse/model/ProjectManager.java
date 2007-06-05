@@ -4,7 +4,7 @@ import com.zutubi.pulse.core.PulseException;
 import com.zutubi.pulse.core.model.Revision;
 import com.zutubi.pulse.license.LicenseException;
 import com.zutubi.pulse.personal.PatchArchive;
-import com.zutubi.pulse.prototype.config.ProjectConfiguration;
+import com.zutubi.pulse.prototype.config.project.ProjectConfiguration;
 import org.acegisecurity.annotation.Secured;
 
 import java.util.Collection;

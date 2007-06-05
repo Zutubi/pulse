@@ -3,10 +3,18 @@ package com.zutubi.pulse.upgrade.tasks;
 import com.zutubi.pulse.upgrade.UpgradeContext;
 import com.zutubi.pulse.util.JDBCUtils;
 import com.zutubi.util.IOUtils;
-import com.zutubi.pulse.scheduling.tasks.BuildProjectTask;
 
-import java.sql.*;
-import java.io.*;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.Serializable;
+import java.sql.CallableStatement;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.Map;
 
 /**
@@ -14,6 +22,8 @@ import java.util.Map;
  */
 public class TriggerBuildSpecificationUpgradeTask extends DatabaseUpgradeTask
 {
+    public static final String PARAM_SPEC = "spec";
+
     public String getName()
     {
         return "Trigger build specification";
@@ -59,7 +69,7 @@ public class TriggerBuildSpecificationUpgradeTask extends DatabaseUpgradeTask
             ois = new ObjectInputStream(new ByteArrayInputStream(data));
             Map<Serializable, Serializable> dataMap = (Map<Serializable, Serializable>)ois.readObject();
 
-            Serializable serializable = dataMap.get(BuildProjectTask.PARAM_SPEC);
+            Serializable serializable = dataMap.get(PARAM_SPEC);
             if(serializable instanceof Long)
             {
                 // We have been run before!
@@ -68,7 +78,7 @@ public class TriggerBuildSpecificationUpgradeTask extends DatabaseUpgradeTask
 
             String specName = (String) serializable;
             Long specId = getSpecId(con, projectId, specName);
-            dataMap.put(BuildProjectTask.PARAM_SPEC, specId);
+            dataMap.put(PARAM_SPEC, specId);
 
             ByteArrayOutputStream byteStream = new ByteArrayOutputStream();
             oos = new ObjectOutputStream(byteStream);

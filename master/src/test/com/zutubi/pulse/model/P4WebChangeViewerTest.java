@@ -3,7 +3,7 @@ package com.zutubi.pulse.model;
 import com.zutubi.pulse.core.model.NumericalFileRevision;
 import com.zutubi.pulse.core.model.NumericalRevision;
 import com.zutubi.pulse.test.PulseTestCase;
-import com.zutubi.pulse.prototype.config.changeviewer.P4WebChangeViewer;
+import com.zutubi.pulse.prototype.config.project.changeviewer.P4WebChangeViewer;
 
 /**
  */

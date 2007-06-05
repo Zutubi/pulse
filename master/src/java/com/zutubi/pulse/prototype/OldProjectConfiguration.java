@@ -2,7 +2,7 @@ package com.zutubi.pulse.prototype;
 
 import com.zutubi.pulse.core.config.ResourceProperty;
 import com.zutubi.pulse.model.*;
-import com.zutubi.pulse.prototype.config.changeviewer.ChangeViewerConfiguration;
+import com.zutubi.pulse.prototype.config.project.changeviewer.ChangeViewerConfiguration;
 
 import java.util.LinkedList;
 import java.util.List;

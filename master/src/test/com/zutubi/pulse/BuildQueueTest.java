@@ -3,7 +3,7 @@ package com.zutubi.pulse;
 import com.zutubi.pulse.core.BuildRevision;
 import com.zutubi.pulse.events.build.BuildRequestEvent;
 import com.zutubi.pulse.model.BuildReason;
-import com.zutubi.pulse.prototype.config.ProjectConfiguration;
+import com.zutubi.pulse.prototype.config.project.ProjectConfiguration;
 import com.zutubi.pulse.test.PulseTestCase;
 
 /**

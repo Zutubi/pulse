@@ -4,7 +4,7 @@ import com.zutubi.pulse.core.model.Feature;
 import com.zutubi.pulse.core.config.ResourceProperty;
 import com.zutubi.pulse.core.model.ResultState;
 import com.zutubi.pulse.test.PulseTestCase;
-import com.zutubi.pulse.prototype.config.ProjectConfiguration;
+import com.zutubi.pulse.prototype.config.project.ProjectConfiguration;
 
 import java.util.Arrays;
 import java.util.LinkedList;

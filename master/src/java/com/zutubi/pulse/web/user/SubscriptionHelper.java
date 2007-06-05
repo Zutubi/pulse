@@ -11,7 +11,7 @@ import com.zutubi.pulse.condition.antlr.NotifyConditionLexer;
 import com.zutubi.pulse.condition.antlr.NotifyConditionParser;
 import com.zutubi.pulse.condition.antlr.NotifyConditionTreeParser;
 import com.zutubi.pulse.model.*;
-import com.zutubi.pulse.prototype.config.ProjectConfiguration;
+import com.zutubi.pulse.prototype.config.project.ProjectConfiguration;
 import com.zutubi.pulse.renderer.BuildResultRenderer;
 import com.zutubi.pulse.renderer.TemplateInfo;
 

@@ -1,12 +1,11 @@
 package com.zutubi.pulse.scheduling.tasks;
 
-import com.zutubi.pulse.model.Project;
 import com.zutubi.pulse.model.ProjectManager;
 import com.zutubi.pulse.model.TriggerBuildReason;
 import com.zutubi.pulse.scheduling.Task;
 import com.zutubi.pulse.scheduling.TaskExecutionContext;
 import com.zutubi.pulse.scheduling.Trigger;
-import com.zutubi.pulse.prototype.config.ProjectConfiguration;
+import com.zutubi.pulse.prototype.config.project.ProjectConfiguration;
 import com.zutubi.util.logging.Logger;
 
 import java.io.Serializable;
@@ -17,7 +16,6 @@ import java.util.Map;
  */
 public class BuildProjectTask implements Task
 {
-    public static final String PARAM_SPEC = "spec";
     public static final String PARAM_FORCE = "force";
 
     private static final Logger LOG = Logger.getLogger(BuildProjectTask.class);

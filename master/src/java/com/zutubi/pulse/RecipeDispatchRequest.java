@@ -5,7 +5,7 @@ import com.zutubi.pulse.core.RecipeRequest;
 import com.zutubi.pulse.model.BuildHostRequirements;
 import com.zutubi.pulse.model.BuildResult;
 import com.zutubi.pulse.util.TimeStamps;
-import com.zutubi.pulse.prototype.config.ProjectConfiguration;
+import com.zutubi.pulse.prototype.config.project.ProjectConfiguration;
 
 /**
  * A request to dispatch a recipe to some build hostRequirements, which may be restricted.

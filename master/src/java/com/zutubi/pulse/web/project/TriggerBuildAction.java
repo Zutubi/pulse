@@ -2,7 +2,7 @@ package com.zutubi.pulse.web.project;
 
 import com.zutubi.pulse.model.ManualTriggerBuildReason;
 import com.zutubi.pulse.model.Project;
-import com.zutubi.pulse.prototype.config.ProjectConfiguration;
+import com.zutubi.pulse.prototype.config.project.ProjectConfiguration;
 
 public class TriggerBuildAction extends ProjectActionSupport
 {

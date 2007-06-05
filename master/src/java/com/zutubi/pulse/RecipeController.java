@@ -17,7 +17,7 @@ import com.zutubi.pulse.events.build.RecipeEvent;
 import com.zutubi.pulse.model.BuildManager;
 import com.zutubi.pulse.model.BuildResult;
 import com.zutubi.pulse.model.RecipeResultNode;
-import com.zutubi.pulse.prototype.config.ProjectConfiguration;
+import com.zutubi.pulse.prototype.config.project.ProjectConfiguration;
 import com.zutubi.pulse.services.ServiceTokenManager;
 import com.zutubi.util.logging.Logger;
 

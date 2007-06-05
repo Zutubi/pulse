@@ -2,8 +2,8 @@ package com.zutubi.pulse.web.project;
 
 import com.zutubi.pulse.model.BuildResult;
 import com.zutubi.pulse.model.Project;
-import com.zutubi.pulse.prototype.config.BuildOptionsConfiguration;
-import com.zutubi.pulse.prototype.config.ProjectConfiguration;
+import com.zutubi.pulse.prototype.config.project.BuildOptionsConfiguration;
+import com.zutubi.pulse.prototype.config.project.ProjectConfiguration;
 
 import java.io.File;
 

@@ -5,11 +5,11 @@ import com.zutubi.pulse.core.model.Changelist;
 import com.zutubi.pulse.core.model.FileRevision;
 import com.zutubi.pulse.model.BuildManager;
 import com.zutubi.pulse.model.BuildResult;
-import com.zutubi.pulse.prototype.config.changeviewer.ChangeViewerConfiguration;
+import com.zutubi.pulse.prototype.config.project.changeviewer.ChangeViewerConfiguration;
 import com.zutubi.pulse.model.ChangelistUtils;
 import com.zutubi.pulse.model.Project;
 import com.zutubi.pulse.model.persistence.ChangelistDao;
-import com.zutubi.pulse.prototype.config.ProjectConfiguration;
+import com.zutubi.pulse.prototype.config.project.ProjectConfiguration;
 import com.zutubi.pulse.servercore.config.ScmConfiguration;
 import com.zutubi.pulse.web.ActionSupport;
 

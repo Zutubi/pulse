@@ -48,11 +48,17 @@ public class DefaultUserManager implements UserManager
         licenseManager.addAuthorisation(addUserAuthorisation);
     }
 
+    /**
+     * @deprecated
+     */
     public void save(User user)
     {
         userDao.save(user);
     }
 
+    /**
+     * @deprecated
+     */
     public void save(ContactPoint contact)
     {
         contactPointDao.save(contact);
@@ -97,19 +103,20 @@ public class DefaultUserManager implements UserManager
         licenseManager.refreshAuthorisations();
     }
 
+    /**
+     * @deprecated
+     */
     public User getUser(String login)
     {
         return userDao.findByLogin(login);
     }
 
+    /**
+     * @deprecated
+     */
     public User getUser(long id)
     {
         return userDao.findById(id);
-    }
-
-    public List<User> getUsersWithLoginLike(String login)
-    {
-        return userDao.findByLikeLogin(login);
     }
 
     public List<User> getAllUsers()
@@ -117,6 +124,9 @@ public class DefaultUserManager implements UserManager
         return userDao.findAll();
     }
 
+    /**
+     * @deprecated
+     */
     public ContactPoint getContactPoint(long id)
     {
         return contactPointDao.findById(id);
@@ -137,6 +147,9 @@ public class DefaultUserManager implements UserManager
         licenseManager.refreshAuthorisations();
     }
 
+    /**
+     * @deprecated
+     */
     public void delete(ContactPoint contact)
     {
         contactPointDao.delete(contact);

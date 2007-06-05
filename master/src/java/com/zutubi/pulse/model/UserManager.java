@@ -39,17 +39,6 @@ public interface UserManager extends EntityManager<User>, UserDetailsService
     User getUser(long id);
 
     /**
-     * Retrieve a list of users who have a login name similar to the specified name. A similar login
-     * name is one that contains the specified string as a substring within the login name. For example:
-     * the name 'dan' would be considered similar to 'daniel' and 'brendan'
-     *
-     * @param name
-     *
-     * @return a list of user instances, or an empty list if no users match the requirements.
-     */
-    List<User> getUsersWithLoginLike(String name);
-
-    /**
      * Retrieve a list of all of the users within the system.
      *
      * @return a list of all user instances.

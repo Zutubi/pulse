@@ -16,7 +16,7 @@ import com.zutubi.util.logging.Logger;
 import com.zutubi.pulse.web.project.CommitMessageSupport;
 import com.zutubi.pulse.xwork.TextProviderSupport;
 import com.zutubi.pulse.xwork.interceptor.Cancelable;
-import com.zutubi.pulse.prototype.config.ProjectConfiguration;
+import com.zutubi.pulse.prototype.config.project.ProjectConfiguration;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;

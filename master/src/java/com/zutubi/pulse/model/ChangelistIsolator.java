@@ -1,7 +1,7 @@
 package com.zutubi.pulse.model;
 
 import com.zutubi.pulse.core.model.Revision;
-import com.zutubi.pulse.prototype.config.ProjectConfiguration;
+import com.zutubi.pulse.prototype.config.project.ProjectConfiguration;
 import com.zutubi.pulse.scm.ScmException;
 
 import java.util.Arrays;

@@ -5,7 +5,7 @@ import com.zutubi.pulse.core.model.FileRevision;
 import com.zutubi.pulse.core.model.NumericalFileRevision;
 import com.zutubi.pulse.core.model.Revision;
 import com.zutubi.pulse.test.PulseTestCase;
-import com.zutubi.pulse.prototype.config.changeviewer.CustomChangeViewerConfiguration;
+import com.zutubi.pulse.prototype.config.project.changeviewer.CustomChangeViewerConfiguration;
 
 import java.util.Date;
 

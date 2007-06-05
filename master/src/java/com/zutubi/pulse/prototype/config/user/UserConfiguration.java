@@ -1,18 +1,17 @@
 package com.zutubi.pulse.prototype.config.user;
 
-import com.zutubi.prototype.type.Extendable;
-import com.zutubi.pulse.core.config.AbstractNamedConfiguration;
-import com.zutubi.pulse.core.config.AbstractConfiguration;
-import com.zutubi.pulse.prototype.config.user.contacts.ContactConfiguration;
-import com.zutubi.config.annotations.Transient;
-import com.zutubi.config.annotations.SymbolicName;
 import com.zutubi.config.annotations.Form;
 import com.zutubi.config.annotations.ID;
+import com.zutubi.config.annotations.SymbolicName;
+import com.zutubi.config.annotations.Transient;
+import com.zutubi.prototype.type.Extendable;
+import com.zutubi.pulse.core.config.AbstractConfiguration;
+import com.zutubi.pulse.prototype.config.user.contacts.ContactConfiguration;
 
-import java.util.Map;
 import java.util.HashMap;
-import java.util.List;
 import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
 
 /**
  *
@@ -37,6 +36,8 @@ public class UserConfiguration extends AbstractConfiguration implements Extendab
     private Map<String, ContactConfiguration> contacts = new HashMap<String, ContactConfiguration>();
 
     private List<SubscriptionConfiguration> subscriptions = new LinkedList<SubscriptionConfiguration>();
+
+    private DashboardConfiguration dashboard = new DashboardConfiguration();
 
     public String getName()
     {
@@ -105,5 +106,15 @@ public class UserConfiguration extends AbstractConfiguration implements Extendab
             extensions = new HashMap<String, Object>();
         }
         return extensions;
+    }
+
+    public DashboardConfiguration getDashboard()
+    {
+        return dashboard;
+    }
+
+    public void setDashboard(DashboardConfiguration dashboard)
+    {
+        this.dashboard = dashboard;
     }
 }

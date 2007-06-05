@@ -1,11 +1,18 @@
 package com.zutubi.prototype.config;
 
 import com.zutubi.config.annotations.Reference;
-import com.zutubi.prototype.config.events.*;
+import com.zutubi.prototype.config.events.PostDeleteEvent;
+import com.zutubi.prototype.config.events.PostInsertEvent;
+import com.zutubi.prototype.config.events.PostSaveEvent;
+import com.zutubi.prototype.config.events.PreDeleteEvent;
+import com.zutubi.prototype.config.events.PreInsertEvent;
+import com.zutubi.prototype.config.events.PreSaveEvent;
 import com.zutubi.prototype.type.*;
-import com.zutubi.prototype.type.record.*;
-import com.zutubi.prototype.i18n.Messages;
-import com.zutubi.prototype.i18n.TypeContext;
+import com.zutubi.prototype.type.record.MutableRecord;
+import com.zutubi.prototype.type.record.PathUtils;
+import com.zutubi.prototype.type.record.Record;
+import com.zutubi.prototype.type.record.RecordManager;
+import com.zutubi.prototype.type.record.TemplateRecord;
 import com.zutubi.pulse.core.config.Configuration;
 import com.zutubi.pulse.events.EventManager;
 import com.zutubi.util.ClassLoaderUtils;
@@ -19,7 +26,13 @@ import com.zutubi.validation.ValidationException;
 import com.zutubi.validation.ValidationManager;
 import com.zutubi.validation.i18n.MessagesTextProvider;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
 
 /**
  *
@@ -174,6 +187,22 @@ public class ConfigurationPersistenceManager
         }
 
         return records;
+    }
+
+    public <T> T getAncestorOfType(Configuration c, Class<T> clazz)
+    {
+        String path = c.getConfigurationPath();
+        CompositeType type = typeRegistry.getType(clazz);
+        if (type != null)
+        {
+            String ancestorPath = getClosestOwningScope(type, path);
+            if(ancestorPath != null)
+            {
+                return (T) getInstance(ancestorPath);
+            }
+        }
+
+        return null;
     }
 
     String getClosestOwningScope(CompositeType type, String path)

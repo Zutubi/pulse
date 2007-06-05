@@ -1,7 +1,5 @@
 package com.zutubi.pulse.scheduling;
 
-import org.hibernate.proxy.HibernateProxy;
-
 import java.text.ParseException;
 
 /**

@@ -2,7 +2,7 @@ package com.zutubi.pulse.scm;
 
 import com.zutubi.pulse.core.model.Revision;
 import com.zutubi.pulse.events.Event;
-import com.zutubi.pulse.prototype.config.ProjectConfiguration;
+import com.zutubi.pulse.prototype.config.project.ProjectConfiguration;
 
 /**
  * This event indicates that a change has been detected in an SCM.

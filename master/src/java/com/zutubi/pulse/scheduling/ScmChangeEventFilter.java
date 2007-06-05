@@ -2,7 +2,7 @@ package com.zutubi.pulse.scheduling;
 
 import com.zutubi.pulse.events.Event;
 import com.zutubi.pulse.model.ProjectManager;
-import com.zutubi.pulse.prototype.config.ProjectConfiguration;
+import com.zutubi.pulse.prototype.config.project.ProjectConfiguration;
 import com.zutubi.pulse.scm.ScmChangeEvent;
 
 /**

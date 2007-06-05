@@ -39,7 +39,7 @@ public class HibernateUserDao extends HibernateEntityDao<User> implements UserDa
 
                 SessionFactoryUtils.applyTransactionTimeout(queryObject, getSessionFactory());
                 queryObject.setCacheable(true);
-                
+
                 return queryObject.list();
             }
         });

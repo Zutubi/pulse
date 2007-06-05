@@ -1,11 +1,10 @@
 package com.zutubi.pulse.events.build;
 
 import com.zutubi.pulse.core.BuildRevision;
-import com.zutubi.pulse.core.model.Entity;
 import com.zutubi.pulse.events.Event;
 import com.zutubi.pulse.model.*;
 import com.zutubi.pulse.util.TimeStamps;
-import com.zutubi.pulse.prototype.config.ProjectConfiguration;
+import com.zutubi.pulse.prototype.config.project.ProjectConfiguration;
 
 /**
  */

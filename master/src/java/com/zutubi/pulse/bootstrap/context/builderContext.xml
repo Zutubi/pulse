@@ -215,4 +215,6 @@
 
     <bean id="cleanupManager" class="com.zutubi.pulse.cleanup.CleanupManager" autowire="byName" init-method="init"/>
 
+    <bean id="triggerManager" class="com.zutubi.pulse.prototype.config.project.triggers.TriggerManager" autowire="byName" init-method="init"/>
+
 </beans>

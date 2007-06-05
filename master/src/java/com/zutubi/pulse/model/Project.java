@@ -39,7 +39,7 @@ public class Project extends Entity implements AclObjectIdentity, AclObjectIdent
     private Long lastPollTime;
     private boolean forceClean = false;
 
-    // Not sure where the ACLs belong, in the database or in the configuration
+    //FIXME: move these into the configuration.  They are not state.
     private List<ProjectAclEntry> aclEntries;
 
     public Project()
@@ -92,11 +92,17 @@ public class Project extends Entity implements AclObjectIdentity, AclObjectIdent
         return state == State.PAUSED || state == State.PAUSING;
     }
 
+    /**
+     * Update the state of the project to indicate that the build has commenced.
+     */
     public synchronized void buildCommenced()
     {
         state = State.BUILDING;
     }
 
+    /**
+     * Update the state of the project to indicate that the build has been completed.
+     */
     public synchronized void buildCompleted()
     {
         if (state == State.PAUSING)
@@ -109,6 +115,9 @@ public class Project extends Entity implements AclObjectIdentity, AclObjectIdent
         }
     }
 
+    /**
+     * Update the state of the project to indicate that this project is paused.
+     */
     public synchronized void pause()
     {
         switch (state)
@@ -122,6 +131,10 @@ public class Project extends Entity implements AclObjectIdentity, AclObjectIdent
         }
     }
 
+    /**
+     * If this project is paused, then update the state of this project to indicate that
+     * building can be resumed.  
+     */
     public synchronized void resume()
     {
         switch (state)

@@ -1,6 +1,6 @@
 package com.zutubi.pulse.web.project;
 
-import com.zutubi.pulse.prototype.config.ProjectConfiguration;
+import com.zutubi.pulse.prototype.config.project.ProjectConfiguration;
 import com.zutubi.pulse.scm.ScmException;
 
 import java.io.InputStream;

@@ -6,7 +6,7 @@ import com.zutubi.pulse.core.VariableHelper;
 import com.zutubi.pulse.core.config.ResourceProperty;
 import com.zutubi.pulse.core.model.Property;
 import com.zutubi.pulse.core.model.ResultState;
-import com.zutubi.pulse.prototype.config.ProjectConfiguration;
+import com.zutubi.pulse.prototype.config.project.ProjectConfiguration;
 import com.zutubi.pulse.servercore.scm.ScmClient;
 
 import java.util.List;

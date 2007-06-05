@@ -1,7 +1,7 @@
 package com.zutubi.pulse.model;
 
 import com.zutubi.pulse.MasterBuildPaths;
-import com.zutubi.pulse.prototype.config.ProjectConfiguration;
+import com.zutubi.pulse.prototype.config.project.ProjectConfiguration;
 import com.zutubi.pulse.bootstrap.MasterConfigurationManager;
 import com.zutubi.pulse.core.FileLoadException;
 import com.zutubi.pulse.core.Scope;

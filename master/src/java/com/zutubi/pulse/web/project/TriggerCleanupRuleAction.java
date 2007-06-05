@@ -3,7 +3,7 @@ package com.zutubi.pulse.web.project;
 import com.zutubi.pulse.cleanup.CleanupManager;
 import com.zutubi.pulse.cleanup.config.CleanupConfiguration;
 import com.zutubi.pulse.model.Project;
-import com.zutubi.pulse.prototype.config.ProjectConfiguration;
+import com.zutubi.pulse.prototype.config.project.ProjectConfiguration;
 
 import java.util.Map;
 import java.util.concurrent.ExecutorService;

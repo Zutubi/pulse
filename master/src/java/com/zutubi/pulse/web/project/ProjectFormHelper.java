@@ -1,8 +1,7 @@
 package com.zutubi.pulse.web.project;
 
-import com.zutubi.pulse.model.Project;
 import com.zutubi.pulse.model.ProjectManager;
-import com.zutubi.pulse.prototype.config.ProjectConfiguration;
+import com.zutubi.pulse.prototype.config.project.ProjectConfiguration;
 
 import java.util.List;
 import java.util.LinkedList;

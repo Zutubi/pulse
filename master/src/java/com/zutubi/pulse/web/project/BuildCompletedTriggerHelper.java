@@ -1,15 +1,12 @@
 package com.zutubi.pulse.web.project;
 
 import com.zutubi.pulse.core.model.ResultState;
-import com.zutubi.pulse.model.NamedEntityComparator;
-import com.zutubi.pulse.model.Project;
 import com.zutubi.pulse.model.ProjectManager;
 import com.zutubi.pulse.scheduling.BuildCompletedEventFilter;
 import com.zutubi.pulse.scheduling.Trigger;
-import com.zutubi.pulse.prototype.config.ProjectConfiguration;
+import com.zutubi.pulse.prototype.config.project.ProjectConfiguration;
 
 import java.io.Serializable;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;

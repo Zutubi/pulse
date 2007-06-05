@@ -2,7 +2,7 @@ package com.zutubi.pulse.web.admin.user;
 
 import com.zutubi.pulse.model.GrantedAuthority;
 import com.zutubi.pulse.model.Group;
-import com.zutubi.pulse.prototype.config.ProjectConfiguration;
+import com.zutubi.pulse.prototype.config.project.ProjectConfiguration;
 
 import java.util.ArrayList;
 import java.util.Collection;

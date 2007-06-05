@@ -1,7 +1,7 @@
 package com.zutubi.pulse.web.admin;
 
 import com.zutubi.pulse.committransformers.CommitMessageTransformerManager;
-import com.zutubi.pulse.prototype.config.ProjectConfiguration;
+import com.zutubi.pulse.prototype.config.project.ProjectConfiguration;
 import com.zutubi.pulse.web.ActionSupport;
 
 import java.util.Collection;
