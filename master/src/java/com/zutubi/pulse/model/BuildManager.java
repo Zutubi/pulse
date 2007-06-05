@@ -141,7 +141,7 @@ public interface BuildManager
     // debugging hack: need to work out a better way
     void executeInTransaction(Runnable r);
 
-    void cleanupResult(BuildResult build);
+    void cleanupResult(BuildResult build, boolean rmdir);
 
     void cleanupWork(BuildResult build);
 }

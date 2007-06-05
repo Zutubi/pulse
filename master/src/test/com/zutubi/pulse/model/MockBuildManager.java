@@ -313,7 +313,7 @@ public class MockBuildManager implements BuildManager
         throw new RuntimeException("Method not implemented.");
     }
 
-    public void cleanupResult(BuildResult build)
+    public void cleanupResult(BuildResult build, boolean rmdir)
     {
         throw new RuntimeException("Method not implemented.");
     }

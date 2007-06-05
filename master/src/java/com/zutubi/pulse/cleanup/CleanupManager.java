@@ -12,11 +12,7 @@ import com.zutubi.pulse.events.Event;
 import com.zutubi.pulse.events.EventListener;
 import com.zutubi.pulse.events.EventManager;
 import com.zutubi.pulse.events.build.BuildCompletedEvent;
-import com.zutubi.pulse.model.BuildManager;
-import com.zutubi.pulse.model.BuildResult;
-import com.zutubi.pulse.model.Project;
-import com.zutubi.pulse.model.ProjectManager;
-import com.zutubi.pulse.model.User;
+import com.zutubi.pulse.model.*;
 import com.zutubi.pulse.model.persistence.BuildResultDao;
 import com.zutubi.pulse.prototype.config.project.ProjectConfiguration;
 import com.zutubi.pulse.scheduling.Scheduler;
@@ -197,7 +193,7 @@ public class CleanupManager
             List<BuildResult> results = buildResultDao.getOldestCompletedBuilds(user, count - max);
             for(BuildResult result: results)
             {
-                buildManager.cleanupResult(result);
+                buildManager.cleanupResult(result, true);
             }
         }
     }
@@ -214,7 +210,7 @@ public class CleanupManager
             }
             else
             {
-                buildManager.cleanupResult(build);
+                buildManager.cleanupResult(build, true);
             }
         }
     }

@@ -3,14 +3,7 @@ package com.zutubi.pulse.model;
 import com.zutubi.pulse.MasterBuildPaths;
 import com.zutubi.pulse.bootstrap.DatabaseConsole;
 import com.zutubi.pulse.bootstrap.MasterConfigurationManager;
-import com.zutubi.pulse.core.model.Changelist;
-import com.zutubi.pulse.core.model.CommandResult;
-import com.zutubi.pulse.core.model.PersistentName;
-import com.zutubi.pulse.core.model.RecipeResult;
-import com.zutubi.pulse.core.model.ResultState;
-import com.zutubi.pulse.core.model.Revision;
-import com.zutubi.pulse.core.model.StoredArtifact;
-import com.zutubi.pulse.core.model.StoredFileArtifact;
+import com.zutubi.pulse.core.model.*;
 import com.zutubi.pulse.model.persistence.ArtifactDao;
 import com.zutubi.pulse.model.persistence.BuildResultDao;
 import com.zutubi.pulse.model.persistence.ChangelistDao;
@@ -20,6 +13,8 @@ import com.zutubi.util.logging.Logger;
 
 import java.io.File;
 import java.util.List;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.LinkedBlockingQueue;
 
 /**
  *
@@ -38,8 +33,35 @@ public class DefaultBuildManager implements BuildManager
 
     private DatabaseConsole databaseConsole;
 
+    private BlockingQueue<CleanupRequest> cleanupQueue = new LinkedBlockingQueue<CleanupRequest>();
+
     public void init()
     {
+        Thread cleanupThread = new Thread(new Runnable()
+        {
+            @SuppressWarnings({"InfiniteLoopStatement"})
+            public void run()
+            {
+                while(true)
+                {
+                    try
+                    {
+                        CleanupRequest request = cleanupQueue.take();
+                        if(request.dir.exists() && !FileSystemUtils.rmdir(request.dir))
+                        {
+                            LOG.warning("Unable to remove directory '" + request.dir.getAbsolutePath() + "'");
+                        }
+                    }
+                    catch (InterruptedException e)
+                    {
+                        LOG.warning(e);
+                    }
+                }
+            }
+        }, "Build Cleanup Service");
+
+        cleanupThread.setDaemon(true);
+        cleanupThread.start();
     }
 
     public void setBuildResultDao(BuildResultDao dao)
@@ -240,17 +262,14 @@ public class DefaultBuildManager implements BuildManager
 
         MasterBuildPaths paths = new MasterBuildPaths(configurationManager);
         File projectDir = paths.getProjectDir(project);
-        if (!FileSystemUtils.rmdir(projectDir))
-        {
-            LOG.warning("Unable to remove project directory '" + projectDir.getAbsolutePath() + "'");
-        }
+        scheduleCleanup(projectDir);
 
         do
         {
             results = buildResultDao.findOldestByProject(project, null, 100, true);
             for (BuildResult r : results)
             {
-                cleanupResult(r);
+                cleanupResult(r, false);
             }
         }
         while (results.size() > 0);
@@ -260,15 +279,12 @@ public class DefaultBuildManager implements BuildManager
     {
         MasterBuildPaths paths = new MasterBuildPaths(configurationManager);
         File userDir = paths.getUserDir(user.getId());
-        if (!FileSystemUtils.rmdir(userDir))
-        {
-            LOG.warning("Unable to remove user directory '" + userDir.getAbsolutePath() + "'");
-        }
+        scheduleCleanup(userDir);
 
         List<BuildResult> results = buildResultDao.findByUser(user);
         for (BuildResult r : results)
         {
-            cleanupResult(r);
+            cleanupResult(r, false);
         }
     }
 
@@ -279,7 +295,7 @@ public class DefaultBuildManager implements BuildManager
 
     public void delete(BuildResult result)
     {
-        cleanupResult(result);
+        cleanupResult(result, true);
     }
 
     public void abortUnfinishedBuilds(Project project, String message)
@@ -404,14 +420,13 @@ public class DefaultBuildManager implements BuildManager
         }
     }
 
-    public void cleanupResult(BuildResult build)
+    public void cleanupResult(BuildResult build, boolean rmdir)
     {
         MasterBuildPaths paths = new MasterBuildPaths(configurationManager);
         File buildDir = paths.getBuildDir(build);
-        if (buildDir.exists() && !FileSystemUtils.rmdir(buildDir))
+        if (rmdir && buildDir.exists())
         {
-            LOG.warning("Unable to clean up build directory '" + buildDir.getAbsolutePath() + "'");
-            return;
+            scheduleCleanup(buildDir);
         }
 
         if(build.isPersonal())
@@ -450,12 +465,25 @@ public class DefaultBuildManager implements BuildManager
         for (RecipeResultNode node : nodes)
         {
             File workDir = paths.getBaseDir(build, node.getResult().getId());
-            if (!FileSystemUtils.rmdir(workDir))
+            if (workDir.exists())
             {
-                LOG.warning("Unable to clean up build directory '" + workDir.getAbsolutePath() + "'");
+                scheduleCleanup(workDir);
             }
-
             cleanupWorkForNodes(paths, build, node.getChildren());
+        }
+    }
+
+    private void scheduleCleanup(File dir)
+    {
+        File dead = new File(dir + ".dead");
+        dir.renameTo(dead);
+        try
+        {
+            cleanupQueue.put(new CleanupRequest(dead));
+        }
+        catch (InterruptedException e)
+        {
+            LOG.warning(e);
         }
     }
 
@@ -482,5 +510,15 @@ public class DefaultBuildManager implements BuildManager
     public void setDatabaseConsole(DatabaseConsole databaseConsole)
     {
         this.databaseConsole = databaseConsole;
+    }
+
+    private class CleanupRequest
+    {
+        private File dir;
+
+        public CleanupRequest(File dir)
+        {
+            this.dir = dir;
+        }
     }
 }
