@@ -14,7 +14,9 @@ import java.util.Properties;
 public class CommandResult extends Result
 {
     private static final Logger LOG = Logger.getLogger(CommandResult.class);
-    
+
+    // NOTE: if you add a field here (or to the base class) you must also
+    // modify the update() method!
     private String commandName;
     private Properties properties;
     private List<StoredArtifact> artifacts = new LinkedList<StoredArtifact>();
@@ -130,5 +132,30 @@ public class CommandResult extends Result
                 LOG.severe("Unable to load features: " + e.getMessage(), e);
             }
         }
+    }
+
+    public void update(CommandResult other)
+    {
+        state = other.state;
+
+        // Keep our own start time
+        other.stamps.setStartTime(stamps.getStartTime());
+        stamps = other.stamps;
+
+        setOutputDir(other.getOutputDir());
+
+        features.clear();
+        features.addAll(other.features);
+
+        warningFeatureCount = other.warningFeatureCount;
+        errorFeatureCount = other.errorFeatureCount;
+
+        commandName = other.commandName;
+
+        properties.clear();
+        properties.putAll(other.getProperties());
+
+        artifacts.clear();
+        artifacts.addAll(other.artifacts);
     }
 }

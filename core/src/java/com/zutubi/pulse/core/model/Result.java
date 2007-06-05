@@ -15,13 +15,14 @@ import java.util.List;
 public abstract class Result extends Entity
 {
     private static final String EXCEPTION_FILE = "exception";
+    protected static final int UNDEFINED = -1;
 
+    // NOTE: if you add a field here, check the update() method in
+    // CommandResult!
     protected ResultState state = ResultState.INITIAL;
     protected TimeStamps stamps = new TimeStamps();
     private File outputDir;
     protected List<Feature> features = new LinkedList<Feature>();
-
-    protected static final int UNDEFINED = -1;
 
     /**
      * A count of the number of warning features associated with this result.
