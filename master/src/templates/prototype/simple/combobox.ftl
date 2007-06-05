@@ -24,7 +24,10 @@
 
     fieldConfig.store = store;
     fieldConfig.mode = 'local';
+    fieldConfig.hiddenName = fieldConfig.name;
+    fieldConfig.name = 'combo.' + fieldConfig.hiddenName;
     fieldConfig.displayField = 'text';
+    fieldConfig.valueField = 'value';
     fieldConfig.editable = false;
     fieldConfig.forceSelection = true;
 <#if parameters.value?exists>

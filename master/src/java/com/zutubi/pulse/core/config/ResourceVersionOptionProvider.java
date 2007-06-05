@@ -1,29 +1,29 @@
 package com.zutubi.pulse.core.config;
 
-import com.zutubi.prototype.ListOptionProvider;
+import com.zutubi.prototype.MapOptionProvider;
 import com.zutubi.prototype.type.TypeProperty;
 import com.zutubi.util.Sort;
 
-import java.util.Collections;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 
 /**
  * An option provider for selecting a default resource version from an
  * existing resource's versions.
  */
-public class ResourceVersionOptionProvider extends ListOptionProvider
+public class ResourceVersionOptionProvider extends MapOptionProvider
 {
-    public List<String> getOptions(Object instance, String path, TypeProperty property)
+    public Map<String, String> getMap(Object instance, String path, TypeProperty property)
     {
-        List<String> versions = new LinkedList<String>();
-//        versions.add("");
-        if(instance != null && instance instanceof Resource)
+        List<String> resourceVersions = new LinkedList<String>(((Resource) instance).getVersions().keySet());
+        Collections.sort(resourceVersions, new Sort.StringComparator());
+
+        Map<String, String> versions = new HashMap<String, String>(resourceVersions.size() + 1);
+        versions.put("", "[none]");
+        for(String version: resourceVersions)
         {
-            versions.addAll(((Resource)instance).getVersions().keySet());
+            versions.put(version, version);
         }
         
-        Collections.sort(versions, new Sort.StringComparator());
         return versions;
     }
 }
