@@ -180,6 +180,8 @@
         </property>
     </bean>
 
+    <bean id="cleanupManager" class="com.zutubi.pulse.model.CleanupManager" autowire="byName" init-method="init"/>
+
     <bean id="tokenManager" class="com.zutubi.pulse.api.DefaultTokenManager" autowire="byName" init-method="init"/>
 
     <bean id="serverMessagesHandler" class="com.zutubi.pulse.logging.ServerMessagesHandler" init-method="init"/>

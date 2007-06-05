@@ -1,7 +1,8 @@
 package com.zutubi.pulse.web.project;
 
-import com.zutubi.pulse.model.Project;
+import com.zutubi.pulse.model.CleanupManager;
 import com.zutubi.pulse.model.CleanupRule;
+import com.zutubi.pulse.model.Project;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -16,6 +17,7 @@ import java.util.concurrent.Executors;
 public class TriggerCleanupRuleAction extends ProjectActionSupport
 {
     private long id;
+    private CleanupManager cleanupManager;
 
     public long getId()
     {
@@ -29,7 +31,7 @@ public class TriggerCleanupRuleAction extends ProjectActionSupport
 
     public String execute() throws Exception
     {
-        Project project = getProjectManager().getProject(projectId);
+        final Project project = getProjectManager().getProject(projectId);
         if(project == null)
         {
             addActionError("Unknown project [" + projectId + "]");
@@ -44,10 +46,15 @@ public class TriggerCleanupRuleAction extends ProjectActionSupport
         {
             public void run()
             {
-                buildManager.cleanupBuilds(rule);
+                cleanupManager.cleanupBuilds(project, rule);
             }
         });
 
         return SUCCESS;
+    }
+
+    public void setCleanupManager(CleanupManager cleanupManager)
+    {
+        this.cleanupManager = cleanupManager;
     }
 }

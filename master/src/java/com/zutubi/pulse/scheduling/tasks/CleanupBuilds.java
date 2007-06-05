@@ -1,6 +1,6 @@
 package com.zutubi.pulse.scheduling.tasks;
 
-import com.zutubi.pulse.model.BuildManager;
+import com.zutubi.pulse.model.CleanupManager;
 import com.zutubi.pulse.scheduling.Task;
 import com.zutubi.pulse.scheduling.TaskExecutionContext;
 import com.zutubi.pulse.util.logging.Logger;
@@ -12,16 +12,16 @@ public class CleanupBuilds implements Task
 {
     private static final Logger LOG = Logger.getLogger(CleanupBuilds.class);
 
-    private BuildManager buildManager;
+    private CleanupManager cleanupManager;
 
     public void execute(TaskExecutionContext context)
     {
         LOG.info("cleaning up builds");
-        buildManager.cleanupBuilds();
+        cleanupManager.cleanupBuilds();
     }
 
-    public void setBuildManager(BuildManager buildManager)
+    public void setCleanupManager(CleanupManager cleanupManager)
     {
-        this.buildManager = buildManager;
+        this.cleanupManager = cleanupManager;
     }
 }

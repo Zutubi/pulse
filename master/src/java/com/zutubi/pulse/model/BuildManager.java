@@ -108,7 +108,8 @@ public interface BuildManager
      */
     BuildResult getPreviousBuildResult(BuildResult result);
 
-    void cleanupBuilds();
+    void cleanupResult(BuildResult result, boolean rmdir);
+    void cleanupWork(BuildResult result);
 
     Revision getPreviousRevision(Project project, PersistentName specification);
 
@@ -142,14 +143,6 @@ public interface BuildManager
     boolean isSpaceAvailableForBuild();
 
     boolean canCancel(BuildResult build, User user);
-
-    void cleanupBuilds(User user);
-
-    void cleanupBuilds(Project project);
-
-    void cleanupBuilds(CleanupRule rule);
-
-    boolean isCleanupInProgress(Project project);
 
     CommandResult getCommandResultByArtifact(long artifactId);
 

@@ -19,6 +19,7 @@ public class ConfigureProjectAction extends ProjectActionSupport
     private boolean cleanupInProgress = false;
 
     private List<CommitMessageTransformer> transformers;
+    private CleanupManager cleanupManager;
 
     public long getId()
     {
@@ -120,7 +121,7 @@ public class ConfigureProjectAction extends ProjectActionSupport
 
         transformers = commitMessageTransformerManager.getByProject(project);
 
-        cleanupInProgress = buildManager.isCleanupInProgress(project);
+        cleanupInProgress = cleanupManager.isCleanupInProgress(project);
 
         return SUCCESS;
     }
@@ -128,5 +129,10 @@ public class ConfigureProjectAction extends ProjectActionSupport
     public void setUserManager(UserManager userManager)
     {
         this.userManager = userManager;
+    }
+
+    public void setCleanupManager(CleanupManager cleanupManager)
+    {
+        this.cleanupManager = cleanupManager;
     }
 }

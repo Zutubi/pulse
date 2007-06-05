@@ -168,6 +168,16 @@ public class MockBuildManager implements BuildManager
         throw new RuntimeException("Method not implemented.");
     }
 
+    public void cleanupResult(BuildResult result, boolean rmdir)
+    {
+        throw new RuntimeException("Method not yet implemented.");
+    }
+
+    public void cleanupWork(BuildResult result)
+    {
+        throw new RuntimeException("Method not yet implemented.");
+    }
+
     public BuildResult getLatestBuildResult(Project project)
     {
         BuildResult result = null;
@@ -204,11 +214,6 @@ public class MockBuildManager implements BuildManager
     public long getNextBuildNumber(Project project)
     {
         return nextBuildNumber++;
-    }
-
-    public void cleanupBuilds()
-    {
-        throw new RuntimeException("Method not implemented.");
     }
 
     public Revision getPreviousRevision(Project project, PersistentName specification)
@@ -296,8 +301,6 @@ public class MockBuildManager implements BuildManager
 
     public void abortUnfinishedBuilds(User user, String message)
     {
-        BuildResult result = null;
-
         for (BuildResult r : buildResults.values())
         {
             if (user.equals(r.getOwner()) && r.inProgress())
@@ -313,28 +316,7 @@ public class MockBuildManager implements BuildManager
         return true;
     }
 
-    public void cleanupBuilds(User user)
-    {
-        throw new RuntimeException("Method not implemented.");
-    }
-
     public boolean canCancel(BuildResult build, User user)
-    {
-        throw new RuntimeException("Method not implemented.");
-    }
-
-
-    public void cleanupBuilds(Project project)
-    {
-        throw new RuntimeException("Method not implemented.");
-    }
-
-    public void cleanupBuilds(CleanupRule rule)
-    {
-        throw new RuntimeException("Method not implemented.");
-    }
-
-    public boolean isCleanupInProgress(Project project)
     {
         throw new RuntimeException("Method not implemented.");
     }

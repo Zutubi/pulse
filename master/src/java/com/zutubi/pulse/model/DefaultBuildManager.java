@@ -4,27 +4,15 @@ import com.zutubi.pulse.MasterBuildPaths;
 import com.zutubi.pulse.bootstrap.DatabaseConsole;
 import com.zutubi.pulse.bootstrap.MasterConfigurationManager;
 import com.zutubi.pulse.core.model.*;
-import com.zutubi.pulse.events.Event;
-import com.zutubi.pulse.events.EventListener;
-import com.zutubi.pulse.events.EventManager;
-import com.zutubi.pulse.events.build.BuildCompletedEvent;
 import com.zutubi.pulse.model.persistence.ArtifactDao;
 import com.zutubi.pulse.model.persistence.BuildResultDao;
 import com.zutubi.pulse.model.persistence.ChangelistDao;
 import com.zutubi.pulse.model.persistence.FileArtifactDao;
-import com.zutubi.pulse.scheduling.Scheduler;
-import com.zutubi.pulse.scheduling.SchedulingException;
-import com.zutubi.pulse.scheduling.SimpleTrigger;
-import com.zutubi.pulse.scheduling.Trigger;
-import com.zutubi.pulse.scheduling.tasks.CleanupBuilds;
-import com.zutubi.pulse.util.Constants;
 import com.zutubi.pulse.util.FileSystemUtils;
 import com.zutubi.pulse.util.logging.Logger;
 
 import java.io.File;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 
@@ -32,7 +20,7 @@ import java.util.concurrent.LinkedBlockingQueue;
  *
  *
  */
-public class DefaultBuildManager implements BuildManager, EventListener
+public class DefaultBuildManager implements BuildManager
 {
     private static final Logger LOG = Logger.getLogger(DefaultBuildManager.class);
 
@@ -41,43 +29,14 @@ public class DefaultBuildManager implements BuildManager, EventListener
     private FileArtifactDao fileArtifactDao;
     private ChangelistDao changelistDao;
     private ProjectManager projectManager;
-    private Scheduler scheduler;
     private MasterConfigurationManager configurationManager;
-    private EventManager eventManager;
 
     private DatabaseConsole databaseConsole;
 
     private BlockingQueue<CleanupRequest> cleanupQueue = new LinkedBlockingQueue<CleanupRequest>();
 
-    private static final String CLEANUP_NAME = "cleanup";
-    private static final String CLEANUP_GROUP = "services";
-    private static final long CLEANUP_FREQUENCY = Constants.HOUR;
-
-    private static final Map<Project, Object> runningCleanups = new HashMap<Project, Object>();
-
     public void init()
     {
-        eventManager.register(this);
-
-        // register a schedule for cleaning up old build results.
-        // check if the trigger exists. if not, create and schedule.
-        Trigger trigger = scheduler.getTrigger(CLEANUP_NAME, CLEANUP_GROUP);
-        if (trigger == null)
-        {
-            // initialise the trigger.
-            trigger = new SimpleTrigger(CLEANUP_NAME, CLEANUP_GROUP, CLEANUP_FREQUENCY);
-            trigger.setTaskClass(CleanupBuilds.class);
-
-            try
-            {
-                scheduler.schedule(trigger);
-            }
-            catch (SchedulingException e)
-            {
-                LOG.severe(e);
-            }
-        }
-
         Thread cleanupThread = new Thread(new Runnable()
         {
             @SuppressWarnings({"InfiniteLoopStatement"})
@@ -99,7 +58,7 @@ public class DefaultBuildManager implements BuildManager, EventListener
                     }
                 }
             }
-        }, "Build Cleanup Service");
+        }, "Build Disk Cleanup Service");
 
         cleanupThread.setDaemon(true);
         cleanupThread.start();
@@ -249,25 +208,6 @@ public class DefaultBuildManager implements BuildManager, EventListener
         return buildResultDao.querySpecificationBuilds(project, spec, states, lowestNumber, highestNumber, first, max, mostRecentFirst, initialise);
     }
 
-    public void cleanupBuilds()
-    {
-        // Lookup project cleanup info, query for old builds, cleanup where necessary
-        List<Project> projects = projectManager.getAllProjects();
-        for (Project project : projects)
-        {
-            cleanupBuilds(project);
-        }
-
-        // Now check the database is not too close to full
-        if (databaseConsole.isEmbedded())
-        {
-            if(databaseConsole.getDatabaseUsagePercent() > 95.0)
-            {
-                LOG.warning("The internal database is close to reaching its size limit.  Consider adding more cleanup rules to remove old build information.");
-            }
-        }
-    }
-
     public Revision getPreviousRevision(Project project, PersistentName specification)
     {
         Revision previousRevision = null;
@@ -407,18 +347,6 @@ public class DefaultBuildManager implements BuildManager, EventListener
         return buildResultDao.findPreviousBuildResult(result);
     }
 
-    /**
-     * Returns true if a cleanup is being run for the specified project, false otherwise.
-     *
-     * @param project being queried.
-     *
-     * @return true iff a cleanup is in progress.
-     */
-    public boolean isCleanupInProgress(Project project)
-    {
-        return runningCleanups.containsKey(project);
-    }
-
     public CommandResult getCommandResultByArtifact(long artifactId)
     {
         return buildResultDao.findCommandResultByArtifact(artifactId);
@@ -487,76 +415,6 @@ public class DefaultBuildManager implements BuildManager, EventListener
         return buildResultDao.findLatestSuccessful();
     }
 
-    /**
-     * Execute the configured cleanup rules for the specified project.
-     *
-     * @param project   the project to be cleaned up.
-     */
-    public void cleanupBuilds(Project project)
-    {
-        try
-        {
-            runningCleanups.put(project, null);
-
-            List<CleanupRule> rules = project.getCleanupRules();
-
-            for (CleanupRule rule : rules)
-            {
-                cleanupBuilds(rule, project);
-            }
-        }
-        finally
-        {
-            runningCleanups.remove(project);
-        }
-    }
-
-    public void cleanupBuilds(CleanupRule rule)
-    {
-        // locate the project associated with the cleanup rule.
-        Project project = projectManager.getProjectByCleanupRule(rule);
-        try
-        {
-            runningCleanups.put(project, null);
-            cleanupBuilds(rule, project);
-        }
-        finally
-        {
-            runningCleanups.remove(project);
-        }
-    }
-
-    public void cleanupBuilds(User user)
-    {
-        int count = buildResultDao.getCompletedResultCount(user);
-        int max = user.getMyBuildsCount();
-        if(count > max)
-        {
-            List<BuildResult> results = buildResultDao.getOldestCompletedBuilds(user, count - max);
-            for(BuildResult result: results)
-            {
-                cleanupResult(result, true);
-            }
-        }
-    }
-
-    private synchronized void cleanupBuilds(CleanupRule rule, Project project)
-    {
-        List<BuildResult> oldBuilds = rule.getMatchingResults(project, buildResultDao);
-
-        for (BuildResult build : oldBuilds)
-        {
-            if (rule.getWorkDirOnly())
-            {
-                cleanupWork(build);
-            }
-            else
-            {
-                cleanupResult(build, true);
-            }
-        }
-    }
-
     public boolean canCancel(BuildResult build, User user)
     {
         if(build.isPersonal())
@@ -577,7 +435,7 @@ public class DefaultBuildManager implements BuildManager, EventListener
         }
     }
 
-    private void cleanupResult(BuildResult build, boolean rmdir)
+    public void cleanupResult(BuildResult build, boolean rmdir)
     {
         MasterBuildPaths paths = new MasterBuildPaths(configurationManager);
         File buildDir = paths.getBuildDir(build);
@@ -609,7 +467,7 @@ public class DefaultBuildManager implements BuildManager, EventListener
         buildResultDao.delete(build);
     }
 
-    private void cleanupWork(BuildResult build)
+    public void cleanupWork(BuildResult build)
     {
         build.setHasWorkDir(false);
         buildResultDao.save(build);
@@ -644,30 +502,6 @@ public class DefaultBuildManager implements BuildManager, EventListener
         }
     }
 
-    public void handleEvent(Event evt)
-    {
-        BuildCompletedEvent completedEvent = (BuildCompletedEvent) evt;
-        BuildResult result = completedEvent.getResult();
-        if(result.isPersonal())
-        {
-            cleanupBuilds(result.getUser());
-        }
-        else
-        {
-            cleanupBuilds(result.getProject());
-        }
-    }
-
-    public Class[] getHandledEvents()
-    {
-        return new Class[]{BuildCompletedEvent.class};
-    }
-
-    public void setScheduler(Scheduler scheduler)
-    {
-        this.scheduler = scheduler;
-    }
-
     public void setProjectManager(ProjectManager projectManager)
     {
         this.projectManager = projectManager;
@@ -686,11 +520,6 @@ public class DefaultBuildManager implements BuildManager, EventListener
     public void setConfigurationManager(MasterConfigurationManager configurationManager)
     {
         this.configurationManager = configurationManager;
-    }
-
-    public void setEventManager(EventManager eventManager)
-    {
-        this.eventManager = eventManager;
     }
 
     public void setDatabaseConsole(DatabaseConsole databaseConsole)
