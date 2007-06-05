@@ -150,7 +150,7 @@ public class RecipeControllerTest extends PulseTestCase
         assertTrue(commandResults.size() > 0);
         CommandResult result = commandResults.get(commandResults.size() - 1);
         assertTrue(result.completed());
-        assertSame(event.getResult(), result);
+        assertEquals("dummy", result.getOutputDir());
 
         assertSame(rootResult, buildManager.getRecipeResult(rootResult.getId()));
     }
