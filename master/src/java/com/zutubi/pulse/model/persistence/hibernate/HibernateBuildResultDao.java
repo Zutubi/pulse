@@ -417,7 +417,7 @@ public class HibernateBuildResultDao extends HibernateEntityDao<BuildResult> imp
         if(total > limit)
         {
             // Clean out the difference
-            return queryBuilds(new Project[] { project }, states, null, 0, 0, hasWorkDir, 0, total - limit, false);
+            return queryBuilds(new Project[] { project }, states, 0, 0, hasWorkDir, 0, total - limit, false);
         }
 
         return Collections.EMPTY_LIST;
