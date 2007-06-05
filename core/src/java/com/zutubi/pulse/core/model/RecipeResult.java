@@ -63,17 +63,17 @@ public class RecipeResult extends Result
 
     public void update(CommandResult result)
     {
-        // lets save this command result by replacing the existing persistent result
-        // with the new one... simple.
-        CommandResult currentResult = results.remove(results.size() - 1);
-        result.setId(currentResult.getId());
-        result.getStamps().setStartTime(currentResult.getStamps().getStartTime());
-        add(result);
-
         // Adjust the command's output directory to the local one
         File remoteDir = new File(FileSystemUtils.localiseSeparators(result.getOutputDir()));
         File localDir = new File(getOutputDir(), remoteDir.getName());
         result.setOutputDir(localDir.getPath());
+
+        // Update the result (always last in the list).
+        CommandResult currentResult = results.remove(results.size() - 1);
+        currentResult.update(result);
+
+        // The add call checks for the command state
+        add(currentResult);
     }
 
     public void update(RecipeResult result)
