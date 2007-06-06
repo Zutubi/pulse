@@ -541,7 +541,8 @@ Ext.extend(ZUTUBI.Select, Ext.form.Field, {
             if(this.multiple)
             {
                 var total = this.store.getTotalCount();
-                this.size = total > 10 ? 10 : total;
+                // Make the min size 3 (looks like a select) and max size 10
+                this.size = total > 10 ? 10 : (total < 3 ? 3: total);
             }
             else
             {

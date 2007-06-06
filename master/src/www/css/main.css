@@ -823,6 +823,18 @@ table.detail td li
     border-bottom: none;
     font-weight: normal;
 }
+
+.x-form-select, .x-form-select-multiple
+{
+    border: 1px solid #B5B8C8;
+}
+
+.x-form-focus
+{
+	border: 1px solid #7eadd9;
+}
+
+
 /*
 .x-item-disabled
 {

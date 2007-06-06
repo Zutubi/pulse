@@ -63,6 +63,8 @@
         <script type="text/javascript" src="/js/ext-all.js"></script>
         <script type="text/javascript" src="$base/js/main.js"></script>
         <script type="text/javascript">
+            Ext.BLANK_IMAGE_URL = '$base/images/default/s.gif';
+            
             var layout;
             var nestedLayout;
 

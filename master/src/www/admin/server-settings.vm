@@ -40,7 +40,7 @@
         var getAjaxCallback = function(maskedElement)
         {
             return {
-                success: function(response) { handleConfigurationResponse(Ext.decode(response.responseText)); },
+                success: function(response) { handleConfigurationResponse(Ext.decode(response.responseText)); if(maskedElement) { maskedElement.unmask() } },
                 failure: function(response) { if(maskedElement) { maskedElement.unmask() } }
             }
         }
