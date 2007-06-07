@@ -1,14 +1,13 @@
 package com.zutubi.pulse.prototype.config.setup;
 
 import com.zutubi.prototype.type.CompositeType;
+import com.zutubi.prototype.type.Type;
 import com.zutubi.prototype.type.TypeException;
 import com.zutubi.prototype.type.TypeProperty;
-import com.zutubi.prototype.type.Type;
 import com.zutubi.prototype.type.record.MutableRecord;
 import com.zutubi.prototype.type.record.PathUtils;
-import com.zutubi.prototype.wizard.WizardState;
-import com.zutubi.prototype.wizard.WizardTransition;
 import com.zutubi.prototype.wizard.TypeWizardState;
+import com.zutubi.prototype.wizard.WizardTransition;
 import com.zutubi.prototype.wizard.webwork.AbstractTypeWizard;
 import com.zutubi.pulse.bootstrap.MasterConfiguration;
 import com.zutubi.pulse.bootstrap.MasterConfigurationManager;
@@ -120,7 +119,7 @@ public class SetupConfigurationWizard extends AbstractTypeWizard
             String baseUrl = (String) serverConfigRecord.get("baseUrl");
             record.put("baseUrl", baseUrl);
             record.put("masterHost", getMasterHost(baseUrl));
-            configurationPersistenceManager.saveRecord(GlobalConfiguration.SCOPE_NAME, GENERAL_CONFIG_PROPERTY, record);
+            configurationTemplateManager.saveRecord(GlobalConfiguration.SCOPE_NAME, GENERAL_CONFIG_PROPERTY, record);
 
             // Now copy over the email properties
             extractAndSave(EmailConfiguration.class, serverConfigRecord);
@@ -210,7 +209,7 @@ public class SetupConfigurationWizard extends AbstractTypeWizard
         List<String> paths = configurationPersistenceManager.getConfigurationPaths(type);
         assert(paths.size() == 1);
         String path = paths.get(0);
-        configurationPersistenceManager.saveRecord(PathUtils.getParentPath(path), PathUtils.getBaseName(path), record);
+        configurationTemplateManager.saveRecord(PathUtils.getParentPath(path), PathUtils.getBaseName(path), record);
     }
 
     public void setUserManager(UserManager userManager)

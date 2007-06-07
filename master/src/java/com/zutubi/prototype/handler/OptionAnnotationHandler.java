@@ -2,7 +2,7 @@ package com.zutubi.prototype.handler;
 
 import com.zutubi.prototype.Descriptor;
 import com.zutubi.prototype.OptionProvider;
-import com.zutubi.prototype.config.ConfigurationPersistenceManager;
+import com.zutubi.prototype.config.ConfigurationTemplateManager;
 import com.zutubi.prototype.model.SelectFieldDescriptor;
 import com.zutubi.prototype.type.CompositeType;
 import com.zutubi.prototype.type.TypeProperty;
@@ -18,7 +18,7 @@ import java.util.Collection;
  */
 public abstract class OptionAnnotationHandler extends FieldAnnotationHandler
 {
-    private ConfigurationPersistenceManager configurationPersistenceManager;
+    private ConfigurationTemplateManager configurationTemplateManager;
     /**
      * Object factory provides access to object instantiation services.
      */
@@ -35,13 +35,13 @@ public abstract class OptionAnnotationHandler extends FieldAnnotationHandler
 
         SelectFieldDescriptor field = (SelectFieldDescriptor) descriptor;
         String fieldPath = field.getPath();
-        process(configurationPersistenceManager, optionProvider, fieldPath, field);
+        process(configurationTemplateManager, optionProvider, fieldPath, field);
     }
 
-    public static void process(ConfigurationPersistenceManager configurationPersistenceManager, OptionProvider optionProvider, String fieldPath, SelectFieldDescriptor field)
+    public static void process(ConfigurationTemplateManager configurationTemplateManager, OptionProvider optionProvider, String fieldPath, SelectFieldDescriptor field)
     {
         String instancePath = PathUtils.getParentPath(fieldPath);
-        Object instance = configurationPersistenceManager.getInstance(instancePath);
+        Object instance = configurationTemplateManager.getInstance(instancePath);
         TypeProperty fieldTypeProperty = field.getProperty();
 
         // FIXME: not sure what the correct behaviour here should be? see comment.
@@ -73,8 +73,8 @@ public abstract class OptionAnnotationHandler extends FieldAnnotationHandler
         this.objectFactory = objectFactory;
     }
 
-    public void setConfigurationPersistenceManager(ConfigurationPersistenceManager configurationPersistenceManager)
+    public void setConfigurationTemplateManager(ConfigurationTemplateManager configurationTemplateManager)
     {
-        this.configurationPersistenceManager = configurationPersistenceManager;
+        this.configurationTemplateManager = configurationTemplateManager;
     }
 }

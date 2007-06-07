@@ -66,13 +66,13 @@ public class CheckAction extends PrototypeSupport
 
         // validate the check form first.
         boolean valid = true;
-        if (configurationPersistenceManager.validate(null, null, checkRecord, new XWorkValidationAdapter(this)) == null)
+        if (configurationTemplateManager.validate(null, null, checkRecord, new XWorkValidationAdapter(this)) == null)
         {
             valid = false;
         }
 
         // validate the primary form.
-        if (configurationPersistenceManager.validate(PathUtils.getParentPath(path), PathUtils.getBaseName(path), record, new XWorkValidationAdapter(this, "_check")) == null)
+        if (configurationTemplateManager.validate(PathUtils.getParentPath(path), PathUtils.getBaseName(path), record, new XWorkValidationAdapter(this, "_check")) == null)
         {
             valid = false;
         }

@@ -1,14 +1,14 @@
 package com.zutubi.prototype.velocity;
 
 import com.zutubi.prototype.config.ConfigurationPersistenceManager;
+import com.zutubi.prototype.config.ConfigurationTemplateManager;
+import com.zutubi.prototype.table.FormattingWrapper;
 import com.zutubi.prototype.table.TableDescriptor;
 import com.zutubi.prototype.table.TableDescriptorFactory;
-import com.zutubi.prototype.table.FormattingWrapper;
 import com.zutubi.prototype.type.CollectionType;
 import com.zutubi.prototype.type.CompositeType;
 import com.zutubi.prototype.type.Type;
 import com.zutubi.pulse.bootstrap.ComponentContext;
-import com.zutubi.pulse.bootstrap.freemarker.FreemarkerConfigurationFactoryBean;
 import com.zutubi.util.logging.Logger;
 import freemarker.template.Configuration;
 import freemarker.template.Template;
@@ -32,6 +32,7 @@ import java.util.Map;
 public class TableDirective extends PrototypeDirective
 {
     private ConfigurationPersistenceManager configurationPersistenceManager;
+    private ConfigurationTemplateManager configurationTemplateManager;
 
     private static final Logger LOG = Logger.getLogger(TableDirective.class);
 
@@ -122,7 +123,7 @@ public class TableDirective extends PrototypeDirective
     private Collection getTableData(String path)
     {
         Collection data;
-        Object collection = configurationPersistenceManager.getInstance(path);
+        Object collection = configurationTemplateManager.getInstance(path);
         Type type = configurationPersistenceManager.getType(path).getTargetType();
         
         if (collection instanceof Map)
@@ -155,5 +156,10 @@ public class TableDirective extends PrototypeDirective
     public void setConfigurationPersistenceManager(ConfigurationPersistenceManager configurationPersistenceManager)
     {
         this.configurationPersistenceManager = configurationPersistenceManager;
+    }
+
+    public void setConfigurationTemplateManager(ConfigurationTemplateManager configurationTemplateManager)
+    {
+        this.configurationTemplateManager = configurationTemplateManager;
     }
 }

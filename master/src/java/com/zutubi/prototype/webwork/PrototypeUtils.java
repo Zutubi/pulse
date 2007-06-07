@@ -3,6 +3,7 @@ package com.zutubi.prototype.webwork;
 import com.zutubi.prototype.type.CompositeType;
 import com.zutubi.prototype.type.TypeProperty;
 import com.zutubi.prototype.type.record.MutableRecord;
+import com.zutubi.prototype.type.record.MutableRecordImpl;
 import com.zutubi.prototype.type.record.PathUtils;
 import com.zutubi.prototype.type.record.Record;
 import com.zutubi.util.StringUtils;
@@ -66,7 +67,8 @@ public class PrototypeUtils
      */
     public static Record toRecord(CompositeType type, Map<String, String[]> parameters)
     {
-        MutableRecord record = type.createNewRecord();
+        MutableRecord record = new MutableRecordImpl();
+        record.setSymbolicName(type.getSymbolicName());
 
         for (TypeProperty property : type.getProperties())
         {

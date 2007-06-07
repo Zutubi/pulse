@@ -12,7 +12,7 @@ public class MapTypeTest extends  TypeTestCase
     {
         super.setUp();
 
-        mapType = new MapType(configurationPersistenceManager);
+        mapType = new MapType(configurationTemplateManager);
         mapType.setTypeRegistry(typeRegistry);
 
         typeRegistry.register("mockA", MockA.class);
@@ -91,9 +91,8 @@ public class MapTypeTest extends  TypeTestCase
 
             MockA mockA = (MockA) o;
 
-            if (a != null ? !a.equals(mockA.a) : mockA.a != null) return false;
+            return !(a != null ? !a.equals(mockA.a) : mockA.a != null);
 
-            return true;
         }
 
         public int hashCode()
@@ -132,9 +131,8 @@ public class MapTypeTest extends  TypeTestCase
 
             MockB mockB = (MockB) o;
 
-            if (b != null ? !b.equals(mockB.b) : mockB.b != null) return false;
+            return !(b != null ? !b.equals(mockB.b) : mockB.b != null);
 
-            return true;
         }
 
         public int hashCode()

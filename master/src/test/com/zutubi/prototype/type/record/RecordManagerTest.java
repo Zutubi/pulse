@@ -1,12 +1,11 @@
 package com.zutubi.prototype.type.record;
 
+import com.zutubi.pulse.util.FileSystemUtils;
 import junit.framework.TestCase;
 
-import java.util.Map;
-import java.util.HashMap;
 import java.io.File;
-
-import com.zutubi.pulse.util.FileSystemUtils;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  *
@@ -14,7 +13,6 @@ import com.zutubi.pulse.util.FileSystemUtils;
  */
 public class RecordManagerTest extends TestCase
 {
-    private static final long HANDLE_BLOCK_SIZE = 32;
     private File tempDir;
     private RecordManager recordManager;
 
@@ -23,17 +21,17 @@ public class RecordManagerTest extends TestCase
         super.setUp();
 
         tempDir = FileSystemUtils.createTempDir(getName(), "");
-        newRecordManager(HANDLE_BLOCK_SIZE);
+        newRecordManager();
     }
 
     protected void tearDown() throws Exception
     {
         recordManager = null;
-        if(!FileSystemUtils.rmdir(tempDir))
+        if (!FileSystemUtils.rmdir(tempDir))
         {
             throw new RuntimeException("Unable to remove '" + tempDir + "' because your OS is not brown enough");
         }
-        
+
         super.tearDown();
     }
 
@@ -258,31 +256,67 @@ public class RecordManagerTest extends TestCase
 
     public void testHandlesAreUniqueAcrossRuns()
     {
-        long handle = recordManager.allocateHandle();
-        for(int i = 0; i < HANDLE_BLOCK_SIZE * 2 + 5; i++)
+        long handle = 0;
+        for (int i = 0; i < 10; i++)
         {
-            newRecordManager(HANDLE_BLOCK_SIZE);
-            for(int j = 0; j < i; j++)
+            newRecordManager();
+            for (int j = 0; j < i; j++)
             {
-                long nextHandle = recordManager.allocateHandle();
+                String path = "i" + i + "j" + j;
+                recordManager.insert(path, new MutableRecordImpl());
+                long nextHandle = recordManager.load(path).getHandle();
                 assertNextHandle(nextHandle, handle);
                 handle = nextHandle;
             }
         }
     }
 
-    public void testIncreasingHandleBoundary()
+    public void testHandleMap()
     {
-        long handle = recordManager.allocateHandle();
-        newRecordManager(HANDLE_BLOCK_SIZE + 10);
-        assertNextHandle(recordManager.allocateHandle(), handle);
+        recordManager.insert("r1", new MutableRecordImpl());
+        recordManager.insert("r2", new MutableRecordImpl());
+        assertHandleToPath("r1");
+        assertHandleToPath("r2");
     }
 
-    public void testDecreasingHandleBoundary()
+    public void testHandleMapNoSuchPath()
     {
-        long handle = recordManager.allocateHandle();
-        newRecordManager(HANDLE_BLOCK_SIZE - 1);
-        assertNextHandle(recordManager.allocateHandle(), handle);
+        assertNull(recordManager.getPathForHandle(100));
+    }
+
+    public void testHandleMapAferReload()
+    {
+        recordManager.insert("r1", new MutableRecordImpl());
+        recordManager.insert("r2", new MutableRecordImpl());
+        assertHandleToPath("r1");
+        assertHandleToPath("r2");
+        newRecordManager();
+        assertHandleToPath("r1");
+        assertHandleToPath("r2");
+    }
+
+    public void testHandleMapAferDelete()
+    {
+        recordManager.insert("r1", new MutableRecordImpl());
+        recordManager.insert("r2", new MutableRecordImpl());
+        assertHandleToPath("r1");
+        assertHandleToPath("r2");
+
+        long handle =  recordManager.delete("r1").getHandle();
+        assertNull(recordManager.getPathForHandle(handle));
+        assertHandleToPath("r2");
+    }
+
+    public void testHandleMapAferMove()
+    {
+        long handle = recordManager.insert("r1", new MutableRecordImpl()).getHandle();
+        recordManager.move("r1", "r2");
+        assertEquals("r2", recordManager.getPathForHandle(handle));
+    }
+    
+    private void assertHandleToPath(String path)
+    {
+        assertEquals(path, recordManager.getPathForHandle(recordManager.load(path).getHandle()));
     }
 
     private void assertNextHandle(long nextHandle, long handle)
@@ -333,7 +367,7 @@ public class RecordManagerTest extends TestCase
         Record inserted = recordManager.insert("testpath", record);
         Record insertedNest = (Record) inserted.get("nested");
         assertTrue(insertedNest.getHandle() > 0);
-        
+
         Record moved = recordManager.move("testpath", "newpath");
         assertEquals("val", moved.get("prop"));
         Record movedNest = (Record) moved.get("nested");
@@ -347,10 +381,9 @@ public class RecordManagerTest extends TestCase
         assertNull(recordManager.load("testpath/nested"));
     }
 
-    private void newRecordManager(long handleBlockSize)
+    private void newRecordManager()
     {
         recordManager = new RecordManager();
-        recordManager.setHandleBlockSize(handleBlockSize);
         recordManager.setRecordSerialiser(new DefaultRecordSerialiser(tempDir));
         recordManager.init();
     }

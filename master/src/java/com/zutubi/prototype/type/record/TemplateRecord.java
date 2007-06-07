@@ -124,6 +124,7 @@ public class TemplateRecord extends AbstractRecord
 
     public MutableRecord flatten()
     {
+        // FIXME NYI
         return new MutableRecordImpl();
     }
 

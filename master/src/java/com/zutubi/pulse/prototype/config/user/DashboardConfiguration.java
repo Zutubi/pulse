@@ -1,11 +1,11 @@
 package com.zutubi.pulse.prototype.config.user;
 
-import com.zutubi.pulse.core.config.AbstractConfiguration;
-import com.zutubi.pulse.prototype.config.project.ProjectConfiguration;
 import com.zutubi.config.annotations.ControllingCheckbox;
+import com.zutubi.config.annotations.Form;
 import com.zutubi.config.annotations.Reference;
 import com.zutubi.config.annotations.SymbolicName;
-import com.zutubi.config.annotations.Form;
+import com.zutubi.pulse.core.config.AbstractConfiguration;
+import com.zutubi.pulse.prototype.config.project.ProjectConfiguration;
 
 import java.util.List;
 
@@ -22,7 +22,7 @@ public class DashboardConfiguration extends AbstractConfiguration
     @ControllingCheckbox(invert = true, dependentFields = {"shownProjects"})
     private boolean showAllProjects;
 
-    @Reference(optionProvider = "com.zutubi.pulse.prototype.config.ProjectReferenceOptionProvider")
+    @Reference
     private List<ProjectConfiguration> shownProjects;
 
     @ControllingCheckbox(dependentFields = {"myChangeCount"})

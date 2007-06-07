@@ -1,6 +1,6 @@
 package com.zutubi.prototype.config.events;
 
-import com.zutubi.prototype.config.ConfigurationPersistenceManager;
+import com.zutubi.prototype.config.ConfigurationTemplateManager;
 
 /**
  */
@@ -8,7 +8,7 @@ public class PreDeleteEvent extends ConfigurationEvent
 {
     private Object instance;
 
-    public PreDeleteEvent(ConfigurationPersistenceManager source, String path, Object instance)
+    public PreDeleteEvent(ConfigurationTemplateManager source, String path, Object instance)
     {
         super(source, path);
         this.instance = instance;

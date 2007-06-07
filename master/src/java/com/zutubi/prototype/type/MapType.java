@@ -1,7 +1,7 @@
 package com.zutubi.prototype.type;
 
 import com.zutubi.config.annotations.ID;
-import com.zutubi.prototype.config.ConfigurationPersistenceManager;
+import com.zutubi.prototype.config.ConfigurationTemplateManager;
 import com.zutubi.prototype.type.record.MutableRecord;
 import com.zutubi.prototype.type.record.PathUtils;
 import com.zutubi.prototype.type.record.Record;
@@ -9,13 +9,8 @@ import com.zutubi.prototype.type.record.RecordManager;
 import com.zutubi.util.AnnotationUtils;
 import com.zutubi.util.logging.Logger;
 
-import java.beans.BeanInfo;
 import java.beans.IntrospectionException;
-import java.beans.Introspector;
-import java.beans.PropertyDescriptor;
-import java.lang.annotation.Annotation;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -26,18 +21,19 @@ public class MapType extends CollectionType
 {
     private static final Logger LOG = Logger.getLogger(MapType.class);
 
-    private ConfigurationPersistenceManager configurationPersistenceManager;
     private String keyProperty;
+    private ConfigurationTemplateManager configurationTemplateManager;
 
-    public MapType(ConfigurationPersistenceManager configurationPersistenceManager)
+    public MapType(ConfigurationTemplateManager configurationTemplateManager)
     {
         super(HashMap.class);
-        this.configurationPersistenceManager = configurationPersistenceManager;
+        this.configurationTemplateManager = configurationTemplateManager;
     }
 
+    @SuppressWarnings({"unchecked"})
     public Map instantiate(String path, Object data) throws TypeException
     {
-        Map instance = (Map) (path == null ? null : configurationPersistenceManager.getInstance(path));
+        Map instance = (Map) (path == null ? null : configurationTemplateManager.getInstance(path));
         if (instance == null && data != null)
         {
             if (!(data instanceof Record))
@@ -51,7 +47,7 @@ public class MapType extends CollectionType
             instance = new HashMap<String, Object>();
             if (path != null)
             {
-                configurationPersistenceManager.putInstance(path, instance);
+                configurationTemplateManager.putInstance(path, instance);
             }
 
             for (String key : record.keySet())
@@ -69,7 +65,6 @@ public class MapType extends CollectionType
                 }
 
                 Object value = type.instantiate(path == null ? null : PathUtils.getPath(path, key), child);
-                //noinspection unchecked
                 instance.put(key, value);
             }
         }
@@ -77,6 +72,7 @@ public class MapType extends CollectionType
         return instance;
     }
 
+    @SuppressWarnings({"unchecked"})
     public Object unstantiate(Object instance) throws TypeException
     {
         if(!(instance instanceof Map))
@@ -109,27 +105,9 @@ public class MapType extends CollectionType
         // Unfortunately we cannot use the type registry information as we
         // are part way through registration and cyclical type structures
         // mean that the ID property may not yet have been found.
-        Class clazz = compositeType.getClazz();
         try
         {
-            BeanInfo beanInfo = Introspector.getBeanInfo(clazz);
-            for(PropertyDescriptor descriptor: beanInfo.getPropertyDescriptors())
-            {
-                List<Annotation> annotations = AnnotationUtils.annotationsFromProperty(descriptor);
-                for(Annotation a: annotations)
-                {
-                    if(a.annotationType() == ID.class)
-                    {
-                        keyProperty = descriptor.getName();
-                        break;
-                    }
-                }
-
-                if(keyProperty != null)
-                {
-                    break;
-                }
-            }
+            keyProperty = AnnotationUtils.getPropertyAnnotatedWith(compositeType.getClazz(), ID.class);
         }
         catch (IntrospectionException e)
         {
@@ -153,14 +131,9 @@ public class MapType extends CollectionType
         String newName = (String) record.get(keyProperty);
         if(baseName != null && !baseName.equals(newName))
         {
-            // We need to update our own record and tell the CPM to update
-            // references.
+            // We need to update our own record
             String oldPath = PathUtils.getPath(path, baseName);
             String newPath = PathUtils.getPath(path, newName);
-
-            // Rename references first, as the below changes to the record
-            // will invalidate the reference index.
-            configurationPersistenceManager.renameReferences(oldPath, newPath);
 
             recordManager.move(oldPath, newPath);
             recordManager.update(newPath, record);

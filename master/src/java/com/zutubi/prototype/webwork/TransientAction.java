@@ -4,7 +4,7 @@ import com.opensymphony.util.TextUtils;
 import com.opensymphony.xwork.ActionContext;
 import com.zutubi.i18n.Messages;
 import com.zutubi.i18n.MessagesProvider;
-import com.zutubi.prototype.config.ConfigurationPersistenceManager;
+import com.zutubi.prototype.config.ConfigurationTemplateManager;
 import com.zutubi.prototype.type.CompositeType;
 import com.zutubi.prototype.type.Type;
 import com.zutubi.prototype.type.TypeRegistry;
@@ -22,10 +22,9 @@ public abstract class TransientAction<T> extends ActionSupport implements Messag
     protected Configuration configuration;
 
     protected TypeRegistry typeRegistry;
-    protected ConfigurationPersistenceManager configurationPersistenceManager;
+    protected ConfigurationTemplateManager configurationTemplateManager;
 
     protected Record record;
-
     private CompositeType type;
     private String symbolicName;
     private String submitField;
@@ -135,7 +134,7 @@ public abstract class TransientAction<T> extends ActionSupport implements Messag
 
         String parentPath = PathUtils.getParentPath(path);
         String baseName = PathUtils.getBaseName(path);
-        Object instance = configurationPersistenceManager.validate(parentPath, baseName, record, new XWorkValidationAdapter(this));
+        Object instance = configurationTemplateManager.validate(parentPath, baseName, record, new XWorkValidationAdapter(this));
         if (instance == null)
         {
             return INPUT;
@@ -152,8 +151,8 @@ public abstract class TransientAction<T> extends ActionSupport implements Messag
         this.typeRegistry = typeRegistry;
     }
 
-    public void setConfigurationPersistenceManager(ConfigurationPersistenceManager configurationPersistenceManager)
+    public void setConfigurationTemplateManager(ConfigurationTemplateManager configurationTemplateManager)
     {
-        this.configurationPersistenceManager = configurationPersistenceManager;
+        this.configurationTemplateManager = configurationTemplateManager;
     }
 }

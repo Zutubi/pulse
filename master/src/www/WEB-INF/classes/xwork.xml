@@ -451,66 +451,6 @@
             <result name="error" type="velocity">generic-error.vm</result>
         </action>
 
-        <!-- Alias is required as WW can't chain to a non-execute method :| -->
-        <action name="editCronTrigger!input" class="com.zutubi.pulse.web.project.EditCronTriggerAction" method="doInput">
-            <interceptor-ref name="crudStack"/>
-            <result name="input" type="velocity">edit-trigger-cron.vm</result>
-        </action>
-
-        <action name="editCronTrigger" class="com.zutubi.pulse.web.project.EditCronTriggerAction">
-            <interceptor-ref name="crudStack"/>
-            <result name="input" type="velocity">edit-trigger-cron.vm</result>
-            <result name="cancel" type="redirect">/configureProject.action?id=${projectId}</result>
-            <result name="success" type="redirect">/configureProject.action?id=${projectId}</result>
-        </action>
-
-        <!-- Alias is required as WW can't chain to a non-execute method :| -->
-        <action name="editEventTrigger!input" class="com.zutubi.pulse.web.project.EditEventTriggerAction"
-                method="doInput">
-            <interceptor-ref name="crudStack"/>
-            <result name="input" type="velocity">edit-trigger-event.vm</result>
-        </action>
-
-        <action name="editEventTrigger" class="com.zutubi.pulse.web.project.EditEventTriggerAction">
-            <interceptor-ref name="crudStack"/>
-            <result name="input" type="velocity">edit-trigger-event.vm</result>
-            <result name="cancel" type="redirect">/configureProject.action?id=${projectId}</result>
-            <result name="success" type="redirect">/configureProject.action?id=${projectId}</result>
-        </action>
-
-        <!-- Alias is required as WW can't chain to a non-execute method :| -->
-        <action name="editBuildCompletedTrigger!input" class="com.zutubi.pulse.web.project.EditBuildCompletedTriggerAction"
-                method="doInput">
-            <interceptor-ref name="crudStack"/>
-            <result name="input" type="velocity">edit-trigger-build-completed.vm</result>
-        </action>
-
-        <action name="editBuildCompletedTrigger" class="com.zutubi.pulse.web.project.EditBuildCompletedTriggerAction">
-            <interceptor-ref name="crudStack"/>
-            <result name="input" type="velocity">edit-trigger-build-completed.vm</result>
-            <result name="cancel" type="redirect">/configureProject.action?id=${projectId}</result>
-            <result name="success" type="redirect">/configureProject.action?id=${projectId}</result>
-        </action>
-
-        <action name="addProjectGroup" class="com.zutubi.pulse.web.project.ProjectGroupAction">
-            <result name="error" type="velocity">generic-error.vm</result>
-            <result name="input" type="velocity">add-project-group.vm</result>
-            <result name="cancel" type="redirect">/viewProjects.action</result>
-            <result name="success" type="redirect">/viewProjects.action</result>
-        </action>
-
-        <action name="editProjectGroup" class="com.zutubi.pulse.web.project.ProjectGroupAction">
-            <result name="error" type="velocity">generic-error.vm</result>
-            <result name="input" type="velocity">edit-project-group.vm</result>
-            <result name="cancel" type="redirect">/viewProjects.action</result>
-            <result name="success" type="redirect">/viewProjects.action</result>
-        </action>
-
-        <action name="deleteProjectGroup" class="com.zutubi.pulse.web.project.DeleteProjectGroupAction">
-            <result name="error" type="velocity">generic-error.vm</result>
-            <result name="success" type="redirect">/viewProjects.action</result>
-        </action>
-
         <action name="editOutputProcessors" class="com.zutubi.pulse.web.project.EditOutputProcessorsAction">
             <result name="input" type="velocity">edit-output-processors.vm</result>
             <result name="cancel" type="redirect">/configureProject.action?id=${projectId}</result>
@@ -666,13 +606,6 @@
 
     <package name="user" namespace="/user" extends="webwork-default-package">
         <default-interceptor-ref name="completeStack"/>
-
-        <action name="configureDashboard" class="com.zutubi.pulse.web.user.ConfigureDashboardAction">
-            <result name="input" type="velocity">configure-dashboard.vm</result>
-            <result name="error" type="velocity">configure-dashboard.vm</result>
-            <result name="cancel" type="redirect">/dashboard.action</result>
-            <result name="success" type="redirect">/dashboard.action</result>
-        </action>
 
         <action name="hideDashboardProject" class="com.zutubi.pulse.web.user.HideDashboardProjectAction">
             <result name="error" type="velocity">generic-error.vm</result>

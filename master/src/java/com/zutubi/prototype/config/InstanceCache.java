@@ -2,9 +2,9 @@ package com.zutubi.prototype.config;
 
 import com.zutubi.prototype.type.record.PathUtils;
 
-import java.util.List;
-import java.util.Map;
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.Map;
 
 /**
  * A cache for configuration instances, supporting addressing by path,
@@ -30,13 +30,13 @@ class InstanceCache
         return entry == null ? null : get(entry, elements, index + 1);
     }
 
-    public void getAll(String path, List result)
+    public void getAll(String path, Collection result)
     {
         getAll(root, PathUtils.getPathElements(path), 0, result);
     }
 
     @SuppressWarnings({"unchecked"})
-    private void getAll(Entry entry, String[] elements, int index, List result)
+    private void getAll(Entry entry, String[] elements, int index, Collection result)
     {
         if(index == elements.length)
         {

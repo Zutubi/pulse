@@ -47,7 +47,7 @@ public class ProjectConfigurationWizard extends AbstractTypeWizard
         record.put("scm", wizardStates.get(2).getRecord());
         record.put("type", wizardStates.get(4).getRecord());
 
-        successPath = configurationPersistenceManager.insertRecord("project", record);
+        successPath = configurationTemplateManager.insertRecord("project", record);
     }
 
     public Type getType()

@@ -1,12 +1,12 @@
 package com.zutubi.pulse.prototype.config.user;
 
-import com.zutubi.prototype.wizard.webwork.AbstractTypeWizard;
-import com.zutubi.prototype.wizard.TypeWizardState;
-import com.zutubi.prototype.type.record.TemplateRecord;
-import com.zutubi.prototype.type.record.MutableRecordImpl;
-import com.zutubi.prototype.type.record.MutableRecord;
 import com.zutubi.prototype.type.CompositeType;
 import com.zutubi.prototype.type.Type;
+import com.zutubi.prototype.type.record.MutableRecord;
+import com.zutubi.prototype.type.record.MutableRecordImpl;
+import com.zutubi.prototype.type.record.TemplateRecord;
+import com.zutubi.prototype.wizard.TypeWizardState;
+import com.zutubi.prototype.wizard.webwork.AbstractTypeWizard;
 import com.zutubi.util.logging.Logger;
 
 import java.util.LinkedList;
@@ -43,7 +43,7 @@ public class SubscriptionConfigurationWizard extends AbstractTypeWizard
         record.update(wizardStates.get(0).getRecord());
         record.put("condition", wizardStates.get(2).getRecord());
 
-        successPath = configurationPersistenceManager.insertRecord(path, record);
+        successPath = configurationTemplateManager.insertRecord(path, record);
     }
 
     public Type getType()

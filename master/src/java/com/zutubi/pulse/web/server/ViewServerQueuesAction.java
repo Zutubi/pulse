@@ -4,20 +4,11 @@ import com.zutubi.pulse.FatController;
 import com.zutubi.pulse.RecipeDispatchRequest;
 import com.zutubi.pulse.RecipeQueue;
 import com.zutubi.pulse.events.build.AbstractBuildRequestEvent;
-import com.zutubi.pulse.model.BuildManager;
-import com.zutubi.pulse.model.BuildResult;
-import com.zutubi.pulse.model.Project;
-import com.zutubi.pulse.model.ProjectManager;
-import com.zutubi.pulse.model.User;
-import com.zutubi.pulse.model.UserManager;
+import com.zutubi.pulse.model.*;
 import com.zutubi.pulse.prototype.config.project.ProjectConfiguration;
 import com.zutubi.pulse.web.ActionSupport;
 
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  */
@@ -85,7 +76,7 @@ public class ViewServerQueuesAction extends ActionSupport
                 else
                 {
                     ProjectConfiguration projectConfig = (ProjectConfiguration) active.getOwner();
-                    Project project = projectManager.getProject(projectConfig.getId());
+                    Project project = projectManager.getProject(projectConfig.getProjectId());
                     result = buildManager.getLatestBuildResult(project);
                 }
 

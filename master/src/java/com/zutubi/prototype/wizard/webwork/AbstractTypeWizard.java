@@ -5,21 +5,18 @@ import com.zutubi.prototype.FieldDescriptor;
 import com.zutubi.prototype.FormDescriptor;
 import com.zutubi.prototype.FormDescriptorFactory;
 import com.zutubi.prototype.config.ConfigurationPersistenceManager;
+import com.zutubi.prototype.config.ConfigurationTemplateManager;
 import com.zutubi.prototype.model.SelectFieldDescriptor;
-import com.zutubi.prototype.type.CompositeType;
-import com.zutubi.prototype.type.SimpleType;
-import com.zutubi.prototype.type.TypeProperty;
-import com.zutubi.prototype.type.TypeRegistry;
-import com.zutubi.prototype.type.Type;
+import com.zutubi.prototype.type.*;
 import com.zutubi.prototype.type.record.MutableRecord;
 import com.zutubi.prototype.type.record.MutableRecordImpl;
 import com.zutubi.prototype.type.record.Record;
 import com.zutubi.prototype.type.record.TemplateRecord;
 import com.zutubi.prototype.webwork.PrototypeUtils;
+import com.zutubi.prototype.wizard.TypeWizardState;
 import com.zutubi.prototype.wizard.Wizard;
 import com.zutubi.prototype.wizard.WizardState;
 import com.zutubi.prototype.wizard.WizardTransition;
-import com.zutubi.prototype.wizard.TypeWizardState;
 import static com.zutubi.prototype.wizard.WizardTransition.*;
 import com.zutubi.validation.ValidationAware;
 
@@ -33,6 +30,7 @@ public abstract class AbstractTypeWizard implements Wizard
 {
     protected TypeRegistry typeRegistry;
     protected ConfigurationPersistenceManager configurationPersistenceManager;
+    protected ConfigurationTemplateManager configurationTemplateManager;
 
     protected TypeWizardState currentState;
 
@@ -164,14 +162,14 @@ public abstract class AbstractTypeWizard implements Wizard
         this.typeRegistry = typeRegistry;
     }
 
-    /**
-     * Required resource.
-     * 
-     * @param configurationPersistenceManager
-     */
     public void setConfigurationPersistenceManager(ConfigurationPersistenceManager configurationPersistenceManager)
     {
         this.configurationPersistenceManager = configurationPersistenceManager;
+    }
+
+    public void setConfigurationTemplateManager(ConfigurationTemplateManager configurationTemplateManager)
+    {
+        this.configurationTemplateManager = configurationTemplateManager;
     }
 
     public abstract class AbstractTypeWizardState implements TypeWizardState
@@ -213,7 +211,7 @@ public abstract class AbstractTypeWizard implements Wizard
         public boolean validate(String path, ValidationAware validationCallback)
         {
             validationCallback.addIgnoredFields(ignoredFields);
-            return configurationPersistenceManager.validate(path, null, currentState.getRecord(), validationCallback) != null;
+            return configurationTemplateManager.validate(path, null, currentState.getRecord(), validationCallback) != null;
         }
     }
 

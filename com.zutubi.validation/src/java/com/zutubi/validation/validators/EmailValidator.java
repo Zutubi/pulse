@@ -21,7 +21,6 @@ public class EmailValidator extends FieldValidatorSupport
         Object fieldValue = getFieldValue(getFieldName(), obj);
         if (fieldValue == null)
         {
-            addFieldError(getFieldName());
             return;
         }
 
@@ -29,14 +28,17 @@ public class EmailValidator extends FieldValidatorSupport
         {
             String str = ((String) fieldValue);
 
-            try
+            if (str.length() > 0)
             {
-                new InternetAddress(str);
-            }
-            catch (AddressException e)
-            {
-                setDefaultMessage(getDefaultMessage());
-                addFieldError(getFieldName());
+                try
+                {
+                    new InternetAddress(str);
+                }
+                catch (AddressException e)
+                {
+                    setDefaultMessage(getDefaultMessage());
+                    addFieldError(getFieldName());
+                }
             }
         }
 

@@ -1,10 +1,6 @@
 package com.zutubi.pulse.prototype.config.user;
 
-import com.zutubi.config.annotations.Reference;
-import com.zutubi.config.annotations.Select;
-import com.zutubi.config.annotations.SymbolicName;
-import com.zutubi.config.annotations.Table;
-import com.zutubi.config.annotations.Form;
+import com.zutubi.config.annotations.*;
 import com.zutubi.pulse.core.config.AbstractNamedConfiguration;
 import com.zutubi.pulse.prototype.config.project.ProjectConfiguration;
 import com.zutubi.pulse.prototype.config.user.contacts.ContactConfiguration;
@@ -24,7 +20,7 @@ public class SubscriptionConfiguration extends AbstractNamedConfiguration
     @Reference
     private ContactConfiguration contact;
 
-    @Reference(optionProvider = "com.zutubi.pulse.prototype.config.ProjectReferenceOptionProvider")
+    @Reference
     private List<ProjectConfiguration> projects;
 
     private SubscriptionConditionConfiguration condition;

@@ -12,6 +12,7 @@ import com.zutubi.validation.annotations.Required;
 public class DefaultReferenceCleanupTaskProvider implements ReferenceCleanupTaskProvider
 {
     private ConfigurationPersistenceManager configurationPersistenceManager;
+    private ConfigurationReferenceManager configurationReferenceManager;
     private RecordManager recordManager;
 
     public ReferenceCleanupTask getAction(String deletedPath, String referencingPath)
@@ -31,7 +32,7 @@ public class DefaultReferenceCleanupTaskProvider implements ReferenceCleanupTask
         {
             if(property.getAnnotation(Required.class) != null)
             {
-                return configurationPersistenceManager.getCleanupTasks(parentPath);
+                return configurationReferenceManager.getCleanupTasks(parentPath);
             }
             else
             {
@@ -52,5 +53,10 @@ public class DefaultReferenceCleanupTaskProvider implements ReferenceCleanupTask
     public void setRecordManager(RecordManager recordManager)
     {
         this.recordManager = recordManager;
+    }
+
+    public void setConfigurationReferenceManager(ConfigurationReferenceManager configurationReferenceManager)
+    {
+        this.configurationReferenceManager = configurationReferenceManager;
     }
 }

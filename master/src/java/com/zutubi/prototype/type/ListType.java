@@ -1,10 +1,10 @@
 package com.zutubi.prototype.type;
 
-import com.zutubi.prototype.type.record.Record;
-import com.zutubi.prototype.type.record.PathUtils;
-import com.zutubi.prototype.type.record.RecordManager;
+import com.zutubi.prototype.config.ConfigurationTemplateManager;
 import com.zutubi.prototype.type.record.MutableRecord;
-import com.zutubi.prototype.config.ConfigurationPersistenceManager;
+import com.zutubi.prototype.type.record.PathUtils;
+import com.zutubi.prototype.type.record.Record;
+import com.zutubi.prototype.type.record.RecordManager;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -15,18 +15,19 @@ import java.util.List;
  */
 public class ListType extends CollectionType
 {
-    private ConfigurationPersistenceManager configurationPersistenceManager;
+    private ConfigurationTemplateManager configurationTemplateManager;
     private static final String LATEST_KEY_KEY = "latestKey";
 
-    public ListType(ConfigurationPersistenceManager configurationPersistenceManager)
+    public ListType(ConfigurationTemplateManager configurationTemplateManager)
     {
         super(LinkedList.class);
-        this.configurationPersistenceManager = configurationPersistenceManager;
+        this.configurationTemplateManager = configurationTemplateManager;
     }
 
+    @SuppressWarnings({"unchecked"})
     public List<Object> instantiate(String path, Object data) throws TypeException
     {
-        List<Object> instance = (List<Object>) (path == null ? null : configurationPersistenceManager.getInstance(path));
+        List<Object> instance = (List<Object>) (path == null ? null : configurationTemplateManager.getInstance(path));
         if (instance == null && data != null)
         {
             if (data instanceof Record)
@@ -118,7 +119,7 @@ public class ListType extends CollectionType
         instance = new LinkedList<Object>();
         if (path != null)
         {
-            configurationPersistenceManager.putInstance(path, instance);
+            configurationTemplateManager.putInstance(path, instance);
         }
         return instance;
     }

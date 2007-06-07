@@ -1,7 +1,7 @@
 package com.zutubi.prototype.type;
 
 import com.zutubi.config.annotations.Internal;
-import com.zutubi.prototype.config.ConfigurationPersistenceManager;
+import com.zutubi.prototype.config.ConfigurationTemplateManager;
 import com.zutubi.prototype.type.record.*;
 import com.zutubi.pulse.core.config.Configuration;
 import com.zutubi.util.CollectionUtils;
@@ -31,12 +31,12 @@ public class CompositeType extends AbstractType implements ComplexType
     
     private Map<Class, List<String>> propertiesByClass = new HashMap<Class, List<String>>();
 
-    private ConfigurationPersistenceManager configurationPersistenceManager;
+    private ConfigurationTemplateManager configurationTemplateManager;
 
-    public CompositeType(Class type, String symbolicName, ConfigurationPersistenceManager configurationPersistenceManager)
+    public CompositeType(Class type, String symbolicName, ConfigurationTemplateManager configurationTemplateManager)
     {
         super(type, symbolicName);
-        this.configurationPersistenceManager = configurationPersistenceManager;
+        this.configurationTemplateManager = configurationTemplateManager;
     }
 
     public void addProperty(TypeProperty property)
@@ -140,7 +140,7 @@ public class CompositeType extends AbstractType implements ComplexType
 
     public Object instantiate(String path, Object data) throws TypeException
     {
-        Object instance =  path == null ? null : configurationPersistenceManager.getInstance(path);
+        Object instance =  path == null ? null : configurationTemplateManager.getInstance(path);
         if (instance == null && data != null)
         {
             try
@@ -158,7 +158,7 @@ public class CompositeType extends AbstractType implements ComplexType
                 if (path != null)
                 {
                     // paths are associated with configuration objects only.
-                    configurationPersistenceManager.putInstance(path, instance);
+                    configurationTemplateManager.putInstance(path, instance);
                     if (instance instanceof Configuration)
                     {
                         Configuration config = (Configuration) instance;
@@ -219,7 +219,7 @@ public class CompositeType extends AbstractType implements ComplexType
         {
             if (exception == null)
             {
-                exception = new TypeConversionException();
+                exception = new TypeConversionException(e);
             }
             exception.addFieldError(name, e.getMessage());
         }
@@ -319,12 +319,6 @@ public class CompositeType extends AbstractType implements ComplexType
         record.setSymbolicName(getSymbolicName());
 
         return record;
-    }
-
-    public Record unstantiateMe(Object instance)
-    {
-        
-        return null;
     }
 
     public boolean isTemplated()

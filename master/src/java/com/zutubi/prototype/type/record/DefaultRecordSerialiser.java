@@ -1,9 +1,9 @@
 package com.zutubi.prototype.type.record;
 
-import com.zutubi.util.CollectionUtils;
 import com.zutubi.pulse.util.FileSystemUtils;
-import com.zutubi.util.Mapping;
 import com.zutubi.pulse.util.XMLUtils;
+import com.zutubi.util.CollectionUtils;
+import com.zutubi.util.Mapping;
 import com.zutubi.util.logging.Logger;
 import nu.xom.*;
 
@@ -21,6 +21,7 @@ public class DefaultRecordSerialiser implements RecordSerialiser
     private static final Logger LOG = Logger.getLogger(DefaultRecordSerialiser.class);
     private static final DateFormat FORMAT = DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.LONG);
 
+    private String basePath;
     private File baseDirectory;
     private static final String ELEMENT_RECORD = "record";
     private static final String ELEMENT_META = "meta";
@@ -36,6 +37,8 @@ public class DefaultRecordSerialiser implements RecordSerialiser
         {
             baseDirectory.mkdirs();
         }
+
+        basePath = PathUtils.normalizePath(baseDirectory.getAbsolutePath());
     }
 
     public void serialise(String path, Record record, boolean deep)
@@ -147,7 +150,7 @@ public class DefaultRecordSerialiser implements RecordSerialiser
         return element;
     }
 
-    public MutableRecord deserialise(String path)
+    public MutableRecord deserialise(String path, RecordHandler handler)
     {
         File dir = new File(baseDirectory, path);
         if (!dir.isDirectory())
@@ -155,7 +158,7 @@ public class DefaultRecordSerialiser implements RecordSerialiser
             throw new RecordSerialiseException("No record found at path '" + path + "': directory '" + dir.getAbsolutePath() + "' does not exist");
         }
 
-        return deserialise(dir);
+        return deserialise(dir, handler);
     }
 
     public void delete(String path) throws RecordSerialiseException
@@ -164,7 +167,7 @@ public class DefaultRecordSerialiser implements RecordSerialiser
         FileSystemUtils.rmdir(dir);
     }
 
-    private MutableRecord deserialise(File dir)
+    private MutableRecord deserialise(File dir, RecordHandler handler)
     {
         try
         {
@@ -183,14 +186,28 @@ public class DefaultRecordSerialiser implements RecordSerialiser
 
             for (File childDir : dir.listFiles(new SubrecordDirFileFilter()))
             {
-                record.put(childDir.getName(), deserialise(childDir));
+                record.put(childDir.getName(), deserialise(childDir, handler));
             }
 
+            handler.handle(getPath(dir), record);
             return record;
         }
         catch (Exception e)
         {
             throw new RecordSerialiseException("Unable to parse record file: " + e.getMessage(), e);
+        }
+    }
+
+    private String getPath(File dir)
+    {
+        String path = PathUtils.normalizePath(dir.getAbsolutePath());
+        if(path.equals(basePath))
+        {
+            return "";
+        }
+        else
+        {
+            return path.substring(basePath.length() + 1);
         }
     }
 

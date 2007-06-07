@@ -1,38 +1,12 @@
 package com.zutubi.prototype.config;
 
-import com.zutubi.config.annotations.Reference;
-import com.zutubi.prototype.config.events.PostDeleteEvent;
-import com.zutubi.prototype.config.events.PostInsertEvent;
-import com.zutubi.prototype.config.events.PostSaveEvent;
-import com.zutubi.prototype.config.events.PreDeleteEvent;
-import com.zutubi.prototype.config.events.PreInsertEvent;
-import com.zutubi.prototype.config.events.PreSaveEvent;
 import com.zutubi.prototype.type.*;
-import com.zutubi.prototype.type.record.MutableRecord;
 import com.zutubi.prototype.type.record.PathUtils;
 import com.zutubi.prototype.type.record.Record;
 import com.zutubi.prototype.type.record.RecordManager;
-import com.zutubi.prototype.type.record.TemplateRecord;
 import com.zutubi.pulse.core.config.Configuration;
-import com.zutubi.pulse.events.EventManager;
-import com.zutubi.util.ClassLoaderUtils;
-import com.zutubi.util.CollectionUtils;
-import com.zutubi.util.Mapping;
-import com.zutubi.util.bean.ObjectFactory;
-import com.zutubi.util.logging.Logger;
-import com.zutubi.validation.ValidationAware;
-import com.zutubi.validation.ValidationContext;
-import com.zutubi.validation.ValidationException;
-import com.zutubi.validation.ValidationManager;
-import com.zutubi.validation.i18n.MessagesTextProvider;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  *
@@ -41,29 +15,16 @@ import java.util.Map;
 @SuppressWarnings({"unchecked"})
 public class ConfigurationPersistenceManager
 {
-    private static final Logger LOG = Logger.getLogger(ConfigurationPersistenceManager.class);
-
     private TypeRegistry typeRegistry;
-
     private RecordManager recordManager;
-    private ValidationManager validationManager;
-    private ObjectFactory objectFactory;
-    private EventManager eventManager;
 
-    private Map<String, ScopeInfo> rootScopes = new HashMap<String, ScopeInfo>();
+    private Map<String, ConfigurationScopeInfo> rootScopes = new HashMap<String, ConfigurationScopeInfo>();
     /**
      * An index mapping from composite types to all paths where records of that
      * type (or a subtype) may reside.  Paths will include wildcards to navigate
      * collection members.
      */
     private Map<CompositeType, List<String>> compositeTypePathIndex = new HashMap<CompositeType, List<String>>();
-    private InstanceCache instances = new InstanceCache();
-    private Map<String, List<String>> references = new HashMap<String, List<String>>();
-
-    public void init()
-    {
-        refreshInstances();
-    }
 
     public void register(String scope, ComplexType type)
     {
@@ -81,7 +42,7 @@ public class ConfigurationPersistenceManager
     public void register(String scope, ComplexType type, boolean persistent)
     {
         validateConfiguration(type);
-        rootScopes.put(scope, new ScopeInfo(scope, type, persistent));
+        rootScopes.put(scope, new ConfigurationScopeInfo(scope, type, persistent));
         if (persistent)
         {
             if(recordManager == null)
@@ -106,6 +67,16 @@ public class ConfigurationPersistenceManager
                 updateIndex(scope, (CollectionType) type);
             }
         }
+    }
+
+    public Collection<ConfigurationScopeInfo> getScopes()
+    {
+        return rootScopes.values();
+    }
+
+    public ConfigurationScopeInfo getScopeInfo(String scope)
+    {
+        return rootScopes.get(scope);
     }
 
     private void validateConfiguration(ComplexType type)
@@ -176,35 +147,6 @@ public class ConfigurationPersistenceManager
         return l;
     }
 
-    public Map<String, Record> getReferencableRecords(CompositeType type, String referencingPath)
-    {
-        HashMap<String, Record> records = new HashMap<String, Record>();
-        // FIXME does not account for templating, and may need to be more
-        // FIXME general.  review when we have more config objects...
-        for (String path : getOwningPaths(type, getClosestOwningScope(type, referencingPath)))
-        {
-            recordManager.loadAll(path, records);
-        }
-
-        return records;
-    }
-
-    public <T> T getAncestorOfType(Configuration c, Class<T> clazz)
-    {
-        String path = c.getConfigurationPath();
-        CompositeType type = typeRegistry.getType(clazz);
-        if (type != null)
-        {
-            String ancestorPath = getClosestOwningScope(type, path);
-            if(ancestorPath != null)
-            {
-                return (T) getInstance(ancestorPath);
-            }
-        }
-
-        return null;
-    }
-
     String getClosestOwningScope(CompositeType type, String path)
     {
         List<String> patterns = compositeTypePathIndex.get(type);
@@ -234,13 +176,22 @@ public class ConfigurationPersistenceManager
     {
         List<String> paths = compositeTypePathIndex.get(type);
         List<String> result = new LinkedList<String>();
-        if (prefix != null && paths != null)
+        if (paths != null)
         {
-            for (String owningPath : paths)
+            if( prefix == null)
             {
-                if (PathUtils.prefixMatchesPathPattern(owningPath, prefix))
+                // Include all
+                result.addAll(paths);
+            }
+            else
+            {
+                // Restrict to those under prefix
+                for (String owningPath : paths)
                 {
-                    result.add(PathUtils.getPath(prefix, PathUtils.stripMatchingPrefix(owningPath, prefix)));
+                    if (PathUtils.prefixMatchesPathPattern(owningPath, prefix))
+                    {
+                        result.add(PathUtils.getPath(prefix, PathUtils.stripMatchingPrefix(owningPath, prefix)));
+                    }
                 }
             }
         }
@@ -263,7 +214,7 @@ public class ConfigurationPersistenceManager
             throw new IllegalArgumentException("Invalid path '" + path + "': no parent");
         }
 
-        ScopeInfo info = rootScopes.get(pathElements[0]);
+        ConfigurationScopeInfo info = rootScopes.get(pathElements[0]);
         if (info == null)
         {
             throw new IllegalArgumentException("Invalid path '" + path + ": references non-existant root scope '" + pathElements[0] + "'");
@@ -289,7 +240,7 @@ public class ConfigurationPersistenceManager
         }
     }
 
-    private CompositeType lookupTransientType(String path, String[] pathElements, ScopeInfo info)
+    private CompositeType lookupTransientType(String path, String[] pathElements, ConfigurationScopeInfo info)
     {
         CompositeType type = (CompositeType) info.getType();
         for(int i = 1; i < pathElements.length; i++)
@@ -390,7 +341,7 @@ public class ConfigurationPersistenceManager
         if (path.length() == 0)
         {
             // Root listing
-            for(ScopeInfo info: rootScopes.values())
+            for(ConfigurationScopeInfo info: rootScopes.values())
             {
                 if(info.isPersistent())
                 {
@@ -444,208 +395,12 @@ public class ConfigurationPersistenceManager
         return compositeTypePathIndex.get(type);
     }
 
-    private void refreshInstances()
-    {
-        instances.clear();
-        references.clear();
-
-        for (ScopeInfo scope : rootScopes.values())
-        {
-            String path = scope.getScopeName();
-            Type type = scope.getType();
-            try
-            {
-                type.instantiate(path, recordManager.load(path));
-            }
-            catch (TypeException e)
-            {
-                // FIXME how should we present this? i think we need to
-                // FIXME store and allow the UI to show such problems
-                LOG.severe("Unable to instantiate '" + path + "': " + e.getMessage(), e);
-            }
-        }
-    }
-
-    /**
-     * Load the object at the specified path, or null if no object exists.
-     *
-     * @param path path of the instance to retrieve
-     * @return object defined by the path.
-     */
-    public Object getInstance(String path)
-    {
-        return instances.get(path);
-    }
-
-    public <T> T getInstance(String path, Class<T> clazz)
-    {
-        Object instance = getInstance(path);
-        if (instance == null)
-        {
-            return null;
-        }
-
-        if (!clazz.isAssignableFrom(instance.getClass()))
-        {
-            throw new IllegalArgumentException("Path '" + path + "' does not reference an instance of type '" + clazz.getName() + "'");
-        }
-
-        return (T) instance;
-    }
-
-    public <T> Collection<T> getAllInstances(String path, Class<T> clazz)
-    {
-        List<T> result = new LinkedList<T>();
-        instances.getAll(path, result);
-        return result;
-    }
-
-    public <T> Collection<T> getAllInstances(Class<T> clazz)
-    {
-        CompositeType type = typeRegistry.getType(clazz);
-        if (type == null)
-        {
-            return Collections.EMPTY_LIST;
-        }
-
-        List<T> result = new LinkedList<T>();
-        List<String> paths = compositeTypePathIndex.get(type);
-        if (paths != null)
-        {
-            for (String path : paths)
-            {
-                instances.getAll(path, result);
-            }
-        }
-
-        return result;
-    }
-
-    public Object resolveReference(String fromPath, String toPath) throws TypeException
-    {
-        indexReference(fromPath, toPath);
-        Object instance = getInstance(toPath);
-        if (instance == null)
-        {
-            Record record = getRecord(toPath);
-            if (record == null || record.getSymbolicName() == null)
-            {
-                throw new TypeException("Broken reference from '" + fromPath + "' to '" + toPath + "'");
-            }
-
-            Type type = typeRegistry.getType(record.getSymbolicName());
-            if (type == null)
-            {
-                throw new TypeException("Reference to unrecognised type '" + record.getSymbolicName() + "'");
-            }
-
-            instance = type.instantiate(toPath, record);
-        }
-
-        return instance;
-    }
-
-    private void indexReference(String fromPath, String toPath)
-    {
-        List<String> index = references.get(toPath);
-        if (index == null)
-        {
-            index = new LinkedList<String>();
-            references.put(toPath, index);
-        }
-
-        index.add(fromPath);
-    }
-
-    public void putInstance(String path, Object instance)
-    {
-        instances.put(path, instance);
-    }
-
-    public Record getRecord(String path)
-    {
-        checkPersistent(path);
-
-        Record record = recordManager.load(path);
-        if (record == null)
-        {
-            return null;
-        }
-        return templatiseRecord(path, record);
-    }
-
-    private Record templatiseRecord(String path, Record record)
-    {
-        checkPersistent(path);
-
-        // We need to understand the root level can be templated.
-        String[] pathElements = PathUtils.getPathElements(path);
-        if (pathElements.length > 1)
-        {
-            ScopeInfo scopeInfo = rootScopes.get(pathElements[0]);
-            if (scopeInfo.isTemplated())
-            {
-                // Need to load a chain of templates.
-                // FIXME this does not appear to handle the case where the
-                // FIXME parent has no configuration but the grandparent does
-                String owner = pathElements[1];
-                Record owningRecord = recordManager.load(PathUtils.getPath(pathElements[0], pathElements[1]));
-                String parent = owningRecord.getMeta("parent");
-                TemplateRecord parentRecord = null;
-                if (parent != null)
-                {
-                    pathElements[1] = parent;
-                    parentRecord = (TemplateRecord) getRecord(PathUtils.getPath(pathElements));
-                }
-
-                return new TemplateRecord(owner, parentRecord, record);
-            }
-        }
-
-        return record;
-    }
-
-    public String insert(String parentPath, Object instance)
-    {
-        CompositeType type = typeRegistry.getType(instance.getClass());
-        if (type == null)
-        {
-            throw new IllegalArgumentException("Attempt to insert object of unregistered class '" + instance.getClass().getName() + "'");
-        }
-
-        try
-        {
-            Record record = type.unstantiate(instance);
-            return insertRecord(parentPath, record);
-        }
-        catch (TypeException e)
-        {
-            throw new ConfigRuntimeException(e);
-        }
-    }
-
-    public String insertRecord(final String path, Record record)
-    {
-        checkPersistent(path);
-
-        ComplexType type = getType(path, ComplexType.class);
-
-        eventManager.publish(new PreInsertEvent(this, path, (MutableRecord) record));
-
-        final String result = type.insert(path, record, recordManager);
-        refreshInstances();
-
-        eventManager.publish(new PostInsertEvent(this, path, result, instances.get(result)));
-
-        return result;
-    }
-
     public boolean isPersistent(String path)
     {
         String[] parts = PathUtils.getPathElements(path);
         if(parts.length > 0)
         {
-            ScopeInfo rootScope = rootScopes.get(parts[0]);
+            ConfigurationScopeInfo rootScope = rootScopes.get(parts[0]);
             if(rootScope == null)
             {
                 throw new IllegalArgumentException("Invalid path '" + path + "': references non-existant root scope '" + parts[0] + "'");
@@ -659,224 +414,6 @@ public class ConfigurationPersistenceManager
         }
     }
 
-    private void checkPersistent(String path)
-    {
-        if(!isPersistent(path))
-        {
-            throw new IllegalArgumentException("Attempt to manage records for non-persistent path '" + path + "'");
-        }
-    }
-
-    public Object validate(String parentPath, String baseName, Record subject, ValidationAware validationCallback)
-    {
-        // The type we validating against.
-        Type type = typeRegistry.getType(subject.getSymbolicName());
-
-        // Construct the validation context, wrapping it around the validation callback to that the
-        // client is notified of validation errors.
-        MessagesTextProvider textProvider = new MessagesTextProvider(type.getClazz());
-        ValidationContext context = new ConfigurationValidationContext(validationCallback, textProvider, parentPath == null ? null : getInstance(parentPath), baseName);
-
-        // Create an instance of the object represented by the record.  It is during the instantiation that
-        // type conversion errors are detected.
-        Object instance;
-        try
-        {
-            instance = type.instantiate(null, subject);
-        }
-        catch (TypeConversionException e)
-        {
-            for (String field : e.getFieldErrors())
-            {
-                context.addFieldError(field, e.getFieldError(field));
-            }
-            return null;
-        }
-        catch(TypeException e)
-        {
-            context.addActionError(e.getMessage());
-            return null;
-        }
-
-        // Process the instance via the validation manager.
-        try
-        {
-            validationManager.validate(instance, context);
-            if(context.hasErrors())
-            {
-                return null;
-            }
-            else
-            {
-                return instance;
-            }
-        }
-        catch (ValidationException e)
-        {
-            context.addActionError(e.getMessage());
-            return null;
-        }
-    }
-
-    public void save(String parentPath, String baseName, Object instance)
-    {
-        CompositeType type = typeRegistry.getType(instance.getClass());
-        if (type == null)
-        {
-            throw new IllegalArgumentException("Attempt to save instance of an unknown class '" + instance.getClass().getName() + "'");
-        }
-
-        Record record;
-        try
-        {
-            record = type.unstantiate(instance);
-        }
-        catch (TypeException e)
-        {
-            throw new ConfigRuntimeException(e);
-        }
-
-        saveRecord(parentPath, baseName, record);
-    }
-
-    public String saveRecord(String parentPath, String baseName, Record record)
-    {
-        checkPersistent(parentPath);
-                
-        Record parentRecord = recordManager.load(parentPath);
-        if (parentRecord == null)
-        {
-            throw new IllegalArgumentException("Invalid parent path '" + parentPath + "'");
-        }
-
-        ComplexType parentType = (ComplexType) getType(parentPath);
-
-        String path = PathUtils.getPath(parentPath, baseName);
-        Object oldInstance = instances.get(path);
-        eventManager.publish(new PreSaveEvent(this, path, oldInstance));
-
-        final String newPath = parentType.save(parentPath, baseName, record, recordManager);
-        refreshInstances();
-
-        eventManager.publish(new PostSaveEvent(this, path, oldInstance, newPath, instances.get(newPath)));
-
-        return newPath;
-    }
-
-    public void renameReferences(final String oldPath, final String newPath)
-    {
-        List<String> index = references.get(oldPath);
-        if (index != null)
-        {
-            for (String referencingPath : index)
-            {
-                String parentPath = PathUtils.getParentPath(referencingPath);
-                String baseName = PathUtils.getBaseName(referencingPath);
-
-                Record parentRecord = recordManager.load(parentPath);
-                if (parentRecord != null)
-                {
-                    Object currentValue = parentRecord.get(baseName);
-                    if (currentValue != null)
-                    {
-                        MutableRecord newRecord = parentRecord.copy(false);
-                        Object newValue = currentValue;
-
-                        if (currentValue instanceof String)
-                        {
-                            newValue = newPath;
-                        }
-                        else if (currentValue instanceof String[])
-                        {
-                            String[] refs = (String[]) currentValue;
-                            newValue = CollectionUtils.mapToArray(refs, new Mapping<String, String>()
-                            {
-                                public String map(String s)
-                                {
-                                    if (s.equals(oldPath))
-                                    {
-                                        return newPath;
-                                    }
-                                    else
-                                    {
-                                        return s;
-                                    }
-                                }
-                            }, new String[refs.length]);
-                        }
-
-                        newRecord.put(baseName, newValue);
-                        recordManager.update(parentPath, newRecord);
-                    }
-                }
-            }
-        }
-    }
-
-    public ReferenceCleanupTask getCleanupTasks(String path)
-    {
-        DeleteReferenceCleanupTask result = new DeleteReferenceCleanupTask(path, recordManager);
-        List<String> index = references.get(path);
-        if (index != null)
-        {
-            for (String referencingPath : index)
-            {
-                ReferenceCleanupTaskProvider provider = getCleanupTaskProvider(referencingPath);
-                if (provider != null)
-                {
-                    ReferenceCleanupTask task = provider.getAction(path, referencingPath);
-                    if (task != null)
-                    {
-                        result.addCascaded(task);
-                    }
-                }
-            }
-        }
-
-        return result;
-    }
-
-    private ReferenceCleanupTaskProvider getCleanupTaskProvider(String referencingPath)
-    {
-        String parentPath = PathUtils.getParentPath(referencingPath);
-        String baseName = PathUtils.getBaseName(referencingPath);
-
-        CompositeType parentType = (CompositeType) getType(parentPath);
-        TypeProperty property = parentType.getProperty(baseName);
-        Reference ref = property.getAnnotation(Reference.class);
-        try
-        {
-            Class<? extends ReferenceCleanupTaskProvider> providerClass = ClassLoaderUtils.loadAssociatedClass(parentType.getClazz(), ref.cleanupTaskProvider());
-            return objectFactory.buildBean(providerClass);
-        }
-        catch (Exception e)
-        {
-            LOG.severe("Unable to instantiate reference cleanup task provider of class '" + ref.cleanupTaskProvider() + "': " + e.getMessage(), e);
-            try
-            {
-                return objectFactory.buildBean(DefaultReferenceCleanupTaskProvider.class);
-            }
-            catch (Exception omg)
-            {
-                LOG.severe("Unable to instantiate default reference cleanup task provider: " + e.getMessage(), e);
-                return null;
-            }
-        }
-    }
-
-    public void delete(final String path)
-    {
-        checkPersistent(path);
-
-        Object oldInstance = instances.get(path);
-        eventManager.publish(new PreDeleteEvent(this, path, oldInstance));
-
-        getCleanupTasks(path).execute();
-        refreshInstances();
-
-        eventManager.publish(new PostDeleteEvent(this, path, oldInstance));
-    }
-
     public void setTypeRegistry(TypeRegistry typeRegistry)
     {
         this.typeRegistry = typeRegistry;
@@ -885,67 +422,5 @@ public class ConfigurationPersistenceManager
     public void setRecordManager(RecordManager recordManager)
     {
         this.recordManager = recordManager;
-    }
-
-    public void setValidationManager(ValidationManager validationManager)
-    {
-        this.validationManager = validationManager;
-    }
-
-    public void setObjectFactory(ObjectFactory objectFactory)
-    {
-        this.objectFactory = objectFactory;
-    }
-
-    public void setEventManager(EventManager eventManager)
-    {
-        this.eventManager = eventManager;
-    }
-
-    /**
-     * Holds information about a root scope.
-     */
-    private class ScopeInfo
-    {
-        private String scopeName;
-        private ComplexType type;
-        private boolean persistent;
-
-        public ScopeInfo(String scopeName, ComplexType type, boolean persistent)
-        {
-            this.scopeName = scopeName;
-            this.type = type;
-            this.persistent = persistent;
-        }
-
-        public String getScopeName()
-        {
-            return scopeName;
-        }
-
-        public ComplexType getType()
-        {
-            return type;
-        }
-
-        public boolean isPersistent()
-        {
-            return persistent;
-        }
-
-        public Type getTargetType()
-        {
-            return type.getTargetType();
-        }
-
-        public boolean isCollection()
-        {
-            return type instanceof CollectionType;
-        }
-
-        public boolean isTemplated()
-        {
-            return type.isTemplated();
-        }
     }
 }

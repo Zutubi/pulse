@@ -3,7 +3,8 @@ package com.zutubi.prototype.type;
 import com.zutubi.config.annotations.Reference;
 import com.zutubi.config.annotations.SymbolicName;
 import com.zutubi.config.annotations.Transient;
-import com.zutubi.prototype.config.ConfigurationPersistenceManager;
+import com.zutubi.prototype.config.ConfigurationReferenceManager;
+import com.zutubi.prototype.config.ConfigurationTemplateManager;
 import com.zutubi.util.AnnotationUtils;
 import com.zutubi.util.CollectionUtils;
 
@@ -28,7 +29,8 @@ public class TypeRegistry
     private Map<Class, CompositeType> classMapping = new HashMap<Class, CompositeType>();
     private Map<Class, SimpleType> primitiveMapping = new HashMap<Class, SimpleType>();
 
-    private ConfigurationPersistenceManager configurationPersistenceManager;
+    private ConfigurationReferenceManager configurationReferenceManager;
+    private ConfigurationTemplateManager configurationTemplateManager;
 
     public TypeRegistry()
     {
@@ -103,7 +105,7 @@ public class TypeRegistry
             CompositeType type = classMapping.get(clazz);
             if (type == null)
             {
-                type = new CompositeType(clazz, symbolicName, configurationPersistenceManager);
+                type = new CompositeType(clazz, symbolicName, configurationTemplateManager);
                 type.setTypeRegistry(this);
                 classMapping.put(clazz, type);
 
@@ -219,14 +221,14 @@ public class TypeRegistry
                         if (List.class.isAssignableFrom(clazz))
                         {
                             valueClass = (Class) parameterizedType.getActualTypeArguments()[0];
-                            collection = new ListType(configurationPersistenceManager);
+                            collection = new ListType(configurationTemplateManager);
                         }
                         else
                         {
                             if (Map.class.isAssignableFrom(clazz))
                             {
                                 valueClass = (Class) parameterizedType.getActualTypeArguments()[1];
-                                collection = new MapType(configurationPersistenceManager);
+                                collection = new MapType(configurationTemplateManager);
                             }
                         }
 
@@ -266,11 +268,11 @@ public class TypeRegistry
         }
     }
 
-    private Type checkReferenceType(TypeProperty property, CompositeType compositeType)
+    private Type checkReferenceType(TypeProperty property, CompositeType compositeType) throws TypeException
     {
         if (property.getAnnotation(Reference.class) != null)
         {
-            ReferenceType referenceType = new ReferenceType(compositeType, configurationPersistenceManager);
+            ReferenceType referenceType = new ReferenceType(compositeType, configurationReferenceManager);
             referenceType.setTypeRegistry(this);
             return referenceType;
         }
@@ -311,8 +313,13 @@ public class TypeRegistry
         return CollectionUtils.containsIdentity(BUILT_IN_TYPES, type) || type.isEnum();
     }
 
-    public void setConfigurationPersistenceManager(ConfigurationPersistenceManager configurationPersistenceManager)
+    public void setConfigurationReferenceManager(ConfigurationReferenceManager configurationReferenceManager)
     {
-        this.configurationPersistenceManager = configurationPersistenceManager;
+        this.configurationReferenceManager = configurationReferenceManager;
+    }
+
+    public void setConfigurationTemplateManager(ConfigurationTemplateManager configurationTemplateManager)
+    {
+        this.configurationTemplateManager = configurationTemplateManager;
     }
 }

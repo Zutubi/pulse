@@ -1,6 +1,6 @@
 package com.zutubi.prototype.config.events;
 
-import com.zutubi.prototype.config.ConfigurationPersistenceManager;
+import com.zutubi.prototype.config.ConfigurationTemplateManager;
 
 /**
  */
@@ -9,7 +9,7 @@ public class PostInsertEvent extends ConfigurationEvent
     private String insertedPath;
     private Object newInstance;
 
-    public PostInsertEvent(ConfigurationPersistenceManager source, String path, String insertedPath, Object newInstance)
+    public PostInsertEvent(ConfigurationTemplateManager source, String path, String insertedPath, Object newInstance)
     {
         super(source, path);
         this.newInstance = newInstance;

@@ -38,7 +38,7 @@ public class GenericAction extends PrototypeSupport
         Method actionMethod = handlerClass.getMethod("do" + action, type.getClazz());
 
         // need the configuration instance.
-        Object config = configurationPersistenceManager.getInstance(path);
+        Object config = configurationTemplateManager.getInstance(path);
 
         // put the two together.
         actionMethod.invoke(actionHandler, config);

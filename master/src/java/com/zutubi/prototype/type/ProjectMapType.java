@@ -1,14 +1,14 @@
 package com.zutubi.prototype.type;
 
-import com.zutubi.prototype.config.ConfigurationPersistenceManager;
+import com.zutubi.prototype.config.ConfigurationTemplateManager;
 
 /**
  */
 public class ProjectMapType extends MapType
 {
-    public ProjectMapType(ConfigurationPersistenceManager configurationPersistenceManager)
+    public ProjectMapType(ConfigurationTemplateManager configurationTemplateManager)
     {
-        super(configurationPersistenceManager);
+        super(configurationTemplateManager);
     }
 
     public boolean isTemplated()

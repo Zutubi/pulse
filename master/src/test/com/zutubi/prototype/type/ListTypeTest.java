@@ -15,7 +15,7 @@ public class ListTypeTest extends TypeTestCase
         typeRegistry.register("mockA", MockA.class);
         typeRegistry.register("mockB", MockB.class);
         
-        listType = new ListType(configurationPersistenceManager);
+        listType = new ListType(configurationTemplateManager);
         listType.setTypeRegistry(typeRegistry);
     }
 

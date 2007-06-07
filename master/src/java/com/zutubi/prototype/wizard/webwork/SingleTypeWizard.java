@@ -37,7 +37,7 @@ public class SingleTypeWizard extends AbstractTypeWizard
 
     public void doFinish()
     {
-        successPath = configurationPersistenceManager.insertRecord(path, recordState.getRecord());
+        successPath = configurationTemplateManager.insertRecord(path, recordState.getRecord());
     }
 
     public Type getType()

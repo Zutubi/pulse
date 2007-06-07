@@ -5,6 +5,7 @@ import com.zutubi.i18n.Messages;
 import com.zutubi.i18n.MessagesProvider;
 import com.zutubi.prototype.config.ConfigurationPersistenceManager;
 import com.zutubi.prototype.config.ConfigurationRegistry;
+import com.zutubi.prototype.config.ConfigurationTemplateManager;
 import com.zutubi.prototype.type.CollectionType;
 import com.zutubi.prototype.type.CompositeType;
 import com.zutubi.prototype.type.Type;
@@ -25,6 +26,7 @@ public class PrototypeSupport extends ActionSupport implements MessagesProvider
     protected TypeRegistry typeRegistry;
     protected ConfigurationRegistry configurationRegistry;
     protected ConfigurationPersistenceManager configurationPersistenceManager;
+    protected ConfigurationTemplateManager configurationTemplateManager;
 
     protected Record record;
     
@@ -242,5 +244,10 @@ public class PrototypeSupport extends ActionSupport implements MessagesProvider
     public void setConfigurationPersistenceManager(ConfigurationPersistenceManager configurationPersistenceManager)
     {
         this.configurationPersistenceManager = configurationPersistenceManager;
+    }
+
+    public void setConfigurationTemplateManager(ConfigurationTemplateManager configurationTemplateManager)
+    {
+        this.configurationTemplateManager = configurationTemplateManager;
     }
 }

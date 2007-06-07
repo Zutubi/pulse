@@ -1,11 +1,15 @@
 package com.zutubi.pulse.prototype.config;
 
 import com.zutubi.prototype.MapOptionProvider;
-import com.zutubi.prototype.config.ConfigurationPersistenceManager;
+import com.zutubi.prototype.config.ConfigurationReferenceManager;
 import com.zutubi.prototype.type.ReferenceType;
 import com.zutubi.prototype.type.TypeProperty;
-import com.zutubi.prototype.type.record.Record;
+import com.zutubi.pulse.core.config.Configuration;
+import com.zutubi.util.bean.BeanException;
+import com.zutubi.util.bean.BeanUtils;
+import com.zutubi.util.logging.Logger;
 
+import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -15,26 +19,33 @@ import java.util.Map;
  */
 public class DefaultReferenceOptionProvider extends MapOptionProvider
 {
-    private ConfigurationPersistenceManager configurationPersistenceManager;
+    private static final Logger LOG = Logger.getLogger(DefaultReferenceOptionProvider.class);
+    
+    private ConfigurationReferenceManager configurationReferenceManager;
 
     public Map<String,String> getMap(Object instance, String path, TypeProperty property)
     {
-        // We need to find all objects of a given type in a given scope...
         ReferenceType referenceType = (ReferenceType) property.getType().getTargetType();
-        Map<String, Record> referencable = configurationPersistenceManager.getReferencableRecords(referenceType.getReferencedType(), path);
+        Collection<Configuration> referencable = configurationReferenceManager.getReferencableInstances(referenceType.getReferencedType(), path);
         Map<String, String> options = new LinkedHashMap<String, String>();
 
-        for(Map.Entry<String, Record> entry: referencable.entrySet())
+        for(Configuration r: referencable)
         {
-            // FIXME get name properly
-            options.put(entry.getKey(), (String) entry.getValue().get("name"));
+            try
+            {
+                options.put(Long.toString(r.getHandle()), (String) BeanUtils.getProperty(referenceType.getIdProperty(), r));
+            }
+            catch (BeanException e)
+            {
+                LOG.severe(e);
+            }
         }
         
         return options;
     }
 
-    public void setConfigurationPersistenceManager(ConfigurationPersistenceManager configurationPersistenceManager)
+    public void setConfigurationReferenceManager(ConfigurationReferenceManager configurationReferenceManager)
     {
-        this.configurationPersistenceManager = configurationPersistenceManager;
+        this.configurationReferenceManager = configurationReferenceManager;
     }
 }

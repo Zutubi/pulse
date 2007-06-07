@@ -2,17 +2,17 @@ package com.zutubi.util;
 
 import com.zutubi.util.bean.BeanUtils;
 
-import java.beans.IntrospectionException;
-import java.beans.PropertyDescriptor;
-import java.beans.Introspector;
 import java.beans.BeanInfo;
+import java.beans.IntrospectionException;
+import java.beans.Introspector;
+import java.beans.PropertyDescriptor;
 import java.lang.annotation.Annotation;
-import java.lang.reflect.Method;
 import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import java.util.*;
 
 /**
- * 
+ *
  */
 public class AnnotationUtils
 {
@@ -49,12 +49,12 @@ public class AnnotationUtils
             }
 
             Class superClass = declaringClass.getSuperclass();
-            if(superClass != null && superClass != Object.class)
+            if (superClass != null && superClass != Object.class)
             {
                 processSuper(superClass, property, annotations);
             }
 
-            for(Class superInterface: declaringClass.getInterfaces())
+            for (Class superInterface : declaringClass.getInterfaces())
             {
                 processSuper(superInterface, property, annotations);
             }
@@ -74,7 +74,7 @@ public class AnnotationUtils
             }
         });
 
-        if(superDescriptor != null)
+        if (superDescriptor != null)
         {
             annotations.addAll(annotationsFromProperty(superDescriptor));
         }
@@ -84,9 +84,9 @@ public class AnnotationUtils
      * This method will check if an annotation property has a default value by checking
      * if there is a field named DEFAULT_ + property name.
      *
-     * @param annotation
-     * @param annotationMethod
-     *
+     * @param annotation       annotation instance to check
+     * @param annotationMethod getter method for the property value
+     * @return true if the property has the default value
      */
     public static boolean isDefault(Annotation annotation, Method annotationMethod)
     {
@@ -114,9 +114,8 @@ public class AnnotationUtils
      * the target and set it with the value of the attribute unless the attribute
      * is set to the "default" value
      *
-     * @param annotation
-     *
-     * @param target
+     * @param annotation annotation instance to grab properties from
+     * @param target     object on which to set the property values
      */
     public static void setPropertiesFromAnnotation(Annotation annotation, Object target)
     {
@@ -180,19 +179,19 @@ public class AnnotationUtils
         }, seenTypes);
 
         Queue<Annotation> toProcess = new LinkedList<Annotation>(from);
-        while(!toProcess.isEmpty())
+        while (!toProcess.isEmpty())
         {
             Annotation a = toProcess.remove();
-            if(clazz.isInstance(a))
+            if (clazz.isInstance(a))
             {
                 return (T) a;
             }
 
             Class<? extends Annotation> type = a.annotationType();
             seenTypes.add(type);
-            for(Annotation meta: type.getAnnotations())
+            for (Annotation meta : type.getAnnotations())
             {
-                if(!seenTypes.contains(meta.annotationType()))
+                if (!seenTypes.contains(meta.annotationType()))
                 {
                     toProcess.offer(meta);
                 }
@@ -202,7 +201,35 @@ public class AnnotationUtils
         return null;
     }
 
+    /**
+     * Returns the property ot the given class (or superclass) that is
+     * annotated with an annotation of the given type.
+     *
+     * @param clazz          type to check the properties of
+     * @param annotationType type of annotation to check for
+     * @return the annotated property, or null of none is found
+     * @throws IntrospectionException on reflection error
+     */
+    public static <T extends Annotation> String getPropertyAnnotatedWith(Class clazz, Class<T> annotationType) throws IntrospectionException
+    {
+        BeanInfo beanInfo = Introspector.getBeanInfo(clazz);
+        for (PropertyDescriptor descriptor : beanInfo.getPropertyDescriptors())
+        {
+            List<Annotation> annotations = AnnotationUtils.annotationsFromProperty(descriptor);
+            for (Annotation a : annotations)
+            {
+                if (a.annotationType() == annotationType)
+                {
+                    return descriptor.getName();
+                }
+            }
+        }
+
+        return null;
+    }
+
     private static final Set<String> internalMethods = new HashSet<String>();
+
     static
     {
         internalMethods.add("toString");

@@ -1,6 +1,6 @@
 package com.zutubi.prototype.type;
 
-import com.zutubi.prototype.config.ConfigurationPersistenceManager;
+import com.zutubi.prototype.config.ConfigurationTemplateManager;
 import com.zutubi.prototype.type.record.RecordManager;
 import junit.framework.TestCase;
 
@@ -8,10 +8,10 @@ import junit.framework.TestCase;
  *
  *
  */
-public class TypeTestCase extends TestCase
+public abstract class TypeTestCase extends TestCase
 {
     protected RecordManager recordManager;
-    protected ConfigurationPersistenceManager configurationPersistenceManager;
+    protected ConfigurationTemplateManager configurationTemplateManager;
     protected TypeRegistry typeRegistry;
 
     protected void setUp() throws Exception
@@ -19,15 +19,13 @@ public class TypeTestCase extends TestCase
         super.setUp();
 
         typeRegistry = new TypeRegistry();
-        configurationPersistenceManager = new ConfigurationPersistenceManager();
-        configurationPersistenceManager.setTypeRegistry(typeRegistry);
-        configurationPersistenceManager.init();
+        configurationTemplateManager = new ConfigurationTemplateManager();
     }
 
     protected void tearDown() throws Exception
     {
         typeRegistry = null;
-        configurationPersistenceManager = null;
+        configurationTemplateManager = null;
         super.tearDown();
     }
 }

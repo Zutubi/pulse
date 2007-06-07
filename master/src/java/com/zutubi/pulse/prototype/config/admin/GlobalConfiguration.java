@@ -1,6 +1,6 @@
 package com.zutubi.pulse.prototype.config.admin;
 
-import com.zutubi.prototype.config.ConfigurationPersistenceManager;
+import com.zutubi.prototype.config.ConfigurationTemplateManager;
 import com.zutubi.prototype.type.record.PathUtils;
 import com.zutubi.pulse.core.config.AbstractConfiguration;
 import com.zutubi.pulse.core.config.Configuration;
@@ -19,7 +19,7 @@ public class GlobalConfiguration extends AbstractConfiguration
     private JabberConfiguration jabberConfig = new JabberConfiguration();
     private LicenseConfiguration licenseConfig = new LicenseConfiguration();
 
-    private ConfigurationPersistenceManager configurationPersistenceManager;
+    private ConfigurationTemplateManager configurationTemplateManager;
 
     public GeneralAdminConfiguration getGeneralConfig()
     {
@@ -81,13 +81,13 @@ public class GlobalConfiguration extends AbstractConfiguration
         this.licenseConfig = licenseConfig;
     }
 
-    public void setConfigurationPersistenceManager(ConfigurationPersistenceManager configurationPersistenceManager)
+    public void setConfigurationTemplateManager(ConfigurationTemplateManager configurationTemplateManager)
     {
-        this.configurationPersistenceManager = configurationPersistenceManager;
+        this.configurationTemplateManager = configurationTemplateManager;
     }
 
     public <T extends Configuration> T lookupExtendedConfig(String name, Class<T> clazz)
     {
-        return configurationPersistenceManager.getInstance(PathUtils.getPath(SCOPE_NAME, name), clazz);
+        return configurationTemplateManager.getInstance(PathUtils.getPath(SCOPE_NAME, name), clazz);
     }
 }

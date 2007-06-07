@@ -103,39 +103,15 @@ public class MutableRecordImpl extends AbstractMutableRecord
 
     public void update(Record record)
     {
-        Map<String, Object> newData = new HashMap<String, Object>();
-
-        // take the existing records but not the existing primitives.
-        for (Map.Entry<String, Object> entry : data.entrySet())
-        {
-            if (entry.getValue() instanceof Record)
-            {
-                newData.put(entry.getKey(), entry.getValue());
-            }
-        }
-
         // take the new primitive data from the record.
         for (String key : record.keySet())
         {
             Object value = record.get(key);
             if(!(value instanceof Record))
             {
-                newData.put(key, value);
+                data.put(key, value);
             }
         }
-
-        data.clear();
-        data.putAll(newData);
-
-        // copy across all of the meta data.
-        Map<String, String> newMetaData = new HashMap<String, String>();
-        for (String key: record.metaKeySet())
-        {
-            newMetaData.put(key, record.getMeta(key));
-        }
-        
-        meta.clear();
-        meta.putAll(newMetaData);
     }
 
     public Set<String> simpleKeySet()

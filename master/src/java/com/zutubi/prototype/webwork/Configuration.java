@@ -3,16 +3,17 @@ package com.zutubi.prototype.webwork;
 import com.opensymphony.util.TextUtils;
 import com.zutubi.prototype.config.ConfigurationPersistenceManager;
 import com.zutubi.prototype.config.ConfigurationRegistry;
+import com.zutubi.prototype.config.ConfigurationTemplateManager;
 import com.zutubi.prototype.type.*;
 import com.zutubi.prototype.type.record.PathUtils;
 import com.zutubi.prototype.type.record.Record;
 import com.zutubi.pulse.bootstrap.ComponentContext;
 
-import java.util.LinkedList;
-import java.util.List;
+import java.text.Collator;
 import java.util.Collections;
 import java.util.Comparator;
-import java.text.Collator;
+import java.util.LinkedList;
+import java.util.List;
 
 /**
  *
@@ -21,6 +22,7 @@ import java.text.Collator;
 public class Configuration
 {
     private ConfigurationPersistenceManager configurationPersistenceManager;
+    private ConfigurationTemplateManager configurationTemplateManager;
 
     private ConfigurationRegistry configurationRegistry;
 
@@ -70,7 +72,7 @@ public class Configuration
 
         if (configurationPersistenceManager.isPersistent(path))
         {
-            record = configurationPersistenceManager.getRecord(path);
+            record = configurationTemplateManager.getRecord(path);
         }
 
         parentPath = PathUtils.getParentPath(path);
@@ -200,5 +202,10 @@ public class Configuration
     public void setConfigurationRegistry(ConfigurationRegistry configurationRegistry)
     {
         this.configurationRegistry = configurationRegistry;
+    }
+
+    public void setConfigurationTemplateManager(ConfigurationTemplateManager configurationTemplateManager)
+    {
+        this.configurationTemplateManager = configurationTemplateManager;
     }
 }

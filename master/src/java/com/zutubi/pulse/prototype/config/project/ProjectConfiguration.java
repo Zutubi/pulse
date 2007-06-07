@@ -4,7 +4,6 @@ import com.zutubi.config.annotations.*;
 import com.zutubi.prototype.type.Extendable;
 import com.zutubi.pulse.core.config.AbstractNamedConfiguration;
 import com.zutubi.pulse.core.config.ResourceProperty;
-import com.zutubi.pulse.model.NamedEntity;
 import com.zutubi.pulse.model.ResourceRequirement;
 import com.zutubi.pulse.prototype.config.project.actions.PostBuildActionConfiguration;
 import com.zutubi.pulse.prototype.config.project.changeviewer.ChangeViewerConfiguration;
@@ -22,7 +21,7 @@ import java.util.Map;
  */
 @Form(fieldOrder = {"name", "url", "description"})
 @Table(columns = {"name"})
-public class ProjectConfiguration extends AbstractNamedConfiguration implements Extendable, NamedEntity
+public class ProjectConfiguration extends AbstractNamedConfiguration implements Extendable
 {
     @Internal
     private long projectId;
@@ -63,12 +62,6 @@ public class ProjectConfiguration extends AbstractNamedConfiguration implements 
     }
 
     public long getProjectId()
-    {
-        return projectId;
-    }
-
-    @Internal
-    public long getId()
     {
         return projectId;
     }

@@ -8,7 +8,7 @@ public class MockRecordSerialiser implements RecordSerialiser
     {
     }
 
-    public MutableRecord deserialise(String path) throws RecordSerialiseException
+    public MutableRecord deserialise(String path, RecordHandler handler) throws RecordSerialiseException
     {
         return new MutableRecordImpl();
     }

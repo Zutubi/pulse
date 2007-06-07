@@ -1,7 +1,12 @@
 package com.zutubi.prototype.type;
 
-import com.zutubi.prototype.config.ConfigurationPersistenceManager;
+import com.zutubi.config.annotations.ID;
+import com.zutubi.prototype.config.ConfigurationReferenceManager;
 import com.zutubi.pulse.core.config.Configuration;
+import com.zutubi.util.AnnotationUtils;
+import com.zutubi.util.logging.Logger;
+
+import java.beans.IntrospectionException;
 
 /**
  * A type that represents a reference to some composite type.  The reference
@@ -10,14 +15,31 @@ import com.zutubi.pulse.core.config.Configuration;
  */
 public class ReferenceType extends SimpleType implements Type
 {
-    private CompositeType referencedType;
-    private ConfigurationPersistenceManager configurationPersistenceManager;
+    private static final Logger LOG = Logger.getLogger(ReferenceType.class);
 
-    public ReferenceType(CompositeType referencedType, ConfigurationPersistenceManager configurationPersistenceManager)
+    private CompositeType referencedType;
+    private ConfigurationReferenceManager configurationReferenceManager;
+    private String idProperty;
+
+    public ReferenceType(CompositeType referencedType, ConfigurationReferenceManager configurationReferenceManager) throws TypeException
     {
         super(referencedType.getClazz());
         this.referencedType = referencedType;
-        this.configurationPersistenceManager = configurationPersistenceManager;
+        this.configurationReferenceManager = configurationReferenceManager;
+
+        try
+        {
+            idProperty = AnnotationUtils.getPropertyAnnotatedWith(referencedType.getClazz(), ID.class);
+        }
+        catch (IntrospectionException e)
+        {
+            LOG.severe(e);
+        }
+
+        if(idProperty == null)
+        {
+            throw new TypeException("Referenced types must have an ID property");
+        }
     }
 
     public CompositeType getReferencedType()
@@ -25,22 +47,35 @@ public class ReferenceType extends SimpleType implements Type
         return referencedType;
     }
 
+    public String getIdProperty()
+    {
+        return idProperty;
+    }
+
     public Object instantiate(String path, Object data) throws TypeException
     {
-        String referencePath = (String) data;
-        if(referencePath.length() > 0)
+        String referenceHandle = (String) data;
+        try
         {
-            return configurationPersistenceManager.resolveReference(path, referencePath);
+            long handle = Long.parseLong(referenceHandle);
+            if(handle > 0)
+            {
+                return configurationReferenceManager.resolveReference(path, handle);
+            }
+            else
+            {
+                // Zero handle == null reference.
+                return null;
+            }
         }
-        else
+        catch (NumberFormatException e)
         {
-            // Empty string == null reference.
-            return null;
+            throw new TypeException("Illegal reference '" + referenceHandle + "'");
         }
     }
 
     public Object unstantiate(Object instance) throws TypeException
     {
-        return ((Configuration)instance).getConfigurationPath();
+        return instance == null ? 0 : Long.toString(((Configuration)instance).getHandle());
     }
 }

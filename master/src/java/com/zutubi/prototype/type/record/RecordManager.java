@@ -1,7 +1,6 @@
 package com.zutubi.prototype.type.record;
 
-import com.zutubi.util.logging.Logger;
-
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -16,89 +15,50 @@ import java.util.Map;
  */
 public class RecordManager
 {
-    private static final Logger LOG = Logger.getLogger(RecordManager.class);
-
-    private static final String NEXT_HANDLE_KEY = "nextHandle";
     private static final long UNDEFINED = 0;
-    private static final long DEFAULT_HANDLE_BLOCK_SIZE = 1024;
 
     /**
      * The base record is the 'anchor' point for all of the records held in memory. All searches for
      * records start from here.
      */
     private MutableRecord baseRecord;
+    private Map<Long, String> handleToPathMap = new HashMap<Long, String>();
     private long nextHandle = UNDEFINED;
-    private long handleBlockSize = DEFAULT_HANDLE_BLOCK_SIZE;
     private RecordSerialiser recordSerialiser;
 
     public void init()
     {
-        baseRecord = recordSerialiser.deserialise("");
-        String handleString = baseRecord.getMeta(NEXT_HANDLE_KEY);
-        if(handleString != null)
+        final long[] highest = { 0L };
+        baseRecord = recordSerialiser.deserialise("", new RecordHandler()
         {
-            try
+            public void handle(String path, Record record)
             {
-                nextHandle = Long.parseLong(handleString);
-                if(nextHandle % handleBlockSize != 0)
+                long handle = record.getHandle();
+                if(handle > highest[0])
                 {
-                    moveNextHandleToBoundary();
+                    highest[0] = handle;
                 }
+
+                handleToPathMap.put(handle, path);
             }
-            catch (NumberFormatException e)
-            {
-                LOG.warning("Illegal next handle value '" + handleString + "'");
-                // Dealt with below.
-            }
-        }
+        });
 
-        if(nextHandle == UNDEFINED)
-        {
-            initialiseNextHandle();
-        }
-    }
-
-    private void initialiseNextHandle()
-    {
-        nextHandle = getHighestHandle(baseRecord, "") + 1;
-        moveNextHandleToBoundary();
-    }
-
-    private void moveNextHandleToBoundary()
-    {
-        long handle = ((nextHandle / handleBlockSize) + 1) * handleBlockSize;
-        baseRecord.putMeta(NEXT_HANDLE_KEY, Long.toString(handle));
-        recordSerialiser.serialise("", baseRecord, false);
-    }
-
-    private long getHighestHandle(Record record, String path)
-    {
-        long highest = record.getHandle();
-        for(String key: record.keySet())
-        {
-            Object value = record.get(key);
-            if(value instanceof Record)
-            {
-                long childHandle = getHighestHandle((Record)value, PathUtils.getPath(path, key));
-                if(childHandle > highest)
-                {
-                    highest = childHandle;
-                }
-            }
-        }
-
-        return highest;
+        nextHandle = highest[0] + 1;
     }
 
     long allocateHandle()
     {
-        if(nextHandle % handleBlockSize == 0)
-        {
-            baseRecord.putMeta(NEXT_HANDLE_KEY, Long.toString(nextHandle + handleBlockSize));
-            recordSerialiser.serialise("", baseRecord, false);
-        }
-
         return nextHandle++;
+    }
+
+    /**
+     * @param handle handle to look up
+     * @return the path for the record with the given handle, or null if no
+     *         record has that handle
+     */
+    public String getPathForHandle(long handle)
+    {
+        return handleToPathMap.get(handle);
     }
 
     /**
@@ -223,6 +183,7 @@ public class RecordManager
         // Save first before hooking up in memory
         recordSerialiser.serialise(path, record, true);
         parent.put(pathElements[pathElements.length - 1], record);
+        handleToPathMap.put(record.getHandle(), path);
         return record;
     }
 
@@ -336,6 +297,7 @@ public class RecordManager
         if(value != null && value instanceof Record)
         {
             Record result = (Record) parentRecord.remove(baseName);
+            handleToPathMap.remove(result.getHandle());
             recordSerialiser.delete(path);
             return result;
         }
@@ -381,11 +343,6 @@ public class RecordManager
             record = store(destinationPath, (MutableRecord) record);
         }
         return record;
-    }
-
-    public void setHandleBlockSize(long handleBlockSize)
-    {
-        this.handleBlockSize = handleBlockSize;
     }
 
     public void setRecordSerialiser(RecordSerialiser recordSerialiser)

@@ -1,6 +1,6 @@
 package com.zutubi.prototype.config.events;
 
-import com.zutubi.prototype.config.ConfigurationPersistenceManager;
+import com.zutubi.prototype.config.ConfigurationTemplateManager;
 
 /**
  */
@@ -10,7 +10,7 @@ public class PostSaveEvent extends ConfigurationEvent
     private String newPath;
     private Object newInstance;
 
-    public PostSaveEvent(ConfigurationPersistenceManager source, String path, Object oldInstance, String newPath, Object newInstance)
+    public PostSaveEvent(ConfigurationTemplateManager source, String path, Object oldInstance, String newPath, Object newInstance)
     {
         super(source, path);
         this.oldInstance = oldInstance;

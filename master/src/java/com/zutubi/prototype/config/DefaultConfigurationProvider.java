@@ -4,12 +4,7 @@ import com.zutubi.prototype.config.events.ConfigurationEvent;
 import com.zutubi.prototype.type.CompositeType;
 import com.zutubi.prototype.type.TypeRegistry;
 import com.zutubi.pulse.core.config.Configuration;
-import com.zutubi.pulse.events.AsynchronousDelegatingListener;
-import com.zutubi.pulse.events.Event;
-import com.zutubi.pulse.events.EventListener;
-import com.zutubi.pulse.events.EventManager;
-import com.zutubi.pulse.events.FilteringListener;
-import com.zutubi.pulse.events.MultiplexingListener;
+import com.zutubi.pulse.events.*;
 import com.zutubi.util.Predicate;
 
 import java.util.Collection;
@@ -22,11 +17,12 @@ import java.util.List;
  */
 public class DefaultConfigurationProvider implements ConfigurationProvider
 {
+    private TypeRegistry typeRegistry;
     private ConfigurationPersistenceManager configurationPersistenceManager;
+    private ConfigurationTemplateManager configurationTemplateManager;
     private EventManager eventManager;
     private MultiplexingListener syncMux;
     private MultiplexingListener asyncMux;
-    private TypeRegistry typeRegistry;
 
     public void init()
     {
@@ -40,7 +36,7 @@ public class DefaultConfigurationProvider implements ConfigurationProvider
 
     public <T> T get(String path, Class<T> clazz)
     {
-        return configurationPersistenceManager.getInstance(path, clazz);
+        return configurationTemplateManager.getInstance(path, clazz);
     }
 
     public <T> T get(Class<T> clazz)
@@ -56,33 +52,33 @@ public class DefaultConfigurationProvider implements ConfigurationProvider
 
     public <T> Collection<T> getAll(String path, Class<T> clazz)
     {
-        return configurationPersistenceManager.getAllInstances(path, clazz);
+        return configurationTemplateManager.getAllInstances(path, clazz);
     }
 
     public <T> Collection<T> getAll(Class<T> clazz)
     {
-        return configurationPersistenceManager.getAllInstances(clazz);
+        return configurationTemplateManager.getAllInstances(clazz);
     }
 
     @SuppressWarnings({"unchecked"})
     public <T> T getAncestorOfType(Configuration c, Class<T> clazz)
     {
-        return configurationPersistenceManager.getAncestorOfType(c, clazz);
+        return configurationTemplateManager.getAncestorOfType(c, clazz);
     }
 
     public String insert(String parentPath, Object instance)
     {
-        return configurationPersistenceManager.insert(parentPath, instance);
+        return configurationTemplateManager.insert(parentPath, instance);
     }
 
     public void save(String parentPath, String baseName, Object instance)
     {
-        configurationPersistenceManager.save(parentPath, baseName, instance);
+        configurationTemplateManager.save(parentPath, baseName, instance);
     }
 
     public void delete(String path)
     {
-        configurationPersistenceManager.delete(path);
+        configurationTemplateManager.delete(path);
     }
 
     public void registerEventListener(ConfigurationEventListener listener, boolean synchronous, boolean includeChildPaths, Class clazz)
@@ -140,19 +136,24 @@ public class DefaultConfigurationProvider implements ConfigurationProvider
         });
     }
 
+    public void setTypeRegistry(TypeRegistry typeRegistry)
+    {
+        this.typeRegistry = typeRegistry;
+    }
+
     public void setConfigurationPersistenceManager(ConfigurationPersistenceManager configurationPersistenceManager)
     {
         this.configurationPersistenceManager = configurationPersistenceManager;
     }
 
+    public void setConfigurationTemplateManager(ConfigurationTemplateManager configurationTemplateManager)
+    {
+        this.configurationTemplateManager = configurationTemplateManager;
+    }
+
     public void setEventManager(EventManager eventManager)
     {
         this.eventManager = eventManager;
-    }
-
-    public void setTypeRegistry(TypeRegistry typeRegistry)
-    {
-        this.typeRegistry = typeRegistry;
     }
 
     private static class Listener implements EventListener

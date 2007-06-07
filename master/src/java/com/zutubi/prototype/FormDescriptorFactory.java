@@ -2,7 +2,7 @@ package com.zutubi.prototype;
 
 import com.zutubi.config.annotations.FieldType;
 import com.zutubi.config.annotations.Handler;
-import com.zutubi.prototype.config.ConfigurationPersistenceManager;
+import com.zutubi.prototype.config.ConfigurationTemplateManager;
 import com.zutubi.prototype.handler.AnnotationHandler;
 import com.zutubi.prototype.handler.OptionAnnotationHandler;
 import com.zutubi.prototype.model.*;
@@ -48,10 +48,10 @@ public class FormDescriptorFactory
     }
 
     private Map<String, Class<? extends FieldDescriptor>> fieldDescriptorTypes = new HashMap<String, Class<? extends FieldDescriptor>>();
-    private ConfigurationPersistenceManager configurationPersistenceManager;
+    private ConfigurationTemplateManager configurationTemplateManager;
     private TypeRegistry typeRegistry;
 
-    
+
     public void init()
     {
         // FIXME: incomplete
@@ -206,7 +206,7 @@ public class FormDescriptorFactory
     {
         if(typeProperty.getType().getTargetType() instanceof EnumType)
         {
-            OptionAnnotationHandler.process(configurationPersistenceManager, new EnumOptionProvider(), path, fd);
+            OptionAnnotationHandler.process(configurationTemplateManager, new EnumOptionProvider(), path, fd);
         }
         else
         {
@@ -286,8 +286,8 @@ public class FormDescriptorFactory
         this.objectFactory = objectFactory;
     }
 
-    public void setConfigurationPersistenceManager(ConfigurationPersistenceManager configurationPersistenceManager)
+    public void setConfigurationTemplateManager(ConfigurationTemplateManager configurationTemplateManager)
     {
-        this.configurationPersistenceManager = configurationPersistenceManager;
+        this.configurationTemplateManager = configurationTemplateManager;
     }
 }
