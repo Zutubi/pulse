@@ -1003,6 +1003,7 @@
         </action>
 
         <action name="ls" class="com.zutubi.prototype.webwork.LsAction">
+            <param name="basePath">config</param>
             <result name="success" type="flexjson">listing</result>
             <result name="error" type="json">error.xml</result>
         </action>
@@ -1016,7 +1017,16 @@
             <result name="composite" type="velocity">composite.vm</result>
             <result name="map" type="velocity">map.vm</result>
         </action>
+    </package>
 
+    <package name="templateAjax" namespace="/atemplate" extends="default">
+        <default-interceptor-ref name="ajaxStack"/>
+
+        <action name="ls" class="com.zutubi.prototype.webwork.LsAction">
+            <param name="basePath">templates</param>
+            <result name="success" type="flexjson">listing</result>
+            <result name="error" type="json">error.xml</result>
+        </action>
     </package>
 
     <package name="adminAjax" namespace="/ajax/admin" extends="admin">

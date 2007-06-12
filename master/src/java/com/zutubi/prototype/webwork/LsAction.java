@@ -18,9 +18,20 @@ import java.util.Arrays;
  */
 public class LsAction extends ActionSupport
 {
+    private String basePath;
     private String path;
     private FileSystemManager fileSystemManager;
     private ExtFile[] listing;
+
+    public String getBasePath()
+    {
+        return basePath;
+    }
+
+    public void setBasePath(String basePath)
+    {
+        this.basePath = basePath;
+    }
 
     public String getPath()
     {
@@ -39,12 +50,16 @@ public class LsAction extends ActionSupport
 
     public String execute() throws Exception
     {
-        String fullPath = "pulse:///config";
+        String fullPath = "pulse:///";
+        if(TextUtils.stringSet(basePath))
+        {
+            fullPath += "/" + PathUtils.normalizePath(basePath);
+        }
         if(TextUtils.stringSet(path))
         {
             fullPath += "/" + PathUtils.normalizePath(path);
         }
-        
+
         final FileObject fileObject = fileSystemManager.resolveFile(fullPath);
 
         // can only list a file object if

@@ -5,6 +5,7 @@
     <excludes>
         <pattern>/aconfig/*</pattern>
         <pattern>/ajax/*</pattern>
+        <pattern>/atemplate/*</pattern>
         <pattern>/personal/*</pattern>
         <pattern>/popups/*</pattern>
         <pattern>/view/*</pattern>

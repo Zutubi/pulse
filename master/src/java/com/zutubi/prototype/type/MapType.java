@@ -120,6 +120,11 @@ public class MapType extends CollectionType
         }
     }
 
+    public String getKeyProperty()
+    {
+        return keyProperty;
+    }
+
     protected String getItemKey(String path, Record collectionRecord, Record itemRecord, RecordManager recordManager)
     {
         return (String) itemRecord.get(keyProperty);

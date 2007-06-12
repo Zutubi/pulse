@@ -12,10 +12,7 @@ import com.zutubi.validation.ValidationException;
 import com.zutubi.validation.ValidationManager;
 import com.zutubi.validation.i18n.MessagesTextProvider;
 
-import java.util.Collection;
-import java.util.Collections;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 
 /**
  */
@@ -23,8 +20,12 @@ public class ConfigurationTemplateManager
 {
     private static final Logger LOG = Logger.getLogger(ConfigurationTemplateManager.class);
 
-    private InstanceCache instances = new InstanceCache();
+    private static final String PARENT_KEY = "parentHandle";
+    private static final String TEMPLATE_KEY = "template";
 
+    private InstanceCache instances = new InstanceCache();
+    private Map<String, TemplateHierarchy> templateHierarchies = new HashMap<String, TemplateHierarchy>();
+    
     private TypeRegistry typeRegistry;
     private RecordManager recordManager;
     private ConfigurationPersistenceManager configurationPersistenceManager;
@@ -34,7 +35,7 @@ public class ConfigurationTemplateManager
 
     public void init()
     {
-        refreshInstances();
+        refreshCaches();
     }
 
     private void checkPersistent(String path)
@@ -57,6 +58,56 @@ public class ConfigurationTemplateManager
         return templatiseRecord(path, record);
     }
 
+    /**
+     * Returns the parent handle for the given record in the template
+     * hierarchy or 0 if it does not exist or is not valid.
+     *
+     * @param path   path of the record
+     * @param record record to get parent handle for
+     * @return parent handle, or 0 if there is no valid parent
+     */
+    private long getTemplateParentHandle(String path, Record record)
+    {
+        String parentString = record.getMeta(PARENT_KEY);
+        if (parentString != null)
+        {
+            try
+            {
+                return Long.parseLong(parentString);
+            }
+            catch (NumberFormatException e)
+            {
+                LOG.severe("Record at path '" + path + "' has illegal parent handle value '" + parentString + "'");
+            }
+        }
+
+        return 0;
+    }
+
+    /**
+     * Returns the path of the parent record in the template hierarchy, or
+     * null if no such parent exists.
+     *
+     * @param path   path of the record
+     * @param record record to get the parent of
+     * @return the parent records path or null is there is no valid parent
+     */
+    private String getTemplateParentPath(String path, Record record)
+    {
+        String result = null;
+        long handle = getTemplateParentHandle(path, record);
+        if(handle != 0)
+        {
+            result = recordManager.getPathForHandle(handle);
+            if(result == null)
+            {
+                LOG.severe("Record at path '" + path + "' has reference to unknown parent '" + handle + "'");
+            }
+        }
+
+        return result;
+    }
+    
     private Record templatiseRecord(String path, Record record)
     {
         // We need to understand the root level can be templated.
@@ -66,20 +117,30 @@ public class ConfigurationTemplateManager
             ConfigurationScopeInfo scopeInfo = configurationPersistenceManager.getScopeInfo(pathElements[0]);
             if (scopeInfo.isTemplated())
             {
-                // Need to load a chain of templates.
-                // FIXME this does not appear to handle the case where the
-                // FIXME parent has no configuration but the grandparent does
-                String owner = pathElements[1];
-                Record owningRecord = recordManager.load(PathUtils.getPath(pathElements[0], pathElements[1]));
-                String parent = owningRecord.getMeta("parent");
-                TemplateRecord parentRecord = null;
-                if (parent != null)
+                // Get the top-level template record for our parent and then
+                // ask it for the property to get our parent template record.
+                String owningPath = PathUtils.getPath(pathElements[0], pathElements[1]);
+                Record owningRecord = recordManager.load(owningPath);
+                TemplateRecord parentTemplateRecord = null;
+                String parentOwningPath = getTemplateParentPath(owningPath, owningRecord);
+                if (parentOwningPath != null)
                 {
-                    pathElements[1] = parent;
-                    parentRecord = (TemplateRecord) getRecord(PathUtils.getPath(pathElements));
+                    parentTemplateRecord = (TemplateRecord) getRecord(parentOwningPath);
                 }
 
-                return new TemplateRecord(owner, parentRecord, record);
+                for (int i = 2; i < pathElements.length && parentTemplateRecord != null; i++)
+                {
+                    Object value = parentTemplateRecord.get(pathElements[i]);
+                    if (value != null && !(value instanceof TemplateRecord))
+                    {
+                        LOG.severe("Templatising record at path '" + path + "', traverse of element '" + pathElements[1] + "' gave property of unexpected type '" + value.getClass() + "'");
+                        parentTemplateRecord = null;
+                        break;
+                    }
+                    parentTemplateRecord = (TemplateRecord) value;
+                }
+
+                record = new TemplateRecord(pathElements[1], parentTemplateRecord, record);
             }
         }
 
@@ -96,7 +157,7 @@ public class ConfigurationTemplateManager
 
         try
         {
-            Record record = type.unstantiate(instance);
+            MutableRecord record = type.unstantiate(instance);
             return insertRecord(parentPath, record);
         }
         catch (TypeException e)
@@ -105,26 +166,31 @@ public class ConfigurationTemplateManager
         }
     }
 
-    public String insertRecord(final String path, Record record)
+    public String insertRecord(final String path, MutableRecord record)
     {
         checkPersistent(path);
 
         ComplexType type = configurationPersistenceManager.getType(path, ComplexType.class);
-
-        eventManager.publish(new PreInsertEvent(this, path, (MutableRecord) record));
+        eventManager.publish(new PreInsertEvent(this, path, record));
 
         final String result = type.insert(path, record, recordManager);
-        refreshInstances();
+        refreshCaches();
 
         eventManager.publish(new PostInsertEvent(this, path, result, instances.get(result)));
 
         return result;
     }
 
+    private void refreshCaches()
+    {
+        configurationReferenceManager.clear();
+        refreshInstances();
+        refreshTemplateHierarchies();
+    }
+
     private void refreshInstances()
     {
         instances.clear();
-        configurationReferenceManager.clear();
 
         for (ConfigurationScopeInfo scope : configurationPersistenceManager.getScopes())
         {
@@ -141,6 +207,68 @@ public class ConfigurationTemplateManager
                 LOG.severe("Unable to instantiate '" + path + "': " + e.getMessage(), e);
             }
         }
+    }
+
+    private void refreshTemplateHierarchies()
+    {
+        templateHierarchies.clear();
+        for(ConfigurationScopeInfo scope: configurationPersistenceManager.getScopes())
+        {
+            if(scope.isTemplated())
+            {
+                MapType type = (MapType) scope.getType();
+                String idProperty = type.getKeyProperty();
+                Map<String, Record> recordsByPath = new HashMap<String, Record>();
+                recordManager.loadAll(PathUtils.getPath(scope.getScopeName(), PathUtils.WILDCARD_ANY_ELEMENT), recordsByPath);
+
+                Map<Long, List<Record>> recordsByParent = new HashMap<Long, List<Record>>();
+                for(Map.Entry<String, Record> entry: recordsByPath.entrySet())
+                {
+                    long parentHandle = getTemplateParentHandle(entry.getKey(), entry.getValue());
+                    List<Record> records = recordsByParent.get(parentHandle);
+                    if(records == null)
+                    {
+                        records = new LinkedList<Record>();
+                        recordsByParent.put(parentHandle, records);
+                    }
+
+                    records.add(entry.getValue());
+                }
+
+                TemplateNode root = null;
+                List<Record> rootRecords = recordsByParent.get(0L);
+                if(rootRecords != null)
+                {
+                    if(rootRecords.size() != 1)
+                    {
+                        LOG.severe("Found multiple root records for scope '" + scope.getScopeName() + "': choosing an arbitrary one");
+                    }
+
+                    Record record = rootRecords.get(0);
+                    root = createTemplateNode(record, scope.getScopeName(), idProperty, recordsByParent);
+                }
+
+                templateHierarchies.put(scope.getScopeName(), new TemplateHierarchy(scope.getScopeName(), root));
+            }
+        }
+    }
+
+    private TemplateNode createTemplateNode(Record record, String scopeName, String idProperty, Map<Long, List<Record>> recordsByParent)
+    {
+        String id = (String) record.get(idProperty);
+        String path = PathUtils.getPath(scopeName, id);
+        TemplateNode node = new TemplateNode(null, path, id);
+
+        List<Record> children = recordsByParent.get(record.getHandle());
+        if(children != null)
+        {
+            for(Record child: children)
+            {
+                node.addChild(createTemplateNode(child, scopeName, idProperty, recordsByParent));
+            }
+        }
+
+        return node;
     }
 
     public Object validate(String parentPath, String baseName, Record subject, ValidationAware validationCallback)
@@ -233,7 +361,7 @@ public class ConfigurationTemplateManager
         eventManager.publish(new PreSaveEvent(this, path, oldInstance));
 
         final String newPath = parentType.save(parentPath, baseName, record, recordManager);
-        refreshInstances();
+        refreshCaches();
 
         eventManager.publish(new PostSaveEvent(this, path, oldInstance, newPath, instances.get(newPath)));
 
@@ -248,7 +376,7 @@ public class ConfigurationTemplateManager
         eventManager.publish(new PreDeleteEvent(this, path, oldInstance));
 
         configurationReferenceManager.getCleanupTasks(path).execute();
-        refreshInstances();
+        refreshCaches();
 
         eventManager.publish(new PostDeleteEvent(this, path, oldInstance));
     }
@@ -340,6 +468,37 @@ public class ConfigurationTemplateManager
         }
 
         return null;
+    }
+
+    public void markAsTemplate(MutableRecord record)
+    {
+        record.putMeta(TEMPLATE_KEY, "true");
+    }
+
+    public void setParentTemplate(MutableRecord record, long parentHandle)
+    {
+        record.putMeta(PARENT_KEY, Long.toString(parentHandle));
+    }
+
+    public Set<String> getTemplateScopes()
+    {
+        return templateHierarchies.keySet();
+    }
+
+    public TemplateHierarchy getTemplateHeirarchy(String scope)
+    {
+        ConfigurationScopeInfo scopeInfo = configurationPersistenceManager.getScopeInfo(scope);
+        if(scopeInfo == null)
+        {
+            throw new IllegalArgumentException("Request for template hierarchy for non-existant scope '" + scope + "'");
+        }
+
+        if(!scopeInfo.isTemplated())
+        {
+            throw new IllegalArgumentException("Request for template hierarchy for non-templated scope '" + scope + "'");
+        }
+
+        return templateHierarchies.get(scope);
     }
 
     public void setTypeRegistry(TypeRegistry typeRegistry)

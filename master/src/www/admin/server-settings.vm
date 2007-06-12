@@ -12,7 +12,7 @@
         {
             if(node)
             {
-                Ext.get('detail-pane').load({url: '$base/aconfig' + tree.loader.getNodePath(node), scripts:true});
+                Ext.get('detail-pane').load({url: tree.loader.getNodePath(node), scripts:true});
             }
         }
 
@@ -101,8 +101,8 @@
                         autoScroll: true
                     });
 
-                    var loader = new ZUTUBI.ConfigTreeLoader('$base');
-                    loader.on('loadexception', function(loader, node, response) {  console.dir(response); });
+                    var loader = new ZUTUBI.ConfigTreeLoader('$base/aconfig');
+                    //loader.on('loadexception', function(loader, node, response) {  console.dir(response); });
 
                     tree = new ZUTUBI.ConfigTree('config-tree', {
                         animate: false,

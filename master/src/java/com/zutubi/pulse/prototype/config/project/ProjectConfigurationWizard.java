@@ -4,10 +4,10 @@ import com.zutubi.prototype.type.CompositeType;
 import com.zutubi.prototype.type.Type;
 import com.zutubi.prototype.type.record.MutableRecord;
 import com.zutubi.prototype.type.record.MutableRecordImpl;
+import com.zutubi.prototype.type.record.Record;
 import com.zutubi.prototype.type.record.TemplateRecord;
 import com.zutubi.prototype.wizard.TypeWizardState;
 import com.zutubi.prototype.wizard.webwork.AbstractTypeWizard;
-import com.zutubi.util.logging.Logger;
 
 import java.util.LinkedList;
 
@@ -17,8 +17,6 @@ import java.util.LinkedList;
  */
 public class ProjectConfigurationWizard extends AbstractTypeWizard
 {
-    private static final Logger LOG = Logger.getLogger(ProjectConfigurationWizard.class);
-
     private static final TemplateRecord EMPTY_RECORD = new TemplateRecord("empty", null, new MutableRecordImpl());
 
     private CompositeType projectType;
@@ -47,6 +45,10 @@ public class ProjectConfigurationWizard extends AbstractTypeWizard
         record.put("scm", wizardStates.get(2).getRecord());
         record.put("type", wizardStates.get(4).getRecord());
 
+        // FIXME: temporary setting of parent
+        String globalPath = configurationTemplateManager.getTemplateHeirarchy("project").getRoot().getPath();
+        Record globalRecord = configurationTemplateManager.getRecord(globalPath);
+        configurationTemplateManager.setParentTemplate(record, globalRecord.getHandle());
         successPath = configurationTemplateManager.insertRecord("project", record);
     }
 

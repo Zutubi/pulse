@@ -2,6 +2,9 @@ package com.zutubi.pulse.model;
 
 import com.zutubi.prototype.config.CollectionListener;
 import com.zutubi.prototype.config.ConfigurationProvider;
+import com.zutubi.prototype.config.ConfigurationTemplateManager;
+import com.zutubi.prototype.type.CompositeType;
+import com.zutubi.prototype.type.TypeRegistry;
 import com.zutubi.prototype.type.record.MutableRecord;
 import com.zutubi.pulse.bootstrap.ComponentContext;
 import com.zutubi.pulse.cache.ehcache.CustomAclEntryCache;
@@ -55,6 +58,8 @@ public class DefaultProjectManager implements ProjectManager
     private CustomAclEntryCache projectAclEntryCache;
 
     private ConfigurationProvider configurationProvider;
+    private TypeRegistry typeRegistry;
+    private ConfigurationTemplateManager configurationTemplateManager;
 
     private Map<String, ProjectConfiguration> nameToConfig = new HashMap<String, ProjectConfiguration>();
     private Map<Long, ProjectConfiguration> idToConfig = new HashMap<Long, ProjectConfiguration>();
@@ -110,16 +115,15 @@ public class DefaultProjectManager implements ProjectManager
 
     private void ensureDefaultProjectDefined()
     {
-        if (configurationProvider.getAll(ProjectConfiguration.class).size() > 0)
+        if (configurationProvider.getAll(ProjectConfiguration.class).size() == 0)
         {
-            return;
+            CompositeType projectType = typeRegistry.getType(ProjectConfiguration.class);
+            MutableRecord globalTemplate = projectType.createNewRecord();
+            globalTemplate.put("name", "global project template");
+            globalTemplate.put("description", "The global template is the base of the project template heirarchy.  Configuration shared among all projects should be added here.");
+            configurationTemplateManager.markAsTemplate(globalTemplate);
+            configurationTemplateManager.insertRecord("project", globalTemplate);
         }
-
-/*
-        ProjectConfiguration defaultConfig = new ProjectConfiguration();
-        defaultConfig.setName("default project template");
-        configurationProvider.insert("project", defaultConfig);
-*/
     }
 
     @SuppressWarnings({"unchecked"})
@@ -259,7 +263,7 @@ public class DefaultProjectManager implements ProjectManager
                     List<Revision> revisions = changelistIsolator.getRevisionsToRequest(projectConfig, project, force);
                     for(Revision r: revisions)
                     {
-                        requestBuildOfRevision(reason, projectConfig, project, r);
+                        requestBuildOfRevision(reason, projectConfig, r);
                     }
                 }
                 catch (ScmException e)
@@ -275,7 +279,7 @@ public class DefaultProjectManager implements ProjectManager
         else
         {
             // Just raise one request.
-            requestBuildOfRevision(reason, projectConfig, project, revision);
+            requestBuildOfRevision(reason, projectConfig, revision);
         }
     }
 
@@ -308,7 +312,7 @@ public class DefaultProjectManager implements ProjectManager
         return number;
     }
 
-    private void requestBuildOfRevision(BuildReason reason, ProjectConfiguration projectConfig, Project project, Revision revision)
+    private void requestBuildOfRevision(BuildReason reason, ProjectConfiguration projectConfig, Revision revision)
     {
         try
         {
@@ -639,5 +643,15 @@ public class DefaultProjectManager implements ProjectManager
     public void setConfigurationProvider(ConfigurationProvider configurationProvider)
     {
         this.configurationProvider = configurationProvider;
+    }
+
+    public void setConfigurationTemplateManager(ConfigurationTemplateManager configurationTemplateManager)
+    {
+        this.configurationTemplateManager = configurationTemplateManager;
+    }
+
+    public void setTypeRegistry(TypeRegistry typeRegistry)
+    {
+        this.typeRegistry = typeRegistry;
     }
 }

@@ -8,7 +8,7 @@ ZUTUBI.widget = ZUTUBI.widget || {};
 ZUTUBI.ConfigTreeLoader = function(base)
 {
     ZUTUBI.ConfigTreeLoader.superclass.constructor.call(this, {
-        dataUrl: base + '/aconfig',
+        dataUrl: base,
         requestMethod: 'get'
     });
 };
@@ -22,7 +22,7 @@ Ext.extend(ZUTUBI.ConfigTreeLoader, Ext.tree.TreeLoader, {
             path = '/';
         }
 
-        return path;
+        return this.dataUrl + path;
     },
 
     requestData : function(node, callback)
@@ -37,7 +37,7 @@ Ext.extend(ZUTUBI.ConfigTreeLoader, Ext.tree.TreeLoader, {
                 argument: {callback: callback, node: node}
             };
 
-            this.transId = Ext.lib.Ajax.request(this.requestMethod, this.dataUrl + this.getNodePath(node) + '?ls', cb, params);
+            this.transId = Ext.lib.Ajax.request(this.requestMethod, this.getNodePath(node) + '?ls', cb, params);
         }
         else
         {

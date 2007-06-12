@@ -226,7 +226,7 @@ public class CompositeType extends AbstractType implements ComplexType
         return exception;
     }
 
-    public Record unstantiate(Object instance) throws TypeException
+    public MutableRecord unstantiate(Object instance) throws TypeException
     {
         MutableRecord result;
 

@@ -4,35 +4,190 @@
 <html>
 <head>
     <title>#wwtext("name=administration")</title>
+    <script type="text/javascript" src="$base/js/zutubi.js"></script>
 	<script type="text/javascript">
-        Layout = function(){
-                var layout;
-                return {
-                    init : function(){
-                        nestedLayout.addRegion('north', {
-                            split: false,
-                            titlebar: false
-                        });
+        // ------------------------------------------------------------------
+	    // Shared tree functions
+        // ------------------------------------------------------------------
 
-                        nestedLayout.addRegion('west', {
-                            split:true,
-                            initialSize: 200,
-                            minSize: 175,
-                            maxSize: 400,
-                            titlebar: true,
-                            collapsible: true,
-                            animate: true,
-                            tabPosition: 'top'
-                        });
+        var handleConfigurationResponse = function(result, tree)
+        {
+            if(result.success)
+            {
+                if(result.newPanel)
+                {
+                    Ext.get('detail-pane').update(result.newPanel, true);
+                }
+                else
+                {
+                    tree.invalidatePaths(result.invalidatedPaths, function()
+                    {
+                        if(result.newPath)
+                        {
+                            selectPath(result.newPath);
+                        }
+                    });
+                }
+            }
+        }
 
-                        nestedLayout.beginUpdate();
-                        nestedLayout.add('north', new Ext.ContentPanel('innernorth', {title: 'Inner North'}));
-                        nestedLayout.add('west', new Ext.ContentPanel('project-tree', {title: 'Projects'}));
-                        nestedLayout.add('west', new Ext.ContentPanel('config-tree', {title: 'Configuration'}));
-                        nestedLayout.endUpdate();
-                   }
-             }
+        var getAjaxCallback = function(maskedElement, tree)
+        {
+            return {
+                success: function(response) { handleConfigurationResponse(Ext.decode(response.responseText), tree); if(maskedElement) { maskedElement.unmask() } },
+                failure: function(response) { if(maskedElement) { maskedElement.unmask() } }
+            }
+        }
+
+        var runAjaxRequest = function(url, tree)
+        {
+            var pane = Ext.get('detail-pane');
+            pane.mask('Please wait...');
+            Ext.lib.Ajax.request('get', url, getAjaxCallback(pane, tree));
+        }
+
+        // ------------------------------------------------------------------
+        // Config tree
+        // ------------------------------------------------------------------
+
+        var configTree;
+
+        var onConfigSelect = function(sm, node)
+        {
+            if(node)
+            {
+                Ext.get('detail-pane').load({url: configTree.loader.getNodePath(node), scripts:true});
+            }
+        }
+
+        var createConfigTree = function(project)
+        {
+            Ext.get('config-tree').update('');
+            
+            var loader = new ZUTUBI.ConfigTreeLoader('$base/aconfig/project/' + project);
+
+            configTree = new ZUTUBI.ConfigTree('config-tree', {
+                animate: false,
+                loader: loader,
+                rootVisible: true,
+                title: 'configuration'
+            });
+
+            var root = new Ext.tree.AsyncTreeNode({
+                id: 'x',
+                text: project,
+                allowDrag: false,
+                allowDrop: false
+            });
+
+            configTree.setRootNode(root);
+            configTree.getSelectionModel().on('selectionchange', onConfigSelect);
+            configTree.render();
+            root.expand();
+        }
+
+        var selectPath = function(path)
+        {
+            configTree.getSelectionModel().clearSelections();
+            configTree.selectPath(configTree.getRootNode().getPath() + '/' + path);
+        }
+
+        var addToPath = function(path)
+        {
+            runAjaxRequest('$base/aconfig/' + path + '?wizard', configTree);
+        }
+
+        var deletePath = function(path)
+        {
+            runAjaxRequest('$base/aconfig/' + path + '?delete=confirm', configTree);
+        }
+
+        // ------------------------------------------------------------------
+        // Template tree
+        // ------------------------------------------------------------------
+
+        var templateTree;
+
+        var onTemplateSelect = function(sm, node)
+        {
+            if(node)
+            {
+                Ext.get('detail-pane').load({url: '$base/aconfig/project/' + node.id, scripts:true});
+                createConfigTree(node.id);
+            }
+        }
+
+        // ------------------------------------------------------------------
+        // Layout
+        // ------------------------------------------------------------------
+
+        var Layout = function()
+        {
+            var centerRegion;
+#if($path)
+            var path = '$path';
+#else
+            var path = '';
+#end
+
+            return {
+                init : function()
+                {
+                    centerRegion = nestedLayout.getRegion('center');
+                    var centerPanel = centerRegion.getPanel(0);
+                    centerPanel.setTitle('');
+                    centerPanel.getEl().setStyle('margin', '0');
+                    centerRegion.titleEl.show();
+
+                    nestedLayout.addRegion('north', {
+                        split: false,
+                        titlebar: false
+                    });
+
+                    nestedLayout.addRegion('west', {
+                        split:true,
+                        initialSize: 300,
+                        titlebar: true,
+                        collapsible: true,
+                        animate: true,
+                        tabPosition: 'top',
+                        autoScroll: true
+                    });
+
+                    var templateLoader = new ZUTUBI.ConfigTreeLoader('$base/atemplate/project');
+
+                    templateTree = new ZUTUBI.ConfigTree('template-tree', {
+                        animate: false,
+                        loader: templateLoader,
+                        rootVisible: false,
+                        title: 'projects'
+                    });
+
+                    var templateRoot = new Ext.tree.AsyncTreeNode({
+                        id: 'x',
+                        text: 'settings',
+                        allowDrag: false,
+                        allowDrop: false
+                    });
+
+                    templateTree.setRootNode(templateRoot);
+                    templateTree.getSelectionModel().on('selectionchange', onTemplateSelect);
+
+                    nestedLayout.beginUpdate();
+                    nestedLayout.add('north', new Ext.ContentPanel('innernorth', {title: 'inner north'}));
+                    nestedLayout.add('west', new Ext.ContentPanel('template-tree', {title: 'Projects'}));
+                    nestedLayout.add('west', new Ext.ContentPanel('config-tree', {title: 'Configuration'}));
+                    nestedLayout.endUpdate();
+
+                    templateTree.render();
+                    templateRoot.expand(false, false, function() {
+                        templateRoot.firstChild.select();
+                        templateRoot.firstChild.expand();
+                    });
+                }
+            }
         }();
+
         Ext.onReady(Layout.init, Layout, true);
 	</script>
 </head>
@@ -44,16 +199,14 @@
     <div id="innernorth" style="padding: 4px; padding-bottom: 12px; border-bottom: 1px solid #ccc">
     </div>
   
-    <div id="project-tree" class="ylayout-inactive-content">
-        A tree of templates/projects.
+    <div id="template-tree" class="ylayout-inactive-content">
     </div>
 
     <div id="config-tree" class="ylayout-inactive-content">
-        The configuration tree for a single project.
     </div>
 
-    <p>
+    <div id="detail-pane">
         This is where the actual content ends up!
-    </p>
+    </div>
 </body>
 </html>
