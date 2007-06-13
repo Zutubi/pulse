@@ -25,9 +25,11 @@ public class EmailContactPoint extends ContactPoint
     private static final String SMTP_HOST_PROPERTY = "mail.smtp.host";
     private static final String SMTP_AUTH_PROPERTY = "mail.smtp.auth";
     private static final String SMTP_PORT_PROPERTY = "mail.smtp.port";
+    private static final String SMTP_LOCALHOST_PROPERTY = "mail.smtp.localhost";
     private static final String SMTPS_HOST_PROPERTY = "mail.smtps.host";
     private static final String SMTPS_AUTH_PROPERTY = "mail.smtps.auth";
     private static final String SMTPS_PORT_PROPERTY = "mail.smtps.port";
+    private static final String SMTPS_LOCALHOST_PROPERTY = "mail.smtps.localhost";
 
     private static final String NO_SMTP_HOST_ERROR = "Unable to deliver email: SMTP host not configured.";
 
@@ -109,6 +111,19 @@ public class EmailContactPoint extends ContactPoint
             else
             {
                 properties.put(SMTP_PORT_PROPERTY, Integer.toString(config.getPort()));
+            }
+        }
+
+        String localhost = config.getLocalhost();
+        if(TextUtils.stringSet(localhost))
+        {
+            if(config.getSsl())
+            {
+                properties.put(SMTPS_LOCALHOST_PROPERTY, localhost);
+            }
+            else
+            {
+                properties.put(SMTP_LOCALHOST_PROPERTY, localhost);
             }
         }
 

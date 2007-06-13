@@ -1,21 +1,17 @@
 package com.zutubi.pulse.prototype.config.admin;
 
-import com.zutubi.config.annotations.ConfigurationCheck;
-import com.zutubi.config.annotations.Form;
-import com.zutubi.config.annotations.Password;
-import com.zutubi.config.annotations.SymbolicName;
-import com.zutubi.config.annotations.ControllingCheckbox;
+import com.zutubi.config.annotations.*;
+import com.zutubi.pulse.core.config.AbstractConfiguration;
 import com.zutubi.validation.annotations.Email;
 import com.zutubi.validation.annotations.Numeric;
 import com.zutubi.validation.annotations.Required;
-import com.zutubi.pulse.core.config.AbstractConfiguration;
 
 /**
  *
  *
  */
 @SymbolicName("emailConfig")
-@Form(fieldOrder = { "host", "ssl", "from", "username", "password", "subjectPrefix", "customPort", "port"})
+@Form(fieldOrder = { "host", "ssl", "from", "username", "password", "subjectPrefix", "customPort", "port", "localhost"})
 @ConfigurationCheck("EmailConfigurationCheckHandler")
 public class EmailConfiguration extends AbstractConfiguration
 {
@@ -28,6 +24,7 @@ public class EmailConfiguration extends AbstractConfiguration
     @Password
     private String password;
     private String subjectPrefix;
+    private String localhost;
 
     @ControllingCheckbox(dependentFields = {"port"})
     private boolean customPort;
@@ -120,5 +117,15 @@ public class EmailConfiguration extends AbstractConfiguration
     public void setPort(int port)
     {
         this.port = port;
+    }
+
+    public String getLocalhost()
+    {
+        return localhost;
+    }
+
+    public void setLocalhost(String localhost)
+    {
+        this.localhost = localhost;
     }
 }
