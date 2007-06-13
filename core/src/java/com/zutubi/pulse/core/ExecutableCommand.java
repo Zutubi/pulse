@@ -5,6 +5,7 @@ import com.zutubi.pulse.core.model.StoredArtifact;
 import com.zutubi.pulse.core.model.StoredFileArtifact;
 import com.zutubi.pulse.jni.ProcessControl;
 import com.zutubi.pulse.util.*;
+import com.zutubi.validation.annotations.Required;
 
 import java.io.*;
 import java.util.*;
@@ -432,6 +433,7 @@ public class ExecutableCommand implements Command, ScopeAware
         return Arrays.asList(OUTPUT_ARTIFACT_NAME);
     }
 
+    @Required
     public String getExe()
     {
         return exe;

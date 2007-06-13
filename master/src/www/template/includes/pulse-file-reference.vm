@@ -119,6 +119,9 @@
                             #refLink("regex-test.pp")
                         </li>
                         <li>
+                            #refLink("unittestpp.pp")
+                        </li>
+                        <li>
                             #refLink("xcodebuild.pp")
                         </li>
                     </ul>
