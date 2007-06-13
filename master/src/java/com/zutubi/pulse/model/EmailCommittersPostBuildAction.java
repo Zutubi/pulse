@@ -1,18 +1,18 @@
 package com.zutubi.pulse.model;
 
-import com.zutubi.pulse.core.model.ResultState;
-import com.zutubi.pulse.core.model.ResourceProperty;
-import com.zutubi.pulse.core.model.Changelist;
-import com.zutubi.pulse.renderer.BuildResultRenderer;
-import com.zutubi.pulse.ResultNotifier;
-import com.zutubi.pulse.util.logging.Logger;
-import com.zutubi.pulse.util.StringUtils;
-import com.zutubi.pulse.bootstrap.MasterConfigurationManager;
-import com.zutubi.pulse.bootstrap.MasterConfiguration;
 import com.opensymphony.util.TextUtils;
+import com.zutubi.pulse.ResultNotifier;
+import com.zutubi.pulse.bootstrap.MasterConfiguration;
+import com.zutubi.pulse.bootstrap.MasterConfigurationManager;
+import com.zutubi.pulse.core.model.Changelist;
+import com.zutubi.pulse.core.model.ResourceProperty;
+import com.zutubi.pulse.core.model.ResultState;
+import com.zutubi.pulse.renderer.BuildResultRenderer;
+import com.zutubi.pulse.util.StringUtils;
+import com.zutubi.pulse.util.logging.Logger;
 
-import java.util.List;
 import java.util.LinkedList;
+import java.util.List;
 
 /**
  * A post build action that sends an email to users that committed changes
@@ -63,7 +63,7 @@ public class EmailCommittersPostBuildAction extends PostBuildAction
                         subject = appConfig.getSmtpPrefix() + " " + subject;
                     }
                     
-                    EmailContactPoint.sendMail(emails, subject, mimeType, rendered.getContent(), appConfig.getSmtpHost(), appConfig.getSmtpPort(), appConfig.getSmtpSSL(), appConfig.getSmtpUsername(), appConfig.getSmtpPassword(), appConfig.getSmtpFrom());
+                    EmailContactPoint.sendMail(emails, subject, mimeType, rendered.getContent(), appConfig.getSmtpHost(), appConfig.getSmtpPort(), appConfig.getSmtpSSL(), appConfig.getSmtpUsername(), appConfig.getSmtpPassword(), appConfig.getSmtpLocalhost(), appConfig.getSmtpFrom());
                 }
             }
             else

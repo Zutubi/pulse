@@ -2,8 +2,8 @@ package com.zutubi.pulse.web.ajax;
 
 import com.opensymphony.util.TextUtils;
 import com.zutubi.pulse.model.EmailContactPoint;
-import com.zutubi.pulse.web.ActionSupport;
 import com.zutubi.pulse.util.logging.Logger;
+import com.zutubi.pulse.web.ActionSupport;
 
 import java.util.Arrays;
 
@@ -22,6 +22,7 @@ public class TestSmtpAction extends ActionSupport
     private String from;
     private String username;
     private String password;
+    private String localhost;
     private String prefix;
     private String to;
 
@@ -43,6 +44,16 @@ public class TestSmtpAction extends ActionSupport
     public void setPassword(String password)
     {
         this.password = password;
+    }
+
+    public String getLocalhost()
+    {
+        return localhost;
+    }
+
+    public void setLocalhost(String localhost)
+    {
+        this.localhost = localhost;
     }
 
     public void setPrefix(String prefix)
@@ -95,7 +106,7 @@ public class TestSmtpAction extends ActionSupport
                 {
                     port = -1;
                 }
-                EmailContactPoint.sendMail(Arrays.asList(to), prefix + " Test Email", "text/plain", "Welcome to Zutubi Pulse!", host, port, ssl, username, password, from);
+                EmailContactPoint.sendMail(Arrays.asList(to), prefix + " Test Email", "text/plain", "Welcome to Zutubi Pulse!", host, port, ssl, username, password, localhost, from);
             }
             catch(Exception e)
             {

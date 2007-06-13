@@ -40,6 +40,8 @@ public interface MasterConfiguration extends LogConfiguration
 
     public static final String SMTP_PASSWORD = "mail.smtp.password";
 
+    public static final String SMTP_LOCAL_HOSTNAME = "mail.smtp.localhost";
+
     //---( jabber configuration )---
 
     public static final String JABBER_HOST = "jabber.host";
@@ -125,6 +127,10 @@ public interface MasterConfiguration extends LogConfiguration
     void setSmtpUsername(String username);
 
     String getSmtpPassword();
+
+    String getSmtpLocalhost();
+
+    void setSmtpLocalhost(String host);
 
     void setSmtpPassword(String password);
 

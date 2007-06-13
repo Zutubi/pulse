@@ -18,12 +18,13 @@
             var from = escape($F("editSmtp!save_smtp_from"));
             var username = escape($F("editSmtp!save_smtp_username"));
             var password = escape($F("editSmtp!save_smtp_password"));
+            var localhost = escape($F("editSmtp!save_smtp_localhost"));
             var prefix = escape($F("editSmtp!save_smtp_prefix"));
             var to = escape($F("test.address"));
             var customPort = escape($F("editSmtp!save_smtp_customPort"));
             var port = escape($F("editSmtp!save_smtp_port"));
 
-            var params = "host=" + host + "&ssl=" + ssl + "&from=" + from + "&username=" + username + "&password=" + password + "&prefix=" + prefix + "&to=" + to + "&customPort=" + customPort + "&port=" + port;
+            var params = "host=" + host + "&ssl=" + ssl + "&from=" + from + "&username=" + username + "&password=" + password + "&localhost=" + localhost + "&prefix=" + prefix + "&to=" + to + "&customPort=" + customPort + "&port=" + port;
 
             var updater = new Ajax.Updater({success: 'test-results'},
                                            "/ajax/testSmtp.action",
@@ -58,8 +59,10 @@
     #wwcheckbox("name=smtp.customPort" "label=%{getText('smtp.custom.port')}" "onclick=setEnableState('editSmtp!save_smtp_port', 'editSmtp!save_smtp_customPort')" "tabindex=7")
     #wwtextfield("name=smtp.port" "label=%{getText('smtp.port')}" "tabindex=8")
     #inlineHelp("smtp.port.help")
+    #wwtextfield("name=smtp.localhost" "label=%{getText('smtp.localhost')}" "tabindex=9")
+    #inlineHelp("smtp.localhost.help")
 
-    #saveCancel(9)
+    #saveCancel(10)
 #end
 
     <table class="content">

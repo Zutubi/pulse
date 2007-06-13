@@ -1,8 +1,8 @@
 package com.zutubi.pulse.web.admin;
 
-import com.zutubi.pulse.web.ActionSupport;
-import com.zutubi.pulse.bootstrap.MasterConfigurationManager;
 import com.zutubi.pulse.bootstrap.MasterConfiguration;
+import com.zutubi.pulse.bootstrap.MasterConfigurationManager;
+import com.zutubi.pulse.web.ActionSupport;
 
 /**
  * <class-comment/>
@@ -57,6 +57,7 @@ public class SmtpConfigurationAction extends ActionSupport
         config.setSmtpPort(-1);
         config.setSmtpUsername(null);
         config.setSmtpPassword(null);
+        config.setSmtpLocalhost(null);
     }
 
     private void saveConfig()
@@ -68,6 +69,7 @@ public class SmtpConfigurationAction extends ActionSupport
         config.setSmtpSSL(smtp.getSsl());
         config.setSmtpUsername(smtp.getUsername());
         config.setSmtpPassword(smtp.getPassword());
+        config.setSmtpLocalhost(smtp.getLocalhost());
 
         if(smtp.getCustomPort())
         {
@@ -88,6 +90,7 @@ public class SmtpConfigurationAction extends ActionSupport
         smtp.setSsl(config.getSmtpSSL());
         smtp.setUsername(config.getSmtpUsername());
         smtp.setPassword(config.getSmtpPassword());
+        smtp.setLocalhost(config.getSmtpLocalhost());
         int port = config.getSmtpPort();
 
         if(port > 0)
@@ -123,6 +126,7 @@ public class SmtpConfigurationAction extends ActionSupport
         private String host;
         private String username;
         private String password;
+        private String localhost;
         private boolean customPort;
         private int port;
 
@@ -164,6 +168,16 @@ public class SmtpConfigurationAction extends ActionSupport
         public void setPassword(String password)
         {
             this.password = password;
+        }
+
+        public String getLocalhost()
+        {
+            return localhost;
+        }
+
+        public void setLocalhost(String localhost)
+        {
+            this.localhost = localhost;
         }
 
         public String getPrefix()

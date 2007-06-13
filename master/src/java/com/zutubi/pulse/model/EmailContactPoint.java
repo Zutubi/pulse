@@ -11,10 +11,10 @@ import com.zutubi.validation.annotations.Required;
 import javax.mail.*;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
-import java.util.Date;
-import java.util.Properties;
-import java.util.List;
 import java.util.Arrays;
+import java.util.Date;
+import java.util.List;
+import java.util.Properties;
 
 /**
  *
@@ -27,9 +27,11 @@ public class EmailContactPoint extends ContactPoint
     private static final String SMTP_HOST_PROPERTY = "mail.smtp.host";
     private static final String SMTP_AUTH_PROPERTY = "mail.smtp.auth";
     private static final String SMTP_PORT_PROPERTY = "mail.smtp.port";
+    private static final String SMTP_LOCALHOST_PROPERTY = "mail.smtp.localhost";
     private static final String SMTPS_HOST_PROPERTY = "mail.smtps.host";
     private static final String SMTPS_AUTH_PROPERTY = "mail.smtps.auth";
     private static final String SMTPS_PORT_PROPERTY = "mail.smtps.port";
+    private static final String SMTPS_LOCALHOST_PROPERTY = "mail.smtps.localhost";
 
     private static final String NO_SMTP_HOST_ERROR = "Unable to deliver email: SMTP host not configured.";
 
@@ -81,7 +83,7 @@ public class EmailContactPoint extends ContactPoint
 
         try
         {
-            sendMail(Arrays.asList(getEmail()), prefix + subject, mimeType, rendered, config.getSmtpHost(), config.getSmtpPort(), config.getSmtpSSL(), config.getSmtpUsername(), config.getSmtpPassword(), config.getSmtpFrom());
+            sendMail(Arrays.asList(getEmail()), prefix + subject, mimeType, rendered, config.getSmtpHost(), config.getSmtpPort(), config.getSmtpSSL(), config.getSmtpUsername(), config.getSmtpPassword(), config.getSmtpLocalhost(), config.getSmtpFrom());
         }
         catch (Exception e)
         {
@@ -95,7 +97,7 @@ public class EmailContactPoint extends ContactPoint
         return (MasterConfigurationManager) ComponentContext.getBean("configurationManager");
     }
 
-    public static void sendMail(List<String> emails, String subject, String mimeType, String body, String host, int port, boolean ssl, final String username, final String password, String from) throws Exception
+    public static void sendMail(List<String> emails, String subject, String mimeType, String body, String host, int port, boolean ssl, final String username, final String password, final String localhost, String from) throws Exception
     {
         Properties properties = (Properties) System.getProperties().clone();
         if(ssl)
@@ -140,6 +142,18 @@ public class EmailContactPoint extends ContactPoint
                     return new PasswordAuthentication(username, password);
                 }
             };
+        }
+
+        if(TextUtils.stringSet(localhost))
+        {
+            if(ssl)
+            {
+                properties.put(SMTPS_LOCALHOST_PROPERTY, localhost);
+            }
+            else
+            {
+                properties.put(SMTP_LOCALHOST_PROPERTY, localhost);
+            }
         }
 
         Session session = Session.getInstance(properties, authenticator);

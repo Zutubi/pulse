@@ -165,6 +165,16 @@ public class MasterConfigurationSupport extends ConfigSupport implements MasterC
         return getProperty(SMTP_PASSWORD);
     }
 
+    public String getSmtpLocalhost()
+    {
+        return getProperty(SMTP_LOCAL_HOSTNAME);
+    }
+
+    public void setSmtpLocalhost(String host)
+    {
+        setProperty(SMTP_LOCAL_HOSTNAME, host);
+    }
+
     public void setSmtpPassword(String password)
     {
         setProperty(SMTP_PASSWORD, password);
