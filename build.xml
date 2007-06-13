@@ -317,7 +317,7 @@
         </copy>
 -->
         <copy todir="${version.root.master}/system/templates">
-            <fileset dir="master/src/templates" includes="**/*.vm **/*.ftl **/*.properties"/>
+            <fileset dir="master/src/templates" includes="**/*.vm **/*.ftl **/*.properties **/*.example"/>
         </copy>
         <!-- place holder for the log directory -->
         <copy todir="${package.root.master}/logs">
