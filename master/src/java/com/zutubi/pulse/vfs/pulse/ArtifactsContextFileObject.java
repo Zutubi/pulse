@@ -22,11 +22,28 @@ public class ArtifactsContextFileObject extends AbstractPulseFileObject implemen
 
     public AbstractPulseFileObject createFile(final FileName fileName) throws Exception
     {
-        // this is a recipe node.
-        long recipeId = Long.parseLong(fileName.getBaseName());
-        return objectFactory.buildBean(ArtifactStageFileObject.class,
-                new Class[]{FileName.class, Long.TYPE, AbstractFileSystem.class},
-                new Object[]{fileName, recipeId, pfs}
+        // Should refer to a stage.  First, try to interpret the name as a
+        // recipe result ID.  If that doesn't work, try looking at it as a
+        // stage name.
+        try
+        {
+            long recipeId = Long.parseLong(fileName.getBaseName());
+            if(buildManager.getRecipeResult(recipeId) != null)
+            {
+                return objectFactory.buildBean(ArtifactStageFileObject.class,
+                                               new Class[]{FileName.class, Long.TYPE, AbstractFileSystem.class},
+                                               new Object[]{fileName, recipeId, pfs}
+                );
+            }
+        }
+        catch (NumberFormatException e)
+        {
+            // Maybe a stage name, continue the research Smithers.
+        }
+        
+        return objectFactory.buildBean(NamedStageFileObject.class,
+                new Class[]{FileName.class, String.class, AbstractFileSystem.class},
+                new Object[]{fileName, fileName.getBaseName(), pfs}
         );
     }
 
@@ -61,7 +78,7 @@ public class ArtifactsContextFileObject extends AbstractPulseFileObject implemen
 
     protected BuildResult getBuildResult() throws FileSystemException
     {
-        BuildResultProvider provider = (BuildResultProvider) getAncestor(BuildResultProvider.class);
+        BuildResultProvider provider = getAncestor(BuildResultProvider.class);
         if (provider != null)
         {
             return provider.getBuildResult();
@@ -73,7 +90,7 @@ public class ArtifactsContextFileObject extends AbstractPulseFileObject implemen
     {
         try
         {
-            BuildResultProvider provider = (BuildResultProvider) getAncestor(BuildResultProvider.class);
+            BuildResultProvider provider = getAncestor(BuildResultProvider.class);
             if (provider != null)
             {
                 return provider.getBuildResultId();

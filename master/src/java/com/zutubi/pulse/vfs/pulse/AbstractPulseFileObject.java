@@ -109,17 +109,19 @@ public abstract class AbstractPulseFileObject extends AbstractFileObject
      *
      * @throws FileSystemException if there are any problems that prevent searching the hierarchy.
      */
+    @SuppressWarnings({"unchecked"})
     public <T> T getAncestor(Class<T> type) throws FileSystemException
     {
-        if (type.isAssignableFrom(this.getClass()))
+        for(AbstractPulseFileObject ancestor = (AbstractPulseFileObject) getParent();
+            ancestor != null;
+            ancestor = (AbstractPulseFileObject) ancestor.getParent())
         {
-            return (T) this;
+            if (type.isAssignableFrom(ancestor.getClass()))
+            {
+                return (T) ancestor;
+            }
         }
-        AbstractPulseFileObject parent = (AbstractPulseFileObject) getParent();
-        if (parent != null)
-        {
-            return parent.getAncestor(type);
-        }
+
         return null;
     }
 
