@@ -350,7 +350,7 @@
         </move>
 
         <copy todir="${version.root.master}/system/templates">
-            <fileset dir="master/src/templates" includes="**/*.vm **/*.ftl **/*.properties"/>
+            <fileset dir="master/src/templates" includes="**/*.vm **/*.ftl **/*.properties **/*.example"/>
         </copy>
         <copy todir="${package.root.master}/logs">
             <fileset dir="etc" includes="delete-me.txt"/>
