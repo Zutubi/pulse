@@ -5,68 +5,19 @@ import com.zutubi.pulse.model.Project;
 import com.zutubi.pulse.util.logging.Logger;
 import org.apache.commons.vfs.FileName;
 import org.apache.commons.vfs.FileSystemException;
-import org.apache.commons.vfs.FileType;
 import org.apache.commons.vfs.provider.AbstractFileSystem;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
-
 /**
- * <class comment/>
+ * Represents the latest build result for a scope, which may be global, a
+ * single project or a single build specification.
  */
-public class LatestBuildFileObject extends AbstractPulseFileObject implements AddressableFileObject, BuildResultProvider
+public class LatestBuildFileObject extends AbstractBuildFileObject
 {
-    private static final Map<String, Class> nodesDefinitions = new HashMap<String, Class>();
-    {
-        // setup the default root node definitions.
-        nodesDefinitions.put("artifacts", NamedArtifactsFileObject.class);
-    }
-
     private static final Logger LOG = Logger.getLogger(LatestBuildFileObject.class);
 
     public LatestBuildFileObject(final FileName name, final AbstractFileSystem fs)
     {
         super(name, fs);
-    }
-
-    public AbstractPulseFileObject createFile(final FileName fileName) throws Exception
-    {
-        String name = fileName.getBaseName();
-        if (nodesDefinitions.containsKey(name))
-        {
-            Class clazz = nodesDefinitions.get(name);
-            return objectFactory.buildBean(clazz,
-                    new Class[]{FileName.class, AbstractFileSystem.class},
-                    new Object[]{fileName, pfs}
-            );
-        }
-
-        return objectFactory.buildBean(NamedStageFileObject.class,
-                new Class[]{FileName.class, String.class, AbstractFileSystem.class},
-                new Object[]{fileName, name, pfs}
-        );
-    }
-
-    protected FileType doGetType() throws Exception
-    {
-        return FileType.IMAGINARY;
-    }
-
-    protected String[] doListChildren() throws Exception
-    {
-        Set<String> rootPaths = nodesDefinitions.keySet();
-        return rootPaths.toArray(new String[rootPaths.size()]);
-    }
-
-    public boolean isLocal()
-    {
-        return true;
-    }
-
-    public String getUrlPath()
-    {
-        return "/viewBuild.action?id=" + getBuildResultId();
     }
 
     public BuildResult getBuildResult()

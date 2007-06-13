@@ -83,7 +83,7 @@ public class NamedArtifactFileObject extends AbstractPulseFileObject implements 
 
     protected BuildResult getBuildResult() throws FileSystemException
     {
-        BuildResultProvider provider = (BuildResultProvider) getAncestor(BuildResultProvider.class);
+        BuildResultProvider provider = getAncestor(BuildResultProvider.class);
         if (provider == null)
         {
             throw new FileSystemException("Missing build result context");
@@ -93,7 +93,7 @@ public class NamedArtifactFileObject extends AbstractPulseFileObject implements 
 
     protected CommandResult getCommandResult() throws FileSystemException
     {
-        CommandResultProvider provider = (CommandResultProvider) getAncestor(CommandResultProvider.class);
+        CommandResultProvider provider = getAncestor(CommandResultProvider.class);
         if (provider == null)
         {
             throw new FileSystemException("Missing command result context");
