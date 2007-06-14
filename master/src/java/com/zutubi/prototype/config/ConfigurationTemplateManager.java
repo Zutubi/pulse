@@ -1,8 +1,17 @@
 package com.zutubi.prototype.config;
 
-import com.zutubi.prototype.config.events.*;
+import com.zutubi.prototype.config.events.PostDeleteEvent;
+import com.zutubi.prototype.config.events.PostInsertEvent;
+import com.zutubi.prototype.config.events.PostSaveEvent;
+import com.zutubi.prototype.config.events.PreDeleteEvent;
+import com.zutubi.prototype.config.events.PreInsertEvent;
+import com.zutubi.prototype.config.events.PreSaveEvent;
 import com.zutubi.prototype.type.*;
-import com.zutubi.prototype.type.record.*;
+import com.zutubi.prototype.type.record.MutableRecord;
+import com.zutubi.prototype.type.record.PathUtils;
+import com.zutubi.prototype.type.record.Record;
+import com.zutubi.prototype.type.record.RecordManager;
+import com.zutubi.prototype.type.record.TemplateRecord;
 import com.zutubi.pulse.core.config.Configuration;
 import com.zutubi.pulse.events.EventManager;
 import com.zutubi.util.logging.Logger;
@@ -13,6 +22,8 @@ import com.zutubi.validation.ValidationManager;
 import com.zutubi.validation.i18n.MessagesTextProvider;
 
 import java.util.*;
+import java.util.Map;
+import java.util.HashMap;
 
 /**
  */
@@ -147,7 +158,7 @@ public class ConfigurationTemplateManager
         return record;
     }
 
-    public String insert(String parentPath, Object instance)
+    public String insert(String path, Object instance)
     {
         CompositeType type = typeRegistry.getType(instance.getClass());
         if (type == null)
@@ -158,7 +169,7 @@ public class ConfigurationTemplateManager
         try
         {
             MutableRecord record = type.unstantiate(instance);
-            return insertRecord(parentPath, record);
+            return insertRecord(path, record);
         }
         catch (TypeException e)
         {
@@ -171,14 +182,70 @@ public class ConfigurationTemplateManager
         checkPersistent(path);
 
         ComplexType type = configurationPersistenceManager.getType(path, ComplexType.class);
-        eventManager.publish(new PreInsertEvent(this, path, record));
 
-        final String result = type.insert(path, record, recordManager);
+        Record parentRecord = recordManager.load(path);
+
+        // determine the path at which the record will be inserted.  If we are inserting into a collection,
+        // this will be determined by the collection.  If we insert into a complex type, then we insert directly using
+        // the path that is provided.
+
+        String newPath = path;
+        if (type instanceof CollectionType)
+        {
+            CollectionType collectionType = (CollectionType) type;
+            String insertionPath = collectionType.getInsertionPath(parentRecord, record);
+            newPath = PathUtils.getPath(path, insertionPath);
+        }
+
+        // Do some level of type checking to ensure that all is as expected when we insert into the record manager. 
+        if (type instanceof CollectionType)
+        {
+            // If we are inserting into a collection, then the record must represent data for the collection type.
+            CompositeType collectionType = (CompositeType) type.getTargetType();
+            List<String> allowedTypes = new LinkedList<String>();
+            allowedTypes.add(collectionType.getSymbolicName());
+            allowedTypes.addAll(collectionType.getExtensions());
+            if (!allowedTypes.contains(record.getSymbolicName()))
+            {
+                // need to support type extensions here.
+                Type recordType = typeRegistry.getType(record.getSymbolicName());
+                throw new IllegalArgumentException("Expected type: " + collectionType.getClazz() + " but instead found " + recordType.getClazz());
+            }
+        }
+        else
+        {
+            // If we are inserting into an object, then the object is defined by the parent path, and the record
+            // must represent data for that objects specified property.
+            String parentPath = PathUtils.getParentPath(path);
+            CompositeType parentType = (CompositeType) configurationPersistenceManager.getType(parentPath);
+            TypeProperty property = parentType.getProperty(PathUtils.getBaseName(path));
+            Type propertyType = property.getType();
+            Type recordType = typeRegistry.getType(record.getSymbolicName());
+            if (recordType != propertyType)
+            {
+                throw new IllegalArgumentException("Expected type: " + propertyType.getClazz() + " but instead found " + recordType.getClazz());
+            }
+        }
+
+        // generate and send out events for each of the records being inserted.  The root record may itself contain
+        // subrecords.
+
+        Map<String, Record> insertedPaths = getPathRecordMapping(newPath, record);
+        for (String p : insertedPaths.keySet())
+        {
+            Record r = insertedPaths.get(p);
+            eventManager.publish(new PreInsertEvent(this, p, (MutableRecord) r));
+        }
+
+        recordManager.insert(newPath, record);
         refreshCaches();
 
-        eventManager.publish(new PostInsertEvent(this, path, result, instances.get(result)));
+        for (String p : insertedPaths.keySet())
+        {
+            eventManager.publish(new PostInsertEvent(this, p, p, instances.get(p)));
+        }
 
-        return result;
+        return newPath;
     }
 
     private void refreshCaches()
@@ -322,7 +389,7 @@ public class ConfigurationTemplateManager
         }
     }
 
-    public void save(String parentPath, String baseName, Object instance)
+    public void save(String path, Object instance)
     {
         CompositeType type = typeRegistry.getType(instance.getClass());
         if (type == null)
@@ -339,13 +406,14 @@ public class ConfigurationTemplateManager
         {
             throw new ConfigRuntimeException(e);
         }
-
-        saveRecord(parentPath, baseName, record);
+        saveRecord(path, record);
     }
 
-
-    public String saveRecord(String parentPath, String baseName, Record record)
+    public String saveRecord(String path, Record record)
     {
+        String parentPath = PathUtils.getParentPath(path);
+        String baseName = PathUtils.getBaseName(path);
+
         checkPersistent(parentPath);
 
         Record parentRecord = recordManager.load(parentPath);
@@ -354,13 +422,38 @@ public class ConfigurationTemplateManager
             throw new IllegalArgumentException("Invalid parent path '" + parentPath + "'");
         }
 
-        ComplexType parentType = (ComplexType) configurationPersistenceManager.getType(parentPath);
-
-        String path = PathUtils.getPath(parentPath, baseName);
         Object oldInstance = instances.get(path);
+
+        // generate pre save events.
+
         eventManager.publish(new PreSaveEvent(this, path, oldInstance));
 
-        final String newPath = parentType.save(parentPath, baseName, record, recordManager);
+        ComplexType parentType = (ComplexType) configurationPersistenceManager.getType(parentPath);
+
+        String newPath = path;
+        if (parentType instanceof CollectionType)
+        {
+            CollectionType collectionType = (CollectionType) parentType;
+            String newName = collectionType.getSavePath(recordManager.load(parentPath), record);
+            if(baseName != null && !baseName.equals(newName))
+            {
+                // We need to update our own record
+                newPath = PathUtils.getPath(parentPath, newName);
+
+                recordManager.move(path, newPath);
+                recordManager.update(newPath, record);
+            }
+            else
+            {
+                recordManager.update(newPath, record);
+            }
+        }
+        else
+        {
+            // Regular update.
+            recordManager.update(newPath, record);
+        }
+
         refreshCaches();
 
         eventManager.publish(new PostSaveEvent(this, path, oldInstance, newPath, instances.get(newPath)));
@@ -372,13 +465,23 @@ public class ConfigurationTemplateManager
     {
         checkPersistent(path);
 
-        Object oldInstance = instances.get(path);
-        eventManager.publish(new PreDeleteEvent(this, path, oldInstance));
+        // need to send out events for the individual record deletes.  How do we pick up the individual deletes.
+
+        List<String> pathsToBeDeleted = getPathListing(path, recordManager.load(path));
+        Map<String, Object> instancesToBeDeleted = getPathInstanceMapping(pathsToBeDeleted);
+
+        for (String p : instancesToBeDeleted.keySet())
+        {
+            eventManager.publish(new PreDeleteEvent(this, p, instancesToBeDeleted.get(p)));
+        }
 
         configurationReferenceManager.getCleanupTasks(path).execute();
         refreshCaches();
 
-        eventManager.publish(new PostDeleteEvent(this, path, oldInstance));
+        for (String p : instancesToBeDeleted.keySet())
+        {
+            eventManager.publish(new PostDeleteEvent(this, p, instancesToBeDeleted.get(p)));
+        }
     }
 
     /**
@@ -499,6 +602,52 @@ public class ConfigurationTemplateManager
         }
 
         return templateHierarchies.get(scope);
+    }
+
+    private List<String> getPathListing(String basePath, Record record)
+    {
+        List<String> paths = new LinkedList<String>();
+        paths.add(basePath);
+
+        for (String key : record.keySet())
+        {
+            Object value = record.get(key);
+            if (value instanceof Record)
+            {
+                String childPath = PathUtils.getPath(basePath, key);
+                Record child = (Record) value;
+                paths.addAll(getPathListing(childPath, child));
+            }
+        }
+        return paths;
+    }
+
+    private Map<String, Object> getPathInstanceMapping(List<String> paths)
+    {
+        Map<String, Object> mapping = new HashMap<String, Object>();
+        for (String path : paths)
+        {
+            mapping.put(path, instances.get(path));
+        }
+        return mapping;
+    }
+
+    private Map<String, Record> getPathRecordMapping(String basePath, Record record)
+    {
+        Map<String, Record> paths = new HashMap<String, Record>();
+        paths.put(basePath, record);
+
+        for (String key : record.keySet())
+        {
+            Object value = record.get(key);
+            if (value instanceof Record)
+            {
+                String childPath = PathUtils.getPath(basePath, key);
+                Record child = (Record) value;
+                paths.putAll(getPathRecordMapping(childPath, child));
+            }
+        }
+        return paths;
     }
 
     public void setTypeRegistry(TypeRegistry typeRegistry)

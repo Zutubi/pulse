@@ -2,6 +2,7 @@ package com.zutubi.pulse.prototype.config.project.triggers;
 
 import com.zutubi.prototype.config.ConfigurationProvider;
 import com.zutubi.prototype.config.TypeListener;
+import com.zutubi.pulse.bootstrap.ComponentContext;
 import com.zutubi.pulse.scheduling.Scheduler;
 import com.zutubi.pulse.scheduling.SchedulingException;
 import com.zutubi.pulse.scheduling.Trigger;
@@ -35,12 +36,13 @@ public class TriggerManager
                 {
                     recursiveCheck = true;
 
+                    ComponentContext.autowire(instance);
                     Trigger trigger = instance.newTrigger();
                     scheduler.schedule(trigger);
                     instance.setTriggerId(trigger.getId());
 
                     // resave required 
-                    configurationProvider.insert(instance.getConfigurationPath(), instance);
+                    configurationProvider.save(instance.getConfigurationPath(), instance);
                 }
                 catch (SchedulingException e)
                 {
@@ -67,6 +69,10 @@ public class TriggerManager
 
             public void postSave(TriggerConfiguration instance)
             {
+                if (recursiveCheck)
+                {
+                    return;
+                }
                 try
                 {
                     Trigger trigger = scheduler.getTrigger(instance.getTriggerId());

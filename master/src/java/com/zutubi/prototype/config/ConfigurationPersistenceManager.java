@@ -147,7 +147,41 @@ public class ConfigurationPersistenceManager
         return l;
     }
 
-    String getClosestOwningScope(CompositeType type, String path)
+/*
+<<<<<<< .mine
+    public Map<String, Record> getReferencableRecords(CompositeType type, String referencingPath)
+    {
+        HashMap<String, Record> records = new HashMap<String, Record>();
+        // FIXME does not account for templating, and may need to be more
+        // FIXME general.  review when we have more config objects...
+        for (String path : getOwningPaths(type, getClosestOwningScope(type, referencingPath)))
+        {
+            recordManager.loadAll(path, records);
+        }
+
+        return records;
+    }
+
+    public <T> T getAncestorOfType(Configuration c, Class<T> clazz)
+    {
+        String path = c.getConfigurationPath();
+        CompositeType type = typeRegistry.getType(clazz);
+        if (type != null)
+        {
+            String ancestorPath = getClosestMatchingScope(type, path);
+            if(ancestorPath != null)
+            {
+                return (T) getInstance(ancestorPath);
+            }
+        }
+
+        return null;
+    }
+
+=======
+>>>>>>> .r3386
+*/
+    String getClosestMatchingScope(CompositeType type, String path)
     {
         List<String> patterns = compositeTypePathIndex.get(type);
         if (patterns != null)
@@ -161,15 +195,23 @@ public class ConfigurationPersistenceManager
                 {
                     if (PathUtils.prefixMatchesPathPattern(candidatePattern, path))
                     {
-                        return PathUtils.getParentPath(path);
+                        return path;
                     }
                 }
-
                 path = PathUtils.getParentPath(path);
             }
         }
-
         return null;
+    }
+
+    String getClosestOwningScope(CompositeType type, String path)
+    {
+        String scope = getClosestMatchingScope(type, path);
+        if (scope != null)
+        {
+            return PathUtils.getParentPath(scope);
+        }
+        return scope;
     }
 
     List<String> getOwningPaths(CompositeType type, String prefix)

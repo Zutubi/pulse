@@ -114,9 +114,7 @@ public class LicenseManager implements ConfigurationEventListener
 
                             // now we also need to save the change.
                             ConfigurationProvider provider = ComponentContext.getBean("configurationProvider");
-                            String parentPath = PathUtils.getParentPath(config.getConfigurationPath());
-                            String baseName = PathUtils.getBaseName(config.getConfigurationPath());
-                            provider.save(parentPath, baseName, config);
+                            provider.save(config.getConfigurationPath(), config);
                         }
                         finally
                         {

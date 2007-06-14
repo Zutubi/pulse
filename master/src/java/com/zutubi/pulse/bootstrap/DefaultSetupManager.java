@@ -3,6 +3,7 @@ package com.zutubi.pulse.bootstrap;
 import com.opensymphony.util.TextUtils;
 import com.opensymphony.xwork.spring.SpringObjectFactory;
 import com.zutubi.prototype.config.*;
+import com.zutubi.prototype.config.DefaultConfigurationProvider;
 import com.zutubi.prototype.type.record.RecordManager;
 import com.zutubi.pulse.Version;
 import com.zutubi.pulse.bootstrap.conf.EnvConfig;
@@ -282,7 +283,7 @@ public class DefaultSetupManager implements SetupManager
         ConfigurationReferenceManager configurationReferenceManager = ComponentContext.getBean("configurationReferenceManager");
         ConfigurationTemplateManager configurationTemplateManager = ComponentContext.getBean("configurationTemplateManager");
         ConfigurationRegistry configurationRegistry = ComponentContext.getBean("configurationRegistry");
-        ConfigurationProvider configurationProvider = ComponentContext.getBean("configurationProvider");
+        DefaultConfigurationProvider configurationProvider = ComponentContext.getBean("configurationProvider");
 
         recordManager.init();
         configurationPersistenceManager.setRecordManager(recordManager);

@@ -9,6 +9,8 @@ import com.zutubi.prototype.config.events.PreDeleteEvent;
 import com.zutubi.prototype.config.events.PostInsertEvent;
 import com.zutubi.prototype.config.events.PostDeleteEvent;
 import com.zutubi.prototype.config.events.PostSaveEvent;
+import com.zutubi.prototype.type.TypeRegistry;
+import com.zutubi.prototype.type.CompositeType;
 
 /**
  *
@@ -18,8 +20,14 @@ public class ClassPredicate implements Predicate<Event>
 {
     private Class clazz;
 
+    private TypeRegistry typeRegistry;
+
     public ClassPredicate(Class clazz)
     {
+        if (clazz == null)
+        {
+            throw new IllegalArgumentException();
+        }
         this.clazz = clazz;
     }
 
@@ -32,7 +40,13 @@ public class ClassPredicate implements Predicate<Event>
 
         if (event instanceof PreInsertEvent)
         {
-//            ((PreInsertEvent)event);
+            String symbolicName = ((PreInsertEvent)event).getRecord().getSymbolicName();
+            CompositeType type = typeRegistry.getType(symbolicName);
+            if (type != null)
+            {
+                return clazz.isAssignableFrom(type.getClazz());
+            }
+            return false;
         }
         else if (event instanceof PreSaveEvent)
         {
@@ -59,4 +73,8 @@ public class ClassPredicate implements Predicate<Event>
     }
 
 
+    public void setTypeRegistry(TypeRegistry typeRegistry)
+    {
+        this.typeRegistry = typeRegistry;
+    }
 }

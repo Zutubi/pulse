@@ -10,7 +10,6 @@ import org.quartz.impl.calendar.BaseCalendar;
  */
 public class CronExpressionValidator extends FieldValidatorSupport
 {
-
     public void validate(Object object) throws ValidationException
     {
         Object obj = getFieldValue(getFieldName(), object);

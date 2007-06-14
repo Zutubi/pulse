@@ -35,12 +35,10 @@ public class GenericAction extends PrototypeSupport
 
         ComponentContext.autowire(actionHandler);
 
-        Method actionMethod = handlerClass.getMethod("do" + action, type.getClazz());
-
         // need the configuration instance.
         Object config = configurationTemplateManager.getInstance(path);
 
-        // put the two together.
+        Method actionMethod = ConventionSupport.getActionMethod(handlerClass, type, action);
         actionMethod.invoke(actionHandler, config);
 
         doRender();

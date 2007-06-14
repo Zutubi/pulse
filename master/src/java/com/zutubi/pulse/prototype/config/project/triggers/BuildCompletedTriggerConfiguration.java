@@ -3,6 +3,7 @@ package com.zutubi.pulse.prototype.config.project.triggers;
 import com.zutubi.config.annotations.Form;
 import com.zutubi.config.annotations.Reference;
 import com.zutubi.config.annotations.Select;
+import com.zutubi.prototype.config.ConfigurationProvider;
 import com.zutubi.pulse.core.model.ResultState;
 import com.zutubi.pulse.events.build.BuildCompletedEvent;
 import com.zutubi.pulse.prototype.config.project.ProjectConfiguration;
@@ -29,6 +30,8 @@ public class BuildCompletedTriggerConfiguration extends TriggerConfiguration
 
     @Select(optionProvider = "com.zutubi.pulse.prototype.CompletedResultStateOptionProvider")
     private List<ResultState> states;
+
+    private ConfigurationProvider configurationProvider;
 
     public BuildCompletedTriggerConfiguration()
     {
@@ -66,13 +69,14 @@ public class BuildCompletedTriggerConfiguration extends TriggerConfiguration
 
     public Trigger newTrigger()
     {
+        ProjectConfiguration project = configurationProvider.getAncestorOfType(this, ProjectConfiguration.class);
         String triggerName = "trigger:" + getHandle();
         String triggerGroup = "project:" + project.getProjectId();
         
         EventTrigger trigger = new EventTrigger(BuildCompletedEvent.class, triggerName, triggerGroup, BuildCompletedEventFilter.class);
 
         Map<Serializable, Serializable> dataMap = trigger.getDataMap();
-        dataMap.put(BuildCompletedEventFilter.PARAM_PROJECT, project.getProjectId());
+        dataMap.put(BuildCompletedEventFilter.PARAM_PROJECT, this.project.getProjectId());
 
         if(states != null && states.size() > 0)
         {
@@ -85,10 +89,16 @@ public class BuildCompletedTriggerConfiguration extends TriggerConfiguration
     public void update(Trigger trigger)
     {
         Map<Serializable, Serializable> dataMap = trigger.getDataMap();
+        dataMap.put(BuildCompletedEventFilter.PARAM_PROJECT, this.project.getProjectId());
 
         if(states != null && states.size() > 0)
         {
             dataMap.put(BuildCompletedEventFilter.PARAM_STATES, ResultState.getStatesString(states));
         }
+    }
+
+    public void setConfigurationProvider(ConfigurationProvider configurationProvider)
+    {
+        this.configurationProvider = configurationProvider;
     }
 }

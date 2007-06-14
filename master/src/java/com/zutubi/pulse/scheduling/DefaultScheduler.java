@@ -29,7 +29,7 @@ public class DefaultScheduler implements Scheduler, EventListener
     /**
      * Register a scheduling strategy that will be used to handle a specific trigger type.
      *
-     * @param strategy
+     * @param strategy new scheduler strategy implementation
      */
     public void register(SchedulerStrategy strategy)
     {
@@ -128,7 +128,7 @@ public class DefaultScheduler implements Scheduler, EventListener
     /**
      * Unschedule a trigger. Only scheduled triggers can be unscheduled.
      *
-     * @param trigger
+     * @param trigger instance to be unscheduled.
      * @throws SchedulingException
      */
     public void unschedule(Trigger trigger) throws SchedulingException
@@ -227,7 +227,7 @@ public class DefaultScheduler implements Scheduler, EventListener
     /**
      * Retrieve the first registered strategy that is able to handle this trigger.
      *
-     * @param trigger
+     * @param trigger instance for which the strategy is being retrieved.
      * @return a scheduler strategy.
      */
     private SchedulerStrategy getStrategy(Trigger trigger)
@@ -246,7 +246,7 @@ public class DefaultScheduler implements Scheduler, EventListener
     /**
      * Set a reference to the required TriggerDao resource.
      *
-     * @param triggerDao
+     * @param triggerDao instance
      */
     public void setTriggerDao(TriggerDao triggerDao)
     {

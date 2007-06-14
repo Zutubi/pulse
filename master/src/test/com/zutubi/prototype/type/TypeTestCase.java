@@ -20,6 +20,8 @@ public abstract class TypeTestCase extends TestCase
 
         typeRegistry = new TypeRegistry();
         configurationTemplateManager = new ConfigurationTemplateManager();
+
+        typeRegistry.setConfigurationTemplateManager(configurationTemplateManager);
     }
 
     protected void tearDown() throws Exception

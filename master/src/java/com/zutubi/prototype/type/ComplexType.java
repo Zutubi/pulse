@@ -1,7 +1,6 @@
 package com.zutubi.prototype.type;
 
 import com.zutubi.prototype.type.record.Record;
-import com.zutubi.prototype.type.record.RecordManager;
 
 /**
  */
@@ -9,9 +8,9 @@ public interface ComplexType extends Type
 {
     String getSymbolicName();
 
-    String insert(String path, Record newRecord, RecordManager recordManager);
+    String getSavePath(Record collection, Record record);
 
-    String save(String path, String baseName, Record record, RecordManager recordManager);
+    String getInsertionPath(Record collection, Record record);
 
     Record createNewRecord();
 

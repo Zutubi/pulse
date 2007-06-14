@@ -62,7 +62,7 @@ public class SaveAction extends PrototypeSupport
             return INPUT;
         }
 
-        String newPath = configurationTemplateManager.saveRecord(parentPath, baseName, record);
+        String newPath = configurationTemplateManager.saveRecord(path, record);
         response = new ConfigurationResponse(newPath);
         if(!newPath.equals(path))
         {

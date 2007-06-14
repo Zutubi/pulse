@@ -1,13 +1,12 @@
 package com.zutubi.pulse.model;
 
-import com.zutubi.prototype.config.CollectionListener;
+import com.zutubi.prototype.config.CollectionAdapter;
 import com.zutubi.prototype.config.ConfigurationEventListener;
 import com.zutubi.prototype.config.ConfigurationProvider;
 import com.zutubi.prototype.config.events.ConfigurationEvent;
 import com.zutubi.prototype.config.events.PostInsertEvent;
 import com.zutubi.prototype.config.events.PostSaveEvent;
 import com.zutubi.prototype.config.events.PreDeleteEvent;
-import com.zutubi.prototype.type.record.MutableRecord;
 import com.zutubi.pulse.core.ConfigurableResourceRepository;
 import com.zutubi.pulse.core.ResourceRepository;
 import com.zutubi.pulse.core.config.Resource;
@@ -28,12 +27,8 @@ public class DefaultResourceManager implements ResourceManager, ConfigurationEve
 
     public void init()
     {
-        CollectionListener<AgentConfiguration> listener = new CollectionListener<AgentConfiguration>("agent", AgentConfiguration.class, true)
+        CollectionAdapter<AgentConfiguration> listener = new CollectionAdapter<AgentConfiguration>("agent", AgentConfiguration.class, true)
         {
-            protected void preInsert(MutableRecord record)
-            {
-            }
-
             protected void instanceInserted(AgentConfiguration instance)
             {
                 agentRepositories.put(instance.getHandle(), new ConfigurationResourceRepository(instance, configurationProvider));

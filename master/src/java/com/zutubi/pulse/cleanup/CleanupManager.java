@@ -1,10 +1,9 @@
 package com.zutubi.pulse.cleanup;
 
-import com.zutubi.prototype.config.CollectionListener;
+import com.zutubi.prototype.config.CollectionAdapter;
 import com.zutubi.prototype.config.ConfigurationProvider;
 import com.zutubi.prototype.config.ConfigurationRegistry;
 import com.zutubi.prototype.type.TypeException;
-import com.zutubi.prototype.type.record.MutableRecord;
 import com.zutubi.prototype.type.record.PathUtils;
 import com.zutubi.pulse.cleanup.config.CleanupConfiguration;
 import com.zutubi.pulse.cleanup.config.CleanupWhat;
@@ -12,7 +11,11 @@ import com.zutubi.pulse.events.Event;
 import com.zutubi.pulse.events.EventListener;
 import com.zutubi.pulse.events.EventManager;
 import com.zutubi.pulse.events.build.BuildCompletedEvent;
-import com.zutubi.pulse.model.*;
+import com.zutubi.pulse.model.BuildManager;
+import com.zutubi.pulse.model.BuildResult;
+import com.zutubi.pulse.model.Project;
+import com.zutubi.pulse.model.ProjectManager;
+import com.zutubi.pulse.model.User;
 import com.zutubi.pulse.model.persistence.BuildResultDao;
 import com.zutubi.pulse.prototype.config.project.ProjectConfiguration;
 import com.zutubi.pulse.scheduling.Scheduler;
@@ -95,25 +98,13 @@ public class CleanupManager
             }
         }
 
-        CollectionListener<ProjectConfiguration> listener = new CollectionListener<ProjectConfiguration>("project", ProjectConfiguration.class, true)
+        CollectionAdapter<ProjectConfiguration> listener = new CollectionAdapter<ProjectConfiguration>("project", ProjectConfiguration.class, true)
         {
-            protected void preInsert(MutableRecord record)
-            {
-            }
-
             protected void instanceInserted(ProjectConfiguration instance)
             {
                 CleanupConfiguration cleanupConfiguration = new CleanupConfiguration();
                 cleanupConfiguration.setName("default");
                 configurationProvider.insert(PathUtils.getPath(instance.getConfigurationPath(), "cleanup"), cleanupConfiguration);
-            }
-
-            protected void instanceDeleted(ProjectConfiguration instance)
-            {
-            }
-
-            protected void instanceChanged(ProjectConfiguration instance)
-            {
             }
         };
         listener.register(configurationProvider);

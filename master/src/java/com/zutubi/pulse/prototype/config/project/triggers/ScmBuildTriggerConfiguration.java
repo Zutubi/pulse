@@ -18,12 +18,15 @@ public class ScmBuildTriggerConfiguration extends TriggerConfiguration
     public Trigger newTrigger()
     {
         ProjectConfiguration project = configurationTemplateManager.getAncestorOfType(this, ProjectConfiguration.class);
-        return new EventTrigger(ScmChangeEvent.class, "trigger:"+getHandle(), "project:" + project.getProjectId(), ScmChangeEventFilter.class);
+        String triggerName = "trigger:" + getHandle();
+        String triggerGroup = "project:" + project.getProjectId();
+
+        return new EventTrigger(ScmChangeEvent.class, triggerName, triggerGroup, ScmChangeEventFilter.class);
     }
 
     public void update(Trigger trigger)
     {
-
+        // no details to be updated.
     }
 
     public void setConfigurationTemplateManager(ConfigurationTemplateManager configurationTemplateManager)

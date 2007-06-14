@@ -39,7 +39,7 @@ public abstract class TypeListener<T extends Configuration>
                     postDelete((T) ((PostDeleteEvent)event).getOldInstance());
                 }
             }
-        }, false, configurationClass);
+        }, true, configurationClass);
     }
 
     /**

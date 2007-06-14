@@ -1,14 +1,17 @@
 package com.zutubi.prototype.type;
 
 import com.zutubi.config.annotations.Internal;
+import com.zutubi.config.annotations.ID;
 import com.zutubi.prototype.config.ConfigurationTemplateManager;
 import com.zutubi.prototype.type.record.*;
 import com.zutubi.pulse.core.config.Configuration;
 import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.Mapping;
+import com.zutubi.util.AnnotationUtils;
 import com.zutubi.util.logging.Logger;
 
 import java.util.*;
+import java.beans.IntrospectionException;
 
 /**
  *
@@ -268,18 +271,28 @@ public class CompositeType extends AbstractType implements ComplexType
         }
     }
 
-    public String insert(String path, Record newRecord, RecordManager recordManager)
+    public String getSavePath(Record parent, Record record)
     {
-        recordManager.insert(path, newRecord);
-        return path;
+        // retrieve the records key
+        return record.get(getKeyProperty()).toString();
     }
 
-    public String save(String path, String baseName, Record record, RecordManager recordManager)
+    public String getInsertionPath(Record parent, Record record)
     {
-        // Nothing special to do, let the record manager figure it out.
-        String newPath = PathUtils.getPath(path, baseName);
-        recordManager.insertOrUpdate(newPath, record);
-        return newPath;
+        // retrieve the records key
+        return record.get(getKeyProperty()).toString();
+    }
+
+    private String getKeyProperty()
+    {
+        try
+        {
+            return AnnotationUtils.getPropertyAnnotatedWith(getClazz(), ID.class);
+        }
+        catch (IntrospectionException e)
+        {
+            throw new RuntimeException("key property not available.");
+        }
     }
 
     public MutableRecord createNewRecord()

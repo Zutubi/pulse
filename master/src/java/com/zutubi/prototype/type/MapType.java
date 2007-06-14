@@ -5,7 +5,6 @@ import com.zutubi.prototype.config.ConfigurationTemplateManager;
 import com.zutubi.prototype.type.record.MutableRecord;
 import com.zutubi.prototype.type.record.PathUtils;
 import com.zutubi.prototype.type.record.Record;
-import com.zutubi.prototype.type.record.RecordManager;
 import com.zutubi.util.AnnotationUtils;
 import com.zutubi.util.logging.Logger;
 
@@ -125,31 +124,13 @@ public class MapType extends CollectionType
         return keyProperty;
     }
 
-    protected String getItemKey(String path, Record collectionRecord, Record itemRecord, RecordManager recordManager)
+    public String getInsertionPath(Record collection, Record record)
     {
-        return (String) itemRecord.get(keyProperty);
+        return (String) record.get(keyProperty);
     }
 
-    public String save(String path, String baseName, Record record, RecordManager recordManager)
+    public String getSavePath(Record collection, Record record)
     {
-        // Check for renames
-        String newName = (String) record.get(keyProperty);
-        if(baseName != null && !baseName.equals(newName))
-        {
-            // We need to update our own record
-            String oldPath = PathUtils.getPath(path, baseName);
-            String newPath = PathUtils.getPath(path, newName);
-
-            recordManager.move(oldPath, newPath);
-            recordManager.update(newPath, record);
-            return newPath;
-        }
-        else
-        {
-            // Regular update.
-            String newPath = PathUtils.getPath(path, baseName);
-            recordManager.update(newPath, record);
-            return newPath;
-        }
+        return (String) record.get(keyProperty);
     }
 }

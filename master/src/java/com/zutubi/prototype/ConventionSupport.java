@@ -2,6 +2,8 @@ package com.zutubi.prototype;
 
 import com.zutubi.prototype.type.Type;
 
+import java.lang.reflect.Method;
+
 /**
  *
  *
@@ -25,16 +27,42 @@ public class ConventionSupport
 
     private static Class loadClass(Type type, String suffix)
     {
-        try
+        // we need to search up the inheritence hierarchy.
+        Class clazz = type.getClazz();
+        while (clazz != Object.class)
         {
-            Class clazz = type.getClazz();
-            String wizardClassName = clazz.getCanonicalName() + suffix;
-            return clazz.getClassLoader().loadClass(wizardClassName);
+            try
+            {
+                String className = clazz.getCanonicalName() + suffix;
+                return clazz.getClassLoader().loadClass(className);
+            }
+            catch (ClassNotFoundException e)
+            {
+                // noops.
+            }
+            clazz = clazz.getSuperclass();
         }
-        catch (Exception e)
+        return null;
+    }
+
+    public static Method getActionMethod(Class handlerClass, Type type, String action)
+    {
+        // again, we search up the inheritance hierarchy for the methods argument.
+
+        Class clazz = type.getClazz();
+        while (clazz != Object.class)
         {
-            // noop.
+            try
+            {
+                return handlerClass.getMethod("do" + action, clazz);
+            }
+            catch (NoSuchMethodException e)
+            {
+                // noop.
+            }
+            clazz = clazz.getSuperclass();
         }
+
         return null;
     }
 }

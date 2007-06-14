@@ -119,7 +119,7 @@ public class SetupConfigurationWizard extends AbstractTypeWizard
             String baseUrl = (String) serverConfigRecord.get("baseUrl");
             record.put("baseUrl", baseUrl);
             record.put("masterHost", getMasterHost(baseUrl));
-            configurationTemplateManager.saveRecord(GlobalConfiguration.SCOPE_NAME, GENERAL_CONFIG_PROPERTY, record);
+            configurationTemplateManager.saveRecord(PathUtils.getPath(GlobalConfiguration.SCOPE_NAME, GENERAL_CONFIG_PROPERTY), record);
 
             // Now copy over the email properties
             extractAndSave(EmailConfiguration.class, serverConfigRecord);
@@ -209,7 +209,7 @@ public class SetupConfigurationWizard extends AbstractTypeWizard
         List<String> paths = configurationPersistenceManager.getConfigurationPaths(type);
         assert(paths.size() == 1);
         String path = paths.get(0);
-        configurationTemplateManager.saveRecord(PathUtils.getParentPath(path), PathUtils.getBaseName(path), record);
+        configurationTemplateManager.saveRecord(path, record);
     }
 
     public void setUserManager(UserManager userManager)

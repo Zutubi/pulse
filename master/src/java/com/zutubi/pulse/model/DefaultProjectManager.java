@@ -1,11 +1,12 @@
 package com.zutubi.pulse.model;
 
-import com.zutubi.prototype.config.CollectionListener;
+import com.zutubi.prototype.config.CollectionAdapter;
 import com.zutubi.prototype.config.ConfigurationProvider;
 import com.zutubi.prototype.config.ConfigurationTemplateManager;
 import com.zutubi.prototype.type.CompositeType;
 import com.zutubi.prototype.type.TypeRegistry;
 import com.zutubi.prototype.type.record.MutableRecord;
+import com.zutubi.prototype.type.record.PathUtils;
 import com.zutubi.pulse.bootstrap.ComponentContext;
 import com.zutubi.pulse.cache.ehcache.CustomAclEntryCache;
 import com.zutubi.pulse.core.BuildException;
@@ -32,7 +33,11 @@ import com.zutubi.pulse.scm.ScmException;
 import com.zutubi.util.logging.Logger;
 import org.acegisecurity.annotation.Secured;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * 
@@ -73,7 +78,7 @@ public class DefaultProjectManager implements ProjectManager
         addProjectAuthorisation.setProjectManager(this);
         licenseManager.addAuthorisation(addProjectAuthorisation);
 
-        CollectionListener<ProjectConfiguration> listener = new CollectionListener<ProjectConfiguration>("project", ProjectConfiguration.class, true)
+        CollectionAdapter<ProjectConfiguration> listener = new CollectionAdapter<ProjectConfiguration>("project", ProjectConfiguration.class, true)
         {
             protected void preInsert(MutableRecord record)
             {
@@ -119,8 +124,9 @@ public class DefaultProjectManager implements ProjectManager
         {
             CompositeType projectType = typeRegistry.getType(ProjectConfiguration.class);
             MutableRecord globalTemplate = projectType.createNewRecord();
+            // FIXME: I18N these strings.
             globalTemplate.put("name", "global project template");
-            globalTemplate.put("description", "The global template is the base of the project template heirarchy.  Configuration shared among all projects should be added here.");
+            globalTemplate.put("description", "The global template is the base of the project template hierarchy.  Configuration shared among all projects should be added here.");
             configurationTemplateManager.markAsTemplate(globalTemplate);
             configurationTemplateManager.insertRecord("project", globalTemplate);
         }
@@ -163,7 +169,7 @@ public class DefaultProjectManager implements ProjectManager
 
     public void saveProjectConfig(ProjectConfiguration config)
     {
-        configurationProvider.save("project", config.getName(), config);
+        configurationProvider.save(PathUtils.getPath("project", config.getName()), config);
     }
 
     public Project getProject(String name)

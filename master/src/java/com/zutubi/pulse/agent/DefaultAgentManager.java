@@ -1,6 +1,6 @@
 package com.zutubi.pulse.agent;
 
-import com.zutubi.prototype.config.CollectionListener;
+import com.zutubi.prototype.config.CollectionAdapter;
 import com.zutubi.prototype.config.ConfigurationProvider;
 import com.zutubi.prototype.type.record.MutableRecord;
 import com.zutubi.pulse.AgentService;
@@ -81,7 +81,7 @@ public class DefaultAgentManager implements AgentManager, EventListener, Stoppab
 
     public void init()
     {
-        CollectionListener<AgentConfiguration> listener = new CollectionListener<AgentConfiguration>("agent", AgentConfiguration.class, true)
+        CollectionAdapter<AgentConfiguration> listener = new CollectionAdapter<AgentConfiguration>("agent", AgentConfiguration.class, true)
         {
             protected void preInsert(MutableRecord record)
             {

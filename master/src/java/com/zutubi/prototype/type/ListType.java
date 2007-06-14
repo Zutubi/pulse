@@ -4,7 +4,6 @@ import com.zutubi.prototype.config.ConfigurationTemplateManager;
 import com.zutubi.prototype.type.record.MutableRecord;
 import com.zutubi.prototype.type.record.PathUtils;
 import com.zutubi.prototype.type.record.Record;
-import com.zutubi.prototype.type.record.RecordManager;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -17,6 +16,7 @@ public class ListType extends CollectionType
 {
     private ConfigurationTemplateManager configurationTemplateManager;
     private static final String LATEST_KEY_KEY = "latestKey";
+    private static final String ITEM_KEY_KEY = "itemKey";
 
     public ListType(ConfigurationTemplateManager configurationTemplateManager)
     {
@@ -124,9 +124,9 @@ public class ListType extends CollectionType
         return instance;
     }
 
-    protected String getItemKey(String path, Record collectionRecord, Record itemRecord, RecordManager recordManager)
+    public String getInsertionPath(Record collection, Record record)
     {
-        String latestKey = collectionRecord.getMeta(LATEST_KEY_KEY);
+        String latestKey = collection.getMeta(LATEST_KEY_KEY);
         if (latestKey == null)
         {
             latestKey = "1";
@@ -135,17 +135,19 @@ public class ListType extends CollectionType
         {
             latestKey = Integer.toString(Integer.parseInt(latestKey) + 1);
         }
-
-        MutableRecord mutableRecord = collectionRecord.copy(false);
-        mutableRecord.putMeta(LATEST_KEY_KEY, latestKey);
-        recordManager.update(path, mutableRecord);
+        ((MutableRecord)collection).putMeta(LATEST_KEY_KEY, latestKey);
+        ((MutableRecord)record).putMeta(ITEM_KEY_KEY, latestKey);
         return latestKey;
     }
 
-    public String save(String path, String baseName, Record record, RecordManager recordManager)
+    public String getSavePath(Record collection, Record record)
     {
-        String newPath = PathUtils.getPath(path, baseName);
-        recordManager.update(newPath, record);
-        return newPath;
+        if (record.getMeta(ITEM_KEY_KEY) == null)
+        {
+            // indicates that this record has not been saved.  To generate the save path we would
+            // need the collection, as is the case with the insertionPath.
+        }
+
+        return record.getMeta(ITEM_KEY_KEY);
     }
 }

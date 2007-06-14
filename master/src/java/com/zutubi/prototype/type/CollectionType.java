@@ -62,20 +62,6 @@ public abstract class CollectionType extends AbstractType implements ComplexType
         return Arrays.asList(order.split(","));
     }
 
-    public String insert(String path, Record newRecord, RecordManager recordManager)
-    {
-        Record collectionRecord = recordManager.load(path);
-        if (collectionRecord == null)
-        {
-            throw new IllegalArgumentException("Attempt to store into a non-existant collection at path '" + path + "'");
-        }
-
-        String newKey = getItemKey(path, collectionRecord, newRecord, recordManager);
-        String newPath = PathUtils.getPath(path, newKey);
-        recordManager.insert(newPath, newRecord);
-        return newPath;
-    }
-
     public MutableRecord createNewRecord()
     {
         return new MutableRecordImpl();
@@ -85,11 +71,4 @@ public abstract class CollectionType extends AbstractType implements ComplexType
     {
         return false;
     }
-
-    public void save(String baseName, Record record)
-    {
-        // Noop
-    }
-
-    protected abstract String getItemKey(String path, Record collectionRecord, Record itemRecord, RecordManager recordManager);
 }

@@ -3,10 +3,12 @@ package com.zutubi.pulse.prototype.config.project.triggers;
 import com.zutubi.pulse.core.config.AbstractNamedConfiguration;
 import com.zutubi.pulse.scheduling.Trigger;
 import com.zutubi.config.annotations.Internal;
+import com.zutubi.config.annotations.Table;
 
 /**
  * 
  */
+@Table(columns = {"name", "state"})
 public abstract class TriggerConfiguration extends AbstractNamedConfiguration
 {
     @Internal

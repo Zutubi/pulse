@@ -71,9 +71,9 @@ public class DefaultConfigurationProvider implements ConfigurationProvider
         return configurationTemplateManager.insert(parentPath, instance);
     }
 
-    public void save(String parentPath, String baseName, Object instance)
+    public void save(String path, Object instance)
     {
-        configurationTemplateManager.save(parentPath, baseName, instance);
+        configurationTemplateManager.save(path, instance);
     }
 
     public void delete(String path)
@@ -108,7 +108,9 @@ public class DefaultConfigurationProvider implements ConfigurationProvider
 
     public void registerEventListener(ConfigurationEventListener listener, boolean synchronous, Class clazz)
     {
-        FilteringListener filter = new FilteringListener(new ClassPredicate(clazz), new Listener(listener));
+        ClassPredicate classPredicate = new ClassPredicate(clazz);
+        classPredicate.setTypeRegistry(typeRegistry);
+        FilteringListener filter = new FilteringListener(classPredicate, new Listener(listener));
         if (synchronous)
         {
             syncMux.addDelegate(filter);

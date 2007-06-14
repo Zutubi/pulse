@@ -23,7 +23,6 @@ public abstract class CollectionListener<T extends Configuration>
 
     public void register(final ConfigurationProvider configurationProvider)
     {
-        // A listener for inserts into the collection
         configurationProvider.registerEventListener(new ConfigurationEventListener()
         {
             public void handleConfigurationEvent(ConfigurationEvent event)
@@ -40,15 +39,7 @@ public abstract class CollectionListener<T extends Configuration>
                         instanceInserted((T)instance);
                     }
                 }
-            }
-        }, synchronous, false, path);
-
-        // A listener for deletes from the collection
-        configurationProvider.registerEventListener(new ConfigurationEventListener()
-        {
-            public void handleConfigurationEvent(ConfigurationEvent event)
-            {
-                if(event instanceof PreDeleteEvent)
+                else if(event instanceof PreDeleteEvent)
                 {
                     Object instance = ((PreDeleteEvent)event).getInstance();
                     if(configurationClass.isInstance(instance))
