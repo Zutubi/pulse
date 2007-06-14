@@ -6,6 +6,7 @@ import com.zutubi.pulse.util.SystemUtils;
 import com.zutubi.util.Constants;
 import com.zutubi.util.ForkOutputStream;
 import com.zutubi.util.IOUtils;
+import com.zutubi.validation.annotations.Required;
 
 import java.io.*;
 import java.util.*;
@@ -508,6 +509,7 @@ public class ExecutableCommand extends CommandSupport implements ScopeAware
         return Arrays.asList(OUTPUT_ARTIFACT_NAME);
     }
 
+    @Required
     public String getExe()
     {
         return exe;
