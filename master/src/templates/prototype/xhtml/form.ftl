@@ -1,7 +1,7 @@
 <#-- render form -->
 <script type="text/javascript">
     Ext.QuickTips.init();    
-    Ext.form.Field.prototype.msgTarget = 'side';
+    Ext.form.Field.prototype.msgTarget = 'under';
     
     var ${form.name} = function()
     {
@@ -17,7 +17,7 @@
             Ext.get('submitField').dom.value = value;
     <#if form.ajax>
             form.submit({
-                clientValidation: value != 'cancel',
+                clientValidation: false,
                 waitMsg: 'Submitting...'
             });
     <#else>
@@ -40,8 +40,6 @@
 
             form.addButton('${submitField.value}', function() { submitForm('${submitField.value}'); });
         </#list>
-
-        form.on('render', function() { form.items.first().focus(); });
 
         <#include "/prototype/xhtml/form-fields.ftl"/>
 

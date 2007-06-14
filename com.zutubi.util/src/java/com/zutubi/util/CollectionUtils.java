@@ -146,6 +146,19 @@ public class CollectionUtils
         return false;
     }
 
+    public static <T> boolean contains(T[] a, T x)
+    {
+        for(T t: a)
+        {
+            if(t.equals(x))
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     public static <T> Mapping<? extends T, T> identityMapping()
     {
         return new Mapping<T, T>()

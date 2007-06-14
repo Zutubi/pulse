@@ -1,16 +1,15 @@
 package com.zutubi.pulse.acceptance.forms.setup;
 
-import com.zutubi.pulse.acceptance.forms.BaseForm;
-import net.sourceforge.jwebunit.WebTester;
+import com.thoughtworks.selenium.Selenium;
+import com.zutubi.pulse.acceptance.forms.SeleniumForm;
 
 /**
- * <class-comment/>
  */
-public class ServerSettingsForm extends BaseForm
+public class ServerSettingsForm extends SeleniumForm
 {
-    public ServerSettingsForm(WebTester tester)
+    public ServerSettingsForm(Selenium selenium)
     {
-        super(tester);
+        super(selenium);
     }
 
     public String getFormName()

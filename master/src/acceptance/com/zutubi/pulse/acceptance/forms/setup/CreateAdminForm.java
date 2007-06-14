@@ -1,16 +1,15 @@
 package com.zutubi.pulse.acceptance.forms.setup;
 
-import com.zutubi.pulse.acceptance.forms.BaseForm;
-import net.sourceforge.jwebunit.WebTester;
+import com.thoughtworks.selenium.Selenium;
+import com.zutubi.pulse.acceptance.forms.SeleniumForm;
 
 /**
- * <class-comment/>
  */
-public class CreateAdminForm extends BaseForm
+public class CreateAdminForm extends SeleniumForm
 {
-    public CreateAdminForm(WebTester tester)
+    public CreateAdminForm(Selenium selenium)
     {
-        super(tester);
+        super(selenium);
     }
 
     public String getFormName()

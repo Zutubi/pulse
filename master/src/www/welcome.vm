@@ -4,7 +4,7 @@
     <title>welcome</title>
 </head>
 <body>
-    <h1>:: #wwtext("name=welcome") :: </h1>
+    <h1 id="welcome.heading">:: #wwtext("name=welcome") :: </h1>
     <p>
         Welcome to your new pulse server!  To help you get started, some common setup tasks are listed below.
     </p>

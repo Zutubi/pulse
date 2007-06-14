@@ -18,7 +18,7 @@ import java.io.IOException;
  * having multiple test methods, there is one testSetupProcess method that is breaks up the setup
  * process and handles all of the validation testing as it goes.
  */
-public class SetupAcceptanceTest extends BaseAcceptanceTestCase
+public class SetupAcceptanceTest extends SeleniumTestBase
 {
     public String licenseKey;
     public String expiredLicenseKey;
@@ -41,7 +41,7 @@ public class SetupAcceptanceTest extends BaseAcceptanceTestCase
     public void testSetupProcess() throws InterruptedException, IOException, SAXException
     {
         // first we deal with the pulse home property configuration.
-        beginAt("/");
+        selenium.open("http://localhost:" + port + "/setup/setupData!input.action");
 
         // step one. setting the pulse home variable.
         checkSetPulseData();
@@ -52,15 +52,11 @@ public class SetupAcceptanceTest extends BaseAcceptanceTestCase
         // step three. creating the administration user.
         checkCreateAdmin();
 
-        // check that any attempts to bypass the setup fail.
-        //beginAt("/");
-
         // step four. configuring the server essentials.
         checkServerSettings();
 
-        // step five. setup in progress - simulate the auto refresh of the browser.
         assertTextPresent("system setup");
-        pauseWhileMetaRefreshActive();
+        selenium.waitForCondition("selenium.browserbot.getCurrentWindow().document.getElementById('welcome.heading') != null", "60000");
 
         // one complete, we should see the home page, and it should contain the following:
         assertTextPresent(":: welcome ::");
@@ -71,37 +67,22 @@ public class SetupAcceptanceTest extends BaseAcceptanceTestCase
         // was actually persisted.
     }
 
-    private void checkServerSettings()
+    private void checkSetPulseData()
     {
-        ServerSettingsForm settingsForm = new ServerSettingsForm(tester);
-        settingsForm.assertFormPresent();
+        SetPulseDataForm form = new SetPulseDataForm(selenium);
+        form.assertFormPresent();
+        assertFormFieldNotEmpty("zfid.data");
 
-        // local host is required, and while we are at it, verify that all of the other form fields
-        // are correctly returned to the user when there is a validation failure.
-        settingsForm.finishFormElements("", "some.smtp.host.com", "false", "from@some.host.com", "username", "password", "prefix", "false", null);
-        settingsForm.assertFormElements("", "some.smtp.host.com", "false", "from@some.host.com", "username", "password", "prefix", "false", "25");
-        assertTextPresent("required");
+        form.nextFormElements("");
+        assertTextPresent("data requires a value");
+        form.assertFormPresent();
 
-        // if smtp host is set, then smtp from is also required.
-        settingsForm.finishFormElements("localhost:8080", "some.smtp.host.com", "false", "", "", "", "", "false", null);
-        settingsForm.assertFormElements("localhost:8080", "some.smtp.host.com", "false", "", "", "", "", "false", "25");
-        assertTextPresent("required");
-
-        // ensure that the base url setting is a valid url.
-        settingsForm.finishFormElements("localhost:8080", "false", "", "", "", "", "", "false", null);
-        settingsForm.assertFormElements("localhost:8080", "false", "", "", "", "", "", "false", "25");
-        assertTextPresent("valid");
-
-        // check that the from address is correctly validated.
-        settingsForm.finishFormElements("http://localhost:8080", "false", "", "invalid at email dot com", "", "", "", "false", null);
-        assertTextPresent("invalid");
-
-        settingsForm.finishFormElements("http://localhost:8080", "some.smtp.host.com", "true", "Setup <from@localhost.com>", "username", "password", "prefix", "true", "123");
+        form.nextFormElements("data");
     }
 
     private void checkLicenseDetails()
     {
-        PulseLicenseForm licenseForm = new PulseLicenseForm(tester);
+        PulseLicenseForm licenseForm = new PulseLicenseForm(selenium);
 
         licenseForm.assertFormPresent();
 
@@ -109,7 +90,7 @@ public class SetupAcceptanceTest extends BaseAcceptanceTestCase
         licenseForm.nextFormElements("");
         licenseForm.assertFormPresent();
         licenseForm.assertFormElements("");
-        assertTextPresent("required");
+        assertTextPresent("license requires a value");
 
         // check that license validation works.
         licenseForm.nextFormElements(invalidLicenseKey);
@@ -130,55 +111,18 @@ public class SetupAcceptanceTest extends BaseAcceptanceTestCase
 
     private void checkCreateAdmin()
     {
-        CreateAdminForm createAdminForm = new CreateAdminForm(tester);
+        CreateAdminForm createAdminForm = new CreateAdminForm(selenium);
 
         // create admin.
         createAdminForm.assertFormPresent();
-
-        // check validation on the form.
-        createAdminForm.nextFormElements("", "A. D. Ministrator", "admin", "admin");
-        createAdminForm.assertFormElements("", "A. D. Ministrator", "admin", "admin");
-        assertTextPresent("required");
-
-        // - no name
-        createAdminForm.nextFormElements("admin", "", "admin", "admin");
-        createAdminForm.assertFormElements("admin", "", "admin", "admin");
-        assertTextPresent("required");
-
-        // - no password
-        createAdminForm.nextFormElements("admin", "A. D. Ministrator", "", "admin");
-        createAdminForm.assertFormElements("admin", "A. D. Ministrator", "", "admin");
-        assertTextPresent("required");
-
-        // - password and confirmation do not match
-        createAdminForm.nextFormElements("admin", "A. D. Ministrator", "admin", "something other then pass");
-        createAdminForm.assertFormElements("admin", "A. D. Ministrator", "admin", "something other then pass");
-
-        // now create the administrator.
         createAdminForm.nextFormElements("admin", "A. D. Ministrator", "admin", "admin");
     }
 
-    private void checkSetPulseData()
+    private void checkServerSettings()
     {
-        SetPulseDataForm dataForm = new SetPulseDataForm(tester);
-
-        dataForm.assertFormPresent();
-
-        // ensure that we have a default value for the pulseData property.
-        assertFormElementNotEmpty("data");
-        // record the default value for later use.
-        String defaultData = getFormValue("data");
-
-        // check the validation - an empty pulse data.
-        dataForm.nextFormElements("");
-        // assert that we are still on the same page.
-        dataForm.assertFormElements("");
-
-        // check validation - an invalid pulse data value.
-
-        // enter valid pulse data that does not exist.
-        dataForm.nextFormElements("data");
-
-        // it should prompt for confirmation to create the directory....
+        ServerSettingsForm settingsForm = new ServerSettingsForm(selenium);
+        settingsForm.assertFormPresent();
+        settingsForm.finishFormElements("http://localhost:8080", "some.smtp.host.com", "true", "Setup <from@localhost.com>", "username", "password", "prefix", "true", "123");
     }
+
 }

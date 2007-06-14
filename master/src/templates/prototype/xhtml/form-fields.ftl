@@ -62,8 +62,11 @@ Ext.onReady(function()
     }
 </#list>
 
+    var buttonEl;
 <#list form.submitFields as submitField>
-    form.buttons[${submitField_index}].el.select('button').set({tabindex: window.nextTabindex++ });
+    buttonEl = form.buttons[${submitField_index}].el.child('button:first');
+    buttonEl.set({tabindex: window.nextTabindex++ });
+    buttonEl.dom.id = buttonEl.id = 'zfid.${submitField.value}';
 </#list>
 
     form.rendered = true;

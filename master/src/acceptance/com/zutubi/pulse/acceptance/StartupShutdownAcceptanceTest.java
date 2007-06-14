@@ -1,6 +1,8 @@
 package com.zutubi.pulse.acceptance;
 
 import com.opensymphony.util.TextUtils;
+import com.thoughtworks.selenium.DefaultSelenium;
+import com.thoughtworks.selenium.Selenium;
 import com.zutubi.pulse.acceptance.forms.setup.PulseLicenseForm;
 import com.zutubi.pulse.acceptance.forms.setup.SetPulseDataForm;
 import com.zutubi.pulse.bootstrap.SystemConfiguration;
@@ -12,7 +14,6 @@ import com.zutubi.pulse.config.Config;
 import com.zutubi.pulse.config.FileConfig;
 import com.zutubi.pulse.util.FileSystemUtils;
 import junit.framework.TestCase;
-import net.sourceforge.jwebunit.WebTester;
 import org.apache.commons.cli.ParseException;
 
 import java.io.File;
@@ -349,24 +350,24 @@ public class StartupShutdownAcceptanceTest extends TestCase
 
     private String assertPromptForPulseDataDirectory(RuntimeContext expected)
     {
-        WebTester tester = expected.initWebTester();
+        Selenium selenium = expected.initSelenium();
 
-        SetPulseDataForm form = new SetPulseDataForm(tester);
+        SetPulseDataForm form = new SetPulseDataForm(selenium);
         form.assertFormPresent();
 
         String dataDir = form.getFormValues()[0];
 
         // set the data directory
-        form.next();
+        form.nextFormElements("data");
 
         return dataDir;
     }
 
     private void assertPromptForLicense(RuntimeContext expected)
     {
-        WebTester tester = expected.initWebTester();
+        Selenium selenium = expected.initSelenium();
 
-        PulseLicenseForm form = new PulseLicenseForm(tester);
+        PulseLicenseForm form = new PulseLicenseForm(selenium);
         form.assertFormPresent();
     }
 
@@ -544,12 +545,12 @@ public class StartupShutdownAcceptanceTest extends TestCase
             return "http://localhost:" + getPort() + getContextPath();
         }
 
-        public WebTester initWebTester()
+        public Selenium initSelenium()
         {
-            WebTester tester = new WebTester();
-            tester.getTestContext().setBaseUrl(getBaseUrl());
-            tester.beginAt("/");
-            return tester;
+            Selenium selenium = new DefaultSelenium("localhost", 4444, "*firefox", getBaseUrl());
+            selenium.start();
+            selenium.open("/");
+            return selenium;
         }
     }
 }

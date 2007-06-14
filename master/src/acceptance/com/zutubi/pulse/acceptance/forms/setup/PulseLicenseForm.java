@@ -1,21 +1,20 @@
 package com.zutubi.pulse.acceptance.forms.setup;
 
-import com.zutubi.pulse.acceptance.forms.BaseForm;
-import net.sourceforge.jwebunit.WebTester;
+import com.thoughtworks.selenium.Selenium;
+import com.zutubi.pulse.acceptance.forms.SeleniumForm;
 
 /**
- * <class-comment/>
  */
-public class PulseLicenseForm extends BaseForm
+public class PulseLicenseForm extends SeleniumForm
 {
-    public PulseLicenseForm(WebTester tester)
+    public PulseLicenseForm(Selenium selenium)
     {
-        super(tester);
+        super(selenium);
     }
 
     public String getFormName()
     {
-        return "setup.license";
+        return "com.zutubi.pulse.prototype.config.setup.SetupLicenseConfiguration";
     }
 
     public String[] getFieldNames()
