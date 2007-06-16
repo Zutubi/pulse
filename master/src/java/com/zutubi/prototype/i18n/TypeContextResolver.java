@@ -2,7 +2,7 @@ package com.zutubi.prototype.i18n;
 
 import com.zutubi.i18n.context.ContextResolver;
 import com.zutubi.i18n.context.ExtendedClassContextResolver;
-import com.zutubi.i18n.context.ClassContext;
+import com.zutubi.i18n.context.ExtendedClassContext;
 import com.zutubi.prototype.type.Type;
 import com.zutubi.prototype.type.CollectionType;
 
@@ -21,8 +21,8 @@ public class TypeContextResolver implements ContextResolver<TypeContext>
         }
         Class clazz = type.getClazz();
 
-        ContextResolver<ClassContext> resolver = new ExtendedClassContextResolver();
-        return resolver.resolve(new ClassContext(clazz));
+        ContextResolver<ExtendedClassContext> resolver = new ExtendedClassContextResolver();
+        return resolver.resolve(new ExtendedClassContext(clazz));
     }
 
     public Class<TypeContext> getContextType()

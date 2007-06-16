@@ -5,9 +5,9 @@ import java.util.*;
 /**
  * <class-comment/>
  */
-public class ExtendedClassContextResolver implements ContextResolver<ClassContext>
+public class ExtendedClassContextResolver implements ContextResolver<ExtendedClassContext>
 {
-    public String[] resolve(ClassContext context)
+    public String[] resolve(ExtendedClassContext context)
     {
         List<String> resolvedNames = new LinkedList<String>();
 
@@ -44,8 +44,8 @@ public class ExtendedClassContextResolver implements ContextResolver<ClassContex
         return clazz.getName().replace('.', '/');
     }
 
-    public Class<ClassContext> getContextType()
+    public Class<ExtendedClassContext> getContextType()
     {
-        return ClassContext.class;
+        return ExtendedClassContext.class;
     }
 }

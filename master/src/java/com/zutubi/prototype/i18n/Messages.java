@@ -3,7 +3,7 @@ package com.zutubi.prototype.i18n;
 import com.zutubi.i18n.DefaultMessageHandler;
 import com.zutubi.i18n.MessageHandler;
 import com.zutubi.i18n.bundle.DefaultBundleManager;
-import com.zutubi.i18n.context.ClassContext;
+import com.zutubi.i18n.context.ExtendedClassContext;
 import com.zutubi.i18n.context.Context;
 import com.zutubi.i18n.context.DefaultContextCache;
 import com.zutubi.i18n.context.ExtendedClassContextResolver;
@@ -71,7 +71,7 @@ public class Messages
         }
         else
         {
-            return new ClassContext(obj);
+            return new ExtendedClassContext(obj);
         }
     }
 

@@ -27,7 +27,7 @@ public class ExtendedClassContextResolverTest extends TestCase
 
     public void testJavaLangObject()
     {
-        String[] resolvedBundleNames = resolver.resolve(new ClassContext(Object.class));
+        String[] resolvedBundleNames = resolver.resolve(new ExtendedClassContext(Object.class));
         assertEquals(4, resolvedBundleNames.length);
         assertEquals("java/lang/Object", resolvedBundleNames[0]);
         assertEquals("java/lang/package", resolvedBundleNames[1]);
@@ -37,7 +37,7 @@ public class ExtendedClassContextResolverTest extends TestCase
 
     public void testMockBook()
     {
-        String[] resolvedBundleNames = resolver.resolve(new ClassContext(MockBook.class));
+        String[] resolvedBundleNames = resolver.resolve(new ExtendedClassContext(MockBook.class));
         assertEquals(7, resolvedBundleNames.length);
         assertEquals("com/zutubi/i18n/mock/MockBook", resolvedBundleNames[0]);
         assertEquals("java/lang/Object", resolvedBundleNames[1]);
@@ -50,7 +50,7 @@ public class ExtendedClassContextResolverTest extends TestCase
 
     public void testMockSubClass()
     {
-        String[] resolvedBundleNames = resolver.resolve(new ClassContext(MockSubClass.class));
+        String[] resolvedBundleNames = resolver.resolve(new ExtendedClassContext(MockSubClass.class));
         assertEquals(9, resolvedBundleNames.length);
         assertEquals("com/zutubi/i18n/mock/MockSubClass", resolvedBundleNames[0]);
         assertEquals("com/zutubi/i18n/mock/MockClass", resolvedBundleNames[1]);

@@ -7,9 +7,9 @@ import java.util.Arrays;
 /**
  * <class-comment/>
  */
-public class XWorkContextResolver implements ContextResolver<ClassContext>
+public class XWorkContextResolver implements ContextResolver<ExtendedClassContext>
 {
-    public String[] resolve(ClassContext context)
+    public String[] resolve(ExtendedClassContext context)
     {
         // Class file.
         List<String> resolvedNames = new LinkedList<String>();
@@ -25,8 +25,8 @@ public class XWorkContextResolver implements ContextResolver<ClassContext>
         return resolvedNames.toArray(new String[resolvedNames.size()]);
     }
 
-    public Class<ClassContext> getContextType()
+    public Class<ExtendedClassContext> getContextType()
     {
-        return ClassContext.class;
+        return ExtendedClassContext.class;
     }
 }

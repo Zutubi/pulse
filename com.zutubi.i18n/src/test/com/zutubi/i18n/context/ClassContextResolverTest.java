@@ -32,7 +32,7 @@ public class ClassContextResolverTest extends TestCase
 
     public void testClassContext()
     {
-        String[] resolvedBundleNames = resolver.resolve(new ClassContext(ClassContext.class));
+        String[] resolvedBundleNames = resolver.resolve(new ClassContext(ExtendedClassContext.class));
         assertEquals(3, resolvedBundleNames.length);
         assertEquals("com/zutubi/i18n/context/ClassContext", resolvedBundleNames[0]);
         assertEquals("com/zutubi/i18n/context/Context", resolvedBundleNames[1]);

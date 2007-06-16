@@ -1,13 +1,7 @@
 <html>
 <body>
 
-<h2>#i18n("key=label")</h2>
-<div style="color:gray">
-    #i18n("key=introduction")
-</div>
-<p>
     #pwizard("path=$action.path")
-</p>
 
 </body>
 </html>

@@ -74,7 +74,7 @@ public class Messages
         }
         else
         {
-            return new ClassContext(obj);
+            return new ExtendedClassContext(obj);
         }
     }
 

@@ -189,7 +189,14 @@ public class ConfigurationWizardAction extends ActionSupport
 
     private boolean validateState()
     {
-        return getState().validate(path, new XWorkValidationAdapter(this));
+        WizardState state = getState();
+        if (state != null)
+        {
+            return state.validate(path, new XWorkValidationAdapter(this));
+        }
+
+        // The session has likely timed out, or the user has manually constructed the post.
+        return false;
     }
 
     private boolean validateWizard()

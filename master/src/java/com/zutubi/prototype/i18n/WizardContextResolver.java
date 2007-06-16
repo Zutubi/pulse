@@ -1,8 +1,10 @@
 package com.zutubi.prototype.i18n;
 
-import com.zutubi.i18n.context.ClassContext;
+import com.zutubi.i18n.context.ExtendedClassContext;
 import com.zutubi.i18n.context.ContextResolver;
 import com.zutubi.i18n.context.ExtendedClassContextResolver;
+import com.zutubi.i18n.context.ClassContext;
+import com.zutubi.i18n.context.ClassContextResolver;
 import com.zutubi.prototype.wizard.TypeWizardState;
 import com.zutubi.prototype.wizard.webwork.AbstractTypeWizard;
 
@@ -16,7 +18,8 @@ import java.util.List;
  */
 public class WizardContextResolver implements ContextResolver<WizardContext>
 {
-    private ExtendedClassContextResolver delegateResolver = new ExtendedClassContextResolver();
+    private ClassContextResolver delegateClassResolver = new ClassContextResolver();
+    private ExtendedClassContextResolver delegateExtendedClassResolver = new ExtendedClassContextResolver();
 
     public String[] resolve(WizardContext context)
     {
@@ -33,14 +36,19 @@ public class WizardContextResolver implements ContextResolver<WizardContext>
         wizardTypeResourceName = wizardTypeResourceName + ".wizard";
         resolvedNames.add(wizardTypeResourceName);
 
-        resolveUsingDelegateResolver(new ClassContext(wizard.getType().getClazz()), resolvedNames);
+        resolveUsingDelegateResolver(new ExtendedClassContext(wizard.getType().getClazz()), resolvedNames);
 
         return resolvedNames.toArray(new String[resolvedNames.size()]);
     }
 
     private void resolveUsingDelegateResolver(ClassContext context, List<String> resolvedNames)
     {
-        resolvedNames.addAll(Arrays.asList(delegateResolver.resolve(context)));
+        resolvedNames.addAll(Arrays.asList(delegateClassResolver.resolve(context)));
+    }
+
+    private void resolveUsingDelegateResolver(ExtendedClassContext context, List<String> resolvedNames)
+    {
+        resolvedNames.addAll(Arrays.asList(delegateExtendedClassResolver.resolve(context)));
     }
 
     public Class<WizardContext> getContextType()

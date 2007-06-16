@@ -26,7 +26,7 @@ public class XWorkContextResolverTest extends TestCase
 
     public void testJavaLangObject()
     {
-        String[] resolvedBundleNames = resolver.resolve(new ClassContext(new Object()));
+        String[] resolvedBundleNames = resolver.resolve(new ExtendedClassContext(new Object()));
         assertEquals(4, resolvedBundleNames.length);
         assertEquals("java/lang/Object", resolvedBundleNames[0]);
         assertEquals("java/lang/package", resolvedBundleNames[1]);
@@ -36,7 +36,7 @@ public class XWorkContextResolverTest extends TestCase
 
     public void testMockBook()
     {
-        String[] resolvedBundleNames = resolver.resolve(new ClassContext(MockBook.class));
+        String[] resolvedBundleNames = resolver.resolve(new ExtendedClassContext(MockBook.class));
         assertEquals(6, resolvedBundleNames.length);
         assertEquals("com/zutubi/i18n/mock/MockBook", resolvedBundleNames[0]);
         assertEquals("com/zutubi/i18n/mock/package", resolvedBundleNames[1]);
