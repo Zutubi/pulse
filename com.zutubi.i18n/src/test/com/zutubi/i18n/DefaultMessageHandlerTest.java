@@ -6,6 +6,7 @@ import com.zutubi.i18n.context.PackageContextResolver;
 import com.zutubi.i18n.context.ClassContextResolver;
 import com.zutubi.i18n.context.ExtendedClassContext;
 import com.zutubi.i18n.context.DefaultContextCache;
+import com.zutubi.i18n.context.ClassContext;
 import com.zutubi.i18n.mock.MockClass;
 
 import java.util.Locale;
@@ -39,7 +40,7 @@ public class DefaultMessageHandlerTest extends TestCase
     // just make sure that everything is playing nicely.
     public void testKeyFormattedAsExpected()
     {
-        ExtendedClassContext context = new ExtendedClassContext(MockClass.class);
+        ClassContext context = new ClassContext(MockClass.class);
         assertEquals("This ARG is formatted.", handler.format(context, "message.key", "ARG"));
         handler.setLocale(new Locale("de"));
         assertEquals("This ARG is formatted in german.", handler.format(context, "message.key", "ARG"));

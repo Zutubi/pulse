@@ -59,7 +59,7 @@ public class DefaultBundleManagerTest extends TestCase
     {
         bundleManager.addResolver(new ClassContextResolver());
 
-        List<ResourceBundle> bundles =  bundleManager.getBundles(new ExtendedClassContext(MockSubClass.class), locale);
+        List<ResourceBundle> bundles =  bundleManager.getBundles(new ClassContext(MockSubClass.class), locale);
         assertEquals(2, bundles.size());
     }
 
