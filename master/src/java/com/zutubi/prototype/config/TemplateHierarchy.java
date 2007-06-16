@@ -27,7 +27,7 @@ public class TemplateHierarchy
         return root;
     }
 
-    public TemplateNode getNode(String path)
+    public TemplateNode getNodeByTemplatePath(String path)
     {
         TemplateNode current = null;
 
@@ -42,5 +42,10 @@ public class TemplateHierarchy
         }
 
         return current;
+    }
+
+    public TemplateNode getNodeById(String id)
+    {
+        return root.findNodeById(id);
     }
 }

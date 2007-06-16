@@ -27,7 +27,7 @@ public class GenericAction extends PrototypeSupport
 
     public String execute() throws Exception
     {
-        CompositeType type = (CompositeType) configurationPersistenceManager.getType(path);
+        CompositeType type = (CompositeType) configurationTemplateManager.getType(path);
 
         // need the action handler.
         Class handlerClass = ConventionSupport.getActions(type);

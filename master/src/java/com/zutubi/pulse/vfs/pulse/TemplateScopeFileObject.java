@@ -47,7 +47,7 @@ public class TemplateScopeFileObject extends AbstractPulseFileObject
 
     public TemplateHierarchy getTemplateHierarchy()
     {
-        return configurationTemplateManager.getTemplateHeirarchy(getName().getBaseName());
+        return configurationTemplateManager.getTemplateHierarchy(getName().getBaseName());
     }
 
     public void setConfigurationTemplateManager(ConfigurationTemplateManager configurationTemplateManager)

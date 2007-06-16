@@ -1,10 +1,10 @@
 package com.zutubi.pulse.vfs.pulse;
 
-import com.zutubi.prototype.config.ConfigurationPersistenceManager;
-import com.zutubi.prototype.type.CollectionType;
+import com.zutubi.prototype.config.ConfigurationTemplateManager;
 import com.zutubi.prototype.type.ComplexType;
 import com.zutubi.prototype.type.Type;
 import com.zutubi.prototype.type.record.PathUtils;
+import com.zutubi.prototype.webwork.PrototypeUtils;
 import com.zutubi.pulse.filesystem.FileSystemException;
 import org.apache.commons.vfs.FileName;
 import org.apache.commons.vfs.FileType;
@@ -18,7 +18,7 @@ import java.util.List;
  */
 public class ConfigFileObject extends AbstractPulseFileObject
 {
-    private ConfigurationPersistenceManager configurationPersistenceManager;
+    private ConfigurationTemplateManager configurationTemplateManager;
     /**
      * This is the path into the configuration subsystem.
      */
@@ -42,7 +42,7 @@ public class ConfigFileObject extends AbstractPulseFileObject
     public AbstractPulseFileObject createFile(final FileName fileName) throws Exception
     {
         String childPath = PathUtils.getPath(path, fileName.getBaseName());
-        Type childType = configurationPersistenceManager.getType(childPath);
+        Type childType = configurationTemplateManager.getType(childPath);
         if(!(childType instanceof ComplexType))
         {
             throw new FileSystemException("Illegal path '" + childPath + "': does not refer to a valid type");
@@ -56,7 +56,7 @@ public class ConfigFileObject extends AbstractPulseFileObject
 
     protected FileType doGetType() throws Exception
     {
-        if(type == null || configurationPersistenceManager.getListing(path).size() > 0 || configurationPersistenceManager.getType(path) instanceof CollectionType)
+        if(type == null || PrototypeUtils.isFolder(path, configurationTemplateManager))
         {
             return FileType.FOLDER;
         }
@@ -68,12 +68,12 @@ public class ConfigFileObject extends AbstractPulseFileObject
 
     protected String[] doListChildren() throws Exception
     {
-        List<String> listing = configurationPersistenceManager.getListing(path);
+        List<String> listing = PrototypeUtils.getPathListing(path, type, configurationTemplateManager);
         return listing.toArray(new String[listing.size()]);
     }
 
-    public void setConfigurationPersistenceManager(ConfigurationPersistenceManager configurationPersistenceManager)
+    public void setConfigurationTemplateManager(ConfigurationTemplateManager configurationTemplateManager)
     {
-        this.configurationPersistenceManager = configurationPersistenceManager;
+        this.configurationTemplateManager = configurationTemplateManager;
     }
 }

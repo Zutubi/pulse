@@ -2,7 +2,6 @@ package com.zutubi.prototype.config;
 
 import com.zutubi.prototype.config.types.*;
 import com.zutubi.prototype.type.CompositeType;
-import com.zutubi.prototype.type.Type;
 import com.zutubi.prototype.type.TypeException;
 import com.zutubi.prototype.type.TypeRegistry;
 import com.zutubi.prototype.type.record.MockRecordSerialiser;
@@ -39,22 +38,6 @@ public class ConfigurationPersistenceManagerTest extends TestCase
         manager = null;
 
         super.tearDown();
-    }
-
-    public void testListingSimpleObject() throws TypeException
-    {
-        manager.register("simple", typeRegistry.register(SimpleObject.class));
-        assertEquals(0, manager.getListing("simple").size());
-
-        Type type = manager.getType("simple");
-        assertEquals(SimpleObject.class, type.getClazz());
-    }
-
-    public void testListingCollectionObject() throws TypeException
-    {
-        manager.register("simpleCollection", typeRegistry.register(SimpleCollectionObject.class));
-        assertEquals(1, manager.getListing("simpleCollection").size());
-        assertEquals(0, manager.getListing("simpleCollection/simpleList").size());
     }
 
     public void testIndexSimple() throws TypeException

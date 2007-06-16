@@ -32,7 +32,7 @@ public class SaveAction extends PrototypeSupport
         }
         else if(isCancelSelected())
         {
-            response = new ConfigurationResponse(path);
+            response = new ConfigurationResponse(path, configurationTemplateManager.getTemplatePath(path));
         }
         
         return doRender();
@@ -63,10 +63,10 @@ public class SaveAction extends PrototypeSupport
         }
 
         String newPath = configurationTemplateManager.saveRecord(path, record);
-        response = new ConfigurationResponse(newPath);
+        response = new ConfigurationResponse(newPath, configurationTemplateManager.getTemplatePath(newPath));
         if(!newPath.equals(path))
         {
-            response.addInvalidatedPath(parentPath);
+            response.addRenamedPath(new ConfigurationResponse.Rename(path, newPath));
         }
 
         path = newPath;

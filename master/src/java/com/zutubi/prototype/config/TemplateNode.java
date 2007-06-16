@@ -1,5 +1,6 @@
 package com.zutubi.prototype.config;
 
+import com.zutubi.prototype.type.record.PathUtils;
 import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.Predicate;
 
@@ -18,9 +19,8 @@ public class TemplateNode
     private String path;
     private String id;
 
-    public TemplateNode(TemplateNode parent, String path, String id)
+    public TemplateNode(String path, String id)
     {
-        this.parent = parent;
         this.path = path;
         this.id = id;
     }
@@ -28,6 +28,11 @@ public class TemplateNode
     public TemplateNode getParent()
     {
         return parent;
+    }
+
+    private void setParent(TemplateNode parent)
+    {
+        this.parent = parent;
     }
 
     public List<TemplateNode> getChildren()
@@ -48,6 +53,7 @@ public class TemplateNode
 
     public void addChild(TemplateNode child)
     {
+        child.setParent(this);
         children.add(child);
     }
 
@@ -59,5 +65,36 @@ public class TemplateNode
     public String getId()
     {
         return id;
+    }
+
+    public TemplateNode findNodeById(String id)
+    {
+        if(this.id.equals(id))
+        {
+            return this;
+        }
+
+        for(TemplateNode child: children)
+        {
+            TemplateNode node = child.findNodeById(id);
+            if(node != null)
+            {
+                return node;
+            }
+        }
+
+        return null;
+    }
+
+    public String getTemplatePath()
+    {
+        if(parent == null)
+        {
+            return id;
+        }
+        else
+        {
+            return PathUtils.getPath(parent.getTemplatePath(), id);
+        }
     }
 }

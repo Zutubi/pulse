@@ -43,30 +43,35 @@ public class DeleteAction extends PrototypeSupport
     {
         parentPath = PathUtils.getParentPath(path);
 
-        type = configurationPersistenceManager.getType(path);
+        type = configurationTemplateManager.getType(path);
         textProvider = new MessagesTextProvider(type.getClazz());
 
-        if(isConfirmSelected())
+        if (isConfirmSelected())
         {
             task = configurationReferenceManager.getCleanupTasks(getPath());
             newPanel = new ConfigurationPanel("aconfig/confirm.vm");
             return "confirm";
         }
-        else if (isDeleteSelected())
+        else
         {
-            configurationTemplateManager.delete(path);
-            response = new ConfigurationResponse(PathUtils.getParentPath(path));
-            response.addInvalidatedPath(response.getNewPath());
-            path = response.getNewPath();
-            return SUCCESS;
+            String templatePath = configurationTemplateManager.getTemplatePath(path);
+            if (isDeleteSelected())
+            {
+                String newTemplatePath = templatePath == null ? null : PathUtils.getParentPath(templatePath);
+                configurationTemplateManager.delete(path);
+
+                response = new ConfigurationResponse(parentPath, newTemplatePath);
+                response.addRemovedPath(path);
+                path = response.getNewPath();
+                return SUCCESS;
+            }
+            else if (isCancelSelected())
+            {
+                response = new ConfigurationResponse(parentPath, templatePath);
+                path = response.getNewPath();
+                return "cancel";
+            }
         }
-        else if(isCancelSelected())
-        {
-            response = new ConfigurationResponse(PathUtils.getParentPath(path));
-            path = response.getNewPath();
-            return "cancel";
-        }
-        
         return ERROR;
     }
 

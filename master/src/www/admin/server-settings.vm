@@ -24,16 +24,9 @@
                 {
                     Ext.get('detail-pane').update(result.newPanel, true);
                 }
-                else
-                {
-                    tree.invalidatePaths(result.invalidatedPaths, function()
-                    {
-                        if(result.newPath)
-                        {
-                            selectPath(result.newPath);
-                        }
-                    });
-                }
+
+                tree.handleResponse(result);
+                tree.redirectToNewPath(result);
             }
         }
 

@@ -1,0 +1,32 @@
+<h2>$!webwork.htmlEncode($id)</h2>
+
+<h3>actions</h3>
+
+<ul class="template-actions">
+    <li><img alt="configure" src="$base/images/pencil.gif"/> <a href="#" onclick="configureRecord('$path'); return false">configure</a> this #i18n("key=label")</li>
+    <li><img alt="add concrete" src="$base/images/add.gif"/> <a href="#" onclick="addToPath('$path', false); return false">add concrete</a> #i18n("key=label")</li>
+    <li><img alt="add template" src="$base/images/add.gif"/> <a href="#" onclick="addToPath('$path', true); return false">add template</a> #i18n("key=label")</li>
+#if($node.children.size() == 0)
+    <li><img alt="add concrete" src="$base/images/delete.gif"/> <a href="#" onclick="deletePath('$path'); return false">delete </a> this #i18n("key=label")</li>
+#end
+</ul>
+
+<h3>navigate</h3>
+
+#if($node.parent)
+<p>
+Parent:
+    <a href="#" onclick="selectTemplate('$node.parent.templatePath')">$!webwork.htmlEncode($node.parent.id)</a>
+</p>
+#end
+
+#if($node.children.size() > 0)
+<p>
+Children:
+    <ul class="template-children">
+#foreach($child in $node.children)
+        <li><a href="#" onclick="selectTemplate('$child.templatePath'); return false">$!webwork.htmlEncode($child.id)</a></li>
+#end
+    </ul>
+</p>
+#end

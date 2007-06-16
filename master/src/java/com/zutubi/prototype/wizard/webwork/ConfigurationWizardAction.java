@@ -4,23 +4,20 @@ import com.opensymphony.util.TextUtils;
 import com.opensymphony.xwork.ActionContext;
 import com.zutubi.i18n.Messages;
 import com.zutubi.prototype.ConventionSupport;
-import com.zutubi.prototype.config.ConfigurationPersistenceManager;
+import com.zutubi.prototype.config.ConfigurationTemplateManager;
 import com.zutubi.prototype.type.CollectionType;
 import com.zutubi.prototype.type.Type;
 import com.zutubi.prototype.type.record.PathUtils;
 import com.zutubi.prototype.webwork.ConfigurationErrors;
 import com.zutubi.prototype.webwork.ConfigurationPanel;
 import com.zutubi.prototype.webwork.ConfigurationResponse;
+import com.zutubi.prototype.webwork.PrototypeUtils;
 import com.zutubi.prototype.wizard.Wizard;
 import com.zutubi.prototype.wizard.WizardState;
 import com.zutubi.pulse.bootstrap.ComponentContext;
 import com.zutubi.pulse.web.ActionSupport;
 import com.zutubi.util.logging.Logger;
-import com.zutubi.validation.DelegatingValidationContext;
-import com.zutubi.validation.ValidationContext;
-import com.zutubi.validation.ValidationException;
-import com.zutubi.validation.ValidationManager;
-import com.zutubi.validation.XWorkValidationAdapter;
+import com.zutubi.validation.*;
 import com.zutubi.validation.i18n.MessagesTextProvider;
 
 import java.util.Map;
@@ -45,7 +42,7 @@ public class ConfigurationWizardAction extends ActionSupport
 
     private boolean wizardRequiresLazyInitialisation = false;
 
-    private ConfigurationPersistenceManager configurationPersistenceManager;
+    private ConfigurationTemplateManager configurationTemplateManager;
 
     /**
      * Setter for the configuration path.
@@ -283,11 +280,11 @@ public class ConfigurationWizardAction extends ActionSupport
     {
         getWizardInstance().doFinish();
         String newPath = ((AbstractTypeWizard) getWizardInstance()).getSuccessPath();
-        configurationResponse = new ConfigurationResponse(newPath);
+        configurationResponse = new ConfigurationResponse(newPath, configurationTemplateManager.getTemplatePath(newPath));
         if(!path.equals(newPath))
         {
-            // Then we added a child, invalidating path
-            configurationResponse.addInvalidatedPath(path);
+            // Then we added something.
+            configurationResponse.addAddedFile(new ConfigurationResponse.Addition(newPath, configurationTemplateManager.getTemplatePath(newPath), PrototypeUtils.isLeaf(newPath, configurationTemplateManager)));
         }
         removeWizard();
         path = newPath;
@@ -313,7 +310,7 @@ public class ConfigurationWizardAction extends ActionSupport
     {
         getWizardInstance().doCancel();
         removeWizard();
-        configurationResponse = new ConfigurationResponse(path);
+        configurationResponse = new ConfigurationResponse(path, configurationTemplateManager.getTemplatePath(path));
         return "cancel";
     }
 
@@ -378,19 +375,16 @@ public class ConfigurationWizardAction extends ActionSupport
         }
     }
 
+    @SuppressWarnings({"unchecked"})
     protected Wizard doCreateWizard()
     {
         AbstractTypeWizard wizardInstance = null;
 
-        Type type = configurationPersistenceManager.getType(path);
+        Type type = configurationTemplateManager.getType(path);
         if (type instanceof CollectionType)
         {
             type = ((CollectionType) type).getCollectionType();
         }
-
-        // can create wizards using a number of conventions.
-        // a) <configurationClass>Wizard
-        // b) defined by the Wizard annotation.
 
         Class wizardClass = ConventionSupport.getWizard(type);
         if (wizardClass != null)
@@ -423,8 +417,8 @@ public class ConfigurationWizardAction extends ActionSupport
         this.validationManager = validationManager;
     }
 
-    public void setConfigurationPersistenceManager(ConfigurationPersistenceManager configurationPersistenceManager)
+    public void setConfigurationTemplateManager(ConfigurationTemplateManager configurationTemplateManager)
     {
-        this.configurationPersistenceManager = configurationPersistenceManager;
+        this.configurationTemplateManager = configurationTemplateManager;
     }
 }

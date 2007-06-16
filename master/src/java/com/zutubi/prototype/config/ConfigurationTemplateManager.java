@@ -1,17 +1,8 @@
 package com.zutubi.prototype.config;
 
-import com.zutubi.prototype.config.events.PostDeleteEvent;
-import com.zutubi.prototype.config.events.PostInsertEvent;
-import com.zutubi.prototype.config.events.PostSaveEvent;
-import com.zutubi.prototype.config.events.PreDeleteEvent;
-import com.zutubi.prototype.config.events.PreInsertEvent;
-import com.zutubi.prototype.config.events.PreSaveEvent;
+import com.zutubi.prototype.config.events.*;
 import com.zutubi.prototype.type.*;
-import com.zutubi.prototype.type.record.MutableRecord;
-import com.zutubi.prototype.type.record.PathUtils;
-import com.zutubi.prototype.type.record.Record;
-import com.zutubi.prototype.type.record.RecordManager;
-import com.zutubi.prototype.type.record.TemplateRecord;
+import com.zutubi.prototype.type.record.*;
 import com.zutubi.pulse.core.config.Configuration;
 import com.zutubi.pulse.events.EventManager;
 import com.zutubi.util.logging.Logger;
@@ -22,8 +13,6 @@ import com.zutubi.validation.ValidationManager;
 import com.zutubi.validation.i18n.MessagesTextProvider;
 
 import java.util.*;
-import java.util.Map;
-import java.util.HashMap;
 
 /**
  */
@@ -324,7 +313,7 @@ public class ConfigurationTemplateManager
     {
         String id = (String) record.get(idProperty);
         String path = PathUtils.getPath(scopeName, id);
-        TemplateNode node = new TemplateNode(null, path, id);
+        TemplateNode node = new TemplateNode(path, id);
 
         List<Record> children = recordsByParent.get(record.getHandle());
         if(children != null)
@@ -588,7 +577,7 @@ public class ConfigurationTemplateManager
         return templateHierarchies.keySet();
     }
 
-    public TemplateHierarchy getTemplateHeirarchy(String scope)
+    public TemplateHierarchy getTemplateHierarchy(String scope)
     {
         ConfigurationScopeInfo scopeInfo = configurationPersistenceManager.getScopeInfo(scope);
         if(scopeInfo == null)
@@ -602,6 +591,27 @@ public class ConfigurationTemplateManager
         }
 
         return templateHierarchies.get(scope);
+    }
+
+    public String getTemplatePath(String path)
+    {
+        String templatePath = null;
+        String[] elements = PathUtils.getPathElements(path);
+        if(elements.length == 2)
+        {
+            ConfigurationScopeInfo scope = configurationPersistenceManager.getScopeInfo(elements[0]);
+            if(scope != null && scope.isTemplated())
+            {
+                TemplateHierarchy hierarchy = templateHierarchies.get(scope.getScopeName());
+                TemplateNode node = hierarchy.getNodeById(elements[1]);
+                if (node != null)
+                {
+                    templatePath = node.getTemplatePath();
+                }
+            }
+        }
+
+        return templatePath;
     }
 
     private List<String> getPathListing(String basePath, Record record)
@@ -648,6 +658,25 @@ public class ConfigurationTemplateManager
             }
         }
         return paths;
+    }
+
+    public Type getType(String path)
+    {
+        return configurationPersistenceManager.getType(path);
+    }
+
+    public List<String> getRootListing()
+    {
+        List<String> result = new LinkedList<String>();
+        for(ConfigurationScopeInfo scope: configurationPersistenceManager.getScopes())
+        {
+            if(scope.isPersistent())
+            {
+                result.add(scope.getScopeName());
+            }
+        }
+
+        return result;
     }
 
     public void setTypeRegistry(TypeRegistry typeRegistry)

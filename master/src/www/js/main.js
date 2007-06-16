@@ -1,3 +1,22 @@
+function each(a, f)
+{
+    for(var i = 0; i < a.length; i++)
+    {
+        f(a[i]);
+    }
+}
+
+function map(a, mapping)
+{
+    var out = new Array(a.length);
+    for(var i = 0; i < a.length; i++)
+    {
+        out[i] = mapping(a[i]);
+    }
+
+    return out;
+}
+
 function getElement(id)
 {
     var element;

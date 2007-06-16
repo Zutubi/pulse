@@ -98,33 +98,4 @@ public class LsAction extends ActionSupport
         this.fileSystemManager = fileSystemManager;
     }
 
-    public static class ExtFile
-    {
-        private String id;
-        private String text;
-        private boolean leaf;
-
-        public ExtFile(FileObjectWrapper fo)
-        {
-            id = fo.getId();
-            text = fo.getId();
-            leaf = !fo.isContainer();
-        }
-
-        public String getId()
-        {
-            return id;
-        }
-
-        public String getText()
-        {
-            return text;
-        }
-
-        public boolean isLeaf()
-        {
-            return leaf;
-        }
-    }
-
 }

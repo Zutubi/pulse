@@ -1,6 +1,5 @@
 package com.zutubi.prototype.velocity;
 
-import com.zutubi.prototype.config.ConfigurationPersistenceManager;
 import com.zutubi.prototype.config.ConfigurationTemplateManager;
 import com.zutubi.prototype.table.FormattingWrapper;
 import com.zutubi.prototype.table.TableDescriptor;
@@ -31,7 +30,6 @@ import java.util.Map;
  */
 public class TableDirective extends PrototypeDirective
 {
-    private ConfigurationPersistenceManager configurationPersistenceManager;
     private ConfigurationTemplateManager configurationTemplateManager;
 
     private static final Logger LOG = Logger.getLogger(TableDirective.class);
@@ -74,7 +72,7 @@ public class TableDirective extends PrototypeDirective
             Map params = createPropertyMap(contextAdapter, node);
             wireParams(params);
 
-            Type collectionType = configurationPersistenceManager.getType(path);
+            Type collectionType = configurationTemplateManager.getType(path);
             
             // lookup the data.
             Collection data = getTableData(path);
@@ -124,7 +122,7 @@ public class TableDirective extends PrototypeDirective
     {
         Collection data;
         Object collection = configurationTemplateManager.getInstance(path);
-        Type type = configurationPersistenceManager.getType(path).getTargetType();
+        Type type = configurationTemplateManager.getType(path).getTargetType();
         
         if (collection instanceof Map)
         {
@@ -151,11 +149,6 @@ public class TableDirective extends PrototypeDirective
     public void setFreemarkerConfiguration(Configuration configuration)
     {
         this.configuration = configuration;
-    }
-
-    public void setConfigurationPersistenceManager(ConfigurationPersistenceManager configurationPersistenceManager)
-    {
-        this.configurationPersistenceManager = configurationPersistenceManager;
     }
 
     public void setConfigurationTemplateManager(ConfigurationTemplateManager configurationTemplateManager)

@@ -43,7 +43,7 @@ public class TemplateFileObject extends AbstractPulseFileObject
         TemplateHierarchy hierarchy = scopeFile.getTemplateHierarchy();
         if(hierarchy != null)
         {
-            TemplateNode node = hierarchy.getNode(scopeFile.getName().getRelativeName(getName()));
+            TemplateNode node = hierarchy.getNodeByTemplatePath(scopeFile.getName().getRelativeName(getName()));
             if(node != null)
             {
                 List<String> childNodes = CollectionUtils.map(node.getChildren(), new Mapping<TemplateNode, String>()

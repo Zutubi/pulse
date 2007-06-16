@@ -16,13 +16,8 @@ ZUTUBI.ConfigTreeLoader = function(base)
 Ext.extend(ZUTUBI.ConfigTreeLoader, Ext.tree.TreeLoader, {
     getNodePath : function(node)
     {
-        var path = node.getPath().substring(2);
-        if(path.length == 0)
-        {
-            path = '/';
-        }
-
-        return this.dataUrl + path;
+        var tree = node.getOwnerTree();
+        return this.dataUrl + '/' + tree.getNodeConfigPath(node);
     },
 
     requestData : function(node, callback)
@@ -58,39 +53,226 @@ ZUTUBI.ConfigTree = function(id, config)
 }
 
 Ext.extend(ZUTUBI.ConfigTree, Ext.tree.TreePanel, {
-    getNodeByPath: function(path)
+    configPathToTreePath: function(configPath)
     {
-        var keys = path.split(this.pathSeparator);
+        var treePath = configPath;
+
+        if (this.pathPrefix && treePath.indexOf(this.pathPrefix) == 0)
+        {
+            treePath = treePath.substring(this.pathPrefix.length);
+        }
+
+        if(treePath.length > 0 && treePath[0] != '/')
+        {
+            treePath = '/' + treePath;
+        }
+
+        if (!this.rootVisible)
+        {
+            treePath = this.pathSeparator + this.root.id + treePath;
+        }
+
+        // Workaround odd Ext behaviour: selecting needs a leading slash
+        // except when selecting the root.
+        if (treePath.lastIndexOf('/') == 0)
+        {
+            treePath = treePath.substring(1);
+        }
+
+        //console.log('cpttp(' + configPath + ') -> ' + treePath);
+        return treePath;
+    },
+
+    treePathToConfigPath: function(treePath)
+    {
+        var configPath = treePath;
+        
+        if (!this.rootVisible)
+        {
+            configPath = configPath.substring(this.root.id.length + 1);
+        }
+
+        if(configPath.length > 0 && configPath[0] == '/')
+        {
+            configPath = configPath.substring(1);    
+        }
+
+        if (this.pathPrefix)
+        {
+            configPath = this.pathPrefix + this.pathSeparator + configPath;
+        }
+
+        //console.log('tptcp(' + treePath + ') -> ' + configPath);
+        return configPath;
+    },
+
+    selectConfigPath: function(configPath)
+    {
+        this.getSelectionModel().clearSelections();
+        this.selectPath(this.configPathToTreePath(configPath));
+    },
+
+    getNodeConfigPath: function(node)
+    {
+        return this.treePathToConfigPath(node.getPath());
+    },
+
+    getNodeByConfigPath: function(configPath)
+    {
+        var treePath = this.configPathToTreePath(configPath);
+        if(treePath[0] == '/')
+        {
+            treePath = treePath.substring(1);
+        }
+        
+        var keys = treePath.split(this.pathSeparator);
+
+        if (keys[0] != this.root.id)
+        {
+            return null;
+        }
+
         var node = this.root;
-        for(var i = 0; node && i < keys.length; i++)
+        for(var i = 1; node && i < keys.length; i++)
         {
             node = node.findChild('id', keys[i]);
         }
+        
         return node;
     },
 
-    invalidatePaths: function(paths, callback, index)
+    handleResponse: function(response)
     {
-        if(!index)
+        var tree = this;
+
+        if(response.addedFiles)
         {
-            index = 0;
+            each(response.addedFiles, function(addition) { tree.addNode(addition.parentPath, {id: addition.baseName, text: addition.baseName, leaf: addition.leaf}); });
         }
 
-        if(paths && paths.length - index > 0)
+        if(response.renamedPaths)
         {
-            callback = paths.length - index == 1 ? callback : function() { invalidatePaths(paths, callback, index + 1); };
-            var node = this.getNodeByPath(paths[index]);
-            if(node && node.isLoaded())
+            each(response.renamedPaths, function(rename) { tree.renameNode(rename.oldPath, rename.newName); });
+        }
+
+        if(response.removedPaths)
+        {
+            each(response.removedPaths, function(path) { tree.removeNode(path) });
+        }
+    },
+
+    redirectToNewPath: function(response)
+    {
+        if (response.newPath)
+        {
+            this.selectConfigPath(response.newPath);
+        }
+    },
+
+    addNode: function(parentPath, config)
+    {
+        if (parentPath)
+        {
+            var parentNode = this.getNodeByConfigPath(parentPath);
+            if (parentNode)
             {
-                node.reload(callback);
-                return;
+                var newNode = this.getLoader().createNode(config);
+                parentNode.appendChild(newNode);
             }
         }
+    },
 
-        callback();
+    renameNode: function(oldPath, newName)
+    {
+        if(oldPath)
+        {
+            var node = this.getNodeByConfigPath(oldPath);
+            if(node)
+            {
+                this.setNodeId(node, newName);
+                node.setText(newName);
+            }
+        }
+    },
+
+    removeNode: function(path)
+    {
+        if (path)
+        {
+            var node = this.getNodeByConfigPath(path);
+            if (node && !node.isRoot)
+            {
+                node.parentNode.removeChild(node);
+            }
+        }
+    },
+
+    setNodeId: function(node, id)
+    {
+        this.unregisterNode(node);
+        node.id = id;
+        node.attributes.id = id;
+        this.registerNode(node);
     }
 });
 
+
+ZUTUBI.TemplateTree = function(scope, id, config)
+{
+    this.scope = scope;
+    ZUTUBI.TemplateTree.superclass.constructor.call(this, id, config);
+}
+
+Ext.extend(ZUTUBI.TemplateTree, ZUTUBI.ConfigTree, {
+    handleResponse: function(response)
+    {
+        var tree = this;
+
+        if (response.addedFiles)
+        {
+            each(response.addedFiles, function(addition) {
+                if (addition.parentTemplatePath && addition.parentPath == tree.scope)
+                {
+                    tree.addNode(addition.parentTemplatePath, {id: addition.baseName, text: addition.baseName, leaf: addition.leaf});
+                }
+            });
+        }
+
+        if (response.renamedPaths)
+        {
+            each(response.renamedPaths, function(rename) { tree.renameNode(tree.translatePath(rename.oldPath), rename.newName); });
+        }
+
+        if (response.removedPaths)
+        {
+            each(response.removedPaths, function(path) { tree.removeNode(tree.translatePath(path)); } );
+        }
+    },
+
+    redirectToNewPath: function(response)
+    {
+        if (response.newTemplatePath)
+        {
+            this.selectConfigPath(response.newTemplatePath);
+        }
+    },
+
+    translatePath: function(path)
+    {
+        var pieces = path.split(this.pathSeparator);
+        if (pieces.length == 2 && pieces[0] == this.scope)
+        {
+            var id = pieces[1];
+            var node = this.getNodeById(id);
+            if (node)
+            {
+                return this.getNodeConfigPath(node);
+            }
+        }
+        
+        return null;
+    }
+});
 
 ZUTUBI.CheckForm = function(mainForm, options)
 {

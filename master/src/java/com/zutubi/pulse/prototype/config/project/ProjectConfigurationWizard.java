@@ -25,7 +25,7 @@ public class ProjectConfigurationWizard extends AbstractTypeWizard
     {
         TemplateRecord templateRecord = EMPTY_RECORD;
 
-        projectType = (CompositeType) configurationPersistenceManager.getType("project").getTargetType();
+        projectType = typeRegistry.getType(ProjectConfiguration.class);
         
         CompositeType scmType = (CompositeType) projectType.getProperty("scm").getType();
         CompositeType typeType = (CompositeType) projectType.getProperty("type").getType();
@@ -46,7 +46,7 @@ public class ProjectConfigurationWizard extends AbstractTypeWizard
         record.put("type", wizardStates.get(4).getRecord());
 
         // FIXME: temporary setting of parent
-        String globalPath = configurationTemplateManager.getTemplateHeirarchy("project").getRoot().getPath();
+        String globalPath = configurationTemplateManager.getTemplateHierarchy("project").getRoot().getPath();
         Record globalRecord = configurationTemplateManager.getRecord(globalPath);
         configurationTemplateManager.setParentTemplate(record, globalRecord.getHandle());
         successPath = configurationTemplateManager.insertRecord("project", record);

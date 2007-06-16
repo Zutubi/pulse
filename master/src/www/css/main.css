@@ -818,7 +818,7 @@ table.detail td li
     padding: 0;    
 }
 
-.x-tree-node a
+.x-tabs-strip a, .x-tree-node a
 {
     border-bottom: none;
     font-weight: normal;

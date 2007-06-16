@@ -4,7 +4,8 @@ import com.opensymphony.util.TextUtils;
 import com.zutubi.prototype.config.ConfigurationPersistenceManager;
 import com.zutubi.prototype.config.ConfigurationRegistry;
 import com.zutubi.prototype.config.ConfigurationTemplateManager;
-import com.zutubi.prototype.type.*;
+import com.zutubi.prototype.type.CompositeType;
+import com.zutubi.prototype.type.Type;
 import com.zutubi.prototype.type.record.PathUtils;
 import com.zutubi.prototype.type.record.Record;
 import com.zutubi.pulse.bootstrap.ComponentContext;
@@ -38,8 +39,8 @@ public class Configuration
     private String[] parentPathElements;
     private String currentPath;
 
-    private List<String> simpleProperties = new LinkedList<String>();
-    private List<String> nestedProperties = new LinkedList<String>();
+    private List<String> simpleProperties;
+    private List<String> nestedProperties;
     private List<String> extensions = new LinkedList<String>();
 
     private boolean configurationCheckAvailable = false;
@@ -85,32 +86,8 @@ public class Configuration
             CompositeType ctype = (CompositeType) targetType;
             targetSymbolicName = ctype.getSymbolicName();
 
-            // FIXME if necessary
-//            if (!ConfigurationExtension.class.isAssignableFrom(targetType.getClazz()))
-//            {
-                // only show a simple properties form if it is not associated with an extension type.
-                for (String propertyName : ctype.getPropertyNames(PrimitiveType.class))
-                {
-                    simpleProperties.add(propertyName);
-                }
-                for (String propertyName : ctype.getPropertyNames(ReferenceType.class))
-                {
-                    simpleProperties.add(propertyName);
-                }
-//            }
-
-            for (String propertyName : ctype.getPropertyNames(CompositeType.class))
-            {
-                nestedProperties.add(propertyName);
-            }
-            for (TypeProperty property: ctype.getProperties(CollectionType.class))
-            {
-                final CollectionType propertyType = (CollectionType) property.getType();
-                if(!(propertyType.getCollectionType() instanceof SimpleType))
-                {
-                    nestedProperties.add(property.getName());
-                }
-            }
+            simpleProperties = PrototypeUtils.getSimpleProperties(ctype);
+            nestedProperties = PrototypeUtils.getNestedProperties(ctype);
 
             // sort the nested properties.... this is a ui thing.
             final Collator collator = Collator.getInstance();
@@ -122,9 +99,7 @@ public class Configuration
                 }
             });
 
-
             extensions.addAll(((CompositeType) targetType).getExtensions());
-
             configurationCheckAvailable = configurationRegistry.getConfigurationCheckType(ctype) != null;
         }
     }
