@@ -23,6 +23,11 @@ public class BuildContext
     private String buildVersion = null;
     private FileRepository fileRepository;
 
+    /**
+     * The name of the project being built.
+     */
+    private String projectName;
+
     public long getBuildNumber()
     {
         return buildNumber;
@@ -73,4 +78,13 @@ public class BuildContext
         this.fileRepository = fileRepository;
     }
 
+    public void setProjectName(String project)
+    {
+        this.projectName = project;
+    }
+
+    public String getProjectName()
+    {
+        return projectName;
+    }
 }
