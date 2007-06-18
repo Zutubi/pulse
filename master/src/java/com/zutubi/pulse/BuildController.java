@@ -54,7 +54,7 @@ import java.util.concurrent.locks.ReentrantLock;
 public class BuildController implements EventListener
 {
     private static final Logger LOG = Logger.getLogger(BuildController.class);
-    
+
     private static final String TIMEOUT_TRIGGER_GROUP = "timeout";
 
     private static final Lock CHANGE_LOCK = new ReentrantLock();
@@ -128,7 +128,7 @@ public class BuildController implements EventListener
         previousSuccessful = getPreviousSuccessfulBuild();
         buildProperties = new LinkedList<ResourceProperty>(projectConfig.getProperties().values());
         buildProperties.add(new ResourceProperty("project", projectConfig.getName()));
-        
+
         configure(root, buildResult.getRoot());
 
         return tree;
@@ -137,7 +137,7 @@ public class BuildController implements EventListener
     private BuildResult getPreviousSuccessfulBuild()
     {
         BuildResult previousSuccessful = null;
-        List<BuildResult> previousSuccess = buildManager.queryBuilds(project, new ResultState[] { ResultState.SUCCESS }, -1, -1, 0, 1, true, true);
+        List<BuildResult> previousSuccess = buildManager.queryBuilds(project, new ResultState[]{ResultState.SUCCESS}, -1, -1, 0, 1, true, true);
         if (previousSuccess.size() > 0)
         {
             previousSuccessful = previousSuccess.get(0);
@@ -160,7 +160,7 @@ public class BuildController implements EventListener
 
             // FIXME: lookup the checkout scheme from the projectConfig.scm when available.
             CheckoutScheme checkoutScheme = CheckoutScheme.CLEAN_CHECKOUT;
-            
+
             boolean incremental = !request.isPersonal() && checkoutScheme == CheckoutScheme.INCREMENTAL_UPDATE;
             List<ResourceProperty> recipeProperties = new LinkedList<ResourceProperty>(buildProperties);
             RecipeRequest recipeRequest = new RecipeRequest(projectConfig.getName(), recipeResult.getId(), stage.getRecipe(), incremental, getResourceRequirements(stage), recipeProperties);
@@ -172,7 +172,7 @@ public class BuildController implements EventListener
             rc.setRecipeQueue(queue);
             rc.setBuildManager(buildManager);
             rc.setServiceTokenManager(serviceTokenManager);
-            
+
             TreeNode<RecipeController> child = new TreeNode<RecipeController>(rc);
             rcNode.add(child);
             pendingRecipes++;
@@ -477,7 +477,7 @@ public class BuildController implements EventListener
     /**
      * Called when the first recipe for this build is dispatched.  It is at
      * this point that the build is said to have commenced.
-     * 
+     *
      * @param controller the controller for the recipe that has been dispatched
      */
     private void handleFirstDispatch(RecipeController controller)
@@ -624,41 +624,53 @@ public class BuildController implements EventListener
 
     private void completeBuild()
     {
-        buildResult.abortUnfinishedRecipes();
-        buildResult.setHasWorkDir(projectConfig.getOptions().getRetainWorkingCopy());
-        buildResult.complete();
-
-        if (!request.isPersonal())
+        // FIXME: If there is an SQL problem while saving the build result, the build becomes stuck and the server
+        // needs to be restarted to clear it up.  To prevent the need for server restarts, we catch and log the exception
+        // and continue.  This leaves the build result in an incorrect state, but will allow builds to continue. The
+        // builds will be cleaned up next time the server restarts.  THIS IS ONLY A TEMPORARY FIX UNTIL WE WORK OUT
+        // WHAT IS CAUSING THE SQL PROBLEMS (DEADLOCKS, STALE SESSIONS) IN THE FIRST PLACE.
+        // Unfortunately, if we can not write to the db, then we are a little stuffed.
+        try
         {
-            if (project.isForceClean())
+            buildResult.abortUnfinishedRecipes();
+            buildResult.setHasWorkDir(projectConfig.getOptions().getRetainWorkingCopy());
+            buildResult.complete();
+
+            if (!request.isPersonal())
             {
-                project.setForceClean(false);
-                projectManager.save(project);
+                if (project.isForceClean())
+                {
+                    project.setForceClean(false);
+                    projectManager.save(project);
+                }
+
+                for (PostBuildActionConfiguration action : projectConfig.getPostBuildActions())
+                {
+                    ComponentContext.autowire(action);
+                    action.execute();
+                }
             }
 
-            for (PostBuildActionConfiguration action : projectConfig.getPostBuildActions())
+            // calculate the feature counts at the end of the build so that the result hierarchy does not need to
+            // be traversed when this information is required.
+            buildResult.calculateFeatureCounts();
+
+            long start = System.currentTimeMillis();
+            testManager.index(buildResult);
+            long duration = System.currentTimeMillis() - start;
+            if (duration > 300000)
             {
-                ComponentContext.autowire(action);
-//                action.execute(projectConfig, buildResult, null, buildProperties);
-                action.execute();
+                LOG.warning("Test case indexing for project %s took %f seconds", projectConfig.getName(), duration / 1000.0);
             }
+
+            buildManager.save(buildResult);
+
+            tree.cleanup(buildResult);
         }
-
-        // calculate the feature counts at the end of the build so that the result hierarchy does not need to
-        // be traversed when this information is required.
-        buildResult.calculateFeatureCounts();
-
-        long start = System.currentTimeMillis();
-        testManager.index(buildResult);
-        long duration = System.currentTimeMillis() - start;
-        if (duration > 300000)
+        catch (Exception e)
         {
-            LOG.warning("Test case indexing for project %s took %f seconds", projectConfig.getName(), duration / 1000.0);
+            LOG.severe("Failed to persist the completed build result. Reason: " + e.getMessage(), e);
         }
-
-        buildManager.save(buildResult);
-
-        tree.cleanup(buildResult);
 
         eventManager.unregister(asyncListener);
         eventManager.publish(new BuildCompletedEvent(this, buildResult));
@@ -667,7 +679,7 @@ public class BuildController implements EventListener
 
     public Class[] getHandledEvents()
     {
-        return new Class[] { BuildCommencedEvent.class, RecipeEvent.class, BuildTerminationRequestEvent.class, RecipeTimeoutEvent.class };
+        return new Class[]{BuildCommencedEvent.class, RecipeEvent.class, BuildTerminationRequestEvent.class, RecipeTimeoutEvent.class};
     }
 
     public long getBuildId()

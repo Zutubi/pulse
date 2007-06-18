@@ -36,8 +36,8 @@ public class ErrorHandlingRunnable implements Runnable
         }
         catch (BuildException e)
         {
+            LOG.warning(e);
             sendError(e);
-
         }
         catch (Exception e)
         {

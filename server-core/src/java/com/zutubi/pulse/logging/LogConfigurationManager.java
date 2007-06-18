@@ -41,6 +41,7 @@ public class LogConfigurationManager
 
         applyConfig();
         
+        // publish all events that pass through the event manager to the event logger
         final Logger evtLogger = Loggers.getEventLogger();
         eventManager.register(new AllEventListener()
         {
@@ -53,7 +54,7 @@ public class LogConfigurationManager
                 catch (Throwable t)
                 {
                     // noop.
-                    evtLogger.info(evt.getClass().getName());
+                    evtLogger.info("Failed to log event. Reason: " + t.getMessage(), t);
                 }
             }
         });

@@ -2,6 +2,7 @@ package com.zutubi.pulse;
 
 import com.zutubi.pulse.bootstrap.ComponentContext;
 import com.zutubi.pulse.core.Stoppable;
+import com.zutubi.util.logging.Logger;
 
 import java.lang.reflect.Method;
 import java.util.LinkedList;
@@ -13,6 +14,8 @@ import java.util.List;
  */
 public class ShutdownManager
 {
+    private static final Logger LOG = Logger.getLogger(ShutdownManager.class);
+
     /**
      * The list of objects that are called during a shutdown.  
      */
@@ -32,6 +35,7 @@ public class ShutdownManager
      */
     public void shutdown(boolean force, boolean exitJvm)
     {
+        LOG.info("Shutdown requested.");
         // Ensure that we only handle one shutdown request at a time.
         synchronized(this)
         {
@@ -66,6 +70,7 @@ public class ShutdownManager
         if (exitJvm)
         {
             // why exit? because some external packages do not clean up all of there threads...
+            LOG.info("System exiting with exit status 0");
             System.exit(0);
         }
         else
@@ -97,7 +102,7 @@ public class ShutdownManager
             }
             catch (Exception e)
             {
-                e.printStackTrace();
+                LOG.severe(e);
                 throw e;
             }
         }
@@ -111,12 +116,14 @@ public class ShutdownManager
 
     public void delayedShutdown(boolean force, boolean exitJvm)
     {
+        LOG.info("Delayed shutdown requested.");
         ShutdownRunner runner = new ShutdownRunner(force, exitJvm);
         new Thread(runner).start();
     }
 
     public void delayedStop()
     {
+        LOG.info("Delayed stop requested.");
         StopRunner runner = new StopRunner();
         new Thread(runner).start();
     }
@@ -137,9 +144,11 @@ public class ShutdownManager
 
     public void reboot()
     {
+        LOG.info("Reboot requested.");
         if(!checkWrapper(EXIT_REBOOT))
         {
             stop(true);
+            LOG.info("System exiting with exit status " + EXIT_REBOOT);
             System.exit(EXIT_REBOOT);
         }
     }
