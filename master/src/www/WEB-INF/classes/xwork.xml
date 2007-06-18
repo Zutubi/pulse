@@ -983,7 +983,7 @@
             <result name="map" type="velocity">map.vm</result>
         </action>
 
-        <action name="wizard" class="com.zutubi.prototype.wizard.webwork.ConfigurationWizardAction">
+        <action name="wizard" class="com.zutubi.prototype.wizard.webwork.AjaxEnabledConfigurationWizardAction">
             <interceptor-ref name="ajaxPrototypeWizardStack"/>
             <result name="step" type="flexjson">configurationPanel</result>
             <result name="input" type="flexjson">configurationErrors</result>
