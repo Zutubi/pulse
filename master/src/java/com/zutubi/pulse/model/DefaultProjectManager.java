@@ -33,11 +33,7 @@ import com.zutubi.pulse.scm.ScmException;
 import com.zutubi.util.logging.Logger;
 import org.acegisecurity.annotation.Secured;
 
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * 
@@ -123,7 +119,7 @@ public class DefaultProjectManager implements ProjectManager
         if (configurationProvider.getAll(ProjectConfiguration.class).size() == 0)
         {
             CompositeType projectType = typeRegistry.getType(ProjectConfiguration.class);
-            MutableRecord globalTemplate = projectType.createNewRecord();
+            MutableRecord globalTemplate = projectType.createNewRecord(true);
             // FIXME: I18N these strings.
             globalTemplate.put("name", "global project template");
             globalTemplate.put("description", "The global template is the base of the project template hierarchy.  Configuration shared among all projects should be added here.");

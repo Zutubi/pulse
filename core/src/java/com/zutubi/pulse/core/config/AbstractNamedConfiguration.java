@@ -1,8 +1,5 @@
 package com.zutubi.pulse.core.config;
 
-import com.zutubi.pulse.core.model.PersistentName;
-import com.zutubi.config.annotations.Transient;
-
 /**
  * Abstract base to be extended by named configuration objects.
  */

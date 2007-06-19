@@ -40,7 +40,7 @@ public class ProjectConfigurationWizard extends AbstractTypeWizard
 
     public void doFinish()
     {
-        MutableRecord record = projectType.createNewRecord();
+        MutableRecord record = projectType.createNewRecord(false);
         record.update(wizardStates.get(0).getRecord());
         record.put("scm", wizardStates.get(2).getRecord());
         record.put("type", wizardStates.get(4).getRecord());

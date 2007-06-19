@@ -1,17 +1,20 @@
 package com.zutubi.prototype.type;
 
-import com.zutubi.config.annotations.Internal;
 import com.zutubi.config.annotations.ID;
+import com.zutubi.config.annotations.Internal;
 import com.zutubi.prototype.config.ConfigurationTemplateManager;
-import com.zutubi.prototype.type.record.*;
+import com.zutubi.prototype.type.record.MutableRecord;
+import com.zutubi.prototype.type.record.MutableRecordImpl;
+import com.zutubi.prototype.type.record.PathUtils;
+import com.zutubi.prototype.type.record.Record;
 import com.zutubi.pulse.core.config.Configuration;
+import com.zutubi.util.AnnotationUtils;
 import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.Mapping;
-import com.zutubi.util.AnnotationUtils;
 import com.zutubi.util.logging.Logger;
 
-import java.util.*;
 import java.beans.IntrospectionException;
+import java.util.*;
 
 /**
  *
@@ -21,7 +24,7 @@ public class CompositeType extends AbstractType implements ComplexType
     private static final Logger LOG = Logger.getLogger(CompositeType.class);
 
     /**
-     * The list of symbolic names of types that 'extend' this type. 
+     * The list of symbolic names of types that 'extend' this type.
      */
     private List<String> extensions = new LinkedList<String>();
 
@@ -31,7 +34,7 @@ public class CompositeType extends AbstractType implements ComplexType
     private Map<String, TypeProperty> internalProperties = new HashMap<String, TypeProperty>();
 
     private Map<String, TypeProperty> properties = new HashMap<String, TypeProperty>();
-    
+
     private Map<Class, List<String>> propertiesByClass = new HashMap<Class, List<String>>();
 
     private ConfigurationTemplateManager configurationTemplateManager;
@@ -143,7 +146,7 @@ public class CompositeType extends AbstractType implements ComplexType
 
     public Object instantiate(String path, Object data) throws TypeException
     {
-        Object instance =  path == null ? null : configurationTemplateManager.getInstance(path);
+        Object instance = path == null ? null : configurationTemplateManager.getInstance(path);
         if (instance == null && data != null)
         {
             try
@@ -203,18 +206,24 @@ public class CompositeType extends AbstractType implements ComplexType
     private TypeConversionException instantiateProperty(Map.Entry<String, TypeProperty> entry, String path, Record record, Object instance, TypeConversionException exception) throws TypeException
     {
         String name = entry.getKey();
-        if (!record.containsKey(name))
-        {
-            return exception;
-        }
-
         TypeProperty property = entry.getValue();
-
-        // Instantiate even if there is no setter so the instance
-        // is both checked for validity and cached.
-        Type type = property.getType();
         try
         {
+            if (!record.containsKey(name))
+            {
+                if (property.getType() instanceof CollectionType)
+                {
+                    // Be nice and create empty collection instances instead of
+                    // leaving nulls.
+                    property.setValue(instance, ((CollectionType) property.getType()).emptyInstance());
+                }
+
+                return exception;
+            }
+
+            // Instantiate even if there is no setter so the instance
+            // is both checked for validity and cached.
+            Type type = property.getType();
             Object value = type.instantiate(path == null ? null : PathUtils.getPath(path, name), record.get(name));
             property.setValue(instance, value);
         }
@@ -233,7 +242,7 @@ public class CompositeType extends AbstractType implements ComplexType
     {
         MutableRecord result;
 
-        if(extensions.size() > 0)
+        if (extensions.size() > 0)
         {
             CompositeType actualType = typeRegistry.getType(instance.getClass());
             return actualType.unstantiate(instance);
@@ -295,16 +304,23 @@ public class CompositeType extends AbstractType implements ComplexType
         }
     }
 
-    public MutableRecord createNewRecord()
+    public MutableRecord createNewRecord(boolean applyDefaults)
     {
         try
         {
-            Object defaultInstance = getClazz().newInstance();
-            return (MutableRecord) unstantiate(defaultInstance);
+            if (applyDefaults)
+            {
+                Object defaultInstance = getClazz().newInstance();
+                return unstantiate(defaultInstance);
+            }
+            else
+            {
+                return newRecord();
+            }
         }
         catch (Exception e)
         {
-            LOG.warning(e);
+            LOG.severe(e);
             return null;
         }
     }
@@ -319,17 +335,17 @@ public class CompositeType extends AbstractType implements ComplexType
         }
 
         MutableRecordImpl record = new MutableRecordImpl();
-
-        // a) initialise all collection properties to empty collections.
-        //    leave other items blank so that they match the actual values in the objects.
-        for (TypeProperty property : getProperties(CollectionType.class))
-        {
-            CollectionType type = (CollectionType) property.getType();
-            record.put(property.getName(), type.createNewRecord());
-        }
-
-        // b) set the symbolic name of the record.
         record.setSymbolicName(getSymbolicName());
+
+        // Create empty collections for all non-simple collection properties
+//        for (TypeProperty property : getProperties(CollectionType.class))
+//        {
+//            CollectionType type = (CollectionType) property.getType();
+//            if(type.getCollectionType() instanceof ComplexType)
+//            {
+//                record.put(property.getName(), type.createNewRecord(true));
+//            }
+//        }
 
         return record;
     }

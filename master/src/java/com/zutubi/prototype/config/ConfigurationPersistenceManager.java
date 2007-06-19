@@ -52,7 +52,7 @@ public class ConfigurationPersistenceManager
 
             if(!recordManager.containsRecord(scope))
             {
-                recordManager.insert(scope, type.createNewRecord());
+                recordManager.insert(scope, type.createNewRecord(true));
             }
         }
 
@@ -147,40 +147,6 @@ public class ConfigurationPersistenceManager
         return l;
     }
 
-/*
-<<<<<<< .mine
-    public Map<String, Record> getReferencableRecords(CompositeType type, String referencingPath)
-    {
-        HashMap<String, Record> records = new HashMap<String, Record>();
-        // FIXME does not account for templating, and may need to be more
-        // FIXME general.  review when we have more config objects...
-        for (String path : getOwningPaths(type, getClosestOwningScope(type, referencingPath)))
-        {
-            recordManager.loadAll(path, records);
-        }
-
-        return records;
-    }
-
-    public <T> T getAncestorOfType(Configuration c, Class<T> clazz)
-    {
-        String path = c.getConfigurationPath();
-        CompositeType type = typeRegistry.getType(clazz);
-        if (type != null)
-        {
-            String ancestorPath = getClosestMatchingScope(type, path);
-            if(ancestorPath != null)
-            {
-                return (T) getInstance(ancestorPath);
-            }
-        }
-
-        return null;
-    }
-
-=======
->>>>>>> .r3386
-*/
     String getClosestMatchingScope(CompositeType type, String path)
     {
         List<String> patterns = compositeTypePathIndex.get(type);
@@ -313,13 +279,11 @@ public class ConfigurationPersistenceManager
             throw new IllegalArgumentException("Invalid path '" + path + "': parent does not exist");
         }
 
-        String parentSymbolicName = parentRecord.getSymbolicName();
         Object value = parentRecord.get(lastElement);
-
-        if (parentSymbolicName == null)
+        if (parentRecord.isCollection())
         {
-            // Parent is a collection, last segment of path must refer to an
-            // existing child composite record.
+            // Last segment of path must refer to an existing child
+            // composite record.
             if (value == null)
             {
                 throw new IllegalArgumentException("Invalid path '" + path + "': references unknown child '" + lastElement + "' of collection");
@@ -330,6 +294,7 @@ public class ConfigurationPersistenceManager
         else
         {
             // Parent is a composite, see if the field exists.
+            String parentSymbolicName = parentRecord.getSymbolicName();
             CompositeType parentType = typeRegistry.getType(parentSymbolicName);
             TypeProperty typeProperty = parentType.getProperty(lastElement);
             if (typeProperty == null)

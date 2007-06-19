@@ -158,7 +158,7 @@ public class ConfigurationRegistry
             projectConfig.addProperty(new ExtensionTypeProperty("commit", commitTransformers));
 
             // define the root level scope.
-            ProjectMapType projectCollection = new ProjectMapType(configurationTemplateManager);
+            TemplatedMapType projectCollection = new TemplatedMapType(configurationTemplateManager);
             projectCollection.setTypeRegistry(typeRegistry);
             projectCollection.setCollectionType(projectConfig);
 

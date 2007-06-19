@@ -6,9 +6,11 @@ import com.zutubi.prototype.type.record.MutableRecord;
 import com.zutubi.prototype.type.record.PathUtils;
 import com.zutubi.prototype.type.record.Record;
 import com.zutubi.util.AnnotationUtils;
+import com.zutubi.util.Sort;
 import com.zutubi.util.logging.Logger;
 
 import java.beans.IntrospectionException;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -79,7 +81,7 @@ public class MapType extends CollectionType
             throw new TypeException("Expecting map, got '" + instance.getClass().getName() + "'");
         }
 
-        MutableRecord result = createNewRecord();
+        MutableRecord result = createNewRecord(true);
         Map<String, Object> map = (Map<String, Object>) instance;
         Type collectionType = getCollectionType();
         for(Map.Entry<String, Object> entry: map.entrySet())
@@ -117,6 +119,17 @@ public class MapType extends CollectionType
         {
             throw new TypeException("Types stored in maps must have an @ID property");
         }
+    }
+
+    protected Comparator<String> getKeyComparator()
+    {
+        // Lexicographical ordering by the key.
+        return new Sort.StringComparator();
+    }
+
+    public Object emptyInstance()
+    {
+        return new HashMap(0);
     }
 
     public String getKeyProperty()

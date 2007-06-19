@@ -1,7 +1,7 @@
 package com.zutubi.prototype.type.record;
 
-import java.util.Set;
 import java.util.Collection;
+import java.util.Set;
 
 /**
  * A record defines a simple map for storing data.  
@@ -10,8 +10,10 @@ import java.util.Collection;
 public interface Record
 {
     /**
-     * Get the symbolic name associated with the data for this record.  The symbolic name defined the type of the
-     * records data.
+     * Get the symbolic name associated with the data for this record.  The
+     * symbolic name defines the type of the record's data.  For collections,
+     * it is one of the CollectionType.SN_* constants.  Otherwise, it is the
+     * symbolic name of a type registered with the type registry.
      * 
      * @return the symbolic name
      *
@@ -87,4 +89,6 @@ public interface Record
      *         been saved.
      */
     long getHandle();
+
+    boolean isCollection();
 }

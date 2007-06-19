@@ -115,7 +115,7 @@ public class SetupConfigurationWizard extends AbstractTypeWizard
 
             // apply the settings
             CompositeType generalType = typeRegistry.getType(GENERAL_CONFIG_PROPERTY);
-            MutableRecord record = generalType.createNewRecord();
+            MutableRecord record = generalType.createNewRecord(true);
             String baseUrl = (String) serverConfigRecord.get("baseUrl");
             record.put("baseUrl", baseUrl);
             record.put("masterHost", getMasterHost(baseUrl));
@@ -195,7 +195,7 @@ public class SetupConfigurationWizard extends AbstractTypeWizard
     {
         CompositeType type = typeRegistry.getType(clazz);
 
-        MutableRecord record = type.createNewRecord();
+        MutableRecord record = type.createNewRecord(true);
         for(TypeProperty property: type.getProperties())
         {
             String name = property.getName();

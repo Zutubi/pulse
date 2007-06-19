@@ -1,8 +1,8 @@
 package com.zutubi.prototype.type;
 
-import com.zutubi.prototype.type.record.Record;
-import com.zutubi.prototype.type.record.MutableRecord;
 import com.zutubi.config.annotations.SymbolicName;
+import com.zutubi.prototype.type.record.MutableRecord;
+import com.zutubi.prototype.type.record.Record;
 
 /**
  *
@@ -70,7 +70,7 @@ public class CompositeTypeTest extends TypeTestCase
     public void testCreateNewRecordInitialisedDefaultFields()
     {
         CompositeType compositeType = typeRegistry.getType("typeA");
-        MutableRecord record = compositeType.createNewRecord();
+        MutableRecord record = compositeType.createNewRecord(true);
         assertNotNull(record);
 
         // field a contains an instance of typeB.
@@ -119,9 +119,7 @@ public class CompositeTypeTest extends TypeTestCase
 
             ObjectTypeA that = (ObjectTypeA) o;
 
-            if (a != null ? !a.equals(that.a) : that.a != null) return false;
-
-            return true;
+            return !(a != null ? !a.equals(that.a) : that.a != null);
         }
 
         public int hashCode()
@@ -152,9 +150,7 @@ public class CompositeTypeTest extends TypeTestCase
 
             ObjectTypeB that = (ObjectTypeB) o;
 
-            if (a != null ? !a.equals(that.a) : that.a != null) return false;
-
-            return true;
+            return !(a != null ? !a.equals(that.a) : that.a != null);
         }
 
         public int hashCode()
@@ -431,12 +427,7 @@ public class CompositeTypeTest extends TypeTestCase
             {
                 return false;
             }
-            if (string != null ? !string.equals(that.string) : that.string != null)
-            {
-                return false;
-            }
-
-            return true;
+            return !(string != null ? !string.equals(that.string) : that.string != null);
         }
 
         public int hashCode()

@@ -4,6 +4,7 @@ import com.opensymphony.util.TextUtils;
 import com.zutubi.prototype.FormDescriptor;
 import com.zutubi.prototype.FormDescriptorFactory;
 import com.zutubi.prototype.TemplateFormDecorator;
+import com.zutubi.prototype.config.ConfigurationTemplateManager;
 import com.zutubi.prototype.model.Form;
 import com.zutubi.prototype.model.HiddenFieldDescriptor;
 import com.zutubi.prototype.type.CompositeType;
@@ -40,6 +41,7 @@ public class FormDirective extends PrototypeDirective
     private String formName = "form";
     private boolean ajax = false;
     private MasterConfigurationManager configurationManager;
+    private ConfigurationTemplateManager configurationTemplateManager;
 
     /**
      * The name of this velocity directive.
@@ -83,10 +85,12 @@ public class FormDirective extends PrototypeDirective
             CompositeType ctype = (CompositeType) type;
             Record data = lookupRecord();
 
-            FormDescriptor formDescriptor = formDescriptorFactory.createDescriptor(lookupPath(), ctype, formName);
+            String path = lookupPath();
+            FormDescriptor formDescriptor = formDescriptorFactory.createDescriptor(path, ctype, formName);
             formDescriptor.setAjax(ajax);
             
-            TemplateFormDecorator templateDecorator = new TemplateFormDecorator(null);
+            TemplateFormDecorator templateDecorator = new TemplateFormDecorator(path, data);
+            templateDecorator.setConfigurationTemplateManager(configurationTemplateManager);
             templateDecorator.decorate(formDescriptor);
 
             // Decorate the form to include the symbolic name as a hidden field. This is necessary for configuration.
@@ -144,6 +148,11 @@ public class FormDirective extends PrototypeDirective
     public void setConfigurationManager(MasterConfigurationManager configurationManager)
     {
         this.configurationManager = configurationManager;
+    }
+
+    public void setConfigurationTemplateManager(ConfigurationTemplateManager configurationTemplateManager)
+    {
+        this.configurationTemplateManager = configurationTemplateManager;
     }
 }
 

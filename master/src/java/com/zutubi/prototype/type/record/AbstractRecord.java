@@ -1,7 +1,5 @@
 package com.zutubi.prototype.type.record;
 
-import java.util.Collection;
-
 /**
  * Convenient abstract base for record implementations.
  */
@@ -26,5 +24,10 @@ public abstract class AbstractRecord implements Record
         }
 
         return UNDEFINED;
+    }
+
+    public boolean isCollection()
+    {
+        return getSymbolicName() == null;
     }
 }

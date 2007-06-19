@@ -1,43 +1,62 @@
 package com.zutubi.prototype;
 
+import com.zutubi.prototype.config.ConfigurationTemplateManager;
+import com.zutubi.prototype.type.record.Record;
 import com.zutubi.prototype.type.record.TemplateRecord;
-import com.zutubi.prototype.config.ConfigurationPersistenceManager;
 
 /**
- *
- *
+ * Decorates form fields with templating information if there is such
+ * information available (i.e. for templated scopes).
  */
 public class TemplateFormDecorator
 {
-    private ConfigurationPersistenceManager configurationPersistenceManager;
+    private String path;
+    private Record record;
+    private ConfigurationTemplateManager configurationTemplateManager;
 
-    private TemplateRecord record;
-
-    public TemplateFormDecorator(TemplateRecord templateRecord)
+    public TemplateFormDecorator(String path, Record record)
     {
-        this.record = templateRecord;
+        this.path = path;
+        this.record = record;
     }
 
     public FormDescriptor decorate(FormDescriptor descriptor)
     {
-//        String concreteId = record.getOwner();
-
-        for (FieldDescriptor field : descriptor.getFieldDescriptors())
+        if (record != null && record instanceof TemplateRecord)
         {
-/*
-            String id = record.getFieldOwner(field.getName());
-            if(!id.equals(concreteId))
+            String concreteId = configurationTemplateManager.getOwner(path);
+            TemplateRecord templateRecord = (TemplateRecord) record;
+            TemplateRecord parentRecord = templateRecord.getParent();
+
+            for (FieldDescriptor field : descriptor.getFieldDescriptors())
             {
-                field.getParameters().put("inheritedFrom", id);
+                String fieldName = field.getName();
+                String ownerId = templateRecord.getOwner(fieldName);
+                if (ownerId != null)
+                {
+                    if (!ownerId.equals(concreteId))
+                    {
+                        field.addParameter("inheritedFrom", ownerId);
+                    }
+                    else if(parentRecord != null)
+                    {
+                        // Check for override
+                        String parentOwnerId = parentRecord.getOwner(fieldName);
+                        if(parentOwnerId != null)
+                        {
+                            field.addParameter("overriddenOwner", parentOwnerId);
+                            field.addParameter("overriddenValue", parentRecord.get(fieldName));
+                        }
+                    }
+                }
             }
-*/
-            field.getParameters().put("inheritedFrom", "x/y/z");
         }
+
         return descriptor;
     }
 
-    public void setConfigurationPersistenceManager(ConfigurationPersistenceManager configurationPersistenceManager)
+    public void setConfigurationTemplateManager(ConfigurationTemplateManager configurationTemplateManager)
     {
-        this.configurationPersistenceManager = configurationPersistenceManager;
+        this.configurationTemplateManager = configurationTemplateManager;
     }
 }

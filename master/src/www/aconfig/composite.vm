@@ -22,7 +22,7 @@
     #end
 #else
     #if( $config.extensions.size() > 0)
-        <p>To create the #i18n("key=label") please use the <a href="$base/config/${config.path}?wizard">wizard</a>.</p>
+        <p>To create the #i18n("key=label") please use the <a href="#" onclick="addToPath('${config.path}'); return false">wizard</a>.</p>
     #else
         <!-- this configuration definition contains fields to be configured. -->
         <p>

@@ -39,7 +39,7 @@ public class SubscriptionConfigurationWizard extends AbstractTypeWizard
 
     public void doFinish()
     {
-        MutableRecord record = subscriptionType.createNewRecord();
+        MutableRecord record = subscriptionType.createNewRecord(true);
         record.update(wizardStates.get(0).getRecord());
         record.put("condition", wizardStates.get(2).getRecord());
 

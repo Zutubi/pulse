@@ -2,16 +2,12 @@ package com.zutubi.prototype.config;
 
 import com.zutubi.config.annotations.ID;
 import com.zutubi.config.annotations.SymbolicName;
-import com.zutubi.prototype.config.events.PostDeleteEvent;
-import com.zutubi.prototype.config.events.PostInsertEvent;
-import com.zutubi.prototype.config.events.PostSaveEvent;
-import com.zutubi.prototype.config.events.PreDeleteEvent;
-import com.zutubi.prototype.config.events.PreInsertEvent;
-import com.zutubi.prototype.config.events.PreSaveEvent;
+import com.zutubi.prototype.config.events.*;
 import com.zutubi.prototype.type.CompositeType;
 import com.zutubi.prototype.type.MapType;
 import com.zutubi.pulse.core.config.AbstractConfiguration;
 
+import java.util.LinkedList;
 import java.util.List;
 
 /**
@@ -160,7 +156,7 @@ public class DefaultConfigurationProviderTest extends AbstractConfigurationSyste
         @ID
         String field;
         B b;
-        List<B> collectionB;
+        List<B> collectionB = new LinkedList<B>();
 
         public A(){}
         public A(String field){this.field = field;}
@@ -177,7 +173,7 @@ public class DefaultConfigurationProviderTest extends AbstractConfigurationSyste
     {
         String field;
         C c;
-        List<C> collectionC;
+        List<C> collectionC = new LinkedList<C>();
 
         public B(){}
         public B(String field){this.field = field;}

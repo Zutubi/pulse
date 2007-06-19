@@ -1,6 +1,8 @@
 <#-- render form -->
 <script type="text/javascript">
     Ext.QuickTips.init();    
+    Ext.QuickTips.tagConfig.width = 'qwidth';
+
     Ext.form.Field.prototype.msgTarget = 'under';
     
     var ${form.name} = function()

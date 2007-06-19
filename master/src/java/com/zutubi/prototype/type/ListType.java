@@ -4,9 +4,9 @@ import com.zutubi.prototype.config.ConfigurationTemplateManager;
 import com.zutubi.prototype.type.record.MutableRecord;
 import com.zutubi.prototype.type.record.PathUtils;
 import com.zutubi.prototype.type.record.Record;
+import com.zutubi.pulse.core.config.Configuration;
 
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 
 /**
  *
@@ -15,13 +15,16 @@ import java.util.List;
 public class ListType extends CollectionType
 {
     private ConfigurationTemplateManager configurationTemplateManager;
-    private static final String LATEST_KEY_KEY = "latestKey";
-    private static final String ITEM_KEY_KEY = "itemKey";
 
     public ListType(ConfigurationTemplateManager configurationTemplateManager)
     {
         super(LinkedList.class);
         this.configurationTemplateManager = configurationTemplateManager;
+    }
+
+    public Object emptyInstance()
+    {
+        return new ArrayList(0);
     }
 
     @SuppressWarnings({"unchecked"})
@@ -36,7 +39,7 @@ public class ListType extends CollectionType
 
                 instance = create(path);
 
-                Iterable<String> keys = getOrder(record);
+                Collection<String> keys = getOrder(record);
                 Type defaultType = getCollectionType();
                 for (String key : keys)
                 {
@@ -101,14 +104,19 @@ public class ListType extends CollectionType
         }
         else
         {
-            // A sub-record.  We have no sensible way to define an ordering...
-            MutableRecord result = createNewRecord();
-            int i = 0;
+            // A sub-record.  Need to set the ordering based on the iteration
+            // order of the list.
+            MutableRecord result = createNewRecord(true);
+            List<String> order = new ArrayList<String>(list.size());
             for(Object o: list)
             {
-                result.put(Integer.toString(i++), collectionType.unstantiate(o));
+                Configuration config = (Configuration) o;
+                String key = Long.toString(config.getHandle());
+                order.add(key);
+                result.put(key, collectionType.unstantiate(o));
             }
 
+            setOrder(result, order);
             return result;
         }
     }
@@ -126,28 +134,34 @@ public class ListType extends CollectionType
 
     public String getInsertionPath(Record collection, Record record)
     {
-        String latestKey = collection.getMeta(LATEST_KEY_KEY);
-        if (latestKey == null)
-        {
-            latestKey = "1";
-        }
-        else
-        {
-            latestKey = Integer.toString(Integer.parseInt(latestKey) + 1);
-        }
-        ((MutableRecord)collection).putMeta(LATEST_KEY_KEY, latestKey);
-        ((MutableRecord)record).putMeta(ITEM_KEY_KEY, latestKey);
-        return latestKey;
+        return Long.toString(record.getHandle());
     }
 
     public String getSavePath(Record collection, Record record)
     {
-        if (record.getMeta(ITEM_KEY_KEY) == null)
-        {
-            // indicates that this record has not been saved.  To generate the save path we would
-            // need the collection, as is the case with the insertionPath.
-        }
+        return Long.toString(record.getHandle());
+    }
 
-        return record.getMeta(ITEM_KEY_KEY);
+    protected Comparator<String> getKeyComparator()
+    {
+        // We want the items to appear in their inserted order.  We rely on
+        // the ever-increasing handles to allow this.
+        return new Comparator<String>()
+        {
+            public int compare(String o1, String o2)
+            {
+                try
+                {
+                    long l1 = Long.parseLong(o1);
+                    long l2 = Long.parseLong(o2);
+
+                    return (int) (l1 - l2);
+                }
+                catch (NumberFormatException e)
+                {
+                    return 0;
+                }
+            }
+        };
     }
 }

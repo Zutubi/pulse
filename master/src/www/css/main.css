@@ -834,6 +834,15 @@ table.detail td li
 	border: 1px solid #7eadd9;
 }
 
+.field-overridden, textarea.field-overridden
+{
+    background: #ffffe0;
+}
+
+.field-inherited, textarea.field-inherited
+{
+    background: #e0e0ff;
+}
 
 /*
 .x-item-disabled

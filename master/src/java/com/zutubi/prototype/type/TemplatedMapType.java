@@ -4,9 +4,9 @@ import com.zutubi.prototype.config.ConfigurationTemplateManager;
 
 /**
  */
-public class ProjectMapType extends MapType
+public class TemplatedMapType extends MapType
 {
-    public ProjectMapType(ConfigurationTemplateManager configurationTemplateManager)
+    public TemplatedMapType(ConfigurationTemplateManager configurationTemplateManager)
     {
         super(configurationTemplateManager);
     }

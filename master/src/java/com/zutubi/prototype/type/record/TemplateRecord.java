@@ -1,6 +1,6 @@
 package com.zutubi.prototype.type.record;
 
-import com.zutubi.prototype.type.TypeRegistry;
+import com.zutubi.prototype.type.CollectionType;
 
 import java.util.Collection;
 import java.util.HashMap;
@@ -11,16 +11,21 @@ import java.util.Set;
  */
 public class TemplateRecord extends AbstractRecord
 {
-    private TypeRegistry registry;
     private TemplateRecord parent;
     private Record moi;
     private String owner;
+    private Collection<String> declaredOrder = null;
 
     public TemplateRecord(String owner, TemplateRecord parent, Record moi)
     {
         this.owner = owner;
         this.parent = parent;
         this.moi = moi;
+
+        if(moi.isCollection())
+        {
+            declaredOrder = CollectionType.getDeclaredOrder(moi);
+        }
     }
 
     public String getSymbolicName()
@@ -70,7 +75,6 @@ public class TemplateRecord extends AbstractRecord
         }
         else if (value instanceof Record)
         {
-            // Wrap in another template on the way out
             return new TemplateRecord(owner, (TemplateRecord) getInherited(key), (MutableRecord) value);
         }
         else
@@ -82,7 +86,14 @@ public class TemplateRecord extends AbstractRecord
 
     private Object getInherited(String key)
     {
-        return parent == null ? null : parent.get(key);
+        // If we have no parent or we have a declared order that omits this
+        // key, we cannot inherit a value.
+        if(parent == null || declaredOrder != null && !declaredOrder.contains(key))
+        {
+            return null;
+        }
+
+        return parent.get(key);
     }
 
     public Set<String> keySet()
@@ -118,7 +129,7 @@ public class TemplateRecord extends AbstractRecord
         {
             mergedMap.putAll(parent.getMergedMap());
         }
-        
+
         return mergedMap;
     }
 
@@ -126,6 +137,16 @@ public class TemplateRecord extends AbstractRecord
     {
         // FIXME NYI
         return new MutableRecordImpl();
+    }
+
+    public TemplateRecord getParent()
+    {
+        return parent;
+    }
+
+    public String getOwner()
+    {
+        return owner;
     }
 
     public String getOwner(String key)
@@ -151,6 +172,12 @@ public class TemplateRecord extends AbstractRecord
 
     public Set<String> simpleKeySet()
     {
+        // FIXME: should only return keys for simple properties
         return getMergedMap().keySet();
+    }
+
+    public Record getMoi()
+    {
+        return moi;
     }
 }

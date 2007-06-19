@@ -12,7 +12,7 @@ public interface ComplexType extends Type
 
     String getInsertionPath(Record collection, Record record);
 
-    Record createNewRecord();
+    Record createNewRecord(boolean applyDefaults);
 
     boolean isTemplated();
 }

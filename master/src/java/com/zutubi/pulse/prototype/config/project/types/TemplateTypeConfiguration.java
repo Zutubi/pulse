@@ -1,5 +1,7 @@
 package com.zutubi.pulse.prototype.config.project.types;
 
+import com.zutubi.config.annotations.Select;
+import com.zutubi.config.annotations.Transient;
 import com.zutubi.pulse.bootstrap.ComponentContext;
 import com.zutubi.pulse.core.BuildException;
 import com.zutubi.pulse.core.model.Revision;
@@ -7,17 +9,12 @@ import com.zutubi.pulse.personal.PatchArchive;
 import com.zutubi.pulse.prototype.config.project.ProjectConfiguration;
 import com.zutubi.pulse.util.FileSystemUtils;
 import com.zutubi.util.logging.Logger;
-import com.zutubi.config.annotations.Select;
-import com.zutubi.config.annotations.Transient;
 import org.apache.velocity.VelocityContext;
 import org.apache.velocity.app.VelocityEngine;
 
 import java.io.File;
 import java.io.StringWriter;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Set;
-import java.util.TreeSet;
+import java.util.*;
 
 /**
  *
@@ -29,8 +26,7 @@ public abstract class TemplateTypeConfiguration extends TypeConfiguration
 
     private List<String> postProcessors = new LinkedList<String>();
 
-    private List<ArtifactConfiguration> artifacts = new LinkedList<ArtifactConfiguration>();
-
+    private Map<String, ArtifactConfiguration> artifacts = new HashMap<String, ArtifactConfiguration>();
     @Transient
     private VelocityEngine velocityEngine;
 
@@ -45,12 +41,12 @@ public abstract class TemplateTypeConfiguration extends TypeConfiguration
         this.postProcessors = postProcessors;
     }
 
-    public List<ArtifactConfiguration> getArtifacts()
+    public Map<String, ArtifactConfiguration> getArtifacts()
     {
         return artifacts;
     }
 
-    public void setArtifacts(List<ArtifactConfiguration> artifacts)
+    public void setArtifacts(Map<String, ArtifactConfiguration> artifacts)
     {
         this.artifacts = artifacts;
     }
@@ -111,7 +107,7 @@ public abstract class TemplateTypeConfiguration extends TypeConfiguration
             addProcessor(includedProcessors, processor, templates);
         }
 
-        for(ArtifactConfiguration artifact: artifacts)
+        for(ArtifactConfiguration artifact: artifacts.values())
         {
             for(String processor: artifact.getPostprocessors())
             {

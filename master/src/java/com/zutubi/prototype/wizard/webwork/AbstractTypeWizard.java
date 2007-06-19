@@ -234,7 +234,8 @@ public abstract class AbstractTypeWizard implements Wizard
         {
             this.type = type;
             this.templateRecord = record;
-            this.record = type.createNewRecord();
+            // FIXME template
+            this.record = type.createNewRecord(false);
 
             // extract initial values from the template record.
             if (record != null)
@@ -414,7 +415,8 @@ public abstract class AbstractTypeWizard implements Wizard
                 if (!typeRecordCache.containsKey(selectedSymbolicName))
                 {
                     CompositeType selectedType = typeRegistry.getType(selectedSymbolicName);
-                    MutableRecord r = selectedType.createNewRecord();
+                    // FIXME template
+                    MutableRecord r = selectedType.createNewRecord(false);
                     typeRecordCache.put(selectedSymbolicName, r);
                 }
                 return typeRecordCache.get(selectedSymbolicName);

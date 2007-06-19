@@ -1,10 +1,12 @@
 package com.zutubi.prototype.type;
 
 import com.zutubi.config.annotations.Ordered;
-import com.zutubi.prototype.type.record.*;
+import com.zutubi.prototype.type.record.MutableRecord;
+import com.zutubi.prototype.type.record.MutableRecordImpl;
+import com.zutubi.prototype.type.record.Record;
+import com.zutubi.util.StringUtils;
 
-import java.util.Arrays;
-import java.util.Set;
+import java.util.*;
 
 /**
  *
@@ -12,6 +14,8 @@ import java.util.Set;
  */
 public abstract class CollectionType extends AbstractType implements ComplexType
 {
+    public static final String ORDER_KEY = "order";
+    
     private Type collectionType;
 
     public CollectionType(Class type)
@@ -39,36 +43,63 @@ public abstract class CollectionType extends AbstractType implements ComplexType
         this.collectionType = collectionType;
     }
 
-    public Iterable<String> getOrder(Record record)
+    public static Collection<String> getDeclaredOrder(Record record)
     {
-        Set<String> keys = record.keySet();
-
-        if (getAnnotation(Ordered.class) != null)
+        String order = record.getMeta(ORDER_KEY);
+        if (order == null)
         {
-            String order = record.getMeta("order");
-            if (order != null)
-            {
-                return convertOrder(order);
-            }
+            return null;
         }
 
-        // By default, just whatever order.
-        return keys;
-    }
+        if(order.length() == 0)
+        {
+            return new ArrayList<String>(0);
+        }
 
-    private Iterable<String> convertOrder(String order)
-    {
         // FIXME comma not safe in keys, could be bad.
         return Arrays.asList(order.split(","));
     }
 
-    public MutableRecord createNewRecord()
+    public Collection<String> getOrder(Record record)
     {
-        return new MutableRecordImpl();
+        Collection<String> order = getDeclaredOrder(record);
+        if(order == null)
+        {
+            List<String> defaultOrder = new ArrayList<String>(record.keySet());
+            Collections.sort(defaultOrder, getKeyComparator());
+            order = defaultOrder;
+        }
+
+        return order;
+    }
+
+    protected void setOrder(MutableRecord record, Collection<String> order)
+    {
+        record.putMeta(ORDER_KEY, StringUtils.join(",", order));
+    }
+
+    protected abstract Comparator<String> getKeyComparator();
+
+    @SuppressWarnings({"unchecked"})
+    public MutableRecord createNewRecord(boolean applyDefaults)
+    {
+        MutableRecordImpl record = new MutableRecordImpl();
+        if(isOrdered())
+        {
+            setOrder(record, Collections.EMPTY_LIST);
+        }
+        return record;
+    }
+
+    public boolean isOrdered()
+    {
+        return getAnnotation(Ordered.class) != null;
     }
 
     public boolean isTemplated()
     {
         return false;
     }
+
+    public abstract Object emptyInstance();
 }

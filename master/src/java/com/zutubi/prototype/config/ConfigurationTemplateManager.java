@@ -25,7 +25,7 @@ public class ConfigurationTemplateManager
 
     private InstanceCache instances = new InstanceCache();
     private Map<String, TemplateHierarchy> templateHierarchies = new HashMap<String, TemplateHierarchy>();
-    
+
     private TypeRegistry typeRegistry;
     private RecordManager recordManager;
     private ConfigurationPersistenceManager configurationPersistenceManager;
@@ -46,16 +46,21 @@ public class ConfigurationTemplateManager
         }
     }
 
+    public String getOwner(String path)
+    {
+        String[] elements = PathUtils.getPathElements(path);
+        if (elements.length > 1 && configurationPersistenceManager.getScopeInfo(elements[0]).isTemplated())
+        {
+            return elements[1];
+        }
+
+        return null;
+    }
+
     public Record getRecord(String path)
     {
         checkPersistent(path);
-
-        Record record = recordManager.load(path);
-        if (record == null)
-        {
-            return null;
-        }
-        return templatiseRecord(path, record);
+        return templatiseRecord(path, recordManager.load(path));
     }
 
     /**
@@ -96,10 +101,10 @@ public class ConfigurationTemplateManager
     {
         String result = null;
         long handle = getTemplateParentHandle(path, record);
-        if(handle != 0)
+        if (handle != 0)
         {
             result = recordManager.getPathForHandle(handle);
-            if(result == null)
+            if (result == null)
             {
                 LOG.severe("Record at path '" + path + "' has reference to unknown parent '" + handle + "'");
             }
@@ -107,7 +112,7 @@ public class ConfigurationTemplateManager
 
         return result;
     }
-    
+
     private Record templatiseRecord(String path, Record record)
     {
         // We need to understand the root level can be templated.
@@ -140,7 +145,14 @@ public class ConfigurationTemplateManager
                     parentTemplateRecord = (TemplateRecord) value;
                 }
 
-                record = new TemplateRecord(pathElements[1], parentTemplateRecord, record);
+                if (record == null)
+                {
+                    record = parentTemplateRecord;
+                }
+                else
+                {
+                    record = new TemplateRecord(pathElements[1], parentTemplateRecord, record);
+                }
             }
         }
 
@@ -182,6 +194,14 @@ public class ConfigurationTemplateManager
         if (type instanceof CollectionType)
         {
             CollectionType collectionType = (CollectionType) type;
+            if (parentRecord == null)
+            {
+                // Need to create the collection record.
+                // FIXME: for templating, we may also want to init an order here??
+                parentRecord = collectionType.createNewRecord(true);
+                recordManager.insert(path, parentRecord);
+            }
+
             String insertionPath = collectionType.getInsertionPath(parentRecord, record);
             newPath = PathUtils.getPath(path, insertionPath);
         }
@@ -190,16 +210,7 @@ public class ConfigurationTemplateManager
         if (type instanceof CollectionType)
         {
             // If we are inserting into a collection, then the record must represent data for the collection type.
-            CompositeType collectionType = (CompositeType) type.getTargetType();
-            List<String> allowedTypes = new LinkedList<String>();
-            allowedTypes.add(collectionType.getSymbolicName());
-            allowedTypes.addAll(collectionType.getExtensions());
-            if (!allowedTypes.contains(record.getSymbolicName()))
-            {
-                // need to support type extensions here.
-                Type recordType = typeRegistry.getType(record.getSymbolicName());
-                throw new IllegalArgumentException("Expected type: " + collectionType.getClazz() + " but instead found " + recordType.getClazz());
-            }
+            checkRecordType((CompositeType) type.getTargetType(), record);
         }
         else
         {
@@ -208,12 +219,7 @@ public class ConfigurationTemplateManager
             String parentPath = PathUtils.getParentPath(path);
             CompositeType parentType = (CompositeType) configurationPersistenceManager.getType(parentPath);
             TypeProperty property = parentType.getProperty(PathUtils.getBaseName(path));
-            Type propertyType = property.getType();
-            Type recordType = typeRegistry.getType(record.getSymbolicName());
-            if (recordType != propertyType)
-            {
-                throw new IllegalArgumentException("Expected type: " + propertyType.getClazz() + " but instead found " + recordType.getClazz());
-            }
+            checkRecordType((CompositeType) property.getType(), record);
         }
 
         // generate and send out events for each of the records being inserted.  The root record may itself contain
@@ -237,6 +243,19 @@ public class ConfigurationTemplateManager
         return newPath;
     }
 
+    private void checkRecordType(CompositeType expectedType, MutableRecord record)
+    {
+        List<String> allowedTypes = new LinkedList<String>();
+        allowedTypes.add(expectedType.getSymbolicName());
+        allowedTypes.addAll(expectedType.getExtensions());
+        if (!allowedTypes.contains(record.getSymbolicName()))
+        {
+            // need to support type extensions here.
+            Type recordType = typeRegistry.getType(record.getSymbolicName());
+            throw new IllegalArgumentException("Expected type: " + expectedType.getClazz() + " but instead found " + recordType.getClazz());
+        }
+    }
+
     private void refreshCaches()
     {
         configurationReferenceManager.clear();
@@ -252,9 +271,35 @@ public class ConfigurationTemplateManager
         {
             String path = scope.getScopeName();
             Type type = scope.getType();
+            Record topRecord = recordManager.load(path);
+
             try
             {
-                type.instantiate(path, recordManager.load(path));
+                if (scope.isTemplated())
+                {
+                    // Create the collection ourselves, and populate it with
+                    // instances created from template records.
+                    CollectionType collectionType = (CollectionType) type;
+                    CompositeType templatedType = (CompositeType) collectionType.getCollectionType();
+                    Map<String, Object> topInstance = new LinkedHashMap<String, Object>();
+                    instances.put(path, topInstance);
+                    for(String id: collectionType.getOrder(topRecord))
+                    {
+                        String itemPath = PathUtils.getPath(path, id);
+                        Record record = getRecord(itemPath);
+                        Object instance = templatedType.instantiate(itemPath, record);
+
+                        // Only concrete instances go into the collection
+                        if(isConcrete(record))
+                        {
+                            topInstance.put(id, instance);
+                        }
+                    }
+                }
+                else
+                {
+                    type.instantiate(path, topRecord);
+                }
             }
             catch (TypeException e)
             {
@@ -265,12 +310,21 @@ public class ConfigurationTemplateManager
         }
     }
 
+    private boolean isConcrete(Record record)
+    {
+        if(record instanceof TemplateRecord)
+        {
+            record = ((TemplateRecord)record).getMoi();
+        }
+        return !Boolean.valueOf(record.getMeta(TEMPLATE_KEY));
+    }
+
     private void refreshTemplateHierarchies()
     {
         templateHierarchies.clear();
-        for(ConfigurationScopeInfo scope: configurationPersistenceManager.getScopes())
+        for (ConfigurationScopeInfo scope : configurationPersistenceManager.getScopes())
         {
-            if(scope.isTemplated())
+            if (scope.isTemplated())
             {
                 MapType type = (MapType) scope.getType();
                 String idProperty = type.getKeyProperty();
@@ -278,11 +332,11 @@ public class ConfigurationTemplateManager
                 recordManager.loadAll(PathUtils.getPath(scope.getScopeName(), PathUtils.WILDCARD_ANY_ELEMENT), recordsByPath);
 
                 Map<Long, List<Record>> recordsByParent = new HashMap<Long, List<Record>>();
-                for(Map.Entry<String, Record> entry: recordsByPath.entrySet())
+                for (Map.Entry<String, Record> entry : recordsByPath.entrySet())
                 {
                     long parentHandle = getTemplateParentHandle(entry.getKey(), entry.getValue());
                     List<Record> records = recordsByParent.get(parentHandle);
-                    if(records == null)
+                    if (records == null)
                     {
                         records = new LinkedList<Record>();
                         recordsByParent.put(parentHandle, records);
@@ -293,9 +347,9 @@ public class ConfigurationTemplateManager
 
                 TemplateNode root = null;
                 List<Record> rootRecords = recordsByParent.get(0L);
-                if(rootRecords != null)
+                if (rootRecords != null)
                 {
-                    if(rootRecords.size() != 1)
+                    if (rootRecords.size() != 1)
                     {
                         LOG.severe("Found multiple root records for scope '" + scope.getScopeName() + "': choosing an arbitrary one");
                     }
@@ -316,9 +370,9 @@ public class ConfigurationTemplateManager
         TemplateNode node = new TemplateNode(path, id);
 
         List<Record> children = recordsByParent.get(record.getHandle());
-        if(children != null)
+        if (children != null)
         {
-            for(Record child: children)
+            for (Record child : children)
             {
                 node.addChild(createTemplateNode(child, scopeName, idProperty, recordsByParent));
             }
@@ -424,7 +478,7 @@ public class ConfigurationTemplateManager
         {
             CollectionType collectionType = (CollectionType) parentType;
             String newName = collectionType.getSavePath(recordManager.load(parentPath), record);
-            if(baseName != null && !baseName.equals(newName))
+            if (baseName != null && !baseName.equals(newName))
             {
                 // We need to update our own record
                 newPath = PathUtils.getPath(parentPath, newName);
@@ -580,12 +634,12 @@ public class ConfigurationTemplateManager
     public TemplateHierarchy getTemplateHierarchy(String scope)
     {
         ConfigurationScopeInfo scopeInfo = configurationPersistenceManager.getScopeInfo(scope);
-        if(scopeInfo == null)
+        if (scopeInfo == null)
         {
             throw new IllegalArgumentException("Request for template hierarchy for non-existant scope '" + scope + "'");
         }
 
-        if(!scopeInfo.isTemplated())
+        if (!scopeInfo.isTemplated())
         {
             throw new IllegalArgumentException("Request for template hierarchy for non-templated scope '" + scope + "'");
         }
@@ -597,10 +651,10 @@ public class ConfigurationTemplateManager
     {
         String templatePath = null;
         String[] elements = PathUtils.getPathElements(path);
-        if(elements.length == 2)
+        if (elements.length == 2)
         {
             ConfigurationScopeInfo scope = configurationPersistenceManager.getScopeInfo(elements[0]);
-            if(scope != null && scope.isTemplated())
+            if (scope != null && scope.isTemplated())
             {
                 TemplateHierarchy hierarchy = templateHierarchies.get(scope.getScopeName());
                 TemplateNode node = hierarchy.getNodeById(elements[1]);
@@ -668,9 +722,9 @@ public class ConfigurationTemplateManager
     public List<String> getRootListing()
     {
         List<String> result = new LinkedList<String>();
-        for(ConfigurationScopeInfo scope: configurationPersistenceManager.getScopes())
+        for (ConfigurationScopeInfo scope : configurationPersistenceManager.getScopes())
         {
-            if(scope.isPersistent())
+            if (scope.isPersistent())
             {
                 result.add(scope.getScopeName());
             }
