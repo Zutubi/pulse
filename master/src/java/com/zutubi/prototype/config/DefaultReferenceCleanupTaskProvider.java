@@ -11,7 +11,7 @@ import com.zutubi.validation.annotations.Required;
  */
 public class DefaultReferenceCleanupTaskProvider implements ReferenceCleanupTaskProvider
 {
-    private ConfigurationPersistenceManager configurationPersistenceManager;
+    private ConfigurationTemplateManager configurationTemplateManager;
     private ConfigurationReferenceManager configurationReferenceManager;
     private RecordManager recordManager;
 
@@ -26,7 +26,7 @@ public class DefaultReferenceCleanupTaskProvider implements ReferenceCleanupTask
         String parentPath = PathUtils.getParentPath(referencingPath);
         String baseName = PathUtils.getBaseName(referencingPath);
 
-        CompositeType parentType = (CompositeType) configurationPersistenceManager.getType(parentPath);
+        CompositeType parentType = (CompositeType) configurationTemplateManager.getType(parentPath);
         TypeProperty property = parentType.getProperty(baseName);
         if(property.getType() instanceof ReferenceType)
         {
@@ -45,9 +45,9 @@ public class DefaultReferenceCleanupTaskProvider implements ReferenceCleanupTask
         }
     }
 
-    public void setConfigurationPersistenceManager(ConfigurationPersistenceManager configurationPersistenceManager)
+    public void setConfigurationTemplateManager(ConfigurationTemplateManager configurationTemplateManager)
     {
-        this.configurationPersistenceManager = configurationPersistenceManager;
+        this.configurationTemplateManager = configurationTemplateManager;
     }
 
     public void setRecordManager(RecordManager recordManager)

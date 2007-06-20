@@ -78,7 +78,7 @@ public class Configuration
 
         parentPath = PathUtils.getParentPath(path);
 
-        type = configurationPersistenceManager.getType(path);
+        type = configurationTemplateManager.getType(path);
         targetType = type.getTargetType();
 
         if (targetType instanceof CompositeType)

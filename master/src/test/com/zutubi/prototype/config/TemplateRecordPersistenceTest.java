@@ -44,8 +44,7 @@ public class TemplateRecordPersistenceTest extends AbstractConfigurationSystemTe
 
     public void testSingleRecord()
     {
-        MutableRecord global = createGlobal();
-        configurationTemplateManager.insertRecord("project", global);
+        insertGlobal();
 
         TemplateRecord record = (TemplateRecord) configurationTemplateManager.getRecord("project/global");
         assertEquals(GLOBAL_PROJECT, record.getOwner());
@@ -76,9 +75,8 @@ public class TemplateRecordPersistenceTest extends AbstractConfigurationSystemTe
 
     public void testComposite()
     {
-        MutableRecord global = createGlobal();
-        global.put("property", createProperty("p", "v"));
-        configurationTemplateManager.insertRecord("project", global);
+        insertGlobal();
+        configurationTemplateManager.insertRecord("project/global/property", createProperty("p", "v"));
 
         TemplateRecord record = (TemplateRecord) configurationTemplateManager.getRecord("project/global");
         // Test both retrieving the property and asking for it directly by path
@@ -97,9 +95,9 @@ public class TemplateRecordPersistenceTest extends AbstractConfigurationSystemTe
 
     public void testNestedCollection()
     {
-        MutableRecord global = createGlobal();
-        addNamed((MutableRecord) global.get("stages"), createStage("stagename", "p1", "v1"));
-        configurationTemplateManager.insertRecord("project", global);
+        insertGlobal();
+        configurationTemplateManager.insertRecord("project/global/stages", createStage("stagename"));
+        configurationTemplateManager.insertRecord("project/global/stages/stagename/properties", createProperty("p1", "v1"));
 
         TemplateRecord record = (TemplateRecord) configurationTemplateManager.getRecord("project/global");
         TemplateRecord stages = (TemplateRecord) record.get("stages");
@@ -133,9 +131,7 @@ public class TemplateRecordPersistenceTest extends AbstractConfigurationSystemTe
         MutableRecord global = createGlobal();
         global.put("url", "inherited url");
         configurationTemplateManager.insertRecord("project", global);
-        MutableRecord child = createProject("child", "my own way baby!");
-        configurationTemplateManager.setParentTemplate(child, configurationTemplateManager.getRecord("project/global").getHandle());
-        configurationTemplateManager.insertRecord("project", child);
+        insertChild();
 
         TemplateRecord childTemplate = (TemplateRecord) configurationTemplateManager.getRecord("project/child");
         TemplateRecord parent = childTemplate.getParent();
@@ -152,8 +148,7 @@ public class TemplateRecordPersistenceTest extends AbstractConfigurationSystemTe
 
     public void testSimpleOverride()
     {
-        MutableRecord global = createGlobal();
-        configurationTemplateManager.insertRecord("project", global);
+        insertGlobal();
         MutableRecord child = createProject("child", "my own way baby!");
         child.put("url", "override url");
         configurationTemplateManager.setParentTemplate(child, configurationTemplateManager.getRecord("project/global").getHandle());
@@ -168,11 +163,8 @@ public class TemplateRecordPersistenceTest extends AbstractConfigurationSystemTe
 
     public void testInheritedMap()
     {
-        MutableRecord global = createGlobal();
-        configurationTemplateManager.insertRecord("project", global);
-        MutableRecord child = createProject("child", "my own way baby!");
-        configurationTemplateManager.setParentTemplate(child, configurationTemplateManager.getRecord("project/global").getHandle());
-        configurationTemplateManager.insertRecord("project", child);
+        insertGlobal();
+        insertChild();
 
         TemplateRecord childTemplate = (TemplateRecord) configurationTemplateManager.getRecord("project/child");
         assertEquals("child", childTemplate.getOwner());
@@ -184,21 +176,72 @@ public class TemplateRecordPersistenceTest extends AbstractConfigurationSystemTe
 
     public void testInheritedList()
     {
-        MutableRecord global = createGlobal();
-        configurationTemplateManager.insertRecord("project", global);
-        MutableRecord child = createProject("child", "my own way baby!");
-        configurationTemplateManager.setParentTemplate(child, configurationTemplateManager.getRecord("project/global").getHandle());
-        configurationTemplateManager.insertRecord("project", child);
+        insertGlobal();
+        insertChild();
+
+        configurationTemplateManager.insertRecord("project/global/propertiesList", createProperty("gp1", "gv1"));
 
         TemplateRecord childTemplate = (TemplateRecord) configurationTemplateManager.getRecord("project/child");
         assertEquals("child", childTemplate.getOwner());
-        assertEquals(GLOBAL_PROJECT, childTemplate.getOwner("stages"));
+        assertEquals(GLOBAL_PROJECT, childTemplate.getOwner("propertiesList"));
 
+        assertInheritedList((TemplateRecord) childTemplate.get("propertiesList"));
+        assertInheritedList((TemplateRecord) configurationTemplateManager.getRecord("project/child/propertiesList"));
+    }
+
+    private void assertInheritedList(TemplateRecord propertiesList)
+    {
+        assertEquals(1, propertiesList.size());
+        String key = propertiesList.keySet().iterator().next();
+        assertEquals(GLOBAL_PROJECT, propertiesList.getOwner());
+        assertEquals(GLOBAL_PROJECT, propertiesList.getOwner(key));
+
+        TemplateRecord property = (TemplateRecord) propertiesList.get(key);
+        assertEquals(GLOBAL_PROJECT, property.getOwner());
+        assertEquals(GLOBAL_PROJECT, property.getOwner("name"));
+        assertEquals("gp1", property.get("name"));
+    }
+
+    public void testSaveInherited()
+    {
+        // Test saving a record to a path where there is no existing record,
+        // but there *is* an inherited record (i.e. it is valid to save to
+        // this path only when templating is taken into account).
+        insertGlobal();
+        configurationTemplateManager.insertRecord("project/global/property", createProperty("p", "v"));
+        insertChild();
+        assertNotNull(configurationTemplateManager.getRecord("project/child/property"));
+
+        MutableRecord overridingProperty = propertyType.createNewRecord(false);
+        overridingProperty.put("cp", "cv");
+
+        configurationTemplateManager.saveRecord("project/child/property", overridingProperty);
+    }
+
+    private void insertGlobal()
+    {
+        MutableRecord global = createGlobal();
+        configurationTemplateManager.insertRecord("project", global);
     }
 
     private MutableRecord createGlobal()
     {
-        return createProject(GLOBAL_PROJECT, "this is the daddy of them all");
+        MutableRecord record = createProject(GLOBAL_PROJECT, "this is the daddy of them all");
+        configurationTemplateManager.markAsTemplate(record);
+        return record;
+    }
+
+    private void insertChild()
+    {
+        MutableRecord child = createChild();
+        configurationTemplateManager.insertRecord("project", child);
+    }
+
+    private MutableRecord createChild()
+    {
+        MutableRecord child = createProject("child", "my own way baby!");
+        configurationTemplateManager.setParentTemplate(child, configurationTemplateManager.getRecord("project/global").getHandle());
+        return child;
     }
 
     private MutableRecord createProject(String name, String description)
@@ -218,22 +261,11 @@ public class TemplateRecordPersistenceTest extends AbstractConfigurationSystemTe
         return record;
     }
 
-    private MutableRecord createStage(String name, String... properties)
+    private MutableRecord createStage(String name)
     {
         MutableRecord record = stageType.createNewRecord(true);
         record.put("name", name);
-        MutableRecord propertiesRecord = (MutableRecord) record.get("properties");
-        for(int i = 0; i < properties.length - 1; i += 2)
-        {
-            addNamed(propertiesRecord, createProperty(properties[i], properties[i + 1]));
-        }
-
         return record;
-    }
-
-    private void addNamed(MutableRecord record, MutableRecord named)
-    {
-        record.put((String) named.get("name"), named);
     }
 
     private void assertEmptyCollection(TemplateRecord record, String property)

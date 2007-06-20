@@ -126,6 +126,11 @@ public class ConfigurationTemplateManager
                 // ask it for the property to get our parent template record.
                 String owningPath = PathUtils.getPath(pathElements[0], pathElements[1]);
                 Record owningRecord = recordManager.load(owningPath);
+                if (owningRecord == null)
+                {
+                    throw new IllegalArgumentException("Invalid path '" + path + "': owning record '" + owningPath + "' does not exist");
+                }
+
                 TemplateRecord parentTemplateRecord = null;
                 String parentOwningPath = getTemplateParentPath(owningPath, owningRecord);
                 if (parentOwningPath != null)
@@ -151,7 +156,8 @@ public class ConfigurationTemplateManager
                 }
                 else
                 {
-                    record = new TemplateRecord(pathElements[1], parentTemplateRecord, record);
+                    ComplexType type = parentTemplateRecord == null ? configurationPersistenceManager.getType(path) : parentTemplateRecord.getType();
+                    record = new TemplateRecord(pathElements[1], parentTemplateRecord, type, record);
                 }
             }
         }
@@ -182,8 +188,7 @@ public class ConfigurationTemplateManager
     {
         checkPersistent(path);
 
-        ComplexType type = configurationPersistenceManager.getType(path, ComplexType.class);
-
+        ComplexType type = getType(path);
         Record parentRecord = recordManager.load(path);
 
         // determine the path at which the record will be inserted.  If we are inserting into a collection,
@@ -283,14 +288,14 @@ public class ConfigurationTemplateManager
                     CompositeType templatedType = (CompositeType) collectionType.getCollectionType();
                     Map<String, Object> topInstance = new LinkedHashMap<String, Object>();
                     instances.put(path, topInstance);
-                    for(String id: collectionType.getOrder(topRecord))
+                    for (String id : collectionType.getOrder(topRecord))
                     {
                         String itemPath = PathUtils.getPath(path, id);
                         Record record = getRecord(itemPath);
                         Object instance = templatedType.instantiate(itemPath, record);
 
                         // Only concrete instances go into the collection
-                        if(isConcrete(record))
+                        if (isConcrete(record))
                         {
                             topInstance.put(id, instance);
                         }
@@ -312,9 +317,9 @@ public class ConfigurationTemplateManager
 
     private boolean isConcrete(Record record)
     {
-        if(record instanceof TemplateRecord)
+        if (record instanceof TemplateRecord)
         {
-            record = ((TemplateRecord)record).getMoi();
+            record = ((TemplateRecord) record).getMoi();
         }
         return !Boolean.valueOf(record.getMeta(TEMPLATE_KEY));
     }
@@ -440,7 +445,7 @@ public class ConfigurationTemplateManager
             throw new IllegalArgumentException("Attempt to save instance of an unknown class '" + instance.getClass().getName() + "'");
         }
 
-        Record record;
+        MutableRecord record;
         try
         {
             record = type.unstantiate(instance);
@@ -452,26 +457,88 @@ public class ConfigurationTemplateManager
         saveRecord(path, record);
     }
 
-    public String saveRecord(String path, Record record)
+    public String saveRecord(String path, MutableRecord record)
     {
+        checkPersistent(path);
+
+        Record existingRecord = getRecord(path);
+        if (existingRecord == null)
+        {
+            throw new IllegalArgumentException("Illegal path '" + path + "': no existing record found");
+        }
+
+        // See if this is a templated scope: in which case more magic needs
+        // to happen.
+        if (existingRecord instanceof TemplateRecord)
+        {
+            // Ensure there is a concrete record for this path.  We may need
+            // to create a few records along the path to make this happen.
+            TemplateRecord templateRecord = (TemplateRecord) existingRecord;
+            String[] pathElements = PathUtils.getPathElements(path);
+            if (!templateRecord.getOwner().equals(pathElements[1]))
+            {
+                String owningPath = PathUtils.getPath(pathElements[0], pathElements[1]);
+                Record owningRecord = recordManager.load(owningPath);
+
+                String parentOwningPath = getTemplateParentPath(owningPath, owningRecord);
+                TemplateRecord parentTemplateRecord = (TemplateRecord) getRecord(parentOwningPath);
+
+                // Find where in the path there cease to be records in our
+                // owner.  From the point where it is found, create empty
+                // records to populate the remainder of the path, using the
+                // type that we have inherited.
+                for (int i = 2; i < pathElements.length; i++)
+                {
+                    String element = pathElements[i];
+                    if (owningRecord != null)
+                    {
+                        owningRecord = (Record) owningRecord.get(element);
+                    }
+                    owningPath = PathUtils.getPath(owningPath, element);
+                    parentTemplateRecord = (TemplateRecord) parentTemplateRecord.get(element);
+
+                    if (owningRecord == null)
+                    {
+                        ComplexType type = parentTemplateRecord.getType();
+                        recordManager.insert(owningPath, type.createNewRecord(false));
+                    }
+                }
+            }
+
+            // Scrub values from the incoming record where they are identical
+            // to the existing record.
+            // Perhaps we could use an iterator to remove, but does Record
+            // specify what happens when removing using a key set iterator?
+            Set<String> dead = new HashSet<String>();
+            for(String key: record.keySet())
+            {
+                if(record.get(key).equals(existingRecord.get(key)))
+                {
+                    dead.add(key);
+                }
+            }
+
+            for(String key: dead)
+            {
+                record.remove(key);
+            }
+        }
+
         String parentPath = PathUtils.getParentPath(path);
         String baseName = PathUtils.getBaseName(path);
 
         checkPersistent(parentPath);
 
-        Record parentRecord = recordManager.load(parentPath);
+        Record parentRecord = getRecord(parentPath);
         if (parentRecord == null)
         {
             throw new IllegalArgumentException("Invalid parent path '" + parentPath + "'");
         }
 
+        ComplexType parentType = configurationPersistenceManager.getType(parentPath);
         Object oldInstance = instances.get(path);
 
-        // generate pre save events.
-
         eventManager.publish(new PreSaveEvent(this, path, oldInstance));
-
-        ComplexType parentType = (ComplexType) configurationPersistenceManager.getType(parentPath);
 
         String newPath = path;
         if (parentType instanceof CollectionType)
@@ -538,7 +605,7 @@ public class ConfigurationTemplateManager
         return instances.get(path);
     }
 
-    @SuppressWarnings({"unchecked"})
+    @SuppressWarnings({ "unchecked" })
     public <T> T getInstance(String path, Class<T> clazz)
     {
         Object instance = getInstance(path);
@@ -567,7 +634,7 @@ public class ConfigurationTemplateManager
         instances.getAll(path, result);
     }
 
-    @SuppressWarnings({"unchecked"})
+    @SuppressWarnings({ "unchecked" })
     public <T> Collection<T> getAllInstances(Class<T> clazz)
     {
         CompositeType type = typeRegistry.getType(clazz);
@@ -594,7 +661,7 @@ public class ConfigurationTemplateManager
         instances.put(path, instance);
     }
 
-    @SuppressWarnings({"unchecked"})
+    @SuppressWarnings({ "unchecked" })
     public <T> T getAncestorOfType(Configuration c, Class<T> clazz)
     {
         String path = c.getConfigurationPath();
@@ -714,8 +781,75 @@ public class ConfigurationTemplateManager
         return paths;
     }
 
-    public Type getType(String path)
+    @SuppressWarnings({ "unchecked" })
+    public <T extends Type> T getType(String path, Class<T> typeClass)
     {
+        Type type = getType(path);
+        if (type == null)
+        {
+            throw new IllegalArgumentException("Invalid path '" + path + "': does not exist");
+        }
+
+        if (!typeClass.isInstance(type))
+        {
+            throw new IllegalArgumentException("Invalid path '" + path + "': references incompatible type (expected '" + typeClass.getName() + "', found '" + type.getClass().getName() + "')");
+        }
+
+        return (T) type;
+    }
+
+    public ComplexType getType(String path)
+    {
+        String[] pathElements = PathUtils.getPathElements(path);
+
+        // Templated paths below the owner level need special treatment.
+        if (pathElements.length > 2)
+        {
+            ConfigurationScopeInfo scope = configurationPersistenceManager.getScopeInfo(pathElements[0]);
+            if (scope == null)
+            {
+                throw new IllegalArgumentException("Invalid path '" + path + "':refers to unknown root scope '" + pathElements[0]);
+            }
+
+            if (scope.isTemplated())
+            {
+                TemplateRecord parentRecord = (TemplateRecord) getRecord(PathUtils.getParentPath(path));
+                if (parentRecord == null)
+                {
+                    throw new IllegalArgumentException("Invalid path '" + path + "': parent path does not exist");
+                }
+
+                ComplexType parentType = parentRecord.getType();
+                String baseName = pathElements[pathElements.length - 1];
+                Object value = parentRecord.get(baseName);
+                if (value != null)
+                {
+                    if (value instanceof TemplateRecord)
+                    {
+                        return ((TemplateRecord) value).getType();
+                    }
+                    else
+                    {
+                        throw new IllegalArgumentException("Invalid path '" + path + "': references non-complex type");
+                    }
+                }
+                else if (parentType instanceof CompositeType)
+                {
+                    Type propertyType = ((CompositeType) parentType).getProperty(baseName).getType();
+                    if(!(propertyType instanceof ComplexType))
+                    {
+                        throw new IllegalArgumentException("Invalid path '" + path + "': references non-complex type");
+                    }
+
+                    return (ComplexType) propertyType;
+                }
+                else
+                {
+                    throw new IllegalArgumentException("Invalid path '" + path + "': references unknown child '" + baseName + "' of collection");
+                }
+            }
+        }
+
         return configurationPersistenceManager.getType(path);
     }
 

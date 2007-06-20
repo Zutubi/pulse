@@ -22,6 +22,8 @@ public interface Type
 
     Type getTargetType();
 
+    Type getActualType(Object value);
+
     /**
      * The underlying class represented by this type instance.
      *

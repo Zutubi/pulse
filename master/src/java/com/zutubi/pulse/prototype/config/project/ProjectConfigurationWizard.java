@@ -17,7 +17,7 @@ import java.util.LinkedList;
  */
 public class ProjectConfigurationWizard extends AbstractTypeWizard
 {
-    private static final TemplateRecord EMPTY_RECORD = new TemplateRecord("empty", null, new MutableRecordImpl());
+    private static final TemplateRecord EMPTY_RECORD = new TemplateRecord("empty", null, null, new MutableRecordImpl());
 
     private CompositeType projectType;
 

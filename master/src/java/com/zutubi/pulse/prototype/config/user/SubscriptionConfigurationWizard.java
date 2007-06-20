@@ -18,7 +18,7 @@ public class SubscriptionConfigurationWizard extends AbstractTypeWizard
 {
     private static final Logger LOG = Logger.getLogger(SubscriptionConfigurationWizard.class);
 
-    private static final TemplateRecord EMPTY_RECORD = new TemplateRecord("empty", null, new MutableRecordImpl());
+    private static final TemplateRecord EMPTY_RECORD = new TemplateRecord("empty", null, null, new MutableRecordImpl());
 
     private CompositeType subscriptionType;
 

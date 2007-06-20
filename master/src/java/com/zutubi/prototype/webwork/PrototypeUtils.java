@@ -64,7 +64,7 @@ public class PrototypeUtils
      * @param parameters map that contains the http parameters to be converted into a record.
      * @return a record instance containing the parameter data that applies to the map.
      */
-    public static Record toRecord(CompositeType type, Map<String, String[]> parameters)
+    public static MutableRecord toRecord(CompositeType type, Map<String, String[]> parameters)
     {
         MutableRecord record = new MutableRecordImpl();
         record.setSymbolicName(type.getSymbolicName());
@@ -131,7 +131,7 @@ public class PrototypeUtils
             Record record = configurationTemplateManager.getRecord(path);
             if(record != null)
             {
-                listing = new LinkedList<String>(record.keySet());
+                listing = new LinkedList<String>(((CollectionType)type).getOrder(record));
             }
         }
         else if(type instanceof CompositeType)

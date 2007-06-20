@@ -74,6 +74,11 @@ public abstract class AbstractType implements Type
         return this;
     }
 
+    public Type getActualType(Object value)
+    {
+        return this;
+    }
+
     public void addAnnotation(Annotation annotation)
     {
         this.annotations.add(annotation);

@@ -15,4 +15,7 @@ public interface ComplexType extends Type
     Record createNewRecord(boolean applyDefaults);
 
     boolean isTemplated();
+
+    Type getActualPropertyType(String propertyName, Object propertyValue);
+
 }

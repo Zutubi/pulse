@@ -115,7 +115,7 @@ public class ConfigurationReferenceManager
         String parentPath = PathUtils.getParentPath(referencingPath);
         String baseName = PathUtils.getBaseName(referencingPath);
 
-        CompositeType parentType = (CompositeType) configurationPersistenceManager.getType(parentPath);
+        CompositeType parentType = (CompositeType) configurationTemplateManager.getType(parentPath);
         TypeProperty property = parentType.getProperty(baseName);
         Reference ref = property.getAnnotation(Reference.class);
         try

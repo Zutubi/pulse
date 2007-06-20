@@ -15,14 +15,14 @@ public class SingleTypeWizard extends AbstractTypeWizard
 {
     private static final Logger LOG = Logger.getLogger(SingleTypeWizard.class);
 
-    private static final TemplateRecord EMPTY_RECORD = new TemplateRecord("empty", null, new MutableRecordImpl());
+    private static final TemplateRecord EMPTY_RECORD = new TemplateRecord("empty", null, null, new MutableRecordImpl());
     private WizardState recordState;
     
     private CompositeType type;
 
     public void initialise()
     {
-        type = (CompositeType) configurationPersistenceManager.getType(path).getTargetType();
+        type = (CompositeType) configurationTemplateManager.getType(path).getTargetType();
 
         LOG.warning("TODO: load template record for path: " + path + ", currently using empty template record.");
 

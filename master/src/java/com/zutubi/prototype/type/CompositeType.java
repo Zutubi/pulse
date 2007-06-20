@@ -355,6 +355,28 @@ public class CompositeType extends AbstractType implements ComplexType
         return false;
     }
 
+    public CompositeType getActualType(Object value)
+    {
+        if(value == null || getExtensions().size() == 0)
+        {
+            return this;
+        }
+        else
+        {
+            return typeRegistry.getType(((Record)value).getSymbolicName());
+        }
+    }
+
+    public Type getActualPropertyType(String propertyName, Object propertyValue)
+    {
+        return properties.get(propertyName).getType().getActualType(propertyValue);
+    }
+
+    public Type getPropertyType(String key)
+    {
+        return properties.get(key).getType();
+    }
+
     public boolean equals(Object o)
     {
         if (this == o)

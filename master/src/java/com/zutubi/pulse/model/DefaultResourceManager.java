@@ -134,7 +134,7 @@ public class DefaultResourceManager implements ResourceManager, ConfigurationEve
         }
         else if(event instanceof PostSaveEvent)
         {
-            
+            // FIXME: looks totally incomplete
         }
     }
 

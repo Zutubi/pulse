@@ -1,6 +1,7 @@
 package com.zutubi.prototype.type.record;
 
 import com.zutubi.prototype.type.CollectionType;
+import com.zutubi.prototype.type.ComplexType;
 
 import java.util.Collection;
 import java.util.HashMap;
@@ -11,18 +12,20 @@ import java.util.Set;
  */
 public class TemplateRecord extends AbstractRecord
 {
-    private TemplateRecord parent;
-    private Record moi;
     private String owner;
+    private TemplateRecord parent;
+    private ComplexType type;
+    private Record moi;
     private Collection<String> declaredOrder = null;
 
-    public TemplateRecord(String owner, TemplateRecord parent, Record moi)
+    public TemplateRecord(String owner, TemplateRecord parent, ComplexType type, Record moi)
     {
         this.owner = owner;
         this.parent = parent;
+        this.type = type;
         this.moi = moi;
 
-        if(moi.isCollection())
+        if(type instanceof CollectionType)
         {
             declaredOrder = CollectionType.getDeclaredOrder(moi);
         }
@@ -75,7 +78,7 @@ public class TemplateRecord extends AbstractRecord
         }
         else if (value instanceof Record)
         {
-            return new TemplateRecord(owner, (TemplateRecord) getInherited(key), (MutableRecord) value);
+            return new TemplateRecord(owner, (TemplateRecord) getInherited(key), (ComplexType) type.getActualPropertyType(key, value), (MutableRecord) value);
         }
         else
         {
@@ -127,7 +130,21 @@ public class TemplateRecord extends AbstractRecord
 
         if (parent != this && parent != null) // ensure that we do not recurse infinitely -> IDEA complaint.
         {
-            mergedMap.putAll(parent.getMergedMap());
+            Map<String, Object> parentMerged = parent.getMergedMap();
+            if(declaredOrder == null)
+            {
+                mergedMap.putAll(parentMerged);
+            }
+            else
+            {
+                for(Map.Entry<String, Object> entry: parentMerged.entrySet())
+                {
+                    if(declaredOrder.contains(entry.getKey()))
+                    {
+                        mergedMap.put(entry.getKey(), entry.getValue());
+                    }
+                }
+            }
         }
 
         return mergedMap;
@@ -147,6 +164,11 @@ public class TemplateRecord extends AbstractRecord
     public String getOwner()
     {
         return owner;
+    }
+
+    public ComplexType getType()
+    {
+        return type;
     }
 
     public String getOwner(String key)

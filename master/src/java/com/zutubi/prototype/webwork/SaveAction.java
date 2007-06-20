@@ -3,6 +3,7 @@ package com.zutubi.prototype.webwork;
 import com.opensymphony.util.TextUtils;
 import com.opensymphony.xwork.ActionContext;
 import com.zutubi.prototype.type.CompositeType;
+import com.zutubi.prototype.type.record.MutableRecord;
 import com.zutubi.prototype.type.record.PathUtils;
 import com.zutubi.validation.XWorkValidationAdapter;
 
@@ -62,7 +63,7 @@ public class SaveAction extends PrototypeSupport
             return INPUT;
         }
 
-        String newPath = configurationTemplateManager.saveRecord(path, record);
+        String newPath = configurationTemplateManager.saveRecord(path, (MutableRecord) record);
         response = new ConfigurationResponse(newPath, configurationTemplateManager.getTemplatePath(newPath));
         if(!newPath.equals(path))
         {

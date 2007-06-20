@@ -21,7 +21,6 @@ public class DefaultRecordSerialiser implements RecordSerialiser
     private static final Logger LOG = Logger.getLogger(DefaultRecordSerialiser.class);
     private static final DateFormat FORMAT = DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.LONG);
 
-    private String basePath;
     private File baseDirectory;
     private static final String ELEMENT_RECORD = "record";
     private static final String ELEMENT_META = "meta";
@@ -37,8 +36,6 @@ public class DefaultRecordSerialiser implements RecordSerialiser
         {
             baseDirectory.mkdirs();
         }
-
-        basePath = PathUtils.normalizePath(baseDirectory.getAbsolutePath());
     }
 
     public void serialise(String path, Record record, boolean deep)
@@ -158,7 +155,7 @@ public class DefaultRecordSerialiser implements RecordSerialiser
             throw new RecordSerialiseException("No record found at path '" + path + "': directory '" + dir.getAbsolutePath() + "' does not exist");
         }
 
-        return deserialise(dir, handler);
+        return deserialise(dir, handler, "");
     }
 
     public void delete(String path) throws RecordSerialiseException
@@ -167,7 +164,7 @@ public class DefaultRecordSerialiser implements RecordSerialiser
         FileSystemUtils.rmdir(dir);
     }
 
-    private MutableRecord deserialise(File dir, RecordHandler handler)
+    private MutableRecord deserialise(File dir, RecordHandler handler, String path)
     {
         try
         {
@@ -186,28 +183,15 @@ public class DefaultRecordSerialiser implements RecordSerialiser
 
             for (File childDir : dir.listFiles(new SubrecordDirFileFilter()))
             {
-                record.put(childDir.getName(), deserialise(childDir, handler));
+                record.put(childDir.getName(), deserialise(childDir, handler, PathUtils.getPath(path, childDir.getName())));
             }
 
-            handler.handle(getPath(dir), record);
+            handler.handle(path, record);
             return record;
         }
         catch (Exception e)
         {
             throw new RecordSerialiseException("Unable to parse record file: " + e.getMessage(), e);
-        }
-    }
-
-    private String getPath(File dir)
-    {
-        String path = PathUtils.normalizePath(dir.getAbsolutePath());
-        if(path.equals(basePath))
-        {
-            return "";
-        }
-        else
-        {
-            return path.substring(basePath.length() + 1);
         }
     }
 

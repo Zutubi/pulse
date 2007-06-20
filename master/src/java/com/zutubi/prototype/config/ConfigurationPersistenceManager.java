@@ -213,7 +213,7 @@ public class ConfigurationPersistenceManager
      * @param path the path to retrieve the type of
      * @return the type definition, or null if none exists.
      */
-    public Type getType(String path)
+    ComplexType getType(String path)
     {
         String[] pathElements = PathUtils.getPathElements(path);
         String[] parentElements = PathUtils.getParentPathElements(pathElements);
@@ -271,7 +271,7 @@ public class ConfigurationPersistenceManager
         return type;
     }
 
-    private Type lookupPersistentType(String path, String[] parentElements, String lastElement)
+    private ComplexType lookupPersistentType(String path, String[] parentElements, String lastElement)
     {
         Record parentRecord = recordManager.load(PathUtils.getPath(parentElements));
         if (parentRecord == null)
@@ -305,7 +305,7 @@ public class ConfigurationPersistenceManager
             Type type = typeProperty.getType();
             if (value == null || type instanceof CollectionType)
             {
-                return type;
+                return (ComplexType) type;
             }
             else
             {
@@ -324,22 +324,6 @@ public class ConfigurationPersistenceManager
 
         Record record = (Record) value;
         return typeRegistry.getType(record.getSymbolicName());
-    }
-
-    public <T extends Type> T getType(String path, Class<T> typeClass)
-    {
-        Type type = getType(path);
-        if (type == null)
-        {
-            throw new IllegalArgumentException("Invalid path '" + path + "': does not exist");
-        }
-
-        if (!typeClass.isInstance(type))
-        {
-            throw new IllegalArgumentException("Invalid path '" + path + "': references incompatible type (expected '" + typeClass.getName() + "', found '" + type.getClass().getName() + "')");
-        }
-
-        return (T) type;
     }
 
     public List<String> getConfigurationPaths(CompositeType type)
