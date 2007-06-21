@@ -1,12 +1,14 @@
 package com.zutubi.prototype.table;
 
+import com.zutubi.config.annotations.Table;
+import com.zutubi.prototype.ConventionSupport;
+import com.zutubi.prototype.actions.Actions;
 import com.zutubi.prototype.type.CompositeType;
 import com.zutubi.prototype.type.PrimitiveType;
-import com.zutubi.prototype.ConventionSupport;
+import com.zutubi.util.bean.ObjectFactory;
 import com.zutubi.util.logging.Logger;
-import com.zutubi.config.annotations.Table;
 
-import java.lang.reflect.Method;
+import java.util.List;
 
 /**
  * The table descriptor factory is an implementation of a descriptor factory that uses an objects type definition
@@ -17,6 +19,8 @@ public class TableDescriptorFactory
 {
     private static final Logger LOG = Logger.getLogger(TableDescriptorFactory.class);
 
+    private ObjectFactory objectFactory;
+
     public TableDescriptor create(CompositeType type)
     {
         TableDescriptor td = new TableDescriptor();
@@ -26,29 +30,21 @@ public class TableDescriptorFactory
         td.addAction("delete");
 
         Class handler = ConventionSupport.getActions(type);
+
+        //FIXME: convert this to using the Actions object.  Problem: actions object requires an instance of the
+        //       object being represented, so that if necessary, the getActions(instance) method can be supported.
+        //       We do not have that instance at this stage.
         if (handler != null)
         {
-            for (Method m : handler.getMethods())
+            Actions actions = new Actions();
+            actions.setObjectFactory(objectFactory);
+
+            List<String> defaultActions = actions.getDefaultActions(handler, type.getClazz());
+            
+            for (String actionName : defaultActions)
             {
-                if (!m.getName().startsWith("do"))
-                {
-                    continue;
-                }
-                if (m.getReturnType() != Void.TYPE)
-                {
-                    continue;
-                }
-                if (m.getParameterTypes().length != 1)
-                {
-                    continue;
-                }
-                Class param = m.getParameterTypes()[0];
-                if (param != type.getClazz())
-                {
-                    continue;
-                }
                 // ok, we have an action here.
-                td.addAction(m.getName().substring(2));
+                td.addAction(actionName);
             }
         }
 
@@ -74,5 +70,10 @@ public class TableDescriptorFactory
         }
 
         return td;
+    }
+
+    public void setObjectFactory(ObjectFactory objectFactory)
+    {
+        this.objectFactory = objectFactory;
     }
 }

@@ -1,7 +1,5 @@
 package com.zutubi.validation.validators;
 
-import com.zutubi.validation.ValidationException;
-
 /**
  * <class-comment/>
  */

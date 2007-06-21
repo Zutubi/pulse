@@ -1,0 +1,13 @@
+Handles the XXXActions support for configuration instances.
+
+Sample:
+
+public class XXXActions
+{
+    /**
+     * Optional: manually specify the available actoins.
+     */
+    public List<String> getActions(T instance);
+
+    public void do<ActionName>(T instance);
+}

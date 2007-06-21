@@ -51,14 +51,14 @@ public class LicensedInterceptor implements Interceptor
         Method method = null;
         try
         {
-            method = target.getClass().getMethod(methodName, new Class[0]);
+            method = target.getClass().getMethod(methodName);
         }
         catch (NoSuchMethodException nsme)
         {
             // look for methodName or doMethodName
             try
             {
-                method = target.getClass().getMethod(doXxxMethodName(methodName), new Class[0]);
+                method = target.getClass().getMethod(doXxxMethodName(methodName));
             }
             catch (NoSuchMethodException nsme2)
             {

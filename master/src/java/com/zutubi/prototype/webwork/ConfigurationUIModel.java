@@ -8,7 +8,11 @@ import com.zutubi.prototype.type.CompositeType;
 import com.zutubi.prototype.type.Type;
 import com.zutubi.prototype.type.record.PathUtils;
 import com.zutubi.prototype.type.record.Record;
+import com.zutubi.prototype.actions.Actions;
+import com.zutubi.prototype.ConventionSupport;
+import com.zutubi.prototype.format.Display;
 import com.zutubi.pulse.bootstrap.ComponentContext;
+import com.zutubi.util.bean.ObjectFactory;
 
 import java.text.Collator;
 import java.util.Collections;
@@ -20,12 +24,14 @@ import java.util.List;
  *
  *
  */
-public class Configuration
+public class ConfigurationUIModel
 {
     private ConfigurationPersistenceManager configurationPersistenceManager;
     private ConfigurationTemplateManager configurationTemplateManager;
 
     private ConfigurationRegistry configurationRegistry;
+
+    private ObjectFactory objectFactory;
 
     private Record record;
     private Type type;
@@ -43,9 +49,15 @@ public class Configuration
     private List<String> nestedProperties;
     private List<String> extensions = new LinkedList<String>();
 
+    private List<String> actions = new LinkedList<String>();
+
+    private List<String> displayFields = new LinkedList<String>();
+
     private boolean configurationCheckAvailable = false;
 
-    public Configuration(String path)
+    private Object instance;
+
+    public ConfigurationUIModel(String path)
     {
         if (!TextUtils.stringSet(path))
         {
@@ -55,10 +67,11 @@ public class Configuration
         this.path = PathUtils.normalizePath(path);
 
         ComponentContext.autowire(this);
+
+        analyse();
     }
 
-
-    public void analyse()
+    private void analyse()
     {
         // load the type defined by the path.
         pathElements = PathUtils.getPathElements(path);
@@ -78,6 +91,7 @@ public class Configuration
 
         parentPath = PathUtils.getParentPath(path);
 
+        instance = configurationTemplateManager.getInstance(path);
         type = configurationTemplateManager.getType(path);
         targetType = type.getTargetType();
 
@@ -102,6 +116,42 @@ public class Configuration
             extensions.addAll(((CompositeType) targetType).getExtensions());
             configurationCheckAvailable = configurationRegistry.getConfigurationCheckType(ctype) != null;
         }
+
+        // determine the actions.
+        Class actionHandler = ConventionSupport.getActions(targetType);
+        if (actionHandler != null)
+        {
+            Actions actionSupport = new Actions();
+            actionSupport.setObjectFactory(objectFactory);
+            actions = actionSupport.getActions(actionHandler, configurationTemplateManager.getInstance(path));
+        }
+
+        Class displayHandler = ConventionSupport.getDisplay(targetType);
+        if (displayHandler != null)
+        {
+            Display displaySupport = new Display();
+            displaySupport.setObjectFactory(objectFactory);
+            displayFields = displaySupport.getDisplayFields(displayHandler);
+        }
+    }
+
+    public Object format(String fieldName)
+    {
+        Class displayHandler = ConventionSupport.getDisplay(targetType);
+        if (displayHandler != null)
+        {
+            try
+            {
+                Display displaySupport = new Display();
+                displaySupport.setObjectFactory(objectFactory);
+                return displaySupport.format(displayHandler, fieldName, instance);
+            }
+            catch (Exception e)
+            {
+                e.printStackTrace();
+            }
+        }
+        return null;
     }
 
     public boolean isConfigurationCheckAvailable()
@@ -112,6 +162,11 @@ public class Configuration
     public String getPath()
     {
         return path;
+    }
+
+    public Object getInstance()
+    {
+        return instance;
     }
 
     public String getParentPath()
@@ -169,6 +224,16 @@ public class Configuration
         return targetSymbolicName;
     }
 
+    public List<String> getActions()
+    {
+        return actions;
+    }
+
+    public List<String> getDisplayFields()
+    {
+        return displayFields;
+    }
+
     public void setConfigurationPersistenceManager(ConfigurationPersistenceManager configurationPersistenceManager)
     {
         this.configurationPersistenceManager = configurationPersistenceManager;
@@ -182,5 +247,10 @@ public class Configuration
     public void setConfigurationTemplateManager(ConfigurationTemplateManager configurationTemplateManager)
     {
         this.configurationTemplateManager = configurationTemplateManager;
+    }
+
+    public void setObjectFactory(ObjectFactory objectFactory)
+    {
+        this.objectFactory = objectFactory;
     }
 }

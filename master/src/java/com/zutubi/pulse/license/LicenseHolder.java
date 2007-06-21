@@ -1,9 +1,7 @@
 package com.zutubi.pulse.license;
 
-import com.zutubi.pulse.license.authorisation.AddAgentAuthorisation;
-
-import java.util.List;
 import java.util.LinkedList;
+import java.util.List;
 
 /**
  *

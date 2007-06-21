@@ -19,7 +19,7 @@ import com.zutubi.validation.XWorkValidationAdapter;
 public abstract class TransientAction<T> extends ActionSupport implements MessagesProvider
 {
     protected String path;
-    protected Configuration configuration;
+    protected ConfigurationUIModel configuration;
 
     protected TypeRegistry typeRegistry;
     protected ConfigurationTemplateManager configurationTemplateManager;
@@ -75,7 +75,7 @@ public abstract class TransientAction<T> extends ActionSupport implements Messag
         return type;
     }
 
-    public Configuration getConfiguration()
+    public ConfigurationUIModel getConfiguration()
     {
         return configuration;
     }
@@ -92,8 +92,7 @@ public abstract class TransientAction<T> extends ActionSupport implements Messag
 
     public void analyse()
     {
-        configuration = new Configuration(path);
-        configuration.analyse();
+        configuration = new ConfigurationUIModel(path);
         type = (CompositeType) configuration.getType();
     }
 

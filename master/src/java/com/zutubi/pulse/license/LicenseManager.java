@@ -1,21 +1,11 @@
 package com.zutubi.pulse.license;
 
-import com.zutubi.prototype.config.ConfigurationEventListener;
-import com.zutubi.prototype.config.PathPredicate;
-import com.zutubi.prototype.config.ConfigurationProvider;
-import com.zutubi.prototype.config.events.ConfigurationEvent;
-import com.zutubi.prototype.config.events.PostSaveEvent;
-import com.zutubi.prototype.type.record.PathUtils;
-import com.zutubi.pulse.Version;
-import com.zutubi.pulse.bootstrap.ComponentContext;
 import com.zutubi.pulse.events.DataDirectoryChangedEvent;
 import com.zutubi.pulse.events.Event;
 import com.zutubi.pulse.events.EventListener;
 import com.zutubi.pulse.events.EventManager;
-import com.zutubi.pulse.events.FilteringListener;
 import com.zutubi.pulse.license.authorisation.Authorisation;
-import com.zutubi.pulse.license.authorisation.CanRunPulseAuthorisation;
-import com.zutubi.pulse.prototype.config.admin.LicenseConfiguration;
+import com.zutubi.pulse.license.events.LicenseUpdateEvent;
 import com.zutubi.util.logging.Logger;
 
 import java.util.Arrays;
@@ -25,7 +15,7 @@ import java.util.List;
 /**
  * The License manager handles all things license related.
  */
-public class LicenseManager implements ConfigurationEventListener
+public class LicenseManager
 {
     private static final Logger LOG = Logger.getLogger(LicenseManager.class);
 
@@ -48,16 +38,10 @@ public class LicenseManager implements ConfigurationEventListener
     {
         // check that the license key is valid.
         LicenseDecoder decoder = new LicenseDecoder();
-        License license = decoder.decode(newKey.getBytes());
+        decoder.decode(newKey.getBytes());
 
         // persist the license key
         keyStore.setKey(newKey);
-
-        // refresh the authorisations, now that we have a new license.
-        LicenseHolder.setLicense(license);
-        refreshAuthorisations();
-
-        eventManager.publish(new LicenseUpdateEvent(license));
     }
 
     /**
@@ -82,56 +66,13 @@ public class LicenseManager implements ConfigurationEventListener
             }
         });
 
-        //FIXME: it would be nice not to have to 'go behind the back' of the configuration system like this
-        //       because the system is not yet avialable.  Also, the real solution is probably to support
-        //       storage of data externally from the configuration system, so that we dont have the data in two locations.
-        FilteringListener filter = new FilteringListener(new PathPredicate(true, "/global/*"), new EventListener()
+        keyStore.register(new LicenseKeyStoreListener()
         {
-            // we need this state check to prevent the listeners updating of the license from triggering
-            // this listener over and over.
-            private boolean updatingLicense = false;
-
-            public void handleEvent(Event evt)
+            public void keyChanged()
             {
-                if (evt instanceof PostSaveEvent)
-                {
-                    PostSaveEvent psEvt = (PostSaveEvent) evt;
-                    if (psEvt.getNewInstance() instanceof LicenseConfiguration)
-                    {
-                        if (updatingLicense)
-                        {
-                            return;
-                        }
-                        try
-                        {
-                            updatingLicense = true;
-                            LicenseConfiguration config = (LicenseConfiguration) psEvt.getNewInstance();
-                            installLicense(config.getKey());
-
-                            License license = LicenseHolder.getLicense();
-                            config.setName(license.getHolder());
-                            config.setType(license.getType().toString());
-
-                            // now we also need to save the change.
-                            ConfigurationProvider provider = ComponentContext.getBean("configurationProvider");
-                            provider.save(config.getConfigurationPath(), config);
-                        }
-                        finally
-                        {
-                            updatingLicense = false;
-                        }
-                    }
-                }
-            }
-
-            public Class[] getHandledEvents()
-            {
-                return new Class[]{ConfigurationEvent.class};
+                refresh();
             }
         });
-        eventManager.register(filter);
-
-        // also, on system started, we need to sync the existing license details with those of the configuration system. 
 
         refresh();
     }
@@ -139,24 +80,27 @@ public class LicenseManager implements ConfigurationEventListener
     private void refresh()
     {
         String key = keyStore.getKey();
+        License license = null;
         if (key != null)
         {
             try
             {
                 LicenseDecoder decoder = new LicenseDecoder();
-                License license = decoder.decode(key.getBytes());
-                LicenseHolder.setLicense(license);
+                license = decoder.decode(key.getBytes());
             }
             catch (LicenseException e)
             {
                 // license key is invalid.
                 LOG.warning("Failed to decode the configured license key.", e);
-                LicenseHolder.setLicense(null);
+                license = null;
             }
         }
 
+        LicenseHolder.setLicense(license);
+
         // refresh the supported authorisations.
         refreshAuthorisations();
+        eventManager.publish(new LicenseUpdateEvent(license));
     }
 
     public void refreshAuthorisations()
@@ -168,19 +112,6 @@ public class LicenseManager implements ConfigurationEventListener
             newAuths.addAll(Arrays.asList(auth.getAuthorisation(license)));
         }
         LicenseHolder.setAuthorizations(newAuths);
-    }
-
-    /**
-     * Check whether or not the currently installed license is able to run the specified version of pulse.
-     *
-     * @param version to check
-     * @return true if the installed license can run the specified version, false otherwise.
-     */
-    public boolean canRun(Version version)
-    {
-        CanRunPulseAuthorisation canRunPulse = new CanRunPulseAuthorisation();
-        List<String> auths = Arrays.asList(canRunPulse.getAuthorisation(LicenseHolder.getLicense(), version));
-        return auths.contains(LicenseHolder.AUTH_RUN_PULSE);
     }
 
     /**
@@ -197,18 +128,6 @@ public class LicenseManager implements ConfigurationEventListener
     {
         this.authorisations.add(auth);
         refreshAuthorisations();
-    }
-
-    public void handleConfigurationEvent(ConfigurationEvent event)
-    {
-        if (event instanceof PostSaveEvent)
-        {
-            LicenseConfiguration config = (LicenseConfiguration) ((PostSaveEvent) event).getNewInstance();
-            installLicense(config.getKey());
-
-            License license = LicenseHolder.getLicense();
-            config.setName(license.getHolder());
-        }
     }
 
     /**

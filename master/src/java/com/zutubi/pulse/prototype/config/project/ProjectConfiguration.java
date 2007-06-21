@@ -27,7 +27,8 @@ public class ProjectConfiguration extends AbstractNamedConfiguration implements 
     private long projectId;
     @Url
     private String url;
-    @TextArea
+
+    @TextArea(rows = 7, cols = 80)
     private String description;
 
     private ScmConfiguration scm;

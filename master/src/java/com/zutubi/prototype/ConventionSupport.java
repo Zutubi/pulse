@@ -2,8 +2,6 @@ package com.zutubi.prototype;
 
 import com.zutubi.prototype.type.Type;
 
-import java.lang.reflect.Method;
-
 /**
  *
  *
@@ -25,6 +23,11 @@ public class ConventionSupport
         return loadClass(type, "Formatter");
     }
 
+    public static Class getDisplay(Type type)
+    {
+        return loadClass(type, "Display");
+    }
+
     private static Class loadClass(Type type, String suffix)
     {
         // we need to search up the inheritence hierarchy.
@@ -42,27 +45,6 @@ public class ConventionSupport
             }
             clazz = clazz.getSuperclass();
         }
-        return null;
-    }
-
-    public static Method getActionMethod(Class handlerClass, Type type, String action)
-    {
-        // again, we search up the inheritance hierarchy for the methods argument.
-
-        Class clazz = type.getClazz();
-        while (clazz != Object.class)
-        {
-            try
-            {
-                return handlerClass.getMethod("do" + action, clazz);
-            }
-            catch (NoSuchMethodException e)
-            {
-                // noop.
-            }
-            clazz = clazz.getSuperclass();
-        }
-
         return null;
     }
 }

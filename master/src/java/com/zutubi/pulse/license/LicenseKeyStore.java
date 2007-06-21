@@ -20,4 +20,8 @@ public interface LicenseKeyStore
      * @param licenseKey string representing a valid license key
      */
     void setKey(String licenseKey) throws LicenseException;
+
+    void register(LicenseKeyStoreListener listener);
+
+    void unregister(LicenseKeyStoreListener listener);
 }

@@ -1,6 +1,7 @@
-package com.zutubi.pulse.license;
+package com.zutubi.pulse.license.events;
 
 import com.zutubi.pulse.events.Event;
+import com.zutubi.pulse.license.License;
 
 /**
  * The base event type for license related events.

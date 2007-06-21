@@ -36,7 +36,6 @@ public class Data implements MasterUserPaths
     private static final Logger LOG = Logger.getLogger(Data.class);
 
     public static final String CONFIG_FILE_NAME = "pulse.config.properties";
-    private static final String LICENSE_KEY = "license.key";
 
     private final File pulseData;
 
@@ -257,16 +256,6 @@ public class Data implements MasterUserPaths
             dataVersion = Version.read(prop);
         }
         return dataVersion;
-    }
-
-    public String getLicenseKey()
-    {
-        return getConfig().getProperty(LICENSE_KEY);
-    }
-
-    public void setLicenseKey(String licenseKey)
-    {
-        getConfig().setProperty(LICENSE_KEY, licenseKey);
     }
 
     //---( implementation of the data resolver interface. )---

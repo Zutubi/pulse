@@ -48,6 +48,9 @@ public class DefaultSetupManager implements SetupManager
      */
     private List<String> daoContexts = new LinkedList<String>();
 
+    // Stage B.2
+    private List<String> licenseContexts = new LinkedList<String>();
+
     /**
      * Contexts for Stage C: the upgrade system.
      */
@@ -183,6 +186,12 @@ public class DefaultSetupManager implements SetupManager
         loadSystemProperties();
         linkUserTemplates();
 
+        // load db contexts...
+        loadContexts(daoContexts);
+        initialiseConfigurationPersistence();
+        
+        loadContexts(licenseContexts);
+
         state = SetupState.STARTING;
         if (isLicenseRequired())
         {
@@ -241,11 +250,6 @@ public class DefaultSetupManager implements SetupManager
         state = SetupState.STARTING;
 
         // License is allowed to run this version of pulse. Therefore, it is okay to go ahead with an upgrade.
-
-        // load db contexts...
-        loadContexts(daoContexts);
-
-        initialiseConfigurationPersistence();
 
         // create the database based on the hibernate configuration.
         databaseConsole = (DatabaseConsole) ComponentContext.getBean("databaseConsole");
@@ -395,6 +399,11 @@ public class DefaultSetupManager implements SetupManager
     public void setDaoContexts(List<String> daoContexts)
     {
         this.daoContexts = daoContexts;
+    }
+
+    public void setLicenseContexts(List<String> licenseContexts)
+    {
+        this.licenseContexts = licenseContexts;
     }
 
     public void setSetupContexts(List<String> setupContexts)

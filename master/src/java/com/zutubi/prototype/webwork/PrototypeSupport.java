@@ -20,7 +20,7 @@ public class PrototypeSupport extends ActionSupport implements MessagesProvider
 {
     protected String path;
     protected ConfigurationResponse response;
-    protected Configuration configuration;
+    protected ConfigurationUIModel configuration;
 
     protected TypeRegistry typeRegistry;
     protected ConfigurationRegistry configurationRegistry;
@@ -182,7 +182,7 @@ public class PrototypeSupport extends ActionSupport implements MessagesProvider
         return type;
     }
 
-    public Configuration getConfiguration()
+    public ConfigurationUIModel getConfiguration()
     {
         return configuration;
     }
@@ -195,8 +195,7 @@ public class PrototypeSupport extends ActionSupport implements MessagesProvider
     protected void prepare()
     {
         // default handling - render the page.
-        configuration = new Configuration(path);
-        configuration.analyse();
+        configuration = new ConfigurationUIModel(path);
 
         if (record == null)
         {

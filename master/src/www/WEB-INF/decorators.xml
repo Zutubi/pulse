@@ -29,7 +29,7 @@
         <pattern>/upgrade/*</pattern>
         <pattern>/startup/*</pattern>
         <pattern>/shutdown/*</pattern>
-        <pattern>/config/*</pattern>
+        <pattern>/config/setup*</pattern>
     </decorator>
 
     <decorator name="panel" page="panel.vm"/>

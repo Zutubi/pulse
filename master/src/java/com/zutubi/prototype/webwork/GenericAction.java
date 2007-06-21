@@ -1,9 +1,11 @@
 package com.zutubi.prototype.webwork;
 
 import com.zutubi.prototype.ConventionSupport;
+import com.zutubi.prototype.actions.Actions;
 import com.zutubi.prototype.type.CompositeType;
 import com.zutubi.pulse.bootstrap.ComponentContext;
 import com.zutubi.util.logging.Logger;
+import com.zutubi.util.bean.ObjectFactory;
 
 import java.lang.reflect.Method;
 
@@ -14,6 +16,8 @@ import java.lang.reflect.Method;
 public class GenericAction extends PrototypeSupport
 {
     private static final Logger LOG = Logger.getLogger(GenericAction.class);
+
+    private ObjectFactory objectFactory;
 
     /**
      * The action that should be executed.
@@ -31,15 +35,13 @@ public class GenericAction extends PrototypeSupport
 
         // need the action handler.
         Class handlerClass = ConventionSupport.getActions(type);
-        Object actionHandler = handlerClass.newInstance();
-
-        ComponentContext.autowire(actionHandler);
 
         // need the configuration instance.
         Object config = configurationTemplateManager.getInstance(path);
 
-        Method actionMethod = ConventionSupport.getActionMethod(handlerClass, type, action);
-        actionMethod.invoke(actionHandler, config);
+        Actions actions = new Actions();
+        actions.setObjectFactory(objectFactory);
+        actions.execute(handlerClass, action, config);
 
         doRender();
 
@@ -60,5 +62,10 @@ public class GenericAction extends PrototypeSupport
             LOG.debug(e);
         }
         return null;
+    }
+
+    public void setObjectFactory(ObjectFactory objectFactory)
+    {
+        this.objectFactory = objectFactory;
     }
 }

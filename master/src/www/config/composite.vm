@@ -10,8 +10,25 @@
     #i18n("key=introduction")
 </div>
 
+#if ($config.displayFields.size() > 0)
+<p>&nbsp;</p>
+<h2>state</h2>
+<p>
+<table>
+    #foreach($field in $config.displayFields)
+    <tr>
+        <td>#i18n("key=${field}.label")</td>
+        <td>$config.format($field)</td>
+    </tr>
+    #end
+</table>
+</p>
+#end
+
 #if( $config.record )
     #if( $config.simpleProperties.size() > 0)
+        <p>&nbsp;</p>
+        <h2>config</h2>
         <!-- this configuration definition contains fields to be configured. -->
         <p>
             #pform("path=$config.path" "formName=mainform")
@@ -25,10 +42,11 @@
     #else
         #if( $config.simpleProperties.size() > 0)
             <!-- this configuration definition contains fields to be configured. -->
+            <p>&nbsp;</p>
+            <h2>config</h2>
             <p>
                 #pform("path=$config.path" "formName=mainform")
             </p>
-
             #parse("/aconfig/check.vm")
         #end
     #end
@@ -42,6 +60,16 @@
 <ul>
     #foreach($prop in $config.nestedProperties)
         <li>* #i18n("property=$prop" "key=label") <a href='#url("action=display" "path=${config.path}/${prop}")'>(+)</a>  </li>
+    #end
+</ul>
+#end
+
+#if ($config.actions.size() > 0)
+<h4>Available actions</h4>
+<p>&nbsp;&nbsp;the following actions are available for this configuration:</p>
+<ul>
+    #foreach($action in $config.actions)
+        <li>${action} .. todo: create link ${config.instance.configurationPath}</li>
     #end
 </ul>
 #end

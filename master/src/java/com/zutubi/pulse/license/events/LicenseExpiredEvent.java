@@ -1,4 +1,6 @@
-package com.zutubi.pulse.license;
+package com.zutubi.pulse.license.events;
+
+import com.zutubi.pulse.license.License;
 
 /**
  * A license event indicating that a license has expired.

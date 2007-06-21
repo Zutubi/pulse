@@ -17,6 +17,9 @@
                 <value>classpath:/com/zutubi/pulse/bootstrap/context/cacheContext.xml</value>
             </list>
         </property>
+        <property name="licenseContexts">
+            <value>classpath:/com/zutubi/pulse/bootstrap/context/licenseContext.xml</value>
+        </property>
         <property name="upgradeContexts">
             <list>
                 <value>classpath:/com/zutubi/pulse/bootstrap/context/upgradeContext.xml</value>
