@@ -32,11 +32,33 @@
                 if(enabled)
                 {
                     field.enable();
+
+                    var labelDomEl = Ext.query("//[@for='"+field.getId()+"']", form.el.dom)[0];
+                    if (labelDomEl)
+                    {
+                        Ext.get(labelDomEl).removeClass('x-item-disabled');
+                    }
+                    var helpDomEl = Ext.query("//[@id='"+field.getId()+"-inline-help']", form.el.dom)[0];
+                    if (helpDomEl)
+                    {
+                        Ext.get(helpDomEl).removeClass('x-item-disabled');
+                    }
                 }
                 else
                 {
                     field.clearInvalid();
                     field.disable();
+                    
+                    var labelDomEl = Ext.query("//[@for='"+field.getId()+"']", form.el.dom)[0];
+                    if (labelDomEl)
+                    {
+                        Ext.get(labelDomEl).addClass('x-item-disabled');
+                    }
+                    var helpDomEl = Ext.query("//[@id='"+field.getId()+"-inline-help']", form.el.dom)[0];
+                    if (helpDomEl)
+                    {
+                        Ext.get(helpDomEl).addClass('x-item-disabled');
+                    }
                 }
             }
         });

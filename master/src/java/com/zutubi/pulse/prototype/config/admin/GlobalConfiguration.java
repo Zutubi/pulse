@@ -5,6 +5,7 @@ import com.zutubi.prototype.type.record.PathUtils;
 import com.zutubi.pulse.core.config.AbstractConfiguration;
 import com.zutubi.pulse.core.config.Configuration;
 import com.zutubi.pulse.license.config.LicenseConfiguration;
+import com.zutubi.pulse.jabber.config.JabberConfiguration;
 
 /**
  * The global configuration scope, which holds server-wide configuration.

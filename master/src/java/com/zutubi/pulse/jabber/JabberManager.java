@@ -1,12 +1,11 @@
 package com.zutubi.pulse.jabber;
 
-import com.opensymphony.util.TextUtils;
 import com.zutubi.prototype.config.ConfigurationEventListener;
 import com.zutubi.prototype.config.ConfigurationProvider;
 import com.zutubi.prototype.config.events.ConfigurationEvent;
 import com.zutubi.prototype.config.events.PostSaveEvent;
 import com.zutubi.pulse.core.Stoppable;
-import com.zutubi.pulse.prototype.config.admin.JabberConfiguration;
+import com.zutubi.pulse.jabber.config.JabberConfiguration;
 import com.zutubi.util.Constants;
 import com.zutubi.util.logging.Logger;
 import org.jivesoftware.smack.*;
@@ -43,7 +42,7 @@ public class JabberManager implements Stoppable, PacketListener, ConfigurationEv
     private void init(JabberConfiguration config)
     {
         statusMessage = null;
-        if (config != null && TextUtils.stringSet(config.getServer()))
+        if (config != null && config.isEnabled())
         {
             LOG.info("Initialising Jabber");
             Roster.setDefaultSubscriptionMode(Roster.SUBSCRIPTION_ACCEPT_ALL);
@@ -76,7 +75,7 @@ public class JabberManager implements Stoppable, PacketListener, ConfigurationEv
     public boolean isConfigured()
     {
         JabberConfiguration config = configurationProvider.get(JabberConfiguration.class);
-        return config != null && TextUtils.stringSet(config.getServer());
+        return config != null && config.isEnabled();
     }
 
     private void openConnection(JabberConfiguration config) throws XMPPException

@@ -1,10 +1,11 @@
 package com.zutubi.prototype.actions;
 
 import com.zutubi.util.bean.ObjectFactory;
+import com.zutubi.util.logging.Logger;
 
-import java.util.List;
-import java.util.LinkedList;
 import java.lang.reflect.Method;
+import java.util.LinkedList;
+import java.util.List;
 
 /**
  *
@@ -13,6 +14,8 @@ import java.lang.reflect.Method;
 //FIXME: rename to something more appropriate. 
 public class Actions
 {
+    private static final Logger LOG = Logger.getLogger(Actions.class);
+
     private ObjectFactory objectFactory;
 
     public List<String> getActions(Class actionHandlerClass, Object configurationInstance)
@@ -37,7 +40,7 @@ public class Actions
                 }
                 catch (Exception e)
                 {
-                    e.printStackTrace();
+                    LOG.debug(e);
                 }
             }
         }
@@ -61,15 +64,19 @@ public class Actions
             {
                 continue;
             }
-            if (method.getParameterTypes().length != 1)
+            if (method.getParameterTypes().length > 1)
             {
                 continue;
             }
-            Class param = method.getParameterTypes()[0];
-            if (param != configurationClass)
+            if (method.getParameterTypes().length == 1)
             {
-                continue;
+                Class param = method.getParameterTypes()[0];
+                if (!param.isAssignableFrom(configurationClass))
+                {
+                    continue;
+                }
             }
+            
             // ok, we have an action here.
             String actionName = methodName.substring(2, 3).toLowerCase();
             if (methodName.length() > 3)
@@ -101,7 +108,7 @@ public class Actions
         }
         catch (Exception e)
         {
-            e.printStackTrace();
+            LOG.debug(e);
         }
     }
 

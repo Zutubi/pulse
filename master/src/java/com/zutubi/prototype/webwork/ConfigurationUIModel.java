@@ -6,6 +6,7 @@ import com.zutubi.prototype.config.ConfigurationRegistry;
 import com.zutubi.prototype.config.ConfigurationTemplateManager;
 import com.zutubi.prototype.type.CompositeType;
 import com.zutubi.prototype.type.Type;
+import com.zutubi.prototype.type.CollectionType;
 import com.zutubi.prototype.type.record.PathUtils;
 import com.zutubi.prototype.type.record.Record;
 import com.zutubi.prototype.actions.Actions;
@@ -118,20 +119,23 @@ public class ConfigurationUIModel
         }
 
         // determine the actions.
-        Class actionHandler = ConventionSupport.getActions(targetType);
-        if (actionHandler != null)
+        if (!(type instanceof CollectionType))
         {
-            Actions actionSupport = new Actions();
-            actionSupport.setObjectFactory(objectFactory);
-            actions = actionSupport.getActions(actionHandler, configurationTemplateManager.getInstance(path));
-        }
+            Class actionHandler = ConventionSupport.getActions(type);
+            if (actionHandler != null)
+            {
+                Actions actionSupport = new Actions();
+                actionSupport.setObjectFactory(objectFactory);
+                actions = actionSupport.getActions(actionHandler, configurationTemplateManager.getInstance(path));
+            }
 
-        Class displayHandler = ConventionSupport.getDisplay(targetType);
-        if (displayHandler != null)
-        {
-            Display displaySupport = new Display();
-            displaySupport.setObjectFactory(objectFactory);
-            displayFields = displaySupport.getDisplayFields(displayHandler);
+            Class displayHandler = ConventionSupport.getDisplay(type);
+            if (displayHandler != null)
+            {
+                Display displaySupport = new Display();
+                displaySupport.setObjectFactory(objectFactory);
+                displayFields = displaySupport.getDisplayFields(displayHandler);
+            }
         }
     }
 

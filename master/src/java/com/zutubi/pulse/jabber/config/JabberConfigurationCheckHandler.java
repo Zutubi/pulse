@@ -1,4 +1,4 @@
-package com.zutubi.pulse.prototype.config.admin;
+package com.zutubi.pulse.jabber.config;
 
 import com.zutubi.config.annotations.SymbolicName;
 import com.zutubi.prototype.ConfigurationCheckHandlerSupport;

@@ -1,4 +1,28 @@
 <html>
+<head>
+<style>
+    .introduction {
+        color:gray;
+    }
+    .description {
+        color:gray;
+    }
+    .column {
+        vertical-align:top;
+        padding-right:50px
+    }
+    .frame {
+        padding-bottom:20px
+    }
+    .header {
+        border-bottom: 1px solid #bbb;
+        padding: 4px;
+        background: #e8e8f3;
+        white-space: nowrap;
+        margin: 0;
+    }
+</style>
+</head>
 <body>
 
 #set($config = $action.configuration)
@@ -6,73 +30,119 @@
 #parse("config/breadcrumbs.vm")
 
 <h2>#i18n("key=label")</h2>
-<div style="color:gray">
+<p class="introduction">
     #i18n("key=introduction")
-</div>
-
-#if ($config.displayFields.size() > 0)
-<p>&nbsp;</p>
-<h2>state</h2>
-<p>
-<table>
-    #foreach($field in $config.displayFields)
-    <tr>
-        <td>#i18n("key=${field}.label")</td>
-        <td>$config.format($field)</td>
-    </tr>
-    #end
-</table>
 </p>
-#end
 
-#if( $config.record )
-    #if( $config.simpleProperties.size() > 0)
-        <p>&nbsp;</p>
-        <h2>config</h2>
-        <!-- this configuration definition contains fields to be configured. -->
-        <p>
-            #pform("path=$config.path" "formName=mainform")
-        </p>
+<table>
+    <tr>
+        <td class="column">
 
-        #parse("/aconfig/check.vm")
-    #end
-#else
-    #if( $config.extensions.size() > 0)
-        <p>To create the #i18n("key=label") please use the <a href="$base/config/${config.path}?wizard">wizard</a>.</p>
-    #else
-        #if( $config.simpleProperties.size() > 0)
-            <!-- this configuration definition contains fields to be configured. -->
-            <p>&nbsp;</p>
-            <h2>config</h2>
+            #if ($config.displayFields.size() > 0)
+            <div class="frame">
+                <h3 class="header">#i18n("key=state.heading")</h3>
+                <p class="description">
+                    #i18n("key=state.description")
+                </p>
+                <table width="100%">
+                    #set($odd = true)
+                    #foreach($field in $config.displayFields)
+                    <tr>
+                        #if($odd) #set($bgcolor="#e8e8f3") #else #set($bgcolor="#ffffff") #end
+                        <td bgcolor="$bgcolor" width="20%"><b>#i18n("key=${field}.label")</b>: </td>
+                        <td bgcolor="$bgcolor">$config.format($field)</td>
+                    </tr>
+                        #if($odd) #set($odd = false) #else #set($odd = true) #end
+                    #end
+                </table>
+            </div>
+            #end
+
+                #if( $config.record )
+                    #if( $config.simpleProperties.size() > 0)
+                    <div class="frame">
+                        <h3 class="header">#i18n("key=form.heading")</h3>
+                        <p class="description">
+                            #i18n("key=form.description")
+                        </p>
+                        <!-- this configuration definition contains fields to be configured. -->
+                        <p>
+                            #pform("path=$config.path" "formName=mainform")
+                        </p>
+                        #parse("/aconfig/check.vm")
+                    </div>
+                    #end
+                #else
+                    #if( $config.extensions.size() > 0)
+                    <div class="frame">
+                        <h3 class="header">#i18n("key=form.heading")</h3>
+                        <p class="description">
+                            #i18n("key=form.description")
+                        </p>
+                        <p>To create the #i18n("key=label") please use the <a href="$base/config/${config.path}?wizard">wizard</a>.</p>
+                    </div>
+                    #else
+                        #if( $config.simpleProperties.size() > 0)
+                        <div class="frame">
+                            <h3 class="header">#i18n("key=form.heading")</h3>
+                            <p class="description">
+                                #i18n("key=form.description")
+                            </p>
+                            <!-- this configuration definition contains fields to be configured. -->
+                            <p>
+                                #pform("path=$config.path" "formName=mainform")
+                            </p>
+                            #parse("/aconfig/check.vm")
+                        </div>
+                        #end
+                    #end
+                #end
+
+
+        </td>
+        <td class="column" style="width:250px">
+            #if ($config.actions.size() > 0)
+            <div class="frame">
+            <h3 class="header">actions</h3>
             <p>
-                #pform("path=$config.path" "formName=mainform")
+            <ul>
+                #foreach($action in $config.actions)
+                    <li><a href='#url("action=display" "path=${config.instance.configurationPath}?${action}")'>#i18n("key=${action}.label")</a> </li>
+                #end
+            </ul>
             </p>
-            #parse("/aconfig/check.vm")
-        #end
-    #end
-#end
+            </div>
+            #end
 
+<!--
+            <div class="frame">
+            <h3 class="header">help</h3>
+            <p>
+                <ul>
+                    <li>a</li>
+                    <li>b</li>
+                    <li>c</li>
+                </ul>
+            </p>
+            </div>
+-->
 
-#if( $config.nestedProperties.size() > 0)
-<p>&nbsp;</p>
-<h4>Nested configurations</h4>
-<p>&nbsp;&nbsp;the following nested configurations are also available:</p>
-<ul>
-    #foreach($prop in $config.nestedProperties)
-        <li>* #i18n("property=$prop" "key=label") <a href='#url("action=display" "path=${config.path}/${prop}")'>(+)</a>  </li>
-    #end
-</ul>
-#end
+            #if( $config.nestedProperties.size() > 0)
+            <div class="frame">
+            <h3 class="header">links</h3>
+            <p>
+            <ul>
+                #foreach($prop in $config.nestedProperties)
+                    <li>* #i18n("property=$prop" "key=label") <a href='#url("action=display" "path=${config.path}/${prop}")'>(+)</a>  </li>
+                #end
+            </ul>
+            </p>
+            </div>
+            #end
 
-#if ($config.actions.size() > 0)
-<h4>Available actions</h4>
-<p>&nbsp;&nbsp;the following actions are available for this configuration:</p>
-<ul>
-    #foreach($action in $config.actions)
-        <li>${action} .. todo: create link ${config.instance.configurationPath}</li>
-    #end
-</ul>
-#end
+        </td>
+    </tr>
+</table>
 
 </body>
 </html>

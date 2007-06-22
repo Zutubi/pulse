@@ -1,9 +1,12 @@
     #if ($config.configurationCheckAvailable)
-    <p>
-        Test configuration
-        <div id="check.result"></div>
-        #checkform("path=$config.path" "mainFormName=mainform" "checkFormName=checkform")
-    </p>
+    <div class="frame">
+        <h3 class="header">#i18n("key=test.heading")</h3>
+        <p class="description">
+            #i18n("key=test.description")
+        </p>
+        <p>
+            #checkform("path=$config.path" "mainFormName=mainform" "checkFormName=checkform")
+        </p>
 
     <script type="text/javascript">
         checkform.on('actioncomplete', function(form, action)
@@ -19,4 +22,5 @@
             }
         });
     </script>
+    </div>
     #end

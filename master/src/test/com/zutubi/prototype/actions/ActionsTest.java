@@ -31,17 +31,22 @@ public class ActionsTest extends TestCase
     public void testDefaultActions()
     {
         List<String> actions = a.getActions(DefaultActions.class, new T());
-        assertNotNull(actions);
-        assertEquals(3, actions.size());
+        assertEquals(4, actions.size());
         assertTrue(actions.contains("a"));
         assertTrue(actions.contains("act"));
         assertTrue(actions.contains("action"));
+        assertTrue(actions.contains("noParamAction"));
+    }
+
+    public void testParameterIsExtensionOfActionParam()
+    {
+        List<String> actions = a.getActions(DefaultActions.class, new U());
+        assertEquals(4, actions.size());
     }
 
     public void testDefinedActions()
     {
         List<String> actions = a.getActions(DefinedActions.class, new T());
-        assertNotNull(actions);
         assertEquals(1, actions.size());
         assertTrue(actions.contains("action"));
     }
@@ -54,6 +59,11 @@ public class ActionsTest extends TestCase
     }
 
     public class T
+    {
+
+    }
+
+    public class U extends T
     {
 
     }
@@ -71,6 +81,11 @@ public class ActionsTest extends TestCase
         }
 
         public void doAction(T t)
+        {
+
+        }
+
+        public void doNoParamAction()
         {
 
         }
@@ -99,19 +114,6 @@ public class ActionsTest extends TestCase
         public void doAction(T t)
         {
             obj = t;
-        }
-    }
-
-    public static class InvalidActions
-    {
-        public void doAct()
-        {
-
-        }
-
-        public List<String> getActions(T t)
-        {
-            return Arrays.asList("action");
         }
     }
 }

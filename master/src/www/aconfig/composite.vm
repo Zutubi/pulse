@@ -4,6 +4,21 @@
     #i18n("key=introduction")
 </div>
 
+#if ($config.displayFields.size() > 0)
+<p>&nbsp;</p>
+<h2>state</h2>
+<p>
+<table>
+    #foreach($field in $config.displayFields)
+    <tr>
+        <td><b>#i18n("key=${field}.label")</b></td>
+        <td>$config.format($field)</td>
+    </tr>
+    #end
+</table>
+</p>
+#end
+
 #if( $config.record )
     #if( $config.simpleProperties.size() > 0)
         <!-- this configuration definition contains fields to be configured. -->

@@ -1,8 +1,9 @@
-package com.zutubi.pulse.prototype.config.admin;
+package com.zutubi.pulse.jabber.config;
 
 import com.zutubi.config.annotations.ConfigurationCheck;
 import com.zutubi.config.annotations.Form;
 import com.zutubi.config.annotations.SymbolicName;
+import com.zutubi.config.annotations.ControllingCheckbox;
 import com.zutubi.pulse.jabber.JabberManager;
 import com.zutubi.pulse.core.config.AbstractConfiguration;
 import com.zutubi.validation.annotations.Required;
@@ -12,10 +13,13 @@ import com.zutubi.validation.annotations.Required;
  *
  */
 @SymbolicName("internal.jabberConfig")
-@Form(fieldOrder = {"server", "port", "username", "password", "ssl"})
+@Form(fieldOrder = {"enabled", "server", "port", "username", "password", "ssl"})
 @ConfigurationCheck("JabberConfigurationCheckHandler")
 public class JabberConfiguration extends AbstractConfiguration
 {
+    @ControllingCheckbox
+    private boolean enabled;
+    
     @Required
     private String server;
     @Required
@@ -24,6 +28,16 @@ public class JabberConfiguration extends AbstractConfiguration
     private String username;
     private String password;
     private boolean ssl;
+
+    public boolean isEnabled()
+    {
+        return enabled;
+    }
+
+    public void setEnabled(boolean enabled)
+    {
+        this.enabled = enabled;
+    }
 
     public String getServer()
     {
