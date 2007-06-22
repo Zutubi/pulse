@@ -33,6 +33,7 @@ public class RemoveCleanupTask extends ReferenceCleanupTaskSupport
         Record parentRecord = recordManager.load(parentPath);
         if (parentRecord != null)
         {
+            // FIXME: review this use of copy
             MutableRecord newValues = parentRecord.copy(false);
             String[] references = (String[]) newValues.get(baseName);
             references = CollectionUtils.filterToArray(references, new Predicate<String>()

@@ -2,6 +2,7 @@ package com.zutubi.prototype.type.record;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicLong;
 
 /**
  * Manages a tree of records used to store arbitrary data.  All records are
@@ -10,10 +11,10 @@ import java.util.Map;
  * consistency for loaded records.
  *
  * This class should not usually be accessed directly.  Rather, the
- * {@link com.zutubi.prototype.config.ConfigurationPersistenceManager} should
+ * {@link com.zutubi.prototype.config.ConfigurationTemplateManager} should
  * be used.
  */
-public class RecordManager
+public class RecordManager implements HandleAllocator
 {
     private static final long UNDEFINED = 0;
 
@@ -23,7 +24,7 @@ public class RecordManager
      */
     private MutableRecord baseRecord;
     private Map<Long, String> handleToPathMap = new HashMap<Long, String>();
-    private long nextHandle = UNDEFINED;
+    private AtomicLong nextHandle = new AtomicLong(UNDEFINED);
     private RecordSerialiser recordSerialiser;
 
     public void init()
@@ -43,12 +44,12 @@ public class RecordManager
             }
         });
 
-        nextHandle = highest[0] + 1;
+        nextHandle.set(highest[0]);
     }
 
-    long allocateHandle()
+    public long allocateHandle()
     {
-        return nextHandle++;
+        return nextHandle.incrementAndGet();
     }
 
     /**
@@ -218,7 +219,8 @@ public class RecordManager
 
     /**
      * Updates the record at the given path with the new values.  Only simple
-     * values are updated: child records are unaffected.
+     * values are updated: child records are unaffected.  Values will also be
+     * removed if they do not exist in the given record.
      *
      * @param path   path of the record to update: a record must exist at
      *               this path
@@ -248,7 +250,20 @@ public class RecordManager
         // the cached record.  The cached record is cut loose and will be
         // collected when no longer in use.
         MutableRecord copy = record.copy(false);
-        copy.update(values);
+        for(String key: values.simpleKeySet())
+        {
+            copy.put(key, values.get(key));
+        }
+
+        // Remove simple values not present in the input
+        for(String key: record.simpleKeySet())
+        {
+            if(values.get(key) == null)
+            {
+                copy.remove(key);
+            }
+        }
+
         parentRecord.put(baseName, copy);
         recordSerialiser.serialise(path, copy, false);
         return copy;

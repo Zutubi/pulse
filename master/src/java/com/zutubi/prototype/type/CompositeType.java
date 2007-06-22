@@ -1,6 +1,5 @@
 package com.zutubi.prototype.type;
 
-import com.zutubi.config.annotations.ID;
 import com.zutubi.config.annotations.Internal;
 import com.zutubi.prototype.config.ConfigurationTemplateManager;
 import com.zutubi.prototype.type.record.MutableRecord;
@@ -8,12 +7,10 @@ import com.zutubi.prototype.type.record.MutableRecordImpl;
 import com.zutubi.prototype.type.record.PathUtils;
 import com.zutubi.prototype.type.record.Record;
 import com.zutubi.pulse.core.config.Configuration;
-import com.zutubi.util.AnnotationUtils;
 import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.Mapping;
 import com.zutubi.util.logging.Logger;
 
-import java.beans.IntrospectionException;
 import java.util.*;
 
 /**
@@ -280,28 +277,14 @@ public class CompositeType extends AbstractType implements ComplexType
         }
     }
 
-    public String getSavePath(Record parent, Record record)
+    public String getSavePath(String path, Record record)
     {
-        // retrieve the records key
-        return record.get(getKeyProperty()).toString();
+        return path;
     }
 
-    public String getInsertionPath(Record parent, Record record)
+    public String getInsertionPath(String path, Record record)
     {
-        // retrieve the records key
-        return record.get(getKeyProperty()).toString();
-    }
-
-    private String getKeyProperty()
-    {
-        try
-        {
-            return AnnotationUtils.getPropertyAnnotatedWith(getClazz(), ID.class);
-        }
-        catch (IntrospectionException e)
-        {
-            throw new RuntimeException("key property not available.");
-        }
+        return path;
     }
 
     public MutableRecord createNewRecord(boolean applyDefaults)
@@ -338,14 +321,14 @@ public class CompositeType extends AbstractType implements ComplexType
         record.setSymbolicName(getSymbolicName());
 
         // Create empty collections for all non-simple collection properties
-//        for (TypeProperty property : getProperties(CollectionType.class))
-//        {
-//            CollectionType type = (CollectionType) property.getType();
-//            if(type.getCollectionType() instanceof ComplexType)
-//            {
-//                record.put(property.getName(), type.createNewRecord(true));
-//            }
-//        }
+        for (TypeProperty property : getProperties(CollectionType.class))
+        {
+            CollectionType type = (CollectionType) property.getType();
+            if(type.getCollectionType() instanceof ComplexType)
+            {
+                record.put(property.getName(), type.createNewRecord(true));
+            }
+        }
 
         return record;
     }

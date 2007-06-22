@@ -1,5 +1,6 @@
 package com.zutubi.prototype.type;
 
+import com.zutubi.prototype.type.record.MutableRecord;
 import com.zutubi.prototype.type.record.Record;
 
 /**
@@ -8,11 +9,11 @@ public interface ComplexType extends Type
 {
     String getSymbolicName();
 
-    String getSavePath(Record collection, Record record);
+    String getSavePath(String path, Record record);
 
-    String getInsertionPath(Record collection, Record record);
+    String getInsertionPath(String path, Record record);
 
-    Record createNewRecord(boolean applyDefaults);
+    MutableRecord createNewRecord(boolean applyDefaults);
 
     boolean isTemplated();
 

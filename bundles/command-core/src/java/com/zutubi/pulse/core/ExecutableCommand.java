@@ -212,8 +212,6 @@ public class ExecutableCommand extends CommandSupport implements ScopeAware
         if (envArtifact != null)
         {
             artifacts.add(envArtifact);
-
-            ProcessControl.destroyProcess(child);
         }
         if (outputArtifact != null)
         {

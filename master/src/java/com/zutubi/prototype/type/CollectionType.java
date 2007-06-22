@@ -83,12 +83,7 @@ public abstract class CollectionType extends AbstractType implements ComplexType
     @SuppressWarnings({"unchecked"})
     public MutableRecord createNewRecord(boolean applyDefaults)
     {
-        MutableRecordImpl record = new MutableRecordImpl();
-        if(isOrdered())
-        {
-            setOrder(record, Collections.EMPTY_LIST);
-        }
-        return record;
+        return new MutableRecordImpl();
     }
 
     public boolean isOrdered()

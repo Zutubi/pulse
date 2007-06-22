@@ -8,5 +8,5 @@ public abstract class AbstractMutableRecord extends AbstractRecord implements Mu
     public void setHandle(long id)
     {
         putMeta(HANDLE_KEY, Long.toString(id));
-    }    
+    }
 }

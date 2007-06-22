@@ -3,16 +3,18 @@ package com.zutubi.prototype.config;
 import com.zutubi.config.annotations.ID;
 import com.zutubi.config.annotations.SymbolicName;
 import com.zutubi.prototype.config.events.ConfigurationEvent;
-import com.zutubi.prototype.config.events.PreInsertEvent;
 import com.zutubi.prototype.config.events.PostInsertEvent;
+import com.zutubi.prototype.config.events.PreInsertEvent;
 import com.zutubi.prototype.type.CompositeType;
 import com.zutubi.prototype.type.MapType;
+import com.zutubi.prototype.type.record.MutableRecord;
+import com.zutubi.prototype.type.record.Record;
 import com.zutubi.pulse.core.config.AbstractConfiguration;
 import com.zutubi.pulse.events.Event;
 import com.zutubi.pulse.events.EventListener;
 
-import java.util.List;
 import java.util.LinkedList;
+import java.util.List;
 
 /**
  *
@@ -20,11 +22,13 @@ import java.util.LinkedList;
  */
 public class ConfigurationTemplateManagerTest extends AbstractConfigurationSystemTestCase
 {
+    private CompositeType typeA;
+
     protected void setUp() throws Exception
     {
         super.setUp();
 
-        CompositeType typeA = typeRegistry.register("mockA", MockA.class);
+        typeA = typeRegistry.register("mockA", MockA.class);
         MapType mapA = new MapType(configurationTemplateManager);
         mapA.setTypeRegistry(typeRegistry);
         mapA.setCollectionType(typeA);
@@ -126,12 +130,51 @@ public class ConfigurationTemplateManagerTest extends AbstractConfigurationSyste
         assertEquals("sample/a", events.get(3).getPath());
     }
 
+    public void testSaveRecord()
+    {
+        MutableRecord record = typeA.createNewRecord(true);
+        record.put("a", "avalue");
+        record.put("b", "bvalue");
+
+        configurationTemplateManager.insertRecord("sample", record);
+
+        record = typeA.createNewRecord(false);
+        record.put("a", "avalue");
+        record.put("b", "newb");
+
+        configurationTemplateManager.saveRecord("sample/avalue", record);
+
+        Record loaded = configurationTemplateManager.getRecord("sample/avalue");
+        assertEquals("newb", loaded.get("b"));
+    }
+
+    public void testSaveRecordDoesNotRemoveKeys()
+    {
+        MutableRecord record = typeA.createNewRecord(true);
+        record.put("a", "avalue");
+        record.put("b", "bvalue");
+        record.put("c", "cvalue");
+
+        configurationTemplateManager.insertRecord("sample", record);
+
+        record = typeA.createNewRecord(false);
+        record.put("a", "avalue");
+        record.put("b", "newb");
+        record.remove("c");
+        configurationTemplateManager.saveRecord("sample/avalue", record);
+
+        Record loaded = configurationTemplateManager.getRecord("sample/avalue");
+        assertEquals("newb", loaded.get("b"));
+        assertEquals("cvalue", loaded.get("c"));
+    }
+
     @SymbolicName("mockA")
     public static class MockA extends AbstractConfiguration
     {
         @ID
         private String a;
         private String b;
+        private String c;
 
         private MockB mock;
 
@@ -141,6 +184,9 @@ public class ConfigurationTemplateManagerTest extends AbstractConfigurationSyste
         public void setA(String a){this.a = a;}
         public String getB(){return b;}
         public void setB(String b){this.b = b;}
+        public String getC(){return c;}
+        public void setC(String c){this.c = c;}
+
         public MockB getMock(){return mock;}
         public void setMock(MockB mock){this.mock = mock;}
     }

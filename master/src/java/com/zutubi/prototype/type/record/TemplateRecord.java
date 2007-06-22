@@ -2,10 +2,10 @@ package com.zutubi.prototype.type.record;
 
 import com.zutubi.prototype.type.CollectionType;
 import com.zutubi.prototype.type.ComplexType;
+import com.zutubi.prototype.type.CompositeType;
 
 import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.HashSet;
 import java.util.Set;
 
 /**
@@ -101,59 +101,83 @@ public class TemplateRecord extends AbstractRecord
 
     public Set<String> keySet()
     {
-        return getMergedMap().keySet();
+        if(declaredOrder != null)
+        {
+            return new HashSet<String>(declaredOrder);
+        }
+        else
+        {
+            Set<String> set = parent == null ? new HashSet<String>() : new HashSet<String>(parent.keySet());
+            set.addAll(moi.keySet());
+            return set;
+        }
     }
 
     public Set<String> metaKeySet()
     {
-        return moi.metaKeySet();
+        Set<String> set = parent == null ? new HashSet<String>() : new HashSet<String>(parent.metaKeySet());
+        set.addAll(moi.metaKeySet());
+        return set;
     }
 
     public Collection<Object> values()
     {
-        return getMergedMap().values();
+        return flatten().values();
     }
 
-    public Set<Map.Entry<String, Object>> entrySet()
-    {
-        return getMergedMap().entrySet();
-    }
-
-    private Map<String, Object> getMergedMap()
-    {
-        Map<String, Object> mergedMap = new HashMap<String, Object>();
-
-        for (String key : moi.keySet())
-        {
-            mergedMap.put(key, moi.get(key));
-        }
-
-        if (parent != this && parent != null) // ensure that we do not recurse infinitely -> IDEA complaint.
-        {
-            Map<String, Object> parentMerged = parent.getMergedMap();
-            if(declaredOrder == null)
-            {
-                mergedMap.putAll(parentMerged);
-            }
-            else
-            {
-                for(Map.Entry<String, Object> entry: parentMerged.entrySet())
-                {
-                    if(declaredOrder.contains(entry.getKey()))
-                    {
-                        mergedMap.put(entry.getKey(), entry.getValue());
-                    }
-                }
-            }
-        }
-
-        return mergedMap;
-    }
+//    private Map<String, Object> getMergedMap()
+//    {
+//        Map<String, Object> mergedMap = new HashMap<String, Object>();
+//        if (parent != null)
+//        {
+//            Map<String, Object> parentMerged = parent.getMergedMap();
+//            if(declaredOrder == null)
+//            {
+//                mergedMap.putAll(parentMerged);
+//            }
+//            else
+//            {
+//                for(Map.Entry<String, Object> entry: parentMerged.entrySet())
+//                {
+//                    if(declaredOrder.contains(entry.getKey()))
+//                    {
+//                        mergedMap.put(entry.getKey(), entry.getValue());
+//                    }
+//                }
+//            }
+//        }
+//
+//        for (String key : moi.keySet())
+//        {
+//            mergedMap.put(key, moi.get(key));
+//        }
+//
+//        return mergedMap;
+//    }
 
     public MutableRecord flatten()
     {
-        // FIXME NYI
-        return new MutableRecordImpl();
+        MutableRecord record = new MutableRecordImpl();
+        for(String metaKey: metaKeySet())
+        {
+            if (!metaKey.equals(HANDLE_KEY))
+            {
+                record.putMeta(metaKey, getMeta(metaKey));
+            }
+        }
+
+        for(String key: keySet())
+        {
+            Object value = get(key);
+            if(value instanceof TemplateRecord)
+            {
+                value = ((TemplateRecord)value).flatten();
+            }
+            
+            record.put(key, value);
+        }
+
+        return record;
     }
 
     public TemplateRecord getParent()
@@ -171,9 +195,14 @@ public class TemplateRecord extends AbstractRecord
         return type;
     }
 
+    public Record getMoi()
+    {
+        return moi;
+    }
+
     public String getOwner(String key)
     {
-        if (moi.containsKey(key))
+        if (isSignificant(type, key, moi.get(key)))
         {
             return owner;
         }
@@ -187,19 +216,45 @@ public class TemplateRecord extends AbstractRecord
         }
     }
 
+    private boolean isSignificant(ComplexType type, String key, Object value)
+    {
+        if(value == null)
+        {
+            return false;
+        }
+
+        if(value instanceof Record)
+        {
+            Record record = (Record) value;
+            if(record.isCollection())
+            {
+                // Only ordered collections have an owner, and that is
+                // whoever's order applies.  If there is no order, the
+                // record is owned by the root of the template tree.
+                return CollectionType.getDeclaredOrder(record) != null || parent == null;
+            }
+            else
+            {
+                CompositeType actualType = (CompositeType) type.getActualPropertyType(key, value);
+                for(String property: actualType.getPropertyNames())
+                {
+                    if(isSignificant(actualType, property, record.get(property)))
+                    {
+                        return true;
+                    }
+                }
+
+                return false;
+            }
+        }
+        else
+        {
+            return true;
+        }
+    }
+
     public MutableRecord copy(boolean deep)
     {
         throw new UnsupportedOperationException("Record is not mutable.");
-    }
-
-    public Set<String> simpleKeySet()
-    {
-        // FIXME: should only return keys for simple properties
-        return getMergedMap().keySet();
-    }
-
-    public Record getMoi()
-    {
-        return moi;
     }
 }

@@ -189,33 +189,14 @@ public class ConfigurationTemplateManager
         checkPersistent(path);
 
         ComplexType type = getType(path);
-        Record parentRecord = recordManager.load(path);
 
-        // determine the path at which the record will be inserted.  If we are inserting into a collection,
-        // this will be determined by the collection.  If we insert into a complex type, then we insert directly using
-        // the path that is provided.
-
-        String newPath = path;
+        // Determine the path at which the record will be inserted.  This is
+        // type-dependent.
+        String newPath = type.getInsertionPath(path, record);
+        CompositeType expectedType;
         if (type instanceof CollectionType)
         {
-            CollectionType collectionType = (CollectionType) type;
-            if (parentRecord == null)
-            {
-                // Need to create the collection record.
-                // FIXME: for templating, we may also want to init an order here??
-                parentRecord = collectionType.createNewRecord(true);
-                recordManager.insert(path, parentRecord);
-            }
-
-            String insertionPath = collectionType.getInsertionPath(parentRecord, record);
-            newPath = PathUtils.getPath(path, insertionPath);
-        }
-
-        // Do some level of type checking to ensure that all is as expected when we insert into the record manager. 
-        if (type instanceof CollectionType)
-        {
-            // If we are inserting into a collection, then the record must represent data for the collection type.
-            checkRecordType((CompositeType) type.getTargetType(), record);
+            expectedType = (CompositeType) type.getTargetType();
         }
         else
         {
@@ -224,12 +205,13 @@ public class ConfigurationTemplateManager
             String parentPath = PathUtils.getParentPath(path);
             CompositeType parentType = (CompositeType) configurationPersistenceManager.getType(parentPath);
             TypeProperty property = parentType.getProperty(PathUtils.getBaseName(path));
-            checkRecordType((CompositeType) property.getType(), record);
+            expectedType = (CompositeType) property.getType();
         }
+
+        CompositeType actualType = checkRecordType(expectedType, record);
 
         // generate and send out events for each of the records being inserted.  The root record may itself contain
         // subrecords.
-
         Map<String, Record> insertedPaths = getPathRecordMapping(newPath, record);
         for (String p : insertedPaths.keySet())
         {
@@ -237,7 +219,55 @@ public class ConfigurationTemplateManager
             eventManager.publish(new PreInsertEvent(this, p, (MutableRecord) r));
         }
 
+        // If inserting into a template path, we have two cases:
+        //   - Inserting a new entry in the top collection (e.g. a project).
+        //     In this case we need to build a skeleton out of the parent.
+        //   - Inserting within an existing template.  In this case we need
+        //     to add matching skeletons to our descendents.
+        final String[] elements = PathUtils.getPathElements(newPath);
+        final String scope = elements[0];
+        ConfigurationScopeInfo scopeInfo = configurationPersistenceManager.getScopeInfo(scope);
+        if (scopeInfo.isTemplated())
+        {
+            if (elements.length == 2)
+            {
+                // Brand new, if we have a parent we need to skeletonise.
+                String templateParentPath = getTemplateParentPath(newPath, record);
+                if (templateParentPath != null)
+                {
+                    record = applySkeleton(actualType, record, createSkeletonRecord(actualType, recordManager.load(templateParentPath)));
+                }
+            }
+            else
+            {
+                final String remainderPath = PathUtils.getPath(2, elements);
+                final Record skeleton = createSkeletonRecord(actualType, record);
+                TemplateHierarchy hierarchy = getTemplateHierarchy(scope);
+                TemplateNode node = hierarchy.getNodeById(elements[1]);
+
+                node.forEachDescendent(new TemplateNode.NodeHandler()
+                {
+                    public boolean handle(TemplateNode templateNode)
+                    {
+                        String descendentPath = PathUtils.getPath(scope, templateNode.getId(), remainderPath);
+                        if (recordManager.load(descendentPath) == null)
+                        {
+                            recordManager.insert(descendentPath, skeleton);
+                            return true;
+                        }
+                        else
+                        {
+                            // We hit an existing record, bail out of this
+                            // subtree.
+                            return false;
+                        }
+                    }
+                });
+            }
+        }
+
         recordManager.insert(newPath, record);
+
         refreshCaches();
 
         for (String p : insertedPaths.keySet())
@@ -248,17 +278,46 @@ public class ConfigurationTemplateManager
         return newPath;
     }
 
-    private void checkRecordType(CompositeType expectedType, MutableRecord record)
+    private MutableRecord applySkeleton(CompositeType type, MutableRecord record, Record skeleton)
+    {
+        TemplateRecord parent = new TemplateRecord(null, null, type, skeleton);
+        TemplateRecord template = new TemplateRecord(null, parent, type, record);
+        return template.flatten();
+//        for (String key : skeleton.keySet())
+//        {
+//            if (record.get(key) == null)
+//            {
+//                record.put(key, skeleton.get(key));
+//            }
+//        }
+    }
+
+    private Record createSkeletonRecord(ComplexType type, Record record)
+    {
+        MutableRecord result = type.createNewRecord(false);
+        for (String key : record.nestedKeySet())
+        {
+            Record child = (Record) record.get(key);
+            ComplexType childType = (ComplexType) type.getActualPropertyType(key, child);
+            result.put(key, createSkeletonRecord(childType, child));
+        }
+
+        return result;
+    }
+
+    private CompositeType checkRecordType(CompositeType expectedType, MutableRecord record)
     {
         List<String> allowedTypes = new LinkedList<String>();
         allowedTypes.add(expectedType.getSymbolicName());
         allowedTypes.addAll(expectedType.getExtensions());
+        CompositeType recordType = typeRegistry.getType(record.getSymbolicName());
         if (!allowedTypes.contains(record.getSymbolicName()))
         {
             // need to support type extensions here.
-            Type recordType = typeRegistry.getType(record.getSymbolicName());
             throw new IllegalArgumentException("Expected type: " + expectedType.getClazz() + " but instead found " + recordType.getClazz());
         }
+
+        return recordType;
     }
 
     private void refreshCaches()
@@ -467,66 +526,7 @@ public class ConfigurationTemplateManager
             throw new IllegalArgumentException("Illegal path '" + path + "': no existing record found");
         }
 
-        // See if this is a templated scope: in which case more magic needs
-        // to happen.
-        if (existingRecord instanceof TemplateRecord)
-        {
-            // Ensure there is a concrete record for this path.  We may need
-            // to create a few records along the path to make this happen.
-            TemplateRecord templateRecord = (TemplateRecord) existingRecord;
-            String[] pathElements = PathUtils.getPathElements(path);
-            if (!templateRecord.getOwner().equals(pathElements[1]))
-            {
-                String owningPath = PathUtils.getPath(pathElements[0], pathElements[1]);
-                Record owningRecord = recordManager.load(owningPath);
-
-                String parentOwningPath = getTemplateParentPath(owningPath, owningRecord);
-                TemplateRecord parentTemplateRecord = (TemplateRecord) getRecord(parentOwningPath);
-
-                // Find where in the path there cease to be records in our
-                // owner.  From the point where it is found, create empty
-                // records to populate the remainder of the path, using the
-                // type that we have inherited.
-                for (int i = 2; i < pathElements.length; i++)
-                {
-                    String element = pathElements[i];
-                    if (owningRecord != null)
-                    {
-                        owningRecord = (Record) owningRecord.get(element);
-                    }
-                    owningPath = PathUtils.getPath(owningPath, element);
-                    parentTemplateRecord = (TemplateRecord) parentTemplateRecord.get(element);
-
-                    if (owningRecord == null)
-                    {
-                        ComplexType type = parentTemplateRecord.getType();
-                        recordManager.insert(owningPath, type.createNewRecord(false));
-                    }
-                }
-            }
-
-            // Scrub values from the incoming record where they are identical
-            // to the existing record.
-            // Perhaps we could use an iterator to remove, but does Record
-            // specify what happens when removing using a key set iterator?
-            Set<String> dead = new HashSet<String>();
-            for(String key: record.keySet())
-            {
-                if(record.get(key).equals(existingRecord.get(key)))
-                {
-                    dead.add(key);
-                }
-            }
-
-            for(String key: dead)
-            {
-                record.remove(key);
-            }
-        }
-
         String parentPath = PathUtils.getParentPath(path);
-        String baseName = PathUtils.getBaseName(path);
-
         checkPersistent(parentPath);
 
         Record parentRecord = getRecord(parentPath);
@@ -536,32 +536,67 @@ public class ConfigurationTemplateManager
         }
 
         ComplexType parentType = configurationPersistenceManager.getType(parentPath);
-        Object oldInstance = instances.get(path);
-
-        eventManager.publish(new PreSaveEvent(this, path, oldInstance));
-
-        String newPath = path;
-        if (parentType instanceof CollectionType)
+        String newPath = parentType.getSavePath(path, record);
+        
+        MutableRecord newRecord;
+        // See if this is a templated scope: in which case more magic needs
+        // to happen.
+        if (existingRecord instanceof TemplateRecord)
         {
-            CollectionType collectionType = (CollectionType) parentType;
-            String newName = collectionType.getSavePath(recordManager.load(parentPath), record);
-            if (baseName != null && !baseName.equals(newName))
-            {
-                // We need to update our own record
-                newPath = PathUtils.getPath(parentPath, newName);
+            // Ensure there is a concrete record for this path.  We may need
+            // to create a few records along the path to make this happen.
+            TemplateRecord templateRecord = (TemplateRecord) existingRecord;
+            newRecord = templateRecord.getMoi().copy(false);
+            newRecord.update(record);
 
-                recordManager.move(path, newPath);
-                recordManager.update(newPath, record);
-            }
-            else
+            // Scrub values from the incoming record where they are identical
+            // to the existing record's parent.
+            // Perhaps we could use an iterator to remove, but does Record
+            // specify what happens when removing using a key set iterator?
+            TemplateRecord existingParent = templateRecord.getParent();
+            if (existingParent != null)
             {
-                recordManager.update(newPath, record);
+                Set<String> dead = new HashSet<String>();
+                for (String key : newRecord.keySet())
+                {
+                    if (newRecord.get(key).equals(existingParent.get(key)))
+                    {
+                        dead.add(key);
+                    }
+                }
+
+                for (String key : dead)
+                {
+                    newRecord.remove(key);
+                }
+            }
+
+            // If there is nothing to save, bail now.
+            if (templateRecord.getMoi().equals(newRecord))
+            {
+                return path;
             }
         }
         else
         {
-            // Regular update.
-            recordManager.update(newPath, record);
+            newRecord = existingRecord.copy(false);
+            newRecord.update(record);
+        }
+
+        Object oldInstance = instances.get(path);
+
+        eventManager.publish(new PreSaveEvent(this, path, oldInstance));
+
+        if (newPath.equals(path))
+        {
+            // Regular update
+            recordManager.update(newPath, newRecord);
+        }
+        else
+        {
+            // We need to update the path by moving
+            recordManager.move(path, newPath);
+            recordManager.update(newPath, newRecord);
         }
 
         refreshCaches();
@@ -605,7 +640,7 @@ public class ConfigurationTemplateManager
         return instances.get(path);
     }
 
-    @SuppressWarnings({ "unchecked" })
+    @SuppressWarnings({"unchecked"})
     public <T> T getInstance(String path, Class<T> clazz)
     {
         Object instance = getInstance(path);
@@ -634,7 +669,7 @@ public class ConfigurationTemplateManager
         instances.getAll(path, result);
     }
 
-    @SuppressWarnings({ "unchecked" })
+    @SuppressWarnings({"unchecked"})
     public <T> Collection<T> getAllInstances(Class<T> clazz)
     {
         CompositeType type = typeRegistry.getType(clazz);
@@ -661,7 +696,7 @@ public class ConfigurationTemplateManager
         instances.put(path, instance);
     }
 
-    @SuppressWarnings({ "unchecked" })
+    @SuppressWarnings({"unchecked"})
     public <T> T getAncestorOfType(Configuration c, Class<T> clazz)
     {
         String path = c.getConfigurationPath();
@@ -781,7 +816,7 @@ public class ConfigurationTemplateManager
         return paths;
     }
 
-    @SuppressWarnings({ "unchecked" })
+    @SuppressWarnings({"unchecked"})
     public <T extends Type> T getType(String path, Class<T> typeClass)
     {
         Type type = getType(path);
@@ -836,7 +871,7 @@ public class ConfigurationTemplateManager
                 else if (parentType instanceof CompositeType)
                 {
                     Type propertyType = ((CompositeType) parentType).getProperty(baseName).getType();
-                    if(!(propertyType instanceof ComplexType))
+                    if (!(propertyType instanceof ComplexType))
                     {
                         throw new IllegalArgumentException("Invalid path '" + path + "': references non-complex type");
                     }

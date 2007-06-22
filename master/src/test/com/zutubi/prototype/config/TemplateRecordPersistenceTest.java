@@ -64,7 +64,7 @@ public class TemplateRecordPersistenceTest extends AbstractConfigurationSystemTe
 
         assertEmptyCollection(record, "properties");
 
-        assertDefaultStages((TemplateRecord) record.get("stages"));
+        assertDefaultStages((TemplateRecord) record.get("stages"), GLOBAL_PROJECT);
 
         assertEmptyCollection(record, "propertiesList");
 
@@ -170,8 +170,8 @@ public class TemplateRecordPersistenceTest extends AbstractConfigurationSystemTe
         assertEquals("child", childTemplate.getOwner());
         assertEquals(GLOBAL_PROJECT, childTemplate.getOwner("stages"));
 
-        assertDefaultStages((TemplateRecord) childTemplate.get("stages"));
-        assertDefaultStages((TemplateRecord) configurationTemplateManager.getRecord("project/child/stages"));
+        assertDefaultStages((TemplateRecord) childTemplate.get("stages"), "child");
+        assertDefaultStages((TemplateRecord) configurationTemplateManager.getRecord("project/child/stages"), "child");
     }
 
     public void testInheritedList()
@@ -193,11 +193,11 @@ public class TemplateRecordPersistenceTest extends AbstractConfigurationSystemTe
     {
         assertEquals(1, propertiesList.size());
         String key = propertiesList.keySet().iterator().next();
-        assertEquals(GLOBAL_PROJECT, propertiesList.getOwner());
+        assertEquals("child", propertiesList.getOwner());
         assertEquals(GLOBAL_PROJECT, propertiesList.getOwner(key));
 
         TemplateRecord property = (TemplateRecord) propertiesList.get(key);
-        assertEquals(GLOBAL_PROJECT, property.getOwner());
+        assertEquals("child", property.getOwner());
         assertEquals(GLOBAL_PROJECT, property.getOwner("name"));
         assertEquals("gp1", property.get("name"));
     }
@@ -210,12 +210,76 @@ public class TemplateRecordPersistenceTest extends AbstractConfigurationSystemTe
         insertGlobal();
         configurationTemplateManager.insertRecord("project/global/property", createProperty("p", "v"));
         insertChild();
+        assertInheritedProperty();
+    }
+
+    public void testSaveInheritedAddChildFirst()
+    {
+        // Like testSaveInherited, but insert the child record before
+        // creating the inherited property.
+        insertGlobal();
+        insertChild();
+        configurationTemplateManager.insertRecord("project/global/property", createProperty("p", "v"));
+        assertInheritedProperty();
+    }
+
+    private void assertInheritedProperty()
+    {
+        TemplateRecord childProperty = (TemplateRecord) configurationTemplateManager.getRecord("project/child/property");
+        assertNotNull(childProperty);
+        assertEquals(GLOBAL_PROJECT, childProperty.getOwner("name"));
+        assertEquals(GLOBAL_PROJECT, childProperty.getOwner("value"));
+
+        MutableRecord overridingProperty = childProperty.flatten();
+        overridingProperty.put("value", "cv");
+
+        configurationTemplateManager.saveRecord("project/child/property", overridingProperty);
+        childProperty = (TemplateRecord) configurationTemplateManager.getRecord("project/child/property");
+        assertEquals(GLOBAL_PROJECT, childProperty.getOwner("name"));
+        assertEquals("child", childProperty.getOwner("value"));
+    }
+
+    public void testSaveInheritedNested()
+    {
+        // Like testSaveInherited except that the path saved to is nested
+        // within a collection
+        insertGlobal();
+        configurationTemplateManager.insertRecord("project/global/properties", createProperty("p", "v"));
+        insertChild();
+        TemplateRecord childProperty = (TemplateRecord) configurationTemplateManager.getRecord("project/child/properties/p");
+        assertNotNull(childProperty);
+        assertEquals(GLOBAL_PROJECT, childProperty.getOwner("name"));
+        assertEquals(GLOBAL_PROJECT, childProperty.getOwner("value"));
+
+        MutableRecord overridingProperty = childProperty.flatten();
+        overridingProperty.put("value", "cv");
+
+        configurationTemplateManager.saveRecord("project/child/properties/p", overridingProperty);
+        childProperty = (TemplateRecord) configurationTemplateManager.getRecord("project/child/properties/p");
+        assertEquals(GLOBAL_PROJECT, childProperty.getOwner("name"));
+        assertEquals("child", childProperty.getOwner("value"));
+    }
+
+    public void testSaveRevertingToParentValue()
+    {
+        // Save once overriding a field, and then save again restoring it to
+        // the parent value, ensuring that the field ownership reverts to the
+        // parent.
+        insertGlobal();
+        configurationTemplateManager.insertRecord("project/global/property", createProperty("p", "v"));
+        insertChild();
         assertNotNull(configurationTemplateManager.getRecord("project/child/property"));
 
         MutableRecord overridingProperty = propertyType.createNewRecord(false);
-        overridingProperty.put("cp", "cv");
-
+        overridingProperty.put("name", "cp");
         configurationTemplateManager.saveRecord("project/child/property", overridingProperty);
+        overridingProperty.put("name", "p");
+        configurationTemplateManager.saveRecord("project/child/property", overridingProperty);
+
+        TemplateRecord childProperty = (TemplateRecord) configurationTemplateManager.getRecord("project/child/property");
+        assertNotNull(childProperty);
+        assertEquals(GLOBAL_PROJECT, childProperty.getOwner("name"));
+        assertEquals(GLOBAL_PROJECT, childProperty.getOwner("value"));
     }
 
     private void insertGlobal()
@@ -271,18 +335,17 @@ public class TemplateRecordPersistenceTest extends AbstractConfigurationSystemTe
     private void assertEmptyCollection(TemplateRecord record, String property)
     {
         TemplateRecord collection = (TemplateRecord) record.get(property);
-        assertEquals(record.getOwner(), record.getOwner(property));
         assertEquals(0, collection.size());
     }
 
-    private void assertDefaultStages(TemplateRecord stages)
+    private void assertDefaultStages(TemplateRecord stages, String owner)
     {
         assertEquals(1, stages.size());
-        assertEquals(GLOBAL_PROJECT, stages.getOwner());
+        assertEquals(owner, stages.getOwner());
         assertEquals(GLOBAL_PROJECT, stages.getOwner("default"));
 
         TemplateRecord stage = (TemplateRecord) stages.get("default");
-        assertEquals(GLOBAL_PROJECT, stage.getOwner());
+        assertEquals(owner, stage.getOwner());
         assertEquals(GLOBAL_PROJECT, stage.getOwner("name"));
         assertEquals("default", stage.get("name"));
     }

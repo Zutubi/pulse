@@ -2,7 +2,6 @@ package com.zutubi.prototype.type;
 
 import com.zutubi.config.annotations.ID;
 import com.zutubi.prototype.type.record.MutableRecord;
-import com.zutubi.prototype.type.record.MutableRecordImpl;
 import com.zutubi.prototype.type.record.Record;
 import com.zutubi.pulse.core.config.AbstractConfiguration;
 
@@ -24,10 +23,9 @@ public class ListTypeTest extends TypeTestCase
 
         mockAType = typeRegistry.register("mockA", MockA.class);
 
-        listType = new ListType(configurationTemplateManager);
+        listType = new ListType(configurationTemplateManager, recordManager);
         listType.setTypeRegistry(typeRegistry);
         listType.setCollectionType(mockAType);
-        
     }
 
     protected void tearDown() throws Exception
@@ -46,26 +44,22 @@ public class ListTypeTest extends TypeTestCase
 
         Record record = (Record) listType.unstantiate(list);
 
-        List<Object> newList = listType.instantiate("", record);
+        List<Object> newList = listType.instantiate(null, record);
         assertEquals(2, newList.size());
         assertTrue(newList.get(0) instanceof MockA);
     }
 
     public void testInsertionPath() throws TypeException
     {
-        Record collection = new MutableRecordImpl();
+        long lastHandle = recordManager.allocateHandle();
         MutableRecord record = mockAType.unstantiate(new MockA("valueA"));
-        record.setHandle(10);
-        assertEquals("10", listType.getInsertionPath(collection, record));
+        assertEquals("coll/" + Long.toString(lastHandle + 1), listType.getInsertionPath("coll", record));
     }
 
     public void testSavePath() throws TypeException
     {
-        Record collection = new MutableRecordImpl();
         MutableRecord record = mockAType.unstantiate(new MockA("valueA"));
-        record.setHandle(210);
-        assertEquals("210", listType.getInsertionPath(collection, record));
-        assertEquals("210", listType.getSavePath(collection, record));
+        assertEquals("any/path", listType.getSavePath("any/path", record));
     }
 
     public static class MockA extends AbstractConfiguration

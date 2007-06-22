@@ -3,6 +3,7 @@ package com.zutubi.prototype.config;
 import com.zutubi.config.annotations.ConfigurationCheck;
 import com.zutubi.prototype.ConfigurationCheckHandler;
 import com.zutubi.prototype.type.*;
+import com.zutubi.prototype.type.record.HandleAllocator;
 import com.zutubi.pulse.prototype.config.admin.GlobalConfiguration;
 import com.zutubi.pulse.prototype.config.agent.AgentConfiguration;
 import com.zutubi.pulse.prototype.config.misc.LoginConfiguration;
@@ -44,6 +45,7 @@ public class ConfigurationRegistry
     private Map<CompositeType, CompositeType> checkTypeMapping = new HashMap<CompositeType, CompositeType>();
 
     private TypeRegistry typeRegistry;
+    private HandleAllocator handleAllocator;
     private ConfigurationPersistenceManager configurationPersistenceManager;
     private ConfigurationTemplateManager configurationTemplateManager;
 
@@ -313,5 +315,10 @@ public class ConfigurationRegistry
     public void setConfigurationTemplateManager(ConfigurationTemplateManager configurationTemplateManager)
     {
         this.configurationTemplateManager = configurationTemplateManager;
+    }
+
+    public void setHandleAllocator(HandleAllocator handleAllocator)
+    {
+        this.handleAllocator = handleAllocator;
     }
 }

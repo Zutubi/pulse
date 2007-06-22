@@ -1,10 +1,10 @@
 package com.zutubi.prototype.config;
 
-import junit.framework.TestCase;
 import com.zutubi.prototype.type.TypeRegistry;
-import com.zutubi.prototype.type.record.RecordManager;
 import com.zutubi.prototype.type.record.MockRecordSerialiser;
+import com.zutubi.prototype.type.record.RecordManager;
 import com.zutubi.pulse.events.DefaultEventManager;
+import junit.framework.TestCase;
 
 /**
  *
@@ -50,6 +50,7 @@ public abstract class AbstractConfigurationSystemTestCase extends TestCase
 
         typeRegistry.setConfigurationReferenceManager(configurationReferenceManager);
         typeRegistry.setConfigurationTemplateManager(configurationTemplateManager);
+        typeRegistry.setHandleAllocator(recordManager);
     }
 
     protected void tearDown() throws Exception

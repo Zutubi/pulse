@@ -2,7 +2,6 @@ package com.zutubi.prototype.type;
 
 import com.zutubi.config.annotations.ID;
 import com.zutubi.prototype.type.record.Record;
-import com.zutubi.prototype.type.record.MutableRecordImpl;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -52,23 +51,16 @@ public class MapTypeTest extends TypeTestCase
 
     public void testInsertionPath() throws TypeException
     {
-        Record collection = new MutableRecordImpl();
         Record record = mockAType.unstantiate(new MockA("valueA"));
-
-        assertEquals("valueA", mapType.getInsertionPath(collection, record));
+        assertEquals("coll/valueA", mapType.getInsertionPath("coll", record));
     }
 
     public void testSavePath() throws TypeException
     {
-        Record collection = new MutableRecordImpl();
         Record record = mockAType.unstantiate(new MockA("valueA"));
 
-        assertEquals("valueA", mapType.getInsertionPath(collection, record));
-        assertEquals("valueA", mapType.getSavePath(collection, record));
-
-        record = mockAType.unstantiate(new MockA("valueB"));
-        assertEquals("valueB", mapType.getInsertionPath(collection, record));
-        assertEquals("valueB", mapType.getSavePath(collection, record));
+        assertEquals("coll/valueA", mapType.getInsertionPath("coll", record));
+        assertEquals("coll/valueA", mapType.getSavePath("coll/valueA", record));
     }
 
     public static class MockA

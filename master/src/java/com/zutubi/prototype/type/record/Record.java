@@ -82,6 +82,8 @@ public interface Record
 
     Set<String> simpleKeySet();
 
+    Set<String> nestedKeySet();
+
     Collection<Object> values();
 
     /**

@@ -137,13 +137,13 @@ public class MapType extends CollectionType
         return keyProperty;
     }
 
-    public String getInsertionPath(Record collection, Record record)
+    public String getInsertionPath(String path, Record record)
     {
-        return (String) record.get(keyProperty);
+        return PathUtils.getPath(path, (String) record.get(keyProperty));
     }
 
-    public String getSavePath(Record collection, Record record)
+    public String getSavePath(String path, Record record)
     {
-        return (String) record.get(keyProperty);
+        return PathUtils.getPath(PathUtils.getParentPath(path), (String) record.get(keyProperty));
     }
 }

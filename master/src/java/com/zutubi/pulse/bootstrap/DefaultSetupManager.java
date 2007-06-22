@@ -3,7 +3,7 @@ package com.zutubi.pulse.bootstrap;
 import com.opensymphony.util.TextUtils;
 import com.opensymphony.xwork.spring.SpringObjectFactory;
 import com.zutubi.prototype.config.*;
-import com.zutubi.prototype.config.DefaultConfigurationProvider;
+import com.zutubi.prototype.type.record.DelegatingHandleAllocator;
 import com.zutubi.prototype.type.record.RecordManager;
 import com.zutubi.pulse.Version;
 import com.zutubi.pulse.bootstrap.conf.EnvConfig;
@@ -283,6 +283,7 @@ public class DefaultSetupManager implements SetupManager
     private void initialiseConfigurationPersistence()
     {
         RecordManager recordManager = ComponentContext.getBean("recordManager");
+        DelegatingHandleAllocator handleAllocator = ComponentContext.getBean("handleAllocator");
         ConfigurationPersistenceManager configurationPersistenceManager = ComponentContext.getBean("configurationPersistenceManager");
         ConfigurationReferenceManager configurationReferenceManager = ComponentContext.getBean("configurationReferenceManager");
         ConfigurationTemplateManager configurationTemplateManager = ComponentContext.getBean("configurationTemplateManager");
@@ -290,6 +291,7 @@ public class DefaultSetupManager implements SetupManager
         DefaultConfigurationProvider configurationProvider = ComponentContext.getBean("configurationProvider");
 
         recordManager.init();
+        handleAllocator.setDelegate(handleAllocator);
         configurationPersistenceManager.setRecordManager(recordManager);
         configurationReferenceManager.setRecordManager(recordManager);
         configurationTemplateManager.setRecordManager(recordManager);

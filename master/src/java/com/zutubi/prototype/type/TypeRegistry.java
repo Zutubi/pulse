@@ -5,6 +5,7 @@ import com.zutubi.config.annotations.SymbolicName;
 import com.zutubi.config.annotations.Transient;
 import com.zutubi.prototype.config.ConfigurationReferenceManager;
 import com.zutubi.prototype.config.ConfigurationTemplateManager;
+import com.zutubi.prototype.type.record.HandleAllocator;
 import com.zutubi.util.AnnotationUtils;
 import com.zutubi.util.CollectionUtils;
 
@@ -31,6 +32,7 @@ public class TypeRegistry
 
     private ConfigurationReferenceManager configurationReferenceManager;
     private ConfigurationTemplateManager configurationTemplateManager;
+    private HandleAllocator handleAllocator;
 
     public TypeRegistry()
     {
@@ -221,7 +223,7 @@ public class TypeRegistry
                         if (List.class.isAssignableFrom(clazz))
                         {
                             valueClass = (Class) parameterizedType.getActualTypeArguments()[0];
-                            collection = new ListType(configurationTemplateManager);
+                            collection = new ListType(configurationTemplateManager, handleAllocator);
                         }
                         else
                         {
@@ -321,5 +323,10 @@ public class TypeRegistry
     public void setConfigurationTemplateManager(ConfigurationTemplateManager configurationTemplateManager)
     {
         this.configurationTemplateManager = configurationTemplateManager;
+    }
+
+    public void setHandleAllocator(HandleAllocator handleAllocator)
+    {
+        this.handleAllocator = handleAllocator;
     }
 }

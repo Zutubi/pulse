@@ -28,6 +28,7 @@ public class NullifyCleanupTask extends ReferenceCleanupTaskSupport
         Record parentRecord = recordManager.load(parentPath);
         if (parentRecord != null)
         {
+            // FIXME: review this use of copy
             MutableRecord newValue = parentRecord.copy(false);
             newValue.put(PathUtils.getBaseName(getAffectedPath()), "");
             recordManager.update(parentPath, newValue);

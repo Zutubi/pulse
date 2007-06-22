@@ -1,10 +1,10 @@
 package com.zutubi.prototype.type;
 
 import com.zutubi.prototype.config.ConfigurationTemplateManager;
+import com.zutubi.prototype.type.record.HandleAllocator;
 import com.zutubi.prototype.type.record.MutableRecord;
 import com.zutubi.prototype.type.record.PathUtils;
 import com.zutubi.prototype.type.record.Record;
-import com.zutubi.pulse.core.config.Configuration;
 
 import java.util.*;
 
@@ -15,11 +15,13 @@ import java.util.*;
 public class ListType extends CollectionType
 {
     private ConfigurationTemplateManager configurationTemplateManager;
+    private HandleAllocator handleAllocator;
 
-    public ListType(ConfigurationTemplateManager configurationTemplateManager)
+    public ListType(ConfigurationTemplateManager configurationTemplateManager, HandleAllocator handleAllocator)
     {
         super(LinkedList.class);
         this.configurationTemplateManager = configurationTemplateManager;
+        this.handleAllocator = handleAllocator;
     }
 
     public Object emptyInstance()
@@ -110,13 +112,16 @@ public class ListType extends CollectionType
             List<String> order = new ArrayList<String>(list.size());
             for(Object o: list)
             {
-                Configuration config = (Configuration) o;
-                String key = Long.toString(config.getHandle());
-                order.add(key);
+                String key = Long.toString(handleAllocator.allocateHandle());
                 result.put(key, collectionType.unstantiate(o));
+                order.add(key);
             }
 
-            setOrder(result, order);
+            if (isOrdered() && order.size() > 0)
+            {
+                setOrder(result, order);
+            }
+            
             return result;
         }
     }
@@ -132,14 +137,14 @@ public class ListType extends CollectionType
         return instance;
     }
 
-    public String getInsertionPath(Record collection, Record record)
+    public String getInsertionPath(String path, Record record)
     {
-        return Long.toString(record.getHandle());
+        return PathUtils.getPath(path, Long.toString(handleAllocator.allocateHandle()));
     }
 
-    public String getSavePath(Record collection, Record record)
+    public String getSavePath(String path, Record record)
     {
-        return Long.toString(record.getHandle());
+        return path;
     }
 
     protected Comparator<String> getKeyComparator()

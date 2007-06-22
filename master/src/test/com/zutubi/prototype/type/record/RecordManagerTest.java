@@ -381,6 +381,36 @@ public class RecordManagerTest extends TestCase
         assertNull(recordManager.load("testpath/nested"));
     }
 
+    public void testUpdateRemovesKeys()
+    {
+        MutableRecord record = new MutableRecordImpl();
+        record.put("foo", "bar");
+
+        recordManager.insert("path", record);
+
+        record = new MutableRecordImpl();
+        recordManager.update("path", record);
+
+        Record loaded = recordManager.load("path");
+        assertEquals(0, loaded.size());
+    }
+
+    public void testUpdateDoesNotRemoveNested()
+    {
+        MutableRecord record = new MutableRecordImpl();
+        record.put("foo", "bar");
+        record.put("quux", new MutableRecordImpl());
+
+        recordManager.insert("path", record);
+
+        record = new MutableRecordImpl();
+        recordManager.update("path", record);
+
+        Record loaded = recordManager.load("path");
+        assertEquals(1, loaded.size());
+        assertNotNull(loaded.get("quux"));
+    }
+
     private void newRecordManager()
     {
         recordManager = new RecordManager();

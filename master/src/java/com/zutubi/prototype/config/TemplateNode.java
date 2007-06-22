@@ -97,4 +97,27 @@ public class TemplateNode
             return PathUtils.getPath(parent.getTemplatePath(), id);
         }
     }
+
+    public void forEachDescendent(NodeHandler callback)
+    {
+        for(TemplateNode node: children)
+        {
+            if(callback.handle(node))
+            {
+                node.forEachDescendent(callback);
+            }
+        }
+    }
+    
+    public interface NodeHandler
+    {
+        /**
+         * Called with a node to be processed.  May optionally abort
+         * processing the descendents of this node.
+         *
+         * @param node the node to process
+         * @return true to process this node's descendents
+         */
+        boolean handle(TemplateNode node);
+    }
 }

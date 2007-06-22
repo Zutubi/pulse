@@ -1,9 +1,9 @@
 package com.zutubi.prototype.type.record;
 
-import com.zutubi.util.CollectionUtils;
-import com.zutubi.util.Predicate;
-
-import java.util.*;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * Simple record that holds key:value data, along with meta data.
@@ -112,17 +112,6 @@ public class MutableRecordImpl extends AbstractMutableRecord
                 data.put(key, value);
             }
         }
-    }
-
-    public Set<String> simpleKeySet()
-    {
-        return CollectionUtils.filter(keySet(), new Predicate<String>()
-        {
-            public boolean satisfied(String s)
-            {
-                return !(get(s) instanceof Record);
-            }
-        }, new HashSet<String>(data.size()));
     }
 
     public Collection<Object> values()
