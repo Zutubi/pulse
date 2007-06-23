@@ -350,9 +350,16 @@ public class CompositeType extends AbstractType implements ComplexType
         }
     }
 
+    public Type getDeclaredPropertyType(String propertyName)
+    {
+        TypeProperty property = properties.get(propertyName);
+        return property == null ? null : property.getType();
+    }
+
     public Type getActualPropertyType(String propertyName, Object propertyValue)
     {
-        return properties.get(propertyName).getType().getActualType(propertyValue);
+        TypeProperty property = properties.get(propertyName);
+        return property == null ? null : property.getType().getActualType(propertyValue);
     }
 
     public Type getPropertyType(String key)

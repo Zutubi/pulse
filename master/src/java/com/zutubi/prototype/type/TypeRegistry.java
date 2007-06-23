@@ -181,7 +181,7 @@ public class TypeRegistry
                 property.setSetter(descriptor.getWriteMethod());
 
                 // extract annotations for this property, from the getter, setter
-                property.setAnnotations(AnnotationUtils.annotationsFromProperty(descriptor));
+                property.setAnnotations(AnnotationUtils.annotationsFromProperty(descriptor, true));
 
                 if(property.getAnnotation(Transient.class) != null)
                 {

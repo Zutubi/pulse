@@ -844,6 +844,11 @@ table.detail td li
     background: #e0e0ff;
 }
 
+.field-no-override, textarea.field-no-override
+{
+    background: #f0f0f0;
+}
+
 /*
 .x-item-disabled
 {

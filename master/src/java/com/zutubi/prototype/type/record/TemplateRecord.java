@@ -1,8 +1,10 @@
 package com.zutubi.prototype.type.record;
 
+import com.zutubi.config.annotations.NoInherit;
 import com.zutubi.prototype.type.CollectionType;
 import com.zutubi.prototype.type.ComplexType;
 import com.zutubi.prototype.type.CompositeType;
+import com.zutubi.prototype.type.TypeProperty;
 
 import java.util.Collection;
 import java.util.HashSet;
@@ -25,7 +27,7 @@ public class TemplateRecord extends AbstractRecord
         this.type = type;
         this.moi = moi;
 
-        if(type instanceof CollectionType)
+        if (type instanceof CollectionType)
         {
             declaredOrder = CollectionType.getDeclaredOrder(moi);
         }
@@ -89,19 +91,49 @@ public class TemplateRecord extends AbstractRecord
 
     private Object getInherited(String key)
     {
-        // If we have no parent or we have a declared order that omits this
-        // key, we cannot inherit a value.
-        if(parent == null || declaredOrder != null && !declaredOrder.contains(key))
+        if (canInherit(key))
+        {
+            return parent.get(key);
+        }
+        else
         {
             return null;
         }
+    }
 
-        return parent.get(key);
+    private boolean canInherit(String key)
+    {
+        // No parent, nothing to inherit.
+        if (parent == null)
+        {
+            return false;
+        }
+
+        // If we have a declared order that omits this key, we cannot inherit
+        // a value.
+        if (declaredOrder != null && !declaredOrder.contains(key))
+        {
+            return false;
+        }
+
+        // Composite properties explicitly marked NoInherit cannot be
+        // inherited.
+        if (type instanceof CompositeType)
+        {
+            CompositeType ctype = (CompositeType) type;
+            TypeProperty property = ctype.getProperty(key);
+            if (property != null && property.getAnnotation(NoInherit.class) != null)
+            {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     public Set<String> keySet()
     {
-        if(declaredOrder != null)
+        if (declaredOrder != null)
         {
             return new HashSet<String>(declaredOrder);
         }
@@ -125,40 +157,10 @@ public class TemplateRecord extends AbstractRecord
         return flatten().values();
     }
 
-//    private Map<String, Object> getMergedMap()
-//    {
-//        Map<String, Object> mergedMap = new HashMap<String, Object>();
-//        if (parent != null)
-//        {
-//            Map<String, Object> parentMerged = parent.getMergedMap();
-//            if(declaredOrder == null)
-//            {
-//                mergedMap.putAll(parentMerged);
-//            }
-//            else
-//            {
-//                for(Map.Entry<String, Object> entry: parentMerged.entrySet())
-//                {
-//                    if(declaredOrder.contains(entry.getKey()))
-//                    {
-//                        mergedMap.put(entry.getKey(), entry.getValue());
-//                    }
-//                }
-//            }
-//        }
-//
-//        for (String key : moi.keySet())
-//        {
-//            mergedMap.put(key, moi.get(key));
-//        }
-//
-//        return mergedMap;
-//    }
-
     public MutableRecord flatten()
     {
         MutableRecord record = new MutableRecordImpl();
-        for(String metaKey: metaKeySet())
+        for (String metaKey : metaKeySet())
         {
             if (!metaKey.equals(HANDLE_KEY))
             {
@@ -166,14 +168,14 @@ public class TemplateRecord extends AbstractRecord
             }
         }
 
-        for(String key: keySet())
+        for (String key : keySet())
         {
             Object value = get(key);
-            if(value instanceof TemplateRecord)
+            if (value instanceof TemplateRecord)
             {
-                value = ((TemplateRecord)value).flatten();
+                value = ((TemplateRecord) value).flatten();
             }
-            
+
             record.put(key, value);
         }
 
@@ -218,15 +220,21 @@ public class TemplateRecord extends AbstractRecord
 
     private boolean isSignificant(ComplexType type, String key, Object value)
     {
-        if(value == null)
+        // If we can't inherit a value, we own it even if it is null.
+        if (!canInherit(key))
+        {
+            return true;
+        }
+
+        if (value == null)
         {
             return false;
         }
 
-        if(value instanceof Record)
+        if (value instanceof Record)
         {
             Record record = (Record) value;
-            if(record.isCollection())
+            if (record.isCollection())
             {
                 // Only ordered collections have an owner, and that is
                 // whoever's order applies.  If there is no order, the
@@ -236,9 +244,9 @@ public class TemplateRecord extends AbstractRecord
             else
             {
                 CompositeType actualType = (CompositeType) type.getActualPropertyType(key, value);
-                for(String property: actualType.getPropertyNames())
+                for (String property : actualType.getPropertyNames())
                 {
-                    if(isSignificant(actualType, property, record.get(property)))
+                    if (isSignificant(actualType, property, record.get(property)))
                     {
                         return true;
                     }
@@ -247,10 +255,8 @@ public class TemplateRecord extends AbstractRecord
                 return false;
             }
         }
-        else
-        {
-            return true;
-        }
+
+        return true;
     }
 
     public MutableRecord copy(boolean deep)

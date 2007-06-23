@@ -5,6 +5,10 @@ form.items.last().on('render', function(field)
     linkEl.on('click', function(e) { field.fireEvent('browse', field); e.preventDefault(); });
 </#if>
 
+<#if parameters.noOverride?exists>
+    field.getEl().addClass('field-no-override');
+</#if>
+
 <#if parameters.inheritedFrom?exists>
     var inheritedEl = Ext.DomHelper.append(field.getEl().dom.parentNode, { tag: 'img', alt: 'inherited', src: '${base}/images/inherited.gif', id: '${parameters.id}.inherited'}, true);
     inheritedEl.dom.qtip = 'value inherited from ${parameters.inheritedFrom}';

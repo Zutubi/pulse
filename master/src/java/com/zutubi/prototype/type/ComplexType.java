@@ -17,6 +17,8 @@ public interface ComplexType extends Type
 
     boolean isTemplated();
 
+    Type getDeclaredPropertyType(String propertyName);
+
     Type getActualPropertyType(String propertyName, Object propertyValue);
 
 }

@@ -96,6 +96,11 @@ public abstract class CollectionType extends AbstractType implements ComplexType
         return false;
     }
 
+    public Type getDeclaredPropertyType(String propertyName)
+    {
+        return collectionType;
+    }
+
     public Type getActualPropertyType(String propertyName, Object propertyValue)
     {
         return collectionType.getActualType(propertyValue);

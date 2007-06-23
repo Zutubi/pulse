@@ -193,10 +193,10 @@ public class ConfigurationTemplateManager
         // Determine the path at which the record will be inserted.  This is
         // type-dependent.
         String newPath = type.getInsertionPath(path, record);
-        CompositeType expectedType;
+        Type expectedType;
         if (type instanceof CollectionType)
         {
-            expectedType = (CompositeType) type.getTargetType();
+            expectedType = type.getTargetType();
         }
         else
         {
@@ -204,8 +204,7 @@ public class ConfigurationTemplateManager
             // must represent data for that objects specified property.
             String parentPath = PathUtils.getParentPath(path);
             CompositeType parentType = (CompositeType) configurationPersistenceManager.getType(parentPath);
-            TypeProperty property = parentType.getProperty(PathUtils.getBaseName(path));
-            expectedType = (CompositeType) property.getType();
+            expectedType = parentType.getDeclaredPropertyType(PathUtils.getBaseName(path));
         }
 
         CompositeType actualType = checkRecordType(expectedType, record);
@@ -283,13 +282,6 @@ public class ConfigurationTemplateManager
         TemplateRecord parent = new TemplateRecord(null, null, type, skeleton);
         TemplateRecord template = new TemplateRecord(null, parent, type, record);
         return template.flatten();
-//        for (String key : skeleton.keySet())
-//        {
-//            if (record.get(key) == null)
-//            {
-//                record.put(key, skeleton.get(key));
-//            }
-//        }
     }
 
     private Record createSkeletonRecord(ComplexType type, Record record)
@@ -305,11 +297,17 @@ public class ConfigurationTemplateManager
         return result;
     }
 
-    private CompositeType checkRecordType(CompositeType expectedType, MutableRecord record)
+    private CompositeType checkRecordType(Type expectedType, MutableRecord record)
     {
+        if(!(expectedType instanceof CompositeType))
+        {
+            throw new IllegalArgumentException("Expected a composite type, but instead found " + expectedType.getClass().getName());
+        }
+
+        CompositeType ctype = (CompositeType) expectedType;
         List<String> allowedTypes = new LinkedList<String>();
-        allowedTypes.add(expectedType.getSymbolicName());
-        allowedTypes.addAll(expectedType.getExtensions());
+        allowedTypes.add(ctype.getSymbolicName());
+        allowedTypes.addAll(ctype.getExtensions());
         CompositeType recordType = typeRegistry.getType(record.getSymbolicName());
         if (!allowedTypes.contains(record.getSymbolicName()))
         {
@@ -527,17 +525,12 @@ public class ConfigurationTemplateManager
         }
 
         String parentPath = PathUtils.getParentPath(path);
-        checkPersistent(parentPath);
-
-        Record parentRecord = getRecord(parentPath);
-        if (parentRecord == null)
-        {
-            throw new IllegalArgumentException("Invalid parent path '" + parentPath + "'");
-        }
-
         ComplexType parentType = configurationPersistenceManager.getType(parentPath);
         String newPath = parentType.getSavePath(path, record);
-        
+
+        // Type check of incoming record.
+        CompositeType actualType = checkRecordType(parentType.getDeclaredPropertyType(PathUtils.getBaseName(newPath)), record);
+
         MutableRecord newRecord;
         // See if this is a templated scope: in which case more magic needs
         // to happen.
@@ -551,15 +544,20 @@ public class ConfigurationTemplateManager
 
             // Scrub values from the incoming record where they are identical
             // to the existing record's parent.
-            // Perhaps we could use an iterator to remove, but does Record
-            // specify what happens when removing using a key set iterator?
             TemplateRecord existingParent = templateRecord.getParent();
             if (existingParent != null)
             {
+                // We add an empty layer where we are about to add the new
+                // record in case there are any values hidden from the parent
+                // via templating rules (like NoInherit).
+                TemplateRecord emptyChild = new TemplateRecord(null, existingParent, actualType, actualType.createNewRecord(false));
                 Set<String> dead = new HashSet<String>();
+
+                // Perhaps we could use an iterator to remove, but does Record
+                // specify what happens when removing using a key set iterator?
                 for (String key : newRecord.keySet())
                 {
-                    if (newRecord.get(key).equals(existingParent.get(key)))
+                    if (newRecord.get(key).equals(emptyChild.get(key)))
                     {
                         dead.add(key);
                     }
@@ -569,12 +567,6 @@ public class ConfigurationTemplateManager
                 {
                     newRecord.remove(key);
                 }
-            }
-
-            // If there is nothing to save, bail now.
-            if (templateRecord.getMoi().equals(newRecord))
-            {
-                return path;
             }
         }
         else
@@ -594,7 +586,9 @@ public class ConfigurationTemplateManager
         }
         else
         {
-            // We need to update the path by moving
+            // We need to update the path by moving.  If templating, this
+            // means also moving all children.
+
             recordManager.move(path, newPath);
             recordManager.update(newPath, newRecord);
         }

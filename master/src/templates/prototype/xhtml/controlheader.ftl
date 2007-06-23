@@ -7,3 +7,7 @@
 <#if parameters.name?exists>
     fieldConfig.name = '${parameters.name?js_string}';
 </#if>
+<#if parameters.noOverride?exists>
+    fieldConfig.readOnly = true;
+</#if>
+

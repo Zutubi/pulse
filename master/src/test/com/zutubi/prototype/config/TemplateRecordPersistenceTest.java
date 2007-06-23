@@ -1,5 +1,6 @@
 package com.zutubi.prototype.config;
 
+import com.zutubi.config.annotations.NoInherit;
 import com.zutubi.config.annotations.SymbolicName;
 import com.zutubi.prototype.type.CompositeType;
 import com.zutubi.prototype.type.TemplatedMapType;
@@ -22,6 +23,9 @@ public class TemplateRecordPersistenceTest extends AbstractConfigurationSystemTe
     private CompositeType propertyType;
     private CompositeType stageType;
     private static final String GLOBAL_PROJECT = "global";
+    private static final String GLOBAL_DESCRIPTION = "this is the daddy of them all";
+    private static final String CHILD_PROJECT = "child";
+    private static final String CHILD_DESCRIPTION = "my own way baby!";
 
     protected void setUp() throws Exception
     {
@@ -53,7 +57,7 @@ public class TemplateRecordPersistenceTest extends AbstractConfigurationSystemTe
         assertEquals(GLOBAL_PROJECT, record.get("name"));
         assertEquals(GLOBAL_PROJECT, record.getOwner("name"));
 
-        assertEquals("this is the daddy of them all", record.get("description"));
+        assertEquals(GLOBAL_DESCRIPTION, record.get("description"));
         assertEquals(GLOBAL_PROJECT, record.getOwner("description"));
 
         assertNull(record.get("url"));
@@ -140,8 +144,8 @@ public class TemplateRecordPersistenceTest extends AbstractConfigurationSystemTe
         assertEquals(GLOBAL_PROJECT, parent.getOwner("name"));
         assertNull(parent.getParent());
 
-        assertEquals("child", childTemplate.getOwner());
-        assertEquals("child", childTemplate.get("name"));
+        assertEquals(CHILD_PROJECT, childTemplate.getOwner());
+        assertEquals(CHILD_PROJECT, childTemplate.get("name"));
         assertEquals("inherited url", childTemplate.get("url"));
         assertEquals(GLOBAL_PROJECT, childTemplate.getOwner("url"));
     }
@@ -149,16 +153,16 @@ public class TemplateRecordPersistenceTest extends AbstractConfigurationSystemTe
     public void testSimpleOverride()
     {
         insertGlobal();
-        MutableRecord child = createProject("child", "my own way baby!");
+        MutableRecord child = createProject(CHILD_PROJECT, CHILD_DESCRIPTION);
         child.put("url", "override url");
         configurationTemplateManager.setParentTemplate(child, configurationTemplateManager.getRecord("project/global").getHandle());
         configurationTemplateManager.insertRecord("project", child);
 
         TemplateRecord childTemplate = (TemplateRecord) configurationTemplateManager.getRecord("project/child");
-        assertEquals("child", childTemplate.getOwner());
-        assertEquals("child", childTemplate.get("name"));
+        assertEquals(CHILD_PROJECT, childTemplate.getOwner());
+        assertEquals(CHILD_PROJECT, childTemplate.get("name"));
         assertEquals("override url", childTemplate.get("url"));
-        assertEquals("child", childTemplate.getOwner("url"));
+        assertEquals(CHILD_PROJECT, childTemplate.getOwner("url"));
     }
 
     public void testInheritedMap()
@@ -167,11 +171,11 @@ public class TemplateRecordPersistenceTest extends AbstractConfigurationSystemTe
         insertChild();
 
         TemplateRecord childTemplate = (TemplateRecord) configurationTemplateManager.getRecord("project/child");
-        assertEquals("child", childTemplate.getOwner());
+        assertEquals(CHILD_PROJECT, childTemplate.getOwner());
         assertEquals(GLOBAL_PROJECT, childTemplate.getOwner("stages"));
 
-        assertDefaultStages((TemplateRecord) childTemplate.get("stages"), "child");
-        assertDefaultStages((TemplateRecord) configurationTemplateManager.getRecord("project/child/stages"), "child");
+        assertDefaultStages((TemplateRecord) childTemplate.get("stages"), CHILD_PROJECT);
+        assertDefaultStages((TemplateRecord) configurationTemplateManager.getRecord("project/child/stages"), CHILD_PROJECT);
     }
 
     public void testInheritedList()
@@ -182,7 +186,7 @@ public class TemplateRecordPersistenceTest extends AbstractConfigurationSystemTe
         configurationTemplateManager.insertRecord("project/global/propertiesList", createProperty("gp1", "gv1"));
 
         TemplateRecord childTemplate = (TemplateRecord) configurationTemplateManager.getRecord("project/child");
-        assertEquals("child", childTemplate.getOwner());
+        assertEquals(CHILD_PROJECT, childTemplate.getOwner());
         assertEquals(GLOBAL_PROJECT, childTemplate.getOwner("propertiesList"));
 
         assertInheritedList((TemplateRecord) childTemplate.get("propertiesList"));
@@ -193,11 +197,11 @@ public class TemplateRecordPersistenceTest extends AbstractConfigurationSystemTe
     {
         assertEquals(1, propertiesList.size());
         String key = propertiesList.keySet().iterator().next();
-        assertEquals("child", propertiesList.getOwner());
+        assertEquals(CHILD_PROJECT, propertiesList.getOwner());
         assertEquals(GLOBAL_PROJECT, propertiesList.getOwner(key));
 
         TemplateRecord property = (TemplateRecord) propertiesList.get(key);
-        assertEquals("child", property.getOwner());
+        assertEquals(CHILD_PROJECT, property.getOwner());
         assertEquals(GLOBAL_PROJECT, property.getOwner("name"));
         assertEquals("gp1", property.get("name"));
     }
@@ -236,7 +240,7 @@ public class TemplateRecordPersistenceTest extends AbstractConfigurationSystemTe
         configurationTemplateManager.saveRecord("project/child/property", overridingProperty);
         childProperty = (TemplateRecord) configurationTemplateManager.getRecord("project/child/property");
         assertEquals(GLOBAL_PROJECT, childProperty.getOwner("name"));
-        assertEquals("child", childProperty.getOwner("value"));
+        assertEquals(CHILD_PROJECT, childProperty.getOwner("value"));
     }
 
     public void testSaveInheritedNested()
@@ -257,7 +261,7 @@ public class TemplateRecordPersistenceTest extends AbstractConfigurationSystemTe
         configurationTemplateManager.saveRecord("project/child/properties/p", overridingProperty);
         childProperty = (TemplateRecord) configurationTemplateManager.getRecord("project/child/properties/p");
         assertEquals(GLOBAL_PROJECT, childProperty.getOwner("name"));
-        assertEquals("child", childProperty.getOwner("value"));
+        assertEquals(CHILD_PROJECT, childProperty.getOwner("value"));
     }
 
     public void testSaveRevertingToParentValue()
@@ -282,6 +286,27 @@ public class TemplateRecordPersistenceTest extends AbstractConfigurationSystemTe
         assertEquals(GLOBAL_PROJECT, childProperty.getOwner("value"));
     }
 
+    public void testNoInheritValuesAreNotScrubbed()
+    {
+        // If a we save a value to a child NoInherit property that is the
+        // same as the value in the parent, it should *not* be scrubbed.
+        insertGlobal();
+        insertChild();
+
+        TemplateRecord child = (TemplateRecord) configurationTemplateManager.getRecord("project/child");
+        assertEquals(CHILD_PROJECT, child.getOwner("description"));
+        assertEquals(CHILD_DESCRIPTION, child.get("description"));
+        MutableRecord record = child.flatten();
+        
+        record.put("description", GLOBAL_DESCRIPTION);
+        configurationTemplateManager.saveRecord("project/child", record);
+
+        child = (TemplateRecord) configurationTemplateManager.getRecord("project/child");
+        assertEquals(CHILD_PROJECT, child.getOwner("description"));
+        assertEquals(GLOBAL_DESCRIPTION, child.get("description"));
+        assertEquals(GLOBAL_DESCRIPTION, child.getMoi().get("description"));
+    }
+
     private void insertGlobal()
     {
         MutableRecord global = createGlobal();
@@ -290,7 +315,7 @@ public class TemplateRecordPersistenceTest extends AbstractConfigurationSystemTe
 
     private MutableRecord createGlobal()
     {
-        MutableRecord record = createProject(GLOBAL_PROJECT, "this is the daddy of them all");
+        MutableRecord record = createProject(GLOBAL_PROJECT, GLOBAL_DESCRIPTION);
         configurationTemplateManager.markAsTemplate(record);
         return record;
     }
@@ -303,7 +328,7 @@ public class TemplateRecordPersistenceTest extends AbstractConfigurationSystemTe
 
     private MutableRecord createChild()
     {
-        MutableRecord child = createProject("child", "my own way baby!");
+        MutableRecord child = createProject(CHILD_PROJECT, CHILD_DESCRIPTION);
         configurationTemplateManager.setParentTemplate(child, configurationTemplateManager.getRecord("project/global").getHandle());
         return child;
     }
@@ -363,6 +388,7 @@ public class TemplateRecordPersistenceTest extends AbstractConfigurationSystemTe
     @SymbolicName("project")
     public static class Project extends AbstractNamedConfiguration
     {
+        @NoInherit
         private String description;
         private String url;
         private Property property;

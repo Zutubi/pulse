@@ -16,7 +16,22 @@ import java.util.*;
  */
 public class AnnotationUtils
 {
-    public static List<Annotation> annotationsFromProperty(final PropertyDescriptor property) throws IntrospectionException
+    /**
+     * Finds all annotations attached to the give property.  Annotations can
+     * be found on the read and write methods as well as the field
+     * declaration if one exists.  The inheritance hierarchy is also
+     * searched, so if property appears in the superclass, annotations in the
+     * superclass are also included.  Finally, if includeMeta is true,
+     * annotations on the annotations found will also be included,
+     * transitively.
+     *
+     * @param property    the property to retrieve annotations for
+     * @param includeMeta if true, meta-annotations (annotations on
+     *                    annotations) are also included
+     * @return the annotations for the given property
+     * @throws IntrospectionException if reflection fails
+     */
+    public static List<Annotation> annotationsFromProperty(final PropertyDescriptor property, boolean includeMeta) throws IntrospectionException
     {
         List<Annotation> annotations = new LinkedList<Annotation>();
 
@@ -48,22 +63,62 @@ public class AnnotationUtils
                 // noop.
             }
 
+            // Look for the meta annotations now.  Meta annotations for
+            // superclass properties are found by the mutual recursion into
+            // this method.
+            if (includeMeta)
+            {
+                annotations = addMetaAnnotations(annotations);
+            }
+
             Class superClass = declaringClass.getSuperclass();
             if (superClass != null && superClass != Object.class)
             {
-                processSuper(superClass, property, annotations);
+                processSuper(superClass, property, annotations, includeMeta);
             }
 
             for (Class superInterface : declaringClass.getInterfaces())
             {
-                processSuper(superInterface, property, annotations);
+                processSuper(superInterface, property, annotations, includeMeta);
             }
         }
 
         return annotations;
     }
 
-    private static void processSuper(Class superClass, final PropertyDescriptor property, List<Annotation> annotations) throws IntrospectionException
+    private static List<Annotation> addMetaAnnotations(List<Annotation> annotations)
+    {
+        Set<Class<? extends Annotation>> seenTypes = new HashSet<Class<? extends Annotation>>();
+        CollectionUtils.map(annotations, new Mapping<Annotation, Class<? extends Annotation>>()
+        {
+            public Class<? extends Annotation> map(Annotation annotation)
+            {
+                return annotation.annotationType();
+            }
+        }, seenTypes);
+
+        List<Annotation> result = new LinkedList<Annotation>();
+        Queue<Annotation> toProcess = new LinkedList<Annotation>(annotations);
+        while (!toProcess.isEmpty())
+        {
+            Annotation a = toProcess.remove();
+            result.add(a);
+            
+            Class<? extends Annotation> type = a.annotationType();
+            seenTypes.add(type);
+            for (Annotation meta : type.getAnnotations())
+            {
+                if (!seenTypes.contains(meta.annotationType()))
+                {
+                    toProcess.offer(meta);
+                }
+            }
+        }
+
+        return result;
+    }
+
+    private static void processSuper(Class superClass, final PropertyDescriptor property, List<Annotation> annotations, boolean includeMeta) throws IntrospectionException
     {
         BeanInfo superInfo = Introspector.getBeanInfo(superClass);
         PropertyDescriptor superDescriptor = CollectionUtils.find(superInfo.getPropertyDescriptors(), new Predicate<PropertyDescriptor>()
@@ -76,7 +131,7 @@ public class AnnotationUtils
 
         if (superDescriptor != null)
         {
-            annotations.addAll(annotationsFromProperty(superDescriptor));
+            annotations.addAll(annotationsFromProperty(superDescriptor, includeMeta));
         }
     }
 
@@ -162,7 +217,7 @@ public class AnnotationUtils
 
     public static <T extends Annotation> T findAnnotation(PropertyDescriptor property, Class<T> clazz) throws IntrospectionException
     {
-        List<Annotation> from = annotationsFromProperty(property);
+        List<Annotation> from = annotationsFromProperty(property, false);
         return findAnnotation(from, clazz);
     }
 
@@ -215,7 +270,7 @@ public class AnnotationUtils
         BeanInfo beanInfo = Introspector.getBeanInfo(clazz);
         for (PropertyDescriptor descriptor : beanInfo.getPropertyDescriptors())
         {
-            List<Annotation> annotations = AnnotationUtils.annotationsFromProperty(descriptor);
+            List<Annotation> annotations = AnnotationUtils.annotationsFromProperty(descriptor, false);
             for (Annotation a : annotations)
             {
                 if (a.annotationType() == annotationType)
