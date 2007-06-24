@@ -61,10 +61,10 @@ public class TemplateRecordPersistenceTest extends AbstractConfigurationSystemTe
         assertEquals(GLOBAL_PROJECT, record.getOwner("description"));
 
         assertNull(record.get("url"));
-        assertNull(record.getOwner("url"));
+        assertEquals(GLOBAL_PROJECT, record.getOwner("url"));
 
         assertNull(record.get("property"));
-        assertNull(record.getOwner("property"));
+        assertEquals(GLOBAL_PROJECT, record.getOwner("property"));
 
         assertEmptyCollection(record, "properties");
 

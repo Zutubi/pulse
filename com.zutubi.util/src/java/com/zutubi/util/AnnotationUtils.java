@@ -16,6 +16,8 @@ import java.util.*;
  */
 public class AnnotationUtils
 {
+    private static final Package ANNOTATION_PACKAGE = Package.getPackage("java.lang.annotation");
+
     /**
      * Finds all annotations attached to the give property.  Annotations can
      * be found on the read and write methods as well as the field
@@ -108,7 +110,7 @@ public class AnnotationUtils
             seenTypes.add(type);
             for (Annotation meta : type.getAnnotations())
             {
-                if (!seenTypes.contains(meta.annotationType()))
+                if (isUserDeclared(meta.annotationType()) && !seenTypes.contains(meta.annotationType()))
                 {
                     toProcess.offer(meta);
                 }
@@ -116,6 +118,11 @@ public class AnnotationUtils
         }
 
         return result;
+    }
+
+    private static boolean isUserDeclared(Class<? extends Annotation> annotationType)
+    {
+        return annotationType.getPackage() != ANNOTATION_PACKAGE;
     }
 
     private static void processSuper(Class superClass, final PropertyDescriptor property, List<Annotation> annotations, boolean includeMeta) throws IntrospectionException

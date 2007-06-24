@@ -51,14 +51,15 @@ public class TypeRegistryTest extends TestCase
 
     public void testAnnotations() throws TypeException
     {
+        // Note that the registry also gathers meta-annotations.
         CompositeType type = typeRegistry.register("mockName", Mock.class);
         assertEquals(1, type.getAnnotations().size());
         TypeProperty propertyType = type.getProperty("name");
-        assertEquals(1, propertyType.getAnnotations().size());
+        assertEquals(3, propertyType.getAnnotations().size());
         propertyType = type.getProperty("mock");
         assertEquals(0, propertyType.getAnnotations().size());
         propertyType = type.getProperty("anotherMock");
-        assertEquals(1, propertyType.getAnnotations().size());
+        assertEquals(2, propertyType.getAnnotations().size());
     }
 
     public void testPropertyTypes() throws TypeException
