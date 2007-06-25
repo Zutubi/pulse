@@ -307,6 +307,34 @@ public class TemplateRecordPersistenceTest extends AbstractConfigurationSystemTe
         assertEquals(GLOBAL_DESCRIPTION, child.getMoi().get("description"));
     }
 
+    public void testRenameInherited()
+    {
+        // If we rename something that is inherited, the inherited value
+        // needs to be renamed too.
+        insertGlobal();
+        insertChild();
+        configurationTemplateManager.insertRecord("project/child/stages/default/properties", createProperty("foo", "bar"));
+
+        TemplateRecord stageTemplate = (TemplateRecord) configurationTemplateManager.getRecord("project/global/stages/default");
+        MutableRecord record = stageTemplate.flatten();
+        record.put("name", "newname");
+        String newPath = configurationTemplateManager.saveRecord("project/global/stages/default", record);
+        assertEquals("project/global/stages/newname", newPath);
+
+        stageTemplate = (TemplateRecord) configurationTemplateManager.getRecord(newPath);
+        assertEquals(GLOBAL_PROJECT, stageTemplate.getOwner("name"));
+        assertEquals("newname", stageTemplate.get("name"));
+
+        assertNull(configurationTemplateManager.getRecord("project/child/stages/default"));
+        
+        stageTemplate = (TemplateRecord) configurationTemplateManager.getRecord("project/child/stages/newname");
+        assertEquals(GLOBAL_PROJECT, stageTemplate.getOwner("name"));
+        assertEquals("newname", stageTemplate.get("name"));
+
+        TemplateRecord movedProperty = (TemplateRecord) configurationTemplateManager.getRecord("project/child/stages/newname/properties/foo");
+        assertEquals("foo", movedProperty.get("name"));
+    }
+
     private void insertGlobal()
     {
         MutableRecord global = createGlobal();
@@ -368,8 +396,11 @@ public class TemplateRecordPersistenceTest extends AbstractConfigurationSystemTe
         assertEquals(1, stages.size());
         assertEquals(owner, stages.getOwner());
         assertEquals(GLOBAL_PROJECT, stages.getOwner("default"));
+        assertDefaultStage((TemplateRecord) stages.get("default"), owner);
+    }
 
-        TemplateRecord stage = (TemplateRecord) stages.get("default");
+    private void assertDefaultStage(TemplateRecord stage, String owner)
+    {
         assertEquals(owner, stage.getOwner());
         assertEquals(GLOBAL_PROJECT, stage.getOwner("name"));
         assertEquals("default", stage.get("name"));

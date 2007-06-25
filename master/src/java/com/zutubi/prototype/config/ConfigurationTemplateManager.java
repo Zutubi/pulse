@@ -588,6 +588,28 @@ public class ConfigurationTemplateManager
         {
             // We need to update the path by moving.  If templating, this
             // means also moving all children.
+            if(existingRecord instanceof TemplateRecord)
+            {
+                String[] elements = PathUtils.getPathElements(path);
+                final String scope = elements[0];
+                String newName = PathUtils.getBaseName(newPath);
+
+                final String oldRemainderPath = PathUtils.getPath(2, elements);
+                final String newRemainderPath = PathUtils.getPath(PathUtils.getParentPath(oldRemainderPath), newName);
+                TemplateHierarchy hierarchy = getTemplateHierarchy(scope);
+                TemplateNode node = hierarchy.getNodeById(elements[1]);
+
+                node.forEachDescendent(new TemplateNode.NodeHandler()
+                {
+                    public boolean handle(TemplateNode templateNode)
+                    {
+                        String oldDescendentPath = PathUtils.getPath(scope, templateNode.getId(), oldRemainderPath);
+                        String newDescendentPath = PathUtils.getPath(scope, templateNode.getId(), newRemainderPath);
+                        recordManager.move(oldDescendentPath, newDescendentPath);
+                        return true;
+                    }
+                });
+            }
 
             recordManager.move(path, newPath);
             recordManager.update(newPath, newRecord);
