@@ -1,6 +1,41 @@
 <#include "/prototype/xhtml/checkbox.ftl" />
 (function()
 {
+    function _enable(form, field)
+    {
+        field.enable();
+
+        <#-- lookup and enable the fields label and inline help text. -->
+        var labelDomEl = Ext.query("//[@for='"+field.getId()+"']", form.el.dom)[0];
+        if (labelDomEl)
+        {
+            Ext.get(labelDomEl).removeClass('x-item-disabled');
+        }
+        var helpDomEl = Ext.query("//[@id='"+field.getId()+"-inline-help']", form.el.dom)[0];
+        if (helpDomEl)
+        {
+            Ext.get(helpDomEl).removeClass('x-item-disabled');
+        }
+    }
+
+    function _disable(form, field)
+    {
+        field.clearInvalid();
+        field.disable();
+
+        var labelDomEl = Ext.query("//[@for='"+field.getId()+"']", form.el.dom)[0];
+        if (labelDomEl)
+        {
+            Ext.get(labelDomEl).addClass('x-item-disabled');
+        }
+        var helpDomEl = Ext.query("//[@id='"+field.getId()+"-inline-help']", form.el.dom)[0];
+        if (helpDomEl)
+        {
+            Ext.get(helpDomEl).addClass('x-item-disabled');
+        }
+    }
+
+
     function setEnabledState(checkbox)
     {
         if(!form.rendered)
@@ -14,13 +49,13 @@
         if(enabled)
         {
         <#list parameters.dependentFields as dependent>
-            form.findField('${dependent}').enable();
+            _enable(form, form.findField('${dependent}'));
         </#list>
         }
         else
         {
         <#list parameters.dependentFields as dependent>
-            form.findField('${dependent}').disable();
+            _disable(form, form.findField('${dependent}'));
         </#list>
         }
     <#else>
@@ -31,34 +66,11 @@
             {
                 if(enabled)
                 {
-                    field.enable();
-
-                    var labelDomEl = Ext.query("//[@for='"+field.getId()+"']", form.el.dom)[0];
-                    if (labelDomEl)
-                    {
-                        Ext.get(labelDomEl).removeClass('x-item-disabled');
-                    }
-                    var helpDomEl = Ext.query("//[@id='"+field.getId()+"-inline-help']", form.el.dom)[0];
-                    if (helpDomEl)
-                    {
-                        Ext.get(helpDomEl).removeClass('x-item-disabled');
-                    }
+                    _enable(form, field);
                 }
                 else
                 {
-                    field.clearInvalid();
-                    field.disable();
-                    
-                    var labelDomEl = Ext.query("//[@for='"+field.getId()+"']", form.el.dom)[0];
-                    if (labelDomEl)
-                    {
-                        Ext.get(labelDomEl).addClass('x-item-disabled');
-                    }
-                    var helpDomEl = Ext.query("//[@id='"+field.getId()+"-inline-help']", form.el.dom)[0];
-                    if (helpDomEl)
-                    {
-                        Ext.get(helpDomEl).addClass('x-item-disabled');
-                    }
+                    _disable(form, field);
                 }
             }
         });
