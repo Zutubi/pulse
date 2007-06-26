@@ -1,5 +1,5 @@
 <table>
-<#assign tablewidth = table.columns?size + table.actions?size/>
+<#assign tablewidth = table.columns?size + 1/>
     <tr>
         <th class="heading" colspan="${tablewidth}">${"table.header.label"?i18n}</th>
     </tr>
@@ -8,26 +8,27 @@
 <#assign header>${column.name}.label</#assign>
         <th class="content" colspan="1">${header?i18n}</th>
 </#list>
-<#if table.actions?size &gt; 0>
-        <th class="content" colspan="${table.actions?size}">${"actions.label"?i18n}</th>
-</#if>
+        <th class="content" colspan="1">${"actions.label"?i18n}</th>
     </tr>
 <#if data?exists && data?size &gt; 0>
 <#list data as item>
     <tr>
 <#list table.columns as column>
-        <td class="content"><#if item[column.name]?exists>${item[column.name]?string}</#if></td>
+    <#assign value = column.getValue(item)/>
+        <td class="content">${value?string}</td>
 </#list>
-<#list table.actions as action>
-<#assign actionlabel>${action}.label</#assign>
+        <td class="content">
+<#list table.getActions(item) as action>
+    <#assign actionlabel>${action}.label</#assign>
 <#if action == "edit">
-        <td class="content"><a href="${base}/config/${item.configurationPath}">${"edit.label"?i18n}</a></td>
+        <a href="${base}/config/${item.configurationPath}">${"edit.label"?i18n}</a>
 <#elseif action == "delete">
-        <td class="content"><a href="${base}/config/${item.configurationPath}?${action}=confirm">${"delete.label"?i18n}</a>  </td>
+        <a href="${base}/config/${item.configurationPath}?${action}=confirm">${"delete.label"?i18n}</a>
 <#else>
-        <td class="content"><a href="${base}/config/${item.configurationPath}?${action}">${actionlabel?i18n}</a>  </td>
+        <a href="${base}/config/${item.configurationPath}?${action}">${actionlabel?i18n}</a>
 </#if>
 </#list>
+        </td>
     </tr>
 </#list>
 <#else>

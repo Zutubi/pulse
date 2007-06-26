@@ -42,12 +42,5 @@
 
     #buildColumnsPopup("all.projects" "popup")
 
-#authorize("ifAllGranted=ROLE_ADMINISTRATOR")
-    #licensed("require=canAddProject")
-        <a href="addProject!input.action" id="project.add"><img alt="add" src="$base/images/add.gif"/> #wwtext("name=add.project")</a>
-        &nbsp;
-    #end
-    <a href="addProjectGroup!input.action" id="project.group.add"><img alt="add" src="$base/images/add.gif"/> #wwtext("name=add.project.group")</a>
-#end
 </body>
 </html>

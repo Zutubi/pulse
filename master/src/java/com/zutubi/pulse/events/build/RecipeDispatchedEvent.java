@@ -41,7 +41,7 @@ public class RecipeDispatchedEvent extends RecipeEvent
         buff.append(": ").append(getRecipeId());
         if (getAgent() != null)
         {
-            buff.append(": ").append(getAgent().getAgentConfig().getName());
+            buff.append(": ").append(getAgent().getConfig().getName());
         }
         return buff.toString();
     }    

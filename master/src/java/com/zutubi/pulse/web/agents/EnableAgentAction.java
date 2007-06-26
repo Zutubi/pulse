@@ -17,7 +17,7 @@ public class EnableAgentAction extends AgentActionSupport
     {
         try
         {
-            getAgentManager().setAgentState(getAgent().getAgentConfig().getHandle(), AgentState.EnableState.valueOf(enable));
+            getAgentManager().setAgentState(getAgent().getConfig().getHandle(), AgentState.EnableState.valueOf(enable));
         }
         catch(IllegalArgumentException e)
         {

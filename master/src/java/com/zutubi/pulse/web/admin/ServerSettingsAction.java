@@ -34,6 +34,18 @@ public class ServerSettingsAction extends ActionSupport
     private License license;
     private List<LicenseRestriction> restrictions;
 
+    private String path;
+
+    public String getPath()
+    {
+        return path;
+    }
+
+    public void setPath(String path)
+    {
+        this.path = path;
+    }
+
     public MasterConfiguration getConfig()
     {
         return config;

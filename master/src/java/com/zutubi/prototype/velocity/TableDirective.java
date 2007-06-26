@@ -140,7 +140,7 @@ public class TableDirective extends PrototypeDirective
         {
             for (Object instance : data)
             {
-                wrappedData.add(new FormattingWrapper(instance, (CompositeType) type));
+                wrappedData.add(instance);//new FormattingWrapper(instance, (CompositeType) type));
             }
         }
         return wrappedData;

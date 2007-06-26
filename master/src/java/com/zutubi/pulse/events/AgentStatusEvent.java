@@ -25,7 +25,7 @@ public class AgentStatusEvent extends AgentEvent
         StringBuffer buff = new StringBuffer("Agent Status Event");
         if (getAgent() != null)
         {
-            buff.append(": ").append(getAgent().getAgentConfig().getName()).append(", ").append(oldStatus);
+            buff.append(": ").append(getAgent().getConfig().getName()).append(", ").append(oldStatus);
         }
         return buff.toString();
     }    

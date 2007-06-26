@@ -54,7 +54,7 @@ public class DefaultAgent implements Agent
         return agentService;
     }
 
-    public AgentState getAgentState()
+    public AgentState getState()
     {
         return agentState;
     }
@@ -81,7 +81,7 @@ public class DefaultAgent implements Agent
         this.status = status;
     }
 
-    public AgentConfiguration getAgentConfig()
+    public AgentConfiguration getConfig()
     {
         return agentConfig;
     }
@@ -126,6 +126,11 @@ public class DefaultAgent implements Agent
     public boolean isEnabled()
     {
         return agentState.isEnabled();
+    }
+
+    public boolean isDisabled()
+    {
+        return agentState.isDisabled();
     }
 
     public boolean isUpgrading()

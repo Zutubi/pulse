@@ -43,7 +43,7 @@ public class DefaultRecipeLogger implements RecipeLogger
 
     public void log(RecipeDispatchedEvent event)
     {
-        logMarker("Recipe dispatched to agent " + event.getAgent().getAgentConfig().getName(), System.currentTimeMillis());
+        logMarker("Recipe dispatched to agent " + event.getAgent().getConfig().getName(), System.currentTimeMillis());
     }
 
     public void log(RecipeCommencedEvent event, RecipeResult result)

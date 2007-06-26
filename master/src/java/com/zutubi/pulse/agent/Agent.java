@@ -23,12 +23,13 @@ public interface Agent
     void setStatus(Status status);
     void upgradeStatus(UpgradeState state, int progress, String message);
 
-    AgentConfiguration getAgentConfig();
-    AgentState getAgentState();
+    AgentConfiguration getConfig();
+    AgentState getState();
     AgentService getService();
 
     boolean isOnline();
     boolean isEnabled();
+    boolean isDisabled();
     boolean isUpgrading();
     boolean isFailedUpgrade();
     boolean isAvailable();

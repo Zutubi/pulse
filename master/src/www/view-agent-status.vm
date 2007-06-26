@@ -10,9 +10,9 @@
 
     <table id="agent.status" class="content">
         #headingRow("agent.status" 2)
-        #dynamicRow("agent.name" $agent.name)
+        #dynamicRow("agent.name" $agent.config.name)
         #dynamicRow("agent.location" $agent.location)
-#if($agent.isSlave())
+
     #if($agent.isEnabled() && $agent.hasBeenPinged())
         #dynamicRow("agent.status" $agent.status.prettyString)
         #dynamicRow("agent.last.ping" $action.getPrettyDate($agent.lastPingTime))
@@ -48,11 +48,8 @@
             #contentCell("agent.disabled")
         </tr>
     #end
-#end
     </table>
 
-#if(!$agent.isSlave())
     <a href="$base/viewServerQueues.action">#wwtext("name=view.server.queues")</a>
-#end
-
+</body>
 </html>

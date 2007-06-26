@@ -8,8 +8,6 @@ import com.zutubi.prototype.type.PrimitiveType;
 import com.zutubi.util.bean.ObjectFactory;
 import com.zutubi.util.logging.Logger;
 
-import java.util.List;
-
 /**
  * The table descriptor factory is an implementation of a descriptor factory that uses an objects type definition
  * to construct a table descriptor.
@@ -26,38 +24,32 @@ public class TableDescriptorFactory
         TableDescriptor td = new TableDescriptor();
 
         // default actions.
-        td.addAction("edit");
-        td.addAction("delete");
+        ActionDescriptor ad = new ActionDescriptor();
+        ad.addDefaultAction("edit");
+        ad.addDefaultAction("delete");
+        td.addActionDescriptor(ad);
 
         Class handler = ConventionSupport.getActions(type);
-
-        //FIXME: convert this to using the Actions object.  Problem: actions object requires an instance of the
-        //       object being represented, so that if necessary, the getActions(instance) method can be supported.
-        //       We do not have that instance at this stage.
         if (handler != null)
         {
             Actions actions = new Actions();
             actions.setObjectFactory(objectFactory);
-
-            List<String> defaultActions = actions.getDefaultActions(handler, type.getClazz());
-            
-            for (String actionName : defaultActions)
-            {
-                // ok, we have an action here.
-                td.addAction(actionName);
-            }
+            ad.addActionHandler(handler, actions);
         }
 
+        // does the table has a Table annotation defining the columns to be rendered?
         Table tableAnnotation = (Table) type.getAnnotation(Table.class);
         if (tableAnnotation != null)
         {
             for (String columnName : tableAnnotation.columns())
             {
                 ColumnDescriptor cd = new ColumnDescriptor(columnName);
+                cd.setType(type);
                 td.addColumn(cd);
             }
         }
 
+        // default table definition is based on the types primitive properties.
         if (td.getColumns().size() == 0)
         {
             // By default, we extract all of the primitive properties and make them available to the table.
@@ -65,6 +57,7 @@ public class TableDescriptorFactory
             for (String primitivePropertyName : type.getPropertyNames(PrimitiveType.class))
             {
                 ColumnDescriptor cd = new ColumnDescriptor(primitivePropertyName);
+                cd.setType(type);
                 td.addColumn(cd);
             }
         }

@@ -122,12 +122,6 @@ public class DefaultAgentManager implements AgentManager, EventListener, Stoppab
         {
             AgentConfiguration masterAgent = new AgentConfiguration();
             masterAgent.setName("master agent");
-/*
-            //FIXME: do we need to specify these details? and if so, how to we ensure that they stay up to date.
-            SystemConfiguration systemConfiguration = configurationManager.getSystemConfig();
-            masterAgent.setHost(systemConfiguration.getBindAddress());
-            masterAgent.setPort(systemConfiguration.getServerPort());
-*/
             masterAgent.setRemote(false);
             configurationProvider.insert("agent", masterAgent);
         }
@@ -232,10 +226,10 @@ public class DefaultAgentManager implements AgentManager, EventListener, Stoppab
         Agent agent = agents.get(handle);
         if (agent != null)
         {
-            AgentState agentState = agent.getAgentState();
+            AgentState agentState = agent.getState();
             agentState.setEnableState(state);
             agentStateManager.save(agentState);
-            agentChanged(agent.getAgentConfig());
+            agentChanged(agent.getConfig());
         }
     }
 
@@ -256,12 +250,12 @@ public class DefaultAgentManager implements AgentManager, EventListener, Stoppab
             }
             catch (TimeoutException e)
             {
-                LOG.warning("Timed out pinging agent '" + agent.getAgentConfig().getName() + "'", e);
+                LOG.warning("Timed out pinging agent '" + agent.getConfig().getName() + "'", e);
                 status = new SlaveStatus(Status.OFFLINE, "Agent ping timed out");
             }
             catch(Exception e)
             {
-                String message = "Unexpected error pinging agent '" + agent.getAgentConfig().getName() + "': " + e.getMessage();
+                String message = "Unexpected error pinging agent '" + agent.getConfig().getName() + "': " + e.getMessage();
                 LOG.warning(message);
                 LOG.debug(e);
                 status = new SlaveStatus(Status.OFFLINE, message);
@@ -276,11 +270,11 @@ public class DefaultAgentManager implements AgentManager, EventListener, Stoppab
                 try
                 {
                     List<Resource> resources = agent.getService().discoverResources();
-                    resourceManager.addDiscoveredResources(agent.getAgentConfig().getHandle(), resources);
+                    resourceManager.addDiscoveredResources(agent.getConfig().getHandle(), resources);
                 }
                 catch (Exception e)
                 {
-                    LOG.warning("Unable to discover resource for agent '" + agent.getAgentConfig().getName() + "': " + e.getMessage(), e);
+                    LOG.warning("Unable to discover resource for agent '" + agent.getConfig().getName() + "': " + e.getMessage(), e);
                 }
             }
 
@@ -299,7 +293,7 @@ public class DefaultAgentManager implements AgentManager, EventListener, Stoppab
 
     private void updateAgent(Agent agent)
     {
-        AgentState agentState = agent.getAgentState();
+        AgentState agentState = agent.getState();
         agentState.setEnableState(AgentState.EnableState.UPGRADING);
         agentStateManager.save(agentState);
 
@@ -309,7 +303,7 @@ public class DefaultAgentManager implements AgentManager, EventListener, Stoppab
 
         try
         {
-            updaters.put(agent.getAgentConfig().getHandle(), updater);
+            updaters.put(agent.getConfig().getHandle(), updater);
             updater.start();
         }
         finally
@@ -345,7 +339,7 @@ public class DefaultAgentManager implements AgentManager, EventListener, Stoppab
     public void handleEvent(Event evt)
     {
         AgentUpgradeCompleteEvent suce = (AgentUpgradeCompleteEvent) evt;
-        AgentState agentState = suce.getAgent().getAgentState();
+        AgentState agentState = suce.getAgent().getState();
 
         updatersLock.lock();
         try
@@ -387,7 +381,7 @@ public class DefaultAgentManager implements AgentManager, EventListener, Stoppab
             {
                 public int compare(Agent o1, Agent o2)
                 {
-                    return c.compare(o1.getAgentConfig().getName(), o2.getAgentConfig().getName());
+                    return c.compare(o1.getConfig().getName(), o2.getConfig().getName());
                 }
             });
             return result;
@@ -523,7 +517,7 @@ public class DefaultAgentManager implements AgentManager, EventListener, Stoppab
             lock.lock();
             for(Agent s: agents.values())
             {
-                if(s.getAgentConfig().getName().equals(name))
+                if(s.getConfig().getName().equals(name))
                 {
                     return s;
                 }
@@ -618,7 +612,7 @@ public class DefaultAgentManager implements AgentManager, EventListener, Stoppab
                 }
                 else
                 {
-                    LOG.warning("Exception pinging agent '" + agent.getAgentConfig().getName() + "': " + e.getMessage());
+                    LOG.warning("Exception pinging agent '" + agent.getConfig().getName() + "': " + e.getMessage());
                     LOG.debug(e);
                     status = new SlaveStatus(Status.OFFLINE, "Exception: '" + e.getClass().getName() + "'. Reason: " + e.getMessage());
                 }

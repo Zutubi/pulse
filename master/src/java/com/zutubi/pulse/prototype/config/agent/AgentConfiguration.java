@@ -11,6 +11,7 @@ import java.util.Map;
 /**
  */
 @Form(fieldOrder = {"name", "remote", "host", "port"})
+@Table(columns = {"name", "location", "status"})
 @SymbolicName("internal.agentConfig")
 public class AgentConfiguration extends AbstractNamedConfiguration
 {

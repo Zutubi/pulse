@@ -16,7 +16,7 @@ public class AgentRemovedEvent extends AgentEvent
         StringBuffer buff = new StringBuffer("Agent Removed Event");
         if (getAgent() != null)
         {
-            buff.append(": ").append(getAgent().getAgentConfig().getName());
+            buff.append(": ").append(getAgent().getConfig().getName());
         }
         return buff.toString();
     }

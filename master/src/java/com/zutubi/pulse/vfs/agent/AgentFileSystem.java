@@ -117,7 +117,7 @@ public class AgentFileSystem extends AbstractFileSystem
         try
         {
             Agent agent = agentManager.getAgent(Long.valueOf(this.agent));
-            return proxyFactory.createProxy(agent.getAgentConfig());
+            return proxyFactory.createProxy(agent.getConfig());
         }
         catch (MalformedURLException e)
         {

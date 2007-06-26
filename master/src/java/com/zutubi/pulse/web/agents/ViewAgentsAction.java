@@ -31,12 +31,12 @@ public class ViewAgentsAction extends ActionSupport
 
     public boolean upgrading(DefaultAgent agent)
     {
-        return agent.getAgentState().getEnableState() == AgentState.EnableState.UPGRADING;
+        return agent.getState().getEnableState() == AgentState.EnableState.UPGRADING;
     }
 
     public boolean failedUpgrade(DefaultAgent agent)
     {
-        return agent.getAgentState().getEnableState() == AgentState.EnableState.FAILED_UPGRADE;
+        return agent.getState().getEnableState() == AgentState.EnableState.FAILED_UPGRADE;
     }
 
     public String execute() throws Exception

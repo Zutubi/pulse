@@ -30,6 +30,11 @@ public class AgentState extends Entity
 
     }
 
+    public boolean isDisabled()
+    {
+        return enableState == EnableState.DISABLED;
+    }
+
     public boolean isEnabled()
     {
         return enableState == EnableState.ENABLED;

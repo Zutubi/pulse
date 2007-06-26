@@ -256,11 +256,7 @@
 ## Shows an agent tab of the given name with the given action name
 ##
 #macro(agentTab $name $action $selected)
-    #if($slave)
-        #set($args = "?agentId=$slave.id")
-    #else
-        #set($args = "")
-    #end
+    #set($args = "?agentHandle=$agent.config.handle")
     #tabItem("tab.agent.$name" $name "${action}.action${args}" $selected)
 #end
 
@@ -270,7 +266,6 @@
 #macro(agentTabs $selected)
     #openTabs()
         #agentTab("status" "$base/viewAgentStatus" $selected)
-        #agentTab("resources" "$base/viewResources" $selected)
         #agentTab("server-messages" "$base/serverMessages" $selected)
         #agentTab("server-info" "$base/viewSystemInfo" $selected)
     #closeTabs()

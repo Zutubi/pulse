@@ -15,7 +15,7 @@ public class TableDescriptor
      */
     private List<ColumnDescriptor> columns = new LinkedList<ColumnDescriptor>();
 
-    private List<String> actions = new LinkedList<String>();
+    private ActionDescriptor actions = null;
 
     /**
      * Retreive the list of column descriptors associated with this table descriptor.
@@ -37,13 +37,13 @@ public class TableDescriptor
         columns.add(descriptor);
     }
 
-    public List<String> getActions()
+    public List<String> getActions(Object configInstance)
     {
-        return actions;
+        return actions.getActions(configInstance);
     }
 
-    public void addAction(String action)
+    public void addActionDescriptor(ActionDescriptor ad)
     {
-        actions.add(action);
+        this.actions = ad;
     }
 }

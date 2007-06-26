@@ -99,17 +99,9 @@
                 </tr>
             </table>
 
-            <table id="project.buildspecs" class="fill-content">
-                #headingRow("project.buildspecs" 2)
-    #foreach($buildSpec in $project.buildSpecifications)
-                <tr>
-                    #dynamicCell($buildSpec.name)
-#acl("domainObject=project" "hasPermission=4,1")
-                    #actionCell("buildspec.trigger" "triggerBuild.action?id=$buildSpec.id&amp;projectId=$project.id" "lightning.gif")
-#end
-                </tr>
-    #end
-            </table>
+<!-- FIXME: replace this with links to the projects configuration for those that are authorised...
+    can also include links to the actions available for the projectConfig so that admins can interact with the
+    project outside the config pages.
 
             <table class="fill-content">
                 #headingRow("project.basics" 2)
@@ -143,7 +135,7 @@
                     </td>
                 </tr>
             </table>
-
+-->
         </td>
     </tr>
 </table>

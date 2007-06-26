@@ -274,7 +274,7 @@ public class ThreadedRecipeQueue implements Runnable, RecipeQueue, EventListener
         lock.lock();
         try
         {
-            long handle = agent.getAgentConfig().getHandle();
+            long handle = agent.getConfig().getHandle();
             if(!onlineAgents.containsKey(handle))
             {
                 onlineAgents.put(handle, agent);
@@ -308,7 +308,7 @@ public class ThreadedRecipeQueue implements Runnable, RecipeQueue, EventListener
         lock.lock();
         try
         {
-            onlineAgents.remove(agent.getAgentConfig().getHandle());
+            onlineAgents.remove(agent.getConfig().getHandle());
 
             if(unsatisfiableTimeout == 0)
             {
@@ -322,7 +322,7 @@ public class ThreadedRecipeQueue implements Runnable, RecipeQueue, EventListener
             long deadRecipe = 0;
             for (Map.Entry<Long, Agent> entry : executingAgents.entrySet())
             {
-                if (entry.getValue().getAgentConfig().getHandle() == agent.getAgentConfig().getHandle())
+                if (entry.getValue().getConfig().getHandle() == agent.getConfig().getHandle())
                 {
                     // Agent dropped off while we were executing.
                     deadRecipe = entry.getKey();
@@ -337,7 +337,7 @@ public class ThreadedRecipeQueue implements Runnable, RecipeQueue, EventListener
                 error = new RecipeErrorEvent(this, deadRecipe, "Connection to agent lost during recipe execution");
             }
 
-            availableAgents.remove(agent.getAgentConfig().getHandle());
+            availableAgents.remove(agent.getConfig().getHandle());
             lockCondition.signal();
         }
         finally
@@ -455,7 +455,7 @@ public class ThreadedRecipeQueue implements Runnable, RecipeQueue, EventListener
 
                 for (Agent a : unavailableAgents)
                 {
-                    availableAgents.remove(a.getAgentConfig().getHandle());
+                    availableAgents.remove(a.getConfig().getHandle());
                 }
 
                 try
@@ -492,7 +492,7 @@ public class ThreadedRecipeQueue implements Runnable, RecipeQueue, EventListener
         // We can no longer update the revision once we have dispatched a
         // request: it is fixed here if not already.
         buildRevision.apply(recipeRequest);
-        recipeRequest.prepare(agent.getAgentConfig().getName());
+        recipeRequest.prepare(agent.getConfig().getName());
 
         // TODO: this code cannot handle an agent rejecting the build
         // (the handling was backed outdue to CIB-553 and the fact that
@@ -607,7 +607,7 @@ public class ThreadedRecipeQueue implements Runnable, RecipeQueue, EventListener
             if (agent != null)
             {
                 executingAgents.remove(event.getRecipeId());
-                long handle = agent.getAgentConfig().getHandle();
+                long handle = agent.getConfig().getHandle();
                 if(onlineAgents.containsKey(handle))
                 {
                     availableAgents.put(handle, agent);

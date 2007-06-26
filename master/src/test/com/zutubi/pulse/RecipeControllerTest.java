@@ -372,6 +372,11 @@ public class RecipeControllerTest extends PulseTestCase
             throw new RuntimeException("Method not yet implemented.");
         }
 
+        public boolean isDisabled()
+        {
+            throw new RuntimeException("Method not yet implemented.");
+        }
+
         public boolean isUpgrading()
         {
             throw new RuntimeException("Method not yet implemented.");
@@ -412,12 +417,12 @@ public class RecipeControllerTest extends PulseTestCase
             throw new RuntimeException("Method not yet implemented.");
         }
 
-        public AgentConfiguration getAgentConfig()
+        public AgentConfiguration getConfig()
         {
             throw new RuntimeException("Method not yet implemented.");
         }
 
-        public AgentState getAgentState()
+        public AgentState getState()
         {
             throw new RuntimeException("Method not yet implemented.");
         }

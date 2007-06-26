@@ -53,8 +53,8 @@ public class ComponentContext
 
     private static void publishContext(ConfigurableApplicationContext newContext)
     {
-        newContext.refresh();
         context = newContext;
+        newContext.refresh();
     }
 
     public static boolean containsBean(String name)

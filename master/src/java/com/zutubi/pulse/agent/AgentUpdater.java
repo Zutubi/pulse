@@ -70,7 +70,7 @@ public class AgentUpdater implements Runnable
 
         try
         {
-            boolean accepted = agentService.updateVersion(masterBuild, masterUrl, agent.getAgentState().getId(), packageUrl, packageFile.length());
+            boolean accepted = agentService.updateVersion(masterBuild, masterUrl, agent.getState().getId(), packageUrl, packageFile.length());
 
             if(!accepted)
             {

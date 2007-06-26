@@ -1,5 +1,7 @@
 package com.zutubi.prototype.table;
 
+import com.zutubi.prototype.type.CompositeType;
+
 /**
  * The column descriptor represents the model used to render a column to the UI.
  *
@@ -23,6 +25,8 @@ public class ColumnDescriptor
      */
     private boolean required;
 
+    private CompositeType type;
+
     public ColumnDescriptor()
     {
     }
@@ -30,6 +34,24 @@ public class ColumnDescriptor
     public ColumnDescriptor(String name)
     {
         this.name = name;
+    }
+
+    public void setType(CompositeType type)
+    {
+        this.type = type;
+    }
+
+    public Object getValue(Object instance)
+    {
+        try
+        {
+            FormattingWrapper wrapper = new FormattingWrapper(instance, type);
+            return wrapper.get(name);
+        }
+        catch (Exception e)
+        {
+            return "";
+        }
     }
 
     public String getName()

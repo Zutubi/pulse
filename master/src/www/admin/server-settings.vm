@@ -120,6 +120,10 @@
                     nestedLayout.endUpdate();
 
                     tree.render();
+                    if (path && path != '')
+                    {
+                        tree.selectConfigPath(path);
+                    }
                     root.expand();
                 }
             }
