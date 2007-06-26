@@ -7,5 +7,5 @@ import java.util.List;
  */
 public interface ValidatorProvider
 {
-    List<Validator> getValidators(Object obj);
+    List<Validator> getValidators(Object obj, ValidationContext context);
 }

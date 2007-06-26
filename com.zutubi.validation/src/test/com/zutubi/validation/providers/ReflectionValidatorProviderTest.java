@@ -1,9 +1,9 @@
 package com.zutubi.validation.providers;
 
-import junit.framework.TestCase;
-import com.zutubi.validation.mock.MockWallet;
 import com.zutubi.validation.Validator;
+import com.zutubi.validation.mock.MockWallet;
 import com.zutubi.validation.validators.ValidateableValidator;
+import junit.framework.TestCase;
 
 import java.util.List;
 
@@ -30,7 +30,7 @@ public class ReflectionValidatorProviderTest extends TestCase
 
     public void testValidateableObject()
     {
-        List<Validator> validators = provider.getValidators(new MockWallet());
+        List<Validator> validators = provider.getValidators(new MockWallet(), null);
         assertEquals(1, validators.size());
 
         ValidateableValidator v = (ValidateableValidator) validators.get(0);
@@ -38,7 +38,7 @@ public class ReflectionValidatorProviderTest extends TestCase
 
     public void testPlainOldJavaObject()
     {
-        List<Validator> validators = provider.getValidators(new Object());
+        List<Validator> validators = provider.getValidators(new Object(), null);
         assertEquals(0, validators.size());
     }
 }

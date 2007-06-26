@@ -13,19 +13,20 @@
     <tr>
         <td valign="top" class="wizardsteps">
             <ul>
-            <#list 1..wizard.stepCount as x>
-                <#assign xlabel>${x}.label</#assign>
-                <#assign stepclass>wizardstep</#assign>
-                <#if x == wizard.currentStep>
-                    <#assign xdescr>${x}.description</#assign>
-                    <#assign stepclass>currentwizardstep</#assign>
+            <#list wizard.steps as step>
+                <#assign index = step_index + 1/>
+                <#assign labelkey = "${step}.label"/>
+                <#assign stepclass = "wizardstep"/>
+                <#if index == wizard.currentStep>
+                    <#assign descrkey = "${step}.description"/>
+                    <#assign stepclass = "currentwizardstep"/>
                 </#if>
-                <li class="<#if x == wizard.currentStep>currentwizardstep<#else>wizardstep</#if>"> ${x}: ${xlabel?i18n} </li>
+                <li class="${stepclass}"> ${index}: ${labelkey?i18n} </li>
             </#list>
             </ul>
         </td>
         <td valign="top">
-            <p>${xdescr?i18n}</p>
+            <p>${descrkey?i18n}</p>
             <#assign form = wizard.form/>
             <#include "form.ftl"/>
         </td>
@@ -35,4 +36,3 @@
     <#assign form = wizard.form/>
     <#include "form.ftl"/>
 </#if>
-

@@ -7,11 +7,14 @@ import com.zutubi.prototype.config.events.PostInsertEvent;
 import com.zutubi.prototype.config.events.PreInsertEvent;
 import com.zutubi.prototype.type.CompositeType;
 import com.zutubi.prototype.type.MapType;
+import com.zutubi.prototype.type.TemplatedMapType;
 import com.zutubi.prototype.type.record.MutableRecord;
 import com.zutubi.prototype.type.record.Record;
 import com.zutubi.pulse.core.config.AbstractConfiguration;
 import com.zutubi.pulse.events.Event;
 import com.zutubi.pulse.events.EventListener;
+import com.zutubi.validation.ValidationAwareSupport;
+import com.zutubi.validation.annotations.Required;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -23,17 +26,24 @@ import java.util.List;
 public class ConfigurationTemplateManagerTest extends AbstractConfigurationSystemTestCase
 {
     private CompositeType typeA;
+    private CompositeType typeB;
 
     protected void setUp() throws Exception
     {
         super.setUp();
 
         typeA = typeRegistry.register("mockA", MockA.class);
+        typeB = typeRegistry.getType("mockB");
         MapType mapA = new MapType(configurationTemplateManager);
         mapA.setTypeRegistry(typeRegistry);
         mapA.setCollectionType(typeA);
 
+        MapType templatedMap = new TemplatedMapType(configurationTemplateManager);
+        templatedMap.setTypeRegistry(typeRegistry);
+        templatedMap.setCollectionType(typeA);
+
         configurationPersistenceManager.register("sample", mapA);
+        configurationPersistenceManager.register("template", templatedMap);
     }
 
     protected void tearDown() throws Exception
@@ -148,6 +158,40 @@ public class ConfigurationTemplateManagerTest extends AbstractConfigurationSyste
         assertEquals("newb", loaded.get("b"));
     }
 
+    public void testSaveRecordUnknownPath()
+    {
+        MutableRecord record = typeA.createNewRecord(false);
+        record.put("a", "avalue");
+        record.put("b", "newb");
+
+        try
+        {
+            configurationTemplateManager.saveRecord("sample/avalue", record);
+            fail();
+        }
+        catch (IllegalArgumentException e)
+        {
+            assertEquals("Illegal path 'sample/avalue': no existing record found", e.getMessage());
+        }
+    }
+
+    public void testSaveRecordToCollectionPath()
+    {
+        MutableRecord record = typeA.createNewRecord(false);
+        record.put("a", "avalue");
+        record.put("b", "newb");
+
+        try
+        {
+            configurationTemplateManager.saveRecord("sample", record);
+            fail();
+        }
+        catch (IllegalArgumentException e)
+        {
+            assertEquals("Illegal path 'sample': no parent record", e.getMessage());
+        }
+    }
+
     public void testSaveRecordDoesNotRemoveKeys()
     {
         MutableRecord record = typeA.createNewRecord(true);
@@ -166,6 +210,97 @@ public class ConfigurationTemplateManagerTest extends AbstractConfigurationSyste
         Record loaded = configurationTemplateManager.getRecord("sample/avalue");
         assertEquals("newb", loaded.get("b"));
         assertEquals("cvalue", loaded.get("c"));
+    }
+
+    public void testValidate()
+    {
+        MutableRecord record = typeA.createNewRecord(true);
+        ValidationAwareSupport validationAware = new ValidationAwareSupport();
+        assertNull(configurationTemplateManager.validate("template", "a", record, validationAware));
+        List<String> aErrors = validationAware.getFieldErrors("a");
+        assertEquals(1, aErrors.size());
+        assertEquals("a requires a value", aErrors.get(0));
+    }
+
+    public void testValidateNullParentPath()
+    {
+        MutableRecord record = typeA.createNewRecord(true);
+        record.put("a", "value");
+        ValidationAwareSupport validationAware = new ValidationAwareSupport();
+        assertNotNull(configurationTemplateManager.validate(null, "a", record, validationAware));
+    }
+
+    public void testValidateNullBaseName()
+    {
+        MutableRecord record = typeA.createNewRecord(true);
+        record.put("a", "value");
+        ValidationAwareSupport validationAware = new ValidationAwareSupport();
+        assertNotNull(configurationTemplateManager.validate("template", null, record, validationAware));
+    }
+
+    public void testValidateTemplate()
+    {
+        MutableRecord record = typeA.createNewRecord(true);
+        configurationTemplateManager.markAsTemplate(record);
+        ValidationAwareSupport validationAware = new ValidationAwareSupport();
+        MockA instance = configurationTemplateManager.validate("template", "a", record, validationAware);
+        assertNotNull(instance);
+        assertNull(instance.getA());
+        assertFalse(validationAware.hasErrors());
+    }
+
+    public void testValidateNestedPath()
+    {
+        // Check that a record not directly marked us a template is correctly
+        // detected as a template for validation (by checking the owner).
+        MutableRecord record = typeA.createNewRecord(true);
+        record.put("a", "a");
+        configurationTemplateManager.insertRecord("template", record);
+
+        record = typeB.createNewRecord(true);
+        ValidationAwareSupport validationAware = new ValidationAwareSupport();
+        assertNull(configurationTemplateManager.validate("template/a", "b", record, validationAware));
+        List<String> aErrors = validationAware.getFieldErrors("b");
+        assertEquals(1, aErrors.size());
+        assertEquals("b requires a value", aErrors.get(0));
+    }
+    
+    public void testValidateTemplateNestedPath()
+    {
+        // Check that a record not directly marked us a template is correctly
+        // detected as a template for validation (by checking the owner).
+        MutableRecord record = typeA.createNewRecord(true);
+        record.put("a", "a");
+        configurationTemplateManager.markAsTemplate(record);
+        configurationTemplateManager.insertRecord("template", record);
+
+        record = typeB.createNewRecord(true);
+        ValidationAwareSupport validationAware = new ValidationAwareSupport();
+        MockB instance = configurationTemplateManager.validate("template/a", "b", record, validationAware);
+        assertNotNull(instance);
+        assertNull(instance.getB());
+        assertFalse(validationAware.hasErrors());
+    }
+    
+    public void testIsTemplatedCollection()
+    {
+        assertFalse(configurationTemplateManager.isTemplatedCollection("sample"));
+        assertTrue(configurationTemplateManager.isTemplatedCollection("template"));    
+    }
+
+    public void testIsTemplatedCollectionUnknownPath()
+    {
+        assertFalse(configurationTemplateManager.isTemplatedCollection("unknown"));
+    }
+
+    public void testIsTemplatedCollectionChildPath()
+    {
+        assertFalse(configurationTemplateManager.isTemplatedCollection("template/a"));
+
+        MockA a = new MockA("a");
+        configurationTemplateManager.insert("template", a);
+
+        assertFalse(configurationTemplateManager.isTemplatedCollection("template/a"));
     }
 
     @SymbolicName("mockA")
@@ -194,6 +329,7 @@ public class ConfigurationTemplateManagerTest extends AbstractConfigurationSyste
     @SymbolicName("mockB")
     public static class MockB extends AbstractConfiguration
     {
+        @Required
         private String b;
 
         public MockB(){}

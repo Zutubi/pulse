@@ -6,7 +6,6 @@ import com.zutubi.prototype.type.TypeException;
 import com.zutubi.prototype.type.TypeProperty;
 import com.zutubi.prototype.type.record.MutableRecord;
 import com.zutubi.prototype.type.record.PathUtils;
-import com.zutubi.prototype.wizard.TypeWizardState;
 import com.zutubi.prototype.wizard.WizardTransition;
 import com.zutubi.prototype.wizard.webwork.AbstractTypeWizard;
 import com.zutubi.pulse.bootstrap.MasterConfiguration;
@@ -23,7 +22,6 @@ import java.net.InetAddress;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.UnknownHostException;
-import java.util.LinkedList;
 import java.util.List;
 
 /**
@@ -43,14 +41,13 @@ public class SetupConfigurationWizard extends AbstractTypeWizard
         adminConfigType = typeRegistry.getType(AdminUserConfiguration.class);
         CompositeType serverConfigType = typeRegistry.getType(ServerSettingsConfiguration.class);
 
-        wizardStates = new LinkedList<TypeWizardState>();
-        addWizardStates(wizardStates, adminConfigType, null);
-        addWizardStates(wizardStates, serverConfigType, null);
+        addWizardStates(adminConfigType, null);
+        addWizardStates(serverConfigType, null);
 
         // a bit of custom initialisation
         SystemConfigurationSupport systemConfig = (SystemConfigurationSupport) configurationManager.getSystemConfig();
         
-        MutableRecord record = wizardStates.get(1).getRecord();
+        MutableRecord record = wizardStates.get(1).getDataRecord();
         record.put("baseUrl", systemConfig.getHostUrl());
 
         currentState = wizardStates.getFirst();
@@ -72,8 +69,8 @@ public class SetupConfigurationWizard extends AbstractTypeWizard
     {
         try
         {
-            AdminUserConfiguration adminConfig = (AdminUserConfiguration) adminConfigType.instantiate(null, wizardStates.get(0).getRecord());
-            MutableRecord serverConfigRecord = wizardStates.get(1).getRecord();
+            AdminUserConfiguration adminConfig = (AdminUserConfiguration) adminConfigType.instantiate(null, wizardStates.get(0).getDataRecord());
+            MutableRecord serverConfigRecord = wizardStates.get(1).getDataRecord();
             MasterConfiguration config = configurationManager.getAppConfig();
 
             // create the admin user.

@@ -2,7 +2,6 @@ package com.zutubi.prototype;
 
 import com.zutubi.config.annotations.NoInherit;
 import com.zutubi.config.annotations.NoOverride;
-import com.zutubi.prototype.config.ConfigurationTemplateManager;
 import com.zutubi.prototype.type.CompositeType;
 import com.zutubi.prototype.type.record.Record;
 import com.zutubi.prototype.type.record.TemplateRecord;
@@ -15,13 +14,10 @@ import java.lang.annotation.Annotation;
  */
 public class TemplateFormDecorator
 {
-    private String path;
     private Record record;
-    private ConfigurationTemplateManager configurationTemplateManager;
 
-    public TemplateFormDecorator(String path, Record record)
+    public TemplateFormDecorator(Record record)
     {
-        this.path = path;
         this.record = record;
     }
 
@@ -29,7 +25,6 @@ public class TemplateFormDecorator
     {
         if (record != null && record instanceof TemplateRecord)
         {
-            String concreteId = configurationTemplateManager.getOwner(path);
             TemplateRecord templateRecord = (TemplateRecord) record;
             TemplateRecord parentRecord = templateRecord.getParent();
             CompositeType type = (CompositeType) templateRecord.getType();
@@ -58,7 +53,7 @@ public class TemplateFormDecorator
                 String ownerId = templateRecord.getOwner(fieldName);
                 if (ownerId != null)
                 {
-                    if (!ownerId.equals(concreteId))
+                    if (!ownerId.equals(templateRecord.getOwner()))
                     {
                         field.addParameter("inheritedFrom", ownerId);
                     }
@@ -82,10 +77,5 @@ public class TemplateFormDecorator
     private boolean fieldHasAnnotation(CompositeType type, String fieldName, Class<? extends Annotation> annotationClass)
     {
         return type.getProperty(fieldName).getAnnotation(annotationClass) != null;
-    }
-
-    public void setConfigurationTemplateManager(ConfigurationTemplateManager configurationTemplateManager)
-    {
-        this.configurationTemplateManager = configurationTemplateManager;
     }
 }

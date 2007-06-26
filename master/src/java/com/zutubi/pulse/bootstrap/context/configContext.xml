@@ -11,14 +11,21 @@
     <bean id="zutubiValidationManager" class="com.zutubi.validation.DefaultValidationManager">
         <property name="providers">
             <list>
-                <ref local="annotationValidatorProvider"/>
-                <ref local="reflectionValidatorProvider"/>
+                <ref local="configurationValidatorProvider"/>
             </list>
         </property>
     </bean>
 
     <bean id="annotationValidatorProvider" class="com.zutubi.validation.providers.AnnotationValidatorProvider"/>
     <bean id="reflectionValidatorProvider" class="com.zutubi.validation.providers.ReflectionValidatorProvider"/>
+    <bean id="configurationValidatorProvider" class="com.zutubi.prototype.config.ConfigurationValidatorProvider">
+        <property name="delegates">
+            <list>
+                <ref local="annotationValidatorProvider"/>
+                <ref local="reflectionValidatorProvider"/>
+            </list>
+        </property>
+    </bean>
 
     <!-- Config system -->
     <bean id="handleAllocator" class="com.zutubi.prototype.type.record.DelegatingHandleAllocator" autowire="byName"/>

@@ -2,42 +2,28 @@ package com.zutubi.prototype.wizard.webwork;
 
 import com.zutubi.prototype.type.CompositeType;
 import com.zutubi.prototype.type.Type;
-import com.zutubi.prototype.type.record.MutableRecordImpl;
-import com.zutubi.prototype.type.record.TemplateRecord;
 import com.zutubi.prototype.wizard.WizardState;
-import com.zutubi.util.logging.Logger;
 
 /**
- *
- *
+ * A wizard that configures a single record. perhaps including two states if
+ * there are multiple extensions to choose from.
  */
 public class SingleTypeWizard extends AbstractTypeWizard
 {
-    private static final Logger LOG = Logger.getLogger(SingleTypeWizard.class);
-
-    private static final TemplateRecord EMPTY_RECORD = new TemplateRecord("empty", null, null, new MutableRecordImpl());
     private WizardState recordState;
     
     private CompositeType type;
 
     public void initialise()
     {
-        type = (CompositeType) configurationTemplateManager.getType(path).getTargetType();
-
-        LOG.warning("TODO: load template record for path: " + path + ", currently using empty template record.");
-
-        // for now, use an empty template record.
-        TemplateRecord templateRecord = EMPTY_RECORD;
-
-        // the template record represents the existing data.
-        recordState = addWizardStates(wizardStates, type, templateRecord);
-
+        type = (CompositeType) configurationTemplateManager.getType(configPath).getTargetType();
+        recordState = addWizardStates(type, templateParentRecord);
         currentState = wizardStates.getFirst();
     }
 
     public void doFinish()
     {
-        successPath = configurationTemplateManager.insertRecord(path, recordState.getRecord());
+        successPath = configurationTemplateManager.insertRecord(configPath, recordState.getDataRecord());
     }
 
     public Type getType()

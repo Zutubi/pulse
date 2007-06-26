@@ -1,6 +1,5 @@
 package com.zutubi.prototype.wizard.webwork;
 
-import com.opensymphony.util.TextUtils;
 import com.opensymphony.xwork.ActionContext;
 import com.zutubi.i18n.Messages;
 import com.zutubi.prototype.ConventionSupport;
@@ -13,11 +12,7 @@ import com.zutubi.prototype.wizard.WizardState;
 import com.zutubi.pulse.bootstrap.ComponentContext;
 import com.zutubi.pulse.web.ActionSupport;
 import com.zutubi.util.logging.Logger;
-import com.zutubi.validation.DelegatingValidationContext;
-import com.zutubi.validation.ValidationContext;
-import com.zutubi.validation.ValidationException;
-import com.zutubi.validation.ValidationManager;
-import com.zutubi.validation.XWorkValidationAdapter;
+import com.zutubi.validation.*;
 import com.zutubi.validation.i18n.MessagesTextProvider;
 
 import java.util.Map;
@@ -30,15 +25,28 @@ public class ConfigurationWizardAction extends ActionSupport
 {
     private static final Logger LOG = Logger.getLogger(ConfigurationWizardAction.class);
 
+    private static final String CREATE_TEMPLATE  = "template";
+
+    private static final String SUBMIT_CANCEL   = "cancel";
+    private static final String SUBMIT_PREVIOUS = "previous";
+    private static final String SUBMIT_NEXT     = "next";
+    private static final String SUBMIT_FINISH   = "finish";
+
     /**
      * The path to the configuration type that defines this wizard.
      */
     private String path;
-
     protected String originalPath;
+    /**
+     * The submit field is used to communicate the selected button from the
+     * client JavaScript.  On init, it may also indicate that we are
+     * configuring a template.
+     */
+    private String submitField;
 
     private boolean wizardRequiresLazyInitialisation = false;
 
+    private ValidationManager validationManager;
     protected ConfigurationTemplateManager configurationTemplateManager;
 
     /**
@@ -56,56 +64,6 @@ public class ConfigurationWizardAction extends ActionSupport
         return path;
     }
 
-    /**
-     * This is set to something if the user has selected the cancel action.
-     */
-    private String cancel;
-
-    /**
-     * This is set to something if the user has selected the next action.
-     */
-    private String next;
-
-    /**
-     * This is set to something if the user has selected the previous action.
-     */
-    private String previous;
-
-    /**
-     * This is set to something if the user has selected the finish action.
-     */
-    private String finish;
-
-    /**
-     * The submit field value is used as an override for the next, previous and
-     * cancel fields, and is set by a javascript function when the user hits enter
-     * on a form. Without this (and the associated javascript), the first submit
-     * button would always be the one used.
-     */
-    private String submitField;
-
-    private ValidationManager validationManager;
-
-    public void setCancel(String cancel)
-    {
-        this.cancel = cancel;
-    }
-
-    public void setNext(String next)
-    {
-        this.next = next;
-    }
-
-    public void setPrevious(String previous)
-    {
-        this.previous = previous;
-    }
-
-    public void setFinish(String finish)
-    {
-        this.finish = finish;
-    }
-
     public void setSubmitField(String submitField)
     {
         this.submitField = submitField;
@@ -118,52 +76,9 @@ public class ConfigurationWizardAction extends ActionSupport
         return !wizardRequiresLazyInitialisation;
     }
 
-    public boolean isCancelSelected()
+    public boolean isSelected(String value)
     {
-        if (TextUtils.stringSet(submitField))
-        {
-            return submitField.equals("cancel");
-        }
-        else
-        {
-            return TextUtils.stringSet(cancel);
-        }
-    }
-
-    public boolean isPreviousSelected()
-    {
-        if (TextUtils.stringSet(submitField))
-        {
-            return submitField.equals("previous");
-        }
-        else
-        {
-            return TextUtils.stringSet(previous);
-        }
-    }
-
-    public boolean isNextSelected()
-    {
-        if (TextUtils.stringSet(submitField))
-        {
-            return submitField.equals("next");
-        }
-        else
-        {
-            return TextUtils.stringSet(next);
-        }
-    }
-
-    public boolean isFinishSelected()
-    {
-        if (TextUtils.stringSet(submitField))
-        {
-            return submitField.equals("finish");
-        }
-        else
-        {
-            return TextUtils.stringSet(finish);
-        }
+        return value.equals(submitField);
     }
 
     private boolean validateState()
@@ -219,7 +134,7 @@ public class ConfigurationWizardAction extends ActionSupport
             }
 
             // only validate when we are moving forwards in the wizard
-            if (isNextSelected() || isFinishSelected())
+            if (isSelected(SUBMIT_NEXT) || isSelected(SUBMIT_FINISH))
             {
                 if (!validateState() || !validateWizard())
                 {
@@ -230,19 +145,19 @@ public class ConfigurationWizardAction extends ActionSupport
             
             initWizardIfRequired();
 
-            if (isCancelSelected())
+            if (isSelected(SUBMIT_CANCEL))
             {
                 return doCancel();
             }
-            else if (isNextSelected())
+            else if (isSelected(SUBMIT_NEXT))
             {
                 return doNext();
             }
-            else if (isPreviousSelected())
+            else if (isSelected(SUBMIT_PREVIOUS))
             {
                 return doPrevious();
             }
-            else if (isFinishSelected())
+            else if (isSelected(SUBMIT_FINISH))
             {
                 return doFinish();
             }
@@ -379,7 +294,7 @@ public class ConfigurationWizardAction extends ActionSupport
             ComponentContext.autowire(wizardInstance);
         }
         
-        wizardInstance.setPath(path);
+        wizardInstance.setParameters(path, isSelected(CREATE_TEMPLATE));
 
         wizardRequiresLazyInitialisation = true;
         return wizardInstance;

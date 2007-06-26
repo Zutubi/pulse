@@ -1,26 +1,23 @@
 package com.zutubi.prototype.model;
 
+import java.util.LinkedList;
+import java.util.List;
+
 /**
  *
  *
  */
 public class Wizard
 {
-    private int stepCount;
+    private List<String> steps = new LinkedList<String>();
     private int currentStep;
 
     private boolean decorate;
-
     private Form form;
 
     public int getStepCount()
     {
-        return stepCount;
-    }
-
-    public void setStepCount(int stepCount)
-    {
-        this.stepCount = stepCount;
+        return steps.size();
     }
 
     public int getCurrentStep()
@@ -51,5 +48,15 @@ public class Wizard
     public void setForm(Form form)
     {
         this.form = form;
+    }
+
+    public List<String> getSteps()
+    {
+        return steps;
+    }
+
+    public void addStep(String name)
+    {
+        steps.add(name);
     }
 }

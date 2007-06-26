@@ -89,8 +89,7 @@ public class FormDirective extends PrototypeDirective
             FormDescriptor formDescriptor = formDescriptorFactory.createDescriptor(path, ctype, formName);
             formDescriptor.setAjax(ajax);
             
-            TemplateFormDecorator templateDecorator = new TemplateFormDecorator(path, data);
-            templateDecorator.setConfigurationTemplateManager(configurationTemplateManager);
+            TemplateFormDecorator templateDecorator = new TemplateFormDecorator(data);
             templateDecorator.decorate(formDescriptor);
 
             // Decorate the form to include the symbolic name as a hidden field. This is necessary for configuration.

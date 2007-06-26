@@ -1,14 +1,15 @@
 package com.zutubi.validation.providers;
 
-import com.zutubi.validation.ValidatorProvider;
-import com.zutubi.validation.Validator;
 import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.bean.ObjectFactory;
+import com.zutubi.validation.ValidationContext;
+import com.zutubi.validation.Validator;
+import com.zutubi.validation.ValidatorProvider;
 
-import java.util.List;
-import java.beans.PropertyDescriptor;
-import java.beans.Introspector;
 import java.beans.IntrospectionException;
+import java.beans.Introspector;
+import java.beans.PropertyDescriptor;
+import java.util.List;
 
 /**
  *
@@ -20,7 +21,7 @@ public class PrimitiveTypeValidationProvider implements ValidatorProvider
 
     private ObjectFactory objectFactory = null;
 
-    public List<Validator> getValidators(Object obj)
+    public List<Validator> getValidators(Object obj, ValidationContext context)
     {
         try
         {

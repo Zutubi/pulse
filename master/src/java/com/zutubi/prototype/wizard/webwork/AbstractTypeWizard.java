@@ -7,11 +7,11 @@ import com.zutubi.prototype.FormDescriptorFactory;
 import com.zutubi.prototype.config.ConfigurationPersistenceManager;
 import com.zutubi.prototype.config.ConfigurationTemplateManager;
 import com.zutubi.prototype.model.SelectFieldDescriptor;
-import com.zutubi.prototype.type.*;
-import com.zutubi.prototype.type.record.MutableRecord;
-import com.zutubi.prototype.type.record.MutableRecordImpl;
-import com.zutubi.prototype.type.record.Record;
-import com.zutubi.prototype.type.record.TemplateRecord;
+import com.zutubi.prototype.type.CompositeType;
+import com.zutubi.prototype.type.Type;
+import com.zutubi.prototype.type.TypeProperty;
+import com.zutubi.prototype.type.TypeRegistry;
+import com.zutubi.prototype.type.record.*;
 import com.zutubi.prototype.webwork.PrototypeUtils;
 import com.zutubi.prototype.wizard.TypeWizardState;
 import com.zutubi.prototype.wizard.Wizard;
@@ -28,42 +28,82 @@ import java.util.*;
  */
 public abstract class AbstractTypeWizard implements Wizard
 {
+    protected LinkedList<TypeWizardState> wizardStates = new LinkedList<TypeWizardState>();
+    protected Map<String, TypeWizardState> configureStates = new HashMap<String, TypeWizardState>();
+
+    protected TypeWizardState currentState;
+
+    /**
+     * The path we are configuring.  Either the path to a composite or a
+     * collection that will hold the configured composite.
+     */
+    protected String configPath;
+    /**
+     * Path that was actually configured in the case of a successful wizard.
+     * The user is taken here to see what they hath wrought.
+     */
+    protected String successPath;
+    /**
+     * Template parent record, if we have a template parent.
+     */
+    protected TemplateRecord templateParentRecord;
+    /**
+     * If true, we are configuring a template (as opposed to concrete) record.
+     */
+    protected boolean template;
+
     protected TypeRegistry typeRegistry;
     protected ConfigurationPersistenceManager configurationPersistenceManager;
     protected ConfigurationTemplateManager configurationTemplateManager;
 
-    protected TypeWizardState currentState;
-
-    protected String successPath;
-
-    protected LinkedList<TypeWizardState> wizardStates = new LinkedList<TypeWizardState>();
-
-    protected String path;
-
-    protected TypeWizardState addWizardStates(List<TypeWizardState> wizardStates, CompositeType type, TemplateRecord templateRecord)
+    protected TypeWizardState addWizardStates(CompositeType baseType, TemplateRecord templateParentRecord)
     {
-        int extensionCount = type.getExtensions().size();
-        if(extensionCount < 2)
-        {
-            // No point showing the first state, just check if we are
-            // configuring a type itself or a type with only one extension.
-            if(extensionCount == 1)
-            {
-                type = typeRegistry.getType(type.getExtensions().get(0));
-            }
+        CompositeType type = baseType;
 
-            SingleStepWizardState singleStepState = new SingleStepWizardState(type, templateRecord);
-            wizardStates.add(singleStepState);
+        // If we have a template record, then we are configuring an override.
+        // The type is pre-determined as it must be the same as the template
+        // parent.
+        if(templateParentRecord != null)
+        {
+            type = typeRegistry.getType(templateParentRecord.getSymbolicName());
+            TemplateRecord templateRecord = new TemplateRecord("", templateParentRecord, type, type.createNewRecord(false));
+            SingleStepWizardState singleStepState = new SingleStepWizardState(baseType, type, templateRecord);
+            addState(singleStepState, true);
         }
         else
         {
-            TwoStepWizardState state = new TwoStepWizardState(type, templateRecord);
-            state.setTypeRegistry(typeRegistry);
-            wizardStates.add(state.getFirstState());
-            wizardStates.add(state.getSecondState());
+            int extensionCount = baseType.getExtensions().size();
+            if(extensionCount < 2)
+            {
+                // No point showing the first state, just check if we are
+                // configuring a type itself or a type with only one extension.
+                if(extensionCount == 1)
+                {
+                    type = typeRegistry.getType(baseType.getExtensions().get(0));
+                }
+
+                SingleStepWizardState singleStepState = new SingleStepWizardState(baseType, type, null);
+                addState(singleStepState, true);
+            }
+            else
+            {
+                TwoStepWizardState state = new TwoStepWizardState(baseType);
+                state.setTypeRegistry(typeRegistry);
+                addState(state.getFirstState(), false);
+                addState(state.getSecondState(), true);
+            }
         }
 
         return wizardStates.get(wizardStates.size() - 1);
+    }
+
+    private void addState(TypeWizardState state, boolean configuration)
+    {
+        wizardStates.add(state);
+        if(configuration)
+        {
+            configureStates.put(state.getBaseType().getSymbolicName(), state);
+        }
     }
 
     public TypeWizardState getCurrentState()
@@ -71,14 +111,36 @@ public abstract class AbstractTypeWizard implements Wizard
         return currentState;
     }
 
+    public TypeWizardState getStateForType(CompositeType type)
+    {
+        return configureStates.get(type.getSymbolicName());
+    }
+
     public String getSuccessPath()
     {
         return successPath;
     }
 
-    public void setPath(String path)
+    public void setParameters(String path, boolean template)
     {
-        this.path = path;
+        // The incoming path for a templated scope should hold the template
+        // parent as its last element.
+        String parentPath = PathUtils.getParentPath(path);
+        if(parentPath != null && configurationTemplateManager.isTemplatedCollection(parentPath))
+        {
+            configPath = parentPath;
+            templateParentRecord = (TemplateRecord) configurationTemplateManager.getRecord(path);
+            if (templateParentRecord == null)
+            {
+                throw new IllegalArgumentException("Invalid wizard path '" + path + "': template parent does not exist");
+            }
+        }
+        else
+        {
+            configPath = path;
+        }
+
+        this.template = template;
     }
 
     public List<WizardTransition> getAvailableActions()
@@ -150,6 +212,11 @@ public abstract class AbstractTypeWizard implements Wizard
         return wizardStates.indexOf(currentState);
     }
 
+    public Iterable<? extends WizardState> getStates()
+    {
+        return wizardStates;
+    }
+
     public abstract Type getType();
 
     /**
@@ -174,15 +241,23 @@ public abstract class AbstractTypeWizard implements Wizard
 
     public abstract class AbstractTypeWizardState implements TypeWizardState
     {
+        private CompositeType baseType;
         private Set<String> ignoredFields = new HashSet<String>();
-        
+
+        protected AbstractTypeWizardState(CompositeType baseType)
+        {
+            this.baseType = baseType;
+        }
+
+        public CompositeType getBaseType()
+        {
+            return baseType;
+        }
+
         @SuppressWarnings({"unchecked"})
         public void updateRecord(Map parameters)
         {
-            Record post = PrototypeUtils.toRecord(getType(), parameters);
-
-            // apply the posted record details to the current state's record.
-            getRecord().update(post);
+            getDataRecord().update(PrototypeUtils.toRecord(getType(), parameters));
         }
 
         public Messages getMessages()
@@ -204,14 +279,14 @@ public abstract class AbstractTypeWizard implements Wizard
                     fieldIt.remove();
                 }
             }
-            
+
             return descriptor;
         }
 
         public boolean validate(String path, ValidationAware validationCallback)
         {
             validationCallback.addIgnoredFields(ignoredFields);
-            return configurationTemplateManager.validate(path, null, currentState.getRecord(), validationCallback) != null;
+            return configurationTemplateManager.validate(path, null, currentState.getRenderRecord(), validationCallback) != null;
         }
     }
 
@@ -225,25 +300,22 @@ public abstract class AbstractTypeWizard implements Wizard
          * Every wizard state / form is represented by a type.
          */
         private CompositeType type;
-
+        private MutableRecord dataRecord = null;
         private TemplateRecord templateRecord;
 
-        private MutableRecord record = null;
-
-        public SingleStepWizardState(CompositeType type, TemplateRecord record)
+        public SingleStepWizardState(CompositeType baseType, CompositeType type, TemplateRecord templateRecord)
         {
+            super(baseType);
             this.type = type;
-            this.templateRecord = record;
-            // FIXME template
-            this.record = type.createNewRecord(false);
+            this.templateRecord = templateRecord;
 
-            // extract initial values from the template record.
-            if (record != null)
+            if (templateRecord == null)
             {
-                for (TypeProperty property : type.getProperties(SimpleType.class))
-                {
-                    this.record.put(property.getName(), record.get(property.getName()));
-                }
+                this.dataRecord = type.createNewRecord(true);
+            }
+            else
+            {
+                this.dataRecord = (MutableRecord) templateRecord.getMoi();
             }
         }
 
@@ -257,14 +329,36 @@ public abstract class AbstractTypeWizard implements Wizard
             return type;
         }
 
-        public TemplateRecord getTemplateRecord()
+        public String getName()
         {
-            return templateRecord;
+            return getBaseType().getSymbolicName();
         }
 
-        public MutableRecord getRecord()
+        public Record getRenderRecord()
         {
-            return record;
+            if (templateRecord == null)
+            {
+                return dataRecord;
+            }
+            else
+            {
+                return templateRecord;
+            }
+        }
+
+        public MutableRecord getDataRecord()
+        {
+            return dataRecord;
+        }
+
+        @SuppressWarnings({"unchecked"})
+        public void updateRecord(Map parameters)
+        {
+            super.updateRecord(parameters);
+            if(templateRecord != null)
+            {
+                configurationTemplateManager.scrubInheritedValues(templateRecord, dataRecord, type);
+            }
         }
     }
 
@@ -275,22 +369,16 @@ public abstract class AbstractTypeWizard implements Wizard
      */
     public class TwoStepWizardState
     {
-        private TypeRegistry typeRegistry;
-
-        private CompositeType type;
-
-        private TemplateRecord record;
-
         private MutableRecord selectionRecord;
-
+        private CompositeType baseType;
         private Map<String, MutableRecord> typeRecordCache = new TreeMap<String, MutableRecord>();
 
-        public TwoStepWizardState(CompositeType type, TemplateRecord record)
+        private TypeRegistry typeRegistry;
+
+        public TwoStepWizardState(CompositeType baseType)
         {
-            this.type = type;
-            this.record = record;
+            this.baseType = baseType;
             this.selectionRecord = new MutableRecordImpl();
-            selectionRecord.setSymbolicName(type.getSymbolicName());
         }
 
         /**
@@ -328,26 +416,27 @@ public abstract class AbstractTypeWizard implements Wizard
         {
             private static final String SELECT_FIELD_NAME = "option";
 
-            public SelectWizardState()
+            public CompositeType getBaseType()
             {
-                // initialise the data.
-                if (getTemplateRecord() != null)
-                {
-                    selectionRecord.put(SELECT_FIELD_NAME, getTemplateRecord().getSymbolicName());
-                }
-            }
-
-            public TemplateRecord getTemplateRecord()
-            {
-                return record;
+                return baseType;
             }
 
             public CompositeType getType()
             {
-                return type;
+                return baseType;
             }
 
-            public MutableRecord getRecord()
+            public String getName()
+            {
+                return baseType.getSymbolicName() + ".select";
+            }
+
+            public Record getRenderRecord()
+            {
+                return selectionRecord;
+            }
+
+            public MutableRecord getDataRecord()
             {
                 return selectionRecord;
             }
@@ -363,7 +452,7 @@ public abstract class AbstractTypeWizard implements Wizard
 
             public Messages getMessages()
             {
-                return Messages.getInstance(type.getClazz());
+                return Messages.getInstance(baseType.getClazz());
             }
 
             public FormDescriptor createFormDescriptor(FormDescriptorFactory formDescriptorFactory, String path, String name)
@@ -375,7 +464,7 @@ public abstract class AbstractTypeWizard implements Wizard
                 SelectFieldDescriptor select = new SelectFieldDescriptor();
                 select.setName("option");
                 select.setType("select");
-                select.setList(type.getExtensions());
+                select.setList(baseType.getExtensions());
                 descriptor.add(select);
                 return descriptor;
             }
@@ -390,17 +479,7 @@ public abstract class AbstractTypeWizard implements Wizard
         {
             public ConfigurationWizardState()
             {
-                // initialise the states data using the template record if it exists.
-                if (record != null)
-                {
-                    MutableRecord data = record.flatten();
-                    typeRecordCache.put(type.getSymbolicName(), data);
-                }
-            }
-
-            public TemplateRecord getTemplateRecord()
-            {
-                return record;
+                super(baseType);
             }
 
             public CompositeType getType()
@@ -409,15 +488,23 @@ public abstract class AbstractTypeWizard implements Wizard
                 return typeRegistry.getType(selectedSymbolicName);
             }
 
-            public MutableRecord getRecord()
+            public String getName()
+            {
+                return baseType.getSymbolicName();
+            }
+
+            public Record getRenderRecord()
+            {
+                return getDataRecord();
+            }
+
+            public MutableRecord getDataRecord()
             {
                 String selectedSymbolicName = getSelectedSymbolicName();
                 if (!typeRecordCache.containsKey(selectedSymbolicName))
                 {
                     CompositeType selectedType = typeRegistry.getType(selectedSymbolicName);
-                    // FIXME template
-                    MutableRecord r = selectedType.createNewRecord(false);
-                    typeRecordCache.put(selectedSymbolicName, r);
+                    typeRecordCache.put(selectedSymbolicName, selectedType.createNewRecord(true));
                 }
                 return typeRecordCache.get(selectedSymbolicName);
             }

@@ -4,7 +4,7 @@ import com.zutubi.i18n.Messages;
 import com.zutubi.prototype.FormDescriptor;
 import com.zutubi.prototype.FormDescriptorFactory;
 import com.zutubi.prototype.type.record.MutableRecord;
-import com.zutubi.prototype.type.record.TemplateRecord;
+import com.zutubi.prototype.type.record.Record;
 import com.zutubi.validation.ValidationAware;
 
 import java.util.Map;
@@ -16,19 +16,27 @@ import java.util.Map;
 public interface WizardState
 {
     /**
-     * The template record associated with the data for this wizard state.
-     *
-     * @return
+     * @return a name for this state, unique in the wizard (used for I18N
+     *         lookups)
      */
-    TemplateRecord getTemplateRecord();
-
+    String getName();
     /**
-     * The record containing the data within this wizard state.
-     *
-     * @return
+     * @return The record used to render the form for this state, which may
+     * be different to the actual record that will be updated/inserted (e.g.
+     * in the case of a templated scope).
      */
-    MutableRecord getRecord();
-
+    Record getRenderRecord();
+    /**
+     * @return the record containing the data within this wizard state.  This
+     * is the record that is eventually inserted if the wizard completes.
+     */
+    MutableRecord getDataRecord();
+    /**
+     * Updates the data record for this state with the given posted
+     * parameters.
+     *
+     * @param parameters parameters posted from the web client
+     */
     void updateRecord(Map parameters);
 
     Messages getMessages();

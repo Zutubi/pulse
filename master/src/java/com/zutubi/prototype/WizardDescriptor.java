@@ -34,18 +34,25 @@ public class WizardDescriptor extends AbstractDescriptor
         wizard.setDecorate(decorate);
 
         // create the form wizard for the wizard.
-        WizardState state = wizardInstance.getCurrentState();
+        WizardState currentState = wizardInstance.getCurrentState();
 
-        FormDescriptor formDescriptor = state.createFormDescriptor(formDescriptorFactory, path, "wizardForm");
+        FormDescriptor formDescriptor = currentState.createFormDescriptor(formDescriptorFactory, path, "wizardForm");
         formDescriptor.setAction("wizard");
         formDescriptor.setAjax(ajax);
         
+        TemplateFormDecorator templateDecorator = new TemplateFormDecorator(record);
+        templateDecorator.decorate(formDescriptor);
+
         // decorate the form so that it fits into the wizard.
         decorate(formDescriptor);
 
         wizard.setForm(formDescriptor.instantiate(path, record));
 
-        wizard.setStepCount(wizardInstance.getStateCount());
+        for(WizardState state: wizardInstance.getStates())
+        {
+            wizard.addStep(state.getName());    
+        }
+
         wizard.setCurrentStep(wizardInstance.getCurrentStateIndex() + 1);
 
         return wizard;

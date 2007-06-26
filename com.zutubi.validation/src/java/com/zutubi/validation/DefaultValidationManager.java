@@ -3,8 +3,8 @@ package com.zutubi.validation;
 import com.zutubi.validation.validators.DelegateValidator;
 import com.zutubi.validation.validators.ValidateableValidator;
 
-import java.util.List;
 import java.util.LinkedList;
+import java.util.List;
 
 /**
  * <class-comment/>
@@ -25,7 +25,7 @@ public class DefaultValidationManager implements ValidationManager
         List<Validator> validators = new LinkedList<Validator>();
         for (ValidatorProvider provider : providers)
         {
-            validators.addAll(provider.getValidators(o));
+            validators.addAll(provider.getValidators(o, context));
         }
 
         // run them.

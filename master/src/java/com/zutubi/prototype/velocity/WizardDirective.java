@@ -6,9 +6,9 @@ import com.zutubi.i18n.Messages;
 import com.zutubi.prototype.FormDescriptor;
 import com.zutubi.prototype.FormDescriptorFactory;
 import com.zutubi.prototype.WizardDescriptor;
-import com.zutubi.prototype.i18n.WizardContextResolver;
-import com.zutubi.prototype.i18n.WizardContext;
 import com.zutubi.prototype.freemarker.GetTextMethod;
+import com.zutubi.prototype.i18n.WizardContext;
+import com.zutubi.prototype.i18n.WizardContextResolver;
 import com.zutubi.prototype.model.HiddenFieldDescriptor;
 import com.zutubi.prototype.type.record.PathUtils;
 import com.zutubi.prototype.wizard.TypeWizardState;
@@ -108,7 +108,7 @@ public class WizardDirective extends AbstractDirective
             Messages messages = Messages.getInstance(new WizardContext(wizardInstance));
 
             context.put("i18nText", new GetTextMethod(messages));
-            context.put("wizard", wizardDescriptor.instantiate(path, state.getRecord()));
+            context.put("wizard", wizardDescriptor.instantiate(path, state.getRenderRecord()));
 
             // validation support:
             OgnlValueStack stack = ActionContext.getContext().getValueStack();

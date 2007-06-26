@@ -3,36 +3,23 @@ package com.zutubi.pulse.prototype.config.user;
 import com.zutubi.prototype.type.CompositeType;
 import com.zutubi.prototype.type.Type;
 import com.zutubi.prototype.type.record.MutableRecord;
-import com.zutubi.prototype.type.record.MutableRecordImpl;
-import com.zutubi.prototype.type.record.TemplateRecord;
-import com.zutubi.prototype.wizard.TypeWizardState;
 import com.zutubi.prototype.wizard.webwork.AbstractTypeWizard;
-import com.zutubi.util.logging.Logger;
-
-import java.util.LinkedList;
 
 /**
  *
  */
 public class SubscriptionConfigurationWizard extends AbstractTypeWizard
 {
-    private static final Logger LOG = Logger.getLogger(SubscriptionConfigurationWizard.class);
-
-    private static final TemplateRecord EMPTY_RECORD = new TemplateRecord("empty", null, null, new MutableRecordImpl());
-
     private CompositeType subscriptionType;
+    private CompositeType conditionType;
 
     public void initialise()
     {
-        TemplateRecord templateRecord = EMPTY_RECORD;
-
         subscriptionType = typeRegistry.getType(SubscriptionConfiguration.class);
+        conditionType = (CompositeType) subscriptionType.getProperty("condition").getType();
 
-        CompositeType conditionType = (CompositeType) subscriptionType.getProperty("condition").getType();
-
-        wizardStates = new LinkedList<TypeWizardState>();
-        addWizardStates(wizardStates, subscriptionType, templateRecord);
-        addWizardStates(wizardStates, conditionType, (TemplateRecord) templateRecord.get("condition"));
+        addWizardStates(subscriptionType, null);
+        addWizardStates(conditionType, null);
 
         currentState = wizardStates.getFirst();
     }
@@ -40,10 +27,10 @@ public class SubscriptionConfigurationWizard extends AbstractTypeWizard
     public void doFinish()
     {
         MutableRecord record = subscriptionType.createNewRecord(true);
-        record.update(wizardStates.get(0).getRecord());
-        record.put("condition", wizardStates.get(2).getRecord());
+        record.update(getStateForType(subscriptionType).getDataRecord());
+        record.put("condition", getStateForType(conditionType).getDataRecord());
 
-        successPath = configurationTemplateManager.insertRecord(path, record);
+        successPath = configurationTemplateManager.insertRecord(configPath, record);
     }
 
     public Type getType()

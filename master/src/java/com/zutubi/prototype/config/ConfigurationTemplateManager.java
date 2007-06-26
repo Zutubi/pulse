@@ -57,10 +57,42 @@ public class ConfigurationTemplateManager
         return null;
     }
 
+    /**
+     * Returns the record at the given path.  If the path lies within a
+     * templated scope, a {@link TemplateRecord} will be returned.
+     *
+     * @param path path to retrieve the record for
+     * @return the record at the given location, or null if no record exists
+     *         at that location
+     * @throws IllegalArgumentException if the parent path is invalid
+     */
     public Record getRecord(String path)
     {
         checkPersistent(path);
-        return templatiseRecord(path, recordManager.load(path));
+        Record record = recordManager.load(path);
+        if (record != null)
+        {
+            record = templatiseRecord(path, record);
+        }
+
+        return record;
+    }
+
+    public TemplateRecord getParentRecord(String path)
+    {
+        checkPersistent(path);
+
+        String[] pathElements = PathUtils.getPathElements(path);
+        if (pathElements.length > 1)
+        {
+            ConfigurationScopeInfo scopeInfo = configurationPersistenceManager.getScopeInfo(pathElements[0]);
+            if (scopeInfo.isTemplated())
+            {
+                return getParentRecord(pathElements);
+            }
+        }
+
+        return null;
     }
 
     /**
@@ -113,6 +145,40 @@ public class ConfigurationTemplateManager
         return result;
     }
 
+    private TemplateRecord getParentRecord(String[] pathElements)
+    {
+        // Get the top-level template record for our parent and then
+        // ask it for the property to get our parent template record.
+        String owningPath = PathUtils.getPath(pathElements[0], pathElements[1]);
+        Record owningRecord = recordManager.load(owningPath);
+        if (owningRecord == null)
+        {
+            throw new IllegalArgumentException("Invalid path '" + PathUtils.getPath(pathElements) + "': owning record '" + owningPath + "' does not exist");
+        }
+
+        TemplateRecord parentTemplateRecord = null;
+        String parentOwningPath = getTemplateParentPath(owningPath, owningRecord);
+        if (parentOwningPath != null)
+        {
+            parentTemplateRecord = (TemplateRecord) getRecord(parentOwningPath);
+        }
+
+        for (int i = 2; i < pathElements.length && parentTemplateRecord != null; i++)
+        {
+            Object value = parentTemplateRecord.get(pathElements[i]);
+            if (value != null && !(value instanceof TemplateRecord))
+            {
+                LOG.severe("Find parent template record for path '" + PathUtils.getPath(pathElements) + "', traverse of element '" + pathElements[1] + "' gave property of unexpected type '" + value.getClass() + "'");
+                parentTemplateRecord = null;
+                break;
+            }
+
+            parentTemplateRecord = (TemplateRecord) value;
+        }
+
+        return parentTemplateRecord;
+    }
+
     private Record templatiseRecord(String path, Record record)
     {
         // We need to understand the root level can be templated.
@@ -122,43 +188,9 @@ public class ConfigurationTemplateManager
             ConfigurationScopeInfo scopeInfo = configurationPersistenceManager.getScopeInfo(pathElements[0]);
             if (scopeInfo.isTemplated())
             {
-                // Get the top-level template record for our parent and then
-                // ask it for the property to get our parent template record.
-                String owningPath = PathUtils.getPath(pathElements[0], pathElements[1]);
-                Record owningRecord = recordManager.load(owningPath);
-                if (owningRecord == null)
-                {
-                    throw new IllegalArgumentException("Invalid path '" + path + "': owning record '" + owningPath + "' does not exist");
-                }
-
-                TemplateRecord parentTemplateRecord = null;
-                String parentOwningPath = getTemplateParentPath(owningPath, owningRecord);
-                if (parentOwningPath != null)
-                {
-                    parentTemplateRecord = (TemplateRecord) getRecord(parentOwningPath);
-                }
-
-                for (int i = 2; i < pathElements.length && parentTemplateRecord != null; i++)
-                {
-                    Object value = parentTemplateRecord.get(pathElements[i]);
-                    if (value != null && !(value instanceof TemplateRecord))
-                    {
-                        LOG.severe("Templatising record at path '" + path + "', traverse of element '" + pathElements[1] + "' gave property of unexpected type '" + value.getClass() + "'");
-                        parentTemplateRecord = null;
-                        break;
-                    }
-                    parentTemplateRecord = (TemplateRecord) value;
-                }
-
-                if (record == null)
-                {
-                    record = parentTemplateRecord;
-                }
-                else
-                {
-                    ComplexType type = parentTemplateRecord == null ? configurationPersistenceManager.getType(path) : parentTemplateRecord.getType();
-                    record = new TemplateRecord(pathElements[1], parentTemplateRecord, type, record);
-                }
+                TemplateRecord parentTemplateRecord = getParentRecord(pathElements);
+                ComplexType type = parentTemplateRecord == null ? configurationPersistenceManager.getType(path) : parentTemplateRecord.getType();
+                record = new TemplateRecord(pathElements[1], parentTemplateRecord, type, record);
             }
         }
 
@@ -299,7 +331,7 @@ public class ConfigurationTemplateManager
 
     private CompositeType checkRecordType(Type expectedType, MutableRecord record)
     {
-        if(!(expectedType instanceof CompositeType))
+        if (!(expectedType instanceof CompositeType))
         {
             throw new IllegalArgumentException("Expected a composite type, but instead found " + expectedType.getClass().getName());
         }
@@ -370,6 +402,31 @@ public class ConfigurationTemplateManager
                 LOG.severe("Unable to instantiate '" + path + "': " + e.getMessage(), e);
             }
         }
+    }
+
+    private boolean isConcrete(String parentPath, Record subject)
+    {
+        if (parentPath != null)
+        {
+            String[] elements = PathUtils.getPathElements(parentPath);
+            if (configurationPersistenceManager.getScopeInfo(elements[0]).isTemplated())
+            {
+                if (elements.length == 1)
+                {
+                    // This record itself will carry the template marker
+                    return isConcrete(subject);
+                }
+                else
+                {
+                    // Load the owner to see if it is marked as a template
+                    String ownerPath = PathUtils.getPath(elements[0], elements[1]);
+                    Record ownerRecord = getRecord(ownerPath);
+                    return isConcrete(ownerRecord);
+                }
+            }
+        }
+
+        return true;
     }
 
     private boolean isConcrete(Record record)
@@ -443,15 +500,31 @@ public class ConfigurationTemplateManager
         return node;
     }
 
-    public Object validate(String parentPath, String baseName, Record subject, ValidationAware validationCallback)
+    /**
+     * Validates the given record as a composite of some type, and returns
+     * the instance if valid.  The validation occurs in the context of where
+     * the record is to be stored, allowing inspection of associated
+     * instances if necessary.
+     *
+     * @param parentPath         parent of the path where the record is to be
+     *                           stored
+     * @param baseName           base name of the path where the record is to
+     *                           be stored
+     * @param subject            record to validate
+     * @param validationCallback receives details of validation errors
+     * @return the instance if valid, null otherwise
+     */
+    @SuppressWarnings({"unchecked"})
+    public <T> T validate(String parentPath, String baseName, Record subject, ValidationAware validationCallback)
     {
-        // The type we validating against.
+        // The type we are validating against.
         Type type = typeRegistry.getType(subject.getSymbolicName());
 
-        // Construct the validation context, wrapping it around the validation callback to that the
+        // Construct the validation context, wrapping it around the validation callback so that the
         // client is notified of validation errors.
         MessagesTextProvider textProvider = new MessagesTextProvider(type.getClazz());
-        ValidationContext context = new ConfigurationValidationContext(validationCallback, textProvider, parentPath == null ? null : getInstance(parentPath), baseName);
+        Object parentInstance = parentPath == null ? null : getInstance(parentPath);
+        ValidationContext context = new ConfigurationValidationContext(validationCallback, textProvider, parentInstance, baseName, !isConcrete(parentPath, subject));
 
         // Create an instance of the object represented by the record.  It is during the instantiation that
         // type conversion errors are detected.
@@ -484,7 +557,7 @@ public class ConfigurationTemplateManager
             }
             else
             {
-                return instance;
+                return (T) instance;
             }
         }
         catch (ValidationException e)
@@ -525,6 +598,11 @@ public class ConfigurationTemplateManager
         }
 
         String parentPath = PathUtils.getParentPath(path);
+        if (parentPath == null)
+        {
+            throw new IllegalArgumentException("Illegal path '" + path + "': no parent record");
+        }
+
         ComplexType parentType = configurationPersistenceManager.getType(parentPath);
         String newPath = parentType.getSavePath(path, record);
 
@@ -536,38 +614,13 @@ public class ConfigurationTemplateManager
         // to happen.
         if (existingRecord instanceof TemplateRecord)
         {
-            // Ensure there is a concrete record for this path.  We may need
-            // to create a few records along the path to make this happen.
             TemplateRecord templateRecord = (TemplateRecord) existingRecord;
             newRecord = templateRecord.getMoi().copy(false);
             newRecord.update(record);
 
             // Scrub values from the incoming record where they are identical
             // to the existing record's parent.
-            TemplateRecord existingParent = templateRecord.getParent();
-            if (existingParent != null)
-            {
-                // We add an empty layer where we are about to add the new
-                // record in case there are any values hidden from the parent
-                // via templating rules (like NoInherit).
-                TemplateRecord emptyChild = new TemplateRecord(null, existingParent, actualType, actualType.createNewRecord(false));
-                Set<String> dead = new HashSet<String>();
-
-                // Perhaps we could use an iterator to remove, but does Record
-                // specify what happens when removing using a key set iterator?
-                for (String key : newRecord.keySet())
-                {
-                    if (newRecord.get(key).equals(emptyChild.get(key)))
-                    {
-                        dead.add(key);
-                    }
-                }
-
-                for (String key : dead)
-                {
-                    newRecord.remove(key);
-                }
-            }
+            scrubInheritedValues(templateRecord, newRecord, actualType);
         }
         else
         {
@@ -588,7 +641,7 @@ public class ConfigurationTemplateManager
         {
             // We need to update the path by moving.  If templating, this
             // means also moving all children.
-            if(existingRecord instanceof TemplateRecord)
+            if (existingRecord instanceof TemplateRecord)
             {
                 String[] elements = PathUtils.getPathElements(path);
                 final String scope = elements[0];
@@ -620,6 +673,34 @@ public class ConfigurationTemplateManager
         eventManager.publish(new PostSaveEvent(this, path, oldInstance, newPath, instances.get(newPath)));
 
         return newPath;
+    }
+
+    public void scrubInheritedValues(TemplateRecord templateRecord, MutableRecord record, CompositeType type)
+    {
+        TemplateRecord existingParent = templateRecord.getParent();
+        if (existingParent != null)
+        {
+            // We add an empty layer where we are about to add the new
+            // record in case there are any values hidden from the parent
+            // via templating rules (like NoInherit).
+            TemplateRecord emptyChild = new TemplateRecord(null, existingParent, type, type.createNewRecord(false));
+            Set<String> dead = new HashSet<String>();
+
+            // Perhaps we could use an iterator to remove, but does Record
+            // specify what happens when removing using a key set iterator?
+            for (String key : record.keySet())
+            {
+                if (record.get(key).equals(emptyChild.get(key)))
+                {
+                    dead.add(key);
+                }
+            }
+
+            for (String key : dead)
+            {
+                record.remove(key);
+            }
+        }
     }
 
     public void delete(final String path)
@@ -916,6 +997,28 @@ public class ConfigurationTemplateManager
         }
 
         return result;
+    }
+
+    /**
+     * Returns true if the given path points to a templated collection: i.e.
+     * a collection at the root of a templated scope.
+     *
+     * @param path the path to test
+     * @return true iff path points to a templated collection
+     */
+    public boolean isTemplatedCollection(String path)
+    {
+        String[] elements = PathUtils.getPathElements(path);
+        if (elements.length == 1)
+        {
+            ConfigurationScopeInfo info = configurationPersistenceManager.getScopeInfo(elements[0]);
+            if (info != null && info.isTemplated())
+            {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     public void setTypeRegistry(TypeRegistry typeRegistry)

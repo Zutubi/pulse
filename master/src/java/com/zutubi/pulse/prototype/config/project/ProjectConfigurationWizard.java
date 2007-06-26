@@ -3,13 +3,8 @@ package com.zutubi.pulse.prototype.config.project;
 import com.zutubi.prototype.type.CompositeType;
 import com.zutubi.prototype.type.Type;
 import com.zutubi.prototype.type.record.MutableRecord;
-import com.zutubi.prototype.type.record.MutableRecordImpl;
-import com.zutubi.prototype.type.record.Record;
 import com.zutubi.prototype.type.record.TemplateRecord;
-import com.zutubi.prototype.wizard.TypeWizardState;
 import com.zutubi.prototype.wizard.webwork.AbstractTypeWizard;
-
-import java.util.LinkedList;
 
 /**
  * This wizard walks a user through the project configuration process. During project configuration,
@@ -17,23 +12,20 @@ import java.util.LinkedList;
  */
 public class ProjectConfigurationWizard extends AbstractTypeWizard
 {
-    private static final TemplateRecord EMPTY_RECORD = new TemplateRecord("empty", null, null, new MutableRecordImpl());
-
     private CompositeType projectType;
+    private CompositeType scmType;
+    private CompositeType typeType;
 
     public void initialise()
     {
-        TemplateRecord templateRecord = EMPTY_RECORD;
-
         projectType = typeRegistry.getType(ProjectConfiguration.class);
-        
-        CompositeType scmType = (CompositeType) projectType.getProperty("scm").getType();
-        CompositeType typeType = (CompositeType) projectType.getProperty("type").getType();
 
-        wizardStates = new LinkedList<TypeWizardState>();
-        addWizardStates(wizardStates, projectType, templateRecord);
-        addWizardStates(wizardStates, scmType, (TemplateRecord) templateRecord.get("scm"));
-        addWizardStates(wizardStates, typeType, (TemplateRecord) templateRecord.get("type"));
+        scmType = (CompositeType) projectType.getProperty("scm").getType();
+        typeType = (CompositeType) projectType.getProperty("type").getType();
+
+        addWizardStates(projectType, templateParentRecord);
+        addWizardStates(scmType, (TemplateRecord) (templateParentRecord == null ? null : templateParentRecord.get("scm")));
+        addWizardStates(typeType, (TemplateRecord) (templateParentRecord == null ? null : templateParentRecord.get("type")));
 
         currentState = wizardStates.getFirst();
     }
@@ -41,14 +33,16 @@ public class ProjectConfigurationWizard extends AbstractTypeWizard
     public void doFinish()
     {
         MutableRecord record = projectType.createNewRecord(false);
-        record.update(wizardStates.get(0).getRecord());
-        record.put("scm", wizardStates.get(2).getRecord());
-        record.put("type", wizardStates.get(4).getRecord());
+        record.update(getStateForType(projectType).getDataRecord());
+        record.put("scm", getStateForType(scmType).getDataRecord());
+        record.put("type", getStateForType(typeType).getDataRecord());
 
-        // FIXME: temporary setting of parent
-        String globalPath = configurationTemplateManager.getTemplateHierarchy("project").getRoot().getPath();
-        Record globalRecord = configurationTemplateManager.getRecord(globalPath);
-        configurationTemplateManager.setParentTemplate(record, globalRecord.getHandle());
+        configurationTemplateManager.setParentTemplate(record, templateParentRecord.getHandle());
+        if(template)
+        {
+            configurationTemplateManager.markAsTemplate(record);
+        }
+        
         successPath = configurationTemplateManager.insertRecord("project", record);
     }
 

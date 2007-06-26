@@ -14,6 +14,10 @@ import java.util.Set;
  */
 public class TemplateRecord extends AbstractRecord
 {
+    /**
+     * Id of the owning object.  For example, the name of the project his
+     * record lives in.  This may be empty for new template records.
+     */
     private String owner;
     private TemplateRecord parent;
     private ComplexType type;

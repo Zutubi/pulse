@@ -1,22 +1,23 @@
 package com.zutubi.validation.providers;
 
-import com.zutubi.validation.ValidatorProvider;
-import com.zutubi.validation.Validator;
-import com.zutubi.validation.FieldValidator;
-import com.zutubi.validation.annotations.Constraint;
-import com.zutubi.util.bean.ObjectFactory;
-import com.zutubi.util.bean.DefaultObjectFactory;
 import com.zutubi.util.AnnotationUtils;
 import com.zutubi.util.ClassLoaderUtils;
+import com.zutubi.util.bean.DefaultObjectFactory;
+import com.zutubi.util.bean.ObjectFactory;
+import com.zutubi.validation.FieldValidator;
+import com.zutubi.validation.ValidationContext;
+import com.zutubi.validation.Validator;
+import com.zutubi.validation.ValidatorProvider;
+import com.zutubi.validation.annotations.Constraint;
 
-import java.util.*;
-import java.lang.reflect.Method;
-import java.lang.reflect.Field;
-import java.lang.reflect.AnnotatedElement;
-import java.lang.annotation.Annotation;
-import java.beans.Introspector;
 import java.beans.IntrospectionException;
+import java.beans.Introspector;
 import java.beans.PropertyDescriptor;
+import java.lang.annotation.Annotation;
+import java.lang.reflect.AnnotatedElement;
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
+import java.util.*;
 
 /**
  * <class-comment/>
@@ -32,7 +33,7 @@ public class AnnotationValidatorProvider implements ValidatorProvider
         this.objectFactory = objectFactory;
     }
 
-    public List<Validator> getValidators(Object obj)
+    public List<Validator> getValidators(Object obj, ValidationContext context)
     {
         return traverse(obj.getClass(), new HashSet<Class>());
     }

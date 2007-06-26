@@ -2,7 +2,8 @@ package com.zutubi.pulse.prototype.config.project;
 
 import com.zutubi.config.annotations.*;
 import com.zutubi.prototype.type.Extendable;
-import com.zutubi.pulse.core.config.AbstractNamedConfiguration;
+import com.zutubi.pulse.core.config.AbstractConfiguration;
+import com.zutubi.pulse.core.config.NamedConfiguration;
 import com.zutubi.pulse.core.config.ResourceProperty;
 import com.zutubi.pulse.model.ResourceRequirement;
 import com.zutubi.pulse.prototype.config.project.actions.PostBuildActionConfiguration;
@@ -21,10 +22,12 @@ import java.util.Map;
  */
 @Form(fieldOrder = {"name", "url", "description"})
 @Table(columns = {"name"})
-public class ProjectConfiguration extends AbstractNamedConfiguration implements Extendable
+public class ProjectConfiguration extends AbstractConfiguration implements Extendable, NamedConfiguration
 {
     @Internal
     private long projectId;
+    @NoInherit
+    private String name;
     @Url
     private String url;
     @NoInherit
@@ -70,6 +73,16 @@ public class ProjectConfiguration extends AbstractNamedConfiguration implements 
     public void setProjectId(long projectId)
     {
         this.projectId = projectId;
+    }
+
+    public String getName()
+    {
+        return name;
+    }
+
+    public void setName(String name)
+    {
+        this.name = name;
     }
 
     public String getUrl()
