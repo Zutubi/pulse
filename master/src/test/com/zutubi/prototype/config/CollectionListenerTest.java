@@ -1,13 +1,13 @@
 package com.zutubi.prototype.config;
 
-import com.zutubi.prototype.type.record.MutableRecord;
-import com.zutubi.prototype.type.record.Record;
+import com.zutubi.config.annotations.ID;
+import com.zutubi.config.annotations.SymbolicName;
 import com.zutubi.prototype.type.CompositeType;
 import com.zutubi.prototype.type.MapType;
-import com.zutubi.pulse.core.config.Configuration;
+import com.zutubi.prototype.type.record.MutableRecord;
+import com.zutubi.prototype.type.record.Record;
 import com.zutubi.pulse.core.config.AbstractConfiguration;
-import com.zutubi.config.annotations.SymbolicName;
-import com.zutubi.config.annotations.ID;
+import com.zutubi.pulse.core.config.Configuration;
 
 /**
  *
@@ -29,7 +29,7 @@ public class CollectionListenerTest extends AbstractConfigurationSystemTestCase
         provider.init();
 
         CompositeType typeA = typeRegistry.register("a", A.class);
-        MapType mapA = new MapType(configurationTemplateManager);
+        MapType mapA = new MapType();
         mapA.setTypeRegistry(typeRegistry);
         mapA.setCollectionType(typeA);
 

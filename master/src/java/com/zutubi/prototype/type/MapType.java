@@ -1,7 +1,7 @@
 package com.zutubi.prototype.type;
 
 import com.zutubi.config.annotations.ID;
-import com.zutubi.prototype.config.ConfigurationTemplateManager;
+import com.zutubi.prototype.config.InstanceCache;
 import com.zutubi.prototype.type.record.MutableRecord;
 import com.zutubi.prototype.type.record.PathUtils;
 import com.zutubi.prototype.type.record.Record;
@@ -23,18 +23,16 @@ public class MapType extends CollectionType
     private static final Logger LOG = Logger.getLogger(MapType.class);
 
     private String keyProperty;
-    private ConfigurationTemplateManager configurationTemplateManager;
 
-    public MapType(ConfigurationTemplateManager configurationTemplateManager)
+    public MapType()
     {
         super(HashMap.class);
-        this.configurationTemplateManager = configurationTemplateManager;
     }
 
     @SuppressWarnings({"unchecked"})
-    public Map instantiate(String path, Object data) throws TypeException
+    public Map instantiate(String path, InstanceCache cache, Object data) throws TypeException
     {
-        Map instance = (Map) (path == null ? null : configurationTemplateManager.getInstance(path));
+        Map instance = (Map) (path == null ? null : cache.get(path));
         if (instance == null && data != null)
         {
             if (!(data instanceof Record))
@@ -48,7 +46,7 @@ public class MapType extends CollectionType
             instance = new HashMap<String, Object>();
             if (path != null)
             {
-                configurationTemplateManager.putInstance(path, instance);
+                cache.put(path, instance);
             }
 
             for (String key : record.keySet())
@@ -65,7 +63,7 @@ public class MapType extends CollectionType
                     }
                 }
 
-                Object value = type.instantiate(path == null ? null : PathUtils.getPath(path, key), child);
+                Object value = type.instantiate(path == null ? null : PathUtils.getPath(path, key), cache, child);
                 instance.put(key, value);
             }
         }

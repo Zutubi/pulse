@@ -83,10 +83,10 @@ public class CheckAction extends PrototypeSupport
         }
 
         // Instantiate the primary configuration object.
-        Object instance = type.instantiate(null, record);
+        Object instance = type.instantiate(null, null, record);
 
         // Instantiate and execute the check handler.
-        ConfigurationCheckHandler handler = (ConfigurationCheckHandler) checkType.instantiate(null, checkRecord);
+        ConfigurationCheckHandler handler = (ConfigurationCheckHandler) checkType.instantiate(null, null, checkRecord);
         ComponentContext.autowire(handler);
         Exception exception = null;
         try

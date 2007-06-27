@@ -149,8 +149,7 @@
                     centerRegion = nestedLayout.getRegion('center');
                     var centerPanel = centerRegion.getPanel(0);
                     centerPanel.setTitle('');
-                    centerPanel.getEl().setStyle('margin', '0');
-                    centerRegion.titleEl.show();
+                    centerPanel.getEl().setStyle('margin', '4px');
 
                     nestedLayout.addRegion('north', {
                         split: false,
@@ -160,10 +159,9 @@
                     nestedLayout.addRegion('west', {
                         split:true,
                         initialSize: 300,
-                        titlebar: true,
+                        titlebar: false,
                         collapsible: true,
                         animate: true,
-                        tabPosition: 'top',
                         autoScroll: true
                     });
 
@@ -188,12 +186,12 @@
 
                     nestedLayout.beginUpdate();
                     nestedLayout.add('north', new Ext.ContentPanel('innernorth', {title: 'inner north'}));
-                    nestedLayout.add('west', new Ext.ContentPanel('template-tree', {title: 'Projects'}));
-                    nestedLayout.add('west', new Ext.ContentPanel('config-tree', {title: 'Configuration'}));
+                    nestedLayout.add('west', new Ext.ContentPanel('template-tree', {title: 'hierarchy'}));
+                    nestedLayout.add('west', new Ext.ContentPanel('config-tree', {title: 'configuration'}));
                     nestedLayout.endUpdate();
 
                     nestedLayout.getRegion('west').on('panelactivated', function(region, panel) {
-                        if(panel.title == 'Configuration')
+                        if(panel.title == 'configuration')
                         {
                             var node = templateTree.getSelectionModel().getSelectedNode();
                             if (!node)
@@ -246,7 +244,7 @@
 
     #parse("/template/includes/actionerrors.vm")
 
-    <div id="innernorth" style="padding: 4px; padding-bottom: 12px; border-bottom: 1px solid #ccc">
+    <div id="innernorth" style="padding: 4px; border-bottom: 1px solid #ccc">
     </div>
   
     <div id="template-tree" class="ylayout-inactive-content">

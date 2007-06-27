@@ -22,7 +22,7 @@ public class MapTypeTest extends TypeTestCase
 
         mockAType = typeRegistry.register("mockA", MockA.class);
 
-        mapType = new MapType(configurationTemplateManager);
+        mapType = new MapType();
         mapType.setTypeRegistry(typeRegistry);
         mapType.setCollectionType(typeRegistry.getType(MockA.class));
     }
@@ -42,7 +42,7 @@ public class MapTypeTest extends TypeTestCase
         instance.put("keyB", new MockA("valueB"));
 
         Record record = (Record) mapType.unstantiate(instance);
-        Map newInstance = mapType.instantiate("", record);
+        Map newInstance = mapType.instantiate(null, null, record);
 
         assertEquals(2, newInstance.size());
         assertEquals(instance.get("keyA"), newInstance.get("keyA"));

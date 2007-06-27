@@ -18,6 +18,7 @@ public class Actions
 
     private ObjectFactory objectFactory;
 
+    @SuppressWarnings({"unchecked"})
     public List<String> getActions(Class actionHandlerClass, Object configurationInstance)
     {
         // is the getActions method defined?
@@ -88,6 +89,7 @@ public class Actions
         return actions;
     }
 
+    @SuppressWarnings({"unchecked"})
     public void execute(Class actionHandlerClass, String actionName, Object configurationInstance)
     {
         String methodName = "do" + actionName.substring(0, 1).toUpperCase();
@@ -112,11 +114,6 @@ public class Actions
         }
     }
 
-    /**
-     * Required resource
-     *
-     * @param objectFactory instance
-     */
     public void setObjectFactory(ObjectFactory objectFactory)
     {
         this.objectFactory = objectFactory;

@@ -1,21 +1,20 @@
 package com.zutubi.prototype.config;
 
-import com.zutubi.pulse.test.PulseTestCase;
-import com.zutubi.pulse.core.config.Configuration;
 import com.zutubi.pulse.core.config.AbstractConfiguration;
+import com.zutubi.pulse.test.PulseTestCase;
 
-import java.util.List;
 import java.util.LinkedList;
+import java.util.List;
 
 /**
  */
-public class InstanceCacheTest extends PulseTestCase
+public class DefaultInstanceCacheTest extends PulseTestCase
 {
-    private InstanceCache cache;
+    private DefaultInstanceCache cache;
 
     protected void setUp() throws Exception
     {
-        cache = new InstanceCache();
+        cache = new DefaultInstanceCache();
     }
 
     protected void tearDown() throws Exception

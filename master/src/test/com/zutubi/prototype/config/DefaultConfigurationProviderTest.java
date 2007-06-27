@@ -39,7 +39,7 @@ public class DefaultConfigurationProviderTest extends AbstractConfigurationSyste
         b.setC(c);
 
         CompositeType typeA = typeRegistry.getType(A.class);
-        MapType mapA = new MapType(configurationTemplateManager);
+        MapType mapA = new MapType();
         mapA.setTypeRegistry(typeRegistry);
         mapA.setCollectionType(typeA);
 

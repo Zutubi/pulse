@@ -120,7 +120,6 @@ public class DefaultProjectManager implements ProjectManager
         {
             CompositeType projectType = typeRegistry.getType(ProjectConfiguration.class);
             MutableRecord globalTemplate = projectType.createNewRecord(true);
-            // FIXME: I18N these strings.
             globalTemplate.put("name", "global project template");
             globalTemplate.put("description", "The global template is the base of the project template hierarchy.  Configuration shared among all projects should be added here.");
             configurationTemplateManager.markAsTemplate(globalTemplate);

@@ -1,7 +1,7 @@
 package com.zutubi.prototype.type;
 
 import com.zutubi.config.annotations.Internal;
-import com.zutubi.prototype.config.ConfigurationTemplateManager;
+import com.zutubi.prototype.config.InstanceCache;
 import com.zutubi.prototype.type.record.MutableRecord;
 import com.zutubi.prototype.type.record.MutableRecordImpl;
 import com.zutubi.prototype.type.record.PathUtils;
@@ -34,12 +34,10 @@ public class CompositeType extends AbstractType implements ComplexType
 
     private Map<Class, List<String>> propertiesByClass = new HashMap<Class, List<String>>();
 
-    private ConfigurationTemplateManager configurationTemplateManager;
 
-    public CompositeType(Class type, String symbolicName, ConfigurationTemplateManager configurationTemplateManager)
+    public CompositeType(Class type, String symbolicName)
     {
         super(type, symbolicName);
-        this.configurationTemplateManager = configurationTemplateManager;
     }
 
     public void addProperty(TypeProperty property)
@@ -141,9 +139,9 @@ public class CompositeType extends AbstractType implements ComplexType
         this.extensions = extensions;
     }
 
-    public Object instantiate(String path, Object data) throws TypeException
+    public Object instantiate(String path, InstanceCache cache, Object data) throws TypeException
     {
-        Object instance = path == null ? null : configurationTemplateManager.getInstance(path);
+        Object instance = path == null ? null : cache.get(path);
         if (instance == null && data != null)
         {
             try
@@ -154,14 +152,14 @@ public class CompositeType extends AbstractType implements ComplexType
                 if (!getSymbolicName().equals(record.getSymbolicName()))
                 {
                     CompositeType type = typeRegistry.getType(record.getSymbolicName());
-                    return type.instantiate(path, data);
+                    return type.instantiate(path, cache, data);
                 }
 
                 instance = getClazz().newInstance();
                 if (path != null)
                 {
                     // paths are associated with configuration objects only.
-                    configurationTemplateManager.putInstance(path, instance);
+                    cache.put(path, instance);
                     if (instance instanceof Configuration)
                     {
                         Configuration config = (Configuration) instance;
@@ -174,11 +172,11 @@ public class CompositeType extends AbstractType implements ComplexType
 
                 for (Map.Entry<String, TypeProperty> entry : properties.entrySet())
                 {
-                    exception = instantiateProperty(entry, path, record, instance, exception);
+                    exception = instantiateProperty(entry, path, cache, record, instance, exception);
                 }
                 for (Map.Entry<String, TypeProperty> entry : internalProperties.entrySet())
                 {
-                    exception = instantiateProperty(entry, path, record, instance, exception);
+                    exception = instantiateProperty(entry, path, cache, record, instance, exception);
                 }
 
                 if (exception != null)
@@ -200,7 +198,7 @@ public class CompositeType extends AbstractType implements ComplexType
         return instance;
     }
 
-    private TypeConversionException instantiateProperty(Map.Entry<String, TypeProperty> entry, String path, Record record, Object instance, TypeConversionException exception) throws TypeException
+    private TypeConversionException instantiateProperty(Map.Entry<String, TypeProperty> entry, String path, InstanceCache cache, Record record, Object instance, TypeConversionException exception) throws TypeException
     {
         String name = entry.getKey();
         TypeProperty property = entry.getValue();
@@ -221,7 +219,7 @@ public class CompositeType extends AbstractType implements ComplexType
             // Instantiate even if there is no setter so the instance
             // is both checked for validity and cached.
             Type type = property.getType();
-            Object value = type.instantiate(path == null ? null : PathUtils.getPath(path, name), record.get(name));
+            Object value = type.instantiate(path == null ? null : PathUtils.getPath(path, name), cache, record.get(name));
             property.setValue(instance, value);
         }
         catch (Exception e)

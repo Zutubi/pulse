@@ -4,7 +4,6 @@ import com.zutubi.config.annotations.Reference;
 import com.zutubi.config.annotations.SymbolicName;
 import com.zutubi.config.annotations.Transient;
 import com.zutubi.prototype.config.ConfigurationReferenceManager;
-import com.zutubi.prototype.config.ConfigurationTemplateManager;
 import com.zutubi.prototype.type.record.HandleAllocator;
 import com.zutubi.util.AnnotationUtils;
 import com.zutubi.util.CollectionUtils;
@@ -31,7 +30,6 @@ public class TypeRegistry
     private Map<Class, SimpleType> primitiveMapping = new HashMap<Class, SimpleType>();
 
     private ConfigurationReferenceManager configurationReferenceManager;
-    private ConfigurationTemplateManager configurationTemplateManager;
     private HandleAllocator handleAllocator;
 
     public TypeRegistry()
@@ -107,7 +105,7 @@ public class TypeRegistry
             CompositeType type = classMapping.get(clazz);
             if (type == null)
             {
-                type = new CompositeType(clazz, symbolicName, configurationTemplateManager);
+                type = new CompositeType(clazz, symbolicName);
                 type.setTypeRegistry(this);
                 classMapping.put(clazz, type);
 
@@ -223,14 +221,14 @@ public class TypeRegistry
                         if (List.class.isAssignableFrom(clazz))
                         {
                             valueClass = (Class) parameterizedType.getActualTypeArguments()[0];
-                            collection = new ListType(configurationTemplateManager, handleAllocator);
+                            collection = new ListType(handleAllocator);
                         }
                         else
                         {
                             if (Map.class.isAssignableFrom(clazz))
                             {
                                 valueClass = (Class) parameterizedType.getActualTypeArguments()[1];
-                                collection = new MapType(configurationTemplateManager);
+                                collection = new MapType();
                             }
                         }
 
@@ -318,11 +316,6 @@ public class TypeRegistry
     public void setConfigurationReferenceManager(ConfigurationReferenceManager configurationReferenceManager)
     {
         this.configurationReferenceManager = configurationReferenceManager;
-    }
-
-    public void setConfigurationTemplateManager(ConfigurationTemplateManager configurationTemplateManager)
-    {
-        this.configurationTemplateManager = configurationTemplateManager;
     }
 
     public void setHandleAllocator(HandleAllocator handleAllocator)

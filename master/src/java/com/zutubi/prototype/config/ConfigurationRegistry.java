@@ -128,7 +128,7 @@ public class ConfigurationRegistry
             triggerConfig.addExtension("cronTriggerConfig");
             triggerConfig.addExtension("scmTriggerConfig");
             
-            MapType triggers = new MapType(configurationTemplateManager);
+            MapType triggers = new MapType();
             triggers.setTypeRegistry(typeRegistry);
             triggers.setCollectionType(typeRegistry.getType("triggerConfig"));
             projectConfig.addProperty(new ExtensionTypeProperty("trigger", triggers));
@@ -154,19 +154,19 @@ public class ConfigurationRegistry
             commitConfig.addExtension("jiraCommitConfig");
             commitConfig.addExtension("customCommitConfig");
 
-            MapType commitTransformers = new MapType(configurationTemplateManager);
+            MapType commitTransformers = new MapType();
             commitTransformers.setTypeRegistry(typeRegistry);
             commitTransformers.setCollectionType(typeRegistry.getType("commitConfig"));
             projectConfig.addProperty(new ExtensionTypeProperty("commit", commitTransformers));
 
             // define the root level scope.
-            TemplatedMapType projectCollection = new TemplatedMapType(configurationTemplateManager);
+            TemplatedMapType projectCollection = new TemplatedMapType();
             projectCollection.setTypeRegistry(typeRegistry);
             projectCollection.setCollectionType(projectConfig);
 
             configurationPersistenceManager.register("project", projectCollection);
 
-            MapType agentCollection = new MapType(configurationTemplateManager);
+            MapType agentCollection = new MapType();
             agentCollection.setTypeRegistry(typeRegistry);
             agentCollection.setCollectionType(registerConfigurationType(AgentConfiguration.class));
             configurationPersistenceManager.register("agent", agentCollection);
@@ -177,7 +177,7 @@ public class ConfigurationRegistry
             
             // user configuration.
 
-            MapType userCollection = new MapType(configurationTemplateManager);
+            MapType userCollection = new MapType();
             userCollection.setTypeRegistry(typeRegistry);
             userCollection.setCollectionType(registerConfigurationType(UserConfiguration.class));
 
@@ -221,7 +221,7 @@ public class ConfigurationRegistry
     public void registerProjectMapExtension(String name, Class clazz) throws TypeException
     {
         // create the map type.
-        MapType mapType = new MapType(configurationTemplateManager);
+        MapType mapType = new MapType();
         mapType.setTypeRegistry(typeRegistry);
 
         // register the new type.

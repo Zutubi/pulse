@@ -1,6 +1,6 @@
 package com.zutubi.prototype.type;
 
-import com.zutubi.prototype.config.ConfigurationTemplateManager;
+import com.zutubi.prototype.config.InstanceCache;
 import com.zutubi.prototype.type.record.HandleAllocator;
 import com.zutubi.prototype.type.record.MutableRecord;
 import com.zutubi.prototype.type.record.PathUtils;
@@ -14,13 +14,11 @@ import java.util.*;
  */
 public class ListType extends CollectionType
 {
-    private ConfigurationTemplateManager configurationTemplateManager;
     private HandleAllocator handleAllocator;
 
-    public ListType(ConfigurationTemplateManager configurationTemplateManager, HandleAllocator handleAllocator)
+    public ListType(HandleAllocator handleAllocator)
     {
         super(LinkedList.class);
-        this.configurationTemplateManager = configurationTemplateManager;
         this.handleAllocator = handleAllocator;
     }
 
@@ -30,16 +28,16 @@ public class ListType extends CollectionType
     }
 
     @SuppressWarnings({"unchecked"})
-    public List<Object> instantiate(String path, Object data) throws TypeException
+    public List<Object> instantiate(String path, InstanceCache cache, Object data) throws TypeException
     {
-        List<Object> instance = (List<Object>) (path == null ? null : configurationTemplateManager.getInstance(path));
+        List<Object> instance = (List<Object>) (path == null ? null : cache.get(path));
         if (instance == null && data != null)
         {
             if (data instanceof Record)
             {
                 Record record = (Record) data;
 
-                instance = create(path);
+                instance = create(path, cache);
 
                 Collection<String> keys = getOrder(record);
                 Type defaultType = getCollectionType();
@@ -57,7 +55,7 @@ public class ListType extends CollectionType
                             throw new TypeException("Reference to unknown type '" + symbolicName + "'");
                         }
                     }
-                    Object value = type.instantiate(path == null ? null : PathUtils.getPath(path, key), child);
+                    Object value = type.instantiate(path == null ? null : PathUtils.getPath(path, key), cache, child);
                     instance.add(value);
                 }
 
@@ -65,12 +63,12 @@ public class ListType extends CollectionType
             }
             else if(data instanceof String[])
             {
-                instance = create(path);
+                instance = create(path, cache);
                 Type type = getCollectionType();
                 String[] references = (String[]) data;
                 for (String reference : references)
                 {
-                    instance.add(type.instantiate(path, reference));
+                    instance.add(type.instantiate(path, cache, reference));
                 }
                 return instance;
             }
@@ -126,13 +124,13 @@ public class ListType extends CollectionType
         }
     }
 
-    private List<Object> create(String path)
+    private List<Object> create(String path, InstanceCache cache)
     {
         List<Object> instance;
         instance = new LinkedList<Object>();
         if (path != null)
         {
-            configurationTemplateManager.putInstance(path, instance);
+            cache.put(path, instance);
         }
         return instance;
     }

@@ -23,7 +23,8 @@ public class ConfigurationTemplateManager
     private static final String PARENT_KEY = "parentHandle";
     private static final String TEMPLATE_KEY = "template";
 
-    private InstanceCache instances = new InstanceCache();
+    private DefaultInstanceCache instances = new DefaultInstanceCache();
+    private DefaultInstanceCache incompleteInstances = new DefaultInstanceCache();
     private Map<String, TemplateHierarchy> templateHierarchies = new HashMap<String, TemplateHierarchy>();
 
     private TypeRegistry typeRegistry;
@@ -381,10 +382,11 @@ public class ConfigurationTemplateManager
                     {
                         String itemPath = PathUtils.getPath(path, id);
                         Record record = getRecord(itemPath);
-                        Object instance = templatedType.instantiate(itemPath, record);
+                        boolean concrete = isConcrete(record);
+                        Object instance = templatedType.instantiate(itemPath, concrete ? instances : incompleteInstances, record);
 
                         // Only concrete instances go into the collection
-                        if (isConcrete(record))
+                        if (concrete)
                         {
                             topInstance.put(id, instance);
                         }
@@ -392,7 +394,7 @@ public class ConfigurationTemplateManager
                 }
                 else
                 {
-                    type.instantiate(path, topRecord);
+                    type.instantiate(path, instances, topRecord);
                 }
             }
             catch (TypeException e)
@@ -531,7 +533,7 @@ public class ConfigurationTemplateManager
         Object instance;
         try
         {
-            instance = type.instantiate(null, subject);
+            instance = type.instantiate(null, null, subject);
         }
         catch (TypeConversionException e)
         {
@@ -839,13 +841,17 @@ public class ConfigurationTemplateManager
     public <T> Collection<T> getAllInstances(String path, Class<T> clazz)
     {
         List<T> result = new LinkedList<T>();
-        getAllInstances(path, result);
+        getAllInstances(path, result, false);
         return result;
     }
 
-    public <T> void getAllInstances(String path, Collection<T> result)
+    public <T> void getAllInstances(String path, Collection<T> result, boolean allowIncomplete)
     {
         instances.getAll(path, result);
+        if (allowIncomplete)
+        {
+            incompleteInstances.getAll(path, result);
+        }
     }
 
     @SuppressWarnings({"unchecked"})
@@ -868,11 +874,6 @@ public class ConfigurationTemplateManager
         }
 
         return result;
-    }
-
-    public void putInstance(String path, Object instance)
-    {
-        instances.put(path, instance);
     }
 
     @SuppressWarnings({"unchecked"})

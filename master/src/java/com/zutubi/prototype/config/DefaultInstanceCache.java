@@ -10,7 +10,7 @@ import java.util.Map;
  * A cache for configuration instances, supporting addressing by path,
  * including paths with wildcards.
  */
-class InstanceCache
+class DefaultInstanceCache implements InstanceCache
 {
     private Entry root = new Entry(null);
 

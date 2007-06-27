@@ -34,7 +34,7 @@ public class TemplateRecordPersistenceTest extends AbstractConfigurationSystemTe
         projectType = typeRegistry.register(Project.class);
         propertyType = typeRegistry.getType(Property.class);
         stageType = typeRegistry.getType(Stage.class);
-        TemplatedMapType top = new TemplatedMapType(configurationTemplateManager);
+        TemplatedMapType top = new TemplatedMapType();
         top.setTypeRegistry(typeRegistry);
         top.setCollectionType(projectType);
 

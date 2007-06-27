@@ -1,5 +1,6 @@
 package com.zutubi.prototype.type;
 
+import com.zutubi.prototype.config.InstanceCache;
 import com.zutubi.pulse.prototype.squeezer.SqueezeException;
 import com.zutubi.pulse.prototype.squeezer.Squeezers;
 import com.zutubi.pulse.prototype.squeezer.TypeSqueezer;
@@ -24,7 +25,7 @@ public class PrimitiveType extends SimpleType implements Type
         }
     }
 
-    public Object instantiate(String path, Object data) throws TypeException
+    public Object instantiate(String path, InstanceCache cache, Object data) throws TypeException
     {
         TypeSqueezer squeezer = Squeezers.findSqueezer(getClazz());
         try

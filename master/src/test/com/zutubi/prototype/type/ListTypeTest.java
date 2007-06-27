@@ -23,7 +23,7 @@ public class ListTypeTest extends TypeTestCase
 
         mockAType = typeRegistry.register("mockA", MockA.class);
 
-        listType = new ListType(configurationTemplateManager, recordManager);
+        listType = new ListType(recordManager);
         listType.setTypeRegistry(typeRegistry);
         listType.setCollectionType(mockAType);
     }
@@ -44,7 +44,7 @@ public class ListTypeTest extends TypeTestCase
 
         Record record = (Record) listType.unstantiate(list);
 
-        List<Object> newList = listType.instantiate(null, record);
+        List<Object> newList = listType.instantiate(null, null, record);
         assertEquals(2, newList.size());
         assertTrue(newList.get(0) instanceof MockA);
     }

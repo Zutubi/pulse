@@ -175,7 +175,7 @@ public class ConfigurationPersistenceManager
         String scope = getClosestMatchingScope(type, path);
         if (scope != null)
         {
-            return PathUtils.getParentPath(scope);
+            scope = PathUtils.getParentPath(scope);
         }
         return scope;
     }
@@ -186,7 +186,7 @@ public class ConfigurationPersistenceManager
         List<String> result = new LinkedList<String>();
         if (paths != null)
         {
-            if( prefix == null)
+            if (prefix == null)
             {
                 // Include all
                 result.addAll(paths);

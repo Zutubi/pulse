@@ -62,7 +62,6 @@ public abstract class AbstractConfigurationSystemTestCase extends TestCase
         configurationTemplateManager.setConfigurationReferenceManager(configurationReferenceManager);
 
         typeRegistry.setConfigurationReferenceManager(configurationReferenceManager);
-        typeRegistry.setConfigurationTemplateManager(configurationTemplateManager);
         typeRegistry.setHandleAllocator(recordManager);
     }
 

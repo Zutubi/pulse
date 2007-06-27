@@ -1,7 +1,11 @@
 package com.zutubi.prototype.config;
 
-import com.zutubi.prototype.config.types.*;
+import com.zutubi.prototype.config.types.CompositeCollectionObject;
+import com.zutubi.prototype.config.types.CompositeObject;
+import com.zutubi.prototype.config.types.SimpleCollectionObject;
+import com.zutubi.prototype.config.types.SimpleObject;
 import com.zutubi.prototype.type.CompositeType;
+import com.zutubi.prototype.type.MapType;
 import com.zutubi.prototype.type.TypeException;
 import com.zutubi.prototype.type.TypeRegistry;
 import com.zutubi.prototype.type.record.MockRecordSerialiser;
@@ -76,7 +80,7 @@ public class ConfigurationPersistenceManagerTest extends TestCase
     public void testIndexTopLevelCollection() throws TypeException
     {
         CompositeType simple = typeRegistry.register(SimpleObject.class);
-        TopLevelMapType top = new TopLevelMapType(null);
+        MapType top = new MapType();
         top.setCollectionType(simple);
         manager.register("top", top);
         assertEquals(Arrays.asList("top/*"), manager.getConfigurationPaths(simple));

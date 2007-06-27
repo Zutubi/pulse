@@ -276,6 +276,6 @@ public class ActionSupport extends com.opensymphony.xwork.ActionSupport implemen
 
     public String getMessage(Object instance, String key, String... args)
     {
-        return Messages.getInstance(instance).format(key, args);
+        return Messages.getInstance(instance).format(key, (Object[])args);
     }
 }

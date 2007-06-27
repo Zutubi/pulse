@@ -27,7 +27,7 @@ public class TypeListenerTest extends AbstractConfigurationSystemTestCase
         provider.init();
 
         CompositeType typeA = typeRegistry.register("a", A.class);
-        MapType mapA = new MapType(configurationTemplateManager);
+        MapType mapA = new MapType();
         mapA.setTypeRegistry(typeRegistry);
         mapA.setCollectionType(typeA);
 

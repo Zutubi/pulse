@@ -5,6 +5,7 @@ import com.zutubi.prototype.type.*;
 import com.zutubi.prototype.type.record.PathUtils;
 import com.zutubi.prototype.type.record.Record;
 import com.zutubi.prototype.type.record.RecordManager;
+import com.zutubi.prototype.type.record.TemplateRecord;
 import com.zutubi.pulse.core.config.Configuration;
 import com.zutubi.util.ClassLoaderUtils;
 import com.zutubi.util.bean.ObjectFactory;
@@ -38,7 +39,7 @@ public class ConfigurationReferenceManager
         references.clear();
     }
 
-    public Object resolveReference(String fromPath, long toHandle) throws TypeException
+    public Object resolveReference(String fromPath, long toHandle, InstanceCache cache) throws TypeException
     {
         String toPath = recordManager.getPathForHandle(toHandle);
         indexReference(fromPath, toPath);
@@ -57,7 +58,7 @@ public class ConfigurationReferenceManager
                 throw new TypeException("Reference to unrecognised type '" + record.getSymbolicName() + "'");
             }
 
-            instance = type.instantiate(toPath, record);
+            instance = type.instantiate(toPath, cache, record);
         }
 
         return instance;
@@ -79,9 +80,14 @@ public class ConfigurationReferenceManager
     {
         Collection<Configuration> instances = new LinkedList<Configuration>();
         String owningScope = configurationPersistenceManager.getClosestOwningScope(type, referencingPath);
+        // If the owning scope is a templated object, then we can refer to
+        // templated instances.  Otherwise, accept only concrete
+        // instances.
+        boolean allowTemplated = owningScope != null && configurationTemplateManager.getRecord(owningScope) instanceof TemplateRecord;
+        
         for (String path : configurationPersistenceManager.getOwningPaths(type, owningScope))
         {
-            configurationTemplateManager.getAllInstances(path, instances);
+            configurationTemplateManager.getAllInstances(path, instances, allowTemplated);
         }
 
         return instances;

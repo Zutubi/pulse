@@ -69,7 +69,7 @@ public class SetupConfigurationWizard extends AbstractTypeWizard
     {
         try
         {
-            AdminUserConfiguration adminConfig = (AdminUserConfiguration) adminConfigType.instantiate(null, wizardStates.get(0).getDataRecord());
+            AdminUserConfiguration adminConfig = (AdminUserConfiguration) adminConfigType.instantiate(null, null, wizardStates.get(0).getDataRecord());
             MutableRecord serverConfigRecord = wizardStates.get(1).getDataRecord();
             MasterConfiguration config = configurationManager.getAppConfig();
 
