@@ -28,43 +28,43 @@ public class TemplateFormDecorator
             TemplateRecord templateRecord = (TemplateRecord) record;
             TemplateRecord parentRecord = templateRecord.getParent();
             CompositeType type = (CompositeType) templateRecord.getType();
-            
+
             for (FieldDescriptor field : descriptor.getFieldDescriptors())
             {
                 String fieldName = field.getName();
 
-                // If a field has both noInherit and noOverride, noInherit
-                // takes precedence.
+                // Note that if a field has both noInherit and noOverride,
+                // noInherit takes precedence.
                 if(fieldHasAnnotation(type, fieldName, NoInherit.class))
                 {
                     field.addParameter("noInherit", "true");
-                    continue;
                 }
-
-                if(fieldHasAnnotation(type, fieldName, NoOverride.class))
+                else
                 {
-                    // This field should be read-only.
-                    field.addParameter("noOverride", "true");
-                    continue;
-                }
-
-                // Field follows normal inheritance rules.  Decorate it if it
-                // inherits or overrides a value.
-                String ownerId = templateRecord.getOwner(fieldName);
-                if (ownerId != null)
-                {
-                    if (!ownerId.equals(templateRecord.getOwner()))
+                    String ownerId = templateRecord.getOwner(fieldName);
+                    if (ownerId != null)
                     {
-                        field.addParameter("inheritedFrom", ownerId);
-                    }
-                    else if(parentRecord != null)
-                    {
-                        // Check for override
-                        String parentOwnerId = parentRecord.getOwner(fieldName);
-                        if(parentOwnerId != null)
+                        if (!ownerId.equals(templateRecord.getOwner()))
                         {
-                            field.addParameter("overriddenOwner", parentOwnerId);
-                            field.addParameter("overriddenValue", parentRecord.get(fieldName));
+                            if(fieldHasAnnotation(type, fieldName, NoOverride.class))
+                            {
+                                // This field should be read-only.
+                                field.addParameter("noOverride", "true");
+                            }
+                            else
+                            {
+                                field.addParameter("inheritedFrom", ownerId);
+                            }
+                        }
+                        else if(parentRecord != null)
+                        {
+                            // Check for override
+                            String parentOwnerId = parentRecord.getOwner(fieldName);
+                            if(parentOwnerId != null)
+                            {
+                                field.addParameter("overriddenOwner", parentOwnerId);
+                                field.addParameter("overriddenValue", parentRecord.get(fieldName));
+                            }
                         }
                     }
                 }
