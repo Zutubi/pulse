@@ -1,38 +1,39 @@
 <table>
-<#assign tablewidth = table.columns?size + table.actions?size/>
+<#assign tablewidth = table.columns?size + 1/>
     <tr>
-        <th class="content" colspan="${tablewidth}">${"table.header.label"?i18n}</th>
+        <th class="heading" colspan="${tablewidth}">${"table.header.label"?i18n}</th>
     </tr>
     <tr>
 <#list table.columns as column>
 <#assign header>${column.name}.label</#assign>
         <th class="content" colspan="1">${header?i18n}</th>
 </#list>
-<#if table.actions?size &gt; 0>
-        <th class="content" colspan="${table.actions?size}">${"actions.label"?i18n}</th>
-</#if>
+        <th class="content" colspan="1">${"actions.label"?i18n}</th>
     </tr>
 <#if data?exists && data?size &gt; 0>
 <#list data as item>
-        <tr>
+    <tr>
 <#list table.columns as column>
-            <td class="content"><#if item[column.name]?exists>${item[column.name]?string}</#if></td>
+    <#assign value = column.getValue(item)/>
+        <td class="content">${value?string}</td>
 </#list>
-<#list table.actions as action>
-<#assign actionlabel>${action}.label</#assign>
+        <td class="content">
+<#list table.getActions(item) as action>
+    <#assign actionlabel>${action}.label</#assign>
 <#if action == "edit">
-            <td class="content"><a onclick="selectPath('${item.configurationPath}'); return false;">${"edit.label"?i18n}</a></td>
+        <a onclick="selectPath('${item.configurationPath}'); return false;">${"edit.label"?i18n}</a>
 <#elseif action == "delete">
-            <td class="content"><a onclick="deletePath('${item.configurationPath}'); return false;">${"delete.label"?i18n}</a>  </td>
+        <a onclick="deletePath('${item.configurationPath}'); return false;">${"delete.label"?i18n}</a>
 <#else>
-            <td class="content"><a onclick="actionPath('${item.configurationPath}'); return false;">${actionlabel?i18n}</a>  </td>
+        <a onclick="actionPath('${item.configurationPath}?${action}'); return false;">${actionlabel?i18n}</a>
 </#if>
 </#list>
-        </tr>
+        </td>
+    </tr>
 </#list>
 <#else>
     <tr>
-        <td class="content" colspan="${tablewidth}">${"no.data.available.label"?i18n}</td>
+        <td class="content" colspan="${tablewidth}">${"no.data.available"?i18n}</td>
     </tr>
 </#if>
     <tr>
