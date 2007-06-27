@@ -1,7 +1,6 @@
 package com.zutubi.prototype.config;
 
 import com.zutubi.prototype.type.record.RecordManager;
-import com.zutubi.validation.i18n.TextProvider;
 
 import java.util.Set;
 
@@ -9,13 +8,15 @@ import java.util.Set;
  * A reference cleanup task that deletes a record.  Any tasks needed to
  * cleanup references to the deleted record will cascade off this.
  */
-public class DeleteReferenceCleanupTask extends ReferenceCleanupTaskSupport
+public class DeleteRecordCleanupTask extends RecordCleanupTaskSupport
 {
+    private boolean internal;
     private RecordManager recordManager;
 
-    public DeleteReferenceCleanupTask(String path, RecordManager recordManager)
+    public DeleteRecordCleanupTask(String path, boolean internal, RecordManager recordManager)
     {
         super(path);
+        this.internal = internal;
         this.recordManager = recordManager;
     }
 
@@ -25,9 +26,9 @@ public class DeleteReferenceCleanupTask extends ReferenceCleanupTaskSupport
         recordManager.delete(getAffectedPath());
     }
 
-    public String getSummary(TextProvider textProvider)
+    public boolean isInternal()
     {
-        return textProvider.getText("delete.record");
+        return internal;
     }
 
     @SuppressWarnings({"unchecked"})

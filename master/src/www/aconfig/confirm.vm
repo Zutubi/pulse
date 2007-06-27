@@ -4,11 +4,13 @@
             $indent <a href="#url("action=display" "path=$cleanupTask.affectedPath")">$!webwork.htmlEncode($cleanupTask.affectedPath)</a>
         </td>
         <td class="content">
-            $cleanupTask.getSummary($textProvider)
+            $action.getMessage($cleanupTask, "summary")
         </td>
     </tr>
     #foreach($childTask in $cleanupTask.cascaded)
-        #showTask($childTask "&nbsp;&nbsp;&nbsp;&nbsp;$indent")
+        #if(!$childTask.internal)
+            #showTask($childTask "&nbsp;&nbsp;&nbsp;&nbsp;$indent")
+        #end
     #end
 #end
 

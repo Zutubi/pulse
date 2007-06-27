@@ -1,7 +1,6 @@
 package com.zutubi.prototype.webwork;
 
-import com.zutubi.prototype.config.ConfigurationReferenceManager;
-import com.zutubi.prototype.config.ReferenceCleanupTask;
+import com.zutubi.prototype.config.RecordCleanupTask;
 import com.zutubi.prototype.type.record.PathUtils;
 import com.zutubi.validation.i18n.MessagesTextProvider;
 import com.zutubi.validation.i18n.TextProvider;
@@ -12,14 +11,13 @@ import com.zutubi.validation.i18n.TextProvider;
  */
 public class DeleteAction extends PrototypeSupport
 {
-    private ReferenceCleanupTask task;
+    private RecordCleanupTask task;
     private String parentPath;
     private ConfigurationPanel newPanel;
 
     private TextProvider textProvider;
-    private ConfigurationReferenceManager configurationReferenceManager;
 
-    public ReferenceCleanupTask getTask()
+    public RecordCleanupTask getTask()
     {
         return task;
     }
@@ -48,7 +46,7 @@ public class DeleteAction extends PrototypeSupport
 
         if (isConfirmSelected())
         {
-            task = configurationReferenceManager.getCleanupTasks(getPath());
+            task = configurationTemplateManager.getCleanupTasks(getPath());
             newPanel = new ConfigurationPanel("aconfig/confirm.vm");
             return "confirm";
         }
@@ -73,10 +71,5 @@ public class DeleteAction extends PrototypeSupport
             }
         }
         return ERROR;
-    }
-
-    public void setConfigurationReferenceManager(ConfigurationReferenceManager configurationReferenceManager)
-    {
-        this.configurationReferenceManager = configurationReferenceManager;
     }
 }

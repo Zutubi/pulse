@@ -4,19 +4,20 @@ import com.opensymphony.util.TextUtils;
 import com.opensymphony.xwork.ActionContext;
 import com.opensymphony.xwork.TextProvider;
 import com.opensymphony.xwork.util.OgnlValueStack;
+import com.zutubi.i18n.Messages;
 import com.zutubi.pulse.committransformers.CommitMessageTransformerManager;
 import com.zutubi.pulse.core.model.Changelist;
 import com.zutubi.pulse.core.model.Revision;
 import com.zutubi.pulse.model.Project;
 import com.zutubi.pulse.model.ProjectManager;
+import com.zutubi.pulse.prototype.config.project.ProjectConfiguration;
 import com.zutubi.pulse.security.AcegiUtils;
-import com.zutubi.util.StringUtils;
 import com.zutubi.pulse.util.TimeStamps;
-import com.zutubi.util.logging.Logger;
 import com.zutubi.pulse.web.project.CommitMessageSupport;
 import com.zutubi.pulse.xwork.TextProviderSupport;
 import com.zutubi.pulse.xwork.interceptor.Cancelable;
-import com.zutubi.pulse.prototype.config.project.ProjectConfiguration;
+import com.zutubi.util.StringUtils;
+import com.zutubi.util.logging.Logger;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
@@ -266,5 +267,15 @@ public class ActionSupport extends com.opensymphony.xwork.ActionSupport implemen
     public CommitMessageSupport getCommitMessageSupport(Changelist changelist)
     {
         return new CommitMessageSupport(changelist, commitMessageTransformerManager.getCommitMessageTransformers());
+    }
+
+    public String getMessage(Object instance, String key)
+    {
+        return Messages.getInstance(instance).format(key);
+    }
+
+    public String getMessage(Object instance, String key, String... args)
+    {
+        return Messages.getInstance(instance).format(key, args);
     }
 }

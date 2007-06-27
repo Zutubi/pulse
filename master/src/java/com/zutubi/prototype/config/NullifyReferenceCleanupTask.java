@@ -4,17 +4,16 @@ import com.zutubi.prototype.type.record.MutableRecord;
 import com.zutubi.prototype.type.record.PathUtils;
 import com.zutubi.prototype.type.record.Record;
 import com.zutubi.prototype.type.record.RecordManager;
-import com.zutubi.validation.i18n.TextProvider;
 
 /**
- * A reference cleanup task that nulls out the reference.  Should only be
- * used when the reference is not required.
+ * A record cleanup task that nulls out a reference.  Should only be used
+ * when the reference is not required.
  */
-public class NullifyCleanupTask extends ReferenceCleanupTaskSupport
+public class NullifyReferenceCleanupTask extends RecordCleanupTaskSupport
 {
     private RecordManager recordManager;
 
-    public NullifyCleanupTask(String referencingPath, RecordManager recordManager)
+    public NullifyReferenceCleanupTask(String referencingPath, RecordManager recordManager)
     {
         super(referencingPath);
         this.recordManager = recordManager;
@@ -28,15 +27,9 @@ public class NullifyCleanupTask extends ReferenceCleanupTaskSupport
         Record parentRecord = recordManager.load(parentPath);
         if (parentRecord != null)
         {
-            // FIXME: review this use of copy
             MutableRecord newValue = parentRecord.copy(false);
             newValue.put(PathUtils.getBaseName(getAffectedPath()), "");
             recordManager.update(parentPath, newValue);
         }
-    }
-
-    public String getSummary(TextProvider textProvider)
-    {
-        return textProvider.getText("nullify.reference");
     }
 }

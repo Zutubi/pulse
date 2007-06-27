@@ -307,6 +307,38 @@ public class TemplateRecordPersistenceTest extends AbstractConfigurationSystemTe
         assertEquals(GLOBAL_DESCRIPTION, child.getMoi().get("description"));
     }
 
+    public void testRenameProject()
+    {
+        insertGlobal();
+
+        TemplateRecord template = (TemplateRecord) configurationTemplateManager.getRecord("project/global");
+        MutableRecord record = template.flatten();
+        record.put("name", "newname");
+        configurationTemplateManager.saveRecord("project/global", record);
+
+        assertNull(configurationTemplateManager.getRecord("project/global"));
+        template = (TemplateRecord) configurationTemplateManager.getRecord("project/newname");
+        assertEquals("newname", template.getOwner());
+        assertEquals("newname", template.get("name"));
+    }
+
+    public void testRenameProjectLeavesDescendents()
+    {
+        insertGlobal();
+        insertChild();
+
+        TemplateRecord template = (TemplateRecord) configurationTemplateManager.getRecord("project/global");
+        MutableRecord record = template.flatten();
+        record.put("name", "newname");
+        configurationTemplateManager.saveRecord("project/global", record);
+
+        assertNull(configurationTemplateManager.getRecord("project/global"));
+        template = (TemplateRecord) configurationTemplateManager.getRecord("project/child");
+        assertEquals(CHILD_PROJECT, template.getOwner());
+        assertEquals(CHILD_PROJECT, template.get("name"));
+        assertEquals("newname", template.getOwner("url"));
+    }
+
     public void testRenameInherited()
     {
         // If we rename something that is inherited, the inherited value
@@ -326,13 +358,38 @@ public class TemplateRecordPersistenceTest extends AbstractConfigurationSystemTe
         assertEquals("newname", stageTemplate.get("name"));
 
         assertNull(configurationTemplateManager.getRecord("project/child/stages/default"));
-        
+
         stageTemplate = (TemplateRecord) configurationTemplateManager.getRecord("project/child/stages/newname");
         assertEquals(GLOBAL_PROJECT, stageTemplate.getOwner("name"));
         assertEquals("newname", stageTemplate.get("name"));
 
         TemplateRecord movedProperty = (TemplateRecord) configurationTemplateManager.getRecord("project/child/stages/newname/properties/foo");
         assertEquals("foo", movedProperty.get("name"));
+    }
+
+    public void testDelete()
+    {
+        insertGlobal();
+        configurationTemplateManager.delete("project/global");
+        assertNull(configurationTemplateManager.getRecord("project/global"));
+    }
+
+    public void testDeleteRemovesDescendents()
+    {
+        insertGlobal();
+        insertChild();
+        configurationTemplateManager.delete("project/global");
+        assertNull(configurationTemplateManager.getRecord("project/global"));
+        assertNull(configurationTemplateManager.getRecord("project/child"));
+    }
+
+    public void testDeleteCollectionItemRemovesDescendents()
+    {
+        insertGlobal();
+        insertChild();
+        configurationTemplateManager.delete("project/global/stages/default");
+        assertNull(configurationTemplateManager.getRecord("project/global/stages/default"));
+        assertNull(configurationTemplateManager.getRecord("project/child/stages/default"));
     }
 
     private void insertGlobal()

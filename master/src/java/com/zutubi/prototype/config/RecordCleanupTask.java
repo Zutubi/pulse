@@ -1,17 +1,15 @@
 package com.zutubi.prototype.config;
 
-import com.zutubi.validation.i18n.TextProvider;
-
 import java.util.List;
 import java.util.Set;
 
 /**
- * An action that needs to be undertaken to cleanup a reference to a record
- * to be deleted.  As the action itself may lead to further records being
- * deleted, further actions may cascade.  The root action itself is always
- * the deletion of the original record.
+ * An action that needs to be undertaken to cleanup when a record is deleted.
+ * As the action itself may lead to further records being deleted, further
+ * actions may cascade.  The root action itself is always the deletion of the
+ * original record.
  */
-public interface ReferenceCleanupTask
+public interface RecordCleanupTask
 {
     /**
      * Executes the cleanup task.  Note that tasks <b>must</b> be robust to
@@ -20,6 +18,8 @@ public interface ReferenceCleanupTask
      */
     void execute();
 
+    boolean isInternal();
+    
     /**
      * @return the path of the record or record property affected by this
      * task.
@@ -27,19 +27,10 @@ public interface ReferenceCleanupTask
     String getAffectedPath();
 
     /**
-     * @param textProvider used for i18n
-     * @return a human-readable summary of what the task will do to the
-     *         affected path, displayed to the user while confirming the
-     *         delete
-     */
-    String getSummary(TextProvider textProvider);
-
-    /**
      * @return cleanup tasks cascaded from this one: i.e. tasks that must be
-     *         carried out to cleanup references to records removed by this
-     *         task
+     *         carried out to cleanup after records removed by this task
      */
-    List<ReferenceCleanupTask> getCascaded();
+    List<RecordCleanupTask> getCascaded();
 
     /**
      * Populates the given set with the paths invalidated by this task, and

@@ -23,11 +23,13 @@ public interface MutableRecord extends Record
      */
     void putMeta(String key, String value);
 
+    String removeMeta(String key);
+
     Object put(String key, Object value);
 
-    void clear();
-
     Object remove(String key);
+
+    void clear();
 
     void update(Record record);
 

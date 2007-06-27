@@ -12,10 +12,9 @@ import com.zutubi.validation.annotations.Required;
 public class DefaultReferenceCleanupTaskProvider implements ReferenceCleanupTaskProvider
 {
     private ConfigurationTemplateManager configurationTemplateManager;
-    private ConfigurationReferenceManager configurationReferenceManager;
     private RecordManager recordManager;
 
-    public ReferenceCleanupTask getAction(String deletedPath, String referencingPath)
+    public RecordCleanupTask getAction(String deletedPath, String referencingPath)
     {
         // Default behaviour:
         //   - if referencing path is a simple property
@@ -32,16 +31,16 @@ public class DefaultReferenceCleanupTaskProvider implements ReferenceCleanupTask
         {
             if(property.getAnnotation(Required.class) != null)
             {
-                return configurationReferenceManager.getCleanupTasks(parentPath);
+                return configurationTemplateManager.getCleanupTasks(parentPath);
             }
             else
             {
-                return new NullifyCleanupTask(referencingPath, recordManager);
+                return new NullifyReferenceCleanupTask(referencingPath, recordManager);
             }
         }
         else
         {
-            return new RemoveCleanupTask(deletedPath, referencingPath, recordManager);
+            return new RemoveReferenceCleanupTask(deletedPath, referencingPath, recordManager);
         }
     }
 
@@ -53,10 +52,5 @@ public class DefaultReferenceCleanupTaskProvider implements ReferenceCleanupTask
     public void setRecordManager(RecordManager recordManager)
     {
         this.recordManager = recordManager;
-    }
-
-    public void setConfigurationReferenceManager(ConfigurationReferenceManager configurationReferenceManager)
-    {
-        this.configurationReferenceManager = configurationReferenceManager;
     }
 }

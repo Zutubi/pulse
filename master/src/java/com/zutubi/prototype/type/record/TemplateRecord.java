@@ -263,6 +263,30 @@ public class TemplateRecord extends AbstractRecord
         return true;
     }
 
+    public boolean isSkeleton()
+    {
+        // If we do not override anything, then we are a skeleton.
+        if(declaredOrder != null)
+        {
+            return false;
+        }
+
+        if(moi.simpleKeySet().size() > 0)
+        {
+            return false;
+        }
+
+        for(String key: nestedKeySet())
+        {
+            if(!((TemplateRecord)get(key)).isSkeleton())
+            {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
     public MutableRecord copy(boolean deep)
     {
         throw new UnsupportedOperationException("Record is not mutable.");

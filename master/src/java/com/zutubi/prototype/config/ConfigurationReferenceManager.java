@@ -87,9 +87,8 @@ public class ConfigurationReferenceManager
         return instances;
     }
 
-    public ReferenceCleanupTask getCleanupTasks(String path)
+    public void addReferenceCleanupTasks(String path, DeleteRecordCleanupTask result)
     {
-        DeleteReferenceCleanupTask result = new DeleteReferenceCleanupTask(path, recordManager);
         List<String> index = references.get(path);
         if (index != null)
         {
@@ -98,7 +97,7 @@ public class ConfigurationReferenceManager
                 ReferenceCleanupTaskProvider provider = getCleanupTaskProvider(referencingPath);
                 if (provider != null)
                 {
-                    ReferenceCleanupTask task = provider.getAction(path, referencingPath);
+                    RecordCleanupTask task = provider.getAction(path, referencingPath);
                     if (task != null)
                     {
                         result.addCascaded(task);
@@ -106,8 +105,6 @@ public class ConfigurationReferenceManager
                 }
             }
         }
-
-        return result;
     }
 
     private ReferenceCleanupTaskProvider getCleanupTaskProvider(String referencingPath)

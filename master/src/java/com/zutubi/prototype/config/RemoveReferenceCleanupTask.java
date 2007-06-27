@@ -6,17 +6,16 @@ import com.zutubi.prototype.type.record.Record;
 import com.zutubi.prototype.type.record.RecordManager;
 import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.Predicate;
-import com.zutubi.validation.i18n.TextProvider;
 
 /**
- * A reference cleanup task that removes a reference from a collection.
+ * A record cleanup task that removes a reference from a collection.
  */
-public class RemoveCleanupTask extends ReferenceCleanupTaskSupport
+public class RemoveReferenceCleanupTask extends RecordCleanupTaskSupport
 {
     private String deletedPath;
     private RecordManager recordManager;
 
-    public RemoveCleanupTask(String deletedPath, String referencingPath, RecordManager recordManager)
+    public RemoveReferenceCleanupTask(String deletedPath, String referencingPath, RecordManager recordManager)
     {
         super(referencingPath);
         this.deletedPath = deletedPath;
@@ -33,7 +32,6 @@ public class RemoveCleanupTask extends ReferenceCleanupTaskSupport
         Record parentRecord = recordManager.load(parentPath);
         if (parentRecord != null)
         {
-            // FIXME: review this use of copy
             MutableRecord newValues = parentRecord.copy(false);
             String[] references = (String[]) newValues.get(baseName);
             references = CollectionUtils.filterToArray(references, new Predicate<String>()
@@ -55,10 +53,5 @@ public class RemoveCleanupTask extends ReferenceCleanupTaskSupport
 
             recordManager.update(parentPath, newValues);
         }
-    }
-
-    public String getSummary(TextProvider textProvider)
-    {
-        return textProvider.getText("remove.reference");
     }
 }

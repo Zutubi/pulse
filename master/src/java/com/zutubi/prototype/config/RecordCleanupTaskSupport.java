@@ -5,14 +5,14 @@ import java.util.List;
 import java.util.Set;
 
 /**
- * Helper base class for implementations of {@link ReferenceCleanupTask}.
+ * Helper base class for implementations of {@link RecordCleanupTask}.
  */
-public abstract class ReferenceCleanupTaskSupport implements ReferenceCleanupTask
+public abstract class RecordCleanupTaskSupport implements RecordCleanupTask
 {
     private String path;
-    private List<ReferenceCleanupTask> cascaded = new LinkedList<ReferenceCleanupTask>();
+    private List<RecordCleanupTask> cascaded = new LinkedList<RecordCleanupTask>();
 
-    public ReferenceCleanupTaskSupport(String path)
+    public RecordCleanupTaskSupport(String path)
     {
         this.path = path;
     }
@@ -22,7 +22,7 @@ public abstract class ReferenceCleanupTaskSupport implements ReferenceCleanupTas
         return path;
     }
 
-    public List<ReferenceCleanupTask> getCascaded()
+    public List<RecordCleanupTask> getCascaded()
     {
         return cascaded;
     }
@@ -30,7 +30,7 @@ public abstract class ReferenceCleanupTaskSupport implements ReferenceCleanupTas
     @SuppressWarnings({"unchecked"})
     public void getInvalidatedPaths(Set<String> paths)
     {
-        for(ReferenceCleanupTask cascade: cascaded)
+        for(RecordCleanupTask cascade: cascaded)
         {
             cascade.getInvalidatedPaths(paths);
         }
@@ -38,13 +38,18 @@ public abstract class ReferenceCleanupTaskSupport implements ReferenceCleanupTas
 
     public void execute()
     {
-        for(ReferenceCleanupTask cascade: cascaded)
+        for(RecordCleanupTask cascade: cascaded)
         {
             cascade.execute();
         }
     }
 
-    public void addCascaded(ReferenceCleanupTask task)
+    public boolean isInternal()
+    {
+        return false;
+    }
+
+    public void addCascaded(RecordCleanupTask task)
     {
         cascaded.add(task);
     }

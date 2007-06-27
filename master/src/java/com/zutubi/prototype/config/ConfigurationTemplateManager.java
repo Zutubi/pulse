@@ -640,28 +640,31 @@ public class ConfigurationTemplateManager
         else
         {
             // We need to update the path by moving.  If templating, this
-            // means also moving all children.
+            // means also moving all children, *except* at the top level.
             if (existingRecord instanceof TemplateRecord)
             {
                 String[] elements = PathUtils.getPathElements(path);
-                final String scope = elements[0];
-                String newName = PathUtils.getBaseName(newPath);
-
-                final String oldRemainderPath = PathUtils.getPath(2, elements);
-                final String newRemainderPath = PathUtils.getPath(PathUtils.getParentPath(oldRemainderPath), newName);
-                TemplateHierarchy hierarchy = getTemplateHierarchy(scope);
-                TemplateNode node = hierarchy.getNodeById(elements[1]);
-
-                node.forEachDescendent(new TemplateNode.NodeHandler()
+                if (elements.length > 2)
                 {
-                    public boolean handle(TemplateNode templateNode)
+                    final String scope = elements[0];
+                    String newName = PathUtils.getBaseName(newPath);
+
+                    final String oldRemainderPath = PathUtils.getPath(2, elements);
+                    final String newRemainderPath = PathUtils.getPath(PathUtils.getParentPath(oldRemainderPath), newName);
+                    TemplateHierarchy hierarchy = getTemplateHierarchy(scope);
+                    TemplateNode node = hierarchy.getNodeById(elements[1]);
+
+                    node.forEachDescendent(new TemplateNode.NodeHandler()
                     {
-                        String oldDescendentPath = PathUtils.getPath(scope, templateNode.getId(), oldRemainderPath);
-                        String newDescendentPath = PathUtils.getPath(scope, templateNode.getId(), newRemainderPath);
-                        recordManager.move(oldDescendentPath, newDescendentPath);
-                        return true;
-                    }
-                });
+                        public boolean handle(TemplateNode templateNode)
+                        {
+                            String oldDescendentPath = PathUtils.getPath(scope, templateNode.getId(), oldRemainderPath);
+                            String newDescendentPath = PathUtils.getPath(scope, templateNode.getId(), newRemainderPath);
+                            recordManager.move(oldDescendentPath, newDescendentPath);
+                            return true;
+                        }
+                    });
+                }
             }
 
             recordManager.move(path, newPath);
@@ -703,6 +706,85 @@ public class ConfigurationTemplateManager
         }
     }
 
+    @SuppressWarnings({"unchecked"})
+    public List<String> getDescendentPaths(String path)
+    {
+        String[] elements = PathUtils.getPathElements(path);
+        if(elements.length > 1)
+        {
+            String scope = elements[0];
+            ConfigurationScopeInfo scopeInfo = configurationPersistenceManager.getScopeInfo(scope);
+            if(scopeInfo == null)
+            {
+                throw new IllegalArgumentException("Invalid path '" + path + "': references unknown scope '" + scope + "'");
+            }
+
+            if(scopeInfo.isTemplated())
+            {
+                final List<String> result = new LinkedList<String>();
+
+                TemplateHierarchy hierarchy = getTemplateHierarchy(scope);
+                TemplateNode node = hierarchy.getNodeById(elements[1]);
+                final String remainderPath = elements.length == 2 ? null : PathUtils.getPath(2, elements);
+
+                node.forEachDescendent(new TemplateNode.NodeHandler()
+                {
+                    public boolean handle(TemplateNode node)
+                    {
+                        result.add(remainderPath == null ? node.getPath() : PathUtils.getPath(node.getPath(), remainderPath));
+                        return true;
+                    }
+                });
+
+                return result;
+            }
+        }
+
+        return Collections.EMPTY_LIST;
+    }
+
+    public boolean isSkeleton(String path)
+    {
+        String[] elements = PathUtils.getPathElements(path);
+        if(elements.length > 2)
+        {
+            String scope = elements[0];
+            ConfigurationScopeInfo scopeInfo = configurationPersistenceManager.getScopeInfo(scope);
+            if(scopeInfo == null)
+            {
+                throw new IllegalArgumentException("Invalid path '" + path + "': references unknown scope '" + scope + "'");
+            }
+
+            if(scopeInfo.isTemplated())
+            {
+                TemplateRecord record = (TemplateRecord) getRecord(path);
+                if(record == null)
+                {
+                    throw new IllegalArgumentException("Invalid path '" + path + "': no record found");
+                }
+
+                return record.isSkeleton();
+            }
+        }
+
+        return false;
+    }
+
+    public RecordCleanupTask getCleanupTasks(String path)
+    {
+        DeleteRecordCleanupTask result = new DeleteRecordCleanupTask(path, isSkeleton(path), recordManager);
+
+        // If this is a templated scope, all descendents must also be deleted
+        List<String> descendentPaths = getDescendentPaths(path);
+        for(String descendentPath: descendentPaths)
+        {
+            result.addCascaded(getCleanupTasks(descendentPath));
+        }
+
+        configurationReferenceManager.addReferenceCleanupTasks(path, result);
+        return result;
+    }
+
     public void delete(final String path)
     {
         checkPersistent(path);
@@ -717,7 +799,7 @@ public class ConfigurationTemplateManager
             eventManager.publish(new PreDeleteEvent(this, p, instancesToBeDeleted.get(p)));
         }
 
-        configurationReferenceManager.getCleanupTasks(path).execute();
+        getCleanupTasks(path).execute();
         refreshCaches();
 
         for (String p : instancesToBeDeleted.keySet())

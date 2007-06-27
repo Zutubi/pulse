@@ -31,6 +31,11 @@ public class MutableRecordImpl extends AbstractMutableRecord
         meta.put(key, value);
     }
 
+    public String removeMeta(String key)
+    {
+        return meta.remove(key);
+    }
+
     public String getMeta(String key)
     {
         return meta.get(key);
