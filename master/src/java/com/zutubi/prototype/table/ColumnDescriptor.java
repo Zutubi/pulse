@@ -46,7 +46,12 @@ public class ColumnDescriptor
         try
         {
             FormattingWrapper wrapper = new FormattingWrapper(instance, type);
-            return wrapper.get(name);
+            Object value = wrapper.get(name);
+            if (value != null)
+            {
+                return value;
+            }
+            return "";
         }
         catch (Exception e)
         {
