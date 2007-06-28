@@ -19,6 +19,7 @@ public class ConfigurationPersistenceManager
     private RecordManager recordManager;
 
     private Map<String, ConfigurationScopeInfo> rootScopes = new HashMap<String, ConfigurationScopeInfo>();
+    
     /**
      * An index mapping from composite types to all paths where records of that
      * type (or a subtype) may reside.  Paths will include wildcards to navigate
@@ -41,7 +42,7 @@ public class ConfigurationPersistenceManager
      */
     public void register(String scope, ComplexType type, boolean persistent)
     {
-        validateConfiguration(type);
+        validateConfiguration(type, scope);
         rootScopes.put(scope, new ConfigurationScopeInfo(scope, type, persistent));
         if (persistent)
         {
@@ -79,14 +80,24 @@ public class ConfigurationPersistenceManager
         return rootScopes.get(scope);
     }
 
-    private void validateConfiguration(ComplexType type)
+    private void validateConfiguration(ComplexType type, String scope)
     {
-        if (type instanceof CollectionType)
+        validateConfiguration(type, new HashSet<ComplexType>(), scope);
+    }
+
+    private void validateConfiguration(ComplexType type, Set<ComplexType> seenTypes, String path)
+    {
+        if (seenTypes.contains(type))
+        {
+            throw new IllegalArgumentException("Cycle detected in type definition at path '" + path + "': type '" + type.getClazz().getName() + "' has already appeared in this path");
+        }
+
+        if(type instanceof CollectionType)
         {
             Type targetType = type.getTargetType();
             if (targetType instanceof ComplexType)
             {
-                validateConfiguration((ComplexType) targetType);
+                validateConfiguration((ComplexType) targetType, seenTypes, PathUtils.getPath(path, PathUtils.WILDCARD_ANY_ELEMENT));
             }
         }
         else
@@ -97,9 +108,10 @@ public class ConfigurationPersistenceManager
                 throw new IllegalArgumentException("Attempt to register persistent configuration of type '" + compositeType.getClazz() + "': which does not implement Configuration");
             }
 
+            seenTypes.add(type);
             for (TypeProperty property : compositeType.getProperties(ComplexType.class))
             {
-                validateConfiguration((ComplexType) property.getType());
+                validateConfiguration((ComplexType) property.getType(), new HashSet<ComplexType>(seenTypes), PathUtils.getPath(path, property.getName()));
             }
         }
     }

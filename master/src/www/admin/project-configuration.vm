@@ -244,10 +244,10 @@
 
     #parse("/template/includes/actionerrors.vm")
 
-    <div id="innernorth" style="padding: 4px; border-bottom: 1px solid #ccc">
+    <div id="innernorth" style="padding: 0px;">
     </div>
   
-    <div id="template-tree" class="ylayout-inactive-content">
+    <div id="template-tree" class="ylayout-inactive-content" style="padding: 10px">
     </div>
 
     <div id="config-tree" class="ylayout-inactive-content">

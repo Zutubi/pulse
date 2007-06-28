@@ -406,7 +406,7 @@ public class ConfigurationTemplateManager
         }
     }
 
-    private boolean isConcrete(String parentPath, Record subject)
+    public boolean isConcrete(String parentPath, Record subject)
     {
         if (parentPath != null)
         {
@@ -818,7 +818,13 @@ public class ConfigurationTemplateManager
      */
     public Object getInstance(String path)
     {
-        return instances.get(path);
+        Object instance = instances.get(path);
+        if(instance == null)
+        {
+            instance = incompleteInstances.get(path);
+        }
+
+        return instance;
     }
 
     @SuppressWarnings({"unchecked"})
@@ -838,10 +844,10 @@ public class ConfigurationTemplateManager
         return (T) instance;
     }
 
-    public <T> Collection<T> getAllInstances(String path, Class<T> clazz)
+    public <T> Collection<T> getAllInstances(String path, Class<T> clazz, boolean allowIncomplete)
     {
         List<T> result = new LinkedList<T>();
-        getAllInstances(path, result, false);
+        getAllInstances(path, result, allowIncomplete);
         return result;
     }
 

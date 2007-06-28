@@ -1,9 +1,6 @@
 package com.zutubi.prototype.config;
 
-import com.zutubi.prototype.config.types.CompositeCollectionObject;
-import com.zutubi.prototype.config.types.CompositeObject;
-import com.zutubi.prototype.config.types.SimpleCollectionObject;
-import com.zutubi.prototype.config.types.SimpleObject;
+import com.zutubi.prototype.config.types.*;
 import com.zutubi.prototype.type.CompositeType;
 import com.zutubi.prototype.type.MapType;
 import com.zutubi.prototype.type.TypeException;
@@ -88,10 +85,16 @@ public class ConfigurationPersistenceManagerTest extends TestCase
 
     public void testIndexCircular() throws TypeException
     {
-        // FIXME make nested work
-//        CompositeType type = typeRegistry.register(CircularObject.class);
-//        manager.register("nested", type);
-//        assertEquals(Arrays.asList("nested", "nested/nested"), manager.getConfigurationPaths(type));
+        try
+        {
+            CompositeType type = typeRegistry.register(CircularObject.class);
+            manager.register("nested", type);
+            fail();
+        }
+        catch (IllegalArgumentException e)
+        {
+            assertEquals("Cycle detected in type definition at path 'nested/nested': type 'com.zutubi.prototype.config.types.CircularObject' has already appeared in this path", e.getMessage());
+        }
     }
 
 }

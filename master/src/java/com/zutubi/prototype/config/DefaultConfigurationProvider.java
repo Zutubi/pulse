@@ -52,7 +52,7 @@ public class DefaultConfigurationProvider implements ConfigurationProvider
 
     public <T> Collection<T> getAll(String path, Class<T> clazz)
     {
-        return configurationTemplateManager.getAllInstances(path, clazz);
+        return configurationTemplateManager.getAllInstances(path, clazz, false);
     }
 
     public <T> Collection<T> getAll(Class<T> clazz)

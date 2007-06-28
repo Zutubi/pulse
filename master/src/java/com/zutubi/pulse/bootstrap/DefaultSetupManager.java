@@ -11,6 +11,7 @@ import com.zutubi.pulse.config.PropertiesWriter;
 import com.zutubi.pulse.license.LicenseHolder;
 import com.zutubi.pulse.logging.LogConfigurationManager;
 import com.zutubi.pulse.model.UserManager;
+import com.zutubi.pulse.prototype.config.admin.GeneralAdminConfiguration;
 import com.zutubi.pulse.upgrade.UpgradeManager;
 import com.zutubi.util.IOUtils;
 import com.zutubi.util.logging.Logger;
@@ -77,6 +78,8 @@ public class DefaultSetupManager implements SetupManager
     private DatabaseConsole databaseConsole;
 
     private ProcessSetupStartupTask setupCallback;
+    // Note that this is null until part way through startup
+    private ConfigurationProvider configurationProvider;
 
     public SetupState getCurrentState()
     {
@@ -87,11 +90,23 @@ public class DefaultSetupManager implements SetupManager
     {
         if (!promptShown)
         {
+            String baseUrl = null;
+            if(configurationProvider != null)
+            {
+                GeneralAdminConfiguration config = configurationProvider.get(GeneralAdminConfiguration.class);
+                if (config != null)
+                {
+                    baseUrl = config.getBaseUrl();
+                }
+            }
+
+            if(!TextUtils.stringSet(baseUrl))
+            {
+                SystemConfigurationSupport systemConfig = (SystemConfigurationSupport) configurationManager.getSystemConfig();
+                baseUrl = systemConfig.getHostUrl();
+            }
+            
             // let the user know that they should continue / complete the setup process via the Web UI.
-            SystemConfigurationSupport systemConfig = (SystemConfigurationSupport) configurationManager.getSystemConfig();
-            // FIXME showing the base url is tricky as this can be called
-            // FIXME very early
-            String baseUrl = systemConfig.getHostUrl();
             System.err.println("Now go to " + baseUrl + " and follow the prompts.");
             promptShown = true;
         }
@@ -118,7 +133,6 @@ public class DefaultSetupManager implements SetupManager
         {
             // request data input.
             state = SetupState.DATA;
-
             showPrompt();
             return;
         }
@@ -298,6 +312,7 @@ public class DefaultSetupManager implements SetupManager
         configurationRegistry.init();
         configurationTemplateManager.init();
         configurationProvider.init();
+        this.configurationProvider = configurationProvider;
     }
 
     public void requestUpgradeComplete(boolean changes)
