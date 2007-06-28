@@ -124,9 +124,13 @@ public class ConfigurationUIModel
             Class actionHandler = ConventionSupport.getActions(type);
             if (actionHandler != null)
             {
-                Actions actionSupport = new Actions();
-                actionSupport.setObjectFactory(objectFactory);
-                actions = actionSupport.getActions(actionHandler, configurationTemplateManager.getInstance(path));
+                // do not show actions for template records.
+                if (configurationTemplateManager.isConcrete(parentPath, record))
+                {
+                    Actions actionSupport = new Actions();
+                    actionSupport.setObjectFactory(objectFactory);
+                    actions = actionSupport.getActions(actionHandler, configurationTemplateManager.getInstance(path));
+                }
             }
 
             Class displayHandler = ConventionSupport.getDisplay(type);
