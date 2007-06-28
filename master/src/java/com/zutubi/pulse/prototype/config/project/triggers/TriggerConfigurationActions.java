@@ -4,6 +4,9 @@ import com.zutubi.pulse.scheduling.Scheduler;
 import com.zutubi.pulse.scheduling.Trigger;
 import com.zutubi.pulse.scheduling.SchedulingException;
 
+import java.util.List;
+import java.util.LinkedList;
+
 /**
  *
  *
@@ -11,6 +14,24 @@ import com.zutubi.pulse.scheduling.SchedulingException;
 public class TriggerConfigurationActions
 {
     private Scheduler scheduler;
+
+    public List<String> getActions(TriggerConfiguration config)
+    {
+        List<String> actions = new LinkedList<String>();
+        Trigger trigger = scheduler.getTrigger(config.getTriggerId());
+        if (trigger != null && trigger.isScheduled())
+        {
+            if (trigger.isPaused())
+            {
+                actions.add("resume");
+            }
+            else
+            {
+                actions.add("pause");
+            }
+        }
+        return actions;
+    }
 
     public void doPause(TriggerConfiguration config) throws SchedulingException
     {
@@ -21,12 +42,6 @@ public class TriggerConfigurationActions
         }
     }
 
-    public boolean isPauseEnabled(TriggerConfiguration config)
-    {
-        Trigger trigger = scheduler.getTrigger(config.getTriggerId());
-        return !trigger.isPaused();
-    }
-
     public void doResume(TriggerConfiguration config) throws SchedulingException
     {
         Trigger trigger = scheduler.getTrigger(config.getTriggerId());
@@ -34,12 +49,6 @@ public class TriggerConfigurationActions
         {
             scheduler.resume(trigger);
         }
-    }
-
-    public boolean isResumeEnabled(TriggerConfiguration config)
-    {
-        Trigger trigger = scheduler.getTrigger(config.getTriggerId());
-        return trigger.isPaused();
     }
 
     public void setScheduler(Scheduler scheduler)
