@@ -33,6 +33,7 @@ public class ConfigurationTemplateManager
     private ConfigurationReferenceManager configurationReferenceManager;
     private EventManager eventManager;
     private ValidationManager validationManager;
+    private int refreshCount = 0;
 
     public void init()
     {
@@ -256,7 +257,9 @@ public class ConfigurationTemplateManager
                 String templateParentPath = getTemplateParentPath(newPath, record);
                 if (templateParentPath != null)
                 {
-                    record = applySkeleton(actualType, record, createSkeletonRecord(actualType, recordManager.load(templateParentPath)));
+                    TemplateRecord templateParent = (TemplateRecord) getRecord(templateParentPath);
+                    record = applySkeleton(actualType, record, createSkeletonRecord(actualType, templateParent.getMoi()));
+                    scrubInheritedValues(templateParent, record, true);
                 }
             }
             else
@@ -345,6 +348,7 @@ public class ConfigurationTemplateManager
         configurationReferenceManager.clear();
         refreshInstances();
         refreshTemplateHierarchies();
+        refreshCount++;
     }
 
     private void refreshInstances()
@@ -674,15 +678,24 @@ public class ConfigurationTemplateManager
         TemplateRecord existingParent = templateRecord.getParent();
         if (existingParent != null)
         {
+            scrubInheritedValues(existingParent, record, false);
+        }
+    }
+
+    private void scrubInheritedValues(TemplateRecord templateParent, MutableRecord record, boolean deep)
+    {
+        ComplexType type = templateParent.getType();
+        if (type instanceof CompositeType)
+        {
             // We add an empty layer where we are about to add the new
             // record in case there are any values hidden from the parent
             // via templating rules (like NoInherit).
-            TemplateRecord emptyChild = new TemplateRecord(null, existingParent, type, type.createNewRecord(false));
+            TemplateRecord emptyChild = new TemplateRecord(null, templateParent, type, type.createNewRecord(false));
             Set<String> dead = new HashSet<String>();
 
             // Perhaps we could use an iterator to remove, but does Record
             // specify what happens when removing using a key set iterator?
-            for (String key : record.keySet())
+            for (String key : record.simpleKeySet())
             {
                 if (record.get(key).equals(emptyChild.get(key)))
                 {
@@ -693,6 +706,18 @@ public class ConfigurationTemplateManager
             for (String key : dead)
             {
                 record.remove(key);
+            }
+        }
+
+        if (deep)
+        {
+            for(String key: record.nestedKeySet())
+            {
+                TemplateRecord propertyParent = (TemplateRecord) templateParent.get(key);
+                if(propertyParent != null)
+                {
+                    scrubInheritedValues(propertyParent, (MutableRecord) record.get(key), true);
+                }
             }
         }
     }
@@ -1127,5 +1152,10 @@ public class ConfigurationTemplateManager
     public void setValidationManager(ValidationManager validationManager)
     {
         this.validationManager = validationManager;
+    }
+
+    public int getRefreshCount()
+    {
+        return refreshCount;
     }
 }

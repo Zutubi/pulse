@@ -5,6 +5,7 @@ import com.zutubi.config.annotations.SymbolicName;
 import com.zutubi.prototype.type.CompositeType;
 import com.zutubi.prototype.type.TemplatedMapType;
 import com.zutubi.prototype.type.record.MutableRecord;
+import com.zutubi.prototype.type.record.PathUtils;
 import com.zutubi.prototype.type.record.TemplateRecord;
 import com.zutubi.pulse.core.config.AbstractNamedConfiguration;
 
@@ -148,6 +149,41 @@ public class TemplateRecordPersistenceTest extends AbstractConfigurationSystemTe
         assertEquals(CHILD_PROJECT, childTemplate.get("name"));
         assertEquals("inherited url", childTemplate.get("url"));
         assertEquals(GLOBAL_PROJECT, childTemplate.getOwner("url"));
+    }
+
+    public void testScrubOnInsert()
+    {
+        MutableRecord record = createGlobal();
+        record.put("url", "some url");
+        configurationTemplateManager.insertRecord("project", record);
+
+        record = createChild();
+        record.put("url", "some url");
+        configurationTemplateManager.insertRecord("project", record);
+
+        TemplateRecord template = (TemplateRecord) configurationTemplateManager.getRecord("project/child");
+        assertEquals("some url", template.get("url"));
+        assertEquals(GLOBAL_PROJECT, template.getOwner("url"));
+        assertNull(template.getMoi().get("url"));
+    }
+
+    public void testScrubOnInsertDeep()
+    {
+        MutableRecord record = createGlobal();
+        configurationTemplateManager.insertRecord("project", record);
+        configurationTemplateManager.insertRecord("project/global/properties", createProperty("foo", "bar"));
+
+        record = createChild();
+        ((MutableRecord) record.get("properties")).put("foo", createProperty("foo", "bar"));
+        configurationTemplateManager.insertRecord("project", record);
+
+        TemplateRecord property = (TemplateRecord) configurationTemplateManager.getRecord("project/child/properties/foo");
+        assertEquals("foo", property.get("name"));
+        assertEquals(GLOBAL_PROJECT, property.getOwner("name"));
+        assertNull(property.getMoi().get("name"));
+        assertEquals("bar", property.get("value"));
+        assertEquals(GLOBAL_PROJECT, property.getOwner("value"));
+        assertNull(property.getMoi().get("value"));
     }
 
     public void testSimpleOverride()
@@ -392,6 +428,16 @@ public class TemplateRecordPersistenceTest extends AbstractConfigurationSystemTe
         assertNull(configurationTemplateManager.getRecord("project/child/stages/default"));
     }
 
+    public void testInsertPerformance()
+    {
+        insertGlobal();
+        long globalHandle = configurationTemplateManager.getRecord("project/global").getHandle();
+        for(int i = 0; i < 10; i++)
+        {
+            insertLargeProject("project" + i, globalHandle, 3, 5);
+        }
+    }
+
     private void insertGlobal()
     {
         MutableRecord global = createGlobal();
@@ -416,6 +462,38 @@ public class TemplateRecordPersistenceTest extends AbstractConfigurationSystemTe
         MutableRecord child = createProject(CHILD_PROJECT, CHILD_DESCRIPTION);
         configurationTemplateManager.setParentTemplate(child, configurationTemplateManager.getRecord("project/global").getHandle());
         return child;
+    }
+
+    private void insertLargeProject(String name, long parent, int stages, int propertiesPerStage)
+    {
+        MutableRecord project = createProject(name, "fake");
+        configurationTemplateManager.setParentTemplate(project, parent);
+        configurationTemplateManager.insertRecord("project", project);
+        String stagePath = PathUtils.getPath("project", name, "stages");
+        for(int i = 0; i < stages; i++)
+        {
+            insertStage(stagePath, "stage " + i, propertiesPerStage);
+        }
+    }
+
+    private void insertStage(String path, String name, int properties)
+    {
+        MutableRecord stage = stageType.createNewRecord(false);
+        stage.put("name", name);
+        configurationTemplateManager.insertRecord(path, stage);
+        String propertiesPath = PathUtils.getPath(path, name, "properties");
+        for(int i = 0; i < properties; i++)
+        {
+            insertProperty(propertiesPath, "property " + i);
+        }
+    }
+
+    private void insertProperty(String path, String name)
+    {
+        MutableRecord property = propertyType.createNewRecord(false);
+        property.put("name", name);
+        property.put("value", "wow!");
+        configurationTemplateManager.insertRecord(path, property);
     }
 
     private MutableRecord createProject(String name, String description)
