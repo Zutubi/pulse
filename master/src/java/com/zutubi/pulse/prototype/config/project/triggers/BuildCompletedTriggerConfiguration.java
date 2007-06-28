@@ -25,9 +25,6 @@ public class BuildCompletedTriggerConfiguration extends TriggerConfiguration
     @Required
     private ProjectConfiguration project;
 
-    @Reference
-    private List<ProjectConfiguration> projects;
-
     @Select(optionProvider = "com.zutubi.pulse.prototype.CompletedResultStateOptionProvider")
     private List<ResultState> states;
 
@@ -45,16 +42,6 @@ public class BuildCompletedTriggerConfiguration extends TriggerConfiguration
     public void setProject(ProjectConfiguration project)
     {
         this.project = project;
-    }
-
-    public List<ProjectConfiguration> getProjects()
-    {
-        return projects;
-    }
-
-    public void setProjects(List<ProjectConfiguration> projects)
-    {
-        this.projects = projects;
     }
 
     public List<ResultState> getStates()
@@ -94,6 +81,10 @@ public class BuildCompletedTriggerConfiguration extends TriggerConfiguration
         if(states != null && states.size() > 0)
         {
             dataMap.put(BuildCompletedEventFilter.PARAM_STATES, ResultState.getStatesString(states));
+        }
+        else
+        {
+            dataMap.remove(BuildCompletedEventFilter.PARAM_STATES);
         }
     }
 

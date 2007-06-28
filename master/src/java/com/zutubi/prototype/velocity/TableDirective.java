@@ -1,7 +1,6 @@
 package com.zutubi.prototype.velocity;
 
 import com.zutubi.prototype.config.ConfigurationTemplateManager;
-import com.zutubi.prototype.table.FormattingWrapper;
 import com.zutubi.prototype.table.TableDescriptor;
 import com.zutubi.prototype.table.TableDescriptorFactory;
 import com.zutubi.prototype.type.CollectionType;
@@ -20,8 +19,6 @@ import org.apache.velocity.runtime.parser.node.Node;
 import java.io.IOException;
 import java.io.Writer;
 import java.util.Collection;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -122,8 +119,7 @@ public class TableDirective extends PrototypeDirective
     {
         Collection data;
         Object collection = configurationTemplateManager.getInstance(path);
-        Type type = configurationTemplateManager.getType(path).getTargetType();
-        
+
         if (collection instanceof Map)
         {
             Map map = (Map) collection;
@@ -134,16 +130,7 @@ public class TableDirective extends PrototypeDirective
             data = (Collection) collection;
         }
 
-        // wrap the collection
-        List<Object> wrappedData = new LinkedList<Object>();
-        if (data != null)
-        {
-            for (Object instance : data)
-            {
-                wrappedData.add(instance);//new FormattingWrapper(instance, (CompositeType) type));
-            }
-        }
-        return wrappedData;
+        return data;
     }
 
     public void setFreemarkerConfiguration(Configuration configuration)

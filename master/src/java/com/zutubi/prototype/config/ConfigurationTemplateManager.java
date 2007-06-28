@@ -47,17 +47,6 @@ public class ConfigurationTemplateManager
         }
     }
 
-    public String getOwner(String path)
-    {
-        String[] elements = PathUtils.getPathElements(path);
-        if (elements.length > 1 && configurationPersistenceManager.getScopeInfo(elements[0]).isTemplated())
-        {
-            return elements[1];
-        }
-
-        return null;
-    }
-
     /**
      * Returns the record at the given path.  If the path lies within a
      * templated scope, a {@link TemplateRecord} will be returned.
@@ -745,7 +734,7 @@ public class ConfigurationTemplateManager
         return Collections.EMPTY_LIST;
     }
 
-    public boolean isSkeleton(String path)
+    private boolean isSkeleton(String path)
     {
         String[] elements = PathUtils.getPathElements(path);
         if(elements.length > 2)
