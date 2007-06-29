@@ -1,6 +1,8 @@
 package com.zutubi.prototype.config;
 
-import com.zutubi.prototype.config.events.*;
+import com.zutubi.prototype.config.events.PostInsertEvent;
+import com.zutubi.prototype.config.events.PostSaveEvent;
+import com.zutubi.prototype.config.events.PreDeleteEvent;
 import com.zutubi.prototype.type.*;
 import com.zutubi.prototype.type.record.*;
 import com.zutubi.pulse.core.config.Configuration;
@@ -207,6 +209,7 @@ public class ConfigurationTemplateManager
         }
     }
 
+    @SuppressWarnings({"unchecked"})
     public String insertRecord(final String path, MutableRecord record)
     {
         checkPersistent(path);
@@ -232,15 +235,6 @@ public class ConfigurationTemplateManager
 
         CompositeType actualType = checkRecordType(expectedType, record);
 
-        // generate and send out events for each of the records being inserted.  The root record may itself contain
-        // subrecords.
-        Map<String, Record> insertedPaths = getPathRecordMapping(newPath, record);
-        for (String p : insertedPaths.keySet())
-        {
-            Record r = insertedPaths.get(p);
-            eventManager.publish(new PreInsertEvent(this, p, (MutableRecord) r));
-        }
-
         // If inserting into a template path, we have two cases:
         //   - Inserting a new entry in the top collection (e.g. a project).
         //     In this case we need to build a skeleton out of the parent.
@@ -254,59 +248,65 @@ public class ConfigurationTemplateManager
             if (elements.length == 2)
             {
                 // Brand new, if we have a parent we need to skeletonise.
-                String templateParentPath = getTemplateParentPath(newPath, record);
-                if (templateParentPath != null)
-                {
-                    TemplateRecord templateParent = (TemplateRecord) getRecord(templateParentPath);
-                    record = applySkeleton(actualType, record, createSkeletonRecord(actualType, templateParent.getMoi()));
-                    scrubInheritedValues(templateParent, record, true);
-                }
+                record = applyParentSkeleton(newPath, record, actualType);
             }
             else
             {
-                final String remainderPath = PathUtils.getPath(2, elements);
-                final Record skeleton = createSkeletonRecord(actualType, record);
                 TemplateHierarchy hierarchy = getTemplateHierarchy(scope);
                 TemplateNode node = hierarchy.getNodeById(elements[1]);
 
-                node.forEachDescendent(new TemplateNode.NodeHandler()
+                if (!node.isConcrete())
                 {
-                    public boolean handle(TemplateNode templateNode)
-                    {
-                        String descendentPath = PathUtils.getPath(scope, templateNode.getId(), remainderPath);
-                        if (recordManager.load(descendentPath) == null)
-                        {
-                            recordManager.insert(descendentPath, skeleton);
-                            return true;
-                        }
-                        else
-                        {
-                            // We hit an existing record, bail out of this
-                            // subtree.
-                            return false;
-                        }
-                    }
-                });
+                    addInheritedSkeletons(elements, actualType, record, node);
+                }
             }
         }
 
         recordManager.insert(newPath, record);
-
         refreshCaches();
-
-        for (String p : insertedPaths.keySet())
-        {
-            eventManager.publish(new PostInsertEvent(this, p, p, instances.get(p)));
-        }
+        raiseInsertEvents(getDescendentPaths(newPath, false, true));
 
         return newPath;
     }
 
-    private MutableRecord applySkeleton(CompositeType type, MutableRecord record, Record skeleton)
+    private MutableRecord applyParentSkeleton(String newPath, MutableRecord record, CompositeType actualType)
     {
-        TemplateRecord parent = new TemplateRecord(null, null, type, skeleton);
-        TemplateRecord template = new TemplateRecord(null, parent, type, record);
-        return template.flatten();
+        String templateParentPath = getTemplateParentPath(newPath, record);
+        if (templateParentPath != null)
+        {
+            TemplateRecord templateParent = (TemplateRecord) getRecord(templateParentPath);
+            TemplateRecord parentSkeleton = new TemplateRecord(null, null, actualType, createSkeletonRecord(actualType, templateParent.getMoi()));
+            TemplateRecord template = new TemplateRecord(null, parentSkeleton, actualType, record);
+            record = template.flatten();
+            scrubInheritedValues(templateParent, record, true);
+        }
+
+        return record;
+    }
+
+    private void addInheritedSkeletons(final String[] pathElements, CompositeType actualType, MutableRecord record, TemplateNode node)
+    {
+        final String remainderPath = PathUtils.getPath(2, pathElements);
+        final Record skeleton = createSkeletonRecord(actualType, record);
+
+        node.forEachDescendent(new TemplateNode.NodeHandler()
+        {
+            public boolean handle(TemplateNode templateNode)
+            {
+                String descendentPath = PathUtils.getPath(pathElements[0], templateNode.getId(), remainderPath);
+                if (recordManager.load(descendentPath) == null)
+                {
+                    recordManager.insert(descendentPath, skeleton);
+                    return true;
+                }
+                else
+                {
+                    // We hit an existing record, bail out of this
+                    // subtree.
+                    return false;
+                }
+            }
+        }, true);
     }
 
     private Record createSkeletonRecord(ComplexType type, Record record)
@@ -320,6 +320,60 @@ public class ConfigurationTemplateManager
         }
 
         return result;
+    }
+
+    private void raiseInsertEvents(List<String> concretePaths)
+    {
+        // For every new concrete path that has appeared (possibly inherited)
+        for (String concretePath : concretePaths)
+        {
+            // Raise an event for all the config instances under this path.
+            for (Object instance : instances.getAllDescendents(concretePath))
+            {
+                if (instance instanceof Configuration)
+                {
+                    Configuration configuration = (Configuration) instance;
+                    eventManager.publish(new PostInsertEvent(this, configuration, !concretePath.equals(configuration.getConfigurationPath())));
+                    updateInternalProperties(configuration);
+                }
+            }
+        }
+    }
+
+    private void updateInternalProperties(Configuration configuration)
+    {
+        String path = configuration.getConfigurationPath();
+        CompositeType type = (CompositeType) getType(path);
+        if (type.hasInternalProperties())
+        {
+            MutableRecord mutable = recordManager.load(path).copy(false);
+            for (TypeProperty property : type.getInternalProperties())
+            {
+                try
+                {
+                    Object value = property.getValue(configuration);
+                    if(value != null)
+                    {
+                        value = property.getType().unstantiate(value);
+                    }
+
+                    if (value == null)
+                    {
+                        mutable.remove(property.getName());
+                    }
+                    else
+                    {
+                        mutable.put(property.getName(), value);
+                    }
+                }
+                catch (Exception e)
+                {
+                    LOG.severe(e);
+                }
+            }
+
+            recordManager.update(path, mutable);
+        }
     }
 
     private CompositeType checkRecordType(Type expectedType, MutableRecord record)
@@ -481,7 +535,7 @@ public class ConfigurationTemplateManager
     {
         String id = (String) record.get(idProperty);
         String path = PathUtils.getPath(scopeName, id);
-        TemplateNode node = new TemplateNode(path, id);
+        TemplateNode node = new TemplateNode(path, id, isConcrete(record));
 
         List<Record> children = recordsByParent.get(record.getHandle());
         if (children != null)
@@ -604,29 +658,7 @@ public class ConfigurationTemplateManager
         // Type check of incoming record.
         CompositeType actualType = checkRecordType(parentType.getDeclaredPropertyType(PathUtils.getBaseName(newPath)), record);
 
-        MutableRecord newRecord;
-        // See if this is a templated scope: in which case more magic needs
-        // to happen.
-        if (existingRecord instanceof TemplateRecord)
-        {
-            TemplateRecord templateRecord = (TemplateRecord) existingRecord;
-            newRecord = templateRecord.getMoi().copy(false);
-            newRecord.update(record);
-
-            // Scrub values from the incoming record where they are identical
-            // to the existing record's parent.
-            scrubInheritedValues(templateRecord, newRecord, actualType);
-        }
-        else
-        {
-            newRecord = existingRecord.copy(false);
-            newRecord.update(record);
-        }
-
-        Object oldInstance = instances.get(path);
-
-        eventManager.publish(new PreSaveEvent(this, path, oldInstance));
-
+        MutableRecord newRecord = updateRecord(existingRecord, record, actualType);
         if (newPath.equals(path))
         {
             // Regular update
@@ -638,28 +670,7 @@ public class ConfigurationTemplateManager
             // means also moving all children, *except* at the top level.
             if (existingRecord instanceof TemplateRecord)
             {
-                String[] elements = PathUtils.getPathElements(path);
-                if (elements.length > 2)
-                {
-                    final String scope = elements[0];
-                    String newName = PathUtils.getBaseName(newPath);
-
-                    final String oldRemainderPath = PathUtils.getPath(2, elements);
-                    final String newRemainderPath = PathUtils.getPath(PathUtils.getParentPath(oldRemainderPath), newName);
-                    TemplateHierarchy hierarchy = getTemplateHierarchy(scope);
-                    TemplateNode node = hierarchy.getNodeById(elements[1]);
-
-                    node.forEachDescendent(new TemplateNode.NodeHandler()
-                    {
-                        public boolean handle(TemplateNode templateNode)
-                        {
-                            String oldDescendentPath = PathUtils.getPath(scope, templateNode.getId(), oldRemainderPath);
-                            String newDescendentPath = PathUtils.getPath(scope, templateNode.getId(), newRemainderPath);
-                            recordManager.move(oldDescendentPath, newDescendentPath);
-                            return true;
-                        }
-                    });
-                }
+                moveDescendents(path, newPath);
             }
 
             recordManager.move(path, newPath);
@@ -668,9 +679,64 @@ public class ConfigurationTemplateManager
 
         refreshCaches();
 
-        eventManager.publish(new PostSaveEvent(this, path, oldInstance, newPath, instances.get(newPath)));
+        for(String concretePath: getDescendentPaths(newPath, false, true))
+        {
+            Object instance = instances.get(concretePath);
+            if(instance != null && instance instanceof Configuration)
+            {
+                eventManager.publish(new PostSaveEvent(this, (Configuration) instance));
+            }
+        }
 
         return newPath;
+    }
+
+    private MutableRecord updateRecord(Record existingRecord, MutableRecord updates, CompositeType type)
+    {
+        MutableRecord newRecord;
+        if (existingRecord instanceof TemplateRecord)
+        {
+            TemplateRecord templateRecord = (TemplateRecord) existingRecord;
+            newRecord = templateRecord.getMoi().copy(false);
+            newRecord.update(updates);
+
+            // Scrub values from the incoming record where they are identical
+            // to the existing record's parent.
+            scrubInheritedValues(templateRecord, newRecord, type);
+        }
+        else
+        {
+            newRecord = existingRecord.copy(false);
+            newRecord.update(updates);
+        }
+        
+        return newRecord;
+    }
+
+    private void moveDescendents(String path, String newPath)
+    {
+        String[] elements = PathUtils.getPathElements(path);
+        if (elements.length > 2)
+        {
+            final String scope = elements[0];
+            String newName = PathUtils.getBaseName(newPath);
+
+            final String oldRemainderPath = PathUtils.getPath(2, elements);
+            final String newRemainderPath = PathUtils.getPath(PathUtils.getParentPath(oldRemainderPath), newName);
+            TemplateHierarchy hierarchy = getTemplateHierarchy(scope);
+            TemplateNode node = hierarchy.getNodeById(elements[1]);
+
+            node.forEachDescendent(new TemplateNode.NodeHandler()
+            {
+                public boolean handle(TemplateNode templateNode)
+                {
+                    String oldDescendentPath = PathUtils.getPath(scope, templateNode.getId(), oldRemainderPath);
+                    String newDescendentPath = PathUtils.getPath(scope, templateNode.getId(), newRemainderPath);
+                    recordManager.move(oldDescendentPath, newDescendentPath);
+                    return true;
+                }
+            }, true);
+        }
     }
 
     public void scrubInheritedValues(TemplateRecord templateRecord, MutableRecord record, CompositeType type)
@@ -711,10 +777,10 @@ public class ConfigurationTemplateManager
 
         if (deep)
         {
-            for(String key: record.nestedKeySet())
+            for (String key : record.nestedKeySet())
             {
                 TemplateRecord propertyParent = (TemplateRecord) templateParent.get(key);
-                if(propertyParent != null)
+                if (propertyParent != null)
                 {
                     scrubInheritedValues(propertyParent, (MutableRecord) record.get(key), true);
                 }
@@ -723,22 +789,21 @@ public class ConfigurationTemplateManager
     }
 
     @SuppressWarnings({"unchecked"})
-    public List<String> getDescendentPaths(String path)
+    public List<String> getDescendentPaths(String path, boolean strict, final boolean concreteOnly)
     {
         String[] elements = PathUtils.getPathElements(path);
-        if(elements.length > 1)
+        if (elements.length > 1)
         {
             String scope = elements[0];
             ConfigurationScopeInfo scopeInfo = configurationPersistenceManager.getScopeInfo(scope);
-            if(scopeInfo == null)
+            if (scopeInfo == null)
             {
                 throw new IllegalArgumentException("Invalid path '" + path + "': references unknown scope '" + scope + "'");
             }
 
-            if(scopeInfo.isTemplated())
+            if (scopeInfo.isTemplated())
             {
                 final List<String> result = new LinkedList<String>();
-
                 TemplateHierarchy hierarchy = getTemplateHierarchy(scope);
                 TemplateNode node = hierarchy.getNodeById(elements[1]);
                 final String remainderPath = elements.length == 2 ? null : PathUtils.getPath(2, elements);
@@ -747,34 +812,45 @@ public class ConfigurationTemplateManager
                 {
                     public boolean handle(TemplateNode node)
                     {
-                        result.add(remainderPath == null ? node.getPath() : PathUtils.getPath(node.getPath(), remainderPath));
+                        if (!concreteOnly || node.isConcrete())
+                        {
+                            result.add(remainderPath == null ? node.getPath() : PathUtils.getPath(node.getPath(), remainderPath));
+                        }
                         return true;
                     }
-                });
+                }, strict);
 
                 return result;
             }
         }
 
-        return Collections.EMPTY_LIST;
+        // We get here for non-templated scopes.
+        if(strict)
+        {
+            return Collections.EMPTY_LIST;
+        }
+        else
+        {
+            return Arrays.asList(path);
+        }
     }
 
     private boolean isSkeleton(String path)
     {
         String[] elements = PathUtils.getPathElements(path);
-        if(elements.length > 2)
+        if (elements.length > 2)
         {
             String scope = elements[0];
             ConfigurationScopeInfo scopeInfo = configurationPersistenceManager.getScopeInfo(scope);
-            if(scopeInfo == null)
+            if (scopeInfo == null)
             {
                 throw new IllegalArgumentException("Invalid path '" + path + "': references unknown scope '" + scope + "'");
             }
 
-            if(scopeInfo.isTemplated())
+            if (scopeInfo.isTemplated())
             {
                 TemplateRecord record = (TemplateRecord) getRecord(path);
-                if(record == null)
+                if (record == null)
                 {
                     throw new IllegalArgumentException("Invalid path '" + path + "': no record found");
                 }
@@ -791,8 +867,8 @@ public class ConfigurationTemplateManager
         DeleteRecordCleanupTask result = new DeleteRecordCleanupTask(path, isSkeleton(path), recordManager);
 
         // If this is a templated scope, all descendents must also be deleted
-        List<String> descendentPaths = getDescendentPaths(path);
-        for(String descendentPath: descendentPaths)
+        List<String> descendentPaths = getDescendentPaths(path, true, false);
+        for (String descendentPath : descendentPaths)
         {
             result.addCascaded(getCleanupTasks(descendentPath));
         }
@@ -805,23 +881,20 @@ public class ConfigurationTemplateManager
     {
         checkPersistent(path);
 
-        // need to send out events for the individual record deletes.  How do we pick up the individual deletes.
-
-        List<String> pathsToBeDeleted = getPathListing(path, recordManager.load(path));
-        Map<String, Object> instancesToBeDeleted = getPathInstanceMapping(pathsToBeDeleted);
-
-        for (String p : instancesToBeDeleted.keySet())
+        for(String concretePath: getDescendentPaths(path, false, true))
         {
-            eventManager.publish(new PreDeleteEvent(this, p, instancesToBeDeleted.get(p)));
+            for(Object instance: instances.getAllDescendents(concretePath))
+            {
+                if(instance instanceof Configuration)
+                {
+                    Configuration configuration = (Configuration) instance;
+                    eventManager.publish(new PreDeleteEvent(this, configuration, !concretePath.equals(configuration.getConfigurationPath())));
+                }
+            }
         }
 
         getCleanupTasks(path).execute();
         refreshCaches();
-
-        for (String p : instancesToBeDeleted.keySet())
-        {
-            eventManager.publish(new PostDeleteEvent(this, p, instancesToBeDeleted.get(p)));
-        }
     }
 
     /**
@@ -833,7 +906,7 @@ public class ConfigurationTemplateManager
     public Object getInstance(String path)
     {
         Object instance = instances.get(path);
-        if(instance == null)
+        if (instance == null)
         {
             instance = incompleteInstances.get(path);
         }
@@ -867,10 +940,10 @@ public class ConfigurationTemplateManager
 
     public <T> void getAllInstances(String path, Collection<T> result, boolean allowIncomplete)
     {
-        instances.getAll(path, result);
+        instances.getAllMatchingPathPattern(path, result);
         if (allowIncomplete)
         {
-            incompleteInstances.getAll(path, result);
+            incompleteInstances.getAllMatchingPathPattern(path, result);
         }
     }
 
@@ -889,7 +962,7 @@ public class ConfigurationTemplateManager
         {
             for (String path : paths)
             {
-                instances.getAll(path, result);
+                instances.getAllMatchingPathPattern(path, result);
             }
         }
 
@@ -996,24 +1069,6 @@ public class ConfigurationTemplateManager
             mapping.put(path, instances.get(path));
         }
         return mapping;
-    }
-
-    private Map<String, Record> getPathRecordMapping(String basePath, Record record)
-    {
-        Map<String, Record> paths = new HashMap<String, Record>();
-        paths.put(basePath, record);
-
-        for (String key : record.keySet())
-        {
-            Object value = record.get(key);
-            if (value instanceof Record)
-            {
-                String childPath = PathUtils.getPath(basePath, key);
-                Record child = (Record) value;
-                paths.putAll(getPathRecordMapping(childPath, child));
-            }
-        }
-        return paths;
     }
 
     @SuppressWarnings({"unchecked"})
@@ -1124,6 +1179,11 @@ public class ConfigurationTemplateManager
         return false;
     }
 
+    public int getRefreshCount()
+    {
+        return refreshCount;
+    }
+
     public void setTypeRegistry(TypeRegistry typeRegistry)
     {
         this.typeRegistry = typeRegistry;
@@ -1152,10 +1212,5 @@ public class ConfigurationTemplateManager
     public void setValidationManager(ValidationManager validationManager)
     {
         this.validationManager = validationManager;
-    }
-
-    public int getRefreshCount()
-    {
-        return refreshCount;
     }
 }

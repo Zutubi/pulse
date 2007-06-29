@@ -18,9 +18,11 @@ public class TemplateNode
     private List<TemplateNode> children = new LinkedList<TemplateNode>();
     private String path;
     private String id;
+    private boolean concrete;
 
-    public TemplateNode(String path, String id)
+    public TemplateNode(String path, String id, boolean concrete)
     {
+        this.concrete = concrete;
         this.path = path;
         this.id = id;
     }
@@ -67,6 +69,11 @@ public class TemplateNode
         return id;
     }
 
+    public boolean isConcrete()
+    {
+        return concrete;
+    }
+
     public TemplateNode findNodeById(String id)
     {
         if(this.id.equals(id))
@@ -98,17 +105,17 @@ public class TemplateNode
         }
     }
 
-    public void forEachDescendent(NodeHandler callback)
+    public void forEachDescendent(NodeHandler callback, boolean strict)
     {
-        for(TemplateNode node: children)
+        if(strict || callback.handle(this))
         {
-            if(callback.handle(node))
+            for(TemplateNode node: children)
             {
-                node.forEachDescendent(callback);
+                node.forEachDescendent(callback, false);
             }
         }
     }
-    
+
     public interface NodeHandler
     {
         /**

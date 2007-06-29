@@ -1,7 +1,7 @@
 package com.zutubi.pulse.prototype.config.project.triggers;
 
 import com.zutubi.config.annotations.SymbolicName;
-import com.zutubi.prototype.config.ConfigurationTemplateManager;
+import com.zutubi.prototype.config.ConfigurationProvider;
 import com.zutubi.pulse.prototype.config.project.ProjectConfiguration;
 import com.zutubi.pulse.scheduling.CronTrigger;
 import com.zutubi.pulse.scheduling.Trigger;
@@ -13,9 +13,9 @@ import com.zutubi.pulse.scheduling.Trigger;
 @SymbolicName("internal.cronBuildTriggerConfig")
 public class CronBuildTriggerConfiguration extends TriggerConfiguration
 {
-    private ConfigurationTemplateManager configurationTemplateManager;
-
     private String cron;
+
+    private ConfigurationProvider configurationProvider;
 
     public String getCron()
     {
@@ -29,7 +29,7 @@ public class CronBuildTriggerConfiguration extends TriggerConfiguration
 
     public Trigger newTrigger()
     {
-        ProjectConfiguration project = configurationTemplateManager.getAncestorOfType(this, ProjectConfiguration.class);
+        ProjectConfiguration project = configurationProvider.getAncestorOfType(this, ProjectConfiguration.class);
         String triggerName = "trigger:" + getHandle();
         String triggerGroup = "project:" + project.getProjectId();
         
@@ -42,8 +42,8 @@ public class CronBuildTriggerConfiguration extends TriggerConfiguration
         cronTrigger.setCron(cron);
     }
 
-    public void setConfigurationTemplateManager(ConfigurationTemplateManager configurationTemplateManager)
+    public void setConfigurationProvider(ConfigurationProvider configurationProvider)
     {
-        this.configurationTemplateManager = configurationTemplateManager;
+        this.configurationProvider = configurationProvider;
     }
 }

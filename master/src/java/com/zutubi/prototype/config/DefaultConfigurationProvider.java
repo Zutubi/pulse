@@ -109,7 +109,6 @@ public class DefaultConfigurationProvider implements ConfigurationProvider
     public void registerEventListener(ConfigurationEventListener listener, boolean synchronous, Class clazz)
     {
         ClassPredicate classPredicate = new ClassPredicate(clazz);
-        classPredicate.setTypeRegistry(typeRegistry);
         FilteringListener filter = new FilteringListener(classPredicate, new Listener(listener));
         if (synchronous)
         {

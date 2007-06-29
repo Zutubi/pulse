@@ -3,6 +3,7 @@ package com.zutubi.pulse.prototype.config.project.triggers;
 import com.zutubi.prototype.config.ConfigurationProvider;
 import com.zutubi.prototype.config.TypeListener;
 import com.zutubi.pulse.bootstrap.ComponentContext;
+import com.zutubi.pulse.core.PulseRuntimeException;
 import com.zutubi.pulse.scheduling.Scheduler;
 import com.zutubi.pulse.scheduling.SchedulingException;
 import com.zutubi.pulse.scheduling.Trigger;
@@ -24,18 +25,10 @@ public class TriggerManager
     {
         TypeListener<TriggerConfiguration> listener = new TypeListener<TriggerConfiguration>(TriggerConfiguration.class)
         {
-            private boolean recursiveCheck = false;
-
             public void postInsert(TriggerConfiguration instance)
             {
-                if (recursiveCheck)
-                {
-                    return;
-                }
                 try
                 {
-                    recursiveCheck = true;
-
                     ComponentContext.autowire(instance);
                     Trigger trigger = instance.newTrigger();
                     scheduler.schedule(trigger);
@@ -46,15 +39,12 @@ public class TriggerManager
                 }
                 catch (SchedulingException e)
                 {
-                    LOG.warning(e);
-                }
-                finally
-                {
-                    recursiveCheck = false;
+                    LOG.severe(e);
+                    throw new PulseRuntimeException(e);
                 }
             }
 
-            public void postDelete(TriggerConfiguration instance)
+            public void preDelete(TriggerConfiguration instance)
             {
                 try
                 {
@@ -63,16 +53,12 @@ public class TriggerManager
                 }
                 catch (SchedulingException e)
                 {
-                    LOG.warning(e);
+                    LOG.severe(e);
                 }
             }
 
             public void postSave(TriggerConfiguration instance)
             {
-                if (recursiveCheck)
-                {
-                    return;
-                }
                 try
                 {
                     Trigger trigger = scheduler.getTrigger(instance.getTriggerId());
@@ -84,7 +70,7 @@ public class TriggerManager
                 }
                 catch (SchedulingException e)
                 {
-                    LOG.warning(e);
+                    LOG.severe(e);
                 }
             }
         };

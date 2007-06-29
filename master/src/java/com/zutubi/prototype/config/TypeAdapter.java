@@ -6,7 +6,7 @@ import com.zutubi.pulse.core.config.Configuration;
  *
  *
  */
-public class TypeAdapter<X extends Configuration> extends TypeListener<X>
+public abstract class TypeAdapter<X extends Configuration> extends TypeListener<X>
 {
     public TypeAdapter(Class<X> configurationClass)
     {
@@ -18,7 +18,7 @@ public class TypeAdapter<X extends Configuration> extends TypeListener<X>
         // noop
     }
 
-    public void postDelete(X instance)
+    public void preDelete(X instance)
     {
         // noop
     }

@@ -1,8 +1,8 @@
 package com.zutubi.pulse.model;
 
-import com.zutubi.prototype.config.CollectionAdapter;
 import com.zutubi.prototype.config.ConfigurationProvider;
 import com.zutubi.prototype.config.ConfigurationTemplateManager;
+import com.zutubi.prototype.config.TypeListener;
 import com.zutubi.prototype.type.CompositeType;
 import com.zutubi.prototype.type.TypeRegistry;
 import com.zutubi.prototype.type.record.MutableRecord;
@@ -74,27 +74,23 @@ public class DefaultProjectManager implements ProjectManager
         addProjectAuthorisation.setProjectManager(this);
         licenseManager.addAuthorisation(addProjectAuthorisation);
 
-        CollectionAdapter<ProjectConfiguration> listener = new CollectionAdapter<ProjectConfiguration>("project", ProjectConfiguration.class, true)
+        TypeListener<ProjectConfiguration> listener = new TypeListener<ProjectConfiguration>(ProjectConfiguration.class)
         {
-            protected void preInsert(MutableRecord record)
+            public void postInsert(ProjectConfiguration instance)
             {
                 Project project = new Project();
                 save(project);
-                record.put("projectId", Long.toString(project.getId()));
-            }
-
-            protected void instanceInserted(ProjectConfiguration instance)
-            {
+                instance.setProjectId(project.getId());
                 registerProjectConfig(instance);
             }
 
-            protected void instanceDeleted(ProjectConfiguration instance)
+            public void preDelete(ProjectConfiguration instance)
             {
                 nameToConfig.remove(instance.getName());
                 idToConfig.remove(instance.getProjectId());
             }
 
-            protected void instanceChanged(ProjectConfiguration instance)
+            public void postSave(ProjectConfiguration instance)
             {
                 // Tricky: the name may have changed.
                 ProjectConfiguration old = idToConfig.remove(instance.getProjectId());
@@ -106,7 +102,6 @@ public class DefaultProjectManager implements ProjectManager
                 registerProjectConfig(instance);
             }
         };
-
         listener.register(configurationProvider);
         updateProjects();
 

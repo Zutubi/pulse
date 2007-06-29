@@ -4,6 +4,7 @@ import com.zutubi.prototype.type.record.PathUtils;
 
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.Map;
 
 /**
@@ -16,21 +17,39 @@ class DefaultInstanceCache implements InstanceCache
 
     public Object get(String path)
     {
-        return get(root, PathUtils.getPathElements(path), 0);
+        Entry entry = getEntry(path);
+        return entry == null ? null : entry.getInstance();
     }
 
-    private Object get(Entry entry, String[] elements, int index)
+    private Entry getEntry(String path)
     {
-        if(index == elements.length)
+        return getEntry(root, PathUtils.getPathElements(path), 0);
+    }
+
+    private Entry getEntry(Entry entry, String[] elements, int index)
+    {
+
+        if (index == elements.length)
         {
-            return entry.getInstance();
+            return entry;
         }
 
         entry = entry.getChild(elements[index]);
-        return entry == null ? null : get(entry, elements, index + 1);
+        return entry == null ? null : getEntry(entry, elements, index + 1);
     }
 
-    public void getAll(String path, Collection result)
+    public Collection<Object> getAllDescendents(String path)
+    {
+        Collection<Object> result = new LinkedList<Object>();
+        Entry entry = getEntry(path);
+        if (entry != null)
+        {
+            entry.getAllDescendents(result);
+        }
+        return result;
+    }
+
+    public void getAllMatchingPathPattern(String path, Collection result)
     {
         getAll(root, PathUtils.getPathElements(path), 0, result);
     }
@@ -38,24 +57,24 @@ class DefaultInstanceCache implements InstanceCache
     @SuppressWarnings({"unchecked"})
     private void getAll(Entry entry, String[] elements, int index, Collection result)
     {
-        if(index == elements.length)
+        if (index == elements.length)
         {
             Object instance = entry.getInstance();
-            if(instance != null)
+            if (instance != null)
             {
                 result.add(instance);
             }
-            
+
             return;
         }
 
         String pattern = elements[index];
         Map<String, Entry> children = entry.children;
-        if(children != null)
+        if (children != null)
         {
-            for(Map.Entry<String, Entry> child: children.entrySet())
+            for (Map.Entry<String, Entry> child : children.entrySet())
             {
-                if(PathUtils.elementMatches(pattern, child.getKey()))
+                if (PathUtils.elementMatches(pattern, child.getKey()))
                 {
                     getAll(child.getValue(), elements, index + 1, result);
                 }
@@ -70,7 +89,7 @@ class DefaultInstanceCache implements InstanceCache
 
     private void put(Object instance, Entry entry, String[] elements, int index)
     {
-        if(index == elements.length)
+        if (index == elements.length)
         {
             entry.setInstance(instance);
             return;
@@ -113,7 +132,7 @@ class DefaultInstanceCache implements InstanceCache
 
         public void addChild(String element, Entry entry)
         {
-            if(children == null)
+            if (children == null)
             {
                 children = new HashMap<String, Entry>();
             }
@@ -128,13 +147,29 @@ class DefaultInstanceCache implements InstanceCache
         public Entry getOrCreateChild(String element)
         {
             Entry child = getChild(element);
-            if(child == null)
+            if (child == null)
             {
                 child = new Entry(null);
                 addChild(element, child);
             }
 
             return child;
+        }
+
+        public void getAllDescendents(Collection<Object> result)
+        {
+            if(instance != null)
+            {
+                result.add(instance);
+            }
+
+            if (children != null)
+            {
+                for(Entry child: children.values())
+                {
+                    child.getAllDescendents(result);
+                }
+            }
         }
     }
 }

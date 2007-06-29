@@ -211,7 +211,7 @@ public class JabberManager implements Stoppable, PacketListener, ConfigurationEv
         if(event instanceof PostSaveEvent)
         {
             stop(true);
-            init((JabberConfiguration) ((PostSaveEvent)event).getNewInstance());
+            init((JabberConfiguration) event.getInstance());
         }
     }
 }

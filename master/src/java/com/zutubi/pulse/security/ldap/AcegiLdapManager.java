@@ -376,7 +376,7 @@ public class AcegiLdapManager implements LdapManager, ConfigurationEventListener
     {
         if(event instanceof PostSaveEvent)
         {
-            init((LDAPConfiguration) ((PostSaveEvent)event).getNewInstance());
+            init((LDAPConfiguration) event.getInstance());
         }
     }
 

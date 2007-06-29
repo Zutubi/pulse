@@ -1,8 +1,9 @@
 package com.zutubi.pulse.cleanup;
 
-import com.zutubi.prototype.config.CollectionAdapter;
 import com.zutubi.prototype.config.ConfigurationProvider;
 import com.zutubi.prototype.config.ConfigurationRegistry;
+import com.zutubi.prototype.config.TypeAdapter;
+import com.zutubi.prototype.config.TypeListener;
 import com.zutubi.prototype.type.TypeException;
 import com.zutubi.prototype.type.record.PathUtils;
 import com.zutubi.pulse.cleanup.config.CleanupConfiguration;
@@ -11,11 +12,7 @@ import com.zutubi.pulse.events.Event;
 import com.zutubi.pulse.events.EventListener;
 import com.zutubi.pulse.events.EventManager;
 import com.zutubi.pulse.events.build.BuildCompletedEvent;
-import com.zutubi.pulse.model.BuildManager;
-import com.zutubi.pulse.model.BuildResult;
-import com.zutubi.pulse.model.Project;
-import com.zutubi.pulse.model.ProjectManager;
-import com.zutubi.pulse.model.User;
+import com.zutubi.pulse.model.*;
 import com.zutubi.pulse.model.persistence.BuildResultDao;
 import com.zutubi.pulse.prototype.config.project.ProjectConfiguration;
 import com.zutubi.pulse.scheduling.Scheduler;
@@ -98,10 +95,11 @@ public class CleanupManager
             }
         }
 
-        CollectionAdapter<ProjectConfiguration> listener = new CollectionAdapter<ProjectConfiguration>("project", ProjectConfiguration.class, true)
+        TypeListener<ProjectConfiguration> listener = new TypeAdapter<ProjectConfiguration>(ProjectConfiguration.class)
         {
-            protected void instanceInserted(ProjectConfiguration instance)
+            public void postInsert(ProjectConfiguration instance)
             {
+                // FIXME: need to actually contribute to the global project
                 CleanupConfiguration cleanupConfiguration = new CleanupConfiguration();
                 cleanupConfiguration.setName("default");
                 configurationProvider.insert(PathUtils.getPath(instance.getConfigurationPath(), "cleanup"), cleanupConfiguration);

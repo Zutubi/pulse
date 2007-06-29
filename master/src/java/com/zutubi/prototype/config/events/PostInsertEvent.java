@@ -1,33 +1,27 @@
 package com.zutubi.prototype.config.events;
 
 import com.zutubi.prototype.config.ConfigurationTemplateManager;
+import com.zutubi.pulse.core.config.Configuration;
 
 /**
  */
 public class PostInsertEvent extends ConfigurationEvent
 {
-    private String insertedPath;
-    private Object newInstance;
+    private boolean cascaded;
 
-    public PostInsertEvent(ConfigurationTemplateManager source, String path, String insertedPath, Object newInstance)
+    public PostInsertEvent(ConfigurationTemplateManager source, Configuration newInstance, boolean cascaded)
     {
-        super(source, path);
-        this.newInstance = newInstance;
-        this.insertedPath = insertedPath;
+        super(source, newInstance);
+        this.cascaded = cascaded;
     }
 
-    public String getInsertedPath()
+    public boolean isCascaded()
     {
-        return insertedPath;
-    }
-
-    public Object getNewInstance()
-    {
-        return newInstance;
+        return cascaded;
     }
 
     public String toString()
     {
-        return "Post Insert Event: " + getPath();
+        return "Post Insert Event: " + getInstance().getConfigurationPath();
     }
 }

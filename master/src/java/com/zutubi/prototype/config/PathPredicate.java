@@ -1,9 +1,9 @@
 package com.zutubi.prototype.config;
 
-import com.zutubi.pulse.events.Event;
-import com.zutubi.util.Predicate;
 import com.zutubi.prototype.config.events.ConfigurationEvent;
 import com.zutubi.prototype.type.record.PathUtils;
+import com.zutubi.pulse.events.Event;
+import com.zutubi.util.Predicate;
 
 /**
  * An event predicate that is satisfied by {@link com.zutubi.prototype.config.events.ConfigurationEvent}s
@@ -24,7 +24,7 @@ public class PathPredicate implements Predicate<Event>
     {
         if(event instanceof ConfigurationEvent)
         {
-            final String path = ((ConfigurationEvent) event).getPath();
+            final String path = ((ConfigurationEvent) event).getInstance().getConfigurationPath();
             for(String pattern: patterns)
             {
                 if(includeChildPaths)

@@ -1,14 +1,15 @@
 package com.zutubi.pulse.model;
 
-import com.zutubi.prototype.config.CollectionAdapter;
 import com.zutubi.prototype.config.ConfigurationEventListener;
 import com.zutubi.prototype.config.ConfigurationProvider;
+import com.zutubi.prototype.config.TypeListener;
 import com.zutubi.prototype.config.events.ConfigurationEvent;
 import com.zutubi.prototype.config.events.PostInsertEvent;
 import com.zutubi.prototype.config.events.PostSaveEvent;
 import com.zutubi.prototype.config.events.PreDeleteEvent;
 import com.zutubi.pulse.core.ConfigurableResourceRepository;
 import com.zutubi.pulse.core.ResourceRepository;
+import com.zutubi.pulse.core.config.Configuration;
 import com.zutubi.pulse.core.config.Resource;
 import com.zutubi.pulse.core.config.ResourceVersion;
 import com.zutubi.pulse.prototype.config.agent.AgentConfiguration;
@@ -27,25 +28,24 @@ public class DefaultResourceManager implements ResourceManager, ConfigurationEve
 
     public void init()
     {
-        CollectionAdapter<AgentConfiguration> listener = new CollectionAdapter<AgentConfiguration>("agent", AgentConfiguration.class, true)
+        TypeListener<AgentConfiguration> listener = new TypeListener<AgentConfiguration>(AgentConfiguration.class)
         {
-            protected void instanceInserted(AgentConfiguration instance)
+            public void postInsert(AgentConfiguration instance)
             {
                 agentRepositories.put(instance.getHandle(), new ConfigurationResourceRepository(instance, configurationProvider));
             }
 
-            protected void instanceDeleted(AgentConfiguration instance)
+            public void preDelete(AgentConfiguration instance)
             {
                 agentRepositories.remove(instance.getHandle());
             }
 
-            protected void instanceChanged(AgentConfiguration instance)
+            public void postSave(AgentConfiguration instance)
             {
-                instanceDeleted(instance);
-                instanceInserted(instance);
+                preDelete(instance);
+                postInsert(instance);
             }
         };
-
         listener.register(configurationProvider);
     }
 
@@ -123,14 +123,13 @@ public class DefaultResourceManager implements ResourceManager, ConfigurationEve
     {
         if(event instanceof PostInsertEvent)
         {
-            PostInsertEvent pie = (PostInsertEvent) event;
-            AgentConfiguration agentConfig = (AgentConfiguration) pie.getNewInstance();
-            agentRepositories.put(agentConfig.getHandle(), new ConfigurationResourceRepository((AgentConfiguration) pie.getNewInstance(), configurationProvider));
+            AgentConfiguration agentConfig = (AgentConfiguration) event.getInstance();
+            agentRepositories.put(agentConfig.getHandle(), new ConfigurationResourceRepository((AgentConfiguration) event.getInstance(), configurationProvider));
         }
         else if(event instanceof PreDeleteEvent)
         {
             PreDeleteEvent pde = (PreDeleteEvent) event;
-            agentRepositories.remove(((AgentConfiguration) pde.getInstance()).getHandle());
+            agentRepositories.remove(((Configuration) pde.getInstance()).getHandle());
         }
         else if(event instanceof PostSaveEvent)
         {

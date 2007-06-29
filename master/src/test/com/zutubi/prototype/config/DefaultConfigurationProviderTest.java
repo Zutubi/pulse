@@ -2,9 +2,12 @@ package com.zutubi.prototype.config;
 
 import com.zutubi.config.annotations.ID;
 import com.zutubi.config.annotations.SymbolicName;
-import com.zutubi.prototype.config.events.*;
+import com.zutubi.prototype.config.events.PostInsertEvent;
+import com.zutubi.prototype.config.events.PostSaveEvent;
+import com.zutubi.prototype.config.events.PreDeleteEvent;
 import com.zutubi.prototype.type.CompositeType;
 import com.zutubi.prototype.type.MapType;
+import com.zutubi.prototype.type.TemplatedMapType;
 import com.zutubi.pulse.core.config.AbstractConfiguration;
 
 import java.util.LinkedList;
@@ -42,8 +45,12 @@ public class DefaultConfigurationProviderTest extends AbstractConfigurationSyste
         MapType mapA = new MapType();
         mapA.setTypeRegistry(typeRegistry);
         mapA.setCollectionType(typeA);
-
         configurationPersistenceManager.register("sample", mapA);
+
+        MapType templatedMap = new TemplatedMapType();
+        templatedMap.setTypeRegistry(typeRegistry);
+        templatedMap.setCollectionType(typeA);
+        configurationPersistenceManager.register("template", templatedMap);
     }
 
     protected void tearDown() throws Exception
@@ -64,20 +71,18 @@ public class DefaultConfigurationProviderTest extends AbstractConfigurationSyste
 
         // check the insert events.
         configurationTemplateManager.insert("sample", a);
-        listener.expected(PreInsertEvent.class, PostInsertEvent.class);
-        listener.clear();
-
-        a.setConfigurationPath("sample/a"); // should not be necessary...
+        listener.assertNextEvent(PostInsertEvent.class, "sample/a");
+        listener.assertNoMoreEvents();
 
         // check the save events.
         configurationTemplateManager.save("sample/a", a);
-        listener.expected(PreSaveEvent.class, PostSaveEvent.class);
-        listener.clear();
+        listener.assertNextEvent(PostSaveEvent.class, "sample/a");
+        listener.assertNoMoreEvents();
 
         // check the delete events.
         configurationTemplateManager.delete("sample/a");
-        listener.expected(PreDeleteEvent.class, PostDeleteEvent.class);
-        listener.clear();
+        listener.assertNextEvent(PreDeleteEvent.class, "sample/a");
+        listener.assertNoMoreEvents();
     }
 
     public void testRegisterListenerByPath()
@@ -93,41 +98,37 @@ public class DefaultConfigurationProviderTest extends AbstractConfigurationSyste
 
         // check the insert events.
         configurationTemplateManager.insert("sample", a);
-        includingChildren.expected(PreInsertEvent.class, PreInsertEvent.class, PostInsertEvent.class, PostInsertEvent.class);
-        includingChildren.clear();
-        excludingChildren.expected();
-        excludingChildren.clear();
+        includingChildren.assertNextEvent(PostInsertEvent.class, "sample/a");
+        includingChildren.assertNoMoreEvents();
+        excludingChildren.assertNoMoreEvents();
 
         B b = new B("b");
 
         configurationTemplateManager.insert("sample/a/b", b);
-        includingChildren.expected(PreInsertEvent.class, PreInsertEvent.class, PostInsertEvent.class, PostInsertEvent.class);
-        includingChildren.clear();
-        excludingChildren.expected();
-        excludingChildren.clear();
+        includingChildren.assertNextEvent(PostInsertEvent.class, "sample/a/b");
+        includingChildren.assertNoMoreEvents();
+        excludingChildren.assertNoMoreEvents();
 
         // check the save events.
         configurationTemplateManager.save("sample/a", a);
         // including listening at "sample", will see everything that happens below it.
-        includingChildren.expected(PreSaveEvent.class, PostSaveEvent.class);
-        includingChildren.clear();
+        includingChildren.assertNextEvent(PostSaveEvent.class, "sample/a");
+        includingChildren.assertNoMoreEvents();
         // excludingChildren listening at "sample", will not see changes to "sample/a"
-        excludingChildren.expected();
-        excludingChildren.clear();
+        excludingChildren.assertNoMoreEvents();
 
         configurationTemplateManager.save("sample/a/b", b);
-        includingChildren.expected(PreSaveEvent.class, PostSaveEvent.class);
-        includingChildren.clear();
-        excludingChildren.expected();
-        excludingChildren.clear();
+        includingChildren.assertNextEvent(PostSaveEvent.class, "sample/a/b");
+        includingChildren.assertNoMoreEvents();
+        excludingChildren.assertNoMoreEvents();
 
         // check the delete events.
         configurationTemplateManager.delete("sample/a");
-        includingChildren.expected(PreDeleteEvent.class, PreDeleteEvent.class, PreDeleteEvent.class, PreDeleteEvent.class, PostDeleteEvent.class, PostDeleteEvent.class, PostDeleteEvent.class, PostDeleteEvent.class);
-        includingChildren.clear();
+        includingChildren.assertNextEvent(PreDeleteEvent.class, "sample/a");
+        includingChildren.assertNextEvent(PreDeleteEvent.class, "sample/a/b");
+        includingChildren.assertNoMoreEvents();
         // excludingChildren listenening at "sample", will not see changes to "sample/a"
-        excludingChildren.expected();
-        excludingChildren.clear();
+        excludingChildren.assertNoMoreEvents();
     }
 
     public void testNotificationsForNestedClassWhenAncestorIsModified()
@@ -141,12 +142,12 @@ public class DefaultConfigurationProviderTest extends AbstractConfigurationSyste
 
         // check the insert event.
         configurationTemplateManager.insert("sample", a);
-        listener.expected(PreInsertEvent.class, PostInsertEvent.class);
-        listener.clear();
+        listener.assertNextEvent(PostInsertEvent.class, "sample/a/b");
+        listener.assertNoMoreEvents();
 
         configurationTemplateManager.delete("sample/a");
-        listener.expected(PreDeleteEvent.class, PostDeleteEvent.class);
-        listener.clear();
+        listener.assertNextEvent(PreDeleteEvent.class, "sample/a/b");
+        listener.assertNoMoreEvents();
     }
 
 

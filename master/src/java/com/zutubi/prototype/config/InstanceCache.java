@@ -8,7 +8,9 @@ public interface InstanceCache
 {
     Object get(String path);
 
-    void getAll(String path, Collection result);
+    Collection<Object> getAllDescendents(String path);
+
+    void getAllMatchingPathPattern(String path, Collection result);
 
     void put(String path, Object instance);
 

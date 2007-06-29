@@ -1,23 +1,13 @@
 package com.zutubi.pulse.agent;
 
-import com.zutubi.prototype.config.CollectionAdapter;
 import com.zutubi.prototype.config.ConfigurationProvider;
-import com.zutubi.prototype.type.record.MutableRecord;
-import com.zutubi.pulse.AgentService;
-import com.zutubi.pulse.MasterAgentService;
-import com.zutubi.pulse.SlaveAgentService;
-import com.zutubi.pulse.SlaveProxyFactory;
-import com.zutubi.pulse.Version;
+import com.zutubi.prototype.config.TypeListener;
+import com.zutubi.pulse.*;
 import com.zutubi.pulse.bootstrap.MasterConfigurationManager;
 import com.zutubi.pulse.core.Stoppable;
 import com.zutubi.pulse.core.config.Resource;
-import com.zutubi.pulse.events.AgentRemovedEvent;
-import com.zutubi.pulse.events.AgentStatusEvent;
-import com.zutubi.pulse.events.AgentUpgradeCompleteEvent;
-import com.zutubi.pulse.events.Event;
+import com.zutubi.pulse.events.*;
 import com.zutubi.pulse.events.EventListener;
-import com.zutubi.pulse.events.EventManager;
-import com.zutubi.pulse.license.LicenseHolder;
 import com.zutubi.pulse.license.LicenseManager;
 import com.zutubi.pulse.license.authorisation.AddAgentAuthorisation;
 import com.zutubi.pulse.model.AgentState;
@@ -34,20 +24,8 @@ import com.zutubi.util.bean.ObjectFactory;
 import com.zutubi.util.logging.Logger;
 
 import java.net.ConnectException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.TreeMap;
-import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.FutureTask;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
+import java.util.*;
+import java.util.concurrent.*;
 import java.util.concurrent.locks.ReentrantLock;
 
 /**
@@ -81,33 +59,26 @@ public class DefaultAgentManager implements AgentManager, EventListener, Stoppab
 
     public void init()
     {
-        CollectionAdapter<AgentConfiguration> listener = new CollectionAdapter<AgentConfiguration>("agent", AgentConfiguration.class, true)
+        TypeListener<AgentConfiguration> listener = new TypeListener<AgentConfiguration>(AgentConfiguration.class)
         {
-            protected void preInsert(MutableRecord record)
+            public void postInsert(AgentConfiguration instance)
             {
-                LicenseHolder.ensureAuthorization(AddAgentAuthorisation.AUTH);
-
                 AgentState state = new AgentState();
                 agentStateManager.save(state);
-                record.put("agentStateId", Long.toString(state.getId()));
-            }
-
-            protected void instanceInserted(AgentConfiguration instance)
-            {
+                instance.setAgentStateId(state.getId());
                 agentAdded(instance);
             }
 
-            protected void instanceDeleted(AgentConfiguration instance)
+            public void preDelete(AgentConfiguration instance)
             {
                 agentDeleted(instance);
             }
 
-            protected void instanceChanged(AgentConfiguration instance)
+            public void postSave(AgentConfiguration instance)
             {
                 agentChanged(instance);
             }
         };
-
         listener.register(configurationProvider);
 
         refreshAgents();

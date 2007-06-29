@@ -1,11 +1,10 @@
 package com.zutubi.prototype.config;
 
 import com.zutubi.prototype.config.events.ConfigurationEvent;
-
-import java.util.List;
-import java.util.LinkedList;
-
 import junit.framework.Assert;
+
+import java.util.LinkedList;
+import java.util.List;
 
 /**
  *
@@ -19,19 +18,16 @@ public class MockConfigurationEventListener implements ConfigurationEventListene
         actualEvents.add(event);
     }
 
-    public void clear()
+    public void assertNextEvent(Class expectedType, String expectedPath)
     {
-        actualEvents.clear();
+        Assert.assertTrue(actualEvents.size() > 0);
+        ConfigurationEvent next = actualEvents.remove(0);
+        Assert.assertEquals(expectedType, next.getClass());
+        Assert.assertEquals(expectedPath, next.getInstance().getConfigurationPath());
     }
 
-    public void expected(Class... expectedEvents)
+    public void assertNoMoreEvents()
     {
-        Assert.assertEquals(expectedEvents.length, actualEvents.size());
-        for (int i = 0; i < expectedEvents.length; i++)
-        {
-            Class expected = expectedEvents[i];
-            ConfigurationEvent actual = actualEvents.get(i);
-            Assert.assertTrue(expected == actual.getClass());
-        }
+        Assert.assertEquals(0, actualEvents.size());
     }
 }

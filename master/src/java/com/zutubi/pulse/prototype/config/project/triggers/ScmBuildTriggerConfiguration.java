@@ -1,6 +1,6 @@
 package com.zutubi.pulse.prototype.config.project.triggers;
 
-import com.zutubi.prototype.config.ConfigurationTemplateManager;
+import com.zutubi.prototype.config.ConfigurationProvider;
 import com.zutubi.pulse.prototype.config.project.ProjectConfiguration;
 import com.zutubi.pulse.scheduling.EventTrigger;
 import com.zutubi.pulse.scheduling.ScmChangeEventFilter;
@@ -13,11 +13,11 @@ import com.zutubi.pulse.scm.ScmChangeEvent;
  */
 public class ScmBuildTriggerConfiguration extends TriggerConfiguration
 {
-    private ConfigurationTemplateManager configurationTemplateManager;
+    private ConfigurationProvider configurationProvider;
 
     public Trigger newTrigger()
     {
-        ProjectConfiguration project = configurationTemplateManager.getAncestorOfType(this, ProjectConfiguration.class);
+        ProjectConfiguration project = configurationProvider.getAncestorOfType(this, ProjectConfiguration.class);
         String triggerName = "trigger:" + getHandle();
         String triggerGroup = "project:" + project.getProjectId();
 
@@ -29,8 +29,8 @@ public class ScmBuildTriggerConfiguration extends TriggerConfiguration
         // no details to be updated.
     }
 
-    public void setConfigurationTemplateManager(ConfigurationTemplateManager configurationTemplateManager)
+    public void setConfigurationProvider(ConfigurationProvider configurationProvider)
     {
-        this.configurationTemplateManager = configurationTemplateManager;
+        this.configurationProvider = configurationProvider;
     }
 }

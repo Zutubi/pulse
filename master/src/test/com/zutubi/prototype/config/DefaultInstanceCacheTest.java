@@ -77,14 +77,14 @@ public class DefaultInstanceCacheTest extends PulseTestCase
     public void testGetAllEmptyCache()
     {
         List all = new LinkedList();
-        cache.getAll("path", all);
+        cache.getAllMatchingPathPattern("path", all);
         assertEquals(0, all.size());
     }
 
     public void testGetAllEmptyPath()
     {
         List all = new LinkedList();
-        cache.getAll("", all);
+        cache.getAllMatchingPathPattern("", all);
         assertEquals(0, all.size());
     }
 
@@ -97,7 +97,7 @@ public class DefaultInstanceCacheTest extends PulseTestCase
         cache.put("foo/quux", new TestConfiguration());
         
         List all = new LinkedList();
-        cache.getAll("foo/baz", all);
+        cache.getAllMatchingPathPattern("foo/baz", all);
         assertEquals(1, all.size());
         assertEquals(o, all.get(0));
     }
@@ -113,7 +113,7 @@ public class DefaultInstanceCacheTest extends PulseTestCase
         cache.put("foo/quux", quux);
 
         List all = new LinkedList();
-        cache.getAll("foo/*", all);
+        cache.getAllMatchingPathPattern("foo/*", all);
         assertEquals(3, all.size());
         assertTrue(all.contains(bar));
         assertTrue(all.contains(baz));

@@ -1,6 +1,7 @@
 package com.zutubi.prototype.config.events;
 
 import com.zutubi.prototype.config.ConfigurationTemplateManager;
+import com.zutubi.pulse.core.config.Configuration;
 import com.zutubi.pulse.events.Event;
 
 /**
@@ -8,16 +9,16 @@ import com.zutubi.pulse.events.Event;
  */
 public class ConfigurationEvent extends Event<ConfigurationTemplateManager>
 {
-    private String path;
+    private Configuration instance;
 
-    public ConfigurationEvent(ConfigurationTemplateManager source, String path)
+    public ConfigurationEvent(ConfigurationTemplateManager source, Configuration instance)
     {
         super(source);
-        this.path = path;
+        this.instance = instance;
     }
 
-    public String getPath()
+    public Configuration getInstance()
     {
-        return path;
+        return instance;
     }
 }

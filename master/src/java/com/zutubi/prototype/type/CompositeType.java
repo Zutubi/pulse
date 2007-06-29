@@ -40,7 +40,7 @@ public class CompositeType extends AbstractType implements ComplexType
         super(type, symbolicName);
     }
 
-    public void addProperty(TypeProperty property)
+    public void addProperty(TypeProperty property) throws TypeException
     {
         if (property.getAnnotation(Internal.class) == null)
         {
@@ -55,6 +55,11 @@ public class CompositeType extends AbstractType implements ComplexType
         }
         else
         {
+            if(!(property.getType() instanceof PrimitiveType))
+            {
+                throw new TypeException("Internal property '" + property.getName() + "' has non-primitive type");
+            }
+
             internalProperties.put(property.getName(), property);
         }
     }
@@ -122,6 +127,21 @@ public class CompositeType extends AbstractType implements ComplexType
     public boolean hasProperty(String propertyName)
     {
         return properties.containsKey(propertyName);
+    }
+
+    public boolean hasInternalProperties()
+    {
+        return internalProperties.size() > 0;
+    }
+    
+    public List<String> getInternalPropertyNames()
+    {
+        return Collections.unmodifiableList(new LinkedList<String>(internalProperties.keySet()));
+    }
+
+    public List<TypeProperty> getInternalProperties()
+    {
+        return Collections.unmodifiableList(new LinkedList<TypeProperty>(internalProperties.values()));
     }
 
     public void addExtension(String symbolicName)

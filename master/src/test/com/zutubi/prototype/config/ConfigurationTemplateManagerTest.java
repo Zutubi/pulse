@@ -4,7 +4,6 @@ import com.zutubi.config.annotations.ID;
 import com.zutubi.config.annotations.SymbolicName;
 import com.zutubi.prototype.config.events.ConfigurationEvent;
 import com.zutubi.prototype.config.events.PostInsertEvent;
-import com.zutubi.prototype.config.events.PreInsertEvent;
 import com.zutubi.prototype.type.CompositeType;
 import com.zutubi.prototype.type.MapType;
 import com.zutubi.prototype.type.TemplatedMapType;
@@ -129,15 +128,11 @@ public class ConfigurationTemplateManagerTest extends AbstractConfigurationSyste
 
         configurationTemplateManager.insert("sample", a);
 
-        assertEquals(4, events.size());
-        assertTrue(events.get(0) instanceof PreInsertEvent);
-        assertEquals("sample/a/mock", events.get(0).getPath());
-        assertTrue(events.get(1) instanceof PreInsertEvent);
-        assertEquals("sample/a", events.get(1).getPath());
-        assertTrue(events.get(2) instanceof PostInsertEvent);
-        assertEquals("sample/a/mock", events.get(2).getPath());
-        assertTrue(events.get(3) instanceof PostInsertEvent);
-        assertEquals("sample/a", events.get(3).getPath());
+        assertEquals(2, events.size());
+        assertTrue(events.get(0) instanceof PostInsertEvent);
+        assertEquals("sample/a", events.get(0).getInstance().getConfigurationPath());
+        assertTrue(events.get(1) instanceof PostInsertEvent);
+        assertEquals("sample/a/mock", events.get(1).getInstance().getConfigurationPath());
     }
 
     public void testSaveRecord()

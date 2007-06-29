@@ -11,18 +11,13 @@ import com.zutubi.pulse.core.BuildRevision;
 import com.zutubi.pulse.core.RecipeRequest;
 import com.zutubi.pulse.core.Stoppable;
 import com.zutubi.pulse.core.model.Revision;
-import com.zutubi.pulse.events.AgentEvent;
-import com.zutubi.pulse.events.AgentRemovedEvent;
-import com.zutubi.pulse.events.AgentStatusEvent;
-import com.zutubi.pulse.events.Event;
-import com.zutubi.pulse.events.EventListener;
-import com.zutubi.pulse.events.EventManager;
+import com.zutubi.pulse.events.*;
 import com.zutubi.pulse.events.build.RecipeCompletedEvent;
 import com.zutubi.pulse.events.build.RecipeDispatchedEvent;
 import com.zutubi.pulse.events.build.RecipeErrorEvent;
 import com.zutubi.pulse.events.build.RecipeEvent;
-import com.zutubi.pulse.prototype.config.project.ProjectConfiguration;
 import com.zutubi.pulse.prototype.config.admin.GeneralAdminConfiguration;
+import com.zutubi.pulse.prototype.config.project.ProjectConfiguration;
 import com.zutubi.pulse.prototype.config.project.types.TypeConfiguration;
 import com.zutubi.pulse.scm.ScmChangeEvent;
 import com.zutubi.pulse.scm.ScmException;
@@ -731,7 +726,7 @@ public class ThreadedRecipeQueue implements Runnable, RecipeQueue, EventListener
     {
         if(event instanceof PostSaveEvent)
         {
-            updateTimeout((GeneralAdminConfiguration) ((PostSaveEvent)event).getNewInstance());
+            updateTimeout((GeneralAdminConfiguration) event.getInstance());
         }
     }
 
