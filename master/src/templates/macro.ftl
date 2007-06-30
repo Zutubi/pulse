@@ -396,32 +396,58 @@ pre.feature {
 [/#macro]
 
 <#---------------------------------------------------------------------------
+Shows a list of links for a build.
+---------------------------------------------------------------------------->
+[#macro buildLinksHTML result]
+    <p style="font-size: 85%">
+        jump to ::
+          <a href="${baseUrl}/viewBuild.action?id=${result.id?c}">summary</a>
+        | <a href="${baseUrl}/viewChanges.action?id=${result.id?c}">changes</a>
+        | <a href="${baseUrl}/viewTests.action?id=${result.id?c}">tests</a>
+        | <a href="${baseUrl}/viewBuildArtifacts.action?id=${result.id?c}">artifacts</a>
+    <p/>
+[/#macro]
+
+<#---------------------------------------------------------------------------
 Shows a summary table for a build.
 ---------------------------------------------------------------------------->
 [#macro buildSummaryHTML result]
     [@openTable/]
-        [@headingRow heading="summary" span=11/]
+        [@headingRow heading="summary" span=8/]
         <tr>
             [@contentHeader cc="id"/]
             [@contentHeader cc="status"/]
             [@contentHeader cc="spec"/]
             [@contentHeader cc="reason"/]
             [@contentHeader cc="tests"/]
+            [@contentHeader cc="start time"/]
+            [@contentHeader cc="end time"/]
             [@contentHeader cc="elapsed"/]
-            [@contentHeader cc="actions" span=2/]
         </tr>
         <tr>
             [#assign class = result.state.string]
-            [@classCell cc=result.number?c/]
+            [@linkCell cc=result.number?c url="${baseUrl}/viewBuild.action?id=${result.id?c}" class=class/]
             [@classCell cc=result.stateName?lower_case/]
             [@classCell cc=result.buildSpecification/]
             [@classCell cc=result.reason.summary/]
             [@linkCell cc=result.testSummary url="${testsLink(result)}" class=class/]
+            [@classCell cc=result.stamps.prettyStartDate/]
+            [@classCell cc=result.stamps.prettyEndDate/]
             [@classCell cc=result.stamps.prettyElapsed/]
-            [@linkCell cc="view" url="${baseUrl}/viewBuild.action?id=${result.id?c}"/]
-            [@linkCell cc="artifacts" url="${baseUrl}/viewBuildArtifacts.action?id=${result.id?c}"/]
         </tr>
     </table>
+[/#macro]
+
+<#---------------------------------------------------------------------------
+Shows a list of links to build stage logs.
+---------------------------------------------------------------------------->
+[#macro stageLogLinksHTML result]
+    <p style="font-size: 85%">
+        stage logs ::
+    [#list result.root.children as child]
+        <a href="${baseUrl}/tailRecipeLog.action?id=${child.id?c}&buildId=${result.id?c}">${child.stage}</a> [#if child_has_next]|[/#if]
+    [/#list]
+    </p>
 [/#macro]
 
 <#---------------------------------------------------------------------------
@@ -429,26 +455,28 @@ Shows a summary for each stage in a build.
 ---------------------------------------------------------------------------->
 [#macro buildStageSummariesHTML result]
     [@openTable/]
-        [@headingRow heading="stages" span=7/]
+        [@headingRow heading="stages" span=8/]
         <tr>
             [@contentHeader cc="stage"/]
             [@contentHeader cc="recipe"/]
             [@contentHeader cc="host"/]
             [@contentHeader cc="status"/]
             [@contentHeader cc="tests"/]
+            [@contentHeader cc="start time"/]
+            [@contentHeader cc="end time"/]
             [@contentHeader cc="elapsed"/]
-            [@contentHeader cc="actions"/]
         </tr>
     [#list result.root.children as child]
         <tr>
             [#assign class = child.result.state.string]
-            [@classCell cc=child.stage/]
+            [@linkCell cc=child.stage url="${stageDetailsLink(result, child)}" class=class/]
             [@classCell cc=child.result.recipeNameSafe/]
             [@classCell cc=child.hostSafe/]
             [@classCell cc=child.result.stateName?lower_case/]
             [@linkCell cc=child.testSummary url="${stageTestsLink(result, child)}" class=class/]
+            [@classCell cc=result.stamps.prettyStartDate/]
+            [@classCell cc=result.stamps.prettyEndDate/]
             [@classCell cc=child.result.stamps.prettyElapsed/]
-            [@linkCell cc="view" url="${stageDetailsLink(result, child)}"/]
         </tr>
     [/#list]
     </table>

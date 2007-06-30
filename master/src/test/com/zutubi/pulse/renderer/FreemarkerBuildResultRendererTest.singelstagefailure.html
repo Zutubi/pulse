@@ -125,11 +125,23 @@ pre.feature {
         <a href="http://host.url/currentBuild.action?id=0">test project</a> ::
         <a href="http://host.url/viewBuild.action?id=11">build 101</a>
     </h1>
+    <p style="font-size: 85%">
+        jump to ::
+          <a href="http://host.url/viewBuild.action?id=11">summary</a>
+        | <a href="http://host.url/viewChanges.action?id=11">changes</a>
+        | <a href="http://host.url/viewTests.action?id=11">tests</a>
+        | <a href="http://host.url/viewBuildArtifacts.action?id=11">artifacts</a>
+    <p/>
+    <p style="font-size: 85%">
+        stage logs ::
+        <a href="http://host.url/tailRecipeLog.action?id=0&buildId=11">first stage</a> |
+        <a href="http://host.url/tailRecipeLog.action?id=0&buildId=11">second stage</a> 
+    </p>
 <table>
 <tr><td>
     <table class="content" style="border-collapse: collapse; border: 1px solid #bbb; margin-bottom: 16px;">
     <tr>
-        <th class="heading" colspan="11" style="border: 1px solid #bbb; padding: 3px; text-align: left; vertical-align: top; background: #e9e9f5;">
+        <th class="heading" colspan="8" style="border: 1px solid #bbb; padding: 3px; text-align: left; vertical-align: top; background: #e9e9f5;">
             summary
         </th>
     </tr>
@@ -145,13 +157,15 @@ reason</th>
         <th class="content" colspan="1" style="border: 1px solid #bbb; padding: 3px; text-align: left;">
 tests</th>
         <th class="content" colspan="1" style="border: 1px solid #bbb; padding: 3px; text-align: left;">
+start time</th>
+        <th class="content" colspan="1" style="border: 1px solid #bbb; padding: 3px; text-align: left;">
+end time</th>
+        <th class="content" colspan="1" style="border: 1px solid #bbb; padding: 3px; text-align: left;">
 elapsed</th>
-        <th class="content" colspan="2" style="border: 1px solid #bbb; padding: 3px; text-align: left;">
-actions</th>
         </tr>
         <tr>
         <td class="failure" colspan="1" style="border: 1px solid #bbb; padding: 3px; text-align: left;">
-101</td>
+<a href="http://host.url/viewBuild.action?id=11">101</a></td>
         <td class="failure" colspan="1" style="border: 1px solid #bbb; padding: 3px; text-align: left;">
 failure</td>
         <td class="failure" colspan="1" style="border: 1px solid #bbb; padding: 3px; text-align: left;">
@@ -161,18 +175,18 @@ trigger 'scm trigger'</td>
         <td class="failure" colspan="1" style="border: 1px solid #bbb; padding: 3px; text-align: left;">
 <a href="http://host.url/viewTests.action?id=11">none</a></td>
         <td class="failure" colspan="1" style="border: 1px solid #bbb; padding: 3px; text-align: left;">
+1/01/70 10:00:10</td>
+        <td class="failure" colspan="1" style="border: 1px solid #bbb; padding: 3px; text-align: left;">
+1/01/70 10:01:40</td>
+        <td class="failure" colspan="1" style="border: 1px solid #bbb; padding: 3px; text-align: left;">
 1 min 30 secs</td>
-        <td class="content" colspan="1" style="border: 1px solid #bbb; padding: 3px; text-align: left;">
-<a href="http://host.url/viewBuild.action?id=11">view</a></td>
-        <td class="content" colspan="1" style="border: 1px solid #bbb; padding: 3px; text-align: left;">
-<a href="http://host.url/viewBuildArtifacts.action?id=11">artifacts</a></td>
         </tr>
     </table>
 </td></tr>
 <tr><td>
     <table class="content" style="border-collapse: collapse; border: 1px solid #bbb; margin-bottom: 16px;">
     <tr>
-        <th class="heading" colspan="7" style="border: 1px solid #bbb; padding: 3px; text-align: left; vertical-align: top; background: #e9e9f5;">
+        <th class="heading" colspan="8" style="border: 1px solid #bbb; padding: 3px; text-align: left; vertical-align: top; background: #e9e9f5;">
             stages
         </th>
     </tr>
@@ -188,13 +202,15 @@ status</th>
         <th class="content" colspan="1" style="border: 1px solid #bbb; padding: 3px; text-align: left;">
 tests</th>
         <th class="content" colspan="1" style="border: 1px solid #bbb; padding: 3px; text-align: left;">
-elapsed</th>
+start time</th>
         <th class="content" colspan="1" style="border: 1px solid #bbb; padding: 3px; text-align: left;">
-actions</th>
+end time</th>
+        <th class="content" colspan="1" style="border: 1px solid #bbb; padding: 3px; text-align: left;">
+elapsed</th>
         </tr>
         <tr>
         <td class="success" colspan="1" style="border: 1px solid #bbb; padding: 3px; text-align: left;">
-first stage</td>
+<a href="http://host.url/viewCommandLog.action?id=11&amp;selectedNode=0">first stage</a></td>
         <td class="success" colspan="1" style="border: 1px solid #bbb; padding: 3px; text-align: left;">
 first recipe</td>
         <td class="success" colspan="1" style="border: 1px solid #bbb; padding: 3px; text-align: left;">
@@ -204,13 +220,15 @@ success</td>
         <td class="success" colspan="1" style="border: 1px solid #bbb; padding: 3px; text-align: left;">
 <a href="http://host.url/viewTestSuite.action?id=11&amp;nodeId=0">none</a></td>
         <td class="success" colspan="1" style="border: 1px solid #bbb; padding: 3px; text-align: left;">
+1/01/70 10:00:10</td>
+        <td class="success" colspan="1" style="border: 1px solid #bbb; padding: 3px; text-align: left;">
+1/01/70 10:01:40</td>
+        <td class="success" colspan="1" style="border: 1px solid #bbb; padding: 3px; text-align: left;">
 0 ms</td>
-        <td class="content" colspan="1" style="border: 1px solid #bbb; padding: 3px; text-align: left;">
-<a href="http://host.url/viewCommandLog.action?id=11&amp;selectedNode=0">view</a></td>
         </tr>
         <tr>
         <td class="failure" colspan="1" style="border: 1px solid #bbb; padding: 3px; text-align: left;">
-second stage</td>
+<a href="http://host.url/viewCommandLog.action?id=11&amp;selectedNode=0">second stage</a></td>
         <td class="failure" colspan="1" style="border: 1px solid #bbb; padding: 3px; text-align: left;">
 second recipe</td>
         <td class="failure" colspan="1" style="border: 1px solid #bbb; padding: 3px; text-align: left;">
@@ -220,9 +238,11 @@ failure</td>
         <td class="failure" colspan="1" style="border: 1px solid #bbb; padding: 3px; text-align: left;">
 <a href="http://host.url/viewTestSuite.action?id=11&amp;nodeId=0">none</a></td>
         <td class="failure" colspan="1" style="border: 1px solid #bbb; padding: 3px; text-align: left;">
+1/01/70 10:00:10</td>
+        <td class="failure" colspan="1" style="border: 1px solid #bbb; padding: 3px; text-align: left;">
+1/01/70 10:01:40</td>
+        <td class="failure" colspan="1" style="border: 1px solid #bbb; padding: 3px; text-align: left;">
 0 ms</td>
-        <td class="content" colspan="1" style="border: 1px solid #bbb; padding: 3px; text-align: left;">
-<a href="http://host.url/viewCommandLog.action?id=11&amp;selectedNode=0">view</a></td>
         </tr>
     </table>
 </td></tr>
