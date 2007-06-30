@@ -13,8 +13,10 @@ import com.zutubi.pulse.events.build.RecipeCompletedEvent;
 import com.zutubi.pulse.events.build.RecipeDispatchedEvent;
 import com.zutubi.pulse.events.build.RecipeErrorEvent;
 import com.zutubi.pulse.events.build.RecipeEvent;
+import com.zutubi.pulse.model.BuildReason;
 import com.zutubi.pulse.model.Project;
 import com.zutubi.pulse.model.Scm;
+import com.zutubi.pulse.model.TriggerBuildReason;
 import com.zutubi.pulse.scm.SCMChangeEvent;
 import com.zutubi.pulse.scm.SCMException;
 import com.zutubi.pulse.util.Constants;
@@ -496,19 +498,31 @@ public class ThreadedRecipeQueue implements Runnable, RecipeQueue, EventListener
         // agents do not currently reject builds)
         eventManager.publish(new RecipeDispatchedEvent(this, recipeRequest, agent));
         dispatchedRequests.add(request);
-
-        // Generate the build context.
-        BuildContext context = new BuildContext();
-        context.setBuildNumber(request.getBuild().getNumber());
-        context.setBuildRevision(buildRevision.getRevision().getRevisionString());
-        context.setBuildTimestamp(buildRevision.getTimestamp());
-        context.setProjectName(recipeRequest.getProject());
-
         unavailableAgents.add(agent);
         executingAgents.put(recipeRequest.getId(), agent);
+
+        BuildContext context = createBuildContext(request, recipeRequest, buildRevision);
         dispatchedQueue.offer(new DispatchedRequest(recipeRequest, context, agent));
 
         return true;
+    }
+
+    private BuildContext createBuildContext(RecipeDispatchRequest request, RecipeRequest recipeRequest, BuildRevision buildRevision)
+    {
+        BuildContext context = new BuildContext();
+        context.setBuildNumber(request.getBuild().getNumber());
+
+        BuildReason buildReason = request.getBuild().getReason();
+        context.setBuildReason(buildReason.getSummary());
+        if(buildReason instanceof TriggerBuildReason)
+        {
+            context.setBuildTrigger(((TriggerBuildReason)buildReason).getTriggerName());
+        }
+
+        context.setBuildRevision(buildRevision.getRevision().getRevisionString());
+        context.setBuildTimestamp(buildRevision.getTimestamp());
+        context.setProjectName(recipeRequest.getProject());
+        return context;
     }
 
     public void stop(boolean force)
