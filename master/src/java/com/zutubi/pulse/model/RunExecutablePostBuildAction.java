@@ -6,7 +6,6 @@ import com.zutubi.pulse.core.FileLoadException;
 import com.zutubi.pulse.core.Scope;
 import com.zutubi.pulse.core.VariableHelper;
 import com.zutubi.pulse.core.model.*;
-import com.zutubi.pulse.jni.ProcessControl;
 import com.zutubi.pulse.util.IOUtils;
 
 import java.util.LinkedList;
@@ -56,7 +55,10 @@ public class RunExecutablePostBuildAction extends PostBuildAction
         }
         finally
         {
-            ProcessControl.destroyProcess(child);
+            if (child != null)
+            {
+                child.destroy();
+            }
         }
     }
 

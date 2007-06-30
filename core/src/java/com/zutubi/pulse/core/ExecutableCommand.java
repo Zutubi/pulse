@@ -184,7 +184,7 @@ public class ExecutableCommand implements Command, ScopeAware
                 ProcessSupport.postProcess(processes, outputFileDir, outputFile, cmdResult, context);
             }
 
-            ProcessControl.destroyProcess(child);
+            child.destroy();
         }
     }
 
