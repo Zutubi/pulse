@@ -1,12 +1,13 @@
 package com.zutubi.pulse.scm.p4;
 
 import com.opensymphony.util.TextUtils;
+import com.zutubi.pulse.core.Scope;
+import com.zutubi.pulse.core.VariableHelper;
 import com.zutubi.pulse.core.model.*;
 import com.zutubi.pulse.filesystem.remote.CachingRemoteFile;
 import com.zutubi.pulse.scm.*;
 import static com.zutubi.pulse.scm.p4.P4Constants.*;
 import com.zutubi.pulse.util.FileSystemUtils;
-import com.zutubi.pulse.util.StringUtils;
 import com.zutubi.pulse.util.SystemUtils;
 import com.zutubi.pulse.util.logging.Logger;
 
@@ -37,21 +38,39 @@ public class P4Server extends CachingSCMServer
         this.excludedPaths = filteredPaths;
     }
 
-    private String resolveClient() throws SCMException
+    private String resolveClient(NumericalRevision revision) throws SCMException
     {
+        return resolveClient(revision, true);
+    }
+
+    private String resolveClient(NumericalRevision revision, boolean cache) throws SCMException
+    {
+        String resolved;
         if (resolvedClient == null)
         {
             if (templateClient.startsWith("!"))
             {
                 String commandLine = templateClient.substring(1);
-                List<String> command = StringUtils.split(commandLine);
+
+                Scope scope = new Scope();
+                String revisionSpec;
+                if(revision == null)
+                {
+                    revisionSpec = "#head";
+                }
+                else
+                {
+                    revisionSpec = "@" + revision.getRevisionString();
+                }
+
+                scope.add(new Property("revision.spec", revisionSpec));
 
                 try
                 {
-                    resolvedClient = SystemUtils.runCommand(command.toArray(new String[command.size()])).trim();
-                    return resolvedClient;
+                    List<String> command = VariableHelper.splitAndReplaceVariables(commandLine, scope, true);
+                    resolved = SystemUtils.runCommand(command.toArray(new String[command.size()])).trim();
                 }
-                catch (IOException e)
+                catch (Exception e)
                 {
                     LOG.severe(e);
                     throw new SCMException("Error running template client generation command: " + e.getMessage(), e);
@@ -59,16 +78,25 @@ public class P4Server extends CachingSCMServer
             }
             else
             {
-                resolvedClient = templateClient;
+                resolved = templateClient;
             }
+
+            if(cache)
+            {
+                resolvedClient = resolved;
+            }
+
+            return resolved;
         }
-        
-        return resolvedClient;
+        else
+        {
+            return resolvedClient;
+        }
     }
 
-    private void createClient(String clientName, File toDirectory) throws SCMException
+    private void createClient(String clientName, File toDirectory, NumericalRevision revision) throws SCMException
     {
-        client.createClient(resolveClient(), clientName, toDirectory);
+        client.createClient(resolveClient(revision), clientName, toDirectory);
     }
 
     private boolean clientExists(String clientName) throws SCMException
@@ -99,7 +127,7 @@ public class P4Server extends CachingSCMServer
 //        }
 //    }
 
-    private String updateClient(String id, File toDirectory) throws SCMException
+    private String updateClient(String id, File toDirectory, NumericalRevision revision) throws SCMException
     {
         if (toDirectory == null)
         {
@@ -111,7 +139,7 @@ public class P4Server extends CachingSCMServer
 
         // If the client exists, perforce will just update the details.  This
         // is important in case the template is changed.
-        createClient(clientName, toDirectory);
+        createClient(clientName, toDirectory, revision);
 
         return clientName;
     }
@@ -134,6 +162,7 @@ public class P4Server extends CachingSCMServer
             }
             catch (UnsupportedEncodingException e)
             {
+                // Noop
             }
             clientName = clientPrefix + id;
         }
@@ -151,7 +180,7 @@ public class P4Server extends CachingSCMServer
 
         if (clientName == null)
         {
-            clientName = updateClient(null, null);
+            clientName = updateClient(null, null, null);
             cleanup = true;
         }
 
@@ -176,7 +205,7 @@ public class P4Server extends CachingSCMServer
         CachingRemoteFile rootFile = new CachingRemoteFile("", true, null, "");
         item.cachedListing.put("", rootFile);
 
-        String clientName = updateClient(null, null);
+        String clientName = updateClient(null, null, null);
 
         try
         {
@@ -215,18 +244,6 @@ public class P4Server extends CachingSCMServer
         catch (SCMException e)
         {
             LOG.warning("Unable to delete client: " + e.getMessage(), e);
-        }
-    }
-
-    private void populateChanges(StringBuffer stdout, List<Change> changes)
-    {
-        // RE to capture depot file, revision and local file
-        Matcher matcher = syncPattern.matcher(stdout);
-
-        while (matcher.find())
-        {
-            FileRevision fileRevision = new NumericalFileRevision(Long.parseLong(matcher.group(2)));
-            changes.add(new Change(matcher.group(1), fileRevision, decodeAction(matcher.group(3))));
         }
     }
 
@@ -378,7 +395,7 @@ public class P4Server extends CachingSCMServer
 
     private Revision sync(String id, File toDirectory, Revision revision, SCMCheckoutEventHandler handler, boolean force) throws SCMException
     {
-        String clientName = updateClient(id, toDirectory);
+        String clientName = updateClient(id, toDirectory, (NumericalRevision) revision);
 
         try
         {
@@ -455,12 +472,12 @@ public class P4Server extends CachingSCMServer
             this.client.setEnv(ENV_PASSWORD, password);
         }
 
-        this.client.setEnv(ENV_CLIENT, resolveClient());
+        this.client.setEnv(ENV_CLIENT, resolveClient(null, false));
     }
 
     public Map<String, String> getServerInfo() throws SCMException
     {
-        return client.getServerInfo(resolveClient());
+        return client.getServerInfo(resolveClient(null));
     }
 
     public String getUid()
@@ -475,7 +492,7 @@ public class P4Server extends CachingSCMServer
 
     public void testConnection() throws SCMException
     {
-        String client = resolveClient();
+        String client = resolveClient(null);
         if (!clientExists(client))
         {
             throw new SCMException("Client '" + client + "' does not exist");
@@ -489,7 +506,7 @@ public class P4Server extends CachingSCMServer
 
     public String checkout(Revision revision, String file) throws SCMException
     {
-        String clientName = updateClient(null, null);
+        String clientName = updateClient(null, null, (NumericalRevision) revision);
 
         try
         {
@@ -538,7 +555,7 @@ public class P4Server extends CachingSCMServer
     {
         List<Revision> result = new LinkedList<Revision>();
 
-        String clientName = updateClient(null, null);
+        String clientName = updateClient(null, null, null);
 
         if (to == null)
         {
@@ -582,7 +599,7 @@ public class P4Server extends CachingSCMServer
 
     public boolean hasChangedSince(Revision since) throws SCMException
     {
-        String clientName = updateClient(null, null);
+        String clientName = updateClient(null, null, null);
         try
         {
             String root = new File(clientRoot.getAbsolutePath(), VALUE_ALL_FILES).getAbsolutePath();
@@ -635,7 +652,7 @@ public class P4Server extends CachingSCMServer
 
     public void tag(Revision revision, String name, boolean moveExisting) throws SCMException
     {
-        String clientName = updateClient(null, null);
+        String clientName = updateClient(null, null, (NumericalRevision) revision);
         try
         {
             if (!labelExists(clientName, name))
@@ -668,10 +685,10 @@ public class P4Server extends CachingSCMServer
 
     public void writeConnectionDetails(File outputDir) throws SCMException, IOException
     {
-        P4Client.P4Result result = client.runP4(null, P4_COMMAND, FLAG_CLIENT, resolveClient(), COMMAND_INFO);
+        P4Client.P4Result result = client.runP4(null, P4_COMMAND, FLAG_CLIENT, resolveClient(null), COMMAND_INFO);
         FileSystemUtils.createFile(new File(outputDir, "server-info.txt"), result.stdout.toString());
 
-        result = client.runP4(null, P4_COMMAND, FLAG_CLIENT, resolveClient(), COMMAND_CLIENT, FLAG_OUTPUT);
+        result = client.runP4(null, P4_COMMAND, FLAG_CLIENT, resolveClient(null), COMMAND_CLIENT, FLAG_OUTPUT);
         FileSystemUtils.createFile(new File(outputDir, "template-client.txt"), result.stdout.toString());
     }
 
@@ -708,7 +725,7 @@ public class P4Server extends CachingSCMServer
             public void checkCancelled() throws SCMCancelledException
             {
             }
-        }, null, P4_COMMAND, FLAG_CLIENT, resolveClient(), COMMAND_CLIENT, FLAG_OUTPUT);
+        }, null, P4_COMMAND, FLAG_CLIENT, resolveClient(null), COMMAND_CLIENT, FLAG_OUTPUT);
 
         return eol[0];
     }
@@ -741,7 +758,7 @@ public class P4Server extends CachingSCMServer
         //    ... ... otherAction0 edit
         //    ... ... otherChange0 38
         //    ... ... otherOpen 1
-        String clientName = updateClient(null, null);
+        String clientName = updateClient(null, null, (NumericalRevision) repoRevision);
         try
         {
             File f = new File(clientRoot.getAbsoluteFile(), path);
@@ -787,7 +804,7 @@ public class P4Server extends CachingSCMServer
 
     public NumericalRevision getRevision(String revision) throws SCMException
     {
-        String clientName = updateClient(null, null);
+        String clientName = updateClient(null, null, null);
         try
         {
             try
