@@ -8,6 +8,12 @@ import com.caucho.hessian.client.HessianProxyFactory;
  */
 public class CustomHessianProxyFactory extends HessianProxyFactory
 {
+    public CustomHessianProxyFactory()
+    {
+        super();
+        setReadTimeout(60000);
+    }
+
     public void setCustomSerialiserFactory(CustomSerialiserFactory factory)
     {
         getSerializerFactory().addFactory(factory);
