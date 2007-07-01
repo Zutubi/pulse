@@ -468,8 +468,8 @@ public class FreemarkerBuildResultRendererTest extends PulseTestCase
 
                 StringWriter writer = new StringWriter();
                 renderer.render(result, dataMap, type, writer);
-                String got = replaceTimestamps(writer.getBuffer().toString());
-                String expected = replaceTimestamps(IOUtils.inputStreamToString(expectedStream));
+                String got = removeCR(replaceTimestamps(writer.getBuffer().toString()));
+                String expected = removeCR(replaceTimestamps(IOUtils.inputStreamToString(expectedStream)));
                 assertEquals(expected, got);
             }
             finally
@@ -477,6 +477,11 @@ public class FreemarkerBuildResultRendererTest extends PulseTestCase
                 IOUtils.close(expectedStream);
             }
         }
+    }
+
+    private String removeCR(String s)
+    {
+        return s.replace("\r", "");
     }
 
     private Map<String, Object> getDataMap(String baseUrl, BuildResult result, List<Changelist> changelists)
