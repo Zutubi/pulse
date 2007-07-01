@@ -326,3 +326,12 @@ Ext.extend(ZUTUBI.CheckForm, Ext.form.Form, {
         ZUTUBI.CheckForm.superclass.submit.call(this, options);
     }
 });
+
+Ext.form.Field.prototype.isDirty = function()
+{
+    if(this.disabled)
+    {
+        return false;
+    }
+    return String(this.getValue()) !== String(this.originalValue);
+}

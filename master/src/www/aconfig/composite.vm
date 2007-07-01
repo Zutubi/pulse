@@ -23,7 +23,7 @@
     #if( $config.simpleProperties.size() > 0)
         <!-- this configuration definition contains fields to be configured. -->
         <p>
-            #pform("path=$config.path" "formName=mainform" "ajax=true")
+            #pform("path=$config.path" "formName=mainform" "displayMode=true" "ajax=true")
         </p>
 
         <script type="text/javascript">
@@ -41,7 +41,7 @@
     #else
         <!-- this configuration definition contains fields to be configured. -->
         <p>
-            #pform("path=$config.path" "formName=mainform" "ajax=true")
+            #pform("path=$config.path" "formName=mainform" "displayMode=true" "ajax=true")
         </p>
 
         <script type="text/javascript">

@@ -1,6 +1,5 @@
 package com.zutubi.prototype.webwork;
 
-import com.opensymphony.util.TextUtils;
 import com.zutubi.i18n.Messages;
 import com.zutubi.i18n.MessagesProvider;
 import com.zutubi.prototype.config.ConfigurationRegistry;
@@ -30,126 +29,41 @@ public class PrototypeSupport extends ActionSupport implements MessagesProvider
     
     protected Type type;
 
-    private String previous;
-    private String next;
-    private String finish;
-    private String save;
-    private String confirm;
-    private String delete;
     private String submitField;
 
     public boolean isCancelSelected()
     {
-        if (TextUtils.stringSet(submitField))
-        {
-            return submitField.equals("cancel");
-        }
-        else
-        {
-            return TextUtils.stringSet(cancel);
-        }
-    }
-
-    public void setSave(String save)
-    {
-        this.save = save;
+        return "cancel".equals(submitField) || "reset".equals(submitField);
     }
 
     public boolean isSaveSelected()
     {
-        if (TextUtils.stringSet(submitField))
-        {
-            return submitField.equals("save");
-        }
-        else
-        {
-            return TextUtils.stringSet(save);
-        }
-    }
-
-    public void setConfirm(String confirm)
-    {
-        this.confirm = confirm;
+        return "save".equals(submitField) || "apply".equals(submitField);
     }
 
     public boolean isConfirmSelected()
     {
-        if (TextUtils.stringSet(submitField))
-        {
-            return submitField.equals("confirm");
-        }
-        else
-        {
-            return TextUtils.stringSet(confirm);
-        }
-    }
-
-    public void setDelete(String delete)
-    {
-        this.delete = delete;
+        return "confirm".equals(submitField);
     }
 
     public boolean isDeleteSelected()
     {
-        if (TextUtils.stringSet(submitField))
-        {
-            return submitField.equals("delete");
-        }
-        else
-        {
-            return TextUtils.stringSet(delete);
-        }
-    }
-
-    public void setPrevious(String previous)
-    {
-        this.previous = previous;
+        return "delete".equals(submitField);
     }
 
     public boolean isPreviousSelected()
     {
-        if (TextUtils.stringSet(submitField))
-        {
-            return submitField.equals("previous");
-        }
-        else
-        {
-            return TextUtils.stringSet(previous);
-        }
-    }
-
-    public void setNext(String next)
-    {
-        this.next = next;
+        return "previous".equals(submitField);
     }
 
     public boolean isNextSelected()
     {
-        if (TextUtils.stringSet(submitField))
-        {
-            return submitField.equals("next");
-        }
-        else
-        {
-            return TextUtils.stringSet(next);
-        }
-    }
-
-    public void setFinish(String finish)
-    {
-        this.finish = finish;
+        return "next".equals(submitField);
     }
 
     public boolean isFinishSelected()
     {
-        if (TextUtils.stringSet(submitField))
-        {
-            return submitField.equals("finish");
-        }
-        else
-        {
-            return TextUtils.stringSet(finish);
-        }
+        return "finish".equals(submitField);
     }
 
     public void setSubmitField(String submitField)

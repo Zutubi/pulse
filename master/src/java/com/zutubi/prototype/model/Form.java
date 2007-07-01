@@ -13,6 +13,7 @@ public class Form extends UIComponent
     private static final String PARAMETER_NAME = "name";
     private static final String PARAMETER_ID = "id";
     private static final String PARAMETER_ACTION = "action";
+    private static final String PARAMETER_DISPLAY_MODE = "displayMode";
     private static final String PARAMETER_AJAX = "ajax";
 
     /**
@@ -59,6 +60,16 @@ public class Form extends UIComponent
         parameters.put(PARAMETER_ACTION, action);
     }
 
+    public boolean getDisplayMode()
+    {
+        return (Boolean) parameters.get(PARAMETER_DISPLAY_MODE);
+    }
+
+    public void setDisplayMode(boolean displayMode)
+    {
+        parameters.put(PARAMETER_DISPLAY_MODE, displayMode);
+    }
+
     public boolean getAjax()
     {
         return (Boolean) parameters.get(PARAMETER_AJAX);
@@ -90,7 +101,7 @@ public class Form extends UIComponent
     {
         this.fields.clear();
         this.submitFields.clear();
-        
+
         for (Field field : fields)
         {
             add(field);

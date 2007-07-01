@@ -1043,34 +1043,6 @@ public class ConfigurationTemplateManager
         return templatePath;
     }
 
-    private List<String> getPathListing(String basePath, Record record)
-    {
-        List<String> paths = new LinkedList<String>();
-        paths.add(basePath);
-
-        for (String key : record.keySet())
-        {
-            Object value = record.get(key);
-            if (value instanceof Record)
-            {
-                String childPath = PathUtils.getPath(basePath, key);
-                Record child = (Record) value;
-                paths.addAll(getPathListing(childPath, child));
-            }
-        }
-        return paths;
-    }
-
-    private Map<String, Object> getPathInstanceMapping(List<String> paths)
-    {
-        Map<String, Object> mapping = new HashMap<String, Object>();
-        for (String path : paths)
-        {
-            mapping.put(path, instances.get(path));
-        }
-        return mapping;
-    }
-
     @SuppressWarnings({"unchecked"})
     public <T extends Type> T getType(String path, Class<T> typeClass)
     {

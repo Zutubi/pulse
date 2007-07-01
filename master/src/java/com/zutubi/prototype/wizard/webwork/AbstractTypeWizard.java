@@ -286,7 +286,7 @@ public abstract class AbstractTypeWizard implements Wizard
         public boolean validate(String path, ValidationAware validationCallback)
         {
             validationCallback.addIgnoredFields(ignoredFields);
-            return configurationTemplateManager.validate(path, null, currentState.getRenderRecord(), validationCallback) != null;
+            return configurationTemplateManager.validate(path, null, currentState.getDataRecord(), validationCallback) != null;
         }
     }
 

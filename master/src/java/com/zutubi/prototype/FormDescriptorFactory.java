@@ -83,7 +83,7 @@ public class FormDescriptorFactory
     {
         FormDescriptor descriptor = new FormDescriptor();
         descriptor.setName(name);
-        descriptor.setActions(Arrays.asList("save", "cancel"));
+        descriptor.setActions("save", "cancel");
 
         // The symbolic name uniquely identifies the type, and so will uniquely identify this form.
         // (we are not planning to have multiple forms on a single page at this stage...)

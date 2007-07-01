@@ -23,6 +23,30 @@ function handleKeypress(evt)
     }
 }
 
+function updateButtons()
+{
+    var dirty = false;
+    form.items.each(function(field)
+    {
+        if(field.isDirty())
+        {
+            dirty = true;
+        }
+    });
+
+    for(var i = 0; i < form.buttons.length; i++)
+    {
+        if(dirty)
+        {
+            form.buttons[i].enable();
+        }
+        else
+        {
+            form.buttons[i].disable();
+        }
+    }
+}
+
 Ext.onReady(function()
 {
     form.render('${form.id}');
@@ -58,6 +82,10 @@ Ext.onReady(function()
         el.set({tabindex: window.nextTabindex++ });
     <#if parameters.submitOnEnter>
         el.on('keypress', function(event){ return handleKeypress(event); });
+    </#if>
+    <#if form.displayMode?default(false)>
+        el.on('keyup', updateButtons);
+        el.on('click', updateButtons);
     </#if>
     }
 </#list>

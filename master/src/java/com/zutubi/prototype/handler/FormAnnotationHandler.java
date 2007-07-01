@@ -7,7 +7,6 @@ import com.zutubi.prototype.type.CompositeType;
 import com.zutubi.util.AnnotationUtils;
 
 import java.lang.annotation.Annotation;
-import java.util.Arrays;
 
 /**
  *
@@ -19,7 +18,7 @@ public class FormAnnotationHandler implements AnnotationHandler
     {
         Form form = (Form) annotation;
         FormDescriptor formDescriptor = (FormDescriptor) descriptor;
-        formDescriptor.setActions(Arrays.asList(form.actions()));
+        formDescriptor.setActions(form.actions());
         
         // Collect all of the annotations fields in a map and add them to the descriptor.
         descriptor.addAll(AnnotationUtils.collectPropertiesFromAnnotation(annotation));

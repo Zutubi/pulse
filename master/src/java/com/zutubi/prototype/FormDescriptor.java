@@ -26,6 +26,7 @@ public class FormDescriptor extends AbstractDescriptor
     private String action = DEFAULT_ACTION;
     private List<FieldDescriptor> fieldDescriptors = new LinkedList<FieldDescriptor>();
     private List<String> actions = new LinkedList<String>();
+    private boolean displayMode = false;
     private boolean ajax = false;
 
 //    private String[] fieldOrder;
@@ -76,6 +77,15 @@ public class FormDescriptor extends AbstractDescriptor
         return Collections.unmodifiableList(actions);
     }
 
+    public void setActions(String... actions)
+    {
+        this.actions.clear();
+        for(String action: actions)
+        {
+            this.actions.add(action);
+        }
+    }
+
     public void setActions(List<String> actions)
     {
         this.actions.clear();
@@ -88,6 +98,7 @@ public class FormDescriptor extends AbstractDescriptor
         form.setName(name);
         form.setId(id);
         form.setAction(PrototypeUtils.getConfigURL(path, action, null, ajax));
+        form.setDisplayMode(displayMode);
         form.setAjax(ajax);
         form.addAll(getParameters());
         List<String> fieldOrder = evaluateFieldOrder();
@@ -159,6 +170,11 @@ public class FormDescriptor extends AbstractDescriptor
             }
         }
         return ordered;
+    }
+
+    public void setDisplayMode(boolean displayMode)
+    {
+        this.displayMode = displayMode;
     }
 
     public void setAjax(boolean ajax)

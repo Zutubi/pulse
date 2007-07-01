@@ -31,6 +31,7 @@
         }
 
         var defaultSubmit = function() {};
+        var buttonConfig;
 
         <#list form.submitFields as submitField>
             <#if submitField.parameters.default?exists>
@@ -40,7 +41,11 @@
                 }
             </#if>
 
-            form.addButton('${submitField.value}', function() { submitForm('${submitField.value}'); });
+            buttonConfig = { text: '${submitField.value}' };
+            <#if form.displayMode?default(false)>
+                buttonConfig.disabled = true;
+            </#if>
+            form.addButton(buttonConfig, function() { submitForm('${submitField.value}'); });
         </#list>
 
         <#include "/prototype/xhtml/form-fields.ftl"/>

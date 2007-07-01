@@ -20,7 +20,6 @@ import org.apache.velocity.runtime.parser.node.Node;
 
 import java.io.IOException;
 import java.io.Writer;
-import java.util.Arrays;
 import java.util.Map;
 
 /**
@@ -91,7 +90,7 @@ public class CheckDirective extends PrototypeDirective
             FormDescriptor formDescriptor = formDescriptorFactory.createDescriptor(path, checkType, "check");
             formDescriptor.setName(checkFormName);
             formDescriptor.setAction(action);
-            formDescriptor.setActions(Arrays.asList("check"));
+            formDescriptor.setActions("check");
             formDescriptor.setAjax(true);
 
             Map<String, Object> context = initialiseContext(checkType.getClazz());

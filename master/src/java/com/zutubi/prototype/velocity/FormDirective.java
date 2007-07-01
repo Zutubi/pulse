@@ -39,6 +39,7 @@ public class FormDirective extends PrototypeDirective
     private FormDescriptorFactory formDescriptorFactory;
     private String action;
     private String formName = "form";
+    private boolean displayMode = false;
     private boolean ajax = false;
     private MasterConfigurationManager configurationManager;
     private ConfigurationTemplateManager configurationTemplateManager;
@@ -68,6 +69,11 @@ public class FormDirective extends PrototypeDirective
         this.formName = formName;
     }
 
+    public void setDisplayMode(boolean displayMode)
+    {
+        this.displayMode = displayMode;
+    }
+
     public void setAjax(boolean ajax)
     {
         this.ajax = ajax;
@@ -87,8 +93,15 @@ public class FormDirective extends PrototypeDirective
 
             String path = lookupPath();
             FormDescriptor formDescriptor = formDescriptorFactory.createDescriptor(path, ctype, formName);
+            formDescriptor.setDisplayMode(displayMode);
             formDescriptor.setAjax(ajax);
-            
+
+            // These decorations should be genericised
+            if(displayMode)
+            {
+                formDescriptor.setActions("apply", "reset");
+            }
+
             TemplateFormDecorator templateDecorator = new TemplateFormDecorator(data);
             templateDecorator.decorate(formDescriptor);
 
@@ -107,7 +120,7 @@ public class FormDirective extends PrototypeDirective
             {
                 form.setAction(action);
             }
-            
+
             context.put("form", form);
 
             // Get our own configuration so that we can mess with the
