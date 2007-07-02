@@ -34,6 +34,11 @@ import java.util.Properties;
 public class DefaultSetupManager implements SetupManager
 {
     private static final Logger LOG = Logger.getLogger(DefaultSetupManager.class);
+
+    /**
+     * Set to true during startup if the setup manager is run.
+     */
+    public static boolean initialInstallation = false;
     
     private MasterConfigurationManager configurationManager;
     private UserManager userManager;
@@ -330,6 +335,7 @@ public class DefaultSetupManager implements SetupManager
         if (isSetupRequired())
         {
             state = SetupState.SETUP;
+            initialInstallation = true;
             return;
         }
         requestSetupComplete();

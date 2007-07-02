@@ -8,6 +8,7 @@ import com.zutubi.prototype.type.TypeRegistry;
 import com.zutubi.prototype.type.record.MutableRecord;
 import com.zutubi.prototype.type.record.PathUtils;
 import com.zutubi.pulse.bootstrap.ComponentContext;
+import com.zutubi.pulse.bootstrap.DefaultSetupManager;
 import com.zutubi.pulse.cache.ehcache.CustomAclEntryCache;
 import com.zutubi.pulse.core.BuildException;
 import com.zutubi.pulse.core.BuildRevision;
@@ -111,7 +112,7 @@ public class DefaultProjectManager implements ProjectManager
 
     private void ensureDefaultProjectDefined()
     {
-        if (configurationProvider.getAll(ProjectConfiguration.class).size() == 0)
+        if (DefaultSetupManager.initialInstallation)
         {
             CompositeType projectType = typeRegistry.getType(ProjectConfiguration.class);
             MutableRecord globalTemplate = projectType.createNewRecord(true);
