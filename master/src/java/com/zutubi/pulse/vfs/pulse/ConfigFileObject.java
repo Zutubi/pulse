@@ -4,6 +4,7 @@ import com.zutubi.prototype.config.ConfigurationTemplateManager;
 import com.zutubi.prototype.type.ComplexType;
 import com.zutubi.prototype.type.Type;
 import com.zutubi.prototype.type.record.PathUtils;
+import com.zutubi.prototype.type.record.Record;
 import com.zutubi.prototype.webwork.PrototypeUtils;
 import com.zutubi.pulse.filesystem.FileSystemException;
 import org.apache.commons.vfs.FileName;
@@ -23,20 +24,26 @@ public class ConfigFileObject extends AbstractPulseFileObject
      * This is the path into the configuration subsystem.
      */
     private String path;
+    private ComplexType parentType;
     private ComplexType type;
+    private Record value;
 
     public ConfigFileObject(FileName name, AbstractFileSystem fs)
     {
         super(name, fs);
         path = "";
+        parentType = null;
         type = null;
+        value = null;
     }
 
-    public ConfigFileObject(FileName name, AbstractFileSystem fs, String path, ComplexType type)
+    public ConfigFileObject(FileName name, AbstractFileSystem fs, String path, ComplexType parentType, ComplexType type, Record value)
     {
         super(name, fs);
         this.path = path;
+        this.parentType = parentType;
         this.type = type;
+        this.value = value;
     }
 
     public AbstractPulseFileObject createFile(final FileName fileName) throws Exception
@@ -48,10 +55,25 @@ public class ConfigFileObject extends AbstractPulseFileObject
             throw new FileSystemException("Illegal path '" + childPath + "': does not refer to a valid type");
         }
 
+        Record childValue;
+        if(value == null)
+        {
+            childValue = configurationTemplateManager.getRecord(childPath);
+        }
+        else
+        {
+            childValue = (Record) value.get(fileName.getBaseName());
+        }
+
         return objectFactory.buildBean(ConfigFileObject.class,
-                new Class[]{FileName.class, AbstractFileSystem.class, String.class, ComplexType.class},
-                new Object[]{fileName, pfs, childPath, (ComplexType) childType}
+                new Class[]{FileName.class, AbstractFileSystem.class, String.class, ComplexType.class, ComplexType.class, Record.class},
+                new Object[]{fileName, pfs, childPath, type, (ComplexType) childType, childValue}
         );
+    }
+
+    public String getDisplayName()
+    {
+        return PrototypeUtils.getDisplayName(path, parentType, value, configurationTemplateManager);
     }
 
     protected FileType doGetType() throws Exception

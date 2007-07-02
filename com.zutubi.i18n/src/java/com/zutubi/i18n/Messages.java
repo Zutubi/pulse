@@ -47,6 +47,11 @@ public class Messages
         bundleManager.addResolver(resolver);
     }
 
+    public static boolean isKeyDefined(Object context, String key)
+    {
+        return getHandler().isKeyDefined(getContext(context), key);
+    }
+
     public static String format(Object context, String key)
     {
         return getHandler().format(getContext(context), key);
@@ -81,6 +86,11 @@ public class Messages
     public static Messages getInstance(Object context)
     {
         return new Messages(getContext(context));
+    }
+
+    public boolean isKeyDefined(String key)
+    {
+        return Messages.isKeyDefined(context, key);
     }
 
     public String format(String key)

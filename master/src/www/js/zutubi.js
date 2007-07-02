@@ -147,7 +147,7 @@ Ext.extend(ZUTUBI.ConfigTree, Ext.tree.TreePanel, {
 
         if(response.addedFiles)
         {
-            each(response.addedFiles, function(addition) { tree.addNode(addition.parentPath, {id: addition.baseName, text: addition.baseName, leaf: addition.leaf}); });
+            each(response.addedFiles, function(addition) { tree.addNode(addition.parentPath, {id: addition.baseName, text: addition.displayName, leaf: addition.leaf}); });
         }
 
         if(response.renamedPaths)
@@ -233,7 +233,7 @@ Ext.extend(ZUTUBI.TemplateTree, ZUTUBI.ConfigTree, {
             each(response.addedFiles, function(addition) {
                 if (addition.parentTemplatePath && addition.parentPath == tree.scope)
                 {
-                    tree.addNode(addition.parentTemplatePath, {id: addition.baseName, text: addition.baseName, leaf: addition.leaf});
+                    tree.addNode(addition.parentTemplatePath, {id: addition.baseName, text: addition.displayName, leaf: addition.leaf});
                 }
             });
         }

@@ -15,14 +15,14 @@ public class ExtFile
     public ExtFile(FileObjectWrapper fo)
     {
         id = fo.getId();
-        text = fo.getId();
+        text = fo.getName();
         leaf = !fo.isContainer();
     }
 
-    public ExtFile(String id, boolean leaf)
+    public ExtFile(String id, String text, boolean leaf)
     {
         this.id = id;
-        this.text = id;
+        this.text = text;
         this.leaf = leaf;
     }
 

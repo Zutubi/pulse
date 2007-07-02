@@ -408,6 +408,7 @@ public class ConfigurationTemplateManager
     private void refreshInstances()
     {
         instances.clear();
+        incompleteInstances.clear();
 
         for (ConfigurationScopeInfo scope : configurationPersistenceManager.getScopes())
         {

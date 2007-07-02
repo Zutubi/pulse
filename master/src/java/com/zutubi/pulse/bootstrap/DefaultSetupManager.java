@@ -305,7 +305,7 @@ public class DefaultSetupManager implements SetupManager
         DefaultConfigurationProvider configurationProvider = ComponentContext.getBean("configurationProvider");
 
         recordManager.init();
-        handleAllocator.setDelegate(handleAllocator);
+        handleAllocator.setDelegate(recordManager);
         configurationPersistenceManager.setRecordManager(recordManager);
         configurationReferenceManager.setRecordManager(recordManager);
         configurationTemplateManager.setRecordManager(recordManager);

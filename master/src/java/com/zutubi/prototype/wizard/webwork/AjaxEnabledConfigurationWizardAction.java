@@ -44,7 +44,8 @@ public class AjaxEnabledConfigurationWizardAction extends ConfigurationWizardAct
             if(!originalPath.equals(newPath))
             {
                 // Then we added something.
-                configurationResponse.addAddedFile(new ConfigurationResponse.Addition(newPath, configurationTemplateManager.getTemplatePath(newPath), PrototypeUtils.isLeaf(newPath, configurationTemplateManager)));
+                String displayName = PrototypeUtils.getDisplayName(newPath, configurationTemplateManager);
+                configurationResponse.addAddedFile(new ConfigurationResponse.Addition(newPath, displayName, configurationTemplateManager.getTemplatePath(newPath), PrototypeUtils.isLeaf(newPath, configurationTemplateManager)));
             }
         }
         else if ("step".equals(result))

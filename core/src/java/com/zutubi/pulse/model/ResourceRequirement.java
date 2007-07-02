@@ -1,5 +1,6 @@
 package com.zutubi.pulse.model;
 
+import com.opensymphony.util.TextUtils;
 import com.zutubi.config.annotations.SymbolicName;
 import com.zutubi.pulse.core.config.AbstractConfiguration;
 
@@ -45,5 +46,10 @@ public class ResourceRequirement extends AbstractConfiguration
     public ResourceRequirement copy()
     {
         return new ResourceRequirement(resource, version);
+    }
+
+    public String toString()
+    {
+        return (resource == null ? "?" : resource) + ":" + (TextUtils.stringSet(version) ? version : "[default]");
     }
 }

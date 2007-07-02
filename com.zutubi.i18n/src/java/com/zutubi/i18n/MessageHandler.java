@@ -1,5 +1,7 @@
 package com.zutubi.i18n;
 
+import com.zutubi.i18n.context.Context;
+
 import java.util.Locale;
 
 /**
@@ -28,6 +30,8 @@ public interface MessageHandler
      * @return currently used locale
      */
     public Locale getLocale();
+
+    boolean isKeyDefined(Context context, String key);
 
     /**
      * Retrieve the message for the specified i18n key within the provided
@@ -60,5 +64,4 @@ public interface MessageHandler
      * Clear any cached data held by this message handler.
      */
     public void clear();
-
 }

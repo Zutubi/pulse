@@ -16,9 +16,8 @@ public class StringUtils
     /**
      * A null safe equals method for strings.
      *
-     * @param a
-     * @param b
-     *
+     * @param a first string
+     * @param b second string
      * @return true if the strings are equal, false otherwise.
      */
     public static boolean equals(String a, String b)
@@ -94,7 +93,6 @@ public class StringUtils
      *                   in the middle of a word to ensure the the lineLength is
      *                   not exceeded. If false, this method will search for the
      *                   nearest appropriate whitespace at which to split.
-     *
      * @return a version of the given string with newlines inserted to
      *         wrap lines at the given length
      */
@@ -192,7 +190,7 @@ public class StringUtils
                                     // dont need a second new line.
                                     k = k + 1;
                                 }
-                                
+
                                 if (prefix != null)
                                 {
                                     result.append(prefix);
@@ -231,7 +229,7 @@ public class StringUtils
      */
     public static String getLine(String s, int line)
     {
-        String [] lines = s.split("\r\n|\n|\r");
+        String[] lines = s.split("\r\n|\n|\r");
         if (lines.length >= line)
         {
             return lines[line - 1];
@@ -248,22 +246,22 @@ public class StringUtils
         s = s.replace("\r", "\n");
 
         int currentLine = 1;
-        for(int i = 0; i < s.length(); i++)
+        for (int i = 0; i < s.length(); i++)
         {
-            if(currentLine == line)
+            if (currentLine == line)
             {
                 return i;
             }
 
-            if(s.charAt(i) == '\r')
+            if (s.charAt(i) == '\r')
             {
                 currentLine++;
-                if(i + 1 < s.length() && s.charAt(i + 1) == '\n')
+                if (i + 1 < s.length() && s.charAt(i + 1) == '\n')
                 {
                     i++;
                 }
             }
-            else if(s.charAt(i) == '\n')
+            else if (s.charAt(i) == '\n')
             {
                 currentLine++;
             }
@@ -302,12 +300,12 @@ public class StringUtils
             {
                 switch (c)
                 {
-                    case '\\':
+                    case'\\':
                     {
                         escaped = true;
                         break;
                     }
-                    case ' ':
+                    case' ':
                     {
                         if (inQuotes)
                         {
@@ -322,7 +320,7 @@ public class StringUtils
 
                         break;
                     }
-                    case '"':
+                    case'"':
                     {
                         if (inQuotes)
                         {
@@ -347,11 +345,11 @@ public class StringUtils
             }
         }
 
-        if(escaped)
+        if (escaped)
         {
             throw new IllegalArgumentException("Unexpected end of input after backslash (\\)");
         }
-        if(inQuotes)
+        if (inQuotes)
         {
             throw new IllegalArgumentException("Unexpected end of input looking for end of quote (\")");
         }
@@ -380,21 +378,21 @@ public class StringUtils
         StringBuilder current = new StringBuilder();
         boolean first = true;
 
-        for(String piece: pieces)
+        for (String piece : pieces)
         {
             boolean quote = piece.length() == 0;
             current.delete(0, current.length());
 
-            for(int i = 0; i < piece.length(); i++)
+            for (int i = 0; i < piece.length(); i++)
             {
                 char c = piece.charAt(i);
-                switch(c)
+                switch (c)
                 {
-                    case '\\':
-                    case '\"':
+                    case'\\':
+                    case'\"':
                         current.append('\\');
                         break;
-                    case ' ':
+                    case' ':
                         quote = true;
                         break;
                 }
@@ -402,7 +400,7 @@ public class StringUtils
                 current.append(c);
             }
 
-            if(first)
+            if (first)
             {
                 first = false;
             }
@@ -411,14 +409,14 @@ public class StringUtils
                 result.append(' ');
             }
 
-            if(quote)
+            if (quote)
             {
                 result.append('\"');
             }
 
             result.append(current);
 
-            if(quote)
+            if (quote)
             {
                 result.append('\"');
             }
@@ -455,11 +453,11 @@ public class StringUtils
     {
         StringBuilder result = new StringBuilder();
 
-        if(skipEmpty)
+        if (skipEmpty)
         {
             // For total consistency, strip out empty pieces first
             List<String> list = new ArrayList<String>(pieces.length);
-            for(String piece: pieces)
+            for (String piece : pieces)
             {
                 if (piece.length() > 0)
                 {
@@ -470,24 +468,24 @@ public class StringUtils
             pieces = list.toArray(new String[list.size()]);
         }
 
-        for(int i = 0; i < pieces.length; i++)
+        for (int i = 0; i < pieces.length; i++)
         {
             String piece = pieces[i];
 
-            if(glueCheck)
+            if (glueCheck)
             {
-                if(i > 0 && piece.startsWith(glue))
+                if (i > 0 && piece.startsWith(glue))
                 {
                     piece = piece.substring(glue.length());
                 }
 
-                if(i < pieces.length - 1 && piece.endsWith(glue))
+                if (i < pieces.length - 1 && piece.endsWith(glue))
                 {
                     piece = piece.substring(0, piece.length() - glue.length());
                 }
             }
 
-            if(i > 0)
+            if (i > 0)
             {
                 result.append(glue);
             }
@@ -539,7 +537,7 @@ public class StringUtils
             // double slash at the start of the path confuses URI.
             URI uri = new URI("http", "0.0.0.0", "/" + path, null);
             String encoded = uri.getRawPath();
-            if(encoded.startsWith("/"))
+            if (encoded.startsWith("/"))
             {
                 encoded = encoded.substring(1);
             }
@@ -549,5 +547,54 @@ public class StringUtils
         {
             return path;
         }
+    }
+
+    public static String pluralise(String singularNoun)
+    {
+        String pluralNoun = singularNoun;
+
+        int nounLength = pluralNoun.length();
+
+        if (nounLength == 1)
+        {
+            pluralNoun = pluralNoun + 's';
+        }
+        else if (nounLength > 1)
+        {
+            char secondToLastChar = pluralNoun.charAt(nounLength - 2);
+
+            if (pluralNoun.endsWith("y"))
+            {
+                switch (secondToLastChar)
+                {
+                    case'a': // fall-through
+                    case'e': // fall-through
+                    case'i': // fall-through
+                    case'o': // fall-through
+                    case'u':
+                        pluralNoun = pluralNoun + 's';
+                        break;
+                    default:
+                        pluralNoun = pluralNoun.substring(0, nounLength - 1)
+                                + "ies";
+                }
+            }
+            else if (pluralNoun.endsWith("s"))
+            {
+                switch (secondToLastChar)
+                {
+                    case's':
+                        pluralNoun = pluralNoun + "es";
+                        break;
+                    default:
+                        pluralNoun = pluralNoun + "ses";
+                }
+            }
+            else
+            {
+                pluralNoun = pluralNoun + 's';
+            }
+        }
+        return pluralNoun;
     }
 }

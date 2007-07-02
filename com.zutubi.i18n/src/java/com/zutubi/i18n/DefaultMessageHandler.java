@@ -1,9 +1,11 @@
 package com.zutubi.i18n;
 
-import com.zutubi.i18n.locale.LocaleManager;
-import com.zutubi.i18n.format.Formatter;
 import com.zutubi.i18n.bundle.BundleManager;
+import com.zutubi.i18n.context.Context;
+import com.zutubi.i18n.format.Formatter;
+import com.zutubi.i18n.locale.LocaleManager;
 
+import java.util.Enumeration;
 import java.util.Locale;
 import java.util.ResourceBundle;
 
@@ -35,6 +37,23 @@ public class DefaultMessageHandler implements MessageHandler
     public Locale getLocale()
     {
         return localeManager().getLocale();
+    }
+
+    public boolean isKeyDefined(Context context, String key)
+    {
+        for (ResourceBundle bundle : bundleManager.getBundles(context, getLocale()))
+        {
+            Enumeration<String> keys = bundle.getKeys();
+            while(keys.hasMoreElements())
+            {
+                if(keys.nextElement().equals(key))
+                {
+                    return true;
+                }
+            }
+        }
+        
+        return false;
     }
 
     public String format(Object context, String key)
