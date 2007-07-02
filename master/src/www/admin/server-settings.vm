@@ -77,7 +77,6 @@
                     var centerPanel = centerRegion.getPanel(0);
                     centerPanel.setTitle('');
                     centerPanel.getEl().setStyle('margin', '0');
-                    centerRegion.titleEl.show();
 
                     nestedLayout.addRegion('north', {
                         split: false,
@@ -87,14 +86,14 @@
                     nestedLayout.addRegion('west', {
                         split:true,
                         initialSize: 300,
-                        titlebar: true,
+                        titlebar: false,
                         collapsible: true,
                         animate: true,
-                        tabPosition: 'top',
+                        tabPosition: 'bottom',
                         autoScroll: true
                     });
 
-                    var loader = new ZUTUBI.ConfigTreeLoader('$base/aconfig');
+                    var loader = new ZUTUBI.ConfigTreeLoader('$base/aconfig/global');
                     //loader.on('loadexception', function(loader, node, response) {  console.dir(response); });
 
                     tree = new ZUTUBI.ConfigTree('config-tree', {
@@ -135,7 +134,7 @@
 <body>
     #adminTabs("settings")
 
-    <div id="innernorth" style="padding: 4px; padding-bottom: 12px; border-bottom: 1px solid #ccc">
+    <div id="innernorth" style="padding: 0px;">
     </div>
 
     <div id="config-tree">

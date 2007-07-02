@@ -8,7 +8,7 @@
 
     <p>&nbsp;</p>
 
-    #pform("path=$path" "action=setup/setupData.action")
+    #pform("path=$path" "action=setup/setupData.action" "namespace=setup")
 
     <p>
         <img alt="info" src="$base/images/information.gif"/> $action.getText("data.using.config", [$pulseConfigPath])

@@ -5,6 +5,7 @@ import com.zutubi.prototype.model.Form;
 import com.zutubi.prototype.model.SubmitFieldDescriptor;
 import com.zutubi.prototype.type.record.Record;
 import com.zutubi.prototype.webwork.PrototypeUtils;
+import com.zutubi.prototype.webwork.ConfigurationActionMapper;
 import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.Predicate;
 
@@ -27,9 +28,16 @@ public class FormDescriptor extends AbstractDescriptor
     private List<FieldDescriptor> fieldDescriptors = new LinkedList<FieldDescriptor>();
     private List<String> actions = new LinkedList<String>();
     private boolean displayMode = false;
+
+    /**
+     * Indicates whether or not form submission should be via ajax.
+     */
     private boolean ajax = false;
 
-//    private String[] fieldOrder;
+    /**
+     * Defines url namespace in which the form submission should be made.
+     */
+    private String namespace = ConfigurationActionMapper.CONFIG_NAMESPACE;
 
     public void setName(String name)
     {
@@ -44,6 +52,11 @@ public class FormDescriptor extends AbstractDescriptor
     public void setAction(String action)
     {
         this.action = action;
+    }
+
+    public void setNamespace(String namespace)
+    {
+        this.namespace = namespace;
     }
 
     public void add(FieldDescriptor descriptor)
@@ -97,7 +110,7 @@ public class FormDescriptor extends AbstractDescriptor
         Form form = new Form();
         form.setName(name);
         form.setId(id);
-        form.setAction(PrototypeUtils.getConfigURL(path, action, null, ajax));
+        form.setAction(PrototypeUtils.getConfigURL(path, action, null, namespace, ajax));
         form.setDisplayMode(displayMode);
         form.setAjax(ajax);
         form.addAll(getParameters());

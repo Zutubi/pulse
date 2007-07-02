@@ -1,71 +1,112 @@
 #set($config = $action.configuration)
 <h2>#i18n("key=label")</h2>
-<div style="color:gray">
+<p class="introduction">
     #i18n("key=introduction")
-</div>
-
-#if ($config.displayFields.size() > 0)
-<p>&nbsp;</p>
-<h2>state</h2>
-<p>
-<table>
-    #foreach($field in $config.displayFields)
-    <tr>
-        <td><b>#i18n("key=${field}.label")</b></td>
-        <td>$config.format($field)</td>
-    </tr>
-    #end
-</table>
 </p>
-#end
 
-#if( $config.record )
-    #if( $config.simpleProperties.size() > 0)
-        <!-- this configuration definition contains fields to be configured. -->
-        <p>
-            #pform("path=$config.path" "formName=mainform" "displayMode=true" "ajax=true")
-        </p>
+<table>
+    <tr>
+        <td class="column">
 
-        <script type="text/javascript">
-            mainform.on('actioncomplete', function(form, action)
-            {
-                handleConfigurationResponse(action.result);
-            });
-        </script>
+            #if ($config.displayFields.size() > 0)
+            <div class="frame">
+                <h3 class="header">#i18n("key=state.heading")</h3>
+                <p class="description">
+                    #i18n("key=state.description")
+                </p>
+                <table width="100%">
+                    #set($odd = true)
+                    #foreach($field in $config.displayFields)
+                    <tr>
+                        #if($odd) #set($bgcolor="#e8e8f3") #else #set($bgcolor="#ffffff") #end
+                        <td bgcolor="$bgcolor" width="20%"><b>#i18n("key=${field}.label")</b>: </td>
+                        <td bgcolor="$bgcolor">$config.format($field)</td>
+                    </tr>
+                        #if($odd) #set($odd = false) #else #set($odd = true) #end
+                    #end
+                </table>
+            </div>
+            #end
 
-        #parse("/aconfig/check.vm")
-    #end
-#else
-    #if( $config.extensions.size() > 0)
-        <p>To create the #i18n("key=label") please use the <a href="#" onclick="addToPath('${config.path}'); return false">wizard</a>.</p>
-    #else
-        <!-- this configuration definition contains fields to be configured. -->
-        <p>
-            #pform("path=$config.path" "formName=mainform" "displayMode=true" "ajax=true")
-        </p>
+                #if( $config.record )
+                    #if( $config.simpleProperties.size() > 0)
+                    <div class="frame">
+                        <h3 class="header">#i18n("key=form.heading")</h3>
+                        <p class="description">
+                            #i18n("key=form.description")
+                        </p>
+                        <!-- this configuration definition contains fields to be configured. -->
+                        <p>
+                            #pform("path=$config.path" "formName=mainform" "displayMode=true" "ajax=true" "namespace=aconfig")
+                        </p>
+                        <script type="text/javascript">
+                            mainform.on('actioncomplete', function(form, action)
+                            {
+                                handleConfigurationResponse(action.result);
+                            });
+                        </script>
+                        #parse("/aconfig/check.vm")
+                    </div>
+                    #end
+                #else
+                    #if( $config.extensions.size() > 0)
+                    <div class="frame">
+                        <h3 class="header">#i18n("key=form.heading")</h3>
+                        <p class="description">
+                            #i18n("key=form.description")
+                        </p>
+                        <p>To create the #i18n("key=label") please use the <a href="$base/admin/${config.path}?wizard">wizard</a>.</p>
+                    </div>
+                    #else
+                        #if( $config.simpleProperties.size() > 0)
+                        <div class="frame">
+                            <h3 class="header">#i18n("key=form.heading")</h3>
+                            <p class="description">
+                                #i18n("key=form.description")
+                            </p>
+                            <!-- this configuration definition contains fields to be configured. -->
+                            <p>
+                                #pform("path=$config.path" "formName=mainform"  "displayMode=true" "ajax=true" "namespace=aconfig")
+                            </p>
+                            <script type="text/javascript">
+                                mainform.on('actioncomplete', function(form, action)
+                                {
+                                    handleConfigurationResponse(action.result);
+                                });
+                            </script>
+                            #parse("/aconfig/check.vm")
+                        </div>
+                        #end
+                    #end
+                #end
+        </td>
+        <td class="column" style="width:300px">
+            #if ($config.actions.size() > 0)
+            <div class="frame">
+            <h3 class="header">actions</h3>
+            <p>
+            <ul>
+                #foreach($action in $config.actions)
+                    <li><a href="#" onclick="actionPath('${config.path}?${action}'); return false;">#i18n("key=${action}.label")</a></li>
+                #end
+            </ul>
+            </p>
+            </div>
+            #end
 
-        <script type="text/javascript">
-            mainform.on('actioncomplete', function(form, action)
-            {
-                handleConfigurationResponse(action.result);
-            });
-        </script>
+            #if( $config.nestedProperties.size() > 0)
+            <div class="frame">
+            <h3 class="header">links</h3>
+            <p>
+            <ul>
+                #foreach($prop in $config.nestedProperties)
+                    <li>+ #i18n("property=$prop" "key=label") <a href="#" onclick="selectPath('${config.path}/${prop}'); return false;">(+)</a>  </li>
+                #end
+            </ul>
+            </p>
+            </div>
+            #end
 
-        #parse("/aconfig/check.vm")
-    #end
-#end
-
-#if( $config.simpleProperties.size() > 0)
-        
-#end
-
-#if( $config.nestedProperties.size() > 0)
-<p>&nbsp;</p>
-<h4>Nested configurations</h4>
-<p>&nbsp;&nbsp;the following nested configurations are also available:</p>
-<ul>
-    #foreach($prop in $config.nestedProperties)
-        <li>+ #i18n("property=$prop" "key=label") <a href="#" onclick="selectPath('${config.path}/${prop}'); return false;">(+)</a>  </li>
-    #end
-</ul>
-#end
+        </td>
+    </tr>
+</table>

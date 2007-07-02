@@ -3,21 +3,16 @@ package com.zutubi.prototype.velocity;
 import com.opensymphony.xwork.ActionContext;
 import com.opensymphony.xwork.util.OgnlValueStack;
 import com.zutubi.i18n.Messages;
-import com.zutubi.prototype.FormDescriptor;
 import com.zutubi.prototype.FormDescriptorFactory;
 import com.zutubi.prototype.WizardDescriptor;
 import com.zutubi.prototype.freemarker.GetTextMethod;
 import com.zutubi.prototype.i18n.WizardContext;
 import com.zutubi.prototype.i18n.WizardContextResolver;
-import com.zutubi.prototype.model.HiddenFieldDescriptor;
 import com.zutubi.prototype.type.record.PathUtils;
 import com.zutubi.prototype.wizard.TypeWizardState;
-import com.zutubi.prototype.wizard.WizardTransition;
 import com.zutubi.prototype.wizard.webwork.AbstractTypeWizard;
 import com.zutubi.pulse.bootstrap.ComponentContext;
 import com.zutubi.pulse.velocity.AbstractDirective;
-import com.zutubi.util.CollectionUtils;
-import com.zutubi.util.Mapping;
 import freemarker.core.DelegateBuiltin;
 import freemarker.template.Configuration;
 import freemarker.template.Template;
@@ -32,7 +27,6 @@ import java.io.IOException;
 import java.io.StringWriter;
 import java.io.Writer;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -46,6 +40,7 @@ public class WizardDirective extends AbstractDirective
     private String path;
     private boolean ajax = false;
     private boolean decorate = true;
+    private String namespace;
 
     private FormDescriptorFactory formDescriptorFactory;
 
@@ -102,6 +97,7 @@ public class WizardDirective extends AbstractDirective
             wizardDescriptor.setFormDescriptorFactory(formDescriptorFactory);
             wizardDescriptor.setDecorate(decorate);
             wizardDescriptor.setAjax(ajax);
+            wizardDescriptor.setNamespace(namespace);
 
             Map<String, Object> context = new HashMap<String, Object>();
 
@@ -130,31 +126,9 @@ public class WizardDirective extends AbstractDirective
         }
     }
 
-    private void decorate(FormDescriptor formDescriptor)
-    {
-        List<String> actions = CollectionUtils.map(wizardInstance.getAvailableActions(), new Mapping<WizardTransition, String>()
-        {
-            public String map(WizardTransition o)
-            {
-                return o.name().toLowerCase();
-            }
-        });
-        formDescriptor.setActions(actions);
-
-        HiddenFieldDescriptor hiddenStateField = new HiddenFieldDescriptor();
-        hiddenStateField.setName("state");
-        hiddenStateField.setValue(wizardInstance.getCurrentStateIndex());
-
-        formDescriptor.add(hiddenStateField);
-    }
-
     public void setFreemarkerConfiguration(Configuration configuration)
     {
         this.configuration = configuration;
-    }
-
-    public void setAction(String action)
-    {
     }
 
     public void setPath(String path)
@@ -170,6 +144,17 @@ public class WizardDirective extends AbstractDirective
     public void setDecorate(boolean decorate)
     {
         this.decorate = decorate;
+    }
+
+    /**
+     * The namespace defines the url namespace that this form is being rendered in.  This is used by
+     * the form generation process to determine the correct url to submit the form to.
+     *
+     * @param namespace in which this form is operating.
+     */
+    public void setNamespace(String namespace)
+    {
+        this.namespace = namespace;
     }
 
     public void setFormDescriptorFactory(FormDescriptorFactory formDescriptorFactory)

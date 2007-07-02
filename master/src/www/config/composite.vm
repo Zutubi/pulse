@@ -34,6 +34,8 @@
     #i18n("key=introduction")
 </p>
 
+<h2>NO LONGER BEING USED</h2>
+
 <table>
     <tr>
         <td class="column">
@@ -107,25 +109,12 @@
             <p>
             <ul>
                 #foreach($action in $config.actions)
-                    <li><a href='#url("action=display" "path=${config.instance.configurationPath}?${action}")'>#i18n("key=${action}.label")</a> </li>
+                    <li><a href='#url("action=display" "path=${config.instance.configurationPath}?${action}" "ajax=true")'>#i18n("key=${action}.label")</a> </li>
                 #end
             </ul>
             </p>
             </div>
             #end
-
-<!--
-            <div class="frame">
-            <h3 class="header">help</h3>
-            <p>
-                <ul>
-                    <li>a</li>
-                    <li>b</li>
-                    <li>c</li>
-                </ul>
-            </p>
-            </div>
--->
 
             #if( $config.nestedProperties.size() > 0)
             <div class="frame">

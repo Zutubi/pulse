@@ -3,7 +3,7 @@
     #i18n("key=introduction")
 </div>
 <p>
-    #pwizard("path=$action.path" "ajax=true")
+    #pwizard("path=$action.path" "ajax=true" "namespace=aconfig")
 </p>
 <script type="text/javascript">
     wizardForm.on('actioncomplete', function(form, action)

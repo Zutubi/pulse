@@ -1,0 +1,268 @@
+#authorisationTags($principle)
+<content tag="selectedTab">administration</content>
+<html>
+<head>
+    <title>#wwtext("name=administration")</title>
+    <script type="text/javascript" src="$base/js/zutubi.js"></script>
+	<script type="text/javascript">
+        var configTree;
+        var templateTree;
+        var visibleTree;
+
+        // ------------------------------------------------------------------
+	    // Shared tree functions
+        // ------------------------------------------------------------------
+
+        var handleConfigurationResponse = function(result)
+        {
+            if (result.success)
+            {
+                if (result.newPanel)
+                {
+                    Ext.get('detail-pane').update(result.newPanel, true);
+                }
+
+                if (configTree)
+                {
+                    configTree.handleResponse(result);
+                }
+
+                if (templateTree)
+                {
+                    templateTree.handleResponse(result);
+                }
+
+                visibleTree.redirectToNewPath(result);
+            }
+            // else indicate problem in the ui via an icon?
+        }
+
+        var getAjaxCallback = function(maskedElement)
+        {
+            return {
+                success: function(response) { handleConfigurationResponse(Ext.decode(response.responseText)); if(maskedElement) { maskedElement.unmask() } },
+                failure: function(response) { if(maskedElement) { maskedElement.unmask() } }
+            }
+        }
+
+        var runAjaxRequest = function(url)
+        {
+            var pane = Ext.get('detail-pane');
+            pane.mask('Please wait...');
+            Ext.lib.Ajax.request('get', url, getAjaxCallback(pane));
+        }
+
+        // ------------------------------------------------------------------
+        // Config tree
+        // ------------------------------------------------------------------
+
+        var onConfigSelect = function(sm, node)
+        {
+            if(node)
+            {
+                Ext.get('detail-pane').load({url: configTree.loader.getNodePath(node), scripts:true});
+                templateTree.getSelectionModel().clearSelections();
+            }
+        }
+
+        var createConfigTree = function(project)
+        {
+            Ext.get('config-tree').update('');
+            
+            var loader = new ZUTUBI.ConfigTreeLoader('$base/aconfig');
+
+            configTree = new ZUTUBI.ConfigTree('config-tree', {
+                pathPrefix: '$scope',
+                animate: false,
+                loader: loader,
+                rootVisible: true,
+                title: 'configuration'
+            });
+
+            var root = new Ext.tree.AsyncTreeNode({
+                id: project,
+                text: project,
+                allowDrag: false,
+                allowDrop: false
+            });
+
+            configTree.setRootNode(root);
+            configTree.getSelectionModel().on('selectionchange', onConfigSelect);
+            configTree.render();
+            root.expand();
+        }
+
+        var selectPath = function(path)
+        {
+            configTree.selectConfigPath(path);
+        }
+
+        var addToPath = function(path, template)
+        {
+            runAjaxRequest('$base/aconfig/' + path + '?wizard' + (template ? '=template' : ''));
+        }
+
+        var deletePath = function(path)
+        {
+            runAjaxRequest('$base/aconfig/' + path + '?delete=confirm');
+        }
+
+        // ------------------------------------------------------------------
+        // Template tree
+        // ------------------------------------------------------------------
+
+        var onTemplateSelect = function(sm, node)
+        {
+            if(node)
+            {
+                Ext.get('detail-pane').load({url: '$base/atemplate/$scope/' + node.id, scripts:true});
+            }
+        }
+
+        var configureRecord = function(id)
+        {
+            nestedLayout.getRegion('west').showPanel('config-tree');
+        }
+
+        var selectTemplate = function(path)
+        {
+            templateTree.getSelectionModel().clearSelections();
+            templateTree.selectPath(templateTree.getRootNode().getPath() + '/' + path);
+        }
+
+        // ------------------------------------------------------------------
+        // Layout
+        // ------------------------------------------------------------------
+
+        var Layout = function()
+        {
+            var centerRegion;
+#if($path)
+            var path = '$path';
+#else
+            var path = '';
+#end
+
+            return {
+                init : function()
+                {
+                    centerRegion = nestedLayout.getRegion('center');
+                    var centerPanel = centerRegion.getPanel(0);
+                    centerPanel.setTitle('');
+                    centerPanel.getEl().setStyle('margin', '4px');
+
+                    nestedLayout.addRegion('north', {
+                        split: false,
+                        titlebar: false
+                    });
+
+                    nestedLayout.addRegion('west', {
+                        split:true,
+                        initialSize: 300,
+                        titlebar: false,
+                        collapsible: true,
+                        animate: true,
+                        autoScroll: true
+                    });
+
+                    var templateLoader = new ZUTUBI.ConfigTreeLoader('$base/atemplate/$scope');
+
+                    templateTree = new ZUTUBI.TemplateTree('project', 'template-tree', {
+                        animate: false,
+                        loader: templateLoader,
+                        rootVisible: false,
+                        title: '${scope}s'
+                    });
+
+                    var templateRoot = new Ext.tree.AsyncTreeNode({
+                        id: 'x',
+                        text: 'settings',
+                        allowDrag: false,
+                        allowDrop: false
+                    });
+
+                    templateTree.setRootNode(templateRoot);
+                    templateTree.getSelectionModel().on('selectionchange', onTemplateSelect);
+
+                    nestedLayout.beginUpdate();
+                    nestedLayout.add('north', new Ext.ContentPanel('innernorth', {title: 'inner north'}));
+                    nestedLayout.add('west', new Ext.ContentPanel('template-tree', {title: 'hierarchy'}));
+                    nestedLayout.add('west', new Ext.ContentPanel('config-tree', {title: 'configuration'}));
+                    nestedLayout.endUpdate();
+
+                    nestedLayout.getRegion('west').on('panelactivated', function(region, panel) {
+                        if(panel.title == 'configuration') // going to the configuration panel
+                        {
+                            var node = templateTree.getSelectionModel().getSelectedNode();
+                            if (!node)
+                            {
+                                node = templateTree.getRootNode();
+                            }
+
+                            if(!configTree || configTree.getRootNode().id != node.id)
+                            {
+                                createConfigTree(node.id);
+                            }
+
+                            configTree.selectPath(node.id);
+                            visibleTree = configTree;
+                        }
+                        else  // going to the template tree panel.
+                        {
+                            var node;
+
+                            if(configTree)
+                            {
+                                var configId = configTree.getRootNode().id;
+                                node = templateTree.getNodeById(configId);
+
+                            }
+
+                            if(!node)
+                            {
+                                node = templateTree.getRootNode().firstChild;
+                            }
+                            
+                            node.select();
+                            visibleTree = templateTree;
+                        }
+                    });
+
+                    templateTree.render();
+
+#if($baseName)
+                    createConfigTree('$baseName');
+                    configTree.selectConfigPath('$configTreePath');
+                    templateTree.expandToPath('$templateTreePath')
+#else
+                    templateRoot.expand(false, false, function() {
+                        templateRoot.firstChild.expand();
+                        nestedLayout.getRegion('west').showPanel('template-tree');
+                    });
+#end
+                }
+            }
+        }();
+
+        Ext.onReady(Layout.init, Layout, true);
+	</script>
+</head>
+<body>
+    #adminTabs("${scope}s")
+
+    #parse("/template/includes/actionerrors.vm")
+
+    <div id="innernorth" style="padding: 4px; border-bottom: 1px solid #ccc">
+    </div>
+  
+    <div id="template-tree" class="ylayout-inactive-content">
+    </div>
+
+    <div id="config-tree" class="ylayout-inactive-content">
+    </div>
+
+    <div id="detail-pane">
+        This is where the actual content ends up!
+    </div>
+</body>
+</html>

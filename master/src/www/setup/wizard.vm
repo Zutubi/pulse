@@ -1,0 +1,7 @@
+<html>
+<body>
+
+    #pwizard("path=$action.path" "namespace=setup")
+
+</body>
+</html>

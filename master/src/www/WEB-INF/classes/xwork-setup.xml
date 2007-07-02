@@ -22,7 +22,7 @@
 
         <action name="setup" class="com.zutubi.pulse.web.setup.SetupWorkflowAction">
             <result name="data" type="redirect">/setup/setupData!input.action</result>
-            <result name="setup" type="redirect">/config/setup?wizard</result>
+            <result name="setup" type="redirect">/setup/init.action?wizard</result>
             <result name="license" type="redirect">/setup/setupLicense!input.action</result>
             <result name="upgrade" type="redirect">/upgrade/preview.action</result>
             <result name="starting" type="redirect">/startup/starting.action</result>
@@ -42,10 +42,6 @@
         <action name="execute" class="com.zutubi.pulse.web.setup.SetupActionSupport">
             <result name="success" type="velocity">/system-setup.vm</result>
         </action>
-    </package>
-
-    <package name="config" namespace="/config" extends="webwork-default-package">
-        <default-interceptor-ref name="completeStack"/>
 
         <action name="wizard" class="com.zutubi.prototype.wizard.webwork.ConfigurationWizardAction">
             <interceptor-ref name="prototypeWizardStack"/>

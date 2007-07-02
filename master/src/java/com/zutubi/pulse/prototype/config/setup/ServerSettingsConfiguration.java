@@ -5,6 +5,7 @@ import com.zutubi.config.annotations.ConfigurationCheck;
 import com.zutubi.config.annotations.Form;
 import com.zutubi.config.annotations.Password;
 import com.zutubi.config.annotations.SymbolicName;
+import com.zutubi.config.annotations.ControllingCheckbox;
 import com.zutubi.validation.Validateable;
 import com.zutubi.validation.ValidationContext;
 import com.zutubi.validation.ValidationException;
@@ -29,6 +30,7 @@ public class ServerSettingsConfiguration extends AbstractConfiguration implement
     private boolean ssl;
     @Email
     private String from;
+    @ControllingCheckbox(dependentFields = {"port"})
     private boolean customPort;
     private int port = 25;
     private String username;

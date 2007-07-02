@@ -209,11 +209,6 @@
 
     <servlet-mapping>
         <servlet-name>webwork</servlet-name>
-        <url-pattern>/config/*</url-pattern>
-    </servlet-mapping>
-
-    <servlet-mapping>
-        <servlet-name>webwork</servlet-name>
         <url-pattern>/aconfig/*</url-pattern>
     </servlet-mapping>
 

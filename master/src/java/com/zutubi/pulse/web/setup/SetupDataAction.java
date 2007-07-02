@@ -21,7 +21,7 @@ public class SetupDataAction extends TransientAction<SetupDataConfiguration>
 
     public SetupDataAction()
     {
-        super("setup/data");
+        super("init/data");
     }
 
     public String getPulseConfigPath()

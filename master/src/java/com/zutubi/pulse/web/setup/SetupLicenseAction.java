@@ -15,7 +15,7 @@ public class SetupLicenseAction extends TransientAction<SetupLicenseConfiguratio
 
     public SetupLicenseAction()
     {
-        super("setup/license");
+        super("init/license");
     }
 
     public String getLicense()

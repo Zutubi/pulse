@@ -6,7 +6,7 @@
 <body>
     <h1>:: #wwtext("name=license.setup") ::</h1>
 
-    #pform("path=$path" "action=setup/setupLicense.action")
+    #pform("path=$path" "action=setup/setupLicense.action" "namespace=setup")
 
     #wwaction("namespace=/ajax" "name=requestLicense!input" "executeResult=true")
 </body>

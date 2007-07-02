@@ -18,6 +18,11 @@ public class PathUtils
 
     public static String[] getPathElements(String path, boolean allowEmpty)
     {
+        if (path == null)
+        {
+            return new String[0];
+        }
+        
         String[] elements = path.split(SEPARATOR);
         if (!allowEmpty)
         {
@@ -53,6 +58,10 @@ public class PathUtils
 
     public static String[] getParentPathElements(String[] elements)
     {
+        if (elements.length == 0)
+        {
+            return null;
+        }
         String[] parent = new String[elements.length - 1];
         System.arraycopy(elements, 0, parent, 0, elements.length - 1);
         return parent;

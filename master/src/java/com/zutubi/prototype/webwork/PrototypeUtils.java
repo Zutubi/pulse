@@ -20,28 +20,23 @@ public class PrototypeUtils
 {
     public static String getConfigURL(String path, String action, String submitField)
     {
-        return getConfigURL(path, action, submitField, false);
+        return getConfigURL(path, action, submitField, null, false);
     }
 
-    public static String getConfigURL(String path, String action, String submitField, boolean ajax)
+    public static String getConfigURL(String path, String action, String submitField, String namespace, boolean ajax)
     {
-        String result;
-
-        if (ajax)
-        {
-            result = ConfigurationActionMapper.AJAX_CONFIG_NAMESPACE;
-        }
-        else
-        {
-            result = ConfigurationActionMapper.CONFIG_NAMESPACE;
-        }
-
+        String result = (namespace != null) ? namespace : ConfigurationActionMapper.CONFIG_NAMESPACE;
         if(path != null)
         {
             result = StringUtils.join("/", true, true, result, path);
         }
 
         result = PathUtils.normalizePath(result);
+
+        if (!ajax)
+        {
+            result = result + ".action";
+        }
 
         if(action != null && !action.equals("display") || submitField != null)
         {

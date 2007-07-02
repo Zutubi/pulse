@@ -15,7 +15,7 @@ public class RequestLicenseAction extends TransientAction<RequestLicenseConfigur
 
     public RequestLicenseAction()
     {
-        super("setup/requestLicense");
+        super("init/requestLicense");
     }
 
     public LicenseResult getResult()

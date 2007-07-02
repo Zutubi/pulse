@@ -50,8 +50,22 @@ public class Actions
         return getDefaultActions(actionHandlerClass, configurationInstance.getClass());
     }
 
+    /**
+     * Get the list of actions based on the action handler methods.  That is, all of the do<ActionName>() methods.
+     *
+     * @param actionHandlerClass
+     * @param configurationClass
+     *
+     * @return a list of action names.
+     */
+    //TODO: configurationClass type should be determinable from the actionHandlerClass type via parametrization
     public List<String> getDefaultActions(Class actionHandlerClass, Class configurationClass)
     {
+        if (configurationClass == null)
+        {
+            configurationClass = Object.class;
+        }
+
         Method[] methods = actionHandlerClass.getMethods();
         List<String> actions = new LinkedList<String>();
         for (Method method : methods)
@@ -77,26 +91,28 @@ public class Actions
                     continue;
                 }
             }
-            
+
             // ok, we have an action here.
-            String actionName = methodName.substring(2, 3).toLowerCase();
-            if (methodName.length() > 3)
-            {
-                actionName = actionName + methodName.substring(3);
-            }
-            actions.add(actionName);
+            actions.add(methodToAction(methodName));
         }
         return actions;
+    }
+
+    private String methodToAction(String methodName)
+    {
+        // ok, we have an action here.
+        String actionName = methodName.substring(2, 3).toLowerCase();
+        if (methodName.length() > 3)
+        {
+            actionName = actionName + methodName.substring(3);
+        }
+        return actionName;
     }
 
     @SuppressWarnings({"unchecked"})
     public void execute(Class actionHandlerClass, String actionName, Object configurationInstance)
     {
-        String methodName = "do" + actionName.substring(0, 1).toUpperCase();
-        if (actionName.length() > 1)
-        {
-            methodName = methodName + actionName.substring(1);
-        }
+        String methodName = actionToMethod(actionName);
 
         try
         {
@@ -114,6 +130,21 @@ public class Actions
         }
     }
 
+    private String actionToMethod(String actionName)
+    {
+        String methodName = "do" + actionName.substring(0, 1).toUpperCase();
+        if (actionName.length() > 1)
+        {
+            methodName = methodName + actionName.substring(1);
+        }
+        return methodName;
+    }
+
+    /**
+     * Required resource
+     *
+     * @param objectFactory instance
+     */
     public void setObjectFactory(ObjectFactory objectFactory)
     {
         this.objectFactory = objectFactory;

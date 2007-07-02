@@ -703,11 +703,6 @@
             <result name="success" type="velocity">server-settings.vm</result>
         </action>
 
-        <action name="projectConfiguration" class="com.zutubi.pulse.web.admin.ProjectConfigurationAction">
-            <interceptor-ref name="defaultReadOnlyStack"/>
-            <result name="success" type="velocity">project-configuration.vm</result>
-        </action>
-
         <action name="hibernateStatistics" class="com.zutubi.pulse.web.admin.debug.DumpHibernateStatisticsAction">
             <interceptor-ref name="defaultReadOnlyStack"/>
             <result name="success" type="velocity">hibernate-statistics.vm</result>
@@ -846,10 +841,6 @@
             <result name="success" type="redirect">/admin/serverSettings.action</result>
         </action>
 
-        <action name="plugins" class="com.zutubi.pulse.web.admin.plugins.PluginsAction">
-            <result name="success" type="velocity">plugins.vm</result>
-        </action>
-
         <action name="installPlugin" class="com.zutubi.pulse.web.admin.plugins.InstallPluginAction">
             <result name="input" type="velocity">addplugin.vm</result>
             <result name="error" type="velocity">addplugin.vm</result>
@@ -857,47 +848,28 @@
             <result name="cancel" type="redirect">/admin/plugins.action</result>
         </action>
 
-        <action name="dumpData" class="com.zutubi.pulse.web.admin.DumpDataAction">
-            <result name="success" type="redirect">/admin/serverSettings.action</result>
+        <action name="template" class="com.zutubi.prototype.webwork.DisplayTemplatedConfigAction">
+            <interceptor-ref name="defaultReadOnlyStack"/>
+            <result name="success" type="velocity">templated-configuration.vm</result>
         </action>
 
-    </package>
-
-    <package name="config" namespace="/config" extends="webwork-default-package">
-        <default-interceptor-ref name="completeStack"/>
-
-        <action name="index" class="com.zutubi.pulse.web.ActionSupport">
-            <result name="success" type="velocity">index.vm</result>
+        <action name="projects" class="com.zutubi.pulse.web.admin.ProjectsAction">
+            <interceptor-ref name="defaultReadOnlyStack"/>
+            <result name="success" type="velocity">templated-configuration.vm</result>
         </action>
 
-        <action name="wizard" class="com.zutubi.prototype.wizard.webwork.ConfigurationWizardAction">
-            <interceptor-ref name="prototypeWizardStack"/>
-            <result name="step" type="velocity">wizard.vm</result>
-            <result name="input" type="velocity">wizard.vm</result>
-            <result name="cancel" type="redirect">${path}/</result>
-            <result name="success" type="redirect">${path}/</result>
+        <action name="agents" class="com.zutubi.pulse.web.admin.AgentsAction">
+            <interceptor-ref name="defaultReadOnlyStack"/>
+            <result name="success" type="velocity">templated-configuration.vm</result>
         </action>
 
-        <action name="display" class="com.zutubi.prototype.webwork.DisplayAction">
-            <result name="composite" type="velocity">composite.vm</result>
-            <result name="map" type="velocity">map.vm</result>
+        <action name="settings" class="com.zutubi.pulse.web.admin.SettingsAction">
+            <interceptor-ref name="defaultReadOnlyStack"/>
+            <result name="success" type="velocity">server-settings.vm</result>
         </action>
 
-        <action name="save" class="com.zutubi.prototype.webwork.SaveAction">
-            <result name="composite" type="velocity">composite.vm</result>
-            <result name="input" type="velocity">composite.vm</result>
-            <result name="cancel" type="redirect">${path}/</result>
-        </action>
-
-        <action name="delete" class="com.zutubi.prototype.webwork.DeleteAction">
-            <result name="confirm" type="velocity">confirm.vm</result>
-            <result name="success" type="redirect">${path}</result>
-            <result name="cancel" type="redirect">${path}</result>
-        </action>
-
-        <action name="generic" class="com.zutubi.prototype.webwork.GenericAction">
-            <result name="composite" type="velocity">composite.vm</result>
-            <result name="map" type="velocity">map.vm</result>
+        <action name="plugins" class="com.zutubi.pulse.web.admin.plugins.PluginsAction">
+            <result name="success" type="velocity">plugins.vm</result>
         </action>
 
     </package>
@@ -987,6 +959,7 @@
             <interceptor-ref name="ajaxPrototypeWizardStack"/>
             <result name="step" type="flexjson">configurationPanel</result>
             <result name="input" type="flexjson">configurationErrors</result>
+            <result name="error" type="flexjson">configurationErrors</result>
             <result name="cancel" type="flexjson">configurationResponse</result>
             <result name="success" type="flexjson">configurationResponse</result>
         </action>
@@ -1014,9 +987,10 @@
         </action>
 
         <action name="generic" class="com.zutubi.prototype.webwork.GenericAction">
-            <result name="composite" type="velocity">composite.vm</result>
-            <result name="map" type="velocity">map.vm</result>
+            <result name="error" type="flexjson">configurationErrors</result>
+            <result name="success" type="flexjson">configurationResponse</result>
         </action>
+        
     </package>
 
     <package name="templateAjax" namespace="/atemplate" extends="default">

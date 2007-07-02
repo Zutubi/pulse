@@ -1,6 +1,7 @@
 package com.zutubi.prototype.velocity;
 
 import com.zutubi.prototype.webwork.PrototypeUtils;
+import com.zutubi.prototype.webwork.ConfigurationActionMapper;
 import com.zutubi.pulse.bootstrap.MasterConfigurationManager;
 import com.zutubi.util.StringUtils;
 import com.zutubi.util.logging.Logger;
@@ -35,6 +36,8 @@ public class URLDirective extends PrototypeDirective
      */
     private boolean ajax = false;
 
+    private String namespace = ConfigurationActionMapper.CONFIG_NAMESPACE;
+
     private MasterConfigurationManager configurationManager;
 
     /**
@@ -64,6 +67,17 @@ public class URLDirective extends PrototypeDirective
         this.path = path;
     }
 
+    /**
+     * The namespace defines the url namespace that this form is being rendered in.  This is used by
+     * the form generation process to determine the correct url to submit the form to.
+     *
+     * @param namespace in which this form is operating.
+     */
+    public void setNamespace(String namespace)
+    {
+        this.namespace = namespace;
+    }
+
     public void setAjax(boolean ajax)
     {
         this.ajax = ajax;
@@ -76,7 +90,7 @@ public class URLDirective extends PrototypeDirective
             Map params = createPropertyMap(context, node);
             wireParams(params);
 
-            writer.write(StringUtils.join("/", true, true, configurationManager.getSystemConfig().getContextPath(), PrototypeUtils.getConfigURL(path, action, null, ajax)));
+            writer.write(StringUtils.join("/", true, true, configurationManager.getSystemConfig().getContextPath(), PrototypeUtils.getConfigURL(path, action, null, namespace, ajax)));
 
             return true;
         }

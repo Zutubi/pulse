@@ -112,6 +112,11 @@ Ext.extend(ZUTUBI.ConfigTree, Ext.tree.TreePanel, {
         this.selectPath(this.configPathToTreePath(configPath));
     },
 
+    expandToPath: function(path)
+    {
+        this.expandPath(this.configPathToTreePath(path));        
+    },
+
     getNodeConfigPath: function(node)
     {
         return this.treePathToConfigPath(node.getPath());

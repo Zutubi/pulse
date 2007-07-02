@@ -1,4 +1,3 @@
-#helpTag("Administration+Projects+Tab")
 #authorisationTags($principle)
 <content tag="selectedTab">administration</content>
 <html>
@@ -68,11 +67,11 @@
         var createConfigTree = function(project)
         {
             Ext.get('config-tree').update('');
-            
+
             var loader = new ZUTUBI.ConfigTreeLoader('$base/aconfig');
 
             configTree = new ZUTUBI.ConfigTree('config-tree', {
-                pathPrefix: 'project',
+                pathPrefix: '${scope}',
                 animate: false,
                 loader: loader,
                 rootVisible: true,
@@ -115,7 +114,7 @@
         {
             if(node)
             {
-                Ext.get('detail-pane').load({url: '$base/atemplate/project/' + node.id, scripts:true});
+                Ext.get('detail-pane').load({url: '$base/atemplate/$scope/' + node.id, scripts:true});
             }
         }
 
@@ -165,13 +164,13 @@
                         autoScroll: true
                     });
 
-                    var templateLoader = new ZUTUBI.ConfigTreeLoader('$base/atemplate/project');
+                    var templateLoader = new ZUTUBI.ConfigTreeLoader('$base/atemplate/$scope');
 
-                    templateTree = new ZUTUBI.TemplateTree('project', 'template-tree', {
+                    templateTree = new ZUTUBI.TemplateTree('$scope', 'template-tree', {
                         animate: false,
                         loader: templateLoader,
                         rootVisible: false,
-                        title: 'projects'
+                        title: '${scope}s'
                     });
 
                     var templateRoot = new Ext.tree.AsyncTreeNode({
@@ -221,12 +220,12 @@
                             {
                                 node = templateTree.getRootNode().firstChild;
                             }
-                            
+
                             node.select();
                             visibleTree = templateTree;
                         }
                     });
-                    
+
                     templateTree.render();
                     templateRoot.expand(false, false, function() {
                         templateRoot.firstChild.expand();
@@ -240,13 +239,13 @@
 	</script>
 </head>
 <body>
-    #adminTabs("projects")
+    #adminTabs("${scope}s")
 
     #parse("/template/includes/actionerrors.vm")
 
     <div id="innernorth" style="padding: 0px;">
     </div>
-  
+
     <div id="template-tree" class="ylayout-inactive-content" style="padding: 10px">
     </div>
 

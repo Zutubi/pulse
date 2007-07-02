@@ -3,11 +3,7 @@ package com.zutubi.prototype.webwork;
 import com.zutubi.prototype.ConventionSupport;
 import com.zutubi.prototype.actions.Actions;
 import com.zutubi.prototype.type.CompositeType;
-import com.zutubi.pulse.bootstrap.ComponentContext;
-import com.zutubi.util.logging.Logger;
 import com.zutubi.util.bean.ObjectFactory;
-
-import java.lang.reflect.Method;
 
 /**
  *
@@ -15,8 +11,6 @@ import java.lang.reflect.Method;
  */
 public class GenericAction extends PrototypeSupport
 {
-    private static final Logger LOG = Logger.getLogger(GenericAction.class);
-
     private ObjectFactory objectFactory;
 
     /**
@@ -24,6 +18,11 @@ public class GenericAction extends PrototypeSupport
      */
     private String action;
 
+    /**
+     * Setter for the action property
+     *
+     * @param action identifies the action to be executed
+     */
     public void setAction(String action)
     {
         this.action = action;
@@ -33,8 +32,13 @@ public class GenericAction extends PrototypeSupport
     {
         CompositeType type = (CompositeType) configurationTemplateManager.getType(path);
 
-        // need the action handler.
+        // lookup the action handler.
         Class handlerClass = ConventionSupport.getActions(type);
+        if (handlerClass == null)
+        {
+            addActionError("No action handler available for '" + type.getSymbolicName() +"'");
+            return ERROR;
+        }
 
         // need the configuration instance.
         Object config = configurationTemplateManager.getInstance(path);
@@ -45,23 +49,9 @@ public class GenericAction extends PrototypeSupport
 
         doRender();
 
-        return SUCCESS;
-    }
+        response = new ConfigurationResponse(path, configurationTemplateManager.getTemplatePath(path));
 
-    private Object getInfo(CompositeType type)
-    {
-        Class clazz = type.getClazz();
-        try
-        {
-            String infoClassName = clazz.getCanonicalName() + "Info";
-            Class infoClazz = clazz.getClassLoader().loadClass(infoClassName);
-            return infoClazz.newInstance();
-        }
-        catch (Exception e)
-        {
-            LOG.debug(e);
-        }
-        return null;
+        return SUCCESS;
     }
 
     public void setObjectFactory(ObjectFactory objectFactory)

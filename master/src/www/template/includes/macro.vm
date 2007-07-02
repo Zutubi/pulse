@@ -275,7 +275,7 @@
 ## Shows an admin tab of the given name with the given action name
 ##
 #macro(adminTab $name $action $selected)
-    #tabItem("tab.administration.$name" $name "${action}.action" $selected)
+    #tabItem("tab.administration.$name" $name "${action}" $selected)
 #end
 
 ##
@@ -283,12 +283,15 @@
 ##
 #macro(adminTabs $selected)
     #openTabs()
-        #adminTab("projects" "$base/admin/projectConfiguration" $selected)
-        #adminTab("settings" "$base/admin/serverSettings" $selected)
+        #adminTab("projects" "$base/admin/projects.action" $selected)
+        #adminTab("agents" "$base/admin/agents.action" $selected)
+        #adminTab("settings" "$base/admin/settings.action" $selected)
+<!--
         #adminTab("users" "$base/admin/userSettings" $selected)
         #adminTab("groups" "$base/admin/viewGroups" $selected)
-        #adminTab("plugins" "$base/admin/plugins" $selected)
-    #closeTabs()
+-->
+        #adminTab("plugins" "$base/admin/plugins.action" $selected)
+#closeTabs()
 #end
 
 ##

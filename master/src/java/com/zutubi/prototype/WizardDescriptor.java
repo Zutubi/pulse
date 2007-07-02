@@ -20,6 +20,7 @@ public class WizardDescriptor extends AbstractDescriptor
 
     private boolean ajax;
     private boolean decorate;
+    private String namespace;
 
     private FormDescriptorFactory formDescriptorFactory;
 
@@ -39,6 +40,7 @@ public class WizardDescriptor extends AbstractDescriptor
         FormDescriptor formDescriptor = currentState.createFormDescriptor(formDescriptorFactory, path, "wizardForm");
         formDescriptor.setAction("wizard");
         formDescriptor.setAjax(ajax);
+        formDescriptor.setNamespace(namespace);
         
         TemplateFormDecorator templateDecorator = new TemplateFormDecorator(record);
         templateDecorator.decorate(formDescriptor);
@@ -90,5 +92,10 @@ public class WizardDescriptor extends AbstractDescriptor
     public void setFormDescriptorFactory(FormDescriptorFactory formDescriptorFactory)
     {
         this.formDescriptorFactory = formDescriptorFactory;
+    }
+
+    public void setNamespace(String namespace)
+    {
+        this.namespace = namespace;
     }
 }

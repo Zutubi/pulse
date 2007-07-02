@@ -2,14 +2,25 @@ package com.zutubi.prototype.config;
 
 import com.zutubi.config.annotations.ConfigurationCheck;
 import com.zutubi.prototype.ConfigurationCheckHandler;
-import com.zutubi.prototype.type.*;
+import com.zutubi.prototype.type.CompositeType;
+import com.zutubi.prototype.type.ExtensionTypeProperty;
+import com.zutubi.prototype.type.MapType;
+import com.zutubi.prototype.type.TemplatedMapType;
+import com.zutubi.prototype.type.TypeException;
+import com.zutubi.prototype.type.TypeHandler;
+import com.zutubi.prototype.type.TypeRegistry;
 import com.zutubi.prototype.type.record.HandleAllocator;
 import com.zutubi.pulse.prototype.config.admin.GlobalConfiguration;
 import com.zutubi.pulse.prototype.config.agent.AgentConfiguration;
 import com.zutubi.pulse.prototype.config.misc.LoginConfiguration;
 import com.zutubi.pulse.prototype.config.misc.TransientConfiguration;
 import com.zutubi.pulse.prototype.config.project.ProjectConfiguration;
-import com.zutubi.pulse.prototype.config.project.changeviewer.*;
+import com.zutubi.pulse.prototype.config.project.changeviewer.ChangeViewerConfiguration;
+import com.zutubi.pulse.prototype.config.project.changeviewer.CustomChangeViewerConfiguration;
+import com.zutubi.pulse.prototype.config.project.changeviewer.FisheyeConfiguration;
+import com.zutubi.pulse.prototype.config.project.changeviewer.P4WebChangeViewer;
+import com.zutubi.pulse.prototype.config.project.changeviewer.TracChangeViewer;
+import com.zutubi.pulse.prototype.config.project.changeviewer.ViewVCChangeViewer;
 import com.zutubi.pulse.prototype.config.project.commit.CommitMessageConfiguration;
 import com.zutubi.pulse.prototype.config.project.commit.CustomCommitMessageConfiguration;
 import com.zutubi.pulse.prototype.config.project.commit.JiraCommitMessageConfiguration;
@@ -19,7 +30,12 @@ import com.zutubi.pulse.prototype.config.project.triggers.ScmBuildTriggerConfigu
 import com.zutubi.pulse.prototype.config.project.triggers.TriggerConfiguration;
 import com.zutubi.pulse.prototype.config.project.types.*;
 import com.zutubi.pulse.prototype.config.setup.SetupConfiguration;
-import com.zutubi.pulse.prototype.config.user.*;
+import com.zutubi.pulse.prototype.config.user.AllBuildsConditionConfiguration;
+import com.zutubi.pulse.prototype.config.user.CustomConditionConfiguration;
+import com.zutubi.pulse.prototype.config.user.SelectedBuildsConditionConfiguration;
+import com.zutubi.pulse.prototype.config.user.SubscriptionConditionConfiguration;
+import com.zutubi.pulse.prototype.config.user.UnsuccessfulConditionConfiguration;
+import com.zutubi.pulse.prototype.config.user.UserConfiguration;
 import com.zutubi.pulse.prototype.config.user.contacts.ContactConfiguration;
 import com.zutubi.pulse.prototype.config.user.contacts.EmailContactConfiguration;
 import com.zutubi.pulse.prototype.config.user.contacts.JabberContactConfiguration;
@@ -54,7 +70,7 @@ public class ConfigurationRegistry
         try
         {
             CompositeType setupConfig = registerConfigurationType(SetupConfiguration.class);
-            configurationPersistenceManager.register("setup", setupConfig, false);
+            configurationPersistenceManager.register("init", setupConfig, false);
         }
         catch (TypeException e)
         {
@@ -166,7 +182,7 @@ public class ConfigurationRegistry
 
             configurationPersistenceManager.register("project", projectCollection);
 
-            MapType agentCollection = new MapType();
+            TemplatedMapType agentCollection = new TemplatedMapType();
             agentCollection.setTypeRegistry(typeRegistry);
             agentCollection.setCollectionType(registerConfigurationType(AgentConfiguration.class));
             configurationPersistenceManager.register("agent", agentCollection);

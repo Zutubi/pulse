@@ -1,13 +1,27 @@
 package com.zutubi.pulse.agent;
 
 import com.zutubi.prototype.config.ConfigurationProvider;
+import com.zutubi.prototype.config.ConfigurationTemplateManager;
 import com.zutubi.prototype.config.TypeListener;
-import com.zutubi.pulse.*;
+import com.zutubi.prototype.type.CompositeType;
+import com.zutubi.prototype.type.TypeRegistry;
+import com.zutubi.prototype.type.record.MutableRecord;
+import com.zutubi.prototype.type.record.Record;
+import com.zutubi.pulse.AgentService;
+import com.zutubi.pulse.MasterAgentService;
+import com.zutubi.pulse.SlaveAgentService;
+import com.zutubi.pulse.SlaveProxyFactory;
+import com.zutubi.pulse.Version;
+import com.zutubi.pulse.bootstrap.DefaultSetupManager;
 import com.zutubi.pulse.bootstrap.MasterConfigurationManager;
 import com.zutubi.pulse.core.Stoppable;
 import com.zutubi.pulse.core.config.Resource;
-import com.zutubi.pulse.events.*;
+import com.zutubi.pulse.events.AgentRemovedEvent;
+import com.zutubi.pulse.events.AgentStatusEvent;
+import com.zutubi.pulse.events.AgentUpgradeCompleteEvent;
+import com.zutubi.pulse.events.Event;
 import com.zutubi.pulse.events.EventListener;
+import com.zutubi.pulse.events.EventManager;
 import com.zutubi.pulse.license.LicenseManager;
 import com.zutubi.pulse.license.authorisation.AddAgentAuthorisation;
 import com.zutubi.pulse.model.AgentState;
@@ -24,8 +38,20 @@ import com.zutubi.util.bean.ObjectFactory;
 import com.zutubi.util.logging.Logger;
 
 import java.net.ConnectException;
-import java.util.*;
-import java.util.concurrent.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.FutureTask;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 import java.util.concurrent.locks.ReentrantLock;
 
 /**
@@ -42,6 +68,8 @@ public class DefaultAgentManager implements AgentManager, EventListener, Stoppab
     private AgentStateManager agentStateManager;
     private MasterConfigurationManager configurationManager;
     private ConfigurationProvider configurationProvider;
+    private ConfigurationTemplateManager configurationTemplateManager;
+    private TypeRegistry typeRegistry;
     private ResourceManager resourceManager;
     private EventManager eventManager;
     private SlaveProxyFactory slaveProxyFactory;
@@ -89,12 +117,26 @@ public class DefaultAgentManager implements AgentManager, EventListener, Stoppab
         licenseManager.addAuthorisation(addAgentAuthorisation);
 
         // ensure that we create the default master agent.
-        if (agents.size() == 0)
+        if (DefaultSetupManager.initialInstallation)
         {
-            AgentConfiguration masterAgent = new AgentConfiguration();
-            masterAgent.setName("master agent");
-            masterAgent.setRemote(false);
-            configurationProvider.insert("agent", masterAgent);
+            CompositeType agentType = typeRegistry.getType(AgentConfiguration.class);
+            MutableRecord globalTemplate = agentType.createNewRecord(false);
+            globalTemplate.put("name", "global agent template");
+            globalTemplate.put("port", "8090");
+            globalTemplate.put("remote", "true");
+
+            configurationTemplateManager.markAsTemplate(globalTemplate);
+            configurationTemplateManager.insertRecord("agent", globalTemplate);            
+
+            // reload the template so that we have the handle.
+            Record persistedGlobalTemplate = configurationTemplateManager.getRecord("agent/global agent template");
+
+            MutableRecord masterAgent = agentType.createNewRecord(false);
+            masterAgent.put("name", "master agent");
+            masterAgent.put("remote", "false");
+
+            configurationTemplateManager.setParentTemplate(masterAgent, persistedGlobalTemplate.getHandle());
+            configurationTemplateManager.insertRecord("agent", masterAgent);
         }
     }
 
@@ -546,6 +588,16 @@ public class DefaultAgentManager implements AgentManager, EventListener, Stoppab
     public void setObjectFactory(ObjectFactory objectFactory)
     {
         this.objectFactory = objectFactory;
+    }
+
+    public void setConfigurationTemplateManager(ConfigurationTemplateManager configurationTemplateManager)
+    {
+        this.configurationTemplateManager = configurationTemplateManager;
+    }
+
+    public void setTypeRegistry(TypeRegistry typeRegistry)
+    {
+        this.typeRegistry = typeRegistry;
     }
 
     private class Pinger implements Callable<SlaveStatus>

@@ -4,7 +4,6 @@ import com.opensymphony.util.TextUtils;
 import com.zutubi.prototype.FormDescriptor;
 import com.zutubi.prototype.FormDescriptorFactory;
 import com.zutubi.prototype.TemplateFormDecorator;
-import com.zutubi.prototype.config.ConfigurationTemplateManager;
 import com.zutubi.prototype.model.Form;
 import com.zutubi.prototype.model.HiddenFieldDescriptor;
 import com.zutubi.prototype.type.CompositeType;
@@ -41,8 +40,9 @@ public class FormDirective extends PrototypeDirective
     private String formName = "form";
     private boolean displayMode = false;
     private boolean ajax = false;
+    private String namespace;
+    
     private MasterConfigurationManager configurationManager;
-    private ConfigurationTemplateManager configurationTemplateManager;
 
     /**
      * The name of this velocity directive.
@@ -79,6 +79,18 @@ public class FormDirective extends PrototypeDirective
         this.ajax = ajax;
     }
 
+    /**
+     * The namespace defines the url namespace that this form is being rendered in.  This is used by
+     * the form generation process to determine the correct url to submit the form to.
+     *
+     * @param namespace in which this form is operating.
+     */
+    public void setNamespace(String namespace)
+    {
+        //TODO: Is there a way to extract this automatically?  It is used via PathUtils.getConfigPath
+        this.namespace = namespace;
+    }
+
     public boolean render(InternalContextAdapter contextAdapter, Writer writer, Node node) throws IOException, ResourceNotFoundException, ParseErrorException
     {
         try
@@ -95,6 +107,7 @@ public class FormDirective extends PrototypeDirective
             FormDescriptor formDescriptor = formDescriptorFactory.createDescriptor(path, ctype, formName);
             formDescriptor.setDisplayMode(displayMode);
             formDescriptor.setAjax(ajax);
+            formDescriptor.setNamespace(namespace);
 
             // These decorations should be genericised
             if(displayMode)
@@ -160,11 +173,6 @@ public class FormDirective extends PrototypeDirective
     public void setConfigurationManager(MasterConfigurationManager configurationManager)
     {
         this.configurationManager = configurationManager;
-    }
-
-    public void setConfigurationTemplateManager(ConfigurationTemplateManager configurationTemplateManager)
-    {
-        this.configurationTemplateManager = configurationTemplateManager;
     }
 }
 
