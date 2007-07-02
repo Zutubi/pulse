@@ -1,20 +1,27 @@
 package com.zutubi.pulse.api;
 
+import com.zutubi.pulse.ShutdownManager;
+import com.zutubi.pulse.Version;
+import com.zutubi.pulse.bootstrap.ComponentContext;
+import com.zutubi.pulse.events.Event;
+import com.zutubi.pulse.events.EventManager;
+import com.zutubi.pulse.events.system.SystemStartedEvent;
+
 /**
  * Implements a simple API for remote monitoring and control.
  */
 // FIXME
-public class RemoteApi //implements com.zutubi.pulse.events.EventListener
+public class RemoteApi implements com.zutubi.pulse.events.EventListener
 {
-//    private TokenManager tokenManager;
-//
-//    private ShutdownManager shutdownManager;
+    private TokenManager tokenManager;
+    private EventManager eventManager;
+    private ShutdownManager shutdownManager;
+    
 //    private BuildManager buildManager;
 //    private ProjectManager projectManager;
 //    private UserManager userManager;
 //    private AgentManager agentManager;
 //    private AuthenticationManager authenticationManager;
-//    private EventManager eventManager;
 //
 //    private ValidationManager validationManager;
 //
@@ -37,33 +44,33 @@ public class RemoteApi //implements com.zutubi.pulse.events.EventListener
 //        structDefs.put(VersionedPulseFileDetails.class, new String[]{"pulseFileName"});
 //    }
 //
-//    public RemoteApi()
-//    {
-//        // can remove this call when we sort out autowiring from the XmlRpcServlet.
-//        ComponentContext.autowire(this);
-//    }
-//
-//    public int getVersion()
-//    {
-//        Version v = Version.getVersion();
-//        return v.getBuildNumberAsInt();
-//    }
-//
-//    public String login(String username, String password) throws AuthenticationException
-//    {
-//        return tokenManager.login(username, password);
-//    }
-//
-//    public boolean logout(String token)
-//    {
-//        return tokenManager.logout(token);
-//    }
-//
-//    public String ping()
-//    {
-//        return "pong";
-//    }
-//
+    public RemoteApi()
+    {
+        // can remove this call when we sort out autowiring from the XmlRpcServlet.
+        ComponentContext.autowire(this);
+    }
+
+    public int getVersion()
+    {
+        Version v = Version.getVersion();
+        return v.getBuildNumberAsInt();
+    }
+
+    public String login(String username, String password) throws AuthenticationException
+    {
+        return tokenManager.login(username, password);
+    }
+
+    public boolean logout(String token)
+    {
+        return tokenManager.logout(token);
+    }
+
+    public String ping()
+    {
+        return "pong";
+    }
+
 //    public Vector<String> getAllUserLogins(String token) throws AuthenticationException
 //    {
 //        tokenManager.verifyAdmin(token);
@@ -628,24 +635,24 @@ public class RemoteApi //implements com.zutubi.pulse.events.EventListener
 //
 //        return true;
 //    }
-//
-//    public boolean shutdown(String token, boolean force, boolean exitJvm) throws AuthenticationException
-//    {
-//        tokenManager.verifyAdmin(token);
-//
-//        // Sigh ... this is tricky, because if we shutdown here Jetty dies
-//        // before this request is complete and the client gets an error :-|.
-//        shutdownManager.delayedShutdown(force, exitJvm);
-//        return true;
-//    }
-//
-//    public boolean stopService(String token) throws AuthenticationException
-//    {
-//        tokenManager.verifyAdmin(token);
-//        shutdownManager.delayedStop();
-//        return true;
-//    }
-//
+
+    public boolean shutdown(String token, boolean force, boolean exitJvm) throws AuthenticationException
+    {
+        tokenManager.verifyAdmin(token);
+
+        // Sigh ... this is tricky, because if we shutdown here Jetty dies
+        // before this request is complete and the client gets an error :-|.
+        shutdownManager.delayedShutdown(force, exitJvm);
+        return true;
+    }
+
+    public boolean stopService(String token) throws AuthenticationException
+    {
+        tokenManager.verifyAdmin(token);
+        shutdownManager.delayedStop();
+        return true;
+    }
+
 //    /**
 //     * Updates the specified users password.
 //     *
@@ -1222,32 +1229,17 @@ public class RemoteApi //implements com.zutubi.pulse.events.EventListener
 //
 //        return spec;
 //    }
-//
-//    /**
-//     * Required resource.
-//     *
-//     * @param tokenManager instance
-//     */
-//    public void setTokenManager(TokenManager tokenManager)
-//    {
-//        this.tokenManager = tokenManager;
-//    }
-//
-//    /**
-//     * Required resource.
-//     *
-//     * @param shutdownManager instance
-//     */
-//    public void setShutdownManager(ShutdownManager shutdownManager)
-//    {
-//        this.shutdownManager = shutdownManager;
-//    }
-//
-//    /**
-//     * Required resource.
-//     *
-//     * @param userManager instance
-//     */
+
+    public void setTokenManager(TokenManager tokenManager)
+    {
+        this.tokenManager = tokenManager;
+    }
+
+    public void setShutdownManager(ShutdownManager shutdownManager)
+    {
+        this.shutdownManager = shutdownManager;
+    }
+
 //    public void setUserManager(UserManager userManager)
 //    {
 //        this.userManager = userManager;
@@ -1282,22 +1274,22 @@ public class RemoteApi //implements com.zutubi.pulse.events.EventListener
 //    {
 //        this.authenticationManager = authenticationManager;
 //    }
-//
-//    public void setEventManager(EventManager eventManager)
-//    {
-//        this.eventManager = eventManager;
-//        eventManager.register(this);
-//    }
-//
-//    public void handleEvent(Event evt)
-//    {
-//        // Rewire on startup to get the full token manager.
-//        ComponentContext.autowire(this);
-//        eventManager.unregister(this);
-//    }
-//
-//    public Class[] getHandledEvents()
-//    {
-//        return new Class[] { SystemStartedEvent.class } ;
-//    }
+
+    public void setEventManager(EventManager eventManager)
+    {
+        this.eventManager = eventManager;
+        eventManager.register(this);
+    }
+
+    public void handleEvent(Event evt)
+    {
+        // Rewire on startup to get the full token manager.
+        ComponentContext.autowire(this);
+        eventManager.unregister(this);
+    }
+
+    public Class[] getHandledEvents()
+    {
+        return new Class[] { SystemStartedEvent.class } ;
+    }
 }
