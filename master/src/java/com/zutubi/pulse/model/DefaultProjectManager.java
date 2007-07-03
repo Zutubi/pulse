@@ -1,5 +1,6 @@
 package com.zutubi.pulse.model;
 
+import com.zutubi.prototype.config.ConfigurationInjector;
 import com.zutubi.prototype.config.ConfigurationProvider;
 import com.zutubi.prototype.config.ConfigurationTemplateManager;
 import com.zutubi.prototype.config.TypeListener;
@@ -18,8 +19,6 @@ import com.zutubi.pulse.core.model.TestCaseIndex;
 import com.zutubi.pulse.events.EventManager;
 import com.zutubi.pulse.events.build.BuildRequestEvent;
 import com.zutubi.pulse.events.build.PersonalBuildRequestEvent;
-import com.zutubi.pulse.license.LicenseException;
-import com.zutubi.pulse.license.LicenseHolder;
 import com.zutubi.pulse.license.LicenseManager;
 import com.zutubi.pulse.license.authorisation.AddProjectAuthorisation;
 import com.zutubi.pulse.model.persistence.ProjectDao;
@@ -40,7 +39,7 @@ import java.util.*;
  * 
  *
  */
-public class DefaultProjectManager implements ProjectManager
+public class DefaultProjectManager implements ProjectManager, ConfigurationInjector.ConfigurationSetter<Project>
 {
     public static final int DEFAULT_WORK_DIR_BUILDS = 10;
 
@@ -502,54 +501,6 @@ public class DefaultProjectManager implements ProjectManager
         }
     }
 
-    public void create(Project project) throws LicenseException
-    {
-        LicenseHolder.ensureAuthorization(LicenseHolder.AUTH_ADD_PROJECT);
-
-        for(Group group: userManager.getAdminAllProjectGroups())
-        {
-            project.addAdmin(group.getDefaultAuthority());
-        }
-
-        // setup the project defaults.
-
-// Fixme: this functionality is not present with the new plugin configuration system.  There is no concept of a
-//        default inclusion by an external plugin to the project.        
-//        project.addCleanupRule(new CleanupRule(true, null, DEFAULT_WORK_DIR_BUILDS, CleanupRule.CleanupUnit.BUILDS));
-
-        projectDao.save(project);
-
-        // create a simple build specification that executes the default recipe.
-/*
-        BuildSpecificationNode parent = buildSpecificationNodeDao.findById(buildSpec.getRoot().getId());
-        BuildStage stage = new BuildStage("default", new AnyCapableBuildHostRequirements(), null);
-        BuildSpecificationNode node = new BuildSpecificationNode(stage);
-        parent.addChild(node);
-        buildSpecificationNodeDao.save(parent);
-*/
-
-        // schedule the event trigger - unique to this project.
-/*
-        FIXME: need to convert triggers to config system.
-        try
-        {
-            EventTrigger trigger = new EventTrigger(ScmChangeEvent.class, "scm trigger", project.getName(), ScmChangeEventFilter.class);
-            trigger.setProject(project.getId());
-            trigger.setTaskClass(BuildProjectTask.class);
-
-            scheduler.schedule(trigger);
-        }
-        catch (SchedulingException e)
-        {
-            e.printStackTrace();
-        }
-*/
-
-        projectDao.save(project);
-
-        licenseManager.refreshAuthorisations();
-    }
-
     public void setProjectDao(ProjectDao dao)
     {
         projectDao = dao;
@@ -602,6 +553,11 @@ public class DefaultProjectManager implements ProjectManager
         projectGroupDao.delete(projectGroup);
     }
 
+    public void setConfiguration(Project state)
+    {
+        state.setConfig(idToConfig.get(state.getId()));
+    }
+
     public void delete(BuildHostRequirements hostRequirements)
     {
         projectDao.delete(hostRequirements);
@@ -650,5 +606,10 @@ public class DefaultProjectManager implements ProjectManager
     public void setTypeRegistry(TypeRegistry typeRegistry)
     {
         this.typeRegistry = typeRegistry;
+    }
+
+    public void setConfigurationInjector(ConfigurationInjector configurationInjector)
+    {
+        configurationInjector.registerSetter(Project.class, this);
     }
 }

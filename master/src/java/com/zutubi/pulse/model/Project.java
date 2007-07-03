@@ -1,6 +1,7 @@
 package com.zutubi.pulse.model;
 
 import com.zutubi.pulse.core.model.Entity;
+import com.zutubi.pulse.prototype.config.project.ProjectConfiguration;
 import org.acegisecurity.acl.basic.AclObjectIdentity;
 import org.acegisecurity.acl.basic.AclObjectIdentityAware;
 
@@ -38,6 +39,7 @@ public class Project extends Entity implements AclObjectIdentity, AclObjectIdent
     private long nextBuildNumber = 1;
     private Long lastPollTime;
     private boolean forceClean = false;
+    private ProjectConfiguration config;
 
     //FIXME: move these into the configuration.  They are not state.
     private List<ProjectAclEntry> aclEntries;
@@ -216,4 +218,28 @@ public class Project extends Entity implements AclObjectIdentity, AclObjectIdent
         }
     }
 
+    public ProjectConfiguration getConfig()
+    {
+        return config;
+    }
+
+    public void setConfig(ProjectConfiguration config)
+    {
+        this.config = config;
+    }
+
+    public String getName()
+    {
+        return config.getName();
+    }
+
+    public String getUrl()
+    {
+        return config.getUrl();
+    }
+
+    public String getDescription()
+    {
+        return config.getDescription();
+    }
 }

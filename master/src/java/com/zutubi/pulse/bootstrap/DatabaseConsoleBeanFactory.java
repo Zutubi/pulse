@@ -1,7 +1,7 @@
 package com.zutubi.pulse.bootstrap;
 
-import com.zutubi.pulse.upgrade.tasks.MutableConfiguration;
 import com.zutubi.pulse.upgrade.tasks.HackyConnectionProvider;
+import com.zutubi.pulse.upgrade.tasks.MutableConfiguration;
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
@@ -93,5 +93,4 @@ public class DatabaseConsoleBeanFactory implements FactoryBean
     {
         this.mappings = mappings;
     }
-
 }

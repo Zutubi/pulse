@@ -48,7 +48,7 @@ public class BuildAborterTest extends PulseTestCase
         result.commence(10);
         result.complete();
 
-        projectManager.create(project);
+        projectManager.save(project);
         buildManager.save(result);
 
         assertTrue(result.succeeded());
@@ -62,7 +62,7 @@ public class BuildAborterTest extends PulseTestCase
         BuildResult result = new BuildResult(new TriggerBuildReason("scm trigger"), project, 1, false);
         result.commence(10);
 
-        projectManager.create(project);
+        projectManager.save(project);
         buildManager.save(result);
 
         assertTrue(result.commenced());
@@ -85,7 +85,7 @@ public class BuildAborterTest extends PulseTestCase
         assertTrue(result.succeeded());
 
         Mock mockUserManager = new Mock(UserManager.class);
-        mockUserManager.expectAndReturn("getAllUsers", C.ANY_ARGS, Arrays.asList(new User[] { user }));
+        mockUserManager.expectAndReturn("getAllUsers", C.ANY_ARGS, Arrays.asList(user));
         aborter.setUserManager((UserManager) mockUserManager.proxy());
         aborter.execute();
 
@@ -105,7 +105,7 @@ public class BuildAborterTest extends PulseTestCase
         assertFalse(result.completed());
 
         Mock mockUserManager = new Mock(UserManager.class);
-        mockUserManager.expectAndReturn("getAllUsers", C.ANY_ARGS, Arrays.asList(new User[] { user }));
+        mockUserManager.expectAndReturn("getAllUsers", C.ANY_ARGS, Arrays.asList(user));
         aborter.setUserManager((UserManager) mockUserManager.proxy());
         aborter.execute();
 

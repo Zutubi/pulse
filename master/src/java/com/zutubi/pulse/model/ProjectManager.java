@@ -2,7 +2,6 @@ package com.zutubi.pulse.model;
 
 import com.zutubi.pulse.core.PulseException;
 import com.zutubi.pulse.core.model.Revision;
-import com.zutubi.pulse.license.LicenseException;
 import com.zutubi.pulse.personal.PatchArchive;
 import com.zutubi.pulse.prototype.config.project.ProjectConfiguration;
 import org.acegisecurity.annotation.Secured;
@@ -48,9 +47,6 @@ public interface ProjectManager extends EntityManager<Project>
 
     @Secured({"ACL_PROJECT_WRITE"})
     void resumeProject(Project project);
-
-    @Secured({"ROLE_ADMINISTRATOR"})
-    void create(Project project) throws LicenseException;
 
     @Secured({"ROLE_ADMINISTRATOR"})
     void delete(Project project);

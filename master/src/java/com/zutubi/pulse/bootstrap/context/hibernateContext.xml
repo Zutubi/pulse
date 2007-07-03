@@ -24,6 +24,8 @@ This context requires:
         <property name="hibernateMappings"><ref bean="hibernateMappings"/></property>
     </bean>
 
+    <bean id="configurationInjector" class="com.zutubi.prototype.config.ConfigurationInjector" autowire="byName"/>
+
     <bean id="sessionFactory" class="org.springframework.orm.hibernate3.LocalSessionFactoryBean">
         <property name="mappingResources">
             <ref bean="hibernateMappings"/>
@@ -33,6 +35,9 @@ This context requires:
         </property>
         <property name="dataSource">
             <ref bean="dataSource"/>
+        </property>
+        <property name="entityInterceptor">
+            <ref bean="configurationInjector"/>
         </property>
     </bean>
 
