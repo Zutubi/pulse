@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?xml-stylesheet type="text/xsl" href="http://www.jayasoft.fr/org/ivyrep/ivy-doc.xsl"?>
 <ivy-module version="1.0">
-
     <info organisation="zutubi" module="pulse-server-core" status="integration">
         <ivyauthor name="zutubi" url="http://www.zutubi.com/"/>
         <description homepage="http://www.zutubi.com/">
@@ -14,7 +13,8 @@
         <conf name="release" description="Defines those packages that are included in the final release."/>
         <conf name="external" description="All of those packages that are external to Pulse."/>
         <conf name="build" description="All of the packages required during the build."/>
-        <conf name="bundles" description="Internal bundles required by Pulse."/>
+        <conf name="internal-bundles" description="Internal bundles required by Pulse."/>
+        <conf name="prepackaged-bundles" description="Prepackaged bundles required by Pulse."/>
     </configurations>
 
     <publications>
@@ -23,8 +23,13 @@
     </publications>
 
     <dependencies>
+        <!-- Project module dependencies -->
         <dependency org="zutubi" name="pulse-core" rev="latest.integration" conf="*->@"/>
 
+         <!-- Internal plugins -->
+        <dependency org="zutubi" name="com.zutubi.pulse.servercore" rev="latest.integration" conf="internal-bundles->bundle"/>
+
+        <!-- Library dependencies -->
         <dependency org="apache" name="commons-collections" rev="3.1" conf="external,build,release->default"/>
         <dependency org="apache" name="commons-cli" rev="1.0" conf="external,build,release->default"/>
         <dependency org="apache" name="commons-vfs" rev="20061011" conf="external,build,release->default"/>
@@ -41,6 +46,4 @@
         <dependency org="mockobjects" name="mockobjects-alt-jdk1.4" rev="0.09" conf="external,build->default"/>
         <dependency org="mockobjects" name="mockobjects-alt-jdk1.4-j2ee1.3" rev="0.09" conf="external,build->default"/>
     </dependencies>
-
-
 </ivy-module>

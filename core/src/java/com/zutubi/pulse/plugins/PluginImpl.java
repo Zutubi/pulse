@@ -12,9 +12,7 @@ import java.io.File;
 public class PluginImpl implements Plugin
 {
     private static final String HEADER_NAME = "Bundle-Name";
-    private static final String HEADER_VERSION = "Bundle-Version";
     private static final String HEADER_DESCRIPTION = "Bundle-Description";
-    private static final String HEADER_REQUIRE = "Require-Bundle";
     private static final String HEADER_VENDOR = "Bundle-Vendor";
 
     enum Type
@@ -195,5 +193,21 @@ public class PluginImpl implements Plugin
     public boolean canUpdate()
     {
         return isEnabled() || isDisabled();
+    }
+
+    public boolean equals(Object obj)
+    {
+        if(obj == null || !(obj instanceof PluginImpl))
+        {
+            return false;
+        }
+
+        PluginImpl other = (PluginImpl) obj;
+        return getId().equals(other.getId()) && getVersion().equals(other.getVersion());
+    }
+
+    public int hashCode()
+    {
+        return getId().hashCode() + 31 * getVersion().hashCode();
     }
 }

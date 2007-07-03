@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?xml-stylesheet type="text/xsl" href="http://www.jayasoft.fr/org/ivyrep/ivy-doc.xsl"?>
 <ivy-module version="1.0">
-
     <info organisation="zutubi" module="com.zutubi.pulse.core" status="integration">
         <ivyauthor name="Zutubi" url="http://www.zutubi.com/"/>
         <description homepage="http://www.zutubi.com/">
@@ -13,7 +12,6 @@
         <conf name="build"/>
         <conf name="source"/>
         <conf name="bundle"/>
-        <conf name="external"/>
     </configurations>
 
     <publications>
@@ -22,7 +20,6 @@
     </publications>
 
     <dependencies>
-        <dependency org="zutubi" name="pulse-core" rev="latest.integration" conf="*->@"/>
+        <dependency org="zutubi" name="pulse-core" rev="latest.integration" conf="build->@"/>
     </dependencies>
-
 </ivy-module>

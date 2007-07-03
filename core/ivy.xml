@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?xml-stylesheet type="text/xsl" href="http://www.jayasoft.fr/org/ivyrep/ivy-doc.xsl"?>
 <ivy-module version="1.0">
-
     <info organisation="zutubi" module="pulse-core" status="integration">
         <ivyauthor name="zutubi" url="http://www.zutubi.com/"/>
         <description homepage="http://www.zutubi.com/">
@@ -14,7 +13,8 @@
         <conf name="release" description="Defines those packages that are included in the final release."/>
         <conf name="external" description="All of those packages that are external to Pulse."/>
         <conf name="build" description="All of the packages required during the build."/>
-        <conf name="bundles" description="Internal bundles required by Pulse."/>
+        <conf name="internal-bundles" description="Internal bundles required by Pulse."/>
+        <conf name="prepackaged-bundles" description="Prepackaged bundles required by Pulse."/>
     </configurations>
 
     <publications>
@@ -23,9 +23,26 @@
     </publications>
 
     <dependencies>
-        <dependency org="zutubi" name="com.zutubi.validation" rev="latest.integration" conf="*->@"/>
-        <dependency org="zutubi" name="com.zutubi.config.annotations" rev="latest.integration" conf="*->@"/>
+        <!-- Project module dependencies -->
+        <dependency org="zutubi" name="com.zutubi.validation" rev="latest.integration" conf="release,external,build->@"/>
+        <dependency org="zutubi" name="com.zutubi.config.annotations" rev="latest.integration" conf="release,external,build->@"/>
 
+        <!-- Internal plugins -->
+        <dependency org="zutubi" name="com.zutubi.pulse.core" rev="latest.integration" conf="internal-bundles->bundle"/>
+        <dependency org="eclipse" name="equinox-bundles" rev="3.3M4" conf="build,internal-bundles->default"/>
+
+        <!-- Prepackaged plugins -->
+        <dependency org="zutubi" name="com.zutubi.pulse.core.commands.ant" rev="latest.integration" conf="prepackaged-bundles->bundle"/>
+        <dependency org="zutubi" name="com.zutubi.pulse.core.commands.core" rev="latest.integration" conf="prepackaged-bundles->bundle"/>
+        <dependency org="zutubi" name="com.zutubi.pulse.core.commands.make" rev="latest.integration" conf="prepackaged-bundles->bundle"/>
+        <dependency org="zutubi" name="com.zutubi.pulse.core.commands.maven" rev="latest.integration" conf="prepackaged-bundles->bundle"/>
+        <dependency org="zutubi" name="com.zutubi.pulse.core.commands.maven2" rev="latest.integration" conf="prepackaged-bundles->bundle"/>
+        <dependency org="zutubi" name="com.zutubi.pulse.core.commands.xcode" rev="latest.integration" conf="prepackaged-bundles->bundle"/>
+        <dependency org="zutubi" name="com.zutubi.pulse.core.postprocessors.cppunit" rev="latest.integration" conf="prepackaged-bundles->bundle"/>
+        <dependency org="zutubi" name="com.zutubi.pulse.core.postprocessors.ocunit" rev="latest.integration" conf="prepackaged-bundles->bundle"/>
+        <dependency org="zutubi" name="com.zutubi.pulse.core.postprocessors.unittestpp" rev="latest.integration" conf="prepackaged-bundles->bundle"/>
+
+        <!-- Library dependencies -->
         <dependency org="zutubi" name="boot" rev="1.2" conf="external,build,release->default"/>
 
         <dependency org="apache" name="ant" rev="1.6.5" conf="external,build,release->directoryscanner"/>
@@ -50,10 +67,8 @@
         <dependency org="xstream" name="xstream" rev="1.2" conf="external,build,release->default"/>
 
         <dependency org="eclipse" name="equinox" rev="3.3M4" conf="external,build,release->default"/>
-        <dependency org="eclipse" name="equinox-bundles" rev="3.3M4" conf="build,bundles->default"/>
 
         <dependency org="springframework" name="spring" rev="2.0" conf="external,build,release->spring-beans,spring-context,spring-core"/>
-
     </dependencies>
-
 </ivy-module>
+

@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?xml-stylesheet type="text/xsl" href="http://www.jayasoft.fr/org/ivyrep/ivy-doc.xsl"?>
 <ivy-module version="1.0">
-
     <info organisation="zutubi" module="pulse-master" status="integration">
         <ivyauthor name="zutubi" url="http://www.zutubi.com/"/>
         <description homepage="http://www.zutubi.com/">
@@ -15,7 +14,8 @@
         <conf name="release" description="Defines those packages that are included in the final release."/>
         <conf name="external" description="All of those packages that are external to Pulse."/>
         <conf name="build" description="All of the packages required during the build."/>
-        <conf name="bundles" description="Internal bundles required by Pulse."/>
+        <conf name="internal-bundles" description="Internal bundles required by Pulse."/>
+        <conf name="prepackaged-bundles" description="Prepackaged bundles required by Pulse."/>
     </configurations>
 
     <publications>
@@ -23,11 +23,7 @@
     </publications>
 
     <dependencies>
-
-        <dependency org="zutubi" name="pulse-server-core" rev="latest.integration" conf="release->release"/>
-        <dependency org="zutubi" name="pulse-server-core" rev="latest.integration" conf="external->external"/>
-        <dependency org="zutubi" name="pulse-server-core" rev="latest.integration" conf="build->build"/>
-        <dependency org="zutubi" name="pulse-server-core" rev="latest.integration" conf="bundles->bundles"/>
+        <dependency org="zutubi" name="pulse-server-core" rev="latest.integration" conf="*->@"/>
 
         <dependency org="acegisecurity" name="acegisecurity" rev="1.0.0" conf="external,build,release->default"/>
 
@@ -71,7 +67,5 @@
         <dependency org="jwebunit" name="jwebunit" rev="1.2" conf="external,build->default"/>
 
         <dependency org="jfree" name="jfreechart" rev="1.0.0-rc1" conf="external,build,release->default"/>
-
     </dependencies>
-
 </ivy-module>

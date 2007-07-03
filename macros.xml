@@ -1,15 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns:ivy="antlib:fr.jayasoft.ivy.ant" name="Common macros" basedir=".">
-
     <macrodef name="retrieve-dependencies">
         <attribute name="ivyfile" default="ivy.xml"/>
         <attribute name="conf" default="default"/>
         <attribute name="dest" default="lib"/>
         <sequential>
             <ivy:resolve useOrigin="true" file="@{ivyfile}" conf="@{conf}"/>
-            <!-- <ivy:deliver deliverpattern="${project.repository}/[module]/ivy-[revision].xml" replacedynamicrev="false"/> -->
             <ivy:retrieve pattern="@{dest}/[artifact]-[revision].[ext]" useOrigin="true" validate="true" conf="@{conf}"/>
         </sequential>
     </macrodef>
-
 </project>

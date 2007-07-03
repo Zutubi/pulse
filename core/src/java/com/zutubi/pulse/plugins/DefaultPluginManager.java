@@ -34,7 +34,6 @@ public class DefaultPluginManager implements PluginManager
     private static final String ATTRIBUTE_NAME = "name";
     private static final String ATTRIBUTE_FILE = "file";
     private static final String ATTRIBUTE_STATE = "state";
-    private static final String ATTRIBUTE_VERSION = "version";
 
     private PluginPaths pluginPaths;
     private BundleContext context;
@@ -187,6 +186,8 @@ public class DefaultPluginManager implements PluginManager
             // Equinox barfs).
             resolveBundles(null);
 
+            foundPlugins = sortPlugins(foundPlugins);
+
             // Start enabled plugins
             for (PluginImpl plugin : foundPlugins)
             {
@@ -205,6 +206,33 @@ public class DefaultPluginManager implements PluginManager
         }
 
         return foundPlugins;
+    }
+
+    private List<PluginImpl> sortPlugins(final List<PluginImpl> foundPlugins)
+    {
+        // A normal sort will not work as there is no ordering relationship
+        // between plugins that have no dependency relationship.
+        List<PluginImpl> sorted = new LinkedList<PluginImpl>();
+        for(PluginImpl plugin: foundPlugins)
+        {
+            // Insert it as late as we can in sorted without inserting after
+            // a transitive dependent.  If a dependent comes first, we are
+            // sure to insert before it.  If it comes after, it will end up
+            // after by virtue of being inserted as late as possible.
+            int i;
+            List<Plugin> dependents = getDependentPlugins(plugin, foundPlugins, true);
+            for(i = 0; i < sorted.size(); i++)
+            {
+                if(dependents.contains(sorted.get(i)))
+                {
+                    break;
+                }
+            }
+
+            sorted.add(i, plugin);
+        }
+
+        return sorted;
     }
 
     private void startPlugin(PluginImpl plugin)
@@ -624,39 +652,50 @@ public class DefaultPluginManager implements PluginManager
 
     public List<Plugin> getDependentPlugins(Plugin plugin)
     {
-        return getDependentPlugins((PluginImpl) plugin);
+        return getDependentPlugins((PluginImpl) plugin, plugins, false);
     }
 
-    private List<Plugin> getDependentPlugins(PluginImpl pluginImpl)
+    private List<Plugin> getDependentPlugins(PluginImpl pluginImpl, List<PluginImpl> fromPlugins, boolean transitive)
     {
         List<Plugin> result = new LinkedList<Plugin>();
+        addDependentPlugins(pluginImpl, fromPlugins, transitive, result);
+        return result;
+    }
+
+    private void addDependentPlugins(PluginImpl pluginImpl, List<PluginImpl> fromPlugins, boolean transitive, List<Plugin> result)
+    {
         BundleDescription[] required = pluginImpl.getBundleDescription().getDependents();
         if (required != null)
         {
             for (BundleDescription r : required)
             {
-                PluginImpl p = getPlugin(r.getSymbolicName());
+                PluginImpl p = findPlugin(r.getSymbolicName(), fromPlugins);
                 if (p != null)
                 {
                     result.add(p);
+                    if (transitive)
+                    {
+                        addDependentPlugins(p, fromPlugins, transitive, result);
+                    }
                 }
             }
         }
-
-        return result;
     }
 
-    public PluginImpl getPlugin(String id)
+    public PluginImpl getPlugin(final String id)
     {
-        for (PluginImpl plugin : plugins)
-        {
-            if (plugin.getId().equals(id))
-            {
-                return plugin;
-            }
-        }
+        return (PluginImpl) findPlugin(id, plugins);
+    }
 
-        return null;
+    private PluginImpl findPlugin(final String id, List<PluginImpl> plugins)
+    {
+        return CollectionUtils.find(plugins, new Predicate<PluginImpl>()
+        {
+            public boolean satisfied(PluginImpl plugin)
+            {
+                return plugin.getId().equals(id);
+            }
+        });
     }
 
     public Plugin installPlugin(URL url) throws PluginException

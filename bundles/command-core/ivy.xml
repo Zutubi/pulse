@@ -26,7 +26,7 @@
     </publications>
 
     <dependencies>
-        <dependency org="zutubi" name="pulse-core" rev="latest.integration" conf="*->@"/>
+        <dependency org="zutubi" name="pulse-core" rev="latest.integration" conf="build,external->@"/>
     </dependencies>
 
 </ivy-module>
