@@ -1,1 +1,1 @@
-<#include "/prototype/simple/hidden.ftl" />
+hiddenFields.push({name: '${parameters.name}', value: '${parameters.value?default("")}'});
