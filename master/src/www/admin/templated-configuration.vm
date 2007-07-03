@@ -101,6 +101,11 @@
             runAjaxRequest('$base/aconfig/' + path + '?wizard' + (template ? '=template' : ''));
         }
 
+        var actionPath = function(path)
+        {
+            runAjaxRequest('$base/aconfig/' + path);
+        }
+
         var deletePath = function(path)
         {
             runAjaxRequest('$base/aconfig/' + path + '?delete=confirm');

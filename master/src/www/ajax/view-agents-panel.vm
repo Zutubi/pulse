@@ -17,9 +17,11 @@
         #if($agent.enabled)
             #staticCell($agent.status.prettyString)
 #authorize("ifAllGranted=ROLE_ADMINISTRATOR")
-            #linkCell("agent.ping.$agent.config.name" "agent.ping" "$base/config/$agent.config.configurationPath?ping")
-            #linkCell("agent.disable.$agent.config.name" "agent.disable" "$base/config/$agent.config.configurationPath?disable")
-            #editCell("$base/config/$agent.config.configurationPath" "edit_$!webwork.htmlEncode($agent.config.name)")
+<!--
+            #linkCell("agent.ping.$agent.config.name" "agent.ping" "$base/admin/${agent.config.configurationPath}.action?ping")
+            #linkCell("agent.disable.$agent.config.name" "agent.disable" "$base/admin/${agent.config.configurationPath}.action?disable")
+-->            
+            #editCell("$base/admin/${agent.config.configurationPath}.action" "edit_$!webwork.htmlEncode($agent.config.name)")
 #end
         #else
             #if($action.upgrading($agent))
@@ -32,15 +34,21 @@
             #elseif($action.failedUpgrade($agent))
                 #contentCell("agent.failed.upgrade")
                 #contentCell("empty.cell")
-                #linkCell("agent.enable.$agent.config.name" "agent.enable" "$base/config/$agent.config.configurationPath?enable")
-                #editCell("$base/config/$agent.config.configurationPath" "edit_$!webwork.htmlEncode($agent.config.name)")
+<!--
+                #linkCell("agent.enable.$agent.config.name" "agent.enable" "$base/admin/${agent.config.configurationPath}.action?enable")
+                #editCell("$base/admin/${agent.config.configurationPath}.action" "edit_$!webwork.htmlEncode($agent.config.name)")
+-->
             #else
                 ## Just plain disabled
                 #contentCell("agent.disabled")
 #authorize("ifAllGranted=ROLE_ADMINISTRATOR")
                 #contentCell("empty.cell")
-                #linkCell("agent.enable.$agent.config.name" "agent.enable" "$base/config/$agent.config.configurationPath?enable")
-                #editCell("$base/config/$agent.config.configurationPath" "edit_$!webwork.htmlEncode($agent.config.name)")
+<!--
+                #linkCell("agent.enable.$agent.config.name" "agent.enable" "$base/admin/${agent.config.configurationPath}.action?enable")
+                #editCell("$base/admin/${agent.config.configurationPath}.action" "edit_$!webwork.htmlEncode($agent.config.name)")
+-->                
+                #editCell("$base/admin/${agent.config.configurationPath}.action" "edit_$!webwork.htmlEncode($agent.config.name)")
+
 #end
             #end
         #end
@@ -48,7 +56,7 @@
 #end
 #authorize("ifAllGranted=ROLE_ADMINISTRATOR")
     #licensed("require=canAddAgent")
-        #addRow("add.agent" 7 "$base/config/agent?wizard" "agent.add")
+        #addRow("add.agent" 7 "$base/admin/agents.action" "agent.add")
     #end
 #end
 </table>
