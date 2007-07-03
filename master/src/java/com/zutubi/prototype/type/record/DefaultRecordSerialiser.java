@@ -58,7 +58,7 @@ public class DefaultRecordSerialiser implements RecordSerialiser
             File file = getRecordFile(storageDir);
             try
             {
-                XMLUtils.writeDocument(file, doc, true);
+                XMLUtils.writeDocument(file, doc, false);
             }
             catch (IOException e)
             {
