@@ -15,7 +15,6 @@ public class PersonalBuildConfig implements Config
     public static final String PROPERTY_PULSE_USER = "pulse.user";
     public static final String PROPERTY_PULSE_PASSWORD = "pulse.password";
     public static final String PROPERTY_PROJECT = "project";
-    public static final String PROPERTY_SPECIFICATION = "specification";
 
     public static final String PROPERTY_CHECK_REPOSITORY = "check.repository";
     public static final String PROPERTY_CONFIRM_UPDATE = "confirm.update";
@@ -76,8 +75,6 @@ public class PersonalBuildConfig implements Config
             defaults.setProperty(PROPERTY_PULSE_USER, userName);
         }
 
-        defaults.setProperty(PROPERTY_SPECIFICATION, "");
-
         return defaults;
     }
 
@@ -104,11 +101,6 @@ public class PersonalBuildConfig implements Config
     public String getProject()
     {
         return config.getProperty(PROPERTY_PROJECT);
-    }
-
-    public String getSpecification()
-    {
-        return config.getProperty(PROPERTY_SPECIFICATION);
     }
 
     public File getBase()

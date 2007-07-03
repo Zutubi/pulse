@@ -230,16 +230,16 @@ public class Project extends Entity implements AclObjectIdentity, AclObjectIdent
 
     public String getName()
     {
-        return config.getName();
+        return config == null ? null : config.getName();
     }
 
     public String getUrl()
     {
-        return config.getUrl();
+        return config == null ? null : config.getUrl();
     }
 
     public String getDescription()
     {
-        return config.getDescription();
+        return config == null ? null : config.getDescription();
     }
 }

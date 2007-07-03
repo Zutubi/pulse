@@ -135,11 +135,6 @@ public class ViewChangesAction extends ProjectActionSupport
             {
                 addActionError("Invalid build range");
             }
-
-            if(sinceResult != null && result != null && !sinceResult.getProject().equals(result.getProject()))
-            {
-                addActionError("Builds must be of the same specification");
-            }
         }
     }
 

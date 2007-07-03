@@ -1,11 +1,6 @@
 package com.zutubi.pulse.web.project;
 
-import com.zutubi.pulse.charting.BuildResultsChart;
-import com.zutubi.pulse.charting.BuildTimesChart;
-import com.zutubi.pulse.charting.ChartUtils;
-import com.zutubi.pulse.charting.DBBuildResultsDataSource;
-import com.zutubi.pulse.charting.TestCountChart;
-import com.zutubi.pulse.charting.TimeBasedChartData;
+import com.zutubi.pulse.charting.*;
 import com.zutubi.pulse.model.Project;
 import com.zutubi.pulse.model.persistence.BuildResultDao;
 import com.zutubi.pulse.web.ActionSupport;
@@ -14,7 +9,7 @@ import java.util.Map;
 import java.util.TreeMap;
 
 /**
- * <class comment/>
+ * Action for viewing project reports (e.g. build time trend graph).
  */
 public class ViewReportsAction extends ActionSupport
 {

@@ -2,23 +2,18 @@ package com.zutubi.pulse;
 
 import com.zutubi.pulse.events.build.AbstractBuildRequestEvent;
 
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * The build queue manages multiple build requests for a single project or
  * user, ensuring (with the guidance of the FatController) that a project
  * is not building in parallel with itself, and that users only have one
- * live personal build at a time.  It also makes sure all relevant requests
- * for a build (e.g. those for different specifications) are remembered.
+ * live personal build at a time.
  */
 public class BuildQueue
 {
     /**
-     * Map from enetity to queued requests for that entity.  The first item
+     * Map from entity to queued requests for that entity.  The first item
      * in the list is the executing build for the entity.  Behind that are
      * queued requests for the entity.  The entity is either a project or a
      * user (for personal builds).
@@ -69,7 +64,7 @@ public class BuildQueue
     private void enqueueRequest(List<AbstractBuildRequestEvent> entityRequests, AbstractBuildRequestEvent event)
     {
         // Fixed revisions are always accepted, floating will be filtered out
-        // if there is already a floater for the same project + specification
+        // if there is already a floater for the same project.
         if (!event.getRevision().isFixed())
         {
             // Include the running build, it can be floating until the first

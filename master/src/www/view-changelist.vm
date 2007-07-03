@@ -35,11 +35,10 @@
     </table>
 
     <table class="content">
-       #headingRow("changelist.builds" 5)
+       #headingRow("changelist.builds" 4)
        <tr>
            #contentHeading("project" 1)
            #contentHeading("build.id" 1)
-           #contentHeading("build.spec" 1)
            #contentHeading("status" 2)
         </tr>
 #foreach($result in $buildResults)
@@ -49,11 +48,11 @@
             #set($result = $latestBuilds.get($index))
 
             #dynamicRightLinkCell($result.number "viewBuild.action?id=$result.id")
-            #contentCell($result.buildSpecification)
             #statusCell($result true)
         </tr>
 #end
-
+    </table>
+    
     <table class="content">
         #headingRow("changelist.files" 4)
         <tr>

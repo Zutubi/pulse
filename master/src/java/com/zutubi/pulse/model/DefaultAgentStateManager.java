@@ -19,7 +19,6 @@ public class DefaultAgentStateManager implements AgentStateManager
 
     private AgentStateDao agentStateDao;
     private Scheduler scheduler;
-    private ProjectManager projectManager;
 
     private static final String PING_NAME = "ping";
     private static final String PING_GROUP = "services";
@@ -64,40 +63,7 @@ public class DefaultAgentStateManager implements AgentStateManager
         AgentState agentState = agentStateDao.findById(id);
         if (agentState != null)
         {
-            // Remove all build stages that require this slave explicitly
-            // FIXME: build specifications no longer hold the stages. this needs to be updated accordingly.
-/*
-            List<BuildSpecification> buildSpecs = buildSpecificationDao.findBySlave(agentState);
-            for(BuildSpecification spec: buildSpecs)
-            {
-                removeStageReferences(spec.getRoot(), id);
-                projectManager.save(spec);
-            }
-*/
-
             agentStateDao.delete(agentState);
-        }
-    }
-
-    private void removeStageReferences(BuildSpecificationNode node, long id)
-    {
-        for(BuildSpecificationNode child: node.getChildren())
-        {
-            BuildStage stage = child.getStage();
-            if(stage != null)
-            {
-                BuildHostRequirements hostRequirements = stage.getHostRequirements();
-                if(hostRequirements instanceof SlaveBuildHostRequirements)
-                {
-                    if(((SlaveBuildHostRequirements)hostRequirements).getSlave().getId() == id)
-                    {
-                        stage.setHostRequirements(new AnyCapableBuildHostRequirements());
-                        projectManager.delete(hostRequirements);
-                    }
-                }
-            }
-
-            removeStageReferences(child, id);
         }
     }
 
@@ -119,10 +85,5 @@ public class DefaultAgentStateManager implements AgentStateManager
     public void setScheduler(Scheduler scheduler)
     {
         this.scheduler = scheduler;
-    }
-
-    public void setProjectManager(ProjectManager projectManager)
-    {
-        this.projectManager = projectManager;
     }
 }

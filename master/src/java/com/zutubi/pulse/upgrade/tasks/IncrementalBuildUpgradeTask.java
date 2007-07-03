@@ -1,6 +1,6 @@
 package com.zutubi.pulse.upgrade.tasks;
 
-import com.zutubi.pulse.model.BuildSpecification;
+import com.zutubi.pulse.servercore.config.CheckoutScheme;
 import com.zutubi.pulse.upgrade.UpgradeContext;
 import com.zutubi.pulse.util.JDBCUtils;
 
@@ -85,7 +85,7 @@ public class IncrementalBuildUpgradeTask extends DatabaseUpgradeTask
 
     private void setCheckoutScheme(Connection con, Long id, String scheme) throws SQLException
     {
-        BuildSpecification.CheckoutScheme newScheme = convertScheme(scheme);
+        CheckoutScheme newScheme = convertScheme(scheme);
 
         CallableStatement stmt = null;
         try
@@ -101,19 +101,19 @@ public class IncrementalBuildUpgradeTask extends DatabaseUpgradeTask
         }
     }
 
-    private BuildSpecification.CheckoutScheme convertScheme(String scheme)
+    private CheckoutScheme convertScheme(String scheme)
     {
         if(scheme == null)
         {
-            return BuildSpecification.CheckoutScheme.CLEAN_CHECKOUT;
+            return CheckoutScheme.CLEAN_CHECKOUT;
         }
         else if(scheme.equals("CHECKOUT_AND_UPDATE"))
         {
-            return BuildSpecification.CheckoutScheme.CLEAN_UPDATE;
+            return CheckoutScheme.CLEAN_UPDATE;
         }
         else
         {
-            return BuildSpecification.CheckoutScheme.CLEAN_CHECKOUT;
+            return CheckoutScheme.CLEAN_CHECKOUT;
         }
     }
 

@@ -1,7 +1,7 @@
 package com.zutubi.pulse.model;
 
-import com.zutubi.pulse.core.model.Entity;
 import com.zutubi.pulse.core.config.ResourceProperty;
+import com.zutubi.pulse.core.model.Entity;
 import com.zutubi.pulse.core.model.ResultState;
 import com.zutubi.pulse.prototype.config.project.ProjectConfiguration;
 import com.zutubi.util.logging.Logger;
@@ -10,8 +10,8 @@ import java.util.LinkedList;
 import java.util.List;
 
 /**
- * Post build actions are run after a build, but may be restricted to certain
- * build specifications and result states.
+ * Post build actions are run after a build, and may be restricted to certain
+ * result states.
  */
 public abstract class PostBuildAction extends Entity
 {

@@ -3,7 +3,6 @@ package com.zutubi.pulse.scheduling;
 import com.zutubi.pulse.core.model.ResultState;
 import com.zutubi.pulse.events.Event;
 import com.zutubi.pulse.events.build.BuildCompletedEvent;
-import com.zutubi.util.logging.Logger;
 
 /**
  * A filter that will only allow triggers for builds that complete in
@@ -11,10 +10,7 @@ import com.zutubi.util.logging.Logger;
  */
 public class BuildCompletedEventFilter implements EventTriggerFilter
 {
-    private static final Logger LOG = Logger.getLogger(BuildCompletedEventFilter.class);
-
     public static final String PARAM_PROJECT = "other.project";
-    public static final String PARAM_SPECIFICATION = "other.spec";
     public static final String PARAM_STATES = "build.states";
     public static final String SEPARATOR = ",";
 

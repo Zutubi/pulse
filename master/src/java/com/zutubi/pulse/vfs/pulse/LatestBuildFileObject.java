@@ -8,8 +8,8 @@ import org.apache.commons.vfs.FileSystemException;
 import org.apache.commons.vfs.provider.AbstractFileSystem;
 
 /**
- * Represents the latest build result for a scope, which may be global, a
- * single project or a single build specification.
+ * Represents the latest build result for a scope, which may be global, or a
+ * single project.
  */
 public class LatestBuildFileObject extends AbstractBuildFileObject
 {

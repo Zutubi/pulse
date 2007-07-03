@@ -1,12 +1,7 @@
 package com.zutubi.pulse.model.persistence.hibernate;
 
 import com.zutubi.pulse.core.model.*;
-import com.zutubi.pulse.model.BuildResult;
-import com.zutubi.pulse.model.BuildScmDetails;
-import com.zutubi.pulse.model.Project;
-import com.zutubi.pulse.model.RecipeResultNode;
-import com.zutubi.pulse.model.TriggerBuildReason;
-import com.zutubi.pulse.model.User;
+import com.zutubi.pulse.model.*;
 import com.zutubi.pulse.model.persistence.BuildResultDao;
 import com.zutubi.pulse.model.persistence.ChangelistDao;
 import com.zutubi.pulse.model.persistence.ProjectDao;
@@ -106,12 +101,6 @@ public class HibernateBuildResultDaoTest extends MasterPersistenceTestCase
         projectDao.save(project);
 
         // Ditto for spec
-/*
-        BuildSpecification spec = new BuildSpecification("specname");
-        BuildSpecificationNode node = new BuildSpecificationNode(new BuildStage("name", new AnyCapableBuildHostRequirements(), null));
-        spec.getRoot().addChild(node);
-        buildSpecificationDao.save(spec);
-*/
 
 
         BuildResult buildResult = new BuildResult(new TriggerBuildReason("scm trigger"), project, 11, false);

@@ -173,98 +173,8 @@
            eternal="true"
            overflowToDisk="false"/>
 
-    <cache name="com.zutubi.pulse.model.Project.buildSpecifications"
-           maxElementsInMemory="500"
-           eternal="true"
-           overflowToDisk="false"/>
-
-    <cache name="com.zutubi.pulse.model.Project.postBuildActions"
-           maxElementsInMemory="500"
-           eternal="true"
-           overflowToDisk="false"/>
-
-    <cache name="com.zutubi.pulse.model.Project.cleanupRules"
-           maxElementsInMemory="500"
-           eternal="true"
-           overflowToDisk="false"/>
-
     <cache name="com.zutubi.pulse.model.Project.aclEntries"
            maxElementsInMemory="500"
-           eternal="true"
-           overflowToDisk="false"/>
-
-    <cache name="com.zutubi.pulse.model.Scm"
-           maxElementsInMemory="500"
-           eternal="true"
-           overflowToDisk="false"/>
-
-    <cache name="com.zutubi.pulse.model.PulseFileDetails"
-           maxElementsInMemory="500"
-           eternal="true"
-           overflowToDisk="false"/>
-
-    <cache name="com.zutubi.pulse.model.TemplatePulseFileDetails.outputProcessors"
-           maxElementsInMemory="500"
-           eternal="true"
-           overflowToDisk="false"/>
-
-    <cache name="com.zutubi.pulse.model.TemplatePulseFileDetails.captures"
-           maxElementsInMemory="500"
-           eternal="true"
-           overflowToDisk="false"/>
-
-    <cache name="com.zutubi.pulse.model.AntPulseFileDetails.environment"
-           maxElementsInMemory="500"
-           eternal="true"
-           overflowToDisk="false"/>
-
-    <cache name="com.zutubi.pulse.model.ExecutablePulseFileDetails.environment"
-           maxElementsInMemory="500"
-           eternal="true"
-           overflowToDisk="false"/>
-
-    <cache name="com.zutubi.pulse.model.MakePulseFileDetails.environment"
-           maxElementsInMemory="500"
-           eternal="true"
-           overflowToDisk="false"/>
-
-    <cache name="com.zutubi.pulse.model.Capture"
-           maxElementsInMemory="2000"
-           eternal="true"
-           overflowToDisk="false"/>
-
-    <cache name="com.zutubi.pulse.model.Capture.processors"
-           maxElementsInMemory="2000"
-           eternal="true"
-           overflowToDisk="false"/>
-
-    <cache name="com.zutubi.pulse.model.PostBuildAction"
-           maxElementsInMemory="2000"
-           eternal="true"
-           overflowToDisk="false"/>
-
-    <cache name="com.zutubi.pulse.model.PostBuildAction.specifications"
-           maxElementsInMemory="2000"
-           eternal="true"
-           overflowToDisk="false"/>
-
-    <cache name="com.zutubi.pulse.model.BuildSpecificationNode"
-           maxElementsInMemory="5000"
-           eternal="true"
-           overflowToDisk="false"/>
-
-    <cache name="com.zutubi.pulse.model.BuildSpecificationNode.postActions"
-           maxElementsInMemory="5000"
-           eternal="true"
-           overflowToDisk="false"/>
-
-    <cache name="com.zutubi.pulse.model.BuildSpecificationNode.resourceRequirements"
-           maxElementsInMemory="5000"
-           eternal="true"
-           overflowToDisk="false"/>
-
-    <cache name="com.zutubi.pulse.model.BuildSpecificationNode.children"
-           maxElementsInMemory="5000"
            eternal="true"
            overflowToDisk="false"/>
 
@@ -278,23 +188,4 @@
            eternal="true"
            overflowToDisk="false"/>
 
-    <cache name="com.zutubi.pulse.core.config.ResourceProperty"
-           maxElementsInMemory="5000"
-           eternal="true"
-           overflowToDisk="false"/>
-
-    <cache name="com.zutubi.pulse.model.PersistentResource"
-           maxElementsInMemory="500"
-           eternal="true"
-           overflowToDisk="false"/>
-
-    <cache name="com.zutubi.pulse.model.PersistentResource.versions"
-           maxElementsInMemory="500"
-           eternal="true"
-           overflowToDisk="false"/>
-
-    <cache name="com.zutubi.pulse.core.config.ResourceVersion"
-           maxElementsInMemory="1000"
-           eternal="true"
-           overflowToDisk="false"/>
 </ehcache>

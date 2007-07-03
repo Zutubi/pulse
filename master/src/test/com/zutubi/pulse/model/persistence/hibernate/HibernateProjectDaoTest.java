@@ -1,15 +1,8 @@
 package com.zutubi.pulse.model.persistence.hibernate;
 
-import com.zutubi.pulse.core.model.ResultState;
-import com.zutubi.pulse.model.AntPulseFileDetails;
-import com.zutubi.pulse.model.DirectoryCapture;
-import com.zutubi.pulse.model.FileCapture;
 import com.zutubi.pulse.model.Project;
-import com.zutubi.pulse.model.RunExecutablePostBuildAction;
-import com.zutubi.pulse.model.TagPostBuildAction;
 import com.zutubi.pulse.model.persistence.ProjectDao;
 
-import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -44,36 +37,6 @@ public class HibernateProjectDaoTest extends MasterPersistenceTestCase
 
         Project otherProject = projectDao.findById(project.getId());
         assertPropertyEquals(project, otherProject);
-    }
-
-    public void testLoadSaveFileCapture()
-    {
-        AntPulseFileDetails details = new AntPulseFileDetails();
-        FileCapture capture = new FileCapture("name", "file", "type");
-        capture.addProcessor("processor");
-        details.addCapture(capture);
-
-        projectDao.save(details);
-        commitAndRefreshTransaction();
-
-        AntPulseFileDetails otherDetails = projectDao.findAntPulseFileSource(details.getId());
-        assertPropertyEquals(capture, otherDetails.getCaptures().get(0));
-    }
-
-    public void testLoadSaveDirectoryCapture()
-    {
-        AntPulseFileDetails details = new AntPulseFileDetails();
-        DirectoryCapture capture = new DirectoryCapture("name", "file", "type");
-        capture.setIncludes("include pattern");
-        capture.setIncludes("exclude pattern");
-        capture.addProcessor("processor");
-        details.addCapture(capture);
-
-        projectDao.save(details);
-        commitAndRefreshTransaction();
-
-        AntPulseFileDetails otherDetails = projectDao.findAntPulseFileSource(details.getId());
-        assertPropertyEquals(capture, otherDetails.getCaptures().get(0));
     }
 
     public void testFindByAdminAuthority()

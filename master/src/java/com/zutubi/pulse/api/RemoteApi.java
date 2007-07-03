@@ -31,17 +31,6 @@ public class RemoteApi implements com.zutubi.pulse.events.EventListener
 //
 //    {
 //        structDefs.put(Project.class, new String[]{"name", "description", "url"});
-//        structDefs.put(Cvs.class, new String[]{"root", "module", "password", "branch", "quietPeriod", "monitor", "pollingInterval"});
-//        structDefs.put(Svn.class, new String[]{"url", "username", "password", "keyfile", "passphrase", "monitor", "pollingInterval"});
-//        structDefs.put(P4.class, new String[]{"port", "user", "password", "client", "monitor", "pollingInterval"});
-//        structDefs.put(AntPulseFileDetails.class, new String[]{"buildFile", "targets", "arguments", "workingDir"});
-//        structDefs.put(ExecutablePulseFileDetails.class, new String[]{"executable", "arguments", "workingDir"});
-//        structDefs.put(MavenPulseFileDetails.class, new String[]{"targets", "workingDir", "arguments"});
-//        structDefs.put(Maven2PulseFileDetails.class, new String[]{"goals", "workingDir", "arguments"});
-//        structDefs.put(MakePulseFileDetails.class, new String[]{"makefile", "targets", "arguments", "workingDir"});
-//        structDefs.put(XCodePulseFileDetails.class, new String[]{"workingDir", "project", "config", "target", "action", "settings"});
-//        structDefs.put(CustomPulseFileDetails.class, new String[]{"pulseFile"});
-//        structDefs.put(VersionedPulseFileDetails.class, new String[]{"pulseFileName"});
 //    }
 //
     public RemoteApi()
@@ -1105,75 +1094,6 @@ public class RemoteApi implements com.zutubi.pulse.events.EventListener
 //        }
 //    }
 //
-//    private PulseFileDetails createFileDetails(Hashtable<String, Object> type) throws IllegalArgumentException
-//    {
-//        //TODO: This goes into the project type manager.
-//        String projectType = (String) type.remove("type");
-//
-//        PulseFileDetails details;
-//        if ("ant".equals(projectType))
-//        {
-//            details = new AntPulseFileDetails();
-//        }
-//        else if ("executable".equals(projectType))
-//        {
-//            details = new ExecutablePulseFileDetails();
-//        }
-//        else if ("maven".equals(projectType))
-//        {
-//            details = new MavenPulseFileDetails();
-//        }
-//        else if ("maven2".equals(projectType))
-//        {
-//            details = new Maven2PulseFileDetails();
-//        }
-//        else if ("xcode".equals(projectType))
-//        {
-//            details = new XCodePulseFileDetails();
-//        }
-//        else if ("custom".equals(projectType))
-//        {
-//            details = new CustomPulseFileDetails();
-//        }
-//        else if ("versioned".equals(projectType))
-//        {
-//            details = new VersionedPulseFileDetails();
-//        }
-//        else
-//        {
-//            throw new IllegalArgumentException("Unknown project type: " + type);
-//        }
-//        setProperties(type, details);
-//        return details;
-//    }
-//
-//    private Scm createScm(Hashtable<String, Object> details) throws IllegalArgumentException
-//    {
-//        //TODO: This goes into the ScmManager.
-//        String type = (String) details.remove("type");
-//
-//        Scm scm;
-//        if ("cvs".equals(type))
-//        {
-//            scm = new Cvs();
-//        }
-//        else if ("svn".equals(type))
-//        {
-//            scm = new Svn();
-//        }
-//        else if ("perforce".equals(type))
-//        {
-//            scm = new P4();
-//        }
-//        else
-//        {
-//            throw new IllegalArgumentException("Unknown scm type: " + type);
-//        }
-//
-//        setProperties(details, scm);
-//
-//        return scm;
-//    }
 //
 //    private void setProperties(Hashtable<String, Object> scmDetails, Object object)
 //    {

@@ -13,6 +13,7 @@ import com.zutubi.pulse.servercore.config.ScmConfiguration;
 import com.zutubi.validation.annotations.Url;
 
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -50,7 +51,7 @@ public class ProjectConfiguration extends AbstractConfiguration implements Exten
     private Map<String, Object> extensions = new HashMap<String, Object>();
 
     @Transient // FIXME sort this out later.
-    private List<PostBuildActionConfiguration> postBuildActions;
+    private List<PostBuildActionConfiguration> postBuildActions = new LinkedList<PostBuildActionConfiguration>();
 
     private ChangeViewerConfiguration changeViewer;
 

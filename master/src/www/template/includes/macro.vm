@@ -875,7 +875,7 @@
             <div id="$changeId" style="display: none">
             <table class="content" style="margin: 0">
                 <tr>
-                    <th class="heading" colspan="5">
+                    <th class="heading" colspan="4">
                         <span class="action">
                             <a href="#" onclick="showHideBuildsFloat('$changeId'); return false;"><img alt="$action.getText('close')" src="$base/images/delete.gif"/>#wwtext("name=close")</a>
                         </span>
@@ -885,7 +885,6 @@
                 <tr>
                     #contentHeading("project" 1)
                     #contentHeading("build id" 1)
-                    #contentHeading("build.spec" 1)
                     #contentHeading("status" 2)
                 </tr>
             #foreach($id in $changelist.resultIds)
@@ -894,7 +893,6 @@
                     <td class="content"><a href="currentBuild.action?id=$result.project.id">$!webwork.htmlEncode($result.project.name)</a></td>
                     #assignGlobalResultCssClass($result)
                     #dynamicRightLinkCell($result.number "viewBuild.action?id=$result.id")
-                    #classCell($result.buildSpecification)
                     #statusCell($result true)
                 </tr>
             #end
@@ -2388,8 +2386,6 @@
         #dynamicRightLinkCell($buildResult.number "viewBuild.action?id=$buildResult.id")
     #elseif($key == "project")
         #projectClassCell($project)
-    #elseif($key == "spec")
-        #classCell($buildResult.buildSpecification)
     #elseif($key == "status")
         #statusCell($buildResult true)
     #elseif($key == "reason")
@@ -2472,24 +2468,21 @@
                         <tr>
                             #buildColumnCheckbox("id" $idSuffix $popupName)
                             #buildColumnCheckbox("project" $idSuffix $popupName)
-                            #buildColumnCheckbox("spec" $idSuffix $popupName)
                             #buildColumnCheckbox("status" $idSuffix $popupName)
-                        </tr>
-                        <tr>
-                            #buildColumnCheckbox("reason" $idSuffix $popupName)
-                            #buildColumnCheckbox("tests" $idSuffix $popupName)
-                            #buildColumnCheckbox("owner" $idSuffix $popupName)
                             #buildColumnCheckbox("rev" $idSuffix $popupName)
+                            #buildColumnCheckbox("reason" $idSuffix $popupName)
                         </tr>
                         <tr>
-                            #buildColumnCheckbox("version" $idSuffix $popupName)
+                            #buildColumnCheckbox("tests" $idSuffix $popupName)
                             #buildColumnCheckbox("when" $idSuffix $popupName)
                             #buildColumnCheckbox("elapsed" $idSuffix $popupName)
-                            #buildColumnCheckbox("actions" $idSuffix $popupName)
+                            #buildColumnCheckbox("owner" $idSuffix $popupName)
+                            #buildColumnCheckbox("version" $idSuffix $popupName)
                         </tr>
                         <tr>
                             #buildColumnCheckbox("warnings" $idSuffix $popupName)
                             #buildColumnCheckbox("errors" $idSuffix $popupName)
+                            #buildColumnCheckbox("actions" $idSuffix $popupName)
                         </tr>
                     </table>
 

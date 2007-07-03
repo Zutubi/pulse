@@ -32,9 +32,8 @@ public class ChangelistIsolator
         }
         else
         {
-            // We have not yet seen a request for this build specification.
-            // Find out what the last revision built of this specification
-            // was (if any).
+            // We have not yet seen a request for this project. Find out what
+            // the last revision built of this project was (if any).
             latestBuiltRevision = getLatestBuiltRevision(project);
             if (latestBuiltRevision != null)
             {

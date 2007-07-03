@@ -7,18 +7,13 @@ import com.zutubi.pulse.core.BuildException;
 import com.zutubi.pulse.core.BuildRevision;
 import com.zutubi.pulse.core.RecipeRequest;
 import com.zutubi.pulse.core.config.ResourceProperty;
-import com.zutubi.pulse.core.model.Changelist;
-import com.zutubi.pulse.core.model.Feature;
-import com.zutubi.pulse.core.model.RecipeResult;
-import com.zutubi.pulse.core.model.ResultState;
-import com.zutubi.pulse.core.model.Revision;
+import com.zutubi.pulse.core.model.*;
 import com.zutubi.pulse.events.AsynchronousDelegatingListener;
 import com.zutubi.pulse.events.Event;
 import com.zutubi.pulse.events.EventListener;
 import com.zutubi.pulse.events.EventManager;
 import com.zutubi.pulse.events.build.*;
 import com.zutubi.pulse.model.*;
-import com.zutubi.pulse.model.BuildSpecification.CheckoutScheme;
 import com.zutubi.pulse.prototype.config.project.BuildOptionsConfiguration;
 import com.zutubi.pulse.prototype.config.project.BuildStageConfiguration;
 import com.zutubi.pulse.prototype.config.project.ProjectConfiguration;
@@ -26,6 +21,7 @@ import com.zutubi.pulse.prototype.config.project.actions.PostBuildActionConfigur
 import com.zutubi.pulse.scheduling.quartz.TimeoutRecipeJob;
 import com.zutubi.pulse.scm.FileStatus;
 import com.zutubi.pulse.scm.ScmException;
+import com.zutubi.pulse.servercore.config.CheckoutScheme;
 import com.zutubi.pulse.servercore.config.ScmConfiguration;
 import com.zutubi.pulse.servercore.scm.ScmClient;
 import com.zutubi.pulse.services.ServiceTokenManager;
@@ -158,9 +154,7 @@ public class BuildController implements EventListener
             File recipeOutputDir = paths.getOutputDir(buildResult, recipeResult.getId());
             recipeResult.setAbsoluteOutputDir(configurationManager.getDataDirectory(), recipeOutputDir);
 
-            // FIXME: lookup the checkout scheme from the projectConfig.scm when available.
-            CheckoutScheme checkoutScheme = CheckoutScheme.CLEAN_CHECKOUT;
-
+            CheckoutScheme checkoutScheme = projectConfig.getScm().getCheckoutScheme();
             boolean incremental = !request.isPersonal() && checkoutScheme == CheckoutScheme.INCREMENTAL_UPDATE;
             List<ResourceProperty> recipeProperties = new LinkedList<ResourceProperty>(buildProperties);
             RecipeRequest recipeRequest = new RecipeRequest(projectConfig.getName(), recipeResult.getId(), stage.getRecipe(), incremental, getResourceRequirements(stage), recipeProperties);
@@ -250,8 +244,7 @@ public class BuildController implements EventListener
             throw new BuildException("Insufficient database space to run build.  Consider adding more cleanup rules to remove old build information");
         }
 
-        // FIXME: lookup the checkout scheme from the projectConfig.scm when available.
-        CheckoutScheme checkoutScheme = CheckoutScheme.CLEAN_CHECKOUT;
+        CheckoutScheme checkoutScheme = projectConfig.getScm().getCheckoutScheme();
 
         // check project configuration to determine which bootstrap configuration should be used.
         Bootstrapper initialBootstrapper;

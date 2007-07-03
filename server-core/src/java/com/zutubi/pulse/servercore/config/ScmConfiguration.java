@@ -1,11 +1,11 @@
 package com.zutubi.pulse.servercore.config;
 
+import com.zutubi.config.annotations.ControllingCheckbox;
 import com.zutubi.config.annotations.SymbolicName;
 import com.zutubi.config.annotations.Transient;
-import com.zutubi.config.annotations.ControllingCheckbox;
+import com.zutubi.pulse.core.config.AbstractConfiguration;
 import com.zutubi.pulse.scm.ScmException;
 import com.zutubi.pulse.servercore.scm.ScmClient;
-import com.zutubi.pulse.core.config.AbstractConfiguration;
 import com.zutubi.validation.annotations.Numeric;
 
 import java.util.List;
@@ -17,6 +17,8 @@ import java.util.List;
 public abstract class ScmConfiguration extends AbstractConfiguration
 {
     private boolean monitor;
+
+    private CheckoutScheme checkoutScheme;
     
     @ControllingCheckbox(dependentFields = {"pollingInterval"})
     private boolean customPollingInterval;
@@ -44,6 +46,16 @@ public abstract class ScmConfiguration extends AbstractConfiguration
     public void setMonitor(boolean monitor)
     {
         this.monitor = monitor;
+    }
+
+    public CheckoutScheme getCheckoutScheme()
+    {
+        return checkoutScheme;
+    }
+
+    public void setCheckoutScheme(CheckoutScheme checkoutScheme)
+    {
+        this.checkoutScheme = checkoutScheme;
     }
 
     public boolean isCustomPollingInterval()

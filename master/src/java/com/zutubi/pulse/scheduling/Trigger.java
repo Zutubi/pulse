@@ -5,11 +5,7 @@ import com.zutubi.pulse.model.NamedEntity;
 import com.zutubi.pulse.model.Project;
 
 import java.io.Serializable;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.TreeMap;
+import java.util.*;
 
 /**
  * <class-comment/>
@@ -112,15 +108,6 @@ public abstract class Trigger extends Entity implements NamedEntity
         {
             Serializable key = entry.getKey();
             Serializable value = entry.getValue();
-
-/*
-            if(taskClass == BuildProjectTask.class && key.equals(BuildProjectTask.PARAM_SPEC))
-            {
-                BuildSpecification spec = oldProject.getBuildSpecification((Long)value);
-                value = newProject.getBuildSpecification(spec.getName()).getId();
-            }
-*/
-
             copy.dataMap.put(key, value);
         }
         copy.taskClass = taskClass;

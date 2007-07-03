@@ -138,11 +138,6 @@ public class MockBuildManager implements BuildManager
         throw new RuntimeException("Method not implemented.");
     }
 
-    public List<PersistentName> getBuildSpecifications(Project project)
-    {
-        throw new RuntimeException("Method not implemented.");
-    }
-
     public List<BuildResult> getLatestCompletedBuildResults(Project project, int max)
     {
         throw new RuntimeException("Method not implemented.");
@@ -281,8 +276,6 @@ public class MockBuildManager implements BuildManager
 
     public void abortUnfinishedBuilds(User user, String message)
     {
-        BuildResult result = null;
-
         for (BuildResult r : buildResults.values())
         {
             if (user.equals(r.getOwner()) && r.inProgress())

@@ -34,8 +34,7 @@
             #wwcform("action=projectReports.action" "heading=%{getText('chart.parameters')}" "colspan=5" "width=100%" "method=post")
                 #wwhidden("name=id")
                 <tr>
-                    #wwselect("name=specId" "label=%{getText('chart.specification')}" "list=buildSpecifications" "singleRow=true" "tabindex=1")
-                    #wwselect("name=timeframe" "label=%{getText('chart.timeframe')}" "list=timeframes" "singleRow=true" "tabindex=2")
+                    #wwselect("name=timeframe" "label=%{getText('chart.timeframe')}" "list=timeframes" "singleRow=true" "tabindex=1")
                     <td>
                         #wwsubmit("name=refresh" "value=%{getText('refresh.name')}" "tabindex=$tabIndex")
                     </td>

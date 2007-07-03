@@ -1,8 +1,8 @@
 package com.zutubi.pulse.model;
 
 import com.zutubi.pulse.core.model.Entity;
-import com.zutubi.util.StringUtils;
 import com.zutubi.pulse.web.DefaultAction;
+import com.zutubi.util.StringUtils;
 
 import java.util.*;
 
@@ -498,7 +498,7 @@ public class User extends Entity
 
     public String getMyBuildsColumns()
     {
-        return getStringProperty(PROPERTY_MY_BUILDS_COLUMNS, StringUtils.join(",", BuildColumns.KEY_ID, BuildColumns.KEY_PROJECT, BuildColumns.KEY_SPECIFICATION, BuildColumns.KEY_STATUS, BuildColumns.KEY_TESTS, BuildColumns.KEY_WHEN, BuildColumns.KEY_ELAPSED, BuildColumns.KEY_ACTIONS));
+        return getStringProperty(PROPERTY_MY_BUILDS_COLUMNS, StringUtils.join(",", BuildColumns.KEY_ID, BuildColumns.KEY_PROJECT, BuildColumns.KEY_STATUS, BuildColumns.KEY_TESTS, BuildColumns.KEY_WHEN, BuildColumns.KEY_ELAPSED, BuildColumns.KEY_ACTIONS));
     }
 
     public void setMyBuildsColumns(String columns)
@@ -558,12 +558,12 @@ public class User extends Entity
 
     public static String getDefaultProjectColumns()
     {
-        return StringUtils.join(",", BuildColumns.KEY_ID, BuildColumns.KEY_SPECIFICATION, BuildColumns.KEY_STATUS, BuildColumns.KEY_REASON, BuildColumns.KEY_TESTS, BuildColumns.KEY_WHEN, BuildColumns.KEY_ELAPSED, BuildColumns.KEY_ACTIONS);
+        return StringUtils.join(",", BuildColumns.KEY_ID, BuildColumns.KEY_STATUS, BuildColumns.KEY_REASON, BuildColumns.KEY_TESTS, BuildColumns.KEY_WHEN, BuildColumns.KEY_ELAPSED, BuildColumns.KEY_ACTIONS);
     }
 
     public static String getDefaultAllProjectsColumns()
     {
-        return StringUtils.join(",", BuildColumns.KEY_ID, BuildColumns.KEY_SPECIFICATION, BuildColumns.KEY_STATUS, BuildColumns.KEY_REASON, BuildColumns.KEY_TESTS, BuildColumns.KEY_WHEN, BuildColumns.KEY_ELAPSED, BuildColumns.KEY_ACTIONS);
+        return StringUtils.join(",", BuildColumns.KEY_ID, BuildColumns.KEY_STATUS, BuildColumns.KEY_REASON, BuildColumns.KEY_TESTS, BuildColumns.KEY_WHEN, BuildColumns.KEY_ELAPSED, BuildColumns.KEY_ACTIONS);
     }
 
     public boolean equals(Object other)

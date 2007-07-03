@@ -116,11 +116,9 @@ public class ConfigCommand implements Command
     public void setupLocalConfig(PersonalBuildUI ui, PersonalBuildConfig config) throws PersonalBuildException
     {
         String pulseProject = ui.inputPrompt("Pulse project");
-        String spec = ui.inputPrompt("Build specification");
 
         ui.status("Storing project details in '" + config.getLocalConfigFile().getAbsolutePath() + "'.");
         config.setProperty(PersonalBuildConfig.PROPERTY_PROJECT, pulseProject, true);
-        config.setProperty(PersonalBuildConfig.PROPERTY_SPECIFICATION, spec, true);
     }
 
     public String getHelp()

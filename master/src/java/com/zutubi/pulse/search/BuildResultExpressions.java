@@ -29,11 +29,6 @@ public class BuildResultExpressions
         return Expression.in("project", projects);
     }
 
-    public static Criterion buildSpecEq(String buildSpec)
-    {
-        return Expression.eq("buildSpecification", buildSpec);
-    }
-
     public static Criterion statesIn(ResultState... states)
     {
         // convert to string.

@@ -9,7 +9,6 @@ import com.zutubi.prototype.config.events.PostSaveEvent;
 import com.zutubi.prototype.config.events.PreDeleteEvent;
 import com.zutubi.pulse.core.ConfigurableResourceRepository;
 import com.zutubi.pulse.core.ResourceRepository;
-import com.zutubi.pulse.core.config.Configuration;
 import com.zutubi.pulse.core.config.Resource;
 import com.zutubi.pulse.core.config.ResourceVersion;
 import com.zutubi.pulse.prototype.config.agent.AgentConfiguration;
@@ -129,7 +128,7 @@ public class DefaultResourceManager implements ResourceManager, ConfigurationEve
         else if(event instanceof PreDeleteEvent)
         {
             PreDeleteEvent pde = (PreDeleteEvent) event;
-            agentRepositories.remove(((Configuration) pde.getInstance()).getHandle());
+            agentRepositories.remove(pde.getInstance().getHandle());
         }
         else if(event instanceof PostSaveEvent)
         {

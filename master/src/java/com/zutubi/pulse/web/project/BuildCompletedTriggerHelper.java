@@ -2,15 +2,15 @@ package com.zutubi.pulse.web.project;
 
 import com.zutubi.pulse.core.model.ResultState;
 import com.zutubi.pulse.model.ProjectManager;
+import com.zutubi.pulse.prototype.config.project.ProjectConfiguration;
 import com.zutubi.pulse.scheduling.BuildCompletedEventFilter;
 import com.zutubi.pulse.scheduling.Trigger;
-import com.zutubi.pulse.prototype.config.project.ProjectConfiguration;
 
 import java.io.Serializable;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
-import java.util.Collection;
 
 /**
  */
@@ -29,7 +29,7 @@ public class BuildCompletedTriggerHelper
         }
     }
 
-    public void populateTrigger(Trigger trigger, Long filterProject, String filterSpecification, List<String> filterStateNames)
+    public void populateTrigger(Trigger trigger, Long filterProject, List<String> filterStateNames)
     {
         Map<Serializable, Serializable> dataMap = trigger.getDataMap();
         dataMap.put(BuildCompletedEventFilter.PARAM_PROJECT, filterProject);

@@ -9,7 +9,7 @@ import org.apache.commons.vfs.provider.AbstractFileSystem;
 
 /**
  * Represents the latest successful build result for a scope, which may be
- * global, a single project or a single build specification.
+ * global or a single project.
  */
 public class LatestSuccessfulBuildFileObject extends AbstractBuildFileObject
 {

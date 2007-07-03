@@ -1,12 +1,12 @@
 package com.zutubi.pulse.prototype.config.user;
 
 import com.zutubi.config.annotations.Internal;
+import com.zutubi.config.annotations.Select;
 import com.zutubi.config.annotations.SymbolicName;
 import com.zutubi.config.annotations.Transient;
-import com.zutubi.config.annotations.Select;
+import com.zutubi.pulse.core.config.AbstractConfiguration;
 import com.zutubi.pulse.model.BuildColumns;
 import com.zutubi.pulse.web.DefaultAction;
-import com.zutubi.pulse.core.config.AbstractConfiguration;
 import com.zutubi.util.StringUtils;
 
 import java.util.HashMap;
@@ -176,7 +176,7 @@ public class UserSettingsConfiguration extends AbstractConfiguration
     @Internal
     public String getMyBuildsColumns()
     {
-        return getStringProperty(PROPERTY_MY_BUILDS_COLUMNS, StringUtils.join(",", BuildColumns.KEY_ID, BuildColumns.KEY_PROJECT, BuildColumns.KEY_SPECIFICATION, BuildColumns.KEY_STATUS, BuildColumns.KEY_TESTS, BuildColumns.KEY_WHEN, BuildColumns.KEY_ELAPSED, BuildColumns.KEY_ACTIONS));
+        return getStringProperty(PROPERTY_MY_BUILDS_COLUMNS, StringUtils.join(",", BuildColumns.KEY_ID, BuildColumns.KEY_PROJECT, BuildColumns.KEY_STATUS, BuildColumns.KEY_TESTS, BuildColumns.KEY_WHEN, BuildColumns.KEY_ELAPSED, BuildColumns.KEY_ACTIONS));
     }
 
     public void setMyBuildsColumns(String columns)
@@ -242,12 +242,12 @@ public class UserSettingsConfiguration extends AbstractConfiguration
     @Internal
     public static String getDefaultProjectColumns()
     {
-        return StringUtils.join(",", BuildColumns.KEY_ID, BuildColumns.KEY_SPECIFICATION, BuildColumns.KEY_STATUS, BuildColumns.KEY_REASON, BuildColumns.KEY_TESTS, BuildColumns.KEY_WHEN, BuildColumns.KEY_ELAPSED, BuildColumns.KEY_ACTIONS);
+        return StringUtils.join(",", BuildColumns.KEY_ID, BuildColumns.KEY_STATUS, BuildColumns.KEY_REASON, BuildColumns.KEY_TESTS, BuildColumns.KEY_WHEN, BuildColumns.KEY_ELAPSED, BuildColumns.KEY_ACTIONS);
     }
 
     public static String getDefaultAllProjectsColumns()
     {
-        return StringUtils.join(",", BuildColumns.KEY_ID, BuildColumns.KEY_SPECIFICATION, BuildColumns.KEY_STATUS, BuildColumns.KEY_REASON, BuildColumns.KEY_TESTS, BuildColumns.KEY_WHEN, BuildColumns.KEY_ELAPSED, BuildColumns.KEY_ACTIONS);
+        return StringUtils.join(",", BuildColumns.KEY_ID, BuildColumns.KEY_STATUS, BuildColumns.KEY_REASON, BuildColumns.KEY_TESTS, BuildColumns.KEY_WHEN, BuildColumns.KEY_ELAPSED, BuildColumns.KEY_ACTIONS);
     }
 
     public Map<String, String> getProperties()

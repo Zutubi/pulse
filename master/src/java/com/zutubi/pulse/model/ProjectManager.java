@@ -91,10 +91,10 @@ public interface ProjectManager extends EntityManager<Project>
     void removeAcls(String authority);
 
     /**
-     * Triggers a build of the given specification of the given project by
-     * raising appropriate build request events.  Multiple events may be
-     * raised depending on configuration, for example if the build
-     * specification is marked for changelist isolation.
+     * Triggers a build of the given project by raising appropriate build
+     * request events.  Multiple events may be raised depending on
+     * configuration, for example if the project is marked for changelist
+     * isolation.
      *
      * @param project       the project to trigger a build of
      * @param reason        the reason the build was triggered

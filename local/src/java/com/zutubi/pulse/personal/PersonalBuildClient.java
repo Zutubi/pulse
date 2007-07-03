@@ -53,7 +53,7 @@ public class PersonalBuildClient extends PersonalBuildSupport
                 token = rpc.login(config.getPulseUser(), getPassword());
                 debug("Login successful.");
                 WorkingCopy wc = prepare(rpc, token);
-                debug("Verified: personal build for project: " + config.getProject() + ", specification: " + config.getSpecification() + ".");
+                debug("Verified: personal build for project: " + config.getProject() + ".");
                 return wc;
             }
             catch (PersonalBuildException e)
@@ -174,7 +174,7 @@ public class PersonalBuildClient extends PersonalBuildSupport
         try
         {
             debug("Checking configuration and obtaining project SCM details...");
-            ScmConfiguration scmConfiguration = rpc.preparePersonalBuild(token, config.getProject(), config.getSpecification());
+            ScmConfiguration scmConfiguration = rpc.preparePersonalBuild(token, config.getProject());
             debug("Configuration accepted.");
             String scmType = scmConfiguration.getType();
             debug("SCM type: " + scmType);
@@ -319,7 +319,6 @@ public class PersonalBuildClient extends PersonalBuildSupport
             Part[] parts = {
                     new StringPart("version", Version.getVersion().getBuildNumber()),
                     new StringPart("project", config.getProject()),
-                    new StringPart("specification", config.getSpecification()),
                     new FilePart("patch.zip", patch.getPatchFile()),
             };
             post.setRequestEntity(new MultipartRequestEntity(parts, post.getParams()));

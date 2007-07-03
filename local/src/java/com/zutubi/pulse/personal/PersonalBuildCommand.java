@@ -51,7 +51,6 @@ public class PersonalBuildCommand implements Command
         addPropertyOption(options, 'u', "user", PersonalBuildConfig.PROPERTY_PULSE_USER);
         addPropertyOption(options, 'p', "password", PersonalBuildConfig.PROPERTY_PULSE_PASSWORD);
         addPropertyOption(options, 'r', "project", PersonalBuildConfig.PROPERTY_PROJECT);
-        addPropertyOption(options, 'b', "specification", PersonalBuildConfig.PROPERTY_SPECIFICATION);
 
         CommandLineParser parser = new PosixParser();
 
@@ -195,25 +194,24 @@ public class PersonalBuildCommand implements Command
                "file and sending the patch to the pulse server to execute a build.\n\n" +
                "Configuration is defined via properties files or command line arguments.  The\n" +
                "configuration specifies connection details for the pulse server, along with\n" +
-               "information about the project and build specification you wish to execute.\n" +
-               "The SCM configuration of the project must match the working copy.";
+               "information about the project you wish to execute.  The SCM configuration of\n" +
+               "the project must match the working copy.";
     }
 
     public List<String> getUsages()
     {
-        return Arrays.asList(new String[] { "", "<file> ...", ":<changelist>" });
+        return Arrays.asList("", "<file> ...", ":<changelist>");
     }
 
     public List<String> getAliases()
     {
-        return Arrays.asList(new String[] { "pe", "per", "pers" });
+        return Arrays.asList("pe", "per", "pers");
     }
 
     public Map<String, String> getOptions()
     {
         Map<String, String> options = new LinkedHashMap<String, String>();
         options.put("-r [--project] project", "set project to build");
-        options.put("-b [--specification] spec", "set build specification to build");
         options.put("-s [--server] url", "set pulse server url");
         options.put("-u [--user] name", "set pulse user name");
         options.put("-p [--password] password", "set pulse password");

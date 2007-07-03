@@ -14,7 +14,6 @@ This context exports:
         <property name="list">
             <list>
                 <value>com/zutubi/pulse/model/persistence/hibernate/BuildResult.hbm.xml</value>
-                <value>com/zutubi/pulse/model/persistence/hibernate/BuildSpecification.hbm.xml</value>
                 <value>com/zutubi/pulse/model/persistence/hibernate/Changelist.hbm.xml</value>
                 <value>com/zutubi/pulse/model/persistence/hibernate/CommandResult.hbm.xml</value>
                 <value>com/zutubi/pulse/model/persistence/hibernate/CommitMessageTransformer.hbm.xml</value>

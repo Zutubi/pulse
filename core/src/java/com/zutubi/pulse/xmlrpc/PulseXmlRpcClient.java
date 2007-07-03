@@ -56,14 +56,9 @@ public class PulseXmlRpcClient
         }
     }
 
-    public ScmConfiguration preparePersonalBuild(String token, String projectName, String buildSpecification)
+    public ScmConfiguration preparePersonalBuild(String token, String projectName)
     {
-        if(buildSpecification == null)
-        {
-            buildSpecification = "";
-        }
-
-        Hashtable<String, String> result = (Hashtable<String, String>) execute("RemoteApi.preparePersonalBuild", token, projectName, buildSpecification);
+        Hashtable<String, String> result = (Hashtable<String, String>) execute("RemoteApi.preparePersonalBuild", token, projectName);
 
         ScmConfiguration config = new ScmConfiguration(result.get(ScmConfiguration.PROPERTY_TYPE));
         for(Map.Entry<String, String> entry: result.entrySet())
