@@ -157,7 +157,7 @@ Ext.extend(ZUTUBI.ConfigTree, Ext.tree.TreePanel, {
 
         if(response.renamedPaths)
         {
-            each(response.renamedPaths, function(rename) { tree.renameNode(rename.oldPath, rename.newName); });
+            each(response.renamedPaths, function(rename) { tree.renameNode(rename.oldPath, rename.newName, rename.newDisplayName); });
         }
 
         if(response.removedPaths)
@@ -187,7 +187,7 @@ Ext.extend(ZUTUBI.ConfigTree, Ext.tree.TreePanel, {
         }
     },
 
-    renameNode: function(oldPath, newName)
+    renameNode: function(oldPath, newName, newDisplayName)
     {
         if(oldPath)
         {
@@ -195,7 +195,7 @@ Ext.extend(ZUTUBI.ConfigTree, Ext.tree.TreePanel, {
             if(node)
             {
                 this.setNodeId(node, newName);
-                node.setText(newName);
+                node.setText(newDisplayName);
             }
         }
     },
@@ -245,7 +245,7 @@ Ext.extend(ZUTUBI.TemplateTree, ZUTUBI.ConfigTree, {
 
         if (response.renamedPaths)
         {
-            each(response.renamedPaths, function(rename) { tree.renameNode(tree.translatePath(rename.oldPath), rename.newName); });
+            each(response.renamedPaths, function(rename) { tree.renameNode(tree.translatePath(rename.oldPath), rename.newName, rename.newDisplayName); });
         }
 
         if (response.removedPaths)

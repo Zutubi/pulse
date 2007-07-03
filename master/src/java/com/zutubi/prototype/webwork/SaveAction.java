@@ -63,11 +63,13 @@ public class SaveAction extends PrototypeSupport
             return INPUT;
         }
 
+        String displayName = PrototypeUtils.getDisplayName(path, configurationTemplateManager);
         String newPath = configurationTemplateManager.saveRecord(path, (MutableRecord) record);
+        String newDisplayName = PrototypeUtils.getDisplayName(newPath, configurationTemplateManager);
         response = new ConfigurationResponse(newPath, configurationTemplateManager.getTemplatePath(newPath));
-        if(!newPath.equals(path))
+        if(!newPath.equals(path) || !newDisplayName.equals(displayName))
         {
-            response.addRenamedPath(new ConfigurationResponse.Rename(path, newPath));
+            response.addRenamedPath(new ConfigurationResponse.Rename(path, newPath, newDisplayName));
         }
 
         path = newPath;

@@ -37,7 +37,7 @@ public class TemplateScopeFileObject extends AbstractPulseFileObject
     protected String[] doListChildren() throws Exception
     {
         TemplateHierarchy hierarchy = getTemplateHierarchy();
-        if(hierarchy != null)
+        if(hierarchy != null && hierarchy.getRoot() != null)
         {
             return new String[] { hierarchy.getRoot().getId() };
         }

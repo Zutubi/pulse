@@ -168,11 +168,13 @@ public class ConfigurationResponse
     {
         private String oldPath;
         private String newName;
+        private String newDisplayName;
 
-        public Rename(String oldPath, String newPath)
+        public Rename(String oldPath, String newPath, String newDisplayName)
         {
             this.oldPath = oldPath;
             this.newName = PathUtils.getBaseName(newPath);
+            this.newDisplayName = newDisplayName;
         }
 
         public String getOldPath()
@@ -183,6 +185,11 @@ public class ConfigurationResponse
         public String getNewName()
         {
             return newName;
+        }
+
+        public String getNewDisplayName()
+        {
+            return newDisplayName;
         }
     }
 }
