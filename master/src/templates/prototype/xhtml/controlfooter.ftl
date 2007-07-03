@@ -24,7 +24,8 @@ form.items.last().on('render', function(field)
 <#assign helpkey>${parameters.name}.help</#assign>
 <#assign helpmsg>${helpkey?i18n}</#assign>
 <#if helpmsg?exists && helpkey != helpmsg>
-    Ext.DomHelper.append(field.getEl().dom.parentNode, { tag: 'span', class: 'inline-help', html: '${helpmsg}', id:field.getId() + '-inline-help'});
+    var xFormElement = field.getEl().findParent('.x-form-element')
+    Ext.DomHelper.append(xFormElement, { tag: 'span', class: 'inline-help', html: '${helpmsg}', id:field.getId() + '-inline-help'});
 </#if>
 });
 
