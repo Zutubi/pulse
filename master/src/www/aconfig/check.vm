@@ -1,12 +1,12 @@
-    #if ($config.configurationCheckAvailable)
-    <div class="frame">
-        <h3 class="header">#i18n("key=test.heading")</h3>
-        <p class="description">
-            #i18n("key=test.description")
-        </p>
-        <p>
-            #checkform("path=$config.path" "mainFormName=mainform" "checkFormName=checkform")
-        </p>
+#if ($config.configurationCheckAvailable)
+<div class="frame">
+    <h3 class="header">#i18n("key=test.heading")</h3>
+    <p class="description">
+        #i18n("key=test.description")
+    </p>
+    <div class="form-container">
+        #checkform("path=$config.path" "mainFormName=mainform" "checkFormName=checkform")
+    </div>
 
     <script type="text/javascript">
         checkform.on('actioncomplete', function(form, action)
@@ -22,5 +22,5 @@
             }
         });
     </script>
-    </div>
-    #end
+</div>
+#end

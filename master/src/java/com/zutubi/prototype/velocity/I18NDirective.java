@@ -20,20 +20,11 @@ import java.util.Map;
  * that provides the class context needed to retrieve the correct i18n bundle.
  *
  */
-public class I18NDirective extends PrototypeDirective
+public class I18NDirective extends AbstractI18NDirective
 {
     private static final Logger LOG = Logger.getLogger(I18NDirective.class);
 
-    /**
-     * The I18N message key.  This field is required.
-     */
-    private String key;
-
-    /**
-     * When specified, use the property of the base context type as the
-     * i18n bundle context instead. This field is optional.
-     */
-    private String property;
+    private static final boolean DEBUG_MODE = false;
 
     public I18NDirective()
     {
@@ -57,26 +48,6 @@ public class I18NDirective extends PrototypeDirective
         return LINE;
     }
 
-    /**
-     * Setter for the <code>key</code> property.
-     *
-     * @param key
-     */
-    public void setKey(String key)
-    {
-        this.key = key;
-    }
-
-    /**
-     * Setter for the <code>property</code> property.
-     *
-     * @param property
-     */
-    public void setProperty(String property)
-    {
-        this.property = property;
-    }
-
     public boolean render(InternalContextAdapter context, Writer writer, Node node) throws IOException, ResourceNotFoundException, ParseErrorException
     {
         // validation: key field is required.
@@ -88,12 +59,10 @@ public class I18NDirective extends PrototypeDirective
 
             Messages messages = getMessages();
 
-            String value = messages.format(this.key);
-            if (!TextUtils.stringSet(value))
+            String value = DEBUG_MODE ? "unresolved: " + key : "";
+            if (messages.isKeyDefined(this.key))
             {
-                // only print unresolved when in debug mode..., would be nice to also know where the
-                // messages are coming from, the context.
-                value = "unresolved: " + key;
+                value = messages.format(this.key);
             }
 
             writer.write(value);
@@ -108,23 +77,4 @@ public class I18NDirective extends PrototypeDirective
         }
     }
 
-    private Messages getMessages()
-    {
-        Type type = lookupType();
-        if (type == null)
-        {
-            return lookupMessages();
-        }
-
-        type = type.getTargetType();
-
-        CompositeType ctype = (CompositeType) type;
-        if (ctype.hasProperty(property))
-        {
-            type = ctype.getProperty(property).getType();
-            type = type.getTargetType();
-        }
-
-        return Messages.getInstance(type.getClazz());
-    }
 }

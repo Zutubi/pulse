@@ -1,89 +1,161 @@
+<style type="text/css">
+
+    .panel{
+        border-bottom-style:dotted;
+        border-right-style:dotted;
+        border-left-style:dotted;
+        border-bottom-color:gray;
+        border-left-color:gray;
+        border-right-color:gray;
+        border-bottom-width:1px;
+        border-right-width:1px;
+        border-left-width:1px;
+        margin-bottom:3em;
+    }
+
+    .header {
+        padding:10px;
+        background-color:#e8e8f3;
+        border-top-width:1px;
+        border-top-style:dotted;
+        border-top-color:gray;
+    }
+    
+    .description {
+        background-color:#e8e8f3;
+        padding:10px;
+        margin:0;
+    }
+
+    .config-state-table
+    {
+        width:100%
+    }
+    .config-state-table th {
+        font-weight:bold;
+        font-size:large;
+        background-color:#e8e8f3;
+        border-top-width:1px;
+        border-top-style:dotted;
+        border-top-color:gray;
+    }
+    .config-state-table .odd {
+        background-color:#ffffff
+    }
+    .config-state-table .even {
+        background-color:#e8e8f3
+    }
+    .config-state-table .first {
+        padding-top:4px;
+    }
+    .config-state-table .last {
+        padding-bottom:4px;
+    }
+    .config-state-table .label {
+        padding-top:3px;
+        padding-right:3px;
+        padding-bottom:3px;
+        padding-left:5px;
+    }
+    .config-state-table .value {
+        font-weight:normal;
+        padding-top:3px;
+        padding-right:5px;
+        padding-bottom:3px;
+        padding-left:0px;
+    }
+
+    .form-container{
+        padding:10px;
+        padding-right:50px
+    }
+
+    #left-column {
+
+    }
+
+    #right-column {
+        padding-left:50px;
+        width:300px;
+        vertical-align:top;
+    }
+</style>
+
+#macro(renderform)
+    <div class="panel">
+        <h3 class="header">#i18n("key=form.heading")</h3>
+        <p class="description">
+            #i18n("key=form.description")
+        </p>
+        ##<!-- add some space around the form so that it does not sit directly on the border. -->
+        <div class="form-container">
+            #pform("path=$config.path" "formName=mainform" "displayMode=true" "ajax=true" "namespace=aconfig")
+        </div>
+        <script type="text/javascript">
+            mainform.on('actioncomplete', function(form, action)
+            {
+                handleConfigurationResponse(action.result);
+            });
+        </script>
+        #parse("/aconfig/check.vm")
+    </div>
+#end
+
+#macro(renderstate)
+    <div class="panel">
+        #i18nexists("key=state.heading")<h3 class="header">#i18n("key=state.heading")</h3>#end
+        #i18nexists("key=state.description")<p class="description">#i18n("key=state.description")</p>#end
+        <table class="config-state-table">
+            #i18nexists("key=state.table.heading")<th colspan="2">#i18n("key=state.table.heading")</th>#end
+            #set($odd = true)
+            #foreach($field in $config.displayFields)
+            <tr>
+                #if($odd) #set($bgcolor="odd") #else #set($bgcolor="even") #end
+                <td class="label" width="20%">#i18n("key=${field}.label"): </td>
+                <td class="value $bgcolor">$config.format($field)</td>
+            </tr>
+                #if($odd) #set($odd = false) #else #set($odd = true) #end
+            #end
+        </table>
+    </div>
+#end
+
 #set($config = $action.configuration)
 <h2>#i18n("key=label")</h2>
 <p class="introduction">
     #i18n("key=introduction")
 </p>
-
 <table>
     <tr>
-        <td class="column">
-
+        <td id="left-column">
             #if ($config.displayFields.size() > 0)
-            <div class="frame">
-                <h3 class="header">#i18n("key=state.heading")</h3>
-                <p class="description">
-                    #i18n("key=state.description")
-                </p>
-                <table width="100%">
-                    #set($odd = true)
-                    #foreach($field in $config.displayFields)
-                    <tr>
-                        #if($odd) #set($bgcolor="#e8e8f3") #else #set($bgcolor="#ffffff") #end
-                        <td bgcolor="$bgcolor" width="20%"><b>#i18n("key=${field}.label")</b>: </td>
-                        <td bgcolor="$bgcolor">$config.format($field)</td>
-                    </tr>
-                        #if($odd) #set($odd = false) #else #set($odd = true) #end
-                    #end
-                </table>
-            </div>
+                #renderstate()
             #end
-
-                #if( $config.record )
-                    #if( $config.simpleProperties.size() > 0)
-                    <div class="frame">
-                        <h3 class="header">#i18n("key=form.heading")</h3>
-                        <p class="description">
-                            #i18n("key=form.description")
-                        </p>
-                        <!-- this configuration definition contains fields to be configured. -->
-                        <p>
-                            #pform("path=$config.path" "formName=mainform" "displayMode=true" "ajax=true" "namespace=aconfig")
-                        </p>
-                        <script type="text/javascript">
-                            mainform.on('actioncomplete', function(form, action)
-                            {
-                                handleConfigurationResponse(action.result);
-                            });
-                        </script>
-                        #parse("/aconfig/check.vm")
-                    </div>
-                    #end
+            #if( $config.record )
+                #if( $config.simpleProperties.size() > 0)
+                    #renderform()
+                #end
+            #else
+                #if( $config.extensions.size() > 0)
+                <div class="panel">
+                    <h3 class="header">#i18n("key=form.heading")</h3>
+                    <p class="description">
+                        #i18n("key=form.description")
+                    </p>
+                    <p>To create the #i18n("key=label") please use the <a href="$base/admin/${config.path}?wizard">wizard</a>.</p>
+                </div>
                 #else
-                    #if( $config.extensions.size() > 0)
-                    <div class="frame">
-                        <h3 class="header">#i18n("key=form.heading")</h3>
-                        <p class="description">
-                            #i18n("key=form.description")
-                        </p>
-                        <p>To create the #i18n("key=label") please use the <a href="$base/admin/${config.path}?wizard">wizard</a>.</p>
-                    </div>
-                    #else
-                        #if( $config.simpleProperties.size() > 0)
-                        <div class="frame">
-                            <h3 class="header">#i18n("key=form.heading")</h3>
-                            <p class="description">
-                                #i18n("key=form.description")
-                            </p>
-                            <!-- this configuration definition contains fields to be configured. -->
-                            <p>
-                                #pform("path=$config.path" "formName=mainform"  "displayMode=true" "ajax=true" "namespace=aconfig")
-                            </p>
-                            <script type="text/javascript">
-                                mainform.on('actioncomplete', function(form, action)
-                                {
-                                    handleConfigurationResponse(action.result);
-                                });
-                            </script>
-                            #parse("/aconfig/check.vm")
-                        </div>
-                        #end
+                    #if( $config.simpleProperties.size() > 0)
+                        #renderform()
                     #end
                 #end
+            #end
         </td>
-        <td class="column" style="width:300px">
+        
+        <td id="right-column">
             #if ($config.actions.size() > 0)
-            <div class="frame">
-            <h3 class="header">actions</h3>
+            <div>
+            <h3>actions</h3>
             <p>
             <ul>
                 #foreach($action in $config.actions)
@@ -95,8 +167,8 @@
             #end
 
             #if( $config.nestedProperties.size() > 0)
-            <div class="frame">
-            <h3 class="header">links</h3>
+            <div>
+            <h3>links</h3>
             <p>
             <ul>
                 #foreach($prop in $config.nestedProperties)

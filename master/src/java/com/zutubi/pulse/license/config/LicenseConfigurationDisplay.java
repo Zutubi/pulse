@@ -2,6 +2,9 @@ package com.zutubi.pulse.license.config;
 
 import com.zutubi.pulse.license.LicenseHolder;
 import com.zutubi.pulse.license.License;
+import com.zutubi.i18n.Messages;
+
+import java.util.Date;
 
 /**
  *
@@ -21,7 +24,15 @@ public class LicenseConfigurationDisplay
 
     public String getExpiry()
     {
-        return LicenseHolder.getLicense().getExpiryDate().toString();
+        Date expiryDate = LicenseHolder.getLicense().getExpiryDate();
+        if (expiryDate != null)
+        {
+            //TODO: formatting of this date should be configurable for I18N purposes.
+            return expiryDate.toString();
+        }
+        
+        Messages messages = Messages.getInstance(LicenseConfiguration.class);
+        return messages.format("no.expiry");
     }
 
     public String getStatus()
