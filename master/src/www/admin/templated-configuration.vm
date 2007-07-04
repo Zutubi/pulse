@@ -257,8 +257,6 @@
     <div id="config-tree" class="ylayout-inactive-content">
     </div>
 
-    <div id="detail-pane">
-        This is where the actual content ends up!
-    </div>
+    <div id="detail-pane" style="padding: 4px; min-height: 100%"></div>
 </body>
 </html>

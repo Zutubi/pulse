@@ -3,12 +3,13 @@ package com.zutubi.pulse.prototype.config.misc;
 import com.zutubi.config.annotations.Form;
 import com.zutubi.config.annotations.Password;
 import com.zutubi.config.annotations.SymbolicName;
+import com.zutubi.pulse.core.config.AbstractConfiguration;
 
 /**
  */
 @Form(fieldOrder = { "login", "password" })
 @SymbolicName("zutubi.transient.login")
-public class LoginConfiguration
+public class LoginConfiguration extends AbstractConfiguration
 {
     private String login;
     @Password

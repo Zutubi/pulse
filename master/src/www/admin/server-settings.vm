@@ -24,7 +24,6 @@
                 {
                     Ext.get('detail-pane').update(result.newPanel, true);
                 }
-
                 tree.handleResponse(result);
                 tree.redirectToNewPath(result);
             }
@@ -81,7 +80,7 @@
                     centerRegion = nestedLayout.getRegion('center');
                     var centerPanel = centerRegion.getPanel(0);
                     centerPanel.setTitle('');
-                    centerPanel.getEl().setStyle('margin', '0');
+                    centerPanel.getEl().setStyle('margin', '4px');
 
                     nestedLayout.addRegion('north', {
                         split: false,
@@ -138,6 +137,8 @@
 </head>
 <body>
     #adminTabs("settings")
+
+    #parse("/template/includes/actionerrors.vm")
 
     <div id="innernorth" style="padding: 0px;">
     </div>
