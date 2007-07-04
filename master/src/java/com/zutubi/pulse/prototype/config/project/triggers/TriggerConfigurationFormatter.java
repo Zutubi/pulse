@@ -21,6 +21,11 @@ public class TriggerConfigurationFormatter
         return "N/A";
     }
 
+    public String getType(TriggerConfiguration config)
+    {
+        return config.getType();
+    }
+
     public void setScheduler(Scheduler scheduler)
     {
         this.scheduler = scheduler;

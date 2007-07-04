@@ -90,6 +90,11 @@ public class BuildCompletedTriggerConfiguration extends TriggerConfiguration
         }
     }
 
+    public String getType()
+    {
+        return "build completed";
+    }
+
     public void setConfigurationProvider(ConfigurationProvider configurationProvider)
     {
         this.configurationProvider = configurationProvider;

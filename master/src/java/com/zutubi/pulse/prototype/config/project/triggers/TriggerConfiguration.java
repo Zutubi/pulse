@@ -9,7 +9,7 @@ import com.zutubi.config.annotations.SymbolicName;
 /**
  * 
  */
-@Table(columns = {"name", "state"})
+@Table(columns = {"name", "type", "state"})
 @SymbolicName("zutubi.triggerConfig")
 public abstract class TriggerConfiguration extends AbstractNamedConfiguration
 {
@@ -29,4 +29,6 @@ public abstract class TriggerConfiguration extends AbstractNamedConfiguration
     public abstract Trigger newTrigger();
 
     public abstract void update(Trigger trigger);
+
+    public abstract String getType();
 }

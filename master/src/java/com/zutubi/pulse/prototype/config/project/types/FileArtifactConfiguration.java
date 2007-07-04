@@ -43,4 +43,9 @@ public class FileArtifactConfiguration extends ArtifactConfiguration
     {
         this.mimeType = mimeType;
     }
+
+    public String toString()
+    {
+        return file;
+    }
 }

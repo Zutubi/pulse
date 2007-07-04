@@ -71,4 +71,9 @@ public class DirectoryArtifactConfiguration extends ArtifactConfiguration
     {
         this.mimeType = mimeType;
     }
+
+    public String toString()
+    {
+        return base;
+    }
 }

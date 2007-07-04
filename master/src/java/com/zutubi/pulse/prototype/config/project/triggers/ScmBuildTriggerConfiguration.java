@@ -31,6 +31,11 @@ public class ScmBuildTriggerConfiguration extends TriggerConfiguration
         // no details to be updated.
     }
 
+    public String getType()
+    {
+        return "scm";
+    }
+
     public void setConfigurationProvider(ConfigurationProvider configurationProvider)
     {
         this.configurationProvider = configurationProvider;

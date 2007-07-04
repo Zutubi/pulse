@@ -1,4 +1,4 @@
-<table>
+<table width="60%">
 <#assign tablewidth = table.columns?size + 1/>
     <tr>
         <th class="heading" colspan="${tablewidth}">${"table.header.label"?i18n}</th>
@@ -17,7 +17,7 @@
     <#assign value = column.getValue(item)/>
         <td class="content">${value?string}</td>
 </#list>
-        <td class="content">
+        <td class="content" width="5%">
 <#list table.getActions(item) as action>
     <#assign actionlabel>${action}.label</#assign>
 <#if action == "edit">

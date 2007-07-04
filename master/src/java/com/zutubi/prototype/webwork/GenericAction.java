@@ -49,6 +49,8 @@ public class GenericAction extends PrototypeSupport
 
         doRender();
 
+        // FIXME: want to trigger a reload of the same page, not necessarily always a reload of the configs path, since
+        // the action may be triggered from multiple locations.
         response = new ConfigurationResponse(path, configurationTemplateManager.getTemplatePath(path));
 
         return SUCCESS;
