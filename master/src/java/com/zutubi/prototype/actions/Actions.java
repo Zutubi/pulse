@@ -116,9 +116,40 @@ public class Actions
 
         try
         {
-            Method method = actionHandlerClass.getMethod(methodName, configurationInstance.getClass());
-            Object instance = objectFactory.buildBean(actionHandlerClass);
-            method.invoke(instance, configurationInstance);
+            for (Method method : actionHandlerClass.getMethods())
+            {
+                if (!method.getName().equals(methodName))
+                {
+                    continue;
+                }
+
+                if (method.getReturnType() != Void.TYPE)
+                {
+                    continue;
+                }
+                if (method.getParameterTypes().length > 1)
+                {
+                    continue;
+                }
+
+                if (method.getParameterTypes().length == 1)
+                {
+                    Class param = method.getParameterTypes()[0];
+                    if (!param.isAssignableFrom(configurationInstance.getClass()))
+                    {
+                        continue;
+                    }
+                    Object instance = objectFactory.buildBean(actionHandlerClass);
+                    method.invoke(instance, configurationInstance);
+                    return;
+                }
+                else
+                {
+                    Object instance = objectFactory.buildBean(actionHandlerClass);
+                    method.invoke(instance);
+                    return;
+                }
+            }
         }
         catch (NoSuchMethodException e)
         {
