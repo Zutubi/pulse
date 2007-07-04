@@ -18,16 +18,13 @@
     </configurations>
 
     <publications>
-        <artifact name="server-core" type="jar" conf="release, build"/>
-        <artifact name="server-core-test" type="jar" conf="build"/>
+        <artifact name="pulse-server-core" type="jar" conf="release, build"/>
+        <artifact name="pulse-server-core-test" type="jar" conf="build"/>
     </publications>
 
     <dependencies>
         <!-- Project module dependencies -->
         <dependency org="zutubi" name="pulse-core" rev="latest.integration" conf="*->@"/>
-
-         <!-- Internal plugins -->
-        <dependency org="zutubi" name="com.zutubi.pulse.servercore" rev="latest.integration" conf="internal-bundles->bundle"/>
 
         <!-- Library dependencies -->
         <dependency org="apache" name="commons-collections" rev="3.1" conf="external,build,release->default"/>

@@ -13,13 +13,11 @@
         <conf name="release" description="Defines those packages that are included in the final release."/>
         <conf name="external" description="All of those packages that are external to Pulse."/>
         <conf name="build" description="All of the packages required during the build."/>
-        <conf name="internal-bundles" description="Internal bundles required by Pulse."/>
-        <conf name="prepackaged-bundles" description="Prepackaged bundles required by Pulse."/>
     </configurations>
 
     <publications>
-        <artifact name="core" type="jar" conf="release, build"/>
-        <artifact name="core-test" type="jar" conf="build"/>
+        <artifact name="pulse-core" type="jar" conf="release, build"/>
+        <artifact name="pulse-core-test" type="jar" conf="build"/>
     </publications>
 
     <dependencies>
@@ -27,27 +25,14 @@
         <dependency org="zutubi" name="com.zutubi.validation" rev="latest.integration" conf="release,external,build->@"/>
         <dependency org="zutubi" name="com.zutubi.config.annotations" rev="latest.integration" conf="release,external,build->@"/>
 
-        <!-- Internal plugins -->
-        <dependency org="zutubi" name="com.zutubi.pulse.core" rev="latest.integration" conf="internal-bundles->bundle"/>
-        <dependency org="eclipse" name="equinox-bundles" rev="3.3M4" conf="build,internal-bundles->default"/>
-
-        <!-- Prepackaged plugins -->
-        <dependency org="zutubi" name="com.zutubi.pulse.core.commands.ant" rev="latest.integration" conf="prepackaged-bundles->bundle"/>
-        <dependency org="zutubi" name="com.zutubi.pulse.core.commands.core" rev="latest.integration" conf="prepackaged-bundles->bundle"/>
-        <dependency org="zutubi" name="com.zutubi.pulse.core.commands.make" rev="latest.integration" conf="prepackaged-bundles->bundle"/>
-        <dependency org="zutubi" name="com.zutubi.pulse.core.commands.maven" rev="latest.integration" conf="prepackaged-bundles->bundle"/>
-        <dependency org="zutubi" name="com.zutubi.pulse.core.commands.maven2" rev="latest.integration" conf="prepackaged-bundles->bundle"/>
-        <dependency org="zutubi" name="com.zutubi.pulse.core.commands.xcode" rev="latest.integration" conf="prepackaged-bundles->bundle"/>
-        <dependency org="zutubi" name="com.zutubi.pulse.core.postprocessors.cppunit" rev="latest.integration" conf="prepackaged-bundles->bundle"/>
-        <dependency org="zutubi" name="com.zutubi.pulse.core.postprocessors.ocunit" rev="latest.integration" conf="prepackaged-bundles->bundle"/>
-        <dependency org="zutubi" name="com.zutubi.pulse.core.postprocessors.unittestpp" rev="latest.integration" conf="prepackaged-bundles->bundle"/>
-
         <!-- Library dependencies -->
         <dependency org="zutubi" name="boot" rev="1.2" conf="external,build,release->default"/>
 
         <dependency org="apache" name="ant" rev="1.6.5" conf="external,build,release->directoryscanner"/>
         <dependency org="apache" name="commons-cli" rev="1.0" conf="external,build,release->default"/>
         <dependency org="apache" name="xmlrpc" rev="2.0.1" conf="external,build,release->default"/>
+
+        <dependency org="eclipse" name="equinox-bundles" rev="3.3M4" conf="build->default"/>
 
         <dependency org="javasvn" name="javasvn" rev="1.0.6" conf="external,build,release->default"/>
 

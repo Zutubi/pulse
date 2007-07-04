@@ -19,7 +19,7 @@
     </configurations>
 
     <publications>
-        <artifact name="master" type="jar" conf="release,build"/>
+        <artifact name="pulse-master" type="jar" conf="release,build"/>
     </publications>
 
     <dependencies>

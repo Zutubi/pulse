@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet type="text/xsl" href="http://www.jayasoft.fr/org/ivyrep/ivy-doc.xsl"?>
+<ivy-module version="1.0">
+    <info organisation="zutubi" module="pulse-core-package" status="integration"/>
+
+    <configurations>
+        <conf name="release" description="Defines those packages that are included in the final release."/>
+        <conf name="equinox-bundles" description="Internal bundles required by Pulse."/>
+        <conf name="internal-bundles" extends="equinox-bundles" description="Internal bundles required by Pulse."/>
+        <conf name="prepackaged-bundles" description="Prepackaged bundles required by Pulse."/>
+        <conf name="build" extends="*" description="Modules that must be built when packaging this module."/>
+    </configurations>
+
+    <publications/>
+
+    <dependencies>
+        <!-- Project module dependencies -->
+        <dependency org="zutubi" name="pulse-core" rev="latest.integration" conf="release->@"/>
+
+        <!-- Internal plugins -->
+        <dependency org="zutubi" name="com.zutubi.pulse.core" rev="latest.integration" conf="internal-bundles->bundle"/>
+        <dependency org="eclipse" name="equinox-bundles" rev="3.3M4" conf="equinox-bundles->default"/>
+
+        <!-- Prepackaged plugins -->
+        <dependency org="zutubi" name="com.zutubi.pulse.core.commands.ant" rev="latest.integration" conf="prepackaged-bundles->bundle"/>
+        <dependency org="zutubi" name="com.zutubi.pulse.core.commands.core" rev="latest.integration" conf="prepackaged-bundles->bundle"/>
+        <dependency org="zutubi" name="com.zutubi.pulse.core.commands.make" rev="latest.integration" conf="prepackaged-bundles->bundle"/>
+        <dependency org="zutubi" name="com.zutubi.pulse.core.commands.maven" rev="latest.integration" conf="prepackaged-bundles->bundle"/>
+        <dependency org="zutubi" name="com.zutubi.pulse.core.commands.maven2" rev="latest.integration" conf="prepackaged-bundles->bundle"/>
+        <dependency org="zutubi" name="com.zutubi.pulse.core.commands.xcode" rev="latest.integration" conf="prepackaged-bundles->bundle"/>
+        <dependency org="zutubi" name="com.zutubi.pulse.core.postprocessors.cppunit" rev="latest.integration" conf="prepackaged-bundles->bundle"/>
+        <dependency org="zutubi" name="com.zutubi.pulse.core.postprocessors.ocunit" rev="latest.integration" conf="prepackaged-bundles->bundle"/>
+        <dependency org="zutubi" name="com.zutubi.pulse.core.postprocessors.unittestpp" rev="latest.integration" conf="prepackaged-bundles->bundle"/>
+    </dependencies>
+</ivy-module>
+

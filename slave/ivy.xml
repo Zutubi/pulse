@@ -17,7 +17,7 @@
     </configurations>
 
     <publications>
-        <artifact name="slave" type="jar" conf="release,build"/>
+        <artifact name="pulse-slave" type="jar" conf="release,build"/>
     </publications>
 
     <dependencies>

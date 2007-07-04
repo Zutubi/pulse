@@ -7,6 +7,13 @@ import java.util.Collections;
  */
 public class XCodeCommandLoadTest extends FileLoaderTestBase
 {
+    public void setUp() throws Exception
+    {
+        super.setUp();
+
+        loader.register("xcode", XCodeCommand.class);
+    }
+
     public void testEmpty() throws PulseException
     {
         XCodeCommand command = commandHelper("empty");

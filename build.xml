@@ -26,13 +26,26 @@
 
     <target name="clean" depends="clean.all"/>
 
-    <target name="clean.all" depends="init">
-        <for-all target="clean"/>
+    <target name="buildlist" depends="init">
+        <ivy:buildlist reference="build.path" skipbuildwithoutivy="true">
+            <fileset dir="${project.root.dir}" includes="*/build.xml"/>
+            <fileset dir="${project.root.dir}/bundles" includes="*/build.xml"/>
+        </ivy:buildlist>
+    </target>
+
+    <target name="show.all" depends="buildlist">
+        <subant inheritall="false" target="show" buildpathref="build.path"/>
+    </target>
+
+    <target name="clean.all" depends="buildlist">
+        <subant inheritall="false" target="clean" buildpathref="build.path"/>
         <delete dir="build"/>
     </target>
 
-    <target name="build.all" depends="init">
-        <for-all target="build.module"/>
+    <target name="build.all" depends="buildlist">
+        <subant inheritall="false" target="build.module" buildpathref="build.path">
+            <property name="skip.dependencies" value="true"/>
+        </subant>
 
         <!-- Generate one mega report -->
         <property name="report.dir" value="build/reports/junit"/>
@@ -40,6 +53,7 @@
         <junitreport todir="${report.dir}">
             <fileset dir=".">
                 <include name="*/${report.dir}/xml/*.xml"/>
+                <include name="bundles/*/${report.dir}/xml/*.xml"/>
             </fileset>
             <report format="frames" todir="${report.dir}/html"/>
         </junitreport>
@@ -72,35 +86,39 @@
     </target>
 
     <!--
-     Leave the following build targets separate so that we can use ants dependency mapping to ensure that
-     targets are only built once.
+        FIXME: these targets do not currently work.  Use: ant -f [module]/build.xml instead.
     -->
     
-    <target name="build.core" depends="init">
+    <target name="build.core">
         <ant inheritAll="false" dir="core" antfile="build.xml" target="build.module"/>
     </target>
 
-    <target name="build.server-core" depends="init, build.core">
+    <target name="build.server-core">
         <ant inheritAll="false" dir="server-core" antfile="build.xml" target="build.module"/>
     </target>
 
-    <target name="build.bundles" depends="init, build.core">
+    <target name="build.bundles">
         <ant inheritAll="false" dir="bundles" antfile="build.xml"/>
     </target>
 
-    <target name="build.local" depends="init, build.core">
+    <target name="build.local">
         <ant inheritAll="false" dir="local" antfile="build.xml" target="build.module"/>
     </target>
 
-    <target name="build.master" depends="init, build.core, build.server-core">
+    <target name="build.master">
         <ant inheritAll="false" dir="master" antfile="build.xml" target="build.module"/>
     </target>
 
-    <target name="build.slave" depends="init, build.core, build.server-core">
+    <target name="build.slave">
         <ant inheritAll="false" dir="slave" antfile="build.xml" target="build.module"/>
     </target>
 
-    <target name="package.local" depends="init, build.local, build.bundles">
+    <target name="package.local" depends="init">
+        <build-package-deps module="local"/>
+        <antcall target="assemble.package.local"/>
+    </target>
+
+    <target name="assemble.package.local" depends="init">
         <property name="package.name.local" value="pulse-dev-${pulse.version}"/>
         <property name="package.root.local" value="build/package/${package.name.local}"/>
         <property name="version.root.local" value="${package.root.local}/versions/${pulse.build}"/>
@@ -170,7 +188,12 @@
         </exec>
     </target>
 
-    <target name="package.slave" depends="init, build.slave, build.bundles">
+    <target name="package.slave" depends="init">
+        <build-package-deps module="slave"/>
+        <antcall target="assemble.package.slave"/>
+    </target>
+
+    <target name="assemble.package.slave" depends="init">
         <property name="package.name.slave" value="pulse-agent-${pulse.version}"/>
         <property name="package.root.slave" value="build/package/${package.name.slave}"/>
         <property name="version.root.slave" value="${package.root.slave}/versions/${pulse.build}"/>
@@ -197,8 +220,6 @@
         <chmod perm="755" dir="${package.root.slave}/bin" includes="**/*.sh" verbose="true"/>
 
         <retrieve-package-deps module="slave" dest="${version.root.slave}"/>
-        <!-- Allows slave installs to run local builds, without a dubious build-time dependency. -->  
-        <retrieve-module-and-deps module="local" dest="${version.root.master}/lib"/>        
 
         <copy todir="${package.root.slave}/logs">
             <fileset dir="etc" includes="delete-me.txt"/>
@@ -275,7 +296,11 @@
         </exec>
     </target>
 
-    <target name="package.master" depends="init, package.local, package.slave, build.master">
+    <target name="package.master" depends="init">
+        <build-package-deps module="master"/>
+        <antcall target="assemble.package.local"/>
+        <antcall target="assemble.package.slave"/>
+
         <property name="package.name.master" value="pulse-${pulse.version}"/>
         <property name="package.root.master" value="build/package/${package.name.master}"/>
         <property name="version.root.master" value="${package.root.master}/versions/${pulse.build}"/>
@@ -303,8 +328,6 @@
         <chmod perm="755" dir="${package.root.master}/bin" includes="**/*.sh" verbose="true"/>
 
         <retrieve-package-deps module="master" dest="${version.root.master}"/>
-        <!-- Allows master installs to run local builds, without a dubious build-time dependency. -->  
-        <retrieve-module-and-deps module="local" dest="${version.root.master}/lib"/>        
 
         <copy todir="${version.root.master}/system/templates">
             <fileset dir="master/src/templates" includes="**/*.vm **/*.ftl **/*.properties **/*.example"/>
@@ -505,15 +528,23 @@
         <property file="ivy.properties"/>
         <ivy:configure/>
         
-        <retrieve-module-and-deps module="master" dest="plugins/internal" conf="bundles"/>
+        <retrieve-dependencies ivyfile="package/core/ivy.xml" conf="equinox-bundles" dest="plugins/internal"/>        
     </target>
 
-    <macrodef name="retrieve-module-and-deps">
+    <macrodef name="build-package-deps">
         <attribute name="module"/>
-        <attribute name="dest"/>
-        <attribute name="conf" default="release"/>
         <sequential>
-            <ivy:retrieve inline="true" organisation="zutubi" module="pulse-@{module}" pattern="@{dest}/[artifact]-[revision].[ext]" useOrigin="true" validate="true" conf="@{conf}"/>
+            <ivy:buildlist reference="build.path.@{module}" root="pulse-@{module}-package" ivyfilepath="ivy.xml" excluderoot="true" skipbuildwithoutivy="true">
+                <fileset dir="${project.root.dir}/">
+	            <include name="*/build.xml"/>
+	            <include name="bundles/*/build.xml"/>
+	            <include name="package/*/build.xml"/>
+	        </fileset>
+            </ivy:buildlist>
+
+            <subant inheritAll="false" target="build.module" buildpathref="build.path.@{module}">
+                <property name="skip.dependencies" value="true"/>
+            </subant>
         </sequential>
     </macrodef>
 
@@ -521,9 +552,9 @@
         <attribute name="module"/>
         <attribute name="dest"/>
         <sequential>
-            <retrieve-module-and-deps module="@{module}" dest="@{dest}/lib"/>        
-            <retrieve-module-and-deps module="@{module}" conf="internal-bundles" dest="@{dest}/system/plugins/internal"/>
-            <retrieve-module-and-deps module="@{module}" conf="prepackaged-bundles" dest="@{dest}/system/plugins/prepackaged"/>        
+            <retrieve-dependencies ivyfile="package/@{module}/ivy.xml" conf="release" dest="@{dest}/lib"/>        
+            <retrieve-dependencies ivyfile="package/@{module}/ivy.xml" conf="internal-bundles" dest="@{dest}/system/plugins/internal"/>
+            <retrieve-dependencies ivyfile="package/@{module}/ivy.xml" conf="prepackaged-bundles" dest="@{dest}/system/plugins/prepackaged"/>        
 
             <copy todir="@{dest}/system/plugins/config">
                 <fileset dir="master/etc/osgi" includes="config.ini"/>
@@ -534,28 +565,4 @@
             </move>
         </sequential>
     </macrodef>
-
-    <macrodef name="for-all">
-        <attribute name="target"/>
-        <sequential>
-            <foreach target="delegate-ant-script" param="module.dir" list="${core.modules}" trim="true">
-                <param name="project.root.dir" value="${project.root.dir}"/>
-                <param name="target" value="@{target}"/>
-            </foreach>
-            <foreach target="delegate-ant-script" param="module.dir" list="${internal.bundles}" trim="true">
-                <param name="project.root.dir" value="${project.root.dir}"/>
-                <param name="target" value="@{target}"/>
-            </foreach>
-            <foreach target="delegate-ant-script" param="module.dir" list="${prepackaged.bundles}" trim="true">
-                <param name="project.root.dir" value="${project.root.dir}"/>
-                <param name="target" value="@{target}"/>
-            </foreach>
-        </sequential>
-    </macrodef>
-
-    <target name="delegate-ant-script">
-        <ant inheritAll="false" antfile="${module.dir}/build.xml" target="${target}">
-            <property name="skip.dependencies" value="true"/>
-        </ant>
-    </target>
 </project>

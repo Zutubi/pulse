@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet type="text/xsl" href="http://www.jayasoft.fr/org/ivyrep/ivy-doc.xsl"?>
+<ivy-module version="1.0">
+    <info organisation="zutubi" module="pulse-server-core-package" status="integration"/>
+
+    <configurations>
+        <conf name="release" description="Defines those packages that are included in the final release."/>
+        <conf name="internal-bundles" description="Internal bundles required by Pulse."/>
+        <conf name="prepackaged-bundles" description="Prepackaged bundles required by Pulse."/>
+        <conf name="build" extends="*" description="Modules that must be built when packaging this module."/>
+    </configurations>
+
+    <publications/>
+
+    <dependencies>
+        <!-- Packaging module dependencies -->
+        <dependency org="zutubi" name="pulse-local-package" rev="latest.integration" conf="*->@"/>
+
+        <!-- Project module dependencies -->
+        <dependency org="zutubi" name="pulse-server-core" rev="latest.integration" conf="release->@"/>
+      
+        <!-- Internal plugins -->
+        <dependency org="zutubi" name="com.zutubi.pulse.servercore" rev="latest.integration" conf="internal-bundles->bundle"/>
+    </dependencies>
+</ivy-module>
