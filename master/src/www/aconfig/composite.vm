@@ -137,13 +137,7 @@
                 #end
             #else
                 #if( $config.extensions.size() > 0)
-                <div class="panel">
-                    <h3 class="header">#i18n("key=form.heading")</h3>
-                    <p class="description">
-                        #i18n("key=form.description")
-                    </p>
-                    <p>To create the #i18n("key=label") please use the <a href="$base/admin/${config.path}?wizard">wizard</a>.</p>
-                </div>
+                    <p>To add a new #i18n("key=label"), please use the <a href="#" onclick="addToPath('${config.path}'); return false">wizard</a>.</p>
                 #else
                     #if( $config.simpleProperties.size() > 0)
                         #renderform()
@@ -154,12 +148,12 @@
         
         <td id="right-column">
             #if ($config.actions.size() > 0)
-            <div>
+            <div style="padding-bottom:15px;">
             <h3>actions</h3>
             <p>
             <ul>
                 #foreach($action in $config.actions)
-                    <li><a href="#" onclick="actionPath('${config.path}?${action}'); return false;">#i18n("key=${action}.label")</a></li>
+                    <li>+ <a href="#" onclick="actionPath('${config.path}?${action}'); return false;">#i18n("key=${action}.label")</a></li>
                 #end
             </ul>
             </p>
@@ -172,7 +166,7 @@
             <p>
             <ul>
                 #foreach($prop in $config.nestedProperties)
-                    <li>+ #displayname("path=${config.path}/${prop}") <a href="#" onclick="selectPath('${config.path}/${prop}'); return false;">(+)</a>  </li>
+                    <li>+ <a href="#" onclick="selectPath('${config.path}/${prop}'); return false;">#displayname("path=${config.path}/${prop}")</a></li>
                 #end
             </ul>
             </p>
