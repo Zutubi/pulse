@@ -172,7 +172,7 @@
             <p>
             <ul>
                 #foreach($prop in $config.nestedProperties)
-                    <li>+ #i18n("property=$prop" "key=label") <a href="#" onclick="selectPath('${config.path}/${prop}'); return false;">(+)</a>  </li>
+                    <li>+ #displayname("path=${config.path}/${prop}") <a href="#" onclick="selectPath('${config.path}/${prop}'); return false;">(+)</a>  </li>
                 #end
             </ul>
             </p>

@@ -3,9 +3,7 @@ package com.zutubi.pulse.web;
 import com.zutubi.pulse.agent.AgentManager;
 import com.zutubi.pulse.license.License;
 import com.zutubi.pulse.license.LicenseHolder;
-import com.zutubi.pulse.model.ProjectManager;
 import com.zutubi.pulse.model.UserManager;
-import com.zutubi.pulse.web.admin.ServerSettingsAction.LicenseRestriction;
 
 import java.util.LinkedList;
 
@@ -58,5 +56,34 @@ public class NotLicensedErrorAction extends ActionSupport
     public void setUserManager(UserManager userManager)
     {
         this.userManager = userManager;
+    }
+
+    public static class LicenseRestriction
+    {
+        private String entity;
+        private int supported;
+        private int inUse;
+
+        public LicenseRestriction(String entity, int supported, int inUse)
+        {
+            this.entity = entity;
+            this.supported = supported;
+            this.inUse = inUse;
+        }
+
+        public String getEntity()
+        {
+            return entity;
+        }
+
+        public int getSupported()
+        {
+            return supported;
+        }
+
+        public int getInUse()
+        {
+            return inUse;
+        }
     }
 }
