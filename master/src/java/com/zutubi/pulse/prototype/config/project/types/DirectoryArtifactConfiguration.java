@@ -1,12 +1,14 @@
 package com.zutubi.pulse.prototype.config.project.types;
 
 import com.zutubi.config.annotations.Form;
+import com.zutubi.config.annotations.SymbolicName;
 
 /**
  *
  *
  */
 @Form(fieldOrder = {"name", "base", "mimeType", "includes", "excludes"})
+@SymbolicName("zutubi.directoryArtifactConfig")
 public class DirectoryArtifactConfiguration extends ArtifactConfiguration
 {
     /**

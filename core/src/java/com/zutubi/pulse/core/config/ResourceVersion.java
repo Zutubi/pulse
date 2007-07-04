@@ -11,7 +11,7 @@ import java.util.TreeMap;
 /**
  */
 @Form(fieldOrder = {"value"})
-@SymbolicName("internal.resourceVersion")
+@SymbolicName("zutubi.resourceVersion")
 public class ResourceVersion extends AbstractConfiguration
 {
     @ID

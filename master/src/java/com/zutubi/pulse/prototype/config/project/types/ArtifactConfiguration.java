@@ -10,7 +10,7 @@ import java.util.List;
  *
  *
  */
-@SymbolicName("internal.artifactConfig")
+@SymbolicName("zutubi.artifactConfig")
 public class ArtifactConfiguration extends AbstractNamedConfiguration
 {
     List<String> postprocessors = new LinkedList<String>();

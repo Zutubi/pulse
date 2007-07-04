@@ -7,7 +7,7 @@ import com.zutubi.validation.annotations.Required;
 
 /**
  */
-@SymbolicName("internal.emailConfigurationCheckHandler")
+@SymbolicName("zutubi.emailConfigurationCheckHandler")
 public class EmailConfigurationCheckHandler extends ConfigurationCheckHandlerSupport<EmailConfiguration>
 {
     @Required

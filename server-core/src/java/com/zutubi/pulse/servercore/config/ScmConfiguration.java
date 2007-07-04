@@ -13,7 +13,7 @@ import java.util.List;
 /**
  *
  */
-@SymbolicName("internal.scmConfig")
+@SymbolicName("zutubi.scmConfig")
 public abstract class ScmConfiguration extends AbstractConfiguration
 {
     private boolean monitor;

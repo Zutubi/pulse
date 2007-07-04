@@ -7,7 +7,7 @@ import com.zutubi.config.annotations.SymbolicName;
  *
  *
  */
-@SymbolicName("internal.subscriptionConditionConfig")
+@SymbolicName("zutubi.subscriptionConditionConfig")
 public class SubscriptionConditionConfiguration extends AbstractConfiguration
 {
 }

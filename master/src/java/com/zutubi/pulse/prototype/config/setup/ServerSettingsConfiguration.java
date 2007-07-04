@@ -19,7 +19,7 @@ import com.zutubi.pulse.core.config.AbstractConfiguration;
  *
  *
  */
-@SymbolicName("internal.serverSettingsConfig")
+@SymbolicName("zutubi.serverSettingsConfig")
 @ConfigurationCheck("ServerSettingsConfigurationCheckHandler")
 @Form(fieldOrder = {"baseUrl", "host", "ssl", "from", "username", "password", "subjectPrefix", "customPort", "port"})
 public class ServerSettingsConfiguration extends AbstractConfiguration implements Validateable

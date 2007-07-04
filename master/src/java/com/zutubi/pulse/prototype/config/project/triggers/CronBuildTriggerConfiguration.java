@@ -10,7 +10,7 @@ import com.zutubi.pulse.scheduling.Trigger;
  *
  *
  */
-@SymbolicName("internal.cronBuildTriggerConfig")
+@SymbolicName("zutubi.cronTriggerConfig")
 public class CronBuildTriggerConfiguration extends TriggerConfiguration
 {
     private String cron;

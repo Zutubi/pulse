@@ -6,7 +6,7 @@ import com.zutubi.pulse.core.config.AbstractConfiguration;
 /**
  * Placeholder type that is used to create a transient scope.
  */
-@SymbolicName("internal.transient")
+@SymbolicName("zutubi.transient")
 public class TransientConfiguration extends AbstractConfiguration
 {
 }

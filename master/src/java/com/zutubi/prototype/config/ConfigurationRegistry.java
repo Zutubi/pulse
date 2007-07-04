@@ -43,6 +43,7 @@ import com.zutubi.pulse.servercore.config.CvsConfiguration;
 import com.zutubi.pulse.servercore.config.PerforceConfiguration;
 import com.zutubi.pulse.servercore.config.ScmConfiguration;
 import com.zutubi.pulse.servercore.config.SvnConfiguration;
+import com.zutubi.pulse.cleanup.config.CleanupConfiguration;
 import com.zutubi.util.logging.Logger;
 
 import java.util.HashMap;
@@ -87,75 +88,75 @@ public class ConfigurationRegistry
 
             registerTransientConfiguration("login", LoginConfiguration.class);
 
-            CompositeType typeConfig = registerConfigurationType("internal.typeConfig", TypeConfiguration.class);
-            registerConfigurationType("internal.antTypeConfig", AntTypeConfiguration.class);
-            registerConfigurationType("internal.customTypeConfig", CustomTypeConfiguration.class);
-            registerConfigurationType("internal.executableTypeConfig", ExecutableTypeConfiguration.class);
-            registerConfigurationType("internal.mavenTypeConfig", MavenTypeConfiguration.class);
-            registerConfigurationType("internal.maven2TypeConfig", Maven2TypeConfiguration.class);
-            registerConfigurationType("internal.makeTypeConfig", MakeTypeConfiguration.class);
-            registerConfigurationType("internal.versionedTypeConfig", VersionedTypeConfiguration.class);
-            registerConfigurationType("internal.xcodeTypeConfig", XCodeTypeConfiguration.class);
+            CompositeType typeConfig = registerConfigurationType(TypeConfiguration.class);
+            registerConfigurationType(AntTypeConfiguration.class);
+            registerConfigurationType(CustomTypeConfiguration.class);
+            registerConfigurationType(ExecutableTypeConfiguration.class);
+            registerConfigurationType(MavenTypeConfiguration.class);
+            registerConfigurationType(Maven2TypeConfiguration.class);
+            registerConfigurationType(MakeTypeConfiguration.class);
+            registerConfigurationType(VersionedTypeConfiguration.class);
+            registerConfigurationType(XCodeTypeConfiguration.class);
 
-            typeConfig.addExtension("internal.antTypeConfig");
-            typeConfig.addExtension("internal.customTypeConfig");
-            typeConfig.addExtension("internal.executableTypeConfig");
-            typeConfig.addExtension("internal.mavenTypeConfig");
-            typeConfig.addExtension("internal.maven2TypeConfig");
-            typeConfig.addExtension("internal.makeTypeConfig");
-            typeConfig.addExtension("internal.versionedTypeConfig");
-            typeConfig.addExtension("internal.xcodeTypeConfig");
+            typeConfig.addExtension("zutubi.antTypeConfig");
+            typeConfig.addExtension("zutubi.customTypeConfig");
+            typeConfig.addExtension("zutubi.executableTypeConfig");
+            typeConfig.addExtension("zutubi.mavenTypeConfig");
+            typeConfig.addExtension("zutubi.maven2TypeConfig");
+            typeConfig.addExtension("zutubi.makeTypeConfig");
+            typeConfig.addExtension("zutubi.versionedTypeConfig");
+            typeConfig.addExtension("zutubi.xcodeTypeConfig");
 
             // change viewer configuration
-            CompositeType changeViewerConfig = registerConfigurationType("changeViewerConfig", ChangeViewerConfiguration.class);
-            registerConfigurationType("fisheyeChangeViewerConfig", FisheyeConfiguration.class);
-            registerConfigurationType("customChangeViewerConfig", CustomChangeViewerConfiguration.class);
-            registerConfigurationType("p4WebChangeViewerConfig", P4WebChangeViewer.class);
-            registerConfigurationType("tracChangeViewerConfig", TracChangeViewer.class);
-            registerConfigurationType("viewVCChangeViewerConfig", ViewVCChangeViewer.class);
+            CompositeType changeViewerConfig = registerConfigurationType(ChangeViewerConfiguration.class);
+            registerConfigurationType(FisheyeConfiguration.class);
+            registerConfigurationType(CustomChangeViewerConfiguration.class);
+            registerConfigurationType(P4WebChangeViewer.class);
+            registerConfigurationType(TracChangeViewer.class);
+            registerConfigurationType(ViewVCChangeViewer.class);
 
-            changeViewerConfig.addExtension("fisheyeChangeViewerConfig");
-            changeViewerConfig.addExtension("customChangeViewerConfig");
-            changeViewerConfig.addExtension("p4WebChangeViewerConfig");
-            changeViewerConfig.addExtension("tracChangeViewerConfig");
-            changeViewerConfig.addExtension("viewVCChangeViewerConfig");
+            changeViewerConfig.addExtension("zutubi.fisheyeChangeViewerConfig");
+            changeViewerConfig.addExtension("zutubi.customChangeViewerConfig");
+            changeViewerConfig.addExtension("zutubi.p4WebChangeViewerConfig");
+            changeViewerConfig.addExtension("zutubi.tracChangeViewerConfig");
+            changeViewerConfig.addExtension("zutubi.viewVCChangeViewerConfig");
 
             // generated dynamically as new components are registered.
-            CompositeType projectConfig = registerConfigurationType("projectConfig", ProjectConfiguration.class);
+            CompositeType projectConfig = registerConfigurationType(ProjectConfiguration.class);
 
             // scm configuration
             CompositeType scmConfig = typeRegistry.getType(ScmConfiguration.class);
-            registerConfigurationType("svnConfig", SvnConfiguration.class);
-            registerConfigurationType("cvsConfig", CvsConfiguration.class);
-            registerConfigurationType("perforceConfig", PerforceConfiguration.class);
+            registerConfigurationType(SvnConfiguration.class);
+            registerConfigurationType(CvsConfiguration.class);
+            registerConfigurationType(PerforceConfiguration.class);
 
             // sort out the extensions.
-            scmConfig.addExtension("svnConfig");
-            scmConfig.addExtension("cvsConfig");
-            scmConfig.addExtension("perforceConfig");
+            scmConfig.addExtension("zutubi.svnConfig");
+            scmConfig.addExtension("zutubi.cvsConfig");
+            scmConfig.addExtension("zutubi.perforceConfig");
 
             // Triggers
-            CompositeType triggerConfig = registerConfigurationType("triggerConfig", TriggerConfiguration.class);
-            registerConfigurationType("buildCompletedConfig", BuildCompletedTriggerConfiguration.class);
-            registerConfigurationType("cronTriggerConfig", CronBuildTriggerConfiguration.class);
-            registerConfigurationType("scmTriggerConfig", ScmBuildTriggerConfiguration.class);
+            CompositeType triggerConfig = registerConfigurationType(TriggerConfiguration.class);
+            registerConfigurationType(BuildCompletedTriggerConfiguration.class);
+            registerConfigurationType(CronBuildTriggerConfiguration.class);
+            registerConfigurationType(ScmBuildTriggerConfiguration.class);
 
-            triggerConfig.addExtension("buildCompletedConfig");
-            triggerConfig.addExtension("cronTriggerConfig");
-            triggerConfig.addExtension("scmTriggerConfig");
+            triggerConfig.addExtension("zutubi.buildCompletedConfig");
+            triggerConfig.addExtension("zutubi.cronTriggerConfig");
+            triggerConfig.addExtension("zutubi.scmTriggerConfig");
             
             MapType triggers = new MapType();
             triggers.setTypeRegistry(typeRegistry);
-            triggers.setCollectionType(typeRegistry.getType("triggerConfig"));
+            triggers.setCollectionType(triggerConfig);
             projectConfig.addProperty(new ExtensionTypeProperty("trigger", triggers));
 
             // Artifacts.
-            CompositeType artifactConfig = registerConfigurationType("artifactConfig", ArtifactConfiguration.class);
-            registerConfigurationType("fileArtifactConfig", FileArtifactConfiguration.class);
-            registerConfigurationType("directoryArtifactConfig", DirectoryArtifactConfiguration.class);
+            CompositeType artifactConfig = registerConfigurationType(ArtifactConfiguration.class);
+            registerConfigurationType(FileArtifactConfiguration.class);
+            registerConfigurationType(DirectoryArtifactConfiguration.class);
 
-            artifactConfig.addExtension("fileArtifactConfig");
-            artifactConfig.addExtension("directoryArtifactConfig");
+            artifactConfig.addExtension("zutubi.fileArtifactConfig");
+            artifactConfig.addExtension("zutubi.directoryArtifactConfig");
 
 //            ListType artifacts = new ListType(configurationPersistenceManager);
 //            artifacts.setTypeRegistry(typeRegistry);
@@ -164,15 +165,15 @@ public class ConfigurationRegistry
 
             // commit message processors.
             CompositeType commitConfig = registerConfigurationType(CommitMessageConfiguration.class);
-            registerConfigurationType("jiraCommitConfig", JiraCommitMessageConfiguration.class);
-            registerConfigurationType("customCommitConfig", CustomCommitMessageConfiguration.class);
+            registerConfigurationType(JiraCommitMessageConfiguration.class);
+            registerConfigurationType(CustomCommitMessageConfiguration.class);
 
-            commitConfig.addExtension("jiraCommitConfig");
-            commitConfig.addExtension("customCommitConfig");
+            commitConfig.addExtension("zutubi.jiraCommitMessageConfig");
+            commitConfig.addExtension("zutubi.customCommitMessageConfig");
 
             MapType commitTransformers = new MapType();
             commitTransformers.setTypeRegistry(typeRegistry);
-            commitTransformers.setCollectionType(typeRegistry.getType("commitConfig"));
+            commitTransformers.setCollectionType(commitConfig);
             projectConfig.addProperty(new ExtensionTypeProperty("commit", commitTransformers));
 
             // define the root level scope.
@@ -182,12 +183,15 @@ public class ConfigurationRegistry
 
             configurationPersistenceManager.register("project", projectCollection);
 
+            // register project configuration.  This will eventually be handled as an extension point
+            registerProjectMapExtension("cleanup", CleanupConfiguration.class);
+            
             TemplatedMapType agentCollection = new TemplatedMapType();
             agentCollection.setTypeRegistry(typeRegistry);
             agentCollection.setCollectionType(registerConfigurationType(AgentConfiguration.class));
             configurationPersistenceManager.register("agent", agentCollection);
 
-            CompositeType globalConfig = registerConfigurationType("globalConfig", GlobalConfiguration.class);
+            CompositeType globalConfig = registerConfigurationType(GlobalConfiguration.class);
             configurationPersistenceManager.register(GlobalConfiguration.SCOPE_NAME, globalConfig);
 
             
@@ -201,25 +205,24 @@ public class ConfigurationRegistry
 
             // contacts configuration
             CompositeType contactConfig = typeRegistry.getType(ContactConfiguration.class);
-            registerConfigurationType("emailContactConfig", EmailContactConfiguration.class);
-            registerConfigurationType("jabberContactConfig", JabberContactConfiguration.class);
+            registerConfigurationType(EmailContactConfiguration.class);
+            registerConfigurationType(JabberContactConfiguration.class);
 
             // sort out the extensions.
-            contactConfig.addExtension("emailContactConfig");
-            contactConfig.addExtension("jabberContactConfig");
-
+            contactConfig.addExtension("zutubi.emailContactConfig");
+            contactConfig.addExtension("zutubi.jabberContactConfig");
 
             // user subscription conditions
             CompositeType userSubscriptionConfig = typeRegistry.getType(SubscriptionConditionConfiguration.class);
-            registerConfigurationType("internal.allBuildsConditionConfig", AllBuildsConditionConfiguration.class);
-            registerConfigurationType("internal.selectedBuildsConditionConfig", SelectedBuildsConditionConfiguration.class);
-            registerConfigurationType("internal.customConditionConfig", CustomConditionConfiguration.class);
-            registerConfigurationType("internal.unsuccessfulConditionConfig", UnsuccessfulConditionConfiguration.class);
+            registerConfigurationType(AllBuildsConditionConfiguration.class);
+            registerConfigurationType(SelectedBuildsConditionConfiguration.class);
+            registerConfigurationType(CustomConditionConfiguration.class);
+            registerConfigurationType(UnsuccessfulConditionConfiguration.class);
 
-            userSubscriptionConfig.addExtension("internal.allBuildsConditionConfig");
-            userSubscriptionConfig.addExtension("internal.selectedBuildsConditionConfig");
-            userSubscriptionConfig.addExtension("internal.customConditionConfig");
-            userSubscriptionConfig.addExtension("internal.unsuccessfulConditionConfig");
+            userSubscriptionConfig.addExtension("zutubi.allBuildsConditionConfig");
+            userSubscriptionConfig.addExtension("zutubi.selectedBuildsConditionConfig");
+            userSubscriptionConfig.addExtension("zutubi.customConditionConfig");
+            userSubscriptionConfig.addExtension("zutubi.unsuccessfulConditionConfig");
 
         }
         catch (TypeException e)
@@ -234,7 +237,7 @@ public class ConfigurationRegistry
         transientConfig.addProperty(new ExtensionTypeProperty(propertyName, type));
     }
 
-    public void registerProjectMapExtension(String name, Class clazz) throws TypeException
+    private void registerProjectMapExtension(String name, Class clazz) throws TypeException
     {
         // create the map type.
         MapType mapType = new MapType();

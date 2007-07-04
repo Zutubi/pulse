@@ -9,7 +9,7 @@ import com.zutubi.pulse.servercore.config.CvsConfiguration;
  *
  *
  */
-@SymbolicName("internal.cvsConfigurationCheckHandler")
+@SymbolicName("zutubi.cvsConfigurationCheckHandler")
 public class CvsConfigurationCheckHandler extends ConfigurationCheckHandlerSupport<CvsConfiguration>
 {
     public void test(CvsConfiguration configuration) throws ScmException

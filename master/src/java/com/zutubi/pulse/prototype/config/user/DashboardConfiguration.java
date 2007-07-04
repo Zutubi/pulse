@@ -13,7 +13,7 @@ import java.util.List;
  *
  *
  */
-@SymbolicName("internal.dashboardConfig")
+@SymbolicName("zutubi.dashboardConfig")
 @Form(fieldOrder = {"buildCount", "showAllProjects", "shownProjects", "showMyChanges", "myChangeCount", "showProjectChanges", "projectChangeCount"})
 public class DashboardConfiguration extends AbstractConfiguration
 {

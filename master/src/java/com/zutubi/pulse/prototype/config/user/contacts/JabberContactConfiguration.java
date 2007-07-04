@@ -1,9 +1,12 @@
 package com.zutubi.pulse.prototype.config.user.contacts;
 
+import com.zutubi.config.annotations.SymbolicName;
+
 /**
  *
  *
  */
+@SymbolicName("zutubi.jabberContactConfig")
 public class JabberContactConfiguration extends ContactConfiguration
 {
     private String username;

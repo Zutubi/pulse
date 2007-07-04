@@ -10,6 +10,7 @@ import com.zutubi.pulse.core.model.Revision;
 import com.zutubi.pulse.servercore.config.ScmConfiguration;
 import com.zutubi.util.StringUtils;
 import com.zutubi.config.annotations.Form;
+import com.zutubi.config.annotations.SymbolicName;
 
 import java.text.SimpleDateFormat;
 import java.util.TimeZone;
@@ -19,6 +20,7 @@ import java.util.TimeZone;
  * URLs with embedded variables.
  */
 @Form(fieldOrder = {"name", "changesetURL", "fileViewURL", "fielDownloadURL", "fileDiffURL"})
+@SymbolicName("zutubi.customChangeViewerConfig")
 public class CustomChangeViewerConfiguration extends ChangeViewerConfiguration
 {
     private static final String PROPERTY_REVISION = "revision";

@@ -15,8 +15,10 @@ import com.zutubi.pulse.bootstrap.SystemConfigurationSupport;
 import com.zutubi.pulse.model.*;
 import com.zutubi.pulse.prototype.config.admin.EmailConfiguration;
 import com.zutubi.pulse.prototype.config.admin.GlobalConfiguration;
+import com.zutubi.pulse.prototype.config.admin.GeneralAdminConfiguration;
 import com.zutubi.pulse.security.AcegiUtils;
 import com.zutubi.pulse.web.DefaultAction;
+import com.zutubi.util.logging.Logger;
 
 import java.net.InetAddress;
 import java.net.MalformedURLException;
@@ -28,7 +30,7 @@ import java.util.List;
  */
 public class SetupConfigurationWizard extends AbstractTypeWizard
 {
-    private static final String GENERAL_CONFIG_PROPERTY = "generalConfig";
+    private static final Logger LOG = Logger.getLogger(SetupConfigurationWizard.class);
 
     private CompositeType adminConfigType;
     
@@ -110,13 +112,14 @@ public class SetupConfigurationWizard extends AbstractTypeWizard
             developersGroup.addAdditionalAuthority(GrantedAuthority.PERSONAL);
             userManager.addGroup(developersGroup);
 
+            // FIXME: should be using objects here so that we are not relying on magic strings.
             // apply the settings
-            CompositeType generalType = typeRegistry.getType(GENERAL_CONFIG_PROPERTY);
+            CompositeType generalType = typeRegistry.getType(GeneralAdminConfiguration.class);
             MutableRecord record = generalType.createNewRecord(true);
             String baseUrl = (String) serverConfigRecord.get("baseUrl");
             record.put("baseUrl", baseUrl);
             record.put("masterHost", getMasterHost(baseUrl));
-            configurationTemplateManager.saveRecord(PathUtils.getPath(GlobalConfiguration.SCOPE_NAME, GENERAL_CONFIG_PROPERTY), record);
+            configurationTemplateManager.saveRecord(PathUtils.getPath(GlobalConfiguration.SCOPE_NAME, "generalConfig"), record);
 
             // Now copy over the email properties
             extractAndSave(EmailConfiguration.class, serverConfigRecord);
@@ -139,16 +142,12 @@ public class SetupConfigurationWizard extends AbstractTypeWizard
             }
             catch (Exception e)
             {
-                e.printStackTrace();
-/*
-            addActionError(e.getMessage());
-            LOG.severe(e.getMessage(), e);
-*/
+                LOG.severe(e);
             }
         }
         catch (TypeException e)
         {
-            e.printStackTrace();
+            LOG.severe(e);
         }
 
     }

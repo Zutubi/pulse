@@ -8,7 +8,7 @@ import org.apache.velocity.VelocityContext;
  *
  *
  */
-@SymbolicName("internal.makeTypeConfig")
+@SymbolicName("zutubi.makeTypeConfig")
 public class MakeTypeConfiguration extends TemplateTypeConfiguration
 {
     private String makefile;

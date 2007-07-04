@@ -7,7 +7,7 @@ import com.zutubi.pulse.core.config.AbstractNamedConfiguration;
  *
  *
  */
-@SymbolicName("commitConfig")
+@SymbolicName("zutubi.commitConfig")
 public class CommitMessageConfiguration extends AbstractNamedConfiguration
 {
 }

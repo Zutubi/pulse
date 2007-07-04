@@ -8,7 +8,7 @@ import org.apache.velocity.VelocityContext;
  *
  *
  */
-@SymbolicName("internal.executableTypeConfig")
+@SymbolicName("zutubi.executableTypeConfig")
 public class ExecutableTypeConfiguration extends TemplateTypeConfiguration
 {
     /**

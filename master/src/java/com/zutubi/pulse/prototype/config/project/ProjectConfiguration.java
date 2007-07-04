@@ -23,6 +23,7 @@ import java.util.Map;
  */
 @Form(fieldOrder = {"name", "url", "description"})
 @Table(columns = {"name"})
+@SymbolicName("zutubi.projectConfig")
 public class ProjectConfiguration extends AbstractConfiguration implements Extendable, NamedConfiguration
 {
     @Internal

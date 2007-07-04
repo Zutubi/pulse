@@ -10,7 +10,7 @@ import java.util.TreeMap;
  * external tool, a certain operating system, or some virtual concept.
  */
 @Form(fieldOrder = { "name", "defaultVersion" })
-@SymbolicName("internal.resource")
+@SymbolicName("zutubi.resource")
 public class Resource extends AbstractNamedConfiguration
 {
     private Map<String, ResourceProperty> properties = new TreeMap<String, ResourceProperty>();

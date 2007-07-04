@@ -4,6 +4,7 @@ import com.zutubi.pulse.core.model.FileRevision;
 import com.zutubi.pulse.core.model.Revision;
 import com.zutubi.util.StringUtils;
 import com.zutubi.config.annotations.Form;
+import com.zutubi.config.annotations.SymbolicName;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
@@ -12,6 +13,7 @@ import java.net.URLEncoder;
  * A change viwer implementation for linking to a Trac instance.
  */
 @Form(fieldOrder = {"name", "baseURL", "projectPath"})
+@SymbolicName("zutubi.tracChangeViewerConfig")
 public class TracChangeViewer extends BasePathChangeViewer
 {
     public TracChangeViewer()

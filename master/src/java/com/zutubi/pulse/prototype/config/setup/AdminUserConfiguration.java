@@ -12,7 +12,7 @@ import com.zutubi.pulse.core.config.AbstractConfiguration;
  *
  *
  */
-@SymbolicName("internal.adminUserConfig")
+@SymbolicName("zutubi.adminUserConfig")
 @Form(fieldOrder = {"login", "name", "password", "confirm"})
 public class AdminUserConfiguration extends AbstractConfiguration implements Validateable
 {

@@ -3,6 +3,7 @@ package com.zutubi.pulse.prototype.config.project.triggers;
 import com.zutubi.config.annotations.Form;
 import com.zutubi.config.annotations.Reference;
 import com.zutubi.config.annotations.Select;
+import com.zutubi.config.annotations.SymbolicName;
 import com.zutubi.prototype.config.ConfigurationProvider;
 import com.zutubi.pulse.core.model.ResultState;
 import com.zutubi.pulse.events.build.BuildCompletedEvent;
@@ -19,6 +20,7 @@ import java.util.Map;
 /**
  */
 @Form(fieldOrder = { "name", "project", "states"})
+@SymbolicName("zutubi.buildCompletedConfig")
 public class BuildCompletedTriggerConfiguration extends TriggerConfiguration
 {
     @Reference

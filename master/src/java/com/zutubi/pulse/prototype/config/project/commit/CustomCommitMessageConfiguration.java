@@ -1,9 +1,12 @@
 package com.zutubi.pulse.prototype.config.project.commit;
 
+import com.zutubi.config.annotations.SymbolicName;
+
 /**
  *
  *
  */
+@SymbolicName("zutubi.customCommitMessageConfig")
 public class CustomCommitMessageConfiguration extends CommitMessageConfiguration
 {
     private String regex;

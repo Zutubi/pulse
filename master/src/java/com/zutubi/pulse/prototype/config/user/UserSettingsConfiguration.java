@@ -16,7 +16,7 @@ import java.util.Map;
  *
  *
  */
-@SymbolicName("internal.userSettingConfig")
+@SymbolicName("zutubi.userSettingConfig")
 public class UserSettingsConfiguration extends AbstractConfiguration
 {
     private static final String PROPERTY_DASHBOARD_BUILD_COUNT = "user.dashboardBuildCount";

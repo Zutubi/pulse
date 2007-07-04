@@ -9,7 +9,7 @@ import com.zutubi.pulse.servercore.config.SvnConfiguration;
  *
  *
  */
-@SymbolicName("internal.svnConfigurationCheckHandler")
+@SymbolicName("zutubi.svnConfigurationCheckHandler")
 public class SvnConfigurationCheckHandler extends ConfigurationCheckHandlerSupport<SvnConfiguration>
 {
     public void test(SvnConfiguration configuration) throws ScmException

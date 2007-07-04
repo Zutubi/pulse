@@ -9,7 +9,7 @@ import com.zutubi.validation.annotations.Required;
 /**
  * Used for the AJAX request license form on the setup license page.
  */
-@SymbolicName("internal.requestLicenseConfig")
+@SymbolicName("zutubi.requestLicenseConfig")
 @Form(fieldOrder = { "name", "email" }, actions = { "request" })
 public class RequestLicenseConfiguration extends AbstractConfiguration
 {

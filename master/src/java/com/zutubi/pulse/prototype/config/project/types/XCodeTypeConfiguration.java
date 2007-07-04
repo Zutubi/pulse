@@ -8,7 +8,7 @@ import org.apache.velocity.VelocityContext;
  *
  *
  */
-@SymbolicName("internal.xcodeTypeConfig")
+@SymbolicName("zutubi.xcodeTypeConfig")
 public class XCodeTypeConfiguration extends TemplateTypeConfiguration
 {
     private String workingDir = null;

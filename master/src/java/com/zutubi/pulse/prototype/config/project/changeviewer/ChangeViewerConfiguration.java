@@ -11,7 +11,7 @@ import com.zutubi.pulse.servercore.config.ScmConfiguration;
  * Represents an external SCM change viewing application, such as Fisheye or
  * ViewVC.
  */
-@SymbolicName("internal.changeViewerConfig")
+@SymbolicName("zutubi.changeViewerConfig")
 public abstract class ChangeViewerConfiguration extends AbstractNamedConfiguration
 {
     public enum Capability

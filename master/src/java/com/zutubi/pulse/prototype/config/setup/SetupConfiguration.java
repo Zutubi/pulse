@@ -7,7 +7,7 @@ import com.zutubi.pulse.core.config.AbstractConfiguration;
  *
  *
  */
-@SymbolicName("internal.setupConfig")
+@SymbolicName("zutubi.setupConfig")
 public class SetupConfiguration extends AbstractConfiguration
 {
     private SetupDataConfiguration data;

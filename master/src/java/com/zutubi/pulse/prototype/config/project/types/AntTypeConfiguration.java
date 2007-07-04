@@ -8,7 +8,7 @@ import org.apache.velocity.VelocityContext;
  *
  *
  */
-@SymbolicName("internal.antTypeConfig")
+@SymbolicName("zutubi.antTypeConfig")
 public class AntTypeConfiguration extends TemplateTypeConfiguration
 {
     private String work;

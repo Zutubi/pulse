@@ -9,7 +9,7 @@ import com.zutubi.validation.annotations.Required;
  *
  *
  */
-@SymbolicName("internal.ldapConfigutionCheckHandler")
+@SymbolicName("zutubi.ldapConfigutionCheckHandler")
 public class LDAPConfigurationCheckHandler extends ConfigurationCheckHandlerSupport<LDAPConfiguration>
 {
     @Required

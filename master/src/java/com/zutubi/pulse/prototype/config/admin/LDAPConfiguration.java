@@ -7,7 +7,7 @@ import com.zutubi.pulse.core.config.AbstractConfiguration;
 /**
  * Configuration for LDAP auth integration.
  */
-@SymbolicName("ldapConfig")
+@SymbolicName("zutubi.ldapConfig")
 @Form(fieldOrder = {"enabled", "ldapUrl", "baseDn", "managerDn", "managerPassword",
         "userBaseDn", "userFilter", "autoAddUsers", "emailAttribute", "groupBaseDn", "groupSearchFilter",
         "groupRoleAttribute", "searchGroupSubtree", "followReferrals", "escapeSpaceCharacters"})

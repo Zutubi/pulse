@@ -2,6 +2,7 @@ package com.zutubi.pulse.servercore.config;
 
 import com.zutubi.config.annotations.ConfigurationCheck;
 import com.zutubi.config.annotations.Form;
+import com.zutubi.config.annotations.SymbolicName;
 import com.zutubi.pulse.scm.ScmException;
 import com.zutubi.pulse.servercore.scm.ScmClient;
 import com.zutubi.pulse.servercore.scm.p4.PerforceClient;
@@ -12,6 +13,7 @@ import com.zutubi.pulse.servercore.scm.p4.PerforceClient;
  */
 @Form(fieldOrder = { "port", "user", "password", "spec", "monitor", "customPollingInterval", "pollingInterval", "quietPeriodEnabled", "quietPeriod" })
 @ConfigurationCheck("com.zutubi.pulse.prototype.config.PerforceConfigurationCheckHandler")
+@SymbolicName("zutubi.perforceConfig")
 public class PerforceConfiguration extends ScmConfiguration
 {
     private String port;

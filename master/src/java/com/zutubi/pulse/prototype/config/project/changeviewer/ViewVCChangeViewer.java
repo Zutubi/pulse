@@ -6,11 +6,13 @@ import com.zutubi.pulse.core.model.Revision;
 import com.zutubi.pulse.servercore.config.ScmConfiguration;
 import com.zutubi.util.StringUtils;
 import com.zutubi.config.annotations.Form;
+import com.zutubi.config.annotations.SymbolicName;
 
 /**
  * A change viewer for linking to ViewVC.
  */
 @Form(fieldOrder = {"name", "baseURL", "projectPath"})
+@SymbolicName("zutubi.viewVCChangeViewerConfig")
 public class ViewVCChangeViewer extends BasePathChangeViewer
 {
     public ViewVCChangeViewer()

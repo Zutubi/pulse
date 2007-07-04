@@ -18,7 +18,7 @@ import java.util.Map;
  */
 @Form(fieldOrder = {"name", "remote", "host", "port"})
 @Table(columns = {"name", "location", "status"})
-@SymbolicName("internal.agentConfig")
+@SymbolicName("zutubi.agentConfig")
 public class AgentConfiguration extends AbstractConfiguration implements NamedConfiguration
 {
     @Internal

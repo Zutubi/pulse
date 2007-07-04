@@ -7,7 +7,7 @@ import com.zutubi.config.annotations.SymbolicName;
  *
  *
  */
-@SymbolicName("internal.postBuildActionConfig")
+@SymbolicName("zutubi.postBuildActionConfig")
 public abstract class PostBuildActionConfiguration extends AbstractNamedConfiguration
 {
     public abstract void execute();

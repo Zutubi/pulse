@@ -7,7 +7,7 @@ import com.zutubi.pulse.servercore.config.PerforceConfiguration;
 
 /**
  */
-@SymbolicName("internal.perforceConfigurationCheckHandler")
+@SymbolicName("zutubi.perforceConfigurationCheckHandler")
 public class PerforceConfigurationCheckHandler extends ConfigurationCheckHandlerSupport<PerforceConfiguration>
 {
     public void test(PerforceConfiguration configuration) throws ScmException

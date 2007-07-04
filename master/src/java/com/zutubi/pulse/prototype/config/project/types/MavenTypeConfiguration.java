@@ -8,7 +8,7 @@ import org.apache.velocity.VelocityContext;
  *
  *
  */
-@SymbolicName("internal.mavenTypeConfig")
+@SymbolicName("zutubi.mavenTypeConfig")
 public class MavenTypeConfiguration extends TemplateTypeConfiguration
 {
     private String targets;

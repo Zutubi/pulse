@@ -6,7 +6,7 @@ import com.zutubi.config.annotations.Form;
 /**
  */
 @Form(fieldOrder = { "name", "value", "addToEnvironment", "addToPath", "resolveVariables" })
-@SymbolicName("internal.resourceProperty")
+@SymbolicName("zutubi.resourceProperty")
 public class ResourceProperty extends AbstractNamedConfiguration
 {
     private String value;

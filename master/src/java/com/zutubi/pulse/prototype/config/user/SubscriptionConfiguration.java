@@ -11,7 +11,7 @@ import java.util.List;
  *
  *
  */
-@SymbolicName("internal.userSubscriptionConfig")
+@SymbolicName("zutubi.userSubscriptionConfig")
 @Table(columns = {"name"})
 @Form(fieldOrder = {"name", "projects", "contact", "template"})
 public class SubscriptionConfiguration extends AbstractNamedConfiguration

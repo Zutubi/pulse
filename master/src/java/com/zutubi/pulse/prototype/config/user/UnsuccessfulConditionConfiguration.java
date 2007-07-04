@@ -6,7 +6,7 @@ import com.zutubi.config.annotations.SymbolicName;
  *
  *
  */
-@SymbolicName("internal.unsuccessfulConditionConfig")
+@SymbolicName("zutubi.unsuccessfulConditionConfig")
 public class UnsuccessfulConditionConfiguration extends SubscriptionConditionConfiguration
 {
     private long after = 5;

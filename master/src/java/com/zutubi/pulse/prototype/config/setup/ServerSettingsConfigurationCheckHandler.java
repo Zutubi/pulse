@@ -7,7 +7,7 @@ import com.zutubi.prototype.ConfigurationCheckHandlerSupport;
  *
  *
  */
-@SymbolicName("internal.serverSettingsConfigurationCheckHandler")
+@SymbolicName("zutubi.serverSettingsConfigurationCheckHandler")
 public class ServerSettingsConfigurationCheckHandler extends ConfigurationCheckHandlerSupport
 {
     private String testAddress;

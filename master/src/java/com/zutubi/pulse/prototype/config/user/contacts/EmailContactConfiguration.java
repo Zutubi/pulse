@@ -1,9 +1,12 @@
 package com.zutubi.pulse.prototype.config.user.contacts;
 
+import com.zutubi.config.annotations.SymbolicName;
+
 /**
  *
  *
  */
+@SymbolicName("zutubi.emailContactConfig")
 public class EmailContactConfiguration extends ContactConfiguration
 {
     private String address;

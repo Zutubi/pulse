@@ -9,7 +9,7 @@ import com.zutubi.pulse.personal.PatchArchive;
  *
  *
  */
-@SymbolicName("internal.versionedTypeConfig")
+@SymbolicName("zutubi.versionedTypeConfig")
 public class VersionedTypeConfiguration extends TypeConfiguration
 {
     private String pulseFileName;

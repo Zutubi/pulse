@@ -9,7 +9,7 @@ import com.zutubi.pulse.core.config.AbstractNamedConfiguration;
  *
  *
  */
-@SymbolicName("internal.userContactConfig")
+@SymbolicName("zutubi.userContactConfig")
 @Table(columns = {"name", "uid"})
 public abstract class ContactConfiguration extends AbstractNamedConfiguration
 {

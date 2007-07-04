@@ -4,11 +4,13 @@ import com.zutubi.pulse.core.model.FileRevision;
 import com.zutubi.pulse.core.model.Revision;
 import com.zutubi.util.StringUtils;
 import com.zutubi.config.annotations.Form;
+import com.zutubi.config.annotations.SymbolicName;
 
 /**
  * A ChangeViewer for linking to a P4Web instance.
  */
 @Form(fieldOrder = {"name", "baseURL", "projectPath"})
+@SymbolicName("zutubi.p4WebChangeViewerConfig")
 public class P4WebChangeViewer extends BasePathChangeViewer
 {
     public P4WebChangeViewer()

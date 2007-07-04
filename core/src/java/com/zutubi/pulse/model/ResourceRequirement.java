@@ -7,7 +7,7 @@ import com.zutubi.pulse.core.config.AbstractConfiguration;
 /**
  * Identifies a required resource for a build stage.
  */
-@SymbolicName("internal.resourceRequirementConfig")
+@SymbolicName("zutubi.resourceRequirementConfig")
 public class ResourceRequirement extends AbstractConfiguration
 {
     private String resource;

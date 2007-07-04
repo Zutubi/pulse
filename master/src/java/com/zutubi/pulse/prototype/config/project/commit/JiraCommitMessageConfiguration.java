@@ -1,9 +1,12 @@
 package com.zutubi.pulse.prototype.config.project.commit;
 
+import com.zutubi.config.annotations.SymbolicName;
+
 /**
  *
  *
  */
+@SymbolicName("zutubi.jiraCommitMessageConfig")
 public class JiraCommitMessageConfiguration extends CommitMessageConfiguration
 {
     private String url;

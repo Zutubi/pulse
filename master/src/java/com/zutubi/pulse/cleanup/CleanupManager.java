@@ -63,16 +63,7 @@ public class CleanupManager
      */
     public void init()
     {
-        try
-        {
-            // register project configuration.  This will eventually be handled as an extension point
-            configurationRegistry.registerProjectMapExtension("cleanup", CleanupConfiguration.class);
-        }
-        catch (TypeException e)
-        {
-            LOG.warning(e);
-            return;
-        }
+        //NOTE: extension point registration currently handled in the configuration registry.
 
         // register for events.
         eventManager.register(eventListener);

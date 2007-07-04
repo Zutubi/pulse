@@ -10,7 +10,7 @@ import com.zutubi.pulse.personal.PatchArchive;
  *
  *
  */
-@SymbolicName("internal.customTypeConfig")
+@SymbolicName("zutubi.customTypeConfig")
 public class CustomTypeConfiguration extends TypeConfiguration
 {
     @TextArea

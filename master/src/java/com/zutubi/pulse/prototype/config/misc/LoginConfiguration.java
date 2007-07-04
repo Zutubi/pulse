@@ -7,7 +7,7 @@ import com.zutubi.config.annotations.SymbolicName;
 /**
  */
 @Form(fieldOrder = { "login", "password" })
-@SymbolicName("internal.transient.login")
+@SymbolicName("zutubi.transient.login")
 public class LoginConfiguration
 {
     private String login;

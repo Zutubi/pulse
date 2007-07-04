@@ -10,7 +10,7 @@ import com.zutubi.validation.annotations.Required;
  *
  *
  */
-@SymbolicName("emailConfig")
+@SymbolicName("zutubi.emailConfig")
 @Form(fieldOrder = { "host", "ssl", "from", "username", "password", "subjectPrefix", "customPort", "port", "localhost"})
 @ConfigurationCheck("EmailConfigurationCheckHandler")
 public class EmailConfiguration extends AbstractConfiguration

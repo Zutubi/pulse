@@ -17,7 +17,7 @@ import java.util.Map;
  *
  *
  */
-@SymbolicName("internal.userConfig")
+@SymbolicName("zutubi.userConfig")
 @Form(fieldOrder = {"login", "name"})
 public class UserConfiguration extends AbstractConfiguration implements Extendable
 {

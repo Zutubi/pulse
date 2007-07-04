@@ -9,7 +9,7 @@ import com.zutubi.pulse.license.LicenseKey;
  *
  *
  */
-@SymbolicName("licenseConfig")
+@SymbolicName("zutubu.licenseConfig")
 public class LicenseConfiguration extends AbstractConfiguration
 {
     @LicenseKey

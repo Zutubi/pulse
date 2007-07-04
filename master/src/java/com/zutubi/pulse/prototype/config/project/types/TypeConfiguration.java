@@ -10,7 +10,7 @@ import com.zutubi.config.annotations.SymbolicName;
  *
  *
  */
-@SymbolicName("internal.typeConfig")
+@SymbolicName("zutubi.typeConfig")
 public abstract class TypeConfiguration extends AbstractConfiguration
 {
     public abstract String getPulseFile(long id, ProjectConfiguration projectConfig, Revision revision, PatchArchive patch);

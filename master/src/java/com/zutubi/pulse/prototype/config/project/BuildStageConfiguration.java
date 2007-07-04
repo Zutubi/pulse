@@ -15,7 +15,7 @@ import java.util.Map;
  *
  *
  */
-@SymbolicName("internal.stageConfig")
+@SymbolicName("zutubi.stageConfig")
 public class BuildStageConfiguration extends AbstractNamedConfiguration
 {
     @Transient

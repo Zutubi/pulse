@@ -6,11 +6,13 @@ import com.zutubi.pulse.scheduling.EventTrigger;
 import com.zutubi.pulse.scheduling.ScmChangeEventFilter;
 import com.zutubi.pulse.scheduling.Trigger;
 import com.zutubi.pulse.scm.ScmChangeEvent;
+import com.zutubi.config.annotations.SymbolicName;
 
 /**
  *
  *
  */
+@SymbolicName("zutubi.scmTriggerConfig")
 public class ScmBuildTriggerConfiguration extends TriggerConfiguration
 {
     private ConfigurationProvider configurationProvider;

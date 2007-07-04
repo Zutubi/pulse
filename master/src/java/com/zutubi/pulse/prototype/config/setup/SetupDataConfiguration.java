@@ -16,7 +16,7 @@ import java.io.IOException;
  * Used for the setup data page: i.e. the very first page shown when no data
  * directory is available.
  */
-@SymbolicName("internal.setupDataConfig")
+@SymbolicName("zutubi.setupDataConfig")
 @Form(fieldOrder = { "data" }, actions = { "next"})
 public class SetupDataConfiguration extends AbstractConfiguration implements Validateable
 {

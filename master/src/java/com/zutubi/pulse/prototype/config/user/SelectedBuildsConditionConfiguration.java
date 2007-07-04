@@ -6,7 +6,7 @@ import com.zutubi.config.annotations.SymbolicName;
  *
  *
  */
-@SymbolicName("internal.selectedBuildsConditionConfig")
+@SymbolicName("zutubi.selectedBuildsConditionConfig")
 public class SelectedBuildsConditionConfiguration extends SubscriptionConditionConfiguration
 {
     private boolean unsuccessful;

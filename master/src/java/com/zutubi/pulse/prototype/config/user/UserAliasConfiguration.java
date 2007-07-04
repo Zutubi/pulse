@@ -7,7 +7,7 @@ import com.zutubi.pulse.core.config.AbstractConfiguration;
  *
  *
  */
-@SymbolicName("internal.userAliasConfig")
+@SymbolicName("zutubi.userAliasConfig")
 public class UserAliasConfiguration extends AbstractConfiguration
 {
     private String alias;

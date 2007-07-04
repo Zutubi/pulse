@@ -9,7 +9,7 @@ import org.jivesoftware.smack.XMPPException;
  *
  *
  */
-@SymbolicName("internal.jabberConfigurationCheckHandler")
+@SymbolicName("zutubi.jabberConfigurationCheckHandler")
 public class JabberConfigurationCheckHandler extends ConfigurationCheckHandlerSupport<JabberConfiguration>
 {
     private JabberManager jabberManager;

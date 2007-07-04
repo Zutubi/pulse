@@ -7,7 +7,7 @@ import com.zutubi.pulse.core.config.AbstractConfiguration;
  *
  *
  */
-@SymbolicName("internal.buildOptionsConfig")
+@SymbolicName("zutubi.buildOptionsConfig")
 public class BuildOptionsConfiguration extends AbstractConfiguration
 {
     public static final int TIMEOUT_NEVER = 0;

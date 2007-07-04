@@ -6,7 +6,7 @@ import com.zutubi.pulse.core.config.AbstractConfiguration;
 
 /**
  */
-@SymbolicName("loggingConfig")
+@SymbolicName("zutubi.loggingConfig")
 public class LoggingConfiguration extends AbstractConfiguration
 {
     private String level = "default";

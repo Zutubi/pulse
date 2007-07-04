@@ -10,7 +10,7 @@ import com.zutubi.pulse.core.config.AbstractConfiguration;
  *
  *
  */
-@SymbolicName("generalConfig")
+@SymbolicName("zutubi.generalConfig")
 @Form(fieldOrder={"baseUrl", "masterHost", "baseHelpUrl", "rssEnabled", "anonymousAccessEnabled", "anonymousSignupEnabled", "scmPollingInterval", "recipeTimeoutEnabled", "recipeTimeout" })
 public class GeneralAdminConfiguration extends AbstractConfiguration
 {
