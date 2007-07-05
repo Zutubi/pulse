@@ -27,7 +27,21 @@ public interface OptionProvider
      */
     Collection getOptions(Object instance, String path, TypeProperty property);
 
+    /**
+     * Defines the key/property to be used to retrieve the option key from the
+     * items in the collection.
+     *
+     * @return the key / property name used to retrieve the option key from the
+     * collection item.
+     */
     String getOptionKey();
 
+    /**
+     * Defines the key/property to be used to retrieve the option value from the
+     * items in the collection.
+     *
+     * @return the key / property name used to retrieve the option value from the 
+     * collection item.
+     */
     String getOptionValue();
 }

@@ -4,6 +4,7 @@ import com.zutubi.i18n.Messages;
 import com.zutubi.prototype.FieldDescriptor;
 import com.zutubi.prototype.FormDescriptor;
 import com.zutubi.prototype.FormDescriptorFactory;
+import com.zutubi.prototype.ExtensionOptionProvider;
 import com.zutubi.prototype.config.ConfigurationPersistenceManager;
 import com.zutubi.prototype.config.ConfigurationTemplateManager;
 import com.zutubi.prototype.model.SelectFieldDescriptor;
@@ -464,7 +465,13 @@ public abstract class AbstractTypeWizard implements Wizard
                 SelectFieldDescriptor select = new SelectFieldDescriptor();
                 select.setName("option");
                 select.setType("select");
-                select.setList(baseType.getExtensions());
+
+                ExtensionOptionProvider optionProvider = new ExtensionOptionProvider(baseType);
+                optionProvider.setTypeRegistry(typeRegistry);
+                select.setListKey(optionProvider.getOptionKey());
+                select.setListValue(optionProvider.getOptionValue());
+                select.setList(optionProvider.getOptions(null, null, null));
+
                 descriptor.add(select);
                 return descriptor;
             }
