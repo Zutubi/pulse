@@ -148,9 +148,9 @@
     <div id="innernorth" style="padding: 0px;">
     </div>
 
-    <div id="config-tree">
+    <div id="config-tree" style="padding: 10px">
     </div>
 
-    <div id="detail-pane" style="padding: 4px; min-height: 100%"></div>
+    <div id="detail-pane" style="padding: 10px; min-height: 100%"></div>
 </body>
 </html>

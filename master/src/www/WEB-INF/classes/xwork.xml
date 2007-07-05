@@ -742,7 +742,7 @@
             <result name="error" type="json">error.xml</result>
         </action>
 
-        <action name="display" class="com.zutubi.prototype.webwork.DispatlayTemplateAction">
+        <action name="display" class="com.zutubi.prototype.webwork.DisplayTemplateAction">
             <result name="success" type="velocity">template.vm</result>
         </action>
     </package>

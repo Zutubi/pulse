@@ -40,7 +40,9 @@
         fieldConfig.value = data[0][0];
     }
 </#if>
-    form.add(new Ext.form.ComboBox(fieldConfig));
+    var combo = new Ext.form.ComboBox(fieldConfig);
+    form.add(combo);
+    combo.on('select', updateButtons);
 }());
 
 <#include "/prototype/xhtml/controlfooter.ftl" />
