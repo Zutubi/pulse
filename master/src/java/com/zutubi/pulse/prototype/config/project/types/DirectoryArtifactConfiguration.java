@@ -2,6 +2,12 @@ package com.zutubi.pulse.prototype.config.project.types;
 
 import com.zutubi.config.annotations.Form;
 import com.zutubi.config.annotations.SymbolicName;
+import com.zutubi.config.annotations.Transient;
+import com.zutubi.util.StringUtils;
+import com.opensymphony.util.TextUtils;
+
+import java.util.List;
+import java.util.Collections;
 
 /**
  *
@@ -32,6 +38,28 @@ public class DirectoryArtifactConfiguration extends ArtifactConfiguration
      */
     private String mimeType;
 
+    public DirectoryArtifactConfiguration()
+    {
+    }
+
+    public DirectoryArtifactConfiguration(String name)
+    {
+        super(name);
+    }
+
+    public DirectoryArtifactConfiguration(String name, String base)
+    {
+        super(name);
+        this.base = base;
+    }
+
+    public DirectoryArtifactConfiguration(String name, String base, String mimeType)
+    {
+        super(name);
+        this.base = base;
+        this.mimeType = mimeType;
+    }
+
     public String getBase()
     {
         return base;
@@ -52,6 +80,12 @@ public class DirectoryArtifactConfiguration extends ArtifactConfiguration
         this.includes = includes;
     }
 
+    @Transient
+    public List<String> getIncludePatterns()
+    {
+        return splitPatterns(includes);
+    }
+
     public String getExcludes()
     {
         return excludes;
@@ -60,6 +94,25 @@ public class DirectoryArtifactConfiguration extends ArtifactConfiguration
     public void setExcludes(String excludes)
     {
         this.excludes = excludes;
+    }
+
+    @Transient
+    public List<String> getExcludePatterns()
+    {
+        return splitPatterns(excludes);
+    }
+
+    @SuppressWarnings({"unchecked"})
+    private List<String> splitPatterns(String patterns)
+    {
+        if(TextUtils.stringSet(patterns))
+        {
+            return StringUtils.split(patterns);
+        }
+        else
+        {
+            return Collections.EMPTY_LIST;
+        }
     }
 
     public String getMimeType()
@@ -75,5 +128,11 @@ public class DirectoryArtifactConfiguration extends ArtifactConfiguration
     public String toString()
     {
         return base;
+    }
+
+    @Transient
+    public String getType()
+    {
+        return "dir";
     }
 }

@@ -432,33 +432,6 @@ public class DefaultProjectManager implements ProjectManager, ConfigurationInjec
     }
 */
 
-/*
-    @Secured({"ACL_PROJECT_WRITE"})
-    public void deleteArtifact(Project project, long id)
-    {
-        project = getProject(project.getId());
-        if(project != null && project.getPulseFileDetails().isBuiltIn())
-        {
-            TemplatePulseFileDetails details = (TemplatePulseFileDetails) project.getPulseFileDetails();
-            Capture deadMan = null;
-
-            for(Capture c: details.getCaptures())
-            {
-                if(c.getId() == id)
-                {
-                    deadMan = c;
-                    break;
-                }
-            }
-
-            if(deadMan != null)
-            {
-                details.removeCapture(deadMan);
-            }
-        }
-    }
-*/
-
     public void buildCommenced(long projectId)
     {
         Project project = getProject(projectId);

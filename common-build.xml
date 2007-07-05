@@ -112,7 +112,6 @@
                 <exclude name="**/LogInformationAnalyserTest*"/>
                 <exclude name="**/Svn*"/>
                 <exclude name="**/*WorkingCopyTest*"/>
-                <exclude name="**/*PulseFileDetailsTest.java"/>
                 <exclude name="**/LocalBuildTest.java"/>
                 <exclude name="**/*Perforce*Test*"/>
             </fileset>

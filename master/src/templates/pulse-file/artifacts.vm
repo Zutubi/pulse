@@ -1,36 +1,36 @@
-#macro(processors $capture)
-    #foreach($processor in $capture.processors)
+#macro(processors $artifact)
+    #foreach($processor in $artifact.postprocessors)
         <process processor="$details.getReference($processor)"/>
     #end
 #end
-#foreach($capture in $captures)
-    #if($capture.type.equals("file"))
-<artifact name="$capture.name" file="$capture.file" fail-if-not-present="false"
-        #if($capture.mimeType)
-        type="$capture.mimeType"
+#foreach($artifact in $artifacts)
+    #if($artifact.type.equals("file"))
+<artifact name="$artifact.name" file="$artifact.file" fail-if-not-present="false"
+        #if($artifact.mimeType)
+        type="$artifact.mimeType"
         #end
         >
-    #processors($capture)
+    #processors($artifact)
 </artifact>
     #else
-<dir-artifact name="$capture.name" fail-if-not-present="false"
-        #if($capture.base)
-        base="$capture.base"
+<dir-artifact name="$artifact.name" fail-if-not-present="false"
+        #if($artifact.base)
+        base="$artifact.base"
         #end
-        #if($capture.index)
-        base="$capture.index"
+        #if($artifact.index)
+        base="$artifact.index"
         #end
-        #if($capture.mimeType)
-        type="$capture.mimeType"
+        #if($artifact.mimeType)
+        type="$artifact.mimeType"
         #end
         >
-        #foreach($pattern in $capture.includePatterns)
+        #foreach($pattern in $artifact.includePatterns)
     <include pattern="$pattern"/>
         #end
-        #foreach($pattern in $capture.excludePatterns)
+        #foreach($pattern in $artifact.excludePatterns)
     <exclude pattern="$pattern"/>
         #end
-    #processors($capture)
+    #processors($artifact)
 </dir-artifact>
     #end
 #end

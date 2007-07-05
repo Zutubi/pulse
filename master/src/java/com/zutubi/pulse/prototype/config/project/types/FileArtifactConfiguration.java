@@ -3,6 +3,7 @@ package com.zutubi.pulse.prototype.config.project.types;
 import com.zutubi.validation.annotations.Required;
 import com.zutubi.config.annotations.Form;
 import com.zutubi.config.annotations.SymbolicName;
+import com.zutubi.config.annotations.Transient;
 
 /**
  *
@@ -15,7 +16,7 @@ public class FileArtifactConfiguration extends ArtifactConfiguration
     /**
      * Path of the file to capture, relative to the base directory.
      */
-    @Required()
+    @Required
     private String file;
 
     /**
@@ -23,6 +24,23 @@ public class FileArtifactConfiguration extends ArtifactConfiguration
      * when the user downloads the artifact.
      */
     private String mimeType;
+
+    public FileArtifactConfiguration()
+    {
+    }
+
+    public FileArtifactConfiguration(String name, String file)
+    {
+        super(name);
+        this.file = file;
+    }
+
+    public FileArtifactConfiguration(String name, String file, String mimeType)
+    {
+        super(name);
+        this.file = file;
+        this.mimeType = mimeType;
+    }
 
     public String getFile()
     {
@@ -47,5 +65,11 @@ public class FileArtifactConfiguration extends ArtifactConfiguration
     public String toString()
     {
         return file;
+    }
+
+    @Transient
+    public String getType()
+    {
+        return "file";
     }
 }

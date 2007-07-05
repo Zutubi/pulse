@@ -33,11 +33,6 @@ public interface ProjectManager extends EntityManager<Project>
 
     int getProjectCount();
 
-/*
-    @Secured({"ACL_PROJECT_WRITE"})
-    void deleteArtifact(Project project, long id);
-*/
-
     void buildCommenced(long projectId);
 
     void buildCompleted(long projectId);

@@ -1,16 +1,18 @@
 package com.zutubi.pulse.model;
 
 import com.zutubi.pulse.util.FileSystemUtils;
+import com.zutubi.pulse.prototype.config.project.types.TemplateTypeConfiguration;
+import com.zutubi.pulse.prototype.config.project.types.MakeTypeConfiguration;
 
 /**
  */
-public class MakePulseFileDetailsTest extends TemplatePulseFileDetailsTestBase
+public class MakeTypeConfigurationTest extends TemplateTypeConfigurationTestBase
 {
-    private MakePulseFileDetails details;
+    private MakeTypeConfiguration type;
 
     protected void setUp() throws Exception
     {
-        details = new MakePulseFileDetails();
+        type = new MakeTypeConfiguration();
         generateMode = true;
         super.setUp();
     }
@@ -21,9 +23,9 @@ public class MakePulseFileDetailsTest extends TemplatePulseFileDetailsTestBase
         FileSystemUtils.rmdir(tmpDir);
     }
 
-    public TemplatePulseFileDetails getDetails()
+    public TemplateTypeConfiguration getType()
     {
-        return details;
+        return type;
     }
 
     public void testBasic() throws Exception
@@ -33,44 +35,37 @@ public class MakePulseFileDetailsTest extends TemplatePulseFileDetailsTestBase
 
     public void testExplicitBuildFile() throws Exception
     {
-        details.setMakefile("test.makefile");
+        type.setMakefile("test.makefile");
         createAndVerify("explicitMakefile");
-    }
-
-    public void testEnvironment() throws Exception
-    {
-        details.addEnvironmentalVariable("var", "value");
-        details.addEnvironmentalVariable("var2", "value2");
-        createAndVerify("environment");
     }
 
     public void testExplicitTargets() throws Exception
     {
-        details.setTargets("build test");
+        type.setTargets("build test");
         createAndVerify("explicitTargets");
     }
 
     public void testExplicitWorkingDir() throws Exception
     {
-        details.setWorkingDir("mywork");
+        type.setWorkingDir("mywork");
         createAndVerify("explicitWorkingDir");
     }
 
     public void testExplicitArgs() throws Exception
     {
-        details.setArguments("arg1 arg2");
+        type.setArguments("arg1 arg2");
         createAndVerify("explicitArgs");
     }
 
     public void testProcessOutput() throws Exception
     {
-        details.getOutputProcessors().add("junit");
+        type.addPostProcessor("junit");
         createAndVerify("processOutput");
     }
 
     public void testCaptureArtifacts() throws Exception
     {
-        addCaptures(details);
+        addArtifacts(type);
         createAndVerify("captureArtifacts");
     }
 }

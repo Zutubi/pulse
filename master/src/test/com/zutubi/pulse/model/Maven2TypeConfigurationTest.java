@@ -1,16 +1,18 @@
 package com.zutubi.pulse.model;
 
 import com.zutubi.pulse.util.FileSystemUtils;
+import com.zutubi.pulse.prototype.config.project.types.TemplateTypeConfiguration;
+import com.zutubi.pulse.prototype.config.project.types.Maven2TypeConfiguration;
 
 /**
  */
-public class MavenPulseFileDetailsTest extends TemplatePulseFileDetailsTestBase
+public class Maven2TypeConfigurationTest extends TemplateTypeConfigurationTestBase
 {
-    private MavenPulseFileDetails details;
+    private Maven2TypeConfiguration type;
 
     protected void setUp() throws Exception
     {
-        details = new MavenPulseFileDetails();
+        type = new Maven2TypeConfiguration();
         super.setUp();
     }
 
@@ -20,9 +22,9 @@ public class MavenPulseFileDetailsTest extends TemplatePulseFileDetailsTestBase
         FileSystemUtils.rmdir(tmpDir);
     }
 
-    public TemplatePulseFileDetails getDetails()
+    public TemplateTypeConfiguration getType()
     {
-        return details;
+        return type;
     }
 
     public void testBasic() throws Exception
@@ -32,31 +34,31 @@ public class MavenPulseFileDetailsTest extends TemplatePulseFileDetailsTestBase
 
     public void testArguments() throws Exception
     {
-        details.setArguments("arg1 arg2");
+        type.setArguments("arg1 arg2");
         createAndVerify("arguments");
     }
 
-    public void testTargets() throws Exception
+    public void testGoals() throws Exception
     {
-        details.setTargets("target1 target2");
+        type.setGoals("goal1 goal2");
         createAndVerify("targets");
     }
 
     public void testWorkingDir() throws Exception
     {
-        details.setWorkingDir("work");
+        type.setWorkingDir("work");
         createAndVerify("workingDir");
     }
 
     public void testProcessOutput() throws Exception
     {
-        details.getOutputProcessors().add("junit");
+        type.addPostProcessor("junit");
         createAndVerify("processOutput");
     }
 
     public void testCaptureArtifacts() throws Exception
     {
-        addCaptures(details);
+        addArtifacts(type);
         createAndVerify("captureArtifacts");
     }
 

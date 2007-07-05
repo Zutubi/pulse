@@ -10,21 +10,9 @@ import java.util.List;
  */
 public interface ProjectDao extends EntityDao<Project>
 {
-    void save(VersionedPulseFileDetails details);
-
-    VersionedPulseFileDetails findVersionedPulseFileDetails(long id);
-
-    void save(AntPulseFileDetails source);
-
-    void save(MakePulseFileDetails source);
-
     void save(TagPostBuildAction action);
 
     void save(RunExecutablePostBuildAction action);
-
-    AntPulseFileDetails findAntPulseFileSource(long id);
-
-    MakePulseFileDetails findMakePulseFileSource(long id);
 
     TagPostBuildAction findTagPostBuildAction(long id);
 

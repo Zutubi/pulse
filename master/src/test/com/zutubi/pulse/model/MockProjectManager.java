@@ -63,12 +63,6 @@ public class MockProjectManager implements ProjectManager
         throw new RuntimeException("Method not implemented.");
     }
 
-    @Secured({"ACL_PROJECT_WRITE"})
-    public void deleteArtifact(Project project, long id)
-    {
-        throw new RuntimeException("Method not implemented.");
-    }
-
     public void buildCommenced(long projectId)
     {
         throw new RuntimeException("Method not implemented.");

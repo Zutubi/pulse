@@ -26,7 +26,7 @@ public abstract class TemplateTypeConfiguration extends TypeConfiguration
 
     private List<String> postProcessors = new LinkedList<String>();
 
-    private Map<String, ArtifactConfiguration> artifacts = new HashMap<String, ArtifactConfiguration>();
+    private Map<String, ArtifactConfiguration> artifacts = new LinkedHashMap<String, ArtifactConfiguration>();
     @Transient
     private VelocityEngine velocityEngine;
 
@@ -41,6 +41,11 @@ public abstract class TemplateTypeConfiguration extends TypeConfiguration
         this.postProcessors = postProcessors;
     }
 
+    public void addPostProcessor(String postprocessor)
+    {
+        postProcessors.add(postprocessor);    
+    }
+
     public Map<String, ArtifactConfiguration> getArtifacts()
     {
         return artifacts;
@@ -49,6 +54,11 @@ public abstract class TemplateTypeConfiguration extends TypeConfiguration
     public void setArtifacts(Map<String, ArtifactConfiguration> artifacts)
     {
         this.artifacts = artifacts;
+    }
+
+    public void addArtifact(ArtifactConfiguration artifact)
+    {
+        artifacts.put(artifact.getName(), artifact);
     }
 
     public String getPulseFile(long id, ProjectConfiguration projectConfig, Revision revision, PatchArchive patch)
