@@ -102,10 +102,11 @@
                         autoScroll: true
                     });
 
-                    var loader = new ZUTUBI.ConfigTreeLoader('$base/aconfig/global');
+                    var loader = new ZUTUBI.ConfigTreeLoader('$base/aconfig');
                     //loader.on('loadexception', function(loader, node, response) {  console.dir(response); });
 
                     tree = new ZUTUBI.ConfigTree('config-tree', {
+                        pathPrefix: '${scope}',
                         animate: false,
                         loader: loader,
                         rootVisible: false,
@@ -128,9 +129,13 @@
                     nestedLayout.endUpdate();
 
                     tree.render();
-                    if (path && path != '')
+                    if (path && path != 'global')
                     {
                         tree.selectConfigPath(path);
+                    }
+                    else
+                    {
+                        tree.selectConfigPath('global/emailConfig');
                     }
                     root.expand();
                 }
