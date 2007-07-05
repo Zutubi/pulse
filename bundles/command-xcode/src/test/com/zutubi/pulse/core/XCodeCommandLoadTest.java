@@ -11,7 +11,7 @@ public class XCodeCommandLoadTest extends FileLoaderTestBase
     {
         super.setUp();
 
-        loader.register("xcode", XCodeCommand.class);
+        loader.register("xcodebuild", XCodeCommand.class);
     }
 
     public void testEmpty() throws PulseException
