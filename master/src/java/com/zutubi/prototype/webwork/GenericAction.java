@@ -4,6 +4,7 @@ import com.zutubi.prototype.ConventionSupport;
 import com.zutubi.prototype.actions.Actions;
 import com.zutubi.prototype.type.CompositeType;
 import com.zutubi.util.bean.ObjectFactory;
+import com.opensymphony.util.TextUtils;
 
 /**
  *
@@ -18,6 +19,8 @@ public class GenericAction extends PrototypeSupport
      */
     private String action;
 
+    private String newPath;
+
     /**
      * Setter for the action property
      *
@@ -26,6 +29,11 @@ public class GenericAction extends PrototypeSupport
     public void setAction(String action)
     {
         this.action = action;
+    }
+
+    public void setNewPath(String newPath)
+    {
+        this.newPath = newPath;
     }
 
     public String execute() throws Exception
@@ -51,7 +59,14 @@ public class GenericAction extends PrototypeSupport
 
         // FIXME: want to trigger a reload of the same page, not necessarily always a reload of the configs path, since
         // the action may be triggered from multiple locations.
-        response = new ConfigurationResponse(path, configurationTemplateManager.getTemplatePath(path));
+        if (TextUtils.stringSet(newPath))
+        {
+            response = new ConfigurationResponse(newPath, null);
+        }
+        else
+        {
+            response = new ConfigurationResponse(path, configurationTemplateManager.getTemplatePath(path));
+        }
 
         return SUCCESS;
     }

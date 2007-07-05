@@ -57,7 +57,12 @@
 
         var actionPath = function(path)
         {
-            runAjaxRequest('$base/aconfig/' + path);
+            // ajax actions are executed in place. so that we know where to refresh to, we
+            // first need to know where we are.
+            var detailPane = Ext.get('detail-pane').getUpdateManager().defaultUrl;
+            var oldPath = detailPane.substring('$base/aconfig/'.length, detailPane.length);
+            
+            runAjaxRequest('$base/aconfig/' + path + '=&newPath=' + oldPath);
         }
 
         var deletePath = function(path)
