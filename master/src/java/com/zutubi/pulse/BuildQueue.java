@@ -1,5 +1,6 @@
 package com.zutubi.pulse;
 
+import com.zutubi.pulse.core.model.Entity;
 import com.zutubi.pulse.events.build.AbstractBuildRequestEvent;
 
 import java.util.*;
@@ -90,7 +91,7 @@ public class BuildQueue
      * @param owner owner of the completed build
      * @return the next request for the project, or null if there is none
      */
-    public AbstractBuildRequestEvent buildCompleted(Object owner)
+    public AbstractBuildRequestEvent buildCompleted(Entity owner)
     {
         List<AbstractBuildRequestEvent> entityRequests = requests.get(owner);
         assert(entityRequests.size() > 0);

@@ -10,6 +10,7 @@ import com.zutubi.pulse.prototype.config.agent.AgentConfiguration;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 /**
  * A resource repository backed by the configuration subsystem.
@@ -69,12 +70,15 @@ public class ConfigurationResourceRepository implements ConfigurableResourceRepo
             // we have an existing resource, so merge the details.
             for (String propertyName: resource.getProperties().keySet())
             {
-                if (existingResource.hasProperty(propertyName) && overwrite)
+                if (existingResource.hasProperty(propertyName))
                 {
-                    existingResource.deleteProperty(propertyName);
-                    existingResource.addProperty(resource.getProperty(propertyName));
+                    if (overwrite)
+                    {
+                        existingResource.deleteProperty(propertyName);
+                        existingResource.addProperty(resource.getProperty(propertyName));
+                    }
                 }
-                else if (!existingResource.hasProperty(propertyName))
+                else
                 {
                     existingResource.addProperty(resource.getProperty(propertyName));
                 }
@@ -95,12 +99,15 @@ public class ConfigurationResourceRepository implements ConfigurableResourceRepo
                     {
                         try
                         {
-                            if (existingVersion.hasProperty(propertyName) && overwrite)
+                            if (existingVersion.hasProperty(propertyName))
                             {
-                                existingVersion.deleteProperty(propertyName);
-                                existingVersion.addProperty(version.getProperty(propertyName));
+                                if (overwrite)
+                                {
+                                    existingVersion.deleteProperty(propertyName);
+                                    existingVersion.addProperty(version.getProperty(propertyName));
+                                }
                             }
-                            else if (!existingVersion.hasProperty(propertyName))
+                            else
                             {
                                 existingVersion.addProperty(version.getProperty(propertyName));
                             }
@@ -116,6 +123,11 @@ public class ConfigurationResourceRepository implements ConfigurableResourceRepo
 
             configurationProvider.insert(getResourcesPath(), existingResource);
         }
+    }
+
+    public Map<String, Resource> getAll()
+    {
+        return agentConfig.getResources();
     }
 
     private String getResourcesPath()

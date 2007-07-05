@@ -259,7 +259,7 @@ public class DefaultProjectManager implements ProjectManager, ConfigurationInjec
                     List<Revision> revisions = changelistIsolator.getRevisionsToRequest(projectConfig, project, force);
                     for(Revision r: revisions)
                     {
-                        requestBuildOfRevision(reason, projectConfig, r);
+                        requestBuildOfRevision(reason, project, r);
                     }
                 }
                 catch (ScmException e)
@@ -269,13 +269,13 @@ public class DefaultProjectManager implements ProjectManager, ConfigurationInjec
             }
             else
             {
-                eventManager.publish(new BuildRequestEvent(this, reason, projectConfig, new BuildRevision()));
+                eventManager.publish(new BuildRequestEvent(this, reason, project, new BuildRevision()));
             }
         }
         else
         {
             // Just raise one request.
-            requestBuildOfRevision(reason, projectConfig, revision);
+            requestBuildOfRevision(reason, project, revision);
         }
     }
 
@@ -308,16 +308,16 @@ public class DefaultProjectManager implements ProjectManager, ConfigurationInjec
         return number;
     }
 
-    private void requestBuildOfRevision(BuildReason reason, ProjectConfiguration projectConfig, Revision revision)
+    private void requestBuildOfRevision(BuildReason reason, Project project, Revision revision)
     {
         try
         {
-            String pulseFile = getPulseFile(projectConfig, revision, null);
-            eventManager.publish(new BuildRequestEvent(this, reason, projectConfig, new BuildRevision(revision, pulseFile, reason.isUser())));
+            String pulseFile = getPulseFile(project.getConfig(), revision, null);
+            eventManager.publish(new BuildRequestEvent(this, reason, project, new BuildRevision(revision, pulseFile, reason.isUser())));
         }
         catch (BuildException e)
         {
-            LOG.severe("Unable to obtain pulse file for project '" + projectConfig.getName() + "', revision '" + revision.getRevisionString() + "': " + e.getMessage(), e);
+            LOG.severe("Unable to obtain pulse file for project '" + project.getName() + "', revision '" + revision.getRevisionString() + "': " + e.getMessage(), e);
         }
     }
 

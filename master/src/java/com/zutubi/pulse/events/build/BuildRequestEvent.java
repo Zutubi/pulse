@@ -1,28 +1,26 @@
 package com.zutubi.pulse.events.build;
 
 import com.zutubi.pulse.core.BuildRevision;
-import com.zutubi.pulse.model.BuildReason;
-import com.zutubi.pulse.model.BuildResult;
-import com.zutubi.pulse.model.Project;
-import com.zutubi.pulse.model.ProjectManager;
-import com.zutubi.pulse.model.UserManager;
-import com.zutubi.pulse.prototype.config.project.ProjectConfiguration;
+import com.zutubi.pulse.core.model.Entity;
+import com.zutubi.pulse.model.*;
 
 /**
  */
 public class BuildRequestEvent extends AbstractBuildRequestEvent
 {
     private BuildReason reason;
+    private Project owner;
 
-    public BuildRequestEvent(Object source, BuildReason reason, ProjectConfiguration projectConfig, BuildRevision revision)
+    public BuildRequestEvent(Object source, BuildReason reason, Project project, BuildRevision revision)
     {
-        super(source, revision, projectConfig);
+        super(source, revision, project.getConfig());
+        this.owner = project;
         this.reason = reason;
     }
 
-    public Object getOwner()
+    public Entity getOwner()
     {
-        return projectConfig;
+        return owner;
     }
 
     public boolean isPersonal()

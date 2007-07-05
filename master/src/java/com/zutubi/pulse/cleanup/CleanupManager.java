@@ -4,9 +4,9 @@ import com.zutubi.prototype.config.ConfigurationProvider;
 import com.zutubi.prototype.config.ConfigurationRegistry;
 import com.zutubi.prototype.config.TypeAdapter;
 import com.zutubi.prototype.config.TypeListener;
-import com.zutubi.prototype.type.TypeException;
 import com.zutubi.prototype.type.record.PathUtils;
 import com.zutubi.pulse.cleanup.config.CleanupConfiguration;
+import com.zutubi.pulse.cleanup.config.CleanupUnit;
 import com.zutubi.pulse.cleanup.config.CleanupWhat;
 import com.zutubi.pulse.events.Event;
 import com.zutubi.pulse.events.EventListener;
@@ -93,6 +93,9 @@ public class CleanupManager
                 // FIXME: need to actually contribute to the global project
                 CleanupConfiguration cleanupConfiguration = new CleanupConfiguration();
                 cleanupConfiguration.setName("default");
+                cleanupConfiguration.setWhat(CleanupWhat.WORKING_DIRECTORIES_ONLY);
+                cleanupConfiguration.setRetain(10);
+                cleanupConfiguration.setUnit(CleanupUnit.BUILDS);
                 configurationProvider.insert(PathUtils.getPath(instance.getConfigurationPath(), "cleanup"), cleanupConfiguration);
             }
         };

@@ -1,10 +1,13 @@
 package com.zutubi.pulse.events.build;
 
 import com.zutubi.pulse.core.BuildRevision;
+import com.zutubi.pulse.core.model.Entity;
 import com.zutubi.pulse.events.Event;
-import com.zutubi.pulse.model.*;
-import com.zutubi.pulse.util.TimeStamps;
+import com.zutubi.pulse.model.BuildResult;
+import com.zutubi.pulse.model.ProjectManager;
+import com.zutubi.pulse.model.UserManager;
 import com.zutubi.pulse.prototype.config.project.ProjectConfiguration;
+import com.zutubi.pulse.util.TimeStamps;
 
 /**
  */
@@ -23,7 +26,7 @@ public abstract class AbstractBuildRequestEvent extends Event
         this.queued = System.currentTimeMillis();
     }
 
-    public abstract Object getOwner();
+    public abstract Entity getOwner();
     public abstract boolean isPersonal();
     public abstract BuildResult createResult(ProjectManager projectManager, UserManager userManager);
 

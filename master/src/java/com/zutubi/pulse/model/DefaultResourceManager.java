@@ -1,28 +1,23 @@
 package com.zutubi.pulse.model;
 
-import com.zutubi.prototype.config.ConfigurationEventListener;
 import com.zutubi.prototype.config.ConfigurationProvider;
 import com.zutubi.prototype.config.TypeListener;
-import com.zutubi.prototype.config.events.ConfigurationEvent;
-import com.zutubi.prototype.config.events.PostInsertEvent;
-import com.zutubi.prototype.config.events.PostSaveEvent;
-import com.zutubi.prototype.config.events.PreDeleteEvent;
 import com.zutubi.pulse.core.ConfigurableResourceRepository;
 import com.zutubi.pulse.core.ResourceRepository;
 import com.zutubi.pulse.core.config.Resource;
 import com.zutubi.pulse.core.config.ResourceVersion;
 import com.zutubi.pulse.prototype.config.agent.AgentConfiguration;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
 /**
  */
-public class DefaultResourceManager implements ResourceManager, ConfigurationEventListener
+public class DefaultResourceManager implements ResourceManager
 {
     private Map<Long, ConfigurationResourceRepository> agentRepositories = new TreeMap<Long, ConfigurationResourceRepository>();
-
     private ConfigurationProvider configurationProvider;
 
     public void init()
@@ -31,7 +26,7 @@ public class DefaultResourceManager implements ResourceManager, ConfigurationEve
         {
             public void postInsert(AgentConfiguration instance)
             {
-                agentRepositories.put(instance.getHandle(), new ConfigurationResourceRepository(instance, configurationProvider));
+                addAgentRepo(instance);
             }
 
             public void preDelete(AgentConfiguration instance)
@@ -41,11 +36,22 @@ public class DefaultResourceManager implements ResourceManager, ConfigurationEve
 
             public void postSave(AgentConfiguration instance)
             {
-                preDelete(instance);
-                postInsert(instance);
+                // Replaces the existing as it is stored by the (unchanging)
+                // handle.
+                addAgentRepo(instance);
             }
         };
         listener.register(configurationProvider);
+
+        for(AgentConfiguration agentConfig: configurationProvider.getAll(AgentConfiguration.class))
+        {
+            addAgentRepo(agentConfig);
+        }
+    }
+
+    private void addAgentRepo(AgentConfiguration agentConfiguration)
+    {
+        agentRepositories.put(agentConfiguration.getHandle(), new ConfigurationResourceRepository(agentConfiguration, configurationProvider));
     }
 
     public ResourceRepository getAgentRepository(long handle)
@@ -70,8 +76,13 @@ public class DefaultResourceManager implements ResourceManager, ConfigurationEve
 
     public Map<String, Resource> findAll()
     {
-        // FIXME
-        return null;
+        Map<String, Resource> allResources = new HashMap<String, Resource>();
+        for(ConfigurationResourceRepository repo: agentRepositories.values())
+        {
+            allResources.putAll(repo.getAll());
+        }
+
+        return allResources;
     }
 
     public void editResource(PersistentResource resource, String newName, String defaultVersion)
@@ -116,24 +127,6 @@ public class DefaultResourceManager implements ResourceManager, ConfigurationEve
         resource.deleteVersion(version);
         version.setValue(newValue);
         resource.add(version);
-    }
-
-    public void handleConfigurationEvent(ConfigurationEvent event)
-    {
-        if(event instanceof PostInsertEvent)
-        {
-            AgentConfiguration agentConfig = (AgentConfiguration) event.getInstance();
-            agentRepositories.put(agentConfig.getHandle(), new ConfigurationResourceRepository((AgentConfiguration) event.getInstance(), configurationProvider));
-        }
-        else if(event instanceof PreDeleteEvent)
-        {
-            PreDeleteEvent pde = (PreDeleteEvent) event;
-            agentRepositories.remove(pde.getInstance().getHandle());
-        }
-        else if(event instanceof PostSaveEvent)
-        {
-            // FIXME: looks totally incomplete
-        }
     }
 
     public void setConfigurationProvider(ConfigurationProvider configurationProvider)

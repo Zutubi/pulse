@@ -1,16 +1,13 @@
 package com.zutubi.pulse.cleanup.config;
 
-import com.zutubi.config.annotations.Form;
-import com.zutubi.config.annotations.Select;
-import com.zutubi.config.annotations.SymbolicName;
-import com.zutubi.config.annotations.Format;
-import com.zutubi.config.annotations.Table;
+import com.zutubi.config.annotations.*;
 import com.zutubi.pulse.core.config.AbstractNamedConfiguration;
 import com.zutubi.pulse.core.model.ResultState;
 import com.zutubi.pulse.model.BuildResult;
 import com.zutubi.pulse.model.Project;
 import com.zutubi.pulse.model.persistence.BuildResultDao;
 import com.zutubi.util.Constants;
+import com.zutubi.validation.annotations.Numeric;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -30,6 +27,7 @@ public class CleanupConfiguration extends AbstractNamedConfiguration
     @Format("CleanupStateColumnFormatter")
     private List<ResultState> states;
 
+    @Numeric(min = 1)
     private int retain;
 
     private CleanupUnit unit;

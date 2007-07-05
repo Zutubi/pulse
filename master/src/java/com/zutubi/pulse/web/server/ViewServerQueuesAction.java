@@ -5,7 +5,6 @@ import com.zutubi.pulse.RecipeDispatchRequest;
 import com.zutubi.pulse.RecipeQueue;
 import com.zutubi.pulse.events.build.AbstractBuildRequestEvent;
 import com.zutubi.pulse.model.*;
-import com.zutubi.pulse.prototype.config.project.ProjectConfiguration;
 import com.zutubi.pulse.web.ActionSupport;
 
 import java.util.*;
@@ -20,7 +19,6 @@ public class ViewServerQueuesAction extends ActionSupport
     private FatController fatController;
     private RecipeQueue recipeQueue;
     private BuildManager buildManager;
-    private ProjectManager projectManager;
     private UserManager userManager;
 
     public List<AbstractBuildRequestEvent> getBuildQueue()
@@ -75,8 +73,7 @@ public class ViewServerQueuesAction extends ActionSupport
                 }
                 else
                 {
-                    ProjectConfiguration projectConfig = (ProjectConfiguration) active.getOwner();
-                    Project project = projectManager.getProject(projectConfig.getProjectId());
+                    Project project = (Project) active.getOwner();
                     result = buildManager.getLatestBuildResult(project);
                 }
 

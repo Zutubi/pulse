@@ -15,5 +15,4 @@ public interface ResourceRepository
     Resource getResource(String name);
 
     List<String> getResourceNames();
-
 }
