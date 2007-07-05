@@ -14,8 +14,7 @@ public class BrowseProjectDirAction extends ProjectActionSupport
     private long buildId;
     private BuildResult buildResult;
     private String separator;
-    // FIXME: rename me to something else, make sure the template is also updated.
-    private BuildOptionsConfiguration buildSpecification;
+    private BuildOptionsConfiguration buildOptions;
 
     public long getBuildId()
     {
@@ -32,9 +31,9 @@ public class BrowseProjectDirAction extends ProjectActionSupport
         return buildResult;
     }
 
-    public BuildOptionsConfiguration getBuildSpecification()
+    public BuildOptionsConfiguration getBuildOptions()
     {
-        return buildSpecification;
+        return buildOptions;
     }
 
     public String getSeparator()
@@ -69,9 +68,9 @@ public class BrowseProjectDirAction extends ProjectActionSupport
         separator = File.separator.replace("\\", "\\\\");
 
         // provide some useful feedback on why the working directory is not available.
-        ProjectConfiguration projectConfig = getProjectManager().getProjectConfig(projectId);
+        ProjectConfiguration projectConfig = getProjectManager().getProjectConfig(buildResult.getProject().getId());
         // a) the working copy is not being retained.
-        buildSpecification = projectConfig.getOptions();
+        buildOptions = projectConfig.getOptions();
         // b) else, the working directory has been cleaned up by a the projects "cleanup rules" or
         //    it has been manually deleted or the working directory capture has failed.
 

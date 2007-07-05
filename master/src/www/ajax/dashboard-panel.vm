@@ -70,13 +70,7 @@
 </p>
 #end
 
-<p style="text-align: right; margin-bottom: 0">
-    <a href="$base/user/configureDashboard!input.action" id="configure.dashboard">
-        <img alt="configure" src="$base/images/pencil.gif"/> #wwtext("name=configure.dashboard")
-    </a>
-</p>
-
-<h2 style="margin-top: 0" class="section">#wwtext("name=my.projects")
+<h2 class="section">#wwtext("name=my.projects")
 #if($rssEnabled)
     <a class="unadorned" href="$base/rss.action?userId=$principle.id"><img alt="$action.getText('rss')" src="$base/images/feed-icon-16x16.gif"/></a>
 #end

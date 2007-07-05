@@ -37,7 +37,7 @@
                 #actionCellTitle("home.tab" "currentBuild.action?id=$project.id" "house.gif")
                 #actionCellTitle("reporting.tab" "projectReports.action?id=$project.id" "chart_bar.gif")
                 #actionCellTitle("history.tab" "history.action?id=$project.id" "time.gif")
-                #actionCellTitle("configuration.tab" "configureProject.action?id=$project.id" "pencil.gif")
+                #actionCellTitle("configuration.tab" "$base/admin/project/#uce($project.name).action" "pencil.gif")
             #if($action.canWrite($project))
                 #actionCellTitle("buildspec.trigger" "triggerBuild.action?projectId=$project.id" "lightning.gif")
             #else

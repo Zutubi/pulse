@@ -33,7 +33,7 @@
                             <li>
                                 <a href="#" id="nav_$node.id" onclick="selectNode('$node.id'); return false;">
                                     #statusImage($node.result false)
-                                    $!webwork.htmlEncode($node.stage)
+                                    $!webwork.htmlEncode($node.stageName)
                                 </a>
             #if($node.result.commandResults.size() > 0)
                                <ul>

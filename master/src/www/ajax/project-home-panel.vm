@@ -99,10 +99,10 @@
                 </tr>
             </table>
 
-<!-- FIXME: replace this with links to the projects configuration for those that are authorised...
-    can also include links to the actions available for the projectConfig so that admins can interact with the
-    project outside the config pages.
-
+<!--
+FIXME: Hide link to the configuration for users that cannot edit.  Also add
+project action links.
+-->
             <table class="fill-content">
                 #headingRow("project.basics" 2)
                 #dynamicRow("project.name" $project.name)
@@ -115,27 +115,13 @@
             #if($project.url && $project.url.length() > 0)
                 #dynamicLinkRow("project.url" "homepage" $project.url)
             #end
-#authorize("ifAllGranted=ROLE_ADMINISTRATOR")
                 <tr>
-                    <th class="content-row" rowspan="2">#wwtext("name=actions")</th>
+                    <th class="content-row"">#wwtext("name=actions")</th>
                     <td class="content">
-                        <img src="$base/images/page_copy.gif"/> #wwtext("name=project.clone")
-                    </td>
-                </tr>
-                <tr>
-                    <td class="content">
-            #if($projectNotBuilding)
-                        <a href="deleteProject!input.action?id=$project.id">
-                            <img src="$base/images/delete.gif"/> #wwtext("name=delete.project")
-                        </a>
-            #else
-                        #wwtext("name=project.actions.building")
-            #end
-#end
+                        <img src="$base/images/pencil.gif"/> <a href="$base/admin/project/#uce($project.name).action">#wwtext("name=project.configure")</a>
                     </td>
                 </tr>
             </table>
--->
         </td>
     </tr>
 </table>

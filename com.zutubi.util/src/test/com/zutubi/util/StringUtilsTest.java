@@ -1,6 +1,5 @@
 package com.zutubi.util;
 
-import com.zutubi.util.StringUtils;
 import junit.framework.TestCase;
 
 import java.util.Arrays;
@@ -365,6 +364,36 @@ public class StringUtilsTest extends TestCase
     public void testUrlEncodePathEmpty()
     {
         assertEquals("", StringUtils.urlEncodePath(""));
+    }
+
+    public void testURIComponentEncodeEmpty()
+    {
+        assertEquals("", StringUtils.uriComponentEncode(""));
+    }
+
+    public void testURIComponentEncodeNoChange()
+    {
+        assertEquals("agzALZ0369_-!~.'()*", StringUtils.uriComponentEncode("agzALZ0369_-!~.'()*"));
+    }
+
+    public void testURIComponentEncodeNonASCII()
+    {
+        assertEquals("\u1234", StringUtils.uriComponentEncode("\u1234"));
+    }
+
+    public void testURIComponentEncodeForwardSlash()
+    {
+        assertEquals("%2f", StringUtils.uriComponentEncode("/"));
+    }
+
+    public void testURIComponentEncodeMixedFirstOK()
+    {
+        assertEquals("a%2f%20b%26c%23", StringUtils.uriComponentEncode("a/ b&c#"));
+    }
+
+    public void testURIComponentEncodeMixedFirstEncoded()
+    {
+        assertEquals("%3ahelp%2b%26m%24e", StringUtils.uriComponentEncode(":help+&m$e"));
     }
 
     private void splitHelper(String s, String... expected)

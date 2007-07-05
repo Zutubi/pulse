@@ -162,7 +162,6 @@ public class BuildController implements EventListener
             DefaultRecipeLogger logger = new DefaultRecipeLogger(new File(paths.getRecipeDir(buildResult, recipeResult.getId()), RecipeResult.RECIPE_LOG));
             RecipeResultNode previousRecipe = previousSuccessful == null ? null : previousSuccessful.findResultNodeByHandle(stage.getHandle());
             RecipeController rc = new RecipeController(projectConfig, buildResult, childResultNode, dispatchRequest, recipeProperties, request.isPersonal(), incremental, previousRecipe, logger, collector);
-            //queue, buildManager, serviceTokenManager
             rc.setRecipeQueue(queue);
             rc.setBuildManager(buildManager);
             rc.setServiceTokenManager(serviceTokenManager);

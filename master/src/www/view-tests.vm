@@ -25,7 +25,7 @@
         #foreach($node in $result.root.children)
             #set($summary = $node.result.testSummary)
         <tr>
-            #dynamicLinkCell($node.stage "viewTestSuite.action?id=$result.id&nodeId=$node.id")
+            #dynamicLinkCell($node.stageName "viewTestSuite.action?id=$result.id&nodeId=$node.id")
             #testStatusCell($summary)
             #rightCell($summary.total)
             #rightCell($summary.failures)

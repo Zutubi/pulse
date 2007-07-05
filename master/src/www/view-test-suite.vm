@@ -35,7 +35,7 @@
 
     <p>
         <a href="viewTests.action?id=$result.id">#wwtext("name=tests.all")</a>
-        :: <a href="viewTestSuite.action?id=$result.id&nodeId=$node.id">#wwtext("name=build.stage") $!webwork.htmlEncode($node.stage)</a>
+        :: <a href="viewTestSuite.action?id=$result.id&nodeId=$node.id">#wwtext("name=build.stage") $!webwork.htmlEncode($node.stageName)</a>
 #set($suitePath="")
 #foreach($element in $paths)
     #if($element.length() > 0)

@@ -51,7 +51,7 @@
 #macro(stageTags $buildResult $resultNode)
     #buildTags($buildResult.project $buildResult)
     <content tag="resultNodeId">$resultNode.id</content>
-    <content tag="stageName">$!webwork.htmlEncode($resultNode.stage)</content>
+    <content tag="stageName">$!webwork.htmlEncode($resultNode.stageName)</content>
 #end
 
 ##
@@ -220,7 +220,6 @@
         #projectTab("home" "currentBuild" $selected)
         #projectTab("reporting" "projectReports" $selected)
         #projectTab("history" "history" $selected)
-        #projectTab("configuration" "configureProject" $selected)
     #closeTabs()
 #end
 
@@ -308,7 +307,9 @@
     #openTabs()
         #dashboardTab("homepage" "$base/dashboard" $selected)
         #dashboardTab("my-builds" "$base/myBuilds" $selected)
+<!--
         #dashboardTab("preferences" "$base/preferences" $selected)
+-->
     #closeTabs()
 #end
 
@@ -1333,11 +1334,11 @@
     #if($detailedView)
         <td class="content">
             <a href="#" onclick="selectNode('$resultNode.id'); return false">
-                $!webwork.htmlEncode($resultNode.stage)
+                $!webwork.htmlEncode($resultNode.stageName)
             </a>
         </td>
     #else
-        #dynamicLinkCell($resultNode.stage "$base/viewCommandLog.action?id=$build.id&amp;selectedNode=$resultNode.id")
+        #dynamicLinkCell($resultNode.stageName "$base/viewCommandLog.action?id=$build.id&amp;selectedNode=$resultNode.id")
     #end
         #dynamicCell($recipe.recipeNameSafe)
         #dynamicCell($resultNode.hostSafe)
@@ -1490,7 +1491,7 @@
 ##
 #macro(nodeMessageSummary $build $node $level)
     #if($node.hasMessages($level))
-        <li class="header">#wwtext("name=build.stage") :: $!webwork.htmlEncode($node.stage) :: $!webwork.htmlEncode("$node.result.recipeNameSafe@$node.hostSafe")
+        <li class="header">#wwtext("name=build.stage") :: $!webwork.htmlEncode($node.stageName) :: $!webwork.htmlEncode("$node.result.recipeNameSafe@$node.hostSafe")
             <ul>
             #recipeMessageSummary($build $node.result $level false)
             #foreach($child in $node.children)
@@ -1626,7 +1627,7 @@
 ##
 #macro(recipeNodeArtifacts $build $node)
     #if($node.hasArtifacts())
-        <li class="artifact"><span class="expanded-list" id="${node.result.id}_artifacts_header" onclick="toggleList('${node.result.id}_artifacts');">#wwtext("name=build.stage") :: $!webwork.htmlEncode($node.stage) :: $!webwork.htmlEncode("$node.result.recipeNameSafe@$node.hostSafe")</span>
+        <li class="artifact"><span class="expanded-list" id="${node.result.id}_artifacts_header" onclick="toggleList('${node.result.id}_artifacts');">#wwtext("name=build.stage") :: $!webwork.htmlEncode($node.stageName) :: $!webwork.htmlEncode("$node.result.recipeNameSafe@$node.hostSafe")</span>
             <ul class="artifact" id="${node.result.id}_artifacts">
             #recipeArtifacts($build $node.result false)
             #foreach($child in $node.children)
@@ -1663,7 +1664,7 @@
     <table class="fill-content">
         <tr>
             <th class="heading" colspan="5">
-                #wwtext("name=build.stage") :: $!webwork.htmlEncode($recipeNode.stage) :: $!webwork.htmlEncode("$recipeNode.result.recipeNameSafe@$recipeNode.hostSafe")
+                #wwtext("name=build.stage") :: $!webwork.htmlEncode($recipeNode.stageName) :: $!webwork.htmlEncode("$recipeNode.result.recipeNameSafe@$recipeNode.hostSafe")
             </th>
         </tr>
         #set($excess = $recipeNode.result.excessFailureCount)

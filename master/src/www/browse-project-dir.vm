@@ -67,7 +67,7 @@
 #else
     <p style="max-width:600px">
         The working directory for this build is not available.
-        #if ($buildSpecification.getRetainWorkingCopy())
+        #if ($buildOptions.getRetainWorkingCopy())
             This is likely the result of one of the following:
             <ul>
                 <li><strong>1</strong>&nbsp;&nbsp; The build specification was not configured to retain the working copy at the time of the build.</li>

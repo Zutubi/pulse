@@ -42,9 +42,11 @@ public class RecipeResultNode extends Entity
     }
 
     /**
-     * WARNING: This stage configuration id may or MAY NOT exist.
+     * WARNING: The actual stage configuration for this handle may not exist.
+     * It may have been deleted after this build occured.
      *  
-     * @return
+     * @return a handle that can be used to identify the same stage across
+     *         multiple builds
      */
     public long getStageHandle()
     {

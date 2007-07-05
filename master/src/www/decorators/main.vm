@@ -159,7 +159,7 @@
               </td>
               <td class="user" align="right">
 #if($principle)
-                  $principle.name [ <a id="prefs" href="$base/preferences.action">preferences</a>#if($canLogout) | <a id="logout" href="$base/logout.action">logout</a>#end ]
+                  $principle.name #if($canLogout) [ <a id="logout" href="$base/logout.action">logout</a> ] #end
 #else
                   <a id="login" href="$base/login.action">login</a>
 #end
@@ -188,7 +188,7 @@
         <li><a #if($selectedTab && $selectedTab == "queues")         class="active" #end id="tab.queues" href="$base/viewServerQueues.action">queues</a></li>
         <li><a #if($selectedTab && $selectedTab == "agents")         class="active" #end id="tab.agents" href="$base/viewAgents.action">agents</a></li>
         #authorize("ifAllGranted=ROLE_ADMINISTRATOR")
-        <li><a #if($selectedTab && $selectedTab == "administration") class="active" #end id="tab.administration" href="$base/admin/settings.action">administration</a></li>
+        <li><a #if($selectedTab && $selectedTab == "administration") class="active" #end id="tab.administration" href="$base/admin/projects.action">administration</a></li>
         #end
       </ul>
       <div class="clear"></div>
