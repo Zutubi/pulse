@@ -60,7 +60,6 @@
             if(node)
             {
                 Ext.get('detail-pane').load({url: configTree.loader.getNodePath(node), scripts:true});
-                templateTree.getSelectionModel().clearSelections();
             }
         }
 
@@ -211,6 +210,7 @@
                                 createConfigTree(node.id);
                             }
 
+                            configTree.getSelectionModel().clearSelections();
                             configTree.selectPath(node.id);
                             visibleTree = configTree;
                         }
@@ -229,6 +229,7 @@
                                 node = templateTree.getRootNode().firstChild;
                             }
 
+                            templateTree.getSelectionModel().clearSelections();
                             node.select();
                             visibleTree = templateTree;
                         }
@@ -257,9 +258,9 @@
     <div id="template-tree" class="ylayout-inactive-content" style="padding: 10px">
     </div>
 
-    <div id="config-tree" class="ylayout-inactive-content">
+    <div id="config-tree" class="ylayout-inactive-content" style="padding: 10px">
     </div>
 
-    <div id="detail-pane" style="padding: 4px; min-height: 100%"></div>
+    <div id="detail-pane" style="padding: 10px; min-height: 100%"></div>
 </body>
 </html>

@@ -7,21 +7,13 @@ import com.zutubi.prototype.type.CompositeType;
 import com.zutubi.prototype.type.TypeRegistry;
 import com.zutubi.prototype.type.record.MutableRecord;
 import com.zutubi.prototype.type.record.Record;
-import com.zutubi.pulse.AgentService;
-import com.zutubi.pulse.MasterAgentService;
-import com.zutubi.pulse.SlaveAgentService;
-import com.zutubi.pulse.SlaveProxyFactory;
-import com.zutubi.pulse.Version;
+import com.zutubi.pulse.*;
 import com.zutubi.pulse.bootstrap.DefaultSetupManager;
 import com.zutubi.pulse.bootstrap.MasterConfigurationManager;
 import com.zutubi.pulse.core.Stoppable;
 import com.zutubi.pulse.core.config.Resource;
-import com.zutubi.pulse.events.AgentRemovedEvent;
-import com.zutubi.pulse.events.AgentStatusEvent;
-import com.zutubi.pulse.events.AgentUpgradeCompleteEvent;
-import com.zutubi.pulse.events.Event;
+import com.zutubi.pulse.events.*;
 import com.zutubi.pulse.events.EventListener;
-import com.zutubi.pulse.events.EventManager;
 import com.zutubi.pulse.license.LicenseManager;
 import com.zutubi.pulse.license.authorisation.AddAgentAuthorisation;
 import com.zutubi.pulse.model.AgentState;
@@ -30,7 +22,6 @@ import com.zutubi.pulse.model.ResourceManager;
 import com.zutubi.pulse.prototype.config.admin.GeneralAdminConfiguration;
 import com.zutubi.pulse.prototype.config.agent.AgentConfiguration;
 import com.zutubi.pulse.services.ServiceTokenManager;
-import com.zutubi.pulse.services.SlaveService;
 import com.zutubi.pulse.services.SlaveStatus;
 import com.zutubi.pulse.services.UpgradeStatus;
 import com.zutubi.util.Sort;
@@ -38,20 +29,8 @@ import com.zutubi.util.bean.ObjectFactory;
 import com.zutubi.util.logging.Logger;
 
 import java.net.ConnectException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.TreeMap;
-import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.FutureTask;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
+import java.util.*;
+import java.util.concurrent.*;
 import java.util.concurrent.locks.ReentrantLock;
 
 /**
@@ -189,8 +168,14 @@ public class DefaultAgentManager implements AgentManager, EventListener, Stoppab
     {
         if(agentConfig.isRemote())
         {
-            SlaveService service = slaveProxyFactory.createProxy(agentConfig);
-            return objectFactory.buildBean(SlaveAgentService.class, new Class[] {SlaveService.class, AgentConfiguration.class}, new Object[]{service, agentConfig});
+            // Object factory fails us here as some of these deps are in the
+            // same context.
+            SlaveAgentService agentService = new SlaveAgentService(slaveProxyFactory.createProxy(agentConfig), agentConfig);
+            agentService.setConfigurationManager(configurationManager);
+            agentService.setConfigurationProvider(configurationProvider);
+            agentService.setResourceManager(resourceManager);
+            agentService.setServiceTokenManager(serviceTokenManager);
+            return agentService;
         }
         else
         {

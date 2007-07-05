@@ -1,5 +1,4 @@
 <style type="text/css">
-
     .panel{
         border-bottom-style:dotted;
         border-right-style:dotted;
@@ -121,7 +120,7 @@
 #end
 
 #set($config = $action.configuration)
-<h2>#i18n("key=label")</h2>
+<h2>$!webwork.htmlEncode($config.displayName)</h2>
 <p class="introduction">
     #i18n("key=introduction")
 </p>
@@ -137,7 +136,7 @@
                 #end
             #else
                 #if( $config.extensions.size() > 0)
-                    <p>To add a new #i18n("key=label"), please use the <a href="#" onclick="addToPath('${config.path}'); return false">wizard</a>.</p>
+                    <p><a href="#" class="unadorned" onclick="addToPath('${config.path}'); return false"><img alt="configure" src="$base/images/pencil.gif"/></a> <a href="#" onclick="addToPath('${config.path}'); return false">configure</a> a #i18n("key=label")</p>
                 #else
                     #if( $config.simpleProperties.size() > 0)
                         #renderform()

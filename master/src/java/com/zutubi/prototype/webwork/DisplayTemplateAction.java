@@ -30,6 +30,7 @@ public class DisplayTemplateAction extends ActionSupport implements MessagesProv
     private Record record;
     private Record parentRecord;
     private List<Record> childRecords;
+
     private ConfigurationTemplateManager configurationTemplateManager;
     private TypeRegistry typeRegistry;
 
@@ -66,6 +67,16 @@ public class DisplayTemplateAction extends ActionSupport implements MessagesProv
     public List<Record> getChildRecords()
     {
         return childRecords;
+    }
+
+    public boolean isRootTemplate()
+    {
+        return node.getParent() == null;
+    }
+
+    public boolean isConcrete()
+    {
+        return node.isConcrete();
     }
 
     public Messages getMessages()

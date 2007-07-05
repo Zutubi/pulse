@@ -1,17 +1,17 @@
 package com.zutubi.prototype.webwork;
 
 import com.opensymphony.util.TextUtils;
+import com.zutubi.prototype.ConventionSupport;
+import com.zutubi.prototype.actions.Actions;
 import com.zutubi.prototype.config.ConfigurationPersistenceManager;
 import com.zutubi.prototype.config.ConfigurationRegistry;
 import com.zutubi.prototype.config.ConfigurationTemplateManager;
+import com.zutubi.prototype.format.Display;
+import com.zutubi.prototype.type.CollectionType;
 import com.zutubi.prototype.type.CompositeType;
 import com.zutubi.prototype.type.Type;
-import com.zutubi.prototype.type.CollectionType;
 import com.zutubi.prototype.type.record.PathUtils;
 import com.zutubi.prototype.type.record.Record;
-import com.zutubi.prototype.actions.Actions;
-import com.zutubi.prototype.ConventionSupport;
-import com.zutubi.prototype.format.Display;
 import com.zutubi.pulse.bootstrap.ComponentContext;
 import com.zutubi.util.bean.ObjectFactory;
 
@@ -45,7 +45,8 @@ public class ConfigurationUIModel
     private String parentPath;
     private String[] parentPathElements;
     private String currentPath;
-
+    private String displayName;
+    
     private List<String> simpleProperties;
     private List<String> nestedProperties;
     private List<String> extensions = new LinkedList<String>();
@@ -145,6 +146,8 @@ public class ConfigurationUIModel
                 }
             }
         }
+
+        displayName = PrototypeUtils.getDisplayName(path, configurationTemplateManager);
     }
 
     public Object format(String fieldName)
@@ -199,6 +202,11 @@ public class ConfigurationUIModel
     public String[] getPathElements()
     {
         return pathElements;
+    }
+
+    public String getDisplayName()
+    {
+        return displayName;
     }
 
     public Record getRecord()

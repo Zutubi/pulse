@@ -1,32 +1,77 @@
+<style type="text/css">
+    .panel{
+        border-bottom-style:dotted;
+        border-right-style:dotted;
+        border-left-style:dotted;
+        border-bottom-color:gray;
+        border-left-color:gray;
+        border-right-color:gray;
+        border-bottom-width:1px;
+        border-right-width:1px;
+        border-left-width:1px;
+        margin-bottom:3em;
+    }
+
+    .header {
+        padding:5px;
+        background-color:#e8e8f3;
+        border-top-width:1px;
+        border-top-style:dotted;
+        border-top-color:gray;
+    }
+</style>
+
 <h2>$!webwork.htmlEncode($id)</h2>
+<p></p>
 
-<h3>actions</h3>
-
-<ul class="template-actions">
-    <li><img alt="configure" src="$base/images/pencil.gif"/> <a href="#" onclick="configureRecord('$path'); return false">configure</a> this #i18n("key=label")</li>
-    <li><img alt="add concrete" src="$base/images/add.gif"/> <a href="#" onclick="addToPath('$path', false); return false">add concrete</a> #i18n("key=label")</li>
-    <li><img alt="add template" src="$base/images/add.gif"/> <a href="#" onclick="addToPath('$path', true); return false">add template</a> #i18n("key=label")</li>
-#if($node.children.size() == 0)
-    <li><img alt="add concrete" src="$base/images/delete.gif"/> <a href="#" onclick="deletePath('$path'); return false">delete </a> this #i18n("key=label")</li>
-#end
-</ul>
-
-<h3>navigate</h3>
-
-#if($node.parent)
-<p>
-Parent:
-    <a href="#" onclick="selectTemplate('$node.parent.templatePath')">$!webwork.htmlEncode($node.parent.id)</a>
-</p>
+#macro(actionHeader $action $img $onclick)
+    <th><img alt="$action" src="$base/images/${img}.gif"/> <a href="#" onclick="$onclick; return false">$action</a></th>
 #end
 
-#if($node.children.size() > 0)
-<p>
-Children:
-    <ul class="template-children">
-#foreach($child in $node.children)
-        <li><a href="#" onclick="selectTemplate('$child.templatePath'); return false">$!webwork.htmlEncode($child.id)</a></li>
+<table class="template-actions" cellspacing="5px">
+    <tr>
+        #actionHeader("configure" "pencil" "configureRecord('$path')")
+        <td>jump to the configuration for this #i18n("key=label") #if(!$concrete) template #end</td>
+    </tr>
+#if(!$concrete)
+    <tr>
+        #actionHeader("add new" "add" "addToPath('$path', false)")
+        <td>add a new #i18n("key=label") as a child of this template</td>
+    </tr>
+    <tr>
+        #actionHeader("add new template" "add" "addToPath('$path', true)")
+        <td>add a new #i18n("key=label") template as a child of this template</td>
+    </tr>
 #end
-    </ul>
-</p>
+#if(!$rootTemplate || $node.children.size() == 0)
+    <tr>
+        #actionHeader("delete" "delete" "deletePath('$path')")
+        <td>delete this #i18n("key=label") #if(!$concrete) template #end</td>
+    </tr>
 #end
+</table>
+
+<!--
+#if(!$rootTemplate || $node.children.size() > 0)
+<div class="panel">
+    <h3 class="header">navigate</h3>
+    #if($node.parent)
+    <p>
+    Parent:
+        <a href="#" onclick="selectTemplate('$node.parent.templatePath')">$!webwork.htmlEncode($node.parent.id)</a>
+    </p>
+    #end
+
+    #if($node.children.size() > 0)
+    <p>
+    Children:
+        <ul class="template-children">
+    #foreach($child in $node.children)
+            <li><a href="#" onclick="selectTemplate('$child.templatePath'); return false">$!webwork.htmlEncode($child.id)</a></li>
+    #end
+        </ul>
+    </p>
+    #end
+</div>
+#end
+-->

@@ -3,9 +3,9 @@
 <link rel="stylesheet" type="text/css" href="/css/prototype.css" media="screen"/>
 
 <h2>${"label"?i18n}</h2>
-<div style="color:gray">
+<p class="introduction">
     ${"introduction"?i18n}
-</div>
+</p>
 
 <#-- TODO: review the css classes used here. -->
 <#if wizard.decorate == true>

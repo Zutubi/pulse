@@ -1,10 +1,9 @@
 #set($config = $action.configuration)
 
-<h2>#i18n("key=label")</h2>
-<div style="color:gray">
+<h2>$!webwork.htmlEncode($config.displayName)</h2>
+<p class="introduction">
     #i18n("key=introduction")
-</div>
-
+</p>
 <p>
     #table("path=$config.path" "ajax=true")
 </p>

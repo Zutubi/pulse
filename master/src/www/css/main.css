@@ -807,6 +807,32 @@ table.detail td li
 }
 
 /*
+ * Template display
+ */
+
+table.template-actions
+{
+    width: 100%;
+    border: solid 1px #e0e0e0;
+}
+
+.template-actions th, .template-actions td
+{
+    padding: 6px;
+    border: dotted 1px #e0e0e0;
+}
+
+.template-actions th
+{
+}
+
+.template-actions td
+{
+    width: 100%;
+}
+
+
+/*
  * For Ext.
  */
 .x-layout-panel, .x-layout-nested-layout .x-layout-panel {

@@ -2,7 +2,7 @@ package com.zutubi.pulse.prototype.config.project.changeviewer;
 
 import com.zutubi.config.annotations.SymbolicName;
 import com.zutubi.config.annotations.Transient;
-import com.zutubi.pulse.core.config.AbstractNamedConfiguration;
+import com.zutubi.pulse.core.config.AbstractConfiguration;
 import com.zutubi.pulse.core.model.FileRevision;
 import com.zutubi.pulse.core.model.Revision;
 import com.zutubi.pulse.servercore.config.ScmConfiguration;
@@ -12,7 +12,7 @@ import com.zutubi.pulse.servercore.config.ScmConfiguration;
  * ViewVC.
  */
 @SymbolicName("zutubi.changeViewerConfig")
-public abstract class ChangeViewerConfiguration extends AbstractNamedConfiguration
+public abstract class ChangeViewerConfiguration extends AbstractConfiguration
 {
     public enum Capability
     {
