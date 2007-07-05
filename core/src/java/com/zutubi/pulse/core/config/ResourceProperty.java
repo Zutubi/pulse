@@ -2,10 +2,12 @@ package com.zutubi.pulse.core.config;
 
 import com.zutubi.config.annotations.SymbolicName;
 import com.zutubi.config.annotations.Form;
+import com.zutubi.config.annotations.Table;
 
 /**
  */
 @Form(fieldOrder = { "name", "value", "addToEnvironment", "addToPath", "resolveVariables" })
+@Table(columns = {"name", "value"})
 @SymbolicName("zutubi.resourceProperty")
 public class ResourceProperty extends AbstractNamedConfiguration
 {

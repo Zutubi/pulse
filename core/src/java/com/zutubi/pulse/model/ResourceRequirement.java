@@ -3,6 +3,7 @@ package com.zutubi.pulse.model;
 import com.opensymphony.util.TextUtils;
 import com.zutubi.config.annotations.SymbolicName;
 import com.zutubi.pulse.core.config.AbstractConfiguration;
+import com.zutubi.validation.annotations.Required;
 
 /**
  * Identifies a required resource for a build stage.
@@ -10,6 +11,7 @@ import com.zutubi.pulse.core.config.AbstractConfiguration;
 @SymbolicName("zutubi.resourceRequirementConfig")
 public class ResourceRequirement extends AbstractConfiguration
 {
+    @Required
     private String resource;
     private String version;
 

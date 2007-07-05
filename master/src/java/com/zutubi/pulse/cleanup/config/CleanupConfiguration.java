@@ -21,7 +21,7 @@ import java.util.List;
  */
 @SymbolicName("zutubi.cleanupConfig")
 @Form(fieldOrder = {"name", "what", "retain", "unit"})
-@Table(columns = {"name", "states", "when"})
+@Table(columns = {"name", "states", "after"})
 public class CleanupConfiguration extends AbstractNamedConfiguration
 {
     private CleanupWhat what;
