@@ -1,5 +1,6 @@
 package com.zutubi.pulse.model;
 
+import com.opensymphony.util.TextUtils;
 import com.zutubi.prototype.config.ConfigurationProvider;
 import com.zutubi.prototype.type.record.PathUtils;
 import com.zutubi.pulse.core.ConfigurableResourceRepository;
@@ -29,7 +30,7 @@ public class ConfigurationResourceRepository implements ConfigurableResourceRepo
     public boolean hasResource(String name, String version)
     {
         Resource r = getResource(name);
-        return r != null && (version == null || r.hasVersion(version));
+        return r != null && (!TextUtils.stringSet(version) || r.hasVersion(version));
     }
 
     public boolean hasResource(String name)
