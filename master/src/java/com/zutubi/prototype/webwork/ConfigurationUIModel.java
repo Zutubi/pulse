@@ -136,9 +136,13 @@ public class ConfigurationUIModel
             Class displayHandler = ConventionSupport.getDisplay(type);
             if (displayHandler != null)
             {
-                Display displaySupport = new Display();
-                displaySupport.setObjectFactory(objectFactory);
-                displayFields = displaySupport.getDisplayFields(displayHandler);
+                // do not show display fields for template records.
+                if (configurationTemplateManager.isConcrete(parentPath, record))
+                {
+                    Display displaySupport = new Display();
+                    displaySupport.setObjectFactory(objectFactory);
+                    displayFields = displaySupport.getDisplayFields(displayHandler);
+                }
             }
         }
     }

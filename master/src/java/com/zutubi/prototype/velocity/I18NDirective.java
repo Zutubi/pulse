@@ -64,10 +64,6 @@ public class I18NDirective extends AbstractI18NDirective
             {
                 value = messages.format(this.key);
             }
-            if (!TextUtils.stringSet(value))
-            {
-                value = key;
-            }
             writer.write(value);
 
             return true;
