@@ -14,7 +14,6 @@
                     #dynamicRow("install.builddate" $targetVersion.buildDate)
                     #dynamicRow("install.buildnumber" $targetVersion.buildNumber)
                     #dynamicRow("install.versionnumber" $targetVersion.versionNumber)
-##                    #dynamicRow("install.lastused" "")
                 </table>
             </td>
             <td class="columns" width="45%">
@@ -28,7 +27,14 @@
         </tr>
     </table>
 </p>
+<p style="width:50%; color: red; font-size: 125%">
+   This is an experimental release of Pulse 2.0 that <strong>does not</strong> support
+   an upgrade path.  Please modify your config.properties file to use a fresh
+   data path.  <strong>DO NOT</strong> attempt to use this version of Pulse with
+   production data.
+</p>
 
+<!--
 #if($upgradePreview.size() > 0)
 <p>
     Before pulse can use this data directory, it will need to run the following upgrade tasks.
@@ -52,8 +58,6 @@
 #wwform("action=execute.action" "method=post")
 #continue(1)
 #end
-
-
-
+-->
 </body>
 </html>

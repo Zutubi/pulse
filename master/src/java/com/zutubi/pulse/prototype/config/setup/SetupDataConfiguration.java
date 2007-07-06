@@ -38,6 +38,13 @@ public class SetupDataConfiguration extends AbstractConfiguration implements Val
     public void validate(ValidationContext context)
     {
         File data = new File(this.data);
+
+        // FIXME
+        if(data.exists() && data.list().length > 0)
+        {
+            context.addFieldError("data", "data.not.empty");
+        }
+        
         if (!data.exists() && !data.mkdirs())
         {
             context.addFieldError("data", "data.create.failed");

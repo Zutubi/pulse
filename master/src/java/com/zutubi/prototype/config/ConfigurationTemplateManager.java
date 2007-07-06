@@ -1152,6 +1152,11 @@ public class ConfigurationTemplateManager
         return false;
     }
 
+    public boolean isPersistent(String path)
+    {
+        return configurationPersistenceManager.isPersistent(path);
+    }
+
     public int getRefreshCount()
     {
         return refreshCount;

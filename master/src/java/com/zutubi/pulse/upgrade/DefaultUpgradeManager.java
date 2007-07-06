@@ -175,7 +175,9 @@ public class DefaultUpgradeManager implements UpgradeManager
         Version from = data.getVersion();
         Version to = Version.getVersion();
 
-        return isUpgradeRequired(from.getBuildNumberAsInt(), to.getBuildNumberAsInt());
+        // FIXME
+        return from.getBuildNumberAsInt() != to.getBuildNumberAsInt();
+        //return isUpgradeRequired(from.getBuildNumberAsInt(), to.getBuildNumberAsInt());
     }
 
     /**

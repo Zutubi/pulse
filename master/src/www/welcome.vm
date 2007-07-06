@@ -2,63 +2,71 @@
 <html>
 <head>
     <title>welcome</title>
+    <style>
+        p { width: 770px; }
+    </style>
 </head>
 <body>
     <h1 id="welcome.heading">:: #wwtext("name=welcome") :: </h1>
     <p>
-        Welcome to your new pulse server!  To help you get started, some common setup tasks are listed below.
+        Welcome to the Pulse 2.0 Early Access Program.  This is your opportunity to play with Pulse 2.0
+        before it is <strike>stable</strike> feature complete.  It is a great time to provide feedback:
+        let us know what you think of the new features!
     </p>
     <p>
         You can return to this page at any time by clicking on the pulse link in the top left corner.
     </p>
+    <h1> :: what's new :: </h1>
     <p>
-        Once you are familiar with your pulse server, you can dismiss this default view using the link at the
-        bottom of the page.
+        Pulse 2.0 is a major rework, boasting largely new internals that enable important new features.
+        New things to look at so far include:
+
+        <h3><a href="/admin/projects.action">Configuration UI</a></h3>
+        <p>
+            The configuration UI has been completely redone.  All configuration is now in the one place,
+            under 'administration'.  We have used AJAX to create a more consistent interface that is also
+            more responsive.
+        </p>
+
+        <h3><a href="/admin/projects.action">Templated Configuration</a></h3>
+        <p>
+            The new configuration system supports templating: a way to share common configuration between
+            related projects (and agents) by inheritance from ancestor templates.  You will notice that
+            the configuration system allows you to configure a hierarchy of projects/agents, and shows
+            the inheritance relationship of fields.
+        </p>
+        <h3><a href="/admin/plugins.action">Plugins</a></h3>
+        <p>
+            Support for various tools is being extracted into plugins.  The plugin UI is raw at the moment,
+            but illustrates that we are already running some of the functionality via plugins 'under the
+            hood'.  Further, the new configuration UI is generated: so plugin authors do not need to write
+            any UI code!
+        </p>
+    </p>
+    <h1> :: what's missing :: </h1>
+    <p>
+        As we are moving things over to a new architecture in Pulse 2.0, some Pulse 1.2 features are not
+        yet available.  They will be readded in future EAP builds:
+
+        <h3>User Management</h3>
+        <p>
+            User management is currently disabled, as it will be moved over to the new configuration system.
+            At the same time we will be adding a much-requested feature: finer grained permissions.
+        </p>
+
+        <h3>Project Configuration</h3>
+        <p>
+            Some project configuration options have also not yet been transferred to the new system.  For
+            example, we are planning to make post-build actions more flexible in Pulse 2.0, so have not
+            moved them over in their existing form.  Stay tuned.
+        </p>
+
+        <h3>Upgrade Path</h3>
+        <p>
+            You cannot upgrade to or from EAP builds.  This is a Good Thing, as they are experimental and
+            must not be used with production data.
+        </p>
     </p>
 
-    <h3 class="heading">configure</h3>
-    <div class="box">
-        <ul>
-            #authorize("ifAllGranted=ROLE_ADMINISTRATOR")
-            <li class="task">
-                <a href="addProject!input.action">add new projects</a> :: using the add project wizard (projects &gt; add new project)
-            </li>
-            <li class="task">
-                <a href="admin/userSettings.action">add new users</a> :: at the users view (administration &gt; users tab)
-            </li>
-            <li class="task">
-                <a href="admin/addAgent!input.action">add new agents</a> :: using the add agent form (agents &gt; add new agent)
-            </li>
-            <li class="task">
-                <a href="admin/serverSettings.action">configure server settings</a> :: at the server settings view (administration &gt; settings tab)
-            </li>
-            #end
-            <li class="task">
-                <a href="preferences.action">configure your preferences</a> :: at the preferences view (dashboard &gt; preferences tab)
-            </li>
-        </ul>
-    </div>
-
-    <h3 class="heading">explore</h3>
-    <div class="box">
-       <ul>
-           <li class="explore">
-               <a href="dashboard.action">go to your home page</a> :: at the dashboard view (dashboard &gt; home)
-           </li>
-           <li class="explore">
-               <a href="viewProjects.action">view all projects</a> :: at the projects view (projects)
-           </li>
-           <li class="explore">
-               <a href="viewServerQueues.action">view server queues</a> :: at the server queues view (queues)
-           </li>
-           <li class="explore">
-               <a href="viewAgents.action">view all agents</a> :: at the agents view (agents)
-           </li>
-       </ul>
-    </div>
-
-    <p>
-        <a href="dismissWelcome.action"><img alt="$!webwork.getText('delete')" src="$base/images/delete.gif">dismiss this page</a>
-    </p>
 </body>
 </html>
