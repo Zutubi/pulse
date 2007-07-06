@@ -4,6 +4,135 @@ var ZUTUBI = window.ZUTUBI || {};
 // if it is already defined, great, otherwise create it.
 ZUTUBI.widget = ZUTUBI.widget || {};
 
+/**
+ * @class ZUTUBI.Select
+ * @extends Ext.form.Field
+ * Basic select box.  Supports multi-select, which is not available in Ext
+ * currently.
+ * @constructor
+ * Creates a new TextField
+ * @param {Object} config Configuration options
+ */
+ZUTUBI.Select = function(config)
+{
+    ZUTUBI.Select.superclass.constructor.call(this, config);
+    this.viewRendered = false;
+};
+
+Ext.extend(ZUTUBI.Select, Ext.form.Field, {
+    /**
+     * @cfg {Ext.data.Store} store The data defining select items.
+     * selections.
+     */
+    store: undefined,
+    /**
+     * @cfg {Boolean} multiple True if this field should allow multiple
+     * selections.
+     */
+    multiple: false,
+    /**
+     * @cfg {Number} size The size of the select element.
+     */
+    size : undefined,
+    /**
+     * @cfg {String} displayField The store field to use as item text.
+     */
+    displayField : 'text',
+    /**
+     * @cfg {String} valueField The store field to use as item values.
+     */
+    valueField : 'value',
+
+    onRender : function(ct, position){
+        if(!this.size)
+        {
+            if(this.multiple)
+            {
+                var total = this.store.getTotalCount();
+                // Make the min size 3 (looks like a select) and max size 10
+                this.size = total > 10 ? 10 : (total < 3 ? 3: total);
+            }
+            else
+            {
+                this.size = 1;
+            }
+        }
+        if(!this.el)
+        {
+            this.defaultAutoCreate = {tag: 'select', size: this.size };
+            if(this.multiple)
+            {
+                this.defaultAutoCreate.multiple = 'true';
+            }
+        }
+        ZUTUBI.Select.superclass.onRender.call(this, ct, position);
+
+        if(!this.tpl){
+            this.tpl = '<option value="{' + this.valueField + '}">{' + this.displayField + '}</option>';
+        }
+
+        this.view = new Ext.View(this.el, this.tpl, {
+            singleSelect :!this.multiple,
+            store: this.store
+        });
+
+        this.viewRendered = true;
+        this.initValue();
+
+        //this.view.on('click', this.onViewClick, this);
+        //this.store.on('beforeload', this.onBeforeLoad, this);
+        //this.store.on('load', this.onLoad, this);
+        //this.store.on('loadexception', this.collapse, this);
+    },
+
+    initValue: function()
+    {
+        if(!this.viewRendered)
+        {
+            return;
+        }
+
+        this.setValue(this.value);
+    },
+
+    findRecord : function(prop, value){
+        var record;
+        if(this.store.getCount() > 0){
+            this.store.each(function(r){
+                if(r.data[prop] == value){
+                    record = r;
+                    return false;
+                }
+            });
+        }
+        return record;
+    },
+
+    setValue: function(value)
+    {
+        // Clear current selection
+        this.el.dom.selectedIndex = -1;
+        this.view.clearSelections();
+
+        // Now select values in the view and DOM
+        var options = this.el.dom.options;
+        for(var i = 0; i < value.length; i++)
+        {
+            var record = this.findRecord(this.valueField, value[i]);
+            if (record)
+            {
+                this.view.select(this.store.indexOf(record));
+                for(var j = 0; j < options.length; j++)
+                {
+                    if(options[j].value == value[i])
+                    {
+                        options[j].selected = true;
+                    }
+                }
+            }
+        }
+    }
+});
 
 ZUTUBI.ConfigTreeLoader = function(base)
 {
@@ -62,7 +191,7 @@ Ext.extend(ZUTUBI.ConfigTree, Ext.tree.TreePanel, {
             treePath = treePath.substring(this.pathPrefix.length);
         }
 
-        if(treePath.length > 0 && treePath[0] != '/')
+        if(treePath.length > 0 && treePath.substring(0, 1) != '/')
         {
             treePath = '/' + treePath;
         }
@@ -79,7 +208,7 @@ Ext.extend(ZUTUBI.ConfigTree, Ext.tree.TreePanel, {
             treePath = treePath.substring(1);
         }
 
-        //console.log('cpttp(' + configPath + ') -> ' + treePath);
+        //alert('cpttp(' + configPath + ') -> ' + treePath);
         return treePath;
     },
 
@@ -92,7 +221,7 @@ Ext.extend(ZUTUBI.ConfigTree, Ext.tree.TreePanel, {
             configPath = configPath.substring(this.root.id.length + 1);
         }
 
-        if(configPath.length > 0 && configPath[0] == '/')
+        if(configPath.length > 0 && configPath.substring(0, 1) == '/')
         {
             configPath = configPath.substring(1);    
         }
@@ -125,7 +254,7 @@ Ext.extend(ZUTUBI.ConfigTree, Ext.tree.TreePanel, {
     getNodeByConfigPath: function(configPath)
     {
         var treePath = this.configPathToTreePath(configPath);
-        if(treePath[0] == '/')
+        if(treePath.substring(0, 1) == '/')
         {
             treePath = treePath.substring(1);
         }

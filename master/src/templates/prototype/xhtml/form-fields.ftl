@@ -59,7 +59,7 @@ Ext.onReady(function()
         Ext.DomHelper.append(form.el, config);
     }
 
-    form.el.dom.name = '${form.name}';
+    form.el.set({name: '${form.name}'});
 
     var errorMessage;
     if (!window.nextTabindex)

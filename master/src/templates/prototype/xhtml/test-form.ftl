@@ -1,4 +1,5 @@
 <#if form?exists>
+<div id="${form.id}" style="width: 350px"></div>
 <script type="text/javascript" src="${base}/js/zutubi.js"></script>
 <script type="text/javascript">
     var ${form.name} = function()
@@ -32,6 +33,4 @@
         return form;
     }();
 </script>
-
-<div id="${form.id}" style="width: 350px"></div>
 </#if>

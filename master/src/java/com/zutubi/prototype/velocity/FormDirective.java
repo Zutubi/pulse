@@ -38,7 +38,7 @@ public class FormDirective extends PrototypeDirective
 
     private FormDescriptorFactory formDescriptorFactory;
     private String action;
-    private String formName = "form";
+    private String formName = "mainForm";
     private boolean displayMode = false;
     private boolean ajax = false;
     private String namespace;

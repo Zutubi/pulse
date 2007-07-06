@@ -1,10 +1,15 @@
+<#--
+A table is used as there is no good way to have a div collapse to the
+width of its contents.  Floating it works, but hurts other things.
+-->
+<table class="eform"><tr><td id="${form.name}.status"></td></tr><tr><td id="${form.id}"><td></tr></table>
+
 <#-- render form -->
 <script type="text/javascript">
-    Ext.QuickTips.init();    
     Ext.QuickTips.tagConfig.width = 'qwidth';
 
     Ext.form.Field.prototype.msgTarget = 'under';
-    
+
     var ${form.name} = function()
     {
         var form = new Ext.form.Form({
@@ -53,8 +58,3 @@
         return form;
     }();
 </script>
-<#--
-A table is used as there is no good way to have a div collapse to the
-width of its contents.  Floating it works, but hurts other things.
--->
-<table class="eform"><tr><td id="${form.name}.status"></td></tr><tr><td id="${form.id}"><td></tr></table>

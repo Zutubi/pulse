@@ -1,7 +1,7 @@
 form.items.last().on('render', function(field)
 {
 <#if parameters.browseLink?exists>
-    var linkEl = Ext.DomHelper.append(field.getEl().dom.parentNode, { tag: 'a', href: '#', html: '${parameters.browseLink?i18n}', class: 'browse', id: '${parameters.id}.${parameters.browseLink}'}, true);
+    var linkEl = Ext.DomHelper.append(field.getEl().dom.parentNode, { tag: 'a', href: '#', html: '${parameters.browseLink?i18n}', cls: 'browse', id: '${parameters.id}.${parameters.browseLink}'}, true);
     linkEl.on('click', function(e) { field.fireEvent('browse', field); e.preventDefault(); });
 </#if>
 
@@ -25,7 +25,7 @@ form.items.last().on('render', function(field)
 <#assign helpmsg>${helpkey?i18n}</#assign>
 <#if helpmsg?exists && helpkey != helpmsg>
     var xFormElement = field.getEl().findParent('.x-form-element')
-    Ext.DomHelper.append(xFormElement, { tag: 'span', class: 'inline-help', html: '${helpmsg}', id:field.getId() + '-inline-help'});
+    Ext.DomHelper.append(xFormElement, { tag: 'span', cls: 'inline-help', html: '${helpmsg?js_string}', id:field.getId() + '-inline-help'});
 </#if>
 });
 
