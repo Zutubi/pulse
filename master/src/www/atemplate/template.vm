@@ -1,26 +1,3 @@
-<style type="text/css">
-    .panel{
-        border-bottom-style:dotted;
-        border-right-style:dotted;
-        border-left-style:dotted;
-        border-bottom-color:gray;
-        border-left-color:gray;
-        border-right-color:gray;
-        border-bottom-width:1px;
-        border-right-width:1px;
-        border-left-width:1px;
-        margin-bottom:3em;
-    }
-
-    .header {
-        padding:5px;
-        background-color:#e8e8f3;
-        border-top-width:1px;
-        border-top-style:dotted;
-        border-top-color:gray;
-    }
-</style>
-
 <h2>$!webwork.htmlEncode($id)</h2>
 <p></p>
 

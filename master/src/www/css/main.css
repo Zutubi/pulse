@@ -371,7 +371,7 @@ th.content-row {
 }
 
 h3.heading, th.heading, th.group {
-    background: #e8e8f3;
+    background: #E0E6F0;
     white-space: nowrap;
 }
 
@@ -850,6 +850,16 @@ table.template-actions
     font-weight: normal;
 }
 
+.x-tabs-bottom .x-tabs-wrap {
+    border-top:1px solid #6593CF;
+}
+
+.x-tree-node
+{
+    font-family: verdana;
+    font-size: 10px;
+}
+
 .x-form-select, .x-form-select-multiple
 {
     border: 1px solid #B5B8C8;
@@ -858,6 +868,17 @@ table.template-actions
 .x-form-focus
 {
 	border: 1px solid #7eadd9;
+}
+
+.x-form-item
+{
+    font-family: verdana;
+    font-size: 12px;
+}
+
+.x-layout-split
+{
+    background-color: #3e4e6a;
 }
 
 .field-overridden, textarea.field-overridden

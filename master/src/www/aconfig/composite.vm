@@ -13,17 +13,17 @@
     }
 
     .header {
-        padding:10px;
-        background-color:#e8e8f3;
+        padding:8px;
+        background-color:#E0E6F0;
         border-top-width:1px;
         border-top-style:dotted;
         border-top-color:gray;
     }
     
     .description {
-        background-color:#e8e8f3;
-        padding:10px;
+        padding:8px;
         margin:0;
+        font-size: 10px;
     }
 
     .config-state-table
@@ -33,7 +33,7 @@
     .config-state-table th {
         font-weight:bold;
         font-size:large;
-        background-color:#e8e8f3;
+        background-color:#E0E6F0;
         border-top-width:1px;
         border-top-style:dotted;
         border-top-color:gray;
@@ -42,7 +42,7 @@
         background-color:#ffffff
     }
     .config-state-table .even {
-        background-color:#e8e8f3
+        background-color:#f6f6f6;
     }
     .config-state-table .first {
         padding-top:4px;
@@ -51,17 +51,22 @@
         padding-bottom:4px;
     }
     .config-state-table .label {
+        text-align: right;
+        font-weight: bold;
         padding-top:3px;
-        padding-right:3px;
+        padding-right:5px;
         padding-bottom:3px;
         padding-left:5px;
+        border-right: solid 1px #ddd;
+        background-color:#f6f6f6;
+
     }
     .config-state-table .value {
         font-weight:normal;
         padding-top:3px;
         padding-right:5px;
         padding-bottom:3px;
-        padding-left:0px;
+        padding-left:5px;
     }
 
     .form-container{
@@ -83,9 +88,6 @@
 #macro(renderform)
     <div class="panel">
         <h3 class="header">#i18n("key=form.heading")</h3>
-        <p class="description">
-            #i18n("key=form.description")
-        </p>
         ##<!-- add some space around the form so that it does not sit directly on the border. -->
         <div class="form-container">
             #pform("path=$config.path" "formName=mainform" "displayMode=true" "ajax=true" "namespace=aconfig")
@@ -109,9 +111,8 @@
             #set($odd = true)
             #foreach($field in $config.displayFields)
             <tr>
-                #if($odd) #set($bgcolor="odd") #else #set($bgcolor="even") #end
-                <td class="label" width="20%">#i18n("key=${field}.label"): </td>
-                <td class="value $bgcolor">$config.format($field)</td>
+                <td class="label" width="20%">#i18n("key=${field}.label")</td>
+                <td class="value #if($odd) odd #else even #end">$config.format($field)</td>
             </tr>
                 #if($odd) #set($odd = false) #else #set($odd = true) #end
             #end
@@ -126,22 +127,13 @@
 </p>
 <table>
     <tr>
+#if($config.record || $config.extensions.size() == 0)
         <td id="left-column">
             #if ($config.displayFields.size() > 0)
                 #renderstate()
             #end
-            #if( $config.record )
-                #if( $config.simpleProperties.size() > 0)
-                    #renderform()
-                #end
-            #else
-                #if( $config.extensions.size() > 0)
-                    <p><a href="#" class="unadorned" onclick="addToPath('${config.path}'); return false"><img alt="configure" src="$base/images/pencil.gif"/></a> <a href="#" onclick="addToPath('${config.path}'); return false">configure</a> a #i18n("key=label")</p>
-                #else
-                    #if( $config.simpleProperties.size() > 0)
-                        #renderform()
-                    #end
-                #end
+            #if( $config.simpleProperties.size() > 0)
+                #renderform()
             #end
         </td>
         
@@ -171,7 +163,17 @@
             </p>
             </div>
             #end
-
         </td>
+#else
+    ## We don't know what type we are dealing with, it needs to be configured
+    ## by a wizard.
+    <table class="template-actions" cellspacing="5px">
+        <tr>
+            <th><a href="#" class="unadorned" onclick="addToPath('${config.path}'); return false"><img alt="configure" src="$base/images/pencil.gif"/></a> <a href="#" onclick="addToPath('${config.path}'); return false">configure</a></th>
+            <td>configure a #i18n("key=label") using the wizard</td>
+        </tr>
+    </table>
+#end
+
     </tr>
 </table>
