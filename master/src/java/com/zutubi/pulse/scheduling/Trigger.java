@@ -1,5 +1,6 @@
 package com.zutubi.pulse.scheduling;
 
+import com.zutubi.config.annotations.Transient;
 import com.zutubi.pulse.core.model.Entity;
 import com.zutubi.pulse.model.NamedEntity;
 import com.zutubi.pulse.model.Project;
@@ -92,6 +93,7 @@ public abstract class Trigger extends Entity implements NamedEntity
      * Return the type identifier for this type of trigger. This identifier is used to
      * locate the Scheduler Strategies available to handle this trigger.
      */
+    @Transient
     public abstract String getType();
 
     public abstract Trigger copy(Project oldProject, Project newProject);

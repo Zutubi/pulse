@@ -3,8 +3,8 @@ package com.zutubi.pulse.servercore.config;
 import com.opensymphony.util.TextUtils;
 import com.zutubi.config.annotations.ConfigurationCheck;
 import com.zutubi.config.annotations.Form;
-import com.zutubi.config.annotations.Text;
 import com.zutubi.config.annotations.SymbolicName;
+import com.zutubi.config.annotations.Wizard;
 import com.zutubi.pulse.scm.ScmException;
 import com.zutubi.pulse.servercore.scm.ScmClient;
 import com.zutubi.pulse.servercore.scm.svn.SvnClient;
@@ -13,23 +13,22 @@ import com.zutubi.validation.annotations.Required;
 
 /**
  */
-@Form(fieldOrder = { "url", "username", "password", "keyfile", "keyfilePassphrase", "externalMonitorPaths", "verifyExternals", "monitor", "customPollingInterval", "pollingInterval", "quietPeriodEnabled", "quietPeriod" })
+@Form(fieldOrder = { "url", "username", "password", "keyfile", "keyfilePassphrase", "externalMonitorPaths", "verifyExternals", "monitor", "checkoutScheme", "customPollingInterval", "pollingInterval", "quietPeriodEnabled", "quietPeriod" })
 @ConfigurationCheck("com.zutubi.pulse.prototype.config.SvnConfigurationCheckHandler")
 @SymbolicName("zutubi.svnConfig")
 public class SvnConfiguration extends ScmConfiguration
 {
     @Required
-    @Text(size = 80)
     private String url;
     private String username;
     private String password;
-    @Text(size = 80)
     private String keyfile;
     private String keyfilePassphrase;
 
     // FIXME: add a validator that splits this field
-    @Text(size = 80)
+    @Wizard.Ignore
     private String externalMonitorPaths;
+    @Wizard.Ignore
     private boolean verifyExternals;
 
     public SvnConfiguration()

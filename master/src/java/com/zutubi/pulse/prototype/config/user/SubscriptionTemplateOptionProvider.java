@@ -16,7 +16,7 @@ public class SubscriptionTemplateOptionProvider extends MapOptionProvider
 {
     private BuildResultRenderer buildResultRenderer;
 
-    protected Map<String, String> getMap(Object instance, String path, TypeProperty property)
+    protected Map<String, String> getMap(Object instance, String parentPath, TypeProperty property)
     {
         Map<String, String> options = new HashMap<String, String>();
         for (TemplateInfo template : buildResultRenderer.getAvailableTemplates(false))

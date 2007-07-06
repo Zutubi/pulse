@@ -1,10 +1,10 @@
 package com.zutubi.prototype.wizard.webwork;
 
 import com.zutubi.i18n.Messages;
+import com.zutubi.prototype.ExtensionOptionProvider;
 import com.zutubi.prototype.FieldDescriptor;
 import com.zutubi.prototype.FormDescriptor;
 import com.zutubi.prototype.FormDescriptorFactory;
-import com.zutubi.prototype.ExtensionOptionProvider;
 import com.zutubi.prototype.config.ConfigurationPersistenceManager;
 import com.zutubi.prototype.config.ConfigurationTemplateManager;
 import com.zutubi.prototype.model.SelectFieldDescriptor;
@@ -269,7 +269,7 @@ public abstract class AbstractTypeWizard implements Wizard
         public FormDescriptor createFormDescriptor(FormDescriptorFactory formDescriptorFactory, String path, String name)
         {
             CompositeType type = getType();
-            FormDescriptor descriptor = formDescriptorFactory.createDescriptor(path, type, name);
+            FormDescriptor descriptor = formDescriptorFactory.createDescriptor(path, null, type, name);
             Iterator<FieldDescriptor> fieldIt = descriptor.getFieldDescriptors().iterator();
             while(fieldIt.hasNext())
             {

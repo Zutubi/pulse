@@ -7,7 +7,6 @@ import com.zutubi.prototype.handler.AnnotationHandler;
 import com.zutubi.prototype.handler.OptionAnnotationHandler;
 import com.zutubi.prototype.model.*;
 import com.zutubi.prototype.type.*;
-import com.zutubi.prototype.type.record.PathUtils;
 import com.zutubi.pulse.prototype.config.EnumOptionProvider;
 import com.zutubi.util.AnnotationUtils;
 import com.zutubi.util.bean.DefaultObjectFactory;
@@ -69,17 +68,17 @@ public class FormDescriptorFactory
         fieldDescriptorTypes.put(type, clazz);
     }
     
-    public FormDescriptor createDescriptor(String path, Class clazz)
+    public FormDescriptor createDescriptor(String parentPath, String baseName, Class clazz)
     {
-        return createDescriptor(path, typeRegistry.getType(clazz), "form");
+        return createDescriptor(parentPath, baseName, typeRegistry.getType(clazz), "form");
     }
 
-    public FormDescriptor createDescriptor(String path, String symbolicName)
+    public FormDescriptor createDescriptor(String parentPath, String baseName, String symbolicName)
     {
-        return createDescriptor(path, typeRegistry.getType(symbolicName), "form");
+        return createDescriptor(parentPath, baseName, typeRegistry.getType(symbolicName), "form");
     }
 
-    public FormDescriptor createDescriptor(String path, CompositeType type, String name)
+    public FormDescriptor createDescriptor(String parentPath, String baseName, CompositeType type, String name)
     {
         FormDescriptor descriptor = new FormDescriptor();
         descriptor.setName(name);
@@ -93,19 +92,19 @@ public class FormDescriptorFactory
         List<Annotation> annotations = type.getAnnotations();
         handleAnnotations(type, descriptor, annotations);
 
-        descriptor.setFieldDescriptors(buildFieldDescriptors(path, type, descriptor));
+        descriptor.setFieldDescriptors(buildFieldDescriptors(parentPath, baseName, type, descriptor));
 
         return descriptor;
     }
 
-    private List<FieldDescriptor> buildFieldDescriptors(String path, CompositeType type, FormDescriptor form)
+    private List<FieldDescriptor> buildFieldDescriptors(String parentPath, String baseName, CompositeType type, FormDescriptor form)
     {
         List<FieldDescriptor> fieldDescriptors = new LinkedList<FieldDescriptor>();
 
         for (TypeProperty property : type.getProperties(SimpleType.class))
         {
-            FieldDescriptor fd = createField(path, property, form);
-            addFieldParameters(type, path, property, fd);
+            FieldDescriptor fd = createField(parentPath, baseName, property, form);
+            addFieldParameters(type, parentPath, baseName, property, fd);
             fieldDescriptors.add(fd);
         }
 
@@ -117,11 +116,12 @@ public class FormDescriptorFactory
             {
                 SelectFieldDescriptor fd = new SelectFieldDescriptor();
                 fd.setForm(form);
-                fd.setPath(PathUtils.getPath(path, property.getName()));
+                fd.setParentPath(parentPath);
+                fd.setBaseName(baseName);
                 fd.setProperty(property);
                 fd.setName(property.getName());
                 fd.setMultiple(true);
-                addFieldParameters(type, path, property, fd);
+                addFieldParameters(type, parentPath, baseName, property, fd);
                 fieldDescriptors.add(fd);
             }
         }
@@ -129,7 +129,7 @@ public class FormDescriptorFactory
         return fieldDescriptors;
     }
 
-    private FieldDescriptor createField(String path, TypeProperty property, FormDescriptor form)
+    private FieldDescriptor createField(String parentPath, String baseName, TypeProperty property, FormDescriptor form)
     {
         String fieldType = FieldType.TEXT;
         com.zutubi.config.annotations.Field field = AnnotationUtils.findAnnotation(property.getAnnotations(), com.zutubi.config.annotations.Field.class);
@@ -161,7 +161,8 @@ public class FormDescriptorFactory
 
         FieldDescriptor fd = createFieldOfType(fieldType);
         fd.setType(fieldType);
-        fd.setPath(PathUtils.getPath(path, property.getName()));
+        fd.setParentPath(parentPath);
+        fd.setBaseName(baseName);
         fd.setProperty(property);
         fd.setName(property.getName());
         fd.setForm(form);
@@ -189,7 +190,7 @@ public class FormDescriptorFactory
         }
     }
 
-    private void addFieldParameters(CompositeType type, String path, TypeProperty property, FieldDescriptor fd)
+    private void addFieldParameters(CompositeType type, String parentPath, String baseName, TypeProperty property, FieldDescriptor fd)
     {
         handleAnnotations(type, fd, property.getAnnotations());
         if(fd instanceof SelectFieldDescriptor)
@@ -197,16 +198,16 @@ public class FormDescriptorFactory
             SelectFieldDescriptor select = (SelectFieldDescriptor) fd;
             if (select.getList() == null)
             {
-                addDefaultOptions(path, property, select);
+                addDefaultOptions(parentPath, baseName, property, select);
             }
         }
     }
 
-    private void addDefaultOptions(String path, TypeProperty typeProperty, SelectFieldDescriptor fd)
+    private void addDefaultOptions(String parentPath, String baseName, TypeProperty typeProperty, SelectFieldDescriptor fd)
     {
         if(typeProperty.getType().getTargetType() instanceof EnumType)
         {
-            OptionAnnotationHandler.process(configurationTemplateManager, new EnumOptionProvider(), path, fd);
+            OptionAnnotationHandler.process(configurationTemplateManager, new EnumOptionProvider(), parentPath, baseName, fd);
         }
         else
         {

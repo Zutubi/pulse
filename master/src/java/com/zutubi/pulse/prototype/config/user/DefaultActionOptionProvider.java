@@ -3,8 +3,8 @@ package com.zutubi.pulse.prototype.config.user;
 import com.zutubi.prototype.ListOptionProvider;
 import com.zutubi.prototype.type.TypeProperty;
 
-import java.util.List;
 import java.util.LinkedList;
+import java.util.List;
 
 /**
  *
@@ -19,7 +19,7 @@ public class DefaultActionOptionProvider extends ListOptionProvider
         options.add("projects");
     }
     
-    public List<String> getOptions(Object instance, String path, TypeProperty property)
+    public List<String> getOptions(Object instance, String parentPath, TypeProperty property)
     {
         return options;
     }

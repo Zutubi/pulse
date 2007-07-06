@@ -12,9 +12,13 @@ import java.util.*;
  */
 public class ResourceVersionOptionProvider extends MapOptionProvider
 {
-    public Map<String, String> getMap(Object instance, String path, TypeProperty property)
+    public Map<String, String> getMap(Object instance, String parentPath, TypeProperty property)
     {
-        List<String> resourceVersions = new LinkedList<String>(((Resource) instance).getVersions().keySet());
+        List<String> resourceVersions = new LinkedList<String>();
+        if(instance != null)
+        {
+            resourceVersions.addAll(((Resource) instance).getVersions().keySet());
+        }
         Collections.sort(resourceVersions, new Sort.StringComparator());
 
         Map<String, String> versions = new HashMap<String, String>(resourceVersions.size() + 1);

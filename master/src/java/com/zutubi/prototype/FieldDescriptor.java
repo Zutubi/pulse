@@ -15,7 +15,8 @@ public class FieldDescriptor extends AbstractDescriptor
 {
     private FormDescriptor form;
     private Object value;
-    private String path;
+    private String parentPath;
+    private String baseName;
     private TypeProperty property;
     private String name;
     private String type;
@@ -32,7 +33,8 @@ public class FieldDescriptor extends AbstractDescriptor
         field.setId("zfid." + getName());
         field.setLabel(getName() + ".label");
         
-        field.addParameter("path", getPath());
+        field.addParameter("parentPath", getParentPath());
+        field.addParameter("baseName", getBaseName());
         field.addParameter("required", isRequired());
         field.addParameter("constrained", isConstrained());
         field.addParameter("submitOnEnter", submitOnEnter);
@@ -73,14 +75,24 @@ public class FieldDescriptor extends AbstractDescriptor
         this.value = value;
     }
 
-    public String getPath()
+    public String getParentPath()
     {
-        return path;
+        return parentPath;
     }
 
-    public void setPath(String path)
+    public void setParentPath(String parentPath)
     {
-        this.path = path;
+        this.parentPath = parentPath;
+    }
+
+    public String getBaseName()
+    {
+        return baseName;
+    }
+
+    public void setBaseName(String baseName)
+    {
+        this.baseName = baseName;
     }
 
     public TypeProperty getProperty()

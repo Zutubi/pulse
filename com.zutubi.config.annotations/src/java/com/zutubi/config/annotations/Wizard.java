@@ -15,7 +15,7 @@ public @interface Wizard
 {
 //    String value();
 
-    @Target(ElementType.METHOD)
+    @Target({ElementType.METHOD, ElementType.FIELD})
     @Retention(RetentionPolicy.RUNTIME)
     public @interface Ignore {}
 }

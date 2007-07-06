@@ -14,7 +14,7 @@ public class PostProcessorOptionProvider extends MapOptionProvider
 {
     private PostProcessorManager postProcessorManager;
 
-    protected Map<String, String> getMap(Object instance, String path, TypeProperty property)
+    protected Map<String, String> getMap(Object instance, String parentPath, TypeProperty property)
     {
         return postProcessorManager.getAvailableProcessors();
     }

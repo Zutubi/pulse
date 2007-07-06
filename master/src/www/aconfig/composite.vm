@@ -105,7 +105,7 @@
 #macro(renderstate)
     <div class="panel">
         #i18nexists("key=state.heading")<h3 class="header">#i18n("key=state.heading")</h3>#end
-        #i18nexists("key=state.description")<p class="description">#i18n("key=state.description")</p>#end
+##        #i18nexists("key=state.description")<p class="description">#i18n("key=state.description")</p>#end
         <table class="config-state-table">
             #i18nexists("key=state.table.heading")<th colspan="2">#i18n("key=state.table.heading")</th>#end
             #set($odd = true)

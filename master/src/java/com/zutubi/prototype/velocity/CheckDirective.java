@@ -8,6 +8,7 @@ import com.zutubi.prototype.config.ConfigurationRegistry;
 import com.zutubi.prototype.model.Form;
 import com.zutubi.prototype.type.CompositeType;
 import com.zutubi.prototype.type.Type;
+import com.zutubi.prototype.type.record.PathUtils;
 import com.zutubi.prototype.type.record.Record;
 import com.zutubi.util.logging.Logger;
 import freemarker.template.Configuration;
@@ -94,7 +95,7 @@ public class CheckDirective extends PrototypeDirective
             String path = lookupPath();
             CompositeType checkType = configurationRegistry.getConfigurationCheckType(ctype);
 
-            FormDescriptor formDescriptor = formDescriptorFactory.createDescriptor(path, checkType, "check");
+            FormDescriptor formDescriptor = formDescriptorFactory.createDescriptor(PathUtils.getParentPath(path), null, checkType, "check");
             formDescriptor.setName(checkFormName);
             formDescriptor.setAction(action);
             formDescriptor.setActions("check");

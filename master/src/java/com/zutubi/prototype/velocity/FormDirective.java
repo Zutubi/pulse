@@ -8,6 +8,7 @@ import com.zutubi.prototype.model.Form;
 import com.zutubi.prototype.model.HiddenFieldDescriptor;
 import com.zutubi.prototype.type.CompositeType;
 import com.zutubi.prototype.type.Type;
+import com.zutubi.prototype.type.record.PathUtils;
 import com.zutubi.prototype.type.record.Record;
 import com.zutubi.pulse.bootstrap.MasterConfigurationManager;
 import com.zutubi.pulse.bootstrap.freemarker.FreemarkerConfigurationFactoryBean;
@@ -104,7 +105,7 @@ public class FormDirective extends PrototypeDirective
             Record data = lookupRecord();
 
             String path = lookupPath();
-            FormDescriptor formDescriptor = formDescriptorFactory.createDescriptor(path, ctype, formName);
+            FormDescriptor formDescriptor = formDescriptorFactory.createDescriptor(PathUtils.getParentPath(path), PathUtils.getBaseName(path), ctype, formName);
             formDescriptor.setDisplayMode(displayMode);
             formDescriptor.setAjax(ajax);
             formDescriptor.setNamespace(namespace);

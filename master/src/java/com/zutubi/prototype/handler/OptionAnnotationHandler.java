@@ -34,22 +34,19 @@ public abstract class OptionAnnotationHandler extends FieldAnnotationHandler
         OptionProvider optionProvider = (OptionProvider) objectFactory.buildBean(ClassLoaderUtils.loadAssociatedClass(annotatedType.getClazz(), className));
 
         SelectFieldDescriptor field = (SelectFieldDescriptor) descriptor;
-        String fieldPath = field.getPath();
-        process(configurationTemplateManager, optionProvider, fieldPath, field);
+        process(configurationTemplateManager, optionProvider, field.getParentPath(), field.getBaseName(), field);
     }
 
-    public static void process(ConfigurationTemplateManager configurationTemplateManager, OptionProvider optionProvider, String fieldPath, SelectFieldDescriptor field)
+    public static void process(ConfigurationTemplateManager configurationTemplateManager, OptionProvider optionProvider, String parentPath, String baseName, SelectFieldDescriptor field)
     {
-        String instancePath = PathUtils.getParentPath(fieldPath);
-        Object instance = configurationTemplateManager.getInstance(instancePath);
+        Object instance = null;
+        if(baseName != null)
+        {
+            instance = configurationTemplateManager.getInstance(PathUtils.getPath(parentPath, baseName));
+        }
+
         TypeProperty fieldTypeProperty = field.getProperty();
-
-        // FIXME: not sure what the correct behaviour here should be? see comment.
-        // there are occasions, particularly with wizards, where we are rendering a configuration object at
-        // a path that represents a collection of that type.  In that situation, if the option provider is expecting
-        // the type that it is defined on, then things will go amiss.  How should we deal with this? pass a null?
-
-        Collection optionList = optionProvider.getOptions(instance, fieldPath, fieldTypeProperty);
+        Collection optionList = optionProvider.getOptions(instance, parentPath, fieldTypeProperty);
         field.setList(optionList);
         if (optionProvider.getOptionKey() != null)
         {
