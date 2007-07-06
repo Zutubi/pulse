@@ -19,7 +19,7 @@ public interface ProjectManager extends EntityManager<Project>
 
     ProjectConfiguration getProjectConfig(String name);
 
-    ProjectConfiguration getProjectConfig(long id);
+    ProjectConfiguration getProjectConfig(long handle);
 
     void saveProjectConfig(ProjectConfiguration config);
 

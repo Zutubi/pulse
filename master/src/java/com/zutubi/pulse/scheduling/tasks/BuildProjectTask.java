@@ -26,10 +26,10 @@ public class BuildProjectTask implements Task
     {
         Trigger trigger = context.getTrigger();
         Map<Serializable, Serializable> dataMap = trigger.getDataMap();
-        long projectId = trigger.getProject();
+        long projectHandle = trigger.getProject();
         boolean force = dataMap.containsKey(PARAM_FORCE);
 
-        ProjectConfiguration project = projectManager.getProjectConfig(projectId);
+        ProjectConfiguration project = projectManager.getProjectConfig(projectHandle);
         if (project != null)
         {
             // generate build request.
@@ -37,7 +37,7 @@ public class BuildProjectTask implements Task
         }
         else
         {
-            LOG.warning("Build project task fired for unknown project '" + projectId + "' (trigger '" + trigger.getName() + "')");
+            LOG.warning("Build project task fired for unknown project '" + projectHandle + "' (trigger '" + trigger.getName() + "')");
         }
     }
 

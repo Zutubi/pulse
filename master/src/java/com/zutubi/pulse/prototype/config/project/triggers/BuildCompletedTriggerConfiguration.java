@@ -11,6 +11,7 @@ import com.zutubi.pulse.prototype.config.project.ProjectConfiguration;
 import com.zutubi.pulse.scheduling.BuildCompletedEventFilter;
 import com.zutubi.pulse.scheduling.EventTrigger;
 import com.zutubi.pulse.scheduling.Trigger;
+import com.zutubi.pulse.scheduling.tasks.BuildProjectTask;
 import com.zutubi.validation.annotations.Required;
 
 import java.io.Serializable;
@@ -63,7 +64,9 @@ public class BuildCompletedTriggerConfiguration extends TriggerConfiguration
         String triggerGroup = "project:" + project.getProjectId();
         
         EventTrigger trigger = new EventTrigger(BuildCompletedEvent.class, triggerName, triggerGroup, BuildCompletedEventFilter.class);
-
+        trigger.setTaskClass(BuildProjectTask.class);
+        trigger.setProject(project.getHandle());
+        
         Map<Serializable, Serializable> dataMap = trigger.getDataMap();
         dataMap.put(BuildCompletedEventFilter.PARAM_PROJECT, this.project.getProjectId());
 

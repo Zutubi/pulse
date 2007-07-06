@@ -6,6 +6,7 @@ import com.zutubi.prototype.config.ConfigurationProvider;
 import com.zutubi.pulse.prototype.config.project.ProjectConfiguration;
 import com.zutubi.pulse.scheduling.CronTrigger;
 import com.zutubi.pulse.scheduling.Trigger;
+import com.zutubi.pulse.scheduling.tasks.BuildProjectTask;
 
 /**
  *
@@ -35,7 +36,11 @@ public class CronBuildTriggerConfiguration extends TriggerConfiguration
         String triggerName = "trigger:" + getHandle();
         String triggerGroup = "project:" + project.getProjectId();
         
-        return new CronTrigger(cron, triggerName, triggerGroup);
+        Trigger trigger =  new CronTrigger(cron, triggerName, triggerGroup);
+        trigger.setTaskClass(BuildProjectTask.class);
+        trigger.setProject(project.getHandle());
+        
+        return trigger;
     }
 
     public void update(Trigger trigger)

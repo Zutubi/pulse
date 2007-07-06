@@ -5,6 +5,7 @@ import com.zutubi.pulse.prototype.config.project.ProjectConfiguration;
 import com.zutubi.pulse.scheduling.EventTrigger;
 import com.zutubi.pulse.scheduling.ScmChangeEventFilter;
 import com.zutubi.pulse.scheduling.Trigger;
+import com.zutubi.pulse.scheduling.tasks.BuildProjectTask;
 import com.zutubi.pulse.scm.ScmChangeEvent;
 import com.zutubi.config.annotations.SymbolicName;
 
@@ -23,7 +24,11 @@ public class ScmBuildTriggerConfiguration extends TriggerConfiguration
         String triggerName = "trigger:" + getHandle();
         String triggerGroup = "project:" + project.getProjectId();
 
-        return new EventTrigger(ScmChangeEvent.class, triggerName, triggerGroup, ScmChangeEventFilter.class);
+        Trigger trigger = new EventTrigger(ScmChangeEvent.class, triggerName, triggerGroup, ScmChangeEventFilter.class);
+        trigger.setTaskClass(BuildProjectTask.class);
+        trigger.setProject(project.getHandle());
+        
+        return trigger;
     }
 
     public void update(Trigger trigger)
