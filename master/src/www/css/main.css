@@ -896,6 +896,91 @@ table.template-actions
     background: #f0f0f0;
 }
 
+.config-panel{
+    border-bottom-style:dotted;
+    border-right-style:dotted;
+    border-left-style:dotted;
+    border-bottom-color:gray;
+    border-left-color:gray;
+    border-right-color:gray;
+    border-bottom-width:1px;
+    border-right-width:1px;
+    border-left-width:1px;
+    margin-bottom:3em;
+}
+
+.config-header {
+    padding:8px;
+    background-color:#E0E6F0;
+    border-top-width:1px;
+    border-top-style:dotted;
+    border-top-color:gray;
+}
+
+.config-description {
+    padding:8px;
+    margin:0;
+    font-size: 10px;
+}
+
+.config-state-table
+{
+    width:100%
+}
+.config-state-table th {
+    font-weight:bold;
+    font-size:large;
+    background-color:#E0E6F0;
+    border-top-width:1px;
+    border-top-style:dotted;
+    border-top-color:gray;
+}
+.config-state-table .odd {
+    background-color:#ffffff
+}
+.config-state-table .even {
+    background-color:#f6f6f6;
+}
+.config-state-table .first {
+    padding-top:4px;
+}
+.config-state-table .last {
+    padding-bottom:4px;
+}
+.config-state-table .label {
+    text-align: right;
+    font-weight: bold;
+    padding-top:3px;
+    padding-right:5px;
+    padding-bottom:3px;
+    padding-left:5px;
+    border-right: solid 1px #ddd;
+    background-color:#f6f6f6;
+
+}
+.config-state-table .value {
+    font-weight:normal;
+    padding-top:3px;
+    padding-right:5px;
+    padding-bottom:3px;
+    padding-left:5px;
+}
+
+.config-form-container{
+    padding:10px;
+    padding-right:50px
+}
+
+#left-column {
+
+}
+
+#right-column {
+    padding-left:50px;
+    width:300px;
+    vertical-align:top;
+}
+
 /*
 .x-item-disabled
 {

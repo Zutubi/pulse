@@ -1,8 +1,8 @@
 #if ($config.configurationCheckAvailable)
 <div class="frame">
-    #i18nexists("key=test.heading")<h3 class="header">#i18n("key=test.heading")</h3>#end
-    #i18nexists("key=test.description")<p class="description">#i18n("key=test.description")</p>#end
-    <div class="form-container">
+    #i18nexists("key=test.heading")<h3 class="config-header">#i18n("key=test.heading")</h3>#end
+    #i18nexists("key=test.description")<p class="config-description">#i18n("key=test.description")</p>#end
+    <div class="config-form-container">
         #checkform("path=$config.path" "mainFormName=mainform" "checkFormName=checkform" "namespace=aconfig")
     </div>
     <script type="text/javascript">
