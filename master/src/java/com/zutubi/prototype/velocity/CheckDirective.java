@@ -39,6 +39,8 @@ public class CheckDirective extends PrototypeDirective
     private ConfigurationRegistry configurationRegistry;
     private Configuration configuration;
 
+    private String namespace;
+
     /**
      * The name of this velocity directive.
      *
@@ -74,6 +76,11 @@ public class CheckDirective extends PrototypeDirective
         this.checkFormName = checkFormName;
     }
 
+    public void setNamespace(String namespace)
+    {
+        this.namespace = namespace;
+    }
+
     public boolean render(InternalContextAdapter contextAdapter, Writer writer, Node node) throws IOException, ResourceNotFoundException, ParseErrorException
     {
         try
@@ -91,6 +98,7 @@ public class CheckDirective extends PrototypeDirective
             formDescriptor.setName(checkFormName);
             formDescriptor.setAction(action);
             formDescriptor.setActions("check");
+            formDescriptor.setNamespace(namespace);
             formDescriptor.setAjax(true);
 
             Map<String, Object> context = initialiseContext(checkType.getClazz());

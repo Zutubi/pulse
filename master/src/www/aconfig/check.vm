@@ -3,7 +3,7 @@
     #i18nexists("key=test.heading")<h3 class="header">#i18n("key=test.heading")</h3>#end
     #i18nexists("key=test.description")<p class="description">#i18n("key=test.description")</p>#end
     <div class="form-container">
-        #checkform("path=$config.path" "mainFormName=mainform" "checkFormName=checkform")
+        #checkform("path=$config.path" "mainFormName=mainform" "checkFormName=checkform" "namespace=aconfig")
     </div>
     <script type="text/javascript">
         checkform.on('actioncomplete', function(form, action)
