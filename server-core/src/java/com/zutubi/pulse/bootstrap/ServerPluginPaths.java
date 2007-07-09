@@ -56,7 +56,11 @@ public class ServerPluginPaths implements PluginPaths
     {
         if(userPluginRoot == null)
         {
-            userPluginRoot = new File(configurationManager.getUserPaths().getData(), "plugins");
+            File dataDir = configurationManager.getUserPaths().getData();
+            if (dataDir != null)
+            {
+                userPluginRoot = new File(dataDir, "plugins");
+            }
         }
         return userPluginRoot;
     }

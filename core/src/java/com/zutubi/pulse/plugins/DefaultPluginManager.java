@@ -2,6 +2,10 @@ package com.zutubi.pulse.plugins;
 
 import com.zutubi.pulse.bootstrap.ComponentContext;
 import com.zutubi.pulse.util.FileSystemUtils;
+import com.zutubi.pulse.events.EventListener;
+import com.zutubi.pulse.events.Event;
+import com.zutubi.pulse.events.EventManager;
+import com.zutubi.pulse.events.DataDirectoryLocatedEvent;
 import com.zutubi.util.*;
 import com.zutubi.util.logging.Logger;
 import nu.xom.*;
@@ -26,11 +30,11 @@ import org.osgi.service.packageadmin.PackageAdmin;
 
 import java.io.*;
 import java.net.URL;
-import java.util.*;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
+import java.util.*;
 
-public class DefaultPluginManager implements PluginManager
+public class DefaultPluginManager implements PluginManager, EventListener
 {
     private static final Logger LOG = Logger.getLogger(DefaultPluginManager.class);
 
@@ -102,17 +106,6 @@ public class DefaultPluginManager implements PluginManager
             extensionTracker = new ExtensionTracker(extensionRegistry);
 
             loadPrepackagedPlugins();
-
-            // Ensure we have a user plugins directory
-            // FIXME
-//            File userPlugins = pluginPaths.getUserPluginRoot();
-//            if (!userPlugins.isDirectory())
-//            {
-//                userPlugins.mkdirs();
-//            }
-//
-//            loadUserPlugins();
-
             LOG.info("Plugin manager started.");
         }
         catch (Exception e)
@@ -170,6 +163,12 @@ public class DefaultPluginManager implements PluginManager
 
     private void loadUserPlugins()
     {
+        File userPlugins = pluginPaths.getUserPluginRoot();
+        if (!userPlugins.isDirectory())
+        {
+            userPlugins.mkdirs();
+        }
+
         LOG.info("Loading user plugins...");
         List<PluginImpl> foundPlugins = loadPlugins(pluginPaths.getUserPluginRoot(), PluginImpl.Type.USER);
         plugins.addAll(foundPlugins);
@@ -1055,8 +1054,23 @@ public class DefaultPluginManager implements PluginManager
         return pluginDir;
     }
 
+    public void handleEvent(Event evt)
+    {
+        loadUserPlugins();
+    }
+
+    public Class[] getHandledEvents()
+    {
+        return new Class[]{ DataDirectoryLocatedEvent.class } ;
+    }
+
     public void setPluginPaths(PluginPaths pluginPaths)
     {
         this.pluginPaths = pluginPaths;
+    }
+
+    public void setEventManager(EventManager eventManager)
+    {
+        eventManager.register(this);
     }
 }

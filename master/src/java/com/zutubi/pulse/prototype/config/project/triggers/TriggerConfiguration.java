@@ -5,6 +5,7 @@ import com.zutubi.pulse.scheduling.Trigger;
 import com.zutubi.config.annotations.Internal;
 import com.zutubi.config.annotations.Table;
 import com.zutubi.config.annotations.SymbolicName;
+import com.zutubi.config.annotations.Transient;
 
 /**
  * 
@@ -30,5 +31,6 @@ public abstract class TriggerConfiguration extends AbstractNamedConfiguration
 
     public abstract void update(Trigger trigger);
 
+    @Transient
     public abstract String getType();
 }

@@ -5,8 +5,8 @@ import com.zutubi.pulse.bootstrap.conf.EnvConfig;
 import com.zutubi.pulse.bootstrap.conf.VolatileReadOnlyConfig;
 import com.zutubi.pulse.config.Config;
 import com.zutubi.pulse.config.FileConfig;
-import com.zutubi.pulse.events.EventManager;
 import com.zutubi.pulse.events.DataDirectoryChangedEvent;
+import com.zutubi.pulse.events.EventManager;
 import com.zutubi.util.IOUtils;
 
 import java.io.File;

@@ -6,6 +6,8 @@ import com.zutubi.prototype.config.*;
 import com.zutubi.prototype.type.record.DelegatingHandleAllocator;
 import com.zutubi.prototype.type.record.RecordManager;
 import com.zutubi.pulse.Version;
+import com.zutubi.pulse.events.DataDirectoryLocatedEvent;
+import com.zutubi.pulse.events.EventManager;
 import com.zutubi.pulse.bootstrap.conf.EnvConfig;
 import com.zutubi.pulse.config.PropertiesWriter;
 import com.zutubi.pulse.license.LicenseHolder;
@@ -43,6 +45,7 @@ public class DefaultSetupManager implements SetupManager
     private MasterConfigurationManager configurationManager;
     private UserManager userManager;
     private UpgradeManager upgradeManager;
+    private EventManager eventManager;
 
     /**
      * Contexts for Stage A: the config subsystem.
@@ -201,6 +204,8 @@ public class DefaultSetupManager implements SetupManager
         {
             configurationManager.getData().init(configurationManager.getSystemPaths());
         }
+
+        eventManager.publish(new DataDirectoryLocatedEvent(this));
 
         loadSystemProperties();
         linkUserTemplates();
@@ -447,5 +452,10 @@ public class DefaultSetupManager implements SetupManager
     public void setUpgradeContexts(List<String> upgradeContexts)
     {
         this.upgradeContexts = upgradeContexts;
+    }
+
+    public void setEventManager(EventManager eventManager)
+    {
+        this.eventManager = eventManager;
     }
 }

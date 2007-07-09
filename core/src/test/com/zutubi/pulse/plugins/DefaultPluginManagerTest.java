@@ -1,5 +1,6 @@
 package com.zutubi.pulse.plugins;
 
+import com.zutubi.pulse.events.DataDirectoryLocatedEvent;
 import com.zutubi.pulse.test.PulseTestCase;
 import com.zutubi.pulse.util.FileSystemUtils;
 import org.osgi.framework.Bundle;
@@ -16,11 +17,7 @@ public class DefaultPluginManagerTest extends PulseTestCase
     private static final String CONSUMER_ID = "com.zutubi.bundles.consumer";
 
     private File tempDir;
-    private File internalDir;
-    private File prepackagedDir;
-    private File userDir;
     private DefaultPluginManager pluginManager;
-    private File bundleDir;
     private URL producer1URL;
     private URL producer11URL;
     private URL producer2URL;
@@ -29,11 +26,11 @@ public class DefaultPluginManagerTest extends PulseTestCase
     protected void setUp() throws Exception
     {
         tempDir = FileSystemUtils.createTempDir(DefaultPluginManagerTest.class.getName(), "");
-        internalDir = new File(tempDir, "internal");
+        File internalDir = new File(tempDir, "internal");
         internalDir.mkdir();
-        prepackagedDir = new File(tempDir, "prepackaged");
+        File prepackagedDir = new File(tempDir, "prepackaged");
         prepackagedDir.mkdir();
-        userDir = new File(tempDir, "user");
+        File userDir = new File(tempDir, "user");
         userDir.mkdir();
 
         ConfigurablePluginPaths paths = new ConfigurablePluginPaths();
@@ -45,7 +42,7 @@ public class DefaultPluginManagerTest extends PulseTestCase
         pluginManager = new DefaultPluginManager();
         pluginManager.setPluginPaths(paths);
 
-        bundleDir = getTestDataDir("core", "test-bundles");
+        File bundleDir = getTestDataDir("core", "test-bundles");
         producer1URL = new File(bundleDir, "com.zutubi.bundles.producer_1.0.0.jar").toURL();
         producer11URL = new File(bundleDir, "com.zutubi.bundles.producer_1.1.0.jar").toURL();
         producer2URL = new File(bundleDir, "com.zutubi.bundles.producer_2.0.0.jar").toURL();
@@ -59,7 +56,7 @@ public class DefaultPluginManagerTest extends PulseTestCase
 
     public void testInstall() throws PluginException
     {
-        pluginManager.init();
+        init();
         try
         {
             assertEquals(0, pluginManager.getAllPlugins().size());
@@ -77,7 +74,7 @@ public class DefaultPluginManagerTest extends PulseTestCase
 
     public void testInstallDependent() throws Exception
     {
-        pluginManager.init();
+        init();
         try
         {
             assertEquals(0, pluginManager.getAllPlugins().size());
@@ -93,7 +90,7 @@ public class DefaultPluginManagerTest extends PulseTestCase
 
     public void testInstallDependencyMissing() throws Exception
     {
-        pluginManager.init();
+        init();
         try
         {
             assertEquals(0, pluginManager.getAllPlugins().size());
@@ -109,7 +106,7 @@ public class DefaultPluginManagerTest extends PulseTestCase
 
     public void testInstallSameId() throws Exception
     {
-        pluginManager.init();
+        init();
         try
         {
             assertEquals(0, pluginManager.getAllPlugins().size());
@@ -129,7 +126,7 @@ public class DefaultPluginManagerTest extends PulseTestCase
 
     public void testInstallBadURL() throws Exception
     {
-        pluginManager.init();
+        init();
         try
         {
             assertEquals(0, pluginManager.getAllPlugins().size());
@@ -148,7 +145,7 @@ public class DefaultPluginManagerTest extends PulseTestCase
 
     public void testUninstall() throws Exception
     {
-        pluginManager.init();
+        init();
         try
         {
             PluginImpl plugin = installProducer1();
@@ -173,7 +170,7 @@ public class DefaultPluginManagerTest extends PulseTestCase
     {
         // We allow the plugin to be uninstalled at this level, but on
         // restart the dependent will fail to load.
-        pluginManager.init();
+        init();
         try
         {
             assertEquals(0, pluginManager.getAllPlugins().size());
@@ -199,7 +196,7 @@ public class DefaultPluginManagerTest extends PulseTestCase
 
     public void testUninstallDisabled() throws Exception
     {
-        pluginManager.init();
+        init();
         try
         {
             PluginImpl plugin = installAndDisableProducer1();
@@ -222,7 +219,7 @@ public class DefaultPluginManagerTest extends PulseTestCase
 
     public void testUninstallDisabling() throws Exception
     {
-        pluginManager.init();
+        init();
         try
         {
             PluginImpl plugin = installProducer1();
@@ -246,7 +243,7 @@ public class DefaultPluginManagerTest extends PulseTestCase
 
     public void testUninstallUpdating() throws Exception
     {
-        pluginManager.init();
+        init();
         try
         {
             PluginImpl plugin = installAndMarkForUpdateProducer1();
@@ -266,7 +263,7 @@ public class DefaultPluginManagerTest extends PulseTestCase
 
     public void testUninstallUninstalling() throws Exception
     {
-        pluginManager.init();
+        init();
         try
         {
             PluginImpl plugin = installProducer1();
@@ -288,7 +285,7 @@ public class DefaultPluginManagerTest extends PulseTestCase
 
     public void testUpdate() throws PluginException
     {
-        pluginManager.init();
+        init();
         try
         {
             PluginImpl oldPlugin = installAndMarkForUpdateProducer1();
@@ -309,7 +306,7 @@ public class DefaultPluginManagerTest extends PulseTestCase
 
     public void testUpdateDependencyOK() throws PluginException
     {
-        pluginManager.init();
+        init();
         try
         {
             PluginImpl oldPlugin = installProducer1();
@@ -342,7 +339,7 @@ public class DefaultPluginManagerTest extends PulseTestCase
 
     public void testUpdateDependencyBroken() throws PluginException
     {
-        pluginManager.init();
+        init();
         try
         {
             PluginImpl oldPlugin = installProducer1();
@@ -376,7 +373,7 @@ public class DefaultPluginManagerTest extends PulseTestCase
 
     public void testUpdateDisabled() throws PluginException
     {
-        pluginManager.init();
+        init();
         try
         {
             PluginImpl oldPlugin = installAndDisableProducer1();
@@ -405,7 +402,7 @@ public class DefaultPluginManagerTest extends PulseTestCase
 
     public void testUpdateDisabling() throws PluginException
     {
-        pluginManager.init();
+        init();
         try
         {
             PluginImpl oldPlugin = installProducer1();
@@ -436,7 +433,7 @@ public class DefaultPluginManagerTest extends PulseTestCase
 
     public void testUpdateUninstalling() throws PluginException
     {
-        pluginManager.init();
+        init();
         try
         {
             PluginImpl oldPlugin = installAndMarkForUninstallProducer1();
@@ -455,7 +452,7 @@ public class DefaultPluginManagerTest extends PulseTestCase
 
     public void testUpdateUpdating() throws PluginException
     {
-        pluginManager.init();
+        init();
         try
         {
             PluginImpl oldPlugin = installAndMarkForUpdateProducer1();
@@ -474,7 +471,7 @@ public class DefaultPluginManagerTest extends PulseTestCase
 
     public void testDisable() throws PluginException
     {
-        pluginManager.init();
+        init();
         try
         {
             PluginImpl plugin = installProducer1();
@@ -495,7 +492,7 @@ public class DefaultPluginManagerTest extends PulseTestCase
     {
         // We allow the plugin to be uninstalled at this level, but on
         // restart the dependent will fail to load.
-        pluginManager.init();
+        init();
         try
         {
             Plugin plugin = installProducer1();
@@ -518,7 +515,7 @@ public class DefaultPluginManagerTest extends PulseTestCase
 
     public void testDisableDisabling() throws PluginException
     {
-        pluginManager.init();
+        init();
         try
         {
             PluginImpl plugin = installProducer1();
@@ -539,7 +536,7 @@ public class DefaultPluginManagerTest extends PulseTestCase
 
     public void testDisableDisabled() throws PluginException
     {
-        pluginManager.init();
+        init();
         try
         {
             PluginImpl plugin = installProducer1();
@@ -559,7 +556,7 @@ public class DefaultPluginManagerTest extends PulseTestCase
 
     public void testDisableUninstalling() throws PluginException
     {
-        pluginManager.init();
+        init();
         try
         {
             PluginImpl plugin = installAndMarkForUninstallProducer1();
@@ -578,7 +575,7 @@ public class DefaultPluginManagerTest extends PulseTestCase
 
     public void testDisableUpdating() throws PluginException
     {
-        pluginManager.init();
+        init();
         try
         {
             PluginImpl plugin = installAndMarkForUpdateProducer1();
@@ -597,7 +594,7 @@ public class DefaultPluginManagerTest extends PulseTestCase
 
     public void testEnable() throws PluginException
     {
-        pluginManager.init();
+        init();
         try
         {
             PluginImpl plugin = installProducer1();
@@ -617,7 +614,7 @@ public class DefaultPluginManagerTest extends PulseTestCase
 
     public void testEnableEnabled() throws PluginException
     {
-        pluginManager.init();
+        init();
         try
         {
             PluginImpl plugin = installProducer1();
@@ -633,7 +630,7 @@ public class DefaultPluginManagerTest extends PulseTestCase
 
     public void testEnableDisabled() throws PluginException
     {
-        pluginManager.init();
+        init();
         try
         {
             PluginImpl plugin = installProducer1();
@@ -657,7 +654,7 @@ public class DefaultPluginManagerTest extends PulseTestCase
 
     public void testEnableDisabling() throws PluginException
     {
-        pluginManager.init();
+        init();
         try
         {
             PluginImpl plugin = installProducer1();
@@ -677,7 +674,7 @@ public class DefaultPluginManagerTest extends PulseTestCase
 
     public void testEnableUninstalling() throws PluginException
     {
-        pluginManager.init();
+        init();
         try
         {
             PluginImpl plugin = installAndMarkForUninstallProducer1();
@@ -696,7 +693,7 @@ public class DefaultPluginManagerTest extends PulseTestCase
 
     public void testEnableUpdating() throws PluginException
     {
-        pluginManager.init();
+        init();
         try
         {
             PluginImpl plugin = installAndMarkForUpdateProducer1();
@@ -716,7 +713,7 @@ public class DefaultPluginManagerTest extends PulseTestCase
     public void testDiscovery() throws PluginException
     {
         pluginManager.copyInPlugin(pluginManager.deriveName(producer1URL), producer11URL);
-        pluginManager.init();
+        init();
         try
         {
             assertEnabledProducer1();
@@ -730,14 +727,14 @@ public class DefaultPluginManagerTest extends PulseTestCase
     public void testUndiscovery() throws PluginException
     {
         File f = pluginManager.copyInPlugin(pluginManager.deriveName(producer1URL), producer11URL);
-        pluginManager.init();
+        init();
         try
         {
             assertEnabledProducer1();
             pluginManager.destroy();
             f.delete();
             assertFalse(f.isFile());
-            pluginManager.init();
+            init();
             assertEquals(0, pluginManager.getAllPlugins().size());
         }
         finally
@@ -748,7 +745,7 @@ public class DefaultPluginManagerTest extends PulseTestCase
 
     public void testGetDependentPlugins() throws PluginException
     {
-        pluginManager.init();
+        init();
         try
         {
             Plugin plugin = installProducer1();
@@ -765,7 +762,7 @@ public class DefaultPluginManagerTest extends PulseTestCase
 
     public void testGetRequiredPlugins() throws PluginException
     {
-        pluginManager.init();
+        init();
         try
         {
             Plugin producer = installProducer1();
@@ -820,10 +817,16 @@ public class DefaultPluginManagerTest extends PulseTestCase
         assertNull(plugin.getErrorMessage());
     }
 
+    private void init()
+    {
+        pluginManager.init();
+        pluginManager.handleEvent(new DataDirectoryLocatedEvent(this));
+    }
+
     private void restart()
     {
         pluginManager.destroy();
-        pluginManager.init();
+        init();
     }
 
     private PluginImpl installProducer1() throws PluginException
@@ -875,14 +878,6 @@ public class DefaultPluginManagerTest extends PulseTestCase
     {
         assertEquals(PRODUCER_ID, plugin.getId());
         assertEquals("1.1.0", plugin.getVersion());
-    }
-
-    private Plugin installProducer2() throws PluginException
-    {
-        Plugin plugin = pluginManager.installPlugin(producer2URL);
-        assertEquals(PRODUCER_ID, plugin.getId());
-        assertEquals("2.0.0", plugin.getVersion());
-        return plugin;
     }
 
     private void assertProducer2(PluginImpl producer)

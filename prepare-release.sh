@@ -33,12 +33,12 @@ tmpFile=/tmp/tmp.$$
 # Update the Ivy files for all components:
 #   - replace the component's status="integration" with status="release" revision="$version"
 #   - replace rev="latest.integration" with rev="$version" for all pulse dependencies
-for comp in $COMPONENTS
+for ivy in */ivy.xml package/*/ivy.xml bundles/*/ivy.xml
 do
     
     sed -e "s/status=\"integration\"/status=\"release\" revision=\"$version\"/g" \
-        -e "s/latest.integration/$version/g" $comp/ivy.xml > $tmpFile
-    mv $tmpFile $comp/ivy.xml
+        -e "s/latest.integration/$version/g" $ivy > $tmpFile
+    mv $tmpFile $ivy
 done
 
 # Update build.properties

@@ -203,9 +203,9 @@ public class Data implements MasterUserPaths
      * Transfer the database.properties.template file into the data directory so that it is available for pulse
      * to create the database connection.
      *
-     * @param systemPaths
+     * @param systemPaths paths to pulse system info
      *
-     * @throws IOException if there is a problem transferring the template.
+     * @throws StartupException if there is a problem transferring the template.
      */
     private void transferDatabaseConfig(SystemPaths systemPaths) throws StartupException
     {
