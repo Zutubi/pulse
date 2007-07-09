@@ -75,7 +75,7 @@ public class CvsConfiguration extends ScmConfiguration
         return "cvs";
     }
 
-    public ScmClient createClient() throws ScmException
+    public CvsClient createClient() throws ScmException
     {
         // use a manual autowire here since this object itself is not wired, and so
         // does not have access to the object factory.

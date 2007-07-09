@@ -13,6 +13,5 @@ public enum ScmCapability
     LIST_CHANGES,
     POLL,
     TAG,
-    TEST_CONNECTION,
     UPDATE
 }

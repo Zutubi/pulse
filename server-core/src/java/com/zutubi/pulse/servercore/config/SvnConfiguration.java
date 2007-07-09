@@ -97,7 +97,7 @@ public class SvnConfiguration extends ScmConfiguration
         return "svn";
     }
 
-    public ScmClient createClient() throws ScmException
+    public SvnClient createClient() throws ScmException
     {
         SvnClient client;
         if (!TextUtils.stringSet(keyfile))

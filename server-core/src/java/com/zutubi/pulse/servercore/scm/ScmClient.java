@@ -11,7 +11,6 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 /**
@@ -28,16 +27,6 @@ public interface ScmClient
      * @return a set of operations this implementation is capable of
      */
     Set<ScmCapability> getCapabilities();
-
-    /**
-     * Returns information about the server, as name-value pairs.
-     *
-     * Required for all implementations.
-     *
-     * @return a set of name-value pairs giving information about the server
-     * @throws com.zutubi.pulse.scm.ScmException on error
-     */
-    Map<String, String> getServerInfo() throws ScmException;
 
     /**
      * Returns a summarised form of the location of the source this SCM has
@@ -134,16 +123,6 @@ public interface ScmClient
      * @throws ScmException on error
      */
     String getUid() throws ScmException;
-
-    /**
-     * Run a check on the connection to the SCM server.  If there is a
-     * problem contacting the server, an exception is thrown.
-     *
-     * Required for {@link ScmCapability#TEST_CONNECTION}.
-     * 
-     * @throws ScmException if there are any problems connecting.
-     */
-    void testConnection() throws ScmException;
 
     /**
      * Checks out the specified file at the given revision.

@@ -66,7 +66,7 @@ public class PerforceConfiguration extends ScmConfiguration
         return "p4";
     }
 
-    public ScmClient createClient() throws ScmException
+    public PerforceClient createClient() throws ScmException
     {
         PerforceClient client = new PerforceClient(port, user, password, spec);
         client.setExcludedPaths(getFilterPaths());

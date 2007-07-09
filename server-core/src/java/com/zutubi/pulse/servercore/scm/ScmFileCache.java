@@ -67,11 +67,6 @@ public class ScmFileCache
         return item.cachedListing;
     }
 
-    private String getUID(CvsClient client)
-    {
-        return client.getLocation();
-    }
-
     public class CacheItem
     {
         public Map<String, CachingScmFile> cachedListing;
