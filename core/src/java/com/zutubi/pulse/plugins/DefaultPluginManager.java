@@ -1,9 +1,9 @@
 package com.zutubi.pulse.plugins;
 
-import com.zutubi.pulse.util.*;
-import com.zutubi.util.logging.Logger;
 import com.zutubi.pulse.bootstrap.ComponentContext;
+import com.zutubi.pulse.util.FileSystemUtils;
 import com.zutubi.util.*;
+import com.zutubi.util.logging.Logger;
 import nu.xom.*;
 import org.eclipse.core.internal.registry.osgi.OSGIUtils;
 import org.eclipse.core.runtime.IExtension;
@@ -12,17 +12,23 @@ import org.eclipse.core.runtime.RegistryFactory;
 import org.eclipse.core.runtime.adaptor.EclipseStarter;
 import org.eclipse.core.runtime.dynamichelpers.ExtensionTracker;
 import org.eclipse.core.runtime.dynamichelpers.IExtensionTracker;
-import org.eclipse.osgi.service.resolver.*;
-import org.eclipse.osgi.framework.util.Headers;
 import org.eclipse.osgi.framework.internal.core.FrameworkProperties;
-import org.osgi.framework.*;
+import org.eclipse.osgi.framework.util.Headers;
+import org.eclipse.osgi.service.resolver.BundleDescription;
+import org.eclipse.osgi.service.resolver.BundleSpecification;
+import org.eclipse.osgi.service.resolver.PlatformAdmin;
+import org.eclipse.osgi.service.resolver.State;
+import org.osgi.framework.Bundle;
+import org.osgi.framework.BundleContext;
+import org.osgi.framework.BundleException;
+import org.osgi.framework.ServiceReference;
 import org.osgi.service.packageadmin.PackageAdmin;
 
 import java.io.*;
 import java.net.URL;
 import java.util.*;
-import java.util.jar.JarFile;
 import java.util.jar.JarEntry;
+import java.util.jar.JarFile;
 
 public class DefaultPluginManager implements PluginManager
 {
@@ -98,13 +104,14 @@ public class DefaultPluginManager implements PluginManager
             loadPrepackagedPlugins();
 
             // Ensure we have a user plugins directory
-            File userPlugins = pluginPaths.getUserPluginRoot();
-            if (!userPlugins.isDirectory())
-            {
-                userPlugins.mkdirs();
-            }
-
-            loadUserPlugins();
+            // FIXME
+//            File userPlugins = pluginPaths.getUserPluginRoot();
+//            if (!userPlugins.isDirectory())
+//            {
+//                userPlugins.mkdirs();
+//            }
+//
+//            loadUserPlugins();
 
             LOG.info("Plugin manager started.");
         }
