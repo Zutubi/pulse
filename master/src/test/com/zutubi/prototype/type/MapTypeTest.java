@@ -1,6 +1,7 @@
 package com.zutubi.prototype.type;
 
 import com.zutubi.config.annotations.ID;
+import com.zutubi.config.annotations.SymbolicName;
 import com.zutubi.prototype.type.record.Record;
 import com.zutubi.pulse.core.config.AbstractConfiguration;
 
@@ -21,7 +22,7 @@ public class MapTypeTest extends TypeTestCase
     {
         super.setUp();
 
-        mockAType = typeRegistry.register("mockA", MockA.class);
+        mockAType = typeRegistry.register(MockA.class);
 
         mapType = new MapType();
         mapType.setTypeRegistry(typeRegistry);
@@ -65,6 +66,7 @@ public class MapTypeTest extends TypeTestCase
         assertEquals("coll/valueA", mapType.getSavePath("coll/valueA", record));
     }
 
+    @SymbolicName("mockA")
     public static class MockA extends AbstractConfiguration
     {
         @ID

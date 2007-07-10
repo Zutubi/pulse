@@ -1,10 +1,14 @@
 package com.zutubi.pulse.prototype.config.admin;
 
+import com.opensymphony.util.TextUtils;
 import com.zutubi.config.annotations.*;
 import com.zutubi.pulse.core.config.AbstractConfiguration;
+import com.zutubi.validation.Validateable;
+import com.zutubi.validation.ValidationContext;
+import com.zutubi.validation.ValidationException;
 import com.zutubi.validation.annotations.Email;
 import com.zutubi.validation.annotations.Numeric;
-import com.zutubi.validation.annotations.Required;
+import com.zutubi.validation.validators.EmailValidator;
 
 /**
  *
@@ -13,12 +17,11 @@ import com.zutubi.validation.annotations.Required;
 @SymbolicName("zutubi.emailConfig")
 @Form(fieldOrder = { "host", "ssl", "from", "username", "password", "subjectPrefix", "customPort", "port", "localhost"})
 @ConfigurationCheck("EmailConfigurationCheckHandler")
-public class EmailConfiguration extends AbstractConfiguration
+public class EmailConfiguration extends AbstractConfiguration implements Validateable
 {
-    @Required
     private String host;
     private boolean ssl = false;
-    @Required @Email
+    @Email
     private String from;
     private String username;
     @Password
@@ -127,5 +130,32 @@ public class EmailConfiguration extends AbstractConfiguration
     public void setLocalhost(String localhost)
     {
         this.localhost = localhost;
+    }
+
+    public void validate(ValidationContext context)
+    {
+        if (TextUtils.stringSet(host))
+        {
+            if (!TextUtils.stringSet(from))
+            {
+                context.addFieldError("from", "from address is required when smtp host is provided");
+            }
+        }
+
+        // If the from address is specified, then ensure that a valid value is set.
+        if (TextUtils.stringSet(from))
+        {
+            EmailValidator validator = new EmailValidator();
+            validator.setValidationContext(context);
+            validator.setFieldName("from");
+            try
+            {
+                validator.validate(this);
+            }
+            catch (ValidationException e)
+            {
+                context.addFieldError("from", e.getMessage());
+            }
+        }
     }
 }

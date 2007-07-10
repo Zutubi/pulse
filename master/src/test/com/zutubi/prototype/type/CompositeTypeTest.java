@@ -15,7 +15,7 @@ public class CompositeTypeTest extends TypeTestCase
     {
         super.setUp();
 
-        typeRegistry.register("basicTypes", BasicTypes.class);
+        typeRegistry.register(BasicTypes.class);
         typeRegistry.register(ObjectTypeA.class);
     }
 
@@ -163,6 +163,7 @@ public class CompositeTypeTest extends TypeTestCase
         }
     }
 
+    @SymbolicName("basicTypes")
     public static class BasicTypes extends AbstractConfiguration
     {
         private Boolean booleanO;

@@ -31,7 +31,7 @@ public class ConfigurationTemplateManagerTest extends AbstractConfigurationSyste
     {
         super.setUp();
 
-        typeA = typeRegistry.register("mockA", MockA.class);
+        typeA = typeRegistry.register(MockA.class);
         typeB = typeRegistry.getType("mockB");
         MapType mapA = new MapType();
         mapA.setTypeRegistry(typeRegistry);

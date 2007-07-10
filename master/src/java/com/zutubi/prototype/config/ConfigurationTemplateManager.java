@@ -590,7 +590,7 @@ public class ConfigurationTemplateManager
         // Construct the validation context, wrapping it around the validation callback so that the
         // client is notified of validation errors.
         MessagesTextProvider textProvider = new MessagesTextProvider(type.getClazz());
-        Object parentInstance = parentPath == null ? null : getInstance(parentPath);
+        Configuration parentInstance = parentPath == null ? null : getInstance(parentPath);
         ValidationContext context = new ConfigurationValidationContext(validationCallback, textProvider, parentInstance, baseName, !isConcrete(parentPath, subject));
 
         // Create an instance of the object represented by the record.  It is during the instantiation that
@@ -700,10 +700,10 @@ public class ConfigurationTemplateManager
 
         for (String concretePath : getDescendentPaths(newPath, false, true))
         {
-            Object instance = instances.get(concretePath);
+            Configuration instance = instances.get(concretePath);
             if (isComposite(instance))
             {
-                eventManager.publish(new PostSaveEvent(this, (Configuration) instance));
+                eventManager.publish(new PostSaveEvent(this, instance));
             }
         }
 
@@ -922,9 +922,9 @@ public class ConfigurationTemplateManager
      * @param path path of the instance to retrieve
      * @return object defined by the path.
      */
-    public Object getInstance(String path)
+    public Configuration getInstance(String path)
     {
-        Object instance = instances.get(path);
+        Configuration instance = instances.get(path);
         if (instance == null)
         {
             instance = incompleteInstances.get(path);
@@ -934,9 +934,9 @@ public class ConfigurationTemplateManager
     }
 
     @SuppressWarnings({ "unchecked" })
-    public <T> T getInstance(String path, Class<T> clazz)
+    public <T extends Configuration> T getInstance(String path, Class<T> clazz)
     {
-        Object instance = getInstance(path);
+        Configuration instance = getInstance(path);
         if (instance == null)
         {
             return null;
@@ -950,24 +950,25 @@ public class ConfigurationTemplateManager
         return (T) instance;
     }
 
-    public <T> Collection<T> getAllInstances(String path, Class<T> clazz, boolean allowIncomplete)
+    public <T extends Configuration> Collection<T> getAllInstances(String path, Class<T> clazz, boolean allowIncomplete)
     {
         List<T> result = new LinkedList<T>();
         getAllInstances(path, result, allowIncomplete);
         return result;
     }
 
-    public <T> void getAllInstances(String path, Collection<T> result, boolean allowIncomplete)
+    @SuppressWarnings({ "unchecked" })
+    public <T extends Configuration> void getAllInstances(String path, Collection<T> result, boolean allowIncomplete)
     {
-        instances.getAllMatchingPathPattern(path, result);
+        instances.getAllMatchingPathPattern(path, (Collection<Configuration>) result);
         if (allowIncomplete)
         {
-            incompleteInstances.getAllMatchingPathPattern(path, result);
+            incompleteInstances.getAllMatchingPathPattern(path, (Collection<Configuration>) result);
         }
     }
 
     @SuppressWarnings({ "unchecked" })
-    public <T> Collection<T> getAllInstances(Class<T> clazz)
+    public <T extends Configuration> Collection<T> getAllInstances(Class<T> clazz)
     {
         CompositeType type = typeRegistry.getType(clazz);
         if (type == null)
@@ -981,7 +982,7 @@ public class ConfigurationTemplateManager
         {
             for (String path : paths)
             {
-                instances.getAllMatchingPathPattern(path, result);
+                instances.getAllMatchingPathPattern(path, (Collection<Configuration>) result);
             }
         }
 
@@ -989,7 +990,7 @@ public class ConfigurationTemplateManager
     }
 
     @SuppressWarnings({ "unchecked" })
-    public <T> T getAncestorOfType(Configuration c, Class<T> clazz)
+    public <T extends Configuration> T getAncestorOfType(Configuration c, Class<T> clazz)
     {
         String path = c.getConfigurationPath();
         CompositeType type = typeRegistry.getType(clazz);

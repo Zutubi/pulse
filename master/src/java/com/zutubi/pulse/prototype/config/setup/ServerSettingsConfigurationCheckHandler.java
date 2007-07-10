@@ -2,13 +2,15 @@ package com.zutubi.pulse.prototype.config.setup;
 
 import com.zutubi.config.annotations.SymbolicName;
 import com.zutubi.prototype.ConfigurationCheckHandlerSupport;
+import com.zutubi.pulse.model.EmailContactPoint;
+
+import javax.mail.MessagingException;
 
 /**
- *
- *
+ * Server settings page of the setup wizard.
  */
 @SymbolicName("zutubi.serverSettingsConfigurationCheckHandler")
-public class ServerSettingsConfigurationCheckHandler extends ConfigurationCheckHandlerSupport
+public class ServerSettingsConfigurationCheckHandler extends ConfigurationCheckHandlerSupport<ServerSettingsConfiguration>
 {
     private String testAddress;
 
@@ -22,8 +24,8 @@ public class ServerSettingsConfigurationCheckHandler extends ConfigurationCheckH
         this.testAddress = testAddress;
     }
 
-    public void test(Object configuration)
+    public void test(ServerSettingsConfiguration configuration) throws MessagingException
     {
-
+        EmailContactPoint.sendMail(testAddress, configuration, "Test Email", "text/plain", "Welcome to Zutubi Pulse!");
     }
 }

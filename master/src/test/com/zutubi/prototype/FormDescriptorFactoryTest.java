@@ -1,7 +1,9 @@
 package com.zutubi.prototype;
 
+import com.zutubi.config.annotations.SymbolicName;
 import com.zutubi.prototype.type.TypeException;
 import com.zutubi.prototype.type.TypeRegistry;
+import com.zutubi.pulse.core.config.AbstractConfiguration;
 import junit.framework.TestCase;
 
 import java.util.List;
@@ -34,7 +36,7 @@ public class FormDescriptorFactoryTest extends TestCase
 
     public void testPasswordField() throws TypeException
     {
-        typeRegistry.register("mock", MockPassword.class);
+        typeRegistry.register(MockPassword.class);
         FormDescriptor formDescriptor = descriptorFactory.createDescriptor("path", "basename", "mock");
 
         List<FieldDescriptor> fieldDescriptors = formDescriptor.getFieldDescriptors();
@@ -44,7 +46,7 @@ public class FormDescriptorFactoryTest extends TestCase
 
     public void testTextField() throws TypeException
     {
-        typeRegistry.register("mock", MockText.class);
+        typeRegistry.register(MockText.class);
         FormDescriptor formDescriptor = descriptorFactory.createDescriptor("path", "basename", "mock");
 
         List<FieldDescriptor> fieldDescriptors = formDescriptor.getFieldDescriptors();
@@ -52,7 +54,8 @@ public class FormDescriptorFactoryTest extends TestCase
         assertEquals("text", fieldDescriptors.get(0).getType());
     }
 
-    private class MockText
+    @SymbolicName("mockText")
+    private class MockText extends AbstractConfiguration
     {
         private String text;
 
@@ -67,7 +70,8 @@ public class FormDescriptorFactoryTest extends TestCase
         }
     }
 
-    private class MockPassword
+    @SymbolicName("mockPassword")
+    private class MockPassword extends AbstractConfiguration
     {
         private String password;
 

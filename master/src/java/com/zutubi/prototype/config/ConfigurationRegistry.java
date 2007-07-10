@@ -2,25 +2,16 @@ package com.zutubi.prototype.config;
 
 import com.zutubi.config.annotations.ConfigurationCheck;
 import com.zutubi.prototype.ConfigurationCheckHandler;
-import com.zutubi.prototype.type.CompositeType;
-import com.zutubi.prototype.type.ExtensionTypeProperty;
-import com.zutubi.prototype.type.MapType;
-import com.zutubi.prototype.type.TemplatedMapType;
-import com.zutubi.prototype.type.TypeException;
-import com.zutubi.prototype.type.TypeHandler;
-import com.zutubi.prototype.type.TypeRegistry;
+import com.zutubi.prototype.type.*;
 import com.zutubi.prototype.type.record.HandleAllocator;
+import com.zutubi.pulse.cleanup.config.CleanupConfiguration;
+import com.zutubi.pulse.core.config.Configuration;
 import com.zutubi.pulse.prototype.config.admin.GlobalConfiguration;
 import com.zutubi.pulse.prototype.config.agent.AgentConfiguration;
 import com.zutubi.pulse.prototype.config.misc.LoginConfiguration;
 import com.zutubi.pulse.prototype.config.misc.TransientConfiguration;
 import com.zutubi.pulse.prototype.config.project.ProjectConfiguration;
-import com.zutubi.pulse.prototype.config.project.changeviewer.ChangeViewerConfiguration;
-import com.zutubi.pulse.prototype.config.project.changeviewer.CustomChangeViewerConfiguration;
-import com.zutubi.pulse.prototype.config.project.changeviewer.FisheyeConfiguration;
-import com.zutubi.pulse.prototype.config.project.changeviewer.P4WebChangeViewer;
-import com.zutubi.pulse.prototype.config.project.changeviewer.TracChangeViewer;
-import com.zutubi.pulse.prototype.config.project.changeviewer.ViewVCChangeViewer;
+import com.zutubi.pulse.prototype.config.project.changeviewer.*;
 import com.zutubi.pulse.prototype.config.project.commit.CommitMessageConfiguration;
 import com.zutubi.pulse.prototype.config.project.commit.CustomCommitMessageConfiguration;
 import com.zutubi.pulse.prototype.config.project.commit.JiraCommitMessageConfiguration;
@@ -30,12 +21,7 @@ import com.zutubi.pulse.prototype.config.project.triggers.ScmBuildTriggerConfigu
 import com.zutubi.pulse.prototype.config.project.triggers.TriggerConfiguration;
 import com.zutubi.pulse.prototype.config.project.types.*;
 import com.zutubi.pulse.prototype.config.setup.SetupConfiguration;
-import com.zutubi.pulse.prototype.config.user.AllBuildsConditionConfiguration;
-import com.zutubi.pulse.prototype.config.user.CustomConditionConfiguration;
-import com.zutubi.pulse.prototype.config.user.SelectedBuildsConditionConfiguration;
-import com.zutubi.pulse.prototype.config.user.SubscriptionConditionConfiguration;
-import com.zutubi.pulse.prototype.config.user.UnsuccessfulConditionConfiguration;
-import com.zutubi.pulse.prototype.config.user.UserConfiguration;
+import com.zutubi.pulse.prototype.config.user.*;
 import com.zutubi.pulse.prototype.config.user.contacts.ContactConfiguration;
 import com.zutubi.pulse.prototype.config.user.contacts.EmailContactConfiguration;
 import com.zutubi.pulse.prototype.config.user.contacts.JabberContactConfiguration;
@@ -43,7 +29,6 @@ import com.zutubi.pulse.servercore.config.CvsConfiguration;
 import com.zutubi.pulse.servercore.config.PerforceConfiguration;
 import com.zutubi.pulse.servercore.config.ScmConfiguration;
 import com.zutubi.pulse.servercore.config.SvnConfiguration;
-import com.zutubi.pulse.cleanup.config.CleanupConfiguration;
 import com.zutubi.util.logging.Logger;
 
 import java.util.HashMap;
@@ -252,15 +237,8 @@ public class ConfigurationRegistry
         projectConfig.addProperty(new ExtensionTypeProperty(name, mapType));
     }
 
-    public CompositeType registerConfigurationType(Class clazz) throws TypeException
+    public <T extends Configuration> CompositeType registerConfigurationType(Class<T> clazz) throws TypeException
     {
-        return registerConfigurationType(null, clazz);
-    }
-
-    public CompositeType registerConfigurationType(String name, Class clazz) throws TypeException
-    {
-        CompositeType type;
-
         // Type callback that looks for ConfigurationCheck annotations
         TypeHandler handler = new TypeHandler()
         {
@@ -299,16 +277,7 @@ public class ConfigurationRegistry
             }
         };
 
-        if (name == null)
-        {
-            type = typeRegistry.register(clazz, handler);
-        }
-        else
-        {
-            type = typeRegistry.register(name, clazz, handler);
-        }
-
-        return type;
+        return typeRegistry.register(clazz, handler);
     }
 
     public CompositeType getConfigurationCheckType(CompositeType type)

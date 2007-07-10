@@ -1,5 +1,7 @@
 package com.zutubi.prototype.type;
 
+import com.zutubi.pulse.core.config.Configuration;
+
 /**
  * A callback interface used by types to instantiate their properties (or
  * child items in the case of a collection).  This allows extra logic to be
@@ -32,5 +34,5 @@ public interface Instantiator
      * @return the reference object
      * @throws TypeException if the reference cannot be resolved
      */
-    Object resolveReference(long toHandle) throws TypeException;
+    Configuration resolveReference(long toHandle) throws TypeException;
 }

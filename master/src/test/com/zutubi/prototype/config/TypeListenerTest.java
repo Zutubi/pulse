@@ -38,7 +38,7 @@ public class TypeListenerTest extends AbstractConfigurationSystemTestCase
         provider.setConfigurationTemplateManager(configurationTemplateManager);
         provider.init();
 
-        typeA = typeRegistry.register("a", A.class);
+        typeA = typeRegistry.register(A.class);
         typeB = typeRegistry.getType(B.class);
 
         MapType mapA = new MapType();
@@ -746,11 +746,7 @@ public class TypeListenerTest extends AbstractConfigurationSystemTestCase
 
                 Event event = (Event) o;
 
-                if (path != null ? !path.equals(event.path) : event.path != null)
-                {
-                    return false;
-                }
-                return type == event.type;
+                return !(path != null ? !path.equals(event.path) : event.path != null) && type == event.type;
             }
 
             public int hashCode()

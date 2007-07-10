@@ -2,6 +2,7 @@ package com.zutubi.prototype.type;
 
 import com.zutubi.config.annotations.ID;
 import com.zutubi.config.annotations.SymbolicName;
+import com.zutubi.pulse.core.config.AbstractConfiguration;
 import com.zutubi.validation.annotations.Required;
 import junit.framework.TestCase;
 
@@ -32,7 +33,7 @@ public class TypeRegistryTest extends TestCase
 
     public void testSimpleObject() throws TypeException
     {
-        CompositeType type = typeRegistry.register("mockName", Mock.class);
+        CompositeType type = typeRegistry.register(Mock.class);
 
         assertTrue(type.hasProperty("name"));
         assertTrue(type.hasProperty("names"));
@@ -43,7 +44,7 @@ public class TypeRegistryTest extends TestCase
 
     public void testSimpleInterfaceHolder() throws TypeException
     {
-        CompositeType type = typeRegistry.register("mockName", SimpleInterfaceHolder.class);
+        CompositeType type = typeRegistry.register(SimpleInterfaceHolder.class);
 
         assertTrue(type.hasProperty("simpleInterface"));
         assertEquals(1, type.getProperties().size());
@@ -52,7 +53,7 @@ public class TypeRegistryTest extends TestCase
     public void testAnnotations() throws TypeException
     {
         // Note that the registry also gathers meta-annotations.
-        CompositeType type = typeRegistry.register("mockName", Mock.class);
+        CompositeType type = typeRegistry.register(Mock.class);
         assertEquals(1, type.getAnnotations().size());
         TypeProperty propertyType = type.getProperty("name");
         assertEquals(3, propertyType.getAnnotations().size());
@@ -64,7 +65,7 @@ public class TypeRegistryTest extends TestCase
 
     public void testPropertyTypes() throws TypeException
     {
-        CompositeType type = typeRegistry.register("mockName", Mock.class);
+        CompositeType type = typeRegistry.register(Mock.class);
 
         List<String> mapProperties = type.getPropertyNames(MapType.class);
         assertEquals(1, mapProperties.size());
@@ -92,25 +93,6 @@ public class TypeRegistryTest extends TestCase
 
         // registering the same class a second time will return the original class.
         assertEquals(type, typeRegistry.register(SimpleObject.class));
-
-        // ensure that there is no prior registration to the someName key.
-        assertNull(typeRegistry.getType("someName"));
-        typeRegistry.register("someName", SimpleObject.class);
-        assertEquals(type, typeRegistry.getType("someName"));
-
-        // can have multiple symbolic names to the same type.
-        typeRegistry.register("someOtherName", SimpleObject.class);
-        assertEquals(typeRegistry.getType("someName"), typeRegistry.getType("someOtherName"));
-
-        // can not reassign existing type definition.
-        try
-        {
-            typeRegistry.register("someName", Map.class);
-            fail();
-        }
-        catch (TypeException e)
-        {
-        }
     }
 
     public void testRegistrationRequiresSymbolicName()
@@ -126,7 +108,7 @@ public class TypeRegistryTest extends TestCase
     }
 
     @SymbolicName("mockName")
-    public static class Mock
+    public static class Mock extends AbstractConfiguration
     {
         @ID
         private String name;
@@ -192,7 +174,7 @@ public class TypeRegistryTest extends TestCase
     }
 
     @SymbolicName("simpleObject")
-    public static class SimpleObject
+    public static class SimpleObject extends AbstractConfiguration
     {
         private String b;
 
@@ -210,7 +192,7 @@ public class TypeRegistryTest extends TestCase
     /**
      * No symbolic name makes this invalid.
      */
-    public static class InvalidObject
+    public static class InvalidObject extends AbstractConfiguration
     {
         private String c;
 
@@ -233,7 +215,7 @@ public class TypeRegistryTest extends TestCase
     }
 
     @SymbolicName("simpleInterfaceHolder")
-    public static class SimpleInterfaceHolder
+    public static class SimpleInterfaceHolder extends AbstractConfiguration
     {
         private SimpleInterface simpleInterface;
 

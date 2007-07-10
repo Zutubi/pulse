@@ -157,9 +157,9 @@ public class CompositeType extends AbstractType implements ComplexType
         this.extensions = extensions;
     }
 
-    public Object instantiate(Object data, Instantiator instantiator) throws TypeException
+    public Configuration instantiate(Object data, Instantiator instantiator) throws TypeException
     {
-        Object instance = null;
+        Configuration instance = null;
         if (data != null)
         {
             Record record = (Record) data;
@@ -169,7 +169,7 @@ public class CompositeType extends AbstractType implements ComplexType
             {
                 try
                 {
-                    instance = getClazz().newInstance();
+                    instance = (Configuration) getClazz().newInstance();
                 }
                 catch (Exception e)
                 {

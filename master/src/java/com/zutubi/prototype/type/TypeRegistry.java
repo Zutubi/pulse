@@ -5,6 +5,7 @@ import com.zutubi.config.annotations.SymbolicName;
 import com.zutubi.config.annotations.Transient;
 import com.zutubi.prototype.config.ConfigurationReferenceManager;
 import com.zutubi.prototype.type.record.HandleAllocator;
+import com.zutubi.pulse.core.config.Configuration;
 import com.zutubi.util.AnnotationUtils;
 import com.zutubi.util.CollectionUtils;
 
@@ -61,15 +62,15 @@ public class TypeRegistry
         }
     }
 
-    public CompositeType register(Class clazz) throws TypeException
+    public <T extends Configuration> CompositeType register(Class<T> clazz) throws TypeException
     {
         return register(clazz, null);
     }
 
     @SuppressWarnings({"unchecked"})
-    public CompositeType register(Class clazz, TypeHandler handler) throws TypeException
+    public <T extends Configuration> CompositeType register(Class<T> clazz, TypeHandler handler) throws TypeException
     {
-        SymbolicName symbolicName = (SymbolicName) clazz.getAnnotation(SymbolicName.class);
+        SymbolicName symbolicName = clazz.getAnnotation(SymbolicName.class);
         if (symbolicName != null)
         {
             return register(symbolicName.value(), clazz, handler);
@@ -78,12 +79,7 @@ public class TypeRegistry
         return register(null, clazz, handler);
     }
 
-    public CompositeType register(String symbolicName, Class clazz) throws TypeException
-    {
-        return register(symbolicName,  clazz, null);
-    }
-
-    public CompositeType register(String symbolicName, Class clazz, TypeHandler handler) throws TypeException
+    private CompositeType register(String symbolicName, Class clazz, TypeHandler handler) throws TypeException
     {
         try
         {

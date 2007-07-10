@@ -4,11 +4,12 @@ import com.opensymphony.xwork.ActionContext;
 import com.zutubi.prototype.ConfigurationCheckHandler;
 import com.zutubi.prototype.config.ConfigurationReferenceManager;
 import com.zutubi.prototype.type.CompositeType;
-import com.zutubi.prototype.type.Type;
 import com.zutubi.prototype.type.SimpleInstantiator;
+import com.zutubi.prototype.type.Type;
 import com.zutubi.prototype.type.record.PathUtils;
 import com.zutubi.prototype.type.record.Record;
 import com.zutubi.pulse.bootstrap.ComponentContext;
+import com.zutubi.pulse.core.config.Configuration;
 import com.zutubi.validation.XWorkValidationAdapter;
 
 import java.util.HashMap;
@@ -87,7 +88,7 @@ public class CheckAction extends PrototypeSupport
 
         // Instantiate the primary configuration object.
         SimpleInstantiator instantiator = new SimpleInstantiator(configurationReferenceManager);
-        Object instance = instantiator.instantiate(type, record);
+        Configuration instance = (Configuration) instantiator.instantiate(type, record);
 
         // Instantiate and execute the check handler.
         ConfigurationCheckHandler handler = (ConfigurationCheckHandler) instantiator.instantiate(checkType, checkRecord);

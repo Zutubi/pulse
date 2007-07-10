@@ -7,6 +7,7 @@ import com.zutubi.prototype.model.SelectFieldDescriptor;
 import com.zutubi.prototype.type.CompositeType;
 import com.zutubi.prototype.type.TypeProperty;
 import com.zutubi.prototype.type.record.PathUtils;
+import com.zutubi.pulse.core.config.Configuration;
 import com.zutubi.util.ClassLoaderUtils;
 import com.zutubi.util.bean.ObjectFactory;
 
@@ -39,7 +40,7 @@ public abstract class OptionAnnotationHandler extends FieldAnnotationHandler
 
     public static void process(ConfigurationTemplateManager configurationTemplateManager, OptionProvider optionProvider, String parentPath, String baseName, SelectFieldDescriptor field)
     {
-        Object instance = null;
+        Configuration instance = null;
         if(baseName != null)
         {
             instance = configurationTemplateManager.getInstance(PathUtils.getPath(parentPath, baseName));

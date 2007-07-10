@@ -1,6 +1,7 @@
 package com.zutubi.prototype.config;
 
 import com.zutubi.prototype.type.record.PathUtils;
+import com.zutubi.pulse.core.config.Configuration;
 
 import java.util.Collection;
 import java.util.HashMap;
@@ -15,7 +16,7 @@ class DefaultInstanceCache implements InstanceCache
 {
     private Entry root = new Entry(null);
 
-    public Object get(String path)
+    public Configuration get(String path)
     {
         Entry entry = getEntry(path);
         return entry == null ? null : entry.getInstance();
@@ -38,9 +39,9 @@ class DefaultInstanceCache implements InstanceCache
         return entry == null ? null : getEntry(entry, elements, index + 1);
     }
 
-    public Collection<Object> getAllDescendents(String path)
+    public Collection<Configuration> getAllDescendents(String path)
     {
-        Collection<Object> result = new LinkedList<Object>();
+        Collection<Configuration> result = new LinkedList<Configuration>();
         Entry entry = getEntry(path);
         if (entry != null)
         {
@@ -49,17 +50,16 @@ class DefaultInstanceCache implements InstanceCache
         return result;
     }
 
-    public void getAllMatchingPathPattern(String path, Collection result)
+    public void getAllMatchingPathPattern(String path, Collection<Configuration> result)
     {
         getAll(root, PathUtils.getPathElements(path), 0, result);
     }
 
-    @SuppressWarnings({"unchecked"})
-    private void getAll(Entry entry, String[] elements, int index, Collection result)
+    private void getAll(Entry entry, String[] elements, int index, Collection<Configuration> result)
     {
         if (index == elements.length)
         {
-            Object instance = entry.getInstance();
+            Configuration instance = entry.getInstance();
             if (instance != null)
             {
                 result.add(instance);
@@ -82,12 +82,12 @@ class DefaultInstanceCache implements InstanceCache
         }
     }
 
-    public void put(String path, Object instance)
+    public void put(String path, Configuration instance)
     {
         put(instance, root, PathUtils.getPathElements(path), 0);
     }
 
-    private void put(Object instance, Entry entry, String[] elements, int index)
+    private void put(Configuration instance, Entry entry, String[] elements, int index)
     {
         if (index == elements.length)
         {
@@ -108,24 +108,24 @@ class DefaultInstanceCache implements InstanceCache
         /**
          * Cached instance at this path.
          */
-        private Object instance;
+        private Configuration instance;
         /**
          * Created on demand to prevent wastage for the large numbers of
          * leaf instances.
          */
         private Map<String, Entry> children;
 
-        public Entry(Object instance)
+        public Entry(Configuration instance)
         {
             this.instance = instance;
         }
 
-        public Object getInstance()
+        public Configuration getInstance()
         {
             return instance;
         }
 
-        public void setInstance(Object instance)
+        public void setInstance(Configuration instance)
         {
             this.instance = instance;
         }
@@ -156,7 +156,7 @@ class DefaultInstanceCache implements InstanceCache
             return child;
         }
 
-        public void getAllDescendents(Collection<Object> result)
+        public void getAllDescendents(Collection<Configuration> result)
         {
             if(instance != null)
             {

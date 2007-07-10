@@ -13,6 +13,7 @@ import com.zutubi.prototype.type.Type;
 import com.zutubi.prototype.type.record.PathUtils;
 import com.zutubi.prototype.type.record.Record;
 import com.zutubi.pulse.bootstrap.ComponentContext;
+import com.zutubi.pulse.core.config.Configuration;
 import com.zutubi.util.bean.ObjectFactory;
 
 import java.text.Collator;
@@ -22,8 +23,8 @@ import java.util.LinkedList;
 import java.util.List;
 
 /**
- *
- *
+ * Analyses a configuration path, extracting information that is used to
+ * render the path in the UI.
  */
 public class ConfigurationUIModel
 {
@@ -57,7 +58,7 @@ public class ConfigurationUIModel
 
     private boolean configurationCheckAvailable = false;
 
-    private Object instance;
+    private Configuration instance;
 
     public ConfigurationUIModel(String path)
     {
@@ -179,7 +180,7 @@ public class ConfigurationUIModel
         return path;
     }
 
-    public Object getInstance()
+    public Configuration getInstance()
     {
         return instance;
     }

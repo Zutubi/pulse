@@ -55,7 +55,7 @@ public class PersistentInstantiator implements Instantiator
         return instance;
     }
 
-    public Object resolveReference(long toHandle) throws TypeException
+    public Configuration resolveReference(long toHandle) throws TypeException
     {
         return configurationReferenceManager.resolveReference(path, toHandle, this);
     }

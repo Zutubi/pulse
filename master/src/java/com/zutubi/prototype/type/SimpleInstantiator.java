@@ -1,6 +1,7 @@
 package com.zutubi.prototype.type;
 
 import com.zutubi.prototype.config.ConfigurationReferenceManager;
+import com.zutubi.pulse.core.config.Configuration;
 
 /**
  * A property instantiator that applies no extra logic to the instantiation
@@ -30,7 +31,7 @@ public class SimpleInstantiator implements Instantiator
         return instance;
     }
 
-    public Object resolveReference(long toHandle) throws TypeException
+    public Configuration resolveReference(long toHandle) throws TypeException
     {
         return configurationReferenceManager.resolveReference(null, toHandle, this);
     }

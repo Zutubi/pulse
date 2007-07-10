@@ -1,6 +1,7 @@
 package com.zutubi.prototype.type;
 
 import com.zutubi.config.annotations.ID;
+import com.zutubi.config.annotations.SymbolicName;
 import com.zutubi.prototype.type.record.MutableRecord;
 import com.zutubi.prototype.type.record.Record;
 import com.zutubi.pulse.core.config.AbstractConfiguration;
@@ -22,7 +23,7 @@ public class ListTypeTest extends TypeTestCase
     {
         super.setUp();
 
-        mockAType = typeRegistry.register("mockA", MockA.class);
+        mockAType = typeRegistry.register(MockA.class);
 
         listType = new ListType(recordManager);
         listType.setTypeRegistry(typeRegistry);
@@ -64,6 +65,7 @@ public class ListTypeTest extends TypeTestCase
         assertEquals("any/path", listType.getSavePath("any/path", record));
     }
 
+    @SymbolicName("mockA")
     public static class MockA extends AbstractConfiguration
     {
         @ID

@@ -52,7 +52,7 @@ public class ReferenceType extends SimpleType implements Type
         return idProperty;
     }
 
-    public Object instantiate(Object data, Instantiator instantiator) throws TypeException
+    public Configuration instantiate(Object data, Instantiator instantiator) throws TypeException
     {
         String referenceHandle = (String) data;
         try

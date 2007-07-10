@@ -18,7 +18,7 @@ public interface ConfigurationProvider
      *
      * @return the configuration instance.
      */
-    <T> T get(String path, Class<T> clazz);
+    <T extends Configuration> T get(String path, Class<T> clazz);
 
     /**
      * Retrieve a configuration instance of the specified type.  Note, if there are more than one instance
@@ -30,7 +30,7 @@ public interface ConfigurationProvider
      *
      * @return an instance of the requested type, or null if none exists.
      */
-    <T> T get(Class<T> clazz);
+    <T extends Configuration> T get(Class<T> clazz);
 
     /**
      * Retrieve all of the instances of the configuration instances at the specified path.  All of these instances must
@@ -44,7 +44,7 @@ public interface ConfigurationProvider
      *
      * @return the collection of configuration instances. If none were located, then an empty collection is returned.  
      */
-    <T> Collection<T> getAll(String path, Class<T> clazz);
+    <T extends Configuration> Collection<T> getAll(String path, Class<T> clazz);
 
     /**
      * Retrieve all of the configuration instances of the specified type.
@@ -53,7 +53,7 @@ public interface ConfigurationProvider
      *
      * @return a collection of configuration instances.
      */
-    <T> Collection<T> getAll(Class<T> clazz);
+    <T extends Configuration> Collection<T> getAll(Class<T> clazz);
 
     /**
      * Retrieve the ancestor of the specific configuration instance that is of the specified type.
@@ -67,7 +67,7 @@ public interface ConfigurationProvider
      *
      * @return the located configuration instance, or null if none is found.
      */
-    <T> T getAncestorOfType(Configuration c, Class<T> clazz);
+    <T extends Configuration> T getAncestorOfType(Configuration c, Class<T> clazz);
 
     /**
      * Register a configuration event listener.  This listener will receive events from configuration instances identified

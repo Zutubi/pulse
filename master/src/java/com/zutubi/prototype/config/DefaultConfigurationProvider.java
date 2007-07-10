@@ -34,12 +34,12 @@ public class DefaultConfigurationProvider implements ConfigurationProvider
         eventManager.register(asych);
     }
 
-    public <T> T get(String path, Class<T> clazz)
+    public <T extends Configuration> T get(String path, Class<T> clazz)
     {
         return configurationTemplateManager.getInstance(path, clazz);
     }
 
-    public <T> T get(Class<T> clazz)
+    public <T extends Configuration> T get(Class<T> clazz)
     {
         Collection<T> instances = getAll(clazz);
         if(instances.size() > 0)
@@ -50,18 +50,18 @@ public class DefaultConfigurationProvider implements ConfigurationProvider
         return null;
     }
 
-    public <T> Collection<T> getAll(String path, Class<T> clazz)
+    public <T extends Configuration> Collection<T> getAll(String path, Class<T> clazz)
     {
         return configurationTemplateManager.getAllInstances(path, clazz, false);
     }
 
-    public <T> Collection<T> getAll(Class<T> clazz)
+    public <T extends Configuration> Collection<T> getAll(Class<T> clazz)
     {
         return configurationTemplateManager.getAllInstances(clazz);
     }
 
     @SuppressWarnings({"unchecked"})
-    public <T> T getAncestorOfType(Configuration c, Class<T> clazz)
+    public <T extends Configuration> T getAncestorOfType(Configuration c, Class<T> clazz)
     {
         return configurationTemplateManager.getAncestorOfType(c, clazz);
     }
