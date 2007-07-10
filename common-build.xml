@@ -290,7 +290,7 @@
             <report format="frames" todir="${report.dir}/junit/html"/>
         </junitreport>
 
-        <!--<fail if="test.failed" message="One or more tests failed.  See the reports (${report.dir}) for details."/>-->
+        <fail if="test.failed" message="One or more tests failed.  See the reports (${report.dir}) for details."/>
     </target>
 
     <!-- package artifacts -->
