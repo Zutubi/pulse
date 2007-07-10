@@ -1,10 +1,10 @@
 package com.zutubi.prototype.type;
 
 import com.zutubi.config.annotations.ID;
-import com.zutubi.prototype.config.InstanceCache;
 import com.zutubi.prototype.type.record.MutableRecord;
 import com.zutubi.prototype.type.record.PathUtils;
 import com.zutubi.prototype.type.record.Record;
+import com.zutubi.pulse.core.config.ConfigurationMap;
 import com.zutubi.util.AnnotationUtils;
 import com.zutubi.util.Sort;
 import com.zutubi.util.logging.Logger;
@@ -30,45 +30,53 @@ public class MapType extends CollectionType
     }
 
     @SuppressWarnings({"unchecked"})
-    public Map instantiate(String path, InstanceCache cache, Object data) throws TypeException
+    public Map instantiate(Object data, Instantiator instantiator) throws TypeException
     {
-        Map instance = (Map) (path == null ? null : cache.get(path));
-        if (instance == null && data != null)
+        Map instance = null;
+        if (data != null)
         {
             if (!(data instanceof Record))
             {
                 throw new TypeConversionException("Expected a record, instead received " + data.getClass());
             }
 
-            Record record = (Record) data;
-
-            Type defaultType = getCollectionType();
-            instance = new HashMap<String, Object>();
-            if (path != null)
-            {
-                cache.put(path, instance);
-            }
-
-            for (String key : record.keySet())
-            {
-                Object child = record.get(key);
-                Type type = defaultType;
-                if (child instanceof Record)
-                {
-                    Record childRecord = (Record) child;
-                    type = typeRegistry.getType(childRecord.getSymbolicName());
-                    if(type == null)
-                    {
-                        throw new TypeException("Reference to unrecognised type '" + childRecord.getSymbolicName() + "'");
-                    }
-                }
-
-                Object value = type.instantiate(path == null ? null : PathUtils.getPath(path, key), cache, child);
-                instance.put(key, value);
-            }
+            instance = new ConfigurationMap();
         }
 
         return instance;
+    }
+
+    @SuppressWarnings({ "unchecked" })
+    public void initialise(Object instance, Object data, Instantiator instantiator)
+    {
+        ConfigurationMap<String, Object> map = (ConfigurationMap<String, Object>) instance;
+        Record record = (Record) data;
+
+        Type defaultType = getCollectionType();
+        for (String key : record.keySet())
+        {
+            Object child = record.get(key);
+            Type type = defaultType;
+            if (child instanceof Record)
+            {
+                Record childRecord = (Record) child;
+                type = typeRegistry.getType(childRecord.getSymbolicName());
+                if(type == null)
+                {
+                    map.addFieldError(key, "Reference to unrecognised type '" + childRecord.getSymbolicName() + "'");
+                    continue;
+                }
+            }
+
+            try
+            {
+                map.put(key, instantiator.instantiate(key, true, type, data));
+            }
+            catch (TypeException e)
+            {
+                map.addFieldError(key, e.getMessage());
+            }
+        }
     }
 
     @SuppressWarnings({"unchecked"})
@@ -123,11 +131,6 @@ public class MapType extends CollectionType
     {
         // Lexicographical ordering by the key.
         return new Sort.StringComparator();
-    }
-
-    public Object emptyInstance()
-    {
-        return new HashMap(0);
     }
 
     public String getKeyProperty()

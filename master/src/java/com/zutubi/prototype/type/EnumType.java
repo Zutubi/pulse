@@ -1,7 +1,5 @@
 package com.zutubi.prototype.type;
 
-import com.zutubi.prototype.config.InstanceCache;
-
 /**
  * Type used for enum-valued properties.  They are similar to simple string
  * values, except are converted to the enums on instantiated objects and
@@ -20,9 +18,16 @@ public class EnumType extends SimpleType
         return (Class<? extends Enum>) super.getClazz();
     }
 
-    public Object instantiate(String path, InstanceCache cache, Object record) throws TypeException
+    public Object instantiate(Object data, Instantiator instantiator) throws TypeException
     {
-        return Enum.valueOf(getClazz(), (String) record);
+        try
+        {
+            return Enum.valueOf(getClazz(), (String) data);
+        }
+        catch (IllegalArgumentException e)
+        {
+            throw new TypeException("Illegal enumeration value '" + data.toString() + "'");
+        }
     }
 
     public Object unstantiate(Object instance) throws TypeException

@@ -2,8 +2,10 @@ package com.zutubi.prototype.webwork;
 
 import com.opensymphony.xwork.ActionContext;
 import com.zutubi.prototype.ConfigurationCheckHandler;
+import com.zutubi.prototype.config.ConfigurationReferenceManager;
 import com.zutubi.prototype.type.CompositeType;
 import com.zutubi.prototype.type.Type;
+import com.zutubi.prototype.type.SimpleInstantiator;
 import com.zutubi.prototype.type.record.PathUtils;
 import com.zutubi.prototype.type.record.Record;
 import com.zutubi.pulse.bootstrap.ComponentContext;
@@ -22,6 +24,7 @@ public class CheckAction extends PrototypeSupport
     private ConfigurationErrors configurationErrors = new ConfigurationErrors(this);
     private CheckResponse checkResponse;
     private freemarker.template.Configuration freemarkerConfiguration;
+    private ConfigurationReferenceManager configurationReferenceManager;
 
     public Record getCheckRecord()
     {
@@ -83,10 +86,11 @@ public class CheckAction extends PrototypeSupport
         }
 
         // Instantiate the primary configuration object.
-        Object instance = type.instantiate(null, null, record);
+        SimpleInstantiator instantiator = new SimpleInstantiator(configurationReferenceManager);
+        Object instance = instantiator.instantiate(type, record);
 
         // Instantiate and execute the check handler.
-        ConfigurationCheckHandler handler = (ConfigurationCheckHandler) checkType.instantiate(null, null, checkRecord);
+        ConfigurationCheckHandler handler = (ConfigurationCheckHandler) instantiator.instantiate(checkType, checkRecord);
         ComponentContext.autowire(handler);
         Exception exception = null;
         try
@@ -105,5 +109,10 @@ public class CheckAction extends PrototypeSupport
     public void setFreemarkerConfiguration(freemarker.template.Configuration freemarkerConfiguration)
     {
         this.freemarkerConfiguration = freemarkerConfiguration;
+    }
+
+    public void setConfigurationReferenceManager(ConfigurationReferenceManager configurationReferenceManager)
+    {
+        this.configurationReferenceManager = configurationReferenceManager;
     }
 }

@@ -1,7 +1,5 @@
 package com.zutubi.prototype.type;
 
-import com.zutubi.prototype.config.InstanceCache;
-
 import java.lang.annotation.Annotation;
 import java.util.List;
 
@@ -34,21 +32,32 @@ public interface Type
     Class getClazz();
 
     /**
-     * Returns an instance of the object defined by this type, using the data to populate the details.
-     * <p/>
-     * The type of the data will vary between types.
+     * Returns an instance of the object defined by this type, based on the
+     * given data.  Note that the instance will not be initialised with child
+     * properties.  Use {@link #initialise} to fill in the instance.
      *
-     * @param path defines the path defining the data to be instantiated, may be null
-     * @param cache cache that all new instances should be inserted into, ignored
-     *              when path is null
-     * @param data is the data that represents this type.  The type of the data will vary based on type
-     * implementation.  For instance, for a <code>PrimitiveType</code>, the data will be a primitive java type.  For a
-     * <code>CompositeType</code>, the data will be a <code>Record</code> instance.
+     * @param data the data that represents this type.  The type of the data will vary based on type
+     *             implementation.  For example, for a <code>PrimitiveType</code>, the data will be
+     *             a primitive java type.  For a <code>CompositeType</code>, the data will be a
+     *             <code>Record</code> instance.
+     * @param instantiator callback interface used during
+     *                             instantiation
      * @return the instance defined by this type and data.
      *
-     * @throws TypeException if there is a problem instantiating the data.
+     * @throws TypeException if there is a problem creating the instance
      */
-    Object instantiate(String path, InstanceCache cache, Object data) throws TypeException;
+    Object instantiate(Object data, Instantiator instantiator) throws TypeException;
+
+    /**
+     * Fills in the properties of the given instance with the given data.
+     * The instance should have been previously created with {@link
+     * #instantiate}.  Errors are recorded on the instance.
+     *
+     * @param instance             instance to be initialised
+     * @param data                 data to initialise the instance with
+     * @param instantiator callback interface used to instantiate child properties
+     */
+    void initialise(Object instance, Object data, Instantiator instantiator);
 
     Object unstantiate(Object instance) throws TypeException;
 }

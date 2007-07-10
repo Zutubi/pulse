@@ -1,10 +1,10 @@
 package com.zutubi.prototype.type;
 
-import com.zutubi.prototype.config.InstanceCache;
 import com.zutubi.prototype.type.record.HandleAllocator;
 import com.zutubi.prototype.type.record.MutableRecord;
 import com.zutubi.prototype.type.record.PathUtils;
 import com.zutubi.prototype.type.record.Record;
+import com.zutubi.pulse.core.config.ConfigurationList;
 
 import java.util.*;
 
@@ -22,63 +22,71 @@ public class ListType extends CollectionType
         this.handleAllocator = handleAllocator;
     }
 
-    public Object emptyInstance()
+    @SuppressWarnings({"unchecked"})
+    public List<Object> instantiate(Object data, Instantiator instantiator) throws TypeException
     {
-        return new ArrayList(0);
+        if(data == null)
+        {
+            return null;
+        }
+        else if(data instanceof Record)
+        {
+            return new ConfigurationList<Object>();
+        }
+        else if(data instanceof String[])
+        {
+            List<Object> list = new LinkedList<Object>();
+            Type type = getCollectionType();
+            String[] references = (String[]) data;
+            for (int i = 0; i < references.length; i++)
+            {
+                list.add(instantiator.instantiate(Integer.toString(i), true, type, references[i]));
+            }
+
+            return list;
+        }
+        else
+        {
+            throw new TypeConversionException("Expected a record or string array, instead received " + data.getClass());
+        }
     }
 
-    @SuppressWarnings({"unchecked"})
-    public List<Object> instantiate(String path, InstanceCache cache, Object data) throws TypeException
+    @SuppressWarnings({ "unchecked" })
+    public void initialise(Object instance, Object data, Instantiator instantiator)
     {
-        List<Object> instance = (List<Object>) (path == null ? null : cache.get(path));
-        if (instance == null && data != null)
+        if (data instanceof Record)
         {
-            if (data instanceof Record)
+            ConfigurationList<Object> list = (ConfigurationList<Object>) instance;
+            Record record = (Record) data;
+
+            Collection<String> keys = getOrder(record);
+            Type defaultType = getCollectionType();
+            for (String key : keys)
             {
-                Record record = (Record) data;
-
-                instance = create(path, cache);
-
-                Collection<String> keys = getOrder(record);
-                Type defaultType = getCollectionType();
-                for (String key : keys)
+                Object child = record.get(key);
+                Type type = defaultType;
+                if (child instanceof Record)
                 {
-                    Object child = record.get(key);
-                    Type type = defaultType;
-                    if (child instanceof Record)
+                    Record childRecord = (Record) child;
+                    String symbolicName = childRecord.getSymbolicName();
+                    type = typeRegistry.getType(symbolicName);
+                    if(type == null)
                     {
-                        Record childRecord = (Record) child;
-                        String symbolicName = childRecord.getSymbolicName();
-                        type = typeRegistry.getType(symbolicName);
-                        if(type == null)
-                        {
-                            throw new TypeException("Reference to unknown type '" + symbolicName + "'");
-                        }
+                        list.addFieldError(key, "Reference to unknown type '" + symbolicName + "'");
+                        continue;
                     }
-                    Object value = type.instantiate(path == null ? null : PathUtils.getPath(path, key), cache, child);
-                    instance.add(value);
                 }
 
-                return instance;
-            }
-            else if(data instanceof String[])
-            {
-                instance = create(path, cache);
-                Type type = getCollectionType();
-                String[] references = (String[]) data;
-                for (String reference : references)
+                try
                 {
-                    instance.add(type.instantiate(path, cache, reference));
+                    list.add(instantiator.instantiate(key, true, type, child));
                 }
-                return instance;
-            }
-            else
-            {
-                throw new TypeConversionException("Expected a record or string array, instead received " + data.getClass());
+                catch (TypeException e)
+                {
+                    list.addFieldError(key, e.getMessage());
+                }
             }
         }
-
-        return instance;
     }
 
     public Object unstantiate(Object instance) throws TypeException
@@ -122,17 +130,6 @@ public class ListType extends CollectionType
             
             return result;
         }
-    }
-
-    private List<Object> create(String path, InstanceCache cache)
-    {
-        List<Object> instance;
-        instance = new LinkedList<Object>();
-        if (path != null)
-        {
-            cache.put(path, instance);
-        }
-        return instance;
     }
 
     public String getInsertionPath(String path, Record record)

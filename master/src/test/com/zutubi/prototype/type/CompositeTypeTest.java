@@ -47,7 +47,7 @@ public class CompositeTypeTest extends TypeTestCase
         Type compositeType = typeRegistry.getType("basicTypes");
 
         Record record = (Record) compositeType.unstantiate(instance);
-        Object newInstance = compositeType.instantiate(null, null, record);
+        Object newInstance = compositeType.instantiate(record, new SimpleInstantiator(null));
         assertTrue(newInstance instanceof BasicTypes);
         assertEquals(newInstance, instance);
     }
@@ -62,7 +62,7 @@ public class CompositeTypeTest extends TypeTestCase
         instance.setA(objectTypeB);
 
         Record record = (Record) compositeType.unstantiate(instance);
-        Object newInstance = compositeType.instantiate(null, null, record);
+        Object newInstance = compositeType.instantiate(record, new SimpleInstantiator(null));
 
         assertEquals(newInstance, instance);
     }

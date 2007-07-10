@@ -1,13 +1,11 @@
 package com.zutubi.prototype.type;
 
-import com.zutubi.prototype.config.InstanceCache;
 import com.zutubi.pulse.prototype.squeezer.SqueezeException;
 import com.zutubi.pulse.prototype.squeezer.Squeezers;
 import com.zutubi.pulse.prototype.squeezer.TypeSqueezer;
 
 /**
- *
- *
+ * Manages basic numerical, boolean and string values.
  */
 public class PrimitiveType extends SimpleType implements Type
 {
@@ -25,7 +23,7 @@ public class PrimitiveType extends SimpleType implements Type
         }
     }
 
-    public Object instantiate(String path, InstanceCache cache, Object data) throws TypeException
+    public Object instantiate(Object data, Instantiator instantiator) throws TypeException
     {
         TypeSqueezer squeezer = Squeezers.findSqueezer(getClazz());
         try

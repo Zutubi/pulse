@@ -18,6 +18,10 @@ public interface RecordCleanupTask
      */
     void execute();
 
+    /**
+     * @return true if this is an internal task that the user need not be
+     * notified of.
+     */
     boolean isInternal();
     
     /**

@@ -1,10 +1,8 @@
 package com.zutubi.prototype.type;
 
 import com.zutubi.config.annotations.Internal;
-import com.zutubi.prototype.config.InstanceCache;
 import com.zutubi.prototype.type.record.MutableRecord;
 import com.zutubi.prototype.type.record.MutableRecordImpl;
-import com.zutubi.prototype.type.record.PathUtils;
 import com.zutubi.prototype.type.record.Record;
 import com.zutubi.pulse.core.config.Configuration;
 import com.zutubi.util.CollectionUtils;
@@ -159,98 +157,76 @@ public class CompositeType extends AbstractType implements ComplexType
         this.extensions = extensions;
     }
 
-    public Object instantiate(String path, InstanceCache cache, Object data) throws TypeException
+    public Object instantiate(Object data, Instantiator instantiator) throws TypeException
     {
-        Object instance = path == null ? null : cache.get(path);
-        if (instance == null && data != null)
+        Object instance = null;
+        if (data != null)
         {
-            try
+            Record record = (Record) data;
+
+            // Check if it is actually a derived type.
+            if (getSymbolicName().equals(record.getSymbolicName()))
             {
-                Record record = (Record) data;
-
-                // Check if it is actually a derived type.
-                if (!getSymbolicName().equals(record.getSymbolicName()))
+                try
                 {
-                    CompositeType type = typeRegistry.getType(record.getSymbolicName());
-                    return type.instantiate(path, cache, data);
+                    instance = getClazz().newInstance();
                 }
-
-                instance = getClazz().newInstance();
-                if (path != null)
+                catch (Exception e)
                 {
-                    // paths are associated with configuration objects only.
-                    cache.put(path, instance);
-                    if (instance instanceof Configuration)
-                    {
-                        Configuration config = (Configuration) instance;
-                        config.setConfigurationPath(path);
-                        config.setHandle(record.getHandle());
-                    }
-                }
-
-                TypeConversionException exception = null;
-
-                for (Map.Entry<String, TypeProperty> entry : properties.entrySet())
-                {
-                    exception = instantiateProperty(entry, path, cache, record, instance, exception);
-                }
-                for (Map.Entry<String, TypeProperty> entry : internalProperties.entrySet())
-                {
-                    exception = instantiateProperty(entry, path, cache, record, instance, exception);
-                }
-
-                if (exception != null)
-                {
-                    throw exception;
+                    throw new TypeException(e.getMessage(), e);
                 }
             }
-            catch (TypeConversionException e)
+            else
             {
-                // let the type conversion exception pass through.
-                throw e;
-            }
-            catch (Exception e)
-            {
-                throw new TypeConversionException("Instantiating type '" + getSymbolicName() + "': " + e.getMessage(), e);
+                CompositeType type = typeRegistry.getType(record.getSymbolicName());
+                instance = type.instantiate(data, instantiator);
             }
         }
 
         return instance;
     }
 
-    private TypeConversionException instantiateProperty(Map.Entry<String, TypeProperty> entry, String path, InstanceCache cache, Record record, Object instance, TypeConversionException exception) throws TypeException
+    public void initialise(Object instance, Object data, Instantiator instantiator)
+    {
+        Type actualType = typeRegistry.getType(instance.getClass());
+        if(this == actualType)
+        {
+            Record record = (Record) data;
+            for (Map.Entry<String, TypeProperty> entry : properties.entrySet())
+            {
+                instantiateProperty(entry, record, (Configuration) instance, instantiator);
+            }
+            for (Map.Entry<String, TypeProperty> entry : internalProperties.entrySet())
+            {
+                instantiateProperty(entry, record, (Configuration) instance, instantiator);
+            }
+        }
+        else
+        {
+            actualType.initialise(instance, data, instantiator);
+        }
+    }
+
+    private void instantiateProperty(Map.Entry<String, TypeProperty> entry, Record record, Configuration instance, Instantiator instantiator)
     {
         String name = entry.getKey();
-        TypeProperty property = entry.getValue();
         try
         {
-            if (!record.containsKey(name))
+            TypeProperty property = entry.getValue();
+            if (record.containsKey(name))
             {
-                if (property.getType() instanceof CollectionType)
-                {
-                    // Be nice and create empty collection instances instead of
-                    // leaving nulls.
-                    property.setValue(instance, ((CollectionType) property.getType()).emptyInstance());
-                }
-
-                return exception;
+                // Instantiate even if there is no setter so the instance
+                // is both checked for validity and cached.
+                Type type = property.getType();
+                Object value = instantiator.instantiate(name, true, type, record.get(name));
+                property.setValue(instance, value);
             }
-
-            // Instantiate even if there is no setter so the instance
-            // is both checked for validity and cached.
-            Type type = property.getType();
-            Object value = type.instantiate(path == null ? null : PathUtils.getPath(path, name), cache, record.get(name));
-            property.setValue(instance, value);
         }
         catch (Exception e)
         {
-            if (exception == null)
-            {
-                exception = new TypeConversionException(e);
-            }
-            exception.addFieldError(name, e.getMessage());
+            LOG.debug("Unable to instantiate property '" + name + "': " + e.getMessage(), e);
+            instance.addFieldError(name, e.getMessage());
         }
-        return exception;
     }
 
     public MutableRecord unstantiate(Object instance) throws TypeException

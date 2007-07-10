@@ -1,13 +1,11 @@
 package com.zutubi.pulse.prototype.config.setup;
 
-import com.zutubi.prototype.type.CompositeType;
-import com.zutubi.prototype.type.Type;
-import com.zutubi.prototype.type.TypeException;
-import com.zutubi.prototype.type.TypeProperty;
+import com.zutubi.prototype.type.*;
 import com.zutubi.prototype.type.record.MutableRecord;
 import com.zutubi.prototype.type.record.PathUtils;
 import com.zutubi.prototype.wizard.WizardTransition;
 import com.zutubi.prototype.wizard.webwork.AbstractTypeWizard;
+import com.zutubi.prototype.config.ConfigurationReferenceManager;
 import com.zutubi.pulse.bootstrap.MasterConfiguration;
 import com.zutubi.pulse.bootstrap.MasterConfigurationManager;
 import com.zutubi.pulse.bootstrap.SetupManager;
@@ -37,6 +35,7 @@ public class SetupConfigurationWizard extends AbstractTypeWizard
     private UserManager userManager;
     private MasterConfigurationManager configurationManager;
     private SetupManager setupManager;
+    private ConfigurationReferenceManager configurationReferenceManager;
 
     public void initialise()
     {
@@ -71,7 +70,8 @@ public class SetupConfigurationWizard extends AbstractTypeWizard
     {
         try
         {
-            AdminUserConfiguration adminConfig = (AdminUserConfiguration) adminConfigType.instantiate(null, null, wizardStates.get(0).getDataRecord());
+            SimpleInstantiator instantiator = new SimpleInstantiator(configurationReferenceManager);
+            AdminUserConfiguration adminConfig = (AdminUserConfiguration) instantiator.instantiate(adminConfigType, wizardStates.get(0).getDataRecord());
             MutableRecord serverConfigRecord = wizardStates.get(1).getDataRecord();
             MasterConfiguration config = configurationManager.getAppConfig();
 
@@ -223,4 +223,8 @@ public class SetupConfigurationWizard extends AbstractTypeWizard
         this.setupManager = setupManager;
     }
 
+    public void setConfigurationReferenceManager(ConfigurationReferenceManager configurationReferenceManager)
+    {
+        this.configurationReferenceManager = configurationReferenceManager;
+    }
 }

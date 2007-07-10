@@ -33,9 +33,12 @@ public class CustomVelocityManager extends VelocityManager
         if(getConfigurationProvider() != null)
         {
             GeneralAdminConfiguration config = getConfigurationProvider().get(GeneralAdminConfiguration.class);
-            context.put("helpUrl", config.getBaseHelpUrl());
-            context.put("rssEnabled", config.isRssEnabled());
-            context.put("config", config);
+            if (config != null)
+            {
+                context.put("helpUrl", config.getBaseHelpUrl());
+                context.put("rssEnabled", config.isRssEnabled());
+                context.put("config", config);
+            }
         }
 
         String login = AcegiUtils.getLoggedInUser();

@@ -6,6 +6,7 @@ import com.zutubi.prototype.config.events.PreDeleteEvent;
 import com.zutubi.prototype.type.*;
 import com.zutubi.prototype.type.record.*;
 import com.zutubi.pulse.core.config.Configuration;
+import com.zutubi.pulse.core.config.ConfigurationMap;
 import com.zutubi.pulse.events.EventManager;
 import com.zutubi.util.logging.Logger;
 import com.zutubi.validation.ValidationAware;
@@ -330,7 +331,8 @@ public class ConfigurationTemplateManager
             // Raise an event for all the config instances under this path.
             for (Object instance : instances.getAllDescendents(concretePath))
             {
-                if (instance instanceof Configuration)
+                // Quicker way to get the type for existant-composites
+                if (typeRegistry.getType(instance.getClass()) != null)
                 {
                     Configuration configuration = (Configuration) instance;
                     eventManager.publish(new PostInsertEvent(this, configuration, !concretePath.equals(configuration.getConfigurationPath())));
@@ -416,41 +418,51 @@ public class ConfigurationTemplateManager
             Type type = scope.getType();
             Record topRecord = recordManager.load(path);
 
-            try
-            {
                 if (scope.isTemplated())
                 {
                     // Create the collection ourselves, and populate it with
                     // instances created from template records.
                     CollectionType collectionType = (CollectionType) type;
                     CompositeType templatedType = (CompositeType) collectionType.getCollectionType();
-                    Map<String, Object> topInstance = new LinkedHashMap<String, Object>();
+                    ConfigurationMap<String, Object> topInstance = new ConfigurationMap<String, Object>();
                     instances.put(path, topInstance);
                     for (String id : collectionType.getOrder(topRecord))
                     {
                         String itemPath = PathUtils.getPath(path, id);
                         Record record = getRecord(itemPath);
                         boolean concrete = isConcrete(record);
-                        Object instance = templatedType.instantiate(itemPath, concrete ? instances : incompleteInstances, record);
-
-                        // Only concrete instances go into the collection
-                        if (concrete)
+                        try
                         {
-                            topInstance.put(id, instance);
+                            PersistentInstantiator instantiator = new PersistentInstantiator(path, concrete ? instances : incompleteInstances, configurationReferenceManager);
+                            Object instance = instantiator.instantiate(id, true, templatedType, record);
+
+                            // Only concrete instances go into the collection
+                            if (concrete)
+                            {
+                                topInstance.put(id, instance);
+                            }
+                        }
+                        catch (TypeException e)
+                        {
+                            topInstance.addFieldError(id, e.getMessage());
                         }
                     }
                 }
                 else
                 {
-                    type.instantiate(path, instances, topRecord);
+                    try
+                    {
+                        PersistentInstantiator instantiator = new PersistentInstantiator(path, instances, configurationReferenceManager);
+                        instantiator.instantiate(path, false, type, topRecord);
+                    }
+                    catch (TypeException e)
+                    {
+                        // This is pretty fatal, but should only happen if
+                        // there is a programming error in Pulse or severe
+                        // data corruption.
+                        LOG.severe("Unable to instantiate object at root of scope '" + path + "': " + e.getMessage(), e);
+                    }
                 }
-            }
-            catch (TypeException e)
-            {
-                // FIXME how should we present this? i think we need to
-                // FIXME store and allow the UI to show such problems
-                LOG.severe("Unable to instantiate '" + path + "': " + e.getMessage(), e);
-            }
         }
     }
 
@@ -581,7 +593,8 @@ public class ConfigurationTemplateManager
         Object instance;
         try
         {
-            instance = type.instantiate(null, null, subject);
+            SimpleInstantiator instantiator = new SimpleInstantiator(configurationReferenceManager);
+            instance = instantiator.instantiate(type, subject);
         }
         catch (TypeConversionException e)
         {

@@ -39,17 +39,21 @@ public class ConfigurationReferenceManager
         references.clear();
     }
 
-    public Object resolveReference(String fromPath, long toHandle, InstanceCache cache) throws TypeException
+    public Object resolveReference(String fromPath, long toHandle, Instantiator instantiator) throws TypeException
     {
         String toPath = recordManager.getPathForHandle(toHandle);
-        indexReference(fromPath, toPath);
+        if (fromPath != null)
+        {
+            indexReference(fromPath, toPath);
+        }
+        
         Object instance = configurationTemplateManager.getInstance(toPath);
         if (instance == null)
         {
             Record record = configurationTemplateManager.getRecord(toPath);
             if (record == null || record.getSymbolicName() == null)
             {
-                throw new TypeException("Broken reference from '" + fromPath + "' to '" + toPath + "'");
+                throw new TypeException("Broken reference to '" + toPath + "'");
             }
 
             Type type = typeRegistry.getType(record.getSymbolicName());
@@ -58,7 +62,7 @@ public class ConfigurationReferenceManager
                 throw new TypeException("Reference to unrecognised type '" + record.getSymbolicName() + "'");
             }
 
-            instance = type.instantiate(toPath, cache, record);
+            instance = instantiator.instantiate(toPath, false, type, record);
         }
 
         return instance;

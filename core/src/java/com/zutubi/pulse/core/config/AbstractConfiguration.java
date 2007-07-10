@@ -1,5 +1,12 @@
 package com.zutubi.pulse.core.config;
 
+import com.zutubi.config.annotations.Transient;
+
+import java.util.List;
+import java.util.Map;
+import java.util.LinkedList;
+import java.util.HashMap;
+
 /**
  * Convenient base class for configuration types.
  */
@@ -7,6 +14,8 @@ public abstract class AbstractConfiguration implements Configuration
 {
     private long handle;
     private String configurationPath;
+    private List<String> instanceErrors = new LinkedList<String>();
+    private Map<String, List<String>> fieldErrors = new HashMap<String, List<String>>();
 
     public long getHandle()
     {
@@ -26,5 +35,61 @@ public abstract class AbstractConfiguration implements Configuration
     public void setConfigurationPath(String configurationPath)
     {
         this.configurationPath = configurationPath;
+    }
+
+    @Transient
+    public boolean isValid()
+    {
+        return instanceErrors.size() == 0 && fieldErrors.size() == 0;
+    }
+
+    @Transient
+    public List<String> getInstanceErrors()
+    {
+        return instanceErrors;
+    }
+
+    public void addInstanceError(String message)
+    {
+        instanceErrors.add(message);
+    }
+
+    public void clearInstanceErrors()
+    {
+        instanceErrors.clear();
+    }
+
+    @Transient
+    public Map<String, List<String>> getFieldErrors()
+    {
+        return fieldErrors;
+    }
+
+    public void clearFieldErrors()
+    {
+        fieldErrors.clear();
+    }
+
+    @Transient
+    public List<String> getFieldErrors(String field)
+    {
+        List<String> errors = fieldErrors.get(field);
+        if(errors == null)
+        {
+            errors = new LinkedList<String>();
+            fieldErrors.put(field, errors);
+        }
+
+        return errors;
+    }
+
+    public void addFieldError(String field, String message)
+    {
+        getFieldErrors(field).add(message);
+    }
+
+    public void clearFieldErrors(String field)
+    {
+        getFieldErrors(field).clear();
     }
 }

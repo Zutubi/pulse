@@ -2,7 +2,6 @@ package com.zutubi.prototype.type;
 
 import com.zutubi.config.annotations.ID;
 import com.zutubi.prototype.config.ConfigurationReferenceManager;
-import com.zutubi.prototype.config.InstanceCache;
 import com.zutubi.pulse.core.config.Configuration;
 import com.zutubi.util.AnnotationUtils;
 import com.zutubi.util.logging.Logger;
@@ -53,7 +52,7 @@ public class ReferenceType extends SimpleType implements Type
         return idProperty;
     }
 
-    public Object instantiate(String path, InstanceCache cache, Object data) throws TypeException
+    public Object instantiate(Object data, Instantiator instantiator) throws TypeException
     {
         String referenceHandle = (String) data;
         try
@@ -61,7 +60,7 @@ public class ReferenceType extends SimpleType implements Type
             long handle = Long.parseLong(referenceHandle);
             if(handle > 0)
             {
-                return configurationReferenceManager.resolveReference(path, handle, cache);
+                return instantiator.resolveReference(handle);
             }
             else
             {

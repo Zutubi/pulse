@@ -14,4 +14,9 @@ public abstract class SimpleType extends AbstractType
     {
         super(type, symbolicName);
     }
+
+    public void initialise(Object instance, Object data, Instantiator instantiator)
+    {
+        // Nothing to to
+    }
 }
