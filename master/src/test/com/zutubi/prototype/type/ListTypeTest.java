@@ -12,6 +12,7 @@ import java.util.List;
  *
  *
  */
+@SuppressWarnings({ "unchecked" })
 public class ListTypeTest extends TypeTestCase
 {
     private ListType listType;
@@ -44,7 +45,8 @@ public class ListTypeTest extends TypeTestCase
 
         Record record = (Record) listType.unstantiate(list);
 
-        List<Object> newList = listType.instantiate(record, new SimpleInstantiator(null));
+        SimpleInstantiator instantiator = new SimpleInstantiator(null);
+        List<Object> newList = (List<Object>) instantiator.instantiate(listType, record);
         assertEquals(2, newList.size());
         assertTrue(newList.get(0) instanceof MockA);
     }

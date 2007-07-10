@@ -210,7 +210,7 @@ public class ConfigurationTemplateManager
         }
     }
 
-    @SuppressWarnings({"unchecked"})
+    @SuppressWarnings({ "unchecked" })
     public String insertRecord(final String path, MutableRecord record)
     {
         checkPersistent(path);
@@ -331,8 +331,7 @@ public class ConfigurationTemplateManager
             // Raise an event for all the config instances under this path.
             for (Object instance : instances.getAllDescendents(concretePath))
             {
-                // Quicker way to get the type for existant-composites
-                if (typeRegistry.getType(instance.getClass()) != null)
+                if (isComposite(instance))
                 {
                     Configuration configuration = (Configuration) instance;
                     eventManager.publish(new PostInsertEvent(this, configuration, !concretePath.equals(configuration.getConfigurationPath())));
@@ -340,6 +339,12 @@ public class ConfigurationTemplateManager
                 }
             }
         }
+    }
+
+    private boolean isComposite(Object instance)
+    {
+        // Quicker way to get the type for existant-composites
+        return instance != null && typeRegistry.getType(instance.getClass()) != null;
     }
 
     private void updateInternalProperties(Configuration configuration)
@@ -354,7 +359,7 @@ public class ConfigurationTemplateManager
                 try
                 {
                     Object value = property.getValue(configuration);
-                    if(value != null)
+                    if (value != null)
                     {
                         value = property.getType().unstantiate(value);
                     }
@@ -418,51 +423,51 @@ public class ConfigurationTemplateManager
             Type type = scope.getType();
             Record topRecord = recordManager.load(path);
 
-                if (scope.isTemplated())
+            if (scope.isTemplated())
+            {
+                // Create the collection ourselves, and populate it with
+                // instances created from template records.
+                CollectionType collectionType = (CollectionType) type;
+                CompositeType templatedType = (CompositeType) collectionType.getCollectionType();
+                ConfigurationMap<String, Object> topInstance = new ConfigurationMap<String, Object>();
+                instances.put(path, topInstance);
+                for (String id : collectionType.getOrder(topRecord))
                 {
-                    // Create the collection ourselves, and populate it with
-                    // instances created from template records.
-                    CollectionType collectionType = (CollectionType) type;
-                    CompositeType templatedType = (CompositeType) collectionType.getCollectionType();
-                    ConfigurationMap<String, Object> topInstance = new ConfigurationMap<String, Object>();
-                    instances.put(path, topInstance);
-                    for (String id : collectionType.getOrder(topRecord))
-                    {
-                        String itemPath = PathUtils.getPath(path, id);
-                        Record record = getRecord(itemPath);
-                        boolean concrete = isConcrete(record);
-                        try
-                        {
-                            PersistentInstantiator instantiator = new PersistentInstantiator(path, concrete ? instances : incompleteInstances, configurationReferenceManager);
-                            Object instance = instantiator.instantiate(id, true, templatedType, record);
-
-                            // Only concrete instances go into the collection
-                            if (concrete)
-                            {
-                                topInstance.put(id, instance);
-                            }
-                        }
-                        catch (TypeException e)
-                        {
-                            topInstance.addFieldError(id, e.getMessage());
-                        }
-                    }
-                }
-                else
-                {
+                    String itemPath = PathUtils.getPath(path, id);
+                    Record record = getRecord(itemPath);
+                    boolean concrete = isConcrete(record);
                     try
                     {
-                        PersistentInstantiator instantiator = new PersistentInstantiator(path, instances, configurationReferenceManager);
-                        instantiator.instantiate(path, false, type, topRecord);
+                        PersistentInstantiator instantiator = new PersistentInstantiator(path, concrete ? instances : incompleteInstances, configurationReferenceManager);
+                        Object instance = instantiator.instantiate(id, true, templatedType, record);
+
+                        // Only concrete instances go into the collection
+                        if (concrete)
+                        {
+                            topInstance.put(id, instance);
+                        }
                     }
                     catch (TypeException e)
                     {
-                        // This is pretty fatal, but should only happen if
-                        // there is a programming error in Pulse or severe
-                        // data corruption.
-                        LOG.severe("Unable to instantiate object at root of scope '" + path + "': " + e.getMessage(), e);
+                        topInstance.addFieldError(id, e.getMessage());
                     }
                 }
+            }
+            else
+            {
+                try
+                {
+                    PersistentInstantiator instantiator = new PersistentInstantiator(path, instances, configurationReferenceManager);
+                    instantiator.instantiate(path, false, type, topRecord);
+                }
+                catch (TypeException e)
+                {
+                    // This is pretty fatal, but should only happen if
+                    // there is a programming error in Pulse or severe
+                    // data corruption.
+                    LOG.severe("Unable to instantiate object at root of scope '" + path + "': " + e.getMessage(), e);
+                }
+            }
         }
     }
 
@@ -576,7 +581,7 @@ public class ConfigurationTemplateManager
      * @param validationCallback receives details of validation errors
      * @return the instance if valid, null otherwise
      */
-    @SuppressWarnings({"unchecked"})
+    @SuppressWarnings({ "unchecked" })
     public <T> T validate(String parentPath, String baseName, Record subject, ValidationAware validationCallback)
     {
         // The type we are validating against.
@@ -693,10 +698,10 @@ public class ConfigurationTemplateManager
 
         refreshCaches();
 
-        for(String concretePath: getDescendentPaths(newPath, false, true))
+        for (String concretePath : getDescendentPaths(newPath, false, true))
         {
             Object instance = instances.get(concretePath);
-            if(instance != null && instance instanceof Configuration)
+            if (isComposite(instance))
             {
                 eventManager.publish(new PostSaveEvent(this, (Configuration) instance));
             }
@@ -723,7 +728,7 @@ public class ConfigurationTemplateManager
             newRecord = existingRecord.copy(false);
             newRecord.update(updates);
         }
-        
+
         return newRecord;
     }
 
@@ -802,7 +807,7 @@ public class ConfigurationTemplateManager
         }
     }
 
-    @SuppressWarnings({"unchecked"})
+    @SuppressWarnings({ "unchecked" })
     public List<String> getDescendentPaths(String path, boolean strict, final boolean concreteOnly)
     {
         String[] elements = PathUtils.getPathElements(path);
@@ -839,7 +844,7 @@ public class ConfigurationTemplateManager
         }
 
         // We get here for non-templated scopes.
-        if(strict)
+        if (strict)
         {
             return Collections.EMPTY_LIST;
         }
@@ -895,11 +900,11 @@ public class ConfigurationTemplateManager
     {
         checkPersistent(path);
 
-        for(String concretePath: getDescendentPaths(path, false, true))
+        for (String concretePath : getDescendentPaths(path, false, true))
         {
-            for(Object instance: instances.getAllDescendents(concretePath))
+            for (Object instance : instances.getAllDescendents(concretePath))
             {
-                if(instance instanceof Configuration)
+                if (isComposite(instance))
                 {
                     Configuration configuration = (Configuration) instance;
                     eventManager.publish(new PreDeleteEvent(this, configuration, !concretePath.equals(configuration.getConfigurationPath())));
@@ -928,7 +933,7 @@ public class ConfigurationTemplateManager
         return instance;
     }
 
-    @SuppressWarnings({"unchecked"})
+    @SuppressWarnings({ "unchecked" })
     public <T> T getInstance(String path, Class<T> clazz)
     {
         Object instance = getInstance(path);
@@ -961,7 +966,7 @@ public class ConfigurationTemplateManager
         }
     }
 
-    @SuppressWarnings({"unchecked"})
+    @SuppressWarnings({ "unchecked" })
     public <T> Collection<T> getAllInstances(Class<T> clazz)
     {
         CompositeType type = typeRegistry.getType(clazz);
@@ -983,7 +988,7 @@ public class ConfigurationTemplateManager
         return result;
     }
 
-    @SuppressWarnings({"unchecked"})
+    @SuppressWarnings({ "unchecked" })
     public <T> T getAncestorOfType(Configuration c, Class<T> clazz)
     {
         String path = c.getConfigurationPath();
@@ -1057,7 +1062,7 @@ public class ConfigurationTemplateManager
         return templatePath;
     }
 
-    @SuppressWarnings({"unchecked"})
+    @SuppressWarnings({ "unchecked" })
     public <T extends Type> T getType(String path, Class<T> typeClass)
     {
         Type type = getType(path);

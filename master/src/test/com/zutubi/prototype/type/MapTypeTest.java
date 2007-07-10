@@ -2,6 +2,7 @@ package com.zutubi.prototype.type;
 
 import com.zutubi.config.annotations.ID;
 import com.zutubi.prototype.type.record.Record;
+import com.zutubi.pulse.core.config.AbstractConfiguration;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -42,7 +43,8 @@ public class MapTypeTest extends TypeTestCase
         instance.put("keyB", new MockA("valueB"));
 
         Record record = (Record) mapType.unstantiate(instance);
-        Map newInstance = mapType.instantiate(record, new SimpleInstantiator(null));
+        SimpleInstantiator instantiator = new SimpleInstantiator(null);
+        Map newInstance = (Map) instantiator.instantiate(mapType, record);
 
         assertEquals(2, newInstance.size());
         assertEquals(instance.get("keyA"), newInstance.get("keyA"));
@@ -63,7 +65,7 @@ public class MapTypeTest extends TypeTestCase
         assertEquals("coll/valueA", mapType.getSavePath("coll/valueA", record));
     }
 
-    public static class MockA
+    public static class MockA extends AbstractConfiguration
     {
         @ID
         private String a;

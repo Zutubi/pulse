@@ -70,7 +70,7 @@ public class MapType extends CollectionType
 
             try
             {
-                map.put(key, instantiator.instantiate(key, true, type, data));
+                map.put(key, instantiator.instantiate(key, true, type, child));
             }
             catch (TypeException e)
             {

@@ -3,6 +3,7 @@ package com.zutubi.prototype.type;
 import com.zutubi.config.annotations.SymbolicName;
 import com.zutubi.prototype.type.record.MutableRecord;
 import com.zutubi.prototype.type.record.Record;
+import com.zutubi.pulse.core.config.AbstractConfiguration;
 
 /**
  *
@@ -47,12 +48,13 @@ public class CompositeTypeTest extends TypeTestCase
         Type compositeType = typeRegistry.getType("basicTypes");
 
         Record record = (Record) compositeType.unstantiate(instance);
-        Object newInstance = compositeType.instantiate(record, new SimpleInstantiator(null));
+        SimpleInstantiator instantiator = new SimpleInstantiator(null);
+        Object newInstance = instantiator.instantiate(compositeType, record);
         assertTrue(newInstance instanceof BasicTypes);
         assertEquals(newInstance, instance);
     }
 
-    public void testWithNestedComplextType() throws TypeException
+    public void testWithNestedComplexType() throws TypeException
     {
         Type compositeType = typeRegistry.getType("typeA");
         
@@ -62,9 +64,11 @@ public class CompositeTypeTest extends TypeTestCase
         instance.setA(objectTypeB);
 
         Record record = (Record) compositeType.unstantiate(instance);
-        Object newInstance = compositeType.instantiate(record, new SimpleInstantiator(null));
+        SimpleInstantiator instantiator = new SimpleInstantiator(null);
+        ObjectTypeA newInstance = (ObjectTypeA) instantiator.instantiate(compositeType, record);
 
-        assertEquals(newInstance, instance);
+        assertNotNull(newInstance.getA());
+        assertEquals("b", newInstance.getA().getA());
     }
 
     public void testCreateNewRecordInitialisedDefaultFields()
@@ -86,7 +90,7 @@ public class CompositeTypeTest extends TypeTestCase
 
 
     @SymbolicName("typeA")
-    public static class ObjectTypeA
+    public static class ObjectTypeA extends AbstractConfiguration
     {
         private ObjectTypeB a = new ObjectTypeB();
 
@@ -129,7 +133,7 @@ public class CompositeTypeTest extends TypeTestCase
     }
 
     @SymbolicName("typeB")
-    public static class ObjectTypeB
+    public static class ObjectTypeB extends AbstractConfiguration
     {
         private String a = "value";
 
@@ -159,7 +163,7 @@ public class CompositeTypeTest extends TypeTestCase
         }
     }
 
-    public static class BasicTypes
+    public static class BasicTypes extends AbstractConfiguration
     {
         private Boolean booleanO;
         private boolean booleanP;
