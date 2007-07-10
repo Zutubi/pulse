@@ -68,16 +68,6 @@ public class FormDescriptorFactory
         fieldDescriptorTypes.put(type, clazz);
     }
     
-    public FormDescriptor createDescriptor(String parentPath, String baseName, Class clazz)
-    {
-        return createDescriptor(parentPath, baseName, typeRegistry.getType(clazz), "form");
-    }
-
-    public FormDescriptor createDescriptor(String parentPath, String baseName, String symbolicName)
-    {
-        return createDescriptor(parentPath, baseName, typeRegistry.getType(symbolicName), "form");
-    }
-
     public FormDescriptor createDescriptor(String parentPath, String baseName, CompositeType type, String name)
     {
         FormDescriptor descriptor = new FormDescriptor();
