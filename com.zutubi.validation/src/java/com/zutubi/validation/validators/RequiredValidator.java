@@ -1,7 +1,6 @@
 package com.zutubi.validation.validators;
 
 import com.zutubi.validation.ValidationException;
-import com.zutubi.validation.ShortCircuitableValidator;
 
 /**
  * <class-comment/>
@@ -9,6 +8,7 @@ import com.zutubi.validation.ShortCircuitableValidator;
 public class RequiredValidator extends FieldValidatorSupport
 {
     public static final String REQUIRED = ".required";
+    private boolean ignorable = true;
 
     public RequiredValidator()
     {
@@ -33,5 +33,15 @@ public class RequiredValidator extends FieldValidatorSupport
                 addFieldError(getFieldName());
             }
         }
+    }
+
+    public boolean isIgnorable()
+    {
+        return ignorable;
+    }
+
+    public void setIgnorable(boolean ignorable)
+    {
+        this.ignorable = ignorable;
     }
 }

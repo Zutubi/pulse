@@ -185,7 +185,7 @@ public class AnnotationUtils
         {
             try
             {
-                if (!isDefault(annotation, annotationMethod))
+                if (isUserDeclared(annotationMethod) && !isDefault(annotation, annotationMethod))
                 {
                     BeanUtils.setProperty(
                             annotationMethod.getName(),

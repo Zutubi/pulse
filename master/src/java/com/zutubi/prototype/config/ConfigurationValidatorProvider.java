@@ -28,7 +28,8 @@ public class ConfigurationValidatorProvider implements ValidatorProvider
             {
                 public boolean satisfied(Validator validator)
                 {
-                    return includeRequired || !(validator instanceof RequiredValidator);
+                    return !(!includeRequired && validator instanceof RequiredValidator) || !((RequiredValidator) validator).isIgnorable();
+
                 }
             }, validators);
         }

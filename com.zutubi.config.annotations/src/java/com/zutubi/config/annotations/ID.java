@@ -18,4 +18,5 @@ import java.lang.annotation.Target;
 @NoOverride
 public @interface ID
 {
+    public boolean ignorable() default false;
 }
