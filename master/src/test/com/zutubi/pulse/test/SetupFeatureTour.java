@@ -8,9 +8,9 @@ import com.zutubi.pulse.core.*;
 import com.zutubi.pulse.core.model.*;
 import com.zutubi.pulse.model.*;
 import com.zutubi.pulse.model.persistence.*;
+import com.zutubi.pulse.util.Constants;
 import com.zutubi.pulse.util.FileSystemUtils;
 import com.zutubi.pulse.util.IOUtils;
-import com.zutubi.pulse.util.Constants;
 import com.zutubi.pulse.util.logging.Logger;
 
 import java.io.File;
@@ -567,11 +567,7 @@ public class SetupFeatureTour implements Runnable
 
     private Changelist createChange(BuildResult previous, long revision, String author, String comment, long time, String... files)
     {
-        NumericalRevision rev = new NumericalRevision(revision);
-        rev.setAuthor(author);
-        rev.setComment(comment);
-        rev.setDate(new Date(time));
-
+        NumericalRevision rev = new NumericalRevision(author, comment, new Date(time), revision);
         Changelist list = new Changelist(":1666", rev);
         list.addProjectId(project.getId());
         list.addResultId(build.getId());

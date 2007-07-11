@@ -322,12 +322,7 @@ public class P4Server extends CachingSCMServer
 
         String comment = getChangelistComment(lines, affectedFilesIndex);
 
-        NumericalRevision revision = new NumericalRevision(number);
-        revision.setDate(date);
-        revision.setAuthor(user);
-        revision.setComment(comment);
-        // branch??
-
+        NumericalRevision revision = new NumericalRevision(user, comment, date, number);
         ScmFilepathFilter filter = new ScmFilepathFilter(excludedPaths);
         Changelist changelist = new Changelist(getUid(), revision);
 

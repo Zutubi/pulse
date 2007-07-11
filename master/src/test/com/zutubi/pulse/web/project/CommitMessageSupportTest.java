@@ -1,12 +1,13 @@
 package com.zutubi.pulse.web.project;
 
+import com.zutubi.pulse.committransformers.LinkCommitMessageTransformer;
 import com.zutubi.pulse.core.model.Changelist;
 import com.zutubi.pulse.core.model.Revision;
 import com.zutubi.pulse.model.CommitMessageTransformer;
 import com.zutubi.pulse.test.PulseTestCase;
-import com.zutubi.pulse.committransformers.LinkCommitMessageTransformer;
 
 import java.util.Arrays;
+import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -82,7 +83,7 @@ public class CommitMessageSupportTest extends PulseTestCase
 
     private void assertReplacement(String input, String replacement, long project, int limit)
     {
-        Revision rev = new Revision("author", input, 0, "rev");
+        Revision rev = new Revision("author", input, new Date(0));
         Changelist list = new Changelist("uid", rev);
         list.addProjectId(project);
 

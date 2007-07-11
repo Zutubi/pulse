@@ -1,5 +1,7 @@
 package com.zutubi.pulse.core.model;
 
+import java.util.Date;
+
 /**
  * A subversion revision, which is just a revision number.
  *
@@ -13,6 +15,12 @@ public class NumericalRevision extends Revision
 
     public NumericalRevision(long revisionNumber)
     {
+        setRevisionString(Long.toString(revisionNumber));
+    }
+
+    public NumericalRevision(String author, String comment, Date date, long revisionNumber)
+    {
+        super(author, comment, date);
         setRevisionString(Long.toString(revisionNumber));
     }
 

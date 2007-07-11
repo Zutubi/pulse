@@ -4,7 +4,6 @@ import com.zutubi.pulse.core.model.*;
 import com.zutubi.pulse.model.*;
 import com.zutubi.pulse.model.persistence.*;
 
-import java.util.Calendar;
 import java.util.List;
 
 
@@ -84,11 +83,6 @@ public class HibernateBuildResultDaoTest extends MasterPersistenceTestCase
         RecipeResult recipeResult = createRecipe();
 
         BuildScmDetails scmDetails = new BuildScmDetails(new NumericalRevision(42));
-
-        Revision revision = new NumericalRevision(12345);
-        revision.setDate(Calendar.getInstance().getTime());
-        revision.setAuthor("user");
-        revision.setComment("i like fruit");
 
         // Need to save the Project as it is *not* cascaded from BuildResult
         Project project = new Project();

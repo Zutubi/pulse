@@ -8,23 +8,34 @@ import java.util.Date;
  */
 public class Revision extends Entity implements Comparable<Revision>
 {
+    private static final int MAX_COMMENT_LENGTH = 4095;
+    private static final String COMMENT_TRIM_MESSAGE = "... [trimmed]";
+
     private String author;
     private String comment;
     private String branch;
     private long time;
     private String revisionString;
 
-    public Revision()
+    protected Revision()
     {
-
     }
 
-    public Revision(String author, String comment, long time, String revisionString)
+    public Revision(String author, String comment, Date date)
     {
         this.author = author;
-        this.comment = comment;
-        this.time = time;
-        this.revisionString = revisionString;
+        this.comment = trimComment(comment);
+        setDate(date);
+    }
+
+    private String trimComment(String comment)
+    {
+        if(comment != null && comment.length() > MAX_COMMENT_LENGTH)
+        {
+            comment = comment.substring(0, MAX_COMMENT_LENGTH - COMMENT_TRIM_MESSAGE.length()) + COMMENT_TRIM_MESSAGE;
+        }
+
+        return comment;
     }
 
     protected void copyCommon(Revision copy)
@@ -64,7 +75,7 @@ public class Revision extends Entity implements Comparable<Revision>
         return comment;
     }
 
-    public void setComment(String comment)
+    private void setComment(String comment)
     {
         this.comment = comment;
     }

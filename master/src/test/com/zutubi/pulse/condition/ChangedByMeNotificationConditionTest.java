@@ -1,14 +1,13 @@
 package com.zutubi.pulse.condition;
 
-import com.zutubi.pulse.core.model.Change;
-import com.zutubi.pulse.core.model.Changelist;
-import com.zutubi.pulse.core.model.Revision;
+import com.zutubi.pulse.core.model.*;
 import com.zutubi.pulse.model.BuildResult;
 import com.zutubi.pulse.model.BuildScmDetails;
 import com.zutubi.pulse.model.MockBuildManager;
 import com.zutubi.pulse.model.User;
 import com.zutubi.pulse.test.PulseTestCase;
-import com.zutubi.pulse.core.model.NumericalFileRevision;
+
+import java.util.Date;
 
 /**
  */
@@ -59,14 +58,14 @@ public class ChangedByMeNotificationConditionTest extends PulseTestCase
             list.addResultId(result.getId());
             buildManager.save(list);
         }
-        BuildScmDetails details = new BuildScmDetails(new Revision());
+        BuildScmDetails details = new BuildScmDetails(new NumericalRevision(1));
         result.setScmDetails(details);
         return result;
     }
 
     private Changelist getChangelistBy(String author)
     {
-        Changelist change = new Changelist("uid", new Revision(author, "comment", 0, "rev"));
+        Changelist change = new Changelist("uid", new Revision(author, "comment", new Date(0)));
         change.addChange(new Change("file", new NumericalFileRevision(1), Change.Action.EDIT));
         return change;
     }
