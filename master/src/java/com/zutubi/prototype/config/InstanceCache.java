@@ -18,5 +18,12 @@ public interface InstanceCache
 
     void put(String path, Configuration instance);
 
+    void forAllInstances(InstanceHandler handler);
+
     void clear();
+
+    public static interface InstanceHandler
+    {
+        void handle(Configuration instance, String path, Configuration parentInstance);
+    }
 }

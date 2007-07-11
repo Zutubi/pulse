@@ -46,11 +46,6 @@ public class XWorkValidationAdapter implements ValidationAware
         delegate.setFieldErrors(new HashMap());
     }
 
-    public void addActionMessage(String message)
-    {
-        delegate.addActionMessage(message);
-    }
-
     public void addActionError(String error)
     {
         delegate.addActionError(error);
@@ -62,11 +57,6 @@ public class XWorkValidationAdapter implements ValidationAware
         {
             delegate.addFieldError(field + fieldSuffix, error);
         }
-    }
-
-    public Collection<String> getActionMessages()
-    {
-        return delegate.getActionMessages();
     }
 
     public Collection<String> getActionErrors()
@@ -97,11 +87,7 @@ public class XWorkValidationAdapter implements ValidationAware
     public boolean hasFieldError(String field)
     {
         List<String> errors = getFieldErrors(field);
-        if (errors != null)
-        {
-            return errors.size() > 0;
-        }
-        return false;
+        return errors != null && errors.size() > 0;
     }
 
     public boolean hasActionErrors()
@@ -109,23 +95,8 @@ public class XWorkValidationAdapter implements ValidationAware
         return delegate.hasActionErrors();
     }
 
-    public boolean hasActionMessages()
+    public void clearFieldErrors()
     {
-        return delegate.hasActionMessages();
-    }
-
-    public void setActionMessages(Collection<String> messages)
-    {
-        delegate.setActionMessages(messages);
-    }
-
-    public void setActionErrors(Collection<String> errors)
-    {
-        delegate.setActionErrors(errors);
-    }
-
-    public void setFieldErrors(Map<String, List<String>> errors)
-    {
-        delegate.setFieldErrors(errors);
+        delegate.setFieldErrors(null);
     }
 }

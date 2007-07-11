@@ -6,6 +6,7 @@ import com.zutubi.prototype.ConventionSupport;
 import com.zutubi.prototype.config.ConfigurationTemplateManager;
 import com.zutubi.prototype.type.CollectionType;
 import com.zutubi.prototype.type.Type;
+import com.zutubi.prototype.type.TypeException;
 import com.zutubi.prototype.type.record.PathUtils;
 import com.zutubi.prototype.wizard.Wizard;
 import com.zutubi.prototype.wizard.WizardState;
@@ -25,12 +26,12 @@ public class ConfigurationWizardAction extends ActionSupport
 {
     private static final Logger LOG = Logger.getLogger(ConfigurationWizardAction.class);
 
-    private static final String CREATE_TEMPLATE  = "template";
+    private static final String CREATE_TEMPLATE = "template";
 
-    private static final String SUBMIT_CANCEL   = "cancel";
+    private static final String SUBMIT_CANCEL = "cancel";
     private static final String SUBMIT_PREVIOUS = "previous";
-    private static final String SUBMIT_NEXT     = "next";
-    private static final String SUBMIT_FINISH   = "finish";
+    private static final String SUBMIT_NEXT = "next";
+    private static final String SUBMIT_FINISH = "finish";
 
     /**
      * The path to the configuration type that defines this wizard.
@@ -86,7 +87,15 @@ public class ConfigurationWizardAction extends ActionSupport
         WizardState state = getState();
         if (state != null)
         {
-            return state.validate(path, new XWorkValidationAdapter(this));
+            try
+            {
+                return state.validate(path, this);
+            }
+            catch (TypeException e)
+            {
+                addActionError(e.getMessage());
+                return false;
+            }
         }
 
         // The session has likely timed out, or the user has manually constructed the post.
@@ -142,7 +151,7 @@ public class ConfigurationWizardAction extends ActionSupport
                     return INPUT;
                 }
             }
-            
+
             initWizardIfRequired();
 
             if (isSelected(SUBMIT_CANCEL))
@@ -240,7 +249,7 @@ public class ConfigurationWizardAction extends ActionSupport
         removeWizard();
     }
 
-    @SuppressWarnings({"unchecked"})
+    @SuppressWarnings({ "unchecked" })
     public Wizard getWizardInstance()
     {
         try
@@ -263,7 +272,7 @@ public class ConfigurationWizardAction extends ActionSupport
         }
     }
 
-    @SuppressWarnings({"unchecked"})
+    @SuppressWarnings({ "unchecked" })
     protected Wizard doCreateWizard()
     {
         AbstractTypeWizard wizardInstance = null;
@@ -293,7 +302,7 @@ public class ConfigurationWizardAction extends ActionSupport
             wizardInstance = new SingleTypeWizard();
             ComponentContext.autowire(wizardInstance);
         }
-        
+
         wizardInstance.setParameters(path, isSelected(CREATE_TEMPLATE));
 
         wizardRequiresLazyInitialisation = true;

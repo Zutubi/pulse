@@ -9,7 +9,6 @@ import com.zutubi.pulse.core.config.Configuration;
 import com.zutubi.pulse.core.config.ConfigurationMap;
 import com.zutubi.pulse.events.EventManager;
 import com.zutubi.util.logging.Logger;
-import com.zutubi.validation.ValidationAware;
 import com.zutubi.validation.ValidationContext;
 import com.zutubi.validation.ValidationException;
 import com.zutubi.validation.ValidationManager;
@@ -469,6 +468,25 @@ public class ConfigurationTemplateManager
                 }
             }
         }
+
+        validateInstances(instances, true);
+        validateInstances(incompleteInstances, false);
+    }
+
+    private void validateInstances(InstanceCache instances, final boolean concrete)
+    {
+        instances.forAllInstances(new InstanceCache.InstanceHandler()
+        {
+            public void handle(Configuration instance, String path, Configuration parentInstance)
+            {
+                CompositeType type = typeRegistry.getType(instance.getClass());
+                if (type != null)
+                {
+                    // Then we have a composite
+                    validateInstance(type, instance, parentInstance, PathUtils.getBaseName(path), concrete, null);
+                }
+            }
+        });
     }
 
     public boolean isConcrete(String parentPath, Record subject)
@@ -578,60 +596,57 @@ public class ConfigurationTemplateManager
      * @param baseName           base name of the path where the record is to
      *                           be stored
      * @param subject            record to validate
-     * @param validationCallback receives details of validation errors
      * @return the instance if valid, null otherwise
+     * @throws com.zutubi.prototype.type.TypeException if an error prevents
+     *         creation of the instance: this is motre fatal than a normal
+     *         validation problem
      */
     @SuppressWarnings({ "unchecked" })
-    public <T> T validate(String parentPath, String baseName, Record subject, ValidationAware validationCallback)
+    public <T> T validate(String parentPath, String baseName, Record subject) throws TypeException
+    {
+        return (T) validate(parentPath, baseName, subject, null);
+    }
+
+    @SuppressWarnings({ "unchecked" })
+    public <T> T validate(String parentPath, String baseName, Record subject, Set<String> ignoredFields) throws TypeException    
     {
         // The type we are validating against.
-        Type type = typeRegistry.getType(subject.getSymbolicName());
+        CompositeType type = typeRegistry.getType(subject.getSymbolicName());
+        if(type == null)
+        {
+            throw new TypeException("Attempt to validate record with unrecognised symbolic name '" + subject.getSymbolicName() + "'");
+        }
+        
+        // Create an instance of the object represented by the record.  It is
+        // during the instantiation that type conversion errors are detected.
+        Configuration instance;
+        SimpleInstantiator instantiator = new SimpleInstantiator(configurationReferenceManager);
+        instance = (Configuration) instantiator.instantiate(type, subject);
 
-        // Construct the validation context, wrapping it around the validation callback so that the
-        // client is notified of validation errors.
-        MessagesTextProvider textProvider = new MessagesTextProvider(type.getClazz());
+        // Now apply validations via using the validation manager.
         Configuration parentInstance = parentPath == null ? null : getInstance(parentPath);
-        ValidationContext context = new ConfigurationValidationContext(validationCallback, textProvider, parentInstance, baseName, !isConcrete(parentPath, subject));
+        boolean concrete = isConcrete(parentPath, subject);
+        validateInstance(type, instance, parentInstance, baseName, concrete, ignoredFields);
 
-        // Create an instance of the object represented by the record.  It is during the instantiation that
-        // type conversion errors are detected.
-        Object instance;
-        try
+        return (T) instance;
+    }
+
+    private void validateInstance(CompositeType type, Configuration instance, Configuration parentInstance, String baseName, boolean concrete, Set<String> ignoredFields)
+    {
+        MessagesTextProvider textProvider = new MessagesTextProvider(type.getClazz());
+        ValidationContext context = new ConfigurationValidationContext(instance, textProvider, parentInstance, baseName, !concrete);
+        if(ignoredFields != null)
         {
-            SimpleInstantiator instantiator = new SimpleInstantiator(configurationReferenceManager);
-            instance = instantiator.instantiate(type, subject);
-        }
-        catch (TypeConversionException e)
-        {
-            for (String field : e.getFieldErrors())
-            {
-                context.addFieldError(field, e.getFieldError(field));
-            }
-            return null;
-        }
-        catch (TypeException e)
-        {
-            context.addActionError(e.getMessage());
-            return null;
+            context.addIgnoredFields(ignoredFields);
         }
 
-        // Process the instance via the validation manager.
         try
         {
             validationManager.validate(instance, context);
-            if (context.hasErrors())
-            {
-                return null;
-            }
-            else
-            {
-                return (T) instance;
-            }
         }
         catch (ValidationException e)
         {
-            context.addActionError(e.getMessage());
-            return null;
+            instance.addInstanceError(e.getMessage());
         }
     }
 

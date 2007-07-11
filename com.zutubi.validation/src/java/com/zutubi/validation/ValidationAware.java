@@ -1,8 +1,8 @@
 package com.zutubi.validation;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
-import java.util.Collection;
 import java.util.Set;
 
 /**
@@ -16,13 +16,9 @@ public interface ValidationAware
 
     void ignoreAllFields();
     
-    void addActionMessage(String message);
-
     void addActionError(String error);
 
     void addFieldError(String field, String error);
-
-    Collection<String> getActionMessages();
 
     Collection<String> getActionErrors();
 
@@ -38,11 +34,5 @@ public interface ValidationAware
 
     boolean hasActionErrors();
 
-    boolean hasActionMessages();
-
-    void setActionMessages(Collection<String> messages);
-
-    void setActionErrors(Collection<String> errors);
-
-    void setFieldErrors(Map<String, List<String>> errors);
+    void clearFieldErrors();
 }

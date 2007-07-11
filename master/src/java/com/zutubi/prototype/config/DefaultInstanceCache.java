@@ -87,6 +87,11 @@ class DefaultInstanceCache implements InstanceCache
         put(instance, root, PathUtils.getPathElements(path), 0);
     }
 
+    public void forAllInstances(InstanceHandler handler)
+    {
+        root.forAllInstances(null, "", handler);
+    }
+
     private void put(Configuration instance, Entry entry, String[] elements, int index)
     {
         if (index == elements.length)
@@ -168,6 +173,22 @@ class DefaultInstanceCache implements InstanceCache
                 for(Entry child: children.values())
                 {
                     child.getAllDescendents(result);
+                }
+            }
+        }
+
+        public void forAllInstances(Configuration parentInstance, String path, InstanceHandler handler)
+        {
+            if(instance != null)
+            {
+                handler.handle(instance, path, parentInstance);
+            }
+
+            if (children != null)
+            {
+                for(Map.Entry<String,Entry> childEntry: children.entrySet())
+                {
+                    childEntry.getValue().forAllInstances(instance, PathUtils.getPath(path, childEntry.getKey()), handler);
                 }
             }
         }

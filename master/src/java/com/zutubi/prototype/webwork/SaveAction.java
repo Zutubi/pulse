@@ -3,9 +3,10 @@ package com.zutubi.prototype.webwork;
 import com.opensymphony.util.TextUtils;
 import com.opensymphony.xwork.ActionContext;
 import com.zutubi.prototype.type.CompositeType;
+import com.zutubi.prototype.type.TypeException;
 import com.zutubi.prototype.type.record.MutableRecord;
 import com.zutubi.prototype.type.record.PathUtils;
-import com.zutubi.validation.XWorkValidationAdapter;
+import com.zutubi.pulse.core.config.Configuration;
 
 /**
  *
@@ -57,12 +58,25 @@ public class SaveAction extends PrototypeSupport
 
         String parentPath = PathUtils.getParentPath(path);
         String baseName = PathUtils.getBaseName(path);
-        if (configurationTemplateManager.validate(parentPath, baseName, record, new XWorkValidationAdapter(this)) == null)
+        try
+        {
+            Configuration instance = configurationTemplateManager.validate(parentPath, baseName, record);
+            if (!instance.isValid())
+            {
+                PrototypeUtils.mapErrors(instance, this, null);
+            }
+        }
+        catch (TypeException e)
+        {
+            addActionError(e.getMessage());
+        }
+
+        if(hasErrors())
         {
             prepare();
             return INPUT;
         }
-
+        
         String displayName = PrototypeUtils.getDisplayName(path, configurationTemplateManager);
         String newPath = configurationTemplateManager.saveRecord(path, (MutableRecord) record);
         String newDisplayName = PrototypeUtils.getDisplayName(newPath, configurationTemplateManager);

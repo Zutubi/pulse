@@ -45,6 +45,7 @@ public class PersistentInstantiator implements Instantiator
                     Configuration configuration = (Configuration) instance;
                     configuration.setConfigurationPath(propertyPath);
                     configuration.setHandle(((Record) data).getHandle());
+
                     cache.put(propertyPath, configuration);
                 }
 

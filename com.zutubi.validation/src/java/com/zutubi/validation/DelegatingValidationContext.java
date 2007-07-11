@@ -1,10 +1,11 @@
 package com.zutubi.validation;
 
-import com.zutubi.validation.i18n.*;
+import com.zutubi.validation.i18n.DefaultTextProvider;
+import com.zutubi.validation.i18n.TextProvider;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
-import java.util.Collection;
 import java.util.Set;
 
 /**
@@ -94,6 +95,11 @@ public class DelegatingValidationContext implements ValidationContext
         return validationAware.hasActionErrors();
     }
 
+    public void clearFieldErrors()
+    {
+        validationAware.clearFieldErrors();
+    }
+
     public boolean hasFieldError(String field)
     {
         return validationAware.hasFieldError(field);
@@ -120,36 +126,6 @@ public class DelegatingValidationContext implements ValidationContext
         validationAware.ignoreAllFields();
     }
 
-    public void addActionMessage(String message)
-    {
-        validationAware.addActionMessage(message);
-    }
-
-    public Collection<String> getActionMessages()
-    {
-        return validationAware.getActionMessages();
-    }
-
-    public boolean hasActionMessages()
-    {
-        return validationAware.hasActionMessages();
-    }
-
-    public void setActionMessages(Collection<String> messages)
-    {
-        validationAware.setActionMessages(messages);
-    }
-
-    public void setActionErrors(Collection<String> errors)
-    {
-        validationAware.setActionErrors(errors);
-    }
-
-    public void setFieldErrors(Map<String, List<String>> errors)
-    {
-        validationAware.setFieldErrors(errors);
-    }
-
     public String getText(String key)
     {
         return textProvider.getText(key);
@@ -168,10 +144,5 @@ public class DelegatingValidationContext implements ValidationContext
     public String getText(String key, String defaultValue, Object... args)
     {
         return textProvider.getText(key, defaultValue, args);
-    }
-
-    public String getFullFieldName(String fieldName)
-    {
-        return fieldName;
     }
 }

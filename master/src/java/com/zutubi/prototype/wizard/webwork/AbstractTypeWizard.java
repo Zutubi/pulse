@@ -1,5 +1,6 @@
 package com.zutubi.prototype.wizard.webwork;
 
+import com.opensymphony.xwork.ValidationAware;
 import com.zutubi.i18n.Messages;
 import com.zutubi.prototype.ExtensionOptionProvider;
 import com.zutubi.prototype.FieldDescriptor;
@@ -8,10 +9,7 @@ import com.zutubi.prototype.FormDescriptorFactory;
 import com.zutubi.prototype.config.ConfigurationPersistenceManager;
 import com.zutubi.prototype.config.ConfigurationTemplateManager;
 import com.zutubi.prototype.model.SelectFieldDescriptor;
-import com.zutubi.prototype.type.CompositeType;
-import com.zutubi.prototype.type.Type;
-import com.zutubi.prototype.type.TypeProperty;
-import com.zutubi.prototype.type.TypeRegistry;
+import com.zutubi.prototype.type.*;
 import com.zutubi.prototype.type.record.*;
 import com.zutubi.prototype.webwork.PrototypeUtils;
 import com.zutubi.prototype.wizard.TypeWizardState;
@@ -19,7 +17,7 @@ import com.zutubi.prototype.wizard.Wizard;
 import com.zutubi.prototype.wizard.WizardState;
 import com.zutubi.prototype.wizard.WizardTransition;
 import static com.zutubi.prototype.wizard.WizardTransition.*;
-import com.zutubi.validation.ValidationAware;
+import com.zutubi.pulse.core.config.Configuration;
 
 import java.util.*;
 
@@ -286,8 +284,17 @@ public abstract class AbstractTypeWizard implements Wizard
 
         public boolean validate(String path, ValidationAware validationCallback)
         {
-            validationCallback.addIgnoredFields(ignoredFields);
-            return configurationTemplateManager.validate(path, null, currentState.getDataRecord(), validationCallback) != null;
+            try
+            {
+                Configuration configuration = configurationTemplateManager.validate(path, null, currentState.getDataRecord(), ignoredFields);
+                PrototypeUtils.mapErrors(configuration, validationCallback, null);
+                return configuration.isValid();
+            }
+            catch (TypeException e)
+            {
+                validationCallback.addActionError(e.getMessage());
+                return false;
+            }
         }
     }
 

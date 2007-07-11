@@ -1,14 +1,14 @@
 package com.zutubi.validation;
 
-import junit.framework.TestCase;
+import com.zutubi.validation.mock.MockAccount;
 import com.zutubi.validation.mock.MockAnimal;
 import com.zutubi.validation.mock.MockWallet;
-import com.zutubi.validation.mock.MockAccount;
 import com.zutubi.validation.providers.AnnotationValidatorProvider;
 import com.zutubi.validation.providers.ReflectionValidatorProvider;
+import junit.framework.TestCase;
 
-import java.util.List;
 import java.util.Arrays;
+import java.util.List;
 
 /**
  * <class-comment/>
@@ -86,7 +86,7 @@ public class DefaultValidationManagerTest extends TestCase
         assertEquals("email.required", fieldErrors.get(0));
 
         // reset the validation context.
-        validationContext.setFieldErrors(null);
+        validationContext.clearFieldErrors();
         assertFalse(validationContext.hasErrors());
 
         account.setEmail("invalid email");

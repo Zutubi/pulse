@@ -6,11 +6,11 @@ import com.zutubi.prototype.config.ConfigurationReferenceManager;
 import com.zutubi.prototype.type.CompositeType;
 import com.zutubi.prototype.type.SimpleInstantiator;
 import com.zutubi.prototype.type.Type;
+import com.zutubi.prototype.type.TypeException;
 import com.zutubi.prototype.type.record.PathUtils;
 import com.zutubi.prototype.type.record.Record;
 import com.zutubi.pulse.bootstrap.ComponentContext;
 import com.zutubi.pulse.core.config.Configuration;
-import com.zutubi.validation.XWorkValidationAdapter;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -68,20 +68,22 @@ public class CheckAction extends PrototypeSupport
         CompositeType checkType = configurationRegistry.getConfigurationCheckType((CompositeType) type);
         checkRecord = PrototypeUtils.toRecord(checkType, parameters);
 
-        // validate the check form first.
-        boolean valid = true;
-        if (configurationTemplateManager.validate(null, null, checkRecord, new XWorkValidationAdapter(this)) == null)
+        try
         {
-            valid = false;
+            Configuration checkInstance = configurationTemplateManager.validate(null, null, checkRecord);
+            Configuration mainInstance = configurationTemplateManager.validate(PathUtils.getParentPath(path), PathUtils.getBaseName(path), record);
+            if (!checkInstance.isValid() || !mainInstance.isValid())
+            {
+                PrototypeUtils.mapErrors(checkInstance, this, null);
+                PrototypeUtils.mapErrors(mainInstance, this, "_check");
+            }
+        }
+        catch (TypeException e)
+        {
+            addActionError(e.getMessage());
         }
 
-        // validate the primary form.
-        if (configurationTemplateManager.validate(PathUtils.getParentPath(path), PathUtils.getBaseName(path), record, new XWorkValidationAdapter(this, "_check")) == null)
-        {
-            valid = false;
-        }
-
-        if (!valid)
+        if(hasErrors())
         {
             return INPUT;
         }

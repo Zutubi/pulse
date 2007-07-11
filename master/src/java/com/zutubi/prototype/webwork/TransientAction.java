@@ -7,11 +7,12 @@ import com.zutubi.i18n.MessagesProvider;
 import com.zutubi.prototype.config.ConfigurationTemplateManager;
 import com.zutubi.prototype.type.CompositeType;
 import com.zutubi.prototype.type.Type;
+import com.zutubi.prototype.type.TypeException;
 import com.zutubi.prototype.type.TypeRegistry;
 import com.zutubi.prototype.type.record.PathUtils;
 import com.zutubi.prototype.type.record.Record;
+import com.zutubi.pulse.core.config.Configuration;
 import com.zutubi.pulse.web.ActionSupport;
-import com.zutubi.validation.XWorkValidationAdapter;
 
 /**
  * Base for actions that use transient configuration.
@@ -133,8 +134,21 @@ public abstract class TransientAction<T> extends ActionSupport implements Messag
 
         String parentPath = PathUtils.getParentPath(path);
         String baseName = PathUtils.getBaseName(path);
-        Object instance = configurationTemplateManager.validate(parentPath, baseName, record, new XWorkValidationAdapter(this));
-        if (instance == null)
+        Configuration instance = null;
+        try
+        {
+            instance = configurationTemplateManager.validate(parentPath, baseName, record);
+            if (!instance.isValid())
+            {
+                PrototypeUtils.mapErrors(instance, this, null);
+            }
+        }
+        catch (TypeException e)
+        {
+            addActionError(e.getMessage());
+        }
+
+        if(hasErrors())
         {
             return INPUT;
         }

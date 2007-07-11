@@ -1,6 +1,7 @@
 package com.zutubi.prototype.webwork;
 
 import com.opensymphony.util.TextUtils;
+import com.opensymphony.xwork.ValidationAware;
 import com.zutubi.i18n.Messages;
 import com.zutubi.prototype.config.ConfigurationTemplateManager;
 import com.zutubi.prototype.type.*;
@@ -8,6 +9,7 @@ import com.zutubi.prototype.type.record.MutableRecord;
 import com.zutubi.prototype.type.record.MutableRecordImpl;
 import com.zutubi.prototype.type.record.PathUtils;
 import com.zutubi.prototype.type.record.Record;
+import com.zutubi.pulse.core.config.Configuration;
 import com.zutubi.util.StringUtils;
 
 import java.util.*;
@@ -276,5 +278,22 @@ public class PrototypeUtils
         }
 
         return result;
+    }
+
+    public static void mapErrors(Configuration instance, ValidationAware validationAware, String fieldSuffix)
+    {
+        for(String instanceError: instance.getInstanceErrors())
+        {
+            validationAware.addActionError(instanceError);
+        }
+
+        for(Map.Entry<String, List<String>> fieldEntry: instance.getFieldErrors().entrySet())
+        {
+            String fieldName = fieldSuffix == null ? fieldEntry.getKey() : fieldEntry.getKey() + fieldSuffix;
+            for(String error: fieldEntry.getValue())
+            {
+                validationAware.addFieldError(fieldName, error);
+            }
+        }
     }
 }

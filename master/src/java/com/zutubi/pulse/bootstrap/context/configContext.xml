@@ -2,13 +2,7 @@
 <!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
 <beans default-autowire="byName">
     <!-- Validation system -->
-    <bean id="validationManager" class="com.zutubi.pulse.validation.HybridValidationManager">
-        <property name="validationManager">
-            <ref local="zutubiValidationManager"/>
-        </property>
-    </bean>
-
-    <bean id="zutubiValidationManager" class="com.zutubi.validation.DefaultValidationManager">
+    <bean id="validationManager" class="com.zutubi.validation.DefaultValidationManager">
         <property name="providers">
             <list>
                 <ref local="configurationValidatorProvider"/>

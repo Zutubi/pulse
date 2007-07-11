@@ -9,7 +9,6 @@ public class ValidationAwareSupport implements ValidationAware
 {
     private Set<String> ignoredFields;
     private Collection<String> actionErrors;
-    private Collection<String> actionMessages;
     private Map<String, List<String>> fieldErrors;
     private boolean ignoreAllFields = false;
 
@@ -47,11 +46,6 @@ public class ValidationAwareSupport implements ValidationAware
         internalGetActionErrors().add(error);
     }
 
-    public void addActionMessage(String message)
-    {
-        internalGetActionMessages().add(message);
-    }
-
     public void addFieldError(String field, String error)
     {
         if (!ignoreAllFields && !getIgnoredFields().contains(field))
@@ -69,11 +63,6 @@ public class ValidationAwareSupport implements ValidationAware
     public Collection<String> getActionErrors()
     {
         return new LinkedList<String>(internalGetActionErrors());
-    }
-
-    public Collection<String> getActionMessages()
-    {
-        return new LinkedList<String>(internalGetActionMessages());
     }
 
     public List<String> getFieldErrors(String field)
@@ -96,9 +85,9 @@ public class ValidationAwareSupport implements ValidationAware
         return internalGetActionErrors().size() > 0;
     }
 
-    public boolean hasActionMessages()
+    public void clearFieldErrors()
     {
-        return internalGetActionErrors().size() > 0;
+        fieldErrors = null;
     }
 
     public boolean hasFieldError(String field)
@@ -110,30 +99,6 @@ public class ValidationAwareSupport implements ValidationAware
     public Map<String, List<String>> getFieldErrors()
     {
         return new HashMap<String, List<String>>(internalGetFieldErrors());
-    }
-
-    public void setActionMessages(Collection<String> messages)
-    {
-        this.actionMessages = messages;
-    }
-
-    public void setActionErrors(Collection<String> errors)
-    {
-        this.actionErrors = errors;
-    }
-
-    public void setFieldErrors(Map<String, List<String>> errors)
-    {
-        this.fieldErrors = errors;
-    }
-
-    private Collection<String> internalGetActionMessages()
-    {
-        if (actionMessages == null)
-        {
-            actionMessages = new LinkedList<String>();
-        }
-        return actionMessages;
     }
 
     private Collection<String> internalGetActionErrors()

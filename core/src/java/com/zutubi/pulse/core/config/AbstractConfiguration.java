@@ -2,10 +2,10 @@ package com.zutubi.pulse.core.config;
 
 import com.zutubi.config.annotations.Transient;
 
+import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.LinkedList;
-import java.util.HashMap;
 
 /**
  * Convenient base class for configuration types.
@@ -40,7 +40,20 @@ public abstract class AbstractConfiguration implements Configuration
     @Transient
     public boolean isValid()
     {
-        return instanceErrors.size() == 0 && fieldErrors.size() == 0;
+        if(instanceErrors.size() > 0)
+        {
+            return false;
+        }
+
+        for(List<String> fieldMessages: fieldErrors.values())
+        {
+            if(fieldMessages.size() > 0)
+            {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     @Transient

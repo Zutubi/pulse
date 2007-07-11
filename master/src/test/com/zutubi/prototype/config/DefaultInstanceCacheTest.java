@@ -1,6 +1,7 @@
 package com.zutubi.prototype.config;
 
 import com.zutubi.pulse.core.config.AbstractConfiguration;
+import com.zutubi.pulse.core.config.Configuration;
 import com.zutubi.pulse.test.PulseTestCase;
 
 import java.util.LinkedList;
@@ -76,14 +77,14 @@ public class DefaultInstanceCacheTest extends PulseTestCase
 
     public void testGetAllEmptyCache()
     {
-        List all = new LinkedList();
+        List<Configuration> all = new LinkedList<Configuration>();
         cache.getAllMatchingPathPattern("path", all);
         assertEquals(0, all.size());
     }
 
     public void testGetAllEmptyPath()
     {
-        List all = new LinkedList();
+        List<Configuration> all = new LinkedList<Configuration>();
         cache.getAllMatchingPathPattern("", all);
         assertEquals(0, all.size());
     }
@@ -96,7 +97,7 @@ public class DefaultInstanceCacheTest extends PulseTestCase
         cache.put("foo/baz", o);
         cache.put("foo/quux", new TestConfiguration());
         
-        List all = new LinkedList();
+        List<Configuration> all = new LinkedList<Configuration>();
         cache.getAllMatchingPathPattern("foo/baz", all);
         assertEquals(1, all.size());
         assertEquals(o, all.get(0));
@@ -112,12 +113,23 @@ public class DefaultInstanceCacheTest extends PulseTestCase
         cache.put("foo/baz", baz);
         cache.put("foo/quux", quux);
 
-        List all = new LinkedList();
+        List<Configuration> all = new LinkedList<Configuration>();
         cache.getAllMatchingPathPattern("foo/*", all);
         assertEquals(3, all.size());
         assertTrue(all.contains(bar));
         assertTrue(all.contains(baz));
         assertTrue(all.contains(quux));
+    }
+
+    public void testForAllEmptyCache()
+    {
+        cache.forAllInstances(new InstanceCache.InstanceHandler()
+        {
+            public void handle(Configuration instance, String path, Configuration parentInstance)
+            {
+                fail();
+            }
+        });
     }
 
     private static class TestConfiguration extends AbstractConfiguration

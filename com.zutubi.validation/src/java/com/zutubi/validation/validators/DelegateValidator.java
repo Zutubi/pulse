@@ -1,6 +1,9 @@
 package com.zutubi.validation.validators;
 
-import com.zutubi.validation.*;
+import com.zutubi.validation.DelegatingValidationContext;
+import com.zutubi.validation.ValidationContext;
+import com.zutubi.validation.ValidationException;
+import com.zutubi.validation.ValidationManager;
 
 import java.util.Collection;
 
@@ -82,7 +85,7 @@ public class DelegateValidator extends FieldValidatorSupport
             super.addFieldError(getFullFieldName(field), error);
         }
 
-        public String getFullFieldName(String field)
+        private String getFullFieldName(String field)
         {
             return this.fieldName + "." + field;
         }
