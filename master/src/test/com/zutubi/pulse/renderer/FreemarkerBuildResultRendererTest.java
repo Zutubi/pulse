@@ -515,6 +515,6 @@ public class FreemarkerBuildResultRendererTest extends PulseTestCase
 
     private String replaceTimestamps(String str)
     {
-        return str.replaceAll("\n.*ago<", "@@@@").replaceAll("\n[0-9]+ ms", "@@@@");
+        return str.replaceAll("\n.*ago<", "@@@@").replaceAll("\n[0-9]+ ms", "@@@@").replaceAll("\n.*70.*<", "@@@@");
     }
 }
