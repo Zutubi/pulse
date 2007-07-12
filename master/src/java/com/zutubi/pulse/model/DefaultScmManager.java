@@ -5,8 +5,8 @@ import com.zutubi.pulse.ShutdownManager;
 import com.zutubi.pulse.core.Stoppable;
 import com.zutubi.pulse.core.model.Revision;
 import com.zutubi.pulse.events.EventManager;
-import com.zutubi.pulse.prototype.config.project.ProjectConfiguration;
 import com.zutubi.pulse.prototype.config.admin.GeneralAdminConfiguration;
+import com.zutubi.pulse.prototype.config.project.ProjectConfiguration;
 import com.zutubi.pulse.scheduling.Scheduler;
 import com.zutubi.pulse.scheduling.SchedulingException;
 import com.zutubi.pulse.scheduling.SimpleTrigger;
@@ -117,11 +117,7 @@ public class DefaultScmManager implements ScmManager, Stoppable
             public boolean satisfied(ProjectConfiguration configuration)
             {
                 ScmConfiguration scm = configuration.getScm();
-                if (scm != null)
-                {
-                    return configuration.getScm().getMonitor();
-                }
-                return false;
+                return scm != null && configuration.getScm().getMonitor();
             }
         });
     }

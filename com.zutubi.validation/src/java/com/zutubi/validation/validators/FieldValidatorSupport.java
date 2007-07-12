@@ -51,7 +51,7 @@ public abstract class FieldValidatorSupport extends ValidatorSupport implements 
         return new Object[]{getFieldName()};
     }
 
-    protected String getMessage()
+    public String getMessage()
     {
         // just a bit of craziness...
         String message;

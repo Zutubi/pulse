@@ -2,15 +2,13 @@ package com.zutubi.pulse.condition.antlr;
 
 import antlr.MismatchedTokenException;
 import antlr.collections.AST;
-import com.opensymphony.xwork.ValidationAwareSupport;
 import com.zutubi.pulse.condition.*;
-import com.zutubi.util.bean.DefaultObjectFactory;
 import com.zutubi.pulse.core.PulseRuntimeException;
 import com.zutubi.pulse.test.PulseTestCase;
-import com.zutubi.pulse.web.user.SubscriptionHelper;
+import com.zutubi.pulse.validation.validators.SubscriptionConditionValidator;
+import com.zutubi.util.bean.DefaultObjectFactory;
 
 import java.io.StringReader;
-import java.util.List;
 
 /**
  */
@@ -375,11 +373,12 @@ public class NotifyConditionParserTest extends PulseTestCase
     {
         NotifyConditionFactory factory = new NotifyConditionFactory();
         factory.setObjectFactory(new DefaultObjectFactory());
-        ValidationAwareSupport validate = new ValidationAwareSupport();
-        NotifyCondition condition = SubscriptionHelper.validateCondition(expression, validate, factory);
+        SubscriptionConditionValidator validator = new SubscriptionConditionValidator();
+        validator.setNotifyConditionFactory(factory);
+        NotifyCondition condition = validator.validateCondition(expression);
         if(condition == null)
         {
-            throw new PulseRuntimeException((String) ((List)validate.getFieldErrors().get("expression")).get(0));
+            throw new PulseRuntimeException(validator.getMessage());
         }
 
         return condition;

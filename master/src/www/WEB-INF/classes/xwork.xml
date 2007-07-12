@@ -402,22 +402,6 @@
         <action name="clearContactPointError" class="com.zutubi.pulse.web.user.ClearContactPointErrorAction">
             <result name="success" type="redirect">/preferences.action</result>
         </action>
-
-        <action name="deleteSubscription" class="com.zutubi.pulse.web.user.DeleteSubscriptionAction">
-            <result name="success" type="redirect">/preferences.action</result>
-        </action>
-
-        <action name="editPersonalBuildSubscription" class="com.zutubi.pulse.web.user.EditPersonalBuildSubscriptionAction">
-            <result name="input" type="velocity">edit-subscription-personal.vm</result>
-            <result name="cancel" type="redirect">/preferences.action</result>
-            <result name="success" type="redirect">/preferences.action</result>
-        </action>
-
-        <action name="editProjectBuildSubscription" class="com.zutubi.pulse.web.user.EditProjectBuildSubscriptionAction">
-            <result name="input" type="velocity">edit-subscription-project.vm</result>
-            <result name="cancel" type="redirect">/preferences.action</result>
-            <result name="success" type="redirect">/preferences.action</result>
-        </action>
     </package>
 
     <package name="startup" namespace="/startup" extends="webwork-default-package">
@@ -559,18 +543,6 @@
 
         <action name="pingAgent" class="com.zutubi.pulse.web.agents.PingAgentAction">
             <result name="success" type="redirect">/viewAgents.action</result>
-        </action>
-
-        <action name="deleteCommitMessageLink" class="com.zutubi.pulse.web.admin.DeleteCommitMessageTransformerAction">
-            <result name="success" type="redirect">/admin/serverSettings.action</result>
-            <result name="error" type="velocity">/generic-error.vm</result>
-        </action>
-
-        <action name="editCommitMessageProjects" class="com.zutubi.pulse.web.admin.EditCommitMessageTransformerProjectsAction">
-            <result name="input" type="velocity">edit-commit-message-projects.vm</result>
-            <result name="cancel" type="redirect">/admin/serverSettings.action</result>
-            <result name="success" type="redirect">/admin/serverSettings.action</result>
-            <result name="error" type="velocity">/generic-error.vm</result>
         </action>
 
         <action name="addSystemProperty" class="com.zutubi.pulse.web.admin.SystemPropertiesAction" method="doAdd">
