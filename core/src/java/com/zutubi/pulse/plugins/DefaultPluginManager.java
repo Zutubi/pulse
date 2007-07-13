@@ -52,6 +52,7 @@ public class DefaultPluginManager implements PluginManager, EventListener
     private PackageAdmin packageAdmin;
     private ServiceReference platformAdminRef;
     private PlatformAdmin platformAdmin;
+    private State offlineState;
     private int offlineId = 1;
 
     private IExtensionTracker extensionTracker;
@@ -97,6 +98,9 @@ public class DefaultPluginManager implements PluginManager, EventListener
                 return;
             }
 
+            offlineState = platformAdmin.getFactory().createState(platformAdmin.getState());
+            offlineState.setResolver(platformAdmin.getResolver());
+            offlineState.setPlatformProperties(FrameworkProperties.getProperties());
             loadInternalPlugins();
 
             extensionRegistry = RegistryFactory.getRegistry();
@@ -429,13 +433,9 @@ public class DefaultPluginManager implements PluginManager, EventListener
 
         try
         {
-            State tempState = platformAdmin.getFactory().createState(platformAdmin.getState());
-            tempState.setResolver(platformAdmin.getResolver());
-            tempState.setPlatformProperties(FrameworkProperties.getProperties());
-
-            bundleDescription = platformAdmin.getFactory().createBundleDescription(tempState, manifest, getBundleLocation(pluginFile), offlineId++);
-            tempState.addBundle(bundleDescription);
-            tempState.resolve();
+            bundleDescription = platformAdmin.getFactory().createBundleDescription(offlineState, manifest, getBundleLocation(pluginFile), offlineId++);
+            offlineState.addBundle(bundleDescription);
+            offlineState.resolve();
         }
         catch (BundleException e)
         {
