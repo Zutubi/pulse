@@ -1,7 +1,7 @@
 package com.zutubi.pulse.condition;
 
 import com.zutubi.pulse.model.BuildResult;
-import com.zutubi.pulse.model.User;
+import com.zutubi.pulse.prototype.config.user.UserConfiguration;
 
 /**
  * Describes an interface for making notifications conditional based on
@@ -11,5 +11,5 @@ import com.zutubi.pulse.model.User;
  */
 public interface NotifyCondition
 {
-    public boolean satisfied(BuildResult result, User user);
+    public boolean satisfied(BuildResult result, UserConfiguration user);
 }

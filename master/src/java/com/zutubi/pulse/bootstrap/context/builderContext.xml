@@ -82,21 +82,6 @@
         </property>
     </bean>
 
-    <bean id="subscriptionManagerTarget" class="com.zutubi.pulse.model.DefaultSubscriptionManager" autowire="byName"/>
-    <bean id="subscriptionManager" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
-        <property name="transactionManager">
-            <ref bean="transactionManager"/>
-        </property>
-        <property name="target">
-            <ref bean="subscriptionManagerTarget"/>
-        </property>
-        <property name="transactionAttributes">
-            <props>
-                <prop key="*">PROPAGATION_REQUIRED</prop>
-            </props>
-        </property>
-    </bean>
-
     <bean id="scmManagerTarget" class="com.zutubi.pulse.model.DefaultScmManager" autowire="byName" init-method="init" destroy-method="shutdown"/>
     <bean id="scmManager" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
         <property name="transactionManager">

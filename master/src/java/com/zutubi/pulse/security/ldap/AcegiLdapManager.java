@@ -5,9 +5,16 @@ import com.zutubi.prototype.config.ConfigurationEventListener;
 import com.zutubi.prototype.config.ConfigurationProvider;
 import com.zutubi.prototype.config.events.ConfigurationEvent;
 import com.zutubi.prototype.config.events.PostSaveEvent;
+import com.zutubi.prototype.type.record.PathUtils;
 import com.zutubi.pulse.license.LicenseHolder;
-import com.zutubi.pulse.model.*;
+import com.zutubi.pulse.model.AcegiUser;
+import com.zutubi.pulse.model.Group;
+import com.zutubi.pulse.model.User;
+import com.zutubi.pulse.model.UserManager;
 import com.zutubi.pulse.prototype.config.admin.LDAPConfiguration;
+import com.zutubi.pulse.prototype.config.user.UserConfiguration;
+import com.zutubi.pulse.prototype.config.user.UserPreferencesConfiguration;
+import com.zutubi.pulse.prototype.config.user.contacts.EmailContactConfiguration;
 import com.zutubi.util.logging.Logger;
 import org.acegisecurity.BadCredentialsException;
 import org.acegisecurity.GrantedAuthority;
@@ -288,7 +295,9 @@ public class AcegiLdapManager implements LdapManager, ConfigurationEventListener
 
     private void addContact(User user, LdapUserDetails details)
     {
-        if (user.getContactPoint(EMAIL_CONTACT_NAME) == null)
+        UserConfiguration config = user.getConfig();
+        UserPreferencesConfiguration prefs = config.getPreferences();
+        if (prefs.getContacts().containsKey(EMAIL_CONTACT_NAME))
         {
             String email = getStringAttribute(details, emailAttribute, user.getLogin());
             if (email != null)
@@ -296,13 +305,11 @@ public class AcegiLdapManager implements LdapManager, ConfigurationEventListener
                 try
                 {
                     new InternetAddress(email);
-                    EmailContactPoint point = new EmailContactPoint(email);
-                    point.setName(EMAIL_CONTACT_NAME);
-                    user.add(point);
-                    if (user.isPersistent())
-                    {
-                        userManager.save(user);
-                    }
+                    EmailContactConfiguration contact = new EmailContactConfiguration();
+                    contact.setName(EMAIL_CONTACT_NAME);
+                    contact.setAddress(email);
+                    // FIXME check what happens when users are being auto-added
+                    configurationProvider.insert(PathUtils.getPath(config.getConfigurationPath(), "contacts"), contact);
                 }
                 catch (AddressException e)
                 {

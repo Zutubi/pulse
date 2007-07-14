@@ -57,11 +57,6 @@ public interface UserManager extends EntityManager<User>, UserDetailsService
 
     void setPassword(User user, String rawPassword);
 
-    //---( Contact point related interface )---
-    void save(ContactPoint contact);
-    ContactPoint getContactPoint(long id);
-    void delete(ContactPoint contact);
-
     List<Group> getAllGroups();
     List<Group> getAdminAllProjectGroups();
     Group getGroup(long id);

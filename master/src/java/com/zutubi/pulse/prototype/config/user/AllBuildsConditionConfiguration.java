@@ -1,13 +1,17 @@
 package com.zutubi.pulse.prototype.config.user;
 
 import com.zutubi.config.annotations.SymbolicName;
+import com.zutubi.pulse.condition.NotifyConditionFactory;
 
 /**
- *
- *
+ * A condition that is always true, and hence allows notifications for all
+ * builds.
  */
 @SymbolicName("zutubi.allBuildsConditionConfig")
 public class AllBuildsConditionConfiguration extends SubscriptionConditionConfiguration
 {
-    // Has no data to be filled in, so do not show user a blank form.
+    public String getExpression()
+    {
+        return NotifyConditionFactory.TRUE;
+    }
 }

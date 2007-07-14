@@ -1,7 +1,7 @@
 package com.zutubi.pulse.condition;
 
 import com.zutubi.pulse.model.BuildResult;
-import com.zutubi.pulse.model.User;
+import com.zutubi.pulse.prototype.config.user.UserConfiguration;
 
 /**
  * 
@@ -9,7 +9,7 @@ import com.zutubi.pulse.model.User;
  */
 public class FailureNotifyCondition implements NotifyCondition
 {
-    public boolean satisfied(BuildResult result, User user)
+    public boolean satisfied(BuildResult result, UserConfiguration user)
     {
         return result != null && result.failed();
     }

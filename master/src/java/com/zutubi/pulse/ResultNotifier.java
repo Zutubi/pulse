@@ -1,5 +1,6 @@
 package com.zutubi.pulse;
 
+import com.zutubi.prototype.config.ConfigurationProvider;
 import com.zutubi.pulse.bootstrap.ComponentContext;
 import com.zutubi.pulse.bootstrap.MasterConfigurationManager;
 import com.zutubi.pulse.condition.UnsuccessfulCountBuildsValue;
@@ -9,12 +10,16 @@ import com.zutubi.pulse.events.Event;
 import com.zutubi.pulse.events.EventListener;
 import com.zutubi.pulse.events.EventManager;
 import com.zutubi.pulse.events.build.BuildCompletedEvent;
-import com.zutubi.pulse.model.*;
-import com.zutubi.pulse.renderer.BuildResultRenderer;
-import com.zutubi.util.logging.Logger;
+import com.zutubi.pulse.model.BuildManager;
+import com.zutubi.pulse.model.BuildResult;
+import com.zutubi.pulse.model.Project;
+import com.zutubi.pulse.model.ProjectManager;
 import com.zutubi.pulse.prototype.config.admin.GeneralAdminConfiguration;
 import com.zutubi.pulse.prototype.config.project.ProjectConfiguration;
-import com.zutubi.prototype.config.ConfigurationProvider;
+import com.zutubi.pulse.prototype.config.user.SubscriptionConfiguration;
+import com.zutubi.pulse.prototype.config.user.contacts.ContactConfiguration;
+import com.zutubi.pulse.renderer.BuildResultRenderer;
+import com.zutubi.util.logging.Logger;
 
 import java.io.StringWriter;
 import java.util.*;
@@ -29,8 +34,6 @@ public class ResultNotifier implements EventListener
 
     private static final Logger LOG = Logger.getLogger(ResultNotifier.class);
 
-    private SubscriptionManager subscriptionManager;
-    private UserManager userManager;
     private MasterConfigurationManager configurationManager;
     private ConfigurationProvider configurationProvider;
     private BuildResultRenderer buildResultRenderer;
@@ -67,14 +70,12 @@ public class ResultNotifier implements EventListener
         Map<String, RenderedResult> renderCache = new HashMap<String, RenderedResult>();
         Map<String, Object> dataMap = getDataMap(buildResult, configurationProvider.get(GeneralAdminConfiguration.class).getBaseUrl(), buildManager, buildResultRenderer);
 
-        // Retrieve all of the subscriptions indicating an interest in the project
-        // associated with the build result.
-        List<Subscription> subscriptions = subscriptionManager.getSubscriptions(buildResult.getProject());
-        for (Subscription subscription : subscriptions)
+        Collection<SubscriptionConfiguration> subscriptions = configurationProvider.getAll(SubscriptionConfiguration.class);
+        for (SubscriptionConfiguration subscription : subscriptions)
         {
             // filter out contact points that we have already notified.
-            ContactPoint contactPoint = subscription.getContactPoint();
-            if (notifiedContactPoints.contains(contactPoint.getId()))
+            ContactConfiguration contactPoint = subscription.getContact();
+            if (notifiedContactPoints.contains(contactPoint.getHandle()))
             {
                 continue;
             }
@@ -88,11 +89,11 @@ public class ResultNotifier implements EventListener
             {
                 String templateName = subscription.getTemplate();
                 RenderedResult rendered = renderResult(buildResult, dataMap, templateName, renderCache);
-                notifiedContactPoints.add(contactPoint.getId());
+                notifiedContactPoints.add(contactPoint.getHandle());
                 contactPoint.notify(buildResult, rendered.subject, rendered.content, buildResultRenderer.getTemplateInfo(templateName, buildResult.isPersonal()).getMimeType());
                 
                 // Contact point may be modified: e.g. error may be set.
-                userManager.save(contactPoint);
+                configurationProvider.save(contactPoint.getConfigurationPath(), contactPoint);
             }
         }
     }
@@ -171,16 +172,6 @@ public class ResultNotifier implements EventListener
     public void setEventManager(EventManager eventManager)
     {
         eventManager.register(this);
-    }
-
-    public void setSubscriptionManager(SubscriptionManager subscriptionManager)
-    {
-        this.subscriptionManager = subscriptionManager;
-    }
-
-    public void setUserManager(UserManager userManager)
-    {
-        this.userManager = userManager;
     }
 
     public void setConfigurationManager(MasterConfigurationManager configurationManager)

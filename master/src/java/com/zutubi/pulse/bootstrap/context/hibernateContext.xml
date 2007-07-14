@@ -134,27 +134,6 @@ This context requires:
         </property>
     </bean>
 
-
-    <bean id="contactPointDaoTarget" class="com.zutubi.pulse.model.persistence.hibernate.HibernateContactPointDao">
-        <property name="sessionFactory">
-            <ref bean="sessionFactory"/>
-        </property>
-    </bean>
-    <bean id="contactPointDao" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
-        <property name="transactionManager">
-            <ref bean="transactionManager"/>
-        </property>
-        <property name="target">
-            <ref bean="contactPointDaoTarget"/>
-        </property>
-        <property name="transactionAttributes">
-            <props>
-                <prop key="*">PROPAGATION_REQUIRED</prop>
-            </props>
-        </property>
-    </bean>
-
-
     <bean id="fileArtifactDaoTarget" class="com.zutubi.pulse.model.persistence.hibernate.HibernateFileArtifactDao">
         <property name="sessionFactory">
             <ref bean="sessionFactory"/>
@@ -262,26 +241,6 @@ This context requires:
         </property>
         <property name="target">
             <ref bean="agentStateDaoTarget"/>
-        </property>
-        <property name="transactionAttributes">
-            <props>
-                <prop key="*">PROPAGATION_REQUIRED</prop>
-            </props>
-        </property>
-    </bean>
-
-
-    <bean id="subscriptionDaoTarget" class="com.zutubi.pulse.model.persistence.hibernate.HibernateSubscriptionDao">
-        <property name="sessionFactory">
-            <ref bean="sessionFactory"/>
-        </property>
-    </bean>
-    <bean id="subscriptionDao" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
-        <property name="transactionManager">
-            <ref bean="transactionManager"/>
-        </property>
-        <property name="target">
-            <ref bean="subscriptionDaoTarget"/>
         </property>
         <property name="transactionAttributes">
             <props>

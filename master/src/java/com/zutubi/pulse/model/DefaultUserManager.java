@@ -1,11 +1,13 @@
 package com.zutubi.pulse.model;
 
+import com.zutubi.prototype.config.ConfigurationInjector;
+import com.zutubi.prototype.config.ConfigurationProvider;
 import com.zutubi.pulse.bootstrap.ComponentContext;
 import com.zutubi.pulse.license.LicenseManager;
 import com.zutubi.pulse.license.authorisation.AddUserAuthorisation;
-import com.zutubi.pulse.model.persistence.ContactPointDao;
 import com.zutubi.pulse.model.persistence.GroupDao;
 import com.zutubi.pulse.model.persistence.UserDao;
+import com.zutubi.pulse.prototype.config.user.UserConfiguration;
 import com.zutubi.pulse.security.ldap.LdapManager;
 import com.zutubi.pulse.web.DefaultAction;
 import org.acegisecurity.providers.encoding.PasswordEncoder;
@@ -21,10 +23,9 @@ import java.util.Set;
  *
  *
  */
-public class DefaultUserManager implements UserManager
+public class DefaultUserManager implements UserManager, ConfigurationInjector.ConfigurationSetter<User>
 {
     private UserDao userDao;
-    private ContactPointDao contactPointDao;
     private GroupDao groupDao;
     private PasswordEncoder passwordEncoder;
 
@@ -39,6 +40,7 @@ public class DefaultUserManager implements UserManager
      * is initialised on demand (not available when this manager is created).
      */
     private LdapManager ldapManager;
+    private ConfigurationProvider configurationProvider;
 
     public void init()
     {
@@ -54,14 +56,6 @@ public class DefaultUserManager implements UserManager
     public void save(User user)
     {
         userDao.save(user);
-    }
-
-    /**
-     * @deprecated
-     */
-    public void save(ContactPoint contact)
-    {
-        contactPointDao.save(contact);
     }
 
     public boolean hasAuthority(User user, String authority)
@@ -124,14 +118,6 @@ public class DefaultUserManager implements UserManager
         return userDao.findAll();
     }
 
-    /**
-     * @deprecated
-     */
-    public ContactPoint getContactPoint(long id)
-    {
-        return contactPointDao.findById(id);
-    }
-
     public void delete(User user)
     {
         getBuildManager().deleteAllBuilds(user);
@@ -145,14 +131,6 @@ public class DefaultUserManager implements UserManager
         userDao.delete(user);
 
         licenseManager.refreshAuthorisations();
-    }
-
-    /**
-     * @deprecated
-     */
-    public void delete(ContactPoint contact)
-    {
-        contactPointDao.delete(contact);
     }
 
     public List<Group> getAllGroups()
@@ -316,11 +294,6 @@ public class DefaultUserManager implements UserManager
         this.userDao = userDao;
     }
 
-    public void setContactPointDao(ContactPointDao contactDao)
-    {
-        this.contactPointDao = contactDao;
-    }
-
     public void setLicenseManager(LicenseManager licenseManager)
     {
         this.licenseManager = licenseManager;
@@ -357,5 +330,16 @@ public class DefaultUserManager implements UserManager
     public void setLdapManager(LdapManager ldapManager)
     {
         this.ldapManager = ldapManager;
+    }
+
+    public void setConfiguration(User state)
+    {
+        // FIXME: exploits the fact that there is only one user atm
+        state.setConfig(configurationProvider.get(UserConfiguration.class));
+    }
+
+    public void setConfigurationProvider(ConfigurationProvider configurationProvider)
+    {
+        this.configurationProvider = configurationProvider;
     }
 }

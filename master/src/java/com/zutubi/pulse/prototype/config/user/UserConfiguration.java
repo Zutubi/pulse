@@ -1,9 +1,6 @@
 package com.zutubi.pulse.prototype.config.user;
 
-import com.zutubi.config.annotations.Form;
-import com.zutubi.config.annotations.ID;
-import com.zutubi.config.annotations.SymbolicName;
-import com.zutubi.config.annotations.Transient;
+import com.zutubi.config.annotations.*;
 import com.zutubi.prototype.type.Extendable;
 import com.zutubi.pulse.core.config.AbstractConfiguration;
 
@@ -25,6 +22,19 @@ public class UserConfiguration extends AbstractConfiguration implements Extendab
 
     @Transient
     private Map<String, Object> extensions;
+
+    @Internal
+    private long userId;
+
+    public UserConfiguration()
+    {
+    }
+
+    public UserConfiguration(String login, String name)
+    {
+        this.login = login;
+        this.name = name;
+    }
 
     public String getName()
     {
@@ -64,5 +74,15 @@ public class UserConfiguration extends AbstractConfiguration implements Extendab
     public void setExtensions(Map<String, Object> extensions)
     {
         this.extensions = extensions;
+    }
+
+    public long getUserId()
+    {
+        return userId;
+    }
+
+    public void setUserId(long userId)
+    {
+        this.userId = userId;
     }
 }

@@ -3,7 +3,6 @@ package com.zutubi.pulse.web.user;
 import com.opensymphony.util.TextUtils;
 import com.zutubi.pulse.UserLoginComparator;
 import com.zutubi.pulse.bootstrap.MasterConfigurationManager;
-import com.zutubi.pulse.model.SubscriptionManager;
 import com.zutubi.pulse.model.User;
 import com.zutubi.pulse.model.UserManager;
 import com.zutubi.pulse.web.ActionSupport;
@@ -24,7 +23,6 @@ public class UserActionSupport extends ActionSupport
      */
     private UserManager userManager;
 
-    private SubscriptionManager subscriptionManager;
     private MasterConfigurationManager configurationManager;
 
     /**
@@ -57,16 +55,6 @@ public class UserActionSupport extends ActionSupport
     public UserManager getUserManager()
     {
         return userManager;
-    }
-
-    public SubscriptionManager getSubscriptionManager()
-    {
-        return subscriptionManager;
-    }
-
-    public void setSubscriptionManager(SubscriptionManager subscriptionManager)
-    {
-        this.subscriptionManager = subscriptionManager;
     }
 
     /**

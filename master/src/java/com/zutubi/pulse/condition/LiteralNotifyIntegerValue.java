@@ -1,7 +1,7 @@
 package com.zutubi.pulse.condition;
 
 import com.zutubi.pulse.model.BuildResult;
-import com.zutubi.pulse.model.User;
+import com.zutubi.pulse.prototype.config.user.UserConfiguration;
 
 /**
  */
@@ -14,7 +14,7 @@ public class LiteralNotifyIntegerValue implements NotifyIntegerValue
         this.value = value;
     }
 
-    public int getValue(BuildResult result, User user)
+    public int getValue(BuildResult result, UserConfiguration user)
     {
         return value;
     }

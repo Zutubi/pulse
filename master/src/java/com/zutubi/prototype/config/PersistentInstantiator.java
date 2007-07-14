@@ -5,6 +5,7 @@ import com.zutubi.prototype.type.Type;
 import com.zutubi.prototype.type.TypeException;
 import com.zutubi.prototype.type.record.PathUtils;
 import com.zutubi.prototype.type.record.Record;
+import com.zutubi.pulse.bootstrap.ComponentContext;
 import com.zutubi.pulse.core.config.Configuration;
 
 /**
@@ -40,6 +41,8 @@ public class PersistentInstantiator implements Instantiator
 
             if (instance != null)
             {
+                ComponentContext.autowire(instance);
+                
                 if (instance instanceof Configuration)
                 {
                     Configuration configuration = (Configuration) instance;

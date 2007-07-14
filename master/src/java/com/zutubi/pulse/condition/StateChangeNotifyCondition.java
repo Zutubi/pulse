@@ -2,7 +2,7 @@ package com.zutubi.pulse.condition;
 
 import com.zutubi.pulse.model.BuildManager;
 import com.zutubi.pulse.model.BuildResult;
-import com.zutubi.pulse.model.User;
+import com.zutubi.pulse.prototype.config.user.UserConfiguration;
 
 /**
  * This notify condition triggers when the received build result is the first
@@ -27,7 +27,7 @@ public class StateChangeNotifyCondition implements NotifyCondition
         this.buildManager = buildManager;
     }
 
-    public boolean satisfied(BuildResult result, User user)
+    public boolean satisfied(BuildResult result, UserConfiguration user)
     {
         if(result == null)
         {

@@ -101,6 +101,7 @@ public class SetupConfigurationWizard extends AbstractTypeWizard
             UserConfiguration adminUser = new UserConfiguration();
             adminUser.setLogin(adminConfig.getLogin());
             adminUser.setName(adminConfig.getName());
+            adminUser.setUserId(admin.getId());
             configurationTemplateManager.insert(ConfigurationRegistry.USERS_SCOPE, adminUser);
             
             // create an administrators group (for convenience)

@@ -3,6 +3,7 @@ package com.zutubi.pulse.web.user;
 import com.zutubi.pulse.core.model.Changelist;
 import com.zutubi.pulse.core.model.ChangelistComparator;
 import com.zutubi.pulse.model.*;
+import com.zutubi.pulse.prototype.config.user.contacts.ContactConfiguration;
 import com.zutubi.pulse.security.AcegiUtils;
 import com.zutubi.pulse.web.ActionSupport;
 
@@ -116,7 +117,7 @@ public class DashboardAction extends ActionSupport
             projectChangelists = buildManager.getLatestChangesForProjects(projects.toArray(new Project[]{}), user.getProjectChangesCount());
         }
 
-        for(ContactPoint contact: user.getContactPoints())
+        for(ContactConfiguration contact: user.getConfig().getPreferences().getContacts().values())
         {
             if(contact.hasError())
             {

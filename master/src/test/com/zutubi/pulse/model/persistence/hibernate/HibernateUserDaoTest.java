@@ -1,6 +1,9 @@
 package com.zutubi.pulse.model.persistence.hibernate;
 
-import com.zutubi.pulse.model.*;
+import com.zutubi.pulse.model.Group;
+import com.zutubi.pulse.model.Project;
+import com.zutubi.pulse.model.ProjectGroup;
+import com.zutubi.pulse.model.User;
 import com.zutubi.pulse.model.persistence.GroupDao;
 import com.zutubi.pulse.model.persistence.ProjectDao;
 import com.zutubi.pulse.model.persistence.ProjectGroupDao;
@@ -65,23 +68,6 @@ public class HibernateUserDaoTest extends MasterPersistenceTestCase
         List users = userDao.findAll();
         assertNotNull(users);
         assertEquals(1, users.size());
-    }
-
-    public void testUserContactPoints()
-    {
-        User user = new User("login", "name");
-        userDao.save(user);
-        EmailContactPoint email = new EmailContactPoint();
-        email.setName("home");
-        email.setEmail("daniel@home.com");
-        user.add(email);
-        userDao.save(user);
-        commitAndRefreshTransaction();
-
-        user = userDao.findById(user.getId());
-        assertEquals(1, user.getContactPoints().size());
-        EmailContactPoint otherEmail = (EmailContactPoint) user.getContactPoints().get(0);
-        assertPropertyEquals(email, otherEmail);
     }
 
     public void testAliases()

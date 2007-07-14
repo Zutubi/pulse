@@ -12,6 +12,15 @@ public class UserAliasConfiguration extends AbstractConfiguration
 {
     private String alias;
 
+    public UserAliasConfiguration()
+    {
+    }
+
+    public UserAliasConfiguration(String alias)
+    {
+        this.alias = alias;
+    }
+
     public String getAlias()
     {
         return alias;

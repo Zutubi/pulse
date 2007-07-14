@@ -2,13 +2,14 @@ package com.zutubi.pulse.condition;
 
 import com.zutubi.pulse.core.model.Change;
 import com.zutubi.pulse.core.model.Changelist;
+import com.zutubi.pulse.core.model.NumericalFileRevision;
 import com.zutubi.pulse.core.model.Revision;
 import com.zutubi.pulse.model.BuildResult;
 import com.zutubi.pulse.model.BuildScmDetails;
 import com.zutubi.pulse.model.MockBuildManager;
-import com.zutubi.pulse.model.User;
+import com.zutubi.pulse.prototype.config.user.UserAliasConfiguration;
+import com.zutubi.pulse.prototype.config.user.UserConfiguration;
 import com.zutubi.pulse.test.PulseTestCase;
-import com.zutubi.pulse.core.model.NumericalFileRevision;
 
 /**
  */
@@ -25,29 +26,29 @@ public class ChangedByMeNotificationConditionTest extends PulseTestCase
     public void testChangedByMe()
     {
         BuildResult result = getBuildWithChanges(getChangelistBy("me"));
-        User me = new User("me", "Your Overlord");
+        UserConfiguration me = new UserConfiguration("me", "Your Overlord");
         assertTrue(condition.satisfied(result, me));
     }
 
     public void testChangedOther()
     {
         BuildResult result = getBuildWithChanges(getChangelistBy("you"));
-        User me = new User("me", "Your Overlord");
+        UserConfiguration me = new UserConfiguration("me", "Your Overlord");
         assertFalse(condition.satisfied(result, me));
     }
 
     public void testChangedByNobody()
     {
         BuildResult result = getBuildWithChanges();
-        User me = new User("me", "Your Overlord");
+        UserConfiguration me = new UserConfiguration("me", "Your Overlord");
         assertFalse(condition.satisfied(result, me));
     }
 
     public void testChangedByAlias()
     {
         BuildResult result = getBuildWithChanges(getChangelistBy("my alias"));
-        User me = new User("me", "Your Overlord");
-        me.addAlias("my alias");
+        UserConfiguration me = new UserConfiguration("me", "Your Overlord");
+        me.getPreferences().getAlias().add(new UserAliasConfiguration("my alias"));
         assertTrue(condition.satisfied(result, me));
     }
 

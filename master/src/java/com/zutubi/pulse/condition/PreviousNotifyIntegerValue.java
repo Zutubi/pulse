@@ -2,7 +2,7 @@ package com.zutubi.pulse.condition;
 
 import com.zutubi.pulse.model.BuildManager;
 import com.zutubi.pulse.model.BuildResult;
-import com.zutubi.pulse.model.User;
+import com.zutubi.pulse.prototype.config.user.UserConfiguration;
 
 /**
  */
@@ -16,7 +16,7 @@ public class PreviousNotifyIntegerValue implements NotifyIntegerValue
         this.delegate = delegate;
     }
 
-    public int getValue(BuildResult result, User user)
+    public int getValue(BuildResult result, UserConfiguration user)
     {
         BuildResult previous = buildManager.getPreviousBuildResult(result);
         return delegate.getValue(previous, user);

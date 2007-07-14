@@ -3,7 +3,8 @@ package com.zutubi.pulse.condition;
 import com.zutubi.pulse.core.model.Changelist;
 import com.zutubi.pulse.model.BuildManager;
 import com.zutubi.pulse.model.BuildResult;
-import com.zutubi.pulse.model.User;
+import com.zutubi.pulse.prototype.config.user.UserAliasConfiguration;
+import com.zutubi.pulse.prototype.config.user.UserConfiguration;
 
 import java.util.List;
 
@@ -22,7 +23,7 @@ public class ChangedByMeNotifyCondition implements NotifyCondition
     {
     }
 
-    public boolean satisfied(BuildResult result, User user)
+    public boolean satisfied(BuildResult result, UserConfiguration user)
     {
         if(result == null)
         {
@@ -42,7 +43,7 @@ public class ChangedByMeNotifyCondition implements NotifyCondition
         return false;
     }
 
-    private boolean byMe(Changelist changelist, User user)
+    private boolean byMe(Changelist changelist, UserConfiguration user)
     {
         String author = changelist.getRevision().getAuthor();
         if(author.equals(user.getLogin()))
@@ -50,9 +51,9 @@ public class ChangedByMeNotifyCondition implements NotifyCondition
             return true;
         }
 
-        for(String alias: user.getAliases())
+        for(UserAliasConfiguration alias: user.getPreferences().getAlias())
         {
-            if(author.equals(alias))
+            if(author.equals(alias.getAlias()))
             {
                 return true;
             }

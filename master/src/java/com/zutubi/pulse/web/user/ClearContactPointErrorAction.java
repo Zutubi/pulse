@@ -1,36 +1,42 @@
 package com.zutubi.pulse.web.user;
 
-import com.zutubi.pulse.model.ContactPoint;
-import com.zutubi.pulse.model.EmailContactPoint;
-import com.zutubi.pulse.model.JabberContactPoint;
+import com.zutubi.prototype.config.ConfigurationProvider;
+import com.zutubi.pulse.prototype.config.user.contacts.ContactConfiguration;
+import com.zutubi.pulse.web.ActionSupport;
 
 /**
- *
- *
+ * An action to clear an error from a contact point.
  */
-public class ClearContactPointErrorAction extends UserActionSupport
+public class ClearContactPointErrorAction extends ActionSupport
 {
-    private long id;
+    // FIXME: the ui will not pass this!
+    private String path;
+    private ConfigurationProvider configurationProvider;
 
-    public void setId(long id)
+    public String getPath()
     {
-        this.id = id;
+        return path;
     }
 
-    public long getId()
+    public void setPath(String path)
     {
-        return id;
+        this.path = path;
     }
 
     public String execute()
     {
-        ContactPoint contact = getUserManager().getContactPoint(id);
+        ContactConfiguration contact = configurationProvider.get(path, ContactConfiguration.class);
         if (contact != null)
         {
-            contact.clearError();
-            getUserManager().save(contact);
+            contact.clearLastError();
+            configurationProvider.save(contact.getConfigurationPath(), contact);
         }
         
         return SUCCESS;
+    }
+
+    public void setConfigurationProvider(ConfigurationProvider configurationProvider)
+    {
+        this.configurationProvider = configurationProvider;
     }
 }

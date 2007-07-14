@@ -207,7 +207,7 @@ public class ConfigurationRegistry
             registerConfigurationType(AllBuildsConditionConfiguration.class);
             registerConfigurationType(SelectedBuildsConditionConfiguration.class);
             registerConfigurationType(CustomConditionConfiguration.class);
-            registerConfigurationType(UnsuccessfulConditionConfiguration.class);
+            registerConfigurationType(RepeatedUnsuccessfulConditionConfiguration.class);
 
             userSubscriptionConditionConfig.addExtension("zutubi.allBuildsConditionConfig");
             userSubscriptionConditionConfig.addExtension("zutubi.selectedBuildsConditionConfig");

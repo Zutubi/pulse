@@ -1,6 +1,7 @@
 package com.zutubi.pulse.model;
 
 import com.zutubi.pulse.core.model.Entity;
+import com.zutubi.pulse.prototype.config.user.UserConfiguration;
 import com.zutubi.pulse.web.DefaultAction;
 import com.zutubi.util.StringUtils;
 
@@ -53,10 +54,6 @@ public class User extends Entity
      * The users password.
      */
     private String password;
-    /**
-     * Contact points configured by the user for notifications.
-     */
-    private List<ContactPoint> contactPoints;
 
     /**
      * Set of projects the user wants to show on their dashboard.  Ignored
@@ -88,6 +85,7 @@ public class User extends Entity
      */
     private List<String> aliases;
     private long nextBuildNumber = 1;
+    private UserConfiguration config;
 
     public User()
     {
@@ -154,83 +152,6 @@ public class User extends Entity
     public void setPassword(String encodedPassword)
     {
         this.password = encodedPassword;
-    }
-
-    public void add(ContactPoint point)
-    {
-        getContactPoints().add(point);
-        point.setUser(this);
-    }
-
-    public boolean remove(ContactPoint point)
-    {
-        if (contactPoints.remove(point))
-        {
-            point.setUser(null);
-            return true;
-        }
-        return false;
-    }
-
-    private void setContactPoints(List<ContactPoint> l)
-    {
-        this.contactPoints = l;
-    }
-
-    public List<ContactPoint> getContactPoints()
-    {
-        if (contactPoints == null)
-        {
-            contactPoints = new LinkedList<ContactPoint>();
-        }
-        return contactPoints;
-    }
-
-    public ContactPoint getContactPoint(String name)
-    {
-        for (ContactPoint cp : getContactPoints())
-        {
-            if (cp.getName().compareTo(name) == 0)
-            {
-                return cp;
-            }
-        }
-        return null;
-    }
-
-    public ContactPoint getContactPoint(long contactPointId)
-    {
-        for (ContactPoint cp : contactPoints)
-        {
-            if (cp.getId() == contactPointId)
-            {
-                return cp;
-            }
-        }
-        return null;
-    }
-
-    public List<Subscription> getSubscriptions()
-    {
-        List<Subscription> subscriptions = new LinkedList<Subscription>();
-        for (ContactPoint cp : contactPoints)
-        {
-            subscriptions.addAll(cp.getSubscriptions());
-        }
-        return subscriptions;
-    }
-
-    public Subscription getSubscription(long id)
-    {
-        for(Subscription s: getSubscriptions())
-        {
-            if(s.getId() == id)
-            {
-                return s;
-            }
-        }
-
-        return null;
     }
 
     /**
@@ -661,5 +582,15 @@ public class User extends Entity
     public void setNextBuildNumber(long nextBuildNumber)
     {
         this.nextBuildNumber = nextBuildNumber;
+    }
+
+    public UserConfiguration getConfig()
+    {
+        return config;
+    }
+
+    public void setConfig(UserConfiguration config)
+    {
+        this.config = config;
     }
 }

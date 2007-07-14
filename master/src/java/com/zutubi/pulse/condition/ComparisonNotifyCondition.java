@@ -1,7 +1,7 @@
 package com.zutubi.pulse.condition;
 
 import com.zutubi.pulse.model.BuildResult;
-import com.zutubi.pulse.model.User;
+import com.zutubi.pulse.prototype.config.user.UserConfiguration;
 
 /**
  */
@@ -110,7 +110,7 @@ public class ComparisonNotifyCondition implements NotifyCondition
         this.op = op;
     }
 
-    public boolean satisfied(BuildResult result, User user)
+    public boolean satisfied(BuildResult result, UserConfiguration user)
     {
         return op.evaluate(left.getValue(result, user), right.getValue(result, user));
     }

@@ -4,6 +4,7 @@ import com.zutubi.config.annotations.Reference;
 import com.zutubi.config.annotations.SymbolicName;
 import com.zutubi.config.annotations.Table;
 import com.zutubi.pulse.core.config.AbstractNamedConfiguration;
+import com.zutubi.pulse.model.BuildResult;
 import com.zutubi.pulse.prototype.config.user.contacts.ContactConfiguration;
 
 /**
@@ -25,4 +26,7 @@ public abstract class SubscriptionConfiguration extends AbstractNamedConfigurati
     {
         this.contact = contact;
     }
+
+    public abstract boolean conditionSatisfied(BuildResult buildResult);
+    public abstract String getTemplate();
 }

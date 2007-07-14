@@ -49,7 +49,6 @@ public class DefaultProjectManager implements ProjectManager, ConfigurationInjec
     private TestCaseIndexDao testCaseIndexDao;
     private Scheduler scheduler;
     private BuildManager buildManager;
-    private SubscriptionManager subscriptionManager;
     private EventManager eventManager;
     private ChangelistIsolator changelistIsolator;
 
@@ -203,7 +202,6 @@ public class DefaultProjectManager implements ProjectManager, ConfigurationInjec
         }
         
         buildManager.deleteAllBuilds(entity);
-        subscriptionManager.deleteAllSubscriptions(entity);
         userManager.removeReferencesToProject(entity);
 
         // Remove test case index
@@ -486,11 +484,6 @@ public class DefaultProjectManager implements ProjectManager, ConfigurationInjec
     public void setBuildManager(BuildManager buildManager)
     {
         this.buildManager = buildManager;
-    }
-
-    public void setSubscriptionManager(SubscriptionManager subscriptionManager)
-    {
-        this.subscriptionManager = subscriptionManager;
     }
 
     public List<ProjectGroup> getAllProjectGroups()
