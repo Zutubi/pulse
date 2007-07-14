@@ -1,12 +1,12 @@
 package com.zutubi.pulse.prototype.config.admin;
 
+import com.zutubi.config.annotations.SymbolicName;
 import com.zutubi.prototype.config.ConfigurationTemplateManager;
 import com.zutubi.prototype.type.record.PathUtils;
 import com.zutubi.pulse.core.config.AbstractConfiguration;
 import com.zutubi.pulse.core.config.Configuration;
-import com.zutubi.pulse.license.config.LicenseConfiguration;
 import com.zutubi.pulse.jabber.config.JabberConfiguration;
-import com.zutubi.config.annotations.SymbolicName;
+import com.zutubi.pulse.license.config.LicenseConfiguration;
 
 /**
  * The global configuration scope, which holds server-wide configuration.
@@ -14,7 +14,7 @@ import com.zutubi.config.annotations.SymbolicName;
 @SymbolicName("zutubi.globalConfig")
 public class GlobalConfiguration extends AbstractConfiguration
 {
-    public static final String SCOPE_NAME = "global";
+    public static final String SCOPE_NAME = "settings";
 
     private GeneralAdminConfiguration generalConfig = new GeneralAdminConfiguration();
     private LoggingConfiguration loggingConfig = new LoggingConfiguration();

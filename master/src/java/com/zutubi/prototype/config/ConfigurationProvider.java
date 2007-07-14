@@ -36,7 +36,7 @@ public interface ConfigurationProvider
      * Retrieve all of the instances of the configuration instances at the specified path.  All of these instances must
      * be of the specified type.  The path may contain wildcards.
      *
-     * For example, getAll("project/*", ProjectConfiguration.class) will return all of the ProjectConfiguration
+     * For example, getAll("projects/*", ProjectConfiguration.class) will return all of the ProjectConfiguration
      * instances located in the collection defined at "project/*"
      *
      * @param path of the configuration instances being looked up.  This path can contain wild card characters.

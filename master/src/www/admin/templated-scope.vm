@@ -247,9 +247,7 @@
 	</script>
 </head>
 <body>
-    #adminTabs("${scope}s")
-
-    #parse("/template/includes/actionerrors.vm")
+    #adminTabs("${tab}")
 
     <div id="innernorth" style="padding: 0px;">
     </div>
@@ -260,6 +258,8 @@
     <div id="config-tree" class="ylayout-inactive-content" style="padding: 10px">
     </div>
 
-    <div id="detail-pane" style="padding: 10px; min-height: 100%"></div>
+    <div id="detail-pane" style="padding: 10px; min-height: 100%">
+        #parse("/template/includes/actionerrors.vm")
+    </div>
 </body>
 </html>

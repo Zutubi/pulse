@@ -17,8 +17,11 @@ import java.util.Map;
 public interface WizardState
 {
     /**
-     * @return a name for this state, unique in the wizard (used for I18N
-     *         lookups)
+     * @return a unique id for the state in the wizard
+     */
+    String getId();
+    /**
+     * @return a name for this state, used for I18N lookups
      */
     String getName();
     /**
@@ -45,4 +48,6 @@ public interface WizardState
     FormDescriptor createFormDescriptor(FormDescriptorFactory formDescriptorFactory, String path, String name);
 
     boolean validate(String path, ValidationAware validationCallback) throws TypeException;
+
+    WizardState getNextState();
 }

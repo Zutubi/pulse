@@ -1,9 +1,8 @@
-#helpTag("Administration+Settings+Tab")
 #authorisationTags($principle)
-<content tag="selectedTab">administration</content>
+<content tag="selectedTab">$section</content>
 <html>
 <head>
-    <title>#wwtext("name=administration")</title>
+    <title>#wwtext("name=${section}")</title>
     <script type="text/javascript" src="$base/js/zutubi.js"></script>
 	<script type="text/javascript">
         var tree;
@@ -47,7 +46,7 @@
         var selectPath = function(path)
         {
             tree.getSelectionModel().clearSelections();
-            tree.selectPath(tree.getRootNode().getPath() + '/' + path);
+            tree.selectConfigPath(path);
         }
 
         var addToPath = function(path)
@@ -106,16 +105,17 @@
                     //loader.on('loadexception', function(loader, node, response) {  console.dir(response); });
 
                     tree = new ZUTUBI.ConfigTree('config-tree', {
-                        pathPrefix: '${scope}',
+#if($prefixPath)
+                        pathPrefix: '$prefixPath',
+ #end
                         animate: false,
                         loader: loader,
-                        rootVisible: false,
                         title: 'config'
                     });
 
                     var root = new Ext.tree.AsyncTreeNode({
-                        id: 'x',
-                        text: 'settings',
+                        id: '${tab}',
+                        text: '${tab}',
                         allowDrag: false,
                         allowDrop: false
                     });
@@ -146,9 +146,11 @@
 	</script>
 </head>
 <body>
-    #adminTabs("settings")
-
-    #parse("/template/includes/actionerrors.vm")
+#if($section == "administration")
+    #adminTabs("${tab}")
+#else
+    #dashboardTabs("${tab}")
+#end
 
     <div id="innernorth" style="padding: 0px;">
     </div>
@@ -156,6 +158,8 @@
     <div id="config-tree" style="padding: 10px">
     </div>
 
-    <div id="detail-pane" style="padding: 10px; min-height: 100%"></div>
+    <div id="detail-pane" style="padding: 10px; min-height: 100%">
+        #parse("/template/includes/actionerrors.vm")
+    </div>
 </body>
 </html>

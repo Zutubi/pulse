@@ -5,6 +5,7 @@ import com.zutubi.prototype.model.Wizard;
 import com.zutubi.prototype.type.record.Record;
 import com.zutubi.prototype.wizard.WizardState;
 import com.zutubi.prototype.wizard.WizardTransition;
+import com.zutubi.prototype.wizard.webwork.ConfigurationWizardInterceptor;
 import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.Mapping;
 
@@ -52,10 +53,10 @@ public class WizardDescriptor extends AbstractDescriptor
 
         for(WizardState state: wizardInstance.getStates())
         {
-            wizard.addStep(state.getName());    
+            wizard.addStep(state.getId(), state.getName());    
         }
 
-        wizard.setCurrentStep(wizardInstance.getCurrentStateIndex() + 1);
+        wizard.setCurrentStep(wizardInstance.getCurrentState().getId());
 
         return wizard;
     }
@@ -73,8 +74,8 @@ public class WizardDescriptor extends AbstractDescriptor
         descriptor.setActions(actions);
 
         HiddenFieldDescriptor hidden = new HiddenFieldDescriptor();
-        hidden.setName("state");
-        hidden.setValue(wizardInstance.getCurrentStateIndex());
+        hidden.setName(ConfigurationWizardInterceptor.STATE_ID_PARAMETER);
+        hidden.setValue(wizardInstance.getCurrentState().getId());
 
         descriptor.add(hidden);
     }

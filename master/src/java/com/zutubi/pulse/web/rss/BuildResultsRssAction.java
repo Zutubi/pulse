@@ -4,8 +4,8 @@ import com.sun.syndication.feed.WireFeed;
 import com.sun.syndication.feed.module.content.ContentModule;
 import com.sun.syndication.feed.module.content.ContentModuleImpl;
 import com.sun.syndication.feed.synd.*;
+import com.zutubi.prototype.config.ConfigurationProvider;
 import com.zutubi.pulse.ResultNotifier;
-import com.zutubi.pulse.prototype.config.admin.GeneralAdminConfiguration;
 import com.zutubi.pulse.bootstrap.MasterConfigurationManager;
 import com.zutubi.pulse.cache.Cache;
 import com.zutubi.pulse.cache.CacheManager;
@@ -13,13 +13,13 @@ import com.zutubi.pulse.model.BuildResult;
 import com.zutubi.pulse.model.Project;
 import com.zutubi.pulse.model.ProjectGroup;
 import com.zutubi.pulse.model.User;
+import com.zutubi.pulse.prototype.config.admin.GeneralAdminConfiguration;
 import com.zutubi.pulse.renderer.BuildResultRenderer;
 import com.zutubi.pulse.search.BuildResultExpressions;
 import com.zutubi.pulse.search.Queries;
 import com.zutubi.pulse.search.SearchQuery;
 import com.zutubi.pulse.web.project.ProjectActionSupport;
 import com.zutubi.pulse.xwork.results.JITFeed;
-import com.zutubi.prototype.config.ConfigurationProvider;
 import org.hibernate.criterion.Expression;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Projections;
@@ -369,7 +369,7 @@ public class BuildResultsRssAction extends ProjectActionSupport
 
         public String getLink()
         {
-            return getBaseUrl() + "/dashboard.action";
+            return getBaseUrl() + "/dashboard/home/";
         }
 
         public String getEntryTitle(BuildResult result)

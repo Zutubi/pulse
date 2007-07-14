@@ -24,12 +24,12 @@
         <pattern>/signup*</pattern>
     </decorator>
 
-    <decorator name="basoc" page="basic.vm">
+    <decorator name="basic" page="basic.vm">
         <pattern>/setup/*</pattern>
+        <pattern>/setupwizard/*</pattern>
         <pattern>/upgrade/*</pattern>
         <pattern>/startup/*</pattern>
         <pattern>/shutdown/*</pattern>
-        <pattern>/config/setup*</pattern>
     </decorator>
 
     <decorator name="panel" page="panel.vm"/>

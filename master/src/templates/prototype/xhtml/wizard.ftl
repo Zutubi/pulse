@@ -15,10 +15,10 @@
             <ul>
             <#list wizard.steps as step>
                 <#assign index = step_index + 1/>
-                <#assign labelkey = "${step}.label"/>
+                <#assign labelkey = "${step.name}.label"/>
                 <#assign stepclass = "wizardstep"/>
-                <#if index == wizard.currentStep>
-                    <#assign descrkey = "${step}.description"/>
+                <#if step.id == wizard.currentStep>
+                    <#assign descrkey = "${step.name}.description"/>
                     <#assign stepclass = "currentwizardstep"/>
                 </#if>
                 <li class="${stepclass}"> ${index}: ${labelkey?i18n} </li>

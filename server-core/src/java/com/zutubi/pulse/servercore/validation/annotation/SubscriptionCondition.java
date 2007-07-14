@@ -8,11 +8,11 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Validation annotation for checking CVS root syntax.
+ * Validation annotation for checking custom subscription condition syntax.
  */
-@Constraint("com.zutubi.pulse.validation.validators.CvsRootValidator")
-@Target({ElementType.METHOD, ElementType.FIELD})
+@Constraint("com.zutubi.pulse.validation.validators.SubscriptionConditionValidator")
+@Target({ ElementType.METHOD, ElementType.FIELD})
 @Retention(RetentionPolicy.RUNTIME)
-public @interface CvsRoot
+public @interface SubscriptionCondition
 {
 }

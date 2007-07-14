@@ -66,7 +66,7 @@
 
 #if($contactError)
 <p class="note">
-    One or more of your contact points has caused a notification error. View your <a href="$base/preferences.action">preferences</a> for details.
+    One or more of your contact points has caused a notification error. View your <a href="$base/dashboard/preferences/">preferences</a> for details.
 </p>
 #end
 

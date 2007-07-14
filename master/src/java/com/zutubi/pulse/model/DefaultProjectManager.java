@@ -1,9 +1,6 @@
 package com.zutubi.pulse.model;
 
-import com.zutubi.prototype.config.ConfigurationInjector;
-import com.zutubi.prototype.config.ConfigurationProvider;
-import com.zutubi.prototype.config.ConfigurationTemplateManager;
-import com.zutubi.prototype.config.TypeListener;
+import com.zutubi.prototype.config.*;
 import com.zutubi.prototype.type.CompositeType;
 import com.zutubi.prototype.type.TypeRegistry;
 import com.zutubi.prototype.type.record.MutableRecord;
@@ -41,9 +38,11 @@ import java.util.*;
  */
 public class DefaultProjectManager implements ProjectManager, ConfigurationInjector.ConfigurationSetter<Project>
 {
+    private static final Logger LOG = Logger.getLogger(DefaultProjectManager.class);
+
     public static final int DEFAULT_WORK_DIR_BUILDS = 10;
 
-    private static final Logger LOG = Logger.getLogger(DefaultProjectManager.class);
+    private static final String GLOBAL_PROJECT_NAME = "global project template";
 
     private ProjectDao projectDao;
     private ProjectGroupDao projectGroupDao;
@@ -115,10 +114,10 @@ public class DefaultProjectManager implements ProjectManager, ConfigurationInjec
         {
             CompositeType projectType = typeRegistry.getType(ProjectConfiguration.class);
             MutableRecord globalTemplate = projectType.createNewRecord(true);
-            globalTemplate.put("name", "global project template");
+            globalTemplate.put("name", GLOBAL_PROJECT_NAME);
             globalTemplate.put("description", "The global template is the base of the project template hierarchy.  Configuration shared among all projects should be added here.");
             configurationTemplateManager.markAsTemplate(globalTemplate);
-            configurationTemplateManager.insertRecord("project", globalTemplate);
+            configurationTemplateManager.insertRecord(ConfigurationRegistry.PROJECTS_SCOPE, globalTemplate);
         }
     }
 

@@ -2,7 +2,7 @@ package com.zutubi.prototype.wizard.webwork;
 
 import com.zutubi.prototype.type.CompositeType;
 import com.zutubi.prototype.type.Type;
-import com.zutubi.prototype.wizard.WizardState;
+import com.zutubi.prototype.wizard.TypeWizardState;
 
 /**
  * A wizard that configures a single record. perhaps including two states if
@@ -10,19 +10,19 @@ import com.zutubi.prototype.wizard.WizardState;
  */
 public class SingleTypeWizard extends AbstractTypeWizard
 {
-    private WizardState recordState;
-    
     private CompositeType type;
 
     public void initialise()
     {
         type = (CompositeType) configurationTemplateManager.getType(configPath).getTargetType();
-        recordState = addWizardStates(type, templateParentRecord);
-        currentState = wizardStates.getFirst();
+        addWizardStates(null, type, templateParentRecord);
     }
 
     public void doFinish()
     {
+        super.doFinish();
+
+        TypeWizardState recordState = getCompletedStateForType(type);
         successPath = configurationTemplateManager.insertRecord(configPath, recordState.getDataRecord());
     }
 

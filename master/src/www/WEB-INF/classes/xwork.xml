@@ -6,7 +6,7 @@
         <default-interceptor-ref name="completeStack"/>
 
         <action name="default" class="com.zutubi.pulse.web.DefaultAction">
-            <result name="dashboard" type="redirect">/dashboard.action</result>
+            <result name="dashboard" type="redirect">/dashboard/home/</result>
             <result name="welcome" type="velocity">/welcome.vm</result>
             <result name="projects" type="redirect">/viewProjects.action</result>
         </action>
@@ -31,33 +31,6 @@
 
         <action name="dismissWelcome" class="com.zutubi.pulse.web.DismissWelcomeAction">
             <result name="success" type="redirect">/default.action</result>
-        </action>
-
-        <action name="dashboard" class="com.zutubi.pulse.web.user.DashboardAction">
-            <interceptor-ref name="ajaxReadOnlyStack"/>
-            <result name="success" type="velocity">dashboard.vm</result>
-            <result name="error" type="velocity">generic-error.vm</result>
-            <result name="guest" type="redirect">/viewProjects.action</result>
-        </action>
-
-        <action name="myBuilds" class="com.zutubi.pulse.web.user.MyBuildsAction">
-            <interceptor-ref name="ajaxReadOnlyStack"/>
-            <result name="success" type="velocity">my-builds.vm</result>
-            <result name="error" type="velocity">generic-error.vm</result>
-            <result name="guest" type="redirect">/viewProjects.action</result>
-        </action>
-
-        <action name="preferences" class="com.zutubi.pulse.web.user.PreferencesAction">
-            <interceptor-ref name="completeReadOnlyStack"/>
-            <result name="input" type="velocity">/preferences.vm</result>
-            <result name="success" type="velocity">/preferences.vm</result>
-            <result name="error" type="velocity">generic-error.vm</result>
-            <result name="guest" type="redirect">/viewProjects.action</result>
-        </action>
-
-        <action name="preferences!input" class="com.zutubi.pulse.web.user.PreferencesAction" method="doInput">
-            <result name="input" type="velocity">/preferences.vm</result>
-            <result name="guest" type="redirect">/viewProjects.action</result>
         </action>
 
         <action name="viewAgents" class="com.zutubi.pulse.web.agents.ViewAgentsAction">
@@ -340,6 +313,24 @@
         </action>
     </package>
 
+    <package name="dashboard" namespace="/dashboard" extends="webwork-default-package">
+        <default-interceptor-ref name="completeReadOnlyStack"/>
+
+        <action name="home" class="com.zutubi.pulse.web.user.DashboardAction">
+            <interceptor-ref name="ajaxReadOnlyStack"/>
+            <result name="success" type="velocity">/dashboard.vm</result>
+            <result name="error" type="velocity">generic-error.vm</result>
+            <result name="guest" type="redirect">/viewProjects.action</result>
+        </action>
+
+        <action name="my" class="com.zutubi.pulse.web.user.MyBuildsAction">
+            <interceptor-ref name="ajaxReadOnlyStack"/>
+            <result name="success" type="velocity">/my-builds.vm</result>
+            <result name="error" type="velocity">generic-error.vm</result>
+            <result name="guest" type="redirect">/viewProjects.action</result>
+        </action>
+    </package>
+
     <package name="personal" namespace="/personal" extends="webwork-default-package">
         <default-interceptor-ref name="completeStack"/>
 
@@ -354,53 +345,12 @@
 
         <action name="hideDashboardProject" class="com.zutubi.pulse.web.user.HideDashboardProjectAction">
             <result name="error" type="velocity">generic-error.vm</result>
-            <result name="success" type="redirect">/dashboard.action</result>
+            <result name="success" type="redirect">/dashboard/home/</result>
         </action>
 
         <action name="hideDashboardGroup" class="com.zutubi.pulse.web.user.HideDashboardGroupAction">
             <result name="error" type="velocity">generic-error.vm</result>
-            <result name="success" type="redirect">/dashboard.action</result>
-        </action>
-
-        <action name="editUser" class="com.zutubi.pulse.web.user.EditUserAction">
-            <result name="input" type="velocity">edit-user.vm</result>
-            <result name="error" type="velocity">edit-user.vm</result>
-            <result name="cancel" type="redirect">/preferences.action</result>
-            <result name="success" type="redirect">/preferences.action</result>
-        </action>
-
-        <action name="editPassword" class="com.zutubi.pulse.web.user.EditPasswordAction">
-            <result name="input" type="velocity">edit-user.vm</result>
-            <result name="error" type="velocity">edit-user.vm</result>
-            <result name="cancel" type="redirect">/preferences.action</result>
-            <result name="success" type="redirect">/preferences.action</result>
-        </action>
-
-        <action name="addAlias" class="com.zutubi.pulse.web.user.AddAliasAction">
-            <result name="input" type="velocity">add-alias.vm</result>
-            <result name="error" type="velocity">generic-error.vm</result>
-            <result name="cancel" type="redirect">/preferences.action</result>
-            <result name="success" type="redirect">/preferences.action</result>
-        </action>
-
-        <action name="deleteAlias" class="com.zutubi.pulse.web.user.DeleteAliasAction">
-            <result name="error" type="velocity">generic-error.vm</result>
-            <result name="success" type="redirect">/preferences.action</result>
-        </action>
-
-        <action name="editUserSettings" class="com.zutubi.pulse.web.user.EditUserSettingsAction">
-            <result name="input" type="velocity">edit-user-settings.vm</result>
-            <result name="error" type="velocity">edit-user-settings.vm</result>
-            <result name="cancel" type="redirect">/preferences.action</result>
-            <result name="success" type="redirect">/preferences.action</result>
-        </action>
-
-        <action name="deleteContactPoint" class="com.zutubi.pulse.web.user.DeleteContactPointAction">
-            <result name="success" type="redirect">/preferences.action</result>
-        </action>
-
-        <action name="clearContactPointError" class="com.zutubi.pulse.web.user.ClearContactPointErrorAction">
-            <result name="success" type="redirect">/preferences.action</result>
+            <result name="success" type="redirect">/dashboard/home/</result>
         </action>
     </package>
 
@@ -560,30 +510,17 @@
             <result name="cancel" type="redirect">/admin/plugins.action</result>
         </action>
 
-        <action name="template" class="com.zutubi.prototype.webwork.DisplayTemplatedConfigAction">
+        <action name="display" class="com.zutubi.prototype.webwork.DisplayScopeAction">
             <interceptor-ref name="defaultReadOnlyStack"/>
-            <result name="success" type="velocity">templated-configuration.vm</result>
-        </action>
-
-        <action name="projects" class="com.zutubi.pulse.web.admin.ProjectsAction">
-            <interceptor-ref name="defaultReadOnlyStack"/>
-            <result name="success" type="velocity">templated-configuration.vm</result>
-        </action>
-
-        <action name="agents" class="com.zutubi.pulse.web.admin.AgentsAction">
-            <interceptor-ref name="defaultReadOnlyStack"/>
-            <result name="success" type="velocity">templated-configuration.vm</result>
-        </action>
-
-        <action name="settings" class="com.zutubi.pulse.web.admin.SettingsAction">
-            <interceptor-ref name="defaultReadOnlyStack"/>
-            <result name="success" type="velocity">server-settings.vm</result>
+            <result name="config" type="velocity">scope.vm</result>
+            <result name="template" type="velocity">templated-scope.vm</result>
+            <!-- FIXME: replace this and related code in the action with an interceptor -->
+            <result name="guest" type="redirect">/viewProjects.action</result>
         </action>
 
         <action name="plugins" class="com.zutubi.pulse.web.admin.plugins.PluginsAction">
             <result name="success" type="velocity">plugins.vm</result>
         </action>
-
     </package>
 
     <package name="ajax" namespace="/ajax" extends="webwork-default-package">

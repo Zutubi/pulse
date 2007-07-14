@@ -1,5 +1,6 @@
 package com.zutubi.pulse.prototype.config.agent;
 
+import com.zutubi.prototype.config.ConfigurationRegistry;
 import com.zutubi.prototype.type.CompositeType;
 import com.zutubi.prototype.type.Type;
 import com.zutubi.prototype.type.record.MutableRecord;
@@ -16,16 +17,15 @@ public class AgentConfigurationWizard extends AbstractTypeWizard
     public void initialise()
     {
         agentType = typeRegistry.getType(AgentConfiguration.class);
-
-        addWizardStates(agentType, templateParentRecord);
-
-        currentState = wizardStates.getFirst();
+        addWizardStates(null, agentType, templateParentRecord);
     }
 
     public void doFinish()
     {
+        super.doFinish();
+
         MutableRecord record = agentType.createNewRecord(false);
-        record.update(getStateForType(agentType).getDataRecord());
+        record.update(getCompletedStateForType(agentType).getDataRecord());
 
         configurationTemplateManager.setParentTemplate(record, templateParentRecord.getHandle());
         if(template)
@@ -33,7 +33,7 @@ public class AgentConfigurationWizard extends AbstractTypeWizard
             configurationTemplateManager.markAsTemplate(record);
         }
 
-        successPath = configurationTemplateManager.insertRecord("agent", record);
+        successPath = configurationTemplateManager.insertRecord(ConfigurationRegistry.AGENTS_SCOPE, record);
     }
 
     public Type getType()

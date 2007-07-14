@@ -65,15 +65,9 @@ public interface Wizard
     WizardState doRestart();
 
     /**
-     * @return a count of the number of states defined in this wizard. Note, this currently assumes that the wizard
-     * does not branch.
+     * @return true if this wizard is a single step
      */
-    int getStateCount();
-
-    /**
-     * @return the index of the current state. The index starts at 0, and ends at #getStateCount() - 1
-     */
-    int getCurrentStateIndex();
+    boolean isSingleStep();
 
     /**
      * @return the states in this wizard

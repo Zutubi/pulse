@@ -14,6 +14,8 @@ import java.util.Map;
  */
 public class ConfigurationWizardInterceptor implements Interceptor
 {
+    public static final String STATE_ID_PARAMETER = "stateId";
+
     public void destroy()
     {
 
@@ -63,13 +65,13 @@ public class ConfigurationWizardInterceptor implements Interceptor
                 // ensure state is in sync.
                 if (wizardAction.isInitialised())
                 {
-                    String[] actualStates = (String[]) parameters.get("state");
+                    String[] actualStates = (String[]) parameters.get(STATE_ID_PARAMETER);
                     String actualState = (actualStates.length > 0) ? actualStates[0] : null;
-                    String expectedState = Integer.toString(wizardAction.getWizardInstance().getCurrentStateIndex());
+                    Wizard wizard = wizardAction.getWizardInstance();
+                    String expectedState = wizard.getCurrentState().getId();
                     if (!expectedState.equals(actualState))
                     {
                         String previousExpected = null;
-                        Wizard wizard = wizardAction.getWizardInstance();
                         while (!expectedState.equals(actualState))
                         {
                             // a small safety net. When we get to the initial state, doPrevious will go no further.
@@ -79,7 +81,7 @@ public class ConfigurationWizardInterceptor implements Interceptor
                                 break;
                             }
                             wizard.doPrevious();
-                            expectedState = Integer.toString(wizard.getCurrentStateIndex());
+                            expectedState = wizard.getCurrentState().getId();
                             previousExpected = expectedState;
                         }
                     }

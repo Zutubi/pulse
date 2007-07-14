@@ -4,8 +4,8 @@ import com.zutubi.prototype.model.Field;
 import com.zutubi.prototype.model.Form;
 import com.zutubi.prototype.model.SubmitFieldDescriptor;
 import com.zutubi.prototype.type.record.Record;
-import com.zutubi.prototype.webwork.PrototypeUtils;
 import com.zutubi.prototype.webwork.ConfigurationActionMapper;
+import com.zutubi.prototype.webwork.PrototypeUtils;
 import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.Predicate;
 
@@ -37,7 +37,7 @@ public class FormDescriptor extends AbstractDescriptor
     /**
      * Defines url namespace in which the form submission should be made.
      */
-    private String namespace = ConfigurationActionMapper.CONFIG_NAMESPACE;
+    private String namespace = ConfigurationActionMapper.ADMIN_NAMESPACE;
 
     public void setName(String name)
     {
@@ -110,7 +110,7 @@ public class FormDescriptor extends AbstractDescriptor
         Form form = new Form();
         form.setName(name);
         form.setId(id);
-        form.setAction(PrototypeUtils.getConfigURL(path, action, null, namespace, ajax));
+        form.setAction(PrototypeUtils.getConfigURL(path, action, null, namespace));
         form.setDisplayMode(displayMode);
         form.setAjax(ajax);
         form.addAll(getParameters());

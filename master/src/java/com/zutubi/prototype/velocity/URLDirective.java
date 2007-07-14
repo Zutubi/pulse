@@ -1,7 +1,7 @@
 package com.zutubi.prototype.velocity;
 
-import com.zutubi.prototype.webwork.PrototypeUtils;
 import com.zutubi.prototype.webwork.ConfigurationActionMapper;
+import com.zutubi.prototype.webwork.PrototypeUtils;
 import com.zutubi.pulse.bootstrap.MasterConfigurationManager;
 import com.zutubi.util.StringUtils;
 import com.zutubi.util.logging.Logger;
@@ -31,12 +31,7 @@ public class URLDirective extends PrototypeDirective
      */
     private String path;
 
-    /**
-     * Set to true for the AJAX form of the URL.
-     */
-    private boolean ajax = false;
-
-    private String namespace = ConfigurationActionMapper.CONFIG_NAMESPACE;
+    private String namespace = ConfigurationActionMapper.ADMIN_NAMESPACE;
 
     private MasterConfigurationManager configurationManager;
 
@@ -78,11 +73,6 @@ public class URLDirective extends PrototypeDirective
         this.namespace = namespace;
     }
 
-    public void setAjax(boolean ajax)
-    {
-        this.ajax = ajax;
-    }
-
     public boolean render(InternalContextAdapter context, Writer writer, Node node) throws IOException, ResourceNotFoundException, ParseErrorException
     {
         try
@@ -90,7 +80,7 @@ public class URLDirective extends PrototypeDirective
             Map params = createPropertyMap(context, node);
             wireParams(params);
 
-            writer.write(StringUtils.join("/", true, true, configurationManager.getSystemConfig().getContextPath(), PrototypeUtils.getConfigURL(path, action, null, namespace, ajax)));
+            writer.write(StringUtils.join("/", true, true, configurationManager.getSystemConfig().getContextPath(), PrototypeUtils.getConfigURL(path, action, null, namespace)));
 
             return true;
         }

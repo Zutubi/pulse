@@ -1,19 +1,21 @@
 package com.zutubi.pulse.prototype.config.setup;
 
+import com.zutubi.prototype.config.ConfigurationReferenceManager;
+import com.zutubi.prototype.config.ConfigurationRegistry;
 import com.zutubi.prototype.type.*;
 import com.zutubi.prototype.type.record.MutableRecord;
 import com.zutubi.prototype.type.record.PathUtils;
 import com.zutubi.prototype.wizard.WizardTransition;
 import com.zutubi.prototype.wizard.webwork.AbstractTypeWizard;
-import com.zutubi.prototype.config.ConfigurationReferenceManager;
 import com.zutubi.pulse.bootstrap.MasterConfiguration;
 import com.zutubi.pulse.bootstrap.MasterConfigurationManager;
 import com.zutubi.pulse.bootstrap.SetupManager;
 import com.zutubi.pulse.bootstrap.SystemConfigurationSupport;
 import com.zutubi.pulse.model.*;
 import com.zutubi.pulse.prototype.config.admin.EmailConfiguration;
-import com.zutubi.pulse.prototype.config.admin.GlobalConfiguration;
 import com.zutubi.pulse.prototype.config.admin.GeneralAdminConfiguration;
+import com.zutubi.pulse.prototype.config.admin.GlobalConfiguration;
+import com.zutubi.pulse.prototype.config.user.UserConfiguration;
 import com.zutubi.pulse.security.AcegiUtils;
 import com.zutubi.pulse.web.DefaultAction;
 import com.zutubi.util.logging.Logger;
@@ -31,7 +33,8 @@ public class SetupConfigurationWizard extends AbstractTypeWizard
     private static final Logger LOG = Logger.getLogger(SetupConfigurationWizard.class);
 
     private CompositeType adminConfigType;
-    
+    private CompositeType serverConfigType;
+
     private UserManager userManager;
     private MasterConfigurationManager configurationManager;
     private SetupManager setupManager;
@@ -40,18 +43,16 @@ public class SetupConfigurationWizard extends AbstractTypeWizard
     public void initialise()
     {
         adminConfigType = typeRegistry.getType(AdminUserConfiguration.class);
-        CompositeType serverConfigType = typeRegistry.getType(ServerSettingsConfiguration.class);
+        serverConfigType = typeRegistry.getType(ServerSettingsConfiguration.class);
 
-        addWizardStates(adminConfigType, null);
-        addWizardStates(serverConfigType, null);
+        List<AbstractChainableState> states = addWizardStates(null, adminConfigType, null);
+        states = addWizardStates(states, serverConfigType, null);
 
         // a bit of custom initialisation
         SystemConfigurationSupport systemConfig = (SystemConfigurationSupport) configurationManager.getSystemConfig();
-        
-        MutableRecord record = wizardStates.get(1).getDataRecord();
-        record.put("baseUrl", systemConfig.getHostUrl());
 
-        currentState = wizardStates.getFirst();
+        MutableRecord record = states.get(0).getDataRecord();
+        record.put("baseUrl", systemConfig.getHostUrl());
     }
 
     public List<WizardTransition> getAvailableActions()
@@ -68,11 +69,13 @@ public class SetupConfigurationWizard extends AbstractTypeWizard
 
     public void doFinish()
     {
+        super.doFinish();
+
         try
         {
             SimpleInstantiator instantiator = new SimpleInstantiator(configurationReferenceManager);
-            AdminUserConfiguration adminConfig = (AdminUserConfiguration) instantiator.instantiate(adminConfigType, wizardStates.get(0).getDataRecord());
-            MutableRecord serverConfigRecord = wizardStates.get(1).getDataRecord();
+            AdminUserConfiguration adminConfig = (AdminUserConfiguration) instantiator.instantiate(adminConfigType, getCompletedStateForType(adminConfigType).getDataRecord());
+            MutableRecord serverConfigRecord = getCompletedStateForType(serverConfigType).getDataRecord();
             MasterConfiguration config = configurationManager.getAppConfig();
 
             // create the admin user.
@@ -95,6 +98,11 @@ public class SetupConfigurationWizard extends AbstractTypeWizard
             userManager.setPassword(admin, adminConfig.getPassword());
             userManager.save(admin);
 
+            UserConfiguration adminUser = new UserConfiguration();
+            adminUser.setLogin(adminConfig.getLogin());
+            adminUser.setName(adminConfig.getName());
+            configurationTemplateManager.insert(ConfigurationRegistry.USERS_SCOPE, adminUser);
+            
             // create an administrators group (for convenience)
             Group adminGroup = new Group("administrators");
             adminGroup.addAdditionalAuthority(GrantedAuthority.ADMINISTRATOR);

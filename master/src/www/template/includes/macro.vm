@@ -282,14 +282,14 @@
 ##
 #macro(adminTabs $selected)
     #openTabs()
-        #adminTab("projects" "$base/admin/projects.action" $selected)
-        #adminTab("agents" "$base/admin/agents.action" $selected)
-        #adminTab("settings" "$base/admin/settings.action" $selected)
+        #adminTab("projects" "$base/admin/projects/" $selected)
+        #adminTab("agents" "$base/admin/agents/" $selected)
+        #adminTab("settings" "$base/admin/settings/" $selected)
 <!--
         #adminTab("users" "$base/admin/userSettings" $selected)
         #adminTab("groups" "$base/admin/viewGroups" $selected)
 -->
-        #adminTab("plugins" "$base/admin/plugins.action" $selected)
+        #adminTab("plugins" "$base/admin/plugins/" $selected)
 #closeTabs()
 #end
 
@@ -297,7 +297,7 @@
 ## Shows a dashboard tab of the given name with the given action name
 ##
 #macro(dashboardTab $name $action $selected)
-    #tabItem("tab.dashboard.$name" $name "${action}.action" $selected)
+    #tabItem("tab.dashboard.$name" $name "${action}" $selected)
 #end
 
 ##
@@ -305,11 +305,9 @@
 ##
 #macro(dashboardTabs $selected)
     #openTabs()
-        #dashboardTab("homepage" "$base/dashboard" $selected)
-        #dashboardTab("my-builds" "$base/myBuilds" $selected)
-<!--
-        #dashboardTab("preferences" "$base/preferences" $selected)
--->
+        #dashboardTab("homepage" "$base/dashboard/home/" $selected)
+        #dashboardTab("my-builds" "$base/dashboard/my/" $selected)
+        #dashboardTab("preferences" "$base/dashboard/preferences/" $selected)
     #closeTabs()
 #end
 

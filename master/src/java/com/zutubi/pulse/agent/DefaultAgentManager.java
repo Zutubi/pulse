@@ -1,11 +1,13 @@
 package com.zutubi.pulse.agent;
 
 import com.zutubi.prototype.config.ConfigurationProvider;
+import com.zutubi.prototype.config.ConfigurationRegistry;
 import com.zutubi.prototype.config.ConfigurationTemplateManager;
 import com.zutubi.prototype.config.TypeListener;
 import com.zutubi.prototype.type.CompositeType;
 import com.zutubi.prototype.type.TypeRegistry;
 import com.zutubi.prototype.type.record.MutableRecord;
+import com.zutubi.prototype.type.record.PathUtils;
 import com.zutubi.prototype.type.record.Record;
 import com.zutubi.pulse.*;
 import com.zutubi.pulse.bootstrap.DefaultSetupManager;
@@ -39,6 +41,12 @@ public class DefaultAgentManager implements AgentManager, EventListener, Stoppab
 {
     private static final Logger LOG = Logger.getLogger(DefaultAgentManager.class);
 
+    // ping timeout in seconds.
+    private static final int PING_TIMEOUT = Integer.getInteger("pulse.agent.ping.timeout", 45);
+    private static final String GLOBAL_AGENT_NAME = "global agent template";
+    private static final String MASTER_AGENT_NAME = "master agent";
+    private static final int DEFAULT_AGENT_PORT = 8090;
+
     private final int masterBuildNumber = Version.getVersion().getBuildNumberAsInt();
 
     private ReentrantLock lock = new ReentrantLock();
@@ -60,9 +68,6 @@ public class DefaultAgentManager implements AgentManager, EventListener, Stoppab
 
     private Map<Long, AgentUpdater> updaters = new TreeMap<Long, AgentUpdater>();
     private ReentrantLock updatersLock = new ReentrantLock();
-
-    // ping timeout in seconds.
-    private static final int PING_TIMEOUT = Integer.getInteger("pulse.agent.ping.timeout", 45);
 
     public void init()
     {
@@ -100,22 +105,22 @@ public class DefaultAgentManager implements AgentManager, EventListener, Stoppab
         {
             CompositeType agentType = typeRegistry.getType(AgentConfiguration.class);
             MutableRecord globalTemplate = agentType.createNewRecord(false);
-            globalTemplate.put("name", "global agent template");
-            globalTemplate.put("port", "8090");
+            globalTemplate.put("name", GLOBAL_AGENT_NAME);
+            globalTemplate.put("port", Integer.toString(DEFAULT_AGENT_PORT));
             globalTemplate.put("remote", "true");
 
             configurationTemplateManager.markAsTemplate(globalTemplate);
-            configurationTemplateManager.insertRecord("agent", globalTemplate);            
+            configurationTemplateManager.insertRecord(ConfigurationRegistry.AGENTS_SCOPE, globalTemplate);
 
             // reload the template so that we have the handle.
-            Record persistedGlobalTemplate = configurationTemplateManager.getRecord("agent/global agent template");
+            Record persistedGlobalTemplate = configurationTemplateManager.getRecord(PathUtils.getPath(ConfigurationRegistry.AGENTS_SCOPE, GLOBAL_AGENT_NAME));
 
             MutableRecord masterAgent = agentType.createNewRecord(false);
-            masterAgent.put("name", "master agent");
+            masterAgent.put("name", MASTER_AGENT_NAME);
             masterAgent.put("remote", "false");
 
             configurationTemplateManager.setParentTemplate(masterAgent, persistedGlobalTemplate.getHandle());
-            configurationTemplateManager.insertRecord("agent", masterAgent);
+            configurationTemplateManager.insertRecord(ConfigurationRegistry.AGENTS_SCOPE, masterAgent);
         }
     }
 

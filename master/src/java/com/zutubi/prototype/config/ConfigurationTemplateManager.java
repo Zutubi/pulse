@@ -1165,6 +1165,28 @@ public class ConfigurationTemplateManager
     }
 
     /**
+     * Returns true iff the given path is at or under a template scope.  The
+     * validity of the path is not checked.
+     *
+     * @param path the path test test
+     * @return true iff the path is templated
+     */
+    public boolean isTemplatedPath(String path)
+    {
+        String[] elements = PathUtils.getPathElements(path);
+        if (elements.length >= 1)
+        {
+            ConfigurationScopeInfo info = configurationPersistenceManager.getScopeInfo(elements[0]);
+            if (info != null && info.isTemplated())
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
      * Returns true if the given path points to a templated collection: i.e.
      * a collection at the root of a templated scope.
      *

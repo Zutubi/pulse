@@ -3,7 +3,6 @@ package com.zutubi.prototype.config;
 import com.zutubi.config.annotations.ConfigurationCheck;
 import com.zutubi.prototype.ConfigurationCheckHandler;
 import com.zutubi.prototype.type.*;
-import com.zutubi.prototype.type.record.HandleAllocator;
 import com.zutubi.pulse.cleanup.config.CleanupConfiguration;
 import com.zutubi.pulse.core.config.Configuration;
 import com.zutubi.pulse.prototype.config.admin.GlobalConfiguration;
@@ -37,17 +36,21 @@ import java.util.Map;
 /**
  * Registers the Pulse built-in configuration types.
  */
+@SuppressWarnings({ "unchecked" })
 public class ConfigurationRegistry
 {
     private static final Logger LOG = Logger.getLogger(ConfigurationRegistry.class);
 
     private static final String TRANSIENT_SCOPE = "transient";
 
+    public static final String AGENTS_SCOPE = "agents";
+    public static final String PROJECTS_SCOPE = "projects";
+    public static final String USERS_SCOPE = "users";
+
     private CompositeType transientConfig;
     private Map<CompositeType, CompositeType> checkTypeMapping = new HashMap<CompositeType, CompositeType>();
 
     private TypeRegistry typeRegistry;
-    private HandleAllocator handleAllocator;
     private ConfigurationPersistenceManager configurationPersistenceManager;
     private ConfigurationTemplateManager configurationTemplateManager;
 
@@ -143,11 +146,6 @@ public class ConfigurationRegistry
             artifactConfig.addExtension("zutubi.fileArtifactConfig");
             artifactConfig.addExtension("zutubi.directoryArtifactConfig");
 
-//            ListType artifacts = new ListType(configurationPersistenceManager);
-//            artifacts.setTypeRegistry(typeRegistry);
-//            artifacts.setCollectionType(typeRegistry.getType("artifactConfig"));
-//            projectConfig.addProperty(new ExtensionTypeProperty("artifact", artifacts));
-
             // commit message processors.
             CompositeType commitConfig = registerConfigurationType(CommitMessageConfiguration.class);
             registerConfigurationType(JiraCommitMessageConfiguration.class);
@@ -166,7 +164,7 @@ public class ConfigurationRegistry
             projectCollection.setTypeRegistry(typeRegistry);
             projectCollection.setCollectionType(projectConfig);
 
-            configurationPersistenceManager.register("project", projectCollection);
+            configurationPersistenceManager.register(PROJECTS_SCOPE, projectCollection);
 
             // register project configuration.  This will eventually be handled as an extension point
             registerProjectMapExtension("cleanup", CleanupConfiguration.class);
@@ -174,7 +172,7 @@ public class ConfigurationRegistry
             TemplatedMapType agentCollection = new TemplatedMapType();
             agentCollection.setTypeRegistry(typeRegistry);
             agentCollection.setCollectionType(registerConfigurationType(AgentConfiguration.class));
-            configurationPersistenceManager.register("agent", agentCollection);
+            configurationPersistenceManager.register(AGENTS_SCOPE, agentCollection);
 
             CompositeType globalConfig = registerConfigurationType(GlobalConfiguration.class);
             configurationPersistenceManager.register(GlobalConfiguration.SCOPE_NAME, globalConfig);
@@ -186,7 +184,7 @@ public class ConfigurationRegistry
             userCollection.setTypeRegistry(typeRegistry);
             userCollection.setCollectionType(registerConfigurationType(UserConfiguration.class));
 
-            configurationPersistenceManager.register("user", userCollection);
+            configurationPersistenceManager.register(USERS_SCOPE, userCollection);
 
             // contacts configuration
             CompositeType contactConfig = typeRegistry.getType(ContactConfiguration.class);
@@ -197,17 +195,24 @@ public class ConfigurationRegistry
             contactConfig.addExtension("zutubi.emailContactConfig");
             contactConfig.addExtension("zutubi.jabberContactConfig");
 
+            // user subscriptions
+            CompositeType userSubscriptionConfig = typeRegistry.getType(SubscriptionConfiguration.class);
+            registerConfigurationType(ProjectSubscriptionConfiguration.class);
+            registerConfigurationType(PersonalSubscriptionConfiguration.class);
+            userSubscriptionConfig.addExtension("zutubi.projectSubscriptionConfig");
+            userSubscriptionConfig.addExtension("zutubi.personalSubscriptionConfig");
+            
             // user subscription conditions
-            CompositeType userSubscriptionConfig = typeRegistry.getType(SubscriptionConditionConfiguration.class);
+            CompositeType userSubscriptionConditionConfig = typeRegistry.getType(SubscriptionConditionConfiguration.class);
             registerConfigurationType(AllBuildsConditionConfiguration.class);
             registerConfigurationType(SelectedBuildsConditionConfiguration.class);
             registerConfigurationType(CustomConditionConfiguration.class);
             registerConfigurationType(UnsuccessfulConditionConfiguration.class);
 
-            userSubscriptionConfig.addExtension("zutubi.allBuildsConditionConfig");
-            userSubscriptionConfig.addExtension("zutubi.selectedBuildsConditionConfig");
-            userSubscriptionConfig.addExtension("zutubi.customConditionConfig");
-            userSubscriptionConfig.addExtension("zutubi.unsuccessfulConditionConfig");
+            userSubscriptionConditionConfig.addExtension("zutubi.allBuildsConditionConfig");
+            userSubscriptionConditionConfig.addExtension("zutubi.selectedBuildsConditionConfig");
+            userSubscriptionConditionConfig.addExtension("zutubi.customConditionConfig");
+            userSubscriptionConditionConfig.addExtension("zutubi.unsuccessfulConditionConfig");
 
         }
         catch (TypeException e)
@@ -271,7 +276,6 @@ public class ConfigurationRegistry
                     CompositeType checkType = typeRegistry.register(checkClass);
 
                     // FIXME should verify that everything in the check type would land in one form
-                    
                     checkTypeMapping.put(type, checkType);
                 }
             }
@@ -303,10 +307,5 @@ public class ConfigurationRegistry
     public void setConfigurationTemplateManager(ConfigurationTemplateManager configurationTemplateManager)
     {
         this.configurationTemplateManager = configurationTemplateManager;
-    }
-
-    public void setHandleAllocator(HandleAllocator handleAllocator)
-    {
-        this.handleAllocator = handleAllocator;
     }
 }

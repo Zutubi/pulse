@@ -9,8 +9,8 @@ import java.util.List;
  */
 public class Wizard
 {
-    private List<String> steps = new LinkedList<String>();
-    private int currentStep;
+    private List<WizardStep> steps = new LinkedList<WizardStep>();
+    private String currentStep;
 
     private boolean decorate;
     private Form form;
@@ -20,12 +20,12 @@ public class Wizard
         return steps.size();
     }
 
-    public int getCurrentStep()
+    public String getCurrentStep()
     {
         return currentStep;
     }
 
-    public void setCurrentStep(int currentStep)
+    public void setCurrentStep(String currentStep)
     {
         this.currentStep = currentStep;
     }
@@ -50,13 +50,13 @@ public class Wizard
         this.form = form;
     }
 
-    public List<String> getSteps()
+    public List<WizardStep> getSteps()
     {
         return steps;
     }
 
-    public void addStep(String name)
+    public void addStep(String id, String name)
     {
-        steps.add(name);
+        steps.add(new WizardStep(id, name));
     }
 }

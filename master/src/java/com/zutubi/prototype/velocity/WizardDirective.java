@@ -94,7 +94,7 @@ public class WizardDirective extends AbstractDirective
         try
         {
             // for wizards that are represented by a single step, just render a form.
-            if (wizardInstance.getStateCount() == 1)
+            if (wizardInstance.isSingleStep())
             {
                 decorate = false;
             }

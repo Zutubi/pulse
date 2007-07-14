@@ -1,10 +1,13 @@
 package com.zutubi.pulse.prototype.config.project;
 
+import com.zutubi.prototype.config.ConfigurationRegistry;
 import com.zutubi.prototype.type.CompositeType;
 import com.zutubi.prototype.type.Type;
 import com.zutubi.prototype.type.record.MutableRecord;
 import com.zutubi.prototype.type.record.TemplateRecord;
 import com.zutubi.prototype.wizard.webwork.AbstractTypeWizard;
+
+import java.util.List;
 
 /**
  * This wizard walks a user through the project configuration process. During project configuration,
@@ -23,19 +26,19 @@ public class ProjectConfigurationWizard extends AbstractTypeWizard
         scmType = (CompositeType) projectType.getProperty("scm").getType();
         typeType = (CompositeType) projectType.getProperty("type").getType();
 
-        addWizardStates(projectType, templateParentRecord);
-        addWizardStates(scmType, (TemplateRecord) (templateParentRecord == null ? null : templateParentRecord.get("scm")));
-        addWizardStates(typeType, (TemplateRecord) (templateParentRecord == null ? null : templateParentRecord.get("type")));
-
-        currentState = wizardStates.getFirst();
+        List<AbstractChainableState> states = addWizardStates(null, projectType, templateParentRecord);
+        states = addWizardStates(states, scmType, (TemplateRecord) (templateParentRecord == null ? null : templateParentRecord.get("scm")));
+        addWizardStates(states, typeType, (TemplateRecord) (templateParentRecord == null ? null : templateParentRecord.get("type")));
     }
 
     public void doFinish()
     {
+        super.doFinish();
+
         MutableRecord record = projectType.createNewRecord(false);
-        record.update(getStateForType(projectType).getDataRecord());
-        record.put("scm", getStateForType(scmType).getDataRecord());
-        record.put("type", getStateForType(typeType).getDataRecord());
+        record.update(getCompletedStateForType(projectType).getDataRecord());
+        record.put("scm", getCompletedStateForType(scmType).getDataRecord());
+        record.put("type", getCompletedStateForType(typeType).getDataRecord());
 
         configurationTemplateManager.setParentTemplate(record, templateParentRecord.getHandle());
         if(template)
@@ -43,7 +46,7 @@ public class ProjectConfigurationWizard extends AbstractTypeWizard
             configurationTemplateManager.markAsTemplate(record);
         }
         
-        successPath = configurationTemplateManager.insertRecord("project", record);
+        successPath = configurationTemplateManager.insertRecord(ConfigurationRegistry.PROJECTS_SCOPE, record);
     }
 
     public Type getType()

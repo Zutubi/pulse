@@ -182,13 +182,13 @@
 #end
       <ul id="nav">
 #if($principle)
-        <li><a #if($selectedTab && $selectedTab == "dashboard")      class="active" #end id="tab.dashboard" href="$base/dashboard.action">dashboard</a></li>
+        <li><a #if($selectedTab && $selectedTab == "dashboard")      class="active" #end id="tab.dashboard" href="$base/dashboard/home/">dashboard</a></li>
 #end
         <li><a #if($selectedTab && $selectedTab == "projects")       class="active" #end id="tab.projects" href="$base/viewProjects.action">browse</a></li>
         <li><a #if($selectedTab && $selectedTab == "queues")         class="active" #end id="tab.queues" href="$base/viewServerQueues.action">queues</a></li>
         <li><a #if($selectedTab && $selectedTab == "agents")         class="active" #end id="tab.agents" href="$base/viewAgents.action">agents</a></li>
         #authorize("ifAllGranted=ROLE_ADMINISTRATOR")
-        <li><a #if($selectedTab && $selectedTab == "administration") class="active" #end id="tab.administration" href="$base/admin/projects.action">administration</a></li>
+        <li><a #if($selectedTab && $selectedTab == "administration") class="active" #end id="tab.administration" href="$base/admin/projects/">administration</a></li>
         #end
       </ul>
       <div class="clear"></div>

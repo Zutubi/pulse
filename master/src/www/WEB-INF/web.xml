@@ -218,6 +218,21 @@
     </servlet-mapping>
 
     <servlet-mapping>
+        <servlet-name>webwork</servlet-name>
+        <url-pattern>/dashboard/*</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>webwork</servlet-name>
+        <url-pattern>/admin/*</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>webwork</servlet-name>
+        <url-pattern>/setupwizard/*</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
         <servlet-name>download</servlet-name>
         <url-pattern>/download</url-pattern>
     </servlet-mapping>
