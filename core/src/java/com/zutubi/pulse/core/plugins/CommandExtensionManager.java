@@ -52,11 +52,6 @@ public class CommandExtensionManager extends AbstractExtensionManager
         }
     }
 
-    public void setPluginManager(PluginManager pluginManager)
-    {
-        this.pluginManager = pluginManager;
-    }
-
     public void setFileLoaderFactory(PulseFileLoaderFactory fileLoaderFactory)
     {
         this.fileLoaderFactory = fileLoaderFactory;

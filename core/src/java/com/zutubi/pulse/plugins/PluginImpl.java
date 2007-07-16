@@ -14,6 +14,8 @@ public class PluginImpl implements Plugin
     private static final String HEADER_NAME = "Bundle-Name";
     private static final String HEADER_DESCRIPTION = "Bundle-Description";
     private static final String HEADER_VENDOR = "Bundle-Vendor";
+    private static final String HEADER_VERSION = "Bundle-Version";
+    private static final String HEADER_SYMBOLICNAME = "Bundle-SymbolicName";
 
     enum Type
     {
@@ -46,10 +48,9 @@ public class PluginImpl implements Plugin
      */
     private Bundle bundle;
 
-    public PluginImpl(Headers manifest, BundleDescription bundleDescription, File pluginFile, State state, Type type)
+    public PluginImpl(Headers manifest, File pluginFile, State state, Type type)
     {
         this.manifest = manifest;
-        this.bundleDescription = bundleDescription;
         this.pluginFile = pluginFile;
         this.state = state;
         this.type = type;
@@ -67,7 +68,7 @@ public class PluginImpl implements Plugin
 
     public String getId()
     {
-        return bundleDescription.getSymbolicName();
+        return getSymbolicName();
     }
 
     public String getName()
@@ -83,12 +84,17 @@ public class PluginImpl implements Plugin
 
     public String getVersion()
     {
-        return bundleDescription.getVersion().toString();
+        return (String) manifest.get(HEADER_VERSION);
     }
 
     public String getVendor()
     {
         return (String) manifest.get(HEADER_VENDOR);
+    }
+
+    public String getSymbolicName()
+    {
+        return (String) manifest.get(HEADER_SYMBOLICNAME);
     }
 
     public Plugin.State getState()
@@ -143,6 +149,11 @@ public class PluginImpl implements Plugin
     Bundle getBundle()
     {
         return bundle;
+    }
+
+    void setBundleDescription(BundleDescription bundleDescription)
+    {
+        this.bundleDescription = bundleDescription;
     }
 
     void setBundle(Bundle bundle)

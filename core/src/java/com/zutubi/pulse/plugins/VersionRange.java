@@ -1,7 +1,5 @@
 package com.zutubi.pulse.plugins;
 
-import com.zutubi.pulse.plugins.Version;
-
 /**
  * Stores a range of versions, used in expression of dependencies.
  */

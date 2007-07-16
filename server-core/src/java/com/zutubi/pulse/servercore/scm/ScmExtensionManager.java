@@ -1,13 +1,13 @@
 package com.zutubi.pulse.servercore.scm;
 
 import com.zutubi.pulse.plugins.AbstractExtensionManager;
-import com.zutubi.pulse.plugins.PluginManager;
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IExtension;
 import org.eclipse.core.runtime.dynamichelpers.IExtensionTracker;
 
 /**
- * Extension manager for managing build commands (e.g. the Ant command).
+ * Extension manager for managing scm implementations
+ * 
  */
 public class ScmExtensionManager extends AbstractExtensionManager
 {
@@ -36,10 +36,5 @@ public class ScmExtensionManager extends AbstractExtensionManager
         for (Object o : objects)
         {
         }
-    }
-
-    public void setPluginManager(PluginManager pluginManager)
-    {
-        this.pluginManager = pluginManager;
     }
 }

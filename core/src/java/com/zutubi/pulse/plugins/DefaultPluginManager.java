@@ -22,6 +22,7 @@ import org.eclipse.osgi.service.resolver.BundleDescription;
 import org.eclipse.osgi.service.resolver.BundleSpecification;
 import org.eclipse.osgi.service.resolver.PlatformAdmin;
 import org.eclipse.osgi.service.resolver.State;
+import org.eclipse.osgi.internal.baseadaptor.StateManager;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.BundleException;
@@ -52,8 +53,6 @@ public class DefaultPluginManager implements PluginManager, EventListener
     private PackageAdmin packageAdmin;
     private ServiceReference platformAdminRef;
     private PlatformAdmin platformAdmin;
-    private State offlineState;
-    private int offlineId = 1;
 
     private IExtensionTracker extensionTracker;
     private List<PluginImpl> plugins;
@@ -98,9 +97,6 @@ public class DefaultPluginManager implements PluginManager, EventListener
                 return;
             }
 
-            offlineState = platformAdmin.getFactory().createState(platformAdmin.getState());
-            offlineState.setResolver(platformAdmin.getResolver());
-            offlineState.setPlatformProperties(FrameworkProperties.getProperties());
             loadInternalPlugins();
 
             extensionRegistry = RegistryFactory.getRegistry();
@@ -429,26 +425,15 @@ public class DefaultPluginManager implements PluginManager, EventListener
     private PluginImpl loadPluginFile(File pluginFile, PluginImpl.Type type, boolean update, Plugin.State state) throws PluginException
     {
         Headers manifest = loadBundleManifest(pluginFile);
-        BundleDescription bundleDescription;
 
-        try
-        {
-            bundleDescription = platformAdmin.getFactory().createBundleDescription(offlineState, manifest, getBundleLocation(pluginFile), offlineId++);
-            offlineState.addBundle(bundleDescription);
-            offlineState.resolve();
-        }
-        catch (BundleException e)
-        {
-            LOG.warning(e);
-            throw new PluginException(e);
-        }
+        testAddingBundleToTemporaryState(manifest, pluginFile);
 
-        PluginImpl plugin = new PluginImpl(manifest, bundleDescription, pluginFile, state, type);
+        PluginImpl plugin = new PluginImpl(manifest, pluginFile, state, type);
         if(!update)
         {
-            if (getPlugin(bundleDescription.getSymbolicName()) != null)
+            if (getPlugin(plugin.getSymbolicName()) != null)
             {
-                throw new PluginException("A plugin with the same identifier (" + bundleDescription.getSymbolicName() + ") already exists.");
+                throw new PluginException("A plugin with the same identifier (" + plugin.getSymbolicName() + ") already exists.");
             }
 
             if(state == Plugin.State.ENABLED)
@@ -457,6 +442,9 @@ public class DefaultPluginManager implements PluginManager, EventListener
                 {
                     Bundle bundle = installBundle(pluginFile);
                     plugin.setBundle(bundle);
+                    
+                    BundleDescription description = ((StateManager)platformAdmin).getSystemState().getBundle(plugin.getSymbolicName(), new org.osgi.framework.Version(plugin.getVersion()));
+                    plugin.setBundleDescription(description);
                 }
                 catch (BundleException e)
                 {
@@ -468,6 +456,42 @@ public class DefaultPluginManager implements PluginManager, EventListener
         }
 
         return plugin;
+    }
+
+    /**
+     *
+     * @param manifest
+     * @param pluginFile
+     *
+     * @throws PluginException
+     */
+    private void testAddingBundleToTemporaryState(Headers manifest, File pluginFile) throws PluginException
+    {
+        try
+        {
+            State temporaryState = platformAdmin.getFactory().createState(platformAdmin.getState());
+            temporaryState.setResolver(platformAdmin.getResolver());
+            temporaryState.setPlatformProperties(FrameworkProperties.getProperties());
+
+            long highestBundleId = 0;
+            for (BundleDescription bundle : temporaryState.getBundles())
+            {
+                if (bundle.getBundleId() > highestBundleId)
+                {
+                    highestBundleId = bundle.getBundleId();
+                }
+            }
+
+            BundleDescription bundleDescription = platformAdmin.getFactory().createBundleDescription(temporaryState, manifest, getBundleLocation(pluginFile), highestBundleId + 1);
+
+            temporaryState.addBundle(bundleDescription);
+            temporaryState.resolve();
+        }
+        catch (BundleException e)
+        {
+            LOG.warning(e);
+            throw new PluginException(e);
+        }
     }
 
     private Headers loadBundleManifest(File pluginFile) throws PluginException
@@ -671,18 +695,22 @@ public class DefaultPluginManager implements PluginManager, EventListener
 
     private void addDependentPlugins(PluginImpl pluginImpl, List<PluginImpl> fromPlugins, boolean transitive, List<Plugin> result)
     {
-        BundleDescription[] required = pluginImpl.getBundleDescription().getDependents();
-        if (required != null)
+        BundleDescription description = pluginImpl.getBundleDescription();
+        if (description != null)
         {
-            for (BundleDescription r : required)
+            BundleDescription[] required = description.getDependents();
+            if (required != null)
             {
-                PluginImpl p = findPlugin(r.getSymbolicName(), fromPlugins);
-                if (p != null)
+                for (BundleDescription r : required)
                 {
-                    result.add(p);
-                    if (transitive)
+                    PluginImpl p = findPlugin(r.getSymbolicName(), fromPlugins);
+                    if (p != null)
                     {
-                        addDependentPlugins(p, fromPlugins, transitive, result);
+                        result.add(p);
+                        if (transitive)
+                        {
+                            addDependentPlugins(p, fromPlugins, transitive, result);
+                        }
                     }
                 }
             }
