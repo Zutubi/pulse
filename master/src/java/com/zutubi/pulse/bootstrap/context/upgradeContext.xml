@@ -88,6 +88,7 @@
                 <ref local="schemaUpgrade0102019001"/>
                 <ref local="subscriptionCondition"/>
                 <ref local="schemaUpgrade0102023001"/>
+                <ref local="longRevisionComments"/>
             </list>
         </property>
         <property name="systemTasks">
@@ -615,5 +616,9 @@
                 <value>com/zutubi/pulse/upgrade/schema/build_0102023001/Project.hbm.xml</value>
             </list>
         </property>
+    </bean>
+
+    <bean id="longRevisionComments" class="com.zutubi.pulse.upgrade.tasks.LongRevisionCommentsUpgradeTask" autowire="byName">
+        <property name="buildNumber" value="102030001"/>
     </bean>
 </beans>

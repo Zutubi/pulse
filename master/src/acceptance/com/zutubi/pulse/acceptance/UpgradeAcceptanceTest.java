@@ -35,10 +35,12 @@ public class UpgradeAcceptanceTest extends BaseAcceptanceTestCase
     private File tmpDir = null;
     private DriverManagerDataSource dataSource = new DriverManagerDataSource();
     private String dialect = "org.hibernate.dialect.HSQLDialect";
+    private String db;
 
     protected void setUp() throws Exception
     {
         tmpDir = FileSystemUtils.createTempDir("UAT", "");
+        db = System.getenv("PULSE_DB");
     }
 
     protected void tearDown() throws Exception
@@ -75,9 +77,18 @@ public class UpgradeAcceptanceTest extends BaseAcceptanceTestCase
         importAndUpgradeTest("0102019000");
     }
 
+    public void testLongRevisionComments() throws Exception
+    {
+        // the import will not run for postgres, but this is ok as a postgres
+        // dm cannot contain a long revision comment anyway
+        if (!"postgres".equals(db))
+        {
+            importAndUpgradeTest("0102030000");
+        }
+    }
+
     public void importAndUpgradeTest(String build) throws Exception
     {
-        String db = System.getenv("PULSE_DB");
         if ("mysql".equals(db))
         {
             setupMySQL();
