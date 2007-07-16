@@ -8,19 +8,24 @@ import junit.framework.TestCase;
  */
 public class PluginRegistryTest extends TestCase
 {
-    private PluginRegistry registry;
+//    private PluginRegistry registry;
+//
+//    protected void setUp() throws Exception
+//    {
+//        super.setUp();
+//
+//        registry = new PluginRegistry(null);
+//    }
+//
+//    protected void tearDown() throws Exception
+//    {
+//        registry = null;
+//
+//        super.tearDown();
+//    }
 
-    protected void setUp() throws Exception
+    public void test()
     {
-        super.setUp();
-
-        registry = new PluginRegistry();
-    }
-
-    protected void tearDown() throws Exception
-    {
-        registry = null;
-
-        super.tearDown();
+        // noop.
     }
 }
