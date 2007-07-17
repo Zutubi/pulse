@@ -97,7 +97,7 @@ public class SlaveBuildService implements BuildService
 
             URL resultUrl = new URL("http", slave.getHost(), slave.getPort(), "/download?token=" + serviceTokenManager.getToken() + "&project=" + UrlEncoded.encodeString(project) + "&spec=" + UrlEncoded.encodeString(spec) + "&incremental=" + incremental + "&output=" + output + "&recipe=" + recipeId);
             URLConnection urlConnection = resultUrl.openConnection();
-            urlConnection.setReadTimeout(120000);
+            urlConnection.setReadTimeout(300000);
             
             // originally the zip stream was unzipped as read from the
             // servlet, however this resulted in socket errors on the
