@@ -11,15 +11,22 @@ import com.zutubi.pulse.servercore.validation.annotation.SubscriptionCondition;
 public class CustomConditionConfiguration extends SubscriptionConditionConfiguration
 {
     @SubscriptionCondition
-    private String expression;
+    private String customCondition;
 
+    // Note this is a transient property, so we do not use the same name for
+    // the actual expression property.
     public String getExpression()
     {
-        return expression;
+        return customCondition;
     }
 
-    public void setExpression(String expression)
+    public String getCustomCondition()
     {
-        this.expression = expression;
+        return customCondition;
+    }
+
+    public void setCustomCondition(String customCondition)
+    {
+        this.customCondition = customCondition;
     }
 }

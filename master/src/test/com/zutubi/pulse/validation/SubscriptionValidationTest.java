@@ -74,14 +74,14 @@ public class SubscriptionValidationTest extends AbstractValidationTestCase
     public void testCustomConditionValid() throws TypeException
     {
         CustomConditionConfiguration condition = new CustomConditionConfiguration();
-        condition.setExpression("changed or not success");
+        condition.setCustomCondition("changed or not success");
         assertValid(subscriptionPath, "condition", condition);
     }
 
     public void testCustomConditionInvalid() throws TypeException
     {
         CustomConditionConfiguration condition = new CustomConditionConfiguration();
-        condition.setExpression("invalid");
-        assertFieldErrors(subscriptionPath, "condition", condition, "expression", "line 1:1: unexpected token: invalid");
+        condition.setCustomCondition("invalid");
+        assertFieldErrors(subscriptionPath, "condition", condition, "customCondition", "line 1:1: unexpected token: invalid");
     }
 }
