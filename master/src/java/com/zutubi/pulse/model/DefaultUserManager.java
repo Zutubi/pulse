@@ -342,4 +342,9 @@ public class DefaultUserManager implements UserManager, ConfigurationInjector.Co
     {
         this.configurationProvider = configurationProvider;
     }
+
+    public void setConfigurationInjector(ConfigurationInjector configurationInjector)
+    {
+        configurationInjector.registerSetter(User.class, this);
+    }
 }

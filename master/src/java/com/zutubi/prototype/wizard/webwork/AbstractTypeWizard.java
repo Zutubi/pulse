@@ -10,7 +10,10 @@ import com.zutubi.prototype.config.ConfigurationPersistenceManager;
 import com.zutubi.prototype.config.ConfigurationTemplateManager;
 import com.zutubi.prototype.model.SelectFieldDescriptor;
 import com.zutubi.prototype.type.*;
-import com.zutubi.prototype.type.record.*;
+import com.zutubi.prototype.type.record.MutableRecord;
+import com.zutubi.prototype.type.record.MutableRecordImpl;
+import com.zutubi.prototype.type.record.Record;
+import com.zutubi.prototype.type.record.TemplateRecord;
 import com.zutubi.prototype.webwork.PrototypeUtils;
 import com.zutubi.prototype.wizard.TypeWizardState;
 import com.zutubi.prototype.wizard.Wizard;
@@ -32,10 +35,15 @@ public abstract class AbstractTypeWizard implements Wizard
     protected Stack<TypeWizardState> completedStates = new Stack<TypeWizardState>();
 
     /**
-     * The path we are configuring.  Either the path to a composite or a
+     * The path of the parent instance that will hold a successfully-
+     * configured result.
+     */
+    protected String parentPath;
+    /**
+     * The path we will insert to.  Either the path to a composite or a
      * collection that will hold the configured composite.
      */
-    protected String configPath;
+    protected String insertPath;
     /**
      * Path that was actually configured in the case of a successful wizard.
      * The user is taken here to see what they hath wrought.
@@ -56,7 +64,7 @@ public abstract class AbstractTypeWizard implements Wizard
     protected ConfigurationPersistenceManager configurationPersistenceManager;
     protected ConfigurationTemplateManager configurationTemplateManager;
 
-    protected List<AbstractChainableState> addWizardStates(List<AbstractChainableState> previousStates, CompositeType baseType, TemplateRecord templateParentRecord)
+    protected List<AbstractChainableState> addWizardStates(List<AbstractChainableState> previousStates, String parentPath, CompositeType baseType, TemplateRecord templateParentRecord)
     {
         CompositeType type = baseType;
 
@@ -67,7 +75,7 @@ public abstract class AbstractTypeWizard implements Wizard
         {
             type = typeRegistry.getType(templateParentRecord.getSymbolicName());
             TemplateRecord templateRecord = new TemplateRecord("", templateParentRecord, type, type.createNewRecord(false));
-            return addSingleStepState(previousStates, baseType, type, templateRecord);
+            return addSingleStepState(previousStates, parentPath, baseType, type, templateRecord);
         }
         else
         {
@@ -81,15 +89,15 @@ public abstract class AbstractTypeWizard implements Wizard
                     type = typeRegistry.getType(baseType.getExtensions().get(0));
                 }
 
-                return addSingleStepState(previousStates, baseType, type, null);
+                return addSingleStepState(previousStates, parentPath, baseType, type, null);
             }
             else
             {
                 // Extendable types give two wizard steps: a type selection,
                 // followed by a type-specific configure.
-                TwoStepWizardState state = new TwoStepWizardState(ord++, baseType, typeRegistry);
-                linkPreviousStates(previousStates, state.getSelectState());
-                return state.getChainableStates();
+                TwoStepStateBuilder stateBuilder = new TwoStepStateBuilder(ord++, parentPath, baseType, typeRegistry);
+                linkPreviousStates(previousStates, stateBuilder.getSelectState());
+                return stateBuilder.getChainableStates();
             }
         }
     }
@@ -109,9 +117,9 @@ public abstract class AbstractTypeWizard implements Wizard
         }
     }
 
-    private List<AbstractChainableState> addSingleStepState(List<AbstractChainableState> previousStates, CompositeType baseType, CompositeType type, TemplateRecord templateRecord)
+    private List<AbstractChainableState> addSingleStepState(List<AbstractChainableState> previousStates, String parentPath, CompositeType baseType, CompositeType type, TemplateRecord templateRecord)
     {
-        SingleStepWizardState singleStepState = new SingleStepWizardState(ord++, baseType, type, templateRecord);
+        SingleStepWizardState singleStepState = new SingleStepWizardState(ord++, parentPath, baseType, type, templateRecord);
         linkPreviousStates(previousStates, singleStepState);
         return Arrays.asList((AbstractChainableState)singleStepState);
     }
@@ -139,25 +147,11 @@ public abstract class AbstractTypeWizard implements Wizard
         return successPath;
     }
 
-    public void setParameters(String path, boolean template)
+    public void setParameters(String parentPath, String insertPath, TemplateRecord templateParentRecord, boolean template)
     {
-        // The incoming path for a templated scope should hold the template
-        // parent as its last element.
-        String parentPath = PathUtils.getParentPath(path);
-        if(parentPath != null && configurationTemplateManager.isTemplatedCollection(parentPath))
-        {
-            configPath = parentPath;
-            templateParentRecord = (TemplateRecord) configurationTemplateManager.getRecord(path);
-            if (templateParentRecord == null)
-            {
-                throw new IllegalArgumentException("Invalid wizard path '" + path + "': template parent does not exist");
-            }
-        }
-        else
-        {
-            configPath = path;
-        }
-
+        this.parentPath = parentPath;
+        this.insertPath = insertPath;
+        this.templateParentRecord = templateParentRecord;
         this.template = template;
     }
 
@@ -189,22 +183,29 @@ public abstract class AbstractTypeWizard implements Wizard
 
     public WizardState doNext()
     {
-        // only step forward if there is another state to step to.
-        TypeWizardState next = currentState.getNextState();
-        if (next != null)
+        do
         {
             completedStates.push(currentState);
-            currentState = next;
+            currentState = currentState.getNextState();
         }
+        while(currentState != null && !currentState.hasFields());
+
         return currentState;
     }
 
     public WizardState doPrevious()
     {
-        if (!completedStates.isEmpty())
+        do
         {
+            if (completedStates.isEmpty())
+            {
+                break;
+            }
+
             currentState = completedStates.pop();
         }
+        while(!currentState.hasFields());
+
         return currentState;
     }
 
@@ -281,12 +282,14 @@ public abstract class AbstractTypeWizard implements Wizard
     public abstract class AbstractTypeWizardState extends AbstractChainableState
     {
         private String id;
+        private String parentPath;
         private CompositeType baseType;
         private Set<String> ignoredFields = new HashSet<String>();
 
-        protected AbstractTypeWizardState(String id, CompositeType baseType)
+        protected AbstractTypeWizardState(String id, String parentPath, CompositeType baseType)
         {
             this.id = id;
+            this.parentPath = parentPath;
             this.baseType = baseType;
         }
 
@@ -334,11 +337,11 @@ public abstract class AbstractTypeWizard implements Wizard
             return descriptor;
         }
 
-        public boolean validate(String path, ValidationAware validationCallback)
+        public boolean validate(ValidationAware validationCallback)
         {
             try
             {
-                Configuration configuration = configurationTemplateManager.validate(path, null, currentState.getDataRecord(), ignoredFields);
+                Configuration configuration = configurationTemplateManager.validate(parentPath, null, currentState.getDataRecord(), ignoredFields);
                 PrototypeUtils.mapErrors(configuration, validationCallback, null);
                 return configuration.isValid();
             }
@@ -347,6 +350,11 @@ public abstract class AbstractTypeWizard implements Wizard
                 validationCallback.addActionError(e.getMessage());
                 return false;
             }
+        }
+
+        public boolean hasFields()
+        {
+            return PrototypeUtils.getSimpleProperties(getType()).size() > 0;
         }
     }
 
@@ -363,9 +371,9 @@ public abstract class AbstractTypeWizard implements Wizard
         private MutableRecord dataRecord = null;
         private TemplateRecord templateRecord;
 
-        public SingleStepWizardState(int ord, CompositeType baseType, CompositeType type, TemplateRecord templateRecord)
+        public SingleStepWizardState(int ord, String parentPath, CompositeType baseType, CompositeType type, TemplateRecord templateRecord)
         {
-            super(Integer.toString(ord), baseType);
+            super(Integer.toString(ord), parentPath, baseType);
             this.type = type;
             this.templateRecord = templateRecord;
 
@@ -427,7 +435,7 @@ public abstract class AbstractTypeWizard implements Wizard
      * information.  In particular, types that define multiple extension points.  These types need two-step
      * wizards.
      */
-    public class TwoStepWizardState
+    public class TwoStepStateBuilder
     {
         private static final String SELECT_FIELD_NAME = "option";
 
@@ -439,7 +447,7 @@ public abstract class AbstractTypeWizard implements Wizard
 
         private TypeRegistry typeRegistry;
 
-        public TwoStepWizardState(int ord, CompositeType baseType, TypeRegistry typeRegistry)
+        public TwoStepStateBuilder(int ord, String parentPath, CompositeType baseType, TypeRegistry typeRegistry)
         {
             this.typeRegistry = typeRegistry;
             this.baseType = baseType;
@@ -447,7 +455,7 @@ public abstract class AbstractTypeWizard implements Wizard
             unknownTypeState = new UnknownTypeState(ord, baseType);
             for(String symbolicName: baseType.getExtensions())
             {
-                configureStates.put(symbolicName, new ConfigurationWizardState(ord, this.typeRegistry.getType(symbolicName)));
+                configureStates.put(symbolicName, new ConfigurationWizardState(ord, parentPath, this.typeRegistry.getType(symbolicName)));
             }
             
             this.selectionRecord = new MutableRecordImpl();
@@ -543,7 +551,7 @@ public abstract class AbstractTypeWizard implements Wizard
                 return descriptor;
             }
 
-            public boolean validate(String path, ValidationAware validationCallback)
+            public boolean validate(ValidationAware validationCallback)
             {
                 return true;
             }
@@ -559,6 +567,11 @@ public abstract class AbstractTypeWizard implements Wizard
                 {
                     return configureStates.get(selectedType);
                 }
+            }
+
+            public boolean hasFields()
+            {
+                return true;
             }
         }
 
@@ -608,7 +621,7 @@ public abstract class AbstractTypeWizard implements Wizard
                 throw new UnsupportedOperationException("This state cannot be rendered");
             }
 
-            public boolean validate(String path, ValidationAware validationCallback) throws TypeException
+            public boolean validate(ValidationAware validationCallback) throws TypeException
             {
                 return true;
             }
@@ -622,6 +635,11 @@ public abstract class AbstractTypeWizard implements Wizard
             {
                 return baseType;
             }
+
+            public boolean hasFields()
+            {
+                return false;
+            }
         }
         
         private class ConfigurationWizardState extends AbstractTypeWizardState
@@ -629,9 +647,9 @@ public abstract class AbstractTypeWizard implements Wizard
             private CompositeType type;
             private MutableRecord record;
 
-            public ConfigurationWizardState(int ord, CompositeType type)
+            public ConfigurationWizardState(int ord, String parentPath, CompositeType type)
             {
-                super(Integer.toString(ord) + "." + baseType.getSymbolicName(), baseType);
+                super(Integer.toString(ord) + "." + baseType.getSymbolicName(), parentPath, baseType);
                 this.type = type;
                 this.record = type.createNewRecord(true);
             }

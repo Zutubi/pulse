@@ -1,10 +1,9 @@
 package com.zutubi.validation.validators;
 
-import com.zutubi.validation.FieldValidator;
 import com.zutubi.validation.ValidationException;
 
 /**
- * <class-comment/>
+ * Validates that numerical values fall within some range.
  */
 public class NumericValidator extends FieldValidatorSupport
 {
@@ -12,26 +11,26 @@ public class NumericValidator extends FieldValidatorSupport
 
     public static final String MAX = ".max";
 
-    private int max = Integer.MAX_VALUE;
+    private long max = Long.MAX_VALUE;
     
-    private int min = Integer.MIN_VALUE;
+    private long min = Long.MIN_VALUE;
 
-    public void setMax(int max)
+    public void setMax(long max)
     {
         this.max = max;
     }
 
-    public void setMin(int min)
+    public void setMin(long min)
     {
         this.min = min;
     }
 
-    public int getMax()
+    public long getMax()
     {
         return max;
     }
 
-    public int getMin()
+    public long getMin()
     {
         return min;
     }
@@ -44,13 +43,32 @@ public class NumericValidator extends FieldValidatorSupport
             Integer integerValue = (Integer) value;
             if (integerValue < min)
             {
-                validationContext.addFieldError(getFieldName(), getFieldName() + MIN);
+                addError(MIN);
             }
 
             if (max < integerValue)
             {
-                validationContext.addFieldError(getFieldName(), getFieldName() + MAX);
+                addError(MAX);
             }
         }
+        else if (value instanceof Long)
+        {
+            Long longValue = (Long) value;
+            if (longValue < min)
+            {
+                addError(MIN);
+            }
+
+            if (max < longValue)
+            {
+                addError(MAX);
+            }
+        }
+    }
+
+    private void addError(String suffix)
+    {
+        setMessageKey(getFieldName() + suffix);
+        addFieldError(getFieldName());
     }
 }

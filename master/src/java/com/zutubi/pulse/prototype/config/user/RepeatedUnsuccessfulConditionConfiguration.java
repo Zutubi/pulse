@@ -2,6 +2,7 @@ package com.zutubi.pulse.prototype.config.user;
 
 import com.zutubi.config.annotations.SymbolicName;
 import com.zutubi.pulse.condition.NotifyConditionFactory;
+import com.zutubi.validation.annotations.Numeric;
 
 /**
  * A condition that becomes true after a run of unsuccessful builds for a
@@ -10,15 +11,16 @@ import com.zutubi.pulse.condition.NotifyConditionFactory;
 @SymbolicName("zutubi.repeatedUnsuccessfulConditionConfig")
 public class RepeatedUnsuccessfulConditionConfiguration extends SubscriptionConditionConfiguration
 {
-    private long after = 5;
+    @Numeric(min = 1)
+    private int after = 5;
     private Units units = Units.BUILDS;
 
-    public long getAfter()
+    public int getAfter()
     {
         return after;
     }
 
-    public void setAfter(long after)
+    public void setAfter(int after)
     {
         this.after = after;
     }

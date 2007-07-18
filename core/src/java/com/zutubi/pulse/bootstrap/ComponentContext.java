@@ -88,7 +88,7 @@ public class ComponentContext
     {
         SpringAutowireSupport support = new SpringAutowireSupport();
         support.setApplicationContext(context);
-        return (U) support.createWiredBean(beanClass);
+        return support.createWiredBean(beanClass);
     }
 
     public static void closeAll()

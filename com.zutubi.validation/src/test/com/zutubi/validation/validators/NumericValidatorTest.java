@@ -36,4 +36,20 @@ public class NumericValidatorTest extends FieldValidatorTestCase
         assertEquals(Arrays.asList("field.max"), validationAware.getFieldErrors("field"));
     }
 
+    public void testMinValidationLong() throws ValidationException
+    {
+        ((NumericValidator)validator).setMin(5);
+        validator.validate(new FieldProvider((long) 3));
+        assertTrue(validationAware.hasFieldErrors());
+        assertEquals(Arrays.asList("field.min"), validationAware.getFieldErrors("field"));
+    }
+
+    public void testMaxValidationLong() throws ValidationException
+    {
+        ((NumericValidator)validator).setMax(2);
+        validator.validate(new FieldProvider((long) 3));
+        assertTrue(validationAware.hasFieldErrors());
+        assertEquals(Arrays.asList("field.max"), validationAware.getFieldErrors("field"));
+    }
+
 }

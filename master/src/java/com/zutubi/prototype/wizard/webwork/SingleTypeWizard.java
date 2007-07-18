@@ -14,8 +14,8 @@ public class SingleTypeWizard extends AbstractTypeWizard
 
     public void initialise()
     {
-        type = (CompositeType) configurationTemplateManager.getType(configPath).getTargetType();
-        addWizardStates(null, type, templateParentRecord);
+        type = (CompositeType) configurationTemplateManager.getType(insertPath).getTargetType();
+        addWizardStates(null, parentPath, type, templateParentRecord);
     }
 
     public void doFinish()
@@ -23,7 +23,7 @@ public class SingleTypeWizard extends AbstractTypeWizard
         super.doFinish();
 
         TypeWizardState recordState = getCompletedStateForType(type);
-        successPath = configurationTemplateManager.insertRecord(configPath, recordState.getDataRecord());
+        successPath = configurationTemplateManager.insertRecord(insertPath, recordState.getDataRecord());
     }
 
     public Type getType()

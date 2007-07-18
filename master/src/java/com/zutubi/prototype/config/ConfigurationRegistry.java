@@ -45,6 +45,7 @@ public class ConfigurationRegistry
 
     public static final String AGENTS_SCOPE = "agents";
     public static final String PROJECTS_SCOPE = "projects";
+    public static final String SETUP_SCOPE = "init";
     public static final String USERS_SCOPE = "users";
 
     private CompositeType transientConfig;
@@ -59,7 +60,7 @@ public class ConfigurationRegistry
         try
         {
             CompositeType setupConfig = registerConfigurationType(SetupConfiguration.class);
-            configurationPersistenceManager.register("init", setupConfig, false);
+            configurationPersistenceManager.register(SETUP_SCOPE, setupConfig, false);
         }
         catch (TypeException e)
         {
@@ -212,7 +213,7 @@ public class ConfigurationRegistry
             userSubscriptionConditionConfig.addExtension("zutubi.allBuildsConditionConfig");
             userSubscriptionConditionConfig.addExtension("zutubi.selectedBuildsConditionConfig");
             userSubscriptionConditionConfig.addExtension("zutubi.customConditionConfig");
-            userSubscriptionConditionConfig.addExtension("zutubi.unsuccessfulConditionConfig");
+            userSubscriptionConditionConfig.addExtension("zutubi.repeatedUnsuccessfulConditionConfig");
 
         }
         catch (TypeException e)

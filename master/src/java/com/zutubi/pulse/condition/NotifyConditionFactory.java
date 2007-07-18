@@ -1,7 +1,8 @@
 package com.zutubi.pulse.condition;
 
-import com.zutubi.util.bean.ObjectFactory;
 import com.zutubi.pulse.core.PulseRuntimeException;
+import com.zutubi.util.bean.DefaultObjectFactory;
+import com.zutubi.util.bean.ObjectFactory;
 
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -28,7 +29,7 @@ public class NotifyConditionFactory
 
     private final static Map<String, Class> typeMap = new HashMap<String, Class>();
 
-    private ObjectFactory objectFactory;
+    private ObjectFactory objectFactory = new DefaultObjectFactory();
 
     static
     {

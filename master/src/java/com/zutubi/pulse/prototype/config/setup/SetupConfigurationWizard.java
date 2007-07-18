@@ -45,8 +45,8 @@ public class SetupConfigurationWizard extends AbstractTypeWizard
         adminConfigType = typeRegistry.getType(AdminUserConfiguration.class);
         serverConfigType = typeRegistry.getType(ServerSettingsConfiguration.class);
 
-        List<AbstractChainableState> states = addWizardStates(null, adminConfigType, null);
-        states = addWizardStates(states, serverConfigType, null);
+        List<AbstractChainableState> states = addWizardStates(null, ConfigurationRegistry.SETUP_SCOPE, adminConfigType, null);
+        states = addWizardStates(states, ConfigurationRegistry.SETUP_SCOPE, serverConfigType, null);
 
         // a bit of custom initialisation
         SystemConfigurationSupport systemConfig = (SystemConfigurationSupport) configurationManager.getSystemConfig();

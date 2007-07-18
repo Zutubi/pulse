@@ -47,7 +47,7 @@ public interface WizardState
 
     FormDescriptor createFormDescriptor(FormDescriptorFactory formDescriptorFactory, String path, String name);
 
-    boolean validate(String path, ValidationAware validationCallback) throws TypeException;
+    boolean validate(ValidationAware validationCallback) throws TypeException;
 
     WizardState getNextState();
 }

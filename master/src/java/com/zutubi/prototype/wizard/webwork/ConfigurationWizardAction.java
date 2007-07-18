@@ -8,6 +8,7 @@ import com.zutubi.prototype.type.CollectionType;
 import com.zutubi.prototype.type.Type;
 import com.zutubi.prototype.type.TypeException;
 import com.zutubi.prototype.type.record.PathUtils;
+import com.zutubi.prototype.type.record.TemplateRecord;
 import com.zutubi.prototype.wizard.Wizard;
 import com.zutubi.prototype.wizard.WizardState;
 import com.zutubi.pulse.bootstrap.ComponentContext;
@@ -89,7 +90,7 @@ public class ConfigurationWizardAction extends ActionSupport
         {
             try
             {
-                return state.validate(path, this);
+                return state.validate(this);
             }
             catch (TypeException e)
             {
@@ -200,8 +201,16 @@ public class ConfigurationWizardAction extends ActionSupport
 
     private String doNext()
     {
-        getWizardInstance().doNext();
-        return "step";
+        if(getWizardInstance().doNext() != null)
+        {
+            return "step";
+        }
+        else
+        {
+            // The next state has no form to show, so head straight for the
+            // finish line.
+            return doFinish();
+        }
     }
 
     private String doCancel()
@@ -277,10 +286,34 @@ public class ConfigurationWizardAction extends ActionSupport
     {
         AbstractTypeWizard wizardInstance = null;
 
-        Type type = configurationTemplateManager.getType(path);
-        if (type instanceof CollectionType)
+        String parentPath = PathUtils.getParentPath(path);
+        Type type;
+        String insertPath;
+        TemplateRecord templateParentRecord = null;
+
+        // The incoming path for a templated scope should hold the template
+        // parent as its last element.
+        if(parentPath != null && configurationTemplateManager.isTemplatedCollection(parentPath))
         {
-            type = ((CollectionType) type).getCollectionType();
+            type = configurationTemplateManager.getType(parentPath).getTargetType();
+            templateParentRecord = (TemplateRecord) configurationTemplateManager.getRecord(path);
+            if (templateParentRecord == null)
+            {
+                throw new IllegalArgumentException("Invalid wizard path '" + path + "': template parent does not exist");
+            }
+
+            insertPath = parentPath;
+        }
+        else
+        {
+            type = configurationTemplateManager.getType(path);
+            insertPath = path;
+
+            if (type instanceof CollectionType)
+            {
+                type = ((CollectionType) type).getCollectionType();
+                parentPath = path;
+            }
         }
 
         Class wizardClass = ConventionSupport.getWizard(type);
@@ -303,7 +336,7 @@ public class ConfigurationWizardAction extends ActionSupport
             ComponentContext.autowire(wizardInstance);
         }
 
-        wizardInstance.setParameters(path, isSelected(CREATE_TEMPLATE));
+        wizardInstance.setParameters(parentPath, insertPath, templateParentRecord, isSelected(CREATE_TEMPLATE));
 
         wizardRequiresLazyInitialisation = true;
         return wizardInstance;

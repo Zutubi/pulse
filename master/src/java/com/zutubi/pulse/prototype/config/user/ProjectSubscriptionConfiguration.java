@@ -1,10 +1,7 @@
 package com.zutubi.pulse.prototype.config.user;
 
 import antlr.collections.AST;
-import com.zutubi.config.annotations.Form;
-import com.zutubi.config.annotations.Reference;
-import com.zutubi.config.annotations.Select;
-import com.zutubi.config.annotations.SymbolicName;
+import com.zutubi.config.annotations.*;
 import com.zutubi.prototype.config.ConfigurationProvider;
 import com.zutubi.pulse.condition.FalseNotifyCondition;
 import com.zutubi.pulse.condition.NotifyCondition;
@@ -45,6 +42,7 @@ public class ProjectSubscriptionConfiguration extends SubscriptionConfiguration
     /**
      * Cache of the parsed and modelled condition.
      */
+    @Transient
     private NotifyCondition notifyCondition = null;
 
     private ConfigurationProvider configurationProvider;

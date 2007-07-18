@@ -26,9 +26,9 @@ public class ProjectConfigurationWizard extends AbstractTypeWizard
         scmType = (CompositeType) projectType.getProperty("scm").getType();
         typeType = (CompositeType) projectType.getProperty("type").getType();
 
-        List<AbstractChainableState> states = addWizardStates(null, projectType, templateParentRecord);
-        states = addWizardStates(states, scmType, (TemplateRecord) (templateParentRecord == null ? null : templateParentRecord.get("scm")));
-        addWizardStates(states, typeType, (TemplateRecord) (templateParentRecord == null ? null : templateParentRecord.get("type")));
+        List<AbstractChainableState> states = addWizardStates(null, parentPath, projectType, templateParentRecord);
+        states = addWizardStates(states, null, scmType, (TemplateRecord) (templateParentRecord == null ? null : templateParentRecord.get("scm")));
+        addWizardStates(states, null, typeType, (TemplateRecord) (templateParentRecord == null ? null : templateParentRecord.get("type")));
     }
 
     public void doFinish()

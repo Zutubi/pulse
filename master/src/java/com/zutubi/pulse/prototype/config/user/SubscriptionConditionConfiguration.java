@@ -1,6 +1,7 @@
 package com.zutubi.pulse.prototype.config.user;
 
 import com.zutubi.config.annotations.SymbolicName;
+import com.zutubi.config.annotations.Transient;
 import com.zutubi.pulse.core.config.AbstractConfiguration;
 
 /**
@@ -10,5 +11,6 @@ import com.zutubi.pulse.core.config.AbstractConfiguration;
 @SymbolicName("zutubi.subscriptionConditionConfig")
 public abstract class SubscriptionConditionConfiguration extends AbstractConfiguration
 {
+    @Transient
     public abstract String getExpression();
 }

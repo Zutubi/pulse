@@ -25,14 +25,14 @@ public class SubscriptionConfigurationWizard extends AbstractTypeWizard
         projectSubscriptionType = typeRegistry.getType(ProjectSubscriptionConfiguration.class);
         conditionType = typeRegistry.getType(SubscriptionConditionConfiguration.class);
 
-        List<AbstractChainableState> states = addWizardStates(null, subscriptionType, null);
+        List<AbstractChainableState> states = addWizardStates(null, parentPath, subscriptionType, null);
         addWizardStates(CollectionUtils.filter(states, new Predicate<AbstractChainableState>()
         {
             public boolean satisfied(AbstractChainableState state)
             {
                 return state.getType().equals(projectSubscriptionType);
             }
-        }), conditionType, null);
+        }), null, conditionType, null);
     }
 
     public void doFinish()
@@ -46,7 +46,7 @@ public class SubscriptionConfigurationWizard extends AbstractTypeWizard
             record.put("condition", conditionState.getDataRecord());
         }
 
-        successPath = configurationTemplateManager.insertRecord(configPath, record);
+        successPath = configurationTemplateManager.insertRecord(insertPath, record);
     }
 
     public Type getType()

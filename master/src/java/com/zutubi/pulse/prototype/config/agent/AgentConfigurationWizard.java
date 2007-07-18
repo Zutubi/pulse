@@ -17,7 +17,7 @@ public class AgentConfigurationWizard extends AbstractTypeWizard
     public void initialise()
     {
         agentType = typeRegistry.getType(AgentConfiguration.class);
-        addWizardStates(null, agentType, templateParentRecord);
+        addWizardStates(null, parentPath, agentType, templateParentRecord);
     }
 
     public void doFinish()
