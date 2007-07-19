@@ -1,4 +1,8 @@
 #! /bin/bash
 
-yes
+while true
+do
+    sleep 1
+    echo yes
+done
 
