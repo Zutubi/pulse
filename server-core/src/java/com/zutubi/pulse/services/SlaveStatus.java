@@ -17,16 +17,22 @@ public class SlaveStatus
      */
     private long recipeId = 0;
     /**
+     * If true, this is the first status request the agent has answered since
+     * it booted.  Used to detect agent bounces between pings (CIB-1141).
+     */
+    private boolean first = false;
+    /**
      * If an error occured, a detail message.
      */
     private String message = null;
 
     private long pingTime;
 
-    public SlaveStatus(Status status, long recipeId)
+    public SlaveStatus(Status status, long recipeId, boolean first)
     {
         this.status = status;
         this.recipeId = recipeId;
+        this.first = first;
     }
 
     public SlaveStatus(Status status, String message)
@@ -48,6 +54,11 @@ public class SlaveStatus
     public long getRecipeId()
     {
         return recipeId;
+    }
+
+    public boolean isFirst()
+    {
+        return first;
     }
 
     public String getMessage()

@@ -38,7 +38,7 @@ public class ThreadedRecipeQueueTest extends TestCase implements EventListener
     private Semaphore semaphore;
     private Semaphore errorSemaphore;
     private Semaphore dispatchedSemaphore;
-    private ThreadedRecipeQueueTest.MockAgentManager agentManager;
+    private MockAgentManager agentManager;
     private Slave slave1000;
     private Slave slave2000;
     private Slave slave3000;
@@ -686,7 +686,7 @@ public class ThreadedRecipeQueueTest extends TestCase implements EventListener
     private Agent createAvailableAgent(long type)
     {
         SlaveAgent slaveAgent = new SlaveAgent(createSlave(type), null, null, new MockBuildService(type));
-        slaveAgent.updateStatus(new SlaveStatus(Status.IDLE, 0));
+        slaveAgent.updateStatus(new SlaveStatus(Status.IDLE, 0, false));
         return slaveAgent;
     }
 
@@ -1011,7 +1011,7 @@ public class ThreadedRecipeQueueTest extends TestCase implements EventListener
         public void addSlave(Slave slave)
         {
             SlaveAgent agent = new SlaveAgent(slave, null, null, new MockBuildService(slave.getId()));
-            agent.updateStatus(new SlaveStatus(Status.IDLE, 0));
+            agent.updateStatus(new SlaveStatus(Status.IDLE, 0, false));
             onlineAgents.put(slave.getId(), agent);
         }
 
