@@ -289,7 +289,8 @@ public abstract class PulseTestCase extends TestCase
 
     protected File getTestDataFile(String module, String testName, String extension)
     {
-        return new File(getPulseRoot(), FileSystemUtils.composeFilename(module, "src", "test", getClass().getName().replace('.', File.separatorChar) + "." + testName + "." + extension));
+        String testPart = testName == null ? "" : "." + testName;
+        return new File(getPulseRoot(), FileSystemUtils.composeFilename(module, "src", "test", getClass().getName().replace('.', File.separatorChar) + testPart + "." + extension));
     }
 
     public static File getPulseRoot()
@@ -339,6 +340,15 @@ public abstract class PulseTestCase extends TestCase
                     throw new RuntimeException("Server did not start");
                 }
             }
+        }
+    }
+
+    protected <T> void assertListEquals(List<T> got, T... expected)
+    {
+        assertEquals(expected.length, got.size());
+        for(int i = 0; i < expected.length; i++)
+        {
+            assertEquals(expected[i], got.get(i));
         }
     }
 }

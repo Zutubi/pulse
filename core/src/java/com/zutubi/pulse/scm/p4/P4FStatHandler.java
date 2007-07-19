@@ -32,7 +32,7 @@ public class P4FStatHandler extends P4ErrorDetectingHandler
         this.checkOutOfDate = checkOutOfDate;
     }
 
-    public void handleStdout(String line) throws SCMException
+    public void handleStdout(String line) 
     {
         line = line.trim();
         if(line.length() == 0)

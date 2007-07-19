@@ -19,7 +19,7 @@ public class P4SyncHandler implements P4Handler
         this.ui = ui;
     }
 
-    public void handleStdout(String line) throws SCMException
+    public void handleStdout(String line)
     {
         if(ui != null)
         {
@@ -32,7 +32,7 @@ public class P4SyncHandler implements P4Handler
         }
     }
 
-    public void handleStderr(String line) throws SCMException
+    public void handleStderr(String line)
     {
         if(ui != null)
         {

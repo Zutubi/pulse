@@ -8,8 +8,9 @@ import com.zutubi.pulse.filesystem.remote.CachingRemoteFile;
 import com.zutubi.pulse.scm.*;
 import static com.zutubi.pulse.scm.p4.P4Constants.*;
 import com.zutubi.pulse.util.FileSystemUtils;
-import com.zutubi.pulse.util.SystemUtils;
 import com.zutubi.pulse.util.logging.Logger;
+import com.zutubi.pulse.util.process.AsyncProcess;
+import com.zutubi.pulse.util.process.BufferingCharHandler;
 
 import java.io.File;
 import java.io.IOException;
@@ -18,12 +19,15 @@ import java.net.URLEncoder;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class P4Server extends CachingSCMServer
 {
     private static final Logger LOG = Logger.getLogger(P4Server.class);
+
+    private static final long RESOLVE_COMMAND_TIMEOUT = Long.getLong("pulse.p4.client.command.timeout", 300);
 
     private P4Client client;
     private String templateClient;
@@ -65,15 +69,33 @@ public class P4Server extends CachingSCMServer
 
                 scope.add(new Property("revision.spec", revisionSpec));
 
+                Process p;
                 try
                 {
                     List<String> command = VariableHelper.splitAndReplaceVariables(commandLine, scope, true);
-                    resolved = SystemUtils.runCommand(command.toArray(new String[command.size()])).trim();
+                    p = Runtime.getRuntime().exec(command.toArray(new String[command.size()]));
+                }
+                catch(Exception e)
+                {
+                    throw new SCMException("Error starting template client generation command: " + e.getMessage(), e);
+                }
+
+                BufferingCharHandler handler = new BufferingCharHandler();
+                AsyncProcess ap = new AsyncProcess(p, handler, false);
+
+                try
+                {
+                    ap.waitForSuccessOrThrow(RESOLVE_COMMAND_TIMEOUT, TimeUnit.SECONDS);
+                    resolved = handler.getStdout().trim();
                 }
                 catch (Exception e)
                 {
                     LOG.severe(e);
                     throw new SCMException("Error running template client generation command: " + e.getMessage(), e);
+                }
+                finally
+                {
+                    ap.destroy();
                 }
             }
             else
@@ -693,7 +715,7 @@ public class P4Server extends CachingSCMServer
 
         client.runP4WithHandler(new P4ErrorDetectingHandler(true)
         {
-            public void handleStdout(String line) throws SCMException
+            public void handleStdout(String line)
             {
                 if (line.startsWith("LineEnd:"))
                 {

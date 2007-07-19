@@ -5,7 +5,6 @@ import com.zutubi.pulse.core.model.FileRevision;
 import com.zutubi.pulse.core.model.NumericalFileRevision;
 import com.zutubi.pulse.scm.SCMCancelledException;
 import com.zutubi.pulse.scm.SCMCheckoutEventHandler;
-import com.zutubi.pulse.scm.SCMException;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -24,7 +23,7 @@ public class P4CheckoutHandler extends P4ErrorDetectingHandler
         this.handler = handler;
     }
 
-    public void handleStdout(String line) throws SCMException
+    public void handleStdout(String line)
     {
         if (handler != null)
         {

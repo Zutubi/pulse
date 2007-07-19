@@ -7,8 +7,8 @@ import com.zutubi.pulse.scm.SCMException;
  */
 public interface P4Handler
 {
-    void handleStdout(String line) throws SCMException;
-    void handleStderr(String line) throws SCMException;
+    void handleStdout(String line);
+    void handleStderr(String line);
     void handleExitCode(int code) throws SCMException;
 
     void checkCancelled() throws SCMCancelledException;
