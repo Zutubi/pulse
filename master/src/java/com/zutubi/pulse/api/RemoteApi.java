@@ -281,6 +281,58 @@ public class RemoteApi implements com.zutubi.pulse.events.EventListener
         }
     }
 
+    public Vector<Hashtable<String, Object>> queryBuildsForProject(String token, String projectName, String[] resultStates, String[] buildSpecifications, long earliestStartTime, long latestStartTime, int firstResult, int maxResults, boolean mostRecentFirst) throws AuthenticationException
+    {
+        tokenManager.verifyUser(token);
+        Project project = internalGetProject(projectName);
+
+        List<BuildResult> builds = buildManager.queryBuilds(new Project[]{project}, mapStates(resultStates), mapSpecs(buildSpecifications, project), earliestStartTime, latestStartTime, null, firstResult, maxResults, mostRecentFirst);
+        Vector<Hashtable<String, Object>> result = new Vector<Hashtable<String, Object>>(builds.size());
+        for (BuildResult build : builds)
+        {
+            Hashtable<String, Object> buildDetails = convertResult(build);
+            result.add(buildDetails);
+        }
+
+        return result;
+    }
+
+    private PersistentName[] mapSpecs(String[] buildSpecifications, Project project)
+    {
+        if (buildSpecifications.length > 0)
+        {
+            PersistentName[] specs = new PersistentName[buildSpecifications.length];
+            for(int i = 0; i < buildSpecifications.length; i++)
+            {
+                specs[i] = getBuildSpecification(project, buildSpecifications[i]).getPname();
+            }
+
+            return specs;
+        }
+        else
+        {
+            return null;
+        }
+    }
+
+    private ResultState[] mapStates(String[] stateNames)
+    {
+        if(stateNames.length > 0)
+        {
+            ResultState[] states = new ResultState[stateNames.length];
+            for(int i = 0; i < stateNames.length; i++)
+            {
+                states[i] = ResultState.fromPrettyString(stateNames[i]);
+            }
+
+            return states;
+        }
+        else
+        {
+            return null;
+        }
+    }
+
     public Vector<Hashtable<String, Object>> getLatestBuildsForProject(String token, String projectName, String buildSpecification, boolean completedOnly, int maxResults) throws AuthenticationException
     {
         tokenManager.verifyUser(token);

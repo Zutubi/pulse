@@ -216,4 +216,17 @@ public enum ResultState
     {
         return new ResultState[] { INITIAL, IN_PROGRESS, TERMINATING };
     }
+
+    public static ResultState fromPrettyString(String prettyString)
+    {
+        for(ResultState state: values())
+        {
+            if(state.getPrettyString().equals(prettyString))
+            {
+                return state;
+            }
+        }
+
+        throw new IllegalArgumentException("No such result state '" + prettyString + "'");
+    }
 }
