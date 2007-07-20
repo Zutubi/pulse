@@ -38,4 +38,26 @@ public class XCodePostProcessor extends PostProcessorGroup
         xcode.setTrailingContext(6);
         add(xcode);
     }
+
+    public void setLeadingContext(int leadingContext)
+    {
+        for(PostProcessor child: getProcessors())
+        {
+            if(child instanceof RegexPostProcessor)
+            {
+                ((RegexPostProcessor)child).setLeadingContext(leadingContext);
+            }
+        }
+    }
+
+    public void setTrailingContext(int trailingContext)
+    {
+        for(PostProcessor child: getProcessors())
+        {
+            if(child instanceof RegexPostProcessor)
+            {
+                ((RegexPostProcessor)child).setTrailingContext(trailingContext);
+            }
+        }
+    }
 }
