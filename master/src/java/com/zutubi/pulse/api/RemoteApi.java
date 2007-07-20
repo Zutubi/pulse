@@ -427,6 +427,7 @@ public class RemoteApi implements com.zutubi.pulse.events.EventListener
         buildDetails.put("project", build.getProject().getName());
         buildDetails.put("specification", build.getBuildSpecification());
         buildDetails.put("status", build.getState().getPrettyString());
+        buildDetails.put("revision", getBuildRevision(build));
         buildDetails.put("completed", build.completed());
         buildDetails.put("succeeded", build.succeeded());
 
@@ -443,6 +444,21 @@ public class RemoteApi implements com.zutubi.pulse.events.EventListener
         }
 
         return buildDetails;
+    }
+
+    private String getBuildRevision(BuildResult build)
+    {
+        BuildScmDetails details = build.getScmDetails();
+        if(details != null)
+        {
+            Revision revision = details.getRevision();
+            if(revision != null)
+            {
+                return revision.getRevisionString();
+            }
+        }
+
+        return "";
     }
 
     public Vector<Hashtable<String, Object>> getChangesInBuild(String token, String projectName, int id) throws AuthenticationException
