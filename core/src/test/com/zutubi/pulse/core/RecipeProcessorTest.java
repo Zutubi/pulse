@@ -242,7 +242,7 @@ public class RecipeProcessorTest extends PulseTestCase implements EventListener
     {
         List<ResourceProperty> properties = new ArrayList<ResourceProperty>(1);
         properties.add(new ResourceProperty("property1", "propvalue", true, true, true));
-        recipeProcessor.build(new RecipeRequest("project", "spec", 1, new SimpleBootstrapper(), getPulseFile("properties"), "default", false, null, properties), new SimpleRecipePaths(baseDir, outputDir), resourceRepository, false, new BuildContext());
+        recipeProcessor.build(new RecipeRequest("project", "spec", 1, new SimpleBootstrapper(), getPulseFile("properties"), "default", false, false, false, null, properties), new SimpleRecipePaths(baseDir, outputDir), resourceRepository, false, new BuildContext());
         assertRecipeCommenced(1, "default");
         assertCommandCommenced(1, "bootstrap");
         assertCommandCompleted(1, ResultState.SUCCESS);

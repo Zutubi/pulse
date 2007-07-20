@@ -6,8 +6,6 @@ import com.zutubi.pulse.bootstrap.ConfigurationManager;
 import com.zutubi.pulse.services.InvalidTokenException;
 import com.zutubi.pulse.services.ServiceTokenManager;
 import com.zutubi.pulse.util.IOUtils;
-import com.zutubi.pulse.util.RandomUtils;
-import com.zutubi.pulse.util.ZipUtils;
 import com.zutubi.pulse.util.logging.Logger;
 
 import javax.servlet.http.HttpServlet;
@@ -19,6 +17,8 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 
 /**
+ * A servlet used to download build results from an agent.  The results can
+ * be either the artifacts or the working directory snapshot.
  */
 public class DownloadResultsServlet extends HttpServlet
 {
@@ -50,24 +50,19 @@ public class DownloadResultsServlet extends HttpServlet
 
             // lookup the recipe location, zip it up and write to output.
             ServerRecipePaths paths = new ServerRecipePaths(project, spec, recipeId, getConfigurationManager().getUserPaths().getData(), incremental);
-            File dir;
             File zipFile;
 
             if (output)
             {
-                dir = paths.getOutputDir();
-                zipFile = new File(paths.getOutputZip().getAbsolutePath() + RandomUtils.randomString(10));
+                zipFile = new File(paths.getOutputDir().getAbsolutePath() + ".zip");
             }
             else
             {
-                dir = paths.getBaseDir();
-                zipFile = new File(paths.getBaseZip().getAbsolutePath() + RandomUtils.randomString(10));
+                zipFile = new File(paths.getBaseDir().getAbsolutePath() + ".zip");
             }
 
             try
             {
-                ZipUtils.createZip(zipFile, dir, null);
-
                 response.setContentType("application/x-octet-stream");
                 response.setContentLength((int) zipFile.length());
 
@@ -93,7 +88,6 @@ public class DownloadResultsServlet extends HttpServlet
             catch (IOException e)
             {
                 LOG.warning(e);
-                response.sendError(500, "I/O error: " + e.getMessage());
             }
         }
         catch (NumberFormatException e)

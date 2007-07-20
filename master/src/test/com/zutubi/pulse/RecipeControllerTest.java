@@ -56,7 +56,7 @@ public class RecipeControllerTest extends PulseTestCase
         childNode.setId(103);
         rootNode.addChild(childNode);
 
-        recipeRequest = new RecipeRequest("project", "spec", rootResult.getId(), rootResult.getRecipeName(), false);
+        recipeRequest = new RecipeRequest("project", "spec", rootResult.getId(), rootResult.getRecipeName());
         BuildResult build = new BuildResult();
         BuildSpecificationNode specificationNode = new BuildSpecificationNode();
         dispatchRequest = new RecipeDispatchRequest(new MasterBuildHostRequirements(), new BuildRevision(), recipeRequest, null);
@@ -92,7 +92,7 @@ public class RecipeControllerTest extends PulseTestCase
 
         // After dispatching, the controller should handle a dispatched event
         // by recording the build service on the result node.
-        RecipeDispatchedEvent event = new RecipeDispatchedEvent(this, new RecipeRequest("project", "spec", rootResult.getId(), "test", false), new MockAgent(buildService));
+        RecipeDispatchedEvent event = new RecipeDispatchedEvent(this, new RecipeRequest("project", "spec", rootResult.getId(), "test"), new MockAgent(buildService));
         assertTrue(recipeController.handleRecipeEvent(event));
         assertEquals(buildService.getHostName(), rootNode.getHost());
 
@@ -457,6 +457,10 @@ public class RecipeControllerTest extends PulseTestCase
         }
 
         public void log(RecipeCompletedEvent event, RecipeResult result)
+        {
+        }
+
+        public void log(RecipeStatusEvent event)
         {
         }
 

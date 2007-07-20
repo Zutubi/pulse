@@ -15,6 +15,8 @@ public class RecipeRequest
     private String project;
     private String spec;
     private boolean incremental;
+    private boolean compressArtifacts;
+    private boolean compressWorkingCopy;
     /**
      * The unique identifier for the execution of this recipe.
      */
@@ -42,27 +44,22 @@ public class RecipeRequest
      */
     private List<ResourceProperty> properties;
 
-    public RecipeRequest(String project, String spec, long id, String recipeName, boolean incremental)
+    public RecipeRequest(String project, String spec, long id, String recipeName)
     {
-        this(project, spec, id, recipeName, incremental, null, null);
+        this(project, spec, id, recipeName, false, false, false, null, null);
     }
 
-    public RecipeRequest(String project, String spec, long id, String recipeName, boolean incremental, List<ResourceRequirement> resourceRequirements, List<ResourceProperty> properties)
+    public RecipeRequest(String project, String spec, long id, String recipeName, boolean incremental, boolean compressArtifacts, boolean compressWorkingCopy, List<ResourceRequirement> resourceRequirements, List<ResourceProperty> properties)
     {
-        this(project, spec, id, null, null, recipeName, incremental, resourceRequirements, properties);
+        this(project, spec, id, null, null, recipeName, incremental, compressArtifacts, compressWorkingCopy, resourceRequirements, properties);
     }
 
     public RecipeRequest(long id, Bootstrapper bootstrapper, String pulseFileSource, String recipeName)
     {
-        this(null, null, id, bootstrapper, pulseFileSource, recipeName, false, null, null);
+        this(null, null, id, bootstrapper, pulseFileSource, recipeName, false, false, false, null, null);
     }
 
-    public RecipeRequest(String project, String spec, long id, Bootstrapper bootstrapper, String pulseFileSource, String recipeName, boolean incremental)
-    {
-        this(project, spec, id, bootstrapper, pulseFileSource, recipeName, incremental, null, null);
-    }
-
-    public RecipeRequest(String project, String spec, long id, Bootstrapper bootstrapper, String pulseFileSource, String recipeName, boolean incremental, List<ResourceRequirement> resourceRequirements, List<ResourceProperty> properties)
+    public RecipeRequest(String project, String spec, long id, Bootstrapper bootstrapper, String pulseFileSource, String recipeName, boolean incremental, boolean compressArtifacts, boolean compressWorkingCopy, List<ResourceRequirement> resourceRequirements, List<ResourceProperty> properties)
     {
         this.project = project;
         this.spec = spec;
@@ -71,6 +68,8 @@ public class RecipeRequest
         this.pulseFileSource = pulseFileSource;
         this.recipeName = recipeName;
         this.incremental = incremental;
+        this.compressArtifacts = compressArtifacts;
+        this.compressWorkingCopy = compressWorkingCopy;
         this.resourceRequirements = resourceRequirements;
         this.properties = properties;
     }
@@ -88,6 +87,16 @@ public class RecipeRequest
     public boolean isIncremental()
     {
         return incremental;
+    }
+
+    public boolean getCompressArtifacts()
+    {
+        return compressArtifacts;
+    }
+
+    public boolean getCompressWorkingCopy()
+    {
+        return compressWorkingCopy;
     }
 
     public long getId()

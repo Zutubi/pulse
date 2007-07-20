@@ -86,6 +86,11 @@ public class DefaultRecipeLogger implements RecipeLogger
         // Do nothing: completion message comes from complete
     }
 
+    public void log(RecipeStatusEvent event)
+    {
+        logMarker(event.getMessage());
+    }
+
     public void log(RecipeErrorEvent event, RecipeResult result)
     {
         logMarker("Recipe terminated with an error: " + event.getErrorMessage(), System.currentTimeMillis());

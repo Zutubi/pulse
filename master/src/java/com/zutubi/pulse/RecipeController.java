@@ -121,6 +121,10 @@ public class RecipeController
             {
                 handleRecipeCompleted((RecipeCompletedEvent) event);
             }
+            else if (event instanceof RecipeStatusEvent)
+            {
+                logger.log((RecipeStatusEvent) event);
+            }
             else if (event instanceof RecipeErrorEvent)
             {
                 handleRecipeError((RecipeErrorEvent) event);

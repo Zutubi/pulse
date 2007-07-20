@@ -701,7 +701,7 @@ public class ThreadedRecipeQueueTest extends TestCase implements EventListener
         project.setScm(scm);
         BuildResult result = new BuildResult(new UnknownBuildReason(), project, new BuildSpecification("spec"), 100, false);
         BuildHostRequirements requirements = new MockBuildHostRequirements(type);
-        RecipeRequest request = new RecipeRequest("project", "spec", id, null, null, null, false, null, new LinkedList<ResourceProperty>());
+        RecipeRequest request = new RecipeRequest("project", "spec", id, null, null, null, false, false, false, null, new LinkedList<ResourceProperty>());
         request.setBootstrapper(new ChainBootstrapper());
         return new RecipeDispatchRequest(requirements, new BuildRevision(), request, result);
     }

@@ -4,13 +4,11 @@ import com.opensymphony.util.TextUtils;
 import com.zutubi.pulse.BuildContext;
 import com.zutubi.pulse.core.model.*;
 import com.zutubi.pulse.events.EventManager;
-import com.zutubi.pulse.events.build.CommandCommencedEvent;
-import com.zutubi.pulse.events.build.CommandCompletedEvent;
-import com.zutubi.pulse.events.build.RecipeCommencedEvent;
-import com.zutubi.pulse.events.build.RecipeCompletedEvent;
+import com.zutubi.pulse.events.build.*;
 import com.zutubi.pulse.model.ResourceRequirement;
 import com.zutubi.pulse.util.FileSystemUtils;
 import com.zutubi.pulse.util.IOUtils;
+import com.zutubi.pulse.util.ZipUtils;
 import com.zutubi.pulse.util.logging.Logger;
 
 import java.io.ByteArrayInputStream;
@@ -113,8 +111,13 @@ public class RecipeProcessor
         }
         finally
         {
+            eventManager.publish(new RecipeStatusEvent(this, runningRecipe, "Storing test results..."));
             writeTestResults(paths, testResults);
             result.setTestSummary(testResults.getSummary());
+            eventManager.publish(new RecipeStatusEvent(this, runningRecipe, "Test results stored."));
+
+            compressResults(paths, request.getCompressArtifacts(), request.getCompressWorkingCopy());
+
             result.complete();
             RecipeCompletedEvent completedEvent = new RecipeCompletedEvent(this, result);
             if(context != null)
@@ -132,6 +135,43 @@ public class RecipeProcessor
                 terminating = false;
             }
             runningLock.unlock();
+        }
+    }
+
+    private void compressResults(RecipePaths paths, boolean compressArtifacts, boolean compressWorkingCopy)
+    {
+        if (compressArtifacts)
+        {
+            eventManager.publish(new RecipeStatusEvent(this, runningRecipe, "Compressing recipe artifacts..."));
+            if(zipDir(paths.getOutputDir()))
+            {
+                eventManager.publish(new RecipeStatusEvent(this, runningRecipe, "Artifacts compressed."));
+            }
+        }
+
+        if(compressWorkingCopy)
+        {
+            eventManager.publish(new RecipeStatusEvent(this, runningRecipe, "Compressing working copy snapshot..."));
+            if(zipDir(paths.getOutputDir()))
+            {
+                eventManager.publish(new RecipeStatusEvent(this, runningRecipe, "Working copy snapshot compressed."));
+            }
+        }
+    }
+
+    private boolean zipDir(File dir)
+    {
+        try
+        {
+            File zipFile = new File(dir.getAbsolutePath() + ".zip");
+            ZipUtils.createZip(zipFile, dir, null);
+            return true;
+        }
+        catch (IOException e)
+        {
+            LOG.severe(e);
+            eventManager.publish(new RecipeStatusEvent(this, runningRecipe, "Compression failed: " + e.getMessage() + "."));
+            return false;
         }
     }
 

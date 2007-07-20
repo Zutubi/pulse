@@ -152,7 +152,6 @@ public class ZipUtils
                     {
                         command.add(f);
                     }
-
                 }
                 else
                 {
