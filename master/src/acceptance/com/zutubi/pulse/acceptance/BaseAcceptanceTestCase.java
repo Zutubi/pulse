@@ -207,13 +207,6 @@ public abstract class BaseAcceptanceTestCase extends ExtendedWebTestCase
         form.nextFormElements(root, module, password, "", "", "");
     }
 
-    protected void submitProjectBasicsForm(String projectName, String description, String url, String scm, String type)
-    {
-        AddProjectWizard.Select form = new AddProjectWizard.Select(tester);
-        form.assertFormPresent();
-        form.nextFormElements(projectName, description, url, scm, type);
-    }
-
     protected void ensureUser(String login) throws Exception
     {
         Vector<String> users = (Vector<String>) callRemoteApi("getAllUserLogins");
@@ -222,19 +215,6 @@ public abstract class BaseAcceptanceTestCase extends ExtendedWebTestCase
             clickLink(Navigation.TAB_ADMINISTRATION);
             clickLink(Navigation.Administration.TAB_USERS);
             submitCreateUserForm(login, login, login, login);
-        }
-    }
-
-    protected void ensureProject(String name) throws Exception
-    {
-        Vector<String> projects = (Vector<String>) callRemoteApi("getAllProjectNames");
-        if(!projects.contains(name))
-        {
-            clickLink(Navigation.TAB_PROJECTS);
-            clickLink(Navigation.Projects.LINK_ADD_PROJECT);
-            submitProjectBasicsForm(name, "desc", "url", "cvs", "ant");
-            submitCvsSetupForm(TEST_CVSROOT, "module", "", "");
-            submitAntSetupForm();
         }
     }
 

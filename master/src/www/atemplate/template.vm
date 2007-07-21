@@ -1,28 +1,29 @@
-<h2>$!webwork.htmlEncode($id)</h2>
+<h2 id="$path">$!webwork.htmlEncode($id)</h2>
+
 <p></p>
 
-#macro(actionHeader $action $img $onclick)
-    <th><img alt="$action" src="$base/images/${img}.gif"/> <a href="#" onclick="$onclick; return false">$action</a></th>
+#macro(actionHeader $id $action $img $onclick)
+    <th><img alt="$action" src="$base/images/${img}.gif"/> <a href="#" onclick="$onclick; return false" id="$id">$action</a></th>
 #end
 
 <table class="template-actions" cellspacing="5px">
     <tr>
-        #actionHeader("configure" "pencil" "configureRecord('$path')")
+        #actionHeader("configure" "configure" "pencil" "configureRecord('$path')")
         <td>jump to the configuration for this #i18n("key=label") #if(!$concrete) template #end</td>
     </tr>
 #if(!$concrete)
     <tr>
-        #actionHeader("add new" "add" "addToPath('$path', false)")
+        #actionHeader("add.new" "add new" "add" "addToPath('$path', false)")
         <td>add a new #i18n("key=label") as a child of this template</td>
     </tr>
     <tr>
-        #actionHeader("add new template" "add" "addToPath('$path', true)")
+        #actionHeader("add.template" "add new template" "add" "addToPath('$path', true)")
         <td>add a new #i18n("key=label") template as a child of this template</td>
     </tr>
 #end
 #if(!$rootTemplate || $node.children.size() == 0)
     <tr>
-        #actionHeader("delete" "delete" "deletePath('$path')")
+        #actionHeader("delete" "delete" "delete" "deletePath('$path')")
         <td>delete this #i18n("key=label") #if(!$concrete) template #end</td>
     </tr>
 #end

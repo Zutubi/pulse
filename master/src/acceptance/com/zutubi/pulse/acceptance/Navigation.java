@@ -1,10 +1,15 @@
 package com.zutubi.pulse.acceptance;
 
 /**
- * <class comment/>
+ * Constants for navigating around the Pulse web UI.
  */
 public class Navigation
 {
+    public static final String LOCATION_LOGIN = "login.action";
+    
+    public static final String LOCATION_ADMINISTRATION = "admin";
+    public static final String LOCATION_PROJECT_CONFIG = LOCATION_ADMINISTRATION + "/projects/";
+
     public static final String TAB_ADMINISTRATION = "tab.administration";
     public static final String TAB_PROJECTS = "tab.projects";
     public static final String TAB_DASHBOARD = "tab.dashboard";

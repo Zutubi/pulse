@@ -23,7 +23,6 @@ public class FormDescriptorFactoryTest extends TestCase
 
         typeRegistry = new TypeRegistry();
         descriptorFactory = new FormDescriptorFactory();
-        descriptorFactory.setTypeRegistry(typeRegistry);
     }
 
     protected void tearDown() throws Exception

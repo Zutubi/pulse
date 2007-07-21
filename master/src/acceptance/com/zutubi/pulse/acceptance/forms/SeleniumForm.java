@@ -1,6 +1,7 @@
 package com.zutubi.pulse.acceptance.forms;
 
 import com.thoughtworks.selenium.Selenium;
+import com.zutubi.pulse.acceptance.SeleniumUtils;
 import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.Mapping;
 import junit.framework.Assert;
@@ -11,17 +12,30 @@ import junit.framework.TestCase;
  */
 public abstract class SeleniumForm
 {
-    protected final Selenium selenium;
     protected static final int TEXTFIELD = 3;
     protected static final int CHECKBOX = 4;
     protected static final int RADIOBOX = 5;
-    protected static final int SELECT = 6;
+    protected static final int COMBOBOX = 6;
     protected static final int MULTI_CHECKBOX = 7;
     protected static final int MULTI_SELECT = 8;
+
+    protected Selenium selenium;
+    protected boolean ajax = true;
 
     public SeleniumForm(Selenium selenium)
     {
         this.selenium = selenium;
+    }
+
+    protected SeleniumForm(Selenium selenium, boolean ajax)
+    {
+        this.selenium = selenium;
+        this.ajax = ajax;
+    }
+
+    public void waitFor()
+    {
+        SeleniumUtils.waitForElement(selenium, getFormName());
     }
 
     public void assertFormPresent()
@@ -55,10 +69,6 @@ public abstract class SeleniumForm
      * returns an array of TEXTFIELD identifiers.
      *
      * @return an array of form field identifiers.
-     * @see SeleniumForm#TEXTFIELD
-     * @see SeleniumForm#CHECKBOX
-     * @see SeleniumForm#RADIOBOX
-     * @see SeleniumForm#SELECT
      */
     public int[] getFieldTypes()
     {
@@ -104,7 +114,10 @@ public abstract class SeleniumForm
     private void submit(String id)
     {
         selenium.click("zfid." + id);
-        selenium.waitForPageToLoad("30000");
+        if (!ajax)
+        {
+            selenium.waitForPageToLoad("30000");
+        }
     }
 
     public String getFieldValue(String name)
@@ -128,10 +141,12 @@ public abstract class SeleniumForm
                         selenium.type(locator, values[i]);
                     }
                     break;
-                case SELECT:
+                case COMBOBOX:
                     if (values[i] != null)
                     {
-                        selenium.select(locator, values[i]);
+                        // Combos are custom ext widgets, so we just poke a
+                        // value into the underlying hidden input field.
+                        selenium.getEval("selenium.browserbot.getCurrentWindow().document.getElementById('zfid." + getFieldNames()[i] + "').value = '" + values[i] + "';");
                     }
                     break;
                 case CHECKBOX:
@@ -185,7 +200,7 @@ public abstract class SeleniumForm
                     // FIXME
                     TestCase.fail();
                     break;
-                case SELECT:
+                case COMBOBOX:
                     TestCase.assertEquals(values[i], getFieldValue(fieldName));
                     break;
                 case MULTI_CHECKBOX:

@@ -41,7 +41,7 @@ public class SetupAcceptanceTest extends SeleniumTestBase
     public void testSetupProcess() throws InterruptedException, IOException, SAXException
     {
         // first we deal with the pulse home property configuration.
-        selenium.open("http://localhost:" + port + "/setup/setupData!input.action");
+        goTo("setup/setupData!input.action");
 
         // step one. setting the pulse home variable.
         checkSetPulseData();
@@ -56,8 +56,8 @@ public class SetupAcceptanceTest extends SeleniumTestBase
         checkServerSettings();
 
         assertTextPresent("system setup");
-        selenium.waitForCondition("selenium.browserbot.getCurrentWindow().document.getElementById('welcome.heading') != null", "60000");
-
+        waitForElement("welcome.heading", 60000);
+        
         // one complete, we should see the home page, and it should contain the following:
         assertTextPresent(":: welcome ::");
         assertTextPresent("A. D. Ministrator");

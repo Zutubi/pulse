@@ -48,7 +48,6 @@ public class FormDescriptorFactory
 
     private Map<String, Class<? extends FieldDescriptor>> fieldDescriptorTypes = new HashMap<String, Class<? extends FieldDescriptor>>();
     private ConfigurationTemplateManager configurationTemplateManager;
-    private TypeRegistry typeRegistry;
 
 
     public void init()
@@ -265,11 +264,6 @@ public class FormDescriptorFactory
                 }
             }
         }
-    }
-
-    public void setTypeRegistry(TypeRegistry typeRegistry)
-    {
-        this.typeRegistry = typeRegistry;
     }
 
     public void setObjectFactory(ObjectFactory objectFactory)

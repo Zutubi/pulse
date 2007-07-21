@@ -20,9 +20,9 @@ public class ConfigureDashboardAcceptanceTest extends BaseAcceptanceTestCase
     {
         super.setUp();
         loginAsAdmin();
-        ensureProject(P1);
-        ensureProject(P2);
-        ensureProject(P3);
+//        ensureProject(P1);
+//        ensureProject(P2);
+//        ensureProject(P3);
         ensureProjectGroup(G1, P1, P3);
         ensureProjectGroup(G2, P2, P3);
 
