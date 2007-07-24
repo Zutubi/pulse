@@ -46,7 +46,6 @@ public interface ProjectManager extends EntityManager<Project>
     @Secured({"ROLE_ADMINISTRATOR"})
     void delete(Project project);
 
-    @Secured({"ROLE_ADMINISTRATOR", "ACL_PROJECT_WRITE"})
     void save(Project project);
 
     @Secured({"ACL_PROJECT_WRITE"})
